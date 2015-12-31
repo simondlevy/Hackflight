@@ -1,0 +1,34 @@
+{
+  "ATTITUDE": [{"ID": 108},
+               {"comment" : "angles should be divided by 10"},
+               {"angx"    : "short"}, 
+               {"angy"    : "short"},
+               {"heading" : "short"}],
+
+  "RC":       [{"ID": 105},
+               {"comment": "16 channels in http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol"}, 
+               {"c1": "short"}, 
+               {"c2": "short"}, 
+               {"c3": "short"}, 
+               {"c4": "short"}, 
+               {"c5": "short"}, 
+               {"c6": "short"}, 
+               {"c7": "short"}, 
+               {"c8": "short"}],
+
+  "SET_RAW_RC": [{"ID": 200},
+                 {"comment": "16 channels in http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol"}, 
+                 {"c1": "short"}, 
+                 {"c2": "short"}, 
+                 {"c3": "short"}, 
+                 {"c4": "short"}, 
+                 {"c5": "short"}, 
+                 {"c6": "short"}, 
+                 {"c7": "short"}, 
+                 {"c8": "short"}],
+
+  "PX4FLOW": [{"ID": 125},
+               {"comment": " ttps://pixhawk.org/modules/px4flow#i2c"},
+               {"pixel_flow_x_sum": "short"}, 
+               {"pixel_flow_y_sum": "short"}]
+}
