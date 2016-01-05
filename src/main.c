@@ -115,7 +115,8 @@ int main(void)
     // trigger accelerometer calibration requirement
     useSmallAngle = 1;
     
-    px4flow_available = initPX4Flow();
+    mb1242_available = initMB1242();
+    //px4flow_available = initPX4Flow();
     //lidarlite_available = initLidarLite();
 
     // loopy

@@ -57,9 +57,11 @@ uint8_t armed;
 uint8_t px4flow_available;
 px4flow_frame_t px4flow_frame;
 
+uint8_t lidarlite_available;
 uint16_t lidarlite_distance;
 
-uint8_t lidarlite_available;
+uint8_t mb1242_available;
+uint16_t mb1242_distance;
 
 extern int16_t gyroZero[3];
 extern int16_t gyroData[3];

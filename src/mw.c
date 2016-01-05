@@ -371,12 +371,14 @@ void loop(void)
             case 0:
                 taskOrder++;
             case 1:
-                if (px4flow_available)
-                    pollPX4Flow();
+                //if (px4flow_available)
+                //    pollPX4Flow();
                 taskOrder++;
             case 2:
-                if (lidarlite_available)
-                    pollLidarLite();
+                if (mb1242_available) {
+                    pollMB1242();
+                    printf("%d\n", mb1242_distance);
+                }
                 taskOrder++;
             case 3:
                 // if GPS feature is enabled, gpsThread() will be called at some intervals to check for stuck

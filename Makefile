@@ -57,24 +57,6 @@ COMMON_SRC	 = imu.c \
 		   $(CMSIS_SRC) \
 		   $(STDPERIPH_SRC)
 
-COMMON_SRC	 = imu.c \
-		   main.c \
-		   mixer.c \
-		   mw.c \
-		   sensors.c \
-		   serial.c \
-		   rxmsp.c \
-		   drv_gpio.c \
-		   drv_i2c.c \
-		   drv_system.c \
-		   drv_serial.c \
-		   drv_uart.c \
-		   printf.c \
-		   utils.c \
-		   startup_stm32f10x_md_gcc.S \
-		   $(CMSIS_SRC) \
-		   $(STDPERIPH_SRC)
-
 # Source files for full-featured systems
 HIGHEND_SRC	 = telemetry_common.c
 
@@ -86,6 +68,7 @@ NAZE_SRC	 = drv_adc.c \
 		   drv_timer.c \
 		   drv_px4flow.c \
 		   drv_lidarlite.c \
+		   drv_mb1242.c \
 		   $(HIGHEND_SRC) \
 		   $(COMMON_SRC)
 

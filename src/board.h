@@ -22,6 +22,7 @@
 #include "drv_gpio.h"
 #include "drv_px4flow.h"
 #include "drv_lidarlite.h"
+#include "drv_mb1242.h"
 #include "utils.h"
 
 #ifndef M_PI
