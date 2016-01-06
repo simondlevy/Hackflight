@@ -12,4 +12,4 @@ flow:
 	./bluepx4flow.py
 
 clean:
-	rm -f logs/* *~
+	rm -rf logs/* output *~

@@ -377,7 +377,6 @@ void loop(void)
             case 2:
                 if (mb1242_available) {
                     pollMB1242();
-                    printf("%d\n", mb1242_distance);
                 }
                 taskOrder++;
             case 3:
