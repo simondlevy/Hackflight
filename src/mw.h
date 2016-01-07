@@ -61,7 +61,7 @@ uint8_t lidarlite_available;
 uint16_t lidarlite_distance;
 
 uint8_t mb1242_available;
-uint16_t mb1242_distance;
+int16_t sonarAlt;
 
 extern int16_t gyroZero[3];
 extern int16_t gyroData[3];
@@ -74,7 +74,7 @@ extern int16_t gyroADC[3], accADC[3], accSmooth[3], magADC[3];
 extern int32_t accSum[3];
 extern uint16_t acc_1G;
 extern uint32_t accTimeSum;
-extern int accSumCount;
+extern int      accSumCount;
 extern uint32_t currentTime;
 extern uint32_t previousTime;
 extern uint16_t cycleTime;
@@ -86,6 +86,7 @@ extern int32_t AltHold;
 extern int32_t setVelocity;
 extern uint8_t velocityControl;
 extern int32_t errorVelocityI;
+extern int32_t AltitudePID;
 extern int32_t vario;
 extern int16_t throttleAngleCorrection;
 extern int16_t headFreeModeHold;
@@ -110,6 +111,7 @@ void loop(void);
 void imuInit(void);
 void computeIMU(void);
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
+int getEstimatedAltitude();
 
 // Sensors
 bool sensorsAutodetect(void);

@@ -84,8 +84,6 @@ typedef struct sensor_t {
 #define LED1_PIN    Pin_4 // PB4 (LED)
 #define BEEP_GPIO   GPIOA
 #define BEEP_PIN    Pin_12 // PA12 (Buzzer)
-#define BARO_GPIO   GPIOC
-#define BARO_PIN    Pin_13
 #define INV_PIN     Pin_2 // PB2 (BOOT1) abused as inverter select GPIO
 #define INV_GPIO    GPIOB
 

@@ -7,6 +7,12 @@ static const uint8_t CONFIG_AXIS_P[3] = {40, 40, 85};
 static const uint8_t CONFIG_AXIS_I[3] = {30, 30, 45};
 static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 
+// altitude
+static const uint8_t CONFIG_ALT_P = 50;
+static const uint8_t CONFIG_VEL_P = 120;
+static const uint8_t CONFIG_VEL_I = 45;
+static const uint8_t CONFIG_VEL_D = 1;
+
 #define CONFIG_USE_CPPM                             1
 #define CONFIG_HORIZON_MODE                         1
 #define CONFIG_CALIBRATING_GYRO_CYCLES              1000
@@ -24,6 +30,8 @@ static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 #define CONFIG_YAW_CONTROL_DIRECTION                1   /* 1 or -1 */
 #define CONFIG_MAX_ANGLE_INCLINATION                500 /* 50 degrees */
 #define CONFIG_MAXCHECK                             1900
+
+#define CONFIG_ALTITUDE_UPDATE_USEC                 25000   // 40hz update rate (20hz LPF on acc)
 
 #define CONFIG_IMU_LOOPTIME_USEC                    3500
 #define CONFIG_RC_LOOPTIME_USEC                     20000

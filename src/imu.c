@@ -7,15 +7,8 @@ int32_t accSum[3];
 uint32_t accTimeSum = 0;        // keep track for integration of acc
 int accSumCount = 0;
 int16_t smallAngle = 0;
-int32_t baroPressure = 0;
-int32_t baroTemperature = 0;
-uint32_t baroPressureSum = 0;
-int32_t BaroAlt = 0;
 float sonarTransition = 0;
-int32_t baroAlt_offset = 0;
-int32_t sonarAlt = -1;         // in cm , -1 indicate sonar is not in range
 int32_t EstAlt;                // in cm
-int32_t BaroPID = 0;
 int32_t AltHold;
 int32_t setVelocity = 0;
 uint8_t velocityControl = 0;
@@ -26,6 +19,7 @@ float magneticDeclination = 0.0f;       // calculated at startup from config
 float accVelScale;
 float throttleAngleScale;
 float fc_acc;
+int32_t AltitudePID = 0;
 
 // **************
 // gyro+acc IMU
@@ -72,7 +66,6 @@ void computeIMU(void)
 // **************************************************
 
 #define INV_GYR_CMPF_FACTOR   (1.0f / ((float)CONFIG_GYRO_CMPF_FACTOR + 1.0f))
-#define INV_GYR_CMPFM_FACTOR  (1.0f / ((float)CONFIG_GYRO_CMPFM_FACTOR + 1.0f))
 
 typedef struct fp_vector {
     float X;
@@ -251,9 +244,9 @@ static void getEstimatedAttitude(void)
 
     rotateV(&EstG.V, deltaGyroAngle);
 
-    // Apply complimentary filter (Gyro drift correction)
-    // If accel magnitude >1.15G or <0.85G and ACC vector outside of the limit range => we neutralize the effect of accelerometers in the angle estimation.
-    // To do that, we just skip filter, as EstV already rotated by Gyro
+    // Apply complementary filter (Gyro drift correction)
+    // If accel magnitude >1.15G or <0.85G and ACC vector outside of the limit range => we neutralize the effect of 
+    // accelerometers in the angle estimation.  To do that, we just skip filter, as EstV already rotated by Gyro.
     if (72 < (uint16_t)accMag && (uint16_t)accMag < 133) {
         for (axis = 0; axis < 3; axis++)
             EstG.A[axis] = (EstG.A[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + accSmooth[axis]) * INV_GYR_CMPF_FACTOR;
@@ -285,6 +278,85 @@ static void getEstimatedAttitude(void)
                 deg = 900;
             throttleAngleCorrection = lrintf(CONFIG_THROTTLE_CORRECTION_VALUE * sinf(deg / (900.0f * M_PI / 2.0f)));
         }
-
     }
+}
+
+int getEstimatedAltitude(void)
+{
+    static uint32_t previousT;
+    uint32_t currentT = micros();
+    uint32_t dTime;
+    int32_t error;
+    int32_t vel_tmp;
+    int32_t setVel;
+    float dt;
+    float vel_acc;
+    float accZ_tmp;
+    static float accZ_old = 0.0f;
+    static float vel = 0.0f;
+    static float accAlt = 0.0f;
+    int16_t tiltAngle = max(abs(angle[ROLL]), abs(angle[PITCH]));
+
+    dTime = currentT - previousT;
+    if (dTime < CONFIG_ALTITUDE_UPDATE_USEC)
+        return 0;
+    previousT = currentT;
+
+    // calculate sonar altitude only if the sonar is facing downwards(<25deg)
+    if (tiltAngle > 250)
+        sonarAlt = -1;
+    else
+        sonarAlt = sonarAlt * (900.0f - tiltAngle) / 900.0f;
+
+    dt = accTimeSum * 1e-6f; // delta acc reading time in seconds
+
+    // Integrator - velocity, cm/sec
+    accZ_tmp = (float)accSum[2] / (float)accSumCount;
+    vel_acc = accZ_tmp * accVelScale * (float)accTimeSum;
+
+    // integrate velocity to get distance (x= a/2 * t^2)
+    accAlt += (vel_acc * 0.5f) * dt + vel * dt;     
+
+    EstAlt = sonarAlt;
+
+    printf("%d\n", EstAlt);
+
+    vel += vel_acc;
+
+    accSum_reset();
+
+    vel_tmp = lrintf(vel);
+
+    // set vario
+    vario = applyDeadband(vel_tmp, 5);
+
+    if (tiltAngle < 800) { // only calculate pid if the copters thrust is facing downwards(<80deg)
+        // Altitude P-Controller
+        if (!velocityControl) {
+            error = constrain(AltHold - EstAlt, -500, 500);
+            error = applyDeadband(error, 10);       // remove small P parametr to reduce noise near zero position
+            setVel = constrain((CONFIG_ALT_P * error / 128), -300, +300); // limit velocity to +/- 3 m/s
+        } else {
+            setVel = setVelocity;
+        }
+
+        // Velocity PID-Controller // P
+        error = setVel - vel_tmp;
+        AltitudePID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
+
+        // I
+        errorVelocityI += (CONFIG_VEL_I * error);
+        errorVelocityI = constrain(errorVelocityI, -(8196 * 200), (8196 * 200));
+        AltitudePID += errorVelocityI / 8196;     // I in the range of +/-200
+
+        // D
+        AltitudePID -= constrain(CONFIG_VEL_D * (accZ_tmp + accZ_old) / 512, -150, 150);
+
+    } else {
+        AltitudePID = 0;
+    }
+
+    accZ_old = accZ_tmp;
+
+    return 1;
 }

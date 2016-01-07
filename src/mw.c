@@ -280,7 +280,6 @@ static void pidMultiWii(void)
 
 void loop(void)
 {
-
     static uint8_t rcDelayCommand;      // this indicates the number of time (multiple of RC measurement at 50Hz) 
     // the sticks must be maintained to run or switch off motors
     static uint8_t rcSticks;            // this hold sticks position for command combos
@@ -369,15 +368,14 @@ void loop(void)
         static int taskOrder = 0;   // never call all function in the same loop, to avoid high delay spikes
         switch (taskOrder) {
             case 0:
-                taskOrder++;
-            case 1:
-                //if (px4flow_available)
-                //    pollPX4Flow();
-                taskOrder++;
-            case 2:
                 if (mb1242_available) {
                     pollMB1242();
                 }
+                taskOrder++;
+            case 1:
+                getEstimatedAltitude();
+                taskOrder++;
+            case 2:
                 taskOrder++;
             case 3:
                 // if GPS feature is enabled, gpsThread() will be called at some intervals to check for stuck

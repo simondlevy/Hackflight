@@ -17,7 +17,7 @@
 #define MSP_ALTITUDE             109    //out message         altitude, variometer
 
 #define MSP_PX4FLOW              125
-#define MSP_MB1242            126
+#define MSP_MB1242               126
 
 #define MSP_SET_RAW_RC           200    //in message          8 rc chan
 #define MSP_SET_MOTOR            214    //in message          PropBalance function
@@ -212,7 +212,7 @@ static void evaluateCommand(void)
 
         case MSP_MB1242:
             headSerialReply(2);
-            serialize16(mb1242_distance);
+            serialize16(sonarAlt);
             break;
 
         case MSP_ALTITUDE:
