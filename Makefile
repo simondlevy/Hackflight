@@ -5,7 +5,7 @@
 # this stuff is worth it, you can buy me a beer in return
 ###############################################################################
 #
-# Makefile for building the baseflight firmware.
+# Makefile for building the hackflight firmware.
 #
 # Invoke this with 'make help' to see the list of supported targets.
 # 
@@ -76,8 +76,8 @@ NAZE_SRC	 = drv_adc.c \
 # This will prevent accidental deletion of startup code.
 .PRECIOUS: %.s
 
-# Search path for baseflight sources
-VPATH		:= $(SRC_DIR):$(SRC_DIR)/baseflight_startups
+# Search path for hackflight sources
+VPATH		:= $(SRC_DIR):$(SRC_DIR)/hackflight_startups
 
 # Search path and source files for the CMSIS sources
 VPATH		:= $(VPATH):$(CMSIS_DIR)/CM3/CoreSupport:$(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x
@@ -155,10 +155,10 @@ LDFLAGS		 = -lm \
 # Things we will build
 #
 
-TARGET_HEX	 = $(BIN_DIR)/baseflight_$(TARGET).hex
-TARGET_ELF	 = $(BIN_DIR)/baseflight_$(TARGET).elf
+TARGET_HEX	 = $(BIN_DIR)/hackflight_$(TARGET).hex
+TARGET_ELF	 = $(BIN_DIR)/hackflight_$(TARGET).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC))))
-TARGET_MAP   = $(OBJECT_DIR)/baseflight_$(TARGET).map
+TARGET_MAP   = $(OBJECT_DIR)/hackflight_$(TARGET).map
 
 # List of buildable ELF files and their object dependencies.
 # It would be nice to compute these lists, but that seems to be just beyond make.
