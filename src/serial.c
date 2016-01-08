@@ -22,7 +22,6 @@
 #define MSP_SET_RAW_RC           200    //in message          8 rc chan
 #define MSP_SET_MOTOR            214    //in message          PropBalance function
 
-
 // Additional private MSP for baseflight configurator
 #define MSP_REBOOT               68     //in message          reboot settings
 #define MSP_BUILDINFO            69     //out message         build date as well as some space for future expansion
@@ -211,9 +210,10 @@ static void evaluateCommand(void)
             break;
 
         case MSP_MB1242:
-            headSerialReply(8);
+            headSerialReply(12);
             serialize32(SonarAlt);
             serialize32(AltHold);
+            serialize32(SonarPID);
             break;
 
         case MSP_ALTITUDE:

@@ -34,5 +34,6 @@
 
   "MB1242": [{"ID": 126},
                {"distance": "int"},
-               {"alt_hold": "int"}] 
+               {"alt_hold": "int"},
+               {"pid": "int"}] 
 }

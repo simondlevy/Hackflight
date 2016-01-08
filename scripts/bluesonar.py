@@ -18,15 +18,18 @@ class AGLPlotter(RealtimePlotter):
 
         ylim = (0, MAXAGLCM)
         ytic = range(ylim[0], ylim[1], 20)
-        RealtimePlotter.__init__(self, [ylim, ylim], 
+        pidmax = 250
+
+        RealtimePlotter.__init__(self, [ylim, ylim, (-pidmax,+pidmax)], 
                 window_name='MB1242 Sonar',
-                yticks = [ytic, ytic],
-                styles = ['b', 'r'], 
-                ylabels=['AGL (cm)', 'HOLD (cm)'])
+                yticks = [ytic, ytic, range(-pidmax, +pidmax, 25)],
+                styles = ['b', 'r', 'k'], 
+                ylabels=['AGL (cm)', 'HOLD (cm)', 'PID'])
 
         self.xcurr = 0
         self.aglcm = 0
         self.holdcm = 0
+        self.pid = 0
 
         self.parser = Parser()
         self.parser.set_MB1242_Handler(self.handler)
@@ -40,16 +43,16 @@ class AGLPlotter(RealtimePlotter):
 
         self.logfile = open('logs/' + strftime("%d-%b-%Y-%H-%M-%S", localtime()), 'w')
 
-    def handler(self, aglcm, holdcm):
-        print(aglcm, holdcm)
+    def handler(self, aglcm, holdcm, pid):
         self.aglcm = aglcm
         self.holdcm = holdcm
-        self.logfile.write('%d %d\n' % (aglcm, holdcm))
+        self.pid = pid
+        self.logfile.write('%d %d %d\n' % (aglcm, holdcm, pid))
         self.sock.send(self.request)
 
     def getValues(self):
 
-        return (self.aglcm,self.holdcm)
+        return (self.aglcm,self.holdcm,self.pid)
 
     def update(self):
 
@@ -57,7 +60,8 @@ class AGLPlotter(RealtimePlotter):
 
             self.parser.parse(self.sock.recv(1))
             plotter.xcurr += 1
-            sleep(.002)
+            #sleep(.002)
+            sleep(.001)
 
 
 if __name__ == '__main__':
