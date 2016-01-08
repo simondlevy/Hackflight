@@ -61,7 +61,6 @@ uint8_t lidarlite_available;
 uint16_t lidarlite_distance;
 
 uint8_t mb1242_available;
-int16_t sonarAlt;
 
 extern int16_t gyroZero[3];
 extern int16_t gyroData[3];
@@ -81,6 +80,7 @@ extern uint16_t cycleTime;
 extern uint16_t calibratingA;
 extern uint16_t calibratingB;
 extern uint16_t calibratingG;
+extern int32_t SonarAlt;
 extern int32_t EstAlt;
 extern int32_t AltHold;
 extern int32_t setVelocity;

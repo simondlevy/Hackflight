@@ -211,8 +211,9 @@ static void evaluateCommand(void)
             break;
 
         case MSP_MB1242:
-            headSerialReply(2);
-            serialize16(sonarAlt);
+            headSerialReply(8);
+            serialize32(SonarAlt);
+            serialize32(AltHold);
             break;
 
         case MSP_ALTITUDE:

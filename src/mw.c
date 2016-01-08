@@ -295,6 +295,8 @@ void loop(void)
 
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC)) {
 
+        printf("%d %d\n", alt_hold_mode, AltHold);
+
         computeRC();
 
         // ------------------ STICKS COMMAND HANDLER --------------------
@@ -358,6 +360,7 @@ void loop(void)
                 auxState = 2;
         }
 
+        // Switch to alt-hold when switch moves to position 1 or 2
         if (auxState > 0) {
             if (!alt_hold_mode) {
                 alt_hold_mode = 1;
@@ -423,13 +426,15 @@ void loop(void)
                 if (abs(rcCommand[THROTTLE] - initialThrottleHold) > CONFIG_ALT_HOLD_THROTTLE_NEUTRAL) {
                     errorVelocityI = 0;
                     isAltHoldChanged = 1;
-                    rcCommand[THROTTLE] += (rcCommand[THROTTLE] > initialThrottleHold) ? -CONFIG_ALT_HOLD_THROTTLE_NEUTRAL : CONFIG_ALT_HOLD_THROTTLE_NEUTRAL;
+                    rcCommand[THROTTLE] += (rcCommand[THROTTLE] > initialThrottleHold) 
+                        ? -CONFIG_ALT_HOLD_THROTTLE_NEUTRAL : CONFIG_ALT_HOLD_THROTTLE_NEUTRAL;
                 } else {
                     if (isAltHoldChanged) {
                         AltHold = EstAlt;
                         isAltHoldChanged = 0;
                     }
-                    rcCommand[THROTTLE] = constrain(initialThrottleHold + SonarPID, CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
+                    rcCommand[THROTTLE] = constrain(initialThrottleHold + SonarPID, 
+                            CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
                 }
             } else {
                 // slow alt changes for apfags

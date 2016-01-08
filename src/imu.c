@@ -7,7 +7,7 @@ int32_t accSum[3];
 uint32_t accTimeSum = 0;        // keep track for integration of acc
 int accSumCount = 0;
 int16_t smallAngle = 0;
-uint32_t SonarAlt = 0;
+int32_t SonarAlt = 0;
 float sonarTransition = 0;
 int32_t EstAlt;                // in cm
 int32_t AltHold;

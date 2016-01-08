@@ -16,14 +16,17 @@ class AGLPlotter(RealtimePlotter):
 
     def __init__(self):
 
-        RealtimePlotter.__init__(self, [(0,MAXAGLCM)], 
+        ylim = (0, MAXAGLCM)
+        ytic = range(ylim[0], ylim[1], 20)
+        RealtimePlotter.__init__(self, [ylim, ylim], 
                 window_name='MB1242 Sonar',
-                yticks = [range(0,MAXAGLCM,20)],
-                styles = ['r'], 
-                ylabels=['AGL (cm)'])
+                yticks = [ytic, ytic],
+                styles = ['b', 'r'], 
+                ylabels=['AGL (cm)', 'HOLD (cm)'])
 
         self.xcurr = 0
         self.aglcm = 0
+        self.holdcm = 0
 
         self.parser = Parser()
         self.parser.set_MB1242_Handler(self.handler)
@@ -37,15 +40,16 @@ class AGLPlotter(RealtimePlotter):
 
         self.logfile = open('logs/' + strftime("%d-%b-%Y-%H-%M-%S", localtime()), 'w')
 
-    def handler(self, aglcm):
-        print(aglcm)
+    def handler(self, aglcm, holdcm):
+        print(aglcm, holdcm)
         self.aglcm = aglcm
-        self.logfile.write('%d\n' % aglcm)
+        self.holdcm = holdcm
+        self.logfile.write('%d %d\n' % (aglcm, holdcm))
         self.sock.send(self.request)
 
     def getValues(self):
 
-        return (self.aglcm,)
+        return (self.aglcm,self.holdcm)
 
     def update(self):
 

@@ -29,7 +29,7 @@ void pollMB1242()
         else if (state == 1) {
             uint8_t bytes[2];
             if (i2cRead(MB1242_ADDRESS, 0x8F, 2, bytes)) {
-                sonarAlt = (bytes[0] << 8) + bytes[1];  
+                SonarAlt = (bytes[0] << 8) + bytes[1];  
                 state++;
             }
         }
