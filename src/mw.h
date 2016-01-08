@@ -86,7 +86,7 @@ extern int32_t AltHold;
 extern int32_t setVelocity;
 extern uint8_t velocityControl;
 extern int32_t errorVelocityI;
-extern int32_t AltitudePID;
+extern int32_t SonarPID;
 extern int32_t vario;
 extern int16_t throttleAngleCorrection;
 extern int16_t headFreeModeHold;

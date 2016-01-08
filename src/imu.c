@@ -7,6 +7,7 @@ int32_t accSum[3];
 uint32_t accTimeSum = 0;        // keep track for integration of acc
 int accSumCount = 0;
 int16_t smallAngle = 0;
+uint32_t SonarAlt = 0;
 float sonarTransition = 0;
 int32_t EstAlt;                // in cm
 int32_t AltHold;
@@ -19,7 +20,7 @@ float magneticDeclination = 0.0f;       // calculated at startup from config
 float accVelScale;
 float throttleAngleScale;
 float fc_acc;
-int32_t AltitudePID = 0;
+int32_t SonarPID = 0;
 
 // **************
 // gyro+acc IMU
@@ -287,6 +288,7 @@ int getEstimatedAltitude(void)
     uint32_t currentT = micros();
     uint32_t dTime;
     int32_t error;
+    int32_t sonarVel;
     int32_t vel_tmp;
     int32_t setVel;
     float dt;
@@ -295,6 +297,7 @@ int getEstimatedAltitude(void)
     static float accZ_old = 0.0f;
     static float vel = 0.0f;
     static float accAlt = 0.0f;
+    static int32_t lastSonarAlt;
     int16_t tiltAngle = max(abs(angle[ROLL]), abs(angle[PITCH]));
 
     dTime = currentT - previousT;
@@ -304,9 +307,9 @@ int getEstimatedAltitude(void)
 
     // calculate sonar altitude only if the sonar is facing downwards(<25deg)
     if (tiltAngle > 250)
-        sonarAlt = -1;
+        SonarAlt = -1;
     else
-        sonarAlt = sonarAlt * (900.0f - tiltAngle) / 900.0f;
+        SonarAlt = SonarAlt * (900.0f - tiltAngle) / 900.0f;
 
     dt = accTimeSum * 1e-6f; // delta acc reading time in seconds
 
@@ -317,20 +320,31 @@ int getEstimatedAltitude(void)
     // integrate velocity to get distance (x= a/2 * t^2)
     accAlt += (vel_acc * 0.5f) * dt + vel * dt;     
 
-    EstAlt = sonarAlt;
+    // complementary filter for altitude estimation (baro & acc)
+    accAlt = accAlt * CONFIG_CF_ALT + (float)SonarAlt * (1.0f - CONFIG_CF_ALT);      
 
-    printf("%d\n", EstAlt);
+    EstAlt = SonarAlt;
 
     vel += vel_acc;
 
     accSum_reset();
 
+    sonarVel = (SonarAlt - lastSonarAlt) * 1000000.0f / dTime;
+    lastSonarAlt = SonarAlt;
+
+    sonarVel = constrain(sonarVel, -1500, 1500);    // constrain baro velocity +/- 1500cm/s
+    sonarVel = applyDeadband(sonarVel, 10);         // to reduce noise near zero
+
+    // apply Complimentary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity).
+    // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
+    vel = vel * CONFIG_CF_VEL + sonarVel * (1 - CONFIG_CF_VEL);
     vel_tmp = lrintf(vel);
 
     // set vario
     vario = applyDeadband(vel_tmp, 5);
 
     if (tiltAngle < 800) { // only calculate pid if the copters thrust is facing downwards(<80deg)
+
         // Altitude P-Controller
         if (!velocityControl) {
             error = constrain(AltHold - EstAlt, -500, 500);
@@ -340,20 +354,21 @@ int getEstimatedAltitude(void)
             setVel = setVelocity;
         }
 
-        // Velocity PID-Controller // P
+        // Velocity PID-Controller 
+        // P
         error = setVel - vel_tmp;
-        AltitudePID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
+        SonarPID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
 
         // I
         errorVelocityI += (CONFIG_VEL_I * error);
         errorVelocityI = constrain(errorVelocityI, -(8196 * 200), (8196 * 200));
-        AltitudePID += errorVelocityI / 8196;     // I in the range of +/-200
+        SonarPID += errorVelocityI / 8196;     // I in the range of +/-200
 
         // D
-        AltitudePID -= constrain(CONFIG_VEL_D * (accZ_tmp + accZ_old) / 512, -150, 150);
+        SonarPID -= constrain(CONFIG_VEL_D * (accZ_tmp + accZ_old) / 512, -150, 150);
 
     } else {
-        AltitudePID = 0;
+        SonarPID = 0;
     }
 
     accZ_old = accZ_tmp;

@@ -286,13 +286,12 @@ void loop(void)
     uint8_t stTmp = 0;
     int i;
     static uint32_t rcTime = 0;
+    static int16_t initialThrottleHold;
     static uint32_t loopTime;
     uint16_t auxState = 0;
     bool isThrottleLow = false;
 
-    //static uint16_t targetAGLcm;
-    //static uint8_t  altHold;
-
+    static uint8_t alt_hold_mode;
 
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC)) {
 
@@ -353,9 +352,24 @@ void loop(void)
         }
 
         // Check AUX switches
-        for (i = 0; i < 4; i++)
-            auxState |= (rcData[AUX1 + i] < 1300) << (3 * i) | (1300 < rcData[AUX1 + i] && rcData[AUX1 + i] < 1700) 
-                << (3 * i + 1) | (rcData[AUX1 + i] > 1700) << (3 * i + 2);
+        if (rcData[AUX1] > 1300) {
+            auxState = 1;
+            if (rcData[AUX1] > 1700)
+                auxState = 2;
+        }
+
+        if (auxState > 0) {
+            if (!alt_hold_mode) {
+                alt_hold_mode = 1;
+                AltHold = EstAlt;
+                initialThrottleHold = rcCommand[THROTTLE];
+                errorVelocityI = 0;
+                SonarPID = 0;
+            }
+        }
+        else {
+            alt_hold_mode = 0;
+        }
 
         // note: if FAILSAFE is disable, failsafeCnt > 5 * FAILSAVE_DELAY is always false
         if (failsafeCnt > 5 * CONFIG_FAILSAFE_DELAY) {
@@ -401,6 +415,38 @@ void loop(void)
 
         // non IMU critical, temeperatur, serialcom
         annexCode();
+
+        if (alt_hold_mode) {
+            static uint8_t isAltHoldChanged = 0;
+            if (CONFIG_ALT_HOLD_FAST_CHANGE) {
+                // rapid alt changes
+                if (abs(rcCommand[THROTTLE] - initialThrottleHold) > CONFIG_ALT_HOLD_THROTTLE_NEUTRAL) {
+                    errorVelocityI = 0;
+                    isAltHoldChanged = 1;
+                    rcCommand[THROTTLE] += (rcCommand[THROTTLE] > initialThrottleHold) ? -CONFIG_ALT_HOLD_THROTTLE_NEUTRAL : CONFIG_ALT_HOLD_THROTTLE_NEUTRAL;
+                } else {
+                    if (isAltHoldChanged) {
+                        AltHold = EstAlt;
+                        isAltHoldChanged = 0;
+                    }
+                    rcCommand[THROTTLE] = constrain(initialThrottleHold + SonarPID, CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
+                }
+            } else {
+                // slow alt changes for apfags
+                if (abs(rcCommand[THROTTLE] - initialThrottleHold) > CONFIG_ALT_HOLD_THROTTLE_NEUTRAL) {
+                    // set velocity proportional to stick movement +100 throttle gives ~ +50 cm/s
+                    setVelocity = (rcCommand[THROTTLE] - initialThrottleHold) / 2;
+                    velocityControl = 1;
+                    isAltHoldChanged = 1;
+                } else if (isAltHoldChanged) {
+                    AltHold = EstAlt;
+                    velocityControl = 0;
+                    isAltHoldChanged = 0;
+                }
+                rcCommand[THROTTLE] = constrain(initialThrottleHold + SonarPID, CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
+            }
+        }
+
 
         if (CONFIG_THROTTLE_CORRECTION_VALUE && CONFIG_HORIZON_MODE) {
             rcCommand[THROTTLE] += throttleAngleCorrection;
