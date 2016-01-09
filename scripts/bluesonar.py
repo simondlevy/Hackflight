@@ -5,7 +5,8 @@ BT_ADDR = "00:06:66:73:e3:a6"
 BT_PORT = 1
 
 MAXAGLCM = 300
-
+MAXPID   = 250
+ 
 from msppg import MSP_Parser as Parser
 from realtime_plot import RealtimePlotter
 from time import localtime, strftime, sleep
@@ -18,13 +19,12 @@ class AGLPlotter(RealtimePlotter):
 
         ylim = (0, MAXAGLCM)
         ytic = range(ylim[0], ylim[1], 20)
-        pidmax = 250
 
-        RealtimePlotter.__init__(self, [ylim, ylim, (-pidmax,+pidmax)], 
+        RealtimePlotter.__init__(self, [ylim, (-MAXPID,+MAXPID)], 
                 window_name='MB1242 Sonar',
-                yticks = [ytic, ytic, range(-pidmax, +pidmax, 25)],
-                styles = ['b', 'r', 'k'], 
-                ylabels=['AGL (cm)', 'HOLD (cm)', 'PID'])
+                yticks = [ytic, range(-MAXPID, +MAXPID, 25)],
+                styles = [('b', 'r'), 'k'], 
+                ylabels=['AGL (cm)', 'PID'])
 
         self.xcurr = 0
         self.aglcm = 0
@@ -41,13 +41,14 @@ class AGLPlotter(RealtimePlotter):
 
         print('connected to %s' % BT_ADDR)
 
-        self.logfile = open('logs/' + strftime("%d-%b-%Y-%H-%M-%S", localtime()), 'w')
+        self.logfile = open('logs/' + strftime("%d-%b-%Y-%H-%M-%S.csv", localtime()), 'w')
 
     def handler(self, aglcm, holdcm, pid):
         self.aglcm = aglcm
         self.holdcm = holdcm
         self.pid = pid
-        self.logfile.write('%d %d %d\n' % (aglcm, holdcm, pid))
+        self.logfile.write('%d,%d,%d\n' % (aglcm, holdcm, pid))
+        self.logfile.flush()
         self.sock.send(self.request)
 
     def getValues(self):
