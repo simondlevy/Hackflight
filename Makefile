@@ -39,13 +39,13 @@ OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
 # Source files common to all targets
-COMMON_SRC	 = imu.c \
-		   main.c \
+COMMON_SRC	 = main.c \
 		   mixer.c \
 		   mw.c \
 		   sensors.c \
 		   serial.c \
 		   rxmsp.c \
+		   state.c \
 		   drv_gpio.c \
 		   drv_i2c.c \
 		   drv_system.c \
