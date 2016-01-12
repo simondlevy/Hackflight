@@ -74,6 +74,20 @@ typedef struct sensor_t {
     float scale;                                            // scalefactor (currently used for gyro only, todo for accel)
 } sensor_t;
 
+typedef void (*baroOpFuncPtr)(void);                       // baro start operation
+typedef void (*baroCalculateFuncPtr)(int32_t *pressure, int32_t *temperature);             // baro calculation (filled params are pressure and temperature)
+
+typedef struct baro_t {
+    uint16_t ut_delay;
+    uint16_t up_delay;
+    baroOpFuncPtr start_ut;
+    baroOpFuncPtr get_ut;
+    baroOpFuncPtr start_up;
+    baroOpFuncPtr get_up;
+    baroCalculateFuncPtr calculate;
+} baro_t;
+
+
 // Hardware definitions and GPIO
 // Target definitions (NAZE, ... are same as in Makefile
 #if defined(NAZE)
@@ -86,6 +100,8 @@ typedef struct sensor_t {
 #define BEEP_PIN    Pin_12 // PA12 (Buzzer)
 #define INV_PIN     Pin_2 // PB2 (BOOT1) abused as inverter select GPIO
 #define INV_GPIO    GPIOB
+#define BARO_GPIO   GPIOC
+#define BARO_PIN    Pin_13
 
 #define GYRO
 #define ACC

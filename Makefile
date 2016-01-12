@@ -63,6 +63,7 @@ HIGHEND_SRC	 = telemetry_common.c
 # Source files for the NAZE target
 NAZE_SRC	 = drv_adc.c \
 		   drv_mpu6050.c \
+		   drv_ms5611.c \
 		   drv_pwm.c \
 		   drv_spi.c \
 		   drv_timer.c \
