@@ -18,6 +18,7 @@ int16_t heading, magHold;
 sensor_t acc;                       // acc access functions
 sensor_t gyro;                      // gyro access functions
 sensor_t mag;                       // mag access functions
+baro_t baro;                        // barometer access functions
 
 static int16_t accZero[3];
 
@@ -150,4 +151,46 @@ void Gyro_getADC(void)
     // range: +/- 8192; +/- 2000 deg/sec
     gyro.read(gyroADC);
     GYRO_Common();
+}
+
+static void Baro_Common(void)
+{
+    static int32_t baroHistTab[BARO_TAB_SIZE_MAX];
+    static int baroHistIdx;
+    int indexplus1;
+
+    indexplus1 = (baroHistIdx + 1);
+    if (indexplus1 == CONFIG_BARO_TAB_SIZE)
+        indexplus1 = 0;
+    baroHistTab[baroHistIdx] = baroPressure;
+    baroPressureSum += baroHistTab[baroHistIdx];
+    baroPressureSum -= baroHistTab[indexplus1];
+    baroHistIdx = indexplus1;
+}
+
+int Baro_update(void)
+{
+    static uint32_t baroDeadline = 0;
+    static int state = 0;
+
+    if ((int32_t)(currentTime - baroDeadline) < 0)
+        return 0;
+
+    baroDeadline = currentTime;
+
+    if (state) {
+        baro.get_up();
+        baro.start_ut();
+        baroDeadline += baro.ut_delay;
+        baro.calculate(&baroPressure, &baroTemperature);
+        state = 0;
+        return 2;
+    } else {
+        baro.get_ut();
+        baro.start_up();
+        Baro_Common();
+        state = 1;
+        baroDeadline += baro.up_delay;
+        return 1;
+    }
 }
