@@ -295,8 +295,6 @@ void loop(void)
 
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC)) {
 
-        printf("%d %d %d\n", alt_hold_mode, AltHold, SonarPID);
-
         computeRC();
 
         // ------------------ STICKS COMMAND HANDLER --------------------

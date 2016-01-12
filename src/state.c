@@ -7,6 +7,10 @@ int32_t accSum[3];
 uint32_t accTimeSum = 0;        // keep track for integration of acc
 int accSumCount = 0;
 int16_t smallAngle = 0;
+int32_t baroPressure = 0;
+int32_t baroTemperature = 0;
+uint32_t baroPressureSum = 0;
+int32_t BaroAlt = 0;
 int32_t SonarAlt = 0;
 float sonarTransition = 0;
 int32_t EstAlt;                // in cm
@@ -299,17 +303,40 @@ int getEstimatedAltitude(void)
     static float accAlt = 0.0f;
     static int32_t lastSonarAlt;
     int16_t tiltAngle = max(abs(angle[ROLL]), abs(angle[PITCH]));
-
+    int32_t baroVel;
+    int32_t BaroAlt_tmp;
+    static int32_t lastBaroAlt;
+    static int32_t baroGroundAltitude = 0;
+    static int32_t baroGroundPressure = 0;
+ 
     dTime = currentT - previousT;
     if (dTime < CONFIG_ALTITUDE_UPDATE_USEC)
         return 0;
     previousT = currentT;
+
+    if (calibratingB > 0) {
+        baroGroundPressure -= baroGroundPressure / 8;
+        baroGroundPressure += baroPressureSum / (CONFIG_BARO_TAB_SIZE - 1);
+        baroGroundAltitude = (1.0f - powf((baroGroundPressure / 8) / 101325.0f, 0.190295f)) * 4433000.0f;
+
+        vel = 0;
+        accAlt = 0;
+        calibratingB--;
+    }
 
     // calculate sonar altitude only if the sonar is facing downwards(<25deg)
     if (tiltAngle > 250)
         SonarAlt = -1;
     else
         SonarAlt = SonarAlt * (900.0f - tiltAngle) / 900.0f;
+
+    // calculates height from ground via baro readings
+    // see: https://github.com/diydrones/ardupilot/blob/master/libraries/AP_Baro/AP_Baro.cpp#L140
+    BaroAlt_tmp = lrintf((1.0f - powf((float)(baroPressureSum / (CONFIG_BARO_TAB_SIZE - 1)) / 101325.0f, 0.190295f)) * 4433000.0f); // in cm
+    BaroAlt_tmp -= baroGroundAltitude;
+    BaroAlt = lrintf((float)BaroAlt * CONFIG_BARO_NOISE_LPF + (float)BaroAlt_tmp * (1.0f - CONFIG_BARO_NOISE_LPF)); // additional LPF to reduce baro noise
+
+    printf("%d\n", BaroAlt);
 
     dt = accTimeSum * 1e-6f; // delta acc reading time in seconds
 
@@ -332,6 +359,13 @@ int getEstimatedAltitude(void)
     sonarVel = (SonarAlt - lastSonarAlt) * 1000000.0f / dTime;
     lastSonarAlt = SonarAlt;
 
+    baroVel = (BaroAlt - lastBaroAlt) * 1000000.0f / dTime;
+    lastBaroAlt = BaroAlt;
+
+    baroVel = constrain(baroVel, -1500, 1500);    // constrain baro velocity +/- 1500cm/s
+    baroVel = applyDeadband(baroVel, 10);         // to reduce noise near zero
+
+ 
     sonarVel = constrain(sonarVel, -1500, 1500);    // constrain baro velocity +/- 1500cm/s
     sonarVel = applyDeadband(sonarVel, 10);         // to reduce noise near zero
 

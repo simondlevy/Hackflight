@@ -5,6 +5,8 @@
 
 #pragma once
 
+#define BARO_TAB_SIZE_MAX   48
+
 #define RC_CHANS    (18)
 
 /*********** RC alias *****************/
@@ -80,6 +82,10 @@ extern uint16_t cycleTime;
 extern uint16_t calibratingA;
 extern uint16_t calibratingB;
 extern uint16_t calibratingG;
+extern int32_t baroPressure;
+extern int32_t baroTemperature;
+extern uint32_t baroPressureSum;
+extern int32_t BaroAlt;
 extern int32_t SonarAlt;
 extern int32_t EstAlt;
 extern int32_t AltHold;
@@ -107,7 +113,7 @@ extern sensor_t gyro;
 // main
 void loop(void);
 
-// IMU
+// State
 void imuInit(void);
 void computeIMU(void);
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
@@ -117,6 +123,7 @@ int getEstimatedAltitude();
 bool sensorsAutodetect(void);
 void ACC_getADC(void);
 void Gyro_getADC(void);
+int Baro_update(void);
 
 // Output
 void mixerInit(void);

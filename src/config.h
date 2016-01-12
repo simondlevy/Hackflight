@@ -17,6 +17,7 @@ static const uint8_t CONFIG_VEL_D = 1;
 #define CONFIG_HORIZON_MODE                         1
 #define CONFIG_CALIBRATING_GYRO_CYCLES              1000
 #define CONFIG_CALIBRATING_ACC_CYCLES               400
+#define CONFIG_CALIBRATING_BARO_CYCLES              200
 #define CONFIG_EMF_AVOIDANCE                        0
 #define CONFIG_SERIAL_BAUDRATE                      115200
 #define CONFIG_MOTOR_PWM_RATE                       400
@@ -43,6 +44,9 @@ static const uint8_t CONFIG_VEL_D = 1;
 #define CONFIG_IMU_LOOPTIME_USEC                    3500
 #define CONFIG_RC_LOOPTIME_USEC                     20000
 #define CONFIG_CALIBRATE_ACCTIME_USEC               500000
+
+#define CONFIG_BARO_TAB_SIZE                        21
+#define CONFIG_BARO_NOISE_LPF                       0.6f
 
 #define CONFIG_MORON_THRESHOLD                      32
 #define CONFIG_REBOOT_CHARACTER                     'R'
