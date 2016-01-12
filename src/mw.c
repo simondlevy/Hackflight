@@ -388,9 +388,10 @@ void loop(void)
                 }
                 taskOrder++;
             case 1:
-                getEstimatedAltitude();
+                Baro_update();
                 taskOrder++;
             case 2:
+                getEstimatedAltitude();
                 taskOrder++;
             case 3:
                 // if GPS feature is enabled, gpsThread() will be called at some intervals to check for stuck

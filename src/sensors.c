@@ -6,6 +6,7 @@
 #include "board.h"
 #include "mw.h"
 #include "config.h"
+#include "drv_ms5611.h"
 
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.
@@ -24,13 +25,12 @@ static int16_t accZero[3];
 
 bool sensorsAutodetect(void)
 {
-    // Autodetect Invensense acc/gyro hardware
     mpuDetect(&acc, &gyro, CONFIG_GYRO_LPF);
 
-    // Now time to init things, acc first
+    ms5611Detect(&baro);
+
     acc.init(CONFIG_ACC_ALIGN);
 
-    // this is safe because either mpu6050 or mpu3050 or lg3d20 sets it, and in case of fail, we never get here.
     gyro.init(CONFIG_GYRO_ALIGN);
 
     return true;
