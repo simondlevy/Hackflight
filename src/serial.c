@@ -55,8 +55,8 @@ typedef  struct mspPortState_t {
     serialState_t c_state;
 } mspPortState_t;
 
-static mspPortState_t ports[2];
-static mspPortState_t *currentPortState = &ports[0];
+static mspPortState_t port;
+static mspPortState_t *currentPortState = &port;
 static int numTelemetryPorts = 0;
 
 void serialize8(uint8_t a)
@@ -140,7 +140,7 @@ void serialInit(uint32_t baudrate)
 {
     numTelemetryPorts = 0;
     telemport = uartOpen(USART1, NULL, baudrate, MODE_RXTX);
-    ports[0].port = telemport;
+    port.port = telemport;
     numTelemetryPorts++;
 }
 
@@ -169,7 +169,7 @@ static void evaluateCommand(void)
             serialize16(cycleTime);
             serialize16(i2cGetErrorCounter());
             serialize16(0);
-           serialize8(0);
+            serialize8(0);
             break;
 
         case MSP_RAW_IMU:
@@ -248,55 +248,52 @@ static void evaluateCommand(void)
 void serialCom(void)
 {
     uint8_t c;
-    int i;
 
-    for (i = 0; i < numTelemetryPorts; i++) {
-        currentPortState = &ports[i];
+    currentPortState = &port;
 
-        if (pendReboot)
-            systemReset(false); // noreturn
+    if (pendReboot)
+        systemReset(false); // noreturn
 
-        while (serialTotalBytesWaiting(currentPortState->port)) {
-            c = serialRead(currentPortState->port);
+    while (serialTotalBytesWaiting(currentPortState->port)) {
+        c = serialRead(currentPortState->port);
 
-            if (currentPortState->c_state == IDLE) {
-                currentPortState->c_state = (c == '$') ? HEADER_START : IDLE;
-                if (currentPortState->c_state == IDLE && !armed) {
-                    if (c == '#')
-                        ;
-                    else if (c == CONFIG_REBOOT_CHARACTER) 
-                        systemReset(true);      // reboot to bootloader
-                }
-            } else if (currentPortState->c_state == HEADER_START) {
-                currentPortState->c_state = (c == 'M') ? HEADER_M : IDLE;
-            } else if (currentPortState->c_state == HEADER_M) {
-                currentPortState->c_state = (c == '<') ? HEADER_ARROW : IDLE;
-            } else if (currentPortState->c_state == HEADER_ARROW) {
-                if (c > INBUF_SIZE) {       // now we are expecting the payload size
-                    currentPortState->c_state = IDLE;
-                    continue;
-                }
-                currentPortState->dataSize = c;
-                currentPortState->offset = 0;
-                currentPortState->checksum = 0;
-                currentPortState->indRX = 0;
-                currentPortState->checksum ^= c;
-                currentPortState->c_state = HEADER_SIZE;      // the command is to follow
-            } else if (currentPortState->c_state == HEADER_SIZE) {
-                currentPortState->cmdMSP = c;
-                currentPortState->checksum ^= c;
-                currentPortState->c_state = HEADER_CMD;
-            } else if (currentPortState->c_state == HEADER_CMD && 
-                    currentPortState->offset < currentPortState->dataSize) {
-                currentPortState->checksum ^= c;
-                currentPortState->inBuf[currentPortState->offset++] = c;
-            } else if (currentPortState->c_state == HEADER_CMD && 
-                    currentPortState->offset >= currentPortState->dataSize) {
-                if (currentPortState->checksum == c) {        // compare calculated and transferred checksum
-                    evaluateCommand();      // we got a valid packet, evaluate it
-                }
-                currentPortState->c_state = IDLE;
+        if (currentPortState->c_state == IDLE) {
+            currentPortState->c_state = (c == '$') ? HEADER_START : IDLE;
+            if (currentPortState->c_state == IDLE && !armed) {
+                if (c == '#')
+                    ;
+                else if (c == CONFIG_REBOOT_CHARACTER) 
+                    systemReset(true);      // reboot to bootloader
             }
+        } else if (currentPortState->c_state == HEADER_START) {
+            currentPortState->c_state = (c == 'M') ? HEADER_M : IDLE;
+        } else if (currentPortState->c_state == HEADER_M) {
+            currentPortState->c_state = (c == '<') ? HEADER_ARROW : IDLE;
+        } else if (currentPortState->c_state == HEADER_ARROW) {
+            if (c > INBUF_SIZE) {       // now we are expecting the payload size
+                currentPortState->c_state = IDLE;
+                continue;
+            }
+            currentPortState->dataSize = c;
+            currentPortState->offset = 0;
+            currentPortState->checksum = 0;
+            currentPortState->indRX = 0;
+            currentPortState->checksum ^= c;
+            currentPortState->c_state = HEADER_SIZE;      // the command is to follow
+        } else if (currentPortState->c_state == HEADER_SIZE) {
+            currentPortState->cmdMSP = c;
+            currentPortState->checksum ^= c;
+            currentPortState->c_state = HEADER_CMD;
+        } else if (currentPortState->c_state == HEADER_CMD && 
+                currentPortState->offset < currentPortState->dataSize) {
+            currentPortState->checksum ^= c;
+            currentPortState->inBuf[currentPortState->offset++] = c;
+        } else if (currentPortState->c_state == HEADER_CMD && 
+                currentPortState->offset >= currentPortState->dataSize) {
+            if (currentPortState->checksum == c) {        // compare calculated and transferred checksum
+                evaluateCommand();      // we got a valid packet, evaluate it
+            }
+            currentPortState->c_state = IDLE;
         }
     }
 }
