@@ -288,6 +288,11 @@ static void getEstimatedAttitude(void)
     }
 }
 
+static bool sonarInRange(void)
+{
+    return SonarAlt > 20 && SonarAlt < 765;
+}
+
 int getEstimatedAltitude(void)
 {
     static uint32_t previousT;
@@ -337,7 +342,7 @@ int getEstimatedAltitude(void)
         SonarAlt = SonarAlt * (900.0f - tiltAngle) / 900.0f;
 
     // do SonarAlt and baroAlt fusion
-    if (SonarAlt > 0 && SonarAlt < 200) {
+    if (sonarInRange()) {
         baroAlt_offset = BaroAlt - SonarAlt;
         BaroAlt = SonarAlt;
     } else {
@@ -358,11 +363,7 @@ int getEstimatedAltitude(void)
     accAlt += (vel_acc * 0.5f) * dt + vel * dt;                                         // integrate velocity to get distance (x= a/2 * t^2)
     accAlt = accAlt * CONFIG_BARO_CF_ALT + (float)BaroAlt * (1.0f - CONFIG_BARO_CF_ALT);      // complementary filter for altitude estimation (baro & acc)
 
-    // when the sonar is in its best range
-    if (SonarAlt > 20 && SonarAlt < 765)
-        EstAlt = BaroAlt;
-    else
-        EstAlt = accAlt;
+    EstAlt = sonarInRange() ? BaroAlt : accAlt;
 
     vel += vel_acc;
 
