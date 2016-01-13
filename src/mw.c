@@ -383,16 +383,22 @@ void loop(void)
         static int taskOrder = 0;   // never call all function in the same loop, to avoid high delay spikes
         switch (taskOrder) {
             case 0:
+                taskOrder++;
                 if (sonar_available) {
                     pollSonar();
                 }
-                taskOrder++;
             case 1:
-                //Baro_update();
                 taskOrder++;
+                if (baro_available) {
+                    Baro_update();
+                    break;
+                }
             case 2:
-                //getEstimatedAltitude();
                 taskOrder++;
+                if (baro_available && sonar_available) {
+                    getEstimatedAltitude();
+                    break;
+                }
             case 3:
                 // if GPS feature is enabled, gpsThread() will be called at some intervals to check for stuck
                 // hardware, wrong baud rates, init GPS if needed, etc. Don't use SENSOR_GPS here as gpsThread() 
