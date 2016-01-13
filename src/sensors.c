@@ -21,19 +21,22 @@ sensor_t gyro;                      // gyro access functions
 sensor_t mag;                       // mag access functions
 baro_t baro;                        // barometer access functions
 
+bool baro_available;
+bool sonar_available;
+
 static int16_t accZero[3];
 
-bool sensorsAutodetect(void)
+void initSensors(void)
 {
     mpuDetect(&acc, &gyro, CONFIG_GYRO_LPF);
-
-    ms5611Detect(&baro);
 
     acc.init(CONFIG_ACC_ALIGN);
 
     gyro.init(CONFIG_GYRO_ALIGN);
 
-    return true;
+    baro_available = initBaro(&baro);
+
+    sonar_available = initSonar();
 }
 
 static void ACC_Common(void)

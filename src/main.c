@@ -47,7 +47,6 @@ static void activateConfig(void)
 int main(void)
 {
     uint8_t i;
-    bool sensorsOK = false;
 
     // Configure clock, this figures out HSE for hardware autodetect
     SetSysClock(CONFIG_EMF_AVOIDANCE);
@@ -74,12 +73,7 @@ int main(void)
 
     adcInit();
 
-    // drop out any sensors that don't seem to work, init all the others. halt if gyro is dead.
-    sensorsOK = sensorsAutodetect();
-
-    // if gyro was not detected due to whatever reason, we give up now.
-    if (!sensorsOK)
-        failureMode(3);
+    initSensors();
 
     LED1_ON;
     LED0_OFF;
@@ -115,10 +109,6 @@ int main(void)
     // trigger accelerometer calibration requirement
     useSmallAngle = 1;
     
-    mb1242_available = initMB1242();
-    //px4flow_available = initPX4Flow();
-    //lidarlite_available = initLidarLite();
-
     // loopy
     while (1) {
         loop();

@@ -38,7 +38,7 @@ static uint32_t ms5611_up;  // static result of pressure measurement
 static uint16_t ms5611_c[PROM_NB];  // on-chip ROM
 static uint8_t ms5611_osr = CMD_ADC_4096;
 
-bool ms5611Detect(baro_t *baro)
+bool initBaro(baro_t *baro)
 {
     bool ack = false;
     uint8_t sig;

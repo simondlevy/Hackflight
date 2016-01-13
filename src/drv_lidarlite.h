@@ -1,5 +1,5 @@
 #pragma once
 
-uint8_t initLidarLite();
+bool initLidarLite(void);
 
-void pollLidarLite();
+void pollLidarLite(void);

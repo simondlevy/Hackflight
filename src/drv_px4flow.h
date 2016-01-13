@@ -18,6 +18,6 @@ typedef struct px4flow_frame_t
 
 } px4flow_frame_t;
 
-uint8_t initPX4Flow();
+bool initPX4Flow(void);
 
-void pollPX4Flow();
+void pollPX4Flow(void);

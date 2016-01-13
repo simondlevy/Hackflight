@@ -10,17 +10,17 @@ static void adjust_reading() {
     SonarAlt = 1.071 * SonarAlt + 3.103; // emprically determined
 }
 
-static uint8_t attempt_write()
+static bool attempt_write()
 {
     return i2cWrite(MB1242_ADDRESS, 0x00, 0x51);
 }
 
-uint8_t initMB1242()
+bool initSonar()
 {
-    return attempt_write();
+    return attempt_write() == 1;
 }
 
-void pollMB1242()
+void pollSonar()
 {
     static uint32_t mb1242Time = 0;
     static uint8_t state;

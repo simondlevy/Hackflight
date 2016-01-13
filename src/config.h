@@ -13,6 +13,7 @@ static const uint8_t CONFIG_VEL_P = 120;
 static const uint8_t CONFIG_VEL_I = 45;
 static const uint8_t CONFIG_VEL_D = 1;
 
+#define CONFIG_ALT_UPDATE_USEC                      25000
 #define CONFIG_USE_CPPM                             1
 #define CONFIG_HORIZON_MODE                         1
 #define CONFIG_CALIBRATING_GYRO_CYCLES              1000
@@ -47,6 +48,8 @@ static const uint8_t CONFIG_VEL_D = 1;
 
 #define CONFIG_BARO_TAB_SIZE                        21
 #define CONFIG_BARO_NOISE_LPF                       0.6f
+#define CONFIG_BARO_CF_ALT                          0.965 
+#define CONFIG_BARO_CF_VEL                          0.985 
 
 #define CONFIG_MORON_THRESHOLD                      32
 #define CONFIG_REBOOT_CHARACTER                     'R'

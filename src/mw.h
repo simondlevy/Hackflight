@@ -56,13 +56,14 @@ typedef struct core_t {
 uint8_t useSmallAngle;
 uint8_t armed;
 
-uint8_t px4flow_available;
+extern bool px4flow_available;
 px4flow_frame_t px4flow_frame;
 
-uint8_t lidarlite_available;
+extern bool lidarlite_available;
 uint16_t lidarlite_distance;
 
-uint8_t mb1242_available;
+extern bool sonar_available;
+extern int32_t SonarAlt;
 
 extern int16_t gyroZero[3];
 extern int16_t gyroData[3];
@@ -82,16 +83,20 @@ extern uint16_t cycleTime;
 extern uint16_t calibratingA;
 extern uint16_t calibratingB;
 extern uint16_t calibratingG;
+
+extern bool baro_available;
 extern int32_t baroPressure;
 extern int32_t baroTemperature;
 extern uint32_t baroPressureSum;
 extern int32_t BaroAlt;
-extern int32_t SonarAlt;
+
+
 extern int32_t EstAlt;
 extern int32_t AltHold;
 extern int32_t setVelocity;
 extern uint8_t velocityControl;
 extern int32_t errorVelocityI;
+extern int32_t BaroPID;
 extern int32_t SonarPID;
 extern int32_t vario;
 extern int16_t throttleAngleCorrection;
@@ -120,10 +125,13 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
 int getEstimatedAltitude();
 
 // Sensors
-bool sensorsAutodetect(void);
+void initSensors(void);
 void ACC_getADC(void);
 void Gyro_getADC(void);
 int Baro_update(void);
+bool initBaro(baro_t * baro);
+bool initSonar();
+void pollSonar();
 
 // Output
 void mixerInit(void);

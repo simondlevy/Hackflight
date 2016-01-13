@@ -5,17 +5,17 @@
 
 extern bool check_and_update_timed_task(uint32_t * usec, uint32_t period);
 
-static uint8_t attempt_write()
+static bool attempt_write(void)
 {
     return i2cWrite(LIDARLITE_ADDRESS, 0x00, 0x04);
 }
 
-uint8_t initLidarLite()
+bool initLidarLite(void)
 {
     return attempt_write();
 }
 
-void pollLidarLite()
+void pollLidarLite(void)
 {
     static uint32_t lidarTime = 0;
     static uint8_t state;

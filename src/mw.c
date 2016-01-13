@@ -365,7 +365,7 @@ void loop(void)
                 AltHold = EstAlt;
                 initialThrottleHold = rcCommand[THROTTLE];
                 errorVelocityI = 0;
-                SonarPID = 0;
+                BaroPID = 0;
             }
         }
         else {
@@ -383,15 +383,15 @@ void loop(void)
         static int taskOrder = 0;   // never call all function in the same loop, to avoid high delay spikes
         switch (taskOrder) {
             case 0:
-                if (mb1242_available) {
-                    pollMB1242();
+                if (sonar_available) {
+                    pollSonar();
                 }
                 taskOrder++;
             case 1:
-                Baro_update();
+                //Baro_update();
                 taskOrder++;
             case 2:
-                getEstimatedAltitude();
+                //getEstimatedAltitude();
                 taskOrder++;
             case 3:
                 // if GPS feature is enabled, gpsThread() will be called at some intervals to check for stuck
@@ -432,7 +432,7 @@ void loop(void)
                         AltHold = EstAlt;
                         isAltHoldChanged = 0;
                     }
-                    rcCommand[THROTTLE] = constrain(initialThrottleHold + SonarPID, 
+                    rcCommand[THROTTLE] = constrain(initialThrottleHold + BaroPID, 
                             CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
                 }
             } else {
@@ -447,7 +447,7 @@ void loop(void)
                     velocityControl = 0;
                     isAltHoldChanged = 0;
                 }
-                rcCommand[THROTTLE] = constrain(initialThrottleHold + SonarPID, CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
+                rcCommand[THROTTLE] = constrain(initialThrottleHold + BaroPID, CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
             }
         }
 
