@@ -43,15 +43,7 @@ typedef struct motorMixer_t {
     float yaw;
 } motorMixer_t;
 
-// Core runtime settings
-typedef struct core_t {
-    serialPort_t *mainport;
-    serialPort_t *flexport;
-    serialPort_t *gpsport;
-    serialPort_t *telemport;
-    serialPort_t *rcvrport;
-    uint8_t numRCChannels;                  // number of rc channels as reported by current input driver
-} core_t;
+extern serialPort_t * telemport;
 
 uint8_t useSmallAngle;
 uint8_t armed;
@@ -90,7 +82,6 @@ extern int32_t baroTemperature;
 extern uint32_t baroPressureSum;
 extern int32_t BaroAlt;
 
-
 extern int32_t EstAlt;
 extern int32_t AltHold;
 extern int32_t setVelocity;
@@ -111,7 +102,6 @@ extern int16_t telemTemperature1;      // gyro sensor temperature
 extern int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
 extern int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
-extern core_t core;
 extern sensor_t acc;
 extern sensor_t gyro;
 

@@ -396,7 +396,6 @@ void loop(void)
             case 2:
                 taskOrder++;
                 if (baro_available && sonar_available) {
-                    printf("%d %d\n", BaroAlt, SonarAlt);
                     getEstimatedAltitude();
                     break;
                 }

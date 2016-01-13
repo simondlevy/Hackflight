@@ -229,7 +229,7 @@ void tfp_printf(char *fmt, ...)
     va_start(va, fmt);
     tfp_format(stdout_putp, stdout_putf, fmt, va);
     va_end(va);
-    while (!isSerialTransmitBufferEmpty(core.mainport));
+    while (!isSerialTransmitBufferEmpty(telemport));
 }
 
 static void putcp(void *p, char c)

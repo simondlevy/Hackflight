@@ -6,8 +6,6 @@ void checkTelemetryState(void);
 
 void initTelemetry(void)
 {
-    core.telemport = core.mainport;
-
     checkTelemetryState();
 }
 

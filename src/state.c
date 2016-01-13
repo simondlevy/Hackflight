@@ -2,31 +2,31 @@
 #include "mw.h"
 #include "config.h"
 
-int16_t gyroADC[3], accADC[3], accSmooth[3], magADC[3];
-int32_t accSum[3];
+int16_t  gyroADC[3], accADC[3], accSmooth[3], magADC[3];
+int32_t  accSum[3];
 uint32_t accTimeSum = 0;        // keep track for integration of acc
-int accSumCount = 0;
-int16_t smallAngle = 0;
-int32_t baroPressure = 0;
-int32_t baroTemperature = 0;
+int      accSumCount = 0;
+int16_t  smallAngle = 0;
+int32_t  baroPressure = 0;
+int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
-int32_t BaroAlt = 0;
-int32_t BaroPID = 0;
-int32_t baroAlt_offset = 0;
-int32_t SonarAlt = 0;
-float sonarTransition = 0;
-int32_t EstAlt;                // in cm
-int32_t AltHold;
-int32_t setVelocity = 0;
-uint8_t velocityControl = 0;
-int32_t errorVelocityI = 0;
-int32_t vario = 0;                      // variometer in cm/s
-int16_t throttleAngleCorrection = 0;    // correction of throttle in lateral wind,
-float magneticDeclination = 0.0f;       // calculated at startup from config
-float accVelScale;
-float throttleAngleScale;
-float fc_acc;
-int32_t SonarPID = 0;
+int32_t  BaroAlt = 0;
+int32_t  BaroPID = 0;
+int32_t  baroAlt_offset = 0;
+int32_t  SonarAlt = 0;
+float    sonarTransition = 0;
+int32_t  EstAlt;                // in cm
+int32_t  AltHold;
+int32_t  setVelocity = 0;
+uint8_t  velocityControl = 0;
+int32_t  errorVelocityI = 0;
+int32_t  vario = 0;                      // variometer in cm/s
+int16_t  throttleAngleCorrection = 0;    // correction of throttle in lateral wind,
+float    magneticDeclination = 0.0f;       // calculated at startup from config
+float    accVelScale;
+float    throttleAngleScale;
+float    fc_acc;
+int32_t  SonarPID = 0;
 
 // **************
 // gyro+acc IMU
@@ -308,7 +308,7 @@ int getEstimatedAltitude(void)
     float accZ_tmp;
     static float accZ_old = 0.0f;
     static float vel = 0.0f;
-    static float accAlt = 0.0f;
+    static float AccelAlt = 0.0f;
     static int32_t lastBaroAlt;
     static int32_t baroGroundAltitude = 0;
     static int32_t baroGroundPressure = 0;
@@ -319,32 +319,29 @@ int getEstimatedAltitude(void)
         return 0;
     previousT = currentT;
 
+    // Automatically calibrate baro on startup
     if (calibratingB > 0) {
         baroGroundPressure -= baroGroundPressure / 8;
         baroGroundPressure += baroPressureSum / (CONFIG_BARO_TAB_SIZE - 1);
         baroGroundAltitude = (1.0f - powf((baroGroundPressure / 8) / 101325.0f, 0.190295f)) * 4433000.0f;
 
         vel = 0;
-        accAlt = 0;
+        AccelAlt = 0;
         calibratingB--;
     }
 
-    // calculates height from ground via baro readings
-    // see: https://github.com/diydrones/ardupilot/blob/master/libraries/AP_Baro/AP_Baro.cpp#L140
+    // Calculates height from ground via baro readings in cm
+    // See: https://github.com/diydrones/ardupilot/blob/master/libraries/AP_Baro/AP_Baro.cpp#L140
     BaroAlt_tmp = lrintf((1.0f - powf((float)(baroPressureSum / (CONFIG_BARO_TAB_SIZE - 1)) / 101325.0f, 0.190295f)) 
-            * 4433000.0f); // in cm
-    BaroAlt_tmp -= baroGroundAltitude;
+            * 4433000.0f) - baroGroundAltitude;
 
-    // additional LPF to reduce baro noise
+    // Additional low-pass filter to reduce baro noise
     BaroAlt = lrintf((float)BaroAlt * CONFIG_BARO_NOISE_LPF + (float)BaroAlt_tmp * (1.0f - CONFIG_BARO_NOISE_LPF)); 
 
-    // calculate sonar altitude only if the sonar is facing downwards(<25deg)
-    if (tiltAngle > 250)
-        SonarAlt = -1;
-    else
-        SonarAlt = SonarAlt * (900.0f - tiltAngle) / 900.0f;
+    // Calculate sonar altitude only if the sonar is facing downwards(<25deg)
+    SonarAlt = (tiltAngle > 250) ? -1 : SonarAlt * (900.0f - tiltAngle) / 900.0f;
 
-    // do SonarAlt and baroAlt fusion
+    // Fuse SonarAlt and BaroAlt
     if (sonarInRange()) {
         baroAlt_offset = BaroAlt - SonarAlt;
         BaroAlt = SonarAlt;
@@ -356,19 +353,20 @@ int getEstimatedAltitude(void)
         }
     }
 
-    dt = accTimeSum * 1e-6f; // delta acc reading time in seconds
+    // delta acc reading time in seconds
+    dt = accTimeSum * 1e-6f; 
 
     // Integrator - velocity, cm/sec
     accZ_tmp = (float)accSum[2] / (float)accSumCount;
     vel_acc = accZ_tmp * accVelScale * (float)accTimeSum;
 
     // integrate velocity to get distance (x= a/2 * t^2)
-    accAlt += (vel_acc * 0.5f) * dt + vel * dt;                                         
+    AccelAlt += (vel_acc * 0.5f) * dt + vel * dt;                                         
 
     // complementary filter for altitude estimation (baro & acc)
-    accAlt = accAlt * CONFIG_BARO_CF_ALT + (float)BaroAlt * (1.0f - CONFIG_BARO_CF_ALT);      
+    AccelAlt = AccelAlt * CONFIG_BARO_CF_ALT + (float)BaroAlt * (1.0f - CONFIG_BARO_CF_ALT);      
 
-    EstAlt = sonarInRange() ? BaroAlt : accAlt;
+    EstAlt = sonarInRange() ? BaroAlt : AccelAlt;
 
     vel += vel_acc;
 

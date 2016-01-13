@@ -28,6 +28,8 @@
 
 #define INBUF_SIZE 128
 
+serialPort_t * telemport;
+
 // from mixer.c
 extern int16_t motor_disarmed[4];
 // cause reboot after MSP processing complete
@@ -137,8 +139,8 @@ void serializeNames(const char *s)
 void serialInit(uint32_t baudrate)
 {
     numTelemetryPorts = 0;
-    core.mainport = uartOpen(USART1, NULL, baudrate, MODE_RXTX);
-    ports[0].port = core.mainport;
+    telemport = uartOpen(USART1, NULL, baudrate, MODE_RXTX);
+    ports[0].port = telemport;
     numTelemetryPorts++;
 }
 

@@ -7,7 +7,6 @@
 #include "telemetry_common.h"
 #include "config.h"
 
-core_t core;
 int hw_revision = 0;
 extern rcReadRawDataPtr rcReadRawFunc;
 
@@ -21,7 +20,7 @@ void SetSysClock(bool overclock);
 static void _putc(void *p, char c)
 {
     (void)p;
-    serialWrite(core.mainport, c);
+    serialWrite(telemport, c);
 }
 
 static void activateConfig(void)
@@ -100,7 +99,6 @@ int main(void)
     for (i = 0; i < RC_CHANS; i++)
         rcData[i] = 1502;
     rcReadRawFunc = pwmReadRawRC;
-    core.numRCChannels = MAX_INPUTS;
 
     previousTime = micros();
     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
