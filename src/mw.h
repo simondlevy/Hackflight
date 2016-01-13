@@ -121,7 +121,7 @@ void Gyro_getADC(void);
 int Baro_update(void);
 bool initBaro(baro_t * baro);
 bool initSonar();
-void pollSonar();
+int32_t pollSonar();
 
 // Output
 void mixerInit(void);

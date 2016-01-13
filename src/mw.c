@@ -385,7 +385,7 @@ void loop(void)
             case 0:
                 taskOrder++;
                 if (sonar_available) {
-                    pollSonar();
+                    SonarAlt = pollSonar();
                 }
             case 1:
                 taskOrder++;

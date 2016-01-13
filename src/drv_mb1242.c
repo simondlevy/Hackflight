@@ -1,13 +1,15 @@
 #include "board.h"
-#include "mw.h"
+//#include "mw.h"
 
 #define MB1242_ADDRESS 0x70
 
 extern bool check_and_update_timed_task(uint32_t * usec, uint32_t period);
 
+static int32_t distance_cm;
+
 static void adjust_reading() {
 
-    SonarAlt = 1.071 * SonarAlt + 3.103; // emprically determined
+    distance_cm = 1.071 * distance_cm + 3.103; // emprically determined
 }
 
 static bool attempt_write()
@@ -20,7 +22,7 @@ bool initSonar()
     return attempt_write() == 1;
 }
 
-void pollSonar()
+int32_t pollSonar()
 {
     static uint32_t mb1242Time = 0;
     static uint8_t state;
@@ -34,7 +36,7 @@ void pollSonar()
         else if (state == 1) {
             uint8_t bytes[2];
             if (i2cRead(MB1242_ADDRESS, 0x8F, 2, bytes)) {
-                SonarAlt = (bytes[0] << 8) + bytes[1];  
+                distance_cm = (bytes[0] << 8) + bytes[1];  
                 adjust_reading();
                 state++;
             }
@@ -43,4 +45,6 @@ void pollSonar()
             state = 0;
         }
     }
+
+    return distance_cm;
 }
