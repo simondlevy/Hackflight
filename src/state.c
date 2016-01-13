@@ -331,9 +331,12 @@ int getEstimatedAltitude(void)
 
     // calculates height from ground via baro readings
     // see: https://github.com/diydrones/ardupilot/blob/master/libraries/AP_Baro/AP_Baro.cpp#L140
-    BaroAlt_tmp = lrintf((1.0f - powf((float)(baroPressureSum / (CONFIG_BARO_TAB_SIZE - 1)) / 101325.0f, 0.190295f)) * 4433000.0f); // in cm
+    BaroAlt_tmp = lrintf((1.0f - powf((float)(baroPressureSum / (CONFIG_BARO_TAB_SIZE - 1)) / 101325.0f, 0.190295f)) 
+            * 4433000.0f); // in cm
     BaroAlt_tmp -= baroGroundAltitude;
-    BaroAlt = lrintf((float)BaroAlt * CONFIG_BARO_NOISE_LPF + (float)BaroAlt_tmp * (1.0f - CONFIG_BARO_NOISE_LPF)); // additional LPF to reduce baro noise
+
+    // additional LPF to reduce baro noise
+    BaroAlt = lrintf((float)BaroAlt * CONFIG_BARO_NOISE_LPF + (float)BaroAlt_tmp * (1.0f - CONFIG_BARO_NOISE_LPF)); 
 
     // calculate sonar altitude only if the sonar is facing downwards(<25deg)
     if (tiltAngle > 250)
@@ -359,9 +362,11 @@ int getEstimatedAltitude(void)
     accZ_tmp = (float)accSum[2] / (float)accSumCount;
     vel_acc = accZ_tmp * accVelScale * (float)accTimeSum;
 
-    // Integrator - Altitude in cm
-    accAlt += (vel_acc * 0.5f) * dt + vel * dt;                                         // integrate velocity to get distance (x= a/2 * t^2)
-    accAlt = accAlt * CONFIG_BARO_CF_ALT + (float)BaroAlt * (1.0f - CONFIG_BARO_CF_ALT);      // complementary filter for altitude estimation (baro & acc)
+    // integrate velocity to get distance (x= a/2 * t^2)
+    accAlt += (vel_acc * 0.5f) * dt + vel * dt;                                         
+
+    // complementary filter for altitude estimation (baro & acc)
+    accAlt = accAlt * CONFIG_BARO_CF_ALT + (float)BaroAlt * (1.0f - CONFIG_BARO_CF_ALT);      
 
     EstAlt = sonarInRange() ? BaroAlt : accAlt;
 
@@ -375,8 +380,9 @@ int getEstimatedAltitude(void)
     baroVel = constrain(baroVel, -1500, 1500);    // constrain baro velocity +/- 1500cm/s
     baroVel = applyDeadband(baroVel, 10);         // to reduce noise near zero
 
-    // apply Complimentary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity).
-    // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
+    // Apply complementary filter to keep the calculated velocity based on baro velocity (i.e. near real velocity).
+    // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, 
+    // i.e without delay
     vel = vel * CONFIG_BARO_CF_VEL + baroVel * (1 - CONFIG_BARO_CF_VEL);
     vel_tmp = lrintf(vel);
 
