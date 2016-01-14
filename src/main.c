@@ -102,6 +102,7 @@ int main(void)
 
     previousTime = micros();
     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
+    calibratingB = CONFIG_CALIBRATING_BARO_CYCLES;             // 10 seconds init_delay + 200 * 25 ms = 15 seconds before ground pressure settles
     // 10 seconds init_delay + 200 * 25 ms = 15 seconds before ground pressure settles
 
     // trigger accelerometer calibration requirement

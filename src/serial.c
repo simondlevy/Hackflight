@@ -212,8 +212,11 @@ static void evaluateCommand(void)
             break;
 
         case MSP_MB1242:
-            headSerialReply(12);
+            headSerialReply(24);
             serialize32(BaroAlt);
+            serialize32(SonarAlt);
+            serialize32(FusedBaroSonarAlt);
+            serialize32(EstAlt);
             serialize32(AltHold);
             serialize32(AltPID);
             break;

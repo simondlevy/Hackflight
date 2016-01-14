@@ -4,7 +4,7 @@ BT_BAUD = 115200
 BT_ADDR = "00:06:66:73:e3:a6"
 BT_PORT = 1
 
-MAXAGLCM = 300
+MAXAGLCM = 200
 MAXPID   = 250
  
 from msppg import MSP_Parser as Parser
@@ -17,20 +17,23 @@ class AGLPlotter(RealtimePlotter):
 
     def __init__(self):
 
-        ylim = (0, MAXAGLCM)
+        ylim = (-50, MAXAGLCM)
         ytic = range(ylim[0], ylim[1], 20)
 
-        RealtimePlotter.__init__(self, [ylim, (-MAXPID,+MAXPID)], 
+        RealtimePlotter.__init__(self, [ylim], 
                 window_name='MB1242 Sonar',
-                yticks = [ytic, range(-MAXPID, +MAXPID, 25)],
-                styles = [('b', 'r'), 'k'], 
-                ylabels=['AGL (cm)', 'PID'])
+                yticks = [ytic],
+                styles = [('b', 'r', 'g', 'k')], 
+                ylabels=['AGL (cm)'])
 
         self.xcurr = 0
-        self.aglcm = 0
-        self.holdcm = 0
+        self.baro = 0
+        self.sonar = 0
+        self.baro_sonar = 0
+        self.est = 0
+        self.hold = 0
         self.pid = 0
-
+ 
         self.parser = Parser()
         self.parser.set_MB1242_Handler(self.handler)
         self.request = self.parser.serialize_MB1242_Request()
@@ -43,17 +46,20 @@ class AGLPlotter(RealtimePlotter):
 
         self.logfile = open('logs/' + strftime("%d-%b-%Y-%H-%M-%S.csv", localtime()), 'w')
 
-    def handler(self, aglcm, holdcm, pid):
-        self.aglcm = aglcm
-        self.holdcm = holdcm
+    def handler(self, baro, sonar, baro_sonar, est, hold, pid):
+        self.baro = baro
+        self.sonar = sonar
+        self.baro_sonar = baro_sonar
+        self.est = est
+        self.hold = hold
         self.pid = pid
-        self.logfile.write('%d,%d,%d\n' % (aglcm, holdcm, pid))
+        self.logfile.write('%d,%d,%d,%d\n' % (baro, sonar, baro_sonar, est))
         self.logfile.flush()
         self.sock.send(self.request)
 
     def getValues(self):
 
-        return (self.aglcm,self.holdcm,self.pid)
+        return self.baro, self.sonar, self.baro_sonar, self.est
 
     def update(self):
 
@@ -61,7 +67,6 @@ class AGLPlotter(RealtimePlotter):
 
             self.parser.parse(self.sock.recv(1))
             plotter.xcurr += 1
-            #sleep(.002)
             sleep(.001)
 
 

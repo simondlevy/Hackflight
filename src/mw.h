@@ -82,6 +82,7 @@ extern int32_t baroTemperature;
 extern uint32_t baroPressureSum;
 extern int32_t BaroAlt;
 
+extern int32_t FusedBaroSonarAlt;
 extern int32_t EstAlt;
 extern int32_t AltHold;
 extern int32_t setVelocity;

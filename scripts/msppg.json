@@ -33,7 +33,10 @@
                {"pixel_flow_y_sum": "short"}],
 
   "MB1242": [{"ID": 126},
-               {"distance": "int"},
+               {"baro": "int"},
+               {"sonar": "int"},
+               {"baro_sonar": "int"},
+               {"est": "int"},
                {"alt_hold": "int"},
                {"pid": "int"}] 
 }
