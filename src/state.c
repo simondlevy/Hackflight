@@ -11,7 +11,7 @@ int32_t  baroPressure = 0;
 int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
 int32_t  BaroAlt = 0;
-int32_t  BaroPID = 0;
+int32_t  AltPID = 0;
 int32_t  baroAlt_offset = 0;
 int32_t  SonarAlt = 0;
 float    sonarTransition = 0;
@@ -26,7 +26,6 @@ float    magneticDeclination = 0.0f;       // calculated at startup from config
 float    accVelScale;
 float    throttleAngleScale;
 float    fc_acc;
-int32_t  SonarPID = 0;
 
 // **************
 // gyro+acc IMU
@@ -293,28 +292,28 @@ static bool sonarInRange(void)
     return SonarAlt > 20 && SonarAlt < 765;
 }
 
+// complementary filter
+static float cfilter(float a, float b, float c) 
+{
+    return a * c + b * (1 - c);
+}
+
 int getEstimatedAltitude(void)
 {
     static uint32_t previousT;
-    uint32_t currentT = micros();
-    uint32_t dTime;
-    int32_t error;
-    int32_t baroVel;
-    int32_t vel_tmp;
-    int32_t BaroAlt_tmp;
-    int32_t setVel;
-    float dt;
-    float vel_acc;
-    float accZ_tmp;
-    static float accZ_old = 0.0f;
-    static float vel = 0.0f;
-    static float AccelAlt = 0.0f;
+    static float accZ_old;
+    static float accelVel;
+    static float accelAlt;
     static int32_t lastBaroAlt;
-    static int32_t baroGroundAltitude = 0;
-    static int32_t baroGroundPressure = 0;
+    static int32_t baroGroundAltitude;
+    static int32_t baroGroundPressure;
+
+    uint32_t currentT = micros();
+
     int16_t tiltAngle = max(abs(angle[ROLL]), abs(angle[PITCH]));
 
-    dTime = currentT - previousT;
+    uint32_t dTime = currentT - previousT;
+
     if (dTime < CONFIG_ALT_UPDATE_USEC)
         return 0;
     previousT = currentT;
@@ -325,18 +324,19 @@ int getEstimatedAltitude(void)
         baroGroundPressure += baroPressureSum / (CONFIG_BARO_TAB_SIZE - 1);
         baroGroundAltitude = (1.0f - powf((baroGroundPressure / 8) / 101325.0f, 0.190295f)) * 4433000.0f;
 
-        vel = 0;
-        AccelAlt = 0;
+        accelVel = 0;
+        accelAlt = 0;
         calibratingB--;
     }
 
     // Calculates height from ground via baro readings in cm
     // See: https://github.com/diydrones/ardupilot/blob/master/libraries/AP_Baro/AP_Baro.cpp#L140
-    BaroAlt_tmp = lrintf((1.0f - powf((float)(baroPressureSum / (CONFIG_BARO_TAB_SIZE - 1)) / 101325.0f, 0.190295f)) 
-            * 4433000.0f) - baroGroundAltitude;
+    int32_t BaroAlt_tmp = lrintf((1.0f - powf((float)(baroPressureSum / (CONFIG_BARO_TAB_SIZE - 1)) 
+                    / 101325.0f, 0.190295f)) * 4433000.0f) - baroGroundAltitude;
 
     // Additional low-pass filter to reduce baro noise
-    BaroAlt = lrintf((float)BaroAlt * CONFIG_BARO_NOISE_LPF + (float)BaroAlt_tmp * (1.0f - CONFIG_BARO_NOISE_LPF)); 
+    //BaroAlt = lrintf((float)BaroAlt * CONFIG_BARO_NOISE_LPF + (float)BaroAlt_tmp * (1.0f - CONFIG_BARO_NOISE_LPF)); 
+    BaroAlt = lrintf(cfilter(BaroAlt, BaroAlt_tmp, CONFIG_BARO_NOISE_LPF));
 
     // Calculate sonar altitude only if the sonar is facing downwards(<25deg)
     SonarAlt = (tiltAngle > 250) ? -1 : SonarAlt * (900.0f - tiltAngle) / 900.0f;
@@ -346,33 +346,34 @@ int getEstimatedAltitude(void)
         baroAlt_offset = BaroAlt - SonarAlt;
         BaroAlt = SonarAlt;
     } else {
-        BaroAlt -= baroAlt_offset;
+        BaroAlt = BaroAlt - baroAlt_offset;
         if (SonarAlt > 0) {
             sonarTransition = (300 - SonarAlt) / 100.0f;
-            BaroAlt = SonarAlt * sonarTransition + BaroAlt * (1.0f - sonarTransition);
+            //BaroAlt = SonarAlt * sonarTransition + BaroAlt * (1.0f - sonarTransition);
+            BaroAlt = cfilter(SonarAlt, BaroAlt, sonarTransition); 
         }
     }
 
     // delta acc reading time in seconds
-    dt = accTimeSum * 1e-6f; 
+    float dt = accTimeSum * 1e-6f; 
 
     // Integrator - velocity, cm/sec
-    accZ_tmp = (float)accSum[2] / (float)accSumCount;
-    vel_acc = accZ_tmp * accVelScale * (float)accTimeSum;
+    float accZ_tmp = (float)accSum[2] / (float)accSumCount;
+    float vel_acc = accZ_tmp * accVelScale * (float)accTimeSum;
 
-    // integrate velocity to get distance (x= a/2 * t^2)
-    AccelAlt += (vel_acc * 0.5f) * dt + vel * dt;                                         
+    // integrate accelerometer velocity to get distance (x= a/2 * t^2)
+    accelAlt += (vel_acc * 0.5f) * dt + accelVel * dt;                                         
+    accelVel += vel_acc;
 
     // complementary filter for altitude estimation (baro & acc)
-    AccelAlt = AccelAlt * CONFIG_BARO_CF_ALT + (float)BaroAlt * (1.0f - CONFIG_BARO_CF_ALT);      
+    //accelAlt = accelAlt * CONFIG_BARO_CF_ALT + (float)BaroAlt * (1.0f - CONFIG_BARO_CF_ALT);      
+    accelAlt = cfilter(accelAlt, BaroAlt, CONFIG_BARO_CF_ALT);
 
-    EstAlt = sonarInRange() ? BaroAlt : AccelAlt;
-
-    vel += vel_acc;
+    EstAlt = sonarInRange() ? BaroAlt : accelAlt;
 
     accSum_reset();
 
-    baroVel = (BaroAlt - lastBaroAlt) * 1000000.0f / dTime;
+    int32_t baroVel = (BaroAlt - lastBaroAlt) * 1000000.0f / dTime;
     lastBaroAlt = BaroAlt;
 
     baroVel = constrain(baroVel, -1500, 1500);    // constrain baro velocity +/- 1500cm/s
@@ -381,37 +382,39 @@ int getEstimatedAltitude(void)
     // Apply complementary filter to keep the calculated velocity based on baro velocity (i.e. near real velocity).
     // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, 
     // i.e without delay
-    vel = vel * CONFIG_BARO_CF_VEL + baroVel * (1 - CONFIG_BARO_CF_VEL);
-    vel_tmp = lrintf(vel);
+    //accelVel = accelVel * CONFIG_BARO_CF_VEL + baroVel * (1 - CONFIG_BARO_CF_VEL);
+    accelVel = cfilter(accelVel, baroVel, CONFIG_BARO_CF_VEL);
+    int32_t vel_tmp = lrintf(accelVel);
 
     // set vario
     vario = applyDeadband(vel_tmp, 5);
 
+    int32_t setVel = setVelocity;
+
     if (tiltAngle < 800) { // only calculate pid if the copters thrust is facing downwards(<80deg)
+
         // Altitude P-Controller
         if (!velocityControl) {
-            error = constrain(AltHold - EstAlt, -500, 500);
+            int32_t error = constrain(AltHold - EstAlt, -500, 500);
             error = applyDeadband(error, 10);       // remove small P parametr to reduce noise near zero position
             setVel = constrain((CONFIG_ALT_P * error / 128), -300, +300); // limit velocity to +/- 3 m/s
-        } else {
-            setVel = setVelocity;
-        }
+        } 
 
         // Velocity PID-Controller
         // P
-        error = setVel - vel_tmp;
-        BaroPID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
+        int32_t error = setVel - vel_tmp;
+        AltPID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
 
         // I
         errorVelocityI += (CONFIG_VEL_I * error);
         errorVelocityI = constrain(errorVelocityI, -(8196 * 200), (8196 * 200));
-        BaroPID += errorVelocityI / 8196;     // I in the range of +/-200
+        AltPID += errorVelocityI / 8196;     // I in the range of +/-200
 
         // D
-        BaroPID -= constrain(CONFIG_VEL_D * (accZ_tmp + accZ_old) / 512, -150, 150);
+        AltPID -= constrain(CONFIG_VEL_D * (accZ_tmp + accZ_old) / 512, -150, 150);
 
     } else {
-        BaroPID = 0;
+        AltPID = 0;
     }
 
     accZ_old = accZ_tmp;

@@ -87,8 +87,7 @@ extern int32_t AltHold;
 extern int32_t setVelocity;
 extern uint8_t velocityControl;
 extern int32_t errorVelocityI;
-extern int32_t BaroPID;
-extern int32_t SonarPID;
+extern int32_t AltPID;
 extern int32_t vario;
 extern int16_t throttleAngleCorrection;
 extern int16_t headFreeModeHold;
@@ -118,10 +117,10 @@ int getEstimatedAltitude();
 void initSensors(void);
 void ACC_getADC(void);
 void Gyro_getADC(void);
-int Baro_update(void);
 bool initBaro(baro_t * baro);
+int Baro_update(void);
 bool initSonar();
-int32_t pollSonar();
+void Sonar_update(void);
 
 // Output
 void mixerInit(void);

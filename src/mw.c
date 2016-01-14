@@ -365,7 +365,7 @@ void loop(void)
                 AltHold = EstAlt;
                 initialThrottleHold = rcCommand[THROTTLE];
                 errorVelocityI = 0;
-                BaroPID = 0;
+                AltPID = 0;
             }
         }
         else {
@@ -385,7 +385,8 @@ void loop(void)
             case 0:
                 taskOrder++;
                 if (sonar_available) {
-                    SonarAlt = pollSonar();
+                    Sonar_update();
+                    break;
                 }
             case 1:
                 taskOrder++;
@@ -438,7 +439,7 @@ void loop(void)
                         AltHold = EstAlt;
                         isAltHoldChanged = 0;
                     }
-                    rcCommand[THROTTLE] = constrain(initialThrottleHold + BaroPID, 
+                    rcCommand[THROTTLE] = constrain(initialThrottleHold + AltPID, 
                             CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
                 }
             } else {
@@ -453,7 +454,7 @@ void loop(void)
                     velocityControl = 0;
                     isAltHoldChanged = 0;
                 }
-                rcCommand[THROTTLE] = constrain(initialThrottleHold + BaroPID, CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
+                rcCommand[THROTTLE] = constrain(initialThrottleHold + AltPID, CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
             }
         }
 

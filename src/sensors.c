@@ -197,3 +197,10 @@ int Baro_update(void)
         return 1;
     }
 }
+
+void Sonar_update(void) 
+{
+    extern int32_t pollSonar(void);
+
+    SonarAlt = pollSonar();
+}

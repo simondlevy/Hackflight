@@ -1,5 +1,7 @@
-#include "board.h"
-//#include "mw.h"
+#include <stdbool.h>
+#include <stdint.h>
+
+#include "drv_i2c.h"
 
 #define MB1242_ADDRESS 0x70
 

@@ -35,8 +35,6 @@ static const uint8_t CONFIG_VEL_D = 1;
 
 #define CONFIG_ALTITUDE_UPDATE_USEC                 25000   // 40hz update rate (20hz LPF on acc)
 #define CONFIG_ALT_HOLD_THROTTLE_NEUTRAL            40
-#define CONFIG_CF_ALT                               0.965
-#define CONFIG_CF_VEL                               0.985
 
 // when disabled, turn off the althold when throttle stick is out of deadband defined with 
 // alt_hold_throttle_neutral; when enabled, altitude changes slowly proportional to stick movement
