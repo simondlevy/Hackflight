@@ -15,6 +15,7 @@ int32_t  FusedBaroSonarAlt = 0;
 int32_t  AltPID = 0;
 int32_t  baroAlt_offset = 0;
 int32_t  SonarAlt = 0;
+int32_t  AccelAlt = 0;
 float    sonarTransition = 0;
 int32_t  EstAlt;                // in cm
 int32_t  AltHold;
@@ -304,10 +305,10 @@ int getEstimatedAltitude(void)
     static uint32_t previousT;
     static float accZ_old;
     static float accelVel;
-    static float accelAlt;
     static int32_t lastFusedBaroSonarAlt;
     static int32_t baroGroundAltitude;
     static int32_t baroGroundPressure;
+    static float   accelAlt;
 
     uint32_t currentT = micros();
 
@@ -330,10 +331,12 @@ int getEstimatedAltitude(void)
         calibratingB--;
     }
 
-    // Calculates height from ground via baro readings in cm
+    // Calculates height from ground in cm via baro pressure
     // See: https://github.com/diydrones/ardupilot/blob/master/libraries/AP_Baro/AP_Baro.cpp#L140
     int32_t BaroAlt_tmp = lrintf((1.0f - powf((float)(baroPressureSum / (CONFIG_BARO_TAB_SIZE - 1)) 
-                    / 101325.0f, 0.190295f)) * 4433000.0f) - baroGroundAltitude;
+                    / 101325.0f, 0.190295f)) * 4433000.0f);
+    printf("%d %d\n", baroGroundAltitude, BaroAlt_tmp);
+    BaroAlt_tmp -= baroGroundAltitude;
 
     // Additional low-pass filter to reduce baro noise
     BaroAlt = lrintf(cfilter(BaroAlt, BaroAlt_tmp, CONFIG_BARO_NOISE_LPF));
@@ -365,7 +368,9 @@ int getEstimatedAltitude(void)
     accelVel += vel_acc;
 
     // complementary filter for altitude estimation (baro & acc)
-    accelAlt = cfilter(accelAlt, FusedBaroSonarAlt, CONFIG_BARO_CF_ALT);
+    //accelAlt = cfilter(accelAlt, FusedBaroSonarAlt, CONFIG_BARO_CF_ALT);
+
+    AccelAlt = (int)accelAlt;
 
     EstAlt = sonarInRange() ? FusedBaroSonarAlt : accelAlt;
 

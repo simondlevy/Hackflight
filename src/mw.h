@@ -57,6 +57,8 @@ uint16_t lidarlite_distance;
 extern bool sonar_available;
 extern int32_t SonarAlt;
 
+extern int32_t AccelAlt;
+
 extern int16_t gyroZero[3];
 extern int16_t gyroData[3];
 extern int16_t angle[2];

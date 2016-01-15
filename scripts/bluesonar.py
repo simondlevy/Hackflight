@@ -5,7 +5,6 @@ BT_ADDR = "00:06:66:73:e3:a6"
 BT_PORT = 1
 
 MAXAGLCM = 200
-MAXPID   = 250
  
 from msppg import MSP_Parser as Parser
 from realtime_plot import RealtimePlotter
@@ -17,23 +16,20 @@ class AGLPlotter(RealtimePlotter):
 
     def __init__(self):
 
-        ylim = (-50, MAXAGLCM)
+        ylim = (-MAXAGLCM, MAXAGLCM)
         ytic = range(ylim[0], ylim[1], 20)
 
         RealtimePlotter.__init__(self, [ylim], 
                 window_name='MB1242 Sonar',
                 yticks = [ytic],
-                styles = [('b', 'r', 'g', 'k')], 
-                legends = [('baro', 'sonar', 'fused', 'estimated')],
+                styles = [('r', 'g', 'b')], 
+                legends = [('accel', 'baro', 'sonar')],
                 ylabels=['AGL (cm)'])
 
         self.xcurr = 0
+        self.accel = 0
         self.baro = 0
         self.sonar = 0
-        self.baro_sonar = 0
-        self.est = 0
-        self.hold = 0
-        self.pid = 0
  
         self.parser = Parser()
         self.parser.set_MB1242_Handler(self.handler)
@@ -47,20 +43,17 @@ class AGLPlotter(RealtimePlotter):
 
         self.logfile = open('logs/' + strftime("%d-%b-%Y-%H-%M-%S.csv", localtime()), 'w')
 
-    def handler(self, baro, sonar, baro_sonar, est, hold, pid):
+    def handler(self, accel, baro, sonar):
+        self.accel = accel
         self.baro = baro
         self.sonar = sonar
-        self.baro_sonar = baro_sonar
-        self.est = est
-        self.hold = hold
-        self.pid = pid
-        self.logfile.write('%d,%d,%d,%d\n' % (baro, sonar, baro_sonar, est))
+        self.logfile.write('%d,%d,%d\n' % (accel, baro, sonar))
         self.logfile.flush()
         self.sock.send(self.request)
 
     def getValues(self):
 
-        return self.baro, self.sonar, self.baro_sonar, self.est
+        return self.accel, self.baro, self.sonar
 
     def update(self):
 
