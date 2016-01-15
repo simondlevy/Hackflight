@@ -24,6 +24,7 @@ class AGLPlotter(RealtimePlotter):
                 window_name='MB1242 Sonar',
                 yticks = [ytic],
                 styles = [('b', 'r', 'g', 'k')], 
+                legends = [('baro', 'sonar', 'fused', 'estimated')],
                 ylabels=['AGL (cm)'])
 
         self.xcurr = 0
