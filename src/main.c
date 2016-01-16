@@ -9,6 +9,8 @@
 
 int hw_revision = 0;
 extern rcReadRawDataPtr rcReadRawFunc;
+uint8_t useSmallAngle;
+uint8_t armed;
 
 // receiver read function
 extern uint16_t pwmReadRawRC(uint8_t chan);

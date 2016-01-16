@@ -3,6 +3,8 @@
 
 #define PX4FLOW_ADDRESS 0x42
 
+px4flow_frame_t px4flow_frame;
+
 bool initPX4Flow(void)
 {
     return i2cWrite(PX4FLOW_ADDRESS, 0x00, 0x00);

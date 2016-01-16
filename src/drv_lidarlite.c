@@ -3,6 +3,8 @@
 
 #define LIDARLITE_ADDRESS 0x62
 
+uint16_t lidarlite_distance;
+
 extern bool check_and_update_timed_task(uint32_t * usec, uint32_t period);
 
 static bool attempt_write(void)

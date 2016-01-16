@@ -45,14 +45,14 @@ typedef struct motorMixer_t {
 
 extern serialPort_t * telemport;
 
-uint8_t useSmallAngle;
-uint8_t armed;
+extern uint8_t useSmallAngle;
+extern uint8_t armed;
 
 extern bool px4flow_available;
-px4flow_frame_t px4flow_frame;
+extern px4flow_frame_t px4flow_frame;
 
 extern bool lidarlite_available;
-uint16_t lidarlite_distance;
+extern uint16_t lidarlite_distance;
 
 extern bool sonar_available;
 extern int32_t SonarAlt;
