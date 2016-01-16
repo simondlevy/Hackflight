@@ -41,7 +41,7 @@ typedef enum serialState_t {
     HEADER_M,
     HEADER_ARROW,
     HEADER_SIZE,
-    HEADER_CMD,
+    HEADER_CMD
 } serialState_t;
 
 typedef  struct mspPortState_t {

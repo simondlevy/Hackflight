@@ -4,7 +4,7 @@ typedef enum portMode_t {
     MODE_RX = 1 << 0,
     MODE_TX = 1 << 1,
     MODE_RXTX = MODE_RX | MODE_TX,
-    MODE_SBUS = 1 << 2,
+    MODE_SBUS = 1 << 2
 } portMode_t;
 
 typedef struct serialPort {

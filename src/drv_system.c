@@ -51,33 +51,28 @@ void systemInit(void)
     struct {
         GPIO_TypeDef *gpio;
         gpio_config_t cfg;
-    } gpio_setup[] = {
-#ifdef LED0
-        {
-            .gpio = LED0_GPIO,
-            .cfg = { LED0_PIN, Mode_Out_PP, Speed_2MHz }
-        },
-#endif
-#ifdef LED1
+    } gpio_setup[4];
 
-        {
-            .gpio = LED1_GPIO,
-            .cfg = { LED1_PIN, Mode_Out_PP, Speed_2MHz }
-        },
-#endif
-#ifdef BUZZER
-        {
-            .gpio = BEEP_GPIO,
-            .cfg = { BEEP_PIN, Mode_Out_OD, Speed_2MHz }
-        },
-#endif
-#ifdef INVERTER
-        {
-            .gpio = INV_GPIO,
-            .cfg = { INV_PIN, Mode_Out_PP, Speed_2MHz }
-        },
-#endif
-    };
+    gpio_setup[0].gpio = LED0_GPIO;
+    gpio_setup[0].cfg.pin = LED0_PIN;
+    gpio_setup[0].cfg.mode = Mode_Out_PP;
+    gpio_setup[0].cfg.speed = Speed_2MHz;
+
+    gpio_setup[1].gpio = LED1_GPIO;
+    gpio_setup[1].cfg.pin = LED1_PIN;
+    gpio_setup[1].cfg.mode = Mode_Out_PP;
+    gpio_setup[1].cfg.speed = Speed_2MHz;
+
+    gpio_setup[2].gpio = BEEP_GPIO;
+    gpio_setup[2].cfg.pin = BEEP_PIN;
+    gpio_setup[2].cfg.mode = Mode_Out_OD;
+    gpio_setup[2].cfg.speed = Speed_2MHz;
+
+    gpio_setup[3].gpio = INV_GPIO;
+    gpio_setup[3].cfg.pin = INV_PIN;
+    gpio_setup[3].cfg.mode = Mode_Out_PP;
+    gpio_setup[3].cfg.speed = Speed_2MHz;
+
     gpio_config_t gpio;
     int i, gpio_count = sizeof(gpio_setup) / sizeof(gpio_setup[0]);
 
@@ -127,39 +122,11 @@ void systemInit(void)
     SysTick_Config(SystemCoreClock / 1000);
 }
 
-#if 1
 void delayMicroseconds(uint32_t us)
 {
     uint32_t now = micros();
     while (micros() - now < us);
 }
-#else
-void delayMicroseconds(uint32_t us)
-{
-    uint32_t elapsed = 0;
-    uint32_t lastCount = SysTick->VAL;
-
-    for (;;) {
-        register uint32_t current_count = SysTick->VAL;
-        uint32_t elapsed_us;
-
-        // measure the time elapsed since the last time we checked
-        elapsed += current_count - lastCount;
-        lastCount = current_count;
-
-        // convert to microseconds
-        elapsed_us = elapsed / usTicks;
-        if (elapsed_us >= us)
-            break;
-
-        // reduce the delay by the elapsed time
-        us -= elapsed_us;
-
-        // keep fractional microseconds for the next iteration
-        elapsed %= usTicks;
-    }
-}
-#endif
 
 void delay(uint32_t ms)
 {

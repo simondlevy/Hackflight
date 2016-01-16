@@ -226,7 +226,10 @@ static void getEstimatedAttitude(void)
 {
     int32_t axis;
     int32_t accMag = 0;
-    static t_fp_vector EstN = { .A = { 1.0f, 0.0f, 0.0f } };
+    static t_fp_vector EstN;
+    EstN.A[0] = 1.0f;
+    EstN.A[1] = 0.0f;
+    EstN.A[2] = 0.0f;
     static float accLPF[3];
     static uint32_t previousT;
     uint32_t currentT = micros();

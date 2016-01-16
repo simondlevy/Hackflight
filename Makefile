@@ -95,7 +95,7 @@ STDPERIPH_SRC	 = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
 
 # Tool names
 CC		 = arm-none-eabi-gcc
-OBJCOPY		 = arm-none-eabi-objcopy
+OBJCOPY	 = arm-none-eabi-objcopy
 
 #
 # Tool options.
@@ -109,7 +109,7 @@ ARCH_FLAGS	 = -mthumb -mcpu=cortex-m3
 
 ifeq ($(DEBUG),GDB)
 OPTIMIZE	 = -Og
-LTO_FLAGS	 = $(OPTIMIZE)
+
 else
 OPTIMIZE	 = -Os
 LTO_FLAGS	 = -flto -fuse-linker-plugin $(OPTIMIZE)
@@ -117,12 +117,14 @@ endif
 
 DEBUG_FLAGS	 = -ggdb3
 
+STD99 = -std=gnu99
+
 CFLAGS		 = $(ARCH_FLAGS) \
 		   $(LTO_FLAGS) \
 		   $(addprefix -D,$(OPTIONS)) \
 		   $(addprefix -I,$(INCLUDE_DIRS)) \
 		   $(DEBUG_FLAGS) \
-		   -std=gnu99 \
+		   $(STD99) \
 		   -Wall -pedantic -Wextra -Wshadow -Wunsafe-loop-optimizations \
 		   -ffunction-sections \
 		   -fdata-sections \
