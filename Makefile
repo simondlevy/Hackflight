@@ -94,7 +94,8 @@ STDPERIPH_SRC	 = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
 #
 
 # Tool names
-CC		 = arm-none-eabi-gcc
+CC		 = arm-none-eabi-gcc -std=gnu99
+#CC		 = arm-none-eabi-g++
 OBJCOPY	 = arm-none-eabi-objcopy
 
 #
@@ -117,14 +118,11 @@ endif
 
 DEBUG_FLAGS	 = -ggdb3
 
-STD99 = -std=gnu99
-
 CFLAGS		 = $(ARCH_FLAGS) \
 		   $(LTO_FLAGS) \
 		   $(addprefix -D,$(OPTIONS)) \
 		   $(addprefix -I,$(INCLUDE_DIRS)) \
 		   $(DEBUG_FLAGS) \
-		   $(STD99) \
 		   -Wall -pedantic -Wextra -Wshadow -Wunsafe-loop-optimizations \
 		   -ffunction-sections \
 		   -fdata-sections \

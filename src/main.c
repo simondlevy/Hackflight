@@ -49,6 +49,8 @@ int main(void)
 {
     uint8_t i;
 
+    armed = 0;
+
     // Configure clock, this figures out HSE for hardware autodetect
     SetSysClock(CONFIG_EMF_AVOIDANCE);
 
