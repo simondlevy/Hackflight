@@ -309,40 +309,38 @@ int getEstimatedAltitude(void)
     static float accZ_old;
     static float accelVel;
     static int32_t lastFusedBaroSonarAlt;
-    static int32_t baroGroundAltitude;
+    int32_t baroAltGround;
+    static int32_t baroAltBaseline;
     static int32_t baroGroundPressure;
     static float   accelAlt;
+    static bool wasArmed;
 
     uint32_t currentT = micros();
-
     int16_t tiltAngle = max(abs(angle[ROLL]), abs(angle[PITCH]));
-
     uint32_t dTime = currentT - previousT;
 
     if (dTime < CONFIG_ALT_UPDATE_USEC)
         return 0;
     previousT = currentT;
 
-    // Automatically calibrate baro on startup
-    if (calibratingB > 0) {
-        baroGroundPressure -= baroGroundPressure / 8;
-        baroGroundPressure += baroPressureSum / (CONFIG_BARO_TAB_SIZE - 1);
-        baroGroundAltitude = (1.0f - powf((baroGroundPressure / 8) / 101325.0f, 0.190295f)) * 4433000.0f;
-
-        accelVel = 0;
-        accelAlt = 0;
-        calibratingB--;
-    }
-
     // Calculates height from ground in cm via baro pressure
     // See: https://github.com/diydrones/ardupilot/blob/master/libraries/AP_Baro/AP_Baro.cpp#L140
-    int32_t BaroAlt_tmp = lrintf((1.0f - powf((float)(baroPressureSum / (CONFIG_BARO_TAB_SIZE - 1)) 
+    int32_t baroAltRaw = lrintf((1.0f - powf((float)(baroPressureSum / (CONFIG_BARO_TAB_SIZE - 1)) 
                     / 101325.0f, 0.190295f)) * 4433000.0f);
-    printf("%d %d\n", baroGroundAltitude, BaroAlt_tmp);
-    BaroAlt_tmp -= baroGroundAltitude;
 
-    // Additional low-pass filter to reduce baro noise
-    BaroAlt = lrintf(cfilter(BaroAlt, BaroAlt_tmp, CONFIG_BARO_NOISE_LPF));
+    // Grab baro baseline on arming
+    if (armed) {
+        if (!wasArmed) {
+            baroAltBaseline = baroAltRaw;
+            accelVel = 0;
+            accelAlt = 0;
+        }
+        BaroAlt = baroAltRaw - baroAltBaseline;
+    }
+    else {
+        BaroAlt = 0;
+    }
+    wasArmed = armed;
 
     // Calculate sonar altitude only if the sonar is facing downwards(<25deg)
     SonarAlt = (tiltAngle > 250) ? -1 : SonarAlt * (900.0f - tiltAngle) / 900.0f;
