@@ -6,8 +6,8 @@ BT_PORT = 1
 
 SONARMIN = 0
 SONARMAX = 200
-BAROMIN = 97200
-BAROMAX = 97500
+BAROMIN = 972
+BAROMAX = 975
  
 from msppg import MSP_Parser as Parser
 from realtime_plot import RealtimePlotter
@@ -23,12 +23,13 @@ class AGLPlotter(RealtimePlotter):
 
         RealtimePlotter.__init__(self, [(SONARMIN,+SONARMAX), (BAROMIN,BAROMAX)], 
                 window_name='Altitude Sensor Fusion',
-                yticks = [range(SONARMIN,+SONARMAX,50), range(BAROMIN,BAROMAX,100)],
-                styles = ['r', 'g'], 
-                ylabels=['Sonar (cm)', 'BaroPress'])
+                yticks = [range(SONARMIN,+SONARMAX,50), range(BAROMIN,BAROMAX,1)],
+                styles = [('r','b'), 'g'], 
+                legends = [('Sonar', 'Fused'), None],
+                ylabels=['AGL (cm)', 'Baro (mb)'])
 
         self.xcurr = 0
-        self.accel = 0
+        self.fused = 0
         self.baropress = 0
         self.sonar = 0
  
@@ -44,17 +45,17 @@ class AGLPlotter(RealtimePlotter):
 
         self.logfile = open('logs/' + strftime("%d-%b-%Y-%H-%M-%S.csv", localtime()), 'w')
 
-    def handler(self, accel, baropress, sonar):
-        self.accel = accel
-        self.baropress = baropress
+    def handler(self, baropress, sonar):
+        self.fused = 0
+        self.baropress = baropress / 100.
         self.sonar = sonar
-        self.logfile.write('%d,%d,%d\n' % (accel, baropress, sonar))
+        self.logfile.write('%d,%d\n' % (baropress, sonar))
         self.logfile.flush()
         self.sock.send(self.request)
 
     def getValues(self):
 
-        return self.sonar, self.baropress
+        return self.sonar, self.fused, self.baropress
 
     def update(self):
 
