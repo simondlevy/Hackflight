@@ -79,6 +79,7 @@ extern uint16_t calibratingG;
 
 extern bool baro_available;
 extern int32_t baroPressure;
+extern int32_t baroPressure2;
 extern int32_t baroTemperature;
 extern uint32_t baroPressureSum;
 extern int32_t BaroAlt;

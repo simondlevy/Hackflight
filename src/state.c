@@ -8,6 +8,7 @@ uint32_t accTimeSum = 0;        // keep track for integration of acc
 int      accSumCount = 0;
 int16_t  smallAngle = 0;
 int32_t  baroPressure = 0;
+int32_t  baroPressure2 = 0;
 int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
 int32_t  BaroAlt = 0;
@@ -309,9 +310,8 @@ int getEstimatedAltitude(void)
     static float accZ_old;
     static float accelVel;
     static int32_t lastFusedBaroSonarAlt;
-    int32_t baroAltGround;
     static int32_t baroAltBaseline;
-    static int32_t baroGroundPressure;
+    static int32_t baroPressureBaseline;
     static float   accelAlt;
     static bool wasArmed;
 
@@ -332,15 +332,19 @@ int getEstimatedAltitude(void)
     if (armed) {
         if (!wasArmed) {
             baroAltBaseline = baroAltRaw;
+            baroPressureBaseline = baroPressureSum;
             accelVel = 0;
             accelAlt = 0;
         }
         BaroAlt = baroAltRaw - baroAltBaseline;
+        baroPressure2 = baroPressureSum - baroPressureBaseline;
     }
     else {
         BaroAlt = 0;
     }
     wasArmed = armed;
+
+    printf("%d\n", baroPressure2);
 
     // Calculate sonar altitude only if the sonar is facing downwards(<25deg)
     SonarAlt = (tiltAngle > 250) ? -1 : SonarAlt * (900.0f - tiltAngle) / 900.0f;

@@ -6,8 +6,7 @@ BT_PORT = 1
 
 SONARMIN = 0
 SONARMAX = 200
-BAROMIN = 972
-BAROMAX = 975
+BAROMAX = 10
  
 from msppg import MSP_Parser as Parser
 from realtime_plot import RealtimePlotter
@@ -21,9 +20,9 @@ class AGLPlotter(RealtimePlotter):
 
         agllim = SONARMIN, SONARMAX
 
-        RealtimePlotter.__init__(self, [(SONARMIN,+SONARMAX), (BAROMIN,BAROMAX)], 
+        RealtimePlotter.__init__(self, [(SONARMIN,+SONARMAX), (-BAROMAX,+BAROMAX)], 
                 window_name='Altitude Sensor Fusion',
-                yticks = [range(SONARMIN,+SONARMAX,50), range(BAROMIN,BAROMAX,1)],
+                yticks = [range(SONARMIN,+SONARMAX,50), range(-BAROMAX,+BAROMAX,1)],
                 styles = [('r','b'), 'g'], 
                 legends = [('Sonar', 'Fused'), None],
                 ylabels=['AGL (cm)', 'Baro (mb)'])

@@ -216,7 +216,7 @@ static void evaluateCommand(void)
 
         case MSP_MB1242:
             headSerialReply(8);
-            serialize32(baroPressure);
+            serialize32(baroPressure2);
             serialize32(SonarAlt);
             break;
 
