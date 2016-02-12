@@ -4,10 +4,6 @@
 BT_ADDR = "00:06:66:73:e3:a6"
 BT_PORT = 1
 
-# for plotting
-BARO_RANGE    = 20
-SONAR_RANGE   = 200
-
 from altitude_fuser import ASL_Plotter
 from msppg import MSP_Parser as Parser
 import threading
