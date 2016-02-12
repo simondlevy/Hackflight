@@ -54,7 +54,9 @@ class Bluetooth_ASL_EKF(ASL_EKF):
             self.parser.parse(self.sock.recv(1))
 
     def handler(self, baro, sonar):
-        print(baro, sonar)
+
+        self.plotter.setSensors(baro, sonar)
+
         self.sock.send(self.request)
 
     def getBaroBaseline(self):
@@ -67,6 +69,16 @@ class Bluetooth_ASLPlotter(ASL_Plotter):
 
         ASL_Plotter.__init__(self, Bluetooth_ASL_EKF(self))
         self.count = 0
+
+        self.baro = None
+        self.sonar = None
+
+    def setSensors(self, baro, sonar):
+
+        self.baro = baro
+        self.sonar = sonar
+
+        print(self.baro, self.sonar)
 
     def handleClose(self, event):
 
