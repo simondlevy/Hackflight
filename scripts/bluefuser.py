@@ -10,19 +10,8 @@ SONAR_RANGE   = 200
 
 from altitude_fuser import ASL_EKF, ASL_Plotter
 from msppg import MSP_Parser as Parser
-import numpy as np
 import threading
-from math import sin, pi
 import bluetooth
-
-# ground-truth AGL to sonar measurement, empirically determined:
-# see http://diydrones.com/profiles/blogs/altitude-hold-with-mb1242-sonar
-def sonarfun( agl):
-
-    return 0.933 * agl - 2.894
-
-
-BARO_BASELINE = 97420
 
 class Bluetooth_ASL_EKF(ASL_EKF):
 
@@ -49,36 +38,27 @@ class Bluetooth_ASL_EKF(ASL_EKF):
 
     def loop(self):
 
-        while True:
+        while self.plotter.running:
 
             self.parser.parse(self.sock.recv(1))
 
     def handler(self, baro, sonar):
 
-        self.plotter.setSensors(baro, sonar)
+        print(baro, sonar)
 
         self.sock.send(self.request)
 
     def getBaroBaseline(self):
 
-        return BARO_BASELINE
+        return 1974822
 
 class Bluetooth_ASLPlotter(ASL_Plotter):
 
     def __init__(self):
 
+        self.running = True
+
         ASL_Plotter.__init__(self, Bluetooth_ASL_EKF(self))
-        self.count = 0
-
-        self.baro = None
-        self.sonar = None
-
-    def setSensors(self, baro, sonar):
-
-        self.baro = baro
-        self.sonar = sonar
-
-        print(self.baro, self.sonar)
 
     def handleClose(self, event):
 
@@ -88,18 +68,7 @@ class Bluetooth_ASLPlotter(ASL_Plotter):
 
     def getSensors(self):
 
-        LOOPSIZE = 5000
-
-        # Model up-and-down motion with a sine wave
-        self.count = (self.count + 1) % LOOPSIZE
-        sine = sin(self.count/float(LOOPSIZE) * 2 * pi)
-
-        baro  = BARO_BASELINE + sine * BARO_RANGE
-
-        # Add noise to simulated sonar at random intervals
-        sonar = sonarfun(50*(1-sine)) + (50 if np.random.rand()>0.9 else 0)
-
-        return baro, sonar
+        return 0, 0
 
 if __name__ == '__main__':
 
