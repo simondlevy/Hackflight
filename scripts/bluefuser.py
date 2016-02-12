@@ -13,10 +13,13 @@ class Bluetooth_ASLPlotter(ASL_Plotter):
 
     def __init__(self):
 
-        self.running = True
-
         ASL_Plotter.__init__(self)
 
+        self.running = True
+
+        self.actual_baro = 0
+        self.actual_sonar = 0
+        
         self.parser = Parser()
         self.parser.set_MB1242_Handler(self.handler)
         self.request = self.parser.serialize_MB1242_Request()
@@ -40,7 +43,8 @@ class Bluetooth_ASLPlotter(ASL_Plotter):
 
     def handler(self, baro, sonar):
 
-        print(baro, sonar)
+        self.actual_baro = baro
+        self.actual_sonar = sonar
 
         self.sock.send(self.request)
 
@@ -51,6 +55,8 @@ class Bluetooth_ASLPlotter(ASL_Plotter):
         self.running = False
 
     def getSensors(self):
+
+        print(self.actual_baro, self.actual_sonar)
 
         return 0, 0
 
