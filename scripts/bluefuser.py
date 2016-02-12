@@ -8,10 +8,12 @@ BT_PORT = 1
 BARO_RANGE    = 20
 SONAR_RANGE   = 200
 
-import numpy as np
 from altitude_fuser import ASL_EKF, ASL_Plotter
+from msppg import MSP_Parser as Parser
+import numpy as np
 import threading
 from math import sin, pi
+import bluetooth
 
 # ground-truth AGL to sonar measurement, empirically determined:
 # see http://diydrones.com/profiles/blogs/altitude-hold-with-mb1242-sonar
@@ -27,6 +29,20 @@ class Bluetooth_ASL_EKF(ASL_EKF):
     def __init__(self):
 
         ASL_EKF.__init__(self)
+
+        parser = Parser()
+        parser.set_MB1242_Handler(self.handler)
+        self.request = parser.serialize_MB1242_Request()
+
+        self.sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM )
+        self.sock.connect((BT_ADDR, BT_PORT))
+        self.sock.send(self.request)
+
+        print('connected to %s' % BT_ADDR)
+
+    def handler(self, baro, sonar):
+        print(baro, sonar)
+        self.sock.send(self.request)
 
     def getBaroBaseline(self):
 
