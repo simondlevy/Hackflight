@@ -26,9 +26,11 @@ BARO_BASELINE = 97420
 
 class Bluetooth_ASL_EKF(ASL_EKF):
 
-    def __init__(self):
+    def __init__(self, plotter):
 
         ASL_EKF.__init__(self)
+
+        self.plotter = plotter
 
         self.parser = Parser()
         self.parser.set_MB1242_Handler(self.handler)
@@ -63,8 +65,14 @@ class Bluetooth_ASLPlotter(ASL_Plotter):
 
     def __init__(self):
 
-        ASL_Plotter.__init__(self, Bluetooth_ASL_EKF())
+        ASL_Plotter.__init__(self, Bluetooth_ASL_EKF(self))
         self.count = 0
+
+    def handleClose(self, event):
+
+        ASL_Plotter.handleClose(self, event)
+
+        self.running = False
 
     def getSensors(self):
 
