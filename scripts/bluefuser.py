@@ -8,18 +8,18 @@ BT_PORT = 1
 BARO_RANGE    = 20
 SONAR_RANGE   = 200
 
-from altitude_fuser import ASL_EKF, ASL_Plotter
+from altitude_fuser import ASL_Plotter
 from msppg import MSP_Parser as Parser
 import threading
 import bluetooth
 
-class Bluetooth_ASL_EKF(ASL_EKF):
+class Bluetooth_ASLPlotter(ASL_Plotter):
 
-    def __init__(self, plotter):
+    def __init__(self):
 
-        ASL_EKF.__init__(self)
+        self.running = True
 
-        self.plotter = plotter
+        ASL_Plotter.__init__(self)
 
         self.parser = Parser()
         self.parser.set_MB1242_Handler(self.handler)
@@ -38,7 +38,7 @@ class Bluetooth_ASL_EKF(ASL_EKF):
 
     def loop(self):
 
-        while self.plotter.running:
+        while self.running:
 
             self.parser.parse(self.sock.recv(1))
 
@@ -47,18 +47,6 @@ class Bluetooth_ASL_EKF(ASL_EKF):
         print(baro, sonar)
 
         self.sock.send(self.request)
-
-    def getBaroBaseline(self):
-
-        return 1974822
-
-class Bluetooth_ASLPlotter(ASL_Plotter):
-
-    def __init__(self):
-
-        self.running = True
-
-        ASL_Plotter.__init__(self, Bluetooth_ASL_EKF(self))
 
     def handleClose(self, event):
 
