@@ -50,7 +50,7 @@ COMMON_SRC = main.c \
 		   board/drv_i2c.c \
 		   board/drv_system.c \
 		   board/drv_serial.c \
-		   drv_uart.c \
+		   board/drv_uart.c \
 		   printf.c \
 		   utils.c \
 		   startup_stm32f10x_md_gcc.S \
@@ -66,7 +66,7 @@ NAZE_SRC = board/drv_adc.c \
 		   board/drv_ms5611.c \
 		   drv_pwm.c \
 		   board/drv_spi.c \
-		   drv_timer.c \
+		   board/drv_timer.c \
 		   board/drv_px4flow.c \
 		   board/drv_lidarlite.c \
 		   board/drv_mb1242.c \

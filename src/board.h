@@ -74,8 +74,8 @@ typedef void (*pidControllerFuncPtr)(void);                // pid controller fun
 #include "board/drv_spi.h"
 
 #include "drv_pwm.h"
-#include "drv_timer.h"
-#include "drv_uart.h"
+#include "board/drv_timer.h"
+#include "board/drv_uart.h"
 
 #endif /* all conditions */
 

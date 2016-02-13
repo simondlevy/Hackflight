@@ -5,7 +5,16 @@
  * DMA UART routines idea lifted from AutoQuad
  * Copyright © 2011  Bill Nesbitt
 */
-#include "board.h"
+
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+#include "stm32f10x_conf.h"
+
+#include "drv_serial.h"
+#include "drv_gpio.h"
+#include "drv_uart.h"
 
 static uartPort_t uartPort1;
 
