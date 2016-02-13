@@ -3,6 +3,7 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 #include "ms5611_board.h"
+#include "../baro.h"
 
 // MS5611, Standard address 0x77
 #define MS5611_ADDR                 0x77

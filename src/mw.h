@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "baro.h"
+
 #define BARO_TAB_SIZE_MAX   48
 
 #define RC_CHANS    (18)
