@@ -2,11 +2,23 @@
  * This file is part of baseflight
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
-#include "board.h"
+
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+#include "stm32f10x_conf.h"
+
+#include "board/drv_serial.h"
+#include "board/drv_gpio.h"
+#include "board/drv_system.h"
+
+#include "drv_pwm.h"
 #include "sensors.h"
 #include "mw.h"
 #include "telemetry_common.h"
 #include "config.h"
+#include "utils.h"
 
 int16_t debug[4];
 uint32_t currentTime = 0;

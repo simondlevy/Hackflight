@@ -50,8 +50,8 @@ extern serialPort_t * telemport;
 extern uint8_t useSmallAngle;
 extern uint8_t armed;
 
-extern bool px4flow_available;
-extern px4flow_frame_t px4flow_frame;
+//extern bool px4flow_available;
+//extern px4flow_frame_t px4flow_frame;
 
 extern bool lidarlite_available;
 extern uint16_t lidarlite_distance;

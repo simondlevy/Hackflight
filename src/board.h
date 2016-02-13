@@ -17,7 +17,7 @@
 
 #include "stm32f10x_conf.h"
 #include "core_cm3.h"
-#include "printf.h"
+#include "board/printf.h"
 #include "board/drv_system.h"         // timers, delays, etc
 #include "board/drv_gpio.h"
 #include "board/drv_px4flow.h"
@@ -32,8 +32,6 @@
 #define RADX10 (M_PI / 1800.0f)                  // 0.001745329252f
 #define RAD    (M_PI / 180.0f)
 
-#define min(a, b) ((a) < (b) ? (a) : (b))
-#define max(a, b) ((a) > (b) ? (a) : (b))
 #define abs(x) ((x) > 0 ? (x) : -(x))
 
 typedef enum {
@@ -41,9 +39,6 @@ typedef enum {
     Y,
     Z
 } sensor_axis_e;
-
-//typedef uint16_t (*rcReadRawDataPtr)(uint8_t chan);        // used by receiver driver to return channel data
-typedef void (*pidControllerFuncPtr)(void);                // pid controller function prototype
 
 // Hardware definitions and GPIO
 // Target definitions (NAZE, ... are same as in Makefile

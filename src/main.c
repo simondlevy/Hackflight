@@ -11,18 +11,17 @@
 
 #include "stm32f10x_conf.h"
 
-#include "printf.h"
 #include "drv_pwm.h"
 
 #include "board/revision.h"
+#include "board/printf.h"
+
 #include "board/drv_adc.h"
 #include "board/drv_i2c.h"
 #include "board/drv_serial.h"
 #include "board/drv_spi.h"
 #include "board/drv_gpio.h"
 #include "board/drv_system.h"
-
-#include "board/drv_px4flow.h"
 
 #include "telemetry_common.h"
 #include "config.h"

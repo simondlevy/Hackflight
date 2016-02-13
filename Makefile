@@ -46,14 +46,14 @@ COMMON_SRC = main.c \
 		   serial.c \
 		   rxmsp.c \
 		   state.c \
+		   utils.c \
+		   startup_stm32f10x_md_gcc.S \
 		   board/drv_gpio.c \
 		   board/drv_i2c.c \
 		   board/drv_system.c \
 		   board/drv_serial.c \
 		   board/drv_uart.c \
-		   printf.c \
-		   utils.c \
-		   startup_stm32f10x_md_gcc.S \
+		   board/printf.c \
 		   $(CMSIS_SRC) \
 		   $(STDPERIPH_SRC)
 

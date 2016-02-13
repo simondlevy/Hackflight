@@ -29,11 +29,15 @@
  * OF SUCH DAMAGE.
  */
 
-#include "board.h"
-#include "sensors.h"
-#include "mw.h"
+#include <stdarg.h>
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "drv_serial.h"
 
 #define PRINTF_LONG_SUPPORT
+
+extern serialPort_t * telemport;
 
 typedef void (*putcf) (void *, char);
 static putcf stdout_putf;

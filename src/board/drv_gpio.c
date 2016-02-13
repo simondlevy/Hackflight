@@ -17,8 +17,6 @@
 
 #define I2C_DEVICE (I2CDEV_2)
 
-typedef void (*pidControllerFuncPtr)(void);                // pid controller function prototype
-
 #define GYRO
 #define ACC
 #define BUZZER
