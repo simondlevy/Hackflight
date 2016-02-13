@@ -3,7 +3,14 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include "board.h"
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "stm32f10x_conf.h"
+
+#include "drv_spi.h"
+#include "drv_system.h"         // timers, delays, etc
+#include "drv_gpio.h"
 
 // SPI2 Driver
 // PB15     28      SPI2_MOSI

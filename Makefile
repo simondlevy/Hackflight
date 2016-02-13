@@ -48,8 +48,8 @@ COMMON_SRC = main.c \
 		   state.c \
 		   board/drv_gpio.c \
 		   board/drv_i2c.c \
-		   drv_system.c \
-		   drv_serial.c \
+		   board/drv_system.c \
+		   board/drv_serial.c \
 		   drv_uart.c \
 		   printf.c \
 		   utils.c \
@@ -65,7 +65,7 @@ NAZE_SRC = board/drv_adc.c \
 		   board/drv_mpu6050.c \
 		   board/drv_ms5611.c \
 		   drv_pwm.c \
-		   drv_spi.c \
+		   board/drv_spi.c \
 		   drv_timer.c \
 		   board/drv_px4flow.c \
 		   board/drv_lidarlite.c \

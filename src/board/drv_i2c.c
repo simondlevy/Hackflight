@@ -2,7 +2,15 @@
  * This file is part of baseflight
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
-#include "i2c_board.h"
+#define I2C_DEVICE (I2CDEV_2)
+
+#include <stdbool.h>
+#include <stdio.h>
+
+#include "stm32f10x_conf.h"
+#include "drv_system.h"         // timers, delays, etc
+#include "drv_gpio.h"
+
 #include "drv_i2c.h"
 
 #ifndef SOFT_I2C

@@ -18,10 +18,11 @@
 #include "stm32f10x_conf.h"
 #include "core_cm3.h"
 #include "printf.h"
-#include "drv_system.h"         // timers, delays, etc
+#include "board/drv_system.h"         // timers, delays, etc
 #include "board/drv_gpio.h"
 #include "board/drv_px4flow.h"
 #include "board/drv_lidarlite.h"
+#include "board/drv_serial.h"
 #include "utils.h"
 
 #ifndef M_PI
@@ -41,7 +42,6 @@ typedef enum {
     Z
 } sensor_axis_e;
 
-typedef void (*serialReceiveCallbackPtr)(uint16_t data);   // used by serial drivers to return frames to app
 typedef uint16_t (*rcReadRawDataPtr)(uint8_t chan);        // used by receiver driver to return channel data
 typedef void (*pidControllerFuncPtr)(void);                // pid controller function prototype
 
@@ -71,10 +71,10 @@ typedef void (*pidControllerFuncPtr)(void);                // pid controller fun
 
 #include "board/drv_adc.h"
 #include "board/drv_i2c.h"
-#include "drv_spi.h"
+#include "board/drv_spi.h"
+
 #include "drv_pwm.h"
 #include "drv_timer.h"
-#include "drv_serial.h"
 #include "drv_uart.h"
 
 #endif /* all conditions */

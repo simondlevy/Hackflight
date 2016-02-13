@@ -1,4 +1,7 @@
-#include "board.h"
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "drv_serial.h"
 
 void serialPrint(serialPort_t *instance, const char *str)
 {
