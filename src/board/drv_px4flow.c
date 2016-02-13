@@ -1,5 +1,8 @@
-#include "board.h"
-#include "mw.h"
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "drv_i2c.h"
+#include "drv_px4flow.h"
 
 #define PX4FLOW_ADDRESS 0x42
 

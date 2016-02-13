@@ -2,7 +2,8 @@
  * This file is part of baseflight
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
-#include "board.h"
+#include "i2c_board.h"
+#include "drv_i2c.h"
 
 #ifndef SOFT_I2C
 

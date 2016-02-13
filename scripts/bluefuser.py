@@ -56,9 +56,7 @@ class Bluetooth_ASLPlotter(ASL_Plotter):
 
     def getSensors(self):
 
-        print(self.actual_baro, self.actual_sonar)
-
-        return 0, 0
+        return self.actual_baro, self.actual_sonar
 
 if __name__ == '__main__':
 

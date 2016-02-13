@@ -1,7 +1,9 @@
-#include "board.h"
-#include "mw.h"
-
 #define LIDARLITE_ADDRESS 0x62
+
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "drv_i2c.h"
 
 uint16_t lidarlite_distance;
 

@@ -39,15 +39,15 @@ OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
 # Source files common to all targets
-COMMON_SRC	 = main.c \
+COMMON_SRC = main.c \
 		   mixer.c \
 		   mw.c \
 		   sensors.c \
 		   serial.c \
 		   rxmsp.c \
 		   state.c \
-		   drv_gpio.c \
-		   drv_i2c.c \
+		   board/drv_gpio.c \
+		   board/drv_i2c.c \
 		   drv_system.c \
 		   drv_serial.c \
 		   drv_uart.c \
@@ -61,15 +61,15 @@ COMMON_SRC	 = main.c \
 HIGHEND_SRC	 = telemetry_common.c
 
 # Source files for the NAZE target
-NAZE_SRC	 = drv_adc.c \
-		   drv_mpu6050.c \
-		   drv_ms5611.c \
+NAZE_SRC = board/drv_adc.c \
+		   board/drv_mpu6050.c \
+		   board/drv_ms5611.c \
 		   drv_pwm.c \
 		   drv_spi.c \
 		   drv_timer.c \
-		   drv_px4flow.c \
-		   drv_lidarlite.c \
-		   drv_mb1242.c \
+		   board/drv_px4flow.c \
+		   board/drv_lidarlite.c \
+		   board/drv_mb1242.c \
 		   $(HIGHEND_SRC) \
 		   $(COMMON_SRC)
 

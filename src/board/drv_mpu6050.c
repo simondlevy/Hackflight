@@ -3,7 +3,8 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include "board.h"
+#include "mpu6050_board.h"
+#include "drv_mpu6050.h"
 
 /* Generic driver for invensense gyro/acc devices.
  *
