@@ -1,4 +1,10 @@
 typedef enum {
+    X = 0,
+    Y,
+    Z
+} sensor_axis_e;
+
+typedef enum {
     ALIGN_DEFAULT = 0,                                      // driver-provided alignment
     CW0_DEG = 1,
     CW90_DEG = 2,

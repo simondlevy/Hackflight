@@ -3,7 +3,18 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include "board.h"
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+#include "stm32f10x_conf.h"
+
+#include "board/drv_serial.h"
+#include "board/drv_gpio.h"
+#include "board/drv_uart.h"
+#include "board/drv_system.h"
+#include "board/drv_i2c.h"
+
 #include "sensors.h"
 #include "mw.h"
 #include "telemetry_common.h"

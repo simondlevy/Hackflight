@@ -1,6 +1,8 @@
-#include "board.h"
+#include <stdint.h>
+#include <stdbool.h>
+
 #include "sensors.h"
-#include "mw.h"
+//#include "mw.h"
 
 int constrain(int amt, int low, int high)
 {

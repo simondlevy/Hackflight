@@ -1,4 +1,11 @@
-#include "board.h"
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "stm32f10x_conf.h"
+
+#include "board/drv_gpio.h"
+#include "board/drv_serial.h"
+
 #include "sensors.h"
 #include "mw.h"
 
