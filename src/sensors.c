@@ -4,9 +4,12 @@
  */
 
 #include "board.h"
+#include "sensors.h"
 #include "mw.h"
 #include "config.h"
+
 #include "board/drv_ms5611.h"
+#include "board/drv_mpu6050.h"
 
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.

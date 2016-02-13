@@ -30,6 +30,7 @@
  */
 
 #include "board.h"
+#include "sensors.h"
 #include "mw.h"
 
 #define PRINTF_LONG_SUPPORT

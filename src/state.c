@@ -1,4 +1,5 @@
 #include "board.h"
+#include "sensors.h"
 #include "mw.h"
 #include "config.h"
 

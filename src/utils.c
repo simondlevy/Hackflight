@@ -1,4 +1,5 @@
 #include "board.h"
+#include "sensors.h"
 #include "mw.h"
 
 int constrain(int amt, int low, int high)

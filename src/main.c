@@ -2,10 +2,13 @@
  * This file is part of baseflight
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
+
+#include "board/revision.h"
 #include "board.h"
-#include "mw.h"
 #include "telemetry_common.h"
 #include "config.h"
+#include "sensors.h"
+#include "mw.h"
 
 int hw_revision = 0;
 extern rcReadRawDataPtr rcReadRawFunc;

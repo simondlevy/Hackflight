@@ -2,7 +2,20 @@
  * This file is part of baseflight
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
-#include "ms5611_board.h"
+#include <stdbool.h>
+
+#include "stm32f10x_conf.h"
+#include "drv_system.h"         // timers, delays, etc
+#include "drv_gpio.h"
+
+#define BARO_GPIO   GPIOC
+#define BARO_PIN    Pin_13
+
+#define I2C_DEVICE (I2CDEV_2)
+
+#include "drv_i2c.h"
+
+#include "revision.h"
 #include "../baro.h"
 
 // MS5611, Standard address 0x77

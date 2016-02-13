@@ -1,4 +1,43 @@
-#include "gpio_board.h"
+#include <stdint.h>
+#include "../sensors.h"
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <math.h>
+#include <ctype.h>
+#include <string.h>
+#include <stdio.h>
+
+#include "stm32f10x_conf.h"
+#include "core_cm3.h"
+#include "printf.h"
+#include "drv_system.h"         // timers, delays, etc
+#include "drv_gpio.h"
+#include "utils.h"
+
+#define I2C_DEVICE (I2CDEV_2)
+
+typedef void (*serialReceiveCallbackPtr)(uint16_t data);   // used by serial drivers to return frames to app
+typedef uint16_t (*rcReadRawDataPtr)(uint8_t chan);        // used by receiver driver to return channel data
+typedef void (*pidControllerFuncPtr)(void);                // pid controller function prototype
+
+#define GYRO
+#define ACC
+#define BUZZER
+#define LED0
+#define LED1
+#define INVERTER
+
+#define I2C_DEVICE (I2CDEV_2)
+
+#include "drv_adc.h"
+#include "drv_i2c.h"
+#include "drv_spi.h"
+#include "drv_mpu6050.h"
+#include "drv_pwm.h"
+#include "drv_timer.h"
+#include "drv_serial.h"
+#include "drv_uart.h"
 
 void gpioInit(GPIO_TypeDef *gpio, gpio_config_t *config)
 {

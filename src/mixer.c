@@ -3,6 +3,7 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 #include "board.h"
+#include "sensors.h"
 #include "mw.h"
 #include "config.h"
 

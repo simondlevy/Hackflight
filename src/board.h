@@ -35,43 +35,15 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define abs(x) ((x) > 0 ? (x) : -(x))
 
-typedef enum HardwareRevision {
-    NAZE32 = 1,                                         // Naze32 and compatible with 8MHz HSE
-    NAZE32_REV5,                                        // Naze32 and compatible with 12MHz HSE
-    NAZE32_SP,                                          // Naze32 w/Sensor Platforms
-    NAZE32_REV6                                        // Naze32 rev6
-} HardwareRevision;
-
 typedef enum {
     X = 0,
     Y,
     Z
 } sensor_axis_e;
 
-typedef enum {
-    ALIGN_DEFAULT = 0,                                      // driver-provided alignment
-    CW0_DEG = 1,
-    CW90_DEG = 2,
-    CW180_DEG = 3,
-    CW270_DEG = 4,
-    CW0_DEG_FLIP = 5,
-    CW90_DEG_FLIP = 6,
-    CW180_DEG_FLIP = 7,
-    CW270_DEG_FLIP = 8
-} sensor_align_e;
-
-typedef void (*sensorInitFuncPtr)(sensor_align_e align);   // sensor init prototype
-typedef void (*sensorReadFuncPtr)(int16_t *data);          // sensor read and align prototype
 typedef void (*serialReceiveCallbackPtr)(uint16_t data);   // used by serial drivers to return frames to app
 typedef uint16_t (*rcReadRawDataPtr)(uint8_t chan);        // used by receiver driver to return channel data
 typedef void (*pidControllerFuncPtr)(void);                // pid controller function prototype
-
-typedef struct sensor_t {
-    sensorInitFuncPtr init;                                 // initialize function
-    sensorReadFuncPtr read;                                 // read 3 axis data function
-    sensorReadFuncPtr temperature;                          // read temperature if available
-    float scale;                                            // scalefactor (currently used for gyro only, todo for accel)
-} sensor_t;
 
 // Hardware definitions and GPIO
 // Target definitions (NAZE, ... are same as in Makefile
@@ -100,7 +72,6 @@ typedef struct sensor_t {
 #include "board/drv_adc.h"
 #include "board/drv_i2c.h"
 #include "drv_spi.h"
-#include "board/drv_mpu6050.h"
 #include "drv_pwm.h"
 #include "drv_timer.h"
 #include "drv_serial.h"

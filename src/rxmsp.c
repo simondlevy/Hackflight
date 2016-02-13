@@ -1,4 +1,5 @@
 #include "board.h"
+#include "sensors.h"
 #include "mw.h"
 
 static bool rxMspFrameDone = false;

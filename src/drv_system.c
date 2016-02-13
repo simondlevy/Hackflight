@@ -4,6 +4,7 @@
  */
 
 #include "board.h"
+#include "board/revision.h"
 
 // cycles per microsecond
 static volatile uint32_t usTicks = 0;

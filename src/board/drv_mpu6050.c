@@ -3,7 +3,22 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include "mpu6050_board.h"
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <math.h>
+
+#include "revision.h"
+#include "stm32f10x_conf.h"
+#include "drv_system.h"         // timers, delays, etc
+#include "drv_gpio.h"
+#include "utils.h"
+#include "../sensors.h"
+
+#define I2C_DEVICE (I2CDEV_2)
+
+#include "drv_adc.h"
+#include "drv_i2c.h"
 #include "drv_mpu6050.h"
 
 /* Generic driver for invensense gyro/acc devices.
