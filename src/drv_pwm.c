@@ -4,7 +4,17 @@
  */
 
 
-#include "board.h"
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+#include "stm32f10x_conf.h"
+
+#include "drv_pwm.h"
+
+#include "board/drv_gpio.h"
+#include "board/drv_timer.h"
+
 #include "config.h"
 
 /*

@@ -42,7 +42,7 @@ typedef enum {
     Z
 } sensor_axis_e;
 
-typedef uint16_t (*rcReadRawDataPtr)(uint8_t chan);        // used by receiver driver to return channel data
+//typedef uint16_t (*rcReadRawDataPtr)(uint8_t chan);        // used by receiver driver to return channel data
 typedef void (*pidControllerFuncPtr)(void);                // pid controller function prototype
 
 // Hardware definitions and GPIO
