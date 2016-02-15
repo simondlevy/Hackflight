@@ -41,8 +41,7 @@
 
 serialPort_t * telemport;
 
-// from mixer.c
-extern int16_t motor_disarmed[4];
+
 // cause reboot after MSP processing complete
 static bool pendReboot = false;
 
@@ -189,6 +188,9 @@ static void evaluateCommand(void)
 {
     uint32_t i;
     const char *build = __DATE__;
+
+    // from mixer.c
+    extern int16_t motor_disarmed[4];
 
     switch (currentPortState->cmdMSP) {
 
