@@ -118,7 +118,7 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
 int getEstimatedAltitude();
 
 // Sensors
-void initSensors(int hw_revision);
+void initSensors(void);
 void ACC_getADC(void);
 void Gyro_getADC(void);
 bool initBaro(baro_t * baro);

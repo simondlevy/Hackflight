@@ -93,9 +93,9 @@ int main(void)
     if (hw_revision != NAZE32_SP)
         i2cInit(I2C_DEVICE);
 
-    adcInit();
+    adcInit(hw_revision);
 
-    initSensors(hw_revision);
+    initSensors();
 
     LED1_ON;
     LED0_OFF;

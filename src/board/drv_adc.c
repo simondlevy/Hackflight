@@ -17,7 +17,7 @@ typedef struct adc_config_t {
 static adc_config_t adcConfig[ADC_CHANNEL_MAX];
 static volatile uint16_t adcValues[ADC_CHANNEL_MAX];
 
-void adcInit()
+void adcInit(int hwrev)
 {
     ADC_InitTypeDef adc;
     DMA_InitTypeDef dma;
@@ -28,7 +28,7 @@ void adcInit()
     adcConfig[ADC_BATTERY].dmaIndex = numChannels - 1;
 
     // optional ADC5 input on rev.5 hardware
-    if (hw_revision >= NAZE32_REV5) {
+    if (hwrev >= NAZE32_REV5) {
         numChannels++;
         adcConfig[ADC_EXTERNAL_PAD].adcChannel = ADC_Channel_5;
         adcConfig[ADC_EXTERNAL_PAD].dmaIndex = numChannels - 1;
