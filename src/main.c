@@ -26,8 +26,8 @@
 #include "axes.h"
 #include "mw.h"
 
-int hw_revision = 0;
-extern rcReadRawDataPtr rcReadRawFunc;
+int     hw_revision = 0;
+extern  rcReadRawDataPtr rcReadRawFunc;
 uint8_t useSmallAngle;
 uint8_t armed;
 

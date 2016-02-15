@@ -66,9 +66,9 @@ NAZE_SRC = board/drv_adc.c \
 		   board/drv_pwm.c \
 		   board/drv_spi.c \
 		   board/drv_timer.c \
-		   board/drv_px4flow.c \
-		   board/drv_lidarlite.c \
-		   board/drv_mb1242.c \
+		   external/drv_px4flow.c \
+		   external/drv_lidarlite.c \
+		   external/drv_mb1242.c \
 		   $(HIGHEND_SRC) \
 		   $(COMMON_SRC)
 

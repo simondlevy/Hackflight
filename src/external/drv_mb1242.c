@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "drv_i2c.h"
+#include "../board/drv_i2c.h"
 
 #define MB1242_ADDRESS 0x70
 

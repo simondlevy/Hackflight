@@ -20,7 +20,6 @@ typedef void (*sensorInitFuncPtr)(sensor_align_e align);   // sensor init protot
 
 typedef void (*sensorReadFuncPtr)(int16_t *data);          // sensor read and align prototype
 
-
 typedef struct sensor_t {
     sensorInitFuncPtr init;                                 // initialize function
     sensorReadFuncPtr read;                                 // read 3 axis data function
