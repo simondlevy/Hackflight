@@ -1,6 +1,6 @@
 #pragma once
 
-#define UART_BUFFER_SIZE    64
+#define UART_BUFFER_SIZE        64
 
 #define UART1_RX_BUFFER_SIZE    256
 #define UART1_TX_BUFFER_SIZE    256
@@ -27,13 +27,12 @@ typedef struct {
     USART_TypeDef *USARTx;
 } uartPort_t;
 
-extern const struct serialPortVTable uartVTable[];
 
 serialPort_t *uartOpen(USART_TypeDef *USARTx, serialReceiveCallbackPtr callback, uint32_t baudRate, portMode_t mode);
 
 // serialPort API
-void uartWrite(serialPort_t *instance, uint8_t ch);
+void    uartWrite(serialPort_t *instance, uint8_t ch);
 uint8_t uartTotalBytesWaiting(serialPort_t *instance);
 uint8_t uartRead(serialPort_t *instance);
-void uartSetBaudRate(serialPort_t *s, uint32_t baudRate);
-bool isUartTransmitBufferEmpty(serialPort_t *s);
+void    uartSetBaudRate(serialPort_t *s, uint32_t baudRate);
+bool    isUartTransmitBufferEmpty(serialPort_t *s);

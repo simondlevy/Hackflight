@@ -16,6 +16,84 @@
 #include "drv_gpio.h"
 #include "drv_uart.h"
 
+void uartSetMode(serialPort_t *s, portMode_t mode)
+{
+    (void)s;
+    (void)mode;
+    // not implemented.
+}
+
+uint8_t uartTotalBytesWaiting(serialPort_t *instance)
+{
+    uartPort_t *s = (uartPort_t *)instance;
+    // FIXME always returns 1 or 0, not the amount of bytes waiting
+    if (s->rxDMAChannel)
+        return s->rxDMAChannel->CNDTR != s->rxDMAPos;
+    else
+        return s->port.rxBufferTail != s->port.rxBufferHead;
+}
+
+uint8_t uartRead(serialPort_t *instance)
+{
+    uint8_t ch;
+    uartPort_t *s = (uartPort_t *)instance;
+
+    if (s->rxDMAChannel) {
+        ch = s->port.rxBuffer[s->port.rxBufferSize - s->rxDMAPos];
+        if (--s->rxDMAPos == 0)
+            s->rxDMAPos = s->port.rxBufferSize;
+    } else {
+        ch = s->port.rxBuffer[s->port.rxBufferTail];
+        s->port.rxBufferTail = (s->port.rxBufferTail + 1) % s->port.rxBufferSize;
+    }
+
+    return ch;
+}
+
+void uartSetBaudRate(serialPort_t *instance, uint32_t baudRate)
+{
+    USART_InitTypeDef USART_InitStructure;
+    uartPort_t *s = (uartPort_t *)instance;
+
+    USART_InitStructure.USART_BaudRate = baudRate;
+    USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+    USART_InitStructure.USART_StopBits = USART_StopBits_1;
+    USART_InitStructure.USART_Parity = USART_Parity_No;
+    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+    USART_InitStructure.USART_Mode = 0;
+    if (s->port.mode & MODE_RX)
+        USART_InitStructure.USART_Mode |= USART_Mode_Rx;
+    if (s->port.mode & MODE_TX)
+        USART_InitStructure.USART_Mode |= USART_Mode_Tx;
+    USART_Init(s->USARTx, &USART_InitStructure);
+
+    s->port.baudRate = baudRate;
+}
+
+// BUGBUG TODO TODO FIXME - What is the bug?
+bool isUartTransmitBufferEmpty(serialPort_t *instance)
+{
+    uartPort_t *s = (uartPort_t *)instance;
+    if (s->txDMAChannel)
+        return s->txDMAEmpty;
+    else
+        return s->port.txBufferTail == s->port.txBufferHead;
+}
+
+
+
+const struct serialPortVTable uartVTable[] = {
+    {
+        uartWrite,
+        uartTotalBytesWaiting,
+        uartRead,
+        uartSetBaudRate,
+        isUartTransmitBufferEmpty,
+        uartSetMode,
+    }
+};
+
+
 static uartPort_t uartPort1;
 
 // USART1 - Telemetry (RX/TX by DMA)
@@ -150,34 +228,6 @@ serialPort_t *uartOpen(USART_TypeDef *USARTx, serialReceiveCallbackPtr callback,
     return (serialPort_t *)s;
 }
 
-void uartSetBaudRate(serialPort_t *instance, uint32_t baudRate)
-{
-    USART_InitTypeDef USART_InitStructure;
-    uartPort_t *s = (uartPort_t *)instance;
-
-    USART_InitStructure.USART_BaudRate = baudRate;
-    USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-    USART_InitStructure.USART_StopBits = USART_StopBits_1;
-    USART_InitStructure.USART_Parity = USART_Parity_No;
-    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    USART_InitStructure.USART_Mode = 0;
-    if (s->port.mode & MODE_RX)
-        USART_InitStructure.USART_Mode |= USART_Mode_Rx;
-    if (s->port.mode & MODE_TX)
-        USART_InitStructure.USART_Mode |= USART_Mode_Tx;
-    USART_Init(s->USARTx, &USART_InitStructure);
-
-    s->port.baudRate = baudRate;
-}
-
-void uartSetMode(serialPort_t *s, portMode_t mode)
-{
-    (void)s;
-    (void)mode;
-    // not implemented.
-}
-
-
 static void uartStartTxDMA(uartPort_t *s)
 {
     s->txDMAChannel->CMAR = (uint32_t)&s->port.txBuffer[s->port.txBufferTail];
@@ -190,43 +240,6 @@ static void uartStartTxDMA(uartPort_t *s)
     }
     s->txDMAEmpty = false;
     DMA_Cmd(s->txDMAChannel, ENABLE);
-}
-
-uint8_t uartTotalBytesWaiting(serialPort_t *instance)
-{
-    uartPort_t *s = (uartPort_t *)instance;
-    // FIXME always returns 1 or 0, not the amount of bytes waiting
-    if (s->rxDMAChannel)
-        return s->rxDMAChannel->CNDTR != s->rxDMAPos;
-    else
-        return s->port.rxBufferTail != s->port.rxBufferHead;
-}
-
-// BUGBUG TODO TODO FIXME - What is the bug?
-bool isUartTransmitBufferEmpty(serialPort_t *instance)
-{
-    uartPort_t *s = (uartPort_t *)instance;
-    if (s->txDMAChannel)
-        return s->txDMAEmpty;
-    else
-        return s->port.txBufferTail == s->port.txBufferHead;
-}
-
-uint8_t uartRead(serialPort_t *instance)
-{
-    uint8_t ch;
-    uartPort_t *s = (uartPort_t *)instance;
-
-    if (s->rxDMAChannel) {
-        ch = s->port.rxBuffer[s->port.rxBufferSize - s->rxDMAPos];
-        if (--s->rxDMAPos == 0)
-            s->rxDMAPos = s->port.rxBufferSize;
-    } else {
-        ch = s->port.rxBuffer[s->port.rxBufferTail];
-        s->port.rxBufferTail = (s->port.rxBufferTail + 1) % s->port.rxBufferSize;
-    }
-
-    return ch;
 }
 
 void uartWrite(serialPort_t *instance, uint8_t ch)
@@ -242,17 +255,6 @@ void uartWrite(serialPort_t *instance, uint8_t ch)
         USART_ITConfig(s->USARTx, USART_IT_TXE, ENABLE);
     }
 }
-
-const struct serialPortVTable uartVTable[] = {
-    {
-        uartWrite,
-        uartTotalBytesWaiting,
-        uartRead,
-        uartSetBaudRate,
-        isUartTransmitBufferEmpty,
-        uartSetMode,
-    }
-};
 
 // Handlers
 
