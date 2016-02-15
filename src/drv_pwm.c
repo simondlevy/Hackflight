@@ -278,7 +278,7 @@ static void pwmWriteStandard(uint8_t index, uint16_t value)
     *motors[index]->ccr = value;
 }
 
-void pwmInit(uint16_t config_failsafeThreshold, uint8_t config_pwmFilter)
+void pwmInit(uint16_t config_failsafeThreshold, uint8_t config_pwmFilter, uint8_t config_useCPPM)
 {
     const uint8_t *setup;
     uint16_t period;
@@ -289,7 +289,7 @@ void pwmInit(uint16_t config_failsafeThreshold, uint8_t config_pwmFilter)
     // pwm filtering on input
     pwmFilter = config_pwmFilter;
 
-    setup = CONFIG_USE_CPPM ? multiPPM : multiPWM;
+    setup = config_useCPPM ? multiPPM : multiPWM;
 
     int i;
     for (i = 0; i < MAX_PORTS; i++) {

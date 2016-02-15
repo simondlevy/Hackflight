@@ -117,7 +117,7 @@ int main(void)
 
     serialInit(CONFIG_SERIAL_BAUDRATE);
 
-    pwmInit(CONFIG_FAILSAFE_DETECT_THRESHOLD, CONFIG_PWM_FILTER);
+    pwmInit(CONFIG_FAILSAFE_DETECT_THRESHOLD, CONFIG_PWM_FILTER, CONFIG_USE_CPPM);
 
     // configure PWM/CPPM read function and max number of channels
     // these, if enabled
