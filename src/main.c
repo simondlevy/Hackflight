@@ -26,10 +26,10 @@
 #include "axes.h"
 #include "mw.h"
 
-int     hw_revision = 0;
 extern  rcReadRawDataPtr rcReadRawFunc;
 uint8_t useSmallAngle;
 uint8_t armed;
+int     hw_revision;
 
 // receiver read function
 extern uint16_t pwmReadRawRC(uint8_t chan);
@@ -74,6 +74,7 @@ int main(void)
     SetSysClock(CONFIG_EMF_AVOIDANCE);
 
     // determine hardware revision based on clock frequency
+    hw_revision = 0;
     if (hse_value == 8000000)
         hw_revision = NAZE32;
     else if (hse_value == 12000000)
@@ -94,7 +95,7 @@ int main(void)
 
     adcInit();
 
-    initSensors();
+    initSensors(hw_revision);
 
     LED1_ON;
     LED0_OFF;
