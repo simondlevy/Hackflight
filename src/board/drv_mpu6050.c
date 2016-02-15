@@ -19,7 +19,6 @@
 
 #include "drv_adc.h"
 #include "drv_i2c.h"
-#include "drv_mpu6050.h"
 
 /* Generic driver for invensense gyro/acc devices.
  *
@@ -101,7 +100,7 @@ static sensor_align_e accAlign = CW0_DEG;
 // Lowpass
 static uint8_t mpuLowPassFilter = INV_FILTER_42HZ;
 
-bool mpuDetect(sensor_t *acc, sensor_t *gyro, uint8_t lpf)
+void mpuInit(sensor_t *acc, sensor_t *gyro, uint8_t lpf)
 {
     gpio_config_t gpio;
 
@@ -140,8 +139,6 @@ bool mpuDetect(sensor_t *acc, sensor_t *gyro, uint8_t lpf)
 
     // initialize the device
     mpu6050Init(acc, gyro);
-
-    return true;
 }
 
 // MPU6xxx registers

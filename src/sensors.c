@@ -17,7 +17,6 @@
 #include "config.h"
 
 #include "board/drv_ms5611.h"
-#include "board/drv_mpu6050.h"
 
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.
@@ -38,7 +37,7 @@ static int16_t accZero[3];
 
 void initSensors(void)
 {
-    mpuDetect(&acc, &gyro, CONFIG_GYRO_LPF);
+    mpuInit(&acc, &gyro, CONFIG_GYRO_LPF);
 
     acc.init(CONFIG_ACC_ALIGN);
 
