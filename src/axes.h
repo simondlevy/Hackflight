@@ -27,7 +27,7 @@ typedef struct sensor_t {
     float scale;                                            // scalefactor (currently used for gyro only, todo for accel)
 } sensor_t;
 
-// Should return value of acc_1G
-uint16_t mpuInit(sensor_t *acc, sensor_t *gyro, uint8_t lpf);
+// Returns value of acc_1G
+uint16_t mpuInit(sensor_t *acc, sensor_t *gyro, uint8_t lpf, int hwrev);
 
 void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation);

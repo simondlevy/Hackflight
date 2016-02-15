@@ -33,9 +33,9 @@ bool sonar_available;
 
 static int16_t accZero[3];
 
-void initSensors(void)
+void initSensors(int hwrev)
 {
-    acc_1G = mpuInit(&acc, &gyro, CONFIG_GYRO_LPF);
+    acc_1G = mpuInit(&acc, &gyro, CONFIG_GYRO_LPF, hwrev);
 
     acc.init(CONFIG_ACC_ALIGN);
 

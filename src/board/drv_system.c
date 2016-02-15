@@ -55,7 +55,7 @@ uint32_t millis(void)
     return sysTickUptime;
 }
 
-void systemInit(void)
+void systemInit(int hwrev)
 {
     struct {
         GPIO_TypeDef *gpio;
@@ -108,7 +108,7 @@ void systemInit(void)
 #ifdef BUZZER
     // Configure gpio
     // rev5 needs inverted beeper. oops.
-    if (hw_revision >= NAZE32_REV5)
+    if (hwrev >= NAZE32_REV5)
         systemBeepPtr = beepRev5;
     else
         systemBeepPtr = beepRev4;
@@ -119,7 +119,7 @@ void systemInit(void)
 
     // Hack - rev4 and below used opendrain to PNP for buzzer. Rev5 and above use PP to NPN.
     for (i = 0; i < gpio_count; i++) {
-        if (hw_revision >= NAZE32_REV5 && gpio_setup[i].cfg.mode == Mode_Out_OD)
+        if (hwrev >= NAZE32_REV5 && gpio_setup[i].cfg.mode == Mode_Out_OD)
             gpio_setup[i].cfg.mode = Mode_Out_PP;
         gpioInit(gpio_setup[i].gpio, &gpio_setup[i].cfg);
     }

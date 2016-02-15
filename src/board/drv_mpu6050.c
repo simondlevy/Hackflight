@@ -8,17 +8,16 @@
 #include <stdint.h>
 #include <math.h>
 
+#define I2C_DEVICE (I2CDEV_2)
+
 #include "revision.h"
 #include "stm32f10x_conf.h"
 #include "drv_system.h"         // timers, delays, etc
 #include "drv_gpio.h"
-#include "utils.h"
-#include "../axes.h"
-
-#define I2C_DEVICE (I2CDEV_2)
-
 #include "drv_adc.h"
 #include "drv_i2c.h"
+
+#include "../axes.h"            // IMU data structure
 
 /* Generic driver for invensense gyro/acc devices.
  *
@@ -98,7 +97,7 @@ static sensor_align_e accAlign = CW0_DEG;
 static uint8_t mpuLowPassFilter = INV_FILTER_42HZ;
 
 // Returns acc_1G
-uint16_t mpuInit(sensor_t *acc, sensor_t *gyro, uint8_t lpf)
+uint16_t mpuInit(sensor_t *acc, sensor_t *gyro, uint8_t lpf, int hwrev)
 {
     gpio_config_t gpio;
 
@@ -128,7 +127,7 @@ uint16_t mpuInit(sensor_t *acc, sensor_t *gyro, uint8_t lpf)
         mpuLowPassFilter = INV_FILTER_5HZ;
 
     // MPU_INT output on rev5+ hardware (PC13)
-    if (hw_revision >= NAZE32_REV5) {
+    if (hwrev >= NAZE32_REV5) {
         gpio.pin = GYRO_INT_PIN;
         gpio.speed = Speed_2MHz;
         gpio.mode = Mode_IN_FLOATING;
