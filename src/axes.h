@@ -27,3 +27,5 @@ typedef struct sensor_t {
     sensorReadFuncPtr temperature;                          // read temperature if available
     float scale;                                            // scalefactor (currently used for gyro only, todo for accel)
 } sensor_t;
+
+void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation);

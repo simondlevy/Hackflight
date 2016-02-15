@@ -44,7 +44,6 @@ COMMON_SRC = main.c \
 		   mw.c \
 		   sensors.c \
 		   serial.c \
-		   rxmsp.c \
 		   state.c \
 		   utils.c \
 		   startup_stm32f10x_md_gcc.S \
