@@ -278,7 +278,8 @@ static void pwmWriteStandard(uint8_t index, uint16_t value)
     *motors[index]->ccr = value;
 }
 
-void pwmInit(uint16_t config_failsafeThreshold, uint8_t config_pwmFilter, uint8_t config_useCPPM)
+void pwmInit(uint16_t config_failsafeThreshold, uint8_t config_pwmFilter, uint8_t config_useCPPM,
+        uint16_t config_motorPwmRate)
 {
     const uint8_t *setup;
     uint16_t period;
@@ -309,7 +310,7 @@ void pwmInit(uint16_t config_failsafeThreshold, uint8_t config_pwmFilter, uint8_
         } else if (mask & TYPE_M) {
             uint32_t hz, mhz;
 
-            if (CONFIG_MOTOR_PWM_RATE > 500 || CONFIG_FAST_PWM)
+            if (config_motorPwmRate > 500 || CONFIG_FAST_PWM)
                 mhz = PWM_TIMER_8_MHZ;
             else
                 mhz = PWM_TIMER_MHZ;
@@ -319,7 +320,7 @@ void pwmInit(uint16_t config_failsafeThreshold, uint8_t config_pwmFilter, uint8_
             if (CONFIG_FAST_PWM)
                 period = hz / 4000;
             else
-                period = hz / CONFIG_MOTOR_PWM_RATE;
+                period = hz / config_motorPwmRate;
 
             motors[numMotors++] = pwmOutConfig(port, mhz, period, CONFIG_PWM_IDLE_PULSE);
         }
@@ -327,7 +328,7 @@ void pwmInit(uint16_t config_failsafeThreshold, uint8_t config_pwmFilter, uint8_
 
     // determine motor writer function
     pwmWritePtr = pwmWriteStandard;
-    if (CONFIG_MOTOR_PWM_RATE > 500)
+    if (config_motorPwmRate > 500)
         pwmWritePtr = pwmWriteBrushed;
 }
 
