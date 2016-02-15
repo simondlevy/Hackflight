@@ -31,6 +31,7 @@ enum {
 
 void pwmICConfig(TIM_TypeDef *tim, uint8_t channel, uint16_t polarity);
 
-void pwmInit(); // returns whether driver is asking to calibrate throttle or not
+void pwmInit(uint16_t config_failsafeThreshold);
+
 void pwmWriteMotor(uint8_t index, uint16_t value);
 uint16_t pwmRead(uint8_t channel);

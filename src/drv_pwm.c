@@ -278,13 +278,13 @@ static void pwmWriteStandard(uint8_t index, uint16_t value)
     *motors[index]->ccr = value;
 }
 
-void pwmInit()
+void pwmInit(uint16_t config_failsafeThreshold)
 {
     const uint8_t *setup;
     uint16_t period;
 
     // to avoid importing cfg
-    failsafeThreshold = CONFIG_FAILSAFE_DETECT_THRESHOLD; 
+    failsafeThreshold = config_failsafeThreshold;
     
     // pwm filtering on input
     pwmFilter = CONFIG_PWM_FILTER;
