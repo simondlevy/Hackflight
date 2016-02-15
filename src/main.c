@@ -133,7 +133,6 @@ int main(void)
     useSmallAngle = 1;
     
     // loopy
-    while (1) {
+    while (1) 
         loop();
-    }
 }
