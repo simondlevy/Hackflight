@@ -57,7 +57,7 @@ COMMON_SRC = main.c \
 		   $(STDPERIPH_SRC)
 
 # Source files for full-featured systems
-HIGHEND_SRC	 = telemetry_common.c
+#HIGHEND_SRC	 = telemetry_common.c
 
 # Source files for the NAZE target
 NAZE_SRC = board/drv_adc.c \

@@ -22,7 +22,6 @@
 #include "board/drv_system.h"
 #include "board/drv_pwm.h"
 
-#include "telemetry_common.h"
 #include "config.h"
 #include "axes.h"
 #include "mw.h"

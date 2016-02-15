@@ -17,7 +17,6 @@
 
 #include "axes.h"
 #include "mw.h"
-#include "telemetry_common.h"
 #include "config.h"
 
 // Multiwii Serial Protocol 0

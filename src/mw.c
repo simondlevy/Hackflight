@@ -16,7 +16,6 @@
 
 #include "axes.h"
 #include "mw.h"
-#include "telemetry_common.h"
 #include "config.h"
 #include "utils.h"
 
@@ -159,7 +158,7 @@ void annexCode(void)
         if (armed)
             LED0_ON;
 
-        checkTelemetryState();
+        //checkTelemetryState();
     }
 
     if (check_timed_task(calibratedAccTime)) {
