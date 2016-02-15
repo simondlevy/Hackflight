@@ -106,9 +106,11 @@ regs Kusti, 23.10.2004
 #ifndef __TFP_PRINTF__
 #define __TFP_PRINTF__
 
+#include "drv_serial.h"
 #include <stdarg.h>
 
-void init_printf(void *putp, void (*putf) (void *, char));
+// We specify a serial port input as well, for telemetry
+void init_printf(void *putp, void (*putf) (void *, char), serialPort_t * port);
 
 void tfp_printf(const char *fmt, ...);
 void tfp_sprintf(char *s, const char *fmt, ...);

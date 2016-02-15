@@ -80,7 +80,6 @@ int main(void)
         hw_revision = NAZE32_REV5;
 
     systemInit();
-    init_printf(NULL, _putc);
 
     // sleep for 100ms
     delay(100);
@@ -114,6 +113,8 @@ int main(void)
     mixerInit(); 
 
     serialInit(CONFIG_SERIAL_BAUDRATE);
+
+    init_printf( NULL, _putc, telemport);
 
     pwmInit(CONFIG_FAILSAFE_DETECT_THRESHOLD, CONFIG_PWM_FILTER, CONFIG_USE_CPPM, CONFIG_MOTOR_PWM_RATE,
             CONFIG_FAST_PWM, CONFIG_PWM_IDLE_PULSE);

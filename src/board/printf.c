@@ -37,7 +37,7 @@
 
 #define PRINTF_LONG_SUPPORT
 
-extern serialPort_t * telemport;
+static serialPort_t * telemport;
 
 typedef void (*putcf) (void *, char);
 static putcf stdout_putf;
@@ -222,10 +222,12 @@ abort:
 }
 
 
-void init_printf(void *putp, void (*putf) (void *, char))
+void init_printf(void *putp, void (*putf) (void *, char), serialPort_t * port)
 {
     stdout_putf = putf;
     stdout_putp = putp;
+
+    telemport = port;
 }
 
 void tfp_printf(const char *fmt, ...)
