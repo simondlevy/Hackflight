@@ -66,7 +66,6 @@ extern int16_t gyroData[3];
 extern int16_t angle[2];
 extern int16_t axisPID[3];
 extern int16_t rcCommand[4];
-extern int16_t failsafeCnt;
 extern int16_t debug[4];
 extern int16_t gyroADC[3], accADC[3], accSmooth[3], magADC[3];
 extern int32_t accSum[3];

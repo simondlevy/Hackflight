@@ -86,7 +86,6 @@ void mspFrameRecieve(void)
 bool mspFrameComplete(void)
 {
     if (rxMspFrameDone) {
-        failsafeCnt = 0; // clear FailSafe counter
         rxMspFrameDone = false;
         return true;
     }
