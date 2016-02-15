@@ -35,7 +35,7 @@ static int16_t accZero[3];
 
 void initSensors(void)
 {
-    mpuInit(&acc, &gyro, CONFIG_GYRO_LPF);
+    acc_1G = mpuInit(&acc, &gyro, CONFIG_GYRO_LPF);
 
     acc.init(CONFIG_ACC_ALIGN);
 
