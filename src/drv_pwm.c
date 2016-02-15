@@ -279,7 +279,7 @@ static void pwmWriteStandard(uint8_t index, uint16_t value)
 }
 
 void pwmInit(uint16_t config_failsafeThreshold, uint8_t config_pwmFilter, uint8_t config_useCPPM,
-        uint16_t config_motorPwmRate)
+        uint16_t config_motorPwmRate, uint8_t config_fastPWM)
 {
     const uint8_t *setup;
     uint16_t period;
@@ -310,14 +310,14 @@ void pwmInit(uint16_t config_failsafeThreshold, uint8_t config_pwmFilter, uint8_
         } else if (mask & TYPE_M) {
             uint32_t hz, mhz;
 
-            if (config_motorPwmRate > 500 || CONFIG_FAST_PWM)
+            if (config_motorPwmRate > 500 || config_fastPWM)
                 mhz = PWM_TIMER_8_MHZ;
             else
                 mhz = PWM_TIMER_MHZ;
 
             hz = mhz * 1000000;
 
-            if (CONFIG_FAST_PWM)
+            if (config_fastPWM)
                 period = hz / 4000;
             else
                 period = hz / config_motorPwmRate;
