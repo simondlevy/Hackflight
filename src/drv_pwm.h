@@ -31,7 +31,8 @@ enum {
 
 void pwmICConfig(TIM_TypeDef *tim, uint8_t channel, uint16_t polarity);
 
-void pwmInit(uint16_t config_failsafeThreshold);
+void pwmInit(uint16_t config_failsafeThreshold, uint8_t config_pwmFilter);
 
 void pwmWriteMotor(uint8_t index, uint16_t value);
+
 uint16_t pwmRead(uint8_t channel);
