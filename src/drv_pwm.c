@@ -15,8 +15,6 @@
 #include "board/drv_gpio.h"
 #include "board/drv_timer.h"
 
-#include "config.h"
-
 /*
    Configuration maps:
 
@@ -279,7 +277,7 @@ static void pwmWriteStandard(uint8_t index, uint16_t value)
 }
 
 void pwmInit(uint16_t config_failsafeThreshold, uint8_t config_pwmFilter, uint8_t config_useCPPM,
-        uint16_t config_motorPwmRate, uint8_t config_fastPWM)
+        uint16_t config_motorPwmRate, uint8_t config_fastPWM, uint16_t config_PwmIdlePulse)
 {
     const uint8_t *setup;
     uint16_t period;
@@ -322,7 +320,7 @@ void pwmInit(uint16_t config_failsafeThreshold, uint8_t config_pwmFilter, uint8_
             else
                 period = hz / config_motorPwmRate;
 
-            motors[numMotors++] = pwmOutConfig(port, mhz, period, CONFIG_PWM_IDLE_PULSE);
+            motors[numMotors++] = pwmOutConfig(port, mhz, period, config_PwmIdlePulse);
         }
     }
 
