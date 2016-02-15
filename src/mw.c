@@ -12,8 +12,8 @@
 #include "board/drv_serial.h"
 #include "board/drv_gpio.h"
 #include "board/drv_system.h"
+#include "board/drv_pwm.h"
 
-#include "drv_pwm.h"
 #include "sensors.h"
 #include "mw.h"
 #include "telemetry_common.h"

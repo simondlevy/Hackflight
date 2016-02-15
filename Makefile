@@ -64,7 +64,7 @@ HIGHEND_SRC	 = telemetry_common.c
 NAZE_SRC = board/drv_adc.c \
 		   board/drv_mpu6050.c \
 		   board/drv_ms5611.c \
-		   drv_pwm.c \
+		   board/drv_pwm.c \
 		   board/drv_spi.c \
 		   board/drv_timer.c \
 		   board/drv_px4flow.c \
