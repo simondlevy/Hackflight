@@ -24,7 +24,7 @@
 
 #include "telemetry_common.h"
 #include "config.h"
-#include "sensors.h"
+#include "axes.h"
 #include "mw.h"
 
 int hw_revision = 0;

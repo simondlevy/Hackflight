@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "sensors.h"
-//#include "mw.h"
+#include "axes.h"
+
 
 int constrain(int amt, int low, int high)
 {

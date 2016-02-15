@@ -13,7 +13,7 @@
 #include "board/drv_gpio.h"
 #include "board/drv_pwm.h"
 
-#include "sensors.h"
+#include "axes.h"
 #include "mw.h"
 #include "config.h"
 #include "utils.h"

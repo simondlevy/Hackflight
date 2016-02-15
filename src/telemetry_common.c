@@ -6,7 +6,7 @@
 #include "board/drv_gpio.h"
 #include "board/drv_serial.h"
 
-#include "sensors.h"
+#include "axes.h"
 #include "mw.h"
 
 static bool isTelemetryConfigurationValid = false; // flag used to avoid repeated configuration checks

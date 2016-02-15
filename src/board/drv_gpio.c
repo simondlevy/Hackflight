@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include "../sensors.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -14,6 +13,8 @@
 #include "drv_system.h"         // timers, delays, etc
 #include "drv_gpio.h"
 #include "utils.h"
+
+#include "../axes.h"
 
 #define I2C_DEVICE (I2CDEV_2)
 

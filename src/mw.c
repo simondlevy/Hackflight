@@ -14,7 +14,7 @@
 #include "board/drv_system.h"
 #include "board/drv_pwm.h"
 
-#include "sensors.h"
+#include "axes.h"
 #include "mw.h"
 #include "telemetry_common.h"
 #include "config.h"
