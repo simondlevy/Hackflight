@@ -302,6 +302,8 @@ static void pidMultiWii(void)
 
 void setup(void)
 {
+    activateConfig();
+
     int i;
 
     LED1_ON;

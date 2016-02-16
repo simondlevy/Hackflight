@@ -41,7 +41,7 @@ int main(void)
     // from system_stm32f10x.c
     extern void SetSysClock(bool overclock);
 
-    extern void activateConfig(void);
+    //extern void activateConfig(void);
 
     uint8_t i;
 
@@ -60,7 +60,7 @@ int main(void)
     // sleep for 100ms
     delay(100);
 
-    activateConfig();
+    //activateConfig();
 
     if (spiInit() == SPI_DEVICE_MPU && hw_revision == NAZE32_REV5)
         hw_revision = NAZE32_SP;
