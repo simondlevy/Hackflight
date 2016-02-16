@@ -237,7 +237,7 @@ void serialInit(serialPort_t * telemport)
     port.port = telemport;
 }
 
-void mspCom(int16_t motor[4], int16_t motor_disarmed[4])
+void mspCom(bool armed, int16_t motor[4], int16_t motor_disarmed[4])
 {
     uint8_t c;
 

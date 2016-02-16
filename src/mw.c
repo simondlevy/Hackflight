@@ -43,12 +43,15 @@
 #define THR_CE (3 << (2 * THROTTLE))
 #define THR_HI (2 << (2 * THROTTLE))
 
-// Globals
+// Globals =================================================
 bool     useSmallAngle;
-bool     armed;
 uint32_t currentTime = 0;
 int16_t  rcData[RC_CHANS];       // interval [1000;2000]
 int16_t  axisPID[3];
+
+// =========================================================
+
+static bool armed;
 
 static int16_t motor[4];
 static int16_t motor_disarmed[4];
@@ -151,8 +154,9 @@ static void annexCode(void)
         }
     }
 
-    extern void mspCom(int16_t motor[4], int16_t motor_disarmed[4]);
-    mspCom(motor, motor_disarmed);
+    // MSP need to know about our situation
+    extern void mspCom(bool armed, int16_t motor[4], int16_t motor_disarmed[4]);
+    mspCom(armed, motor, motor_disarmed);
 }
 
 static void computeRC(void)
@@ -476,7 +480,7 @@ void loop(void)
             case 2:
                 taskOrder++;
                 if (baro_available && sonar_available) {
-                    getEstimatedAltitude();
+                    getEstimatedAltitude(armed);
                     break;
                 }
             case 3:
@@ -494,7 +498,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        computeIMU();
+        computeIMU(armed);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
@@ -541,7 +545,7 @@ void loop(void)
         }
 
         pidMultiWii();
-        mixTable(rcCommand, motor, motor_disarmed);
+        mixTable(rcCommand, armed, motor, motor_disarmed);
         writeMotors(motor);
     }
 }
