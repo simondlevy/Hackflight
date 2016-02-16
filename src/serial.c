@@ -65,35 +65,13 @@ typedef  struct mspPortState_t {
 
 static mspPortState_t port;
 static mspPortState_t *currentPortState = &port;
-static int numTelemetryPorts = 0;
 
 static bool rxMspFrameDone = false;
-static uint16_t mspReadRawRC(uint8_t chan);
-
-static uint16_t mspReadRawRC(uint8_t chan)
-{
-    return rcData[chan];
-}
-
-void mspFrameRecieve(void)
+static void mspFrameReceive(void)
 {
     rxMspFrameDone = true;
 }
 
-bool mspFrameComplete(void)
-{
-    if (rxMspFrameDone) {
-        rxMspFrameDone = false;
-        return true;
-    }
-    return false;
-}
-
-void mspInit(rcReadRawDataPtr *callback)
-{
-    if (callback)
-        *callback = mspReadRawRC;
-}
 static void serialize8(uint8_t a)
 {
     serialWrite(currentPortState->port, a);
@@ -126,16 +104,7 @@ static uint16_t read16(void)
     return t;
 }
 
-/*
-static uint32_t read32(void)
-{
-    uint32_t t = read16();
-    t += (uint32_t)read16() << 16;
-    return t;
-}
-*/
-
-void headSerialResponse(uint8_t err, uint8_t s)
+static void headSerialResponse(uint8_t err, uint8_t s)
 {
     serialize8('$');
     serialize8('M');
@@ -145,43 +114,26 @@ void headSerialResponse(uint8_t err, uint8_t s)
     serialize8(currentPortState->cmdMSP);
 }
 
-void headSerialReply(uint8_t s)
+static void headSerialReply(uint8_t s)
 {
     headSerialResponse(0, s);
 }
 
-void headSerialError(uint8_t s)
+static void headSerialError(uint8_t s)
 {
     headSerialResponse(1, s);
 }
 
-void tailSerialReply(void)
+static void tailSerialReply(void)
 {
     serialize8(currentPortState->checksum);
 }
 
-void s_struct(uint8_t *cb, uint8_t siz)
+static void s_struct(uint8_t *cb, uint8_t siz)
 {
     headSerialReply(siz);
     while (siz--)
         serialize8(*cb++);
-}
-
-void serializeNames(const char *s)
-{
-    const char *c;
-    for (c = s; *c; c++)
-        serialize8(*c);
-}
-
-serialPort_t * serialInit(uint32_t baudrate)
-{
-    numTelemetryPorts = 0;
-    serialPort_t * telemport = uartOpen(USART1, NULL, baudrate, MODE_RXTX);
-    port.port = telemport;
-    numTelemetryPorts++;
-
-    return telemport;
 }
 
 static void evaluateCommand(void)
@@ -198,7 +150,7 @@ static void evaluateCommand(void)
             for (i = 0; i < 8; i++)
                 rcData[i] = read16();
             headSerialReply(0);
-            mspFrameRecieve();
+            mspFrameReceive();
             break;
 
         case MSP_SET_MOTOR:
@@ -280,6 +232,15 @@ static void evaluateCommand(void)
     tailSerialReply();
 }
 
+// ==================================================================================
+
+serialPort_t * serialInit(uint32_t baudrate)
+{
+    serialPort_t * telemport = uartOpen(USART1, NULL, baudrate, MODE_RXTX);
+    port.port = telemport;
+
+    return telemport;
+}
 
 void serialCom(void)
 {

@@ -38,66 +38,12 @@ static sensor_t acc;                       // acc access functions
 static baro_t baro;                        // barometer access functions
 static int16_t accZero[3];
 
-void initSensors(int hwrev)
-{
-    acc_1G = mpuInit(&acc, &gyro, CONFIG_GYRO_LPF, hwrev);
+typedef struct stdev_t {
+    float m_oldM, m_newM, m_oldS, m_newS;
+    int m_n;
+} stdev_t;
 
-    acc.init(CONFIG_ACC_ALIGN);
 
-    gyro.init(CONFIG_GYRO_ALIGN);
-
-    baro_available = initBaro(&baro);
-
-    sonar_available = initSonar();
-}
-
-void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
-{
-    switch (rotation) {
-        case CW0_DEG:
-            dest[X] = src[X];
-            dest[Y] = src[Y];
-            dest[Z] = src[Z];
-            break;
-        case CW90_DEG:
-            dest[X] = src[Y];
-            dest[Y] = -src[X];
-            dest[Z] = src[Z];
-            break;
-        case CW180_DEG:
-            dest[X] = -src[X];
-            dest[Y] = -src[Y];
-            dest[Z] = src[Z];
-            break;
-        case CW270_DEG:
-            dest[X] = -src[Y];
-            dest[Y] = src[X];
-            dest[Z] = src[Z];
-            break;
-        case CW0_DEG_FLIP:
-            dest[X] = -src[X];
-            dest[Y] = src[Y];
-            dest[Z] = -src[Z];
-            break;
-        case CW90_DEG_FLIP:
-            dest[X] = src[Y];
-            dest[Y] = src[X];
-            dest[Z] = -src[Z];
-            break;
-        case CW180_DEG_FLIP:
-            dest[X] = src[X];
-            dest[Y] = -src[Y];
-            dest[Z] = -src[Z];
-            break;
-        case CW270_DEG_FLIP:
-            dest[X] = -src[Y];
-            dest[Y] = -src[X];
-            dest[Z] = -src[Z];
-            break;
-        default:
-            break;
-    }
-}
 static void ACC_Common(void)
 {
     static int32_t a[3];
@@ -127,17 +73,6 @@ static void ACC_Common(void)
     accADC[PITCH] -= accZero[PITCH];
     accADC[YAW] -= accZero[YAW];
 }
-
-void ACC_getADC(void)
-{
-    acc.read(accADC);
-    ACC_Common();
-}
-
-typedef struct stdev_t {
-    float m_oldM, m_newM, m_oldS, m_newS;
-    int m_n;
-} stdev_t;
 
 static void devClear(stdev_t *dev)
 {
@@ -208,13 +143,6 @@ static void GYRO_Common(void)
         gyroADC[axis] -= gyroZero[axis];
 }
 
-void Gyro_getADC(void)
-{
-    // range: +/- 8192; +/- 2000 deg/sec
-    gyro.read(gyroADC);
-    GYRO_Common();
-}
-
 static void Baro_Common(void)
 {
     static int32_t baroHistTab[BARO_TAB_SIZE_MAX];
@@ -228,6 +156,83 @@ static void Baro_Common(void)
     baroPressureSum += baroHistTab[baroHistIdx];
     baroPressureSum -= baroHistTab[indexplus1];
     baroHistIdx = indexplus1;
+}
+
+// ==============================================================================================
+
+void initSensors(int hwrev)
+{
+    acc_1G = mpuInit(&acc, &gyro, CONFIG_GYRO_LPF, hwrev);
+
+    acc.init(CONFIG_ACC_ALIGN);
+
+    gyro.init(CONFIG_GYRO_ALIGN);
+
+    baro_available = initBaro(&baro);
+
+    sonar_available = initSonar();
+}
+
+void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
+{
+    switch (rotation) {
+        case CW0_DEG:
+            dest[X] = src[X];
+            dest[Y] = src[Y];
+            dest[Z] = src[Z];
+            break;
+        case CW90_DEG:
+            dest[X] = src[Y];
+            dest[Y] = -src[X];
+            dest[Z] = src[Z];
+            break;
+        case CW180_DEG:
+            dest[X] = -src[X];
+            dest[Y] = -src[Y];
+            dest[Z] = src[Z];
+            break;
+        case CW270_DEG:
+            dest[X] = -src[Y];
+            dest[Y] = src[X];
+            dest[Z] = src[Z];
+            break;
+        case CW0_DEG_FLIP:
+            dest[X] = -src[X];
+            dest[Y] = src[Y];
+            dest[Z] = -src[Z];
+            break;
+        case CW90_DEG_FLIP:
+            dest[X] = src[Y];
+            dest[Y] = src[X];
+            dest[Z] = -src[Z];
+            break;
+        case CW180_DEG_FLIP:
+            dest[X] = src[X];
+            dest[Y] = -src[Y];
+            dest[Z] = -src[Z];
+            break;
+        case CW270_DEG_FLIP:
+            dest[X] = -src[Y];
+            dest[Y] = -src[X];
+            dest[Z] = -src[Z];
+            break;
+        default:
+            break;
+    }
+}
+
+
+void ACC_getADC(void)
+{
+    acc.read(accADC);
+    ACC_Common();
+}
+
+void Gyro_getADC(void)
+{
+    // range: +/- 8192; +/- 2000 deg/sec
+    gyro.read(gyroADC);
+    GYRO_Common();
 }
 
 int Baro_update(void)

@@ -29,7 +29,6 @@ extern int16_t motor[4];
 extern int16_t rcCommand[4];
 
 void mixerInit(void);
-void mixerResetMotors(void);
 void writeMotors(void);
 void writeAllMotors(int16_t mc);
 void mixTable(void);
@@ -61,9 +60,6 @@ void Sonar_update(void);
 
 serialPort_t * serialInit(uint32_t baudrate);
 void           serialCom(void);
-void           mspInit(rcReadRawDataPtr *callback);
-bool           mspFrameComplete(void);
-void           mspFrameRecieve(void);
 
 // state ---------------------------------------------------
 

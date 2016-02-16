@@ -149,33 +149,7 @@ static void annexCode(void)
     serialCom();
 }
 
-// ===============================================================================================
-
-bool check_and_update_timed_task(uint32_t * usec, uint32_t period) 
-{
-
-    bool result = (int32_t)(currentTime - *usec) >= 0;
-
-    if (result)
-        update_timed_task(usec, period);
-
-    return result;
-}
-
-void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
-{
-    uint8_t i, r;
-
-    for (r = 0; r < repeat; r++) {
-        for (i = 0; i < num; i++) {
-            LED0_TOGGLE;            // switch LEDPIN state
-            delay(wait);
-        }
-        delay(60);
-    }
-}
-
-void computeRC(void)
+static void computeRC(void)
 {
     uint16_t capture;
     int i, chan;
@@ -199,6 +173,8 @@ void computeRC(void)
     }
     rcAverageIndex++;
 }
+
+
 
 static void mwArm(void)
 {
@@ -279,6 +255,31 @@ static void pidMultiWii(void)
         delta1[axis] = delta;
         DTerm = (deltaSum * dynD8[axis]) / 32;
         axisPID[axis] = PTerm + ITerm - DTerm;
+    }
+}
+
+// ===============================================================================================
+
+bool check_and_update_timed_task(uint32_t * usec, uint32_t period) 
+{
+    bool result = (int32_t)(currentTime - *usec) >= 0;
+
+    if (result)
+        update_timed_task(usec, period);
+
+    return result;
+}
+
+void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
+{
+    uint8_t i, r;
+
+    for (r = 0; r < repeat; r++) {
+        for (i = 0; i < num; i++) {
+            LED0_TOGGLE;            // switch LEDPIN state
+            delay(wait);
+        }
+        delay(60);
     }
 }
 

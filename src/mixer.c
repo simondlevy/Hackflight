@@ -39,6 +39,16 @@ static const motorMixer_t mixerQuadX[] = {
     { 1.0f,  1.0f, -1.0f, -1.0f },          // FRONT_L
 };
 
+static void mixerResetMotors(void)
+{
+    int i;
+    // set disarmed motor values
+    for (i = 0; i < 4; i++)
+        motor_disarmed[i] = CONFIG_MINCOMMAND;
+}
+
+// =========================================================================
+
 void mixerInit(void)
 {
     int i;
@@ -49,14 +59,6 @@ void mixerInit(void)
     mixerResetMotors();
 }
 
-void mixerResetMotors(void)
-{
-    int i;
-    // set disarmed motor values
-    for (i = 0; i < 4; i++)
-        motor_disarmed[i] = CONFIG_MINCOMMAND;
-}
-
 void writeMotors(void)
 {
     uint8_t i;
@@ -64,6 +66,8 @@ void writeMotors(void)
     for (i = 0; i < 4; i++)
         pwmWriteMotor(i, motor[i]);
 }
+
+
 
 void writeAllMotors(int16_t mc)
 {
