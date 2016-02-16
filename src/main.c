@@ -82,22 +82,10 @@ int main(void)
     LED0_OFF;
     LED1_OFF;
 
-    imuInit(); 
-    mixerInit(); 
 
     telemport = serialInit(CONFIG_SERIAL_BAUDRATE);
 
     init_printf(NULL, _putc);
-
-    pwmInit(CONFIG_FAILSAFE_DETECT_THRESHOLD, CONFIG_PWM_FILTER, CONFIG_USE_CPPM, CONFIG_MOTOR_PWM_RATE,
-            CONFIG_FAST_PWM, CONFIG_PWM_IDLE_PULSE);
-
-    // configure PWM/CPPM read function and max number of channels
-    // these, if enabled
-    for (i = 0; i < RC_CHANS; i++)
-        rcData[i] = 1502;
-
-    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
 
     // set up initial conditions
     setup();
