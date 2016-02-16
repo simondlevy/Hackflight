@@ -10,12 +10,12 @@
 
 #define I2C_DEVICE (I2CDEV_2)
 
-#include "revision.h"
 #include "stm32f10x_conf.h"
-#include "drv_system.h"         // timers, delays, etc
-#include "drv_gpio.h"
-#include "drv_adc.h"
-#include "drv_i2c.h"
+#include "../board/revision.h"
+#include "../board/drv_system.h"         // timers, delays, etc
+#include "../board/drv_gpio.h"
+#include "../board/drv_adc.h"
+#include "../board/drv_i2c.h"
 
 #include "../axes.h"            // IMU data structure
 

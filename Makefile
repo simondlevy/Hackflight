@@ -61,11 +61,11 @@ COMMON_SRC = main.c \
 
 # Source files for the NAZE target
 NAZE_SRC = board/drv_adc.c \
-		   board/drv_mpu6050.c \
-		   board/drv_ms5611.c \
 		   board/drv_pwm.c \
 		   board/drv_spi.c \
 		   board/drv_timer.c \
+		   onboard/drv_mpu6050.c \
+		   onboard/drv_ms5611.c \
 		   external/drv_px4flow.c \
 		   external/drv_lidarlite.c \
 		   external/drv_mb1242.c \

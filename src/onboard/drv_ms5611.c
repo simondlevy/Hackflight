@@ -4,18 +4,18 @@
  */
 #include <stdbool.h>
 
-#include "stm32f10x_conf.h"
-#include "drv_system.h"         // timers, delays, etc
-#include "drv_gpio.h"
+#define I2C_DEVICE (I2CDEV_2)
 
 #define BARO_GPIO   GPIOC
 #define BARO_PIN    Pin_13
 
-#define I2C_DEVICE (I2CDEV_2)
+#include "stm32f10x_conf.h"
 
-#include "drv_i2c.h"
+#include "../board/drv_system.h"         // timers, delays, etc
+#include "../board/drv_gpio.h"
+#include "../board/drv_i2c.h"
+#include "../board/revision.h"
 
-#include "revision.h"
 #include "../baro.h"
 
 // MS5611, Standard address 0x77
