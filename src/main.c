@@ -41,10 +41,6 @@ int main(void)
     // from system_stm32f10x.c
     extern void SetSysClock(bool overclock);
 
-    //extern void activateConfig(void);
-
-    uint8_t i;
-
     // Configure clock, this figures out HSE for hardware autodetect
     SetSysClock(CONFIG_EMF_AVOIDANCE);
 
@@ -60,8 +56,6 @@ int main(void)
     // sleep for 100ms
     delay(100);
 
-    //activateConfig();
-
     if (spiInit() == SPI_DEVICE_MPU && hw_revision == NAZE32_REV5)
         hw_revision = NAZE32_SP;
 
@@ -72,13 +66,13 @@ int main(void)
 
     initSensors(hw_revision);
 
+    // set up initial conditions
+    setup();
+    
     telemport = serialInit(CONFIG_SERIAL_BAUDRATE);
 
     init_printf(NULL, _putc);
 
-    // set up initial conditions
-    setup();
-    
     // loopy
     while (1) 
         loop();

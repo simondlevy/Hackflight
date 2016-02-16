@@ -60,27 +60,6 @@ static void update_timed_task(uint32_t * usec, uint32_t period)
     *usec = currentTime + period;
 }
 
-void activateConfig(void)
-{
-    uint8_t i;
-    for (i = 0; i < PITCH_LOOKUP_LENGTH; i++)
-        lookupPitchRollRC[i] = (2500 + CONFIG_RC_EXPO_8 * (i * i - 25)) * i * (int32_t)CONFIG_RC_RATE_8 / 2500;
-
-    for (i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
-        int16_t tmp = 10 * i - CONFIG_THR_MID_8;
-        uint8_t y = 1;
-        if (tmp > 0)
-            y = 100 - CONFIG_THR_MID_8;
-        if (tmp < 0)
-            y = CONFIG_THR_MID_8;
-        lookupThrottleRC[i] = 10 * CONFIG_THR_MID_8 + tmp * (100 - CONFIG_THR_EXPO_8 + 
-                (int32_t)CONFIG_THR_EXPO_8 * (tmp * tmp) / (y * y)) / 10;
-        lookupThrottleRC[i] = CONFIG_MINTHROTTLE + (int32_t)(CONFIG_MAXTHROTTLE - CONFIG_MINTHROTTLE) * 
-            lookupThrottleRC[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
-    }
-}
-
-
 bool check_and_update_timed_task(uint32_t * usec, uint32_t period) 
 {
 
@@ -302,9 +281,24 @@ static void pidMultiWii(void)
 
 void setup(void)
 {
-    activateConfig();
-
     int i;
+
+    for (i = 0; i < PITCH_LOOKUP_LENGTH; i++)
+        lookupPitchRollRC[i] = (2500 + CONFIG_RC_EXPO_8 * (i * i - 25)) * i * (int32_t)CONFIG_RC_RATE_8 / 2500;
+
+    for (i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
+        int16_t tmp = 10 * i - CONFIG_THR_MID_8;
+        uint8_t y = 1;
+        if (tmp > 0)
+            y = 100 - CONFIG_THR_MID_8;
+        if (tmp < 0)
+            y = CONFIG_THR_MID_8;
+        lookupThrottleRC[i] = 10 * CONFIG_THR_MID_8 + tmp * (100 - CONFIG_THR_EXPO_8 + 
+                (int32_t)CONFIG_THR_EXPO_8 * (tmp * tmp) / (y * y)) / 10;
+        lookupThrottleRC[i] = CONFIG_MINTHROTTLE + (int32_t)(CONFIG_MAXTHROTTLE - CONFIG_MINTHROTTLE) * 
+            lookupThrottleRC[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
+    }
+
 
     LED1_ON;
     LED0_OFF;
