@@ -15,6 +15,7 @@
 #include "board/drv_system.h"
 #include "board/drv_i2c.h"
 
+#include "mixer.h"
 #include "axes.h"
 #include "mw.h"
 #include "config.h"

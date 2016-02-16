@@ -2,11 +2,6 @@
 #include <stdbool.h>
 #include <math.h>
 
-#include "stm32f10x_conf.h"
-
-#include "board/drv_serial.h"
-#include "board/drv_gpio.h"
-#include "board/drv_uart.h"
 #include "board/drv_system.h"
 #include "board/printf.h"
 
@@ -49,31 +44,6 @@ static float    anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination i
 
 static const float magneticDeclination = 0.0f;       // XXX should be calculated at startup from config
 
-// ==========================================================================================
-
-static void getEstimatedAttitude(void);
-
-
-void imuInit(void)
-{
-    smallAngle = lrintf(acc_1G * cosf(RAD * CONFIG_SMALL_ANGLE));
-    accVelScale = 9.80665f / acc_1G / 10000.0f;
-    throttleAngleScale = (1800.0f / M_PI) * (900.0f / CONFIG_THROTTLE_CORRECTION_ANGLE);
-
-    fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
-}
-
-void computeIMU(void)
-{
-    Gyro_getADC();
-    ACC_getADC();
-    getEstimatedAttitude();
-
-    gyroData[YAW] = gyroADC[YAW];
-    gyroData[ROLL] = gyroADC[ROLL];
-    gyroData[PITCH] = gyroADC[PITCH];
-}
-
 // **************************************************
 // Simplified IMU based on "Complementary Filter"
 // Inspired by http://starlino.com/imu_guide.html
@@ -104,7 +74,7 @@ typedef union {
 t_fp_vector EstG;
 
 // Normalize a vector
-void normalizeV(struct fp_vector *src, struct fp_vector *dest)
+static void normalizeV(struct fp_vector *src, struct fp_vector *dest)
 {
     float length;
 
@@ -117,7 +87,7 @@ void normalizeV(struct fp_vector *src, struct fp_vector *dest)
 }
 
 // Rotate Estimated vector(s) with small angle approximation, according to the gyro data
-void rotateV(struct fp_vector *v, float *delta)
+static void rotateV(struct fp_vector *v, float *delta)
 {
     struct fp_vector v_tmp = *v;
 
@@ -153,7 +123,7 @@ void rotateV(struct fp_vector *v, float *delta)
     v->Z = v_tmp.X * mat[0][2] + v_tmp.Y * mat[1][2] + v_tmp.Z * mat[2][2];
 }
 
-int32_t applyDeadband(int32_t value, int32_t deadband)
+static int32_t applyDeadband(int32_t value, int32_t deadband)
 {
     if (abs(value) < deadband) {
         value = 0;
@@ -209,7 +179,7 @@ static void acc_calc(uint32_t deltaT)
     accSumCount++;
 }
 
-void accSum_reset(void)
+static void accSum_reset(void)
 {
     accSum[0] = 0;
     accSum[1] = 0;
@@ -316,6 +286,28 @@ static bool sonarInRange(void)
 static float cfilter(float a, float b, float c) 
 {
     return a * c + b * (1 - c);
+}
+
+// ===============================================================================================
+
+void imuInit(void)
+{
+    smallAngle = lrintf(acc_1G * cosf(RAD * CONFIG_SMALL_ANGLE));
+    accVelScale = 9.80665f / acc_1G / 10000.0f;
+    throttleAngleScale = (1800.0f / M_PI) * (900.0f / CONFIG_THROTTLE_CORRECTION_ANGLE);
+
+    fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
+}
+
+void computeIMU(void)
+{
+    Gyro_getADC();
+    ACC_getADC();
+    getEstimatedAttitude();
+
+    gyroData[YAW] = gyroADC[YAW];
+    gyroData[ROLL] = gyroADC[ROLL];
+    gyroData[PITCH] = gyroADC[PITCH];
 }
 
 int getEstimatedAltitude(void)

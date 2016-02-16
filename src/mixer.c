@@ -13,6 +13,7 @@
 #include "board/drv_gpio.h"
 #include "board/drv_pwm.h"
 
+#include "mixer.h"
 #include "axes.h"
 #include "mw.h"
 #include "config.h"

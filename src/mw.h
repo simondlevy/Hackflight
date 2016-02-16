@@ -23,16 +23,6 @@ enum {
     AUX4
 };
 
-// mixer ---------------------------------------------------
-
-extern int16_t motor[4];
-extern int16_t rcCommand[4];
-
-void mixerInit(void);
-void writeMotors(void);
-void writeAllMotors(int16_t mc);
-void mixTable(void);
-
 // mw  -----------------------------------------------------
 
 extern bool     armed;
@@ -43,6 +33,7 @@ extern bool     useSmallAngle;
 
 void loop(void);
 void setup(void);
+void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
 
 // sensors -------------------------------------------------
 
@@ -56,9 +47,8 @@ int  Baro_update(void);
 bool initSonar();
 void Sonar_update(void);
 
-// Multiwii Serial Protocol --------------------------------
+// msp -----------------------------------------------------
 
-void mspInit(void);
 void mspCom(void);
 
 // state ---------------------------------------------------
@@ -88,6 +78,5 @@ extern bool     velocityControl;
 
 void imuInit(void);
 void computeIMU(void);
-void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
 int  getEstimatedAltitude();
 
