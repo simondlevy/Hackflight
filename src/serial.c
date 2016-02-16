@@ -39,8 +39,6 @@
 
 #define INBUF_SIZE 128
 
-serialPort_t * telemport;
-
 
 // cause reboot after MSP processing complete
 static bool pendReboot = false;
@@ -176,12 +174,14 @@ void serializeNames(const char *s)
         serialize8(*c);
 }
 
-void serialInit(uint32_t baudrate)
+serialPort_t * serialInit(uint32_t baudrate)
 {
     numTelemetryPorts = 0;
-    telemport = uartOpen(USART1, NULL, baudrate, MODE_RXTX);
+    serialPort_t * telemport = uartOpen(USART1, NULL, baudrate, MODE_RXTX);
     port.port = telemport;
     numTelemetryPorts++;
+
+    return telemport;
 }
 
 static void evaluateCommand(void)

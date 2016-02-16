@@ -16,6 +16,8 @@
 #include "mw.h"
 #include "config.h"
 
+#define BARO_TAB_SIZE_MAX   48
+
 // Globals ====================================================================================
 
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 

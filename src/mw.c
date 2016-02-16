@@ -22,6 +22,19 @@
 #define PITCH_LOOKUP_LENGTH     7
 #define THROTTLE_LOOKUP_LENGTH 12
 
+#define ROL_LO (1 << (2 * ROLL))
+#define ROL_CE (3 << (2 * ROLL))
+#define ROL_HI (2 << (2 * ROLL))
+#define PIT_LO (1 << (2 * PITCH))
+#define PIT_CE (3 << (2 * PITCH))
+#define PIT_HI (2 << (2 * PITCH))
+#define YAW_LO (1 << (2 * YAW))
+#define YAW_CE (3 << (2 * YAW))
+#define YAW_HI (2 << (2 * YAW))
+#define THR_LO (1 << (2 * THROTTLE))
+#define THR_CE (3 << (2 * THROTTLE))
+#define THR_HI (2 << (2 * THROTTLE))
+
 // Globals
 uint32_t currentTime = 0;
 int16_t rcData[RC_CHANS];       // interval [1000;2000]

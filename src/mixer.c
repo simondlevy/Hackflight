@@ -22,6 +22,14 @@
 int16_t motor[4];
 int16_t motor_disarmed[4];
 
+// Custom mixer data per motor
+typedef struct motorMixer_t {
+    float throttle;
+    float roll;
+    float pitch;
+    float yaw;
+} motorMixer_t;
+
 static motorMixer_t currentMixer[4];
 
 static const motorMixer_t mixerQuadX[] = {

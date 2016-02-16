@@ -30,6 +30,8 @@
 uint8_t useSmallAngle;
 uint8_t armed;
 
+static serialPort_t * telemport;
+
 // from system_stm32f10x.c
 void SetSysClock(bool overclock);
 
@@ -90,7 +92,7 @@ int main(void)
     imuInit(); 
     mixerInit(); 
 
-    serialInit(CONFIG_SERIAL_BAUDRATE);
+    telemport = serialInit(CONFIG_SERIAL_BAUDRATE);
 
     init_printf( NULL, _putc, telemport);
 

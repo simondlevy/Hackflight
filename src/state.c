@@ -15,23 +15,14 @@
 #include "config.h"
 #include "utils.h"
 
+// Globals ===============================================================================
 
 int16_t  gyroADC[3], accADC[3], accSmooth[3], magADC[3];
-int32_t  accSum[3];
-uint32_t accTimeSum = 0;        // keep track for integration of acc
-int      accSumCount = 0;
-int16_t  smallAngle = 0;
 int32_t  baroPressure = 0;
-int32_t  baroPressure2 = 0;
 int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
-int32_t  BaroAlt = 0;
-int32_t  FusedBaroSonarAlt = 0;
 int32_t  AltPID = 0;
-int32_t  baroAlt_offset = 0;
 int32_t  SonarAlt = 0;
-int32_t  AccelAlt = 0;
-float    sonarTransition = 0;
 int32_t  EstAlt;                // in cm
 int32_t  AltHold;
 int32_t  setVelocity = 0;
@@ -39,20 +30,29 @@ uint8_t  velocityControl = 0;
 int32_t  errorVelocityI = 0;
 int32_t  vario = 0;                      // variometer in cm/s
 int16_t  throttleAngleCorrection = 0;    // correction of throttle in lateral wind,
-float    magneticDeclination = 0.0f;       // calculated at startup from config
-float    accVelScale;
-float    throttleAngleScale;
-float    fc_acc;
+int16_t  gyroData[3] = { 0, 0, 0 };
+int16_t  gyroZero[3] = { 0, 0, 0 };
+int16_t  angle[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
 
-// **************
-// gyro+acc IMU
-// **************
-int16_t gyroData[3] = { 0, 0, 0 };
-int16_t gyroZero[3] = { 0, 0, 0 };
-int16_t angle[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
-float anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
+// Locals ===================================================================================
+
+
+static int32_t  accSum[3];
+static uint32_t accTimeSum;        // keep track for integration of acc
+static int      accSumCount;
+static int16_t  smallAngle;
+static int32_t  baroPressure2;
+static float    accVelScale;
+static float    throttleAngleScale;
+static float    fc_acc;
+static float    anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
+
+static const float magneticDeclination = 0.0f;       // XXX should be calculated at startup from config
+
+// ==========================================================================================
 
 static void getEstimatedAttitude(void);
+
 
 void imuInit(void)
 {
@@ -329,9 +329,12 @@ int getEstimatedAltitude(void)
     static float   accelAlt;
     static bool wasArmed;
 
+    int32_t  FusedBaroSonarAlt = 0;
+    int32_t BaroAlt = 0;
     uint32_t currentT = micros();
     int16_t tiltAngle = max(abs(angle[ROLL]), abs(angle[PITCH]));
     uint32_t dTime = currentT - previousT;
+    int32_t  baroAlt_offset = 0;
 
     if (dTime < CONFIG_ALT_UPDATE_USEC)
         return 0;
@@ -358,8 +361,6 @@ int getEstimatedAltitude(void)
     }
     wasArmed = armed;
 
-    printf("%d\n", baroPressure2);
-
     // Calculate sonar altitude only if the sonar is facing downwards(<25deg)
     SonarAlt = (tiltAngle > 250) ? -1 : SonarAlt * (900.0f - tiltAngle) / 900.0f;
 
@@ -370,7 +371,7 @@ int getEstimatedAltitude(void)
     } else {
         BaroAlt = BaroAlt - baroAlt_offset;
         if (SonarAlt > 0) {
-            sonarTransition = (300 - SonarAlt) / 100.0f;
+            float sonarTransition = (300 - SonarAlt) / 100.0f;
             FusedBaroSonarAlt = cfilter(SonarAlt, BaroAlt, sonarTransition); 
         }
     }
@@ -388,8 +389,6 @@ int getEstimatedAltitude(void)
 
     // complementary filter for altitude estimation (baro & acc)
     //accelAlt = cfilter(accelAlt, FusedBaroSonarAlt, CONFIG_BARO_CF_ALT);
-
-    AccelAlt = (int)accelAlt;
 
     EstAlt = sonarInRange() ? FusedBaroSonarAlt : accelAlt;
 
