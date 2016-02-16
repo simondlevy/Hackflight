@@ -66,31 +66,7 @@ static void update_timed_task(uint32_t * usec, uint32_t period)
     *usec = currentTime + period;
 }
 
-bool check_and_update_timed_task(uint32_t * usec, uint32_t period) 
-{
-
-    bool result = (int32_t)(currentTime - *usec) >= 0;
-
-    if (result)
-        update_timed_task(usec, period);
-
-    return result;
-}
-
-void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
-{
-    uint8_t i, r;
-
-    for (r = 0; r < repeat; r++) {
-        for (i = 0; i < num; i++) {
-            LED0_TOGGLE;            // switch LEDPIN state
-            delay(wait);
-        }
-        delay(60);
-    }
-}
-
-void annexCode(void)
+static void annexCode(void)
 {
     static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
@@ -173,9 +149,30 @@ void annexCode(void)
     serialCom();
 }
 
-uint16_t pwmReadRawRC(uint8_t chan)
+// ===============================================================================================
+
+bool check_and_update_timed_task(uint32_t * usec, uint32_t period) 
 {
-    return pwmRead(CONFIG_RCMAP[chan]);
+
+    bool result = (int32_t)(currentTime - *usec) >= 0;
+
+    if (result)
+        update_timed_task(usec, period);
+
+    return result;
+}
+
+void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
+{
+    uint8_t i, r;
+
+    for (r = 0; r < repeat; r++) {
+        for (i = 0; i < num; i++) {
+            LED0_TOGGLE;            // switch LEDPIN state
+            delay(wait);
+        }
+        delay(60);
+    }
 }
 
 void computeRC(void)
@@ -188,7 +185,7 @@ void computeRC(void)
 
     for (chan = 0; chan < 8; chan++) {
 
-        capture = pwmReadRawRC(chan);
+        capture = pwmRead(CONFIG_RCMAP[chan]);
 
         // validate input
         if (capture < PULSE_MIN || capture > PULSE_MAX)

@@ -45,18 +45,13 @@ COMMON_SRC = mixer.c \
 		   serial.c \
 		   state.c \
 		   utils.c \
-		   startup_stm32f10x_md_gcc.S \
-		   board/drv_gpio.c \
-		   board/drv_i2c.c \
-		   board/drv_system.c \
-		   board/drv_serial.c \
-		   board/drv_uart.c \
-		   board/printf.c \
 		   $(CMSIS_SRC) \
 		   $(STDPERIPH_SRC)
 
-# Source files for full-featured systems
-#HIGHEND_SRC	 = telemetry_common.c
+# Source for off-board sensors
+OFFBOARD_SRC = offboard/drv_px4flow.c \
+		       offboard/drv_lidarlite.c \
+		       offboard/drv_mb1242.c \
 
 # Source files for the NAZE target
 NAZE_SRC = board/main.c \
@@ -64,11 +59,16 @@ NAZE_SRC = board/main.c \
 		   board/drv_pwm.c \
 		   board/drv_spi.c \
 		   board/drv_timer.c \
+		   startup_stm32f10x_md_gcc.S \
+		   board/drv_gpio.c \
+		   board/drv_i2c.c \
+		   board/drv_system.c \
+		   board/drv_serial.c \
+		   board/drv_uart.c \
+		   board/printf.c \
 		   onboard/drv_mpu6050.c \
 		   onboard/drv_ms5611.c \
-		   offboard/drv_px4flow.c \
-		   offboard/drv_lidarlite.c \
-		   offboard/drv_mb1242.c \
+		   $(OFFBOARD_SRC) \
 		   $(HIGHEND_SRC) \
 		   $(COMMON_SRC)
 
