@@ -4,7 +4,7 @@
 
 #define GYRO
 #define ACC
-#define BUZZER
+//#define BUZZER
 #define LED0
 #define LED1
 #define INVERTER
@@ -13,8 +13,6 @@
 #define LED0_PIN    Pin_3 // PB3 (LED)
 #define LED1_GPIO   GPIOB
 #define LED1_PIN    Pin_4 // PB4 (LED)
-#define BEEP_GPIO   GPIOA
-#define BEEP_PIN    Pin_12 // PA12 (Buzzer)
 #define INV_PIN     Pin_2 // PB2 (BOOT1) abused as inverter select GPIO
 #define INV_GPIO    GPIOB
 
@@ -36,16 +34,6 @@
 #define LED1_TOGGLE
 #define LED1_OFF
 #define LED1_ON
-#endif
-
-#ifdef BEEP_GPIO
-#define BEEP_TOGGLE              digitalToggle(BEEP_GPIO, BEEP_PIN);
-#define BEEP_OFF                 systemBeep(false);
-#define BEEP_ON                  systemBeep(true);
-#else
-#define BEEP_TOGGLE              ;
-#define BEEP_OFF                 ;
-#define BEEP_ON                  ;
 #endif
 
 #ifdef INV_GPIO

@@ -97,9 +97,7 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
     for (r = 0; r < repeat; r++) {
         for (i = 0; i < num; i++) {
             LED0_TOGGLE;            // switch LEDPIN state
-            BEEP_ON;
             delay(wait);
-            BEEP_OFF;
         }
         delay(60);
     }
