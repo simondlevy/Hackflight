@@ -26,7 +26,6 @@
 #include "axes.h"
 #include "mw.h"
 
-extern  rcReadRawDataPtr rcReadRawFunc;
 uint8_t useSmallAngle;
 uint8_t armed;
 
@@ -123,7 +122,6 @@ int main(void)
     // these, if enabled
     for (i = 0; i < RC_CHANS; i++)
         rcData[i] = 1502;
-    rcReadRawFunc = pwmReadRawRC;
 
     previousTime = micros();
 
