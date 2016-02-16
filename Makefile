@@ -14,7 +14,7 @@
 # Things that the user might override on the commandline
 #
 
-# The target to build, must be one of NAZE or CJMCU
+# The target to build
 TARGET		?= NAZE
 
 # Compile-time options
@@ -66,9 +66,9 @@ NAZE_SRC = board/main.c \
 		   board/drv_timer.c \
 		   onboard/drv_mpu6050.c \
 		   onboard/drv_ms5611.c \
-		   external/drv_px4flow.c \
-		   external/drv_lidarlite.c \
-		   external/drv_mb1242.c \
+		   offboard/drv_px4flow.c \
+		   offboard/drv_lidarlite.c \
+		   offboard/drv_mb1242.c \
 		   $(HIGHEND_SRC) \
 		   $(COMMON_SRC)
 
