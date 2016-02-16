@@ -72,17 +72,6 @@ int main(void)
 
     initSensors(hw_revision);
 
-    LED1_ON;
-    LED0_OFF;
-    for (i = 0; i < 10; i++) {
-        LED1_TOGGLE;
-        LED0_TOGGLE;
-        delay(50);
-    }
-    LED0_OFF;
-    LED1_OFF;
-
-
     telemport = serialInit(CONFIG_SERIAL_BAUDRATE);
 
     init_printf(NULL, _putc);

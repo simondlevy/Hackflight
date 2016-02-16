@@ -302,6 +302,18 @@ static void pidMultiWii(void)
 
 void setup(void)
 {
+    int i;
+
+    LED1_ON;
+    LED0_OFF;
+    for (i = 0; i < 10; i++) {
+        LED1_TOGGLE;
+        LED0_TOGGLE;
+        delay(50);
+    }
+    LED0_OFF;
+    LED1_OFF;
+
     imuInit(); 
     mixerInit(); 
 
@@ -310,7 +322,6 @@ void setup(void)
 
     // configure PWM/CPPM read function and max number of channels
     // these, if enabled
-    int i;
     for (i = 0; i < RC_CHANS; i++)
         rcData[i] = 1502;
 
