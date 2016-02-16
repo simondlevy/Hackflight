@@ -39,8 +39,7 @@ OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
 # Source files common to all targets
-COMMON_SRC = main.c \
-		   mixer.c \
+COMMON_SRC = mixer.c \
 		   mw.c \
 		   sensors.c \
 		   serial.c \
@@ -60,7 +59,8 @@ COMMON_SRC = main.c \
 #HIGHEND_SRC	 = telemetry_common.c
 
 # Source files for the NAZE target
-NAZE_SRC = board/drv_adc.c \
+NAZE_SRC = board/main.c \
+           board/drv_adc.c \
 		   board/drv_pwm.c \
 		   board/drv_spi.c \
 		   board/drv_timer.c \

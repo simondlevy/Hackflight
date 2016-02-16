@@ -8,13 +8,10 @@
 
 #include "stm32f10x_conf.h"
 
-#include "board/printf.h"
-
-#include "board/drv_serial.h"
-#include "board/drv_gpio.h"
-#include "board/drv_system.h"
-
-#include "config.h"
+#include "printf.h"
+#include "drv_serial.h"
+#include "drv_gpio.h"
+#include "drv_system.h"
 
 static serialPort_t * telemport;
 
@@ -32,14 +29,14 @@ int main(void)
     extern void SetSysClock(bool overclock);
 
     // Configure clock, this figures out HSE for hardware autodetect
-    SetSysClock(CONFIG_EMF_AVOIDANCE);
+    SetSysClock(false);
 
     // set up initial conditions
     extern void setup();
     setup();
     
     extern serialPort_t * serialInit(uint32_t baudrate);
-    telemport = serialInit(CONFIG_SERIAL_BAUDRATE);
+    telemport = serialInit(115200);
 
     init_printf(NULL, _putc);
 
