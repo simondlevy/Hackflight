@@ -19,10 +19,6 @@
 #include "config.h"
 #include "utils.h"
 
-// Globals
-int16_t motor[4];
-int16_t motor_disarmed[4];
-
 // Custom mixer data per motor
 typedef struct motorMixer_t {
     float throttle;
@@ -40,27 +36,19 @@ static const motorMixer_t mixerQuadX[] = {
     { 1.0f,  1.0f, -1.0f, -1.0f },          // FRONT_L
 };
 
-static void mixerResetMotors(void)
-{
-    int i;
-    // set disarmed motor values
-    for (i = 0; i < 4; i++)
-        motor_disarmed[i] = CONFIG_MINCOMMAND;
-}
-
 // =========================================================================
 
-void mixerInit(void)
+void mixerInit(int16_t motor_disarmed[4])
 {
     int i;
 
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++) {
         currentMixer[i] = mixerQuadX[i];
-
-    mixerResetMotors();
+        motor_disarmed[i] = CONFIG_MINCOMMAND;
+    }
 }
 
-void writeMotors(void)
+void writeMotors(int16_t motor[4])
 {
     uint8_t i;
 
@@ -69,18 +57,7 @@ void writeMotors(void)
 }
 
 
-
-void writeAllMotors(int16_t mc)
-{
-    uint8_t i;
-
-    // Sends commands to all motors
-    for (i = 0; i < 4; i++)
-        motor[i] = mc;
-    writeMotors();
-}
-
-void mixTable(int16_t * rcCommand)
+void mixTable(int16_t * rcCommand, int16_t motor[4], int16_t motor_disarmed[4])
 {
     int16_t maxMotor;
     uint32_t i;

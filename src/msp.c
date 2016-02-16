@@ -137,13 +137,10 @@ static void s_struct(uint8_t *cb, uint8_t siz)
         serialize8(*cb++);
 }
 
-static void evaluateCommand(void)
+static void evaluateCommand(int16_t motor[4], int16_t motor_disarmed[4])
 {
     uint32_t i;
     const char *build = __DATE__;
-
-    // from mixer.c
-    extern int16_t motor_disarmed[4];
 
     switch (currentPortState->cmdMSP) {
 
@@ -240,7 +237,7 @@ void serialInit(serialPort_t * telemport)
     port.port = telemport;
 }
 
-void mspCom(void)
+void mspCom(int16_t motor[4], int16_t motor_disarmed[4])
 {
     uint8_t c;
 
@@ -286,7 +283,7 @@ void mspCom(void)
         } else if (currentPortState->c_state == HEADER_CMD && 
                 currentPortState->offset >= currentPortState->dataSize) {
             if (currentPortState->checksum == c) {        // compare calculated and transferred checksum
-                evaluateCommand();      // we got a valid packet, evaluate it
+                evaluateCommand(motor, motor_disarmed);          // we got a valid packet, evaluate it
             }
             currentPortState->c_state = IDLE;
         }

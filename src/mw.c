@@ -50,6 +50,10 @@ uint32_t currentTime = 0;
 int16_t  rcData[RC_CHANS];       // interval [1000;2000]
 int16_t  axisPID[3];
 
+static int16_t motor[4];
+static int16_t motor_disarmed[4];
+
+
 static int16_t  rcCommand[4];   // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
 
 static uint8_t accCalibrated;
@@ -147,8 +151,8 @@ static void annexCode(void)
         }
     }
 
-    extern void mspCom();
-    mspCom();
+    extern void mspCom(int16_t motor[4], int16_t motor_disarmed[4]);
+    mspCom(motor, motor_disarmed);
 }
 
 static void computeRC(void)
@@ -340,7 +344,7 @@ void setup(void)
     LED1_OFF;
 
     imuInit(); 
-    mixerInit(); 
+    mixerInit(motor_disarmed); 
 
     pwmInit(CONFIG_FAILSAFE_DETECT_THRESHOLD, CONFIG_PWM_FILTER, CONFIG_USE_CPPM, CONFIG_MOTOR_PWM_RATE,
             CONFIG_FAST_PWM, CONFIG_PWM_IDLE_PULSE);
@@ -537,7 +541,7 @@ void loop(void)
         }
 
         pidMultiWii();
-        mixTable(rcCommand);
-        writeMotors();
+        mixTable(rcCommand, motor, motor_disarmed);
+        writeMotors(motor);
     }
 }
