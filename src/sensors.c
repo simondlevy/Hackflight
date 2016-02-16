@@ -12,6 +12,7 @@
 #include "board/drv_serial.h"
 #include "board/drv_gpio.h"
 
+#include "sensors.h"
 #include "axes.h"
 #include "mw.h"
 #include "config.h"

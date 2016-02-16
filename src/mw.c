@@ -21,6 +21,7 @@
 #include "board/revision.h"
 
 #include "mixer.h"
+#include "sensors.h"
 #include "axes.h"
 #include "mw.h"
 #include "config.h"
@@ -47,8 +48,9 @@ bool     useSmallAngle;
 bool     armed;
 uint32_t currentTime = 0;
 int16_t  rcData[RC_CHANS];       // interval [1000;2000]
-int16_t  rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
 int16_t  axisPID[3];
+
+static int16_t  rcCommand[4];   // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
 
 static uint8_t accCalibrated;
 
@@ -145,6 +147,7 @@ static void annexCode(void)
         }
     }
 
+    extern void mspCom();
     mspCom();
 }
 
@@ -534,7 +537,7 @@ void loop(void)
         }
 
         pidMultiWii();
-        mixTable();
+        mixTable(rcCommand);
         writeMotors();
     }
 }

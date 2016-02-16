@@ -6,6 +6,7 @@
 #include "board/printf.h"
 
 #include "axes.h"
+#include "sensors.h"
 #include "mw.h"
 #include "config.h"
 #include "utils.h"

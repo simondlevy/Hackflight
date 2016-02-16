@@ -80,7 +80,7 @@ void writeAllMotors(int16_t mc)
     writeMotors();
 }
 
-void mixTable(void)
+void mixTable(int16_t * rcCommand)
 {
     int16_t maxMotor;
     uint32_t i;
