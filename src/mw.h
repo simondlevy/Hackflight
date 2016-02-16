@@ -66,15 +66,12 @@ extern int16_t gyroData[3];
 extern int16_t angle[2];
 extern int16_t axisPID[3];
 extern int16_t rcCommand[4];
-extern int16_t debug[4];
 extern int16_t gyroADC[3], accADC[3], accSmooth[3], magADC[3];
 extern int32_t accSum[3];
 extern uint16_t acc_1G;
 extern uint32_t accTimeSum;
 extern int      accSumCount;
 extern uint32_t currentTime;
-extern uint32_t previousTime;
-extern uint16_t cycleTime;
 extern uint16_t calibratingA;
 extern uint16_t calibratingG;
 
@@ -95,17 +92,10 @@ extern int32_t AltPID;
 extern int32_t vario;
 extern int16_t throttleAngleCorrection;
 extern int16_t headFreeModeHold;
-extern int16_t heading, magHold;
+extern int16_t heading;
 extern int16_t motor[4];
 extern int16_t rcData[RC_CHANS];
-extern int16_t telemTemperature1;      // gyro sensor temperature
 
-#define PITCH_LOOKUP_LENGTH 7
-#define THROTTLE_LOOKUP_LENGTH 12
-extern int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
-extern int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
-
-extern sensor_t acc;
 extern sensor_t gyro;
 
 // main

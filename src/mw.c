@@ -19,40 +19,21 @@
 #include "config.h"
 #include "utils.h"
 
-int16_t debug[4];
+#define PITCH_LOOKUP_LENGTH     7
+#define THROTTLE_LOOKUP_LENGTH 12
+
+// Globals
 uint32_t currentTime = 0;
-uint32_t previousTime = 0;
-uint16_t cycleTime = 0;         
-// this is the number in micro second to achieve a full loop, it can differ a little and is taken into 
-// account in the PID loop
-
-uint16_t vbat;                  // battery voltage in 0.1V steps
-int32_t amperage;               // amperage read by current sensor in centiampere (1/100th A)
-int32_t mAhdrawn;              // milliampere hours drawn from the battery since start
-int16_t telemTemperature1;      // gyro sensor temperature
-
-int16_t failsafeEvents = 0;
 int16_t rcData[RC_CHANS];       // interval [1000;2000]
 int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
-int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
-int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
+int16_t axisPID[3];
 
 static uint8_t accCalibrated;
 
-static void pidMultiWii(void);
-pidControllerFuncPtr pid_controller = pidMultiWii; // which pid controller are we using, defaultMultiWii
+static uint8_t dynP8[3], dynI8[3], dynD8[3];
 
-uint8_t dynP8[3], dynI8[3], dynD8[3];
-
-int16_t axisPID[3];
-
-// Battery monitoring stuff
-uint8_t batteryCellCount = 3;       // cell count
-uint16_t batteryWarningVoltage;     // slow buzzer after this one, recommended 80% of battery used. Time to land.
-uint16_t batteryCriticalVoltage;    // annoying buzzer after this one, battery is going to be dead.
-
-// Time of automatic disarm when "Don't spin the motors when armed" is enabled.
-static uint32_t disarmTime = 0;
+static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
+static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
 static bool check_timed_task(uint32_t usec) {
 
@@ -63,6 +44,27 @@ static void update_timed_task(uint32_t * usec, uint32_t period)
 {
     *usec = currentTime + period;
 }
+
+void activateConfig(void)
+{
+    uint8_t i;
+    for (i = 0; i < PITCH_LOOKUP_LENGTH; i++)
+        lookupPitchRollRC[i] = (2500 + CONFIG_RC_EXPO_8 * (i * i - 25)) * i * (int32_t)CONFIG_RC_RATE_8 / 2500;
+
+    for (i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
+        int16_t tmp = 10 * i - CONFIG_THR_MID_8;
+        uint8_t y = 1;
+        if (tmp > 0)
+            y = 100 - CONFIG_THR_MID_8;
+        if (tmp < 0)
+            y = CONFIG_THR_MID_8;
+        lookupThrottleRC[i] = 10 * CONFIG_THR_MID_8 + tmp * (100 - CONFIG_THR_EXPO_8 + 
+                (int32_t)CONFIG_THR_EXPO_8 * (tmp * tmp) / (y * y)) / 10;
+        lookupThrottleRC[i] = CONFIG_MINTHROTTLE + (int32_t)(CONFIG_MAXTHROTTLE - CONFIG_MINTHROTTLE) * 
+            lookupThrottleRC[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
+    }
+}
+
 
 bool check_and_update_timed_task(uint32_t * usec, uint32_t period) 
 {
@@ -171,11 +173,6 @@ void annexCode(void)
     }
 
     serialCom();
-
-    // Read out gyro temperature. can use it for something somewhere. maybe get MCU temperature instead? 
-    // lots of fun possibilities.
-    if (gyro.temperature)
-        gyro.temperature(&telemTemperature1);
 }
 
 uint16_t pwmReadRawRC(uint8_t chan)
@@ -221,6 +218,9 @@ static void mwArm(void)
 
 static void mwDisarm(void)
 {
+    // Time of automatic disarm when "Don't spin the motors when armed" is enabled.
+    static uint32_t disarmTime;
+
     if (armed) {
         armed = 0;
         // Reset disarm time so that it works next time we arm the board.
@@ -423,8 +423,6 @@ void loop(void)
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
-        cycleTime = (int32_t)(currentTime - previousTime);
-        previousTime = currentTime;
 
         // non IMU critical, temeperatur, serialcom
         annexCode();
@@ -467,7 +465,7 @@ void loop(void)
             rcCommand[THROTTLE] += throttleAngleCorrection;
         }
 
-        pid_controller();
+        pidMultiWii();
         mixTable();
         writeMotors();
     }

@@ -18,6 +18,7 @@
 #include "config.h"
 #include "utils.h"
 
+// Globals
 int16_t motor[4];
 int16_t motor_disarmed[4];
 

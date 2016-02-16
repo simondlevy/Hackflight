@@ -207,14 +207,6 @@ static void evaluateCommand(void)
             headSerialReply(0);
             break;
 
-        case MSP_STATUS:
-            headSerialReply(11);
-            serialize16(cycleTime);
-            serialize16(i2cGetErrorCounter());
-            serialize16(0);
-            serialize8(0);
-            break;
-
         case MSP_RAW_IMU:
             headSerialReply(18);
             // Retarded hack until multiwiidorks start using real units for sensor data

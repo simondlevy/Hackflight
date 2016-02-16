@@ -26,11 +26,9 @@
 #include "axes.h"
 #include "mw.h"
 
+// Globals
 uint8_t useSmallAngle;
 uint8_t armed;
-
-// receiver read function
-extern uint16_t pwmReadRawRC(uint8_t chan);
 
 // from system_stm32f10x.c
 void SetSysClock(bool overclock);
@@ -42,30 +40,11 @@ static void _putc(void *p, char c)
     serialWrite(telemport, c);
 }
 
-static void activateConfig(void)
-{
-    uint8_t i;
-    for (i = 0; i < PITCH_LOOKUP_LENGTH; i++)
-        lookupPitchRollRC[i] = (2500 + CONFIG_RC_EXPO_8 * (i * i - 25)) * i * (int32_t)CONFIG_RC_RATE_8 / 2500;
-
-    for (i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
-        int16_t tmp = 10 * i - CONFIG_THR_MID_8;
-        uint8_t y = 1;
-        if (tmp > 0)
-            y = 100 - CONFIG_THR_MID_8;
-        if (tmp < 0)
-            y = CONFIG_THR_MID_8;
-        lookupThrottleRC[i] = 10 * CONFIG_THR_MID_8 + tmp * (100 - CONFIG_THR_EXPO_8 + 
-                (int32_t)CONFIG_THR_EXPO_8 * (tmp * tmp) / (y * y)) / 10;
-        lookupThrottleRC[i] = CONFIG_MINTHROTTLE + (int32_t)(CONFIG_MAXTHROTTLE - CONFIG_MINTHROTTLE) * 
-            lookupThrottleRC[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
-    }
-}
-
 int main(void)
 {
-    uint8_t i;
+    extern void activateConfig(void);
 
+    uint8_t i;
     armed = 0;
 
     // Configure clock, this figures out HSE for hardware autodetect
@@ -122,8 +101,6 @@ int main(void)
     // these, if enabled
     for (i = 0; i < RC_CHANS; i++)
         rcData[i] = 1502;
-
-    previousTime = micros();
 
     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
 

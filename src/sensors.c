@@ -16,21 +16,24 @@
 #include "mw.h"
 #include "config.h"
 
+// Globals ====================================================================================
+
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.
 uint16_t calibratingA = 0;      
 uint16_t calibratingG = 0;
-uint16_t acc_1G = 256;          // this is the 1G measured acceleration.
-int16_t heading, magHold;
-
-sensor_t acc;                       // acc access functions
+int16_t heading;
 sensor_t gyro;                      // gyro access functions
-sensor_t mag;                       // mag access functions
-baro_t baro;                        // barometer access functions
 
 bool baro_available;
 bool sonar_available;
 
+uint16_t acc_1G;          // this is the 1G measured acceleration.
+
+// ==============================================================================================
+
+static sensor_t acc;                       // acc access functions
+static baro_t baro;                        // barometer access functions
 static int16_t accZero[3];
 
 void initSensors(int hwrev)
