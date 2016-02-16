@@ -4,7 +4,6 @@
 
 #define GYRO
 #define ACC
-//#define BUZZER
 #define LED0
 #define LED1
 #define INVERTER

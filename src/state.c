@@ -26,7 +26,7 @@ int32_t  SonarAlt = 0;
 int32_t  EstAlt;                // in cm
 int32_t  AltHold;
 int32_t  setVelocity = 0;
-uint8_t  velocityControl = 0;
+bool     velocityControl = false;
 int32_t  errorVelocityI = 0;
 int32_t  vario = 0;                      // variometer in cm/s
 int16_t  throttleAngleCorrection = 0;    // correction of throttle in lateral wind,

@@ -23,14 +23,6 @@ enum {
     AUX4
 };
 
-// buzzer
-void systemBeep(bool onoff);
-
-// main ----------------------------------------------------
-
-extern uint8_t useSmallAngle;
-extern uint8_t armed;
-
 // mixer ---------------------------------------------------
 
 extern int16_t motor[4];
@@ -44,11 +36,14 @@ void mixTable(void);
 
 // mw  -----------------------------------------------------
 
-extern int16_t axisPID[3];
+extern bool     armed;
+extern int16_t  axisPID[3];
 extern uint32_t currentTime;
-extern int16_t rcData[RC_CHANS];
+extern int16_t  rcData[RC_CHANS];
+extern bool     useSmallAngle;
 
 void loop(void);
+void setup(void);
 
 // sensors -------------------------------------------------
 
@@ -58,42 +53,42 @@ void initSensors(int hwrev);
 void ACC_getADC(void);
 void Gyro_getADC(void);
 bool initBaro(baro_t * baro);
-int Baro_update(void);
+int  Baro_update(void);
 bool initSonar();
 void Sonar_update(void);
 
 // serial --------------------------------------------------
 
 serialPort_t * serialInit(uint32_t baudrate);
-void serialCom(void);
-void mspInit(rcReadRawDataPtr *callback);
-bool mspFrameComplete(void);
-void mspFrameRecieve(void);
+void           serialCom(void);
+void           mspInit(rcReadRawDataPtr *callback);
+bool           mspFrameComplete(void);
+void           mspFrameRecieve(void);
 
 // state ---------------------------------------------------
 
 extern uint16_t acc_1G;
-extern int32_t AltHold;
-extern int32_t AltPID;
-extern int16_t angle[2];
-extern bool baro_available;
-extern int32_t baroPressure;
+extern int32_t  AltHold;
+extern int32_t  AltPID;
+extern int16_t  angle[2];
+extern bool     baro_available;
+extern int32_t  baroPressure;
 extern uint32_t baroPressureSum;
-extern int32_t baroTemperature;
+extern int32_t  baroTemperature;
 extern uint16_t calibratingA;
 extern uint16_t calibratingG;
-extern int32_t errorVelocityI;
-extern int32_t EstAlt;
+extern int32_t  errorVelocityI;
+extern int32_t  EstAlt;
 extern sensor_t gyro;
-extern int16_t gyroADC[3], accADC[3], accSmooth[3], magADC[3];
-extern int16_t gyroZero[3];
-extern int16_t gyroData[3];
-extern int16_t heading;
-extern int32_t setVelocity;
-extern int32_t SonarAlt;
-extern int16_t throttleAngleCorrection;
-extern int32_t vario;
-extern uint8_t velocityControl;
+extern int16_t  gyroADC[3], accADC[3], accSmooth[3], magADC[3];
+extern int16_t  gyroZero[3];
+extern int16_t  gyroData[3];
+extern int16_t  heading;
+extern int32_t  setVelocity;
+extern int32_t  SonarAlt;
+extern int16_t  throttleAngleCorrection;
+extern int32_t  vario;
+extern bool     velocityControl;
 
 void imuInit(void);
 void computeIMU(void);

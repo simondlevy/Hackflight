@@ -36,10 +36,12 @@
 #define THR_HI (2 << (2 * THROTTLE))
 
 // Globals
+bool     useSmallAngle;
+bool     armed;
 uint32_t currentTime = 0;
-int16_t rcData[RC_CHANS];       // interval [1000;2000]
-int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
-int16_t axisPID[3];
+int16_t  rcData[RC_CHANS];       // interval [1000;2000]
+int16_t  rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
+int16_t  axisPID[3];
 
 static uint8_t accCalibrated;
 
@@ -298,6 +300,14 @@ static void pidMultiWii(void)
     }
 }
 
+void setup(void)
+{
+    // trigger accelerometer calibration requirement
+    useSmallAngle = true;
+
+    armed = false;
+}
+
 #define GYRO_I_MAX 256
 
 void loop(void)
@@ -460,11 +470,11 @@ void loop(void)
                 if (abs(rcCommand[THROTTLE] - initialThrottleHold) > CONFIG_ALT_HOLD_THROTTLE_NEUTRAL) {
                     // set velocity proportional to stick movement +100 throttle gives ~ +50 cm/s
                     setVelocity = (rcCommand[THROTTLE] - initialThrottleHold) / 2;
-                    velocityControl = 1;
+                    velocityControl = true;
                     isAltHoldChanged = 1;
                 } else if (isAltHoldChanged) {
                     AltHold = EstAlt;
-                    velocityControl = 0;
+                    velocityControl = false;
                     isAltHoldChanged = 0;
                 }
                 rcCommand[THROTTLE] = constrain(initialThrottleHold + AltPID, CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);

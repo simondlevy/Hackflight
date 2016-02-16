@@ -26,14 +26,7 @@
 #include "axes.h"
 #include "mw.h"
 
-// Globals
-uint8_t useSmallAngle;
-uint8_t armed;
-
 static serialPort_t * telemport;
-
-// from system_stm32f10x.c
-void SetSysClock(bool overclock);
 
 // gcc/GNU version
 static void _putc(void *p, char c)
@@ -44,10 +37,12 @@ static void _putc(void *p, char c)
 
 int main(void)
 {
+    // from system_stm32f10x.c
+    extern void SetSysClock(bool overclock);
+
     extern void activateConfig(void);
 
     uint8_t i;
-    armed = 0;
 
     // Configure clock, this figures out HSE for hardware autodetect
     SetSysClock(CONFIG_EMF_AVOIDANCE);
@@ -103,8 +98,8 @@ int main(void)
 
     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
 
-    // trigger accelerometer calibration requirement
-    useSmallAngle = 1;
+    // set up initial conditions
+    setup();
     
     // loopy
     while (1) 
