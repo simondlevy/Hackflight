@@ -131,8 +131,6 @@ static void annexCode(void)
             LED0_OFF;
         if (armed)
             LED0_ON;
-
-        //checkTelemetryState();
     }
 
     if (check_timed_task(calibratedAccTime)) {
@@ -146,7 +144,7 @@ static void annexCode(void)
         }
     }
 
-    serialCom();
+    mspCom();
 }
 
 static void computeRC(void)

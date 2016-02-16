@@ -35,8 +35,8 @@ int main(void)
     extern void setup();
     setup();
     
-    extern serialPort_t * serialInit(uint32_t baudrate);
-    telemport = serialInit(115200);
+    extern serialPort_t * mspInit(uint32_t baudrate);
+    telemport = mspInit(115200);
 
     init_printf(NULL, _putc);
 

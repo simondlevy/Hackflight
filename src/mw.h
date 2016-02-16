@@ -56,10 +56,10 @@ int  Baro_update(void);
 bool initSonar();
 void Sonar_update(void);
 
-// serial --------------------------------------------------
+// Multiwii Serial Protocol --------------------------------
 
-serialPort_t * serialInit(uint32_t baudrate);
-void           serialCom(void);
+serialPort_t * mspInit(uint32_t baudrate);
+void           mspCom(void);
 
 // state ---------------------------------------------------
 

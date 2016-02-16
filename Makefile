@@ -42,7 +42,7 @@ BIN_DIR		 = $(ROOT)/obj
 COMMON_SRC = mixer.c \
 		   mw.c \
 		   sensors.c \
-		   serial.c \
+		   msp.c \
 		   state.c \
 		   utils.c \
 		   $(CMSIS_SRC) \
