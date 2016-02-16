@@ -58,8 +58,8 @@ void Sonar_update(void);
 
 // Multiwii Serial Protocol --------------------------------
 
-serialPort_t * mspInit(uint32_t baudrate);
-void           mspCom(void);
+void mspInit(void);
+void mspCom(void);
 
 // state ---------------------------------------------------
 

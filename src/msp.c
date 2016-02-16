@@ -234,12 +234,9 @@ static void evaluateCommand(void)
 
 // ==================================================================================
 
-serialPort_t * mspInit(uint32_t baudrate)
+void serialInit(serialPort_t * telemport)
 {
-    serialPort_t * telemport = uartOpen(USART1, NULL, baudrate, MODE_RXTX);
     port.port = telemport;
-
-    return telemport;
 }
 
 void mspCom(void)

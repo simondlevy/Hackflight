@@ -10,6 +10,7 @@
 
 #include "printf.h"
 #include "drv_serial.h"
+#include "drv_uart.h"
 #include "drv_gpio.h"
 #include "drv_system.h"
 
@@ -25,6 +26,11 @@ static void _putc(void *p, char c)
 
 int main(void)
 {
+    // Do our best to mock up Arduino approach
+    extern void setup();
+    extern void loop();
+    extern void serialInit(serialPort_t * telemport);
+
     // from system_stm32f10x.c
     extern void SetSysClock(bool overclock);
 
@@ -32,15 +38,15 @@ int main(void)
     SetSysClock(false);
 
     // set up initial conditions
-    extern void setup();
     setup();
     
-    extern serialPort_t * mspInit(uint32_t baudrate);
-    telemport = mspInit(115200);
+    // set up a telemetry port
+    telemport = uartOpen(USART1, NULL, 115200, MODE_RXTX);
+    serialInit(telemport);
 
+    // intitialize for printing over this port
     init_printf(NULL, _putc);
 
-    extern void loop();
     while (1) 
         loop();
 }
