@@ -9,11 +9,19 @@
 
 #include "stm32f10x_conf.h"
 
+#define I2C_DEVICE (I2CDEV_2)
+
+#include "board/drv_adc.h"
+#include "board/drv_i2c.h"
 #include "board/drv_serial.h"
 #include "board/drv_gpio.h"
 #include "board/drv_system.h"
 #include "board/drv_pwm.h"
+#include "board/drv_spi.h"
+
 #include "board/printf.h"
+
+#include "board/revision.h"
 
 #include "axes.h"
 #include "sensors.h"
@@ -288,6 +296,65 @@ static void pidMultiWii(void)
 }
 
 #define GYRO_I_MAX 256
+
+void setup(void)
+{
+    armed = 0;
+
+    // determine hardware revision based on clock frequency
+    if (hse_value == 8000000)
+        hw_revision = NAZE32;
+    else if (hse_value == 12000000)
+        hw_revision = NAZE32_REV5;
+
+    systemInit();
+
+    // sleep for 100ms
+    delay(100);
+
+    uint8_t i;
+
+    for (i = 0; i < PITCH_LOOKUP_LENGTH; i++)
+        lookupPitchRollRC[i] = (2500 + CONFIG_RC_EXPO_8 * (i * i - 25)) * i * (int32_t)CONFIG_RC_RATE_8 / 2500;
+
+    for (i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
+        int16_t tmp = 10 * i - CONFIG_THR_MID_8;
+        uint8_t y = 1;
+        if (tmp > 0)
+            y = 100 - CONFIG_THR_MID_8;
+        if (tmp < 0)
+            y = CONFIG_THR_MID_8;
+        lookupThrottleRC[i] = 10 * CONFIG_THR_MID_8 + tmp * (100 - CONFIG_THR_EXPO_8 + 
+                (int32_t)CONFIG_THR_EXPO_8 * (tmp * tmp) / (y * y)) / 10;
+        lookupThrottleRC[i] = CONFIG_MINTHROTTLE + (int32_t)(CONFIG_MAXTHROTTLE - CONFIG_MINTHROTTLE) * 
+            lookupThrottleRC[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
+    }
+
+    if (spiInit() == SPI_DEVICE_MPU && hw_revision == NAZE32_REV5)
+        hw_revision = NAZE32_SP;
+
+    if (hw_revision != NAZE32_SP)
+        i2cInit(I2C_DEVICE);
+
+    adcInit();
+
+    initSensors();
+
+    LED1_ON;
+    LED0_OFF;
+    for (i = 0; i < 10; i++) {
+        LED1_TOGGLE;
+        LED0_TOGGLE;
+        delay(50);
+    }
+    LED0_OFF;
+    LED1_OFF;
+
+    imuInit(); 
+    mixerInit(); 
+
+    serialInit(CONFIG_SERIAL_BAUDRATE);
+}
 
 void loop(void)
 {

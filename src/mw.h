@@ -104,7 +104,8 @@ extern int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for e
 extern sensor_t acc;
 extern sensor_t gyro;
 
-// main
+// mw
+void setup(void);
 void loop(void);
 
 // State
