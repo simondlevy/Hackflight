@@ -9,7 +9,7 @@
 
 #include "stm32f10x_conf.h"
 
-#include "revision.h"
+#include "../board/revision.h"
 
 #include "drv_gpio.h"
 #include "drv_system.h"

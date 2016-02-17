@@ -9,11 +9,10 @@
 
 #include "stm32f10x_conf.h"
 
-#include "board/printf.h"
+#include "printf.h"
 
-#include "board/drv_serial.h"
-#include "board/drv_gpio.h"
-#include "board/drv_system.h"
+#include "drv_serial.h"
+#include "drv_system.h"
 
 #include "fakeduino.h"
 

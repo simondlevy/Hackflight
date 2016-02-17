@@ -11,19 +11,18 @@
 
 #define I2C_DEVICE (I2CDEV_2)
 
-#include "board/drv_adc.h"
-#include "board/drv_i2c.h"
-#include "board/drv_serial.h"
-#include "board/drv_gpio.h"
-#include "board/drv_system.h"
-#include "board/drv_pwm.h"
-#include "board/drv_spi.h"
+#include "fakeduino/drv_adc.h"
+#include "fakeduino/drv_i2c.h"
+#include "fakeduino/drv_serial.h"
+#include "fakeduino/drv_gpio.h"
+#include "fakeduino/drv_system.h"
+#include "fakeduino/drv_pwm.h"
+#include "fakeduino/drv_spi.h"
 
-#include "board/printf.h"
+#include "fakeduino/printf.h"
+#include "fakeduino/fakeduino.h"
 
 #include "board/revision.h"
-
-#include "fakeduino.h"
 
 #include "axes.h"
 #include "sensors.h"
@@ -315,7 +314,6 @@ void setup(void)
         hw_revision = NAZE32;
     else if (hse_value == 12000000)
         hw_revision = NAZE32_REV5;
-
 
     // sleep for 100ms
     delay(100);

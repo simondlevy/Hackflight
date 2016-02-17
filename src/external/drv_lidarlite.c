@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "../board/drv_i2c.h"
+#include "../fakeduino/drv_i2c.h"
 
 uint16_t lidarlite_distance;
 

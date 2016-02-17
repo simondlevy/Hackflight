@@ -9,11 +9,11 @@
 
 #include "stm32f10x_conf.h"
 
-#include "board/drv_serial.h"
-#include "board/drv_gpio.h"
-#include "board/drv_uart.h"
-#include "board/drv_system.h"
-#include "board/drv_i2c.h"
+#include "fakeduino/drv_serial.h"
+#include "fakeduino/drv_gpio.h"
+#include "fakeduino/drv_uart.h"
+#include "fakeduino/drv_system.h"
+#include "fakeduino/drv_i2c.h"
 
 #include "axes.h"
 #include "mw.h"

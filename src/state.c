@@ -2,20 +2,15 @@
 #include <stdbool.h>
 #include <math.h>
 
-//#include "stm32f10x_conf.h"
-
-#include "board/drv_serial.h"
-//#include "board/drv_gpio.h"
-//#include "board/drv_uart.h"
-#include "board/drv_system.h"
-#include "board/printf.h"
+#include "fakeduino/drv_serial.h"
+#include "fakeduino/drv_system.h"
+#include "fakeduino/printf.h"
 
 #include "axes.h"
 #include "mw.h"
 #include "config.h"
 #include "sensors.h"
 #include "utils.h"
-
 
 int16_t  gyroADC[3], accADC[3], accSmooth[3], magADC[3];
 int32_t  accSum[3];

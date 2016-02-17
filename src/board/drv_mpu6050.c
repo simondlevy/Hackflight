@@ -8,17 +8,19 @@
 #include <stdint.h>
 #include <math.h>
 
-#include "revision.h"
-#include "stm32f10x_conf.h"
-#include "drv_system.h"         // timers, delays, etc
-#include "drv_gpio.h"
-#include "utils.h"
-#include "../axes.h"
-
 #define I2C_DEVICE (I2CDEV_2)
 
-#include "drv_adc.h"
-#include "drv_i2c.h"
+#include "revision.h"
+#include "stm32f10x_conf.h"
+
+#include "../fakeduino/drv_system.h"         // timers, delays, etc
+#include "../fakeduino/drv_gpio.h"
+#include "../axes.h"
+
+#include "../fakeduino/drv_adc.h"
+#include "../fakeduino/drv_i2c.h"
+
+#include "utils.h"
 
 /* Generic driver for invensense gyro/acc devices.
  *
