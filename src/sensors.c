@@ -28,9 +28,6 @@ uint16_t calibratingG = 0;
 int16_t heading;
 sensor_t gyro;                      // gyro access functions
 
-bool baro_available;
-bool sonar_available;
-
 // ==============================================================================================
 
 static sensor_t acc;                       // acc access functions
@@ -159,19 +156,17 @@ static void Baro_Common(void)
 
 // ==============================================================================================
 
-uint16_t initSensors(int hwrev)
+void initSensors(int hwrev, uint16_t * acc_1G, bool * baro_available, bool * sonar_available)
 {
-    uint16_t acc_1G = mpuInit(&acc, &gyro, CONFIG_GYRO_LPF, hwrev);
+    *acc_1G = mpuInit(&acc, &gyro, CONFIG_GYRO_LPF, hwrev);
 
     acc.init(CONFIG_ACC_ALIGN);
 
     gyro.init(CONFIG_GYRO_ALIGN);
 
-    baro_available = initBaro(&baro);
+    *baro_available = initBaro(&baro);
 
-    sonar_available = initSonar();
-
-    return acc_1G;
+    *sonar_available = initSonar();
 }
 
 void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)

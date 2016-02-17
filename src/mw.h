@@ -31,7 +31,6 @@ extern void mspCom(bool armed, int16_t * rcData, int16_t motor[4], int16_t motor
 extern int32_t  AltHold;
 extern int32_t  AltPID;
 extern int16_t  angle[2];
-extern bool     baro_available;
 extern int32_t  baroPressure;
 extern uint32_t baroPressureSum;
 extern int32_t  baroTemperature;

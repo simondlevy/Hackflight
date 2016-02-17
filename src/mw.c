@@ -49,6 +49,7 @@ static uint8_t  accCalibrated;
 static uint16_t acc_1G;
 static bool     armed;
 static int16_t  axisPID[3];
+static bool     baro_available;
 static uint32_t currentTime;
 static uint8_t  dynP8[3], dynI8[3], dynD8[3];
 static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
@@ -57,6 +58,7 @@ static int16_t  motor[4];
 static int16_t  motor_disarmed[4];
 static int16_t  rcCommand[4];   // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
 static int16_t  rcData[RC_CHANS];
+static bool     sonar_available;
 static bool     useSmallAngle;
 
 static bool check_timed_task(uint32_t usec) {
@@ -309,8 +311,7 @@ void setup(void)
 
     adcInit(hw_revision);
 
-    acc_1G = initSensors(hw_revision);
-
+    initSensors(hw_revision, &acc_1G, &baro_available, &sonar_available);
 
     for (i = 0; i < PITCH_LOOKUP_LENGTH; i++)
         lookupPitchRollRC[i] = (2500 + CONFIG_RC_EXPO_8 * (i * i - 25)) * i * (int32_t)CONFIG_RC_RATE_8 / 2500;
