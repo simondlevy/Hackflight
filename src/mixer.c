@@ -57,7 +57,8 @@ void writeMotors(int16_t motor[4])
 }
 
 
-void mixTable(int16_t * rcCommand, bool armed, int16_t motor[4], int16_t motor_disarmed[4])
+void mixTable(int16_t * rcCommand, bool armed, int16_t * rcData, 
+        int16_t motor[4], int16_t motor_disarmed[4], int16_t axisPID[3])
 {
     int16_t maxMotor;
     uint32_t i;

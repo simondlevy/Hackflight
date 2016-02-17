@@ -208,7 +208,8 @@ static int16_t calculateHeading(t_fp_vector *vec)
     return head;
 }
 
-static void getEstimatedAttitude(bool armed)
+// Returns updated useSmallAngle flag
+static bool estimateAttitude(bool armed)
 {
     int32_t axis;
     int32_t accMag = 0;
@@ -249,7 +250,7 @@ static void getEstimatedAttitude(bool armed)
             EstG.A[axis] = (EstG.A[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + accSmooth[axis]) * INV_GYR_CMPF_FACTOR;
     }
 
-    useSmallAngle = (EstG.A[Z] > smallAngle);
+    bool useSmallAngle = (EstG.A[Z] > smallAngle);
 
     // Attitude of the estimated vector
     anglerad[ROLL] = atan2f(EstG.V.Y, EstG.V.Z);
@@ -276,6 +277,8 @@ static void getEstimatedAttitude(bool armed)
             throttleAngleCorrection = lrintf(CONFIG_THROTTLE_CORRECTION_VALUE * sinf(deg / (900.0f * M_PI / 2.0f)));
         }
     }
+
+    return useSmallAngle;
 }
 
 static bool sonarInRange(void)
@@ -300,15 +303,19 @@ void imuInit(void)
     fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 }
 
-void computeIMU(bool armed)
+// Returns updated useSmallAngle flag
+bool computeIMU(bool armed)
 {
     Gyro_getADC();
     ACC_getADC();
-    getEstimatedAttitude(armed);
+
+    bool useSmallAngle = estimateAttitude(armed);
 
     gyroData[YAW] = gyroADC[YAW];
     gyroData[ROLL] = gyroADC[ROLL];
     gyroData[PITCH] = gyroADC[PITCH];
+
+    return useSmallAngle;
 }
 
 int getEstimatedAltitude(bool armed)

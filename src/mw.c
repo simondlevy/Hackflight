@@ -43,28 +43,18 @@
 #define THR_CE (3 << (2 * THROTTLE))
 #define THR_HI (2 << (2 * THROTTLE))
 
-// Globals =================================================
-bool     useSmallAngle;
-uint32_t currentTime = 0;
-int16_t  rcData[RC_CHANS];       // interval [1000;2000]
-int16_t  axisPID[3];
-
-// =========================================================
-
-static bool armed;
-
-static int16_t motor[4];
-static int16_t motor_disarmed[4];
-
-
+static bool     armed;
+static int16_t  axisPID[3];
+static int16_t  motor[4];
+static int16_t  motor_disarmed[4];
+static uint32_t currentTime;
+static bool     useSmallAngle;
 static int16_t  rcCommand[4];   // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
-
-static uint8_t accCalibrated;
-
-static uint8_t dynP8[3], dynI8[3], dynD8[3];
-
-static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
-static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
+static uint8_t  accCalibrated;
+static uint8_t  dynP8[3], dynI8[3], dynD8[3];
+static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
+static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
+static int16_t  rcData[RC_CHANS];
 
 static bool check_timed_task(uint32_t usec) {
 
@@ -155,8 +145,8 @@ static void annexCode(void)
     }
 
     // MSP need to know about our situation
-    extern void mspCom(bool armed, int16_t motor[4], int16_t motor_disarmed[4]);
-    mspCom(armed, motor, motor_disarmed);
+    extern void mspCom(bool armed, int16_t * rcData, int16_t motor[4], int16_t motor_disarmed[4]);
+    mspCom(armed, rcData, motor, motor_disarmed);
 }
 
 static void computeRC(void)
@@ -474,7 +464,7 @@ void loop(void)
             case 1:
                 taskOrder++;
                 if (baro_available) {
-                    Baro_update();
+                    Baro_update(currentTime);
                     break;
                 }
             case 2:
@@ -498,7 +488,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        computeIMU(armed);
+        useSmallAngle = computeIMU(armed);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
@@ -545,7 +535,7 @@ void loop(void)
         }
 
         pidMultiWii();
-        mixTable(rcCommand, armed, motor, motor_disarmed);
+        mixTable(rcCommand, armed, rcData, motor, motor_disarmed, axisPID);
         writeMotors(motor);
     }
 }

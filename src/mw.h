@@ -22,10 +22,6 @@ enum {
 
 // mw  -----------------------------------------------------
 
-extern int16_t  axisPID[3];
-extern uint32_t currentTime;
-extern int16_t  rcData[RC_CHANS];
-extern bool     useSmallAngle;
 
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
 
@@ -55,6 +51,6 @@ extern int32_t  vario;
 extern bool     velocityControl;
 
 void imuInit(void);
-void computeIMU(bool armed);
+bool computeIMU(bool armed);
 int  getEstimatedAltitude(bool armed);
 

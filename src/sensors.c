@@ -236,7 +236,7 @@ void Gyro_getADC(void)
     GYRO_Common();
 }
 
-int Baro_update(void)
+int Baro_update(uint32_t currentTime)
 {
     static uint32_t baroDeadline = 0;
     static int state = 0;
