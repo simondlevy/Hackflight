@@ -75,7 +75,7 @@ static void update_timed_task(uint32_t * usec, uint32_t period)
     *usec = currentTime + period;
 }
 
-static void annexCode(uint16_t calibratingA)
+static void annexCode(uint16_t calibratingA, int32_t EstAlt)
 {
     static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
@@ -154,7 +154,7 @@ static void annexCode(uint16_t calibratingA)
     }
 
     // MSP needs to know about our situation
-    mspCom(armed, rcData, motor, motor_disarmed, acc_1G, angle);
+    mspCom(armed, rcData, motor, motor_disarmed, acc_1G, angle, EstAlt);
 }
 
 static void computeRC(void)
@@ -364,6 +364,7 @@ void loop(void)
     static uint32_t loopTime;
     static uint8_t alt_hold_mode;
     static uint16_t calibratingA;
+    static int32_t  EstAlt;
 
     uint8_t stTmp = 0;
     int i;
@@ -474,7 +475,7 @@ void loop(void)
             case 2:
                 taskOrder++;
                 if (baro_available && sonar_available) {
-                    AltPID = getAltPID(armed, AltHold, angle);
+                    getAltPID(armed, AltHold, angle, &AltPID, &EstAlt);
                     break;
                 }
             case 3:
@@ -498,7 +499,7 @@ void loop(void)
         currentTime = micros();
 
         // non IMU critical, temeperatur, serialcom
-        annexCode(calibratingA);
+        annexCode(calibratingA, EstAlt);
 
         if (alt_hold_mode) {
             static uint8_t isAltHoldChanged = 0;

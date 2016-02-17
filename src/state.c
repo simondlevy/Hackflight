@@ -18,7 +18,6 @@ int32_t  baroPressure = 0;
 int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
 int32_t  SonarAlt = 0;
-int32_t  EstAlt;                // in cm
 int32_t  setVelocity = 0;
 bool     velocityControl = false;
 int32_t  errorVelocityI = 0;
@@ -316,7 +315,7 @@ bool computeIMU(bool armed, uint16_t acc_1G, int16_t angle[2], uint16_t * calibr
     return useSmallAngle;
 }
 
-int32_t getAltPID(bool armed, int32_t AltHold, int16_t angle[2])
+void getAltPID(bool armed, int32_t AltHold, int16_t angle[2], int32_t * AltPID, int32_t * EstAlt)
 {
     static uint32_t previousT;
     static float accZ_old;
@@ -333,10 +332,11 @@ int32_t getAltPID(bool armed, int32_t AltHold, int16_t angle[2])
     int16_t tiltAngle = max(abs(angle[ROLL]), abs(angle[PITCH]));
     uint32_t dTime = currentT - previousT;
     int32_t  baroAlt_offset = 0;
-    int32_t AltPID = 0;
+
+    *AltPID = 0;
 
     if (dTime < CONFIG_ALT_UPDATE_USEC)
-        return 0;
+        return;
     previousT = currentT;
 
     // Calculates height from ground in cm via baro pressure
@@ -389,7 +389,7 @@ int32_t getAltPID(bool armed, int32_t AltHold, int16_t angle[2])
     // complementary filter for altitude estimation (baro & acc)
     //accelAlt = cfilter(accelAlt, FusedBaroSonarAlt, CONFIG_BARO_CF_ALT);
 
-    EstAlt = sonarInRange() ? FusedBaroSonarAlt : accelAlt;
+    *EstAlt = sonarInRange() ? FusedBaroSonarAlt : accelAlt;
 
     accSum_reset();
 
@@ -414,7 +414,7 @@ int32_t getAltPID(bool armed, int32_t AltHold, int16_t angle[2])
 
         // Altitude P-Controller
         if (!velocityControl) {
-            int32_t error = constrain(AltHold - EstAlt, -500, 500);
+            int32_t error = constrain(AltHold - *EstAlt, -500, 500);
             error = applyDeadband(error, 10);       // remove small P parametr to reduce noise near zero position
             setVel = constrain((CONFIG_ALT_P * error / 128), -300, +300); // limit velocity to +/- 3 m/s
         } 
@@ -422,7 +422,7 @@ int32_t getAltPID(bool armed, int32_t AltHold, int16_t angle[2])
         // Velocity PID-Controller
         // P
         int32_t error = setVel - vel_tmp;
-        AltPID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
+        *AltPID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
 
         // I
         errorVelocityI += (CONFIG_VEL_I * error);
@@ -430,12 +430,10 @@ int32_t getAltPID(bool armed, int32_t AltHold, int16_t angle[2])
         AltPID += errorVelocityI / 8196;     // I in the range of +/-200
 
         // D
-        AltPID -= constrain(CONFIG_VEL_D * (accZ_tmp + accZ_old) / 512, -150, 150);
+        *AltPID = *AltPID - constrain(CONFIG_VEL_D * (accZ_tmp + accZ_old) / 512, -150, 150);
 
     } 
 
     accZ_old = accZ_tmp;
-
-    return AltPID;
 }
 
