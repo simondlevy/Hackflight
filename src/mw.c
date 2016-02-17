@@ -47,6 +47,9 @@
 
 static uint8_t  accCalibrated;
 static uint16_t acc_1G;
+static int16_t  angle[2] = { 0, 0 };  // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
+static int32_t  AltHold;
+static int32_t  AltPID;
 static bool     armed;
 static int16_t  axisPID[3];
 static bool     baro_available;
@@ -149,8 +152,8 @@ static void annexCode(void)
         }
     }
 
-    // MSP need to know about our situation
-    mspCom(armed, rcData, motor, motor_disarmed, acc_1G);
+    // MSP needs to know about our situation
+    mspCom(armed, rcData, motor, motor_disarmed, acc_1G, angle);
 }
 
 static void computeRC(void)
@@ -207,7 +210,7 @@ static void mwDisarm(void)
 static int32_t errorGyroI[3] = { 0, 0, 0 };
 static int32_t errorAngleI[2] = { 0, 0 };
 
-static void pidMultiWii(void)
+static void pidMultiWii()
 {
     int axis, prop;
     int32_t error, errorAngle;
@@ -473,7 +476,7 @@ void loop(void)
             case 2:
                 taskOrder++;
                 if (baro_available && sonar_available) {
-                    getEstimatedAltitude(armed);
+                    AltPID = getAltPID(armed, AltHold, angle);
                     break;
                 }
             case 3:
@@ -491,7 +494,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        useSmallAngle = computeIMU(armed, acc_1G);
+        useSmallAngle = computeIMU(armed, acc_1G, angle);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
@@ -537,7 +540,7 @@ void loop(void)
             rcCommand[THROTTLE] += throttleAngleCorrection;
         }
 
-        pidMultiWii();
+        pidMultiWii(angle);
         mixTable(rcCommand, armed, rcData, motor, motor_disarmed, axisPID);
         writeMotors(motor);
     }

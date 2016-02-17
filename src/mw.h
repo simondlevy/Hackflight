@@ -24,13 +24,11 @@ extern void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
 
 // msp -----------------------------------------------------
 
-extern void mspCom(bool armed, int16_t * rcData, int16_t motor[4], int16_t motor_disarmed[4], uint16_t acc_1G);
+extern void mspCom(bool armed, int16_t * rcData, int16_t motor[4], int16_t motor_disarmed[4], 
+        uint16_t acc_1G, int16_t angle[2]);
 
 // state ---------------------------------------------------
 
-extern int32_t  AltHold;
-extern int32_t  AltPID;
-extern int16_t  angle[2];
 extern int32_t  baroPressure;
 extern uint32_t baroPressureSum;
 extern int32_t  baroTemperature;
@@ -49,7 +47,6 @@ extern int16_t  throttleAngleCorrection;
 extern int32_t  vario;
 extern bool     velocityControl;
 
-void imuInit(uint16_t acc_1G);
-bool computeIMU(bool armed, uint16_t acc_1G);
-int  getEstimatedAltitude(bool armed);
-
+void    imuInit(uint16_t acc_1G);
+bool    computeIMU(bool armed, uint16_t acc_1G, int16_t angle[2]);
+int32_t getAltPID(bool armed, int32_t AltHold, int16_t angle[2]);

@@ -17,10 +17,8 @@ int16_t  gyroADC[3], accADC[3], accSmooth[3], magADC[3];
 int32_t  baroPressure = 0;
 int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
-int32_t  AltPID = 0;
 int32_t  SonarAlt = 0;
 int32_t  EstAlt;                // in cm
-int32_t  AltHold;
 int32_t  setVelocity = 0;
 bool     velocityControl = false;
 int32_t  errorVelocityI = 0;
@@ -28,13 +26,12 @@ int32_t  vario = 0;                      // variometer in cm/s
 int16_t  throttleAngleCorrection = 0;    // correction of throttle in lateral wind,
 int16_t  gyroData[3] = { 0, 0, 0 };
 int16_t  gyroZero[3] = { 0, 0, 0 };
-int16_t  angle[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
 
 // Locals ===================================================================================
 
 
 static int32_t  accSum[3];
-static uint32_t accTimeSum;        // keep track for integration of acc
+static uint32_t accTimeSum;           // keep track for integration of acc
 static int      accSumCount;
 static int16_t  smallAngle;
 static int32_t  baroPressure2;
@@ -209,7 +206,7 @@ static int16_t calculateHeading(t_fp_vector *vec)
 }
 
 // Returns updated useSmallAngle flag
-static bool estimateAttitude(bool armed, uint16_t acc_1G)
+static bool estimateAttitude(bool armed, uint16_t acc_1G, int16_t angle[2])
 {
     int32_t axis;
     int32_t accMag = 0;
@@ -304,13 +301,13 @@ void imuInit(uint16_t acc_1G)
 }
 
 // Returns updated useSmallAngle flag
-bool computeIMU(bool armed, uint16_t acc_1G)
+bool computeIMU(bool armed, uint16_t acc_1G, int16_t angle[2])
 {
     Gyro_getADC();
 
     ACC_getADC(acc_1G);
 
-    bool useSmallAngle = estimateAttitude(armed, acc_1G);
+    bool useSmallAngle = estimateAttitude(armed, acc_1G, angle);
 
     gyroData[YAW] = gyroADC[YAW];
     gyroData[ROLL] = gyroADC[ROLL];
@@ -319,7 +316,7 @@ bool computeIMU(bool armed, uint16_t acc_1G)
     return useSmallAngle;
 }
 
-int getEstimatedAltitude(bool armed)
+int32_t getAltPID(bool armed, int32_t AltHold, int16_t angle[2])
 {
     static uint32_t previousT;
     static float accZ_old;
@@ -336,6 +333,7 @@ int getEstimatedAltitude(bool armed)
     int16_t tiltAngle = max(abs(angle[ROLL]), abs(angle[PITCH]));
     uint32_t dTime = currentT - previousT;
     int32_t  baroAlt_offset = 0;
+    int32_t AltPID = 0;
 
     if (dTime < CONFIG_ALT_UPDATE_USEC)
         return 0;
@@ -434,12 +432,10 @@ int getEstimatedAltitude(bool armed)
         // D
         AltPID -= constrain(CONFIG_VEL_D * (accZ_tmp + accZ_old) / 512, -150, 150);
 
-    } else {
-        AltPID = 0;
-    }
+    } 
 
     accZ_old = accZ_tmp;
 
-    return 1;
+    return AltPID;
 }
 
