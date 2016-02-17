@@ -4,18 +4,18 @@
  */
 #include <stdbool.h>
 
-#define I2C_DEVICE (I2CDEV_2)
+#include "stm32f10x_conf.h"
+#include "drv_system.h"         // timers, delays, etc
+#include "drv_gpio.h"
 
 #define BARO_GPIO   GPIOC
 #define BARO_PIN    Pin_13
 
-#include "stm32f10x_conf.h"
+#define I2C_DEVICE (I2CDEV_2)
 
-#include "../board/drv_system.h"         // timers, delays, etc
-#include "../board/drv_gpio.h"
-#include "../board/drv_i2c.h"
-#include "../board/revision.h"
+#include "drv_i2c.h"
 
+#include "revision.h"
 #include "../baro.h"
 
 // MS5611, Standard address 0x77
@@ -58,9 +58,20 @@ bool initBaro(baro_t *baro)
     uint8_t sig;
     int i;
 
+    if (hw_revision == NAZE32) {
+        // PC13 (BMP085's XCLR reset input, which we use to disable it). Only needed when running at 8MHz
+        gpio_config_t gpio;
+        gpio.pin = Pin_13;
+        gpio.speed = Speed_2MHz;
+        gpio.mode = Mode_Out_PP;
+        gpioInit(GPIOC, &gpio);
+        BMP085_OFF;
+    }
+
     delay(10); // No idea how long the chip takes to power-up, but let's make it 10ms
 
-    // If we have a MS5611, it will reply. if no reply, means either we have BMP085 or no baro at all.
+    // BMP085 is disabled. If we have a MS5611, it will reply. if no reply, means either
+    // we have BMP085 or no baro at all.
     ack = i2cRead(MS5611_ADDR, CMD_PROM_RD, 1, &sig);
     if (!ack)
         return false;

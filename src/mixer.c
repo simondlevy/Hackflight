@@ -13,19 +13,13 @@
 #include "board/drv_gpio.h"
 #include "board/drv_pwm.h"
 
-#include "mixer.h"
 #include "axes.h"
 #include "mw.h"
 #include "config.h"
 #include "utils.h"
 
-// Custom mixer data per motor
-typedef struct motorMixer_t {
-    float throttle;
-    float roll;
-    float pitch;
-    float yaw;
-} motorMixer_t;
+int16_t motor[4];
+int16_t motor_disarmed[4];
 
 static motorMixer_t currentMixer[4];
 
@@ -36,19 +30,25 @@ static const motorMixer_t mixerQuadX[] = {
     { 1.0f,  1.0f, -1.0f, -1.0f },          // FRONT_L
 };
 
-// =========================================================================
-
-void mixerInit(int16_t motor_disarmed[4])
+void mixerInit(void)
 {
     int i;
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++)
         currentMixer[i] = mixerQuadX[i];
-        motor_disarmed[i] = CONFIG_MINCOMMAND;
-    }
+
+    mixerResetMotors();
 }
 
-void writeMotors(int16_t motor[4])
+void mixerResetMotors(void)
+{
+    int i;
+    // set disarmed motor values
+    for (i = 0; i < 4; i++)
+        motor_disarmed[i] = CONFIG_MINCOMMAND;
+}
+
+void writeMotors(void)
 {
     uint8_t i;
 
@@ -56,9 +56,17 @@ void writeMotors(int16_t motor[4])
         pwmWriteMotor(i, motor[i]);
 }
 
+void writeAllMotors(int16_t mc)
+{
+    uint8_t i;
 
-void mixTable(int16_t * rcCommand, bool armed, int16_t * rcData, 
-        int16_t motor[4], int16_t motor_disarmed[4], int16_t axisPID[3])
+    // Sends commands to all motors
+    for (i = 0; i < 4; i++)
+        motor[i] = mc;
+    writeMotors();
+}
+
+void mixTable(void)
 {
     int16_t maxMotor;
     uint32_t i;

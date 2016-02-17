@@ -18,6 +18,12 @@
 static volatile uint32_t usTicks = 0;
 // current uptime for 1kHz systick timer. will rollover after 49 days. hopefully we won't care.
 static volatile uint32_t sysTickUptime = 0;
+#ifdef BUZZER
+void systemBeep(bool onoff);
+static void beepRev4(bool onoff);
+static void beepRev5(bool onoff);
+void (*systemBeepPtr)(bool onoff) = NULL;
+#endif
 
 static void cycleCounterInit(void)
 {
@@ -49,12 +55,12 @@ uint32_t millis(void)
     return sysTickUptime;
 }
 
-void systemInit(int hwrev)
+void systemInit(void)
 {
     struct {
         GPIO_TypeDef *gpio;
         gpio_config_t cfg;
-    } gpio_setup[3];
+    } gpio_setup[4];
 
     gpio_setup[0].gpio = LED0_GPIO;
     gpio_setup[0].cfg.pin = LED0_PIN;
@@ -66,10 +72,15 @@ void systemInit(int hwrev)
     gpio_setup[1].cfg.mode = Mode_Out_PP;
     gpio_setup[1].cfg.speed = Speed_2MHz;
 
-    gpio_setup[2].gpio = INV_GPIO;
-    gpio_setup[2].cfg.pin = INV_PIN;
-    gpio_setup[2].cfg.mode = Mode_Out_PP;
+    gpio_setup[2].gpio = BEEP_GPIO;
+    gpio_setup[2].cfg.pin = BEEP_PIN;
+    gpio_setup[2].cfg.mode = Mode_Out_OD;
     gpio_setup[2].cfg.speed = Speed_2MHz;
+
+    gpio_setup[3].gpio = INV_GPIO;
+    gpio_setup[3].cfg.pin = INV_PIN;
+    gpio_setup[3].cfg.mode = Mode_Out_PP;
+    gpio_setup[3].cfg.speed = Speed_2MHz;
 
     gpio_config_t gpio;
     int i, gpio_count = sizeof(gpio_setup) / sizeof(gpio_setup[0]);
@@ -94,12 +105,21 @@ void systemInit(int hwrev)
 #define AFIO_MAPR_SWJ_CFG_NO_JTAG_SW            (0x2 << 24)
     AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_NO_JTAG_SW;
 
+#ifdef BUZZER
+    // Configure gpio
+    // rev5 needs inverted beeper. oops.
+    if (hw_revision >= NAZE32_REV5)
+        systemBeepPtr = beepRev5;
+    else
+        systemBeepPtr = beepRev4;
+    BEEP_OFF;
+#endif
     LED0_OFF;
     LED1_OFF;
 
     // Hack - rev4 and below used opendrain to PNP for buzzer. Rev5 and above use PP to NPN.
     for (i = 0; i < gpio_count; i++) {
-        if (hwrev >= NAZE32_REV5 && gpio_setup[i].cfg.mode == Mode_Out_OD)
+        if (hw_revision >= NAZE32_REV5 && gpio_setup[i].cfg.mode == Mode_Out_OD)
             gpio_setup[i].cfg.mode = Mode_Out_PP;
         gpioInit(gpio_setup[i].gpio, &gpio_setup[i].cfg);
     }
@@ -131,7 +151,9 @@ void failureMode(uint8_t mode)
         LED1_TOGGLE;
         LED0_TOGGLE;
         delay(475 * mode - 2);
+        BEEP_ON
         delay(25);
+        BEEP_OFF;
     }
 }
 
@@ -165,3 +187,28 @@ void systemReset(bool toBootloader)
     // Generate system reset
     SCB->AIRCR = AIRCR_VECTKEY_MASK | (uint32_t)0x04;
 }
+
+#ifdef BUZZER
+static void beepRev4(bool onoff)
+{
+    if (onoff) {
+        digitalLo(BEEP_GPIO, BEEP_PIN);
+    } else {
+        digitalHi(BEEP_GPIO, BEEP_PIN);
+    }
+}
+
+static void beepRev5(bool onoff)
+{
+    if (onoff) {
+        digitalHi(BEEP_GPIO, BEEP_PIN);
+    } else {
+        digitalLo(BEEP_GPIO, BEEP_PIN);
+    }
+}
+
+void systemBeep(bool onoff)
+{
+    systemBeepPtr(onoff);
+}
+#endif

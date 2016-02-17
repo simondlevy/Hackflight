@@ -12,75 +12,38 @@
 #include "board/drv_serial.h"
 #include "board/drv_gpio.h"
 
-#include "sensors.h"
 #include "axes.h"
 #include "mw.h"
 #include "config.h"
 
-#define BARO_TAB_SIZE_MAX   48
-
-// Globals ====================================================================================
-
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.
-int16_t heading;
+uint16_t calibratingA = 0;      
+uint16_t calibratingG = 0;
+uint16_t acc_1G = 256;          // this is the 1G measured acceleration.
+int16_t heading, magHold;
+
+sensor_t acc;                       // acc access functions
 sensor_t gyro;                      // gyro access functions
+sensor_t mag;                       // mag access functions
+baro_t baro;                        // barometer access functions
 
-// ==============================================================================================
+bool baro_available;
+bool sonar_available;
 
-static sensor_t acc;                       // acc access functions
-static baro_t baro;                        // barometer access functions
 static int16_t accZero[3];
 
-typedef struct stdev_t {
-    float m_oldM, m_newM, m_oldS, m_newS;
-    int m_n;
-} stdev_t;
-
-
-static void devClear(stdev_t *dev)
+void initSensors(void)
 {
-    dev->m_n = 0;
-}
-
-static void devPush(stdev_t *dev, float x)
-{
-    dev->m_n++;
-    if (dev->m_n == 1) {
-        dev->m_oldM = dev->m_newM = x;
-        dev->m_oldS = 0.0f;
-    } else {
-        dev->m_newM = dev->m_oldM + (x - dev->m_oldM) / dev->m_n;
-        dev->m_newS = dev->m_oldS + (x - dev->m_oldM) * (x - dev->m_newM);
-        dev->m_oldM = dev->m_newM;
-        dev->m_oldS = dev->m_newS;
-    }
-}
-
-static float devVariance(stdev_t *dev)
-{
-    return ((dev->m_n > 1) ? dev->m_newS / (dev->m_n - 1) : 0.0f);
-}
-
-static float devStandardDeviation(stdev_t *dev)
-{
-    return sqrtf(devVariance(dev));
-}
-
-
-// ==============================================================================================
-
-void initSensors(int hwrev, uint16_t * acc_1G, bool * baro_available, bool * sonar_available)
-{
-    *acc_1G = mpuInit(&acc, &gyro, CONFIG_GYRO_LPF, hwrev);
+    acc_1G = mpuInit(&acc, &gyro, CONFIG_GYRO_LPF);
 
     acc.init(CONFIG_ACC_ALIGN);
 
     gyro.init(CONFIG_GYRO_ALIGN);
 
-    *baro_available = initBaro(&baro);
+    baro_available = initBaro(&baro);
 
-    *sonar_available = initSonar();
+    sonar_available = initSonar();
 }
 
 void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
@@ -130,12 +93,8 @@ void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
             break;
     }
 }
-
-
-uint16_t ACC_getADC(uint16_t calibratingA, uint16_t acc_1G)
+static void ACC_Common(void)
 {
-    acc.read(accADC);
-
     static int32_t a[3];
     int axis;
 
@@ -162,15 +121,50 @@ uint16_t ACC_getADC(uint16_t calibratingA, uint16_t acc_1G)
     accADC[ROLL] -= accZero[ROLL];
     accADC[PITCH] -= accZero[PITCH];
     accADC[YAW] -= accZero[YAW];
-
-    return calibratingA;
 }
 
-uint16_t Gyro_getADC(uint16_t calibratingG)
+void ACC_getADC(void)
 {
-    // range: +/- 8192; +/- 2000 deg/sec
-    gyro.read(gyroADC);
+    acc.read(accADC);
+    ACC_Common();
+}
 
+typedef struct stdev_t {
+    float m_oldM, m_newM, m_oldS, m_newS;
+    int m_n;
+} stdev_t;
+
+static void devClear(stdev_t *dev)
+{
+    dev->m_n = 0;
+}
+
+static void devPush(stdev_t *dev, float x)
+{
+    dev->m_n++;
+    if (dev->m_n == 1) {
+        dev->m_oldM = dev->m_newM = x;
+        dev->m_oldS = 0.0f;
+    } else {
+        dev->m_newM = dev->m_oldM + (x - dev->m_oldM) / dev->m_n;
+        dev->m_newS = dev->m_oldS + (x - dev->m_oldM) * (x - dev->m_newM);
+        dev->m_oldM = dev->m_newM;
+        dev->m_oldS = dev->m_newS;
+    }
+}
+
+static float devVariance(stdev_t *dev)
+{
+    return ((dev->m_n > 1) ? dev->m_newS / (dev->m_n - 1) : 0.0f);
+}
+
+static float devStandardDeviation(stdev_t *dev)
+{
+    return sqrtf(devVariance(dev));
+}
+
+static void GYRO_Common(void)
+{
     int axis;
     static int32_t g[3];
     static stdev_t var[3];
@@ -205,14 +199,33 @@ uint16_t Gyro_getADC(uint16_t calibratingG)
         }
         calibratingG--;
     }
-
     for (axis = 0; axis < 3; axis++)
         gyroADC[axis] -= gyroZero[axis];
-
-    return calibratingG;
 }
 
-int Baro_update(uint32_t currentTime)
+void Gyro_getADC(void)
+{
+    // range: +/- 8192; +/- 2000 deg/sec
+    gyro.read(gyroADC);
+    GYRO_Common();
+}
+
+static void Baro_Common(void)
+{
+    static int32_t baroHistTab[BARO_TAB_SIZE_MAX];
+    static int baroHistIdx;
+    int indexplus1;
+
+    indexplus1 = (baroHistIdx + 1);
+    if (indexplus1 == CONFIG_BARO_TAB_SIZE)
+        indexplus1 = 0;
+    baroHistTab[baroHistIdx] = baroPressure;
+    baroPressureSum += baroHistTab[baroHistIdx];
+    baroPressureSum -= baroHistTab[indexplus1];
+    baroHistIdx = indexplus1;
+}
+
+int Baro_update(void)
 {
     static uint32_t baroDeadline = 0;
     static int state = 0;
@@ -232,17 +245,7 @@ int Baro_update(uint32_t currentTime)
     } else {
         baro.get_ut();
         baro.start_up();
-        static int32_t baroHistTab[BARO_TAB_SIZE_MAX];
-        static int baroHistIdx;
-        int indexplus1;
-
-        indexplus1 = (baroHistIdx + 1);
-        if (indexplus1 == CONFIG_BARO_TAB_SIZE)
-            indexplus1 = 0;
-        baroHistTab[baroHistIdx] = baroPressure;
-        baroPressureSum += baroHistTab[baroHistIdx];
-        baroPressureSum -= baroHistTab[indexplus1];
-        baroHistIdx = indexplus1;
+        Baro_Common();
         state = 1;
         baroDeadline += baro.up_delay;
         return 1;
@@ -251,7 +254,7 @@ int Baro_update(uint32_t currentTime)
 
 void Sonar_update(void) 
 {
-    int32_t pollSonar(void);
+    extern int32_t pollSonar(void);
 
     SonarAlt = pollSonar();
 }

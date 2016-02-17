@@ -2,44 +2,77 @@
 #include <stdbool.h>
 #include <math.h>
 
+#include "stm32f10x_conf.h"
+
+#include "board/drv_serial.h"
+#include "board/drv_gpio.h"
+#include "board/drv_uart.h"
 #include "board/drv_system.h"
 #include "board/printf.h"
 
 #include "axes.h"
-#include "sensors.h"
 #include "mw.h"
 #include "config.h"
 #include "utils.h"
 
-// Globals ===============================================================================
 
 int16_t  gyroADC[3], accADC[3], accSmooth[3], magADC[3];
+int32_t  accSum[3];
+uint32_t accTimeSum = 0;        // keep track for integration of acc
+int      accSumCount = 0;
+int16_t  smallAngle = 0;
 int32_t  baroPressure = 0;
+int32_t  baroPressure2 = 0;
 int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
+int32_t  BaroAlt = 0;
+int32_t  FusedBaroSonarAlt = 0;
+int32_t  AltPID = 0;
+int32_t  baroAlt_offset = 0;
 int32_t  SonarAlt = 0;
+int32_t  AccelAlt = 0;
+float    sonarTransition = 0;
+int32_t  EstAlt;                // in cm
+int32_t  AltHold;
 int32_t  setVelocity = 0;
-bool     velocityControl = false;
+uint8_t  velocityControl = 0;
 int32_t  errorVelocityI = 0;
 int32_t  vario = 0;                      // variometer in cm/s
 int16_t  throttleAngleCorrection = 0;    // correction of throttle in lateral wind,
-int16_t  gyroData[3] = { 0, 0, 0 };
-int16_t  gyroZero[3] = { 0, 0, 0 };
+float    magneticDeclination = 0.0f;       // calculated at startup from config
+float    accVelScale;
+float    throttleAngleScale;
+float    fc_acc;
 
-// Locals ===================================================================================
+// **************
+// gyro+acc IMU
+// **************
+int16_t gyroData[3] = { 0, 0, 0 };
+int16_t gyroZero[3] = { 0, 0, 0 };
+int16_t angle[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
+float anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
 
+static void getEstimatedAttitude(void);
 
-static int32_t  accSum[3];
-static uint32_t accTimeSum;           // keep track for integration of acc
-static int      accSumCount;
-static int16_t  smallAngle;
-static int32_t  baroPressure2;
-static float    accVelScale;
-static float    throttleAngleScale;
-static float    fc_acc;
-static float    anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
+void imuInit(void)
+{
+    smallAngle = lrintf(acc_1G * cosf(RAD * CONFIG_SMALL_ANGLE));
+    accVelScale = 9.80665f / acc_1G / 10000.0f;
+    throttleAngleScale = (1800.0f / M_PI) * (900.0f / CONFIG_THROTTLE_CORRECTION_ANGLE);
 
-static const float magneticDeclination = 0.0f;       // XXX should be calculated at startup from config
+    fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
+}
+
+void computeIMU(void)
+{
+    Gyro_getADC();
+    ACC_getADC();
+    getEstimatedAttitude();
+
+    gyroData[YAW] = gyroADC[YAW];
+    gyroData[ROLL] = gyroADC[ROLL];
+    gyroData[PITCH] = gyroADC[PITCH];
+}
 
 // **************************************************
 // Simplified IMU based on "Complementary Filter"
@@ -71,7 +104,7 @@ typedef union {
 t_fp_vector EstG;
 
 // Normalize a vector
-static void normalizeV(struct fp_vector *src, struct fp_vector *dest)
+void normalizeV(struct fp_vector *src, struct fp_vector *dest)
 {
     float length;
 
@@ -84,7 +117,7 @@ static void normalizeV(struct fp_vector *src, struct fp_vector *dest)
 }
 
 // Rotate Estimated vector(s) with small angle approximation, according to the gyro data
-static void rotateV(struct fp_vector *v, float *delta)
+void rotateV(struct fp_vector *v, float *delta)
 {
     struct fp_vector v_tmp = *v;
 
@@ -120,7 +153,7 @@ static void rotateV(struct fp_vector *v, float *delta)
     v->Z = v_tmp.X * mat[0][2] + v_tmp.Y * mat[1][2] + v_tmp.Z * mat[2][2];
 }
 
-static int32_t applyDeadband(int32_t value, int32_t deadband)
+int32_t applyDeadband(int32_t value, int32_t deadband)
 {
     if (abs(value) < deadband) {
         value = 0;
@@ -133,7 +166,7 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
 }
 
 // rotate acc into Earth frame and calculate acceleration in it
-static void acc_calc(bool armed, uint32_t deltaT, uint16_t acc_1G)
+void acc_calc(uint32_t deltaT)
 {
     static int32_t accZoffset = 0;
     static float accz_smooth = 0;
@@ -176,7 +209,7 @@ static void acc_calc(bool armed, uint32_t deltaT, uint16_t acc_1G)
     accSumCount++;
 }
 
-static void accSum_reset(void)
+void accSum_reset(void)
 {
     accSum[0] = 0;
     accSum[1] = 0;
@@ -204,8 +237,7 @@ static int16_t calculateHeading(t_fp_vector *vec)
     return head;
 }
 
-// Returns updated useSmallAngle flag
-static bool estimateAttitude(bool armed, uint16_t acc_1G, int16_t angle[2])
+static void getEstimatedAttitude(void)
 {
     int32_t axis;
     int32_t accMag = 0;
@@ -246,7 +278,7 @@ static bool estimateAttitude(bool armed, uint16_t acc_1G, int16_t angle[2])
             EstG.A[axis] = (EstG.A[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + accSmooth[axis]) * INV_GYR_CMPF_FACTOR;
     }
 
-    bool useSmallAngle = (EstG.A[Z] > smallAngle);
+    useSmallAngle = (EstG.A[Z] > smallAngle);
 
     // Attitude of the estimated vector
     anglerad[ROLL] = atan2f(EstG.V.Y, EstG.V.Z);
@@ -258,7 +290,7 @@ static bool estimateAttitude(bool armed, uint16_t acc_1G, int16_t angle[2])
     normalizeV(&EstN.V, &EstN.V);
     heading = calculateHeading(&EstN);
 
-    acc_calc(armed, deltaT, acc_1G); // rotate acc vector into earth frame
+    acc_calc(deltaT); // rotate acc vector into earth frame
 
     if (CONFIG_THROTTLE_CORRECTION_VALUE) {
 
@@ -273,8 +305,6 @@ static bool estimateAttitude(bool armed, uint16_t acc_1G, int16_t angle[2])
             throttleAngleCorrection = lrintf(CONFIG_THROTTLE_CORRECTION_VALUE * sinf(deg / (900.0f * M_PI / 2.0f)));
         }
     }
-
-    return useSmallAngle;
 }
 
 static bool sonarInRange(void)
@@ -288,34 +318,7 @@ static float cfilter(float a, float b, float c)
     return a * c + b * (1 - c);
 }
 
-// ===============================================================================================
-
-void imuInit(uint16_t acc_1G)
-{
-    smallAngle = lrintf(acc_1G * cosf(RAD * CONFIG_SMALL_ANGLE));
-    accVelScale = 9.80665f / acc_1G / 10000.0f;
-    throttleAngleScale = (1800.0f / M_PI) * (900.0f / CONFIG_THROTTLE_CORRECTION_ANGLE);
-
-    fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
-}
-
-// Returns updated useSmallAngle flag
-bool computeIMU(bool armed, uint16_t acc_1G, int16_t angle[2], uint16_t * calibratingA, uint16_t * calibratingG)
-{
-    *calibratingG = Gyro_getADC(*calibratingG);
-
-    *calibratingA = ACC_getADC(*calibratingA, acc_1G);
-
-    bool useSmallAngle = estimateAttitude(armed, acc_1G, angle);
-
-    gyroData[YAW] = gyroADC[YAW];
-    gyroData[ROLL] = gyroADC[ROLL];
-    gyroData[PITCH] = gyroADC[PITCH];
-
-    return useSmallAngle;
-}
-
-void getAltPID(bool armed, int32_t AltHold, int16_t angle[2], int32_t * AltPID, int32_t * EstAlt)
+int getEstimatedAltitude(void)
 {
     static uint32_t previousT;
     static float accZ_old;
@@ -326,17 +329,12 @@ void getAltPID(bool armed, int32_t AltHold, int16_t angle[2], int32_t * AltPID, 
     static float   accelAlt;
     static bool wasArmed;
 
-    int32_t  FusedBaroSonarAlt = 0;
-    int32_t BaroAlt = 0;
     uint32_t currentT = micros();
     int16_t tiltAngle = max(abs(angle[ROLL]), abs(angle[PITCH]));
     uint32_t dTime = currentT - previousT;
-    int32_t  baroAlt_offset = 0;
-
-    *AltPID = 0;
 
     if (dTime < CONFIG_ALT_UPDATE_USEC)
-        return;
+        return 0;
     previousT = currentT;
 
     // Calculates height from ground in cm via baro pressure
@@ -360,6 +358,8 @@ void getAltPID(bool armed, int32_t AltHold, int16_t angle[2], int32_t * AltPID, 
     }
     wasArmed = armed;
 
+    printf("%d\n", baroPressure2);
+
     // Calculate sonar altitude only if the sonar is facing downwards(<25deg)
     SonarAlt = (tiltAngle > 250) ? -1 : SonarAlt * (900.0f - tiltAngle) / 900.0f;
 
@@ -370,7 +370,7 @@ void getAltPID(bool armed, int32_t AltHold, int16_t angle[2], int32_t * AltPID, 
     } else {
         BaroAlt = BaroAlt - baroAlt_offset;
         if (SonarAlt > 0) {
-            float sonarTransition = (300 - SonarAlt) / 100.0f;
+            sonarTransition = (300 - SonarAlt) / 100.0f;
             FusedBaroSonarAlt = cfilter(SonarAlt, BaroAlt, sonarTransition); 
         }
     }
@@ -389,7 +389,9 @@ void getAltPID(bool armed, int32_t AltHold, int16_t angle[2], int32_t * AltPID, 
     // complementary filter for altitude estimation (baro & acc)
     //accelAlt = cfilter(accelAlt, FusedBaroSonarAlt, CONFIG_BARO_CF_ALT);
 
-    *EstAlt = sonarInRange() ? FusedBaroSonarAlt : accelAlt;
+    AccelAlt = (int)accelAlt;
+
+    EstAlt = sonarInRange() ? FusedBaroSonarAlt : accelAlt;
 
     accSum_reset();
 
@@ -414,7 +416,7 @@ void getAltPID(bool armed, int32_t AltHold, int16_t angle[2], int32_t * AltPID, 
 
         // Altitude P-Controller
         if (!velocityControl) {
-            int32_t error = constrain(AltHold - *EstAlt, -500, 500);
+            int32_t error = constrain(AltHold - EstAlt, -500, 500);
             error = applyDeadband(error, 10);       // remove small P parametr to reduce noise near zero position
             setVel = constrain((CONFIG_ALT_P * error / 128), -300, +300); // limit velocity to +/- 3 m/s
         } 
@@ -422,7 +424,7 @@ void getAltPID(bool armed, int32_t AltHold, int16_t angle[2], int32_t * AltPID, 
         // Velocity PID-Controller
         // P
         int32_t error = setVel - vel_tmp;
-        *AltPID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
+        AltPID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
 
         // I
         errorVelocityI += (CONFIG_VEL_I * error);
@@ -430,10 +432,14 @@ void getAltPID(bool armed, int32_t AltHold, int16_t angle[2], int32_t * AltPID, 
         AltPID += errorVelocityI / 8196;     // I in the range of +/-200
 
         // D
-        *AltPID = *AltPID - constrain(CONFIG_VEL_D * (accZ_tmp + accZ_old) / 512, -150, 150);
+        AltPID -= constrain(CONFIG_VEL_D * (accZ_tmp + accZ_old) / 512, -150, 150);
 
-    } 
+    } else {
+        AltPID = 0;
+    }
 
     accZ_old = accZ_tmp;
+
+    return 1;
 }
 

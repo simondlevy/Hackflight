@@ -14,7 +14,7 @@
 # Things that the user might override on the commandline
 #
 
-# The target to build
+# The target to build, must be one of NAZE or CJMCU
 TARGET		?= NAZE
 
 # Compile-time options
@@ -39,26 +39,13 @@ OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
 # Source files common to all targets
-COMMON_SRC = mixer.c \
+COMMON_SRC = main.c \
+		   mixer.c \
 		   mw.c \
 		   sensors.c \
-		   msp.c \
+		   serial.c \
 		   state.c \
 		   utils.c \
-		   $(CMSIS_SRC) \
-		   $(STDPERIPH_SRC)
-
-# Source for off-board sensors
-OFFBOARD_SRC = offboard/drv_px4flow.c \
-		       offboard/drv_lidarlite.c \
-		       offboard/drv_mb1242.c \
-
-# Source files for the NAZE target
-NAZE_SRC = board/main.c \
-           board/drv_adc.c \
-		   board/drv_pwm.c \
-		   board/drv_spi.c \
-		   board/drv_timer.c \
 		   startup_stm32f10x_md_gcc.S \
 		   board/drv_gpio.c \
 		   board/drv_i2c.c \
@@ -66,9 +53,22 @@ NAZE_SRC = board/main.c \
 		   board/drv_serial.c \
 		   board/drv_uart.c \
 		   board/printf.c \
-		   onboard/drv_mpu6050.c \
-		   onboard/drv_ms5611.c \
-		   $(OFFBOARD_SRC) \
+		   $(CMSIS_SRC) \
+		   $(STDPERIPH_SRC)
+
+# Source files for full-featured systems
+#HIGHEND_SRC	 = telemetry_common.c
+
+# Source files for the NAZE target
+NAZE_SRC = board/drv_adc.c \
+		   board/drv_mpu6050.c \
+		   board/drv_ms5611.c \
+		   board/drv_pwm.c \
+		   board/drv_spi.c \
+		   board/drv_timer.c \
+		   external/drv_px4flow.c \
+		   external/drv_lidarlite.c \
+		   external/drv_mb1242.c \
 		   $(HIGHEND_SRC) \
 		   $(COMMON_SRC)
 

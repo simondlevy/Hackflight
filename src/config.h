@@ -18,6 +18,8 @@ static const uint8_t CONFIG_VEL_D = 1;
 #define CONFIG_HORIZON_MODE                         1
 #define CONFIG_CALIBRATING_GYRO_CYCLES              1000
 #define CONFIG_CALIBRATING_ACC_CYCLES               400
+#define CONFIG_EMF_AVOIDANCE                        0
+#define CONFIG_SERIAL_BAUDRATE                      115200
 #define CONFIG_MOTOR_PWM_RATE                       400
 #define CONFIG_MIDRC                                1500
 #define CONFIG_MINCOMMAND                           1000
@@ -29,6 +31,7 @@ static const uint8_t CONFIG_VEL_D = 1;
 #define CONFIG_YAW_CONTROL_DIRECTION                1   /* 1 or -1 */
 #define CONFIG_MAX_ANGLE_INCLINATION                500 /* 50 degrees */
 #define CONFIG_MAXCHECK                             1900
+
 #define CONFIG_ALTITUDE_UPDATE_USEC                 25000   // 40hz update rate (20hz LPF on acc)
 #define CONFIG_ALT_HOLD_THROTTLE_NEUTRAL            40
 
