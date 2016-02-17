@@ -15,6 +15,7 @@
 #include "axes.h"
 #include "mw.h"
 #include "config.h"
+#include "sensors.h"
 
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.

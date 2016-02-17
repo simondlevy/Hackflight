@@ -22,6 +22,7 @@
 #include "board/drv_system.h"
 #include "board/drv_pwm.h"
 
+#include "sensors.h"
 #include "config.h"
 #include "axes.h"
 #include "mw.h"

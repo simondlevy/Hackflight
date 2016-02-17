@@ -13,6 +13,7 @@
 #include "axes.h"
 #include "mw.h"
 #include "config.h"
+#include "sensors.h"
 #include "utils.h"
 
 

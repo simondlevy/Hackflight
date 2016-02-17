@@ -5,10 +5,6 @@
 
 #pragma once
 
-#include "baro.h"
-
-#define BARO_TAB_SIZE_MAX   48
-
 #define RC_CHANS    (18)
 
 /*********** RC alias *****************/
@@ -116,15 +112,6 @@ void imuInit(void);
 void computeIMU(void);
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
 int getEstimatedAltitude();
-
-// Sensors
-void initSensors(void);
-void ACC_getADC(void);
-void Gyro_getADC(void);
-bool initBaro(baro_t * baro);
-int Baro_update(void);
-bool initSonar();
-void Sonar_update(void);
 
 // Output
 void mixerInit(void);
