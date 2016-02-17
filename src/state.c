@@ -301,11 +301,11 @@ void imuInit(uint16_t acc_1G)
 }
 
 // Returns updated useSmallAngle flag
-bool computeIMU(bool armed, uint16_t acc_1G, int16_t angle[2])
+bool computeIMU(bool armed, uint16_t acc_1G, int16_t angle[2], uint16_t * calibratingA, uint16_t * calibratingG)
 {
-    Gyro_getADC();
+    *calibratingG = Gyro_getADC(*calibratingG);
 
-    ACC_getADC(acc_1G);
+    *calibratingA = ACC_getADC(*calibratingA, acc_1G);
 
     bool useSmallAngle = estimateAttitude(armed, acc_1G, angle);
 

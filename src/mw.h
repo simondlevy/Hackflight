@@ -32,21 +32,21 @@ extern void mspCom(bool armed, int16_t * rcData, int16_t motor[4], int16_t motor
 extern int32_t  baroPressure;
 extern uint32_t baroPressureSum;
 extern int32_t  baroTemperature;
-extern uint16_t calibratingA;
-extern uint16_t calibratingG;
-extern int32_t  errorVelocityI;
+
 extern int32_t  EstAlt;
+extern int32_t  SonarAlt;
+
+extern int32_t  errorVelocityI;
 extern sensor_t gyro;
 extern int16_t  gyroADC[3], accADC[3], accSmooth[3], magADC[3];
 extern int16_t  gyroZero[3];
 extern int16_t  gyroData[3];
 extern int16_t  heading;
 extern int32_t  setVelocity;
-extern int32_t  SonarAlt;
 extern int16_t  throttleAngleCorrection;
 extern int32_t  vario;
 extern bool     velocityControl;
 
 void    imuInit(uint16_t acc_1G);
-bool    computeIMU(bool armed, uint16_t acc_1G, int16_t angle[2]);
+bool    computeIMU(bool armed, uint16_t acc_1G, int16_t angle[2], uint16_t * calibratingA, uint16_t * calibratingG);
 int32_t getAltPID(bool armed, int32_t AltHold, int16_t angle[2]);

@@ -53,6 +53,7 @@ static int32_t  AltPID;
 static bool     armed;
 static int16_t  axisPID[3];
 static bool     baro_available;
+static uint16_t calibratingG;
 static uint32_t currentTime;
 static uint8_t  dynP8[3], dynI8[3], dynD8[3];
 static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
@@ -74,7 +75,7 @@ static void update_timed_task(uint32_t * usec, uint32_t period)
     *usec = currentTime + period;
 }
 
-static void annexCode(void)
+static void annexCode(uint16_t calibratingA)
 {
     static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
@@ -182,17 +183,6 @@ static void computeRC(void)
 }
 
 
-
-static void mwArm(void)
-{
-    if (calibratingG == 0 && accCalibrated) {
-        if (!armed) {         // arm now!
-            armed = 1;
-        }
-    } else if (!armed) {
-        blinkLED(2, 255, 1);
-    }
-}
 
 static void mwDisarm(void)
 {
@@ -369,15 +359,16 @@ void loop(void)
     static uint8_t rcDelayCommand;      // this indicates the number of time (multiple of RC measurement at 50Hz) 
     // the sticks must be maintained to run or switch off motors
     static uint8_t rcSticks;            // this hold sticks position for command combos
-    uint8_t stTmp = 0;
-    int i;
     static uint32_t rcTime = 0;
     static int16_t initialThrottleHold;
     static uint32_t loopTime;
+    static uint8_t alt_hold_mode;
+    static uint16_t calibratingA;
+
+    uint8_t stTmp = 0;
+    int i;
     uint16_t auxState = 0;
     bool isThrottleLow = false;
-
-    static uint8_t alt_hold_mode;
 
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC)) {
 
@@ -423,8 +414,15 @@ void loop(void)
                 } 
 
                 // Arm via YAW
-                if ((rcSticks == THR_LO + YAW_HI + PIT_CE + ROL_CE))
-                    mwArm();
+                if ((rcSticks == THR_LO + YAW_HI + PIT_CE + ROL_CE)) {
+                    if (calibratingG == 0 && accCalibrated) {
+                        if (!armed) {         // arm now!
+                            armed = 1;
+                        }
+                    } else if (!armed) {
+                        blinkLED(2, 255, 1);
+                    }
+                }
 
                 // Calibrating Acc
                 else if (rcSticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
@@ -494,13 +492,13 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        useSmallAngle = computeIMU(armed, acc_1G, angle);
+        useSmallAngle = computeIMU(armed, acc_1G, angle, &calibratingA, &calibratingG);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
 
         // non IMU critical, temeperatur, serialcom
-        annexCode();
+        annexCode(calibratingA);
 
         if (alt_hold_mode) {
             static uint8_t isAltHoldChanged = 0;
