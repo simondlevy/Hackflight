@@ -299,6 +299,8 @@ static void pidMultiWii(void)
 
 void setup(void)
 {
+    uint8_t i;
+
     armed = 0;
 
     // determine hardware revision based on clock frequency
@@ -311,8 +313,6 @@ void setup(void)
 
     // sleep for 100ms
     delay(100);
-
-    uint8_t i;
 
     for (i = 0; i < PITCH_LOOKUP_LENGTH; i++)
         lookupPitchRollRC[i] = (2500 + CONFIG_RC_EXPO_8 * (i * i - 25)) * i * (int32_t)CONFIG_RC_RATE_8 / 2500;
@@ -354,7 +354,23 @@ void setup(void)
     mixerInit(); 
 
     serialInit(CONFIG_SERIAL_BAUDRATE);
-}
+
+    pwmInit(CONFIG_FAILSAFE_DETECT_THRESHOLD, CONFIG_PWM_FILTER, CONFIG_USE_CPPM, CONFIG_MOTOR_PWM_RATE,
+            CONFIG_FAST_PWM, CONFIG_PWM_IDLE_PULSE);
+
+    // configure PWM/CPPM read function and max number of channels
+    // these, if enabled
+    for (i = 0; i < RC_CHANS; i++)
+        rcData[i] = 1502;
+    rcReadRawFunc = pwmReadRawRC;
+
+    previousTime = micros();
+
+    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
+
+    // trigger accelerometer calibration requirement
+    useSmallAngle = 1;
+ }
 
 void loop(void)
 {

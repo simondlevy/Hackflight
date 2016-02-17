@@ -14,7 +14,6 @@
 #include "board/drv_serial.h"
 #include "board/drv_gpio.h"
 #include "board/drv_system.h"
-#include "board/drv_pwm.h"
 
 #include "sensors.h"
 #include "config.h"
@@ -49,23 +48,7 @@ int main(void)
 
     init_printf( NULL, _putc);
 
-    pwmInit(CONFIG_FAILSAFE_DETECT_THRESHOLD, CONFIG_PWM_FILTER, CONFIG_USE_CPPM, CONFIG_MOTOR_PWM_RATE,
-            CONFIG_FAST_PWM, CONFIG_PWM_IDLE_PULSE);
-
-    // configure PWM/CPPM read function and max number of channels
-    // these, if enabled
-    uint8_t i;
-    for (i = 0; i < RC_CHANS; i++)
-        rcData[i] = 1502;
-    rcReadRawFunc = pwmReadRawRC;
-
-    previousTime = micros();
-
-    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
-
-    // trigger accelerometer calibration requirement
-    useSmallAngle = 1;
-    
+   
     // loopy
     while (1) 
         loop();
