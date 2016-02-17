@@ -38,11 +38,12 @@ extern uint16_t pwmReadRawRC(uint8_t chan);
 // from system_stm32f10x.c
 void SetSysClock(bool overclock);
 
-// gcc/GNU version
 static void _putc(void *p, char c)
 {
-    (void)p;
+    (void)p; // avoid compiler warning about unused variable
     serialWrite(telemport, c);
+
+    while (!isSerialTransmitBufferEmpty(telemport));
 }
 
 static void activateConfig(void)
@@ -72,7 +73,7 @@ int main(void)
     armed = 0;
 
     // Configure clock, this figures out HSE for hardware autodetect
-    SetSysClock(CONFIG_EMF_AVOIDANCE);
+    SetSysClock(0);
 
     // determine hardware revision based on clock frequency
     if (hse_value == 8000000)
@@ -112,7 +113,7 @@ int main(void)
 
     serialInit(CONFIG_SERIAL_BAUDRATE);
 
-    init_printf( NULL, _putc, telemport);
+    init_printf( NULL, _putc);
 
     pwmInit(CONFIG_FAILSAFE_DETECT_THRESHOLD, CONFIG_PWM_FILTER, CONFIG_USE_CPPM, CONFIG_MOTOR_PWM_RATE,
             CONFIG_FAST_PWM, CONFIG_PWM_IDLE_PULSE);
@@ -131,7 +132,6 @@ int main(void)
     useSmallAngle = 1;
     
     // loopy
-    while (1) {
+    while (1) 
         loop();
-    }
 }

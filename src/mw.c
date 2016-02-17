@@ -13,6 +13,7 @@
 #include "board/drv_gpio.h"
 #include "board/drv_system.h"
 #include "board/drv_pwm.h"
+#include "board/printf.h"
 
 #include "axes.h"
 #include "sensors.h"
@@ -290,6 +291,9 @@ static void pidMultiWii(void)
 
 void loop(void)
 {
+    static int count;
+    printf("%d\n", count++);
+
     static uint8_t rcDelayCommand;      // this indicates the number of time (multiple of RC measurement at 50Hz) 
     // the sticks must be maintained to run or switch off motors
     static uint8_t rcSticks;            // this hold sticks position for command combos
