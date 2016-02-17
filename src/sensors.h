@@ -5,10 +5,10 @@
 
 bool sonar_available;
 
-void initSensors(int hwrev);
-void ACC_getADC(void);
-void Gyro_getADC(void);
-bool initBaro(baro_t * baro);
-int Baro_update(uint32_t currentTime);
-bool initSonar();
-void Sonar_update(void);
+void     ACC_getADC(uint16_t acc_1G);
+int      Baro_update(uint32_t currentTime);
+void     Gyro_getADC(void);
+bool     initBaro(baro_t * baro);
+uint16_t initSensors(int hwrev);
+bool     initSonar();
+void     Sonar_update(void);

@@ -27,6 +27,8 @@
 #include "config.h"
 #include "utils.h"
 
+#define RC_CHANS    (8)
+
 #define PITCH_LOOKUP_LENGTH     7
 #define THROTTLE_LOOKUP_LENGTH 12
 
@@ -43,18 +45,19 @@
 #define THR_CE (3 << (2 * THROTTLE))
 #define THR_HI (2 << (2 * THROTTLE))
 
+static uint8_t  accCalibrated;
+static uint16_t acc_1G;
 static bool     armed;
 static int16_t  axisPID[3];
-static int16_t  motor[4];
-static int16_t  motor_disarmed[4];
 static uint32_t currentTime;
-static bool     useSmallAngle;
-static int16_t  rcCommand[4];   // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
-static uint8_t  accCalibrated;
 static uint8_t  dynP8[3], dynI8[3], dynD8[3];
 static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
 static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
+static int16_t  motor[4];
+static int16_t  motor_disarmed[4];
+static int16_t  rcCommand[4];   // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
 static int16_t  rcData[RC_CHANS];
+static bool     useSmallAngle;
 
 static bool check_timed_task(uint32_t usec) {
 
@@ -145,8 +148,7 @@ static void annexCode(void)
     }
 
     // MSP need to know about our situation
-    extern void mspCom(bool armed, int16_t * rcData, int16_t motor[4], int16_t motor_disarmed[4]);
-    mspCom(armed, rcData, motor, motor_disarmed);
+    mspCom(armed, rcData, motor, motor_disarmed, acc_1G);
 }
 
 static void computeRC(void)
@@ -307,7 +309,7 @@ void setup(void)
 
     adcInit(hw_revision);
 
-    initSensors(hw_revision);
+    acc_1G = initSensors(hw_revision);
 
 
     for (i = 0; i < PITCH_LOOKUP_LENGTH; i++)
@@ -337,7 +339,7 @@ void setup(void)
     LED0_OFF;
     LED1_OFF;
 
-    imuInit(); 
+    imuInit(acc_1G); 
     mixerInit(motor_disarmed); 
 
     pwmInit(CONFIG_FAILSAFE_DETECT_THRESHOLD, CONFIG_PWM_FILTER, CONFIG_USE_CPPM, CONFIG_MOTOR_PWM_RATE,
@@ -488,7 +490,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        useSmallAngle = computeIMU(armed);
+        useSmallAngle = computeIMU(armed, acc_1G);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();

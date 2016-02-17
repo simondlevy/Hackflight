@@ -7,8 +7,6 @@
 
 // RC alias -----------------------------------------------
 
-#define RC_CHANS    (18)
-
 enum {
     ROLL = 0,
     PITCH,
@@ -22,12 +20,14 @@ enum {
 
 // mw  -----------------------------------------------------
 
+extern void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
 
-void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
+// msp -----------------------------------------------------
+
+extern void mspCom(bool armed, int16_t * rcData, int16_t motor[4], int16_t motor_disarmed[4], uint16_t acc_1G);
 
 // state ---------------------------------------------------
 
-extern uint16_t acc_1G;
 extern int32_t  AltHold;
 extern int32_t  AltPID;
 extern int16_t  angle[2];
@@ -50,7 +50,7 @@ extern int16_t  throttleAngleCorrection;
 extern int32_t  vario;
 extern bool     velocityControl;
 
-void imuInit(void);
-bool computeIMU(bool armed);
+void imuInit(uint16_t acc_1G);
+bool computeIMU(bool armed, uint16_t acc_1G);
 int  getEstimatedAltitude(bool armed);
 

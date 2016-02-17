@@ -137,7 +137,7 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
 }
 
 // rotate acc into Earth frame and calculate acceleration in it
-static void acc_calc(bool armed, uint32_t deltaT)
+static void acc_calc(bool armed, uint32_t deltaT, uint16_t acc_1G)
 {
     static int32_t accZoffset = 0;
     static float accz_smooth = 0;
@@ -209,7 +209,7 @@ static int16_t calculateHeading(t_fp_vector *vec)
 }
 
 // Returns updated useSmallAngle flag
-static bool estimateAttitude(bool armed)
+static bool estimateAttitude(bool armed, uint16_t acc_1G)
 {
     int32_t axis;
     int32_t accMag = 0;
@@ -262,7 +262,7 @@ static bool estimateAttitude(bool armed)
     normalizeV(&EstN.V, &EstN.V);
     heading = calculateHeading(&EstN);
 
-    acc_calc(armed, deltaT); // rotate acc vector into earth frame
+    acc_calc(armed, deltaT, acc_1G); // rotate acc vector into earth frame
 
     if (CONFIG_THROTTLE_CORRECTION_VALUE) {
 
@@ -294,7 +294,7 @@ static float cfilter(float a, float b, float c)
 
 // ===============================================================================================
 
-void imuInit(void)
+void imuInit(uint16_t acc_1G)
 {
     smallAngle = lrintf(acc_1G * cosf(RAD * CONFIG_SMALL_ANGLE));
     accVelScale = 9.80665f / acc_1G / 10000.0f;
@@ -304,12 +304,13 @@ void imuInit(void)
 }
 
 // Returns updated useSmallAngle flag
-bool computeIMU(bool armed)
+bool computeIMU(bool armed, uint16_t acc_1G)
 {
     Gyro_getADC();
-    ACC_getADC();
 
-    bool useSmallAngle = estimateAttitude(armed);
+    ACC_getADC(acc_1G);
+
+    bool useSmallAngle = estimateAttitude(armed, acc_1G);
 
     gyroData[YAW] = gyroADC[YAW];
     gyroData[ROLL] = gyroADC[ROLL];

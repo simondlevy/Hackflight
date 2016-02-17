@@ -31,8 +31,6 @@ sensor_t gyro;                      // gyro access functions
 bool baro_available;
 bool sonar_available;
 
-uint16_t acc_1G;          // this is the 1G measured acceleration.
-
 // ==============================================================================================
 
 static sensor_t acc;                       // acc access functions
@@ -45,7 +43,7 @@ typedef struct stdev_t {
 } stdev_t;
 
 
-static void ACC_Common(void)
+static void ACC_Common(uint16_t acc_1G)
 {
     static int32_t a[3];
     int axis;
@@ -161,9 +159,9 @@ static void Baro_Common(void)
 
 // ==============================================================================================
 
-void initSensors(int hwrev)
+uint16_t initSensors(int hwrev)
 {
-    acc_1G = mpuInit(&acc, &gyro, CONFIG_GYRO_LPF, hwrev);
+    uint16_t acc_1G = mpuInit(&acc, &gyro, CONFIG_GYRO_LPF, hwrev);
 
     acc.init(CONFIG_ACC_ALIGN);
 
@@ -172,6 +170,8 @@ void initSensors(int hwrev)
     baro_available = initBaro(&baro);
 
     sonar_available = initSonar();
+
+    return acc_1G;
 }
 
 void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
@@ -223,10 +223,10 @@ void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
 }
 
 
-void ACC_getADC(void)
+void ACC_getADC(uint16_t acc_1G)
 {
     acc.read(accADC);
-    ACC_Common();
+    ACC_Common(acc_1G);
 }
 
 void Gyro_getADC(void)
