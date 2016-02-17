@@ -23,11 +23,18 @@
 
 #include "board/revision.h"
 
+#include "fakeduino.h"
+
 #include "axes.h"
 #include "sensors.h"
 #include "mw.h"
 #include "config.h"
 #include "utils.h"
+
+int     hw_revision = 0;
+extern  rcReadRawDataPtr rcReadRawFunc;
+uint8_t useSmallAngle;
+uint8_t armed;
 
 int16_t debug[4];
 uint32_t currentTime = 0;

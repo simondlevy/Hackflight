@@ -15,21 +15,13 @@
 #include "board/drv_gpio.h"
 #include "board/drv_system.h"
 
-#include "sensors.h"
-#include "config.h"
-#include "axes.h"
-#include "mw.h"
+#include "fakeduino.h"
 
-int     hw_revision = 0;
-extern  rcReadRawDataPtr rcReadRawFunc;
-uint8_t useSmallAngle;
-uint8_t armed;
-
-// receiver read function
-extern uint16_t pwmReadRawRC(uint8_t chan);
+extern serialPort_t * telemport;
+void serialInit(uint32_t baudrate);
 
 // from system_stm32f10x.c
-void SetSysClock(bool overclock);
+extern void SetSysClock(bool overclock);
 
 static void _putc(void *p, char c)
 {
@@ -46,7 +38,7 @@ int main(void)
 
     systemInit();
 
-    serialInit(CONFIG_SERIAL_BAUDRATE);
+    serialInit(115200);
 
     setup();
 
