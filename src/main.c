@@ -44,10 +44,13 @@ int main(void)
     // Configure clock, this figures out HSE for hardware autodetect
     SetSysClock(0);
 
+    systemInit();
+
+    serialInit(CONFIG_SERIAL_BAUDRATE);
+
     setup();
 
     init_printf( NULL, _putc);
-
    
     // loopy
     while (1) 
