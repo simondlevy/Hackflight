@@ -125,6 +125,6 @@ void serialInit(uint32_t baudrate);
 void serialCom(void);
 
 // MSP
-void mspInit(rcReadRawDataPtr *callback);
+//void mspInit(rcReadRawDataPtr *callback);
 bool mspFrameComplete(void);
 void mspFrameRecieve(void);

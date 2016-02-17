@@ -2,11 +2,11 @@
 #include <stdbool.h>
 #include <math.h>
 
-#include "stm32f10x_conf.h"
+//#include "stm32f10x_conf.h"
 
 #include "board/drv_serial.h"
-#include "board/drv_gpio.h"
-#include "board/drv_uart.h"
+//#include "board/drv_gpio.h"
+//#include "board/drv_uart.h"
 #include "board/drv_system.h"
 #include "board/printf.h"
 
