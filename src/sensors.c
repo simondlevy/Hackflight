@@ -9,8 +9,7 @@
 
 #include "stm32f10x_conf.h"
 
-#include "fakeduino/drv_serial.h"
-#include "fakeduino/drv_gpio.h"
+#include "fakeduino/fakeduino.h"
 
 #include "axes.h"
 #include "mw.h"

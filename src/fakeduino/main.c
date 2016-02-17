@@ -37,8 +37,6 @@ int main(void)
 
     systemInit();
 
-    serialInit(115200);
-
     setup();
 
     init_printf( NULL, _putc);

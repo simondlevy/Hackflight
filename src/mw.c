@@ -7,19 +7,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "stm32f10x_conf.h"
-
 #define I2C_DEVICE (I2CDEV_2)
 
-#include "fakeduino/drv_adc.h"
-#include "fakeduino/drv_i2c.h"
-#include "fakeduino/drv_serial.h"
-#include "fakeduino/drv_gpio.h"
-#include "fakeduino/drv_system.h"
-#include "fakeduino/drv_pwm.h"
-#include "fakeduino/drv_spi.h"
-
-#include "fakeduino/printf.h"
 #include "fakeduino/fakeduino.h"
 
 #include "board/revision.h"
@@ -306,6 +295,8 @@ static void pidMultiWii(void)
 void setup(void)
 {
     uint8_t i;
+
+    serialInit(CONFIG_SERIAL_BAUDRATE);
 
     armed = 0;
 
