@@ -137,10 +137,7 @@ void mixTable(void);
 void serialInit(uint32_t baudrate);
 void serialCom(void);
 
-// rxmsp
+// MSP
 void mspInit(rcReadRawDataPtr *callback);
 bool mspFrameComplete(void);
 void mspFrameRecieve(void);
-
-// buzzer
-void systemBeep(bool onoff);

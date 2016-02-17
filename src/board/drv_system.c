@@ -18,12 +18,6 @@
 static volatile uint32_t usTicks = 0;
 // current uptime for 1kHz systick timer. will rollover after 49 days. hopefully we won't care.
 static volatile uint32_t sysTickUptime = 0;
-#ifdef BUZZER
-void systemBeep(bool onoff);
-static void beepRev4(bool onoff);
-static void beepRev5(bool onoff);
-void (*systemBeepPtr)(bool onoff) = NULL;
-#endif
 
 static void cycleCounterInit(void)
 {
@@ -105,15 +99,6 @@ void systemInit(void)
 #define AFIO_MAPR_SWJ_CFG_NO_JTAG_SW            (0x2 << 24)
     AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_NO_JTAG_SW;
 
-#ifdef BUZZER
-    // Configure gpio
-    // rev5 needs inverted beeper. oops.
-    if (hw_revision >= NAZE32_REV5)
-        systemBeepPtr = beepRev5;
-    else
-        systemBeepPtr = beepRev4;
-    BEEP_OFF;
-#endif
     LED0_OFF;
     LED1_OFF;
 
@@ -151,9 +136,7 @@ void failureMode(uint8_t mode)
         LED1_TOGGLE;
         LED0_TOGGLE;
         delay(475 * mode - 2);
-        BEEP_ON
         delay(25);
-        BEEP_OFF;
     }
 }
 
@@ -187,28 +170,3 @@ void systemReset(bool toBootloader)
     // Generate system reset
     SCB->AIRCR = AIRCR_VECTKEY_MASK | (uint32_t)0x04;
 }
-
-#ifdef BUZZER
-static void beepRev4(bool onoff)
-{
-    if (onoff) {
-        digitalLo(BEEP_GPIO, BEEP_PIN);
-    } else {
-        digitalHi(BEEP_GPIO, BEEP_PIN);
-    }
-}
-
-static void beepRev5(bool onoff)
-{
-    if (onoff) {
-        digitalHi(BEEP_GPIO, BEEP_PIN);
-    } else {
-        digitalLo(BEEP_GPIO, BEEP_PIN);
-    }
-}
-
-void systemBeep(bool onoff)
-{
-    systemBeepPtr(onoff);
-}
-#endif
