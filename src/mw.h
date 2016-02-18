@@ -55,7 +55,6 @@ extern int32_t baroPressure;
 extern int32_t baroPressure2;
 extern int32_t baroTemperature;
 extern uint32_t baroPressureSum;
-extern int32_t BaroAlt;
 
 extern int32_t FusedBaroSonarAlt;
 extern int32_t EstAlt;

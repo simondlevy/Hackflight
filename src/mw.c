@@ -377,18 +377,18 @@ void setup(void)
 void loop(void)
 {
     static uint8_t rcDelayCommand;      // this indicates the number of time (multiple of RC measurement at 50Hz) 
-    // the sticks must be maintained to run or switch off motors
+                                        // the sticks must be maintained to run or switch off motors
     static uint8_t rcSticks;            // this hold sticks position for command combos
-    uint8_t stTmp = 0;
-    int i;
     static uint32_t rcTime = 0;
     static int16_t initialThrottleHold;
     static uint32_t loopTime;
     uint16_t auxState = 0;
-    bool isThrottleLow = false;
     static int32_t SonarAlt;
-
     static uint8_t alt_hold_mode;
+
+    bool isThrottleLow = false;
+    uint8_t stTmp = 0;
+    int i;
 
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC)) {
 

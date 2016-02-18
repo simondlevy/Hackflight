@@ -351,8 +351,6 @@ void getEstimatedAltitude(int32_t * SonarAlt)
     }
     wasArmed = armed;
 
-    printf("%d\n", baroPressure2);
-
     // Calculate sonar altitude only if the sonar is facing downwards(<25deg)
     *SonarAlt = (tiltAngle > 250) ? -1 : *SonarAlt * (900.0f - tiltAngle) / 900.0f;
 
