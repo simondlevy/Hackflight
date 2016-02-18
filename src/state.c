@@ -21,7 +21,6 @@ int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
 int32_t  baroAlt_offset = 0;
 float    sonarTransition = 0;
-int32_t  setVelocity = 0;
 uint8_t  velocityControl = 0;
 int32_t  errorVelocityI = 0;
 int32_t  vario = 0;                      // variometer in cm/s
@@ -305,7 +304,8 @@ static float cfilter(float a, float b, float c)
     return a * c + b * (1 - c);
 }
 
-void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt, int32_t * AltHold) 
+void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt, int32_t * AltHold, 
+        int32_t *setVelocity) 
 {
     static uint32_t previousT;
     static float accZ_old;
@@ -394,7 +394,7 @@ void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt
 
     if (tiltAngle < 800) { // only calculate pid if the copters thrust is facing downwards(<80deg)
 
-        int32_t setVel = setVelocity;
+        int32_t setVel = *setVelocity;
 
         // Altitude P-Controller
         if (!velocityControl) {

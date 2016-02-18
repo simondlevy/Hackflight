@@ -54,7 +54,6 @@ extern int32_t baroPressure2;
 extern int32_t baroTemperature;
 extern uint32_t baroPressureSum;
 
-extern int32_t setVelocity;
 extern uint8_t velocityControl;
 extern int32_t errorVelocityI;
 extern int32_t vario;
@@ -76,7 +75,8 @@ extern sensor_t gyro;
 void imuInit(void);
 void computeIMU(void);
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
-void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt, int32_t * AltHold);
+void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt, int32_t * AltHold, 
+        int32_t *setVelocity);
 
 // Output
 void mixerInit(void);

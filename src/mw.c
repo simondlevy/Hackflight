@@ -387,6 +387,7 @@ void loop(void)
     static int32_t AltPID;
     static uint8_t alt_hold_mode;
     static int32_t AltHold;
+    static int32_t setVelocity;
 
     uint16_t auxState = 0;
     bool isThrottleLow = false;
@@ -490,7 +491,7 @@ void loop(void)
             case 2:
                 taskOrder++;
                 if (baro_available && sonar_available) {
-                    getEstimatedAltitude(&SonarAlt, &AltPID, &EstAlt, &AltHold);
+                    getEstimatedAltitude(&SonarAlt, &AltPID, &EstAlt, &AltHold, &setVelocity);
                     break;
                 }
             case 3:
