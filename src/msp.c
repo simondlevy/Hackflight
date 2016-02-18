@@ -63,8 +63,7 @@ typedef  struct mspPortState_t {
     serialState_t c_state;
 } mspPortState_t;
 
-static mspPortState_t port;
-static mspPortState_t *currentPortState = &port;
+static mspPortState_t portState;
 
 static bool rxMspFrameDone = false;
 
@@ -84,8 +83,8 @@ bool mspFrameComplete(void)
 
 static void serialize8(uint8_t a)
 {
-    serialWrite(currentPortState->port, a);
-    currentPortState->checksum ^= a;
+    serialWrite(portState.port, a);
+    portState.checksum ^= a;
 }
 
 static void serialize16(int16_t a)
@@ -104,7 +103,7 @@ static void serialize32(uint32_t a)
 
 static uint8_t read8(void)
 {
-    return currentPortState->inBuf[currentPortState->indRX++] & 0xff;
+    return portState.inBuf[portState.indRX++] & 0xff;
 }
 
 static uint16_t read16(void)
@@ -128,9 +127,9 @@ void headSerialResponse(uint8_t err, uint8_t s)
     serialize8('$');
     serialize8('M');
     serialize8(err ? '!' : '>');
-    currentPortState->checksum = 0;               // start calculating a new checksum
+    portState.checksum = 0;               // start calculating a new checksum
     serialize8(s);
-    serialize8(currentPortState->cmdMSP);
+    serialize8(portState.cmdMSP);
 }
 
 void headSerialReply(uint8_t s)
@@ -145,7 +144,7 @@ void headSerialError(uint8_t s)
 
 void tailSerialReply(void)
 {
-    serialize8(currentPortState->checksum);
+    serialize8(portState.checksum);
 }
 
 void s_struct(uint8_t *cb, uint8_t siz)
@@ -164,7 +163,7 @@ void serializeNames(const char *s)
 
 void mspInit(void)
 {
-    port.port = Serial1;
+    portState.port = Serial1; // provided by Mockduino
 }
 
 static void evaluateCommand(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading,
@@ -173,7 +172,7 @@ static void evaluateCommand(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt,
     uint32_t i;
     const char *build = __DATE__;
 
-    switch (currentPortState->cmdMSP) {
+    switch (portState.cmdMSP) {
 
         case MSP_SET_RAW_RC:
             for (i = 0; i < 8; i++)
@@ -273,51 +272,49 @@ void mspCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, 
 {
     uint8_t c;
 
-    currentPortState = &port;
-
     if (pendReboot)
         systemReset(false); // noreturn
 
-    while (serialTotalBytesWaiting(currentPortState->port)) {
-        c = serialRead(currentPortState->port);
+    while (serialTotalBytesWaiting(portState.port)) {
+        c = serialRead(portState.port);
 
-        if (currentPortState->c_state == IDLE) {
-            currentPortState->c_state = (c == '$') ? HEADER_START : IDLE;
-            if (currentPortState->c_state == IDLE && !armed) {
+        if (portState.c_state == IDLE) {
+            portState.c_state = (c == '$') ? HEADER_START : IDLE;
+            if (portState.c_state == IDLE && !armed) {
                 if (c == '#')
                     ;
                 else if (c == CONFIG_REBOOT_CHARACTER) 
                     systemReset(true);      // reboot to bootloader
             }
-        } else if (currentPortState->c_state == HEADER_START) {
-            currentPortState->c_state = (c == 'M') ? HEADER_M : IDLE;
-        } else if (currentPortState->c_state == HEADER_M) {
-            currentPortState->c_state = (c == '<') ? HEADER_ARROW : IDLE;
-        } else if (currentPortState->c_state == HEADER_ARROW) {
+        } else if (portState.c_state == HEADER_START) {
+            portState.c_state = (c == 'M') ? HEADER_M : IDLE;
+        } else if (portState.c_state == HEADER_M) {
+            portState.c_state = (c == '<') ? HEADER_ARROW : IDLE;
+        } else if (portState.c_state == HEADER_ARROW) {
             if (c > INBUF_SIZE) {       // now we are expecting the payload size
-                currentPortState->c_state = IDLE;
+                portState.c_state = IDLE;
                 continue;
             }
-            currentPortState->dataSize = c;
-            currentPortState->offset = 0;
-            currentPortState->checksum = 0;
-            currentPortState->indRX = 0;
-            currentPortState->checksum ^= c;
-            currentPortState->c_state = HEADER_SIZE;      // the command is to follow
-        } else if (currentPortState->c_state == HEADER_SIZE) {
-            currentPortState->cmdMSP = c;
-            currentPortState->checksum ^= c;
-            currentPortState->c_state = HEADER_CMD;
-        } else if (currentPortState->c_state == HEADER_CMD && 
-                currentPortState->offset < currentPortState->dataSize) {
-            currentPortState->checksum ^= c;
-            currentPortState->inBuf[currentPortState->offset++] = c;
-        } else if (currentPortState->c_state == HEADER_CMD && 
-                currentPortState->offset >= currentPortState->dataSize) {
-            if (currentPortState->checksum == c) {        // compare calculated and transferred checksum
+            portState.dataSize = c;
+            portState.offset = 0;
+            portState.checksum = 0;
+            portState.indRX = 0;
+            portState.checksum ^= c;
+            portState.c_state = HEADER_SIZE;      // the command is to follow
+        } else if (portState.c_state == HEADER_SIZE) {
+            portState.cmdMSP = c;
+            portState.checksum ^= c;
+            portState.c_state = HEADER_CMD;
+        } else if (portState.c_state == HEADER_CMD && 
+                portState.offset < portState.dataSize) {
+            portState.checksum ^= c;
+            portState.inBuf[portState.offset++] = c;
+        } else if (portState.c_state == HEADER_CMD && 
+                portState.offset >= portState.dataSize) {
+            if (portState.checksum == c) {        // compare calculated and transferred checksum
                 evaluateCommand(rcData, SonarAlt, EstAlt, vario, heading, motor);
             }
-            currentPortState->c_state = IDLE;
+            portState.c_state = IDLE;
         }
     }
 }
