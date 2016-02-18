@@ -57,14 +57,6 @@ extern uint32_t baroPressureSum;
 extern int16_t throttleAngleCorrection;
 extern int16_t headFreeModeHold;
 extern int16_t magHold;
-extern int16_t motor[4];
-
-#define PITCH_LOOKUP_LENGTH 7
-#define THROTTLE_LOOKUP_LENGTH 12
-extern int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
-extern int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
-
-extern sensor_t acc;
 
 // State
 void imuInit(void);
@@ -76,13 +68,12 @@ void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt
 // Output
 void mixerInit(void);
 void mixerResetMotors(void);
-void writeMotors(void);
-void writeAllMotors(int16_t mc);
-void mixTable(uint16_t * rcData);
+void writeMotors(int16_t motor[4]);
+void mixTable(uint16_t * rcData, int16_t * motor);
 
 // Serial
 void serialInit(uint32_t baudrate);
-void serialCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading);
+void serialCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor);
 
 // MSP
 //void mspInit(rcReadRawDataPtr *callback);

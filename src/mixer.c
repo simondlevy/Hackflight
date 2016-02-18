@@ -16,7 +16,6 @@
 #include "config.h"
 #include "utils.h"
 
-int16_t motor[4];
 int16_t motor_disarmed[4];
 
 static motorMixer_t currentMixer[4];
@@ -46,7 +45,7 @@ void mixerResetMotors(void)
         motor_disarmed[i] = CONFIG_MINCOMMAND;
 }
 
-void writeMotors(void)
+void writeMotors(int16_t motor[4])
 {
     uint8_t i;
 
@@ -54,17 +53,7 @@ void writeMotors(void)
         pwmWriteMotor(i, motor[i]);
 }
 
-void writeAllMotors(int16_t mc)
-{
-    uint8_t i;
-
-    // Sends commands to all motors
-    for (i = 0; i < 4; i++)
-        motor[i] = mc;
-    writeMotors();
-}
-
-void mixTable(uint16_t * rcData)
+void mixTable(uint16_t * rcData, int16_t * motor)
 {
     int16_t maxMotor;
     uint32_t i;

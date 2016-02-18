@@ -32,6 +32,8 @@
 #define THR_CE (3 << (2 * THROTTLE))
 #define THR_HI (2 << (2 * THROTTLE))
 
+#define PITCH_LOOKUP_LENGTH 7
+#define THROTTLE_LOOKUP_LENGTH 12
 
 extern  rcReadRawDataPtr rcReadRawFunc;
 uint8_t useSmallAngle;
@@ -47,19 +49,17 @@ uint16_t cycleTime = 0;
 uint16_t vbat;                  // battery voltage in 0.1V steps
 int32_t amperage;               // amperage read by current sensor in centiampere (1/100th A)
 int32_t mAhdrawn;              // milliampere hours drawn from the battery since start
-
 int16_t failsafeEvents = 0;
 int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
-int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
-int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
-rcReadRawDataPtr rcReadRawFunc = NULL;  // receive data from default (pwm/ppm) or additional 
-
+static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
+static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 static uint8_t accCalibrated;
 static uint16_t rcData[RC_CHANS];       // interval [1000;2000]
 static sensor_t gyro;
-
 static void pidMultiWii(void);
+
 pidControllerFuncPtr pid_controller = pidMultiWii; // which pid controller are we using, defaultMultiWii
+rcReadRawDataPtr rcReadRawFunc = NULL;  // receive data from default (pwm/ppm) or additional 
 
 uint8_t dynP8[3], dynI8[3], dynD8[3];
 
@@ -111,7 +111,7 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
     }
 }
 
-void annexCode(int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading)
+void annexCode(int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor)
 {
     static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
@@ -191,7 +191,7 @@ void annexCode(int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading)
         }
     }
 
-    serialCom(rcData, SonarAlt, EstAlt, vario, heading);
+    serialCom(rcData, SonarAlt, EstAlt, vario, heading, motor);
 }
 
 uint16_t pwmReadRawRC(uint8_t chan)
@@ -387,6 +387,7 @@ void loop(void)
     static int32_t errorVelocityI;
     static int32_t vario;
     static int16_t heading;
+    static int16_t motor[4];
 
     uint16_t auxState = 0;
     bool isThrottleLow = false;
@@ -517,7 +518,7 @@ void loop(void)
         previousTime = currentTime;
 
         // non IMU critical, temeperatur, serialcom
-        annexCode(SonarAlt, EstAlt, vario, heading);
+        annexCode(SonarAlt, EstAlt, vario, heading, motor);
 
         if (alt_hold_mode) {
             static uint8_t isAltHoldChanged = 0;
@@ -558,7 +559,7 @@ void loop(void)
         }
 
         pid_controller();
-        mixTable(rcData);
-        writeMotors();
+        mixTable(rcData, motor);
+        writeMotors(motor);
     }
 }
