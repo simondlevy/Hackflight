@@ -32,8 +32,6 @@ extern serialPort_t * telemport;
 extern uint8_t useSmallAngle;
 extern uint8_t armed;
 
-extern int32_t AccelAlt;
-
 extern int16_t gyroZero[3];
 extern int16_t gyroData[3];
 extern int16_t angle[2];
@@ -56,13 +54,10 @@ extern int32_t baroPressure2;
 extern int32_t baroTemperature;
 extern uint32_t baroPressureSum;
 
-extern int32_t FusedBaroSonarAlt;
-extern int32_t EstAlt;
 extern int32_t AltHold;
 extern int32_t setVelocity;
 extern uint8_t velocityControl;
 extern int32_t errorVelocityI;
-extern int32_t AltPID;
 extern int32_t vario;
 extern int16_t throttleAngleCorrection;
 extern int16_t headFreeModeHold;
@@ -82,7 +77,7 @@ extern sensor_t gyro;
 void imuInit(void);
 void computeIMU(void);
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
-void getEstimatedAltitude(int32_t * SonarAlt);
+void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt);
 
 // Output
 void mixerInit(void);
@@ -93,7 +88,7 @@ void mixTable(uint16_t * rcData);
 
 // Serial
 void serialInit(uint32_t baudrate);
-void serialCom(uint16_t * rcData, int32_t SonarAlt);
+void serialCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt);
 
 // MSP
 //void mspInit(rcReadRawDataPtr *callback);

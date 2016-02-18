@@ -19,13 +19,8 @@ int32_t  baroPressure = 0;
 int32_t  baroPressure2 = 0;
 int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
-int32_t  BaroAlt = 0;
-int32_t  FusedBaroSonarAlt = 0;
-int32_t  AltPID = 0;
 int32_t  baroAlt_offset = 0;
-int32_t  AccelAlt = 0;
 float    sonarTransition = 0;
-int32_t  EstAlt;                // in cm
 int32_t  AltHold;
 int32_t  setVelocity = 0;
 uint8_t  velocityControl = 0;
@@ -311,16 +306,18 @@ static float cfilter(float a, float b, float c)
     return a * c + b * (1 - c);
 }
 
-void getEstimatedAltitude(int32_t * SonarAlt)
+void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt) 
 {
     static uint32_t previousT;
     static float accZ_old;
     static float accelVel;
+    static int32_t  FusedBaroSonarAlt;
     static int32_t lastFusedBaroSonarAlt;
     static int32_t baroAltBaseline;
     static int32_t baroPressureBaseline;
     static float   accelAlt;
     static bool wasArmed;
+    static int32_t  BaroAlt;
 
     uint32_t currentT = micros();
     int16_t tiltAngle = max(abs(angle[ROLL]), abs(angle[PITCH]));
@@ -377,12 +374,7 @@ void getEstimatedAltitude(int32_t * SonarAlt)
     accelAlt += (vel_acc * 0.5f) * dt + accelVel * dt;                                         
     accelVel += vel_acc;
 
-    // complementary filter for altitude estimation (baro & acc)
-    //accelAlt = cfilter(accelAlt, FusedBaroSonarAlt, CONFIG_BARO_CF_ALT);
-
-    AccelAlt = (int)accelAlt;
-
-    EstAlt = sonarInRange(*SonarAlt) ? FusedBaroSonarAlt : accelAlt;
+    *EstAlt = sonarInRange(*SonarAlt) ? FusedBaroSonarAlt : accelAlt;
 
     accSum_reset();
 
@@ -407,7 +399,7 @@ void getEstimatedAltitude(int32_t * SonarAlt)
 
         // Altitude P-Controller
         if (!velocityControl) {
-            int32_t error = constrain(AltHold - EstAlt, -500, 500);
+            int32_t error = constrain(AltHold - *EstAlt, -500, 500);
             error = applyDeadband(error, 10);       // remove small P parametr to reduce noise near zero position
             setVel = constrain((CONFIG_ALT_P * error / 128), -300, +300); // limit velocity to +/- 3 m/s
         } 
@@ -415,18 +407,18 @@ void getEstimatedAltitude(int32_t * SonarAlt)
         // Velocity PID-Controller
         // P
         int32_t error = setVel - vel_tmp;
-        AltPID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
+        *AltPID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
 
         // I
         errorVelocityI += (CONFIG_VEL_I * error);
         errorVelocityI = constrain(errorVelocityI, -(8196 * 200), (8196 * 200));
-        AltPID += errorVelocityI / 8196;     // I in the range of +/-200
+        *AltPID = *AltPID + errorVelocityI / 8196;     // I in the range of +/-200
 
         // D
-        AltPID -= constrain(CONFIG_VEL_D * (accZ_tmp + accZ_old) / 512, -150, 150);
+        *AltPID -= constrain(CONFIG_VEL_D * (accZ_tmp + accZ_old) / 512, -150, 150);
 
     } else {
-        AltPID = 0;
+        *AltPID = 0;
     }
 
     accZ_old = accZ_tmp;

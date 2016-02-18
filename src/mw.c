@@ -111,7 +111,7 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
     }
 }
 
-void annexCode(int32_t SonarAlt)
+void annexCode(int32_t SonarAlt, int32_t EstAlt)
 {
     static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
@@ -191,7 +191,7 @@ void annexCode(int32_t SonarAlt)
         }
     }
 
-    serialCom(rcData, SonarAlt);
+    serialCom(rcData, SonarAlt, EstAlt);
 
     // Read out gyro temperature. can use it for something somewhere. maybe get MCU temperature instead? 
     // lots of fun possibilities.
@@ -382,10 +382,12 @@ void loop(void)
     static uint32_t rcTime = 0;
     static int16_t initialThrottleHold;
     static uint32_t loopTime;
-    uint16_t auxState = 0;
     static int32_t SonarAlt;
+    static int32_t EstAlt;
+    static int32_t AltPID;
     static uint8_t alt_hold_mode;
 
+    uint16_t auxState = 0;
     bool isThrottleLow = false;
     uint8_t stTmp = 0;
     int i;
@@ -487,7 +489,7 @@ void loop(void)
             case 2:
                 taskOrder++;
                 if (baro_available && sonar_available) {
-                    getEstimatedAltitude(&SonarAlt);
+                    getEstimatedAltitude(&SonarAlt, &AltPID, &EstAlt);
                     break;
                 }
             case 3:
@@ -513,7 +515,7 @@ void loop(void)
         previousTime = currentTime;
 
         // non IMU critical, temeperatur, serialcom
-        annexCode(SonarAlt);
+        annexCode(SonarAlt, EstAlt);
 
         if (alt_hold_mode) {
             static uint8_t isAltHoldChanged = 0;

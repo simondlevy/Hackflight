@@ -174,7 +174,7 @@ void serialInit(uint32_t baudrate)
     numTelemetryPorts++;
 }
 
-static void evaluateCommand(uint16_t * rcData, int32_t SonarAlt)
+static void evaluateCommand(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt)
 {
     uint32_t i;
     const char *build = __DATE__;
@@ -276,7 +276,7 @@ static void evaluateCommand(uint16_t * rcData, int32_t SonarAlt)
 }
 
 
-void serialCom(uint16_t * rcData, int32_t SonarAlt)
+void serialCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt)
 {
     uint8_t c;
 
@@ -322,7 +322,7 @@ void serialCom(uint16_t * rcData, int32_t SonarAlt)
         } else if (currentPortState->c_state == HEADER_CMD && 
                 currentPortState->offset >= currentPortState->dataSize) {
             if (currentPortState->checksum == c) {        // compare calculated and transferred checksum
-                evaluateCommand(rcData, SonarAlt);
+                evaluateCommand(rcData, SonarAlt, EstAlt);
             }
             currentPortState->c_state = IDLE;
         }
