@@ -331,7 +331,7 @@ void imuInit(void)
     fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 }
 
-void getEstimatedAttitude(int16_t * heading, sensor_t * gyro, int16_t * throttleAngleCorrection)
+bool getEstimatedAttitude(int16_t * heading, sensor_t * gyro, int16_t * throttleAngleCorrection)
 {
     Gyro_getADC(gyro);
     ACC_getADC();
@@ -375,7 +375,7 @@ void getEstimatedAttitude(int16_t * heading, sensor_t * gyro, int16_t * throttle
             EstG.A[axis] = (EstG.A[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + accSmooth[axis]) * INV_GYR_CMPF_FACTOR;
     }
 
-    useSmallAngle = (EstG.A[Z] > smallAngle);
+    bool useSmallAngle = (EstG.A[Z] > smallAngle);
 
     // Attitude of the estimated vector
     anglerad[ROLL] = atan2f(EstG.V.Y, EstG.V.Z);
@@ -406,6 +406,8 @@ void getEstimatedAttitude(int16_t * heading, sensor_t * gyro, int16_t * throttle
     gyroData[YAW] = gyroADC[YAW];
     gyroData[ROLL] = gyroADC[ROLL];
     gyroData[PITCH] = gyroADC[PITCH];
+
+    return useSmallAngle;
 }
 
 

@@ -27,7 +27,6 @@ typedef struct motorMixer_t {
     float yaw;
 } motorMixer_t;
 
-extern uint8_t useSmallAngle;
 extern uint8_t armed;
 extern int16_t gyroZero[3];
 extern int16_t gyroData[3];
@@ -45,7 +44,7 @@ extern int16_t  accSmooth[3];
 // State
 void imuInit(void);
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
-void getEstimatedAttitude(int16_t * heading, sensor_t * gyro, int16_t * throttleAngleCorrection);
+bool getEstimatedAttitude(int16_t * heading, sensor_t * gyro, int16_t * throttleAngleCorrection);
 void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt, int32_t * AltHold, 
         int32_t *setVelocity, int32_t * errorVelocityI, int32_t * vario, bool velocityControl, 
         uint32_t baroPressureSum);
