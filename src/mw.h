@@ -19,19 +19,6 @@ enum {
     AUX4
 };
 
-#define ROL_LO (1 << (2 * ROLL))
-#define ROL_CE (3 << (2 * ROLL))
-#define ROL_HI (2 << (2 * ROLL))
-#define PIT_LO (1 << (2 * PITCH))
-#define PIT_CE (3 << (2 * PITCH))
-#define PIT_HI (2 << (2 * PITCH))
-#define YAW_LO (1 << (2 * YAW))
-#define YAW_CE (3 << (2 * YAW))
-#define YAW_HI (2 << (2 * YAW))
-#define THR_LO (1 << (2 * THROTTLE))
-#define THR_CE (3 << (2 * THROTTLE))
-#define THR_HI (2 << (2 * THROTTLE))
-
 // Custom mixer data per motor
 typedef struct motorMixer_t {
     float throttle;
@@ -44,8 +31,6 @@ extern serialPort_t * telemport;
 
 extern uint8_t useSmallAngle;
 extern uint8_t armed;
-
-extern int32_t SonarAlt;
 
 extern int32_t AccelAlt;
 
@@ -98,7 +83,7 @@ extern sensor_t gyro;
 void imuInit(void);
 void computeIMU(void);
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
-int getEstimatedAltitude();
+void getEstimatedAltitude(int32_t * SonarAlt);
 
 // Output
 void mixerInit(void);
@@ -109,7 +94,7 @@ void mixTable(uint16_t * rcData);
 
 // Serial
 void serialInit(uint32_t baudrate);
-void serialCom(uint16_t * rcData);
+void serialCom(uint16_t * rcData, int32_t SonarAlt);
 
 // MSP
 //void mspInit(rcReadRawDataPtr *callback);

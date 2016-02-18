@@ -11,6 +11,6 @@ void Gyro_getADC(void);
 bool initBaro(baro_t * baro);
 int Baro_update(void);
 bool initSonar();
-void Sonar_update(void);
+void Sonar_update(int32_t * SonarAlt);
 
 

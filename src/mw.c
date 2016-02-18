@@ -19,6 +19,20 @@
 #include "config.h"
 #include "utils.h"
 
+#define ROL_LO (1 << (2 * ROLL))
+#define ROL_CE (3 << (2 * ROLL))
+#define ROL_HI (2 << (2 * ROLL))
+#define PIT_LO (1 << (2 * PITCH))
+#define PIT_CE (3 << (2 * PITCH))
+#define PIT_HI (2 << (2 * PITCH))
+#define YAW_LO (1 << (2 * YAW))
+#define YAW_CE (3 << (2 * YAW))
+#define YAW_HI (2 << (2 * YAW))
+#define THR_LO (1 << (2 * THROTTLE))
+#define THR_CE (3 << (2 * THROTTLE))
+#define THR_HI (2 << (2 * THROTTLE))
+
+
 extern  rcReadRawDataPtr rcReadRawFunc;
 uint8_t useSmallAngle;
 uint8_t armed;
@@ -97,7 +111,7 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
     }
 }
 
-void annexCode(void)
+void annexCode(int32_t SonarAlt)
 {
     static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
@@ -177,7 +191,7 @@ void annexCode(void)
         }
     }
 
-    serialCom(rcData);
+    serialCom(rcData, SonarAlt);
 
     // Read out gyro temperature. can use it for something somewhere. maybe get MCU temperature instead? 
     // lots of fun possibilities.
@@ -372,6 +386,7 @@ void loop(void)
     static uint32_t loopTime;
     uint16_t auxState = 0;
     bool isThrottleLow = false;
+    static int32_t SonarAlt;
 
     static uint8_t alt_hold_mode;
 
@@ -460,7 +475,7 @@ void loop(void)
             case 0:
                 taskOrder++;
                 if (sonar_available) {
-                    Sonar_update();
+                    Sonar_update(&SonarAlt);
                     break;
                 }
             case 1:
@@ -472,7 +487,7 @@ void loop(void)
             case 2:
                 taskOrder++;
                 if (baro_available && sonar_available) {
-                    getEstimatedAltitude();
+                    getEstimatedAltitude(&SonarAlt);
                     break;
                 }
             case 3:
@@ -498,7 +513,7 @@ void loop(void)
         previousTime = currentTime;
 
         // non IMU critical, temeperatur, serialcom
-        annexCode();
+        annexCode(SonarAlt);
 
         if (alt_hold_mode) {
             static uint8_t isAltHoldChanged = 0;

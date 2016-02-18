@@ -23,7 +23,6 @@ int32_t  BaroAlt = 0;
 int32_t  FusedBaroSonarAlt = 0;
 int32_t  AltPID = 0;
 int32_t  baroAlt_offset = 0;
-int32_t  SonarAlt = 0;
 int32_t  AccelAlt = 0;
 float    sonarTransition = 0;
 int32_t  EstAlt;                // in cm
@@ -301,7 +300,7 @@ static void getEstimatedAttitude(void)
     }
 }
 
-static bool sonarInRange(void)
+static bool sonarInRange(int32_t SonarAlt)
 {
     return SonarAlt > 20 && SonarAlt < 765;
 }
@@ -312,7 +311,7 @@ static float cfilter(float a, float b, float c)
     return a * c + b * (1 - c);
 }
 
-int getEstimatedAltitude(void)
+void getEstimatedAltitude(int32_t * SonarAlt)
 {
     static uint32_t previousT;
     static float accZ_old;
@@ -328,7 +327,7 @@ int getEstimatedAltitude(void)
     uint32_t dTime = currentT - previousT;
 
     if (dTime < CONFIG_ALT_UPDATE_USEC)
-        return 0;
+        return;
     previousT = currentT;
 
     // Calculates height from ground in cm via baro pressure
@@ -355,17 +354,17 @@ int getEstimatedAltitude(void)
     printf("%d\n", baroPressure2);
 
     // Calculate sonar altitude only if the sonar is facing downwards(<25deg)
-    SonarAlt = (tiltAngle > 250) ? -1 : SonarAlt * (900.0f - tiltAngle) / 900.0f;
+    *SonarAlt = (tiltAngle > 250) ? -1 : *SonarAlt * (900.0f - tiltAngle) / 900.0f;
 
     // Fuse SonarAlt and BaroAlt
-    if (sonarInRange()) {
-        baroAlt_offset = BaroAlt - SonarAlt;
-        FusedBaroSonarAlt = SonarAlt;
+    if (sonarInRange(*SonarAlt)) {
+        baroAlt_offset = BaroAlt - *SonarAlt;
+        FusedBaroSonarAlt = *SonarAlt;
     } else {
         BaroAlt = BaroAlt - baroAlt_offset;
-        if (SonarAlt > 0) {
-            sonarTransition = (300 - SonarAlt) / 100.0f;
-            FusedBaroSonarAlt = cfilter(SonarAlt, BaroAlt, sonarTransition); 
+        if (*SonarAlt > 0) {
+            sonarTransition = (300 - *SonarAlt) / 100.0f;
+            FusedBaroSonarAlt = cfilter(*SonarAlt, BaroAlt, sonarTransition); 
         }
     }
 
@@ -385,7 +384,7 @@ int getEstimatedAltitude(void)
 
     AccelAlt = (int)accelAlt;
 
-    EstAlt = sonarInRange() ? FusedBaroSonarAlt : accelAlt;
+    EstAlt = sonarInRange(*SonarAlt) ? FusedBaroSonarAlt : accelAlt;
 
     accSum_reset();
 
@@ -433,7 +432,5 @@ int getEstimatedAltitude(void)
     }
 
     accZ_old = accZ_tmp;
-
-    return 1;
 }
 

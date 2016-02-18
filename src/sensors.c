@@ -249,9 +249,9 @@ int Baro_update(void)
     }
 }
 
-void Sonar_update(void) 
+void Sonar_update(int32_t * SonarAlt) 
 {
     extern int32_t pollSonar(void);
 
-    SonarAlt = pollSonar();
+    * SonarAlt = pollSonar();
 }
