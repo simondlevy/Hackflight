@@ -1,5 +1,8 @@
 #pragma once
 
+#include <stdbool.h>
+#include <stdlib.h>
+
 #include "stm32f10x_conf.h"
 
 #include "drv_adc.h"

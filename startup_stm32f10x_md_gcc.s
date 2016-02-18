@@ -1,8 +1,8 @@
-# 1 ".//src/baseflight_startups/startup_stm32f10x_md_gcc.S"
+# 1 ".//src/startups/startup_stm32f10x_md_gcc.S"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 ".//src/baseflight_startups/startup_stm32f10x_md_gcc.S"
-# 31 ".//src/baseflight_startups/startup_stm32f10x_md_gcc.S"
+# 1 ".//src/startups/startup_stm32f10x_md_gcc.S"
+# 31 ".//src/startups/startup_stm32f10x_md_gcc.S"
   .syntax unified
  .cpu cortex-m3
  .fpu softvfp
@@ -24,7 +24,7 @@
 .word _ebss
 
 .equ BootRAM, 0xF108F85F
-# 61 ".//src/baseflight_startups/startup_stm32f10x_md_gcc.S"
+# 61 ".//src/startups/startup_stm32f10x_md_gcc.S"
     .section .text.Reset_Handler
  .weak Reset_Handler
  .type Reset_Handler, %function
@@ -111,7 +111,7 @@ Reboot_Loader:
         bx r0
 
 .size Reset_Handler, .-Reset_Handler
-# 156 ".//src/baseflight_startups/startup_stm32f10x_md_gcc.S"
+# 156 ".//src/startups/startup_stm32f10x_md_gcc.S"
     .section .text.Default_Handler,"ax",%progbits
 Default_Handler:
 Infinite_Loop:
@@ -197,7 +197,7 @@ g_pfnVectors:
  .word 0
  .word 0
  .word BootRAM
-# 251 ".//src/baseflight_startups/startup_stm32f10x_md_gcc.S"
+# 251 ".//src/startups/startup_stm32f10x_md_gcc.S"
   .weak NMI_Handler
  .thumb_set NMI_Handler,Default_Handler
 

@@ -3,21 +3,9 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdlib.h>
-
-#include "stm32f10x_conf.h"
-
-#include "printf.h"
-
-#include "drv_serial.h"
-#include "drv_system.h"
-
 #include "fakeduino.h"
 
 extern serialPort_t * telemport;
-void serialInit(uint32_t baudrate);
 
 // from system_stm32f10x.c
 extern void SetSysClock(bool overclock);

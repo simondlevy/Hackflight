@@ -331,7 +331,7 @@ void setup(void)
     if (hw_revision != NAZE32_SP)
         i2cInit(I2C_DEVICE);
 
-    adcInit();
+    adcInit(hw_revision >= NAZE32_REV5);
 
     initSensors();
 
@@ -367,8 +367,7 @@ void setup(void)
 
 void loop(void)
 {
-    static int count;
-    printf("%d\n", count++);
+    printf("REV5: %d\n", hw_revision >= NAZE32_REV5);
 
     static uint8_t rcDelayCommand;      // this indicates the number of time (multiple of RC measurement at 50Hz) 
     // the sticks must be maintained to run or switch off motors

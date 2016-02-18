@@ -8,5 +8,5 @@ typedef enum {
     ADC_CHANNEL_MAX = 4
 } AdcChannel;
 
-void adcInit();
+void adcInit(bool haveADC5);
 uint16_t adcGetChannel(uint8_t channel);

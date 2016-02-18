@@ -54,7 +54,7 @@ void systemInit(void)
     struct {
         GPIO_TypeDef *gpio;
         gpio_config_t cfg;
-    } gpio_setup[4];
+    } gpio_setup[3];
 
     gpio_setup[0].gpio = LED0_GPIO;
     gpio_setup[0].cfg.pin = LED0_PIN;
@@ -66,15 +66,10 @@ void systemInit(void)
     gpio_setup[1].cfg.mode = Mode_Out_PP;
     gpio_setup[1].cfg.speed = Speed_2MHz;
 
-    gpio_setup[2].gpio = BEEP_GPIO;
-    gpio_setup[2].cfg.pin = BEEP_PIN;
-    gpio_setup[2].cfg.mode = Mode_Out_OD;
+    gpio_setup[2].gpio = INV_GPIO;
+    gpio_setup[2].cfg.pin = INV_PIN;
+    gpio_setup[2].cfg.mode = Mode_Out_PP;
     gpio_setup[2].cfg.speed = Speed_2MHz;
-
-    gpio_setup[3].gpio = INV_GPIO;
-    gpio_setup[3].cfg.pin = INV_PIN;
-    gpio_setup[3].cfg.mode = Mode_Out_PP;
-    gpio_setup[3].cfg.speed = Speed_2MHz;
 
     gpio_config_t gpio;
     int i, gpio_count = sizeof(gpio_setup) / sizeof(gpio_setup[0]);
@@ -102,10 +97,7 @@ void systemInit(void)
     LED0_OFF;
     LED1_OFF;
 
-    // Hack - rev4 and below used opendrain to PNP for buzzer. Rev5 and above use PP to NPN.
     for (i = 0; i < gpio_count; i++) {
-        if (hw_revision >= NAZE32_REV5 && gpio_setup[i].cfg.mode == Mode_Out_OD)
-            gpio_setup[i].cfg.mode = Mode_Out_PP;
         gpioInit(gpio_setup[i].gpio, &gpio_setup[i].cfg);
     }
 
