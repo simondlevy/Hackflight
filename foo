@@ -1,0 +1,1 @@
+grep -lR $1 src | grep -v swp

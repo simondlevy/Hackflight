@@ -47,7 +47,6 @@ uint16_t cycleTime = 0;
 uint16_t vbat;                  // battery voltage in 0.1V steps
 int32_t amperage;               // amperage read by current sensor in centiampere (1/100th A)
 int32_t mAhdrawn;              // milliampere hours drawn from the battery since start
-int16_t telemTemperature1;      // gyro sensor temperature
 
 int16_t failsafeEvents = 0;
 int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
@@ -111,7 +110,7 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
     }
 }
 
-void annexCode(int32_t SonarAlt, int32_t EstAlt)
+void annexCode(int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading)
 {
     static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
@@ -191,12 +190,7 @@ void annexCode(int32_t SonarAlt, int32_t EstAlt)
         }
     }
 
-    serialCom(rcData, SonarAlt, EstAlt);
-
-    // Read out gyro temperature. can use it for something somewhere. maybe get MCU temperature instead? 
-    // lots of fun possibilities.
-    if (gyro.temperature)
-        gyro.temperature(&telemTemperature1);
+    serialCom(rcData, SonarAlt, EstAlt, vario, heading);
 }
 
 uint16_t pwmReadRawRC(uint8_t chan)
@@ -389,6 +383,9 @@ void loop(void)
     static int32_t AltHold;
     static int32_t setVelocity;
     static bool velocityControl;
+    static int32_t errorVelocityI;
+    static int32_t vario;
+    static int16_t heading;
 
     uint16_t auxState = 0;
     bool isThrottleLow = false;
@@ -492,7 +489,8 @@ void loop(void)
             case 2:
                 taskOrder++;
                 if (baro_available && sonar_available) {
-                    getEstimatedAltitude(&SonarAlt, &AltPID, &EstAlt, &AltHold, &setVelocity, velocityControl);
+                    getEstimatedAltitude(&SonarAlt, &AltPID, &EstAlt, &AltHold, &setVelocity, &errorVelocityI,
+                            &vario, velocityControl);
                     break;
                 }
             case 3:
@@ -510,7 +508,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        computeIMU();
+        computeIMU(&heading);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
@@ -518,7 +516,7 @@ void loop(void)
         previousTime = currentTime;
 
         // non IMU critical, temeperatur, serialcom
-        annexCode(SonarAlt, EstAlt);
+        annexCode(SonarAlt, EstAlt, vario, heading);
 
         if (alt_hold_mode) {
             static uint8_t isAltHoldChanged = 0;

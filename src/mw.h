@@ -54,13 +54,10 @@ extern int32_t baroPressure2;
 extern int32_t baroTemperature;
 extern uint32_t baroPressureSum;
 
-extern int32_t errorVelocityI;
-extern int32_t vario;
 extern int16_t throttleAngleCorrection;
 extern int16_t headFreeModeHold;
-extern int16_t heading, magHold;
+extern int16_t magHold;
 extern int16_t motor[4];
-extern int16_t telemTemperature1;      // gyro sensor temperature
 
 #define PITCH_LOOKUP_LENGTH 7
 #define THROTTLE_LOOKUP_LENGTH 12
@@ -72,10 +69,10 @@ extern sensor_t gyro;
 
 // State
 void imuInit(void);
-void computeIMU(void);
+void computeIMU(int16_t * heading);
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
 void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt, int32_t * AltHold, 
-        int32_t *setVelocity, bool velocityControl);
+        int32_t *setVelocity, int32_t * errorVelocityI, int32_t * vario, bool velocityControl);
 
 // Output
 void mixerInit(void);
@@ -86,7 +83,7 @@ void mixTable(uint16_t * rcData);
 
 // Serial
 void serialInit(uint32_t baudrate);
-void serialCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt);
+void serialCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading);
 
 // MSP
 //void mspInit(rcReadRawDataPtr *callback);

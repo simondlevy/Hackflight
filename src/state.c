@@ -21,8 +21,6 @@ int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
 int32_t  baroAlt_offset = 0;
 float    sonarTransition = 0;
-int32_t  errorVelocityI = 0;
-int32_t  vario = 0;                      // variometer in cm/s
 int16_t  throttleAngleCorrection = 0;    // correction of throttle in lateral wind,
 float    magneticDeclination = 0.0f;       // calculated at startup from config
 float    accVelScale;
@@ -36,28 +34,6 @@ int16_t gyroData[3] = { 0, 0, 0 };
 int16_t gyroZero[3] = { 0, 0, 0 };
 int16_t angle[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
 float anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
-
-static void getEstimatedAttitude(void);
-
-void imuInit(void)
-{
-    smallAngle = lrintf(acc_1G * cosf(RAD * CONFIG_SMALL_ANGLE));
-    accVelScale = 9.80665f / acc_1G / 10000.0f;
-    throttleAngleScale = (1800.0f / M_PI) * (900.0f / CONFIG_THROTTLE_CORRECTION_ANGLE);
-
-    fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
-}
-
-void computeIMU(void)
-{
-    Gyro_getADC();
-    ACC_getADC();
-    getEstimatedAttitude();
-
-    gyroData[YAW] = gyroADC[YAW];
-    gyroData[ROLL] = gyroADC[ROLL];
-    gyroData[PITCH] = gyroADC[PITCH];
-}
 
 // **************************************************
 // Simplified IMU based on "Complementary Filter"
@@ -89,7 +65,7 @@ typedef union {
 t_fp_vector EstG;
 
 // Normalize a vector
-void normalizeV(struct fp_vector *src, struct fp_vector *dest)
+static void normalizeV(struct fp_vector *src, struct fp_vector *dest)
 {
     float length;
 
@@ -102,7 +78,7 @@ void normalizeV(struct fp_vector *src, struct fp_vector *dest)
 }
 
 // Rotate Estimated vector(s) with small angle approximation, according to the gyro data
-void rotateV(struct fp_vector *v, float *delta)
+static void rotateV(struct fp_vector *v, float *delta)
 {
     struct fp_vector v_tmp = *v;
 
@@ -138,7 +114,7 @@ void rotateV(struct fp_vector *v, float *delta)
     v->Z = v_tmp.X * mat[0][2] + v_tmp.Y * mat[1][2] + v_tmp.Z * mat[2][2];
 }
 
-int32_t applyDeadband(int32_t value, int32_t deadband)
+static int32_t applyDeadband(int32_t value, int32_t deadband)
 {
     if (abs(value) < deadband) {
         value = 0;
@@ -151,7 +127,7 @@ int32_t applyDeadband(int32_t value, int32_t deadband)
 }
 
 // rotate acc into Earth frame and calculate acceleration in it
-void acc_calc(uint32_t deltaT)
+static void acc_calc(uint32_t deltaT, int16_t heading)
 {
     static int32_t accZoffset = 0;
     static float accz_smooth = 0;
@@ -194,15 +170,6 @@ void acc_calc(uint32_t deltaT)
     accSumCount++;
 }
 
-void accSum_reset(void)
-{
-    accSum[0] = 0;
-    accSum[1] = 0;
-    accSum[2] = 0;
-    accSumCount = 0;
-    accTimeSum = 0;
-}
-
 // baseflight calculation by Luggi09 originates from arducopter
 static int16_t calculateHeading(t_fp_vector *vec)
 {
@@ -222,7 +189,7 @@ static int16_t calculateHeading(t_fp_vector *vec)
     return head;
 }
 
-static void getEstimatedAttitude(void)
+static void getEstimatedAttitude(int16_t * heading)
 {
     int32_t axis;
     int32_t accMag = 0;
@@ -273,9 +240,9 @@ static void getEstimatedAttitude(void)
 
     rotateV(&EstN.V, deltaGyroAngle);
     normalizeV(&EstN.V, &EstN.V);
-    heading = calculateHeading(&EstN);
+    *heading = calculateHeading(&EstN);
 
-    acc_calc(deltaT); // rotate acc vector into earth frame
+    acc_calc(deltaT, *heading); // rotate acc vector into earth frame
 
     if (CONFIG_THROTTLE_CORRECTION_VALUE) {
 
@@ -303,8 +270,10 @@ static float cfilter(float a, float b, float c)
     return a * c + b * (1 - c);
 }
 
+// ==================================================================================================
+
 void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt, int32_t * AltHold, 
-        int32_t *setVelocity, bool velocityControl) 
+        int32_t *setVelocity, int32_t * errorVelocityI, int32_t * vario, bool velocityControl) 
 {
     static uint32_t previousT;
     static float accZ_old;
@@ -374,7 +343,11 @@ void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt
 
     *EstAlt = sonarInRange(*SonarAlt) ? FusedBaroSonarAlt : accelAlt;
 
-    accSum_reset();
+    accSum[0] = 0;
+    accSum[1] = 0;
+    accSum[2] = 0;
+    accSumCount = 0;
+    accTimeSum = 0;
 
     int32_t fusedBaroSonarVel = (FusedBaroSonarAlt - lastFusedBaroSonarAlt) * 1000000.0f / dTime;
     lastFusedBaroSonarAlt = FusedBaroSonarAlt;
@@ -389,7 +362,7 @@ void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt
     int32_t vel_tmp = lrintf(accelVel);
 
     // set vario
-    vario = applyDeadband(vel_tmp, 5);
+    *vario = applyDeadband(vel_tmp, 5);
 
     if (tiltAngle < 800) { // only calculate pid if the copters thrust is facing downwards(<80deg)
 
@@ -408,9 +381,9 @@ void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt
         *AltPID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
 
         // I
-        errorVelocityI += (CONFIG_VEL_I * error);
-        errorVelocityI = constrain(errorVelocityI, -(8196 * 200), (8196 * 200));
-        *AltPID = *AltPID + errorVelocityI / 8196;     // I in the range of +/-200
+        *errorVelocityI = *errorVelocityI + (CONFIG_VEL_I * error);
+        *errorVelocityI = *errorVelocityI + constrain(*errorVelocityI, -(8196 * 200), (8196 * 200));
+        *AltPID = *AltPID + *errorVelocityI / 8196;     // I in the range of +/-200
 
         // D
         *AltPID -= constrain(CONFIG_VEL_D * (accZ_tmp + accZ_old) / 512, -150, 150);
@@ -421,4 +394,25 @@ void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt
 
     accZ_old = accZ_tmp;
 }
+
+void imuInit(void)
+{
+    smallAngle = lrintf(acc_1G * cosf(RAD * CONFIG_SMALL_ANGLE));
+    accVelScale = 9.80665f / acc_1G / 10000.0f;
+    throttleAngleScale = (1800.0f / M_PI) * (900.0f / CONFIG_THROTTLE_CORRECTION_ANGLE);
+
+    fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
+}
+
+void computeIMU(int16_t * heading)
+{
+    Gyro_getADC();
+    ACC_getADC();
+    getEstimatedAttitude(heading);
+
+    gyroData[YAW] = gyroADC[YAW];
+    gyroData[ROLL] = gyroADC[ROLL];
+    gyroData[PITCH] = gyroADC[PITCH];
+}
+
 
