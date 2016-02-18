@@ -21,7 +21,6 @@ int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
 int32_t  baroAlt_offset = 0;
 float    sonarTransition = 0;
-uint8_t  velocityControl = 0;
 int32_t  errorVelocityI = 0;
 int32_t  vario = 0;                      // variometer in cm/s
 int16_t  throttleAngleCorrection = 0;    // correction of throttle in lateral wind,
@@ -305,7 +304,7 @@ static float cfilter(float a, float b, float c)
 }
 
 void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt, int32_t * AltHold, 
-        int32_t *setVelocity) 
+        int32_t *setVelocity, bool velocityControl) 
 {
     static uint32_t previousT;
     static float accZ_old;

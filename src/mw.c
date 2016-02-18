@@ -388,6 +388,7 @@ void loop(void)
     static uint8_t alt_hold_mode;
     static int32_t AltHold;
     static int32_t setVelocity;
+    static bool velocityControl;
 
     uint16_t auxState = 0;
     bool isThrottleLow = false;
@@ -491,7 +492,7 @@ void loop(void)
             case 2:
                 taskOrder++;
                 if (baro_available && sonar_available) {
-                    getEstimatedAltitude(&SonarAlt, &AltPID, &EstAlt, &AltHold, &setVelocity);
+                    getEstimatedAltitude(&SonarAlt, &AltPID, &EstAlt, &AltHold, &setVelocity, velocityControl);
                     break;
                 }
             case 3:
@@ -541,11 +542,11 @@ void loop(void)
                 if (abs(rcCommand[THROTTLE] - initialThrottleHold) > CONFIG_ALT_HOLD_THROTTLE_NEUTRAL) {
                     // set velocity proportional to stick movement +100 throttle gives ~ +50 cm/s
                     setVelocity = (rcCommand[THROTTLE] - initialThrottleHold) / 2;
-                    velocityControl = 1;
+                    velocityControl = true;
                     isAltHoldChanged = 1;
                 } else if (isAltHoldChanged) {
                     AltHold = EstAlt;
-                    velocityControl = 0;
+                    velocityControl = false;
                     isAltHoldChanged = 0;
                 }
                 rcCommand[THROTTLE] = constrain(initialThrottleHold + AltPID, CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
