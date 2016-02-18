@@ -5,7 +5,7 @@
 
 #include "mockduino.h"
 
-extern serialPort_t * telemport;
+serialPort_t * Serial1;
 
 // from system_stm32f10x.c
 extern void SetSysClock(bool overclock);
@@ -13,9 +13,9 @@ extern void SetSysClock(bool overclock);
 static void _putc(void *p, char c)
 {
     (void)p; // avoid compiler warning about unused variable
-    serialWrite(telemport, c);
+    serialWrite(Serial1, c);
 
-    while (!isSerialTransmitBufferEmpty(telemport));
+    while (!isSerialTransmitBufferEmpty(Serial1));
 }
 
 int main(void)
@@ -24,6 +24,9 @@ int main(void)
     SetSysClock(0);
 
     systemInit();
+
+    // Suport just one baud rate for now
+    Serial1 = uartOpen(USART1, NULL, 115200, MODE_RXTX);
 
     setup();
 

@@ -12,8 +12,11 @@
 #include "drv_system.h"
 #include "drv_pwm.h"
 #include "drv_spi.h"
+#include "drv_uart.h"
 
 #include "printf.h"
+
+extern serialPort_t * Serial1;
 
 void setup(void);
 void loop(void);

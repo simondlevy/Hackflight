@@ -9,11 +9,7 @@
 
 #include "stm32f10x_conf.h"
 
-#include "mockduino/drv_serial.h"
-#include "mockduino/drv_gpio.h"
-#include "mockduino/drv_uart.h"
-#include "mockduino/drv_system.h"
-#include "mockduino/drv_i2c.h"
+#include "mockduino/mockduino.h"
 
 #include "axes.h"
 #include "mw.h"
@@ -37,12 +33,13 @@
 #define MSP_REBOOT               68     //in message          reboot settings
 #define MSP_BUILDINFO            69     //out message         build date as well as some space for future expansion
 
-#define INBUF_SIZE 128
+#define INBUF_SIZE              128
 
 serialPort_t * telemport;
 
 // from mixer.c
 extern int16_t motor_disarmed[4];
+
 // cause reboot after MSP processing complete
 static bool pendReboot = false;
 
@@ -68,7 +65,6 @@ typedef  struct mspPortState_t {
 
 static mspPortState_t port;
 static mspPortState_t *currentPortState = &port;
-static int numTelemetryPorts = 0;
 
 static bool rxMspFrameDone = false;
 
@@ -166,12 +162,9 @@ void serializeNames(const char *s)
         serialize8(*c);
 }
 
-void serialInit(uint32_t baudrate)
+void mspInit(void)
 {
-    numTelemetryPorts = 0;
-    telemport = uartOpen(USART1, NULL, baudrate, MODE_RXTX);
-    port.port = telemport;
-    numTelemetryPorts++;
+    port.port = Serial1;
 }
 
 static void evaluateCommand(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading,
@@ -276,7 +269,7 @@ static void evaluateCommand(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt,
     tailSerialReply();
 }
 
-void serialCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor)
+void mspCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor)
 {
     uint8_t c;
 

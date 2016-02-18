@@ -191,7 +191,7 @@ void annexCode(int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading,
         }
     }
 
-    serialCom(rcData, SonarAlt, EstAlt, vario, heading, motor);
+    mspCom(rcData, SonarAlt, EstAlt, vario, heading, motor);
 }
 
 uint16_t pwmReadRawRC(uint8_t chan)
@@ -306,12 +306,9 @@ static void pidMultiWii(void)
 
 void setup(void)
 {
-    //extern bool useSPI();
-    //extern bool haveADC5();
-
     uint8_t i;
 
-    serialInit(CONFIG_SERIAL_BAUDRATE);
+    mspInit();
 
     armed = 0;
 

@@ -60,9 +60,9 @@ void mixerResetMotors(void);
 void writeMotors(int16_t motor[4]);
 void mixTable(uint16_t * rcData, int16_t * motor);
 
-// Serial
-void serialInit(uint32_t baudrate);
-void serialCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor);
+// MSP
+void mspInit();
+void mspCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor);
 
 // MSP
 //void mspInit(rcReadRawDataPtr *callback);
