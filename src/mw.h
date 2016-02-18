@@ -34,11 +34,7 @@ extern int16_t gyroData[3];
 extern int16_t angle[2];
 extern int16_t axisPID[3];
 extern int16_t rcCommand[4];
-extern int16_t debug[4];
 extern uint16_t acc_1G;
-extern uint32_t currentTime;
-extern uint32_t previousTime;
-extern uint16_t cycleTime;
 extern uint16_t calibratingA;
 extern uint16_t calibratingG;
 extern int16_t  gyroADC[3];
@@ -63,7 +59,7 @@ void mixTable(uint16_t * rcData, int16_t * motor);
 // MSP
 void mspInit();
 void mspCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor,
-        uint32_t baroPressureSum);
+        uint32_t baroPressureSum, uint16_t cycleTime);
 
 // MSP
 //void mspInit(rcReadRawDataPtr *callback);

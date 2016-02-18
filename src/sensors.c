@@ -208,10 +208,10 @@ void Baro_update(uint32_t * baroPressureSum)
     static int32_t  baroPressure;
     static int32_t  baroTemperature;
 
-    if ((int32_t)(currentTime - baroDeadline) < 0)
+    if ((int32_t)(micros() - baroDeadline) < 0)
         return;
 
-    baroDeadline = currentTime;
+    baroDeadline = micros();
 
     if (state) {
         baro.get_up();

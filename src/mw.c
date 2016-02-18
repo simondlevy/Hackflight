@@ -39,10 +39,6 @@ extern  rcReadRawDataPtr rcReadRawFunc;
 uint8_t useSmallAngle;
 uint8_t armed;
 
-int16_t debug[4];
-uint32_t currentTime = 0;
-uint32_t previousTime = 0;
-uint16_t cycleTime = 0;         
 // this is the number in micro second to achieve a full loop, it can differ a little and is taken into 
 // account in the PID loop
 
@@ -57,6 +53,8 @@ static uint8_t accCalibrated;
 static uint16_t rcData[RC_CHANS];       // interval [1000;2000]
 static sensor_t gyro;
 static void pidMultiWii(void);
+static uint32_t previousTime;
+static uint32_t currentTime;
 
 pidControllerFuncPtr pid_controller = pidMultiWii; // which pid controller are we using, defaultMultiWii
 rcReadRawDataPtr rcReadRawFunc = NULL;  // receive data from default (pwm/ppm) or additional 
@@ -111,7 +109,7 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
     }
 }
 
-void annexCode(int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor, uint32_t baroPressureSum)
+void annexCode(void)
 {
     static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
@@ -185,13 +183,11 @@ void annexCode(int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading,
             accCalibrated = 0; // the multi uses ACC and is not calibrated or is too much inclinated
             LED0_TOGGLE;
             update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC);
-            //calibratedAccTime = currentTime + CONFIG_CALIBRATE_ACCTIME_USEC;
         } else {
             accCalibrated = 1;
         }
     }
 
-    mspCom(rcData, SonarAlt, EstAlt, vario, heading, motor, baroPressureSum);
 }
 
 uint16_t pwmReadRawRC(uint8_t chan)
@@ -513,11 +509,14 @@ void loop(void)
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
-        cycleTime = (int32_t)(currentTime - previousTime);
+        uint16_t cycleTime = (int32_t)(currentTime - previousTime);
         previousTime = currentTime;
 
-        // non IMU critical, temeperatur, serialcom
-        annexCode(SonarAlt, EstAlt, vario, heading, motor, baroPressureSum);
+        // non IMU critical, temeperature
+        annexCode();
+
+        // update MSP
+        mspCom(rcData, SonarAlt, EstAlt, vario, heading, motor, baroPressureSum, cycleTime);
 
         if (alt_hold_mode) {
             static uint8_t isAltHoldChanged = 0;
