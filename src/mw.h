@@ -36,21 +36,19 @@ extern int16_t angle[2];
 extern int16_t axisPID[3];
 extern int16_t rcCommand[4];
 extern int16_t debug[4];
-extern int16_t gyroADC[3], accADC[3], accSmooth[3], magADC[3];
-extern int32_t accSum[3];
 extern uint16_t acc_1G;
-extern uint32_t accTimeSum;
-extern int      accSumCount;
 extern uint32_t currentTime;
 extern uint32_t previousTime;
 extern uint16_t cycleTime;
 extern uint16_t calibratingA;
 extern uint16_t calibratingG;
-extern int32_t baroPressure;
-extern int32_t baroPressure2;
-extern int32_t baroTemperature;
-extern uint32_t baroPressureSum;
 
+// State
+extern int16_t  gyroADC[3];
+extern int16_t  accADC[3];
+extern int16_t  magADC[3];
+extern int16_t  accSmooth[3];
+extern uint32_t baroPressureSum;
 
 // State
 void imuInit(void);

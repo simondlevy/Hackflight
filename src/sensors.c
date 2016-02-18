@@ -205,6 +205,8 @@ void Baro_update(void)
 {
     static uint32_t baroDeadline = 0;
     static int state = 0;
+    static int32_t  baroPressure;
+    static int32_t  baroTemperature;
 
     if ((int32_t)(currentTime - baroDeadline) < 0)
         return;

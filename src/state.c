@@ -10,21 +10,11 @@
 #include "sensors.h"
 #include "utils.h"
 
-int16_t  gyroADC[3], accADC[3], accSmooth[3], magADC[3];
-int32_t  accSum[3];
-uint32_t accTimeSum = 0;        // keep track for integration of acc
-int      accSumCount = 0;
-int16_t  smallAngle = 0;
-int32_t  baroPressure = 0;
-int32_t  baroPressure2 = 0;
-int32_t  baroTemperature = 0;
+int16_t  gyroADC[3];
+int16_t  accADC[3];
+int16_t  magADC[3];
+int16_t  accSmooth[3];
 uint32_t baroPressureSum = 0;
-int32_t  baroAlt_offset = 0;
-float    sonarTransition = 0;
-float    magneticDeclination = 0.0f;       // calculated at startup from config
-float    accVelScale;
-float    throttleAngleScale;
-float    fc_acc;
 
 // **************
 // gyro+acc IMU
@@ -33,6 +23,16 @@ int16_t gyroData[3] = { 0, 0, 0 };
 int16_t gyroZero[3] = { 0, 0, 0 };
 int16_t angle[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
 float anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
+
+static float    accVelScale;
+static float    fc_acc;
+static float    throttleAngleScale;
+static int16_t  smallAngle;
+static uint32_t accTimeSum;
+static int32_t  accSumCount;
+static int32_t  accSum[3];
+
+static const float magneticDeclination = 0.0f;       
 
 // **************************************************
 // Simplified IMU based on "Complementary Filter"
@@ -210,10 +210,10 @@ void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt
     static int32_t  FusedBaroSonarAlt;
     static int32_t lastFusedBaroSonarAlt;
     static int32_t baroAltBaseline;
-    static int32_t baroPressureBaseline;
     static float   accelAlt;
     static bool wasArmed;
     static int32_t  BaroAlt;
+    static int32_t  baroAlt_offset;
 
     uint32_t currentT = micros();
     int16_t tiltAngle = max(abs(angle[ROLL]), abs(angle[PITCH]));
@@ -232,12 +232,10 @@ void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt
     if (armed) {
         if (!wasArmed) {
             baroAltBaseline = baroAltRaw;
-            baroPressureBaseline = baroPressureSum;
             accelVel = 0;
             accelAlt = 0;
         }
         BaroAlt = baroAltRaw - baroAltBaseline;
-        baroPressure2 = baroPressureSum - baroPressureBaseline;
     }
     else {
         BaroAlt = 0;
@@ -254,7 +252,7 @@ void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt
     } else {
         BaroAlt = BaroAlt - baroAlt_offset;
         if (*SonarAlt > 0) {
-            sonarTransition = (300 - *SonarAlt) / 100.0f;
+            float sonarTransition = (300 - *SonarAlt) / 100.0f;
             FusedBaroSonarAlt = cfilter(*SonarAlt, BaroAlt, sonarTransition); 
         }
     }
