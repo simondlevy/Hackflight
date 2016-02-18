@@ -45,14 +45,14 @@ extern int16_t  gyroADC[3];
 extern int16_t  accADC[3];
 extern int16_t  magADC[3];
 extern int16_t  accSmooth[3];
-extern uint32_t baroPressureSum;
 
 // State
 void imuInit(void);
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
 void getEstimatedAttitude(int16_t * heading, sensor_t * gyro, int16_t * throttleAngleCorrection);
 void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt, int32_t * AltHold, 
-        int32_t *setVelocity, int32_t * errorVelocityI, int32_t * vario, bool velocityControl);
+        int32_t *setVelocity, int32_t * errorVelocityI, int32_t * vario, bool velocityControl, 
+        uint32_t baroPressureSum);
 
 // Output
 void mixerInit(void);
@@ -62,7 +62,8 @@ void mixTable(uint16_t * rcData, int16_t * motor);
 
 // MSP
 void mspInit();
-void mspCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor);
+void mspCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor,
+        uint32_t baroPressureSum);
 
 // MSP
 //void mspInit(rcReadRawDataPtr *callback);

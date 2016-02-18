@@ -167,7 +167,7 @@ void mspInit(void)
 }
 
 static void evaluateCommand(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading,
-        int16_t * motor)
+        int16_t * motor, uint32_t baroPressureSum)
 {
     uint32_t i;
     const char *build = __DATE__;
@@ -268,7 +268,8 @@ static void evaluateCommand(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt,
     tailSerialReply();
 }
 
-void mspCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor)
+void mspCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor,
+        uint32_t baroPressureSum)
 {
     uint8_t c;
 
@@ -312,7 +313,7 @@ void mspCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, 
         } else if (portState.c_state == HEADER_CMD && 
                 portState.offset >= portState.dataSize) {
             if (portState.checksum == c) {        // compare calculated and transferred checksum
-                evaluateCommand(rcData, SonarAlt, EstAlt, vario, heading, motor);
+                evaluateCommand(rcData, SonarAlt, EstAlt, vario, heading, motor, baroPressureSum);
             }
             portState.c_state = IDLE;
         }

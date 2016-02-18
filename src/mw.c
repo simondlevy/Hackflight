@@ -111,7 +111,7 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
     }
 }
 
-void annexCode(int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor)
+void annexCode(int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor, uint32_t baroPressureSum)
 {
     static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
@@ -191,7 +191,7 @@ void annexCode(int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading,
         }
     }
 
-    mspCom(rcData, SonarAlt, EstAlt, vario, heading, motor);
+    mspCom(rcData, SonarAlt, EstAlt, vario, heading, motor, baroPressureSum);
 }
 
 uint16_t pwmReadRawRC(uint8_t chan)
@@ -386,6 +386,7 @@ void loop(void)
     static int16_t heading;
     static int16_t motor[4];
     static int16_t throttleAngleCorrection;
+    static uint32_t baroPressureSum;
 
     uint16_t auxState = 0;
     bool isThrottleLow = false;
@@ -483,14 +484,14 @@ void loop(void)
             case 1:
                 taskOrder++;
                 if (baro_available) {
-                    Baro_update();
+                    Baro_update(&baroPressureSum);
                     break;
                 }
             case 2:
                 taskOrder++;
                 if (baro_available && sonar_available) {
                     getEstimatedAltitude(&SonarAlt, &AltPID, &EstAlt, &AltHold, &setVelocity, &errorVelocityI,
-                            &vario, velocityControl);
+                            &vario, velocityControl, baroPressureSum);
                     break;
                 }
             case 3:
@@ -516,7 +517,7 @@ void loop(void)
         previousTime = currentTime;
 
         // non IMU critical, temeperatur, serialcom
-        annexCode(SonarAlt, EstAlt, vario, heading, motor);
+        annexCode(SonarAlt, EstAlt, vario, heading, motor, baroPressureSum);
 
         if (alt_hold_mode) {
             static uint8_t isAltHoldChanged = 0;

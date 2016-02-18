@@ -14,7 +14,6 @@ int16_t  gyroADC[3];
 int16_t  accADC[3];
 int16_t  magADC[3];
 int16_t  accSmooth[3];
-uint32_t baroPressureSum = 0;
 
 // **************
 // gyro+acc IMU
@@ -202,7 +201,8 @@ static float cfilter(float a, float b, float c)
 // ==================================================================================================
 
 void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt, int32_t * AltHold, 
-        int32_t *setVelocity, int32_t * errorVelocityI, int32_t * vario, bool velocityControl) 
+        int32_t *setVelocity, int32_t * errorVelocityI, int32_t * vario, bool velocityControl, 
+        uint32_t baroPressureSum) 
 {
     static uint32_t previousT;
     static float accZ_old;

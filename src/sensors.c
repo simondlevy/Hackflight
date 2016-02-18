@@ -201,7 +201,7 @@ void Gyro_getADC(sensor_t * gyro)
         gyroADC[axis] -= gyroZero[axis];
 }
 
-void Baro_update(void)
+void Baro_update(uint32_t * baroPressureSum)
 {
     static uint32_t baroDeadline = 0;
     static int state = 0;
@@ -228,8 +228,8 @@ void Baro_update(void)
         if (indexplus1 == CONFIG_BARO_TAB_SIZE)
             indexplus1 = 0;
         baroHistTab[baroHistIdx] = baroPressure;
-        baroPressureSum += baroHistTab[baroHistIdx];
-        baroPressureSum -= baroHistTab[indexplus1];
+        *baroPressureSum += baroHistTab[baroHistIdx];
+        *baroPressureSum -= baroHistTab[indexplus1];
         baroHistIdx = indexplus1;
         state = 1;
         baroDeadline += baro.up_delay;
