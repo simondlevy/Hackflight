@@ -174,7 +174,7 @@ void serialInit(uint32_t baudrate)
     numTelemetryPorts++;
 }
 
-static void evaluateCommand(void)
+static void evaluateCommand(uint16_t * rcData)
 {
     uint32_t i;
     const char *build = __DATE__;
@@ -276,7 +276,7 @@ static void evaluateCommand(void)
 }
 
 
-void serialCom(void)
+void serialCom(uint16_t * rcData)
 {
     uint8_t c;
 
@@ -322,7 +322,7 @@ void serialCom(void)
         } else if (currentPortState->c_state == HEADER_CMD && 
                 currentPortState->offset >= currentPortState->dataSize) {
             if (currentPortState->checksum == c) {        // compare calculated and transferred checksum
-                evaluateCommand();      // we got a valid packet, evaluate it
+                evaluateCommand(rcData);      // we got a valid packet, evaluate it
             }
             currentPortState->c_state = IDLE;
         }

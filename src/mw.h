@@ -5,7 +5,6 @@
 
 #pragma once
 
-#define RC_CHANS    (18)
 
 /*********** RC alias *****************/
 
@@ -46,12 +45,6 @@ extern serialPort_t * telemport;
 extern uint8_t useSmallAngle;
 extern uint8_t armed;
 
-//extern bool px4flow_available;
-//extern px4flow_frame_t px4flow_frame;
-
-extern bool lidarlite_available;
-extern uint16_t lidarlite_distance;
-
 extern int32_t SonarAlt;
 
 extern int32_t AccelAlt;
@@ -91,7 +84,6 @@ extern int16_t throttleAngleCorrection;
 extern int16_t headFreeModeHold;
 extern int16_t heading, magHold;
 extern int16_t motor[4];
-extern int16_t rcData[RC_CHANS];
 extern int16_t telemTemperature1;      // gyro sensor temperature
 
 #define PITCH_LOOKUP_LENGTH 7
@@ -113,11 +105,11 @@ void mixerInit(void);
 void mixerResetMotors(void);
 void writeMotors(void);
 void writeAllMotors(int16_t mc);
-void mixTable(void);
+void mixTable(uint16_t * rcData);
 
 // Serial
 void serialInit(uint32_t baudrate);
-void serialCom(void);
+void serialCom(uint16_t * rcData);
 
 // MSP
 //void mspInit(rcReadRawDataPtr *callback);

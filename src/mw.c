@@ -9,6 +9,8 @@
 
 #define I2C_DEVICE (I2CDEV_2)
 
+#define RC_CHANS    (18)
+
 #include "mockduino/mockduino.h"
 
 #include "axes.h"
@@ -34,13 +36,13 @@ int32_t mAhdrawn;              // milliampere hours drawn from the battery since
 int16_t telemTemperature1;      // gyro sensor temperature
 
 int16_t failsafeEvents = 0;
-int16_t rcData[RC_CHANS];       // interval [1000;2000]
 int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
 int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
 int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 rcReadRawDataPtr rcReadRawFunc = NULL;  // receive data from default (pwm/ppm) or additional 
 
 static uint8_t accCalibrated;
+static uint16_t rcData[RC_CHANS];       // interval [1000;2000]
 
 static void pidMultiWii(void);
 pidControllerFuncPtr pid_controller = pidMultiWii; // which pid controller are we using, defaultMultiWii
@@ -175,7 +177,7 @@ void annexCode(void)
         }
     }
 
-    serialCom();
+    serialCom(rcData);
 
     // Read out gyro temperature. can use it for something somewhere. maybe get MCU temperature instead? 
     // lots of fun possibilities.
@@ -537,7 +539,7 @@ void loop(void)
         }
 
         pid_controller();
-        mixTable();
+        mixTable(rcData);
         writeMotors();
     }
 }
