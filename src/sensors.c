@@ -28,12 +28,9 @@ sensor_t gyro;                      // gyro access functions
 sensor_t mag;                       // mag access functions
 baro_t baro;                        // barometer access functions
 
-bool baro_available;
-bool sonar_available;
-
 static int16_t accZero[3];
 
-void initSensors(void)
+void initSensors(bool * baro_available, bool * sonar_available)
 {
     acc_1G = mpuInit(&acc, &gyro, CONFIG_GYRO_LPF);
 
@@ -41,9 +38,9 @@ void initSensors(void)
 
     gyro.init(CONFIG_GYRO_ALIGN);
 
-    baro_available = initBaro(&baro);
+    *baro_available = initBaro(&baro);
 
-    sonar_available = initSonar();
+    *sonar_available = initSonar();
 }
 
 void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)

@@ -52,7 +52,6 @@ extern uint8_t armed;
 extern bool lidarlite_available;
 extern uint16_t lidarlite_distance;
 
-extern bool sonar_available;
 extern int32_t SonarAlt;
 
 extern int32_t AccelAlt;
@@ -74,7 +73,6 @@ extern uint16_t cycleTime;
 extern uint16_t calibratingA;
 extern uint16_t calibratingG;
 
-extern bool baro_available;
 extern int32_t baroPressure;
 extern int32_t baroPressure2;
 extern int32_t baroTemperature;

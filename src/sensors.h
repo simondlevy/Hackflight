@@ -4,8 +4,8 @@
 
 #include "baro.h"
 
+void initSensors(bool * baro_available, bool * sonar_available);
 
-void initSensors(void);
 void ACC_getADC(void);
 void Gyro_getADC(void);
 bool initBaro(baro_t * baro);

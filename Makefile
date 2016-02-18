@@ -61,9 +61,9 @@ COMMON_SRC = mockduino/main.c \
 
 # Source files for the NAZE target
 NAZE_SRC = mockduino/drv_adc.c \
-		   board/drv_mpu6050.c \
-		   board/drv_ms5611.c \
-		   board/board.c \
+		   onboard/drv_mpu6050.c \
+		   onboard/drv_ms5611.c \
+		   board.c \
 		   mockduino/drv_pwm.c \
 		   mockduino/drv_spi.c \
 		   mockduino/drv_timer.c \

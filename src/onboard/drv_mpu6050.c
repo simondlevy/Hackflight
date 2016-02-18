@@ -3,21 +3,16 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include <stdint.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <math.h>
-
-#define I2C_DEVICE (I2CDEV_2)
 
 #include "stm32f10x_conf.h"
 
 #include "../mockduino/drv_system.h"         // timers, delays, etc
 #include "../mockduino/drv_gpio.h"
-#include "../axes.h"
-
-#include "../mockduino/drv_adc.h"
 #include "../mockduino/drv_i2c.h"
+
+#include "../axes.h"
 
 /* Generic driver for invensense gyro/acc devices.
  *

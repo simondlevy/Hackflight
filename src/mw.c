@@ -57,6 +57,10 @@ uint16_t batteryCriticalVoltage;    // annoying buzzer after this one, battery i
 // Time of automatic disarm when "Don't spin the motors when armed" is enabled.
 static uint32_t disarmTime = 0;
 
+static bool baro_available;
+static bool sonar_available;
+
+
 static bool check_timed_task(uint32_t usec) {
 
     return (int32_t)(currentTime - usec) >= 0;
@@ -322,7 +326,7 @@ void setup(void)
     extern void initBoardSpecific(void);
     initBoardSpecific();
 
-    initSensors();
+    initSensors(&baro_available, &sonar_available);
 
     LED1_ON;
     LED0_OFF;
