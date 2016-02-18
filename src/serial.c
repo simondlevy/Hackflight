@@ -9,11 +9,11 @@
 
 #include "stm32f10x_conf.h"
 
-#include "fakeduino/drv_serial.h"
-#include "fakeduino/drv_gpio.h"
-#include "fakeduino/drv_uart.h"
-#include "fakeduino/drv_system.h"
-#include "fakeduino/drv_i2c.h"
+#include "mockduino/drv_serial.h"
+#include "mockduino/drv_gpio.h"
+#include "mockduino/drv_uart.h"
+#include "mockduino/drv_system.h"
+#include "mockduino/drv_i2c.h"
 
 #include "axes.h"
 #include "mw.h"

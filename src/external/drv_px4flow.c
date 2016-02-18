@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "../fakeduino/drv_i2c.h"
+#include "../mockduino/drv_i2c.h"
 
 #include "drv_px4flow.h"
 

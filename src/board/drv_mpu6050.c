@@ -13,12 +13,12 @@
 #include "revision.h"
 #include "stm32f10x_conf.h"
 
-#include "../fakeduino/drv_system.h"         // timers, delays, etc
-#include "../fakeduino/drv_gpio.h"
+#include "../mockduino/drv_system.h"         // timers, delays, etc
+#include "../mockduino/drv_gpio.h"
 #include "../axes.h"
 
-#include "../fakeduino/drv_adc.h"
-#include "../fakeduino/drv_i2c.h"
+#include "../mockduino/drv_adc.h"
+#include "../mockduino/drv_i2c.h"
 
 #include "utils.h"
 
@@ -102,8 +102,6 @@ static uint8_t mpuLowPassFilter = INV_FILTER_42HZ;
 // Returns acc_1G
 uint16_t mpuInit(sensor_t *acc, sensor_t *gyro, uint8_t lpf)
 {
-    gpio_config_t gpio;
-
     // Set acc_1G. Modified once by mpu6050CheckRevision for old (hopefully nonexistent outside of clones) parts
     uint16_t acc_1G = 512 * 8;
 
@@ -128,14 +126,6 @@ uint16_t mpuInit(sensor_t *acc, sensor_t *gyro, uint8_t lpf)
         mpuLowPassFilter = INV_FILTER_10HZ;
     else
         mpuLowPassFilter = INV_FILTER_5HZ;
-
-    // MPU_INT output on rev5+ hardware (PC13)
-    if (hw_revision >= NAZE32_REV5) {
-        gpio.pin = GYRO_INT_PIN;
-        gpio.speed = Speed_2MHz;
-        gpio.mode = Mode_IN_FLOATING;
-        gpioInit(GYRO_INT_GPIO, &gpio);
-    }
 
     // initialize the device
     mpu6050Init(acc, gyro);

@@ -3,7 +3,7 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include "fakeduino.h"
+#include "mockduino.h"
 
 extern serialPort_t * telemport;
 

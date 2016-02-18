@@ -9,9 +9,7 @@
 
 #define I2C_DEVICE (I2CDEV_2)
 
-#include "fakeduino/fakeduino.h"
-
-#include "board/revision.h"
+#include "mockduino/mockduino.h"
 
 #include "axes.h"
 #include "sensors.h"
@@ -19,7 +17,6 @@
 #include "config.h"
 #include "utils.h"
 
-int     hw_revision = 0;
 extern  rcReadRawDataPtr rcReadRawFunc;
 uint8_t useSmallAngle;
 uint8_t armed;
@@ -294,17 +291,14 @@ static void pidMultiWii(void)
 
 void setup(void)
 {
+    //extern bool useSPI();
+    //extern bool haveADC5();
+
     uint8_t i;
 
     serialInit(CONFIG_SERIAL_BAUDRATE);
 
     armed = 0;
-
-    // determine hardware revision based on clock frequency
-    if (hse_value == 8000000)
-        hw_revision = NAZE32;
-    else if (hse_value == 12000000)
-        hw_revision = NAZE32_REV5;
 
     // sleep for 100ms
     delay(100);
@@ -325,13 +319,8 @@ void setup(void)
             lookupThrottleRC[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
     }
 
-    if (spiInit() == SPI_DEVICE_MPU && hw_revision == NAZE32_REV5)
-        hw_revision = NAZE32_SP;
-
-    if (hw_revision != NAZE32_SP)
-        i2cInit(I2C_DEVICE);
-
-    adcInit(hw_revision >= NAZE32_REV5);
+    extern void initBoardSpecific(void);
+    initBoardSpecific();
 
     initSensors();
 
@@ -367,8 +356,6 @@ void setup(void)
 
 void loop(void)
 {
-    printf("REV5: %d\n", hw_revision >= NAZE32_REV5);
-
     static uint8_t rcDelayCommand;      // this indicates the number of time (multiple of RC measurement at 50Hz) 
     // the sticks must be maintained to run or switch off motors
     static uint8_t rcSticks;            // this hold sticks position for command combos

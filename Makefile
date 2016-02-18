@@ -39,7 +39,7 @@ OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
 # Source files common to all targets
-COMMON_SRC = fakeduino/main.c \
+COMMON_SRC = mockduino/main.c \
 		   mixer.c \
 		   mw.c \
 		   sensors.c \
@@ -47,12 +47,12 @@ COMMON_SRC = fakeduino/main.c \
 		   state.c \
 		   utils.c \
 		   startup_stm32f10x_md_gcc.S \
-		   fakeduino/drv_gpio.c \
-		   fakeduino/drv_i2c.c \
-		   fakeduino/drv_system.c \
-		   fakeduino/drv_serial.c \
-		   fakeduino/drv_uart.c \
-		   fakeduino/printf.c \
+		   mockduino/drv_gpio.c \
+		   mockduino/drv_i2c.c \
+		   mockduino/drv_system.c \
+		   mockduino/drv_serial.c \
+		   mockduino/drv_uart.c \
+		   mockduino/printf.c \
 		   $(CMSIS_SRC) \
 		   $(STDPERIPH_SRC)
 
@@ -60,12 +60,13 @@ COMMON_SRC = fakeduino/main.c \
 #HIGHEND_SRC	 = telemetry_common.c
 
 # Source files for the NAZE target
-NAZE_SRC = fakeduino/drv_adc.c \
+NAZE_SRC = mockduino/drv_adc.c \
 		   board/drv_mpu6050.c \
 		   board/drv_ms5611.c \
-		   fakeduino/drv_pwm.c \
-		   fakeduino/drv_spi.c \
-		   fakeduino/drv_timer.c \
+		   board/board.c \
+		   mockduino/drv_pwm.c \
+		   mockduino/drv_spi.c \
+		   mockduino/drv_timer.c \
 		   external/drv_px4flow.c \
 		   external/drv_lidarlite.c \
 		   external/drv_mb1242.c \
