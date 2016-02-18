@@ -201,28 +201,13 @@ void Gyro_getADC(sensor_t * gyro)
         gyroADC[axis] -= gyroZero[axis];
 }
 
-static void Baro_Common(void)
-{
-    static int32_t baroHistTab[BARO_TAB_SIZE_MAX];
-    static int baroHistIdx;
-    int indexplus1;
-
-    indexplus1 = (baroHistIdx + 1);
-    if (indexplus1 == CONFIG_BARO_TAB_SIZE)
-        indexplus1 = 0;
-    baroHistTab[baroHistIdx] = baroPressure;
-    baroPressureSum += baroHistTab[baroHistIdx];
-    baroPressureSum -= baroHistTab[indexplus1];
-    baroHistIdx = indexplus1;
-}
-
-int Baro_update(void)
+void Baro_update(void)
 {
     static uint32_t baroDeadline = 0;
     static int state = 0;
 
     if ((int32_t)(currentTime - baroDeadline) < 0)
-        return 0;
+        return;
 
     baroDeadline = currentTime;
 
@@ -232,14 +217,20 @@ int Baro_update(void)
         baroDeadline += baro.ut_delay;
         baro.calculate(&baroPressure, &baroTemperature);
         state = 0;
-        return 2;
     } else {
         baro.get_ut();
         baro.start_up();
-        Baro_Common();
+        static int32_t baroHistTab[BARO_TAB_SIZE_MAX];
+        static int baroHistIdx;
+        int indexplus1 = (baroHistIdx + 1);
+        if (indexplus1 == CONFIG_BARO_TAB_SIZE)
+            indexplus1 = 0;
+        baroHistTab[baroHistIdx] = baroPressure;
+        baroPressureSum += baroHistTab[baroHistIdx];
+        baroPressureSum -= baroHistTab[indexplus1];
+        baroHistIdx = indexplus1;
         state = 1;
         baroDeadline += baro.up_delay;
-        return 1;
     }
 }
 

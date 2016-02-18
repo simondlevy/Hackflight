@@ -28,10 +28,8 @@ typedef struct motorMixer_t {
 } motorMixer_t;
 
 extern serialPort_t * telemport;
-
 extern uint8_t useSmallAngle;
 extern uint8_t armed;
-
 extern int16_t gyroZero[3];
 extern int16_t gyroData[3];
 extern int16_t angle[2];
@@ -48,7 +46,6 @@ extern uint32_t previousTime;
 extern uint16_t cycleTime;
 extern uint16_t calibratingA;
 extern uint16_t calibratingG;
-
 extern int32_t baroPressure;
 extern int32_t baroPressure2;
 extern int32_t baroTemperature;
