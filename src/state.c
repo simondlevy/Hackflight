@@ -21,7 +21,6 @@ int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
 int32_t  baroAlt_offset = 0;
 float    sonarTransition = 0;
-int32_t  AltHold;
 int32_t  setVelocity = 0;
 uint8_t  velocityControl = 0;
 int32_t  errorVelocityI = 0;
@@ -306,7 +305,7 @@ static float cfilter(float a, float b, float c)
     return a * c + b * (1 - c);
 }
 
-void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt) 
+void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt, int32_t * AltHold) 
 {
     static uint32_t previousT;
     static float accZ_old;
@@ -399,7 +398,7 @@ void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt
 
         // Altitude P-Controller
         if (!velocityControl) {
-            int32_t error = constrain(AltHold - *EstAlt, -500, 500);
+            int32_t error = constrain(*AltHold - *EstAlt, -500, 500);
             error = applyDeadband(error, 10);       // remove small P parametr to reduce noise near zero position
             setVel = constrain((CONFIG_ALT_P * error / 128), -300, +300); // limit velocity to +/- 3 m/s
         } 
