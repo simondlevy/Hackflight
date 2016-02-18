@@ -388,6 +388,7 @@ void loop(void)
     static int32_t vario;
     static int16_t heading;
     static int16_t motor[4];
+    static int16_t throttleAngleCorrection;
 
     uint16_t auxState = 0;
     bool isThrottleLow = false;
@@ -510,7 +511,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        computeIMU(&heading, &gyro);
+        getEstimatedAttitude(&heading, &gyro, &throttleAngleCorrection);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();

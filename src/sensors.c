@@ -21,7 +21,6 @@
 uint16_t calibratingA = 0;      
 uint16_t calibratingG = 0;
 uint16_t acc_1G = 256;          // this is the 1G measured acceleration.
-int16_t magHold;
 
 sensor_t acc;                       // acc access functions
 sensor_t mag;                       // mag access functions

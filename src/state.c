@@ -21,7 +21,6 @@ int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
 int32_t  baroAlt_offset = 0;
 float    sonarTransition = 0;
-int16_t  throttleAngleCorrection = 0;    // correction of throttle in lateral wind,
 float    magneticDeclination = 0.0f;       // calculated at startup from config
 float    accVelScale;
 float    throttleAngleScale;
@@ -189,76 +188,6 @@ static int16_t calculateHeading(t_fp_vector *vec)
     return head;
 }
 
-static void getEstimatedAttitude(int16_t * heading, sensor_t * gyro)
-{
-    int32_t axis;
-    int32_t accMag = 0;
-    static t_fp_vector EstN;
-    EstN.A[0] = 1.0f;
-    EstN.A[1] = 0.0f;
-    EstN.A[2] = 0.0f;
-    static float accLPF[3];
-    static uint32_t previousT;
-    uint32_t currentT = micros();
-    uint32_t deltaT;
-    float scale, deltaGyroAngle[3];
-    deltaT = currentT - previousT;
-    scale = deltaT * gyro->scale;
-    previousT = currentT;
-
-    // Initialization
-    for (axis = 0; axis < 3; axis++) {
-        deltaGyroAngle[axis] = gyroADC[axis] * scale;
-        if (CONFIG_ACC_LPF_FACTOR > 0) {
-            accLPF[axis] = accLPF[axis] * (1.0f - (1.0f / CONFIG_ACC_LPF_FACTOR)) + accADC[axis] * 
-                (1.0f / CONFIG_ACC_LPF_FACTOR);
-            accSmooth[axis] = accLPF[axis];
-        } else {
-            accSmooth[axis] = accADC[axis];
-        }
-        accMag += (int32_t)accSmooth[axis] * accSmooth[axis];
-    }
-    accMag = accMag * 100 / ((int32_t)acc_1G * acc_1G);
-
-    rotateV(&EstG.V, deltaGyroAngle);
-
-    // Apply complementary filter (Gyro drift correction)
-    // If accel magnitude >1.15G or <0.85G and ACC vector outside of the limit range => we neutralize the effect of 
-    // accelerometers in the angle estimation.  To do that, we just skip filter, as EstV already rotated by Gyro.
-    if (72 < (uint16_t)accMag && (uint16_t)accMag < 133) {
-        for (axis = 0; axis < 3; axis++)
-            EstG.A[axis] = (EstG.A[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + accSmooth[axis]) * INV_GYR_CMPF_FACTOR;
-    }
-
-    useSmallAngle = (EstG.A[Z] > smallAngle);
-
-    // Attitude of the estimated vector
-    anglerad[ROLL] = atan2f(EstG.V.Y, EstG.V.Z);
-    anglerad[PITCH] = atan2f(-EstG.V.X, sqrtf(EstG.V.Y * EstG.V.Y + EstG.V.Z * EstG.V.Z));
-    angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
-    angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
-
-    rotateV(&EstN.V, deltaGyroAngle);
-    normalizeV(&EstN.V, &EstN.V);
-    *heading = calculateHeading(&EstN);
-
-    acc_calc(deltaT, *heading); // rotate acc vector into earth frame
-
-    if (CONFIG_THROTTLE_CORRECTION_VALUE) {
-
-        float cosZ = EstG.V.Z / sqrtf(EstG.V.X * EstG.V.X + EstG.V.Y * EstG.V.Y + EstG.V.Z * EstG.V.Z);
-
-        if (cosZ <= 0.015f) { // we are inverted, vertical or with a small angle < 0.86 deg
-            throttleAngleCorrection = 0;
-        } else {
-            int deg = lrintf(acosf(cosZ) * throttleAngleScale);
-            if (deg > 900)
-                deg = 900;
-            throttleAngleCorrection = lrintf(CONFIG_THROTTLE_CORRECTION_VALUE * sinf(deg / (900.0f * M_PI / 2.0f)));
-        }
-    }
-}
-
 static bool sonarInRange(int32_t SonarAlt)
 {
     return SonarAlt > 20 && SonarAlt < 765;
@@ -404,11 +333,77 @@ void imuInit(void)
     fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 }
 
-void computeIMU(int16_t * heading, sensor_t * gyro)
+void getEstimatedAttitude(int16_t * heading, sensor_t * gyro, int16_t * throttleAngleCorrection)
 {
     Gyro_getADC(gyro);
     ACC_getADC();
-    getEstimatedAttitude(heading, gyro);
+
+    int32_t axis;
+    int32_t accMag = 0;
+    static t_fp_vector EstN;
+    EstN.A[0] = 1.0f;
+    EstN.A[1] = 0.0f;
+    EstN.A[2] = 0.0f;
+    static float accLPF[3];
+    static uint32_t previousT;
+    uint32_t currentT = micros();
+    uint32_t deltaT;
+    float scale, deltaGyroAngle[3];
+    deltaT = currentT - previousT;
+    scale = deltaT * gyro->scale;
+    previousT = currentT;
+
+    // Initialization
+    for (axis = 0; axis < 3; axis++) {
+        deltaGyroAngle[axis] = gyroADC[axis] * scale;
+        if (CONFIG_ACC_LPF_FACTOR > 0) {
+            accLPF[axis] = accLPF[axis] * (1.0f - (1.0f / CONFIG_ACC_LPF_FACTOR)) + accADC[axis] * 
+                (1.0f / CONFIG_ACC_LPF_FACTOR);
+            accSmooth[axis] = accLPF[axis];
+        } else {
+            accSmooth[axis] = accADC[axis];
+        }
+        accMag += (int32_t)accSmooth[axis] * accSmooth[axis];
+    }
+    accMag = accMag * 100 / ((int32_t)acc_1G * acc_1G);
+
+    rotateV(&EstG.V, deltaGyroAngle);
+
+    // Apply complementary filter (Gyro drift correction)
+    // If accel magnitude >1.15G or <0.85G and ACC vector outside of the limit range => we neutralize the effect of 
+    // accelerometers in the angle estimation.  To do that, we just skip filter, as EstV already rotated by Gyro.
+    if (72 < (uint16_t)accMag && (uint16_t)accMag < 133) {
+        for (axis = 0; axis < 3; axis++)
+            EstG.A[axis] = (EstG.A[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + accSmooth[axis]) * INV_GYR_CMPF_FACTOR;
+    }
+
+    useSmallAngle = (EstG.A[Z] > smallAngle);
+
+    // Attitude of the estimated vector
+    anglerad[ROLL] = atan2f(EstG.V.Y, EstG.V.Z);
+    anglerad[PITCH] = atan2f(-EstG.V.X, sqrtf(EstG.V.Y * EstG.V.Y + EstG.V.Z * EstG.V.Z));
+    angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
+    angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
+
+    rotateV(&EstN.V, deltaGyroAngle);
+    normalizeV(&EstN.V, &EstN.V);
+    *heading = calculateHeading(&EstN);
+
+    acc_calc(deltaT, *heading); // rotate acc vector into earth frame
+
+    if (CONFIG_THROTTLE_CORRECTION_VALUE) {
+
+        float cosZ = EstG.V.Z / sqrtf(EstG.V.X * EstG.V.X + EstG.V.Y * EstG.V.Y + EstG.V.Z * EstG.V.Z);
+
+        if (cosZ <= 0.015f) { // we are inverted, vertical or with a small angle < 0.86 deg
+            *throttleAngleCorrection = 0;
+        } else {
+            int deg = lrintf(acosf(cosZ) * throttleAngleScale);
+            if (deg > 900)
+                deg = 900;
+            *throttleAngleCorrection = lrintf(CONFIG_THROTTLE_CORRECTION_VALUE * sinf(deg / (900.0f * M_PI / 2.0f)));
+        }
+    }
 
     gyroData[YAW] = gyroADC[YAW];
     gyroData[ROLL] = gyroADC[ROLL];
