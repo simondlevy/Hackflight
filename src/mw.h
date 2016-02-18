@@ -65,11 +65,10 @@ extern int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for exp
 extern int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
 extern sensor_t acc;
-extern sensor_t gyro;
 
 // State
 void imuInit(void);
-void computeIMU(int16_t * heading);
+void computeIMU(int16_t * heading, sensor_t * gyro);
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
 void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt, int32_t * AltHold, 
         int32_t *setVelocity, int32_t * errorVelocityI, int32_t * vario, bool velocityControl);

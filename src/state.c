@@ -189,7 +189,7 @@ static int16_t calculateHeading(t_fp_vector *vec)
     return head;
 }
 
-static void getEstimatedAttitude(int16_t * heading)
+static void getEstimatedAttitude(int16_t * heading, sensor_t * gyro)
 {
     int32_t axis;
     int32_t accMag = 0;
@@ -203,7 +203,7 @@ static void getEstimatedAttitude(int16_t * heading)
     uint32_t deltaT;
     float scale, deltaGyroAngle[3];
     deltaT = currentT - previousT;
-    scale = deltaT * gyro.scale;
+    scale = deltaT * gyro->scale;
     previousT = currentT;
 
     // Initialization
@@ -404,11 +404,11 @@ void imuInit(void)
     fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 }
 
-void computeIMU(int16_t * heading)
+void computeIMU(int16_t * heading, sensor_t * gyro)
 {
-    Gyro_getADC();
+    Gyro_getADC(gyro);
     ACC_getADC();
-    getEstimatedAttitude(heading);
+    getEstimatedAttitude(heading, gyro);
 
     gyroData[YAW] = gyroADC[YAW];
     gyroData[ROLL] = gyroADC[ROLL];

@@ -4,10 +4,10 @@
 
 #include "baro.h"
 
-void initSensors(bool * baro_available, bool * sonar_available);
+void initSensors(sensor_t * gyro, bool * baro_available, bool * sonar_available);
 
 void ACC_getADC(void);
-void Gyro_getADC(void);
+void Gyro_getADC(sensor_t * gyro);
 bool initBaro(baro_t * baro);
 int Baro_update(void);
 bool initSonar();

@@ -56,6 +56,7 @@ rcReadRawDataPtr rcReadRawFunc = NULL;  // receive data from default (pwm/ppm) o
 
 static uint8_t accCalibrated;
 static uint16_t rcData[RC_CHANS];       // interval [1000;2000]
+static sensor_t gyro;
 
 static void pidMultiWii(void);
 pidControllerFuncPtr pid_controller = pidMultiWii; // which pid controller are we using, defaultMultiWii
@@ -336,7 +337,7 @@ void setup(void)
     extern void initBoardSpecific(void);
     initBoardSpecific();
 
-    initSensors(&baro_available, &sonar_available);
+    initSensors(&gyro, &baro_available, &sonar_available);
 
     LED1_ON;
     LED0_OFF;
@@ -508,7 +509,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        computeIMU(&heading);
+        computeIMU(&heading, &gyro);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();

@@ -24,19 +24,18 @@ uint16_t acc_1G = 256;          // this is the 1G measured acceleration.
 int16_t magHold;
 
 sensor_t acc;                       // acc access functions
-sensor_t gyro;                      // gyro access functions
 sensor_t mag;                       // mag access functions
 baro_t baro;                        // barometer access functions
 
 static int16_t accZero[3];
 
-void initSensors(bool * baro_available, bool * sonar_available)
+void initSensors(sensor_t * gyro, bool * baro_available, bool * sonar_available)
 {
-    acc_1G = mpuInit(&acc, &gyro, CONFIG_GYRO_LPF);
+    acc_1G = mpuInit(&acc, gyro, CONFIG_GYRO_LPF);
 
     acc.init(CONFIG_ACC_ALIGN);
 
-    gyro.init(CONFIG_GYRO_ALIGN);
+    gyro->init(CONFIG_GYRO_ALIGN);
 
     *baro_available = initBaro(&baro);
 
@@ -160,8 +159,11 @@ static float devStandardDeviation(stdev_t *dev)
     return sqrtf(devVariance(dev));
 }
 
-static void GYRO_Common(void)
+void Gyro_getADC(sensor_t * gyro)
 {
+    // range: +/- 8192; +/- 2000 deg/sec
+    gyro->read(gyroADC);
+
     int axis;
     static int32_t g[3];
     static stdev_t var[3];
@@ -198,13 +200,6 @@ static void GYRO_Common(void)
     }
     for (axis = 0; axis < 3; axis++)
         gyroADC[axis] -= gyroZero[axis];
-}
-
-void Gyro_getADC(void)
-{
-    // range: +/- 8192; +/- 2000 deg/sec
-    gyro.read(gyroADC);
-    GYRO_Common();
 }
 
 static void Baro_Common(void)
