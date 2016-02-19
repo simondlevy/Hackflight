@@ -20,7 +20,6 @@
 // then we enter in a normal mode.
 uint16_t calibratingA = 0;      
 uint16_t calibratingG = 0;
-uint16_t acc_1G = 256;          // this is the 1G measured acceleration.
 
 sensor_t acc;                       // acc access functions
 sensor_t mag;                       // mag access functions
@@ -28,9 +27,9 @@ baro_t baro;                        // barometer access functions
 
 static int16_t accZero[3];
 
-void initSensors(sensor_t * gyro, bool * baro_available, bool * sonar_available)
+void initSensors(uint16_t * acc_1G, sensor_t * gyro, bool * baro_available, bool * sonar_available)
 {
-    acc_1G = mpuInit(&acc, gyro, CONFIG_GYRO_LPF);
+    *acc_1G = mpuInit(&acc, gyro, CONFIG_GYRO_LPF);
 
     acc.init(CONFIG_ACC_ALIGN);
 
@@ -88,8 +87,10 @@ void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
             break;
     }
 }
-static void ACC_Common(void)
+
+void ACC_getADC(uint16_t acc_1G)
 {
+    acc.read(accADC);
     static int32_t a[3];
     int axis;
 
@@ -116,12 +117,6 @@ static void ACC_Common(void)
     accADC[ROLL] -= accZero[ROLL];
     accADC[PITCH] -= accZero[PITCH];
     accADC[YAW] -= accZero[YAW];
-}
-
-void ACC_getADC(void)
-{
-    acc.read(accADC);
-    ACC_Common();
 }
 
 typedef struct stdev_t {

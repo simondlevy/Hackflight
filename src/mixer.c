@@ -16,6 +16,14 @@
 #include "config.h"
 #include "utils.h"
 
+// Custom mixer data per motor
+typedef struct motorMixer_t {
+    float throttle;
+    float roll;
+    float pitch;
+    float yaw;
+} motorMixer_t;
+
 int16_t motor_disarmed[4];
 
 static motorMixer_t currentMixer[4];

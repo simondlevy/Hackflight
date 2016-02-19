@@ -68,6 +68,7 @@ uint16_t batteryCriticalVoltage;    // annoying buzzer after this one, battery i
 
 // Time of automatic disarm when "Don't spin the motors when armed" is enabled.
 static uint32_t disarmTime = 0;
+static uint16_t acc_1G;
 
 static bool baro_available;
 static bool sonar_available;
@@ -328,7 +329,7 @@ void setup(void)
     extern void initBoardSpecific(void);
     initBoardSpecific();
 
-    initSensors(&gyro, &baro_available, &sonar_available);
+    initSensors(&acc_1G, &gyro, &baro_available, &sonar_available);
 
     LED1_ON;
     LED0_OFF;
@@ -340,7 +341,7 @@ void setup(void)
     LED0_OFF;
     LED1_OFF;
 
-    imuInit(); 
+    imuInit(acc_1G); 
     mixerInit(); 
 
     pwmInit(CONFIG_FAILSAFE_DETECT_THRESHOLD, CONFIG_PWM_FILTER, CONFIG_USE_CPPM, CONFIG_MOTOR_PWM_RATE,
@@ -503,7 +504,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        useSmallAngle = getEstimatedAttitude(&heading, &gyro, &throttleAngleCorrection, armed);
+        useSmallAngle = getEstimatedAttitude(acc_1G, &heading, &gyro, &throttleAngleCorrection, armed);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
@@ -514,7 +515,7 @@ void loop(void)
         annexCode();
 
         // update MSP
-        mspCom(rcData, SonarAlt, EstAlt, vario, heading, motor, baroPressureSum, cycleTime, armed);
+        mspCom(rcData, SonarAlt, EstAlt, vario, heading, motor, baroPressureSum, cycleTime, armed, acc_1G);
 
         if (alt_hold_mode) {
             static uint8_t isAltHoldChanged = 0;

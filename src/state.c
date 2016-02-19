@@ -125,7 +125,7 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
 }
 
 // rotate acc into Earth frame and calculate acceleration in it
-static void acc_calc(uint32_t deltaT, int16_t heading, bool armed)
+static void acc_calc(uint16_t acc_1G, uint32_t deltaT, int16_t heading, bool armed)
 {
     static int32_t accZoffset = 0;
     static float accz_smooth = 0;
@@ -322,7 +322,7 @@ void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt
     accZ_old = accZ_tmp;
 }
 
-void imuInit(void)
+void imuInit(uint16_t acc_1G)
 {
     smallAngle = lrintf(acc_1G * cosf(RAD * CONFIG_SMALL_ANGLE));
     accVelScale = 9.80665f / acc_1G / 10000.0f;
@@ -331,10 +331,10 @@ void imuInit(void)
     fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 }
 
-bool getEstimatedAttitude(int16_t * heading, sensor_t * gyro, int16_t * throttleAngleCorrection, bool armed)
+bool getEstimatedAttitude(uint16_t acc_1G, int16_t * heading, sensor_t * gyro, int16_t * throttleAngleCorrection, bool armed)
 {
     Gyro_getADC(gyro);
-    ACC_getADC();
+    ACC_getADC(acc_1G);
 
     int32_t axis;
     int32_t accMag = 0;
@@ -387,7 +387,7 @@ bool getEstimatedAttitude(int16_t * heading, sensor_t * gyro, int16_t * throttle
     normalizeV(&EstN.V, &EstN.V);
     *heading = calculateHeading(&EstN);
 
-    acc_calc(deltaT, *heading, armed); // rotate acc vector into earth frame
+    acc_calc(acc_1G, deltaT, *heading, armed); // rotate acc vector into earth frame
 
     if (CONFIG_THROTTLE_CORRECTION_VALUE) {
 
