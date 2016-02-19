@@ -20,18 +20,6 @@ PROJECT_SRC = mw.c \
 		   external/drv_lidarlite.c \
 		   external/drv_mb1242.c 
 
-# Misc. helpers
-
-commit:
-	git commit -a --allow-empty-message -m ''
-	git push
-
-debug:
-	miniterm.py $(SERIAL_DEVICE) 115200
-
-listen:
-	miniterm.py $(SERIAL_DEVICE) 115200
-
 ###############################################################################
 
 # You probably shouldn't modify anything below here!
@@ -196,5 +184,15 @@ unbrick_$(TARGET): $(TARGET_HEX)
 	stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
 
 unbrick: unbrick_$(TARGET)
+
+commit:
+	git commit -a --allow-empty-message -m ''
+	git push
+
+debug:
+	miniterm.py $(SERIAL_DEVICE) 115200
+
+listen:
+	miniterm.py $(SERIAL_DEVICE) 115200
 
 
