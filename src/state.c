@@ -10,7 +10,6 @@
 #include "sensors.h"
 #include "utils.h"
 
-int16_t angle[2] = { 0, 0 }; // abs angle inclination in multiple of 0.1 deg:  180 deg = 1800
 int16_t gyroData[3] = { 0, 0, 0 };
 int16_t magADC[3];
 
@@ -194,9 +193,18 @@ static float cfilter(float a, float b, float c)
 
 // ==================================================================================================
 
-void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt, int32_t * AltHold, 
-        int32_t *setVelocity, int32_t * errorVelocityI, int32_t * vario, bool velocityControl, 
-        uint32_t baroPressureSum, bool armed) 
+void getEstimatedAltitude(
+        int16_t * angle, 
+        int32_t * SonarAlt, 
+        int32_t * AltPID, 
+        int32_t * EstAlt, 
+        int32_t * AltHold, 
+        int32_t *setVelocity, 
+        int32_t * errorVelocityI, 
+        int32_t * vario, 
+        bool velocityControl, 
+        uint32_t baroPressureSum, 
+        bool armed) 
 {
     static uint32_t previousT;
     static float accZ_old;
@@ -331,6 +339,7 @@ bool getEstimatedAttitude(
         sensor_t * acc, 
         sensor_t * gyro, 
         int16_t * accSmooth,
+        int16_t * angle,
         int16_t * heading, 
         int16_t * throttleAngleCorrection, 
         bool armed)

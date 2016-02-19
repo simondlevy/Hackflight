@@ -53,6 +53,7 @@ static uint32_t currentTime;
 static bool useSmallAngle;
 static bool armed;
 static int16_t axisPID[3];
+static int16_t angle[2];
 
 static sensor_t gyro;
 static sensor_t acc;                      
@@ -489,7 +490,7 @@ void loop(void)
             case 2:
                 taskOrder++;
                 if (baro_available && sonar_available) {
-                    getEstimatedAltitude(&SonarAlt, &AltPID, &EstAlt, &AltHold, &setVelocity, &errorVelocityI,
+                    getEstimatedAltitude(angle, &SonarAlt, &AltPID, &EstAlt, &AltHold, &setVelocity, &errorVelocityI,
                             &vario, velocityControl, baroPressureSum, armed);
                     break;
                 }
@@ -508,7 +509,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        useSmallAngle = getEstimatedAttitude(&acc, &gyro, accSmooth, &heading, &throttleAngleCorrection, armed);
+        useSmallAngle = getEstimatedAttitude(&acc, &gyro, accSmooth, angle, &heading, &throttleAngleCorrection, armed);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
@@ -519,7 +520,7 @@ void loop(void)
         annexCode();
 
         // update MSP
-        mspCom(rcData, accSmooth, SonarAlt, EstAlt, vario, heading, motor, baroPressureSum, cycleTime, armed, acc_1G);
+        mspCom(angle, rcData, accSmooth, SonarAlt, EstAlt, vario, heading, motor, baroPressureSum, cycleTime, armed, acc_1G);
 
         if (alt_hold_mode) {
             static uint8_t isAltHoldChanged = 0;
