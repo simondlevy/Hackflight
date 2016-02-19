@@ -3,19 +3,25 @@
 # <msmith@FreeBSD.ORG> wrote this file. As long as you retain this notice you
 # can do whatever you want with this stuff. If we meet some day, and you think
 # this stuff is worth it, you can buy me a beer in return
-###############################################################################
-#
-# Makefile for building the hackflight firmware.
-#
-# Invoke this with 'make help' to see the list of supported targets.
-# 
 
 ###############################################################################
-# Things that the user might override on the commandline
-#
 
-# The target to build, must be one of NAZE or CJMCU
-TARGET		?= NAZE
+# Fill this out with source files for your specific project
+PROJECT_SRC = mw.c \
+		   mixer.c \
+		   sensors.c \
+		   msp.c \
+		   state.c \
+		   utils.c \
+		   board.c \
+		   onboard/drv_mpu6050.c \
+		   onboard/drv_ms5611.c \
+		   external/drv_px4flow.c \
+		   external/drv_lidarlite.c \
+		   external/drv_mb1242.c 
+###############################################################################
+
+TARGET		?= MOCKDUINO
 
 # Compile-time options
 OPTIONS		?=
@@ -38,46 +44,22 @@ STDPERIPH_DIR	 = $(ROOT)/lib/STM32F10x_StdPeriph_Driver
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
-# Source files common to all targets
-COMMON_SRC = mockduino/main.c \
-		   mixer.c \
-		   mw.c \
-		   sensors.c \
-		   msp.c \
-		   state.c \
-		   utils.c \
-		   startup_stm32f10x_md_gcc.S \
+MOCKDUINO_SRC = mockduino/main.c \
+		   mockduino/startup_stm32f10x_md_gcc.S \
 		   mockduino/drv_gpio.c \
 		   mockduino/drv_i2c.c \
+		   mockduino/drv_adc.c \
+		   mockduino/drv_spi.c \
+		   mockduino/drv_pwm.c \
 		   mockduino/drv_system.c \
 		   mockduino/drv_serial.c \
 		   mockduino/drv_uart.c \
+		   mockduino/drv_timer.c \
 		   mockduino/printf.c \
+		   $(PROJECT_SRC) \
 		   $(CMSIS_SRC) \
 		   $(STDPERIPH_SRC)
 
-# Source files for full-featured systems
-#HIGHEND_SRC	 = telemetry_common.c
-
-# Source files for the NAZE target
-NAZE_SRC = mockduino/drv_adc.c \
-		   onboard/drv_mpu6050.c \
-		   onboard/drv_ms5611.c \
-		   board.c \
-		   mockduino/drv_pwm.c \
-		   mockduino/drv_spi.c \
-		   mockduino/drv_timer.c \
-		   external/drv_px4flow.c \
-		   external/drv_lidarlite.c \
-		   external/drv_mb1242.c \
-		   $(HIGHEND_SRC) \
-		   $(COMMON_SRC)
-
-# In some cases, %.s regarded as intermediate file, which is actually not.
-# This will prevent accidental deletion of startup code.
-.PRECIOUS: %.s
-
-# Search path for hackflight sources
 VPATH		:= $(SRC_DIR):$(SRC_DIR)/startups
 
 # Search path and source files for the CMSIS sources
@@ -133,8 +115,7 @@ ASFLAGS		 = $(ARCH_FLAGS) \
 		   -x assembler-with-cpp \
 		   $(addprefix -I,$(INCLUDE_DIRS))
 
-# XXX Map/crossref output?
-LD_SCRIPT	 = $(ROOT)/stm32_flash.ld
+LD_SCRIPT	 = $(ROOT)/src/mockduino/stm32_flash.ld
 LDFLAGS		 = -lm \
 		   -nostartfiles \
 		   --specs=nano.specs \
@@ -147,18 +128,14 @@ LDFLAGS		 = -lm \
 		   -Wl,-gc-sections,-Map,$(TARGET_MAP) \
 		   -T$(LD_SCRIPT)
 
-###############################################################################
-# No user-serviceable parts below
-###############################################################################
-
 #
 # Things we will build
 #
 
-TARGET_HEX	 = $(BIN_DIR)/hackflight_$(TARGET).hex
-TARGET_ELF	 = $(BIN_DIR)/hackflight_$(TARGET).elf
+TARGET_HEX	 = $(BIN_DIR)/$(TARGET).hex
+TARGET_ELF	 = $(BIN_DIR)/$(TARGET).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC))))
-TARGET_MAP   = $(OBJECT_DIR)/hackflight_$(TARGET).map
+TARGET_MAP   = $(OBJECT_DIR)/$(TARGET).map
 
 # List of buildable ELF files and their object dependencies.
 # It would be nice to compute these lists, but that seems to be just beyond make.
@@ -168,6 +145,7 @@ $(TARGET_HEX): $(TARGET_ELF)
 
 $(TARGET_ELF):  $(TARGET_OBJS)
 	$(CC) -o $@ $^ $(LDFLAGS)
+	echo $(ROOT)
 
 MKDIR_OBJDIR = @mkdir -p $(dir $@)
 
@@ -188,7 +166,7 @@ $(OBJECT_DIR)/$(TARGET)/%.o): %.S
 	@$(CC) -c -o $@ $(ASFLAGS) $< 
 
 clean:
-	rm -f $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
+	rm -rf $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP) obj
 
 flash_$(TARGET): $(TARGET_HEX)
 	stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
@@ -213,9 +191,3 @@ debug:
 
 listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
-
-sonar:
-	scripts/bluesonar.py
-
-count:
-	wc -l src/*.c src/*.h | sort -n
