@@ -19,7 +19,22 @@ PROJECT_SRC = mw.c \
 		   external/drv_px4flow.c \
 		   external/drv_lidarlite.c \
 		   external/drv_mb1242.c 
+
+# Misc. helpers
+
+commit:
+	git commit -a --allow-empty-message -m ''
+	git push
+
+debug:
+	miniterm.py $(SERIAL_DEVICE) 115200
+
+listen:
+	miniterm.py $(SERIAL_DEVICE) 115200
+
 ###############################################################################
+
+# You probably shouldn't modify anything below here!
 
 TARGET		?= MOCKDUINO
 
@@ -39,8 +54,8 @@ SERIAL_DEVICE	?= /dev/ttyUSB0
 # Working directories
 ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
 SRC_DIR		 = $(ROOT)/src
-CMSIS_DIR	 = $(ROOT)/lib/CMSIS
-STDPERIPH_DIR	 = $(ROOT)/lib/STM32F10x_StdPeriph_Driver
+CMSIS_DIR	 = $(ROOT)/src/mockduino/lib/CMSIS
+STDPERIPH_DIR	 = $(ROOT)/src/mockduino/lib/STM32F10x_StdPeriph_Driver
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
@@ -182,12 +197,4 @@ unbrick_$(TARGET): $(TARGET_HEX)
 
 unbrick: unbrick_$(TARGET)
 
-commit:
-	git commit -a --allow-empty-message -m ''
-	git push
 
-debug:
-	miniterm.py $(SERIAL_DEVICE) 115200
-
-listen:
-	miniterm.py $(SERIAL_DEVICE) 115200
