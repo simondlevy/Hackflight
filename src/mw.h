@@ -24,8 +24,6 @@ extern int16_t gyroData[3];
 extern int16_t angle[2];
 extern int16_t axisPID[3];
 extern int16_t rcCommand[4];
-extern uint16_t calibratingA;
-extern uint16_t calibratingG;
 extern int16_t  gyroADC[3];
 extern int16_t  accADC[3];
 extern int16_t  magADC[3];

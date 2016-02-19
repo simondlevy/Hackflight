@@ -18,8 +18,8 @@
 
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.
-uint16_t calibratingA = 0;      
-uint16_t calibratingG = 0;
+static uint16_t calibratingA;      
+static uint16_t calibratingG;
 
 sensor_t acc;                       // acc access functions
 sensor_t mag;                       // mag access functions
@@ -38,6 +38,9 @@ void initSensors(uint16_t * acc_1G, sensor_t * gyro, bool * baro_available, bool
     *baro_available = initBaro(&baro);
 
     *sonar_available = initSonar();
+
+    calibratingA = 0;
+    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
 }
 
 void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
@@ -236,4 +239,24 @@ void Sonar_update(int32_t * SonarAlt)
     extern int32_t pollSonar(void);
 
     * SonarAlt = pollSonar();
+}
+
+void sensorsInitAccelCalibration(void)
+{
+    calibratingA = CONFIG_CALIBRATING_ACC_CYCLES;
+}
+
+void sensorsInitGyroCalibration(void)
+{
+    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
+}
+
+bool sensorsCalibratingA(void)
+{
+    return calibratingA > 0;
+}
+
+bool sensorsCalibratingG(void)
+{
+    return calibratingG > 0;
 }

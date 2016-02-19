@@ -11,5 +11,7 @@ bool initBaro(baro_t * baro);
 void Baro_update(uint32_t * baroPressureSum);
 bool initSonar();
 void Sonar_update(int32_t * SonarAlt);
-
-
+void sensorsInitAccelCalibration(void);
+void sensorsInitGyroCalibration(void);
+bool sensorsCalibratingA(void);
+bool sensorsCalibratingG(void);

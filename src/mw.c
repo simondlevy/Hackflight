@@ -45,7 +45,7 @@ int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+
 
 static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
 static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
-static uint8_t accCalibrated;
+static bool accCalibrated;
 static uint16_t rcData[RC_CHANS];       // interval [1000;2000]
 static sensor_t gyro;
 static void pidMultiWii(void);
@@ -166,7 +166,7 @@ void annexCode(void)
     rcCommand[THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
             lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
 
-    if (calibratingA > 0 || calibratingG > 0) {      // Calibration phasis
+    if (sensorsCalibratingA() || sensorsCalibratingG()) {      // Calibration phases
         LED0_TOGGLE;
     } else {
         if (accCalibrated)
@@ -179,11 +179,11 @@ void annexCode(void)
 
     if (check_timed_task(calibratedAccTime)) {
         if (!useSmallAngle) {
-            accCalibrated = 0; // the multi uses ACC and is not calibrated or is too much inclinated
+            accCalibrated = false; // the multi uses ACC and is not calibrated or is too much inclinated
             LED0_TOGGLE;
             update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC);
         } else {
-            accCalibrated = 1;
+            accCalibrated = true;
         }
     }
 
@@ -220,9 +220,9 @@ void computeRC(void)
 
 static void mwArm(void)
 {
-    if (calibratingG == 0 && accCalibrated) {
+    if (!sensorsCalibratingG() && accCalibrated) {
         if (!armed) {         // arm now!
-            armed = 1;
+            armed = true;
         }
     } else if (!armed) {
         blinkLED(2, 255, 1);
@@ -355,8 +355,6 @@ void setup(void)
 
     previousTime = micros();
 
-    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
-
     // trigger accelerometer calibration requirement
     useSmallAngle = true;
  }
@@ -428,7 +426,7 @@ void loop(void)
                 i = 0;
                 // GYRO calibration
                 if (rcSticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
-                    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
+                    sensorsInitGyroCalibration();
                 } 
 
                 // Arm via YAW
@@ -437,7 +435,7 @@ void loop(void)
 
                 // Calibrating Acc
                 else if (rcSticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
-                    calibratingA = CONFIG_CALIBRATING_ACC_CYCLES;
+                    sensorsInitAccelCalibration();
 
                 i = 0;
                 if (i) {
