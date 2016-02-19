@@ -269,7 +269,7 @@ static void evaluateCommand(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt,
 }
 
 void mspCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor,
-        uint32_t baroPressureSum, uint16_t cycleTime)
+        uint32_t baroPressureSum, uint16_t cycleTime, bool armed)
 {
     uint8_t c;
 

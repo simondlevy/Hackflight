@@ -53,7 +53,7 @@ void writeMotors(int16_t motor[4])
         pwmWriteMotor(i, motor[i]);
 }
 
-void mixTable(uint16_t * rcData, int16_t * motor)
+void mixTable(uint16_t * rcData, int16_t * motor, bool armed)
 {
     int16_t maxMotor;
     uint32_t i;

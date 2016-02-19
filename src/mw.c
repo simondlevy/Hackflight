@@ -37,7 +37,6 @@
 
 extern  rcReadRawDataPtr rcReadRawFunc;
 
-uint8_t armed;
 uint16_t vbat;                  // battery voltage in 0.1V steps
 int32_t amperage;               // amperage read by current sensor in centiampere (1/100th A)
 int32_t mAhdrawn;              // milliampere hours drawn from the battery since start
@@ -53,6 +52,7 @@ static void pidMultiWii(void);
 static uint32_t previousTime;
 static uint32_t currentTime;
 static bool useSmallAngle;
+static bool armed;
 
 pidControllerFuncPtr pid_controller = pidMultiWii; // which pid controller are we using, defaultMultiWii
 rcReadRawDataPtr rcReadRawFunc = NULL;  // receive data from default (pwm/ppm) or additional 
@@ -485,7 +485,7 @@ void loop(void)
                 taskOrder++;
                 if (baro_available && sonar_available) {
                     getEstimatedAltitude(&SonarAlt, &AltPID, &EstAlt, &AltHold, &setVelocity, &errorVelocityI,
-                            &vario, velocityControl, baroPressureSum);
+                            &vario, velocityControl, baroPressureSum, armed);
                     break;
                 }
             case 3:
@@ -503,7 +503,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        useSmallAngle = getEstimatedAttitude(&heading, &gyro, &throttleAngleCorrection);
+        useSmallAngle = getEstimatedAttitude(&heading, &gyro, &throttleAngleCorrection, armed);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
@@ -514,7 +514,7 @@ void loop(void)
         annexCode();
 
         // update MSP
-        mspCom(rcData, SonarAlt, EstAlt, vario, heading, motor, baroPressureSum, cycleTime);
+        mspCom(rcData, SonarAlt, EstAlt, vario, heading, motor, baroPressureSum, cycleTime, armed);
 
         if (alt_hold_mode) {
             static uint8_t isAltHoldChanged = 0;
@@ -555,7 +555,7 @@ void loop(void)
         }
 
         pid_controller();
-        mixTable(rcData, motor);
+        mixTable(rcData, motor, armed);
         writeMotors(motor);
     }
 }
