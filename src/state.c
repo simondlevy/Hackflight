@@ -10,7 +10,6 @@
 #include "sensors.h"
 #include "utils.h"
 
-int16_t accSmooth[3];
 int16_t angle[2] = { 0, 0 }; // abs angle inclination in multiple of 0.1 deg:  180 deg = 1800
 int16_t gyroData[3] = { 0, 0, 0 };
 int16_t magADC[3];
@@ -120,7 +119,7 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
 }
 
 // rotate acc into Earth frame and calculate acceleration in it
-static void acc_calc(uint32_t deltaT, int16_t heading, bool armed)
+static void acc_calc(int16_t * accSmooth, uint32_t deltaT, int16_t heading, bool armed)
 {
     static int32_t accZoffset = 0;
     static float accz_smooth = 0;
@@ -328,7 +327,13 @@ void imuInit(uint16_t acc_1G)
     s_acc_1G = acc_1G;
 }
 
-bool getEstimatedAttitude(sensor_t * acc, sensor_t * gyro, int16_t * heading, int16_t * throttleAngleCorrection, bool armed)
+bool getEstimatedAttitude(
+        sensor_t * acc, 
+        sensor_t * gyro, 
+        int16_t * accSmooth,
+        int16_t * heading, 
+        int16_t * throttleAngleCorrection, 
+        bool armed)
 {
     int32_t axis;
     int32_t accMag = 0;
@@ -386,7 +391,7 @@ bool getEstimatedAttitude(sensor_t * acc, sensor_t * gyro, int16_t * heading, in
     normalizeV(&EstN.V, &EstN.V);
     *heading = calculateHeading(&EstN);
 
-    acc_calc(deltaT, *heading, armed); // rotate acc vector into earth frame
+    acc_calc(accSmooth, deltaT, *heading, armed); // rotate acc vector into earth frame
 
     if (CONFIG_THROTTLE_CORRECTION_VALUE) {
 

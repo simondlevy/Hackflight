@@ -385,6 +385,7 @@ void loop(void)
     static int16_t motor[4];
     static int16_t throttleAngleCorrection;
     static uint32_t baroPressureSum;
+    static int16_t accSmooth[3];
 
     uint16_t auxState = 0;
     bool isThrottleLow = false;
@@ -507,7 +508,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        useSmallAngle = getEstimatedAttitude(&acc, &gyro, &heading, &throttleAngleCorrection, armed);
+        useSmallAngle = getEstimatedAttitude(&acc, &gyro, accSmooth, &heading, &throttleAngleCorrection, armed);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
@@ -518,7 +519,7 @@ void loop(void)
         annexCode();
 
         // update MSP
-        mspCom(rcData, SonarAlt, EstAlt, vario, heading, motor, baroPressureSum, cycleTime, armed, acc_1G);
+        mspCom(rcData, accSmooth, SonarAlt, EstAlt, vario, heading, motor, baroPressureSum, cycleTime, armed, acc_1G);
 
         if (alt_hold_mode) {
             static uint8_t isAltHoldChanged = 0;

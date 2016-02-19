@@ -145,8 +145,17 @@ static void s_struct(uint8_t *cb, uint8_t siz)
         serialize8(*cb++);
 }
 
-static void evaluateCommand(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading,
-        int16_t * motor, uint32_t baroPressureSum, uint16_t cycleTime, uint16_t acc_1G)
+static void evaluateCommand(
+        uint16_t * rcData, 
+        int16_t * accSmooth,
+        int32_t SonarAlt, 
+        int32_t EstAlt, 
+        int32_t vario, 
+        int16_t heading,
+        int16_t * motor, 
+        uint32_t baroPressureSum, 
+        uint16_t cycleTime, 
+        uint16_t acc_1G)
 {
     uint32_t i;
     const char *build = __DATE__;
@@ -254,8 +263,18 @@ void mspInit(void)
     portState.port = Serial1; // provided by Mockduino
 }
 
-void mspCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, int16_t heading, int16_t * motor,
-        uint32_t baroPressureSum, uint16_t cycleTime, bool armed, uint16_t acc_1G)
+void mspCom(
+        uint16_t * rcData, 
+        int16_t * accSmooth,
+        int32_t SonarAlt, 
+        int32_t EstAlt, 
+        int32_t vario, 
+        int16_t heading, 
+        int16_t * motor,
+        uint32_t baroPressureSum, 
+        uint16_t cycleTime, 
+        bool armed, 
+        uint16_t acc_1G)
 {
     uint8_t c;
 
@@ -299,7 +318,16 @@ void mspCom(uint16_t * rcData, int32_t SonarAlt, int32_t EstAlt, int32_t vario, 
         } else if (portState.c_state == HEADER_CMD && 
                 portState.offset >= portState.dataSize) {
             if (portState.checksum == c) {        // compare calculated and transferred checksum
-                evaluateCommand(rcData, SonarAlt, EstAlt, vario, heading, motor, baroPressureSum, cycleTime, acc_1G);
+                evaluateCommand(
+                        rcData, 
+                        accSmooth,
+                        SonarAlt, 
+                        EstAlt, 
+                        vario, 
+                        heading, 
+                        motor, 
+                        baroPressureSum, 
+                        cycleTime, acc_1G);
             }
             portState.c_state = IDLE;
         }
