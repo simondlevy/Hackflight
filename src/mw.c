@@ -41,8 +41,8 @@ uint16_t vbat;                  // battery voltage in 0.1V steps
 int32_t amperage;               // amperage read by current sensor in centiampere (1/100th A)
 int32_t mAhdrawn;              // milliampere hours drawn from the battery since start
 int16_t failsafeEvents = 0;
-int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
 
+static int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
 static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
 static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 static bool accCalibrated;
@@ -53,13 +53,13 @@ static uint32_t previousTime;
 static uint32_t currentTime;
 static bool useSmallAngle;
 static bool armed;
+static int16_t axisPID[3];
 
 pidControllerFuncPtr pid_controller = pidMultiWii; // which pid controller are we using, defaultMultiWii
 rcReadRawDataPtr rcReadRawFunc = NULL;  // receive data from default (pwm/ppm) or additional 
 
 uint8_t dynP8[3], dynI8[3], dynD8[3];
 
-int16_t axisPID[3];
 
 // Battery monitoring stuff
 uint8_t batteryCellCount = 3;       // cell count
@@ -247,10 +247,11 @@ static void pidMultiWii(void)
     int axis, prop;
     int32_t error, errorAngle;
     int32_t PTerm, ITerm, PTermACC = 0, ITermACC = 0, PTermGYRO = 0, ITermGYRO = 0, DTerm;
-    static int16_t lastGyro[3] = { 0, 0, 0 };
-    static int32_t delta1[3], delta2[3];
     int32_t deltaSum;
     int32_t delta;
+
+    static int16_t lastGyro[3] = { 0, 0, 0 };
+    static int32_t delta1[3], delta2[3];
 
     // **** PITCH & ROLL & YAW PID ****
     prop = max(abs(rcCommand[PITCH]), abs(rcCommand[ROLL])); // range [0;500]
@@ -554,7 +555,7 @@ void loop(void)
         }
 
         pid_controller();
-        mixTable(rcData, motor, armed);
+        mixTable(rcData, rcCommand, motor, axisPID, armed);
         writeMotors(motor);
     }
 }

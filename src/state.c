@@ -10,19 +10,16 @@
 #include "sensors.h"
 #include "utils.h"
 
-int16_t  gyroADC[3];
 int16_t  accADC[3];
-int16_t  magADC[3];
 int16_t  accSmooth[3];
+int16_t angle[2] = { 0, 0 }; // abs angle inclination in multiple of 0.1 deg:  180 deg = 1800
+int16_t  gyroADC[3];
+int16_t  gyroData[3] = { 0, 0, 0 };
+int16_t  gyroZero[3] = { 0, 0, 0 };
+int16_t  magADC[3];
 
-// **************
-// gyro+acc IMU
-// **************
-int16_t gyroData[3] = { 0, 0, 0 };
-int16_t gyroZero[3] = { 0, 0, 0 };
-int16_t angle[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
-float anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
 
+static float    anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
 static float    accVelScale;
 static float    fc_acc;
 static float    throttleAngleScale;
