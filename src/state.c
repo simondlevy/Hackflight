@@ -10,13 +10,10 @@
 #include "sensors.h"
 #include "utils.h"
 
-int16_t  accADC[3];
-int16_t  accSmooth[3];
+int16_t accSmooth[3];
 int16_t angle[2] = { 0, 0 }; // abs angle inclination in multiple of 0.1 deg:  180 deg = 1800
-int16_t  gyroADC[3];
-int16_t  gyroData[3] = { 0, 0, 0 };
-int16_t  gyroZero[3] = { 0, 0, 0 };
-int16_t  magADC[3];
+int16_t gyroData[3] = { 0, 0, 0 };
+int16_t magADC[3];
 
 
 static float    anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
@@ -27,6 +24,7 @@ static int16_t  smallAngle;
 static uint32_t accTimeSum;
 static int32_t  accSumCount;
 static int32_t  accSum[3];
+static uint16_t s_acc_1G;
 
 static const float magneticDeclination = 0.0f;       
 
@@ -122,7 +120,7 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
 }
 
 // rotate acc into Earth frame and calculate acceleration in it
-static void acc_calc(uint16_t acc_1G, uint32_t deltaT, int16_t heading, bool armed)
+static void acc_calc(uint32_t deltaT, int16_t heading, bool armed)
 {
     static int32_t accZoffset = 0;
     static float accz_smooth = 0;
@@ -151,7 +149,7 @@ static void acc_calc(uint16_t acc_1G, uint32_t deltaT, int16_t heading, bool arm
         }
         accel_ned.V.Z -= accZoffset / 64;  // compensate for gravitation on z-axis
     } else
-        accel_ned.V.Z -= acc_1G;
+        accel_ned.V.Z -= s_acc_1G;
 
     accz_smooth = accz_smooth + (dT / (fc_acc + dT)) * (accel_ned.V.Z - accz_smooth); // low pass filter
 
@@ -326,13 +324,12 @@ void imuInit(uint16_t acc_1G)
     throttleAngleScale = (1800.0f / M_PI) * (900.0f / CONFIG_THROTTLE_CORRECTION_ANGLE);
 
     fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
+
+    s_acc_1G = acc_1G;
 }
 
-bool getEstimatedAttitude(uint16_t acc_1G, int16_t * heading, sensor_t * gyro, int16_t * throttleAngleCorrection, bool armed)
+bool getEstimatedAttitude(sensor_t * acc, sensor_t * gyro, int16_t * heading, int16_t * throttleAngleCorrection, bool armed)
 {
-    Gyro_getADC(gyro);
-    ACC_getADC(acc_1G);
-
     int32_t axis;
     int32_t accMag = 0;
     static t_fp_vector EstN;
@@ -347,6 +344,11 @@ bool getEstimatedAttitude(uint16_t acc_1G, int16_t * heading, sensor_t * gyro, i
     deltaT = currentT - previousT;
     scale = deltaT * gyro->scale;
     previousT = currentT;
+    int16_t accADC[3];
+    int16_t gyroADC[3];
+
+    Gyro_getADC(gyro, gyroADC);
+    ACC_getADC(acc, accADC);
 
     // Initialization
     for (axis = 0; axis < 3; axis++) {
@@ -360,7 +362,7 @@ bool getEstimatedAttitude(uint16_t acc_1G, int16_t * heading, sensor_t * gyro, i
         }
         accMag += (int32_t)accSmooth[axis] * accSmooth[axis];
     }
-    accMag = accMag * 100 / ((int32_t)acc_1G * acc_1G);
+    accMag = accMag * 100 / ((int32_t)s_acc_1G * s_acc_1G);
 
     rotateV(&EstG.V, deltaGyroAngle);
 
@@ -384,7 +386,7 @@ bool getEstimatedAttitude(uint16_t acc_1G, int16_t * heading, sensor_t * gyro, i
     normalizeV(&EstN.V, &EstN.V);
     *heading = calculateHeading(&EstN);
 
-    acc_calc(acc_1G, deltaT, *heading, armed); // rotate acc vector into earth frame
+    acc_calc(deltaT, *heading, armed); // rotate acc vector into earth frame
 
     if (CONFIG_THROTTLE_CORRECTION_VALUE) {
 

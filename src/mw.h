@@ -19,12 +19,9 @@ enum {
     AUX4
 };
 
-extern int16_t accADC[3];
 extern int16_t accSmooth[3];
 extern int16_t angle[2];
-extern int16_t gyroADC[3];
 extern int16_t gyroData[3];
-extern int16_t gyroZero[3];
 extern int16_t magADC[3];
 
 
@@ -33,7 +30,7 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
 
 // State
 void imuInit(uint16_t acc_1G);
-bool getEstimatedAttitude(uint16_t acc_1G, int16_t * heading, sensor_t * gyro, int16_t * throttleAngleCorrection, bool armed);
+bool getEstimatedAttitude(sensor_t * acc, sensor_t * gyro, int16_t * heading, int16_t * throttleAngleCorrection, bool armed);
 void getEstimatedAltitude(int32_t * SonarAlt, int32_t * AltPID, int32_t * EstAlt, int32_t * AltHold, 
         int32_t *setVelocity, int32_t * errorVelocityI, int32_t * vario, bool velocityControl, 
         uint32_t baroPressureSum, bool armed);

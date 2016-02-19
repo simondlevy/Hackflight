@@ -47,13 +47,16 @@ static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for e
 static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 static bool accCalibrated;
 static uint16_t rcData[RC_CHANS];       // interval [1000;2000]
-static sensor_t gyro;
 static void pidMultiWii(void);
 static uint32_t previousTime;
 static uint32_t currentTime;
 static bool useSmallAngle;
 static bool armed;
 static int16_t axisPID[3];
+
+static sensor_t gyro;
+static sensor_t acc;                      
+static baro_t baro;
 
 pidControllerFuncPtr pid_controller = pidMultiWii; // which pid controller are we using, defaultMultiWii
 rcReadRawDataPtr rcReadRawFunc = NULL;  // receive data from default (pwm/ppm) or additional 
@@ -330,7 +333,8 @@ void setup(void)
     extern void initBoardSpecific(void);
     initBoardSpecific();
 
-    initSensors(&acc_1G, &gyro, &baro_available, &sonar_available);
+    // init sensors
+    initSensors(&acc, &gyro, &baro, &acc_1G, &baro_available, &sonar_available);
 
     LED1_ON;
     LED0_OFF;
@@ -478,7 +482,7 @@ void loop(void)
             case 1:
                 taskOrder++;
                 if (baro_available) {
-                    Baro_update(&baroPressureSum);
+                    Baro_update(&baro, &baroPressureSum);
                     break;
                 }
             case 2:
@@ -503,7 +507,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        useSmallAngle = getEstimatedAttitude(acc_1G, &heading, &gyro, &throttleAngleCorrection, armed);
+        useSmallAngle = getEstimatedAttitude(&acc, &gyro, &heading, &throttleAngleCorrection, armed);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
