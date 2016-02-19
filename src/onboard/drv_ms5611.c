@@ -8,9 +8,9 @@
 
 #define I2C_DEVICE (I2CDEV_2)
 
-#include "../mockduino/drv_system.h"         // timers, delays, etc
-#include "../mockduino/drv_gpio.h"
-#include "../mockduino/drv_i2c.h"
+#include "../breezystm32/drv_system.h"         // timers, delays, etc
+#include "../breezystm32/drv_gpio.h"
+#include "../breezystm32/drv_i2c.h"
 
 #include "../baro.h"
 

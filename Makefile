@@ -24,7 +24,7 @@ PROJECT_SRC = mw.c \
 
 # You probably shouldn't modify anything below here!
 
-TARGET		?= MOCKDUINO
+TARGET		?= myproject
 
 # Compile-time options
 OPTIONS		?=
@@ -42,23 +42,23 @@ SERIAL_DEVICE	?= /dev/ttyUSB0
 # Working directories
 ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
 SRC_DIR		 = $(ROOT)/src
-CMSIS_DIR	 = $(ROOT)/src/mockduino/lib/CMSIS
-STDPERIPH_DIR	 = $(ROOT)/src/mockduino/lib/STM32F10x_StdPeriph_Driver
+CMSIS_DIR	 = $(ROOT)/src/breezystm32/lib/CMSIS
+STDPERIPH_DIR	 = $(ROOT)/src/breezystm32/lib/STM32F10x_StdPeriph_Driver
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
-MOCKDUINO_SRC = mockduino/main.c \
-		   mockduino/startup_stm32f10x_md_gcc.S \
-		   mockduino/drv_gpio.c \
-		   mockduino/drv_i2c.c \
-		   mockduino/drv_adc.c \
-		   mockduino/drv_spi.c \
-		   mockduino/drv_pwm.c \
-		   mockduino/drv_system.c \
-		   mockduino/drv_serial.c \
-		   mockduino/drv_uart.c \
-		   mockduino/drv_timer.c \
-		   mockduino/printf.c \
+myproject_SRC = breezystm32/main.c \
+		   breezystm32/startup_stm32f10x_md_gcc.S \
+		   breezystm32/drv_gpio.c \
+		   breezystm32/drv_i2c.c \
+		   breezystm32/drv_adc.c \
+		   breezystm32/drv_spi.c \
+		   breezystm32/drv_pwm.c \
+		   breezystm32/drv_system.c \
+		   breezystm32/drv_serial.c \
+		   breezystm32/drv_uart.c \
+		   breezystm32/drv_timer.c \
+		   breezystm32/printf.c \
 		   $(PROJECT_SRC) \
 		   $(CMSIS_SRC) \
 		   $(STDPERIPH_SRC)
@@ -118,7 +118,7 @@ ASFLAGS		 = $(ARCH_FLAGS) \
 		   -x assembler-with-cpp \
 		   $(addprefix -I,$(INCLUDE_DIRS))
 
-LD_SCRIPT	 = $(ROOT)/src/mockduino/stm32_flash.ld
+LD_SCRIPT	 = $(ROOT)/src/breezystm32/stm32_flash.ld
 LDFLAGS		 = -lm \
 		   -nostartfiles \
 		   --specs=nano.specs \
