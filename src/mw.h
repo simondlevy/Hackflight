@@ -19,7 +19,6 @@ enum {
     AUX4
 };
 
-extern int16_t magADC[3];
 
 // Shared
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
@@ -64,6 +63,7 @@ void mspCom(
         int16_t * gyroData,
         uint16_t * rcData, 
         int16_t * accSmooth,
+        int16_t * magADC,
         int32_t SonarAlt, 
         int32_t EstAlt, 
         int32_t vario, 

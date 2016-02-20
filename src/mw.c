@@ -55,6 +55,7 @@ static bool armed;
 static int16_t axisPID[3];
 static int16_t angle[2];
 static int16_t gyroData[3];
+static int16_t magADC[3];
 
 static sensor_t gyro;
 static sensor_t acc;                      
@@ -534,6 +535,7 @@ void loop(void)
                 gyroData,
                 rcData, 
                 accSmooth, 
+                magADC,
                 SonarAlt, 
                 EstAlt, 
                 vario, 

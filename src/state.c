@@ -10,9 +10,6 @@
 #include "sensors.h"
 #include "utils.h"
 
-int16_t magADC[3];
-
-
 static float    anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
 static float    accVelScale;
 static float    fc_acc;
