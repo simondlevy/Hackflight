@@ -54,6 +54,7 @@ static bool useSmallAngle;
 static bool armed;
 static int16_t axisPID[3];
 static int16_t angle[2];
+static int16_t gyroData[3];
 
 static sensor_t gyro;
 static sensor_t acc;                      
@@ -509,7 +510,15 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        useSmallAngle = getEstimatedAttitude(&acc, &gyro, accSmooth, angle, &heading, &throttleAngleCorrection, armed);
+        useSmallAngle = getEstimatedAttitude(
+                &acc, 
+                &gyro, 
+                accSmooth, 
+                gyroData,
+                angle, 
+                &heading, 
+                &throttleAngleCorrection, 
+                armed);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
@@ -520,7 +529,20 @@ void loop(void)
         annexCode();
 
         // update MSP
-        mspCom(angle, rcData, accSmooth, SonarAlt, EstAlt, vario, heading, motor, baroPressureSum, cycleTime, armed, acc_1G);
+        mspCom(
+                angle, 
+                gyroData,
+                rcData, 
+                accSmooth, 
+                SonarAlt, 
+                EstAlt, 
+                vario, 
+                heading, 
+                motor, 
+                baroPressureSum, 
+                cycleTime, 
+                armed, 
+                acc_1G);
 
         if (alt_hold_mode) {
             static uint8_t isAltHoldChanged = 0;

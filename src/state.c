@@ -10,7 +10,6 @@
 #include "sensors.h"
 #include "utils.h"
 
-int16_t gyroData[3] = { 0, 0, 0 };
 int16_t magADC[3];
 
 
@@ -339,6 +338,7 @@ bool getEstimatedAttitude(
         sensor_t * acc, 
         sensor_t * gyro, 
         int16_t * accSmooth,
+        int16_t * gyroData,
         int16_t * angle,
         int16_t * heading, 
         int16_t * throttleAngleCorrection, 

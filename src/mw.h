@@ -19,7 +19,6 @@ enum {
     AUX4
 };
 
-extern int16_t gyroData[3];
 extern int16_t magADC[3];
 
 // Shared
@@ -35,21 +34,22 @@ void getEstimatedAltitude(
         int32_t * AltPID, 
         int32_t * EstAlt, 
         int32_t * AltHold, 
-        int32_t *setVelocity, 
+        int32_t * setVelocity, 
         int32_t * errorVelocityI, 
         int32_t * vario, 
-        bool velocityControl, 
-        uint32_t baroPressureSum, 
-        bool armed);
+        bool      velocityControl, 
+        uint32_t  baroPressureSum, 
+        bool      armed);
 
 bool getEstimatedAttitude(
         sensor_t * acc, 
         sensor_t * gyro, 
-        int16_t * accSmooth,
-        int16_t * angle,
-        int16_t * heading, 
-        int16_t * throttleAngleCorrection, 
-        bool armed);
+        int16_t *  accSmooth,
+        int16_t *  gyroData,
+        int16_t *  angle,
+        int16_t *  heading, 
+        int16_t *  throttleAngleCorrection, 
+        bool       armed);
 
 // Output
 void mixerInit(void);
@@ -61,6 +61,7 @@ void mixTable(uint16_t * rcData, int16_t * rcCommand, int16_t * motor, int16_t *
 void mspInit(void);
 void mspCom(
         int16_t * angle,
+        int16_t * gyroData,
         uint16_t * rcData, 
         int16_t * accSmooth,
         int32_t SonarAlt, 

@@ -147,6 +147,7 @@ static void s_struct(uint8_t *cb, uint8_t siz)
 
 static void evaluateCommand(
         int16_t * angle,
+        int16_t * gyroData,
         uint16_t * rcData, 
         int16_t * accSmooth,
         int32_t SonarAlt, 
@@ -266,6 +267,7 @@ void mspInit(void)
 
 void mspCom(
         int16_t * angle,
+        int16_t * gyroData,
         uint16_t * rcData, 
         int16_t * accSmooth,
         int32_t SonarAlt, 
@@ -322,6 +324,7 @@ void mspCom(
             if (portState.checksum == c) {        // compare calculated and transferred checksum
                 evaluateCommand(
                         angle,
+                        gyroData,
                         rcData, 
                         accSmooth,
                         SonarAlt, 
