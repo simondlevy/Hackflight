@@ -14,10 +14,15 @@
 #include "breezystm32/breezystm32.h"
 
 #include "axes.h"
+#include "msp.h"
+#include "chans.h"
 #include "sensors.h"
-#include "mw.h"
+#include "state.h"
+#include "blink.h"
+#include "mixer.h"
 #include "config.h"
 #include "utils.h"
+#include "board.h"
 
 #define ROL_LO (1 << (2 * ROLL))
 #define ROL_CE (3 << (2 * ROLL))
@@ -56,6 +61,8 @@ static int16_t axisPID[3];
 static int16_t angle[2];
 static int16_t gyroData[3];
 static int16_t magADC[3];
+static int16_t motors[4];
+static int16_t motor_disarmed[4];
 
 static sensor_t gyro;
 static sensor_t acc;                      
@@ -333,11 +340,9 @@ void setup(void)
             lookupThrottleRC[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
     }
 
-    extern void initBoardSpecific(void);
-    initBoardSpecific();
+    boardInit();
 
-    // init sensors
-    initSensors(&acc, &gyro, &baro, &acc_1G, &baro_available, &sonar_available);
+    sensorsInit(&acc, &gyro, &baro, &acc_1G, &baro_available, &sonar_available);
 
     LED1_ON;
     LED0_OFF;
@@ -349,8 +354,8 @@ void setup(void)
     LED0_OFF;
     LED1_OFF;
 
-    imuInit(acc_1G); 
-    mixerInit(); 
+    stateInit(acc_1G); 
+    mixerInit(motor_disarmed); 
 
     pwmInit(CONFIG_FAILSAFE_DETECT_THRESHOLD, CONFIG_PWM_FILTER, CONFIG_USE_CPPM, CONFIG_MOTOR_PWM_RATE,
             CONFIG_FAST_PWM, CONFIG_PWM_IDLE_PULSE);
@@ -372,7 +377,7 @@ void loop(void)
     static uint8_t rcDelayCommand;      // this indicates the number of time (multiple of RC measurement at 50Hz) 
                                         // the sticks must be maintained to run or switch off motors
     static uint8_t rcSticks;            // this hold sticks position for command combos
-    static uint32_t rcTime = 0;
+    static uint32_t rcTime;
     static int16_t initialThrottleHold;
     static uint32_t loopTime;
     static int32_t SonarAlt;
@@ -385,7 +390,6 @@ void loop(void)
     static int32_t errorVelocityI;
     static int32_t vario;
     static int16_t heading;
-    static int16_t motor[4];
     static int16_t throttleAngleCorrection;
     static uint32_t baroPressureSum;
     static int16_t accSmooth[3];
@@ -480,20 +484,30 @@ void loop(void)
             case 0:
                 taskOrder++;
                 if (sonar_available) {
-                    Sonar_update(&SonarAlt);
+                    sensorsUpdateSonar(&SonarAlt);
                     break;
                 }
             case 1:
                 taskOrder++;
                 if (baro_available) {
-                    Baro_update(&baro, &baroPressureSum);
+                    sensorsUpdateBaro(&baro, &baroPressureSum);
                     break;
                 }
             case 2:
                 taskOrder++;
                 if (baro_available && sonar_available) {
-                    getEstimatedAltitude(angle, &SonarAlt, &AltPID, &EstAlt, &AltHold, &setVelocity, &errorVelocityI,
-                            &vario, velocityControl, baroPressureSum, armed);
+                    stateEstimateAltitude(
+                            angle, 
+                            &SonarAlt, 
+                            &AltPID, 
+                            &EstAlt, 
+                            &AltHold, 
+                            &setVelocity, 
+                            &errorVelocityI,
+                            &vario, 
+                            velocityControl, 
+                            baroPressureSum, 
+                            armed);
                     break;
                 }
             case 3:
@@ -511,7 +525,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        useSmallAngle = getEstimatedAttitude(
+        useSmallAngle = stateEstimateAttitude(
                 &acc, 
                 &gyro, 
                 accSmooth, 
@@ -540,7 +554,8 @@ void loop(void)
                 EstAlt, 
                 vario, 
                 heading, 
-                motor, 
+                motors, 
+                motor_disarmed,
                 baroPressureSum, 
                 cycleTime, 
                 armed, 
@@ -585,7 +600,6 @@ void loop(void)
         }
 
         pid_controller();
-        mixTable(rcData, rcCommand, motor, axisPID, armed);
-        writeMotors(motor);
+        mixerWriteMotors(motors, motor_disarmed, rcData, rcCommand, axisPID, armed);
     }
 }

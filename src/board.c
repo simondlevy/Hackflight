@@ -12,7 +12,7 @@ typedef enum HardwareRevision {
     NAZE32_REV6                                         // Naze32 rev6
 } HardwareRevision;
 
-void initBoardSpecific(void)
+void boardInit(void)
 {
     // current crystal frequency - 8 or 12MHz
     extern uint32_t hse_value;

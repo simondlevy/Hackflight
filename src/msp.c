@@ -12,7 +12,7 @@
 #include "breezystm32/breezystm32.h"
 
 #include "axes.h"
-#include "mw.h"
+#include "msp.h"
 #include "config.h"
 
 // Multiwii Serial Protocol 0
@@ -36,9 +36,6 @@
 #define INBUF_SIZE              128
 
 serialPort_t * telemport;
-
-// from mixer.c
-extern int16_t motor_disarmed[4];
 
 // cause reboot after MSP processing complete
 static bool pendReboot = false;
@@ -155,7 +152,8 @@ static void evaluateCommand(
         int32_t EstAlt, 
         int32_t vario, 
         int16_t heading,
-        int16_t * motor, 
+        int16_t * motors, 
+        int16_t * motor_disarmed,
         uint32_t baroPressureSum, 
         uint16_t cycleTime, 
         uint16_t acc_1G)
@@ -203,7 +201,7 @@ static void evaluateCommand(
             break;
 
         case MSP_MOTOR:
-            s_struct((uint8_t *)motor, 16);
+            s_struct((uint8_t *)motors, 16);
             break;
 
         case MSP_RC:
@@ -277,6 +275,7 @@ void mspCom(
         int32_t vario, 
         int16_t heading, 
         int16_t * motor,
+        int16_t * motor_disarmed,
         uint32_t baroPressureSum, 
         uint16_t cycleTime, 
         bool armed, 
@@ -335,6 +334,7 @@ void mspCom(
                         vario, 
                         heading, 
                         motor, 
+                        motor_disarmed,
                         baroPressureSum, 
                         cycleTime, acc_1G);
             }

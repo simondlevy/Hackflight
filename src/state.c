@@ -5,9 +5,10 @@
 #include "breezystm32/breezystm32.h"
 
 #include "axes.h"
-#include "mw.h"
+#include "state.h"
 #include "config.h"
 #include "sensors.h"
+#include "chans.h"
 #include "utils.h"
 
 static float    anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
@@ -189,13 +190,25 @@ static float cfilter(float a, float b, float c)
 
 // ==================================================================================================
 
-void getEstimatedAltitude(
+void stateInit(uint16_t acc_1G)
+{
+    smallAngle = lrintf(acc_1G * cosf(RAD * CONFIG_SMALL_ANGLE));
+    accVelScale = 9.80665f / acc_1G / 10000.0f;
+    throttleAngleScale = (1800.0f / M_PI) * (900.0f / CONFIG_THROTTLE_CORRECTION_ANGLE);
+
+    fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
+
+    s_acc_1G = acc_1G;
+}
+
+
+void stateEstimateAltitude(
         int16_t * angle, 
         int32_t * SonarAlt, 
         int32_t * AltPID, 
         int32_t * EstAlt, 
         int32_t * AltHold, 
-        int32_t *setVelocity, 
+        int32_t * setVelocity, 
         int32_t * errorVelocityI, 
         int32_t * vario, 
         bool velocityControl, 
@@ -320,18 +333,7 @@ void getEstimatedAltitude(
     accZ_old = accZ_tmp;
 }
 
-void imuInit(uint16_t acc_1G)
-{
-    smallAngle = lrintf(acc_1G * cosf(RAD * CONFIG_SMALL_ANGLE));
-    accVelScale = 9.80665f / acc_1G / 10000.0f;
-    throttleAngleScale = (1800.0f / M_PI) * (900.0f / CONFIG_THROTTLE_CORRECTION_ANGLE);
-
-    fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
-
-    s_acc_1G = acc_1G;
-}
-
-bool getEstimatedAttitude(
+bool stateEstimateAttitude(
         sensor_t * acc, 
         sensor_t * gyro, 
         int16_t * accSmooth,
@@ -358,8 +360,8 @@ bool getEstimatedAttitude(
     int16_t accADC[3];
     int16_t gyroADC[3];
 
-    Gyro_getADC(gyro, gyroADC);
-    ACC_getADC(acc, accADC);
+    sensorsGetGyro(gyro, gyroADC);
+    sensorsGetAccel(acc, accADC);
 
     // Initialization
     for (axis = 0; axis < 3; axis++) {

@@ -12,7 +12,8 @@
 #include "breezystm32/breezystm32.h"
 
 #include "axes.h"
-#include "mw.h"
+#include "mixer.h"
+#include "chans.h"
 #include "config.h"
 #include "utils.h"
 
@@ -24,8 +25,6 @@ typedef struct motorMixer_t {
     float yaw;
 } motorMixer_t;
 
-int16_t motor_disarmed[4];
-
 static motorMixer_t currentMixer[4];
 
 static const motorMixer_t mixerQuadX[] = {
@@ -35,33 +34,23 @@ static const motorMixer_t mixerQuadX[] = {
     { 1.0f,  1.0f, -1.0f, -1.0f },          // FRONT_L
 };
 
-void mixerInit(void)
+void mixerInit(int16_t * motor_disarmed)
 {
     int i;
 
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++) {
         currentMixer[i] = mixerQuadX[i];
-
-    mixerResetMotors();
-}
-
-void mixerResetMotors(void)
-{
-    int i;
-    // set disarmed motor values
-    for (i = 0; i < 4; i++)
         motor_disarmed[i] = CONFIG_MINCOMMAND;
+    }
 }
 
-void writeMotors(int16_t motor[4])
-{
-    uint8_t i;
-
-    for (i = 0; i < 4; i++)
-        pwmWriteMotor(i, motor[i]);
-}
-
-void mixTable(uint16_t * rcData, int16_t * rcCommand, int16_t * motor, int16_t * axisPID, bool armed)
+void mixerWriteMotors(
+        int16_t * motors, 
+        int16_t * motor_disarmed, 
+        uint16_t * rcData, 
+        int16_t * rcCommand, 
+        int16_t * axisPID, 
+        bool armed)
 {
     int16_t maxMotor;
     uint32_t i;
@@ -70,24 +59,27 @@ void mixTable(uint16_t * rcData, int16_t * rcCommand, int16_t * motor, int16_t *
     axisPID[YAW] = constrain(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
 
     for (i = 0; i < 4; i++)
-        motor[i] = rcCommand[THROTTLE] * currentMixer[i].throttle + axisPID[PITCH] * currentMixer[i].pitch + 
+        motors[i] = rcCommand[THROTTLE] * currentMixer[i].throttle + axisPID[PITCH] * currentMixer[i].pitch + 
             axisPID[ROLL] * currentMixer[i].roll + -CONFIG_YAW_DIRECTION * axisPID[YAW] * currentMixer[i].yaw;
 
-    maxMotor = motor[0];
+    maxMotor = motors[0];
     for (i = 1; i < 4; i++)
-        if (motor[i] > maxMotor)
-            maxMotor = motor[i];
+        if (motors[i] > maxMotor)
+            maxMotor = motors[i];
     for (i = 0; i < 4; i++) {
         if (maxMotor > CONFIG_MAXTHROTTLE)     
             // this is a way to still have good gyro corrections if at least one motor reaches its max.
-            motor[i] -= maxMotor - CONFIG_MAXTHROTTLE;
+            motors[i] -= maxMotor - CONFIG_MAXTHROTTLE;
 
-        motor[i] = constrain(motor[i], CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
+        motors[i] = constrain(motors[i], CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
         if ((rcData[THROTTLE]) < CONFIG_MINCHECK) {
-            motor[i] = CONFIG_MINTHROTTLE;
+            motors[i] = CONFIG_MINTHROTTLE;
         } 
         if (!armed) {
-            motor[i] = motor_disarmed[i];
+            motors[i] = motor_disarmed[i];
         }
     }
+
+    for (i = 0; i < 4; i++)
+        pwmWriteMotor(i, motors[i]);
 }

@@ -12,9 +12,10 @@
 #include "breezystm32/breezystm32.h"
 
 #include "axes.h"
-#include "mw.h"
+#include "chans.h"
 #include "config.h"
 #include "sensors.h"
+#include "blink.h"
 
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.
@@ -23,7 +24,13 @@ static uint16_t calibratingG;
 static int16_t accZero[3];
 static uint16_t s_acc_1G;
 
-void initSensors(sensor_t * acc, sensor_t * gyro, baro_t * baro, uint16_t * acc_1G, bool * baro_available, bool * sonar_available)
+void sensorsInit(
+        sensor_t * acc, 
+        sensor_t * gyro, 
+        baro_t * baro, 
+        uint16_t * acc_1G, 
+        bool * baro_available, 
+        bool * sonar_available)
 {
     s_acc_1G = mpuInit(acc, gyro, CONFIG_GYRO_LPF);
     acc->init(CONFIG_ACC_ALIGN);
@@ -85,7 +92,7 @@ void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
     }
 }
 
-void ACC_getADC(sensor_t * acc, int16_t * accADC)
+void sensorsGetAccel(sensor_t * acc, int16_t * accADC)
 {
     acc->read(accADC);
     static int32_t a[3];
@@ -150,7 +157,7 @@ static float devStandardDeviation(stdev_t *dev)
     return sqrtf(devVariance(dev));
 }
 
-void Gyro_getADC(sensor_t * gyro, int16_t * gyroADC)
+void sensorsGetGyro(sensor_t * gyro, int16_t * gyroADC)
 {
     // range: +/- 8192; +/- 2000 deg/sec
     gyro->read(gyroADC);
@@ -195,7 +202,7 @@ void Gyro_getADC(sensor_t * gyro, int16_t * gyroADC)
         gyroADC[axis] -= gyroZero[axis];
 }
 
-void Baro_update(baro_t * baro, uint32_t * baroPressureSum)
+void sensorsUpdateBaro(baro_t * baro, uint32_t * baroPressureSum)
 {
     static uint32_t baroDeadline = 0;
     static int state = 0;
@@ -230,7 +237,7 @@ void Baro_update(baro_t * baro, uint32_t * baroPressureSum)
     }
 }
 
-void Sonar_update(int32_t * SonarAlt) 
+void sensorsUpdateSonar(int32_t * SonarAlt) 
 {
     extern int32_t pollSonar(void);
 
