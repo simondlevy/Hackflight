@@ -7,9 +7,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "stm32f10x_conf.h"
-
-#include "breezystm32/breezystm32.h"
+#include <breezystm32.h>
 
 #include "axes.h"
 #include "msp.h"

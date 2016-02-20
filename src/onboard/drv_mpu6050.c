@@ -6,11 +6,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-#include "stm32f10x_conf.h"
-
-#include "../breezystm32/drv_system.h"         // timers, delays, etc
-#include "../breezystm32/drv_gpio.h"
-#include "../breezystm32/drv_i2c.h"
+#include <breezystm32.h>         // timers, delays, etc
 
 #include "../axes.h"
 

@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "../breezystm32/drv_i2c.h"
+#include <breezystm32.h>
 
 #define MB1242_ADDRESS 0x70
 

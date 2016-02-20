@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-#include "breezystm32/breezystm32.h"
+#include <breezystm32.h>
 
 #include "axes.h"
 #include "state.h"

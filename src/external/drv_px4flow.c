@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "../breezystm32/drv_i2c.h"
+#include <breezystm32.h>
 
 #include "drv_px4flow.h"
 

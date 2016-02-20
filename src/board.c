@@ -1,9 +1,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "breezystm32/drv_i2c.h"
-#include "breezystm32/drv_spi.h"
-#include "breezystm32/drv_adc.h"
+#include <drv_i2c.h>
+#include <drv_spi.h>
+#include <drv_adc.h>
 
 typedef enum HardwareRevision {
     NAZE32 = 1,                                         // Naze32 and compatible with 8MHz HSE
