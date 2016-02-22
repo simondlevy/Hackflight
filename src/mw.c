@@ -45,32 +45,16 @@ static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for 
 static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 static uint16_t rcData[RC_CHANS];                           // interval [1000;2000]
 static uint32_t previousTime;
-
 static uint32_t currentTime;
-static bool useSmallAngle;
-static bool armed;
-static int16_t axisPID[3];
-static int16_t angle[2];
-static int16_t gyroData[3];
-static int16_t magADC[3];
-static int16_t motors[4];
-static int16_t motor_disarmed[4];
-
+static bool     useSmallAngle;
+static bool     armed;
+static int16_t  motorDisarmed[4];
 static sensor_t gyro;
 static sensor_t acc;                      
-static baro_t baro;
-
-static uint8_t dynP8[3], dynI8[3], dynD8[3];
-
-// Time of automatic disarm when "Don't spin the motors when armed" is enabled.
-static uint32_t disarmTime = 0;
+static baro_t   baro;
 static uint16_t acc_1G;
-
-static bool baro_available;
-static bool sonar_available;
-
-static int32_t errorGyroI[3] = { 0, 0, 0 };
-static int32_t errorAngleI[2] = { 0, 0 };
+static bool     baroAvailable;
+static bool     sonarAvailable;
 
 static void update_timed_task(uint32_t * usec, uint32_t period) 
 {
@@ -101,7 +85,8 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
     }
 }
 
-static void annexCode(int16_t * rcCommand, bool * accCalibrated)
+static void annexCode(int16_t * rcCommand, bool * accCalibrated, 
+        uint8_t * dynP8, uint8_t * dynI8, uint8_t * dynD8)
 {
     static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
@@ -179,12 +164,12 @@ static void annexCode(int16_t * rcCommand, bool * accCalibrated)
     }
 } // annexCode
 
-uint16_t pwmReadRawRC(uint8_t chan)
+static uint16_t pwmReadRawRC(uint8_t chan)
 {
     return pwmRead(CONFIG_RCMAP[chan]);
 }
 
-void computeRC(void)
+static void computeRC(void)
 {
     uint16_t capture;
     int i, chan;
@@ -222,14 +207,19 @@ static void mwArm(bool accCalibrated)
 static void mwDisarm(void)
 {
     if (armed) {
-        armed = 0;
-        // Reset disarm time so that it works next time we arm the board.
-        if (disarmTime != 0)
-            disarmTime = 0;
+        armed = false;
     }
 }
 
-static void pidMultiWii(int16_t * rcCommand)
+static void pidMultiWii(
+        int16_t * rcCommand, 
+        int16_t * axisPID, 
+        int16_t * angle, 
+        int16_t * gyroData, 
+        uint8_t * dynP8, 
+        uint8_t * dynD8, 
+        int32_t * errorGyroI, 
+        int32_t * errorAngleI)
 {
     int axis, prop;
     int32_t error, errorAngle;
@@ -293,7 +283,7 @@ void setup(void)
 
     mspInit();
 
-    armed = 0;
+    armed = false;
 
     // sleep for 100ms
     delay(100);
@@ -316,7 +306,7 @@ void setup(void)
 
     boardInit();
 
-    sensorsInit(&acc, &gyro, &baro, &acc_1G, &baro_available, &sonar_available);
+    sensorsInit(&acc, &gyro, &baro, &acc_1G, &baroAvailable, &sonarAvailable);
 
     LED1_ON;
     LED0_OFF;
@@ -329,7 +319,7 @@ void setup(void)
     LED1_OFF;
 
     stateInit(acc_1G); 
-    mixerInit(motor_disarmed); 
+    mixerInit(motorDisarmed); 
 
     pwmInit(CONFIG_FAILSAFE_DETECT_THRESHOLD, CONFIG_PWM_FILTER, CONFIG_USE_CPPM, CONFIG_MOTOR_PWM_RATE,
             CONFIG_FAST_PWM, CONFIG_PWM_IDLE_PULSE);
@@ -339,7 +329,9 @@ void setup(void)
     for (i = 0; i < RC_CHANS; i++)
         rcData[i] = 1502;
 
+    // start timing
     previousTime = micros();
+    currentTime = previousTime;
 
     // trigger accelerometer calibration requirement
     useSmallAngle = true;
@@ -367,8 +359,16 @@ void loop(void)
     static int16_t heading;
     static int16_t throttleAngleCorrection;
     static uint32_t baroPressureSum;
-    static int16_t accSmooth[3];
     static bool accCalibrated;
+    static int16_t axisPID[3];
+    static int16_t accSmooth[3];
+    static int16_t angle[2];
+    static int16_t gyroData[3];
+    static int16_t magADC[3];
+    static int16_t motors[4];
+    static uint8_t dynP8[3], dynI8[3], dynD8[3];
+    static int32_t errorGyroI[3];
+    static int32_t errorAngleI[2];
 
     uint16_t auxState = 0;
     bool isThrottleLow = false;
@@ -459,19 +459,19 @@ void loop(void)
         switch (taskOrder) {
             case 0:
                 taskOrder++;
-                if (sonar_available) {
+                if (sonarAvailable) {
                     sensorsUpdateSonar(&SonarAlt);
                     break;
                 }
             case 1:
                 taskOrder++;
-                if (baro_available) {
+                if (baroAvailable) {
                     sensorsUpdateBaro(&baro, &baroPressureSum);
                     break;
                 }
             case 2:
                 taskOrder++;
-                if (baro_available && sonar_available) {
+                if (baroAvailable && sonarAvailable) {
                     stateEstimateAltitude(
                             angle, 
                             &SonarAlt, 
@@ -517,7 +517,7 @@ void loop(void)
         previousTime = currentTime;
 
         // non IMU critical
-        annexCode(rcCommand, &accCalibrated);
+        annexCode(rcCommand, &accCalibrated, dynP8, dynI8, dynD8);
 
         // update MSP
         mspCom(
@@ -531,7 +531,7 @@ void loop(void)
                 vario, 
                 heading, 
                 motors, 
-                motor_disarmed,
+                motorDisarmed,
                 baroPressureSum, 
                 cycleTime, 
                 armed, 
@@ -575,8 +575,8 @@ void loop(void)
             rcCommand[THROTTLE] += throttleAngleCorrection;
         }
 
-        pidMultiWii(rcCommand);
+        pidMultiWii(rcCommand, axisPID, angle, gyroData, dynP8, dynD8, errorGyroI, errorAngleI);
 
-        mixerWriteMotors(motors, motor_disarmed, rcData, rcCommand, axisPID, armed);
+        mixerWriteMotors(motors, motorDisarmed, rcData, rcCommand, axisPID, armed);
     }
 }
