@@ -456,15 +456,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        useSmallAngle = stateEstimateAttitude(
-                &acc, 
-                &gyro, 
-                vitals.accSmooth, 
-                vitals.gyroData,
-                vitals.angle, 
-                &vitals.heading, 
-                &throttleAngleCorrection, 
-                vitals.armed);
+        useSmallAngle = stateEstimateAttitude(&vitals, &acc, &gyro, &throttleAngleCorrection);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();

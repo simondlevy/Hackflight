@@ -115,12 +115,7 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
 }
 
 // rotate acc into Earth frame and calculate acceleration in it
-static void calculateAcceleration(
-        int16_t * accSmooth, 
-        uint32_t deltaT, 
-        int16_t heading, 
-        bool armed, 
-        float * anglerad)
+static void calculateAcceleration(int16_t * accSmooth, uint32_t deltaT, int16_t heading, bool armed, float * anglerad)
 {
     static int32_t accZoffset = 0;
     static float accz_smooth = 0;
@@ -333,20 +328,12 @@ void stateEstimateAltitude(vitals_t * vitals, int32_t * AltPID, int32_t * AltHol
     accZ_old = accZ_tmp;
 }
 
-bool stateEstimateAttitude(
-        sensor_t * acc, 
-        sensor_t * gyro, 
-        int16_t * accSmooth,
-        int16_t * gyroData,
-        int16_t * angle,
-        int16_t * heading, 
-        int16_t * throttleAngleCorrection, 
-        bool armed)
+bool stateEstimateAttitude(vitals_t * vitals, sensor_t * acc, sensor_t * gyro, int16_t * throttleAngleCorrection)
 {
-    static float    anglerad[2];    // absolute angle inclination in radians
+    static float       anglerad[2];    // absolute angle inclination in radians
     static t_fp_vector EstN;
-    static float accLPF[3];
-    static uint32_t previousT;
+    static float       accLPF[3];
+    static uint32_t    previousT;
 
     uint32_t currentT = micros();
     uint32_t deltaT;
@@ -373,11 +360,11 @@ bool stateEstimateAttitude(
         if (CONFIG_ACC_LPF_FACTOR > 0) {
             accLPF[axis] = accLPF[axis] * (1.0f - (1.0f / CONFIG_ACC_LPF_FACTOR)) + accADC[axis] * 
                 (1.0f / CONFIG_ACC_LPF_FACTOR);
-            accSmooth[axis] = accLPF[axis];
+            vitals->accSmooth[axis] = accLPF[axis];
         } else {
-            accSmooth[axis] = accADC[axis];
+            vitals->accSmooth[axis] = accADC[axis];
         }
-        accMag += (int32_t)accSmooth[axis] * accSmooth[axis];
+        accMag += (int32_t)vitals->accSmooth[axis] * vitals->accSmooth[axis];
     }
     accMag = accMag * 100 / ((int32_t)s_acc_1G * s_acc_1G);
 
@@ -388,7 +375,7 @@ bool stateEstimateAttitude(
     // accelerometers in the angle estimation.  To do that, we just skip filter, as EstV already rotated by Gyro.
     if (72 < (uint16_t)accMag && (uint16_t)accMag < 133) {
         for (axis = 0; axis < 3; axis++)
-            EstG.A[axis] = (EstG.A[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + accSmooth[axis]) * INV_GYR_CMPF_FACTOR;
+            EstG.A[axis] = (EstG.A[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + vitals->accSmooth[axis]) * INV_GYR_CMPF_FACTOR;
     }
 
     bool useSmallAngle = (EstG.A[Z] > smallAngle);
@@ -396,14 +383,14 @@ bool stateEstimateAttitude(
     // Attitude of the estimated vector
     anglerad[ROLL] = atan2f(EstG.V.Y, EstG.V.Z);
     anglerad[PITCH] = atan2f(-EstG.V.X, sqrtf(EstG.V.Y * EstG.V.Y + EstG.V.Z * EstG.V.Z));
-    angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
-    angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
+    vitals->angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
+    vitals->angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
 
     rotateV(&EstN.V, deltaGyroAngle);
     normalizeV(&EstN.V, &EstN.V);
-    *heading = calculateHeading(&EstN, anglerad);
+    vitals->heading = calculateHeading(&EstN, anglerad);
 
-    calculateAcceleration(accSmooth, deltaT, *heading, armed, anglerad);
+    calculateAcceleration(vitals->accSmooth, deltaT, vitals->heading, vitals->armed, anglerad);
 
     if (CONFIG_THROTTLE_CORRECTION_VALUE) {
 
@@ -419,9 +406,9 @@ bool stateEstimateAttitude(
         }
     }
 
-    gyroData[YAW] = gyroADC[YAW];
-    gyroData[ROLL] = gyroADC[ROLL];
-    gyroData[PITCH] = gyroADC[PITCH];
+    vitals->gyroData[YAW] = gyroADC[YAW];
+    vitals->gyroData[ROLL] = gyroADC[ROLL];
+    vitals->gyroData[PITCH] = gyroADC[PITCH];
 
     return useSmallAngle;
 }
