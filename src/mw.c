@@ -438,18 +438,7 @@ void loop(void)
             case 2:
                 taskOrder++;
                 if (baroAvailable && sonarAvailable) {
-                    stateEstimateAltitude(
-                            vitals.angle, 
-                            &vitals.sonarAlt, 
-                            &AltPID, 
-                            &vitals.estAlt, 
-                            &AltHold, 
-                            &setVelocity, 
-                            &errorVelocityI,
-                            &vitals.vario, 
-                            velocityControl, 
-                            vitals.baroPressureSum, 
-                            vitals.armed);
+                    stateEstimateAltitude(&vitals, &AltPID, &AltHold, &setVelocity, &errorVelocityI, velocityControl);
                     break;
                 }
             case 3:

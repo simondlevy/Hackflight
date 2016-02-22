@@ -2,18 +2,7 @@
 
 void stateInit(uint16_t acc1G);
 
-void stateEstimateAltitude(
-        int16_t * angle, 
-        int32_t * SonarAlt, 
-        int32_t * AltPID, 
-        int32_t * EstAlt, 
-        int32_t * AltHold, 
-        int32_t * setVelocity, 
-        int32_t * errorVelocityI, 
-        int32_t * vario, 
-        bool      velocityControl, 
-        uint32_t  baroPressureSum, 
-        bool      armed);
+void stateEstimateAltitude(vitals_t * vitals, int32_t * AltPID, int32_t * AltHold, int32_t * setVelocity, int32_t * errorVelocityI, bool velocityControl);
 
 bool stateEstimateAttitude(
         sensor_t * acc, 

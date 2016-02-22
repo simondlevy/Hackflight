@@ -4,6 +4,7 @@
 
 #include <breezystm32.h>
 
+#include "vitals.h"
 #include "axes.h"
 #include "state.h"
 #include "config.h"
@@ -216,19 +217,7 @@ void stateInit(uint16_t acc_1G)
     resetAcc();
 }
 
-
-void stateEstimateAltitude(
-        int16_t * angle, 
-        int32_t * sonarAlt, 
-        int32_t * AltPID, 
-        int32_t * estAlt, 
-        int32_t * AltHold, 
-        int32_t * setVelocity, 
-        int32_t * errorVelocityI, 
-        int32_t * vario, 
-        bool velocityControl, 
-        uint32_t baroPressureSum, 
-        bool armed) 
+void stateEstimateAltitude(vitals_t * vitals, int32_t * AltPID, int32_t * AltHold, int32_t * setVelocity, int32_t * errorVelocityI, bool velocityControl)
 {
     static uint32_t previousT;
     static float accZ_old;
@@ -242,7 +231,7 @@ void stateEstimateAltitude(
     static int32_t  baroAlt_offset;
 
     uint32_t currentT = micros();
-    int16_t tiltAngle = max(abs(angle[ROLL]), abs(angle[PITCH]));
+    int16_t tiltAngle = max(abs(vitals->angle[ROLL]), abs(vitals->angle[PITCH]));
     uint32_t dTime = currentT - previousT;
 
     if (dTime < CONFIG_ALT_UPDATE_USEC)
@@ -251,11 +240,11 @@ void stateEstimateAltitude(
 
     // Calculates height from ground in cm via baro pressure
     // See: https://github.com/diydrones/ardupilot/blob/master/libraries/AP_Baro/AP_Baro.cpp#L140
-    int32_t baroAltRaw = lrintf((1.0f - powf((float)(baroPressureSum / (CONFIG_BARO_TAB_SIZE - 1)) 
+    int32_t baroAltRaw = lrintf((1.0f - powf((float)(vitals->baroPressureSum / (CONFIG_BARO_TAB_SIZE - 1)) 
                     / 101325.0f, 0.190295f)) * 4433000.0f);
 
     // Grab baro baseline on arming
-    if (armed) {
+    if (vitals->armed) {
         if (!wasArmed) {
             baroAltBaseline = baroAltRaw;
             accelVel = 0;
@@ -266,20 +255,20 @@ void stateEstimateAltitude(
     else {
         BaroAlt = 0;
     }
-    wasArmed = armed;
+    wasArmed = vitals->armed;
 
     // Calculate sonar altitude only if the sonar is facing downwards(<25deg)
-    *sonarAlt = (tiltAngle > 250) ? -1 : *sonarAlt * (900.0f - tiltAngle) / 900.0f;
+    vitals->sonarAlt = (tiltAngle > 250) ? -1 : vitals->sonarAlt * (900.0f - tiltAngle) / 900.0f;
 
     // Fuse sonarAlt and BaroAlt
-    if (sonarInRange(*sonarAlt)) {
-        baroAlt_offset = BaroAlt - *sonarAlt;
-        FusedBarosonarAlt = *sonarAlt;
+    if (sonarInRange(vitals->sonarAlt)) {
+        baroAlt_offset = BaroAlt - vitals->sonarAlt;
+        FusedBarosonarAlt = vitals->sonarAlt;
     } else {
         BaroAlt = BaroAlt - baroAlt_offset;
-        if (*sonarAlt > 0) {
-            float sonarTransition = (300 - *sonarAlt) / 100.0f;
-            FusedBarosonarAlt = cfilter(*sonarAlt, BaroAlt, sonarTransition); 
+        if (vitals->sonarAlt > 0) {
+            float sonarTransition = (300 - vitals->sonarAlt) / 100.0f;
+            FusedBarosonarAlt = cfilter(vitals->sonarAlt, BaroAlt, sonarTransition); 
         }
     }
 
@@ -294,7 +283,7 @@ void stateEstimateAltitude(
     accelAlt += (vel_acc * 0.5f) * dt + accelVel * dt;                                         
     accelVel += vel_acc;
 
-    *estAlt = sonarInRange(*sonarAlt) ? FusedBarosonarAlt : accelAlt;
+    vitals->estAlt = sonarInRange(vitals->sonarAlt) ? FusedBarosonarAlt : accelAlt;
 
     resetAcc();
 
@@ -311,7 +300,7 @@ void stateEstimateAltitude(
     int32_t vel_tmp = lrintf(accelVel);
 
     // set vario
-    *vario = applyDeadband(vel_tmp, 5);
+    vitals->vario = applyDeadband(vel_tmp, 5);
 
     if (tiltAngle < 800) { // only calculate pid if the copters thrust is facing downwards(<80deg)
 
@@ -319,7 +308,7 @@ void stateEstimateAltitude(
 
         // Altitude P-Controller
         if (!velocityControl) {
-            int32_t error = constrain(*AltHold - *estAlt, -500, 500);
+            int32_t error = constrain(*AltHold - vitals->estAlt, -500, 500);
             error = applyDeadband(error, 10);       // remove small P parametr to reduce noise near zero position
             setVel = constrain((CONFIG_ALT_P * error / 128), -300, +300); // limit velocity to +/- 3 m/s
         } 
