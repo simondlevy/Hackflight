@@ -12,7 +12,6 @@
 #include "chans.h"
 #include "utils.h"
 
-// shared by stateInit() and other global methods
 static float    accVelScale;
 static float    fcAcc;
 static float    throttleAngleScale;
