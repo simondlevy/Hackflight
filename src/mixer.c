@@ -25,7 +25,7 @@ typedef struct motorMixer_t {
     float yaw;
 } motorMixer_t;
 
-static motorMixer_t currentMixer[4];
+//static motorMixer_t currentMixer[4];
 
 static const motorMixer_t mixerQuadX[] = {
     { 1.0f, -1.0f,  1.0f, -1.0f },          // REAR_R
@@ -39,7 +39,7 @@ void mixerInit(int16_t * motor_disarmed)
     int i;
 
     for (i = 0; i < 4; i++) {
-        currentMixer[i] = mixerQuadX[i];
+        //currentMixer[i] = mixerQuadX[i];
         motor_disarmed[i] = CONFIG_MINCOMMAND;
     }
 }
@@ -59,8 +59,8 @@ void mixerWriteMotors(
     axisPID[YAW] = constrain(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
 
     for (i = 0; i < 4; i++)
-        motors[i] = rcCommand[THROTTLE] * currentMixer[i].throttle + axisPID[PITCH] * currentMixer[i].pitch + 
-            axisPID[ROLL] * currentMixer[i].roll + -CONFIG_YAW_DIRECTION * axisPID[YAW] * currentMixer[i].yaw;
+        motors[i] = rcCommand[THROTTLE] * mixerQuadX[i].throttle + axisPID[PITCH] * mixerQuadX[i].pitch + 
+            axisPID[ROLL] * mixerQuadX[i].roll + -CONFIG_YAW_DIRECTION * axisPID[YAW] * mixerQuadX[i].yaw;
 
     maxMotor = motors[0];
     for (i = 1; i < 4; i++)

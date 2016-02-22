@@ -148,7 +148,6 @@ $(TARGET_HEX): $(TARGET_ELF)
 
 $(TARGET_ELF):  $(TARGET_OBJS)
 	$(CC) -o $@ $^ $(LDFLAGS)
-	echo $(ROOT)
 
 MKDIR_OBJDIR = @mkdir -p $(dir $@)
 
@@ -194,5 +193,8 @@ debug:
 
 listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
+
+sonar:
+	./scripts/bluesonar.py
 
 
