@@ -33,11 +33,6 @@
 
 #define INBUF_SIZE              128
 
-serialPort_t * telemport;
-
-// cause reboot after MSP processing complete
-static bool pendReboot = false;
-
 typedef enum serialState_t {
     IDLE,
     HEADER_START,
@@ -57,6 +52,9 @@ typedef  struct mspPortState_t {
     uint8_t dataSize;
     serialState_t c_state;
 } mspPortState_t;
+
+// cause reboot after MSP processing complete
+static bool pendReboot = false;
 
 static mspPortState_t portState;
 

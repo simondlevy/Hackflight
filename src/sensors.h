@@ -26,6 +26,3 @@ void sensorsInitGyroCalibration(void);
 bool sensorsCalibratingA(void);
 
 bool sensorsCalibratingG(void);
-
-bool initSonar();
-

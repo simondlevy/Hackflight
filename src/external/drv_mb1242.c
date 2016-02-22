@@ -3,6 +3,8 @@
 
 #include <breezystm32.h>
 
+#include "../sonar.h"
+
 #define MB1242_ADDRESS 0x70
 
 extern bool check_and_update_timed_task(uint32_t * usec, uint32_t period);
@@ -19,12 +21,12 @@ static bool attempt_write()
     return i2cWrite(MB1242_ADDRESS, 0x00, 0x51);
 }
 
-bool initSonar()
+bool sonarInit(void)
 {
     return attempt_write() == 1;
 }
 
-int32_t pollSonar()
+int32_t sonarPoll(void)
 {
     static uint32_t mb1242Time = 0;
     static uint8_t state;

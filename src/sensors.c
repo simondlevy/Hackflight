@@ -14,6 +14,7 @@
 #include "config.h"
 #include "sensors.h"
 #include "blink.h"
+#include "sonar.h"
 
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.
@@ -34,7 +35,7 @@ void sensorsInit(
     acc->init(CONFIG_ACC_ALIGN);
     gyro->init(CONFIG_GYRO_ALIGN);
     *baro_available = initBaro(baro);
-    *sonar_available = initSonar();
+    *sonar_available = sonarInit();
 
     calibratingA = 0;
     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
@@ -237,9 +238,7 @@ void sensorsUpdateBaro(baro_t * baro, uint32_t * baroPressureSum)
 
 void sensorsUpdateSonar(int32_t * SonarAlt) 
 {
-    extern int32_t pollSonar(void);
-
-    * SonarAlt = pollSonar();
+    *SonarAlt = sonarPoll();
 }
 
 void sensorsInitAccelCalibration(void)

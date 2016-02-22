@@ -25,8 +25,6 @@ typedef struct motorMixer_t {
     float yaw;
 } motorMixer_t;
 
-//static motorMixer_t currentMixer[4];
-
 static const motorMixer_t mixerQuadX[] = {
     { 1.0f, -1.0f,  1.0f, -1.0f },          // REAR_R
     { 1.0f, -1.0f, -1.0f,  1.0f },          // FRONT_R
@@ -39,7 +37,6 @@ void mixerInit(int16_t * motor_disarmed)
     int i;
 
     for (i = 0; i < 4; i++) {
-        //currentMixer[i] = mixerQuadX[i];
         motor_disarmed[i] = CONFIG_MINCOMMAND;
     }
 }
