@@ -9,10 +9,9 @@
 
 #define I2C_DEVICE (I2CDEV_2)
 
-#define RC_CHANS    (18)
-
 #include <breezystm32.h>
 
+#include "vitals.h"
 #include "axes.h"
 #include "msp.h"
 #include "chans.h"
@@ -43,18 +42,16 @@
 // shared by setup() and loop()
 static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
 static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
-static uint16_t rcData[RC_CHANS];                           // interval [1000;2000]
 static uint32_t previousTime;
 static uint32_t currentTime;
 static bool     useSmallAngle;
-static bool     armed;
-static int16_t  motorDisarmed[4];
 static sensor_t gyro;
 static sensor_t acc;                      
 static baro_t   baro;
-static uint16_t acc1G;
 static bool     baroAvailable;
 static bool     sonarAvailable;
+
+static vitals_t vitals;
 
 static void update_timed_task(uint32_t * usec, uint32_t period) 
 {
@@ -72,27 +69,25 @@ bool check_and_update_timed_task(uint32_t * usec, uint32_t period)
     return result;
 }
 
-static void annexCode(int16_t * rcCommand, bool * accCalibrated, 
-        uint8_t * dynP8, uint8_t * dynI8, uint8_t * dynD8)
+static void annexCode(int16_t * rcCommand, bool * accCalibrated, uint8_t * dynP8, uint8_t * dynI8, uint8_t * dynD8)
 {
     static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
     int32_t axis, prop1, prop2;
 
     // PITCH & ROLL only dynamic PID adjustemnt,  depending on throttle value
-    if (rcData[THROTTLE] < CONFIG_TPA_BREAKPOINT) {
+    if (vitals.rcData[THROTTLE] < CONFIG_TPA_BREAKPOINT) {
         prop2 = 100;
     } else {
-        if (rcData[THROTTLE] < 2000) {
-            prop2 = 100 - (uint16_t)CONFIG_DYN_THR_PID * (rcData[THROTTLE] - CONFIG_TPA_BREAKPOINT) / 
-                (2000 - CONFIG_TPA_BREAKPOINT);
+        if (vitals.rcData[THROTTLE] < 2000) {
+            prop2 = 100 - (uint16_t)CONFIG_DYN_THR_PID * (vitals.rcData[THROTTLE] - CONFIG_TPA_BREAKPOINT) / (2000 - CONFIG_TPA_BREAKPOINT);
         } else {
             prop2 = 100 - CONFIG_DYN_THR_PID;
         }
     }
 
     for (axis = 0; axis < 3; axis++) {
-        tmp = min(abs(rcData[axis] - CONFIG_MIDRC), 500);
+        tmp = min(abs(vitals.rcData[axis] - CONFIG_MIDRC), 500);
         if (axis != 2) {        // ROLL & PITCH
             if (CONFIG_DEADBAND) {
                 if (tmp > CONFIG_DEADBAND) {
@@ -121,11 +116,11 @@ static void annexCode(int16_t * rcCommand, bool * accCalibrated,
         dynP8[axis] = (uint16_t)CONFIG_AXIS_P[axis] * prop1 / 100;
         dynI8[axis] = (uint16_t)CONFIG_AXIS_I[axis] * prop1 / 100;
         dynD8[axis] = (uint16_t)CONFIG_AXIS_D[axis] * prop1 / 100;
-        if (rcData[axis] < CONFIG_MIDRC)
+        if (vitals.rcData[axis] < CONFIG_MIDRC)
             rcCommand[axis] = -rcCommand[axis];
     }
 
-    tmp = constrain(rcData[THROTTLE], CONFIG_MINCHECK, 2000);
+    tmp = constrain(vitals.rcData[THROTTLE], CONFIG_MINCHECK, 2000);
     tmp = (uint32_t)(tmp - CONFIG_MINCHECK) * 1000 / (2000 - CONFIG_MINCHECK);       // [MINCHECK;2000] -> [0;1000]
     tmp2 = tmp / 100;
     rcCommand[THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
@@ -136,7 +131,7 @@ static void annexCode(int16_t * rcCommand, bool * accCalibrated,
     } else {
         if (*accCalibrated)
             LED0_OFF;
-        if (armed)
+        if (vitals.armed)
             LED0_ON;
     }
 
@@ -168,10 +163,10 @@ static void computeRC(void)
             capture = CONFIG_MIDRC;
         rcDataAverage[chan][rcAverageIndex % 4] = capture;
         // clear this since we're not accessing it elsewhere. saves a temp var
-        rcData[chan] = 0;
+        vitals.rcData[chan] = 0;
         for (i = 0; i < 4; i++)
-            rcData[chan] += rcDataAverage[chan][i];
-        rcData[chan] /= 4;
+            vitals.rcData[chan] += rcDataAverage[chan][i];
+        vitals.rcData[chan] /= 4;
     }
     rcAverageIndex++;
 }
@@ -179,26 +174,24 @@ static void computeRC(void)
 static void mwArm(bool accCalibrated)
 {
     if (!sensorsCalibratingG() && accCalibrated) {
-        if (!armed) {         // arm now!
-            armed = true;
+        if (!vitals.armed) {         // arm now!
+            vitals.armed = true;
         }
-    } else if (!armed) {
+    } else if (!vitals.armed) {
         blinkLED(2, 255, 1);
     }
 }
 
 static void mwDisarm(void)
 {
-    if (armed) {
-        armed = false;
+    if (vitals.armed) {
+        vitals.armed = false;
     }
 }
 
 static void pidMultiWii(
         int16_t * rcCommand, 
         int16_t * axisPID, 
-        int16_t * angle, 
-        int16_t * gyroData, 
         uint8_t * dynP8, 
         uint8_t * dynD8, 
         int32_t * errorGyroI, 
@@ -219,7 +212,7 @@ static void pidMultiWii(
         if ((CONFIG_HORIZON_MODE) && axis < 2) { // MODE relying on ACC
             // 50 degrees max inclination
             errorAngle = constrain(2 * rcCommand[axis], -((int)CONFIG_MAX_ANGLE_INCLINATION), 
-                    + CONFIG_MAX_ANGLE_INCLINATION) - angle[axis] + CONFIG_ANGLE_TRIM[axis];
+                    + CONFIG_MAX_ANGLE_INCLINATION) - vitals.angle[axis] + CONFIG_ANGLE_TRIM[axis];
             PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
             // 32 bits is needed for calculation: errorAngle*CONFIG_LEVEL_P could exceed 32768   
             // 16 bits is ok for result
@@ -230,12 +223,12 @@ static void pidMultiWii(
         }
         if (CONFIG_HORIZON_MODE || axis == 2) { // MODE relying on GYRO or YAW axis
             error = (int32_t)rcCommand[axis] * 10 * 8 / CONFIG_AXIS_P[axis];
-            error -= gyroData[axis];
+            error -= vitals.gyroData[axis];
 
             PTermGYRO = rcCommand[axis];
 
             errorGyroI[axis] = constrain(errorGyroI[axis] + error, -16000, +16000); // WindUp
-            if ((abs(gyroData[axis]) > 640) || ((axis == YAW) && (abs(rcCommand[axis]) > 100)))
+            if ((abs(vitals.gyroData[axis]) > 640) || ((axis == YAW) && (abs(rcCommand[axis]) > 100)))
                 errorGyroI[axis] = 0;
             ITermGYRO = (errorGyroI[axis] / 125 * CONFIG_AXIS_I[axis]) >> 6;
         }
@@ -247,9 +240,9 @@ static void pidMultiWii(
             ITerm = ITermGYRO;
         }
 
-        PTerm -= (int32_t)gyroData[axis] * dynP8[axis] / 10 / 8; // 32 bits is needed for calculation
-        delta = gyroData[axis] - lastGyro[axis];
-        lastGyro[axis] = gyroData[axis];
+        PTerm -= (int32_t)vitals.gyroData[axis] * dynP8[axis] / 10 / 8; // 32 bits is needed for calculation
+        delta = vitals.gyroData[axis] - lastGyro[axis];
+        lastGyro[axis] = vitals.gyroData[axis];
         deltaSum = delta1[axis] + delta2[axis] + delta;
         delta2[axis] = delta1[axis];
         delta1[axis] = delta;
@@ -266,7 +259,7 @@ void setup(void)
 
     mspInit();
 
-    armed = false;
+    vitals.armed = false;
 
     // sleep for 100ms
     delay(100);
@@ -289,7 +282,7 @@ void setup(void)
 
     boardInit();
 
-    sensorsInit(&acc, &gyro, &baro, &acc1G, &baroAvailable, &sonarAvailable);
+    sensorsInit(&acc, &gyro, &baro, &vitals.acc1G, &baroAvailable, &sonarAvailable);
 
     LED1_ON;
     LED0_OFF;
@@ -301,8 +294,8 @@ void setup(void)
     LED0_OFF;
     LED1_OFF;
 
-    stateInit(acc1G); 
-    mixerInit(motorDisarmed); 
+    stateInit(vitals.acc1G); 
+    mixerInit(vitals.motorDisarmed); 
 
     pwmInit(CONFIG_FAILSAFE_DETECT_THRESHOLD, CONFIG_PWM_FILTER, CONFIG_USE_CPPM, CONFIG_MOTOR_PWM_RATE,
             CONFIG_FAST_PWM, CONFIG_PWM_IDLE_PULSE);
@@ -310,7 +303,7 @@ void setup(void)
     // configure PWM/CPPM read function and max number of channels
     // these, if enabled
     for (i = 0; i < RC_CHANS; i++)
-        rcData[i] = 1502;
+        vitals.rcData[i] = 1502;
 
     // start timing
     previousTime = micros();
@@ -328,31 +321,20 @@ void loop(void)
     static int16_t rcCommand[4];        // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
     static uint8_t rcSticks;            // this hold sticks position for command combos
     static uint32_t rcTime;
-    static int16_t initialThrottleHold;
+    static int16_t  initialThrottleHold;
     static uint32_t loopTime;
-    static int32_t sonarAlt;
-    static int32_t estAlt;
-    static int32_t AltPID;
-    static uint8_t alt_hold_mode;
-    static int32_t AltHold;
-    static int32_t setVelocity;
-    static bool velocityControl;
-    static int32_t errorVelocityI;
-    static int32_t vario;
-    static int16_t heading;
-    static int16_t throttleAngleCorrection;
-    static uint32_t baroPressureSum;
-    static bool accCalibrated;
-    static int16_t axisPID[3];
-    static int16_t accSmooth[3];
-    static int16_t angle[2];
-    static int16_t gyroData[3];
-    static int16_t magADC[3];
-    static int16_t motors[4];
-    static uint8_t dynP8[3], dynI8[3], dynD8[3];
-    static int32_t errorGyroI[3];
-    static int32_t errorAngleI[2];
-    static telemetry_t telemetry;
+    static int32_t  AltPID;
+    static uint8_t  alt_hold_mode;
+    static int32_t  AltHold;
+    static int32_t  setVelocity;
+    static bool     velocityControl;
+    static int32_t  errorVelocityI;
+    static int16_t  throttleAngleCorrection;
+    static bool     accCalibrated;
+    static int16_t  axisPID[3];
+    static uint8_t  dynP8[3], dynI8[3], dynD8[3];
+    static int32_t  errorGyroI[3];
+    static int32_t  errorAngleI[2];
 
     uint16_t auxState = 0;
     bool isThrottleLow = false;
@@ -367,9 +349,9 @@ void loop(void)
         // checking sticks positions
         for (i = 0; i < 4; i++) {
             stTmp >>= 2;
-            if (rcData[i] > CONFIG_MINCHECK)
+            if (vitals.rcData[i] > CONFIG_MINCHECK)
                 stTmp |= 0x80;  // check for MIN
-            if (rcData[i] < CONFIG_MAXCHECK)
+            if (vitals.rcData[i] < CONFIG_MAXCHECK)
                 stTmp |= 0x40;  // check for MAX
         }
         if (stTmp == rcSticks) {
@@ -380,7 +362,7 @@ void loop(void)
         rcSticks = stTmp;
 
         // perform actions
-        if ((rcData[THROTTLE] < CONFIG_MINCHECK))
+        if ((vitals.rcData[THROTTLE] < CONFIG_MINCHECK))
             isThrottleLow = true;
         if (isThrottleLow) {
             errorGyroI[ROLL] = 0;
@@ -391,7 +373,7 @@ void loop(void)
         }
 
         if (rcDelayCommand == 20) {
-            if (armed) {      // actions during armed
+            if (vitals.armed) {      // actions during armed
                 // Disarm on throttle down + yaw
                 if (rcSticks == THR_LO + YAW_LO + PIT_CE + ROL_CE)
                     mwDisarm();
@@ -418,9 +400,9 @@ void loop(void)
         }
 
         // Check AUX switches
-        if (rcData[AUX1] > 1300) {
+        if (vitals.rcData[AUX1] > 1300) {
             auxState = 1;
-            if (rcData[AUX1] > 1700)
+            if (vitals.rcData[AUX1] > 1700)
                 auxState = 2;
         }
 
@@ -428,7 +410,7 @@ void loop(void)
         if (auxState > 0) {
             if (!alt_hold_mode) {
                 alt_hold_mode = 1;
-                AltHold = estAlt;
+                AltHold = vitals.estAlt;
                 initialThrottleHold = rcCommand[THROTTLE];
                 errorVelocityI = 0;
                 AltPID = 0;
@@ -444,30 +426,30 @@ void loop(void)
             case 0:
                 taskOrder++;
                 if (sonarAvailable) {
-                    sensorsUpdateSonar(&sonarAlt);
+                    sensorsUpdateSonar(&vitals.sonarAlt);
                     break;
                 }
             case 1:
                 taskOrder++;
                 if (baroAvailable) {
-                    sensorsUpdateBaro(&baro, &baroPressureSum);
+                    sensorsUpdateBaro(&baro, &vitals.baroPressureSum);
                     break;
                 }
             case 2:
                 taskOrder++;
                 if (baroAvailable && sonarAvailable) {
                     stateEstimateAltitude(
-                            angle, 
-                            &sonarAlt, 
+                            vitals.angle, 
+                            &vitals.sonarAlt, 
                             &AltPID, 
-                            &estAlt, 
+                            &vitals.estAlt, 
                             &AltHold, 
                             &setVelocity, 
                             &errorVelocityI,
-                            &vario, 
+                            &vitals.vario, 
                             velocityControl, 
-                            baroPressureSum, 
-                            armed);
+                            vitals.baroPressureSum, 
+                            vitals.armed);
                     break;
                 }
             case 3:
@@ -488,38 +470,23 @@ void loop(void)
         useSmallAngle = stateEstimateAttitude(
                 &acc, 
                 &gyro, 
-                accSmooth, 
-                gyroData,
-                angle, 
-                &heading, 
+                vitals.accSmooth, 
+                vitals.gyroData,
+                vitals.angle, 
+                &vitals.heading, 
                 &throttleAngleCorrection, 
-                armed);
+                vitals.armed);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
-        uint16_t cycleTime = (int32_t)(currentTime - previousTime);
+        vitals.cycleTime = (int32_t)(currentTime - previousTime);
         previousTime = currentTime;
 
         // non IMU critical
         annexCode(rcCommand, &accCalibrated, dynP8, dynI8, dynD8);
 
         // update MSP
-        telemetry.accSmooth = accSmooth;
-        telemetry.acc1G = acc1G;
-        telemetry.angle = angle;
-        telemetry.armed = armed; 
-        telemetry.baroPressureSum = baroPressureSum; 
-        telemetry.cycleTime = cycleTime; 
-        telemetry.estAlt = estAlt; 
-        telemetry.gyroData = gyroData;
-        telemetry.heading = heading; 
-        telemetry.magADC = magADC;
-        telemetry.motorDisarmed = motorDisarmed;
-        telemetry.motors = motors;
-        telemetry.rcData = rcData; 
-        telemetry.sonarAlt = sonarAlt; 
-        telemetry.vario = vario; 
-        mspCom(&telemetry);
+        mspCom(&vitals);
 
         if (alt_hold_mode) {
             static uint8_t isAltHoldChanged = 0;
@@ -532,7 +499,7 @@ void loop(void)
                         ? -CONFIG_ALT_HOLD_THROTTLE_NEUTRAL : CONFIG_ALT_HOLD_THROTTLE_NEUTRAL;
                 } else {
                     if (isAltHoldChanged) {
-                        AltHold = estAlt;
+                        AltHold = vitals.estAlt;
                         isAltHoldChanged = 0;
                     }
                     rcCommand[THROTTLE] = constrain(initialThrottleHold + AltPID, 
@@ -546,7 +513,7 @@ void loop(void)
                     velocityControl = true;
                     isAltHoldChanged = 1;
                 } else if (isAltHoldChanged) {
-                    AltHold = estAlt;
+                    AltHold = vitals.estAlt;
                     velocityControl = false;
                     isAltHoldChanged = 0;
                 }
@@ -559,9 +526,9 @@ void loop(void)
             rcCommand[THROTTLE] += throttleAngleCorrection;
         }
 
-        pidMultiWii(rcCommand, axisPID, angle, gyroData, dynP8, dynD8, errorGyroI, errorAngleI);
+        pidMultiWii(rcCommand, axisPID, dynP8, dynD8, errorGyroI, errorAngleI);
 
-        mixerWriteMotors(motors, motorDisarmed, rcData, rcCommand, axisPID, armed);
+        mixerWriteMotors(vitals.motors, vitals.motorDisarmed, vitals.rcData, rcCommand, axisPID, vitals.armed);
     }
 }
 

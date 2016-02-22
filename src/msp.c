@@ -9,6 +9,7 @@
 
 #include <breezystm32.h>
 
+#include "vitals.h"
 #include "axes.h"
 #include "msp.h"
 #include "config.h"
@@ -138,7 +139,7 @@ static void s_struct(uint8_t *cb, uint8_t siz)
         serialize8(*cb++);
 }
 
-static void evaluateCommand(telemetry_t * telemetry)
+static void evaluateCommand(vitals_t * vitals)
 {
     uint32_t i;
     const char *build = __DATE__;
@@ -147,20 +148,20 @@ static void evaluateCommand(telemetry_t * telemetry)
 
         case MSP_SET_RAW_RC:
             for (i = 0; i < 8; i++)
-                telemetry->rcData[i] = read16();
+                vitals->rcData[i] = read16();
             headSerialReply(0);
             mspFrameRecieve();
             break;
 
         case MSP_SET_MOTOR:
             for (i = 0; i < 4; i++)
-                telemetry->motorDisarmed[i] = read16();
+                vitals->motorDisarmed[i] = read16();
             headSerialReply(0);
             break;
 
         case MSP_STATUS:
             headSerialReply(11);
-            serialize16(telemetry->cycleTime);
+            serialize16(vitals->cycleTime);
             serialize16(i2cGetErrorCounter());
             serialize16(0);
             serialize8(0);
@@ -169,34 +170,34 @@ static void evaluateCommand(telemetry_t * telemetry)
         case MSP_RAW_IMU:
             headSerialReply(18);
             // Retarded hack until multiwiidorks start using real units for sensor data
-            if (telemetry->acc1G > 1024) {
+            if (vitals->acc1G > 1024) {
                 for (i = 0; i < 3; i++)
-                    serialize16(telemetry->accSmooth[i] / 8);
+                    serialize16(vitals->accSmooth[i] / 8);
             } else {
                 for (i = 0; i < 3; i++)
-                    serialize16(telemetry->accSmooth[i]);
+                    serialize16(vitals->accSmooth[i]);
             }
             for (i = 0; i < 3; i++)
-                serialize16(telemetry->gyroData[i]);
+                serialize16(vitals->gyroData[i]);
             for (i = 0; i < 3; i++)
-                serialize16(telemetry->magADC[i]);
+                serialize16(vitals->magADC[i]);
             break;
 
         case MSP_MOTOR:
-            s_struct((uint8_t *)telemetry->motors, 16);
+            s_struct((uint8_t *)vitals->motors, 16);
             break;
 
         case MSP_RC:
             headSerialReply(16);
             for (i = 0; i < 8; i++)
-                serialize16(telemetry->rcData[i]);
+                serialize16(vitals->rcData[i]);
             break;
 
         case MSP_ATTITUDE:
             headSerialReply(6);
             for (i = 0; i < 2; i++)
-                serialize16(telemetry->angle[i]);
-            serialize16(telemetry->heading);
+                serialize16(vitals->angle[i]);
+            serialize16(vitals->heading);
             break;
 
             /*
@@ -209,14 +210,14 @@ static void evaluateCommand(telemetry_t * telemetry)
 
         case MSP_MB1242:
             headSerialReply(8);
-            serialize32(telemetry->baroPressureSum/(CONFIG_BARO_TAB_SIZE-1));
-            serialize32(telemetry->sonarAlt);
+            serialize32(vitals->baroPressureSum/(CONFIG_BARO_TAB_SIZE-1));
+            serialize32(vitals->sonarAlt);
             break;
 
         case MSP_ALTITUDE:
             headSerialReply(6);
-            serialize32(telemetry->estAlt);
-            serialize16(telemetry->vario);
+            serialize32(vitals->estAlt);
+            serialize16(vitals->vario);
             break;
 
         case MSP_REBOOT:
@@ -246,7 +247,7 @@ void mspInit(void)
     portState.port = Serial1; // provided by Mockduino
 }
 
-void mspCom(telemetry_t * telemetry)
+void mspCom(vitals_t * vitals)
 {
     uint8_t c;
 
@@ -258,7 +259,7 @@ void mspCom(telemetry_t * telemetry)
 
         if (portState.c_state == IDLE) {
             portState.c_state = (c == '$') ? HEADER_START : IDLE;
-            if (portState.c_state == IDLE && !telemetry->armed) {
+            if (portState.c_state == IDLE && !vitals->armed) {
                 if (c == '#')
                     ;
                 else if (c == CONFIG_REBOOT_CHARACTER) 
@@ -290,7 +291,7 @@ void mspCom(telemetry_t * telemetry)
         } else if (portState.c_state == HEADER_CMD && 
                 portState.offset >= portState.dataSize) {
             if (portState.checksum == c) 
-                evaluateCommand(telemetry);
+                evaluateCommand(vitals);
             portState.c_state = IDLE;
         }
     }
