@@ -226,7 +226,7 @@ void stateEstimateAltitude(vitals_t * vitals, int32_t * AltPID, int32_t * AltHol
     static int32_t  baroAlt_offset;
 
     uint32_t currentT = micros();
-    int16_t tiltAngle = max(abs(vitals->angle[ROLL]), abs(vitals->angle[PITCH]));
+    int16_t tiltAngle = max(abs(vitals->imuAngle[ROLL]), abs(vitals->imuAngle[PITCH]));
     uint32_t dTime = currentT - previousT;
 
     if (dTime < CONFIG_ALT_UPDATE_USEC)
@@ -383,8 +383,8 @@ bool stateEstimateAttitude(vitals_t * vitals, sensor_t * acc, sensor_t * gyro, i
     // Attitude of the estimated vector
     anglerad[ROLL] = atan2f(EstG.V.Y, EstG.V.Z);
     anglerad[PITCH] = atan2f(-EstG.V.X, sqrtf(EstG.V.Y * EstG.V.Y + EstG.V.Z * EstG.V.Z));
-    vitals->angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
-    vitals->angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
+    vitals->imuAngle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
+    vitals->imuAngle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
 
     rotateV(&EstN.V, deltaGyroAngle);
     normalizeV(&EstN.V, &EstN.V);

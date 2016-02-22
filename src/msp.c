@@ -196,7 +196,7 @@ static void evaluateCommand(vitals_t * vitals)
         case MSP_ATTITUDE:
             headSerialReply(6);
             for (i = 0; i < 2; i++)
-                serialize16(vitals->angle[i]);
+                serialize16(vitals->imuAngle[i]);
             serialize16(vitals->heading);
             break;
 

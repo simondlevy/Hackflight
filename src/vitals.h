@@ -6,7 +6,7 @@ typedef struct {
 
     int16_t  accSmooth[3];
     uint16_t acc1G;
-    int16_t  angle[2];
+    int16_t  imuAngle[2];
     bool     armed; 
     uint32_t baroPressureSum; 
     uint16_t cycleTime; 

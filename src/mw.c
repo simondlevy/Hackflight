@@ -212,7 +212,7 @@ static void pidMultiWii(
         if ((CONFIG_HORIZON_MODE) && axis < 2) { // MODE relying on ACC
             // 50 degrees max inclination
             errorAngle = constrain(2 * rcCommand[axis], -((int)CONFIG_MAX_ANGLE_INCLINATION), 
-                    + CONFIG_MAX_ANGLE_INCLINATION) - vitals.angle[axis] + CONFIG_ANGLE_TRIM[axis];
+                    + CONFIG_MAX_ANGLE_INCLINATION) - vitals.imuAngle[axis] + CONFIG_ANGLE_TRIM[axis];
             PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
             // 32 bits is needed for calculation: errorAngle*CONFIG_LEVEL_P could exceed 32768   
             // 16 bits is ok for result
@@ -317,7 +317,7 @@ void setup(void)
 void loop(void)
 {
     static uint8_t  rcDelayCommand;      // this indicates the number of time (multiple of RC measurement at 50Hz) 
-                                        // the sticks must be maintained to run or switch off motors
+                                         // the sticks must be maintained to run or switch off motors
     static int16_t  rcCommand[4];        // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
     static uint8_t  rcSticks;            // this hold sticks position for command combos
     static uint32_t rcTime;

@@ -152,7 +152,7 @@ $(TARGET_ELF):  $(TARGET_OBJS)
 MKDIR_OBJDIR = @mkdir -p $(dir $@)
 
 # Compile
-$(OBJECT_DIR)/$(TARGET)/%.o: %.c config.h
+$(OBJECT_DIR)/$(TARGET)/%.o: %.c config.h vitals.h
 	$(MKDIR_OBJDIR)
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(CFLAGS) $<
