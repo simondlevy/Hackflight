@@ -316,10 +316,10 @@ void setup(void)
 
 void loop(void)
 {
-    static uint8_t rcDelayCommand;      // this indicates the number of time (multiple of RC measurement at 50Hz) 
+    static uint8_t  rcDelayCommand;      // this indicates the number of time (multiple of RC measurement at 50Hz) 
                                         // the sticks must be maintained to run or switch off motors
-    static int16_t rcCommand[4];        // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
-    static uint8_t rcSticks;            // this hold sticks position for command combos
+    static int16_t  rcCommand[4];        // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
+    static uint8_t  rcSticks;            // this hold sticks position for command combos
     static uint32_t rcTime;
     static int16_t  initialThrottleHold;
     static uint32_t loopTime;
@@ -335,10 +335,10 @@ void loop(void)
     static uint8_t  dynP8[3], dynI8[3], dynD8[3];
     static int32_t  errorGyroI[3];
     static int32_t  errorAngleI[2];
+    static uint16_t auxState = 0;
+    static bool     isThrottleLow;
+    static uint8_t  stTmp;
 
-    uint16_t auxState = 0;
-    bool isThrottleLow = false;
-    uint8_t stTmp = 0;
     int i;
 
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC)) {
