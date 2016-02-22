@@ -72,19 +72,6 @@ bool check_and_update_timed_task(uint32_t * usec, uint32_t period)
     return result;
 }
 
-void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
-{
-    uint8_t i, r;
-
-    for (r = 0; r < repeat; r++) {
-        for (i = 0; i < num; i++) {
-            LED0_TOGGLE;            // switch LEDPIN state
-            delay(wait);
-        }
-        delay(60);
-    }
-}
-
 static void annexCode(int16_t * rcCommand, bool * accCalibrated, 
         uint8_t * dynP8, uint8_t * dynI8, uint8_t * dynD8)
 {
@@ -164,11 +151,6 @@ static void annexCode(int16_t * rcCommand, bool * accCalibrated,
     }
 } // annexCode
 
-static uint16_t pwmReadRawRC(uint8_t chan)
-{
-    return pwmRead(CONFIG_RCMAP[chan]);
-}
-
 static void computeRC(void)
 {
     uint16_t capture;
@@ -178,7 +160,8 @@ static void computeRC(void)
     static int rcAverageIndex = 0;
 
     for (chan = 0; chan < 8; chan++) {
-        capture = pwmReadRawRC(chan);
+
+        capture = pwmRead(CONFIG_RCMAP[chan]);
 
         // validate input
         if (capture < PULSE_MIN || capture > PULSE_MAX)
@@ -578,5 +561,18 @@ void loop(void)
         pidMultiWii(rcCommand, axisPID, angle, gyroData, dynP8, dynD8, errorGyroI, errorAngleI);
 
         mixerWriteMotors(motors, motorDisarmed, rcData, rcCommand, axisPID, armed);
+    }
+}
+
+void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
+{
+    uint8_t i, r;
+
+    for (r = 0; r < repeat; r++) {
+        for (i = 0; i < num; i++) {
+            LED0_TOGGLE;            // switch LEDPIN state
+            delay(wait);
+        }
+        delay(60);
     }
 }

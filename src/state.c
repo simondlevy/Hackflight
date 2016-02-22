@@ -11,9 +11,9 @@
 #include "chans.h"
 #include "utils.h"
 
-static float    anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
+// shared by stateInit() and other global methods
 static float    accVelScale;
-static float    fc_acc;
+static float    fcAcc;
 static float    throttleAngleScale;
 static int16_t  smallAngle;
 static uint32_t accTimeSum;
@@ -21,7 +21,6 @@ static int32_t  accSumCount;
 static int32_t  accSum[3];
 static uint16_t s_acc_1G;
 
-static const float magneticDeclination = 0.0f;       
 
 // **************************************************
 // Simplified IMU based on "Complementary Filter"
@@ -115,7 +114,12 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
 }
 
 // rotate acc into Earth frame and calculate acceleration in it
-static void acc_calc(int16_t * accSmooth, uint32_t deltaT, int16_t heading, bool armed)
+static void calculateAcceleration(
+        int16_t * accSmooth, 
+        uint32_t deltaT, 
+        int16_t heading, 
+        bool armed, 
+        float * anglerad)
 {
     static int32_t accZoffset = 0;
     static float accz_smooth = 0;
@@ -146,7 +150,7 @@ static void acc_calc(int16_t * accSmooth, uint32_t deltaT, int16_t heading, bool
     } else
         accel_ned.V.Z -= s_acc_1G;
 
-    accz_smooth = accz_smooth + (dT / (fc_acc + dT)) * (accel_ned.V.Z - accz_smooth); // low pass filter
+    accz_smooth = accz_smooth + (dT / (fcAcc + dT)) * (accel_ned.V.Z - accz_smooth); // low pass filter
 
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
@@ -159,7 +163,7 @@ static void acc_calc(int16_t * accSmooth, uint32_t deltaT, int16_t heading, bool
 }
 
 // baseflight calculation by Luggi09 originates from arducopter
-static int16_t calculateHeading(t_fp_vector *vec)
+static int16_t calculateHeading(t_fp_vector *vec, float * anglerad)
 {
     int16_t head;
 
@@ -169,7 +173,7 @@ static int16_t calculateHeading(t_fp_vector *vec)
     float sinePitch = sinf(anglerad[PITCH]);
     float Xh = vec->A[X] * cosinePitch + vec->A[Y] * sineRoll * sinePitch + vec->A[Z] * sinePitch * cosineRoll;
     float Yh = vec->A[Y] * cosineRoll - vec->A[Z] * sineRoll;
-    float hd = (atan2f(Yh, Xh) * 1800.0f / M_PI + magneticDeclination) / 10.0f;
+    float hd = (atan2f(Yh, Xh) * 1800.0f / M_PI + CONFIG_MAGNETIC_DECLINATION) / 10.0f;
     head = lrintf(hd);
     if (head < 0)
         head += 360;
@@ -188,6 +192,15 @@ static float cfilter(float a, float b, float c)
     return a * c + b * (1 - c);
 }
 
+static void resetAcc(void)
+{
+    accSum[0] = 0;
+    accSum[1] = 0;
+    accSum[2] = 0;
+    accSumCount = 0;
+    accTimeSum = 0;
+}
+
 // ==================================================================================================
 
 void stateInit(uint16_t acc_1G)
@@ -196,9 +209,11 @@ void stateInit(uint16_t acc_1G)
     accVelScale = 9.80665f / acc_1G / 10000.0f;
     throttleAngleScale = (1800.0f / M_PI) * (900.0f / CONFIG_THROTTLE_CORRECTION_ANGLE);
 
-    fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
+    fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 
     s_acc_1G = acc_1G;
+
+    resetAcc();
 }
 
 
@@ -281,11 +296,7 @@ void stateEstimateAltitude(
 
     *EstAlt = sonarInRange(*SonarAlt) ? FusedBaroSonarAlt : accelAlt;
 
-    accSum[0] = 0;
-    accSum[1] = 0;
-    accSum[2] = 0;
-    accSumCount = 0;
-    accTimeSum = 0;
+    resetAcc();
 
     int32_t fusedBaroSonarVel = (FusedBaroSonarAlt - lastFusedBaroSonarAlt) * 1000000.0f / dTime;
     lastFusedBaroSonarAlt = FusedBaroSonarAlt;
@@ -343,22 +354,26 @@ bool stateEstimateAttitude(
         int16_t * throttleAngleCorrection, 
         bool armed)
 {
-    int32_t axis;
-    int32_t accMag = 0;
+    static float    anglerad[2];    // absolute angle inclination in radians
     static t_fp_vector EstN;
-    EstN.A[0] = 1.0f;
-    EstN.A[1] = 0.0f;
-    EstN.A[2] = 0.0f;
     static float accLPF[3];
     static uint32_t previousT;
+
     uint32_t currentT = micros();
     uint32_t deltaT;
     float scale, deltaGyroAngle[3];
+    int16_t accADC[3];
+    int16_t gyroADC[3];
+    int32_t axis;
+    int32_t accMag = 0;
+
+
     deltaT = currentT - previousT;
     scale = deltaT * gyro->scale;
     previousT = currentT;
-    int16_t accADC[3];
-    int16_t gyroADC[3];
+    EstN.A[0] = 1.0f;
+    EstN.A[1] = 0.0f;
+    EstN.A[2] = 0.0f;
 
     sensorsGetGyro(gyro, gyroADC);
     sensorsGetAccel(acc, accADC);
@@ -397,9 +412,9 @@ bool stateEstimateAttitude(
 
     rotateV(&EstN.V, deltaGyroAngle);
     normalizeV(&EstN.V, &EstN.V);
-    *heading = calculateHeading(&EstN);
+    *heading = calculateHeading(&EstN, anglerad);
 
-    acc_calc(accSmooth, deltaT, *heading, armed); // rotate acc vector into earth frame
+    calculateAcceleration(accSmooth, deltaT, *heading, armed, anglerad);
 
     if (CONFIG_THROTTLE_CORRECTION_VALUE) {
 
