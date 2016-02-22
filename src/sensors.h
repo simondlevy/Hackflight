@@ -17,7 +17,7 @@ void sensorsGetGyro(sensor_t * gyro, int16_t * gyroADC);
 
 void sensorsUpdateBaro(baro_t * baro, uint32_t * baroPressureSum);
 
-void sensorsUpdateSonar(int32_t * SonarAlt);
+void sensorsUpdateSonar(int32_t * sonarAlt);
 
 void sensorsInitAccelCalibration(void);
 

@@ -21,17 +21,17 @@
 static uint16_t calibratingA;      
 static uint16_t calibratingG;
 static int16_t accZero[3];
-static uint16_t s_acc_1G;
+static uint16_t s_acc1G;
 
 void sensorsInit(
         sensor_t * acc, 
         sensor_t * gyro, 
         baro_t * baro, 
-        uint16_t * acc_1G, 
+        uint16_t * acc1G, 
         bool * baro_available, 
         bool * sonar_available)
 {
-    s_acc_1G = mpuInit(acc, gyro, CONFIG_GYRO_LPF);
+    s_acc1G = mpuInit(acc, gyro, CONFIG_GYRO_LPF);
     acc->init(CONFIG_ACC_ALIGN);
     gyro->init(CONFIG_GYRO_ALIGN);
     *baro_available = initBaro(baro);
@@ -40,7 +40,7 @@ void sensorsInit(
     calibratingA = 0;
     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
 
-    *acc_1G = s_acc_1G;
+    *acc1G = s_acc1G;
 }
 
 void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
@@ -108,11 +108,11 @@ void sensorsGetAccel(sensor_t * acc, int16_t * accADC)
             accADC[axis] = 0;
             accZero[axis] = 0;
         }
-        // Calculate average, shift Z down by acc_1G
+        // Calculate average, shift Z down by acc1G
         if (calibratingA == 1) {
             accZero[ROLL] = (a[ROLL] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
             accZero[PITCH] = (a[PITCH] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
-            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - s_acc_1G;
+            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - s_acc1G;
         }
         calibratingA--;
     }
@@ -236,9 +236,9 @@ void sensorsUpdateBaro(baro_t * baro, uint32_t * baroPressureSum)
     }
 }
 
-void sensorsUpdateSonar(int32_t * SonarAlt) 
+void sensorsUpdateSonar(int32_t * sonarAlt) 
 {
-    *SonarAlt = sonarPoll();
+    *sonarAlt = sonarPoll();
 }
 
 void sensorsInitAccelCalibration(void)

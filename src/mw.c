@@ -52,7 +52,7 @@ static int16_t  motorDisarmed[4];
 static sensor_t gyro;
 static sensor_t acc;                      
 static baro_t   baro;
-static uint16_t acc_1G;
+static uint16_t acc1G;
 static bool     baroAvailable;
 static bool     sonarAvailable;
 
@@ -289,7 +289,7 @@ void setup(void)
 
     boardInit();
 
-    sensorsInit(&acc, &gyro, &baro, &acc_1G, &baroAvailable, &sonarAvailable);
+    sensorsInit(&acc, &gyro, &baro, &acc1G, &baroAvailable, &sonarAvailable);
 
     LED1_ON;
     LED0_OFF;
@@ -301,7 +301,7 @@ void setup(void)
     LED0_OFF;
     LED1_OFF;
 
-    stateInit(acc_1G); 
+    stateInit(acc1G); 
     mixerInit(motorDisarmed); 
 
     pwmInit(CONFIG_FAILSAFE_DETECT_THRESHOLD, CONFIG_PWM_FILTER, CONFIG_USE_CPPM, CONFIG_MOTOR_PWM_RATE,
@@ -330,8 +330,8 @@ void loop(void)
     static uint32_t rcTime;
     static int16_t initialThrottleHold;
     static uint32_t loopTime;
-    static int32_t SonarAlt;
-    static int32_t EstAlt;
+    static int32_t sonarAlt;
+    static int32_t estAlt;
     static int32_t AltPID;
     static uint8_t alt_hold_mode;
     static int32_t AltHold;
@@ -352,6 +352,7 @@ void loop(void)
     static uint8_t dynP8[3], dynI8[3], dynD8[3];
     static int32_t errorGyroI[3];
     static int32_t errorAngleI[2];
+    static telemetry_t telemetry;
 
     uint16_t auxState = 0;
     bool isThrottleLow = false;
@@ -427,7 +428,7 @@ void loop(void)
         if (auxState > 0) {
             if (!alt_hold_mode) {
                 alt_hold_mode = 1;
-                AltHold = EstAlt;
+                AltHold = estAlt;
                 initialThrottleHold = rcCommand[THROTTLE];
                 errorVelocityI = 0;
                 AltPID = 0;
@@ -443,7 +444,7 @@ void loop(void)
             case 0:
                 taskOrder++;
                 if (sonarAvailable) {
-                    sensorsUpdateSonar(&SonarAlt);
+                    sensorsUpdateSonar(&sonarAlt);
                     break;
                 }
             case 1:
@@ -457,9 +458,9 @@ void loop(void)
                 if (baroAvailable && sonarAvailable) {
                     stateEstimateAltitude(
                             angle, 
-                            &SonarAlt, 
+                            &sonarAlt, 
                             &AltPID, 
-                            &EstAlt, 
+                            &estAlt, 
                             &AltHold, 
                             &setVelocity, 
                             &errorVelocityI,
@@ -503,22 +504,22 @@ void loop(void)
         annexCode(rcCommand, &accCalibrated, dynP8, dynI8, dynD8);
 
         // update MSP
-        mspCom(
-                angle, 
-                gyroData,
-                rcData, 
-                accSmooth, 
-                magADC,
-                SonarAlt, 
-                EstAlt, 
-                vario, 
-                heading, 
-                motors, 
-                motorDisarmed,
-                baroPressureSum, 
-                cycleTime, 
-                armed, 
-                acc_1G);
+        telemetry.accSmooth = accSmooth;
+        telemetry.acc1G = acc1G;
+        telemetry.angle = angle;
+        telemetry.armed = armed; 
+        telemetry.baroPressureSum = baroPressureSum; 
+        telemetry.cycleTime = cycleTime; 
+        telemetry.estAlt = estAlt; 
+        telemetry.gyroData = gyroData;
+        telemetry.heading = heading; 
+        telemetry.magADC = magADC;
+        telemetry.motorDisarmed = motorDisarmed;
+        telemetry.motors = motors;
+        telemetry.rcData = rcData; 
+        telemetry.sonarAlt = sonarAlt; 
+        telemetry.vario = vario; 
+        mspCom(&telemetry);
 
         if (alt_hold_mode) {
             static uint8_t isAltHoldChanged = 0;
@@ -531,7 +532,7 @@ void loop(void)
                         ? -CONFIG_ALT_HOLD_THROTTLE_NEUTRAL : CONFIG_ALT_HOLD_THROTTLE_NEUTRAL;
                 } else {
                     if (isAltHoldChanged) {
-                        AltHold = EstAlt;
+                        AltHold = estAlt;
                         isAltHoldChanged = 0;
                     }
                     rcCommand[THROTTLE] = constrain(initialThrottleHold + AltPID, 
@@ -545,7 +546,7 @@ void loop(void)
                     velocityControl = true;
                     isAltHoldChanged = 1;
                 } else if (isAltHoldChanged) {
-                    AltHold = EstAlt;
+                    AltHold = estAlt;
                     velocityControl = false;
                     isAltHoldChanged = 0;
                 }

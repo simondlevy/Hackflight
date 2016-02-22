@@ -1,6 +1,6 @@
 #pragma once
 
-void stateInit(uint16_t acc_1G);
+void stateInit(uint16_t acc1G);
 
 void stateEstimateAltitude(
         int16_t * angle, 

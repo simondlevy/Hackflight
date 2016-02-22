@@ -138,21 +138,7 @@ static void s_struct(uint8_t *cb, uint8_t siz)
         serialize8(*cb++);
 }
 
-static void evaluateCommand(
-        int16_t * angle,
-        int16_t * gyroData,
-        uint16_t * rcData, 
-        int16_t * accSmooth,
-        int16_t * magADC,
-        int32_t SonarAlt, 
-        int32_t EstAlt, 
-        int32_t vario, 
-        int16_t heading,
-        int16_t * motors, 
-        int16_t * motor_disarmed,
-        uint32_t baroPressureSum, 
-        uint16_t cycleTime, 
-        uint16_t acc_1G)
+static void evaluateCommand(telemetry_t * telemetry)
 {
     uint32_t i;
     const char *build = __DATE__;
@@ -161,20 +147,20 @@ static void evaluateCommand(
 
         case MSP_SET_RAW_RC:
             for (i = 0; i < 8; i++)
-                rcData[i] = read16();
+                telemetry->rcData[i] = read16();
             headSerialReply(0);
             mspFrameRecieve();
             break;
 
         case MSP_SET_MOTOR:
             for (i = 0; i < 4; i++)
-                motor_disarmed[i] = read16();
+                telemetry->motorDisarmed[i] = read16();
             headSerialReply(0);
             break;
 
         case MSP_STATUS:
             headSerialReply(11);
-            serialize16(cycleTime);
+            serialize16(telemetry->cycleTime);
             serialize16(i2cGetErrorCounter());
             serialize16(0);
             serialize8(0);
@@ -183,34 +169,34 @@ static void evaluateCommand(
         case MSP_RAW_IMU:
             headSerialReply(18);
             // Retarded hack until multiwiidorks start using real units for sensor data
-            if (acc_1G > 1024) {
+            if (telemetry->acc1G > 1024) {
                 for (i = 0; i < 3; i++)
-                    serialize16(accSmooth[i] / 8);
+                    serialize16(telemetry->accSmooth[i] / 8);
             } else {
                 for (i = 0; i < 3; i++)
-                    serialize16(accSmooth[i]);
+                    serialize16(telemetry->accSmooth[i]);
             }
             for (i = 0; i < 3; i++)
-                serialize16(gyroData[i]);
+                serialize16(telemetry->gyroData[i]);
             for (i = 0; i < 3; i++)
-                serialize16(magADC[i]);
+                serialize16(telemetry->magADC[i]);
             break;
 
         case MSP_MOTOR:
-            s_struct((uint8_t *)motors, 16);
+            s_struct((uint8_t *)telemetry->motors, 16);
             break;
 
         case MSP_RC:
             headSerialReply(16);
             for (i = 0; i < 8; i++)
-                serialize16(rcData[i]);
+                serialize16(telemetry->rcData[i]);
             break;
 
         case MSP_ATTITUDE:
             headSerialReply(6);
             for (i = 0; i < 2; i++)
-                serialize16(angle[i]);
-            serialize16(heading);
+                serialize16(telemetry->angle[i]);
+            serialize16(telemetry->heading);
             break;
 
             /*
@@ -223,14 +209,14 @@ static void evaluateCommand(
 
         case MSP_MB1242:
             headSerialReply(8);
-            serialize32(baroPressureSum/(CONFIG_BARO_TAB_SIZE-1));
-            serialize32(SonarAlt);
+            serialize32(telemetry->baroPressureSum/(CONFIG_BARO_TAB_SIZE-1));
+            serialize32(telemetry->sonarAlt);
             break;
 
         case MSP_ALTITUDE:
             headSerialReply(6);
-            serialize32(EstAlt);
-            serialize16(vario);
+            serialize32(telemetry->estAlt);
+            serialize16(telemetry->vario);
             break;
 
         case MSP_REBOOT:
@@ -260,22 +246,7 @@ void mspInit(void)
     portState.port = Serial1; // provided by Mockduino
 }
 
-void mspCom(
-        int16_t * angle,
-        int16_t * gyroData,
-        uint16_t * rcData, 
-        int16_t * accSmooth,
-        int16_t * magADC,
-        int32_t SonarAlt, 
-        int32_t EstAlt, 
-        int32_t vario, 
-        int16_t heading, 
-        int16_t * motor,
-        int16_t * motor_disarmed,
-        uint32_t baroPressureSum, 
-        uint16_t cycleTime, 
-        bool armed, 
-        uint16_t acc_1G)
+void mspCom(telemetry_t * telemetry)
 {
     uint8_t c;
 
@@ -287,7 +258,7 @@ void mspCom(
 
         if (portState.c_state == IDLE) {
             portState.c_state = (c == '$') ? HEADER_START : IDLE;
-            if (portState.c_state == IDLE && !armed) {
+            if (portState.c_state == IDLE && !telemetry->armed) {
                 if (c == '#')
                     ;
                 else if (c == CONFIG_REBOOT_CHARACTER) 
@@ -318,22 +289,8 @@ void mspCom(
             portState.inBuf[portState.offset++] = c;
         } else if (portState.c_state == HEADER_CMD && 
                 portState.offset >= portState.dataSize) {
-            if (portState.checksum == c) {        // compare calculated and transferred checksum
-                evaluateCommand(
-                        angle,
-                        gyroData,
-                        rcData, 
-                        accSmooth,
-                        magADC,
-                        SonarAlt, 
-                        EstAlt, 
-                        vario, 
-                        heading, 
-                        motor, 
-                        motor_disarmed,
-                        baroPressureSum, 
-                        cycleTime, acc_1G);
-            }
+            if (portState.checksum == c) 
+                evaluateCommand(telemetry);
             portState.c_state = IDLE;
         }
     }

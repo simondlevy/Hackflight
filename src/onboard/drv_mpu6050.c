@@ -171,7 +171,7 @@ static void mpu6050Init(sensor_t *acc, sensor_t *gyro)
     gyro->read = mpuGyroRead;
 }
 
-static void mpu6050CheckRevision(uint16_t * acc_1G)
+static void mpu6050CheckRevision(uint16_t * acc1G)
 {
     uint8_t rev;
     uint8_t tmp[6];
@@ -203,19 +203,19 @@ static void mpu6050CheckRevision(uint16_t * acc_1G)
 
     // All this just to set the value
     if (half)
-        *acc_1G = 255 * 8;
+        *acc1G = 255 * 8;
 }
 
 
 
-// Returns acc_1G
+// Returns acc1G
 uint16_t mpuInit(sensor_t *acc, sensor_t *gyro, uint8_t lpf)
 {
-    // Set acc_1G. Modified once by mpu6050CheckRevision for old (hopefully nonexistent outside of clones) parts
-    uint16_t acc_1G = 512 * 8;
+    // Set acc1G. Modified once by mpu6050CheckRevision for old (hopefully nonexistent outside of clones) parts
+    uint16_t acc1G = 512 * 8;
 
     //hw = MPU_60x0;
-    mpu6050CheckRevision(&acc_1G);
+    mpu6050CheckRevision(&acc1G);
 
     // 16.4 dps/lsb scalefactor for all Invensense devices
     gyro->scale = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
@@ -239,7 +239,7 @@ uint16_t mpuInit(sensor_t *acc, sensor_t *gyro, uint8_t lpf)
     // initialize the device
     mpu6050Init(acc, gyro);
 
-    return acc_1G;
+    return acc1G;
 }
 
 

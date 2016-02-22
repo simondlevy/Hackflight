@@ -32,18 +32,18 @@ static const motorMixer_t mixerQuadX[] = {
     { 1.0f,  1.0f, -1.0f, -1.0f },          // FRONT_L
 };
 
-void mixerInit(int16_t * motor_disarmed)
+void mixerInit(int16_t * motorDisarmed)
 {
     int i;
 
     for (i = 0; i < 4; i++) {
-        motor_disarmed[i] = CONFIG_MINCOMMAND;
+        motorDisarmed[i] = CONFIG_MINCOMMAND;
     }
 }
 
 void mixerWriteMotors(
         int16_t * motors, 
-        int16_t * motor_disarmed, 
+        int16_t * motorDisarmed, 
         uint16_t * rcData, 
         int16_t * rcCommand, 
         int16_t * axisPID, 
@@ -73,7 +73,7 @@ void mixerWriteMotors(
             motors[i] = CONFIG_MINTHROTTLE;
         } 
         if (!armed) {
-            motors[i] = motor_disarmed[i];
+            motors[i] = motorDisarmed[i];
         }
     }
 

@@ -181,9 +181,9 @@ static int16_t calculateHeading(t_fp_vector *vec, float * anglerad)
     return head;
 }
 
-static bool sonarInRange(int32_t SonarAlt)
+static bool sonarInRange(int32_t sonarAlt)
 {
-    return SonarAlt > 20 && SonarAlt < 765;
+    return sonarAlt > 20 && sonarAlt < 765;
 }
 
 // complementary filter
@@ -219,9 +219,9 @@ void stateInit(uint16_t acc_1G)
 
 void stateEstimateAltitude(
         int16_t * angle, 
-        int32_t * SonarAlt, 
+        int32_t * sonarAlt, 
         int32_t * AltPID, 
-        int32_t * EstAlt, 
+        int32_t * estAlt, 
         int32_t * AltHold, 
         int32_t * setVelocity, 
         int32_t * errorVelocityI, 
@@ -233,8 +233,8 @@ void stateEstimateAltitude(
     static uint32_t previousT;
     static float accZ_old;
     static float accelVel;
-    static int32_t  FusedBaroSonarAlt;
-    static int32_t lastFusedBaroSonarAlt;
+    static int32_t  FusedBarosonarAlt;
+    static int32_t lastFusedBarosonarAlt;
     static int32_t baroAltBaseline;
     static float   accelAlt;
     static bool wasArmed;
@@ -269,17 +269,17 @@ void stateEstimateAltitude(
     wasArmed = armed;
 
     // Calculate sonar altitude only if the sonar is facing downwards(<25deg)
-    *SonarAlt = (tiltAngle > 250) ? -1 : *SonarAlt * (900.0f - tiltAngle) / 900.0f;
+    *sonarAlt = (tiltAngle > 250) ? -1 : *sonarAlt * (900.0f - tiltAngle) / 900.0f;
 
-    // Fuse SonarAlt and BaroAlt
-    if (sonarInRange(*SonarAlt)) {
-        baroAlt_offset = BaroAlt - *SonarAlt;
-        FusedBaroSonarAlt = *SonarAlt;
+    // Fuse sonarAlt and BaroAlt
+    if (sonarInRange(*sonarAlt)) {
+        baroAlt_offset = BaroAlt - *sonarAlt;
+        FusedBarosonarAlt = *sonarAlt;
     } else {
         BaroAlt = BaroAlt - baroAlt_offset;
-        if (*SonarAlt > 0) {
-            float sonarTransition = (300 - *SonarAlt) / 100.0f;
-            FusedBaroSonarAlt = cfilter(*SonarAlt, BaroAlt, sonarTransition); 
+        if (*sonarAlt > 0) {
+            float sonarTransition = (300 - *sonarAlt) / 100.0f;
+            FusedBarosonarAlt = cfilter(*sonarAlt, BaroAlt, sonarTransition); 
         }
     }
 
@@ -294,12 +294,12 @@ void stateEstimateAltitude(
     accelAlt += (vel_acc * 0.5f) * dt + accelVel * dt;                                         
     accelVel += vel_acc;
 
-    *EstAlt = sonarInRange(*SonarAlt) ? FusedBaroSonarAlt : accelAlt;
+    *estAlt = sonarInRange(*sonarAlt) ? FusedBarosonarAlt : accelAlt;
 
     resetAcc();
 
-    int32_t fusedBaroSonarVel = (FusedBaroSonarAlt - lastFusedBaroSonarAlt) * 1000000.0f / dTime;
-    lastFusedBaroSonarAlt = FusedBaroSonarAlt;
+    int32_t fusedBaroSonarVel = (FusedBarosonarAlt - lastFusedBarosonarAlt) * 1000000.0f / dTime;
+    lastFusedBarosonarAlt = FusedBarosonarAlt;
 
     fusedBaroSonarVel = constrain(fusedBaroSonarVel, -1500, 1500);    // constrain baro velocity +/- 1500cm/s
     fusedBaroSonarVel = applyDeadband(fusedBaroSonarVel, 10);         // to reduce noise near zero
@@ -319,7 +319,7 @@ void stateEstimateAltitude(
 
         // Altitude P-Controller
         if (!velocityControl) {
-            int32_t error = constrain(*AltHold - *EstAlt, -500, 500);
+            int32_t error = constrain(*AltHold - *estAlt, -500, 500);
             error = applyDeadband(error, 10);       // remove small P parametr to reduce noise near zero position
             setVel = constrain((CONFIG_ALT_P * error / 128), -300, +300); // limit velocity to +/- 3 m/s
         } 
