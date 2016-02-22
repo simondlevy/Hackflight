@@ -40,20 +40,12 @@
 #define PITCH_LOOKUP_LENGTH 7
 #define THROTTLE_LOOKUP_LENGTH 12
 
-extern  rcReadRawDataPtr rcReadRawFunc;
-
-uint16_t vbat;                  // battery voltage in 0.1V steps
-int32_t amperage;               // amperage read by current sensor in centiampere (1/100th A)
-int32_t mAhdrawn;              // milliampere hours drawn from the battery since start
-int16_t failsafeEvents = 0;
-
-static int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
-static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
-static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
-static bool accCalibrated;
-static uint16_t rcData[RC_CHANS];       // interval [1000;2000]
-static void pidMultiWii(void);
+// shared by setup() and loop()
+static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
+static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
+static uint16_t rcData[RC_CHANS];                           // interval [1000;2000]
 static uint32_t previousTime;
+
 static uint32_t currentTime;
 static bool useSmallAngle;
 static bool armed;
@@ -68,16 +60,7 @@ static sensor_t gyro;
 static sensor_t acc;                      
 static baro_t baro;
 
-pidControllerFuncPtr pid_controller = pidMultiWii; // which pid controller are we using, defaultMultiWii
-rcReadRawDataPtr rcReadRawFunc = NULL;  // receive data from default (pwm/ppm) or additional 
-
-uint8_t dynP8[3], dynI8[3], dynD8[3];
-
-
-// Battery monitoring stuff
-uint8_t batteryCellCount = 3;       // cell count
-uint16_t batteryWarningVoltage;     // slow buzzer after this one, recommended 80% of battery used. Time to land.
-uint16_t batteryCriticalVoltage;    // annoying buzzer after this one, battery is going to be dead.
+static uint8_t dynP8[3], dynI8[3], dynD8[3];
 
 // Time of automatic disarm when "Don't spin the motors when armed" is enabled.
 static uint32_t disarmTime = 0;
@@ -86,11 +69,8 @@ static uint16_t acc_1G;
 static bool baro_available;
 static bool sonar_available;
 
-
-static bool check_timed_task(uint32_t usec) {
-
-    return (int32_t)(currentTime - usec) >= 0;
-}
+static int32_t errorGyroI[3] = { 0, 0, 0 };
+static int32_t errorAngleI[2] = { 0, 0 };
 
 static void update_timed_task(uint32_t * usec, uint32_t period) 
 {
@@ -121,7 +101,7 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
     }
 }
 
-void annexCode(void)
+static void annexCode(int16_t * rcCommand, bool * accCalibrated)
 {
     static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
@@ -182,25 +162,22 @@ void annexCode(void)
     if (sensorsCalibratingA() || sensorsCalibratingG()) {      // Calibration phases
         LED0_TOGGLE;
     } else {
-        if (accCalibrated)
+        if (*accCalibrated)
             LED0_OFF;
         if (armed)
             LED0_ON;
-
-        //checkTelemetryState();
     }
 
-    if (check_timed_task(calibratedAccTime)) {
+    if ((int32_t)(currentTime - calibratedAccTime) >= 0) {
         if (!useSmallAngle) {
-            accCalibrated = false; // the multi uses ACC and is not calibrated or is too much inclinated
+            *accCalibrated = false; // the multi uses ACC and is not calibrated or is too much inclinated
             LED0_TOGGLE;
             update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC);
         } else {
-            accCalibrated = true;
+            *accCalibrated = true;
         }
     }
-
-}
+} // annexCode
 
 uint16_t pwmReadRawRC(uint8_t chan)
 {
@@ -216,7 +193,7 @@ void computeRC(void)
     static int rcAverageIndex = 0;
 
     for (chan = 0; chan < 8; chan++) {
-        capture = rcReadRawFunc(chan);
+        capture = pwmReadRawRC(chan);
 
         // validate input
         if (capture < PULSE_MIN || capture > PULSE_MAX)
@@ -231,7 +208,7 @@ void computeRC(void)
     rcAverageIndex++;
 }
 
-static void mwArm(void)
+static void mwArm(bool accCalibrated)
 {
     if (!sensorsCalibratingG() && accCalibrated) {
         if (!armed) {         // arm now!
@@ -252,10 +229,7 @@ static void mwDisarm(void)
     }
 }
 
-static int32_t errorGyroI[3] = { 0, 0, 0 };
-static int32_t errorAngleI[2] = { 0, 0 };
-
-static void pidMultiWii(void)
+static void pidMultiWii(int16_t * rcCommand)
 {
     int axis, prop;
     int32_t error, errorAngle;
@@ -311,7 +285,7 @@ static void pidMultiWii(void)
     }
 }
 
-#define GYRO_I_MAX 256
+// ======================================================================================================
 
 void setup(void)
 {
@@ -364,18 +338,19 @@ void setup(void)
     // these, if enabled
     for (i = 0; i < RC_CHANS; i++)
         rcData[i] = 1502;
-    rcReadRawFunc = pwmReadRawRC;
 
     previousTime = micros();
 
     // trigger accelerometer calibration requirement
     useSmallAngle = true;
- }
+}
+
 
 void loop(void)
 {
     static uint8_t rcDelayCommand;      // this indicates the number of time (multiple of RC measurement at 50Hz) 
                                         // the sticks must be maintained to run or switch off motors
+    static int16_t rcCommand[4];        // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
     static uint8_t rcSticks;            // this hold sticks position for command combos
     static uint32_t rcTime;
     static int16_t initialThrottleHold;
@@ -393,6 +368,7 @@ void loop(void)
     static int16_t throttleAngleCorrection;
     static uint32_t baroPressureSum;
     static int16_t accSmooth[3];
+    static bool accCalibrated;
 
     uint16_t auxState = 0;
     bool isThrottleLow = false;
@@ -444,7 +420,7 @@ void loop(void)
 
                 // Arm via YAW
                 if ((rcSticks == THR_LO + YAW_HI + PIT_CE + ROL_CE))
-                    mwArm();
+                    mwArm(accCalibrated);
 
                 // Calibrating Acc
                 else if (rcSticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
@@ -540,8 +516,8 @@ void loop(void)
         uint16_t cycleTime = (int32_t)(currentTime - previousTime);
         previousTime = currentTime;
 
-        // non IMU critical, temeperature
-        annexCode();
+        // non IMU critical
+        annexCode(rcCommand, &accCalibrated);
 
         // update MSP
         mspCom(
@@ -599,7 +575,8 @@ void loop(void)
             rcCommand[THROTTLE] += throttleAngleCorrection;
         }
 
-        pid_controller();
+        pidMultiWii(rcCommand);
+
         mixerWriteMotors(motors, motor_disarmed, rcData, rcCommand, axisPID, armed);
     }
 }
