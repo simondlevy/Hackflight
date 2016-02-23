@@ -1,9 +1,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <breezystm32.h>
-
-#include "../sonar.h"
+#include "drv_i2c.h"
 
 #define MB1242_ADDRESS 0x70
 
@@ -21,12 +19,12 @@ static bool attempt_write()
     return i2cWrite(MB1242_ADDRESS, 0x00, 0x51);
 }
 
-bool sonarInit(void)
+bool initSonar()
 {
     return attempt_write() == 1;
 }
 
-int32_t sonarPoll(void)
+int32_t pollSonar()
 {
     static uint32_t mb1242Time = 0;
     static uint8_t state;

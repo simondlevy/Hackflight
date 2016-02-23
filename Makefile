@@ -3,31 +3,19 @@
 # <msmith@FreeBSD.ORG> wrote this file. As long as you retain this notice you
 # can do whatever you want with this stuff. If we meet some day, and you think
 # this stuff is worth it, you can buy me a beer in return
+###############################################################################
+#
+# Makefile for building the hackflight firmware.
+#
+# Invoke this with 'make help' to see the list of supported targets.
+# 
 
 ###############################################################################
+# Things that the user might override on the commandline
+#
 
-# Change this to wherever you put BreezySTM32
-BREEZY_DIR = /home/levys/Desktop/BreezySTM32
-
-# Fill this out with source files for your specific project
-PROJECT_SRC = mw.c \
-		   mixer.c \
-		   sensors.c \
-		   msp.c \
-		   state.c \
-		   utils.c \
-		   board.c \
-		   onboard/drv_mpu6050.c \
-		   onboard/drv_ms5611.c \
-		   external/drv_px4flow.c \
-		   external/drv_lidarlite.c \
-		   external/drv_mb1242.c 
-
-###############################################################################
-
-# You probably shouldn't modify anything below here!
-
-TARGET		?= myproject
+# The target to build, must be one of NAZE or CJMCU
+TARGET		?= NAZE
 
 # Compile-time options
 OPTIONS		?=
@@ -38,31 +26,59 @@ DEBUG ?=
 # Serial port/Device for flashing
 SERIAL_DEVICE	?= /dev/ttyUSB0
 
+###############################################################################
+# Things that need to be maintained as the source changes
+#
+
 # Working directories
 ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
 SRC_DIR		 = $(ROOT)/src
-CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
-STDPERIPH_DIR	 = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
+CMSIS_DIR	 = $(ROOT)/lib/CMSIS
+STDPERIPH_DIR	 = $(ROOT)/lib/STM32F10x_StdPeriph_Driver
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
-myproject_SRC = $(BREEZY_DIR)/main.c \
-		   $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
-		   $(BREEZY_DIR)/drv_gpio.c \
-		   $(BREEZY_DIR)/drv_i2c.c \
-		   $(BREEZY_DIR)/drv_adc.c \
-		   $(BREEZY_DIR)/drv_spi.c \
-		   $(BREEZY_DIR)/drv_pwm.c \
-		   $(BREEZY_DIR)/drv_system.c \
-		   $(BREEZY_DIR)/drv_serial.c \
-		   $(BREEZY_DIR)/drv_uart.c \
-		   $(BREEZY_DIR)/drv_timer.c \
-		   $(BREEZY_DIR)/printf.c \
-		   $(PROJECT_SRC) \
+# Source files common to all targets
+COMMON_SRC	 = main.c \
+		   mixer.c \
+		   mw.c \
+		   sensors.c \
+		   serial.c \
+		   rxmsp.c \
+		   state.c \
+		   drv_gpio.c \
+		   drv_i2c.c \
+		   drv_system.c \
+		   drv_serial.c \
+		   drv_uart.c \
+		   printf.c \
+		   utils.c \
+		   startup_stm32f10x_md_gcc.S \
 		   $(CMSIS_SRC) \
 		   $(STDPERIPH_SRC)
 
-VPATH		:= $(SRC_DIR):$(SRC_DIR)/startups
+# Source files for full-featured systems
+HIGHEND_SRC	 = telemetry_common.c
+
+# Source files for the NAZE target
+NAZE_SRC	 = drv_adc.c \
+		   drv_mpu6050.c \
+		   drv_ms5611.c \
+		   drv_pwm.c \
+		   drv_spi.c \
+		   drv_timer.c \
+		   drv_px4flow.c \
+		   drv_lidarlite.c \
+		   drv_mb1242.c \
+		   $(HIGHEND_SRC) \
+		   $(COMMON_SRC)
+
+# In some cases, %.s regarded as intermediate file, which is actually not.
+# This will prevent accidental deletion of startup code.
+.PRECIOUS: %.s
+
+# Search path for hackflight sources
+VPATH		:= $(SRC_DIR):$(SRC_DIR)/hackflight_startups
 
 # Search path and source files for the CMSIS sources
 VPATH		:= $(VPATH):$(CMSIS_DIR)/CM3/CoreSupport:$(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x
@@ -85,7 +101,6 @@ OBJCOPY	 = arm-none-eabi-objcopy
 # Tool options.
 #
 INCLUDE_DIRS	 = $(SRC_DIR) \
-		   $(BREEZY_DIR) \
 		   $(STDPERIPH_DIR)/inc \
 		   $(CMSIS_DIR)/CM3/CoreSupport \
 		   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x \
@@ -118,7 +133,8 @@ ASFLAGS		 = $(ARCH_FLAGS) \
 		   -x assembler-with-cpp \
 		   $(addprefix -I,$(INCLUDE_DIRS))
 
-LD_SCRIPT	 = $(BREEZY_DIR)/stm32_flash.ld
+# XXX Map/crossref output?
+LD_SCRIPT	 = $(ROOT)/stm32_flash.ld
 LDFLAGS		 = -lm \
 		   -nostartfiles \
 		   --specs=nano.specs \
@@ -131,14 +147,18 @@ LDFLAGS		 = -lm \
 		   -Wl,-gc-sections,-Map,$(TARGET_MAP) \
 		   -T$(LD_SCRIPT)
 
+###############################################################################
+# No user-serviceable parts below
+###############################################################################
+
 #
 # Things we will build
 #
 
-TARGET_HEX	 = $(BIN_DIR)/$(TARGET).hex
-TARGET_ELF	 = $(BIN_DIR)/$(TARGET).elf
+TARGET_HEX	 = $(BIN_DIR)/hackflight_$(TARGET).hex
+TARGET_ELF	 = $(BIN_DIR)/hackflight_$(TARGET).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC))))
-TARGET_MAP   = $(OBJECT_DIR)/$(TARGET).map
+TARGET_MAP   = $(OBJECT_DIR)/hackflight_$(TARGET).map
 
 # List of buildable ELF files and their object dependencies.
 # It would be nice to compute these lists, but that seems to be just beyond make.
@@ -152,7 +172,7 @@ $(TARGET_ELF):  $(TARGET_OBJS)
 MKDIR_OBJDIR = @mkdir -p $(dir $@)
 
 # Compile
-$(OBJECT_DIR)/$(TARGET)/%.o: %.c config.h vitals.h
+$(OBJECT_DIR)/$(TARGET)/%.o: %.c config.h board.h mw.h
 	$(MKDIR_OBJDIR)
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(CFLAGS) $<
@@ -168,7 +188,7 @@ $(OBJECT_DIR)/$(TARGET)/%.o): %.S
 	@$(CC) -c -o $@ $(ASFLAGS) $< 
 
 clean:
-	rm -rf $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP) obj
+	rm -f $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
 
 flash_$(TARGET): $(TARGET_HEX)
 	stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
@@ -194,7 +214,11 @@ debug:
 listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
 
-sonar:
-	./scripts/bluesonar.py
+imu:
+	python getimu.py $(SERIAL_DEVICE)
 
+flow:
+	python getpx4flow.py $(SERIAL_DEVICE)
 
+count:
+	wc -l src/*.c src/*.h | sort -n

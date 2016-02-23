@@ -3,12 +3,7 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include <stdbool.h>
-#include <math.h>
-
-#include <breezystm32.h>         // timers, delays, etc
-
-#include "../axes.h"
+#include "board.h"
 
 /* Generic driver for invensense gyro/acc devices.
  *
@@ -67,12 +62,71 @@ enum accel_fsr_e {
     NUM_ACCEL_FSR
 };
 
+
+// Hardware access functions
+static bool mpuReadRegisterI2C(uint8_t reg, uint8_t *data, int length);
+static bool mpuWriteRegisterI2C(uint8_t reg, uint8_t data);
+static void mpu6050Init(sensor_t *acc, sensor_t *gyro);
+
+// General forward declarations
+static void mpu6050CheckRevision(void);
+static void mpuAccInit(sensor_align_e align);
+static void mpuAccRead(int16_t *accData);
+static void mpuGyroInit(sensor_align_e align);
+static void mpuGyroRead(int16_t *gyroData);
+
+// Needed for MPU6050 half-scale acc bug
+extern uint16_t acc_1G;
+
 // Default orientation
 static sensor_align_e gyroAlign = CW0_DEG;
 static sensor_align_e accAlign = CW0_DEG;
 
 // Lowpass
 static uint8_t mpuLowPassFilter = INV_FILTER_42HZ;
+
+bool mpuDetect(sensor_t *acc, sensor_t *gyro, uint8_t lpf)
+{
+    gpio_config_t gpio;
+
+    // Set acc_1G. Modified once by mpu6050CheckRevision for old (hopefully nonexistent outside of clones) parts
+    acc_1G = 512 * 8;
+
+    //hw = MPU_60x0;
+    mpu6050CheckRevision();
+
+    // 16.4 dps/lsb scalefactor for all Invensense devices
+    gyro->scale = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
+
+    // default lpf is 42Hz, 255 is special case of nolpf
+    if (lpf == 255)
+        mpuLowPassFilter = INV_FILTER_256HZ_NOLPF2;
+    else if (lpf >= 188)
+        mpuLowPassFilter = INV_FILTER_188HZ;
+    else if (lpf >= 98)
+        mpuLowPassFilter = INV_FILTER_98HZ;
+    else if (lpf >= 42)
+        mpuLowPassFilter = INV_FILTER_42HZ;
+    else if (lpf >= 20)
+        mpuLowPassFilter = INV_FILTER_20HZ;
+    else if (lpf >= 10)
+        mpuLowPassFilter = INV_FILTER_10HZ;
+    else
+        mpuLowPassFilter = INV_FILTER_5HZ;
+
+    // MPU_INT output on rev5+ hardware (PC13)
+    if (hw_revision >= NAZE32_REV5) {
+        gpio.pin = GYRO_INT_PIN;
+        gpio.speed = Speed_2MHz;
+        gpio.mode = Mode_IN_FLOATING;
+        gpioInit(GYRO_INT_GPIO, &gpio);
+    }
+
+    // initialize the device
+    mpu6050Init(acc, gyro);
+
+    return true;
+}
 
 // MPU6xxx registers
 #define MPU_RA_SMPLRT_DIV       0x19
@@ -95,55 +149,6 @@ static uint8_t mpuLowPassFilter = INV_FILTER_42HZ;
 #define MPU6050_BIT_FIFO_RST    0x04
 #define MPU6050_BIT_DMP_RST     0x08
 #define MPU6050_BIT_FIFO_EN     0x40
-
-static bool mpuReadRegisterI2C(uint8_t reg, uint8_t *data, int length)
-{
-    return i2cRead(MPU_ADDRESS, reg, length, data);
-}
-
-static bool mpuWriteRegisterI2C(uint8_t reg, uint8_t data)
-{
-    return i2cWrite(MPU_ADDRESS, reg, data);
-}
-
-static void mpuAccInit(sensor_align_e align)
-{
-    if (align > 0)
-        accAlign = align;
-}
-
-static void mpuAccRead(int16_t *accData)
-{
-    uint8_t buf[6];
-    int16_t data[3];
-
-    mpuReadRegisterI2C(MPU_RA_ACCEL_XOUT_H, buf, 6);
-    data[0] = (int16_t)((buf[0] << 8) | buf[1]);
-    data[1] = (int16_t)((buf[2] << 8) | buf[3]);
-    data[2] = (int16_t)((buf[4] << 8) | buf[5]);
-
-    alignSensors(data, accData, accAlign);
-}
-
-static void mpuGyroInit(sensor_align_e align)
-{
-    if (align > 0)
-        gyroAlign = align;
-}
-
-static void mpuGyroRead(int16_t *gyroData)
-{
-    uint8_t buf[6];
-    int16_t data[3];
-
-    mpuReadRegisterI2C(MPU_RA_GYRO_XOUT_H, buf, 6);
-    data[0] = (int16_t)((buf[0] << 8) | buf[1]) / 4;
-    data[1] = (int16_t)((buf[2] << 8) | buf[3]) / 4;
-    data[2] = (int16_t)((buf[4] << 8) | buf[5]) / 4;
-
-    alignSensors(data, gyroData, gyroAlign);
-}
-
 
 static void mpu6050Init(sensor_t *acc, sensor_t *gyro)
 {
@@ -171,7 +176,45 @@ static void mpu6050Init(sensor_t *acc, sensor_t *gyro)
     gyro->read = mpuGyroRead;
 }
 
-static void mpu6050CheckRevision(uint16_t * acc1G)
+static void mpuAccInit(sensor_align_e align)
+{
+    if (align > 0)
+        accAlign = align;
+}
+
+static void mpuGyroInit(sensor_align_e align)
+{
+    if (align > 0)
+        gyroAlign = align;
+}
+
+static void mpuAccRead(int16_t *accData)
+{
+    uint8_t buf[6];
+    int16_t data[3];
+
+    mpuReadRegisterI2C(MPU_RA_ACCEL_XOUT_H, buf, 6);
+    data[0] = (int16_t)((buf[0] << 8) | buf[1]);
+    data[1] = (int16_t)((buf[2] << 8) | buf[3]);
+    data[2] = (int16_t)((buf[4] << 8) | buf[5]);
+
+    alignSensors(data, accData, accAlign);
+}
+
+static void mpuGyroRead(int16_t *gyroData)
+{
+    uint8_t buf[6];
+    int16_t data[3];
+
+    mpuReadRegisterI2C(MPU_RA_GYRO_XOUT_H, buf, 6);
+    data[0] = (int16_t)((buf[0] << 8) | buf[1]) / 4;
+    data[1] = (int16_t)((buf[2] << 8) | buf[3]) / 4;
+    data[2] = (int16_t)((buf[4] << 8) | buf[5]) / 4;
+
+    alignSensors(data, gyroData, gyroAlign);
+}
+
+static void mpu6050CheckRevision(void)
 {
     uint8_t rev;
     uint8_t tmp[6];
@@ -203,43 +246,15 @@ static void mpu6050CheckRevision(uint16_t * acc1G)
 
     // All this just to set the value
     if (half)
-        *acc1G = 255 * 8;
+        acc_1G = 255 * 8;
 }
 
-
-
-// Returns acc1G
-uint16_t mpuInit(sensor_t *acc, sensor_t *gyro, uint8_t lpf)
+static bool mpuReadRegisterI2C(uint8_t reg, uint8_t *data, int length)
 {
-    // Set acc1G. Modified once by mpu6050CheckRevision for old (hopefully nonexistent outside of clones) parts
-    uint16_t acc1G = 512 * 8;
-
-    //hw = MPU_60x0;
-    mpu6050CheckRevision(&acc1G);
-
-    // 16.4 dps/lsb scalefactor for all Invensense devices
-    gyro->scale = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
-
-    // default lpf is 42Hz, 255 is special case of nolpf
-    if (lpf == 255)
-        mpuLowPassFilter = INV_FILTER_256HZ_NOLPF2;
-    else if (lpf >= 188)
-        mpuLowPassFilter = INV_FILTER_188HZ;
-    else if (lpf >= 98)
-        mpuLowPassFilter = INV_FILTER_98HZ;
-    else if (lpf >= 42)
-        mpuLowPassFilter = INV_FILTER_42HZ;
-    else if (lpf >= 20)
-        mpuLowPassFilter = INV_FILTER_20HZ;
-    else if (lpf >= 10)
-        mpuLowPassFilter = INV_FILTER_10HZ;
-    else
-        mpuLowPassFilter = INV_FILTER_5HZ;
-
-    // initialize the device
-    mpu6050Init(acc, gyro);
-
-    return acc1G;
+    return i2cRead(MPU_ADDRESS, reg, length, data);
 }
 
-
+static bool mpuWriteRegisterI2C(uint8_t reg, uint8_t data)
+{
+    return i2cWrite(MPU_ADDRESS, reg, data);
+}

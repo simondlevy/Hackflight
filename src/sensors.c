@@ -3,97 +3,43 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <math.h>
-
-#include <breezystm32.h>
-
-#include "axes.h"
-#include "chans.h"
+#include "board.h"
+#include "mw.h"
 #include "config.h"
-#include "sensors.h"
-#include "blink.h"
-#include "sonar.h"
+#include "drv_ms5611.h"
 
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.
-static uint16_t calibratingA;      
-static uint16_t calibratingG;
+uint16_t calibratingA = 0;      
+uint16_t calibratingG = 0;
+uint16_t acc_1G = 256;          // this is the 1G measured acceleration.
+int16_t heading, magHold;
+
+sensor_t acc;                       // acc access functions
+sensor_t gyro;                      // gyro access functions
+sensor_t mag;                       // mag access functions
+baro_t baro;                        // barometer access functions
+
+bool baro_available;
+bool sonar_available;
+
 static int16_t accZero[3];
-static uint16_t s_acc1G;
 
-void sensorsInit(
-        sensor_t * acc, 
-        sensor_t * gyro, 
-        baro_t * baro, 
-        uint16_t * acc1G, 
-        bool * baro_available, 
-        bool * sonar_available)
+void initSensors(void)
 {
-    s_acc1G = mpuInit(acc, gyro, CONFIG_GYRO_LPF);
-    acc->init(CONFIG_ACC_ALIGN);
-    gyro->init(CONFIG_GYRO_ALIGN);
-    *baro_available = initBaro(baro);
-    *sonar_available = sonarInit();
+    mpuDetect(&acc, &gyro, CONFIG_GYRO_LPF);
 
-    calibratingA = 0;
-    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
+    acc.init(CONFIG_ACC_ALIGN);
 
-    *acc1G = s_acc1G;
+    gyro.init(CONFIG_GYRO_ALIGN);
+
+    baro_available = initBaro(&baro);
+
+    sonar_available = initSonar();
 }
 
-void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
+static void ACC_Common(void)
 {
-    switch (rotation) {
-        case CW0_DEG:
-            dest[X] = src[X];
-            dest[Y] = src[Y];
-            dest[Z] = src[Z];
-            break;
-        case CW90_DEG:
-            dest[X] = src[Y];
-            dest[Y] = -src[X];
-            dest[Z] = src[Z];
-            break;
-        case CW180_DEG:
-            dest[X] = -src[X];
-            dest[Y] = -src[Y];
-            dest[Z] = src[Z];
-            break;
-        case CW270_DEG:
-            dest[X] = -src[Y];
-            dest[Y] = src[X];
-            dest[Z] = src[Z];
-            break;
-        case CW0_DEG_FLIP:
-            dest[X] = -src[X];
-            dest[Y] = src[Y];
-            dest[Z] = -src[Z];
-            break;
-        case CW90_DEG_FLIP:
-            dest[X] = src[Y];
-            dest[Y] = src[X];
-            dest[Z] = -src[Z];
-            break;
-        case CW180_DEG_FLIP:
-            dest[X] = src[X];
-            dest[Y] = -src[Y];
-            dest[Z] = -src[Z];
-            break;
-        case CW270_DEG_FLIP:
-            dest[X] = -src[Y];
-            dest[Y] = -src[X];
-            dest[Z] = -src[Z];
-            break;
-        default:
-            break;
-    }
-}
-
-void sensorsGetAccel(sensor_t * acc, int16_t * accADC)
-{
-    acc->read(accADC);
     static int32_t a[3];
     int axis;
 
@@ -108,11 +54,11 @@ void sensorsGetAccel(sensor_t * acc, int16_t * accADC)
             accADC[axis] = 0;
             accZero[axis] = 0;
         }
-        // Calculate average, shift Z down by acc1G
+        // Calculate average, shift Z down by acc_1G
         if (calibratingA == 1) {
             accZero[ROLL] = (a[ROLL] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
             accZero[PITCH] = (a[PITCH] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
-            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - s_acc1G;
+            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - acc_1G;
         }
         calibratingA--;
     }
@@ -120,6 +66,12 @@ void sensorsGetAccel(sensor_t * acc, int16_t * accADC)
     accADC[ROLL] -= accZero[ROLL];
     accADC[PITCH] -= accZero[PITCH];
     accADC[YAW] -= accZero[YAW];
+}
+
+void ACC_getADC(void)
+{
+    acc.read(accADC);
+    ACC_Common();
 }
 
 typedef struct stdev_t {
@@ -156,16 +108,11 @@ static float devStandardDeviation(stdev_t *dev)
     return sqrtf(devVariance(dev));
 }
 
-void sensorsGetGyro(sensor_t * gyro, int16_t * gyroADC)
+static void GYRO_Common(void)
 {
-    // range: +/- 8192; +/- 2000 deg/sec
-    gyro->read(gyroADC);
-
     int axis;
-
     static int32_t g[3];
     static stdev_t var[3];
-    static int16_t gyroZero[3] = { 0, 0, 0 };
 
     if (calibratingG > 0) {
         for (axis = 0; axis < 3; axis++) {
@@ -201,62 +148,58 @@ void sensorsGetGyro(sensor_t * gyro, int16_t * gyroADC)
         gyroADC[axis] -= gyroZero[axis];
 }
 
-void sensorsUpdateBaro(baro_t * baro, uint32_t * baroPressureSum)
+void Gyro_getADC(void)
+{
+    // range: +/- 8192; +/- 2000 deg/sec
+    gyro.read(gyroADC);
+    GYRO_Common();
+}
+
+static void Baro_Common(void)
+{
+    static int32_t baroHistTab[BARO_TAB_SIZE_MAX];
+    static int baroHistIdx;
+    int indexplus1;
+
+    indexplus1 = (baroHistIdx + 1);
+    if (indexplus1 == CONFIG_BARO_TAB_SIZE)
+        indexplus1 = 0;
+    baroHistTab[baroHistIdx] = baroPressure;
+    baroPressureSum += baroHistTab[baroHistIdx];
+    baroPressureSum -= baroHistTab[indexplus1];
+    baroHistIdx = indexplus1;
+}
+
+int Baro_update(void)
 {
     static uint32_t baroDeadline = 0;
     static int state = 0;
-    static int32_t  baroPressure;
-    static int32_t  baroTemperature;
 
-    if ((int32_t)(micros() - baroDeadline) < 0)
-        return;
+    if ((int32_t)(currentTime - baroDeadline) < 0)
+        return 0;
 
-    baroDeadline = micros();
+    baroDeadline = currentTime;
 
     if (state) {
-        baro->get_up();
-        baro->start_ut();
-        baroDeadline += baro->ut_delay;
-        baro->calculate(&baroPressure, &baroTemperature);
+        baro.get_up();
+        baro.start_ut();
+        baroDeadline += baro.ut_delay;
+        baro.calculate(&baroPressure, &baroTemperature);
         state = 0;
+        return 2;
     } else {
-        baro->get_ut();
-        baro->start_up();
-        static int32_t baroHistTab[BARO_TAB_SIZE_MAX];
-        static int baroHistIdx;
-        int indexplus1 = (baroHistIdx + 1);
-        if (indexplus1 == CONFIG_BARO_TAB_SIZE)
-            indexplus1 = 0;
-        baroHistTab[baroHistIdx] = baroPressure;
-        *baroPressureSum += baroHistTab[baroHistIdx];
-        *baroPressureSum -= baroHistTab[indexplus1];
-        baroHistIdx = indexplus1;
+        baro.get_ut();
+        baro.start_up();
+        Baro_Common();
         state = 1;
-        baroDeadline += baro->up_delay;
+        baroDeadline += baro.up_delay;
+        return 1;
     }
 }
 
-void sensorsUpdateSonar(int32_t * sonarAlt) 
+void Sonar_update(void) 
 {
-    *sonarAlt = sonarPoll();
-}
+    extern int32_t pollSonar(void);
 
-void sensorsInitAccelCalibration(void)
-{
-    calibratingA = CONFIG_CALIBRATING_ACC_CYCLES;
-}
-
-void sensorsInitGyroCalibration(void)
-{
-    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
-}
-
-bool sensorsCalibratingA(void)
-{
-    return calibratingA > 0;
-}
-
-bool sensorsCalibratingG(void)
-{
-    return calibratingG > 0;
+    SonarAlt = pollSonar();
 }

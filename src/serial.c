@@ -3,15 +3,9 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdlib.h>
-
-#include <breezystm32.h>
-
-#include "vitals.h"
-#include "axes.h"
-#include "msp.h"
+#include "board.h"
+#include "mw.h"
+#include "telemetry_common.h"
 #include "config.h"
 
 // Multiwii Serial Protocol 0
@@ -32,7 +26,14 @@
 #define MSP_REBOOT               68     //in message          reboot settings
 #define MSP_BUILDINFO            69     //out message         build date as well as some space for future expansion
 
-#define INBUF_SIZE              128
+#define INBUF_SIZE 128
+
+serialPort_t * telemport;
+
+// from mixer.c
+extern int16_t motor_disarmed[4];
+// cause reboot after MSP processing complete
+static bool pendReboot = false;
 
 typedef enum serialState_t {
     IDLE,
@@ -54,22 +55,14 @@ typedef  struct mspPortState_t {
     serialState_t c_state;
 } mspPortState_t;
 
-// cause reboot after MSP processing complete
-static bool pendReboot = false;
-
-static mspPortState_t portState;
-
-static bool rxMspFrameDone = false;
-
-static void mspFrameRecieve(void)
-{
-    rxMspFrameDone = true;
-}
+static mspPortState_t port;
+static mspPortState_t *currentPortState = &port;
+static int numTelemetryPorts = 0;
 
 static void serialize8(uint8_t a)
 {
-    serialWrite(portState.port, a);
-    portState.checksum ^= a;
+    serialWrite(currentPortState->port, a);
+    currentPortState->checksum ^= a;
 }
 
 static void serialize16(int16_t a)
@@ -88,7 +81,7 @@ static void serialize32(uint32_t a)
 
 static uint8_t read8(void)
 {
-    return portState.inBuf[portState.indRX++] & 0xff;
+    return currentPortState->inBuf[currentPortState->indRX++] & 0xff;
 }
 
 static uint16_t read16(void)
@@ -107,61 +100,76 @@ static uint32_t read32(void)
 }
 */
 
-static void headSerialResponse(uint8_t err, uint8_t s)
+void headSerialResponse(uint8_t err, uint8_t s)
 {
     serialize8('$');
     serialize8('M');
     serialize8(err ? '!' : '>');
-    portState.checksum = 0;               // start calculating a new checksum
+    currentPortState->checksum = 0;               // start calculating a new checksum
     serialize8(s);
-    serialize8(portState.cmdMSP);
+    serialize8(currentPortState->cmdMSP);
 }
 
-static void headSerialReply(uint8_t s)
+void headSerialReply(uint8_t s)
 {
     headSerialResponse(0, s);
 }
 
-static void headSerialError(uint8_t s)
+void headSerialError(uint8_t s)
 {
     headSerialResponse(1, s);
 }
 
-static void tailSerialReply(void)
+void tailSerialReply(void)
 {
-    serialize8(portState.checksum);
+    serialize8(currentPortState->checksum);
 }
 
-static void s_struct(uint8_t *cb, uint8_t siz)
+void s_struct(uint8_t *cb, uint8_t siz)
 {
     headSerialReply(siz);
     while (siz--)
         serialize8(*cb++);
 }
 
-static void evaluateCommand(vitals_t * vitals)
+void serializeNames(const char *s)
+{
+    const char *c;
+    for (c = s; *c; c++)
+        serialize8(*c);
+}
+
+void serialInit(uint32_t baudrate)
+{
+    numTelemetryPorts = 0;
+    telemport = uartOpen(USART1, NULL, baudrate, MODE_RXTX);
+    port.port = telemport;
+    numTelemetryPorts++;
+}
+
+static void evaluateCommand(void)
 {
     uint32_t i;
     const char *build = __DATE__;
 
-    switch (portState.cmdMSP) {
+    switch (currentPortState->cmdMSP) {
 
         case MSP_SET_RAW_RC:
             for (i = 0; i < 8; i++)
-                vitals->rcData[i] = read16();
+                rcData[i] = read16();
             headSerialReply(0);
             mspFrameRecieve();
             break;
 
         case MSP_SET_MOTOR:
             for (i = 0; i < 4; i++)
-                vitals->motorDisarmed[i] = read16();
+                motor_disarmed[i] = read16();
             headSerialReply(0);
             break;
 
         case MSP_STATUS:
             headSerialReply(11);
-            serialize16(vitals->cycleTime);
+            serialize16(cycleTime);
             serialize16(i2cGetErrorCounter());
             serialize16(0);
             serialize8(0);
@@ -170,54 +178,52 @@ static void evaluateCommand(vitals_t * vitals)
         case MSP_RAW_IMU:
             headSerialReply(18);
             // Retarded hack until multiwiidorks start using real units for sensor data
-            if (vitals->acc1G > 1024) {
+            if (acc_1G > 1024) {
                 for (i = 0; i < 3; i++)
-                    serialize16(vitals->accSmooth[i] / 8);
+                    serialize16(accSmooth[i] / 8);
             } else {
                 for (i = 0; i < 3; i++)
-                    serialize16(vitals->accSmooth[i]);
+                    serialize16(accSmooth[i]);
             }
             for (i = 0; i < 3; i++)
-                serialize16(vitals->gyroData[i]);
+                serialize16(gyroData[i]);
             for (i = 0; i < 3; i++)
-                serialize16(vitals->magADC[i]);
+                serialize16(magADC[i]);
             break;
 
         case MSP_MOTOR:
-            s_struct((uint8_t *)vitals->motors, 16);
+            s_struct((uint8_t *)motor, 16);
             break;
 
         case MSP_RC:
             headSerialReply(16);
             for (i = 0; i < 8; i++)
-                serialize16(vitals->rcData[i]);
+                serialize16(rcData[i]);
             break;
 
         case MSP_ATTITUDE:
             headSerialReply(6);
             for (i = 0; i < 2; i++)
-                serialize16(vitals->imuAngle[i]);
-            serialize16(vitals->heading);
+                serialize16(angle[i]);
+            serialize16(heading);
             break;
 
-            /*
         case MSP_PX4FLOW:
             headSerialReply(4);
             serialize16(px4flow_frame.pixel_flow_x_sum);
             serialize16(px4flow_frame.pixel_flow_y_sum);
             break;
-            */
 
         case MSP_MB1242:
             headSerialReply(8);
-            serialize32(vitals->baroPressureSum/(CONFIG_BARO_TAB_SIZE-1));
-            serialize32(vitals->sonarAlt);
+            serialize32(baroPressure2);
+            serialize32(SonarAlt);
             break;
 
         case MSP_ALTITUDE:
             headSerialReply(6);
-            serialize32(vitals->estAlt);
-            serialize16(vitals->vario);
+            serialize32(EstAlt);
+            serialize16(vario);
             break;
 
         case MSP_REBOOT:
@@ -240,59 +246,56 @@ static void evaluateCommand(vitals_t * vitals)
     tailSerialReply();
 }
 
-// =========================================================================================================
 
-void mspInit(void)
-{
-    portState.port = Serial1; // provided by Mockduino
-}
-
-void mspCom(vitals_t * vitals)
+void serialCom(void)
 {
     uint8_t c;
+
+    currentPortState = &port;
 
     if (pendReboot)
         systemReset(false); // noreturn
 
-    while (serialTotalBytesWaiting(portState.port)) {
-        c = serialRead(portState.port);
+    while (serialTotalBytesWaiting(currentPortState->port)) {
+        c = serialRead(currentPortState->port);
 
-        if (portState.c_state == IDLE) {
-            portState.c_state = (c == '$') ? HEADER_START : IDLE;
-            if (portState.c_state == IDLE && !vitals->armed) {
+        if (currentPortState->c_state == IDLE) {
+            currentPortState->c_state = (c == '$') ? HEADER_START : IDLE;
+            if (currentPortState->c_state == IDLE && !armed) {
                 if (c == '#')
                     ;
                 else if (c == CONFIG_REBOOT_CHARACTER) 
                     systemReset(true);      // reboot to bootloader
             }
-        } else if (portState.c_state == HEADER_START) {
-            portState.c_state = (c == 'M') ? HEADER_M : IDLE;
-        } else if (portState.c_state == HEADER_M) {
-            portState.c_state = (c == '<') ? HEADER_ARROW : IDLE;
-        } else if (portState.c_state == HEADER_ARROW) {
+        } else if (currentPortState->c_state == HEADER_START) {
+            currentPortState->c_state = (c == 'M') ? HEADER_M : IDLE;
+        } else if (currentPortState->c_state == HEADER_M) {
+            currentPortState->c_state = (c == '<') ? HEADER_ARROW : IDLE;
+        } else if (currentPortState->c_state == HEADER_ARROW) {
             if (c > INBUF_SIZE) {       // now we are expecting the payload size
-                portState.c_state = IDLE;
+                currentPortState->c_state = IDLE;
                 continue;
             }
-            portState.dataSize = c;
-            portState.offset = 0;
-            portState.checksum = 0;
-            portState.indRX = 0;
-            portState.checksum ^= c;
-            portState.c_state = HEADER_SIZE;      // the command is to follow
-        } else if (portState.c_state == HEADER_SIZE) {
-            portState.cmdMSP = c;
-            portState.checksum ^= c;
-            portState.c_state = HEADER_CMD;
-        } else if (portState.c_state == HEADER_CMD && 
-                portState.offset < portState.dataSize) {
-            portState.checksum ^= c;
-            portState.inBuf[portState.offset++] = c;
-        } else if (portState.c_state == HEADER_CMD && 
-                portState.offset >= portState.dataSize) {
-            if (portState.checksum == c) 
-                evaluateCommand(vitals);
-            portState.c_state = IDLE;
+            currentPortState->dataSize = c;
+            currentPortState->offset = 0;
+            currentPortState->checksum = 0;
+            currentPortState->indRX = 0;
+            currentPortState->checksum ^= c;
+            currentPortState->c_state = HEADER_SIZE;      // the command is to follow
+        } else if (currentPortState->c_state == HEADER_SIZE) {
+            currentPortState->cmdMSP = c;
+            currentPortState->checksum ^= c;
+            currentPortState->c_state = HEADER_CMD;
+        } else if (currentPortState->c_state == HEADER_CMD && 
+                currentPortState->offset < currentPortState->dataSize) {
+            currentPortState->checksum ^= c;
+            currentPortState->inBuf[currentPortState->offset++] = c;
+        } else if (currentPortState->c_state == HEADER_CMD && 
+                currentPortState->offset >= currentPortState->dataSize) {
+            if (currentPortState->checksum == c) {        // compare calculated and transferred checksum
+                evaluateCommand();      // we got a valid packet, evaluate it
+            }
+            currentPortState->c_state = IDLE;
         }
     }
 }

@@ -2,19 +2,13 @@
  * This file is part of baseflight
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
-#include <stdbool.h>
-
-#define I2C_DEVICE (I2CDEV_2)
-
-#include <breezystm32.h>         // timers, delays, etc
-
-#include "../baro.h"
-
-#define BARO_GPIO   GPIOC
-#define BARO_PIN    Pin_13
+#include "board.h"
 
 // MS5611, Standard address 0x77
-#define MS5611_ADDR             0x77
+#define MS5611_ADDR                 0x77
+// Autodetect: turn off BMP085 while initializing ms5611 and check PROM crc to confirm device
+#define BMP085_OFF                  digitalLo(BARO_GPIO, BARO_PIN);
+#define BMP085_ON                   digitalHi(BARO_GPIO, BARO_PIN);
 
 #define CMD_RESET               0x1E // ADC reset command
 #define CMD_ADC_READ            0x00 // ADC read command
@@ -29,10 +23,64 @@
 #define CMD_PROM_RD             0xA0 // Prom read command
 #define PROM_NB                 8
 
+static void ms5611_reset(void);
+static uint16_t ms5611_prom(int8_t coef_num);
+static int8_t ms5611_crc(uint16_t *prom);
+static uint32_t ms5611_read_adc(void);
+static void ms5611_start_ut(void);
+static void ms5611_get_ut(void);
+static void ms5611_start_up(void);
+static void ms5611_get_up(void);
+static void ms5611_calculate(int32_t *pressure, int32_t *temperature);
+
 static uint32_t ms5611_ut;  // static result of temperature measurement
 static uint32_t ms5611_up;  // static result of pressure measurement
 static uint16_t ms5611_c[PROM_NB];  // on-chip ROM
 static uint8_t ms5611_osr = CMD_ADC_4096;
+
+bool initBaro(baro_t *baro)
+{
+    bool ack = false;
+    uint8_t sig;
+    int i;
+
+    if (hw_revision == NAZE32) {
+        // PC13 (BMP085's XCLR reset input, which we use to disable it). Only needed when running at 8MHz
+        gpio_config_t gpio;
+        gpio.pin = Pin_13;
+        gpio.speed = Speed_2MHz;
+        gpio.mode = Mode_Out_PP;
+        gpioInit(GPIOC, &gpio);
+        BMP085_OFF;
+    }
+
+    delay(10); // No idea how long the chip takes to power-up, but let's make it 10ms
+
+    // BMP085 is disabled. If we have a MS5611, it will reply. if no reply, means either
+    // we have BMP085 or no baro at all.
+    ack = i2cRead(MS5611_ADDR, CMD_PROM_RD, 1, &sig);
+    if (!ack)
+        return false;
+
+    ms5611_reset();
+    // read all coefficients
+    for (i = 0; i < PROM_NB; i++)
+        ms5611_c[i] = ms5611_prom(i);
+    // check crc, bail out if wrong - we are probably talking to BMP085 w/o XCLR line!
+    if (ms5611_crc(ms5611_c) != 0)
+        return false;
+
+    // TODO prom + CRC
+    baro->ut_delay = 10000;
+    baro->up_delay = 10000;
+    baro->start_ut = ms5611_start_ut;
+    baro->get_ut = ms5611_get_ut;
+    baro->start_up = ms5611_start_up;
+    baro->get_up = ms5611_get_up;
+    baro->calculate = ms5611_calculate;
+
+    return true;
+}
 
 static void ms5611_reset(void)
 {
@@ -137,45 +185,3 @@ static void ms5611_calculate(int32_t *pressure, int32_t *temperature)
     if (temperature)
         *temperature = temp;
 }
-
-bool initBaro(baro_t *baro)
-{
-    bool ack = false;
-    uint8_t sig;
-    int i;
-
-    gpio_config_t gpio;
-    gpio.pin = Pin_13;
-    gpio.speed = Speed_2MHz;
-    gpio.mode = Mode_Out_PP;
-    gpioInit(GPIOC, &gpio);
-    digitalLo(BARO_GPIO, BARO_PIN);
-
-    delay(10); // No idea how long the chip takes to power-up, but let's make it 10ms
-
-    // If we have an MS5611, it will reply. if no reply, means either we have BMP085 or no baro at all.
-    ack = i2cRead(MS5611_ADDR, CMD_PROM_RD, 1, &sig);
-    if (!ack)
-        return false;
-
-    ms5611_reset();
-    // read all coefficients
-    for (i = 0; i < PROM_NB; i++)
-        ms5611_c[i] = ms5611_prom(i);
-    // check crc, bail out if wrong - we are probably talking to BMP085 w/o XCLR line!
-    if (ms5611_crc(ms5611_c) != 0)
-        return false;
-
-    // TODO prom + CRC
-    baro->ut_delay = 10000;
-    baro->up_delay = 10000;
-    baro->start_ut = ms5611_start_ut;
-    baro->get_ut = ms5611_get_ut;
-    baro->start_up = ms5611_start_up;
-    baro->get_up = ms5611_get_up;
-    baro->calculate = ms5611_calculate;
-
-    return true;
-}
-
-

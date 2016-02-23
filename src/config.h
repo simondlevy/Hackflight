@@ -13,13 +13,13 @@ static const uint8_t CONFIG_VEL_P = 120;
 static const uint8_t CONFIG_VEL_I = 45;
 static const uint8_t CONFIG_VEL_D = 1;
 
-static const float CONFIG_MAGNETIC_DECLINATION = 0.0f;       
-
 #define CONFIG_ALT_UPDATE_USEC                      25000
 #define CONFIG_USE_CPPM                             1
 #define CONFIG_HORIZON_MODE                         1
 #define CONFIG_CALIBRATING_GYRO_CYCLES              1000
 #define CONFIG_CALIBRATING_ACC_CYCLES               400
+#define CONFIG_EMF_AVOIDANCE                        0
+#define CONFIG_SERIAL_BAUDRATE                      115200
 #define CONFIG_MOTOR_PWM_RATE                       400
 #define CONFIG_MIDRC                                1500
 #define CONFIG_MINCOMMAND                           1000
