@@ -5,7 +5,7 @@ BT_PORT = 1
 
 from msppg import MSP_Parser as Parser
 from time import sleep
-import bluetooth
+import socket
 
 def handler(baro, sonar):
     print(baro, sonar)
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     parser.set_MB1242_Handler(handler)
     request = parser.serialize_MB1242_Request()
 
-    sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM )
+    sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
     sock.connect((BT_ADDR, BT_PORT))
     sock.send(request)
 

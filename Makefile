@@ -214,11 +214,8 @@ debug:
 listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
 
-imu:
-	python getimu.py $(SERIAL_DEVICE)
-
-flow:
-	python getpx4flow.py $(SERIAL_DEVICE)
+sonar:
+	./scripts/bluesonar.py
 
 count:
 	wc -l src/*.c src/*.h | sort -n
