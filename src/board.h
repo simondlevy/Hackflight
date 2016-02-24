@@ -15,7 +15,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "stm32f10x_conf.h"
+#include <stm32f10x_conf.h>
 #include "core_cm3.h"
 #include "printf.h"
 #include "drv_system.h"         // timers, delays, etc
@@ -89,8 +89,6 @@ typedef struct baro_t {
 
 // Hardware definitions and GPIO
 // Target definitions (NAZE, ... are same as in Makefile
-#if defined(NAZE)
-
 #define LED0_GPIO   GPIOB
 #define LED0_PIN    Pin_3 // PB3 (LED)
 #define LED1_GPIO   GPIOB
@@ -119,8 +117,6 @@ typedef struct baro_t {
 #include "drv_timer.h"
 #include "drv_serial.h"
 #include "drv_uart.h"
-
-#endif /* all conditions */
 
 // Helpful macros
 #ifdef LED0

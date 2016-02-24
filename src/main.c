@@ -83,10 +83,7 @@ int main(void)
     for (i = 0; i < 10; i++) {
         LED1_TOGGLE;
         LED0_TOGGLE;
-        delay(25);
-        BEEP_ON;
-        delay(25);
-        BEEP_OFF;
+        delay(50);
     }
     LED0_OFF;
     LED1_OFF;

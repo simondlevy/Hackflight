@@ -3,43 +3,16 @@
 # <msmith@FreeBSD.ORG> wrote this file. As long as you retain this notice you
 # can do whatever you want with this stuff. If we meet some day, and you think
 # this stuff is worth it, you can buy me a beer in return
-###############################################################################
-#
-# Makefile for building the hackflight firmware.
-#
-# Invoke this with 'make help' to see the list of supported targets.
-# 
 
 ###############################################################################
 # Things that the user might override on the commandline
 #
 
-# The target to build, must be one of NAZE or CJMCU
-TARGET		?= NAZE
-
-# Compile-time options
-OPTIONS		?=
-
-# Debugger optons, must be empty or GDB
-DEBUG ?=
-
-# Serial port/Device for flashing
-SERIAL_DEVICE	?= /dev/ttyUSB0
-
-###############################################################################
-# Things that need to be maintained as the source changes
-#
-
-# Working directories
-ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
-SRC_DIR		 = $(ROOT)/src
-CMSIS_DIR	 = $(ROOT)/lib/CMSIS
-STDPERIPH_DIR	 = $(ROOT)/lib/STM32F10x_StdPeriph_Driver
-OBJECT_DIR	 = $(ROOT)/obj
-BIN_DIR		 = $(ROOT)/obj
+# Change this to wherever you put BreezySTM32
+BREEZY_DIR = /home/levy/Desktop/BreezySTM32
 
 # Source files common to all targets
-COMMON_SRC	 = main.c \
+PROJECT_SRC = main.c \
 		   mixer.c \
 		   mw.c \
 		   sensors.c \
@@ -53,15 +26,7 @@ COMMON_SRC	 = main.c \
 		   drv_uart.c \
 		   printf.c \
 		   utils.c \
-		   startup_stm32f10x_md_gcc.S \
-		   $(CMSIS_SRC) \
-		   $(STDPERIPH_SRC)
-
-# Source files for full-featured systems
-HIGHEND_SRC	 = telemetry_common.c
-
-# Source files for the NAZE target
-NAZE_SRC	 = drv_adc.c \
+           drv_adc.c \
 		   drv_mpu6050.c \
 		   drv_ms5611.c \
 		   drv_pwm.c \
@@ -69,13 +34,41 @@ NAZE_SRC	 = drv_adc.c \
 		   drv_timer.c \
 		   drv_px4flow.c \
 		   drv_lidarlite.c \
-		   drv_mb1242.c \
-		   $(HIGHEND_SRC) \
-		   $(COMMON_SRC)
+		   drv_mb1242.c 
+
+###############################################################################
+
+# You probably shouldn't modify anything below here!
+
+	
+TARGET		?= myproject
+
+# Compile-time options
+OPTIONS		?=
+
+# Debugger optons, must be empty or GDB
+DEBUG ?=
+
+# Serial port/Device for flashing
+SERIAL_DEVICE	?= /dev/ttyUSB0
+
+# Working directories
+ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
+SRC_DIR		 = $(ROOT)/src
+CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
+STDPERIPH_DIR	 = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
+OBJECT_DIR	 = $(ROOT)/obj
+BIN_DIR		 = $(ROOT)/obj
+
+# Source files common to all targets
+myproject_SRC = $(PROJECT_SRC) \
+		   $(CMSIS_SRC) \
+		   $(STDPERIPH_SRC) \
+		   $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S
 
 # In some cases, %.s regarded as intermediate file, which is actually not.
 # This will prevent accidental deletion of startup code.
-.PRECIOUS: %.s
+#.PRECIOUS: %.s
 
 # Search path for hackflight sources
 VPATH		:= $(SRC_DIR):$(SRC_DIR)/hackflight_startups
@@ -101,6 +94,7 @@ OBJCOPY	 = arm-none-eabi-objcopy
 # Tool options.
 #
 INCLUDE_DIRS	 = $(SRC_DIR) \
+	       $(BREEZY_DIR) \
 		   $(STDPERIPH_DIR)/inc \
 		   $(CMSIS_DIR)/CM3/CoreSupport \
 		   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x \
@@ -126,15 +120,14 @@ CFLAGS		 = $(ARCH_FLAGS) \
 		   -ffunction-sections \
 		   -fdata-sections \
 		   -DSTM32F10X_MD \
-		   -DUSE_STDPERIPH_DRIVER \
-		   -D$(TARGET)
+		   -DUSE_STDPERIPH_DRIVER 
 
 ASFLAGS		 = $(ARCH_FLAGS) \
 		   -x assembler-with-cpp \
 		   $(addprefix -I,$(INCLUDE_DIRS))
 
 # XXX Map/crossref output?
-LD_SCRIPT	 = $(ROOT)/stm32_flash.ld
+LD_SCRIPT	 = $(BREEZY_DIR)/stm32_flash.ld
 LDFLAGS		 = -lm \
 		   -nostartfiles \
 		   --specs=nano.specs \
@@ -188,7 +181,7 @@ $(OBJECT_DIR)/$(TARGET)/%.o): %.S
 	@$(CC) -c -o $@ $(ASFLAGS) $< 
 
 clean:
-	rm -f $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
+	rm -rf obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
 
 flash_$(TARGET): $(TARGET_HEX)
 	stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
