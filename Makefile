@@ -66,12 +66,7 @@ myproject_SRC = $(PROJECT_SRC) \
 		   $(STDPERIPH_SRC) \
 		   $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S
 
-# In some cases, %.s regarded as intermediate file, which is actually not.
-# This will prevent accidental deletion of startup code.
-#.PRECIOUS: %.s
-
-# Search path for hackflight sources
-VPATH		:= $(SRC_DIR):$(SRC_DIR)/hackflight_startups
+VPATH		:= $(SRC_DIR):$(SRC_DIR)
 
 # Search path and source files for the CMSIS sources
 VPATH		:= $(VPATH):$(CMSIS_DIR)/CM3/CoreSupport:$(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x
