@@ -16,8 +16,9 @@
 #include <stdio.h>
 
 #include <stm32f10x_conf.h>
+#include <printf.h>
+
 #include "core_cm3.h"
-#include "printf.h"
 #include "drv_system.h"         // timers, delays, etc
 #include "drv_gpio.h"
 #include "drv_px4flow.h"

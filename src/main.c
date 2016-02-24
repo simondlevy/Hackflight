@@ -2,10 +2,13 @@
  * This file is part of baseflight
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
+
 #include "board.h"
 #include "mw.h"
 #include "telemetry_common.h"
 #include "config.h"
+
+#include <printf.h>
 
 int hw_revision = 0;
 extern rcReadRawDataPtr rcReadRawFunc;
@@ -23,6 +26,7 @@ static void _putc(void *p, char c)
 {
     (void)p;
     serialWrite(telemport, c);
+    while (!isSerialTransmitBufferEmpty(telemport));
 }
 
 static void activateConfig(void)
@@ -109,7 +113,6 @@ int main(void)
     useSmallAngle = 1;
     
     // loopy
-    while (1) {
+    while (1) 
         loop();
-    }
 }

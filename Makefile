@@ -3,10 +3,7 @@
 # <msmith@FreeBSD.ORG> wrote this file. As long as you retain this notice you
 # can do whatever you want with this stuff. If we meet some day, and you think
 # this stuff is worth it, you can buy me a beer in return
-
 ###############################################################################
-# Things that the user might override on the commandline
-#
 
 # Change this to wherever you put BreezySTM32
 BREEZY_DIR = /home/levy/Desktop/BreezySTM32
@@ -24,7 +21,6 @@ PROJECT_SRC = main.c \
 		   drv_system.c \
 		   drv_serial.c \
 		   drv_uart.c \
-		   printf.c \
 		   utils.c \
            drv_adc.c \
 		   drv_mpu6050.c \
@@ -39,7 +35,6 @@ PROJECT_SRC = main.c \
 ###############################################################################
 
 # You probably shouldn't modify anything below here!
-
 	
 TARGET		?= myproject
 
@@ -64,7 +59,8 @@ BIN_DIR		 = $(ROOT)/obj
 myproject_SRC = $(PROJECT_SRC) \
 		   $(CMSIS_SRC) \
 		   $(STDPERIPH_SRC) \
-		   $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S
+		   $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
+		   $(BREEZY_DIR)/printf.c
 
 VPATH		:= $(SRC_DIR):$(SRC_DIR)
 
