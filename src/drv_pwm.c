@@ -5,6 +5,8 @@
 #include "board.h"
 #include "config.h"
 
+#include <printf.h>
+
 /*
    Configuration maps:
 
@@ -245,11 +247,14 @@ static void pwmWriteStandard(uint8_t index, uint16_t value)
 {
     *motors[index]->ccr = value;
 }
-
-void pwmInit(uint8_t config_pwmFilter, uint8_t config_useCPPM, uint8_t config_fastPWM, uint16_t config_pwmIdlePulse)
+void pwmInit(
+        uint16_t config_motorPwmRate,
+        uint8_t config_pwmFilter, 
+        uint8_t config_useCPPM, 
+        uint8_t config_fastPWM, 
+        uint16_t config_pwmIdlePulse)
 {
     const uint8_t *setup;
-    uint16_t period;
 
     // pwm filtering on input
     pwmFilter = config_pwmFilter;
@@ -276,10 +281,7 @@ void pwmInit(uint8_t config_pwmFilter, uint8_t config_useCPPM, uint8_t config_fa
             uint32_t mhz = (CONFIG_MOTOR_PWM_RATE > 500 || config_fastPWM) ? PWM_TIMER_8_MHZ : PWM_TIMER_MHZ;
             uint32_t hz = mhz * 1000000;
 
-            if (config_fastPWM)
-                period = hz / 4000;
-            else
-                period = hz / CONFIG_MOTOR_PWM_RATE;
+            uint16_t period = hz / (config_fastPWM ? 4000 : config_motorPwmRate);
 
             motors[numMotors++] = pwmOutConfig(port, mhz, period, config_pwmIdlePulse);
         }
