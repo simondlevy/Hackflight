@@ -247,13 +247,13 @@ static void pwmWriteStandard(uint8_t index, uint16_t value)
     *motors[index]->ccr = value;
 }
 
-void pwmInit()
+void pwmInit(uint8_t config_pwmFilter)
 {
     const uint8_t *setup;
     uint16_t period;
 
     // pwm filtering on input
-    pwmFilter = CONFIG_PWM_FILTER;
+    pwmFilter = config_pwmFilter;
 
     setup = CONFIG_USE_CPPM ? multiPPM : multiPWM;
 

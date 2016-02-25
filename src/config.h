@@ -60,7 +60,6 @@ static const uint8_t CONFIG_VEL_D = 1;
 #define CONFIG_THR_MID_8                            50
 #define CONFIG_THR_EXPO_8                           0
 #define CONFIG_YAW_DIRECTION                        1
-#define CONFIG_FAILSAFE_DELAY                       10   /* 1sec */
 
 // the angle when the throttle correction is maximal. in 0.1 degres, ex 225 = 22.5 ,30.0, 450 = 45.0 deg
 #define CONFIG_THROTTLE_CORRECTION_ANGLE            800   
