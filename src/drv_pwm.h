@@ -29,8 +29,10 @@ enum {
     MAX_PORTS
 };
 
-void pwmICConfig(TIM_TypeDef *tim, uint8_t channel, uint16_t polarity);
+void     pwmICConfig(TIM_TypeDef *tim, uint8_t channel, uint16_t polarity);
 
-void pwmInit(uint8_t config_pwmFilter);
-void pwmWriteMotor(uint8_t index, uint16_t value);
+void     pwmInit(uint8_t config_pwmFilter, bool config_useCPPM);
+
+void     pwmWriteMotor(uint8_t index, uint16_t value);
+
 uint16_t pwmRead(uint8_t channel);
