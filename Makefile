@@ -16,7 +16,6 @@ PROJECT_SRC = main.c \
 		   serial.c \
 		   rxmsp.c \
 		   state.c \
-		   drv_i2c.c \
 		   drv_system.c \
 		   drv_serial.c \
 		   drv_uart.c \
@@ -58,6 +57,7 @@ myproject_SRC = $(PROJECT_SRC) \
 		   $(STDPERIPH_SRC) \
 		   $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
 		   $(BREEZY_DIR)/drv_gpio.c \
+		   $(BREEZY_DIR)/drv_i2c.c \
 		   $(BREEZY_DIR)/printf.c
 
 VPATH		:= $(SRC_DIR):$(SRC_DIR)

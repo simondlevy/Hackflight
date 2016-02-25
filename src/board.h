@@ -26,6 +26,7 @@
 #include "offboard/drv_lidarlite.h"
 
 #include <drv_gpio.h>
+#include <drv_i2c.h>
 
 #ifndef M_PI
 #define M_PI       3.14159265358979323846f
@@ -111,7 +112,6 @@ typedef struct baro_t {
 #define I2C_DEVICE (I2CDEV_2)
 
 #include "drv_adc.h"
-#include "drv_i2c.h"
 #include "drv_spi.h"
 #include "drv_pwm.h"
 #include "drv_timer.h"
