@@ -84,7 +84,7 @@ OBJCOPY	 = arm-none-eabi-objcopy
 #
 # Tool options.
 #
-INCLUDE_DIRS	 = $(SRC_DIR) \
+INCLUDE_DIRS = $(SRC_DIR) \
 	       $(BREEZY_DIR) \
 		   $(STDPERIPH_DIR)/inc \
 		   $(CMSIS_DIR)/CM3/CoreSupport \

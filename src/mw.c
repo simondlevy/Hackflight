@@ -19,8 +19,6 @@ int32_t amperage;               // amperage read by current sensor in centiamper
 int32_t mAhdrawn;              // milliampere hours drawn from the battery since start
 int16_t telemTemperature1;      // gyro sensor temperature
 
-int16_t failsafeCnt = 0;
-int16_t failsafeEvents = 0;
 int16_t rcData[RC_CHANS];       // interval [1000;2000]
 int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
 int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
@@ -367,13 +365,6 @@ void loop(void)
         else {
             alt_hold_mode = 0;
         }
-
-        // note: if FAILSAFE is disable, failsafeCnt > 5 * FAILSAVE_DELAY is always false
-        if (failsafeCnt > 5 * CONFIG_FAILSAFE_DELAY) {
-            // bumpless transfer to Level mode
-            errorAngleI[ROLL] = 0;
-            errorAngleI[PITCH] = 0;
-        } 
 
     } else {                        // not in rc loop
         static int taskOrder = 0;   // never call all function in the same loop, to avoid high delay spikes

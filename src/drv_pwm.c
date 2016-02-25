@@ -50,9 +50,7 @@ static pwmWriteFuncPtr pwmWritePtr = NULL;
 static uint8_t numMotors = 0;
 static uint8_t numInputs = 0;
 static uint8_t pwmFilter = 0;
-static uint16_t failsafeThreshold = 985;
 // external vars (ugh)
-extern int16_t failsafeCnt;
 
 
 static const uint8_t multiPPM[] = {
@@ -198,21 +196,6 @@ static pwmPortData_t *pwmInConfig(uint8_t port, timerCCCallbackPtr callback, uin
     return p;
 }
 
-static void failsafeCheck(uint8_t channel, uint16_t pulse)
-{
-    static uint8_t goodPulses;
-
-    if (channel < 4 && pulse > failsafeThreshold)
-        goodPulses |= (1 << channel);       // if signal is valid - mark channel as OK
-    if (goodPulses == 0x0F) {               // If first four chanells have good pulses, clear FailSafe counter
-        goodPulses = 0;
-        if (failsafeCnt > 20)
-            failsafeCnt -= 20;
-        else
-            failsafeCnt = 0;
-    }
-}
-
 static void ppmCallback(uint8_t port, uint16_t capture)
 {
     (void)port;
@@ -230,7 +213,6 @@ static void ppmCallback(uint8_t port, uint16_t capture)
     } else {
         if (diff > PULSE_MIN && diff < PULSE_MAX && chan < MAX_INPUTS) {   // 750 to 2250 ms is our 'valid' channel range
             captures[chan] = diff;
-            failsafeCheck(chan, diff);
         }
         chan++;
     }
@@ -248,7 +230,6 @@ static void pwmCallback(uint8_t port, uint16_t capture)
         pwmPorts[port].capture = pwmPorts[port].fall - pwmPorts[port].rise;
         if (pwmPorts[port].capture > PULSE_MIN && pwmPorts[port].capture < PULSE_MAX) { // valid pulse width
             captures[pwmPorts[port].channel] = pwmPorts[port].capture;
-            failsafeCheck(pwmPorts[port].channel, pwmPorts[port].capture);
         }
         // switch state
         pwmPorts[port].state = 0;
@@ -271,9 +252,6 @@ void pwmInit()
     const uint8_t *setup;
     uint16_t period;
 
-    // to avoid importing cfg
-    failsafeThreshold = CONFIG_FAILSAFE_DETECT_THRESHOLD; 
-    
     // pwm filtering on input
     pwmFilter = CONFIG_PWM_FILTER;
 

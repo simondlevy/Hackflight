@@ -55,7 +55,6 @@ static const uint8_t CONFIG_VEL_D = 1;
 #define CONFIG_PWM_IDLE_PULSE                       PULSE_1MS /* standard PWM for brushless ESC */
 #define CONFIG_FAST_PWM                             0   /* 0 or 1 */
 #define CONFIG_PWM_FILTER                           0   /* 0 or 1 */
-#define CONFIG_FAILSAFE_DETECT_THRESHOLD            985 /* any of first 4 chans below this value triggers failsafe */
 #define CONFIG_RC_EXPO_8                            65
 #define CONFIG_RC_RATE_8                            90
 #define CONFIG_THR_MID_8                            50
