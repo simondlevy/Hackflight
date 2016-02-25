@@ -272,14 +272,9 @@ void pwmInit(uint8_t config_pwmFilter, uint8_t config_useCPPM, uint8_t config_fa
             pwmInConfig(port, pwmCallback, numInputs);
             numInputs++;
         } else if (mask & TYPE_M) {
-            uint32_t hz, mhz;
 
-            if (CONFIG_MOTOR_PWM_RATE > 500 || config_fastPWM) 
-                mhz = PWM_TIMER_8_MHZ;
-            else 
-                mhz = PWM_TIMER_MHZ;
-
-            hz = mhz * 1000000;
+            uint32_t mhz = (CONFIG_MOTOR_PWM_RATE > 500 || config_fastPWM) ? PWM_TIMER_8_MHZ : PWM_TIMER_MHZ;
+            uint32_t hz = mhz * 1000000;
 
             if (config_fastPWM)
                 period = hz / 4000;
