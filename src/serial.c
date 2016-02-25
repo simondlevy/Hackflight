@@ -5,7 +5,6 @@
 
 #include "board.h"
 #include "mw.h"
-#include "telemetry_common.h"
 #include "config.h"
 
 // Multiwii Serial Protocol 0
@@ -147,6 +146,37 @@ void serialInit(uint32_t baudrate)
     numTelemetryPorts++;
 }
 
+static bool rxMspFrameDone = false;
+
+static void mspFrameReceive(void)
+{
+    rxMspFrameDone = true;
+}
+
+/*
+   static uint16_t mspReadRawRC(uint8_t chan)
+{
+    return rcData[chan];
+}
+
+
+static bool mspFrameComplete(void)
+{
+    if (rxMspFrameDone) {
+        rxMspFrameDone = false;
+        return true;
+    }
+    return false;
+}
+
+
+void mspInit(rcReadRawDataPtr *callback)
+{
+    if (callback)
+        *callback = mspReadRawRC;
+}
+*/
+
 static void evaluateCommand(void)
 {
     uint32_t i;
@@ -158,7 +188,7 @@ static void evaluateCommand(void)
             for (i = 0; i < 8; i++)
                 rcData[i] = read16();
             headSerialReply(0);
-            mspFrameRecieve();
+            mspFrameReceive();
             break;
 
         case MSP_SET_MOTOR:

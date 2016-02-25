@@ -85,6 +85,8 @@ static sensor_align_e accAlign = CW0_DEG;
 // Lowpass
 static uint8_t mpuLowPassFilter = INV_FILTER_42HZ;
 
+extern int hw_revision;
+
 bool mpuDetect(sensor_t *acc, sensor_t *gyro, uint8_t lpf)
 {
     gpio_config_t gpio;

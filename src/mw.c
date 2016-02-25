@@ -4,7 +4,6 @@
  */
 #include "board.h"
 #include "mw.h"
-#include "telemetry_common.h"
 #include "config.h"
 
 int16_t debug[4];

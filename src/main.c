@@ -5,7 +5,6 @@
 
 #include "board.h"
 #include "mw.h"
-#include "telemetry_common.h"
 #include "config.h"
 
 #include <printf.h>
@@ -59,6 +58,7 @@ int main(void)
     SetSysClock(CONFIG_EMF_AVOIDANCE);
 
     // determine hardware revision based on clock frequency
+    extern uint32_t hse_value;
     if (hse_value == 8000000)
         hw_revision = NAZE32;
     else if (hse_value == 12000000)
@@ -78,7 +78,7 @@ int main(void)
     if (hw_revision != NAZE32_SP)
         i2cInit(I2C_DEVICE);
 
-    adcInit();
+    adcInit(hw_revision >= NAZE32_REV5);
 
     initSensors();
 
