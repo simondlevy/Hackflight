@@ -6,6 +6,11 @@
 #include "mw.h"
 #include "config.h"
 
+int    hw_revision = 0;
+extern rcReadRawDataPtr rcReadRawFunc;
+uint8_t useSmallAngle;
+uint8_t armed;
+
 int16_t debug[4];
 uint32_t currentTime = 0;
 uint32_t previousTime = 0;
@@ -270,6 +275,80 @@ static void pidMultiWii(void)
 }
 
 #define GYRO_I_MAX 256
+
+void setup(void)
+{
+    uint8_t i;
+
+    serialInit();
+
+    armed = 0;
+
+    // determine hardware revision based on clock frequency
+    extern uint32_t hse_value;
+    if (hse_value == 8000000)
+        hw_revision = NAZE32;
+    else if (hse_value == 12000000)
+        hw_revision = NAZE32_REV5;
+
+    // sleep for 100ms
+    delay(100);
+
+    for (i = 0; i < PITCH_LOOKUP_LENGTH; i++)
+        lookupPitchRollRC[i] = (2500 + CONFIG_RC_EXPO_8 * (i * i - 25)) * i * (int32_t)CONFIG_RC_RATE_8 / 2500;
+
+    for (i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
+        int16_t tmp = 10 * i - CONFIG_THR_MID_8;
+        uint8_t y = 1;
+        if (tmp > 0)
+            y = 100 - CONFIG_THR_MID_8;
+        if (tmp < 0)
+            y = CONFIG_THR_MID_8;
+        lookupThrottleRC[i] = 10 * CONFIG_THR_MID_8 + tmp * (100 - CONFIG_THR_EXPO_8 + 
+                (int32_t)CONFIG_THR_EXPO_8 * (tmp * tmp) / (y * y)) / 10;
+        lookupThrottleRC[i] = CONFIG_MINTHROTTLE + (int32_t)(CONFIG_MAXTHROTTLE - CONFIG_MINTHROTTLE) * 
+            lookupThrottleRC[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
+    }
+
+    if (spiInit() == SPI_DEVICE_MPU && hw_revision == NAZE32_REV5)
+        hw_revision = NAZE32_SP;
+
+    if (hw_revision != NAZE32_SP)
+        i2cInit(I2C_DEVICE);
+
+    adcInit(hw_revision >= NAZE32_REV5);
+
+    initSensors();
+
+    LED1_ON;
+    LED0_OFF;
+    for (i = 0; i < 10; i++) {
+        LED1_TOGGLE;
+        LED0_TOGGLE;
+        delay(50);
+    }
+    LED0_OFF;
+    LED1_OFF;
+
+    imuInit(); 
+    mixerInit(); 
+
+
+    pwmInit();
+
+    // configure PWM/CPPM read function and max number of channels
+    // these, if enabled
+    for (i = 0; i < RC_CHANS; i++)
+        rcData[i] = 1502;
+    rcReadRawFunc = pwmReadRawRC;
+
+    previousTime = micros();
+
+    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
+
+    // trigger accelerometer calibration requirement
+    useSmallAngle = 1;
+}
 
 void loop(void)
 {

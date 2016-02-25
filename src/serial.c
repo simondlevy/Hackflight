@@ -27,7 +27,7 @@
 
 #define INBUF_SIZE 128
 
-serialPort_t * telemport;
+extern serialPort_t * Serial1;
 
 // from mixer.c
 extern int16_t motor_disarmed[4];
@@ -138,11 +138,10 @@ void serializeNames(const char *s)
         serialize8(*c);
 }
 
-void serialInit(uint32_t baudrate)
+void serialInit(void)
 {
     numTelemetryPorts = 0;
-    telemport = uartOpen(USART1, NULL, baudrate, MODE_RXTX);
-    port.port = telemport;
+    port.port = Serial1;
     numTelemetryPorts++;
 }
 

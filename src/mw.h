@@ -43,8 +43,6 @@ typedef struct motorMixer_t {
     float yaw;
 } motorMixer_t;
 
-extern serialPort_t * telemport;
-
 extern uint8_t useSmallAngle;
 extern uint8_t armed;
 
@@ -132,5 +130,5 @@ void writeAllMotors(int16_t mc);
 void mixTable(void);
 
 // Serial
-void serialInit(uint32_t baudrate);
+void serialInit(void);
 void serialCom(void);

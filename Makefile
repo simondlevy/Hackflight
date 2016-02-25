@@ -9,8 +9,7 @@
 BREEZY_DIR = /home/levy/Desktop/BreezySTM32
 
 # Source files common to all targets
-PROJECT_SRC = main.c \
-		   mixer.c \
+PROJECT_SRC = mixer.c \
 		   mw.c \
 		   sensors.c \
 		   serial.c \
@@ -49,6 +48,7 @@ myproject_SRC = $(PROJECT_SRC) \
 		   $(CMSIS_SRC) \
 		   $(STDPERIPH_SRC) \
 		   $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
+		   $(BREEZY_DIR)/main.c \
 		   $(BREEZY_DIR)/drv_gpio.c \
 		   $(BREEZY_DIR)/drv_i2c.c \
 		   $(BREEZY_DIR)/drv_timer.c \
