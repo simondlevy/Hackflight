@@ -50,7 +50,6 @@ static pwmWriteFuncPtr pwmWritePtr = NULL;
 static uint8_t numMotors = 0;
 static uint8_t numInputs = 0;
 static uint8_t pwmFilter = 0;
-// external vars (ugh)
 
 
 static const uint8_t multiPPM[] = {
@@ -247,7 +246,7 @@ static void pwmWriteStandard(uint8_t index, uint16_t value)
     *motors[index]->ccr = value;
 }
 
-void pwmInit(uint8_t config_pwmFilter, bool config_useCPPM)
+void pwmInit(uint8_t config_pwmFilter, uint8_t config_useCPPM, uint8_t config_fastPWM)
 {
     const uint8_t *setup;
     uint16_t period;
@@ -275,14 +274,14 @@ void pwmInit(uint8_t config_pwmFilter, bool config_useCPPM)
         } else if (mask & TYPE_M) {
             uint32_t hz, mhz;
 
-            if (CONFIG_MOTOR_PWM_RATE > 500 || CONFIG_FAST_PWM)
+            if (CONFIG_MOTOR_PWM_RATE > 500 || config_fastPWM) 
                 mhz = PWM_TIMER_8_MHZ;
-            else
+            else 
                 mhz = PWM_TIMER_MHZ;
 
             hz = mhz * 1000000;
 
-            if (CONFIG_FAST_PWM)
+            if (config_fastPWM)
                 period = hz / 4000;
             else
                 period = hz / CONFIG_MOTOR_PWM_RATE;
@@ -293,8 +292,9 @@ void pwmInit(uint8_t config_pwmFilter, bool config_useCPPM)
 
     // determine motor writer function
     pwmWritePtr = pwmWriteStandard;
-    if (CONFIG_MOTOR_PWM_RATE > 500)
+    if (CONFIG_MOTOR_PWM_RATE > 500) {
         pwmWritePtr = pwmWriteBrushed;
+    }
 }
 
 void pwmWriteMotor(uint8_t index, uint16_t value)
