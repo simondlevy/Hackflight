@@ -246,7 +246,7 @@ static void pwmWriteStandard(uint8_t index, uint16_t value)
     *motors[index]->ccr = value;
 }
 
-void pwmInit(uint8_t config_pwmFilter, uint8_t config_useCPPM, uint8_t config_fastPWM)
+void pwmInit(uint8_t config_pwmFilter, uint8_t config_useCPPM, uint8_t config_fastPWM, uint16_t config_pwmIdlePulse)
 {
     const uint8_t *setup;
     uint16_t period;
@@ -286,7 +286,7 @@ void pwmInit(uint8_t config_pwmFilter, uint8_t config_useCPPM, uint8_t config_fa
             else
                 period = hz / CONFIG_MOTOR_PWM_RATE;
 
-            motors[numMotors++] = pwmOutConfig(port, mhz, period, CONFIG_PWM_IDLE_PULSE);
+            motors[numMotors++] = pwmOutConfig(port, mhz, period, config_pwmIdlePulse);
         }
     }
 

@@ -31,7 +31,7 @@ enum {
 
 void     pwmICConfig(TIM_TypeDef *tim, uint8_t channel, uint16_t polarity);
 
-void     pwmInit(uint8_t config_pwmFilter, uint8_t config_useCPPM, uint8_t config_fastPWM);
+void pwmInit(uint8_t config_pwmFilter, uint8_t config_useCPPM, uint8_t config_fastPWM, uint16_t config_pwmIdlePulse);
 
 void     pwmWriteMotor(uint8_t index, uint16_t value);
 
