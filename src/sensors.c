@@ -6,7 +6,8 @@
 #include "board.h"
 #include "mw.h"
 #include "config.h"
-#include "drv_ms5611.h"
+
+#include "onboard/drv_ms5611.h"
 
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.

@@ -20,10 +20,12 @@
 
 #include "core_cm3.h"
 #include "drv_system.h"         // timers, delays, etc
-#include "drv_gpio.h"
-#include "drv_px4flow.h"
-#include "drv_lidarlite.h"
 #include "utils.h"
+
+#include "offboard/drv_px4flow.h"
+#include "offboard/drv_lidarlite.h"
+
+#include <drv_gpio.h>
 
 #ifndef M_PI
 #define M_PI       3.14159265358979323846f
@@ -64,8 +66,6 @@ typedef enum {
 typedef void (*sensorInitFuncPtr)(sensor_align_e align);   // sensor init prototype
 typedef void (*sensorReadFuncPtr)(int16_t *data);          // sensor read and align prototype
 typedef void (*serialReceiveCallbackPtr)(uint16_t data);   // used by serial drivers to return frames to app
-typedef uint16_t (*rcReadRawDataPtr)(uint8_t chan);        // used by receiver driver to return channel data
-typedef void (*pidControllerFuncPtr)(void);                // pid controller function prototype
 
 typedef struct sensor_t {
     sensorInitFuncPtr init;                                 // initialize function
@@ -113,11 +113,12 @@ typedef struct baro_t {
 #include "drv_adc.h"
 #include "drv_i2c.h"
 #include "drv_spi.h"
-#include "drv_mpu6050.h"
 #include "drv_pwm.h"
 #include "drv_timer.h"
 #include "drv_serial.h"
 #include "drv_uart.h"
+
+#include "onboard/drv_mpu6050.h"
 
 // Helpful macros
 #ifdef LED0

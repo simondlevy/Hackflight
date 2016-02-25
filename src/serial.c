@@ -208,11 +208,13 @@ static void evaluateCommand(void)
             serialize16(heading);
             break;
 
+            /*
         case MSP_PX4FLOW:
             headSerialReply(4);
             serialize16(px4flow_frame.pixel_flow_x_sum);
             serialize16(px4flow_frame.pixel_flow_y_sum);
             break;
+            */
 
         case MSP_MB1242:
             headSerialReply(8);

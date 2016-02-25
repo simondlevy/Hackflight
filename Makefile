@@ -16,21 +16,18 @@ PROJECT_SRC = main.c \
 		   serial.c \
 		   rxmsp.c \
 		   state.c \
-		   drv_gpio.c \
 		   drv_i2c.c \
 		   drv_system.c \
 		   drv_serial.c \
 		   drv_uart.c \
 		   utils.c \
            drv_adc.c \
-		   drv_mpu6050.c \
-		   drv_ms5611.c \
 		   drv_pwm.c \
 		   drv_spi.c \
 		   drv_timer.c \
-		   drv_px4flow.c \
-		   drv_lidarlite.c \
-		   drv_mb1242.c 
+		   onboard/drv_mpu6050.c \
+		   onboard/drv_ms5611.c \
+		   offboard/drv_mb1242.c 
 
 ###############################################################################
 
@@ -60,6 +57,7 @@ myproject_SRC = $(PROJECT_SRC) \
 		   $(CMSIS_SRC) \
 		   $(STDPERIPH_SRC) \
 		   $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
+		   $(BREEZY_DIR)/drv_gpio.c \
 		   $(BREEZY_DIR)/printf.c
 
 VPATH		:= $(SRC_DIR):$(SRC_DIR)
