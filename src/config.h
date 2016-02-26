@@ -20,6 +20,12 @@ static const bool     CONFIG_FAST_PWM            = false;
 static const uint32_t CONFIG_MOTOR_PWM_RATE      = 400;
 static const uint16_t CONFIG_PWM_IDLE_PULSE_USEC = 1000; // standard PWM for brushless ESC 
 
+static const uint8_t CONFIG_ROLL_PITCH_RATE[2] = {0, 0};
+static const int16_t CONFIG_ANGLE_TRIM[2]      = {0, 0};
+static const int     CONFIG_RCMAP[8]           = {0, 1, 3, 2, 4, 5, 6, 7};
+
+// XXX stuff below here should be declared as const, not #defined
+
 #define CONFIG_ALT_UPDATE_USEC                      25000
 #define CONFIG_HORIZON_MODE                         1
 #define CONFIG_CALIBRATING_GYRO_CYCLES              1000
@@ -83,6 +89,4 @@ static const uint16_t CONFIG_PWM_IDLE_PULSE_USEC = 1000; // standard PWM for bru
 #define CONFIG_DEADBAND                             0
 #define CONFIG_YAW_DEADBAND                         0
 
-static const uint8_t CONFIG_ROLL_PITCH_RATE[2] = {0, 0};
-static const int16_t CONFIG_ANGLE_TRIM[2]      = {0, 0};
-static const int     CONFIG_RCMAP[8]           = {0, 1, 3, 2, 4, 5, 6, 7};
+
