@@ -13,8 +13,10 @@ static const uint8_t CONFIG_VEL_P = 120;
 static const uint8_t CONFIG_VEL_I = 45;
 static const uint8_t CONFIG_VEL_D = 1;
 
+static const bool CONFIG_USE_CPPM   = true;
+static const bool CONFIG_PWM_FILTER = false;
+
 #define CONFIG_ALT_UPDATE_USEC                      25000
-#define CONFIG_USE_CPPM                             1
 #define CONFIG_HORIZON_MODE                         1
 #define CONFIG_CALIBRATING_GYRO_CYCLES              1000
 #define CONFIG_CALIBRATING_ACC_CYCLES               400

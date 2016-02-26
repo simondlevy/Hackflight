@@ -22,6 +22,7 @@
    PWM11..14 used for motors
  */
 
+
 typedef struct {
     volatile uint16_t *ccr;
     volatile uint16_t *cr1;
@@ -36,56 +37,12 @@ typedef struct {
     uint16_t capture;
 } pwmPortData_t;
 
-enum {
-    TYPE_IP = 0x10,
-    TYPE_IW = 0x20,
-    TYPE_M = 0x40,
-    TYPE_S = 0x80
-};
-
 typedef void (*pwmWriteFuncPtr)(uint8_t index, uint16_t value);  // function pointer used to write motors
 
-static pwmPortData_t pwmPorts[MAX_PORTS];
-static uint16_t captures[MAX_INPUTS];
-static pwmPortData_t *motors[4];
+static pwmPortData_t   pwmPorts[MAX_PORTS];
+static uint16_t        captures[MAX_INPUTS];
 static pwmWriteFuncPtr pwmWritePtr = NULL;
-static uint8_t numMotors = 0;
-static uint8_t numInputs = 0;
-static uint8_t pwmFilter = 0;
-
-
-static const uint8_t multiPPM[] = {
-    PWM1 | TYPE_IP,     // PPM input
-    PWM9 | TYPE_M,      // Swap to servo if needed
-    PWM10 | TYPE_M,     // Swap to servo if needed
-    PWM11 | TYPE_M,
-    PWM12 | TYPE_M,
-    PWM13 | TYPE_M,
-    PWM14 | TYPE_M,
-    PWM5 | TYPE_M,      // Swap to servo if needed
-    PWM6 | TYPE_M,      // Swap to servo if needed
-    PWM7 | TYPE_M,      // Swap to servo if needed
-    PWM8 | TYPE_M,      // Swap to servo if needed
-    0xFF
-};
-
-static const uint8_t multiPWM[] = {
-    PWM1 | TYPE_IW,     // input #1
-    PWM2 | TYPE_IW,
-    PWM3 | TYPE_IW,
-    PWM4 | TYPE_IW,
-    PWM5 | TYPE_IW,
-    PWM6 | TYPE_IW,
-    PWM7 | TYPE_IW,
-    PWM8 | TYPE_IW,     // input #8
-    PWM9 | TYPE_M,      // motor #1 or servo #1 (swap to servo if needed)
-    PWM10 | TYPE_M,     // motor #2 or servo #2 (swap to servo if needed)
-    PWM11 | TYPE_M,     // motor #1 or #3
-    PWM12 | TYPE_M,
-    PWM13 | TYPE_M,
-    PWM14 | TYPE_M,     // motor #4 or #6
-    0xFF
-};
+static uint8_t         pwmFilter = 0;
 
 #define PWM_TIMER_MHZ 1
 #define PWM_TIMER_8_MHZ 8
@@ -125,7 +82,7 @@ static void pwmOCConfig(TIM_TypeDef *tim, uint8_t channel, uint16_t value)
     }
 }
 
-void pwmICConfig(TIM_TypeDef *tim, uint8_t channel, uint16_t polarity)
+static void pwmICConfig(TIM_TypeDef *tim, uint8_t channel, uint16_t polarity)
 {
     TIM_ICInitTypeDef TIM_ICInitStructure;
 
@@ -238,6 +195,53 @@ static void pwmCallback(uint8_t port, uint16_t capture)
     }
 }
 
+// ===========================================================================
+
+enum {
+    TYPE_IP = 0x10,
+    TYPE_IW = 0x20,
+    TYPE_M = 0x40,
+    TYPE_S = 0x80
+};
+
+static const uint8_t multiPPM[] = {
+    PWM1 | TYPE_IP,     // PPM input
+    PWM9 | TYPE_M,      // Swap to servo if needed
+    PWM10 | TYPE_M,     // Swap to servo if needed
+    PWM11 | TYPE_M,
+    PWM12 | TYPE_M,
+    PWM13 | TYPE_M,
+    PWM14 | TYPE_M,
+    PWM5 | TYPE_M,      // Swap to servo if needed
+    PWM6 | TYPE_M,      // Swap to servo if needed
+    PWM7 | TYPE_M,      // Swap to servo if needed
+    PWM8 | TYPE_M,      // Swap to servo if needed
+    0xFF
+};
+
+static const uint8_t multiPWM[] = {
+    PWM1 | TYPE_IW,     // input #1
+    PWM2 | TYPE_IW,
+    PWM3 | TYPE_IW,
+    PWM4 | TYPE_IW,
+    PWM5 | TYPE_IW,
+    PWM6 | TYPE_IW,
+    PWM7 | TYPE_IW,
+    PWM8 | TYPE_IW,     // input #8
+    PWM9 | TYPE_M,      // motor #1 or servo #1 (swap to servo if needed)
+    PWM10 | TYPE_M,     // motor #2 or servo #2 (swap to servo if needed)
+    PWM11 | TYPE_M,     // motor #1 or #3
+    PWM12 | TYPE_M,
+    PWM13 | TYPE_M,
+    PWM14 | TYPE_M,     // motor #4 or #6
+    0xFF
+};
+
+
+static         pwmPortData_t *motors[4];
+static uint8_t numMotors = 0;
+static uint8_t numInputs = 0;
+
 static void pwmWriteBrushed(uint8_t index, uint16_t value)
 {
     *motors[index]->ccr = (value - 1000) * motors[index]->period / 1000;
@@ -253,7 +257,7 @@ void pwmInit(void)
     const uint8_t *setup;
 
     // pwm filtering on input
-    pwmFilter = CONFIG_PWM_FILTER;
+    pwmFilter = CONFIG_PWM_FILTER ? 1 : 0;
 
     setup = CONFIG_USE_CPPM ? multiPPM : multiPWM;
 

@@ -29,10 +29,6 @@ enum {
     MAX_PORTS
 };
 
-void     pwmICConfig(TIM_TypeDef *tim, uint8_t channel, uint16_t polarity);
-
 void     pwmInit(void);
-
 void     pwmWriteMotor(uint8_t index, uint16_t value);
-
 uint16_t pwmRead(uint8_t channel);
