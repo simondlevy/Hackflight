@@ -252,14 +252,14 @@ static void pwmWriteStandard(uint8_t index, uint16_t value)
     *motors[index]->ccr = value;
 }
 
-void pwmInit(void)
+void pwmInit(bool useCPPM, bool usePwmFilter, bool fastPWM, uint32_t motorPwmRate, uint16_t idlePulseUsec)
 {
     const uint8_t *setup;
 
     // pwm filtering on input
-    pwmFilter = CONFIG_PWM_FILTER ? 1 : 0;
+    pwmFilter = usePwmFilter ? 1 : 0;
 
-    setup = CONFIG_USE_CPPM ? multiPPM : multiPWM;
+    setup = useCPPM ? multiPPM : multiPWM;
 
     int i;
     for (i = 0; i < MAX_PORTS; i++) {
@@ -278,18 +278,18 @@ void pwmInit(void)
             numInputs++;
         } else if (mask & TYPE_M) {
 
-            uint32_t mhz = (CONFIG_MOTOR_PWM_RATE > 500 || CONFIG_FAST_PWM) ? PWM_TIMER_8_MHZ : PWM_TIMER_MHZ;
+            uint32_t mhz = (motorPwmRate > 500 || fastPWM) ? PWM_TIMER_8_MHZ : PWM_TIMER_MHZ;
             uint32_t hz = mhz * 1000000;
 
-            uint16_t period = hz / (CONFIG_FAST_PWM ? 4000 : CONFIG_MOTOR_PWM_RATE);
+            uint16_t period = hz / (fastPWM ? 4000 : motorPwmRate);
 
-            motors[numMotors++] = pwmOutConfig(port, mhz, period, CONFIG_PWM_IDLE_PULSE_USEC);
+            motors[numMotors++] = pwmOutConfig(port, mhz, period, idlePulseUsec);
         }
     }
 
     // determine motor writer function
     pwmWritePtr = pwmWriteStandard;
-    if (CONFIG_MOTOR_PWM_RATE > 500) {
+    if (motorPwmRate > 500) {
         pwmWritePtr = pwmWriteBrushed;
     }
 }

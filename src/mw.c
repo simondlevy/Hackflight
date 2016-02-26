@@ -334,7 +334,7 @@ void setup(void)
     mixerInit(); 
 
 
-    pwmInit();
+    pwmInit(CONFIG_USE_CPPM, CONFIG_PWM_FILTER, CONFIG_FAST_PWM, CONFIG_MOTOR_PWM_RATE, CONFIG_PWM_IDLE_PULSE_USEC);
 
     // configure PWM/CPPM read function and max number of channels
     // these, if enabled
