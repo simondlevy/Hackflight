@@ -6,7 +6,6 @@
 
 #define MAX_SERVOS  8
 #define MAX_INPUTS  8
-#define PULSE_1MS   (1000)      // 1ms pulse width
 #define PULSE_MIN   (750)       // minimum PWM pulse width which is considered valid
 #define PULSE_MAX   (2250)      // maximum PWM pulse width which is considered valid
 

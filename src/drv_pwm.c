@@ -283,7 +283,7 @@ void pwmInit(void)
 
             uint16_t period = hz / (CONFIG_FAST_PWM ? 4000 : CONFIG_MOTOR_PWM_RATE);
 
-            motors[numMotors++] = pwmOutConfig(port, mhz, period, CONFIG_PWM_IDLE_PULSE);
+            motors[numMotors++] = pwmOutConfig(port, mhz, period, CONFIG_PWM_IDLE_PULSE_USEC);
         }
     }
 
