@@ -15,7 +15,6 @@ PROJECT_SRC = mixer.c \
 		   serial.c \
 		   state.c \
 		   utils.c \
-		   drv_pwm.c \
 		   onboard/drv_mpu6050.c \
 		   onboard/drv_ms5611.c \
 		   offboard/drv_mb1242.c 
@@ -50,6 +49,7 @@ myproject_SRC = $(PROJECT_SRC) \
 		   $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
 		   $(BREEZY_DIR)/main.c \
 		   $(BREEZY_DIR)/drv_gpio.c \
+		   $(BREEZY_DIR)/drv_pwm.c \
 		   $(BREEZY_DIR)/drv_i2c.c \
 		   $(BREEZY_DIR)/drv_timer.c \
 		   $(BREEZY_DIR)/drv_spi.c \
