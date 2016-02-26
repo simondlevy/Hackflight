@@ -13,8 +13,11 @@ static const uint8_t CONFIG_VEL_P = 120;
 static const uint8_t CONFIG_VEL_I = 45;
 static const uint8_t CONFIG_VEL_D = 1;
 
-static const bool CONFIG_USE_CPPM   = true;
-static const bool CONFIG_PWM_FILTER = false;
+// PWM
+static const bool     CONFIG_USE_CPPM        = true;
+static const bool     CONFIG_PWM_FILTER      = false;
+static const bool     CONFIG_FAST_PWM        = false;
+static const uint32_t CONFIG_MOTOR_PWM_RATE  = 400;
 
 #define CONFIG_ALT_UPDATE_USEC                      25000
 #define CONFIG_HORIZON_MODE                         1
@@ -22,7 +25,6 @@ static const bool CONFIG_PWM_FILTER = false;
 #define CONFIG_CALIBRATING_ACC_CYCLES               400
 #define CONFIG_EMF_AVOIDANCE                        0
 #define CONFIG_SERIAL_BAUDRATE                      115200
-#define CONFIG_MOTOR_PWM_RATE                       400
 #define CONFIG_MIDRC                                1500
 #define CONFIG_MINCOMMAND                           1000
 #define CONFIG_GYRO_CMPF_FACTOR                     600    
@@ -55,7 +57,6 @@ static const bool CONFIG_PWM_FILTER = false;
 #define CONFIG_ACC_ALIGN                            ALIGN_DEFAULT
 #define CONFIG_GYRO_ALIGN                           ALIGN_DEFAULT
 #define CONFIG_PWM_IDLE_PULSE                       PULSE_1MS /* standard PWM for brushless ESC */
-#define CONFIG_FAST_PWM                             0   /* 0 or 1 */
 #define CONFIG_PWM_FILTER                           0   /* 0 or 1 */
 #define CONFIG_RC_EXPO_8                            65
 #define CONFIG_RC_RATE_8                            90
