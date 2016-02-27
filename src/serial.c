@@ -207,7 +207,7 @@ static void evaluateCommand(void)
         case MSP_RAW_IMU:
             headSerialReply(18);
             // Retarded hack until multiwiidorks start using real units for sensor data
-            if (acc_1G > 1024) {
+            if (acc1G > 1024) {
                 for (i = 0; i < 3; i++)
                     serialize16(accSmooth[i] / 8);
             } else {
@@ -248,12 +248,12 @@ static void evaluateCommand(void)
         case MSP_MB1242:
             headSerialReply(8);
             serialize32(baroPressureSum/(CONFIG_BARO_TAB_SIZE-1));
-            serialize32(SonarAlt);
+            serialize32(sonarAlt);
             break;
 
         case MSP_ALTITUDE:
             headSerialReply(6);
-            serialize32(EstAlt);
+            serialize32(estAlt);
             serialize16(vario);
             break;
 

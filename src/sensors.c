@@ -9,22 +9,25 @@
 
 #include "onboard/drv_ms5611.h"
 
+#define BARO_TAB_SIZE_MAX   48
+
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.
 uint16_t calibratingA = 0;      
 uint16_t calibratingG = 0;
-uint16_t acc_1G = 256;          // this is the 1G measured acceleration.
-int16_t heading, magHold;
+uint16_t acc1G = 256;          // this is the 1G measured acceleration.
+int16_t heading;
 
 sensor_t acc;                       // acc access functions
 sensor_t gyro;                      // gyro access functions
 sensor_t mag;                       // mag access functions
 baro_t baro;                        // barometer access functions
 
-bool baro_available;
-bool sonar_available;
+bool baroAvailable;
+bool sonarAvailable;
 
 static int16_t accZero[3];
+static int32_t  baroPressure;
 
 void initSensors(void)
 {
@@ -34,9 +37,9 @@ void initSensors(void)
 
     gyro.init(CONFIG_GYRO_ALIGN);
 
-    baro_available = initBaro(&baro);
+    baroAvailable = initBaro(&baro);
 
-    sonar_available = initSonar();
+    sonarAvailable = initSonar();
 }
 
 static void ACC_Common(void)
@@ -55,11 +58,11 @@ static void ACC_Common(void)
             accADC[axis] = 0;
             accZero[axis] = 0;
         }
-        // Calculate average, shift Z down by acc_1G
+        // Calculate average, shift Z down by acc1G
         if (calibratingA == 1) {
             accZero[ROLL] = (a[ROLL] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
             accZero[PITCH] = (a[PITCH] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
-            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - acc_1G;
+            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - acc1G;
         }
         calibratingA--;
     }
@@ -202,5 +205,5 @@ void Sonar_update(void)
 {
     extern int32_t pollSonar(void);
 
-    SonarAlt = pollSonar();
+    sonarAlt = pollSonar();
 }

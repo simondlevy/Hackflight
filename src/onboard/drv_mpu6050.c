@@ -76,7 +76,7 @@ static void mpuGyroInit(sensor_align_e align);
 static void mpuGyroRead(int16_t *gyroData);
 
 // Needed for MPU6050 half-scale acc bug
-extern uint16_t acc_1G;
+extern uint16_t acc1G;
 
 // Default orientation
 static sensor_align_e gyroAlign = CW0_DEG;
@@ -91,8 +91,8 @@ bool mpuDetect(sensor_t *acc, sensor_t *gyro, uint8_t lpf)
 {
     gpio_config_t gpio;
 
-    // Set acc_1G. Modified once by mpu6050CheckRevision for old (hopefully nonexistent outside of clones) parts
-    acc_1G = 512 * 8;
+    // Set acc1G. Modified once by mpu6050CheckRevision for old (hopefully nonexistent outside of clones) parts
+    acc1G = 512 * 8;
 
     //hw = MPU_60x0;
     mpu6050CheckRevision();
@@ -248,7 +248,7 @@ static void mpu6050CheckRevision(void)
 
     // All this just to set the value
     if (half)
-        acc_1G = 255 * 8;
+        acc1G = 255 * 8;
 }
 
 static bool mpuReadRegisterI2C(uint8_t reg, uint8_t *data, int length)

@@ -6,45 +6,43 @@
 #include "mw.h"
 #include "config.h"
 
-int    hw_revision = 0;
-extern rcReadRawDataPtr rcReadRawFunc;
+#define ROL_LO (1 << (2 * ROLL))
+#define ROL_CE (3 << (2 * ROLL))
+#define ROL_HI (2 << (2 * ROLL))
+#define PIT_LO (1 << (2 * PITCH))
+#define PIT_CE (3 << (2 * PITCH))
+#define PIT_HI (2 << (2 * PITCH))
+#define YAW_LO (1 << (2 * YAW))
+#define YAW_CE (3 << (2 * YAW))
+#define YAW_HI (2 << (2 * YAW))
+#define THR_LO (1 << (2 * THROTTLE))
+#define THR_CE (3 << (2 * THROTTLE))
+#define THR_HI (2 << (2 * THROTTLE))
+
+#define PITCH_LOOKUP_LENGTH 7
+#define THROTTLE_LOOKUP_LENGTH 12
+
+
+int     hw_revision = 0;
 uint8_t useSmallAngle;
 uint8_t armed;
-
-int16_t debug[4];
 uint32_t currentTime = 0;
 uint32_t previousTime = 0;
-uint16_t cycleTime = 0;         
-// this is the number in micro second to achieve a full loop, it can differ a little and is taken into 
-// account in the PID loop
 
-uint16_t vbat;                  // battery voltage in 0.1V steps
-int32_t amperage;               // amperage read by current sensor in centiampere (1/100th A)
-int32_t mAhdrawn;              // milliampere hours drawn from the battery since start
-int16_t telemTemperature1;      // gyro sensor temperature
+// this is the number in micro second to achieve a full loop, it can differ a little and is taken into account in the PID loop
+uint16_t cycleTime = 0;         
 
 int16_t rcData[RC_CHANS];       // interval [1000;2000]
 int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
-int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
-int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
-rcReadRawDataPtr rcReadRawFunc = NULL;  // receive data from default (pwm/ppm) or additional 
+
+static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
+static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
 static uint8_t accCalibrated;
-
-static void pidMultiWii(void);
-pidControllerFuncPtr pid_controller = pidMultiWii; // which pid controller are we using, defaultMultiWii
 
 uint8_t dynP8[3], dynI8[3], dynD8[3];
 
 int16_t axisPID[3];
-
-// Battery monitoring stuff
-uint8_t batteryCellCount = 3;       // cell count
-uint16_t batteryWarningVoltage;     // slow buzzer after this one, recommended 80% of battery used. Time to land.
-uint16_t batteryCriticalVoltage;    // annoying buzzer after this one, battery is going to be dead.
-
-// Time of automatic disarm when "Don't spin the motors when armed" is enabled.
-static uint32_t disarmTime = 0;
 
 static bool check_timed_task(uint32_t usec) {
 
@@ -67,20 +65,7 @@ bool check_and_update_timed_task(uint32_t * usec, uint32_t period)
     return result;
 }
 
-void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
-{
-    uint8_t i, r;
-
-    for (r = 0; r < repeat; r++) {
-        for (i = 0; i < num; i++) {
-            LED0_TOGGLE;            // switch LEDPIN state
-            delay(wait);
-        }
-        delay(60);
-    }
-}
-
-void annexCode(void)
+static void annexCode(void)
 {
     static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
@@ -159,19 +144,9 @@ void annexCode(void)
     }
 
     serialCom();
-
-    // Read out gyro temperature. can use it for something somewhere. maybe get MCU temperature instead? 
-    // lots of fun possibilities.
-    if (gyro.temperature)
-        gyro.temperature(&telemTemperature1);
 }
 
-uint16_t pwmReadRawRC(uint8_t chan)
-{
-    return pwmRead(CONFIG_RCMAP[chan]);
-}
-
-void computeRC(void)
+static void computeRC(void)
 {
     uint16_t capture;
     int i, chan;
@@ -180,7 +155,8 @@ void computeRC(void)
     static int rcAverageIndex = 0;
 
     for (chan = 0; chan < 8; chan++) {
-        capture = rcReadRawFunc(chan);
+        //capture = rcReadRawFunc(chan);
+        capture = pwmRead(CONFIG_RCMAP[chan]);
 
         // validate input
         if (capture < PULSE_MIN || capture > PULSE_MAX)
@@ -210,9 +186,6 @@ static void mwDisarm(void)
 {
     if (armed) {
         armed = 0;
-        // Reset disarm time so that it works next time we arm the board.
-        if (disarmTime != 0)
-            disarmTime = 0;
     }
 }
 
@@ -274,7 +247,7 @@ static void pidMultiWii(void)
     }
 }
 
-#define GYRO_I_MAX 256
+// =============================================================================================================
 
 void setup(void)
 {
@@ -340,7 +313,6 @@ void setup(void)
     // these, if enabled
     for (i = 0; i < RC_CHANS; i++)
         rcData[i] = 1502;
-    rcReadRawFunc = pwmReadRawRC;
 
     previousTime = micros();
 
@@ -434,10 +406,10 @@ void loop(void)
         if (auxState > 0) {
             if (!alt_hold_mode) {
                 alt_hold_mode = 1;
-                AltHold = EstAlt;
+                altHold = estAlt;
                 initialThrottleHold = rcCommand[THROTTLE];
                 errorVelocityI = 0;
-                AltPID = 0;
+                altPID = 0;
             }
         }
         else {
@@ -449,19 +421,19 @@ void loop(void)
         switch (taskOrder) {
             case 0:
                 taskOrder++;
-                if (sonar_available) {
+                if (sonarAvailable) {
                     Sonar_update();
                     break;
                 }
             case 1:
                 taskOrder++;
-                if (baro_available) {
+                if (baroAvailable) {
                     Baro_update();
                     break;
                 }
             case 2:
                 taskOrder++;
-                if (baro_available && sonar_available) {
+                if (baroAvailable && sonarAvailable) {
                     getEstimatedAltitude();
                     break;
                 }
@@ -491,20 +463,20 @@ void loop(void)
         annexCode();
 
         if (alt_hold_mode) {
-            static uint8_t isAltHoldChanged = 0;
+            static uint8_t isaltHoldChanged = 0;
             if (CONFIG_ALT_HOLD_FAST_CHANGE) {
                 // rapid alt changes
                 if (abs(rcCommand[THROTTLE] - initialThrottleHold) > CONFIG_ALT_HOLD_THROTTLE_NEUTRAL) {
                     errorVelocityI = 0;
-                    isAltHoldChanged = 1;
+                    isaltHoldChanged = 1;
                     rcCommand[THROTTLE] += (rcCommand[THROTTLE] > initialThrottleHold) 
                         ? -CONFIG_ALT_HOLD_THROTTLE_NEUTRAL : CONFIG_ALT_HOLD_THROTTLE_NEUTRAL;
                 } else {
-                    if (isAltHoldChanged) {
-                        AltHold = EstAlt;
-                        isAltHoldChanged = 0;
+                    if (isaltHoldChanged) {
+                        altHold = estAlt;
+                        isaltHoldChanged = 0;
                     }
-                    rcCommand[THROTTLE] = constrain(initialThrottleHold + AltPID, 
+                    rcCommand[THROTTLE] = constrain(initialThrottleHold + altPID, 
                             CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
                 }
             } else {
@@ -513,13 +485,13 @@ void loop(void)
                     // set velocity proportional to stick movement +100 throttle gives ~ +50 cm/s
                     setVelocity = (rcCommand[THROTTLE] - initialThrottleHold) / 2;
                     velocityControl = 1;
-                    isAltHoldChanged = 1;
-                } else if (isAltHoldChanged) {
-                    AltHold = EstAlt;
+                    isaltHoldChanged = 1;
+                } else if (isaltHoldChanged) {
+                    altHold = estAlt;
                     velocityControl = 0;
-                    isAltHoldChanged = 0;
+                    isaltHoldChanged = 0;
                 }
-                rcCommand[THROTTLE] = constrain(initialThrottleHold + AltPID, CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
+                rcCommand[THROTTLE] = constrain(initialThrottleHold + altPID, CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
             }
         }
 
@@ -528,8 +500,23 @@ void loop(void)
             rcCommand[THROTTLE] += throttleAngleCorrection;
         }
 
-        pid_controller();
+        pidMultiWii();
         mixTable();
         writeMotors();
     }
 }
+
+void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
+{
+    uint8_t i, r;
+
+    for (r = 0; r < repeat; r++) {
+        for (i = 0; i < num; i++) {
+            LED0_TOGGLE;            // switch LEDPIN state
+            delay(wait);
+        }
+        delay(60);
+    }
+}
+
+

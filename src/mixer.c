@@ -9,7 +9,12 @@
 int16_t motor[4];
 int16_t motor_disarmed[4];
 
-static motorMixer_t currentMixer[4];
+typedef struct motorMixer_t {
+    float throttle;
+    float roll;
+    float pitch;
+    float yaw;
+} motorMixer_t;
 
 static const motorMixer_t mixerQuadX[] = {
     { 1.0f, -1.0f,  1.0f, -1.0f },          // REAR_R
@@ -21,17 +26,6 @@ static const motorMixer_t mixerQuadX[] = {
 void mixerInit(void)
 {
     int i;
-
-    for (i = 0; i < 4; i++)
-        currentMixer[i] = mixerQuadX[i];
-
-    mixerResetMotors();
-}
-
-void mixerResetMotors(void)
-{
-    int i;
-    // set disarmed motor values
     for (i = 0; i < 4; i++)
         motor_disarmed[i] = CONFIG_MINCOMMAND;
 }
@@ -63,8 +57,8 @@ void mixTable(void)
     axisPID[YAW] = constrain(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
 
     for (i = 0; i < 4; i++)
-        motor[i] = rcCommand[THROTTLE] * currentMixer[i].throttle + axisPID[PITCH] * currentMixer[i].pitch + 
-            axisPID[ROLL] * currentMixer[i].roll + -CONFIG_YAW_DIRECTION * axisPID[YAW] * currentMixer[i].yaw;
+        motor[i] = rcCommand[THROTTLE] * mixerQuadX[i].throttle + axisPID[PITCH] * mixerQuadX[i].pitch + 
+            axisPID[ROLL] * mixerQuadX[i].roll + -CONFIG_YAW_DIRECTION * axisPID[YAW] * mixerQuadX[i].yaw;
 
     maxMotor = motor[0];
     for (i = 1; i < 4; i++)
