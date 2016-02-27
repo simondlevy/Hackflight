@@ -4,4 +4,4 @@
  */
 #pragma once
 
-bool mpuDetect(sensor_t *acc, sensor_t *gyro, uint8_t lpf);
+bool mpu6050_init(sensor_t *acc, sensor_t *gyro, uint8_t lpf);

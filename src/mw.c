@@ -291,7 +291,7 @@ void setup(void)
 
     adcInit(hw_revision >= NAZE32_REV5);
 
-    initSensors();
+    sensorsInit();
 
     LED1_ON;
     LED0_OFF;
@@ -422,13 +422,13 @@ void loop(void)
             case 0:
                 taskOrder++;
                 if (sonarAvailable) {
-                    Sonar_update();
+                    sensorsUpdateSonar();
                     break;
                 }
             case 1:
                 taskOrder++;
                 if (baroAvailable) {
-                    Baro_update();
+                    sensorsUpdateBaro();
                     break;
                 }
             case 2:
@@ -501,8 +501,8 @@ void loop(void)
         }
 
         pidMultiWii();
-        mixTable();
-        writeMotors();
+        
+        mixerWriteMotors();
     }
 }
 

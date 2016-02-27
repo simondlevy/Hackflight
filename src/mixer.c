@@ -30,25 +30,7 @@ void mixerInit(void)
         motor_disarmed[i] = CONFIG_MINCOMMAND;
 }
 
-void writeMotors(void)
-{
-    uint8_t i;
-
-    for (i = 0; i < 4; i++)
-        pwmWriteMotor(i, motor[i]);
-}
-
-void writeAllMotors(int16_t mc)
-{
-    uint8_t i;
-
-    // Sends commands to all motors
-    for (i = 0; i < 4; i++)
-        motor[i] = mc;
-    writeMotors();
-}
-
-void mixTable(void)
+void mixerWriteMotors(void)
 {
     int16_t maxMotor;
     uint32_t i;
@@ -77,4 +59,7 @@ void mixTable(void)
             motor[i] = motor_disarmed[i];
         }
     }
+
+    for (i = 0; i < 4; i++)
+        pwmWriteMotor(i, motor[i]);
 }

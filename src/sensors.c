@@ -8,6 +8,7 @@
 #include "config.h"
 
 #include "onboard/drv_ms5611.h"
+#include "offboard/drv_mb1242.h"
 
 #define BARO_TAB_SIZE_MAX   48
 
@@ -17,6 +18,9 @@ uint16_t calibratingA = 0;
 uint16_t calibratingG = 0;
 uint16_t acc1G = 256;          // this is the 1G measured acceleration.
 int16_t heading;
+int32_t  baroPressure = 0;
+int32_t  baroTemperature = 0;
+uint32_t baroPressureSum = 0;
 
 sensor_t gyro;                      // gyro access functions
 sensor_t mag;                       // mag access functions
@@ -27,20 +31,6 @@ bool sonarAvailable;
 
 static sensor_t acc;
 static int16_t  accZero[3];
-static int32_t  baroPressure;
-
-void initSensors(void)
-{
-    mpuDetect(&acc, &gyro, CONFIG_GYRO_LPF);
-
-    acc.init(CONFIG_ACC_ALIGN);
-
-    gyro.init(CONFIG_GYRO_ALIGN);
-
-    baroAvailable = initBaro(&baro);
-
-    sonarAvailable = initSonar();
-}
 
 static void ACC_Common(void)
 {
@@ -72,7 +62,7 @@ static void ACC_Common(void)
     accADC[YAW] -= accZero[YAW];
 }
 
-void ACC_getADC(void)
+void sensorsGetAcc(void)
 {
     acc.read(accADC);
     ACC_Common();
@@ -152,13 +142,6 @@ static void GYRO_Common(void)
         gyroADC[axis] -= gyroZero[axis];
 }
 
-void Gyro_getADC(void)
-{
-    // range: +/- 8192; +/- 2000 deg/sec
-    gyro.read(gyroADC);
-    GYRO_Common();
-}
-
 static void Baro_Common(void)
 {
     static int32_t baroHistTab[BARO_TAB_SIZE_MAX];
@@ -174,7 +157,22 @@ static void Baro_Common(void)
     baroHistIdx = indexplus1;
 }
 
-int Baro_update(void)
+// ======================================================================
+
+void sensorsInit(void)
+{
+    mpu6050_init(&acc, &gyro, CONFIG_GYRO_LPF);
+
+    acc.init(CONFIG_ACC_ALIGN);
+
+    gyro.init(CONFIG_GYRO_ALIGN);
+
+    baroAvailable = ms5611_init(&baro);
+
+    sonarAvailable = mb1242_init();
+}
+
+int sensorsUpdateBaro(void)
 {
     static uint32_t baroDeadline = 0;
     static int state = 0;
@@ -201,9 +199,16 @@ int Baro_update(void)
     }
 }
 
-void Sonar_update(void) 
+void sensorsUpdateSonar(void) 
 {
-    extern int32_t pollSonar(void);
-
-    sonarAlt = pollSonar();
+    sonarAlt = mb1242_poll();
 }
+
+void sensorsGetGyro(void)
+{
+    // range: +/- 8192; +/- 2000 deg/sec
+    gyro.read(gyroADC);
+    GYRO_Common();
+}
+
+

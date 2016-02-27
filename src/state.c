@@ -11,9 +11,6 @@ int16_t  accSmooth[3];
 int16_t  magADC[3];
 int32_t  accSum[3];
 int16_t  smallAngle = 0;
-int32_t  baroPressure = 0;
-int32_t  baroTemperature = 0;
-uint32_t baroPressureSum = 0;
 int32_t  altPID = 0;
 int32_t  sonarAlt = 0;
 int32_t  estAlt;                // in cm
@@ -214,8 +211,8 @@ void stateInit(void)
 
 void stateEstimateAngles(void)
 {
-    Gyro_getADC();
-    ACC_getADC();
+    sensorsGetGyro();
+    sensorsGetAcc();
 
     int32_t axis;
     int32_t accMag = 0;

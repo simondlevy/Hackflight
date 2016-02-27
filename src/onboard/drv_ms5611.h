@@ -1,3 +1,3 @@
 #pragma once
 
-bool ms5611Detect(baro_t *baro);
+bool ms5611_init(baro_t *baro);
