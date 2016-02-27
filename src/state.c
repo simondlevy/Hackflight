@@ -174,7 +174,7 @@ void acc_calc(uint32_t deltaT)
 
     rotateV(&accel_ned.V, rpy);
 
-    if (CONFIG_ACC_UNARMEDCAL == 1) {
+    if (CONFIG_ACC_UNARMEDCAL) {
         if (!armed) {
             accZoffset -= accZoffset / 64;
             accZoffset += accel_ned.V.Z;
