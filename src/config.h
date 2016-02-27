@@ -24,14 +24,13 @@ static const uint8_t CONFIG_ROLL_PITCH_RATE[2] = {0, 0};
 static const int16_t CONFIG_ANGLE_TRIM[2]      = {0, 0};
 static const int     CONFIG_RCMAP[8]           = {0, 1, 3, 2, 4, 5, 6, 7};
 
+static const uint32_t CONFIG_ALT_UPDATE_USEC         = 25000;
+static const bool     CONFIG_HORIZON_MODE            = true; 
+static const uint16_t CONFIG_CALIBRATING_GYRO_CYCLES = 1000;
+static const uint16_t CONFIG_CALIBRATING_ACC_CYCLES  =  400;
+
 // XXX stuff below here should be declared as const, not #defined
 
-#define CONFIG_ALT_UPDATE_USEC                      25000
-#define CONFIG_HORIZON_MODE                         1
-#define CONFIG_CALIBRATING_GYRO_CYCLES              1000
-#define CONFIG_CALIBRATING_ACC_CYCLES               400
-#define CONFIG_EMF_AVOIDANCE                        0
-#define CONFIG_SERIAL_BAUDRATE                      115200
 #define CONFIG_MIDRC                                1500
 #define CONFIG_MINCOMMAND                           1000
 #define CONFIG_GYRO_CMPF_FACTOR                     600    
