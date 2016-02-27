@@ -2,16 +2,20 @@
 #include "mw.h"
 #include "config.h"
 
-int16_t  gyroADC[3], accADC[3], accSmooth[3], magADC[3];
+static float  MAGNETIC_DECLINATION       = 0.0f;
+
+// globals
+int16_t  gyroADC[3];
+int16_t  accADC[3];
+int16_t  accSmooth[3];
+int16_t  magADC[3];
 int32_t  accSum[3];
 int16_t  smallAngle = 0;
 int32_t  baroPressure = 0;
 int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
 int32_t  altPID = 0;
-int32_t  baroAlt_offset = 0;
 int32_t  sonarAlt = 0;
-float    sonarTransition = 0;
 int32_t  estAlt;                // in cm
 int32_t  altHold;
 int32_t  setVelocity = 0;
@@ -19,43 +23,16 @@ uint8_t  velocityControl = 0;
 int32_t  errorVelocityI = 0;
 int32_t  vario = 0;                      // variometer in cm/s
 int16_t  throttleAngleCorrection = 0;    // correction of throttle in lateral wind,
-float    magneticDeclination = 0.0f;       // calculated at startup from config
-float    accVelScale;
-float    throttleAngleScale;
-float    fc_acc;
-
-// **************
-// gyro+acc IMU
-// **************
-int16_t gyroData[3] = { 0, 0, 0 };
-int16_t gyroZero[3] = { 0, 0, 0 };
-int16_t angle[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
-float anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
+int16_t  gyroData[3] = { 0, 0, 0 };
+int16_t  gyroZero[3] = { 0, 0, 0 };
+int16_t  angle[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
 
 static uint32_t accTimeSum;        // keep track for integration of acc
 static int32_t  accSumCount;
-
-static void getEstimatedAttitude(void);
-
-void imuInit(void)
-{
-    smallAngle = lrintf(acc1G * cosf(RAD * CONFIG_SMALL_ANGLE));
-    accVelScale = 9.80665f / acc1G / 10000.0f;
-    throttleAngleScale = (1800.0f / M_PI) * (900.0f / CONFIG_THROTTLE_CORRECTION_ANGLE);
-
-    fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
-}
-
-void computeIMU(void)
-{
-    Gyro_getADC();
-    ACC_getADC();
-    getEstimatedAttitude();
-
-    gyroData[YAW] = gyroADC[YAW];
-    gyroData[ROLL] = gyroADC[ROLL];
-    gyroData[PITCH] = gyroADC[PITCH];
-}
+static float    accVelScale;
+static float    throttleAngleScale;
+static float    fcAcc;
+static float    anglerad[2];    // absolute angle inclination in radians
 
 // **************************************************
 // Simplified IMU based on "Complementary Filter"
@@ -87,7 +64,7 @@ typedef union {
 t_fp_vector EstG;
 
 // Normalize a vector
-void normalizeV(struct fp_vector *src, struct fp_vector *dest)
+static void normalizeV(struct fp_vector *src, struct fp_vector *dest)
 {
     float length;
 
@@ -100,7 +77,7 @@ void normalizeV(struct fp_vector *src, struct fp_vector *dest)
 }
 
 // Rotate Estimated vector(s) with small angle approximation, according to the gyro data
-void rotateV(struct fp_vector *v, float *delta)
+static void rotateV(struct fp_vector *v, float *delta)
 {
     struct fp_vector v_tmp = *v;
 
@@ -136,7 +113,7 @@ void rotateV(struct fp_vector *v, float *delta)
     v->Z = v_tmp.X * mat[0][2] + v_tmp.Y * mat[1][2] + v_tmp.Z * mat[2][2];
 }
 
-int32_t applyDeadband(int32_t value, int32_t deadband)
+static int32_t applyDeadband(int32_t value, int32_t deadband)
 {
     if (abs(value) < deadband) {
         value = 0;
@@ -149,7 +126,7 @@ int32_t applyDeadband(int32_t value, int32_t deadband)
 }
 
 // rotate acc into Earth frame and calculate acceleration in it
-void acc_calc(uint32_t deltaT)
+static void acc_calc(uint32_t deltaT)
 {
     static int32_t accZoffset = 0;
     static float accz_smooth = 0;
@@ -180,7 +157,7 @@ void acc_calc(uint32_t deltaT)
     } else
         accel_ned.V.Z -= acc1G;
 
-    accz_smooth = accz_smooth + (dT / (fc_acc + dT)) * (accel_ned.V.Z - accz_smooth); // low pass filter
+    accz_smooth = accz_smooth + (dT / (fcAcc + dT)) * (accel_ned.V.Z - accz_smooth); // low pass filter
 
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
@@ -190,15 +167,6 @@ void acc_calc(uint32_t deltaT)
 
     accTimeSum += deltaT;
     accSumCount++;
-}
-
-void accSum_reset(void)
-{
-    accSum[0] = 0;
-    accSum[1] = 0;
-    accSum[2] = 0;
-    accSumCount = 0;
-    accTimeSum = 0;
 }
 
 // baseflight calculation by Luggi09 originates from arducopter
@@ -212,7 +180,7 @@ static int16_t calculateHeading(t_fp_vector *vec)
     float sinePitch = sinf(anglerad[PITCH]);
     float Xh = vec->A[X] * cosinePitch + vec->A[Y] * sineRoll * sinePitch + vec->A[Z] * sinePitch * cosineRoll;
     float Yh = vec->A[Y] * cosineRoll - vec->A[Z] * sineRoll;
-    float hd = (atan2f(Yh, Xh) * 1800.0f / M_PI + magneticDeclination) / 10.0f;
+    float hd = (atan2f(Yh, Xh) * 1800.0f / M_PI + MAGNETIC_DECLINATION) / 10.0f;
     head = lrintf(hd);
     if (head < 0)
         head += 360;
@@ -220,8 +188,35 @@ static int16_t calculateHeading(t_fp_vector *vec)
     return head;
 }
 
-static void getEstimatedAttitude(void)
+
+static bool sonarInRange(void)
 {
+    return sonarAlt > 20 && sonarAlt < 765;
+}
+
+// complementary filter
+static float cfilter(float a, float b, float c) 
+{
+    return a * c + b * (1 - c);
+}
+
+
+// ====================================================================================
+
+void stateInit(void)
+{
+    smallAngle = lrintf(acc1G * cosf(RAD * CONFIG_SMALL_ANGLE));
+    accVelScale = 9.80665f / acc1G / 10000.0f;
+    throttleAngleScale = (1800.0f / M_PI) * (900.0f / CONFIG_THROTTLE_CORRECTION_ANGLE);
+
+    fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
+}
+
+void stateEstimateAngles(void)
+{
+    Gyro_getADC();
+    ACC_getADC();
+
     int32_t axis;
     int32_t accMag = 0;
     static t_fp_vector EstN;
@@ -288,37 +283,32 @@ static void getEstimatedAttitude(void)
             throttleAngleCorrection = lrintf(CONFIG_THROTTLE_CORRECTION_VALUE * sinf(deg / (900.0f * M_PI / 2.0f)));
         }
     }
+
+    gyroData[YAW] = gyroADC[YAW];
+    gyroData[ROLL] = gyroADC[ROLL];
+    gyroData[PITCH] = gyroADC[PITCH];
 }
 
-static bool sonarInRange(void)
-{
-    return sonarAlt > 20 && sonarAlt < 765;
-}
-
-// complementary filter
-static float cfilter(float a, float b, float c) 
-{
-    return a * c + b * (1 - c);
-}
-
-int getEstimatedAltitude(void)
+void stateEstimateAltitude(void)
 {
     static uint32_t previousT;
-    static float accZ_old;
-    static float accelVel;
+    static float    accZ_old;
+    static float    accelVel;
     static int32_t  FusedBarosonarAlt;
-    static int32_t lastFusedBarosonarAlt;
-    static int32_t baroAlt;
-    static int32_t baroAltBaseline;
-    static float   accelAlt;
-    static bool wasArmed;
+    static int32_t  lastFusedBarosonarAlt;
+    static int32_t  baroAlt;
+    static int32_t  baroAltBaseline;
+    static float    accelAlt;
+    static bool     wasArmed;
+    static int32_t  baroAlt_offset;
+    static float    sonarTransition;
 
     uint32_t currentT = micros();
     int16_t tiltAngle = max(abs(angle[ROLL]), abs(angle[PITCH]));
     uint32_t dTime = currentT - previousT;
 
-    if (dTime < CONFIG_ALT_UPDATE_USEC)
-        return 0;
+    if (dTime < CONFIG_ALT_UPDATE_USEC) 
+        return;
     previousT = currentT;
 
     // Calculates height from ground in cm via baro pressure
@@ -371,7 +361,12 @@ int getEstimatedAltitude(void)
 
     estAlt = sonarInRange() ? FusedBarosonarAlt : accelAlt;
 
-    accSum_reset();
+    // reset acceleromter sum
+    accSum[0] = 0;
+    accSum[1] = 0;
+    accSum[2] = 0;
+    accSumCount = 0;
+    accTimeSum = 0;
 
     int32_t fusedBaroSonarVel = (FusedBarosonarAlt - lastFusedBarosonarAlt) * 1000000.0f / dTime;
     lastFusedBarosonarAlt = FusedBarosonarAlt;
@@ -417,7 +412,4 @@ int getEstimatedAltitude(void)
     }
 
     accZ_old = accZ_tmp;
-
-    return 1;
 }
-

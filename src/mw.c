@@ -303,7 +303,7 @@ void setup(void)
     LED0_OFF;
     LED1_OFF;
 
-    imuInit(); 
+    stateInit(); 
     mixerInit(); 
 
 
@@ -434,7 +434,7 @@ void loop(void)
             case 2:
                 taskOrder++;
                 if (baroAvailable && sonarAvailable) {
-                    getEstimatedAltitude();
+                    stateEstimateAltitude();
                     break;
                 }
             case 3:
@@ -452,7 +452,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        computeIMU();
+        stateEstimateAngles();
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();

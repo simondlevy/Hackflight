@@ -18,7 +18,6 @@ uint16_t calibratingG = 0;
 uint16_t acc1G = 256;          // this is the 1G measured acceleration.
 int16_t heading;
 
-sensor_t acc;                       // acc access functions
 sensor_t gyro;                      // gyro access functions
 sensor_t mag;                       // mag access functions
 baro_t baro;                        // barometer access functions
@@ -26,7 +25,8 @@ baro_t baro;                        // barometer access functions
 bool baroAvailable;
 bool sonarAvailable;
 
-static int16_t accZero[3];
+static sensor_t acc;
+static int16_t  accZero[3];
 static int32_t  baroPressure;
 
 void initSensors(void)

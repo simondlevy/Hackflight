@@ -54,13 +54,12 @@ extern int16_t heading;
 extern int16_t motor[4];
 extern int16_t rcData[RC_CHANS];
 
-extern sensor_t acc;
 extern sensor_t gyro;
 
 // State
-void imuInit(void);
-void computeIMU(void);
-int getEstimatedAltitude();
+void stateInit(void);
+void stateEstimateAngles(void);
+void stateEstimateAltitude();
 
 // Sensors
 void initSensors(void);
