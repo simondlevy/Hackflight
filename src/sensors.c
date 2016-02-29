@@ -8,6 +8,8 @@
 #include "config.h"
 
 #include "onboard/drv_ms5611.h"
+#include "onboard/drv_mpu6050.h"
+
 #include "offboard/drv_mb1242.h"
 
 #define BARO_TAB_SIZE_MAX   48

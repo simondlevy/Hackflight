@@ -2,7 +2,10 @@
 #include "mw.h"
 #include "config.h"
 
+
 static float  MAGNETIC_DECLINATION       = 0.0f;
+
+#define RAD    (M_PI / 180.0f)
 
 // globals
 int16_t  gyroADC[3];

@@ -2,9 +2,12 @@
  * This file is part of baseflight
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
+
 #include "board.h"
 #include "mw.h"
 #include "config.h"
+
+#define I2C_DEVICE (I2CDEV_2)
 
 #define ROL_LO (1 << (2 * ROLL))
 #define ROL_CE (3 << (2 * ROLL))
