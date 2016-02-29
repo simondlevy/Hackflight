@@ -221,7 +221,11 @@ static void evaluateCommand(void)
             break;
 
         case MSP_MOTOR:
-            s_struct((uint8_t *)motor, 16);
+            {
+                int16_t motors[4];
+                mixerGetMotors(motors);
+                s_struct((uint8_t *)motors, 16);
+            }
             break;
 
         case MSP_RC:

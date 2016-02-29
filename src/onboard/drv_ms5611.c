@@ -6,7 +6,7 @@
 #include "../board.h"
 
 // MS5611, Standard address 0x77
-#define MS5611_ADDR                 0x77
+#define MS5611_ADDR             0x77
 // Autodetect: turn off BMP085 while initializing ms5611 and check PROM crc to confirm device
 #define BMP085_OFF                  digitalLo(BARO_GPIO, BARO_PIN);
 #define BMP085_ON                   digitalHi(BARO_GPIO, BARO_PIN);

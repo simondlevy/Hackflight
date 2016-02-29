@@ -64,10 +64,9 @@ void sensorsUpdateSonar(void);
 
 // Mixer
 
-extern int16_t motor[4];
-
 void mixerInit(void);
 void mixerWriteMotors(void);
+void mixerGetMotors(int16_t * motors_copy);
 
 // Serial
 void serialInit(void);

@@ -6,8 +6,9 @@
 #include "mw.h"
 #include "config.h"
 
-int16_t motor[4];
 int16_t motor_disarmed[4];
+
+static int16_t motors[4];
 
 typedef struct motorMixer_t {
     float throttle;
@@ -39,27 +40,32 @@ void mixerWriteMotors(void)
     axisPID[YAW] = constrain(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
 
     for (i = 0; i < 4; i++)
-        motor[i] = rcCommand[THROTTLE] * mixerQuadX[i].throttle + axisPID[PITCH] * mixerQuadX[i].pitch + 
+        motors[i] = rcCommand[THROTTLE] * mixerQuadX[i].throttle + axisPID[PITCH] * mixerQuadX[i].pitch + 
             axisPID[ROLL] * mixerQuadX[i].roll + -CONFIG_YAW_DIRECTION * axisPID[YAW] * mixerQuadX[i].yaw;
 
-    maxMotor = motor[0];
+    maxMotor = motors[0];
     for (i = 1; i < 4; i++)
-        if (motor[i] > maxMotor)
-            maxMotor = motor[i];
+        if (motors[i] > maxMotor)
+            maxMotor = motors[i];
     for (i = 0; i < 4; i++) {
         if (maxMotor > CONFIG_MAXTHROTTLE)     
             // this is a way to still have good gyro corrections if at least one motor reaches its max.
-            motor[i] -= maxMotor - CONFIG_MAXTHROTTLE;
+            motors[i] -= maxMotor - CONFIG_MAXTHROTTLE;
 
-        motor[i] = constrain(motor[i], CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
+        motors[i] = constrain(motors[i], CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
         if ((rcData[THROTTLE]) < CONFIG_MINCHECK) {
-            motor[i] = CONFIG_MINTHROTTLE;
+            motors[i] = CONFIG_MINTHROTTLE;
         } 
         if (!armed) {
-            motor[i] = motor_disarmed[i];
+            motors[i] = motor_disarmed[i];
         }
     }
 
     for (i = 0; i < 4; i++)
-        pwmWriteMotor(i, motor[i]);
+        pwmWriteMotor(i, motors[i]);
+}
+
+void mixerGetMotors(int16_t * motors_copy)
+{
+    memcpy(motors_copy, motors, 4*sizeof(int16_t));
 }
