@@ -31,16 +31,15 @@ int16_t  axisPID[3];
 uint32_t currentTime = 0;
 uint16_t cycleTime = 0;         
 uint8_t  dynP8[3], dynI8[3], dynD8[3];
-uint8_t  hw_revision = 0;
 uint32_t previousTime = 0;
 int16_t  rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
 int16_t  rcData[RC_CHANS];       // interval [1000;2000]
-uint8_t  useSmallAngle;
+bool     useSmallAngle;
 
 static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
 static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
-static uint8_t accCalibrated;
+static bool accCalibrated;
 
 static bool baroAvailable;
 static bool sonarAvailable;
@@ -136,12 +135,12 @@ static void annexCode(void)
 
     if (check_timed_task(calibratedAccTime)) {
         if (!useSmallAngle) {
-            accCalibrated = 0; // the multi uses ACC and is not calibrated or is too much inclinated
+            accCalibrated = false; // the multi uses ACC and is not calibrated or is too much inclinated
             LED0_TOGGLE;
             update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC);
             //calibratedAccTime = currentTime + CONFIG_CALIBRATE_ACCTIME_USEC;
         } else {
-            accCalibrated = 1;
+            accCalibrated = true;
         }
     }
 
@@ -261,6 +260,7 @@ void setup(void)
 
     // determine hardware revision based on clock frequency
     extern uint32_t hse_value;
+    uint8_t  hw_revision = 0;
     if (hse_value == 8000000)
         hw_revision = NAZE32;
     else if (hse_value == 12000000)
@@ -291,9 +291,11 @@ void setup(void)
     if (hw_revision != NAZE32_SP)
         i2cInit(I2C_DEVICE);
 
-    adcInit(hw_revision >= NAZE32_REV5);
+    bool cuttingEdge = hw_revision >= NAZE32_REV5;
 
-    sensorsInit(&baroAvailable, &sonarAvailable);
+    adcInit(cuttingEdge);
+
+    sensorsInit(cuttingEdge, &baroAvailable, &sonarAvailable);
 
     LED1_ON;
     LED0_OFF;
@@ -321,7 +323,7 @@ void setup(void)
     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
 
     // trigger accelerometer calibration requirement
-    useSmallAngle = 1;
+    useSmallAngle = true;
 }
 
 void loop(void)

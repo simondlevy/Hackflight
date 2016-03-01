@@ -54,7 +54,7 @@ extern uint16_t calibratingG;
 extern sensor_t gyro;
 extern int16_t  heading;
 
-void sensorsInit(bool * baroAvailable, bool * sonarAvailable);
+void sensorsInit(bool cuttingEdge, bool * baroAvailable, bool * sonarAvailable);
 void sensorsGetAcc(void);
 void sensorsGetGyro(void);
 int  sensorsUpdateBaro(void);
@@ -76,11 +76,10 @@ extern uint8_t  armed;
 extern int16_t  axisPID[3];
 extern uint32_t currentTime;
 extern uint16_t cycleTime;
-extern uint8_t  hw_revision;
 extern uint8_t  dynP8[3], dynI8[3], dynD8[3];
 extern uint32_t previousTime;
 extern int16_t  rcCommand[4];
 extern int16_t  rcData[RC_CHANS];
-extern uint8_t  useSmallAngle;
+extern bool     useSmallAngle;
 
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);

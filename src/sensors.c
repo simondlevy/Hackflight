@@ -158,9 +158,9 @@ static void Baro_Common(void)
 
 // ======================================================================
 
-void sensorsInit(bool * baroAvailable, bool * sonarAvailable)
+void sensorsInit(bool cuttingEdge, bool * baroAvailable, bool * sonarAvailable)
 {
-    mpu6050_init(&acc, &gyro, CONFIG_GYRO_LPF);
+    mpu6050_init(cuttingEdge, &acc, &gyro, CONFIG_GYRO_LPF);
 
     acc.init(CONFIG_ACC_ALIGN);
 

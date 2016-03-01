@@ -65,7 +65,6 @@ enum accel_fsr_e {
 
 // Needed for MPU6050 half-scale acc bug
 extern uint16_t acc1G;
-extern uint8_t  hw_revision;
 
 // Default orientation
 static sensor_align_e gyroAlign = CW0_DEG;
@@ -209,7 +208,7 @@ static void mpu6050CheckRevision(void)
 
 // ======================================================================
 
-bool mpu6050_init(sensor_t *acc, sensor_t *gyro, uint8_t lpf)
+bool mpu6050_init(bool cuttingEdge, sensor_t *acc, sensor_t *gyro, uint8_t lpf)
 {
     gpio_config_t gpio;
 
@@ -239,7 +238,7 @@ bool mpu6050_init(sensor_t *acc, sensor_t *gyro, uint8_t lpf)
         mpuLowPassFilter = INV_FILTER_5HZ;
 
     // MPU_INT output on rev5+ hardware (PC13)
-    if (hw_revision >= NAZE32_REV5) {
+    if (cuttingEdge) {
         gpio.pin = GYRO_INT_PIN;
         gpio.speed = Speed_2MHz;
         gpio.mode = Mode_IN_FLOATING;
