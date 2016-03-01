@@ -24,11 +24,11 @@ int32_t  baroPressure = 0;
 int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
 
-sensor_t gyro;                      // gyro access functions
 sensor_t mag;                       // mag access functions
 baro_t baro;                        // barometer access functions
 
 static sensor_t acc;
+static sensor_t gyro;
 static int16_t  accZero[3];
 
 static void ACC_Common(void)
@@ -158,13 +158,15 @@ static void Baro_Common(void)
 
 // ======================================================================
 
-void sensorsInit(bool cuttingEdge, bool * baroAvailable, bool * sonarAvailable)
+void sensorsInit(bool cuttingEdge, bool * baroAvailable, bool * sonarAvailable, float * gyroScale)
 {
     mpu6050_init(cuttingEdge, &acc, &gyro, CONFIG_GYRO_LPF);
 
     acc.init(CONFIG_ACC_ALIGN);
 
     gyro.init(CONFIG_GYRO_ALIGN);
+
+    *gyroScale = gyro.scale;
 
     *baroAvailable = ms5611_init(&baro);
 

@@ -295,7 +295,9 @@ void setup(void)
 
     adcInit(cuttingEdge);
 
-    sensorsInit(cuttingEdge, &baroAvailable, &sonarAvailable);
+    float gyroScale;
+
+    sensorsInit(cuttingEdge, &baroAvailable, &sonarAvailable, &gyroScale);
 
     LED1_ON;
     LED0_OFF;
@@ -307,9 +309,9 @@ void setup(void)
     LED0_OFF;
     LED1_OFF;
 
-    stateInit(); 
-    mixerInit(); 
+    stateInit(gyroScale); 
 
+    mixerInit(); 
 
     pwmInit(CONFIG_USE_CPPM, CONFIG_PWM_FILTER, CONFIG_FAST_PWM, CONFIG_MOTOR_PWM_RATE, CONFIG_PWM_IDLE_PULSE_USEC);
 

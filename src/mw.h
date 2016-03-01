@@ -40,7 +40,7 @@ extern int16_t throttleAngleCorrection;
 extern int32_t vario;
 extern uint8_t velocityControl;
 
-void stateInit(void);
+void stateInit(float gyro_scale);
 void stateEstimateAngles(void);
 void stateEstimateAltitude();
 
@@ -51,10 +51,9 @@ extern int32_t  baroTemperature;
 extern uint32_t baroPressureSum;
 extern uint16_t calibratingA;
 extern uint16_t calibratingG;
-extern sensor_t gyro;
 extern int16_t  heading;
 
-void sensorsInit(bool cuttingEdge, bool * baroAvailable, bool * sonarAvailable);
+void sensorsInit(bool cuttingEdge, bool * baroAvailable, bool * sonarAvailable, float * gyroScale);
 void sensorsGetAcc(void);
 void sensorsGetGyro(void);
 int  sensorsUpdateBaro(void);

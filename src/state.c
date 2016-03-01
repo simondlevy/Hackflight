@@ -30,6 +30,7 @@ int16_t  angle[2] = { 0, 0 };     // absolute angle inclination in multiple of 0
 static uint32_t accTimeSum;        // keep track for integration of acc
 static int32_t  accSumCount;
 static float    accVelScale;
+static float    gyroScale;
 static float    throttleAngleScale;
 static float    fcAcc;
 static float    anglerad[2];    // absolute angle inclination in radians
@@ -203,8 +204,10 @@ static float cfilter(float a, float b, float c)
 
 // ====================================================================================
 
-void stateInit(void)
+void stateInit(float gyro_scale)
 {
+    gyroScale = gyro_scale;
+
     smallAngle = lrintf(acc1G * cosf(RAD * CONFIG_SMALL_ANGLE));
     accVelScale = 9.80665f / acc1G / 10000.0f;
     throttleAngleScale = (1800.0f / M_PI) * (900.0f / CONFIG_THROTTLE_CORRECTION_ANGLE);
@@ -229,7 +232,7 @@ void stateEstimateAngles(void)
     uint32_t deltaT;
     float scale, deltaGyroAngle[3];
     deltaT = currentT - previousT;
-    scale = deltaT * gyro.scale;
+    scale = deltaT * gyroScale;
     previousT = currentT;
 
     // Initialization
