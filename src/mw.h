@@ -47,16 +47,14 @@ void stateEstimateAltitude();
 // Sensors
 
 extern uint16_t acc1G;
-extern bool     baroAvailable;
 extern int32_t  baroTemperature;
 extern uint32_t baroPressureSum;
 extern uint16_t calibratingA;
 extern uint16_t calibratingG;
 extern sensor_t gyro;
 extern int16_t  heading;
-extern bool     sonarAvailable;
 
-void sensorsInit(void);
+void sensorsInit(bool * baroAvailable, bool * sonarAvailable);
 void sensorsGetAcc(void);
 void sensorsGetGyro(void);
 int  sensorsUpdateBaro(void);
@@ -78,6 +76,8 @@ extern uint8_t  armed;
 extern int16_t  axisPID[3];
 extern uint32_t currentTime;
 extern uint16_t cycleTime;
+extern uint8_t  hw_revision;
+extern uint8_t  dynP8[3], dynI8[3], dynD8[3];
 extern uint32_t previousTime;
 extern int16_t  rcCommand[4];
 extern int16_t  rcData[RC_CHANS];

@@ -65,7 +65,7 @@ enum accel_fsr_e {
 
 // Needed for MPU6050 half-scale acc bug
 extern uint16_t acc1G;
-extern int hw_revision;
+extern uint8_t  hw_revision;
 
 // Default orientation
 static sensor_align_e gyroAlign = CW0_DEG;

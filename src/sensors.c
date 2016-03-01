@@ -28,9 +28,6 @@ sensor_t gyro;                      // gyro access functions
 sensor_t mag;                       // mag access functions
 baro_t baro;                        // barometer access functions
 
-bool baroAvailable;
-bool sonarAvailable;
-
 static sensor_t acc;
 static int16_t  accZero[3];
 
@@ -161,7 +158,7 @@ static void Baro_Common(void)
 
 // ======================================================================
 
-void sensorsInit(void)
+void sensorsInit(bool * baroAvailable, bool * sonarAvailable)
 {
     mpu6050_init(&acc, &gyro, CONFIG_GYRO_LPF);
 
@@ -169,9 +166,9 @@ void sensorsInit(void)
 
     gyro.init(CONFIG_GYRO_ALIGN);
 
-    baroAvailable = ms5611_init(&baro);
+    *baroAvailable = ms5611_init(&baro);
 
-    sonarAvailable = mb1242_init();
+    *sonarAvailable = mb1242_init();
 }
 
 int sensorsUpdateBaro(void)
@@ -213,4 +210,50 @@ void sensorsGetGyro(void)
     GYRO_Common();
 }
 
-
+void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
+{
+    switch (rotation) {
+        case CW0_DEG:
+            dest[X] = src[X];
+            dest[Y] = src[Y];
+            dest[Z] = src[Z];
+            break;
+        case CW90_DEG:
+            dest[X] = src[Y];
+            dest[Y] = -src[X];
+            dest[Z] = src[Z];
+            break;
+        case CW180_DEG:
+            dest[X] = -src[X];
+            dest[Y] = -src[Y];
+            dest[Z] = src[Z];
+            break;
+        case CW270_DEG:
+            dest[X] = -src[Y];
+            dest[Y] = src[X];
+            dest[Z] = src[Z];
+            break;
+        case CW0_DEG_FLIP:
+            dest[X] = -src[X];
+            dest[Y] = src[Y];
+            dest[Z] = -src[Z];
+            break;
+        case CW90_DEG_FLIP:
+            dest[X] = src[Y];
+            dest[Y] = src[X];
+            dest[Z] = -src[Z];
+            break;
+        case CW180_DEG_FLIP:
+            dest[X] = src[X];
+            dest[Y] = -src[Y];
+            dest[Z] = -src[Z];
+            break;
+        case CW270_DEG_FLIP:
+            dest[X] = -src[Y];
+            dest[Y] = -src[X];
+            dest[Z] = -src[Z];
+            break;
+        default:
+            break;
+    }
+}

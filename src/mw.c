@@ -26,26 +26,25 @@
 #define THROTTLE_LOOKUP_LENGTH 12
 
 
-int     hw_revision = 0;
-uint8_t useSmallAngle;
-uint8_t armed;
+uint8_t  armed;
+int16_t  axisPID[3];
 uint32_t currentTime = 0;
-uint32_t previousTime = 0;
-
-// this is the number in micro second to achieve a full loop, it can differ a little and is taken into account in the PID loop
 uint16_t cycleTime = 0;         
-
-int16_t rcData[RC_CHANS];       // interval [1000;2000]
-int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
+uint8_t  dynP8[3], dynI8[3], dynD8[3];
+uint8_t  hw_revision = 0;
+uint32_t previousTime = 0;
+int16_t  rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
+int16_t  rcData[RC_CHANS];       // interval [1000;2000]
+uint8_t  useSmallAngle;
 
 static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
 static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
 static uint8_t accCalibrated;
 
-uint8_t dynP8[3], dynI8[3], dynD8[3];
+static bool baroAvailable;
+static bool sonarAvailable;
 
-int16_t axisPID[3];
 
 static bool check_timed_task(uint32_t usec) {
 
@@ -294,7 +293,7 @@ void setup(void)
 
     adcInit(hw_revision >= NAZE32_REV5);
 
-    sensorsInit();
+    sensorsInit(&baroAvailable, &sonarAvailable);
 
     LED1_ON;
     LED0_OFF;

@@ -64,3 +64,5 @@ typedef struct baro_t {
     baroOpFuncPtr get_up;
     baroCalculateFuncPtr calculate;
 } baro_t;
+
+void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation);
