@@ -15,8 +15,6 @@ PROJECT_SRC = mixer.c \
 		   serial.c \
 		   state.c \
 		   utils.c \
-		   onboard/drv_mpu6050.c \
-		   onboard/drv_ms5611.c \
 		   offboard/drv_mb1242.c 
 
 ###############################################################################
@@ -57,6 +55,8 @@ myproject_SRC = $(PROJECT_SRC) \
 		   $(BREEZY_DIR)/drv_uart.c \
 		   $(BREEZY_DIR)/drv_adc.c \
 		   $(BREEZY_DIR)/drv_system.c \
+		   $(BREEZY_DIR)/drv_mpu6050.c \
+		   $(BREEZY_DIR)/drv_ms5611.c \
 		   $(BREEZY_DIR)/printf.c
 
 VPATH		:= $(SRC_DIR):$(SRC_DIR)
@@ -153,7 +153,7 @@ $(TARGET_ELF):  $(TARGET_OBJS)
 MKDIR_OBJDIR = @mkdir -p $(dir $@)
 
 # Compile
-$(OBJECT_DIR)/$(TARGET)/%.o: %.c config.h board.h mw.h
+$(OBJECT_DIR)/$(TARGET)/%.o: %.c config.h mw.h
 	$(MKDIR_OBJDIR)
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(CFLAGS) $<
