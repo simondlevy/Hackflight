@@ -14,8 +14,7 @@ PROJECT_SRC = mixer.c \
 		   sensors.c \
 		   serial.c \
 		   state.c \
-		   utils.c \
-		   offboard/drv_mb1242.c 
+		   utils.c 
 
 ###############################################################################
 
@@ -57,6 +56,7 @@ myproject_SRC = $(PROJECT_SRC) \
 		   $(BREEZY_DIR)/drv_system.c \
 		   $(BREEZY_DIR)/drv_mpu6050.c \
 		   $(BREEZY_DIR)/drv_ms5611.c \
+		   $(BREEZY_DIR)/drv_mb1242.c \
 		   $(BREEZY_DIR)/printf.c
 
 VPATH		:= $(SRC_DIR):$(SRC_DIR)

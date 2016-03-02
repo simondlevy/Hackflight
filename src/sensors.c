@@ -12,8 +12,6 @@
 #include "mw.h"
 #include "config.h"
 
-#include "offboard/drv_mb1242.h"
-
 #define BARO_TAB_SIZE_MAX   48
 
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
