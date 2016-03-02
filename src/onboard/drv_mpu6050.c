@@ -3,7 +3,11 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include "../board.h"
+#include <breezystm32.h>
+
+#include <math.h>
+
+#include "../3axis.h"
 
 /* Generic driver for invensense gyro/acc devices.
  *
@@ -62,9 +66,6 @@ enum accel_fsr_e {
     NUM_ACCEL_FSR
 };
 
-
-// Needed for MPU6050 half-scale acc bug
-extern uint16_t acc1G;
 
 // Default orientation
 static sensor_align_e gyroAlign = CW0_DEG;
@@ -171,7 +172,7 @@ static void mpu6050Init(sensor_t *acc, sensor_t *gyro)
     gyro->read = mpuGyroRead;
 }
 
-static void mpu6050CheckRevision(void)
+static void mpu6050CheckRevision(uint16_t * acc1G)
 {
     uint8_t rev;
     uint8_t tmp[6];
@@ -203,20 +204,20 @@ static void mpu6050CheckRevision(void)
 
     // All this just to set the value
     if (half)
-        acc1G = 255 * 8;
+        *acc1G = 255 * 8;
 }
 
 // ======================================================================
 
-bool mpu6050_init(bool cuttingEdge, sensor_t *acc, sensor_t *gyro, uint8_t lpf)
+bool mpu6050_init(bool cuttingEdge, sensor_t *acc, sensor_t *gyro, uint16_t * acc1G, uint8_t lpf)
 {
     gpio_config_t gpio;
 
     // Set acc1G. Modified once by mpu6050CheckRevision for old (hopefully nonexistent outside of clones) parts
-    acc1G = 512 * 8;
+    *acc1G = 512 * 8;
 
     //hw = MPU_60x0;
-    mpu6050CheckRevision();
+    mpu6050CheckRevision(acc1G);
 
     // 16.4 dps/lsb scalefactor for all Invensense devices
     gyro->scale = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;

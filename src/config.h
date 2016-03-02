@@ -54,9 +54,6 @@ static const uint8_t  CONFIG_THR_MID_8                 = 50;
 static const uint8_t  CONFIG_THR_EXPO_8                = 0;
 static const int8_t   CONFIG_YAW_DIRECTION             = 1;
 
-static const sensor_align_e CONFIG_ACC_ALIGN           = ALIGN_DEFAULT;
-static const sensor_align_e CONFIG_GYRO_ALIGN          = ALIGN_DEFAULT;
-
 // the angle when the throttle correction is maximal. in 0.1 degres, ex 225 = 22.5 ,30.0, 450 = 45.0 deg
 static const uint16_t CONFIG_THROTTLE_CORRECTION_ANGLE =       800;
 
@@ -76,4 +73,9 @@ static const uint8_t  CONFIG_SMALL_ANGLE               = 25;
 static const bool     CONFIG_DEADBAND                  = false;
 static const bool     CONFIG_YAW_DEADBAND              = false;
 
+static const float    CONFIG_MAGNETIC_DECLINATION      = 0.0f;
 
+#ifdef _3AXIS
+static const sensor_align_e CONFIG_ACC_ALIGN           = ALIGN_DEFAULT;
+static const sensor_align_e CONFIG_GYRO_ALIGN          = ALIGN_DEFAULT;
+#endif

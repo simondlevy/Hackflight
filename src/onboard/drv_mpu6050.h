@@ -4,4 +4,4 @@
  */
 #pragma once
 
-bool mpu6050_init(bool cuttingEdge, sensor_t *acc, sensor_t *gyro, uint8_t lpf);
+bool mpu6050_init(bool cuttingEdge, sensor_t *acc, sensor_t *gyro, uint16_t * acc1G, uint8_t lpf);

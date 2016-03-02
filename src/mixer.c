@@ -2,9 +2,14 @@
  * This file is part of baseflight
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
-#include "board.h"
+
+#include <breezystm32.h>
+
+#include <string.h>
+
 #include "mw.h"
 #include "config.h"
+#include "utils.h"
 
 int16_t motor_disarmed[4];
 

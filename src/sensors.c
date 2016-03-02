@@ -3,13 +3,19 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include "board.h"
+#include <breezystm32.h>
+
+#include <math.h>
+
+#define _3AXIS
+
+#include "3axis.h"
+#include "baro.h"
 #include "mw.h"
 #include "config.h"
 
 #include "onboard/drv_ms5611.h"
 #include "onboard/drv_mpu6050.h"
-
 #include "offboard/drv_mb1242.h"
 
 #define BARO_TAB_SIZE_MAX   48
@@ -160,7 +166,7 @@ static void Baro_Common(void)
 
 void sensorsInit(bool cuttingEdge, bool * baroAvailable, bool * sonarAvailable, float * gyroScale)
 {
-    mpu6050_init(cuttingEdge, &acc, &gyro, CONFIG_GYRO_LPF);
+    mpu6050_init(cuttingEdge, &acc, &gyro, &acc1G, CONFIG_GYRO_LPF);
 
     acc.init(CONFIG_ACC_ALIGN);
 

@@ -3,9 +3,11 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include "board.h"
+#include <breezystm32.h>
+
 #include "mw.h"
 #include "config.h"
+#include "utils.h"
 
 #define I2C_DEVICE (I2CDEV_2)
 
@@ -25,6 +27,12 @@
 #define PITCH_LOOKUP_LENGTH 7
 #define THROTTLE_LOOKUP_LENGTH 12
 
+typedef enum HardwareRevision {
+    NAZE32 = 1,                                         // Naze32 and compatible with 8MHz HSE
+    NAZE32_REV5,                                        // Naze32 and compatible with 12MHz HSE
+    NAZE32_SP,                                          // Naze32 w/Sensor Platforms
+    NAZE32_REV6                                        // Naze32 rev6
+} HardwareRevision;
 
 uint8_t  armed;
 int16_t  axisPID[3];

@@ -1,5 +1,4 @@
-#include "board.h"
-#include "mw.h"
+#include "utils.h"
 
 int constrain(int amt, int low, int high)
 {
