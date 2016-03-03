@@ -52,7 +52,6 @@ static bool accCalibrated;
 static bool baroAvailable;
 static bool sonarAvailable;
 
-
 static bool check_timed_task(uint32_t usec) {
 
     return (int32_t)(currentTime - usec) >= 0;
@@ -201,7 +200,7 @@ static void mwDisarm(void)
 static int32_t errorGyroI[3] = { 0, 0, 0 };
 static int32_t errorAngleI[2] = { 0, 0 };
 
-static void pidMultiWii(void)
+static void pidMultiWii(int16_t * gyroData)
 {
     int axis, prop;
     int32_t error, errorAngle;
@@ -466,7 +465,9 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        stateEstimateAngles();
+        static int16_t gyroData[3];
+
+        stateEstimateAngles(gyroData);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
@@ -514,7 +515,7 @@ void loop(void)
             rcCommand[THROTTLE] += throttleAngleCorrection;
         }
 
-        pidMultiWii();
+        pidMultiWii(gyroData);
         
         mixerWriteMotors();
     }

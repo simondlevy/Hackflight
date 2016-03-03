@@ -1,4 +1,5 @@
 #include <math.h>
+#include <string.h>
 
 #include <breezystm32.h>
 
@@ -14,9 +15,6 @@
 // globals
 int16_t  gyroADC[3];
 int16_t  accADC[3];
-int16_t  accSmooth[3];
-int16_t  magADC[3];
-int32_t  accSum[3];
 int16_t  smallAngle = 0;
 int32_t  altPID = 0;
 int32_t  sonarAlt = 0;
@@ -27,17 +25,19 @@ uint8_t  velocityControl = 0;
 int32_t  errorVelocityI = 0;
 int32_t  vario = 0;                      // variometer in cm/s
 int16_t  throttleAngleCorrection = 0;    // correction of throttle in lateral wind,
-int16_t  gyroData[3] = { 0, 0, 0 };
 int16_t  gyroZero[3] = { 0, 0, 0 };
 int16_t  angle[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
 
-static uint32_t accTimeSum;        // keep track for integration of acc
+static int16_t  accSmooth[3];
+static int32_t  accSum[3];
 static int32_t  accSumCount;
+static uint32_t accTimeSum;        // keep track for integration of acc
 static float    accVelScale;
-static float    gyroScale;
-static float    throttleAngleScale;
-static float    fcAcc;
 static float    anglerad[2];    // absolute angle inclination in radians
+static float    fcAcc;
+static float    gyroScale;
+static int16_t  magADC[3];
+static float    throttleAngleScale;
 
 // **************************************************
 // Simplified IMU based on "Complementary Filter"
@@ -219,7 +219,7 @@ void stateInit(float gyro_scale)
     fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 }
 
-void stateEstimateAngles(void)
+void stateEstimateAngles(int16_t * gyroOut)
 {
     sensorsGetGyro();
     sensorsGetAcc();
@@ -291,9 +291,9 @@ void stateEstimateAngles(void)
         }
     }
 
-    gyroData[YAW] = gyroADC[YAW];
-    gyroData[ROLL] = gyroADC[ROLL];
-    gyroData[PITCH] = gyroADC[PITCH];
+    gyroOut[YAW]   = gyroADC[YAW];
+    gyroOut[ROLL]  = gyroADC[ROLL];
+    gyroOut[PITCH] = gyroADC[PITCH];
 }
 
 void stateEstimateAltitude(void)
@@ -419,4 +419,11 @@ void stateEstimateAltitude(void)
     }
 
     accZ_old = accZ_tmp;
+}
+
+void stateGetRawIMU(int16_t * raw)
+{
+    memcpy(&raw[0], accSmooth, 3*sizeof(int16_t));
+    memcpy(&raw[3], gyroADC,   3*sizeof(int16_t));
+    memcpy(&raw[6], magADC,    3*sizeof(int16_t));
 }

@@ -31,8 +31,7 @@
 
 extern serialPort_t * Serial1;
 
-// from mixer.c
-extern int16_t motor_disarmed[4];
+
 // cause reboot after MSP processing complete
 static bool pendReboot = false;
 
@@ -180,7 +179,7 @@ void mspInit(rcReadRawDataPtr *callback)
 
 static void evaluateCommand(void)
 {
-    uint32_t i;
+    uint8_t i;
     const char *build = __DATE__;
 
     switch (currentPortState->cmdMSP) {
@@ -194,7 +193,7 @@ static void evaluateCommand(void)
 
         case MSP_SET_MOTOR:
             for (i = 0; i < 4; i++)
-                motor_disarmed[i] = read16();
+                mixerSetMotor(i, read16());
             headSerialReply(0);
             break;
 
@@ -208,24 +207,21 @@ static void evaluateCommand(void)
 
         case MSP_RAW_IMU:
             headSerialReply(18);
-            // Retarded hack until multiwiidorks start using real units for sensor data
-            if (acc1G > 1024) {
+            {
+                static int16_t rawIMU[9];
+                stateGetRawIMU(rawIMU);
                 for (i = 0; i < 3; i++)
-                    serialize16(accSmooth[i] / 8);
-            } else {
-                for (i = 0; i < 3; i++)
-                    serialize16(accSmooth[i]);
+                    serialize16(rawIMU[i] / 8); // accel
+                for (i = 3; i < 9; i++)         // gyro, mag
+                    serialize16(rawIMU[i]);
             }
-            for (i = 0; i < 3; i++)
-                serialize16(gyroData[i]);
-            for (i = 0; i < 3; i++)
-                serialize16(magADC[i]);
             break;
 
         case MSP_MOTOR:
             {
                 int16_t motors[4];
-                mixerGetMotors(motors);
+                for (i=0; i<4; ++i)
+                    motors[i] = mixerGetMotor(i);
                 s_struct((uint8_t *)motors, 16);
             }
             break;
@@ -242,14 +238,6 @@ static void evaluateCommand(void)
                 serialize16(angle[i]);
             serialize16(heading);
             break;
-
-            /*
-        case MSP_PX4FLOW:
-            headSerialReply(4);
-            serialize16(px4flow_frame.pixel_flow_x_sum);
-            serialize16(px4flow_frame.pixel_flow_y_sum);
-            break;
-            */
 
         case MSP_MB1242:
             headSerialReply(8);

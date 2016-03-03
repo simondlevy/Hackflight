@@ -22,9 +22,7 @@ enum {
 
 // State
 
-extern int32_t accSum[3];
 extern int16_t accADC[3];
-extern int16_t accSmooth[3];
 extern int32_t altHold;
 extern int32_t altPID;
 extern int16_t angle[2];
@@ -32,8 +30,6 @@ extern int32_t errorVelocityI;
 extern int32_t estAlt;
 extern int16_t gyroADC[3];
 extern int16_t gyroZero[3];
-extern int16_t gyroData[3];
-extern int16_t magADC[3];
 extern int32_t setVelocity;
 extern int32_t sonarAlt;
 extern int16_t throttleAngleCorrection;
@@ -41,8 +37,9 @@ extern int32_t vario;
 extern uint8_t velocityControl;
 
 void stateInit(float gyro_scale);
-void stateEstimateAngles(void);
+void stateEstimateAngles(int16_t * gyroOut);
 void stateEstimateAltitude();
+void stateGetRawIMU(int16_t * raw);
 
 // Sensors
 
@@ -60,10 +57,10 @@ int  sensorsUpdateBaro(void);
 void sensorsUpdateSonar(void);
 
 // Mixer
-
-void mixerInit(void);
-void mixerWriteMotors(void);
-void mixerGetMotors(int16_t * motors_copy);
+void     mixerInit(void);
+void     mixerWriteMotors(void);
+uint16_t mixerGetMotor(uint8_t i);
+void     mixerSetMotor(uint8_t i, uint16_t value);
 
 // Serial
 void serialInit(void);

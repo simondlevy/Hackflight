@@ -11,7 +11,7 @@
 #include "config.h"
 #include "utils.h"
 
-int16_t motor_disarmed[4];
+static int16_t motorsDisarmed[4];
 
 static int16_t motors[4];
 
@@ -33,7 +33,7 @@ void mixerInit(void)
 {
     int i;
     for (i = 0; i < 4; i++)
-        motor_disarmed[i] = CONFIG_MINCOMMAND;
+        motorsDisarmed[i] = CONFIG_MINCOMMAND;
 }
 
 void mixerWriteMotors(void)
@@ -62,7 +62,7 @@ void mixerWriteMotors(void)
             motors[i] = CONFIG_MINTHROTTLE;
         } 
         if (!armed) {
-            motors[i] = motor_disarmed[i];
+            motors[i] = motorsDisarmed[i];
         }
     }
 
@@ -70,7 +70,12 @@ void mixerWriteMotors(void)
         pwmWriteMotor(i, motors[i]);
 }
 
-void mixerGetMotors(int16_t * motors_copy)
+uint16_t mixerGetMotor(uint8_t i)
 {
-    memcpy(motors_copy, motors, 4*sizeof(int16_t));
+    return motors[i];
+}
+
+void mixerSetMotor(uint8_t i, uint16_t value)
+{
+    motorsDisarmed[i] = value;
 }
