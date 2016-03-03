@@ -131,7 +131,7 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
 }
 
 // rotate acc into Earth frame and calculate acceleration in it
-static void acc_calc(uint32_t deltaT)
+static void acc_calc(uint32_t deltaT, bool armed)
 {
     static int32_t accZoffset = 0;
     static float accz_smooth = 0;
@@ -219,7 +219,7 @@ void stateInit(float gyro_scale)
     fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 }
 
-void stateEstimateAngles(int16_t * gyroOut)
+void stateEstimateAngles(int16_t * gyroOut, bool armed)
 {
     sensorsGetGyro();
     sensorsGetAcc();
@@ -275,7 +275,7 @@ void stateEstimateAngles(int16_t * gyroOut)
     normalizeV(&EstN.V, &EstN.V);
     heading = calculateHeading(&EstN);
 
-    acc_calc(deltaT); // rotate acc vector into earth frame
+    acc_calc(deltaT, armed); // rotate acc vector into earth frame
 
     if (CONFIG_THROTTLE_CORRECTION_VALUE) {
 
@@ -296,7 +296,7 @@ void stateEstimateAngles(int16_t * gyroOut)
     gyroOut[PITCH] = gyroADC[PITCH];
 }
 
-void stateEstimateAltitude(void)
+void stateEstimateAltitude(bool armed)
 {
     static uint32_t previousT;
     static float    accZ_old;

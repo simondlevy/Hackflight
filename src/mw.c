@@ -34,7 +34,6 @@ typedef enum HardwareRevision {
     NAZE32_REV6                                        // Naze32 rev6
 } HardwareRevision;
 
-uint8_t  armed;
 int16_t  axisPID[3];
 uint32_t currentTime = 0;
 uint16_t cycleTime = 0;         
@@ -43,6 +42,8 @@ uint32_t previousTime = 0;
 int16_t  rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
 int16_t  rcData[RC_CHANS];       // interval [1000;2000]
 bool     useSmallAngle;
+
+static bool  armed;
 
 static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
 static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
@@ -151,7 +152,7 @@ static void annexCode(void)
         }
     }
 
-    serialCom();
+    serialCom(armed);
 }
 
 static void computeRC(void)
@@ -183,7 +184,7 @@ static void mwArm(void)
 {
     if (calibratingG == 0 && accCalibrated) {
         if (!armed) {         // arm now!
-            armed = 1;
+            armed = true;
         }
     } else if (!armed) {
         blinkLED(2, 255, 1);
@@ -193,7 +194,7 @@ static void mwArm(void)
 static void mwDisarm(void)
 {
     if (armed) {
-        armed = 0;
+        armed = false;
     }
 }
 
@@ -263,7 +264,7 @@ void setup(void)
 
     serialInit();
 
-    armed = 0;
+    armed = false;
 
     // determine hardware revision based on clock frequency
     extern uint32_t hse_value;
@@ -447,7 +448,7 @@ void loop(void)
             case 2:
                 taskOrder++;
                 if (baroAvailable && sonarAvailable) {
-                    stateEstimateAltitude();
+                    stateEstimateAltitude(armed);
                     break;
                 }
             case 3:
@@ -467,7 +468,7 @@ void loop(void)
 
         static int16_t gyroData[3];
 
-        stateEstimateAngles(gyroData);
+        stateEstimateAngles(gyroData, armed);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
@@ -517,7 +518,7 @@ void loop(void)
 
         pidMultiWii(gyroData);
         
-        mixerWriteMotors();
+        mixerWriteMotors(armed);
     }
 }
 

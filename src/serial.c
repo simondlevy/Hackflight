@@ -272,7 +272,7 @@ static void evaluateCommand(void)
 }
 
 
-void serialCom(void)
+void serialCom(bool armed)
 {
     uint8_t c;
 

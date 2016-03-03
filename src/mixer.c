@@ -36,7 +36,7 @@ void mixerInit(void)
         motorsDisarmed[i] = CONFIG_MINCOMMAND;
 }
 
-void mixerWriteMotors(void)
+void mixerWriteMotors(bool armed)
 {
     int16_t maxMotor;
     uint32_t i;

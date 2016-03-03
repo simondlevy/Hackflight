@@ -37,8 +37,8 @@ extern int32_t vario;
 extern uint8_t velocityControl;
 
 void stateInit(float gyro_scale);
-void stateEstimateAngles(int16_t * gyroOut);
-void stateEstimateAltitude();
+void stateEstimateAngles(int16_t * gyroOut, bool armed);
+void stateEstimateAltitude(bool armed);
 void stateGetRawIMU(int16_t * raw);
 
 // Sensors
@@ -58,17 +58,16 @@ void sensorsUpdateSonar(void);
 
 // Mixer
 void     mixerInit(void);
-void     mixerWriteMotors(void);
+void     mixerWriteMotors(bool armed);
 uint16_t mixerGetMotor(uint8_t i);
 void     mixerSetMotor(uint8_t i, uint16_t value);
 
 // Serial
 void serialInit(void);
-void serialCom(void);
+void serialCom(bool armed);
 
 // MW
 
-extern uint8_t  armed;
 extern int16_t  axisPID[3];
 extern uint32_t currentTime;
 extern uint16_t cycleTime;
