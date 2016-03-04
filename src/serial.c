@@ -233,10 +233,14 @@ static void evaluateCommand(void)
             break;
 
         case MSP_ATTITUDE:
-            headSerialReply(6);
-            for (i = 0; i < 2; i++)
-                serialize16(angle[i]);
-            serialize16(heading);
+            {
+                int16_t heading;
+                stateGetAttitude(&heading);
+                headSerialReply(6);
+                for (i = 0; i < 2; i++)
+                    serialize16(imuAngles[i]);
+                serialize16(heading);
+            }
             break;
 
         case MSP_MB1242:

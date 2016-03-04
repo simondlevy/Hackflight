@@ -37,8 +37,6 @@ typedef enum HardwareRevision {
 int16_t  axisPID[3];
 uint32_t currentTime = 0;
 uint16_t cycleTime = 0;         
-uint8_t  dynP8[3], dynI8[3], dynD8[3];
-uint32_t previousTime = 0;
 int16_t  rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
 int16_t  rcData[RC_CHANS];       // interval [1000;2000]
 bool     useSmallAngle;
@@ -52,6 +50,12 @@ static bool accCalibrated;
 
 static bool baroAvailable;
 static bool sonarAvailable;
+
+static uint32_t previousTime;
+
+static uint8_t  dynP8[3];
+static uint8_t  dynI8[3];
+static uint8_t  dynD8[3];
 
 static bool check_timed_task(uint32_t usec) {
 
@@ -217,7 +221,7 @@ static void pidMultiWii(int16_t * gyroData)
         if (CONFIG_HORIZON_MODE && axis < 2) { // MODE relying on ACC
             // 50 degrees max inclination
             errorAngle = constrain(2 * rcCommand[axis], -((int)CONFIG_MAX_ANGLE_INCLINATION), 
-                    + CONFIG_MAX_ANGLE_INCLINATION) - angle[axis] + CONFIG_ANGLE_TRIM[axis];
+                    + CONFIG_MAX_ANGLE_INCLINATION) - imuAngles[axis] + CONFIG_ANGLE_TRIM[axis];
             PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
             // 32 bits is needed for calculation: errorAngle*CONFIG_LEVEL_P could exceed 32768   
             // 16 bits is ok for result

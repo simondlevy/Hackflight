@@ -16,12 +16,11 @@
 
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.
+int16_t  accADC[3];
 uint16_t calibratingA = 0;      
 uint16_t calibratingG = 0;
-uint16_t acc1G = 256;          // this is the 1G measured acceleration.
-int16_t heading;
+uint16_t acc1G;                     // this is the 1G measured acceleration.
 int32_t  baroPressure = 0;
-int32_t  baroTemperature = 0;
 uint32_t baroPressureSum = 0;
 
 sensor_t mag;                       // mag access functions
@@ -187,6 +186,7 @@ int sensorsUpdateBaro(void)
         baro.get_up();
         baro.start_ut();
         baroDeadline += baro.ut_delay;
+        int32_t  baroTemperature;
         baro.calculate(&baroPressure, &baroTemperature);
         state = 0;
         return 2;

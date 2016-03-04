@@ -19,13 +19,11 @@ enum {
 };
 
 
-
 // State
 
-extern int16_t accADC[3];
 extern int32_t altHold;
 extern int32_t altPID;
-extern int16_t angle[2];
+extern int16_t imuAngles[2];
 extern int32_t errorVelocityI;
 extern int32_t estAlt;
 extern int16_t gyroADC[3];
@@ -40,15 +38,15 @@ void stateInit(float gyro_scale);
 void stateEstimateAngles(int16_t * gyroOut, bool armed);
 void stateEstimateAltitude(bool armed);
 void stateGetRawIMU(int16_t * raw);
+void stateGetAttitude(int16_t * headingOut);
 
 // Sensors
 
+extern int16_t  accADC[3];
 extern uint16_t acc1G;
-extern int32_t  baroTemperature;
 extern uint32_t baroPressureSum;
 extern uint16_t calibratingA;
 extern uint16_t calibratingG;
-extern int16_t  heading;
 
 void sensorsInit(bool cuttingEdge, bool * baroAvailable, bool * sonarAvailable, float * gyroScale);
 void sensorsGetAcc(void);
@@ -63,6 +61,7 @@ uint16_t mixerGetMotor(uint8_t i);
 void     mixerSetMotor(uint8_t i, uint16_t value);
 
 // Serial
+
 void serialInit(void);
 void serialCom(bool armed);
 
@@ -71,8 +70,6 @@ void serialCom(bool armed);
 extern int16_t  axisPID[3];
 extern uint32_t currentTime;
 extern uint16_t cycleTime;
-extern uint8_t  dynP8[3], dynI8[3], dynD8[3];
-extern uint32_t previousTime;
 extern int16_t  rcCommand[4];
 extern int16_t  rcData[RC_CHANS];
 extern bool     useSmallAngle;

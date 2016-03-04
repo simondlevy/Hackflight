@@ -14,7 +14,6 @@
 
 // globals
 int16_t  gyroADC[3];
-int16_t  accADC[3];
 int16_t  smallAngle = 0;
 int32_t  altPID = 0;
 int32_t  sonarAlt = 0;
@@ -26,7 +25,7 @@ int32_t  errorVelocityI = 0;
 int32_t  vario = 0;                      // variometer in cm/s
 int16_t  throttleAngleCorrection = 0;    // correction of throttle in lateral wind,
 int16_t  gyroZero[3] = { 0, 0, 0 };
-int16_t  angle[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
+int16_t  imuAngles[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
 
 static int16_t  accSmooth[3];
 static int32_t  accSum[3];
@@ -36,6 +35,7 @@ static float    accVelScale;
 static float    anglerad[2];    // absolute angle inclination in radians
 static float    fcAcc;
 static float    gyroScale;
+static int16_t  heading;
 static int16_t  magADC[3];
 static float    throttleAngleScale;
 
@@ -268,8 +268,8 @@ void stateEstimateAngles(int16_t * gyroOut, bool armed)
     // Attitude of the estimated vector
     anglerad[ROLL] = atan2f(EstG.V.Y, EstG.V.Z);
     anglerad[PITCH] = atan2f(-EstG.V.X, sqrtf(EstG.V.Y * EstG.V.Y + EstG.V.Z * EstG.V.Z));
-    angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
-    angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
+    imuAngles[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
+    imuAngles[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
 
     rotateV(&EstN.V, deltaGyroAngle);
     normalizeV(&EstN.V, &EstN.V);
@@ -311,7 +311,7 @@ void stateEstimateAltitude(bool armed)
     static float    sonarTransition;
 
     uint32_t currentT = micros();
-    int16_t tiltAngle = max(abs(angle[ROLL]), abs(angle[PITCH]));
+    int16_t tiltAngle = max(abs(imuAngles[ROLL]), abs(imuAngles[PITCH]));
     uint32_t dTime = currentT - previousT;
 
     if (dTime < CONFIG_ALT_UPDATE_USEC) 
@@ -421,9 +421,16 @@ void stateEstimateAltitude(bool armed)
     accZ_old = accZ_tmp;
 }
 
+// for MSP
+
 void stateGetRawIMU(int16_t * raw)
 {
     memcpy(&raw[0], accSmooth, 3*sizeof(int16_t));
     memcpy(&raw[3], gyroADC,   3*sizeof(int16_t));
     memcpy(&raw[6], magADC,    3*sizeof(int16_t));
+}
+
+void stateGetAttitude(int16_t * headingOut)
+{
+    * headingOut = heading;
 }
