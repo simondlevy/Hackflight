@@ -13,7 +13,6 @@
 #define RAD    (M_PI / 180.0f)
 
 // globals
-int16_t  gyroADC[3];
 int16_t  smallAngle = 0;
 int32_t  altPID = 0;
 int32_t  sonarAlt = 0;

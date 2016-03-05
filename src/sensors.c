@@ -16,10 +16,11 @@
 
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.
+uint16_t acc1G;                     // this is the 1G measured acceleration.
 int16_t  accADC[3];
 uint16_t calibratingA = 0;      
 uint16_t calibratingG = 0;
-uint16_t acc1G;                     // this is the 1G measured acceleration.
+int16_t  gyroADC[3];
 int32_t  baroPressure = 0;
 uint32_t baroPressureSum = 0;
 

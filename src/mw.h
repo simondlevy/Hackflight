@@ -26,7 +26,6 @@ extern int32_t altPID;
 extern int16_t imuAngles[2];
 extern int32_t errorVelocityI;
 extern int32_t estAlt;
-extern int16_t gyroADC[3];
 extern int16_t gyroZero[3];
 extern int32_t setVelocity;
 extern int32_t sonarAlt;
@@ -42,8 +41,9 @@ void stateGetAttitude(int16_t * headingOut);
 
 // Sensors
 
-extern int16_t  accADC[3];
 extern uint16_t acc1G;
+extern int16_t  accADC[3];
+extern int16_t  gyroADC[3];
 extern uint32_t baroPressureSum;
 extern uint16_t calibratingA;
 extern uint16_t calibratingG;
