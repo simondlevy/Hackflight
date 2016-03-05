@@ -35,7 +35,7 @@ extern int32_t vario;
 extern uint8_t velocityControl;
 
 void stateInit(float gyro_scale);
-void stateEstimateAngles(int16_t * gyroOut, bool armed);
+void stateEstimateAngles(int16_t * gyroOut, bool armed, bool *useSmallAngle);
 void stateEstimateAltitude(bool armed);
 void stateGetRawIMU(int16_t * raw);
 void stateGetAttitude(int16_t * headingOut);
@@ -72,6 +72,5 @@ extern uint32_t currentTime;
 extern uint16_t cycleTime;
 extern int16_t  rcCommand[4];
 extern int16_t  rcData[RC_CHANS];
-extern bool     useSmallAngle;
 
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);

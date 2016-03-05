@@ -39,7 +39,6 @@ uint32_t currentTime = 0;
 uint16_t cycleTime = 0;         
 int16_t  rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
 int16_t  rcData[RC_CHANS];       // interval [1000;2000]
-bool     useSmallAngle;
 
 static bool  armed;
 
@@ -56,6 +55,8 @@ static uint32_t previousTime;
 static uint8_t  dynP8[3];
 static uint8_t  dynI8[3];
 static uint8_t  dynD8[3];
+
+static bool     useSmallAngle;
 
 static bool check_timed_task(uint32_t usec) {
 
@@ -472,7 +473,7 @@ void loop(void)
 
         static int16_t gyroData[3];
 
-        stateEstimateAngles(gyroData, armed);
+        stateEstimateAngles(gyroData, armed, &useSmallAngle);
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();

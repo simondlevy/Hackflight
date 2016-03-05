@@ -219,7 +219,7 @@ void stateInit(float gyro_scale)
     fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 }
 
-void stateEstimateAngles(int16_t * gyroOut, bool armed)
+void stateEstimateAngles(int16_t * gyroOut, bool armed, bool *useSmallAngle)
 {
     sensorsGetGyro();
     sensorsGetAcc();
@@ -263,7 +263,7 @@ void stateEstimateAngles(int16_t * gyroOut, bool armed)
             EstG.A[axis] = (EstG.A[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + accSmooth[axis]) * INV_GYR_CMPF_FACTOR;
     }
 
-    useSmallAngle = (EstG.A[Z] > smallAngle);
+    *useSmallAngle = (EstG.A[Z] > smallAngle);
 
     // Attitude of the estimated vector
     anglerad[ROLL] = atan2f(EstG.V.Y, EstG.V.Z);
