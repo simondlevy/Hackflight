@@ -23,7 +23,6 @@ uint8_t  velocityControl = 0;
 int32_t  errorVelocityI = 0;
 int32_t  vario = 0;                      // variometer in cm/s
 int16_t  throttleAngleCorrection = 0;    // correction of throttle in lateral wind,
-int16_t  gyroZero[3] = { 0, 0, 0 };
 int16_t  imuAngles[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
 
 static int16_t  accSmooth[3];

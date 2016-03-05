@@ -26,7 +26,6 @@ extern int32_t altPID;
 extern int16_t imuAngles[2];
 extern int32_t errorVelocityI;
 extern int32_t estAlt;
-extern int16_t gyroZero[3];
 extern int32_t setVelocity;
 extern int32_t sonarAlt;
 extern int16_t throttleAngleCorrection;
