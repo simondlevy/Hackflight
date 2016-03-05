@@ -25,18 +25,17 @@ extern int32_t altHold;
 extern int32_t altPID;
 extern int16_t imuAngles[2];
 extern int32_t errorVelocityI;
-extern int32_t estAlt;
 extern int32_t setVelocity;
 extern int32_t sonarAlt;
 extern int16_t throttleAngleCorrection;
-extern int32_t vario;
 extern uint8_t velocityControl;
 
 void stateInit(float gyro_scale);
 void stateEstimateAngles(int16_t * gyroOut, bool armed, bool *useSmallAngle);
-void stateEstimateAltitude(bool armed);
+void stateEstimateAltitude(bool armed, int32_t *estAltOut);
 void stateGetRawIMU(int16_t * raw);
 void stateGetAttitude(int16_t * headingOut);
+void stateGetAltitude(int32_t *estAltOut, int32_t * varioOut);
 
 // Sensors
 

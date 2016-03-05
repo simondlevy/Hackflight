@@ -16,12 +16,10 @@
 int16_t  smallAngle = 0;
 int32_t  altPID = 0;
 int32_t  sonarAlt = 0;
-int32_t  estAlt;                // in cm
 int32_t  altHold;
 int32_t  setVelocity = 0;
 uint8_t  velocityControl = 0;
 int32_t  errorVelocityI = 0;
-int32_t  vario = 0;                      // variometer in cm/s
 int16_t  throttleAngleCorrection = 0;    // correction of throttle in lateral wind,
 int16_t  imuAngles[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
 
@@ -31,11 +29,13 @@ static int32_t  accSumCount;
 static uint32_t accTimeSum;        // keep track for integration of acc
 static float    accVelScale;
 static float    anglerad[2];    // absolute angle inclination in radians
+static int32_t  estAlt;                // in cm
 static float    fcAcc;
 static float    gyroScale;
 static int16_t  heading;
 static int16_t  magADC[3];
 static float    throttleAngleScale;
+static int32_t  vario;                      // variometer in cm/s
 
 // **************************************************
 // Simplified IMU based on "Complementary Filter"
@@ -294,7 +294,7 @@ void stateEstimateAngles(int16_t * gyroOut, bool armed, bool *useSmallAngle)
     gyroOut[PITCH] = gyroADC[PITCH];
 }
 
-void stateEstimateAltitude(bool armed)
+void stateEstimateAltitude(bool armed, int32_t *estAltOut)
 {
     static uint32_t previousT;
     static float    accZ_old;
@@ -417,6 +417,8 @@ void stateEstimateAltitude(bool armed)
     }
 
     accZ_old = accZ_tmp;
+
+    *estAltOut = estAlt;
 }
 
 // for MSP
@@ -431,4 +433,10 @@ void stateGetRawIMU(int16_t * raw)
 void stateGetAttitude(int16_t * headingOut)
 {
     * headingOut = heading;
+}
+
+void stateGetAltitude(int32_t *estAltOut, int32_t * varioOut)
+{
+    *estAltOut = estAlt;
+    *varioOut = vario;
 }

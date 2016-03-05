@@ -1,1 +1,1 @@
-grep -lwR $1 src | grep -v swp
+grep -lwR $1 src/*.c | grep -v swp

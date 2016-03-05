@@ -250,9 +250,14 @@ static void evaluateCommand(void)
             break;
 
         case MSP_ALTITUDE:
-            headSerialReply(6);
-            serialize32(estAlt);
-            serialize16(vario);
+            {
+                int32_t estAlt;
+                int32_t vario;
+                headSerialReply(6);
+                stateGetAltitude(&estAlt, &vario);
+                serialize32(estAlt);
+                serialize16(vario);
+            }
             break;
 
         case MSP_REBOOT:
