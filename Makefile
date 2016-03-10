@@ -32,7 +32,7 @@ SERIAL_DEVICE	?= /dev/ttyUSB0
 ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
 SRC_DIR		 = $(ROOT)/src
 CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
-STDPERIPH_DIR = $(ROOT)/lib/STM32F10x_StdPeriph_Driver
+STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
@@ -55,7 +55,7 @@ NAZE_SRC =  imu.c \
 		   	drv_mpu6050.c \
 		   	drv_pwm.c \
 		   	drv_spi.c \
-		   	drv_timer.c \
+		   	$(BREEZY_DIR)/drv_timer.c \
 		   	$(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
 		   	$(CMSIS_SRC) \
 		   	$(STDPERIPH_SRC)
@@ -87,7 +87,8 @@ OBJCOPY	 = arm-none-eabi-objcopy
 #
 # Tool options.
 #
-INCLUDE_DIRS	 = $(SRC_DIR) \
+INCLUDE_DIRS = $(SRC_DIR) \
+		   $(BREEZY_DIR) \
 		   $(STDPERIPH_DIR)/inc \
 		   $(CMSIS_DIR)/CM3/CoreSupport \
 		   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x \
@@ -176,7 +177,7 @@ $(OBJECT_DIR)/$(TARGET)/%.o): %.S
 	@$(CC) -c -o $@ $(ASFLAGS) $< 
 
 clean:
-	rm -f $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
+	rm -rf obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
 
 flash_$(TARGET): $(TARGET_HEX)
 	stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
