@@ -71,7 +71,7 @@ int main(void)
     if (hw_revision != NAZE32_SP)
         i2cInit(I2C_DEVICE);
 
-    adcInit();
+    adcInit(hw_revision >= NAZE32_REV5);
 
     // drop out any sensors that don't seem to work, init all the others. halt if gyro is dead.
     sensorsOK = sensorsAutodetect();
