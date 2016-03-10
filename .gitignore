@@ -1,0 +1,4 @@
+*.swp
+obj
+scripts/logs
+scripts/output
