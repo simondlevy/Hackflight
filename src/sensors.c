@@ -3,33 +3,36 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include <breezystm32.h>
-
-#include <math.h>
-
-#define _3AXIS
-
+#include "board.h"
 #include "mw.h"
 #include "config.h"
 
-#define BARO_TAB_SIZE_MAX   48
-
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.
-uint16_t acc1G;                     // this is the 1G measured acceleration.
-int16_t  accADC[3];
 uint16_t calibratingA = 0;      
 uint16_t calibratingG = 0;
-int16_t  gyroADC[3];
-int32_t  baroPressure = 0;
-uint32_t baroPressureSum = 0;
+uint16_t acc_1G = 256;          // this is the 1G measured acceleration.
+int16_t heading, magHold;
 
+sensor_t acc;                       // acc access functions
+sensor_t gyro;                      // gyro access functions
 sensor_t mag;                       // mag access functions
-baro_t baro;                        // barometer access functions
 
-static sensor_t acc;
-static sensor_t gyro;
-static int16_t  accZero[3];
+static int16_t accZero[3];
+
+bool sensorsAutodetect(void)
+{
+    // Autodetect Invensense acc/gyro hardware
+    mpuDetect(&acc, &gyro, CONFIG_GYRO_LPF);
+
+    // Now time to init things, acc first
+    acc.init(CONFIG_ACC_ALIGN);
+
+    // this is safe because either mpu6050 or mpu3050 or lg3d20 sets it, and in case of fail, we never get here.
+    gyro.init(CONFIG_GYRO_ALIGN);
+
+    return true;
+}
 
 static void ACC_Common(void)
 {
@@ -47,11 +50,11 @@ static void ACC_Common(void)
             accADC[axis] = 0;
             accZero[axis] = 0;
         }
-        // Calculate average, shift Z down by acc1G
+        // Calculate average, shift Z down by acc_1G
         if (calibratingA == 1) {
             accZero[ROLL] = (a[ROLL] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
             accZero[PITCH] = (a[PITCH] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
-            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - acc1G;
+            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - acc_1G;
         }
         calibratingA--;
     }
@@ -61,7 +64,7 @@ static void ACC_Common(void)
     accADC[YAW] -= accZero[YAW];
 }
 
-void sensorsGetAcc(void)
+void ACC_getADC(void)
 {
     acc.read(accADC);
     ACC_Common();
@@ -106,7 +109,6 @@ static void GYRO_Common(void)
     int axis;
     static int32_t g[3];
     static stdev_t var[3];
-    static int16_t gyroZero[3];
 
     if (calibratingG > 0) {
         for (axis = 0; axis < 3; axis++) {
@@ -142,122 +144,9 @@ static void GYRO_Common(void)
         gyroADC[axis] -= gyroZero[axis];
 }
 
-static void Baro_Common(void)
-{
-    static int32_t baroHistTab[BARO_TAB_SIZE_MAX];
-    static int baroHistIdx;
-    int indexplus1;
-
-    indexplus1 = (baroHistIdx + 1);
-    if (indexplus1 == CONFIG_BARO_TAB_SIZE)
-        indexplus1 = 0;
-    baroHistTab[baroHistIdx] = baroPressure;
-    baroPressureSum += baroHistTab[baroHistIdx];
-    baroPressureSum -= baroHistTab[indexplus1];
-    baroHistIdx = indexplus1;
-}
-
-// ======================================================================
-
-void sensorsInit(bool cuttingEdge, bool * baroAvailable, bool * sonarAvailable, float * gyroScale)
-{
-    mpu6050_init(cuttingEdge, &acc, &gyro, &acc1G, CONFIG_GYRO_LPF);
-
-    acc.init(CONFIG_ACC_ALIGN);
-
-    gyro.init(CONFIG_GYRO_ALIGN);
-
-    *gyroScale = gyro.scale;
-
-    *baroAvailable = ms5611_init(&baro);
-
-    *sonarAvailable = mb1242_init();
-}
-
-int sensorsUpdateBaro(void)
-{
-    static uint32_t baroDeadline = 0;
-    static int state = 0;
-
-    if ((int32_t)(currentTime - baroDeadline) < 0)
-        return 0;
-
-    baroDeadline = currentTime;
-
-    if (state) {
-        baro.get_up();
-        baro.start_ut();
-        baroDeadline += baro.ut_delay;
-        int32_t  baroTemperature;
-        baro.calculate(&baroPressure, &baroTemperature);
-        state = 0;
-        return 2;
-    } else {
-        baro.get_ut();
-        baro.start_up();
-        Baro_Common();
-        state = 1;
-        baroDeadline += baro.up_delay;
-        return 1;
-    }
-}
-
-void sensorsUpdateSonar(void) 
-{
-    sonarAlt = mb1242_poll();
-}
-
-void sensorsGetGyro(void)
+void Gyro_getADC(void)
 {
     // range: +/- 8192; +/- 2000 deg/sec
     gyro.read(gyroADC);
     GYRO_Common();
-}
-
-void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
-{
-    switch (rotation) {
-        case CW0_DEG:
-            dest[X] = src[X];
-            dest[Y] = src[Y];
-            dest[Z] = src[Z];
-            break;
-        case CW90_DEG:
-            dest[X] = src[Y];
-            dest[Y] = -src[X];
-            dest[Z] = src[Z];
-            break;
-        case CW180_DEG:
-            dest[X] = -src[X];
-            dest[Y] = -src[Y];
-            dest[Z] = src[Z];
-            break;
-        case CW270_DEG:
-            dest[X] = -src[Y];
-            dest[Y] = src[X];
-            dest[Z] = src[Z];
-            break;
-        case CW0_DEG_FLIP:
-            dest[X] = -src[X];
-            dest[Y] = src[Y];
-            dest[Z] = -src[Z];
-            break;
-        case CW90_DEG_FLIP:
-            dest[X] = src[Y];
-            dest[Y] = src[X];
-            dest[Z] = -src[Z];
-            break;
-        case CW180_DEG_FLIP:
-            dest[X] = src[X];
-            dest[Y] = -src[Y];
-            dest[Z] = -src[Z];
-            break;
-        case CW270_DEG_FLIP:
-            dest[X] = -src[Y];
-            dest[Y] = -src[X];
-            dest[Z] = -src[Z];
-            break;
-        default:
-            break;
-    }
 }
