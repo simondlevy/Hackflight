@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-BT_BAUD = 115200
 BT_ADDR = "00:06:66:73:e3:a6"
 BT_PORT = 1
 
