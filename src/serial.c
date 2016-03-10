@@ -5,7 +5,6 @@
 
 #include "board.h"
 #include "mw.h"
-#include "telemetry_common.h"
 #include "config.h"
 
 // Multiwii Serial Protocol 0
@@ -202,17 +201,6 @@ static void evaluateCommand(void)
             for (i = 0; i < 2; i++)
                 serialize16(angle[i]);
             serialize16(heading);
-            break;
-
-        case MSP_PX4FLOW:
-            headSerialReply(4);
-            serialize16(px4flow_frame.pixel_flow_x_sum);
-            serialize16(px4flow_frame.pixel_flow_y_sum);
-            break;
-
-        case MSP_LIDARLITE:
-            headSerialReply(2);
-            serialize16(lidarlite_distance);
             break;
 
         case MSP_ALTITUDE:

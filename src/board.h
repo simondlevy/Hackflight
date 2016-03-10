@@ -20,8 +20,6 @@
 #include "printf.h"
 #include "drv_system.h"         // timers, delays, etc
 #include "drv_gpio.h"
-#include "drv_px4flow.h"
-#include "drv_lidarlite.h"
 #include "utils.h"
 
 #ifndef M_PI

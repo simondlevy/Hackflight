@@ -4,7 +4,6 @@
  */
 #include "board.h"
 #include "mw.h"
-#include "telemetry_common.h"
 #include "config.h"
 
 core_t core;
@@ -115,9 +114,6 @@ int main(void)
     // trigger accelerometer calibration requirement
     useSmallAngle = 1;
     
-    px4flow_available = initPX4Flow();
-    //lidarlite_available = initLidarLite();
-
     // loopy
     while (1) {
         loop();

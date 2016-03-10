@@ -4,7 +4,6 @@
  */
 #include "board.h"
 #include "mw.h"
-#include "telemetry_common.h"
 #include "config.h"
 
 int16_t debug[4];
@@ -145,8 +144,6 @@ void annexCode(void)
             LED0_OFF;
         if (armed)
             LED0_ON;
-
-        checkTelemetryState();
     }
 
     if (check_timed_task(calibratedAccTime)) {
@@ -371,12 +368,8 @@ void loop(void)
             case 0:
                 taskOrder++;
             case 1:
-                if (px4flow_available)
-                    pollPX4Flow();
                 taskOrder++;
             case 2:
-                if (lidarlite_available)
-                    pollLidarLite();
                 taskOrder++;
             case 3:
                 // if GPS feature is enabled, gpsThread() will be called at some intervals to check for stuck

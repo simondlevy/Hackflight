@@ -27,11 +27,6 @@
                  {"c7": "short"}, 
                  {"c8": "short"}],
 
-  "PX4FLOW": [{"ID": 125},
-               {"comment": " ttps://pixhawk.org/modules/px4flow#i2c"},
-               {"pixel_flow_x_sum": "short"}, 
-               {"pixel_flow_y_sum": "short"}],
-
   "MB1242": [{"ID": 126},
                {"baropress": "int"},
                {"sonar":     "int"}]

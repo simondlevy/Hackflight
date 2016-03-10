@@ -54,13 +54,6 @@ typedef struct core_t {
 uint8_t useSmallAngle;
 uint8_t armed;
 
-uint8_t px4flow_available;
-px4flow_frame_t px4flow_frame;
-
-uint16_t lidarlite_distance;
-
-uint8_t lidarlite_available;
-
 extern int16_t gyroZero[3];
 extern int16_t gyroData[3];
 extern int16_t angle[2];

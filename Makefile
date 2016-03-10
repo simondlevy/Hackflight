@@ -4,11 +4,8 @@
 # can do whatever you want with this stuff. If we meet some day, and you think
 # this stuff is worth it, you can buy me a beer in return
 ###############################################################################
-#
-# Makefile for building the baseflight firmware.
-#
-# Invoke this with 'make help' to see the list of supported targets.
-# 
+# Change this to wherever you put BreezySTM32
+BREEZY_DIR = /home/levy/Desktop/BreezySTM32
 
 ###############################################################################
 # Things that the user might override on the commandline
@@ -39,25 +36,7 @@ OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
 # Source files common to all targets
-COMMON_SRC	 = imu.c \
-		   main.c \
-		   mixer.c \
-		   mw.c \
-		   sensors.c \
-		   serial.c \
-		   rxmsp.c \
-		   drv_gpio.c \
-		   drv_i2c.c \
-		   drv_system.c \
-		   drv_serial.c \
-		   drv_uart.c \
-		   printf.c \
-		   utils.c \
-		   startup_stm32f10x_md_gcc.S \
-		   $(CMSIS_SRC) \
-		   $(STDPERIPH_SRC)
-
-COMMON_SRC	 = imu.c \
+COMMON_SRC = imu.c \
 		   main.c \
 		   mixer.c \
 		   mw.c \
@@ -76,16 +55,14 @@ COMMON_SRC	 = imu.c \
 		   $(STDPERIPH_SRC)
 
 # Source files for full-featured systems
-HIGHEND_SRC	 = telemetry_common.c
+#HIGHEND_SRC	 = telemetry_common.c
 
 # Source files for the NAZE target
-NAZE_SRC	 = drv_adc.c \
+NAZE_SRC = drv_adc.c \
 		   drv_mpu6050.c \
 		   drv_pwm.c \
 		   drv_spi.c \
 		   drv_timer.c \
-		   drv_px4flow.c \
-		   drv_lidarlite.c \
 		   $(HIGHEND_SRC) \
 		   $(COMMON_SRC)
 
@@ -111,7 +88,7 @@ STDPERIPH_SRC	 = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
 
 # Tool names
 CC		 = arm-none-eabi-gcc
-OBJCOPY		 = arm-none-eabi-objcopy
+OBJCOPY	 = arm-none-eabi-objcopy
 
 #
 # Tool options.
