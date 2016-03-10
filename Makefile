@@ -12,7 +12,6 @@ BREEZY_DIR = /home/levy/Desktop/BreezySTM32
 # Things that the user might override on the commandline
 #
 
-# The target to build, must be one of NAZE or CJMCU
 TARGET		?= NAZE
 
 # Compile-time options

@@ -15,14 +15,14 @@ sock.connect((BT_ADDR, BT_PORT))
 
 print('connected to %s' % BT_ADDR)
 
-def handler(pitch, roll, yaw):
+def handler(c1, c2, c3, c4, c5, c6, c7, c8):
 
-    print('%+3.f %+3.f %+3.f' % (pitch, roll, yaw))
+    print(c1, c2, c3, c4, c5, c6, c7, c8)
     sock.send(request)
 
 parser = Parser()
-request = parser.serialize_ATTITUDE_Request()
-parser.set_ATTITUDE_Handler(handler)
+request = parser.serialize_RC_Request()
+parser.set_RC_Handler(handler)
 
 sock.send(request)
 
