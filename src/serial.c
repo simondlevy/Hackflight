@@ -3,9 +3,10 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include "board.h"
+#include <breezystm32.h>
+
+#include "3axis.h"
 #include "mw.h"
-#include "telemetry_common.h"
 #include "config.h"
 
 // Multiwii Serial Protocol 0
@@ -17,11 +18,10 @@
 #define MSP_ALTITUDE             109    //out message         altitude, variometer
 
 #define MSP_PX4FLOW              125
-#define MSP_LIDARLITE            126
+#define MSP_MB1242               126
 
 #define MSP_SET_RAW_RC           200    //in message          8 rc chan
 #define MSP_SET_MOTOR            214    //in message          PropBalance function
-
 
 // Additional private MSP for baseflight configurator
 #define MSP_REBOOT               68     //in message          reboot settings
@@ -29,8 +29,9 @@
 
 #define INBUF_SIZE 128
 
-// from mixer.c
-extern int16_t motor_disarmed[4];
+extern serialPort_t * Serial1;
+
+
 // cause reboot after MSP processing complete
 static bool pendReboot = false;
 
@@ -40,7 +41,7 @@ typedef enum serialState_t {
     HEADER_M,
     HEADER_ARROW,
     HEADER_SIZE,
-    HEADER_CMD,
+    HEADER_CMD
 } serialState_t;
 
 typedef  struct mspPortState_t {
@@ -54,47 +55,50 @@ typedef  struct mspPortState_t {
     serialState_t c_state;
 } mspPortState_t;
 
-static mspPortState_t ports[2];
-static mspPortState_t *currentPortState = &ports[0];
+static mspPortState_t port;
+static mspPortState_t *currentPortState = &port;
 static int numTelemetryPorts = 0;
 
-void serialize8(uint8_t a)
+static void serialize8(uint8_t a)
 {
     serialWrite(currentPortState->port, a);
     currentPortState->checksum ^= a;
 }
 
-void serialize16(int16_t a)
+static void serialize16(int16_t a)
 {
     serialize8(a & 0xFF);
     serialize8((a >> 8) & 0xFF);
 }
 
-void serialize32(uint32_t a)
+static void serialize32(uint32_t a)
 {
     serialize8(a & 0xFF);
     serialize8((a >> 8) & 0xFF);
     serialize8((a >> 16) & 0xFF);
     serialize8((a >> 24) & 0xFF);
 }
-uint8_t read8(void)
+
+static uint8_t read8(void)
 {
     return currentPortState->inBuf[currentPortState->indRX++] & 0xff;
 }
 
-uint16_t read16(void)
+static uint16_t read16(void)
 {
     uint16_t t = read8();
     t += (uint16_t)read8() << 8;
     return t;
 }
 
-uint32_t read32(void)
+/*
+static uint32_t read32(void)
 {
     uint32_t t = read16();
     t += (uint32_t)read16() << 16;
     return t;
 }
+*/
 
 void headSerialResponse(uint8_t err, uint8_t s)
 {
@@ -135,17 +139,47 @@ void serializeNames(const char *s)
         serialize8(*c);
 }
 
-void serialInit(uint32_t baudrate)
+void serialInit(void)
 {
     numTelemetryPorts = 0;
-    core.mainport = uartOpen(USART1, NULL, baudrate, MODE_RXTX);
-    ports[0].port = core.mainport;
+    port.port = Serial1;
     numTelemetryPorts++;
 }
 
+static bool rxMspFrameDone = false;
+
+static void mspFrameReceive(void)
+{
+    rxMspFrameDone = true;
+}
+
+/*
+   static uint16_t mspReadRawRC(uint8_t chan)
+{
+    return rcData[chan];
+}
+
+
+static bool mspFrameComplete(void)
+{
+    if (rxMspFrameDone) {
+        rxMspFrameDone = false;
+        return true;
+    }
+    return false;
+}
+
+
+void mspInit(rcReadRawDataPtr *callback)
+{
+    if (callback)
+        *callback = mspReadRawRC;
+}
+*/
+
 static void evaluateCommand(void)
 {
-    uint32_t i;
+    uint8_t i;
     const char *build = __DATE__;
 
     switch (currentPortState->cmdMSP) {
@@ -154,12 +188,12 @@ static void evaluateCommand(void)
             for (i = 0; i < 8; i++)
                 rcData[i] = read16();
             headSerialReply(0);
-            mspFrameRecieve();
+            mspFrameReceive();
             break;
 
         case MSP_SET_MOTOR:
             for (i = 0; i < 4; i++)
-                motor_disarmed[i] = read16();
+                mixerSetMotor(i, read16());
             headSerialReply(0);
             break;
 
@@ -168,27 +202,28 @@ static void evaluateCommand(void)
             serialize16(cycleTime);
             serialize16(i2cGetErrorCounter());
             serialize16(0);
-           serialize8(0);
+            serialize8(0);
             break;
 
         case MSP_RAW_IMU:
             headSerialReply(18);
-            // Retarded hack until multiwiidorks start using real units for sensor data
-            if (acc_1G > 1024) {
+            {
+                static int16_t rawIMU[9];
+                stateGetRawIMU(rawIMU);
                 for (i = 0; i < 3; i++)
-                    serialize16(accSmooth[i] / 8);
-            } else {
-                for (i = 0; i < 3; i++)
-                    serialize16(accSmooth[i]);
+                    serialize16(rawIMU[i] / 8); // accel
+                for (i = 3; i < 9; i++)         // gyro, mag
+                    serialize16(rawIMU[i]);
             }
-            for (i = 0; i < 3; i++)
-                serialize16(gyroData[i]);
-            for (i = 0; i < 3; i++)
-                serialize16(magADC[i]);
             break;
 
         case MSP_MOTOR:
-            s_struct((uint8_t *)motor, 16);
+            {
+                int16_t motors[4];
+                for (i=0; i<4; ++i)
+                    motors[i] = mixerGetMotor(i);
+                s_struct((uint8_t *)motors, 16);
+            }
             break;
 
         case MSP_RC:
@@ -198,27 +233,31 @@ static void evaluateCommand(void)
             break;
 
         case MSP_ATTITUDE:
-            headSerialReply(6);
-            for (i = 0; i < 2; i++)
-                serialize16(angle[i]);
-            serialize16(heading);
+            {
+                int16_t heading;
+                stateGetAttitude(&heading);
+                headSerialReply(6);
+                for (i = 0; i < 2; i++)
+                    serialize16(imuAngles[i]);
+                serialize16(heading);
+            }
             break;
 
-        case MSP_PX4FLOW:
-            headSerialReply(4);
-            serialize16(px4flow_frame.pixel_flow_x_sum);
-            serialize16(px4flow_frame.pixel_flow_y_sum);
-            break;
-
-        case MSP_LIDARLITE:
-            headSerialReply(2);
-            serialize16(lidarlite_distance);
+        case MSP_MB1242:
+            headSerialReply(8);
+            serialize32(baroPressureSum/(CONFIG_BARO_TAB_SIZE-1));
+            serialize32(sonarAlt);
             break;
 
         case MSP_ALTITUDE:
-            headSerialReply(6);
-            serialize32(EstAlt);
-            serialize16(vario);
+            {
+                int32_t estAlt;
+                int32_t vario;
+                headSerialReply(6);
+                stateGetAltitude(&estAlt, &vario);
+                serialize32(estAlt);
+                serialize16(vario);
+            }
             break;
 
         case MSP_REBOOT:
@@ -242,58 +281,55 @@ static void evaluateCommand(void)
 }
 
 
-void serialCom(void)
+void serialCom(bool armed)
 {
     uint8_t c;
-    int i;
 
-    for (i = 0; i < numTelemetryPorts; i++) {
-        currentPortState = &ports[i];
+    currentPortState = &port;
 
-        if (pendReboot)
-            systemReset(false); // noreturn
+    if (pendReboot)
+        systemReset(false); // noreturn
 
-        while (serialTotalBytesWaiting(currentPortState->port)) {
-            c = serialRead(currentPortState->port);
+    while (serialTotalBytesWaiting(currentPortState->port)) {
+        c = serialRead(currentPortState->port);
 
-            if (currentPortState->c_state == IDLE) {
-                currentPortState->c_state = (c == '$') ? HEADER_START : IDLE;
-                if (currentPortState->c_state == IDLE && !armed) {
-                    if (c == '#')
-                        ;
-                    else if (c == CONFIG_REBOOT_CHARACTER) 
-                        systemReset(true);      // reboot to bootloader
-                }
-            } else if (currentPortState->c_state == HEADER_START) {
-                currentPortState->c_state = (c == 'M') ? HEADER_M : IDLE;
-            } else if (currentPortState->c_state == HEADER_M) {
-                currentPortState->c_state = (c == '<') ? HEADER_ARROW : IDLE;
-            } else if (currentPortState->c_state == HEADER_ARROW) {
-                if (c > INBUF_SIZE) {       // now we are expecting the payload size
-                    currentPortState->c_state = IDLE;
-                    continue;
-                }
-                currentPortState->dataSize = c;
-                currentPortState->offset = 0;
-                currentPortState->checksum = 0;
-                currentPortState->indRX = 0;
-                currentPortState->checksum ^= c;
-                currentPortState->c_state = HEADER_SIZE;      // the command is to follow
-            } else if (currentPortState->c_state == HEADER_SIZE) {
-                currentPortState->cmdMSP = c;
-                currentPortState->checksum ^= c;
-                currentPortState->c_state = HEADER_CMD;
-            } else if (currentPortState->c_state == HEADER_CMD && 
-                    currentPortState->offset < currentPortState->dataSize) {
-                currentPortState->checksum ^= c;
-                currentPortState->inBuf[currentPortState->offset++] = c;
-            } else if (currentPortState->c_state == HEADER_CMD && 
-                    currentPortState->offset >= currentPortState->dataSize) {
-                if (currentPortState->checksum == c) {        // compare calculated and transferred checksum
-                    evaluateCommand();      // we got a valid packet, evaluate it
-                }
-                currentPortState->c_state = IDLE;
+        if (currentPortState->c_state == IDLE) {
+            currentPortState->c_state = (c == '$') ? HEADER_START : IDLE;
+            if (currentPortState->c_state == IDLE && !armed) {
+                if (c == '#')
+                    ;
+                else if (c == CONFIG_REBOOT_CHARACTER) 
+                    systemReset(true);      // reboot to bootloader
             }
+        } else if (currentPortState->c_state == HEADER_START) {
+            currentPortState->c_state = (c == 'M') ? HEADER_M : IDLE;
+        } else if (currentPortState->c_state == HEADER_M) {
+            currentPortState->c_state = (c == '<') ? HEADER_ARROW : IDLE;
+        } else if (currentPortState->c_state == HEADER_ARROW) {
+            if (c > INBUF_SIZE) {       // now we are expecting the payload size
+                currentPortState->c_state = IDLE;
+                continue;
+            }
+            currentPortState->dataSize = c;
+            currentPortState->offset = 0;
+            currentPortState->checksum = 0;
+            currentPortState->indRX = 0;
+            currentPortState->checksum ^= c;
+            currentPortState->c_state = HEADER_SIZE;      // the command is to follow
+        } else if (currentPortState->c_state == HEADER_SIZE) {
+            currentPortState->cmdMSP = c;
+            currentPortState->checksum ^= c;
+            currentPortState->c_state = HEADER_CMD;
+        } else if (currentPortState->c_state == HEADER_CMD && 
+                currentPortState->offset < currentPortState->dataSize) {
+            currentPortState->checksum ^= c;
+            currentPortState->inBuf[currentPortState->offset++] = c;
+        } else if (currentPortState->c_state == HEADER_CMD && 
+                currentPortState->offset >= currentPortState->dataSize) {
+            if (currentPortState->checksum == c) {        // compare calculated and transferred checksum
+                evaluateCommand();      // we got a valid packet, evaluate it
+            }
+            currentPortState->c_state = IDLE;
         }
     }
 }

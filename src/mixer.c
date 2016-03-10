@@ -2,14 +2,25 @@
  * This file is part of baseflight
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
-#include "board.h"
+
+#include <breezystm32.h>
+
+#include <string.h>
+
 #include "mw.h"
 #include "config.h"
+#include "utils.h"
 
-int16_t motor[4];
-int16_t motor_disarmed[4];
+static int16_t motorsDisarmed[4];
 
-static motorMixer_t currentMixer[4];
+static int16_t motors[4];
+
+typedef struct motorMixer_t {
+    float throttle;
+    float roll;
+    float pitch;
+    float yaw;
+} motorMixer_t;
 
 static const motorMixer_t mixerQuadX[] = {
     { 1.0f, -1.0f,  1.0f, -1.0f },          // REAR_R
@@ -21,40 +32,11 @@ static const motorMixer_t mixerQuadX[] = {
 void mixerInit(void)
 {
     int i;
-
     for (i = 0; i < 4; i++)
-        currentMixer[i] = mixerQuadX[i];
-
-    mixerResetMotors();
+        motorsDisarmed[i] = CONFIG_MINCOMMAND;
 }
 
-void mixerResetMotors(void)
-{
-    int i;
-    // set disarmed motor values
-    for (i = 0; i < 4; i++)
-        motor_disarmed[i] = CONFIG_MINCOMMAND;
-}
-
-void writeMotors(void)
-{
-    uint8_t i;
-
-    for (i = 0; i < 4; i++)
-        pwmWriteMotor(i, motor[i]);
-}
-
-void writeAllMotors(int16_t mc)
-{
-    uint8_t i;
-
-    // Sends commands to all motors
-    for (i = 0; i < 4; i++)
-        motor[i] = mc;
-    writeMotors();
-}
-
-void mixTable(void)
+void mixerWriteMotors(bool armed)
 {
     int16_t maxMotor;
     uint32_t i;
@@ -63,24 +45,37 @@ void mixTable(void)
     axisPID[YAW] = constrain(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
 
     for (i = 0; i < 4; i++)
-        motor[i] = rcCommand[THROTTLE] * currentMixer[i].throttle + axisPID[PITCH] * currentMixer[i].pitch + 
-            axisPID[ROLL] * currentMixer[i].roll + -CONFIG_YAW_DIRECTION * axisPID[YAW] * currentMixer[i].yaw;
+        motors[i] = rcCommand[THROTTLE] * mixerQuadX[i].throttle + axisPID[PITCH] * mixerQuadX[i].pitch + 
+            axisPID[ROLL] * mixerQuadX[i].roll + -CONFIG_YAW_DIRECTION * axisPID[YAW] * mixerQuadX[i].yaw;
 
-    maxMotor = motor[0];
+    maxMotor = motors[0];
     for (i = 1; i < 4; i++)
-        if (motor[i] > maxMotor)
-            maxMotor = motor[i];
+        if (motors[i] > maxMotor)
+            maxMotor = motors[i];
     for (i = 0; i < 4; i++) {
         if (maxMotor > CONFIG_MAXTHROTTLE)     
             // this is a way to still have good gyro corrections if at least one motor reaches its max.
-            motor[i] -= maxMotor - CONFIG_MAXTHROTTLE;
+            motors[i] -= maxMotor - CONFIG_MAXTHROTTLE;
 
-        motor[i] = constrain(motor[i], CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
+        motors[i] = constrain(motors[i], CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
         if ((rcData[THROTTLE]) < CONFIG_MINCHECK) {
-            motor[i] = CONFIG_MINTHROTTLE;
+            motors[i] = CONFIG_MINTHROTTLE;
         } 
         if (!armed) {
-            motor[i] = motor_disarmed[i];
+            motors[i] = motorsDisarmed[i];
         }
     }
+
+    for (i = 0; i < 4; i++)
+        pwmWriteMotor(i, motors[i]);
+}
+
+uint16_t mixerGetMotor(uint8_t i)
+{
+    return motors[i];
+}
+
+void mixerSetMotor(uint8_t i, uint16_t value)
+{
+    motorsDisarmed[i] = value;
 }

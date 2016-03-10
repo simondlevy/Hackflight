@@ -4,18 +4,23 @@
 # can do whatever you want with this stuff. If we meet some day, and you think
 # this stuff is worth it, you can buy me a beer in return
 ###############################################################################
-#
-# Makefile for building the baseflight firmware.
-#
-# Invoke this with 'make help' to see the list of supported targets.
-# 
+
+# Change this to wherever you put BreezySTM32
+BREEZY_DIR = /home/levy/Desktop/BreezySTM32
+
+# Source files common to all targets
+PROJECT_SRC = mixer.c \
+		   mw.c \
+		   sensors.c \
+		   serial.c \
+		   state.c \
+		   utils.c 
 
 ###############################################################################
-# Things that the user might override on the commandline
-#
 
-# The target to build, must be one of NAZE or CJMCU
-TARGET		?= NAZE
+# You probably shouldn't modify anything below here!
+	
+TARGET		?= myproject
 
 # Compile-time options
 OPTIONS		?=
@@ -26,75 +31,35 @@ DEBUG ?=
 # Serial port/Device for flashing
 SERIAL_DEVICE	?= /dev/ttyUSB0
 
-###############################################################################
-# Things that need to be maintained as the source changes
-#
-
 # Working directories
 ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
 SRC_DIR		 = $(ROOT)/src
-CMSIS_DIR	 = $(ROOT)/lib/CMSIS
-STDPERIPH_DIR	 = $(ROOT)/lib/STM32F10x_StdPeriph_Driver
+CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
+STDPERIPH_DIR	 = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
 # Source files common to all targets
-COMMON_SRC	 = imu.c \
-		   main.c \
-		   mixer.c \
-		   mw.c \
-		   sensors.c \
-		   serial.c \
-		   rxmsp.c \
-		   drv_gpio.c \
-		   drv_i2c.c \
-		   drv_system.c \
-		   drv_serial.c \
-		   drv_uart.c \
-		   printf.c \
-		   utils.c \
-		   startup_stm32f10x_md_gcc.S \
+myproject_SRC = $(PROJECT_SRC) \
 		   $(CMSIS_SRC) \
-		   $(STDPERIPH_SRC)
+		   $(STDPERIPH_SRC) \
+		   $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
+		   $(BREEZY_DIR)/main.c \
+		   $(BREEZY_DIR)/drv_gpio.c \
+		   $(BREEZY_DIR)/drv_pwm.c \
+		   $(BREEZY_DIR)/drv_i2c.c \
+		   $(BREEZY_DIR)/drv_timer.c \
+		   $(BREEZY_DIR)/drv_spi.c \
+		   $(BREEZY_DIR)/drv_serial.c \
+		   $(BREEZY_DIR)/drv_uart.c \
+		   $(BREEZY_DIR)/drv_adc.c \
+		   $(BREEZY_DIR)/drv_system.c \
+		   $(BREEZY_DIR)/drv_mpu6050.c \
+		   $(BREEZY_DIR)/drv_ms5611.c \
+		   $(BREEZY_DIR)/drv_mb1242.c \
+		   $(BREEZY_DIR)/printf.c
 
-COMMON_SRC	 = imu.c \
-		   main.c \
-		   mixer.c \
-		   mw.c \
-		   sensors.c \
-		   serial.c \
-		   rxmsp.c \
-		   drv_gpio.c \
-		   drv_i2c.c \
-		   drv_system.c \
-		   drv_serial.c \
-		   drv_uart.c \
-		   printf.c \
-		   utils.c \
-		   startup_stm32f10x_md_gcc.S \
-		   $(CMSIS_SRC) \
-		   $(STDPERIPH_SRC)
-
-# Source files for full-featured systems
-HIGHEND_SRC	 = telemetry_common.c
-
-# Source files for the NAZE target
-NAZE_SRC	 = drv_adc.c \
-		   drv_mpu6050.c \
-		   drv_pwm.c \
-		   drv_spi.c \
-		   drv_timer.c \
-		   drv_px4flow.c \
-		   drv_lidarlite.c \
-		   $(HIGHEND_SRC) \
-		   $(COMMON_SRC)
-
-# In some cases, %.s regarded as intermediate file, which is actually not.
-# This will prevent accidental deletion of startup code.
-.PRECIOUS: %.s
-
-# Search path for baseflight sources
-VPATH		:= $(SRC_DIR):$(SRC_DIR)/baseflight_startups
+VPATH		:= $(SRC_DIR):$(SRC_DIR)
 
 # Search path and source files for the CMSIS sources
 VPATH		:= $(VPATH):$(CMSIS_DIR)/CM3/CoreSupport:$(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x
@@ -110,13 +75,14 @@ STDPERIPH_SRC	 = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
 #
 
 # Tool names
-CC		 = arm-none-eabi-gcc
-OBJCOPY		 = arm-none-eabi-objcopy
+CC		 = arm-none-eabi-gcc -std=gnu99
+OBJCOPY	 = arm-none-eabi-objcopy
 
 #
 # Tool options.
 #
-INCLUDE_DIRS	 = $(SRC_DIR) \
+INCLUDE_DIRS = $(SRC_DIR) \
+	       $(BREEZY_DIR) \
 		   $(STDPERIPH_DIR)/inc \
 		   $(CMSIS_DIR)/CM3/CoreSupport \
 		   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x \
@@ -125,7 +91,7 @@ ARCH_FLAGS	 = -mthumb -mcpu=cortex-m3
 
 ifeq ($(DEBUG),GDB)
 OPTIMIZE	 = -Og
-LTO_FLAGS	 = $(OPTIMIZE)
+
 else
 OPTIMIZE	 = -Os
 LTO_FLAGS	 = -flto -fuse-linker-plugin $(OPTIMIZE)
@@ -138,20 +104,18 @@ CFLAGS		 = $(ARCH_FLAGS) \
 		   $(addprefix -D,$(OPTIONS)) \
 		   $(addprefix -I,$(INCLUDE_DIRS)) \
 		   $(DEBUG_FLAGS) \
-		   -std=gnu99 \
 		   -Wall -pedantic -Wextra -Wshadow -Wunsafe-loop-optimizations \
 		   -ffunction-sections \
 		   -fdata-sections \
 		   -DSTM32F10X_MD \
-		   -DUSE_STDPERIPH_DRIVER \
-		   -D$(TARGET)
+		   -DUSE_STDPERIPH_DRIVER 
 
 ASFLAGS		 = $(ARCH_FLAGS) \
 		   -x assembler-with-cpp \
 		   $(addprefix -I,$(INCLUDE_DIRS))
 
 # XXX Map/crossref output?
-LD_SCRIPT	 = $(ROOT)/stm32_flash.ld
+LD_SCRIPT	 = $(BREEZY_DIR)/stm32_flash.ld
 LDFLAGS		 = -lm \
 		   -nostartfiles \
 		   --specs=nano.specs \
@@ -172,10 +136,10 @@ LDFLAGS		 = -lm \
 # Things we will build
 #
 
-TARGET_HEX	 = $(BIN_DIR)/baseflight_$(TARGET).hex
-TARGET_ELF	 = $(BIN_DIR)/baseflight_$(TARGET).elf
+TARGET_HEX	 = $(BIN_DIR)/hackflight_$(TARGET).hex
+TARGET_ELF	 = $(BIN_DIR)/hackflight_$(TARGET).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC))))
-TARGET_MAP   = $(OBJECT_DIR)/baseflight_$(TARGET).map
+TARGET_MAP   = $(OBJECT_DIR)/hackflight_$(TARGET).map
 
 # List of buildable ELF files and their object dependencies.
 # It would be nice to compute these lists, but that seems to be just beyond make.
@@ -189,7 +153,7 @@ $(TARGET_ELF):  $(TARGET_OBJS)
 MKDIR_OBJDIR = @mkdir -p $(dir $@)
 
 # Compile
-$(OBJECT_DIR)/$(TARGET)/%.o: %.c config.h board.h mw.h
+$(OBJECT_DIR)/$(TARGET)/%.o: %.c config.h mw.h
 	$(MKDIR_OBJDIR)
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(CFLAGS) $<
@@ -205,7 +169,7 @@ $(OBJECT_DIR)/$(TARGET)/%.o): %.S
 	@$(CC) -c -o $@ $(ASFLAGS) $< 
 
 clean:
-	rm -f $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
+	rm -rf obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
 
 flash_$(TARGET): $(TARGET_HEX)
 	stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
@@ -231,11 +195,8 @@ debug:
 listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
 
-imu:
-	python getimu.py $(SERIAL_DEVICE)
-
-flow:
-	python getpx4flow.py $(SERIAL_DEVICE)
+sonar:
+	./scripts/bluesonar.py
 
 count:
 	wc -l src/*.c src/*.h | sort -n

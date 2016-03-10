@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-BAUD = 115200
-
 from msppg import MSP_Parser as Parser
 
 import bluetooth
