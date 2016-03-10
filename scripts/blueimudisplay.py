@@ -25,11 +25,11 @@ BT_PORT         = 1
 
 from tkinter import *
 import threading
-import bluetooth
 import time
 import msppg
 from math import sin, cos, radians, degrees
 import numpy as np
+import socket
 
 class Display(object):
 
@@ -586,7 +586,7 @@ class MSPDriver(object):
         self.root = root
         self.canvas = canvas
 
-        self.sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM )
+        self.sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
         self.sock.connect((BT_ADDR, BT_PORT))
 
         # MSPPG

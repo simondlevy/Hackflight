@@ -4,6 +4,7 @@
 # can do whatever you want with this stuff. If we meet some day, and you think
 # this stuff is worth it, you can buy me a beer in return
 ###############################################################################
+
 # Change this to wherever you put BreezySTM32
 BREEZY_DIR = /home/levy/Desktop/BreezySTM32
 
@@ -30,41 +31,34 @@ SERIAL_DEVICE	?= /dev/ttyUSB0
 # Working directories
 ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
 SRC_DIR		 = $(ROOT)/src
-CMSIS_DIR	 = $(ROOT)/lib/CMSIS
-STDPERIPH_DIR	 = $(ROOT)/lib/STM32F10x_StdPeriph_Driver
+CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
+STDPERIPH_DIR = $(ROOT)/lib/STM32F10x_StdPeriph_Driver
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
 # Source files common to all targets
-COMMON_SRC = imu.c \
-		   main.c \
-		   mixer.c \
-		   mw.c \
-		   sensors.c \
-		   serial.c \
-		   rxmsp.c \
-		   drv_gpio.c \
-		   drv_i2c.c \
-		   drv_system.c \
-		   drv_serial.c \
-		   drv_uart.c \
-		   printf.c \
-		   utils.c \
-		   startup_stm32f10x_md_gcc.S \
-		   $(CMSIS_SRC) \
-		   $(STDPERIPH_SRC)
-
-# Source files for full-featured systems
-#HIGHEND_SRC	 = telemetry_common.c
-
-# Source files for the NAZE target
-NAZE_SRC = drv_adc.c \
-		   drv_mpu6050.c \
-		   drv_pwm.c \
-		   drv_spi.c \
-		   drv_timer.c \
-		   $(HIGHEND_SRC) \
-		   $(COMMON_SRC)
+NAZE_SRC =  imu.c \
+		   	main.c \
+		   	mixer.c \
+		   	mw.c \
+		   	sensors.c \
+		   	serial.c \
+		   	rxmsp.c \
+		   	printf.c \
+		   	utils.c \
+		   	drv_gpio.c \
+		   	drv_i2c.c \
+		   	drv_system.c \
+		   	drv_serial.c \
+		   	drv_uart.c \
+			drv_adc.c \
+		   	drv_mpu6050.c \
+		   	drv_pwm.c \
+		   	drv_spi.c \
+		   	drv_timer.c \
+		   	$(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
+		   	$(CMSIS_SRC) \
+		   	$(STDPERIPH_SRC)
 
 # In some cases, %.s regarded as intermediate file, which is actually not.
 # This will prevent accidental deletion of startup code.
@@ -128,7 +122,7 @@ ASFLAGS		 = $(ARCH_FLAGS) \
 		   $(addprefix -I,$(INCLUDE_DIRS))
 
 # XXX Map/crossref output?
-LD_SCRIPT	 = $(ROOT)/stm32_flash.ld
+LD_SCRIPT	 = $(BREEZY_DIR)/stm32_flash.ld
 LDFLAGS		 = -lm \
 		   -nostartfiles \
 		   --specs=nano.specs \
