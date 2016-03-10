@@ -50,10 +50,10 @@ NAZE_SRC =  imu.c \
 		   	drv_i2c.c \
 		   	drv_system.c \
 		   	drv_serial.c \
-		   	drv_uart.c \
-			$(BREEZY_DIR)/drv_adc.c \
+		   	$(BREEZY_DIR)/drv_uart.c \
 		   	drv_mpu6050.c \
 		   	drv_pwm.c \
+			$(BREEZY_DIR)/drv_adc.c \
 		   	$(BREEZY_DIR)/drv_spi.c \
 		   	$(BREEZY_DIR)/drv_timer.c \
 		   	$(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
