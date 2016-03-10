@@ -121,7 +121,6 @@ void serialCom(void);
 // rxmsp
 void mspInit(rcReadRawDataPtr *callback);
 bool mspFrameComplete(void);
-void mspFrameRecieve(void);
 
 // buzzer
 void systemBeep(bool onoff);

@@ -57,6 +57,14 @@ static mspPortState_t ports[2];
 static mspPortState_t *currentPortState = &ports[0];
 static int numTelemetryPorts = 0;
 
+static bool rxMspFrameDone = false;
+
+static void mspFrameReceive(void)
+{
+    rxMspFrameDone = true;
+}
+
+
 void serialize8(uint8_t a)
 {
     serialWrite(currentPortState->port, a);
@@ -153,7 +161,7 @@ static void evaluateCommand(void)
             for (i = 0; i < 8; i++)
                 rcData[i] = read16();
             headSerialReply(0);
-            mspFrameRecieve();
+            mspFrameReceive();
             break;
 
         case MSP_SET_MOTOR:

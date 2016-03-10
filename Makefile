@@ -43,15 +43,14 @@ NAZE_SRC =  imu.c \
 		   	mw.c \
 		   	sensors.c \
 		   	serial.c \
-		   	rxmsp.c \
 		   	printf.c \
 		   	utils.c \
-		   	$(BREEZY_DIR)/drv_gpio.c \
 		   	drv_i2c.c \
 		   	drv_system.c \
 		   	drv_serial.c \
 		   	drv_mpu6050.c \
 		   	drv_pwm.c \
+		   	$(BREEZY_DIR)/drv_gpio.c \
 		   	$(BREEZY_DIR)/drv_uart.c \
 			$(BREEZY_DIR)/drv_adc.c \
 		   	$(BREEZY_DIR)/drv_spi.c \
