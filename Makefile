@@ -36,14 +36,14 @@ OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
 # Source files common to all targets
-NAZE_SRC =  imu.c \
+NAZE_SRC =  state.c \
 		   	main.c \
 		   	mixer.c \
 		   	mw.c \
 		   	sensors.c \
 		   	serial.c \
-		   	printf.c \
 		   	utils.c \
+		   	$(BREEZY_DIR)/printf.c \
 		   	$(BREEZY_DIR)/drv_system.c \
 		   	$(BREEZY_DIR)/drv_mpu6050.c \
 		   	$(BREEZY_DIR)/drv_i2c.c \

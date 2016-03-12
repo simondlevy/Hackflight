@@ -21,6 +21,7 @@ static void _putc(void *p, char c)
 {
     (void)p;
     serialWrite(core.mainport, c);
+    while (!isSerialTransmitBufferEmpty(core.mainport));
 }
 
 static void activateConfig(void)
