@@ -22,6 +22,8 @@ static int16_t accZero[3];
 
 bool sensorsAutodetect(void)
 {
+    extern int hw_revision;
+
     // Autodetect Invensense acc/gyro hardware
     mpu6050_init(hw_revision >= NAZE32_REV5, CONFIG_GYRO_LPF, &acc, &gyro, &acc_1G);
 

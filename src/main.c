@@ -47,6 +47,7 @@ int main(void)
 {
     uint8_t i;
     bool sensorsOK = false;
+    extern uint32_t hse_value;
 
     // Configure clock, this figures out HSE for hardware autodetect
     SetSysClock(CONFIG_EMF_AVOIDANCE);
@@ -85,10 +86,7 @@ int main(void)
     for (i = 0; i < 10; i++) {
         LED1_TOGGLE;
         LED0_TOGGLE;
-        delay(25);
-        BEEP_ON;
-        delay(25);
-        BEEP_OFF;
+        delay(50);
     }
     LED0_OFF;
     LED1_OFF;
