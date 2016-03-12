@@ -33,7 +33,7 @@ static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 #define CONFIG_REBOOT_CHARACTER                     'R'
 #define CONFIG_ACC_ALIGN                            ALIGN_DEFAULT
 #define CONFIG_GYRO_ALIGN                           ALIGN_DEFAULT
-#define CONFIG_PWM_IDLE_PULSE                       PULSE_1MS /* standard PWM for brushless ESC */
+#define CONFIG_PWM_IDLE_PULSE                       1000  /* standard PWM in usec for brushless ESC */
 #define CONFIG_FAST_PWM                             0   /* 0 or 1 */
 #define CONFIG_PWM_FILTER                           0   /* 0 or 1 */
 #define CONFIG_FAILSAFE_DETECT_THRESHOLD            985 /* any of first 4 chans below this value triggers failsafe */
