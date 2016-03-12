@@ -94,9 +94,6 @@ extern core_t core;
 extern sensor_t acc;
 extern sensor_t gyro;
 
-// main
-void loop(void);
-
 // IMU
 void imuInit(void);
 void computeIMU(void);
