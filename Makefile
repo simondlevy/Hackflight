@@ -46,8 +46,8 @@ NAZE_SRC =  imu.c \
 		   	utils.c \
 		   	drv_i2c.c \
 		   	drv_system.c \
-		   	drv_serial.c \
 		   	drv_mpu6050.c \
+		   	$(BREEZY_DIR)/drv_serial.c \
 		   	$(BREEZY_DIR)/drv_pwm.c \
 		   	$(BREEZY_DIR)/drv_gpio.c \
 		   	$(BREEZY_DIR)/drv_uart.c \

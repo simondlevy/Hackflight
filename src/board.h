@@ -60,7 +60,6 @@ typedef enum {
 
 typedef void (*sensorInitFuncPtr)(sensor_align_e align);   // sensor init prototype
 typedef void (*sensorReadFuncPtr)(int16_t *data);          // sensor read and align prototype
-typedef void (*serialReceiveCallbackPtr)(uint16_t data);   // used by serial drivers to return frames to app
 
 typedef struct sensor_t {
     sensorInitFuncPtr init;                                 // initialize function
