@@ -7,36 +7,49 @@
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
+#define ROL_LO (1 << (2 * ROLL))
+#define ROL_CE (3 << (2 * ROLL))
+#define ROL_HI (2 << (2 * ROLL))
+#define PIT_LO (1 << (2 * PITCH))
+#define PIT_CE (3 << (2 * PITCH))
+#define PIT_HI (2 << (2 * PITCH))
+#define YAW_LO (1 << (2 * YAW))
+#define YAW_CE (3 << (2 * YAW))
+#define YAW_HI (2 << (2 * YAW))
+#define THR_LO (1 << (2 * THROTTLE))
+#define THR_CE (3 << (2 * THROTTLE))
+#define THR_HI (2 << (2 * THROTTLE))
+
 #define I2C_DEVICE (I2CDEV_2)
 
-uint32_t currentTime = 0;
-uint32_t previousTime = 0;
 uint16_t cycleTime = 0;         
 // this is the number in micro second to achieve a full loop, it can differ a little and is taken into 
 // account in the PID loop
 
 
-int16_t failsafeCnt = 0;
-int16_t failsafeEvents = 0;
+
 int16_t rcData[RC_CHANS];       // interval [1000;2000]
 int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
-int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
-int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 rcReadRawDataPtr rcReadRawFunc = NULL;  // receive data from default (pwm/ppm) or additional 
+
+static uint32_t currentTime;
+static uint32_t previousTime;
+static int16_t failsafeCnt;
 
 static uint8_t accCalibrated;
 
 static void pidMultiWii(void);
+
+#define PITCH_LOOKUP_LENGTH 7
+#define THROTTLE_LOOKUP_LENGTH 12
+static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
+static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
+
 pidControllerFuncPtr pid_controller = pidMultiWii; // which pid controller are we using, defaultMultiWii
 
 uint8_t dynP8[3], dynI8[3], dynD8[3];
 
 int16_t axisPID[3];
-
-// Battery monitoring stuff
-uint8_t batteryCellCount = 3;       // cell count
-uint16_t batteryWarningVoltage;     // slow buzzer after this one, recommended 80% of battery used. Time to land.
-uint16_t batteryCriticalVoltage;    // annoying buzzer after this one, battery is going to be dead.
 
 // Time of automatic disarm when "Don't spin the motors when armed" is enabled.
 static uint32_t disarmTime = 0;
@@ -140,7 +153,7 @@ static void annexCode(void)
         }
     }
 
-    serialCom();
+    mspCom();
 }
 
 static uint16_t pwmReadRawRC(uint8_t chan)
@@ -292,10 +305,10 @@ void setup(void)
     LED0_OFF;
     LED1_OFF;
 
-    imuInit(); 
+    stateInit(); 
     mixerInit(); 
 
-    serialInit();
+    mspInit();
 
     pwmInit(CONFIG_USE_CPPM, CONFIG_PWM_FILTER, CONFIG_FAST_PWM, CONFIG_MOTOR_PWM_RATE, CONFIG_PWM_IDLE_PULSE);
 
@@ -423,7 +436,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        computeIMU();
+        stateComputeAngles();
 
         // Measure loop rate just afer reading the sensors
         currentTime = micros();
@@ -438,8 +451,8 @@ void loop(void)
         }
 
         pid_controller();
-        mixTable();
-        writeMotors();
+
+        mixerWriteMotors();
     }
 }
 

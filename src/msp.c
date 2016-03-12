@@ -170,7 +170,7 @@ static void evaluateCommand(void)
         case MSP_RAW_IMU:
             headSerialReply(18);
             // Retarded hack until multiwiidorks start using real units for sensor data
-            if (acc_1G > 1024) {
+            if (acc1G > 1024) {
                 for (i = 0; i < 3; i++)
                     serialize16(accSmooth[i] / 8);
             } else {
@@ -184,7 +184,7 @@ static void evaluateCommand(void)
             break;
 
         case MSP_MOTOR:
-            s_struct((uint8_t *)motor, 16);
+            s_struct((uint8_t *)motors, 16);
             break;
 
         case MSP_RC:
@@ -202,7 +202,7 @@ static void evaluateCommand(void)
 
         case MSP_ALTITUDE:
             headSerialReply(6);
-            serialize32(EstAlt);
+            serialize32(estAlt);
             serialize16(vario);
             break;
 
@@ -228,13 +228,13 @@ static void evaluateCommand(void)
 
 // ================================================================================================================
 
-void serialInit()
+void mspInit()
 {
     ports[0].port = Serial1;
 }
 
 
-void serialCom(void)
+void mspCom(void)
 {
     uint8_t c;
 

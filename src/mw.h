@@ -7,8 +7,6 @@
 
 #define RC_CHANS    (18)
 
-/*********** RC alias *****************/
-
 enum {
     ROLL = 0,
     PITCH,
@@ -20,94 +18,49 @@ enum {
     AUX4
 };
 
-#define ROL_LO (1 << (2 * ROLL))
-#define ROL_CE (3 << (2 * ROLL))
-#define ROL_HI (2 << (2 * ROLL))
-#define PIT_LO (1 << (2 * PITCH))
-#define PIT_CE (3 << (2 * PITCH))
-#define PIT_HI (2 << (2 * PITCH))
-#define YAW_LO (1 << (2 * YAW))
-#define YAW_CE (3 << (2 * YAW))
-#define YAW_HI (2 << (2 * YAW))
-#define THR_LO (1 << (2 * THROTTLE))
-#define THR_CE (3 << (2 * THROTTLE))
-#define THR_HI (2 << (2 * THROTTLE))
-
-// Custom mixer data per motor
-typedef struct motorMixer_t {
-    float throttle;
-    float roll;
-    float pitch;
-    float yaw;
-} motorMixer_t;
-
-// Core runtime settings
-uint8_t useSmallAngle;
-uint8_t armed;
-
-extern int16_t gyroZero[3];
-extern int16_t gyroData[3];
-extern int16_t angle[2];
-extern int16_t axisPID[3];
-extern int16_t rcCommand[4];
-extern int16_t failsafeCnt;
-extern int16_t debug[4];
-extern int16_t gyroADC[3], accADC[3], accSmooth[3], magADC[3];
-extern int32_t accSum[3];
-extern uint16_t acc_1G;
-extern uint32_t accTimeSum;
-extern int accSumCount;
-extern uint32_t currentTime;
-extern uint32_t previousTime;
-extern uint16_t cycleTime;
+extern uint16_t acc1G;
+extern int16_t  accADC[3];
+extern int16_t  accSmooth[3];
+extern int32_t  altHold;
+extern int16_t  angle[2];
+uint8_t         armed;
+extern int16_t  axisPID[3];
 extern uint16_t calibratingA;
-extern uint16_t calibratingB;
 extern uint16_t calibratingG;
-extern int32_t EstAlt;
-extern int32_t AltHold;
-extern int32_t setVelocity;
-extern uint8_t velocityControl;
-extern int32_t errorVelocityI;
-extern int32_t vario;
-extern int16_t throttleAngleCorrection;
-extern int16_t headFreeModeHold;
-extern int16_t heading, magHold;
-extern int16_t motor[4];
-extern int16_t rcData[RC_CHANS];
-extern int16_t telemTemperature1;      // gyro sensor temperature
-
-#define PITCH_LOOKUP_LENGTH 7
-#define THROTTLE_LOOKUP_LENGTH 12
-extern int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
-extern int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
+extern uint16_t cycleTime;
+extern int32_t  estAlt;
+extern int16_t  gyroADC[3];
+extern int16_t  gyroZero[3];
+extern int16_t  gyroData[3];
+extern int16_t  heading;
+extern int16_t  magADC[3];
+extern int16_t  motors[4];
+extern int16_t  rcCommand[4];
+extern int16_t  rcData[RC_CHANS];
+extern int16_t  throttleAngleCorrection;
+uint8_t         useSmallAngle;
+extern int32_t  vario;
 
 extern sensor_t acc;
 extern sensor_t gyro;
 
-// IMU
-void imuInit(void);
-void computeIMU(void);
-void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
+// State
+void stateInit(void);
+void stateComputeAngles(void);
 
 // Sensors
 void sensorsInit(void);
-void ACC_getADC(void);
-void Gyro_getADC(void);
+void sensorsGetAccel(void);
+void sensorsGetGyro(void);
 
-// Output
+// Mixer
 void mixerInit(void);
-void mixerResetMotors(void);
-void writeMotors(void);
-void writeAllMotors(int16_t mc);
-void mixTable(void);
+void mixerWriteMotors(void);
 
-// Serial
-void serialInit(void);
-void serialCom(void);
+// MSP
+void mspInit(void);
+void mspCom(void);
 
-// rxmsp
-void mspInit(rcReadRawDataPtr *callback);
-bool mspFrameComplete(void);
+// Common
+void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
 
-// buzzer
-void systemBeep(bool onoff);

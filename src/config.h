@@ -7,6 +7,8 @@ static const uint8_t CONFIG_AXIS_P[3] = {40, 40, 85};
 static const uint8_t CONFIG_AXIS_I[3] = {30, 30, 45};
 static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 
+#define CONFIG_MAGNETIC_DECLINATION                 0
+
 #define CONFIG_USE_CPPM                             1
 #define CONFIG_HORIZON_MODE                         1
 #define CONFIG_CALIBRATING_GYRO_CYCLES              1000

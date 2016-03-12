@@ -14,7 +14,7 @@
 // then we enter in a normal mode.
 uint16_t calibratingA = 0;      
 uint16_t calibratingG = 0;
-uint16_t acc_1G;          // this is the 1G measured acceleration.
+uint16_t acc1G;          // this is the 1G measured acceleration.
 int16_t heading, magHold;
 
 sensor_t acc;                       // acc access functions
@@ -39,11 +39,11 @@ static void ACC_Common(void)
             accADC[axis] = 0;
             accZero[axis] = 0;
         }
-        // Calculate average, shift Z down by acc_1G
+        // Calculate average, shift Z down by acc1G
         if (calibratingA == 1) {
             accZero[ROLL] = (a[ROLL] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
             accZero[PITCH] = (a[PITCH] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
-            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - acc_1G;
+            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - acc1G;
         }
         calibratingA--;
     }
@@ -53,7 +53,7 @@ static void ACC_Common(void)
     accADC[YAW] -= accZero[YAW];
 }
 
-void ACC_getADC(void)
+void sensorsGetAccel(void)
 {
     acc.read(accADC);
     ACC_Common();
@@ -137,7 +137,7 @@ static void GYRO_Common(void)
 
 void sensorsInit(void)
 {
-    mpu6050_init(false, CONFIG_GYRO_LPF, &acc, &gyro, &acc_1G);
+    mpu6050_init(false, CONFIG_GYRO_LPF, &acc, &gyro, &acc1G);
 
     acc.init(CONFIG_ACC_ALIGN);
 
@@ -145,7 +145,7 @@ void sensorsInit(void)
 }
 
 
-void Gyro_getADC(void)
+void sensorsGetGyro(void)
 {
     // range: +/- 8192; +/- 2000 deg/sec
     gyro.read(gyroADC);
