@@ -65,46 +65,48 @@ static void mspFrameReceive(void)
     rxMspFrameDone = true;
 }
 
-
-void serialize8(uint8_t a)
+static void serialize8(uint8_t a)
 {
     serialWrite(currentPortState->port, a);
     currentPortState->checksum ^= a;
 }
 
-void serialize16(int16_t a)
+static void serialize16(int16_t a)
 {
     serialize8(a & 0xFF);
     serialize8((a >> 8) & 0xFF);
 }
 
-void serialize32(uint32_t a)
+static void serialize32(uint32_t a)
 {
     serialize8(a & 0xFF);
     serialize8((a >> 8) & 0xFF);
     serialize8((a >> 16) & 0xFF);
     serialize8((a >> 24) & 0xFF);
 }
-uint8_t read8(void)
+
+static uint8_t read8(void)
 {
     return currentPortState->inBuf[currentPortState->indRX++] & 0xff;
 }
 
-uint16_t read16(void)
+static uint16_t read16(void)
 {
     uint16_t t = read8();
     t += (uint16_t)read8() << 8;
     return t;
 }
 
-uint32_t read32(void)
+/*
+static uint32_t read32(void)
 {
     uint32_t t = read16();
     t += (uint32_t)read16() << 16;
     return t;
 }
+*/
 
-void headSerialResponse(uint8_t err, uint8_t s)
+static void headSerialResponse(uint8_t err, uint8_t s)
 {
     serialize8('$');
     serialize8('M');
@@ -114,38 +116,26 @@ void headSerialResponse(uint8_t err, uint8_t s)
     serialize8(currentPortState->cmdMSP);
 }
 
-void headSerialReply(uint8_t s)
+static void headSerialReply(uint8_t s)
 {
     headSerialResponse(0, s);
 }
 
-void headSerialError(uint8_t s)
+static void headSerialError(uint8_t s)
 {
     headSerialResponse(1, s);
 }
 
-void tailSerialReply(void)
+static void tailSerialReply(void)
 {
     serialize8(currentPortState->checksum);
 }
 
-void s_struct(uint8_t *cb, uint8_t siz)
+static void s_struct(uint8_t *cb, uint8_t siz)
 {
     headSerialReply(siz);
     while (siz--)
         serialize8(*cb++);
-}
-
-void serializeNames(const char *s)
-{
-    const char *c;
-    for (c = s; *c; c++)
-        serialize8(*c);
-}
-
-void serialInit()
-{
-    ports[0].port = Serial1;
 }
 
 static void evaluateCommand(void)
@@ -233,6 +223,13 @@ static void evaluateCommand(void)
             break;
     }
     tailSerialReply();
+}
+
+// ================================================================================================================
+
+void serialInit()
+{
+    ports[0].port = Serial1;
 }
 
 

@@ -40,7 +40,7 @@ NAZE_SRC =  state.c \
 		   	mixer.c \
 		   	mw.c \
 		   	sensors.c \
-		   	serial.c \
+		   	msp.c \
 		   	utils.c \
 		   	$(BREEZY_DIR)/main.c \
 		   	$(BREEZY_DIR)/printf.c \
