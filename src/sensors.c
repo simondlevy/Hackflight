@@ -15,49 +15,10 @@
 uint16_t calibratingA = 0;      
 uint16_t calibratingG = 0;
 uint16_t acc1G;          // this is the 1G measured acceleration.
-int16_t heading, magHold;
+int16_t heading;
 
 sensor_t acc;                       // acc access functions
 sensor_t gyro;                      // gyro access functions
-sensor_t mag;                       // mag access functions
-
-static int16_t accZero[3];
-
-static void ACC_Common(void)
-{
-    static int32_t a[3];
-    int axis;
-
-    if (calibratingA > 0) {
-        for (axis = 0; axis < 3; axis++) {
-            // Reset a[axis] at start of calibration
-            if (calibratingA == CONFIG_CALIBRATING_ACC_CYCLES)
-                a[axis] = 0;
-            // Sum up CONFIG_CALIBRATING_ACC_CYCLES readings
-            a[axis] += accADC[axis];
-            // Clear global variables for next reading
-            accADC[axis] = 0;
-            accZero[axis] = 0;
-        }
-        // Calculate average, shift Z down by acc1G
-        if (calibratingA == 1) {
-            accZero[ROLL] = (a[ROLL] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
-            accZero[PITCH] = (a[PITCH] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
-            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - acc1G;
-        }
-        calibratingA--;
-    }
-
-    accADC[ROLL] -= accZero[ROLL];
-    accADC[PITCH] -= accZero[PITCH];
-    accADC[YAW] -= accZero[YAW];
-}
-
-void sensorsGetAccel(void)
-{
-    acc.read(accADC);
-    ACC_Common();
-}
 
 typedef struct stdev_t {
     float m_oldM, m_newM, m_oldS, m_newS;
@@ -93,8 +54,57 @@ static float devStandardDeviation(stdev_t *dev)
     return sqrtf(devVariance(dev));
 }
 
-static void GYRO_Common(void)
+// ==============================================================================================================
+
+void sensorsInit(void)
 {
+    mpu6050_init(false, CONFIG_GYRO_LPF, &acc, &gyro, &acc1G);
+
+    acc.init(CONFIG_ACC_ALIGN);
+
+    gyro.init(CONFIG_GYRO_ALIGN);
+}
+
+void sensorsGetAccel(void)
+{
+    static int16_t accZero[3];
+
+    acc.read(accADC);
+
+    static int32_t a[3];
+    int axis;
+
+    if (calibratingA > 0) {
+        for (axis = 0; axis < 3; axis++) {
+            // Reset a[axis] at start of calibration
+            if (calibratingA == CONFIG_CALIBRATING_ACC_CYCLES)
+                a[axis] = 0;
+            // Sum up CONFIG_CALIBRATING_ACC_CYCLES readings
+            a[axis] += accADC[axis];
+            // Clear global variables for next reading
+            accADC[axis] = 0;
+            accZero[axis] = 0;
+        }
+        // Calculate average, shift Z down by acc1G
+        if (calibratingA == 1) {
+            accZero[ROLL] = (a[ROLL] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
+            accZero[PITCH] = (a[PITCH] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
+            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - acc1G;
+        }
+        calibratingA--;
+    }
+
+    accADC[ROLL] -= accZero[ROLL];
+    accADC[PITCH] -= accZero[PITCH];
+    accADC[YAW] -= accZero[YAW];
+}
+
+
+void sensorsGetGyro(void)
+{
+    // range: +/- 8192; +/- 2000 deg/sec
+    gyro.read(gyroADC);
+
     int axis;
     static int32_t g[3];
     static stdev_t var[3];
@@ -131,25 +141,6 @@ static void GYRO_Common(void)
     }
     for (axis = 0; axis < 3; axis++)
         gyroADC[axis] -= gyroZero[axis];
-}
-
-// ==============================================================================================================
-
-void sensorsInit(void)
-{
-    mpu6050_init(false, CONFIG_GYRO_LPF, &acc, &gyro, &acc1G);
-
-    acc.init(CONFIG_ACC_ALIGN);
-
-    gyro.init(CONFIG_GYRO_ALIGN);
-}
-
-
-void sensorsGetGyro(void)
-{
-    // range: +/- 8192; +/- 2000 deg/sec
-    gyro.read(gyroADC);
-    GYRO_Common();
 }
 
 void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
@@ -199,3 +190,5 @@ void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
             break;
     }
 }
+
+
