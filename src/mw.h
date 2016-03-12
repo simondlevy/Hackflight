@@ -42,15 +42,6 @@ typedef struct motorMixer_t {
 } motorMixer_t;
 
 // Core runtime settings
-typedef struct core_t {
-    serialPort_t *mainport;
-    serialPort_t *flexport;
-    serialPort_t *gpsport;
-    serialPort_t *telemport;
-    serialPort_t *rcvrport;
-    uint8_t numRCChannels;                  // number of rc channels as reported by current input driver
-} core_t;
-
 uint8_t useSmallAngle;
 uint8_t armed;
 
@@ -90,7 +81,6 @@ extern int16_t telemTemperature1;      // gyro sensor temperature
 extern int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
 extern int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
-extern core_t core;
 extern sensor_t acc;
 extern sensor_t gyro;
 
@@ -112,7 +102,7 @@ void writeAllMotors(int16_t mc);
 void mixTable(void);
 
 // Serial
-void serialInit(uint32_t baudrate);
+void serialInit(void);
 void serialCom(void);
 
 // rxmsp

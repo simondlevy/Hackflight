@@ -335,7 +335,7 @@ void setup(void)
     imuInit(); 
     mixerInit(); 
 
-    serialInit(CONFIG_SERIAL_BAUDRATE);
+    serialInit();
 
     pwmInit(CONFIG_USE_CPPM, CONFIG_PWM_FILTER, CONFIG_FAST_PWM, CONFIG_MOTOR_PWM_RATE, CONFIG_PWM_IDLE_PULSE);
 
@@ -344,7 +344,6 @@ void setup(void)
     for (i = 0; i < RC_CHANS; i++)
         rcData[i] = 1502;
     rcReadRawFunc = pwmReadRawRC;
-    core.numRCChannels = MAX_INPUTS;
 
     previousTime = micros();
     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
