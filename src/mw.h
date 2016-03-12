@@ -90,7 +90,7 @@ void computeIMU(void);
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
 
 // Sensors
-bool sensorsAutodetect(void);
+void sensorsInit(void);
 void ACC_getADC(void);
 void Gyro_getADC(void);
 

@@ -1,22 +1,20 @@
-/*
- * This file is part of baseflight
- * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
- */
-#include "board.h"
+#include <breezystm32.h>
+
 #include "mw.h"
 #include "config.h"
+#include "utils.h"
 
-int16_t debug[4];
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
+
+#define I2C_DEVICE (I2CDEV_2)
+
 uint32_t currentTime = 0;
 uint32_t previousTime = 0;
 uint16_t cycleTime = 0;         
 // this is the number in micro second to achieve a full loop, it can differ a little and is taken into 
 // account in the PID loop
 
-uint16_t vbat;                  // battery voltage in 0.1V steps
-int32_t amperage;               // amperage read by current sensor in centiampere (1/100th A)
-int32_t mAhdrawn;              // milliampere hours drawn from the battery since start
-int16_t telemTemperature1;      // gyro sensor temperature
 
 int16_t failsafeCnt = 0;
 int16_t failsafeEvents = 0;
@@ -40,8 +38,6 @@ uint8_t batteryCellCount = 3;       // cell count
 uint16_t batteryWarningVoltage;     // slow buzzer after this one, recommended 80% of battery used. Time to land.
 uint16_t batteryCriticalVoltage;    // annoying buzzer after this one, battery is going to be dead.
 
-int hw_revision = 0;
-
 // Time of automatic disarm when "Don't spin the motors when armed" is enabled.
 static uint32_t disarmTime = 0;
 
@@ -55,7 +51,7 @@ static void update_timed_task(uint32_t * usec, uint32_t period)
     *usec = currentTime + period;
 }
 
-bool check_and_update_timed_task(uint32_t * usec, uint32_t period) 
+static bool check_and_update_timed_task(uint32_t * usec, uint32_t period) 
 {
 
     bool result = (int32_t)(currentTime - *usec) >= 0;
@@ -66,20 +62,7 @@ bool check_and_update_timed_task(uint32_t * usec, uint32_t period)
     return result;
 }
 
-void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
-{
-    uint8_t i, r;
-
-    for (r = 0; r < repeat; r++) {
-        for (i = 0; i < num; i++) {
-            LED0_TOGGLE;            // switch LEDPIN state
-            delay(wait);
-        }
-        delay(60);
-    }
-}
-
-void annexCode(void)
+static void annexCode(void)
 {
     static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
@@ -158,19 +141,14 @@ void annexCode(void)
     }
 
     serialCom();
-
-    // Read out gyro temperature. can use it for something somewhere. maybe get MCU temperature instead? 
-    // lots of fun possibilities.
-    if (gyro.temperature)
-        gyro.temperature(&telemTemperature1);
 }
 
-uint16_t pwmReadRawRC(uint8_t chan)
+static uint16_t pwmReadRawRC(uint8_t chan)
 {
     return pwmRead(CONFIG_RCMAP[chan]);
 }
 
-void computeRC(void)
+static void computeRC(void)
 {
     uint16_t capture;
     int i, chan;
@@ -278,15 +256,6 @@ static void pidMultiWii(void)
 void setup(void)
 {
     uint8_t i;
-    bool sensorsOK = false;
-    extern uint32_t hse_value;
-
-    // determine hardware revision based on clock frequency
-    if (hse_value == 8000000)
-        hw_revision = NAZE32;
-    else if (hse_value == 12000000)
-        hw_revision = NAZE32_REV5;
-
 
     // sleep for 100ms
     delay(100);
@@ -307,20 +276,11 @@ void setup(void)
             lookupThrottleRC[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
     }
 
-    if (spiInit() == SPI_DEVICE_MPU && hw_revision == NAZE32_REV5)
-        hw_revision = NAZE32_SP;
+    i2cInit(I2C_DEVICE);
 
-    if (hw_revision != NAZE32_SP)
-        i2cInit(I2C_DEVICE);
+    adcInit(false);
 
-    adcInit(hw_revision >= NAZE32_REV5);
-
-    // drop out any sensors that don't seem to work, init all the others. halt if gyro is dead.
-    sensorsOK = sensorsAutodetect();
-
-    // if gyro was not detected due to whatever reason, we give up now.
-    if (!sensorsOK)
-        failureMode(3);
+    sensorsInit();
 
     LED1_ON;
     LED0_OFF;
@@ -355,7 +315,6 @@ void setup(void)
 
 void loop(void)
 {
-
     static uint8_t rcDelayCommand;      // this indicates the number of time (multiple of RC measurement at 50Hz) 
     // the sticks must be maintained to run or switch off motors
     static uint8_t rcSticks;            // this hold sticks position for command combos
@@ -481,5 +440,18 @@ void loop(void)
         pid_controller();
         mixTable();
         writeMotors();
+    }
+}
+
+void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
+{
+    uint8_t i, r;
+
+    for (r = 0; r < repeat; r++) {
+        for (i = 0; i < num; i++) {
+            LED0_TOGGLE;            // switch LEDPIN state
+            delay(wait);
+        }
+        delay(60);
     }
 }

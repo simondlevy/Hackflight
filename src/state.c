@@ -1,6 +1,11 @@
-#include "board.h"
+
+#include <breezystm32.h>
+
 #include "mw.h"
 #include "config.h"
+
+#include <math.h>
+#define RAD    (M_PI / 180.0f)
 
 int16_t gyroADC[3], accADC[3], accSmooth[3], magADC[3];
 int32_t accSum[3];

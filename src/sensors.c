@@ -3,9 +3,12 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include "board.h"
+#include <breezystm32.h>
+
 #include "mw.h"
 #include "config.h"
+
+#include <math.h>
 
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.
@@ -19,22 +22,6 @@ sensor_t gyro;                      // gyro access functions
 sensor_t mag;                       // mag access functions
 
 static int16_t accZero[3];
-
-bool sensorsAutodetect(void)
-{
-    extern int hw_revision;
-
-    // Autodetect Invensense acc/gyro hardware
-    mpu6050_init(hw_revision >= NAZE32_REV5, CONFIG_GYRO_LPF, &acc, &gyro, &acc_1G);
-
-    // Now time to init things, acc first
-    acc.init(CONFIG_ACC_ALIGN);
-
-    // this is safe because either mpu6050 or mpu3050 or lg3d20 sets it, and in case of fail, we never get here.
-    gyro.init(CONFIG_GYRO_ALIGN);
-
-    return true;
-}
 
 static void ACC_Common(void)
 {
@@ -146,9 +133,69 @@ static void GYRO_Common(void)
         gyroADC[axis] -= gyroZero[axis];
 }
 
+// ==============================================================================================================
+
+void sensorsInit(void)
+{
+    mpu6050_init(false, CONFIG_GYRO_LPF, &acc, &gyro, &acc_1G);
+
+    acc.init(CONFIG_ACC_ALIGN);
+
+    gyro.init(CONFIG_GYRO_ALIGN);
+}
+
+
 void Gyro_getADC(void)
 {
     // range: +/- 8192; +/- 2000 deg/sec
     gyro.read(gyroADC);
     GYRO_Common();
+}
+
+void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
+{
+    switch (rotation) {
+        case CW0_DEG:
+            dest[X] = src[X];
+            dest[Y] = src[Y];
+            dest[Z] = src[Z];
+            break;
+        case CW90_DEG:
+            dest[X] = src[Y];
+            dest[Y] = -src[X];
+            dest[Z] = src[Z];
+            break;
+        case CW180_DEG:
+            dest[X] = -src[X];
+            dest[Y] = -src[Y];
+            dest[Z] = src[Z];
+            break;
+        case CW270_DEG:
+            dest[X] = -src[Y];
+            dest[Y] = src[X];
+            dest[Z] = src[Z];
+            break;
+        case CW0_DEG_FLIP:
+            dest[X] = -src[X];
+            dest[Y] = src[Y];
+            dest[Z] = -src[Z];
+            break;
+        case CW90_DEG_FLIP:
+            dest[X] = src[Y];
+            dest[Y] = src[X];
+            dest[Z] = -src[Z];
+            break;
+        case CW180_DEG_FLIP:
+            dest[X] = src[X];
+            dest[Y] = -src[Y];
+            dest[Z] = -src[Z];
+            break;
+        case CW270_DEG_FLIP:
+            dest[X] = -src[Y];
+            dest[Y] = -src[X];
+            dest[Z] = -src[Z];
+            break;
+        default:
+            break;
+    }
 }
