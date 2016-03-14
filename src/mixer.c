@@ -7,7 +7,6 @@
 
 #include "mw.h"
 #include "config.h"
-#include "utils.h"
 
 // Custom mixer data per motor
 typedef struct motorMixer_t {

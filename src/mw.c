@@ -2,7 +2,6 @@
 
 #include "mw.h"
 #include "config.h"
-#include "utils.h"
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
@@ -467,4 +466,14 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
         }
         delay(60);
     }
+}
+
+int constrain(int amt, int low, int high)
+{
+    if (amt < low)
+        return low;
+    else if (amt > high)
+        return high;
+    else
+        return amt;
 }

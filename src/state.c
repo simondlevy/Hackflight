@@ -189,9 +189,9 @@ static void getEstimatedAttitude(void)
     static uint32_t previousT;
     uint32_t currentT = micros();
     uint32_t deltaT;
-    float scale, deltaGyroAngle[3];
+    float deltaGyroAngle[3];
     deltaT = currentT - previousT;
-    scale = deltaT * gyro.scale;
+    float scale = deltaT * gyroScale;
     previousT = currentT;
 
     // Initialization
