@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #define RC_CHANS    (18)
 
 enum {

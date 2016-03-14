@@ -1,12 +1,8 @@
-/*
- * This file is part of baseflight
- * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
- */
-
-#include <breezystm32.h>
-
 #include "mw.h"
-#include "config.h"
+#include "board.h"
+#include "config.h" 
+
+#define abs(x) ((x) > 0 ? (x) : -(x))
 
 // Custom mixer data per motor
 typedef struct motorMixer_t {
@@ -67,5 +63,5 @@ void mixerWriteMotors(void)
     }
 
     for (i = 0; i < 4; i++)
-        pwmWriteMotor(i, motors[i]);
+        board_writeMotor(i, motors[i]);
 }

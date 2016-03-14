@@ -41,6 +41,7 @@ STM32_SRC = state.c \
 		   	mw.c \
 		   	sensors.c \
 		   	msp.c \
+			stm32.c \
 		   	$(BREEZY_DIR)/main.c \
 		   	$(BREEZY_DIR)/printf.c \
 		   	$(BREEZY_DIR)/drv_system.c \
