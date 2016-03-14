@@ -9,6 +9,8 @@
 
 #define RC_CHANS    (18)
 
+#define abs(x) ((x) > 0 ? (x) : -(x))
+
 enum {
     ROLL = 0,
     PITCH,
@@ -80,7 +82,6 @@ void mixerInit(void);
 void mixerWriteMotors(void);
 
 // MSP
-void mspInit(void);
 void mspCom(void);
 
 // Common

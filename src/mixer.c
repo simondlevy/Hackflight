@@ -2,7 +2,6 @@
 #include "board.h"
 #include "config.h" 
 
-#define abs(x) ((x) > 0 ? (x) : -(x))
 
 // Custom mixer data per motor
 typedef struct motorMixer_t {

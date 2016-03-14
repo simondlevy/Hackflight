@@ -1,10 +1,10 @@
 
-#include <breezystm32.h>
-
 #include "mw.h"
 #include "config.h"
+#include "board.h"
 
 #include <math.h>
+
 #define RAD    (M_PI / 180.0f)
 
 int16_t accADC[3];
@@ -187,7 +187,7 @@ static void getEstimatedAttitude(void)
     static t_fp_vector EstN = { .A = { 1.0f, 0.0f, 0.0f } };
     static float accLPF[3];
     static uint32_t previousT;
-    uint32_t currentT = micros();
+    uint32_t currentT = board_getMicros();
     uint32_t deltaT;
     float deltaGyroAngle[3];
     deltaT = currentT - previousT;

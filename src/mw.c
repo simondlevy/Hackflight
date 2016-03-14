@@ -2,6 +2,7 @@
 
 #include "mw.h"
 #include "config.h"
+#include "board.h"
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
@@ -307,8 +308,6 @@ void setup(void)
     stateInit(); 
     mixerInit(); 
 
-    mspInit();
-
     pwmInit(CONFIG_USE_CPPM, CONFIG_PWM_FILTER, CONFIG_FAST_PWM, CONFIG_MOTOR_PWM_RATE, CONFIG_PWM_IDLE_PULSE);
 
     // configure PWM/CPPM read function and max number of channels
@@ -317,7 +316,7 @@ void setup(void)
         rcData[i] = 1502;
     rcReadRawFunc = pwmReadRawRC;
 
-    previousTime = micros();
+    previousTime = board_getMicros();
     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
     // 10 seconds init_delay + 200 * 25 ms = 15 seconds before ground pressure settles
 
@@ -431,14 +430,14 @@ void loop(void)
         }
     }
     
-    currentTime = micros();
+    currentTime = board_getMicros();
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
         stateComputeAngles();
 
         // Measure loop rate just afer reading the sensors
-        currentTime = micros();
+        currentTime = board_getMicros();
         cycleTime = (int32_t)(currentTime - previousTime);
         previousTime = currentTime;
 

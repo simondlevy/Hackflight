@@ -3,10 +3,10 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include <breezystm32.h>
 
 #include "mw.h"
 #include "config.h"
+#include "board.h"
 
 // Multiwii Serial Protocol 0
 #define MSP_STATUS               101    //out message         cycletime & errors_count & sensor present & box activation & current setting number
@@ -29,8 +29,6 @@
 
 #define INBUF_SIZE 128
 
-extern serialPort_t *  Serial1;
-
 // from mixer.c
 extern int16_t motor_disarmed[4];
 // cause reboot after MSP processing complete
@@ -46,7 +44,6 @@ typedef enum serialState_t {
 } serialState_t;
 
 typedef  struct mspPortState_t {
-    serialPort_t *port;
     uint8_t checksum;
     uint8_t indRX;
     uint8_t inBuf[INBUF_SIZE];
@@ -56,8 +53,7 @@ typedef  struct mspPortState_t {
     serialState_t c_state;
 } mspPortState_t;
 
-static mspPortState_t ports[2];
-static mspPortState_t *currentPortState = &ports[0];
+static mspPortState_t portState;
 
 static bool rxMspFrameDone = false;
 
@@ -68,8 +64,8 @@ static void mspFrameReceive(void)
 
 static void serialize8(uint8_t a)
 {
-    serialWrite(currentPortState->port, a);
-    currentPortState->checksum ^= a;
+    board_serialWrite(a);
+    portState.checksum ^= a;
 }
 
 static void serialize16(int16_t a)
@@ -88,7 +84,7 @@ static void serialize32(uint32_t a)
 
 static uint8_t read8(void)
 {
-    return currentPortState->inBuf[currentPortState->indRX++] & 0xff;
+    return portState.inBuf[portState.indRX++] & 0xff;
 }
 
 static uint16_t read16(void)
@@ -112,9 +108,9 @@ static void headSerialResponse(uint8_t err, uint8_t s)
     serialize8('$');
     serialize8('M');
     serialize8(err ? '!' : '>');
-    currentPortState->checksum = 0;               // start calculating a new checksum
+    portState.checksum = 0;               // start calculating a new checksum
     serialize8(s);
-    serialize8(currentPortState->cmdMSP);
+    serialize8(portState.cmdMSP);
 }
 
 static void headSerialReply(uint8_t s)
@@ -129,7 +125,7 @@ static void headSerialError(uint8_t s)
 
 static void tailSerialReply(void)
 {
-    serialize8(currentPortState->checksum);
+    serialize8(portState.checksum);
 }
 
 static void s_struct(uint8_t *cb, uint8_t siz)
@@ -144,7 +140,7 @@ static void evaluateCommand(void)
     uint32_t i;
     const char *build = __DATE__;
 
-    switch (currentPortState->cmdMSP) {
+    switch (portState.cmdMSP) {
 
         case MSP_SET_RAW_RC:
             for (i = 0; i < 8; i++)
@@ -162,9 +158,9 @@ static void evaluateCommand(void)
         case MSP_STATUS:
             headSerialReply(11);
             serialize16(cycleTime);
-            serialize16(i2cGetErrorCounter());
+            serialize16(board_getI2cErrorCounter());
             serialize16(0);
-           serialize8(0);
+            serialize8(0);
             break;
 
         case MSP_RAW_IMU:
@@ -228,61 +224,53 @@ static void evaluateCommand(void)
 
 // ================================================================================================================
 
-void mspInit()
-{
-    ports[0].port = Serial1;
-}
-
-
 void mspCom(void)
 {
     uint8_t c;
 
-    currentPortState = &ports[0];
+    board_checkReboot(pendReboot);
 
-    if (pendReboot)
-        systemReset(false); // noreturn
+    while (board_serialAvailable()) {
 
-    while (serialTotalBytesWaiting(currentPortState->port)) {
-        c = serialRead(currentPortState->port);
+        c = board_serialRead();
 
-        if (currentPortState->c_state == IDLE) {
-            currentPortState->c_state = (c == '$') ? HEADER_START : IDLE;
-            if (currentPortState->c_state == IDLE && !armed) {
+        if (portState.c_state == IDLE) {
+            portState.c_state = (c == '$') ? HEADER_START : IDLE;
+            if (portState.c_state == IDLE && !armed) {
                 if (c == '#')
                     ;
                 else if (c == CONFIG_REBOOT_CHARACTER) 
-                    systemReset(true);      // reboot to bootloader
+                    board_reboot();
             }
-        } else if (currentPortState->c_state == HEADER_START) {
-            currentPortState->c_state = (c == 'M') ? HEADER_M : IDLE;
-        } else if (currentPortState->c_state == HEADER_M) {
-            currentPortState->c_state = (c == '<') ? HEADER_ARROW : IDLE;
-        } else if (currentPortState->c_state == HEADER_ARROW) {
+        } else if (portState.c_state == HEADER_START) {
+            portState.c_state = (c == 'M') ? HEADER_M : IDLE;
+        } else if (portState.c_state == HEADER_M) {
+            portState.c_state = (c == '<') ? HEADER_ARROW : IDLE;
+        } else if (portState.c_state == HEADER_ARROW) {
             if (c > INBUF_SIZE) {       // now we are expecting the payload size
-                currentPortState->c_state = IDLE;
+                portState.c_state = IDLE;
                 continue;
             }
-            currentPortState->dataSize = c;
-            currentPortState->offset = 0;
-            currentPortState->checksum = 0;
-            currentPortState->indRX = 0;
-            currentPortState->checksum ^= c;
-            currentPortState->c_state = HEADER_SIZE;      // the command is to follow
-        } else if (currentPortState->c_state == HEADER_SIZE) {
-            currentPortState->cmdMSP = c;
-            currentPortState->checksum ^= c;
-            currentPortState->c_state = HEADER_CMD;
-        } else if (currentPortState->c_state == HEADER_CMD && 
-                currentPortState->offset < currentPortState->dataSize) {
-            currentPortState->checksum ^= c;
-            currentPortState->inBuf[currentPortState->offset++] = c;
-        } else if (currentPortState->c_state == HEADER_CMD && 
-                currentPortState->offset >= currentPortState->dataSize) {
-            if (currentPortState->checksum == c) {        // compare calculated and transferred checksum
+            portState.dataSize = c;
+            portState.offset = 0;
+            portState.checksum = 0;
+            portState.indRX = 0;
+            portState.checksum ^= c;
+            portState.c_state = HEADER_SIZE;      // the command is to follow
+        } else if (portState.c_state == HEADER_SIZE) {
+            portState.cmdMSP = c;
+            portState.checksum ^= c;
+            portState.c_state = HEADER_CMD;
+        } else if (portState.c_state == HEADER_CMD && 
+                portState.offset < portState.dataSize) {
+            portState.checksum ^= c;
+            portState.inBuf[portState.offset++] = c;
+        } else if (portState.c_state == HEADER_CMD && 
+                portState.offset >= portState.dataSize) {
+            if (portState.checksum == c) {        // compare calculated and transferred checksum
                 evaluateCommand();      // we got a valid packet, evaluate it
             }
-            currentPortState->c_state = IDLE;
+            portState.c_state = IDLE;
         }
     }
 }
