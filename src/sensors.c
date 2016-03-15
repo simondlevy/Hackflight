@@ -3,10 +3,9 @@
  * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
  */
 
-#include <breezystm32.h>
-
 #include "mw.h"
 #include "config.h"
+#include "board.h"
 
 #include <math.h>
 
@@ -109,13 +108,13 @@ static void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
 
 void sensorsInit(void)
 {
-    mpu6050_init(false, CONFIG_GYRO_LPF, &acc1G, &gyroScale);
+    board_imuInit(CONFIG_GYRO_LPF, &acc1G, &gyroScale);
 }
 
 void sensorsGetAccel(void)
 {
     static int16_t data[3];
-    mpu6050_read_accel(data);
+    board_imuReadAccel(data);
     alignSensors(data, accADC, accAlign);
 
     static int16_t accZero[3];
@@ -153,7 +152,7 @@ void sensorsGetGyro(void)
     // range: +/- 8192; +/- 2000 deg/sec
 
     static int16_t data[3];
-    mpu6050_read_gyro(data);
+    board_imuReadGyro(data);
     alignSensors(data, gyroADC, gyroAlign);
 
     int axis;

@@ -4,6 +4,21 @@
 
 extern serialPort_t * Serial1;
 
+void board_imuInit(uint8_t lpf, uint16_t * acc1G, float * gyroScale)
+{
+    mpu6050_init(false, lpf, acc1G, gyroScale);
+}
+
+void board_imuReadAccel(int16_t * data)
+{
+    mpu6050_read_accel(data);
+}
+
+void board_imuReadGyro(int16_t * data)
+{
+    mpu6050_read_gyro(data);
+}
+
 void board_checkReboot(bool pendReboot)
 {
     if (pendReboot)
