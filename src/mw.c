@@ -1,5 +1,3 @@
-#include <breezystm32.h>
-
 #include "mw.h"
 #include "config.h"
 #include "board.h"
@@ -157,11 +155,8 @@ static void computeRC(void)
 
     for (chan = 0; chan < 8; chan++) {
     
-        capture = board_pwmRead(CONFIG_RCMAP[chan]);
-
-        // validate input
-        if (capture < PULSE_MIN || capture > PULSE_MAX)
-            capture = CONFIG_MIDRC;
+        // get RC PWM, defaulting to CONFIG_MIDRC if out-of-bounds
+        capture = board_pwmRead(CONFIG_RCMAP[chan], CONFIG_MIDRC);
 
         rcDataAverage[chan][rcAverageIndex % 4] = capture;
 
@@ -260,7 +255,7 @@ void setup(void)
     uint8_t i;
 
     // sleep for 100ms
-    delay(100);
+    board_delayMilliseconds(100);
 
     for (i = 0; i < PITCH_LOOKUP_LENGTH; i++)
         lookupPitchRollRC[i] = (2500 + CONFIG_RC_EXPO_8 * (i * i - 25)) * i * (int32_t)CONFIG_RC_RATE_8 / 2500;
@@ -280,8 +275,6 @@ void setup(void)
 
     board_i2cInit();
 
-    //adcInit(false);
-
     sensorsInit();
 
     board_led1On();
@@ -289,7 +282,7 @@ void setup(void)
     for (i = 0; i < 10; i++) {
         board_led1Toggle();
         board_led0Toggle();
-        delay(50);
+        board_delayMilliseconds(50);
     }
     board_led0Off();
     board_led1Off();
@@ -449,9 +442,9 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
     for (r = 0; r < repeat; r++) {
         for (i = 0; i < num; i++) {
             board_led0Toggle();            // switch LEDPIN state
-            delay(wait);
+            board_delayMilliseconds(wait);
         }
-        delay(60);
+        board_delayMilliseconds(60);
     }
 }
 

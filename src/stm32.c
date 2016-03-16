@@ -16,6 +16,11 @@ void board_checkReboot(bool pendReboot)
         systemReset(false); // noreturn
 }
 
+void board_delayMilliseconds(uint32_t msec)
+{
+    delay(msec);
+}
+
 uint16_t board_getI2cErrorCounter(void)
 {
     return i2cGetErrorCounter();
@@ -81,9 +86,9 @@ void board_pwmInit(void)
     pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 }
 
-uint16_t board_pwmRead(uint8_t chan)
+uint16_t board_pwmRead(uint8_t chan, uint16_t oob_default)
 {
-    return pwmRead(chan);
+    return pwmRead(chan, oob_default);
 }
 
 void board_reboot(void)
