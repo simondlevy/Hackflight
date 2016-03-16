@@ -20,11 +20,9 @@
 #define THR_CE (3 << (2 * THROTTLE))
 #define THR_HI (2 << (2 * THROTTLE))
 
-uint16_t cycleTime = 0;         
 // this is the number in micro second to achieve a full loop, it can differ a little and is taken into 
 // account in the PID loop
-
-
+uint16_t cycleTime = 0;         
 
 int16_t rcData[RC_CHANS];       // interval [1000;2000]
 int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
@@ -164,7 +162,9 @@ static void computeRC(void)
         // validate input
         if (capture < PULSE_MIN || capture > PULSE_MAX)
             capture = CONFIG_MIDRC;
+
         rcDataAverage[chan][rcAverageIndex % 4] = capture;
+
         // clear this since we're not accessing it elsewhere. saves a temp var
         rcData[chan] = 0;
         for (i = 0; i < 4; i++)
@@ -280,7 +280,7 @@ void setup(void)
 
     board_i2cInit();
 
-    adcInit(false);
+    //adcInit(false);
 
     sensorsInit();
 
