@@ -25,6 +25,11 @@ void board_checkReboot(bool pendReboot)
         systemReset(false); // noreturn
 }
 
+uint16_t board_pwmRead(uint8_t chan)
+{
+    return pwmRead(chan);
+}
+
 void board_reboot(void)
 {
     systemReset(true);      // reboot to bootloader

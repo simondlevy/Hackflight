@@ -159,7 +159,7 @@ static void computeRC(void)
 
     for (chan = 0; chan < 8; chan++) {
     
-        capture = pwmRead(CONFIG_RCMAP[chan]);
+        capture = board_pwmRead(CONFIG_RCMAP[chan]);
 
         // validate input
         if (capture < PULSE_MIN || capture > PULSE_MAX)

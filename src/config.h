@@ -67,4 +67,4 @@ static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 
 static const uint8_t CONFIG_ROLL_PITCH_RATE[2] = {0, 0};
 static const int16_t CONFIG_ANGLE_TRIM[2]      = {0, 0};
-static const int     CONFIG_RCMAP[8]           = {0, 1, 3, 2, 4, 5, 6, 7};
+static const uint8_t CONFIG_RCMAP[8]           = {0, 1, 3, 2, 4, 5, 6, 7};
