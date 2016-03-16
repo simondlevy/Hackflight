@@ -127,18 +127,18 @@ static void annexCode(void)
             lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
 
     if (calibratingA > 0 || calibratingG > 0) {      // Calibration phasis
-        LED0_TOGGLE;
+        board_led0Toggle();
     } else {
         if (accCalibrated)
-            LED0_OFF;
+            board_led0Off();
         if (armed)
-            LED0_ON;
+            board_led0On();
     }
 
     if (check_timed_task(calibratedAccTime)) {
         if (!useSmallAngle) {
             accCalibrated = 0; // the multi uses ACC and is not calibrated or is too much inclinated
-            LED0_TOGGLE;
+            board_led0Toggle();
             update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC);
             //calibratedAccTime = currentTime + CONFIG_CALIBRATE_ACCTIME_USEC;
         } else {
@@ -284,15 +284,15 @@ void setup(void)
 
     sensorsInit();
 
-    LED1_ON;
-    LED0_OFF;
+    board_led1On();
+    board_led0Off();
     for (i = 0; i < 10; i++) {
-        LED1_TOGGLE;
-        LED0_TOGGLE;
+        board_led1Toggle();
+        board_led0Toggle();
         delay(50);
     }
-    LED0_OFF;
-    LED1_OFF;
+    board_led0Off();
+    board_led1Off();
 
     stateInit(); 
     mixerInit(); 
@@ -448,7 +448,7 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
 
     for (r = 0; r < repeat; r++) {
         for (i = 0; i < num; i++) {
-            LED0_TOGGLE;            // switch LEDPIN state
+            board_led0Toggle();            // switch LEDPIN state
             delay(wait);
         }
         delay(60);
