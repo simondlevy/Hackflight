@@ -30,7 +30,6 @@ uint16_t cycleTime = 0;
 
 int16_t rcData[RC_CHANS];       // interval [1000;2000]
 int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
-rcReadRawDataPtr rcReadRawFunc = NULL;  // receive data from default (pwm/ppm) or additional 
 
 static uint32_t currentTime;
 static uint32_t previousTime;
@@ -170,7 +169,8 @@ static void computeRC(void)
     static int rcAverageIndex = 0;
 
     for (chan = 0; chan < 8; chan++) {
-        capture = rcReadRawFunc(chan);
+
+        capture = pwmReadRawRC(chan);
 
         // validate input
         if (capture < PULSE_MIN || capture > PULSE_MAX)
@@ -314,7 +314,6 @@ void setup(void)
     // these, if enabled
     for (i = 0; i < RC_CHANS; i++)
         rcData[i] = 1502;
-    rcReadRawFunc = pwmReadRawRC;
 
     previousTime = board_getMicros();
     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
