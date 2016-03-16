@@ -20,8 +20,6 @@
 #define THR_CE (3 << (2 * THROTTLE))
 #define THR_HI (2 << (2 * THROTTLE))
 
-#define I2C_DEVICE (I2CDEV_2)
-
 uint16_t cycleTime = 0;         
 // this is the number in micro second to achieve a full loop, it can differ a little and is taken into 
 // account in the PID loop
@@ -285,7 +283,7 @@ void setup(void)
             lookupThrottleRC[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
     }
 
-    i2cInit(I2C_DEVICE);
+    board_i2cInit();
 
     adcInit(false);
 

@@ -41,6 +41,11 @@ uint32_t board_getMicros()
     return micros();
 }
 
+void board_i2cInit(void)
+{
+    i2cInit(I2CDEV_2);
+}
+
 bool board_serialAvailable(void)
 {
     return serialTotalBytesWaiting(Serial1) > 0;
