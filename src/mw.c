@@ -149,11 +149,6 @@ static void annexCode(void)
     mspCom();
 }
 
-static uint16_t pwmReadRawRC(uint8_t chan)
-{
-    return pwmRead(CONFIG_RCMAP[chan]);
-}
-
 static void computeRC(void)
 {
     uint16_t capture;
@@ -163,8 +158,8 @@ static void computeRC(void)
     static int rcAverageIndex = 0;
 
     for (chan = 0; chan < 8; chan++) {
-
-        capture = pwmReadRawRC(chan);
+    
+        capture = pwmRead(CONFIG_RCMAP[chan]);
 
         // validate input
         if (capture < PULSE_MIN || capture > PULSE_MAX)
