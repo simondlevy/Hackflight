@@ -2,6 +2,12 @@
 
 #include "board.h"
 
+#define USE_CPPM                             1
+#define PWM_FILTER                           0     /* 0 or 1 */
+#define FAST_PWM                             0     /* 0 or 1 */
+#define MOTOR_PWM_RATE                       400
+#define PWM_IDLE_PULSE                       1000  /* standard PWM in usec for brushless ESC */
+
 extern serialPort_t * Serial1;
 
 void board_imuInit(uint8_t lpf, uint16_t * acc1G, float * gyroScale)
@@ -23,6 +29,11 @@ void board_checkReboot(bool pendReboot)
 {
     if (pendReboot)
         systemReset(false); // noreturn
+}
+
+void board_pwmInit(void)
+{
+    pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 }
 
 uint16_t board_pwmRead(uint8_t chan)
