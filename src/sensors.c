@@ -11,11 +11,11 @@
 
 // The calibration is done is the main loop. Calibrating decreases at each cycle down to 0, 
 // then we enter in a normal mode.
-uint16_t acc1G;          // this is the 1G measured acceleration.
-uint16_t calibratingA = 0;      
-uint16_t calibratingG = 0;
-int16_t  heading;
-float    gyroScale;
+//uint16_t acc1G;          // this is the 1G measured acceleration.
+//uint16_t calibratingA = 0;      
+//uint16_t calibratingG = 0;
+//int16_t  heading;
+//float    gyroScale;
 
 // Default orientation
 static sensor_align_e gyroAlign = CW0_DEG;

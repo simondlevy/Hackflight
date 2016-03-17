@@ -2,6 +2,8 @@
 #include "board.h"
 #include "config.h" 
 
+//int16_t motors[4];
+//int16_t motor_disarmed[4];
 
 // Custom mixer data per motor
 typedef struct motorMixer_t {
@@ -11,9 +13,6 @@ typedef struct motorMixer_t {
     float yaw;
 } motorMixer_t;
 
-
-int16_t motors[4];
-int16_t motor_disarmed[4];
 
 static const motorMixer_t mixerQuadX[] = {
     { 1.0f, -1.0f,  1.0f, -1.0f },          // REAR_R

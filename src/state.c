@@ -7,6 +7,7 @@
 
 #define RAD    (M_PI / 180.0f)
 
+/*
 int16_t accADC[3];
 int16_t accSmooth[3];
 int32_t altHold;
@@ -16,14 +17,15 @@ int16_t gyroADC[3];
 int16_t gyroData[3] = { 0, 0, 0 };
 int16_t gyroZero[3] = { 0, 0, 0 };
 int16_t magADC[3];
-int16_t smallAngle = 0;
 int16_t throttleAngleCorrection = 0;    // correction of throttle in lateral wind,
 int32_t vario = 0;                      // variometer in cm/s
+*/
 
 static int32_t  accSum[3];
 static uint32_t accTimeSum;        // keep track for integration of acc
 static float    anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
 static float    fc_acc;
+static int16_t smallAngle;
 static float    throttleAngleScale;
 
 // **************************************************

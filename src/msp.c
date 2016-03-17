@@ -31,6 +31,7 @@
 
 // from mixer.c
 extern int16_t motor_disarmed[4];
+
 // cause reboot after MSP processing complete
 static bool pendReboot = false;
 

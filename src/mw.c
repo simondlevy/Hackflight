@@ -1,3 +1,5 @@
+#define EXTERN 
+
 #include "mw.h"
 #include "config.h"
 #include "board.h"
@@ -20,25 +22,22 @@
 
 // this is the number in micro second to achieve a full loop, it can differ a little and is taken into 
 // account in the PID loop
-uint16_t cycleTime = 0;         
-
-int16_t rcData[RC_CHANS];       // interval [1000;2000]
-int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
+//int16_t axisPID[3];
+//uint16_t cycleTime = 0;         
+//int16_t rcData[RC_CHANS];       // interval [1000;2000]
+//int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
 
 static uint32_t currentTime;
 static uint32_t previousTime;
 static int16_t failsafeCnt;
-
 static uint8_t accCalibrated;
+static uint8_t dynP8[3], dynI8[3], dynD8[3];
 
 #define PITCH_LOOKUP_LENGTH 7
 #define THROTTLE_LOOKUP_LENGTH 12
 static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
 static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
-uint8_t dynP8[3], dynI8[3], dynD8[3];
-
-int16_t axisPID[3];
 
 // Time of automatic disarm when "Don't spin the motors when armed" is enabled.
 static uint32_t disarmTime = 0;
@@ -302,7 +301,7 @@ void setup(void)
     // 10 seconds init_delay + 200 * 25 ms = 15 seconds before ground pressure settles
 
     // trigger accelerometer calibration requirement
-    useSmallAngle = 1;
+    useSmallAngle = true;
  }
 
 void loop(void)

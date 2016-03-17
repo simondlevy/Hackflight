@@ -6,6 +6,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define RC_CHANS    (18)
 
@@ -40,33 +41,34 @@ typedef enum {
     CW270_DEG_FLIP = 8
 } sensor_align_e;
 
+#ifndef  EXTERN
+#define  EXTERN  extern
+#endif
 
-extern uint16_t acc1G;
-extern int16_t  accADC[3];
-extern int16_t  accSmooth[3];
-extern int32_t  altHold;
-extern int16_t  angle[2];
+EXTERN uint16_t acc1G;
+EXTERN int16_t  accADC[3];
+EXTERN int16_t  accSmooth[3];
+EXTERN int32_t  altHold;
+EXTERN int16_t  angle[2];
 uint8_t         armed;
-extern int16_t  axisPID[3];
-extern uint16_t calibratingA;
-extern uint16_t calibratingG;
-extern uint16_t cycleTime;
-extern int32_t  estAlt;
-extern int16_t  gyroADC[3];
-extern int16_t  gyroZero[3];
-extern int16_t  gyroData[3];
-extern float    gyroScale;
-extern int16_t  heading;
-extern int16_t  magADC[3];
-extern int16_t  motors[4];
-extern int16_t  rcCommand[4];
-extern int16_t  rcData[RC_CHANS];
-extern int16_t  throttleAngleCorrection;
-uint8_t         useSmallAngle;
-extern int32_t  vario;
-
-//extern sensor_t acc;
-//extern sensor_t gyro;
+EXTERN int16_t  axisPID[3];
+EXTERN uint16_t calibratingA;
+EXTERN uint16_t calibratingG;
+EXTERN uint16_t cycleTime;
+EXTERN int32_t  estAlt;
+EXTERN int16_t  gyroADC[3];
+EXTERN int16_t  gyroZero[3];
+EXTERN int16_t  gyroData[3];
+EXTERN float    gyroScale;
+EXTERN int16_t  heading;
+EXTERN int16_t  magADC[3];
+EXTERN int16_t  motors[4];
+EXTERN int16_t  motor_disarmed[4];
+EXTERN int16_t  rcCommand[4];
+EXTERN int16_t  rcData[RC_CHANS];
+EXTERN int16_t  throttleAngleCorrection;
+bool            useSmallAngle;
+EXTERN int32_t  vario;
 
 // State
 void stateInit(void);

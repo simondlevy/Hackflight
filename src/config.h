@@ -8,11 +8,9 @@ static const uint8_t CONFIG_AXIS_I[3] = {30, 30, 45};
 static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 
 #define CONFIG_MAGNETIC_DECLINATION                 0
-
-#define CONFIG_HORIZON_MODE                         1
+#define CONFIG_HORIZON_MODE                         true
 #define CONFIG_CALIBRATING_GYRO_CYCLES              1000
 #define CONFIG_CALIBRATING_ACC_CYCLES               400
-#define CONFIG_SERIAL_BAUDRATE                      115200
 #define CONFIG_MIDRC                                1500
 #define CONFIG_MINCOMMAND                           1000
 #define CONFIG_GYRO_CMPF_FACTOR                     600    
@@ -30,9 +28,6 @@ static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 
 #define CONFIG_MORON_THRESHOLD                      32
 #define CONFIG_REBOOT_CHARACTER                     'R'
-#define CONFIG_ACC_ALIGN                            ALIGN_DEFAULT
-#define CONFIG_GYRO_ALIGN                           ALIGN_DEFAULT
-#define CONFIG_FAILSAFE_DETECT_THRESHOLD            985 /* any of first 4 chans below this value triggers failsafe */
 #define CONFIG_RC_EXPO_8                            65
 #define CONFIG_RC_RATE_8                            90
 #define CONFIG_THR_MID_8                            50
