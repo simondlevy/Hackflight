@@ -20,13 +20,6 @@
 #define THR_CE (3 << (2 * THROTTLE))
 #define THR_HI (2 << (2 * THROTTLE))
 
-// this is the number in micro second to achieve a full loop, it can differ a little and is taken into 
-// account in the PID loop
-//int16_t axisPID[3];
-//uint16_t cycleTime = 0;         
-//int16_t rcData[RC_CHANS];       // interval [1000;2000]
-//int16_t rcCommand[4];           // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
-
 static uint32_t currentTime;
 static uint32_t previousTime;
 static int16_t failsafeCnt;

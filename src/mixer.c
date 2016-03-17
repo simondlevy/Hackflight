@@ -2,9 +2,6 @@
 #include "board.h"
 #include "config.h" 
 
-//int16_t motors[4];
-//int16_t motor_disarmed[4];
-
 // Custom mixer data per motor
 typedef struct motorMixer_t {
     float throttle;

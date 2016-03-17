@@ -7,25 +7,11 @@
 
 #define RAD    (M_PI / 180.0f)
 
-/*
-int16_t accADC[3];
-int16_t accSmooth[3];
-int32_t altHold;
-int16_t angle[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
-int32_t estAlt;                // in cm
-int16_t gyroADC[3];
-int16_t gyroData[3] = { 0, 0, 0 };
-int16_t gyroZero[3] = { 0, 0, 0 };
-int16_t magADC[3];
-int16_t throttleAngleCorrection = 0;    // correction of throttle in lateral wind,
-int32_t vario = 0;                      // variometer in cm/s
-*/
-
 static int32_t  accSum[3];
 static uint32_t accTimeSum;        // keep track for integration of acc
-static float    anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
-static float    fc_acc;
-static int16_t smallAngle;
+static float    anglerad[2];       // absolute angle inclination in radians
+static float    fcAcc;
+static int16_t  smallAngle;
 static float    throttleAngleScale;
 
 // **************************************************
@@ -152,7 +138,7 @@ static void acc_calc(uint32_t deltaT)
     } else
         accel_ned.V.Z -= acc1G;
 
-    accz_smooth = accz_smooth + (dT / (fc_acc + dT)) * (accel_ned.V.Z - accz_smooth); // low pass filter
+    accz_smooth = accz_smooth + (dT / (fcAcc + dT)) * (accel_ned.V.Z - accz_smooth); // low pass filter
 
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
@@ -257,7 +243,7 @@ void stateInit(void)
     smallAngle = lrintf(acc1G * cosf(RAD * CONFIG_SMALL_ANGLE));
     throttleAngleScale = (1800.0f / M_PI) * (900.0f / CONFIG_THROTTLE_CORRECTION_ANGLE);
 
-    fc_acc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
+    fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 }
 
 void stateComputeAngles(void)

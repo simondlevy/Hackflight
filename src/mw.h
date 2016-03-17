@@ -50,7 +50,7 @@ EXTERN int16_t  accADC[3];
 EXTERN int16_t  accSmooth[3];
 EXTERN int32_t  altHold;
 EXTERN int16_t  angle[2];
-uint8_t         armed;
+EXTERN uint8_t  armed;
 EXTERN int16_t  axisPID[3];
 EXTERN uint16_t calibratingA;
 EXTERN uint16_t calibratingG;
@@ -67,7 +67,7 @@ EXTERN int16_t  motor_disarmed[4];
 EXTERN int16_t  rcCommand[4];
 EXTERN int16_t  rcData[RC_CHANS];
 EXTERN int16_t  throttleAngleCorrection;
-bool            useSmallAngle;
+EXTERN bool     useSmallAngle;
 EXTERN int32_t  vario;
 
 // State
