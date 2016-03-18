@@ -60,7 +60,7 @@ EXTERN uint16_t cycleTime;
 EXTERN int32_t  estAlt;
 EXTERN int16_t  gyroADC[3];
 EXTERN int16_t  gyroZero[3];
-EXTERN int16_t  gyroData[3];
+//EXTERN int16_t  gyroData[3];
 EXTERN float    gyroScale;
 EXTERN int16_t  heading;
 EXTERN int16_t  magADC[3];

@@ -252,9 +252,9 @@ void stateComputeAngles(void)
     sensorsGetAccel();
     getEstimatedAttitude();
 
-    gyroData[YAW] = gyroADC[YAW];
-    gyroData[ROLL] = gyroADC[ROLL];
-    gyroData[PITCH] = gyroADC[PITCH];
+    //gyroData[YAW] = gyroADC[YAW];
+    //gyroData[ROLL] = gyroADC[ROLL];
+    //gyroData[PITCH] = gyroADC[PITCH];
 }
 
 

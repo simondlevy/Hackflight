@@ -212,12 +212,14 @@ static void pidMultiWii(void)
         }
         if (CONFIG_HORIZON_MODE || axis == 2) { // MODE relying on GYRO or YAW axis
             error = (int32_t)rcCommand[axis] * 10 * 8 / CONFIG_AXIS_P[axis];
-            error -= gyroData[axis];
+            //error -= gyroData[axis];
+            error -= gyroADC[axis];
 
             PTermGYRO = rcCommand[axis];
 
             errorGyroI[axis] = constrain(errorGyroI[axis] + error, -16000, +16000); // WindUp
-            if ((abs(gyroData[axis]) > 640) || ((axis == YAW) && (abs(rcCommand[axis]) > 100)))
+            //if ((abs(gyroData[axis]) > 640) || ((axis == YAW) && (abs(rcCommand[axis]) > 100)))
+            if ((abs(gyroADC[axis]) > 640) || ((axis == YAW) && (abs(rcCommand[axis]) > 100)))
                 errorGyroI[axis] = 0;
             ITermGYRO = (errorGyroI[axis] / 125 * CONFIG_AXIS_I[axis]) >> 6;
         }
@@ -229,9 +231,12 @@ static void pidMultiWii(void)
             ITerm = ITermGYRO;
         }
 
-        PTerm -= (int32_t)gyroData[axis] * dynP8[axis] / 10 / 8; // 32 bits is needed for calculation
-        delta = gyroData[axis] - lastGyro[axis];
-        lastGyro[axis] = gyroData[axis];
+        //PTerm -= (int32_t)gyroData[axis] * dynP8[axis] / 10 / 8; // 32 bits is needed for calculation
+        PTerm -= (int32_t)gyroADC[axis] * dynP8[axis] / 10 / 8; // 32 bits is needed for calculation
+        //delta = gyroData[axis] - lastGyro[axis];
+        delta = gyroADC[axis] - lastGyro[axis];
+        //lastGyro[axis] = gyroData[axis];
+        lastGyro[axis] = gyroADC[axis];
         deltaSum = delta1[axis] + delta2[axis] + delta;
         delta2[axis] = delta1[axis];
         delta1[axis] = delta;
