@@ -46,6 +46,7 @@ STM32_SRC = state.c \
 		   	$(BREEZY_DIR)/printf.c \
 		   	$(BREEZY_DIR)/drv_system.c \
 		   	$(BREEZY_DIR)/drv_mpu6050.c \
+		   	$(BREEZY_DIR)/drv_ms5611.c \
 		   	$(BREEZY_DIR)/drv_i2c.c \
 		   	$(BREEZY_DIR)/drv_serial.c \
 		   	$(BREEZY_DIR)/drv_pwm.c \

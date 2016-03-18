@@ -54,6 +54,7 @@ static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 #define CONFIG_SMALL_ANGLE                          25
 #define CONFIG_DEADBAND                             0
 #define CONFIG_YAW_DEADBAND                         0
+#define CONFIG_BARO_TAB_SIZE                        21
 
 static const uint8_t CONFIG_ROLL_PITCH_RATE[2] = {0, 0};
 static const int16_t CONFIG_ANGLE_TRIM[2]      = {0, 0};

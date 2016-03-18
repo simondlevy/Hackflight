@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 #define RC_CHANS    (18)
 
@@ -45,6 +46,7 @@ typedef enum {
 #define  EXTERN  extern
 #endif
 
+// Globals
 EXTERN uint16_t acc1G;
 EXTERN int16_t  accADC[3];
 EXTERN int16_t  accSmooth[3];
@@ -78,6 +80,7 @@ void stateComputeAngles(void);
 void sensorsInit(void);
 void sensorsGetAccel(void);
 void sensorsGetGyro(void);
+void sensorsGetBaro(void);
 
 // Mixer
 void mixerInit(void);

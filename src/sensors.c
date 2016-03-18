@@ -9,9 +9,14 @@
 
 #include <math.h>
 
+#define BARO_TAB_SIZE_MAX 48
+
 // Default orientation
 static sensor_align_e gyroAlign = CW0_DEG;
 static sensor_align_e accAlign = CW0_DEG;
+
+static bool baroAvailable;
+uint32_t baroPressureSum;
 
 typedef struct stdev_t {
     float m_oldM, m_newM, m_oldS, m_newS;
@@ -103,6 +108,8 @@ void sensorsInit(void)
     board_i2cInit();
 
     board_imuInit(CONFIG_GYRO_LPF, &acc1G, &gyroScale);
+
+    baroAvailable = board_baroInit();
 }
 
 void sensorsGetAccel(void)
@@ -187,4 +194,18 @@ void sensorsGetGyro(void)
         gyroADC[axis] -= gyroZero[axis];
 }
 
-
+void sensorsGetBaro(void)
+{
+    if (baroAvailable) {
+        int32_t pressure = board_baroReadPressure();
+        static int32_t baroHistTab[BARO_TAB_SIZE_MAX];
+        static int baroHistIdx;
+        int indexplus1 = (baroHistIdx + 1);
+        if (indexplus1 == CONFIG_BARO_TAB_SIZE)
+            indexplus1 = 0;
+        baroHistTab[baroHistIdx] = pressure;
+        baroPressureSum += baroHistTab[baroHistIdx];
+        baroPressureSum -= baroHistTab[indexplus1];
+        baroHistIdx = indexplus1;
+    }
+}

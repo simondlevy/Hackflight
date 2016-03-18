@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+bool     board_baroInit(void);
+int32_t  board_baroReadPressure(void);
 void     board_checkReboot(bool pendReboot);
 void     board_delayMilliseconds(uint32_t msec);
 uint16_t board_getI2cErrorCounter(void);

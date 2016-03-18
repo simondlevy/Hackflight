@@ -388,6 +388,7 @@ void loop(void)
                 taskOrder++;
             case 1:
                 taskOrder++;
+                sensorsGetBaro();
             case 2:
                 taskOrder++;
             case 3:

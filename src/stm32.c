@@ -10,6 +10,16 @@
 
 extern serialPort_t * Serial1;
 
+bool board_baroInit(void)
+{
+    return ms5611_init();
+}
+
+int32_t board_baroReadPressure(void)
+{
+    return ms5611_read_pressure();
+}
+
 void board_checkReboot(bool pendReboot)
 {
     if (pendReboot)
