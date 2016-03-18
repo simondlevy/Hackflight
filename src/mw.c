@@ -265,8 +265,6 @@ void setup(void)
             lookupThrottleRC[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
     }
 
-    board_i2cInit();
-
     sensorsInit();
 
     board_led1On();
