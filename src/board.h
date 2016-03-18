@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+// Your implementation should define the following
+
+#include <printf.h>
+
 bool     board_baroInit(void);
 int32_t  board_baroReadPressure(void);
 void     board_checkReboot(bool pendReboot);
@@ -26,4 +30,5 @@ void     board_writeMotor(uint8_t index, uint16_t value);
 bool     board_serialAvailable(void);
 uint8_t  board_serialRead(void);
 void     board_serialWrite(uint8_t c);
+bool     board_sonarInit(void);
 

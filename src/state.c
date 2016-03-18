@@ -1,4 +1,3 @@
-
 #include "mw.h"
 #include "config.h"
 #include "board.h"
@@ -251,10 +250,6 @@ void stateComputeAngles(void)
     sensorsGetGyro();
     sensorsGetAccel();
     getEstimatedAttitude();
-
-    //gyroData[YAW] = gyroADC[YAW];
-    //gyroData[ROLL] = gyroADC[ROLL];
-    //gyroData[PITCH] = gyroADC[PITCH];
 }
 
 

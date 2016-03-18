@@ -24,7 +24,7 @@ void mixerInit(void)
 
     // set disarmed motor values
     for (i = 0; i < 4; i++)
-        motor_disarmed[i] = CONFIG_MINCOMMAND;
+        motorsDisarmed[i] = CONFIG_MINCOMMAND;
 }
 
 void mixerWriteMotors(void)
@@ -53,7 +53,7 @@ void mixerWriteMotors(void)
             motors[i] = CONFIG_MINTHROTTLE;
         } 
         if (!armed) {
-            motors[i] = motor_disarmed[i];
+            motors[i] = motorsDisarmed[i];
         }
     }
 

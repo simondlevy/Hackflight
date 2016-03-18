@@ -60,12 +60,11 @@ EXTERN uint16_t cycleTime;
 EXTERN int32_t  estAlt;
 EXTERN int16_t  gyroADC[3];
 EXTERN int16_t  gyroZero[3];
-//EXTERN int16_t  gyroData[3];
 EXTERN float    gyroScale;
 EXTERN int16_t  heading;
 EXTERN int16_t  magADC[3];
 EXTERN int16_t  motors[4];
-EXTERN int16_t  motor_disarmed[4];
+EXTERN int16_t  motorsDisarmed[4];
 EXTERN int16_t  rcCommand[4];
 EXTERN int16_t  rcData[RC_CHANS];
 EXTERN int16_t  throttleAngleCorrection;
@@ -81,6 +80,7 @@ void sensorsInit(void);
 void sensorsGetAccel(void);
 void sensorsGetGyro(void);
 void sensorsGetBaro(void);
+void sensorsGetSonar(void);
 
 // Mixer
 void mixerInit(void);

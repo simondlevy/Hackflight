@@ -47,6 +47,7 @@ STM32_SRC = state.c \
 		   	$(BREEZY_DIR)/drv_system.c \
 		   	$(BREEZY_DIR)/drv_mpu6050.c \
 		   	$(BREEZY_DIR)/drv_ms5611.c \
+		   	$(BREEZY_DIR)/drv_mb1242.c \
 		   	$(BREEZY_DIR)/drv_i2c.c \
 		   	$(BREEZY_DIR)/drv_serial.c \
 		   	$(BREEZY_DIR)/drv_pwm.c \
@@ -160,7 +161,7 @@ $(TARGET_ELF):  $(TARGET_OBJS)
 MKDIR_OBJDIR = @mkdir -p $(dir $@)
 
 # Compile
-$(OBJECT_DIR)/$(TARGET)/%.o: %.c config.h mw.h
+$(OBJECT_DIR)/$(TARGET)/%.o: %.c mw.h config.h board.h
 	$(MKDIR_OBJDIR)
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(CFLAGS) $<

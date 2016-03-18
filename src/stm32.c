@@ -125,3 +125,8 @@ void board_writeMotor(uint8_t index, uint16_t value)
 {
     pwmWriteMotor(index, value);
 }
+
+bool board_sonarInit(void)
+{
+    return mb1242_init();
+}

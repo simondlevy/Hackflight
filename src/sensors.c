@@ -1,8 +1,3 @@
-/*
- * This file is part of baseflight
- * Licensed under GPL V3 or modified DCL - see https://github.com/multiwii/baseflight/blob/master/README.md
- */
-
 #include "mw.h"
 #include "config.h"
 #include "board.h"
@@ -16,7 +11,9 @@ static sensor_align_e gyroAlign = CW0_DEG;
 static sensor_align_e accAlign = CW0_DEG;
 
 static bool baroAvailable;
-uint32_t baroPressureSum;
+static uint32_t baroPressureMean;
+
+static bool sonarAvailable;
 
 typedef struct stdev_t {
     float m_oldM, m_newM, m_oldS, m_newS;
@@ -110,6 +107,8 @@ void sensorsInit(void)
     board_imuInit(CONFIG_GYRO_LPF, &acc1G, &gyroScale);
 
     baroAvailable = board_baroInit();
+
+    sonarAvailable = board_sonarInit();
 }
 
 void sensorsGetAccel(void)
@@ -204,8 +203,15 @@ void sensorsGetBaro(void)
         if (indexplus1 == CONFIG_BARO_TAB_SIZE)
             indexplus1 = 0;
         baroHistTab[baroHistIdx] = pressure;
-        baroPressureSum += baroHistTab[baroHistIdx];
-        baroPressureSum -= baroHistTab[indexplus1];
+        baroPressureMean += baroHistTab[baroHistIdx];
+        baroPressureMean -= baroHistTab[indexplus1];
         baroHistIdx = indexplus1;
     }
 }
+
+void sensorsGetSonar(void)
+{
+    if (sonarAvailable) {
+    }
+}
+ 

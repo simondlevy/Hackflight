@@ -30,7 +30,7 @@
 #define INBUF_SIZE 128
 
 // from mixer.c
-extern int16_t motor_disarmed[4];
+extern int16_t motorsDisarmed[4];
 
 // cause reboot after MSP processing complete
 static bool pendReboot = false;
@@ -152,7 +152,7 @@ static void evaluateCommand(void)
 
         case MSP_SET_MOTOR:
             for (i = 0; i < 4; i++)
-                motor_disarmed[i] = read16();
+                motorsDisarmed[i] = read16();
             headSerialReply(0);
             break;
 
@@ -175,7 +175,6 @@ static void evaluateCommand(void)
                     serialize16(accSmooth[i]);
             }
             for (i = 0; i < 3; i++)
-                //serialize16(gyroData[i]);
                 serialize16(gyroADC[i]);
             for (i = 0; i < 3; i++)
                 serialize16(magADC[i]);
