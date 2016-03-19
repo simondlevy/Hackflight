@@ -130,3 +130,8 @@ bool board_sonarInit(void)
 {
     return mb1242_init();
 }
+
+int32_t board_sonarReadDistance(void)
+{
+    return mb1242_poll();
+}

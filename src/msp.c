@@ -16,8 +16,7 @@
 #define MSP_ATTITUDE             108    //out message         2 angles 1 heading
 #define MSP_ALTITUDE             109    //out message         altitude, variometer
 
-#define MSP_PX4FLOW              125
-#define MSP_LIDARLITE            126
+#define MSP_BARO_SONAR_RAW       126    // out message
 
 #define MSP_SET_RAW_RC           200    //in message          8 rc chan
 #define MSP_SET_MOTOR            214    //in message          PropBalance function
@@ -195,6 +194,12 @@ static void evaluateCommand(void)
             for (i = 0; i < 2; i++)
                 serialize16(angle[i]);
             serialize16(heading);
+            break;
+
+        case MSP_BARO_SONAR_RAW:
+            headSerialReply(8);
+            serialize32(baroPressure);
+            serialize32(sonarDistance);
             break;
 
         case MSP_ALTITUDE:

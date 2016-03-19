@@ -31,4 +31,5 @@ bool     board_serialAvailable(void);
 uint8_t  board_serialRead(void);
 void     board_serialWrite(uint8_t c);
 bool     board_sonarInit(void);
+int32_t  board_sonarReadDistance(void);
 

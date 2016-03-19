@@ -27,7 +27,7 @@
                  {"c7": "short"}, 
                  {"c8": "short"}],
 
-  "MB1242": [{"ID": 126},
-               {"baropress": "int"},
-               {"sonar":     "int"}]
+  "BARO_SONAR_RAW": [{"ID": 126},
+               {"baro":  "int"},
+               {"sonar": "int"}]
 }

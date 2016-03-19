@@ -11,8 +11,6 @@ static sensor_align_e gyroAlign = CW0_DEG;
 static sensor_align_e accAlign = CW0_DEG;
 
 static bool baroAvailable;
-static uint32_t baroPressureMean;
-
 static bool sonarAvailable;
 
 typedef struct stdev_t {
@@ -107,8 +105,11 @@ void sensorsInit(void)
     board_imuInit(CONFIG_GYRO_LPF, &acc1G, &gyroScale);
 
     baroAvailable = board_baroInit();
-
     sonarAvailable = board_sonarInit();
+
+    // Default to OOB value to indicate sensor unavailable
+    baroPressure = -1;
+    sonarDistance = -1;
 }
 
 void sensorsGetAccel(void)
@@ -195,23 +196,13 @@ void sensorsGetGyro(void)
 
 void sensorsGetBaro(void)
 {
-    if (baroAvailable) {
-        int32_t pressure = board_baroReadPressure();
-        static int32_t baroHistTab[BARO_TAB_SIZE_MAX];
-        static int baroHistIdx;
-        int indexplus1 = (baroHistIdx + 1);
-        if (indexplus1 == CONFIG_BARO_TAB_SIZE)
-            indexplus1 = 0;
-        baroHistTab[baroHistIdx] = pressure;
-        baroPressureMean += baroHistTab[baroHistIdx];
-        baroPressureMean -= baroHistTab[indexplus1];
-        baroHistIdx = indexplus1;
-    }
+    if (baroAvailable) 
+        baroPressure = board_baroReadPressure();
 }
 
 void sensorsGetSonar(void)
 {
-    if (sonarAvailable) {
-    }
+    if (sonarAvailable) 
+        sonarDistance  = board_sonarReadDistance();
 }
  
