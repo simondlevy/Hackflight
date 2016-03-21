@@ -106,9 +106,9 @@ void board_reboot(void)
     systemReset(true);      // reboot to bootloader
 }
 
-bool board_serialAvailable(void)
+uint8_t board_serialAvailable(void)
 {
-    return serialTotalBytesWaiting(Serial1) > 0;
+    return serialTotalBytesWaiting(Serial1);
 }
 
 uint8_t board_serialRead(void)

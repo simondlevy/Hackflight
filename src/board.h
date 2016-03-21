@@ -27,7 +27,7 @@ void     board_pwmInit(void);
 uint16_t board_pwmRead(uint8_t chan, uint16_t oob_default);
 void     board_reboot(void);
 void     board_writeMotor(uint8_t index, uint16_t value);
-bool     board_serialAvailable(void);
+uint8_t  board_serialAvailable(void);
 uint8_t  board_serialRead(void);
 void     board_serialWrite(uint8_t c);
 bool     board_sonarInit(void);
