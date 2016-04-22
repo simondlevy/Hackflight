@@ -167,14 +167,14 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.c mw.h config.h board.h
 	@$(CC) -c -o $@ $(CFLAGS) $<
 
 # Assemble
-$(OBJECT_DIR)/$(TARGET)/%.o: %.s
+$(OBJECT_DIR)/$(TARGET)/%.o: %.S
 	$(MKDIR_OBJDIR)
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(ASFLAGS) $< 
-$(OBJECT_DIR)/$(TARGET)/%.o): %.S
-	$(MKDIR_OBJDIR)
-	@echo %% $(notdir $<)
-	@$(CC) -c -o $@ $(ASFLAGS) $< 
+#$(OBJECT_DIR)/$(TARGET)/%.o): %.S
+#	$(MKDIR_OBJDIR)
+#	@echo %% $(notdir $<)
+#	@$(CC) -c -o $@ $(ASFLAGS) $< 
 
 clean:
 	rm -rf obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
