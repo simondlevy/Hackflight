@@ -61,34 +61,19 @@ void board_imuReadGyro(int16_t * data)
     mpu6050_read_gyro(data);
 }
 
-void board_led0Off(void)
+void board_ledOff(void)
 {
     LED0_OFF;
 }
 
-void board_led0On(void)
+void board_ledOn(void)
 {
     LED0_ON;
 }
 
-void board_led0Toggle(void)
+void board_ledToggle(void)
 {
     LED0_TOGGLE;
-}
-
-void board_led1Off(void)
-{
-    LED1_OFF;
-}
-
-void board_led1On(void)
-{
-    LED1_ON;
-}
-
-void board_led1Toggle(void)
-{
-    LED1_TOGGLE;
 }
 
 void board_pwmInit(void)
