@@ -81,9 +81,9 @@ void board_pwmInit(void)
     pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 }
 
-uint16_t board_pwmRead(uint8_t chan, uint16_t oob_default)
+uint16_t board_pwmRead(uint8_t chan)
 {
-    return pwmRead(chan, oob_default);
+    return pwmRead(chan);
 }
 
 void board_reboot(void)

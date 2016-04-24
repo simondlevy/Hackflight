@@ -42,8 +42,6 @@ static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 #define CONFIG_THROTTLE_CORRECTION_VALUE            0
 #define CONFIG_YAW_RATE                             0
 
-/* supported by all gyro drivers now. In case of ST gyro, will default to 32Hz instead */
-#define CONFIG_GYRO_LPF                             42 
 #define CONFIG_DYN_THR_PID                          0
 #define CONFIG_TPA_BREAKPOINT                       1500
 #define CONFIG_ACC_LPF_FACTOR                       4

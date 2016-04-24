@@ -147,8 +147,12 @@ static void computeRC(void)
 
     for (chan = 0; chan < 8; chan++) {
     
-        // get RC PWM, defaulting to CONFIG_MIDRC if out-of-bounds
-        capture = board_pwmRead(CONFIG_RCMAP[chan], CONFIG_MIDRC);
+        // get RC PWM
+        capture = board_pwmRead(CONFIG_RCMAP[chan]);
+
+        // default to CONFIG_MIDRC if out-of-bounds
+        //if (capture < PULSE_MIN || capture > PULSE_MAX)
+        //   capture =  CONFIG_MIDRC;
 
         rcDataAverage[chan][rcAverageIndex % 4] = capture;
 
