@@ -150,7 +150,7 @@ static void computeRC(void)
         // get RC PWM
         capture = board_pwmRead(CONFIG_RCMAP[chan]);
 
-        // default to CONFIG_MIDRC if out-of-bounds
+        // XXX default to CONFIG_MIDRC if out-of-bounds
         //if (capture < PULSE_MIN || capture > PULSE_MAX)
         //   capture =  CONFIG_MIDRC;
 
