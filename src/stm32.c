@@ -46,9 +46,9 @@ void board_i2cInit(void)
     i2cInit(I2CDEV_2);
 }
 
-void board_imuInit(uint8_t lpf, uint16_t * acc1G, float * gyroScale)
+void board_imuInit(uint16_t * acc1G, float * gyroScale)
 {
-    mpu6050_init(false, lpf, acc1G, gyroScale);
+    mpu6050_init(false, acc1G, gyroScale);
 }
 
 void board_imuReadAccel(int16_t * data)

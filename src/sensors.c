@@ -102,7 +102,7 @@ void sensorsInit(void)
 {
     board_i2cInit();
 
-    board_imuInit(CONFIG_GYRO_LPF, &acc1G, &gyroScale);
+    board_imuInit(&acc1G, &gyroScale);
 
     baroAvailable = board_baroInit();
     sonarAvailable = board_sonarInit();
