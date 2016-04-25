@@ -120,7 +120,7 @@ build: $(TARGET).elf
 
 hex: $(TARGET).hex
 
-post_compile: build/$(TARGET).hex
+post_compile: $(TARGET).hex
 	@$(abspath $(TOOLSPATH))/teensy_post_compile -file="$(basename $<)" -path=$(CURDIR) -tools="$(abspath $(TOOLSPATH))"
 
 reboot:
@@ -151,8 +151,6 @@ $(TARGET).elf: $(OBJS) $(LDSCRIPT)
 	@echo "[HEX]\t$@"
 	@$(SIZE) "$<"
 	@$(OBJCOPY) -O ihex -R .eeprom "$<" "$@"
-	mv $(TARGET).hex build
-	mv $(TARGET).elf build
 
 # compiler generated dependency info
 -include $(OBJS:.o=.d)
