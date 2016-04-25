@@ -125,6 +125,8 @@ reboot:
 
 upload: post_compile reboot
 
+flash: post_compile reboot
+
 $(BUILDDIR)/%.o: %.c
 	@echo "[CC]\t$<"
 	@mkdir -p "$(dir $@)"
