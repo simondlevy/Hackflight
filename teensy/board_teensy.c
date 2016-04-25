@@ -1,28 +1,9 @@
 #include <Arduino.h>
 #include <board.h>
 
-bool board_baroInit(void)
-{
-    return false;
-}
-
-int32_t board_baroReadPressure(void)
-{
-    return 0;
-}
-
-void board_checkReboot(bool pendReboot)
-{
-}
-
 void board_delayMilliseconds(uint32_t msec)
 {
     delay(msec);
-}
-
-uint16_t board_getI2cErrorCounter(void)
-{
-    return 0;
 }
 
 uint32_t board_getMicros()
@@ -67,10 +48,6 @@ uint16_t board_pwmRead(uint8_t chan)
     return 0;
 }
 
-void board_reboot(void)
-{
-}
-
 uint8_t board_serialAvailable(void)
 {
     return 0;
@@ -89,6 +66,23 @@ void board_writeMotor(uint8_t index, uint16_t value)
 {
 }
 
+
+
+
+
+void board_checkReboot(bool pendReboot)
+{
+}
+
+uint16_t board_getI2cErrorCounter(void)
+{
+    return 0;
+}
+
+void board_reboot(void)
+{
+}
+
 bool board_sonarInit(void)
 {
     return false;
@@ -98,3 +92,15 @@ int32_t board_sonarReadDistance(void)
 {
     return 0;
 }
+
+bool board_baroInit(void)
+{
+    return false;
+}
+
+int32_t board_baroReadPressure(void)
+{
+    return 0;
+}
+
+

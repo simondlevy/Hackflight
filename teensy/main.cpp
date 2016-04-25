@@ -4,6 +4,10 @@ extern "C" int main(void)
 {
     setup();
 
+    while (1)
+        loop();
+
+    /*
     pinMode(13, OUTPUT);
 
     while (1) {
@@ -12,5 +16,6 @@ extern "C" int main(void)
         digitalWriteFast(13, LOW);
         delay(500);
     }
+    */
 }
 
