@@ -1,4 +1,4 @@
-# The name of your project (used to name the compiled .hex file)
+
 TARGET = hackflight
 
 # The teensy version to use, 30, 31, or LC
@@ -24,7 +24,7 @@ BUILDDIR = $(abspath $(CURDIR)/build)
 #************************************************************************
 
 # path location for Teensy Loader, teensy_post_compile and teensy_reboot
-TOOLSPATH = $(CURDIR)/tools
+TOOLSPATH = /home/levy/Development/teensy-tools
 
 ifeq ($(OS),Windows_NT)
     $(error What is Win Dose?)
@@ -36,10 +36,10 @@ else
 endif
 
 # path location for Teensy 3 core
-COREPATH = teensy3
+COREPATH = /home/levy/Development/teensy3
 
 # path location for Arduino libraries
-LIBRARYPATH = libraries
+LIBRARYPATH = /home/levy//Development/arduino-1.6.8/libraries/
 
 # path location for the arm-none-eabi compiler
 COMPILERPATH = $(TOOLSPATH)/arm/bin
