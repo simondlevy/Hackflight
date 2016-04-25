@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <board.h>
 
-
 void board_delayMilliseconds(uint32_t msec)
 {
     delay(msec);
