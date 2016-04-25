@@ -104,7 +104,7 @@ LC_FILES := $(wildcard $(LIBRARYPATH)/*/*.c)
 LCPP_FILES := $(wildcard $(LIBRARYPATH)/*/*.cpp)
 TC_FILES := $(wildcard $(COREPATH)/*.c)
 TCPP_FILES := $(wildcard $(COREPATH)/*.cpp)
-C_FILES := ../src/mw.c
+C_FILES := ../src/mw.c ../src/mixer.c ../src/msp.c ../src/sensors.c ../src/state.c
 CPP_FILES := $(wildcard *.cpp)
 
 # include paths for libraries

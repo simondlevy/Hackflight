@@ -42,7 +42,7 @@ NAZE_SRC =  state.c \
 		   	mw.c \
 		   	sensors.c \
 		   	msp.c \
-			naze.c \
+			board_naze.c \
 		   	$(BREEZY_DIR)/main.c \
 		   	$(BREEZY_DIR)/printf.c \
 		   	$(BREEZY_DIR)/drv_system.c \
