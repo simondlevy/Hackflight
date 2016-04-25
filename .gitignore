@@ -3,4 +3,5 @@ obj
 scripts/logs
 scripts/output
 teensy/build
+teensy/src
 teensy/hackflight.*
