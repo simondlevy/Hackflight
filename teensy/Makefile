@@ -158,3 +158,4 @@ clean:
 	@echo Cleaning...
 	@rm -rf "$(BUILDDIR)"
 	@rm -f "$(TARGET).elf" "$(TARGET).hex"
+	rm -rf src
