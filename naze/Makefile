@@ -12,7 +12,7 @@ BREEZY_DIR = /home/levy/Desktop/BreezySTM32
 # Things that the user might override on the commandline
 #
 
-TARGET		?= STM32
+TARGET		?= NAZE
 
 # Compile-time options
 OPTIONS		?=
@@ -28,15 +28,16 @@ SERIAL_DEVICE	?= /dev/ttyUSB0
 #
 
 # Working directories
-ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
+ROOT		 = ..
+HERE         = .
 SRC_DIR		 = $(ROOT)/src
+OBJECT_DIR	 = $(HERE)/obj
+BIN_DIR		 = $(HERE)/obj
 CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
 STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
-OBJECT_DIR	 = $(ROOT)/obj
-BIN_DIR		 = $(ROOT)/obj
 
 # Source files common to all targets
-STM32_SRC = state.c \
+NAZE_SRC =  state.c \
 		   	mixer.c \
 		   	mw.c \
 		   	sensors.c \
