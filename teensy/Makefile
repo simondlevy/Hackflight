@@ -1,3 +1,4 @@
+HOME = /home/levys
 
 TARGET = hackflight
 
@@ -24,7 +25,7 @@ BUILDDIR = $(abspath $(CURDIR)/build)
 #************************************************************************
 
 # path location for Teensy Loader, teensy_post_compile and teensy_reboot
-TOOLSPATH = /home/levy/Development/teensy-tools
+TOOLSPATH = $(HOME)/Development/teensy-tools
 
 ifeq ($(OS),Windows_NT)
     $(error What is Win Dose?)
@@ -36,10 +37,10 @@ else
 endif
 
 # path location for Teensy 3 core
-COREPATH = /home/levy/Development/teensy3
+COREPATH = $(HOME)/Development/teensy3
 
 # path location for Arduino libraries
-LIBRARYPATH = /home/levy//Development/arduino-1.6.8/libraries/
+LIBRARYPATH = $(HOME)/Development/arduino-1.6.8/libraries/
 
 # path location for the arm-none-eabi compiler
 COMPILERPATH = $(TOOLSPATH)/arm/bin
@@ -49,7 +50,7 @@ COMPILERPATH = $(TOOLSPATH)/arm/bin
 #************************************************************************
 
 # CPPFLAGS = compiler options for C and C++
-CPPFLAGS = -Wall -g -Os -mthumb -ffunction-sections -fdata-sections -nostdlib -MMD $(OPTIONS) -DTEENSYDUINO=124 -DF_CPU=$(TEENSY_CORE_SPEED) -Isrc -I$(COREPATH)
+CPPFLAGS = -Wall -g -Os -mthumb -ffunction-sections -fdata-sections -nostdlib -MMD $(OPTIONS) -DTEENSYDUINO=124 -DF_CPU=$(TEENSY_CORE_SPEED) -I. -I$(COREPATH)
 
 # compiler options for C++ only
 CXXFLAGS = -std=gnu++0x -felide-constructors -fno-exceptions -fno-rtti
@@ -103,9 +104,9 @@ LC_FILES := $(wildcard $(LIBRARYPATH)/*/*.c)
 LCPP_FILES := $(wildcard $(LIBRARYPATH)/*/*.cpp)
 TC_FILES := $(wildcard $(COREPATH)/*.c)
 TCPP_FILES := $(wildcard $(COREPATH)/*.cpp)
-C_FILES := $(wildcard src/*.c)
-CPP_FILES := $(wildcard src/*.cpp)
-INO_FILES := $(wildcard src/*.ino)
+C_FILES := $(wildcard *.c)
+CPP_FILES := $(wildcard *.cpp)
+INO_FILES := $(wildcard *.ino)
 
 # include paths for libraries
 L_INC := $(foreach lib,$(filter %/, $(wildcard $(LIBRARYPATH)/*/)), -I$(lib))

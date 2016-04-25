@@ -6,7 +6,7 @@
 ###############################################################################
 
 # Change this to wherever you put BreezySTM32
-BREEZY_DIR = /home/levy/Desktop/BreezySTM32
+BREEZY_DIR = /home/levys/Desktop/BreezySTM32
 
 ###############################################################################
 # Things that the user might override on the commandline
@@ -42,7 +42,7 @@ NAZE_SRC =  state.c \
 		   	mw.c \
 		   	sensors.c \
 		   	msp.c \
-			stm32.c \
+			naze.c \
 		   	$(BREEZY_DIR)/main.c \
 		   	$(BREEZY_DIR)/printf.c \
 		   	$(BREEZY_DIR)/drv_system.c \
