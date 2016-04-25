@@ -1,5 +1,3 @@
-HOME = /home/levys
-
 TARGET = hackflight
 
 # The teensy version to use, 30, 31, or LC

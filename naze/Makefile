@@ -6,7 +6,7 @@
 ###############################################################################
 
 # Change this to wherever you put BreezySTM32
-BREEZY_DIR = /home/levys/Desktop/BreezySTM32
+BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 ###############################################################################
 # Things that the user might override on the commandline
