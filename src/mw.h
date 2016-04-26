@@ -11,7 +11,12 @@
 
 #define RC_CHANS    (18)
 
+#ifndef abs
 #define abs(x) ((x) > 0 ? (x) : -(x))
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#endif
+
 
 enum {
     ROLL = 0,
@@ -93,4 +98,4 @@ void mspCom(void);
 
 // Common
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
-int constrain(int amt, int low, int high);
+int constrainer(int amt, int low, int high);

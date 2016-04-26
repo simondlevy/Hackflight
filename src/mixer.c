@@ -33,7 +33,7 @@ void mixerWriteMotors(void)
     uint32_t i;
 
     // prevent "yaw jump" during yaw correction
-    axisPID[YAW] = constrain(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
+    axisPID[YAW] = constrainer(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
 
     for (i = 0; i < 4; i++)
         motors[i] = rcCommand[THROTTLE] * mixerQuadX[i].throttle + axisPID[PITCH] * mixerQuadX[i].pitch + 
@@ -48,7 +48,7 @@ void mixerWriteMotors(void)
             // this is a way to still have good gyro corrections if at least one motor reaches its max.
             motors[i] -= maxMotor - CONFIG_MAXTHROTTLE;
 
-        motors[i] = constrain(motors[i], CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
+        motors[i] = constrainer(motors[i], CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
         if ((rcData[THROTTLE]) < CONFIG_MINCHECK) {
             motors[i] = CONFIG_MINTHROTTLE;
         } 

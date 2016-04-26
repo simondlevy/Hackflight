@@ -4,9 +4,6 @@
 #include "config.h"
 #include "board.h"
 
-#define min(a, b) ((a) < (b) ? (a) : (b))
-#define max(a, b) ((a) > (b) ? (a) : (b))
-
 #define ROL_LO (1 << (2 * ROLL))
 #define ROL_CE (3 << (2 * ROLL))
 #define ROL_HI (2 << (2 * ROLL))
@@ -35,7 +32,20 @@ static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for e
 // Time of automatic disarm when "Don't spin the motors when armed" is enabled.
 static uint32_t disarmTime = 0;
 
-static bool check_timed_task(uint32_t usec) {
+static void ledToggle(void)
+{
+    static bool state;
+
+    if (state)
+        board_ledOff();
+    else
+        board_ledOn();
+
+    state = !state;
+}
+
+static bool check_timed_task(uint32_t usec) 
+{
 
     return (int32_t)(currentTime - usec) >= 0;
 }
@@ -108,14 +118,14 @@ static void annexCode(void)
             rcCommand[axis] = -rcCommand[axis];
     }
 
-    tmp = constrain(rcData[THROTTLE], CONFIG_MINCHECK, 2000);
+    tmp = constrainer(rcData[THROTTLE], CONFIG_MINCHECK, 2000);
     tmp = (uint32_t)(tmp - CONFIG_MINCHECK) * 1000 / (2000 - CONFIG_MINCHECK);       // [MINCHECK;2000] -> [0;1000]
     tmp2 = tmp / 100;
     rcCommand[THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
             lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
 
     if (calibratingA > 0 || calibratingG > 0) {      // Calibration phasis
-        board_ledToggle();
+        ledToggle();
     } else {
         if (accCalibrated)
             board_ledOff();
@@ -126,7 +136,7 @@ static void annexCode(void)
     if (check_timed_task(calibratedAccTime)) {
         if (!useSmallAngle) {
             accCalibrated = 0; // the multi uses ACC and is not calibrated or is too much inclinated
-            board_ledToggle();
+            ledToggle();
             update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC);
             //calibratedAccTime = currentTime + CONFIG_CALIBRATE_ACCTIME_USEC;
         } else {
@@ -204,14 +214,14 @@ static void pidMultiWii(void)
     for (axis = 0; axis < 3; axis++) {
         if ((CONFIG_HORIZON_MODE) && axis < 2) { // MODE relying on ACC
             // 50 degrees max inclination
-            errorAngle = constrain(2 * rcCommand[axis], -((int)CONFIG_MAX_ANGLE_INCLINATION), 
+            errorAngle = constrainer(2 * rcCommand[axis], -((int)CONFIG_MAX_ANGLE_INCLINATION), 
                     + CONFIG_MAX_ANGLE_INCLINATION) - angle[axis] + CONFIG_ANGLE_TRIM[axis];
             PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
             // 32 bits is needed for calculation: errorAngle*CONFIG_LEVEL_P could exceed 32768   
             // 16 bits is ok for result
-            PTermACC = constrain(PTermACC, -CONFIG_LEVEL_D * 5, + CONFIG_LEVEL_D * 5);
+            PTermACC = constrainer(PTermACC, -CONFIG_LEVEL_D * 5, + CONFIG_LEVEL_D * 5);
 
-            errorAngleI[axis] = constrain(errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
+            errorAngleI[axis] = constrainer(errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
             ITermACC = (errorAngleI[axis] * CONFIG_LEVEL_I) >> 12;
         }
         if (CONFIG_HORIZON_MODE || axis == 2) { // MODE relying on GYRO or YAW axis
@@ -220,7 +230,7 @@ static void pidMultiWii(void)
 
             PTermGYRO = rcCommand[axis];
 
-            errorGyroI[axis] = constrain(errorGyroI[axis] + error, -16000, +16000); // WindUp
+            errorGyroI[axis] = constrainer(errorGyroI[axis] + error, -16000, +16000); // WindUp
             if ((abs(gyroADC[axis]) > 640) || ((axis == YAW) && (abs(rcCommand[axis]) > 100)))
                 errorGyroI[axis] = 0;
             ITermGYRO = (errorGyroI[axis] / 125 * CONFIG_AXIS_I[axis]) >> 6;
@@ -250,6 +260,8 @@ void setup(void)
 {
     uint8_t i;
 
+    board_init();
+
     // sleep for 100ms
     board_delayMilliseconds(100);
 
@@ -273,7 +285,7 @@ void setup(void)
 
     board_ledOff();
     for (i = 0; i < 10; i++) {
-        board_ledToggle();
+        ledToggle();
         board_delayMilliseconds(50);
     }
     board_ledOff();
@@ -431,14 +443,14 @@ void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
 
     for (r = 0; r < repeat; r++) {
         for (i = 0; i < num; i++) {
-            board_ledToggle();            // switch LEDPIN state
+            ledToggle();            // switch LEDPIN state
             board_delayMilliseconds(wait);
         }
         board_delayMilliseconds(60);
     }
 }
 
-int constrain(int amt, int low, int high)
+int constrainer(int amt, int low, int high)
 {
     if (amt < low)
         return low;

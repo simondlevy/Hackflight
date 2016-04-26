@@ -13,6 +13,7 @@ void     board_i2cInit(void);
 void     board_imuInit(uint16_t * acc1G, float * gyroScale);
 void     board_imuReadAccel(int16_t * data);
 void     board_imuReadGyro(int16_t * data);
+void     board_init(void);
 void     board_ledOff(void);
 void     board_ledOn(void);
 void     board_ledToggle(void);

@@ -10,6 +10,10 @@
 
 extern serialPort_t * Serial1;
 
+void board_init(void)
+{
+}
+
 bool board_baroInit(void)
 {
     return ms5611_init();
