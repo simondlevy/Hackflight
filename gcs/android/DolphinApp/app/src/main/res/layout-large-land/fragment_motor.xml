@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1"
+    android:id="@+id/linearLayout"
+    android:background="#ff000000">
+
+    <FrameLayout
+        android:layout_width="420dp"
+        android:layout_height="420dp"
+        android:layout_gravity="center_vertical">
+
+        <ToggleButton
+            android:layout_width="@dimen/toggle_button_large_land"
+            android:layout_height="@dimen/toggle_button_large_land"
+            android:text=""
+            android:background="@drawable/toggle1"
+            android:id="@+id/toggleButton1"
+            android:layout_gravity="left|top"
+            android:checked="false"
+            android:enabled="false"
+            android:textOff=""
+            android:textOn=""
+            android:layout_margin="0dp" />
+
+        <ToggleButton
+            android:layout_width="@dimen/toggle_button_large_land"
+            android:layout_height="@dimen/toggle_button_large_land"
+            android:text=""
+            android:background="@drawable/toggle2"
+            android:id="@+id/toggleButton2"
+            android:layout_gravity="right|top"
+            android:checked="false"
+            android:enabled="false"
+            android:textOff=""
+            android:textOn=""
+            android:layout_margin="0dp" />
+
+        <ToggleButton
+            android:layout_width="@dimen/toggle_button_large_land"
+            android:layout_height="@dimen/toggle_button_large_land"
+            android:text=""
+            android:background="@drawable/toggle3"
+            android:id="@+id/toggleButton3"
+            android:layout_gravity="right|bottom"
+            android:textOn=""
+            android:textOff=""
+            android:checked="false"
+            android:clickable="true"
+            android:enabled="false"
+            android:layout_margin="0dp" />
+
+        <ToggleButton
+            android:layout_width="@dimen/toggle_button_large_land"
+            android:layout_height="@dimen/toggle_button_large_land"
+            android:text=""
+            android:background="@drawable/toggle4"
+            android:id="@+id/toggleButton4"
+            android:layout_gravity="left|bottom"
+            android:checked="false"
+            android:enabled="false"
+            android:textOff=""
+            android:textOn=""
+            android:layout_margin="0dp" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:baselineAligned="false">
+
+        <CheckBox
+            android:id="@+id/checkBox"
+
+            android:layout_width="@dimen/motors_check_box_width"
+            android:layout_height="@dimen/motors_check_box_height"
+            android:layout_gravity="center"
+            android:layout_marginTop="150dp"
+            android:layout_weight=".09"
+
+            android:text="@string/textBoxMessage"
+            android:checked="false"
+            android:textColor="@color/checkBoxTextColor"
+            android:background="#ffffffff"/>
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="90dp"
+
+            android:layout_gravity="center"
+            android:progressBackgroundTint="@color/progressBackgroundTint" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_weight="1"
+
+            android:text="0"
+            android:textColor="#ffffffff" />
+    </LinearLayout>
+
+</LinearLayout>

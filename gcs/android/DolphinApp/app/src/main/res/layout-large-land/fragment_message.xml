@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <CheckBox
+        android:id="@+id/messagesCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10sp"
+
+        android:text="@string/messagesCheckBox"
+        android:textColor="@color/checkBoxTextColor"
+        android:background="#ffffffff"
+        android:textSize="25sp" />
+
+    <ScrollView
+        android:id="@+id/scrollerId"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/messagesCheckBox"
+
+        android:scrollbars="vertical"
+        android:fillViewport="true">
+
+
+        <TextView
+            android:id="@+id/messageText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1.0"
+
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text=""
+            android:scrollbars="vertical"
+            android:textSize="25sp"
+            android:paddingBottom="10sp" />
+    </ScrollView>
+
+</RelativeLayout>
+
