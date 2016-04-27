@@ -1,1 +1,0 @@
-#define printf Serial.printf
