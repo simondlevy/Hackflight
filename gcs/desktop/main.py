@@ -11,12 +11,12 @@ USB_UPDATE_MSEC = 200
 
 from serial import Serial
 from serial.tools.list_ports import comports
-from Tkinter import *
 from threading import Thread
 import os
 
-from msppg import Parser
+from msppg import MSP_Parser
 
+from tk import *
 from setup import Setup
 from motors import Motors
 from receiver import Receiver
@@ -95,10 +95,10 @@ class GCS:
         self._show_splash()
 
         # Create a message parser 
-        self.parser = Parser()
+        self.parser = MSP_Parser()
 
         # Set up parser's request strings
-        self.attitude_request = self.parser.serialize_Attitude_Request()
+        self.attitude_request = self.parser.serialize_ATTITUDE_Request()
         self.rc_request = self.parser.serialize_RC_Request()
 
         # No messages yet
@@ -169,12 +169,12 @@ class GCS:
         self.messages.stop()
         self.maps.stop()
 
-        self.parser.set_Attitude_Handler(self._handle_attitude)
+        self.parser.set_ATTITUDE_Handler(self._handle_attitude)
         self.setup.start()
 
     def _start(self):
 
-        self.parser.set_Attitude_Handler(self._handle_attitude)
+        self.parser.set_ATTITUDE_Handler(self._handle_attitude)
         self._send_attitude_request()
         self.setup.start()
 
