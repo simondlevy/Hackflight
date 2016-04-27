@@ -16,7 +16,6 @@ void     board_imuReadGyro(int16_t * data);
 void     board_init(void);
 void     board_ledOff(void);
 void     board_ledOn(void);
-void     board_ledToggle(void);
 void     board_pwmInit(void);
 uint16_t board_pwmRead(uint8_t chan);
 void     board_writeMotor(uint8_t index, uint16_t value);

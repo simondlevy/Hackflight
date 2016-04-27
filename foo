@@ -1,1 +1,0 @@
-grep -lwR $1 src/*.c | grep -v swp

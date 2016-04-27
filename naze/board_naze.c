@@ -75,11 +75,6 @@ void board_ledOn(void)
     LED0_ON;
 }
 
-void board_ledToggle(void)
-{
-    LED0_TOGGLE;
-}
-
 void board_pwmInit(void)
 {
     pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
