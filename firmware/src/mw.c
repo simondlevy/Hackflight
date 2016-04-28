@@ -169,7 +169,12 @@ static void computeRC(void)
         for (i = 0; i < 4; i++)
             rcData[chan] += rcDataAverage[chan][i];
         rcData[chan] /= 4;
+
+        printf("%d:%04d ", chan, rcData[chan]);
     }
+
+    printf("\n");
+
     rcAverageIndex++;
 }
 

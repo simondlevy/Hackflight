@@ -49,7 +49,7 @@ void board_ledOn(void)
 
 uint16_t board_pwmRead(uint8_t chan)
 {
-    return ppm.read(chan);
+    return ppm.read(chan+1);
 }
 
 uint8_t board_serialAvailable(void)
