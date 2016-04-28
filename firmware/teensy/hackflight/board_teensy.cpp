@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <PulsePosition.h>
+
 #include "board.h"
 
 void board_delayMilliseconds(uint32_t msec)
@@ -11,9 +13,6 @@ uint32_t board_getMicros()
     return micros();
 }
 
-void board_i2cInit(void)
-{
-}
 
 void board_imuInit(uint16_t * acc1G, float * gyroScale)
 {
@@ -30,7 +29,8 @@ void board_imuReadGyro(int16_t * data)
 void board_init(void)
 {
     Serial.begin(115200);
-    pinMode(13, OUTPUT);     
+
+    pinMode(13, OUTPUT);  // LED
 }
 
 void board_ledOff(void)
@@ -44,10 +44,6 @@ void board_ledOn(void)
 }
 
 void board_ledToggle(void)
-{
-}
-
-void board_pwmInit(void)
 {
 }
 
