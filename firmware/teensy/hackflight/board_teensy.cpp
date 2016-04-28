@@ -54,16 +54,17 @@ uint16_t board_pwmRead(uint8_t chan)
 
 uint8_t board_serialAvailable(void)
 {
-    return 0;
+    return Serial.available();
 }
 
 uint8_t board_serialRead(void)
 {
-    return 0;
+    return Serial.read();
 }
 
 void board_serialWrite(uint8_t c)
 {
+    Serial.write(c);
 }
 
 void board_writeMotor(uint8_t index, uint16_t value)

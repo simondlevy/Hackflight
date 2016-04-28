@@ -158,8 +158,6 @@ static void computeRC(void)
         // get RC PWM
         capture = board_pwmRead(CONFIG_RCMAP[chan]);
 
-        printf("%d %d\n", chan, capture);
-
         // XXX default to CONFIG_MIDRC if out-of-bounds
         //if (capture < PULSE_MIN || capture > PULSE_MAX)
         //   capture =  CONFIG_MIDRC;
@@ -325,8 +323,6 @@ void loop(void)
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC)) {
 
         computeRC();
-
-        static int count;
 
         // ------------------ STICKS COMMAND HANDLER --------------------
         // checking sticks positions
