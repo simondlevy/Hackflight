@@ -1,9 +1,14 @@
 #include <Arduino.h>
 #include <PulsePosition.h>
+#include <I2Cdev.h>
+#include <MPU6050.h>
+#include <i2c_t3.h>
 
 #include "board.h"
 
 PulsePositionInput ppm;
+
+MPU6050 accelgyro;
 
 void board_delayMilliseconds(uint32_t msec)
 {
@@ -18,14 +23,38 @@ uint32_t board_getMicros()
 
 void board_imuInit(uint16_t * acc1G, float * gyroScale)
 {
+    // XXX MPU6050
+    *acc1G = 4096;
+    *gyroScale = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
+
+    // join I2C bus (I2Cdev library doesn't do this automatically)
+    Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, I2C_RATE_400); 
+
+    accelgyro.initialize();
 }
 
 void board_imuReadAccel(int16_t * data)
 {
+    int16_t ax, ay, az;
+    int16_t gx, gy, gz;
+
+    accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+
+    data[0] = ax;
+    data[1] = ay;
+    data[2] = az;
 }
 
 void board_imuReadGyro(int16_t * data)
 {
+    int16_t ax, ay, az;
+    int16_t gx, gy, gz;
+
+    accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+
+    data[0] = gx;
+    data[1] = gy;
+    data[2] = gz;
 }
 
 void board_init(void)
