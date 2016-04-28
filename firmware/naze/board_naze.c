@@ -12,6 +12,8 @@ extern serialPort_t * Serial1;
 
 void board_init(void)
 {
+    i2cInit(I2CDEV_2);
+    pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 }
 
 bool board_baroInit(void)
@@ -45,11 +47,6 @@ uint32_t board_getMicros()
     return micros();
 }
 
-void board_i2cInit(void)
-{
-    i2cInit(I2CDEV_2);
-}
-
 void board_imuInit(uint16_t * acc1G, float * gyroScale)
 {
     mpu6050_init(false, acc1G, gyroScale);
@@ -75,10 +72,6 @@ void board_ledOn(void)
     LED0_ON;
 }
 
-void board_pwmInit(void)
-{
-    pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
-}
 
 uint16_t board_pwmRead(uint8_t chan)
 {

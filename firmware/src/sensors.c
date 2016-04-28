@@ -100,8 +100,6 @@ static void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
 
 void sensorsInit(void)
 {
-    board_i2cInit();
-
     board_imuInit(&acc1G, &gyroScale);
 
     baroAvailable = board_baroInit();

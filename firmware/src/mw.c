@@ -28,7 +28,6 @@ static uint8_t dynP8[3], dynI8[3], dynD8[3];
 static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
 static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
-
 // Time of automatic disarm when "Don't spin the motors when armed" is enabled.
 static uint32_t disarmTime = 0;
 
@@ -57,7 +56,6 @@ static void update_timed_task(uint32_t * usec, uint32_t period)
 
 static bool check_and_update_timed_task(uint32_t * usec, uint32_t period) 
 {
-
     bool result = (int32_t)(currentTime - *usec) >= 0;
 
     if (result)
@@ -293,8 +291,6 @@ void setup(void)
     stateInit(); 
     mixerInit(); 
 
-    board_pwmInit();
-
     // configure PWM/CPPM read function and max number of channels
     // these, if enabled
     for (i = 0; i < RC_CHANS; i++)
@@ -327,6 +323,9 @@ void loop(void)
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC)) {
 
         computeRC();
+
+        static int count;
+        printf("%d\n", count++);
 
         // ------------------ STICKS COMMAND HANDLER --------------------
         // checking sticks positions
