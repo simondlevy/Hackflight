@@ -3,6 +3,8 @@
 
 #include "board.h"
 
+PulsePositionInput ppm;
+
 void board_delayMilliseconds(uint32_t msec)
 {
     delay(msec);
@@ -31,6 +33,8 @@ void board_init(void)
     Serial.begin(115200);
 
     pinMode(13, OUTPUT);  // LED
+
+    ppm.begin(23);
 }
 
 void board_ledOff(void)
@@ -43,13 +47,9 @@ void board_ledOn(void)
     digitalWriteFast(13, HIGH);
 }
 
-void board_ledToggle(void)
-{
-}
-
 uint16_t board_pwmRead(uint8_t chan)
 {
-    return 0;
+    return ppm.read(chan);
 }
 
 uint8_t board_serialAvailable(void)
