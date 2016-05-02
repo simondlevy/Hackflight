@@ -156,16 +156,18 @@ static void evaluateCommand(void)
             break;
 
         case MSP_STATUS:
+            /*
             headSerialReply(11);
             serialize16(cycleTime);
             serialize16(board_getI2cErrorCounter());
             serialize16(0);
             serialize8(0);
+            */
             break;
 
         case MSP_RAW_IMU:
+            /*
             headSerialReply(18);
-            // Retarded hack until multiwiidorks start using real units for sensor data
             if (acc1G > 1024) {
                 for (i = 0; i < 3; i++)
                     serialize16(accSmooth[i] / 8);
@@ -177,6 +179,7 @@ static void evaluateCommand(void)
                 serialize16(gyroADC[i]);
             for (i = 0; i < 3; i++)
                 serialize16(magADC[i]);
+                */
             break;
 
         case MSP_MOTOR:
@@ -197,15 +200,15 @@ static void evaluateCommand(void)
             break;
 
         case MSP_BARO_SONAR_RAW:
-            headSerialReply(8);
-            serialize32(baroPressure);
-            serialize32(sonarDistance);
+            //headSerialReply(8);
+            //serialize32(baroPressure);
+            //serialize32(sonarDistance);
             break;
 
         case MSP_ALTITUDE:
-            headSerialReply(6);
-            serialize32(estAlt);
-            serialize16(vario);
+            //headSerialReply(6);
+            //serialize32(estAlt);
+            //serialize16(vario);
             break;
 
         case MSP_REBOOT:

@@ -11,7 +11,6 @@ static uint32_t accTimeSum;        // keep track for integration of acc
 static float    anglerad[2];       // absolute angle inclination in radians
 static float    fcAcc;
 static int16_t  smallAngle;
-static float    throttleAngleScale;
 
 // **************************************************
 // Simplified IMU based on "Complementary Filter"
@@ -198,14 +197,13 @@ static void getEstimatedAttitude(void)
     rotateV(&EstG.V, deltaGyroAngle);
 
     // Apply complimentary filter (Gyro drift correction)
-    // If accel magnitude >1.15G or <0.85G and ACC vector outside of the limit range => we neutralize the effect of accelerometers in the angle estimation.
-    // To do that, we just skip filter, as EstV already rotated by Gyro
+    // If accel magnitude >1.15G or <0.85G and ACC vector outside of the limit
+    // range => we neutralize the effect of accelerometers in the angle
+    // estimation.  To do that, we just skip filter, as EstV already rotated by Gyro
     if (72 < (uint16_t)accMag && (uint16_t)accMag < 133) {
         for (axis = 0; axis < 3; axis++)
             EstG.A[axis] = (EstG.A[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + accSmooth[axis]) * INV_GYR_CMPF_FACTOR;
     }
-
-    useSmallAngle = (EstG.A[Z] > smallAngle);
 
     // Attitude of the estimated vector
     anglerad[ROLL] = atan2f(EstG.V.Y, EstG.V.Z);
@@ -225,7 +223,6 @@ static void getEstimatedAttitude(void)
 void stateInit(void)
 {
     smallAngle = lrintf(acc1G * cosf(RAD * CONFIG_SMALL_ANGLE));
-    throttleAngleScale = (1800.0f / M_PI) * (900.0f / CONFIG_THROTTLE_CORRECTION_ANGLE);
 
     fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 }

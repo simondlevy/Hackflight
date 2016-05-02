@@ -28,6 +28,8 @@ static uint8_t dynP8[3], dynI8[3], dynD8[3];
 static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
 static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
+static bool haveSmallAngle;
+
 // Time of automatic disarm when "Don't spin the motors when armed" is enabled.
 static uint32_t disarmTime = 0;
 
@@ -132,11 +134,10 @@ static void annexCode(void)
     }
 
     if (check_timed_task(calibratedAccTime)) {
-        if (!useSmallAngle) {
+        if (!haveSmallAngle) {
             accCalibrated = 0; // the multi uses ACC and is not calibrated or is too much inclinated
             ledToggle();
             update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC);
-            //calibratedAccTime = currentTime + CONFIG_CALIBRATE_ACCTIME_USEC;
         } else {
             accCalibrated = 1;
         }
@@ -302,7 +303,7 @@ void setup(void)
     // 10 seconds init_delay + 200 * 25 ms = 15 seconds before ground pressure settles
 
     // trigger accelerometer calibration requirement
-    useSmallAngle = true;
+    haveSmallAngle = true;
  }
 
 void loop(void)
@@ -316,10 +317,6 @@ void loop(void)
     static uint32_t loopTime;
     uint16_t auxState = 0;
     bool isThrottleLow = false;
-
-    //static uint16_t targetAGLcm;
-    //static uint8_t  altHold;
-
 
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC)) {
 
@@ -396,10 +393,10 @@ void loop(void)
         switch (taskOrder) {
             case 0:
                 taskOrder++;
-                sensorsGetBaro();
+                //sensorsGetBaro();
             case 1:
                 taskOrder++;
-                sensorsGetSonar();
+                //sensorsGetSonar();
             case 2:
                 taskOrder++;
             case 3:
@@ -416,9 +413,10 @@ void loop(void)
 
         stateComputeAngles();
 
+        haveSmallAngle = abs(angle[0]) < CONFIG_SMALL_ANGLE && abs(angle[1]) < CONFIG_SMALL_ANGLE;
+
         // Measure loop rate just afer reading the sensors
         currentTime = board_getMicros();
-        cycleTime = (int32_t)(currentTime - previousTime);
         previousTime = currentTime;
 
         // non IMU critical, temeperatur, serialcom

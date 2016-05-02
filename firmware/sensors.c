@@ -4,14 +4,9 @@
 
 #include <math.h>
 
-#define BARO_TAB_SIZE_MAX 48
-
 // Default orientation
 static sensor_align_e gyroAlign = CW0_DEG;
 static sensor_align_e accAlign = CW0_DEG;
-
-static bool baroAvailable;
-static bool sonarAvailable;
 
 typedef struct stdev_t {
     float m_oldM, m_newM, m_oldS, m_newS;
@@ -101,13 +96,6 @@ static void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
 void sensorsInit(void)
 {
     board_imuInit(&acc1G, &gyroScale);
-
-    baroAvailable = board_baroInit();
-    sonarAvailable = board_sonarInit();
-
-    // Default to OOB value to indicate sensor unavailable
-    baroPressure = -1;
-    sonarDistance = -1;
 }
 
 void sensorsGetAccel(void)
@@ -191,16 +179,3 @@ void sensorsGetGyro(void)
     for (axis = 0; axis < 3; axis++)
         gyroADC[axis] -= gyroZero[axis];
 }
-
-void sensorsGetBaro(void)
-{
-    if (baroAvailable) 
-        baroPressure = board_baroReadPressure();
-}
-
-void sensorsGetSonar(void)
-{
-    if (sonarAvailable) 
-        sonarDistance  = board_sonarReadDistance();
-}
- 
