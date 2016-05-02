@@ -290,8 +290,8 @@ void setup(void)
     }
     board_ledOff();
 
-    sensorsInit();
-    stateInit(); 
+    board_imuInit(&acc1G, &gyroScale);
+
     mixerInit(); 
 
     // configure PWM/CPPM read function and max number of channels

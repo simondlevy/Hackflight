@@ -72,11 +72,9 @@ EXTERN int16_t  gyroZero[3];
 EXTERN float    gyroScale;
 
 // State
-void stateInit(void);
 void stateComputeAngles(void);
 
 // Sensors
-void sensorsInit(void);
 void sensorsGetAccel(void);
 void sensorsGetGyro(void);
 

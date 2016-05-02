@@ -8,7 +8,7 @@
 
 static int32_t  accSum[3];
 static uint32_t accTimeSum;        // keep track for integration of acc
-static float    fcAcc;
+static float    fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 
 // **************************************************
 // Simplified IMU based on "Complementary Filter"
@@ -215,11 +215,6 @@ static void getEstimatedAttitude(void)
 }
 
 // =================================================================================================================
-
-void stateInit(void)
-{
-    fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
-}
 
 void stateComputeAngles(void)
 {

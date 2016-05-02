@@ -93,11 +93,6 @@ static void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
 
 // ==============================================================================================================
 
-void sensorsInit(void)
-{
-    board_imuInit(&acc1G, &gyroScale);
-}
-
 void sensorsGetAccel(void)
 {
     static int16_t data[3];
