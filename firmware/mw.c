@@ -2,7 +2,6 @@
 
 #include "mw.h"
 #include "config.h"
-#include "board.h"
 
 #include <math.h>
 
@@ -253,7 +252,10 @@ static void pidMultiWii(void)
         delta1[axis] = delta;
         DTerm = (deltaSum * dynD8[axis]) / 32;
         axisPID[axis] = PTerm + ITerm - DTerm;
+
+        printf("%d ", gyroADC[axis]);
     }
+    printf("\n");
 }
 
 // =================================================================================================================
@@ -290,7 +292,7 @@ void setup(void)
     }
     board_ledOff();
 
-    board_imuStart();
+    board_imuInit();
 
     mixerInit(); 
 

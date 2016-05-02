@@ -9,6 +9,8 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
+#include <printf.h>
+
 #define RC_CHANS    (18)
 
 #ifndef abs
@@ -65,10 +67,6 @@ EXTERN int16_t  motorsDisarmed[4];
 EXTERN int16_t  rcCommand[4];
 EXTERN int16_t  rcData[RC_CHANS];
 
-// State
-void board_imuStart(void);
-void board_imuComputeAngles(void);
-
 // Mixer
 void mixerInit(void);
 void mixerWriteMotors(void);
@@ -79,3 +77,22 @@ void mspCom(void);
 // Common
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
 int constrainer(int amt, int low, int high);
+
+// Board
+
+void     board_delayMilliseconds(uint32_t msec);
+uint32_t board_getMicros();
+void     board_imuComputeAngles(void);
+void     board_imuInit(void);
+void     board_init(void);
+void     board_ledOff(void);
+void     board_ledOn(void);
+uint16_t board_pwmRead(uint8_t chan);
+void     board_writeMotor(uint8_t index, uint16_t value);
+uint8_t  board_serialAvailable(void);
+uint8_t  board_serialRead(void);
+void     board_serialWrite(uint8_t c);
+
+void     board_checkReboot(bool pendReboot);
+uint16_t board_getI2cErrorCounter(void);
+void     board_reboot(void);

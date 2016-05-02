@@ -37,28 +37,24 @@ CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
 STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 
 # Source files common to all targets
-NAZE_SRC =  state.c \
-		   	mixer.c \
-		   	mw.c \
-		   	msp.c \
-			board_naze.c \
-		   	$(BREEZY_DIR)/main.c \
-		   	$(BREEZY_DIR)/printf.c \
-		   	$(BREEZY_DIR)/drv_system.c \
-		   	$(BREEZY_DIR)/drv_mpu6050.c \
-		   	$(BREEZY_DIR)/drv_ms5611.c \
-		   	$(BREEZY_DIR)/drv_mb1242.c \
-		   	$(BREEZY_DIR)/drv_i2c.c \
-		   	$(BREEZY_DIR)/drv_serial.c \
-		   	$(BREEZY_DIR)/drv_pwm.c \
-		   	$(BREEZY_DIR)/drv_gpio.c \
-		   	$(BREEZY_DIR)/drv_uart.c \
-			$(BREEZY_DIR)/drv_adc.c \
-		   	$(BREEZY_DIR)/drv_spi.c \
-		   	$(BREEZY_DIR)/drv_timer.c \
-		   	$(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
-		   	$(CMSIS_SRC) \
-		   	$(STDPERIPH_SRC)
+NAZE_SRC =  mw.c mixer.c msp.c board_naze.c \
+            $(BREEZY_DIR)/main.c \
+            $(BREEZY_DIR)/printf.c \
+            $(BREEZY_DIR)/drv_system.c \
+            $(BREEZY_DIR)/drv_mpu6050.c \
+            $(BREEZY_DIR)/drv_ms5611.c \
+            $(BREEZY_DIR)/drv_mb1242.c \
+            $(BREEZY_DIR)/drv_i2c.c \
+            $(BREEZY_DIR)/drv_serial.c \
+            $(BREEZY_DIR)/drv_pwm.c \
+            $(BREEZY_DIR)/drv_gpio.c \
+            $(BREEZY_DIR)/drv_uart.c \
+            $(BREEZY_DIR)/drv_adc.c \
+            $(BREEZY_DIR)/drv_spi.c \
+            $(BREEZY_DIR)/drv_timer.c \
+            $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
+            $(CMSIS_SRC) \
+            $(STDPERIPH_SRC)
 
 # In some cases, %.s regarded as intermediate file, which is actually not.
 # This will prevent accidental deletion of startup code.
@@ -161,7 +157,7 @@ $(TARGET_ELF):  $(TARGET_OBJS)
 MKDIR_OBJDIR = @mkdir -p $(dir $@)
 
 # Compile
-$(OBJECT_DIR)/$(TARGET)/%.o: %.c mw.h config.h board.h
+$(OBJECT_DIR)/$(TARGET)/%.o: %.c mw.h config.h
 	$(MKDIR_OBJDIR)
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(CFLAGS) $<

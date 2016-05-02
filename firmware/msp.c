@@ -6,7 +6,6 @@
 
 #include "mw.h"
 #include "config.h"
-#include "board.h"
 
 // Multiwii Serial Protocol 0
 #define MSP_STATUS               101    //out message         cycletime & errors_count & sensor present & box activation & current setting number

@@ -1,5 +1,4 @@
 #include "mw.h"
-#include "board.h"
 #include "config.h" 
 
 // Custom mixer data per motor
