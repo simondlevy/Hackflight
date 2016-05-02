@@ -166,20 +166,6 @@ static void evaluateCommand(void)
             break;
 
         case MSP_RAW_IMU:
-            /*
-            headSerialReply(18);
-            if (acc1G > 1024) {
-                for (i = 0; i < 3; i++)
-                    serialize16(accSmooth[i] / 8);
-            } else {
-                for (i = 0; i < 3; i++)
-                    serialize16(accSmooth[i]);
-            }
-            for (i = 0; i < 3; i++)
-                serialize16(gyroADC[i]);
-            for (i = 0; i < 3; i++)
-                serialize16(magADC[i]);
-                */
             break;
 
         case MSP_MOTOR:

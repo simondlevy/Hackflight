@@ -290,7 +290,7 @@ void setup(void)
     }
     board_ledOff();
 
-    board_imuInit(&acc1G, &gyroScale);
+    board_imuStart();
 
     mixerInit(); 
 
@@ -412,7 +412,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        stateComputeAngles();
+        board_imuComputeAngles();
 
         angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
         angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));

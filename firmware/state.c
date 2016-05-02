@@ -11,6 +11,12 @@
 static sensor_align_e gyroAlign = CW0_DEG;
 static sensor_align_e accAlign = CW0_DEG;
 
+static uint16_t acc1G;
+static int16_t  accADC[3];
+static int16_t  accSmooth[3];
+static int16_t  gyroZero[3];
+static float    gyroScale;
+
 typedef struct stdev_t {
     float m_oldM, m_newM, m_oldS, m_newS;
     int m_n;
@@ -385,7 +391,12 @@ static void getEstimatedAttitude(void)
 
 // =================================================================================================================
 
-void stateComputeAngles(void)
+void board_imuStart(void)
+{
+    board_imuInit(&acc1G, &gyroScale);
+}
+
+void board_imuComputeAngles(void)
 {
     sensorsGetGyro();
     sensorsGetAccel();
