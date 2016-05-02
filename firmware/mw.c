@@ -283,8 +283,6 @@ void setup(void)
             lookupThrottleRC[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
     }
 
-    sensorsInit();
-
     board_ledOff();
     for (i = 0; i < 10; i++) {
         ledToggle();
@@ -292,6 +290,7 @@ void setup(void)
     }
     board_ledOff();
 
+    sensorsInit();
     stateInit(); 
     mixerInit(); 
 
