@@ -74,10 +74,6 @@ EXTERN float    gyroScale;
 // State
 void stateComputeAngles(void);
 
-// Sensors
-void sensorsGetAccel(void);
-void sensorsGetGyro(void);
-
 // Mixer
 void mixerInit(void);
 void mixerWriteMotors(void);

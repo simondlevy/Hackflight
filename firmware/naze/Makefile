@@ -40,7 +40,6 @@ STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 NAZE_SRC =  state.c \
 		   	mixer.c \
 		   	mw.c \
-		   	sensors.c \
 		   	msp.c \
 			board_naze.c \
 		   	$(BREEZY_DIR)/main.c \
