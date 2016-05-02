@@ -424,10 +424,6 @@ void loop(void)
         // non IMU critical, temeperatur, serialcom
         annexCode();
 
-        if (CONFIG_THROTTLE_CORRECTION_VALUE && CONFIG_HORIZON_MODE) {
-            rcCommand[THROTTLE] += throttleAngleCorrection;
-        }
-
         pidMultiWii();
 
         mixerWriteMotors();

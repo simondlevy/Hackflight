@@ -218,21 +218,6 @@ static void getEstimatedAttitude(void)
     heading = calculateHeading(&EstN);
 
     acc_calc(deltaT); // rotate acc vector into earth frame
-
-    if (CONFIG_THROTTLE_CORRECTION_VALUE) {
-
-        float cosZ = EstG.V.Z / sqrtf(EstG.V.X * EstG.V.X + EstG.V.Y * EstG.V.Y + EstG.V.Z * EstG.V.Z);
-
-        if (cosZ <= 0.015f) { // we are inverted, vertical or with a small angle < 0.86 deg
-            throttleAngleCorrection = 0;
-        } else {
-            int deg = lrintf(acosf(cosZ) * throttleAngleScale);
-            if (deg > 900)
-                deg = 900;
-            throttleAngleCorrection = lrintf(CONFIG_THROTTLE_CORRECTION_VALUE * sinf(deg / (900.0f * M_PI / 2.0f)));
-        }
-
-    }
 }
 
 // =================================================================================================================

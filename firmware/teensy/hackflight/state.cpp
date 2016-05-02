@@ -1,1 +1,1 @@
-../../src/state.c
+../../state.c

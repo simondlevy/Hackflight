@@ -30,7 +30,7 @@ SERIAL_DEVICE	?= /dev/ttyUSB0
 # Working directories
 ROOT		 = ..
 HERE         = .
-SRC_DIR		 = $(ROOT)/src
+SRC_DIR		 = $(ROOT)
 OBJECT_DIR	 = $(HERE)/obj
 BIN_DIR		 = $(HERE)/obj
 CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
@@ -74,7 +74,7 @@ CMSIS_SRC	 = $(notdir $(wildcard $(CMSIS_DIR)/CM3/CoreSupport/*.c \
 			               $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x/*.c))
 
 # Search path and source files for the ST stdperiph library
-VPATH		:= $(VPATH):$(STDPERIPH_DIR)/src
+VPATH		:= $(VPATH):$(STDPERIPH_DIR)
 STDPERIPH_SRC	 = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
 
 ###############################################################################
@@ -203,12 +203,3 @@ debug:
 
 listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
-
-imu:
-	python getimu.py $(SERIAL_DEVICE)
-
-flow:
-	python getpx4flow.py $(SERIAL_DEVICE)
-
-count:
-	wc -l src/*.c src/*.h | sort -n

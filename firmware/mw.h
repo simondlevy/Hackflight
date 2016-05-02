@@ -74,7 +74,6 @@ EXTERN int16_t  motorsDisarmed[4];
 EXTERN int16_t  rcCommand[4];
 EXTERN int16_t  rcData[RC_CHANS];
 EXTERN int32_t  sonarDistance;
-EXTERN int16_t  throttleAngleCorrection;
 EXTERN bool     useSmallAngle;
 EXTERN int32_t  vario;
 

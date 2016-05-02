@@ -1,1 +1,1 @@
-../../src/board.h
+../../board.h

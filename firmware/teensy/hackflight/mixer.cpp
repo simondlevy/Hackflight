@@ -1,1 +1,1 @@
-../../src/mixer.c
+../../mixer.c

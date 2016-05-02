@@ -1,1 +1,1 @@
-../../src/sensors.c
+../../sensors.c

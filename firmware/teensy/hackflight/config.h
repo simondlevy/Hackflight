@@ -1,1 +1,1 @@
-../../src/config.h
+../../config.h

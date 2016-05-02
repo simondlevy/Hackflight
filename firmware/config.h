@@ -38,8 +38,6 @@ static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 // the angle when the throttle correction is maximal. in 0.1 degres, ex 225 = 22.5 ,30.0, 450 = 45.0 deg
 #define CONFIG_THROTTLE_CORRECTION_ANGLE            800   
 
-// the correction that will be applied at throttle_correction_angle.
-#define CONFIG_THROTTLE_CORRECTION_VALUE            0
 #define CONFIG_YAW_RATE                             0
 
 #define CONFIG_DYN_THR_PID                          0
