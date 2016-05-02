@@ -53,6 +53,7 @@ typedef enum {
 
 // Globals
 EXTERN int16_t  angle[2];
+EXTERN float    anglerad[2];
 EXTERN uint8_t  armed;
 EXTERN int16_t  axisPID[3];
 EXTERN int16_t  heading;

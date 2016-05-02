@@ -13,7 +13,7 @@ PITCH_ACTIVE = 2
 ROLL_ACTIVE = 3
 
 
-from tk import *
+from Tkinter import *
 
 from math import sin, cos, radians, degrees
 import numpy as np

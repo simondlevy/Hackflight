@@ -8,7 +8,6 @@
 
 static int32_t  accSum[3];
 static uint32_t accTimeSum;        // keep track for integration of acc
-static float    anglerad[2];       // absolute angle inclination in radians
 static float    fcAcc;
 static int16_t  smallAngle;
 
@@ -208,8 +207,6 @@ static void getEstimatedAttitude(void)
     // Attitude of the estimated vector
     anglerad[ROLL] = atan2f(EstG.V.Y, EstG.V.Z);
     anglerad[PITCH] = atan2f(-EstG.V.X, sqrtf(EstG.V.Y * EstG.V.Y + EstG.V.Z * EstG.V.Z));
-    angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
-    angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
 
     rotateV(&EstN.V, deltaGyroAngle);
     normalizeV(&EstN.V, &EstN.V);

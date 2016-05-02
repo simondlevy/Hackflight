@@ -7,7 +7,7 @@ UPDATE_MSEC = 1
 PWM_MIN = 988
 PWM_MAX = 2011
 
-from tk import *
+from Tkinter import *
 
 from dialog import Dialog
 

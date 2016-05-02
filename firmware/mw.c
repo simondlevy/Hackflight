@@ -4,6 +4,8 @@
 #include "config.h"
 #include "board.h"
 
+#include <math.h>
+
 #define ROL_LO (1 << (2 * ROLL))
 #define ROL_CE (3 << (2 * ROLL))
 #define ROL_HI (2 << (2 * ROLL))
@@ -412,6 +414,9 @@ void loop(void)
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
         stateComputeAngles();
+
+        angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
+        angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
 
         haveSmallAngle = abs(angle[0]) < CONFIG_SMALL_ANGLE && abs(angle[1]) < CONFIG_SMALL_ANGLE;
 

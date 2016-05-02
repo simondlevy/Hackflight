@@ -28,7 +28,7 @@ MOTORS_TOP_Y    = 60
 MOTORS_BOTTOM_Y = 220
 MOTORS_RADIUS   = 20
 
-from tk import *
+from Tkinter import *
 from math import sqrt
 
 from dialog import Dialog

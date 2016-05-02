@@ -16,7 +16,7 @@ import os
 
 from msppg import MSP_Parser
 
-from tk import *
+from Tkinter import *
 from setup import Setup
 from motors import Motors
 from receiver import Receiver
