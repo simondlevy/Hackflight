@@ -66,7 +66,7 @@ NAZE_SRC =  state.c \
 .PRECIOUS: %.s
 
 # Search path for hackflight sources
-VPATH		:= $(SRC_DIR):$(SRC_DIR)/hackflight_startups
+VPATH		:= $(SRC_DIR):#$(SRC_DIR)/hackflight_startups
 
 # Search path and source files for the CMSIS sources
 VPATH		:= $(VPATH):$(CMSIS_DIR)/CM3/CoreSupport:$(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x
@@ -74,7 +74,7 @@ CMSIS_SRC	 = $(notdir $(wildcard $(CMSIS_DIR)/CM3/CoreSupport/*.c \
 			               $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x/*.c))
 
 # Search path and source files for the ST stdperiph library
-VPATH		:= $(VPATH):$(STDPERIPH_DIR)
+VPATH		:= $(VPATH):$(STDPERIPH_DIR):$(STDPERIPH_DIR)/src
 STDPERIPH_SRC	 = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
 
 ###############################################################################
