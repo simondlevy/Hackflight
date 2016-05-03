@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include <PulsePosition.h>
 #include <I2Cdev.h>
-#include <MPU6050.h>
 #include <i2c_t3.h>
+#include <math.h>
 
 #include "mw.h"
 
@@ -409,6 +409,8 @@ static void MPU9250SelfTest(float * destination) // Should return percent deviat
 
 }
 
+// ------------------------------------------------------------------------------------
+
 void board_imuInit(uint16_t *acc1G, float * gyroScale)
 {
     // Setup for Master mode, pins 16/17, external pullups, 400kHz for Teensy 3.1
@@ -437,9 +439,9 @@ void board_imuInit(uint16_t *acc1G, float * gyroScale)
         while(1) ; // Loop forever if communication doesn't happen
     }
 
-    // XXX
-    *acc1G = 0;
-    *gyroScale = gRes;
+    *acc1G = 4096;
+    //*gyroScale = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
+    *gyroScale = 0.000000001;
 }
 
 void board_imuRead(int16_t accADC[3], int16_t gyroADC[3])
