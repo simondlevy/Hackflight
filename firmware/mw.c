@@ -778,6 +778,21 @@ void loop(void)
 
         board_imuComputeAngles();
 
+        static int16_t accADCmax[3];
+        static int16_t gyroADCmax[3];
+
+        int k=0;
+        for (k=0; k<3; ++k) {
+            if (abs(accADC[k]) > accADCmax[k])
+                accADCmax[k] = abs(accADC[k]);
+            if (abs(gyroADC[k]) > gyroADCmax[k])
+                gyroADCmax[k] = abs(gyroADC[k]);
+        }
+
+        PRINTF("%d %d %d | %d %d %d\n", 
+                accADCmax[0], accADCmax[1], accADCmax[2],
+                gyroADCmax[0], gyroADCmax[1], gyroADCmax[2]);
+
         angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
         angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
 
@@ -785,8 +800,6 @@ void loop(void)
 
         if (heading < 0)
             heading += 360;
-
-        PRINTF("%d\n", heading);
 
         haveSmallAngle = abs(angle[0]) < CONFIG_SMALL_ANGLE && abs(angle[1]) < CONFIG_SMALL_ANGLE;
 

@@ -49,6 +49,7 @@ EXTERN uint8_t  armed;
 EXTERN uint16_t calibratingA;
 EXTERN uint16_t calibratingG;
 EXTERN int16_t  gyroADC[3];
+EXTERN int16_t  accADC[3];
 
 // Board =======================================================
 
@@ -119,7 +120,6 @@ static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 #define CONFIG_ACCZ_DEADBAND                        40
 #define CONFIG_ACCXY_DEADBAND                       40
 #define CONFIG_ACCZ_LPF_CUTOFF                      5.0F
-#define CONFIG_ACC_UNARMEDCAL                       1
 #define CONFIG_SMALL_ANGLE                          250 // tenths of a degree
 #define CONFIG_DEADBAND                             0
 #define CONFIG_YAW_DEADBAND                         0

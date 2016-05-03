@@ -168,8 +168,6 @@ enum Gscale {
 static uint8_t Gscale = GFS_250DPS;
 static uint8_t Ascale = AFS_2G;
 static float aRes, gRes;      // scale resolutions per LSB for the sensors
-static int16_t accelCount[3];  // Stores the 16-bit signed accelerometer sensor output
-static int16_t gyroCount[3];   // Stores the 16-bit signed gyro sensor output
 static float gyroBias[3] = {0, 0, 0}, accelBias[3] = {0, 0, 0};
 static float SelfTest[6];            // holds results of gyro and accelerometer self test
 
@@ -674,13 +672,22 @@ void board_imuComputeAngles()
 
     // If intPin goes high, all data registers have new data
     if (readByte(MPU9250_ADDRESS, INT_STATUS) & 0x01) {  // check if data ready interrupt
+
+        int16_t accelCount[3];  // Stores the 16-bit signed accelerometer sensor output
+
         // if (digitalRead(intPin)) {  // On interrupt, read data
         readAccelData(accelCount);  // Read the x/y/z adc values
+
+        accADC[0] = accelCount[0];
+        accADC[1] = accelCount[1];
+        accADC[2] = accelCount[2];
 
         // Now we'll calculate the accleration value into actual g's
         ax = (float)accelCount[0]*aRes - accelBias[0];  // get actual g value, this depends on scale being set
         ay = (float)accelCount[1]*aRes - accelBias[1];   
         az = (float)accelCount[2]*aRes - accelBias[2];  
+
+        int16_t gyroCount[3];   // Stores the 16-bit signed gyro sensor output
 
         readGyroData(gyroCount);  // Read the x/y/z adc values
 
@@ -688,6 +695,10 @@ void board_imuComputeAngles()
         gx = (float)gyroCount[0]*gRes;  // get actual gyro value, this depends on scale being set
         gy = (float)gyroCount[1]*gRes;  
         gz = (float)gyroCount[2]*gRes;   
+
+        gyroADC[0] = gyroCount[0] >> 2;
+        gyroADC[1] = gyroCount[1] >> 2;
+        gyroADC[2] = gyroCount[2] >> 2;
     }
 
     Now = micros();
@@ -701,13 +712,6 @@ void board_imuComputeAngles()
 
     anglerad[ROLL] = -asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
 
-    gyroADC[0] = gyroCount[0] >> 2;
-    gyroADC[1] = gyroCount[1] >> 2;
-    gyroADC[2] = gyroCount[2] >> 2;
-
-    float f   = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), 
-            q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);
-
-    Serial.printf("%f\n", f);
+    headingrad = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);
 }
 

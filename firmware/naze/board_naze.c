@@ -10,7 +10,6 @@
 
 
 static uint16_t acc1G;
-static int16_t  accADC[3];
 static int16_t  accSmooth[3];
 static int16_t  gyroZero[3];
 static float    gyroScale;
@@ -231,14 +230,11 @@ static void acc_calc(uint32_t deltaT)
 
     rotateV(&accel_ned.V, rpy);
 
-    if (CONFIG_ACC_UNARMEDCAL == 1) {
-        if (!armed) {
-            accZoffset -= accZoffset / 64;
-            accZoffset += accel_ned.V.Z;
-        }
-        accel_ned.V.Z -= accZoffset / 64;  // compensate for gravitation on z-axis
-    } else
-        accel_ned.V.Z -= acc1G;
+    if (!armed) {
+        accZoffset -= accZoffset / 64;
+        accZoffset += accel_ned.V.Z;
+    }
+    accel_ned.V.Z -= accZoffset / 64;  // compensate for gravitation on z-axis
 
     accz_smooth = accz_smooth + (dT / (fcAcc + dT)) * (accel_ned.V.Z - accz_smooth); // low pass filter
 
@@ -333,16 +329,6 @@ void board_init(void)
     pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 }
 
-bool board_baroInit(void)
-{
-    return ms5611_init();
-}
-
-int32_t board_baroReadPressure(void)
-{
-    return ms5611_read_pressure();
-}
-
 void board_checkReboot(bool pendReboot)
 {
     if (pendReboot)
@@ -404,16 +390,3 @@ void board_writeMotor(uint8_t index, uint16_t value)
 {
     pwmWriteMotor(index, value);
 }
-
-bool board_sonarInit(void)
-{
-    return mb1242_init();
-}
-
-int32_t board_sonarReadDistance(void)
-{
-    return mb1242_poll();
-}
-
-
-
