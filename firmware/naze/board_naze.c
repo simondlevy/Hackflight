@@ -3,11 +3,11 @@
 #include "config.h"
 #include "mw.h"
 
-#define USE_CPPM                             1
-#define PWM_FILTER                           0     /* 0 or 1 */
-#define FAST_PWM                             0     /* 0 or 1 */
-#define MOTOR_PWM_RATE                       400
-#define PWM_IDLE_PULSE                       1000  /* standard PWM in usec for brushless ESC */
+#define USE_CPPM       1
+#define PWM_FILTER     0     // 0 or 1
+#define FAST_PWM       0     // 0 or 1
+#define MOTOR_PWM_RATE 400
+#define PWM_IDLE_PULSE 1000  // standard PWM in usec for brushless ESC
 
 
 static uint16_t acc1G;

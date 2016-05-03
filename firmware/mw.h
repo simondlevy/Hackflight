@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-#include <printf.h>
+#include "printf.h"
 
 #define RC_CHANS    (18)
 
