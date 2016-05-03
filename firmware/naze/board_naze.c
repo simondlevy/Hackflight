@@ -118,7 +118,6 @@ static void sensorsGetGyro(void)
                     continue;
                 }
                 gyroZero[axis] = (g[axis] + (CONFIG_CALIBRATING_GYRO_CYCLES / 2)) / CONFIG_CALIBRATING_GYRO_CYCLES;
-                blinkLED(10, 15, 1);
             }
         }
         calibratingG--;

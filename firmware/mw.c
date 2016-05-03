@@ -32,6 +32,52 @@ static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for e
 
 static bool haveSmallAngle;
 
+static int16_t  motors[4];
+static int16_t  motorsDisarmed[4];
+
+static int16_t  angle[2];
+
+static int16_t  rcCommand[4];
+static int16_t  rcData[RC_CHANS];
+
+// utilities ======================================================================================================
+
+static void ledToggle(void)
+{
+    static bool state;
+
+    if (state)
+        board_ledOff();
+    else
+        board_ledOn();
+
+    state = !state;
+}
+
+
+void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
+{
+    uint8_t i, r;
+
+    for (r = 0; r < repeat; r++) {
+        for (i = 0; i < num; i++) {
+            ledToggle();            // switch LEDPIN state
+            board_delayMilliseconds(wait);
+        }
+        board_delayMilliseconds(60);
+    }
+}
+
+int constrainer(int amt, int low, int high)
+{
+    if (amt < low)
+        return low;
+    else if (amt > high)
+        return high;
+    else
+        return amt;
+}
+
 // MSP ============================================================================================================
 
 typedef enum serialState_t {
@@ -294,18 +340,6 @@ static void mspCom(void)
 // Time of automatic disarm when "Don't spin the motors when armed" is enabled.
 static uint32_t disarmTime = 0;
 
-static void ledToggle(void)
-{
-    static bool state;
-
-    if (state)
-        board_ledOff();
-    else
-        board_ledOn();
-
-    state = !state;
-}
-
 static bool check_timed_task(uint32_t usec) 
 {
 
@@ -517,6 +551,7 @@ static void pidMultiWii(void)
 
 
 // Mixer =========================================================================================================
+
 
 // Custom mixer data per motor
 typedef struct motorMixer_t {
@@ -751,27 +786,4 @@ void loop(void)
 
         mixerWriteMotors();
     }
-}
-
-void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
-{
-    uint8_t i, r;
-
-    for (r = 0; r < repeat; r++) {
-        for (i = 0; i < num; i++) {
-            ledToggle();            // switch LEDPIN state
-            board_delayMilliseconds(wait);
-        }
-        board_delayMilliseconds(60);
-    }
-}
-
-int constrainer(int amt, int low, int high)
-{
-    if (amt < low)
-        return low;
-    else if (amt > high)
-        return high;
-    else
-        return amt;
 }

@@ -41,8 +41,8 @@ typedef enum {
 #define  EXTERN  extern
 #endif
 
-// Globals
-EXTERN int16_t  angle[2];
+// Globals ====================================================
+
 EXTERN float    anglerad[2];
 EXTERN uint8_t  armed;
 EXTERN int16_t  axisPID[3];
@@ -50,14 +50,6 @@ EXTERN uint16_t calibratingA;
 EXTERN uint16_t calibratingG;
 EXTERN int16_t  gyroADC[3];
 EXTERN int16_t  heading;
-EXTERN int16_t  motors[4];
-EXTERN int16_t  motorsDisarmed[4];
-EXTERN int16_t  rcCommand[4];
-EXTERN int16_t  rcData[RC_CHANS];
-
-// Common
-void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat);
-int constrainer(int amt, int low, int high);
 
 // Board =======================================================
 
