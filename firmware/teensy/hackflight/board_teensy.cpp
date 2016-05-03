@@ -167,7 +167,6 @@ enum Gscale {
 // Specify sensor full scale
 static uint8_t Gscale = GFS_250DPS;
 static uint8_t Ascale = AFS_2G;
-static float aRes, gRes;      // scale resolutions per LSB for the sensors
 static float SelfTest[6];            // holds results of gyro and accelerometer self test
 
 // I2C read/write functions for the MPU9250
@@ -201,49 +200,6 @@ static void readBytes(uint8_t address, uint8_t subAddress, uint8_t count, uint8_
     while (Wire.available()) {
         dest[i++] = Wire.read(); }         // Put read results in the Rx buffer
 }
-
-static void getGres() {
-    switch (Gscale)
-    {
-        // Possible gyro scales (and their register bit settings) are:
-        // 250 DPS (00), 500 DPS (01), 1000 DPS (10), and 2000 DPS  (11). 
-        // Here's a bit of an algorith to calculate DPS/(ADC tick) based on that 2-bit value:
-        case GFS_250DPS:
-            gRes = 250.0/32768.0;
-            break;
-        case GFS_500DPS:
-            gRes = 500.0/32768.0;
-            break;
-        case GFS_1000DPS:
-            gRes = 1000.0/32768.0;
-            break;
-        case GFS_2000DPS:
-            gRes = 2000.0/32768.0;
-            break;
-    }
-}
-
-static void getAres() {
-    switch (Ascale)
-    {
-        // Possible accelerometer scales (and their register bit settings) are:
-        // 2 Gs (00), 4 Gs (01), 8 Gs (10), and 16 Gs  (11). 
-        // Here's a bit of an algorith to calculate DPS/(ADC tick) based on that 2-bit value:
-        case AFS_2G:
-            aRes = 2.0/32768.0;
-            break;
-        case AFS_4G:
-            aRes = 4.0/32768.0;
-            break;
-        case AFS_8G:
-            aRes = 8.0/32768.0;
-            break;
-        case AFS_16G:
-            aRes = 16.0/32768.0;
-            break;
-    }
-}
-
 
 static void readAccelData(int16_t * destination)
 {
@@ -426,10 +382,6 @@ void board_imuInit(uint16_t *acc1G, float * gyroScale)
     {  
         MPU9250SelfTest(SelfTest); // Start by performing self test and reporting values
 
-        // get sensor resolutions, only need to do this once
-        getAres();
-        getGres();
-
         initMPU9250(); 
     }
     else
@@ -439,8 +391,8 @@ void board_imuInit(uint16_t *acc1G, float * gyroScale)
         while(1) ; // Loop forever if communication doesn't happen
     }
 
+    // Determined emiprically
     *acc1G = 4096;
-    //*gyroScale = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
     *gyroScale = 0.000000001;
 }
 
