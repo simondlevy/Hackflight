@@ -84,11 +84,6 @@ void board_writeMotor(uint8_t index, uint16_t value)
 #include <i2c_t3.h>
 #include <SPI.h>
 
-// See also MPU-9250 Register Map and Descriptions, Revision 4.0,
-// RM-MPU-9250A-00, Rev. 1.4, 9/9/2013 for registers not listed in above
-// document; the MPU9250 and MPU9150 are virtually identical but the latter has
-// a different register map
-
 #define SELF_TEST_X_GYRO 0x00                  
 #define SELF_TEST_Y_GYRO 0x01                                                                          
 #define SELF_TEST_Z_GYRO 0x02
@@ -181,19 +176,7 @@ static float SelfTest[6];            // holds results of gyro and accelerometer 
 // global constants for 9 DoF fusion and AHRS (Attitude and Heading Reference System)
 static float GyroMeasError = PI * (40.0f / 180.0f);   // gyroscope measurement error in rads/s (start at 40 deg/s)
 
-// There is a tradeoff in the beta parameter between accuracy and response
-// speed.  In the original Madgwick study, beta of 0.041 (corresponding to
-// GyroMeasError of 2.7 degrees/s) was found to give optimal accuracy.
-// However, with this value, the LSM9SD0 response time is about 10 seconds to a
-// stable initial quaternion.  Subsequent changes also require a longish lag
-// time to a stable output, not fast enough for a quadcopter or robot car!
-// By increasing beta (GyroMeasError) by about a factor of fifteen, the
-// response time constant is reduced to ~2 sec I haven't noticed any reduction
-// in solution accuracy. This is essentially the I coefficient in a PID control
-// sense; the bigger the feedback coefficient, the faster the solution
-// converges, usually at the expense of accuracy.  In any case, this is the
-// free parameter in the Madgwick filtering and fusion scheme.
-static float beta = sqrt(3.0f / 4.0f) * GyroMeasError;   // compute beta
+static float beta = sqrt(3.0f / 4.0f) * GyroMeasError;   
 
 static uint32_t delt_t = 0, count = 0;  // used to control display output rate
 
@@ -219,8 +202,6 @@ static uint8_t readByte(uint8_t address, uint8_t subAddress)
     Wire.beginTransmission(address);         // Initialize the Tx buffer
     Wire.write(subAddress);	                 // Put slave register address in Tx buffer
     Wire.endTransmission(I2C_NOSTOP);        // Send the Tx buffer, but send a restart to keep connection alive
-    //	Wire.endTransmission(false);             // Send the Tx buffer, but send a restart to keep connection alive
-    //	Wire.requestFrom(address, 1);  // Read one byte from slave register address 
     Wire.requestFrom(address, (size_t) 1);   // Read one byte from slave register address 
     data = Wire.read();                      // Fill Rx buffer with result
     return data;                             // Return data read from slave register
@@ -231,9 +212,7 @@ static void readBytes(uint8_t address, uint8_t subAddress, uint8_t count, uint8_
     Wire.beginTransmission(address);   // Initialize the Tx buffer
     Wire.write(subAddress);            // Put slave register address in Tx buffer
     Wire.endTransmission(I2C_NOSTOP);  // Send the Tx buffer, but send a restart to keep connection alive
-    //	Wire.endTransmission(false);       // Send the Tx buffer, but send a restart to keep connection alive
     uint8_t i = 0;
-    //        Wire.requestFrom(address, count);  // Read bytes from slave register address 
     Wire.requestFrom(address, (size_t) count);  // Read bytes from slave register address 
     while (Wire.available()) {
         dest[i++] = Wire.read(); }         // Put read results in the Rx buffer
@@ -718,35 +697,12 @@ void board_imuComputeAngles()
     deltat = ((Now - lastUpdate)/1000000.0f); // set integration time by time elapsed since last filter update
     lastUpdate = Now;
 
-    // Sensors x (y)-axis of the accelerometer/gyro is aligned with the y
-    // (x)-axis of the magnetometer; the magnetometer z-axis (+ down) is
-    // misaligned with z-axis (+ up) of accelerometer and gyro!  We have to
-    // make some allowance for this orientation mismatch in feeding the output
-    // to the quaternion filter.  We will assume that +y accel/gyro is North,
-    // then x accel/gyro is East. So if we want te quaternions properly aligned
-    // we need to feed into the madgwick function Ay, Ax, -Az, Gy, Gx, -Gz.
     MadgwickImuUpdate(q, beta, deltat, -ay, -ax, az, gy*PI/180.0f, gx*PI/180.0f, -gz*PI/180.0f);
 
     delt_t = millis() - count;
 
-    if (delt_t > 10) { // update report independent of read rate
+    //if (delt_t > 10) { // update report independent of read rate
 
-        // Define output variables from updated quaternion---these are
-        // Tait-Bryan angles, commonly used in aircraft orientation.  In this
-        // coordinate system, the positive z-axis is down toward Earth.  Yaw is
-        // the angle between Sensor x-axis and Earth magnetic North (or true
-        // North if corrected for local declination, looking down on the //
-        // sensor positive yaw is counterclockwise.  Pitch is angle between
-        // sensor x-axis and Earth ground plane, toward the Earth is positive,
-        // up toward the sky is negative.  Roll is angle between sensor y-axis
-        // and Earth ground plane, y-axis up is positive roll.  These arise
-        // from the definition of the homogeneous rotation matrix constructed
-        // from quaternions.  Tait-Bryan angles as well as Euler angles are
-        // non-commutative; that is, the get the correct orientation the
-        // rotations must be applied in the correct order which for this
-        // configuration is yaw, pitch, and then roll.  For more see
-        // http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-        // which has additional links.
         pitch  = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] *
                 q[1] - q[2] * q[2] + q[3] * q[3]);
 
@@ -762,26 +718,8 @@ void board_imuComputeAngles()
         Serial.printf("%+03d %+03d %+03d\n", (int)pitch, (int)roll, (int)yaw);
         //Serial.printf("%d %d %d\n", gyroCount[0]>>2, gyroCount[1]>>2, gyroCount[2]>>2);
 
-        // With these settings the filter is updating at a ~145 Hz rate using
-        // the Madgwick scheme and >200 Hz using the Mahony scheme even though
-        // the display refreshes at only 2 Hz.  The filter update rate is
-        // determined mostly by the mathematical steps in the respective
-        // algorithms, the processor speed (8 MHz for the 3.3V Pro Mini), and
-        // the magnetometer ODR: an ODR of 10 Hz for the magnetometer produce
-        // the above rates, maximum magnetometer ODR of 100 Hz produces filter
-        // update rates of 36 - 145 and ~38 Hz for the Madgwick and Mahony
-        // schemes, respectively.  This is presumably because the magnetometer
-        // read takes longer than the gyro or accelerometer reads.  This filter
-        // update rate should be fast enough to maintain accurate platform
-        // orientation for stabilization control of a fast-moving robot or
-        // quadcopter. Compare to the update rate of 200 Hz produced by the
-        // on-board Digital Motion Processor of Invensense's MPU6050 6 DoF and
-        // MPU9150 9DoF sensors.  The 3.3 V 8 MHz Pro Mini is doing pretty
-        // well!
-
-        //digitalWrite(myLed, !digitalRead(myLed));
         count = millis(); 
-    }
+    //}
 
-} // pesky_loop
+}
 

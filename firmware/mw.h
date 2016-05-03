@@ -45,7 +45,6 @@ typedef enum {
 
 EXTERN float    anglerad[2];
 EXTERN uint8_t  armed;
-EXTERN int16_t  axisPID[3];
 EXTERN uint16_t calibratingA;
 EXTERN uint16_t calibratingG;
 EXTERN int16_t  gyroADC[3];

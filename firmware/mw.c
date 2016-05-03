@@ -40,6 +40,8 @@ static int16_t  angle[2];
 static int16_t  rcCommand[4];
 static int16_t  rcData[RC_CHANS];
 
+static int16_t  axisPID[3];
+
 // utilities ======================================================================================================
 
 static void ledToggle(void)
