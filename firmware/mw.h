@@ -41,22 +41,12 @@ typedef enum {
 #define  EXTERN  extern
 #endif
 
-// Globals ====================================================
-
-EXTERN float    anglerad[2];
-EXTERN float    headingrad;
-EXTERN uint8_t  armed;
-EXTERN uint16_t calibratingA;
-EXTERN uint16_t calibratingG;
-EXTERN int16_t  gyroADC[3];
-EXTERN int16_t  accADC[3];
-
 // Board =======================================================
 
 void     board_delayMilliseconds(uint32_t msec);
 uint32_t board_getMicros();
-void     board_imuComputeAngles(void);
-void     board_imuInit(void);
+void     board_imuInit(uint16_t *acc1G, float * gyroScale);
+void     board_imuRead(int16_t accADC[3], int16_t gyroADC[3]);
 void     board_init(void);
 void     board_ledOff(void);
 void     board_ledOn(void);

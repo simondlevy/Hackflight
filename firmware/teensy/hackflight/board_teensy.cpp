@@ -168,18 +168,7 @@ enum Gscale {
 static uint8_t Gscale = GFS_250DPS;
 static uint8_t Ascale = AFS_2G;
 static float aRes, gRes;      // scale resolutions per LSB for the sensors
-static float gyroBias[3] = {0, 0, 0}, accelBias[3] = {0, 0, 0};
 static float SelfTest[6];            // holds results of gyro and accelerometer self test
-
-// global constants for 9 DoF fusion and AHRS (Attitude and Heading Reference System)
-static float GyroMeasError = PI * (40.0f / 180.0f);   // gyroscope measurement error in rads/s (start at 40 deg/s)
-
-static float beta = sqrt(3.0f / 4.0f) * GyroMeasError;   
-
-static float deltat = 0.0f;          // integration interval for both filter schemes
-static uint32_t lastUpdate = 0; // used to calculate integration interval
-static uint32_t Now = 0;                         // used to calculate integration interval
-static float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};    // vector to hold quaternion
 
 // I2C read/write functions for the MPU9250
 
@@ -420,222 +409,7 @@ static void MPU9250SelfTest(float * destination) // Should return percent deviat
 
 }
 
-// Function which accumulates gyro and accelerometer data after device initialization. It calculates the average
-// of the at-rest readings and then loads the resulting offsets into accelerometer and gyro bias registers.
-static void accelgyrocalMPU9250(float * dest1, float * dest2)
-{  
-    uint8_t data[12]; // data array to hold accelerometer and gyro x, y, z, data
-    uint16_t ii, packet_count, fifo_count;
-    int32_t gyro_bias[3]  = {0, 0, 0}, accel_bias[3] = {0, 0, 0};
-
-    // reset device
-    writeByte(MPU9250_ADDRESS, PWR_MGMT_1, 0x80); // Write a one to bit 7 reset bit; toggle reset device
-    delay(100);
-
-    // get stable time source; Auto select clock source to be PLL gyroscope reference if ready 
-    // else use the internal oscillator, bits 2:0 = 001
-    writeByte(MPU9250_ADDRESS, PWR_MGMT_1, 0x01);  
-    writeByte(MPU9250_ADDRESS, PWR_MGMT_2, 0x00);
-    delay(200);                                    
-
-    // Configure device for bias calculation
-    writeByte(MPU9250_ADDRESS, INT_ENABLE, 0x00);   // Disable all interrupts
-    writeByte(MPU9250_ADDRESS, FIFO_EN, 0x00);      // Disable FIFO
-    writeByte(MPU9250_ADDRESS, PWR_MGMT_1, 0x00);   // Turn on internal clock source
-    writeByte(MPU9250_ADDRESS, I2C_MST_CTRL, 0x00); // Disable I2C master
-    writeByte(MPU9250_ADDRESS, USER_CTRL, 0x00);    // Disable FIFO and I2C master modes
-    writeByte(MPU9250_ADDRESS, USER_CTRL, 0x0C);    // Reset FIFO and DMP
-    delay(15);
-
-    // Configure MPU6050 gyro and accelerometer for bias calculation
-    writeByte(MPU9250_ADDRESS, CONFIG, 0x01);      // Set low-pass filter to 188 Hz
-    writeByte(MPU9250_ADDRESS, SMPLRT_DIV, 0x00);  // Set sample rate to 1 kHz
-    writeByte(MPU9250_ADDRESS, GYRO_CONFIG, 0x00);  // Set gyro full-scale to 250 degrees per second, maximum sensitivity
-    writeByte(MPU9250_ADDRESS, ACCEL_CONFIG, 0x00); // Set accelerometer full-scale to 2 g, maximum sensitivity
-
-    uint16_t  gyrosensitivity  = 131;   // = 131 LSB/degrees/sec
-    uint16_t  accelsensitivity = 16384;  // = 16384 LSB/g
-
-    // Configure FIFO to capture accelerometer and gyro data for bias calculation
-    writeByte(MPU9250_ADDRESS, USER_CTRL, 0x40);   // Enable FIFO  
-    writeByte(MPU9250_ADDRESS, FIFO_EN, 0x78);     // Enable gyro and accelerometer sensors for FIFO  (max size 512 bytes in MPU-9150)
-    delay(40); // accumulate 40 samples in 40 milliseconds = 480 bytes
-
-    // At end of sample accumulation, turn off FIFO sensor read
-    writeByte(MPU9250_ADDRESS, FIFO_EN, 0x00);        // Disable gyro and accelerometer sensors for FIFO
-    readBytes(MPU9250_ADDRESS, FIFO_COUNTH, 2, &data[0]); // read FIFO sample count
-    fifo_count = ((uint16_t)data[0] << 8) | data[1];
-    packet_count = fifo_count/12;// How many sets of full gyro and accelerometer data for averaging
-
-    for (ii = 0; ii < packet_count; ii++) {
-        int16_t accel_temp[3] = {0, 0, 0}, gyro_temp[3] = {0, 0, 0};
-        readBytes(MPU9250_ADDRESS, FIFO_R_W, 12, &data[0]); // read data for averaging
-        accel_temp[0] = (int16_t) (((int16_t)data[0] << 8) | data[1]  ) ;  // Form signed 16-bit integer for each sample in FIFO
-        accel_temp[1] = (int16_t) (((int16_t)data[2] << 8) | data[3]  ) ;
-        accel_temp[2] = (int16_t) (((int16_t)data[4] << 8) | data[5]  ) ;    
-        gyro_temp[0]  = (int16_t) (((int16_t)data[6] << 8) | data[7]  ) ;
-        gyro_temp[1]  = (int16_t) (((int16_t)data[8] << 8) | data[9]  ) ;
-        gyro_temp[2]  = (int16_t) (((int16_t)data[10] << 8) | data[11]) ;
-
-        accel_bias[0] += (int32_t) accel_temp[0]; // Sum individual signed 16-bit biases to get accumulated signed 32-bit biases
-        accel_bias[1] += (int32_t) accel_temp[1];
-        accel_bias[2] += (int32_t) accel_temp[2];
-        gyro_bias[0]  += (int32_t) gyro_temp[0];
-        gyro_bias[1]  += (int32_t) gyro_temp[1];
-        gyro_bias[2]  += (int32_t) gyro_temp[2];
-
-    }
-    accel_bias[0] /= (int32_t) packet_count; // Normalize sums to get average count biases
-    accel_bias[1] /= (int32_t) packet_count;
-    accel_bias[2] /= (int32_t) packet_count;
-    gyro_bias[0]  /= (int32_t) packet_count;
-    gyro_bias[1]  /= (int32_t) packet_count;
-    gyro_bias[2]  /= (int32_t) packet_count;
-
-    if(accel_bias[2] > 0L) {accel_bias[2] -= (int32_t) accelsensitivity;}  // Remove gravity from the z-axis accelerometer bias calculation
-    else {accel_bias[2] += (int32_t) accelsensitivity;}
-
-    // Construct the gyro biases for push to the hardware gyro bias registers, which are reset to zero upon device startup
-    data[0] = (-gyro_bias[0]/4  >> 8) & 0xFF; // Divide by 4 to get 32.9 LSB per deg/s to conform to expected bias input format
-    data[1] = (-gyro_bias[0]/4)       & 0xFF; // Biases are additive, so change sign on calculated average gyro biases
-    data[2] = (-gyro_bias[1]/4  >> 8) & 0xFF;
-    data[3] = (-gyro_bias[1]/4)       & 0xFF;
-    data[4] = (-gyro_bias[2]/4  >> 8) & 0xFF;
-    data[5] = (-gyro_bias[2]/4)       & 0xFF;
-
-    // Push gyro biases to hardware registers
-    writeByte(MPU9250_ADDRESS, XG_OFFSET_H, data[0]);
-    writeByte(MPU9250_ADDRESS, XG_OFFSET_L, data[1]);
-    writeByte(MPU9250_ADDRESS, YG_OFFSET_H, data[2]);
-    writeByte(MPU9250_ADDRESS, YG_OFFSET_L, data[3]);
-    writeByte(MPU9250_ADDRESS, ZG_OFFSET_H, data[4]);
-    writeByte(MPU9250_ADDRESS, ZG_OFFSET_L, data[5]);
-
-    // Output scaled gyro biases for display in the main program
-    dest1[0] = (float) gyro_bias[0]/(float) gyrosensitivity;  
-    dest1[1] = (float) gyro_bias[1]/(float) gyrosensitivity;
-    dest1[2] = (float) gyro_bias[2]/(float) gyrosensitivity;
-
-    // Construct the accelerometer biases for push to the hardware
-    // accelerometer bias registers. These registers contain factory trim
-    // values which must be added to the calculated accelerometer biases;
-    // on boot up these registers will hold non-zero values. In addition,
-    // bit 0 of the lower byte must be preserved since it is used for
-    // temperature compensation calculations. Accelerometer bias registers
-    // expect bias input as 2048 LSB per g, so that
-    // the accelerometer biases calculated above must be divided by 8.
-
-    int32_t accel_bias_reg[3] = {0, 0, 0}; // A place to hold the factory accelerometer trim biases
-    readBytes(MPU9250_ADDRESS, XA_OFFSET_H, 2, &data[0]); // Read factory accelerometer trim values
-    accel_bias_reg[0] = (int32_t) (((int16_t)data[0] << 8) | data[1]);
-    readBytes(MPU9250_ADDRESS, YA_OFFSET_H, 2, &data[0]);
-    accel_bias_reg[1] = (int32_t) (((int16_t)data[0] << 8) | data[1]);
-    readBytes(MPU9250_ADDRESS, ZA_OFFSET_H, 2, &data[0]);
-    accel_bias_reg[2] = (int32_t) (((int16_t)data[0] << 8) | data[1]);
-
-    uint32_t mask = 1uL; // Define mask for temperature compensation bit 0 of lower byte of accelerometer bias registers
-    uint8_t mask_bit[3] = {0, 0, 0}; // Define array to hold mask bit for each accelerometer bias axis
-
-    for(ii = 0; ii < 3; ii++) {
-        if((accel_bias_reg[ii] & mask)) mask_bit[ii] = 0x01; // If temperature compensation bit is set, record that fact in mask_bit
-    }
-
-    // Construct total accelerometer bias, including calculated average accelerometer bias from above
-    accel_bias_reg[0] -= (accel_bias[0]/8); // Subtract calculated averaged accelerometer bias scaled to 2048 LSB/g (16 g full scale)
-    accel_bias_reg[1] -= (accel_bias[1]/8);
-    accel_bias_reg[2] -= (accel_bias[2]/8);
-
-    data[0] = (accel_bias_reg[0] >> 8) & 0xFF;
-    data[1] = (accel_bias_reg[0])      & 0xFF;
-    data[1] = data[1] | mask_bit[0]; // preserve temperature compensation bit when writing back to accelerometer bias registers
-    data[2] = (accel_bias_reg[1] >> 8) & 0xFF;
-    data[3] = (accel_bias_reg[1])      & 0xFF;
-    data[3] = data[3] | mask_bit[1]; // preserve temperature compensation bit when writing back to accelerometer bias registers
-    data[4] = (accel_bias_reg[2] >> 8) & 0xFF;
-    data[5] = (accel_bias_reg[2])      & 0xFF;
-    data[5] = data[5] | mask_bit[2]; // preserve temperature compensation bit when writing back to accelerometer bias registers
-
-    // Push accelerometer biases to hardware registers
-    // Output scaled accelerometer biases for display in the main program
-    dest2[0] = (float)accel_bias[0]/(float)accelsensitivity; 
-    dest2[1] = (float)accel_bias[1]/(float)accelsensitivity;
-    dest2[2] = (float)accel_bias[2]/(float)accelsensitivity;
-}
-
-static void MadgwickImuUpdate( 
-        float q[4], float beta, float deltat,
-        float ax, float ay, float az,
-        float gx, float gy, float gz) 
-{
-    // Local system variables
-    float norm; // vector norm
-    float SEqDot_omega1, SEqDot_omega2, SEqDot_omega3, SEqDot_omega4; // quaternion derrivative from gyroscopes elements
-    float f_1, f_2, f_3; // objective function elements
-    float J_11or24, J_12or23, J_13or22, J_14or21, J_32, J_33; // objective function Jacobian elements
-    float SEqHatDot_1, SEqHatDot_2, SEqHatDot_3, SEqHatDot_4; // estimated direction of the gyroscope error
-
-    // Axulirary variables to avoid reapeated calcualtions
-    float halfSEq_1 = 0.5f * q[0];
-    float halfSEq_2 = 0.5f * q[1];
-    float halfSEq_3 = 0.5f * q[2];
-    float halfSEq_4 = 0.5f * q[3];
-    float twoSEq_1 = 2.0f * q[0];
-    float twoSEq_2 = 2.0f * q[1];
-    float twoSEq_3 = 2.0f * q[2];
-
-    // Normalise the accelerometer measurement
-    norm = sqrt(ax * ax + ay * ay + az * az);
-    ax /= norm;
-    ay /= norm;
-    az /= norm;
-
-    // Compute the objective function and Jacobian
-    f_1 = twoSEq_2 * q[3] - twoSEq_1 * q[2] - ax;
-    f_2 = twoSEq_1 * q[1] + twoSEq_3 * q[3] - ay;
-    f_3 = 1.0f - twoSEq_2 * q[1] - twoSEq_3 * q[2] - az;
-    J_11or24 = twoSEq_3; // J_11 negated in matrix multiplication
-    J_12or23 = 2.0f * q[3];
-    J_13or22 = twoSEq_1; // J_12 negated in matrix multiplication
-    J_14or21 = twoSEq_2;
-    J_32 = 2.0f * J_14or21; // negated in matrix multiplication
-    J_33 = 2.0f * J_11or24; // negated in matrix multiplication
-
-    // Compute the gradient (matrix multiplication)
-    SEqHatDot_1 = J_14or21 * f_2 - J_11or24 * f_1;
-    SEqHatDot_2 = J_12or23 * f_1 + J_13or22 * f_2 - J_32 * f_3;
-    SEqHatDot_3 = J_12or23 * f_2 - J_33 * f_3 - J_13or22 * f_1;
-    SEqHatDot_4 = J_14or21 * f_1 + J_11or24 * f_2;
-
-    // Normalise the gradient
-    norm = sqrt(SEqHatDot_1 * SEqHatDot_1 + SEqHatDot_2 * SEqHatDot_2 + SEqHatDot_3 * SEqHatDot_3 + SEqHatDot_4 * SEqHatDot_4);
-    SEqHatDot_1 /= norm;
-    SEqHatDot_2 /= norm;
-    SEqHatDot_3 /= norm;
-    SEqHatDot_4 /= norm;
-
-    // Compute the quaternion derrivative measured by gyroscopes
-    SEqDot_omega1 = -halfSEq_2 * gx - halfSEq_3 * gy - halfSEq_4 * gz;
-    SEqDot_omega2 = halfSEq_1 * gx + halfSEq_3 * gz - halfSEq_4 * gy;
-    SEqDot_omega3 = halfSEq_1 * gy - halfSEq_2 * gz + halfSEq_4 * gx;
-    SEqDot_omega4 = halfSEq_1 * gz + halfSEq_2 * gy - halfSEq_3 * gx;
-
-    // Compute then integrate the estimated quaternion derrivative
-    q[0] += (SEqDot_omega1 - (beta * SEqHatDot_1)) * deltat;
-    q[1] += (SEqDot_omega2 - (beta * SEqHatDot_2)) * deltat;
-    q[2] += (SEqDot_omega3 - (beta * SEqHatDot_3)) * deltat;
-    q[3] += (SEqDot_omega4 - (beta * SEqHatDot_4)) * deltat;
-
-    // Normalise quaternion
-    norm = sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
-    q[0] /= norm;
-    q[1] /= norm;
-    q[2] /= norm;
-    q[3] /= norm;
-}
-
-
-
-void board_imuInit()
+void board_imuInit(uint16_t *acc1G, float * gyroScale)
 {
     // Setup for Master mode, pins 16/17, external pullups, 400kHz for Teensy 3.1
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_16_17, I2C_PULLUP_EXT, I2C_RATE_400);
@@ -654,8 +428,6 @@ void board_imuInit()
         getAres();
         getGres();
 
-        accelgyrocalMPU9250(gyroBias, accelBias); // Calibrate gyro and accelerometers, load biases in bias registers
-
         initMPU9250(); 
     }
     else
@@ -664,54 +436,31 @@ void board_imuInit()
         Serial.println(c, HEX);
         while(1) ; // Loop forever if communication doesn't happen
     }
+
+    // XXX
+    *acc1G = 0;
+    *gyroScale = gRes;
 }
 
-void board_imuComputeAngles()
+void board_imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {  
-    static float ax, ay, az, gx, gy, gz; // variables to hold latest sensor data values 
+    static int16_t accelCount[3];  // Stores the 16-bit signed accelerometer sensor output
+    static int16_t gyroCount[3];   // Stores the 16-bit signed gyro sensor output
+
 
     // If intPin goes high, all data registers have new data
     if (readByte(MPU9250_ADDRESS, INT_STATUS) & 0x01) {  // check if data ready interrupt
 
-        int16_t accelCount[3];  // Stores the 16-bit signed accelerometer sensor output
-
-        // if (digitalRead(intPin)) {  // On interrupt, read data
         readAccelData(accelCount);  // Read the x/y/z adc values
-
-        accADC[0] = accelCount[0];
-        accADC[1] = accelCount[1];
-        accADC[2] = accelCount[2];
-
-        // Now we'll calculate the accleration value into actual g's
-        ax = (float)accelCount[0]*aRes - accelBias[0];  // get actual g value, this depends on scale being set
-        ay = (float)accelCount[1]*aRes - accelBias[1];   
-        az = (float)accelCount[2]*aRes - accelBias[2];  
-
-        int16_t gyroCount[3];   // Stores the 16-bit signed gyro sensor output
-
         readGyroData(gyroCount);  // Read the x/y/z adc values
-
-        // Calculate the gyro value into actual degrees per second
-        gx = (float)gyroCount[0]*gRes;  // get actual gyro value, this depends on scale being set
-        gy = (float)gyroCount[1]*gRes;  
-        gz = (float)gyroCount[2]*gRes;   
-
-        gyroADC[0] = gyroCount[0] >> 2;
-        gyroADC[1] = gyroCount[1] >> 2;
-        gyroADC[2] = gyroCount[2] >> 2;
     }
 
-    Now = micros();
-    deltat = ((Now - lastUpdate)/1000000.0f); // set integration time by time elapsed since last filter update
-    lastUpdate = Now;
+    accADC[0] = accelCount[0];
+    accADC[1] = accelCount[1];
+    accADC[2] = accelCount[2];
 
-    MadgwickImuUpdate(q, beta, deltat, -ay, -ax, az, gy*PI/180.0f, gx*PI/180.0f, -gz*PI/180.0f);
-
-    anglerad[PITCH] = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] *
-            q[1] - q[2] * q[2] + q[3] * q[3]);
-
-    anglerad[ROLL] = -asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
-
-    headingrad = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);
+    gyroADC[0] = gyroCount[0] >> 2;
+    gyroADC[1] = gyroCount[1] >> 2;
+    gyroADC[2] = gyroCount[2] >> 2;
 }
 
