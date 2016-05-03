@@ -44,11 +44,11 @@ typedef enum {
 // Globals ====================================================
 
 EXTERN float    anglerad[2];
+EXTERN float    headingrad;
 EXTERN uint8_t  armed;
 EXTERN uint16_t calibratingA;
 EXTERN uint16_t calibratingG;
 EXTERN int16_t  gyroADC[3];
-EXTERN int16_t  heading;
 
 // Board =======================================================
 

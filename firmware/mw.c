@@ -2,6 +2,10 @@
 
 #include "mw.h"
 
+#ifndef PRINTF
+#define PRINTF printf
+#endif
+
 #include <math.h>
 
 #define ROL_LO (1 << (2 * ROLL))
@@ -35,7 +39,8 @@ static bool haveSmallAngle;
 static int16_t  motors[4];
 static int16_t  motorsDisarmed[4];
 
-static int16_t  angle[2];
+static int16_t angle[2];
+static int16_t heading;
 
 static int16_t  rcCommand[4];
 static int16_t  rcData[RC_CHANS];
@@ -338,6 +343,7 @@ static void mspCom(void)
     }
 }
 
+// Core code ==================================================================================
 
 // Time of automatic disarm when "Don't spin the motors when armed" is enabled.
 static uint32_t disarmTime = 0;
@@ -774,6 +780,13 @@ void loop(void)
 
         angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
         angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
+
+        heading = lrintf(headingrad * 1800.0f / M_PI + CONFIG_MAGNETIC_DECLINATION) / 10.0f;
+
+        if (heading < 0)
+            heading += 360;
+
+        PRINTF("%d\n", heading);
 
         haveSmallAngle = abs(angle[0]) < CONFIG_SMALL_ANGLE && abs(angle[1]) < CONFIG_SMALL_ANGLE;
 

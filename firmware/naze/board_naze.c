@@ -223,7 +223,7 @@ static void acc_calc(uint32_t deltaT)
     // the accel values have to be rotated into the earth frame
     rpy[0] = -(float)anglerad[ROLL];
     rpy[1] = -(float)anglerad[PITCH];
-    rpy[2] = -(float)heading * (M_PI / 180.0f);
+    rpy[2] = -(float)headingrad;
 
     accel_ned.V.X = accSmooth[0];
     accel_ned.V.Y = accSmooth[1];
@@ -252,22 +252,15 @@ static void acc_calc(uint32_t deltaT)
 }
 
 // baseflight calculation by Luggi09 originates from arducopter
-static int16_t calculateHeading(t_fp_vector *vec)
+static float calculateHeading(t_fp_vector *vec)
 {
-    int16_t head;
-
     float cosineRoll = cosf(anglerad[ROLL]);
     float sineRoll = sinf(anglerad[ROLL]);
     float cosinePitch = cosf(anglerad[PITCH]);
     float sinePitch = sinf(anglerad[PITCH]);
     float Xh = vec->A[X] * cosinePitch + vec->A[Y] * sineRoll * sinePitch + vec->A[Z] * sinePitch * cosineRoll;
     float Yh = vec->A[Y] * cosineRoll - vec->A[Z] * sineRoll;
-    float hd = (atan2f(Yh, Xh) * 1800.0f / M_PI + CONFIG_MAGNETIC_DECLINATION) / 10.0f;
-    head = lrintf(hd);
-    if (head < 0)
-        head += 360;
-
-    return head;
+    return atan2f(Yh, Xh); 
 }
 
 static void getEstimatedAttitude(void)
@@ -315,7 +308,7 @@ static void getEstimatedAttitude(void)
 
     rotateV(&EstN.V, deltaGyroAngle);
     normalizeV(&EstN.V, &EstN.V);
-    heading = calculateHeading(&EstN);
+    headingrad = calculateHeading(&EstN);
 
     acc_calc(deltaT); // rotate acc vector into earth frame
 }

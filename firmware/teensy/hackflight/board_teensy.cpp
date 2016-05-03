@@ -178,9 +178,6 @@ static float GyroMeasError = PI * (40.0f / 180.0f);   // gyroscope measurement e
 
 static float beta = sqrt(3.0f / 4.0f) * GyroMeasError;   
 
-static uint32_t delt_t = 0, count = 0;  // used to control display output rate
-
-static float pitch, yaw, roll;
 static float deltat = 0.0f;          // integration interval for both filter schemes
 static uint32_t lastUpdate = 0; // used to calculate integration interval
 static uint32_t Now = 0;                         // used to calculate integration interval
@@ -699,27 +696,18 @@ void board_imuComputeAngles()
 
     MadgwickImuUpdate(q, beta, deltat, -ay, -ax, az, gy*PI/180.0f, gx*PI/180.0f, -gz*PI/180.0f);
 
-    delt_t = millis() - count;
+    anglerad[PITCH] = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] *
+            q[1] - q[2] * q[2] + q[3] * q[3]);
 
-    //if (delt_t > 10) { // update report independent of read rate
+    anglerad[ROLL] = -asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
 
-        pitch  = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] *
-                q[1] - q[2] * q[2] + q[3] * q[3]);
+    gyroADC[0] = gyroCount[0] >> 2;
+    gyroADC[1] = gyroCount[1] >> 2;
+    gyroADC[2] = gyroCount[2] >> 2;
 
-        roll = -asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
+    float f   = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), 
+            q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);
 
-        yaw   = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] *
-                q[1] - q[2] * q[2] - q[3] * q[3]);   
-
-        pitch *= 180.0f / PI;
-        roll  *= 180.0f / PI;
-        yaw   *= 180.0f / PI; 
-
-        Serial.printf("%+03d %+03d %+03d\n", (int)pitch, (int)roll, (int)yaw);
-        //Serial.printf("%d %d %d\n", gyroCount[0]>>2, gyroCount[1]>>2, gyroCount[2]>>2);
-
-        count = millis(); 
-    //}
-
+    Serial.printf("%f\n", f);
 }
 
