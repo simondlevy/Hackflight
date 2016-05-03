@@ -10,10 +10,6 @@
 #define PWM_IDLE_PULSE                       1000  /* standard PWM in usec for brushless ESC */
 
 
-// Default orientation
-static sensor_align_e gyroAlign = CW0_DEG;
-static sensor_align_e accAlign = CW0_DEG;
-
 static uint16_t acc1G;
 static int16_t  accADC[3];
 static int16_t  accSmooth[3];
@@ -54,59 +50,9 @@ static float devStandardDeviation(stdev_t *dev)
     return sqrtf(devVariance(dev));
 }
 
-static void alignSensors(int16_t *src, int16_t *dest, uint8_t rotation)
-{
-    switch (rotation) {
-        case CW0_DEG:
-            dest[X] = src[X];
-            dest[Y] = src[Y];
-            dest[Z] = src[Z];
-            break;
-        case CW90_DEG:
-            dest[X] = src[Y];
-            dest[Y] = -src[X];
-            dest[Z] = src[Z];
-            break;
-        case CW180_DEG:
-            dest[X] = -src[X];
-            dest[Y] = -src[Y];
-            dest[Z] = src[Z];
-            break;
-        case CW270_DEG:
-            dest[X] = -src[Y];
-            dest[Y] = src[X];
-            dest[Z] = src[Z];
-            break;
-        case CW0_DEG_FLIP:
-            dest[X] = -src[X];
-            dest[Y] = src[Y];
-            dest[Z] = -src[Z];
-            break;
-        case CW90_DEG_FLIP:
-            dest[X] = src[Y];
-            dest[Y] = src[X];
-            dest[Z] = -src[Z];
-            break;
-        case CW180_DEG_FLIP:
-            dest[X] = src[X];
-            dest[Y] = -src[Y];
-            dest[Z] = -src[Z];
-            break;
-        case CW270_DEG_FLIP:
-            dest[X] = -src[Y];
-            dest[Y] = -src[X];
-            dest[Z] = -src[Z];
-            break;
-        default:
-            break;
-    }
-}
-
 static void sensorsGetAccel(void)
 {
-    static int16_t data[3];
-    mpu6050_read_accel(data);
-    alignSensors(data, accADC, accAlign);
+    mpu6050_read_accel(accADC);
 
     static int16_t accZero[3];
     static int32_t a[3];
@@ -142,9 +88,7 @@ static void sensorsGetGyro(void)
 {
     // range: +/- 8192; +/- 2000 deg/sec
 
-    static int16_t data[3];
-    mpu6050_read_gyro(data);
-    alignSensors(data, gyroADC, gyroAlign);
+    mpu6050_read_gyro(gyroADC);
 
     int axis;
     static int32_t g[3];

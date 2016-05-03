@@ -252,10 +252,7 @@ static void pidMultiWii(void)
         delta1[axis] = delta;
         DTerm = (deltaSum * dynD8[axis]) / 32;
         axisPID[axis] = PTerm + ITerm - DTerm;
-
-        printf("%d ", gyroADC[axis]);
     }
-    printf("\n");
 }
 
 // =================================================================================================================

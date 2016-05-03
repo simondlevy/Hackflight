@@ -6,3 +6,6 @@ flash:
 
 listen:
 	miniterm.py /dev/ttyACM1 115200
+
+edit:
+	vim board_teensy.cpp
