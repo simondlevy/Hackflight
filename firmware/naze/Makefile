@@ -37,7 +37,7 @@ CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
 STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 
 # Source files common to all targets
-NAZE_SRC =  mw.c mixer.c msp.c board_naze.c \
+NAZE_SRC =  mw.c board_naze.c \
             $(BREEZY_DIR)/main.c \
             $(BREEZY_DIR)/printf.c \
             $(BREEZY_DIR)/drv_system.c \
@@ -157,7 +157,7 @@ $(TARGET_ELF):  $(TARGET_OBJS)
 MKDIR_OBJDIR = @mkdir -p $(dir $@)
 
 # Compile
-$(OBJECT_DIR)/$(TARGET)/%.o: %.c mw.h config.h
+$(OBJECT_DIR)/$(TARGET)/%.o: %.c mw.h
 	$(MKDIR_OBJDIR)
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(CFLAGS) $<

@@ -1,6 +1,5 @@
 #include <breezystm32.h>
 #include <math.h>
-#include "config.h"
 #include "mw.h"
 
 #define USE_CPPM       1
