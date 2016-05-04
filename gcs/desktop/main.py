@@ -197,7 +197,7 @@ class GCS:
         self._clear()
 
         self.setup.stop()
-        self.parser.set_Attitude_Handler(self._handle_attitude)
+        self.parser.set_ATTITUDE_Handler(self._handle_attitude)
         self.receiver.stop()
         self.messages.stop()
         self.maps.stop()
@@ -365,7 +365,7 @@ class GCS:
 
     def sendMotorMessage(self, index, value):
 
-        self.comms.send_message(self.parser.serialize_Motor, (index, value))
+        self.comms.send_message(self.parser.serialize_SET_MOTOR, (1000+5*value, 0, 0, 0))
 
     def _show_splash(self):
 
