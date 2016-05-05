@@ -1,10 +1,14 @@
 #include <Arduino.h>
+#include <Servo.h>
 #include <PulsePosition.h>
 #include <I2Cdev.h>
 #include <i2c_t3.h>
 #include <math.h>
 
 #include "mw.h"
+
+static const int ESC_PINS[4] = {3, 4, 5, 6};
+static const int ESC_USEC_MIN = 800;
 
 // unused =========================================================
 
@@ -23,6 +27,8 @@ void board_reboot(void)
 
 // everything but IMU ==============================================
 
+Servo escs[4];
+
 PulsePositionInput ppm;
 
 void board_delayMilliseconds(uint32_t msec)
@@ -40,6 +46,11 @@ void board_init(void)
     Serial.begin(115200);
 
     pinMode(13, OUTPUT);  // LED
+
+    for (int k=0; k<4; ++k) {
+        escs[k].attach(ESC_PINS[k]);
+        escs[k].writeMicroseconds(ESC_USEC_MIN);
+    }
 
     ppm.begin(23);
 }
@@ -76,7 +87,7 @@ void board_serialWrite(uint8_t c)
 
 void board_writeMotor(uint8_t index, uint16_t value)
 {
-    // XXX
+    escs[index].writeMicroseconds(value);
 }
 
 // IMU ===============================================================

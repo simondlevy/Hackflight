@@ -365,7 +365,9 @@ class GCS:
 
     def sendMotorMessage(self, index, value):
 
-        self.comms.send_message(self.parser.serialize_SET_MOTOR, (1000+5*value, 0, 0, 0))
+        values = [1000]*4
+        values[index-1] = value
+        self.comms.send_message(self.parser.serialize_SET_MOTOR, values)
 
     def _show_splash(self):
 

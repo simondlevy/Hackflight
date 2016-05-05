@@ -138,7 +138,7 @@ class Setup(Dialog):
 
         # Convert angles to X,Y,Z rotation matrices
 
-        yawAngle   = radians(self.yaw_pitch_roll[0])
+        yawAngle   = -radians(self.yaw_pitch_roll[0])
         self.yawrot[0,0] = +cos(yawAngle)
         self.yawrot[0,2] = +sin(yawAngle)
         self.yawrot[2,0] = -sin(yawAngle)

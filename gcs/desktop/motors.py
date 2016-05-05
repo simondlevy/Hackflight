@@ -53,7 +53,7 @@ class Motors(Dialog):
                 text=MOTORS_WARNING_TEXT, font=('Heletica', 14),  fg='red', bg='black', highlightthickness=0)
 
         # A a scale for motors
-        self.scale = Scale(self.driver.canvas, from_=100, to_=0, command=self._scale_callback,
+        self.scale = Scale(self.driver.canvas, from_=1850, to_=1000, command=self._scale_callback,
                 orient=VERTICAL, length=MOTOR_SCALE_LENGTH, bg='black', fg='white')
 
         # Index of active motor (0 = none)
@@ -112,10 +112,10 @@ class Motors(Dialog):
 
         if self.checkbox_var.get():
 
-            self._check_motor(event, MOTORS_LEFT_X,  MOTORS_TOP_Y,    self.label_motors1, 1)
+            self._check_motor(event, MOTORS_LEFT_X,  MOTORS_TOP_Y,    self.label_motors4, 4)
             self._check_motor(event, MOTORS_RIGHT_X, MOTORS_TOP_Y,    self.label_motors2, 2)
-            self._check_motor(event, MOTORS_RIGHT_X, MOTORS_BOTTOM_Y, self.label_motors3, 3)
-            self._check_motor(event, MOTORS_LEFT_X,  MOTORS_BOTTOM_Y, self.label_motors4, 4)
+            self._check_motor(event, MOTORS_RIGHT_X, MOTORS_BOTTOM_Y, self.label_motors1, 1)
+            self._check_motor(event, MOTORS_LEFT_X,  MOTORS_BOTTOM_Y, self.label_motors3, 3)
 
     def _load_photo(self, filename):
 
