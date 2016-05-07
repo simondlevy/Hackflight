@@ -1,5 +1,3 @@
-#define EXTERN 
-
 #include "mw.h"
 
 #ifndef PRINTF
