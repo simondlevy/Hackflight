@@ -1,4 +1,6 @@
-#include "mw.h"
+extern "C" {
+
+#include "hackflight.h"
 
 #ifndef PRINTF
 #define PRINTF printf
@@ -21,14 +23,33 @@
 
 #define INBUF_SIZE 128
 
+#define PITCH_LOOKUP_LENGTH 7
+#define THROTTLE_LOOKUP_LENGTH 12
+
+#define MSP_STATUS               101    //out message         cycletime & errors_count & sensor present & box activation & current setting number
+#define MSP_RAW_IMU              102    //out message         9 DOF
+#define MSP_MOTOR                104    //out message         8 motors
+#define MSP_RC                   105    //out message         8 rc chan and more
+#define MSP_ATTITUDE             108    //out message         2 angles 1 heading
+#define MSP_ALTITUDE             109    //out message         altitude, variometer
+
+#define MSP_BARO_SONAR_RAW       126    // out message
+
+#define MSP_SET_RAW_RC           200    //in message          8 rc chan
+#define MSP_SET_MOTOR            214    //in message          PropBalance function
+
+
+// Additional private MSP for baseflight configurator
+#define MSP_REBOOT               68     //in message          reboot settings
+#define MSP_BUILDINFO            69     //out message         build date as well as some space for future expansion
+
+
 static uint32_t currentTime;
 static uint32_t previousTime;
 static int16_t failsafeCnt;
 static uint8_t accCalibrated;
 static uint8_t dynP8[3], dynI8[3], dynD8[3];
 
-#define PITCH_LOOKUP_LENGTH 7
-#define THROTTLE_LOOKUP_LENGTH 12
 static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
 static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
@@ -362,7 +383,6 @@ static void getEstimatedAttitude(void)
     acc_calc(deltaT); // rotate acc vector into earth frame
 }
 
-
 // MSP ============================================================================================================
 
 typedef enum serialState_t {
@@ -383,24 +403,6 @@ typedef  struct mspPortState_t {
     uint8_t dataSize;
     serialState_t c_state;
 } mspPortState_t;
-
-
-#define MSP_STATUS               101    //out message         cycletime & errors_count & sensor present & box activation & current setting number
-#define MSP_RAW_IMU              102    //out message         9 DOF
-#define MSP_MOTOR                104    //out message         8 motors
-#define MSP_RC                   105    //out message         8 rc chan and more
-#define MSP_ATTITUDE             108    //out message         2 angles 1 heading
-#define MSP_ALTITUDE             109    //out message         altitude, variometer
-
-#define MSP_BARO_SONAR_RAW       126    // out message
-
-#define MSP_SET_RAW_RC           200    //in message          8 rc chan
-#define MSP_SET_MOTOR            214    //in message          PropBalance function
-
-
-// Additional private MSP for baseflight configurator
-#define MSP_REBOOT               68     //in message          reboot settings
-#define MSP_BUILDINFO            69     //out message         build date as well as some space for future expansion
 
 // cause reboot after MSP processing complete
 static bool pendReboot;
@@ -835,7 +837,6 @@ static void pidMultiWii(void)
     }
 }
 
-
 // Mixer =========================================================================================================
 
 
@@ -898,8 +899,6 @@ static void mixerWriteMotors(void)
 }
 
 
-// =================================================================================================================
-
 void setup(void)
 {
     uint8_t i;
@@ -950,7 +949,9 @@ void setup(void)
 
     // trigger accelerometer calibration requirement
     haveSmallAngle = true;
- }
+}
+
+
 
 void loop(void)
 {
@@ -977,6 +978,7 @@ void loop(void)
             if (rcData[i] < CONFIG_MAXCHECK)
                 stTmp |= 0x40;  // check for MAX
         }
+
         if (stTmp == rcSticks) {
             if (rcDelayCommand < 250)
                 rcDelayCommand++;
@@ -1052,10 +1054,11 @@ void loop(void)
                 break;
         }
     }
-    
+
     currentTime = board_getMicros();
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
+
 
         sensorsGetIMU();
         getEstimatedAttitude();
@@ -1081,4 +1084,7 @@ void loop(void)
 
         mixerWriteMotors();
     }
-}
+
+} // loop
+
+} // extern "C"
