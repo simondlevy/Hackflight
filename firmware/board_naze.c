@@ -48,14 +48,34 @@ uint32_t board_getMicros()
     return micros();
 }
 
-void board_ledOff(void)
+void board_led0Off(void)
 {
     LED0_OFF;
 }
 
-void board_ledOn(void)
+void board_led0On(void)
 {
     LED0_ON;
+}
+
+void board_led0Toggle(void)
+{
+    LED0_TOGGLE;
+}
+
+void board_led1Off(void)
+{
+    LED1_OFF;
+}
+
+void board_led1On(void)
+{
+    LED1_ON;
+}
+
+void board_led1Toggle(void)
+{
+    LED1_TOGGLE;
 }
 
 uint16_t board_pwmRead(uint8_t chan)

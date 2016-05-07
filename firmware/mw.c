@@ -57,33 +57,20 @@ static int16_t  accADC[3];
 
 // utilities ======================================================================================================
 
-static void ledToggle(void)
-{
-    static bool state;
-
-    if (state)
-        board_ledOff();
-    else
-        board_ledOn();
-
-    state = !state;
-}
-
-
-void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
+static void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
 {
     uint8_t i, r;
 
     for (r = 0; r < repeat; r++) {
         for (i = 0; i < num; i++) {
-            ledToggle();            // switch LEDPIN state
+            board_led0Toggle();            // switch LEDPIN state
             board_delayMilliseconds(wait);
         }
         board_delayMilliseconds(60);
     }
 }
 
-int constrainer(int amt, int low, int high)
+static int constrainer(int amt, int low, int high)
 {
     if (amt < low)
         return low;
@@ -721,18 +708,18 @@ static void annexCode(void)
             lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
 
     if (calibratingA > 0 || calibratingG > 0) {      // Calibration phasis
-        ledToggle();
+        board_led0Toggle();
     } else {
         if (accCalibrated)
-            board_ledOff();
+            board_led0Off();
         if (armed)
-            board_ledOn();
+            board_led0On();
     }
 
     if (check_timed_task(calibratedAccTime)) {
         if (!haveSmallAngle) {
             accCalibrated = 0; // the multi uses ACC and is not calibrated or is too much inclinated
-            ledToggle();
+            board_led0Toggle();
             update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC);
         } else {
             accCalibrated = 1;
@@ -940,12 +927,15 @@ void setup(void)
             lookupThrottleRC[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
     }
 
-    board_ledOff();
+    board_led1On();
+    board_led0Off();
     for (i = 0; i < 10; i++) {
-        ledToggle();
+        board_led1Toggle();
+        board_led0Toggle();
         board_delayMilliseconds(50);
     }
-    board_ledOff();
+    board_led1Off();
+    board_led0Off();
 
     board_imuInit(&acc1G, &gyroScale);
 
