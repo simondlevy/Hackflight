@@ -11,7 +11,7 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 TARGET		?= NAZE
 
-CPP_OBJS = hackflight.o board_naze.o
+CPP_OBJS = hackflight.o imu.o board_naze.o
 
 ###############################################################################
 
