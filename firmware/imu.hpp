@@ -1,6 +1,11 @@
 extern "C" {
 
     class IMU {
+        
+        private:
+
+            uint16_t acc1G;
+            float    gyroScale;
 
         public:
 

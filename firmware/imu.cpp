@@ -8,14 +8,7 @@ extern "C" {
 #define INV_GYR_CMPF_FACTOR   (1.0f / ((float)CONFIG_GYRO_CMPF_FACTOR + 1.0f))
 #define INV_GYR_CMPFM_FACTOR  (1.0f / ((float)CONFIG_GYRO_CMPFM_FACTOR + 1.0f))
 
-static uint16_t acc1G;
-static int16_t  accSmooth[3];
-static int32_t  accSum[3];
-static uint32_t accTimeSum;        // keep track for integration of acc
-static float    EstG[3];
 static float    fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
-static int16_t  gyroZero[3];
-static float    gyroScale;
 
 typedef struct stdev_t {
     float m_oldM, m_newM, m_oldS, m_newS;
@@ -113,6 +106,11 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
     return value;
 }
 
+void IMU::init(void) {
+
+    board_imuInit(&this->acc1G, &this->gyroScale);
+}
+
 void IMU::getEstimatedAttitude(
         bool armed, 
         float anglerad[3], 
@@ -120,13 +118,18 @@ void IMU::getEstimatedAttitude(
         uint16_t & calibratingA,
         uint16_t & calibratingG)
 {
-    static float EstN[3] = { 1.0f, 0.0f, 0.0f };
-    static float accLPF[3];
+    static float    accLPF[3];
+    static int32_t  accZoffset;
+    static float    accz_smooth;
+    static int16_t  accZero[3];
+    static int32_t  a[3];
+    static int16_t  accSmooth[3];
+    static int32_t  accSum[3];
+    static uint32_t accTimeSum;        // keep track for integration of acc
+    static float    EstG[3];
+    static float    EstN[3] = { 1.0f, 0.0f, 0.0f };
+    static int16_t  gyroZero[3];
     static uint32_t previousT;
-    static int32_t accZoffset;
-    static float accz_smooth;
-    static int16_t accZero[3];
-    static int32_t a[3];
 
     int32_t accMag = 0;
     float dT = 0;
@@ -135,7 +138,7 @@ void IMU::getEstimatedAttitude(
     uint32_t currentT = board_getMicros();
     float deltaGyroAngle[3];
     uint32_t deltaT = currentT - previousT;
-    float scale = deltaT * gyroScale;
+    float scale = deltaT * this->gyroScale;
     int16_t  accADC[3];
 
     previousT = currentT;
@@ -158,7 +161,7 @@ void IMU::getEstimatedAttitude(
         if (calibratingA == 1) {
             accZero[ROLL] = (a[ROLL] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
             accZero[PITCH] = (a[PITCH] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
-            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - acc1G;
+            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - this->acc1G;
         }
         calibratingA--;
     }
@@ -217,7 +220,7 @@ void IMU::getEstimatedAttitude(
         }
         accMag += (int32_t)accSmooth[axis] * accSmooth[axis];
     }
-    accMag = accMag * 100 / ((int32_t)acc1G * acc1G);
+    accMag = accMag * 100 / ((int32_t)this->acc1G * this->acc1G);
 
     rotateV(EstG, deltaGyroAngle);
 
@@ -278,10 +281,5 @@ void IMU::getEstimatedAttitude(
 }
 
 
-
-void IMU::init(void) {
-
-    board_imuInit(&acc1G, &gyroScale);
-}
 
 } // extern "C"
