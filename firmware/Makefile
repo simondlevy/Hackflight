@@ -14,7 +14,7 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 TARGET		?= NAZE
 
-CPP_OBJS = mw.o board_naze.o
+CPP_OBJS = mw.o imu.o board_naze.o 
 
 # Compile-time options
 OPTIONS		?=
@@ -40,22 +40,22 @@ STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 
 # Source files common to all targets
 NAZE_SRC = $(BREEZY_DIR)/main.c \
-            $(BREEZY_DIR)/printf.c \
-            $(BREEZY_DIR)/drv_system.c \
-            $(BREEZY_DIR)/drv_mpu6050.c \
-            $(BREEZY_DIR)/drv_ms5611.c \
-            $(BREEZY_DIR)/drv_mb1242.c \
-            $(BREEZY_DIR)/drv_i2c.c \
-            $(BREEZY_DIR)/drv_serial.c \
-            $(BREEZY_DIR)/drv_pwm.c \
-            $(BREEZY_DIR)/drv_gpio.c \
-            $(BREEZY_DIR)/drv_uart.c \
-            $(BREEZY_DIR)/drv_adc.c \
-            $(BREEZY_DIR)/drv_spi.c \
-            $(BREEZY_DIR)/drv_timer.c \
-            $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
-            $(CMSIS_SRC) \
-            $(STDPERIPH_SRC)
+           $(BREEZY_DIR)/printf.c \
+           $(BREEZY_DIR)/drv_system.c \
+           $(BREEZY_DIR)/drv_mpu6050.c \
+           $(BREEZY_DIR)/drv_ms5611.c \
+           $(BREEZY_DIR)/drv_mb1242.c \
+           $(BREEZY_DIR)/drv_i2c.c \
+           $(BREEZY_DIR)/drv_serial.c \
+           $(BREEZY_DIR)/drv_pwm.c \
+           $(BREEZY_DIR)/drv_gpio.c \
+           $(BREEZY_DIR)/drv_uart.c \
+           $(BREEZY_DIR)/drv_adc.c \
+           $(BREEZY_DIR)/drv_spi.c \
+           $(BREEZY_DIR)/drv_timer.c \
+           $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
+           $(CMSIS_SRC) \
+           $(STDPERIPH_SRC)
 
 # In some cases, %.s regarded as intermediate file, which is actually not.
 # This will prevent accidental deletion of startup code.
@@ -155,7 +155,7 @@ $(TARGET_ELF):  $(TARGET_OBJS)
 MKDIR_OBJDIR = @mkdir -p $(dir $@)
 
 # Compile
-$(OBJECT_DIR)/$(TARGET)/%.o: %.c mw.h
+$(OBJECT_DIR)/$(TARGET)/%.o: %.c mw.hpp imu.hpp
 	$(MKDIR_OBJDIR)
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(CFLAGS) $<
@@ -165,14 +165,11 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 	$(MKDIR_OBJDIR)
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(ASFLAGS) $< 
-#$(OBJECT_DIR)/$(TARGET)/%.o): %.S
-#	$(MKDIR_OBJDIR)
-#	@echo %% $(notdir $<)
-#	@$(CC) -c -o $@ $(ASFLAGS) $< 
 
 # C++ support
 %.o: %.cpp
-	$(CC) $(CFLAGS) -c -o $@ $< 
+	@echo %% $(notdir $<)
+	@$(CC) -c -o $@ $(CFLAGS) $< 
 
 clean:
 	rm -rf obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
