@@ -29,10 +29,13 @@ extern "C" {
 #define PITCH_LOOKUP_LENGTH 7
 #define THROTTLE_LOOKUP_LENGTH 12
 
+static int16_t  angle[2];
+static bool     armed;
 static int16_t  axisPID[3];
 static uint16_t calibratingA;
 static uint16_t calibratingG;
 static uint32_t currentTime;
+static int16_t  heading;
 static uint32_t previousTime;
 static int16_t  failsafeCnt;
 static uint8_t  accCalibrated;
@@ -42,12 +45,8 @@ static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for ex
 static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 static bool     haveSmallAngle;
 static int16_t  rcCommand[4];
+static int16_t  rcData[RC_CHANS];
 
-int16_t  angle[2];
-bool     armed;
-int16_t  heading;
-int16_t  motorsDisarmed[4];
-int16_t  rcData[RC_CHANS];
 
 // utilities ======================================================================================================
 
@@ -180,7 +179,7 @@ static void annexCode(void)
     }
 
     // handle serial communications
-    msp.com( armed, angle, heading, motorsDisarmed, rcData);
+    msp.com(armed, angle, heading, mixer.motorsDisarmed, rcData);
 }
 
 static void computeRC(void)

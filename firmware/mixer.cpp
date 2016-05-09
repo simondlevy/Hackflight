@@ -3,8 +3,6 @@ extern "C" {
 #include "mw.hpp"
 #include "mixer.hpp"
 
-extern int16_t  motorsDisarmed[4];
-
 // Custom mixer data per motor
 typedef struct motorMixer_t {
     float throttle;
@@ -24,7 +22,7 @@ void Mixer::init(void)
 {
     // set disarmed motor values
     for (uint8_t i = 0; i < 4; i++)
-        motorsDisarmed[i] = CONFIG_MINCOMMAND;
+        this->motorsDisarmed[i] = CONFIG_MINCOMMAND;
 }
 
 void Mixer::writeMotors(bool armed, int16_t  axisPID[3], int16_t  rcCommand[4], int16_t  rcData[RC_CHANS])
@@ -37,10 +35,13 @@ void Mixer::writeMotors(bool armed, int16_t  axisPID[3], int16_t  rcCommand[4], 
             axisPID[ROLL] * mixerQuadX[i].roll + -CONFIG_YAW_DIRECTION * axisPID[YAW] * mixerQuadX[i].yaw;
 
     maxMotor = motors[0];
+
     for (uint8_t i = 1; i < 4; i++)
         if (motors[i] > maxMotor)
             maxMotor = motors[i];
+
     for (uint8_t i = 0; i < 4; i++) {
+
         if (maxMotor > CONFIG_MAXTHROTTLE)     
             // this is a way to still have good gyro corrections if at least one motor reaches its max.
             motors[i] -= maxMotor - CONFIG_MAXTHROTTLE;
@@ -50,6 +51,7 @@ void Mixer::writeMotors(bool armed, int16_t  axisPID[3], int16_t  rcCommand[4], 
         if ((rcData[THROTTLE]) < CONFIG_MINCHECK) {
             motors[i] = CONFIG_MINTHROTTLE;
         } 
+
         if (!armed) {
             motors[i] = motorsDisarmed[i];
         }
