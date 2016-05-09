@@ -8,15 +8,13 @@ extern "C" {
 #define INV_GYR_CMPF_FACTOR   (1.0f / ((float)CONFIG_GYRO_CMPF_FACTOR + 1.0f))
 #define INV_GYR_CMPFM_FACTOR  (1.0f / ((float)CONFIG_GYRO_CMPFM_FACTOR + 1.0f))
 
-static int32_t  accSum[3];
-static uint32_t accTimeSum;        // keep track for integration of acc
-static float    fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
-
-static float EstG[3];
-
 static int16_t  accADC[3];
 static uint16_t acc1G;
 static int16_t  accSmooth[3];
+static int32_t  accSum[3];
+static uint32_t accTimeSum;        // keep track for integration of acc
+static float    EstG[3];
+static float    fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 static int16_t  gyroZero[3];
 static float    gyroScale;
 
@@ -193,46 +191,6 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
     return value;
 }
 
-// rotate acc into Earth frame and calculate acceleration in it
-static void acc_calc(uint32_t deltaT)
-{
-    static int32_t accZoffset = 0;
-    static float accz_smooth = 0;
-    float dT = 0;
-    float rpy[3];
-    float accel_ned[3];
-
-    // deltaT is measured in us ticks
-    dT = (float)deltaT * 1e-6f;
-
-    // the accel values have to be rotated into the earth frame
-    rpy[0] = -(float)anglerad[ROLL];
-    rpy[1] = -(float)anglerad[PITCH];
-    rpy[2] = -(float)headingrad;
-
-    accel_ned[X] = accSmooth[0];
-    accel_ned[Y] = accSmooth[1];
-    accel_ned[Z] = accSmooth[2];
-
-    rotateV(accel_ned, rpy);
-
-    if (!armed) {
-        accZoffset -= accZoffset / 64;
-        accZoffset += accel_ned[Z];
-    }
-    accel_ned[Z] -= accZoffset / 64;  // compensate for gravitation on z-axis
-
-    accz_smooth = accz_smooth + (dT / (fcAcc + dT)) * (accel_ned[Z] - accz_smooth); // low pass filter
-
-    // apply Deadband to reduce integration drift and vibration influence and
-    // sum up Values for later integration to get velocity and distance
-    accSum[X] += applyDeadband(lrintf(accel_ned[X]), CONFIG_ACCXY_DEADBAND);
-    accSum[Y] += applyDeadband(lrintf(accel_ned[Y]), CONFIG_ACCXY_DEADBAND);
-    accSum[Z] += applyDeadband(lrintf(accz_smooth), CONFIG_ACCZ_DEADBAND);
-
-    accTimeSum += deltaT;
-}
-
 // baseflight calculation by Luggi09 originates from arducopter
 static float calculateHeading(float vec[3])
 {
@@ -247,16 +205,22 @@ static float calculateHeading(float vec[3])
 
 void IMU::getEstimatedAttitude(void)
 {
-    int32_t axis;
-    int32_t accMag = 0;
     static float EstN[3] = { 1.0f, 0.0f, 0.0f };
     static float accLPF[3];
     static uint32_t previousT;
+    static int32_t accZoffset = 0;
+    static float accz_smooth = 0;
+
+    int32_t axis;
+    int32_t accMag = 0;
+    float dT = 0;
+    float rpy[3];
+    float accel_ned[3];
     uint32_t currentT = board_getMicros();
-    uint32_t deltaT;
     float deltaGyroAngle[3];
-    deltaT = currentT - previousT;
+    uint32_t deltaT = currentT - previousT;
     float scale = deltaT * gyroScale;
+
     previousT = currentT;
 
     sensorsGetIMU();
@@ -294,7 +258,35 @@ void IMU::getEstimatedAttitude(void)
     normalizeV(EstN, EstN);
     headingrad = calculateHeading(EstN);
 
-    acc_calc(deltaT); // rotate acc vector into earth frame
+    // deltaT is measured in us ticks
+    dT = (float)deltaT * 1e-6f;
+
+    // the accel values have to be rotated into the earth frame
+    rpy[0] = -(float)anglerad[ROLL];
+    rpy[1] = -(float)anglerad[PITCH];
+    rpy[2] = -(float)headingrad;
+
+    accel_ned[X] = accSmooth[0];
+    accel_ned[Y] = accSmooth[1];
+    accel_ned[Z] = accSmooth[2];
+
+    rotateV(accel_ned, rpy);
+
+    if (!armed) {
+        accZoffset -= accZoffset / 64;
+        accZoffset += accel_ned[Z];
+    }
+    accel_ned[Z] -= accZoffset / 64;  // compensate for gravitation on z-axis
+
+    accz_smooth = accz_smooth + (dT / (fcAcc + dT)) * (accel_ned[Z] - accz_smooth); // low pass filter
+
+    // apply Deadband to reduce integration drift and vibration influence and
+    // sum up Values for later integration to get velocity and distance
+    accSum[X] += applyDeadband(lrintf(accel_ned[X]), CONFIG_ACCXY_DEADBAND);
+    accSum[Y] += applyDeadband(lrintf(accel_ned[Y]), CONFIG_ACCXY_DEADBAND);
+    accSum[Z] += applyDeadband(lrintf(accz_smooth), CONFIG_ACCZ_DEADBAND);
+
+    accTimeSum += deltaT;
 }
 
 
