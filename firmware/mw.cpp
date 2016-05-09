@@ -748,7 +748,7 @@ void loop(void)
 
         float anglerad[3];
 
-        imu.getEstimatedAttitude(armed, anglerad, gyroADC);
+        imu.getEstimatedAttitude(armed, anglerad, gyroADC, calibratingA, calibratingG);
 
         angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
         angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));

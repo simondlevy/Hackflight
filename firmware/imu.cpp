@@ -18,10 +18,6 @@ static float    fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC 
 static int16_t  gyroZero[3];
 static float    gyroScale;
 
-extern uint16_t calibratingA;
-extern uint16_t calibratingG;
-extern int16_t  gyroADC[3];
-
 typedef struct stdev_t {
     float m_oldM, m_newM, m_oldS, m_newS;
     int m_n;
@@ -118,7 +114,12 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
     return value;
 }
 
-void IMU::getEstimatedAttitude(bool armed, float anglerad[3], int16_t gyroADC[3])
+void IMU::getEstimatedAttitude(
+        bool armed, 
+        float anglerad[3], 
+        int16_t gyroADC[3],
+        uint16_t & calibratingA,
+        uint16_t & calibratingG)
 {
     static float EstN[3] = { 1.0f, 0.0f, 0.0f };
     static float accLPF[3];
