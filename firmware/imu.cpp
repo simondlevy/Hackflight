@@ -21,7 +21,6 @@ static float    gyroScale;
 extern uint16_t calibratingA;
 extern uint16_t calibratingG;
 extern int16_t  gyroADC[3];
-extern float    headingrad;
 
 typedef struct stdev_t {
     float m_oldM, m_newM, m_oldS, m_newS;
@@ -187,7 +186,7 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
     return value;
 }
 
-void IMU::getEstimatedAttitude(bool armed, float anglerad[2])
+void IMU::getEstimatedAttitude(bool armed, float anglerad[3])
 {
     static float EstN[3] = { 1.0f, 0.0f, 0.0f };
     static float accLPF[3];
@@ -247,7 +246,7 @@ void IMU::getEstimatedAttitude(bool armed, float anglerad[2])
     float sinePitch = sinf(anglerad[PITCH]);
     float Xh = EstN[X] * cosinePitch + EstN[Y] * sineRoll * sinePitch + EstN[Z] * sinePitch * cosineRoll;
     float Yh = EstN[Y] * cosineRoll - EstN[Z] * sineRoll;
-    headingrad = atan2f(Yh, Xh); 
+    anglerad[YAW] = atan2f(Yh, Xh); 
 
     // deltaT is measured in us ticks
     dT = (float)deltaT * 1e-6f;
@@ -255,7 +254,7 @@ void IMU::getEstimatedAttitude(bool armed, float anglerad[2])
     // the accel values have to be rotated into the earth frame
     rpy[0] = -(float)anglerad[ROLL];
     rpy[1] = -(float)anglerad[PITCH];
-    rpy[2] = -(float)headingrad;
+    rpy[2] = -(float)anglerad[YAW];
 
     accel_ned[X] = accSmooth[0];
     accel_ned[Y] = accSmooth[1];

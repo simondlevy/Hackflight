@@ -27,7 +27,6 @@ extern "C" {
 #define PITCH_LOOKUP_LENGTH 7
 #define THROTTLE_LOOKUP_LENGTH 12
 
-static float    anglerad[2];
 static bool     armed;
 static int16_t  axisPID[3];
 static uint32_t currentTime;
@@ -48,7 +47,6 @@ static int16_t  rcData[RC_CHANS];
 uint16_t calibratingA;
 uint16_t calibratingG;
 int16_t  gyroADC[3];
-float    headingrad;
 
 // utilities ======================================================================================================
 
@@ -748,12 +746,14 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
+        float anglerad[3];
+
         imu.getEstimatedAttitude(armed, anglerad);
 
         angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
         angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
 
-        heading = lrintf(headingrad * 1800.0f / M_PI + CONFIG_MAGNETIC_DECLINATION) / 10.0f;
+        heading = lrintf(anglerad[YAW] * 1800.0f / M_PI + CONFIG_MAGNETIC_DECLINATION) / 10.0f;
 
         if (heading < 0)
             heading += 360;
