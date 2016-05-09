@@ -83,12 +83,7 @@ void MSP::init(void)
     bzero(&this->portState, sizeof(this->portState));
 }
 
-void MSP::com(
-        bool    armed,
-        int16_t angle[2],
-        int16_t heading,
-        int16_t motorsDisarmed[4],
-        int16_t rcData[RC_CHANS])
+void MSP::com( bool armed, int16_t angle[2], int16_t motorsDisarmed[4], int16_t rcData[RC_CHANS])
 {
     static bool pendReboot;
 
@@ -155,9 +150,8 @@ void MSP::com(
 
                     case MSP_ATTITUDE:
                         headSerialReply(6);
-                        for (uint8_t i = 0; i < 2; i++)
+                        for (uint8_t i = 0; i < 3; i++)
                             serialize16(angle[i]);
-                        serialize16(heading);
                         break;
 
                     case MSP_BARO_SONAR_RAW:

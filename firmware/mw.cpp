@@ -29,13 +29,12 @@ extern "C" {
 #define PITCH_LOOKUP_LENGTH 7
 #define THROTTLE_LOOKUP_LENGTH 12
 
-static int16_t  angle[2];
+static int16_t  angle[3];
 static bool     armed;
 static int16_t  axisPID[3];
 static uint16_t calibratingA;
 static uint16_t calibratingG;
 static uint32_t currentTime;
-static int16_t  heading;
 static uint32_t previousTime;
 static int16_t  failsafeCnt;
 static uint8_t  accCalibrated;
@@ -179,7 +178,7 @@ static void annexCode(void)
     }
 
     // handle serial communications
-    msp.com(armed, angle, heading, mixer.motorsDisarmed, rcData);
+    msp.com(armed, angle, mixer.motorsDisarmed, rcData);
 }
 
 static void computeRC(void)
@@ -440,10 +439,10 @@ void loop(void)
         angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
         angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
 
-        heading = lrintf(anglerad[YAW] * 1800.0f / M_PI + CONFIG_MAGNETIC_DECLINATION) / 10.0f;
+        angle[YAW] = lrintf(anglerad[YAW] * 1800.0f / M_PI + CONFIG_MAGNETIC_DECLINATION) / 10.0f;
 
-        if (heading < 0)
-            heading += 360;
+        if (angle[YAW] < 0)
+            angle[YAW] += 360;
 
         haveSmallAngle = abs(angle[0]) < CONFIG_SMALL_ANGLE && abs(angle[1]) < CONFIG_SMALL_ANGLE;
 
