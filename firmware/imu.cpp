@@ -61,13 +61,11 @@ static void sensorsGetIMU(void)
 {
     board_imuRead(accADC, gyroADC);
 
-    int axis = 0;
-
     static int16_t accZero[3];
     static int32_t a[3];
 
     if (calibratingA > 0) {
-        for (axis = 0; axis < 3; axis++) {
+        for (uint8_t axis = 0; axis < 3; axis++) {
             // Reset a[axis] at start of calibration
             if (calibratingA == CONFIG_CALIBRATING_ACC_CYCLES)
                 a[axis] = 0;
@@ -96,7 +94,7 @@ static void sensorsGetIMU(void)
     static stdev_t var[3];
 
     if (calibratingG > 0) {
-        for (axis = 0; axis < 3; axis++) {
+        for (uint8_t axis = 0; axis < 3; axis++) {
             // Reset g[axis] at start of calibration
             if (calibratingG == CONFIG_CALIBRATING_GYRO_CYCLES) {
                 g[axis] = 0;
@@ -124,7 +122,7 @@ static void sensorsGetIMU(void)
         }
         calibratingG--;
     }
-    for (axis = 0; axis < 3; axis++)
+    for (uint8_t axis = 0; axis < 3; axis++)
         gyroADC[axis] -= gyroZero[axis];
 }
 
@@ -197,7 +195,6 @@ void IMU::getEstimatedAttitude(bool armed, float anglerad[2])
     static int32_t accZoffset;
     static float accz_smooth;
 
-    int32_t axis;
     int32_t accMag = 0;
     float dT = 0;
     float rpy[3];
@@ -212,7 +209,7 @@ void IMU::getEstimatedAttitude(bool armed, float anglerad[2])
     sensorsGetIMU();
 
     // Initialization
-    for (axis = 0; axis < 3; axis++) {
+    for (uint8_t axis = 0; axis < 3; axis++) {
         deltaGyroAngle[axis] = gyroADC[axis] * scale;
         if (CONFIG_ACC_LPF_FACTOR > 0) {
             accLPF[axis] = accLPF[axis] * (1.0f - (1.0f / CONFIG_ACC_LPF_FACTOR)) + accADC[axis] * 
@@ -232,7 +229,7 @@ void IMU::getEstimatedAttitude(bool armed, float anglerad[2])
     // range => we neutralize the effect of accelerometers in the angle
     // estimation.  To do that, we just skip filter, as EstV already rotated by Gyro
     if (72 < (uint16_t)accMag && (uint16_t)accMag < 133) {
-        for (axis = 0; axis < 3; axis++)
+        for (uint8_t axis = 0; axis < 3; axis++)
             EstG[axis] = (EstG[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + accSmooth[axis]) * INV_GYR_CMPF_FACTOR;
     }
 
