@@ -56,74 +56,6 @@ static float devStandardDeviation(stdev_t *dev)
     return sqrtf(devVariance(dev));
 }
 
-static void sensorsGetIMU(void)
-{
-    board_imuRead(accADC, gyroADC);
-
-    static int16_t accZero[3];
-    static int32_t a[3];
-
-    if (calibratingA > 0) {
-        for (uint8_t axis = 0; axis < 3; axis++) {
-            // Reset a[axis] at start of calibration
-            if (calibratingA == CONFIG_CALIBRATING_ACC_CYCLES)
-                a[axis] = 0;
-            // Sum up CONFIG_CALIBRATING_ACC_CYCLES readings
-            a[axis] += accADC[axis];
-            // Clear global variables for next reading
-            accADC[axis] = 0;
-            accZero[axis] = 0;
-        }
-        // Calculate average, shift Z down by acc1G
-        if (calibratingA == 1) {
-            accZero[ROLL] = (a[ROLL] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
-            accZero[PITCH] = (a[PITCH] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
-            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - acc1G;
-        }
-        calibratingA--;
-    }
-
-    accADC[ROLL] -= accZero[ROLL];
-    accADC[PITCH] -= accZero[PITCH];
-    accADC[YAW] -= accZero[YAW];
-
-    // range: +/- 8192; +/- 2000 deg/sec
-
-    static int32_t g[3];
-    static stdev_t var[3];
-
-    if (calibratingG > 0) {
-        for (uint8_t axis = 0; axis < 3; axis++) {
-            // Reset g[axis] at start of calibration
-            if (calibratingG == CONFIG_CALIBRATING_GYRO_CYCLES) {
-                g[axis] = 0;
-                devClear(&var[axis]);
-            }
-            // Sum up 1000 readings
-            g[axis] += gyroADC[axis];
-            devPush(&var[axis], gyroADC[axis]);
-            // Clear global variables for next reading
-            gyroADC[axis] = 0;
-            gyroZero[axis] = 0;
-            if (calibratingG == 1) {
-                float dev = devStandardDeviation(&var[axis]);
-                // check deviation and startover if idiot was moving the model
-                if (CONFIG_MORON_THRESHOLD && dev > CONFIG_MORON_THRESHOLD) {
-                    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
-                    devClear(&var[0]);
-                    devClear(&var[1]);
-                    devClear(&var[2]);
-                    g[0] = g[1] = g[2] = 0;
-                    continue;
-                }
-                gyroZero[axis] = (g[axis] + (CONFIG_CALIBRATING_GYRO_CYCLES / 2)) / CONFIG_CALIBRATING_GYRO_CYCLES;
-            }
-        }
-        calibratingG--;
-    }
-    for (uint8_t axis = 0; axis < 3; axis++)
-        gyroADC[axis] -= gyroZero[axis];
-}
 
 // Normalize a vector
 static void normalizeV(float src[3], float dest[3])
@@ -193,6 +125,8 @@ void IMU::getEstimatedAttitude(bool armed, float anglerad[3])
     static uint32_t previousT;
     static int32_t accZoffset;
     static float accz_smooth;
+    static int16_t accZero[3];
+    static int32_t a[3];
 
     int32_t accMag = 0;
     float dT = 0;
@@ -205,7 +139,70 @@ void IMU::getEstimatedAttitude(bool armed, float anglerad[3])
 
     previousT = currentT;
 
-    sensorsGetIMU();
+    board_imuRead(accADC, gyroADC);
+
+    if (calibratingA > 0) {
+
+        for (uint8_t axis = 0; axis < 3; axis++) {
+            // Reset a[axis] at start of calibration
+            if (calibratingA == CONFIG_CALIBRATING_ACC_CYCLES)
+                a[axis] = 0;
+            // Sum up CONFIG_CALIBRATING_ACC_CYCLES readings
+            a[axis] += accADC[axis];
+            // Clear global variables for next reading
+            accADC[axis] = 0;
+            accZero[axis] = 0;
+        }
+        // Calculate average, shift Z down by acc1G
+        if (calibratingA == 1) {
+            accZero[ROLL] = (a[ROLL] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
+            accZero[PITCH] = (a[PITCH] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
+            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - acc1G;
+        }
+        calibratingA--;
+    }
+
+    accADC[ROLL] -= accZero[ROLL];
+    accADC[PITCH] -= accZero[PITCH];
+    accADC[YAW] -= accZero[YAW];
+
+    // range: +/- 8192; +/- 2000 deg/sec
+
+    static int32_t g[3];
+    static stdev_t var[3];
+
+    if (calibratingG > 0) {
+        for (uint8_t axis = 0; axis < 3; axis++) {
+            // Reset g[axis] at start of calibration
+            if (calibratingG == CONFIG_CALIBRATING_GYRO_CYCLES) {
+                g[axis] = 0;
+                devClear(&var[axis]);
+            }
+            // Sum up 1000 readings
+            g[axis] += gyroADC[axis];
+            devPush(&var[axis], gyroADC[axis]);
+            // Clear global variables for next reading
+            gyroADC[axis] = 0;
+            gyroZero[axis] = 0;
+            if (calibratingG == 1) {
+                float dev = devStandardDeviation(&var[axis]);
+                // check deviation and startover if idiot was moving the model
+                if (CONFIG_MORON_THRESHOLD && dev > CONFIG_MORON_THRESHOLD) {
+                    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
+                    devClear(&var[0]);
+                    devClear(&var[1]);
+                    devClear(&var[2]);
+                    g[0] = g[1] = g[2] = 0;
+                    continue;
+                }
+                gyroZero[axis] = (g[axis] + (CONFIG_CALIBRATING_GYRO_CYCLES / 2)) / CONFIG_CALIBRATING_GYRO_CYCLES;
+            }
+        }
+        calibratingG--;
+    }
+
+    for (uint8_t axis = 0; axis < 3; axis++)
+        gyroADC[axis] -= gyroZero[axis];
 
     // Initialization
     for (uint8_t axis = 0; axis < 3; axis++) {
