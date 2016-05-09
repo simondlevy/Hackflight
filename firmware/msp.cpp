@@ -1,5 +1,7 @@
 extern "C" {
 
+#include <strings.h> // for bzero
+
 #include "mw.hpp"
 #include "msp.hpp"
 
@@ -11,70 +13,38 @@ extern "C" {
 #define MSP_SET_RAW_RC           200    // in message  8 rc chan
 #define MSP_SET_MOTOR            214    // in message  PropBalance function
 
-#define INBUF_SIZE 128
-
-typedef enum serialState_t {
-    IDLE,
-    HEADER_START,
-    HEADER_M,
-    HEADER_ARROW,
-    HEADER_SIZE,
-    HEADER_CMD
-} serialState_t;
-
-typedef  struct mspPortState_t {
-    uint8_t checksum;
-    uint8_t indRX;
-    uint8_t inBuf[INBUF_SIZE];
-    uint8_t cmdMSP;
-    uint8_t offset;
-    uint8_t dataSize;
-    serialState_t c_state;
-} mspPortState_t;
-
-// cause reboot after MSP processing complete
-static bool pendReboot;
-static mspPortState_t portState;
-static bool rxMspFrameDone;
-
-static void mspFrameReceive(void)
-{
-    rxMspFrameDone = true;
-}
-
-static void serialize8(uint8_t a)
+void MSP::serialize8(uint8_t a)
 {
     board_serialWrite(a);
     portState.checksum ^= a;
 }
 
-static void serialize16(int16_t a)
+void MSP::serialize16(int16_t a)
 {
     serialize8(a & 0xFF);
     serialize8((a >> 8) & 0xFF);
 }
 
-static uint8_t read8(void)
+uint8_t MSP::read8(void)
 {
     return portState.inBuf[portState.indRX++] & 0xff;
 }
 
-static uint16_t read16(void)
+uint16_t MSP::read16(void)
 {
     uint16_t t = read8();
     t += (uint16_t)read8() << 8;
     return t;
 }
 
-/*
-static uint32_t read32(void)
+uint32_t MSP::read32(void)
 {
     uint32_t t = read16();
     t += (uint32_t)read16() << 16;
     return t;
 }
 
-static void serialize32(uint32_t a)
+void MSP::serialize32(uint32_t a)
 {
     serialize8(a & 0xFF);
     serialize8((a >> 8) & 0xFF);
@@ -82,9 +52,8 @@ static void serialize32(uint32_t a)
     serialize8((a >> 24) & 0xFF);
 }
 
-*/
 
-static void headSerialResponse(uint8_t err, uint8_t s)
+void MSP::headSerialResponse(uint8_t err, uint8_t s)
 {
     serialize8('$');
     serialize8('M');
@@ -94,19 +63,24 @@ static void headSerialResponse(uint8_t err, uint8_t s)
     serialize8(portState.cmdMSP);
 }
 
-static void headSerialReply(uint8_t s)
+void MSP::headSerialReply(uint8_t s)
 {
     headSerialResponse(0, s);
 }
 
-static void headSerialError(uint8_t s)
+void MSP::headSerialError(uint8_t s)
 {
     headSerialResponse(1, s);
 }
 
-static void tailSerialReply(void)
+void MSP::tailSerialReply(void)
 {
     serialize8(portState.checksum);
+}
+
+void MSP::init(void)
+{
+    bzero(&this->portState, sizeof(this->portState));
 }
 
 void MSP::com(
@@ -116,13 +90,13 @@ void MSP::com(
         int16_t motorsDisarmed[4],
         int16_t rcData[RC_CHANS])
 {
-    uint8_t c;
+    static bool pendReboot;
 
     board_checkReboot(pendReboot);
 
     while (board_serialAvailable()) {
 
-        c = board_serialRead();
+        uint8_t c = board_serialRead();
 
         if (portState.c_state == IDLE) {
             portState.c_state = (c == '$') ? HEADER_START : IDLE;
@@ -165,7 +139,6 @@ void MSP::com(
                         for (uint8_t i = 0; i < 8; i++)
                             rcData[i] = read16();
                         headSerialReply(0);
-                        mspFrameReceive();
                         break;
 
                     case MSP_SET_MOTOR:
