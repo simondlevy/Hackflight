@@ -191,18 +191,6 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
     return value;
 }
 
-// baseflight calculation by Luggi09 originates from arducopter
-static float calculateHeading(float vec[3])
-{
-    float cosineRoll = cosf(anglerad[ROLL]);
-    float sineRoll = sinf(anglerad[ROLL]);
-    float cosinePitch = cosf(anglerad[PITCH]);
-    float sinePitch = sinf(anglerad[PITCH]);
-    float Xh = vec[X] * cosinePitch + vec[Y] * sineRoll * sinePitch + vec[Z] * sinePitch * cosineRoll;
-    float Yh = vec[Y] * cosineRoll - vec[Z] * sineRoll;
-    return atan2f(Yh, Xh); 
-}
-
 void IMU::getEstimatedAttitude(void)
 {
     static float EstN[3] = { 1.0f, 0.0f, 0.0f };
@@ -256,7 +244,15 @@ void IMU::getEstimatedAttitude(void)
 
     rotateV(EstN, deltaGyroAngle);
     normalizeV(EstN, EstN);
-    headingrad = calculateHeading(EstN);
+
+    // Calculate heading
+    float cosineRoll = cosf(anglerad[ROLL]);
+    float sineRoll = sinf(anglerad[ROLL]);
+    float cosinePitch = cosf(anglerad[PITCH]);
+    float sinePitch = sinf(anglerad[PITCH]);
+    float Xh = EstN[X] * cosinePitch + EstN[Y] * sineRoll * sinePitch + EstN[Z] * sinePitch * cosineRoll;
+    float Yh = EstN[Y] * cosineRoll - EstN[Z] * sineRoll;
+    headingrad = atan2f(Yh, Xh); 
 
     // deltaT is measured in us ticks
     dT = (float)deltaT * 1e-6f;
