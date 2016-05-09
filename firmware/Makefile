@@ -14,6 +14,8 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 TARGET		?= NAZE
 
+CPP_OBJS = mw.o board_naze.o
+
 # Compile-time options
 OPTIONS		?=
 
@@ -37,8 +39,7 @@ CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
 STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 
 # Source files common to all targets
-NAZE_SRC =  mw.c board_naze.c \
-            $(BREEZY_DIR)/main.c \
+NAZE_SRC = $(BREEZY_DIR)/main.c \
             $(BREEZY_DIR)/printf.c \
             $(BREEZY_DIR)/drv_system.c \
             $(BREEZY_DIR)/drv_mpu6050.c \
@@ -83,11 +84,10 @@ OBJCOPY	 = arm-none-eabi-objcopy
 #
 # Tool options.
 #
-INCLUDE_DIRS = $(SRC_DIR) \
-		   $(BREEZY_DIR) \
-		   $(STDPERIPH_DIR)/inc \
-		   $(CMSIS_DIR)/CM3/CoreSupport \
-		   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x \
+INCLUDE_DIRS = $(BREEZY_DIR) \
+			   $(STDPERIPH_DIR)/inc \
+			   $(CMSIS_DIR)/CM3/CoreSupport \
+			   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x
 
 ARCH_FLAGS	 = -mthumb -mcpu=cortex-m3
 
@@ -106,7 +106,6 @@ CFLAGS		 = $(ARCH_FLAGS) \
 		   $(addprefix -D,$(OPTIONS)) \
 		   $(addprefix -I,$(INCLUDE_DIRS)) \
 		   $(DEBUG_FLAGS) \
-		   -std=gnu99 \
 		   -Wall -pedantic -Wextra -Wshadow -Wunsafe-loop-optimizations \
 		   -ffunction-sections \
 		   -fdata-sections \
@@ -120,11 +119,10 @@ ASFLAGS		 = $(ARCH_FLAGS) \
 
 # XXX Map/crossref output?
 LD_SCRIPT	 = $(BREEZY_DIR)/stm32_flash.ld
-LDFLAGS		 = -lm \
+LDFLAGS	 = -lm \
 		   -nostartfiles \
-		   --specs=nano.specs \
 		   -lc \
-		   -lnosys \
+  		   --specs=rdimon.specs \
 		   $(ARCH_FLAGS) \
 		   $(LTO_FLAGS) \
 		   $(DEBUG_FLAGS) \
@@ -142,7 +140,7 @@ LDFLAGS		 = -lm \
 
 TARGET_HEX	 = $(BIN_DIR)/hackflight_$(TARGET).hex
 TARGET_ELF	 = $(BIN_DIR)/hackflight_$(TARGET).elf
-TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC))))
+TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC)))) $(CPP_OBJS)
 TARGET_MAP   = $(OBJECT_DIR)/hackflight_$(TARGET).map
 
 # List of buildable ELF files and their object dependencies.
@@ -171,6 +169,10 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 #	$(MKDIR_OBJDIR)
 #	@echo %% $(notdir $<)
 #	@$(CC) -c -o $@ $(ASFLAGS) $< 
+
+# C++ support
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c -o $@ $< 
 
 clean:
 	rm -rf obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)

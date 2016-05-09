@@ -1,10 +1,5 @@
-#define EXTERN 
-
 #include "mw.h"
 
-#ifndef PRINTF
-#define PRINTF printf
-#endif
 
 #include <math.h>
 
@@ -1003,7 +998,7 @@ void loop(void)
                 if (rcSticks == THR_LO + YAW_LO + PIT_CE + ROL_CE)
                     mwDisarm();
             } else {            // actions during not armed
-                i = 0;
+
                 // GYRO calibration
                 if (rcSticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
                     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
