@@ -8,7 +8,6 @@ extern "C" {
 #define INV_GYR_CMPF_FACTOR   (1.0f / ((float)CONFIG_GYRO_CMPF_FACTOR + 1.0f))
 #define INV_GYR_CMPFM_FACTOR  (1.0f / ((float)CONFIG_GYRO_CMPFM_FACTOR + 1.0f))
 
-static float    fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 
 typedef struct stdev_t {
     float m_oldM, m_newM, m_oldS, m_newS;
@@ -109,6 +108,9 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
 void IMU::init(void) {
 
     board_imuInit(&this->acc1G, &this->gyroScale);
+
+    // calculate RC time constant used in the accZ lpf    
+    this->fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); 
 }
 
 void IMU::getEstimatedAttitude(

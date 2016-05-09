@@ -5,11 +5,12 @@ extern "C" {
         private:
 
             uint16_t acc1G;
+            float    fcAcc;
             float    gyroScale;
 
         public:
 
-            void init();
+            void init(void);
 
             void getEstimatedAttitude( bool armed, 
                     float anglerad[3], 
