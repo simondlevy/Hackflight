@@ -28,7 +28,9 @@ extern "C" {
 #define PITCH_LOOKUP_LENGTH 7
 #define THROTTLE_LOOKUP_LENGTH 12
 
+static int16_t  angle[2];
 static bool     armed;
+static int16_t  axisPID[3];
 static uint16_t calibratingA;
 static uint16_t calibratingG;
 static uint32_t currentTime;
@@ -40,13 +42,11 @@ static int16_t  gyroADC[3];
 static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
 static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 static bool     haveSmallAngle;
-static int16_t  angle[2];
 static int16_t  heading;
+static int16_t  rcCommand[4];
+static int16_t  rcData[RC_CHANS];
 
-int16_t  axisPID[3];
 int16_t  motorsDisarmed[4];
-int16_t  rcCommand[4];
-int16_t  rcData[RC_CHANS];
 
 // utilities ======================================================================================================
 
@@ -703,7 +703,7 @@ void loop(void)
         // prevent "yaw jump" during yaw correction
         axisPID[YAW] = constrainer(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
 
-        mixer.writeMotors(armed);
+        mixer.writeMotors(armed, axisPID, rcCommand, rcData);
     }
 }
 

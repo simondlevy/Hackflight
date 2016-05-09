@@ -3,11 +3,7 @@ extern "C" {
 #include "mw.hpp"
 #include "mixer.hpp"
 
-extern int16_t  axisPID[3];
 extern int16_t  motorsDisarmed[4];
-extern int16_t  rcCommand[4];
-extern int16_t  rcData[RC_CHANS];
-
 
 // Custom mixer data per motor
 typedef struct motorMixer_t {
@@ -31,7 +27,7 @@ void Mixer::init(void)
         motorsDisarmed[i] = CONFIG_MINCOMMAND;
 }
 
-void Mixer::writeMotors(bool armed)
+void Mixer::writeMotors(bool armed, int16_t  axisPID[3], int16_t  rcCommand[4], int16_t  rcData[RC_CHANS])
 {
     int16_t maxMotor;
     int16_t motors[4];
