@@ -118,7 +118,7 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
     return value;
 }
 
-void IMU::getEstimatedAttitude(bool armed, float anglerad[3])
+void IMU::getEstimatedAttitude(bool armed, float anglerad[3], int16_t gyroADC[3])
 {
     static float EstN[3] = { 1.0f, 0.0f, 0.0f };
     static float accLPF[3];

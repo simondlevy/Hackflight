@@ -34,6 +34,7 @@ static uint32_t previousTime;
 static int16_t  failsafeCnt;
 static uint8_t  accCalibrated;
 static uint8_t  dynP8[3], dynI8[3], dynD8[3];
+static int16_t  gyroADC[3];
 static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
 static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 static bool     haveSmallAngle;
@@ -46,7 +47,6 @@ static int16_t  rcData[RC_CHANS];
 
 uint16_t calibratingA;
 uint16_t calibratingG;
-int16_t  gyroADC[3];
 
 // utilities ======================================================================================================
 
@@ -748,7 +748,7 @@ void loop(void)
 
         float anglerad[3];
 
-        imu.getEstimatedAttitude(armed, anglerad);
+        imu.getEstimatedAttitude(armed, anglerad, gyroADC);
 
         angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
         angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));

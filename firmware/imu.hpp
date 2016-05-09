@@ -6,7 +6,7 @@ extern "C" {
 
             void init();
 
-            void getEstimatedAttitude(bool armed, float anglerad[3]);
+            void getEstimatedAttitude(bool armed, float anglerad[3], int16_t gyroADC[3]);
     };
 
 }
