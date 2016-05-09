@@ -179,7 +179,8 @@ static void annexCode(void)
         }
     }
 
-    msp.com();
+    // handle serial communications
+    msp.com( armed, angle, heading, motorsDisarmed, rcData);
 }
 
 static void computeRC(void)

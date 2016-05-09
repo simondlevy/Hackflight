@@ -35,13 +35,7 @@ typedef  struct mspPortState_t {
 // cause reboot after MSP processing complete
 static bool pendReboot;
 static mspPortState_t portState;
-static bool rxMspFrameDone = false;
-
-extern int16_t angle[2];
-extern bool    armed;
-extern int16_t heading;
-extern int16_t motorsDisarmed[4];
-extern int16_t rcData[RC_CHANS];
+static bool rxMspFrameDone;
 
 static void mspFrameReceive(void)
 {
@@ -115,7 +109,12 @@ static void tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-void MSP::com(void)
+void MSP::com(
+        bool    armed,
+        int16_t angle[2],
+        int16_t heading,
+        int16_t motorsDisarmed[4],
+        int16_t rcData[RC_CHANS])
 {
     uint8_t c;
 
@@ -157,7 +156,9 @@ void MSP::com(void)
             portState.checksum ^= c;
             portState.inBuf[portState.offset++] = c;
         } else if (portState.c_state == HEADER_CMD && portState.offset >= portState.dataSize) {
+
             if (portState.checksum == c) {        // compare calculated and transferred checksum
+
                 switch (portState.cmdMSP) {
 
                     case MSP_SET_RAW_RC:
@@ -203,7 +204,8 @@ void MSP::com(void)
                         pendReboot = true;
                         break;
 
-                    default:                   // we do not know how to handle the (valid) message, indicate error MSP $M!
+                    // don't know how to handle the (valid) message, indicate error MSP $M!
+                    default:                   
                         headSerialError(0);
                         break;
                 }
