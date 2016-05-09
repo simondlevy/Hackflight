@@ -2,6 +2,7 @@ extern "C" {
 
 #include "mw.hpp"
 #include "imu.hpp"
+#include "mixer.hpp"
 
 #ifndef PRINTF
 #define PRINTF printf
@@ -28,7 +29,8 @@ extern "C" {
 #define THROTTLE_LOOKUP_LENGTH 12
 
 static bool     armed;
-static int16_t  axisPID[3];
+static uint16_t calibratingA;
+static uint16_t calibratingG;
 static uint32_t currentTime;
 static uint32_t previousTime;
 static int16_t  failsafeCnt;
@@ -38,15 +40,13 @@ static int16_t  gyroADC[3];
 static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
 static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 static bool     haveSmallAngle;
-static int16_t  motors[4];
-static int16_t  motorsDisarmed[4];
 static int16_t  angle[2];
 static int16_t  heading;
-static int16_t  rcCommand[4];
-static int16_t  rcData[RC_CHANS];
 
-uint16_t calibratingA;
-uint16_t calibratingG;
+int16_t  axisPID[3];
+int16_t  motorsDisarmed[4];
+int16_t  rcCommand[4];
+int16_t  rcData[RC_CHANS];
 
 // utilities ======================================================================================================
 
@@ -61,7 +61,7 @@ static void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
     }
 }
 
-static int constrainer(int amt, int low, int high)
+int constrainer(int amt, int low, int high)
 {
     if (amt < low)
         return low;
@@ -72,6 +72,7 @@ static int constrainer(int amt, int low, int high)
 }
 
 IMU imu;
+Mixer mixer;
 
 // MSP ============================================================================================================
 
@@ -190,14 +191,6 @@ static void tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-static void s_struct(uint8_t *cb, uint8_t siz)
-{
-    headSerialReply(siz);
-    while (siz--)
-        serialize8(*cb++);
-}
-
-
 static void evaluateCommand(void)
 {
     const char *build = __DATE__;
@@ -230,9 +223,6 @@ static void evaluateCommand(void)
         case MSP_RAW_IMU:
             break;
 
-        case MSP_MOTOR:
-            s_struct((uint8_t *)motors, 16);
-            break;
 
         case MSP_RC:
             headSerialReply(16);
@@ -536,65 +526,6 @@ static void pidMultiWii(void)
 }
 
 
-// Mixer =========================================================================================================
-
-
-// Custom mixer data per motor
-typedef struct motorMixer_t {
-    float throttle;
-    float roll;
-    float pitch;
-    float yaw;
-} motorMixer_t;
-
-static const motorMixer_t mixerQuadX[] = {
-    { 1.0f, -1.0f,  1.0f, -1.0f },          // REAR_R
-    { 1.0f, -1.0f, -1.0f,  1.0f },          // FRONT_R
-    { 1.0f,  1.0f,  1.0f,  1.0f },          // REAR_L
-    { 1.0f,  1.0f, -1.0f, -1.0f },          // FRONT_L
-};
-
-static void mixerInit(void)
-{
-    // set disarmed motor values
-    for (uint8_t i = 0; i < 4; i++)
-        motorsDisarmed[i] = CONFIG_MINCOMMAND;
-}
-
-static void mixerWriteMotors(void)
-{
-    int16_t maxMotor;
-
-    // prevent "yaw jump" during yaw correction
-    axisPID[YAW] = constrainer(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
-
-    for (uint8_t i = 0; i < 4; i++)
-        motors[i] = rcCommand[THROTTLE] * mixerQuadX[i].throttle + axisPID[PITCH] * mixerQuadX[i].pitch + 
-            axisPID[ROLL] * mixerQuadX[i].roll + -CONFIG_YAW_DIRECTION * axisPID[YAW] * mixerQuadX[i].yaw;
-
-    maxMotor = motors[0];
-    for (uint8_t i = 1; i < 4; i++)
-        if (motors[i] > maxMotor)
-            maxMotor = motors[i];
-    for (uint8_t i = 0; i < 4; i++) {
-        if (maxMotor > CONFIG_MAXTHROTTLE)     
-            // this is a way to still have good gyro corrections if at least one motor reaches its max.
-            motors[i] -= maxMotor - CONFIG_MAXTHROTTLE;
-
-        motors[i] = constrainer(motors[i], CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
-        if ((rcData[THROTTLE]) < CONFIG_MINCHECK) {
-            motors[i] = CONFIG_MINTHROTTLE;
-        } 
-        if (!armed) {
-            motors[i] = motorsDisarmed[i];
-        }
-    }
-
-    for (uint8_t i = 0; i < 4; i++)
-        board_writeMotor(i, motors[i]);
-}
-
-
 // =================================================================================================================
 
 void setup(void)
@@ -632,7 +563,7 @@ void setup(void)
 
     imu.init();
 
-    mixerInit(); 
+    mixer.init(); 
 
     // configure PWM/CPPM read function and max number of channels
     // these, if enabled
@@ -764,12 +695,15 @@ void loop(void)
         currentTime = board_getMicros();
         previousTime = currentTime;
 
-        // non IMU critical, temeperatur, serialcom
+        // non IMU critical, temeperature, serialcom
         annexCode();
 
         pidMultiWii();
 
-        mixerWriteMotors();
+        // prevent "yaw jump" during yaw correction
+        axisPID[YAW] = constrainer(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
+
+        mixer.writeMotors(armed);
     }
 }
 

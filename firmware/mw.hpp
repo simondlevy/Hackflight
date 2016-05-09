@@ -63,6 +63,9 @@ uint8_t  board_serialRead(void);
 void     board_serialWrite(uint8_t c);
 void     board_writeMotor(uint8_t index, uint16_t value);
 
+// Utilities
+
+int constrainer(int amt, int low, int high);
 
 // Config =====================================================
 
