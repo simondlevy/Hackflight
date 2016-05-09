@@ -111,14 +111,13 @@ void IMU::init(void) {
 
     // calculate RC time constant used in the accZ lpf    
     this->fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); 
+
+    this->gyroADC[0] = 0;
+    this->gyroADC[1] = 0;
+    this->gyroADC[2] = 0;
 }
 
-void IMU::getEstimatedAttitude(
-        bool armed, 
-        float anglerad[3], 
-        int16_t gyroADC[3],
-        uint16_t & calibratingA,
-        uint16_t & calibratingG)
+void IMU::getEstimatedAttitude(bool armed, float anglerad[3], uint16_t & calibratingA, uint16_t & calibratingG)
 {
     static float    accLPF[3];
     static int32_t  accZoffset;
@@ -145,7 +144,7 @@ void IMU::getEstimatedAttitude(
 
     previousT = currentT;
 
-    board_imuRead(accADC, gyroADC);
+    board_imuRead(accADC, this->gyroADC);
 
     if (calibratingA > 0) {
 
@@ -185,10 +184,10 @@ void IMU::getEstimatedAttitude(
                 devClear(&var[axis]);
             }
             // Sum up 1000 readings
-            g[axis] += gyroADC[axis];
-            devPush(&var[axis], gyroADC[axis]);
+            g[axis] += this->gyroADC[axis];
+            devPush(&var[axis], this->gyroADC[axis]);
             // Clear global variables for next reading
-            gyroADC[axis] = 0;
+            this->gyroADC[axis] = 0;
             gyroZero[axis] = 0;
             if (calibratingG == 1) {
                 float dev = devStandardDeviation(&var[axis]);
@@ -208,11 +207,11 @@ void IMU::getEstimatedAttitude(
     }
 
     for (uint8_t axis = 0; axis < 3; axis++)
-        gyroADC[axis] -= gyroZero[axis];
+        this->gyroADC[axis] -= gyroZero[axis];
 
     // Initialization
     for (uint8_t axis = 0; axis < 3; axis++) {
-        deltaGyroAngle[axis] = gyroADC[axis] * scale;
+        deltaGyroAngle[axis] = this->gyroADC[axis] * scale;
         if (CONFIG_ACC_LPF_FACTOR > 0) {
             accLPF[axis] = accLPF[axis] * (1.0f - (1.0f / CONFIG_ACC_LPF_FACTOR)) + accADC[axis] * 
                 (1.0f / CONFIG_ACC_LPF_FACTOR);

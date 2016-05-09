@@ -29,20 +29,20 @@ extern "C" {
 #define PITCH_LOOKUP_LENGTH 7
 #define THROTTLE_LOOKUP_LENGTH 12
 
+static bool     accCalibrated;
 static int16_t  angle[3];
 static bool     armed;
 static int16_t  axisPID[3];
 static uint16_t calibratingA;
 static uint16_t calibratingG;
 static uint32_t currentTime;
-static uint32_t previousTime;
-static int16_t  failsafeCnt;
-static uint8_t  accCalibrated;
-static uint8_t  dynP8[3], dynI8[3], dynD8[3];
-static int16_t  gyroADC[3];
+static uint8_t  dynP8[3];
+static uint8_t  dynI8[3];
+static uint8_t  dynD8[3];
 static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
 static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 static bool     haveSmallAngle;
+static uint32_t previousTime;
 static int16_t  rcCommand[4];
 static int16_t  rcData[RC_CHANS];
 
@@ -169,17 +169,18 @@ static void annexCode(void)
 
     if (check_timed_task(calibratedAccTime)) {
         if (!haveSmallAngle) {
-            accCalibrated = 0; // the multi uses ACC and is not calibrated or is too much inclinated
+            accCalibrated = false; // the multi uses ACC and is not calibrated or is too much inclinated
             board_led0Toggle();
             update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC);
         } else {
-            accCalibrated = 1;
+            accCalibrated = true;
         }
     }
 
     // handle serial communications
     msp.com(armed, angle, mixer.motorsDisarmed, rcData);
-}
+
+} // annexCode
 
 static void computeRC(void)
 {
@@ -252,12 +253,12 @@ static void pidMultiWii(void)
         }
         if (CONFIG_HORIZON_MODE || axis == 2) { // MODE relying on GYRO or YAW axis
             error = (int32_t)rcCommand[axis] * 10 * 8 / CONFIG_AXIS_P[axis];
-            error -= gyroADC[axis];
+            error -= imu.gyroADC[axis];
 
             PTermGYRO = rcCommand[axis];
 
             errorGyroI[axis] = constrainer(errorGyroI[axis] + error, -16000, +16000); // WindUp
-            if ((abs(gyroADC[axis]) > 640) || ((axis == YAW) && (abs(rcCommand[axis]) > 100)))
+            if ((abs(imu.gyroADC[axis]) > 640) || ((axis == YAW) && (abs(rcCommand[axis]) > 100)))
                 errorGyroI[axis] = 0;
             ITermGYRO = (errorGyroI[axis] / 125 * CONFIG_AXIS_I[axis]) >> 6;
         }
@@ -269,9 +270,9 @@ static void pidMultiWii(void)
             ITerm = ITermGYRO;
         }
 
-        PTerm -= (int32_t)gyroADC[axis] * dynP8[axis] / 10 / 8; // 32 bits is needed for calculation
-        delta = gyroADC[axis] - lastGyro[axis];
-        lastGyro[axis] = gyroADC[axis];
+        PTerm -= (int32_t)imu.gyroADC[axis] * dynP8[axis] / 10 / 8; // 32 bits is needed for calculation
+        delta = imu.gyroADC[axis] - lastGyro[axis];
+        lastGyro[axis] = imu.gyroADC[axis];
         deltaSum = delta1[axis] + delta2[axis] + delta;
         delta2[axis] = delta1[axis];
         delta1[axis] = delta;
@@ -402,13 +403,6 @@ void loop(void)
             auxState |= (rcData[AUX1 + i] < 1300) << (3 * i) | (1300 < rcData[AUX1 + i] && rcData[AUX1 + i] < 1700) 
                 << (3 * i + 1) | (rcData[AUX1 + i] > 1700) << (3 * i + 2);
 
-        // note: if FAILSAFE is disable, failsafeCnt > 5 * FAILSAVE_DELAY is always false
-        if (failsafeCnt > 5 * CONFIG_FAILSAFE_DELAY) {
-            // bumpless transfer to Level mode
-            errorAngleI[ROLL] = 0;
-            errorAngleI[PITCH] = 0;
-        } 
-
     } else {                        // not in rc loop
         static int taskOrder = 0;   // never call all functions in the same loop, to avoid high delay spikes
         switch (taskOrder) {
@@ -434,7 +428,7 @@ void loop(void)
 
         float anglerad[3];
 
-        imu.getEstimatedAttitude(armed, anglerad, gyroADC, calibratingA, calibratingG);
+        imu.getEstimatedAttitude(armed, anglerad, calibratingA, calibratingG);
 
         angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
         angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
