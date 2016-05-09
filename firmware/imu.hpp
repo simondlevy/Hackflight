@@ -6,7 +6,7 @@ extern "C" {
 
             void init();
 
-            void getEstimatedAttitude(void);
+            void getEstimatedAttitude(bool armed);
     };
 
 }

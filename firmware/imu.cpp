@@ -19,7 +19,6 @@ static int16_t  gyroZero[3];
 static float    gyroScale;
 
 extern float    anglerad[2];
-extern uint8_t  armed;
 extern uint16_t calibratingA;
 extern uint16_t calibratingG;
 extern int16_t  gyroADC[3];
@@ -191,7 +190,7 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
     return value;
 }
 
-void IMU::getEstimatedAttitude(void)
+void IMU::getEstimatedAttitude(bool armed)
 {
     static float EstN[3] = { 1.0f, 0.0f, 0.0f };
     static float accLPF[3];
