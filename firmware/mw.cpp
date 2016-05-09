@@ -54,10 +54,8 @@ float    headingrad;
 
 static void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
 {
-    uint8_t i, r;
-
-    for (r = 0; r < repeat; r++) {
-        for (i = 0; i < num; i++) {
+    for (uint8_t r = 0; r < repeat; r++) {
+        for (uint8_t i = 0; i < num; i++) {
             board_led0Toggle();            // switch LEDPIN state
             board_delayMilliseconds(wait);
         }
@@ -204,20 +202,19 @@ static void s_struct(uint8_t *cb, uint8_t siz)
 
 static void evaluateCommand(void)
 {
-    uint32_t i;
     const char *build = __DATE__;
 
     switch (portState.cmdMSP) {
 
         case MSP_SET_RAW_RC:
-            for (i = 0; i < 8; i++)
+            for (uint8_t i = 0; i < 8; i++)
                 rcData[i] = read16();
             headSerialReply(0);
             mspFrameReceive();
             break;
 
         case MSP_SET_MOTOR:
-            for (i = 0; i < 4; i++)
+            for (uint8_t i = 0; i < 4; i++)
                 motorsDisarmed[i] = read16();
             headSerialReply(0);
             break;
@@ -241,13 +238,13 @@ static void evaluateCommand(void)
 
         case MSP_RC:
             headSerialReply(16);
-            for (i = 0; i < 8; i++)
+            for (uint8_t i = 0; i < 8; i++)
                 serialize16(rcData[i]);
             break;
 
         case MSP_ATTITUDE:
             headSerialReply(6);
-            for (i = 0; i < 2; i++)
+            for (uint8_t i = 0; i < 2; i++)
                 serialize16(angle[i]);
             serialize16(heading);
             break;
@@ -271,7 +268,7 @@ static void evaluateCommand(void)
 
         case MSP_BUILDINFO:
             headSerialReply(11 + 4 + 4);
-            for (i = 0; i < 11; i++)
+            for (uint8_t i = 0; i < 11; i++)
                 serialize8(build[i]); // MMM DD YYYY as ascii, MMM = Jan/Feb... etc
             serialize32(0); // future exp
             serialize32(0); // future exp
@@ -365,7 +362,7 @@ static void annexCode(void)
 {
     static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
-    int32_t axis, prop1, prop2;
+    int32_t prop1, prop2;
 
     // PITCH & ROLL only dynamic PID adjustemnt,  depending on throttle value
     if (rcData[THROTTLE] < CONFIG_TPA_BREAKPOINT) {
@@ -379,7 +376,7 @@ static void annexCode(void)
         }
     }
 
-    for (axis = 0; axis < 3; axis++) {
+    for (uint8_t axis = 0; axis < 3; axis++) {
         tmp = min(abs(rcData[axis] - CONFIG_MIDRC), 500);
         if (axis != 2) {        // ROLL & PITCH
             if (CONFIG_DEADBAND) {
@@ -443,26 +440,18 @@ static void annexCode(void)
 
 static void computeRC(void)
 {
-    uint16_t capture;
-    int i, chan;
 
     static int16_t rcDataAverage[8][4];
     static int rcAverageIndex = 0;
 
-    for (chan = 0; chan < 8; chan++) {
+    for (uint8_t chan = 0; chan < 8; chan++) {
     
         // get RC PWM
-        capture = board_pwmRead(CONFIG_RCMAP[chan]);
-
-        // XXX default to CONFIG_MIDRC if out-of-bounds
-        //if (capture < PULSE_MIN || capture > PULSE_MAX)
-        //   capture =  CONFIG_MIDRC;
-
-        rcDataAverage[chan][rcAverageIndex % 4] = capture;
+        rcDataAverage[chan][rcAverageIndex % 4] = board_pwmRead(CONFIG_RCMAP[chan]);
 
         // clear this since we're not accessing it elsewhere. saves a temp var
         rcData[chan] = 0;
-        for (i = 0; i < 4; i++)
+        for (uint8_t i = 0; i < 4; i++)
             rcData[chan] += rcDataAverage[chan][i];
         rcData[chan] /= 4;
     }
@@ -496,7 +485,6 @@ static int32_t errorAngleI[2] = { 0, 0 };
 
 static void pidMultiWii(void)
 {
-    int axis, prop;
     int32_t error, errorAngle;
     int32_t PTerm, ITerm, PTermACC = 0, ITermACC = 0, PTermGYRO = 0, ITermGYRO = 0, DTerm;
     static int16_t lastGyro[3] = { 0, 0, 0 };
@@ -505,8 +493,8 @@ static void pidMultiWii(void)
     int32_t delta;
 
     // **** PITCH & ROLL & YAW PID ****
-    prop = max(abs(rcCommand[PITCH]), abs(rcCommand[ROLL])); // range [0;500]
-    for (axis = 0; axis < 3; axis++) {
+    int prop = max(abs(rcCommand[PITCH]), abs(rcCommand[ROLL])); // range [0;500]
+    for (uint8_t axis = 0; axis < 3; axis++) {
         if ((CONFIG_HORIZON_MODE) && axis < 2) { // MODE relying on ACC
             // 50 degrees max inclination
             errorAngle = constrainer(2 * rcCommand[axis], -((int)CONFIG_MAX_ANGLE_INCLINATION), 
@@ -570,30 +558,27 @@ static const motorMixer_t mixerQuadX[] = {
 
 static void mixerInit(void)
 {
-    int i;
-
     // set disarmed motor values
-    for (i = 0; i < 4; i++)
+    for (uint8_t i = 0; i < 4; i++)
         motorsDisarmed[i] = CONFIG_MINCOMMAND;
 }
 
 static void mixerWriteMotors(void)
 {
     int16_t maxMotor;
-    uint32_t i;
 
     // prevent "yaw jump" during yaw correction
     axisPID[YAW] = constrainer(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
 
-    for (i = 0; i < 4; i++)
+    for (uint8_t i = 0; i < 4; i++)
         motors[i] = rcCommand[THROTTLE] * mixerQuadX[i].throttle + axisPID[PITCH] * mixerQuadX[i].pitch + 
             axisPID[ROLL] * mixerQuadX[i].roll + -CONFIG_YAW_DIRECTION * axisPID[YAW] * mixerQuadX[i].yaw;
 
     maxMotor = motors[0];
-    for (i = 1; i < 4; i++)
+    for (uint8_t i = 1; i < 4; i++)
         if (motors[i] > maxMotor)
             maxMotor = motors[i];
-    for (i = 0; i < 4; i++) {
+    for (uint8_t i = 0; i < 4; i++) {
         if (maxMotor > CONFIG_MAXTHROTTLE)     
             // this is a way to still have good gyro corrections if at least one motor reaches its max.
             motors[i] -= maxMotor - CONFIG_MAXTHROTTLE;
@@ -607,7 +592,7 @@ static void mixerWriteMotors(void)
         }
     }
 
-    for (i = 0; i < 4; i++)
+    for (uint8_t i = 0; i < 4; i++)
         board_writeMotor(i, motors[i]);
 }
 
@@ -616,17 +601,15 @@ static void mixerWriteMotors(void)
 
 void setup(void)
 {
-    uint8_t i;
-
     board_init();
 
     // sleep for 100ms
     board_delayMilliseconds(100);
 
-    for (i = 0; i < PITCH_LOOKUP_LENGTH; i++)
+    for (uint8_t i = 0; i < PITCH_LOOKUP_LENGTH; i++)
         lookupPitchRollRC[i] = (2500 + CONFIG_RC_EXPO_8 * (i * i - 25)) * i * (int32_t)CONFIG_RC_RATE_8 / 2500;
 
-    for (i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
+    for (uint8_t i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
         int16_t tmp = 10 * i - CONFIG_THR_MID_8;
         uint8_t y = 1;
         if (tmp > 0)
@@ -641,7 +624,7 @@ void setup(void)
 
     board_led1On();
     board_led0Off();
-    for (i = 0; i < 10; i++) {
+    for (uint8_t i = 0; i < 10; i++) {
         board_led1Toggle();
         board_led0Toggle();
         board_delayMilliseconds(50);
@@ -655,12 +638,12 @@ void setup(void)
 
     // configure PWM/CPPM read function and max number of channels
     // these, if enabled
-    for (i = 0; i < RC_CHANS; i++)
+    for (uint8_t i = 0; i < RC_CHANS; i++)
         rcData[i] = 1502;
 
     previousTime = board_getMicros();
+
     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
-    // 10 seconds init_delay + 200 * 25 ms = 15 seconds before ground pressure settles
 
     // trigger accelerometer calibration requirement
     haveSmallAngle = true;
@@ -672,7 +655,6 @@ void loop(void)
     // the sticks must be maintained to run or switch off motors
     static uint8_t rcSticks;            // this hold sticks position for command combos
     uint8_t stTmp = 0;
-    int i;
     static uint32_t rcTime = 0;
     static uint32_t loopTime;
     uint16_t auxState = 0;
@@ -684,7 +666,7 @@ void loop(void)
 
         // ------------------ STICKS COMMAND HANDLER --------------------
         // checking sticks positions
-        for (i = 0; i < 4; i++) {
+        for (uint8_t i = 0; i < 4; i++) {
             stTmp >>= 2;
             if (rcData[i] > CONFIG_MINCHECK)
                 stTmp |= 0x80;  // check for MIN
@@ -715,7 +697,7 @@ void loop(void)
                 if (rcSticks == THR_LO + YAW_LO + PIT_CE + ROL_CE)
                     mwDisarm();
             } else {            // actions during not armed
-                i = 0;
+                
                 // GYRO calibration
                 if (rcSticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
                     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
@@ -728,16 +710,11 @@ void loop(void)
                 // Calibrating Acc
                 else if (rcSticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
                     calibratingA = CONFIG_CALIBRATING_ACC_CYCLES;
-
-                i = 0;
-                if (i) {
-                    rcDelayCommand = 0; // allow autorepetition
-                }
             }
         }
 
         // Check AUX switches
-        for (i = 0; i < 4; i++)
+        for (uint8_t i = 0; i < 4; i++)
             auxState |= (rcData[AUX1 + i] < 1300) << (3 * i) | (1300 < rcData[AUX1 + i] && rcData[AUX1 + i] < 1700) 
                 << (3 * i + 1) | (rcData[AUX1 + i] > 1700) << (3 * i + 2);
 

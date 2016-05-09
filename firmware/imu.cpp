@@ -194,8 +194,8 @@ void IMU::getEstimatedAttitude(bool armed, float anglerad[2])
     static float EstN[3] = { 1.0f, 0.0f, 0.0f };
     static float accLPF[3];
     static uint32_t previousT;
-    static int32_t accZoffset = 0;
-    static float accz_smooth = 0;
+    static int32_t accZoffset;
+    static float accz_smooth;
 
     int32_t axis;
     int32_t accMag = 0;
