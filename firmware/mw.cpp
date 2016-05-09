@@ -24,33 +24,27 @@ extern "C" {
 
 #define INBUF_SIZE 128
 
-static uint32_t currentTime;
-static uint32_t previousTime;
-static int16_t failsafeCnt;
-static uint8_t accCalibrated;
-static uint8_t dynP8[3], dynI8[3], dynD8[3];
-
 #define PITCH_LOOKUP_LENGTH 7
 #define THROTTLE_LOOKUP_LENGTH 12
-static int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
-static int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
-static bool haveSmallAngle;
-
+static float    anglerad[2];
+static bool     armed;
+static int16_t  axisPID[3];
+static uint32_t currentTime;
+static uint32_t previousTime;
+static int16_t  failsafeCnt;
+static uint8_t  accCalibrated;
+static uint8_t  dynP8[3], dynI8[3], dynD8[3];
+static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
+static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
+static bool     haveSmallAngle;
 static int16_t  motors[4];
 static int16_t  motorsDisarmed[4];
-
-static int16_t angle[2];
-static int16_t heading;
-
+static int16_t  angle[2];
+static int16_t  heading;
 static int16_t  rcCommand[4];
 static int16_t  rcData[RC_CHANS];
 
-static int16_t  axisPID[3];
-
-
-float    anglerad[2];
-uint8_t  armed;
 uint16_t calibratingA;
 uint16_t calibratingG;
 int16_t  gyroADC[3];
@@ -777,7 +771,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
 
-        imu.getEstimatedAttitude(armed);
+        imu.getEstimatedAttitude(armed, anglerad);
 
         angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
         angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
