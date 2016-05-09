@@ -8,7 +8,6 @@ extern "C" {
 #define INV_GYR_CMPF_FACTOR   (1.0f / ((float)CONFIG_GYRO_CMPF_FACTOR + 1.0f))
 #define INV_GYR_CMPFM_FACTOR  (1.0f / ((float)CONFIG_GYRO_CMPFM_FACTOR + 1.0f))
 
-static int16_t  accADC[3];
 static uint16_t acc1G;
 static int16_t  accSmooth[3];
 static int32_t  accSum[3];
@@ -137,6 +136,7 @@ void IMU::getEstimatedAttitude(
     float deltaGyroAngle[3];
     uint32_t deltaT = currentT - previousT;
     float scale = deltaT * gyroScale;
+    int16_t  accADC[3];
 
     previousT = currentT;
 
