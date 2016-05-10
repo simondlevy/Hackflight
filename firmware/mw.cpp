@@ -102,11 +102,10 @@ static bool check_and_update_timed_task(uint32_t * usec, uint32_t period)
 
 static void annexCode(void)
 {
-    static uint32_t calibratedAccTime;
     int32_t tmp, tmp2;
     int32_t prop1, prop2;
 
-    // PITCH & ROLL only dynamic PID adjustemnt,  depending on throttle value
+    // PITCH & ROLL only dynamic PID adjustment,  depending on throttle value
     if (rcData[THROTTLE] < CONFIG_TPA_BREAKPOINT) {
         prop2 = 100;
     } else {
@@ -158,25 +157,6 @@ static void annexCode(void)
     tmp2 = tmp / 100;
     rcCommand[THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
             lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
-
-    if (calibratingA > 0 || calibratingG > 0) {      // Calibration phasis
-        board_led0Toggle();
-    } else {
-        if (accCalibrated)
-            board_led0Off();
-        if (armed)
-            board_led0On();
-    }
-
-    if (check_timed_task(calibratedAccTime)) {
-        if (!haveSmallAngle) {
-            accCalibrated = false; // the multi uses ACC and is not calibrated or is too much inclinated
-            board_led0Toggle();
-            update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC);
-        } else {
-            accCalibrated = true;
-        }
-    }
 
 } // annexCode
 
@@ -335,13 +315,17 @@ void setup(void)
 void loop(void)
 {
     static uint8_t rcDelayCommand;      // this indicates the number of time (multiple of RC measurement at 50Hz) 
-    // the sticks must be maintained to run or switch off motors
+                                        // the sticks must be maintained to run or switch off motors
+
     static uint8_t rcSticks;            // this hold sticks position for command combos
-    uint8_t stTmp = 0;
+
     static uint32_t rcTime = 0;
     static uint32_t loopTime;
+    static uint32_t calibratedAccTime;
+
     uint16_t auxState = 0;
     bool isThrottleLow = false;
+    uint8_t stTmp = 0;
 
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC)) {
 
@@ -438,12 +422,32 @@ void loop(void)
 
         haveSmallAngle = abs(angle[0]) < CONFIG_SMALL_ANGLE && abs(angle[1]) < CONFIG_SMALL_ANGLE;
 
-        // Measure loop rate just afer reading the sensors
+        // measure loop rate just afer reading the sensors
         currentTime = board_getMicros();
         previousTime = currentTime;
 
         // non IMU critical, temeperature, serialcom
         annexCode();
+
+        // use LEDs to indicate calibration status
+        if (calibratingA > 0 || calibratingG > 0) { 
+            board_led0Toggle();
+        } else {
+            if (accCalibrated)
+                board_led0Off();
+            if (armed)
+                board_led0On();
+        }
+
+        if (check_timed_task(calibratedAccTime)) {
+            if (!haveSmallAngle) {
+                accCalibrated = false; // the multi uses ACC and is not calibrated or is too much inclinated
+                board_led0Toggle();
+                update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC);
+            } else {
+                accCalibrated = true;
+            }
+        }
 
         // handle serial communications
         msp.com(armed, angle, mixer.motorsDisarmed, rcData);
@@ -457,4 +461,4 @@ void loop(void)
     }
 }
 
-}
+} // extern "C"
