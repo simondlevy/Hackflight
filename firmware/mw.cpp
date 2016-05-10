@@ -119,7 +119,9 @@ static void annexCode(void)
     }
 
     for (uint8_t axis = 0; axis < 3; axis++) {
+
         tmp = min(abs(rcData[axis] - CONFIG_MIDRC), 500);
+
         if (axis != 2) {        // ROLL & PITCH
             if (CONFIG_DEADBAND) {
                 if (tmp > CONFIG_DEADBAND) {
@@ -130,8 +132,7 @@ static void annexCode(void)
             }
 
             tmp2 = tmp / 100;
-            rcCommand[axis] = lookupPitchRollRC[tmp2] + (tmp - tmp2 * 100) * (lookupPitchRollRC[tmp2 + 1] - 
-                    lookupPitchRollRC[tmp2]) / 100;
+            rcCommand[axis] = lookupPitchRollRC[tmp2] + (tmp - tmp2 * 100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2]) / 100;
             prop1 = 100 - (uint16_t)CONFIG_ROLL_PITCH_RATE[axis] * tmp / 500;
             prop1 = (uint16_t)prop1 * prop2 / 100;
         } else {                // YAW
@@ -176,9 +177,6 @@ static void annexCode(void)
             accCalibrated = true;
         }
     }
-
-    // handle serial communications
-    msp.com(armed, angle, mixer.motorsDisarmed, rcData);
 
 } // annexCode
 
@@ -446,6 +444,9 @@ void loop(void)
 
         // non IMU critical, temeperature, serialcom
         annexCode();
+
+        // handle serial communications
+        msp.com(armed, angle, mixer.motorsDisarmed, rcData);
 
         pidMultiWii();
 

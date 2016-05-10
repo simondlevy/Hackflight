@@ -55,15 +55,38 @@ void board_init(void)
     ppm.begin(23);
 }
 
-void board_ledOff(void)
+static bool ledstate;
+
+void board_led0Off(void)
 {
+    ledstate = false;
     digitalWriteFast(13, LOW);
 }
 
-void board_ledOn(void)
+void board_led0On(void)
 {
+    ledstate = true;
     digitalWriteFast(13, HIGH);
 }
+
+void board_led0Toggle(void)
+{
+    ledstate = !ledstate;
+    digitalWriteFast(13, ledstate ? HIGH : LOW);
+}
+
+void board_led1Off(void)
+{
+}
+
+void board_led1On(void)
+{
+}
+
+void board_led1Toggle(void)
+{
+}
+
 
 uint16_t board_pwmRead(uint8_t chan)
 {
@@ -365,9 +388,8 @@ void board_imuInit(uint16_t *acc1G, float * gyroScale)
         while(1) ; // Loop forever if communication doesn't happen
     }
 
-    // Determined emiprically
     *acc1G = 4096;
-    *gyroScale = 0.000000001;
+    *gyroScale = 1 / 16.4;
 }
 
 void board_imuRead(int16_t accADC[3], int16_t gyroADC[3])
