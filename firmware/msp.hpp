@@ -1,3 +1,5 @@
+#define CONFIG_REBOOT_CHARACTER 'R'
+
 extern "C" {
 
     static const int INBUF_SIZE = 128;
