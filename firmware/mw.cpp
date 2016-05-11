@@ -29,9 +29,7 @@ extern "C" {
 #define PITCH_LOOKUP_LENGTH 7
 #define THROTTLE_LOOKUP_LENGTH 12
 
-static bool     accCalibrated;
 static int16_t  angle[3];
-static bool     armed;
 static int16_t  axisPID[3];
 static uint16_t calibratingA;
 static uint16_t calibratingG;
@@ -41,7 +39,6 @@ static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for 
 static bool     haveSmallAngle;
 static uint32_t previousTime;
 static int16_t  rcData[RC_CHANS];
-
 
 // utilities ======================================================================================================
 
@@ -142,27 +139,6 @@ static void computeRC(void)
     }
 
     rcAverageIndex++;
-}
-
-static void mwArm(void)
-{
-    if (calibratingG == 0 && accCalibrated) {
-        if (!armed) {         // arm now!
-            armed = 1;
-        }
-    } else if (!armed) {
-        blinkLED(2, 255, 1);
-    }
-}
-
-static void mwDisarm(void)
-{
-    if (armed) {
-        armed = 0;
-        // Reset disarm time so that it works next time we arm the board.
-        if (disarmTime != 0)
-            disarmTime = 0;
-    }
 }
 
 static int32_t errorGyroI[3] = { 0, 0, 0 };
@@ -291,8 +267,9 @@ void loop(void)
     static uint32_t rcTime = 0;
     static uint32_t loopTime;
     static uint32_t calibratedAccTime;
-
     static int16_t  rcCommand[4];
+    static bool     accCalibrated;
+    static bool     armed;
 
     uint16_t auxState = 0;
     bool isThrottleLow = false;
@@ -332,18 +309,31 @@ void loop(void)
         if (rcDelayCommand == 20) {
             if (armed) {      // actions during armed
                 // Disarm on throttle down + yaw
-                if (rcSticks == THR_LO + YAW_LO + PIT_CE + ROL_CE)
-                    mwDisarm();
+                if (rcSticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
+                    if (armed) {
+                        armed = false;
+                        // Reset disarm time so that it works next time we arm the board.
+                        if (disarmTime != 0)
+                            disarmTime = 0;
+                    }
+                }
             } else {            // actions during not armed
-                
+
                 // GYRO calibration
                 if (rcSticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
                     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
                 } 
 
                 // Arm via YAW
-                if ((rcSticks == THR_LO + YAW_HI + PIT_CE + ROL_CE))
-                    mwArm();
+                if ((rcSticks == THR_LO + YAW_HI + PIT_CE + ROL_CE)) {
+                    if (calibratingG == 0 && accCalibrated) {
+                        if (!armed) {         // arm now!
+                            armed = true;
+                        }
+                    } else if (!armed) {
+                        blinkLED(2, 255, 1);
+                    }
+                }
 
                 // Calibrating Acc
                 else if (rcSticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
