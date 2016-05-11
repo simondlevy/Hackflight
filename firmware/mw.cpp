@@ -77,6 +77,7 @@ static bool check_and_update_timed_task(uint32_t * usec, uint32_t period, uint32
 
 IMU   imu;
 Mixer mixer;
+PID   pid;
 MSP   msp;
 
 // values initialized in setup()
@@ -172,9 +173,10 @@ void setup(void)
     board_led1Off();
     board_led0Off();
 
+    // initialize our IMU, mixer, and PID controller
     imu.init();
-
     mixer.init(); 
+    pid.init();
 
     // configure PWM/CPPM read function and max number of channels
     // these, if enabled
@@ -355,7 +357,7 @@ void loop(void)
         msp.com(armed, angle, mixer.motorsDisarmed, rcData);
 
         // run PID controller 
-        pidCompute(rcCommand, angle, imu.gyroADC, axisPID, errorGyroI, errorAngleI);
+        pid.compute(rcCommand, angle, imu.gyroADC, axisPID, errorGyroI, errorAngleI);
 
         // prevent "yaw jump" during yaw correction
         axisPID[YAW] = constrainer(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));

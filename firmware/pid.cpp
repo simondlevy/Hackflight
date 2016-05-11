@@ -3,7 +3,16 @@ extern "C" {
 #include "mw.hpp"
 #include "pid.hpp"
 
-void pidCompute(
+void PID::init(void)
+{
+    for (uint8_t axis=0; axis<3; ++axis) {
+        this->lastGyro[axis] = 0;
+        this->delta1[axis] = 0;
+        this->delta2[axis] = 0;
+    }
+}
+
+void PID::compute(
         int16_t rcCommand[4], 
         int16_t angle[3], 
         int16_t gyroADC[3],
@@ -11,9 +20,6 @@ void pidCompute(
         int32_t errorGyroI[3], 
         int32_t errorAngleI[3])
 {
-    static int16_t lastGyro[3] = { 0, 0, 0 };
-    static int32_t delta1[3], delta2[3];
-
     int32_t PTermACC = 0, ITermACC = 0, PTermGYRO = 0, ITermGYRO = 0;
 
     // PITCH & ROLL & YAW PID
@@ -58,11 +64,11 @@ void pidCompute(
         } 
 
         PTerm -= (int32_t)gyroADC[axis] * CONFIG_AXIS_P[axis] / 10 / 8; // 32 bits is needed for calculation
-        int32_t delta = gyroADC[axis] - lastGyro[axis];
-        lastGyro[axis] = gyroADC[axis];
-        int32_t deltaSum = delta1[axis] + delta2[axis] + delta;
-        delta2[axis] = delta1[axis];
-        delta1[axis] = delta;
+        int32_t delta = gyroADC[axis] - this->lastGyro[axis];
+        this->lastGyro[axis] = gyroADC[axis];
+        int32_t deltaSum = this->delta1[axis] + this->delta2[axis] + delta;
+        this->delta2[axis] = this->delta1[axis];
+        this->delta1[axis] = delta;
         int32_t DTerm = (deltaSum * CONFIG_AXIS_D[axis]) / 32;
         axisPID[axis] = PTerm + ITerm - DTerm;
     }
