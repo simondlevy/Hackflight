@@ -24,19 +24,8 @@ extern "C" {
 #define THR_CE (3 << (2 * THROTTLE))
 #define THR_HI (2 << (2 * THROTTLE))
 
-#define INBUF_SIZE 128
-
-#define PITCH_LOOKUP_LENGTH 7
+#define PITCH_LOOKUP_LENGTH    7
 #define THROTTLE_LOOKUP_LENGTH 12
-
-static uint16_t calibratingA;
-static uint16_t calibratingG;
-static uint32_t currentTime;
-static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
-static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
-static bool     haveSmallAngle;
-static uint32_t previousTime;
-static int16_t  rcData[RC_CHANS];
 
 // utilities ======================================================================================================
 
@@ -61,35 +50,43 @@ int constrainer(int amt, int low, int high)
         return amt;
 }
 
-IMU   imu;
-Mixer mixer;
-MSP   msp;
-
-// Core code ==================================================================================
-
-// Time of automatic disarm when "Don't spin the motors when armed" is enabled.
-static uint32_t disarmTime = 0;
-
-static bool check_timed_task(uint32_t usec) 
+static bool check_timed_task(uint32_t usec, uint32_t currentTime) 
 {
 
     return (int32_t)(currentTime - usec) >= 0;
 }
 
-static void update_timed_task(uint32_t * usec, uint32_t period) 
+static void update_timed_task(uint32_t * usec, uint32_t period, uint32_t currentTime) 
 {
     *usec = currentTime + period;
 }
 
-static bool check_and_update_timed_task(uint32_t * usec, uint32_t period) 
+static bool check_and_update_timed_task(uint32_t * usec, uint32_t period, uint32_t currentTime) 
 {
     bool result = (int32_t)(currentTime - *usec) >= 0;
 
     if (result)
-        update_timed_task(usec, period);
+        update_timed_task(usec, period, currentTime);
 
     return result;
 }
+
+
+// Objects we use
+
+IMU   imu;
+Mixer mixer;
+MSP   msp;
+
+// values initialized in setup()
+
+static uint16_t calibratingG;
+static bool     haveSmallAngle;
+static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
+static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
+static uint32_t previousTime;
+static int16_t  rcData[RC_CHANS];
+
 
 static void computeRCExpo(int16_t rcCommand[4])
 {
@@ -250,6 +247,7 @@ void setup(void)
 
     previousTime = board_getMicros();
 
+    // Always do gyro calibration at startup
     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
 
     // trigger accelerometer calibration requirement
@@ -261,9 +259,7 @@ void loop(void)
 {
     static uint8_t rcDelayCommand;      // this indicates the number of time (multiple of RC measurement at 50Hz) 
                                         // the sticks must be maintained to run or switch off motors
-
     static uint8_t rcSticks;            // this hold sticks position for command combos
-
     static uint32_t rcTime = 0;
     static uint32_t loopTime;
     static uint32_t calibratedAccTime;
@@ -272,14 +268,17 @@ void loop(void)
     static bool     armed;
     static int16_t  angle[3];
     static int16_t  axisPID[3];
-    static int32_t errorGyroI[3];
-    static int32_t errorAngleI[2];
+    static int32_t  errorGyroI[3];
+    static int32_t  errorAngleI[2];
+    static uint16_t calibratingA;
+    static uint32_t currentTime;
+    static uint32_t disarmTime = 0;
 
     uint16_t auxState = 0;
     bool isThrottleLow = false;
     uint8_t stTmp = 0;
 
-    if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC)) {
+    if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC, currentTime)) {
 
         computeRC();
 
@@ -373,7 +372,7 @@ void loop(void)
     
     currentTime = board_getMicros();
 
-    if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC)) {
+    if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC, currentTime)) {
 
         float anglerad[3];
 
@@ -406,11 +405,11 @@ void loop(void)
                 board_led0On();
         }
 
-        if (check_timed_task(calibratedAccTime)) {
+        if (check_timed_task(calibratedAccTime, currentTime)) {
             if (!haveSmallAngle) {
                 accCalibrated = false; // the multi uses ACC and is not calibrated or is too much inclinated
                 board_led0Toggle();
-                update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC);
+                update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC, currentTime);
             } else {
                 accCalibrated = true;
             }
@@ -427,7 +426,7 @@ void loop(void)
 
         mixer.writeMotors(armed, axisPID, rcCommand, rcData);
 
-    } // if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC))
+    } // IMU update
 
 } // loop()
 
