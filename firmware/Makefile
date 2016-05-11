@@ -14,7 +14,7 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 TARGET		?= NAZE
 
-CPP_OBJS = mw.o imu.o mixer.o msp.o board_naze.o 
+CPP_OBJS = mw.o imu.o mixer.o pid.o msp.o board_naze.o
 
 # Compile-time options
 OPTIONS		?=
@@ -167,7 +167,7 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 	@$(CC) -c -o $@ $(ASFLAGS) $< 
 
 # C++ support
-%.o: %.cpp mw.hpp imu.hpp mixer.hpp msp.hpp
+%.o: %.cpp mw.hpp imu.hpp mixer.hpp pid.hpp msp.hpp
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(CFLAGS) $< 
 
