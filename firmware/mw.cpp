@@ -5,6 +5,7 @@ extern "C" {
 #include "mixer.hpp"
 #include "msp.hpp"
 #include "pid.hpp"
+#include "rc.hpp"
 
 #ifndef PRINTF
 #define PRINTF printf
@@ -24,9 +25,6 @@ extern "C" {
 #define THR_LO (1 << (2 * THROTTLE))
 #define THR_CE (3 << (2 * THROTTLE))
 #define THR_HI (2 << (2 * THROTTLE))
-
-#define PITCH_LOOKUP_LENGTH    7
-#define THROTTLE_LOOKUP_LENGTH 12
 
 // utilities ======================================================================================================
 
@@ -66,6 +64,7 @@ static bool check_and_update_timed_task(uint32_t * usec, uint32_t period, uint32
 // Objects we use
 
 IMU   imu;
+RC    rc;
 Mixer mixer;
 PID   pid;
 MSP   msp;
@@ -74,61 +73,7 @@ MSP   msp;
 
 static uint16_t calibratingG;
 static bool     haveSmallAngle;
-static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
-static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 static uint32_t previousTime;
-static int16_t  rcData[RC_CHANS];
-
-
-static void computeRCExpo(int16_t rcCommand[4])
-{
-    int32_t tmp, tmp2;
-
-    for (uint8_t axis = 0; axis < 3; axis++) {
-
-        tmp = min(abs(rcData[axis] - CONFIG_MIDRC), 500);
-
-        if (axis != 2) {        // ROLL & PITCH
-            tmp2 = tmp / 100;
-            rcCommand[axis] = lookupPitchRollRC[tmp2] + (tmp - tmp2 * 100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2]) / 100;
-        } else {                // YAW
-            rcCommand[axis] = tmp * -CONFIG_YAW_CONTROL_DIRECTION;
-        }
-
-        if (rcData[axis] < CONFIG_MIDRC)
-            rcCommand[axis] = -rcCommand[axis];
-    }
-
-    tmp = constrain(rcData[THROTTLE], CONFIG_MINCHECK, 2000);
-    tmp = (uint32_t)(tmp - CONFIG_MINCHECK) * 1000 / (2000 - CONFIG_MINCHECK);       // [MINCHECK;2000] -> [0;1000]
-    tmp2 = tmp / 100;
-    rcCommand[THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
-            lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
-
-} // computeRCExpo
-
-static void computeRC(void)
-{
-
-    static int16_t rcDataAverage[8][4];
-    static int rcAverageIndex = 0;
-
-    for (uint8_t chan = 0; chan < 8; chan++) {
-    
-        // get RC PWM
-        rcDataAverage[chan][rcAverageIndex % 4] = board_pwmRead(CONFIG_RCMAP[chan]);
-
-        rcData[chan] = 0;
-
-        for (uint8_t i = 0; i < 4; i++)
-            rcData[chan] += rcDataAverage[chan][i];
-        rcData[chan] /= 4;
-    }
-
-    rcAverageIndex++;
-}
-
-// =================================================================================================================
 
 void setup(void)
 {
@@ -136,22 +81,6 @@ void setup(void)
 
     // sleep for 100ms
     board_delayMilliseconds(100);
-
-    for (uint8_t i = 0; i < PITCH_LOOKUP_LENGTH; i++)
-        lookupPitchRollRC[i] = (2500 + CONFIG_RC_EXPO_8 * (i * i - 25)) * i * (int32_t)CONFIG_RC_RATE_8 / 2500;
-
-    for (uint8_t i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
-        int16_t tmp = 10 * i - CONFIG_THR_MID_8;
-        uint8_t y = 1;
-        if (tmp > 0)
-            y = 100 - CONFIG_THR_MID_8;
-        if (tmp < 0)
-            y = CONFIG_THR_MID_8;
-        lookupThrottleRC[i] = 10 * CONFIG_THR_MID_8 + tmp * (100 - CONFIG_THR_EXPO_8 + 
-                (int32_t)CONFIG_THR_EXPO_8 * (tmp * tmp) / (y * y)) / 10;
-        lookupThrottleRC[i] = CONFIG_MINTHROTTLE + (int32_t)(CONFIG_MAXTHROTTLE - CONFIG_MINTHROTTLE) * 
-            lookupThrottleRC[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
-    }
 
     board_led1On();
     board_led0Off();
@@ -163,15 +92,11 @@ void setup(void)
     board_led1Off();
     board_led0Off();
 
-    // initialize our IMU, mixer, and PID controller
+    // initialize our RC, IMU, mixer, and PID controller
+    rc.init();
     imu.init();
     mixer.init(); 
     pid.init();
-
-    // configure PWM/CPPM read function and max number of channels
-    // these, if enabled
-    for (uint8_t i = 0; i < RC_CHANS; i++)
-        rcData[i] = 1502;
 
     previousTime = board_getMicros();
 
@@ -191,7 +116,6 @@ void loop(void)
     static uint32_t rcTime = 0;
     static uint32_t loopTime;
     static uint32_t calibratedAccTime;
-    static int16_t  rcCommand[4];
     static bool     accCalibrated;
     static bool     armed;
     static int16_t  angle[3];
@@ -208,15 +132,14 @@ void loop(void)
 
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC, currentTime)) {
 
-        computeRC();
+        rc.compute();
 
-        // ------------------ STICKS COMMAND HANDLER --------------------
         // checking sticks positions
         for (uint8_t i = 0; i < 4; i++) {
             stTmp >>= 2;
-            if (rcData[i] > CONFIG_MINCHECK)
+            if (rc.data[i] > CONFIG_MINCHECK)
                 stTmp |= 0x80;  // check for MIN
-            if (rcData[i] < CONFIG_MAXCHECK)
+            if (rc.data[i] < CONFIG_MAXCHECK)
                 stTmp |= 0x40;  // check for MAX
         }
         if (stTmp == rcSticks) {
@@ -227,7 +150,7 @@ void loop(void)
         rcSticks = stTmp;
 
         // perform actions
-        if ((rcData[THROTTLE] < CONFIG_MINCHECK))
+        if ((rc.data[THROTTLE] < CONFIG_MINCHECK))
             isThrottleLow = true;
 
         // when landed, reset integral component of PID
@@ -276,8 +199,8 @@ void loop(void)
 
         // Check AUX switches
         for (uint8_t i = 0; i < 4; i++)
-            auxState |= (rcData[AUX1 + i] < 1300) << (3 * i) | (1300 < rcData[AUX1 + i] && rcData[AUX1 + i] < 1700) 
-                << (3 * i + 1) | (rcData[AUX1 + i] > 1700) << (3 * i + 2);
+            auxState |= (rc.data[AUX1 + i] < 1300) << (3 * i) | (1300 < rc.data[AUX1 + i] && rc.data[AUX1 + i] < 1700) 
+                << (3 * i + 1) | (rc.data[AUX1 + i] > 1700) << (3 * i + 2);
 
     } else {                        // not in rc loop
         static int taskOrder = 0;   // never call all functions in the same loop, to avoid high delay spikes
@@ -321,7 +244,7 @@ void loop(void)
         previousTime = currentTime;
 
         // compute exponential RC commands
-        computeRCExpo(rcCommand);
+        rc.computeExpo();
 
         // use LEDs to indicate calibration status
         if (calibratingA > 0 || calibratingG > 0) { 
@@ -344,15 +267,15 @@ void loop(void)
         }
 
         // handle serial communications
-        msp.com(armed, angle, mixer.motorsDisarmed, rcData);
+        msp.com(armed, angle, mixer.motorsDisarmed, rc.data);
 
         // run PID controller 
-        pid.compute(rcCommand, angle, imu.gyroADC, axisPID, errorGyroI, errorAngleI);
+        pid.compute(rc.command, angle, imu.gyroADC, axisPID, errorGyroI, errorAngleI);
 
         // prevent "yaw jump" during yaw correction
-        axisPID[YAW] = constrain(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
+        axisPID[YAW] = constrain(axisPID[YAW], -100 - abs(rc.command[YAW]), +100 + abs(rc.command[YAW]));
 
-        mixer.writeMotors(armed, axisPID, rcCommand, rcData);
+        mixer.writeMotors(armed, axisPID, rc.command, rc.data);
 
     } // IMU update
 
