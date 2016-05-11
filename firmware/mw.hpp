@@ -107,7 +107,6 @@ static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 
 #define CONFIG_YAW_RATE                             0
 
-#define CONFIG_DYN_THR_PID                          0
 #define CONFIG_TPA_BREAKPOINT                       1500
 #define CONFIG_ACC_LPF_FACTOR                       4
 #define CONFIG_ACCZ_DEADBAND                        40

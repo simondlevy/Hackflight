@@ -36,9 +36,6 @@ static int16_t  axisPID[3];
 static uint16_t calibratingA;
 static uint16_t calibratingG;
 static uint32_t currentTime;
-static uint8_t  dynP8[3];
-static uint8_t  dynI8[3];
-static uint8_t  dynD8[3];
 static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for expo & RC rate PITCH+ROLL
 static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 static bool     haveSmallAngle;
@@ -103,18 +100,6 @@ static bool check_and_update_timed_task(uint32_t * usec, uint32_t period)
 static void annexCode(void)
 {
     int32_t tmp, tmp2;
-    int32_t prop1, prop2;
-
-    // PITCH & ROLL only dynamic PID adjustment,  depending on throttle value
-    if (rcData[THROTTLE] < CONFIG_TPA_BREAKPOINT) {
-        prop2 = 100;
-    } else {
-        if (rcData[THROTTLE] < 2000) {
-            prop2 = 100 - (uint16_t)CONFIG_DYN_THR_PID * (rcData[THROTTLE] - CONFIG_TPA_BREAKPOINT) / (2000 - CONFIG_TPA_BREAKPOINT);
-        } else {
-            prop2 = 100 - CONFIG_DYN_THR_PID;
-        }
-    }
 
     for (uint8_t axis = 0; axis < 3; axis++) {
 
@@ -123,15 +108,10 @@ static void annexCode(void)
         if (axis != 2) {        // ROLL & PITCH
             tmp2 = tmp / 100;
             rcCommand[axis] = lookupPitchRollRC[tmp2] + (tmp - tmp2 * 100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2]) / 100;
-            prop1 = 100 - (uint16_t)CONFIG_ROLL_PITCH_RATE[axis] * tmp / 500;
-            prop1 = (uint16_t)prop1 * prop2 / 100;
         } else {                // YAW
             rcCommand[axis] = tmp * -CONFIG_YAW_CONTROL_DIRECTION;
-            prop1 = 100 - (uint16_t)CONFIG_YAW_RATE * abs(tmp) / 500;
         }
-        dynP8[axis] = (uint16_t)CONFIG_AXIS_P[axis] * prop1 / 100;
-        dynI8[axis] = (uint16_t)CONFIG_AXIS_I[axis] * prop1 / 100;
-        dynD8[axis] = (uint16_t)CONFIG_AXIS_D[axis] * prop1 / 100;
+
         if (rcData[axis] < CONFIG_MIDRC)
             rcCommand[axis] = -rcCommand[axis];
     }
@@ -237,13 +217,13 @@ static void pidMultiWii(void)
             ITerm = (ITermACC * (500 - prop) + ITermGYRO * prop) / 500;
         } 
 
-        PTerm -= (int32_t)imu.gyroADC[axis] * dynP8[axis] / 10 / 8; // 32 bits is needed for calculation
+        PTerm -= (int32_t)imu.gyroADC[axis] * CONFIG_AXIS_P[axis] / 10 / 8; // 32 bits is needed for calculation
         int32_t delta = imu.gyroADC[axis] - lastGyro[axis];
         lastGyro[axis] = imu.gyroADC[axis];
         int32_t deltaSum = delta1[axis] + delta2[axis] + delta;
         delta2[axis] = delta1[axis];
         delta1[axis] = delta;
-        int32_t DTerm = (deltaSum * dynD8[axis]) / 32;
+        int32_t DTerm = (deltaSum * CONFIG_AXIS_D[axis]) / 32;
         axisPID[axis] = PTerm + ITerm - DTerm;
     }
 }
