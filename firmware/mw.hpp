@@ -89,9 +89,9 @@ static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 #define CONFIG_MINTHROTTLE                          990
 #define CONFIG_MAXTHROTTLE                          2010
 #define CONFIG_MINCHECK                             1100
+#define CONFIG_MAXCHECK                             1900
 #define CONFIG_YAW_CONTROL_DIRECTION                1   /* 1 or -1 */
 #define CONFIG_MAX_ANGLE_INCLINATION                500 /* 50 degrees */
-#define CONFIG_MAXCHECK                             1900
 
 #define CONFIG_IMU_LOOPTIME_USEC                    3500
 #define CONFIG_RC_LOOPTIME_USEC                     20000
@@ -105,9 +105,6 @@ static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 #define CONFIG_THR_EXPO_8                           0
 #define CONFIG_YAW_DIRECTION                        1
 
-#define CONFIG_YAW_RATE                             0
-
-#define CONFIG_TPA_BREAKPOINT                       1500
 #define CONFIG_ACC_LPF_FACTOR                       4
 #define CONFIG_ACCZ_DEADBAND                        40
 #define CONFIG_ACCXY_DEADBAND                       40
@@ -115,6 +112,5 @@ static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 #define CONFIG_SMALL_ANGLE                          250 // tenths of a degree
 #define CONFIG_BARO_TAB_SIZE                        21
 
-static const uint8_t CONFIG_ROLL_PITCH_RATE[2] = {0, 0};
 static const int16_t CONFIG_ANGLE_TRIM[2]      = {-50, -25};
 static const uint8_t CONFIG_RCMAP[8]           = {0, 1, 3, 2, 4, 5, 6, 7};

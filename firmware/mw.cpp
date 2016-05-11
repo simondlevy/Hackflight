@@ -40,7 +40,6 @@ static int16_t  lookupPitchRollRC[PITCH_LOOKUP_LENGTH];   // lookup table for ex
 static int16_t  lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 static bool     haveSmallAngle;
 static uint32_t previousTime;
-static int16_t  rcCommand[4];
 static int16_t  rcData[RC_CHANS];
 
 
@@ -97,7 +96,7 @@ static bool check_and_update_timed_task(uint32_t * usec, uint32_t period)
     return result;
 }
 
-static void annexCode(void)
+static void computeRCExpo(int16_t rcCommand[4])
 {
     int32_t tmp, tmp2;
 
@@ -122,7 +121,7 @@ static void annexCode(void)
     rcCommand[THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
             lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
 
-} // annexCode
+} // computeRCExpo
 
 static void computeRC(void)
 {
@@ -169,7 +168,7 @@ static void mwDisarm(void)
 static int32_t errorGyroI[3] = { 0, 0, 0 };
 static int32_t errorAngleI[2] = { 0, 0 };
 
-static void pidMultiWii(void)
+static void pidMultiWii(int16_t rcCommand[4])
 {
     static int16_t lastGyro[3] = { 0, 0, 0 };
     static int32_t delta1[3], delta2[3];
@@ -181,7 +180,7 @@ static void pidMultiWii(void)
 
     for (uint8_t axis = 0; axis < 3; axis++) {
 
-        if ((CONFIG_HORIZON_MODE) && axis < 2) { // MODE relying on ACC
+        if (CONFIG_HORIZON_MODE && axis < 2) { // MODE relying on ACC
 
             // 50 degrees max inclination
             int32_t errorAngle = constrainer(2 * rcCommand[axis], -((int)CONFIG_MAX_ANGLE_INCLINATION), 
@@ -293,6 +292,8 @@ void loop(void)
     static uint32_t loopTime;
     static uint32_t calibratedAccTime;
 
+    static int16_t  rcCommand[4];
+
     uint16_t auxState = 0;
     bool isThrottleLow = false;
     uint8_t stTmp = 0;
@@ -396,7 +397,8 @@ void loop(void)
         currentTime = board_getMicros();
         previousTime = currentTime;
 
-        annexCode();
+        // compute exponential RC commands
+        computeRCExpo(rcCommand);
 
         // use LEDs to indicate calibration status
         if (calibratingA > 0 || calibratingG > 0) { 
@@ -421,7 +423,7 @@ void loop(void)
         // handle serial communications
         msp.com(armed, angle, mixer.motorsDisarmed, rcData);
 
-        pidMultiWii();
+        pidMultiWii(rcCommand);
 
         // prevent "yaw jump" during yaw correction
         axisPID[YAW] = constrainer(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
