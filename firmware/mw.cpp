@@ -82,6 +82,7 @@ void setup(void)
     // sleep for 100ms
     board_delayMilliseconds(100);
 
+    // flash the LEDs to indicate startup
     board_led1On();
     board_led0Off();
     for (uint8_t i = 0; i < 10; i++) {
@@ -98,9 +99,10 @@ void setup(void)
     mixer.init(); 
     pid.init();
 
+    // set initial time
     previousTime = board_getMicros();
 
-    // Always do gyro calibration at startup
+    // always do gyro calibration at startup
     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
 
     // trigger accelerometer calibration requirement
@@ -127,7 +129,6 @@ void loop(void)
     static uint32_t disarmTime = 0;
 
     uint16_t auxState = 0;
-    bool isThrottleLow = false;
     uint8_t stTmp = 0;
 
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC, currentTime)) {
@@ -149,12 +150,8 @@ void loop(void)
             rcDelayCommand = 0;
         rcSticks = stTmp;
 
-        // perform actions
-        if ((rc.data[THROTTLE] < CONFIG_MINCHECK))
-            isThrottleLow = true;
-
         // when landed, reset integral component of PID
-        if (isThrottleLow) {
+        if ((rc.data[THROTTLE] < CONFIG_MINCHECK)) {
             errorGyroI[ROLL] = 0;
             errorGyroI[PITCH] = 0;
             errorGyroI[YAW] = 0;
@@ -163,7 +160,9 @@ void loop(void)
         }
 
         if (rcDelayCommand == 20) {
+
             if (armed) {      // actions during armed
+
                 // Disarm on throttle down + yaw
                 if (rcSticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
                     if (armed) {
@@ -220,7 +219,7 @@ void loop(void)
                 break;
         }
     }
-    
+
     currentTime = board_getMicros();
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC, currentTime)) {
