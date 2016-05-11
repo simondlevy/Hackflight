@@ -46,7 +46,7 @@ void Mixer::writeMotors(bool armed, int16_t  axisPID[3], int16_t  rcCommand[4], 
             // this is a way to still have good gyro corrections if at least one motor reaches its max.
             motors[i] -= maxMotor - CONFIG_MAXTHROTTLE;
 
-        motors[i] = constrainer(motors[i], CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
+        motors[i] = constrain(motors[i], CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
 
         if ((rcData[THROTTLE]) < CONFIG_MINCHECK) {
             motors[i] = CONFIG_MINTHROTTLE;

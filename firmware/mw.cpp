@@ -41,16 +41,6 @@ static void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
     }
 }
 
-int constrainer(int amt, int low, int high)
-{
-    if (amt < low)
-        return low;
-    else if (amt > high)
-        return high;
-    else
-        return amt;
-}
-
 static bool check_timed_task(uint32_t usec, uint32_t currentTime) 
 {
 
@@ -109,7 +99,7 @@ static void computeRCExpo(int16_t rcCommand[4])
             rcCommand[axis] = -rcCommand[axis];
     }
 
-    tmp = constrainer(rcData[THROTTLE], CONFIG_MINCHECK, 2000);
+    tmp = constrain(rcData[THROTTLE], CONFIG_MINCHECK, 2000);
     tmp = (uint32_t)(tmp - CONFIG_MINCHECK) * 1000 / (2000 - CONFIG_MINCHECK);       // [MINCHECK;2000] -> [0;1000]
     tmp2 = tmp / 100;
     rcCommand[THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
@@ -360,7 +350,7 @@ void loop(void)
         pid.compute(rcCommand, angle, imu.gyroADC, axisPID, errorGyroI, errorAngleI);
 
         // prevent "yaw jump" during yaw correction
-        axisPID[YAW] = constrainer(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
+        axisPID[YAW] = constrain(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
 
         mixer.writeMotors(armed, axisPID, rcCommand, rcData);
 

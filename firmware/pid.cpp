@@ -30,15 +30,15 @@ void PID::compute(
         if (CONFIG_HORIZON_MODE && axis < 2) { // MODE relying on ACC
 
             // 50 degrees max inclination
-            int32_t errorAngle = constrainer(2 * rcCommand[axis], -((int)CONFIG_MAX_ANGLE_INCLINATION), 
+            int32_t errorAngle = constrain(2 * rcCommand[axis], -((int)CONFIG_MAX_ANGLE_INCLINATION), 
                     + CONFIG_MAX_ANGLE_INCLINATION) - angle[axis] + CONFIG_ANGLE_TRIM[axis];
             PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
 
             // 32 bits is needed for calculation: errorAngle*CONFIG_LEVEL_P could exceed 32768   
             // 16 bits is ok for result
-            PTermACC = constrainer(PTermACC, -CONFIG_LEVEL_D * 5, + CONFIG_LEVEL_D * 5);
+            PTermACC = constrain(PTermACC, -CONFIG_LEVEL_D * 5, + CONFIG_LEVEL_D * 5);
 
-            errorAngleI[axis] = constrainer(errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
+            errorAngleI[axis] = constrain(errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
             ITermACC = (errorAngleI[axis] * CONFIG_LEVEL_I) >> 12;
         }
 
@@ -49,7 +49,7 @@ void PID::compute(
 
             PTermGYRO = rcCommand[axis];
 
-            errorGyroI[axis] = constrainer(errorGyroI[axis] + error, -16000, +16000); // WindUp
+            errorGyroI[axis] = constrain(errorGyroI[axis] + error, -16000, +16000); // WindUp
             if ((abs(gyroADC[axis]) > 640) || ((axis == YAW) && (abs(rcCommand[axis]) > 100)))
                 errorGyroI[axis] = 0;
             ITermGYRO = (errorGyroI[axis] / 125 * CONFIG_AXIS_I[axis]) >> 6;

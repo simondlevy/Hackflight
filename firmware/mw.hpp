@@ -14,9 +14,10 @@
 #define RC_CHANS    (18)
 
 #ifndef abs
-#define abs(x) ((x) > 0 ? (x) : -(x))
+#define abs(x)    ((x) > 0 ? (x) : -(x))
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
+#define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
 #endif
 
 enum {
