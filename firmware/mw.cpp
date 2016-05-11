@@ -29,8 +29,6 @@ extern "C" {
 #define PITCH_LOOKUP_LENGTH 7
 #define THROTTLE_LOOKUP_LENGTH 12
 
-static int16_t  angle[3];
-static int16_t  axisPID[3];
 static uint16_t calibratingA;
 static uint16_t calibratingG;
 static uint32_t currentTime;
@@ -141,10 +139,12 @@ static void computeRC(void)
     rcAverageIndex++;
 }
 
-static int32_t errorGyroI[3] = { 0, 0, 0 };
-static int32_t errorAngleI[2] = { 0, 0 };
-
-static void pidMultiWii(int16_t rcCommand[4])
+static void pidMultiWii(
+        int16_t rcCommand[4], 
+        int16_t angle[3], 
+        int16_t axisPID[3], 
+        int32_t errorGyroI[3], 
+        int32_t errorAngleI[3])
 {
     static int16_t lastGyro[3] = { 0, 0, 0 };
     static int32_t delta1[3], delta2[3];
@@ -270,6 +270,10 @@ void loop(void)
     static int16_t  rcCommand[4];
     static bool     accCalibrated;
     static bool     armed;
+    static int16_t  angle[3];
+    static int16_t  axisPID[3];
+    static int32_t errorGyroI[3];
+    static int32_t errorAngleI[2];
 
     uint16_t auxState = 0;
     bool isThrottleLow = false;
@@ -298,6 +302,8 @@ void loop(void)
         // perform actions
         if ((rcData[THROTTLE] < CONFIG_MINCHECK))
             isThrottleLow = true;
+
+        // when landed, reset integral component of PID
         if (isThrottleLow) {
             errorGyroI[ROLL] = 0;
             errorGyroI[PITCH] = 0;
@@ -413,7 +419,8 @@ void loop(void)
         // handle serial communications
         msp.com(armed, angle, mixer.motorsDisarmed, rcData);
 
-        pidMultiWii(rcCommand);
+        // run PID controller 
+        pidMultiWii(rcCommand, angle, axisPID, errorGyroI, errorAngleI);
 
         // prevent "yaw jump" during yaw correction
         axisPID[YAW] = constrainer(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
