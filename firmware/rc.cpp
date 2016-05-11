@@ -7,9 +7,10 @@ extern "C" {
 
 void RC::init(void)
 {
-
     bzero (this->dataAverage, 8*4*sizeof(int16_t));
 
+    this->commandDelay = 0;
+    this->sticks = 0;
     this->averageIndex = 0;
 
     for (uint8_t i = 0; i < RC_CHANS; i++)
@@ -32,7 +33,7 @@ void RC::init(void)
     }
 }
 
-void RC::compute(void)
+void RC::update(void)
 {
     for (uint8_t chan = 0; chan < 8; chan++) {
     
@@ -47,6 +48,28 @@ void RC::compute(void)
     }
 
     this->averageIndex++;
+
+
+    // check stick positions, updating command delay
+    uint8_t stTmp = 0;
+    for (uint8_t i = 0; i < 4; i++) {
+        stTmp >>= 2;
+        if (this->data[i] > CONFIG_MINCHECK)
+            stTmp |= 0x80;  // check for MIN
+        if (this->data[i] < CONFIG_MAXCHECK)
+            stTmp |= 0x40;  // check for MAX
+    }
+    if (stTmp == this->sticks) {
+        if (this->commandDelay < 250)
+            this->commandDelay++;
+    } else
+        this->commandDelay = 0;
+    this->sticks = stTmp;
+}
+
+bool RC::changed(void)
+{
+  return this->commandDelay == 20;
 }
 
 void RC::computeExpo(void)
@@ -75,5 +98,12 @@ void RC::computeExpo(void)
             lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
 
 } // computeExpo
+
+uint8_t RC::auxState(void) 
+{
+    int16_t aux = this->data[4];
+
+    return aux < 1500 ? 0 : (aux < 1700 ? 1 : 2);
+}
 
 } // extern "C"

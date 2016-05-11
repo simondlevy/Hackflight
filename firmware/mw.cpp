@@ -112,9 +112,6 @@ void setup(void)
 
 void loop(void)
 {
-    static uint8_t rcDelayCommand;      // this indicates the number of time (multiple of RC measurement at 50Hz) 
-                                        // the sticks must be maintained to run or switch off motors
-    static uint8_t rcSticks;            // this hold sticks position for command combos
     static uint32_t rcTime = 0;
     static uint32_t loopTime;
     static uint32_t calibratedAccTime;
@@ -128,27 +125,9 @@ void loop(void)
     static uint32_t currentTime;
     static uint32_t disarmTime = 0;
 
-    uint16_t auxState = 0;
-    uint8_t stTmp = 0;
-
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC, currentTime)) {
 
-        rc.compute();
-
-        // checking sticks positions
-        for (uint8_t i = 0; i < 4; i++) {
-            stTmp >>= 2;
-            if (rc.data[i] > CONFIG_MINCHECK)
-                stTmp |= 0x80;  // check for MIN
-            if (rc.data[i] < CONFIG_MAXCHECK)
-                stTmp |= 0x40;  // check for MAX
-        }
-        if (stTmp == rcSticks) {
-            if (rcDelayCommand < 250)
-                rcDelayCommand++;
-        } else
-            rcDelayCommand = 0;
-        rcSticks = stTmp;
+        rc.update();
 
         // when landed, reset integral component of PID
         if ((rc.data[THROTTLE] < CONFIG_MINCHECK)) {
@@ -159,12 +138,12 @@ void loop(void)
             errorAngleI[PITCH] = 0;
         }
 
-        if (rcDelayCommand == 20) {
+        if (rc.changed()) {
 
             if (armed) {      // actions during armed
 
                 // Disarm on throttle down + yaw
-                if (rcSticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
+                if (rc.sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
                     if (armed) {
                         armed = false;
                         // Reset disarm time so that it works next time we arm the board.
@@ -175,12 +154,12 @@ void loop(void)
             } else {            // actions during not armed
 
                 // GYRO calibration
-                if (rcSticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
+                if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
                     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
                 } 
 
                 // Arm via YAW
-                if ((rcSticks == THR_LO + YAW_HI + PIT_CE + ROL_CE)) {
+                if ((rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE)) {
                     if (calibratingG == 0 && accCalibrated) {
                         if (!armed) {         // arm now!
                             armed = true;
@@ -191,18 +170,16 @@ void loop(void)
                 }
 
                 // Calibrating Acc
-                else if (rcSticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
+                else if (rc.sticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
                     calibratingA = CONFIG_CALIBRATING_ACC_CYCLES;
             }
-        }
 
-        // Check AUX switches
-        for (uint8_t i = 0; i < 4; i++)
-            auxState |= (rc.data[AUX1 + i] < 1300) << (3 * i) | (1300 < rc.data[AUX1 + i] && rc.data[AUX1 + i] < 1700) 
-                << (3 * i + 1) | (rc.data[AUX1 + i] > 1700) << (3 * i + 2);
+        } // if rc.fresh()
 
     } else {                        // not in rc loop
+
         static int taskOrder = 0;   // never call all functions in the same loop, to avoid high delay spikes
+
         switch (taskOrder) {
             case 0:
                 taskOrder++;

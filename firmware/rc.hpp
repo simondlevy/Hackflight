@@ -14,20 +14,25 @@ extern "C" {
         private:
 
             int16_t dataAverage[8][4];
+            uint8_t commandDelay;                               // milliseconds since most recent movement
             int32_t averageIndex;
             int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
             int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
         public:
 
-            int16_t  command[4];
-
-            int16_t  data[RC_CHANS];
+            uint8_t sticks;            // holds stick positions for command combos
+            int16_t command[4];
+            int16_t data[RC_CHANS];
 
             void init(void);
 
-            void compute(void);
+            void update(void);
+
+            bool changed(void);
 
             void computeExpo(void);
+
+            uint8_t auxState(void);
     };
 }
