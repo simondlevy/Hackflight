@@ -114,8 +114,6 @@ static const uint8_t CONFIG_AXIS_D[3] = {23, 23, 0};
 #define CONFIG_ACCXY_DEADBAND                       40
 #define CONFIG_ACCZ_LPF_CUTOFF                      5.0F
 #define CONFIG_SMALL_ANGLE                          250 // tenths of a degree
-#define CONFIG_DEADBAND                             0
-#define CONFIG_YAW_DEADBAND                         0
 #define CONFIG_BARO_TAB_SIZE                        21
 
 static const uint8_t CONFIG_ROLL_PITCH_RATE[2] = {0, 0};

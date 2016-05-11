@@ -110,8 +110,7 @@ static void annexCode(void)
         prop2 = 100;
     } else {
         if (rcData[THROTTLE] < 2000) {
-            prop2 = 100 - (uint16_t)CONFIG_DYN_THR_PID * (rcData[THROTTLE] - CONFIG_TPA_BREAKPOINT) / 
-                (2000 - CONFIG_TPA_BREAKPOINT);
+            prop2 = 100 - (uint16_t)CONFIG_DYN_THR_PID * (rcData[THROTTLE] - CONFIG_TPA_BREAKPOINT) / (2000 - CONFIG_TPA_BREAKPOINT);
         } else {
             prop2 = 100 - CONFIG_DYN_THR_PID;
         }
@@ -122,26 +121,11 @@ static void annexCode(void)
         tmp = min(abs(rcData[axis] - CONFIG_MIDRC), 500);
 
         if (axis != 2) {        // ROLL & PITCH
-            if (CONFIG_DEADBAND) {
-                if (tmp > CONFIG_DEADBAND) {
-                    tmp -= CONFIG_DEADBAND;
-                } else {
-                    tmp = 0;
-                }
-            }
-
             tmp2 = tmp / 100;
             rcCommand[axis] = lookupPitchRollRC[tmp2] + (tmp - tmp2 * 100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2]) / 100;
             prop1 = 100 - (uint16_t)CONFIG_ROLL_PITCH_RATE[axis] * tmp / 500;
             prop1 = (uint16_t)prop1 * prop2 / 100;
         } else {                // YAW
-            if (CONFIG_YAW_DEADBAND) {
-                if (tmp > CONFIG_YAW_DEADBAND) {
-                    tmp -= CONFIG_YAW_DEADBAND;
-                } else {
-                    tmp = 0;
-                }
-            }
             rcCommand[axis] = tmp * -CONFIG_YAW_CONTROL_DIRECTION;
             prop1 = 100 - (uint16_t)CONFIG_YAW_RATE * abs(tmp) / 500;
         }
@@ -171,8 +155,8 @@ static void computeRC(void)
         // get RC PWM
         rcDataAverage[chan][rcAverageIndex % 4] = board_pwmRead(CONFIG_RCMAP[chan]);
 
-        // clear this since we're not accessing it elsewhere. saves a temp var
         rcData[chan] = 0;
+
         for (uint8_t i = 0; i < 4; i++)
             rcData[chan] += rcDataAverage[chan][i];
         rcData[chan] /= 4;
@@ -207,21 +191,23 @@ static int32_t errorAngleI[2] = { 0, 0 };
 
 static void pidMultiWii(void)
 {
-    int32_t error, errorAngle;
-    int32_t PTerm, ITerm, PTermACC = 0, ITermACC = 0, PTermGYRO = 0, ITermGYRO = 0, DTerm;
     static int16_t lastGyro[3] = { 0, 0, 0 };
     static int32_t delta1[3], delta2[3];
-    int32_t deltaSum;
-    int32_t delta;
 
-    // **** PITCH & ROLL & YAW PID ****
+    int32_t PTermACC = 0, ITermACC = 0, PTermGYRO = 0, ITermGYRO = 0;
+
+    // PITCH & ROLL & YAW PID
     int prop = max(abs(rcCommand[PITCH]), abs(rcCommand[ROLL])); // range [0;500]
+
     for (uint8_t axis = 0; axis < 3; axis++) {
+
         if ((CONFIG_HORIZON_MODE) && axis < 2) { // MODE relying on ACC
+
             // 50 degrees max inclination
-            errorAngle = constrainer(2 * rcCommand[axis], -((int)CONFIG_MAX_ANGLE_INCLINATION), 
+            int32_t errorAngle = constrainer(2 * rcCommand[axis], -((int)CONFIG_MAX_ANGLE_INCLINATION), 
                     + CONFIG_MAX_ANGLE_INCLINATION) - angle[axis] + CONFIG_ANGLE_TRIM[axis];
             PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
+
             // 32 bits is needed for calculation: errorAngle*CONFIG_LEVEL_P could exceed 32768   
             // 16 bits is ok for result
             PTermACC = constrainer(PTermACC, -CONFIG_LEVEL_D * 5, + CONFIG_LEVEL_D * 5);
@@ -229,8 +215,10 @@ static void pidMultiWii(void)
             errorAngleI[axis] = constrainer(errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
             ITermACC = (errorAngleI[axis] * CONFIG_LEVEL_I) >> 12;
         }
+
         if (CONFIG_HORIZON_MODE || axis == 2) { // MODE relying on GYRO or YAW axis
-            error = (int32_t)rcCommand[axis] * 10 * 8 / CONFIG_AXIS_P[axis];
+
+            int32_t error = (int32_t)rcCommand[axis] * 10 * 8 / CONFIG_AXIS_P[axis];
             error -= imu.gyroADC[axis];
 
             PTermGYRO = rcCommand[axis];
@@ -240,21 +228,22 @@ static void pidMultiWii(void)
                 errorGyroI[axis] = 0;
             ITermGYRO = (errorGyroI[axis] / 125 * CONFIG_AXIS_I[axis]) >> 6;
         }
+
+        int32_t PTerm = PTermGYRO;
+        int32_t ITerm = ITermGYRO;
+
         if (CONFIG_HORIZON_MODE && axis < 2) {
             PTerm = (PTermACC * (500 - prop) + PTermGYRO * prop) / 500;
             ITerm = (ITermACC * (500 - prop) + ITermGYRO * prop) / 500;
-        } else {
-            PTerm = PTermGYRO;
-            ITerm = ITermGYRO;
-        }
+        } 
 
         PTerm -= (int32_t)imu.gyroADC[axis] * dynP8[axis] / 10 / 8; // 32 bits is needed for calculation
-        delta = imu.gyroADC[axis] - lastGyro[axis];
+        int32_t delta = imu.gyroADC[axis] - lastGyro[axis];
         lastGyro[axis] = imu.gyroADC[axis];
-        deltaSum = delta1[axis] + delta2[axis] + delta;
+        int32_t deltaSum = delta1[axis] + delta2[axis] + delta;
         delta2[axis] = delta1[axis];
         delta1[axis] = delta;
-        DTerm = (deltaSum * dynD8[axis]) / 32;
+        int32_t DTerm = (deltaSum * dynD8[axis]) / 32;
         axisPID[axis] = PTerm + ITerm - DTerm;
     }
 }
@@ -310,7 +299,8 @@ void setup(void)
 
     // trigger accelerometer calibration requirement
     haveSmallAngle = true;
- }
+
+} // setup
 
 void loop(void)
 {
@@ -426,7 +416,6 @@ void loop(void)
         currentTime = board_getMicros();
         previousTime = currentTime;
 
-        // non IMU critical, temeperature, serialcom
         annexCode();
 
         // use LEDs to indicate calibration status
@@ -458,7 +447,9 @@ void loop(void)
         axisPID[YAW] = constrainer(axisPID[YAW], -100 - abs(rcCommand[YAW]), +100 + abs(rcCommand[YAW]));
 
         mixer.writeMotors(armed, axisPID, rcCommand, rcData);
-    }
-}
+
+    } // if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC))
+
+} // loop()
 
 } // extern "C"
