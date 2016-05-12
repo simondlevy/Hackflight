@@ -43,7 +43,7 @@ extern "C" {
 
         public:
 
-            void com(bool armed, int16_t angle[2], int16_t motorsDisarmed[4], int16_t rcData[RC_CHANS]);
+            void update(bool armed, IMU * imu, Mixer * mixer, int16_t rcData[RC_CHANS]);
 
     }; // class MSP
 

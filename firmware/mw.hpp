@@ -10,9 +10,16 @@
 #include <stdarg.h>
 
 #include "printf.h"
-#include "board.hpp"
 
 #define RC_CHANS    (8)
+
+#include "board.hpp"
+#include "imu.hpp"
+#include "rc.hpp"
+#include "pid.hpp"
+#include "mixer.hpp"
+#include "msp.hpp"
+
 
 #ifndef abs
 #define abs(x)    ((x) > 0 ? (x) : -(x))

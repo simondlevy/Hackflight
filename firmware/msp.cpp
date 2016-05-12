@@ -3,7 +3,6 @@ extern "C" {
 #include <strings.h> // for bzero
 
 #include "mw.hpp"
-#include "msp.hpp"
 
 #define MSP_REBOOT               68     // in message  reboot settings
 #define MSP_RC                   105    // out message 8 rc chan and more
@@ -83,7 +82,7 @@ void MSP::init(void)
     bzero(&this->portState, sizeof(this->portState));
 }
 
-void MSP::com( bool armed, int16_t angle[2], int16_t motorsDisarmed[4], int16_t rcData[RC_CHANS])
+void MSP::update(bool armed, IMU * imu, Mixer * mixer, int16_t rcData[RC_CHANS])
 {
     static bool pendReboot;
 
@@ -138,7 +137,7 @@ void MSP::com( bool armed, int16_t angle[2], int16_t motorsDisarmed[4], int16_t 
 
                     case MSP_SET_MOTOR:
                         for (uint8_t i = 0; i < 4; i++)
-                            motorsDisarmed[i] = read16();
+                            mixer->motorsDisarmed[i] = read16();
                         headSerialReply(0);
                         break;
 
@@ -151,7 +150,7 @@ void MSP::com( bool armed, int16_t angle[2], int16_t motorsDisarmed[4], int16_t 
                     case MSP_ATTITUDE:
                         headSerialReply(6);
                         for (uint8_t i = 0; i < 3; i++)
-                            serialize16(angle[i]);
+                            serialize16(imu->angle[i]);
                         break;
 
                     case MSP_BARO_SONAR_RAW:

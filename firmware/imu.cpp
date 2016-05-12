@@ -3,7 +3,6 @@ extern "C" {
 #include <math.h>
 
 #include "mw.hpp"
-#include "imu.hpp"
 
 #define INV_GYR_CMPF_FACTOR   (1.0f / ((float)CONFIG_GYRO_CMPF_FACTOR + 1.0f))
 #define INV_GYR_CMPFM_FACTOR  (1.0f / ((float)CONFIG_GYRO_CMPFM_FACTOR + 1.0f))

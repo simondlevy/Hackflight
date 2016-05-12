@@ -11,10 +11,7 @@ extern "C" {
 
             void init(void);
 
-            void writeMotors(bool armed, 
-                    int16_t  axisPID[3], 
-                    int16_t  rcCommand[4], 
-                    bool throttleIsDown);
+            void update(bool armed, PID * pid, RC * rc);
     };
 
 }

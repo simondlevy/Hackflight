@@ -1,7 +1,6 @@
 extern "C" {
 
 #include "mw.hpp"
-#include "rc.hpp"
 
 #include <strings.h>
 

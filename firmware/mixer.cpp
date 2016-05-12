@@ -1,7 +1,6 @@
 extern "C" {
 
 #include "mw.hpp"
-#include "mixer.hpp"
 
 // Custom mixer data per motor
 typedef struct motorMixer_t {
@@ -25,14 +24,14 @@ void Mixer::init(void)
         this->motorsDisarmed[i] = CONFIG_MINCOMMAND;
 }
 
-void Mixer::writeMotors(bool armed, int16_t  axisPID[3], int16_t  rcCommand[4], bool throttleIsDown)
+void Mixer::update(bool armed, PID * pid, RC * rc)
 {
     int16_t maxMotor;
     int16_t motors[4];
 
     for (uint8_t i = 0; i < 4; i++)
-        motors[i] = rcCommand[THROTTLE] * mixerQuadX[i].throttle + axisPID[PITCH] * mixerQuadX[i].pitch + 
-            axisPID[ROLL] * mixerQuadX[i].roll + -CONFIG_YAW_DIRECTION * axisPID[YAW] * mixerQuadX[i].yaw;
+        motors[i] = rc->command[THROTTLE] * mixerQuadX[i].throttle + pid->axisPID[PITCH] * mixerQuadX[i].pitch + 
+            pid->axisPID[ROLL] * mixerQuadX[i].roll + -CONFIG_YAW_DIRECTION * pid->axisPID[YAW] * mixerQuadX[i].yaw;
 
     maxMotor = motors[0];
 
@@ -48,7 +47,7 @@ void Mixer::writeMotors(bool armed, int16_t  axisPID[3], int16_t  rcCommand[4], 
 
         motors[i] = constrain(motors[i], CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
 
-        if (throttleIsDown) {
+        if (rc->throttleIsDown()) {
             motors[i] = CONFIG_MINTHROTTLE;
         } 
 

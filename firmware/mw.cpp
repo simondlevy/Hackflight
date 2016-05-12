@@ -1,11 +1,6 @@
 extern "C" {
 
 #include "mw.hpp"
-#include "imu.hpp"
-#include "mixer.hpp"
-#include "msp.hpp"
-#include "pid.hpp"
-#include "rc.hpp"
 
 #ifndef PRINTF
 #define PRINTF printf
@@ -104,7 +99,6 @@ void loop(void)
     static uint32_t calibratedAccTime;
     static bool     accCalibrated;
     static bool     armed;
-    static int16_t  axisPID[3];
     static uint16_t calibratingA;
     static uint32_t currentTime;
     static uint32_t disarmTime = 0;
@@ -213,15 +207,13 @@ void loop(void)
         }
 
         // handle serial communications
-        msp.com(armed, imu.angle, mixer.motorsDisarmed, rc.data);
+        msp.update(armed, &imu, &mixer, rc.data);
 
-        // run PID controller 
-        pid.compute(rc.command, imu.angle, imu.gyroADC, axisPID);
+        // update PID controller 
+        pid.update(&rc, &imu);
 
-        // prevent "yaw jump" during yaw correction
-        axisPID[YAW] = constrain(axisPID[YAW], -100 - abs(rc.command[YAW]), +100 + abs(rc.command[YAW]));
-
-        mixer.writeMotors(armed, axisPID, rc.command, rc.throttleIsDown());
+        // update mixer
+        mixer.update(armed, &pid, &rc);
 
     } // IMU update
 
