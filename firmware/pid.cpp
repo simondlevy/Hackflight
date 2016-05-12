@@ -10,15 +10,11 @@ void PID::init(void)
         this->delta1[axis] = 0;
         this->delta2[axis] = 0;
     }
+
+    this->resetIntegral();
 }
 
-void PID::compute(
-        int16_t rcCommand[4], 
-        int16_t angle[3], 
-        int16_t gyroADC[3],
-        int16_t axisPID[3], 
-        int32_t errorGyroI[3], 
-        int32_t errorAngleI[3])
+void PID::compute(int16_t rcCommand[4], int16_t angle[3], int16_t gyroADC[3], int16_t axisPID[3])
 {
     int32_t PTermACC = 0, ITermACC = 0, PTermGYRO = 0, ITermGYRO = 0;
 
@@ -34,12 +30,12 @@ void PID::compute(
                     + CONFIG_MAX_ANGLE_INCLINATION) - angle[axis] + CONFIG_ANGLE_TRIM[axis];
             PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
 
-            // 32 bits is needed for calculation: errorAngle*CONFIG_LEVEL_P could exceed 32768   
+            // 32 bits is needed for calculation: this->errorAngle*CONFIG_LEVEL_P could exceed 32768   
             // 16 bits is ok for result
             PTermACC = constrain(PTermACC, -CONFIG_LEVEL_D * 5, + CONFIG_LEVEL_D * 5);
 
-            errorAngleI[axis] = constrain(errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
-            ITermACC = (errorAngleI[axis] * CONFIG_LEVEL_I) >> 12;
+            this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
+            ITermACC = (this->errorAngleI[axis] * CONFIG_LEVEL_I) >> 12;
         }
 
         if (CONFIG_HORIZON_MODE || axis == 2) { // MODE relying on GYRO or YAW axis
@@ -49,10 +45,10 @@ void PID::compute(
 
             PTermGYRO = rcCommand[axis];
 
-            errorGyroI[axis] = constrain(errorGyroI[axis] + error, -16000, +16000); // WindUp
+            this->errorGyroI[axis] = constrain(this->errorGyroI[axis] + error, -16000, +16000); // WindUp
             if ((abs(gyroADC[axis]) > 640) || ((axis == YAW) && (abs(rcCommand[axis]) > 100)))
-                errorGyroI[axis] = 0;
-            ITermGYRO = (errorGyroI[axis] / 125 * CONFIG_AXIS_I[axis]) >> 6;
+                this->errorGyroI[axis] = 0;
+            ITermGYRO = (this->errorGyroI[axis] / 125 * CONFIG_AXIS_I[axis]) >> 6;
         }
 
         int32_t PTerm = PTermGYRO;
@@ -72,6 +68,15 @@ void PID::compute(
         int32_t DTerm = (deltaSum * CONFIG_AXIS_D[axis]) / 32;
         axisPID[axis] = PTerm + ITerm - DTerm;
     }
+}
+
+void PID::resetIntegral(void)
+{
+    this->errorGyroI[ROLL] = 0;
+    this->errorGyroI[PITCH] = 0;
+    this->errorGyroI[YAW] = 0;
+    this->errorAngleI[ROLL] = 0;
+    this->errorAngleI[PITCH] = 0;
 }
 
 } // extern "C"

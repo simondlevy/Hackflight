@@ -106,8 +106,6 @@ void loop(void)
     static bool     armed;
     static int16_t  angle[3];
     static int16_t  axisPID[3];
-    static int32_t  errorGyroI[3];
-    static int32_t  errorAngleI[2];
     static uint16_t calibratingA;
     static uint32_t currentTime;
     static uint32_t disarmTime = 0;
@@ -118,13 +116,8 @@ void loop(void)
         rc.update();
 
         // when landed, reset integral component of PID
-        if (rc.throttleIsDown()) {
-            errorGyroI[ROLL] = 0;
-            errorGyroI[PITCH] = 0;
-            errorGyroI[YAW] = 0;
-            errorAngleI[ROLL] = 0;
-            errorAngleI[PITCH] = 0;
-        }
+        if (rc.throttleIsDown()) 
+            pid.resetIntegral();
 
         if (rc.changed()) {
 
@@ -234,7 +227,7 @@ void loop(void)
         msp.com(armed, angle, mixer.motorsDisarmed, rc.data);
 
         // run PID controller 
-        pid.compute(rc.command, angle, imu.gyroADC, axisPID, errorGyroI, errorAngleI);
+        pid.compute(rc.command, angle, imu.gyroADC, axisPID);
 
         // prevent "yaw jump" during yaw correction
         axisPID[YAW] = constrain(axisPID[YAW], -100 - abs(rc.command[YAW]), +100 + abs(rc.command[YAW]));
