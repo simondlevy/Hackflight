@@ -1,10 +1,5 @@
 #pragma once
 
-extern "C" {
-
-    class Board {
-
-    };
 
 void     board_checkReboot(bool pendReboot);
 void     board_delayMilliseconds(uint32_t msec);
@@ -25,5 +20,3 @@ uint8_t  board_serialAvailable(void);
 uint8_t  board_serialRead(void);
 void     board_serialWrite(uint8_t c);
 void     board_writeMotor(uint8_t index, uint16_t value);
-
-}

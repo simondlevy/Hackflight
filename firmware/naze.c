@@ -1,8 +1,7 @@
-extern "C" {
-
 #include <breezystm32.h>
 #include <math.h>
-#include "mw.hpp"
+
+#include "board.h"
 
 #define USE_CPPM       1
 #define PWM_FILTER     0     // 0 or 1
@@ -108,6 +107,4 @@ void board_serialWrite(uint8_t c)
 void board_writeMotor(uint8_t index, uint16_t value)
 {
     pwmWriteMotor(index, value);
-}
-
 }

@@ -14,7 +14,7 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 TARGET		?= NAZE
 
-CPP_OBJS = mw.o imu.o mixer.o pid.o msp.o rc.o board_naze.o
+CPP_OBJS = mw.o imu.o mixer.o pid.o msp.o rc.o
 
 # Compile-time options
 OPTIONS		?=
@@ -39,7 +39,8 @@ CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
 STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 
 # Source files common to all targets
-NAZE_SRC = $(BREEZY_DIR)/main.c \
+NAZE_SRC = naze.c \
+		   $(BREEZY_DIR)/main.c \
            $(BREEZY_DIR)/printf.c \
            $(BREEZY_DIR)/drv_system.c \
            $(BREEZY_DIR)/drv_mpu6050.c \
@@ -155,7 +156,7 @@ $(TARGET_ELF):  $(TARGET_OBJS)
 MKDIR_OBJDIR = @mkdir -p $(dir $@)
 
 # Compile
-$(OBJECT_DIR)/$(TARGET)/%.o: %.c 
+$(OBJECT_DIR)/$(TARGET)/%.o: %.c board.h
 	$(MKDIR_OBJDIR)
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(CFLAGS) $<
@@ -167,12 +168,12 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 	@$(CC) -c -o $@ $(ASFLAGS) $< 
 
 # C++ support
-%.o: %.cpp mw.hpp imu.hpp mixer.hpp pid.hpp msp.hpp rc.hpp board.hpp
+%.o: %.cpp mw.hpp imu.hpp mixer.hpp pid.hpp msp.hpp rc.hpp
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(CFLAGS) $< 
 
 clean:
-	rm -rf obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
+	rm -rf *.o obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
 
 flash_$(TARGET): $(TARGET_HEX)
 	stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
