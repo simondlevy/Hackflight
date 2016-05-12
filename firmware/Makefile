@@ -167,7 +167,7 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 	@$(CC) -c -o $@ $(ASFLAGS) $< 
 
 # C++ support
-%.o: %.cpp mw.hpp imu.hpp mixer.hpp pid.hpp msp.hpp
+%.o: %.cpp mw.hpp imu.hpp mixer.hpp pid.hpp msp.hpp rc.hpp board.hpp
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(CFLAGS) $< 
 
