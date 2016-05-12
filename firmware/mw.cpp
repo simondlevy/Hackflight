@@ -104,7 +104,6 @@ void loop(void)
     static uint32_t calibratedAccTime;
     static bool     accCalibrated;
     static bool     armed;
-    static int16_t  angle[3];
     static int16_t  axisPID[3];
     static uint16_t calibratingA;
     static uint32_t currentTime;
@@ -155,11 +154,11 @@ void loop(void)
                     calibratingA = CONFIG_CALIBRATING_ACC_CYCLES;
             }
 
-        } // if rc.fresh()
+        } // if rc.changed()
 
-    } else {                        // not in rc loop
+    } else {                    // not in rc loop
 
-        static int taskOrder = 0;   // never call all functions in the same loop, to avoid high delay spikes
+        static int taskOrder;   // never call all functions in the same loop, to avoid high delay spikes
 
         switch (taskOrder) {
             case 0:
@@ -182,19 +181,9 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC, currentTime)) {
 
-        float anglerad[3];
+        imu.update(armed, calibratingA, calibratingG);
 
-        imu.getEstimatedAttitude(armed, anglerad, calibratingA, calibratingG);
-
-        angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
-        angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
-
-        angle[YAW] = lrintf(anglerad[YAW] * 1800.0f / M_PI + CONFIG_MAGNETIC_DECLINATION) / 10.0f;
-
-        if (angle[YAW] < 0)
-            angle[YAW] += 360;
-
-        haveSmallAngle = abs(angle[0]) < CONFIG_SMALL_ANGLE && abs(angle[1]) < CONFIG_SMALL_ANGLE;
+        haveSmallAngle = abs(imu.angle[0]) < CONFIG_SMALL_ANGLE && abs(imu.angle[1]) < CONFIG_SMALL_ANGLE;
 
         // measure loop rate just afer reading the sensors
         currentTime = board_getMicros();
@@ -224,10 +213,10 @@ void loop(void)
         }
 
         // handle serial communications
-        msp.com(armed, angle, mixer.motorsDisarmed, rc.data);
+        msp.com(armed, imu.angle, mixer.motorsDisarmed, rc.data);
 
         // run PID controller 
-        pid.compute(rc.command, angle, imu.gyroADC, axisPID);
+        pid.compute(rc.command, imu.angle, imu.gyroADC, axisPID);
 
         // prevent "yaw jump" during yaw correction
         axisPID[YAW] = constrain(axisPID[YAW], -100 - abs(rc.command[YAW]), +100 + abs(rc.command[YAW]));

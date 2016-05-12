@@ -117,7 +117,7 @@ void IMU::init(void) {
     this->gyroADC[2] = 0;
 }
 
-void IMU::getEstimatedAttitude(bool armed, float anglerad[3], uint16_t & calibratingA, uint16_t & calibratingG)
+void IMU::update(bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
 {
     static float    accLPF[3];
     static int32_t  accZoffset;
@@ -141,6 +141,7 @@ void IMU::getEstimatedAttitude(bool armed, float anglerad[3], uint16_t & calibra
     uint32_t deltaT = currentT - previousT;
     float scale = deltaT * this->gyroScale;
     int16_t  accADC[3];
+    float anglerad[3];
 
     previousT = currentT;
 
@@ -279,8 +280,15 @@ void IMU::getEstimatedAttitude(bool armed, float anglerad[3], uint16_t & calibra
     accSum[Z] += applyDeadband(lrintf(accz_smooth), CONFIG_ACCZ_DEADBAND);
 
     accTimeSum += deltaT;
+
+    // Convert angles from radians to tenths of a degrees
+    this->angle[ROLL]  = lrintf(anglerad[ROLL]  * (1800.0f / M_PI));
+    this->angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
+    this->angle[YAW]   = lrintf(anglerad[YAW]   * 1800.0f / M_PI + CONFIG_MAGNETIC_DECLINATION) / 10.0f;
+
+    // Convert heading from [-180,+180] to [0,360]
+    if (this->angle[YAW] < 0)
+        this->angle[YAW] += 360;
 }
-
-
 
 } // extern "C"
