@@ -106,4 +106,9 @@ uint8_t RC::auxState(void)
     return aux < 1500 ? 0 : (aux < 1700 ? 1 : 2);
 }
 
+bool RC::throttleIsDown(void)
+{
+    return this->data[THROTTLE] < CONFIG_MINCHECK;
+}
+
 } // extern "C"

@@ -13,19 +13,6 @@ extern "C" {
 
 #include <math.h>
 
-#define ROL_LO (1 << (2 * ROLL))
-#define ROL_CE (3 << (2 * ROLL))
-#define ROL_HI (2 << (2 * ROLL))
-#define PIT_LO (1 << (2 * PITCH))
-#define PIT_CE (3 << (2 * PITCH))
-#define PIT_HI (2 << (2 * PITCH))
-#define YAW_LO (1 << (2 * YAW))
-#define YAW_CE (3 << (2 * YAW))
-#define YAW_HI (2 << (2 * YAW))
-#define THR_LO (1 << (2 * THROTTLE))
-#define THR_CE (3 << (2 * THROTTLE))
-#define THR_HI (2 << (2 * THROTTLE))
-
 // utilities ======================================================================================================
 
 static void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
@@ -127,10 +114,11 @@ void loop(void)
 
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC, currentTime)) {
 
+        // update RC channels
         rc.update();
 
         // when landed, reset integral component of PID
-        if ((rc.data[THROTTLE] < CONFIG_MINCHECK)) {
+        if (rc.throttleIsDown()) {
             errorGyroI[ROLL] = 0;
             errorGyroI[PITCH] = 0;
             errorGyroI[YAW] = 0;
@@ -251,7 +239,7 @@ void loop(void)
         // prevent "yaw jump" during yaw correction
         axisPID[YAW] = constrain(axisPID[YAW], -100 - abs(rc.command[YAW]), +100 + abs(rc.command[YAW]));
 
-        mixer.writeMotors(armed, axisPID, rc.command, rc.data);
+        mixer.writeMotors(armed, axisPID, rc.command, rc.throttleIsDown());
 
     } // IMU update
 

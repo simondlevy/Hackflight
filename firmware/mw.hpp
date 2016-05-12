@@ -72,7 +72,6 @@ int constrainer(int amt, int low, int high);
 #define CONFIG_MAGNETIC_DECLINATION                 0
 #define CONFIG_CALIBRATING_GYRO_CYCLES              1000
 #define CONFIG_CALIBRATING_ACC_CYCLES               400
-#define CONFIG_MINCHECK                             1100
 #define CONFIG_MAXCHECK                             1900
 #define CONFIG_MINTHROTTLE                          990
 #define CONFIG_MAXTHROTTLE                          2010

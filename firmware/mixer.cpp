@@ -25,7 +25,7 @@ void Mixer::init(void)
         this->motorsDisarmed[i] = CONFIG_MINCOMMAND;
 }
 
-void Mixer::writeMotors(bool armed, int16_t  axisPID[3], int16_t  rcCommand[4], int16_t  rcData[RC_CHANS])
+void Mixer::writeMotors(bool armed, int16_t  axisPID[3], int16_t  rcCommand[4], bool throttleIsDown)
 {
     int16_t maxMotor;
     int16_t motors[4];
@@ -48,7 +48,7 @@ void Mixer::writeMotors(bool armed, int16_t  axisPID[3], int16_t  rcCommand[4], 
 
         motors[i] = constrain(motors[i], CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
 
-        if ((rcData[THROTTLE]) < CONFIG_MINCHECK) {
+        if (throttleIsDown) {
             motors[i] = CONFIG_MINTHROTTLE;
         } 
 
