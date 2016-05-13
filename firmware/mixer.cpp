@@ -17,21 +17,24 @@ static const motorMixer_t mixerQuadX[] = {
     { 1.0f,  1.0f, -1.0f, -1.0f },          // FRONT_L
 };
 
-void Mixer::init(void)
+void Mixer::init(RC * rc, PID * pid)
 {
+    this->_pid = pid;
+    this->_rc = rc;
+
     // set disarmed motor values
     for (uint8_t i = 0; i < 4; i++)
         this->motorsDisarmed[i] = CONFIG_MINCOMMAND;
 }
 
-void Mixer::update(bool armed, PID * pid, RC * rc)
+void Mixer::update(bool armed)
 {
     int16_t maxMotor;
     int16_t motors[4];
 
     for (uint8_t i = 0; i < 4; i++)
-        motors[i] = rc->command[THROTTLE] * mixerQuadX[i].throttle + pid->axisPID[PITCH] * mixerQuadX[i].pitch + 
-            pid->axisPID[ROLL] * mixerQuadX[i].roll + -CONFIG_YAW_DIRECTION * pid->axisPID[YAW] * mixerQuadX[i].yaw;
+        motors[i] = this->_rc->command[THROTTLE] * mixerQuadX[i].throttle + this->_pid->axisPID[PITCH] * mixerQuadX[i].pitch + 
+            this->_pid->axisPID[ROLL] * mixerQuadX[i].roll + -CONFIG_YAW_DIRECTION * this->_pid->axisPID[YAW] * mixerQuadX[i].yaw;
 
     maxMotor = motors[0];
 
@@ -47,7 +50,7 @@ void Mixer::update(bool armed, PID * pid, RC * rc)
 
         motors[i] = constrain(motors[i], CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
 
-        if (rc->throttleIsDown()) {
+        if (this->_rc->throttleIsDown()) {
             motors[i] = CONFIG_MINTHROTTLE;
         } 
 

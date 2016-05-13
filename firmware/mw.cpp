@@ -79,8 +79,8 @@ void setup(void)
     // initialize our RC, IMU, mixer, and PID controller
     rc.init();
     imu.init();
-    mixer.init(); 
     pid.init();
+    mixer.init(&rc, &pid); 
 
     // set initial time
     previousTime = board_getMicros();
@@ -214,7 +214,7 @@ void loop(void)
         pid.update(&rc, &imu);
 
         // update mixer
-        mixer.update(armed, &pid, &rc);
+        mixer.update(armed);
 
     } // IMU update
 

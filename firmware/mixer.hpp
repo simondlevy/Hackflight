@@ -4,14 +4,19 @@
 extern "C" {
 
     class Mixer {
+
+        private:
+
+            RC * _rc;
+            PID * _pid;
         
         public:
 
             int16_t  motorsDisarmed[4];
 
-            void init(void);
+            void init(RC * rc, PID * pid);
 
-            void update(bool armed, PID * pid, RC * rc);
+            void update(bool armed);
     };
 
 }
