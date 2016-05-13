@@ -8,7 +8,16 @@ extern "C" {
 
 #include <math.h>
 
-// utilities ======================================================================================================
+// Objects we use
+
+Board board;
+IMU   imu;
+RC    rc;
+Mixer mixer;
+PID   pid;
+MSP   msp;
+
+// utilities 
 
 static void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
 {
@@ -43,14 +52,6 @@ static bool check_and_update_timed_task(uint32_t * usec, uint32_t period, uint32
 }
 
 
-// Objects we use
-
-IMU   imu;
-RC    rc;
-Mixer mixer;
-PID   pid;
-MSP   msp;
-
 // values initialized in setup()
 
 static uint16_t calibratingG;
@@ -59,7 +60,7 @@ static uint32_t previousTime;
 
 void setup(void)
 {
-    board_init();
+    board.init();
 
     // sleep for 100ms
     board_delayMilliseconds(100);

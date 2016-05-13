@@ -13,7 +13,7 @@
 
 #define RC_CHANS    (8)
 
-#include "board.h"
+#include "board.hpp"
 #include "imu.hpp"
 #include "rc.hpp"
 #include "pid.hpp"
