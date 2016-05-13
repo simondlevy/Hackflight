@@ -13,12 +13,12 @@ extern "C" {
 
 extern serialPort_t * Serial1;
 
-void board_imuInit(uint16_t *acc1G, float * gyroScale)
+void Board::imuInit(uint16_t *acc1G, float * gyroScale)
 {
     mpu6050_init(false, acc1G, gyroScale);
 }
 
-void board_imuRead(int16_t accADC[3], int16_t gyroADC[3])
+void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
     mpu6050_read_accel(accADC);
     mpu6050_read_gyro(gyroADC);
@@ -41,7 +41,7 @@ void Board::delayMilliseconds(uint32_t msec)
     delay(msec);
 }
 
-uint32_t board_getMicros()
+uint32_t Board::getMicros()
 {
     return micros();
 }

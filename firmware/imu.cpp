@@ -104,9 +104,11 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
     return value;
 }
 
-void IMU::init(void) {
+void IMU::init(Board * board) 
+{
+    this->_board = board;
 
-    board_imuInit(&this->acc1G, &this->gyroScale);
+    this->_board->imuInit(&this->acc1G, &this->gyroScale);
 
     // calculate RC time constant used in the accZ lpf    
     this->fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); 
@@ -135,7 +137,7 @@ void IMU::update(bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
     float dT = 0;
     float rpy[3];
     float accel_ned[3];
-    uint32_t currentT = board_getMicros();
+    uint32_t currentT = this->_board->getMicros();
     float deltaGyroAngle[3];
     uint32_t deltaT = currentT - previousT;
     float scale = deltaT * this->gyroScale;
@@ -144,7 +146,7 @@ void IMU::update(bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
 
     previousT = currentT;
 
-    board_imuRead(accADC, this->gyroADC);
+    this->_board->imuRead(accADC, this->gyroADC);
 
     if (calibratingA > 0) {
 

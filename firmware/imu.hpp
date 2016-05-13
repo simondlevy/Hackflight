@@ -12,6 +12,8 @@ extern "C" {
         
         private:
 
+            Board * _board;
+
             uint16_t acc1G;
             float    fcAcc;
             float    gyroScale;
@@ -21,7 +23,7 @@ extern "C" {
             int16_t angle[3];
             int16_t gyroADC[3];
 
-            void init(void);
+            void init(Board * board);
 
             void update(bool armed, uint16_t & calibratingA, uint16_t & calibratingG);
     };

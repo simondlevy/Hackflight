@@ -78,13 +78,13 @@ void setup(void)
 
     // initialize our RC, IMU, mixer, and PID controller
     rc.init(&board);
-    imu.init();
+    imu.init(&board);
     pid.init();
     mixer.init(&board, &rc, &pid); 
     msp.init(&board, &imu, &mixer, &rc);
 
     // set initial time
-    previousTime = board_getMicros();
+    previousTime = board.getMicros();
 
     // always do gyro calibration at startup
     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
@@ -173,7 +173,7 @@ void loop(void)
         }
     }
 
-    currentTime = board_getMicros();
+    currentTime = board.getMicros();
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC, currentTime)) {
 
@@ -182,7 +182,7 @@ void loop(void)
         haveSmallAngle = abs(imu.angle[0]) < CONFIG_SMALL_ANGLE && abs(imu.angle[1]) < CONFIG_SMALL_ANGLE;
 
         // measure loop rate just afer reading the sensors
-        currentTime = board_getMicros();
+        currentTime = board.getMicros();
         previousTime = currentTime;
 
         // compute exponential RC commands
