@@ -81,7 +81,7 @@ void setup(void)
     imu.init();
     pid.init();
     mixer.init(&rc, &pid); 
-    msp.init(&imu, &mixer, &rc);
+    msp.init(&board, &imu, &mixer, &rc);
 
     // set initial time
     previousTime = board_getMicros();

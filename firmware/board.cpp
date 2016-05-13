@@ -30,7 +30,7 @@ void Board::init(void)
     pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 }
 
-void board_checkReboot(bool pendReboot)
+void Board::checkReboot(bool pendReboot)
 {
     if (pendReboot)
         systemReset(false); // noreturn
@@ -81,22 +81,22 @@ uint16_t board_pwmRead(uint8_t chan)
     return pwmRead(chan);
 }
 
-void board_reboot(void)
+void Board::reboot(void)
 {
     systemReset(true);      // reboot to bootloader
 }
 
-uint8_t board_serialAvailable(void)
+uint8_t Board::serialAvailableBytes(void)
 {
     return serialTotalBytesWaiting(Serial1);
 }
 
-uint8_t board_serialRead(void)
+uint8_t Board::serialReadByte(void)
 {
     return serialRead(Serial1);
 }
 
-void board_serialWrite(uint8_t c)
+void Board::serialWriteByte(uint8_t c)
 {
     serialWrite(Serial1, c);
 }
