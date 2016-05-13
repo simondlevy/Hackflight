@@ -36,14 +36,9 @@ void board_checkReboot(bool pendReboot)
         systemReset(false); // noreturn
 }
 
-void board_delayMilliseconds(uint32_t msec)
+void Board::delayMilliseconds(uint32_t msec)
 {
     delay(msec);
-}
-
-uint16_t board_getI2cErrorCounter(void)
-{
-    return i2cGetErrorCounter();
 }
 
 uint32_t board_getMicros()
@@ -51,32 +46,32 @@ uint32_t board_getMicros()
     return micros();
 }
 
-void board_led0Off(void)
+void Board::led0Off(void)
 {
     LED0_OFF;
 }
 
-void board_led0On(void)
+void Board::led0On(void)
 {
     LED0_ON;
 }
 
-void board_led0Toggle(void)
+void Board::led0Toggle(void)
 {
     LED0_TOGGLE;
 }
 
-void board_led1Off(void)
+void Board::led1Off(void)
 {
     LED1_OFF;
 }
 
-void board_led1On(void)
+void Board::led1On(void)
 {
     LED1_ON;
 }
 
-void board_led1Toggle(void)
+void Board::led1Toggle(void)
 {
     LED1_TOGGLE;
 }

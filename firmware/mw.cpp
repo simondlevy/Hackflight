@@ -23,10 +23,10 @@ static void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
 {
     for (uint8_t r = 0; r < repeat; r++) {
         for (uint8_t i = 0; i < num; i++) {
-            board_led0Toggle();            // switch LEDPIN state
-            board_delayMilliseconds(wait);
+            board.led0Toggle();            // switch LEDPIN state
+            board.delayMilliseconds(wait);
         }
-        board_delayMilliseconds(60);
+        board.delayMilliseconds(60);
     }
 }
 
@@ -63,18 +63,18 @@ void setup(void)
     board.init();
 
     // sleep for 100ms
-    board_delayMilliseconds(100);
+    board.delayMilliseconds(100);
 
     // flash the LEDs to indicate startup
-    board_led1On();
-    board_led0Off();
+    board.led1On();
+    board.led0Off();
     for (uint8_t i = 0; i < 10; i++) {
-        board_led1Toggle();
-        board_led0Toggle();
-        board_delayMilliseconds(50);
+        board.led1Toggle();
+        board.led0Toggle();
+        board.delayMilliseconds(50);
     }
-    board_led1Off();
-    board_led0Off();
+    board.led1Off();
+    board.led0Off();
 
     // initialize our RC, IMU, mixer, and PID controller
     rc.init();
@@ -189,18 +189,18 @@ void loop(void)
 
         // use LEDs to indicate calibration status
         if (calibratingA > 0 || calibratingG > 0) { 
-            board_led0Toggle();
+            board.led0Toggle();
         } else {
             if (accCalibrated)
-                board_led0Off();
+                board.led0Off();
             if (armed)
-                board_led0On();
+                board.led0On();
         }
 
         if (check_timed_task(calibratedAccTime, currentTime)) {
             if (!haveSmallAngle) {
                 accCalibrated = false; // the multi uses ACC and is not calibrated or is too much inclinated
-                board_led0Toggle();
+                board.led0Toggle();
                 update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC, currentTime);
             } else {
                 accCalibrated = true;

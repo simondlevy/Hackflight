@@ -8,20 +8,20 @@ class Board {
 
         void init(void);
 
+        void delayMilliseconds(uint32_t msec);
+        void led0Off(void);
+        void led0On(void);
+        void led0Toggle(void);
+        void led1Off(void);
+        void led1On(void);
+        void led1Toggle(void);
+
 }; // class Board
 
 void     board_checkReboot(bool pendReboot);
-void     board_delayMilliseconds(uint32_t msec);
-uint16_t board_getI2cErrorCounter(void);
 uint32_t board_getMicros();
 void     board_imuInit(uint16_t *acc1G, float * gyroScale);
 void     board_imuRead(int16_t accADC[3], int16_t gyroADC[3]);
-void     board_led0Off(void);
-void     board_led0On(void);
-void     board_led0Toggle(void);
-void     board_led1Off(void);
-void     board_led1On(void);
-void     board_led1Toggle(void);
 uint16_t board_pwmRead(uint8_t chan);
 void     board_reboot(void);
 uint8_t  board_serialAvailable(void);
