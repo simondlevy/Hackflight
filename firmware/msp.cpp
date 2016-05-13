@@ -77,12 +77,16 @@ void MSP::tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-void MSP::init(void)
+void MSP::init(IMU * imu, Mixer * mixer, RC * rc)
 {
+    this->_imu = imu;
+    this->_mixer = mixer;
+    this->_rc = rc;
+
     bzero(&this->portState, sizeof(this->portState));
 }
 
-void MSP::update(bool armed, IMU * imu, Mixer * mixer, int16_t rcData[RC_CHANS])
+void MSP::update(bool armed)
 {
     static bool pendReboot;
 
@@ -131,26 +135,26 @@ void MSP::update(bool armed, IMU * imu, Mixer * mixer, int16_t rcData[RC_CHANS])
 
                     case MSP_SET_RAW_RC:
                         for (uint8_t i = 0; i < 8; i++)
-                            rcData[i] = read16();
+                            this->_rc->data[i] = read16();
                         headSerialReply(0);
                         break;
 
                     case MSP_SET_MOTOR:
                         for (uint8_t i = 0; i < 4; i++)
-                            mixer->motorsDisarmed[i] = read16();
+                            this->_mixer->motorsDisarmed[i] = read16();
                         headSerialReply(0);
                         break;
 
                     case MSP_RC:
                         headSerialReply(16);
                         for (uint8_t i = 0; i < 8; i++)
-                            serialize16(rcData[i]);
+                            serialize16(this->_rc->data[i]);
                         break;
 
                     case MSP_ATTITUDE:
                         headSerialReply(6);
                         for (uint8_t i = 0; i < 3; i++)
-                            serialize16(imu->angle[i]);
+                            serialize16(this->_imu->angle[i]);
                         break;
 
                     case MSP_BARO_SONAR_RAW:

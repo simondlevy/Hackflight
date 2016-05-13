@@ -81,6 +81,7 @@ void setup(void)
     imu.init();
     pid.init();
     mixer.init(&rc, &pid); 
+    msp.init(&imu, &mixer, &rc);
 
     // set initial time
     previousTime = board_getMicros();
@@ -208,7 +209,7 @@ void loop(void)
         }
 
         // handle serial communications
-        msp.update(armed, &imu, &mixer, rc.data);
+        msp.update(armed);
 
         // update PID controller 
         pid.update(&rc, &imu);

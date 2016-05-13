@@ -27,6 +27,10 @@ extern "C" {
 
         private:
 
+            IMU * _imu;
+            Mixer * _mixer;
+            RC * _rc;
+
             mspPortState_t portState;
 
             void serialize8(uint8_t a);
@@ -39,11 +43,12 @@ extern "C" {
             void headSerialReply(uint8_t s);
             void headSerialError(uint8_t s);
             void tailSerialReply(void);
-            void init(void);
 
         public:
 
-            void update(bool armed, IMU * imu, Mixer * mixer, int16_t rcData[RC_CHANS]);
+            void init(IMU * imu, Mixer * mixer, RC * rc);
+
+            void update(bool armed);
 
     }; // class MSP
 
