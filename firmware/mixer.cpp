@@ -17,8 +17,9 @@ static const motorMixer_t mixerQuadX[] = {
     { 1.0f,  1.0f, -1.0f, -1.0f },          // FRONT_L
 };
 
-void Mixer::init(RC * rc, PID * pid)
+void Mixer::init(Board * board, RC * rc, PID * pid)
 {
+    this->_board = board;
     this->_pid = pid;
     this->_rc = rc;
 
@@ -60,7 +61,7 @@ void Mixer::update(bool armed)
     }
 
     for (uint8_t i = 0; i < 4; i++)
-        board_writeMotor(i, motors[i]);
+        this->_board->writeMotor(i, motors[i]);
 }
 
 } // extern "C"

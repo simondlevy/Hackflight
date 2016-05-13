@@ -80,7 +80,7 @@ void setup(void)
     rc.init();
     imu.init();
     pid.init();
-    mixer.init(&rc, &pid); 
+    mixer.init(&board, &rc, &pid); 
     msp.init(&board, &imu, &mixer, &rc);
 
     // set initial time

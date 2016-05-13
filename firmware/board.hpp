@@ -26,6 +26,7 @@ class Board {
         uint8_t  serialAvailableBytes(void);
         uint8_t  serialReadByte(void);
         void     serialWriteByte(uint8_t c);
+        void     writeMotor(uint8_t index, uint16_t value);
 
 }; // class Board
 
@@ -33,6 +34,5 @@ uint32_t board_getMicros();
 void     board_imuInit(uint16_t *acc1G, float * gyroScale);
 void     board_imuRead(int16_t accADC[3], int16_t gyroADC[3]);
 uint16_t board_pwmRead(uint8_t chan);
-void     board_writeMotor(uint8_t index, uint16_t value);
 
 } // extern "C"

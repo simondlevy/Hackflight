@@ -101,7 +101,7 @@ void Board::serialWriteByte(uint8_t c)
     serialWrite(Serial1, c);
 }
 
-void board_writeMotor(uint8_t index, uint16_t value)
+void Board::writeMotor(uint8_t index, uint16_t value)
 {
     pwmWriteMotor(index, value);
 }

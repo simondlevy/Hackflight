@@ -7,6 +7,7 @@ extern "C" {
 
         private:
 
+            Board * _board;
             RC * _rc;
             PID * _pid;
         
@@ -14,7 +15,7 @@ extern "C" {
 
             int16_t  motorsDisarmed[4];
 
-            void init(RC * rc, PID * pid);
+            void init(Board * board, RC * rc, PID * pid);
 
             void update(bool armed);
     };
