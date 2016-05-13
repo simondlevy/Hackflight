@@ -76,7 +76,7 @@ void Board::led1Toggle(void)
     LED1_TOGGLE;
 }
 
-uint16_t board_pwmRead(uint8_t chan)
+uint16_t Board::readPWM(uint8_t chan)
 {
     return pwmRead(chan);
 }

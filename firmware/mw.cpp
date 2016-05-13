@@ -77,7 +77,7 @@ void setup(void)
     board.led0Off();
 
     // initialize our RC, IMU, mixer, and PID controller
-    rc.init();
+    rc.init(&board);
     imu.init();
     pid.init();
     mixer.init(&board, &rc, &pid); 

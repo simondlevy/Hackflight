@@ -4,8 +4,10 @@ extern "C" {
 
 #include <strings.h>
 
-void RC::init(void)
+void RC::init(Board * board)
 {
+    this->_board = board;
+
     bzero (this->dataAverage, 8*4*sizeof(int16_t));
 
     this->commandDelay = 0;
@@ -37,7 +39,8 @@ void RC::update(void)
     for (uint8_t chan = 0; chan < 8; chan++) {
     
         // get RC PWM
-        this->dataAverage[chan][this->averageIndex % 4] = board_pwmRead(CONFIG_RCMAP[chan]);
+        this->dataAverage[chan][this->averageIndex % 4] = 
+            this->_board->readPWM(CONFIG_RCMAP[chan]);
 
         this->data[chan] = 0;
 

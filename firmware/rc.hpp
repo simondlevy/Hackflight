@@ -28,6 +28,8 @@ extern "C" {
 
         private:
 
+            Board * _board;
+
             int16_t dataAverage[8][4];
             uint8_t commandDelay;                               // cycles since most recent movement
             int32_t averageIndex;
@@ -37,10 +39,10 @@ extern "C" {
         public:
 
             uint8_t sticks;            // holds stick positions for command combos
+            void init(Board * board);
+
             int16_t command[4];
             int16_t data[RC_CHANS];
-
-            void init(void);
 
             void update(void);
 
