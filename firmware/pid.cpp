@@ -15,41 +15,41 @@ void PID::init(void)
 
 void PID::update(RC * rc, IMU * imu)
 {
-    int32_t PTermACC = 0, ITermACC = 0, PTermGYRO = 0, ITermGYRO = 0;
-
     // PITCH & ROLL & YAW PID
     int prop = max(abs(rc->command[PITCH]), abs(rc->command[ROLL])); // range [0;500]
 
     for (uint8_t axis = 0; axis < 3; axis++) {
 
-        if (axis < 2) { // MODE relying on ACC
+        int32_t error = (int32_t)rc->command[axis] * 10 * 8 / CONFIG_AXIS_P[axis];
+        error -= imu->gyroADC[axis];
+
+        int32_t PTermGYRO = rc->command[axis];
+
+        this->errorGyroI[axis] = constrain(this->errorGyroI[axis] + error, -16000, +16000); // WindUp
+        if ((abs(imu->gyroADC[axis]) > 640) || ((axis == YAW) && (abs(rc->command[axis]) > 100)))
+            this->errorGyroI[axis] = 0;
+        int32_t ITermGYRO = (this->errorGyroI[axis] / 125 * CONFIG_AXIS_I[axis]) >> 6;
+
+        int32_t PTerm = PTermGYRO;
+        int32_t ITerm = ITermGYRO;
+
+        if (axis < 2) {
 
             // 50 degrees max inclination
-            int32_t errorAngle = constrain(2 * rc->command[axis], -((int)CONFIG_MAX_ANGLE_INCLINATION), 
-                    + CONFIG_MAX_ANGLE_INCLINATION) - imu->angle[axis] + CONFIG_ANGLE_TRIM[axis];
-            PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
+            int32_t errorAngle = constrain(2 * rc->command[axis], 
+                                           -((int)CONFIG_MAX_ANGLE_INCLINATION), 
+                                           + CONFIG_MAX_ANGLE_INCLINATION) 
+                                 - imu->angle[axis] + CONFIG_ANGLE_TRIM[axis];
+
+            int32_t PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
 
             // 32 bits is needed for calculation: this->errorAngle*CONFIG_LEVEL_P could exceed 32768   
             // 16 bits is ok for result
             PTermACC = constrain(PTermACC, -CONFIG_LEVEL_D * 5, + CONFIG_LEVEL_D * 5);
 
             this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
-            ITermACC = (this->errorAngleI[axis] * CONFIG_LEVEL_I) >> 12;
-        }
+            int32_t ITermACC = (this->errorAngleI[axis] * CONFIG_LEVEL_I) >> 12;
 
-        int32_t error = (int32_t)rc->command[axis] * 10 * 8 / CONFIG_AXIS_P[axis];
-        error -= imu->gyroADC[axis];
-
-        PTermGYRO = rc->command[axis];
-
-        this->errorGyroI[axis] = constrain(this->errorGyroI[axis] + error, -16000, +16000); // WindUp
-        if ((abs(imu->gyroADC[axis]) > 640) || ((axis == YAW) && (abs(rc->command[axis]) > 100)))
-            this->errorGyroI[axis] = 0;
-        ITermGYRO = (this->errorGyroI[axis] / 125 * CONFIG_AXIS_I[axis]) >> 6;
-        int32_t PTerm = PTermGYRO;
-        int32_t ITerm = ITermGYRO;
-
-        if (axis < 2) {
             PTerm = (PTermACC * (500 - prop) + PTermGYRO * prop) / 500;
             ITerm = (ITermACC * (500 - prop) + ITermGYRO * prop) / 500;
         } 
