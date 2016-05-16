@@ -30,10 +30,6 @@ extern "C" {
     static const int16_t CONFIG_ANGLE_TRIM[2] = {-100, 0};
     */
 
-    // General =============================================
-
-    static const bool CONFIG_HORIZON_MODE = true;
-
     class PID {
 
         private:
