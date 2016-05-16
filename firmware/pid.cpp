@@ -15,9 +15,6 @@ void PID::init(void)
 
 void PID::update(RC * rc, IMU * imu)
 {
-    // PITCH & ROLL & YAW PID
-    int prop = max(abs(rc->command[PITCH]), abs(rc->command[ROLL])); // range [0;500]
-
     for (uint8_t axis = 0; axis < 3; axis++) {
 
         int32_t error = (int32_t)rc->command[axis] * 10 * 8 / CONFIG_AXIS_P[axis];
@@ -49,6 +46,8 @@ void PID::update(RC * rc, IMU * imu)
 
             this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
             int32_t ITermACC = (this->errorAngleI[axis] * CONFIG_LEVEL_I) >> 12;
+
+            int32_t prop = max(abs(rc->command[PITCH]), abs(rc->command[ROLL])); // range [0;500]
 
             PTerm = (PTermACC * (500 - prop) + PTermGYRO * prop) / 500;
             ITerm = (ITermACC * (500 - prop) + ITermGYRO * prop) / 500;
