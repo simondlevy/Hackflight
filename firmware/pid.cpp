@@ -17,7 +17,7 @@ void PID::update(RC * rc, IMU * imu)
 {
     for (uint8_t axis = 0; axis < 3; axis++) {
 
-        int32_t error = (int32_t)rc->command[axis] * 10 * 8 / CONFIG_AXIS_P[axis];
+        int32_t error = (int32_t)rc->command[axis] * 10 * 8 / CONFIG_RATE_P[axis];
         error -= imu->gyroADC[axis];
 
         int32_t PTermGYRO = rc->command[axis];
@@ -25,7 +25,7 @@ void PID::update(RC * rc, IMU * imu)
         this->errorGyroI[axis] = constrain(this->errorGyroI[axis] + error, -16000, +16000); // WindUp
         if ((abs(imu->gyroADC[axis]) > 640) || ((axis == YAW) && (abs(rc->command[axis]) > 100)))
             this->errorGyroI[axis] = 0;
-        int32_t ITermGYRO = (this->errorGyroI[axis] / 125 * CONFIG_AXIS_I[axis]) >> 6;
+        int32_t ITermGYRO = (this->errorGyroI[axis] / 125 * CONFIG_RATE_I[axis]) >> 6;
 
         int32_t PTerm = PTermGYRO;
         int32_t ITerm = ITermGYRO;
@@ -40,10 +40,6 @@ void PID::update(RC * rc, IMU * imu)
 
             int32_t PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
 
-            // 32 bits is needed for calculation: this->errorAngle*CONFIG_LEVEL_P could exceed 32768   
-            // 16 bits is ok for result
-            PTermACC = constrain(PTermACC, -CONFIG_LEVEL_D * 5, + CONFIG_LEVEL_D * 5);
-
             this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
             int32_t ITermACC = (this->errorAngleI[axis] * CONFIG_LEVEL_I) >> 12;
 
@@ -53,13 +49,13 @@ void PID::update(RC * rc, IMU * imu)
             ITerm = (ITermACC * (500 - prop) + ITermGYRO * prop) / 500;
         } 
 
-        PTerm -= (int32_t)imu->gyroADC[axis] * CONFIG_AXIS_P[axis] / 10 / 8; // 32 bits is needed for calculation
+        PTerm -= (int32_t)imu->gyroADC[axis] * CONFIG_RATE_P[axis] / 10 / 8; // 32 bits is needed for calculation
         int32_t delta = imu->gyroADC[axis] - this->lastGyro[axis];
         this->lastGyro[axis] = imu->gyroADC[axis];
         int32_t deltaSum = this->delta1[axis] + this->delta2[axis] + delta;
         this->delta2[axis] = this->delta1[axis];
         this->delta1[axis] = delta;
-        int32_t DTerm = (deltaSum * CONFIG_AXIS_D[axis]) / 32;
+        int32_t DTerm = (deltaSum * CONFIG_RATE_D[axis]) / 32;
         this->axisPID[axis] = PTerm + ITerm - DTerm;
     }
 
