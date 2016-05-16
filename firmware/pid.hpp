@@ -4,8 +4,6 @@ extern "C" {
 
     // Mini-250 ==========================================
 
-    static const int16_t CONFIG_ANGLE_TRIM[2] = {0, 0};
-
     class PID {
 
         private:
@@ -23,9 +21,11 @@ extern "C" {
             static const int16_t  CONFIG_ROLL_TRIM       = 0;
             static const int16_t  CONFIG_PITCH_TRIM      = 0;
 
-            uint8_t config_rate_p[3];
-            uint8_t config_rate_i[3];
-            uint8_t config_rate_d[3];
+            uint8_t rate_p[3];
+            uint8_t rate_i[3];
+            uint8_t rate_d[3];
+
+            int16_t angle_trim[2];
 
             int16_t lastGyro[3];
             int32_t delta1[3]; 

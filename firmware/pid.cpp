@@ -10,17 +10,20 @@ void PID::init(void)
         this->delta2[axis] = 0;
     }
 
-    this->config_rate_p[0] = CONFIG_RATE_PITCHROLL_P;
-    this->config_rate_p[1] = CONFIG_RATE_PITCHROLL_P;
-    this->config_rate_p[2] = CONFIG_YAW_P;
+    this->rate_p[0] = CONFIG_RATE_PITCHROLL_P;
+    this->rate_p[1] = CONFIG_RATE_PITCHROLL_P;
+    this->rate_p[2] = CONFIG_YAW_P;
 
-    this->config_rate_i[0] = CONFIG_RATE_PITCHROLL_I;
-    this->config_rate_i[1] = CONFIG_RATE_PITCHROLL_I;
-    this->config_rate_i[2] = CONFIG_YAW_I;
+    this->rate_i[0] = CONFIG_RATE_PITCHROLL_I;
+    this->rate_i[1] = CONFIG_RATE_PITCHROLL_I;
+    this->rate_i[2] = CONFIG_YAW_I;
 
-    this->config_rate_d[0] = CONFIG_RATE_PITCHROLL_D;
-    this->config_rate_d[1] = CONFIG_RATE_PITCHROLL_D;
-    this->config_rate_d[2] = 0;
+    this->rate_d[0] = CONFIG_RATE_PITCHROLL_D;
+    this->rate_d[1] = CONFIG_RATE_PITCHROLL_D;
+    this->rate_d[2] = 0;
+
+    this->angle_trim[0] = CONFIG_ROLL_TRIM;
+    this->angle_trim[1] = CONFIG_PITCH_TRIM;
 
     this->resetIntegral();
 }
@@ -29,7 +32,7 @@ void PID::update(RC * rc, IMU * imu)
 {
     for (uint8_t axis = 0; axis < 3; axis++) {
 
-        int32_t error = (int32_t)rc->command[axis] * 10 * 8 / config_rate_p[axis];
+        int32_t error = (int32_t)rc->command[axis] * 10 * 8 / this->rate_p[axis];
         error -= imu->gyroADC[axis];
 
         int32_t PTermGYRO = rc->command[axis];
@@ -37,7 +40,7 @@ void PID::update(RC * rc, IMU * imu)
         this->errorGyroI[axis] = constrain(this->errorGyroI[axis] + error, -16000, +16000); // WindUp
         if ((abs(imu->gyroADC[axis]) > 640) || ((axis == YAW) && (abs(rc->command[axis]) > 100)))
             this->errorGyroI[axis] = 0;
-        int32_t ITermGYRO = (this->errorGyroI[axis] / 125 * config_rate_i[axis]) >> 6;
+        int32_t ITermGYRO = (this->errorGyroI[axis] / 125 * this->rate_i[axis]) >> 6;
 
         int32_t PTerm = PTermGYRO;
         int32_t ITerm = ITermGYRO;
@@ -48,7 +51,7 @@ void PID::update(RC * rc, IMU * imu)
             int32_t errorAngle = constrain(2 * rc->command[axis], 
                                            -((int)CONFIG_MAX_ANGLE_INCLINATION), 
                                            + CONFIG_MAX_ANGLE_INCLINATION) 
-                                 - imu->angle[axis] + CONFIG_ANGLE_TRIM[axis];
+                                 - imu->angle[axis] + this->angle_trim[axis];
 
             int32_t PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
 
@@ -61,13 +64,13 @@ void PID::update(RC * rc, IMU * imu)
             ITerm = (ITermACC * (500 - prop) + ITermGYRO * prop) / 500;
         } 
 
-        PTerm -= (int32_t)imu->gyroADC[axis] * config_rate_p[axis] / 10 / 8; // 32 bits is needed for calculation
+        PTerm -= (int32_t)imu->gyroADC[axis] * this->rate_p[axis] / 10 / 8; // 32 bits is needed for calculation
         int32_t delta = imu->gyroADC[axis] - this->lastGyro[axis];
         this->lastGyro[axis] = imu->gyroADC[axis];
         int32_t deltaSum = this->delta1[axis] + this->delta2[axis] + delta;
         this->delta2[axis] = this->delta1[axis];
         this->delta1[axis] = delta;
-        int32_t DTerm = (deltaSum * config_rate_d[axis]) / 32;
+        int32_t DTerm = (deltaSum * this->rate_d[axis]) / 32;
         this->axisPID[axis] = PTerm + ITerm - DTerm;
     }
 
