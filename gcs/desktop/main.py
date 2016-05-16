@@ -20,7 +20,7 @@ from Tkinter import *
 from setup import Setup
 from motors import Motors
 from receiver import Receiver
-from maps import Maps
+#from maps import Maps
 from messages import Messages
 
 # GCS class runs the show =========================================================================================
@@ -60,7 +60,7 @@ class GCS:
         self.button_motors = self._add_button('Motors', self.pane2, self._motors_button_callback)
         self.button_receiver = self._add_button('Receiver', self.pane2, self._receiver_button_callback)
         self.button_messages = self._add_button('Messages', self.pane2, self._messages_button_callback)
-        self.button_maps = self._add_button('Maps', self.pane2, self._maps_button_callback, disabled=False)
+        #self.button_maps = self._add_button('Maps', self.pane2, self._maps_button_callback, disabled=False)
 
         # Prepare for adding ports as they are detected by our timer task
         self.portsvar = StringVar(self.root)
@@ -88,7 +88,7 @@ class GCS:
         self._schedule_connection_task()
 
         # Create a maps dialog
-        self.maps = Maps(self, yoffset=-30)
+        #self.maps = Maps(self, yoffset=-30)
 
         # Create a splash image
         self.splashimage = PhotoImage(file='../media/splash.png')
@@ -167,7 +167,7 @@ class GCS:
         self.motors.stop()
         self.receiver.stop()
         self.messages.stop()
-        self.maps.stop()
+        #self.maps.stop()
 
         self.parser.set_ATTITUDE_Handler(self._handle_attitude)
         self.setup.start()
@@ -200,7 +200,7 @@ class GCS:
         self.parser.set_ATTITUDE_Handler(self._handle_attitude)
         self.receiver.stop()
         self.messages.stop()
-        self.maps.stop()
+        #self.maps.stop()
         self.motors.start()
 
     def _clear(self):
@@ -215,7 +215,7 @@ class GCS:
         self.setup.stop()
         self.motors.stop()
         self.messages.stop()
-        self.maps.stop()
+        #self.maps.stop()
 
         self.receiver.start()
 
@@ -226,7 +226,7 @@ class GCS:
 
         self.setup.stop()
         self.motors.stop()
-        self.maps.stop()
+        #self.maps.stop()
         self.receiver.stop()
 
         self.messages.start()
@@ -247,7 +247,7 @@ class GCS:
             self.setup.stop()
             self.motors.stop()
 
-        self.maps.start()
+        #self.maps.start()
 
     # Callback for Connect / Disconnect button
     def _connect_callback(self):
@@ -261,7 +261,7 @@ class GCS:
             self._clear()
 
             self.setup.stop()
-            self.maps.stop()
+            #self.maps.stop()
             self.motors.stop()
             self.messages.stop()
             self.receiver.stop()
@@ -274,7 +274,7 @@ class GCS:
 
         else:
 
-            self.maps.stop()
+            #self.maps.stop()
 
             self.comms = Comms(self)
             self.comms.start()

@@ -18,6 +18,9 @@
 #define CONFIG_THR_MID_8                            50
 #define CONFIG_THR_EXPO_8                           0
 #define CONFIG_MINCHECK                             1100
+#define CONFIG_MAXCHECK                             1900
+#define CONFIG_MINTHROTTLE                          990
+#define CONFIG_MAXTHROTTLE                          2010
 
 #define PITCH_LOOKUP_LENGTH    7
 #define THROTTLE_LOOKUP_LENGTH 12

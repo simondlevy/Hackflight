@@ -53,9 +53,6 @@ typedef enum {
 #define CONFIG_MAGNETIC_DECLINATION                 0
 #define CONFIG_CALIBRATING_GYRO_CYCLES              1000
 #define CONFIG_CALIBRATING_ACC_CYCLES               400
-#define CONFIG_MAXCHECK                             1900
-#define CONFIG_MINTHROTTLE                          990
-#define CONFIG_MAXTHROTTLE                          2010
 #define CONFIG_YAW_CONTROL_DIRECTION                1   /* 1 or -1 */
 #define CONFIG_IMU_LOOPTIME_USEC                    3500
 #define CONFIG_RC_LOOPTIME_USEC                     20000
