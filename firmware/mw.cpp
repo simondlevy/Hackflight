@@ -196,7 +196,9 @@ void loop(void)
             if (accCalibrated)
                 board.led0Off();
             if (armed)
-                board.led0On();
+                board.led1On();
+            else
+                board.led1Off();
         }
 
         if (check_timed_task(calibratedAccTime, currentTime)) {
