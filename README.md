@@ -4,8 +4,8 @@ Hackflight is simple C++ firmware for inexpensive quadcopter flight controllers.
 who want to tinker with flight-control firmware, and use it to teach students about ideas like inertial measurement 
 and PID tuning.  <b>If you are in the 99% percent of users who just want to get your vehicle flying without getting
 into firmware hacking, I recommend [Cleanflight](http://cleanflight.com/) (great for getting on a 
-budget) or the [Ardupilot](http://copter.ardupilot.org/ardupilot/index.html) system (for sophisticated mission 
-planning with waypoint navigation and the like).</b>  These platforms have community-tested safety features that
+budget) or the [Ardupilot](http://copter.ardupilot.org/ardupilot/index.html) system</b> (for sophisticated mission 
+planning with waypoint navigation and the like).  These platforms have community-tested safety features that
 Hackflight lacks, which will help avoid injury and damage to your vehicle.
 
 
