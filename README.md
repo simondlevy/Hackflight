@@ -18,7 +18,7 @@ write firmware for flight controllers built from the Arduino / Teensy hardware.
 As you'll see, the code follows the Arduino design pattern of a <tt>startup</tt>
 routine that calls the <tt>init()</tt> method of a few objects (<tt>IMU</tt>,
 <tt>RC</tt>, <tt>PID</tt>, <tt>Board</tt>) and a <tt>loop</tt> routine that
-calls the <tt>udpate()</tt> method and other methods of those objects.
+calls the <tt>update()</tt> method and other methods of those objects.
 But with all the features you can now get onboard an inexpensive STM32F103
 board (barometer, magnetometer, flash RAM), there seems little point in building
 your own board, unless you're interested in hardware hacking.  So Hackflight currently
@@ -49,7 +49,13 @@ accelerometer with collective lower-left and cyclic center-down.  As usual, coll
 lower-right arms the board, and lower-left disarms it, as indicated by the red LED.
 The green LED will flash when the board is tilted by more than 25 degrees.
 
-Although Hackflight was designed to be &ldquo;headless&rdquo; (no configurator program)
+Although Hackflight was designed to be &ldquo;headless&rdquo; (no configurator program),
+it is useful to get some visual feedback on things like vehicle orientation and RC receiver
+PWM values.  So in the <tt>gcs</tt> folder you'll find a Python program (<tt>main.py</tt>)
+that allows you to connect to the board and see what's going on.  To use this program you'll
+need to install [MSPPG](https://github.com/simondlevy/MSPPG), a parser generator for the Multiwii Serial 
+Protocol (MSP) messages used by the firmware. Follow the directions in that repository to install
+MSPPG for Python.
 
 If you find Hackflight useful, please consider donating
 to the [Baseflight](https://goo.gl/3tyFhz) or 
