@@ -22,16 +22,25 @@ supports only the STM32F103 boards.  It provides abstraction (through the
 <tt>Board</tt> class) that should make it easy to use the code for other boards.
 
 Meanwhile, to try Hackflight on your board, you'll need to be running Linux on your
-desktop/laptop computer, with the [GNU ARM toolchain](https://launchpad.net/gcc-arm-embedded)
-installed, and you'll need to grab the 
-[BreezySTM32](https://github.com/simondlevy/BreezySTM32) repository.  Then edit the
-Makefile in <b>hackflight/firmware/naze</b> to reflect where you put BreezySTM32.
-In a terminal window, cd to <b>hackflight/firmware/naze</b> and type <tt>make</tt>.
-This will build the firmware in the <b>obj</b> directory.  If you've already got
-Baselfight or Cleanflight running on your board, you should then just be able
-to type <tt>make flash</tt> to flash Hackflight onto it.  If you run into trouble,
-you can short the bootloader pins and type <tt>make unbrick</tt.
+desktop/laptop computer, with the [GNU ARM
+toolchain](https://launchpad.net/gcc-arm-embedded) installed, and you'll need
+to grab the [BreezySTM32](https://github.com/simondlevy/BreezySTM32)
+repository.  Then edit the Makefile in <tt>hackflight/firmware/naze</tt> to
+reflect where you put BreezySTM32.  In a terminal window, cd to
+<tt>hackflight/firmware/naze</tt> and type <tt>make</tt>.  This will build the
+firmware binary in the <tt>obj</tt> directory.  If you've already got Baselfight or
+Cleanflight running on your board, you should then just be able to type
+<tt>make flash</tt> to flash Hackflight onto it.  If you run into trouble, you
+can short the bootloader pins and type <tt>make unbrick</tt>.
 
+Hackflight flies your quadcopter in Level (a.k.a. Stable) mode.  So the only parameters you
+should need to adjust are the PID tuning params in <tt>hackflight/firmware/board.hpp</tt>.
+That file contains two examples of settings that seem to work well (250mm quad, 130mm quad).
+As with Baseflight, you get a gyro auto-calibration sequence on startup, indicated by  steady
+green LED that turns off when the calibration is done.  You can re-calibrate
+the gyro by putting the collective (left) stick in full upper-left and the
+cyclic (right) in full center-down position.  You can calibrate the
+accelerometer with collective lower-left and cyclic center-down.
 
 If you find Hackflight useful, please consider donating
 to the [Baseflight](https://goo.gl/3tyFhz) or 
