@@ -20,7 +20,7 @@ routine that calls the <tt>init()</tt> method of a few objects (<tt>IMU</tt>,
 <tt>RC</tt>, <tt>PID</tt>, <tt>Board</tt>) and a <tt>loop</tt> routine that
 calls the <tt>udpate()</tt> method and other methods of those objects.
 But with all the features you can now get onboard an inexpensive STM32F103
-board (barometer, magnetometer, flash RAM), I can't see the point of building
+board (barometer, magnetometer, flash RAM), there seems little point in building
 your own board, unless you're interested in hardware hacking.  So Hackflight currently
 supports only the STM32F103 boards, while keeping the Arduino design principles.  
 The code provides abstraction (through the <tt>Board</tt> class) that should 
@@ -48,6 +48,8 @@ cyclic (right) in full center-down position.  You can calibrate the
 accelerometer with collective lower-left and cyclic center-down.  As usual, collective 
 lower-right arms the board, and lower-left disarms it, as indicated by the red LED.
 The green LED will flash when the board is tilted by more than 25 degrees.
+
+Although Hackflight was designed to be &ldquo;headless&rdquo; (no configurator program)
 
 If you find Hackflight useful, please consider donating
 to the [Baseflight](https://goo.gl/3tyFhz) or 
