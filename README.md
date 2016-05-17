@@ -25,7 +25,11 @@ Meanwhile, to try Hackflight on your board, you'll need to be running Linux on y
 desktop/laptop computer, and you'll need to grab the 
 [BreezySTM32](https://github.com/simondlevy/BreezySTM32) repository.  Then edit the
 Makefile in <b>hackflight/firmware/naze</b> to reflect where you put BreezySTM32.
-In a terminal window, cd to <tt>hackflight/firmware/naze</b> and type 
+In a terminal window, cd to <b>hackflight/firmware/naze</b> and type <tt>make</tt>.
+This will build the firmware in the <b>obj</b> directory.  If you've already got
+Baselfight or Cleanflight running on your board, you should then just be able
+to type <tt>make flash</tt> to flash Hackflight onto it.  If you run into trouble,
+you can short the bootloader pins and type <tt>make unbrick</tt.
 
 
 If you find Hackflight useful, please consider donating
