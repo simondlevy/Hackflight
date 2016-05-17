@@ -22,8 +22,8 @@ calls the <tt>update()</tt> method and other methods of those objects.
 But with all the features you can now get onboard an inexpensive STM32F103
 board (barometer, magnetometer, flash RAM), there seems little point in building
 your own board, unless you're interested in hardware hacking.  So Hackflight currently
-supports only the STM32F103 boards, while keeping the Arduino design principles.  
-The code provides abstraction (through the <tt>Board</tt> class) that should 
+supports only the STM32F103 boards, while keeping the Arduino design principles.  The 
+code provides abstraction (through the <tt>Board</tt> class) that should 
 make it easy to use the code for other boards.
 
 Meanwhile, to try Hackflight on your board, you'll need to be running Linux on your
