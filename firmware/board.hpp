@@ -19,12 +19,12 @@ class Board {
         uint32_t getMicros();
         void     imuInit(uint16_t *acc1G, float * gyroScale);
         void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
-        void     led0Off(void);
-        void     led0On(void);
-        void     led0Toggle(void);
-        void     led1Off(void);
-        void     led1On(void);
-        void     led1Toggle(void);
+        void     ledGreenOff(void);
+        void     ledGreenOn(void);
+        void     ledGreenToggle(void);
+        void     ledRedOff(void);
+        void     ledRedOn(void);
+        void     ledRedToggle(void);
         uint16_t readPWM(uint8_t chan);
         void     reboot(void);
         uint8_t  serialAvailableBytes(void);

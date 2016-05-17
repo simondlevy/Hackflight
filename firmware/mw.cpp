@@ -23,7 +23,7 @@ static void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
 {
     for (uint8_t r = 0; r < repeat; r++) {
         for (uint8_t i = 0; i < num; i++) {
-            board.led0Toggle();            // switch LED state
+            board.ledGreenToggle();            // switch LED state
             board.delayMilliseconds(wait);
         }
         board.delayMilliseconds(60);
@@ -66,15 +66,15 @@ void setup(void)
     board.delayMilliseconds(100);
 
     // flash the LEDs to indicate startup
-    board.led1On();
-    board.led0Off();
+    board.ledRedOn();
+    board.ledGreenOff();
     for (uint8_t i = 0; i < 10; i++) {
-        board.led1Toggle();
-        board.led0Toggle();
+        board.ledRedToggle();
+        board.ledGreenToggle();
         board.delayMilliseconds(50);
     }
-    board.led1Off();
-    board.led0Off();
+    board.ledRedOff();
+    board.ledGreenOff();
 
     // initialize our RC, IMU, mixer, and PID controller
     rc.init(&board);
@@ -191,20 +191,20 @@ void loop(void)
 
         // use LEDs to indicate calibration status
         if (calibratingA > 0 || calibratingG > 0) { 
-            board.led0Toggle();
+            board.ledGreenToggle();
         } else {
             if (accCalibrated)
-                board.led0Off();
+                board.ledGreenOff();
             if (armed)
-                board.led1On();
+                board.ledRedOn();
             else
-                board.led1Off();
+                board.ledRedOff();
         }
 
         if (check_timed_task(calibratedAccTime, currentTime)) {
             if (!haveSmallAngle) {
                 accCalibrated = false; // accelerometer not calibrated or angle too steep
-                board.led0Toggle();
+                board.ledGreenToggle();
                 update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC, currentTime);
             } else {
                 accCalibrated = true;

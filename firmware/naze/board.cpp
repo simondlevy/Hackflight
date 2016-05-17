@@ -46,32 +46,32 @@ uint32_t Board::getMicros()
     return micros();
 }
 
-void Board::led0Off(void)
+void Board::ledGreenOff(void)
 {
     digitalHi(LED0_GPIO, LED0_PIN);
 }
 
-void Board::led0On(void)
+void Board::ledGreenOn(void)
 {
     digitalLo(LED0_GPIO, LED0_PIN);
 }
 
-void Board::led0Toggle(void)
+void Board::ledGreenToggle(void)
 {
     digitalToggle(LED0_GPIO, LED0_PIN);
 }
 
-void Board::led1Off(void)
+void Board::ledRedOff(void)
 {
     digitalHi(LED1_GPIO, LED1_PIN);
 }
 
-void Board::led1On(void)
+void Board::ledRedOn(void)
 {
     digitalLo(LED1_GPIO, LED1_PIN);
 }
 
-void Board::led1Toggle(void)
+void Board::ledRedToggle(void)
 {
     digitalToggle(LED1_GPIO, LED1_PIN);
 }
