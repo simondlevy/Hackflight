@@ -7,8 +7,8 @@ measurement and PID tuning.  <b>If you are in the 99% percent of users who just
 want to get your vehicle flying without getting into firmware hacking, I
 recommend [Cleanflight](http://cleanflight.com/)</b> (great for getting started
 when you're on a budget) <b>or the [Ardupilot](http://copter.ardupilot.org/ardupilot/index.html) system</b> (for
-sophisticated mission planning with waypoint navigation and the like).  These
-platforms have community-tested safety features that Hackflight lacks, which
+sophisticated mission planning with waypoint navigation and the like).  In addition to big user communities
+and loads of great features, these platforms have safety mechanisms that Hackflight lacks, which
 will help avoid injury to you and damage to your vehicle.
 
 Hackflight derives from the Baselfight firmware (which in turn derives from
@@ -17,12 +17,13 @@ Multiwii), and currently works only on STM32F103 flight-controller boards
 write firmware for flight controllers built from the Arduino / Teensy hardware,
 But with all the features you can now get onboard an inexpensive STM32F103
 board (barometer, magnetometer, flash RAM), I can't see the point of building
-your own board, unless you're interested in hardware hacking.  So I'm currently
-supporting only the STM32F103 boards.  I've provided abstraction (through the
+your own board, unless you're interested in hardware hacking.  So Hackflight currently
+supports only the STM32F103 boards.  It provides abstraction (through the
 <tt>Board</tt> class) that should make it easy to use the code for other boards.
 
 Meanwhile, to try Hackflight on your board, you'll need to be running Linux on your
-desktop/laptop computer, and you'll need to grab the 
+desktop/laptop computer, with the [GNU ARM toolchain](https://launchpad.net/gcc-arm-embedded)
+installed, and you'll need to grab the 
 [BreezySTM32](https://github.com/simondlevy/BreezySTM32) repository.  Then edit the
 Makefile in <b>hackflight/firmware/naze</b> to reflect where you put BreezySTM32.
 In a terminal window, cd to <b>hackflight/firmware/naze</b> and type <tt>make</tt>.
