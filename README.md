@@ -11,7 +11,7 @@ sophisticated mission planning with waypoint navigation and the like).  In addit
 and loads of great features, these platforms have safety mechanisms that Hackflight lacks, which
 will help avoid injury to you and damage to your vehicle.
 
-Hackflight derives from the Baselfight firmware (which in turn derives from
+Hackflight derives from the Baseflight firmware (which in turn derives from
 Multiwii), and currently works only on STM32F103 flight-controller boards
 (Naze32 and clones like Flip32, MultiRC, etc.) I had originally planned to
 write firmware for flight controllers built from the Arduino / Teensy hardware,
@@ -28,7 +28,7 @@ to grab the [BreezySTM32](https://github.com/simondlevy/BreezySTM32)
 repository.  Then edit the Makefile in <tt>hackflight/firmware/naze</tt> to
 reflect where you put BreezySTM32.  In a terminal window, cd to
 <tt>hackflight/firmware/naze</tt> and type <tt>make</tt>.  This will build the
-firmware binary in the <tt>obj</tt> directory.  If you've already got Baselfight or
+firmware binary in the <tt>obj</tt> directory.  If you've already got Baseflight or
 Cleanflight running on your board, you should then just be able to type
 <tt>make flash</tt> to flash Hackflight onto it.  If you run into trouble, you
 can short the bootloader pins and type <tt>make unbrick</tt>.
@@ -42,6 +42,7 @@ the gyro by putting the collective (left) stick in full upper-left and the
 cyclic (right) in full center-down position.  You can calibrate the
 accelerometer with collective lower-left and cyclic center-down.  As usual, collective 
 lower-right arms the board, and lower-left disarms it, as indicated by the red LED.
+The green LED will flash when the board is tilted by more than 25 degrees.
 
 If you find Hackflight useful, please consider donating
 to the [Baseflight](https://goo.gl/3tyFhz) or 
