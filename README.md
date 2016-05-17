@@ -14,12 +14,17 @@ will help avoid injury to you and damage to your vehicle.
 Hackflight derives from the Baseflight firmware (which in turn derives from
 Multiwii), and currently works only on STM32F103 flight-controller boards
 (Naze32 and clones like Flip32, MultiRC, etc.) I had originally planned to
-write firmware for flight controllers built from the Arduino / Teensy hardware,
+write firmware for flight controllers built from the Arduino / Teensy hardware.
+As you'll see, the code follows the Arduino design pattern of a <tt>startup</tt>
+routine that calls the <tt>init()</tt> method of a few objects (<tt>IMU</tt>,
+<tt>RC</tt>, <tt>PID</tt>, <tt>Board</tt>) and a <tt>loop</tt> routine that
+calls the <tt>udpate()</tt> method and other methods of those objects.
 But with all the features you can now get onboard an inexpensive STM32F103
 board (barometer, magnetometer, flash RAM), I can't see the point of building
 your own board, unless you're interested in hardware hacking.  So Hackflight currently
-supports only the STM32F103 boards.  It provides abstraction (through the
-<tt>Board</tt> class) that should make it easy to use the code for other boards.
+supports only the STM32F103 boards, while keeping the Arduino design principles.  
+The code provides abstraction (through the <tt>Board</tt> class) that should 
+make it easy to use the code for other boards.
 
 Meanwhile, to try Hackflight on your board, you'll need to be running Linux on your
 desktop/laptop computer, with the [GNU ARM
