@@ -40,7 +40,8 @@ As with Baseflight, you get a gyro auto-calibration sequence on startup, indicat
 green LED that turns off when the calibration is done.  You can re-calibrate
 the gyro by putting the collective (left) stick in full upper-left and the
 cyclic (right) in full center-down position.  You can calibrate the
-accelerometer with collective lower-left and cyclic center-down.
+accelerometer with collective lower-left and cyclic center-down.  As usual, collective 
+lower-right arms the board, and lower-left disarms it, as indicated by the red LED.
 
 If you find Hackflight useful, please consider donating
 to the [Baseflight](https://goo.gl/3tyFhz) or 
