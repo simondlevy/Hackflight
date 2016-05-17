@@ -63,10 +63,7 @@ class GCS:
         self.root.geometry('%dx%d+%d+%d' % (DISPLAY_WIDTH, DISPLAY_HEIGHT, left, top))
         self.frame = Frame(self.root)
 
-        if 'nt' == os.name:
-            self.root.wm_iconbitmap(bitmap = "media/icon.ico")
-        else:
-            self.root.wm_iconbitmap(bitmap = "@media/icon.xbm")
+        self.root.wm_iconbitmap(bitmap = "@media/icon.xbm")
         
         self.root.tk.call('wm', 'iconphoto', self.root._w, PhotoImage('icon.png'))
 
