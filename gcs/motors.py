@@ -83,10 +83,12 @@ class Motors(Dialog):
 
     def stop(self):
 
+        self.warning_motors.deselect()
         self.hide(self.warning_motors)
         self.hide(self.label_motors)
         self.hide(self.scale)
         self._hide_four_motors()
+        self._turn_off_active()
 
     def _show_motors_image(self, motors_label):
 
@@ -174,7 +176,9 @@ class Motors(Dialog):
             self._show_motors_image(self.label_motors)
 
             # Turn of any spinning motor
-            if self.active_motor > 0:
+            self._turn_off_active()
 
-                self._send_motor_message(0)
+    def _turn_off_active(self):
+        if self.active_motor > 0:
+            self._send_motor_message(0)
 

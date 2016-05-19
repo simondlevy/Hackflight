@@ -271,17 +271,17 @@ class GCS:
 
         if self.connected:
 
-            if not self.comms is None:
-
-                self.comms.stop()
-
-            self._clear()
-
             self.setup.stop()
             #self.maps.stop()
             self.motors.stop()
             self.messages.stop()
             self.receiver.stop()
+
+            if not self.comms is None:
+
+                self.comms.stop()
+
+            self._clear()
 
             self._disable_buttons()
 
