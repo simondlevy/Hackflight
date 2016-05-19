@@ -67,6 +67,8 @@ class GCS:
         
         self.root.tk.call('wm', 'iconphoto', self.root._w, PhotoImage('icon.png'))
 
+        self.root.protocol('WM_DELETE_WINDOW', self.quit)
+
         # Create panes for two rows of widgets
         self.pane1 = self._add_pane()
         self.pane2 = self._add_pane()
@@ -124,6 +126,11 @@ class GCS:
 
         # A hack to support display in Setup dialog
         self.active_axis = 0
+
+
+    def quit(self):
+        self.motors.stop()
+        self.root.destroy()
 
 
     def hide(self, widget):
