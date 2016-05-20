@@ -17,7 +17,9 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __arm__
 extern "C" {
+#endif
 
 #include <math.h>
 
@@ -311,4 +313,6 @@ void IMU::update(bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
         this->angle[YAW] += 360;
 }
 
+#ifdef __arm__
 } // extern "C"
+#endif

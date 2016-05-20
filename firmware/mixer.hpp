@@ -18,7 +18,9 @@
 #define CONFIG_MINCOMMAND     1000
 #define CONFIG_YAW_DIRECTION     1
 
+#ifdef __arm__
 extern "C" {
+#endif
 
     class Mixer {
 
@@ -37,4 +39,6 @@ extern "C" {
             void update(bool armed);
     };
 
-}
+#ifdef __arm__
+} // extern "C"
+#endif

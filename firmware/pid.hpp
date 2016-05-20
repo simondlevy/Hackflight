@@ -17,7 +17,9 @@
 
 #define CONFIG_MAX_ANGLE_INCLINATION                500 /* 50 degrees */
 
+#ifdef __arm__
 extern "C" {
+#endif
 
     class PID {
 
@@ -67,4 +69,6 @@ extern "C" {
             void resetIntegral(void);
     }; 
 
+#ifdef __arm__
 } // extern "C"
+#endif

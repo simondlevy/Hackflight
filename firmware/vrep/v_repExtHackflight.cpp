@@ -34,7 +34,10 @@
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
+// From firmware
 #include "../board.hpp"
+extern void setup(void);
+extern void loop(void);
 
 #define JOY_DEV "/dev/input/js0"
 
@@ -169,6 +172,8 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
     D.pushOutData(CScriptFunctionDataItem(success));
     D.writeDataToStack(cb->stackID);
+
+    setup();
 }
 
 // simExtHackflight_stop --------------------------------------------------------------------------------
@@ -340,6 +345,8 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
             }
         }
     }
+
+    loop();
 
     simSetIntegerParameter(sim_intparam_error_report_mode,errorModeSaved); // restore previous settings
     return(retVal);

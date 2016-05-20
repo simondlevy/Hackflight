@@ -17,7 +17,9 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __arm__
 extern "C" {
+#endif
 
 #include "mw.hpp"
 
@@ -132,4 +134,6 @@ bool RC::throttleIsDown(void)
     return this->data[THROTTLE] < CONFIG_MINCHECK;
 }
 
+#ifdef __arm__
 } // extern "C"
+#endif

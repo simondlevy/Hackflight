@@ -17,7 +17,9 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __arm__
 extern "C" {
+#endif
 
 #include "mw.hpp"
 
@@ -243,4 +245,6 @@ void loop(void)
 
 } // loop()
 
+#ifdef __arm__
 } // extern "C"
+#endif

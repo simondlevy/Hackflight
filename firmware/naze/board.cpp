@@ -17,7 +17,9 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __arm__
 extern "C" {
+#endif
 
 #include <breezystm32.h>
 #include <math.h>
@@ -125,4 +127,6 @@ void Board::writeMotor(uint8_t index, uint16_t value)
     pwmWriteMotor(index, value);
 }
 
+#ifdef __arm__
 } // extern "C"
+#endif

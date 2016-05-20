@@ -23,7 +23,9 @@
 #define CONFIG_GYRO_CMPFM_FACTOR  250  
 #define CONFIG_MORON_THRESHOLD     32
 
+#ifdef __arm__
 extern "C" {
+#endif
 
     class IMU {
         
@@ -45,4 +47,6 @@ extern "C" {
             void update(bool armed, uint16_t & calibratingA, uint16_t & calibratingG);
     };
 
-}
+#ifdef __arm__
+} // extern "C"
+#endif

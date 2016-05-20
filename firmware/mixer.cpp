@@ -17,7 +17,9 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __arm__
 extern "C" {
+#endif
 
 #include "mw.hpp"
 
@@ -83,4 +85,6 @@ void Mixer::update(bool armed)
         this->_board->writeMotor(i, motors[i]);
 }
 
+#ifdef __arm__
 } // extern "C"
+#endif

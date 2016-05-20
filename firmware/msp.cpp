@@ -17,7 +17,9 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __arm__
 extern "C" {
+#endif
 
 #include <strings.h> // for bzero
 
@@ -207,4 +209,6 @@ void MSP::update(bool armed)
     }
 }
 
+#ifdef __arm__
 } // extern "C"
+#endif

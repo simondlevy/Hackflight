@@ -17,7 +17,9 @@
 
 #pragma once
 
+#ifdef __arm__
 extern "C" {
+#endif
 
     class Board {
 
@@ -52,4 +54,6 @@ extern "C" {
     }; // class Board
 
 
+#ifdef __arm__
 } // extern "C"
+#endif

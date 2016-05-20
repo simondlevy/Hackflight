@@ -44,7 +44,9 @@
 #define PITCH_LOOKUP_LENGTH    7
 #define THROTTLE_LOOKUP_LENGTH 12
 
+#ifdef __arm__
 extern "C" {
+#endif
 
     class RC {
 
@@ -76,4 +78,7 @@ extern "C" {
 
             bool throttleIsDown(void);
     };
+
+#ifdef __arm__
 }
+#endif

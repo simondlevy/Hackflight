@@ -17,7 +17,9 @@
 
 #define CONFIG_REBOOT_CHARACTER 'R'
 
+#ifdef __arm__
 extern "C" {
+#endif
 
     static const int INBUF_SIZE = 128;
 
@@ -70,4 +72,6 @@ extern "C" {
 
     }; // class MSP
 
+#ifdef __arm__
 } // extern "C"
+#endif

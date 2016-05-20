@@ -17,7 +17,9 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __arm__
 extern "C" {
+#endif
 
 #include "mw.hpp"
 
@@ -103,4 +105,6 @@ void PID::resetIntegral(void)
     this->errorAngleI[PITCH] = 0;
 }
 
+#ifdef __arm__
 } // extern "C"
+#endif
