@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdint.h>
 #include <sys/ioctl.h>
 #include <linux/joystick.h>
 #include <unistd.h>
@@ -32,6 +33,8 @@
 #include "v_repExtHackflight.hpp"
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
+
+#include "../board.hpp"
 
 #define JOY_DEV "/dev/input/js0"
 
@@ -341,3 +344,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     simSetIntegerParameter(sim_intparam_error_report_mode,errorModeSaved); // restore previous settings
     return(retVal);
 }
+
+// Board implementation --------------------------------------------------------------
+
+
