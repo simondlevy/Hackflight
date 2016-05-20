@@ -30,10 +30,10 @@ ALL = libv_repExtHackflight.so
 all: $(ALL)
 
 libv_repExtHackflight.so: v_repExtHackflight.cpp v_repExtHackflight.hpp
-	g++ $(CFLAGS) -c v_repExtHackflight.cpp -o v_repExtHackflight.o
-	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp -o scriptFunctionData.o
-	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp -o scriptFunctionDataItem.o
-	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp -o v_repLib.o
+	g++ $(CFLAGS) -c v_repExtHackflight.cpp 
+	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
+	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
+	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp
 	g++ scriptFunctionData.o scriptFunctionDataItem.o v_repExtHackflight.o v_repLib.o \
 		-o libv_repExtHackflight.$(EXT) -lpthread -ldl -shared 	
 
