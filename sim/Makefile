@@ -29,7 +29,7 @@ ALL = libv_repExtHackflight.so
 
 all: $(ALL)
 
-libv_repExtHackflight.so: v_repExtHackflight.cpp v_repExtHackflight.hpp
+libv_repExtHackflight.so: v_repExtHackflight.cpp v_repExtHackflight.hpp ../firmware/*.cpp ../firmware/*.hpp
 	g++ $(CFLAGS) -c v_repExtHackflight.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
