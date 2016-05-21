@@ -284,6 +284,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     void* retVal=NULL;
 
+    /*
     struct js_event js;
 
     if (joy_fd > 0) {
@@ -295,14 +296,14 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
             //fflush(stdout);
         }
     }
-
-    float force = .002;
+*/
+    float force = 1;
     float torque = 0;
     simAddForceAndTorque(quadcopter.prop1handle, &force, &torque);
     simAddForceAndTorque(quadcopter.prop2handle, &force, &torque);
     simAddForceAndTorque(quadcopter.prop3handle, &force, &torque);
     simAddForceAndTorque(quadcopter.prop4handle, &force, &torque);
-
+/*
     static int prevMillis;
     int currMillis = getMilliCount();
     if (prevMillis)
@@ -319,8 +320,8 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
         if (simGetObjectOrientation(quadcopter.handle, -1, eulerAngles) != -1) {
 
             // Convert Euler angles to pitch and roll
-            float pitch, roll;
-            rotate(eulerAngles[0], eulerAngles[1], eulerAngles[2], pitch, roll);
+            //float pitch, roll;
+            ////rotate(eulerAngles[0], eulerAngles[1], eulerAngles[2], pitch, roll);
             //printf("%f %f\n", pitch, roll);
         }
         
@@ -349,6 +350,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     loop();
 
     simSetIntegerParameter(sim_intparam_error_report_mode,errorModeSaved); // restore previous settings
+    */
     return(retVal);
 }
 
