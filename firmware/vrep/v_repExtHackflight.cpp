@@ -25,6 +25,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <time.h>
 #include <sys/ioctl.h>
 #include <linux/joystick.h>
 #include <unistd.h>
@@ -61,6 +62,8 @@ struct sQuadcopter
 static sQuadcopter quadcopter;
 
 static int nextHackflightHandle;
+
+static struct timespec start_time;
 
 // --------------------------------------------------------------------------------------
 // simExtHackflight_create
@@ -138,30 +141,31 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     CScriptFunctionData D;
     bool success=false;
 
+    // Initialize nanosecond timer
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
+
+    // Initialize joystick
     joy_fd = open( JOY_DEV , O_RDONLY);
-
-    if(joy_fd > 0) {
-
+    if(joy_fd > 0) 
         fcntl(joy_fd, F_SETFL, O_NONBLOCK);
 
-        // -1 because the last argument is optional
-        if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0]-1,LUA_START_COMMAND)) {
-            std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
-            float duration=inData->at(1).floatData[0];
-            bool leaveDirectly=false;
-            if (inData->size()>2)
-                leaveDirectly=inData->at(2).boolData[0];
-            if (duration<=0.0f)
-                leaveDirectly=true;
-            quadcopter.duration=duration;
-            if (!leaveDirectly)
-                cb->waitUntilZero=1; // the effect of this is that when we leave the callback, the Lua script 
-                                     // gets control
-            // back only when this value turns zero. This allows for "blocking" functions 
-            success=true;
-        }
-
+    // -1 because the last argument is optional
+    if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0]-1,LUA_START_COMMAND)) {
+        std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
+        float duration=inData->at(1).floatData[0];
+        bool leaveDirectly=false;
+        if (inData->size()>2)
+            leaveDirectly=inData->at(2).boolData[0];
+        if (duration<=0.0f)
+            leaveDirectly=true;
+        quadcopter.duration=duration;
+        if (!leaveDirectly)
+            cb->waitUntilZero=1; // the effect of this is that when we leave the callback, the Lua script 
+        // gets control
+        // back only when this value turns zero. This allows for "blocking" functions 
+        success=true;
     }
+
 
     D.pushOutData(CScriptFunctionDataItem(success));
     D.writeDataToStack(cb->stackID);
@@ -286,20 +290,13 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     simAddForceAndTorque(quadcopter.prop3handle, &force, &torque);
     simAddForceAndTorque(quadcopter.prop4handle, &force, &torque);
 
+    struct timespec end_time;
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_time);
+    long diffInNanos = end_time.tv_nsec - start_time.tv_nsec;
+    printf("%ld\n", diffInNanos);
+
     if (message==sim_message_eventcallback_modulehandle)
     {
-        float eulerAngles[3];
-
-        // Get Euler angles of quadcopter.
-        // -1 input means = relative to global cooredinates; -1 return = failure
-        if (simGetObjectOrientation(quadcopter.handle, -1, eulerAngles) != -1) {
-
-            // Convert Euler angles to pitch and roll
-            float pitch, roll;
-            rotate(eulerAngles[0], eulerAngles[1], eulerAngles[2], pitch, roll);
-            printf("%f %f\n", pitch, roll);
-        }
-        
         // is the command also meant for Hackflight?
         if ( (customData==NULL)||(std::string("Hackflight").compare((char*)customData)==0) ) 
         {
@@ -337,6 +334,17 @@ void Board::imuInit(uint16_t *acc1G, float * gyroScale)
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
+    float eulerAngles[3];
+
+    // Get Euler angles of quadcopter.
+    // -1 input means = relative to global cooredinates; -1 return = failure
+    if (simGetObjectOrientation(quadcopter.handle, -1, eulerAngles) != -1) {
+
+        // Convert Euler angles to pitch and roll
+        float pitch, roll;
+        rotate(eulerAngles[0], eulerAngles[1], eulerAngles[2], pitch, roll);
+        printf("%f %f\n", pitch, roll);
+    }
 }
 
 void Board::init(void)
