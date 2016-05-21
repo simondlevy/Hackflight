@@ -50,8 +50,8 @@ void RC::init(Board * board)
             y = CONFIG_THR_MID_8;
         lookupThrottleRC[i] = 10 * CONFIG_THR_MID_8 + tmp * (100 - CONFIG_THR_EXPO_8 + 
                 (int32_t)CONFIG_THR_EXPO_8 * (tmp * tmp) / (y * y)) / 10;
-        lookupThrottleRC[i] = CONFIG_MINTHROTTLE + (int32_t)(CONFIG_MAXTHROTTLE - CONFIG_MINTHROTTLE) * 
-            lookupThrottleRC[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
+        lookupThrottleRC[i] = CONFIG_MINPWM + (int32_t)(CONFIG_MAXPWM - CONFIG_MINPWM) * 
+            lookupThrottleRC[i] / 1000; // [MINPWM;MAXPWM]
     }
 }
 
@@ -118,7 +118,7 @@ void RC::computeExpo(void)
     tmp = (uint32_t)(tmp - CONFIG_MINCHECK) * 1000 / (2000 - CONFIG_MINCHECK);       // [MINCHECK;2000] -> [0;1000]
     tmp2 = tmp / 100;
     this->command[THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
-            lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
+            lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [MINPWM;MAXPWM]
 
 } // computeExpo
 

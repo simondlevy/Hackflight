@@ -66,14 +66,14 @@ void Mixer::update(bool armed)
 
     for (uint8_t i = 0; i < 4; i++) {
 
-        if (maxMotor > CONFIG_MAXTHROTTLE)     
+        if (maxMotor > CONFIG_MAXPWM)     
             // this is a way to still have good gyro corrections if at least one motor reaches its max.
-            motors[i] -= maxMotor - CONFIG_MAXTHROTTLE;
+            motors[i] -= maxMotor - CONFIG_MAXPWM;
 
-        motors[i] = constrain(motors[i], CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
+        motors[i] = constrain(motors[i], CONFIG_MINPWM, CONFIG_MAXPWM);
 
         if (this->_rc->throttleIsDown()) {
-            motors[i] = CONFIG_MINTHROTTLE;
+            motors[i] = CONFIG_MINPWM;
         } 
 
         if (!armed) {

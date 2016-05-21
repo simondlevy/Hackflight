@@ -33,13 +33,14 @@
 
 #define CONFIG_RC_EXPO_8                            65
 #define CONFIG_RC_RATE_8                            90
-#define CONFIG_MIDRC                                1490
 #define CONFIG_THR_MID_8                            50
 #define CONFIG_THR_EXPO_8                           0
 #define CONFIG_MINCHECK                             1100
 #define CONFIG_MAXCHECK                             1900
-#define CONFIG_MINTHROTTLE                          990
-#define CONFIG_MAXTHROTTLE                          2010
+
+#define CONFIG_MIDRC                                1490
+#define CONFIG_MINPWM                                990
+#define CONFIG_MAXPWM                                2010
 
 #define PITCH_LOOKUP_LENGTH    7
 #define THROTTLE_LOOKUP_LENGTH 12
@@ -60,6 +61,7 @@ extern "C" {
             int32_t averageIndex;
             int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
             int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
+            int16_t midrc;
 
         public:
 
