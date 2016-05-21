@@ -357,10 +357,11 @@ uint32_t Board::getMicros()
 {
     struct timespec end_time;
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_time);
-    long elapsedSec = end_time.tv_sec - start_time.tv_sec;
-    printf("%ld\n", elapsedSec);
+    uint32_t elapsedUsec = 1000000 * (end_time.tv_sec - this->start_time.tv_sec) + 
+        (end_time.tv_nsec - this->start_time.tv_nsec) / 1000;
+    printf("%d\n", elapsedUsec);
 
-    return 0;
+    return elapsedUsec;
 }
 
 void Board::ledGreenOff(void)
