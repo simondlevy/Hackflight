@@ -344,6 +344,10 @@ void Board::init(void)
     this->joy_fd = open( JOY_DEV , O_RDONLY);
     if(this->joy_fd > 0) 
         fcntl(this->joy_fd, F_SETFL, O_NONBLOCK);
+
+    // Set initial fake PWM values
+    for (int k=0; k<CONFIG_RC_CHANS; ++k)
+        this->pwm[k] = (CONFIG_PWM_MIN + CONFIG_PWM_MAX) / 2;
 }
 
 void Board::checkReboot(bool pendReboot)
@@ -392,12 +396,14 @@ uint16_t Board::readPWM(uint8_t chan)
 {
     struct js_event js;
 
+    int map[5] = {2, 0, 1, 3, 4};
+
     if (joy_fd > 0) {
 
         read(joy_fd, &js, sizeof(struct js_event));
 
-        if (js.type & ~JS_EVENT_INIT) {
-            printf("axis %d %d\n", js.number, js.value);
+        if ((js.type & ~JS_EVENT_INIT) && js.number < 6) {
+            printf("axis %d %d => chan %d %d\n", js.number, js.value, 0, 0);
             fflush(stdout);
         }
     }
