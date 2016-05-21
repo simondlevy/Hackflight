@@ -330,6 +330,9 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
+    // XXX use MPU6050 settings for now
+    acc1G = 4096;
+    gyroScale = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
 }
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
