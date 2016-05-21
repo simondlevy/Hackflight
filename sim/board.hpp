@@ -27,6 +27,9 @@ extern "C" {
 
             // add stuff as needed here
 
+            struct timespec start_time;
+            int joy_fd;
+
         public:
 
             // your implementation should support these methods

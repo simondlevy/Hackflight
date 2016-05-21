@@ -308,10 +308,6 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
 // Board implementation --------------------------------------------------------------
 
-// XXX these should be private instance variables
-static struct timespec start_time;
-static int joy_fd;
-
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     // XXX use MPU6050 settings for now
@@ -337,16 +333,16 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 void Board::init(void)
 {
     // Initialize nanosecond timer
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &this->start_time);
 
     // Close joystick if open
-    if (joy_fd > 0)
-        close(joy_fd);
+    if (this->joy_fd > 0)
+        close(this->joy_fd);
 
     // Initialize joystick
-    joy_fd = open( JOY_DEV , O_RDONLY);
-    if(joy_fd > 0) 
-        fcntl(joy_fd, F_SETFL, O_NONBLOCK);
+    this->joy_fd = open( JOY_DEV , O_RDONLY);
+    if(this->joy_fd > 0) 
+        fcntl(this->joy_fd, F_SETFL, O_NONBLOCK);
 }
 
 void Board::checkReboot(bool pendReboot)
