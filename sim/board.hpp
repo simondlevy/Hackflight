@@ -25,14 +25,11 @@ extern "C" {
 
         private:
 
-            // add stuff as needed here
-
             struct timespec start_time;
             int joy_fd;
+            int pwm[RC_CHANS];
 
         public:
-
-            // your implementation should support these methods
 
             void     init(void);
 

@@ -55,7 +55,7 @@ extern "C" {
 
             Board * _board;
 
-            int16_t dataAverage[8][4];
+            int16_t dataAverage[RC_CHANS][4];
             uint8_t commandDelay;                               // cycles since most recent movement
             int32_t averageIndex;
             int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL

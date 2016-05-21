@@ -302,6 +302,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 // Board implementation --------------------------------------------------------------
 
 #include "board.hpp"
+#include "../firmware/rc.hpp"
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
