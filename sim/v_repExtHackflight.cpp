@@ -356,12 +356,11 @@ void Board::delayMilliseconds(uint32_t msec)
 uint32_t Board::getMicros()
 {
     struct timespec end_time;
+    
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_time);
-    uint32_t elapsedUsec = 1000000 * (end_time.tv_sec - this->start_time.tv_sec) + 
-        (end_time.tv_nsec - this->start_time.tv_nsec) / 1000;
-    printf("%d\n", elapsedUsec);
 
-    return elapsedUsec;
+    return 1000000 * (end_time.tv_sec - this->start_time.tv_sec) + 
+        (end_time.tv_nsec - this->start_time.tv_nsec) / 1000;
 }
 
 void Board::ledGreenOff(void)
