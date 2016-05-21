@@ -36,7 +36,7 @@ extern "C" {
             void     checkReboot(bool pendReboot);
             void     delayMilliseconds(uint32_t msec);
             uint32_t getMicros();
-            void     imuInit(uint16_t *acc1G, float * gyroScale);
+            void     imuInit(uint16_t & acc1G, float & gyroScale);
             void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
             void     ledGreenOff(void);
             void     ledGreenOn(void);

@@ -292,8 +292,8 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     struct timespec end_time;
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_time);
-    long diffInNanos = end_time.tv_nsec - start_time.tv_nsec;
-    printf("%ld\n", diffInNanos);
+    long elapsedSec = end_time.tv_sec - start_time.tv_sec;
+    printf("%ld\n", elapsedSec);
 
     if (message==sim_message_eventcallback_modulehandle)
     {

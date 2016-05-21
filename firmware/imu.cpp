@@ -129,7 +129,7 @@ void IMU::init(Board * board)
 {
     this->_board = board;
 
-    this->_board->imuInit(&this->acc1G, &this->gyroScale);
+    this->_board->imuInit(this->acc1G, this->gyroScale);
 
     // calculate RC time constant used in the accZ lpf    
     this->fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); 
