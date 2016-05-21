@@ -63,7 +63,6 @@ static sQuadcopter quadcopter;
 
 static int nextHackflightHandle;
 
-static struct timespec start_time;
 
 // --------------------------------------------------------------------------------------
 // simExtHackflight_create
@@ -134,20 +133,10 @@ static const int inArgs_START[]={
     sim_script_arg_bool,0,
 };
 
-static int joy_fd;
-
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
     bool success=false;
-
-    // Initialize nanosecond timer
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
-
-    // Initialize joystick
-    joy_fd = open( JOY_DEV , O_RDONLY);
-    if(joy_fd > 0) 
-        fcntl(joy_fd, F_SETFL, O_NONBLOCK);
 
     // -1 because the last argument is optional
     if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0]-1,LUA_START_COMMAND)) {
@@ -184,10 +173,6 @@ static const int inArgs_STOP[]={
 
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
-
-    if (joy_fd > 0)
-        close(joy_fd);
-
     CScriptFunctionData D;
     bool success=false;
     if (D.readDataFromStack(cb->stackID,inArgs_STOP,inArgs_STOP[0],LUA_STOP_COMMAND))
@@ -290,11 +275,6 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     simAddForceAndTorque(quadcopter.prop3handle, &force, &torque);
     simAddForceAndTorque(quadcopter.prop4handle, &force, &torque);
 
-    struct timespec end_time;
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_time);
-    long elapsedSec = end_time.tv_sec - start_time.tv_sec;
-    printf("%ld\n", elapsedSec);
-
     if (message==sim_message_eventcallback_modulehandle)
     {
         // is the command also meant for Hackflight?
@@ -319,7 +299,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
         }
     }
 
-    //loop();
+    loop();
 
     simSetIntegerParameter(sim_intparam_error_report_mode,errorModeSaved); // restore previous settings
 
@@ -327,6 +307,10 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 }
 
 // Board implementation --------------------------------------------------------------
+
+// XXX these should be private instance variables
+static struct timespec start_time;
+static int joy_fd;
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
@@ -352,6 +336,17 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 
 void Board::init(void)
 {
+    // Initialize nanosecond timer
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
+
+    // Close joystick if open
+    if (joy_fd > 0)
+        close(joy_fd);
+
+    // Initialize joystick
+    joy_fd = open( JOY_DEV , O_RDONLY);
+    if(joy_fd > 0) 
+        fcntl(joy_fd, F_SETFL, O_NONBLOCK);
 }
 
 void Board::checkReboot(bool pendReboot)
@@ -364,6 +359,11 @@ void Board::delayMilliseconds(uint32_t msec)
 
 uint32_t Board::getMicros()
 {
+    struct timespec end_time;
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_time);
+    long elapsedSec = end_time.tv_sec - start_time.tv_sec;
+    printf("%ld\n", elapsedSec);
+
     return 0;
 }
 
