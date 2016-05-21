@@ -302,7 +302,12 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 // Board implementation --------------------------------------------------------------
 
 #include "../firmware/pwm.hpp"
-#include "board.hpp"
+#include "../firmware/board.hpp"
+
+// V-REP memory model seems to prevent us from making these instance variables of a Board object
+static int pwm[8];
+static int joyfd;
+static struct timespec start_time;
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
@@ -334,20 +339,21 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 void Board::init(void)
 {
     // Initialize nanosecond timer
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &this->start_time);
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
 
     // Close joystick if open
-    if (this->joy_fd > 0)
-        close(this->joy_fd);
+    if (joyfd > 0)
+        close(joyfd);
 
     // Initialize joystick
-    this->joy_fd = open( JOY_DEV , O_RDONLY);
-    if(this->joy_fd > 0) 
-        fcntl(this->joy_fd, F_SETFL, O_NONBLOCK);
+    joyfd = open( JOY_DEV , O_RDONLY);
+    if(joyfd > 0) 
+        fcntl(joyfd, F_SETFL, O_NONBLOCK);
 
     // Set initial fake PWM values
-    for (int k=0; k<CONFIG_RC_CHANS; ++k)
-        this->pwm[k] = (CONFIG_PWM_MIN + CONFIG_PWM_MAX) / 2;
+    for (int k=0; k<CONFIG_RC_CHANS; ++k)  {
+        pwm[k] = (CONFIG_PWM_MIN + CONFIG_PWM_MAX) / 2;
+    }
 }
 
 void Board::checkReboot(bool pendReboot)
@@ -369,8 +375,8 @@ uint32_t Board::getMicros()
     
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_time);
 
-    return 1000000 * (end_time.tv_sec - this->start_time.tv_sec) + 
-        (end_time.tv_nsec - this->start_time.tv_nsec) / 1000;
+    return 1000000 * (end_time.tv_sec - start_time.tv_sec) + 
+        (end_time.tv_nsec - start_time.tv_nsec) / 1000;
 }
 
 void Board::ledGreenOff(void)
@@ -405,37 +411,38 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    if (this->joy_fd > 0) {
+    if (joyfd > 0) {
 
         struct js_event js;
-        read(this->joy_fd, &js, sizeof(struct js_event));
+        read(joyfd, &js, sizeof(struct js_event));
 
         if (js.type & ~JS_EVENT_INIT) {
-            int chan = 0;
+            int fakechan = 0;
             switch (js.number) {
                 case 0:
-                    chan = 3;
+                    fakechan = 3;
                     break;
                 case 1:
-                    chan = 1;
+                    fakechan = 1;
                     break;
                 case 2:
-                    chan = 2;
+                    fakechan = 2;
                     break;
                 case 3:
-                    chan = 4;
+                    fakechan = 4;
                     break;
                 case 5:
-                    chan = 5;
+                    fakechan = 5;
                     break;
             }
-            if (chan > 0)
-                printf("%d %d\n", chan, 
-                        CONFIG_PWM_MIN + (int)((js.value + 32767)/65534. * (CONFIG_PWM_MAX-CONFIG_PWM_MIN)));
+
+            if (fakechan > 0)
+                pwm[fakechan-1] = 
+                        CONFIG_PWM_MIN + (int)((js.value + 32767)/65534. * (CONFIG_PWM_MAX-CONFIG_PWM_MIN));
         }
     }
 
-    return 0;
+    return pwm[chan];
 }
 
 void Board::reboot(void)
