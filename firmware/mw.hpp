@@ -23,8 +23,6 @@
 
 #include "printf.h"
 
-#define RC_CHANS    (8)
-
 #include "board.hpp"
 #include "imu.hpp"
 #include "rc.hpp"

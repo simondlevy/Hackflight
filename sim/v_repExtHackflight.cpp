@@ -35,7 +35,6 @@
 #include "v_repLib.h"
 
 // From firmware
-#include "board.hpp"
 extern void setup(void);
 extern void loop(void);
 
@@ -251,12 +250,6 @@ VREP_DLLEXPORT void v_repEnd()
     unloadVrepLibrary(vrepLib); // release the library
 }
 
-static void rotate(float x, float y, float theta, float & pitch, float & roll)
-{
-    pitch =  cos(theta) * x + sin(theta) * y;
-    roll  = -sin(theta) * x + cos(theta) * y;
-}
-
 VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customData,int* replyData)
 {   
     // This is called quite often. Just watch out for messages/events you want to handle
@@ -308,11 +301,19 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
 // Board implementation --------------------------------------------------------------
 
+#include "board.hpp"
+
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     // XXX use MPU6050 settings for now
     acc1G = 4096;
     gyroScale = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
+}
+
+static void rotate(float x, float y, float theta, float & pitch, float & roll)
+{
+    pitch =  cos(theta) * x + sin(theta) * y;
+    roll  = -sin(theta) * x + cos(theta) * y;
 }
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
@@ -326,7 +327,6 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
         // Convert Euler angles to pitch and roll
         float pitch, roll;
         rotate(eulerAngles[0], eulerAngles[1], eulerAngles[2], pitch, roll);
-        printf("%f %f\n", pitch, roll);
     }
 }
 
@@ -389,7 +389,6 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    /*
     struct js_event js;
 
     if (joy_fd > 0) {
@@ -397,11 +396,10 @@ uint16_t Board::readPWM(uint8_t chan)
         read(joy_fd, &js, sizeof(struct js_event));
 
         if (js.type & ~JS_EVENT_INIT) {
-            //printf("axis %d %d\n", js.number, js.value);
-            //fflush(stdout);
+            printf("axis %d %d\n", js.number, js.value);
+            fflush(stdout);
         }
     }
-    */
 
     return 0;
 }

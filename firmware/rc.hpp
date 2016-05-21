@@ -43,6 +43,7 @@
 
 #define PITCH_LOOKUP_LENGTH    7
 #define THROTTLE_LOOKUP_LENGTH 12
+#define RC_CHANS               8
 
 #ifdef __arm__
 extern "C" {
