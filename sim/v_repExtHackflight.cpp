@@ -35,7 +35,7 @@
 #include "v_repLib.h"
 
 // From firmware
-#include "../firmware/board.hpp"
+#include "board.hpp"
 extern void setup(void);
 extern void loop(void);
 
