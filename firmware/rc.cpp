@@ -29,6 +29,8 @@ void RC::init(Board * board)
 {
     this->_board = board;
 
+    this->midrc = (CONFIG_PWM_MAX + CONFIG_PWM_MIN) / 2;
+
     bzero (this->dataAverage, 8*4*sizeof(int16_t));
 
     this->commandDelay = 0;
@@ -50,8 +52,8 @@ void RC::init(Board * board)
             y = CONFIG_THR_MID_8;
         lookupThrottleRC[i] = 10 * CONFIG_THR_MID_8 + tmp * (100 - CONFIG_THR_EXPO_8 + 
                 (int32_t)CONFIG_THR_EXPO_8 * (tmp * tmp) / (y * y)) / 10;
-        lookupThrottleRC[i] = CONFIG_MINPWM + (int32_t)(CONFIG_MAXPWM - CONFIG_MINPWM) * 
-            lookupThrottleRC[i] / 1000; // [MINPWM;MAXPWM]
+        lookupThrottleRC[i] = CONFIG_PWM_MIN + (int32_t)(CONFIG_PWM_MAX - CONFIG_PWM_MIN) * 
+            lookupThrottleRC[i] / 1000; // [PWM_MIN;PWM_MAX]
     }
 }
 
@@ -101,7 +103,7 @@ void RC::computeExpo(void)
 
     for (uint8_t axis = 0; axis < 3; axis++) {
 
-        tmp = min(abs(this->data[axis] - CONFIG_MIDRC), 500);
+        tmp = min(abs(this->data[axis] - this->midrc), 500);
 
         if (axis != 2) {        // ROLL & PITCH
             tmp2 = tmp / 100;
@@ -110,7 +112,7 @@ void RC::computeExpo(void)
             this->command[axis] = tmp * -CONFIG_YAW_CONTROL_DIRECTION;
         }
 
-        if (this->data[axis] < CONFIG_MIDRC)
+        if (this->data[axis] < this->midrc)
             this->command[axis] = -this->command[axis];
     }
 
@@ -118,7 +120,7 @@ void RC::computeExpo(void)
     tmp = (uint32_t)(tmp - CONFIG_MINCHECK) * 1000 / (2000 - CONFIG_MINCHECK);       // [MINCHECK;2000] -> [0;1000]
     tmp2 = tmp / 100;
     this->command[THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
-            lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [MINPWM;MAXPWM]
+            lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [PWM_MIN;PWM_MAX]
 
 } // computeExpo
 

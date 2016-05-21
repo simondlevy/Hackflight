@@ -38,9 +38,8 @@
 #define CONFIG_MINCHECK                             1100
 #define CONFIG_MAXCHECK                             1900
 
-#define CONFIG_MIDRC                                1490
-#define CONFIG_MINPWM                                990
-#define CONFIG_MAXPWM                                2010
+#define CONFIG_PWM_MIN                               990
+#define CONFIG_PWM_MAX                               2010
 
 #define PITCH_LOOKUP_LENGTH    7
 #define THROTTLE_LOOKUP_LENGTH 12
