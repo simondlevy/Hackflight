@@ -25,7 +25,7 @@ extern "C" {
 
         private:
 
-            /* For 130mm quad 
+            /* For 130mm quad */
             static const uint8_t CONFIG_LEVEL_P          = 40;
             static const uint8_t CONFIG_LEVEL_I          = 2;
 
@@ -35,9 +35,8 @@ extern "C" {
 
             static const uint8_t CONFIG_YAW_P            = 40;
             static const uint8_t CONFIG_YAW_I            = 20;
-            */
 
-            /* For 250mm quad */
+            /* For 250mm quad 
             static const uint8_t CONFIG_LEVEL_P          = 90;
             static const uint8_t CONFIG_LEVEL_I          = 10;
 
@@ -47,6 +46,7 @@ extern "C" {
 
             static const uint8_t CONFIG_YAW_P            = 85;
             static const uint8_t CONFIG_YAW_I            = 45;
+            */
 
             uint8_t rate_p[3];
             uint8_t rate_i[3];

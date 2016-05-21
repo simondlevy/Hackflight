@@ -37,7 +37,7 @@ void RC::init(Board * board)
     this->sticks = 0;
     this->averageIndex = 0;
 
-    for (uint8_t i = 0; i < RC_CHANS; i++)
+    for (uint8_t i = 0; i < CONFIG_RC_CHANS; i++)
         this->data[i] = 1502;
 
     for (uint8_t i = 0; i < PITCH_LOOKUP_LENGTH; i++)

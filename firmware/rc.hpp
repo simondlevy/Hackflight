@@ -1,7 +1,7 @@
 /*
    rc.hpp : RC receiver class header
 
-   Adapted from https://github.com/multiwii/baseflight/blob/master/src/mw.c
+   Adapted from https://github.com/multiwii/baseflight/blob/master/src/mw.h
 
    This file is part of Hackflight.
 
@@ -16,6 +16,9 @@
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+// Defines number of RC channels, and min/max PWM
+#include "pwm.hpp"
 
 // For logical combinations of stick positions (low, center, high)
 #define ROL_LO (1 << (2 * ROLL))
@@ -38,12 +41,8 @@
 #define CONFIG_MINCHECK                             1100
 #define CONFIG_MAXCHECK                             1900
 
-#define CONFIG_PWM_MIN                               990
-#define CONFIG_PWM_MAX                               2010
-
 #define PITCH_LOOKUP_LENGTH    7
 #define THROTTLE_LOOKUP_LENGTH 12
-#define RC_CHANS               8
 
 #ifdef __arm__
 extern "C" {
@@ -55,7 +54,7 @@ extern "C" {
 
             Board * _board;
 
-            int16_t dataAverage[RC_CHANS][4];
+            int16_t dataAverage[CONFIG_RC_CHANS][4];
             uint8_t commandDelay;                               // cycles since most recent movement
             int32_t averageIndex;
             int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
@@ -68,7 +67,7 @@ extern "C" {
             void init(Board * board);
 
             int16_t command[4];
-            int16_t data[RC_CHANS];
+            int16_t data[CONFIG_RC_CHANS];
 
             void update(void);
 
