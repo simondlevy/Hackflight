@@ -394,17 +394,32 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    struct js_event js;
-
-    int map[5] = {2, 0, 1, 3, 4};
-
     if (joy_fd > 0) {
 
+        struct js_event js;
         read(joy_fd, &js, sizeof(struct js_event));
 
-        if ((js.type & ~JS_EVENT_INIT) && js.number < 6) {
-            printf("axis %d %d => chan %d %d\n", js.number, js.value, 0, 0);
-            fflush(stdout);
+        if (js.type & ~JS_EVENT_INIT) {
+            int chan = 0;
+            switch (js.number) {
+                case 0:
+                    chan = 3;
+                    break;
+                case 1:
+                    chan = 1;
+                    break;
+                case 2:
+                    chan = 2;
+                    break;
+                case 3:
+                    chan = 4;
+                    break;
+                case 5:
+                    chan = 5;
+                    break;
+            }
+            if (chan > 0)
+                printf("%d\n", chan);
         }
     }
 
