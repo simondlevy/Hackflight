@@ -28,7 +28,6 @@
 #include <sys/ioctl.h>
 #include <linux/joystick.h>
 #include <unistd.h>
-#include <sys/timeb.h>
 
 #include "v_repExtHackflight.hpp"
 #include "scriptFunctionData.h"
@@ -48,12 +47,6 @@ extern void loop(void);
 
 static LIBRARY vrepLib;
 
-static int getMilliCount(){
-    timeb tb;
-    ftime(&tb);
-    int nCount = tb.millitm + (tb.time & 0xfffff) * 1000;
-    return nCount;
-}
 struct sQuadcopter
 {
     int handle;
@@ -276,8 +269,10 @@ static void rotate(float x, float y, float theta, float & pitch, float & roll)
 }
 
 VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customData,int* replyData)
-{ // This is called quite often. Just watch out for messages/events you want to handle
+{   
+    // This is called quite often. Just watch out for messages/events you want to handle
     // This function should not generate any error messages:
+
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
     simSetIntegerParameter(sim_intparam_error_report_mode,sim_api_errormessage_ignore);
@@ -304,13 +299,6 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     simAddForceAndTorque(quadcopter.prop3handle, &force, &torque);
     simAddForceAndTorque(quadcopter.prop4handle, &force, &torque);
 /*
-    static int prevMillis;
-    int currMillis = getMilliCount();
-    if (prevMillis)
-        printf("%d\n", currMillis-prevMillis);
-    prevMillis = currMillis;
-    fflush(stdout);
-
     if (message==sim_message_eventcallback_modulehandle)
     {
         float eulerAngles[3];
