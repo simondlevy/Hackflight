@@ -352,10 +352,15 @@ void Board::init(void)
 
 void Board::checkReboot(bool pendReboot)
 {
+
 }
 
 void Board::delayMilliseconds(uint32_t msec)
 {
+    uint32_t startMicros = this->getMicros();
+
+    while ((this->getMicros() - startMicros)/1000 > msec)
+        ;
 }
 
 uint32_t Board::getMicros()
@@ -370,32 +375,32 @@ uint32_t Board::getMicros()
 
 void Board::ledGreenOff(void)
 {
-    printf("GREEN OFF\n");
+    //printf("GREEN OFF\n");
 }
 
 void Board::ledGreenOn(void)
 {
-    printf("GREEN ON\n");
+    //printf("GREEN ON\n");
 }
 
 void Board::ledGreenToggle(void)
 {
-    printf("GREEN TOGGLE\n");
+    //printf("GREEN TOGGLE\n");
 }
 
 void Board::ledRedOff(void)
 {
-    printf("RED OFF\n");
+    //printf("RED OFF\n");
 }
 
 void Board::ledRedOn(void)
 {
-    printf("RED ON\n");
+    //printf("RED ON\n");
 }
 
 void Board::ledRedToggle(void)
 {
-    printf("RED TOGGLE\n");
+    //printf("RED TOGGLE\n");
 }
 
 uint16_t Board::readPWM(uint8_t chan)
@@ -424,8 +429,9 @@ uint16_t Board::readPWM(uint8_t chan)
                     chan = 5;
                     break;
             }
-            //if (chan > 0)
-            //    printf("%d\n", chan);
+            if (chan > 0)
+                printf("%d %d\n", chan, 
+                        CONFIG_PWM_MIN + (int)((js.value + 32767)/65534. * (CONFIG_PWM_MAX-CONFIG_PWM_MIN)));
         }
     }
 
