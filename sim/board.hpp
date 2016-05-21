@@ -27,7 +27,7 @@ extern "C" {
 
             struct timespec start_time;
             int joy_fd;
-            int pwm[RC_CHANS];
+            int pwm[CONFIG_RC_CHANS];
 
         public:
 
