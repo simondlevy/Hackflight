@@ -35,7 +35,7 @@
 #include "v_repLib.h"
 
 // From firmware
-#include "../board.hpp"
+#include "../firmware/board.hpp"
 extern void setup(void);
 extern void loop(void);
 
@@ -328,7 +328,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
 // Board implementation --------------------------------------------------------------
 
-void Board::imuInit(uint16_t *acc1G, float * gyroScale)
+void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
 }
 
