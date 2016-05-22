@@ -60,10 +60,6 @@ struct sQuadcopter
 
 static sQuadcopter quadcopter;
 
-static int nextHackflightHandle;
-
-
-
 // simExtHackflight_create -------------------------------------------------------------------------
 
 #define LUA_CREATE_COMMAND "simExtHackflight_create"
@@ -81,10 +77,8 @@ static const int inArgs_CREATE[]={
 void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
-    int handle=-1;
     if (D.readDataFromStack(cb->stackID,inArgs_CREATE,inArgs_CREATE[0],LUA_CREATE_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
-        handle=nextHackflightHandle++;
         quadcopter.handle      = inData->at(0).int32Data[0];
         quadcopter.prop1handle = inData->at(1).int32Data[0];
         quadcopter.prop2handle = inData->at(2).int32Data[0];
