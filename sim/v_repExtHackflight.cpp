@@ -220,7 +220,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
     // Register 4 new Lua commands:
 
     simRegisterScriptCallbackFunction(strConCat(LUA_CREATE_COMMAND,"@",PLUGIN_NAME),
-            strConCat("number quadcopterHandle=",LUA_CREATE_COMMAND,
+            strConCat("number success=",LUA_CREATE_COMMAND,
                 "(number prop1, number prop2, number prop3, number prop4)"),
             LUA_CREATE_CALLBACK);
 
