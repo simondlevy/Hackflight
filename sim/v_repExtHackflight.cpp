@@ -316,24 +316,15 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
     gyroScale = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
 }
 
-static void rotate(float x, float y, float theta, float & pitch, float & roll)
-{
-    pitch =  cos(theta) * x + sin(theta) * y;
-    roll  = -sin(theta) * x + cos(theta) * y;
-}
-
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
-    float eulerAngles[3];
+    /*
+    result,force=simReadForceSensor(sensor)
 
-    // Get Euler angles of quadcopter.
-    // -1 input means = relative to global cooredinates; -1 return = failure
-    if (simGetObjectOrientation(quadcopter.handle, -1, eulerAngles) != -1) {
+    if (result>0) then
 
-        // Convert Euler angles to pitch and roll
-        float pitch, roll;
-        rotate(eulerAngles[0], eulerAngles[1], eulerAngles[2], pitch, roll);
-    }
+        accel={force[1]/mass,force[2]/mass,force[3]/mass}
+    */
 }
 
 void Board::init(void)
