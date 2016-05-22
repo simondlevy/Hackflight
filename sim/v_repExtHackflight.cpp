@@ -54,7 +54,6 @@ struct sQuadcopter
     int prop2handle;
     int prop3handle;
     int prop4handle;
-    float duration;
     char* waitUntilZero;
 };
 
@@ -85,7 +84,6 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
         quadcopter.prop3handle = inData->at(3).int32Data[0];
         quadcopter.prop4handle = inData->at(4).int32Data[0];
         quadcopter.waitUntilZero=NULL;
-        quadcopter.duration=0.0f;
     }
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
@@ -121,13 +119,9 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     // -1 because the last argument is optional
     if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0]-1,LUA_START_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
-        float duration=inData->at(1).floatData[0];
         bool leaveDirectly=false;
         if (inData->size()>2)
             leaveDirectly=inData->at(2).boolData[0];
-        if (duration<=0.0f)
-            leaveDirectly=true;
-        quadcopter.duration=duration;
         if (!leaveDirectly)
             cb->waitUntilZero=1; // the effect of this is that when we leave the callback, the Lua script 
     }
@@ -198,7 +192,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 
     simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME),
             strConCat("boolean success=",
-                LUA_START_COMMAND,"(number quadcopterHandle,number duration,boolean returnDirectly=false)"),
+                LUA_START_COMMAND,"(number quadcopterHandle,number boolean returnDirectly=false)"),
             LUA_START_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME),
@@ -237,20 +231,6 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
         {
             float dt=simGetSimulationTimeStep();
 
-            if (quadcopter.duration>0.0f)
-            { // movement mode
-
-                quadcopter.duration-=dt;
-            }
-
-            else
-            { // stopped mode
-                if (quadcopter.waitUntilZero!=NULL)
-                {
-                    quadcopter.waitUntilZero[0]=0;
-                    quadcopter.waitUntilZero=NULL;
-                }
-            }
         }
     }
 
