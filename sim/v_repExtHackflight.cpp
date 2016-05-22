@@ -192,7 +192,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 
     simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME),
             strConCat("boolean success=",
-                LUA_START_COMMAND,"(number quadcopterHandle,number boolean returnDirectly=false)"),
+                LUA_START_COMMAND,"(number quadcopterHandle,number duration,boolean returnDirectly=false)"),
             LUA_START_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME),
@@ -229,8 +229,6 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
         // is the command also meant for Hackflight?
         if ( (customData==NULL)||(std::string("Hackflight").compare((char*)customData)==0) ) 
         {
-            float dt=simGetSimulationTimeStep();
-
         }
     }
 
