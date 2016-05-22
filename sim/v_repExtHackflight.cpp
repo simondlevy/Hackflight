@@ -105,25 +105,11 @@ void LUA_DESTROY_CALLBACK(SScriptCallBack* cb)
 
 #define LUA_START_COMMAND "simExtHackflight_start"
 
-static const int inArgs_START[]={
-    1,
-    sim_script_arg_bool,0,
-};
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
-
-    // -1 because the last argument is optional
-    if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0]-1,LUA_START_COMMAND)) {
-        std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
-        bool leaveDirectly=false;
-        leaveDirectly=inData->at(0).boolData[0];
-        if (!leaveDirectly)
-    }
-
     cb->waitUntilZero=1; // the effect of this is that when we leave the callback, the Lua script 
-
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 
