@@ -201,7 +201,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     void* retVal=NULL;
 
-    float force = 1;
+    float force = 0;
     float torque = 0;
     simAddForceAndTorque(quadcopter.prop1handle, &force, &torque);
     simAddForceAndTorque(quadcopter.prop2handle, &force, &torque);
@@ -247,11 +247,9 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 
     if (simReadForceSensor(quadcopter.accelHandle, force, torque) != -1) {
         for (int k=0; k<3; ++k) {
-            printf("%f ", force[k]);
-            accADC[k] = 0;
+            accADC[k] = (int)(409600 * force[k]);
             gyroADC[k] = 0;
         }
-        printf("\n");
     }
 }
 
