@@ -225,16 +225,16 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
             LUA_CREATE_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_DESTROY_COMMAND,"@",PLUGIN_NAME),
-            strConCat("boolean result=",LUA_DESTROY_COMMAND,"(number quadcopterHandle)"),
+            strConCat("boolean success=",LUA_DESTROY_COMMAND,"(number quadcopterHandle)"),
             LUA_DESTROY_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME),
-            strConCat("boolean result=",
+            strConCat("boolean success=",
                 LUA_START_COMMAND,"(number quadcopterHandle,number duration,boolean returnDirectly=false)"),
             LUA_START_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME),
-            strConCat("boolean result=",LUA_STOP_COMMAND,"(number quadcopterHandle)"),LUA_STOP_CALLBACK);
+            strConCat("boolean success=",LUA_STOP_COMMAND,"(number quadcopterHandle)"),LUA_STOP_CALLBACK);
 
     return(8); // return the version number of this plugin (can be queried with simGetModuleName)
 }
