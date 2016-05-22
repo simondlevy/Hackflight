@@ -19,6 +19,8 @@
 
 #ifdef __arm__
 extern "C" {
+#else
+#include <stdio.h>
 #endif
 
 #include <math.h>
@@ -168,6 +170,8 @@ void IMU::update(bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
     previousT = currentT;
 
     this->_board->imuRead(accADC, this->gyroADC);
+
+    printf("%4d %4d %4d\n", accADC[0], accADC[1], accADC[2]);
 
     if (calibratingA > 0) {
 

@@ -19,6 +19,8 @@
 
 #ifdef __arm__
 extern "C" {
+#else
+#include <stdio.h>
 #endif
 
 #include "mw.hpp"
