@@ -50,6 +50,7 @@ static LIBRARY vrepLib;
 struct sQuadcopter
 {
     int handle;
+    int accelHandle;
     int prop1handle;
     int prop2handle;
     int prop3handle;
@@ -65,9 +66,10 @@ static sQuadcopter quadcopter;
 
 // Five handles: quadcopter + four propellers
 static const int inArgs_CREATE[]={
-    5,
-    sim_script_arg_int32,0,
-    sim_script_arg_int32,0,
+    6,
+    sim_script_arg_int32,0, // quadcopter handle
+    sim_script_arg_int32,0, // accelerometer handle
+    sim_script_arg_int32,0, // propeller handers ...
     sim_script_arg_int32,0,
     sim_script_arg_int32,0,
     sim_script_arg_int32,0,
@@ -79,10 +81,11 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
     if (D.readDataFromStack(cb->stackID,inArgs_CREATE,inArgs_CREATE[0],LUA_CREATE_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
         quadcopter.handle      = inData->at(0).int32Data[0];
-        quadcopter.prop1handle = inData->at(1).int32Data[0];
-        quadcopter.prop2handle = inData->at(2).int32Data[0];
-        quadcopter.prop3handle = inData->at(3).int32Data[0];
-        quadcopter.prop4handle = inData->at(4).int32Data[0];
+        quadcopter.accelHandle = inData->at(2).int32Data[0];
+        quadcopter.prop1handle = inData->at(2).int32Data[0];
+        quadcopter.prop2handle = inData->at(3).int32Data[0];
+        quadcopter.prop3handle = inData->at(4).int32Data[0];
+        quadcopter.prop4handle = inData->at(5).int32Data[0];
         quadcopter.waitUntilZero=NULL;
     }
     D.pushOutData(CScriptFunctionDataItem(true)); // success
