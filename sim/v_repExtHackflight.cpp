@@ -120,10 +120,9 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
         bool leaveDirectly=false;
         leaveDirectly=inData->at(0).boolData[0];
         if (!leaveDirectly)
-            cb->waitUntilZero=1; // the effect of this is that when we leave the callback, the Lua script 
     }
 
-    printf("**** %d\n", cb->waitUntilZero);
+    cb->waitUntilZero=1; // the effect of this is that when we leave the callback, the Lua script 
 
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
