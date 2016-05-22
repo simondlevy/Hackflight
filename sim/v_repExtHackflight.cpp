@@ -244,12 +244,14 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
     float force[3];
     float torque[3];
-    if (simReadForceSensor(quadcopter.accelHandle, force, torque) != -1)
-        ;//printf("%f %f %f\n", force[0], force[1], force[2]);
 
-    for (int k=0; k<3; ++k) {
-        accADC[k] = 0;
-        gyroADC[k] = 0;
+    if (simReadForceSensor(quadcopter.accelHandle, force, torque) != -1) {
+        for (int k=0; k<3; ++k) {
+            printf("%f ", force[k]);
+            accADC[k] = 0;
+            gyroADC[k] = 0;
+        }
+        printf("\n");
     }
 }
 
