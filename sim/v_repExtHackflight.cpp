@@ -197,7 +197,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
             LUA_CREATE_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_DESTROY_COMMAND,"@",PLUGIN_NAME),
-            strConCat("boolean success=",LUA_DESTROY_COMMAND,"(number quadcopterHandle)"),
+            strConCat("boolean success=",LUA_DESTROY_COMMAND,"()"),
             LUA_DESTROY_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME),
