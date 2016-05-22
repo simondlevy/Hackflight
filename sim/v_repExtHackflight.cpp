@@ -63,9 +63,9 @@ static sQuadcopter quadcopter;
 static int nextHackflightHandle;
 
 
-// --------------------------------------------------------------------------------------
-// simExtHackflight_create
-// --------------------------------------------------------------------------------------
+
+// simExtHackflight_create -------------------------------------------------------------------------
+
 #define LUA_CREATE_COMMAND "simExtHackflight_create"
 
 // Five handles: quadcopter + four propellers
@@ -93,7 +93,7 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
         quadcopter.waitUntilZero=NULL;
         quadcopter.duration=0.0f;
     }
-    D.pushOutData(CScriptFunctionDataItem(handle));
+    D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 }
 
