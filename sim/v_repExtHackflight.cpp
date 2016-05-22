@@ -80,7 +80,7 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
     if (D.readDataFromStack(cb->stackID,inArgs_CREATE,inArgs_CREATE[0],LUA_CREATE_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
         quadcopter.handle      = inData->at(0).int32Data[0];
-        quadcopter.accelHandle = inData->at(2).int32Data[0];
+        quadcopter.accelHandle = inData->at(1).int32Data[0];
         quadcopter.prop1handle = inData->at(2).int32Data[0];
         quadcopter.prop2handle = inData->at(3).int32Data[0];
         quadcopter.prop3handle = inData->at(4).int32Data[0];
@@ -242,11 +242,11 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
-    /*
-    result,force=simReadForceSensor(sensor)
-    if (result>0) then
-        accel={force[1]/mass,force[2]/mass,force[3]/mass}
-        */
+    float force[3];
+    float torque[3];
+    printf("*** %d\n", quadcopter.accelHandle);
+    if (simReadForceSensor(quadcopter.accelHandle, force, torque) != -1)
+        printf("%f %f %f\n", force[0], force[1], force[2]);
 }
 
 void Board::init(void)
