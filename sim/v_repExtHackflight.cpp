@@ -101,10 +101,22 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
 
 #define LUA_DESTROY_COMMAND "simExtHackflight_destroy"
 
+static const int inArgs_DESTROY[]={
+    1,
+    sim_script_arg_int32,0,
+};
+
 void LUA_DESTROY_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
-    D.pushOutData(CScriptFunctionDataItem(true));
+    bool success=false;
+    if (D.readDataFromStack(cb->stackID,inArgs_DESTROY,inArgs_DESTROY[0],LUA_DESTROY_COMMAND))
+    {
+        if (quadcopter.waitUntilZero!=NULL)
+            quadcopter.waitUntilZero[0]=0; // free the blocked thread
+        success=true;
+    }
+    D.pushOutData(CScriptFunctionDataItem(success));
     D.writeDataToStack(cb->stackID);
 }
 
@@ -113,10 +125,37 @@ void LUA_DESTROY_CALLBACK(SScriptCallBack* cb)
 
 #define LUA_START_COMMAND "simExtHackflight_start"
 
+static const int inArgs_START[]={
+    3,
+    sim_script_arg_int32,0,
+    sim_script_arg_float,0,
+    sim_script_arg_bool,0,
+};
+
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
-    D.pushOutData(CScriptFunctionDataItem(true));
+    bool success=false;
+
+    // -1 because the last argument is optional
+    if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0]-1,LUA_START_COMMAND)) {
+        std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
+        float duration=inData->at(1).floatData[0];
+        bool leaveDirectly=false;
+        if (inData->size()>2)
+            leaveDirectly=inData->at(2).boolData[0];
+        if (duration<=0.0f)
+            leaveDirectly=true;
+        quadcopter.duration=duration;
+        if (!leaveDirectly)
+            cb->waitUntilZero=1; // the effect of this is that when we leave the callback, the Lua script 
+        // gets control
+        // back only when this value turns zero. This allows for "blocking" functions 
+        success=true;
+    }
+
+
+    D.pushOutData(CScriptFunctionDataItem(success));
     D.writeDataToStack(cb->stackID);
 
     setup();
@@ -126,10 +165,26 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
 #define LUA_STOP_COMMAND "simExtHackflight_stop"
 
+static const int inArgs_STOP[]={
+    1,
+    sim_script_arg_int32,0,
+};
+
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
-    D.pushOutData(CScriptFunctionDataItem(true)); // success
+    bool success=false;
+    if (D.readDataFromStack(cb->stackID,inArgs_STOP,inArgs_STOP[0],LUA_STOP_COMMAND))
+    {
+        if (quadcopter.waitUntilZero!=NULL)
+        {
+            quadcopter.waitUntilZero[0]=0; // free the blocked thread
+            quadcopter.waitUntilZero=NULL;
+        }
+        quadcopter.duration=0.0f;
+        success=true;
+    }
+    D.pushOutData(CScriptFunctionDataItem(success));
     D.writeDataToStack(cb->stackID);
 }
 
@@ -261,15 +316,24 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
     gyroScale = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
 }
 
+static void rotate(float x, float y, float theta, float & pitch, float & roll)
+{
+    pitch =  cos(theta) * x + sin(theta) * y;
+    roll  = -sin(theta) * x + cos(theta) * y;
+}
+
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
-    /*
-    result,force=simReadForceSensor(sensor)
+    float eulerAngles[3];
 
-    if (result>0) then
+    // Get Euler angles of quadcopter.
+    // -1 input means = relative to global cooredinates; -1 return = failure
+    if (simGetObjectOrientation(quadcopter.handle, -1, eulerAngles) != -1) {
 
-        accel={force[1]/mass,force[2]/mass,force[3]/mass}
-    */
+        // Convert Euler angles to pitch and roll
+        float pitch, roll;
+        rotate(eulerAngles[0], eulerAngles[1], eulerAngles[2], pitch, roll);
+    }
 }
 
 void Board::init(void)
