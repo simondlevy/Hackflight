@@ -117,7 +117,6 @@ static const int inArgs_START[]={
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
-    bool success=false;
 
     // -1 because the last argument is optional
     if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0]-1,LUA_START_COMMAND)) {
@@ -131,13 +130,10 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
         quadcopter.duration=duration;
         if (!leaveDirectly)
             cb->waitUntilZero=1; // the effect of this is that when we leave the callback, the Lua script 
-        // gets control
-        // back only when this value turns zero. This allows for "blocking" functions 
-        success=true;
     }
 
 
-    D.pushOutData(CScriptFunctionDataItem(success));
+    D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 
     setup();
