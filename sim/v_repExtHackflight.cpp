@@ -47,7 +47,7 @@ extern void loop(void);
 
 static LIBRARY vrepLib;
 
-struct sQuadcopter
+struct Quadcopter
 {
     int handle;
     int accelHandle;
@@ -57,7 +57,7 @@ struct sQuadcopter
     int prop4handle;
 };
 
-static sQuadcopter quadcopter;
+static Quadcopter quadcopter;
 
 // simExtHackflight_create -------------------------------------------------------------------------
 
