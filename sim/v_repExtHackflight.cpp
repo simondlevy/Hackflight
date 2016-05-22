@@ -55,7 +55,6 @@ struct sQuadcopter
     int prop2handle;
     int prop3handle;
     int prop4handle;
-    char * waitUntilZero;
 };
 
 static sQuadcopter quadcopter;
@@ -86,7 +85,6 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
         quadcopter.prop2handle = inData->at(3).int32Data[0];
         quadcopter.prop3handle = inData->at(4).int32Data[0];
         quadcopter.prop4handle = inData->at(5).int32Data[0];
-        quadcopter.waitUntilZero=NULL;
     }
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
