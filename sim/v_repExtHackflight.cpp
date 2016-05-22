@@ -51,7 +51,6 @@ struct Quadcopter
 {
     int handle;
     int accelHandle;
-    int gyroHandle;
     int prop1handle;
     int prop2handle;
     int prop3handle;
@@ -66,10 +65,9 @@ static Quadcopter quadcopter;
 
 // Five handles: quadcopter + four propellers
 static const int inArgs_CREATE[]={
-    7,
+    6,
     sim_script_arg_int32,0, // quadcopter handle
     sim_script_arg_int32,0, // accelerometer handle
-    sim_script_arg_int32,0, // gyroscope handle
     sim_script_arg_int32,0, // propeller 1 handle
     sim_script_arg_int32,0, // propeller 2 handle
     sim_script_arg_int32,0, // propeller 3 handle
@@ -83,11 +81,10 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
         quadcopter.handle      = inData->at(0).int32Data[0];
         quadcopter.accelHandle = inData->at(1).int32Data[0];
-        quadcopter.gyroHandle  = inData->at(2).int32Data[0];
-        quadcopter.prop1handle = inData->at(3).int32Data[0];
-        quadcopter.prop2handle = inData->at(4).int32Data[0];
-        quadcopter.prop3handle = inData->at(5).int32Data[0];
-        quadcopter.prop4handle = inData->at(6).int32Data[0];
+        quadcopter.prop1handle = inData->at(2).int32Data[0];
+        quadcopter.prop2handle = inData->at(3).int32Data[0];
+        quadcopter.prop3handle = inData->at(4).int32Data[0];
+        quadcopter.prop4handle = inData->at(5).int32Data[0];
     }
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
@@ -171,7 +168,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 
     simRegisterScriptCallbackFunction(strConCat(LUA_CREATE_COMMAND,"@",PLUGIN_NAME),
             strConCat("number success=",LUA_CREATE_COMMAND,
-                "(number quadcopter, number prop1, number prop2, number prop3, number prop4)"),
+                "(number quadcopter, number accel, number prop1, number prop2, number prop3, number prop4)"),
             LUA_CREATE_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_DESTROY_COMMAND,"@",PLUGIN_NAME),
@@ -204,7 +201,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     void* retVal=NULL;
 
-    float force = 0;
+    float force  = 1;
     float torque = 0;
     simAddForceAndTorque(quadcopter.prop1handle, &force, &torque);
     simAddForceAndTorque(quadcopter.prop2handle, &force, &torque);
