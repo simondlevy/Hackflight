@@ -206,7 +206,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
             LUA_START_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME),
-            strConCat("boolean success=",LUA_STOP_COMMAND,"(number quadcopterHandle)"),LUA_STOP_CALLBACK);
+            strConCat("boolean success=",LUA_STOP_COMMAND,"()"),LUA_STOP_CALLBACK);
 
     return(8); // return the version number of this plugin (can be queried with simGetModuleName)
 }
