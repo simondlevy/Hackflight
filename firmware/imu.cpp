@@ -171,7 +171,7 @@ void IMU::update(bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
 
     this->_board->imuRead(accADC, this->gyroADC);
 
-    //printf("%4d %4d %4d\n", gyroADC[0], gyroADC[1], gyroADC[2]);
+    printf("%4d %4d %4d\n", accADC[0], accADC[1], accADC[2]);
 
     if (calibratingA > 0) {
 
