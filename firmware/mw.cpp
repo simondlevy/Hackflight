@@ -197,7 +197,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC, currentTime)) {
 
-        imu.update(armed, calibratingA, calibratingG);
+        imu.update(currentTime, armed, calibratingA, calibratingG);
 
         haveSmallAngle = abs(imu.angle[0]) < CONFIG_SMALL_ANGLE && abs(imu.angle[1]) < CONFIG_SMALL_ANGLE;
 

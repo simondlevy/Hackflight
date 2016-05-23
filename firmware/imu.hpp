@@ -44,7 +44,7 @@ extern "C" {
 
             void init(Board * board);
 
-            void update(bool armed, uint16_t & calibratingA, uint16_t & calibratingG);
+            void update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG);
     };
 
 #ifdef __arm__

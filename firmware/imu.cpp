@@ -141,7 +141,7 @@ void IMU::init(Board * board)
     this->gyroADC[2] = 0;
 }
 
-void IMU::update(bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
+void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
 {
     static float    accLPF[3];
     static int32_t  accZoffset;
@@ -154,20 +154,19 @@ void IMU::update(bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
     static float    EstG[3];
     static float    EstN[3] = { 1.0f, 0.0f, 0.0f };
     static int16_t  gyroZero[3];
-    static uint32_t previousT;
+    static uint32_t previousTime;
 
     int32_t accMag = 0;
     float dT = 0;
     float rpy[3];
     float accel_ned[3];
-    uint32_t currentT = this->_board->getMicros();
     float deltaGyroAngle[3];
-    uint32_t deltaT = currentT - previousT;
+    uint32_t deltaT = currentTime - previousTime;
     float scale = deltaT * this->gyroScale;
     int16_t  accADC[3];
     float anglerad[3];
 
-    previousT = currentT;
+    previousTime = currentTime;
 
     this->_board->imuRead(accADC, this->gyroADC);
 
