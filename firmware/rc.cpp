@@ -79,20 +79,20 @@ void RC::update(void)
     // check stick positions, updating command delay
     uint8_t stTmp = 0;
     for (uint8_t i = 0; i < 4; i++) {
-        //printf("%d ", this->data[i]);
+        //printf("chan %d=%d: %d %d\t", i+1, this->data[i], this->data[i] > CONFIG_MINCHECK,this->data[i] < CONFIG_MAXCHECK);
         stTmp >>= 2;
         if (this->data[i] > CONFIG_MINCHECK)
             stTmp |= 0x80;  // check for MIN
         if (this->data[i] < CONFIG_MAXCHECK)
             stTmp |= 0x40;  // check for MAX
     }
-    //printf("\n");
     if (stTmp == this->sticks) {
         if (this->commandDelay < 250)
             this->commandDelay++;
     } else
         this->commandDelay = 0;
     this->sticks = stTmp;
+    //printf(" | %d (%d) \n", this->sticks, THR_LO + YAW_HI + PIT_CE + ROL_CE);
 }
 
 bool RC::changed(void)

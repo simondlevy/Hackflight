@@ -234,26 +234,26 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
-    // Use simulation time to mock up gyro from Euler angles
+    // Use simulation time to mock up gyro from vehicle's Euler angles
     float curr_time_sec = simGetSimulationTime();
     static float prev_time_sec;
     static float prev_angles[3];
     float angles[3];
-    if (prev_time_sec) {
-        simGetObjectOrientation(quadcopter.handle, -1, angles);
-        float dt_sec = curr_time_sec - prev_time_sec;
-        for (int k=0; k<3; ++k)
-            gyroADC[k] = (int16_t)(4096 * (angles[k] - prev_angles[k]) / M_PI / dt_sec);
-    }
+    static int count; // ignore startup transient
+    simGetObjectOrientation(quadcopter.handle, -1, angles);
+    float dt_sec = curr_time_sec - prev_time_sec;
+    for (int k=0; k<3; ++k)
+        gyroADC[k] = (count++ < 10) ? 0 : (int16_t)(4096 * (angles[k] - prev_angles[k]) / M_PI / dt_sec);
     prev_time_sec = curr_time_sec;
     for (int k=0; k<3; ++k)
         prev_angles[k] = angles[k];
 
+    // Read accelerometer angles from force sensor
     float accelForce[3];
     float accelTorque[3];
     if (simReadForceSensor(quadcopter.accelHandle, accelForce, accelTorque) != -1) {
         for (int k=0; k<3; ++k) {
-            accADC[k] = (int)(4096 * 100 * accelForce[k]);
+            accADC[k] = 0;//(int)(4096 * 100 * accelForce[k]);
         }
     }
 }
@@ -358,7 +358,8 @@ uint16_t Board::readPWM(uint8_t chan)
 
             if (fakechan > 0)
                 pwm[fakechan-1] = 
-                        CONFIG_PWM_MIN + (int)((js.value + 32767)/65534. * (CONFIG_PWM_MAX-CONFIG_PWM_MIN));
+                        CONFIG_PWM_MIN + (int)((js.value + 32767)/65534. * 
+                                (CONFIG_PWM_MAX-CONFIG_PWM_MIN));
         }
     }
 
@@ -385,9 +386,9 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
-    float force = 0;
-    float torque = 1;
-    simAddForceAndTorque(quadcopter.prop1handle, &force, &torque);
+    //float force = 0;
+    //float torque = 1;
+    //simAddForceAndTorque(quadcopter.prop1handle, &force, &torque);
 }
 
 

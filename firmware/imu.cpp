@@ -43,6 +43,8 @@ static void devClear(struct stdev_t *dev)
 
 static void devPush(stdev_t *dev, float x)
 {
+    //printf("push %f\n", x);
+
     dev->m_n++;
     if (dev->m_n == 1) {
         dev->m_oldM = dev->m_newM = x;
