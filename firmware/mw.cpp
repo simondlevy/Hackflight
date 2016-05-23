@@ -77,12 +77,13 @@ static bool check_and_update_timed_task(uint32_t * usec, uint32_t period, uint32
 
 // values initialized in setup()
 
+static uint32_t imuLooptimeUsec;
 static uint16_t calibratingG;
 static bool     haveSmallAngle;
 
 void setup(void)
 {
-    board.init();
+    board.init(imuLooptimeUsec);
 
     // sleep for 100ms
     board.delayMilliseconds(100);
@@ -195,7 +196,7 @@ void loop(void)
 
     currentTime = board.getMicros();
 
-    if (check_and_update_timed_task(&loopTime, CONFIG_IMU_LOOPTIME_USEC, currentTime)) {
+    if (check_and_update_timed_task(&loopTime, imuLooptimeUsec, currentTime)) {
 
         imu.update(currentTime, armed, calibratingA, calibratingG);
 

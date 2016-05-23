@@ -248,7 +248,7 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
     }
 }
 
-void Board::init(void)
+void Board::init(uint32_t & imuLooptimeUsec)
 {
     // Initialize nanosecond timer
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
@@ -266,6 +266,9 @@ void Board::init(void)
     for (int k=0; k<CONFIG_RC_CHANS; ++k)  {
         pwm[k] = (CONFIG_PWM_MIN + CONFIG_PWM_MAX) / 2;
     }
+
+    // Fastest rate we can get in V-REP = 10 msec
+    imuLooptimeUsec = 10000;
 }
 
 void Board::checkReboot(bool pendReboot)

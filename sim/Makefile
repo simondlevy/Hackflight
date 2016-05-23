@@ -20,7 +20,7 @@
 VREP   = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
 COMMON = $(VREP)/programming/common/
 
-CFLAGS = -Wall -I../include -Wall -fPIC -static
+CFLAGS = -Wall -I. -I../include -Wall -fPIC -static
 CFLAGS += -D__linux
 CFLAGS += -I$(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux/programming/include/
 EXT = so

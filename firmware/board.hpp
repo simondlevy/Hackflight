@@ -31,7 +31,7 @@ extern "C" {
 
             // your implementation should support these methods
 
-            void     init(void);
+            void     init(uint32_t & imuLooptimeUsec);
 
             void     checkReboot(bool pendReboot);
             void     delayMilliseconds(uint32_t msec);
