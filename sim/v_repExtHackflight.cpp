@@ -345,7 +345,7 @@ void Board::init(uint32_t & imuLooptimeUsec)
     pwm[4] = CONFIG_PWM_MIN;
 
     // Fastest rate we can get in V-REP = 10 msec
-    imuLooptimeUsec = 5000;
+    imuLooptimeUsec = 10000;
 }
 
 void Board::checkReboot(bool pendReboot)
