@@ -272,10 +272,16 @@ void Board::init(uint32_t & imuLooptimeUsec)
     if(joyfd > 0) 
         fcntl(joyfd, F_SETFL, O_NONBLOCK);
 
-    // Set initial fake PWM values
+    // Set initial fake PWM values to middle of range
     for (int k=0; k<CONFIG_RC_CHANS; ++k)  {
         pwm[k] = (CONFIG_PWM_MIN + CONFIG_PWM_MAX) / 2;
     }
+
+    // Special treatment for throttle and switch: start them at the bottom
+    // of the range.  As soon as they are moved, their actual values will
+    // be returned by Board::readPWM().
+    pwm[2] = CONFIG_PWM_MIN;
+    pwm[4] = CONFIG_PWM_MIN;
 
     // Fastest rate we can get in V-REP = 10 msec
     imuLooptimeUsec = 5000;
@@ -364,6 +370,8 @@ uint16_t Board::readPWM(uint8_t chan)
                                 (CONFIG_PWM_MAX-CONFIG_PWM_MIN));
         }
     }
+
+    printf("%4d %4d %4d %4d %4d\n", pwm[0], pwm[1], pwm[2], pwm[3], pwm[4]);
 
     return pwm[chan];
 }
