@@ -200,8 +200,6 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     void* retVal=NULL;
 
-    //simAddForceAndTorque(quadcopter.prop1handle, &force, &torque);
-
     if (message==sim_message_eventcallback_modulehandle)
     {
         // is the command also meant for Hackflight?
@@ -236,9 +234,6 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
-    float force[3];
-    float torque[3];
-
     // Use simulation time to mock up gyro from Euler angles
     float curr_time_sec = simGetSimulationTime();
     static float prev_time_sec;
@@ -248,16 +243,17 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
         simGetObjectOrientation(quadcopter.handle, -1, angles);
         float dt_sec = curr_time_sec - prev_time_sec;
         for (int k=0; k<3; ++k)
-            printf("%+6.6f ", (angles[k] - prev_angles[k]) / dt_sec);
-        printf("\n");
+            gyroADC[k] = (int16_t)(4096 * (angles[k] - prev_angles[k]) / M_PI / dt_sec);
     }
     prev_time_sec = curr_time_sec;
     for (int k=0; k<3; ++k)
         prev_angles[k] = angles[k];
 
-    if (simReadForceSensor(quadcopter.accelHandle, force, torque) != -1) {
+    float accelForce[3];
+    float accelTorque[3];
+    if (simReadForceSensor(quadcopter.accelHandle, accelForce, accelTorque) != -1) {
         for (int k=0; k<3; ++k) {
-            accADC[k] = (int)(409600 * force[k]);
+            accADC[k] = (int)(4096 * 100 * accelForce[k]);
         }
     }
 }
@@ -389,6 +385,9 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
+    float force = 0;
+    float torque = 1;
+    simAddForceAndTorque(quadcopter.prop1handle, &force, &torque);
 }
 
 

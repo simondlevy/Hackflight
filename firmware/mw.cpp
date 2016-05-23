@@ -133,7 +133,6 @@ void loop(void)
         // when landed, reset integral component of PID
         if (rc.throttleIsDown()) 
             pid.resetIntegral();
-
         if (rc.changed()) {
 
             if (armed) {      // actions during armed
@@ -148,6 +147,10 @@ void loop(void)
                     }
                 }
             } else {            // actions during not armed
+
+                //printf("%d %d %d\n", rc.sticks, 
+                //        THR_LO + YAW_LO + PIT_LO + ROL_CE, 
+                //        THR_HI + YAW_LO + PIT_LO + ROL_CE);
 
                 // GYRO calibration
                 if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {

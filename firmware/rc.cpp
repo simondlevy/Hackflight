@@ -40,7 +40,7 @@ void RC::init(Board * board)
     this->averageIndex = 0;
 
     for (uint8_t i = 0; i < CONFIG_RC_CHANS; i++)
-        this->data[i] = 1502;
+        this->data[i] = this->midrc;
 
     for (uint8_t i = 0; i < PITCH_LOOKUP_LENGTH; i++)
         lookupPitchRollRC[i] = (2500 + CONFIG_RC_EXPO_8 * (i * i - 25)) * i * (int32_t)CONFIG_RC_RATE_8 / 2500;
@@ -76,16 +76,17 @@ void RC::update(void)
 
     this->averageIndex++;
 
-
     // check stick positions, updating command delay
     uint8_t stTmp = 0;
     for (uint8_t i = 0; i < 4; i++) {
+        //printf("%d ", this->data[i]);
         stTmp >>= 2;
         if (this->data[i] > CONFIG_MINCHECK)
             stTmp |= 0x80;  // check for MIN
         if (this->data[i] < CONFIG_MAXCHECK)
             stTmp |= 0x40;  // check for MAX
     }
+    //printf("\n");
     if (stTmp == this->sticks) {
         if (this->commandDelay < 250)
             this->commandDelay++;
