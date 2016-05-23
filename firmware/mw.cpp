@@ -143,7 +143,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC, currentTime)) {
 
-        //printf("%d %d %d %d\n", calibratingG, calibratingA, accCalibrated, armed);
+        printf("%d %d %d %d\n", calibratingG, calibratingA, accCalibrated, armed);
 
         // update RC channels
         rc.update();
@@ -153,8 +153,6 @@ void loop(void)
             pid.resetIntegral();
 
         if (rc.changed()) {
-
-            //printf("%d %d\n", rc.sticks, THR_LO + YAW_LO + PIT_LO + ROL_CE);
 
             if (armed) {      // actions during armed
 
@@ -181,7 +179,7 @@ void loop(void)
                             armed = true;
                         }
                     } else if (!armed) {
-                        blinkLED(2, 255, 1);
+                        //blinkLED(2, 255, 1);
                     }
                 }
 
