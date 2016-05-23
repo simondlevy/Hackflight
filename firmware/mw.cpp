@@ -144,8 +144,6 @@ void loop(void)
 
     if (check_and_update_timed_task(&rcTime, rcLooptimeUsec, currentTime)) {
 
-        printf("%d %d %d %d\n", calibratingG, calibratingA, accCalibrated, armed);
-
         // update RC channels
         rc.update();
 

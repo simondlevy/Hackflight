@@ -103,6 +103,10 @@ class Motor {
             this->jointHandle = jh;
         }
 
+        void spin(int pwm) {
+            printf("%d %d\n", this->jointHandle, pwm);
+        }
+
 };
 
 struct Quadcopter
@@ -110,7 +114,7 @@ struct Quadcopter
     int handle;
     int accelHandle;
 
-    Motor motor1;
+    Motor motors[4];
 
     LED  redLED;
     LED  greenLED;
@@ -141,10 +145,10 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
         quadcopter.handle         = inData->at(0).int32Data[0];
         quadcopter.accelHandle    = inData->at(1).int32Data[0];
 
-        quadcopter.motor1 = Motor(inData->at(4).int32Data[0], inData->at(5).int32Data[0]);
-
         quadcopter.greenLED = LED(inData->at(2).int32Data[0], 0, 255, 0);
+
         quadcopter.redLED   = LED(inData->at(3).int32Data[0], 255, 0, 0);
+        quadcopter.motors[0] = Motor(inData->at(4).int32Data[0], inData->at(5).int32Data[0]);
     }
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
@@ -453,9 +457,9 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
+    if (index == 0) quadcopter.motors[index].spin(value);
+
     //float force = 0;
     //float torque = 1;
     //simAddForceAndTorque(quadcopter.prop1handle, &force, &torque);
 }
-
-
