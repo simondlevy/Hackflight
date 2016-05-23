@@ -338,6 +338,7 @@ uint16_t Board::readPWM(uint8_t chan)
 
         if (js.type & ~JS_EVENT_INIT) {
             int fakechan = 0;
+            int dir = +1;
             switch (js.number) {
                 case 0:
                     fakechan = 3;
@@ -347,6 +348,7 @@ uint16_t Board::readPWM(uint8_t chan)
                     break;
                 case 2:
                     fakechan = 2;
+                    dir = -1;
                     break;
                 case 3:
                     fakechan = 4;
@@ -358,7 +360,7 @@ uint16_t Board::readPWM(uint8_t chan)
 
             if (fakechan > 0)
                 pwm[fakechan-1] = 
-                        CONFIG_PWM_MIN + (int)((js.value + 32767)/65534. * 
+                        CONFIG_PWM_MIN + (int)((dir*js.value + 32767)/65534. * 
                                 (CONFIG_PWM_MAX-CONFIG_PWM_MIN));
         }
     }

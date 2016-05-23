@@ -143,7 +143,7 @@ void loop(void)
 
     if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC, currentTime)) {
 
-        printf("%d %d %d\n", calibratingG, accCalibrated, armed);
+        //printf("%d %d %d %d\n", calibratingG, calibratingA, accCalibrated, armed);
 
         // update RC channels
         rc.update();
@@ -154,40 +154,42 @@ void loop(void)
 
         if (rc.changed()) {
 
-                if (armed) {      // actions during armed
+            //printf("%d %d\n", rc.sticks, THR_LO + YAW_LO + PIT_LO + ROL_CE);
 
-                    // Disarm on throttle down + yaw
-                    if (rc.sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
-                        if (armed) {
-                            armed = false;
-                            // Reset disarm time so that it works next time we arm the board.
-                            if (disarmTime != 0)
-                                disarmTime = 0;
-                        }
+            if (armed) {      // actions during armed
+
+                // Disarm on throttle down + yaw
+                if (rc.sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
+                    if (armed) {
+                        armed = false;
+                        // Reset disarm time so that it works next time we arm the board.
+                        if (disarmTime != 0)
+                            disarmTime = 0;
                     }
-                } else {            // actions during not armed
+                }
+            } else {            // actions during not armed
 
-                    // GYRO calibration
-                    if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
-                        calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
-                    } 
+                // GYRO calibration
+                if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
+                    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
+                } 
 
-                    // Arm via YAW
-                    if ((rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE)) {
-                        if (calibratingG == 0 && accCalibrated) {
-                            if (!armed) {         // arm now!
-                                armed = true;
-                            }
-                        } else if (!armed) {
-                            blinkLED(2, 255, 1);
+                // Arm via YAW
+                if ((rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE)) {
+                    if (calibratingG == 0 && accCalibrated) {
+                        if (!armed) {         // arm now!
+                            armed = true;
                         }
+                    } else if (!armed) {
+                        blinkLED(2, 255, 1);
                     }
+                }
 
-                    // Calibrating Acc
-                    else if (rc.sticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
-                        calibratingA = CONFIG_CALIBRATING_ACC_CYCLES;
+                // Calibrating Acc
+                else if (rc.sticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
+                    calibratingA = CONFIG_CALIBRATING_ACC_CYCLES;
 
-                } // not armed
+            } // not armed
 
         } // rc.changed()
 
