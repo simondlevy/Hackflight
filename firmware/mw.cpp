@@ -68,6 +68,10 @@ static bool check_and_update_timed_task(uint32_t * usec, uint32_t period, uint32
 // values initialized in setup()
 
 static uint32_t imuLooptimeUsec;
+static uint32_t rcLooptimeUsec;
+static uint32_t accCalibrateLooptimeUsec;
+static uint16_t calibratingGyroCycles;
+static uint16_t calibratingAccCycles;
 static uint16_t calibratingG;
 static bool     haveSmallAngle;
 
@@ -89,15 +93,23 @@ void setup(void)
     board.ledRedOff();
     board.ledGreenOff();
 
+    // compute cycles for calibration based on board's time constant
+    calibratingGyroCycles = 1000. * CONFIG_CALIBRATING_GYRO_MSEC / imuLooptimeUsec;
+    calibratingAccCycles  = 1000. * CONFIG_CALIBRATING_ACC_MSEC  / imuLooptimeUsec;
+
+    // convert loop times from milliseconds to microseconds
+    rcLooptimeUsec = CONFIG_RC_LOOPTIME_MSEC * 1000;
+    accCalibrateLooptimeUsec = CONFIG_CALIBRATE_ACCTIME_MSEC * 1000;
+
     // initialize our RC, IMU, mixer, and PID controller
     rc.init(&board);
-    imu.init(&board);
+    imu.init(&board, calibratingGyroCycles, calibratingAccCycles);
     pid.init();
     mixer.init(&board, &rc, &pid); 
     msp.init(&board, &imu, &mixer, &rc);
 
     // always do gyro calibration at startup
-    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
+    calibratingG = calibratingGyroCycles;
 
     // assume shallow angle (no accelerometer calibration needed)
     haveSmallAngle = true;
@@ -130,7 +142,7 @@ void loop(void)
     static uint32_t currentTime;
     static uint32_t disarmTime = 0;
 
-    if (check_and_update_timed_task(&rcTime, CONFIG_RC_LOOPTIME_USEC, currentTime)) {
+    if (check_and_update_timed_task(&rcTime, rcLooptimeUsec, currentTime)) {
 
         printf("%d %d %d %d\n", calibratingG, calibratingA, accCalibrated, armed);
 
@@ -158,7 +170,7 @@ void loop(void)
 
                 // GYRO calibration
                 if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
-                    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
+                    calibratingG = calibratingGyroCycles;
                 } 
 
                 // Arm via YAW
@@ -172,7 +184,7 @@ void loop(void)
 
                 // Calibrating Acc
                 else if (rc.sticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
-                    calibratingA = CONFIG_CALIBRATING_ACC_CYCLES;
+                    calibratingA = calibratingAccCycles;
 
             } // not armed
 
@@ -229,7 +241,7 @@ void loop(void)
             if (!haveSmallAngle) {
                 accCalibrated = false; // accelerometer not calibrated or angle too steep
                 board.ledGreenToggle();
-                update_timed_task(&calibratedAccTime, CONFIG_CALIBRATE_ACCTIME_USEC, currentTime);
+                update_timed_task(&calibratedAccTime, accCalibrateLooptimeUsec, currentTime);
             } else {
                 accCalibrated = true;
             }

@@ -61,11 +61,13 @@ typedef enum {
 // Config =====================================================
 
 #define CONFIG_MAGNETIC_DECLINATION                 0
-#define CONFIG_CALIBRATING_GYRO_CYCLES              1000
-#define CONFIG_CALIBRATING_ACC_CYCLES               400
+
+#define CONFIG_CALIBRATING_GYRO_MSEC                3500
+#define CONFIG_CALIBRATING_ACC_MSEC                 1400
+
 #define CONFIG_YAW_CONTROL_DIRECTION                1   /* 1 or -1 */
-#define CONFIG_RC_LOOPTIME_USEC                     20000
-#define CONFIG_CALIBRATE_ACCTIME_USEC               500000
+#define CONFIG_RC_LOOPTIME_MSEC                     20
+#define CONFIG_CALIBRATE_ACCTIME_MSEC               500
 #define CONFIG_SMALL_ANGLE                          250 // tenths of a degree
 
 static const uint8_t CONFIG_RCMAP[8]           = {0, 1, 3, 2, 4, 5, 6, 7};

@@ -129,7 +129,7 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
     return value;
 }
 
-void IMU::init(Board * board) 
+void IMU::init(Board * board, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles) 
 {
     this->_board = board;
 
@@ -141,6 +141,9 @@ void IMU::init(Board * board)
     this->gyroADC[0] = 0;
     this->gyroADC[1] = 0;
     this->gyroADC[2] = 0;
+
+    this->calibratingGyroCycles = _calibratingGyroCycles;
+    this->calibratingAccCycles = _calibratingAccCycles;
 }
 
 void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
@@ -176,9 +179,9 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
 
         for (uint8_t axis = 0; axis < 3; axis++) {
             // Reset a[axis] at start of calibration
-            if (calibratingA == CONFIG_CALIBRATING_ACC_CYCLES)
+            if (calibratingA == this->calibratingAccCycles)
                 a[axis] = 0;
-            // Sum up CONFIG_CALIBRATING_ACC_CYCLES readings
+            // Sum up this->calibratingAccCycles readings
             a[axis] += accADC[axis];
             // Clear global variables for next reading
             accADC[axis] = 0;
@@ -186,9 +189,9 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
         }
         // Calculate average, shift Z down by acc1G
         if (calibratingA == 1) {
-            accZero[ROLL] = (a[ROLL] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
-            accZero[PITCH] = (a[PITCH] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES;
-            accZero[YAW] = (a[YAW] + (CONFIG_CALIBRATING_ACC_CYCLES / 2)) / CONFIG_CALIBRATING_ACC_CYCLES - this->acc1G;
+            accZero[ROLL] = (a[ROLL] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles;
+            accZero[PITCH] = (a[PITCH] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles;
+            accZero[YAW] = (a[YAW] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles - this->acc1G;
         }
         calibratingA--;
     }
@@ -205,7 +208,7 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     if (calibratingG > 0) {
         for (uint8_t axis = 0; axis < 3; axis++) {
             // Reset g[axis] at start of calibration
-            if (calibratingG == CONFIG_CALIBRATING_GYRO_CYCLES) {
+            if (calibratingG == this->calibratingGyroCycles) {
                 g[axis] = 0;
                 devClear(&var[axis]);
             }
@@ -219,14 +222,14 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
                 float dev = devStandardDeviation(&var[axis]);
                 // check deviation and startover if idiot was moving the model
                 if (CONFIG_MORON_THRESHOLD && dev > CONFIG_MORON_THRESHOLD) {
-                    calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
+                    calibratingG = this->calibratingGyroCycles;
                     devClear(&var[0]);
                     devClear(&var[1]);
                     devClear(&var[2]);
                     g[0] = g[1] = g[2] = 0;
                     continue;
                 }
-                gyroZero[axis] = (g[axis] + (CONFIG_CALIBRATING_GYRO_CYCLES / 2)) / CONFIG_CALIBRATING_GYRO_CYCLES;
+                gyroZero[axis] = (g[axis] + (this->calibratingGyroCycles / 2)) / this->calibratingGyroCycles;
             }
         }
         calibratingG--;

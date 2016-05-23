@@ -26,11 +26,12 @@ extern "C" {
 
 #include "../board.hpp"
 
-#define USE_CPPM       1
-#define PWM_FILTER     0     // 0 or 1
-#define FAST_PWM       0     // 0 or 1
-#define MOTOR_PWM_RATE 400
-#define PWM_IDLE_PULSE 1000  // standard PWM in usec for brushless ESC
+#define USE_CPPM          1
+#define PWM_FILTER        0     // 0 or 1
+#define FAST_PWM          0     // 0 or 1
+#define MOTOR_PWM_RATE    400
+#define PWM_IDLE_PULSE    1000  // standard PWM in usec for brushless ESC
+#define IMU_LOOPTIME_USEC 3500
 
 extern serialPort_t * Serial1;
 
@@ -50,7 +51,7 @@ void Board::init(uint32_t & looptimeMicroseconds)
     i2cInit(I2CDEV_2);
     pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 
-    looptimeMicroseconds = 3500;
+    looptimeMicroseconds = IMU_LOOPTIME_USEC;
 }
 
 void Board::checkReboot(bool pendReboot)
