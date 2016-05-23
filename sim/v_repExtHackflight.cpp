@@ -46,16 +46,58 @@ extern void loop(void);
 
 static LIBRARY vrepLib;
 
+class LED {
+
+    private:
+
+        int handle;
+        float color[3];
+        bool on;
+        float black[3];
+
+    public:
+
+        LED(void) {}
+
+        LED(int handle, int r, int g, int b) {
+            this->handle = handle;
+            this->color[0] = r;
+            this->color[1] = g;
+            this->color[2] = b;
+            this->on = false;
+            this->black[0] = 0;
+            this->black[1] = 0;
+            this->black[2] = 0;
+        }
+
+        void turnOn(void) {
+            simSetShapeColor(this->handle, NULL, 0, this->color);
+            this->on = true;
+        }
+
+        void turnOff(void) {
+            simSetShapeColor(this->handle, NULL, 0, this->black);
+            this->on = false;
+        }
+
+        void toggle(void) {
+            this->on = !this->on;
+            simSetShapeColor(this->handle, NULL, 0, this->on ? this->color : this->black);
+        }
+};
+
+
 struct Quadcopter
 {
     int handle;
     int accelHandle;
-    int greenLedHandle;
-    int redLedHandle;
     int prop1handle;
     int prop2handle;
     int prop3handle;
     int prop4handle;
+
+    LED  redLED;
+    LED  greenLED;
 };
 
 static Quadcopter quadcopter;
@@ -84,12 +126,13 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
         quadcopter.handle         = inData->at(0).int32Data[0];
         quadcopter.accelHandle    = inData->at(1).int32Data[0];
-        quadcopter.greenLedHandle = inData->at(2).int32Data[0];
-        quadcopter.redLedHandle   = inData->at(3).int32Data[0];
         quadcopter.prop1handle    = inData->at(4).int32Data[0];
         quadcopter.prop2handle    = inData->at(5).int32Data[0];
         quadcopter.prop3handle    = inData->at(6).int32Data[0];
         quadcopter.prop4handle    = inData->at(7).int32Data[0];
+
+        quadcopter.greenLED = LED(inData->at(2).int32Data[0], 0, 255, 0);
+        quadcopter.redLED   = LED(inData->at(3).int32Data[0], 255, 0, 0);
     }
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
@@ -308,45 +351,35 @@ uint32_t Board::getMicros()
 
 void Board::ledGreenOff(void)
 {
-    const float black[3] = {0,0,0};
-    simSetShapeColor(quadcopter.greenLedHandle, NULL, 0, black);
+    quadcopter.greenLED.turnOff();
 }
 
 void Board::ledGreenOn(void)
 {
-    const float green[3] = {0,255,0};
-    simSetShapeColor(quadcopter.greenLedHandle, NULL, 0, green);
+    quadcopter.greenLED.turnOn();
 }
 
 void Board::ledGreenToggle(void)
 {
-    static bool on;
-    on = !on;
-    const float black[3] = {0,0,0};
-    const float green[3] = {0,255,0};
-    simSetShapeColor(quadcopter.greenLedHandle, NULL, 0, on ? green : black);
+    quadcopter.greenLED.toggle();
 }
+
 
 void Board::ledRedOff(void)
 {
-    const float black[3] = {0,0,0};
-    simSetShapeColor(quadcopter.redLedHandle, NULL, 0, black);
+    quadcopter.redLED.turnOff();
 }
 
 void Board::ledRedOn(void)
 {
-    const float red[3] = {255,0,0};
-    simSetShapeColor(quadcopter.redLedHandle, NULL, 0, red);
+    quadcopter.redLED.turnOn();
 }
 
 void Board::ledRedToggle(void)
 {
-    static bool on;
-    on = !on;
-    const float black[3] = {0,0,0};
-    const float red[3] = {255,0,0};
-    simSetShapeColor(quadcopter.redLedHandle, NULL, 0, on ? red : black);
+    quadcopter.redLED.toggle();
 }
+
 
 uint16_t Board::readPWM(uint8_t chan)
 {
