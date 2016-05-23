@@ -51,6 +51,7 @@ struct Quadcopter
     int handle;
     int accelHandle;
     int greenLedHandle;
+    int redLedHandle;
     int prop1handle;
     int prop2handle;
     int prop3handle;
@@ -65,10 +66,11 @@ static Quadcopter quadcopter;
 
 // Five handles: quadcopter + four propellers
 static const int inArgs_CREATE[]={
-    7,
+    8,
     sim_script_arg_int32,0, // quadcopter handle
     sim_script_arg_int32,0, // accelerometer handle
     sim_script_arg_int32,0, // green LED handle
+    sim_script_arg_int32,0, // red LED handle
     sim_script_arg_int32,0, // propeller 1 handle
     sim_script_arg_int32,0, // propeller 2 handle
     sim_script_arg_int32,0, // propeller 3 handle
@@ -83,10 +85,11 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
         quadcopter.handle         = inData->at(0).int32Data[0];
         quadcopter.accelHandle    = inData->at(1).int32Data[0];
         quadcopter.greenLedHandle = inData->at(2).int32Data[0];
-        quadcopter.prop1handle    = inData->at(3).int32Data[0];
-        quadcopter.prop2handle    = inData->at(4).int32Data[0];
-        quadcopter.prop3handle    = inData->at(5).int32Data[0];
-        quadcopter.prop4handle    = inData->at(6).int32Data[0];
+        quadcopter.redLedHandle   = inData->at(3).int32Data[0];
+        quadcopter.prop1handle    = inData->at(4).int32Data[0];
+        quadcopter.prop2handle    = inData->at(5).int32Data[0];
+        quadcopter.prop3handle    = inData->at(6).int32Data[0];
+        quadcopter.prop4handle    = inData->at(7).int32Data[0];
     }
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
@@ -170,7 +173,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 
     simRegisterScriptCallbackFunction(strConCat(LUA_CREATE_COMMAND,"@",PLUGIN_NAME),
             strConCat("number success=",LUA_CREATE_COMMAND,
-                "(number quadcopter, number accel, number greenLED, number prop1, number prop2, number prop3, number prop4)"),
+                "(number quadcopter, number accel, number greenLED, number redLED, number prop1, number prop2, number prop3, number prop4)"),
             LUA_CREATE_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_DESTROY_COMMAND,"@",PLUGIN_NAME),
@@ -331,17 +334,23 @@ void Board::ledGreenToggle(void)
 
 void Board::ledRedOff(void)
 {
-    //printf("RED OFF\n");
+    const float black[3] = {0,0,0};
+    simSetShapeColor(quadcopter.redLedHandle, NULL, 0, black);
 }
 
 void Board::ledRedOn(void)
 {
-    //printf("RED ON\n");
+    const float red[3] = {255,0,0};
+    simSetShapeColor(quadcopter.redLedHandle, NULL, 0, red);
 }
 
 void Board::ledRedToggle(void)
 {
-    //printf("RED TOGGLE\n");
+    static bool on;
+    on = !on;
+    const float black[3] = {0,0,0};
+    const float red[3] = {255,0,0};
+    simSetShapeColor(quadcopter.redLedHandle, NULL, 0, on ? red : black);
 }
 
 uint16_t Board::readPWM(uint8_t chan)
