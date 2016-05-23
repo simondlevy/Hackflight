@@ -93,6 +93,7 @@ class Motor {
 
         int propHandle;
         int jointHandle;
+        float pos;
 
     public:
 
@@ -101,10 +102,14 @@ class Motor {
         Motor(int ph, int jh) {
             this->propHandle = ph;
             this->jointHandle = jh;
+            this->pos = 0;
         }
 
         void spin(int pwm) {
-            printf("%d %d\n", this->jointHandle, pwm);
+            this->pos += .01;
+            if (this->pos > 1)
+                this->pos = 0;
+            simSetJointPosition(this->jointHandle, pos);
         }
 
 };
