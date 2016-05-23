@@ -25,7 +25,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdint.h>
-#include <time.h>
 #include <sys/ioctl.h>
 #include <linux/joystick.h>
 #include <unistd.h>
@@ -226,7 +225,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 // V-REP memory model seems to prevent us from making these instance variables of a Board object
 static int pwm[8];
 static int joyfd;
-static struct timespec start_time;
+static uint32_t start_time_usec;
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
@@ -240,18 +239,33 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
     float force[3];
     float torque[3];
 
+    // Use simulation time to mock up gyro from Euler angles
+    float curr_time_sec = simGetSimulationTime();
+    static float prev_time_sec;
+    static float prev_angles[3];
+    float angles[3];
+    if (prev_time_sec) {
+        simGetObjectOrientation(quadcopter.handle, -1, angles);
+        float dt_sec = curr_time_sec - prev_time_sec;
+        for (int k=0; k<3; ++k)
+            printf("%+6.6f ", (angles[k] - prev_angles[k]) / dt_sec);
+        printf("\n");
+    }
+    prev_time_sec = curr_time_sec;
+    for (int k=0; k<3; ++k)
+        prev_angles[k] = angles[k];
+
     if (simReadForceSensor(quadcopter.accelHandle, force, torque) != -1) {
         for (int k=0; k<3; ++k) {
             accADC[k] = (int)(409600 * force[k]);
-            gyroADC[k] = 0;
         }
     }
 }
 
 void Board::init(uint32_t & imuLooptimeUsec)
 {
-    // Initialize nanosecond timer
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
+    // Initialize "microseconds" timer (10 msec precision);
+    start_time_usec = getMicros();
 
     // Close joystick if open
     if (joyfd > 0)
@@ -268,7 +282,7 @@ void Board::init(uint32_t & imuLooptimeUsec)
     }
 
     // Fastest rate we can get in V-REP = 10 msec
-    imuLooptimeUsec = 10000;
+    imuLooptimeUsec = 5000;
 }
 
 void Board::checkReboot(bool pendReboot)
@@ -286,12 +300,7 @@ void Board::delayMilliseconds(uint32_t msec)
 
 uint32_t Board::getMicros()
 {
-    struct timespec end_time;
-    
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_time);
-
-    return 1000000 * (end_time.tv_sec - start_time.tv_sec) + 
-        (end_time.tv_nsec - start_time.tv_nsec) / 1000;
+    return (int)(1e6 * simGetSimulationTime());
 }
 
 void Board::ledGreenOff(void)
