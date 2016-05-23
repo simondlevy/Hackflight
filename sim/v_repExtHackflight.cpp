@@ -111,7 +111,6 @@ void LUA_DESTROY_CALLBACK(SScriptCallBack* cb)
 
 #define LUA_START_COMMAND "simExtHackflight_start"
 
-
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
@@ -295,15 +294,11 @@ void Board::init(uint32_t & imuLooptimeUsec)
 
 void Board::checkReboot(bool pendReboot)
 {
-
 }
 
 void Board::delayMilliseconds(uint32_t msec)
 {
-    uint32_t startMicros = this->getMicros();
-
-    while ((this->getMicros() - startMicros)/1000 > msec)
-        ;
+    usleep(msec*1000);
 }
 
 uint32_t Board::getMicros()
