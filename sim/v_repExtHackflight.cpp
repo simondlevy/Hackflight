@@ -307,32 +307,32 @@ uint32_t Board::getMicros()
 
 void Board::ledGreenOff(void)
 {
-    //printf("GREEN OFF\n");
+    printf("GREEN OFF\n");
 }
 
 void Board::ledGreenOn(void)
 {
-    //printf("GREEN ON\n");
+    printf("GREEN ON\n");
 }
 
 void Board::ledGreenToggle(void)
 {
-    //printf("GREEN TOGGLE\n");
+    printf("GREEN TOGGLE\n");
 }
 
 void Board::ledRedOff(void)
 {
-    //printf("RED OFF\n");
+    printf("RED OFF\n");
 }
 
 void Board::ledRedOn(void)
 {
-    //printf("RED ON\n");
+    printf("RED ON\n");
 }
 
 void Board::ledRedToggle(void)
 {
-    //printf("RED TOGGLE\n");
+    printf("RED TOGGLE\n");
 }
 
 uint16_t Board::readPWM(uint8_t chan)
@@ -370,8 +370,6 @@ uint16_t Board::readPWM(uint8_t chan)
                                 (CONFIG_PWM_MAX-CONFIG_PWM_MIN));
         }
     }
-
-    printf("%4d %4d %4d %4d %4d\n", pwm[0], pwm[1], pwm[2], pwm[3], pwm[4]);
 
     return pwm[chan];
 }
