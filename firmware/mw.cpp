@@ -43,17 +43,6 @@ MSP   msp;
 
 // utilities 
 
-static void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
-{
-    for (uint8_t r = 0; r < repeat; r++) {
-        for (uint8_t i = 0; i < num; i++) {
-            board.ledGreenToggle();            // switch LED state
-            board.delayMilliseconds(wait);
-        }
-        board.delayMilliseconds(60);
-    }
-}
-
 static bool check_timed_task(uint32_t usec, uint32_t currentTime) 
 {
 
@@ -178,9 +167,7 @@ void loop(void)
                         if (!armed) {         // arm now!
                             armed = true;
                         }
-                    } else if (!armed) {
-                        //blinkLED(2, 255, 1);
-                    }
+                    } 
                 }
 
                 // Calibrating Acc
