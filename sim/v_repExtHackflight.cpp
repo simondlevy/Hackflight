@@ -87,14 +87,30 @@ class LED {
 };
 
 
+class Motor {
+
+    private:
+
+        int propHandle;
+        int jointHandle;
+
+    public:
+
+        Motor(void) { }
+
+        Motor(int ph, int jh) {
+            this->propHandle = ph;
+            this->jointHandle = jh;
+        }
+
+};
+
 struct Quadcopter
 {
     int handle;
     int accelHandle;
-    int prop1handle;
-    int prop2handle;
-    int prop3handle;
-    int prop4handle;
+
+    Motor motor1;
 
     LED  redLED;
     LED  greenLED;
@@ -108,15 +124,13 @@ static Quadcopter quadcopter;
 
 // Five handles: quadcopter + four propellers
 static const int inArgs_CREATE[]={
-    8,
+    6,
     sim_script_arg_int32,0, // quadcopter handle
     sim_script_arg_int32,0, // accelerometer handle
     sim_script_arg_int32,0, // green LED handle
     sim_script_arg_int32,0, // red LED handle
     sim_script_arg_int32,0, // propeller 1 handle
-    sim_script_arg_int32,0, // propeller 2 handle
-    sim_script_arg_int32,0, // propeller 3 handle
-    sim_script_arg_int32,0, // propeller 4 handle
+    sim_script_arg_int32,0, // joint 1 handle
 };
 
 void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
@@ -126,10 +140,8 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
         quadcopter.handle         = inData->at(0).int32Data[0];
         quadcopter.accelHandle    = inData->at(1).int32Data[0];
-        quadcopter.prop1handle    = inData->at(4).int32Data[0];
-        quadcopter.prop2handle    = inData->at(5).int32Data[0];
-        quadcopter.prop3handle    = inData->at(6).int32Data[0];
-        quadcopter.prop4handle    = inData->at(7).int32Data[0];
+
+        quadcopter.motor1 = Motor(inData->at(4).int32Data[0], inData->at(5).int32Data[0]);
 
         quadcopter.greenLED = LED(inData->at(2).int32Data[0], 0, 255, 0);
         quadcopter.redLED   = LED(inData->at(3).int32Data[0], 255, 0, 0);
@@ -215,7 +227,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 
     simRegisterScriptCallbackFunction(strConCat(LUA_CREATE_COMMAND,"@",PLUGIN_NAME),
             strConCat("number success=",LUA_CREATE_COMMAND,
-                "(number quadcopter, number accel, number greenLED, number redLED, number prop1, number prop2, number prop3, number prop4)"),
+                "(number quadcopter, number accel, number greenLED, number redLED, "
+                "number prop1, number joint1)"),
             LUA_CREATE_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_DESTROY_COMMAND,"@",PLUGIN_NAME),
