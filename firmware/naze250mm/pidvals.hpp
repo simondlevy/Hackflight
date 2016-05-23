@@ -1,5 +1,5 @@
 /*
-   pid.hpp : PID class header
+   pidvals.hpp : PID values for a specific vehicle
 
    This file is part of Hackflight.
 
@@ -15,39 +15,12 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define CONFIG_MAX_ANGLE_INCLINATION                500 /* 50 degrees */
+static const uint8_t CONFIG_LEVEL_P          = 90;
+static const uint8_t CONFIG_LEVEL_I          = 10;
 
-#ifdef __arm__
-extern "C" {
-#endif
+static const uint8_t CONFIG_RATE_PITCHROLL_P = 40;
+static const uint8_t CONFIG_RATE_PITCHROLL_I = 30;
+static const uint8_t CONFIG_RATE_PITCHROLL_D = 23;
 
-    class PID {
-
-        private:
-
-#include "pidvals.hpp"
-
-            uint8_t rate_p[3];
-            uint8_t rate_i[3];
-            uint8_t rate_d[3];
-
-            int16_t lastGyro[3];
-            int32_t delta1[3]; 
-            int32_t delta2[3];
-            int32_t errorGyroI[3];
-            int32_t errorAngleI[2];
-
-        public:
-
-            int16_t axisPID[3];
-
-            void init(void);
-
-            void update(RC * rc, IMU * imu);
-
-            void resetIntegral(void);
-    }; 
-
-#ifdef __arm__
-} // extern "C"
-#endif
+static const uint8_t CONFIG_YAW_P            = 85;
+static const uint8_t CONFIG_YAW_I            = 45;

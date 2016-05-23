@@ -82,7 +82,8 @@ OBJCOPY	 = arm-none-eabi-objcopy
 #
 # Tool options.
 #
-INCLUDE_DIRS = $(BREEZY_DIR) \
+INCLUDE_DIRS = . \
+			   $(BREEZY_DIR) \
 			   $(STDPERIPH_DIR)/inc \
 			   $(CMSIS_DIR)/CM3/CoreSupport \
 			   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x

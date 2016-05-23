@@ -79,7 +79,6 @@ static bool check_and_update_timed_task(uint32_t * usec, uint32_t period, uint32
 
 static uint16_t calibratingG;
 static bool     haveSmallAngle;
-//static uint32_t previousTime;
 
 void setup(void)
 {
@@ -105,9 +104,6 @@ void setup(void)
     pid.init();
     mixer.init(&board, &rc, &pid); 
     msp.init(&board, &imu, &mixer, &rc);
-
-    // set initial time
-    //previousTime = board.getMicros();
 
     // always do gyro calibration at startup
     calibratingG = CONFIG_CALIBRATING_GYRO_CYCLES;
@@ -207,7 +203,6 @@ void loop(void)
 
         // measure loop rate just afer reading the sensors
         currentTime = board.getMicros();
-        //previousTime = currentTime;
 
         // compute exponential RC commands
         rc.computeExpo();
