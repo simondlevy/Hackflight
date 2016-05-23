@@ -201,12 +201,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     void* retVal=NULL;
 
-    float force  = 1;
-    float torque = 0;
-    simAddForceAndTorque(quadcopter.prop1handle, &force, &torque);
-    simAddForceAndTorque(quadcopter.prop2handle, &force, &torque);
-    simAddForceAndTorque(quadcopter.prop3handle, &force, &torque);
-    simAddForceAndTorque(quadcopter.prop4handle, &force, &torque);
+    //simAddForceAndTorque(quadcopter.prop1handle, &force, &torque);
 
     if (message==sim_message_eventcallback_modulehandle)
     {
