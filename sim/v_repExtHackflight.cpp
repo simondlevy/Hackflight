@@ -106,10 +106,10 @@ class Motor {
         }
 
         void spin(int pwm) {
-            this->pos += .01;
-            if (this->pos > M_PI)
-                this->pos = 0;
-            simSetJointPosition(this->jointHandle, pos);
+            if (pwm > 1200) { // XXX relate to PWM
+                this->pos += M_PI / 4;
+                simSetJointPosition(this->jointHandle, pos);
+            }
         }
 
 };
