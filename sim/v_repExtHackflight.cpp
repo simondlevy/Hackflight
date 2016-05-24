@@ -93,21 +93,23 @@ class Motor {
 
         int propHandle;
         int jointHandle;
+        int dir;
         float pos;
 
     public:
 
         Motor(void) { }
 
-        Motor(int ph, int jh) {
+        Motor(int ph, int jh, int d) {
             this->propHandle = ph;
             this->jointHandle = jh;
+            this->dir = d;
             this->pos = 0;
         }
 
         void spin(int pwm) {
             if (pwm > 1200) { // XXX relate to PWM
-                this->pos += M_PI / 4;
+                this->pos += this->dir * .05;//M_PI / 4;
                 simSetJointPosition(this->jointHandle, pos);
             }
         }
@@ -150,10 +152,10 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
         quadcopter.greenLED = LED(inData->at(0).int32Data[2], 0, 255, 0);
         quadcopter.redLED   = LED(inData->at(0).int32Data[3], 255, 0, 0);
 
-        quadcopter.motors[0] = Motor(inData->at(0).int32Data[4],  inData->at(0).int32Data[5]);
-        quadcopter.motors[1] = Motor(inData->at(0).int32Data[6],  inData->at(0).int32Data[7]);
-        quadcopter.motors[2] = Motor(inData->at(0).int32Data[8],  inData->at(0).int32Data[9]);
-        quadcopter.motors[3] = Motor(inData->at(0).int32Data[10], inData->at(0).int32Data[11]);
+        quadcopter.motors[0] = Motor(inData->at(0).int32Data[4],  inData->at(0).int32Data[5],  -1);
+        quadcopter.motors[1] = Motor(inData->at(0).int32Data[6],  inData->at(0).int32Data[7],  +1);
+        quadcopter.motors[2] = Motor(inData->at(0).int32Data[8],  inData->at(0).int32Data[9],  +1);
+        quadcopter.motors[3] = Motor(inData->at(0).int32Data[10], inData->at(0).int32Data[11], -1);
     }
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
