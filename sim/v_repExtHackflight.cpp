@@ -34,6 +34,9 @@
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
+#include "../firmware/pwm.hpp"
+#include "../firmware/board.hpp"
+
 // From firmware
 extern void setup(void);
 extern void loop(void);
@@ -103,6 +106,9 @@ struct sQuadcopter
 
 static sQuadcopter quadcopter;
 
+static int joyfd;
+
+static int pwm[8];
 
 // --------------------------------------------------------------------------------------
 // simExtHackflight_create
@@ -168,6 +174,15 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 	   				     // back only when this value turns zero. This allows for "blocking" functions.
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
+
+    // Close joystick if open
+    if (joyfd > 0)
+        close(joyfd);
+
+    // Initialize joystick
+    joyfd = open( JOY_DEV , O_RDONLY);
+    if(joyfd > 0) 
+        fcntl(joyfd, F_SETFL, O_NONBLOCK);
 
     setup();
 }
@@ -250,6 +265,39 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     simAddForceAndTorque(quadcopter.prop3handle, &force, &torque);
     simAddForceAndTorque(quadcopter.prop4handle, &force, &torque);
 
+    // Read joystick
+    if (joyfd > 0) {
+
+        struct js_event js;
+        read(joyfd, &js, sizeof(struct js_event));
+
+        if (js.type & ~JS_EVENT_INIT) {
+            int fakechan = 0;
+            switch (js.number) {
+                case 0:
+                    fakechan = 3;
+                    break;
+                case 1:
+                    fakechan = 1;
+                    break;
+                case 2:
+                    fakechan = 2;
+                    break;
+                case 3:
+                    fakechan = 4;
+                    break;
+                case 5:
+                    fakechan = 5;
+                    break;
+            }
+
+            if (fakechan > 0)
+                pwm[fakechan-1] = 
+                        CONFIG_PWM_MIN + (int)((js.value + 32767)/65534. * (CONFIG_PWM_MAX-CONFIG_PWM_MIN));
+        }
+    }
+
+
     if (message==sim_message_eventcallback_modulehandle)
     {
         // is the command also meant for Hackflight?
@@ -283,12 +331,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
 // Board implementation --------------------------------------------------------------
 
-#include "../firmware/pwm.hpp"
-#include "../firmware/board.hpp"
-
 // V-REP memory model seems to prevent us from making these instance variables of a Board object
-static int pwm[8];
-static int joyfd;
 static struct timespec start_time;
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
@@ -313,15 +356,6 @@ void Board::init(uint32_t & imuLooptimeUsec)
 {
     // Initialize nanosecond timer
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
-
-    // Close joystick if open
-    if (joyfd > 0)
-        close(joyfd);
-
-    // Initialize joystick
-    joyfd = open( JOY_DEV , O_RDONLY);
-    if(joyfd > 0) 
-        fcntl(joyfd, F_SETFL, O_NONBLOCK);
 
     // Set initial fake PWM values
     for (int k=0; k<CONFIG_RC_CHANS; ++k)  {
@@ -386,37 +420,6 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    if (joyfd > 0) {
-
-        struct js_event js;
-        read(joyfd, &js, sizeof(struct js_event));
-
-        if (js.type & ~JS_EVENT_INIT) {
-            int fakechan = 0;
-            switch (js.number) {
-                case 0:
-                    fakechan = 3;
-                    break;
-                case 1:
-                    fakechan = 1;
-                    break;
-                case 2:
-                    fakechan = 2;
-                    break;
-                case 3:
-                    fakechan = 4;
-                    break;
-                case 5:
-                    fakechan = 5;
-                    break;
-            }
-
-            if (fakechan > 0)
-                pwm[fakechan-1] = 
-                        CONFIG_PWM_MIN + (int)((js.value + 32767)/65534. * (CONFIG_PWM_MAX-CONFIG_PWM_MIN));
-        }
-    }
-
     return pwm[chan];
 }
 
