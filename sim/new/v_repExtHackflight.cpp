@@ -25,7 +25,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdint.h>
-#include <time.h>
 #include <sys/ioctl.h>
 #include <linux/joystick.h>
 #include <unistd.h>
@@ -33,6 +32,10 @@
 #include "v_repExtHackflight.hpp"
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
+
+#include "../firmware/pwm.hpp"
+#include "../firmware/board.hpp"
+#include "../firmware/rc.hpp"
 
 // From firmware
 extern void setup(void);
@@ -47,53 +50,126 @@ extern void loop(void);
 
 static LIBRARY vrepLib;
 
-struct sQuadcopter
-{
-    int handle;
-    int prop1handle;
-    int prop2handle;
-    int prop3handle;
-    int prop4handle;
-    float duration;
-    char* waitUntilZero;
+class LED {
+
+    private:
+
+        int handle;
+        float color[3];
+        bool on;
+        float black[3];
+
+    public:
+
+        LED(void) {}
+
+        LED(int handle, int r, int g, int b) {
+            this->handle = handle;
+            this->color[0] = r;
+            this->color[1] = g;
+            this->color[2] = b;
+            this->on = false;
+            this->black[0] = 0;
+            this->black[1] = 0;
+            this->black[2] = 0;
+        }
+
+        void turnOn(void) {
+            simSetShapeColor(this->handle, NULL, 0, this->color);
+            this->on = true;
+        }
+
+        void turnOff(void) {
+            simSetShapeColor(this->handle, NULL, 0, this->black);
+            this->on = false;
+        }
+
+        void toggle(void) {
+            this->on = !this->on;
+            simSetShapeColor(this->handle, NULL, 0, this->on ? this->color : this->black);
+        }
 };
 
-static sQuadcopter quadcopter;
 
-static int nextHackflightHandle;
+class Motor {
+
+    private:
+
+        int propHandle;
+        int jointHandle;
+        int dir;
+        float pos;
+        int id;
+
+    public:
+
+        Motor(void) { }
+
+        Motor(int ph, int jh, int d, int k) {
+            this->propHandle = ph;
+            this->jointHandle = jh;
+            this->dir = d;
+            this->id = k;
+            this->pos = 0;
+        }
+
+        void spin(int pwm) {
+
+            // Simulate prop rotation
+            this->pos += (pwm < CONFIG_MINCHECK) ? 0 :
+                1.5 * this->dir * ((float)pwm - CONFIG_MINCHECK) / (CONFIG_MAXCHECK-CONFIG_MINCHECK);
+            simSetJointPosition(this->jointHandle, pos);
 
 
-// --------------------------------------------------------------------------------------
-// simExtHackflight_create
-// --------------------------------------------------------------------------------------
+            float force = 0;
+            float torque = 0;
+            if (this->id == 1)
+                simAddForceAndTorque(this->propHandle, &force, &torque);
+        }
+};
+
+struct Quadcopter
+{
+    int handle;
+    int accelHandle;
+
+    Motor motors[4];
+
+    LED  redLED;
+    LED  greenLED;
+};
+
+static Quadcopter quadcopter;
+
+// simExtHackflight_create -------------------------------------------------------------------------
+
 #define LUA_CREATE_COMMAND "simExtHackflight_create"
 
 // Five handles: quadcopter + four propellers
 static const int inArgs_CREATE[]={
-    5,
-    sim_script_arg_int32,0,
-    sim_script_arg_int32,0,
-    sim_script_arg_int32,0,
-    sim_script_arg_int32,0,
-    sim_script_arg_int32,0,
+    1,
+    sim_script_arg_int32|sim_script_arg_table,12 // all handles
 };
 
 void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
-    int handle=-1;
     if (D.readDataFromStack(cb->stackID,inArgs_CREATE,inArgs_CREATE[0],LUA_CREATE_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
-        handle=nextHackflightHandle++;
-        quadcopter.handle      = inData->at(0).int32Data[0];
-        quadcopter.prop1handle = inData->at(1).int32Data[0];
-        quadcopter.prop2handle = inData->at(2).int32Data[0];
-        quadcopter.prop3handle = inData->at(3).int32Data[0];
-        quadcopter.prop4handle = inData->at(4).int32Data[0];
-        quadcopter.waitUntilZero=NULL;
-        quadcopter.duration=0.0f;
+
+        quadcopter.handle         = inData->at(0).int32Data[0];
+
+        quadcopter.accelHandle    = inData->at(0).int32Data[1];
+
+        quadcopter.greenLED = LED(inData->at(0).int32Data[2], 0, 255, 0);
+        quadcopter.redLED   = LED(inData->at(0).int32Data[3], 255, 0, 0);
+
+        quadcopter.motors[0] = Motor(inData->at(0).int32Data[4],  inData->at(0).int32Data[5],  -1, 1);
+        quadcopter.motors[1] = Motor(inData->at(0).int32Data[6],  inData->at(0).int32Data[7],  +1, 2);
+        quadcopter.motors[2] = Motor(inData->at(0).int32Data[8],  inData->at(0).int32Data[9],  +1, 3);
+        quadcopter.motors[3] = Motor(inData->at(0).int32Data[10], inData->at(0).int32Data[11], -1, 4);
     }
-    D.pushOutData(CScriptFunctionDataItem(handle));
+    D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 }
 
@@ -101,22 +177,10 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
 
 #define LUA_DESTROY_COMMAND "simExtHackflight_destroy"
 
-static const int inArgs_DESTROY[]={
-    1,
-    sim_script_arg_int32,0,
-};
-
 void LUA_DESTROY_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
-    bool success=false;
-    if (D.readDataFromStack(cb->stackID,inArgs_DESTROY,inArgs_DESTROY[0],LUA_DESTROY_COMMAND))
-    {
-        if (quadcopter.waitUntilZero!=NULL)
-            quadcopter.waitUntilZero[0]=0; // free the blocked thread
-        success=true;
-    }
-    D.pushOutData(CScriptFunctionDataItem(success));
+    D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 }
 
@@ -125,37 +189,12 @@ void LUA_DESTROY_CALLBACK(SScriptCallBack* cb)
 
 #define LUA_START_COMMAND "simExtHackflight_start"
 
-static const int inArgs_START[]={
-    3,
-    sim_script_arg_int32,0,
-    sim_script_arg_float,0,
-    sim_script_arg_bool,0,
-};
-
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
-    bool success=false;
-
-    // -1 because the last argument is optional
-    if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0]-1,LUA_START_COMMAND)) {
-        std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
-        float duration=inData->at(1).floatData[0];
-        bool leaveDirectly=false;
-        if (inData->size()>2)
-            leaveDirectly=inData->at(2).boolData[0];
-        if (duration<=0.0f)
-            leaveDirectly=true;
-        quadcopter.duration=duration;
-        if (!leaveDirectly)
-            cb->waitUntilZero=1; // the effect of this is that when we leave the callback, the Lua script 
-        // gets control
-        // back only when this value turns zero. This allows for "blocking" functions 
-        success=true;
-    }
-
-
-    D.pushOutData(CScriptFunctionDataItem(success));
+    cb->waitUntilZero=1; // the effect of this is that when we leave the callback, the Lua script gets control
+	   				     // back only when this value turns zero. This allows for "blocking" functions.
+    D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 
     setup();
@@ -165,26 +204,10 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
 #define LUA_STOP_COMMAND "simExtHackflight_stop"
 
-static const int inArgs_STOP[]={
-    1,
-    sim_script_arg_int32,0,
-};
-
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
-    bool success=false;
-    if (D.readDataFromStack(cb->stackID,inArgs_STOP,inArgs_STOP[0],LUA_STOP_COMMAND))
-    {
-        if (quadcopter.waitUntilZero!=NULL)
-        {
-            quadcopter.waitUntilZero[0]=0; // free the blocked thread
-            quadcopter.waitUntilZero=NULL;
-        }
-        quadcopter.duration=0.0f;
-        success=true;
-    }
-    D.pushOutData(CScriptFunctionDataItem(success));
+    D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 }
 
@@ -226,21 +249,17 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
     // Register 4 new Lua commands:
 
     simRegisterScriptCallbackFunction(strConCat(LUA_CREATE_COMMAND,"@",PLUGIN_NAME),
-            strConCat("number quadcopterHandle=",LUA_CREATE_COMMAND,
-                "(number prop1, number prop2, number prop3, number prop4)"),
+            strConCat("number success=",LUA_CREATE_COMMAND, "(table_12 allHandles)"),
             LUA_CREATE_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_DESTROY_COMMAND,"@",PLUGIN_NAME),
-            strConCat("boolean result=",LUA_DESTROY_COMMAND,"(number quadcopterHandle)"),
-            LUA_DESTROY_CALLBACK);
+            strConCat("boolean success=",LUA_DESTROY_COMMAND,"()"), LUA_DESTROY_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME),
-            strConCat("boolean result=",
-                LUA_START_COMMAND,"(number quadcopterHandle,number duration,boolean returnDirectly=false)"),
-            LUA_START_CALLBACK);
+            strConCat("boolean success=", LUA_START_COMMAND,"()"), LUA_START_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME),
-            strConCat("boolean result=",LUA_STOP_COMMAND,"(number quadcopterHandle)"),LUA_STOP_CALLBACK);
+            strConCat("boolean success=",LUA_STOP_COMMAND,"()"),LUA_STOP_CALLBACK);
 
     return(8); // return the version number of this plugin (can be queried with simGetModuleName)
 }
@@ -261,34 +280,11 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     void* retVal=NULL;
 
-    float force = 1;
-    float torque = 0;
-    simAddForceAndTorque(quadcopter.prop1handle, &force, &torque);
-    simAddForceAndTorque(quadcopter.prop2handle, &force, &torque);
-    simAddForceAndTorque(quadcopter.prop3handle, &force, &torque);
-    simAddForceAndTorque(quadcopter.prop4handle, &force, &torque);
-
     if (message==sim_message_eventcallback_modulehandle)
     {
         // is the command also meant for Hackflight?
         if ( (customData==NULL)||(std::string("Hackflight").compare((char*)customData)==0) ) 
         {
-            float dt=simGetSimulationTimeStep();
-
-            if (quadcopter.duration>0.0f)
-            { // movement mode
-
-                quadcopter.duration-=dt;
-            }
-
-            else
-            { // stopped mode
-                if (quadcopter.waitUntilZero!=NULL)
-                {
-                    quadcopter.waitUntilZero[0]=0;
-                    quadcopter.waitUntilZero=NULL;
-                }
-            }
         }
     }
 
@@ -301,13 +297,10 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
 // Board implementation --------------------------------------------------------------
 
-#include "../firmware/pwm.hpp"
-#include "../firmware/board.hpp"
-
 // V-REP memory model seems to prevent us from making these instance variables of a Board object
 static int pwm[8];
 static int joyfd;
-static struct timespec start_time;
+static uint32_t start_time_usec;
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
@@ -318,19 +311,34 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
-    /*
-    result,force=simReadForceSensor(sensor)
+    // Use simulation time to mock up gyro from vehicle's Euler angles
+    float curr_time_sec = simGetSimulationTime();
+    static float prev_time_sec;
+    static float prev_angles[3];
+    float angles[3];
+    static int count; // ignore startup transient
+    simGetObjectOrientation(quadcopter.handle, -1, angles);
+    float dt_sec = curr_time_sec - prev_time_sec;
+    for (int k=0; k<3; ++k)
+        gyroADC[k] = (count++ < 10) ? 0 : (int16_t)(4096 * (angles[k] - prev_angles[k]) / M_PI / dt_sec);
+    prev_time_sec = curr_time_sec;
+    for (int k=0; k<3; ++k)
+        prev_angles[k] = angles[k];
 
-    if (result>0) then
-
-        accel={force[1]/mass,force[2]/mass,force[3]/mass}
-    */
+    // Read accelerometer angles from force sensor
+    float accelForce[3];
+    float accelTorque[3];
+    if (simReadForceSensor(quadcopter.accelHandle, accelForce, accelTorque) != -1) {
+        for (int k=0; k<3; ++k) {
+            accADC[k] = 0;//(int)(4096 * 100 * accelForce[k]);
+        }
+    }
 }
 
 void Board::init(uint32_t & imuLooptimeUsec)
 {
-    // Initialize nanosecond timer
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
+    // Initialize "microseconds" timer (10 msec precision);
+    start_time_usec = getMicros();
 
     // Close joystick if open
     if (joyfd > 0)
@@ -341,66 +349,66 @@ void Board::init(uint32_t & imuLooptimeUsec)
     if(joyfd > 0) 
         fcntl(joyfd, F_SETFL, O_NONBLOCK);
 
-    // Set initial fake PWM values
+    // Set initial fake PWM values to middle of range
     for (int k=0; k<CONFIG_RC_CHANS; ++k)  {
         pwm[k] = (CONFIG_PWM_MIN + CONFIG_PWM_MAX) / 2;
     }
 
+    // Special treatment for throttle and switch: start them at the bottom
+    // of the range.  As soon as they are moved, their actual values will
+    // be returned by Board::readPWM().
+    pwm[2] = CONFIG_PWM_MIN;
+    pwm[4] = CONFIG_PWM_MIN;
+
+    // Fastest rate we can get in V-REP = 10 msec
     imuLooptimeUsec = 10000;
 }
 
 void Board::checkReboot(bool pendReboot)
 {
-
 }
 
 void Board::delayMilliseconds(uint32_t msec)
 {
-    uint32_t startMicros = this->getMicros();
-
-    while ((this->getMicros() - startMicros)/1000 > msec)
-        ;
+    usleep(msec*1000);
 }
 
 uint32_t Board::getMicros()
 {
-    struct timespec end_time;
-    
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_time);
-
-    return 1000000 * (end_time.tv_sec - start_time.tv_sec) + 
-        (end_time.tv_nsec - start_time.tv_nsec) / 1000;
+    return (int)(1e6 * simGetSimulationTime());
 }
 
 void Board::ledGreenOff(void)
 {
-    //printf("GREEN OFF\n");
+    quadcopter.greenLED.turnOff();
 }
 
 void Board::ledGreenOn(void)
 {
-    //printf("GREEN ON\n");
+    quadcopter.greenLED.turnOn();
 }
 
 void Board::ledGreenToggle(void)
 {
-    //printf("GREEN TOGGLE\n");
+    quadcopter.greenLED.toggle();
 }
+
 
 void Board::ledRedOff(void)
 {
-    //printf("RED OFF\n");
+    quadcopter.redLED.turnOff();
 }
 
 void Board::ledRedOn(void)
 {
-    //printf("RED ON\n");
+    quadcopter.redLED.turnOn();
 }
 
 void Board::ledRedToggle(void)
 {
-    //printf("RED TOGGLE\n");
+    quadcopter.redLED.toggle();
 }
+
 
 uint16_t Board::readPWM(uint8_t chan)
 {
@@ -411,6 +419,7 @@ uint16_t Board::readPWM(uint8_t chan)
 
         if (js.type & ~JS_EVENT_INIT) {
             int fakechan = 0;
+            int dir = +1;
             switch (js.number) {
                 case 0:
                     fakechan = 3;
@@ -420,6 +429,7 @@ uint16_t Board::readPWM(uint8_t chan)
                     break;
                 case 2:
                     fakechan = 2;
+                    dir = -1;
                     break;
                 case 3:
                     fakechan = 4;
@@ -431,7 +441,8 @@ uint16_t Board::readPWM(uint8_t chan)
 
             if (fakechan > 0)
                 pwm[fakechan-1] = 
-                        CONFIG_PWM_MIN + (int)((js.value + 32767)/65534. * (CONFIG_PWM_MAX-CONFIG_PWM_MIN));
+                        CONFIG_PWM_MIN + (int)((dir*js.value + 32767)/65534. * 
+                                (CONFIG_PWM_MAX-CONFIG_PWM_MIN));
         }
     }
 
@@ -458,6 +469,6 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
+    quadcopter.motors[index].spin(value);
+
 }
-
-
