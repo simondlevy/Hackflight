@@ -35,6 +35,7 @@
 
 #include "../firmware/pwm.hpp"
 #include "../firmware/board.hpp"
+#include "../firmware/rc.hpp"
 
 // From firmware
 extern void setup(void);
@@ -111,10 +112,10 @@ class Motor {
         }
 
         void spin(int pwm) {
-            this->pos += this->dir * ((float)pwm - CONFIG_PWM_MIN) / (CONFIG_PWM_MAX-CONFIG_PWM_MIN);
+            this->pos += (pwm < CONFIG_MINCHECK) ? 0 :
+                this->dir * ((float)pwm - CONFIG_MINCHECK) / (CONFIG_MAXCHECK-CONFIG_MINCHECK);
             simSetJointPosition(this->jointHandle, pos);
         }
-
 };
 
 struct Quadcopter
