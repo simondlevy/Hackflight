@@ -134,7 +134,7 @@ static Quadcopter quadcopter;
 // Five handles: quadcopter + four propellers
 static const int inArgs_CREATE[]={
     1,
-    sim_script_arg_int32|sim_script_arg_table,6 // all handles
+    sim_script_arg_int32|sim_script_arg_table,12 // all handles
 };
 
 void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
@@ -142,13 +142,18 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
     CScriptFunctionData D;
     if (D.readDataFromStack(cb->stackID,inArgs_CREATE,inArgs_CREATE[0],LUA_CREATE_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
+
         quadcopter.handle         = inData->at(0).int32Data[0];
+
         quadcopter.accelHandle    = inData->at(0).int32Data[1];
 
         quadcopter.greenLED = LED(inData->at(0).int32Data[2], 0, 255, 0);
-
         quadcopter.redLED   = LED(inData->at(0).int32Data[3], 255, 0, 0);
-        quadcopter.motors[0] = Motor(inData->at(0).int32Data[4], inData->at(0).int32Data[5]);
+
+        quadcopter.motors[0] = Motor(inData->at(0).int32Data[4],  inData->at(0).int32Data[5]);
+        quadcopter.motors[1] = Motor(inData->at(0).int32Data[6],  inData->at(0).int32Data[7]);
+        quadcopter.motors[2] = Motor(inData->at(0).int32Data[8],  inData->at(0).int32Data[9]);
+        quadcopter.motors[3] = Motor(inData->at(0).int32Data[10], inData->at(0).int32Data[11]);
     }
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
@@ -230,7 +235,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
     // Register 4 new Lua commands:
 
     simRegisterScriptCallbackFunction(strConCat(LUA_CREATE_COMMAND,"@",PLUGIN_NAME),
-            strConCat("number success=",LUA_CREATE_COMMAND, "(table_6 allHandles)"),
+            strConCat("number success=",LUA_CREATE_COMMAND, "(table_12 allHandles)"),
             LUA_CREATE_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_DESTROY_COMMAND,"@",PLUGIN_NAME),
