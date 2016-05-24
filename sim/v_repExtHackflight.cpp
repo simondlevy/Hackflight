@@ -34,8 +34,9 @@
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
-#include "../firmware/pwm.hpp"
 #include "../firmware/board.hpp"
+#include "../firmware/pwm.hpp"
+#include "../firmware/rc.hpp"
 
 // From firmware
 extern void setup(void);
@@ -90,18 +91,48 @@ class LED {
         }
 };
 
+class Motor {
+
+    public: // XXX should be private
+
+        int propHandle;
+        int jointHandle;
+        int dir;
+        float pos;
+        int id;
+
+    public:
+
+        Motor(void) { }
+
+        Motor(int ph, int jh, int d, int k) {
+            this->propHandle = ph;
+            this->jointHandle = jh;
+            this->dir = d;
+            this->id = k;
+            this->pos = 0;
+        }
+
+        void spin(int pwm) {
+
+            // Simulate prop rotation
+            this->pos += (pwm < CONFIG_MINCHECK) ? 0 :
+                1.5 * this->dir * ((float)pwm - CONFIG_MINCHECK) / (CONFIG_MAXCHECK-CONFIG_MINCHECK);
+            simSetJointPosition(this->jointHandle, pos);
+
+
+            float force = 0;
+            float torque = 0;
+            if (this->id == 1)
+                simAddForceAndTorque(this->propHandle, &force, &torque);
+        }
+};
+
 
 struct sQuadcopter
 {
     int handle;
-    int prop1handle;
-    int prop2handle;
-    int prop3handle;
-    int prop4handle;
-    int joint1handle;
-    int joint2handle;
-    int joint3handle;
-    int joint4handle;
+    Motor motors[4];
     LED redLED;
     LED greenLED;
     float duration;
@@ -146,15 +177,8 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
         quadcopter.greenLED = LED(inData->at(1).int32Data[0], 0, 1, 0);
         quadcopter.redLED   = LED(inData->at(2).int32Data[0], 1, 0, 0);
 
-        quadcopter.prop1handle = inData->at(3).int32Data[0];
-        quadcopter.prop2handle = inData->at(4).int32Data[0];
-        quadcopter.prop3handle = inData->at(5).int32Data[0];
-        quadcopter.prop4handle = inData->at(6).int32Data[0];
-
-        quadcopter.joint1handle = inData->at(7).int32Data[0];
-        quadcopter.joint2handle = inData->at(8).int32Data[0];
-        quadcopter.joint3handle = inData->at(9).int32Data[0];
-        quadcopter.joint4handle = inData->at(10).int32Data[0];
+        for (int k=0; k<4; ++k)
+            quadcopter.motors[k] = Motor(inData->at(k+3).int32Data[0], inData->at(k+7).int32Data[0], 0, k);
 
         quadcopter.waitUntilZero=NULL;
         quadcopter.duration=0.0f;
@@ -272,10 +296,8 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     float force = 1;
     float torque = 0;
-    simAddForceAndTorque(quadcopter.prop1handle, &force, &torque);
-    simAddForceAndTorque(quadcopter.prop2handle, &force, &torque);
-    simAddForceAndTorque(quadcopter.prop3handle, &force, &torque);
-    simAddForceAndTorque(quadcopter.prop4handle, &force, &torque);
+    for (int k=0; k<4; ++k)
+        simAddForceAndTorque(quadcopter.motors[k].propHandle, &force, &torque);
 
     // Read joystick
     if (joyfd > 0) {
