@@ -140,26 +140,10 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
 #define LUA_STOP_COMMAND "simExtHackflight_stop"
 
-static const int inArgs_STOP[]={
-    1,
-    sim_script_arg_int32,0,
-};
-
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
-    bool success=false;
-    if (D.readDataFromStack(cb->stackID,inArgs_STOP,inArgs_STOP[0],LUA_STOP_COMMAND))
-    {
-        if (quadcopter.waitUntilZero!=NULL)
-        {
-            quadcopter.waitUntilZero[0]=0; // free the blocked thread
-            quadcopter.waitUntilZero=NULL;
-        }
-        quadcopter.duration=0.0f;
-        success=true;
-    }
-    D.pushOutData(CScriptFunctionDataItem(success));
+    D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 }
 
