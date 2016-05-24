@@ -224,9 +224,9 @@ void loop(void)
         rc.computeExpo();
 
         // use LEDs to indicate calibration status
-        if (calibratingA > 0 || calibratingG > 0) { 
-            board.ledGreenToggle();
-        } else {
+        if (calibratingA > 0 || calibratingG > 0) 
+            board.ledGreenOn();
+        else {
             if (accCalibrated)
                 board.ledGreenOff();
             if (armed)

@@ -373,32 +373,38 @@ uint32_t Board::getMicros()
 
 void Board::ledGreenOff(void)
 {
+    printf("GREEN OFF\n");
     quadcopter.greenLED.turnOff();
 }
 
 void Board::ledGreenOn(void)
 {
+    printf("GREEN ON\n");
     quadcopter.greenLED.turnOn();
 }
 
 void Board::ledGreenToggle(void)
 {
+    printf("GREEN TOGGLE\n");
     quadcopter.greenLED.toggle();
 }
 
 
 void Board::ledRedOff(void)
 {
+    printf("RED OFF\n");
     quadcopter.redLED.turnOff();
 }
 
 void Board::ledRedOn(void)
 {
+    printf("RED ON\n");
     quadcopter.redLED.turnOn();
 }
 
 void Board::ledRedToggle(void)
 {
+    printf("RED TOGGLE\n");
     quadcopter.redLED.toggle();
 }
 
