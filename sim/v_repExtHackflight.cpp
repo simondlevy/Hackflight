@@ -133,13 +133,8 @@ static Quadcopter quadcopter;
 
 // Five handles: quadcopter + four propellers
 static const int inArgs_CREATE[]={
-    6,
-    sim_script_arg_int32,0, // quadcopter handle
-    sim_script_arg_int32,0, // accelerometer handle
-    sim_script_arg_int32,0, // green LED handle
-    sim_script_arg_int32,0, // red LED handle
-    sim_script_arg_int32,0, // propeller 1 handle
-    sim_script_arg_int32,0, // joint 1 handle
+    1,
+    sim_script_arg_int32|sim_script_arg_table,6 // all handles
 };
 
 void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
@@ -148,12 +143,12 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
     if (D.readDataFromStack(cb->stackID,inArgs_CREATE,inArgs_CREATE[0],LUA_CREATE_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
         quadcopter.handle         = inData->at(0).int32Data[0];
-        quadcopter.accelHandle    = inData->at(1).int32Data[0];
+        quadcopter.accelHandle    = inData->at(0).int32Data[1];
 
-        quadcopter.greenLED = LED(inData->at(2).int32Data[0], 0, 255, 0);
+        quadcopter.greenLED = LED(inData->at(0).int32Data[2], 0, 255, 0);
 
-        quadcopter.redLED   = LED(inData->at(3).int32Data[0], 255, 0, 0);
-        quadcopter.motors[0] = Motor(inData->at(4).int32Data[0], inData->at(5).int32Data[0]);
+        quadcopter.redLED   = LED(inData->at(0).int32Data[3], 255, 0, 0);
+        quadcopter.motors[0] = Motor(inData->at(0).int32Data[4], inData->at(0).int32Data[5]);
     }
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
@@ -235,18 +230,14 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
     // Register 4 new Lua commands:
 
     simRegisterScriptCallbackFunction(strConCat(LUA_CREATE_COMMAND,"@",PLUGIN_NAME),
-            strConCat("number success=",LUA_CREATE_COMMAND,
-                "(number quadcopter, number accel, number greenLED, number redLED, "
-                "number prop1, number joint1)"),
+            strConCat("number success=",LUA_CREATE_COMMAND, "(table_6 allHandles)"),
             LUA_CREATE_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_DESTROY_COMMAND,"@",PLUGIN_NAME),
-            strConCat("boolean success=",LUA_DESTROY_COMMAND,"()"),
-            LUA_DESTROY_CALLBACK);
+            strConCat("boolean success=",LUA_DESTROY_COMMAND,"()"), LUA_DESTROY_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME),
-            strConCat("boolean success=", LUA_START_COMMAND,"()"),
-            LUA_START_CALLBACK);
+            strConCat("boolean success=", LUA_START_COMMAND,"()"), LUA_START_CALLBACK);
 
     simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME),
             strConCat("boolean success=",LUA_STOP_COMMAND,"()"),LUA_STOP_CALLBACK);
