@@ -102,11 +102,11 @@ struct sQuadcopter
     LED greenLED;
     float duration;
     char* waitUntilZero;
+    int pwm[8];
 };
 
 static sQuadcopter quadcopter;
 static int joyfd;
-static int pwm[8];
 static struct timespec start_time;
 
 
@@ -257,7 +257,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     void* retVal=NULL;
 
-    float force = 1;
+    float force = 0;
     float torque = 0;
     simAddForceAndTorque(quadcopter.prop1handle, &force, &torque);
     simAddForceAndTorque(quadcopter.prop2handle, &force, &torque);
@@ -291,7 +291,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
             }
 
             if (fakechan > 0)
-                pwm[fakechan-1] = 
+                quadcopter.pwm[fakechan-1] = 
                         CONFIG_PWM_MIN + (int)((js.value + 32767)/65534. * (CONFIG_PWM_MAX-CONFIG_PWM_MIN));
         }
     }
@@ -356,14 +356,14 @@ void Board::init(uint32_t & imuLooptimeUsec)
 
     // Set initial fake PWM values to midpoints
     for (int k=0; k<CONFIG_RC_CHANS; ++k)  {
-        pwm[k] = (CONFIG_PWM_MIN + CONFIG_PWM_MAX) / 2;
+        quadcopter.pwm[k] = (CONFIG_PWM_MIN + CONFIG_PWM_MAX) / 2;
     }
 
     // Special treatment for throttle and switch PWM: start them at the bottom
     // of the range.  As soon as they are moved, their actual values will
     // be returned by Board::readPWM().
-    pwm[2] = CONFIG_PWM_MIN;
-    pwm[4] = CONFIG_PWM_MIN;
+    quadcopter.pwm[2] = CONFIG_PWM_MIN;
+    quadcopter.pwm[4] = CONFIG_PWM_MIN;
 
     // Minimal V-REP simulation period
     imuLooptimeUsec = 10000;
@@ -419,7 +419,7 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    return pwm[chan];
+    return quadcopter.pwm[chan];
 }
 
 void Board::writeMotor(uint8_t index, uint16_t value)
