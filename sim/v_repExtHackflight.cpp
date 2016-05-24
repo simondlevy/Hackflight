@@ -107,7 +107,7 @@ class Motor {
 
         void spin(int pwm) {
             this->pos += .01;
-            if (this->pos > 1)
+            if (this->pos > M_PI)
                 this->pos = 0;
             simSetJointPosition(this->jointHandle, pos);
         }
