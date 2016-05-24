@@ -98,6 +98,10 @@ struct sQuadcopter
     int prop2handle;
     int prop3handle;
     int prop4handle;
+    int joint1handle;
+    int joint2handle;
+    int joint3handle;
+    int joint4handle;
     LED redLED;
     LED greenLED;
     float duration;
@@ -116,7 +120,11 @@ static struct timespec start_time;
 
 // Five handles: quadcopter + four propellers
 static const int inArgs_CREATE[]={
-    7,
+    11,
+    sim_script_arg_int32,0,
+    sim_script_arg_int32,0,
+    sim_script_arg_int32,0,
+    sim_script_arg_int32,0,
     sim_script_arg_int32,0,
     sim_script_arg_int32,0,
     sim_script_arg_int32,0,
@@ -142,6 +150,11 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
         quadcopter.prop2handle = inData->at(4).int32Data[0];
         quadcopter.prop3handle = inData->at(5).int32Data[0];
         quadcopter.prop4handle = inData->at(6).int32Data[0];
+
+        quadcopter.joint1handle = inData->at(7).int32Data[0];
+        quadcopter.joint2handle = inData->at(8).int32Data[0];
+        quadcopter.joint3handle = inData->at(9).int32Data[0];
+        quadcopter.joint4handle = inData->at(10).int32Data[0];
 
         quadcopter.waitUntilZero=NULL;
         quadcopter.duration=0.0f;
