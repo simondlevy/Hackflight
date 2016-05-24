@@ -101,22 +101,10 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
 
 #define LUA_DESTROY_COMMAND "simExtHackflight_destroy"
 
-static const int inArgs_DESTROY[]={
-    1,
-    sim_script_arg_int32,0,
-};
-
 void LUA_DESTROY_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
-    bool success=false;
-    if (D.readDataFromStack(cb->stackID,inArgs_DESTROY,inArgs_DESTROY[0],LUA_DESTROY_COMMAND))
-    {
-        if (quadcopter.waitUntilZero!=NULL)
-            quadcopter.waitUntilZero[0]=0; // free the blocked thread
-        success=true;
-    }
-    D.pushOutData(CScriptFunctionDataItem(success));
+    D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 }
 
