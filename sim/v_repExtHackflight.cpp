@@ -113,7 +113,7 @@ class Motor {
 
         void spin(int pwm) {
             this->pos += (pwm < CONFIG_MINCHECK) ? 0 :
-                this->dir * ((float)pwm - CONFIG_MINCHECK) / (CONFIG_MAXCHECK-CONFIG_MINCHECK);
+                1.5 * this->dir * ((float)pwm - CONFIG_MINCHECK) / (CONFIG_MAXCHECK-CONFIG_MINCHECK);
             simSetJointPosition(this->jointHandle, pos);
         }
 };
