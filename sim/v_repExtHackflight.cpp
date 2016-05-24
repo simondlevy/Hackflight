@@ -33,6 +33,9 @@
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
+#include "../firmware/pwm.hpp"
+#include "../firmware/board.hpp"
+
 // From firmware
 extern void setup(void);
 extern void loop(void);
@@ -108,10 +111,8 @@ class Motor {
         }
 
         void spin(int pwm) {
-            if (pwm > 1200) { // XXX relate to PWM
-                this->pos += this->dir * .05;//M_PI / 4;
-                simSetJointPosition(this->jointHandle, pos);
-            }
+            this->pos += this->dir * ((float)pwm - CONFIG_PWM_MIN) / (CONFIG_PWM_MAX-CONFIG_PWM_MIN);
+            simSetJointPosition(this->jointHandle, pos);
         }
 
 };
@@ -284,9 +285,6 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 }
 
 // Board implementation --------------------------------------------------------------
-
-#include "../firmware/pwm.hpp"
-#include "../firmware/board.hpp"
 
 // V-REP memory model seems to prevent us from making these instance variables of a Board object
 static int pwm[8];
