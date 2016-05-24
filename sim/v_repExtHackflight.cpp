@@ -458,7 +458,7 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
-    if (index == 0) quadcopter.motors[index].spin(value);
+    quadcopter.motors[index].spin(value);
 
     //float force = 0;
     //float torque = 1;
