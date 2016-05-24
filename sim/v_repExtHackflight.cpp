@@ -285,6 +285,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
         if (js.type & ~JS_EVENT_INIT) {
             int fakechan = 0;
+            int dir = +1;
             switch (js.number) {
                 case 0:
                     fakechan = 3;
@@ -294,6 +295,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
                     break;
                 case 2:
                     fakechan = 2;
+                    dir = -1; // special handling for inverted pitch
                     break;
                 case 3:
                     fakechan = 4;
@@ -303,9 +305,10 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
                     break;
             }
 
-            if (fakechan > 0)
+            if (fakechan > 0) {
                 quadcopter.pwm[fakechan-1] = 
-                        CONFIG_PWM_MIN + (int)((js.value + 32767)/65534. * (CONFIG_PWM_MAX-CONFIG_PWM_MIN));
+                        CONFIG_PWM_MIN + (int)((dir*js.value + 32767)/65534. * (CONFIG_PWM_MAX-CONFIG_PWM_MIN));
+            }
         }
     }
 
@@ -360,6 +363,8 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 
         accel={force[1]/mass,force[2]/mass,force[3]/mass}
     */
+    for (int k=0; k<3; ++k)
+        gyroADC[k] = accADC[k] = 0;
 }
 
 void Board::init(uint32_t & imuLooptimeUsec)

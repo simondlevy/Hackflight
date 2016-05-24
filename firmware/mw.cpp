@@ -166,6 +166,8 @@ void loop(void)
                 }
             } else {            // actions during not armed
 
+                //printf("%d %d\n", rc.sticks, THR_LO + YAW_LO + PIT_LO + ROL_CE);
+
                 // GYRO calibration
                 if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
                     calibratingG = calibratingGyroCycles;
