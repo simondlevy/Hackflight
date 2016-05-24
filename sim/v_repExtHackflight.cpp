@@ -47,6 +47,47 @@ extern void loop(void);
 
 static LIBRARY vrepLib;
 
+class LED {
+
+    private:
+
+        int handle;
+        float color[3];
+        bool on;
+        float black[3];
+
+    public:
+
+        LED(void) {}
+
+        LED(int handle, int r, int g, int b) {
+            this->handle = handle;
+            this->color[0] = r;
+            this->color[1] = g;
+            this->color[2] = b;
+            this->on = false;
+            this->black[0] = 0;
+            this->black[1] = 0;
+            this->black[2] = 0;
+        }
+
+        void turnOn(void) {
+            simSetShapeColor(this->handle, NULL, 0, this->color);
+            this->on = true;
+        }
+
+        void turnOff(void) {
+            simSetShapeColor(this->handle, NULL, 0, this->black);
+            this->on = false;
+        }
+
+        void toggle(void) {
+            this->on = !this->on;
+            simSetShapeColor(this->handle, NULL, 0, this->on ? this->color : this->black);
+        }
+};
+
+
 struct sQuadcopter
 {
     int handle;
@@ -54,6 +95,8 @@ struct sQuadcopter
     int prop2handle;
     int prop3handle;
     int prop4handle;
+    LED redLED;
+    LED greenLED;
     float duration;
     char* waitUntilZero;
 };
@@ -70,7 +113,9 @@ static int nextHackflightHandle;
 
 // Five handles: quadcopter + four propellers
 static const int inArgs_CREATE[]={
-    5,
+    7,
+    sim_script_arg_int32,0,
+    sim_script_arg_int32,0,
     sim_script_arg_int32,0,
     sim_script_arg_int32,0,
     sim_script_arg_int32,0,
@@ -84,12 +129,19 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
     int handle=-1;
     if (D.readDataFromStack(cb->stackID,inArgs_CREATE,inArgs_CREATE[0],LUA_CREATE_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
+
         handle=nextHackflightHandle++;
-        quadcopter.handle      = inData->at(0).int32Data[0];
-        quadcopter.prop1handle = inData->at(1).int32Data[0];
-        quadcopter.prop2handle = inData->at(2).int32Data[0];
-        quadcopter.prop3handle = inData->at(3).int32Data[0];
-        quadcopter.prop4handle = inData->at(4).int32Data[0];
+
+        quadcopter.handle = inData->at(0).int32Data[0];
+
+        quadcopter.greenLED = LED(inData->at(1).int32Data[0], 0, 255, 0);
+        quadcopter.redLED   = LED(inData->at(2).int32Data[0], 255, 0, 0);
+
+        quadcopter.prop1handle = inData->at(3).int32Data[0];
+        quadcopter.prop2handle = inData->at(4).int32Data[0];
+        quadcopter.prop3handle = inData->at(5).int32Data[0];
+        quadcopter.prop4handle = inData->at(6).int32Data[0];
+
         quadcopter.waitUntilZero=NULL;
         quadcopter.duration=0.0f;
     }
@@ -321,32 +373,32 @@ uint32_t Board::getMicros()
 
 void Board::ledGreenOff(void)
 {
-    //printf("GREEN OFF\n");
+    printf("GREEN OFF\n");
 }
 
 void Board::ledGreenOn(void)
 {
-    //printf("GREEN ON\n");
+    printf("GREEN ON\n");
 }
 
 void Board::ledGreenToggle(void)
 {
-    //printf("GREEN TOGGLE\n");
+    printf("GREEN TOGGLE\n");
 }
 
 void Board::ledRedOff(void)
 {
-    //printf("RED OFF\n");
+    printf("RED OFF\n");
 }
 
 void Board::ledRedOn(void)
 {
-    //printf("RED ON\n");
+    printf("RED ON\n");
 }
 
 void Board::ledRedToggle(void)
 {
-    //printf("RED TOGGLE\n");
+    printf("RED TOGGLE\n");
 }
 
 uint16_t Board::readPWM(uint8_t chan)
