@@ -105,14 +105,13 @@ struct sQuadcopter
 };
 
 static sQuadcopter quadcopter;
-
 static int joyfd;
-
 static int pwm[8];
+static struct timespec start_time;
 
-// --------------------------------------------------------------------------------------
-// simExtHackflight_create
-// --------------------------------------------------------------------------------------
+
+// simExtHackflight_create -------------------------------------------------------------
+
 #define LUA_CREATE_COMMAND "simExtHackflight_create"
 
 // Five handles: quadcopter + four propellers
@@ -329,10 +328,8 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     return(retVal);
 }
 
-// Board implementation --------------------------------------------------------------
+// Board implementation ===============================================================
 
-// V-REP memory model seems to prevent us from making these instance variables of a Board object
-static struct timespec start_time;
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
@@ -368,13 +365,8 @@ void Board::init(uint32_t & imuLooptimeUsec)
     pwm[2] = CONFIG_PWM_MIN;
     pwm[4] = CONFIG_PWM_MIN;
 
-
+    // Minimal V-REP simulation period
     imuLooptimeUsec = 10000;
-}
-
-void Board::checkReboot(bool pendReboot)
-{
-
 }
 
 void Board::delayMilliseconds(uint32_t msec)
@@ -430,26 +422,14 @@ uint16_t Board::readPWM(uint8_t chan)
     return pwm[chan];
 }
 
-void Board::reboot(void)
-{
-}
-
-uint8_t Board::serialAvailableBytes(void)
-{
-    return 0;
-}
-
-uint8_t Board::serialReadByte(void)
-{
-    return 0;
-}
-
-void Board::serialWriteByte(uint8_t c)
-{
-}
-
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
 }
 
+// Unimplemented --------------------------------------------
 
+void Board::checkReboot(bool pendReboot) { }
+void Board::serialWriteByte(uint8_t c) { }
+uint8_t Board::serialReadByte(void) { return 0; }
+uint8_t Board::serialAvailableBytes(void) { return 0; }
+void Board::reboot(void) { }
