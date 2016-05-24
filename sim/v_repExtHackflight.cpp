@@ -57,7 +57,7 @@ class LED {
         int handle;
         float color[3];
         bool on;
-        float black[3];
+        float gray[3];
 
     public:
 
@@ -69,9 +69,9 @@ class LED {
             this->color[1] = g;
             this->color[2] = b;
             this->on = false;
-            this->black[0] = 0;
-            this->black[1] = 0;
-            this->black[2] = 0;
+            this->gray[0] = .32;
+            this->gray[1] = .32;
+            this->gray[2] = .32;
         }
 
         void turnOn(void) {
@@ -80,13 +80,13 @@ class LED {
         }
 
         void turnOff(void) {
-            simSetShapeColor(this->handle, NULL, 0, this->black);
+            simSetShapeColor(this->handle, NULL, 0, this->gray);
             this->on = false;
         }
 
         void toggle(void) {
             this->on = !this->on;
-            simSetShapeColor(this->handle, NULL, 0, this->on ? this->color : this->black);
+            simSetShapeColor(this->handle, NULL, 0, this->on ? this->color : this->gray);
         }
 };
 
@@ -143,8 +143,8 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
 
         quadcopter.handle = inData->at(0).int32Data[0];
 
-        quadcopter.greenLED = LED(inData->at(1).int32Data[0], 0, 255, 0);
-        quadcopter.redLED   = LED(inData->at(2).int32Data[0], 255, 0, 0);
+        quadcopter.greenLED = LED(inData->at(1).int32Data[0], 0, 1, 0);
+        quadcopter.redLED   = LED(inData->at(2).int32Data[0], 1, 0, 0);
 
         quadcopter.prop1handle = inData->at(3).int32Data[0];
         quadcopter.prop2handle = inData->at(4).int32Data[0];
