@@ -357,10 +357,17 @@ void Board::init(uint32_t & imuLooptimeUsec)
     // Initialize nanosecond timer
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
 
-    // Set initial fake PWM values
+    // Set initial fake PWM values to midpoints
     for (int k=0; k<CONFIG_RC_CHANS; ++k)  {
         pwm[k] = (CONFIG_PWM_MIN + CONFIG_PWM_MAX) / 2;
     }
+
+    // Special treatment for throttle and switch PWM: start them at the bottom
+    // of the range.  As soon as they are moved, their actual values will
+    // be returned by Board::readPWM().
+    pwm[2] = CONFIG_PWM_MIN;
+    pwm[4] = CONFIG_PWM_MIN;
+
 
     imuLooptimeUsec = 10000;
 }

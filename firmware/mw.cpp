@@ -147,6 +147,9 @@ void loop(void)
         // update RC channels
         rc.update();
 
+        printf("%4d %4d %4d %4d %4d\n", 
+                rc.data[0], rc.data[1], rc.data[2], rc.data[3], rc.data[4]);
+
         // when landed, reset integral component of PID
         if (rc.throttleIsDown()) 
             pid.resetIntegral();
