@@ -128,7 +128,8 @@ void LUA_DESTROY_CALLBACK(SScriptCallBack* cb)
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
-    cb->waitUntilZero=1; 
+    cb->waitUntilZero=1; // the effect of this is that when we leave the callback, the Lua script gets control
+	   				     // back only when this value turns zero. This allows for "blocking" functions.
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 
