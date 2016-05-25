@@ -119,12 +119,6 @@ class Motor {
             this->pos += (pwm < CONFIG_MINCHECK) ? 0 :
                 1.5 * this->dir * ((float)pwm - CONFIG_MINCHECK) / (CONFIG_MAXCHECK-CONFIG_MINCHECK);
             simSetJointPosition(this->jointHandle, pos);
-
-
-            float force = 0;
-            float torque = 0;
-            if (this->id == 1)
-                simAddForceAndTorque(this->propHandle, &force, &torque);
         }
 };
 
@@ -178,7 +172,7 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
         quadcopter.redLED   = LED(inData->at(2).int32Data[0], 1, 0, 0);
 
         for (int k=0; k<4; ++k)
-            quadcopter.motors[k] = Motor(inData->at(k+3).int32Data[0], inData->at(k+7).int32Data[0], 0, k);
+            quadcopter.motors[k] = Motor(inData->at(k+3).int32Data[0], inData->at(k+7).int32Data[0], +1, k);
 
         quadcopter.waitUntilZero=NULL;
         quadcopter.duration=0.0f;
@@ -294,10 +288,12 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     void* retVal=NULL;
 
-    float force = 1;
+    float force = 0;
     float torque = 0;
-    for (int k=0; k<4; ++k)
+    for (int k=0; k<4; ++k) {
         simAddForceAndTorque(quadcopter.motors[k].propHandle, &force, &torque);
+        quadcopter.motors[k].spin(1500);
+    }
 
     // Read joystick
     if (joyfd > 0) {
