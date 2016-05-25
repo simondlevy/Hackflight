@@ -99,25 +99,25 @@ class Motor {
         int jointHandle;
         int dir;
         float pos;
-        int id;
+        int pwm;
 
     public:
 
         Motor(void) { }
 
-        Motor(int ph, int jh, int d, int k) {
+        Motor(int ph, int jh, int d) {
             this->propHandle = ph;
             this->jointHandle = jh;
             this->dir = d;
-            this->id = k;
             this->pos = 0;
+            this->pwm = 0;
         }
 
-        void spin(int pwm) {
+        void spin(void) {
 
-            // Simulate prop rotation
+            // Simulate prop rotation by setting joint angle to arbitrary multiple of scaled PWM
             this->pos += (pwm < CONFIG_MINCHECK) ? 0 :
-                1.5 * this->dir * ((float)pwm - CONFIG_MINCHECK) / (CONFIG_MAXCHECK-CONFIG_MINCHECK);
+                0.0005 * this->pwm * ((float)this->pwm - CONFIG_MINCHECK) / (CONFIG_MAXCHECK-CONFIG_MINCHECK);
             simSetJointPosition(this->jointHandle, pos);
         }
 };
@@ -131,7 +131,7 @@ struct sQuadcopter
     LED greenLED;
     float duration;
     char* waitUntilZero;
-    int pwm[8];
+    int chanval[8];
 };
 
 static sQuadcopter quadcopter;
@@ -171,10 +171,10 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
         quadcopter.greenLED = LED(inData->at(1).int32Data[0], 0, 1, 0);
         quadcopter.redLED   = LED(inData->at(2).int32Data[0], 1, 0, 0);
 
-        quadcopter.motors[0] = Motor(inData->at(3).int32Data[0], inData->at(7).int32Data[0],  -1, 1);
-        quadcopter.motors[1] = Motor(inData->at(4).int32Data[0], inData->at(8).int32Data[0],  +1, 2);
-        quadcopter.motors[2] = Motor(inData->at(5).int32Data[0], inData->at(9).int32Data[0],  +1, 3);
-        quadcopter.motors[3] = Motor(inData->at(6).int32Data[0], inData->at(10).int32Data[0], -1, 4);
+        quadcopter.motors[0] = Motor(inData->at(3).int32Data[0], inData->at(7).int32Data[0],  -1);
+        quadcopter.motors[1] = Motor(inData->at(4).int32Data[0], inData->at(8).int32Data[0],  +1);
+        quadcopter.motors[2] = Motor(inData->at(5).int32Data[0], inData->at(9).int32Data[0],  +1);
+        quadcopter.motors[3] = Motor(inData->at(6).int32Data[0], inData->at(10).int32Data[0], -1);
 
         quadcopter.waitUntilZero=NULL;
         quadcopter.duration=0.0f;
@@ -294,7 +294,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     float torque = 0;
     for (int k=0; k<4; ++k) {
         simAddForceAndTorque(quadcopter.motors[k].propHandle, &force, &torque);
-        quadcopter.motors[k].spin(1150);
+        quadcopter.motors[k].spin();
     }
 
     // Read joystick
@@ -326,7 +326,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
             }
 
             if (fakechan > 0) {
-                quadcopter.pwm[fakechan-1] = 
+                quadcopter.chanval[fakechan-1] = 
                         CONFIG_PWM_MIN + (int)((dir*js.value + 32767)/65534. * (CONFIG_PWM_MAX-CONFIG_PWM_MIN));
             }
         }
@@ -394,14 +394,14 @@ void Board::init(uint32_t & imuLooptimeUsec)
 
     // Set initial fake PWM values to midpoints
     for (int k=0; k<CONFIG_RC_CHANS; ++k)  {
-        quadcopter.pwm[k] = (CONFIG_PWM_MIN + CONFIG_PWM_MAX) / 2;
+        quadcopter.chanval[k] = (CONFIG_PWM_MIN + CONFIG_PWM_MAX) / 2;
     }
 
     // Special treatment for throttle and switch PWM: start them at the bottom
     // of the range.  As soon as they are moved, their actual values will
     // be returned by Board::readPWM().
-    quadcopter.pwm[2] = CONFIG_PWM_MIN;
-    quadcopter.pwm[4] = CONFIG_PWM_MIN;
+    quadcopter.chanval[2] = CONFIG_PWM_MIN;
+    quadcopter.chanval[4] = CONFIG_PWM_MIN;
 
     // Minimal V-REP simulation period
     imuLooptimeUsec = 10000;
@@ -457,11 +457,12 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    return quadcopter.pwm[chan];
+    return quadcopter.chanval[chan];
 }
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
+    quadcopter.motors[index].pwm = value;
 }
 
 // Unimplemented --------------------------------------------
