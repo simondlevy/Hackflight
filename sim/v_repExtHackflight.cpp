@@ -171,8 +171,10 @@ void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
         quadcopter.greenLED = LED(inData->at(1).int32Data[0], 0, 1, 0);
         quadcopter.redLED   = LED(inData->at(2).int32Data[0], 1, 0, 0);
 
-        for (int k=0; k<4; ++k)
-            quadcopter.motors[k] = Motor(inData->at(k+3).int32Data[0], inData->at(k+7).int32Data[0], +1, k);
+        quadcopter.motors[0] = Motor(inData->at(3).int32Data[0], inData->at(7).int32Data[0],  -1, 1);
+        quadcopter.motors[1] = Motor(inData->at(4).int32Data[0], inData->at(8).int32Data[0],  +1, 2);
+        quadcopter.motors[2] = Motor(inData->at(5).int32Data[0], inData->at(9).int32Data[0],  +1, 3);
+        quadcopter.motors[3] = Motor(inData->at(6).int32Data[0], inData->at(10).int32Data[0], -1, 4);
 
         quadcopter.waitUntilZero=NULL;
         quadcopter.duration=0.0f;
@@ -292,7 +294,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     float torque = 0;
     for (int k=0; k<4; ++k) {
         simAddForceAndTorque(quadcopter.motors[k].propHandle, &force, &torque);
-        quadcopter.motors[k].spin(1500);
+        quadcopter.motors[k].spin(1150);
     }
 
     // Read joystick
