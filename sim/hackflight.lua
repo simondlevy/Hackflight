@@ -6,22 +6,24 @@ end
 
 threadFunction=function()
 
+    -- Launch plugin
     local pluginHandle = simLoadModule('/home/levy/Desktop/hackflight/sim/libv_repExtHackflight.so', 'Hackflight')
-    simExtHackflight_create(simGetObjectHandle('Quadcopter'))
+    simExtHackflight_create()
     simExtHackflight_start()
 
+    -- Loop till user hits stop button
     while simGetSimulationState()~=sim_simulation_advancing_abouttostop do
 
         -- Get Euler angles for IMU
         orientation = simGetObjectOrientation(base, -1)
 
         -- Loop over motors
-        for i = 1, 4, 1 do
+        for i = 1,4,1 do
 
             -- Send IMU info to plugin
-            simExtHackflight_update(i, timestep, orientation)
+            simExtHackflight_update(i, timestep, orientation, gyroAngles)
 
-            -- Get motor thrusts from plugin
+            -- Get motor thrust from plugin
             thrust = simGetFloatSignal('thrust')
 
             -- Convert thrust to force and torque
@@ -46,12 +48,14 @@ threadFunction=function()
             jointAngle = simGetJointPosition(motorJointList[i])
             simSetJointPosition(motorJointList[i], jointAngle + propDirections[i]*thrust/5)
 
-        end
+        end -- loop over motors
 
 
         simSwitchThread()
-    end
 
+    end -- loop till user hits stop button
+
+    -- Cleanup
     simExtHackflight_stop()
     simExtHackflight_destroy()
     simUnloadModule(pluginHandle)

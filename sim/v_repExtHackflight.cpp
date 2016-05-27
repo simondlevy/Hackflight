@@ -43,7 +43,6 @@
 
 static LIBRARY vrepLib;
 
-static int quadcopterHandle;
 static int joyfd;
 
 // PID parameters ==================================================================
@@ -238,10 +237,6 @@ static const int inArgs_CREATE[]={
 void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
-    if (D.readDataFromStack(cb->stackID,inArgs_CREATE,inArgs_CREATE[0],LUA_CREATE_COMMAND)) {
-        std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
-        quadcopterHandle = inData->at(0).int32Data[0];
-    }
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 }
@@ -290,7 +285,7 @@ static const int inArgs_UPDATE[]={
     3,
     sim_script_arg_int32,0,                      // motor index (first = 1)
     sim_script_arg_double,0,                     // timestep
-    sim_script_arg_double|sim_script_arg_table,3 // Euler angles
+    sim_script_arg_double|sim_script_arg_table,3, // Euler angles
 };
 
 
@@ -301,16 +296,18 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
         int i             = inData->at(0).int32Data[0]; 
-        double timestep   = inData->at(1).doubleData[0];  
-        double alpha      = inData->at(2).doubleData[0]; 
-        double beta       = inData->at(2).doubleData[1]; 
-        double gamma      = inData->at(2).doubleData[2]; 
-     
-        // Convert Euler angles to pitch and roll via rotation formula
-        double rollAngle  =  -cos(gamma)*alpha - sin(gamma)*beta; 
-        double pitchAngle =   sin(gamma)*alpha - cos(gamma)*beta;
 
-        double yawAngle = -gamma; 
+        double timestep   = inData->at(1).doubleData[0];  
+
+        double angles[3];
+        for (int k=0; k<3; ++k)
+            angles[k] = inData->at(2).doubleData[k]; 
+
+        // Convert Euler angles to pitch and roll via rotation formula
+        double rollAngle  = -cos(angles[2])*angles[0] - sin(angles[2])*angles[1]; 
+        double pitchAngle =  sin(angles[2])*angles[0] - cos(angles[2])*angles[1];
+
+        double yawAngle = -angles[2]; 
 
         // Get corrections from PID controllers
         double yawCorrection   = yaw_IMU_PID.getCorrection(yawAngle, yawDemand, timestep);
