@@ -34,156 +34,219 @@
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
-#include "../firmware/board.hpp"
-#include "../firmware/pwm.hpp"
-#include "../firmware/rc.hpp"
-
-// From firmware
-extern void setup(void);
-extern void loop(void);
-
-#define JOY_DEV "/dev/input/js0"
-
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
 #define PLUGIN_NAME "Hackflight"
 
+#define JOY_DEV "/dev/input/js0"
+
 static LIBRARY vrepLib;
 
-class LED {
+static int quadcopterHandle;
+static int joyfd;
+
+// PID parameters ==================================================================
+
+static const double IMU_PITCH_ROLL_Kp  = .15;
+static const double IMU_PITCH_ROLL_Kd  = .2;
+static const double IMU_PITCH_ROLL_Ki  = 0;
+
+static const double IMU_YAW_Kp 	       = .05;
+static const double IMU_YAW_Kd 	       = .01;
+static const double IMU_YAW_Ki         = 0;
+
+// Flight Forces ====================================================================
+
+static const double ROLL_DEMAND_FACTOR   = 0.1;
+static const double PITCH_DEMAND_FACTOR  = 0.1;
+static const double YAW_DEMAND_FACTOR    = 0.5;
+
+static const int PARTICLE_COUNT_PER_SECOND = 430;
+static const int PARTICLE_DENSITY = 8500;
+static const double PARTICLE_SIZE = .005;
+ 
+class PID_Controller {
+    
+    // General PID control class. 
 
     private:
 
-        int handle;
-        float color[3];
-        bool on;
-        float gray[3];
+        double Kp;
+        double Ki;
+        double Kd;
+
+        double Eprev;
+        double Stdt;
+        double t;
+
+    protected:
+
+        PID_Controller(void) { }
+
+        void init(double _Kp, double _Ki, double _Kd) {
+
+            this->Kp = _Kp;
+            this->Ki = _Ki;
+            this->Kd = _Kd;
+
+            this->Eprev = 0;
+            this->Stdt = 0;
+            this->t = 0;
+        }
+
+        double getCorrection(double target, double actual, double dt=1) {
+
+            double E = target - actual;
+
+            // dE / dt
+            double dEdt = this->t > 0 ? (E - this->Eprev) / dt : 0;
+
+            // Integral E / dt 
+            this->Stdt += this->t > 0 ? E*dt : 0;
+
+            // Correcting
+            double correction = this->Kp*E + this->Ki*this->Stdt + this->Kd*dEdt;
+
+            // Update
+            this->t += 1;
+            this->Eprev = E;
+
+            return correction;
+        }
+};
+
+class Demand_PID_Controller: public PID_Controller {
+    
+    // A class to handle the interaction of demand (joystick, transmitter) and PID control.
+    // Control switches from demand to PID when demand falls below a given threshold.
+
+    private:
+
+        double noise_threshold;
+        double prevAbsDemand;
+        double target;
 
     public:
 
-        LED(void) {}
+        Demand_PID_Controller(void) : PID_Controller() { }
+        
+        void init(double Kp, double Kd, double Ki=0, double demand_noise_threshold=.01) {
 
-        LED(int handle, int r, int g, int b) {
-            this->handle = handle;
-            this->color[0] = r;
-            this->color[1] = g;
-            this->color[2] = b;
-            this->on = false;
-            this->gray[0] = .32;
-            this->gray[1] = .32;
-            this->gray[2] = .32;
+            PID_Controller::init(Kp, Ki, Kd);
+            
+            // Noise threshold for demand
+            this->noise_threshold = demand_noise_threshold;
+
+            this->prevAbsDemand = 1;
+            this->target        = 0;
         }
 
-        void turnOn(void) {
-            simSetShapeColor(this->handle, NULL, 0, this->color);
-            this->on = true;
+    double getCorrection(double sensorValue, double demandValue, double timestep=1) {
+        
+        // Returns current PID correction based on sensor value and demand value.
+        
+        // Assume no correction
+        double correction = 0;
+        
+        // If there is currently no demand
+        if (abs(demandValue) < this->noise_threshold) {
+        
+            // But there was previously a demand
+            if (this->prevAbsDemand > this->noise_threshold) {
+            
+                // Grab the current sensor value as the target
+                this->target = sensorValue;
+            }
+                              
+            // With no demand, always need a correction 
+            correction = PID_Controller::getCorrection(this->target, sensorValue, timestep);
         }
-
-        void turnOff(void) {
-            simSetShapeColor(this->handle, NULL, 0, this->gray);
-            this->on = false;
-        }
-
-        void toggle(void) {
-            this->on = !this->on;
-            simSetShapeColor(this->handle, NULL, 0, this->on ? this->color : this->gray);
-        }
+                    
+        // Track previous climb demand, angle    
+        this->prevAbsDemand = abs(demandValue);
+                                
+        return correction;
+    }
 };
 
-class Motor {
-
-    public: // XXX should be private
-
-        int propHandle;
-        int jointHandle;
-        int dir;
-        float pos;
-        int pwm;
+class Stability_PID_Controller: public PID_Controller {
 
     public:
 
-        Motor(void) { }
+        // A class to support pitch/roll stability.  K_i parameter and target angle are zero.
 
-        Motor(int ph, int jh, int d) {
-            this->propHandle = ph;
-            this->jointHandle = jh;
-            this->dir = d;
-            this->pos = 0;
-            this->pwm = 0;
+        Stability_PID_Controller(void) : PID_Controller() { }
+
+        void init(double Kp, double Kd, double Ki=0) {
+            PID_Controller::init(Kp, Ki, Kd);
         }
 
-        void spin(void) {
+        double getCorrection(double actualAngle, double timestep=1) {
 
-            // Simulate prop rotation by setting joint angle to arbitrary multiple of scaled PWM
-            this->pos += (pwm < CONFIG_MINCHECK) ? 0 :
-                0.0005 * this->pwm * ((float)this->pwm - CONFIG_MINCHECK) / (CONFIG_MAXCHECK-CONFIG_MINCHECK);
-            simSetJointPosition(this->jointHandle, pos);
+            // Returns current PID correction based on IMU angle in radians.
+
+            return PID_Controller::getCorrection(0, actualAngle, timestep);
         }
 };
 
+class Yaw_PID_Controller : public Demand_PID_Controller {
 
-struct sQuadcopter
-{
-    int handle;
-    Motor motors[4];
-    LED redLED;
-    LED greenLED;
-    float duration;
-    char* waitUntilZero;
-    int chanval[8];
+    // A class for PID control of quadrotor yaw.
+    // Special handling is needed for yaw because of numerical instabilities when angle approaches Pi radians
+    // (180 degrees).
+
+    public:
+
+        Yaw_PID_Controller(void) : Demand_PID_Controller() { }
+
+        void init(double Kp, double Kd, double Ki, double demand_noise_threshold=.01) {
+            Demand_PID_Controller::init(Kp, Kd, Ki, demand_noise_threshold);
+        }
+
+        double getCorrection(double yawAngle, double yawDemand, double timestep=1) {
+
+            // Returns current PID correction based on yaw angle in radians value and demand value in interval [-1,+1].
+
+            double correction =  Demand_PID_Controller::getCorrection(-yawAngle, yawDemand, timestep);
+
+            return abs(correction) < 10 ? correction : 0;
+        }
 };
 
-static sQuadcopter quadcopter;
-static int joyfd;
-static struct timespec start_time;
+static Yaw_PID_Controller yaw_IMU_PID;
+static Stability_PID_Controller pitch_Stability_PID;
+static Stability_PID_Controller roll_Stability_PID;
 
 
-// simExtHackflight_create -------------------------------------------------------------
+static double rollDemand;
+static double pitchDemand;
+static double yawDemand;
+static double throttleDemand;
+
+// simExtHackflight_create ////////////////////////////////////////////////////////////-
 
 #define LUA_CREATE_COMMAND "simExtHackflight_create"
 
 // Five handles: quadcopter + four propellers
 static const int inArgs_CREATE[]={
-    11,
-    sim_script_arg_int32,0,
-    sim_script_arg_int32,0,
-    sim_script_arg_int32,0,
-    sim_script_arg_int32,0,
-    sim_script_arg_int32,0,
-    sim_script_arg_int32,0,
-    sim_script_arg_int32,0,
-    sim_script_arg_int32,0,
-    sim_script_arg_int32,0,
-    sim_script_arg_int32,0,
-    sim_script_arg_int32,0,
+    1,
+    sim_script_arg_int32,0
 };
+
 
 void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
-    int handle=-1;
     if (D.readDataFromStack(cb->stackID,inArgs_CREATE,inArgs_CREATE[0],LUA_CREATE_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
-
-        quadcopter.handle = inData->at(0).int32Data[0];
-
-        quadcopter.greenLED = LED(inData->at(1).int32Data[0], 0, 1, 0);
-        quadcopter.redLED   = LED(inData->at(2).int32Data[0], 1, 0, 0);
-
-        quadcopter.motors[0] = Motor(inData->at(3).int32Data[0], inData->at(7).int32Data[0],  -1);
-        quadcopter.motors[1] = Motor(inData->at(4).int32Data[0], inData->at(8).int32Data[0],  +1);
-        quadcopter.motors[2] = Motor(inData->at(5).int32Data[0], inData->at(9).int32Data[0],  +1);
-        quadcopter.motors[3] = Motor(inData->at(6).int32Data[0], inData->at(10).int32Data[0], -1);
-
-        quadcopter.waitUntilZero=NULL;
-        quadcopter.duration=0.0f;
+        quadcopterHandle = inData->at(0).int32Data[0];
     }
-    D.pushOutData(CScriptFunctionDataItem(handle));
+    D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 }
 
-// simExtHackflight_destroy --------------------------------------------------------------------
+// simExtHackflight_destroy ////////////////////////////////////////////////////////////////////
 
 #define LUA_DESTROY_COMMAND "simExtHackflight_destroy"
 
@@ -195,36 +258,100 @@ void LUA_DESTROY_CALLBACK(SScriptCallBack* cb)
 }
 
 
-// simExtHackflight_start ------------------------------------------------------------------------
+// simExtHackflight_start ////////////////////////////////////////////////////////////////////////
 
 #define LUA_START_COMMAND "simExtHackflight_start"
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
-    CScriptFunctionData D;
-    cb->waitUntilZero=1; // the effect of this is that when we leave the callback, the Lua script gets control
-	   				     // back only when this value turns zero. This allows for "blocking" functions.
-    D.pushOutData(CScriptFunctionDataItem(true)); // success
-    D.writeDataToStack(cb->stackID);
-
-    // Close joystick if open
-    if (joyfd > 0)
-        close(joyfd);
 
     // Initialize joystick
     joyfd = open( JOY_DEV , O_RDONLY);
     if(joyfd > 0) 
         fcntl(joyfd, F_SETFL, O_NONBLOCK);
 
-    setup();
+    // Special handling for throttle
+    throttleDemand = 0;
+
+    // Initialize PID controllers
+    yaw_IMU_PID.init(IMU_YAW_Kp, IMU_YAW_Kd, IMU_YAW_Ki);
+    pitch_Stability_PID.init(IMU_PITCH_ROLL_Kp, IMU_PITCH_ROLL_Kd, IMU_PITCH_ROLL_Ki);
+    roll_Stability_PID.init(IMU_PITCH_ROLL_Kp, IMU_PITCH_ROLL_Kd, IMU_PITCH_ROLL_Ki);
+
+    CScriptFunctionData D;
+    D.pushOutData(CScriptFunctionDataItem(true)); // success
+    D.writeDataToStack(cb->stackID);
 }
 
-// simExtHackflight_stop --------------------------------------------------------------------------------
+#define LUA_UPDATE_COMMAND "simExtHackflight_update"
+
+
+static const int inArgs_UPDATE[]={
+    5,
+    sim_script_arg_int32,0,
+    sim_script_arg_double,0,
+    sim_script_arg_double,0,
+    sim_script_arg_double,0,
+    sim_script_arg_double,0
+};
+
+
+void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
+{
+    CScriptFunctionData D;
+    if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
+        std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
+
+        int i                  = inData->at(0).int32Data[0]; 
+        double timestep        = inData->at(1).doubleData[0];  
+        double pitchAngle      = inData->at(2).doubleData[0]; 
+        double rollAngle       = inData->at(3).doubleData[0]; 
+        double yawAngle        = inData->at(4).doubleData[0]; 
+
+        // Get corrections from PID controllers
+        double yawCorrection   = yaw_IMU_PID.getCorrection(yawAngle, yawDemand, timestep);
+        double pitchCorrection = pitch_Stability_PID.getCorrection(pitchAngle, timestep);
+        double rollCorrection  = roll_Stability_PID.getCorrection(rollAngle, timestep);
+
+        // Baseline thrust is a nonlinear function of climb demand
+        double baselineThrust = 4*sqrt(sqrt(throttleDemand)) + 2;
+
+        // Overall thrust is baseline plus throttle demand plus correction from PD controller
+        // received from the joystick and the # quadrotor model corrections. A positive 
+        // pitch value means, thrust increases for two back propellers and a negative 
+        // is opposite; similarly for roll and yaw.  A positive throttle value means thrust 
+        // increases for all 4 propellers.
+        double psign[4] = {-1, +1, -1, +1}; 
+        double rsign[4] = {+1, +1, -1, -1};
+        double ysign[4] = {+1, -1, -1, +1};
+
+        // LUA -> C++ 
+        i -= 1;
+
+        double thrust = (baselineThrust + 
+                rsign[i]*rollDemand*ROLL_DEMAND_FACTOR + 
+                psign[i]*pitchDemand*PITCH_DEMAND_FACTOR + 
+                ysign[i]*yawDemand*YAW_DEMAND_FACTOR) * 
+                    (1 + rsign[i]*rollCorrection + psign[i]*pitchCorrection + ysign[i]*yawCorrection);
+
+        simSetFloatSignal("thrust", thrust);
+    }
+
+    D.pushOutData(CScriptFunctionDataItem(true)); // success
+    D.writeDataToStack(cb->stackID);
+}
+
+
+// simExtHackflight_stop ////////////////////////////////////////////////////////////////////////////////
 
 #define LUA_STOP_COMMAND "simExtHackflight_stop"
 
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
+    // Close joystick if open
+    if (joyfd > 0)
+        close(joyfd);
+
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
@@ -265,10 +392,11 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
         return(0); // Means error, V-REP will unload this plugin
     }
 
-    // Register 4 new Lua commands:
+    // Register new Lua commands:
     simRegisterScriptCallbackFunction(strConCat(LUA_CREATE_COMMAND,"@",PLUGIN_NAME), NULL, LUA_CREATE_CALLBACK);
     simRegisterScriptCallbackFunction(strConCat(LUA_DESTROY_COMMAND,"@",PLUGIN_NAME), NULL, LUA_DESTROY_CALLBACK);
     simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME), NULL, LUA_START_CALLBACK);
+    simRegisterScriptCallbackFunction(strConCat(LUA_UPDATE_COMMAND,"@",PLUGIN_NAME), NULL, LUA_UPDATE_CALLBACK);
     simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME), NULL, LUA_STOP_CALLBACK);
 
     return(8); // return the version number of this plugin (can be queried with simGetModuleName)
@@ -279,10 +407,51 @@ VREP_DLLEXPORT void v_repEnd()
     unloadVrepLibrary(vrepLib); // release the library
 }
 
+/*
+static void rotate(double x, double y, double theta, double result[2])
+{
+    result[0] =  cos(theta)*x + sin(theta)*y; 
+    result[1] = -sin(theta)*x + cos(theta)*y;
+}
+*/
+
+static double min(double a, double b) {
+    return a < b ? a : b;
+}
+
+static double max(double a, double b) {
+    return a > b ? a : b;
+}
+
 VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customData,int* replyData)
 {   
-    // This is called quite often. Just watch out for messages/events you want to handle
-    // This function should not generate any error messages:
+    // Special handling for PS throttle
+    static float throttleVal;
+
+    // Read joystick
+    if (joyfd > 0) {
+        struct js_event js;
+        read(joyfd, &js, sizeof(struct js_event));
+        if (js.type & ~JS_EVENT_INIT) {
+            float chanval = -js.value / 32767.;
+            switch (js.number) {
+                case 0:
+                    yawDemand = chanval;
+                    break;
+                case 1:
+                    throttleVal = chanval;
+                    break;
+                case 2:
+                    rollDemand = chanval;
+                    break;
+                case 3:
+                    pitchDemand = -chanval;
+            }
+        }
+    }
+
+    throttleDemand += throttleVal * .002;
+    throttleDemand = max(min(throttleDemand, 1), 0);
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
@@ -290,185 +459,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     void* retVal=NULL;
 
-    float force = 0;
-    float torque = 0;
-    for (int k=0; k<4; ++k) {
-        simAddForceAndTorque(quadcopter.motors[k].propHandle, &force, &torque);
-        quadcopter.motors[k].spin();
-    }
-
-    // Read joystick
-    if (joyfd > 0) {
-
-        struct js_event js;
-        read(joyfd, &js, sizeof(struct js_event));
-
-        if (js.type & ~JS_EVENT_INIT) {
-            int fakechan = 0;
-            int dir = +1;
-            switch (js.number) {
-                case 0:
-                    fakechan = 3;
-                    break;
-                case 1:
-                    fakechan = 1;
-                    break;
-                case 2:
-                    fakechan = 2;
-                    dir = -1; // special handling for inverted pitch
-                    break;
-                case 3:
-                    fakechan = 4;
-                    break;
-                case 5:
-                    fakechan = 5;
-                    break;
-            }
-
-            if (fakechan > 0) {
-                quadcopter.chanval[fakechan-1] = 
-                        CONFIG_PWM_MIN + (int)((dir*js.value + 32767)/65534. * (CONFIG_PWM_MAX-CONFIG_PWM_MIN));
-            }
-        }
-    }
-
-
-    if (message==sim_message_eventcallback_modulehandle)
-    {
-        // is the command also meant for Hackflight?
-        if ( (customData==NULL)||(std::string("Hackflight").compare((char*)customData)==0) ) 
-        {
-            float dt=simGetSimulationTimeStep();
-
-            if (quadcopter.duration>0.0f)
-            { // movement mode
-
-                quadcopter.duration-=dt;
-            }
-
-            else
-            { // stopped mode
-                if (quadcopter.waitUntilZero!=NULL)
-                {
-                    quadcopter.waitUntilZero[0]=0;
-                    quadcopter.waitUntilZero=NULL;
-                }
-            }
-        }
-    }
-
-    loop();
-
     simSetIntegerParameter(sim_intparam_error_report_mode,errorModeSaved); // restore previous settings
 
     return(retVal);
 }
-
-// Board implementation ===============================================================
-
-
-void Board::imuInit(uint16_t & acc1G, float & gyroScale)
-{
-    // XXX use MPU6050 settings for now
-    acc1G = 4096;
-    gyroScale = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
-}
-
-void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
-{
-    /*
-    result,force=simReadForceSensor(sensor)
-
-    if (result>0) then
-
-        accel={force[1]/mass,force[2]/mass,force[3]/mass}
-    */
-    for (int k=0; k<3; ++k)
-        gyroADC[k] = accADC[k] = 0;
-}
-
-void Board::init(uint32_t & imuLooptimeUsec)
-{
-    // Initialize nanosecond timer
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
-
-    // Set initial fake PWM values to midpoints
-    for (int k=0; k<CONFIG_RC_CHANS; ++k)  {
-        quadcopter.chanval[k] = (CONFIG_PWM_MIN + CONFIG_PWM_MAX) / 2;
-    }
-
-    // Special treatment for throttle and switch PWM: start them at the bottom
-    // of the range.  As soon as they are moved, their actual values will
-    // be returned by Board::readPWM().
-    quadcopter.chanval[2] = CONFIG_PWM_MIN;
-    quadcopter.chanval[4] = CONFIG_PWM_MIN;
-
-    // Minimal V-REP simulation period
-    imuLooptimeUsec = 10000;
-}
-
-void Board::delayMilliseconds(uint32_t msec)
-{
-    uint32_t startMicros = this->getMicros();
-
-    while ((this->getMicros() - startMicros)/1000 > msec)
-        ;
-}
-
-uint32_t Board::getMicros()
-{
-    struct timespec end_time;
-    
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_time);
-
-    return 1000000 * (end_time.tv_sec - start_time.tv_sec) + 
-        (end_time.tv_nsec - start_time.tv_nsec) / 1000;
-}
-
-void Board::ledGreenOff(void)
-{
-    quadcopter.greenLED.turnOff();
-}
-
-void Board::ledGreenOn(void)
-{
-    quadcopter.greenLED.turnOn();
-}
-
-void Board::ledGreenToggle(void)
-{
-    quadcopter.greenLED.toggle();
-}
-
-void Board::ledRedOff(void)
-{
-    quadcopter.redLED.turnOff();
-}
-
-void Board::ledRedOn(void)
-{
-    quadcopter.redLED.turnOn();
-}
-
-void Board::ledRedToggle(void)
-{
-    quadcopter.redLED.toggle();
-}
-
-uint16_t Board::readPWM(uint8_t chan)
-{
-    return quadcopter.chanval[chan];
-}
-
-void Board::writeMotor(uint8_t index, uint16_t value)
-{
-    quadcopter.motors[index].pwm = value;
-}
-
-// Unimplemented --------------------------------------------
-
-void Board::checkReboot(bool pendReboot) { }
-void Board::serialWriteByte(uint8_t c) { }
-uint8_t Board::serialReadByte(void) { return 0; }
-uint8_t Board::serialAvailableBytes(void) { return 0; }
-void Board::reboot(void) { }

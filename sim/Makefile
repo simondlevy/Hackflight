@@ -29,23 +29,20 @@ ALL = libv_repExtHackflight.so
 
 all: $(ALL)
 
-libv_repExtHackflight.so: v_repExtHackflight.cpp v_repExtHackflight.hpp ../firmware/*.cpp ../firmware/*.hpp
+libv_repExtHackflight.so: v_repExtHackflight.cpp v_repExtHackflight.hpp
 	g++ $(CFLAGS) -c v_repExtHackflight.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
 	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp
-	g++ $(CFLAGS) -c ../firmware/mw.cpp
-	g++ $(CFLAGS) -c ../firmware/imu.cpp
-	g++ $(CFLAGS) -c ../firmware/mixer.cpp
-	g++ $(CFLAGS) -c ../firmware/msp.cpp
-	g++ $(CFLAGS) -c ../firmware/pid.cpp
-	g++ $(CFLAGS) -c ../firmware/rc.cpp
 	g++ scriptFunctionData.o scriptFunctionDataItem.o v_repExtHackflight.o v_repLib.o \
-		mw.o imu.o mixer.o msp.o pid.o rc.o \
 		-o libv_repExtHackflight.$(EXT) -lpthread -ldl -shared 	
 
 edit:
 	vim v_repExtHackflight.cpp
 
+commit:
+	git commit -a --allow-empty-message -m ""
+	git push
+
 clean:
-	rm -f *.o *.so
+	rm -f *.o *.so *.pyc *~
