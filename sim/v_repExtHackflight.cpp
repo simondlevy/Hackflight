@@ -217,41 +217,15 @@ static Yaw_PID_Controller yaw_IMU_PID;
 static Stability_PID_Controller pitch_Stability_PID;
 static Stability_PID_Controller roll_Stability_PID;
 
-
+// Joystick demands
 static double rollDemand;
 static double pitchDemand;
 static double yawDemand;
 static double throttleDemand;
 
-// simExtHackflight_create ////////////////////////////////////////////////////////////-
-
-#define LUA_CREATE_COMMAND "simExtHackflight_create"
-
-// Five handles: quadcopter + four propellers
-static const int inArgs_CREATE[]={
-    1,
-    sim_script_arg_int32,0
-};
-
-
-void LUA_CREATE_CALLBACK(SScriptCallBack* cb)
-{
-    CScriptFunctionData D;
-    D.pushOutData(CScriptFunctionDataItem(true)); // success
-    D.writeDataToStack(cb->stackID);
-}
-
-// simExtHackflight_destroy ////////////////////////////////////////////////////////////////////
-
-#define LUA_DESTROY_COMMAND "simExtHackflight_destroy"
-
-void LUA_DESTROY_CALLBACK(SScriptCallBack* cb)
-{
-    CScriptFunctionData D;
-    D.pushOutData(CScriptFunctionDataItem(true)); // success
-    D.writeDataToStack(cb->stackID);
-}
-
+// Gyro simulation
+static double gyroAngles[3];
+static bool gyroReady;
 
 // simExtHackflight_start ////////////////////////////////////////////////////////////////////////
 
@@ -394,8 +368,6 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
     }
 
     // Register new Lua commands:
-    simRegisterScriptCallbackFunction(strConCat(LUA_CREATE_COMMAND,"@",PLUGIN_NAME), NULL, LUA_CREATE_CALLBACK);
-    simRegisterScriptCallbackFunction(strConCat(LUA_DESTROY_COMMAND,"@",PLUGIN_NAME), NULL, LUA_DESTROY_CALLBACK);
     simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME), NULL, LUA_START_CALLBACK);
     simRegisterScriptCallbackFunction(strConCat(LUA_UPDATE_COMMAND,"@",PLUGIN_NAME), NULL, LUA_UPDATE_CALLBACK);
     simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME), NULL, LUA_STOP_CALLBACK);

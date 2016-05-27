@@ -8,7 +8,6 @@ threadFunction=function()
 
     -- Launch plugin
     local pluginHandle = simLoadModule('/home/levy/Desktop/hackflight/sim/libv_repExtHackflight.so', 'Hackflight')
-    simExtHackflight_create()
     simExtHackflight_start()
 
     -- Loop till user hits stop button
@@ -57,7 +56,6 @@ threadFunction=function()
 
     -- Cleanup
     simExtHackflight_stop()
-    simExtHackflight_destroy()
     simUnloadModule(pluginHandle)
 
 end
