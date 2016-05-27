@@ -26,6 +26,12 @@ threadFunction=function()
         end
         eulerPrev = euler
 
+        -- Read accelerometer
+        result,force = simReadForceSensor(accel)
+        if (result>0) then
+            print(force[1], force[2], force[3])
+        end
+
         -- Loop over motors
         for i = 1,4,1 do
 
@@ -88,6 +94,9 @@ for i = 1, 4, 1 do
     motorRespondableList[i] = simGetObjectHandle('Motor'..i..'_respondable')
     motorJointList[i]       = simGetObjectHandle('Motor'..i..'_joint')
 end
+
+-- Get the handle for the accelerometer
+accel = simGetObjectHandle('Accelerometer_forceSensor')
 
 -- Set up directions for prop spin
 propDirections = {-1,1,1,-1}

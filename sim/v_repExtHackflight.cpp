@@ -285,9 +285,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         double gyro[3];
         for (int k=0; k<3; ++k) {
             gyro[k] = inData->at(2).doubleData[k]; 
-            printf("%+3.3f ", gyro[k]);
         }
-        printf("\n");
 
         // Convert Euler angles to pitch and roll via rotation formula
         double rollAngle  = -cos(angles[2])*angles[0] - sin(angles[2])*angles[1]; 
