@@ -264,8 +264,7 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
 static const int inArgs_UPDATE[]={
-    4,
-    sim_script_arg_int32,0,                       // motor index (first = 1)
+    3,
     sim_script_arg_double|sim_script_arg_table,3, // Euler angles
     sim_script_arg_double|sim_script_arg_table,3, // Gyro values
     sim_script_arg_double|sim_script_arg_table,3  // Accelerometer values
@@ -277,17 +276,14 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
-        // Read motor number
-        int i = inData->at(0).int32Data[0]; 
-
         // Read gyro, accelerometer
         double angles[3];
         double gyro[3];
         double accel[3];
         for (int k=0; k<3; ++k) {
-            angles[k] = inData->at(1).doubleData[k]; 
-            gyro[k]   = inData->at(2).doubleData[k]; 
-            accel[k]  = inData->at(3).doubleData[k]; 
+            angles[k] = inData->at(0).doubleData[k]; 
+            gyro[k]   = inData->at(1).doubleData[k]; 
+            accel[k]  = inData->at(2).doubleData[k]; 
         }
 
         // Convert Euler angles to pitch and roll via rotation formula
@@ -313,16 +309,18 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         double rsign[4] = {+1, +1, -1, -1};
         double ysign[4] = {+1, -1, -1, +1};
 
-        // LUA -> C++ 
-        i -= 1;
+        // Set thrust for each motor
+        for (int i=0; i<4; ++i) {
+            double thrust = (baselineThrust + 
+                    rsign[i]*rollDemand*ROLL_DEMAND_FACTOR + 
+                    psign[i]*pitchDemand*PITCH_DEMAND_FACTOR + 
+                    ysign[i]*yawDemand*YAW_DEMAND_FACTOR) * 
+                (1 + rsign[i]*rollCorrection + psign[i]*pitchCorrection + ysign[i]*yawCorrection);
 
-        double thrust = (baselineThrust + 
-                rsign[i]*rollDemand*ROLL_DEMAND_FACTOR + 
-                psign[i]*pitchDemand*PITCH_DEMAND_FACTOR + 
-                ysign[i]*yawDemand*YAW_DEMAND_FACTOR) * 
-                    (1 + rsign[i]*rollCorrection + psign[i]*pitchCorrection + ysign[i]*yawCorrection);
-
-        simSetFloatSignal("thrust", thrust);
+            char signame[10];
+            sprintf(signame, "thrust%d", i+1);
+            simSetFloatSignal(signame, thrust);
+        }
     }
 
     D.pushOutData(CScriptFunctionDataItem(true)); // success

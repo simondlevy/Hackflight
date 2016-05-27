@@ -29,14 +29,14 @@ threadFunction=function()
         -- Read accelerometer
         result,accel = simReadForceSensor(accelHandle)
 
+        -- Send IMU info to plugin
+        simExtHackflight_update(euler, gyro, accel)
+
         -- Loop over motors
         for i = 1,4,1 do
 
-            -- Send IMU info to plugin
-            simExtHackflight_update(i, euler, gyro, accel)
-
             -- Get motor thrust from plugin
-            thrust = simGetFloatSignal('thrust')
+            thrust = simGetFloatSignal('thrust'..i)
 
             -- Convert thrust to force and torque
             force = particleCount* PARTICLE_DENSITY * thrust * math.pi * math.pow(PARTICLE_SIZE,3) / (6*timestep)
