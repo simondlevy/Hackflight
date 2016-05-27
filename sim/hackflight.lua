@@ -27,16 +27,13 @@ threadFunction=function()
         eulerPrev = euler
 
         -- Read accelerometer
-        result,force = simReadForceSensor(accel)
-        if (result>0) then
-            print(force[1], force[2], force[3])
-        end
+        result,accel = simReadForceSensor(accelHandle)
 
         -- Loop over motors
         for i = 1,4,1 do
 
             -- Send IMU info to plugin
-            simExtHackflight_update(i, euler, gyro)
+            simExtHackflight_update(i, euler, gyro, accel)
 
             -- Get motor thrust from plugin
             thrust = simGetFloatSignal('thrust')
@@ -96,7 +93,7 @@ for i = 1, 4, 1 do
 end
 
 -- Get the handle for the accelerometer
-accel = simGetObjectHandle('Accelerometer_forceSensor')
+accelHandle = simGetObjectHandle('Accelerometer_forceSensor')
 
 -- Set up directions for prop spin
 propDirections = {-1,1,1,-1}
