@@ -57,8 +57,9 @@ threadFunction=function()
                 simSetFloatSignal('torque'..i..k, torques[k])
             end
 
-            -- Simulate prop spin based on torque
-            print(simGetJointPosition(motorJointList[i]))
+            -- Simulate prop spin based on thrust
+            jointAngle = simGetJointPosition(motorJointList[i])
+            simSetJointPosition(motorJointList[i], jointAngle + propDirections[i]*thrust/5)
 
         end
 
@@ -98,6 +99,9 @@ for i = 1, 4, 1 do
     motorRespondableList[i] = simGetObjectHandle('Motor'..i..'_respondable')
     motorJointList[i]       = simGetObjectHandle('Motor'..i..'_joint')
 end
+
+-- Set up directions for prop spin
+propDirections = {-1,1,1,-1}
 
 -- Get the particle behavior needed to compute force and torque for each motor
 PARTICLE_COUNT_PER_SECOND = 430 --simGetScriptSimulationParameter(sim_handle_self,'PARTICLE_COUNT_PER_SECOND')
