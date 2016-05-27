@@ -1,3 +1,5 @@
+-- Looping -------------------------------------------------------------------------
+
 function scalarTo3D(s, a)
     return {s*a[3], s*a[7], s*a[11]}
 end
@@ -56,18 +58,10 @@ threadFunction=function()
 
 end
 
--- Put some initialization code here:
+-- Initialization --------------------------------------------------------------------
+
 simSetThreadSwitchTiming(2) -- Default timing for automatic thread switching
 
-local portNb = simGetInt32Parameter(sim_intparam_server_port_next)
-local portStart = simGetInt32Parameter(sim_intparam_server_port_start)
-local portRange = simGetInt32Parameter(sim_intparam_server_port_range)
-local newPortNb = portNb+1
-if (newPortNb>=portStart+portRange) then
-    newPortNb=portStart
-end
-
-simSetInt32Parameter(sim_intparam_server_port_next,newPortNb)
 simSetThreadAutomaticSwitch(true)
 
 base = simGetObjectHandle('Quadcopter')
