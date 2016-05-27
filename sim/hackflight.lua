@@ -9,7 +9,7 @@ end
 
 threadFunction=function()
 
-    local pluginHandle = simLoadModule('/home/levy/Desktop/simflight/libv_repExtHackflight.so', 'Hackflight')
+    local pluginHandle = simLoadModule('/home/levy/Desktop/hackflight/sim/libv_repExtHackflight.so', 'Hackflight')
     simExtHackflight_create(simGetObjectHandle('Quadcopter'))
     simExtHackflight_start()
 
@@ -58,7 +58,7 @@ threadFunction=function()
             end
 
             -- Simulate prop spin based on torque
-            print(motorJointList[i]) 
+            print(simGetJointPosition(motorJointList[i]))
 
         end
 
