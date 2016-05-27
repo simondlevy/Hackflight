@@ -12,17 +12,25 @@ threadFunction=function()
     -- Call pluging start() function
     simExtHackflight_start(timestep)
 
+    -- Simulate a gyroscope by first-differencing Euler angles
+    eulerPrev = {0, 0, 0}
+
     -- Loop till user hits stop button
     while simGetSimulationState()~=sim_simulation_advancing_abouttostop do
 
-        -- Get Euler angles for IMU
-        orientation = simGetObjectOrientation(base, -1)
+        -- Get Euler angles for gyroscope simulation
+        euler = simGetObjectOrientation(base, -1)
+        gyro = {}
+        for k = 1,3,1 do
+            gyro[k] = (euler[k] - eulerPrev[k]) / timestep
+        end
+        eulerPrev = euler
 
         -- Loop over motors
         for i = 1,4,1 do
 
             -- Send IMU info to plugin
-            simExtHackflight_update(i, orientation)
+            simExtHackflight_update(i, euler, gyro)
 
             -- Get motor thrust from plugin
             thrust = simGetFloatSignal('thrust')

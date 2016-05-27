@@ -223,9 +223,6 @@ static double throttleDemand;
 // Timestep for current run
 static double timestep;
 
-// Gyro simulation
-static double gyroAnglesPrev[3];
-
 // Library support
 static LIBRARY vrepLib;
 
@@ -240,7 +237,6 @@ static const int inArgs_START[]={
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
-
     // Initialize joystick
     joyfd = open( JOY_DEV , O_RDONLY);
     if(joyfd > 0) 
@@ -253,10 +249,6 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     yaw_IMU_PID.init(IMU_YAW_Kp, IMU_YAW_Kd, IMU_YAW_Ki);
     pitch_Stability_PID.init(IMU_PITCH_ROLL_Kp, IMU_PITCH_ROLL_Kd, IMU_PITCH_ROLL_Ki);
     roll_Stability_PID.init(IMU_PITCH_ROLL_Kp, IMU_PITCH_ROLL_Kd, IMU_PITCH_ROLL_Ki);
-
-    // Need two timesteps for gyro simulation
-    for (int k=0; k<3; ++k)
-        gyroAnglesPrev[k] = 0;
 
     CScriptFunctionData D;
     if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0],LUA_START_COMMAND)) {
@@ -272,9 +264,10 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
 static const int inArgs_UPDATE[]={
-    2,
-    sim_script_arg_int32,0,                      // motor index (first = 1)
+    3,
+    sim_script_arg_int32,0,                       // motor index (first = 1)
     sim_script_arg_double|sim_script_arg_table,3, // Euler angles
+    sim_script_arg_double|sim_script_arg_table,3, // Gyro angles
 };
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
@@ -288,6 +281,13 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         double angles[3];
         for (int k=0; k<3; ++k)
             angles[k] = inData->at(1).doubleData[k]; 
+
+        double gyro[3];
+        for (int k=0; k<3; ++k) {
+            gyro[k] = inData->at(2).doubleData[k]; 
+            printf("%+3.3f ", gyro[k]);
+        }
+        printf("\n");
 
         // Convert Euler angles to pitch and roll via rotation formula
         double rollAngle  = -cos(angles[2])*angles[0] - sin(angles[2])*angles[1]; 
@@ -327,7 +327,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 }
-
 
 // simExtHackflight_stop ////////////////////////////////////////////////////////////////////////////////
 
