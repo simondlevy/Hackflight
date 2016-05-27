@@ -277,20 +277,20 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
         // Read gyro, accelerometer
-        double angles[3];
+        double euler[3];
         double gyro[3];
         double accel[3];
         for (int k=0; k<3; ++k) {
-            angles[k] = inData->at(0).doubleData[k]; 
-            gyro[k]   = inData->at(1).doubleData[k]; 
-            accel[k]  = inData->at(2).doubleData[k]; 
+            euler[k] = inData->at(0).doubleData[k]; 
+            gyro[k]  = inData->at(1).doubleData[k]; 
+            accel[k] = inData->at(2).doubleData[k]; 
         }
 
         // Convert Euler angles to pitch and roll via rotation formula
-        double rollAngle  = -cos(angles[2])*angles[0] - sin(angles[2])*angles[1]; 
-        double pitchAngle =  sin(angles[2])*angles[0] - cos(angles[2])*angles[1];
+        double rollAngle  = -cos(euler[2])*euler[0] - sin(euler[2])*euler[1]; 
+        double pitchAngle =  sin(euler[2])*euler[0] - cos(euler[2])*euler[1];
 
-        double yawAngle = -angles[2]; 
+        double yawAngle = -euler[2]; 
 
         // Get corrections from PID controllers
         double yawCorrection   = yaw_IMU_PID.getCorrection(yawAngle, yawDemand, timestep);
