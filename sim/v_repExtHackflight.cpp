@@ -41,10 +41,6 @@
 
 #define JOY_DEV "/dev/input/js0"
 
-static LIBRARY vrepLib;
-
-static int joyfd;
-
 // PID parameters ==================================================================
 
 static const double IMU_PITCH_ROLL_Kp  = .15;
@@ -217,19 +213,30 @@ static Yaw_PID_Controller yaw_IMU_PID;
 static Stability_PID_Controller pitch_Stability_PID;
 static Stability_PID_Controller roll_Stability_PID;
 
-// Joystick demands
+// Joystick support
+static int joyfd;
 static double rollDemand;
 static double pitchDemand;
 static double yawDemand;
 static double throttleDemand;
 
+// Timestep for current run
+static double timestep;
+
 // Gyro simulation
-static double gyroAngles[3];
-static bool gyroReady;
+static double gyroAnglesPrev[3];
+
+// Library support
+static LIBRARY vrepLib;
 
 // simExtHackflight_start ////////////////////////////////////////////////////////////////////////
 
 #define LUA_START_COMMAND "simExtHackflight_start"
+
+static const int inArgs_START[]={
+    1,
+    sim_script_arg_double,0 // timestep
+};
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
@@ -247,21 +254,28 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     pitch_Stability_PID.init(IMU_PITCH_ROLL_Kp, IMU_PITCH_ROLL_Kd, IMU_PITCH_ROLL_Ki);
     roll_Stability_PID.init(IMU_PITCH_ROLL_Kp, IMU_PITCH_ROLL_Kd, IMU_PITCH_ROLL_Ki);
 
+    // Need two timesteps for gyro simulation
+    for (int k=0; k<3; ++k)
+        gyroAnglesPrev[k] = 0;
+
     CScriptFunctionData D;
+    if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0],LUA_START_COMMAND)) {
+        std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
+        timestep = inData->at(0).doubleData[0];  
+    }
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 }
 
+// simExtHackflight_update ////////////////////////////////////////////////////////////////////////
+
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
-
 static const int inArgs_UPDATE[]={
-    3,
+    2,
     sim_script_arg_int32,0,                      // motor index (first = 1)
-    sim_script_arg_double,0,                     // timestep
     sim_script_arg_double|sim_script_arg_table,3, // Euler angles
 };
-
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
@@ -269,13 +283,11 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
-        int i             = inData->at(0).int32Data[0]; 
-
-        double timestep   = inData->at(1).doubleData[0];  
+        int i = inData->at(0).int32Data[0]; 
 
         double angles[3];
         for (int k=0; k<3; ++k)
-            angles[k] = inData->at(2).doubleData[k]; 
+            angles[k] = inData->at(1).doubleData[k]; 
 
         // Convert Euler angles to pitch and roll via rotation formula
         double rollAngle  = -cos(angles[2])*angles[0] - sin(angles[2])*angles[1]; 

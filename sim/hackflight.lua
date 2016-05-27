@@ -8,7 +8,9 @@ threadFunction=function()
 
     -- Launch plugin
     local pluginHandle = simLoadModule('/home/levy/Desktop/hackflight/sim/libv_repExtHackflight.so', 'Hackflight')
-    simExtHackflight_start()
+
+    -- Call pluging start() function
+    simExtHackflight_start(timestep)
 
     -- Loop till user hits stop button
     while simGetSimulationState()~=sim_simulation_advancing_abouttostop do
@@ -20,7 +22,7 @@ threadFunction=function()
         for i = 1,4,1 do
 
             -- Send IMU info to plugin
-            simExtHackflight_update(i, timestep, orientation, gyroAngles)
+            simExtHackflight_update(i, orientation)
 
             -- Get motor thrust from plugin
             thrust = simGetFloatSignal('thrust')
