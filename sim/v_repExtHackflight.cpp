@@ -287,12 +287,10 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
 
 static const int inArgs_UPDATE[]={
-    5,
-    sim_script_arg_int32,0,
-    sim_script_arg_double,0,
-    sim_script_arg_double,0,
-    sim_script_arg_double,0,
-    sim_script_arg_double,0
+    3,
+    sim_script_arg_int32,0,                      // motor index (first = 1)
+    sim_script_arg_double,0,                     // timestep
+    sim_script_arg_double|sim_script_arg_table,3 // Euler angles
 };
 
 
@@ -302,11 +300,17 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
-        int i                  = inData->at(0).int32Data[0]; 
-        double timestep        = inData->at(1).doubleData[0];  
-        double pitchAngle      = inData->at(2).doubleData[0]; 
-        double rollAngle       = inData->at(3).doubleData[0]; 
-        double yawAngle        = inData->at(4).doubleData[0]; 
+        int i             = inData->at(0).int32Data[0]; 
+        double timestep   = inData->at(1).doubleData[0];  
+        double alpha      = inData->at(2).doubleData[0]; 
+        double beta       = inData->at(2).doubleData[1]; 
+        double gamma      = inData->at(2).doubleData[2]; 
+     
+        // Convert Euler angles to pitch and roll via rotation formula
+        double rollAngle  =  -cos(gamma)*alpha - sin(gamma)*beta; 
+        double pitchAngle =   sin(gamma)*alpha - cos(gamma)*beta;
+
+        double yawAngle = -gamma; 
 
         // Get corrections from PID controllers
         double yawCorrection   = yaw_IMU_PID.getCorrection(yawAngle, yawDemand, timestep);
@@ -406,14 +410,6 @@ VREP_DLLEXPORT void v_repEnd()
 { // This is called just once, at the end of V-REP
     unloadVrepLibrary(vrepLib); // release the library
 }
-
-/*
-static void rotate(double x, double y, double theta, double result[2])
-{
-    result[0] =  cos(theta)*x + sin(theta)*y; 
-    result[1] = -sin(theta)*x + cos(theta)*y;
-}
-*/
 
 static double min(double a, double b) {
     return a < b ? a : b;

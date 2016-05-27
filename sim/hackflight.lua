@@ -2,11 +2,6 @@ function scalarTo3D(s, a)
     return {s*a[3], s*a[7], s*a[11]}
 end
 
-function rotate(x, y, theta)
-
-    return {math.cos(theta)*x + math.sin(theta)*y, -math.sin(theta)*x + math.cos(theta)*y}
-end
-
 threadFunction=function()
 
     local pluginHandle = simLoadModule('/home/levy/Desktop/hackflight/sim/libv_repExtHackflight.so', 'Hackflight')
@@ -18,23 +13,11 @@ threadFunction=function()
         -- Get Euler angles for IMU
         orientation = simGetObjectOrientation(base, -1)
 
-        -- Convert Euler angles to pitch, roll, yaw
-        -- See http://en.wikipedia.org/wiki/Flight_dynamics_(fixed-wing_aircraft) for positive/negative orientation
-        alpha = orientation[1]
-        beta  = orientation[2]
-        gamma = orientation[3]
-
-        rollpitch = rotate(alpha, beta, gamma)
-
-        pitchAngle = -rollpitch[2]
-        rollAngle  = -rollpitch[1]
-        yawAngle   = -gamma
-
         -- Loop over motors
         for i = 1, 4, 1 do
 
-            -- Send IMU info to pluging
-            simExtHackflight_update(i, timestep, pitchAngle, rollAngle, yawAngle)
+            -- Send IMU info to plugin
+            simExtHackflight_update(i, timestep, orientation)
 
             -- Get motor thrusts from plugin
             thrust = simGetFloatSignal('thrust')
