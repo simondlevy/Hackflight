@@ -7,15 +7,6 @@ function rotate(x, y, theta)
     return {math.cos(theta)*x + math.sin(theta)*y, -math.sin(theta)*x + math.cos(theta)*y}
 end
 
-function round(num, idp)
-    if idp and idp>0 then
-        local mult = 10^idp
-        return math.floor(num * mult + 0.5) / mult
-    end
-    return math.floor(num + 0.5)
-end
-
-
 threadFunction=function()
 
     local pluginHandle = simLoadModule('/home/levy/Desktop/simflight/libv_repExtHackflight.so', 'Hackflight')
@@ -39,18 +30,21 @@ threadFunction=function()
         rollAngle  = -rollpitch[1]
         yawAngle   = -gamma
 
+        -- Loop over motors
         for i = 1, 4, 1 do
 
-            -- Set forces and torques for each motor
+            -- Send IMU info to pluging
             simExtHackflight_update(i, timestep, pitchAngle, rollAngle, yawAngle)
 
+            -- Get motor thrusts from plugin
             thrust = simGetFloatSignal('thrust')
 
+            -- Convert thrust to force and torque
             force = particleCount* PARTICLE_DENSITY * thrust * math.pi * math.pow(PARTICLE_SIZE,3) / (6*timestep)
-
             torque = math.pow(-1, i+1)*.002 * thrust
 
-            -- Set float signals to the respective motors, and motor respondables
+            -- Set force and torque signals to the respective motors, and motor respondables
+
             simSetFloatSignal('Motor'..i..'_respondable', motorRespondableList[i])
 
             motorMatrix = simGetObjectMatrix(motorList[i],-1)
@@ -58,11 +52,13 @@ threadFunction=function()
             forces = scalarTo3D(force,  motorMatrix)
             torques = scalarTo3D(torque, motorMatrix)
 
-            -- Set force and torque for motor
             for k = 1, 3, 1 do
                 simSetFloatSignal('force'..i..k,  forces[k])
                 simSetFloatSignal('torque'..i..k, torques[k])
             end
+
+            -- Simulate prop spin based on torque
+            print(motorJointList[i]) 
 
         end
 
@@ -94,11 +90,13 @@ base = simGetObjectHandle('Quadcopter')
 
 motorList = {}
 motorRespondableList = {}
+motorJointList = {}
 
--- Get the object handles for the motors and respondables
+-- Get the object handles for the motors, joints, respondables
 for i = 1, 4, 1 do
-    motorList[i]=simGetObjectHandle('Motor'..i)
-    motorRespondableList[i]=simGetObjectHandle('Motor'..i..'_respondable')
+    motorList[i]            = simGetObjectHandle('Motor'..i)
+    motorRespondableList[i] = simGetObjectHandle('Motor'..i..'_respondable')
+    motorJointList[i]       = simGetObjectHandle('Motor'..i..'_joint')
 end
 
 -- Get the particle behavior needed to compute force and torque for each motor
