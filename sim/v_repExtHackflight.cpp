@@ -265,7 +265,7 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
 static const int inArgs_UPDATE[]={
     3,
-    sim_script_arg_double|sim_script_arg_table,3, // Euler angles
+    sim_script_arg_double|sim_script_arg_table,3, // Pitch,roll,yaw
     sim_script_arg_double|sim_script_arg_table,3, // Gyro values
     sim_script_arg_double|sim_script_arg_table,3  // Accelerometer values
 };
@@ -277,26 +277,18 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
         // Read gyro, accelerometer
-        double euler[3];
+        double angles[3];
         double gyro[3];
         double accel[3];
         for (int k=0; k<3; ++k) {
-            euler[k] = inData->at(0).doubleData[k]; 
-            gyro[k]  = inData->at(1).doubleData[k]; 
-            accel[k] = inData->at(2).doubleData[k]; 
+            angles[k] = inData->at(0).doubleData[k]; 
+            gyro[k]   = inData->at(1).doubleData[k]; 
+            accel[k]  = inData->at(2).doubleData[k]; 
         }
 
-        // Convert Euler angles to pitch and roll via rotation formula
-        double rollAngle  = -cos(euler[2])*euler[0] - sin(euler[2])*euler[1]; 
-        double pitchAngle =  sin(euler[2])*euler[0] - cos(euler[2])*euler[1];
-
-        // Get pitch, roll directly from accelerometer
-        //double pitchAngle = -100 * accel[0];
-        //double rollAngle  =  100 * accel[1];
-
-        //printf("%+3.3f %+3.3f %+3.3f (%+3.3f)\n", gyro[0], gyro[1], gyro[2], euler[2]);
-
-        double yawAngle = -euler[2]; 
+        double pitchAngle = angles[0];
+        double rollAngle  = angles[1];
+        double yawAngle   = angles[2]; 
 
         // Get corrections from PID controllers
         double yawCorrection   = yaw_IMU_PID.getCorrection(yawAngle, yawDemand, timestep);

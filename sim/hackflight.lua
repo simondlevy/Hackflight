@@ -26,11 +26,17 @@ threadFunction=function()
         end
         eulerPrev = euler
 
+        -- Convert Euler angles to pitch and roll via rotation formula
+        angles = {0,0,0}
+        angles[1] =  math.sin(euler[3])*euler[1] - math.cos(euler[3])*euler[2];
+        angles[2] = -math.cos(euler[3])*euler[1] - math.sin(euler[3])*euler[2]; 
+        angles[3] = -euler[3] -- yaw direct from Euler
+
         -- Read accelerometer
         result,accel = simReadForceSensor(accelHandle)
 
         -- Send IMU info to plugin
-        simExtHackflight_update(euler, gyro, accel)
+        simExtHackflight_update(angles, gyro, accel)
 
         -- Loop over motors
         for i = 1,4,1 do
