@@ -219,10 +219,12 @@ static double throttleDemand;
 // Timestep for current run
 static double timestep;
 
+// Previous angles for integrating gyro
+static double anglesPrev[3];
+
 // Library support
 static LIBRARY vrepLib;
 
-static int debug;
 
 // simExtHackflight_start ////////////////////////////////////////////////////////////////////////
 
@@ -243,6 +245,10 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     // Special handling for throttle
     throttleDemand = 0;
 
+    // Initialize previous angles
+    for (int k=0; k<3; ++k)
+        anglesPrev[k] = 0;
+
     // Initialize PID controllers
     yaw_IMU_PID.init(IMU_YAW_Kp, IMU_YAW_Kd, IMU_YAW_Ki);
     pitch_Stability_PID.init(IMU_PITCH_ROLL_Kp, IMU_PITCH_ROLL_Kd, IMU_PITCH_ROLL_Ki);
@@ -256,7 +262,6 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 
-    debug = 0;
 }
 
 // simExtHackflight_update ////////////////////////////////////////////////////////////////////////
@@ -264,8 +269,7 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
 static const int inArgs_UPDATE[]={
-    3,
-    sim_script_arg_double|sim_script_arg_table,3, // Pitch,roll,yaw
+    2,
     sim_script_arg_double|sim_script_arg_table,3, // Gyro values
     sim_script_arg_double|sim_script_arg_table,3  // Accelerometer values
 };
@@ -281,9 +285,10 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         double gyro[3];
         double accel[3];
         for (int k=0; k<3; ++k) {
-            angles[k] = inData->at(0).doubleData[k]; 
-            gyro[k]   = inData->at(1).doubleData[k]; 
-            accel[k]  = inData->at(2).doubleData[k]; 
+            gyro[k]   = inData->at(0).doubleData[k]; 
+            accel[k]  = inData->at(1).doubleData[k]; 
+            angles[k] = gyro[k] * timestep + anglesPrev[k]; // Integrate gyro to get angle
+            anglesPrev[k] = angles[k];
         }
 
         double pitchAngle = angles[0];
