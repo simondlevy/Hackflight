@@ -393,43 +393,28 @@ VREP_DLLEXPORT void v_repEnd()
     unloadVrepLibrary(vrepLib); // release the library
 }
 
-static double min(double a, double b) {
-    return a < b ? a : b;
-}
-
-static double max(double a, double b) {
-    return a > b ? a : b;
-}
-
 VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customData,int* replyData)
 {   
-    // Special handling for PS throttle
-    static float throttleVal;
-
     // Read joystick
     if (joyfd > 0) {
         struct js_event js;
         read(joyfd, &js, sizeof(struct js_event));
         if (js.type & ~JS_EVENT_INIT) {
-            float chanval = -js.value / 32767.;
             switch (js.number) {
                 case 0:
-                    yawDemand = chanval;
+                    throttleDemand = (js.value + 32767.) / 65534;
                     break;
                 case 1:
-                    throttleVal = chanval;
+                    rollDemand = -js.value / 32767.;
                     break;
                 case 2:
-                    rollDemand = chanval;
+                    pitchDemand = js.value / 32767.;
                     break;
                 case 3:
-                    pitchDemand = -chanval;
+                    yawDemand = -js.value / 32767.;
             }
         }
     }
-
-    throttleDemand += throttleVal * .002;
-    throttleDemand = max(min(throttleDemand, 1), 0);
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
