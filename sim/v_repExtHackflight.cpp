@@ -43,24 +43,20 @@
 
 // PID parameters ==================================================================
 
-static const double IMU_PITCH_ROLL_Kp  = .15;
-static const double IMU_PITCH_ROLL_Kd  = .2;
+static const double IMU_PITCH_ROLL_Kp  = .6;//.15;
+static const double IMU_PITCH_ROLL_Kd  = .1;//.2;
 static const double IMU_PITCH_ROLL_Ki  = 0;
 
-static const double IMU_YAW_Kp 	       = .05;
-static const double IMU_YAW_Kd 	       = .01;
+static const double IMU_YAW_Kp 	       = 0;//.05;
+static const double IMU_YAW_Kd 	       = 0;//.01;
 static const double IMU_YAW_Ki         = 0;
 
 // Flight Forces ====================================================================
 
-static const double ROLL_DEMAND_FACTOR   = 0.1;
-static const double PITCH_DEMAND_FACTOR  = 0.1;
-static const double YAW_DEMAND_FACTOR    = 0.5;
+static const double ROLL_DEMAND_FACTOR   = 1;
+static const double PITCH_DEMAND_FACTOR  = 1;
+static const double YAW_DEMAND_FACTOR    = 6;
 
-static const int PARTICLE_COUNT_PER_SECOND = 430;
-static const int PARTICLE_DENSITY = 8500;
-static const double PARTICLE_SIZE = .005;
- 
 class PID_Controller {
     
     // General PID control class. 
@@ -226,6 +222,8 @@ static double timestep;
 // Library support
 static LIBRARY vrepLib;
 
+static int debug;
+
 // simExtHackflight_start ////////////////////////////////////////////////////////////////////////
 
 #define LUA_START_COMMAND "simExtHackflight_start"
@@ -257,6 +255,8 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     }
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
+
+    debug = 0;
 }
 
 // simExtHackflight_update ////////////////////////////////////////////////////////////////////////
@@ -290,6 +290,12 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         double rollAngle  = -cos(euler[2])*euler[0] - sin(euler[2])*euler[1]; 
         double pitchAngle =  sin(euler[2])*euler[0] - cos(euler[2])*euler[1];
 
+        // Get pitch, roll directly from accelerometer
+        //double pitchAngle = -100 * accel[0];
+        //double rollAngle  =  100 * accel[1];
+
+        //printf("%+3.3f %+3.3f %+3.3f (%+3.3f)\n", gyro[0], gyro[1], gyro[2], euler[2]);
+
         double yawAngle = -euler[2]; 
 
         // Get corrections from PID controllers
@@ -307,7 +313,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         // increases for all 4 propellers.
         double psign[4] = {-1, +1, -1, +1}; 
         double rsign[4] = {+1, +1, -1, -1};
-        double ysign[4] = {+1, -1, -1, +1};
+        double ysign[4] = {-1, +1, +1, -1};
 
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
