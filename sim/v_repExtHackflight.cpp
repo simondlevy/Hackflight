@@ -426,3 +426,81 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     return(retVal);
 }
+
+// Board implementation ======================================================
+
+#include <board.hpp>
+
+void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
+{
+}
+
+void Board::init(uint32_t & looptimeMicroseconds)
+{
+    looptimeMicroseconds = 5000; // XXX
+}
+
+void Board::checkReboot(bool pendReboot)
+{
+}
+
+void Board::delayMilliseconds(uint32_t msec)
+{
+}
+
+uint32_t Board::getMicros()
+{
+    return 0; 
+}
+
+void Board::ledGreenOff(void)
+{
+
+}
+
+void Board::ledGreenOn(void)
+{
+}
+
+void Board::ledGreenToggle(void)
+{
+}
+
+void Board::ledRedOff(void)
+{
+}
+
+void Board::ledRedOn(void)
+{
+}
+
+void Board::ledRedToggle(void)
+{
+}
+
+uint16_t Board::readPWM(uint8_t chan)
+{
+    return 0;
+}
+
+void Board::reboot(void)
+{
+}
+
+uint8_t Board::serialAvailableBytes(void)
+{
+    return 0;
+}
+
+uint8_t Board::serialReadByte(void)
+{
+    return 0;
+}
+
+void Board::serialWriteByte(uint8_t c)
+{
+}
+
+void Board::writeMotor(uint8_t index, uint16_t value)
+{
+}

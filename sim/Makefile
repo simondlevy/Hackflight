@@ -20,7 +20,7 @@
 VREP   = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
 COMMON = $(VREP)/programming/common/
 
-CFLAGS = -Wall -I. -I../include -Wall -fPIC -static
+CFLAGS = -Wall -I. -I../include -I../firmware -Wall -fPIC -static
 CFLAGS += -D__linux
 CFLAGS += -I$(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux/programming/include/
 EXT = so
@@ -34,8 +34,7 @@ libv_repExtHackflight.so: v_repExtHackflight.cpp v_repExtHackflight.hpp
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
 	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp
-	g++ scriptFunctionData.o scriptFunctionDataItem.o v_repExtHackflight.o v_repLib.o \
-		-o libv_repExtHackflight.$(EXT) -lpthread -ldl -shared 	
+	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -ldl -shared 	
 
 edit:
 	vim v_repExtHackflight.cpp
