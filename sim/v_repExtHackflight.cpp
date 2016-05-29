@@ -477,34 +477,36 @@ uint32_t Board::getMicros()
     return micros; 
 }
 
+static bool green;
+
 void Board::ledGreenOff(void)
 {
-    printf("GREEN OFF\n");
+    green = false;
+    simSetIntegerSignal("greenLED", 0);
 }
 
 void Board::ledGreenOn(void)
 {
-    printf("GREEN ON\n");
+    green = true;
+    simSetIntegerSignal("greenLED", 1);
 }
 
 void Board::ledGreenToggle(void)
 {
-    printf("GREEN TOGGLE\n");
+    green = !green;
+    simSetIntegerSignal("greenLED", green ? 1 : 0);
 }
 
 void Board::ledRedOff(void)
 {
-    printf("RED OFF\n");
 }
 
 void Board::ledRedOn(void)
 {
-    printf("RED ON\n");
 }
 
 void Board::ledRedToggle(void)
 {
-    printf("RED TOGGLE\n");
 }
 
 uint16_t Board::readPWM(uint8_t chan)

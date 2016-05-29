@@ -70,6 +70,14 @@ threadFunction=function()
 
         end -- loop over motors
 
+        -- Get LED status from plugin
+        if simGetIntegerSignal('greenLED') == 1 then
+            color = {0,1,0}
+        else
+            color = {0,0,0}
+        end
+        simSetShapeColor(greenHandle, nil, 0, color)
+        
 
         simSwitchThread()
 
@@ -100,8 +108,9 @@ for i = 1, 4, 1 do
     motorJointList[i]       = simGetObjectHandle('Motor'..i..'_joint')
 end
 
--- Get the handle for the accelerometer
+-- Get handle for objects we'll access
 accelHandle = simGetObjectHandle('Accelerometer_forceSensor')
+greenHandle = simGetObjectHandle('Green_LED_visible')
 
 -- Set up directions for prop spin
 propDirections = {-1,1,1,-1}
