@@ -4,6 +4,13 @@ function scalarTo3D(s, a)
     return {s*a[3], s*a[7], s*a[11]}
 end
 
+function setColor(handle, signalName, color)
+    if (simGetIntegerSignal(signalName)) == 0 then
+        color = {0,0,0}
+    end
+    simSetShapeColor(handle, nil, 0, color)
+ end
+
 threadFunction=function()
 
     -- Launch plugin
@@ -70,15 +77,10 @@ threadFunction=function()
 
         end -- loop over motors
 
-        -- Get LED status from plugin
-        if simGetIntegerSignal('greenLED') == 1 then
-            color = {0,1,0}
-        else
-            color = {0,0,0}
-        end
-        simSetShapeColor(greenHandle, nil, 0, color)
+        -- Set LEDs based on signals from plugin
+        setColor(greenHandle, 'greenLED', {0,1,0})
+        setColor(redHandle,   'redLED',   {1,0,0})
         
-
         simSwitchThread()
 
     end -- loop till user hits stop button
@@ -111,6 +113,7 @@ end
 -- Get handle for objects we'll access
 accelHandle = simGetObjectHandle('Accelerometer_forceSensor')
 greenHandle = simGetObjectHandle('Green_LED_visible')
+redHandle   = simGetObjectHandle('Red_LED_visible')
 
 -- Set up directions for prop spin
 propDirections = {-1,1,1,-1}

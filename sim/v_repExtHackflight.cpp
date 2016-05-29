@@ -497,16 +497,27 @@ void Board::ledGreenToggle(void)
     simSetIntegerSignal("greenLED", green ? 1 : 0);
 }
 
+static bool red;
+
 void Board::ledRedOff(void)
 {
+    printf("OFF\n");
+    red = false;
+    simSetIntegerSignal("redLED", 0);
 }
 
 void Board::ledRedOn(void)
 {
+    printf("ON\n");
+    red = true;
+    simSetIntegerSignal("redLED", 1);
 }
 
 void Board::ledRedToggle(void)
 {
+    printf("TOGGLE\n");
+    red = !red;
+    simSetIntegerSignal("redLED", red ? 1 : 0);
 }
 
 uint16_t Board::readPWM(uint8_t chan)
