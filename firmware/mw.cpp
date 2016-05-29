@@ -83,7 +83,6 @@ void setup(void)
     board.delayMilliseconds(100);
 
     // flash the LEDs to indicate startup
-    printf("RED ON!!!\n");
     board.ledRedOn();
     board.ledGreenOff();
     for (uint8_t i = 0; i < 10; i++) {

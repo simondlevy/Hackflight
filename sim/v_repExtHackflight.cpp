@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdint.h>
@@ -446,6 +447,47 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
 #include <board.hpp>
 
+class LED {
+
+    private:
+
+        char signame[10];
+        bool on;
+
+        void set(bool status)
+        {
+            this->on = status;
+            simSetIntegerSignal(this->signame, this->on ? 1 : 0);
+        }
+
+    public:
+
+        LED(void) { }
+
+        void init(const char * _signame)
+        {
+            strcpy(this->signame, _signame);
+            this->on = false;
+        }
+
+        void turnOff(void) 
+        {
+            this->set(false);
+        }
+
+        void turnOn(void) 
+        {
+            this->set(true);
+        }
+
+        void toggle(void) 
+        {
+            this->set(!this->on);
+        }
+};
+
+static LED greenLED, redLED;
+
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     acc1G = 4096;
@@ -461,6 +503,9 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 void Board::init(uint32_t & looptimeMicroseconds)
 {
     looptimeMicroseconds = 10000;
+
+    greenLED.init("greenLED");
+    redLED.init("redLED");
 }
 
 void Board::checkReboot(bool pendReboot)
@@ -477,47 +522,34 @@ uint32_t Board::getMicros()
     return micros; 
 }
 
-static bool green;
-
 void Board::ledGreenOff(void)
 {
-    green = false;
-    simSetIntegerSignal("greenLED", 0);
+    greenLED.turnOff();
 }
 
 void Board::ledGreenOn(void)
 {
-    green = true;
-    simSetIntegerSignal("greenLED", 1);
+    greenLED.turnOn();
 }
 
 void Board::ledGreenToggle(void)
 {
-    green = !green;
-    simSetIntegerSignal("greenLED", green ? 1 : 0);
+    greenLED.toggle();
 }
-
-static bool red;
 
 void Board::ledRedOff(void)
 {
-    printf("OFF\n");
-    red = false;
-    simSetIntegerSignal("redLED", 0);
+    redLED.turnOff();
 }
 
 void Board::ledRedOn(void)
 {
-    printf("ON\n");
-    red = true;
-    simSetIntegerSignal("redLED", 1);
+    redLED.turnOn();
 }
 
 void Board::ledRedToggle(void)
 {
-    printf("TOGGLE\n");
-    red = !red;
-    simSetIntegerSignal("redLED", red ? 1 : 0);
+    redLED.toggle();
 }
 
 uint16_t Board::readPWM(uint8_t chan)
