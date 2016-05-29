@@ -225,6 +225,10 @@ static double anglesPrev[3];
 // Library support
 static LIBRARY vrepLib;
 
+// Hackflight interface
+extern void setup(void);
+extern void loop(void);
+static uint32_t micros;
 
 // simExtHackflight_start ////////////////////////////////////////////////////////////////////////
 
@@ -254,6 +258,10 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     pitch_Stability_PID.init(IMU_PITCH_ROLL_Kp, IMU_PITCH_ROLL_Kd, IMU_PITCH_ROLL_Ki);
     roll_Stability_PID.init(IMU_PITCH_ROLL_Kp, IMU_PITCH_ROLL_Kd, IMU_PITCH_ROLL_Ki);
 
+    // Run Hackflight setup()
+    //setup();
+
+    // Grab timestep from input stack and return success
     CScriptFunctionData D;
     if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0],LUA_START_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
@@ -283,10 +291,10 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         // Read gyro, accelerometer
         double angles[3];
         double gyro[3];
-        double accel[3];
+        //double accel[3];
         for (int k=0; k<3; ++k) {
             gyro[k]   = inData->at(0).doubleData[k]; 
-            accel[k]  = inData->at(1).doubleData[k]; 
+            //accel[k]  = inData->at(1).doubleData[k]; 
             angles[k] = gyro[k] * timestep + anglesPrev[k]; // Integrate gyro to get angle
             anglesPrev[k] = angles[k];
         }
@@ -326,7 +334,11 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         }
     }
 
-    D.pushOutData(CScriptFunctionDataItem(true)); // success
+    // Increment microsecond count
+    micros += 1e6 * timestep;
+
+    // Return success
+    D.pushOutData(CScriptFunctionDataItem(true)); 
     D.writeDataToStack(cb->stackID);
 }
 
@@ -433,11 +445,13 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
+    for (int k=0; k<3; ++k)
+        accADC[k] = gyroADC[k] = 0;
 }
 
 void Board::init(uint32_t & looptimeMicroseconds)
 {
-    looptimeMicroseconds = 5000; // XXX
+    looptimeMicroseconds = 10000;
 }
 
 void Board::checkReboot(bool pendReboot)
@@ -450,7 +464,7 @@ void Board::delayMilliseconds(uint32_t msec)
 
 uint32_t Board::getMicros()
 {
-    return 0; 
+    return micros; 
 }
 
 void Board::ledGreenOff(void)
