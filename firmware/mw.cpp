@@ -166,8 +166,6 @@ void loop(void)
                 }
             } else {            // actions during not armed
 
-                //printf("%d %d\n", rc.sticks, THR_LO + YAW_LO + PIT_LO + ROL_CE);
-
                 // GYRO calibration
                 if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
                     calibratingG = calibratingGyroCycles;
@@ -210,7 +208,6 @@ void loop(void)
                 break;
         }
     }
-
     currentTime = board.getMicros();
 
     if (check_and_update_timed_task(&loopTime, imuLooptimeUsec, currentTime)) {
@@ -237,6 +234,7 @@ void loop(void)
                 board.ledRedOff();
         }
 
+
         if (check_timed_task(calibratedAccTime, currentTime)) {
             if (!haveSmallAngle) {
                 accCalibrated = false; // accelerometer not calibrated or angle too steep
@@ -257,6 +255,7 @@ void loop(void)
         mixer.update(armed);
 
     } // IMU update
+
 
 } // loop()
 

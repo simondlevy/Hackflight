@@ -259,7 +259,7 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     roll_Stability_PID.init(IMU_PITCH_ROLL_Kp, IMU_PITCH_ROLL_Kd, IMU_PITCH_ROLL_Ki);
 
     // Run Hackflight setup()
-    //setup();
+    setup();
 
     // Grab timestep from input stack and return success
     CScriptFunctionData D;
@@ -436,12 +436,21 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     simSetIntegerParameter(sim_intparam_error_report_mode,errorModeSaved); // restore previous settings
 
+    // Call Hackflight loop() from here for most realistic simulation
+    loop();
+
     return(retVal);
 }
 
 // Board implementation ======================================================
 
 #include <board.hpp>
+
+void Board::imuInit(uint16_t & acc1G, float & gyroScale)
+{
+    acc1G = 4096;
+    gyroScale = 1e-6;
+}
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
@@ -460,6 +469,7 @@ void Board::checkReboot(bool pendReboot)
 
 void Board::delayMilliseconds(uint32_t msec)
 {
+    //usleep(1000*msec);
 }
 
 uint32_t Board::getMicros()
@@ -469,27 +479,32 @@ uint32_t Board::getMicros()
 
 void Board::ledGreenOff(void)
 {
-
+    printf("GREEN OFF\n");
 }
 
 void Board::ledGreenOn(void)
 {
+    printf("GREEN ON\n");
 }
 
 void Board::ledGreenToggle(void)
 {
+    printf("GREEN TOGGLE\n");
 }
 
 void Board::ledRedOff(void)
 {
+    printf("RED OFF\n");
 }
 
 void Board::ledRedOn(void)
 {
+    printf("RED ON\n");
 }
 
 void Board::ledRedToggle(void)
 {
+    printf("RED TOGGLE\n");
 }
 
 uint16_t Board::readPWM(uint8_t chan)
