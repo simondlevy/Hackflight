@@ -43,8 +43,6 @@ static void devClear(struct stdev_t *dev)
 
 static void devPush(stdev_t *dev, float x)
 {
-    //printf("push %f\n", x);
-
     dev->m_n++;
     if (dev->m_n == 1) {
         dev->m_oldM = dev->m_newM = x;
@@ -174,6 +172,8 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     previousTime = currentTime;
 
     this->_board->imuRead(accelADC, this->gyroADC);
+
+    //printf("%d %d %d\n", accelADC[0], accelADC[1], accelADC[2]);
 
     if (calibratingA > 0) {
 

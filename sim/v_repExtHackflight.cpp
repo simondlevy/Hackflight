@@ -217,6 +217,9 @@ static double pitchDemand;
 static double yawDemand;
 static double throttleDemand;
 
+// IMU support
+static double accel[3];
+
 // Timestep for current run
 static double timestep;
 
@@ -292,10 +295,9 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         // Read gyro, accelerometer
         double angles[3];
         double gyro[3];
-        //double accel[3];
         for (int k=0; k<3; ++k) {
             gyro[k]   = inData->at(0).doubleData[k]; 
-            //accel[k]  = inData->at(1).doubleData[k]; 
+            accel[k]  = inData->at(1).doubleData[k]; 
             angles[k] = gyro[k] * timestep + anglesPrev[k]; // Integrate gyro to get angle
             anglesPrev[k] = angles[k];
         }
@@ -496,8 +498,11 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
-    for (int k=0; k<3; ++k)
-        accADC[k] = gyroADC[k] = 0;
+    // Convert from radians to tenths of a degree
+    for (int k=0; k<3; ++k) {
+        accADC[k] = (int16_t)(400000 * accel[k]);
+        gyroADC[k] = 0;
+    }
 }
 
 void Board::init(uint32_t & looptimeMicroseconds)
@@ -514,7 +519,6 @@ void Board::checkReboot(bool pendReboot)
 
 void Board::delayMilliseconds(uint32_t msec)
 {
-    //usleep(1000*msec);
 }
 
 uint32_t Board::getMicros()
