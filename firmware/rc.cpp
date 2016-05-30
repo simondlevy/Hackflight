@@ -74,8 +74,6 @@ void RC::update(void)
         this->data[chan] /= 4;
     }
 
-    printf("%4d %4d %4d %4d\n", this->data[0],this->data[1],this->data[2],this->data[3]);
-
     this->averageIndex++;
 
     // check stick positions, updating command delay

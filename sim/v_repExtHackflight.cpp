@@ -559,18 +559,23 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
+    float scale = 0;
+
     switch (chan) {
         case 0:
-            return CONFIG_PWM_MIN + (1-rollDemand)/2 * (CONFIG_PWM_MAX - CONFIG_PWM_MIN);
+            scale = (1-rollDemand) / 2;
+            break;
         case 1:
-            return CONFIG_PWM_MIN + (1-pitchDemand)/2 *(CONFIG_PWM_MAX - CONFIG_PWM_MIN);
+            scale = (1-pitchDemand) / 2;
+            break;
         case 3:
-            return CONFIG_PWM_MIN + (1-yawDemand)/2 *  (CONFIG_PWM_MAX - CONFIG_PWM_MIN);
+            scale = (1-yawDemand) / 2;
+            break;
         case 2:
-            return CONFIG_PWM_MIN + throttleDemand  *  (CONFIG_PWM_MAX - CONFIG_PWM_MIN);
+            scale = throttleDemand;
     }
 
-    return 0;
+    return CONFIG_PWM_MIN + scale * (CONFIG_PWM_MAX - CONFIG_PWM_MIN);
 }
 
 void Board::reboot(void)
