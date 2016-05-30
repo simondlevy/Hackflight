@@ -448,6 +448,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 // Board implementation ======================================================
 
 #include <board.hpp>
+#include <pwm.hpp>
 
 class LED {
 
@@ -558,6 +559,17 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
+    switch (chan) {
+        case 0:
+            return CONFIG_PWM_MIN + (1-rollDemand)/2 * (CONFIG_PWM_MAX - CONFIG_PWM_MIN);
+        case 1:
+            return CONFIG_PWM_MIN + (1-pitchDemand)/2 *(CONFIG_PWM_MAX - CONFIG_PWM_MIN);
+        case 3:
+            return CONFIG_PWM_MIN + (1-yawDemand)/2 *  (CONFIG_PWM_MAX - CONFIG_PWM_MIN);
+        case 2:
+            return CONFIG_PWM_MIN + throttleDemand  *  (CONFIG_PWM_MAX - CONFIG_PWM_MIN);
+    }
+
     return 0;
 }
 
