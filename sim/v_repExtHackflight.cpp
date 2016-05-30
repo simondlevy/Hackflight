@@ -219,6 +219,7 @@ static double throttleDemand;
 
 // IMU support
 static double accel[3];
+static double gyro[3];
 
 // Timestep for current run
 static double timestep;
@@ -294,7 +295,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
         // Read gyro, accelerometer
         double angles[3];
-        double gyro[3];
         for (int k=0; k<3; ++k) {
             gyro[k]   = inData->at(0).doubleData[k]; 
             accel[k]  = inData->at(1).doubleData[k]; 
@@ -493,17 +493,22 @@ static LED greenLED, redLED;
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
+    // Mimic MPU6050
     acc1G = 4096;
-    gyroScale = 1e-6;
+    gyroScale = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
 }
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
     // Convert from radians to tenths of a degree
+
     for (int k=0; k<3; ++k) {
-        accADC[k] = (int16_t)(400000 * accel[k]);
-        gyroADC[k] = 0;
+        accADC[k]  = (int16_t)(400000 * accel[k]);
     }
+
+    gyroADC[1] = -(int16_t)(1000 * gyro[0]);
+    gyroADC[0] = -(int16_t)(1000 * gyro[1]);
+    gyroADC[2] = -(int16_t)(1000 * gyro[2]);
 }
 
 void Board::init(uint32_t & looptimeMicroseconds)
@@ -598,4 +603,5 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
+    // XXX
 }

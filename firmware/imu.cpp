@@ -173,8 +173,6 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
 
     this->_board->imuRead(accelADC, this->gyroADC);
 
-    //printf("%d %d %d\n", accelADC[0], accelADC[1], accelADC[2]);
-
     if (calibratingA > 0) {
 
         for (uint8_t axis = 0; axis < 3; axis++) {
