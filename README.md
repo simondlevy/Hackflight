@@ -6,10 +6,12 @@ flight-control firmware, and use it to teach students about ideas like inertial
 measurement and PID tuning.  <b>If you are in the 99% percent of users who just
 want to get your vehicle flying without getting into firmware hacking, I
 recommend [Cleanflight](http://cleanflight.com/)</b> (great for getting started
-when you're on a budget) <b>or the [Ardupilot](http://copter.ardupilot.org/ardupilot/index.html) system</b> (for
-sophisticated mission planning with waypoint navigation and the like).  In addition to big user communities
-and loads of great features, these platforms have safety mechanisms that Hackflight lacks, which
-will help avoid injury to you and damage to your vehicle.
+when you're on a budget) <b>or the
+[Ardupilot](http://copter.ardupilot.org/ardupilot/index.html) system</b> (for
+sophisticated mission planning with waypoint navigation and the like).  In
+addition to big user communities and loads of great features, these platforms
+have safety mechanisms that Hackflight lacks, which will help avoid injury to
+you and damage to your vehicle.
 
 Hackflight derives from the Baseflight firmware (which in turn derives from
 Multiwii), and currently works only on STM32F103 flight-controller boards
@@ -30,17 +32,20 @@ Meanwhile, to try Hackflight on your board, you'll need to be running Linux on y
 desktop/laptop computer, with the [GNU ARM
 toolchain](https://launchpad.net/gcc-arm-embedded) installed, and you'll need
 to grab the [BreezySTM32](https://github.com/simondlevy/BreezySTM32)
-repository.  Then edit the Makefile in <tt>hackflight/firmware/naze</tt> to
-reflect where you put BreezySTM32.  In a terminal window, cd to
-<tt>hackflight/firmware/naze</tt> and type <tt>make</tt>.  This will build the
-firmware binary in the <tt>obj</tt> directory.  If you've already got Baseflight or
+repository.  
+
+In <tt>hackflight/firmware/naze130mm</tt> there's code that uses PID values (<tt>pidvals.hpp</tt>
+appropriate that worked well on my 130mm quadcopter.  
+Likewise, <tt>hackflight/firmware/naze250mm</tt> contains 
+code that uses values that worked on a 250mm quad.   So choose whichever is closest to your vehicle,
+cd to that folder, and edit the Makeke to reflect where you put BreezySTM32. Then type <tt>make</tt>,
+which will build the firmware binary in the <tt>obj</tt> directory.  If you've already got Baseflight or
 Cleanflight running on your board, you should then just be able to type
 <tt>make flash</tt> to flash Hackflight onto it.  If you run into trouble, you
 can short the bootloader pins and type <tt>make unbrick</tt>.
 
 Hackflight flies your quadcopter in Level (a.k.a. Stable) mode.  So the only parameters you
-should need to adjust are the PID tuning params in <tt>hackflight/firmware/board.hpp</tt>.
-That file contains two examples of settings that seem to work well (250mm quad, 130mm quad).
+should need to adjust are the PID tuning params.
 As with Baseflight, you get a gyro auto-calibration sequence on startup, indicated by  steady
 green LED that turns off when the calibration is done.  You can re-calibrate
 the gyro by putting the collective (left) stick in full upper-left and the
