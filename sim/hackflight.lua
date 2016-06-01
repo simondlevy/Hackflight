@@ -45,7 +45,7 @@ threadFunction=function()
     while simGetSimulationState()~=sim_simulation_advancing_abouttostop do
 
         -- Get Euler angles for gyroscope simulation
-        euler = simGetObjectOrientation(base, -1)
+        euler = simGetObjectOrientation(quadcopterHandle, -1)
 
         -- Convert Euler angles to pitch and roll via rotation formula
         angles = {0,0,0}
@@ -76,15 +76,13 @@ threadFunction=function()
             force = particleCount* PARTICLE_DENSITY * thrust * math.pi * math.pow(PARTICLE_SIZE,3) / (6*timestep)
             torque = math.pow(-1, i+1)*.002 * thrust
 
-            -- Set force and torque signals to the respective motors, and motor respondables
-
+            -- Compute force and torque signals based on thrust
             simSetFloatSignal('Motor'..i..'_respondable', motorRespondableList[i])
-
             motorMatrix = simGetObjectMatrix(motorList[i],-1)
-
             forces = scalarTo3D(force,  motorMatrix)
             torques = scalarTo3D(torque, motorMatrix)
 
+            -- Send force and torque to props
             for k = 1, 3, 1 do
                 simSetFloatSignal('force'..i..k,  forces[k])
                 simSetFloatSignal('torque'..i..k, torques[k])
@@ -92,6 +90,7 @@ threadFunction=function()
 
             -- Simulate prop spin based on thrust
             jointAngle = simGetJointPosition(motorJointList[i])
+            print(thrust)
             simSetJointPosition(motorJointList[i], jointAngle + propDirections[i]*thrust/5)
 
         end -- loop over motors
@@ -112,17 +111,14 @@ end
 
 -- Initialization --------------------------------------------------------------------
 
-simSetThreadSwitchTiming(2) -- Default timing for automatic thread switching
-
+-- Set default timing for automatic thread switching
+simSetThreadSwitchTiming(2) 
 simSetThreadAutomaticSwitch(true)
 
-base = simGetObjectHandle('Quadcopter')
-
+-- Get the object handles for the motors, joints, respondables
 motorList = {}
 motorRespondableList = {}
 motorJointList = {}
-
--- Get the object handles for the motors, joints, respondables
 for i = 1, 4, 1 do
     motorList[i]            = simGetObjectHandle('Motor'..i)
     motorRespondableList[i] = simGetObjectHandle('Motor'..i..'_respondable')
@@ -130,6 +126,7 @@ for i = 1, 4, 1 do
 end
 
 -- Get handle for objects we'll access
+quadcopterHandle = simGetObjectHandle('Quadcopter')
 accelHandle = simGetObjectHandle('Accelerometer_forceSensor')
 greenHandle = simGetObjectHandle('Green_LED_visible')
 redHandle   = simGetObjectHandle('Red_LED_visible')
@@ -137,13 +134,13 @@ redHandle   = simGetObjectHandle('Red_LED_visible')
 -- Set up directions for prop spin
 propDirections = {-1,1,1,-1}
 
--- Get the particle behavior needed to compute force and torque for each motor
-PARTICLE_COUNT_PER_SECOND = 430 --simGetScriptSimulationParameter(sim_handle_self,'PARTICLE_COUNT_PER_SECOND')
-PARTICLE_DENSITY = 8500 --simGetScriptSimulationParameter(sim_handle_self,'PARTICLE_DENSITY')
-PARTICLE_SIZE = .005  -- particleSizes[i] = baseParticleSize*0.005*simGetObjectSizeFactor(motorList[i]) 
-
+-- Timestep is used in various places
 timestep = simGetSimulationTimeStep()
 
+-- Set the particle behavior needed to compute force and torque for each motor
+PARTICLE_COUNT_PER_SECOND = 430 
+PARTICLE_DENSITY          = 8500 
+PARTICLE_SIZE             = .005
 particleCount = math.floor(PARTICLE_COUNT_PER_SECOND * timestep)
 
 -- Here we execute the regular thread code:

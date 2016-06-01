@@ -59,9 +59,6 @@ static double thrusts[4];
 // Timestep for current run
 static double timestep;
 
-// Previous angles for integrating gyro
-static double anglesPrev[3];
-
 // Library support
 static LIBRARY vrepLib;
 
@@ -85,10 +82,6 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     joyfd = open( JOY_DEV , O_RDONLY);
     if(joyfd > 0) 
         fcntl(joyfd, F_SETFL, O_NONBLOCK);
-
-    // Initialize previous angles
-    for (int k=0; k<3; ++k)
-        anglesPrev[k] = 0;
 
     // Run Hackflight setup()
     setup();
@@ -121,12 +114,9 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
         // Read gyro, accelerometer
-        double angles[3];
         for (int k=0; k<3; ++k) {
             gyro[k]   = inData->at(0).doubleData[k]; 
             accel[k]  = inData->at(1).doubleData[k]; 
-            angles[k] = gyro[k] * timestep + anglesPrev[k]; // Integrate gyro to get angle
-            anglesPrev[k] = angles[k];
         }
 
         // Set thrust for each motor
