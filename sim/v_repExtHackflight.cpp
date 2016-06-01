@@ -42,174 +42,6 @@
 
 #define JOY_DEV "/dev/input/js0"
 
-// PID parameters ==================================================================
-
-static const double IMU_PITCH_ROLL_Kp  = .6;//.15;
-static const double IMU_PITCH_ROLL_Kd  = .1;//.2;
-static const double IMU_PITCH_ROLL_Ki  = 0;
-
-static const double IMU_YAW_Kp 	       = 0;//.05;
-static const double IMU_YAW_Kd 	       = 0;//.01;
-static const double IMU_YAW_Ki         = 0;
-
-// Flight Forces ====================================================================
-
-static const double ROLL_DEMAND_FACTOR   = 1;
-static const double PITCH_DEMAND_FACTOR  = 1;
-static const double YAW_DEMAND_FACTOR    = 6;
-
-class PID_Controller {
-    
-    // General PID control class. 
-
-    private:
-
-        double Kp;
-        double Ki;
-        double Kd;
-
-        double Eprev;
-        double Stdt;
-        double t;
-
-    protected:
-
-        PID_Controller(void) { }
-
-        void init(double _Kp, double _Ki, double _Kd) {
-
-            this->Kp = _Kp;
-            this->Ki = _Ki;
-            this->Kd = _Kd;
-
-            this->Eprev = 0;
-            this->Stdt = 0;
-            this->t = 0;
-        }
-
-        double getCorrection(double target, double actual, double dt=1) {
-
-            double E = target - actual;
-
-            // dE / dt
-            double dEdt = this->t > 0 ? (E - this->Eprev) / dt : 0;
-
-            // Integral E / dt 
-            this->Stdt += this->t > 0 ? E*dt : 0;
-
-            // Correcting
-            double correction = this->Kp*E + this->Ki*this->Stdt + this->Kd*dEdt;
-
-            // Update
-            this->t += 1;
-            this->Eprev = E;
-
-            return correction;
-        }
-};
-
-class Demand_PID_Controller: public PID_Controller {
-    
-    // A class to handle the interaction of demand (joystick, transmitter) and PID control.
-    // Control switches from demand to PID when demand falls below a given threshold.
-
-    private:
-
-        double noise_threshold;
-        double prevAbsDemand;
-        double target;
-
-    public:
-
-        Demand_PID_Controller(void) : PID_Controller() { }
-        
-        void init(double Kp, double Kd, double Ki=0, double demand_noise_threshold=.01) {
-
-            PID_Controller::init(Kp, Ki, Kd);
-            
-            // Noise threshold for demand
-            this->noise_threshold = demand_noise_threshold;
-
-            this->prevAbsDemand = 1;
-            this->target        = 0;
-        }
-
-    double getCorrection(double sensorValue, double demandValue, double timestep=1) {
-        
-        // Returns current PID correction based on sensor value and demand value.
-        
-        // Assume no correction
-        double correction = 0;
-        
-        // If there is currently no demand
-        if (abs(demandValue) < this->noise_threshold) {
-        
-            // But there was previously a demand
-            if (this->prevAbsDemand > this->noise_threshold) {
-            
-                // Grab the current sensor value as the target
-                this->target = sensorValue;
-            }
-                              
-            // With no demand, always need a correction 
-            correction = PID_Controller::getCorrection(this->target, sensorValue, timestep);
-        }
-                    
-        // Track previous climb demand, angle    
-        this->prevAbsDemand = abs(demandValue);
-                                
-        return correction;
-    }
-};
-
-class Stability_PID_Controller: public PID_Controller {
-
-    public:
-
-        // A class to support pitch/roll stability.  K_i parameter and target angle are zero.
-
-        Stability_PID_Controller(void) : PID_Controller() { }
-
-        void init(double Kp, double Kd, double Ki=0) {
-            PID_Controller::init(Kp, Ki, Kd);
-        }
-
-        double getCorrection(double actualAngle, double timestep=1) {
-
-            // Returns current PID correction based on IMU angle in radians.
-
-            return PID_Controller::getCorrection(0, actualAngle, timestep);
-        }
-};
-
-class Yaw_PID_Controller : public Demand_PID_Controller {
-
-    // A class for PID control of quadrotor yaw.
-    // Special handling is needed for yaw because of numerical instabilities when angle approaches Pi radians
-    // (180 degrees).
-
-    public:
-
-        Yaw_PID_Controller(void) : Demand_PID_Controller() { }
-
-        void init(double Kp, double Kd, double Ki, double demand_noise_threshold=.01) {
-            Demand_PID_Controller::init(Kp, Kd, Ki, demand_noise_threshold);
-        }
-
-        double getCorrection(double yawAngle, double yawDemand, double timestep=1) {
-
-            // Returns current PID correction based on yaw angle in radians value and demand value in interval [-1,+1].
-
-            double correction =  Demand_PID_Controller::getCorrection(-yawAngle, yawDemand, timestep);
-
-            return abs(correction) < 10 ? correction : 0;
-        }
-};
-
-static Yaw_PID_Controller yaw_IMU_PID;
-static Stability_PID_Controller pitch_Stability_PID;
-static Stability_PID_Controller roll_Stability_PID;
-
 // Joystick support
 static int joyfd;
 static double rollDemand;
@@ -258,11 +90,6 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     for (int k=0; k<3; ++k)
         anglesPrev[k] = 0;
 
-    // Initialize PID controllers
-    yaw_IMU_PID.init(IMU_YAW_Kp, IMU_YAW_Kd, IMU_YAW_Ki);
-    pitch_Stability_PID.init(IMU_PITCH_ROLL_Kp, IMU_PITCH_ROLL_Kd, IMU_PITCH_ROLL_Ki);
-    roll_Stability_PID.init(IMU_PITCH_ROLL_Kp, IMU_PITCH_ROLL_Kd, IMU_PITCH_ROLL_Ki);
-
     // Run Hackflight setup()
     setup();
 
@@ -302,35 +129,8 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
             anglesPrev[k] = angles[k];
         }
 
-        double pitchAngle = angles[0];
-        double rollAngle  = angles[1];
-        double yawAngle   = angles[2]; 
-
-        // Get corrections from PID controllers
-        double yawCorrection   = yaw_IMU_PID.getCorrection(yawAngle, yawDemand, timestep);
-        double pitchCorrection = pitch_Stability_PID.getCorrection(pitchAngle, timestep);
-        double rollCorrection  = roll_Stability_PID.getCorrection(rollAngle, timestep);
-
-        // Baseline thrust is a nonlinear function of climb demand
-        double baselineThrust = 4*sqrt(sqrt(throttleDemand)) + 2;
-
-        // Overall thrust is baseline plus throttle demand plus correction from PD controller
-        // received from the joystick and the # quadrotor model corrections. A positive 
-        // pitch value means, thrust increases for two back propellers and a negative 
-        // is opposite; similarly for roll and yaw.  A positive throttle value means thrust 
-        // increases for all 4 propellers.
-        double psign[4] = {-1, +1, -1, +1}; 
-        double rsign[4] = {+1, +1, -1, -1};
-        double ysign[4] = {-1, +1, +1, -1};
-
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
-            double thrust = (baselineThrust + 
-                    rsign[i]*rollDemand*ROLL_DEMAND_FACTOR + 
-                    psign[i]*pitchDemand*PITCH_DEMAND_FACTOR + 
-                    ysign[i]*yawDemand*YAW_DEMAND_FACTOR) * 
-                (1 + rsign[i]*rollCorrection + psign[i]*pitchCorrection + ysign[i]*yawCorrection);
-
             char signame[10];
             sprintf(signame, "thrust%d", i+1);
             simSetFloatSignal(signame, thrusts[i]);
