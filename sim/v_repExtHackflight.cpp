@@ -221,6 +221,9 @@ static double throttleDemand;
 static double accel[3];
 static double gyro[3];
 
+// Motor support
+static double thrusts[4];
+
 // Timestep for current run
 static double timestep;
 
@@ -330,7 +333,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
             char signame[10];
             sprintf(signame, "thrust%d", i+1);
-            simSetFloatSignal(signame, thrust);
+            simSetFloatSignal(signame, thrusts[i]);
         }
     }
 
@@ -606,5 +609,5 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
-    // XXX
+    thrusts[index] = 4 * ((float)value - CONFIG_PWM_MIN) / (CONFIG_PWM_MAX - CONFIG_PWM_MIN) + 2;
 }
