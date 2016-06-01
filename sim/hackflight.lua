@@ -1,3 +1,22 @@
+--[[
+This script works with the plugin in v_repExtHackflight.cpp. The script passes the
+simulated gyroscope and accelerometer values to the plugin's update() method,
+which sends the motor thrust values back to the script as signals.
+
+Copyright (C) 2016 Simon D. Levy
+
+This file is part of Hackflight.
+
+Hackflight is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as 
+published by the Free Software Foundation, either version 3 of the 
+License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+--]]
+
 -- Looping -------------------------------------------------------------------------
 
 function scalarTo3D(s, a)
@@ -9,7 +28,7 @@ function setColor(handle, signalName, color)
         color = {0,0,0}
     end
     simSetShapeColor(handle, nil, 0, color)
- end
+end
 
 threadFunction=function()
 
@@ -80,7 +99,7 @@ threadFunction=function()
         -- Set LEDs based on signals from plugin
         setColor(greenHandle, 'greenLED', {0,1,0})
         setColor(redHandle,   'redLED',   {1,0,0})
-        
+
         simSwitchThread()
 
     end -- loop till user hits stop button
