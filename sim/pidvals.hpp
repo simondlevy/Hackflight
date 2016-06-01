@@ -15,8 +15,8 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static const uint8_t CONFIG_LEVEL_P          = 40;
-static const uint8_t CONFIG_LEVEL_I          = 2;
+static const uint8_t CONFIG_LEVEL_P          = 20;
+static const uint8_t CONFIG_LEVEL_I          = 1;
 
 static const uint8_t CONFIG_RATE_PITCHROLL_P = 20;
 static const uint8_t CONFIG_RATE_PITCHROLL_I = 15;
