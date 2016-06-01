@@ -251,9 +251,6 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     if(joyfd > 0) 
         fcntl(joyfd, F_SETFL, O_NONBLOCK);
 
-    // Special handling for throttle
-    throttleDemand = 0;
-
     // Initialize previous angles
     for (int k=0; k<3; ++k)
         anglesPrev[k] = 0;
@@ -410,6 +407,9 @@ VREP_DLLEXPORT void v_repEnd()
 
 VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customData,int* replyData)
 {   
+    // Helps avoid bogus throttle values at startup
+    static int throttleCount;
+
     // Read joystick
     if (joyfd > 0) {
         struct js_event js;
@@ -417,7 +417,9 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
         if (js.type & ~JS_EVENT_INIT) {
             switch (js.number) {
                 case 0:
-                    throttleDemand = (js.value + 32767.) / 65534;
+                    if (throttleCount > 2)
+                        throttleDemand = (js.value + 32767.) / 65534;
+                    throttleCount++;
                     break;
                 case 1:
                     rollDemand = -js.value / 32767.;
