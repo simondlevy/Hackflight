@@ -7,19 +7,9 @@ transmitter with USB adapter cable.  If there is enough community interest, I wi
 controllers.
 
 The simulator uses a V-REP plugin for optimal speed and simplicity.  To build the plugin you should clone the 
-hackflight repository, then do
-
-<pre>
-cd hackflight/sim
-make
-</pre>
-
-You can then either (1) drag the plugin library file <b>libv_repExtHackflight.so</b> to your V-REP folder, 
-or (2) change the value of <tt>VREP\_DIR</tt> in the Makefile and then do
-
-<pre>
-make install
-</pre>
+hackflight repository, cd to <b>hackflight/sim</b>, and edit the value of <tt>VREP\_DIR</tt> in the Makefile
+to reflect where you installed V-REP.  Typing <tt>make install</tt> will build the plugin library file 
+<b>libv_repExtHackflight.so</b> and copy it to the V-REP folder.
 
 You can then launch V-REP, open the scene file <b>hackflight.ttt</b>, and click the play button to start the
 simuation.
