@@ -17,17 +17,19 @@
 #   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 #
  
-VREP   = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
-COMMON = $(VREP)/programming/common/
+# Edit this for where you installed V-REP
+VREP_DIR = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
 
-CFLAGS = -Wall -I. -I../include -I../firmware -Wall -fPIC -static
+COMMON = $(VREP_DIR)/programming/common/
+CFLAGS = -Wall -I$(VREP_DIR)/programming/include/ -I. -I../include -I../firmware -Wall -fPIC -static
+
+# XXX Currently supports only Linux
 CFLAGS += -D__linux
-CFLAGS += -I$(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux/programming/include/
 EXT = so
 
-ALL = libv_repExtHackflight.so 
+PLUGIN = libv_repExtHackflight.$(EXT)
 
-all: $(ALL)
+all: $(PLUGIN)
 
 libv_repExtHackflight.so: *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp
 	g++ $(CFLAGS) -c v_repExtHackflight.cpp 
@@ -41,6 +43,9 @@ libv_repExtHackflight.so: *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp
 	g++ $(CFLAGS) -c ../firmware/pid.cpp
 	g++ $(CFLAGS) -c ../firmware/rc.cpp
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -ldl -shared 	
+
+install:
+	cp $(PLUGIN) $(VREP_DIR)
 
 edit:
 	vim v_repExtHackflight.cpp
