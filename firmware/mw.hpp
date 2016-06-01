@@ -62,7 +62,6 @@ typedef enum {
 
 #define CONFIG_MAGNETIC_DECLINATION                 0
 
-#define CONFIG_CALIBRATING_GYRO_MSEC                3500
 #define CONFIG_CALIBRATING_ACC_MSEC                 1400
 
 #define CONFIG_YAW_CONTROL_DIRECTION                1   /* 1 or -1 */

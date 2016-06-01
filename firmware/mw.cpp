@@ -77,7 +77,10 @@ static bool     haveSmallAngle;
 
 void setup(void)
 {
-    board.init(imuLooptimeUsec);
+    uint32_t calibratingGyroMsec;
+
+    // Get particulars for board
+    board.init(imuLooptimeUsec, calibratingGyroMsec);
 
     // sleep for 100ms
     board.delayMilliseconds(100);
@@ -94,7 +97,7 @@ void setup(void)
     board.ledGreenOff();
 
     // compute cycles for calibration based on board's time constant
-    calibratingGyroCycles = 1000. * CONFIG_CALIBRATING_GYRO_MSEC / imuLooptimeUsec;
+    calibratingGyroCycles = 1000. * calibratingGyroMsec / imuLooptimeUsec;
     calibratingAccCycles  = 1000. * CONFIG_CALIBRATING_ACC_MSEC  / imuLooptimeUsec;
 
     // convert loop times from milliseconds to microseconds
