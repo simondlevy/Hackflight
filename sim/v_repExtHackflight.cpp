@@ -56,7 +56,7 @@ static double gyro[3];
 // Motor support
 static double thrusts[4];
 
-// Timestep for current run
+// Timestep for current run, used for simulating microsend timer
 static double timestep;
 
 // Library support

@@ -17,7 +17,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 --]]
 
--- Looping -------------------------------------------------------------------------
+-- Helpers -------------------------------------------------------------------------
 
 function scalarTo3D(s, a)
     return {s*a[3], s*a[7], s*a[11]}
@@ -29,6 +29,8 @@ function setColor(handle, signalName, color)
     end
     simSetShapeColor(handle, nil, 0, color)
 end
+
+-- Looping -------------------------------------------------------------------------
 
 threadFunction=function()
 
@@ -89,9 +91,10 @@ threadFunction=function()
             end
 
             -- Simulate prop spin based on thrust
-            jointAngle = simGetJointPosition(motorJointList[i])
-            print(thrust)
-            simSetJointPosition(motorJointList[i], jointAngle + propDirections[i]*thrust/5)
+            if thrust > 2.5 then
+                jointAngle = simGetJointPosition(motorJointList[i])
+                simSetJointPosition(motorJointList[i], jointAngle + propDirections[i]*thrust/5)
+            end
 
         end -- loop over motors
 
@@ -99,6 +102,7 @@ threadFunction=function()
         setColor(greenHandle, 'greenLED', {0,1,0})
         setColor(redHandle,   'redLED',   {1,0,0})
 
+        -- Yield to other threads
         simSwitchThread()
 
     end -- loop till user hits stop button
