@@ -197,32 +197,40 @@ VREP_DLLEXPORT void v_repEnd()
     unloadVrepLibrary(vrepLib); // release the library
 }
 
-VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customData,int* replyData)
-{   
+static void js2demands(int jsnumber, float jsvalue) {
+
     // Helps avoid bogus throttle values at startup
     static int throttleCount;
 
+    switch (jsnumber) {
+
+        case 0:
+            if (throttleCount > 2)
+                throttleDemand = (jsvalue + 1) / 2;
+            throttleCount++;
+            break;
+
+        case 1:
+            rollDemand = -jsvalue;
+            break;
+
+        case 2:
+            pitchDemand = jsvalue;
+            break;
+
+        case 3:
+            yawDemand = -jsvalue;
+    }
+}
+
+VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customData,int* replyData)
+{   
     // Read joystick
     if (joyfd > 0) {
         struct js_event js;
         read(joyfd, &js, sizeof(struct js_event));
         if (js.type & ~JS_EVENT_INIT) {
-            float x = js.value / 32767;
-            switch (js.number) {
-                case 0:
-                    if (throttleCount > 2)
-                        throttleDemand = (x + 1) / 2;
-                    throttleCount++;
-                    break;
-                case 1:
-                    rollDemand = -x;
-                    break;
-                case 2:
-                    pitchDemand = x;
-                    break;
-                case 3:
-                    yawDemand = -x;
-            }
+            js2demands(js.number, js.value / 32767);
         }
     }
 
