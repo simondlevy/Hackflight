@@ -29,7 +29,7 @@ EXT = so
 
 PLUGIN = libv_repExtHackflight.$(EXT)
 
-all: $(PLUGIN)
+all: $(PLUGIN) controller
 
 libv_repExtHackflight.so: *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp
 	g++ $(CFLAGS) -c v_repExtHackflight.cpp 
@@ -43,6 +43,9 @@ libv_repExtHackflight.so: *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp
 	g++ $(CFLAGS) -c ../firmware/pid.cpp
 	g++ $(CFLAGS) -c ../firmware/rc.cpp
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -ldl -shared 	
+
+controller: controller.cpp
+	g++ -o controller controller.cpp
 
 install:
 	cp $(PLUGIN) $(VREP_DIR)

@@ -29,7 +29,6 @@
 #include <time.h>
 #include <sys/ioctl.h>
 #include <linux/joystick.h>
-#include <unistd.h>
 
 #include "v_repExtHackflight.hpp"
 #include "scriptFunctionData.h"
@@ -208,20 +207,21 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
         struct js_event js;
         read(joyfd, &js, sizeof(struct js_event));
         if (js.type & ~JS_EVENT_INIT) {
+            float x = js.value / 32767;
             switch (js.number) {
                 case 0:
                     if (throttleCount > 2)
-                        throttleDemand = (js.value + 32767.) / 65534;
+                        throttleDemand = (x + 1) / 2;
                     throttleCount++;
                     break;
                 case 1:
-                    rollDemand = -js.value / 32767.;
+                    rollDemand = -x;
                     break;
                 case 2:
-                    pitchDemand = js.value / 32767.;
+                    pitchDemand = x;
                     break;
                 case 3:
-                    yawDemand = -js.value / 32767.;
+                    yawDemand = -x;
             }
         }
     }
