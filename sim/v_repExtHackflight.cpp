@@ -230,7 +230,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
         struct js_event js;
         read(joyfd, &js, sizeof(struct js_event));
         if (js.type & ~JS_EVENT_INIT) {
-            js2demands(js.number, js.value / 32767);
+            js2demands(js.number, js.value / 32767.);
         }
     }
 

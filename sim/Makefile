@@ -29,7 +29,7 @@ EXT = so
 
 PLUGIN = libv_repExtHackflight.$(EXT)
 
-all: $(PLUGIN) controller
+all: $(PLUGIN) 
 
 libv_repExtHackflight.so: *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp
 	g++ $(CFLAGS) -c v_repExtHackflight.cpp 
@@ -47,7 +47,7 @@ libv_repExtHackflight.so: *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp
 controller: controller.cpp
 	g++ -o controller controller.cpp
 
-install:
+install: $(PLUGIN)
 	cp $(PLUGIN) $(VREP_DIR)
 
 edit:
