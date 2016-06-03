@@ -20,11 +20,15 @@
 # Edit this for where you installed V-REP
 VREP_DIR = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
 
+# Choose which controller you want
+#CONTROLLER = TARANIS
+CONTROLLER = PS3
+
 COMMON = $(VREP_DIR)/programming/common/
 CFLAGS = -Wall -I$(VREP_DIR)/programming/include/ -I. -I../include -I../firmware -Wall -fPIC -static
 
 # XXX Currently supports only Linux
-CFLAGS += -D__linux
+CFLAGS += -D__linux 
 EXT = so
 
 PLUGIN = libv_repExtHackflight.$(EXT)
@@ -32,7 +36,7 @@ PLUGIN = libv_repExtHackflight.$(EXT)
 all: $(PLUGIN) 
 
 libv_repExtHackflight.so: *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp
-	g++ $(CFLAGS) -c v_repExtHackflight.cpp 
+	g++ $(CFLAGS) -c -D$(CONTROLLER) v_repExtHackflight.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
 	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp
@@ -50,6 +54,9 @@ controller: controller.cpp
 install: $(PLUGIN)
 	cp $(PLUGIN) $(VREP_DIR)
 
+uninstall:
+	rm -f $(VREP_DIR)/$(PLUGIN)
+
 edit:
 	vim v_repExtHackflight.cpp
 
@@ -59,3 +66,4 @@ commit:
 
 clean:
 	rm -f *.o *.so *.pyc *~
+

@@ -41,7 +41,11 @@
 
 #define JOY_DEV "/dev/input/js0"
 
-// Joystick support
+// Throttle support for PS3
+static const float PS3_THROTTLE_RATE = .001;
+static int    throttleDirection;
+
+// Controller support
 static int joyfd;
 static double rollDemand;
 static double pitchDemand;
@@ -77,10 +81,13 @@ static const int inArgs_START[]={
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
-    // Initialize joystick
+    // Initialize controller
+
     joyfd = open( JOY_DEV , O_RDONLY);
     if(joyfd > 0) 
         fcntl(joyfd, F_SETFL, O_NONBLOCK);
+
+    throttleDirection = 0;
 
     // Run Hackflight setup()
     setup();
@@ -197,6 +204,7 @@ VREP_DLLEXPORT void v_repEnd()
     unloadVrepLibrary(vrepLib); // release the library
 }
 
+#ifdef TARANIS
 static void js2demands(int jsnumber, float jsvalue) {
 
     // Helps avoid bogus throttle values at startup
@@ -223,15 +231,51 @@ static void js2demands(int jsnumber, float jsvalue) {
     }
 }
 
+#else
+
+static float min(float a, float b) {
+    return a < b ? a : b;
+}
+
+static float max(float a, float b) {
+    return a > b ? a : b;
+}
+
+static void js2demands(int jsnumber, float jsvalue) {
+
+    switch (jsnumber) {
+        case 0:
+            yawDemand = -jsvalue;
+            break;
+        case 1:
+            throttleDirection = jsvalue < 0 ? +1 : (jsvalue > 0 ? -1 : 0);
+            break;
+        case 2:
+            rollDemand = -jsvalue;
+            break;
+        case 3:
+            pitchDemand = jsvalue;
+    }
+}
+
+#endif
+
 VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customData,int* replyData)
 {   
     // Read joystick
     if (joyfd > 0) {
         struct js_event js;
+
         read(joyfd, &js, sizeof(struct js_event));
+
         if (js.type & ~JS_EVENT_INIT) {
             js2demands(js.number, js.value / 32767.);
         }
+
+#ifndef TARANIS
+        throttleDemand += throttleDirection * PS3_THROTTLE_RATE;
+        throttleDemand = max(0, min(1, throttleDemand));
+#endif
     }
 
     int errorModeSaved;
