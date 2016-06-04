@@ -1,4 +1,5 @@
-// Adapted from http://www.cplusplus.com/forum/general/5304/
+// Adapted from  http://www.cplusplus.com/forum/general/5304/
+// Key bindings: http://www.flightsimbooks.com/flightsimhandbook/keyboardcontrols.php
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,17 +9,6 @@
 #include <fcntl.h>
 #include <termios.h>
 
-/* http://www.flightsimbooks.com/flightsimhandbook/keyboardcontrols.php
-   Left Aileron         Keypad 4    
-   Center Ailerons      Keypad 5    
-   Right Aileron        Keypad 6    
-   Up Elevator*         Keypad 2    
-   Down Elevator        Keypad 8    
-   Left Rudder          Keypad 0    
-   Right Rudder         Keypad Enter
-   Throttle Increase*   Keypad 9 
-   Throttle Decrease*   Keypad 3 
-   */
 
 int main()
 {
