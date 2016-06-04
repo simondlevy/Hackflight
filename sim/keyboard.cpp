@@ -47,8 +47,20 @@ int main()
             char c;
             read( fileno( stdin ), &c, 1 );
             switch (c) {
+                case 65:
+                    printf("8\n");
+                    break;
+                case 66:
+                    printf("2\n");
+                    break;
+                case 67:
+                    printf("6\n");
+                    break;
                 case 68:
                     printf("4\n");
+                    break;
+                case 69:
+                    printf("5\n");
                     break;
             }
         }
