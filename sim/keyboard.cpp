@@ -48,31 +48,28 @@ int main()
             read( fileno( stdin ), &c, 1 );
             switch (c) {
                 case 10:
-                    printf("E\n");
+                    printf("Right rudder\n");
                     break;
                 case 50:
-                    printf("0\n");
+                    printf("Left rudder\n");
                     break;
                 case 53:
-                    printf("9\n");
+                    printf("Throttle increase\n");
                     break;
                 case 54:
-                    printf("3\n");
+                    printf("Throttle decrease\n");
                     break;
                 case 65:
-                    printf("8\n");
+                    printf("Down elevator\n");
                     break;
                 case 66:
-                    printf("2\n");
+                    printf("Up elevator\n");
                     break;
                 case 67:
-                    printf("6\n");
+                    printf("Right aileron\n");
                     break;
                 case 68:
-                    printf("4\n");
-                    break;
-                case 69:
-                    printf("5\n");
+                    printf("Left aileron\n");
                     break;
             }
         }
