@@ -40,16 +40,30 @@ class Controller {
 };
 
 class AxialController : Controller {
+
+    private:
+
+        int joyfd;
 };
 
 class TaranisController : public AxialController {
 
-    void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
+    public:
+
+        void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
 };
 
 class PS3Controller : public AxialController {
 
-    void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
+    private:
+
+        static const float THROTTLE_RATE = .001;
+
+        int throttleDirection;
+
+    public:
+
+        void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
 };
 
 /**

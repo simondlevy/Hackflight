@@ -140,8 +140,8 @@ int main()
 
     kb.init();
 
-    while ( 1 )
-    {
+    while (1) {
+
         float pitchDemand, rollDemand, yawDemand, throttleDemand;
 
         kb.getDemands(pitchDemand, rollDemand, yawDemand, throttleDemand);
