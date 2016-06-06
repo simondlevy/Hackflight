@@ -11,6 +11,21 @@
 
 #include "controller.hpp"
 
+KeyboardController::KeyboardController(void) {
+}
+
+void KeyboardController::init(void) {
+}
+
+void KeyboardController::read(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand) {
+
+    pitchDemand = 0;
+    rollDemand = 0;
+    yawDemand = 0;
+    throttleDemand = 0;
+}
+
+
 int main()
 {
     struct termios oldSettings, newSettings;

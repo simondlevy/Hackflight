@@ -2,11 +2,11 @@ class Controller {
 
     protected:
 
-        Controller(void);
+        Controller(void) { }
 
     public :
 
-        virtual void read(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
+        virtual void read(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand) = 0;
 
 };
 
@@ -24,6 +24,10 @@ class PS3Controller : public AxialController {
 };
 
 class KeyboardController : public Controller {
+
+    KeyboardController(void);
+
+    void init(void);
 
     void read(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
 };
