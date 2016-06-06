@@ -19,10 +19,45 @@ void KeyboardController::init(void) {
     newSettings = this->oldSettings;
     newSettings.c_lflag &= (~ICANON & ~ECHO);
     tcsetattr(fileno( stdin ), TCSANOW, &newSettings);
+
+    this->pitch    = 0;
+    this->roll     = 0;
+    this->yaw      = 0;
+    this->throttle = 0;
+}
+
+void KeyboardController::full_increment(float * value) 
+{
+    change(value, +1, -1, +1);
+}
+
+void KeyboardController::full_decrement(float * value) 
+{
+    change(value, -1, -1, +1);
+}
+
+void KeyboardController::pos_increment(float * value) 
+{
+    change(value, +1, 0, +1);
+}
+
+void KeyboardController::pos_decrement(float * value) 
+{
+    change(value, -1, 0, +1);
+}
+
+void KeyboardController::change(float *value, int dir, float min, float max) 
+{
+    *value += dir * INCREMENT;
+
+    if (*value > max)
+        *value = max;
+
+    if (*value < min)
+        *value = min;
 }
 
 void KeyboardController::getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand) {
-
     pitchDemand = 0;
     rollDemand = 0;
     yawDemand = 0;
@@ -45,28 +80,28 @@ void KeyboardController::getDemands(float & pitchDemand, float & rollDemand, flo
         read(fileno( stdin ), &c, 1);
         switch (c) {
             case 10:
-                printf("Right rudder\n");
+                full_increment(&this->yaw);
                 break;
             case 50:
-                printf("Left rudder\n");
+                full_decrement(&this->yaw);
                 break;
             case 53:
-                printf("Throttle increase\n");
+                pos_increment(&this->throttle);
                 break;
             case 54:
-                printf("Throttle decrease\n");
+                pos_decrement(&this->throttle);
                 break;
             case 65:
-                printf("Down elevator\n");
+                full_decrement(&this->pitch);
                 break;
             case 66:
-                printf("Up elevator\n");
+                full_increment(&this->pitch);
                 break;
             case 67:
-                printf("Right aileron\n");
+                full_increment(&this->roll);
                 break;
             case 68:
-                printf("Left aileron\n");
+                full_decrement(&this->roll);
                 break;
         }
     }
@@ -74,6 +109,10 @@ void KeyboardController::getDemands(float & pitchDemand, float & rollDemand, flo
         perror( "select error" );
     }
 
+    pitchDemand    = this->pitch;
+    rollDemand     = this->roll;
+    yawDemand      = this->yaw;
+    throttleDemand = this->throttle;
 }
 
 int main()
@@ -87,6 +126,9 @@ int main()
         float pitchDemand, rollDemand, yawDemand, throttleDemand;
 
         kb.getDemands(pitchDemand, rollDemand, yawDemand, throttleDemand);
+
+        printf("p: %+3.3f  | r: %+3.3f | y: %+3.3f  | t: %3.3f\n", 
+                pitchDemand, rollDemand, yawDemand, throttleDemand);
     }
 
     return 0;
