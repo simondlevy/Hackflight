@@ -33,6 +33,11 @@ class Controller {
 
         Controller(void) { }
 
+        float pitch;
+        float roll;
+        float yaw;
+        float throttle;
+
     public :
 
         virtual void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand) = 0;
@@ -40,6 +45,12 @@ class Controller {
 };
 
 class AxialController : Controller {
+
+    public:
+       
+        void init(const char * devname="/dev/input/js0");
+
+        void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
 
     private:
 
@@ -51,6 +62,7 @@ class TaranisController : public AxialController {
     public:
 
         void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
+
 };
 
 class PS3Controller : public AxialController {
@@ -60,10 +72,6 @@ class PS3Controller : public AxialController {
         static const float THROTTLE_RATE = .001;
 
         int throttleDirection;
-
-    public:
-
-        void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
 };
 
 /**
@@ -78,11 +86,6 @@ class KeyboardController : public Controller {
         static const float INCREMENT = .01;
 
         struct termios oldSettings;
-
-        float pitch;
-        float roll;
-        float yaw;
-        float throttle;
 
         static void full_increment(float * value);
         static void full_decrement(float * value);
