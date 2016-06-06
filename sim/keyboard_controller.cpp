@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <termios.h>
 
+#include "controller.hpp"
 
 int main()
 {
