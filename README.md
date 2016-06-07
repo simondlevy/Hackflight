@@ -1,4 +1,4 @@
-# Hackflight: Simple quadcopter flight control firmware for C++ hackers
+# Hackflight: Simple quadcopter flight control firmware and simulator for C++ hackers
 
 Hackflight is simple C++ firmware for inexpensive quadcopter flight
 controllers.  It is geared toward people like me who want to tinker with

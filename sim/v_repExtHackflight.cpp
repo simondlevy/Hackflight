@@ -34,6 +34,8 @@
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
+#include "controller.hpp"
+
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
@@ -41,12 +43,23 @@
 
 #define JOY_DEV "/dev/input/js0"
 
-// Throttle support for PS3
+// Controller support
 static const float PS3_THROTTLE_RATE = .001;
 static int    throttleDirection;
-
-// Controller support
 static int joyfd;
+
+#ifdef TARANIS
+static TaranisController controller;
+#endif
+
+#ifdef PS3
+static PS3Controller controller;
+#endif
+
+#ifdef KEYBOARD
+static KeyboardController controller;
+#endif
+
 static double rollDemand;
 static double pitchDemand;
 static double yawDemand;
@@ -85,6 +98,7 @@ static const int inArgs_START[]={
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     // Initialize controller
+    //controller.init();
     joyfd = open( JOY_DEV , O_RDONLY);
     if(joyfd > 0) 
         fcntl(joyfd, F_SETFL, O_NONBLOCK);
@@ -152,7 +166,8 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
-    // Close joystick if open
+    // Stop controller interaction
+    //controller.stop();
     if (joyfd > 0)
         close(joyfd);
 

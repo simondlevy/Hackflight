@@ -38,6 +38,7 @@ all: $(PLUGIN) controller_test
 
 libv_repExtHackflight.so: *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp Makefile
 	g++ $(CFLAGS) -c -D$(CONTROLLER) v_repExtHackflight.cpp 
+	g++ $(CFLAGS) -c -D$(CONTROLLER) controller.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
 	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp
