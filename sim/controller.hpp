@@ -38,48 +38,48 @@ class Controller {
         float yaw;
         float throttle;
 
-    public :
+        virtual void update(void) = 0;
 
-        virtual void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand) = 0;
+    public:
 
+        void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
 };
 
-class AxialController : protected Controller {
+class AxialController : public Controller {
 
     public:
        
         void init(const char * devname="/dev/input/js0");
 
-
     protected:
+
+        void update(void);
 
         virtual void js2demands(int jsnumber, float jsvalue) = 0;
 
-//    private:
+        virtual void postprocess(void) = 0;
+
+    private:
 
         int joyfd;
 };
 
 class TaranisController : public AxialController {
 
-    public:
-
-        void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
-
     protected:
 
         void js2demands(int jsnumber, float jsvalue);
+
+        void postprocess(void);
 };
 
 class PS3Controller : public AxialController {
 
-    public:
-
-        void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
-
     protected:
 
         void js2demands(int jsnumber, float jsvalue);
+
+        void postprocess(void);
 
     private:
 
@@ -107,6 +107,10 @@ class KeyboardController : public Controller {
         static void pos_decrement(float * value); 
         static void change(float * value, int dir, float min, float max); 
 
+    protected:
+
+        void update(void);
+
     public:
 
         KeyboardController(void);
@@ -114,7 +118,5 @@ class KeyboardController : public Controller {
         ~KeyboardController(void);
 
         void init(void);
-
-        void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
 };
 

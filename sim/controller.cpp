@@ -23,6 +23,19 @@
 #include "controller.hpp"
 #include <linux/joystick.h>
 
+
+// AxialController ----------------------------------------------------------------------
+
+void Controller::getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand)
+{
+    this->update();
+
+    pitchDemand    = this->pitch;
+    rollDemand     = this->roll;
+    yawDemand      = this->yaw;
+    throttleDemand = this->throttle;
+}
+
 // AxialController ----------------------------------------------------------------------
 
 void AxialController::init(const char * devname)
@@ -31,6 +44,22 @@ void AxialController::init(const char * devname)
 
     if(this->joyfd > 0) 
         fcntl(this->joyfd, F_SETFL, O_NONBLOCK);
+}
+
+void AxialController::update(void)
+{
+    if (this->joyfd > 0) {
+
+        struct js_event js;
+
+        read(joyfd, &js, sizeof(struct js_event));
+
+        if (js.type & ~JS_EVENT_INIT) {
+            this->js2demands(js.number, js.value / 32767.);
+        }
+    }
+
+    this->postprocess();
 }
 
 // PS3Controller ---------------------------------------------------------------------------
@@ -52,19 +81,8 @@ void PS3Controller::js2demands(int jsnumber, float jsvalue)
     }
 }
 
-void PS3Controller::getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand)
+void PS3Controller::postprocess(void)
 {
-    if (this->joyfd > 0) {
-
-        struct js_event js;
-
-        read(joyfd, &js, sizeof(struct js_event));
-
-        if (js.type & ~JS_EVENT_INIT) {
-            this->js2demands(js.number, js.value / 32767.);
-        }
-    }
-
     this->throttle += this->throttleDirection * PS3Controller::THROTTLE_RATE;
 
     if (this->throttle < 0)
@@ -72,10 +90,6 @@ void PS3Controller::getDemands(float & pitchDemand, float & rollDemand, float & 
     if (this->throttle > 1)
         this->throttle = 1;
 
-    pitchDemand    = this->pitch;
-    rollDemand     = this->roll;
-    yawDemand      = this->yaw;
-    throttleDemand = this->throttle;
 }
 
 // TaranisController ---------------------------------------------------------------------------
@@ -106,23 +120,8 @@ void TaranisController::js2demands(int jsnumber, float jsvalue)
     }
 }
 
-void TaranisController::getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand)
+void TaranisController::postprocess(void)
 {
-    if (this->joyfd > 0) {
-
-        struct js_event js;
-
-        read(joyfd, &js, sizeof(struct js_event));
-
-        if (js.type & ~JS_EVENT_INIT) {
-            this->js2demands(js.number, js.value / 32767.);
-        }
-    }
-
-    pitchDemand    = this->pitch;
-    rollDemand     = this->roll;
-    yawDemand      = this->yaw;
-    throttleDemand = this->throttle;
 }
 
 // KeyboardController ----------------------------------------------------------------------
@@ -181,12 +180,8 @@ void KeyboardController::change(float *value, int dir, float min, float max)
         *value = min;
 }
 
-void KeyboardController::getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand) {
-    pitchDemand = 0;
-    rollDemand = 0;
-    yawDemand = 0;
-    throttleDemand = 0;
-
+void KeyboardController::update(void)
+{
     fd_set set;
     struct timeval tv;
 
@@ -232,11 +227,6 @@ void KeyboardController::getDemands(float & pitchDemand, float & rollDemand, flo
     else if( res < 0 ) {
         perror( "select error" );
     }
-
-    pitchDemand    = this->pitch;
-    rollDemand     = this->roll;
-    yawDemand      = this->yaw;
-    throttleDemand = this->throttle;
 }
 
 
