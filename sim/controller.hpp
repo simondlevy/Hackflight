@@ -44,13 +44,18 @@ class Controller {
 
 };
 
-class AxialController : Controller {
+class AxialController : protected Controller {
 
     public:
        
         void init(const char * devname="/dev/input/js0");
 
         void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
+
+
+    protected:
+
+        virtual void js2demands(int jsnumber, float jsvalue) = 0;
 
     private:
 
@@ -66,6 +71,10 @@ class TaranisController : public AxialController {
 };
 
 class PS3Controller : public AxialController {
+
+    protected:
+
+        void js2demands(int jsnumber, float jsvalue);
 
     private:
 

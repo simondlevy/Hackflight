@@ -21,6 +21,7 @@
 */
 
 #include "controller.hpp"
+#include <linux/joystick.h>
 
 // AxialController ----------------------------------------------------------------------
 
@@ -34,8 +35,42 @@ void AxialController::init(const char * devname)
 
 void AxialController::getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand)
 {
+    if (this->joyfd > 0) {
+
+        struct js_event js;
+
+        read(joyfd, &js, sizeof(struct js_event));
+
+        if (js.type & ~JS_EVENT_INIT) {
+            this->js2demands(js.number, js.value / 32767.);
+        }
+    }
+
+    pitchDemand    = this->pitch;
+    rollDemand     = this->roll;
+    yawDemand      = this->yaw;
+    throttleDemand = this->throttle;
 }
 
+
+// PS3Controller ---------------------------------------------------------------------------
+
+void PS3Controller::js2demands(int jsnumber, float jsvalue) 
+{
+    switch (jsnumber) {
+        case 0:
+            this->yaw = -jsvalue;
+            break;
+        case 1:
+            //throttleDirection = jsvalue < 0 ? +1 : (jsvalue > 0 ? -1 : 0);
+            break;
+        case 2:
+            this->roll = -jsvalue;
+            break;
+        case 3:
+            this->pitch = jsvalue;
+    }
+}
 
 // KeyboardController ----------------------------------------------------------------------
 
