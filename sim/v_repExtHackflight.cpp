@@ -44,9 +44,6 @@
 #define JOY_DEV "/dev/input/js0"
 
 // Controller support
-//static const float PS3_THROTTLE_RATE = .001;
-//static int    throttleDirection;
-//static int joyfd;
 
 #ifdef TARANIS
 static TaranisController controller;
@@ -99,11 +96,6 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     // Initialize controller
     controller.init();
-    //joyfd = open( JOY_DEV , O_RDONLY);
-    ////if(joyfd > 0) 
-    ////    fcntl(joyfd, F_SETFL, O_NONBLOCK);
-
-    ////throttleDirection = 0;
 
     // Run Hackflight setup()
     setup();
@@ -168,8 +160,6 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
     // Stop controller interaction
     controller.stop();
-    //if (joyfd > 0)
-    //    close(joyfd);
 
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true)); // success
@@ -226,84 +216,11 @@ VREP_DLLEXPORT void v_repEnd()
     unloadVrepLibrary(vrepLib); // release the library
 }
 
-#ifdef TARANIS
-static void js2demands(int jsnumber, float jsvalue) {
-
-    // Helps avoid bogus throttle values at startup
-    static int throttleCount;
-
-    switch (jsnumber) {
-
-        case 0:
-            if (throttleCount > 2)
-                throttleDemand = (jsvalue + 1) / 2;
-            throttleCount++;
-            break;
-
-        case 1:
-            rollDemand = -jsvalue;
-            break;
-
-        case 2:
-            pitchDemand = jsvalue;
-            break;
-
-        case 3:
-            yawDemand = -jsvalue;
-    }
-}
-
-#else
-
-static float min(float a, float b) {
-    return a < b ? a : b;
-}
-
-static float max(float a, float b) {
-    return a > b ? a : b;
-}
-
-static void js2demands(int jsnumber, float jsvalue) {
-
-    switch (jsnumber) {
-        case 0:
-            yawDemand = -jsvalue;
-            break;
-        case 1:
-            throttleDirection = jsvalue < 0 ? +1 : (jsvalue > 0 ? -1 : 0);
-            break;
-        case 2:
-            rollDemand = -jsvalue;
-            break;
-        case 3:
-            pitchDemand = jsvalue;
-    }
-}
-
-#endif
-
 VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customData,int* replyData)
 {   
     if (!ready)
         return NULL;
 
-    // Read joystick
-    /*
-    if (joyfd > 0) {
-        struct js_event js;
-
-        read(joyfd, &js, sizeof(struct js_event));
-
-        if (js.type & ~JS_EVENT_INIT) {
-            js2demands(js.number, js.value / 32767.);
-        }
-
-#ifndef TARANIS
-        throttleDemand += throttleDirection * PS3_THROTTLE_RATE;
-        throttleDemand = max(0, min(1, throttleDemand));
-#endif
-    }
-    */
     controller.getDemands(pitchDemand, rollDemand, yawDemand, throttleDemand);
 
     int errorModeSaved;
