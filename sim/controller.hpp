@@ -43,6 +43,8 @@ class Controller {
     public:
 
         void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
+
+        virtual void stop(void) = 0;
 };
 
 class AxialController : public Controller {
@@ -50,6 +52,8 @@ class AxialController : public Controller {
     public:
        
         void init(const char * devname="/dev/input/js0");
+
+        void stop(void);
 
     protected:
 
@@ -118,5 +122,7 @@ class KeyboardController : public Controller {
         ~KeyboardController(void);
 
         void init(void);
+
+        void stop(void);
 };
 

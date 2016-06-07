@@ -62,6 +62,13 @@ void AxialController::update(void)
     this->postprocess();
 }
 
+void AxialController::stop(void)
+{
+    if (this->joyfd > 0) 
+        close(this->joyfd);
+}
+
+
 // PS3Controller ---------------------------------------------------------------------------
 
 void PS3Controller::js2demands(int jsnumber, float jsvalue) 
@@ -230,3 +237,6 @@ void KeyboardController::update(void)
 }
 
 
+void KeyboardController::stop(void)
+{
+}
