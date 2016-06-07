@@ -78,6 +78,52 @@ void PS3Controller::getDemands(float & pitchDemand, float & rollDemand, float & 
     throttleDemand = this->throttle;
 }
 
+// TaranisController ---------------------------------------------------------------------------
+
+void TaranisController::js2demands(int jsnumber, float jsvalue) 
+{
+    // Helps avoid bogus throttle values at startup
+    static int throttleCount;
+
+    switch (jsnumber) {
+
+        case 0:
+            if (throttleCount > 2)
+                this->throttle = (jsvalue + 1) / 2;
+            throttleCount++;
+            break;
+
+        case 1:
+            this->roll = -jsvalue;
+            break;
+
+        case 2:
+            this->pitch = jsvalue;
+            break;
+
+        case 3:
+            this->yaw = -jsvalue;
+    }
+}
+
+void TaranisController::getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand)
+{
+    if (this->joyfd > 0) {
+
+        struct js_event js;
+
+        read(joyfd, &js, sizeof(struct js_event));
+
+        if (js.type & ~JS_EVENT_INIT) {
+            this->js2demands(js.number, js.value / 32767.);
+        }
+    }
+
+    pitchDemand    = this->pitch;
+    rollDemand     = this->roll;
+    yawDemand      = this->yaw;
+    throttleDemand = this->throttle;
+}
 
 // KeyboardController ----------------------------------------------------------------------
 

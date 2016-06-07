@@ -66,6 +66,9 @@ class TaranisController : public AxialController {
 
         void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
 
+    protected:
+
+        void js2demands(int jsnumber, float jsvalue);
 };
 
 class PS3Controller : public AxialController {
