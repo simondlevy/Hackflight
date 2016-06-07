@@ -44,9 +44,9 @@
 #define JOY_DEV "/dev/input/js0"
 
 // Controller support
-static const float PS3_THROTTLE_RATE = .001;
-static int    throttleDirection;
-static int joyfd;
+//static const float PS3_THROTTLE_RATE = .001;
+//static int    throttleDirection;
+//static int joyfd;
 
 #ifdef TARANIS
 static TaranisController controller;
@@ -60,10 +60,10 @@ static PS3Controller controller;
 static KeyboardController controller;
 #endif
 
-static double rollDemand;
-static double pitchDemand;
-static double yawDemand;
-static double throttleDemand;
+static float rollDemand;
+static float pitchDemand;
+static float yawDemand;
+static float throttleDemand;
 
 // IMU support
 static double accel[3];
@@ -98,12 +98,12 @@ static const int inArgs_START[]={
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     // Initialize controller
-    //controller.init();
-    joyfd = open( JOY_DEV , O_RDONLY);
-    if(joyfd > 0) 
-        fcntl(joyfd, F_SETFL, O_NONBLOCK);
+    controller.init();
+    //joyfd = open( JOY_DEV , O_RDONLY);
+    ////if(joyfd > 0) 
+    ////    fcntl(joyfd, F_SETFL, O_NONBLOCK);
 
-    throttleDirection = 0;
+    ////throttleDirection = 0;
 
     // Run Hackflight setup()
     setup();
@@ -167,9 +167,9 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
     // Stop controller interaction
-    //controller.stop();
-    if (joyfd > 0)
-        close(joyfd);
+    controller.stop();
+    //if (joyfd > 0)
+    //    close(joyfd);
 
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true)); // success
@@ -288,6 +288,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
         return NULL;
 
     // Read joystick
+    /*
     if (joyfd > 0) {
         struct js_event js;
 
@@ -302,6 +303,8 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
         throttleDemand = max(0, min(1, throttleDemand));
 #endif
     }
+    */
+    controller.getDemands(pitchDemand, rollDemand, yawDemand, throttleDemand);
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
