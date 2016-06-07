@@ -22,6 +22,8 @@
 
 #include "controller.hpp"
 
+// AxialController ----------------------------------------------------------------------
+
 void AxialController::init(const char * devname)
 {
     this->joyfd = open(devname, O_RDONLY);
@@ -29,6 +31,13 @@ void AxialController::init(const char * devname)
     if(this->joyfd > 0) 
         fcntl(this->joyfd, F_SETFL, O_NONBLOCK);
 }
+
+void AxialController::getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand)
+{
+}
+
+
+// KeyboardController ----------------------------------------------------------------------
 
 KeyboardController::KeyboardController(void) {
 }
@@ -142,25 +151,4 @@ void KeyboardController::getDemands(float & pitchDemand, float & rollDemand, flo
     throttleDemand = this->throttle;
 }
 
-void AxialController::getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand)
-{
-}
 
-int main()
-{
-    PS3Controller controller;
-
-    controller.init();
-
-    while (1) {
-
-        float pitchDemand, rollDemand, yawDemand, throttleDemand;
-
-        controller.getDemands(pitchDemand, rollDemand, yawDemand, throttleDemand);
-
-        printf("p: %+3.3f  | r: %+3.3f | y: %+3.3f  | t: %3.3f\n", 
-                pitchDemand, rollDemand, yawDemand, throttleDemand);
-    }
-
-    return 0;
-}

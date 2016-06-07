@@ -22,7 +22,8 @@ VREP_DIR = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
 
 # Choose which controller you want
 #CONTROLLER = TARANIS
-CONTROLLER = PS3
+#CONTROLLER = PS3
+CONTROLLER = KEYBOARD
 
 COMMON = $(VREP_DIR)/programming/common/
 CFLAGS = -Wall -I$(VREP_DIR)/programming/include/ -I. -I../include -I../firmware -Wall -fPIC -static
@@ -33,7 +34,7 @@ EXT = so
 
 PLUGIN = libv_repExtHackflight.$(EXT)
 
-all: $(PLUGIN) 
+all: $(PLUGIN) controller_test
 
 libv_repExtHackflight.so: *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp
 	g++ $(CFLAGS) -c -D$(CONTROLLER) v_repExtHackflight.cpp 
@@ -48,8 +49,8 @@ libv_repExtHackflight.so: *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp
 	g++ $(CFLAGS) -c ../firmware/rc.cpp
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -ldl -shared 	
 
-controller: controller.cpp
-	g++ -o controller controller.cpp
+controller_test: controller.cpp controller_test.cpp
+	g++ -D$(CONTROLLER) -o controller_test controller.cpp controller_test.cpp
 
 install: $(PLUGIN)
 	cp $(PLUGIN) $(VREP_DIR)
