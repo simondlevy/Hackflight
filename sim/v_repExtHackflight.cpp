@@ -70,6 +70,9 @@ extern void setup(void);
 extern void loop(void);
 static uint32_t micros;
 
+// Launch support
+static bool ready;
+
 // simExtHackflight_start ////////////////////////////////////////////////////////////////////////
 
 #define LUA_START_COMMAND "simExtHackflight_start"
@@ -82,7 +85,6 @@ static const int inArgs_START[]={
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     // Initialize controller
-
     joyfd = open( JOY_DEV , O_RDONLY);
     if(joyfd > 0) 
         fcntl(joyfd, F_SETFL, O_NONBLOCK);
@@ -101,6 +103,8 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
 
+    // Now we're ready
+    ready = true;
 }
 
 // simExtHackflight_update ////////////////////////////////////////////////////////////////////////
@@ -139,6 +143,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     // Return success
     D.pushOutData(CScriptFunctionDataItem(true)); 
     D.writeDataToStack(cb->stackID);
+
 }
 
 // simExtHackflight_stop ////////////////////////////////////////////////////////////////////////////////
@@ -154,11 +159,13 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
+
 }
 
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
-{ // This is called just once, at the start of V-REP.
+{ 
+    // This is called just once, at the start of V-REP.
     // Dynamically load and bind V-REP functions:
     char curDirAndFile[1024];
     getcwd(curDirAndFile, sizeof(curDirAndFile));
@@ -262,6 +269,9 @@ static void js2demands(int jsnumber, float jsvalue) {
 
 VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customData,int* replyData)
 {   
+    if (!ready)
+        return NULL;
+
     // Read joystick
     if (joyfd > 0) {
         struct js_event js;
@@ -282,14 +292,12 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
     simSetIntegerParameter(sim_intparam_error_report_mode,sim_api_errormessage_ignore);
 
-    void* retVal=NULL;
-
     simSetIntegerParameter(sim_intparam_error_report_mode,errorModeSaved); // restore previous settings
 
     // Call Hackflight loop() from here for most realistic simulation
     loop();
 
-    return(retVal);
+    return NULL;
 }
 
 // Board implementation ======================================================
