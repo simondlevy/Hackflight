@@ -33,7 +33,26 @@ void AxialController::init(const char * devname)
         fcntl(this->joyfd, F_SETFL, O_NONBLOCK);
 }
 
-void AxialController::getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand)
+// PS3Controller ---------------------------------------------------------------------------
+
+void PS3Controller::js2demands(int jsnumber, float jsvalue) 
+{
+    switch (jsnumber) {
+        case 0:
+            this->yaw = -jsvalue;
+            break;
+        case 1: 
+            this->throttleDirection = jsvalue < 0 ? +1 : (jsvalue > 0 ? -1 : 0);
+            break;
+        case 2:
+            this->roll = -jsvalue;
+            break;
+        case 3:
+            this->pitch = jsvalue;
+    }
+}
+
+void PS3Controller::getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand)
 {
     if (this->joyfd > 0) {
 
@@ -46,31 +65,19 @@ void AxialController::getDemands(float & pitchDemand, float & rollDemand, float 
         }
     }
 
+    this->throttle += this->throttleDirection * PS3Controller::THROTTLE_RATE;
+
+    if (this->throttle < 0)
+        this->throttle = 0;
+    if (this->throttle > 1)
+        this->throttle = 1;
+
     pitchDemand    = this->pitch;
     rollDemand     = this->roll;
     yawDemand      = this->yaw;
     throttleDemand = this->throttle;
 }
 
-
-// PS3Controller ---------------------------------------------------------------------------
-
-void PS3Controller::js2demands(int jsnumber, float jsvalue) 
-{
-    switch (jsnumber) {
-        case 0:
-            this->yaw = -jsvalue;
-            break;
-        case 1:
-            //throttleDirection = jsvalue < 0 ? +1 : (jsvalue > 0 ? -1 : 0);
-            break;
-        case 2:
-            this->roll = -jsvalue;
-            break;
-        case 3:
-            this->pitch = jsvalue;
-    }
-}
 
 // KeyboardController ----------------------------------------------------------------------
 

@@ -49,7 +49,7 @@ libv_repExtHackflight.so: *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp
 	g++ $(CFLAGS) -c ../firmware/rc.cpp
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -ldl -shared 	
 
-controller_test: controller.cpp controller_test.cpp
+controller_test: controller_test.cpp controller.cpp controller.hpp 
 	g++ -D$(CONTROLLER) -o controller_test controller.cpp controller_test.cpp
 
 install: $(PLUGIN)
