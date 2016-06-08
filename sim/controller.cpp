@@ -227,10 +227,10 @@ void KeyboardController::update(void)
         read(fileno( stdin ), &c, 1);
         switch (c) {
             case 10:
-                full_increment(&this->yaw);
+                full_decrement(&this->yaw);
                 break;
             case 50:
-                full_decrement(&this->yaw);
+                full_increment(&this->yaw);
                 break;
             case 53:
                 pos_increment(&this->throttle);
@@ -245,10 +245,10 @@ void KeyboardController::update(void)
                 full_increment(&this->pitch);
                 break;
             case 67:
-                full_increment(&this->roll);
+                full_decrement(&this->roll);
                 break;
             case 68:
-                full_decrement(&this->roll);
+                full_increment(&this->roll);
                 break;
         }
     }
