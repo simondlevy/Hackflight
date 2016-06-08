@@ -1,3 +1,5 @@
+<img src="hackflight.png">
+
 This directory contains code that you can use to build HackflightSim, a flight
 simulator that uses the Hackflight firmware and the [Virtual Robot
 Experimentation Platform](http://www.coppeliarobotics.com/) from Coppelia

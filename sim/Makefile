@@ -21,9 +21,9 @@
 VREP_DIR = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
 
 # Choose which controller you want
-#CONTROLLER = TARANIS
+CONTROLLER = TARANIS
 #CONTROLLER = PS3
-CONTROLLER = KEYBOARD
+#CONTROLLER = KEYBOARD
 
 COMMON = $(VREP_DIR)/programming/common/
 CFLAGS = -Wall -I$(VREP_DIR)/programming/include/ -I. -I../include -I../firmware -Wall -fPIC -static
