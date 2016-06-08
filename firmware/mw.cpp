@@ -74,13 +74,14 @@ static uint16_t calibratingGyroCycles;
 static uint16_t calibratingAccCycles;
 static uint16_t calibratingG;
 static bool     haveSmallAngle;
+static bool     armed;
 
 void setup(void)
 {
     uint32_t calibratingGyroMsec;
 
     // Get particulars for board
-    board.init(imuLooptimeUsec, calibratingGyroMsec);
+    board.init(imuLooptimeUsec, calibratingGyroMsec, armed);
 
     // sleep for 100ms
     board.delayMilliseconds(100);
@@ -140,7 +141,6 @@ void loop(void)
     static uint32_t loopTime;
     static uint32_t calibratedAccTime;
     static bool     accCalibrated;
-    static bool     armed;
     static uint16_t calibratingA;
     static uint32_t currentTime;
     static uint32_t disarmTime = 0;
