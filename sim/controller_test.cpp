@@ -18,14 +18,14 @@ int main(int argc, char ** argv)
 
     controller.init();
 
-    while (1) {
+    for (int k=0; ; k++) {
 
         float pitchDemand, rollDemand, yawDemand, throttleDemand;
 
         controller.getDemands(pitchDemand, rollDemand, yawDemand, throttleDemand);
 
-        printf("p: %+3.3f  | r: %+3.3f | y: %+3.3f  | t: %3.3f\n", 
-                pitchDemand, rollDemand, yawDemand, throttleDemand);
+        printf("%d p: %+3.3f  | r: %+3.3f | y: %+3.3f  | t: %3.3f\n", 
+                k, pitchDemand, rollDemand, yawDemand, throttleDemand);
     }
 
     return 0;
