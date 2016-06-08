@@ -1,5 +1,5 @@
 /*
-   controller.cpp : support for various kinds of control devices
+   controller.cpp : support for various kinds of flight-simulator control devices
 
    Copyright (C) Simon D. Levy 2016
 
@@ -71,6 +71,15 @@ void AxialController::stop(void)
 
 // PS3Controller ---------------------------------------------------------------------------
 
+void PS3Controller::init(void)
+{
+    AxialController::init();
+
+    this->throttle = 0;
+    this->timeprev = 0;
+    this->timecount = 0;
+}
+
 void PS3Controller::js2demands(int jsnumber, float jsvalue) 
 {
     switch (jsnumber) {
@@ -90,7 +99,19 @@ void PS3Controller::js2demands(int jsnumber, float jsvalue)
 
 void PS3Controller::postprocess(void)
 {
-    this->throttle += this->throttleDirection * PS3Controller::THROTTLE_RATE;
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+
+    double timecurr = tv.tv_sec + tv.tv_usec/1e6;
+
+    if (this->timeprev) {
+        this->timeavg += (timecurr-this->timeprev);
+    }
+
+    this->timeprev = timecurr; 
+    this->timecount++;
+
+    this->throttle += this->throttleDirection * this->timeavg / this->timecount / 10;
 
     if (this->throttle < 0)
         this->throttle = 0;

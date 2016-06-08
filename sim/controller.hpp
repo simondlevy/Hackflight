@@ -1,5 +1,5 @@
 /*
-   controller.hpp : header for support for various kinds of control devices
+   controller.hpp : support for various kinds of flight-simulator control devices
 
    Copyright (C) Simon D. Levy 2016
 
@@ -79,17 +79,22 @@ class TaranisController : public AxialController {
 
 class PS3Controller : public AxialController {
 
+    private:
+
+        double timeprev; 
+        double timeavg; 
+        unsigned long timecount;
+        int throttleDirection;
+
     protected:
 
         void js2demands(int jsnumber, float jsvalue);
 
         void postprocess(void);
 
-    private:
+    public:
 
-        static const float THROTTLE_RATE = .00001;
-
-        int throttleDirection;
+        void init(void);
 };
 
 /**

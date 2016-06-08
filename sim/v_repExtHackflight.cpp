@@ -223,6 +223,8 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     controller.getDemands(pitchDemand, rollDemand, yawDemand, throttleDemand);
 
+    printf("%f\n", throttleDemand);
+
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
     simSetIntegerParameter(sim_intparam_error_report_mode,sim_api_errormessage_ignore);
