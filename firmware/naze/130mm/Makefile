@@ -167,9 +167,34 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 	@$(CC) -c -o $@ $(ASFLAGS) $< 
 
 # C++ support
-%.o: %.cpp %.hpp
+
+mw.o: ../../mw.cpp ../../mw.hpp
 	@echo %% $(notdir $<)
-	@$(CC) -c -o $@ $(CFLAGS) $< 
+	@$(CC) $(CFLAGS) -c -o mw.o ../../mw.cpp
+
+imu.o: ../../imu.cpp ../../imu.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o imu.o ../../imu.cpp
+
+mixer.o: ../../mixer.cpp ../../mixer.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o mixer.o ../../mixer.cpp
+
+pid.o: ../../pid.cpp ../../pid.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o pid.o ../../pid.cpp
+
+msp.o: ../../msp.cpp ../../msp.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o msp.o ../../msp.cpp
+
+rc.o: ../../rc.cpp ../../rc.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o rc.o ../../rc.cpp
+
+board.o: ../board.cpp ../../board.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o board.o ../board.cpp
 
 clean:
 	rm -rf *.o obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
