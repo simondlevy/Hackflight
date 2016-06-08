@@ -124,8 +124,6 @@ class KeyboardController : public Controller {
 
         KeyboardController(void);
 
-        ~KeyboardController(void);
-
         void init(void);
 
         void stop(void);

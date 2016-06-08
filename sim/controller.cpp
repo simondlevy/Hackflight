@@ -157,11 +157,6 @@ void TaranisController::postprocess(void)
 KeyboardController::KeyboardController(void) {
 }
 
-KeyboardController::~KeyboardController(void) {
-
-    tcsetattr(fileno( stdin ), TCSANOW, &this->oldSettings);
-}
-
 void KeyboardController::init(void) {
 
     struct termios newSettings;
@@ -260,4 +255,5 @@ void KeyboardController::update(void)
 
 void KeyboardController::stop(void)
 {
+    tcsetattr(fileno( stdin ), TCSANOW, &this->oldSettings);
 }
