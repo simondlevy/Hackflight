@@ -58,6 +58,16 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     initiallyArmed = false;
 }
 
+bool Board::baroInit(void)
+{
+    return ms5611_init();
+}
+
+int32_t Board::baroGetPressure(void)
+{
+    return ms5611_read_pressure();
+}
+
 void Board::checkReboot(bool pendReboot)
 {
     if (pendReboot)

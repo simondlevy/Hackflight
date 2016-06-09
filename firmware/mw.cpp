@@ -40,6 +40,7 @@ RC    rc;
 Mixer mixer;
 PID   pid;
 MSP   msp;
+Baro  baro;
 
 // utilities 
 
@@ -75,6 +76,7 @@ static uint16_t calibratingAccCycles;
 static uint16_t calibratingG;
 static bool     haveSmallAngle;
 static bool     armed;
+static bool     baroAvailable;
 
 void setup(void)
 {
@@ -117,6 +119,9 @@ void setup(void)
 
     // assume shallow angle (no accelerometer calibration needed)
     haveSmallAngle = true;
+
+    // attempt to initialize barometer
+    baroAvailable = baro.init(&board);
 
 } // setup
 
@@ -198,6 +203,8 @@ void loop(void)
         switch (taskOrder) {
             case 0:
                 taskOrder++;
+                if (baroAvailable)
+                    baro.getAltitude();
                 //sensorsGetBaro();
             case 1:
                 taskOrder++;

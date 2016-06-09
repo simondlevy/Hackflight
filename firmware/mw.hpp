@@ -29,6 +29,7 @@
 #include "pid.hpp"
 #include "mixer.hpp"
 #include "msp.hpp"
+#include "baro.hpp"
 
 #ifndef abs
 #define abs(x)    ((x) > 0 ? (x) : -(x))

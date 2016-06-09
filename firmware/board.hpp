@@ -33,6 +33,8 @@ extern "C" {
 
             void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec, bool & initiallyArmed);
 
+            bool     baroInit(void);
+            int32_t  baroGetPressure(void);
             void     checkReboot(bool pendReboot);
             void     delayMilliseconds(uint32_t msec);
             uint32_t getMicros();
