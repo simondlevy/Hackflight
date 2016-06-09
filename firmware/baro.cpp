@@ -52,7 +52,7 @@ int32_t Baro::getAltitude(void)
     this->pressureSum -= this->histTable[indexplus1];
     this->histIdx = indexplus1;
 
-    // Calculates height from ground in cm via baro pressure
+    // Calculate altitude above sea level in cm via baro pressure in Pascals (millibars)
     // See: https://github.com/diydrones/ardupilot/blob/master/libraries/AP_Baro/AP_Baro.cpp#L140
     return lrintf((1.0f - powf((float)(this->pressureSum / (Baro::TABLE_SIZE - 1)) /
        101325.0f, 0.190295f)) * 4433000.0f);

@@ -204,7 +204,7 @@ void loop(void)
             case 0:
                 taskOrder++;
                 if (baro.available())
-                    baro.getAltitude();
+                    printf("%d\n", baro.getAltitude());
                 break;
             case 1:
                 taskOrder++;

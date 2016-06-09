@@ -57,6 +57,7 @@ static PS3Controller controller;
 static KeyboardController controller;
 #endif
 
+// Stick demands from controller
 static float rollDemand;
 static float pitchDemand;
 static float yawDemand;
@@ -65,6 +66,9 @@ static float throttleDemand;
 // IMU support
 static double accel[3];
 static double gyro[3];
+
+// Barometer support
+static int baroPressure;
 
 // Motor support
 static double thrusts[4];
@@ -118,9 +122,10 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
 static const int inArgs_UPDATE[]={
-    2,
+    3,
     sim_script_arg_double|sim_script_arg_table,3, // Gyro values
-    sim_script_arg_double|sim_script_arg_table,3  // Accelerometer values
+    sim_script_arg_double|sim_script_arg_table,3, // Accelerometer values
+    sim_script_arg_int32                          // Barometric pressure
 };
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
@@ -134,6 +139,9 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
             gyro[k]   = inData->at(0).doubleData[k]; 
             accel[k]  = inData->at(1).doubleData[k]; 
         }
+
+        // Read barometer
+        baroPressure = inData->at(2).int32Data[0];
 
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
@@ -313,12 +321,12 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
 bool Board::baroInit(void)
 {
-    return false;
+    return true;
 }
 
 int32_t Board::baroGetPressure(void)
 {
-    return 0;
+    return baroPressure;
 }
 
 
