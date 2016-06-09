@@ -1,0 +1,44 @@
+// AUTO-GENERATED CODE: DO NOT EDIT!!!\n\n'
+
+static const int MAXBUF = 256;
+
+typedef unsigned char byte;
+
+class MSP_Message {
+
+    friend class MSP_Parser;
+
+    protected:
+
+        MSP_Message() { }
+        byte bytes[MAXBUF];
+        int pos;
+        int len;
+
+    public:
+
+        byte start();
+        bool hasNext();
+        byte getNext();
+
+};
+
+class MSP_Parser {
+
+    private:
+
+        int state;
+        byte message_direction;
+        byte message_id;
+        byte message_length_expected;
+        byte message_length_received;
+        byte message_buffer[MAXBUF];
+        byte message_checksum;
+
+    public:
+
+        MSP_Parser();
+
+        void parse(byte b);
+
+

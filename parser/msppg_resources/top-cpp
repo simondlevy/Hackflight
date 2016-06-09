@@ -1,0 +1,105 @@
+#include "msppg.h"
+
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+static byte CRC8(byte * data, int n) {
+
+    byte crc = 0x00;
+
+    for (int k=0; k<n; ++k) {
+
+        crc ^= data[k];
+    }
+
+    return crc;
+}
+
+byte MSP_Message::start() {
+
+    this->pos = 0;
+    return this->getNext();
+}
+
+bool MSP_Message::hasNext() {
+
+    return this->pos <= this->len;
+}
+
+
+byte MSP_Message::getNext() {
+
+    return this->bytes[this->pos++];
+}
+
+MSP_Parser::MSP_Parser() {
+
+    this->state = 0;
+}
+
+void MSP_Parser::parse(byte b) {
+
+    switch (this->state) {
+
+        case 0:               // sync char 1
+            if (b == 36) { // $
+                this->state++;
+            }
+            break;        
+
+        case 1:               // sync char 2
+            if (b == 77) { // M
+                this->state++;
+            }
+            else {            // restart and try again
+                this->state = 0;
+            }
+            break;
+
+        case 2:               // direction (should be >)
+            if (b == 62) { // >
+                this->message_direction = 1;
+            }
+            else {            // <
+                this->message_direction = 0;
+            }
+            this->state++;
+            break;
+
+        case 3:
+            this->message_length_expected = b;
+            this->message_checksum = b;
+            // setup arraybuffer
+            this->message_length_received = 0;
+            this->state++;
+            break;
+
+        case 4:
+            this->message_id = b;
+            this->message_checksum ^= b;
+            if (this->message_length_expected > 0) {
+                // process payload
+                this->state++;
+            }
+            else {
+                // no payload
+                this->state += 2;
+            }
+            break;
+
+        case 5: // payload
+            this->message_buffer[this->message_length_received] = b;
+            this->message_checksum ^= b;
+            this->message_length_received++;
+            if (this->message_length_received >= this->message_length_expected) {
+                this->state++;
+            }
+            break;
+
+        case 6:
+            this->state = 0;
+            if (this->message_checksum == b) {
+                // message received, process
+                switch (this->message_id) {
+                

@@ -76,7 +76,6 @@ static uint16_t calibratingAccCycles;
 static uint16_t calibratingG;
 static bool     haveSmallAngle;
 static bool     armed;
-static bool     baroAvailable;
 
 void setup(void)
 {
@@ -121,7 +120,7 @@ void setup(void)
     haveSmallAngle = true;
 
     // attempt to initialize barometer
-    baroAvailable = baro.init(&board);
+    baro.init(&board);
 
 } // setup
 
@@ -203,16 +202,19 @@ void loop(void)
         switch (taskOrder) {
             case 0:
                 taskOrder++;
-                if (baroAvailable)
+                if (baro.available())
                     baro.getAltitude();
-                //sensorsGetBaro();
+                break;
             case 1:
                 taskOrder++;
                 //sensorsGetSonar();
+                break;
             case 2:
                 taskOrder++;
+                break;
             case 3:
                 taskOrder++;
+                break;
             case 4:
                 taskOrder = 0;
                 break;

@@ -22,7 +22,7 @@ extern "C" {
 #include "mw.hpp"
 #include <math.h>
 
-bool Baro::init(Board * board) 
+void Baro::init(Board * board) 
 {
     this->_board = board;
 
@@ -31,7 +31,12 @@ bool Baro::init(Board * board)
         this->histTable[k] = 0;
     this->pressureSum = 0;
 
-    return board->baroInit();
+    this->avail = board->baroInit();
+}
+
+bool Baro::available(void)
+{
+    return this->avail;
 }
 
 int32_t Baro::getAltitude(void)

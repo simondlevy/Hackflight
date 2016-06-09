@@ -23,6 +23,8 @@ extern "C" {
         
         private:
 
+            bool avail;
+
             static const int TABLE_SIZE     = 21;
             static const int TABLE_SIZE_MAX = 48;
 
@@ -34,7 +36,9 @@ extern "C" {
 
         public:
 
-            bool init(Board * board);
+            void init(Board * board);
+
+            bool available(void);
 
             int32_t getAltitude(void);
     };

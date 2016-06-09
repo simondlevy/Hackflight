@@ -1,0 +1,25 @@
+/* AUTO-GENERATED CODE: DO NOT EDIT!!!*/
+
+#define MAXBUF 256
+
+typedef unsigned char byte;
+typedef unsigned char bool;
+
+typedef struct {
+
+    byte bytes[MAXBUF];
+    int pos;
+    int len;
+
+} msp_message_t;
+
+typedef struct {
+
+    int state;
+    byte message_direction;
+    byte message_id;
+    byte message_length_expected;
+    byte message_length_received;
+    byte message_buffer[MAXBUF];
+    byte message_checksum;
+

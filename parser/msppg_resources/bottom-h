@@ -1,0 +1,12 @@
+
+} msp_parser_t;
+
+byte msp_message_start(msp_message_t * msg);
+
+bool msp_message_has_next(msp_message_t * msg);
+
+byte msp_message_get_next(msp_message_t * msg);
+
+void msp_parser_init(msp_parser_t * parser);
+
+void msp_parser_parse(msp_parser_t * parser, byte b);
