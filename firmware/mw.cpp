@@ -119,6 +119,7 @@ void setup(void)
     // assume shallow angle (no accelerometer calibration needed)
     haveSmallAngle = true;
 
+    
     // attempt to initialize barometer
     baro.init(&board);
 

@@ -48,6 +48,7 @@ libv_repExtHackflight.so: *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp Makefi
 	g++ $(CFLAGS) -c ../firmware/mw.cpp
 	g++ $(CFLAGS) -c ../firmware/pid.cpp
 	g++ $(CFLAGS) -c ../firmware/rc.cpp
+	g++ $(CFLAGS) -c ../firmware/baro.cpp
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -ldl -shared 	
 
 ctest: controller_test

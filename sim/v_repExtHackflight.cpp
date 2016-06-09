@@ -164,7 +164,6 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
-
 }
 
 
@@ -212,7 +211,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 }
 
 VREP_DLLEXPORT void v_repEnd()
-{ // This is called just once, at the end of V-REP
+{ 
+    // This is called just once, at the end of V-REP
     unloadVrepLibrary(vrepLib); // release the library
 }
 
@@ -310,6 +310,17 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     greenLED.init("greenLED");
     redLED.init("redLED");
 }
+
+bool Board::baroInit(void)
+{
+    return false;
+}
+
+int32_t Board::baroGetPressure(void)
+{
+    return 0;
+}
+
 
 void Board::checkReboot(bool pendReboot)
 {

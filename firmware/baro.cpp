@@ -1,6 +1,11 @@
 /*
    baro.cpp : Baro class implementation
 
+   Adapted from 
+
+     https://github.com/multiwii/baseflight/blob/master/src/imu.c
+     https://github.com/multiwii/baseflight/blob/master/src/sensors.c
+
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify
