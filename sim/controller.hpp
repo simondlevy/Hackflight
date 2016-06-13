@@ -37,12 +37,18 @@ class Controller {
         float roll;
         float yaw;
         float throttle;
+        float aux;
 
         virtual void update(void) = 0;
 
     public:
 
-        void getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand);
+        void getDemands(
+                float & pitchDemand, 
+                float & rollDemand, 
+                float & yawDemand, 
+                float & throttleDemand, 
+                float & auxDemand);
 
         virtual void stop(void) = 0;
 };

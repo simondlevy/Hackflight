@@ -20,12 +20,12 @@ int main(int argc, char ** argv)
 
     for (int k=0; ; k++) {
 
-        float pitchDemand, rollDemand, yawDemand, throttleDemand;
+        float pitchDemand, rollDemand, yawDemand, throttleDemand, auxDemand;
 
-        controller.getDemands(pitchDemand, rollDemand, yawDemand, throttleDemand);
+        controller.getDemands(pitchDemand, rollDemand, yawDemand, throttleDemand, auxDemand);
 
-        printf("%d p: %+3.3f  | r: %+3.3f | y: %+3.3f  | t: %3.3f\n", 
-                k, pitchDemand, rollDemand, yawDemand, throttleDemand);
+        printf("%d p: %+3.3f  | r: %+3.3f | y: %+3.3f  | t: %3.3f | a: %+3.3f\n", 
+                k, pitchDemand, rollDemand, yawDemand, throttleDemand, auxDemand);
     }
 
     return 0;

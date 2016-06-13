@@ -62,6 +62,7 @@ static float rollDemand;
 static float pitchDemand;
 static float yawDemand;
 static float throttleDemand;
+static float auxDemand;
 
 // IMU support
 static double accel[3];
@@ -229,7 +230,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     if (!ready)
         return NULL;
 
-    controller.getDemands(pitchDemand, rollDemand, yawDemand, throttleDemand);
+    controller.getDemands(pitchDemand, rollDemand, yawDemand, throttleDemand, auxDemand);
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
@@ -329,7 +330,6 @@ int32_t Board::baroGetPressure(void)
     return baroPressure;
 }
 
-
 void Board::checkReboot(bool pendReboot)
 {
 }
@@ -384,11 +384,14 @@ uint16_t Board::readPWM(uint8_t chan)
         case 1:
             scale = (1-pitchDemand) / 2;
             break;
+        case 2:
+            scale = throttleDemand;
+            break;
         case 3:
             scale = (1-yawDemand) / 2;
             break;
-        case 2:
-            scale = throttleDemand;
+        case 4:
+            scale = (1-auxDemand) / 2;
     }
 
     return CONFIG_PWM_MIN + scale * (CONFIG_PWM_MAX - CONFIG_PWM_MIN);

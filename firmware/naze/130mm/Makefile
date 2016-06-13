@@ -168,7 +168,7 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 
 # C++ support
 
-mw.o: ../../mw.cpp ../../mw.hpp
+mw.o: ../../mw.cpp ../../mw.hpp ../../rc.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o mw.o ../../mw.cpp
 
@@ -176,7 +176,7 @@ imu.o: ../../imu.cpp ../../imu.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o imu.o ../../imu.cpp
 
-mixer.o: ../../mixer.cpp ../../mixer.hpp
+mixer.o: ../../mixer.cpp ../../mixer.hpp ../../rc.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o mixer.o ../../mixer.cpp
 
@@ -184,7 +184,7 @@ pid.o: ../../pid.cpp ../../pid.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o pid.o ../../pid.cpp
 
-msp.o: ../../msp.cpp ../../msp.hpp
+msp.o: ../../msp.cpp ../../msp.hpp ../../rc.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o msp.o ../../msp.cpp
 

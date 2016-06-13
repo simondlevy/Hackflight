@@ -189,7 +189,7 @@ void loop(void)
             case 0:
                 taskOrder++;
                 if (baro.available())
-                    printf("%d\n", baro.getAltitude());
+                    baro.getAltitude();
                 break;
             case 1:
                 taskOrder++;
@@ -254,6 +254,7 @@ void loop(void)
 
     } // IMU update
 
+    printf("%d\n", rc.auxState());
 
 } // loop()
 

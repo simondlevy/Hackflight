@@ -26,7 +26,12 @@
 
 // AxialController ----------------------------------------------------------------------
 
-void Controller::getDemands(float & pitchDemand, float & rollDemand, float & yawDemand, float & throttleDemand)
+void Controller::getDemands(
+        float & pitchDemand, 
+        float & rollDemand, 
+        float & yawDemand, 
+        float & throttleDemand,
+        float & auxDemand)
 {
     this->update();
 
@@ -34,6 +39,7 @@ void Controller::getDemands(float & pitchDemand, float & rollDemand, float & yaw
     rollDemand     = this->roll;
     yawDemand      = this->yaw;
     throttleDemand = this->throttle;
+    auxDemand      = this->aux;
 }
 
 // AxialController ----------------------------------------------------------------------
@@ -145,6 +151,10 @@ void TaranisController::js2demands(int jsnumber, float jsvalue)
 
         case 3:
             this->yaw = -jsvalue;
+            break;
+
+        case 5:
+            this->aux = -jsvalue;
     }
 }
 

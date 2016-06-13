@@ -63,11 +63,11 @@ extern "C" {
 
         public:
 
-            uint8_t sticks;            // holds stick positions for command combos
             void init(Board * board);
 
-            int16_t command[4];
-            int16_t data[CONFIG_RC_CHANS];
+            int16_t data[CONFIG_RC_CHANS]; // raw PWM values for MSP
+            int16_t command[4];            // stick PWM values for mixer, MSP
+            uint8_t sticks;                // stick positions for command combos
 
             void update(void);
 
