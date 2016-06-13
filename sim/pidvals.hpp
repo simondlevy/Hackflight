@@ -15,12 +15,15 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Level (accelerometer)
 static const uint8_t CONFIG_LEVEL_P          = 10;
 static const uint8_t CONFIG_LEVEL_I          = 0;
 
+// Rate (gyro): P must be positive
 static const uint8_t CONFIG_RATE_PITCHROLL_P = 10;
 static const uint8_t CONFIG_RATE_PITCHROLL_I = 0;
 static const uint8_t CONFIG_RATE_PITCHROLL_D = 0;
 
+// Yaw: P must be positive
 static const uint8_t CONFIG_YAW_P            = 10;
 static const uint8_t CONFIG_YAW_I            = 0;

@@ -31,9 +31,9 @@ void Baro::init(Board * board)
 {
     this->_board = board;
 
-    this->histIdx = 0;
+    this->historyIdx = 0;
     for (int k=0; k<Baro::TABLE_SIZE_MAX; ++k)
-        this->histTable[k] = 0;
+        this->historyTable[k] = 0;
     this->pressureSum = 0;
 
     this->avail = board->baroInit();
@@ -46,17 +46,18 @@ bool Baro::available(void)
 
 int32_t Baro::getAltitude(void)
 {
-    int indexplus1 = (this->histIdx + 1) % Baro::TABLE_SIZE;
-    this->histTable[this->histIdx] = this->_board->baroGetPressure();
-    this->pressureSum += this->histTable[this->histIdx];
-    this->pressureSum -= this->histTable[indexplus1];
-    this->histIdx = indexplus1;
+    int indexplus1 = (this->historyIdx + 1) % Baro::TABLE_SIZE;
+    this->historyTable[this->historyIdx] = this->_board->baroGetPressure();
+    this->pressureSum += this->historyTable[this->historyIdx];
+    this->pressureSum -= this->historyTable[indexplus1];
+    this->historyIdx = indexplus1;
 
+    // Compute average over historyory table
+    float baroPressureAverage = (float)(this->pressureSum / (Baro::TABLE_SIZE - 1));
+    
     // Calculate altitude above sea level in cm via baro pressure in Pascals (millibars)
     // See: https://github.com/diydrones/ardupilot/blob/master/libraries/AP_Baro/AP_Baro.cpp#L140
-    return lrintf((1.0f - powf((float)(this->pressureSum / (Baro::TABLE_SIZE - 1)) /
-       101325.0f, 0.190295f)) * 4433000.0f);
-
+    return lrintf((1.0f - powf(baroPressureAverage/101325.0f, 0.190295f)) * 4433000.0f);
 }
 
 #ifdef __arm__

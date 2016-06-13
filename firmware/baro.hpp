@@ -29,8 +29,8 @@ extern "C" {
             static const int TABLE_SIZE_MAX = 48;
 
             uint32_t pressureSum;
-            int32_t  histTable[TABLE_SIZE_MAX];
-            int      histIdx;
+            int32_t  historyTable[TABLE_SIZE_MAX];
+            int      historyIdx;
 
             Board * _board;
 
