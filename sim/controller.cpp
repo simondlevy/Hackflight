@@ -60,12 +60,14 @@ void AxialController::update(void)
 
         read(joyfd, &js, sizeof(struct js_event));
 
-        if (js.type & ~JS_EVENT_INIT) {
+        if (js.type & JS_EVENT_AXIS) 
             this->js2demands(js.number, js.value / 32767.);
-        }
-    }
 
-    this->postprocess();
+        if (js.type & JS_EVENT_BUTTON) 
+            this->handle_button(js.number);
+   }
+
+   this->postprocess();
 }
 
 void AxialController::stop(void)
@@ -84,6 +86,8 @@ void PS3Controller::init(void)
     this->throttle = 0;
     this->timeprev = 0;
     this->timecount = 0;
+    this->aux = +1;
+    this->ready = false;
 }
 
 void PS3Controller::js2demands(int jsnumber, float jsvalue) 
@@ -126,6 +130,25 @@ void PS3Controller::postprocess(void)
 
 }
 
+void PS3Controller::handle_button(int number)
+{
+    // Ignore button registration on startup
+    if (number == 11 && !ready)
+        ready = true;
+
+    if (number < 4 && ready)
+        switch (number) {
+            case 0:
+                this->aux = +1;
+                break;
+            case 1:
+                this->aux = -1;
+                break;
+            case 3:
+                this->aux = 0;
+        }
+}
+
 // TaranisController ---------------------------------------------------------------------------
 
 void TaranisController::js2demands(int jsnumber, float jsvalue) 
@@ -159,6 +182,10 @@ void TaranisController::js2demands(int jsnumber, float jsvalue)
 }
 
 void TaranisController::postprocess(void)
+{
+}
+
+void TaranisController::handle_button(int number)
 {
 }
 

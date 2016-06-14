@@ -67,6 +67,8 @@ class AxialController : public Controller {
 
         virtual void js2demands(int jsnumber, float jsvalue) = 0;
 
+        virtual void handle_button(int button) = 0;
+
         virtual void postprocess(void) = 0;
 
     private:
@@ -80,6 +82,8 @@ class TaranisController : public AxialController {
 
         void js2demands(int jsnumber, float jsvalue);
 
+        void handle_button(int number);
+
         void postprocess(void);
 };
 
@@ -91,10 +95,13 @@ class PS3Controller : public AxialController {
         double timeavg; 
         unsigned long timecount;
         int throttleDirection;
+        bool ready;
 
     protected:
 
         void js2demands(int jsnumber, float jsvalue);
+
+        void handle_button(int number);
 
         void postprocess(void);
 
