@@ -32,6 +32,9 @@ class Position {
         Baro * baro;
         IMU  * imu;
 
+        bool     velocityControl;
+
+        int32_t  sonarAlt;
         uint32_t previousTime;
         float    accZ_old;
         float    accelVel;
@@ -46,9 +49,9 @@ class Position {
 
     public:
 
-        void init(Baro * baro, IMU * imu);
+        void init(Baro * baro, IMU * imu, bool velocityControl=false);
 
-        void getAltitude(bool armed, uint32_t currentTime, int32_t & estAlt);
+        int32_t getAltitude(bool armed, uint32_t currentTime);
 };
 
 

@@ -213,7 +213,7 @@ void loop(void)
                 break;
             case 1:
                 if (baro.available() && altitudeEstimationTask.checkAndUpdate(currentTime))
-                    position.getAltitude(armed, currentTime, estAlt);
+                    estAlt = position.getAltitude(armed, currentTime);
                 taskOrder++;
                 break;
             case 2:
