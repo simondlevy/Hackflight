@@ -198,15 +198,19 @@ void KeyboardController::init(void) {
 
     struct termios newSettings;
 
+    // Save keyboard settings for restoration later
     tcgetattr(fileno( stdin ), &this->oldSettings);
+
+    // Create new keyboard settings
     newSettings = this->oldSettings;
     newSettings.c_lflag &= (~ICANON & ~ECHO);
-    tcsetattr(fileno( stdin ), TCSANOW, &newSettings);
+    tcsetattr(fileno(stdin), TCSANOW, &newSettings);
 
     this->pitch    = 0;
     this->roll     = 0;
     this->yaw      = 0;
     this->throttle = 0;
+    this->aux = +1;
 }
 
 void KeyboardController::full_increment(float * value) 
@@ -281,6 +285,15 @@ void KeyboardController::update(void)
                 break;
             case 68:
                 full_increment(&this->roll);
+                break;
+            case 47:
+                this->aux = +1;
+                break;
+            case 42:
+                this->aux = 0;
+                break;
+            case 45:
+                this->aux = -1;
                 break;
         }
     }
