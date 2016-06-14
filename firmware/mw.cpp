@@ -66,8 +66,50 @@ static bool check_and_update_timed_task(uint32_t * usec, uint32_t period, uint32
     return result;
 }
 
+// support for timed tasks
+
+class TimedTask {
+
+    private:
+
+        uint32_t usec;
+        uint32_t period;
+
+    public:
+
+        void init(uint32_t _period) {
+
+            this->period = _period;
+            this->usec = 0;
+        }
+
+        bool checkAndUpdate(uint32_t currentTime) {
+
+            bool result = (int32_t)(currentTime - this->usec) >= 0;
+
+            if (result)
+                this->update(currentTime);
+
+            return result;
+        }
+
+        void update(uint32_t currentTime) {
+
+            this->usec = currentTime + this->period;
+        }
+
+        bool check(uint32_t currentTime) {
+
+            return (int32_t)(currentTime - this->usec) >= 0;
+        }
+};
+
 
 // values initialized in setup()
+
+static TimedTask imuTask;
+static TimedTask rcTask;
+static TimedTask accCalibrateTask;
 
 static uint32_t imuLooptimeUsec;
 static uint32_t rcLooptimeUsec;
@@ -104,16 +146,22 @@ void setup(void)
     calibratingAccCycles  = 1000. * CONFIG_CALIBRATING_ACC_MSEC  / imuLooptimeUsec;
 
     // convert loop times from milliseconds to microseconds
-    rcLooptimeUsec = CONFIG_RC_LOOPTIME_MSEC * 1000;
-    accCalibrateLooptimeUsec = CONFIG_CALIBRATE_ACCTIME_MSEC * 1000;
 
-    // initialize our objects
+    imuTask.init(imuLooptimeUsec);
+
+    rcLooptimeUsec = CONFIG_RC_LOOPTIME_MSEC * 1000;
+    rcTask.init(CONFIG_RC_LOOPTIME_MSEC * 1000);
+
+    accCalibrateLooptimeUsec = CONFIG_CALIBRATE_ACCTIME_MSEC * 1000;
+    accCalibrateTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
+
+    // initialize our external objects
     rc.init(&board);
     imu.init(&board, calibratingGyroCycles, calibratingAccCycles);
     pid.init();
     mixer.init(&board, &rc, &pid); 
     msp.init(&board, &imu, &mixer, &rc);
-    position.init(&baro);
+    position.init(&baro, &imu);
 
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;
@@ -129,15 +177,17 @@ void setup(void)
 
 void loop(void)
 {
-    static uint32_t rcTime = 0;
+    static uint32_t rcTime;
     static uint32_t loopTime;
     static uint32_t calibratedAccTime;
     static bool     accCalibrated;
     static uint16_t calibratingA;
     static uint32_t currentTime;
-    static uint32_t disarmTime = 0;
+    static uint32_t disarmTime;
+    static int32_t  estAlt;
 
-    if (check_and_update_timed_task(&rcTime, rcLooptimeUsec, currentTime)) {
+    //if (check_and_update_timed_task(&rcTime, rcLooptimeUsec, currentTime)) {
+    if (rcTask.checkAndUpdate(currentTime)) {
 
         // update RC channels
         rc.update();
@@ -195,7 +245,7 @@ void loop(void)
                 break;
             case 1:
                 if (baro.available())
-                    printf("%d\n", baro.getAltitude());
+                    position.getAltitude(armed, currentTime, estAlt);
                 taskOrder++;
                 //sensorsGetSonar();
                 break;

@@ -66,9 +66,10 @@ typedef enum {
 
 #define CONFIG_CALIBRATING_ACC_MSEC                 1400
 
-#define CONFIG_YAW_CONTROL_DIRECTION                1   /* 1 or -1 */
+#define CONFIG_YAW_CONTROL_DIRECTION                1    // 1 or -1 
 #define CONFIG_RC_LOOPTIME_MSEC                     20
 #define CONFIG_CALIBRATE_ACCTIME_MSEC               500
-#define CONFIG_SMALL_ANGLE                          250 // tenths of a degree
+#define CONFIG_SMALL_ANGLE                          250  // tenths of a degree
+#define CONFIG_ACCEL_UPDATE_PERIOD_USEC             25000
 
-static const uint8_t CONFIG_RCMAP[8]           = {0, 1, 3, 2, 4, 5, 6, 7};
+static const uint8_t CONFIG_RCMAP[8] = {0, 1, 3, 2, 4, 5, 6, 7};
