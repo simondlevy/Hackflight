@@ -44,6 +44,11 @@ bool Baro::available(void)
     return this->avail;
 }
 
+void Baro::update(void)
+{
+    this->_board->baroUpdate();
+}
+
 int32_t Baro::getAltitude(void)
 {
     int indexplus1 = (this->historyIdx + 1) % Baro::TABLE_SIZE;

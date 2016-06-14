@@ -325,6 +325,10 @@ bool Board::baroInit(void)
     return true;
 }
 
+void Board::baroUpdate(void)
+{
+}
+
 int32_t Board::baroGetPressure(void)
 {
     return baroPressure;

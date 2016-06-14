@@ -1,5 +1,7 @@
 /*
-   position.hpp : Position class header
+   position.cpp : Position class implementation
+
+   Adapted from https://github.com/multiwii/baseflight/blob/master/src/mixer.c
 
    This file is part of Hackflight.
 
@@ -17,7 +19,24 @@
 
 #ifdef __arm__
 extern "C" {
+#else
+#include <stdio.h>
 #endif
+
+#include "mw.hpp"
+
+class Position {
+
+    private:
+
+        Baro * baro;
+
+    public:
+
+        void init(Baro * baro);
+
+        int32_t getAltitude(bool armed);
+};
 
 
 #ifdef __arm__

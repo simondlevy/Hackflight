@@ -63,6 +63,11 @@ bool Board::baroInit(void)
     return ms5611_init();
 }
 
+void Board::baroUpdate(void)
+{
+    ms5611_update();
+}
+
 int32_t Board::baroGetPressure(void)
 {
     return ms5611_read_pressure();

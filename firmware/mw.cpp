@@ -34,13 +34,14 @@ extern "C" {
 
 // Objects we use
 
-Board board;
-IMU   imu;
-RC    rc;
-Mixer mixer;
-PID   pid;
-MSP   msp;
-Baro  baro;
+Board    board;
+IMU      imu;
+RC       rc;
+Mixer    mixer;
+PID      pid;
+MSP      msp;
+Baro     baro;
+Position position;
 
 // utilities 
 
@@ -106,12 +107,13 @@ void setup(void)
     rcLooptimeUsec = CONFIG_RC_LOOPTIME_MSEC * 1000;
     accCalibrateLooptimeUsec = CONFIG_CALIBRATE_ACCTIME_MSEC * 1000;
 
-    // initialize our RC, IMU, mixer, and PID controller
+    // initialize our objects
     rc.init(&board);
     imu.init(&board, calibratingGyroCycles, calibratingAccCycles);
     pid.init();
     mixer.init(&board, &rc, &pid); 
     msp.init(&board, &imu, &mixer, &rc);
+    position.init(&baro);
 
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;
@@ -189,9 +191,11 @@ void loop(void)
             case 0:
                 taskOrder++;
                 if (baro.available())
-                    baro.getAltitude();
+                    baro.update();
                 break;
             case 1:
+                if (baro.available())
+                    printf("%d\n", baro.getAltitude());
                 taskOrder++;
                 //sensorsGetSonar();
                 break;
@@ -253,8 +257,6 @@ void loop(void)
         mixer.update(armed);
 
     } // IMU update
-
-    printf("%d\n", rc.auxState());
 
 } // loop()
 

@@ -30,6 +30,7 @@
 #include "mixer.hpp"
 #include "msp.hpp"
 #include "baro.hpp"
+#include "position.hpp"
 
 #ifndef abs
 #define abs(x)    ((x) > 0 ? (x) : -(x))

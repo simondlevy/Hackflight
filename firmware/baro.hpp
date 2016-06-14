@@ -40,6 +40,8 @@ extern "C" {
 
             bool available(void);
 
+            void update(void);
+
             int32_t getAltitude(void);
     };
 
