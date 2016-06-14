@@ -86,7 +86,8 @@ class TimedTask {
 
 static TimedTask imuTask;
 static TimedTask rcTask;
-static TimedTask accCalibrateTask;
+static TimedTask accelCalibrationTask;
+static TimedTask altitudeEstimationTask;
 
 static uint32_t imuLooptimeUsec;
 static uint16_t calibratingGyroCycles;
@@ -123,7 +124,8 @@ void setup(void)
     // initializing timing tasks
     imuTask.init(imuLooptimeUsec);
     rcTask.init(CONFIG_RC_LOOPTIME_MSEC * 1000);
-    accCalibrateTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
+    accelCalibrationTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
+    altitudeEstimationTask.init(CONFIG_ALTITUDE_UPDATE_MSEC * 1000);
 
     // initialize our external objects
     rc.init(&board);
@@ -205,15 +207,14 @@ void loop(void)
 
         switch (taskOrder) {
             case 0:
-                taskOrder++;
                 if (baro.available())
                     baro.update();
+                taskOrder++;
                 break;
             case 1:
-                if (baro.available())
+                if (baro.available() && altitudeEstimationTask.checkAndUpdate(currentTime))
                     position.getAltitude(armed, currentTime, estAlt);
                 taskOrder++;
-                //sensorsGetSonar();
                 break;
             case 2:
                 taskOrder++;
@@ -253,12 +254,11 @@ void loop(void)
                 board.ledRedOff();
         }
 
-
-        if (accCalibrateTask.check(currentTime)) {
+        if (accelCalibrationTask.check(currentTime)) {
             if (!haveSmallAngle) {
                 accCalibrated = false; // accelerometer not calibrated or angle too steep
                 board.ledGreenToggle();
-                accCalibrateTask.update(currentTime);
+                accelCalibrationTask.update(currentTime);
             } else {
                 accCalibrated = true;
             }

@@ -70,6 +70,6 @@ typedef enum {
 #define CONFIG_RC_LOOPTIME_MSEC                     20
 #define CONFIG_CALIBRATE_ACCTIME_MSEC               500
 #define CONFIG_SMALL_ANGLE                          250  // tenths of a degree
-#define CONFIG_ACCEL_UPDATE_PERIOD_USEC             25000
+#define CONFIG_ALTITUDE_UPDATE_MSEC                 25   // based on accelerometer low-pass filter
 
 static const uint8_t CONFIG_RCMAP[8] = {0, 1, 3, 2, 4, 5, 6, 7};
