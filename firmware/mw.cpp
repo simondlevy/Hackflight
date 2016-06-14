@@ -43,29 +43,6 @@ MSP      msp;
 Baro     baro;
 Position position;
 
-// utilities 
-
-static bool check_timed_task(uint32_t usec, uint32_t currentTime) 
-{
-
-    return (int32_t)(currentTime - usec) >= 0;
-}
-
-static void update_timed_task(uint32_t * usec, uint32_t period, uint32_t currentTime) 
-{
-    *usec = currentTime + period;
-}
-
-static bool check_and_update_timed_task(uint32_t * usec, uint32_t period, uint32_t currentTime) 
-{
-    bool result = (int32_t)(currentTime - *usec) >= 0;
-
-    if (result)
-        update_timed_task(usec, period, currentTime);
-
-    return result;
-}
-
 // support for timed tasks
 
 class TimedTask {
@@ -112,7 +89,6 @@ static TimedTask rcTask;
 static TimedTask accCalibrateTask;
 
 static uint32_t imuLooptimeUsec;
-static uint32_t accCalibrateLooptimeUsec;
 static uint16_t calibratingGyroCycles;
 static uint16_t calibratingAccCycles;
 static uint16_t calibratingG;
@@ -147,8 +123,6 @@ void setup(void)
     // initializing timing tasks
     imuTask.init(imuLooptimeUsec);
     rcTask.init(CONFIG_RC_LOOPTIME_MSEC * 1000);
-
-    accCalibrateLooptimeUsec = CONFIG_CALIBRATE_ACCTIME_MSEC * 1000;
     accCalibrateTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
 
     // initialize our external objects
@@ -173,7 +147,6 @@ void setup(void)
 
 void loop(void)
 {
-    static uint32_t calibratedAccTime;
     static bool     accCalibrated;
     static uint16_t calibratingA;
     static uint32_t currentTime;
@@ -281,11 +254,11 @@ void loop(void)
         }
 
 
-        if (check_timed_task(calibratedAccTime, currentTime)) {
+        if (accCalibrateTask.check(currentTime)) {
             if (!haveSmallAngle) {
                 accCalibrated = false; // accelerometer not calibrated or angle too steep
                 board.ledGreenToggle();
-                update_timed_task(&calibratedAccTime, accCalibrateLooptimeUsec, currentTime);
+                accCalibrateTask.update(currentTime);
             } else {
                 accCalibrated = true;
             }
