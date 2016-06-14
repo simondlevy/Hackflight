@@ -112,7 +112,6 @@ static TimedTask rcTask;
 static TimedTask accCalibrateTask;
 
 static uint32_t imuLooptimeUsec;
-static uint32_t rcLooptimeUsec;
 static uint32_t accCalibrateLooptimeUsec;
 static uint16_t calibratingGyroCycles;
 static uint16_t calibratingAccCycles;
@@ -145,11 +144,8 @@ void setup(void)
     calibratingGyroCycles = 1000. * calibratingGyroMsec / imuLooptimeUsec;
     calibratingAccCycles  = 1000. * CONFIG_CALIBRATING_ACC_MSEC  / imuLooptimeUsec;
 
-    // convert loop times from milliseconds to microseconds
-
+    // initializing timing tasks
     imuTask.init(imuLooptimeUsec);
-
-    rcLooptimeUsec = CONFIG_RC_LOOPTIME_MSEC * 1000;
     rcTask.init(CONFIG_RC_LOOPTIME_MSEC * 1000);
 
     accCalibrateLooptimeUsec = CONFIG_CALIBRATE_ACCTIME_MSEC * 1000;
@@ -177,8 +173,6 @@ void setup(void)
 
 void loop(void)
 {
-    static uint32_t rcTime;
-    static uint32_t loopTime;
     static uint32_t calibratedAccTime;
     static bool     accCalibrated;
     static uint16_t calibratingA;
@@ -186,7 +180,6 @@ void loop(void)
     static uint32_t disarmTime;
     static int32_t  estAlt;
 
-    //if (check_and_update_timed_task(&rcTime, rcLooptimeUsec, currentTime)) {
     if (rcTask.checkAndUpdate(currentTime)) {
 
         // update RC channels
@@ -260,9 +253,10 @@ void loop(void)
                 break;
         }
     }
+
     currentTime = board.getMicros();
 
-    if (check_and_update_timed_task(&loopTime, imuLooptimeUsec, currentTime)) {
+    if (imuTask.checkAndUpdate(currentTime)) {
 
         imu.update(currentTime, armed, calibratingA, calibratingG);
 
