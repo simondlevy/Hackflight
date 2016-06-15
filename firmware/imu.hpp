@@ -43,6 +43,7 @@ extern "C" {
 
             int16_t angle[3];
             int16_t gyroADC[3];
+            int32_t accelSum[3];
 
             void init(Board * board, uint16_t calibratingGyroCycles, uint16_t calibratingAccCycles);
             void update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG);

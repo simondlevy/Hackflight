@@ -136,9 +136,10 @@ void IMU::init(Board * board, uint16_t _calibratingGyroCycles, uint16_t _calibra
     // calculate RC time constant used in the accZ lpf    
     this->fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); 
 
-    this->gyroADC[0] = 0;
-    this->gyroADC[1] = 0;
-    this->gyroADC[2] = 0;
+    for (int k=0; k<3; ++k) {
+        this->gyroADC[k] = 0;
+        this->accelSum[k] = 0;
+    }
 
     this->calibratingGyroCycles = _calibratingGyroCycles;
     this->calibratingAccCycles = _calibratingAccCycles;
@@ -152,7 +153,6 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     static int16_t  accelZero[3];
     static int32_t  a[3];
     static int16_t  accelSmooth[3];
-    static int32_t  accelSum[3];
     static uint32_t accelTimeSum;        // keep track for integration of acc
     static float    EstG[3];
     static float    EstN[3] = { 1.0f, 0.0f, 0.0f };
@@ -301,9 +301,9 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
 
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
-    accelSum[X] += applyDeadband(lrintf(accel_ned[X]), CONFIG_ACCXY_DEADBAND);
-    accelSum[Y] += applyDeadband(lrintf(accel_ned[Y]), CONFIG_ACCXY_DEADBAND);
-    accelSum[Z] += applyDeadband(lrintf(accz_smooth), CONFIG_ACCZ_DEADBAND);
+    this->accelSum[X] += applyDeadband(lrintf(accel_ned[X]), CONFIG_ACCXY_DEADBAND);
+    this->accelSum[Y] += applyDeadband(lrintf(accel_ned[Y]), CONFIG_ACCXY_DEADBAND);
+    this->accelSum[Z] += applyDeadband(lrintf(accz_smooth), CONFIG_ACCZ_DEADBAND);
 
     accelTimeSum += deltaT;
 
