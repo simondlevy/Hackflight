@@ -59,6 +59,7 @@ int32_t Position::getAltitude(bool armed, uint32_t currentTime)
     // Grab baro baseline on arming
     if (armed) {
         int32_t baroAltRaw = this->baro->getAltitude();
+        printf("%d cm\n", baroAltRaw);
         if (!this->wasArmed) {
             this->baroAltBaseline = baroAltRaw;
             this->accelVel = 0;
