@@ -8,7 +8,7 @@ Robotics.
 To build and run the simulator you will need download V-REP, and you will need to
 use the Linux operating system.  (We are working on a version for Windows 10.)
 The simulator works best with a PS3 controller, Taranis transmitter with USB
-adapter cable, or Spektrum transmitter with 
+mini-B cable, or Spektrum transmitter with 
 [GWS Adapter cable] (https://www.amazon.com/gp/product/B000RO7JAI)
 (which is unfortunately no longer available).
 You can also control it from the numeric keypad on your
