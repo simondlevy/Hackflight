@@ -25,11 +25,10 @@ extern "C" {
 
             bool avail;
 
-            static const int TABLE_SIZE     = 21;
-            static const int TABLE_SIZE_MAX = 48;
+            static const int TABLE_SIZE = 21;
 
             uint32_t pressureSum;
-            int32_t  historyTable[TABLE_SIZE_MAX];
+            int32_t  historyTable[TABLE_SIZE];
             int      historyIdx;
 
             Board * _board;

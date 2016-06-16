@@ -100,8 +100,11 @@ void setup(void)
 {
     uint32_t calibratingGyroMsec;
 
+    // Safety first!
+    armed = false;
+
     // Get particulars for board
-    board.init(imuLooptimeUsec, calibratingGyroMsec, armed);
+    board.init(imuLooptimeUsec, calibratingGyroMsec);
 
     // sleep for 100ms
     board.delayMilliseconds(100);
@@ -153,6 +156,7 @@ void loop(void)
     static uint16_t calibratingA;
     static uint32_t currentTime;
     static uint32_t disarmTime;
+    static int32_t  altHold;
     static int32_t  estAlt;
 
     if (rcTask.checkAndUpdate(currentTime)) {
@@ -213,7 +217,7 @@ void loop(void)
                 break;
             case 1:
                 if (baro.available() && altitudeEstimationTask.checkAndUpdate(currentTime))
-                    estAlt = position.getAltitude(armed, currentTime);
+                    estAlt = position.getAltitude(armed, altHold, currentTime);
                 taskOrder++;
                 break;
             case 2:

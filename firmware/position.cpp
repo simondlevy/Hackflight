@@ -1,5 +1,5 @@
 /*
-   position.hpp : Position class header
+   position.cpp : Position-estimation class implementation
 
    This file is part of Hackflight.
 
@@ -21,6 +21,17 @@ extern "C" {
 
 #include "mw.hpp"
 
+#include <math.h>
+
+static const float   CONFIG_BARO_CF_VEL = 0.985;
+
+static const uint8_t CONFIG_ALT_P = 50;
+static const uint8_t CONFIG_VEL_P = 120;
+static const uint8_t CONFIG_VEL_I = 45;
+static const uint8_t CONFIG_VEL_D = 1;
+
+
+
 // complementary filter
 static float cfilter(float a, float b, float c) 
 {
@@ -30,6 +41,18 @@ static float cfilter(float a, float b, float c)
 static bool sonarInRange(void)
 {
     return false; // XXX
+}
+
+static int32_t applyDeadband(int32_t value, int32_t deadband)
+{
+    if (abs(value) < deadband) {
+        value = 0;
+    } else if (value > 0) {
+        value -= deadband;
+    } else if (value < 0) {
+        value += deadband;
+    }
+    return value;
 }
 
 void Position::init(Baro * _baro, IMU * _imu, bool _velocityControl)
@@ -50,21 +73,23 @@ void Position::init(Baro * _baro, IMU * _imu, bool _velocityControl)
     this->wasArmed = 0;
     this->baroAlt_offset = 0;
     this->sonarTransition = 0;
+    this->altPID = 0;
+    this->errorVelocityI = 0;
 }
 
-int32_t Position::getAltitude(bool armed, uint32_t currentTime)
+int32_t Position::getAltitude(bool armed, int32_t altHold, uint32_t currentTime)
 {
     this->previousTime = currentTime;
 
     // Grab baro baseline on arming
     if (armed) {
         int32_t baroAltRaw = this->baro->getAltitude();
-        printf("%d cm\n", baroAltRaw);
         if (!this->wasArmed) {
             this->baroAltBaseline = baroAltRaw;
             this->accelVel = 0;
             this->accelAlt = 0;
         }
+        printf("%d %d\n", baroAltRaw, baroAltBaseline);
         this->baroAlt = baroAltRaw - this->baroAltBaseline;
     }
     else {
@@ -88,16 +113,12 @@ int32_t Position::getAltitude(bool armed, uint32_t currentTime)
         }
     }
 
-    int32_t estAlt = 0; // XXX
-
-    /*
-
     // delta acc reading time in seconds
-    float dt = accTimeSum * 1e-6f; 
+    float dt = this->imu->accelTimeSum * 1e-6f; 
 
     // Integrator - velocity, cm/sec
-    float accZ_tmp = (float)accSum[2] / (float)accSumCount;
-    float vel_acc = accZ_tmp * accVelScale * accTimeSum;
+    float accZ_tmp = (float)this->imu->accelSum[2] / (float)this->imu->accelSumCount;
+    float vel_acc = accZ_tmp * this->imu->accelVelScale * this->imu->accelTimeSum;
 
     // integrate accelerometer velocity to get distance (x= a/2 * t^2)
     this->accelAlt += (vel_acc * 0.5f) * dt + this->accelVel * dt;                                         
@@ -106,18 +127,14 @@ int32_t Position::getAltitude(bool armed, uint32_t currentTime)
     // complementary filter for altitude estimation (baro & acc)
     //this->accelAlt = cfilter(this->accelAlt, this->FusedBarosonarAlt, CONFIG_BARO_CF_ALT);
 
-    estAlt = sonarInRange() ? this->FusedBarosonarAlt : this->accelAlt;
+    int32_t estAlt = sonarInRange() ? this->FusedBarosonarAlt : this->accelAlt;
 
     // reset acceleromter sum
-    accSum[0] = 0;
-    accSum[1] = 0;
-    accSum[2] = 0;
-    accSumCount = 0;
-    accTimeSum = 0;
+    this->imu->resetAccelSum();
 
     uint32_t dTime = currentTime - this->previousTime;
-    int32_t fusedBaroSonarVel = (this->FusedBarosonarAlt - lastthis->FusedBarosonarAlt) * 1000000.0f / dTime;
-    lastthis->FusedBarosonarAlt = this->FusedBarosonarAlt;
+    int32_t fusedBaroSonarVel = (this->FusedBarosonarAlt - lastFusedBarosonarAlt) * 1000000.0f / dTime;
+    lastFusedBarosonarAlt = this->FusedBarosonarAlt;
 
     fusedBaroSonarVel = constrain(fusedBaroSonarVel, -1500, 1500);    // constrain baro velocity +/- 1500cm/s
     fusedBaroSonarVel = applyDeadband(fusedBaroSonarVel, 10);         // to reduce noise near zero
@@ -128,12 +145,9 @@ int32_t Position::getAltitude(bool armed, uint32_t currentTime)
     this->accelVel = cfilter(this->accelVel, fusedBaroSonarVel, CONFIG_BARO_CF_VEL);
     int32_t vel_tmp = lrintf(this->accelVel);
 
-    // set vario
-    vario = applyDeadband(vel_tmp, 5);
-
     if (tiltAngle < 800) { // only calculate pid if the copters thrust is facing downwards(<80deg)
 
-        int32_t setVel = setVelocity;
+        int32_t setVel = 0;
 
         // Altitude P-Controller
         if (!this->velocityControl) {
@@ -145,22 +159,21 @@ int32_t Position::getAltitude(bool armed, uint32_t currentTime)
         // Velocity PID-Controller
         // P
         int32_t error = setVel - vel_tmp;
-        altPID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
+        this->altPID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
 
         // I
-        errorVelocityI += (CONFIG_VEL_I * error);
-        errorVelocityI = constrain(errorVelocityI, -(8196 * 200), (8196 * 200));
-        altPID += errorVelocityI / 8196;     // I in the range of +/-200
+        this->errorVelocityI += (CONFIG_VEL_I * error);
+        this->errorVelocityI = constrain(this->errorVelocityI, -(8196 * 200), (8196 * 200));
+        this->altPID += this->errorVelocityI / 8196;     // I in the range of +/-200
 
         // D
-        altPID -= constrain(CONFIG_VEL_D * (accZ_tmp + this->accZ_old) / 512, -150, 150);
+        this->altPID -= constrain(CONFIG_VEL_D * (accZ_tmp + this->accZ_old) / 512, -150, 150);
 
     } else {
-        altPID = 0;
+        this->altPID = 0;
     }
 
     this->accZ_old = accZ_tmp;
-    */
 
     return estAlt;
 }

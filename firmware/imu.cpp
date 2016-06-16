@@ -141,6 +141,8 @@ void IMU::init(Board * board, uint16_t _calibratingGyroCycles, uint16_t _calibra
         this->accelSum[k] = 0;
     }
 
+    this->accelVelScale = 9.80665f / this->acc1G / 10000.0f;
+
     this->calibratingGyroCycles = _calibratingGyroCycles;
     this->calibratingAccCycles = _calibratingAccCycles;
 }
@@ -153,7 +155,6 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     static int16_t  accelZero[3];
     static int32_t  a[3];
     static int16_t  accelSmooth[3];
-    static uint32_t accelTimeSum;        // keep track for integration of acc
     static float    EstG[3];
     static float    EstN[3] = { 1.0f, 0.0f, 0.0f };
     static int16_t  gyroZero[3];
@@ -305,7 +306,8 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     this->accelSum[Y] += applyDeadband(lrintf(accel_ned[Y]), CONFIG_ACCXY_DEADBAND);
     this->accelSum[Z] += applyDeadband(lrintf(accz_smooth), CONFIG_ACCZ_DEADBAND);
 
-    accelTimeSum += deltaT;
+    this->accelTimeSum += deltaT;
+    this->accelSumCount++;
 
     // Convert angles from radians to tenths of a degrees
     this->angle[ROLL]  = lrintf(anglerad[ROLL]  * (1800.0f / M_PI));
@@ -315,6 +317,15 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     // Convert heading from [-180,+180] to [0,360]
     if (this->angle[YAW] < 0)
         this->angle[YAW] += 360;
+}
+
+void IMU::resetAccelSum(void)
+{
+    this->accelSum[0] = 0;
+    this->accelSum[1] = 0;
+    this->accelSum[2] = 0;
+    this->accelSumCount = 0;
+    this->accelTimeSum = 0;
 }
 
 #ifdef __arm__

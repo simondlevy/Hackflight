@@ -310,11 +310,10 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
     gyroADC[2] = -(int16_t)(1000 * gyro[2]);
 }
 
-void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec, bool & initiallyArmed)
+void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
     looptimeMicroseconds = 10000;
     calibratingGyroMsec = 100;  // long enough to see but not to annoy
-    initiallyArmed = true;      // bad habit?
 
     greenLED.init("greenLED");
     redLED.init("redLED");
