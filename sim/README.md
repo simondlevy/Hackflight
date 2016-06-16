@@ -7,8 +7,11 @@ Robotics.
 
 To build and run the simulator you will need download V-REP, and you will need to
 use the Linux operating system.  (We are working on a version for Windows 10.)
-The simulator works best with a PS3 controller or Taranis transmitter with USB
-adapter cable.  You can also control it from the numeric keypad on your
+The simulator works best with a PS3 controller, Taranis transmitter with USB
+adapter cable, or Spektrum transmitter with 
+[GWS Adapter cable] (https://www.amazon.com/gp/product/B000RO7JAI)
+(which is unfortunately no longer available).
+You can also control it from the numeric keypad on your
 keyboard, using the [key
 mappings](http://www.flightsimbooks.com/flightsimhandbook/keyboardcontrols.php)
 for the Microsoft Flight Simulator, but I've found it awkward to fly this way:
