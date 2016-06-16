@@ -30,31 +30,12 @@ class Position {
     private:
 
         Baro * baro;
-        IMU  * imu;
-
-        bool     velocityControl;
-
-
-        int32_t  altPID;
-        int32_t  errorVelocityI;
-        int32_t  sonarAlt;
-        uint32_t previousTime;
-        float    accZ_old;
-        float    accelVel;
-        int32_t  FusedBarosonarAlt;
-        int32_t  lastFusedBarosonarAlt;
-        int32_t  baroAlt;
-        int32_t  baroAltBaseline;
-        float    accelAlt;
-        bool     wasArmed;
-        int32_t  baroAlt_offset;
-        float    sonarTransition;
 
     public:
 
-        void init(Baro * baro, IMU * imu, bool velocityControl=false);
+        void init(Baro * baro);
 
-        int32_t getAltitude(bool armed, int32_t altHold, uint32_t currentTime);
+        int32_t getAltitude(void);
 };
 
 

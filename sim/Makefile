@@ -21,6 +21,7 @@
 VREP_DIR = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
 
 # Choose which controller you want
+#CONTROLLER =  SPEKTRUM
 CONTROLLER = TARANIS
 #CONTROLLER = PS3
 #CONTROLLER = KEYBOARD

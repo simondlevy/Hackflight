@@ -34,14 +34,14 @@ extern "C" {
 
 // Objects we use
 
-Board    board;
-IMU      imu;
-RC       rc;
-Mixer    mixer;
-PID      pid;
-MSP      msp;
-Baro     baro;
-Position position;
+static Board    board;
+static IMU      imu;
+static RC       rc;
+static Mixer    mixer;
+static PID      pid;
+static MSP      msp;
+static Baro     baro;
+static Position position;
 
 // support for timed tasks
 
@@ -100,11 +100,8 @@ void setup(void)
 {
     uint32_t calibratingGyroMsec;
 
-    // Safety first!
-    armed = false;
-
     // Get particulars for board
-    board.init(imuLooptimeUsec, calibratingGyroMsec);
+    board.init(imuLooptimeUsec, calibratingGyroMsec, armed);
 
     // sleep for 100ms
     board.delayMilliseconds(100);
@@ -136,7 +133,7 @@ void setup(void)
     pid.init();
     mixer.init(&board, &rc, &pid); 
     msp.init(&board, &imu, &mixer, &rc);
-    position.init(&baro, &imu);
+    position.init(&baro);
 
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;
@@ -156,7 +153,8 @@ void loop(void)
     static uint16_t calibratingA;
     static uint32_t currentTime;
     static uint32_t disarmTime;
-    static int32_t  altHold;
+    static int32_t  altHoldValue;
+    static bool     altHoldMode;
     static int32_t  estAlt;
 
     if (rcTask.checkAndUpdate(currentTime)) {
@@ -181,29 +179,42 @@ void loop(void)
                             disarmTime = 0;
                     }
                 }
-            } else {            // actions during not armed
+            } else {         // actions during not armed
 
-                // GYRO calibration
-                if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
+                printf("%d\n", rc.auxState());
+
+                // gyro calibration
+                if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) 
                     calibratingG = calibratingGyroCycles;
-                } 
 
-                // Arm via YAW
-                if ((rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE)) {
-                    if (calibratingG == 0 && accCalibrated) {
-                        if (!armed) {         // arm now!
-                            armed = true;
-                        }
-                    } 
-                }
+                // Arm via throttle-low / yaw-right
+                if ((rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE)) 
+                    if (calibratingG == 0 && accCalibrated) 
+                        if (!rc.auxState()) // aux switch must be in zero position
+                            if (!armed)          
+                                armed = true;
 
-                // Calibrating Acc
-                else if (rc.sticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
+                // accel calibration
+                if (rc.sticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
                     calibratingA = calibratingAccCycles;
 
             } // not armed
 
         } // rc.changed()
+
+        // Switch to alt-hold when switch moves to position 1 or 2
+        if (rc.auxState() > 0) {
+            if (!altHoldMode) {
+                altHoldMode = true;
+                altHoldValue = estAlt;
+                //initialThrottleHold = rc.command[THROTTLE];
+                //errorVelocityI = 0;
+                //altPID = 0;
+            }
+        }
+        else {
+            altHoldMode = false;
+        }
 
     } else {                    // not in rc loop
 
@@ -217,7 +228,7 @@ void loop(void)
                 break;
             case 1:
                 if (baro.available() && altitudeEstimationTask.checkAndUpdate(currentTime))
-                    estAlt = position.getAltitude(armed, altHold, currentTime);
+                    estAlt = position.getAltitude();
                 taskOrder++;
                 break;
             case 2:

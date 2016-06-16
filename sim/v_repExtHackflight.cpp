@@ -49,6 +49,10 @@
 static TaranisController controller;
 #endif
 
+#ifdef SPEKTRUM
+static SpektrumController controller;
+#endif
+
 #ifdef PS3
 static PS3Controller controller;
 #endif
@@ -230,7 +234,10 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     if (!ready)
         return NULL;
 
-    controller.getDemands(pitchDemand, rollDemand, yawDemand, throttleDemand, auxDemand);
+    controller.getDemands(rollDemand, pitchDemand, yawDemand, throttleDemand, auxDemand);
+
+    printf("%f %f %f %f %f\n",
+           pitchDemand, rollDemand, yawDemand, throttleDemand, auxDemand);
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
@@ -310,13 +317,15 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
     gyroADC[2] = -(int16_t)(1000 * gyro[2]);
 }
 
-void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
+void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec, bool & initiallyArmed)
 {
     looptimeMicroseconds = 10000;
     calibratingGyroMsec = 100;  // long enough to see but not to annoy
 
     greenLED.init("greenLED");
     redLED.init("redLED");
+
+    initiallyArmed = true;
 }
 
 bool Board::baroInit(void)

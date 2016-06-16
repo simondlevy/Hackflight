@@ -43,6 +43,8 @@ class Controller {
 
     public:
 
+        virtual void init(void) = 0;
+
         void getDemands(
                 float & pitchDemand, 
                 float & rollDemand, 
@@ -55,13 +57,14 @@ class Controller {
 
 class AxialController : public Controller {
 
-    public:
-       
-        void init(const char * devname="/dev/input/js0");
+    private:
 
-        void stop(void);
+        char devname[100];
+        int joyfd;
 
     protected:
+
+        int divisor;
 
         void update(void);
 
@@ -71,20 +74,52 @@ class AxialController : public Controller {
 
         virtual void postprocess(void) = 0;
 
-    private:
+        AxialController(int divisor, const char * devname="/dev/input/js0");
 
-        int joyfd;
+    public:
+       
+        void init(void);
+
+        void stop(void);
 };
 
-class TaranisController : public AxialController {
+class RCController : public AxialController {
+
+    private:
+
+        int rolldir;
+        int pitchdir;
+        int yawdir;
+        int auxdir;
+        int yawID;
+        int auxID;
+        int throttleCount;
 
     protected:
+
+        RCController(int divisor, int _yawID, int _auxID, int _rolldir, int _pitchdir, int _yawdir, int _auxdir);
 
         void js2demands(int jsnumber, float jsvalue);
 
         void handle_button(int number);
 
         void postprocess(void);
+
+};
+
+class TaranisController : public RCController {
+
+    public:
+
+        TaranisController(void);
+};
+
+class SpektrumController : public RCController {
+
+
+    public:
+
+        SpektrumController(void);
 };
 
 class PS3Controller : public AxialController {
@@ -97,6 +132,9 @@ class PS3Controller : public AxialController {
         int throttleDirection;
         bool ready;
 
+        static const float THROTTLE_INCREMENT = 0.02;
+        static const float PITCHROLL_FRACTION = 0.5;
+
     protected:
 
         void js2demands(int jsnumber, float jsvalue);
@@ -107,7 +145,9 @@ class PS3Controller : public AxialController {
 
     public:
 
-        void init(void);
+        PS3Controller(void);
+
+        void init();
 };
 
 /**
@@ -135,10 +175,9 @@ class KeyboardController : public Controller {
 
     public:
 
-        KeyboardController(void);
-
         void init(void);
+
+        KeyboardController(void);
 
         void stop(void);
 };
-

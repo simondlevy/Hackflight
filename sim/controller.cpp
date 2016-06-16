@@ -21,22 +21,25 @@
 */
 
 #include "controller.hpp"
+
+#include <string.h>
+
 #include <linux/joystick.h>
 
 
 // AxialController ----------------------------------------------------------------------
 
 void Controller::getDemands(
-        float & pitchDemand, 
         float & rollDemand, 
+        float & pitchDemand, 
         float & yawDemand, 
         float & throttleDemand,
         float & auxDemand)
 {
     this->update();
 
-    pitchDemand    = this->pitch;
     rollDemand     = this->roll;
+    pitchDemand    = this->pitch;
     yawDemand      = this->yaw;
     throttleDemand = this->throttle;
     auxDemand      = this->aux;
@@ -44,12 +47,25 @@ void Controller::getDemands(
 
 // AxialController ----------------------------------------------------------------------
 
-void AxialController::init(const char * devname)
+AxialController::AxialController(int _divisor, const char * _devname)
+{
+    this->divisor = _divisor;
+
+    strcpy(this->devname, _devname);
+}
+
+void AxialController::init(void)
 {
     this->joyfd = open(devname, O_RDONLY);
 
     if(this->joyfd > 0) 
         fcntl(this->joyfd, F_SETFL, O_NONBLOCK);
+
+    this->pitch    = 0;
+    this->roll     = 0;
+    this->yaw      = 0;
+    this->throttle = 0;
+    this->aux = +1;
 }
 
 void AxialController::update(void)
@@ -61,7 +77,7 @@ void AxialController::update(void)
         read(joyfd, &js, sizeof(struct js_event));
 
         if (js.type & JS_EVENT_AXIS) 
-            this->js2demands(js.number, js.value / 32767.);
+            this->js2demands(js.number, js.value / (float)this->divisor);
 
         if (js.type & JS_EVENT_BUTTON) 
             this->handle_button(js.number);
@@ -79,14 +95,14 @@ void AxialController::stop(void)
 
 // PS3Controller ---------------------------------------------------------------------------
 
+PS3Controller::PS3Controller(void) : AxialController::AxialController(65536)
+{
+}
+
 void PS3Controller::init(void)
 {
     AxialController::init();
 
-    this->throttle = 0;
-    this->timeprev = 0;
-    this->timecount = 0;
-    this->aux = +1;
     this->ready = false;
 }
 
@@ -121,7 +137,7 @@ void PS3Controller::postprocess(void)
     this->timeprev = timecurr; 
     this->timecount++;
 
-    this->throttle += this->throttleDirection * this->timeavg / this->timecount / 10;
+    this->throttle += this->throttleDirection * this->timeavg / this->timecount * PS3Controller::THROTTLE_INCREMENT;
 
     if (this->throttle < 0)
         this->throttle = 0;
@@ -148,53 +164,69 @@ void PS3Controller::handle_button(int number)
                 this->aux = 0;
         }
 }
+//
+// RCController ---------------------------------------------------------------------------
+
+RCController::RCController(int divisor, int _yawID, int _auxID, int _rolldir, int _pitchdir, int _yawdir, int _auxdir) 
+    : AxialController::AxialController(divisor)
+{
+    this->yawID = _yawID;
+    this->auxID = _auxID;
+    this->rolldir = _rolldir;
+    this->pitchdir = _pitchdir;
+    this->yawdir = _yawdir;
+    this->auxdir = _auxdir;
+
+    this->throttleCount = 0;
+}
+
+void RCController::js2demands(int jsnumber, float jsvalue) 
+{
+    if (jsnumber == 0) {
+        if (this->throttleCount > 2)
+            this->throttle = (jsvalue + 1) / 2;
+        throttleCount++;
+    }
+
+    if (jsnumber == 1)  
+        this->roll = this->rolldir*jsvalue;
+
+    if (jsnumber == 2)
+        this->pitch = this->pitchdir*jsvalue;
+
+    if (jsnumber == this->yawID)
+        this->yaw = this->yawdir*jsvalue;
+
+    if (jsnumber == this->auxID)
+        this->aux = this->auxdir*jsvalue;
+}
+
+
+void RCController::postprocess(void)
+{
+}
+
+void RCController::handle_button(int number)
+{
+}
 
 // TaranisController ---------------------------------------------------------------------------
 
-void TaranisController::js2demands(int jsnumber, float jsvalue) 
-{
-    // Helps avoid bogus throttle values at startup
-    static int throttleCount;
-
-    switch (jsnumber) {
-
-        case 0:
-            if (throttleCount > 2)
-                this->throttle = (jsvalue + 1) / 2;
-            throttleCount++;
-            break;
-
-        case 1:
-            this->roll = -jsvalue;
-            break;
-
-        case 2:
-            this->pitch = jsvalue;
-            break;
-
-        case 3:
-            this->yaw = -jsvalue;
-            break;
-
-        case 5:
-            this->aux = -jsvalue;
-    }
-}
-
-void TaranisController::postprocess(void)
+TaranisController::TaranisController(void) : 
+    RCController::RCController(32768, 3, 5, -1, +1, -1, -1)
 {
 }
 
-void TaranisController::handle_button(int number)
+// SpektrumController ---------------------------------------------------------------------------
+
+SpektrumController::SpektrumController(void) : 
+    RCController::RCController(21900, 5, 3, +1, -1, +1, +1)
 {
 }
 
 // KeyboardController ----------------------------------------------------------------------
 
 KeyboardController::KeyboardController(void) {
-}
-
-void KeyboardController::init(void) {
 
     struct termios newSettings;
 
@@ -206,11 +238,10 @@ void KeyboardController::init(void) {
     newSettings.c_lflag &= (~ICANON & ~ECHO);
     tcsetattr(fileno(stdin), TCSANOW, &newSettings);
 
-    this->pitch    = 0;
-    this->roll     = 0;
-    this->yaw      = 0;
-    this->throttle = 0;
-    this->aux = +1;
+}
+
+void KeyboardController::init(void)
+{
 }
 
 void KeyboardController::full_increment(float * value) 
@@ -235,7 +266,8 @@ void KeyboardController::pos_decrement(float * value)
 
 void KeyboardController::change(float *value, int dir, float min, float max) 
 {
-    *value += dir * INCREMENT;
+    *value += dir * KeyboardController::INCREMENT;
+
 
     if (*value > max)
         *value = max;
