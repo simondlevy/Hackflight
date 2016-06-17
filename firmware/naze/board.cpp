@@ -26,6 +26,7 @@ extern "C" {
 
 #include "../board.hpp"
 
+#define BOARD_VERSION     5
 #define USE_CPPM          1
 #define PWM_FILTER        0     // 0 or 1
 #define FAST_PWM          0     // 0 or 1
@@ -38,7 +39,7 @@ extern serialPort_t * Serial1;
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
-    mpu6050_init(false, &acc1G, &gyroScale);
+    mpu6050_init(false, &acc1G, &gyroScale, BOARD_VERSION);
 }
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
