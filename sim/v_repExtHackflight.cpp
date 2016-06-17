@@ -236,9 +236,6 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     controller.getDemands(rollDemand, pitchDemand, yawDemand, throttleDemand, auxDemand);
 
-    printf("%f %f %f %f %f\n",
-           pitchDemand, rollDemand, yawDemand, throttleDemand, auxDemand);
-
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
     simSetIntegerParameter(sim_intparam_error_report_mode,sim_api_errormessage_ignore);
