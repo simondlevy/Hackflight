@@ -40,8 +40,8 @@
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
 #define PLUGIN_NAME "Hackflight"
-
-#define JOY_DEV "/dev/input/js0"
+#define LUA_GET_JOYSTICK_COUNT_COMMAND "simExtJoyGetCount"
+#define LUA_GET_JOYSTICK_DATA_COMMAND  "simExtJoyGetData"
 
 // Controller support
 
@@ -91,6 +91,108 @@ static uint32_t micros;
 
 // Launch support
 static bool ready;
+
+// Unused for Windows
+static int joyfd;
+
+// Joystick support for Linux, OS X ==========================================
+#ifndef __WIN32__
+
+#define JOY_DEV "/dev/input/js0"
+
+#include <linux/joystick.h>
+
+void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
+{
+	// Prepare the return value:
+	p->outputArgCount=1; // 1 return value
+
+    // x return values takes x*2 simInt for the type and size buffer
+	p->outputArgTypeAndSize=(simInt*)simCreateBuffer(p->outputArgCount*2*sizeof(simInt)); 
+	p->outputArgTypeAndSize[2*0+0]=sim_lua_arg_int;	        // The return value is an int
+	p->outputArgTypeAndSize[2*0+1]=1;					    // Not used (table size if the return value was a table)
+	p->outputInt=(simInt*)simCreateBuffer(1*sizeof(int));   // One int return value
+
+    int retval = 0;
+
+    joyfd = open(JOY_DEV, O_RDONLY);
+
+    if (joyfd > 0) {
+        fcntl(joyfd, F_SETFL, O_NONBLOCK);
+        retval = 1;
+    }
+
+	p->outputInt[0] = retval;                              // The integer value we want to return
+}
+
+void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
+{
+	bool error=true;
+	if (p->inputArgCount>0)
+	{ // Ok, we have at least 1 input argument
+		if (p->inputArgTypeAndSize[0*2+0]==sim_lua_arg_int)
+		{ // Ok, we have an int as argument 1
+			if ( (p->inputInt[0]<1)&&(p->inputInt[0]>=0) )
+			{ // Ok, there is a device at this index!
+				error=false;
+			}
+			else
+				simSetLastError(LUA_GET_JOYSTICK_DATA_COMMAND,"Invalid index."); // output an error
+		}
+		else
+			simSetLastError(LUA_GET_JOYSTICK_DATA_COMMAND,"Wrong argument type/size."); // output an error
+	}
+	else
+		simSetLastError(LUA_GET_JOYSTICK_DATA_COMMAND,"Not enough arguments."); // output an error
+
+	// Now we prepare the return value(s):
+	if (error)
+	{
+		p->outputArgCount=0; // 0 return values --> nil (error)
+	}
+	else
+	{
+		p->outputArgCount=5; // 5 return value
+		p->outputArgTypeAndSize=(simInt*)simCreateBuffer(p->outputArgCount*10*sizeof(simInt)); // x return values takes x*2 simInt for the type and size buffer
+		p->outputArgTypeAndSize[2*0+0]=sim_lua_arg_int|sim_lua_arg_table;	// The return value is an int table
+		p->outputArgTypeAndSize[2*0+1]=3;					// table size is 3 (the 3 axes)
+		p->outputArgTypeAndSize[2*1+0]=sim_lua_arg_int;	// The return value is an int
+		p->outputArgTypeAndSize[2*1+1]=1;					// Not used (not a table)
+		p->outputArgTypeAndSize[2*2+0]=sim_lua_arg_int|sim_lua_arg_table;	// The return value is an int table
+		p->outputArgTypeAndSize[2*2+1]=3;					// table size is 3 (the 3 rot axes)
+		p->outputArgTypeAndSize[2*3+0]=sim_lua_arg_int|sim_lua_arg_table;	// The return value is an int table
+		p->outputArgTypeAndSize[2*3+1]=2;					// table size is 2 (the 2 sliders)
+		p->outputArgTypeAndSize[2*4+0]=sim_lua_arg_int|sim_lua_arg_table;	// The return value is an int table
+		p->outputArgTypeAndSize[2*4+1]=4;					// table size is 4 (the 4 pov values)
+		p->outputInt=(simInt*)simCreateBuffer(13*sizeof(int)); // 13 int return value (3 for the axes + 1 for the buttons + 3 for rot axis, +2 for slider, +4 for pov)
+		p->outputInt[0]= 0;
+		p->outputInt[1]= 0;
+		p->outputInt[2]= 0;
+		
+		// now the buttons:
+		p->outputInt[3]=0;
+		for (int i=0;i<16;i++)
+	        p->outputInt[3] = 0;
+
+		p->outputInt[4]= 0;
+		p->outputInt[5]= 0;
+		p->outputInt[6]= 0;
+
+		p->outputInt[7]= 0;
+		p->outputInt[8]= 0;
+
+		p->outputInt[9]= 0;
+		p->outputInt[10]= 0;
+		p->outputInt[11]= 0;
+		p->outputInt[12]= 0;
+
+	}
+}
+
+
+
+#endif // non-Windows
+
 
 // simExtHackflight_start ////////////////////////////////////////////////////////////////////////
 
@@ -174,6 +276,9 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
     // Stop controller interaction
     controller.stop();
 
+    if (joyfd)
+        close(joyfd);
+
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
@@ -195,7 +300,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
     vrepLib=loadVrepLibrary(temp.c_str());
     if (vrepLib==NULL)
     {
-        std::cout << "Error, could not find or correctly load v_rep.dll. Cannot start 'Hackflight' plugin.\n";
+        std::cout << "Error, could not find or correctly load v_rep libary. Cannot start 'Hackflight' plugin.\n";
         return(0); // Means error, V-REP will unload this plugin
     }
     if (getVrepProcAddresses(vrepLib)==0)
@@ -216,9 +321,20 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
     }
 
     // Register new Lua commands:
+
     simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME), NULL, LUA_START_CALLBACK);
     simRegisterScriptCallbackFunction(strConCat(LUA_UPDATE_COMMAND,"@",PLUGIN_NAME), NULL, LUA_UPDATE_CALLBACK);
     simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME), NULL, LUA_STOP_CALLBACK);
+
+	int inArgs1[]={0};
+	simRegisterCustomLuaFunction(LUA_GET_JOYSTICK_COUNT_COMMAND,strConCat("number count=",
+                LUA_GET_JOYSTICK_COUNT_COMMAND,"()"),inArgs1,LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK);
+
+	int inArgs2[]={1,sim_lua_arg_int};
+	simRegisterCustomLuaFunction(LUA_GET_JOYSTICK_DATA_COMMAND,
+            strConCat("table_3 axes, number buttons,table_3 rotAxes,table_2 slider,table_4 pov=",
+                LUA_GET_JOYSTICK_DATA_COMMAND,"(number deviceIndex)"),inArgs2,LUA_GET_JOYSTICK_DATA_CALLBACK);
+
 
     return(8); // return the version number of this plugin (can be queried with simGetModuleName)
 }

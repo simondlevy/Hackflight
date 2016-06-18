@@ -23,7 +23,6 @@
 #include "controller.hpp"
 
 #include <string.h>
-
 #include <linux/joystick.h>
 
 
