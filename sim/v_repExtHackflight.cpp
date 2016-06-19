@@ -168,15 +168,44 @@ void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
 		p->outputArgTypeAndSize[2*4+0]=sim_lua_arg_int|sim_lua_arg_table;	// The return value is an int table
 		p->outputArgTypeAndSize[2*4+1]=4;					// table size is 4 (the 4 pov values)
 
-        // 13 int return value (3 for the axes + 1 for the buttons + 3 for rot axis, +2 for slider, +4 for pov)
+        // 13 int return values (3 for the axes + 1 for the buttons + 3 for rot axis, +2 for slider, +4 for pov)
 		p->outputInt=(simInt*)simCreateBuffer(13*sizeof(int)); 
-		p->outputInt[0]= 1; // throttle
-		p->outputInt[1]= 2; // roll
-		p->outputInt[2]= 3; // pitch
-		
-		p->outputInt[4]= 4; // yaw
-		p->outputInt[6]= 6; // aux
-	}
+
+        static int roll, pitch, yaw, throttle, aux;
+
+        if (joyfd > 0) {
+
+            struct js_event js;
+
+            read(joyfd, &js, sizeof(struct js_event));
+
+            if (js.type & JS_EVENT_AXIS) 
+                switch (js.number) {
+                    case 0:
+                        throttle = js.value;
+                        break;
+                    case 1:
+                        roll = js.value;
+                        break;
+                    case 2:
+                        pitch = js.value;
+                        break;
+                    case 3:
+                        yaw = js.value;
+                        break;
+                    case 5:
+                        aux = js.value;
+                        break;
+                }
+        }
+
+        // We only need to specify these five return values
+        p->outputInt[1]= roll;
+        p->outputInt[2]= pitch;
+        p->outputInt[4]= yaw;
+        p->outputInt[0]= throttle;
+        p->outputInt[6]= aux;
+    }
 }
 
 
