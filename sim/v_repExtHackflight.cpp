@@ -102,6 +102,15 @@ static int joyfd;
 
 #include <linux/joystick.h>
 
+#ifdef TARANIS
+#define AXIS_ROLL     1
+#define AXIS_PITCH    2
+#define AXIS_YAW      3
+#define AXIS_THROTTLE 0
+#define AXIS_AUX      5
+#define AXIS_MAXVAL   32767
+#endif
+
 void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
 {
 	// Prepare the return value:
@@ -127,7 +136,7 @@ void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
 
 static int scaleAxis(int value)
 {
-    return 1000 * value / 32767.;
+    return 1000 * value / (float)AXIS_MAXVAL;
 }
 
 void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
@@ -186,19 +195,19 @@ void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
 
             if (js.type & JS_EVENT_AXIS) 
                 switch (js.number) {
-                    case 0:
-                        throttle = scaleAxis(js.value);
-                        break;
-                    case 1:
+                    case AXIS_ROLL:
                         roll = scaleAxis(js.value);
                         break;
-                    case 2:
+                    case AXIS_PITCH:
                         pitch = scaleAxis(js.value);
                         break;
-                    case 3:
+                    case AXIS_YAW:
                         yaw = scaleAxis(js.value);
                         break;
-                    case 5:
+                    case AXIS_THROTTLE:
+                        throttle = scaleAxis(js.value);
+                        break;
+                    case AXIS_AUX:
                         aux = scaleAxis(js.value);
                         break;
                 }
