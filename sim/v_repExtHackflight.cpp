@@ -125,6 +125,11 @@ void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
 	p->outputInt[0] = retval;                              // The integer value we want to return
 }
 
+static int scaleAxis(int value)
+{
+    return 1000 * value / 32767.;
+}
+
 void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
 {
 	bool error=true;
@@ -182,19 +187,19 @@ void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
             if (js.type & JS_EVENT_AXIS) 
                 switch (js.number) {
                     case 0:
-                        throttle = js.value;
+                        throttle = scaleAxis(js.value);
                         break;
                     case 1:
-                        roll = js.value;
+                        roll = scaleAxis(js.value);
                         break;
                     case 2:
-                        pitch = js.value;
+                        pitch = scaleAxis(js.value);
                         break;
                     case 3:
-                        yaw = js.value;
+                        yaw = scaleAxis(js.value);
                         break;
                     case 5:
-                        aux = js.value;
+                        aux = scaleAxis(js.value);
                         break;
                 }
         }
