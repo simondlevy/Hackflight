@@ -145,15 +145,18 @@ void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
 	else
 		simSetLastError(LUA_GET_JOYSTICK_DATA_COMMAND,"Not enough arguments."); // output an error
 
+    //axes,buttons,rotAxes,slider,pov = simExtJoyGetData(0)
+
+
 	// Now we prepare the return value(s):
-	if (error)
-	{
+	if (error) {
 		p->outputArgCount=0; // 0 return values --> nil (error)
 	}
-	else
-	{
-		p->outputArgCount=5; // 5 return value
-		p->outputArgTypeAndSize=(simInt*)simCreateBuffer(p->outputArgCount*10*sizeof(simInt)); // x return values takes x*2 simInt for the type and size buffer
+	else {
+		p->outputArgCount=5; // 5 return values
+
+        // x return values takes x*2 simInt for the type and size buffer
+		p->outputArgTypeAndSize=(simInt*)simCreateBuffer(p->outputArgCount*10*sizeof(simInt)); 
 		p->outputArgTypeAndSize[2*0+0]=sim_lua_arg_int|sim_lua_arg_table;	// The return value is an int table
 		p->outputArgTypeAndSize[2*0+1]=3;					// table size is 3 (the 3 axes)
 		p->outputArgTypeAndSize[2*1+0]=sim_lua_arg_int;	// The return value is an int
@@ -164,28 +167,15 @@ void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
 		p->outputArgTypeAndSize[2*3+1]=2;					// table size is 2 (the 2 sliders)
 		p->outputArgTypeAndSize[2*4+0]=sim_lua_arg_int|sim_lua_arg_table;	// The return value is an int table
 		p->outputArgTypeAndSize[2*4+1]=4;					// table size is 4 (the 4 pov values)
-		p->outputInt=(simInt*)simCreateBuffer(13*sizeof(int)); // 13 int return value (3 for the axes + 1 for the buttons + 3 for rot axis, +2 for slider, +4 for pov)
-		p->outputInt[0]= 0;
-		p->outputInt[1]= 0;
-		p->outputInt[2]= 0;
+
+        // 13 int return value (3 for the axes + 1 for the buttons + 3 for rot axis, +2 for slider, +4 for pov)
+		p->outputInt=(simInt*)simCreateBuffer(13*sizeof(int)); 
+		p->outputInt[0]= 1; // throttle
+		p->outputInt[1]= 2; // roll
+		p->outputInt[2]= 3; // pitch
 		
-		// now the buttons:
-		p->outputInt[3]=0;
-		for (int i=0;i<16;i++)
-	        p->outputInt[3] = 0;
-
-		p->outputInt[4]= 0;
-		p->outputInt[5]= 0;
-		p->outputInt[6]= 0;
-
-		p->outputInt[7]= 0;
-		p->outputInt[8]= 0;
-
-		p->outputInt[9]= 0;
-		p->outputInt[10]= 0;
-		p->outputInt[11]= 0;
-		p->outputInt[12]= 0;
-
+		p->outputInt[4]= 4; // yaw
+		p->outputInt[6]= 6; // aux
 	}
 }
 
@@ -229,7 +219,8 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
 static const int inArgs_UPDATE[]={
-    3,
+    4,
+    sim_script_arg_int32|sim_script_arg_table,5,  // RC axis values
     sim_script_arg_double|sim_script_arg_table,3, // Gyro values
     sim_script_arg_double|sim_script_arg_table,3, // Accelerometer values
     sim_script_arg_int32                          // Barometric pressure
@@ -241,14 +232,21 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
+        // Read RC axes
+        if (joyfd > 0) {
+            for (int k=0; k<5; ++k)
+                printf("%d ", inData->at(0).int32Data[k]);
+            printf("\n");
+        }
+
         // Read gyro, accelerometer
         for (int k=0; k<3; ++k) {
-            gyro[k]   = inData->at(0).doubleData[k]; 
-            accel[k]  = inData->at(1).doubleData[k]; 
+            gyro[k]   = inData->at(1).doubleData[k]; 
+            accel[k]  = inData->at(2).doubleData[k]; 
         }
 
         // Read barometer
-        baroPressure = inData->at(2).int32Data[0];
+        baroPressure = inData->at(3).int32Data[0];
 
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
