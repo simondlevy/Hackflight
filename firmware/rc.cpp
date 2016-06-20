@@ -65,7 +65,7 @@ void RC::update(void)
     
         // get RC PWM
         this->dataAverage[chan][this->averageIndex % 4] = 
-            this->_board->readPWM(CONFIG_RCMAP[chan]);
+            this->_board->readPWM(chan);
 
         this->data[chan] = 0;
 

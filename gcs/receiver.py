@@ -40,9 +40,9 @@ class Receiver(Dialog):
 
         self.roll_gauge     = self._new_gauge(0, '    Roll', 'blue')
         self.pitch_gauge    = self._new_gauge(1, '   Pitch', 'green')
-        self.throttle_gauge = self._new_gauge(2, 'Throttle', 'red')
-        self.yaw_gauge      = self._new_gauge(3, '     Yaw', 'orange')
-        self.switch_gauge   = self._new_gauge(4, '  Switch', 'purple')
+        self.yaw_gauge      = self._new_gauge(2, '     Yaw', 'orange')
+        self.throttle_gauge = self._new_gauge(3, 'Throttle', 'red')
+        self.switch_gauge   = self._new_gauge(4, '     Aux', 'purple')
 
         self.schedule_display_task(delay_msec)
 

@@ -103,13 +103,31 @@ static int joyfd;
 #include <linux/joystick.h>
 
 #ifdef TARANIS
-#define AXIS_ROLL     1
-#define AXIS_PITCH    2
-#define AXIS_YAW      3
-#define AXIS_THROTTLE 0
-#define AXIS_AUX      5
-#define AXIS_MAXVAL   32767
+#define AXIS_ROLL       1
+#define AXIS_PITCH      2
+#define AXIS_YAW        3
+#define AXIS_THROTTLE   0
+#define AXIS_AUX        5
+#define AXIS_MAXVAL     32767
 #endif
+
+#ifdef SPEKTRUM
+#define AXIS_ROLL       1
+#define AXIS_PITCH      2
+#define AXIS_YAW        5
+#define AXIS_THROTTLE   0
+#define AXIS_AUX        3
+#define AXIS_DIRECTION -1
+#define AXIS_MAXVAL     21900
+#endif
+
+#ifdef PS3
+#define AXIS_ROLL     2
+#define AXIS_PITCH    3
+#define AXIS_YAW      0
+#define AXIS_THROTTLE 1
+#endif
+
 
 void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
 {
@@ -196,16 +214,16 @@ void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
             if (js.type & JS_EVENT_AXIS) 
                 switch (js.number) {
                     case AXIS_ROLL:
-                        roll = scaleAxis(js.value);
+                        roll = AXIS_DIRECTION * scaleAxis(js.value);
                         break;
                     case AXIS_PITCH:
-                        pitch = scaleAxis(js.value);
+                        pitch = AXIS_DIRECTION * scaleAxis(js.value);
                         break;
                     case AXIS_YAW:
-                        yaw = scaleAxis(js.value);
+                        yaw = AXIS_DIRECTION * scaleAxis(js.value);
                         break;
                     case AXIS_THROTTLE:
-                        throttle = scaleAxis(js.value);
+                        throttle = AXIS_DIRECTION * scaleAxis(js.value);
                         break;
                     case AXIS_AUX:
                         aux = scaleAxis(js.value);
