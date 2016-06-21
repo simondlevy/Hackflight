@@ -17,12 +17,14 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// Choose which controller you want, or none for keyboard
-//#define CONTROLLER_TARANIS
+// ==================================================================================
+// Choose your controller
+#define CONTROLLER_TARANIS
 //#define CONTROLLER_SPEKTRUM
 //#define CONTROLLER_EXTREME3DPRO
 //#define CONTROLLER_PS3
-#define CONTROLLER_KEYBOARD
+//#define CONTROLLER_KEYBOARD
+// ==================================================================================
 
 #include <iostream>
 
