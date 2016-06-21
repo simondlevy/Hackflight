@@ -100,7 +100,7 @@ endif
 
 DEBUG_FLAGS	 = -ggdb3
 
-CFLAGS		 = $(ARCH_FLAGS) \
+CFLAGS	 = $(ARCH_FLAGS) \
 		   $(LTO_FLAGS) \
 		   $(addprefix -D,$(OPTIONS)) \
 		   $(addprefix -I,$(INCLUDE_DIRS)) \

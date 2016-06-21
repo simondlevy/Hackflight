@@ -21,7 +21,9 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-#include "printf.h"
+#ifdef STM32F10X_MD 
+#include <printf.h>
+#endif
 
 #include "board.hpp"
 #include "imu.hpp"
