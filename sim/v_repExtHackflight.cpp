@@ -154,10 +154,11 @@ static int axes[5] = {2, 3, 0, 1, -1};  // aux unused
 static int axes[5] = {-1, -1, -1, -1, -1};  // all unused
 #endif
 
-
 // needed for spring-mounted throttle stick
 static int ps3throttle;
 #define PS3_THROTTLE_INC .01                
+
+#define KEYBOARD_INC 10
 
 void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
 {
@@ -463,7 +464,7 @@ VREP_DLLEXPORT void v_repEnd()
 
 static void change(int index, int dir)
 {
-    demands[index] += dir;
+    demands[index] += dir*KEYBOARD_INC;
 
     if (demands[index] > 1000)
         demands[index] = 1000;
