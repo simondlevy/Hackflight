@@ -51,6 +51,7 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Program Files %28x86%29\V-REP3\V-REP_PRO_EDU\programming\include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Program Files %28x86%29\V-REP3\V-REP_PRO_EDU\programming\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -112,9 +113,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\common\scriptFunctionData.cpp" />
-    <ClCompile Include="..\..\..\..\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\common\scriptFunctionDataItem.cpp" />
-    <ClCompile Include="..\..\..\..\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\common\v_repLib.cpp" />
+    <ClCompile Include="..\..\..\..\..\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\common\scriptFunctionData.cpp" />
+    <ClCompile Include="..\..\..\..\..\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\common\scriptFunctionDataItem.cpp" />
+    <ClCompile Include="..\..\..\..\..\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\common\v_repLib.cpp" />
     <ClCompile Include="v_repExtHackflightWin32.cpp" />
   </ItemGroup>
   <ItemGroup>

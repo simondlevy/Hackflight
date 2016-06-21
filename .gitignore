@@ -7,3 +7,9 @@ a.out
 *~
 *#
 obj
+Debug
+ipch
+Release
+*.sdf
+*.user
+*.suo
