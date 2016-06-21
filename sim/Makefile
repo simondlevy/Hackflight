@@ -24,7 +24,6 @@ COMMON = $(VREP_DIR)/programming/common/
 CFLAGS = -Wall -I$(VREP_DIR)/programming/include/ -I. -I../include -I../firmware -Wall -fPIC -static
 
 # XXX Currently supports only Linux
-CFLAGS += -D__linux 
 EXT = so
 
 PLUGIN = libv_repExtHackflight.$(EXT)
