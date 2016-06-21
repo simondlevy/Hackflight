@@ -79,17 +79,22 @@ static uint32_t micros;
 // Launch support
 static bool ready;
 
-// Unused for Windows, OS X
-static int joyfd;
 
-// Joystick support for Linux XXX need OS XX ==========================================
+// Joystick support for Linux, OS X ==========================================
 #ifdef __linux__
 #define JOY_DEV "/dev/input/js0"
 #include <linux/joystick.h>
 #include <termios.h>
 static struct termios oldSettings;
+static int joyfd;
 #endif
 
+#ifdef __APPLE__
+#include <SDL.h>
+SDL_Joystick * sdljoy;
+#endif
+
+#ifdef CONTROLLER_KEYBOARD
 void kbinit(void)
 {
 #ifdef __linux__
@@ -140,6 +145,7 @@ static void kbdone(void)
     tcsetattr(fileno(stdin), TCSANOW, &oldSettings);
 #endif
 }
+#endif
 
 // Controller axis maps
 
@@ -176,22 +182,26 @@ void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
 	p->outputArgTypeAndSize[2*0+1]=1;					    // Not used (table size if the return value was a table)
 	p->outputInt=(simInt*)simCreateBuffer(1*sizeof(int));   // One int return value
 
+    // Assume no joystick (return 0)
     int retval = 0;
 
+#ifdef CONTROLLER_KEYBOARD
+    kbinit();
+#else
 #ifdef __linux
     joyfd = open(JOY_DEV, O_RDONLY);
-
     if (joyfd > 0) {
         fcntl(joyfd, F_SETFL, O_NONBLOCK);
         retval = 1;
     }
-
-    // Use keyboard as fallback
-    else {
-        kbinit();
+#else
+    if (SDL_Init(SDL_INIT_JOYSTICK)) {
+        retval = 1;
     }
 #endif
-    p->outputInt[0] = retval;                              // The integer value we want to return
+#endif
+
+    p->outputInt[0] = retval;     // return 1 on success, 0 on failure
 }
 
 static int scaleAxis(int value)
@@ -331,11 +341,11 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
-        // Read RC axes if joystick available
-        if (joyfd > 0) {
-            for (int k=0; k<5; ++k)
-                demands[k] = inData->at(0).int32Data[k];
-        }
+        // Read RC axes 
+#ifndef CONTROLLER_KEYBOARD
+        for (int k=0; k<5; ++k)
+            demands[k] = inData->at(0).int32Data[k];
+#endif
 
 #if defined(CONTROLLER_PS3) || defined(CONTROLLER_EXTREME3DPRO)
 
@@ -395,11 +405,16 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
 
-    // Close joystick connection or keyboard if open
-    if (joyfd > 0)
-        close(joyfd);
-    else
-        kbdone();
+#ifdef CONTROLLER_KEYBOARD
+    kbdone();
+#else
+#ifdef __linux__
+    close(joyfd);
+#else
+    SDL_JoystickClose(sdljoy);
+    SDL_Quit();
+#endif
+#endif
 
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true)); // success
@@ -467,6 +482,7 @@ VREP_DLLEXPORT void v_repEnd()
     unloadVrepLibrary(vrepLib); // release the library
 }
 
+#ifdef CONTROLLER_KEYBOARD
 static void change(int index, int dir)
 {
     demands[index] += dir*KEYBOARD_INC;
@@ -487,7 +503,7 @@ static void decrement(int index)
 {
     change(index, -1);
 }
-
+#endif
 
 VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customData,int* replyData)
 {   
@@ -496,42 +512,43 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
         return NULL;
 
     // Default to keyboard if no joy
-    if (joyfd < 1) 
-        switch (_kbhit()) {
-            case 10:
-                increment(2);
-                break;
-            case 50:
-                decrement(2);
-                break;
-            case 53:
-                increment(3);
-                break;
-            case 54:
-                decrement(3);
-                break;
-            case 65:
-                increment(1);
-                break;
-            case 66:
-                decrement(1);
-                break;
-            case 67:
-                increment(0);
-                break;
-            case 68:
-                decrement(0);
-                break;
-            case 47:
-                //this->aux = +1;
-                break;
-            case 42:
-                //this->aux = 0;
-                break;
-            case 45:
-                //this->aux = -1;
-                break;
-        }
+#ifdef CONTROLLER_KEYBOARD
+     switch (_kbhit()) {
+        case 10:
+            increment(2);
+            break;
+        case 50:
+            decrement(2);
+            break;
+        case 53:
+            increment(3);
+            break;
+        case 54:
+             decrement(3);
+             break;
+        case 65:
+             increment(1);
+             break;
+        case 66:
+            decrement(1);
+            break;
+        case 67:
+            increment(0);
+            break;
+        case 68:
+            decrement(0);
+            break;
+        case 47:
+            //this->aux = +1;
+             break;
+        case 42:
+            //this->aux = 0;
+            break;
+        case 45:
+            //this->aux = -1;
+            break;
+    }
+#endif
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
