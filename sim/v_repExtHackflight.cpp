@@ -51,6 +51,10 @@
 // Stick demands from controller
 static int demands[5];
 
+// needed for spring-mounted throttle stick
+static int ps3throttle;
+#define PS3_THROTTLE_INC .01                
+
 // IMU support
 static double accel[3];
 static double gyro[3];
@@ -75,21 +79,20 @@ static uint32_t micros;
 // Launch support
 static bool ready;
 
-// Unused for Windows
+// Unused for Windows, OS X
 static int joyfd;
 
-// Joystick support for Linux, OS X ==========================================
-#ifndef __WIN32__
-
+// Joystick support for Linux XXX need OS XX ==========================================
+#ifdef __linux__
 #define JOY_DEV "/dev/input/js0"
-
 #include <linux/joystick.h>
 #include <termios.h>
-
 static struct termios oldSettings;
+#endif
 
 void kbinit(void)
 {
+#ifdef __linux__
     struct termios newSettings;
 
     // Save keyboard settings for restoration later
@@ -99,10 +102,14 @@ void kbinit(void)
     newSettings = oldSettings;
     newSettings.c_lflag &= (~ICANON & ~ECHO);
     tcsetattr(fileno(stdin), TCSANOW, &newSettings);
+#endif
 }
 
 int _kbhit(void)
 {
+    char c = 0;
+
+#ifdef __linux__
     fd_set set;
     struct timeval tv;
 
@@ -114,8 +121,6 @@ int _kbhit(void)
 
     int res = select( fileno( stdin )+1, &set, NULL, NULL, &tv );
 
-    char c = 0;
-
     if( res > 0 )
     {
         read(fileno( stdin ), &c, 1);
@@ -124,15 +129,17 @@ int _kbhit(void)
     else if( res < 0 ) {
         perror( "select error" );
     }
+#endif
 
     return (int)c;
 }
 
 static void kbdone(void)
 {
+#ifdef __linux__
     tcsetattr(fileno(stdin), TCSANOW, &oldSettings);
+#endif
 }
-
 
 // Controller axis maps
 
@@ -156,10 +163,6 @@ static int axes[5] = {2, 3, 0, 1, -1};  // aux unused
 static int axes[5] = {-1, -1, -1, -1, -1};  // all unused
 #endif
 
-// needed for spring-mounted throttle stick
-static int ps3throttle;
-#define PS3_THROTTLE_INC .01                
-
 #define KEYBOARD_INC 10
 
 void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
@@ -175,6 +178,7 @@ void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
 
     int retval = 0;
 
+#ifdef __linux
     joyfd = open(JOY_DEV, O_RDONLY);
 
     if (joyfd > 0) {
@@ -186,8 +190,8 @@ void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
     else {
         kbinit();
     }
-
-	p->outputInt[0] = retval;                              // The integer value we want to return
+#endif
+    p->outputInt[0] = retval;                              // The integer value we want to return
 }
 
 static int scaleAxis(int value)
@@ -241,6 +245,7 @@ void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
 
         static int roll, pitch, yaw, throttle, aux;
 
+#ifdef __linux__
         if (joyfd > 0) {
 
             struct js_event js;
@@ -266,7 +271,7 @@ void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
                 }
 
         }
-
+#endif
         // We only need to specify these five return values
         p->outputInt[1]= roll;
         p->outputInt[2]= pitch;
@@ -275,8 +280,6 @@ void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
         p->outputInt[6]= aux;
     }
 }
-
-#endif // non-Windows
 
 
 // simExtHackflight_start ////////////////////////////////////////////////////////////////////////

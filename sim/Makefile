@@ -1,7 +1,7 @@
 #
 #   Makefile for V-REP simulator using Hackflight
 #
-#   Copyright (C) Simon D. Levy 2016
+#   Copyright (C) Simon D. Levy and Matt Lubas 2016
 #
 #   This file is part of Hackflight.
 #
@@ -19,18 +19,24 @@
  
 # Edit this for where you installed V-REP
 VREP_DIR = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
+#VREP_DIR = $(HOME)/Desktop/Research/V-REP_PRO_EDU_V3_3_1_Mac
+
+OS = $(shell uname -s)
+ifeq ($(OS), Linux)
+	EXT = so
+else
+	EXT = dylib
+endif
+
 
 COMMON = $(VREP_DIR)/programming/common/
 CFLAGS = -Wall -I$(VREP_DIR)/programming/include/ -I. -I../include -I../firmware -Wall -fPIC -static
-
-# XXX Currently supports only Linux
-EXT = so
 
 PLUGIN = libv_repExtHackflight.$(EXT)
 
 all: $(PLUGIN) 
 
-libv_repExtHackflight.so: *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp Makefile
+libv_repExtHackflight.$(EXT): *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp Makefile
 	g++ $(CFLAGS) -c v_repExtHackflight.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
@@ -59,5 +65,5 @@ commit:
 	git push
 
 clean:
-	rm -f *.o *.so *.pyc *~
+	rm -f *.o *.$(EXT) *.pyc *~
 
