@@ -20,12 +20,13 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
+
 #ifdef __arm__
 extern "C" {
 #endif
 
 #include "mw.hpp"
-#include <math.h>
 
 void Baro::init(Board * board) 
 {

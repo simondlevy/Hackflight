@@ -17,13 +17,14 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
+
 #ifdef __arm__
 extern "C" {
 #else
 #include <stdio.h>
 #endif
 
-#include <math.h>
 
 #include "mw.hpp"
 
