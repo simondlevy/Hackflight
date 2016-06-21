@@ -189,7 +189,7 @@ void loop(void)
                     calibratingG = calibratingGyroCycles;
 
                 // Arm via throttle-low / yaw-right
-                if ((rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE)) 
+                if (rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE)
                     if (calibratingG == 0 && accCalibrated) 
                         if (!rc.auxState()) // aux switch must be in zero position
                             if (!armed)          
