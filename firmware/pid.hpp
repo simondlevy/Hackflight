@@ -25,7 +25,7 @@ extern "C" {
 
         private:
 
-#include "pidvals.hpp"
+//#include "pidvals.hpp"
 
             uint8_t rate_p[3];
             uint8_t rate_i[3];

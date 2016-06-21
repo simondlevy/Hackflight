@@ -24,6 +24,7 @@ extern "C" {
 #endif
 
 #include "mw.hpp"
+#include "pidvals.hpp"
 
 void PID::init(void)
 {

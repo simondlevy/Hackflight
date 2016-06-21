@@ -118,8 +118,8 @@ void setup(void)
     board.ledGreenOff();
 
     // compute cycles for calibration based on board's time constant
-    calibratingGyroCycles = 1000. * calibratingGyroMsec / imuLooptimeUsec;
-    calibratingAccCycles  = 1000. * CONFIG_CALIBRATING_ACC_MSEC  / imuLooptimeUsec;
+    calibratingGyroCycles = (uint16_t)(1000. * calibratingGyroMsec / imuLooptimeUsec);
+    calibratingAccCycles  = (uint16_t)(1000. * CONFIG_CALIBRATING_ACC_MSEC  / imuLooptimeUsec);
 
     // initializing timing tasks
     imuTask.init(imuLooptimeUsec);
@@ -153,7 +153,7 @@ void loop(void)
     static uint16_t calibratingA;
     static uint32_t currentTime;
     static uint32_t disarmTime;
-    static int32_t  altHoldValue;
+    //static int32_t  altHoldValue;
     static bool     altHoldMode;
     static int32_t  estAlt;
 
@@ -206,7 +206,7 @@ void loop(void)
         if (rc.auxState() > 0) {
             if (!altHoldMode) {
                 altHoldMode = true;
-                altHoldValue = estAlt;
+                //altHoldValue = estAlt;
                 //initialThrottleHold = rc.command[THROTTLE];
                 //errorVelocityI = 0;
                 //altPID = 0;
