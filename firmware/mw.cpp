@@ -17,6 +17,8 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
+
 #ifdef __arm__
 extern "C" {
 #else
@@ -30,7 +32,6 @@ extern "C" {
 #endif
 
 #include <string.h>
-#include <math.h>
 
 // Objects we use
 
