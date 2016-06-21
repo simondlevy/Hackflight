@@ -19,9 +19,11 @@
 
 #include <stdint.h>
 #include <stdarg.h>
+#include <math.h>
 
-#ifndef _WIN32
-#include <stdbool.h>
+#include "crossplatform.h"
+
+#ifndef M_PI
 #endif
 
 #ifdef STM32F10X_MD 

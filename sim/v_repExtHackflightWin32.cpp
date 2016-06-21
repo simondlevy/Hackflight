@@ -349,7 +349,7 @@ static const int inArgs_START[]={
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     // Run Hackflight setup()
-    // XXX setup();
+    setup();
 
     // Grab timestep from input stack and return success
     CScriptFunctionData D;
@@ -598,10 +598,179 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 	simSetIntegerParameter(sim_intparam_error_report_mode,errorModeSaved); // restore previous settings
 
     // Call Hackflight loop() from here for most realistic simulation
-    // XXX loop();
+    loop();
 
 	return NULL;
 }
 
-// -------------------------------------------------------------------------------------------------------
+// Board implementation ======================================================
+
+#include <board.hpp>
+#include <pwm.hpp>
+#include <crossplatform.h>
+
+class LED {
+
+    private:
+
+        char signame[10];
+        bool on;
+
+        void set(bool status)
+        {
+            this->on = status;
+            simSetIntegerSignal(this->signame, this->on ? 1 : 0);
+        }
+
+    public:
+
+        LED(void) { }
+
+        void init(const char * _signame)
+        {
+            strcpy_s(this->signame, _signame);
+            this->on = false;
+        }
+
+        void turnOff(void) 
+        {
+            this->set(false);
+        }
+
+        void turnOn(void) 
+        {
+            this->set(true);
+        }
+
+        void toggle(void) 
+        {
+            this->set(!this->on);
+        }
+};
+
+static LED greenLED, redLED;
+
+void Board::imuInit(uint16_t & acc1G, float & gyroScale)
+{
+    // Mimic MPU6050
+    acc1G = 4096;
+    gyroScale = (float)((4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f);
+}
+
+void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
+{
+    // Convert from radians to tenths of a degree
+
+    for (int k=0; k<3; ++k) {
+        accADC[k]  = (int16_t)(400000 * accel[k]);
+    }
+
+    gyroADC[1] = -(int16_t)(1000 * gyro[0]);
+    gyroADC[0] = -(int16_t)(1000 * gyro[1]);
+    gyroADC[2] = -(int16_t)(1000 * gyro[2]);
+}
+
+void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec, bool & initiallyArmed)
+{
+    looptimeMicroseconds = 10000;
+    calibratingGyroMsec = 100;  // long enough to see but not to annoy
+
+    greenLED.init("greenLED");
+    redLED.init("redLED");
+
+    initiallyArmed = true;
+}
+
+bool Board::baroInit(void)
+{
+    return true;
+}
+
+void Board::baroUpdate(void)
+{
+}
+
+int32_t Board::baroGetPressure(void)
+{
+    return baroPressure;
+}
+
+void Board::checkReboot(bool pendReboot)
+{
+}
+
+void Board::delayMilliseconds(uint32_t msec)
+{
+}
+
+uint32_t Board::getMicros()
+{
+    return micros; 
+}
+
+void Board::ledGreenOff(void)
+{
+    greenLED.turnOff();
+}
+
+void Board::ledGreenOn(void)
+{
+    greenLED.turnOn();
+}
+
+void Board::ledGreenToggle(void)
+{
+    greenLED.toggle();
+}
+
+void Board::ledRedOff(void)
+{
+    redLED.turnOff();
+}
+
+void Board::ledRedOn(void)
+{
+    redLED.turnOn();
+}
+
+void Board::ledRedToggle(void)
+{
+    redLED.toggle();
+}
+
+uint16_t Board::readPWM(uint8_t chan)
+{
+    //return CONFIG_PWM_MIN;
+
+    // V-REP sends joystick demands in [-1000,+1000]
+    int pwm =  (int)(CONFIG_PWM_MIN + (demands[chan] + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
+    if (chan < 5)
+        printf("%d: %d    ", chan, pwm);
+    if (chan == 4)
+        printf("\n");
+    return pwm;
+}
+
+void Board::reboot(void)
+{
+}
+
+uint8_t Board::serialAvailableBytes(void)
+{
+    return 0;
+}
+
+uint8_t Board::serialReadByte(void)
+{
+    return 0;
+}
+
+void Board::serialWriteByte(uint8_t c)
+{
+}
+
+void Board::writeMotor(uint8_t index, uint16_t value)
+{
+    thrusts[index] = 4 * ((float)value - CONFIG_PWM_MIN) / (CONFIG_PWM_MAX - CONFIG_PWM_MIN) + 2;
+}
 

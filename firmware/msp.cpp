@@ -23,7 +23,7 @@ extern "C" {
 #include <stdio.h>
 #endif
 
-#include <strings.h> // for bzero
+#include <string.h> // for memset
 
 #include "mw.hpp"
 
@@ -107,7 +107,7 @@ void MSP::init(Board * board, IMU * imu, Mixer * mixer, RC * rc)
     this->_mixer = mixer;
     this->_rc = rc;
 
-    bzero(&this->portState, sizeof(this->portState));
+    memset(&this->portState, 0, sizeof(this->portState));
 }
 
 void MSP::update(bool armed)

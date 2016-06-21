@@ -20,8 +20,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <math.h>
-
 #ifdef __arm__
 extern "C" {
 #endif
@@ -62,8 +60,8 @@ int32_t Baro::getAltitude(void)
 {
     // Calculate altitude above sea level in cm via baro pressure in Pascals (millibars)
     // See: https://github.com/diydrones/ardupilot/blob/master/libraries/AP_Baro/AP_Baro.cpp#L140
-    return lrintf((1.0f - powf((float)(this->pressureSum / (Baro::TABLE_SIZE - 1)) 
-                                        / 101325.0f, 0.190295f)) * 4433000.0f);
+    return (int32_t)((1.0f - powf((float)(this->pressureSum / (Baro::TABLE_SIZE - 1)) 
+                                        / 101325.0f, 0.190295f)) * 4433000.0f); // XYZ
 }
 
 #ifdef __arm__

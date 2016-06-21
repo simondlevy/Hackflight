@@ -17,8 +17,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <math.h>
-
 #ifdef __arm__
 extern "C" {
 #else
@@ -116,7 +114,7 @@ static void rotateV(float v[3], float *delta)
     v[Z] = v_tmp[X] * mat[0][2] + v_tmp[Y] * mat[1][2] + v_tmp[Z] * mat[2][2];
 }
 
-static int32_t applyDeadband(int32_t value, int32_t deadband)
+static int32_t applyDeadband(float value, int32_t deadband)
 {
     if (abs(value) < deadband) {
         value = 0;
@@ -125,7 +123,7 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
     } else if (value < 0) {
         value += deadband;
     }
-    return value;
+    return (int32_t)value;
 }
 
 void IMU::init(Board * board, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles) 
@@ -135,7 +133,7 @@ void IMU::init(Board * board, uint16_t _calibratingGyroCycles, uint16_t _calibra
     this->_board->imuInit(this->acc1G, this->gyroScale);
 
     // calculate RC time constant used in the accZ lpf    
-    this->fcAcc = 0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF); 
+    this->fcAcc = (float)(0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF)); 
 
     for (int k=0; k<3; ++k) {
         this->gyroADC[k] = 0;
@@ -244,7 +242,7 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
         if (CONFIG_ACC_LPF_FACTOR > 0) {
             accelLPF[axis] = accelLPF[axis] * (1.0f - (1.0f / CONFIG_ACC_LPF_FACTOR)) + accelADC[axis] * 
                 (1.0f / CONFIG_ACC_LPF_FACTOR);
-            accelSmooth[axis] = accelLPF[axis];
+            accelSmooth[axis] = (int16_t)accelLPF[axis];
         } else {
             accelSmooth[axis] = accelADC[axis];
         }
@@ -295,7 +293,7 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
 
     if (!armed) {
         accelZoffset -= accelZoffset / 64;
-        accelZoffset += accel_ned[Z];
+        accelZoffset += (int32_t)accel_ned[Z];
     }
     accel_ned[Z] -= accelZoffset / 64;  // compensate for gravitation on z-axis
 
@@ -311,9 +309,9 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     this->accelSumCount++;
 
     // Convert angles from radians to tenths of a degrees
-    this->angle[ROLL]  = lrintf(anglerad[ROLL]  * (1800.0f / M_PI));
-    this->angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
-    this->angle[YAW]   = lrintf(anglerad[YAW]   * 1800.0f / M_PI + CONFIG_MAGNETIC_DECLINATION) / 10.0f;
+    this->angle[ROLL]  = (int16_t)lrintf(anglerad[ROLL]  * (1800.0f / M_PI));
+    this->angle[PITCH] = (int16_t)lrintf(anglerad[PITCH] * (1800.0f / M_PI));
+    this->angle[YAW]   = (int16_t)(lrintf(anglerad[YAW]   * 1800.0f / M_PI + CONFIG_MAGNETIC_DECLINATION) / 10.0f);
 
     // Convert heading from [-180,+180] to [0,360]
     if (this->angle[YAW] < 0)

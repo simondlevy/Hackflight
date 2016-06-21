@@ -25,7 +25,7 @@ extern "C" {
 
 #include "mw.hpp"
 
-#include <strings.h>
+#include <string.h>
 
 void RC::init(Board * board)
 {
@@ -33,7 +33,7 @@ void RC::init(Board * board)
 
     this->midrc = (CONFIG_PWM_MAX + CONFIG_PWM_MIN) / 2;
 
-    bzero (this->dataAverage, 8*4*sizeof(int16_t));
+    memset (this->dataAverage, 0, 8*4*sizeof(int16_t));
 
     this->commandDelay = 0;
     this->sticks = 0;

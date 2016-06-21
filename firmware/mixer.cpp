@@ -57,8 +57,8 @@ void Mixer::update(bool armed)
     int16_t motors[4];
 
     for (uint8_t i = 0; i < 4; i++)
-        motors[i] = this->_rc->command[THROTTLE] * mixerQuadX[i].throttle + this->_pid->axisPID[PITCH] * mixerQuadX[i].pitch + 
-            this->_pid->axisPID[ROLL] * mixerQuadX[i].roll + -CONFIG_YAW_DIRECTION * this->_pid->axisPID[YAW] * mixerQuadX[i].yaw;
+        motors[i] = (int16_t)(this->_rc->command[THROTTLE] * mixerQuadX[i].throttle + this->_pid->axisPID[PITCH] * mixerQuadX[i].pitch + 
+            this->_pid->axisPID[ROLL] * mixerQuadX[i].roll + -CONFIG_YAW_DIRECTION * this->_pid->axisPID[YAW] * mixerQuadX[i].yaw);
 
     maxMotor = motors[0];
 
