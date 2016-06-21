@@ -26,6 +26,10 @@
 //#define CONTROLLER_KEYBOARD
 // ==================================================================================
 
+#include "v_repExtHackflight.hpp"
+#include "scriptFunctionData.h"
+#include "v_repLib.h"
+
 #include <iostream>
 
 #include <stdio.h>
@@ -33,20 +37,40 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <stdint.h>
 #include <time.h>
 
-#include "v_repExtHackflight.hpp"
-#include "scriptFunctionData.h"
-#include "v_repLib.h"
+#ifdef _WIN32
+	#ifdef QT_COMPIL
+		#include <direct.h>
+	#else
+		#include <shlwapi.h>
+		#pragma comment(lib, "Shlwapi.lib")
+	#endif
+#include <conio.h>
+#endif /* _WIN32 */
+#if defined (__linux) || defined (__APPLE__)
+	#include <unistd.h>
+	#define WIN_AFX_MANAGE_STATE
+	#define LUA_GET_JOYSTICK_COUNT_COMMAND "simExtJoyGetCount"
+	#define LUA_GET_JOYSTICK_DATA_COMMAND  "simExtJoyGetData"
+#endif /* __linux || __APPLE__ */
+
 
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
 #define PLUGIN_NAME "Hackflight"
-#define LUA_GET_JOYSTICK_COUNT_COMMAND "simExtJoyGetCount"
-#define LUA_GET_JOYSTICK_DATA_COMMAND  "simExtJoyGetData"
+
+static LIBRARY vrepLib;
+
+// Hackflight interface
+extern void setup(void);
+extern void loop(void);
+static uint32_t micros;
+
+// Launch support
+static bool ready;
 
 // Stick demands from controller
 static int demands[5];
@@ -68,25 +92,17 @@ static double thrusts[4];
 // Timestep for current run, used for simulating microsend timer
 static double timestep;
 
-// Library support
-static LIBRARY vrepLib;
-
-// Hackflight interface
-extern void setup(void);
-extern void loop(void);
-static uint32_t micros;
-
-// Launch support
-static bool ready;
-
 
 // Joystick support for Linux, OS X ==========================================
 #ifdef __linux__
 #define JOY_DEV "/dev/input/js0"
 #include <linux/joystick.h>
 #include <termios.h>
+#ifdef CONTROLLER_KEYBOARD
 static struct termios oldSettings;
+#else
 static int joyfd;
+#endif
 #endif
 
 #ifdef __APPLE__
@@ -427,12 +443,29 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
     // This is called just once, at the start of V-REP.
     // Dynamically load and bind V-REP functions:
     char curDirAndFile[1024];
-    getcwd(curDirAndFile, sizeof(curDirAndFile));
+
+#ifdef _WIN32
+	#ifdef QT_COMPIL
+		_getcwd(curDirAndFile, sizeof(curDirAndFile));
+	#else
+		GetModuleFileName(NULL,curDirAndFile,1023);
+		PathRemoveFileSpec(curDirAndFile);
+	#endif
+#elif defined (__linux) || defined (__APPLE__)
+	getcwd(curDirAndFile, sizeof(curDirAndFile));
+#endif
 
     std::string currentDirAndPath(curDirAndFile);
     std::string temp(currentDirAndPath);
 
-    temp+="/libv_rep.so";
+#ifdef _WIN32
+	temp+="\\v_rep.dll";
+#elif defined (__linux)
+	temp+="/libv_rep.so";
+#elif defined (__APPLE__)
+	temp+="/libv_rep.dylib";
+#endif /* __linux || __APPLE__ */
+
 
     vrepLib=loadVrepLibrary(temp.c_str());
     if (vrepLib==NULL)
@@ -458,11 +491,11 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
     }
 
     // Register new Lua commands:
-
     simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME), NULL, LUA_START_CALLBACK);
     simRegisterScriptCallbackFunction(strConCat(LUA_UPDATE_COMMAND,"@",PLUGIN_NAME), NULL, LUA_UPDATE_CALLBACK);
     simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME), NULL, LUA_STOP_CALLBACK);
 
+#ifndef _WIN32
 	int inArgs1[]={0};
 	simRegisterCustomLuaFunction(LUA_GET_JOYSTICK_COUNT_COMMAND,strConCat("number count=",
                 LUA_GET_JOYSTICK_COUNT_COMMAND,"()"),inArgs1,LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK);
@@ -471,9 +504,9 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 	simRegisterCustomLuaFunction(LUA_GET_JOYSTICK_DATA_COMMAND,
             strConCat("table_3 axes, number buttons,table_3 rotAxes,table_2 slider,table_4 pov=",
                 LUA_GET_JOYSTICK_DATA_COMMAND,"(number deviceIndex)"),inArgs2,LUA_GET_JOYSTICK_DATA_CALLBACK);
+#endif
 
-
-    return 1; // return the version number of this plugin (can be queried with simGetModuleName)
+    return 8; // return the version number of this plugin (can be queried with simGetModuleName)
 }
 
 VREP_DLLEXPORT void v_repEnd()

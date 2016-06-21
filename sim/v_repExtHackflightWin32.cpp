@@ -17,12 +17,21 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "v_repExtHackflight.h"
+// ==================================================================================
+// Choose your controller
+#define CONTROLLER_TARANIS
+//#define CONTROLLER_SPEKTRUM
+//#define CONTROLLER_EXTREME3DPRO
+//#define CONTROLLER_PS3
+//#define CONTROLLER_KEYBOARD
+// ==================================================================================
+
+##include "v_repExtHackflight.h"
 #include "scriptFunctionData.h"
-#include <iostream>
 #include "v_repLib.h"
 
-// Generic C includes
+#include <iostream>
+
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -30,13 +39,6 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <time.h>
-
-#define CONTROLLER_TARANIS
-//#define CONTROLLER_SPEKTRUM
-//#define CONTROLLER_EXTREME3DPRO
-//#define CONTROLLER_PS3
-//#define CONTROLLER_KEYBOARD
-
 
 #ifdef _WIN32
 	#ifdef QT_COMPIL
@@ -69,12 +71,25 @@ static uint32_t micros;
 // Launch support
 static bool ready;
 
-// Unused for Windows
-static int joyfd;
+// Stick demands from controller
+static int demands[5];
 
 // needed for spring-mounted throttle stick
 static int ps3throttle;
 #define PS3_THROTTLE_INC .01  
+
+// IMU support
+static double accel[3];
+static double gyro[3];
+
+// Barometer support
+static int baroPressure;
+
+// Motor support
+static double thrusts[4];
+
+// Timestep for current run, used for simulating microsend timer
+static double timestep;
 
 // stick keyboardIncrement for each keyboard down cycle
 #define KEYBOARD_INC 10
@@ -273,46 +288,6 @@ void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
 
 #endif // non-Windows
 
-struct sBubbleRob
-{
-	int handle;
-	int motorHandles[2];
-	int sensorHandle;
-	float backRelativeVelocities[2];
-	float duration;
-	float backMovementDuration;
-	char* waitUntilZero;
-};
-
-std::vector<sBubbleRob> allBubbleRobs;
-int nextBubbleRobHandle=0;
-
-int getBubbleRobIndexFromHandle(int bubbleRobHandle)
-{
-	for (unsigned int i=0;i<allBubbleRobs.size();i++)
-	{
-		if (allBubbleRobs[i].handle==bubbleRobHandle)
-			return(i);
-	}
-	return(-1);
-}
-
-// Stick demands from controller
-static int demands[5];
-
-// IMU support
-static double accel[3];
-static double gyro[3];
-
-// Barometer support
-static int baroPressure;
-
-// Motor support
-static double thrusts[4];
-
-// Timestep for current run, used for simulating microsend timer
-static double timestep;
-
 // Keyboard-handling helpers ----------------------------------------------
 
 static void keyboardChange(int index, int dir)
@@ -473,7 +448,8 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 // Generic V-REP plugin support
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
-{ // This is called just once, at the start of V-REP.
+{ 
+    // This is called just once, at the start of V-REP.
 	// Dynamically load and bind V-REP functions:
 	char curDirAndFile[1024];
 #ifdef _WIN32
@@ -501,12 +477,12 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 	vrepLib=loadVrepLibrary(temp.c_str());
 	if (vrepLib==NULL)
 	{
-		std::cout << "Error, could not find or correctly load v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
+        std::cout << "Error, could not find or correctly load v_rep libary. Cannot start 'Hackflight' plugin.\n";
 		return(0); // Means error, V-REP will unload this plugin
 	}
 	if (getVrepProcAddresses(vrepLib)==0)
 	{
-		std::cout << "Error, could not find all required functions in v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
+        std::cout << "Error, could not find all required functions in v_rep.dll. Cannot start 'Hackflight' plugin.\n";
 		unloadVrepLibrary(vrepLib);
 		return(0); // Means error, V-REP will unload this plugin
 	}
@@ -516,7 +492,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 	simGetIntegerParameter(sim_intparam_program_version,&vrepVer);
 	if (vrepVer<30200) // if V-REP version is smaller than 3.02.00
 	{
-		std::cout << "Sorry, your V-REP copy is somewhat old, V-REP 3.2.0 or higher is required. Cannot start 'BubbleRob' plugin.\n";
+        std::cout << "Sorry, V-REP 3.2.0 or higher is required. Cannot start 'Hackflight' plugin.\n";
 		unloadVrepLibrary(vrepLib);
 		return(0); // Means error, V-REP will unload this plugin
 	}
