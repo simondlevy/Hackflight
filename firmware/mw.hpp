@@ -18,8 +18,11 @@
 #pragma once
 
 #include <stdint.h>
-#include <stdbool.h>
 #include <stdarg.h>
+
+#ifndef _WIN32
+#include <stdbool.h>
+#endif
 
 #ifdef STM32F10X_MD 
 #include <printf.h>
