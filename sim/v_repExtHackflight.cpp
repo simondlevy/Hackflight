@@ -17,6 +17,13 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// Choose which controller you want, or none for keyboard
+//#define CONTROLLER_TARANIS
+//#define CONTROLLER_SPEKTRUM
+//#define CONTROLLER_EXTREME3DPRO
+//#define CONTROLLER_PS3
+#define CONTROLLER_KEYBOARD
+
 #include <iostream>
 
 #include <stdio.h>
@@ -27,14 +34,10 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <time.h>
-#include <sys/ioctl.h>
-#include <linux/joystick.h>
 
 #include "v_repExtHackflight.hpp"
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
-
-#include "controller.hpp"
 
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
@@ -43,30 +46,8 @@
 #define LUA_GET_JOYSTICK_COUNT_COMMAND "simExtJoyGetCount"
 #define LUA_GET_JOYSTICK_DATA_COMMAND  "simExtJoyGetData"
 
-// Controller support
-
-#ifdef TARANIS
-static TaranisController controller;
-#endif
-
-#ifdef SPEKTRUM
-static SpektrumController controller;
-#endif
-
-#ifdef PS3
-static PS3Controller controller;
-#endif
-
-#ifdef KEYBOARD
-static KeyboardController controller;
-#endif
-
 // Stick demands from controller
-static float rollDemand;
-static float pitchDemand;
-static float yawDemand;
-static float throttleDemand;
-static float auxDemand;
+static int demands[5];
 
 // IMU support
 static double accel[3];
@@ -101,33 +82,82 @@ static int joyfd;
 #define JOY_DEV "/dev/input/js0"
 
 #include <linux/joystick.h>
+#include <termios.h>
 
-#ifdef TARANIS
-#define AXIS_ROLL       1
-#define AXIS_PITCH      2
-#define AXIS_YAW        3
-#define AXIS_THROTTLE   0
-#define AXIS_AUX        5
-#define AXIS_MAXVAL     32767
+static struct termios oldSettings;
+
+void kbinit(void)
+{
+    struct termios newSettings;
+
+    // Save keyboard settings for restoration later
+    tcgetattr(fileno( stdin ), &oldSettings);
+
+    // Create new keyboard settings
+    newSettings = oldSettings;
+    newSettings.c_lflag &= (~ICANON & ~ECHO);
+    tcsetattr(fileno(stdin), TCSANOW, &newSettings);
+}
+
+int _kbhit(void)
+{
+    fd_set set;
+    struct timeval tv;
+
+    tv.tv_sec = 0;
+    tv.tv_usec = 1000;
+
+    FD_ZERO( &set );
+    FD_SET( fileno( stdin ), &set );
+
+    int res = select( fileno( stdin )+1, &set, NULL, NULL, &tv );
+
+    char c = 0;
+
+    if( res > 0 )
+    {
+        read(fileno( stdin ), &c, 1);
+    }
+
+    else if( res < 0 ) {
+        perror( "select error" );
+    }
+
+    return (int)c;
+}
+
+static void kbdone(void)
+{
+    tcsetattr(fileno(stdin), TCSANOW, &oldSettings);
+}
+
+
+// Controller axis maps
+
+#ifdef CONTROLLER_TARANIS
+static int axes[5] = {0, 1, 2, 3, 4}; // roll, pitch, yaw, throttle, aux
 #endif
 
-#ifdef SPEKTRUM
-#define AXIS_ROLL       1
-#define AXIS_PITCH      2
-#define AXIS_YAW        5
-#define AXIS_THROTTLE   0
-#define AXIS_AUX        3
-#define AXIS_DIRECTION -1
-#define AXIS_MAXVAL     21900
+#ifdef CONTROLLER_SPEKTRUM
+static int axes[5] = {1, 2, 5, 0, 3}; 
 #endif
 
-#ifdef PS3
-#define AXIS_ROLL     2
-#define AXIS_PITCH    3
-#define AXIS_YAW      0
-#define AXIS_THROTTLE 1
+#ifdef CONTROLLER_EXTREME3DPRO
+static int axes[5] = {0, 1, 2, 3, 4}; 
 #endif
 
+#ifdef CONTROLLER_PS3
+static int axes[5] = {2, 3, 0, 1, -1};  // aux unused
+#endif
+
+#ifdef CONTROLLER_KEYBOARD
+static int axes[5] = {-1, -1, -1, -1, -1};  // all unused
+#endif
+
+
+// needed for spring-mounted throttle stick
+static int ps3throttle;
+#define PS3_THROTTLE_INC .01                
 
 void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
 {
@@ -149,12 +179,17 @@ void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
         retval = 1;
     }
 
+    // Use keyboard as fallback
+    else {
+        kbinit();
+    }
+
 	p->outputInt[0] = retval;                              // The integer value we want to return
 }
 
 static int scaleAxis(int value)
 {
-    return 1000 * value / (float)AXIS_MAXVAL;
+    return 1000 * value / 32767.;
 }
 
 void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
@@ -176,8 +211,6 @@ void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
 	}
 	else
 		simSetLastError(LUA_GET_JOYSTICK_DATA_COMMAND,"Not enough arguments."); // output an error
-
-    //axes,buttons,rotAxes,slider,pov = simExtJoyGetData(0)
 
 
 	// Now we prepare the return value(s):
@@ -211,24 +244,24 @@ void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
 
             read(joyfd, &js, sizeof(struct js_event));
 
-            if (js.type & JS_EVENT_AXIS) 
-                switch (js.number) {
-                    case AXIS_ROLL:
-                        roll = AXIS_DIRECTION * scaleAxis(js.value);
-                        break;
-                    case AXIS_PITCH:
-                        pitch = AXIS_DIRECTION * scaleAxis(js.value);
-                        break;
-                    case AXIS_YAW:
-                        yaw = AXIS_DIRECTION * scaleAxis(js.value);
-                        break;
-                    case AXIS_THROTTLE:
-                        throttle = AXIS_DIRECTION * scaleAxis(js.value);
-                        break;
-                    case AXIS_AUX:
+            if (js.type & JS_EVENT_AXIS) {
+
+                    if (js.number == axes[0]) 
+                        roll = scaleAxis(js.value);
+
+                    if (js.number == axes[1]) 
+                        pitch = scaleAxis(js.value);
+
+                    if (js.number == axes[2]) 
+                        yaw = scaleAxis(js.value);
+
+                    if (js.number == axes[3]) 
+                        throttle = scaleAxis(js.value);
+
+                    if (js.number == axes[4]) 
                         aux = scaleAxis(js.value);
-                        break;
                 }
+
         }
 
         // We only need to specify these five return values
@@ -239,8 +272,6 @@ void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
         p->outputInt[6]= aux;
     }
 }
-
-
 
 #endif // non-Windows
 
@@ -256,9 +287,6 @@ static const int inArgs_START[]={
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
-    // Initialize controller
-    controller.init();
-
     // Run Hackflight setup()
     setup();
 
@@ -270,6 +298,10 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     }
     D.pushOutData(CScriptFunctionDataItem(true)); // success
     D.writeDataToStack(cb->stackID);
+
+    // Need this to handle keyboard for throttle and springy PS3 collective stick
+    ps3throttle = -1000;
+    demands[3] = -1000;
 
     // Now we're ready
     ready = true;
@@ -293,12 +325,36 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
-        // Read RC axes
+        // Read RC axes if joystick available
         if (joyfd > 0) {
             for (int k=0; k<5; ++k)
-                printf("%d ", inData->at(0).int32Data[k]);
-            printf("\n");
+                demands[k] = inData->at(0).int32Data[k];
         }
+
+#if defined(CONTROLLER_PS3) || defined(CONTROLLER_EXTREME3DPRO)
+
+        // Scale down non-RC controllers
+        demands[0] /= 2;
+        demands[1] /= 2;
+
+        // and negate their throttle and pitch values
+        demands[1] *= -1;
+        demands[3] *= -1;
+#endif
+
+#ifdef CONTROLLER_PS3
+
+        // PS3 spring-mounted throttle requires special handling
+        ps3throttle += demands[3] * PS3_THROTTLE_INC;     
+        if (ps3throttle < -1000)
+            ps3throttle = -1000;
+        if (ps3throttle > 1000)
+            ps3throttle = 1000;
+        demands[3] = ps3throttle;
+#endif
+
+        //printf("r: %4d    p: %4d    y: %4d    t: %4d    a: %4d\n", demands[0], demands[1], demands[2], demands[3], demands[4]);
+
 
         // Read gyro, accelerometer
         for (int k=0; k<3; ++k) {
@@ -332,11 +388,12 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
-    // Stop controller interaction
-    controller.stop();
 
-    if (joyfd)
+    // Close joystick connection or keyboard if open
+    if (joyfd > 0)
         close(joyfd);
+    else
+        kbdone();
 
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true)); // success
@@ -395,7 +452,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
                 LUA_GET_JOYSTICK_DATA_COMMAND,"(number deviceIndex)"),inArgs2,LUA_GET_JOYSTICK_DATA_CALLBACK);
 
 
-    return(8); // return the version number of this plugin (can be queried with simGetModuleName)
+    return 1; // return the version number of this plugin (can be queried with simGetModuleName)
 }
 
 VREP_DLLEXPORT void v_repEnd()
@@ -404,12 +461,71 @@ VREP_DLLEXPORT void v_repEnd()
     unloadVrepLibrary(vrepLib); // release the library
 }
 
+static void change(int index, int dir)
+{
+    demands[index] += dir;
+
+    if (demands[index] > 1000)
+        demands[index] = 1000;
+
+    if (demands[index] < -1000)
+        demands[index] = -1000;
+}
+
+static void increment(int index) 
+{
+    change(index, +1);
+}
+
+static void decrement(int index) 
+{
+    change(index, -1);
+}
+
+
 VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customData,int* replyData)
 {   
+    // Don't do anything till start() has been called
     if (!ready)
         return NULL;
 
-    controller.getDemands(rollDemand, pitchDemand, yawDemand, throttleDemand, auxDemand);
+    // Default to keyboard if no joy
+    if (joyfd < 1) 
+        switch (_kbhit()) {
+            case 10:
+                increment(2);
+                break;
+            case 50:
+                decrement(2);
+                break;
+            case 53:
+                increment(3);
+                break;
+            case 54:
+                decrement(3);
+                break;
+            case 65:
+                increment(1);
+                break;
+            case 66:
+                decrement(1);
+                break;
+            case 67:
+                increment(0);
+                break;
+            case 68:
+                decrement(0);
+                break;
+            case 47:
+                //this->aux = +1;
+                break;
+            case 42:
+                //this->aux = 0;
+                break;
+            case 45:
+                //this->aux = -1;
+                break;
+        }
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
@@ -559,26 +675,15 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    float scale = 0;
+    //return CONFIG_PWM_MIN;
 
-    switch (chan) {
-        case 0:
-            scale = (1-rollDemand) / 2;
-            break;
-        case 1:
-            scale = (1-pitchDemand) / 2;
-            break;
-        case 2:
-            scale = throttleDemand;
-            break;
-        case 3:
-            scale = (1-yawDemand) / 2;
-            break;
-        case 4:
-            scale = (1-auxDemand) / 2;
-    }
-
-    return CONFIG_PWM_MIN + scale * (CONFIG_PWM_MAX - CONFIG_PWM_MIN);
+    // V-REP sends joystick demands in [-1000,+1000]
+    int pwm =  CONFIG_PWM_MIN + (demands[chan] + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN);
+    if (chan < 5)
+        printf("%d: %d    ", chan, pwm);
+    if (chan == 4)
+        printf("\n");
+    return pwm;
 }
 
 void Board::reboot(void)

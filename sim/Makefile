@@ -20,12 +20,6 @@
 # Edit this for where you installed V-REP
 VREP_DIR = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
 
-# Choose which controller you want
-CONTROLLER =  SPEKTRUM
-#CONTROLLER = TARANIS
-#CONTROLLER = PS3
-#CONTROLLER = KEYBOARD
-
 COMMON = $(VREP_DIR)/programming/common/
 CFLAGS = -Wall -I$(VREP_DIR)/programming/include/ -I. -I../include -I../firmware -Wall -fPIC -static
 
@@ -35,11 +29,10 @@ EXT = so
 
 PLUGIN = libv_repExtHackflight.$(EXT)
 
-all: $(PLUGIN) controller_test
+all: $(PLUGIN) 
 
 libv_repExtHackflight.so: *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp Makefile
-	g++ $(CFLAGS) -c -D$(CONTROLLER) v_repExtHackflight.cpp 
-	g++ $(CFLAGS) -c -D$(CONTROLLER) controller.cpp 
+	g++ $(CFLAGS) -c v_repExtHackflight.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
 	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp
@@ -52,12 +45,6 @@ libv_repExtHackflight.so: *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp Makefi
 	g++ $(CFLAGS) -c ../firmware/baro.cpp
 	g++ $(CFLAGS) -c ../firmware/position.cpp
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -ldl -shared 	
-
-ctest: controller_test
-	./controller_test
-
-controller_test: controller_test.cpp controller.cpp controller.hpp  Makefile
-	g++ -D$(CONTROLLER) -o controller_test controller.cpp controller_test.cpp
 
 install: $(PLUGIN)
 	cp $(PLUGIN) $(VREP_DIR)
@@ -73,5 +60,5 @@ commit:
 	git push
 
 clean:
-	rm -f *.o *.so *.pyc *~ controller_test
+	rm -f *.o *.so *.pyc *~
 
