@@ -30,6 +30,9 @@
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
+// WIN32 support
+#include <crossplatform.h>
+
 #include <iostream>
 
 #include <stdio.h>
@@ -402,7 +405,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
             char signame[10];
-            sprintf_s(signame, "thrust%d", i+1);
+            SPRINTF(signame, "thrust%d", i+1);
             simSetFloatSignal(signame, thrusts[i]);
         }
     }
@@ -602,7 +605,6 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
 #include <board.hpp>
 #include <pwm.hpp>
-#include <crossplatform.h>
 
 class LED {
 
@@ -623,7 +625,7 @@ class LED {
 
         void init(const char * _signame)
         {
-            strcpy_s(this->signame, _signame);
+            STRCPY(this->signame, _signame);
             this->on = false;
         }
 

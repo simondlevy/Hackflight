@@ -20,7 +20,11 @@
 
 #ifdef _WIN32
 #define M_PI 3.14159265358979323846
+#define SPRINTF sprintf_s
+#define STRCPY  strcpy_s
 #define lrintf(x) (float)(int)((x)+0.5)
 #else
+#define SPRINTF sprintf
+#define STRCPY  strcpy
 #include <stdbool.h>
 #endif
