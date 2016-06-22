@@ -19,7 +19,7 @@
 #pragma once
 
 #ifdef _WIN32
-#define M_PI 3.14159265358979323846
+#define M_PI 3.14159265358979323846f
 #define SPRINTF sprintf_s
 #define STRCPY  strcpy_s
 #define lrintf(x) (float)(int)((x)+0.5)

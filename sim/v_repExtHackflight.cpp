@@ -1,7 +1,7 @@
 /*
    V-REP simulator plugin code for Hackflight
 
-   Copyright (C) Simon D. Levy 2016
+   Copyright (C) Simon D. Levy, Matt Lubas, and Julio Hidalgo Lopez 2016
 
    This file is part of Hackflight.
 
@@ -26,22 +26,15 @@
 //#define CONTROLLER_KEYBOARD
 // ==================================================================================
 
-#include "v_repExtHackflight.hpp"
+#include "v_repExtHackflight.h"
 #include "scriptFunctionData.h"
+#include <iostream>
 #include "v_repLib.h"
+
+#include <stdint.h>
 
 // WIN32 support
 #include <crossplatform.h>
-
-#include <iostream>
-
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
-#include <stdint.h>
-#include <time.h>
 
 #ifdef _WIN32
 	#ifdef QT_COMPIL
@@ -50,22 +43,18 @@
 		#include <shlwapi.h>
 		#pragma comment(lib, "Shlwapi.lib")
 	#endif
-#include <conio.h>
 #endif /* _WIN32 */
 #if defined (__linux) || defined (__APPLE__)
 	#include <unistd.h>
 	#define WIN_AFX_MANAGE_STATE
-	#define LUA_GET_JOYSTICK_COUNT_COMMAND "simExtJoyGetCount"
-	#define LUA_GET_JOYSTICK_DATA_COMMAND  "simExtJoyGetData"
 #endif /* __linux || __APPLE__ */
-
 
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
 #define PLUGIN_NAME "Hackflight"
 
-static LIBRARY vrepLib;
+LIBRARY vrepLib;
 
 // Hackflight interface
 extern void setup(void);
@@ -92,9 +81,8 @@ static int baroPressure;
 // Motor support
 static float thrusts[4];
 
-// Timestep for current run, used for simulating microsend timer
-static double timestep;
-
+// 100 Hz timestep, used for simulating microsend timer
+static double timestep = .01;
 
 // Joystick support for Linux, OS X ==========================================
 #ifdef __linux__
@@ -190,6 +178,7 @@ static int axes[5] = {-1, -1, -1, -1, -1};  // all unused
 
 #define KEYBOARD_INC 10
 
+#ifndef _WIN32
 void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
 {
 	// Prepare the return value:
@@ -312,29 +301,19 @@ void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
     }
 }
 #endif
+#endif
 
-// simExtHackflight_start ////////////////////////////////////////////////////////////////////////
 
+// --------------------------------------------------------------------------------------
+// simExtHackflight_start
+// --------------------------------------------------------------------------------------
 #define LUA_START_COMMAND "simExtHackflight_start"
-
-static const int inArgs_START[]={
-    1,
-    sim_script_arg_double,0 // timestep
-};
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
+
     // Run Hackflight setup()
     setup();
-
-    // Grab timestep from input stack and return success
-    CScriptFunctionData D;
-    if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0],LUA_START_COMMAND)) {
-        std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
-        timestep = inData->at(0).doubleData[0];  
-    }
-    D.pushOutData(CScriptFunctionDataItem(true)); // success
-    D.writeDataToStack(cb->stackID);
 
     // Need this to handle keyboard for throttle and springy PS3 collective stick
     ps3throttle = -1000;
@@ -342,9 +321,16 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
     // Now we're ready
     ready = true;
+
+	// Return success to V-REP
+	CScriptFunctionData D;
+	D.pushOutData(CScriptFunctionDataItem(true));
+	D.writeDataToStack(cb->stackID);
 }
 
-// simExtHackflight_update ////////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------
+// simExtHackflight_update
+// --------------------------------------------------------------------------------------
 
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
@@ -413,19 +399,20 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     // Increment microsecond count
     micros += (uint32_t)(1e6 * timestep);
 
-    // Return success
+    // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true)); 
     D.writeDataToStack(cb->stackID);
-
 }
 
-// simExtHackflight_stop ////////////////////////////////////////////////////////////////////////////////
 
+// --------------------------------------------------------------------------------------
+// simExtHackflight_stop
+// --------------------------------------------------------------------------------------
 #define LUA_STOP_COMMAND "simExtHackflight_stop"
+
 
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
-
 #ifdef CONTROLLER_KEYBOARD
     kbdone();
 #else
@@ -438,18 +425,17 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 #endif
 #endif
 
-    CScriptFunctionData D;
-    D.pushOutData(CScriptFunctionDataItem(true)); // success
-    D.writeDataToStack(cb->stackID);
+	CScriptFunctionData D;
+	D.pushOutData(CScriptFunctionDataItem(true));
+	D.writeDataToStack(cb->stackID);
 }
+// --------------------------------------------------------------------------------------
 
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
-{ 
-    // This is called just once, at the start of V-REP.
-    // Dynamically load and bind V-REP functions:
-    char curDirAndFile[1024];
-
+{ // This is called just once, at the start of V-REP.
+	// Dynamically load and bind V-REP functions:
+	char curDirAndFile[1024];
 #ifdef _WIN32
 	#ifdef QT_COMPIL
 		_getcwd(curDirAndFile, sizeof(curDirAndFile));
@@ -461,8 +447,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 	getcwd(curDirAndFile, sizeof(curDirAndFile));
 #endif
 
-    std::string currentDirAndPath(curDirAndFile);
-    std::string temp(currentDirAndPath);
+	std::string currentDirAndPath(curDirAndFile);
+	std::string temp(currentDirAndPath);
 
 #ifdef _WIN32
 	temp+="\\v_rep.dll";
@@ -472,36 +458,36 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 	temp+="/libv_rep.dylib";
 #endif /* __linux || __APPLE__ */
 
+	vrepLib=loadVrepLibrary(temp.c_str());
+	if (vrepLib==NULL)
+	{
+		std::cout << "Error, could not find or correctly load v_rep.dll. Cannot start 'Hackflight' plugin.\n";
+		return(0); // Means error, V-REP will unload this plugin
+	}
+	if (getVrepProcAddresses(vrepLib)==0)
+	{
+		std::cout << "Error, could not find all required functions in v_rep plugin. Cannot start 'Hackflight' plugin.\n";
+		unloadVrepLibrary(vrepLib);
+		return(0); // Means error, V-REP will unload this plugin
+	}
 
-    vrepLib=loadVrepLibrary(temp.c_str());
-    if (vrepLib==NULL)
-    {
-        std::cout << "Error, could not find or correctly load v_rep libary. Cannot start 'Hackflight' plugin.\n";
-        return(0); // Means error, V-REP will unload this plugin
-    }
-    if (getVrepProcAddresses(vrepLib)==0)
-    {
-        std::cout << "Error, could not find all required functions in v_rep.dll. Cannot start 'Hackflight' plugin.\n";
-        unloadVrepLibrary(vrepLib);
-        return(0); // Means error, V-REP will unload this plugin
-    }
+	// Check the V-REP version:
+	int vrepVer;
+	simGetIntegerParameter(sim_intparam_program_version,&vrepVer);
+	if (vrepVer<30200) // if V-REP version is smaller than 3.02.00
+	{
+		std::cout << "Sorry, your V-REP copy is somewhat old, V-REP 3.2.0 or higher is required. Cannot start 'Hackflight' plugin.\n";
+		unloadVrepLibrary(vrepLib);
+		return(0); // Means error, V-REP will unload this plugin
+	}
 
-    // Check the V-REP version:
-    int vrepVer;
-    simGetIntegerParameter(sim_intparam_program_version,&vrepVer);
-    if (vrepVer<30200) // if V-REP version is smaller than 3.02.00
-    {
-        std::cout << "Sorry, V-REP 3.2.0 or higher is required. Cannot start 'Hackflight' plugin.\n";
-        unloadVrepLibrary(vrepLib);
-        return(0); // Means error, V-REP will unload this plugin
-    }
-
-    // Register new Lua commands:
-    simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME), NULL, LUA_START_CALLBACK);
+	// Register new Lua commands:
+	simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME),strConCat("boolean result=",LUA_START_COMMAND,"(number HackflightHandle,number duration,boolean returnDirectly=false)"),LUA_START_CALLBACK);
     simRegisterScriptCallbackFunction(strConCat(LUA_UPDATE_COMMAND,"@",PLUGIN_NAME), NULL, LUA_UPDATE_CALLBACK);
-    simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME), NULL, LUA_STOP_CALLBACK);
+	simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME),strConCat("boolean result=",LUA_STOP_COMMAND,"(number HackflightHandle)"),LUA_STOP_CALLBACK);
 
 #ifndef _WIN32
+	// Register joystick commands for Linux, OS X (already provided in Windows)
 	int inArgs1[]={0};
 	simRegisterCustomLuaFunction(LUA_GET_JOYSTICK_COUNT_COMMAND,strConCat("number count=",
                 LUA_GET_JOYSTICK_COUNT_COMMAND,"()"),inArgs1,LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK);
@@ -512,13 +498,12 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
                 LUA_GET_JOYSTICK_DATA_COMMAND,"(number deviceIndex)"),inArgs2,LUA_GET_JOYSTICK_DATA_CALLBACK);
 #endif
 
-    return 8; // return the version number of this plugin (can be queried with simGetModuleName)
+	return 8; // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
 }
 
 VREP_DLLEXPORT void v_repEnd()
-{ 
-    // This is called just once, at the end of V-REP
-    unloadVrepLibrary(vrepLib); // release the library
+{ // This is called just once, at the end of V-REP
+	unloadVrepLibrary(vrepLib); // release the library
 }
 
 #ifdef CONTROLLER_KEYBOARD
@@ -545,12 +530,11 @@ static void decrement(int index)
 #endif
 
 VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customData,int* replyData)
-{   
+{
     // Don't do anything till start() has been called
     if (!ready)
         return NULL;
 
-    // Default to keyboard if no joy
 #ifdef CONTROLLER_KEYBOARD
      switch (_kbhit()) {
         case 10:
@@ -592,13 +576,12 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
     simSetIntegerParameter(sim_intparam_error_report_mode,sim_api_errormessage_ignore);
-
     simSetIntegerParameter(sim_intparam_error_report_mode,errorModeSaved); // restore previous settings
 
     // Call Hackflight loop() from here for most realistic simulation
     loop();
 
-    return NULL;
+	return NULL;
 }
 
 // Board implementation ======================================================
@@ -740,7 +723,7 @@ uint16_t Board::readPWM(uint8_t chan)
     //return CONFIG_PWM_MIN;
 
     // V-REP sends joystick demands in [-1000,+1000]
-    int pwm =  CONFIG_PWM_MIN + (demands[chan] + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN);
+    int pwm =  (int)(CONFIG_PWM_MIN + (demands[chan] + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
     if (chan < 5)
         printf("%d: %d    ", chan, pwm);
     if (chan == 4)

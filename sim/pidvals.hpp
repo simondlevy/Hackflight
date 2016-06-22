@@ -8,7 +8,7 @@
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
    Hackflight is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   but WITHOUT ANY WARRANTY without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
@@ -16,14 +16,14 @@
  */
 
 // Level (accelerometer)
-static const uint8_t CONFIG_LEVEL_P          = 10;
-static const uint8_t CONFIG_LEVEL_I          = 0;
+#define CONFIG_LEVEL_P           10
+#define CONFIG_LEVEL_I            0
 
 // Rate (gyro): P must be positive
-static const uint8_t CONFIG_RATE_PITCHROLL_P = 10;
-static const uint8_t CONFIG_RATE_PITCHROLL_I = 0;
-static const uint8_t CONFIG_RATE_PITCHROLL_D = 0;
+#define  CONFIG_RATE_PITCHROLL_P  10
+#define  CONFIG_RATE_PITCHROLL_I  0
+#define  CONFIG_RATE_PITCHROLL_D  0
 
 // Yaw: P must be positive
-static const uint8_t CONFIG_YAW_P            = 10;
-static const uint8_t CONFIG_YAW_I            = 0;
+#define  CONFIG_YAW_P             10
+#define  CONFIG_YAW_I             0
