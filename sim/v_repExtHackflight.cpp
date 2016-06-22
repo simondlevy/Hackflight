@@ -87,7 +87,7 @@ static double gyro[3];
 static int baroPressure;
 
 // Motor support
-static double thrusts[4];
+static float thrusts[4];
 
 // Timestep for current run, used for simulating microsend timer
 static double timestep;
@@ -210,7 +210,8 @@ void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
         fcntl(joyfd, F_SETFL, O_NONBLOCK);
         retval = 1;
     }
-#else
+#endif
+#ifdef __APPLE__
     if (SDL_Init(SDL_INIT_JOYSTICK)) {
         retval = 1;
     }
@@ -220,6 +221,7 @@ void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
     p->outputInt[0] = retval;     // return 1 on success, 0 on failure
 }
 
+#ifndef _WIN32
 static int scaleAxis(int value)
 {
     return 1000 * value / 32767.;
@@ -306,7 +308,7 @@ void LUA_GET_JOYSTICK_DATA_CALLBACK(SLuaCallBack* p)
         p->outputInt[6]= aux;
     }
 }
-
+#endif
 
 // simExtHackflight_start ////////////////////////////////////////////////////////////////////////
 
@@ -400,13 +402,13 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
             char signame[10];
-            sprintf(signame, "thrust%d", i+1);
+            sprintf_s(signame, "thrust%d", i+1);
             simSetFloatSignal(signame, thrusts[i]);
         }
     }
 
     // Increment microsecond count
-    micros += 1e6 * timestep;
+    micros += (uint32_t)(1e6 * timestep);
 
     // Return success
     D.pushOutData(CScriptFunctionDataItem(true)); 
@@ -426,7 +428,8 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 #else
 #ifdef __linux__
     close(joyfd);
-#else
+#endif
+#ifdef __APPLE__
     SDL_JoystickClose(sdljoy);
     SDL_Quit();
 #endif
@@ -599,6 +602,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
 #include <board.hpp>
 #include <pwm.hpp>
+#include <crossplatform.h>
 
 class LED {
 
@@ -619,7 +623,7 @@ class LED {
 
         void init(const char * _signame)
         {
-            strcpy(this->signame, _signame);
+            strcpy_s(this->signame, _signame);
             this->on = false;
         }
 
