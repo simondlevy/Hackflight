@@ -46,6 +46,10 @@
 #endif /* _WIN32 */
 #if defined (__linux) || defined (__APPLE__)
 	#include <unistd.h>
+	#include <fcntl.h>
+	#include <math.h>
+	#include <stdio.h>
+	#include <string.h>
 	#define WIN_AFX_MANAGE_STATE
 #endif /* __linux || __APPLE__ */
 
@@ -179,7 +183,11 @@ static int axes[5] = {-1, -1, -1, -1, -1};  // all unused
 #define KEYBOARD_INC 10
 
 #ifndef _WIN32
-void LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK(SLuaCallBack* p)
+
+#define LUA_GET_JOYSTICK_COUNT_COMMAND "simExtJoyGetCount"
+#define LUA_GET_JOYSTICK_DATA_COMMAND  "simExtJoyGetData"
+
+void LUA_GET_JOYSTICK_COUNT_CALLBACK(SLuaCallBack* p)
 {
 	// Prepare the return value:
 	p->outputArgCount=1; // 1 return value
@@ -490,7 +498,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 	// Register joystick commands for Linux, OS X (already provided in Windows)
 	int inArgs1[]={0};
 	simRegisterCustomLuaFunction(LUA_GET_JOYSTICK_COUNT_COMMAND,strConCat("number count=",
-                LUA_GET_JOYSTICK_COUNT_COMMAND,"()"),inArgs1,LUA_GET_JOYSTICK_COUNT_COMMAND_CALLBACK);
+                LUA_GET_JOYSTICK_COUNT_COMMAND,"()"),inArgs1,LUA_GET_JOYSTICK_COUNT_CALLBACK);
 
 	int inArgs2[]={1,sim_lua_arg_int};
 	simRegisterCustomLuaFunction(LUA_GET_JOYSTICK_DATA_COMMAND,
