@@ -17,7 +17,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-static enum Controller { TARANIS, SPEKTRUM, EXTREMEPRO3D, PS3 };
+enum Controller { TARANIS, SPEKTRUM, EXTREMEPRO3D, PS3 };
 
 static Controller controller = EXTREMEPRO3D;
 
