@@ -19,8 +19,7 @@ DLL plugin file</a> to the V-REP folder where the other DLLs are. On my computer
 <p><li>Nyko Core Controller for PS3
 </ul>
 
-<p><li> Navigate to the <b>hackflight/sim</b> folder and double-click <b>hackflight.ttt</b>
-to launch V-REP
+<p><li> Double-click on the hackflight scene <b>hackflight.ttt</b> to launch V-REP.
 <p><li> Press the triangular play button at the top of V-REP.
 <p><ul>
 <p><li> If V-REP asks you whether you really want to run the simulation with a dt=10msec
