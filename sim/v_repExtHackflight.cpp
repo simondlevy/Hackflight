@@ -124,8 +124,8 @@ static void getController(void)
                                          &nBufferSize );                 // Char Count
  
         // Got Device Name?
-        if( nResult < 0 )
-        {
+        if( nResult < 0 ) {
+
             // Error
             cout << "ERR: Unable to get Device Name.. Moving to next device." << endl << endl;
  
@@ -242,8 +242,23 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 // joystick support for OS X
 #ifdef __APPLE__
 
+#include <SDL.h>
+
+static SDL_Joystick * joystick;
+
 static void getController(void)
 {
+    if (SDL_Init(SDL_INIT_JOYSTICK)) {
+        printf("Failed to initialize SDL\n");
+        return;
+    }
+
+    if (!(joystick = SDL_JoystickOpen(0))) {
+        printf("Unable to open joystick\n");
+        return;
+    }
+
+    printf("Name: %s\n", SDL_JoystickNameForIndex(0));
 }
 
 // Ignores input data (used only on Windows)
