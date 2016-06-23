@@ -17,9 +17,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-enum Controller { TARANIS, SPEKTRUM, EXTREMEPRO3D, PS3 };
-
-static Controller controller = SPEKTRUM;
 
 #include "v_repExtHackflight.h"
 #include "scriptFunctionData.h"
@@ -27,6 +24,9 @@ static Controller controller = SPEKTRUM;
 #include "v_repLib.h"
 
 #include <stdint.h>
+
+#include <iostream>
+using namespace std;
 
 // WIN32 support
 #include <crossplatform.h>
@@ -42,6 +42,155 @@ static int demands[5];
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
 #endif
+
+// We currently support these controllers
+enum Controller { TARANIS, SPEKTRUM, EXTREMEPRO3D, PS3 };
+static Controller controller;
+
+// Adapted from http://cboard.cprogramming.com/windows-programming/114294-getting-list-usb-devices-listed-system.html
+static void getController(void)
+{ 
+    // Get Number Of Devices
+    UINT nDevices = 0;
+    GetRawInputDeviceList( NULL, &nDevices, sizeof( RAWINPUTDEVICELIST ) );
+ 
+    // Got Any?
+    if(nDevices < 1)
+        return;
+     
+    // Allocate Memory For Device List
+    PRAWINPUTDEVICELIST pRawInputDeviceList;
+    pRawInputDeviceList = new RAWINPUTDEVICELIST[ sizeof( RAWINPUTDEVICELIST ) * nDevices ];
+ 
+    // Got Memory?
+    if( pRawInputDeviceList == NULL )
+    {
+        // Error
+        cout << "ERR: Could not allocate memory for Device List.";
+        return;
+    }
+     
+    // Fill Device List Buffer
+    int nResult;
+    nResult = GetRawInputDeviceList( pRawInputDeviceList, &nDevices, sizeof( RAWINPUTDEVICELIST ) );
+ 
+    // Got Device List?
+    if( nResult < 0 )
+    {
+        // Clean Up
+        delete [] pRawInputDeviceList;
+ 
+        // Error
+        cout << "ERR: Could not get device list.";
+        return;
+    }
+ 
+    // Loop Through Device List
+    for( UINT i = 0; i < nDevices; i++ )
+    {
+        // Get Character Count For Device Name
+        UINT nBufferSize = 0;
+        nResult = GetRawInputDeviceInfo( pRawInputDeviceList[i].hDevice, // Device
+                                         RIDI_DEVICENAME,                // Get Device Name
+                                         NULL,                           // NO Buff, Want Count!
+                                         &nBufferSize );                 // Char Count Here!
+ 
+        // Got Device Name?
+        if( nResult < 0 )
+        {
+            // Error
+            cout << "ERR: Unable to get Device Name character count.. Moving to next device." << endl << endl;
+ 
+            // Next
+            continue;
+        }
+ 
+        // Allocate Memory For Device Name
+        WCHAR* wcDeviceName = new WCHAR[ nBufferSize + 1 ];
+         
+        // Got Memory
+        if( wcDeviceName == NULL )
+        {
+            // Error
+            cout << "ERR: Unable to allocate memory for Device Name.. Moving to next device." << endl << endl;
+ 
+            // Next
+            continue;
+        }
+ 
+        // Get Name
+        nResult = GetRawInputDeviceInfo( pRawInputDeviceList[i].hDevice, // Device
+                                         RIDI_DEVICENAME,                // Get Device Name
+                                         wcDeviceName,                   // Get Name!
+                                         &nBufferSize );                 // Char Count
+ 
+        // Got Device Name?
+        if( nResult < 0 )
+        {
+            // Error
+            cout << "ERR: Unable to get Device Name.. Moving to next device." << endl << endl;
+ 
+            // Clean Up
+            delete [] wcDeviceName;
+ 
+            // Next
+            continue;
+        }
+ 
+        // Set Device Info & Buffer Size
+        RID_DEVICE_INFO rdiDeviceInfo;
+        rdiDeviceInfo.cbSize = sizeof( RID_DEVICE_INFO );
+        nBufferSize = rdiDeviceInfo.cbSize;
+ 
+        // Get Device Info
+        nResult = GetRawInputDeviceInfo( pRawInputDeviceList[i].hDevice,
+                                         RIDI_DEVICEINFO,
+                                         &rdiDeviceInfo,
+                                         &nBufferSize );
+ 
+        // Got All Buffer?
+        if( nResult < 0 )
+        {
+            // Error
+            cout << "ERR: Unable to read Device Info.. Moving to next device." << endl << endl;
+ 
+            // Next
+            continue;
+        }
+  
+        // Some HID
+        if (rdiDeviceInfo.dwType == RIM_TYPEHID)
+        {
+
+           switch (rdiDeviceInfo.hid.dwVendorId) {
+
+		   case 3727:
+			   controller = PS3;
+			   break;
+
+		   case 1155:
+			   controller = TARANIS;
+			   break;
+
+		   case 1783:
+			   controller = SPEKTRUM;
+			   break;
+
+		   case 1133:
+			   controller = EXTREMEPRO3D; // XXX product ID = 49685
+			   break;
+		   }
+            
+			// XXX could also use if needed: rdiDeviceInfo.hid.dwProductId
+        }
+ 
+        // Delete Name Memory!
+        delete [] wcDeviceName;
+    }
+ 
+    // Clean Up - Free Memory
+    delete [] pRawInputDeviceList;
+}
 
 // Grabs stick demands from script via Windows plugin
 static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
@@ -160,6 +309,9 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     // Need this to handle keyboard for throttle and springy PS3 collective stick
     ps3throttle = -1000;
     demands[3] = -1000;
+
+	// Each input device has its own axis and button mappings
+	getController();
 
     // Now we're ready
     ready = true;
