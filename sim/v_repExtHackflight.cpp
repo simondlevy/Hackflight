@@ -19,7 +19,7 @@
 
 enum Controller { TARANIS, SPEKTRUM, EXTREMEPRO3D, PS3 };
 
-static Controller controller = TARANIS;
+static Controller controller = SPEKTRUM;
 
 #include "v_repExtHackflight.h"
 #include "scriptFunctionData.h"
@@ -93,13 +93,24 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 }
 #endif /* _WIN32 */
 
+// joystick support for Linux
+#ifdef __linux
+static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
+{
+    demands[0] = 0;		// roll
+    demands[1] = 0;	    // pitch
+    demands[2] = 0;		// yaw
+    demands[3] = -1000; // throttle
+}
+#endif
+
 #if defined (__linux) || defined (__APPLE__)
-	#include <unistd.h>
-	#include <fcntl.h>
-	#include <math.h>
-	#include <stdio.h>
-	#include <string.h>
-	#define WIN_AFX_MANAGE_STATE
+#include <unistd.h>
+#include <fcntl.h>
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
+#define WIN_AFX_MANAGE_STATE
 #endif /* __linux || __APPLE__ */
 
 #define CONCAT(x,y,z) x y z
@@ -183,6 +194,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
+        // inData will be used in Windows only
 		getDemands(inData);
 
 		// PS3 spring-mounted throttle requires special handling
