@@ -6,10 +6,9 @@
 
 <ol>
 <li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>.
-<p><li>Download the hackflight 
-<a href="https://github.com/simondlevy/hackflight/blob/master/sim/hackflight.ttt">scene</a>.
-<p><li>Download the <a href="https://github.com/simondlevy/hackflight/blob/master/sim/build/libv_repExtHackflight.dll">
-DLL plugin file</a> to the V-REP folder where the other DLLs are. On my computer this is
+<p><li>Clone the hackflight repository.
+<p><li>Drag the plugin <b>hackflight/sim/build/lib_vRepExtHackflight.dll</b>
+to the V-REP folder where the other DLLs are. On my computer this is
 <b>C:\Program FIles (x86)\V-REP3\V-REP_PRO_EDU</b>.
 <p><li>Plug in your R/C transmitter, joystick, or game controller. Currently supported:
 <p><ul>
@@ -36,8 +35,7 @@ the sticks a little at first for the simulator to detect them.
 
 <ol>
 <li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>.
-<p><li>Download the hackflight 
-<a href="https://github.com/simondlevy/hackflight/blob/master/sim/hackflight.ttt">scene</a>.
+<p><li>Clone the hackflight repository.
 <p><li>Download the <a href="https://github.com/simondlevy/hackflight/blob/master/sim/build/libv_repExtHackflight.so">
 plugin file</a> to the V-REP top-level folder. On my computer this is
 <b>~/Software//V-REP_PRO_EDU_V3_3_1_64_Linux</b>.
