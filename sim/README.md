@@ -5,7 +5,7 @@
 <b>Quickstart, Windows</b>
 
 <ol>
-<li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>
+<li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>.
 <p><li>Download the hackflight 
 <a href="https://github.com/simondlevy/hackflight/blob/master/sim/hackflight.ttt">scene</a>.
 <p><li>Download the <a href="https://github.com/simondlevy/hackflight/blob/master/sim/build/libv_repExtHackflight.dll">
@@ -35,7 +35,7 @@ the sticks a little at first for the simulator to detect them.
 <b>Quickstart, Linux</b>
 
 <ol>
-<li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>
+<li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>.
 <p><li>Download the hackflight 
 <a href="https://github.com/simondlevy/hackflight/blob/master/sim/hackflight.ttt">scene</a>.
 <p><li>Download the <a href="https://github.com/simondlevy/hackflight/blob/master/sim/build/libv_repExtHackflight.so">
