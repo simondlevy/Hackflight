@@ -3,7 +3,7 @@
 <b>Quickstart, Windows</b>
 
 <ol>
-<li> Download [V-REP](http://www.coppeliarobotics.com/downloads.html)
+<li> Download <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>
 <p><li>Copy 
 
 </ol>
