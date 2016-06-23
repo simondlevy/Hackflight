@@ -7,7 +7,7 @@
 <ol>
 <li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>.
 <p><li>Clone the hackflight repository.
-<p><li>Drag the plugin <b>hackflight/sim/build/lib_vRepExtHackflight.dll</b>
+<p><li>Drag the plugin <b>hackflight/sim/build/v_repExtHackflight.dll</b>
 to the V-REP folder where the other DLLs are. On my computer this is
 <b>C:\Program FIles (x86)\V-REP3\V-REP_PRO_EDU</b>.
 <p><li>Plug in your R/C transmitter, joystick, or game controller. Currently supported:
