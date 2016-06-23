@@ -17,7 +17,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include "v_repExtHackflight.h"
 #include "scriptFunctionData.h"
 #include <iostream>
@@ -36,7 +35,7 @@ enum Controller { TARANIS, SPEKTRUM, EXTREME3D, PS3 };
 static Controller controller;
 
 // Stick demands from controller
-static int demands[5];
+static int demands[4];
 
 #ifdef _WIN32
 
@@ -161,7 +160,6 @@ static void getController(void)
         // Some HID
         if (rdiDeviceInfo.dwType == RIM_TYPEHID)
         {
-
            switch (rdiDeviceInfo.hid.dwVendorId) {
 
 		   case 3727:
@@ -233,7 +231,6 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
         break;
 
     case PS3:
-
         demands[0] = axes[2];		// roll
         demands[1] = -rotAxes[2];	// pitch
         demands[2] = axes[0];		// yaw
@@ -251,15 +248,23 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 
 #include <stdio.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <string.h>
 
 static int joyfd;
+
+static int axismap[4];
+static int axisdir[4];
 
 static void getController(void)
 { 
     joyfd = open(JOY_DEV, O_RDONLY);
 
+    for (int k=0; k<4; ++k)
+        axisdir[k] = +1;
+
     if (joyfd > 0) {
+
         fcntl(joyfd, F_SETFL, O_NONBLOCK);
 
         char name[128];
@@ -268,15 +273,35 @@ static void getController(void)
 
         if (strstr(name, "Taranis")) {
             controller = TARANIS;
+            axismap[0] = 0;
+            axismap[1] = 1;
+            axismap[2] = 2;
+            axismap[3] = 3;
         }
         else if (strstr(name, "WAILLY")) {
             controller = SPEKTRUM;
+            axismap[0] = 1;
+            axismap[1] = 2;
+            axismap[2] = 5;
+            axismap[3] = 0;
         }
         else if (strstr(name, "MY-POWER CO.")) {
             controller = PS3;
+            axismap[0] = 2;
+            axismap[1] = 3;
+            axismap[2] = 0;
+            axismap[3] = 1;
+            axisdir[1] = -1;
+            axisdir[3] = -1;
         }
         else if (strstr(name, "Extreme 3D")) {
             controller = EXTREME3D;
+            axismap[0] = 0;
+            axismap[1] = 1;
+            axismap[2] = 2;
+            axismap[3] = 3;
+            axisdir[1] = -1;
+            axisdir[3] = -1;
         }
         else {
             printf("Uknown controller: %s\n", name);
@@ -286,12 +311,19 @@ static void getController(void)
 
 static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 {
-    demands[0] = 0;		// roll
-    demands[1] = 0;	    // pitch
-    demands[2] = 0;		// yaw
-    demands[3] = -1000; // throttle
+    if (!joyfd)
+        return;
+
+    struct js_event js;
+
+    read(joyfd, &js, sizeof(struct js_event));
+
+    if (js.type & JS_EVENT_AXIS) 
+        for (int k=0; k<4; ++k)
+            if (js.number == axismap[k]) 
+                demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
 }
-#endif
+#endif // Linux
 
 #if defined (__linux) || defined (__APPLE__)
 #include <unistd.h>
@@ -318,7 +350,7 @@ static uint32_t micros;
 static bool ready;
 
 // needed for spring-mounted throttle stick
-static int ps3throttle;
+static int throttleDemand;
 #define PS3_THROTTLE_INC .01                
 
 // IMU support
@@ -347,19 +379,19 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     setup();
 
     // Need this to handle keyboard for throttle and springy PS3 collective stick
-    ps3throttle = -1000;
+    throttleDemand = -1000;
     demands[3] = -1000;
 
-	// Each input device has its own axis and button mappings
-	getController();
+    // Each input device has its own axis and button mappings
+    getController();
 
     // Now we're ready
     ready = true;
 
-	// Return success to V-REP
-	CScriptFunctionData D;
-	D.pushOutData(CScriptFunctionDataItem(true));
-	D.writeDataToStack(cb->stackID);
+    // Return success to V-REP
+    CScriptFunctionData D;
+    D.pushOutData(CScriptFunctionDataItem(true));
+    D.writeDataToStack(cb->stackID);
 }
 
 // --------------------------------------------------------------------------------------
@@ -371,8 +403,8 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 static const int inArgs_UPDATE[]={
     6,
     sim_script_arg_int32|sim_script_arg_table,3,  // primary axis values
-	sim_script_arg_int32|sim_script_arg_table,3,  // rotational axis values
-	sim_script_arg_int32|sim_script_arg_table,2,  // sliders
+    sim_script_arg_int32|sim_script_arg_table,3,  // rotational axis values
+    sim_script_arg_int32|sim_script_arg_table,2,  // sliders
     sim_script_arg_double|sim_script_arg_table,3, // Gyro values
     sim_script_arg_double|sim_script_arg_table,3, // Accelerometer values
     sim_script_arg_int32                          // Barometric pressure
@@ -387,23 +419,21 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
         // inData will be used in Windows only
-		getDemands(inData);
+        getDemands(inData);
 
-		// PS3 spring-mounted throttle requires special handling
-		if (controller == PS3) {
-			ps3throttle += (int)(demands[3] * PS3_THROTTLE_INC);     
-			if (ps3throttle < -1000)
-				ps3throttle = -1000;
-			if (ps3throttle > 1000)
-				ps3throttle = 1000;
-			demands[3] = ps3throttle;
-		}
+        // PS3 spring-mounted throttle requires special handling
+        if (controller == PS3) {
+            throttleDemand += (int)(demands[3] * PS3_THROTTLE_INC);     
+            if (throttleDemand < -1000)
+                throttleDemand = -1000;
+            if (throttleDemand > 1000)
+                throttleDemand = 1000;
+        }
+        else {
+            throttleDemand = demands[3];
+        }
 
-		// XXX Don't support aux switch for now
-		demands[4] = -1000;
-
-        //printf("r: %4d    p: %4d    y: %4d    t: %4d    a: %4d\n", demands[0], demands[1], demands[2], demands[3], demands[4]);
-
+        //printf("r: %4d    p: %4d    y: %4d    t: %4d\n", demands[0], demands[1], demands[2], demands[3]);
 
         // Read gyro, accelerometer
         for (int k=0; k<3; ++k) {
@@ -439,73 +469,73 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
-	CScriptFunctionData D;
-	D.pushOutData(CScriptFunctionDataItem(true));
-	D.writeDataToStack(cb->stackID);
+    CScriptFunctionData D;
+    D.pushOutData(CScriptFunctionDataItem(true));
+    D.writeDataToStack(cb->stackID);
 }
 // --------------------------------------------------------------------------------------
 
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 { // This is called just once, at the start of V-REP.
-	// Dynamically load and bind V-REP functions:
-	char curDirAndFile[1024];
+    // Dynamically load and bind V-REP functions:
+    char curDirAndFile[1024];
 #ifdef _WIN32
-	#ifdef QT_COMPIL
-		_getcwd(curDirAndFile, sizeof(curDirAndFile));
-	#else
-		GetModuleFileName(NULL,curDirAndFile,1023);
-		PathRemoveFileSpec(curDirAndFile);
-	#endif
+#ifdef QT_COMPIL
+    _getcwd(curDirAndFile, sizeof(curDirAndFile));
+#else
+    GetModuleFileName(NULL,curDirAndFile,1023);
+    PathRemoveFileSpec(curDirAndFile);
+#endif
 #elif defined (__linux) || defined (__APPLE__)
-	getcwd(curDirAndFile, sizeof(curDirAndFile));
+    getcwd(curDirAndFile, sizeof(curDirAndFile));
 #endif
 
-	std::string currentDirAndPath(curDirAndFile);
-	std::string temp(currentDirAndPath);
+    std::string currentDirAndPath(curDirAndFile);
+    std::string temp(currentDirAndPath);
 
 #ifdef _WIN32
-	temp+="\\v_rep.dll";
+    temp+="\\v_rep.dll";
 #elif defined (__linux)
-	temp+="/libv_rep.so";
+    temp+="/libv_rep.so";
 #elif defined (__APPLE__)
-	temp+="/libv_rep.dylib";
+    temp+="/libv_rep.dylib";
 #endif /* __linux || __APPLE__ */
 
-	vrepLib=loadVrepLibrary(temp.c_str());
-	if (vrepLib==NULL)
-	{
-		std::cout << "Error, could not find or correctly load v_rep.dll. Cannot start 'Hackflight' plugin.\n";
-		return(0); // Means error, V-REP will unload this plugin
-	}
-	if (getVrepProcAddresses(vrepLib)==0)
-	{
-		std::cout << "Error, could not find all required functions in v_rep plugin. Cannot start 'Hackflight' plugin.\n";
-		unloadVrepLibrary(vrepLib);
-		return(0); // Means error, V-REP will unload this plugin
-	}
+    vrepLib=loadVrepLibrary(temp.c_str());
+    if (vrepLib==NULL)
+    {
+        std::cout << "Error, could not find or correctly load v_rep.dll. Cannot start 'Hackflight' plugin.\n";
+        return(0); // Means error, V-REP will unload this plugin
+    }
+    if (getVrepProcAddresses(vrepLib)==0)
+    {
+        std::cout << "Error, could not find all required functions in v_rep plugin. Cannot start 'Hackflight' plugin.\n";
+        unloadVrepLibrary(vrepLib);
+        return(0); // Means error, V-REP will unload this plugin
+    }
 
-	// Check the V-REP version:
-	int vrepVer;
-	simGetIntegerParameter(sim_intparam_program_version,&vrepVer);
-	if (vrepVer<30200) // if V-REP version is smaller than 3.02.00
-	{
-		std::cout << "Sorry, your V-REP copy is somewhat old, V-REP 3.2.0 or higher is required. Cannot start 'Hackflight' plugin.\n";
-		unloadVrepLibrary(vrepLib);
-		return(0); // Means error, V-REP will unload this plugin
-	}
+    // Check the V-REP version:
+    int vrepVer;
+    simGetIntegerParameter(sim_intparam_program_version,&vrepVer);
+    if (vrepVer<30200) // if V-REP version is smaller than 3.02.00
+    {
+        std::cout << "Sorry, your V-REP copy is somewhat old, V-REP 3.2.0 or higher is required. Cannot start 'Hackflight' plugin.\n";
+        unloadVrepLibrary(vrepLib);
+        return(0); // Means error, V-REP will unload this plugin
+    }
 
-	// Register new Lua commands:
-	simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME),strConCat("boolean result=",LUA_START_COMMAND,"(number HackflightHandle,number duration,boolean returnDirectly=false)"),LUA_START_CALLBACK);
+    // Register new Lua commands:
+    simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME),strConCat("boolean result=",LUA_START_COMMAND,"(number HackflightHandle,number duration,boolean returnDirectly=false)"),LUA_START_CALLBACK);
     simRegisterScriptCallbackFunction(strConCat(LUA_UPDATE_COMMAND,"@",PLUGIN_NAME), NULL, LUA_UPDATE_CALLBACK);
-	simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME),strConCat("boolean result=",LUA_STOP_COMMAND,"(number HackflightHandle)"),LUA_STOP_CALLBACK);
+    simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME),strConCat("boolean result=",LUA_STOP_COMMAND,"(number HackflightHandle)"),LUA_STOP_CALLBACK);
 
-	return 8; // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
+    return 8; // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
 }
 
 VREP_DLLEXPORT void v_repEnd()
 { // This is called just once, at the end of V-REP
-	unloadVrepLibrary(vrepLib); // release the library
+    unloadVrepLibrary(vrepLib); // release the library
 }
 
 #ifdef CONTROLLER_KEYBOARD
@@ -538,7 +568,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
         return NULL;
 
 #ifdef CONTROLLER_KEYBOARD
-     switch (_kbhit()) {
+    switch (_kbhit()) {
         case 10:
             increment(2);
             break;
@@ -549,11 +579,11 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
             increment(3);
             break;
         case 54:
-             decrement(3);
-             break;
+            decrement(3);
+            break;
         case 65:
-             increment(1);
-             break;
+            increment(1);
+            break;
         case 66:
             decrement(1);
             break;
@@ -565,7 +595,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
             break;
         case 47:
             //this->aux = +1;
-             break;
+            break;
         case 42:
             //this->aux = 0;
             break;
@@ -583,7 +613,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     // Call Hackflight loop() from here for most realistic simulation
     loop();
 
-	return NULL;
+    return NULL;
 }
 
 // Board implementation ======================================================
@@ -724,14 +754,14 @@ uint16_t Board::readPWM(uint8_t chan)
 {
     //return CONFIG_PWM_MIN;
 
+    int demand = (chan == 3) ? throttleDemand : demands[chan];
+
     // V-REP sends joystick demands in [-1000,+1000]
-    int pwm =  (int)(CONFIG_PWM_MIN + (demands[chan] + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
-    /*
-    if (chan < 5)
-        printf("%d: %d    ", chan, pwm);
-    if (chan == 4)
-        printf("\n");
-        */
+    int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
+       if (chan < 4)
+       printf("%d: %d    ", chan, pwm);
+       if (chan == 3)
+       printf("\n");
     return pwm;
 }
 
