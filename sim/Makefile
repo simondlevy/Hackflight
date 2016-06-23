@@ -64,6 +64,9 @@ uninstall:
 edit:
 	vim v_repExtHackflight.cpp
 
+distro:
+	cp $(PLUGIN) build
+
 commit:
 	git commit -a --allow-empty-message -m ""
 	git push
