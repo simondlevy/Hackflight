@@ -225,7 +225,7 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 
     case EXTREME3D:
         demands[0] = axes[0];		// roll
-        demands[1] = axes[1];		// pitch
+        demands[1] = -axes[1];		// pitch
         demands[2] = rotAxes[2];	// yaw
         demands[3] = -sliders[0];	// throttle
         break;
