@@ -37,7 +37,7 @@ the sticks a little at first for the simulator to detect them.
 <li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>.
 <p><li>Clone the hackflight repository.
 <p><li>Drag the plugin <b>hackflight/sim/build/libv_repExtHackflight.so</b>
-to the V-REP folder where the other DLLs are. On my computer this is
+to the V-REP folder where the other plugins are. On my computer this is
 <b>~/Software//V-REP_PRO_EDU_V3_3_1_64_Linux</b>.
 <p><li>Plug in your R/C transmitter, joystick, or game controller (see above).
 <p><li> Open a terminal window, navigate to the V-REP folder, and do <b>./vrep.sh</b> to launch V-REP.
