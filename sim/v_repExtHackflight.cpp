@@ -31,6 +31,10 @@ using namespace std;
 // WIN32 support
 #include <crossplatform.h>
 
+// We currently support these controllers
+enum Controller { TARANIS, SPEKTRUM, EXTREME3D, PS3 };
+static Controller controller;
+
 // Stick demands from controller
 static int demands[5];
 
@@ -42,10 +46,6 @@ static int demands[5];
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
 #endif
-
-// We currently support these controllers
-enum Controller { TARANIS, SPEKTRUM, EXTREMEPRO3D, PS3 };
-static Controller controller;
 
 // Adapted from http://cboard.cprogramming.com/windows-programming/114294-getting-list-usb-devices-listed-system.html
 static void getController(void)
@@ -177,7 +177,7 @@ static void getController(void)
 			   break;
 
 		   case 1133:
-			   controller = EXTREMEPRO3D; // XXX product ID = 49685
+			   controller = EXTREME3D; // XXX product ID = 49685
 			   break;
 		   }
             
@@ -225,7 +225,7 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
         demands[3] = axes[0];		// throttle
         break;
 
-    case EXTREMEPRO3D:
+    case EXTREME3D:
         demands[0] = axes[0];		// roll
         demands[1] = axes[1];		// pitch
         demands[2] = rotAxes[2];	// yaw
@@ -244,6 +244,46 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 
 // joystick support for Linux
 #ifdef __linux
+
+#define JOY_DEV "/dev/input/js0"
+
+#include <linux/joystick.h>
+
+#include <stdio.h>
+#include <fcntl.h>
+#include <string.h>
+
+static int joyfd;
+
+static void getController(void)
+{ 
+    joyfd = open(JOY_DEV, O_RDONLY);
+
+    if (joyfd > 0) {
+        fcntl(joyfd, F_SETFL, O_NONBLOCK);
+
+        char name[128];
+        if (ioctl(joyfd, JSIOCGNAME(sizeof(name)), name) < 0)
+            printf("Uknown controller\n");
+
+        if (strstr(name, "Taranis")) {
+            controller = TARANIS;
+        }
+        else if (strstr(name, "WAILLY")) {
+            controller = SPEKTRUM;
+        }
+        else if (strstr(name, "MY-POWER CO.")) {
+            controller = PS3;
+        }
+        else if (strstr(name, "Extreme 3D")) {
+            controller = EXTREME3D;
+        }
+        else {
+            printf("Uknown controller: %s\n", name);
+        }
+    }
+} 
+
 static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 {
     demands[0] = 0;		// roll
@@ -686,10 +726,12 @@ uint16_t Board::readPWM(uint8_t chan)
 
     // V-REP sends joystick demands in [-1000,+1000]
     int pwm =  (int)(CONFIG_PWM_MIN + (demands[chan] + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
+    /*
     if (chan < 5)
         printf("%d: %d    ", chan, pwm);
     if (chan == 4)
         printf("\n");
+        */
     return pwm;
 }
 
