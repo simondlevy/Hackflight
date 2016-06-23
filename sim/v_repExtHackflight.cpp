@@ -307,7 +307,7 @@ static void getController(void)
             axismap[2] = 2;
             axismap[3] = 3;
         }
-        else if (strstr(name, "WAILLY")) {
+        else if (strstr(name, "PPM TO USB Adapter")) {
             controller = SPEKTRUM;
             axismap[0] = 1;
             axismap[1] = 2;
