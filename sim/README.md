@@ -6,6 +6,8 @@
 
 <ol>
 <li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>
+<p><li>Download the hackflight 
+<a href="https://github.com/simondlevy/hackflight/blob/master/sim/hackflight.ttt">scene</a>.
 <p><li>Download the <a href="https://github.com/simondlevy/hackflight/blob/master/sim/build/libv_repExtHackflight.dll">
 DLL plugin file</a> to the V-REP folder where the other DLLs are. On my computer this is
 <b>C:\Program FIles (x86)\V-REP3\V-REP_PRO_EDU</b>.
@@ -35,6 +37,8 @@ the sticks a little at first for the simulator to detect them.
 
 <ol>
 <li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>
+<p><li>Download the hackflight 
+<a href="https://github.com/simondlevy/hackflight/blob/master/sim/hackflight.ttt">scene</a>.
 <p><li>Download the <a href="https://github.com/simondlevy/hackflight/blob/master/sim/build/libv_repExtHackflight.so">
 plugin file</a> to the V-REP top-level folder. On my computer this is
 <b>~/Software//V-REP_PRO_EDU_V3_3_1_64_Linux</b>.
@@ -46,4 +50,16 @@ plugin file</a> to the V-REP top-level folder. On my computer this is
 <b>Quickstart, Mac OS X</b>
 <i>Coming soon!</i>
 
+<b>Developing for Windows</b>
+
+You will need Visual Studio for C++.  (I installed the free Visual C++ 2010 Express.) After cloning 
+the hackflight repository, double-click on
+<b>v_repExtHackflight.vcxproj</b> to launch the project.  
+
+<b>Developing for Linux and Mac OS X</b>
+
+After cloning the hackflight repository, edit the <tt>VREP\_DIR</b> variable in
+the Makefile in this directory (<b>hackflight/sim</b>) to reflect where you
+installed V-REP.  Typing <b>make install</b> should then build the plugin and
+install it the appropriate place.
 
