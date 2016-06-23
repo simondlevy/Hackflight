@@ -19,7 +19,7 @@
 
 enum Controller { TARANIS, SPEKTRUM, EXTREMEPRO3D, PS3 };
 
-static Controller controller = EXTREMEPRO3D;
+static Controller controller = TARANIS;
 
 #include "v_repExtHackflight.h"
 #include "scriptFunctionData.h"
@@ -31,14 +31,68 @@ static Controller controller = EXTREMEPRO3D;
 // WIN32 support
 #include <crossplatform.h>
 
+// Stick demands from controller
+static int demands[5];
+
 #ifdef _WIN32
-	#ifdef QT_COMPIL
-		#include <direct.h>
-	#else
-		#include <shlwapi.h>
-		#pragma comment(lib, "Shlwapi.lib")
-	#endif
+
+#ifdef QT_COMPIL
+#include <direct.h>
+#else
+#include <shlwapi.h>
+#pragma comment(lib, "Shlwapi.lib")
+#endif
+
+// Grabs stick demands from script via Windows plugin
+static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
+{
+    int axes[3], rotAxes[3], sliders[2];
+
+    // Read joystick axes
+    for (int k=0; k<3; ++k) {
+        axes[k] = inData->at(0).int32Data[k]; 
+        rotAxes[k] = inData->at(1).int32Data[k]; 
+    }
+
+    // Read sliders
+    for (int k=0; k<2; ++k) {
+        sliders[k] = inData->at(2).int32Data[k]; 
+    }
+
+    // Handle each controller differently
+    switch (controller) {
+
+    case TARANIS:
+        demands[0] = axes[0];     // roll
+        demands[1] = axes[1];     // pitch
+        demands[2] = axes[2];     // yaw
+        demands[3] = rotAxes[0];  // throttle			
+        break;
+
+    case SPEKTRUM:
+        demands[0] = axes[1];		// roll
+        demands[1] = axes[2];		// pitch
+        demands[2] = rotAxes[2];	// yaw
+        demands[3] = axes[0];		// throttle
+        break;
+
+    case EXTREMEPRO3D:
+        demands[0] = axes[0];		// roll
+        demands[1] = axes[1];		// pitch
+        demands[2] = rotAxes[2];	// yaw
+        demands[3] = -sliders[0];	// throttle
+        break;
+
+    case PS3:
+
+        demands[0] = axes[2];		// roll
+        demands[1] = -rotAxes[2];	// pitch
+        demands[2] = axes[0];		// yaw
+        demands[3] = -axes[1];		// throttle
+	}
+}
 #endif /* _WIN32 */
+
 #if defined (__linux) || defined (__APPLE__)
 	#include <unistd.h>
 	#include <fcntl.h>
@@ -62,9 +116,6 @@ static uint32_t micros;
 
 // Launch support
 static bool ready;
-
-// Stick demands from controller
-static int demands[5];
 
 // needed for spring-mounted throttle stick
 static int ps3throttle;
@@ -127,62 +178,21 @@ static const int inArgs_UPDATE[]={
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
+
     if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
+
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
-		int axes[3], rotAxes[3], sliders[2];
+		getDemands(inData);
 
-        // Read joystick axes
-        for (int k=0; k<3; ++k) {
-            axes[k] = inData->at(0).int32Data[k]; 
-			rotAxes[k] = inData->at(1).int32Data[k]; 
-		}
-
-		// Read sliders
-        for (int k=0; k<2; ++k) {
-            sliders[k] = inData->at(2).int32Data[k]; 
-		}
-
-		// Handle each controller differently
-		switch (controller) {
-
-		case TARANIS:
-			demands[0] = axes[0];     // roll
-			demands[1] = axes[1];     // pitch
-			demands[2] = axes[2];     // yaw
-			demands[3] = rotAxes[0];  // throttle			
-			break;
-
-		case SPEKTRUM:
-			demands[0] = axes[1];		// roll
-			demands[1] = axes[2];		// pitch
-			demands[2] = rotAxes[2];	// yaw
-			demands[3] = axes[0];		// throttle
-			break;
-
-		case EXTREMEPRO3D:
-			demands[0] = axes[0];		// roll
-			demands[1] = axes[1];		// pitch
-			demands[2] = rotAxes[2];	// yaw
-			demands[3] = -sliders[0];	// throttle
-			break;
-
-		case PS3:
-
-			demands[0] = axes[2];		// roll
-			demands[1] = -rotAxes[2];	// pitch
-			demands[2] = axes[0];		// yaw
-			demands[3] = -axes[1];		// throttle
-
-			// PS3 spring-mounted throttle requires special handling
-			ps3throttle += demands[3] * PS3_THROTTLE_INC;     
+		// PS3 spring-mounted throttle requires special handling
+		if (controller == PS3) {
+			ps3throttle += (int)(demands[3] * PS3_THROTTLE_INC);     
 			if (ps3throttle < -1000)
 				ps3throttle = -1000;
 			if (ps3throttle > 1000)
 				ps3throttle = 1000;
 			demands[3] = ps3throttle;
-
-			break;
 		}
 
 		// XXX Don't support aux switch for now
