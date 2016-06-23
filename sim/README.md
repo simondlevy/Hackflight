@@ -54,11 +54,12 @@ plugin file</a> to the V-REP top-level folder. On my computer this is
 
 You will need Visual Studio for C++.  (I installed the free Visual C++ 2010 Express.) After cloning 
 the hackflight repository, double-click on
-<b>v_repExtHackflight.vcxproj</b> to launch the project.  
+<b>v_repExtHackflight.vcxproj</b> to launch the project.  Building for Release will create the
+DLL file, which you can then move into the V-REP folder as in the Windows quickstart above.
 
 <b>Developing for Linux and Mac OS X</b>
 
-After cloning the hackflight repository, edit the <tt>VREP\_DIR</b> variable in
+After cloning the hackflight repository, edit the <tt>VREP\_DIR</tt> variable in
 the Makefile in this directory (<b>hackflight/sim</b>) to reflect where you
 installed V-REP.  Typing <b>make install</b> should then build the plugin and
 install it the appropriate place.
