@@ -18,8 +18,9 @@
 #
  
 # Edit this for where you installed V-REP
-#VREP_DIR = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
+VREP_DIR = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
 VREP_DIR = $(HOME)/Desktop/Research/V-REP_PRO_EDU_V3_3_1_Mac
+
 
 COMMON = $(VREP_DIR)/programming/common/
 CFLAGS = -Wall -I$(VREP_DIR)/programming/include/ -I. -I../include -I../firmware -Wall -fPIC -static
@@ -27,10 +28,12 @@ CFLAGS = -Wall -I$(VREP_DIR)/programming/include/ -I. -I../include -I../firmware
 OS = $(shell uname -s)
 ifeq ($(OS), Linux)
 	EXT = so
+    VREP_LIBDIR = $(VREP_DIR)
 else
 	EXT = dylib
 	CFLAGS += -I/Library/Frameworks/SDL2.framework/Headers/
 	JOYLIB = -lSDL2
+    VREP_LIBDIR = $(VREP_DIR)/vrep.app/Contents/MacOS/
 endif
 
 PLUGIN = libv_repExtHackflight.$(EXT)
@@ -53,7 +56,7 @@ libv_repExtHackflight.$(EXT): *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp Ma
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -ldl -shared $(JOYLIB)
 
 install: $(PLUGIN)
-	cp $(PLUGIN) $(VREP_DIR)
+	cp $(PLUGIN) $(VREP_LIBDIR)
 
 uninstall:
 	rm -f $(VREP_DIR)/$(PLUGIN)
