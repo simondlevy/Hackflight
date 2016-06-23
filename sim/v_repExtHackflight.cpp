@@ -239,6 +239,20 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 }
 #endif /* _WIN32 */
 
+// joystick support for OS X
+#ifdef __APPLE__
+
+static void getController(void)
+{
+}
+
+// Ignores input data (used only on Windows)
+static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
+{
+}
+
+#endif
+
 // joystick support for Linux
 #ifdef __linux
 
@@ -309,6 +323,7 @@ static void getController(void)
     }
 } 
 
+// Ignores input data (used only on Windows)
 static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 {
     if (!joyfd)

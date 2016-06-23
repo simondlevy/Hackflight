@@ -1,15 +1,13 @@
-controller_test
-a.out
+*.dylib
 *.so
 *.o
 *.swp
-*.pyc
 *~
 *#
 obj
 Debug
-ipch
 Release
+ipch
 *.sdf
 *.user
 *.suo

@@ -18,8 +18,8 @@
 #
  
 # Edit this for where you installed V-REP
-VREP_DIR = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
-#VREP_DIR = $(HOME)/Desktop/Research/V-REP_PRO_EDU_V3_3_1_Mac
+#VREP_DIR = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
+VREP_DIR = $(HOME)/Desktop/Research/V-REP_PRO_EDU_V3_3_1_Mac
 
 COMMON = $(VREP_DIR)/programming/common/
 CFLAGS = -Wall -I$(VREP_DIR)/programming/include/ -I. -I../include -I../firmware -Wall -fPIC -static
