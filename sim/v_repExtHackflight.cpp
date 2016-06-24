@@ -276,19 +276,29 @@ static void getController(void)
     }
     else if (strstr(name, "PPM TO USB Adapter")) {
         controller = SPEKTRUM;
+        axismap[0] = 1;
+        axismap[1] = 2;
+        axismap[2] = 5;
+        axismap[3] = 3;
     }
     else if (strstr(name, "2In1 USB Joystick")) {
         controller = PS3;
     }
     else if (strstr(name, "Extreme 3D")) {
         controller = EXTREME3D;
+        axismap[0] = 0;
+        axismap[1] = 1;
+        axismap[2] = 2;
+        axismap[3] = 3;
+        axisdir[1] = -1;
+        axisdir[3] = -1;
     }
     else {
         printf("Uknown controller: %s\n", name);
     }
 }
 
-// Ignores input data (used only on Windows)
+// Ignores input data (input data used only on Windows)
 static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 {
     if (!joystick)
@@ -298,6 +308,7 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
     SDL_Event event;
     while (SDL_PollEvent(&event))
         ;
+
 
     if (event.type == SDL_JOYAXISMOTION) {
         SDL_JoyAxisEvent js = event.jaxis;
@@ -379,7 +390,7 @@ static void getController(void)
     }
 } 
 
-// Ignores input data (used only on Windows)
+// Ignores input data (input data used only on Windows)
 static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 {
     if (!joyfd)
