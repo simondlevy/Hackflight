@@ -299,13 +299,15 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
     while (SDL_PollEvent(&event))
         ;
 
-    if (event.type == SDL_JOYAXISMOTION)
-        printf("MOTION\n");
+    if (event.type == SDL_JOYAXISMOTION) {
+        SDL_JoyAxisEvent js = event.jaxis;
+        printf("%d: %d\n", js.axis, js.value);
         /*
         for (int k=0; k<4; ++k)
             if (js.number == axismap[k]) 
                 demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
     */
+    }
 }
 
 #endif
