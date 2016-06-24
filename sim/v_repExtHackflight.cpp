@@ -350,17 +350,16 @@ static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
     // No joystick; use keyboard
     else {
 
-        /*
         fd_set set;
         struct timeval tv;
 
         tv.tv_sec = 0;
-        tv.tv_usec = 1000;
+        tv.tv_usec = 100;
 
         FD_ZERO( &set );
         FD_SET( fileno( stdin ), &set );
 
-        int res = select( fileno( stdin )+1, &set, NULL, NULL, &tv );
+        int res = select(fileno(stdin )+1, &set, NULL, NULL, &tv);
 
         char c = 0;
 
@@ -373,8 +372,7 @@ static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
 
         else if( res < 0 ) {
             perror( "select error" );
-        }*/
-
+        }
     }
 }
 
@@ -907,10 +905,12 @@ uint16_t Board::readPWM(uint8_t chan)
 
     // V-REP sends joystick demands in [-1000,+1000]
     int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
-       if (chan < 4)
-       printf("%d: %d    ", chan, pwm);
-       if (chan == 3)
-       printf("\n");
+    /*
+    if (chan < 4)
+        printf("%d: %d    ", chan, pwm);
+    if (chan == 3)
+        printf("\n");
+        */
     return pwm;
 }
 
