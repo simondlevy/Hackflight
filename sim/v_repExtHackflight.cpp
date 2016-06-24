@@ -239,6 +239,96 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 }
 #endif /* _WIN32 */
 
+// joystick support for Linux
+#ifdef __linux // ===================================================================
+
+#define JOY_DEV "/dev/input/js0"
+
+#include <linux/joystick.h>
+
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+
+static int joyfd;
+
+static int axismap[4];
+static int axisdir[4];
+
+static void getController(void)
+{ 
+    joyfd = open(JOY_DEV, O_RDONLY);
+
+    for (int k=0; k<4; ++k)
+        axisdir[k] = +1;
+
+    if (joyfd > 0) {
+
+        fcntl(joyfd, F_SETFL, O_NONBLOCK);
+
+        char name[128];
+        if (ioctl(joyfd, JSIOCGNAME(sizeof(name)), name) < 0)
+            printf("Uknown controller\n");
+
+        if (strstr(name, "Taranis")) {
+            controller = TARANIS;
+            axismap[0] = 0;
+            axismap[1] = 1;
+            axismap[2] = 2;
+            axismap[3] = 3;
+        }
+        else if (strstr(name, "PPM TO USB Adapter")) {
+            controller = SPEKTRUM;
+            axismap[0] = 1;
+            axismap[1] = 2;
+            axismap[2] = 5;
+            axismap[3] = 0;
+        }
+        else if (strstr(name, "MY-POWER CO.")) {
+            controller = PS3;
+            axismap[0] = 2;
+            axismap[1] = 3;
+            axismap[2] = 0;
+            axismap[3] = 1;
+            axisdir[1] = -1;
+            axisdir[3] = -1;
+        }
+        else if (strstr(name, "Extreme 3D")) {
+            controller = EXTREME3D;
+            axismap[0] = 0;
+            axismap[1] = 1;
+            axismap[2] = 2;
+            axismap[3] = 3;
+            axisdir[1] = -1;
+            axisdir[3] = -1;
+        }
+        else {
+            printf("Uknown controller: %s\n", name);
+        }
+    }
+} 
+
+// Ignores input data (input data used only on Windows)
+static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
+{
+    // joyfd should be a positive integer if there's a joystick
+    if (joyfd < 1) {
+        printf("no joystick!\n");
+        return;
+    }
+
+    struct js_event js;
+
+    read(joyfd, &js, sizeof(struct js_event));
+
+    if (js.type & JS_EVENT_AXIS) 
+        for (int k=0; k<4; ++k)
+            if (js.number == axismap[k]) 
+                demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
+}
+#endif // Linux
+
 // joystick support for OS X
 #ifdef __APPLE__  // ===================================================================
 
@@ -314,93 +404,6 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 }
 
 #endif // OS X
-
-// joystick support for Linux
-#ifdef __linux // ===================================================================
-
-#define JOY_DEV "/dev/input/js0"
-
-#include <linux/joystick.h>
-
-#include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-
-static int joyfd;
-
-static int axismap[4];
-static int axisdir[4];
-
-static void getController(void)
-{ 
-    joyfd = open(JOY_DEV, O_RDONLY);
-
-    for (int k=0; k<4; ++k)
-        axisdir[k] = +1;
-
-    if (joyfd > 0) {
-
-        fcntl(joyfd, F_SETFL, O_NONBLOCK);
-
-        char name[128];
-        if (ioctl(joyfd, JSIOCGNAME(sizeof(name)), name) < 0)
-            printf("Uknown controller\n");
-
-        if (strstr(name, "Taranis")) {
-            controller = TARANIS;
-            axismap[0] = 0;
-            axismap[1] = 1;
-            axismap[2] = 2;
-            axismap[3] = 3;
-        }
-        else if (strstr(name, "PPM TO USB Adapter")) {
-            controller = SPEKTRUM;
-            axismap[0] = 1;
-            axismap[1] = 2;
-            axismap[2] = 5;
-            axismap[3] = 0;
-        }
-        else if (strstr(name, "MY-POWER CO.")) {
-            controller = PS3;
-            axismap[0] = 2;
-            axismap[1] = 3;
-            axismap[2] = 0;
-            axismap[3] = 1;
-            axisdir[1] = -1;
-            axisdir[3] = -1;
-        }
-        else if (strstr(name, "Extreme 3D")) {
-            controller = EXTREME3D;
-            axismap[0] = 0;
-            axismap[1] = 1;
-            axismap[2] = 2;
-            axismap[3] = 3;
-            axisdir[1] = -1;
-            axisdir[3] = -1;
-        }
-        else {
-            printf("Uknown controller: %s\n", name);
-        }
-    }
-} 
-
-// Ignores input data (input data used only on Windows)
-static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
-{
-    if (!joyfd)
-        return;
-
-    struct js_event js;
-
-    read(joyfd, &js, sizeof(struct js_event));
-
-    if (js.type & JS_EVENT_AXIS) 
-        for (int k=0; k<4; ++k)
-            if (js.number == axismap[k]) 
-                demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
-}
-#endif // Linux
 
 #if defined (__linux) || defined (__APPLE__)
 #include <unistd.h>
