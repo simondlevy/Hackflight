@@ -301,12 +301,9 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 
     if (event.type == SDL_JOYAXISMOTION) {
         SDL_JoyAxisEvent js = event.jaxis;
-        printf("%d: %d\n", js.axis, js.value);
-        /*
         for (int k=0; k<4; ++k)
-            if (js.number == axismap[k]) 
+            if (js.axis == axismap[k]) 
                 demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
-    */
     }
 }
 
@@ -507,7 +504,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
             throttleDemand = demands[3];
         }
 
-        //printf("r: %4d    p: %4d    y: %4d    t: %4d\n", demands[0], demands[1], demands[2], demands[3]);
+        printf("r: %4d    p: %4d    y: %4d    t: %4d\n", demands[0], demands[1], demands[2], demands[3]);
 
         // Read gyro, accelerometer
         for (int k=0; k<3; ++k) {
