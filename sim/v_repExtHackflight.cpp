@@ -276,10 +276,8 @@ static void getController(void)
     }
     else if (strstr(name, "PPM TO USB Adapter")) {
         controller = SPEKTRUM;
-        axismap[0] = 1;
-        axismap[1] = 2;
-        axismap[2] = 5;
-        axismap[3] = 3;
+        printf("Spektrum PPM to USB currently not supported on OS X\n");
+        joystick = NULL;
     }
     else if (strstr(name, "2In1 USB Joystick")) {
         controller = PS3;
@@ -515,7 +513,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
             throttleDemand = demands[3];
         }
 
-        printf("r: %4d    p: %4d    y: %4d    t: %4d\n", demands[0], demands[1], demands[2], demands[3]);
+        //printf("r: %4d    p: %4d    y: %4d    t: %4d\n", demands[0], demands[1], demands[2], demands[3]);
 
         // Read gyro, accelerometer
         for (int k=0; k<3; ++k) {
