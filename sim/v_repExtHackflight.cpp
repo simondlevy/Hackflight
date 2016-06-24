@@ -47,7 +47,7 @@ static int demands[4];
 #endif
 
 // Adapted from http://cboard.cprogramming.com/windows-programming/114294-getting-list-usb-devices-listed-system.html
-static void getController(void)
+static void controllerInit(void)
 { 
     // Get Number Of Devices
     UINT nDevices = 0;
@@ -191,7 +191,7 @@ static void getController(void)
 }
 
 // Grabs stick demands from script via Windows plugin
-static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
+static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
 {
     int axes[3], rotAxes[3], sliders[2];
 
@@ -237,6 +237,11 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
         demands[3] = -axes[1];		// throttle
 	}
 }
+
+static void controllerClose(void)
+{
+    // XXX no action needed (?)
+}
 #endif /* _WIN32 */
 
 // joystick support for Linux
@@ -250,13 +255,16 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <termios.h>
 
 static int joyfd;
 
 static int axismap[4];
 static int axisdir[4];
 
-static void getController(void)
+static struct termios oldSettings;
+
+static void controllerInit(void)
 { 
     joyfd = open(JOY_DEV, O_RDONLY);
 
@@ -307,25 +315,76 @@ static void getController(void)
             printf("Uknown controller: %s\n", name);
         }
     }
+
+    // No joystick detected; use keyboard as fallback
+    else {
+
+        struct termios newSettings;
+
+        // Save keyboard settings for restoration later
+        tcgetattr(fileno( stdin ), &oldSettings);
+
+        // Create new keyboard settings
+        newSettings = oldSettings;
+        newSettings.c_lflag &= (~ICANON & ~ECHO);
+        tcsetattr(fileno(stdin), TCSANOW, &newSettings);
+    }
 } 
 
+static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
 // Ignores input data (input data used only on Windows)
-static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 {
-    // joyfd should be a positive integer if there's a joystick
-    if (joyfd < 1) {
-        printf("no joystick!\n");
-        return;
+    // Have a joystick; grab its axes
+    if (joyfd  > 0) {
+
+        struct js_event js;
+
+        read(joyfd, &js, sizeof(struct js_event));
+
+        if (js.type & JS_EVENT_AXIS) 
+            for (int k=0; k<4; ++k)
+                if (js.number == axismap[k]) 
+                    demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
     }
 
-    struct js_event js;
+    // No joystick; use keyboard
+    else {
 
-    read(joyfd, &js, sizeof(struct js_event));
+        /*
+        fd_set set;
+        struct timeval tv;
 
-    if (js.type & JS_EVENT_AXIS) 
-        for (int k=0; k<4; ++k)
-            if (js.number == axismap[k]) 
-                demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
+        tv.tv_sec = 0;
+        tv.tv_usec = 1000;
+
+        FD_ZERO( &set );
+        FD_SET( fileno( stdin ), &set );
+
+        int res = select( fileno( stdin )+1, &set, NULL, NULL, &tv );
+
+        char c = 0;
+
+        if( res > 0 )
+        {
+            read(fileno( stdin ), &c, 1);
+
+            printf("%02X\n", c);
+        }
+
+        else if( res < 0 ) {
+            perror( "select error" );
+        }*/
+
+    }
+}
+
+static void controllerClose(void)
+{
+    if (joyfd > 0)
+        close(joyfd);
+
+    else // reset keyboard if no joystick
+        tcsetattr(fileno(stdin), TCSANOW, &oldSettings);
 }
 #endif // Linux
 
@@ -339,7 +398,7 @@ static SDL_Joystick * joystick;
 static int axismap[4];
 static int axisdir[4];
 
-static void getController(void)
+static void controllerInit(void)
 {
     if (SDL_Init(SDL_INIT_JOYSTICK)) {
         printf("Failed to initialize SDL\n");
@@ -385,7 +444,7 @@ static void getController(void)
 }
 
 // Ignores input data (input data used only on Windows)
-static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
+static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
 {
     if (!joystick)
         return;
@@ -401,6 +460,12 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
             if (js.axis == axismap[k]) 
                 demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
     }
+}
+
+static void controllerClose(void)
+{
+    if (joystick)
+        SDL_JoystickClose(joystick);
 }
 
 #endif // OS X
@@ -465,7 +530,7 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     demands[3] = -1000;
 
     // Each input device has its own axis and button mappings
-    getController();
+    controllerInit();
 
     // Now we're ready
     ready = true;
@@ -501,7 +566,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
         // inData will be used in Windows only
-        getDemands(inData);
+        controllerRead(inData);
 
         // PS3 spring-mounted throttle requires special handling
         if (controller == PS3) {
@@ -551,6 +616,8 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
+    controllerClose();
+
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);
