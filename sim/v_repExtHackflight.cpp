@@ -37,7 +37,7 @@ static Controller controller;
 // Stick demands from controller
 static int demands[4];
 
-#ifdef _WIN32
+#ifdef _WIN32 // ===================================================================
 
 #ifdef QT_COMPIL
 #include <direct.h>
@@ -240,7 +240,7 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 #endif /* _WIN32 */
 
 // joystick support for OS X
-#ifdef __APPLE__
+#ifdef __APPLE__  // ===================================================================
 
 #include <SDL.h>
 
@@ -258,7 +258,26 @@ static void getController(void)
         return;
     }
 
-    printf("Name: %s\n", SDL_JoystickNameForIndex(0));
+    char name[100];
+    strcpy(name, SDL_JoystickNameForIndex(0));
+
+    if (strstr(name, "Taranis")) {
+        controller = TARANIS;
+        printf("TARANIS ******************\n");
+    }
+    else if (strstr(name, "PPM TO USB Adapter")) {
+        controller = SPEKTRUM;
+        printf("SPEKTRUM ******************\n");
+    }
+    else if (strstr(name, "2In1 USB Joystick")) {
+        controller = PS3;
+    }
+    else if (strstr(name, "Extreme 3D")) {
+        controller = EXTREME3D;
+    }
+    else {
+        printf("Uknown controller: %s\n", name);
+    }
 }
 
 // Ignores input data (used only on Windows)
@@ -269,7 +288,7 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 #endif
 
 // joystick support for Linux
-#ifdef __linux
+#ifdef __linux // ===================================================================
 
 #define JOY_DEV "/dev/input/js0"
 
@@ -782,7 +801,7 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    //return CONFIG_PWM_MIN;
+    return CONFIG_PWM_MIN;
 
     int demand = (chan == 3) ? throttleDemand : demands[chan];
 
