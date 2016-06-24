@@ -281,15 +281,13 @@ static void getController(void)
     }
     else if (strstr(name, "2In1 USB Joystick")) {
         controller = PS3;
+        printf("PS3 currently not supported on OS X\n");
+        joystick = NULL;
     }
     else if (strstr(name, "Extreme 3D")) {
         controller = EXTREME3D;
-        axismap[0] = 0;
-        axismap[1] = 1;
-        axismap[2] = 2;
-        axismap[3] = 3;
-        axisdir[1] = -1;
-        axisdir[3] = -1;
+        printf("PS3 currently not supported on OS X\n");
+        joystick = NULL;
     }
     else {
         printf("Uknown controller: %s\n", name);
@@ -307,7 +305,6 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
     while (SDL_PollEvent(&event))
         ;
 
-
     if (event.type == SDL_JOYAXISMOTION) {
         SDL_JoyAxisEvent js = event.jaxis;
         for (int k=0; k<4; ++k)
@@ -316,7 +313,7 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
     }
 }
 
-#endif
+#endif // OS X
 
 // joystick support for Linux
 #ifdef __linux // ===================================================================
@@ -458,8 +455,10 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     // Run Hackflight setup()
     setup();
 
-    // Need this to handle keyboard for throttle and springy PS3 collective stick
+    // Need this for throttle on keyboard and PS3
     throttleDemand = -1000;
+
+    // For safety, all controllers start at minimum throttle
     demands[3] = -1000;
 
     // Each input device has its own axis and button mappings
@@ -832,7 +831,7 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    return CONFIG_PWM_MIN;
+    //return CONFIG_PWM_MIN;
 
     int demand = (chan == 3) ? throttleDemand : demands[chan];
 
