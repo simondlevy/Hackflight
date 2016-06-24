@@ -246,6 +246,9 @@ static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 
 static SDL_Joystick * joystick;
 
+static int axismap[4];
+static int axisdir[4];
+
 static void getController(void)
 {
     if (SDL_Init(SDL_INIT_JOYSTICK)) {
@@ -258,16 +261,21 @@ static void getController(void)
         return;
     }
 
+    for (int k=0; k<4; ++k)
+        axisdir[k] = +1;
+
     char name[100];
     strcpy(name, SDL_JoystickNameForIndex(0));
 
     if (strstr(name, "Taranis")) {
         controller = TARANIS;
-        printf("TARANIS ******************\n");
+        axismap[0] = 0;
+        axismap[1] = 1;
+        axismap[2] = 2;
+        axismap[3] = 3;
     }
     else if (strstr(name, "PPM TO USB Adapter")) {
         controller = SPEKTRUM;
-        printf("SPEKTRUM ******************\n");
     }
     else if (strstr(name, "2In1 USB Joystick")) {
         controller = PS3;
@@ -283,6 +291,21 @@ static void getController(void)
 // Ignores input data (used only on Windows)
 static void getDemands(std::vector<CScriptFunctionDataItem>* inData)
 {
+    if (!joystick)
+        return;
+
+    // Poll until we get an event
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+        ;
+
+    if (event.type == SDL_JOYAXISMOTION)
+        printf("MOTION\n");
+        /*
+        for (int k=0; k<4; ++k)
+            if (js.number == axismap[k]) 
+                demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
+    */
 }
 
 #endif
