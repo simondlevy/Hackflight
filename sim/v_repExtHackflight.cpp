@@ -37,6 +37,9 @@ static Controller controller;
 // Stick demands from controller
 static int demands[4];
 
+// Support incremental axis adjustment for keyboard when no controller available
+static const float KEYBOARD_INC = 10;
+
 #ifdef _WIN32 // ===================================================================
 
 #ifdef QT_COMPIL
@@ -331,14 +334,26 @@ static void controllerInit(void)
     }
 } 
 
-static void increment(int k)
+static void change(int index, int dir)
 {
-    printf("+%d\n", k);
+    demands[index] += dir*KEYBOARD_INC;
+
+    if (demands[index] > 1000)
+        demands[index] = 1000;
+
+    if (demands[index] < -1000)
+        demands[index] = -1000;
 }
 
-static void decrement(int k)
+
+static void increment(int index)
 {
-    printf("-%d\n", k);
+    change(index, +1);
+}
+
+static void decrement(int index)
+{
+    change(index, -1);
 }
 
 
@@ -951,12 +966,10 @@ uint16_t Board::readPWM(uint8_t chan)
 
     // V-REP sends joystick demands in [-1000,+1000]
     int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
-    /*
     if (chan < 4)
         printf("%d: %d    ", chan, pwm);
     if (chan == 3)
         printf("\n");
-        */
     return pwm;
 }
 
