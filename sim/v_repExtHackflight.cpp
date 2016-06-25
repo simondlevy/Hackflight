@@ -331,6 +331,17 @@ static void controllerInit(void)
     }
 } 
 
+static void increment(int k)
+{
+    printf("+%d\n", k);
+}
+
+static void decrement(int k)
+{
+    printf("-%d\n", k);
+}
+
+
 static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
 // Ignores input data (input data used only on Windows)
 {
@@ -367,7 +378,42 @@ static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
         {
             read(fileno( stdin ), &c, 1);
 
-            printf("%02X\n", c);
+            switch (c) {
+
+                case 10:
+                    increment(2);
+                    break;
+                case 50:
+                    decrement(2);
+                    break;
+                case 53:
+                    increment(3);
+                    break;
+                case 54:
+                    decrement(3);
+                    break;
+                case 65:
+                    increment(1);
+                    break;
+                case 66:
+                    decrement(1);
+                    break;
+                case 67:
+                    increment(0);
+                    break;
+                case 68:
+                    decrement(0);
+                    break;
+                case 47:
+                    //this->aux = +1;
+                    break;
+                case 42:
+                    //this->aux = 0;
+                    break;
+                case 45:
+                    //this->aux = -1;
+                    break;
+            }
         }
 
         else if( res < 0 ) {
