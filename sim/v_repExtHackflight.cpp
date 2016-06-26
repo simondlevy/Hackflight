@@ -85,48 +85,23 @@ static void controllerInit(void)
         return;
     }
  
-    // Grab first device
-
-
-        // Get Character Count For Device Name
-        UINT nBufferSize = 0;
-        nResult = GetRawInputDeviceInfo( pRawInputDeviceList[0].hDevice, // Device
-                                         RIDI_DEVICENAME,                // Get Device Name
-                                         NULL,                           // NO Buff, Want Count!
-                                         &nBufferSize );                 // Char Count Here!
+    // Set Device Info & Buffer Size
+    RID_DEVICE_INFO rdiDeviceInfo;
+    rdiDeviceInfo.cbSize = sizeof( RID_DEVICE_INFO );
+    UINT nBufferSize = rdiDeviceInfo.cbSize;
  
-        // Got Device Name?
-        if( nResult < 0 ) {
-            // Error
-            cout << "ERR: Unable to get Device Name character count.. Moving to next device." << endl << endl;
+    // Get Device Info
+    nResult = GetRawInputDeviceInfo(pRawInputDeviceList[0].hDevice, RIDI_DEVICEINFO, &rdiDeviceInfo, &nBufferSize );
  
-            // Next
-            return;
-        }
- 
-        // Set Device Info & Buffer Size
-        RID_DEVICE_INFO rdiDeviceInfo;
-        rdiDeviceInfo.cbSize = sizeof( RID_DEVICE_INFO );
-        nBufferSize = rdiDeviceInfo.cbSize;
- 
-        // Get Device Info
-        nResult = GetRawInputDeviceInfo( pRawInputDeviceList[0].hDevice,
-                                         RIDI_DEVICEINFO,
-                                         &rdiDeviceInfo,
-                                         &nBufferSize );
- 
-        // Got All Buffer?
-        if( nResult < 0 )
-        {
-            // Error
-            cout << "ERR: Unable to read Device Info.. Moving to next device." << endl << endl;
- 
-            // Next
-            return;
-        }
+    // Got All Buffer?
+    if(nResult < 0 ) {
+        // Error
+        cout << "ERR: Unable to read Device Info.. Moving to next device." << endl << endl;
+        return;
+    }
   
-        // Some HID
-        if (rdiDeviceInfo.dwType == RIM_TYPEHID) {
+    // Some HID
+    if (rdiDeviceInfo.dwType == RIM_TYPEHID) {
 
            switch (rdiDeviceInfo.hid.dwVendorId) {
 
@@ -148,9 +123,8 @@ static void controllerInit(void)
 		   }
             
 			// XXX could also use if needed: rdiDeviceInfo.hid.dwProductId
-        }
+    }
     
- 
     // Clean Up - Free Memory
     delete [] pRawInputDeviceList;
 }
