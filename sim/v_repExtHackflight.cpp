@@ -350,35 +350,8 @@ static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
         if( res > 0 )
         {
             read(fileno( stdin ), &c, 1);
-
-            switch (c) {
-
-                case 68: // roll left
-                    kbdecrement(0);
-                    break;
-				case 67: // roll right
-                    kbincrement(0);
-                    break;
-                case 66: // pitch back
-                    kbdecrement(1);
-                    break;
-                case 65: // pitch forward
-                    kbincrement(1);
-                    break;
-                case 50: // yaw left
-                    kbdecrement(2);
-                    break;
-                case 10: // yaw right
-                    kbincrement(2);
-                    break;
-                case 54: // throttle down
-                    kbdecrement(3);
-                    break;
-				case 53: // throttle up
-                    kbincrement(3);
-                    break;
-
-            }
+            char keys[8] = {68, 67, 66, 65, 50, 10, 54, 53};
+            kbRespond(c, keys);
         }
 
         else if( res < 0 ) {
