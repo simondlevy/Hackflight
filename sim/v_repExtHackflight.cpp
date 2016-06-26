@@ -63,6 +63,26 @@ static void kbdecrement(int index)
     kbchange(index, -1);
 }
 
+static void kbRespond(char key, char * keys) 
+{
+	if      (key == keys[0])	// roll left
+        kbdecrement(0);
+	else if (key == keys[1])	// roll right
+        kbincrement(0);
+	else if (key == keys[2])	// pitch back
+        kbdecrement(1);
+	else if (key == keys[3])	// pitch forward
+        kbincrement(1);
+	else if (key == keys[4])	// yaw left
+        kbdecrement(2);
+	else if (key == keys[5])	// yaw right
+        kbincrement(2);		
+	else if (key == keys[6])	// throttle down
+        kbdecrement(3);
+	else if (key == keys[7])	// throttle up
+        kbincrement(3);
+
+}
 
 #ifdef _WIN32 // ===================================================================
 
@@ -205,37 +225,12 @@ static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
 	default:
 		 if (_kbhit()) {
             char c = _getch();
-
-            switch (c) {
-
-                case 13: // yaw right
-                    kbincrement(2);
-                    break;
-                case 48: // yaw left
-                    kbdecrement(2);
-                    break;
-                case 57: // throttle up
-                    kbincrement(3);
-                    break;
-                case 51: // throttle down
-                    kbdecrement(3);
-                    break;
-                case 56: // pitch forward
-                    kbincrement(1);
-                    break;
-                case 50: // pitch back
-                    kbdecrement(1);
-                    break;
-                case 54: // roll right
-                    kbincrement(0);
-                    break;
-                case 52: // roll left
-                    kbdecrement(0);
-                    break;
-            }
-		 }
-	}
+			char keys[8] = {52, 54, 50, 56, 48, 13, 51, 57};
+			kbRespond(c, keys);
+         }
+	 }
 }
+
 
 
 static void controllerClose(void)
@@ -369,39 +364,31 @@ static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
 
             switch (c) {
 
-                case 10: // yaw right
-                    kbincrement(2);
+                case 68: // roll left
+                    kbdecrement(0);
                     break;
-                case 50: // yaw left
-                    kbdecrement(2);
-                    break;
-                case 53: // throttle up
-                    kbincrement(3);
-                    break;
-                case 54: // throttle down
-                    kbdecrement(3);
-                    break;
-                case 65: // pitch forward
-                    kbincrement(1);
+				case 67: // roll right
+                    kbincrement(0);
                     break;
                 case 66: // pitch back
                     kbdecrement(1);
                     break;
-                case 67: // roll right
-                    kbincrement(0);
+                case 65: // pitch forward
+                    kbincrement(1);
                     break;
-                case 68: // roll left
-                    kbdecrement(0);
+                case 50: // yaw left
+                    kbdecrement(2);
                     break;
-                case 47:
-                    //this->aux = +1;
+                case 10: // yaw right
+                    kbincrement(2);
                     break;
-                case 42:
-                    //this->aux = 0;
+                case 54: // throttle down
+                    kbdecrement(3);
                     break;
-                case 45:
-                    //this->aux = -1;
+				case 53: // throttle up
+                    kbincrement(3);
                     break;
+
             }
         }
 
