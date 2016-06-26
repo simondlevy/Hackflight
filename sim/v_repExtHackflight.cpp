@@ -37,8 +37,32 @@ static Controller controller;
 // Stick demands from controller
 static int demands[4];
 
-// Support incremental axis adjustment for keyboard when no controller available
+// Keyboard support
+
 static const float KEYBOARD_INC = 10;
+
+static void kbchange(int index, int dir)
+{
+    demands[index] += (int)(dir*KEYBOARD_INC);
+
+    if (demands[index] > 1000)
+        demands[index] = 1000;
+
+    if (demands[index] < -1000)
+        demands[index] = -1000;
+}
+
+
+static void kbincrement(int index)
+{
+    kbchange(index, +1);
+}
+
+static void kbdecrement(int index)
+{
+    kbchange(index, -1);
+}
+
 
 #ifdef _WIN32 // ===================================================================
 
@@ -49,6 +73,7 @@ static const float KEYBOARD_INC = 10;
 #pragma comment(lib, "Shlwapi.lib")
 #endif
 
+#include <conio.h>
 
 // Adapted from http://cboard.cprogramming.com/windows-programming/114294-getting-list-usb-devices-listed-system.html
 static void controllerInit(void)
@@ -133,9 +158,6 @@ static void controllerInit(void)
 // Grabs stick demands from script via Windows plugin
 static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
 {
-	if (controller == NONE)
-		return;
-
     int axes[3], rotAxes[3], sliders[2];
 
     // Read joystick axes
@@ -178,8 +200,43 @@ static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
         demands[1] = -rotAxes[2];	// pitch
         demands[2] = axes[0];		// yaw
         demands[3] = -axes[1];		// throttle
+		break;
+
+	default:
+		 if (_kbhit()) {
+            char c = _getch();
+
+            switch (c) {
+
+                case 13: // yaw right
+                    kbincrement(2);
+                    break;
+                case 48: // yaw left
+                    kbdecrement(2);
+                    break;
+                case 57: // throttle up
+                    kbincrement(3);
+                    break;
+                case 51: // throttle down
+                    kbdecrement(3);
+                    break;
+                case 56: // pitch forward
+                    kbincrement(1);
+                    break;
+                case 50: // pitch back
+                    kbdecrement(1);
+                    break;
+                case 54: // roll right
+                    kbincrement(0);
+                    break;
+                case 52: // roll left
+                    kbdecrement(0);
+                    break;
+            }
+		 }
 	}
 }
+
 
 static void controllerClose(void)
 {
@@ -274,29 +331,6 @@ static void controllerInit(void)
     }
 } 
 
-static void change(int index, int dir)
-{
-    demands[index] += dir*KEYBOARD_INC;
-
-    if (demands[index] > 1000)
-        demands[index] = 1000;
-
-    if (demands[index] < -1000)
-        demands[index] = -1000;
-}
-
-
-static void increment(int index)
-{
-    change(index, +1);
-}
-
-static void decrement(int index)
-{
-    change(index, -1);
-}
-
-
 static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
 // Ignores input data (input data used only on Windows)
 {
@@ -335,29 +369,29 @@ static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
 
             switch (c) {
 
-                case 10:
-                    increment(2);
+                case 10: // yaw right
+                    kbincrement(2);
                     break;
-                case 50:
-                    decrement(2);
+                case 50: // yaw left
+                    kbdecrement(2);
                     break;
-                case 53:
-                    increment(3);
+                case 53: // throttle up
+                    kbincrement(3);
                     break;
-                case 54:
-                    decrement(3);
+                case 54: // throttle down
+                    kbdecrement(3);
                     break;
-                case 65:
-                    increment(1);
+                case 65: // pitch forward
+                    kbincrement(1);
                     break;
-                case 66:
-                    decrement(1);
+                case 66: // pitch back
+                    kbdecrement(1);
                     break;
-                case 67:
-                    increment(0);
+                case 67: // roll right
+                    kbincrement(0);
                     break;
-                case 68:
-                    decrement(0);
+                case 68: // roll left
+                    kbdecrement(0);
                     break;
                 case 47:
                     //this->aux = +1;
@@ -703,7 +737,7 @@ static void increment(int index)
     change(index, +1);
 }
 
-static void decrement(int index) 
+static void kbdecrement(int index) 
 {
     change(index, -1);
 }
@@ -714,44 +748,6 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     // Don't do anything till start() has been called
     if (!ready)
         return NULL;
-
-#ifdef CONTROLLER_KEYBOARD
-    switch (_kbhit()) {
-        case 10:
-            increment(2);
-            break;
-        case 50:
-            decrement(2);
-            break;
-        case 53:
-            increment(3);
-            break;
-        case 54:
-            decrement(3);
-            break;
-        case 65:
-            increment(1);
-            break;
-        case 66:
-            decrement(1);
-            break;
-        case 67:
-            increment(0);
-            break;
-        case 68:
-            decrement(0);
-            break;
-        case 47:
-            //this->aux = +1;
-            break;
-        case 42:
-            //this->aux = 0;
-            break;
-        case 45:
-            //this->aux = -1;
-            break;
-    }
-#endif
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
