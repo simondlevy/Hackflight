@@ -16,6 +16,8 @@ to the V-REP folder where the other DLLs are. On my computer this is
 <p><li>Spektrum DX-8 transmitter with GWS adapter cable (unfortunately no longer sold)
 <p><li>Logitch Extreme 3D Pro joystick
 <p><li>Nyko Core Controller for PS3
+<p><li>Keyboard, if none of the above are connected; not recommended because it requires you 
+to foreground the console.
 </ul>
 
 <p><li> Double-click on the hackflight scene <b>hackflight.ttt</b> to launch V-REP.
@@ -41,7 +43,7 @@ to the V-REP folder where the other plugins are. On my computer this is
 <b>~/Software//V-REP_PRO_EDU_V3_3_1_64_Linux</b>.
 <p><li>Plug in your R/C transmitter, joystick, or game controller (see above).
 <p><li> Open a terminal window, navigate to the V-REP folder, and do <b>./vrep.sh</b> to launch V-REP.
-<p><li> Follow steps 5-7 above.
+<p><li> Follow steps 6-7 above.
 </ol>
 
 <b>Quickstart, Mac OS X</b>
