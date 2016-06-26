@@ -31,7 +31,7 @@ using namespace std;
 #include <crossplatform.h>
 
 // We currently support these controllers
-enum Controller { TARANIS, SPEKTRUM, EXTREME3D, PS3 };
+enum Controller { NONE, TARANIS, SPEKTRUM, EXTREME3D, PS3 };
 static Controller controller;
 
 // Stick demands from controller
@@ -48,6 +48,7 @@ static const float KEYBOARD_INC = 10;
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
 #endif
+
 
 // Adapted from http://cboard.cprogramming.com/windows-programming/114294-getting-list-usb-devices-listed-system.html
 static void controllerInit(void)
@@ -96,31 +97,31 @@ static void controllerInit(void)
     // Got All Buffer?
     if(nResult < 0 ) {
         // Error
-        cout << "ERR: Unable to read Device Info.. Moving to next device." << endl << endl;
+        cout << "ERR: Unable to read Device Info." << endl;
         return;
     }
   
     // Some HID
     if (rdiDeviceInfo.dwType == RIM_TYPEHID) {
 
-           switch (rdiDeviceInfo.hid.dwVendorId) {
+        switch (rdiDeviceInfo.hid.dwVendorId) {
 
-		   case 3727:
-			   controller = PS3;
-			   break;
+		case 3727:
+			controller = PS3;
+			break;
 
-		   case 1155:
-			   controller = TARANIS;
-			   break;
+		case 1155:
+			controller = TARANIS;
+			break;
 
-		   case 1783:
-			   controller = SPEKTRUM;
-			   break;
+		case 1783:
+			 controller = SPEKTRUM;
+			 break;
 
-		   case 1133:
-			   controller = EXTREME3D; // XXX product ID = 49685
-			   break;
-		   }
+		case 1133:
+			 controller = EXTREME3D; // XXX product ID = 49685
+			 break;
+		}
             
 			// XXX could also use if needed: rdiDeviceInfo.hid.dwProductId
     }
@@ -132,6 +133,9 @@ static void controllerInit(void)
 // Grabs stick demands from script via Windows plugin
 static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
 {
+	if (controller == NONE)
+		return;
+
     int axes[3], rotAxes[3], sliders[2];
 
     // Read joystick axes
@@ -902,12 +906,12 @@ uint16_t Board::readPWM(uint8_t chan)
 
     // V-REP sends joystick demands in [-1000,+1000]
     int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
-	/*
+	
     if (chan < 4)
         printf("%d: %d    ", chan, pwm);
     if (chan == 3)
         printf("\n");
-	*/
+	
     return pwm;
 }
 
