@@ -65,8 +65,7 @@ static void controllerInit(void)
     pRawInputDeviceList = new RAWINPUTDEVICELIST[ sizeof( RAWINPUTDEVICELIST ) * nDevices ];
  
     // Got Memory?
-    if( pRawInputDeviceList == NULL )
-    {
+    if( pRawInputDeviceList == NULL ) {
         // Error
         cout << "ERR: Could not allocate memory for Device List.";
         return;
@@ -77,8 +76,7 @@ static void controllerInit(void)
     nResult = GetRawInputDeviceList( pRawInputDeviceList, &nDevices, sizeof( RAWINPUTDEVICELIST ) );
  
     // Got Device List?
-    if( nResult < 0 )
-    {
+    if( nResult < 0 ) {
         // Clean Up
         delete [] pRawInputDeviceList;
  
@@ -87,41 +85,39 @@ static void controllerInit(void)
         return;
     }
  
-    // Loop Through Device List
-    for( UINT i = 0; i < nDevices; i++ )
-    {
+    // Grab first device
+
+
         // Get Character Count For Device Name
         UINT nBufferSize = 0;
-        nResult = GetRawInputDeviceInfo( pRawInputDeviceList[i].hDevice, // Device
+        nResult = GetRawInputDeviceInfo( pRawInputDeviceList[0].hDevice, // Device
                                          RIDI_DEVICENAME,                // Get Device Name
                                          NULL,                           // NO Buff, Want Count!
                                          &nBufferSize );                 // Char Count Here!
  
         // Got Device Name?
-        if( nResult < 0 )
-        {
+        if( nResult < 0 ) {
             // Error
             cout << "ERR: Unable to get Device Name character count.. Moving to next device." << endl << endl;
  
             // Next
-            continue;
+            return;
         }
  
         // Allocate Memory For Device Name
         WCHAR* wcDeviceName = new WCHAR[ nBufferSize + 1 ];
          
         // Got Memory
-        if( wcDeviceName == NULL )
-        {
+        if( wcDeviceName == NULL ) {
             // Error
             cout << "ERR: Unable to allocate memory for Device Name.. Moving to next device." << endl << endl;
  
             // Next
-            continue;
+            return;
         }
  
         // Get Name
-        nResult = GetRawInputDeviceInfo( pRawInputDeviceList[i].hDevice, // Device
+        nResult = GetRawInputDeviceInfo( pRawInputDeviceList[0].hDevice, // Device
                                          RIDI_DEVICENAME,                // Get Device Name
                                          wcDeviceName,                   // Get Name!
                                          &nBufferSize );                 // Char Count
@@ -136,16 +132,16 @@ static void controllerInit(void)
             delete [] wcDeviceName;
  
             // Next
-            continue;
+            return;
         }
- 
+
         // Set Device Info & Buffer Size
         RID_DEVICE_INFO rdiDeviceInfo;
         rdiDeviceInfo.cbSize = sizeof( RID_DEVICE_INFO );
         nBufferSize = rdiDeviceInfo.cbSize;
  
         // Get Device Info
-        nResult = GetRawInputDeviceInfo( pRawInputDeviceList[i].hDevice,
+        nResult = GetRawInputDeviceInfo( pRawInputDeviceList[0].hDevice,
                                          RIDI_DEVICEINFO,
                                          &rdiDeviceInfo,
                                          &nBufferSize );
@@ -157,12 +153,12 @@ static void controllerInit(void)
             cout << "ERR: Unable to read Device Info.. Moving to next device." << endl << endl;
  
             // Next
-            continue;
+            return;
         }
   
         // Some HID
-        if (rdiDeviceInfo.dwType == RIM_TYPEHID)
-        {
+        if (rdiDeviceInfo.dwType == RIM_TYPEHID) {
+
            switch (rdiDeviceInfo.hid.dwVendorId) {
 
 		   case 3727:
@@ -187,7 +183,7 @@ static void controllerInit(void)
  
         // Delete Name Memory!
         delete [] wcDeviceName;
-    }
+    
  
     // Clean Up - Free Memory
     delete [] pRawInputDeviceList;
@@ -966,10 +962,12 @@ uint16_t Board::readPWM(uint8_t chan)
 
     // V-REP sends joystick demands in [-1000,+1000]
     int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
+	/*
     if (chan < 4)
         printf("%d: %d    ", chan, pwm);
     if (chan == 3)
         printf("\n");
+	*/
     return pwm;
 }
 
