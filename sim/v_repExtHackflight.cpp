@@ -104,37 +104,6 @@ static void controllerInit(void)
             return;
         }
  
-        // Allocate Memory For Device Name
-        WCHAR* wcDeviceName = new WCHAR[ nBufferSize + 1 ];
-         
-        // Got Memory
-        if( wcDeviceName == NULL ) {
-            // Error
-            cout << "ERR: Unable to allocate memory for Device Name.. Moving to next device." << endl << endl;
- 
-            // Next
-            return;
-        }
- 
-        // Get Name
-        nResult = GetRawInputDeviceInfo( pRawInputDeviceList[0].hDevice, // Device
-                                         RIDI_DEVICENAME,                // Get Device Name
-                                         wcDeviceName,                   // Get Name!
-                                         &nBufferSize );                 // Char Count
- 
-        // Got Device Name?
-        if( nResult < 0 ) {
-
-            // Error
-            cout << "ERR: Unable to get Device Name.. Moving to next device." << endl << endl;
- 
-            // Clean Up
-            delete [] wcDeviceName;
- 
-            // Next
-            return;
-        }
-
         // Set Device Info & Buffer Size
         RID_DEVICE_INFO rdiDeviceInfo;
         rdiDeviceInfo.cbSize = sizeof( RID_DEVICE_INFO );
@@ -180,9 +149,6 @@ static void controllerInit(void)
             
 			// XXX could also use if needed: rdiDeviceInfo.hid.dwProductId
         }
- 
-        // Delete Name Memory!
-        delete [] wcDeviceName;
     
  
     // Clean Up - Free Memory
