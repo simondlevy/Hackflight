@@ -65,23 +65,12 @@ static void kbdecrement(int index)
 
 static void kbRespond(char key, char * keys) 
 {
-	if      (key == keys[0])	// roll left
-        kbdecrement(0);
-	else if (key == keys[1])	// roll right
-        kbincrement(0);
-	else if (key == keys[2])	// pitch back
-        kbdecrement(1);
-	else if (key == keys[3])	// pitch forward
-        kbincrement(1);
-	else if (key == keys[4])	// yaw left
-        kbdecrement(2);
-	else if (key == keys[5])	// yaw right
-        kbincrement(2);		
-	else if (key == keys[6])	// throttle down
-        kbdecrement(3);
-	else if (key == keys[7])	// throttle up
-        kbincrement(3);
-
+	for (int k=0; k<8; ++k)
+		if (key == keys[k])
+			if (k%2)
+				kbincrement(k/2);
+			else
+				kbdecrement(k/2);
 }
 
 #ifdef _WIN32 // ===================================================================
