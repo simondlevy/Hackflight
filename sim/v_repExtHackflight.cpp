@@ -332,10 +332,28 @@ static void controllerRead(int * ignore)
 
         read(joyfd, &js, sizeof(struct js_event));
 
+        // Look at all five axes for R/C transmitters, first four for other controllers
+        int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
+
+        // Grab demands from axes
         if (js.type & JS_EVENT_AXIS) 
-            for (int k=0; k<5; ++k)
+            for (int k=0; k<maxaxis; ++k)
                 if (js.number == axismap[k]) 
                     demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
+
+        // Grab aux demand from buttons when detected
+        if (js.type & JS_EVENT_BUTTON && js.value) {
+            switch (js.number) {
+                case 0:
+                    demands[4] = -1000;
+                    break;
+                case 1:
+                    demands[4] =     0;
+                    break;
+                case 2:
+                    demands[4] = +1000;
+            }
+        }
     }
 
     // No joystick; use keyboard
