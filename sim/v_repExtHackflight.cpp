@@ -167,52 +167,38 @@ static void controllerInit(void)
 // Grabs stick demands from script via Windows plugin
 static void controllerRead(int * values) //std::vector<CScriptFunctionDataItem>* inData)
 {
-    int axes[3], rotAxes[3], slider, buttons;
-
-    // Read axes
-    for (int k=0; k<3; ++k) {
-        axes[k]    = values[k]; 
-        rotAxes[k] = values[k+3]; 
-    }
-
-	// Read slider
-	slider = values[6];
-
-	// Read buttons as a single bit-coded integer
-	buttons = values[7];
-
-	//printf("********* %d\n", buttons);
+	//printf("********* %d\n", values[7]);
 
     // Handle each controller differently
     switch (controller) {
 
     case TARANIS:
-        demands[0] = axes[0];     // roll
-        demands[1] = axes[1];     // pitch
-        demands[2] = axes[2];     // yaw
-        demands[3] = rotAxes[0];  // throttle			
-		demands[4] = rotAxes[1];  // aux switch
+        demands[0] = values[0];     // roll
+        demands[1] = values[1];     // pitch
+        demands[2] = values[2];     // yaw
+        demands[3] = values[3];  // throttle			
+		demands[4] = values[4];  // aux switch
         break;
 
     case SPEKTRUM:
-        demands[0] = axes[1];		// roll
-        demands[1] = axes[2];		// pitch
-        demands[2] = rotAxes[2];	// yaw
-        demands[3] = axes[0];		// throttle
+        demands[0] = values[1];		// roll
+        demands[1] = values[2];		// pitch
+        demands[2] = values[5];		// yaw
+        demands[3] = values[0];		// throttle
         break;
 
     case EXTREME3D:
-        demands[0] = axes[0];		// roll
-        demands[1] = -axes[1];		// pitch
-        demands[2] = rotAxes[2];	// yaw
-        demands[3] = -slider;	    // throttle
+        demands[0] =  values[0];	// roll
+        demands[1] = -values[1];	// pitch
+        demands[2] =  values[5];	// yaw
+        demands[3] = -values[6];	// throttle
         break;
 
     case PS3:
-        demands[0] = axes[2];		// roll
-        demands[1] = -rotAxes[2];	// pitch
-        demands[2] = axes[0];		// yaw
-        demands[3] = -axes[1];		// throttle
+        demands[0] =  values[2];	// roll
+        demands[1] = -values[5];	// pitch
+        demands[2] =  values[0];	// yaw
+        demands[3] = -values[1];	// throttle
 		break;
 
 	default:
