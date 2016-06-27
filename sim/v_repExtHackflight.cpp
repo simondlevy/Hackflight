@@ -531,13 +531,14 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
 static const int inArgs_UPDATE[]={
-    6,
+    7,
     sim_script_arg_int32|sim_script_arg_table,3,  // primary axis values
     sim_script_arg_int32|sim_script_arg_table,3,  // rotational axis values
     sim_script_arg_int32|sim_script_arg_table,2,  // sliders
     sim_script_arg_double|sim_script_arg_table,3, // Gyro values
     sim_script_arg_double|sim_script_arg_table,3, // Accelerometer values
-    sim_script_arg_int32                          // Barometric pressure
+    sim_script_arg_int32,                         // Barometric pressure
+	sim_script_arg_int32                          // Buttons
 };
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
