@@ -504,7 +504,7 @@ static bool ready;
 
 // needed for spring-mounted throttle stick
 static int throttleDemand;
-#define PS3_THROTTLE_INC .01                
+#define PS3_THROTTLE_INC .005                
 
 // IMU support
 static double accel[3];
@@ -578,18 +578,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
         // Controller values from script will be used in Windows only
         controllerRead(&inData->at(0).int32Data[0]);
-
-        // PS3 spring-mounted throttle requires special handling
-        if (controller == PS3) {
-            throttleDemand += (int)(demands[3] * PS3_THROTTLE_INC);     
-            if (throttleDemand < -1000)
-                throttleDemand = -1000;
-            if (throttleDemand > 1000)
-                throttleDemand = 1000;
-        }
-        else {
-            throttleDemand = demands[3];
-        }
 
         //printf("r: %4d    p: %4d    y: %4d    t: %4d\n", demands[0], demands[1], demands[2], demands[3]);
 
@@ -731,6 +719,18 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     // Don't do anything till start() has been called
     if (!ready)
         return NULL;
+
+    // PS3 spring-mounted throttle requires special handling
+    if (controller == PS3) {
+        throttleDemand += (int)(demands[3] * PS3_THROTTLE_INC);     
+        if (throttleDemand < -1000)
+            throttleDemand = -1000;
+        if (throttleDemand > 1000)
+            throttleDemand = 1000;
+    }
+    else {
+        throttleDemand = demands[3];
+    }
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);

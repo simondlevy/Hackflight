@@ -6,6 +6,7 @@ sim/libv_repExtHackflight.*
 obj
 Debug
 ipch
+*.pyc
 *.sdf
 *.user
 *.suo
