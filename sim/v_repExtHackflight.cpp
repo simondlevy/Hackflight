@@ -248,8 +248,8 @@ static void controllerClose(void)
 
 static int joyfd;
 
-static int axismap[4];
-static int axisdir[4];
+static int axismap[5];
+static int axisdir[5];
 
 static struct termios oldSettings;
 
@@ -257,7 +257,7 @@ static void controllerInit(void)
 { 
     joyfd = open(JOY_DEV, O_RDONLY);
 
-    for (int k=0; k<4; ++k)
+    for (int k=0; k<5; ++k)
         axisdir[k] = +1;
 
     if (joyfd > 0) {
@@ -274,6 +274,7 @@ static void controllerInit(void)
             axismap[1] = 1;
             axismap[2] = 2;
             axismap[3] = 3;
+            axismap[4] = 4;
         }
         else if (strstr(name, "PPM TO USB Adapter")) {
             controller = SPEKTRUM;
@@ -331,7 +332,7 @@ static void controllerRead(int * ignore)
         read(joyfd, &js, sizeof(struct js_event));
 
         if (js.type & JS_EVENT_AXIS) 
-            for (int k=0; k<4; ++k)
+            for (int k=0; k<5; ++k)
                 if (js.number == axismap[k]) 
                     demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
     }
