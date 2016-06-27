@@ -49,7 +49,19 @@ to the V-REP folder where the other plugins are. On my computer this is
 </ol>
 
 <b>Quickstart, Mac OS X</b>
-<i>Coming soon!</i>
+<ol>
+<li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>.
+<li> Install the SDL runtime binaries in your <b>/Library/Frameworks</b> folder.
+<p><li>Clone the hackflight repository.
+<p><li>Drag the plugin <b>hackflight/sim/build/libv_repExtHackflight.dylib</b>
+to the V-REP folder where the other plugins are. On my computer this is
+<b>/Applications/V-REP_PRO_EDU_V3_3_1_Mac/vrep.app/Contents/MacOS</b>
+<p><li>Plug in your R/C transmitter, joystick, or game controller (see above).
+<p><li> Double-click on the vrep icon in the location where you installed V-REP.  
+On my computer this is <b>/Applications/V-REP_PRO_EDU_V3_3_1_Mac</b>
+<p><li> Follow steps 6-7 above.
+</ol>
+
 
 <b>Developing for Windows</b>
 
