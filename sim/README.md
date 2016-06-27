@@ -7,7 +7,7 @@
 <ol>
 <li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>.
 <p><li>Clone the hackflight repository.
-<p><li>Drag the plugin <b>hackflight/sim/build/v_repExtHackflight.dll</b>
+<p><li>Drag the plugin <b>hackflight/sim/Release/v_repExtHackflight.dll</b>
 to the V-REP folder where the other DLLs are. On my computer this is
 <b>C:\Program FIles (x86)\V-REP3\V-REP_PRO_EDU</b>.
 <p><li>Plug in your R/C transmitter, joystick, or game controller. Currently supported:
@@ -40,7 +40,7 @@ the sticks a little at first for the simulator to detect them.
 <ol>
 <li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>.
 <p><li>Clone the hackflight repository.
-<p><li>Drag the plugin <b>hackflight/sim/build/libv_repExtHackflight.so</b>
+<p><li>Drag the plugin <b>hackflight/sim/Release/libv_repExtHackflight.so</b>
 to the V-REP folder where the other plugins are. On my computer this is
 <b>~/Software//V-REP_PRO_EDU_V3_3_1_64_Linux</b>.
 <p><li>Plug in your R/C transmitter, joystick, or game controller (see above).
@@ -54,7 +54,7 @@ to the V-REP folder where the other plugins are. On my computer this is
 <p><li> Install the <a href="https://www.libsdl.org/release/SDL2-2.0.4.dmg">SDL runtime binaries</a> 
 in your <b>/Library/Frameworks</b> folder.
 <p><li>Clone the hackflight repository.
-<p><li>Drag the plugin <b>hackflight/sim/build/libv_repExtHackflight.dylib</b>
+<p><li>Drag the plugin <b>hackflight/sim/Release/libv_repExtHackflight.dylib</b>
 to the V-REP folder where the other plugins are. On my computer this is
 <b>/Applications/V-REP_PRO_EDU_V3_3_1_Mac/vrep.app/Contents/MacOS</b>
 <p><li>Plug in your R/C transmitter, joystick, or game controller (see above).
