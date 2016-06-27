@@ -165,15 +165,17 @@ static void controllerInit(void)
 }
 
 // Turns button value into aux-switch demand
-static void buttonToAuxDemand(int buttons, const int b0, const int b1, const int b2)
+static void buttonToAuxDemand(int * values)
 {
-	if (buttons == b0)
+	int buttons = values[7];
+
+	if (buttons == 1)
 		demands[4] = -1000;
 
-	if (buttons == b1)
+	if (buttons == 2)
 		demands[4] = 0;
 
-	if (buttons == b2)
+	if (buttons == 4)
 		demands[4] = +1000;
 }
 
@@ -203,6 +205,7 @@ static void controllerRead(int * values) //std::vector<CScriptFunctionDataItem>*
         demands[1] = -values[1];	// pitch
         demands[2] =  values[5];	// yaw
         demands[3] = -values[6];	// throttle
+		buttonToAuxDemand(values);  // aux switch
         break;
 
     case PS3:
@@ -210,7 +213,7 @@ static void controllerRead(int * values) //std::vector<CScriptFunctionDataItem>*
         demands[1] = -values[5];	// pitch
         demands[2] =  values[0];	// yaw
         demands[3] = -values[1];	// throttle
-		buttonToAuxDemand(values[7], 1, 8, 2); // aux switch
+		buttonToAuxDemand(values);  // aux switch
 		break;
 
 	default:
@@ -853,8 +856,7 @@ uint16_t Board::readPWM(uint8_t chan)
     // V-REP sends joystick demands in [-1000,+1000]
     int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
 	
-    if (chan < 5)
-        printf("%d: %d%s", chan, pwm, chan == 4 ? "\n" : "    ");
+    if (chan < 5) printf("%d: %d%s", chan, pwm, chan == 4 ? "\n" : "    ");
 
     return pwm;
 }
