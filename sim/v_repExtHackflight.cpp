@@ -282,6 +282,7 @@ static void controllerInit(void)
             axismap[1] = 2;
             axismap[2] = 5;
             axismap[3] = 0;
+            axismap[4] = 3;
         }
         else if (strstr(name, "MY-POWER CO.")) {
             controller = PS3;
