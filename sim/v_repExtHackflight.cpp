@@ -167,18 +167,19 @@ static void controllerInit(void)
 // Grabs stick demands from script via Windows plugin
 static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
 {
-    int axes[3], rotAxes[3], sliders[2];
+    int axes[3], rotAxes[3], slider, buttons;
 
-    // Read joystick axes
+    // Read axes
     for (int k=0; k<3; ++k) {
-        axes[k] = inData->at(0).int32Data[k]; 
-        rotAxes[k] = inData->at(1).int32Data[k]; 
+        axes[k]    = inData->at(0).int32Data[k]; 
+        rotAxes[k] = inData->at(0).int32Data[k+3]; 
     }
 
-    // Read sliders
-    for (int k=0; k<2; ++k) {
-        sliders[k] = inData->at(2).int32Data[k]; 
-    }
+	// Read slider
+	slider = inData->at(0).int32Data[6];
+
+	// Read buttons as a single bit-coded integer
+	buttons = inData->at(0).int32Data[7];
 
     // Handle each controller differently
     switch (controller) {
@@ -202,7 +203,7 @@ static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
         demands[0] = axes[0];		// roll
         demands[1] = -axes[1];		// pitch
         demands[2] = rotAxes[2];	// yaw
-        demands[3] = -sliders[0];	// throttle
+        demands[3] = -slider;	    // throttle
         break;
 
     case PS3:
@@ -531,14 +532,11 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
 static const int inArgs_UPDATE[]={
-    7,
-    sim_script_arg_int32|sim_script_arg_table,3,  // primary axis values
-    sim_script_arg_int32|sim_script_arg_table,3,  // rotational axis values
-    sim_script_arg_int32|sim_script_arg_table,2,  // sliders
+    4,
+    sim_script_arg_int32|sim_script_arg_table,8,  // Controller values
     sim_script_arg_double|sim_script_arg_table,3, // Gyro values
     sim_script_arg_double|sim_script_arg_table,3, // Accelerometer values
-    sim_script_arg_int32,                         // Barometric pressure
-	sim_script_arg_int32                          // Buttons
+    sim_script_arg_int32                          // Barometric pressure
 };
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
@@ -568,12 +566,12 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
         // Read gyro, accelerometer
         for (int k=0; k<3; ++k) {
-            gyro[k]   = inData->at(3).doubleData[k]; 
-            accel[k]  = inData->at(4).doubleData[k]; 
+            gyro[k]   = inData->at(1).doubleData[k]; 
+            accel[k]  = inData->at(2).doubleData[k]; 
         }
 
         // Read barometer
-        baroPressure = inData->at(5).int32Data[0];
+        baroPressure = inData->at(3).int32Data[0];
 
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
