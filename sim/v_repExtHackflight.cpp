@@ -165,21 +165,23 @@ static void controllerInit(void)
 }
 
 // Grabs stick demands from script via Windows plugin
-static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
+static void controllerRead(int * values) //std::vector<CScriptFunctionDataItem>* inData)
 {
     int axes[3], rotAxes[3], slider, buttons;
 
     // Read axes
     for (int k=0; k<3; ++k) {
-        axes[k]    = inData->at(0).int32Data[k]; 
-        rotAxes[k] = inData->at(0).int32Data[k+3]; 
+        axes[k]    = values[k]; 
+        rotAxes[k] = values[k+3]; 
     }
 
 	// Read slider
-	slider = inData->at(0).int32Data[6];
+	slider = values[6];
 
 	// Read buttons as a single bit-coded integer
-	buttons = inData->at(0).int32Data[7];
+	buttons = values[7];
+
+	//printf("********* %d\n", buttons);
 
     // Handle each controller differently
     switch (controller) {
@@ -317,7 +319,7 @@ static void controllerInit(void)
     }
 } 
 
-static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
+static void controllerRead(int * ignore)
 // Ignores input data (input data used only on Windows)
 {
     // Have a joystick; grab its axes
@@ -428,7 +430,7 @@ static void controllerInit(void)
 }
 
 // Ignores input data (input data used only on Windows)
-static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
+static void controllerRead(int * ignore)
 {
     if (!joystick)
         return;
@@ -547,8 +549,8 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
-        // inData will be used in Windows only
-        controllerRead(inData);
+        // Controller values from script will be used in Windows only
+        controllerRead(&inData->at(0).int32Data[0]);
 
         // PS3 spring-mounted throttle requires special handling
         if (controller == PS3) {
