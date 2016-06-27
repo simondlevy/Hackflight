@@ -66,11 +66,12 @@ static void kbdecrement(int index)
 static void kbRespond(char key, char * keys) 
 {
 	for (int k=0; k<8; ++k)
-		if (key == keys[k])
+		if (key == keys[k]) {
 			if (k%2)
 				kbincrement(k/2);
 			else
 				kbdecrement(k/2);
+        }
 }
 
 #ifdef _WIN32 // ===================================================================
@@ -512,6 +513,9 @@ static double gyro[3];
 // Barometer support
 static int baroPressure;
 
+// Sonar support
+static int sonarAGL;
+
 // Motor support
 static float thrusts[4];
 
@@ -556,11 +560,12 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
 static const int inArgs_UPDATE[]={
-    4,
+    5,
     sim_script_arg_int32|sim_script_arg_table,8,  // Controller values
     sim_script_arg_double|sim_script_arg_table,3, // Gyro values
     sim_script_arg_double|sim_script_arg_table,3, // Accelerometer values
-    sim_script_arg_int32                          // Barometric pressure
+    sim_script_arg_int32,0,                       // Barometric pressure
+    sim_script_arg_int32,0                        // Sonar distance
 };
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
@@ -596,6 +601,11 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
         // Read barometer
         baroPressure = inData->at(3).int32Data[0];
+
+        // Read sonar
+        sonarAGL = inData->at(4).int32Data[0];
+
+        printf("********** %d\n", sonarAGL);
 
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
