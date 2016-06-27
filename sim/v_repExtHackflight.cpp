@@ -35,7 +35,7 @@ enum Controller { NONE, TARANIS, SPEKTRUM, EXTREME3D, PS3 };
 static Controller controller;
 
 // Stick demands from controller
-static int demands[4];
+static int demands[5];
 
 // Keyboard support
 
@@ -188,6 +188,7 @@ static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
         demands[1] = axes[1];     // pitch
         demands[2] = axes[2];     // yaw
         demands[3] = rotAxes[0];  // throttle			
+		demands[4] = rotAxes[1];  // aux switch
         break;
 
     case SPEKTRUM:
@@ -852,11 +853,9 @@ uint16_t Board::readPWM(uint8_t chan)
     // V-REP sends joystick demands in [-1000,+1000]
     int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
 	
-    if (chan < 4)
-        printf("%d: %d    ", chan, pwm);
-    if (chan == 3)
-        printf("\n");
-	
+    if (chan < 5)
+        printf("%d: %d%s", chan, pwm, chan == 4 ? "\n" : "    ");
+
     return pwm;
 }
 
