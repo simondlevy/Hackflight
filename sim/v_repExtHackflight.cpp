@@ -164,20 +164,31 @@ static void controllerInit(void)
     delete [] pRawInputDeviceList;
 }
 
+// Turns button value into aux-switch demand
+static void buttonToAuxDemand(int buttons, const int b0, const int b1, const int b2)
+{
+	if (buttons == b0)
+		demands[4] = -1000;
+
+	if (buttons == b1)
+		demands[4] = 0;
+
+	if (buttons == b2)
+		demands[4] = +1000;
+}
+
 // Grabs stick demands from script via Windows plugin
 static void controllerRead(int * values) //std::vector<CScriptFunctionDataItem>* inData)
 {
-	//printf("********* %d\n", values[7]);
-
     // Handle each controller differently
     switch (controller) {
 
     case TARANIS:
-        demands[0] = values[0];     // roll
-        demands[1] = values[1];     // pitch
-        demands[2] = values[2];     // yaw
-        demands[3] = values[3];  // throttle			
-		demands[4] = values[4];  // aux switch
+        demands[0] = values[0];    // roll
+        demands[1] = values[1];    // pitch
+        demands[2] = values[2];    // yaw
+        demands[3] = values[3];    // throttle			
+		demands[4] = values[4];    // aux switch
         break;
 
     case SPEKTRUM:
@@ -199,6 +210,7 @@ static void controllerRead(int * values) //std::vector<CScriptFunctionDataItem>*
         demands[1] = -values[5];	// pitch
         demands[2] =  values[0];	// yaw
         demands[3] = -values[1];	// throttle
+		buttonToAuxDemand(values[7], 1, 8, 2); // aux switch
 		break;
 
 	default:
@@ -498,8 +510,9 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     // Need this for throttle on keyboard and PS3
     throttleDemand = -1000;
 
-    // For safety, all controllers start at minimum throttle
+    // For safety, all controllers start at minimum throttle, aux switch off
     demands[3] = -1000;
+	demands[4] = -1000;
 
     // Each input device has its own axis and button mappings
     controllerInit();
