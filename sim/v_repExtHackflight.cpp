@@ -463,8 +463,12 @@ static void controllerInit(void)
         axisdir[3] = -1;
     }
     else if (strstr(name, "Extreme 3D")) {
-        printf("Extreme3D currently not supported on OS X\n");
-        joystick = NULL;
+        axismap[0] = 0;
+        axismap[1] = 1;
+        axismap[2] = 2;
+        axismap[3] = 3;
+        axisdir[1] = -1;
+        axisdir[3] = -1;
     }
     else {
         printf("Uknown controller: %s\n", name);
