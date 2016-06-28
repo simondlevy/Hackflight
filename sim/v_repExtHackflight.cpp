@@ -331,32 +331,6 @@ static void posixControllerInit(char * name, const char * ps3name)
     }
 }
 
-static void posixControllerRead(bool isAxis, bool isButton, int number, int value)
-{
-    // Look at all five axes for R/C transmitters, first four for other controllers
-    int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
-
-    // Grab demands from axes
-    if (isAxis) 
-        for (int k=0; k<maxaxis; ++k)
-            if (number == axismap[k]) 
-                demands[k] = axisdir[k] * (int)(1000. * value / 32767);
-
-    // Grab aux demand from buttons when detected
-    if (isButton) {
-        switch (number) {
-            case 0:
-                demands[4] = -1000;
-                break;
-            case 1:
-                demands[4] =     0;
-                break;
-            case 2:
-                demands[4] = +1000;
-        }
-    }
-}
-
 static void posixControllerGrabAxis(int number, int value)
 {
     // Look at all five axes for R/C transmitters, first four for other controllers
@@ -409,12 +383,12 @@ static void controllerInit(void)
         fcntl(joyfd, F_SETFL, O_NONBLOCK);
 
         char name[128];
+
         if (ioctl(joyfd, JSIOCGNAME(sizeof(name)), name) < 0)
             printf("Uknown controller\n");
 
-        else {
+        else 
             posixControllerInit(name, "MY-POWER CO.");
-        }
     }
 
     // No joystick detected; use keyboard as fallback
@@ -426,9 +400,18 @@ static void controllerRead(void * ignore)
 {
     // Have a joystick; grab its axes
     if (joyfd  > 0) {
+
         struct js_event js;
+
         read(joyfd, &js, sizeof(struct js_event));
-        posixControllerRead(js.type&JS_EVENT_AXIS, js.type&JS_EVENT_BUTTON&js.value, js.number, js.value);
+
+        // Grab demands from axes
+        if (js.type & JS_EVENT_AXIS) 
+            posixControllerGrabAxis(js.number, js.value);
+
+        // Grab aux demand from buttons when detected
+        if (js.type & JS_EVENT_BUTTON && js.value) 
+            posixControllerGrabButton(js.number);
     }
 
     // No joystick; use keyboard
@@ -497,7 +480,7 @@ static void controllerRead(void * ignore)
         if (event.type == SDL_JOYBUTTONDOWN) {
             SDL_JoyButtonEvent jb = event.jbutton;
             posixControllerGrabButton(jb.button);
-         }
+        }
      }
 
     // Fall back on keyboard if no controller
