@@ -357,6 +357,32 @@ static void posixControllerRead(bool isAxis, bool isButton, int number, int valu
     }
 }
 
+static void posixControllerGrabAxis(int number, int value)
+{
+    // Look at all five axes for R/C transmitters, first four for other controllers
+    int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
+
+    // Grab demands from axes
+    for (int k=0; k<maxaxis; ++k)
+        if (number == axismap[k]) 
+            demands[k] = axisdir[k] * (int)(1000. * value / 32767);
+}
+
+static void posixControllerGrabButton(int number)
+{
+    switch (number) {
+        case 0:
+            demands[4] = -1000;
+            break;
+        case 1:
+            demands[4] =     0;
+            break;
+        case 2:
+            demands[4] = +1000;
+    }
+}
+
+
 
 
 #endif // Linux, OS X
@@ -463,28 +489,14 @@ static void controllerRead(void * ignore)
         while (SDL_PollEvent(&event))
             ;
 
-        // Look at all five axes for R/C transmitters, first four for other controllers
-        int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
-
         if (event.type == SDL_JOYAXISMOTION) {
             SDL_JoyAxisEvent js = event.jaxis;
-            for (int k=0; k<maxaxis; ++k)
-                if (js.axis == axismap[k]) 
-                    demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
+            posixControllerGrabAxis(js.axis, js.value);
         }
 
         if (event.type == SDL_JOYBUTTONDOWN) {
             SDL_JoyButtonEvent jb = event.jbutton;
-            switch (jb.button) {
-                case 0:
-                    demands[4] = -1000;
-                    break;
-                case 1:
-                    demands[4] =     0;
-                    break;
-                case 2:
-                    demands[4] = +1000;
-            }
+            posixControllerGrabButton(jb.button);
          }
      }
 
