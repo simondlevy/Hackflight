@@ -49,6 +49,7 @@ to the V-REP folder where the other plugins are. On my computer this is
 </ol>
 
 <b>Quickstart, Mac OS X</b>
+<b><i>Note: The simulator runs much slower on OS X for some reason.</i></b>
 <ol>
 <li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>.
 <p><li> Install the <a href="https://www.libsdl.org/release/SDL2-2.0.4.dmg">SDL runtime binaries</a> 
