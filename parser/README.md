@@ -50,5 +50,7 @@ The Arduino example allows you to control the pitch of a buzzer using the pitch 
 
 Then copy the output/arduino/MSPPG folder into your Arduino libaries folder, launch the Arduino IDE, and find the MSPPG submenu under the File/Examples menu.
 
+<b>Extending</b>
+
 The msp-example.json file currently contains just a few message specifications, but you can easily add to it by specifying additional messages from the MSP: http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol. 
 MSPPG currently supports types byte, short, and float, but we will likely add int as the need arises.
