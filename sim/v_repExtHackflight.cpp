@@ -417,7 +417,7 @@ static void controllerRead(void * ignore)
             posixControllerGrabAxis(js.number, js.value);
 
         // Grab aux demand from buttons when detected
-        if (js.type & JS_EVENT_BUTTON && js.value) 
+        if ((js.type & JS_EVENT_BUTTON) && (js.value==1)) 
             posixControllerGrabButton(js.number);
     }
 
