@@ -1,7 +1,7 @@
 # MSPPG
 Multiwii Serial Protocol Parser Generator for Python3, Java, and C++, and C.
 
-Instructions 
+<b>Setup</b>
 
 The script msppg.py is ready to-run using your favorite Python interpreter: command-line, IDLE, etc.  To install so you can run it anywhere, do
 
@@ -12,6 +12,8 @@ from a Windows command shell, or
 % sudo python3 setup.py install
 
 in Unix (Linux, OS X).
+
+<b>Testing</b>
 
 Once the package is installed, you can put your example.json file anywhere and run the following:
 
@@ -25,11 +27,17 @@ which will create output/python, output/java/, output/c, output/cpp, and output/
 to test the code.  On Windows, the easiest way to test would be to modify the Python scripts to use 'COM3' or
 another port to access your flight controller.
 
-In output/python you can also run the msp-imudisplay.py program, which uses Tkinter and NumPy to visualize the Attitude messages coming from a flight controller (tested with AcroNaze running Baseflight).  In output/java you can do
+In output/python you can also run the msp-imudisplay.py program, which uses Tkinter and NumPy to visualize the Attitude messages coming from a flight controller (tested with AcroNaze running Baseflight).  
+
+<b>Java</b>
+
+In output/java you can do
 
 % make jar
 
 to build the msppg.jar file, which can then be used as a library for Android projects and other Java-based work.
+
+<b>Arduino example</b>
 
 The Arduino example allows you to control the pitch of a buzzer using the pitch from the IMU. You should use an Arduino Mega or other Arduino that has TX1/RX1 pins, and make the following connections:
 
