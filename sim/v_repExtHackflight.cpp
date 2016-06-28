@@ -40,6 +40,9 @@ static int demands[5];
 // Downscaling for hypersensitive PS3 controller
 static const int PS3_DOWNSCALE = 2;
 
+// Handle to vision sensor -- too expensive to pass its data in
+static int visionSensorHandle;
+
 // Keyboard support for any OS
 static const float KEYBOARD_INC = 10;
 static void kbchange(int index, int dir)
@@ -551,10 +554,23 @@ static double timestep = .01;
 // --------------------------------------------------------------------------------------
 #define LUA_START_COMMAND  "simExtHackflight_start"
 
+static const int inArgs_START[]={
+    1,
+    sim_script_arg_int32,0  // handle to vision sensor
+};
+
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
 
-    // Run Hackflight setup()
+    CScriptFunctionData D;
+
+    // Grab vision sensor handle
+    if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0],LUA_START_COMMAND)) {
+        std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
+        visionSensorHandle = inData->at(0).int32Data[0];
+    }
+
+     // Run Hackflight setup()
     setup();
 
     // Need this for throttle on keyboard and PS3
@@ -571,7 +587,6 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     ready = true;
 
     // Return success to V-REP
-    CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);
 }
@@ -754,6 +769,8 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     if (!ready)
         return NULL;
 
+    printf("%d\n", visionSensorHandle);
+
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
     simSetIntegerParameter(sim_intparam_error_report_mode,sim_api_errormessage_ignore);
@@ -906,7 +923,7 @@ uint16_t Board::readPWM(uint8_t chan)
     // V-REP sends joystick demands in [-1000,+1000]
     int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
 	
-    if (chan < 5) printf("%d: %d%s", chan, pwm, chan == 4 ? "\n" : "    ");
+    //if (chan < 5) printf("%d: %d%s", chan, pwm, chan == 4 ? "\n" : "    ");
 
     return pwm;
 }
