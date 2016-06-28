@@ -243,14 +243,15 @@ static void controllerClose(void)
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+
 #include <termios.h>
+static struct termios oldSettings;
 
 static int joyfd;
 
 static int axismap[5];
 static int axisdir[5];
 
-static struct termios oldSettings;
 
 static void controllerInit(void)
 { 
@@ -398,6 +399,11 @@ static void controllerClose(void)
 
 #include <SDL.h>
 
+#include <sys/select.h>
+#include <unistd.h>
+#include <termios.h>
+static struct termios oldSettings;
+
 static SDL_Joystick * joystick;
 
 static int axismap[4];
@@ -405,6 +411,16 @@ static int axisdir[4];
 
 static void controllerInit(void)
 {
+    struct termios newSettings;
+
+    // Save keyboard settings for restoration later
+    tcgetattr(fileno( stdin ), &oldSettings);
+
+    // Create new keyboard settings
+    newSettings = oldSettings;
+    newSettings.c_lflag &= (~ICANON & ~ECHO);
+    tcsetattr(fileno(stdin), TCSANOW, &newSettings);
+
     if (SDL_Init(SDL_INIT_JOYSTICK)) {
         printf("Failed to initialize SDL\n");
         return;
@@ -450,26 +466,56 @@ static void controllerInit(void)
 
 static void controllerRead(void * ignore)
 {
-    if (!joystick)
-        return;
+    if (joystick) {
 
-    // Poll until we get an event
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
-        ;
+        // Poll until we get an event
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
+            ;
 
-    if (event.type == SDL_JOYAXISMOTION) {
-        SDL_JoyAxisEvent js = event.jaxis;
-        for (int k=0; k<4; ++k)
-            if (js.axis == axismap[k]) 
-                demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
+        if (event.type == SDL_JOYAXISMOTION) {
+            SDL_JoyAxisEvent js = event.jaxis;
+            for (int k=0; k<4; ++k)
+                if (js.axis == axismap[k]) 
+                    demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
+        }
     }
+
+    // Fall back on keyboard if no controller
+    else {
+        fd_set set;
+        struct timeval tv;
+
+        tv.tv_sec = 0;
+        tv.tv_usec = 100;
+
+        FD_ZERO( &set );
+        FD_SET( fileno( stdin ), &set );
+
+        int res = select(fileno(stdin )+1, &set, NULL, NULL, &tv);
+
+        char c = 0;
+
+        if( res > 0 ) {
+            read(fileno( stdin ), &c, 1);
+            printf("%d\n", c);
+            char keys[8] = {52, 54, 50, 56, 48, 10, 51, 57};
+            kbRespond(c, keys);
+        }
+
+        else if( res < 0 ) {
+            perror( "select error" );
+        }
+     }
 }
 
 static void controllerClose(void)
 {
     if (joystick)
         SDL_JoystickClose(joystick);
+
+    else // reset keyboard if no joystick
+        tcsetattr(fileno(stdin), TCSANOW, &oldSettings);
 }
 
 #endif // OS X
@@ -598,8 +644,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
         // Read sonar
         sonarAGL = inData->at(4).int32Data[0];
-
-        printf("********** %d\n", sonarAGL);
 
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
@@ -880,7 +924,7 @@ uint16_t Board::readPWM(uint8_t chan)
     // V-REP sends joystick demands in [-1000,+1000]
     int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
 	
-    //if (chan < 5) printf("%d: %d%s", chan, pwm, chan == 4 ? "\n" : "    ");
+    if (chan < 5) printf("%d: %d%s", chan, pwm, chan == 4 ? "\n" : "    ");
 
     return pwm;
 }
