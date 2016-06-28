@@ -406,18 +406,20 @@ static void controllerInit(void)
 static void controllerRead(void * ignore)
 {
     // Have a joystick; grab its axes
-    if (joyfd  > 0) {
+    if (joyfd > 0) {
 
         struct js_event js;
 
         read(joyfd, &js, sizeof(struct js_event));
 
+        int jstype = js.type & ~JS_EVENT_INIT;
+
         // Grab demands from axes
-        if (js.type & JS_EVENT_AXIS) 
+        if (jstype == JS_EVENT_AXIS) 
             posixControllerGrabAxis(js.number, js.value);
 
         // Grab aux demand from buttons when detected
-        if ((js.type & JS_EVENT_BUTTON) && (js.value==1)) 
+        if ((jstype == JS_EVENT_BUTTON) && (js.value==1)) 
             posixControllerGrabButton(js.number);
     }
 
