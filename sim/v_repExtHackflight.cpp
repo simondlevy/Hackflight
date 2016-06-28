@@ -37,6 +37,9 @@ static Controller controller;
 // Stick demands from controller
 static int demands[5];
 
+// Downscaling for hypersensitive PS3 controller
+static const int PS3_DOWNSCALE = 2;
+
 // Keyboard support for any OS
 static const float KEYBOARD_INC = 10;
 static void kbchange(int index, int dir)
@@ -164,9 +167,9 @@ static void controllerInit(void)
 }
 
 // Turns button value into aux-switch demand
-static void buttonToAuxDemand(int * values)
+static void buttonToAuxDemand(std::vector<CScriptFunctionDataItem>* inData)
 {
-	int buttons = values[7];
+	int buttons = inData->at(3).int32Data[0];
 
 	if (buttons == 1)
 		demands[4] = -1000;
@@ -179,40 +182,41 @@ static void buttonToAuxDemand(int * values)
 }
 
 // Grabs stick demands from script via Windows plugin
-static void controllerRead(int * values)
+static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
 {
     // Handle each controller differently
     switch (controller) {
 
     case TARANIS:
-        demands[0] = values[0];    // roll
-        demands[1] = values[1];    // pitch
-        demands[2] = values[2];    // yaw
-        demands[3] = values[3];    // throttle			
-		demands[4] = values[4];    // aux switch
+		demands[0] = inData->at(0).int32Data[0];    // roll
+        demands[1] = inData->at(0).int32Data[1];    // pitch
+        demands[2] = inData->at(0).int32Data[2];    // yaw
+        demands[3] = inData->at(1).int32Data[0];    // throttle			
+		demands[4] = inData->at(1).int32Data[1];    // aux switch
         break;
 
     case SPEKTRUM:
-        demands[0] = values[1];		// roll
-        demands[1] = values[2];		// pitch
-        demands[2] = values[5];		// yaw
-        demands[3] = values[0];		// throttle
-        break;
+        demands[0] = inData->at(0).int32Data[1];	// roll
+        demands[1] = inData->at(0).int32Data[2];	// pitch
+        demands[2] = inData->at(1).int32Data[2];	// yaw
+        demands[3] = inData->at(0).int32Data[0];	// throttle
+		demands[4] = inData->at(1).int32Data[0];    // aux switch
+		break;
 
     case EXTREME3D:
-        demands[0] =  values[0];	// roll
-        demands[1] = -values[1];	// pitch
-        demands[2] =  values[5];	// yaw
-        demands[3] = -values[6];	// throttle
-		buttonToAuxDemand(values);  // aux switch
+        demands[0] =  inData->at(0).int32Data[0];	// roll
+        demands[1] = -inData->at(0).int32Data[1];	// pitch
+        demands[2] =  inData->at(1).int32Data[2];	// yaw
+        demands[3] = -inData->at(2).int32Data[0];	// throttle
+		buttonToAuxDemand(inData);					// aux switch
         break;
 
     case PS3:
-        demands[0] =  values[2];	// roll
-        demands[1] = -values[5];	// pitch
-        demands[2] =  values[0];	// yaw
-        demands[3] = -values[1];	// throttle
-		buttonToAuxDemand(values);  // aux switch
+        demands[0] =  inData->at(0).int32Data[2] / PS3_DOWNSCALE;	// roll
+        demands[1] = -inData->at(1).int32Data[2] / PS3_DOWNSCALE;	// pitch
+        demands[2] =  inData->at(0).int32Data[0] / PS3_DOWNSCALE;	// yaw
+        demands[3] = -inData->at(0).int32Data[1] / PS3_DOWNSCALE;	// throttle
+		buttonToAuxDemand(inData);  // aux switch
 		break;
 
 	default:
@@ -337,7 +341,7 @@ static void posixControllerGrabAxis(int number, int value)
     int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
 
     // PS3 axes are hyper-sensitive
-    int downscale = (controller == PS3) ? 2 : 1;
+    int downscale = (controller == PS3) ? PS3_DOWNSCALE : 1;
 
     // Grab demands from axes
     for (int k=0; k<maxaxis; ++k)
@@ -577,8 +581,11 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
 static const int inArgs_UPDATE[]={
-    5,
-    sim_script_arg_int32|sim_script_arg_table,8,  // Controller values
+    8,
+    sim_script_arg_int32|sim_script_arg_table,3,  // axes
+	sim_script_arg_int32|sim_script_arg_table,3,  // rotAxes
+	sim_script_arg_int32|sim_script_arg_table,2,  // sliders
+	sim_script_arg_int32,0,                       // buttons (as bit-coded integer)
     sim_script_arg_double|sim_script_arg_table,3, // Gyro values
     sim_script_arg_double|sim_script_arg_table,3, // Accelerometer values
     sim_script_arg_int32,0,                       // Barometric pressure
@@ -594,7 +601,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
         // Controller values from script will be used in Windows only
-        controllerRead(&inData->at(0).int32Data[0]);
+        controllerRead(inData);
 
         // PS3 spring-mounted throttle requires special handling
         if (controller == PS3) {
@@ -610,15 +617,15 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
         // Read gyro, accelerometer
         for (int k=0; k<3; ++k) {
-            gyro[k]   = inData->at(1).doubleData[k]; 
-            accel[k]  = inData->at(2).doubleData[k]; 
+            gyro[k]   = inData->at(4).doubleData[k]; 
+            accel[k]  = inData->at(5).doubleData[k]; 
         }
 
         // Read barometer
-        baroPressure = inData->at(3).int32Data[0];
+        baroPressure = inData->at(6).int32Data[0];
 
         // Read sonar
-        sonarAGL = inData->at(4).int32Data[0];
+        sonarAGL = inData->at(7).int32Data[0];
 
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
