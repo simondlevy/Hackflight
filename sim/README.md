@@ -49,6 +49,7 @@ to the V-REP folder where the other plugins are. On my computer this is
 </ol>
 
 <b>Quickstart, Mac OS X</b>
+<p>
 <b><i>Note: The simulator runs much slower on OS X for some reason.</i></b>
 <ol>
 <li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>.
