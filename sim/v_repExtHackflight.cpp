@@ -181,7 +181,7 @@ static void buttonToAuxDemand(int * values)
 }
 
 // Grabs stick demands from script via Windows plugin
-static void controllerReadFromScript(int * values) //std::vector<CScriptFunctionDataItem>* inData)
+static void controllerRead(int * values)
 {
     // Handle each controller differently
     switch (controller) {
@@ -225,12 +225,6 @@ static void controllerReadFromScript(int * values) //std::vector<CScriptFunction
          }
 	 }
 }
-
-static void controllerReadFromDevice(void)
-// On windows we read from script, not directly from device
-{
-}
- 
 
 static void controllerClose(void)
 {
@@ -327,12 +321,7 @@ static void controllerInit(void)
     }
 } 
 
-static void controllerReadFromScript(int * ignore)
-{
-// On Linux we read directly from device
-}
-
-static void controllerReadFromDevice(void)
+static void controllerRead(void * ignore)
 {
     // Have a joystick; grab its axes
     if (joyfd  > 0) {
@@ -459,14 +448,7 @@ static void controllerInit(void)
     }
 }
 
-static void controllerReadFromScript(int * ignore)
-{
-// On OS X we read directly from device
-}
-
-
-// Ignores input data (input data used only on Windows)
-static void controllerReadFromDevice(void)
+static void controllerRead(void * ignore)
 {
     if (!joystick)
         return;
@@ -591,9 +573,19 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
         // Controller values from script will be used in Windows only
-        controllerReadFromScript(&inData->at(0).int32Data[0]);
+        controllerRead(&inData->at(0).int32Data[0]);
 
-        //printf("r: %4d    p: %4d    y: %4d    t: %4d\n", demands[0], demands[1], demands[2], demands[3]);
+        // PS3 spring-mounted throttle requires special handling
+        if (controller == PS3) {
+            throttleDemand += (int)(demands[3] * PS3_THROTTLE_INC);     
+            if (throttleDemand < -1000)
+                throttleDemand = -1000;
+            if (throttleDemand > 1000)
+                throttleDemand = 1000;
+        }
+        else {
+            throttleDemand = demands[3];
+        }
 
         // Read gyro, accelerometer
         for (int k=0; k<3; ++k) {
@@ -733,21 +725,6 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     // Don't do anything till start() has been called
     if (!ready)
         return NULL;
-
-    // Read demands directly from controller (Linux, OS X)
-    controllerReadFromDevice();
-
-    // PS3 spring-mounted throttle requires special handling
-    if (controller == PS3) {
-        throttleDemand += (int)(demands[3] * PS3_THROTTLE_INC);     
-        if (throttleDemand < -1000)
-            throttleDemand = -1000;
-        if (throttleDemand > 1000)
-            throttleDemand = 1000;
-    }
-    else {
-        throttleDemand = demands[3];
-    }
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
