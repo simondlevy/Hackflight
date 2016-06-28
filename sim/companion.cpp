@@ -16,3 +16,20 @@
  */
 
 #include "companion.hpp"
+
+#include <stdio.h>
+
+CompanionBoard::CompanionBoard(void)
+{
+}
+
+void CompanionBoard::init(int _imgWidth, int _imgHeight)
+{
+    this->imgWidth = _imgWidth;
+    this->imgHeight = _imgHeight;
+}
+        
+void CompanionBoard::processImage(float * imageBytes)
+{
+    printf("%d %d\n", this->imgWidth, this->imgHeight);
+}

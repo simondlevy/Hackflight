@@ -15,9 +15,17 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Companion {
+class CompanionBoard {
 
+    private:
 
+        int imgWidth, imgHeight;
 
+    public:
 
+        CompanionBoard(void);
+
+        void init(int imgWidth, int imgHeight);
+
+        void processImage(float * imageBytes);
 };

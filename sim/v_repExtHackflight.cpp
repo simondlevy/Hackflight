@@ -44,6 +44,9 @@ static const int PS3_DOWNSCALE = 2;
 // Handle to vision sensor -- too expensive to pass its data in
 static int visionSensorHandle;
 
+// Companion-board support
+CompanionBoard companionBoard;
+
 // Keyboard support for any OS
 static const float KEYBOARD_INC = 10;
 static void kbchange(int index, int dir)
@@ -571,6 +574,13 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
         visionSensorHandle = inData->at(0).int32Data[0];
     }
 
+    // Initialize companion board
+    if (visionSensorHandle) {
+        int res[2];
+        simGetVisionSensorResolution(visionSensorHandle, res);
+        companionBoard.init(res[0], res[1]);
+    }
+
      // Run Hackflight setup()
     setup();
 
@@ -772,10 +782,8 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     // Process data from vision sensor if available
     if (visionSensorHandle) {
-        float* imageBuffer = simGetVisionSensorImage(visionSensorHandle);
-        int res[2];
-        simGetVisionSensorResolution(visionSensorHandle, res);
-        printf("%d %d\n", res[0], res[1]);
+        float * imageBuffer = simGetVisionSensorImage(visionSensorHandle);
+        companionBoard.processImage(imageBuffer);
     }
 
     int errorModeSaved;
