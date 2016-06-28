@@ -181,7 +181,7 @@ static void buttonToAuxDemand(int * values)
 }
 
 // Grabs stick demands from script via Windows plugin
-static void controllerRead(int * values) //std::vector<CScriptFunctionDataItem>* inData)
+static void controllerReadFromScript(int * values) //std::vector<CScriptFunctionDataItem>* inData)
 {
     // Handle each controller differently
     switch (controller) {
@@ -226,7 +226,11 @@ static void controllerRead(int * values) //std::vector<CScriptFunctionDataItem>*
 	 }
 }
 
-
+static void controllerReadFromDevice(void)
+// On windows we read from script, not directly from device
+{
+}
+ 
 
 static void controllerClose(void)
 {
@@ -323,8 +327,12 @@ static void controllerInit(void)
     }
 } 
 
-static void controllerRead(int * ignore)
-// Ignores input data (input data used only on Windows)
+static void controllerReadFromScript(int * ignore)
+{
+// On Linux we read directly from device
+}
+
+static void controllerReadFromDevice(void)
 {
     // Have a joystick; grab its axes
     if (joyfd  > 0) {
@@ -451,8 +459,14 @@ static void controllerInit(void)
     }
 }
 
+static void controllerReadFromScript(int * ignore)
+{
+// On OS X we read directly from device
+}
+
+
 // Ignores input data (input data used only on Windows)
-static void controllerRead(int * ignore)
+static void controllerReadFromDevice(void)
 {
     if (!joystick)
         return;
@@ -577,7 +591,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
         // Controller values from script will be used in Windows only
-        controllerRead(&inData->at(0).int32Data[0]);
+        controllerReadFromScript(&inData->at(0).int32Data[0]);
 
         //printf("r: %4d    p: %4d    y: %4d    t: %4d\n", demands[0], demands[1], demands[2], demands[3]);
 
@@ -719,6 +733,9 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     // Don't do anything till start() has been called
     if (!ready)
         return NULL;
+
+    // Read demands directly from controller (Linux, OS X)
+    controllerReadFromDevice();
 
     // PS3 spring-mounted throttle requires special handling
     if (controller == PS3) {
