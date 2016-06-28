@@ -418,8 +418,8 @@ static void controllerClose(void)
 
 static SDL_Joystick * joystick;
 
-static int axismap[4];
-static int axisdir[4];
+static int axismap[5];
+static int axisdir[5];
 
 static void controllerInit(void)
 {
@@ -435,7 +435,7 @@ static void controllerInit(void)
         return;
     }
 
-    for (int k=0; k<4; ++k)
+    for (int k=0; k<5; ++k)
         axisdir[k] = +1;
 
     char name[100];
@@ -447,20 +447,23 @@ static void controllerInit(void)
         axismap[1] = 1;
         axismap[2] = 2;
         axismap[3] = 3;
+        axismap[4] = 4;
     }
     else if (strstr(name, "PPM TO USB Adapter")) {
-        controller = SPEKTRUM;
         printf("Spektrum PPM to USB currently not supported on OS X\n");
         joystick = NULL;
     }
     else if (strstr(name, "2In1 USB Joystick")) {
         controller = PS3;
-        printf("PS3 currently not supported on OS X\n");
-        joystick = NULL;
+        axismap[0] = 2;
+        axismap[1] = 3;
+        axismap[2] = 0;
+        axismap[3] = 1;
+        axisdir[1] = -1;
+        axisdir[3] = -1;
     }
     else if (strstr(name, "Extreme 3D")) {
-        controller = EXTREME3D;
-        printf("PS3 currently not supported on OS X\n");
+        printf("Extreme3D currently not supported on OS X\n");
         joystick = NULL;
     }
     else {
@@ -477,9 +480,12 @@ static void controllerRead(void * ignore)
         while (SDL_PollEvent(&event))
             ;
 
+        // Look at all five axes for R/C transmitters, first four for other controllers
+        int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
+
         if (event.type == SDL_JOYAXISMOTION) {
             SDL_JoyAxisEvent js = event.jaxis;
-            for (int k=0; k<4; ++k)
+            for (int k=0; k<maxaxis; ++k)
                 if (js.axis == axismap[k]) 
                     demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
         }
@@ -905,7 +911,7 @@ uint16_t Board::readPWM(uint8_t chan)
     // V-REP sends joystick demands in [-1000,+1000]
     int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
 	
-    //if (chan < 5) printf("%d: %d%s", chan, pwm, chan == 4 ? "\n" : "    ");
+    if (chan < 5) printf("%d: %d%s", chan, pwm, chan == 4 ? "\n" : "    ");
 
     return pwm;
 }
