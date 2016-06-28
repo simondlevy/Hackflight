@@ -19,8 +19,9 @@
 
 #include "v_repExtHackflight.h"
 #include "scriptFunctionData.h"
-#include <iostream>
 #include "v_repLib.h"
+
+#include "companion.hpp"
 
 #include <stdint.h>
 
