@@ -450,8 +450,14 @@ static void controllerInit(void)
         axismap[4] = 4;
     }
     else if (strstr(name, "PPM TO USB Adapter")) {
-        printf("Spektrum PPM to USB currently not supported on OS X\n");
-        joystick = NULL;
+        controller = SPEKTRUM;
+        axismap[0] = 1;
+        axismap[1] = 2;
+        axismap[2] = 5;
+        axismap[3] = 0;
+        axismap[4] = 3;
+        //printf("Spektrum PPM to USB currently not supported on OS X\n");
+        //joystick = NULL;
     }
     else if (strstr(name, "2In1 USB Joystick")) {
         controller = PS3;
