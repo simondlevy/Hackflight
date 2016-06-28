@@ -489,7 +489,21 @@ static void controllerRead(void * ignore)
                 if (js.axis == axismap[k]) 
                     demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
         }
-    }
+
+        if (event.type == SDL_JOYBUTTONDOWN) {
+            SDL_JoyButtonEvent jb = event.jbutton;
+            switch (jb.button) {
+                case 0:
+                    demands[4] = -1000;
+                    break;
+                case 1:
+                    demands[4] =     0;
+                    break;
+                case 2:
+                    demands[4] = +1000;
+            }
+         }
+     }
 
     // Fall back on keyboard if no controller
     else {
