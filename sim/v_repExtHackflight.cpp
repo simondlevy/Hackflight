@@ -232,10 +232,12 @@ static void controllerClose(void)
 #else  // Linux, OS X
 
 // Keyboard support for Linux and OS X
+
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
+
 static struct termios oldSettings;
 
 static void posixKbInit(void)
@@ -898,14 +900,12 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    //return CONFIG_PWM_MIN;
-
     int demand = (chan == 3) ? throttleDemand : demands[chan];
 
     // V-REP sends joystick demands in [-1000,+1000]
     int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
 	
-    if (chan < 5) printf("%d: %d%s", chan, pwm, chan == 4 ? "\n" : "    ");
+    //if (chan < 5) printf("%d: %d%s", chan, pwm, chan == 4 ? "\n" : "    ");
 
     return pwm;
 }
