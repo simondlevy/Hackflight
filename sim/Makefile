@@ -27,6 +27,7 @@ CFLAGS = -Wall -I$(VREP_DIR)/programming/include/ -I. -I../firmware -Wall -fPIC 
 OS = $(shell uname -s)
 ifeq ($(OS), Linux)
 	EXT = so
+	CFLAGS += -I/usr/include/SDL
 	VREP_DIR = $(VREP_DIR_LINUX)
     VREP_LIBDIR = $(VREP_DIR)
 else
@@ -54,7 +55,8 @@ libv_repExtHackflight.$(EXT): *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp Ma
 	g++ $(CFLAGS) -c ../firmware/rc.cpp
 	g++ $(CFLAGS) -c ../firmware/baro.cpp
 	g++ $(CFLAGS) -c ../firmware/position.cpp
-	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -ldl -shared $(JOYLIB)
+	#g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -ldl -shared $(JOYLIB)
+	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared $(JOYLIB)
 
 install: $(PLUGIN)
 	cp $(PLUGIN) $(VREP_LIBDIR)

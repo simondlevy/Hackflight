@@ -237,6 +237,11 @@ static void controllerClose(void)
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
+#include <math.h>
+#include <string.h>
+
+static int axismap[5];
+static int axisdir[5];
 
 static struct termios oldSettings;
 
@@ -282,6 +287,78 @@ static void posixKbClose(void)
     tcsetattr(fileno(stdin), TCSANOW, &oldSettings);
 }
 
+static void posixControllerInit(char * name, const char * ps3name)
+{
+    for (int k=0; k<5; ++k)
+        axisdir[k] = +1;
+
+    if (strstr(name, "Taranis")) {
+        controller = TARANIS;
+        axismap[0] = 0;
+        axismap[1] = 1;
+        axismap[2] = 2;
+        axismap[3] = 3;
+        axismap[4] = 4;
+    }
+    else if (strstr(name, "PPM TO USB Adapter")) {
+        controller = SPEKTRUM;
+        axismap[0] = 1;
+        axismap[1] = 2;
+        axismap[2] = 5;
+        axismap[3] = 0;
+        axismap[4] = 3;
+    }
+    else if (strstr(name, ps3name)) {
+        controller = PS3;
+        axismap[0] = 2;
+        axismap[1] = 3;
+        axismap[2] = 0;
+        axismap[3] = 1;
+        axisdir[1] = -1;
+        axisdir[3] = -1;
+    }
+    else if (strstr(name, "Extreme 3D")) {
+        controller = EXTREME3D;
+        axismap[0] = 0;
+        axismap[1] = 1;
+        axismap[2] = 2;
+        axismap[3] = 3;
+        axisdir[1] = -1;
+        axisdir[3] = -1;
+    }
+    else {
+        printf("Uknown controller: %s\n", name);
+    }
+}
+
+static void posixControllerRead(bool isAxis, bool isButton, int number, int value)
+{
+    // Look at all five axes for R/C transmitters, first four for other controllers
+    int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
+
+    // Grab demands from axes
+    if (isAxis) 
+        for (int k=0; k<maxaxis; ++k)
+            if (number == axismap[k]) 
+                demands[k] = axisdir[k] * (int)(1000. * value / 32767);
+
+    // Grab aux demand from buttons when detected
+    if (isButton) {
+        switch (number) {
+            case 0:
+                demands[4] = -1000;
+                break;
+            case 1:
+                demands[4] =     0;
+                break;
+            case 2:
+                demands[4] = +1000;
+        }
+    }
+}
+
+
+
 #endif // Linux, OS X
 
 // joystick support for Linux
@@ -297,15 +374,9 @@ static void posixKbClose(void)
 
 static int joyfd;
 
-static int axismap[5];
-static int axisdir[5];
-
 static void controllerInit(void)
 { 
     joyfd = open(JOY_DEV, O_RDONLY);
-
-    for (int k=0; k<5; ++k)
-        axisdir[k] = +1;
 
     if (joyfd > 0) {
 
@@ -315,42 +386,8 @@ static void controllerInit(void)
         if (ioctl(joyfd, JSIOCGNAME(sizeof(name)), name) < 0)
             printf("Uknown controller\n");
 
-        if (strstr(name, "Taranis")) {
-            controller = TARANIS;
-            axismap[0] = 0;
-            axismap[1] = 1;
-            axismap[2] = 2;
-            axismap[3] = 3;
-            axismap[4] = 4;
-        }
-        else if (strstr(name, "PPM TO USB Adapter")) {
-            controller = SPEKTRUM;
-            axismap[0] = 1;
-            axismap[1] = 2;
-            axismap[2] = 5;
-            axismap[3] = 0;
-            axismap[4] = 3;
-        }
-        else if (strstr(name, "MY-POWER CO.")) {
-            controller = PS3;
-            axismap[0] = 2;
-            axismap[1] = 3;
-            axismap[2] = 0;
-            axismap[3] = 1;
-            axisdir[1] = -1;
-            axisdir[3] = -1;
-        }
-        else if (strstr(name, "Extreme 3D")) {
-            controller = EXTREME3D;
-            axismap[0] = 0;
-            axismap[1] = 1;
-            axismap[2] = 2;
-            axismap[3] = 3;
-            axisdir[1] = -1;
-            axisdir[3] = -1;
-        }
         else {
-            printf("Uknown controller: %s\n", name);
+            posixControllerInit(name, "MY-POWER CO.");
         }
     }
 
@@ -363,33 +400,9 @@ static void controllerRead(void * ignore)
 {
     // Have a joystick; grab its axes
     if (joyfd  > 0) {
-
         struct js_event js;
-
         read(joyfd, &js, sizeof(struct js_event));
-
-        // Look at all five axes for R/C transmitters, first four for other controllers
-        int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
-
-        // Grab demands from axes
-        if (js.type & JS_EVENT_AXIS) 
-            for (int k=0; k<maxaxis; ++k)
-                if (js.number == axismap[k]) 
-                    demands[k] = axisdir[k] * (int)(1000. * js.value / 32767);
-
-        // Grab aux demand from buttons when detected
-        if (js.type & JS_EVENT_BUTTON && js.value) {
-            switch (js.number) {
-                case 0:
-                    demands[4] = -1000;
-                    break;
-                case 1:
-                    demands[4] =     0;
-                    break;
-                case 2:
-                    demands[4] = +1000;
-            }
-        }
+        posixControllerRead(js.type&JS_EVENT_AXIS, js.type&JS_EVENT_BUTTON&js.value, js.number, js.value);
     }
 
     // No joystick; use keyboard
@@ -418,9 +431,6 @@ static void controllerClose(void)
 
 static SDL_Joystick * joystick;
 
-static int axismap[5];
-static int axisdir[5];
-
 static void controllerInit(void)
 {
     if (SDL_Init(SDL_INIT_JOYSTICK)) {
@@ -441,44 +451,7 @@ static void controllerInit(void)
     char name[100];
     strcpy(name, SDL_JoystickNameForIndex(0));
 
-    if (strstr(name, "Taranis")) {
-        controller = TARANIS;
-        axismap[0] = 0;
-        axismap[1] = 1;
-        axismap[2] = 2;
-        axismap[3] = 3;
-        axismap[4] = 4;
-    }
-    else if (strstr(name, "PPM TO USB Adapter")) {
-        controller = SPEKTRUM;
-        axismap[0] = 1;
-        axismap[1] = 2;
-        axismap[2] = 5;
-        axismap[3] = 0;
-        axismap[4] = 3;
-        //printf("Spektrum PPM to USB currently not supported on OS X\n");
-        //joystick = NULL;
-    }
-    else if (strstr(name, "2In1 USB Joystick")) {
-        controller = PS3;
-        axismap[0] = 2;
-        axismap[1] = 3;
-        axismap[2] = 0;
-        axismap[3] = 1;
-        axisdir[1] = -1;
-        axisdir[3] = -1;
-    }
-    else if (strstr(name, "Extreme 3D")) {
-        axismap[0] = 0;
-        axismap[1] = 1;
-        axismap[2] = 2;
-        axismap[3] = 3;
-        axisdir[1] = -1;
-        axisdir[3] = -1;
-    }
-    else {
-        printf("Uknown controller: %s\n", name);
-    }
+    posixControllerInit(name, "2In1 USB Joystick");
 }
 
 static void controllerRead(void * ignore)
@@ -532,15 +505,6 @@ static void controllerClose(void)
 }
 
 #endif // OS X
-
-#if defined (__linux) || defined (__APPLE__)
-#include <unistd.h>
-#include <fcntl.h>
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
-#define WIN_AFX_MANAGE_STATE
-#endif /* __linux || __APPLE__ */
 
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
