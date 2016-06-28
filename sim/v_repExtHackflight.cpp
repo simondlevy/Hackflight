@@ -37,10 +37,8 @@ static Controller controller;
 // Stick demands from controller
 static int demands[5];
 
-// Keyboard support
-
+// Keyboard support for any OS
 static const float KEYBOARD_INC = 10;
-
 static void kbchange(int index, int dir)
 {
     demands[index] += (int)(dir*KEYBOARD_INC);
@@ -230,7 +228,58 @@ static void controllerClose(void)
 {
     // XXX no action needed (?)
 }
-#endif /* _WIN32 */
+
+#else  // Linux, OS X
+
+// Keyboard support for Linux and OS X
+#include <unistd.h>
+#include <termios.h>
+static struct termios oldSettings;
+
+static void posixKbInit(void)
+{
+    struct termios newSettings;
+
+    // Save keyboard settings for restoration later
+    tcgetattr(fileno( stdin ), &oldSettings);
+
+    // Create new keyboard settings
+    newSettings = oldSettings;
+    newSettings.c_lflag &= (~ICANON & ~ECHO);
+    tcsetattr(fileno(stdin), TCSANOW, &newSettings);
+}
+
+static void posixKbGrab(void)
+{
+        fd_set set;
+        struct timeval tv;
+
+        tv.tv_sec = 0;
+        tv.tv_usec = 100;
+
+        FD_ZERO( &set );
+        FD_SET( fileno( stdin ), &set );
+
+        int res = select(fileno(stdin )+1, &set, NULL, NULL, &tv);
+
+        char c = 0;
+
+        if (res > 0) {
+            read(fileno( stdin ), &c, 1);
+            char keys[8] = {52, 54, 50, 56, 48, 10, 51, 57};
+            kbRespond(c, keys);
+        }
+
+        else if( res < 0 ) 
+            perror( "select error" );
+}
+
+static void posixKbClose(void)
+{
+    tcsetattr(fileno(stdin), TCSANOW, &oldSettings);
+}
+
+#endif // Linux, OS X
 
 // joystick support for Linux
 #ifdef __linux // ===================================================================
@@ -241,17 +290,12 @@ static void controllerClose(void)
 
 #include <stdio.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <string.h>
-
-#include <termios.h>
-static struct termios oldSettings;
 
 static int joyfd;
 
 static int axismap[5];
 static int axisdir[5];
-
 
 static void controllerInit(void)
 { 
@@ -308,18 +352,8 @@ static void controllerInit(void)
     }
 
     // No joystick detected; use keyboard as fallback
-    else {
-
-        struct termios newSettings;
-
-        // Save keyboard settings for restoration later
-        tcgetattr(fileno( stdin ), &oldSettings);
-
-        // Create new keyboard settings
-        newSettings = oldSettings;
-        newSettings.c_lflag &= (~ICANON & ~ECHO);
-        tcsetattr(fileno(stdin), TCSANOW, &newSettings);
-    }
+    else 
+        posixKbInit();
 } 
 
 static void controllerRead(void * ignore)
@@ -356,32 +390,8 @@ static void controllerRead(void * ignore)
     }
 
     // No joystick; use keyboard
-    else {
-
-        fd_set set;
-        struct timeval tv;
-
-        tv.tv_sec = 0;
-        tv.tv_usec = 100;
-
-        FD_ZERO( &set );
-        FD_SET( fileno( stdin ), &set );
-
-        int res = select(fileno(stdin )+1, &set, NULL, NULL, &tv);
-
-        char c = 0;
-
-        if( res > 0 )
-        {
-            read(fileno( stdin ), &c, 1);
-            char keys[8] = {68, 67, 66, 65, 50, 10, 54, 53};
-            kbRespond(c, keys);
-        }
-
-        else if( res < 0 ) {
-            perror( "select error" );
-        }
-    }
+    else 
+        posixKbGrab();
 }
 
 static void controllerClose(void)
@@ -390,7 +400,7 @@ static void controllerClose(void)
         close(joyfd);
 
     else // reset keyboard if no joystick
-        tcsetattr(fileno(stdin), TCSANOW, &oldSettings);
+        posixKbClose();
 }
 #endif // Linux
 
@@ -400,9 +410,6 @@ static void controllerClose(void)
 #include <SDL.h>
 
 #include <sys/select.h>
-#include <unistd.h>
-#include <termios.h>
-static struct termios oldSettings;
 
 static SDL_Joystick * joystick;
 
@@ -411,23 +418,15 @@ static int axisdir[4];
 
 static void controllerInit(void)
 {
-    struct termios newSettings;
-
-    // Save keyboard settings for restoration later
-    tcgetattr(fileno( stdin ), &oldSettings);
-
-    // Create new keyboard settings
-    newSettings = oldSettings;
-    newSettings.c_lflag &= (~ICANON & ~ECHO);
-    tcsetattr(fileno(stdin), TCSANOW, &newSettings);
-
     if (SDL_Init(SDL_INIT_JOYSTICK)) {
-        printf("Failed to initialize SDL\n");
+        printf("Failed to initialize SDL; using keyboard\n");
+        posixKbInit();
         return;
     }
 
     if (!(joystick = SDL_JoystickOpen(0))) {
-        printf("Unable to open joystick\n");
+        printf("Unable to open joystick; using keyboard\n");
+        posixKbInit();
         return;
     }
 
@@ -482,31 +481,8 @@ static void controllerRead(void * ignore)
     }
 
     // Fall back on keyboard if no controller
-    else {
-        fd_set set;
-        struct timeval tv;
-
-        tv.tv_sec = 0;
-        tv.tv_usec = 100;
-
-        FD_ZERO( &set );
-        FD_SET( fileno( stdin ), &set );
-
-        int res = select(fileno(stdin )+1, &set, NULL, NULL, &tv);
-
-        char c = 0;
-
-        if( res > 0 ) {
-            read(fileno( stdin ), &c, 1);
-            printf("%d\n", c);
-            char keys[8] = {52, 54, 50, 56, 48, 10, 51, 57};
-            kbRespond(c, keys);
-        }
-
-        else if( res < 0 ) {
-            perror( "select error" );
-        }
-     }
+    else 
+        posixKbGrab();
 }
 
 static void controllerClose(void)
@@ -515,7 +491,7 @@ static void controllerClose(void)
         SDL_JoystickClose(joystick);
 
     else // reset keyboard if no joystick
-        tcsetattr(fileno(stdin), TCSANOW, &oldSettings);
+        posixKbClose();
 }
 
 #endif // OS X
