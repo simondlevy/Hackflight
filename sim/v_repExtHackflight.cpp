@@ -232,7 +232,9 @@ static void controllerClose(void)
 #else  // Linux, OS X
 
 // Keyboard support for Linux and OS X
+#include <stdio.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <termios.h>
 static struct termios oldSettings;
 
@@ -249,26 +251,25 @@ static void posixKbInit(void)
     tcsetattr(fileno(stdin), TCSANOW, &newSettings);
 }
 
-static void posixKbGrab(void)
+static void posixKbGrab(char keys[8])
 {
-        fd_set set;
-        struct timeval tv;
+    fd_set set;
+    struct timeval tv;
 
-        tv.tv_sec = 0;
-        tv.tv_usec = 100;
+    tv.tv_sec = 0;
+    tv.tv_usec = 100;
 
-        FD_ZERO( &set );
-        FD_SET( fileno( stdin ), &set );
+    FD_ZERO( &set );
+    FD_SET( fileno( stdin ), &set );
 
-        int res = select(fileno(stdin )+1, &set, NULL, NULL, &tv);
+    int res = select(fileno(stdin )+1, &set, NULL, NULL, &tv);
 
-        char c = 0;
+    char c = 0;
 
-        if (res > 0) {
-            read(fileno( stdin ), &c, 1);
-            char keys[8] = {52, 54, 50, 56, 48, 10, 51, 57};
-            kbRespond(c, keys);
-        }
+    if (res > 0) {
+        read(fileno( stdin ), &c, 1);
+        kbRespond(c, keys);
+    }
 
         else if( res < 0 ) 
             perror( "select error" );
@@ -390,8 +391,10 @@ static void controllerRead(void * ignore)
     }
 
     // No joystick; use keyboard
-    else 
-        posixKbGrab();
+    else  {
+        char keys[8] = {68, 67, 66, 65, 50, 10, 54, 53};
+        posixKbGrab(keys);
+    }
 }
 
 static void controllerClose(void)
@@ -481,8 +484,10 @@ static void controllerRead(void * ignore)
     }
 
     // Fall back on keyboard if no controller
-    else 
-        posixKbGrab();
+    else {
+        char keys[8] = {52, 54, 50, 56, 48, 10, 51, 57};
+        posixKbGrab(keys);
+    }
 }
 
 static void controllerClose(void)
