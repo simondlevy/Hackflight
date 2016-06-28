@@ -336,10 +336,13 @@ static void posixControllerGrabAxis(int number, int value)
     // Look at all five axes for R/C transmitters, first four for other controllers
     int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
 
+    // PS3 axes are hyper-sensitive
+    int downscale = (controller == PS3) ? 2 : 1;
+
     // Grab demands from axes
     for (int k=0; k<maxaxis; ++k)
         if (number == axismap[k]) 
-            demands[k] = axisdir[k] * (int)(1000. * value / 32767);
+            demands[k] = axisdir[k] * (int)(1000. * value / (downscale*32767));
 }
 
 static void posixControllerGrabButton(int number)
@@ -364,7 +367,7 @@ static void posixControllerGrabButton(int number)
 // joystick support for Linux
 #ifdef __linux // ===================================================================
 
-#define JOY_DEV "/dev/input/js0"
+static const char * JOY_DEV = "/dev/input/js0";
 
 #include <linux/joystick.h>
 
@@ -504,7 +507,7 @@ static void controllerClose(void)
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
-#define PLUGIN_NAME "Hackflight"
+#define PLUGIN_NAME  "Hackflight"
 
 LIBRARY vrepLib;
 
@@ -518,7 +521,7 @@ static bool ready;
 
 // needed for spring-mounted throttle stick
 static int throttleDemand;
-#define PS3_THROTTLE_INC .005                
+static const float PS3_THROTTLE_INC = .01;
 
 // IMU support
 static double accel[3];
@@ -540,7 +543,7 @@ static double timestep = .01;
 // --------------------------------------------------------------------------------------
 // simExtHackflight_start
 // --------------------------------------------------------------------------------------
-#define LUA_START_COMMAND "simExtHackflight_start"
+#define LUA_START_COMMAND  "simExtHackflight_start"
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
