@@ -769,7 +769,13 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     if (!ready)
         return NULL;
 
-    printf("%d\n", visionSensorHandle);
+    // Process data from vision sensor if available
+    if (visionSensorHandle) {
+        float* imageBuffer = simGetVisionSensorImage(visionSensorHandle);
+        int res[2];
+        simGetVisionSensorResolution(visionSensorHandle, res);
+        printf("%d %d\n", res[0], res[1]);
+    }
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
