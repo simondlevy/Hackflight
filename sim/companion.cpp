@@ -33,6 +33,8 @@ void CompanionBoard::init(int _imgWidth, int _imgHeight)
     this->imgWidth = _imgWidth;
     this->imgHeight = _imgHeight;
 
+    this->pid = 0;
+
 #ifdef __linux
     const char * script = "/home/levy/Desktop/hackflight/sim/companion.py";
     char *argv[2] = {(char *)script, NULL};
@@ -52,6 +54,7 @@ void CompanionBoard::update(float * imageBytes)
 void CompanionBoard::halt(void)
 {
 #ifdef __linux
-    kill(this->pid, SIGKILL);
+    if (this->pid)
+        kill(this->pid, SIGKILL);
 #endif
 }
