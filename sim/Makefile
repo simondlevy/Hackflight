@@ -59,9 +59,9 @@ libv_repExtHackflight.$(EXT): *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp Ma
 	#g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -ldl -shared $(JOYLIB)
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared $(JOYLIB)
 
-install: $(PLUGIN) companion.py
+install: $(PLUGIN) hackflight_companion.py
 	cp $(PLUGIN) $(VREP_LIBDIR)
-	cp companion.py $(VREP_LIBDIR)
+	cp hackflight_companion.py $(VREP_LIBDIR)
 
 uninstall:
 	rm -f $(VREP_DIR)/$(PLUGIN)
