@@ -17,7 +17,12 @@
 
 #include "companion.hpp"
 
+#ifdef __linux
 #include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <signal.h>
+#endif
 
 CompanionBoard::CompanionBoard(void)
 {
@@ -27,9 +32,26 @@ void CompanionBoard::init(int _imgWidth, int _imgHeight)
 {
     this->imgWidth = _imgWidth;
     this->imgHeight = _imgHeight;
+
+#ifdef __linux
+    const char * script = "/home/levy/Desktop/hackflight/sim/companion.py";
+    char *argv[2] = {(char *)script, NULL};
+
+    this->pid = fork();
+
+    if (this->pid == 0) {
+        execvp(script, argv);
+    }
+#endif
 }
         
-void CompanionBoard::processImage(float * imageBytes)
+void CompanionBoard::update(float * imageBytes)
 {
-    printf("%d %d\n", this->imgWidth, this->imgHeight);
+}
+
+void CompanionBoard::halt(void)
+{
+#ifdef __linux
+    kill(this->pid, SIGKILL);
+#endif
 }

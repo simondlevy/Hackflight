@@ -1,5 +1,6 @@
-/*
-   companion.hpp : Companion-board class declaration
+#!/usr/bin/env python
+'''
+   companion.py : Companion-board Python code
 
    This file is part of Hackflight.
 
@@ -13,22 +14,7 @@
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
- */
+'''
 
-class CompanionBoard {
-
-    private:
-
-        int imgWidth, imgHeight;
-        int pid;
-
-    public:
-
-        CompanionBoard(void);
-
-        void init(int imgWidth, int imgHeight);
-
-        void update(float * imageBytes);
-
-        void halt(void);
-};
+while True:
+    None

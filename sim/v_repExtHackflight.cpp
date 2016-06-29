@@ -682,6 +682,8 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
     controllerClose();
 
+    companionBoard.halt();
+
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);
@@ -783,7 +785,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
     // Process data from vision sensor if available
     if (visionSensorHandle) {
         float * imageBuffer = simGetVisionSensorImage(visionSensorHandle);
-        companionBoard.processImage(imageBuffer);
+        companionBoard.update(imageBuffer);
     }
 
     int errorModeSaved;
