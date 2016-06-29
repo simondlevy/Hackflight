@@ -125,6 +125,7 @@
     <ClCompile Include="..\firmware\pid.cpp" />
     <ClCompile Include="..\firmware\position.cpp" />
     <ClCompile Include="..\firmware\rc.cpp" />
+    <ClCompile Include="companion.cpp" />
     <ClCompile Include="v_repExtHackflight.cpp" />
   </ItemGroup>
   <ItemGroup>
