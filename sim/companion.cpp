@@ -36,7 +36,8 @@ void CompanionBoard::init(int _imgWidth, int _imgHeight)
     this->pid = 0;
 
 #ifdef __linux
-    const char * script = "/home/levy/Desktop/hackflight/sim/companion.py";
+    char script[200];
+    sprintf(script, "%s/hackflight_companion.py", VREP_DIR);
     char *argv[2] = {(char *)script, NULL};
 
     this->pid = fork();
