@@ -369,9 +369,6 @@ static void posixControllerGrabButton(int number)
     }
 }
 
-
-
-
 #endif // Linux, OS X
 
 // joystick support for Linux
@@ -794,7 +791,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
 
     // Handle camera messages
     if (message ==  sim_message_eventcallback_openglcameraview) {
-        printf("%d %d\n", auxiliaryData[0], auxiliaryData[1]);
+        printf("%d: %4d %4d\n", auxiliaryData[2], auxiliaryData[0], auxiliaryData[1]);
     }
 
     int errorModeSaved;
