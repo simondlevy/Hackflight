@@ -552,9 +552,9 @@ static float thrusts[4];
 static double timestep = .01;
 
 // Timing support
+static unsigned long int update_count;
 #ifdef __linux
 struct timeval start_time;
-static unsigned long int update_count;
 static void gettime(struct timeval * start_time)
 {
     gettimeofday(start_time, NULL);
@@ -572,8 +572,9 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
 #ifdef __linux
     gettime(&start_time);
-    update_count = 0;
 #endif
+
+	update_count = 0;
 
     CScriptFunctionData D;
 
@@ -679,9 +680,10 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
     struct timeval stop_time;
+#ifdef __linux
     gettime(&stop_time);
     printf("%d FPS\n", (int)(update_count/(stop_time.tv_sec-start_time.tv_sec)));
-
+#endif
     controllerClose();
 
     companionBoard.halt();
