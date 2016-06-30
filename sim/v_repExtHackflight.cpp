@@ -41,9 +41,6 @@ static int demands[5];
 // Downscaling for hypersensitive PS3 controller
 static const int PS3_DOWNSCALE = 2;
 
-// Handle to vision sensor -- too expensive to pass its data in
-static int visionSensorHandle;
-
 // Companion-board support
 CompanionBoard companionBoard;
 
@@ -570,11 +567,6 @@ static void gettime(struct timeval * start_time)
 // --------------------------------------------------------------------------------------
 #define LUA_START_COMMAND  "simExtHackflight_start"
 
-static const int inArgs_START[]={
-    1,
-    sim_script_arg_int32,0  // handle to vision sensor
-};
-
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
 
@@ -585,20 +577,7 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
     CScriptFunctionData D;
 
-    // Grab vision sensor handle
-    if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0],LUA_START_COMMAND)) {
-        std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
-        visionSensorHandle = inData->at(0).int32Data[0];
-    }
-
-    // Initialize companion board
-    if (visionSensorHandle) {
-        int res[2];
-        simGetVisionSensorResolution(visionSensorHandle, res);
-        companionBoard.init(res[0], res[1]);
-    }
-
-     // Run Hackflight setup()
+    // Run Hackflight setup()
     setup();
 
     // Need this for throttle on keyboard and PS3
@@ -764,9 +743,15 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
     }
 
     // Register new Lua commands:
-    simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME),strConCat("boolean result=",LUA_START_COMMAND,"(number HackflightHandle,number duration,boolean returnDirectly=false)"),LUA_START_CALLBACK);
+    simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@",PLUGIN_NAME),
+            strConCat("boolean result=",LUA_START_COMMAND,
+                "(number HackflightHandle,number duration,boolean returnDirectly=false)"),LUA_START_CALLBACK);
     simRegisterScriptCallbackFunction(strConCat(LUA_UPDATE_COMMAND,"@",PLUGIN_NAME), NULL, LUA_UPDATE_CALLBACK);
-    simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME),strConCat("boolean result=",LUA_STOP_COMMAND,"(number HackflightHandle)"),LUA_STOP_CALLBACK);
+    simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@",PLUGIN_NAME),
+            strConCat("boolean result=",LUA_STOP_COMMAND,"(number HackflightHandle)"),LUA_STOP_CALLBACK);
+
+    // Enable camera callbacks
+    simEnableEventCallback(sim_message_eventcallback_openglcameraview, "Hackflight", -1);
 
     return 8; // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
 }
@@ -799,20 +784,16 @@ static void kbdecrement(int index)
 }
 #endif
 
-VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customData,int* replyData)
+VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * customData, int * replyData)
 {
     // Don't do anything till start() has been called
     if (!ready)
         return NULL;
 
-    // Process data from vision sensor if available
-    if (visionSensorHandle) {
-        //float * imageBuffer = simGetVisionSensorImage(visionSensorHandle);
-        //companionBoard.update(imageBuffer);
+    // Handle camera messages
+    if (message ==  sim_message_eventcallback_openglcameraview) {
+        printf("%d %d\n", auxiliaryData[0], auxiliaryData[1]);
     }
-
-    else
-        printf("No vision sensor\n");
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
