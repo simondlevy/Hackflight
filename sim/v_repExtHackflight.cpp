@@ -251,6 +251,8 @@ static void controllerClose(void)
 #include <math.h>
 #include <string.h>
 
+#include <sys/time.h>
+
 static int axismap[5];
 static int axisdir[5];
 
@@ -552,6 +554,16 @@ static float thrusts[4];
 // 100 Hz timestep, used for simulating microsend timer
 static double timestep = .01;
 
+// Timing support
+#ifdef __linux
+struct timeval start_time;
+static unsigned long int update_count;
+static void gettime(struct timeval * start_time)
+{
+    gettimeofday(start_time, NULL);
+}
+#endif
+
 
 // --------------------------------------------------------------------------------------
 // simExtHackflight_start
@@ -565,6 +577,11 @@ static const int inArgs_START[]={
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
+
+#ifdef __linux
+    gettime(&start_time);
+    update_count = 0;
+#endif
 
     CScriptFunctionData D;
 
@@ -669,6 +686,8 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true)); 
     D.writeDataToStack(cb->stackID);
+
+    update_count++;
 }
 
 
@@ -680,6 +699,10 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
+    struct timeval stop_time;
+    gettime(&stop_time);
+    printf("%d FPS\n", (int)(update_count/(stop_time.tv_sec-start_time.tv_sec)));
+
     controllerClose();
 
     companionBoard.halt();
@@ -784,8 +807,8 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
 
     // Process data from vision sensor if available
     if (visionSensorHandle) {
-        float * imageBuffer = simGetVisionSensorImage(visionSensorHandle);
-        companionBoard.update(imageBuffer);
+        //float * imageBuffer = simGetVisionSensorImage(visionSensorHandle);
+        //companionBoard.update(imageBuffer);
     }
 
     else
