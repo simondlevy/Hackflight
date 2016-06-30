@@ -19,16 +19,15 @@ class CompanionBoard {
 
     private:
 
-        int imgWidth, imgHeight;
         int pid;
 
     public:
 
         CompanionBoard(void);
 
-        void init(int imgWidth, int imgHeight);
+        void start(void);
 
-        void update(float * imageBytes);
+        void update(char * imageBytes, int imageWidth, int imageHeight);
 
         void halt(void);
 };

@@ -571,6 +571,9 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     gettime(&start_time);
 #endif
 
+    // Start companion board
+    companionBoard.start();
+
 	update_count = 0;
 
     CScriptFunctionData D;
@@ -789,10 +792,9 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
     if (!ready)
         return NULL;
 
-    // Handle camera messages
-    if (message ==  sim_message_eventcallback_openglcameraview) {
-        printf("%d: %4d %4d\n", auxiliaryData[2], auxiliaryData[0], auxiliaryData[1]);
-    }
+    // Handle messages from belly camera
+    if (message ==  sim_message_eventcallback_openglcameraview && auxiliaryData[2] == 1)
+        companionBoard.update((char *)customData, auxiliaryData[0], auxiliaryData[1]);
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);

@@ -28,11 +28,8 @@ CompanionBoard::CompanionBoard(void)
 {
 }
 
-void CompanionBoard::init(int _imgWidth, int _imgHeight)
+void CompanionBoard::start(void)
 {
-    this->imgWidth = _imgWidth;
-    this->imgHeight = _imgHeight;
-
     this->pid = 0;
 
 #ifdef __linux
@@ -48,7 +45,7 @@ void CompanionBoard::init(int _imgWidth, int _imgHeight)
 #endif
 }
         
-void CompanionBoard::update(float * imageBytes)
+void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
 {
 }
 
