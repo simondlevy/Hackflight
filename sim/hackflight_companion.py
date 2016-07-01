@@ -16,5 +16,9 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import cv2
+
 while True:
-    None
+
+    f = open('image.bin', 'rb')
+    f.close()

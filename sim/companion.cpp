@@ -32,28 +32,41 @@ using namespace std;
 #include <signal.h>
 #endif
 
-// threaded function
-static void * _update(void * ptr)
+CompanionBoard::CompanionBoard(void)
 {
-    // the function must return something - NULL will do
-    return NULL;
 }
 
 void CompanionBoard::start(void)
 {
-}
+    this->pid = 0;
 
+#ifdef __linux
+    char script[200];
+    sprintf(script, "%s/hackflight_companion.py", VREP_DIR);
+    char *argv[2] = {(char *)script, NULL};
+
+    this->pid = fork();
+
+    if (this->pid == 0) {
+        execvp(script, argv);
+        exit(0);
+    }
+#endif
+}
+        
 void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
 {
     Mat image = Mat(imageHeight, imageWidth, CV_8UC3, imageBytes);
     flip(image, image, 0);
-    namedWindow( "OpenCV", WINDOW_AUTOSIZE );
-    imshow( "OpenCV", image );              
+    namedWindow( "OpenCV", WINDOW_AUTOSIZE );// Create a window for display.
+    imshow( "OpenCV", image );                   // Show our image inside it.
     waitKey(1);     
 }
 
 void CompanionBoard::halt(void)
 {
+#ifdef __linux
+    if (this->pid)
+        kill(this->pid, SIGKILL);
+#endif
 }
-
-

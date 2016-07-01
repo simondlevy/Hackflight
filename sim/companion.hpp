@@ -15,9 +15,17 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <pthread.h>
+
 class CompanionBoard {
 
+    private:
+
+        int pid;
+
     public:
+
+        CompanionBoard(void);
 
         void start(void);
 
