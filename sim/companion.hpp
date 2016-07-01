@@ -1,5 +1,5 @@
 /*
-   companion.hpp : Companion-board function declarations
+   companion.hpp : Companion-board class declaration
 
    This file is part of Hackflight.
 
@@ -15,9 +15,13 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+class CompanionBoard {
 
-void companion_start(void);
+    public:
 
-void companion_update(char * imageBytes, int imageWidth, int imageHeight);
+        void start(void);
 
-void companion_halt(void);
+        void update(char * imageBytes, int imageWidth, int imageHeight);
+
+        void halt(void);
+};

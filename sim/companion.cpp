@@ -1,5 +1,5 @@
 /*
-   companion.cpp : Companion-board implementation
+   companion.cpp : Companion-board class implementation
 
    This file is part of Hackflight.
 
@@ -32,11 +32,18 @@ using namespace std;
 #include <signal.h>
 #endif
 
-void companion_start(void)
+// threaded function
+static void * _update(void * ptr)
+{
+    // the function must return something - NULL will do
+    return NULL;
+}
+
+void CompanionBoard::start(void)
 {
 }
-        
-void companion_update(char * imageBytes, int imageWidth, int imageHeight)
+
+void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
 {
     Mat image = Mat(imageHeight, imageWidth, CV_8UC3, imageBytes);
     flip(image, image, 0);
@@ -45,6 +52,8 @@ void companion_update(char * imageBytes, int imageWidth, int imageHeight)
     waitKey(1);     
 }
 
-void companion_halt(void)
+void CompanionBoard::halt(void)
 {
 }
+
+
