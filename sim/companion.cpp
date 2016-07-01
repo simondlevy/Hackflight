@@ -21,6 +21,7 @@
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 using namespace cv;
 
 #include <iostream>
@@ -57,9 +58,10 @@ void CompanionBoard::start(void)
 void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
 {
     Mat image = Mat(imageHeight, imageWidth, CV_8UC3, imageBytes);
-    flip(image, image, 0);
-    namedWindow( "OpenCV", WINDOW_AUTOSIZE );// Create a window for display.
-    imshow( "OpenCV", image );                   // Show our image inside it.
+    flip(image, image, 0);                      // rectify image
+    cvtColor(image, image, COLOR_BGR2RGB); // convert image BGR->RGB
+    namedWindow( "OpenCV", WINDOW_AUTOSIZE );   // Create a window for display.
+    imshow( "OpenCV", image );                  // Show our image inside it.
     waitKey(1);     
 }
 
