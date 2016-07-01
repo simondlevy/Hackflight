@@ -41,9 +41,6 @@ static int demands[5];
 // Downscaling for hypersensitive PS3 controller
 static const int PS3_DOWNSCALE = 2;
 
-// Companion-board support
-CompanionBoard companionBoard;
-
 // Keyboard support for any OS
 static const float KEYBOARD_INC = 10;
 static void kbchange(int index, int dir)
@@ -572,7 +569,7 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #endif
 
     // Start companion board
-    companionBoard.start();
+    companion_start();
 
 	update_count = 0;
 
@@ -686,7 +683,7 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 #endif
     controllerClose();
 
-    companionBoard.halt();
+    companion_halt();
 
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true));
@@ -794,7 +791,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
 
     // Handle messages from belly camera
     if (message ==  sim_message_eventcallback_openglcameraview && auxiliaryData[2] == 1)
-        companionBoard.update((char *)customData, auxiliaryData[0], auxiliaryData[1]);
+        companion_update((char *)customData, auxiliaryData[0], auxiliaryData[1]);
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);

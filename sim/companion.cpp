@@ -1,5 +1,5 @@
 /*
-   companion.cpp : Companion-board class implementation
+   companion.cpp : Companion-board implementation
 
    This file is part of Hackflight.
 
@@ -32,23 +32,19 @@ using namespace std;
 #include <signal.h>
 #endif
 
-CompanionBoard::CompanionBoard(void)
-{
-}
-
-void CompanionBoard::start(void)
+void companion_start(void)
 {
 }
         
-void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
+void companion_update(char * imageBytes, int imageWidth, int imageHeight)
 {
     Mat image = Mat(imageHeight, imageWidth, CV_8UC3, imageBytes);
     flip(image, image, 0);
-    namedWindow( "OpenCV", WINDOW_AUTOSIZE );// Create a window for display.
-    imshow( "OpenCV", image );                   // Show our image inside it.
+    namedWindow( "OpenCV", WINDOW_AUTOSIZE );
+    imshow( "OpenCV", image );              
     waitKey(1);     
 }
 
-void CompanionBoard::halt(void)
+void companion_halt(void)
 {
 }
