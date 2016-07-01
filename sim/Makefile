@@ -56,8 +56,7 @@ libv_repExtHackflight.$(EXT): *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp Ma
 	g++ $(CFLAGS) -c ../firmware/rc.cpp
 	g++ $(CFLAGS) -c ../firmware/baro.cpp
 	g++ $(CFLAGS) -c ../firmware/position.cpp
-	#g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -ldl -shared $(JOYLIB)
-	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared $(JOYLIB)
+	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared -lopencv_core -lopencv_highgui $(JOYLIB)
 
 install: $(PLUGIN) hackflight_companion.py
 	cp $(PLUGIN) $(VREP_LIBDIR)

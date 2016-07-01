@@ -18,6 +18,14 @@
 #include "companion.hpp"
 
 #ifdef __linux
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+using namespace cv;
+
+#include <iostream>
+using namespace std;
+
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -47,6 +55,16 @@ void CompanionBoard::start(void)
         
 void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
 {
+    Mat image = Mat(imageHeight, imageWidth, CV_8UC3, imageBytes);
+    namedWindow( "Display window", WINDOW_AUTOSIZE );// Create a window for display.
+    imshow( "Display window", image );                   // Show our image inside it.
+    waitKey(1);     
+
+    // Image comes in as BRG and flipped left/right
+    //bgr_frame[:,:,0] = np.fliplr(rgb_frame[:,:,2])
+    //bgr_frame[:,:,1] = np.fliplr(rgb_frame[:,:,1])
+    //bgr_frame[:,:,2] = np.fliplr(rgb_frame[:,:,0])
+
 }
 
 void CompanionBoard::halt(void)
