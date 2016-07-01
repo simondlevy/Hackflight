@@ -38,19 +38,6 @@ CompanionBoard::CompanionBoard(void)
 
 void CompanionBoard::start(void)
 {
-    this->pid = 0;
-
-#ifdef __linux
-    char script[200];
-    sprintf(script, "%s/hackflight_companion.py", VREP_DIR);
-    char *argv[2] = {(char *)script, NULL};
-
-    this->pid = fork();
-
-    if (this->pid == 0) {
-        execvp(script, argv);
-    }
-#endif
 }
         
 void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
@@ -64,8 +51,4 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
 
 void CompanionBoard::halt(void)
 {
-#ifdef __linux
-    if (this->pid)
-        kill(this->pid, SIGKILL);
-#endif
 }

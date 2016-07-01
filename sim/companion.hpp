@@ -17,10 +17,6 @@
 
 class CompanionBoard {
 
-    private:
-
-        int pid;
-
     public:
 
         CompanionBoard(void);
