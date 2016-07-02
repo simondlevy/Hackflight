@@ -41,13 +41,13 @@ using namespace std;
 #include <time.h> 
 #endif
 
-static int connect_to_server(int port)
+static int connect_to_server(int port, const char * hostname="localhost")
 {
     // http://web.eecs.utk.edu/~huangj/cs360/360/notes/Sockets/socketfun.c
     struct sockaddr_in sn;
     struct hostent *he;
-    if (!(he = gethostbyname("localhost"))) {
-        printf("can't gethostname\n");
+    if (!(he = gethostbyname(hostname))) {
+        printf("can't get host id for %s\n", hostname);
     }
     int ok = 0;
     int sockfd = 0;
@@ -120,6 +120,7 @@ void CompanionBoard::halt(void)
 #ifdef __linux
     if (this->procid) {
         close(this->camera_sockfd);
+        close(this->comms_sockfd);
         kill(this->procid, SIGKILL);
     }
 #endif
