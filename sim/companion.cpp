@@ -43,11 +43,17 @@ using namespace std;
 
 CompanionBoard::CompanionBoard(void)
 {
+    this->pid = 0;
 }
 
 void CompanionBoard::start(void)
 {
 #ifdef __linux
+
+    if (this->pid) {
+        close(this->sockfd);
+        kill(this->pid, SIGKILL);
+    }
 
     this->pid = 0;
 
@@ -96,12 +102,23 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     cvtColor(image, image, COLOR_BGR2RGB); // convert image BGR->RGB
     imwrite("image.jpg", image);
 
-    // Re-open file as binary and send size to Python client
+    // Re-open and read JPEG file
     FILE * fp = fopen("image.jpg", "rb");
-    int size = fread(buf, 1, BUFSIZE, fp);
+    this->imgsize = fread(buf, 1, BUFSIZE, fp);
     fclose(fp);
 
-    write(this->sockfd, &size, 4);
+    printf("1=============\n");
+
+    // Send its size to the Python client
+    write(this->sockfd, &this->imgsize, 4);
+
+    printf("2=============\n");
+
+    // Send the image bytes
+    for (int sent=0; sent<this->imgsize; )
+        sent += write(this->sockfd, &buf[sent], this->imgsize-sent);
+
+    printf("3=============\n");
 
     //namedWindow( "OpenCV", WINDOW_AUTOSIZE );   // Create a window for display.
     //imshow( "OpenCV", image );                  // Show our image inside it.
@@ -110,8 +127,17 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
 
 void CompanionBoard::halt(void)
 {
-    int size = 0;
-    //write(this->sockfd, &size, 4);
-    close(this->sockfd);
-    kill(this->pid, SIGKILL);
+#ifdef __linux
+
+    printf("4=============\n");
+
+    // Send a zero to halt server
+    //this->imgsize = 0;
+
+    // Clean up
+    //sleep(1);
+    //close(this->sockfd);
+    //kill(this->pid, SIGKILL);
+
+#endif
 }

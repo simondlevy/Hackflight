@@ -23,6 +23,7 @@ class CompanionBoard {
 
         int pid;
         int sockfd;
+        int imgsize;
 
     public:
 

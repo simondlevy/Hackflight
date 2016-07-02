@@ -31,6 +31,8 @@ def serve_socket(port, host='localhost'):
     while True:
         
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+ 
+        sock.settimeout(1)
 
         try:
             sock.bind((host, port))
