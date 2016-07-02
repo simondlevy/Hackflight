@@ -17,7 +17,7 @@
 
 #include "companion.hpp"
 
-#ifdef __linux
+#if defined(__linux) && defined(_COMPANION)
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -41,6 +41,7 @@ using namespace std;
 #include <time.h> 
 #endif
 
+#if defined(__linux) && defined(_COMPANION)
 static int connect_to_server(int port, const char * hostname="localhost")
 {
     // http://web.eecs.utk.edu/~huangj/cs360/360/notes/Sockets/socketfun.c
@@ -64,6 +65,7 @@ static int connect_to_server(int port, const char * hostname="localhost")
     }  
     return sockfd;
 }
+#endif
 
 static const int CAMERA_PORT = 5000;
 static const int COMMS_PORT  = 5001;
@@ -75,7 +77,7 @@ CompanionBoard::CompanionBoard(void)
 
 void CompanionBoard::start(void)
 {
-#ifdef __linux
+#if defined(__linux) && defined(_COMPANION)
 
     // Build command-line arguments for forking the Python server script
     char script[200];
@@ -102,22 +104,24 @@ void CompanionBoard::start(void)
 
 void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
 {
-#ifdef __linux
-    // Use OpenCV to convert image to RGB, and save as JPEG
+#if defined(__linux) && defined(_COMPANION)
+
+    // Use OpenCV to convert BGR image bytes to RGB, and save as JPEG
     Mat image = Mat(imageHeight, imageWidth, CV_8UC3, imageBytes);
-    flip(image, image, 0);                      // rectify image
+    flip(image, image, 0);                 // rectify image
     cvtColor(image, image, COLOR_BGR2RGB); // convert image BGR->RGB
     imwrite("image.jpg", image);
 
     // Send sync byte to Python client, which will open and process the image
     char sync = 0;
     write(this->camera_sockfd, &sync, 1);
+
 #endif
 }
 
 void CompanionBoard::halt(void)
 {
-#ifdef __linux
+#if defined(__linux) && defined(_COMPANION)
     if (this->procid) {
         close(this->camera_sockfd);
         close(this->comms_sockfd);

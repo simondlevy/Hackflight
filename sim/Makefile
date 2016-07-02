@@ -21,6 +21,10 @@
 VREP_DIR_LINUX = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
 VREP_DIR_OSX   = /Applications/V-REP_PRO_EDU_V3_3_1_Mac
 
+# Un-comment if you want to build for the companion board:
+# Linux only, requires OpenCV
+#COMPANION=COMPANION
+
 COMMON = $(VREP_DIR)/programming/common/
 CFLAGS = -Wall -I$(VREP_DIR)/programming/include/ -I. -I../firmware -Wall -fPIC -static
 
@@ -44,7 +48,7 @@ all: $(PLUGIN)
 
 libv_repExtHackflight.$(EXT): *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp Makefile
 	g++ $(CFLAGS) -c v_repExtHackflight.cpp 
-	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" companion.cpp 
+	g++ $(CFLAGS) -c -D_$(COMPANION) -DVREP_DIR=\"$(VREP_LIBDIR)\" companion.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
 	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp
