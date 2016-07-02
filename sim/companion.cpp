@@ -93,11 +93,11 @@ void CompanionBoard::start(void)
         exit(0);
     }
 
-    // Open a socket for syncing camera images with the server
+    // Open a socket for syncing camera images with the server, and a socket for comms
     this->camera_sockfd = connect_to_server(CAMERA_PORT);
+    this->comms_sockfd = connect_to_server(COMMS_PORT);
 
 #endif
-
 }
 
 void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)

@@ -23,12 +23,14 @@ from socket_server import serve_socket
 # Two command-line arguments: first is camera-client port, second is MSP port
 if len(sys.argv) > 2:
 
-    client = serve_socket(int(sys.argv[1]))
+    # Serve a socket for camera synching, and a socket for comms
+    camera_client = serve_socket(int(sys.argv[1]))
+    comms_client  = serve_socket(int(sys.argv[2]))
 
     while True:
 
-        # Receive the sync byte from the client
-        client.recv(1)
+        # Receive the camera sync byte from the client
+        camera_client.recv(1)
      
         # Load the image from the temp file
         img = cv2.imread('image.jpg', cv2.IMREAD_COLOR)
