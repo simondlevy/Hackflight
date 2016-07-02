@@ -50,10 +50,12 @@ void CompanionBoard::start(void)
 {
 #ifdef __linux
 
+    /*
     if (this->pid) {
         close(this->sockfd);
         kill(this->pid, SIGKILL);
     }
+    */
 
     this->pid = 0;
 
@@ -105,4 +107,12 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     // Send sync byte to Python client, which will open and process the image
     char sync = 0;
     write(this->sockfd, &sync, 1);
+}
+
+void CompanionBoard::halt(void)
+{
+    if (this->pid) {
+        close(this->sockfd);
+        kill(this->pid, SIGKILL);
+    }
 }
