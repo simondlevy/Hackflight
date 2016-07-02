@@ -107,37 +107,10 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     this->imgsize = fread(buf, 1, BUFSIZE, fp);
     fclose(fp);
 
-    printf("1=============\n");
-
     // Send its size to the Python client
     write(this->sockfd, &this->imgsize, 4);
-
-    printf("2=============\n");
 
     // Send the image bytes
     for (int sent=0; sent<this->imgsize; )
         sent += write(this->sockfd, &buf[sent], this->imgsize-sent);
-
-    printf("3=============\n");
-
-    //namedWindow( "OpenCV", WINDOW_AUTOSIZE );   // Create a window for display.
-    //imshow( "OpenCV", image );                  // Show our image inside it.
-    //waitKey(1);     
-}
-
-void CompanionBoard::halt(void)
-{
-#ifdef __linux
-
-    printf("4=============\n");
-
-    // Send a zero to halt server
-    //this->imgsize = 0;
-
-    // Clean up
-    //sleep(1);
-    //close(this->sockfd);
-    //kill(this->pid, SIGKILL);
-
-#endif
 }

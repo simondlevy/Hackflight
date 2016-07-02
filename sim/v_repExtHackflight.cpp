@@ -686,8 +686,6 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 #endif
     controllerClose();
 
-    companionBoard.halt();
-
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);

@@ -25,30 +25,18 @@ client = serve_socket(5000)
 
 while True:
 
-    print('A ------------')
-
     # Receive the image size from the client
     imgsize = struct.unpack('i', client.recv(4))[0]
-
-    print('B1 ------------')
 
     # Client sends zero to terminate
     if imgsize == 0:
         break
 
-    print('B2 ------------')
-
     # Read image bytes
     remaining = imgsize
     msg = ''
     while remaining > 0:
-        print('C ------------')
         msg += client.recv(remaining)
-        print('D ------------')
         remaining -= len(msg)
 
-    print('E ------------')
-
     print(len(msg))
-
-print('F')
