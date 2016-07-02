@@ -16,20 +16,28 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import sys
 import cv2
-
 from socket_server import serve_socket
 
-client = serve_socket(5000)
+# Two command-line arguments: first is camera-client port, second is MSP port
+if len(sys.argv) > 2:
 
-while True:
+    client = serve_socket(int(sys.argv[1]))
 
-    # Receive the sync byte from the client
-    client.recv(1)
- 
-    # Load the image from the temp file
-    img = cv2.imread('image.jpg', cv2.IMREAD_COLOR)
+    while True:
 
-    # Display the image
-    cv2.imshow('OpenCV', img)
-    cv2.waitKey(1)
+        # Receive the sync byte from the client
+        client.recv(1)
+     
+        # Load the image from the temp file
+        img = cv2.imread('image.jpg', cv2.IMREAD_COLOR)
+
+        # Display the image
+        cv2.imshow('OpenCV', img)
+        cv2.waitKey(1)
+
+# XXX one argument: name of com-port
+else:
+
+    None

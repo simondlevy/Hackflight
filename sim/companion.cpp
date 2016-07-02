@@ -17,6 +17,9 @@
 
 #include "companion.hpp"
 
+static const int CAMERA_PORT = 5000;
+static const int COMMS_PORT  = 5001;
+
 #ifdef __linux
 
 #include <opencv2/core/core.hpp>
@@ -41,11 +44,6 @@ using namespace std;
 #include <time.h> 
 #endif
 
-CompanionBoard::CompanionBoard(void)
-{
-    this->pid = 0;
-}
-
 void CompanionBoard::start(void)
 {
 #ifdef __linux
@@ -54,7 +52,11 @@ void CompanionBoard::start(void)
 
     char script[200];
     sprintf(script, "%s/hackflight_companion.py", VREP_DIR);
-    char *argv[2] = {(char *)script, NULL};
+    char camera_port[10];
+    sprintf(camera_port, "%d", CAMERA_PORT);
+    char comms_port[10];
+    sprintf(comms_port, "%d", COMMS_PORT);
+    char *argv[4] = {(char *)script, camera_port, comms_port, NULL};
 
     this->pid = fork();
 
@@ -72,7 +74,7 @@ void CompanionBoard::start(void)
     int ok = 0;
     while (!ok) {
         sn.sin_family = AF_INET;
-        sn.sin_port  = htons(5000);
+        sn.sin_port  = htons(CAMERA_PORT);
         sn.sin_addr.s_addr = *(u_long*)(he->h_addr_list[0]);
 
         if ((this->sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
@@ -86,11 +88,9 @@ void CompanionBoard::start(void)
 
 }
 
-static const int BUFSIZE = 100000;
-static char buf[BUFSIZE];
-
 void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
 {
+#ifdef __linux
     // Use OpenCV to convert image to RGB, and save as JPEG
     Mat image = Mat(imageHeight, imageWidth, CV_8UC3, imageBytes);
     flip(image, image, 0);                      // rectify image
@@ -100,12 +100,15 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     // Send sync byte to Python client, which will open and process the image
     char sync = 0;
     write(this->sockfd, &sync, 1);
+#endif
 }
 
 void CompanionBoard::halt(void)
 {
+#ifdef __linux
     if (this->pid) {
         close(this->sockfd);
         kill(this->pid, SIGKILL);
     }
+#endif
 }
