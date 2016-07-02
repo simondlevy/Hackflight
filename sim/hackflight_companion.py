@@ -29,7 +29,7 @@ while True:
     # Receive the image size from the client
     imgsize = struct.unpack('i', client.recv(4))[0]
  
-    img = cv2.imread('image.jpg', 0)
+    img = cv2.imread('image.jpg', cv2.IMREAD_COLOR)
     cv2.imshow('OpenCV', img)
     cv2.waitKey(1)
 
