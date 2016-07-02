@@ -94,7 +94,7 @@ void CompanionBoard::start(void)
     }
 
     // Open a socket for syncing camera images with the server
-    this->sockfd = connect_to_server(CAMERA_PORT);
+    this->camera_sockfd = connect_to_server(CAMERA_PORT);
 
 #endif
 
@@ -111,7 +111,7 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
 
     // Send sync byte to Python client, which will open and process the image
     char sync = 0;
-    write(this->sockfd, &sync, 1);
+    write(this->camera_sockfd, &sync, 1);
 #endif
 }
 
@@ -119,7 +119,7 @@ void CompanionBoard::halt(void)
 {
 #ifdef __linux
     if (this->procid) {
-        close(this->sockfd);
+        close(this->camera_sockfd);
         kill(this->procid, SIGKILL);
     }
 #endif
