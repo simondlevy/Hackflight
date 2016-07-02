@@ -21,7 +21,7 @@ class CompanionBoard {
 
     private:
 
-        int pid;
+        int procid;
         int sockfd;
         int imgsize;
 

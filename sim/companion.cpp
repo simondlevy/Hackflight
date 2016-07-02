@@ -70,7 +70,7 @@ static int connect_to_server(int port)
 
 CompanionBoard::CompanionBoard(void)
 {
-    this->pid = 0;
+    this->procid = 0;
 }
 
 void CompanionBoard::start(void)
@@ -87,8 +87,8 @@ void CompanionBoard::start(void)
     char *argv[4] = {(char *)script, camera_port, comms_port, NULL};
 
     // Fork the Python server script
-    this->pid = fork();
-    if (this->pid == 0) {
+    this->procid = fork();
+    if (this->procid == 0) {
         execvp(script, argv);
         exit(0);
     }
@@ -118,9 +118,9 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
 void CompanionBoard::halt(void)
 {
 #ifdef __linux
-    if (this->pid) {
+    if (this->procid) {
         close(this->sockfd);
-        kill(this->pid, SIGKILL);
+        kill(this->procid, SIGKILL);
     }
 #endif
 }
