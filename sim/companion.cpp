@@ -17,9 +17,6 @@
 
 #include "companion.hpp"
 
-static const int CAMERA_PORT = 5000;
-static const int COMMS_PORT  = 5001;
-
 #ifdef __linux
 
 #include <opencv2/core/core.hpp>
@@ -56,7 +53,7 @@ static int connect_to_server(int port)
     int sockfd = 0;
     while (!ok) {
         sn.sin_family = AF_INET;
-        sn.sin_port  = htons(CAMERA_PORT);
+        sn.sin_port  = htons(port);
         sn.sin_addr.s_addr = *(u_long*)(he->h_addr_list[0]);
 
         if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
@@ -67,6 +64,9 @@ static int connect_to_server(int port)
     }  
     return sockfd;
 }
+
+static const int CAMERA_PORT = 5000;
+static const int COMMS_PORT  = 5001;
 
 CompanionBoard::CompanionBoard(void)
 {
