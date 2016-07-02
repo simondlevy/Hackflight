@@ -44,12 +44,37 @@ using namespace std;
 #include <time.h> 
 #endif
 
+static int connect_to_server(int port)
+{
+    // http://web.eecs.utk.edu/~huangj/cs360/360/notes/Sockets/socketfun.c
+    struct sockaddr_in sn;
+    struct hostent *he;
+    if (!(he = gethostbyname("localhost"))) {
+        printf("can't gethostname\n");
+    }
+    int ok = 0;
+    int sockfd = 0;
+    while (!ok) {
+        sn.sin_family = AF_INET;
+        sn.sin_port  = htons(CAMERA_PORT);
+        sn.sin_addr.s_addr = *(u_long*)(he->h_addr_list[0]);
+
+        if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+            perror("socket()");
+        }
+        ok = (connect(sockfd, (struct sockaddr*)&sn, sizeof(sn)) != -1);
+        if (!ok) sleep (1);
+    }  
+    return sockfd;
+}
+
 void CompanionBoard::start(void)
 {
 #ifdef __linux
 
     this->pid = 0;
 
+    // Build command-line arguments for forking the Python server script
     char script[200];
     sprintf(script, "%s/hackflight_companion.py", VREP_DIR);
     char camera_port[10];
@@ -58,31 +83,15 @@ void CompanionBoard::start(void)
     sprintf(comms_port, "%d", COMMS_PORT);
     char *argv[4] = {(char *)script, camera_port, comms_port, NULL};
 
+    // Fork the Python server script
     this->pid = fork();
-
     if (this->pid == 0) {
         execvp(script, argv);
         exit(0);
     }
 
-    // http://web.eecs.utk.edu/~huangj/cs360/360/notes/Sockets/socketfun.c
-    struct sockaddr_in sn;
-    struct hostent *he;
-    if (!(he = gethostbyname("localhost"))) {
-        printf("can't gethostname\n");
-    }
-    int ok = 0;
-    while (!ok) {
-        sn.sin_family = AF_INET;
-        sn.sin_port  = htons(CAMERA_PORT);
-        sn.sin_addr.s_addr = *(u_long*)(he->h_addr_list[0]);
-
-        if ((this->sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-            perror("socket()");
-        }
-        ok = (connect(this->sockfd, (struct sockaddr*)&sn, sizeof(sn)) != -1);
-        if (!ok) sleep (1);
-    }  
+    // Open a socket for syncing camera images with the server
+    this->sockfd = connect_to_server(CAMERA_PORT);
 
 #endif
 
