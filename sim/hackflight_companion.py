@@ -18,6 +18,8 @@
 
 import sys
 import cv2
+import numpy as np
+
 from socket_server import serve_socket
 
 # Two command-line arguments: first is camera-client port, second is MSP port
@@ -33,10 +35,26 @@ if len(sys.argv) > 2:
         camera_client.recv(1)
      
         # Load the image from the temp file
-        img = cv2.imread('image.jpg', cv2.IMREAD_COLOR)
+        image = cv2.imread('image.jpg', cv2.IMREAD_COLOR)
+
+        # Blur the image to reduce noise
+        blur = cv2.GaussianBlur(image, (5,5),0)
+
+        # Convert BGR to HSV
+        hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
+
+        # Threshold the HSV image for only green colors
+        lower_green = np.array([40,70,70])
+        upper_green = np.array([80,200,200])
+
+        # Threshold the HSV image to get only green colors
+        mask = cv2.inRange(hsv, lower_green, upper_green)
+        
+        # Blur the mask
+        bmask = cv2.GaussianBlur(mask, (5,5),0)
 
         # Display the image
-        cv2.imshow('OpenCV', img)
+        cv2.imshow('OpenCV', bmask)
         cv2.waitKey(1)
 
         comms_client.send('hello')
