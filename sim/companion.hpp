@@ -27,6 +27,8 @@ class CompanionBoard {
 
     public:
 
+        CompanionBoard(void);
+
         void start(void);
 
         void update(char * imageBytes, int imageWidth, int imageHeight);

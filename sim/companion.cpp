@@ -68,11 +68,14 @@ static int connect_to_server(int port)
     return sockfd;
 }
 
+CompanionBoard::CompanionBoard(void)
+{
+    this->pid = 0;
+}
+
 void CompanionBoard::start(void)
 {
 #ifdef __linux
-
-    this->pid = 0;
 
     // Build command-line arguments for forking the Python server script
     char script[200];
