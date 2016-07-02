@@ -22,6 +22,7 @@ class CompanionBoard {
     private:
 
         int pid;
+        int sockfd;
 
     public:
 

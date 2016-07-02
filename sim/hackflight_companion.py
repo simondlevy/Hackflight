@@ -17,8 +17,14 @@
 '''
 
 import cv2
+import socket
+import struct
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_address = ('localhost', 5000)
+sock.connect(server_address)
 
 while True:
 
-    f = open('image.bin', 'rb')
-    f.close()
+    data = sock.recv(4)
+    print(struct.unpack('i', data)[0])
