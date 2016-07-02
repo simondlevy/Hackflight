@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-   companion.py : Companion-board Python code
+   hackflight_companion.py : Companion-board Python code
 
    This file is part of Hackflight.
 
@@ -16,9 +16,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import numpy as np
 import cv2
-import struct
 
 from socket_server import serve_socket
 
