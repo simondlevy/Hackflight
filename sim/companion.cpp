@@ -30,8 +30,9 @@ using namespace std;
 
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/types.h>
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -69,6 +70,8 @@ static int connect_to_server(int port, const char * hostname="localhost")
 
 static const int CAMERA_PORT = 5000;
 static const int COMMS_PORT  = 5001;
+
+static const int MAXMSG      = 1000;
 
 CompanionBoard::CompanionBoard(void)
 {
@@ -115,6 +118,16 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     // Send sync byte to Python client, which will open and process the image
     char sync = 0;
     write(this->camera_sockfd, &sync, 1);
+
+    // Check whether bytes are available from server
+    int avail;
+    ioctl(this->comms_sockfd, FIONREAD, &avail);
+
+    // Ignore OOB values
+    if (avail > 0 && avail < MAXMSG) {
+        char msg[MAXMSG];
+        printf("%d\n", (int)read(this->comms_sockfd, msg, avail));
+    }
 
 #endif
 }

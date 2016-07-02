@@ -39,6 +39,8 @@ if len(sys.argv) > 2:
         cv2.imshow('OpenCV', img)
         cv2.waitKey(1)
 
+        comms_client.send('hello')
+
 # XXX one argument: name of com-port
 else:
 
