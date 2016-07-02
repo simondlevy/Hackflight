@@ -22,6 +22,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <netdb.h>
 using namespace cv;
 
 #include <iostream>
@@ -46,9 +47,10 @@ CompanionBoard::CompanionBoard(void)
 
 void CompanionBoard::start(void)
 {
+#ifdef __linux
+
     this->pid = 0;
 
-#ifdef __linux
     char script[200];
     sprintf(script, "%s/hackflight_companion.py", VREP_DIR);
     char *argv[2] = {(char *)script, NULL};
@@ -60,40 +62,47 @@ void CompanionBoard::start(void)
         exit(0);
     }
 
-    printf("ready to serve!\n");
-    struct sockaddr_in serv_addr; 
+    // http://web.eecs.utk.edu/~huangj/cs360/360/notes/Sockets/socketfun.c
+    struct sockaddr_in sn;
+    struct hostent *he;
+    if (!(he = gethostbyname("localhost"))) {
+        printf("can't gethostname\n");
+    }
+    int ok = 0;
+    while (!ok) {
+        sn.sin_family = AF_INET;
+        sn.sin_port  = htons(5000);
+        sn.sin_addr.s_addr = *(u_long*)(he->h_addr_list[0]);
 
-    char sendBuff[1025];
-    time_t ticks; 
-
-    int listenfd = socket(AF_INET, SOCK_STREAM, 0);
-    memset(&serv_addr, '0', sizeof(serv_addr));
-    memset(sendBuff, '0', sizeof(sendBuff)); 
-
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    serv_addr.sin_port = htons(5000); 
-
-    bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)); 
-
-    listen(listenfd, 10);
-
-    this->sockfd = accept(listenfd, (struct sockaddr*)NULL, NULL); 
-
-    printf("Accepted\n");
+        if ((this->sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+            perror("socket()");
+        }
+        ok = (connect(this->sockfd, (struct sockaddr*)&sn, sizeof(sn)) != -1);
+        if (!ok) sleep (1);
+    }  
 
 #endif
+
 }
+
+static const int BUFSIZE = 100000;
+static char buf[BUFSIZE];
 
 void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
 {
+    // Use OpenCV to convert image to RGB, and save as JPEG
     Mat image = Mat(imageHeight, imageWidth, CV_8UC3, imageBytes);
     flip(image, image, 0);                      // rectify image
     cvtColor(image, image, COLOR_BGR2RGB); // convert image BGR->RGB
     imwrite("image.jpg", image);
-    static int count;
-    write(this->sockfd, &count, 4);
-    count++;
+
+    // Re-open file as binary and send size to Python client
+    FILE * fp = fopen("image.jpg", "rb");
+    int size = fread(buf, 1, BUFSIZE, fp);
+    fclose(fp);
+
+    write(this->sockfd, &size, 4);
+
     //namedWindow( "OpenCV", WINDOW_AUTOSIZE );   // Create a window for display.
     //imshow( "OpenCV", image );                  // Show our image inside it.
     //waitKey(1);     
@@ -101,10 +110,8 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
 
 void CompanionBoard::halt(void)
 {
-#ifdef __linux
-    if (this->pid) {
-        close(this->sockfd);
-        kill(this->pid, SIGKILL);
-    }
-#endif
+    int size = 0;
+    //write(this->sockfd, &size, 4);
+    close(this->sockfd);
+    kill(this->pid, SIGKILL);
 }

@@ -61,6 +61,7 @@ libv_repExtHackflight.$(EXT): *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp Ma
 install: $(PLUGIN) hackflight_companion.py
 	cp $(PLUGIN) $(VREP_LIBDIR)
 	cp hackflight_companion.py $(VREP_LIBDIR)
+	cp socket_server.py $(VREP_LIBDIR)
 
 uninstall:
 	rm -f $(VREP_DIR)/$(PLUGIN)

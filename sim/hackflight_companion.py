@@ -17,14 +17,15 @@
 '''
 
 import cv2
-import socket
 import struct
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_address = ('localhost', 5000)
-sock.connect(server_address)
+from socket_server import serve_socket
+
+client = serve_socket(5000)
 
 while True:
 
-    data = sock.recv(4)
-    print(struct.unpack('i', data)[0])
+    data = client.recv(4)
+    imgsize = struct.unpack('i', data)[0]
+    print(imgsize)
+
