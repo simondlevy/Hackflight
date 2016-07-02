@@ -102,15 +102,7 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     cvtColor(image, image, COLOR_BGR2RGB); // convert image BGR->RGB
     imwrite("image.jpg", image);
 
-    // Re-open and read JPEG file
-    FILE * fp = fopen("image.jpg", "rb");
-    this->imgsize = fread(buf, 1, BUFSIZE, fp);
-    fclose(fp);
-
-    // Send its size to the Python client
-    write(this->sockfd, &this->imgsize, 4);
-
-    // Send the image bytes
-    //for (int sent=0; sent<this->imgsize; )
-    //    sent += write(this->sockfd, &buf[sent], this->imgsize-sent);
+    // Send sync byte to Python client, which will open and process the image
+    char sync = 0;
+    write(this->sockfd, &sync, 1);
 }

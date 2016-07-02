@@ -26,21 +26,12 @@ client = serve_socket(5000)
 
 while True:
 
-    # Receive the image size from the client
-    imgsize = struct.unpack('i', client.recv(4))[0]
+    # Receive the sync byte from the client
+    client.recv(1)
  
+    # Load the image from the temp file
     img = cv2.imread('image.jpg', cv2.IMREAD_COLOR)
+
+    # Display the image
     cv2.imshow('OpenCV', img)
     cv2.waitKey(1)
-
-    # Read image bytes
-    #remaining = imgsize
-    #msg = ''
-    #while remaining > 0:
-    #
-    #    msg += client.recv(remaining)
-    #    remaining -= len(msg)
-
-    #imgbytes = np.frombuffer(msg, np.uint8)
-    #imgbytes = np.reshape(imgbytes, (self.size[1], self.size[0], 3))
-    #img = cv2.imdecode(rgb_bytes, cv2.CV_LOAD_IMAGE_COLOR) # cv2.IMREAD_COLOR in OpenCV 3.1
