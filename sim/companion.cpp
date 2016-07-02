@@ -50,13 +50,6 @@ void CompanionBoard::start(void)
 {
 #ifdef __linux
 
-    /*
-    if (this->pid) {
-        close(this->sockfd);
-        kill(this->pid, SIGKILL);
-    }
-    */
-
     this->pid = 0;
 
     char script[200];
