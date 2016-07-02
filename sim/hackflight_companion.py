@@ -16,6 +16,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import numpy as np
 import cv2
 import struct
 
@@ -27,16 +28,19 @@ while True:
 
     # Receive the image size from the client
     imgsize = struct.unpack('i', client.recv(4))[0]
-
-    # Client sends zero to terminate
-    if imgsize == 0:
-        break
+ 
+    img = cv2.imread('image.jpg', 0)
+    cv2.imshow('OpenCV', img)
+    cv2.waitKey(1)
 
     # Read image bytes
-    remaining = imgsize
-    msg = ''
-    while remaining > 0:
-        msg += client.recv(remaining)
-        remaining -= len(msg)
+    #remaining = imgsize
+    #msg = ''
+    #while remaining > 0:
+    #
+    #    msg += client.recv(remaining)
+    #    remaining -= len(msg)
 
-    print(len(msg))
+    #imgbytes = np.frombuffer(msg, np.uint8)
+    #imgbytes = np.reshape(imgbytes, (self.size[1], self.size[0], 3))
+    #img = cv2.imdecode(rgb_bytes, cv2.CV_LOAD_IMAGE_COLOR) # cv2.IMREAD_COLOR in OpenCV 3.1

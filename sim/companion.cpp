@@ -111,6 +111,6 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     write(this->sockfd, &this->imgsize, 4);
 
     // Send the image bytes
-    for (int sent=0; sent<this->imgsize; )
-        sent += write(this->sockfd, &buf[sent], this->imgsize-sent);
+    //for (int sent=0; sent<this->imgsize; )
+    //    sent += write(this->sockfd, &buf[sent], this->imgsize-sent);
 }
