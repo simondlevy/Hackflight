@@ -631,7 +631,7 @@ class Java_Emitter(CodeEmitter):
 if __name__ == '__main__':
 
     # default to input from simple example
-    data = json.load(open(argv[1] if len(argv) > 1 else 'example.json'))
+    data = json.load(open(argv[1] if len(argv) > 1 else 'messages.json'))
  
     # takes the types of messages from the json file
     unicode_message_types = data.keys()
