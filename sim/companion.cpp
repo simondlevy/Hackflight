@@ -45,7 +45,7 @@ using namespace std;
 #if defined(__linux) && defined(_COMPANION)
 static int connect_to_server(int port, const char * hostname="localhost")
 {
-    // http://web.eecs.utk.edu/~huangj/cs360/360/notes/Sockets/socketfun.c
+    // http://web.eecs.utk.edu/~plank/plank/classes/cs360/360/notes/Sockets/sockettome.c
     struct sockaddr_in sn;
     struct hostent *he;
     if (!(he = gethostbyname(hostname))) {
@@ -68,10 +68,10 @@ static int connect_to_server(int port, const char * hostname="localhost")
 }
 #endif
 
-static const int CAMERA_PORT = 5000;
-static const int COMMS_PORT  = 5001;
-
-static const int MAXMSG      = 1000;
+static const int CAMERA_PORT       = 5000;
+static const int COMMS_PORT        = 5001;
+static const char * IMAGE_FILENAME = "image.jpg";
+static const int MAXMSG            = 1000;
 
 CompanionBoard::CompanionBoard(void)
 {
@@ -89,7 +89,7 @@ void CompanionBoard::start(void)
     sprintf(camera_port, "%d", CAMERA_PORT);
     char comms_port[10];
     sprintf(comms_port, "%d", COMMS_PORT);
-    char *argv[4] = {(char *)script, camera_port, comms_port, NULL};
+    char *argv[5] = {(char *)script, camera_port, comms_port, (char *)IMAGE_FILENAME, NULL};
 
     // Fork the Python server script
     this->procid = fork();
@@ -113,7 +113,7 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     Mat image = Mat(imageHeight, imageWidth, CV_8UC3, imageBytes);
     flip(image, image, 0);                 // rectify image
     cvtColor(image, image, COLOR_BGR2RGB); // convert image BGR->RGB
-    imwrite("image.jpg", image);
+    imwrite(IMAGE_FILENAME, image);
 
     // Send sync byte to Python client, which will open and process the image
     char sync = 0;

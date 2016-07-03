@@ -22,12 +22,13 @@ import numpy as np
 
 from socket_server import serve_socket
 
-# Two command-line arguments: first is camera-client port, second is MSP port
+# Three command-line arguments: first is camera-client port, second is MSP port, third is image file name
 if len(sys.argv) > 2:
 
     # Serve a socket for camera synching, and a socket for comms
     camera_client = serve_socket(int(sys.argv[1]))
     comms_client  = serve_socket(int(sys.argv[2]))
+    image_filename  = sys.argv[3]
 
     while True:
 
@@ -35,7 +36,7 @@ if len(sys.argv) > 2:
         camera_client.recv(1)
      
         # Load the image from the temp file
-        image = cv2.imread('image.jpg', cv2.IMREAD_COLOR)
+        image = cv2.imread(image_filename, cv2.IMREAD_COLOR)
 
         # Blur image to remove noise
         frame = cv2.GaussianBlur(image, (3, 3), 0)
