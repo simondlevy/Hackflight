@@ -18,7 +18,6 @@
 
 import sys
 import cv2
-import numpy as np
 
 from socket_server import serve_socket
 
@@ -37,24 +36,24 @@ if len(sys.argv) > 2:
         # Load the image from the temp file
         image = cv2.imread('image.jpg', cv2.IMREAD_COLOR)
 
-        # Blur the image to reduce noise
-        blur = cv2.GaussianBlur(image, (5,5),0)
+        # Blur image to remove noise
+        frame = cv2.GaussianBlur(image, (3, 3), 0)
 
-        # Convert BGR to HSV
-        hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
+        # Switch image from BGR colorspace to HSV
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-        # Threshold the HSV image for only green colors
-        lower_green = np.array([40,70,70])
-        upper_green = np.array([80,200,200])
+        # define range of blue color in HSV
+        blueMin = (100,  50,  10)
+        blueMax = (255, 255, 255)
 
-        # Threshold the HSV image to get only green colors
-        mask = cv2.inRange(hsv, lower_green, upper_green)
-        
-        # Blur the mask
-        bmask = cv2.GaussianBlur(mask, (5,5),0)
+        # Sets pixels to white if in blue range, else will be set to black
+        mask = cv2.inRange(hsv, blueMin, blueMax)
+
+        # Bitwise-AND of mask and blue only image - only used for display
+        res = cv2.bitwise_and(frame, frame, mask= mask)
 
         # Display the image
-        cv2.imshow('OpenCV', bmask)
+        cv2.imshow('OpenCV', res)
         cv2.waitKey(1)
 
         comms_client.send('hello')

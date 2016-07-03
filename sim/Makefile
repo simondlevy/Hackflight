@@ -73,6 +73,9 @@ uninstall:
 edit:
 	vim v_repExtHackflight.cpp
 
+flakes:
+	pyflakes hackflight_companion.py
+
 release: $(PLUGIN)
 	cp $(PLUGIN) Release
 
