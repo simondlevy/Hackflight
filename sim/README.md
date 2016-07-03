@@ -80,3 +80,27 @@ the Makefile in this directory (<b>hackflight/sim</b>) to reflect where you
 installed V-REP.  Typing <b>make install</b> should then build the plugin and
 install it the appropriate place.
 
+<b>Companion-Board Simulation</b>
+
+Linux users can experiment with a simulated &ldquo;companion board&rdquo; computer
+(Raspberry Pi, ODROID, BeagleBone) that uses Python and OpenCV to illustrate a 
+simple machine-vision algorithm.  To do this you will need to install OpenCV.  
+
+<p>
+
+On Ubuntu:
+<pre>
+  sudo apt install python-opencv
+  sudo apt install libopencv-dev
+</pre>
+
+<p>
+
+On Fedora:
+
+<pre>
+  sudo yum install opencv-python
+  sudo yum install opencv-devel
+</pre>
+
+
