@@ -49,11 +49,8 @@ if len(sys.argv) > 2:
         # Sets pixels to white if in blue range, else will be set to black
         mask = cv2.inRange(hsv, blueMin, blueMax)
 
-        # Bitwise-AND of mask and blue only image - only used for display
-        res = cv2.bitwise_and(frame, frame, mask= mask)
-
-        # Display the image
-        cv2.imshow('OpenCV', res)
+        # Display the mask image
+        cv2.imshow('OpenCV', mask)
         cv2.waitKey(1)
 
         comms_client.send('hello')
