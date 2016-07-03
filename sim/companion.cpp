@@ -126,7 +126,7 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     // Ignore OOB values
     if (avail > 0 && avail < MAXMSG) {
         char msg[MAXMSG];
-        printf("%d\n", (int)read(this->comms_sockfd, msg, avail));
+        read(this->comms_sockfd, msg, avail);
     }
 
 #endif

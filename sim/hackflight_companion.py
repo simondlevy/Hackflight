@@ -18,6 +18,7 @@
 
 import sys
 import cv2
+import numpy as np
 
 from socket_server import serve_socket
 
@@ -42,12 +43,14 @@ if len(sys.argv) > 2:
         # Switch image from BGR colorspace to HSV
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-        # define range of blue color in HSV
+        # Define range of blue color in HSV
         blueMin = (100,  50,  10)
         blueMax = (255, 255, 255)
 
-        # Sets pixels to white if in blue range, else will be set to black
+        # Set pixels to white if in blue range, black outside range 
         mask = cv2.inRange(hsv, blueMin, blueMax)
+
+        print(np.sum(mask)/(255*mask.size))
 
         # Display the mask image
         cv2.imshow('OpenCV', mask)
