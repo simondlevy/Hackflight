@@ -66,12 +66,13 @@ static int connect_to_server(int port, const char * hostname="localhost")
     }  
     return sockfd;
 }
-#endif
 
 static const int CAMERA_PORT       = 5000;
 static const int COMMS_PORT        = 5001;
 static const char * IMAGE_FILENAME = "image.jpg";
 static const int MAXMSG            = 1000;
+
+#endif
 
 CompanionBoard::CompanionBoard(void)
 {

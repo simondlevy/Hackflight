@@ -29,13 +29,22 @@ class Position {
 
     private:
 
-        Baro * baro;
+        Board * board;
+        IMU   * imu;
+        Baro  * baro;
 
     public:
 
-        void init(Baro * baro);
+        void init(Board * board, IMU * imu, Baro * baro);
 
-        int32_t getAltitude(void);
+        void getAltitude(
+                int32_t & estAlt, 
+                int32_t & altPID,
+                int32_t & errorVelocityI, 
+                int32_t setVelocity, 
+                bool velocityControl, 
+                int32_t altHold,
+                bool armed);
 };
 
 

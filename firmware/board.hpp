@@ -31,7 +31,7 @@ extern "C" {
 
             // your implementation should support these methods
 
-            void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec, bool & initiallyArmed);
+            void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
 
             bool     baroInit(void);
             void     baroUpdate(void);

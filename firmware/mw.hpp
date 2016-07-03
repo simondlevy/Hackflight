@@ -78,3 +78,9 @@ typedef enum {
 #define CONFIG_CALIBRATE_ACCTIME_MSEC               500
 #define CONFIG_SMALL_ANGLE                          250  // tenths of a degree
 #define CONFIG_ALTITUDE_UPDATE_MSEC                 25   // based on accelerometer low-pass filter
+
+#define CONFIG_ALT_HOLD_FAST_CHANGE                 false
+#define CONFIG_ALT_HOLD_THROTTLE_NEUTRAL            40
+#define CONFIG_MINTHROTTLE                          990
+#define CONFIG_MAXTHROTTLE                          2010
+
