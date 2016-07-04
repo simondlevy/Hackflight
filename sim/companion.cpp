@@ -67,11 +67,11 @@ static int connect_to_server(int port, const char * hostname="localhost")
     return sockfd;
 }
 
-static const int CAMERA_PORT       = 5000;
-static const int COMMS_PORT        = 5001;
-static const char * IMAGE_FILENAME = "image.jpg";
-static const char * IMAGE_FILENAME2 = "image2.jpg";
-static const int MAXMSG            = 1000;
+static const int CAMERA_PORT          = 5000;
+static const int COMMS_PORT           = 5001;
+static const char * IMAGE_TO_PYTHON   = "image.jpg";
+static const char * IMAGE_FROM_PYTHON = "image2.jpg";
+static const int MAXMSG               = 1000;
 
 #endif
 
@@ -91,7 +91,13 @@ void CompanionBoard::start(void)
     sprintf(camera_port, "%d", CAMERA_PORT);
     char comms_port[10];
     sprintf(comms_port, "%d", COMMS_PORT);
-    char *argv[5] = {(char *)script, camera_port, comms_port, (char *)IMAGE_FILENAME, NULL};
+    char *argv[6] = {
+        (char *)script, 
+        camera_port, 
+        comms_port, 
+        (char *)IMAGE_TO_PYTHON, 
+        (char *)IMAGE_FROM_PYTHON, 
+        NULL};
 
     // Fork the Python server script
     this->procid = fork();
@@ -115,13 +121,13 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     Mat image = Mat(imageHeight, imageWidth, CV_8UC3, imageBytes);
     flip(image, image, 0);                 // rectify image
     cvtColor(image, image, COLOR_BGR2RGB); // convert image BGR->RGB
-    imwrite(IMAGE_FILENAME, image);
+    imwrite(IMAGE_TO_PYTHON, image);
 
     // Send sync byte to Python client, which will open and process the image
     char sync = 0;
     write(this->camera_sockfd, &sync, 1);
 
-    Mat image2 = imread(IMAGE_FILENAME2, CV_LOAD_IMAGE_COLOR);
+    Mat image2 = imread(IMAGE_FROM_PYTHON, CV_LOAD_IMAGE_COLOR);
     namedWindow("OpenCV", WINDOW_AUTOSIZE );
     imshow("OpenCV", image2 );
 
