@@ -119,14 +119,14 @@ void Position::computeAltitude(bool armed)
     // Grab baro baseline on arming
     if (armed) {
         if (!wasArmed) {
-            baroAltBaseline = baroAltRaw;
+            this->baroAltBaseline = baroAltRaw;
             accelVel = 0;
             accelAlt = 0;
         }
-        baroAlt = baroAltRaw - baroAltBaseline;
+        this->baroAlt = baroAltRaw - this->baroAltBaseline;
     }
     else {
-        baroAlt = 0;
+        this->baroAlt = 0;
     }
     wasArmed = armed;
 
@@ -135,13 +135,14 @@ void Position::computeAltitude(bool armed)
 
     // Fuse sonarAlt and baroAlt
     if (sonarInRange()) {
-        baroAlt_offset = baroAlt - sonarAlt;
-        fusedBarosonarAlt = sonarAlt;
+        this->baroAlt_offset = this->baroAlt - sonarAlt;
+        this->fusedBarosonarAlt = sonarAlt;
     } else {
-        baroAlt = baroAlt - baroAlt_offset;
+        this->baroAlt -= this->baroAlt_offset;
         if (sonarAlt > 0) {
-            sonarTransition = (300 - sonarAlt) / 100.0f;
-            fusedBarosonarAlt = (int32_t)cfilter((float)sonarAlt, (float)baroAlt, (float)sonarTransition); 
+            this->sonarTransition = (300 - sonarAlt) / 100.0f;
+            this->fusedBarosonarAlt = 
+                (int32_t)cfilter((float)sonarAlt, (float)this->baroAlt, (float)this->sonarTransition); 
         }
     }
 
@@ -179,6 +180,9 @@ void Position::computeAltitude(bool armed)
     // i.e without delay
     accelVel = cfilter((float)accelVel, (float)fusedBaroSonarVel, (float)CONFIG_BARO_CF_VEL);
     int32_t vel_tmp = (int32_t)lrintf(accelVel);
+
+    // For now, use baro only for altitude estimate
+    this->estAlt = this->baroAlt;
 
     if (tiltAngle < 800) { // only calculate pid if the copters thrust is facing downwards(<80deg)
 
@@ -246,9 +250,7 @@ void Position::holdAltitude(void)
             }
             this->rc->command[THROTTLE] = constrain(this->initialThrottleHold + this->altPID, CONFIG_PWM_MIN, CONFIG_PWM_MAX);
         }
-
-        debug("initialThrottle: %4d     altPID: %4d     throttleCommand: %4d   altitude: %d\n", 
-                this->initialThrottleHold, this->altPID, this->rc->command[THROTTLE], this->estAlt);
+        debug("estAlt: %d    altPID: %d\n", this->estAlt, this->altPID);
     }
 #endif // _SIM
 }

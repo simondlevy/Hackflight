@@ -351,7 +351,7 @@ static void posixControllerInit(char * name, const char * ps3name)
         axisdir[3] = -1;
     }
     else {
-        printf("Uknown controller: %s\n", name);
+        debug("Uknown controller: %s\n", name);
     }
 }
 
@@ -409,7 +409,7 @@ static void controllerInit(void)
         char name[128];
 
         if (ioctl(joyfd, JSIOCGNAME(sizeof(name)), name) < 0)
-            printf("Uknown controller\n");
+            debug("Uknown controller\n");
 
         else 
             posixControllerInit(name, "MY-POWER CO.");
@@ -469,13 +469,13 @@ static SDL_Joystick * joystick;
 static void controllerInit(void)
 {
     if (SDL_Init(SDL_INIT_JOYSTICK)) {
-        printf("Failed to initialize SDL; using keyboard\n");
+        debug("Failed to initialize SDL; using keyboard\n");
         posixKbInit();
         return;
     }
 
     if (!(joystick = SDL_JoystickOpen(0))) {
-        printf("Unable to open joystick; using keyboard\n");
+        debug("Unable to open joystick; using keyboard\n");
         posixKbInit();
         return;
     }
@@ -696,7 +696,7 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 #ifdef __linux
     struct timeval stop_time;
     gettime(&stop_time);
-    printf("%d FPS\n", (int)(update_count/(stop_time.tv_sec-start_time.tv_sec)));
+    debug("%d FPS\n", (int)(update_count/(stop_time.tv_sec-start_time.tv_sec)));
 #endif
     controllerClose();
 
@@ -960,7 +960,7 @@ uint16_t Board::readPWM(uint8_t chan)
     // V-REP sends joystick demands in [-1000,+1000]
     int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
 	
-    //if (chan < 5) printf("%d: %d%s", chan, pwm, chan == 4 ? "\n" : "    ");
+    //if (chan < 5) debug("%d: %d%s", chan, pwm, chan == 4 ? "\n" : "    ");
 
     return pwm;
 }

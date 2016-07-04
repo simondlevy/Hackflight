@@ -34,25 +34,25 @@ class Position {
         Baro  * baro;
         RC    * rc;
 
+        float    accelAlt;
+        float    accelVel;
+        float    accZ_old;
         int32_t  altHoldValue;
         bool     altHoldMode;
-        int32_t  estAlt;
         int32_t  altPID;
-        int32_t  setVelocity;
-        bool     velocityControl;
-        int32_t  errorVelocityI;
-        int16_t  initialThrottleHold;
-        uint32_t previousT;
-        float    accZ_old;
-        float    accelVel;
-        int32_t  fusedBarosonarAlt;
-        int32_t  lastFusedBarosonarAlt;
         int32_t  baroAlt;
         int32_t  baroAltBaseline;
-        float    accelAlt;
-        bool     wasArmed;
         int32_t  baroAlt_offset;
+        int32_t  errorVelocityI;
+        int32_t  estAlt;
+        int32_t  fusedBarosonarAlt;
+        int16_t  initialThrottleHold;
+        int32_t  lastFusedBarosonarAlt;
+        uint32_t previousT;
+        int32_t  setVelocity;
         float    sonarTransition;
+        bool     velocityControl;
+        bool     wasArmed;
 
     public:
 
