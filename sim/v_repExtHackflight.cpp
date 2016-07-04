@@ -88,7 +88,7 @@ void debug(const char * format, ...)
     char buffer[256];
     va_list args;
     va_start (args, format);
-    vsnprintf (buffer, 255, format, args);
+    VSNPRINTF(buffer, 255, format, args);
     simSetStringSignal("debug", buffer, strlen(buffer));
     va_end (args);
 }
@@ -544,7 +544,7 @@ static bool ready;
 
 // needed for spring-mounted throttle stick
 static int throttleDemand;
-static const float PS3_THROTTLE_INC = .01;
+static const float PS3_THROTTLE_INC = .01f;
 
 // IMU support
 static double accel[3];
@@ -693,8 +693,8 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
-    struct timeval stop_time;
 #ifdef __linux
+    struct timeval stop_time;
     gettime(&stop_time);
     printf("%d FPS\n", (int)(update_count/(stop_time.tv_sec-start_time.tv_sec)));
 #endif

@@ -15,7 +15,9 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _WIN32
 #include <pthread.h>
+#endif
 
 class CompanionBoard {
 

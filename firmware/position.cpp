@@ -23,8 +23,8 @@ extern "C" {
 
 #include "mw.hpp"
 
-static const float CONFIG_BARO_CF_ALT = 0.965;
-static const float CONFIG_BARO_CF_VEL = 0.985;
+static const float CONFIG_BARO_CF_ALT = 0.965f;
+static const float CONFIG_BARO_CF_VEL = 0.985f;
 
 static const uint8_t CONFIG_ALT_P = 200;
 static const uint8_t CONFIG_VEL_P = 200;
@@ -141,7 +141,7 @@ void Position::computeAltitude(bool armed)
         baroAlt = baroAlt - baroAlt_offset;
         if (sonarAlt > 0) {
             sonarTransition = (300 - sonarAlt) / 100.0f;
-            fusedBarosonarAlt = cfilter(sonarAlt, baroAlt, sonarTransition); 
+            fusedBarosonarAlt = (int32_t)cfilter((float)sonarAlt, (float)baroAlt, (float)sonarTransition); 
         }
     }
 
@@ -157,9 +157,9 @@ void Position::computeAltitude(bool armed)
     accelVel += vel_acc;
 
     // complementary filter for altitude estimation (baro & acc)
-    accelAlt = cfilter(accelAlt, fusedBarosonarAlt, CONFIG_BARO_CF_ALT);
+    accelAlt = cfilter((float)accelAlt, (float)fusedBarosonarAlt, (float)CONFIG_BARO_CF_ALT);
 
-    this->estAlt = sonarInRange() ? fusedBarosonarAlt : accelAlt;
+    this->estAlt = sonarInRange() ? fusedBarosonarAlt : (int32_t)accelAlt;
 
     // reset acceleromter sum
     this->imu->accelSum[0] = 0;
@@ -168,7 +168,7 @@ void Position::computeAltitude(bool armed)
     this->imu->accelSumCount = 0;
     this->imu->accelTimeSum = 0;
 
-    int32_t fusedBaroSonarVel = (fusedBarosonarAlt - lastFusedBarosonarAlt) * 1000000.0f / dTime;
+    int32_t fusedBaroSonarVel = (int32_t)((fusedBarosonarAlt - lastFusedBarosonarAlt) * 1000000.0f / dTime);
     lastFusedBarosonarAlt = fusedBarosonarAlt;
 
     fusedBaroSonarVel = constrain(fusedBaroSonarVel, -1500, 1500);    // constrain baro velocity +/- 1500cm/s
@@ -177,8 +177,8 @@ void Position::computeAltitude(bool armed)
     // Apply complementary filter to keep the calculated velocity based on baro velocity (i.e. near real velocity).
     // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, 
     // i.e without delay
-    accelVel = cfilter(accelVel, fusedBaroSonarVel, CONFIG_BARO_CF_VEL);
-    int32_t vel_tmp = lrintf(accelVel);
+    accelVel = cfilter((float)accelVel, (float)fusedBaroSonarVel, (float)CONFIG_BARO_CF_VEL);
+    int32_t vel_tmp = (int32_t)lrintf(accelVel);
 
     if (tiltAngle < 800) { // only calculate pid if the copters thrust is facing downwards(<80deg)
 
