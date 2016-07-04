@@ -39,6 +39,7 @@ static PID      pid;
 static MSP      msp;
 static Baro     baro;
 static Position position;
+static Hover    hover;
 
 // support for timed tasks
 
@@ -130,7 +131,8 @@ void setup(void)
     pid.init();
     mixer.init(&board, &rc, &pid); 
     msp.init(&board, &imu, &mixer, &rc);
-    position.init(&board, &imu, &baro, &rc);
+    position.init(&board, &imu, &baro);
+    hover.init(&rc, &position);
 
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;
@@ -197,7 +199,7 @@ void loop(void)
         } // rc.changed()
 
         // Switch to alt-hold when switch moves to position 1 or 2
-        position.update();
+        hover.checkSwitch();
 
     } else {                    // not in rc loop
 
@@ -210,8 +212,10 @@ void loop(void)
                 taskOrder++;
                 break;
             case 1:
-                if (baro.available() && altitudeEstimationTask.checkAndUpdate(currentTime))
+                if (baro.available() && altitudeEstimationTask.checkAndUpdate(currentTime)) {
                     position.computeAltitude(armed);
+                    hover.updatePid();
+                }
                 taskOrder++;
                 break;
             case 2:
@@ -266,7 +270,7 @@ void loop(void)
         msp.update(armed);
 
         // hold altitude if indicated
-        position.holdAltitude();
+        hover.holdAltitude();
 
         // update PID controller 
         pid.update(&rc, &imu);

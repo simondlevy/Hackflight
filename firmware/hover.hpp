@@ -1,5 +1,5 @@
 /*
-   position.cpp : Position class declaration
+   hover.hpp : Class declaration for hover-in-place
 
    Adapted from https://github.com/multiwii/baseflight/blob/master/src/mixer.c
 
@@ -25,36 +25,31 @@ extern "C" {
 
 #include "mw.hpp"
 
-class Position {
+class Hover {
 
     private:
 
-        Board * board;
-        IMU   * imu;
-        Baro  * baro;
+        RC * rc;
+        Position * position;
 
-        float    accelAlt;
-        int32_t  baroAlt;
-        int32_t  baroAltBaseline;
-        int32_t  baroAlt_offset;
-        int32_t  fusedBarosonarAlt;
+        float    accelZ_prev;
+        int32_t  altHoldValue;
+        bool     altHoldMode;
+        int32_t  altPID;
+        int32_t  errorVelocityI;
         int16_t  initialThrottleHold;
-        int32_t  lastFusedBarosonarAlt;
-        uint32_t previousT;
-        float    sonarTransition;
-        bool     wasArmed;
+        int32_t  setVelocity;
+        bool     velocityControl;
  
     public:
 
-        // Use by Hover class
-        int32_t  estAlt;
-        float    accelVel;
-        float    accelZ;
-        int16_t  tiltAngle;
+        void init(RC * rc, Position * position);
 
-        void init(Board * board, IMU * imu, Baro * baro);
+        void checkSwitch(void);
 
-        void computeAltitude(bool armed);
+        void updatePid(void);
+
+        void holdAltitude(void);
 };
 
 

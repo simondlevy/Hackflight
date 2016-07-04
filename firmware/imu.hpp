@@ -48,10 +48,10 @@ extern "C" {
             int32_t  accelSumCount;
             uint32_t accelTimeSum;
             float    accelVelScale;
-            void resetAccelSum(void);
 
             void init(Board * board, uint16_t calibratingGyroCycles, uint16_t calibratingAccCycles);
             void update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG);
+            void resetAccelSum(void);
     };
 
 #ifdef __arm__

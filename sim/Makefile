@@ -60,6 +60,8 @@ libv_repExtHackflight.$(EXT): *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp Ma
 	g++ $(CFLAGS) -c ../firmware/rc.cpp
 	g++ $(CFLAGS) -c ../firmware/baro.cpp
 	g++ $(CFLAGS) -c ../firmware/position.cpp
+	g++ $(CFLAGS) -c ../firmware/hover.cpp
+	g++ $(CFLAGS) -c ../firmware/filters.cpp
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared -lopencv_core -lopencv_highgui $(JOYLIB)
 
 install: $(PLUGIN) hackflight_companion.py

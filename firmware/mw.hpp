@@ -46,6 +46,8 @@ void debug(const char * format, ...);
 #include "msp.hpp"
 #include "baro.hpp"
 #include "position.hpp"
+#include "hover.hpp"
+#include "filters.hpp"
 
 #ifndef abs
 #define abs(x)    ((x) > 0 ? (x) : -(x))

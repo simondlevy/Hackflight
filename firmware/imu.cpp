@@ -25,6 +25,7 @@ extern "C" {
 
 
 #include "mw.hpp"
+#include "filters.hpp"
 
 #define INV_GYR_CMPF_FACTOR   (1.0f / ((float)CONFIG_GYRO_CMPF_FACTOR + 1.0f))
 #define INV_GYR_CMPFM_FACTOR  (1.0f / ((float)CONFIG_GYRO_CMPFM_FACTOR + 1.0f))
@@ -112,18 +113,6 @@ static void rotateV(float v[3], float *delta)
     v[X] = v_tmp[X] * mat[0][0] + v_tmp[Y] * mat[1][0] + v_tmp[Z] * mat[2][0];
     v[Y] = v_tmp[X] * mat[0][1] + v_tmp[Y] * mat[1][1] + v_tmp[Z] * mat[2][1];
     v[Z] = v_tmp[X] * mat[0][2] + v_tmp[Y] * mat[1][2] + v_tmp[Z] * mat[2][2];
-}
-
-static int32_t applyDeadband(float value, int32_t deadband)
-{
-    if (abs(value) < deadband) {
-        value = 0;
-    } else if (value > 0) {
-        value -= deadband;
-    } else if (value < 0) {
-        value += deadband;
-    }
-    return (int32_t)value;
 }
 
 void IMU::init(Board * board, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles) 
@@ -301,9 +290,9 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
 
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
-    this->accelSum[X] += applyDeadband(lrintf(accel_ned[X]), CONFIG_ACCXY_DEADBAND);
-    this->accelSum[Y] += applyDeadband(lrintf(accel_ned[Y]), CONFIG_ACCXY_DEADBAND);
-    this->accelSum[Z] += applyDeadband(lrintf(accz_smooth), CONFIG_ACCZ_DEADBAND);
+    this->accelSum[X] += deadbandFilter(lrintf(accel_ned[X]), CONFIG_ACCXY_DEADBAND);
+    this->accelSum[Y] += deadbandFilter(lrintf(accel_ned[Y]), CONFIG_ACCXY_DEADBAND);
+    this->accelSum[Z] += deadbandFilter(lrintf(accz_smooth), CONFIG_ACCZ_DEADBAND);
 
     this->accelTimeSum += deltaT;
     this->accelSumCount++;
