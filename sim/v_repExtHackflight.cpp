@@ -807,8 +807,10 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
         return NULL;
 
     // Handle messages from belly camera
-    if (message ==  sim_message_eventcallback_openglcameraview && auxiliaryData[2] == 1)
+    if (message ==  sim_message_eventcallback_openglcameraview && auxiliaryData[2] == 1) {
         companionBoard.update((char *)customData, auxiliaryData[0], auxiliaryData[1]);
+        auxiliaryData[3] = 1; // overwrite original image
+    }
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);

@@ -123,14 +123,17 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     cvtColor(image, image, COLOR_BGR2RGB); // convert image BGR->RGB
     imwrite(IMAGE_TO_PYTHON, image);
 
-    // Send sync byte to Python client, which will open and process the image
+    // Send sync byte to Python server, which will open the image, process it, and
+    // write the processed image to another file
     char sync = 0;
     write(this->camera_sockfd, &sync, 1);
 
+    // Open and display processed image from server
     Mat image2 = imread(IMAGE_FROM_PYTHON, CV_LOAD_IMAGE_COLOR);
-    namedWindow("OpenCV", WINDOW_AUTOSIZE );
-    imshow("OpenCV", image2 );
-
+    memcpy(imageBytes, image2.data, imageWidth*imageHeight*3);
+    //namedWindow("OpenCV", WINDOW_AUTOSIZE );
+    //imshow("OpenCV", image2 );
+    //waitKey(1);
 
     // Check whether bytes are available from server
     int avail;
