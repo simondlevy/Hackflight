@@ -27,11 +27,11 @@ static const float CONFIG_BARO_CF_ALT = 0.965;
 static const float CONFIG_BARO_CF_VEL = 0.985;
 
 static const uint8_t CONFIG_ALT_P = 200;
-static const uint8_t CONFIG_VEL_P = 120;
+static const uint8_t CONFIG_VEL_P = 200;
 static const uint8_t CONFIG_VEL_I = 45;
 static const uint8_t CONFIG_VEL_D = 1;
 
-static const bool CONFIG_ALT_HOLD_FAST_CHANGE = true;
+static const bool     CONFIG_ALT_HOLD_FAST_CHANGE       = true;
 static const uint16_t CONFIG_ALT_HOLD_THROTTLE_NEUTRAL  = 40;
 
 static bool sonarInRange(void)
@@ -99,9 +99,8 @@ void Position::update(void)
             this->altPID = 0;
         }
     }
-    else {
+    else 
         this->altHoldMode = false;
-    }
 }
 
 void Position::computeAltitude(bool armed)
@@ -247,7 +246,9 @@ void Position::holdAltitude(void)
             }
             this->rc->command[THROTTLE] = constrain(this->initialThrottleHold + this->altPID, CONFIG_PWM_MIN, CONFIG_PWM_MAX);
         }
-        printf("%4d %4d %4d\n", this->initialThrottleHold, this->altPID, this->rc->command[THROTTLE]);
+
+        debug("initialThrottle: %4d     altPID: %4d     throttleCommand: %4d   altitude: %d\n", 
+                this->initialThrottleHold, this->altPID, this->rc->command[THROTTLE], this->estAlt);
     }
 #endif // _SIM
 }

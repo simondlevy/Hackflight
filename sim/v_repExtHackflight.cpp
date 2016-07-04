@@ -24,6 +24,9 @@
 #include "companion.hpp"
 
 #include <stdint.h>
+#include <stdarg.h>
+#include <string.h>
+#include <stdio.h>
 
 #include <iostream>
 using namespace std;
@@ -79,6 +82,17 @@ static void kbRespond(char key, char * keys)
         }
 }
 
+// Debugging support
+void debug(const char * format, ...)
+{
+    char buffer[256];
+    va_list args;
+    va_start (args, format);
+    vsnprintf (buffer, 255, format, args);
+    simSetStringSignal("debug", buffer, strlen(buffer));
+    va_end (args);
+}
+
 #ifdef _WIN32 // ===================================================================
 
 #ifdef QT_COMPIL
@@ -96,76 +110,76 @@ static void controllerInit(void)
     // Get Number Of Devices
     UINT nDevices = 0;
     GetRawInputDeviceList( NULL, &nDevices, sizeof( RAWINPUTDEVICELIST ) );
- 
+
     // Got Any?
     if(nDevices < 1)
         return;
-     
+
     // Allocate Memory For Device List
     PRAWINPUTDEVICELIST pRawInputDeviceList;
     pRawInputDeviceList = new RAWINPUTDEVICELIST[ sizeof( RAWINPUTDEVICELIST ) * nDevices ];
- 
+
     // Got Memory?
     if( pRawInputDeviceList == NULL ) {
         // Error
         cout << "ERR: Could not allocate memory for Device List.";
         return;
     }
-     
+
     // Fill Device List Buffer
     int nResult;
     nResult = GetRawInputDeviceList( pRawInputDeviceList, &nDevices, sizeof( RAWINPUTDEVICELIST ) );
- 
+
     // Got Device List?
     if( nResult < 0 ) {
         // Clean Up
         delete [] pRawInputDeviceList;
- 
+
         // Error
         cout << "ERR: Could not get device list.";
         return;
     }
- 
+
     // Set Device Info & Buffer Size
     RID_DEVICE_INFO rdiDeviceInfo;
     rdiDeviceInfo.cbSize = sizeof( RID_DEVICE_INFO );
     UINT nBufferSize = rdiDeviceInfo.cbSize;
- 
+
     // Get Device Info
     nResult = GetRawInputDeviceInfo(pRawInputDeviceList[0].hDevice, RIDI_DEVICEINFO, &rdiDeviceInfo, &nBufferSize );
- 
+
     // Got All Buffer?
     if(nResult < 0 ) {
         // Error
         cout << "ERR: Unable to read Device Info." << endl;
         return;
     }
-  
+
     // Some HID
     if (rdiDeviceInfo.dwType == RIM_TYPEHID) {
 
         switch (rdiDeviceInfo.hid.dwVendorId) {
 
-		case 3727:
-			controller = PS3;
-			break;
+            case 3727:
+                controller = PS3;
+                break;
 
-		case 1155:
-			controller = TARANIS;
-			break;
+            case 1155:
+                controller = TARANIS;
+                break;
 
-		case 1783:
-			 controller = SPEKTRUM;
-			 break;
+            case 1783:
+                controller = SPEKTRUM;
+                break;
 
-		case 1133:
-			 controller = EXTREME3D; // XXX product ID = 49685
-			 break;
-		}
-            
-			// XXX could also use if needed: rdiDeviceInfo.hid.dwProductId
+            case 1133:
+                controller = EXTREME3D; // XXX product ID = 49685
+                break;
+        }
+
+        // XXX could also use if needed: rdiDeviceInfo.hid.dwProductId
     }
-    
+
     // Clean Up - Free Memory
     delete [] pRawInputDeviceList;
 }
@@ -173,16 +187,16 @@ static void controllerInit(void)
 // Turns button value into aux-switch demand
 static void buttonToAuxDemand(std::vector<CScriptFunctionDataItem>* inData)
 {
-	int buttons = inData->at(3).int32Data[0];
+    int buttons = inData->at(3).int32Data[0];
 
-	if (buttons == 1)
-		demands[4] = -1000;
+    if (buttons == 1)
+        demands[4] = -1000;
 
-	if (buttons == 2)
-		demands[4] = 0;
+    if (buttons == 2)
+        demands[4] = 0;
 
-	if (buttons == 4)
-		demands[4] = +1000;
+    if (buttons == 4)
+        demands[4] = +1000;
 }
 
 // Grabs stick demands from script via Windows plugin
@@ -191,45 +205,45 @@ static void controllerRead(std::vector<CScriptFunctionDataItem>* inData)
     // Handle each controller differently
     switch (controller) {
 
-    case TARANIS:
-		demands[0] = inData->at(0).int32Data[0];    // roll
-        demands[1] = inData->at(0).int32Data[1];    // pitch
-        demands[2] = inData->at(0).int32Data[2];    // yaw
-        demands[3] = inData->at(1).int32Data[0];    // throttle			
-		demands[4] = inData->at(1).int32Data[1];    // aux switch
-        break;
+        case TARANIS:
+            demands[0] = inData->at(0).int32Data[0];    // roll
+            demands[1] = inData->at(0).int32Data[1];    // pitch
+            demands[2] = inData->at(0).int32Data[2];    // yaw
+            demands[3] = inData->at(1).int32Data[0];    // throttle			
+            demands[4] = inData->at(1).int32Data[1];    // aux switch
+            break;
 
-    case SPEKTRUM:
-        demands[0] = inData->at(0).int32Data[1];	// roll
-        demands[1] = inData->at(0).int32Data[2];	// pitch
-        demands[2] = inData->at(1).int32Data[2];	// yaw
-        demands[3] = inData->at(0).int32Data[0];	// throttle
-		demands[4] = inData->at(1).int32Data[0];    // aux switch
-		break;
+        case SPEKTRUM:
+            demands[0] = inData->at(0).int32Data[1];	// roll
+            demands[1] = inData->at(0).int32Data[2];	// pitch
+            demands[2] = inData->at(1).int32Data[2];	// yaw
+            demands[3] = inData->at(0).int32Data[0];	// throttle
+            demands[4] = inData->at(1).int32Data[0];    // aux switch
+            break;
 
-    case EXTREME3D:
-        demands[0] =  inData->at(0).int32Data[0];	// roll
-        demands[1] = -inData->at(0).int32Data[1];	// pitch
-        demands[2] =  inData->at(1).int32Data[2];	// yaw
-        demands[3] = -inData->at(2).int32Data[0];	// throttle
-		buttonToAuxDemand(inData);					// aux switch
-        break;
+        case EXTREME3D:
+            demands[0] =  inData->at(0).int32Data[0];	// roll
+            demands[1] = -inData->at(0).int32Data[1];	// pitch
+            demands[2] =  inData->at(1).int32Data[2];	// yaw
+            demands[3] = -inData->at(2).int32Data[0];	// throttle
+            buttonToAuxDemand(inData);					// aux switch
+            break;
 
-    case PS3:
-        demands[0] =  inData->at(0).int32Data[2] / PS3_DOWNSCALE;	// roll
-        demands[1] = -inData->at(1).int32Data[2] / PS3_DOWNSCALE;	// pitch
-        demands[2] =  inData->at(0).int32Data[0] / PS3_DOWNSCALE;	// yaw
-        demands[3] = -inData->at(0).int32Data[1] / PS3_DOWNSCALE;	// throttle
-		buttonToAuxDemand(inData);  // aux switch
-		break;
+        case PS3:
+            demands[0] =  inData->at(0).int32Data[2] / PS3_DOWNSCALE;	// roll
+            demands[1] = -inData->at(1).int32Data[2] / PS3_DOWNSCALE;	// pitch
+            demands[2] =  inData->at(0).int32Data[0] / PS3_DOWNSCALE;	// yaw
+            demands[3] = -inData->at(0).int32Data[1] / PS3_DOWNSCALE;	// throttle
+            buttonToAuxDemand(inData);  // aux switch
+            break;
 
-	default:
-		 if (_kbhit()) {
-            char c = _getch();
-			char keys[8] = {52, 54, 50, 56, 48, 13, 51, 57};
-			kbRespond(c, keys);
-         }
-	 }
+        default:
+            if (_kbhit()) {
+                char c = _getch();
+                char keys[8] = {52, 54, 50, 56, 48, 13, 51, 57};
+                kbRespond(c, keys);
+            }
+    }
 }
 
 static void controllerClose(void)

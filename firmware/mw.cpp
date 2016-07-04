@@ -27,10 +27,6 @@ extern "C" {
 
 #include "mw.hpp"
 
-#ifndef PRINTF
-#define PRINTF printf
-#endif
-
 #include <string.h>
 
 // Objects we use

@@ -30,6 +30,14 @@
 #include <printf.h>
 #endif
 
+#ifndef PRINTF
+#ifdef _SIM
+void debug(const char * format, ...);
+#else
+#define debug printf
+#endif
+#endif
+
 #include "board.hpp"
 #include "imu.hpp"
 #include "rc.hpp"
