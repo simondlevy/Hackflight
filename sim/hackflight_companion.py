@@ -28,7 +28,8 @@ if len(sys.argv) > 2:
     # Serve a socket for camera synching, and a socket for comms
     camera_client = serve_socket(int(sys.argv[1]))
     comms_client  = serve_socket(int(sys.argv[2]))
-    image_filename  = sys.argv[3]
+    image_from_sim_name  = sys.argv[3]
+    image_to_sim_name  = sys.argv[4]
 
     while True:
 
@@ -36,7 +37,7 @@ if len(sys.argv) > 2:
         camera_client.recv(1)
      
         # Load the image from the temp file
-        image = cv2.imread(image_filename, cv2.IMREAD_COLOR)
+        image = cv2.imread(image_from_sim_name, cv2.IMREAD_COLOR)
 
         # Blur image to remove noise
         frame = cv2.GaussianBlur(image, (3, 3), 0)
@@ -55,7 +56,8 @@ if len(sys.argv) > 2:
         #cv2.imshow('OpenCV', image)
         #cv2.waitKey(1)
 
-        cv2.imwrite('image2.jpg', mask)
+        # Write the processed image to a file for the simulator to display
+        cv2.imwrite(image_to_sim_name, mask)
 
         comms_client.send('hello')
 
