@@ -71,6 +71,9 @@ install: $(PLUGIN) hackflight_companion.py
 
 uninstall:
 	rm -f $(VREP_DIR)/$(PLUGIN)
+	rm -f $(VREP_DIR)/hackflight_companion.py
+	rm -f $(VREP_DIR)/image1.jpg
+	rm -f $(VREP_DIR)/image2.jpg
 
 vedit:
 	vim v_repExtHackflight.cpp

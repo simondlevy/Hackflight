@@ -22,16 +22,17 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <netdb.h>
 using namespace cv;
 
 #include <iostream>
 using namespace std;
 
+#include <netdb.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <signal.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -122,12 +123,12 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     char sync = 0;
     write(this->camera_sockfd, &sync, 1);
 
-    // Open and display processed image from server
-    Mat image2 = imread(IMAGE_FROM_PYTHON, CV_LOAD_IMAGE_COLOR);
-    memcpy(imageBytes, image2.data, imageWidth*imageHeight*3);
-    //namedWindow("OpenCV", WINDOW_AUTOSIZE );
-    //imshow("OpenCV", image2 );
-    //waitKey(1);
+    // If server has created a file for the processed image, open it copy its bytes back to V-REP's camera image
+    struct stat fileStat; 
+    if (!stat(IMAGE_FROM_PYTHON, &fileStat)) {
+        Mat image2 = imread(IMAGE_FROM_PYTHON, CV_LOAD_IMAGE_COLOR);
+        memcpy(imageBytes, image2.data, imageWidth*imageHeight*3);
+    }
 
     // Check whether bytes are available from server
     int avail;
