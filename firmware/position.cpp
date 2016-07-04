@@ -26,7 +26,7 @@ extern "C" {
 static const float CONFIG_BARO_CF_ALT = 0.965;
 static const float CONFIG_BARO_CF_VEL = 0.985;
 
-static const uint8_t CONFIG_ALT_P = 50;
+static const uint8_t CONFIG_ALT_P = 200;
 static const uint8_t CONFIG_VEL_P = 120;
 static const uint8_t CONFIG_VEL_I = 45;
 static const uint8_t CONFIG_VEL_D = 1;
@@ -56,34 +56,53 @@ static int32_t applyDeadband(int32_t value, int32_t deadband)
 }
 
 
-void Position::init(Board * _board, IMU * _imu, Baro * _baro)
+void Position::init(Board * _board, IMU * _imu, Baro * _baro, RC * _rc)
 {
     this->board = _board;
-    this->imu = _imu;
-    this->baro = _baro;
+    this->imu   = _imu;
+    this->baro  = _baro;
+    this->rc    = _rc;
+
+    this->altHoldValue = 0;
+    this->altHoldMode = false;
+    this->estAlt = 0;
+    this->altPID = 0;
+    this->setVelocity = 0;
+    this->velocityControl = false;
+    this->errorVelocityI = 0;
+    this->initialThrottleHold = 0;
+    this->previousT = 0;
+    this->accZ_old = 0;
+    this->accelVel = 0;
+    this->fusedBarosonarAlt = 0;
+    this->lastFusedBarosonarAlt = 0;
+    this->baroAlt = 0;
+    this->baroAltBaseline = 0;
+    this->accelAlt = 0;
+    this->wasArmed = false;
+    this->baroAlt_offset = 0;
+    this->sonarTransition = 0;
+
 }
 
-void Position::getAltitude(
-        int32_t & estAlt, 
-        int32_t & altPID,
-        int32_t & errorVelocityI, 
-        int32_t setVelocity, 
-        bool velocityControl, 
-        int32_t altHold,
-        bool armed)
+void Position::update(void)
 {
-    static uint32_t previousT;
-    static float    accZ_old;
-    static float    accelVel;
-    static int32_t  fusedBarosonarAlt;
-    static int32_t  lastFusedBarosonarAlt;
-    static int32_t  baroAlt;
-    static int32_t  baroAltBaseline;
-    static float    accelAlt;
-    static bool     wasArmed;
-    static int32_t  baroAlt_offset;
-    static float    sonarTransition;
+    if (this->rc->auxState() > 0) {
+        if (!this->altHoldMode) {
+            this->altHoldMode = true;
+            this->altHoldValue = estAlt;
+            this->initialThrottleHold = this->rc->command[THROTTLE];
+            this->errorVelocityI = 0;
+            this->altPID = 0;
+        }
+    }
+    else {
+        this->altHoldMode = false;
+    }
+}
 
+void Position::computeAltitude(bool armed)
+{
     uint32_t currentT = this->board->getMicros();
     int16_t tiltAngle = max(abs(this->imu->angle[ROLL]), abs(this->imu->angle[PITCH]));
     uint32_t dTime = currentT - previousT;
@@ -124,8 +143,6 @@ void Position::getAltitude(
         }
     }
 
-    printf("%d\n", baroAlt);
-
     // delta acc reading time in seconds
     float dt = this->imu->accelTimeSum * 1e-6f; 
 
@@ -140,7 +157,7 @@ void Position::getAltitude(
     // complementary filter for altitude estimation (baro & acc)
     accelAlt = cfilter(accelAlt, fusedBarosonarAlt, CONFIG_BARO_CF_ALT);
 
-    estAlt = sonarInRange() ? fusedBarosonarAlt : accelAlt;
+    this->estAlt = sonarInRange() ? fusedBarosonarAlt : accelAlt;
 
     // reset acceleromter sum
     this->imu->accelSum[0] = 0;
@@ -163,11 +180,11 @@ void Position::getAltitude(
 
     if (tiltAngle < 800) { // only calculate pid if the copters thrust is facing downwards(<80deg)
 
-        int32_t setVel = setVelocity;
+        int32_t setVel = this->setVelocity;
 
         // Altitude P-Controller
-        if (!velocityControl) {
-            int32_t error = constrain(altHold - estAlt, -500, 500);
+        if (!this->velocityControl) {
+            int32_t error = constrain(this->altHoldValue - this->estAlt, -500, 500);
             error = applyDeadband(error, 10);       // remove small P parametr to reduce noise near zero position
             setVel = constrain((CONFIG_ALT_P * error / 128), -300, +300); // limit velocity to +/- 3 m/s
         } 
@@ -175,21 +192,61 @@ void Position::getAltitude(
         // Velocity PID-Controller
         // P
         int32_t error = setVel - vel_tmp;
-        altPID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
+        this->altPID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
 
         // I
         errorVelocityI += (CONFIG_VEL_I * error);
         errorVelocityI = constrain(errorVelocityI, -(8196 * 200), (8196 * 200));
-        altPID += errorVelocityI / 8196;     // I in the range of +/-200
+        this->altPID += errorVelocityI / 8196;     // I in the range of +/-200
 
         // D
-        altPID -= constrain(CONFIG_VEL_D * (accZ_tmp + accZ_old) / 512, -150, 150);
+        this->altPID -= constrain(CONFIG_VEL_D * (accZ_tmp + accZ_old) / 512, -150, 150);
 
     } else {
-        altPID = 0;
+        this->altPID = 0;
     }
 
     accZ_old = accZ_tmp;
+}
+
+void Position::holdAltitude(void)
+{
+// For now, support alt-hold in simulation only
+#ifdef _SIM
+    if (this->altHoldMode) {
+        static bool isaltHoldChanged = false;
+        if (CONFIG_ALT_HOLD_FAST_CHANGE) {
+            // rapid alt changes
+            if (abs(this->rc->command[THROTTLE] - this->initialThrottleHold) > CONFIG_ALT_HOLD_THROTTLE_NEUTRAL) {
+                errorVelocityI = 0;
+                isaltHoldChanged = true;
+                this->rc->command[THROTTLE] += (this->rc->command[THROTTLE] > this->initialThrottleHold) 
+                    ? -CONFIG_ALT_HOLD_THROTTLE_NEUTRAL : CONFIG_ALT_HOLD_THROTTLE_NEUTRAL;
+            } else {
+                if (isaltHoldChanged) {
+                    this->altHoldValue = this->estAlt;
+                    isaltHoldChanged = false;
+                }
+                this->rc->command[THROTTLE] = constrain(this->initialThrottleHold + this->altPID, 
+                        CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
+            }
+        } else {
+            // slow alt changes
+            if (abs(this->rc->command[THROTTLE] - this->initialThrottleHold) > CONFIG_ALT_HOLD_THROTTLE_NEUTRAL) {
+                // set velocity proportional to stick movement +100 throttle gives ~ +50 cm/s
+                this->setVelocity = (this->rc->command[THROTTLE] - this->initialThrottleHold) / 2;
+                this->velocityControl = true;
+                isaltHoldChanged = true;
+            } else if (isaltHoldChanged) {
+                this->altHoldValue = this->estAlt;
+                this->velocityControl = false;
+                isaltHoldChanged = false;
+            }
+            this->rc->command[THROTTLE] = constrain(this->initialThrottleHold + this->altPID, CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
+        }
+        printf("%4d %4d %4d\n", this->initialThrottleHold, this->altPID, this->rc->command[THROTTLE]);
+    }
+#endif // _SIM
 }
 
 #ifdef __arm__

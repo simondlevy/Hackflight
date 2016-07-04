@@ -32,19 +32,37 @@ class Position {
         Board * board;
         IMU   * imu;
         Baro  * baro;
+        RC    * rc;
+
+        int32_t  altHoldValue;
+        bool     altHoldMode;
+        int32_t  estAlt;
+        int32_t  altPID;
+        int32_t  setVelocity;
+        bool     velocityControl;
+        int32_t  errorVelocityI;
+        int16_t  initialThrottleHold;
+        uint32_t previousT;
+        float    accZ_old;
+        float    accelVel;
+        int32_t  fusedBarosonarAlt;
+        int32_t  lastFusedBarosonarAlt;
+        int32_t  baroAlt;
+        int32_t  baroAltBaseline;
+        float    accelAlt;
+        bool     wasArmed;
+        int32_t  baroAlt_offset;
+        float    sonarTransition;
 
     public:
 
-        void init(Board * board, IMU * imu, Baro * baro);
+        void init(Board * board, IMU * imu, Baro * baro, RC * rc);
 
-        void getAltitude(
-                int32_t & estAlt, 
-                int32_t & altPID,
-                int32_t & errorVelocityI, 
-                int32_t setVelocity, 
-                bool velocityControl, 
-                int32_t altHold,
-                bool armed);
+        void update(void);
+
+        void computeAltitude(bool armed);
+
+        void holdAltitude(void);
 };
 
 

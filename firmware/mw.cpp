@@ -134,7 +134,7 @@ void setup(void)
     pid.init();
     mixer.init(&board, &rc, &pid); 
     msp.init(&board, &imu, &mixer, &rc);
-    position.init(&board, &imu, &baro);
+    position.init(&board, &imu, &baro, &rc);
 
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;
@@ -156,15 +156,6 @@ void loop(void)
     static uint16_t calibratingA;
     static uint32_t currentTime;
     static uint32_t disarmTime;
-
-    static int32_t  altHoldValue;
-    static bool     altHoldMode;
-    static int32_t  estAlt;
-    static int32_t  altPID;
-    static int32_t  setVelocity;
-    static bool     velocityControl;
-    static int32_t  errorVelocityI;
-    static int16_t initialThrottleHold;
 
     if (rcTask.checkAndUpdate(currentTime)) {
 
@@ -210,18 +201,7 @@ void loop(void)
         } // rc.changed()
 
         // Switch to alt-hold when switch moves to position 1 or 2
-        if (rc.auxState() > 0) {
-            if (!altHoldMode) {
-                altHoldMode = true;
-                altHoldValue = estAlt;
-                initialThrottleHold = rc.command[THROTTLE];
-                errorVelocityI = 0;
-                altPID = 0;
-            }
-        }
-        else {
-            altHoldMode = false;
-        }
+        position.update();
 
     } else {                    // not in rc loop
 
@@ -235,7 +215,7 @@ void loop(void)
                 break;
             case 1:
                 if (baro.available() && altitudeEstimationTask.checkAndUpdate(currentTime))
-                    position.getAltitude(estAlt, altPID, errorVelocityI, setVelocity, velocityControl, altHoldValue, armed);
+                    position.computeAltitude(armed);
                 taskOrder++;
                 break;
             case 2:
@@ -289,39 +269,8 @@ void loop(void)
         // handle serial communications
         msp.update(armed);
 
-        if (altHoldMode) {
-            static bool isaltHoldChanged = false;
-            if (CONFIG_ALT_HOLD_FAST_CHANGE) {
-                // rapid alt changes
-                if (abs(rc.command[THROTTLE] - initialThrottleHold) > CONFIG_ALT_HOLD_THROTTLE_NEUTRAL) {
-                    errorVelocityI = 0;
-                    isaltHoldChanged = true;
-                    //rc.command[THROTTLE] += (rc.command[THROTTLE] > initialThrottleHold) 
-                    //    ? -CONFIG_ALT_HOLD_THROTTLE_NEUTRAL : CONFIG_ALT_HOLD_THROTTLE_NEUTRAL;
-                } else {
-                    if (isaltHoldChanged) {
-                        altHoldValue = estAlt;
-                        isaltHoldChanged = false;
-                    }
-                    rc.command[THROTTLE] = constrain(initialThrottleHold + altPID, 
-                            CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
-                    //printf("%4d %4d %4d\n", initialThrottleHold, altPID, rc.command[THROTTLE]);
-                }
-            } else {
-                // slow alt changes
-                if (abs(rc.command[THROTTLE] - initialThrottleHold) > CONFIG_ALT_HOLD_THROTTLE_NEUTRAL) {
-                    // set velocity proportional to stick movement +100 throttle gives ~ +50 cm/s
-                    setVelocity = (rc.command[THROTTLE] - initialThrottleHold) / 2;
-                    velocityControl = true;
-                    isaltHoldChanged = true;
-                } else if (isaltHoldChanged) {
-                    altHoldValue = estAlt;
-                    velocityControl = false;
-                    isaltHoldChanged = false;
-                }
-                //rc.command[THROTTLE] = constrain(initialThrottleHold + altPID, CONFIG_MINTHROTTLE, CONFIG_MAXTHROTTLE);
-            }
-        }
+        // hold altitude if indicated
+        position.holdAltitude();
 
         // update PID controller 
         pid.update(&rc, &imu);

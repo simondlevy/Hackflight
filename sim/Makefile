@@ -26,7 +26,7 @@ VREP_DIR_OSX   = /Applications/V-REP_PRO_EDU_V3_3_1_Mac
 #COMPANION=COMPANION
 
 COMMON = $(VREP_DIR)/programming/common/
-CFLAGS = -Wall -I$(VREP_DIR)/programming/include/ -I. -I../firmware -Wall -fPIC -static
+CFLAGS = -Wall -D_SIM -I$(VREP_DIR)/programming/include/ -I. -I../firmware -Wall -fPIC -static
 
 OS = $(shell uname -s)
 ifeq ($(OS), Linux)
