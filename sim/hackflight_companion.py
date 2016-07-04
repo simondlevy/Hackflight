@@ -18,46 +18,79 @@
 
 import sys
 import cv2
-import numpy as np
 
-from socket_server import serve_socket
+def processImage(image):
 
-# Three command-line arguments: first is camera-client port, second is MSP port, third is image file name
-if len(sys.argv) > 2:
+    # Blur image to remove noise
+    frame = cv2.GaussianBlur(image, (3, 3), 0)
 
-    # Serve a socket for camera synching, and a socket for comms
-    camera_client = serve_socket(int(sys.argv[1]))
-    comms_client  = serve_socket(int(sys.argv[2]))
-    image_from_sim_name  = sys.argv[3]
-    image_to_sim_name  = sys.argv[4]
+    # Switch image from BGR colorspace to HSV
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    while True:
+    # Define range of blue color in HSV
+    blueMin = (100,  50,  10)
+    blueMax = (255, 255, 255)
 
-        # Receive the camera sync byte from the client
-        camera_client.recv(1)
-     
-        # Load the image from the temp file
-        image = cv2.imread(image_from_sim_name, cv2.IMREAD_COLOR)
+    # Set pixels to white if in blue range, black outside range 
+    mask = cv2.inRange(hsv, blueMin, blueMax)
 
-        # Blur image to remove noise
-        frame = cv2.GaussianBlur(image, (3, 3), 0)
+    return mask
 
-        # Switch image from BGR colorspace to HSV
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+if __name__ == '__main__':
 
-        # Define range of blue color in HSV
-        blueMin = (100,  50,  10)
-        blueMax = (255, 255, 255)
+    argc = len(sys.argv)
 
-        # Set pixels to white if in blue range, black outside range 
-        mask = cv2.inRange(hsv, blueMin, blueMax)
+    # More than two command-line arguments: simulation mode.  First arg is camera-client port, 
+    # second is MSP port, third is input image file name, fourth is outpt image file name.
+    if argc > 2:
 
-        # Write the processed image to a file for the simulator to display
-        cv2.imwrite(image_to_sim_name, image)
+        from socket_server import serve_socket
 
-        comms_client.send('hello')
+        # Serve a socket for camera synching, and a socket for comms
+        camera_client = serve_socket(int(sys.argv[1]))
+        comms_client  = serve_socket(int(sys.argv[2]))
+        image_from_sim_name  = sys.argv[3]
+        image_to_sim_name  = sys.argv[4]
 
-# XXX one argument: name of com-port
-else:
+        # Set up for optical flow
+        prev_gray = None
 
-    None
+        while True:
+
+            # Receive the camera sync byte from the client
+            camera_client.recv(1)
+         
+            # Load the image from the temp file
+            image = cv2.imread(image_from_sim_name, cv2.IMREAD_COLOR)
+
+            # Process it
+            newimage = processImage(image)
+
+            # Write the processed image to a file for the simulator to display
+            cv2.imwrite(image_to_sim_name, image)
+
+            comms_client.send('hello')
+
+    # Fewer than three arguments: live mode or camera-test mode
+    else:
+
+        commport = sys.arg[1] if argc > 1 else None
+
+        cap = cv2.VideoCapture(0)
+
+        while True:
+
+            success, image = cap.read()
+
+            if success:
+
+                # Process image
+                newimage = processImage(image)
+
+                # Test mode; display image
+                if commport is None:
+                    cv2.imshow('OpenCV', newimage)
+                    if cv2.waitKey(1) == 27:  # ESC
+                        break
+
+
