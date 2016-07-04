@@ -52,12 +52,8 @@ if len(sys.argv) > 2:
         # Set pixels to white if in blue range, black outside range 
         mask = cv2.inRange(hsv, blueMin, blueMax)
 
-        # Display the original image
-        #cv2.imshow('OpenCV', image)
-        #cv2.waitKey(1)
-
         # Write the processed image to a file for the simulator to display
-        cv2.imwrite(image_to_sim_name, mask)
+        cv2.imwrite(image_to_sim_name, image)
 
         comms_client.send('hello')
 

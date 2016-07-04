@@ -91,13 +91,7 @@ void CompanionBoard::start(void)
     sprintf(camera_port, "%d", CAMERA_PORT);
     char comms_port[10];
     sprintf(comms_port, "%d", COMMS_PORT);
-    char *argv[6] = {
-        (char *)script, 
-        camera_port, 
-        comms_port, 
-        (char *)IMAGE_TO_PYTHON, 
-        (char *)IMAGE_FROM_PYTHON, 
-        NULL};
+    char *argv[6] = { (char *)script, camera_port, comms_port, (char *)IMAGE_TO_PYTHON, (char *)IMAGE_FROM_PYTHON, NULL};
 
     // Fork the Python server script
     this->procid = fork();
@@ -119,8 +113,8 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
 
     // Use OpenCV to convert BGR image bytes to RGB, and save as JPEG
     Mat image = Mat(imageHeight, imageWidth, CV_8UC3, imageBytes);
-    flip(image, image, 0);                 // rectify image
-    cvtColor(image, image, COLOR_BGR2RGB); // convert image BGR->RGB
+    //flip(image, image, 0);                 // rectify image
+    //cvtColor(image, image, COLOR_BGR2RGB); // convert image BGR->RGB
     imwrite(IMAGE_TO_PYTHON, image);
 
     // Send sync byte to Python server, which will open the image, process it, and
