@@ -163,11 +163,7 @@ void Position::computeAltitude(bool armed)
     this->estAlt = sonarInRange() ? fusedBarosonarAlt : (int32_t)accelAlt;
 
     // reset acceleromter sum
-    this->imu->accelSum[0] = 0;
-    this->imu->accelSum[1] = 0;
-    this->imu->accelSum[2] = 0;
-    this->imu->accelSumCount = 0;
-    this->imu->accelTimeSum = 0;
+    this->imu->resetAccelSum();
 
     int32_t fusedBaroSonarVel = (int32_t)((fusedBarosonarAlt - lastFusedBarosonarAlt) * 1000000.0f / dTime);
     lastFusedBarosonarAlt = fusedBarosonarAlt;
