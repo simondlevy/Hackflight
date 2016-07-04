@@ -72,8 +72,14 @@ install: $(PLUGIN) hackflight_companion.py
 uninstall:
 	rm -f $(VREP_DIR)/$(PLUGIN)
 
-edit:
+vedit:
 	vim v_repExtHackflight.cpp
+
+cedit:
+	vim companion.cpp
+
+pedit:
+	vim hackflight_companion.py
 
 flakes:
 	pyflakes hackflight_companion.py
