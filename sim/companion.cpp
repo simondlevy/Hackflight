@@ -70,6 +70,7 @@ static int connect_to_server(int port, const char * hostname="localhost")
 static const int CAMERA_PORT       = 5000;
 static const int COMMS_PORT        = 5001;
 static const char * IMAGE_FILENAME = "image.jpg";
+static const char * IMAGE_FILENAME2 = "image2.jpg";
 static const int MAXMSG            = 1000;
 
 #endif
@@ -119,6 +120,11 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     // Send sync byte to Python client, which will open and process the image
     char sync = 0;
     write(this->camera_sockfd, &sync, 1);
+
+    Mat image2 = imread(IMAGE_FILENAME2, CV_LOAD_IMAGE_COLOR);
+    namedWindow("OpenCV", WINDOW_AUTOSIZE );
+    imshow("OpenCV", image2 );
+
 
     // Check whether bytes are available from server
     int avail;

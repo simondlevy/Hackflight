@@ -51,11 +51,11 @@ if len(sys.argv) > 2:
         # Set pixels to white if in blue range, black outside range 
         mask = cv2.inRange(hsv, blueMin, blueMax)
 
-        print(np.sum(mask)/(255*mask.size))
+        # Display the original image
+        #cv2.imshow('OpenCV', image)
+        #cv2.waitKey(1)
 
-        # Display the mask image
-        cv2.imshow('OpenCV', mask)
-        cv2.waitKey(1)
+        cv2.imwrite('image2.jpg', mask)
 
         comms_client.send('hello')
 
