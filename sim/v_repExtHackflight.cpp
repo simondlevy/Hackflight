@@ -682,7 +682,16 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     D.writeDataToStack(cb->stackID);
 
     update_count++;
-}
+
+#ifdef __linux
+    struct timeval stop_time;
+    gettime(&stop_time);
+    long elapsed_time = stop_time.tv_sec - start_time.tv_sec;
+    if (elapsed_time > 0)
+        debug("%d FPS\n", update_count / elapsed_time);
+#endif
+
+} // LUA_UPDATE_COMMAND
 
 
 // --------------------------------------------------------------------------------------
@@ -693,11 +702,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
-#ifdef __linux
-    struct timeval stop_time;
-    gettime(&stop_time);
-    debug("%d FPS\n", (int)(update_count/(stop_time.tv_sec-start_time.tv_sec)));
-#endif
     controllerClose();
 
     companionBoard.halt();
