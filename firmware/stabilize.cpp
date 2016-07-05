@@ -1,5 +1,5 @@
 /*
-   pid.cpp : PID class implementation
+   stabilize.cpp : PID-based stability class implementation
 
    Adapted from https://github.com/multiwii/baseflight/blob/master/src/mw.c
 
@@ -26,7 +26,7 @@ extern "C" {
 #include "mw.hpp"
 #include "pidvals.hpp"
 
-void PID::init(void)
+void Stabilize::init(void)
 {
     for (uint8_t axis=0; axis<3; ++axis) {
         this->lastGyro[axis] = 0;
@@ -49,7 +49,7 @@ void PID::init(void)
     this->resetIntegral();
 }
 
-void PID::update(RC * rc, IMU * imu)
+void Stabilize::update(RC * rc, IMU * imu)
 {
     for (uint8_t axis = 0; axis < 3; axis++) {
 
@@ -99,7 +99,7 @@ void PID::update(RC * rc, IMU * imu)
     this->axisPID[YAW] = constrain(this->axisPID[YAW], -100 - abs(rc->command[YAW]), +100 + abs(rc->command[YAW]));
 }
 
-void PID::resetIntegral(void)
+void Stabilize::resetIntegral(void)
 {
     this->errorGyroI[ROLL] = 0;
     this->errorGyroI[PITCH] = 0;

@@ -1,5 +1,5 @@
 /*
-   pid.hpp : PID class header
+   stabilize.hpp : Class declaration for PID-based stablization
 
    This file is part of Hackflight.
 
@@ -21,11 +21,9 @@
 extern "C" {
 #endif
 
-    class PID {
+    class Stabilize {
 
         private:
-
-//#include "pidvals.hpp"
 
             uint8_t rate_p[3];
             uint8_t rate_i[3];

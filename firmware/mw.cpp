@@ -31,15 +31,15 @@ extern "C" {
 
 // Objects we use
 
-static Board    board;
-static IMU      imu;
-static RC       rc;
-static Mixer    mixer;
-static PID      pid;
-static MSP      msp;
-static Baro     baro;
-static Position position;
-static Hover    hover;
+static Board      board;
+static IMU        imu;
+static RC         rc;
+static Mixer      mixer;
+static Stabilize  stabilize;
+static MSP        msp;
+static Baro       baro;
+static Position   position;
+static Hover      hover;
 
 // support for timed tasks
 
@@ -128,8 +128,8 @@ void setup(void)
     // initialize our external objects
     rc.init(&board);
     imu.init(&board, calibratingGyroCycles, calibratingAccCycles);
-    pid.init();
-    mixer.init(&board, &rc, &pid); 
+    stabilize.init();
+    mixer.init(&board, &rc, &stabilize); 
     msp.init(&board, &imu, &mixer, &rc);
     position.init(&board, &imu, &baro);
     hover.init(&rc, &position);
@@ -162,7 +162,7 @@ void loop(void)
 
         // when landed, reset integral component of PID
         if (rc.throttleIsDown()) 
-            pid.resetIntegral();
+            stabilize.resetIntegral();
 
         if (rc.changed()) {
 
@@ -272,8 +272,8 @@ void loop(void)
         // hold altitude if indicated
         hover.holdAltitude();
 
-        // update PID controller 
-        pid.update(&rc, &imu);
+        // update stability PID controller 
+        stabilize.update(&rc, &imu);
 
         // update mixer
         mixer.update(armed);

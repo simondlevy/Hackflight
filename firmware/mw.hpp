@@ -41,7 +41,7 @@ void debug(const char * format, ...);
 #include "board.hpp"
 #include "imu.hpp"
 #include "rc.hpp"
-#include "pid.hpp"
+#include "stabilize.hpp"
 #include "mixer.hpp"
 #include "msp.hpp"
 #include "baro.hpp"
