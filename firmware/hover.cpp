@@ -1,5 +1,5 @@
 /*
-   hover.cpp : hover-in-place class implementation
+   hover.cpp : PID-based hover-in-place class implementation
 
    This file is part of Hackflight.
 
@@ -22,15 +22,10 @@ extern "C" {
 #endif
 
 #include "mw.hpp"
+#include "pidvals.hpp"
 
-static const uint8_t CONFIG_ALT_P = 200;
-static const uint8_t CONFIG_VEL_P = 200;
-static const uint8_t CONFIG_VEL_I = 45;
-static const uint8_t CONFIG_VEL_D = 1;
-
-static const bool     CONFIG_ALT_HOLD_FAST_CHANGE       = true;
-static const uint16_t CONFIG_ALT_HOLD_THROTTLE_NEUTRAL  = 40;
-
+static const bool     CONFIG_HOVER_ALT_HOLD_FAST_CHANGE       = true;
+static const uint16_t CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL  = 40;
 
 void Hover::init(RC * _rc, Position * _position)
 {
@@ -73,21 +68,21 @@ void Hover::updatePid(void)
         if (!this->velocityControl) {
             int32_t error = constrain(this->altHoldValue - this->position->estAlt, -500, 500);
             error = deadbandFilter(error, 10);       // remove small P parametr to reduce noise near zero position
-            setVel = constrain((CONFIG_ALT_P * error / 128), -300, +300); // limit velocity to +/- 3 m/s
+            setVel = constrain((CONFIG_HOVER_ALT_P * error / 128), -300, +300); // limit velocity to +/- 3 m/s
         } 
 
         // Velocity PID-Controller
         // P
         int32_t error = setVel - (int32_t)lrintf(this->position->accelVel);
-        this->altPID = constrain((CONFIG_VEL_P * error / 32), -300, +300);
+        this->altPID = constrain((CONFIG_HOVER_VEL_P * error / 32), -300, +300);
 
         // I
-        errorVelocityI += (CONFIG_VEL_I * error);
+        errorVelocityI += (CONFIG_HOVER_VEL_I * error);
         errorVelocityI = constrain(errorVelocityI, -(8196 * 200), (8196 * 200));
         this->altPID += errorVelocityI / 8196;     // I in the range of +/-200
 
         // D
-        this->altPID -= constrain(CONFIG_VEL_D * (this->position->accelZ + this->accelZ_prev) / 512, -150, 150);
+        this->altPID -= constrain(CONFIG_HOVER_VEL_D * (this->position->accelZ + this->accelZ_prev) / 512, -150, 150);
 
     } else 
         this->altPID = 0;
@@ -102,13 +97,13 @@ void Hover::holdAltitude(void)
 #ifdef _SIM
     if (this->altHoldMode) {
         static bool isaltHoldChanged = false;
-        if (CONFIG_ALT_HOLD_FAST_CHANGE) {
+        if (CONFIG_HOVER_ALT_HOLD_FAST_CHANGE) {
             // rapid alt changes
-            if (abs(this->rc->command[THROTTLE] - this->initialThrottleHold) > CONFIG_ALT_HOLD_THROTTLE_NEUTRAL) {
+            if (abs(this->rc->command[THROTTLE] - this->initialThrottleHold) > CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL) {
                 errorVelocityI = 0;
                 isaltHoldChanged = true;
                 this->rc->command[THROTTLE] += (this->rc->command[THROTTLE] > this->initialThrottleHold) 
-                    ? -CONFIG_ALT_HOLD_THROTTLE_NEUTRAL : CONFIG_ALT_HOLD_THROTTLE_NEUTRAL;
+                    ? -CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL : CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL;
             } else {
                 if (isaltHoldChanged) {
                     this->altHoldValue = this->position->estAlt;
@@ -119,7 +114,7 @@ void Hover::holdAltitude(void)
             }
         } else {
             // slow alt changes
-            if (abs(this->rc->command[THROTTLE] - this->initialThrottleHold) > CONFIG_ALT_HOLD_THROTTLE_NEUTRAL) {
+            if (abs(this->rc->command[THROTTLE] - this->initialThrottleHold) > CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL) {
                 // set velocity proportional to stick movement +100 throttle gives ~ +50 cm/s
                 this->setVelocity = (this->rc->command[THROTTLE] - this->initialThrottleHold) / 2;
                 this->velocityControl = true;

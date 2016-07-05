@@ -15,12 +15,23 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Level (accelerometer)
 static const uint8_t CONFIG_LEVEL_P          = 40;
 static const uint8_t CONFIG_LEVEL_I          = 2;
 
+// Rate (gyro): P must be positive
 static const uint8_t CONFIG_RATE_PITCHROLL_P = 20;
 static const uint8_t CONFIG_RATE_PITCHROLL_I = 15;
 static const uint8_t CONFIG_RATE_PITCHROLL_D = 11;
 
+// Yaw: P must be positive
 static const uint8_t CONFIG_YAW_P            = 40;
 static const uint8_t CONFIG_YAW_I            = 20;
+
+// For altitude hover XXX too big; return to original!
+#define CONFIG_HOVER_ALT_P  200
+#define CONFIG_HOVER_VEL_P  200
+#define CONFIG_HOVER_VEL_I  45
+#define CONFIG_HOVER_VEL_D  1
+
+
