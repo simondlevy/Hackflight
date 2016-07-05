@@ -20,13 +20,13 @@ import sys
 import cv2
 import numpy as np
 
-def processImage(image, conversion):
+def processImage(image):
 
     # Blur image to remove noise
     frame = cv2.GaussianBlur(image, (3, 3), 0)
 
     # Switch image from BGR colorspace to HSV
-    hsv = cv2.cvtColor(frame, conversion)
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     # Define range of blue color in HSV
     blueMin = (100,  50,  10)
@@ -40,9 +40,6 @@ def processImage(image, conversion):
     if len(x) / float(np.prod(mask.shape)) > 0.2:
         x,y = np.int(np.mean(x)), np.int(np.mean(y))
         cv2.putText(image, 'WATER', (y,x), cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
-
-    return mask
-
 
 if __name__ == '__main__':
 
@@ -72,7 +69,7 @@ if __name__ == '__main__':
             image = cv2.imread(image_from_sim_name, cv2.IMREAD_COLOR)
 
             # Process it
-            mask = processImage(image, cv2.COLOR_RGB2HSV)
+            mask = processImage(image)
 
             # Write the processed image to a file for the simulator to display
             cv2.imwrite(image_to_sim_name, image)
@@ -93,7 +90,7 @@ if __name__ == '__main__':
             if success:
 
                 # Process image
-                mask = processImage(image, cv2.COLOR_BGR2HSV)
+                processImage(image) 
 
                 # Test mode; display image
                 if commport is None:

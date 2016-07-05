@@ -112,10 +112,10 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
 {
 #if defined(__linux) && defined(_COMPANION)
 
-    // Use OpenCV to convert BGR image bytes to RGB, and save as JPEG
+    // Use OpenCV to save image as JPEG
     Mat image = Mat(imageHeight, imageWidth, CV_8UC3, imageBytes);
-    //flip(image, image, 0);                 // rectify image
-    //cvtColor(image, image, COLOR_BGR2RGB); // convert image BGR->RGB
+    flip(image, image, 0);                 // rectify image
+    cvtColor(image, image, COLOR_BGR2RGB); // convert image BGR->RGB
     imwrite(IMAGE_TO_PYTHON, image);
 
     // Send sync byte to Python server, which will open the image, process it, and
@@ -127,6 +127,8 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     struct stat fileStat; 
     if (!stat(IMAGE_FROM_PYTHON, &fileStat)) {
         Mat image2 = imread(IMAGE_FROM_PYTHON, CV_LOAD_IMAGE_COLOR);
+        flip(image2, image2, 0);                 // rectify image
+        cvtColor(image2, image2, COLOR_RGB2BGR); // convert image BGR->RGB
         memcpy(imageBytes, image2.data, imageWidth*imageHeight*3);
     }
 
