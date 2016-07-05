@@ -18,23 +18,31 @@
 
 import sys
 import cv2
+import numpy as np
 
-def processImage(image):
+def processImage(image, conversion):
 
     # Blur image to remove noise
     frame = cv2.GaussianBlur(image, (3, 3), 0)
 
     # Switch image from BGR colorspace to HSV
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(frame, conversion)
 
     # Define range of blue color in HSV
     blueMin = (100,  50,  10)
     blueMax = (255, 255, 255)
 
-    # Set pixels to white if in blue range, black outside range 
+    # Find where image in range
     mask = cv2.inRange(hsv, blueMin, blueMax)
 
+    # Find centroid of mask
+    x, y = np.where(mask)
+    if len(x) / float(np.prod(mask.shape)) > 0.2:
+        x,y = np.int(np.mean(x)), np.int(np.mean(y))
+        cv2.putText(image, 'WATER', (y,x), cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
+
     return mask
+
 
 if __name__ == '__main__':
 
@@ -64,7 +72,7 @@ if __name__ == '__main__':
             image = cv2.imread(image_from_sim_name, cv2.IMREAD_COLOR)
 
             # Process it
-            newimage = processImage(image)
+            mask = processImage(image, cv2.COLOR_RGB2HSV)
 
             # Write the processed image to a file for the simulator to display
             cv2.imwrite(image_to_sim_name, image)
@@ -85,11 +93,11 @@ if __name__ == '__main__':
             if success:
 
                 # Process image
-                newimage = processImage(image)
+                mask = processImage(image, cv2.COLOR_BGR2HSV)
 
                 # Test mode; display image
                 if commport is None:
-                    cv2.imshow('OpenCV', newimage)
+                    cv2.imshow('OpenCV', image)
                     if cv2.waitKey(1) == 27:  # ESC
                         break
 
