@@ -18,7 +18,7 @@ socket_server.py - Python code for serving a socket on an IP address
 import socket
 import time
 
-def serve_socket(port, host='localhost'):
+def serve_socket(port, host='localhost', timeout=5):
     '''
     Serves a blocking socket on the specified port.  Returns a new socket object 
     representing the client, on which send() and recv() can be invoked.
@@ -32,7 +32,7 @@ def serve_socket(port, host='localhost'):
         
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
  
-        sock.settimeout(1)
+        sock.settimeout(timeout)
 
         try:
             sock.bind((host, port))
