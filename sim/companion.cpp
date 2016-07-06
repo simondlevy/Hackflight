@@ -1,5 +1,6 @@
 /*
-   companion.cpp : Companion-board class implementation
+   companion.cpp : Companion-board class implementation 
+   for v_repExtHackflight plugin.
 
    This file is part of Hackflight.
 
@@ -19,6 +20,7 @@
 
 #if defined(__linux) && defined(_COMPANION)
 
+// We use OpenCV to compress JPEG for use by Python script
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -42,6 +44,8 @@ using namespace std;
 #include <string.h>
 #include <time.h> 
 #endif
+
+extern void debug(const char * format, ...);
 
 #if defined(__linux) && defined(_COMPANION)
 static int connect_to_server(int port, const char * hostname="localhost")
@@ -136,10 +140,11 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     int avail;
     ioctl(this->comms_sockfd, FIONREAD, &avail);
 
-    // Ignore OOB values
+    // Ignore OOB values for available bytes
     if (avail > 0 && avail < MAXMSG) {
         char msg[MAXMSG];
         read(this->comms_sockfd, msg, avail);
+        debug("%d\n", strlen(msg));
     }
 
 #endif

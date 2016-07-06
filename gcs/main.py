@@ -34,7 +34,7 @@ from serial.tools.list_ports import comports
 from threading import Thread
 import os
 
-from msppg import MSP_Parser
+from msppg import *
 
 from Tkinter import *
 from setup import Setup
@@ -117,8 +117,8 @@ class GCS:
         self.parser = MSP_Parser()
 
         # Set up parser's request strings
-        self.attitude_request = self.parser.serialize_ATTITUDE_Request()
-        self.rc_request = self.parser.serialize_RC_Request()
+        self.attitude_request = serialize_ATTITUDE_Request()
+        self.rc_request = serialize_RC_Request()
 
         # No messages yet
         self.yaw_pitch_roll = 0,0,0
@@ -391,7 +391,7 @@ class GCS:
 
         values = [1000]*4
         values[index-1] = value
-        self.comms.send_message(self.parser.serialize_SET_MOTOR, values)
+        self.comms.send_message(serialize_SET_MOTOR, values)
 
     def _show_splash(self):
 

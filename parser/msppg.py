@@ -142,36 +142,41 @@ class Python_Emitter(CodeEmitter):
 
         self._write(self._getsrc('bottom-py') + '\n')
 
+        # Emit handler methods for parser
         for msgtype in msgdict.keys():
 
             msgstuff = msgdict[msgtype]
             msgid = msgstuff[0]
-
-            self._write(self.indent + 'def serialize_' + msgtype + '(self')
-            for argname in self._getargnames(msgstuff):
-                self._write(', ' + argname)
-            self._write('):\n\n')
-            self._write(self.indent*2 + 'message_buffer = struct.pack(\'')
-            for argtype in self._getargtypes(msgstuff):
-                self._write(self.type2pack[argtype])
-            self._write('\'')
-            for argname in self._getargnames(msgstuff):
-                self._write(', ' + argname)
-            self._write(')\n\n')
-            self._write(self.indent*2)
-
-            self._write('msg = chr(len(message_buffer)) + chr(%s) + message_buffer\n\n' % msgid)
-            self._write(self.indent*2 + 'return _bytes(\'$M%c\' + msg + chr(_CRC8(msg)))\n\n' %
-                    ('>' if msgid < 200 else '<'))
 
             if msgid < 200:
 
                 self._write(self.indent + 'def set_%s_Handler(self, handler):\n\n' % msgtype) 
                 self._write(2*self.indent + 'self.%s_Handler = handler\n\n' % msgtype)
 
-                self._write(self.indent + 'def serialize_' + msgtype + '_Request(self):\n\n')
-                self._write(2*self.indent + 'return _bytes(\'$M<\' + chr(0) + chr(%s) + chr(%s))\n\n' % 
-                        (msgid, msgid))
+        # Emit serializer functions for module
+        for msgtype in msgdict.keys():
+
+            msgstuff = msgdict[msgtype]
+            msgid = msgstuff[0]
+
+            self._write('def serialize_' + msgtype + '(' + ', '.join(self._getargnames(msgstuff)) + '):\n\n')
+            self._write(self.indent + 'message_buffer = struct.pack(\'')
+            for argtype in self._getargtypes(msgstuff):
+                self._write(self.type2pack[argtype])
+            self._write('\'')
+            for argname in self._getargnames(msgstuff):
+                self._write(', ' + argname)
+            self._write(')\n\n')
+            self._write(self.indent)
+
+            self._write('msg = chr(len(message_buffer)) + chr(%s) + message_buffer\n\n' % msgid)
+            self._write(self.indent + 'return _bytes(\'$M%c\' + msg + chr(_CRC8(msg)))\n\n' %
+                    ('>' if msgid < 200 else '<'))
+
+            if msgid < 200:
+
+                self._write('def serialize_' + msgtype + '_Request():\n\n')
+                self._write(self.indent + 'return _bytes(\'$M<\' + chr(0) + chr(%s) + chr(%s))\n\n' % (msgid, msgid))
 
     def _write(self, s):
 

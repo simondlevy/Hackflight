@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 '''
-   hackflight_companion.py : Companion-board Python code
+   hackflight_companion.py : Companion-board Python code.  Runs in 
+   Python2 instead of Python3, so we can install OpenCV without 
+   major hassles.
 
    This file is part of Hackflight.
 
@@ -19,6 +21,8 @@
 import sys
 import cv2
 import numpy as np
+
+from msppg import MSP_Parser
 
 def processImage(image):
 
@@ -43,11 +47,12 @@ def processImage(image):
 
 if __name__ == '__main__':
 
-    argc = len(sys.argv)
+    # Create a parser for MSP messaging
+    parser = MSP_Parser()
 
-    # More than two command-line arguments: simulation mode.  First arg is camera-client port, 
+    # More than two command-line arguments means simulation mode.  First arg is camera-client port, 
     # second is MSP port, third is input image file name, fourth is outpt image file name.
-    if argc > 2:
+    if len(sys.argv) > 2:
 
         from socket_server import serve_socket
 
@@ -56,9 +61,6 @@ if __name__ == '__main__':
         comms_client  = serve_socket(int(sys.argv[2]))
         image_from_sim_name  = sys.argv[3]
         image_to_sim_name  = sys.argv[4]
-
-        # Set up for optical flow
-        prev_gray = None
 
         while True:
 
@@ -79,7 +81,7 @@ if __name__ == '__main__':
     # Fewer than three arguments: live mode or camera-test mode
     else:
 
-        commport = sys.arg[1] if argc > 1 else None
+        commport = sys.arg[1] if len(sys.argv) > 1 else None
 
         cap = cv2.VideoCapture(0)
 

@@ -563,8 +563,8 @@ static float thrusts[4];
 static double timestep = .01;
 
 // Timing support
-static unsigned long int update_count;
 #ifdef __linux
+static unsigned long int update_count;
 struct timeval start_time;
 static void gettime(struct timeval * start_time)
 {
@@ -582,13 +582,13 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
 
 #ifdef __linux
+	update_count = 0;
     gettime(&start_time);
 #endif
 
     // Start companion board
     companionBoard.start();
 
-	update_count = 0;
 
     CScriptFunctionData D;
 
@@ -681,14 +681,14 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     D.pushOutData(CScriptFunctionDataItem(true)); 
     D.writeDataToStack(cb->stackID);
 
-    update_count++;
 
 #ifdef __linux
+    update_count++;
     struct timeval stop_time;
     gettime(&stop_time);
     long elapsed_time = stop_time.tv_sec - start_time.tv_sec;
     if (elapsed_time > 0)
-        debug("%d FPS\n", update_count / elapsed_time);
+        /*debug("%d FPS\n", update_count / elapsed_time)*/ ;
 #endif
 
 } // LUA_UPDATE_COMMAND
