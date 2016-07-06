@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 '''
-
 msppg.py Multiwii Serial Protocol Parser Generator
 
 Copyright (C) Rob Jones, Alec Singer, Chris Lavin, Blake Liebling, Simon D. Levy 2015
@@ -190,8 +189,11 @@ class CPP_Emitter(CodeEmitter):
 
         CodeEmitter.__init__(self, 'cpp', 'cpp')
         mkdir_if_missing('output/cpp/msppg')
+
+        # Create C++ example
         self._copyfile('example.cpp', 'cpp/example.cpp')
 
+        # Create Arduino stuff
         mkdir_if_missing('output/arduino')
         mkdir_if_missing('output/arduino/MSPPG')
         mkdir_if_missing('output/arduino/MSPPG/examples')
@@ -220,7 +222,7 @@ class CPP_Emitter(CodeEmitter):
             argnames = self._getargnames(msgstuff)
             argtypes = self._getargtypes(msgstuff)
 
-            self._hwrite(self.indent*2 + 'MSP_Message serialize_%s' % msgtype)
+            self._hwrite(self.indent*2 + 'static MSP_Message serialize_%s' % msgtype)
             self._write_params(self.houtput, argtypes, argnames)
             self._write_params(self.ahoutput, argtypes, argnames)
             self._hwrite(';\n\n')
@@ -248,7 +250,7 @@ class CPP_Emitter(CodeEmitter):
                 self._cwrite(');\n')
                 self._cwrite(6*self.indent + '} break;\n\n')
                 
-                self._hwrite(self.indent*2 + 'MSP_Message serialize_%s_Request();\n\n' % msgtype)
+                self._hwrite(self.indent*2 + 'static MSP_Message serialize_%s_Request();\n\n' % msgtype)
                 self._hwrite(self.indent*2 + 
                         'void set_%s_Handler(class %s_Handler * handler);\n\n' % (msgtype, msgtype))
 
@@ -305,7 +307,7 @@ class CPP_Emitter(CodeEmitter):
                 self._cwrite(self.indent + 'msg.bytes[5] = %d;\n\n' % msgid)
                 self._cwrite(self.indent + 'msg.len = 6;\n\n')
                 self._cwrite(self.indent + 'return msg;\n')
-                self._cwrite('}')
+                self._cwrite('}\n\n')
 
 
             # Add parser method for serializing message
