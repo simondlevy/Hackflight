@@ -21,8 +21,6 @@
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
-#include "companion.hpp"
-
 #include <stdint.h>
 #include <stdarg.h>
 #include <string.h>
@@ -30,6 +28,8 @@
 
 #include <iostream>
 using namespace std;
+
+#include "companion.hpp"
 
 // WIN32 support
 #include <crossplatform.h>
@@ -1005,7 +1005,7 @@ uint8_t Board::serialReadByte(void)
 
 void Board::serialWriteByte(uint8_t c)
 {
-    printf("+ : %02X\n", c);
+    companionBoard.sendByte(c);
 }
 
 void Board::writeMotor(uint8_t index, uint16_t value)

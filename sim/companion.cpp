@@ -16,8 +16,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "companion.hpp"
-
 #if defined(__linux) && defined(_COMPANION)
 
 // We use OpenCV to compress JPEG for use by Python script
@@ -44,6 +42,8 @@ using namespace std;
 #include <string.h>
 #include <time.h> 
 #endif
+
+#include "companion.hpp"
 
 extern void debug(const char * format, ...);
 
@@ -150,6 +150,11 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight,
     }
 
 #endif
+}
+
+void CompanionBoard::sendByte(uint8_t b)
+{
+    printf("%02X\n", b);
 }
 
 void CompanionBoard::halt(void)
