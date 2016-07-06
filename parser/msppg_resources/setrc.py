@@ -32,7 +32,7 @@ PWM_MAX         = 2000
 CHANNEL_NEUTRAL       = 1500
 CHANNEL_AUTOPILOT     = 1600
 
-from msppg import MSP_Parser as Parser
+from msppg import MSP_Parser as Parser, serialize_SET_RAW_RC, serialize_RC_Request
 import serial
 import time
 from sys import argv
@@ -67,7 +67,7 @@ class SetterThread(threading.Thread):
             if getter.autopilot: 
 
                 # Make the vehicle pitch forward on autopilot
-                message = parser.serialize_SET_RAW_RC(getter.c1, CHANNEL_AUTOPILOT, getter.c3, getter.c4, 
+                message = serialize_SET_RAW_RC(getter.c1, CHANNEL_AUTOPILOT, getter.c3, getter.c4, 
                             CHANNEL_NEUTRAL, 0, 0, 0)
                 port.write(message)
 
@@ -79,7 +79,7 @@ class Getter:
 
         self.c5prev = 0
 
-        self.request = parser.serialize_RC_Request()
+        self.request = serialize_RC_Request()
 
         port.write(self.request)
 

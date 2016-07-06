@@ -20,7 +20,7 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 BAUD = 115200
 
-from msppg import MSP_Parser as Parser
+from msppg import MSP_Parser as Parser, serialize_ATTITUDE_Request
 import serial
 
 from sys import argv
@@ -32,7 +32,7 @@ if len(argv) < 2:
     exit(1)
 
 parser = Parser()
-request = parser.serialize_ATTITUDE_Request()
+request = serialize_ATTITUDE_Request()
 port = serial.Serial(argv[1], BAUD)
 
 def handler(pitch, roll, yaw):

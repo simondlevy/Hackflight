@@ -592,7 +592,7 @@ class MSPDriver(object):
         # MSPPG
         self.parser = msppg.MSP_Parser()
         self.parser.set_ATTITUDE_Handler(self._attitude_message_handler)
-        self.request = self.parser.serialize_ATTITUDE_Request()
+        self.request = msppg.serialize_ATTITUDE_Request()
 
         self.yaw, self.pitch, self.roll = 0, 0, 0
         
