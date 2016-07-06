@@ -47,6 +47,7 @@ static CompanionBoard companionBoard;
 // MSP message support
 static char mspRequest[200];
 static int  mspRequestLen;
+static int  mspRequestIndex;
 
 // Downscaling for hypersensitive PS3 controller
 static const int PS3_DOWNSCALE = 2;
@@ -816,9 +817,22 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
 
     // Handle messages from belly camera
     if (message ==  sim_message_eventcallback_openglcameraview && auxiliaryData[2] == 1) {
-        mspRequestLen = 0;
-        companionBoard.update((char *)customData, auxiliaryData[0], auxiliaryData[1], mspRequest, mspRequestLen);
-        auxiliaryData[3] = 1; // overwrite original image
+
+        // Send in image bytes, get back serial message request
+        char request[200];
+        int requestLen = 0;
+        companionBoard.update((char *)customData, auxiliaryData[0], auxiliaryData[1], request, requestLen);
+
+        // v_repMessage gets called much more frequently than firmware's serial requests, so avoid interrupting
+        // request handling
+        if (!mspRequestLen) {
+            mspRequestLen = requestLen;
+            mspRequestIndex = 0;
+            memcpy(mspRequest, request, requestLen);
+        }
+
+        // Flag overwrite of original OpenGL image
+        auxiliaryData[3] = 1; 
     }
 
     int errorModeSaved;
@@ -970,8 +984,6 @@ uint16_t Board::readPWM(uint8_t chan)
 
     // V-REP sends joystick demands in [-1000,+1000]
     int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
-	
-    //if (chan < 5) debug("%d: %d%s", chan, pwm, chan == 4 ? "\n" : "    ");
 
     return pwm;
 }
@@ -982,13 +994,13 @@ void Board::reboot(void)
 
 uint8_t Board::serialAvailableBytes(void)
 {
-    debug("%d\n", mspRequestLen);
-    return 0;
+    return mspRequestLen;
 }
 
 uint8_t Board::serialReadByte(void)
 {
-    return 0;
+    mspRequestLen--;
+    return mspRequest[mspRequestIndex++];
 }
 
 void Board::serialWriteByte(uint8_t c)

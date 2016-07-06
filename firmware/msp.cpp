@@ -117,9 +117,13 @@ void MSP::update(bool armed)
     // pendReboot will be set for flashing
     this->_board->checkReboot(pendReboot);
 
+    int count = 0;
+
     while (this->_board->serialAvailableBytes()) {
 
         uint8_t c = this->_board->serialReadByte();
+
+        printf("%d: %02X\n", count++, c);
 
         if (portState.c_state == IDLE) {
             portState.c_state = (c == '$') ? HEADER_START : IDLE;
