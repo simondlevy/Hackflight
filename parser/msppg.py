@@ -37,6 +37,10 @@ def error(errmsg):
     print(errmsg)
     exit(1)
 
+def _openw(fname):
+
+    print('Creating file ' + fname)
+    return open(fname, 'w')
 
 class CodeEmitter(object):
 
@@ -51,7 +55,7 @@ class CodeEmitter(object):
 
     def _copyfile(self, src, dst):
 
-        outfile = open('output/' + dst, 'w')
+        outfile = _openw('output/' + dst)
         outfile.write(self._getsrc(src))
         outfile.close()
 
@@ -120,7 +124,7 @@ class Python_Emitter(CodeEmitter):
 
         self._copyfile('setup.py', 'python/setup.py')
 
-        self.output = open('./output/python/msppg/__init__.py', 'w')
+        self.output = _openw('output/python/msppg/__init__.py')
 
         self._write(self.warning('#'))
 
@@ -202,11 +206,11 @@ class CPP_Emitter(CodeEmitter):
 
         self.type2decl = {'byte': 'byte', 'short' : 'short', 'float' : 'float', 'int' : 'int'}
 
-        self.coutput = open('./output/cpp/msppg/msppg.cpp', 'w')
-        self.houtput = open('./output/cpp/msppg/msppg.h', 'w')
+        self.coutput = _openw('output/cpp/msppg/msppg.cpp')
+        self.houtput = _openw('output/cpp/msppg/msppg.h')
 
-        self.acoutput = open('./output/arduino/MSPPG/msppg.cpp', 'w')
-        self.ahoutput = open('./output/arduino/MSPPG/msppg.h', 'w')
+        self.acoutput = _openw('output/arduino/MSPPG/msppg.cpp')
+        self.ahoutput = _openw('output/arduino/MSPPG/msppg.h')
 
         self._cwrite(self.warning('//'))
 
@@ -360,8 +364,8 @@ class C_Emitter(CodeEmitter):
 
         self.type2decl = {'byte': 'char', 'short' : 'short', 'float' : 'float', 'int' : 'int'}
 
-        self.coutput = open('./output/c/msppg/msppg.c', 'w')
-        self.houtput = open('./output/c/msppg/msppg.h', 'w')
+        self.coutput = _openw('output/c/msppg/msppg.c')
+        self.houtput = _openw('output/c/msppg/msppg.h')
 
         self._cwrite(self.warning('//'))
 
@@ -511,7 +515,7 @@ class Java_Emitter(CodeEmitter):
         self.type2decl  = {'byte': 'byte', 'short' : 'short', 'float' : 'float', 'int' : 'int'}
         self.type2bb   = {'byte': '', 'short' : 'Short', 'float' : 'Float', 'int' : 'Int'}
 
-        self.output = open('./output/java/edu/wlu/cs/msppg/Parser.java', 'w')
+        self.output = _openw('output/java/edu/wlu/cs/msppg/Parser.java')
 
         self._write(self.warning('//'))
 
@@ -620,7 +624,7 @@ class Java_Emitter(CodeEmitter):
                 argnames = self._getargnames(msgstuff)
                 argtypes = self._getargtypes(msgstuff)
 
-                self.output = open('./output/java/edu/wlu/cs/msppg/%s_Handler.java' % msgtype, 'w')
+                self.output = _openw('output/java/edu/wlu/cs/msppg/%s_Handler.java' % msgtype)
                 self.output.write(self.warning('//'))
                 self.output.write('package edu.wlu.cs.msppg;\n\n')
                 self.output.write('public interface %s_Handler {\n\n' % msgtype)
@@ -638,7 +642,7 @@ class Java_Emitter(CodeEmitter):
 if __name__ == '__main__':
 
     # default to input from simple example
-    data = json.load(open(argv[1] if len(argv) > 1 else 'messages.json'))
+    data = json.load(open(argv[1] if len(argv) > 1 else 'messages.json', 'r'))
  
     # takes the types of messages from the json file
     unicode_message_types = data.keys()
