@@ -47,8 +47,7 @@ PLUGIN = libv_repExtHackflight.$(EXT)
 all: $(PLUGIN) 
 
 libv_repExtHackflight.$(EXT): *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp Makefile
-	g++ $(CFLAGS) -c v_repExtHackflight.cpp 
-	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" companion.cpp 
+	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" v_repExtHackflight.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
 	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp
@@ -77,9 +76,6 @@ uninstall:
 
 vedit:
 	vim v_repExtHackflight.cpp
-
-cedit:
-	vim companion.cpp
 
 pedit:
 	vim hackflight_companion.py
