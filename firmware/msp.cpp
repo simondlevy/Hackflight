@@ -123,8 +123,6 @@ void MSP::update(bool armed)
 
         uint8_t c = this->_board->serialReadByte();
 
-        printf("%d: %02X\n", count++, c);
-
         if (portState.c_state == IDLE) {
             portState.c_state = (c == '$') ? HEADER_START : IDLE;
             if (portState.c_state == IDLE && !armed) {
