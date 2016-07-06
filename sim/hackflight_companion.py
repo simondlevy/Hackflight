@@ -22,7 +22,7 @@ import sys
 import cv2
 import numpy as np
 
-from msppg import MSP_Parser
+from msppg import MSP_Parser, serialize_ATTITUDE_Request
 
 def processImage(image):
 
@@ -47,8 +47,9 @@ def processImage(image):
 
 if __name__ == '__main__':
 
-    # Create a parser for MSP messaging
+    # Create an MSP parser and a request message
     parser = MSP_Parser()
+    attitude_request = serialize_ATTITUDE_Request()
 
     # More than two command-line arguments means simulation mode.  First arg is camera-client port, 
     # second is MSP port, third is input image file name, fourth is outpt image file name.
@@ -76,7 +77,8 @@ if __name__ == '__main__':
             # Write the processed image to a file for the simulator to display
             cv2.imwrite(image_to_sim_name, image)
 
-            comms_client.send('hello')
+            # Send an attitude request message to the client
+            comms_client.send(attitude_request)
 
     # Fewer than three arguments: live mode or camera-test mode
     else:

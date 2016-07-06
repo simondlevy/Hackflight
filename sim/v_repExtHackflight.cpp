@@ -44,6 +44,10 @@ static int demands[5];
 // Companion-board support
 static CompanionBoard companionBoard;
 
+// MSP message support
+static char mspRequest[200];
+static int  mspRequestLen;
+
 // Downscaling for hypersensitive PS3 controller
 static const int PS3_DOWNSCALE = 2;
 
@@ -812,7 +816,8 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
 
     // Handle messages from belly camera
     if (message ==  sim_message_eventcallback_openglcameraview && auxiliaryData[2] == 1) {
-        companionBoard.update((char *)customData, auxiliaryData[0], auxiliaryData[1]);
+        mspRequestLen = 0;
+        companionBoard.update((char *)customData, auxiliaryData[0], auxiliaryData[1], mspRequest, mspRequestLen);
         auxiliaryData[3] = 1; // overwrite original image
     }
 
@@ -977,6 +982,7 @@ void Board::reboot(void)
 
 uint8_t Board::serialAvailableBytes(void)
 {
+    debug("%d\n", mspRequestLen);
     return 0;
 }
 

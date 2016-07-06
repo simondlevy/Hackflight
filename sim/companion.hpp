@@ -34,7 +34,7 @@ class CompanionBoard {
 
         void start(void);
 
-        void update(char * imageBytes, int imageWidth, int imageHeight);
+        void update(char * imageBytes, int imageWidth, int imageHeight, char * requestStr, int & requestLen);
 
         void halt(void);
 };

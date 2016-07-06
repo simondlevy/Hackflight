@@ -54,7 +54,7 @@ static int connect_to_server(int port, const char * hostname="localhost")
     struct sockaddr_in sn;
     struct hostent *he;
     if (!(he = gethostbyname(hostname))) {
-        printf("can't get host id for %s\n", hostname);
+        debug("can't get host id for %s\n", hostname);
     }
     int ok = 0;
     int sockfd = 0;
@@ -112,7 +112,8 @@ void CompanionBoard::start(void)
 #endif
 }
 
-void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
+void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight,
+        char * requestStr, int & requestLen)
 {
 #if defined(__linux) && defined(_COMPANION)
 
@@ -144,7 +145,8 @@ void CompanionBoard::update(char * imageBytes, int imageWidth, int imageHeight)
     if (avail > 0 && avail < MAXMSG) {
         char msg[MAXMSG];
         read(this->comms_sockfd, msg, avail);
-        debug("%d\n", strlen(msg));
+        memcpy(requestStr, msg, avail);
+        requestLen = avail;
     }
 
 #endif
