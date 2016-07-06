@@ -29,8 +29,8 @@
 #define  CONFIG_YAW_I             0
 
 // For altitude hover
-#define CONFIG_HOVER_ALT_P  200
-#define CONFIG_HOVER_VEL_P  200
+#define CONFIG_HOVER_ALT_P  50
+#define CONFIG_HOVER_VEL_P  120
 #define CONFIG_HOVER_VEL_I  45
 #define CONFIG_HOVER_VEL_D  1
 
