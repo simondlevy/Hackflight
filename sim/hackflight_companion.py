@@ -21,6 +21,8 @@
 import sys
 import cv2
 import numpy as np
+import threading
+
 
 from msppg import MSP_Parser, serialize_ATTITUDE_Request
 
@@ -28,6 +30,15 @@ def attitude_handler(pitch, roll, yaw):
 
     print(pitch, roll, yaw)
 
+
+def comms_reader(comms_in_client, parser):
+
+    while True:
+
+        # Read one byte from the client and parse it
+        bytes = comms_in_client.recv(1)
+        if len(bytes) > 0:
+            parser.parse(bytes[0])
 
 def processImage(image):
 
@@ -70,6 +81,10 @@ if __name__ == '__main__':
         image_from_sim_name  = sys.argv[4]
         image_to_sim_name  = sys.argv[5]
 
+        thread = threading.Thread(target=comms_reader, args = (comms_in_client,parser))
+        thread.daemon = True
+        thread.start()
+
         while True:
 
             # Receive the camera sync byte from the client
@@ -87,10 +102,6 @@ if __name__ == '__main__':
             # Send an attitude request message to the client
             comms_out_client.send(attitude_request)
 
-            # Read one byte from the client and parse it
-            bytes = comms_in_client.recv(1)
-            if len(bytes) > 0:
-                print('%02X' % ord(bytes[0]))
 
     # Fewer than three arguments: live mode or camera-test mode
     else:
