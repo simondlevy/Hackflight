@@ -436,7 +436,8 @@ static int connect_to_server(int port, const char * hostname="localhost")
 }
 
 static const int CAMERA_PORT          = 5000;
-static const int COMMS_PORT           = 5001;
+static const int COMMS_IN_PORT        = 5001;
+static const int COMMS_OUT_PORT       = 5002;
 static const char * IMAGE_TO_PYTHON   = "image.jpg";
 static const char * IMAGE_FROM_PYTHON = "image2.jpg";
 static const int MAXMSG               = 1000;
@@ -446,8 +447,9 @@ class CompanionBoard {
     private:
 
         int procid;
-        int camera_sockfd;
-        int comms_sockfd;
+        int camerasync_sockfd;
+        int comms_in_sockfd;
+        int comms_out_sockfd;
         int imgsize;
 
     public:
@@ -464,9 +466,18 @@ class CompanionBoard {
             sprintf(script, "%s/hackflight_companion.py", VREP_DIR);
             char camera_port[10];
             sprintf(camera_port, "%d", CAMERA_PORT);
-            char comms_port[10];
-            sprintf(comms_port, "%d", COMMS_PORT);
-            char *argv[6] = { (char *)script, camera_port, comms_port, (char *)IMAGE_TO_PYTHON, (char *)IMAGE_FROM_PYTHON, NULL};
+            char comms_in_port[10];
+            sprintf(comms_in_port, "%d", COMMS_IN_PORT);
+            char comms_out_port[10];
+            sprintf(comms_out_port, "%d", COMMS_OUT_PORT);
+            char *argv[7] = { 
+                (char *)script, 
+                camera_port, 
+                comms_in_port, 
+                comms_out_port, 
+                (char *)IMAGE_TO_PYTHON, 
+                (char *)IMAGE_FROM_PYTHON, 
+                NULL};
 
             // Fork the Python server script
             this->procid = fork();
@@ -475,9 +486,10 @@ class CompanionBoard {
                 exit(0);
             }
 
-            // Open a socket for syncing camera images with the server, and a socket for comms
-            this->camera_sockfd = connect_to_server(CAMERA_PORT);
-            this->comms_sockfd = connect_to_server(COMMS_PORT);
+            // Open a socket for syncing camera images with the server, and sockets for comms
+            this->camerasync_sockfd = connect_to_server(CAMERA_PORT);
+            this->comms_in_sockfd = connect_to_server(COMMS_IN_PORT);
+            this->comms_out_sockfd = connect_to_server(COMMS_OUT_PORT);
         }
 
         void update(char * imageBytes, int imageWidth, int imageHeight,
@@ -492,7 +504,7 @@ class CompanionBoard {
             // Send sync byte to Python server, which will open the image, process it, and
             // write the processed image to another file
             char sync = 0;
-            write(this->camera_sockfd, &sync, 1);
+            write(this->camerasync_sockfd, &sync, 1);
 
             // If server has created a file for the processed image, open it copy its bytes back to V-REP's camera image
             struct stat fileStat; 
@@ -505,12 +517,12 @@ class CompanionBoard {
 
             // Check whether bytes are available from server
             int avail;
-            ioctl(this->comms_sockfd, FIONREAD, &avail);
+            ioctl(this->comms_in_sockfd, FIONREAD, &avail);
 
             // Ignore OOB values for available bytes
             if (avail > 0 && avail < MAXMSG) {
                 char msg[MAXMSG];
-                read(this->comms_sockfd, msg, avail);
+                read(this->comms_in_sockfd, msg, avail);
                 memcpy(requestStr, msg, avail);
                 requestLen = avail;
             }
@@ -524,8 +536,9 @@ class CompanionBoard {
         void halt(void)
         {
             if (this->procid) {
-                close(this->camera_sockfd);
-                close(this->comms_sockfd);
+                close(this->camerasync_sockfd);
+                close(this->comms_in_sockfd);
+                close(this->comms_out_sockfd);
                 kill(this->procid, SIGKILL);
             }
         }
