@@ -530,7 +530,7 @@ class CompanionBoard {
 
         void sendByte(uint8_t b)
         {
-            printf("%02X\n", b);
+            write(this->comms_out_sockfd, &b, 1);
         }
 
         void halt(void)
