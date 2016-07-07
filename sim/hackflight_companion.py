@@ -59,9 +59,10 @@ if __name__ == '__main__':
 
         # Serve a socket for camera synching, and a socket for comms
         camera_client = serve_socket(int(sys.argv[1]))
-        comms_client  = serve_socket(int(sys.argv[2]))
-        image_from_sim_name  = sys.argv[3]
-        image_to_sim_name  = sys.argv[4]
+        comms_out_client  = serve_socket(int(sys.argv[2]))
+        comms_in_client  = serve_socket(int(sys.argv[3]))
+        image_from_sim_name  = sys.argv[4]
+        image_to_sim_name  = sys.argv[5]
 
         while True:
 
@@ -78,7 +79,7 @@ if __name__ == '__main__':
             cv2.imwrite(image_to_sim_name, image)
 
             # Send an attitude request message to the client
-            comms_client.send(attitude_request)
+            comms_out_client.send(attitude_request)
 
     # Fewer than three arguments: live mode or camera-test mode
     else:
