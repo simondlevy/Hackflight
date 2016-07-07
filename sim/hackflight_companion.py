@@ -24,6 +24,11 @@ import numpy as np
 
 from msppg import MSP_Parser, serialize_ATTITUDE_Request
 
+def attitude_handler(pitch, roll, yaw):
+
+    print(pitch, roll, yaw)
+
+
 def processImage(image):
 
     # Blur image to remove noise
@@ -49,6 +54,7 @@ if __name__ == '__main__':
 
     # Create an MSP parser and a request message
     parser = MSP_Parser()
+    parser.set_ATTITUDE_Handler(attitude_handler)
     attitude_request = serialize_ATTITUDE_Request()
 
     # More than two command-line arguments means simulation mode.  First arg is camera-client port, 
@@ -80,6 +86,11 @@ if __name__ == '__main__':
 
             # Send an attitude request message to the client
             comms_out_client.send(attitude_request)
+
+            # Read one byte from the client and parse it
+            bytes = comms_in_client.recv(1)
+            if len(bytes) > 0:
+                print('%02X' % ord(bytes[0]))
 
     # Fewer than three arguments: live mode or camera-test mode
     else:
