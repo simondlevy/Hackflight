@@ -26,15 +26,7 @@ import threading
 
 from msppg import MSP_Parser, serialize_ATTITUDE_Request, serialize_ALTITUDE_Request
 
-def attitude_handler(pitch, roll, yaw):
-
-    return
-
-def altitude_handler(alt, vario):
-
-    None
-
-def comms_reader(comms_in_client, parser):
+def commsReader(comms_in_client, parser):
 
     while True:
 
@@ -42,6 +34,10 @@ def comms_reader(comms_in_client, parser):
         bytes = comms_in_client.recv(1)
         if len(bytes) > 0:
             parser.parse(bytes[0])
+
+def putTextInImage(image, text, x, y, scale, color):
+
+    cv2.putText(image, text, (y,x), cv2.FONT_HERSHEY_SIMPLEX, scale, color)
 
 def processImage(image, altitude):
 
@@ -62,10 +58,10 @@ def processImage(image, altitude):
     x, y = np.where(mask)
     if len(x) / float(np.prod(mask.shape)) > 0.2:
         x,y = np.int(np.mean(x)), np.int(np.mean(y))
-        cv2.putText(image, 'WATER', (y,x), cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
+        putTextInImage(image, 'WATER', x, y, 1, (255,255,255))
 
     # Add text for altitude
-    cv2.putText(image, 'Alt = %+3.2f m above base' % (altitude/100), (20,40), cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,2550),2)
+    putTextInImage(image, 'Alt = %+3.2f m above base' % (altitude/100), 40, 20, .5, (255,0,0))
 
 
 class MyParser(MSP_Parser):
@@ -107,7 +103,7 @@ if __name__ == '__main__':
         image_from_sim_name  = sys.argv[4]
         image_to_sim_name  = sys.argv[5]
 
-        thread = threading.Thread(target=comms_reader, args = (comms_in_client,parser))
+        thread = threading.Thread(target=commsReader, args = (comms_in_client,parser))
         thread.daemon = True
         thread.start()
 
