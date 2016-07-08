@@ -58,7 +58,7 @@ def processImage(image, altitude):
     x, y = np.where(mask)
     if len(x) / float(np.prod(mask.shape)) > 0.2:
         x,y = np.int(np.mean(x)), np.int(np.mean(y))
-        putTextInImage(image, 'WATER', x, y, 1, (255,255,255), 2)
+        putTextInImage(image, 'WATER', x, y, 1, (0,255,255), 2)
 
     # Add text for altitude
     cv2.rectangle(image, (10,25), (290,45), (255,255,255), -1) # filled white rectangle
