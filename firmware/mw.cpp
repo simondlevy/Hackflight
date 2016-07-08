@@ -130,7 +130,7 @@ void setup(void)
     imu.init(&board, calibratingGyroCycles, calibratingAccCycles);
     stabilize.init();
     mixer.init(&board, &rc, &stabilize); 
-    msp.init(&board, &imu, &mixer, &rc);
+    msp.init(&board, &imu, &position, &mixer, &rc);
     position.init(&board, &imu, &baro);
     hover.init(&rc, &position);
 
@@ -256,9 +256,10 @@ void loop(void)
                 board.ledRedOff();
         }
 
+        // periodically update accelerometer calibration status
         if (accelCalibrationTask.check(currentTime)) {
             if (!haveSmallAngle) {
-                accCalibrated = false; // accelerometer not calibrated or angle too steep
+                accCalibrated = false; 
                 board.ledGreenToggle();
                 accelCalibrationTask.update(currentTime);
             } else {

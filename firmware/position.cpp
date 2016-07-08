@@ -51,6 +51,8 @@ void Position::init(Board * _board, IMU * _imu, Baro * _baro)
     this->baroAlt_offset = 0;
     this->sonarTransition = 0;
     this->tiltAngle = 0;
+    this->verticalVelocity = 0;
+    this->vario = 0;
 }
 
 void Position::computeAltitude(bool armed)
@@ -104,14 +106,17 @@ void Position::computeAltitude(bool armed)
     this->accelZ = (float)this->imu->accelSum[2] / (float)this->imu->accelSumCount;
     float vel_acc = this->accelZ * this->imu->accelVelScale * (float)this->imu->accelTimeSum;
 
+    // integrate accelerometer velocity to get vertical velocity
+    this->verticalVelocity += vel_acc;
+
     // integrate accelerometer velocity to get distance (x= a/2 * t^2)
-    accelAlt += (vel_acc * 0.5f) * dt + this->accelVel * dt;                                         
-    accelVel += vel_acc;
+    this->accelAlt += (vel_acc * 0.5f) * dt + this->accelVel * dt;                                         
+    this->accelVel += vel_acc;
 
     // complementary filter for altitude estimation (baro & acc)
     accelAlt = complementaryFilter((float)accelAlt, (float)fusedBarosonarAlt, (float)CONFIG_BARO_CF_ALT);
 
-    this->estAlt = sonarInRange() ? fusedBarosonarAlt : (int32_t)accelAlt;
+    //this->estAlt = sonarInRange() ? fusedBarosonarAlt : (int32_t)accelAlt;
 
     // reset acceleromter sum
     this->imu->resetAccelSum();

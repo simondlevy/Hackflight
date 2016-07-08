@@ -43,11 +43,11 @@ void debug(const char * format, ...);
 #include "rc.hpp"
 #include "stabilize.hpp"
 #include "mixer.hpp"
-#include "msp.hpp"
 #include "baro.hpp"
 #include "position.hpp"
 #include "hover.hpp"
 #include "filters.hpp"
+#include "msp.hpp"
 
 #ifndef abs
 #define abs(x)    ((x) > 0 ? (x) : -(x))

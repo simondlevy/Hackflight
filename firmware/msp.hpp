@@ -46,10 +46,11 @@ extern "C" {
 
         private:
 
-            Board * _board;
-            IMU * _imu;
-            Mixer * _mixer;
-            RC * _rc;
+            Board    * _board;
+            IMU      * _imu;
+            Position * _position;
+            Mixer    * _mixer;
+            RC       * _rc;
 
             mspPortState_t portState;
 
@@ -66,7 +67,7 @@ extern "C" {
 
         public:
 
-            void init(Board * board, IMU * imu, Mixer * mixer, RC * rc);
+            void init(Board * board, IMU * imu, Position * position, Mixer * mixer, RC * rc);
 
             void update(bool armed);
 

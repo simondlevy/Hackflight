@@ -24,11 +24,15 @@ import numpy as np
 import threading
 
 
-from msppg import MSP_Parser, serialize_ATTITUDE_Request
+from msppg import MSP_Parser, serialize_ATTITUDE_Request, serialize_ALTITUDE_Request
 
 def attitude_handler(pitch, roll, yaw):
 
-    print(pitch, roll, yaw)
+    return
+
+def altitude_handler(altitude, vario):
+
+    print(altitude)
 
 
 def comms_reader(comms_in_client, parser):
@@ -63,10 +67,12 @@ def processImage(image):
 
 if __name__ == '__main__':
 
-    # Create an MSP parser and a request message
+    # Create an MSP parser and messages for telemetry requests
     parser = MSP_Parser()
     parser.set_ATTITUDE_Handler(attitude_handler)
     attitude_request = serialize_ATTITUDE_Request()
+    parser.set_ALTITUDE_Handler(altitude_handler)
+    altitude_request = serialize_ALTITUDE_Request()
 
     # More than two command-line arguments means simulation mode.  First arg is camera-client port, 
     # second is MSP port, third is input image file name, fourth is outpt image file name.
@@ -99,9 +105,9 @@ if __name__ == '__main__':
             # Write the processed image to a file for the simulator to display
             cv2.imwrite(image_to_sim_name, image)
 
-            # Send an attitude request message to the client
+            # Send an telemetry request messages to the client
             comms_out_client.send(attitude_request)
-
+            comms_out_client.send(altitude_request)
 
     # Fewer than three arguments: live mode or camera-test mode
     else:

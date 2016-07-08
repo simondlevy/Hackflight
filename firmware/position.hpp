@@ -42,15 +42,16 @@ class Position {
         int32_t  lastFusedBarosonarAlt;
         uint32_t previousT;
         float    sonarTransition;
+        float    verticalVelocity;
         bool     wasArmed;
  
     public:
 
-        // Use by Hover class
         int32_t  estAlt;
         float    accelVel;
         float    accelZ;
         int16_t  tiltAngle;
+        int32_t  vario; // XXX fixed at zero for now
 
         void init(Board * board, IMU * imu, Baro * baro);
 

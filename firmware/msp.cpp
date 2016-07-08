@@ -100,10 +100,11 @@ void MSP::tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-void MSP::init(Board * board, IMU * imu, Mixer * mixer, RC * rc)
+void MSP::init(Board * board, IMU * imu, Position * position, Mixer * mixer, RC * rc)
 {
     this->_board = board;
     this->_imu = imu;
+    this->_position = position;
     this->_mixer = mixer;
     this->_rc = rc;
 
@@ -189,9 +190,9 @@ void MSP::update(bool armed)
                         break;
 
                     case MSP_ALTITUDE:
-                        //headSerialReply(6);
-                        //serialize32(estAlt);
-                        //serialize16(vario);
+                        headSerialReply(6);
+                        serialize32(this->_position->estAlt);
+                        serialize16(this->_position->vario);
                         break;
 
                     case MSP_REBOOT:
