@@ -35,9 +35,9 @@ def commsReader(comms_in_client, parser):
         if len(bytes) > 0:
             parser.parse(bytes[0])
 
-def putTextInImage(image, text, x, y, scale, color):
+def putTextInImage(image, text, x, y, scale, color, thickness=1):
 
-    cv2.putText(image, text, (y,x), cv2.FONT_HERSHEY_SIMPLEX, scale, color)
+    cv2.putText(image, text, (y,x), cv2.FONT_HERSHEY_SIMPLEX, scale, color, thickness)
 
 def processImage(image, altitude):
 
@@ -58,10 +58,11 @@ def processImage(image, altitude):
     x, y = np.where(mask)
     if len(x) / float(np.prod(mask.shape)) > 0.2:
         x,y = np.int(np.mean(x)), np.int(np.mean(y))
-        putTextInImage(image, 'WATER', x, y, 1, (255,255,255))
+        putTextInImage(image, 'WATER', x, y, 1, (255,255,255), 2)
 
     # Add text for altitude
-    putTextInImage(image, 'Alt = %+3.2f m above base' % (altitude/100), 40, 20, .5, (255,0,0))
+    cv2.rectangle(image, (10,25), (290,45), (255,255,255), -1) # filled white rectangle
+    putTextInImage(image, 'Altitude = %3.2f m above base' % (altitude/100.), 40, 20, .5, (255,0,0))
 
 
 class MyParser(MSP_Parser):
