@@ -43,7 +43,7 @@ def comms_reader(comms_in_client, parser):
         if len(bytes) > 0:
             parser.parse(bytes[0])
 
-def processImage(image):
+def processImage(image, altitude):
 
     # Blur image to remove noise
     frame = cv2.GaussianBlur(image, (3, 3), 0)
@@ -64,7 +64,8 @@ def processImage(image):
         x,y = np.int(np.mean(x)), np.int(np.mean(y))
         cv2.putText(image, 'WATER', (y,x), cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
 
-    cv2.putText(image, 'Alt = %+3.2f m above base' % 0, (20,40), cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,2550),2)
+    # Add text for altitude
+    cv2.putText(image, 'Alt = %+3.2f m above base' % (altitude/100), (20,40), cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,2550),2)
 
 
 class MyParser(MSP_Parser):
@@ -73,9 +74,11 @@ class MyParser(MSP_Parser):
 
         MSP_Parser.__init__(self)
 
+        self.altitude = 0
+
     def altitudeHandler(self, altitude, vario):
 
-        print(altitude)
+        self.altitude = altitude
 
     def attitudeHandler(self, pitch, roll, yaw):
 
@@ -117,7 +120,7 @@ if __name__ == '__main__':
             image = cv2.imread(image_from_sim_name, cv2.IMREAD_COLOR)
 
             # Process it
-            mask = processImage(image)
+            mask = processImage(image, parser.altitude)
 
             # Write the processed image to a file for the simulator to display
             cv2.imwrite(image_to_sim_name, image)
