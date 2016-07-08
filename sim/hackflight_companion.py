@@ -30,10 +30,9 @@ def attitude_handler(pitch, roll, yaw):
 
     return
 
-def altitude_handler(altitude, vario):
+def altitude_handler(alt, vario):
 
-    print(altitude)
-
+    None
 
 def comms_reader(comms_in_client, parser):
 
@@ -59,19 +58,37 @@ def processImage(image):
     # Find where image in range
     mask = cv2.inRange(hsv, blueMin, blueMax)
 
-    # Find centroid of mask
+    # Find centroid of mask and label it as water
     x, y = np.where(mask)
     if len(x) / float(np.prod(mask.shape)) > 0.2:
         x,y = np.int(np.mean(x)), np.int(np.mean(y))
         cv2.putText(image, 'WATER', (y,x), cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
 
+    cv2.putText(image, 'Alt = %+3.2f m above base' % 0, (20,40), cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,2550),2)
+
+
+class MyParser(MSP_Parser):
+
+    def __init__(self):
+
+        MSP_Parser.__init__(self)
+
+    def altitudeHandler(self, altitude, vario):
+
+        print(altitude)
+
+    def attitudeHandler(self, pitch, roll, yaw):
+
+        return
+
 if __name__ == '__main__':
 
     # Create an MSP parser and messages for telemetry requests
-    parser = MSP_Parser()
-    parser.set_ATTITUDE_Handler(attitude_handler)
+    parser = MyParser()
+    parser.set_ATTITUDE_Handler(parser.attitudeHandler)
+    parser.set_ALTITUDE_Handler(parser.altitudeHandler)
+
     attitude_request = serialize_ATTITUDE_Request()
-    parser.set_ALTITUDE_Handler(altitude_handler)
     altitude_request = serialize_ALTITUDE_Request()
 
     # More than two command-line arguments means simulation mode.  First arg is camera-client port, 
