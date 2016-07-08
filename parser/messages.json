@@ -27,6 +27,9 @@
                  {"c7": "short"}, 
                  {"c8": "short"}],
 
+  "SET_HEAD": [{"ID": 205},
+               {"head": "short"}],
+
   "SET_MOTOR": [{"ID": 214},
                  {"m1": "short"},
                  {"m2": "short"},
