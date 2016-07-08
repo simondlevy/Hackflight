@@ -23,7 +23,6 @@ import cv2
 import numpy as np
 import threading
 
-
 from msppg import MSP_Parser, serialize_ATTITUDE_Request, serialize_ALTITUDE_Request
 
 def commsReader(comms_in_client, parser):
@@ -63,11 +62,12 @@ def processImage(image, altitude):
     # Add text for altitude
     labelx = 5
     labely = 10
-    labelw = 280
+    labelw = 260
     labelh = 20
     labelm = 5 # margin
     cv2.rectangle(image, (labelx,labely), (labelx+labelw,labely+labelh), (255,255,255), -1) # filled white rectangle
-    putTextInImage(image, 'Altitude = %3.2f m above base' % (altitude/100.), labelx+labelm, labely+labelh-labelm, .5, (255,0,0))
+    putTextInImage(image, 'Altitude = %3.2f m above base' % (altitude/100.), 
+            labelx+labelm, labely+labelh-labelm, .5, (255,0,0))
 
 
 class MyParser(MSP_Parser):
@@ -93,6 +93,7 @@ if __name__ == '__main__':
     parser.set_ATTITUDE_Handler(parser.attitudeHandler)
     parser.set_ALTITUDE_Handler(parser.altitudeHandler)
 
+    # Serialize the telemetry message requests that we'll send to the "firwmare"
     attitude_request = serialize_ATTITUDE_Request()
     altitude_request = serialize_ALTITUDE_Request()
 
@@ -109,6 +110,7 @@ if __name__ == '__main__':
         image_from_sim_name  = sys.argv[4]
         image_to_sim_name  = sys.argv[5]
 
+        # Run serial comms telemetry reading on its own thread
         thread = threading.Thread(target=commsReader, args = (comms_in_client,parser))
         thread.daemon = True
         thread.start()
