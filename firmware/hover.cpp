@@ -87,8 +87,6 @@ void Hover::updatePid(void)
     } else 
         this->altPID = 0;
 
-    debug("%d\n", this->altPID);
-
     // Track accelerometer Z
     this->accelZ_prev = this->position->accelZ;
 }

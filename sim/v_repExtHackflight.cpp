@@ -978,7 +978,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
         char request[200];
         int requestLen = 0;
         companionBoard.update((char *)customData, auxiliaryData[0], auxiliaryData[1], request, requestLen);
-#endif
+
 
         // v_repMessage gets called much more frequently than firmware's serial requests, so avoid interrupting
         // request handling
@@ -987,7 +987,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
             mspRequestIndex = 0;
             memcpy(mspRequest, request, requestLen);
         }
-
+#endif
         // Flag overwrite of original OpenGL image
         auxiliaryData[3] = 1; 
     }
@@ -1162,12 +1162,13 @@ uint8_t Board::serialReadByte(void)
 
 void Board::serialWriteByte(uint8_t c)
 {
-#ifdef __linux
+#if defined(__linux) && defined(_COMPANION)
     companionBoard.sendByte(c);
 #endif
 }
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
-    thrusts[index] = 4 * ((float)value - CONFIG_PWM_MIN) / (CONFIG_PWM_MAX - CONFIG_PWM_MIN) + 2;
+    debug("%d\n", value);
+    thrusts[index] = ((float)value - CONFIG_PWM_MIN) / (CONFIG_PWM_MAX - CONFIG_PWM_MIN);
 }

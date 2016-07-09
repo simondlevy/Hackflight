@@ -15,7 +15,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define CONFIG_MINCOMMAND     1000
 #define CONFIG_YAW_DIRECTION     1
 
 #ifdef __arm__

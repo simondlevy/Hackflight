@@ -77,6 +77,7 @@ class MyParser(MSP_Parser):
         MSP_Parser.__init__(self)
 
         self.altitude = 0
+        self.heading = 0
 
     def altitudeHandler(self, altitude, vario):
 
@@ -84,7 +85,7 @@ class MyParser(MSP_Parser):
 
     def attitudeHandler(self, pitch, roll, yaw):
 
-        return
+        self.heading = yaw
 
 if __name__ == '__main__':
 
@@ -125,6 +126,9 @@ if __name__ == '__main__':
 
             # Process it
             mask = processImage(image, parser.altitude)
+
+            # Determine new heading bawed on current heading and position of water
+            print(parser.heading)
 
             # Write the processed image to a file for the simulator to display
             cv2.imwrite(image_to_sim_name, image)

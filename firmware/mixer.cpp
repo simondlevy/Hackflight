@@ -48,7 +48,7 @@ void Mixer::init(Board * board, RC * rc, Stabilize * stabilize)
 
     // set disarmed motor values
     for (uint8_t i = 0; i < 4; i++)
-        this->motorsDisarmed[i] = CONFIG_MINCOMMAND;
+        this->motorsDisarmed[i] = CONFIG_PWM_MIN;
 }
 
 void Mixer::update(bool armed)
@@ -57,8 +57,11 @@ void Mixer::update(bool armed)
     int16_t motors[4];
 
     for (uint8_t i = 0; i < 4; i++)
-        motors[i] = (int16_t)(this->_rc->command[THROTTLE] * mixerQuadX[i].throttle + this->_stabilize->axisPID[PITCH] * mixerQuadX[i].pitch + 
-            this->_stabilize->axisPID[ROLL] * mixerQuadX[i].roll + -CONFIG_YAW_DIRECTION * this->_stabilize->axisPID[YAW] * mixerQuadX[i].yaw);
+        motors[i] = (int16_t)
+            (this->_rc->command[THROTTLE] * mixerQuadX[i].throttle + 
+             this->_stabilize->axisPID[PITCH] * mixerQuadX[i].pitch + 
+            this->_stabilize->axisPID[ROLL] * mixerQuadX[i].roll - 
+            CONFIG_YAW_DIRECTION * this->_stabilize->axisPID[YAW] * mixerQuadX[i].yaw);
 
     maxMotor = motors[0];
 
