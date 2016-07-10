@@ -38,7 +38,7 @@ def putTextInImage(image, text, x, y, scale, color, thickness=1):
 
     cv2.putText(image, text, (x,y), cv2.FONT_HERSHEY_SIMPLEX, scale, color, thickness)
 
-def processImage(image, altitude):
+def processImage(image, parser):
 
     # Blur image to remove noise
     frame = cv2.GaussianBlur(image, (3, 3), 0)
@@ -62,12 +62,16 @@ def processImage(image, altitude):
     # Add text for altitude
     labelx = 5
     labely = 10
-    labelw = 260
+    labelw = 270
     labelh = 20
     labelm = 5 # margin
     cv2.rectangle(image, (labelx,labely), (labelx+labelw,labely+labelh), (255,255,255), -1) # filled white rectangle
-    putTextInImage(image, 'Altitude = %3.2f m above base' % (altitude/100.), 
-            labelx+labelm, labely+labelh-labelm, .5, (255,0,0))
+    putTextInImage(image, 
+            'ABL = %3.2f m | Heading = %d' % (parser.altitude/100., parser.heading),
+            labelx+labelm, 
+            labely+labelh-labelm, 
+            .5, 
+            (255,0,0))
 
 
 class MyParser(MSP_Parser):
@@ -125,7 +129,7 @@ if __name__ == '__main__':
             image = cv2.imread(image_from_sim_name, cv2.IMREAD_COLOR)
 
             # Process it
-            mask = processImage(image, parser.altitude)
+            mask = processImage(image, parser)
 
             # Determine new heading bawed on current heading and position of water
             #print(parser.heading)
