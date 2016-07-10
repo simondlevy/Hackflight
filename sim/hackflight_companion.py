@@ -128,7 +128,7 @@ if __name__ == '__main__':
             mask = processImage(image, parser.altitude)
 
             # Determine new heading bawed on current heading and position of water
-            print(parser.heading)
+            #print(parser.heading)
 
             # Write the processed image to a file for the simulator to display
             cv2.imwrite(image_to_sim_name, image)

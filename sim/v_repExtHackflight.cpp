@@ -1169,6 +1169,5 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
-    debug("%d\n", value);
     thrusts[index] = ((float)value - CONFIG_PWM_MIN) / (CONFIG_PWM_MAX - CONFIG_PWM_MIN);
 }
