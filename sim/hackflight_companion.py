@@ -58,7 +58,10 @@ def processImage(image, parser):
     if len(x) / float(np.prod(mask.shape)) > 0.2:
         x,y = np.int(np.mean(x)), np.int(np.mean(y))
         putTextInImage(image, 'WATER', x, y, 1, (0,255,255), 2)
-        print(x,y)
+
+        # Compute position of vehicle w.r.t. water centroid
+        h,w,_ = image.shape
+        print(x-w/2,y-h/2)
 
     # Add text for altitude
     labelx = 5
