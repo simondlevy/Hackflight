@@ -20,4 +20,5 @@ ipch
 *.lib
 *.log
 *.pdb
+*.cache
 
