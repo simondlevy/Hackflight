@@ -44,8 +44,7 @@ void debug(const char * format, ...);
 #include "stabilize.hpp"
 #include "mixer.hpp"
 #include "baro.hpp"
-#include "position.hpp"
-#include "hover.hpp"
+#include "navigate.hpp"
 #include "filters.hpp"
 #include "msp.hpp"
 

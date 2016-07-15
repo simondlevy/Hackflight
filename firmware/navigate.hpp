@@ -1,7 +1,6 @@
 /*
-   hover.hpp : Class declaration for hover-in-place
-
-   Adapted from https://github.com/multiwii/baseflight/blob/master/src/mixer.c
+   navigate.hpp : Class declaration for navigation functionality:
+                  altitude hold, hover in place, GPS, visual guidance, etc.
 
    This file is part of Hackflight.
 
@@ -25,31 +24,51 @@ extern "C" {
 
 #include "mw.hpp"
 
-class Hover {
+class Navigation {
 
     private:
 
-        RC * rc;
-        Position * position;
+        Board * board;
+        IMU   * imu;
+        Baro  * baro;
+        RC    * rc;
 
+        float    accelAlt;
         float    accelZ_prev;
         int32_t  altHoldValue;
         bool     altHoldMode;
         int32_t  altPID;
+        int32_t  baroAlt;
+        int32_t  baroAltBaseline;
+        int32_t  baroAlt_offset;
         int32_t  errorVelocityI;
+        int32_t  fusedBarosonarAlt;
         int16_t  initialThrottleHold;
+        int32_t  lastFusedBarosonarAlt;
+        uint32_t previousT;
         int32_t  setVelocity;
+        float    sonarTransition;
         bool     velocityControl;
- 
+        float    verticalVelocity;
+        bool     wasArmed;
+  
     public:
 
-        void init(RC * rc, Position * position);
+        int32_t  estAlt;
+        float    accelVel;
+        float    accelZ;
+        int16_t  tiltAngle;
+        int32_t  vario; // XXX fixed at zero for now
+
+        void init(Board * board, IMU * imu, Baro * baro, RC * rc);
 
         void checkSwitch(void);
 
-        void updatePid(void);
+        void updateAltitudePid(void);
 
         void holdAltitude(void);
+
+        void computeAltitude(bool armed);
 };
 
 

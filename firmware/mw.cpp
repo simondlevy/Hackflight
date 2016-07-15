@@ -35,11 +35,10 @@ static Board      board;
 static IMU        imu;
 static RC         rc;
 static Mixer      mixer;
-static Stabilize  stabilize;
 static MSP        msp;
 static Baro       baro;
-static Position   position;
-static Hover      hover;
+static Navigation nav;
+static Stabilize  stab;
 
 // support for timed tasks
 
@@ -127,12 +126,11 @@ void setup(void)
 
     // initialize our external objects
     rc.init(&board);
+    stab.init();
     imu.init(&board, calibratingGyroCycles, calibratingAccCycles);
-    stabilize.init();
-    mixer.init(&board, &rc, &stabilize); 
-    msp.init(&board, &imu, &position, &mixer, &rc);
-    position.init(&board, &imu, &baro);
-    hover.init(&rc, &position);
+    mixer.init(&board, &rc, &stab); 
+    msp.init(&board, &imu, &nav, &mixer, &rc);
+    nav.init(&board, &imu, &baro, &rc);
 
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;
@@ -162,7 +160,7 @@ void loop(void)
 
         // when landed, reset integral component of PID
         if (rc.throttleIsDown()) 
-            stabilize.resetIntegral();
+            stab.resetIntegral();
 
         if (rc.changed()) {
 
@@ -199,7 +197,7 @@ void loop(void)
         } // rc.changed()
 
         // Switch to alt-hold when switch moves to position 1 or 2
-        hover.checkSwitch();
+        nav.checkSwitch();
 
     } else {                    // not in rc loop
 
@@ -213,8 +211,8 @@ void loop(void)
                 break;
             case 1:
                 if (baro.available() && altitudeEstimationTask.checkAndUpdate(currentTime)) {
-                    position.computeAltitude(armed);
-                    hover.updatePid();
+                    nav.computeAltitude(armed);
+                    nav.updateAltitudePid();
                 }
                 taskOrder++;
                 break;
@@ -271,10 +269,10 @@ void loop(void)
         msp.update(armed);
 
         // hold altitude if indicated
-        hover.holdAltitude();
+        nav.holdAltitude();
 
         // update stability PID controller 
-        stabilize.update(&rc, &imu);
+        stab.update(&rc, &imu);
 
         // update mixer
         mixer.update(armed);
