@@ -172,9 +172,12 @@ void MSP::update(bool armed)
                         headSerialReply(0);
                         break;
 
-                    case MSP_SET_HEAD:
-                        printf("SET_HEAD\n");
-                        headSerialReply(0);
+                    case MSP_SET_HEAD: 
+                        {
+                            int16_t new_heading = read16();
+                            printf("SET_HEAD %d\n", new_heading);
+                            headSerialReply(0);
+                        }
                         break;
 
                     case MSP_RC:

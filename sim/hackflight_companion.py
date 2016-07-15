@@ -68,9 +68,12 @@ def processImage(image, parser, comms_to_client):
         # If we've just seen water for the first time, send a SET_HEADING message to the client
         if not parser.over_water:
 
+            new_heading = parser.heading - 180
+            print('set head: %d' % new_heading)
+
             if not comms_to_client is None:
 
-                comms_to_client.send(serialize_SET_HEAD(parser.heading-180))
+                comms_to_client.send(serialize_SET_HEAD(new_heading))
 
         # Set a flag that we've seen water
         parser.over_water = True
