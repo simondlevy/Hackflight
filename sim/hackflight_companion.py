@@ -23,14 +23,14 @@ import cv2
 import numpy as np
 import threading
 
-from msppg import MSP_Parser, serialize_ATTITUDE_Request, serialize_ALTITUDE_Request
+from msppg import MSP_Parser, serialize_ATTITUDE_Request, serialize_ALTITUDE_Request, serialize_SET_HEAD
 
-def commsReader(comms_in_client, parser):
+def commsReader(comms_from_client, parser):
 
     while True:
 
         # Read one byte from the client and parse it
-        bytes = comms_in_client.recv(1)
+        bytes = comms_from_client.recv(1)
         if len(bytes) > 0:
             parser.parse(bytes[0])
 
@@ -38,7 +38,7 @@ def putTextInImage(image, text, x, y, scale, color, thickness=1):
 
     cv2.putText(image, text, (x,y), cv2.FONT_HERSHEY_SIMPLEX, scale, color, thickness)
 
-def processImage(image, parser):
+def processImage(image, parser, comms_to_client):
 
     # Blur image to remove noise
     frame = cv2.GaussianBlur(image, (3, 3), 0)
@@ -47,21 +47,35 @@ def processImage(image, parser):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     # Define range of blue color in HSV
-    blueMin = (100,  50,  10)
-    blueMax = (255, 255, 255)
+    bluemin = (100,  50,  10)
+    bluemax = (255, 255, 255)
 
-    # Find where image in range
-    mask = cv2.inRange(hsv, blueMin, blueMax)
+    # Find where image is in blue range
+    bluepart = cv2.inRange(hsv, bluemin, bluemax)
 
-    # Find centroid of mask and label it as water
-    y, x = np.where(mask)
-    if len(x) / float(np.prod(mask.shape)) > 0.2:
+    # Find coordinates of blue pizels
+    y, x = np.where(bluepart)
+
+    # If a signficant fraction of the pixels are blue
+    if len(x) / float(np.prod(bluepart.shape)) > 0.2:
+
+        # Find the centroid of the blue component
         x,y = np.int(np.mean(x)), np.int(np.mean(y))
+
+        # Label the centroid point as water
         putTextInImage(image, 'WATER', x, y, 1, (0,255,255), 2)
 
-        # Compute position of vehicle w.r.t. water centroid
-        h,w,_ = image.shape
-        print(x-w/2,y-h/2)
+        # If we've just seen water for the first time, send a SET_HEADING message to the client
+        if not parser.over_water:
+
+            msg = serialize_SET_HEAD(parser.heading-180)
+
+            if not comms_to_client is None:
+
+                print('Sending message of length %d' % len(msg))
+
+        # Set a flag that we've seen water
+        parser.over_water = True
 
     # Add text for altitude
     labelx = 5
@@ -70,12 +84,8 @@ def processImage(image, parser):
     labelh = 20
     labelm = 5 # margin
     cv2.rectangle(image, (labelx,labely), (labelx+labelw,labely+labelh), (255,255,255), -1) # filled white rectangle
-    putTextInImage(image, 
-            'ABL = %3.2f m | Heading = %d' % (parser.altitude/100., parser.heading),
-            labelx+labelm, 
-            labely+labelh-labelm, 
-            .5, 
-            (255,0,0))
+    putTextInImage(image, 'ABL = %3.2f m | Heading = %d' % (parser.altitude/100., parser.heading),
+            labelx+labelm, labely+labelh-labelm, .5, (255,0,0))
 
 
 class MyParser(MSP_Parser):
@@ -86,6 +96,8 @@ class MyParser(MSP_Parser):
 
         self.altitude = 0
         self.heading = 0
+
+        self.over_water = False
 
     def altitudeHandler(self, altitude, vario):
 
@@ -114,13 +126,13 @@ if __name__ == '__main__':
 
         # Serve a socket for camera synching, and a socket for comms
         camera_client = serve_socket(int(sys.argv[1]))
-        comms_out_client  = serve_socket(int(sys.argv[2]))
-        comms_in_client  = serve_socket(int(sys.argv[3]))
+        comms_to_client  = serve_socket(int(sys.argv[2]))
+        comms_from_client  = serve_socket(int(sys.argv[3]))
         image_from_sim_name  = sys.argv[4]
         image_to_sim_name  = sys.argv[5]
 
         # Run serial comms telemetry reading on its own thread
-        thread = threading.Thread(target=commsReader, args = (comms_in_client,parser))
+        thread = threading.Thread(target=commsReader, args = (comms_from_client,parser))
         thread.daemon = True
         thread.start()
 
@@ -133,17 +145,14 @@ if __name__ == '__main__':
             image = cv2.imread(image_from_sim_name, cv2.IMREAD_COLOR)
 
             # Process it
-            mask = processImage(image, parser)
-
-            # Determine new heading bawed on current heading and position of water
-            #print(parser.heading)
+            processImage(image, parser, comms_to_client)
 
             # Write the processed image to a file for the simulator to display
             cv2.imwrite(image_to_sim_name, image)
 
             # Send an telemetry request messages to the client
-            comms_out_client.send(attitude_request)
-            comms_out_client.send(altitude_request)
+            comms_to_client.send(attitude_request)
+            comms_to_client.send(altitude_request)
 
     # Fewer than three arguments: live mode or camera-test mode
     else:
@@ -159,7 +168,7 @@ if __name__ == '__main__':
             if success:
 
                 # Process image
-                processImage(image) 
+                processImage(image, parser, None) 
 
                 # Test mode; display image
                 if commport is None:

@@ -846,7 +846,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     gettime(&stop_time);
     long elapsed_time = stop_time.tv_sec - start_time.tv_sec;
     if (elapsed_time > 0)
-        /*debug("%d FPS\n", update_count / elapsed_time)*/ ;
+        /*debug("%d FPS\n", update_count / elapsed_time)*/;
 #endif
 
 } // LUA_UPDATE_COMMAND
