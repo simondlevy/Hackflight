@@ -27,13 +27,14 @@ extern "C" {
 
 #include "mw.hpp"
 
-#define MSP_REBOOT               68     // in message  reboot settings
-#define MSP_RC                   105    // out message 8 rc chan and more
-#define MSP_ATTITUDE             108    // out message 2 angles 1 heading
-#define MSP_ALTITUDE             109    // out message altitude, variometer
-#define MSP_BARO_SONAR_RAW       126    // out message
-#define MSP_SET_RAW_RC           200    // in message  8 rc chan
-#define MSP_SET_MOTOR            214    // in message  PropBalance function
+#define MSP_REBOOT               68     
+#define MSP_RC                   105    
+#define MSP_ATTITUDE             108    
+#define MSP_ALTITUDE             109    
+#define MSP_BARO_SONAR_RAW       126    
+#define MSP_SET_RAW_RC           200    
+#define MSP_SET_HEAD             205    
+#define MSP_SET_MOTOR            214    
 
 void MSP::serialize8(uint8_t a)
 {
@@ -168,6 +169,11 @@ void MSP::update(bool armed)
                     case MSP_SET_MOTOR:
                         for (uint8_t i = 0; i < 4; i++)
                             this->_mixer->motorsDisarmed[i] = read16();
+                        headSerialReply(0);
+                        break;
+
+                    case MSP_SET_HEAD:
+                        printf("SET_HEAD\n");
                         headSerialReply(0);
                         break;
 

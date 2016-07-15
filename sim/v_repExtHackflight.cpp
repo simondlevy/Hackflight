@@ -41,9 +41,9 @@ static int demands[5];
 
 
 // MSP message support
-static char mspRequest[200];
-static int  mspRequestLen;
-static int  mspRequestIndex;
+static char mspFromServer[200];
+static int  mspFromServerLen;
+static int  mspFromServerIndex;
 
 // Downscaling for hypersensitive PS3 controller
 static const int PS3_DOWNSCALE = 2;
@@ -982,10 +982,10 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
 
         // v_repMessage gets called much more frequently than firmware's serial requests, so avoid interrupting
         // request handling
-        if (!mspRequestLen) {
-            mspRequestLen = requestLen;
-            mspRequestIndex = 0;
-            memcpy(mspRequest, request, requestLen);
+        if (!mspFromServerLen) {
+            mspFromServerLen = requestLen;
+            mspFromServerIndex = 0;
+            memcpy(mspFromServer, request, requestLen);
         }
 #endif
         // Flag overwrite of original OpenGL image
@@ -1151,13 +1151,13 @@ void Board::reboot(void)
 
 uint8_t Board::serialAvailableBytes(void)
 {
-    return mspRequestLen;
+    return mspFromServerLen;
 }
 
 uint8_t Board::serialReadByte(void)
 {
-    mspRequestLen--;
-    return mspRequest[mspRequestIndex++];
+    mspFromServerLen--;
+    return mspFromServer[mspFromServerIndex++];
 }
 
 void Board::serialWriteByte(uint8_t c)
