@@ -33,6 +33,12 @@ class Navigation {
         Baro  * baro;
         RC    * rc;
 
+        typedef enum {
+            MODE_NORMAL,
+            MODE_ALTHOLD,
+            MODE_GUIDED
+        } mode_t;
+
         float    accelAlt;
         float    accelZ_prev;
         int32_t  altHoldValue;
@@ -41,14 +47,15 @@ class Navigation {
         int32_t  baroAlt;
         int32_t  baroAltBaseline;
         int32_t  baroAlt_offset;
-        int32_t  errorVelocityI;
+        int32_t  errorVerticalVelocityI;
         int32_t  fusedBarosonarAlt;
         int16_t  initialThrottleHold;
         int32_t  lastFusedBarosonarAlt;
+        mode_t   flightMode;
         uint32_t previousT;
-        int32_t  setVelocity;
+        int32_t  setVerticalVelocity;
         float    sonarTransition;
-        bool     velocityControl;
+        bool     verticalVelocityControl;
         float    verticalVelocity;
         bool     wasArmed;
   
@@ -64,11 +71,10 @@ class Navigation {
 
         void checkSwitch(void);
 
-        void updateAltitudePid(void);
+        void updateAltitudePid(bool armed);
 
         void holdAltitude(void);
 
-        void computeAltitude(bool armed);
 };
 
 

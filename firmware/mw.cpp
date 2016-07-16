@@ -211,8 +211,7 @@ void loop(void)
                 break;
             case 1:
                 if (baro.available() && altitudeEstimationTask.checkAndUpdate(currentTime)) {
-                    nav.computeAltitude(armed);
-                    nav.updateAltitudePid();
+                    nav.updateAltitudePid(armed);
                 }
                 taskOrder++;
                 break;
