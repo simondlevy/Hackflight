@@ -32,7 +32,6 @@ class Navigation {
         class IMU   * imu;
         class Baro  * baro;
         class RC    * rc;
-        class MSP   * msp;
 
         typedef enum {
             MODE_NORMAL,
@@ -40,10 +39,10 @@ class Navigation {
             MODE_GUIDED
         } mode_t;
 
+        // for alt-hold
         float    accelAlt;
         float    accelZ_prev;
         int32_t  altHoldValue;
-        bool     altHoldMode;
         int32_t  altPID;
         int32_t  baroAlt;
         int32_t  baroAltBaseline;
@@ -59,16 +58,20 @@ class Navigation {
         bool     verticalVelocityControl;
         float    verticalVelocity;
         bool     wasArmed;
-  
+
     public:
 
+        // for alt-hold
         int32_t  estAlt;
         float    accelVel;
         float    accelZ;
         int16_t  tiltAngle;
         int32_t  vario; // XXX fixed at zero for now
 
-        void init(class Board * _board, class IMU * _imu, class Baro * _baro, class RC * _rc, class MSP * _msp);
+        // for heading
+        int16_t headHold; 
+  
+        void init(class Board * _board, class IMU * _imu, class Baro * _baro, class RC * _rc);
 
         void checkSwitch(void);
 

@@ -173,11 +173,8 @@ void MSP::update(bool armed)
                         break;
 
                     case MSP_SET_HEAD: 
-                        {
-                            int16_t new_heading = read16();
-                            printf("SET_HEAD %d\n", new_heading);
-                            headSerialReply(0);
-                        }
+                        this->nav->headHold = read16();
+                        headSerialReply(0);
                         break;
 
                     case MSP_RC:

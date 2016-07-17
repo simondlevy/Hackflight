@@ -36,20 +36,18 @@ static bool sonarInRange(void)
 }
 
 
-void Navigation::init(Board * _board, IMU * _imu, Baro * _baro, RC * _rc, MSP * _msp)
+void Navigation::init(Board * _board, IMU * _imu, Baro * _baro, RC * _rc)
 {
     this->board = _board;
     this->imu   = _imu;
     this->baro  = _baro;
     this->rc = _rc;
-    this->msp = _msp;
 
     this->accelAlt = 0;
     this->accelVel = 0;
     this->accelZ = 0;
     this->accelZ_prev = 0;
     this->altHoldValue = 0;
-    this->altHoldMode = false;
     this->altPID = 0;
     this->baroAlt = 0;
     this->baroAlt_offset = 0;
@@ -72,17 +70,23 @@ void Navigation::init(Board * _board, IMU * _imu, Baro * _baro, RC * _rc, MSP * 
 
 void Navigation::checkSwitch(void)
 {
+    // If aux switch not in off state
     if (this->rc->auxState() > 0) {
-        if (!this->altHoldMode) {
-            this->altHoldMode = true;
+
+        // Grab altitude for hold
+        if (!this->flightMode) {
+
             this->altHoldValue = this->estAlt;
             this->initialThrottleHold = this->rc->command[THROTTLE];
             this->errorVerticalVelocityI = 0;
             this->altPID = 0;
         }
+
+        this->flightMode = this->rc->auxState() > 1 ? MODE_GUIDED : MODE_ALTHOLD;
+
     }
     else 
-        this->altHoldMode = false;
+        this->flightMode = MODE_NORMAL;
 }
 
 void Navigation::updateAltitudePid(bool armed)
@@ -205,7 +209,8 @@ void Navigation::perform(void)
     return;
 #endif
 
-    if (this->altHoldMode) {
+    if (this->flightMode) {
+
         static bool isaltHoldChanged = false;
         if (CONFIG_HOVER_ALT_HOLD_FAST_CHANGE) {
             // rapid alt changes
@@ -236,7 +241,14 @@ void Navigation::perform(void)
             }
             this->rc->command[THROTTLE] = constrain(this->initialThrottleHold + this->altPID, CONFIG_PWM_MIN, CONFIG_PWM_MAX);
         }
-    } // if alt-hold
+
+        if (this->flightMode == MODE_GUIDED) {
+            printf("guided\n");
+        }
+
+
+    } // if this->flightMode
+
 
 } // updatePid
 
