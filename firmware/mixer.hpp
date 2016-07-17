@@ -25,15 +25,15 @@ extern "C" {
 
         private:
 
-            Board     * _board;
-            RC        * _rc;
-            Stabilize * _stabilize;
+            Board     * board;
+            RC        * rc;
+            Stabilize * stabilize;
         
         public:
 
             int16_t  motorsDisarmed[4];
 
-            void init(Board * board, RC * rc, Stabilize * stabilize);
+            void init(Board * _board, RC * _rc, Stabilize * _stabilize);
 
             void update(bool armed);
     };

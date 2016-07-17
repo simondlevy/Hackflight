@@ -1006,7 +1006,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
 // Board implementation ======================================================
 
 #include <board.hpp>
-#include <pwm.hpp>
+#include <rc.hpp>
 
 class LED {
 

@@ -27,9 +27,9 @@ extern "C" {
 
 #include <string.h>
 
-void RC::init(Board * board)
+void RC::init(Board * _board)
 {
-    this->_board = board;
+    this->board = _board;
 
     this->midrc = (CONFIG_PWM_MAX + CONFIG_PWM_MIN) / 2;
 
@@ -65,7 +65,7 @@ void RC::update(void)
     
         // get RC PWM
         this->dataAverage[chan][this->averageIndex % 4] = 
-            this->_board->readPWM(chan);
+            this->board->readPWM(chan);
 
         this->data[chan] = 0;
 

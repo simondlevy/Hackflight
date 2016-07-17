@@ -67,7 +67,7 @@ class Navigation {
         int16_t  tiltAngle;
         int32_t  vario; // XXX fixed at zero for now
 
-        void init(Board * board, IMU * imu, Baro * baro, RC * rc);
+        void init(Board * _board, IMU * _imu, Baro * _baro, RC * _rc);
 
         void checkSwitch(void);
 

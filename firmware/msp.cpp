@@ -38,7 +38,7 @@ extern "C" {
 
 void MSP::serialize8(uint8_t a)
 {
-    this->_board->serialWriteByte(a);
+    this->board->serialWriteByte(a);
     portState.checksum ^= a;
 }
 
@@ -101,13 +101,13 @@ void MSP::tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-void MSP::init(Board * board, IMU * imu, Navigation * nav, Mixer * mixer, RC * rc)
+void MSP::init(Board * _board, IMU * _imu, Navigation * _nav, Mixer * _mixer, RC * _rc)
 {
-    this->_board = board;
-    this->_imu = imu;
-    this->_nav = nav;
-    this->_mixer = mixer;
-    this->_rc = rc;
+    this->board = _board;
+    this->imu = _imu;
+    this->nav = _nav;
+    this->mixer = _mixer;
+    this->rc = _rc;
 
     memset(&this->portState, 0, sizeof(this->portState));
 }
@@ -117,11 +117,11 @@ void MSP::update(bool armed)
     static bool pendReboot;
 
     // pendReboot will be set for flashing
-    this->_board->checkReboot(pendReboot);
+    this->board->checkReboot(pendReboot);
 
-    while (this->_board->serialAvailableBytes()) {
+    while (this->board->serialAvailableBytes()) {
 
-        uint8_t c = this->_board->serialReadByte();
+        uint8_t c = this->board->serialReadByte();
 
         if (portState.c_state == IDLE) {
             portState.c_state = (c == '$') ? HEADER_START : IDLE;
@@ -129,7 +129,7 @@ void MSP::update(bool armed)
                 if (c == '#')
                     ;
                 else if (c == CONFIG_REBOOT_CHARACTER) 
-                    this->_board->reboot();
+                    this->board->reboot();
             }
         } else if (portState.c_state == HEADER_START) {
             portState.c_state = (c == 'M') ? HEADER_M : IDLE;
@@ -162,13 +162,13 @@ void MSP::update(bool armed)
 
                     case MSP_SET_RAW_RC:
                         for (uint8_t i = 0; i < 8; i++)
-                            this->_rc->data[i] = read16();
+                            this->rc->data[i] = read16();
                         headSerialReply(0);
                         break;
 
                     case MSP_SET_MOTOR:
                         for (uint8_t i = 0; i < 4; i++)
-                            this->_mixer->motorsDisarmed[i] = read16();
+                            this->mixer->motorsDisarmed[i] = read16();
                         headSerialReply(0);
                         break;
 
@@ -183,13 +183,13 @@ void MSP::update(bool armed)
                     case MSP_RC:
                         headSerialReply(16);
                         for (uint8_t i = 0; i < 8; i++)
-                            serialize16(this->_rc->data[i]);
+                            serialize16(this->rc->data[i]);
                         break;
 
                     case MSP_ATTITUDE:
                         headSerialReply(6);
                         for (uint8_t i = 0; i < 3; i++)
-                            serialize16(this->_imu->angle[i]);
+                            serialize16(this->imu->angle[i]);
                         break;
 
                     case MSP_BARO_SONAR_RAW:
@@ -200,8 +200,8 @@ void MSP::update(bool armed)
 
                     case MSP_ALTITUDE:
                         headSerialReply(6);
-                        serialize32(this->_nav->estAlt);
-                        serialize16(this->_nav->vario);
+                        serialize32(this->nav->estAlt);
+                        serialize16(this->nav->vario);
                         break;
 
                     case MSP_REBOOT:

@@ -26,9 +26,9 @@ extern "C" {
 
 #include "mw.hpp"
 
-void Baro::init(Board * board) 
+void Baro::init(Board * _board) 
 {
-    this->_board = board;
+    this->board = _board;
 
     this->historyIdx = 0;
     for (int k=0; k<Baro::TABLE_SIZE; ++k)
@@ -45,11 +45,11 @@ bool Baro::available(void)
 void Baro::update(void)
 {
     // Update hardware
-    this->_board->baroUpdate();
+    this->board->baroUpdate();
 
     // Update history table
     int indexplus1 = (this->historyIdx + 1) % Baro::TABLE_SIZE;
-    int32_t currentPressure = this->_board->baroGetPressure();
+    int32_t currentPressure = this->board->baroGetPressure();
     this->historyTable[this->historyIdx] = currentPressure;
     this->pressureSum += this->historyTable[this->historyIdx];
     this->pressureSum -= this->historyTable[indexplus1];

@@ -17,8 +17,10 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Defines number of RC channels, and min/max PWM
-#include "pwm.hpp"
+// Define number of RC channels, and min/max PWM
+#define CONFIG_RC_CHANS 8
+#define CONFIG_PWM_MIN  990
+#define CONFIG_PWM_MAX  2010
 
 // For logical combinations of stick positions (low, center, high)
 #define ROL_LO (1 << (2 * ROLL))
@@ -52,7 +54,7 @@ extern "C" {
 
         private:
 
-            Board * _board;
+            Board * board;
 
             int16_t dataAverage[CONFIG_RC_CHANS][4];
             uint8_t commandDelay;                               // cycles since most recent movement
@@ -63,7 +65,7 @@ extern "C" {
 
         public:
 
-            void init(Board * board);
+            void init(Board * _board);
 
             int16_t data[CONFIG_RC_CHANS]; // raw PWM values for MSP
             int16_t command[4];            // stick PWM values for mixer, MSP
