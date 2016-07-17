@@ -73,7 +73,7 @@ class Navigation {
 
         void updateAltitudePid(bool armed);
 
-        void holdAltitude(void);
+        void perform(void);
 
 };
 

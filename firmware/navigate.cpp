@@ -197,10 +197,13 @@ void Navigation::updateAltitudePid(bool armed)
 }
 
 
-void Navigation::holdAltitude(void)
+void Navigation::perform(void)
 {
-    // For now, support alt-hold in simulation only
-#ifdef _SIM
+    // For now, support navigation tasks in simulation only
+#ifndef _SIM
+    return;
+#endif
+
     if (this->altHoldMode) {
         static bool isaltHoldChanged = false;
         if (CONFIG_HOVER_ALT_HOLD_FAST_CHANGE) {
@@ -232,8 +235,8 @@ void Navigation::holdAltitude(void)
             }
             this->rc->command[THROTTLE] = constrain(this->initialThrottleHold + this->altPID, CONFIG_PWM_MIN, CONFIG_PWM_MAX);
         }
-    }
-#endif // _SIM
+    } // if alt-hold
+
 } // updatePid
 
 

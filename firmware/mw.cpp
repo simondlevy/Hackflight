@@ -267,8 +267,8 @@ void loop(void)
         // handle serial communications
         msp.update(armed);
 
-        // hold altitude if indicated
-        nav.holdAltitude();
+        // perform navigation tasks (alt-hold etc.)
+        nav.perform();
 
         // update stability PID controller 
         stab.update();
