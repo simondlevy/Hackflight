@@ -124,9 +124,9 @@ void setup(void)
     accelCalibrationTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
     altitudeEstimationTask.init(CONFIG_ALTITUDE_UPDATE_MSEC * 1000);
 
-    // initialize our external objects
+    // initialize our external objects with objects they need
     rc.init(&board);
-    stab.init();
+    stab.init(&rc, &imu);
     imu.init(&board, calibratingGyroCycles, calibratingAccCycles);
     mixer.init(&board, &rc, &stab); 
     msp.init(&board, &imu, &nav, &mixer, &rc);
@@ -271,7 +271,7 @@ void loop(void)
         nav.holdAltitude();
 
         // update stability PID controller 
-        stab.update(&rc, &imu);
+        stab.update();
 
         // update mixer
         mixer.update(armed);
