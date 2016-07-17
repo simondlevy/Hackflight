@@ -26,7 +26,7 @@ extern "C" {
 #include "mw.hpp"
 #include "pidvals.hpp"
 
-void Stabilize::init(RC * _rc, IMU * _imu)
+void Stabilize::init(class RC * _rc, class IMU * _imu)
 {
     this->rc = _rc;
     this->imu = _imu;

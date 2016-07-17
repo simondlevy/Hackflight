@@ -101,7 +101,7 @@ void MSP::tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-void MSP::init(Board * _board, IMU * _imu, Navigation * _nav, Mixer * _mixer, RC * _rc)
+void MSP::init(class Board * _board, class IMU * _imu, class Navigation * _nav, class Mixer * _mixer, class RC * _rc)
 {
     this->board = _board;
     this->imu = _imu;

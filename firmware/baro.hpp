@@ -31,11 +31,11 @@ extern "C" {
             int32_t  historyTable[TABLE_SIZE];
             int      historyIdx;
 
-            Board * board;
+            class Board * board;
 
         public:
 
-            void init(Board * _board);
+            void init(class Board * _board);
 
             bool available(void);
 

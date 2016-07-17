@@ -44,9 +44,9 @@ void debug(const char * format, ...);
 #include "stabilize.hpp"
 #include "mixer.hpp"
 #include "baro.hpp"
+#include "msp.hpp"
 #include "navigate.hpp"
 #include "filters.hpp"
-#include "msp.hpp"
 
 #ifndef abs
 #define abs(x)    ((x) > 0 ? (x) : -(x))

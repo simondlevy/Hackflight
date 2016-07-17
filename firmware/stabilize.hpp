@@ -25,8 +25,8 @@ extern "C" {
 
         private:
 
-            RC  * rc;
-            IMU * imu;
+            class RC  * rc;
+            class IMU * imu;
 
             uint8_t rate_p[3];
             uint8_t rate_i[3];
@@ -42,7 +42,7 @@ extern "C" {
 
             int16_t axisPID[3];
 
-            void init(RC * _rc, IMU * _imu);
+            void init(class RC * _rc, class IMU * _imu);
 
             void update(void);
 

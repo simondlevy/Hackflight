@@ -36,12 +36,13 @@ static bool sonarInRange(void)
 }
 
 
-void Navigation::init(Board * _board, IMU * _imu, Baro * _baro, RC * _rc)
+void Navigation::init(Board * _board, IMU * _imu, Baro * _baro, RC * _rc, MSP * _msp)
 {
     this->board = _board;
     this->imu   = _imu;
     this->baro  = _baro;
     this->rc = _rc;
+    this->msp = _msp;
 
     this->accelAlt = 0;
     this->accelVel = 0;

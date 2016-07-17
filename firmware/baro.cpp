@@ -26,7 +26,7 @@ extern "C" {
 
 #include "mw.hpp"
 
-void Baro::init(Board * _board) 
+void Baro::init(class Board * _board) 
 {
     this->board = _board;
 

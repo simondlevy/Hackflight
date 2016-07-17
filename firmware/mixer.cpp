@@ -40,7 +40,7 @@ static const motorMixer_t mixerQuadX[] = {
     { 1.0f,  1.0f, -1.0f, -1.0f },          // FRONT_L
 };
 
-void Mixer::init(Board * _board, RC * _rc, Stabilize * _stabilize)
+void Mixer::init(class Board * _board, class RC * _rc, class Stabilize * _stabilize)
 {
     this->board = _board;
     this->stabilize = _stabilize;

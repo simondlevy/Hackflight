@@ -28,10 +28,11 @@ class Navigation {
 
     private:
 
-        Board * board;
-        IMU   * imu;
-        Baro  * baro;
-        RC    * rc;
+        class Board * board;
+        class IMU   * imu;
+        class Baro  * baro;
+        class RC    * rc;
+        class MSP   * msp;
 
         typedef enum {
             MODE_NORMAL,
@@ -67,7 +68,7 @@ class Navigation {
         int16_t  tiltAngle;
         int32_t  vario; // XXX fixed at zero for now
 
-        void init(Board * _board, IMU * _imu, Baro * _baro, RC * _rc);
+        void init(class Board * _board, class IMU * _imu, class Baro * _baro, class RC * _rc, class MSP * _msp);
 
         void checkSwitch(void);
 

@@ -27,7 +27,7 @@ extern "C" {
 
 #include <string.h>
 
-void RC::init(Board * _board)
+void RC::init(class Board * _board)
 {
     this->board = _board;
 

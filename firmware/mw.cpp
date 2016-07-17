@@ -130,7 +130,7 @@ void setup(void)
     imu.init(&board, calibratingGyroCycles, calibratingAccCycles);
     mixer.init(&board, &rc, &stab); 
     msp.init(&board, &imu, &nav, &mixer, &rc);
-    nav.init(&board, &imu, &baro, &rc);
+    nav.init(&board, &imu, &baro, &rc, &msp);
 
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;

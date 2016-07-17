@@ -115,7 +115,7 @@ static void rotateV(float v[3], float *delta)
     v[Z] = v_tmp[X] * mat[0][2] + v_tmp[Y] * mat[1][2] + v_tmp[Z] * mat[2][2];
 }
 
-void IMU::init(Board * _board, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles) 
+void IMU::init(class Board * _board, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles) 
 {
     this->board = _board;
 

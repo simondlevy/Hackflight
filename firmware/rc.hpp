@@ -54,7 +54,7 @@ extern "C" {
 
         private:
 
-            Board * board;
+            class Board * board;
 
             int16_t dataAverage[CONFIG_RC_CHANS][4];
             uint8_t commandDelay;                               // cycles since most recent movement
@@ -65,7 +65,7 @@ extern "C" {
 
         public:
 
-            void init(Board * _board);
+            void init(class Board * _board);
 
             int16_t data[CONFIG_RC_CHANS]; // raw PWM values for MSP
             int16_t command[4];            // stick PWM values for mixer, MSP
