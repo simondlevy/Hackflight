@@ -26,7 +26,7 @@ CFLAGS = -Wall -D_SIM -I$(VREP_DIR)/programming/include/ -I. -I../firmware -Wall
 
 # Un-comment if you want to build for the companion board:
 # Linux only, requires OpenCV
-CFLAGS += -D_COMPANION
+#CFLAGS += -D_COMPANION
 
 OS = $(shell uname -s)
 ifeq ($(OS), Linux)
