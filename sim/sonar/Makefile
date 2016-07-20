@@ -22,11 +22,7 @@ VREP_DIR_LINUX = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
 VREP_DIR_OSX   = /Applications/V-REP_PRO_EDU_V3_3_1_Mac
 
 COMMON = $(VREP_DIR)/programming/common/
-CFLAGS = -Wall -D_SIM -I$(VREP_DIR)/programming/include/ -I. -I../firmware -Wall -fPIC -static
-
-# Un-comment if you want to build for the companion board:
-# Linux only, requires OpenCV
-#CFLAGS += -D_COMPANION
+CFLAGS = -Wall -D_SIM -I$(VREP_DIR)/programming/include/ -I. -I.. -I../../firmware -Wall -fPIC -static
 
 OS = $(shell uname -s)
 ifeq ($(OS), Linux)
@@ -46,41 +42,30 @@ PLUGIN = libv_repExtHackflight.$(EXT)
 
 all: $(PLUGIN) 
 
-libv_repExtHackflight.$(EXT): *.cpp *.hpp ../firmware/*.cpp ../firmware/*.hpp Makefile
+libv_repExtHackflight.$(EXT): *.cpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp Makefile
 	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" v_repExtHackflight.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
 	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp
-	g++ $(CFLAGS) -c ../firmware/imu.cpp
-	g++ $(CFLAGS) -c ../firmware/mixer.cpp
-	g++ $(CFLAGS) -c ../firmware/msp.cpp
-	g++ $(CFLAGS) -c ../firmware/mw.cpp
-	g++ $(CFLAGS) -c ../firmware/stabilize.cpp
-	g++ $(CFLAGS) -c ../firmware/rc.cpp
-	g++ $(CFLAGS) -c ../firmware/baro.cpp
-	g++ $(CFLAGS) -c ../firmware/navigate.cpp
-	g++ $(CFLAGS) -c ../firmware/filters.cpp
+	g++ $(CFLAGS) -c ../../firmware/imu.cpp
+	g++ $(CFLAGS) -c ../../firmware/mixer.cpp
+	g++ $(CFLAGS) -c ../../firmware/msp.cpp
+	g++ $(CFLAGS) -c ../../firmware/mw.cpp
+	g++ $(CFLAGS) -c ../../firmware/stabilize.cpp
+	g++ $(CFLAGS) -c ../../firmware/rc.cpp
+	g++ $(CFLAGS) -c ../../firmware/baro.cpp
+	g++ $(CFLAGS) -c ../../firmware/navigate.cpp
+	g++ $(CFLAGS) -c ../../firmware/filters.cpp
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared -lopencv_core -lopencv_highgui $(JOYLIB)
 
-install: $(PLUGIN) hackflight_companion.py
+install: $(PLUGIN)
 	cp $(PLUGIN) $(VREP_LIBDIR)
-	cp hackflight_companion.py $(VREP_LIBDIR)
-	cp socket_server.py $(VREP_LIBDIR)
 
 uninstall:
 	rm -f $(VREP_DIR)/$(PLUGIN)
-	rm -f $(VREP_DIR)/hackflight_companion.py
-	rm -f $(VREP_DIR)/image1.jpg
-	rm -f $(VREP_DIR)/image2.jpg
 
-vedit:
+edit:
 	vim v_repExtHackflight.cpp
-
-pedit:
-	vim hackflight_companion.py
-
-flakes:
-	pyflakes hackflight_companion.py
 
 release: $(PLUGIN)
 	cp $(PLUGIN) Release
