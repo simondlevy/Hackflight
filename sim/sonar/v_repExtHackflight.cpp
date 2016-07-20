@@ -39,6 +39,8 @@ static Controller controller;
 // Stick demands from controller
 static int demands[5];
 
+// Handles to sensors that we will read in v_repMessage()
+static int sonarHandle;
 
 // MSP message support
 static char mspFromServer[200];
@@ -84,7 +86,8 @@ static void kbRespond(char key, char * keys)
 }
 
 // Debugging support
-void debug(const char * format, ...)
+/*
+void printf(const char * format, ...)
 {
     char buffer[256];
     va_list args;
@@ -93,6 +96,7 @@ void debug(const char * format, ...)
     simSetStringSignal("debug", buffer, strlen(buffer));
     va_end (args);
 }
+*/
 
 #ifdef _WIN32 // ===================================================================
 
@@ -352,7 +356,7 @@ static void posixControllerInit(char * name, const char * ps3name)
         axisdir[3] = -1;
     }
     else {
-        debug("Uknown controller: %s\n", name);
+        printf("Uknown controller: %s\n", name);
     }
 }
 
@@ -417,7 +421,7 @@ static int connect_to_server(int port, const char * hostname="localhost")
     struct sockaddr_in sn;
     struct hostent *he;
     if (!(he = gethostbyname(hostname))) {
-        debug("can't get host id for %s\n", hostname);
+        printf("can't get host id for %s\n", hostname);
     }
     int ok = 0;
     int sockfd = 0;
@@ -566,7 +570,7 @@ static void controllerInit(void)
         char name[128];
 
         if (ioctl(joyfd, JSIOCGNAME(sizeof(name)), name) < 0)
-            debug("Uknown controller\n");
+            printf("Uknown controller\n");
 
         else 
             posixControllerInit(name, "MY-POWER CO.");
@@ -626,13 +630,13 @@ static SDL_Joystick * joystick;
 static void controllerInit(void)
 {
     if (SDL_Init(SDL_INIT_JOYSTICK)) {
-        debug("Failed to initialize SDL; using keyboard\n");
+        printf("Failed to initialize SDL; using keyboard\n");
         posixKbInit();
         return;
     }
 
     if (!(joystick = SDL_JoystickOpen(0))) {
-        debug("Unable to open joystick; using keyboard\n");
+        printf("Unable to open joystick; using keyboard\n");
         posixKbInit();
         return;
     }
@@ -710,9 +714,6 @@ static double gyro[3];
 // Barometer support
 static int baroPressure;
 
-// Sonar support
-static int sonarAGL;
-
 // Motor support
 static float thrusts[4];
 
@@ -735,6 +736,12 @@ static void gettime(struct timeval * start_time)
 // --------------------------------------------------------------------------------------
 #define LUA_START_COMMAND  "simExtHackflight_start"
 
+static const int inArgs_START[]={
+    1,
+    sim_script_arg_int32,0 // Proximity sensor (sonar) handle
+};
+
+
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
 
@@ -750,7 +757,13 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
     CScriptFunctionData D;
 
-    // Run Hackflight setup()
+    // Grab handle to proximity sensor (sonar)
+    if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0],LUA_START_COMMAND)) {
+        std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
+        sonarHandle = inData->at(0).int32Data[0]; 
+    }
+
+     // Run Hackflight setup()
     setup();
 
     // Need this for throttle on keyboard and PS3
@@ -778,19 +791,20 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
 static const int inArgs_UPDATE[]={
-    8,
+    7,
     sim_script_arg_int32|sim_script_arg_table,3,  // axes
 	sim_script_arg_int32|sim_script_arg_table,3,  // rotAxes
 	sim_script_arg_int32|sim_script_arg_table,2,  // sliders
 	sim_script_arg_int32,0,                       // buttons (as bit-coded integer)
     sim_script_arg_double|sim_script_arg_table,3, // Gyro values
     sim_script_arg_double|sim_script_arg_table,3, // Accelerometer values
-    sim_script_arg_int32,0,                       // Barometric pressure
-    sim_script_arg_int32,0                        // Sonar distance
+    sim_script_arg_int32,0                        // Barometric pressure
 };
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
+    printf("sonar: %d\n", sonarHandle);
+
     CScriptFunctionData D;
 
     if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
@@ -821,9 +835,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         // Read barometer
         baroPressure = inData->at(6).int32Data[0];
 
-        // Read sonar
-        sonarAGL = inData->at(7).int32Data[0];
-
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
             char signame[10];
@@ -846,7 +857,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     gettime(&stop_time);
     long elapsed_time = stop_time.tv_sec - start_time.tv_sec;
     if (elapsed_time > 0)
-        /*debug("%d FPS\n", update_count / elapsed_time)*/;
+        printf("%d FPS\n", (int)(update_count / elapsed_time));
 #endif
 
 } // LUA_UPDATE_COMMAND
