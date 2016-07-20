@@ -85,8 +85,8 @@ install it the appropriate place.
 
 Linux users can experiment with a simulated &ldquo;companion board&rdquo; computer
 (Raspberry Pi, ODROID, BeagleBone) that uses Python and OpenCV to illustrate a 
-simple machine-vision algorithm.  To do this you will need to install OpenCV.  
-This project resides in <b>hackflight/sim/vision</b>.
+simple machine-vision algorithm.  This project resides in <b>hackflight/sim/vision</b>.
+Before trying it out you will need to install OpenCV:  
 
 <p>
 
