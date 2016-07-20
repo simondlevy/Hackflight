@@ -16,7 +16,7 @@
  */
 
 // Level (accelerometer)
-#define CONFIG_LEVEL_P            10 
+#define CONFIG_LEVEL_P            0//10 
 #define CONFIG_LEVEL_I            0
 
 // Rate (gyro): P must be positive
@@ -29,7 +29,6 @@
 #define  CONFIG_YAW_I             0
 
 // For altitude hover
-//#define CONFIG_HOVER_ALT_P  50
 #define CONFIG_HOVER_ALT_P  200
 #define CONFIG_HOVER_VEL_P  200
 #define CONFIG_HOVER_VEL_I  45

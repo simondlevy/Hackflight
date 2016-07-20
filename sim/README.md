@@ -7,7 +7,7 @@
 <ol>
 <li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>.
 <p><li>Clone the hackflight repository.
-<p><li>Drag the plugin <b>hackflight/sim/Release/v_repExtHackflight.dll</b>
+<p><li>Drag the plugin <b>hackflight\sim\outdoors\Release\v_repExtHackflight.dll</b>
 to the V-REP folder where the other DLLs are. On my computer this is
 <b>C:\Program FIles (x86)\V-REP3\V-REP_PRO_EDU</b>.
 <p><li>Plug in your R/C transmitter, joystick, or game controller. Currently supported:
@@ -22,7 +22,8 @@ if none of the above are connected: not recommended because it requires you
 to foreground the console
 </ul>
 
-<p><li> Double-click on the hackflight scene <b>hackflight.ttt</b> to launch V-REP.
+<p><li> In the <b>outdoors</b> folder, ouble-click on the hackflight scene <b>hackflight.ttt</b> 
+to launch V-REP.
 <p><li> Press the triangular play button at the top of V-REP.
 <p><ul>
 <p><li> If V-REP asks you whether you really want to run the simulation with a dt=10msec
@@ -40,7 +41,7 @@ the sticks a little at first for the simulator to detect them.
 <ol>
 <li> Install <a href="http://www.coppeliarobotics.com/downloads.html">V-REP</a>.
 <p><li>Clone the hackflight repository.
-<p><li>Drag the plugin <b>hackflight/sim/Release/libv_repExtHackflight.so</b>
+<p><li>Drag the plugin <b>hackflight/sim/outdoors/Release/libv_repExtHackflight.so</b>
 to the V-REP folder where the other plugins are. On my computer this is
 <b>~/Software//V-REP_PRO_EDU_V3_3_1_64_Linux</b>.
 <p><li>Plug in your R/C transmitter, joystick, or game controller (see above).
@@ -56,7 +57,7 @@ to the V-REP folder where the other plugins are. On my computer this is
 <p><li> Install the <a href="https://www.libsdl.org/release/SDL2-2.0.4.dmg">SDL runtime binaries</a> 
 in your <b>/Library/Frameworks</b> folder.
 <p><li>Clone the hackflight repository.
-<p><li>Drag the plugin <b>hackflight/sim/Release/libv_repExtHackflight.dylib</b>
+<p><li>Drag the plugin <b>hackflight/sim/outdoors/Release/libv_repExtHackflight.dylib</b>
 to the V-REP folder where the other plugins are. On my computer this is
 <b>/Applications/V-REP_PRO_EDU_V3_3_1_Mac/vrep.app/Contents/MacOS</b>
 <p><li>Plug in your R/C transmitter, joystick, or game controller (see above).
@@ -76,7 +77,7 @@ DLL file, which you can then move into the V-REP folder as in the Windows quicks
 <b>Developing for Linux and Mac OS X</b>
 
 After cloning the hackflight repository, edit the <tt>VREP\_DIR</tt> variable in
-the Makefile in this directory (<b>hackflight/sim</b>) to reflect where you
+the Makefile in this directory (<b>hackflight/sim/outdoors</b>) to reflect where you
 installed V-REP.  Typing <b>make install</b> should then build the plugin and
 install it the appropriate place.
 
@@ -85,6 +86,7 @@ install it the appropriate place.
 Linux users can experiment with a simulated &ldquo;companion board&rdquo; computer
 (Raspberry Pi, ODROID, BeagleBone) that uses Python and OpenCV to illustrate a 
 simple machine-vision algorithm.  To do this you will need to install OpenCV.  
+This project resides in <b>hackflight/sim/vision</b>.
 
 <p>
 

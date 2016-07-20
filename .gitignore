@@ -21,4 +21,5 @@ ipch
 *.log
 *.pdb
 *.cache
+sim/*/*.so
 
