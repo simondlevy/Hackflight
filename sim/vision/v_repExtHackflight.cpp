@@ -32,21 +32,18 @@ using namespace std;
 // WIN32 support
 #include <crossplatform.h>
 
-// We currently support these controllers
-enum Controller { NONE, TARANIS, SPEKTRUM, EXTREME3D, PS3 };
-static Controller controller;
+#include "controller.hpp"
+
+// Controller type
+static controller_t controller;
 
 // Stick demands from controller
 static int demands[5];
-
 
 // MSP message support
 static char mspFromServer[200];
 static int  mspFromServerLen;
 static int  mspFromServerIndex;
-
-// Downscaling for hypersensitive PS3 controller
-static const int PS3_DOWNSCALE = 2;
 
 // Keyboard support for any OS
 static const float KEYBOARD_INC = 10;
@@ -72,7 +69,7 @@ static void kbdecrement(int index)
     kbchange(index, -1);
 }
 
-static void kbRespond(char key, char * keys) 
+void kbRespond(char key, char * keys) 
 {
 	for (int k=0; k<8; ++k)
 		if (key == keys[k]) {
@@ -252,144 +249,13 @@ static void controllerClose(void)
     // XXX no action needed (?)
 }
 
-#else  // Linux, OS X
-
-// Keyboard support for Linux and OS X
-
-#include <stdio.h>
+#else 
 #include <unistd.h>
 #include <fcntl.h>
-#include <termios.h>
-#include <math.h>
-#include <string.h>
+#include "posix.hpp"
+#endif // not _WIN32
 
-#include <sys/time.h>
-
-static int axismap[5];
-static int axisdir[5];
-
-static struct termios oldSettings;
-
-static void posixKbInit(void)
-{
-    struct termios newSettings;
-
-    // Save keyboard settings for restoration later
-    tcgetattr(fileno( stdin ), &oldSettings);
-
-    // Create new keyboard settings
-    newSettings = oldSettings;
-    newSettings.c_lflag &= (~ICANON & ~ECHO);
-    tcsetattr(fileno(stdin), TCSANOW, &newSettings);
-}
-
-static void posixKbGrab(char keys[8])
-{
-    fd_set set;
-    struct timeval tv;
-
-    tv.tv_sec = 0;
-    tv.tv_usec = 100;
-
-    FD_ZERO( &set );
-    FD_SET( fileno( stdin ), &set );
-
-    int res = select(fileno(stdin )+1, &set, NULL, NULL, &tv);
-
-    char c = 0;
-
-    if (res > 0) {
-        read(fileno( stdin ), &c, 1);
-        kbRespond(c, keys);
-    }
-
-        else if( res < 0 ) 
-            perror( "select error" );
-}
-
-static void posixKbClose(void)
-{
-    tcsetattr(fileno(stdin), TCSANOW, &oldSettings);
-}
-
-static void posixControllerInit(char * name, const char * ps3name)
-{
-    for (int k=0; k<5; ++k)
-        axisdir[k] = +1;
-
-    if (strstr(name, "Taranis")) {
-        controller = TARANIS;
-        axismap[0] = 0;
-        axismap[1] = 1;
-        axismap[2] = 2;
-        axismap[3] = 3;
-        axismap[4] = 4;
-    }
-    else if (strstr(name, "PPM TO USB Adapter")) {
-        controller = SPEKTRUM;
-        axismap[0] = 1;
-        axismap[1] = 2;
-        axismap[2] = 5;
-        axismap[3] = 0;
-        axismap[4] = 3;
-    }
-    else if (strstr(name, ps3name)) {
-        controller = PS3;
-        axismap[0] = 2;
-        axismap[1] = 3;
-        axismap[2] = 0;
-        axismap[3] = 1;
-        axisdir[1] = -1;
-        axisdir[3] = -1;
-    }
-    else if (strstr(name, "Extreme 3D")) {
-        controller = EXTREME3D;
-        axismap[0] = 0;
-        axismap[1] = 1;
-        axismap[2] = 2;
-        axismap[3] = 3;
-        axisdir[1] = -1;
-        axisdir[3] = -1;
-    }
-    else {
-        debug("Uknown controller: %s\n", name);
-    }
-}
-
-static void posixControllerGrabAxis(int number, int value)
-{
-    // Look at all five axes for R/C transmitters, first four for other controllers
-    int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
-
-    // PS3 axes are hyper-sensitive
-    int downscale = (controller == PS3) ? PS3_DOWNSCALE : 1;
-
-    // Grab demands from axes
-    for (int k=0; k<maxaxis; ++k)
-        if (number == axismap[k]) 
-            demands[k] = axisdir[k] * (int)(1000. * value / (downscale*32767));
-}
-
-static void posixControllerGrabButton(int number)
-{
-    switch (number) {
-        case 0:
-            demands[4] = -1000;
-            break;
-        case 1:
-            demands[4] =     0;
-            break;
-        case 2:
-            demands[4] = +1000;
-    }
-}
-
-#endif // Linux, OS X
-
-// joystick support for Linux
-#ifdef __linux // ===================================================================
-
-#ifdef _COMPANION
+#if defined(__linux) && defined(_COMPANION)
 
 // We use OpenCV to compress JPEG for use by Python script
 #include <opencv2/core/core.hpp>
@@ -547,142 +413,8 @@ class CompanionBoard {
 
 static CompanionBoard companionBoard;
 
-#endif // _COMPANION
+#endif // Linux companion board
 
-static const char * JOY_DEV = "/dev/input/js0";
-
-#include <linux/joystick.h>
-
-static int joyfd;
-
-static void controllerInit(void)
-{ 
-    joyfd = open(JOY_DEV, O_RDONLY);
-
-    if (joyfd > 0) {
-
-        fcntl(joyfd, F_SETFL, O_NONBLOCK);
-
-        char name[128];
-
-        if (ioctl(joyfd, JSIOCGNAME(sizeof(name)), name) < 0)
-            debug("Uknown controller\n");
-
-        else 
-            posixControllerInit(name, "MY-POWER CO.");
-    }
-
-    // No joystick detected; use keyboard as fallback
-    else 
-        posixKbInit();
-} 
-
-static void controllerRead(void * ignore)
-{
-    // Have a joystick; grab its axes
-    if (joyfd > 0) {
-
-        struct js_event js;
-
-        read(joyfd, &js, sizeof(struct js_event));
-
-        int jstype = js.type & ~JS_EVENT_INIT;
-
-        // Grab demands from axes
-        if (jstype == JS_EVENT_AXIS) 
-            posixControllerGrabAxis(js.number, js.value);
-
-        // Grab aux demand from buttons when detected
-        if ((jstype == JS_EVENT_BUTTON) && (js.value==1)) 
-            posixControllerGrabButton(js.number);
-    }
-
-    // No joystick; use keyboard
-    else  {
-        char keys[8] = {68, 67, 66, 65, 50, 10, 54, 53};
-        posixKbGrab(keys);
-    }
-}
-
-static void controllerClose(void)
-{
-    if (joyfd > 0)
-        close(joyfd);
-
-    else // reset keyboard if no joystick
-        posixKbClose();
-}
-#endif // Linux
-
-// joystick support for OS X
-#ifdef __APPLE__  // ===================================================================
-
-#include <SDL.h>
-
-#include <sys/select.h>
-
-static SDL_Joystick * joystick;
-
-static void controllerInit(void)
-{
-    if (SDL_Init(SDL_INIT_JOYSTICK)) {
-        debug("Failed to initialize SDL; using keyboard\n");
-        posixKbInit();
-        return;
-    }
-
-    if (!(joystick = SDL_JoystickOpen(0))) {
-        debug("Unable to open joystick; using keyboard\n");
-        posixKbInit();
-        return;
-    }
-
-    for (int k=0; k<5; ++k)
-        axisdir[k] = +1;
-
-    char name[100];
-    strcpy(name, SDL_JoystickNameForIndex(0));
-
-    posixControllerInit(name, "2In1 USB Joystick");
-}
-
-static void controllerRead(void * ignore)
-{
-    if (joystick) {
-
-        // Poll until we get an event
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-            ;
-
-        if (event.type == SDL_JOYAXISMOTION) {
-            SDL_JoyAxisEvent js = event.jaxis;
-            posixControllerGrabAxis(js.axis, js.value);
-        }
-
-        if (event.type == SDL_JOYBUTTONDOWN) {
-            SDL_JoyButtonEvent jb = event.jbutton;
-            posixControllerGrabButton(jb.button);
-        }
-     }
-
-    // Fall back on keyboard if no controller
-    else {
-        char keys[8] = {52, 54, 50, 56, 48, 10, 51, 57};
-        posixKbGrab(keys);
-    }
-}
-
-static void controllerClose(void)
-{
-    if (joystick)
-        SDL_JoystickClose(joystick);
-
-    else // reset keyboard if no joystick
-        posixKbClose();
-}
-
-#endif // OS X
 
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
@@ -710,24 +442,11 @@ static double gyro[3];
 // Barometer support
 static int baroPressure;
 
-// Sonar support
-static int sonarAGL;
-
 // Motor support
 static float thrusts[4];
 
 // 100 Hz timestep, used for simulating microsend timer
 static double timestep = .01;
-
-// Timing support
-#ifdef __linux
-static unsigned long int update_count;
-struct timeval start_time;
-static void gettime(struct timeval * start_time)
-{
-    gettimeofday(start_time, NULL);
-}
-#endif
 
 
 // --------------------------------------------------------------------------------------
@@ -737,15 +456,8 @@ static void gettime(struct timeval * start_time)
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
-
-#ifdef __linux
-	update_count = 0;
-    gettime(&start_time);
-
-#ifdef _COMPANION
-    // Start companion board
+#if defined(__linux) && defined(_COMPANION)
     companionBoard.start();
-#endif
 #endif
 
     CScriptFunctionData D;
@@ -778,15 +490,14 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
 static const int inArgs_UPDATE[]={
-    8,
+    7,
     sim_script_arg_int32|sim_script_arg_table,3,  // axes
 	sim_script_arg_int32|sim_script_arg_table,3,  // rotAxes
 	sim_script_arg_int32|sim_script_arg_table,2,  // sliders
 	sim_script_arg_int32,0,                       // buttons (as bit-coded integer)
     sim_script_arg_double|sim_script_arg_table,3, // Gyro values
     sim_script_arg_double|sim_script_arg_table,3, // Accelerometer values
-    sim_script_arg_int32,0,                       // Barometric pressure
-    sim_script_arg_int32,0                        // Sonar distance
+    sim_script_arg_int32,0                        // Barometric pressure
 };
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
@@ -798,7 +509,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
         // Controller values from script will be used in Windows only
-        controllerRead(inData);
+        controllerRead(controller, demands, inData);
 
         // PS3 spring-mounted throttle requires special handling
         if (controller == PS3) {
@@ -821,9 +532,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         // Read barometer
         baroPressure = inData->at(6).int32Data[0];
 
-        // Read sonar
-        sonarAGL = inData->at(7).int32Data[0];
-
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
             char signame[10];
@@ -838,16 +546,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true)); 
     D.writeDataToStack(cb->stackID);
-
-
-#ifdef __linux
-    update_count++;
-    struct timeval stop_time;
-    gettime(&stop_time);
-    long elapsed_time = stop_time.tv_sec - start_time.tv_sec;
-    if (elapsed_time > 0)
-        /*debug("%d FPS\n", update_count / elapsed_time)*/;
-#endif
 
 } // LUA_UPDATE_COMMAND
 

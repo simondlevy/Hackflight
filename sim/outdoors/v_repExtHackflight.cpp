@@ -255,7 +255,7 @@ static void controllerClose(void)
 #include <unistd.h>
 #include <fcntl.h>
 #include "posix.hpp"
-#endif // _WIN32
+#endif // not _WIN32
 
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
