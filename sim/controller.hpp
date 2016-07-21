@@ -27,3 +27,6 @@ static const int PS3_DOWNSCALE = 2;
 static int axisdir[5];
 static int axismap[5];
 
+void controllerInit(void);
+void controllerRead(int * demands, void * ignore);
+void controllerClose(void);

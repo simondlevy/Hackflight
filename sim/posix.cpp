@@ -27,7 +27,7 @@
 #include <sys/time.h>
 
 #include "posix.hpp"
-#include "controllers.hpp"
+#include "controller.hpp"
 
 // in v_repExtHackflight.cpp
 extern void kbRespond(char key, char * keys);

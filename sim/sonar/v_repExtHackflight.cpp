@@ -33,8 +33,7 @@ using namespace std;
 // WIN32 support
 #include <crossplatform.h>
 
-#include "controllers.hpp"
-
+#include "controller.hpp"
 
 // Stick demands from controller
 static int demands[5];
@@ -255,74 +254,6 @@ static void controllerClose(void)
 #include "posix.hpp"
 #endif // _WIN32
 
-// joystick support for Linux
-#ifdef __linux // ===================================================================
-
-static const char * JOY_DEV = "/dev/input/js0";
-
-#include <linux/joystick.h>
-
-static int joyfd;
-
-static void controllerInit(void)
-{ 
-    joyfd = open(JOY_DEV, O_RDONLY);
-
-    if (joyfd > 0) {
-
-        fcntl(joyfd, F_SETFL, O_NONBLOCK);
-
-        char name[128];
-
-        if (ioctl(joyfd, JSIOCGNAME(sizeof(name)), name) < 0)
-            printf("Uknown controller\n");
-
-        else 
-            posixControllerInit(name, "MY-POWER CO.");
-    }
-
-    // No joystick detected; use keyboard as fallback
-    else 
-        posixKbInit();
-} 
-
-static void controllerRead(void * ignore)
-{
-    // Have a joystick; grab its axes
-    if (joyfd > 0) {
-
-        struct js_event js;
-
-        read(joyfd, &js, sizeof(struct js_event));
-
-        int jstype = js.type & ~JS_EVENT_INIT;
-
-        // Grab demands from axes
-        if (jstype == JS_EVENT_AXIS) 
-            posixControllerGrabAxis(demands, js.number, js.value);
-
-        // Grab aux demand from buttons when detected
-        if ((jstype == JS_EVENT_BUTTON) && (js.value==1)) 
-            posixControllerGrabButton(demands, js.number);
-    }
-
-    // No joystick; use keyboard
-    else  {
-        char keys[8] = {68, 67, 66, 65, 50, 10, 54, 53};
-        posixKbGrab(keys);
-    }
-}
-
-static void controllerClose(void)
-{
-    if (joyfd > 0)
-        close(joyfd);
-
-    else // reset keyboard if no joystick
-        posixKbClose();
-}
-#endif // Linux
-
 // joystick support for OS X
 #ifdef __APPLE__  // ===================================================================
 
@@ -428,16 +359,6 @@ static float thrusts[4];
 // 100 Hz timestep, used for simulating microsend timer
 static double timestep = .01;
 
-// Timing support
-#ifdef __linux
-static unsigned long int update_count;
-struct timeval start_time;
-static void gettime(struct timeval * start_time)
-{
-    gettimeofday(start_time, NULL);
-}
-#endif
-
 
 // --------------------------------------------------------------------------------------
 // simExtHackflight_start
@@ -447,11 +368,6 @@ static void gettime(struct timeval * start_time)
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
-
-#ifdef __linux
-	update_count = 0;
-    gettime(&start_time);
-#endif
 
     CScriptFunctionData D;
 
@@ -503,7 +419,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
         // Controller values from script will be used in Windows only
-        controllerRead(inData);
+        controllerRead(demands, inData);
 
         // PS3 spring-mounted throttle requires special handling
         if (controller == PS3) {
@@ -548,16 +464,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true)); 
     D.writeDataToStack(cb->stackID);
-
-
-#ifdef __linux
-    update_count++;
-    struct timeval stop_time;
-    gettime(&stop_time);
-    long elapsed_time = stop_time.tv_sec - start_time.tv_sec;
-    if (elapsed_time > 0)
-        /*printf("%d FPS\n", sonarDistance, (int)(update_count / elapsed_time))*/;
-#endif
 
 } // LUA_UPDATE_COMMAND
 
