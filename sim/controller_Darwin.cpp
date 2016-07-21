@@ -26,30 +26,27 @@
 
 static SDL_Joystick * joystick;
 
-void controllerInit(void)
+controller_t controllerInit(void)
 {
     if (SDL_Init(SDL_INIT_JOYSTICK)) {
         printf("Failed to initialize SDL; using keyboard\n");
         posixKbInit();
-        return;
+        return NONE;
     }
 
     if (!(joystick = SDL_JoystickOpen(0))) {
         printf("Unable to open joystick; using keyboard\n");
         posixKbInit();
-        return;
+        return NONE;
     }
-
-    for (int k=0; k<5; ++k)
-        axisdir[k] = +1;
 
     char name[100];
     strcpy(name, SDL_JoystickNameForIndex(0));
 
-    posixControllerInit(name, "2In1 USB Joystick");
+    return posixControllerInit(name, "2In1 USB Joystick");
 }
 
-void controllerRead(int * demands, void * ignore)
+void controllerRead(controller_t controller, int * demands, void * ignore)
 {
     if (joystick) {
 
@@ -60,7 +57,7 @@ void controllerRead(int * demands, void * ignore)
 
         if (event.type == SDL_JOYAXISMOTION) {
             SDL_JoyAxisEvent js = event.jaxis;
-            posixControllerGrabAxis(demands, js.axis, js.value);
+            posixControllerGrabAxis(controller, demands, js.axis, js.value);
         }
 
         if (event.type == SDL_JOYBUTTONDOWN) {
