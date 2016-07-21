@@ -390,166 +390,6 @@ static void posixControllerGrabButton(int number)
 // joystick support for Linux
 #ifdef __linux // ===================================================================
 
-#ifdef _COMPANION
-
-// We use OpenCV to compress JPEG for use by Python script
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-using namespace cv;
-
-#include <fcntl.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <time.h> 
-
-static int connect_to_server(int port, const char * hostname="localhost")
-{
-    // http://web.eecs.utk.edu/~plank/plank/classes/cs360/360/notes/Sockets/sockettome.c
-    struct sockaddr_in sn;
-    struct hostent *he;
-    if (!(he = gethostbyname(hostname))) {
-        printf("can't get host id for %s\n", hostname);
-    }
-    int ok = 0;
-    int sockfd = 0;
-    while (!ok) {
-        sn.sin_family = AF_INET;
-        sn.sin_port  = htons(port);
-        sn.sin_addr.s_addr = *(u_long*)(he->h_addr_list[0]);
-
-        if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-            perror("socket()");
-        }
-        ok = (connect(sockfd, (struct sockaddr*)&sn, sizeof(sn)) != -1);
-        if (!ok) sleep (1);
-    }  
-    return sockfd;
-}
-
-static const int CAMERA_PORT          = 5000;
-static const int COMMS_IN_PORT        = 5001;
-static const int COMMS_OUT_PORT       = 5002;
-static const char * IMAGE_TO_PYTHON   = "image.jpg";
-static const char * IMAGE_FROM_PYTHON = "image2.jpg";
-static const int MAXMSG               = 1000;
-
-class CompanionBoard {
-    
-    private:
-
-        int procid;
-        int camerasync_sockfd;
-        int comms_in_sockfd;
-        int comms_out_sockfd;
-        int imgsize;
-
-    public:
-
-        CompanionBoard(void)
-        {
-            this->procid = 0;
-        }
-
-        void start(void)
-        {
-            // Build command-line arguments for forking the Python server script
-            char script[200];
-            sprintf(script, "%s/hackflight_companion.py", VREP_DIR);
-            char camera_port[10];
-            sprintf(camera_port, "%d", CAMERA_PORT);
-            char comms_in_port[10];
-            sprintf(comms_in_port, "%d", COMMS_IN_PORT);
-            char comms_out_port[10];
-            sprintf(comms_out_port, "%d", COMMS_OUT_PORT);
-            char *argv[7] = { 
-                (char *)script, 
-                camera_port, 
-                comms_in_port, 
-                comms_out_port, 
-                (char *)IMAGE_TO_PYTHON, 
-                (char *)IMAGE_FROM_PYTHON, 
-                NULL};
-
-            // Fork the Python server script
-            this->procid = fork();
-            if (this->procid == 0) {
-                execvp(script, argv);
-                exit(0);
-            }
-
-            // Open a socket for syncing camera images with the server, and sockets for comms
-            this->camerasync_sockfd = connect_to_server(CAMERA_PORT);
-            this->comms_in_sockfd = connect_to_server(COMMS_IN_PORT);
-            this->comms_out_sockfd = connect_to_server(COMMS_OUT_PORT);
-        }
-
-        void update(char * imageBytes, int imageWidth, int imageHeight,
-                char * requestStr, int & requestLen)
-        {
-            // Use OpenCV to save image as JPEG
-            Mat image = Mat(imageHeight, imageWidth, CV_8UC3, imageBytes);
-            flip(image, image, 0);                 // rectify image
-            cvtColor(image, image, COLOR_BGR2RGB); // convert image BGR->RGB
-            imwrite(IMAGE_TO_PYTHON, image);
-
-            // Send sync byte to Python server, which will open the image, process it, and
-            // write the processed image to another file
-            char sync = 0;
-            write(this->camerasync_sockfd, &sync, 1);
-
-            // If server has created a file for the processed image, open it copy its bytes back to V-REP's camera image
-            struct stat fileStat; 
-            if (!stat(IMAGE_FROM_PYTHON, &fileStat)) {
-                Mat image2 = imread(IMAGE_FROM_PYTHON, CV_LOAD_IMAGE_COLOR);
-                flip(image2, image2, 0);                 // rectify image
-                cvtColor(image2, image2, COLOR_RGB2BGR); // convert image BGR->RGB
-                memcpy(imageBytes, image2.data, imageWidth*imageHeight*3);
-            }
-
-            // Check whether bytes are available from server
-            int avail;
-            ioctl(this->comms_in_sockfd, FIONREAD, &avail);
-
-            // Ignore OOB values for available bytes
-            if (avail > 0 && avail < MAXMSG) {
-                char msg[MAXMSG];
-                read(this->comms_in_sockfd, msg, avail);
-                memcpy(requestStr, msg, avail);
-                requestLen = avail;
-            }
-        }
-
-        void sendByte(uint8_t b)
-        {
-            write(this->comms_out_sockfd, &b, 1);
-        }
-
-        void halt(void)
-        {
-            if (this->procid) {
-                close(this->camerasync_sockfd);
-                close(this->comms_in_sockfd);
-                close(this->comms_out_sockfd);
-                kill(this->procid, SIGKILL);
-            }
-        }
-
-}; // CompanionBoard
-
-static CompanionBoard companionBoard;
-
-#endif // _COMPANION
-
 static const char * JOY_DEV = "/dev/input/js0";
 
 #include <linux/joystick.h>
@@ -743,11 +583,6 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #ifdef __linux
 	update_count = 0;
     gettime(&start_time);
-
-#ifdef _COMPANION
-    // Start companion board
-    companionBoard.start();
-#endif
 #endif
 
     CScriptFunctionData D;
@@ -862,10 +697,6 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
     controllerClose();
 
-#if defined(__linux) && defined(_COMPANION)
-    companionBoard.halt();
-#endif
-
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);
@@ -969,28 +800,6 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
     // Don't do anything till start() has been called
     if (!ready)
         return NULL;
-
-    // Handle messages from belly camera
-    if (message ==  sim_message_eventcallback_openglcameraview && auxiliaryData[2] == 1) {
-
-        // Send in image bytes, get back serial message request
-#if defined(__linux) && defined(_COMPANION)
-        char request[200];
-        int requestLen = 0;
-        companionBoard.update((char *)customData, auxiliaryData[0], auxiliaryData[1], request, requestLen);
-
-
-        // v_repMessage gets called much more frequently than firmware's serial requests, so avoid interrupting
-        // request handling
-        if (!mspFromServerLen) {
-            mspFromServerLen = requestLen;
-            mspFromServerIndex = 0;
-            memcpy(mspFromServer, request, requestLen);
-        }
-#endif
-        // Flag overwrite of original OpenGL image
-        auxiliaryData[3] = 1; 
-    }
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
@@ -1162,9 +971,6 @@ uint8_t Board::serialReadByte(void)
 
 void Board::serialWriteByte(uint8_t c)
 {
-#if defined(__linux) && defined(_COMPANION)
-    companionBoard.sendByte(c);
-#endif
 }
 
 void Board::writeMotor(uint8_t index, uint16_t value)
