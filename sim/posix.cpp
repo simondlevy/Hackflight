@@ -34,9 +34,6 @@ extern void kbRespond(char key, char * keys);
 
 static struct termios oldSettings;
 
-static int axisdir[5];
-static int axismap[5];
-
 void posixKbInit(void)
 {
     struct termios newSettings;
