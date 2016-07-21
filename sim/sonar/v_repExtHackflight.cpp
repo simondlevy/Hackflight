@@ -552,7 +552,7 @@ static double gyro[3];
 static int baroPressure;
 
 // Sonar support
-static int sonarDistance;
+static int sonarDistances[5];
 
 // Motor support
 static float thrusts[4];
@@ -623,7 +623,7 @@ static const int inArgs_UPDATE[]={
     sim_script_arg_double|sim_script_arg_table,3, // Gyro values
     sim_script_arg_double|sim_script_arg_table,3, // Accelerometer values
     sim_script_arg_int32,0,                       // Barometric pressure
-    sim_script_arg_int32,0                        // Sonar distance
+    sim_script_arg_int32|sim_script_arg_table,5   // Sonar distances
 };
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
@@ -655,9 +655,16 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
             accel[k]  = inData->at(5).doubleData[k]; 
         }
 
-        // Read barometer and sonar
+        // Read barometer
         baroPressure  = inData->at(6).int32Data[0];
-        sonarDistance = inData->at(7).int32Data[0];
+
+        // Read sonars
+        const char * sonarNames[5] = {"Bk", "Bt", "F", "L", "R"};
+        for (int k=0; k<5; ++k) {
+            sonarDistances[k] = inData->at(7).int32Data[k];
+            printf("%s: %d | ", sonarNames[k], sonarDistances[k]);
+        }
+        printf("\n");
 
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
@@ -681,7 +688,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     gettime(&stop_time);
     long elapsed_time = stop_time.tv_sec - start_time.tv_sec;
     if (elapsed_time > 0)
-        printf("sonar: %d cm   |  %d FPS\n", sonarDistance, (int)(update_count / elapsed_time));
+        /*printf("%d FPS\n", sonarDistance, (int)(update_count / elapsed_time))*/;
 #endif
 
 } // LUA_UPDATE_COMMAND
