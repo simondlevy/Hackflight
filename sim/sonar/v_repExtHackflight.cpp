@@ -25,6 +25,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 #include <iostream>
 using namespace std;
@@ -32,9 +33,8 @@ using namespace std;
 // WIN32 support
 #include <crossplatform.h>
 
-// We currently support these controllers
-enum Controller { NONE, TARANIS, SPEKTRUM, EXTREME3D, PS3 };
-static Controller controller;
+#include "controllers.hpp"
+
 
 // Stick demands from controller
 static int demands[5];
@@ -43,9 +43,6 @@ static int demands[5];
 static char mspFromServer[200];
 static int  mspFromServerLen;
 static int  mspFromServerIndex;
-
-// Downscaling for hypersensitive PS3 controller
-static const int PS3_DOWNSCALE = 2;
 
 // Keyboard support for any OS
 static const float KEYBOARD_INC = 10;
@@ -71,7 +68,7 @@ static void kbdecrement(int index)
     kbchange(index, -1);
 }
 
-static void kbRespond(char key, char * keys) 
+void kbRespond(char key, char * keys) 
 {
 	for (int k=0; k<8; ++k)
 		if (key == keys[k]) {
@@ -252,140 +249,11 @@ static void controllerClose(void)
 {
     // XXX no action needed (?)
 }
-
-#else  // Linux, OS X
-
-// Keyboard support for Linux and OS X
-
-#include <stdio.h>
+#else
 #include <unistd.h>
 #include <fcntl.h>
-#include <termios.h>
-#include <math.h>
-#include <string.h>
-
-#include <sys/time.h>
-
-static int axismap[5];
-static int axisdir[5];
-
-static struct termios oldSettings;
-
-static void posixKbInit(void)
-{
-    struct termios newSettings;
-
-    // Save keyboard settings for restoration later
-    tcgetattr(fileno( stdin ), &oldSettings);
-
-    // Create new keyboard settings
-    newSettings = oldSettings;
-    newSettings.c_lflag &= (~ICANON & ~ECHO);
-    tcsetattr(fileno(stdin), TCSANOW, &newSettings);
-}
-
-static void posixKbGrab(char keys[8])
-{
-    fd_set set;
-    struct timeval tv;
-
-    tv.tv_sec = 0;
-    tv.tv_usec = 100;
-
-    FD_ZERO( &set );
-    FD_SET( fileno( stdin ), &set );
-
-    int res = select(fileno(stdin )+1, &set, NULL, NULL, &tv);
-
-    char c = 0;
-
-    if (res > 0) {
-        read(fileno( stdin ), &c, 1);
-        kbRespond(c, keys);
-    }
-
-        else if( res < 0 ) 
-            perror( "select error" );
-}
-
-static void posixKbClose(void)
-{
-    tcsetattr(fileno(stdin), TCSANOW, &oldSettings);
-}
-
-static void posixControllerInit(char * name, const char * ps3name)
-{
-    for (int k=0; k<5; ++k)
-        axisdir[k] = +1;
-
-    if (strstr(name, "Taranis")) {
-        controller = TARANIS;
-        axismap[0] = 0;
-        axismap[1] = 1;
-        axismap[2] = 2;
-        axismap[3] = 3;
-        axismap[4] = 4;
-    }
-    else if (strstr(name, "PPM TO USB Adapter")) {
-        controller = SPEKTRUM;
-        axismap[0] = 1;
-        axismap[1] = 2;
-        axismap[2] = 5;
-        axismap[3] = 0;
-        axismap[4] = 3;
-    }
-    else if (strstr(name, ps3name)) {
-        controller = PS3;
-        axismap[0] = 2;
-        axismap[1] = 3;
-        axismap[2] = 0;
-        axismap[3] = 1;
-        axisdir[1] = -1;
-        axisdir[3] = -1;
-    }
-    else if (strstr(name, "Extreme 3D")) {
-        controller = EXTREME3D;
-        axismap[0] = 0;
-        axismap[1] = 1;
-        axismap[2] = 2;
-        axismap[3] = 3;
-        axisdir[1] = -1;
-        axisdir[3] = -1;
-    }
-    else {
-        printf("Uknown controller: %s\n", name);
-    }
-}
-
-static void posixControllerGrabAxis(int number, int value)
-{
-    // Look at all five axes for R/C transmitters, first four for other controllers
-    int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
-
-    // PS3 axes are hyper-sensitive
-    int downscale = (controller == PS3) ? PS3_DOWNSCALE : 1;
-
-    // Grab demands from axes
-    for (int k=0; k<maxaxis; ++k)
-        if (number == axismap[k]) 
-            demands[k] = axisdir[k] * (int)(1000. * value / (downscale*32767));
-}
-
-static void posixControllerGrabButton(int number)
-{
-    switch (number) {
-        case 0:
-            demands[4] = -1000;
-            break;
-        case 1:
-            demands[4] =     0;
-            break;
-        case 2:
-            demands[4] = +1000;
-    }
-}
-
-#endif // Linux, OS X
+#include "posix.hpp"
+#endif // _WIN32
 
 // joystick support for Linux
 #ifdef __linux // ===================================================================
@@ -431,11 +299,11 @@ static void controllerRead(void * ignore)
 
         // Grab demands from axes
         if (jstype == JS_EVENT_AXIS) 
-            posixControllerGrabAxis(js.number, js.value);
+            posixControllerGrabAxis(demands, js.number, js.value);
 
         // Grab aux demand from buttons when detected
         if ((jstype == JS_EVENT_BUTTON) && (js.value==1)) 
-            posixControllerGrabButton(js.number);
+            posixControllerGrabButton(demands, js.number);
     }
 
     // No joystick; use keyboard
@@ -551,7 +419,7 @@ static double gyro[3];
 // Barometer support
 static int baroPressure;
 
-// Sonar support
+// Sonar support: sonars in alphabetical ordedr (back, bottom, front, left, right)
 static int sonarDistances[5];
 
 // Motor support
@@ -722,6 +590,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
     GetModuleFileName(NULL,curDirAndFile,1023);
     PathRemoveFileSpec(curDirAndFile);
 #endif
+
+// Posix
 #elif defined (__linux) || defined (__APPLE__)
     getcwd(curDirAndFile, sizeof(curDirAndFile));
 #endif
@@ -736,7 +606,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 #elif defined (__APPLE__)
     temp+="/libv_rep.dylib";
 #endif /* __linux || __APPLE__ */
-
+// Posix
     vrepLib=loadVrepLibrary(temp.c_str());
     if (vrepLib==NULL)
     {
