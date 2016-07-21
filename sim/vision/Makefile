@@ -18,8 +18,7 @@
 #
  
 # Edit this for where you installed V-REP
-VREP_DIR_LINUX = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
-VREP_DIR_OSX   = /Applications/V-REP_PRO_EDU_V3_3_1_Mac
+VREP_DIR = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
 
 COMMON = $(VREP_DIR)/programming/common/
 CFLAGS = -Wall -D_SIM -I$(VREP_DIR)/programming/include/ -I. -I.. -I../../firmware -Wall -fPIC -static
@@ -28,28 +27,14 @@ CFLAGS = -Wall -D_SIM -I$(VREP_DIR)/programming/include/ -I. -I.. -I../../firmwa
 # Linux only, requires OpenCV
 CFLAGS += -D_COMPANION
 
-OS = $(shell uname -s)
-ifeq ($(OS), Linux)
-	EXT = so
-	CFLAGS += -I/usr/include/SDL
-	VREP_DIR = $(VREP_DIR_LINUX)
-    VREP_LIBDIR = $(VREP_DIR)
-else
-	EXT = dylib
-	CFLAGS += -I/Library/Frameworks/SDL2.framework/Headers/
-	JOYLIB = -lSDL2
-	VREP_DIR = $(VREP_DIR_OSX)
-    VREP_LIBDIR = $(VREP_DIR)/vrep.app/Contents/MacOS/
-endif
-
-PLUGIN = libv_repExtHackflight.$(EXT)
+PLUGIN = libv_repExtHackflight.so
 
 all: $(PLUGIN) 
 
-libv_repExtHackflight.$(EXT): *.cpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp Makefile
-	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" v_repExtHackflight.cpp 
+libv_repExtHackflight.so: *.cpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp Makefile
+	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_DIR)\" v_repExtHackflight.cpp 
 	g++ $(CFLAGS) -c ../posix.cpp 
-	g++ $(CFLAGS) -c ../controller_$(OS).cpp 
+	g++ $(CFLAGS) -c ../controller_Linux.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
 	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp
@@ -62,12 +47,12 @@ libv_repExtHackflight.$(EXT): *.cpp ../*.hpp ../../firmware/*.cpp ../../firmware
 	g++ $(CFLAGS) -c ../../firmware/baro.cpp
 	g++ $(CFLAGS) -c ../../firmware/navigate.cpp
 	g++ $(CFLAGS) -c ../../firmware/filters.cpp
-	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared -lopencv_core -lopencv_highgui $(JOYLIB)
+	g++ *.o -o libv_repExtHackflight.so -lpthread -shared -lopencv_core -lopencv_highgui $(JOYLIB)
 
 install: $(PLUGIN) hackflight_companion.py
-	cp $(PLUGIN) $(VREP_LIBDIR)
-	cp hackflight_companion.py $(VREP_LIBDIR)
-	cp socket_server.py $(VREP_LIBDIR)
+	cp $(PLUGIN) $(VREP_DIR)
+	cp hackflight_companion.py $(VREP_DIR)
+	cp socket_server.py $(VREP_DIR)
 
 uninstall:
 	rm -f $(VREP_DIR)/$(PLUGIN)
@@ -92,5 +77,5 @@ commit:
 	git push
 
 clean:
-	rm -f *.o *.$(EXT) *.pyc *~
+	rm -f *.o *.so *.pyc *~
 
