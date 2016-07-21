@@ -58,7 +58,7 @@ libv_repExtHackflight.$(EXT): *.cpp ../*.hpp ../../firmware/*.cpp ../../firmware
 	g++ $(CFLAGS) -c ../../firmware/baro.cpp
 	g++ $(CFLAGS) -c ../../firmware/navigate.cpp
 	g++ $(CFLAGS) -c ../../firmware/filters.cpp
-	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared -lopencv_core -lopencv_highgui $(JOYLIB)
+	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared $(JOYLIB)
 
 install: $(PLUGIN)
 	cp $(PLUGIN) $(VREP_LIBDIR)

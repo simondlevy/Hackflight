@@ -22,4 +22,5 @@ ipch
 *.pdb
 *.cache
 sim/*/*.so
+sim/*/*.dylib
 
