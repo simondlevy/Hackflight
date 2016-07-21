@@ -39,9 +39,6 @@ static Controller controller;
 // Stick demands from controller
 static int demands[5];
 
-// Handles to sensors that we will read in v_repMessage()
-static int sonarHandle;
-
 // MSP message support
 static char mspFromServer[200];
 static int  mspFromServerLen;
@@ -714,6 +711,9 @@ static double gyro[3];
 // Barometer support
 static int baroPressure;
 
+// Sonar support
+static int sonarDistance;
+
 // Motor support
 static float thrusts[4];
 
@@ -736,11 +736,6 @@ static void gettime(struct timeval * start_time)
 // --------------------------------------------------------------------------------------
 #define LUA_START_COMMAND  "simExtHackflight_start"
 
-static const int inArgs_START[]={
-    1,
-    sim_script_arg_int32,0 // Proximity sensor (sonar) handle
-};
-
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
@@ -756,12 +751,6 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #endif
 
     CScriptFunctionData D;
-
-    // Grab handle to proximity sensor (sonar)
-    if (D.readDataFromStack(cb->stackID,inArgs_START,inArgs_START[0],LUA_START_COMMAND)) {
-        std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
-        sonarHandle = inData->at(0).int32Data[0]; 
-    }
 
      // Run Hackflight setup()
     setup();
@@ -791,20 +780,19 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
 static const int inArgs_UPDATE[]={
-    7,
+    8,
     sim_script_arg_int32|sim_script_arg_table,3,  // axes
 	sim_script_arg_int32|sim_script_arg_table,3,  // rotAxes
 	sim_script_arg_int32|sim_script_arg_table,2,  // sliders
 	sim_script_arg_int32,0,                       // buttons (as bit-coded integer)
     sim_script_arg_double|sim_script_arg_table,3, // Gyro values
     sim_script_arg_double|sim_script_arg_table,3, // Accelerometer values
-    sim_script_arg_int32,0                        // Barometric pressure
+    sim_script_arg_int32,0,                       // Barometric pressure
+    sim_script_arg_int32,0                        // Sonar distance
 };
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
-    printf("sonar: %d\n", sonarHandle);
-
     CScriptFunctionData D;
 
     if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
@@ -832,8 +820,9 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
             accel[k]  = inData->at(5).doubleData[k]; 
         }
 
-        // Read barometer
-        baroPressure = inData->at(6).int32Data[0];
+        // Read barometer and sonar
+        baroPressure  = inData->at(6).int32Data[0];
+        sonarDistance = inData->at(7).int32Data[0];
 
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
@@ -857,7 +846,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     gettime(&stop_time);
     long elapsed_time = stop_time.tv_sec - start_time.tv_sec;
     if (elapsed_time > 0)
-        printf("%d FPS\n", (int)(update_count / elapsed_time));
+        printf("sonar: %d cm   |  %d FPS\n", sonarDistance, (int)(update_count / elapsed_time));
 #endif
 
 } // LUA_UPDATE_COMMAND
