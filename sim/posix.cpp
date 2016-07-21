@@ -26,8 +26,11 @@
 
 #include <sys/time.h>
 
-#include "posix.hpp"
 #include "controller.hpp"
+#include "posix.hpp"
+
+static int axisdir[5];
+static int axismap[5];
 
 // in v_repExtHackflight.cpp
 extern void kbRespond(char key, char * keys);
@@ -76,8 +79,10 @@ void posixKbClose(void)
     tcsetattr(fileno(stdin), TCSANOW, &oldSettings);
 }
 
-void posixControllerInit(char * name, const char * ps3name)
+controller_t posixControllerInit(char * name, const char * ps3name)
 {
+    controller_t controller = NONE;
+
     for (int k=0; k<5; ++k)
         axisdir[k] = +1;
 
@@ -118,9 +123,11 @@ void posixControllerInit(char * name, const char * ps3name)
     else {
         printf("Uknown controller: %s\n", name);
     }
+
+    return controller;
 }
 
-void posixControllerGrabAxis(int * demands, int number, int value)
+void posixControllerGrabAxis(controller_t controller, int * demands, int number, int value)
 {
     // Look at all five axes for R/C transmitters, first four for other controllers
     int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;

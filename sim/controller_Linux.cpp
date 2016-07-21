@@ -30,8 +30,10 @@ static const char * JOY_DEV = "/dev/input/js0";
 
 static int joyfd;
 
-void controllerInit(void)
+controller_t controllerInit(void)
 { 
+    controller_t controller = NONE;
+
     joyfd = open(JOY_DEV, O_RDONLY);
 
     if (joyfd > 0) {
@@ -44,15 +46,17 @@ void controllerInit(void)
             printf("Uknown controller\n");
 
         else 
-            posixControllerInit(name, "MY-POWER CO.");
+            controller = posixControllerInit(name, "MY-POWER CO.");
     }
 
     // No joystick detected; use keyboard as fallback
-    else 
+    else  
         posixKbInit();
+
+    return controller;
 } 
 
-void controllerRead(int * demands, void * ignore)
+void controllerRead(controller_t controller, int * demands, void * ignore)
 {
     // Have a joystick; grab its axes
     if (joyfd > 0) {
@@ -65,7 +69,7 @@ void controllerRead(int * demands, void * ignore)
 
         // Grab demands from axes
         if (jstype == JS_EVENT_AXIS) 
-            posixControllerGrabAxis(demands, js.number, js.value);
+            posixControllerGrabAxis(controller, demands, js.number, js.value);
 
         // Grab aux demand from buttons when detected
         if ((jstype == JS_EVENT_BUTTON) && (js.value==1)) 

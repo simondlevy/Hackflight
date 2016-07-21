@@ -35,6 +35,9 @@ using namespace std;
 
 #include "controller.hpp"
 
+// Controller type
+static controller_t controller;
+
 // Stick demands from controller
 static int demands[5];
 
@@ -103,7 +106,7 @@ void printf(const char * format, ...)
 #include <conio.h>
 
 // Adapted from http://cboard.cprogramming.com/windows-programming/114294-getting-list-usb-devices-listed-system.html
-static void controllerInit(void)
+static controller_t controllerInit(void)
 { 
     // Get Number Of Devices
     UINT nDevices = 0;
@@ -312,7 +315,7 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 	demands[4] = -1000;
 
     // Each input device has its own axis and button mappings
-    controllerInit();
+    controller = controllerInit();
 
     // Now we're ready
     ready = true;
@@ -349,7 +352,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
         // Controller values from script will be used in Windows only
-        controllerRead(demands, inData);
+        controllerRead(controller, demands, inData);
 
         // PS3 spring-mounted throttle requires special handling
         if (controller == PS3) {

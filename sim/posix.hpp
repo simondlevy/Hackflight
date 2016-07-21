@@ -23,8 +23,8 @@ void posixKbGrab(char keys[8]);
 
 void posixKbClose(void);
 
-void posixControllerInit(char * name, const char * ps3name);
+controller_t posixControllerInit(char * name, const char * ps3name);
 
-void posixControllerGrabAxis(int * demands, int number, int value);
+void posixControllerGrabAxis(controller_t controller, int * demands, int number, int value);
 
 void posixControllerGrabButton(int * demands, int number);

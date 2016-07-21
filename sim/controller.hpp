@@ -18,15 +18,11 @@
 */
 
 // We currently support these controllers
-enum Controller { NONE, TARANIS, SPEKTRUM, EXTREME3D, PS3 };
-static Controller controller;
+enum controller_t { NONE, TARANIS, SPEKTRUM, EXTREME3D, PS3 };
 
 // Downscaling for hypersensitive PS3 controller
 static const int PS3_DOWNSCALE = 2;
 
-static int axisdir[5];
-static int axismap[5];
-
-void controllerInit(void);
-void controllerRead(int * demands, void * ignore);
-void controllerClose(void);
+controller_t controllerInit(void);
+void         controllerRead(controller_t controller, int * demands, void * ignore);
+void         controllerClose(void);

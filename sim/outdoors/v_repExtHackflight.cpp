@@ -25,6 +25,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 #include <iostream>
 using namespace std;
@@ -32,21 +33,15 @@ using namespace std;
 // WIN32 support
 #include <crossplatform.h>
 
-// We currently support these controllers
-enum Controller { NONE, TARANIS, SPEKTRUM, EXTREME3D, PS3 };
-static Controller controller;
+#include "controller.hpp"
 
 // Stick demands from controller
 static int demands[5];
-
 
 // MSP message support
 static char mspFromServer[200];
 static int  mspFromServerLen;
 static int  mspFromServerIndex;
-
-// Downscaling for hypersensitive PS3 controller
-static const int PS3_DOWNSCALE = 2;
 
 // Keyboard support for any OS
 static const float KEYBOARD_INC = 10;
@@ -72,7 +67,7 @@ static void kbdecrement(int index)
     kbchange(index, -1);
 }
 
-static void kbRespond(char key, char * keys) 
+void kbRespond(char key, char * keys) 
 {
 	for (int k=0; k<8; ++k)
 		if (key == keys[k]) {
@@ -84,7 +79,8 @@ static void kbRespond(char key, char * keys)
 }
 
 // Debugging support
-void debug(const char * format, ...)
+/*
+void printf(const char * format, ...)
 {
     char buffer[256];
     va_list args;
@@ -93,6 +89,7 @@ void debug(const char * format, ...)
     simSetStringSignal("debug", buffer, strlen(buffer));
     va_end (args);
 }
+*/
 
 #ifdef _WIN32 // ===================================================================
 
@@ -251,438 +248,11 @@ static void controllerClose(void)
 {
     // XXX no action needed (?)
 }
-
-#else  // Linux, OS X
-
-// Keyboard support for Linux and OS X
-
-#include <stdio.h>
+#else
 #include <unistd.h>
 #include <fcntl.h>
-#include <termios.h>
-#include <math.h>
-#include <string.h>
-
-#include <sys/time.h>
-
-static int axismap[5];
-static int axisdir[5];
-
-static struct termios oldSettings;
-
-static void posixKbInit(void)
-{
-    struct termios newSettings;
-
-    // Save keyboard settings for restoration later
-    tcgetattr(fileno( stdin ), &oldSettings);
-
-    // Create new keyboard settings
-    newSettings = oldSettings;
-    newSettings.c_lflag &= (~ICANON & ~ECHO);
-    tcsetattr(fileno(stdin), TCSANOW, &newSettings);
-}
-
-static void posixKbGrab(char keys[8])
-{
-    fd_set set;
-    struct timeval tv;
-
-    tv.tv_sec = 0;
-    tv.tv_usec = 100;
-
-    FD_ZERO( &set );
-    FD_SET( fileno( stdin ), &set );
-
-    int res = select(fileno(stdin )+1, &set, NULL, NULL, &tv);
-
-    char c = 0;
-
-    if (res > 0) {
-        read(fileno( stdin ), &c, 1);
-        kbRespond(c, keys);
-    }
-
-        else if( res < 0 ) 
-            perror( "select error" );
-}
-
-static void posixKbClose(void)
-{
-    tcsetattr(fileno(stdin), TCSANOW, &oldSettings);
-}
-
-static void posixControllerInit(char * name, const char * ps3name)
-{
-    for (int k=0; k<5; ++k)
-        axisdir[k] = +1;
-
-    if (strstr(name, "Taranis")) {
-        controller = TARANIS;
-        axismap[0] = 0;
-        axismap[1] = 1;
-        axismap[2] = 2;
-        axismap[3] = 3;
-        axismap[4] = 4;
-    }
-    else if (strstr(name, "PPM TO USB Adapter")) {
-        controller = SPEKTRUM;
-        axismap[0] = 1;
-        axismap[1] = 2;
-        axismap[2] = 5;
-        axismap[3] = 0;
-        axismap[4] = 3;
-    }
-    else if (strstr(name, ps3name)) {
-        controller = PS3;
-        axismap[0] = 2;
-        axismap[1] = 3;
-        axismap[2] = 0;
-        axismap[3] = 1;
-        axisdir[1] = -1;
-        axisdir[3] = -1;
-    }
-    else if (strstr(name, "Extreme 3D")) {
-        controller = EXTREME3D;
-        axismap[0] = 0;
-        axismap[1] = 1;
-        axismap[2] = 2;
-        axismap[3] = 3;
-        axisdir[1] = -1;
-        axisdir[3] = -1;
-    }
-    else {
-        debug("Uknown controller: %s\n", name);
-    }
-}
-
-static void posixControllerGrabAxis(int number, int value)
-{
-    // Look at all five axes for R/C transmitters, first four for other controllers
-    int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
-
-    // PS3 axes are hyper-sensitive
-    int downscale = (controller == PS3) ? PS3_DOWNSCALE : 1;
-
-    // Grab demands from axes
-    for (int k=0; k<maxaxis; ++k)
-        if (number == axismap[k]) 
-            demands[k] = axisdir[k] * (int)(1000. * value / (downscale*32767));
-}
-
-static void posixControllerGrabButton(int number)
-{
-    switch (number) {
-        case 0:
-            demands[4] = -1000;
-            break;
-        case 1:
-            demands[4] =     0;
-            break;
-        case 2:
-            demands[4] = +1000;
-    }
-}
-
-#endif // Linux, OS X
-
-// joystick support for Linux
-#ifdef __linux // ===================================================================
-
-#ifdef _COMPANION
-
-// We use OpenCV to compress JPEG for use by Python script
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-using namespace cv;
-
-#include <fcntl.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <time.h> 
-
-static int connect_to_server(int port, const char * hostname="localhost")
-{
-    // http://web.eecs.utk.edu/~plank/plank/classes/cs360/360/notes/Sockets/sockettome.c
-    struct sockaddr_in sn;
-    struct hostent *he;
-    if (!(he = gethostbyname(hostname))) {
-        debug("can't get host id for %s\n", hostname);
-    }
-    int ok = 0;
-    int sockfd = 0;
-    while (!ok) {
-        sn.sin_family = AF_INET;
-        sn.sin_port  = htons(port);
-        sn.sin_addr.s_addr = *(u_long*)(he->h_addr_list[0]);
-
-        if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-            perror("socket()");
-        }
-        ok = (connect(sockfd, (struct sockaddr*)&sn, sizeof(sn)) != -1);
-        if (!ok) sleep (1);
-    }  
-    return sockfd;
-}
-
-static const int CAMERA_PORT          = 5000;
-static const int COMMS_IN_PORT        = 5001;
-static const int COMMS_OUT_PORT       = 5002;
-static const char * IMAGE_TO_PYTHON   = "image.jpg";
-static const char * IMAGE_FROM_PYTHON = "image2.jpg";
-static const int MAXMSG               = 1000;
-
-class CompanionBoard {
-    
-    private:
-
-        int procid;
-        int camerasync_sockfd;
-        int comms_in_sockfd;
-        int comms_out_sockfd;
-        int imgsize;
-
-    public:
-
-        CompanionBoard(void)
-        {
-            this->procid = 0;
-        }
-
-        void start(void)
-        {
-            // Build command-line arguments for forking the Python server script
-            char script[200];
-            sprintf(script, "%s/hackflight_companion.py", VREP_DIR);
-            char camera_port[10];
-            sprintf(camera_port, "%d", CAMERA_PORT);
-            char comms_in_port[10];
-            sprintf(comms_in_port, "%d", COMMS_IN_PORT);
-            char comms_out_port[10];
-            sprintf(comms_out_port, "%d", COMMS_OUT_PORT);
-            char *argv[7] = { 
-                (char *)script, 
-                camera_port, 
-                comms_in_port, 
-                comms_out_port, 
-                (char *)IMAGE_TO_PYTHON, 
-                (char *)IMAGE_FROM_PYTHON, 
-                NULL};
-
-            // Fork the Python server script
-            this->procid = fork();
-            if (this->procid == 0) {
-                execvp(script, argv);
-                exit(0);
-            }
-
-            // Open a socket for syncing camera images with the server, and sockets for comms
-            this->camerasync_sockfd = connect_to_server(CAMERA_PORT);
-            this->comms_in_sockfd = connect_to_server(COMMS_IN_PORT);
-            this->comms_out_sockfd = connect_to_server(COMMS_OUT_PORT);
-        }
-
-        void update(char * imageBytes, int imageWidth, int imageHeight,
-                char * requestStr, int & requestLen)
-        {
-            // Use OpenCV to save image as JPEG
-            Mat image = Mat(imageHeight, imageWidth, CV_8UC3, imageBytes);
-            flip(image, image, 0);                 // rectify image
-            cvtColor(image, image, COLOR_BGR2RGB); // convert image BGR->RGB
-            imwrite(IMAGE_TO_PYTHON, image);
-
-            // Send sync byte to Python server, which will open the image, process it, and
-            // write the processed image to another file
-            char sync = 0;
-            write(this->camerasync_sockfd, &sync, 1);
-
-            // If server has created a file for the processed image, open it copy its bytes back to V-REP's camera image
-            struct stat fileStat; 
-            if (!stat(IMAGE_FROM_PYTHON, &fileStat)) {
-                Mat image2 = imread(IMAGE_FROM_PYTHON, CV_LOAD_IMAGE_COLOR);
-                flip(image2, image2, 0);                 // rectify image
-                cvtColor(image2, image2, COLOR_RGB2BGR); // convert image BGR->RGB
-                memcpy(imageBytes, image2.data, imageWidth*imageHeight*3);
-            }
-
-            // Check whether bytes are available from server
-            int avail;
-            ioctl(this->comms_in_sockfd, FIONREAD, &avail);
-
-            // Ignore OOB values for available bytes
-            if (avail > 0 && avail < MAXMSG) {
-                char msg[MAXMSG];
-                read(this->comms_in_sockfd, msg, avail);
-                memcpy(requestStr, msg, avail);
-                requestLen = avail;
-            }
-        }
-
-        void sendByte(uint8_t b)
-        {
-            write(this->comms_out_sockfd, &b, 1);
-        }
-
-        void halt(void)
-        {
-            if (this->procid) {
-                close(this->camerasync_sockfd);
-                close(this->comms_in_sockfd);
-                close(this->comms_out_sockfd);
-                kill(this->procid, SIGKILL);
-            }
-        }
-
-}; // CompanionBoard
-
-static CompanionBoard companionBoard;
-
-#endif // _COMPANION
-
-static const char * JOY_DEV = "/dev/input/js0";
-
-#include <linux/joystick.h>
-
-static int joyfd;
-
-static void controllerInit(void)
-{ 
-    joyfd = open(JOY_DEV, O_RDONLY);
-
-    if (joyfd > 0) {
-
-        fcntl(joyfd, F_SETFL, O_NONBLOCK);
-
-        char name[128];
-
-        if (ioctl(joyfd, JSIOCGNAME(sizeof(name)), name) < 0)
-            debug("Uknown controller\n");
-
-        else 
-            posixControllerInit(name, "MY-POWER CO.");
-    }
-
-    // No joystick detected; use keyboard as fallback
-    else 
-        posixKbInit();
-} 
-
-static void controllerRead(void * ignore)
-{
-    // Have a joystick; grab its axes
-    if (joyfd > 0) {
-
-        struct js_event js;
-
-        read(joyfd, &js, sizeof(struct js_event));
-
-        int jstype = js.type & ~JS_EVENT_INIT;
-
-        // Grab demands from axes
-        if (jstype == JS_EVENT_AXIS) 
-            posixControllerGrabAxis(js.number, js.value);
-
-        // Grab aux demand from buttons when detected
-        if ((jstype == JS_EVENT_BUTTON) && (js.value==1)) 
-            posixControllerGrabButton(js.number);
-    }
-
-    // No joystick; use keyboard
-    else  {
-        char keys[8] = {68, 67, 66, 65, 50, 10, 54, 53};
-        posixKbGrab(keys);
-    }
-}
-
-static void controllerClose(void)
-{
-    if (joyfd > 0)
-        close(joyfd);
-
-    else // reset keyboard if no joystick
-        posixKbClose();
-}
-#endif // Linux
-
-// joystick support for OS X
-#ifdef __APPLE__  // ===================================================================
-
-#include <SDL.h>
-
-#include <sys/select.h>
-
-static SDL_Joystick * joystick;
-
-static void controllerInit(void)
-{
-    if (SDL_Init(SDL_INIT_JOYSTICK)) {
-        debug("Failed to initialize SDL; using keyboard\n");
-        posixKbInit();
-        return;
-    }
-
-    if (!(joystick = SDL_JoystickOpen(0))) {
-        debug("Unable to open joystick; using keyboard\n");
-        posixKbInit();
-        return;
-    }
-
-    for (int k=0; k<5; ++k)
-        axisdir[k] = +1;
-
-    char name[100];
-    strcpy(name, SDL_JoystickNameForIndex(0));
-
-    posixControllerInit(name, "2In1 USB Joystick");
-}
-
-static void controllerRead(void * ignore)
-{
-    if (joystick) {
-
-        // Poll until we get an event
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-            ;
-
-        if (event.type == SDL_JOYAXISMOTION) {
-            SDL_JoyAxisEvent js = event.jaxis;
-            posixControllerGrabAxis(js.axis, js.value);
-        }
-
-        if (event.type == SDL_JOYBUTTONDOWN) {
-            SDL_JoyButtonEvent jb = event.jbutton;
-            posixControllerGrabButton(jb.button);
-        }
-     }
-
-    // Fall back on keyboard if no controller
-    else {
-        char keys[8] = {52, 54, 50, 56, 48, 10, 51, 57};
-        posixKbGrab(keys);
-    }
-}
-
-static void controllerClose(void)
-{
-    if (joystick)
-        SDL_JoystickClose(joystick);
-
-    else // reset keyboard if no joystick
-        posixKbClose();
-}
-
-#endif // OS X
+#include "posix.hpp"
+#endif // _WIN32
 
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
@@ -710,24 +280,11 @@ static double gyro[3];
 // Barometer support
 static int baroPressure;
 
-// Sonar support
-static int sonarAGL;
-
 // Motor support
 static float thrusts[4];
 
 // 100 Hz timestep, used for simulating microsend timer
 static double timestep = .01;
-
-// Timing support
-#ifdef __linux
-static unsigned long int update_count;
-struct timeval start_time;
-static void gettime(struct timeval * start_time)
-{
-    gettimeofday(start_time, NULL);
-}
-#endif
 
 
 // --------------------------------------------------------------------------------------
@@ -735,22 +292,13 @@ static void gettime(struct timeval * start_time)
 // --------------------------------------------------------------------------------------
 #define LUA_START_COMMAND  "simExtHackflight_start"
 
+
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
 
-#ifdef __linux
-	update_count = 0;
-    gettime(&start_time);
-
-#ifdef _COMPANION
-    // Start companion board
-    companionBoard.start();
-#endif
-#endif
-
     CScriptFunctionData D;
 
-    // Run Hackflight setup()
+     // Run Hackflight setup()
     setup();
 
     // Need this for throttle on keyboard and PS3
@@ -778,15 +326,14 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
 static const int inArgs_UPDATE[]={
-    8,
+    7,
     sim_script_arg_int32|sim_script_arg_table,3,  // axes
 	sim_script_arg_int32|sim_script_arg_table,3,  // rotAxes
 	sim_script_arg_int32|sim_script_arg_table,2,  // sliders
 	sim_script_arg_int32,0,                       // buttons (as bit-coded integer)
     sim_script_arg_double|sim_script_arg_table,3, // Gyro values
     sim_script_arg_double|sim_script_arg_table,3, // Accelerometer values
-    sim_script_arg_int32,0,                       // Barometric pressure
-    sim_script_arg_int32,0                        // Sonar distance
+    sim_script_arg_int32,0
 };
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
@@ -798,7 +345,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
 
         // Controller values from script will be used in Windows only
-        controllerRead(inData);
+        controllerRead(demands, inData);
 
         // PS3 spring-mounted throttle requires special handling
         if (controller == PS3) {
@@ -819,10 +366,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         }
 
         // Read barometer
-        baroPressure = inData->at(6).int32Data[0];
-
-        // Read sonar
-        sonarAGL = inData->at(7).int32Data[0];
+        baroPressure  = inData->at(6).int32Data[0];
 
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
@@ -839,16 +383,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     D.pushOutData(CScriptFunctionDataItem(true)); 
     D.writeDataToStack(cb->stackID);
 
-
-#ifdef __linux
-    update_count++;
-    struct timeval stop_time;
-    gettime(&stop_time);
-    long elapsed_time = stop_time.tv_sec - start_time.tv_sec;
-    if (elapsed_time > 0)
-        /*debug("%d FPS\n", update_count / elapsed_time)*/;
-#endif
-
 } // LUA_UPDATE_COMMAND
 
 
@@ -861,10 +395,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
     controllerClose();
-
-#if defined(__linux) && defined(_COMPANION)
-    companionBoard.halt();
-#endif
 
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true));
@@ -884,6 +414,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
     GetModuleFileName(NULL,curDirAndFile,1023);
     PathRemoveFileSpec(curDirAndFile);
 #endif
+
+// Posix
 #elif defined (__linux) || defined (__APPLE__)
     getcwd(curDirAndFile, sizeof(curDirAndFile));
 #endif
@@ -898,7 +430,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 #elif defined (__APPLE__)
     temp+="/libv_rep.dylib";
 #endif /* __linux || __APPLE__ */
-
+// Posix
     vrepLib=loadVrepLibrary(temp.c_str());
     if (vrepLib==NULL)
     {
@@ -969,28 +501,6 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
     // Don't do anything till start() has been called
     if (!ready)
         return NULL;
-
-    // Handle messages from belly camera
-    if (message ==  sim_message_eventcallback_openglcameraview && auxiliaryData[2] == 1) {
-
-        // Send in image bytes, get back serial message request
-#if defined(__linux) && defined(_COMPANION)
-        char request[200];
-        int requestLen = 0;
-        companionBoard.update((char *)customData, auxiliaryData[0], auxiliaryData[1], request, requestLen);
-
-
-        // v_repMessage gets called much more frequently than firmware's serial requests, so avoid interrupting
-        // request handling
-        if (!mspFromServerLen) {
-            mspFromServerLen = requestLen;
-            mspFromServerIndex = 0;
-            memcpy(mspFromServer, request, requestLen);
-        }
-#endif
-        // Flag overwrite of original OpenGL image
-        auxiliaryData[3] = 1; 
-    }
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
@@ -1162,9 +672,6 @@ uint8_t Board::serialReadByte(void)
 
 void Board::serialWriteByte(uint8_t c)
 {
-#if defined(__linux) && defined(_COMPANION)
-    companionBoard.sendByte(c);
-#endif
 }
 
 void Board::writeMotor(uint8_t index, uint16_t value)
