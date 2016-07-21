@@ -126,6 +126,7 @@
     <ClCompile Include="..\..\firmware\navigate.cpp" />
     <ClCompile Include="..\..\firmware\rc.cpp" />
     <ClCompile Include="..\..\firmware\stabilize.cpp" />
+    <ClCompile Include="..\controller_Windows.cpp" />
     <ClCompile Include="v_repExtHackflight.cpp" />
   </ItemGroup>
   <ItemGroup>

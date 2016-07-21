@@ -26,3 +26,6 @@ static const int PS3_DOWNSCALE = 2;
 controller_t controllerInit(void);
 void         controllerRead(controller_t controller, int * demands, void * ignore);
 void         controllerClose(void);
+
+// in v_repExtHackflight.cpp
+extern void kbRespond(char key, char * keys);

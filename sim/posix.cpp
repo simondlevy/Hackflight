@@ -32,9 +32,6 @@
 static int axisdir[5];
 static int axismap[5];
 
-// in v_repExtHackflight.cpp
-extern void kbRespond(char key, char * keys);
-
 static struct termios oldSettings;
 
 void posixKbInit(void)
