@@ -34,6 +34,7 @@ using namespace std;
 #include <crossplatform.h>
 
 #include "controller.hpp"
+#include "extras.hpp"
 
 // Controller type
 static controller_t controller;
@@ -144,7 +145,6 @@ static double timestep = .01;
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
-
     CScriptFunctionData D;
 
      // Run Hackflight setup()
@@ -159,6 +159,9 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
     // Each input device has its own axis and button mappings
     controller = controllerInit();
+
+    // Do any extra initialization needed
+    extrasStart();
 
     // Now we're ready
     ready = true;
@@ -228,6 +231,9 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     // Increment microsecond count
     micros += (uint32_t)(1e6 * timestep);
 
+    // Do any extra update needed
+    extrasUpdate();
+
     // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true)); 
     D.writeDataToStack(cb->stackID);
@@ -244,6 +250,9 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
     controllerClose();
+
+    // Do any extra shutdown needed
+    extrasStop();
 
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true));
