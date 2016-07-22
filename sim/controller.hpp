@@ -1,6 +1,8 @@
 /*
    controllers.hpp : Common declarations for controller input functions in simulator
 
+   Each OS handles controllers differently.
+
    Copyright (C) Simon D. Levy, Matt Lubas, and Julio Hidalgo Lopez 2016
 
    This file is part of Hackflight.
@@ -19,9 +21,6 @@
 
 // We currently support these controllers
 enum controller_t { NONE, TARANIS, SPEKTRUM, EXTREME3D, PS3 };
-
-// Downscaling for hypersensitive PS3 controller
-static const int PS3_DOWNSCALE = 2;
 
 controller_t controllerInit(void);
 void         controllerRead(controller_t controller, int * demands, void * ignore);

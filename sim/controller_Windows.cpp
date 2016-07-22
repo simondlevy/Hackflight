@@ -164,14 +164,14 @@ void controllerRead(controller_t controller, int * demands, void * inDataPtr)
             demands[1] = -inData->at(0).int32Data[1];	// pitch
             demands[2] =  inData->at(1).int32Data[2];	// yaw
             demands[3] = -inData->at(2).int32Data[0];	// throttle
-            buttonToAuxDemand(demands, inData);					// aux switch
+            buttonToAuxDemand(demands, inData);		    // aux switch
             break;
 
         case PS3:
-            demands[0] =  inData->at(0).int32Data[2] / PS3_DOWNSCALE;	// roll
-            demands[1] = -inData->at(1).int32Data[2] / PS3_DOWNSCALE;	// pitch
-            demands[2] =  inData->at(0).int32Data[0] / PS3_DOWNSCALE;	// yaw
-            demands[3] = -inData->at(0).int32Data[1] / PS3_DOWNSCALE;	// throttle
+            demands[0] =  inData->at(0).int32Data[2];	// roll
+            demands[1] = -inData->at(1).int32Data[2];	// pitch
+            demands[2] =  inData->at(0).int32Data[0];	// yaw
+            demands[3] = -inData->at(0).int32Data[1];	// throttle
             buttonToAuxDemand(demands, inData);  // aux switch
             break;
 

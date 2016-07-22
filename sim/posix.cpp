@@ -129,13 +129,10 @@ void posixControllerGrabAxis(controller_t controller, int * demands, int number,
     // Look at all five axes for R/C transmitters, first four for other controllers
     int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
 
-    // PS3 axes are hyper-sensitive
-    int downscale = (controller == PS3) ? PS3_DOWNSCALE : 1;
-
     // Grab demands from axes
     for (int k=0; k<maxaxis; ++k)
         if (number == axismap[k]) 
-            demands[k] = axisdir[k] * (int)(1000. * value / (downscale*32767));
+            demands[k] = axisdir[k] * (int)(1000. * value / 32767);
 }
 
 void posixControllerGrabButton(int * demands, int number)
