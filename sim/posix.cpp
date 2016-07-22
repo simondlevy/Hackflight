@@ -78,7 +78,7 @@ void posixKbClose(void)
 
 controller_t posixControllerInit(char * name, const char * ps3name)
 {
-    controller_t controller = NONE;
+    controller_t controller = KEYBOARD;
 
     for (int k=0; k<5; ++k)
         axisdir[k] = +1;

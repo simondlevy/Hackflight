@@ -32,7 +32,7 @@ static int joyfd;
 
 controller_t controllerInit(void)
 { 
-    controller_t controller = NONE;
+    controller_t controller = KEYBOARD;
 
     joyfd = open(JOY_DEV, O_RDONLY);
 

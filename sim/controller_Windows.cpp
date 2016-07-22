@@ -45,7 +45,7 @@ controller_t controllerInit(void)
 
     // Got Any?
     if(nDevices < 1)
-        return NONE;
+        return KEYBOARD;
 
     // Allocate Memory For Device List
     PRAWINPUTDEVICELIST pRawInputDeviceList;
@@ -55,7 +55,7 @@ controller_t controllerInit(void)
     if( pRawInputDeviceList == NULL ) {
         // Error
         cout << "ERR: Could not allocate memory for Device List.";
-        return NONE;
+        return KEYBOARD;
     }
 
     // Fill Device List Buffer
@@ -69,7 +69,7 @@ controller_t controllerInit(void)
 
         // Error
         cout << "ERR: Could not get device list.";
-        return NONE;
+        return KEYBOARD;
     }
 
     // Set Device Info & Buffer Size
@@ -84,10 +84,10 @@ controller_t controllerInit(void)
     if(nResult < 0 ) {
         // Error
         cout << "ERR: Unable to read Device Info." << endl;
-        return NONE;
+        return KEYBOARD;
     }
 
-	controller_t controller = NONE;
+	controller_t controller = KEYBOARD;
 
     // Some HID
     if (rdiDeviceInfo.dwType == RIM_TYPEHID) {

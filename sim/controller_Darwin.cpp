@@ -31,13 +31,13 @@ controller_t controllerInit(void)
     if (SDL_Init(SDL_INIT_JOYSTICK)) {
         printf("Failed to initialize SDL; using keyboard\n");
         posixKbInit();
-        return NONE;
+        return KEYBOARD;
     }
 
     if (!(joystick = SDL_JoystickOpen(0))) {
         printf("Unable to open joystick; using keyboard\n");
         posixKbInit();
-        return NONE;
+        return KEYBOARD;
     }
 
     char name[100];

@@ -1,5 +1,5 @@
 /*
-   controllers.hpp : Common declarations for controller input functions in simulator
+   controller.hpp : Common declarations for controller input functions in simulator
 
    Each OS handles controllers differently.
 
@@ -20,7 +20,7 @@
 */
 
 // We currently support these controllers
-enum controller_t { NONE, TARANIS, SPEKTRUM, EXTREME3D, PS3 };
+enum controller_t { KEYBOARD, TARANIS, SPEKTRUM, EXTREME3D, PS3 };
 
 controller_t controllerInit(void);
 void         controllerRead(controller_t controller, int * demands, void * ignore);
