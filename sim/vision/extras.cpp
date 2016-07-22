@@ -19,6 +19,11 @@
 
 #include "extras.hpp"
 
+#include "v_repExtHackflight.h"
+#include "scriptFunctionData.h"
+#include "v_repLib.h"
+
+
 #include <stdio.h>
 
 // MSP message support
@@ -192,22 +197,27 @@ void extrasUpdate(void)
 {
 }
 
-void extrasMessage(int * auxiliaryData, void * customData)
+void extrasMessage(int message, int * auxiliaryData, void * customData)
 {
-    char request[200];
-    int requestLen = 0;
-    companionBoard.update((char *)customData, auxiliaryData[0], auxiliaryData[1], request, requestLen);
+    // Handle messages from belly camera
+    if (message ==  sim_message_eventcallback_openglcameraview && auxiliaryData[2] == 1) {
 
-    // v_repMessage gets called much more frequently than firmware's serial requests, so avoid interrupting
-    // request handling
-    if (!mspFromServerLen) {
-        mspFromServerLen = requestLen;
-        mspFromServerIndex = 0;
-        memcpy(mspFromServer, request, requestLen);
+        // Send in image bytes, get back serial message request
+        char request[200];
+        int requestLen = 0;
+        companionBoard.update((char *)customData, auxiliaryData[0], auxiliaryData[1], request, requestLen);
+
+
+        // v_repMessage gets called much more frequently than firmware's serial requests, so avoid interrupting
+        // request handling
+        if (!mspFromServerLen) {
+            mspFromServerLen = requestLen;
+            mspFromServerIndex = 0;
+            memcpy(mspFromServer, request, requestLen);
+        }
+        // Flag overwrite of original OpenGL image
+        auxiliaryData[3] = 1; 
     }
-
-    // Flag overwrite of original OpenGL image
-    auxiliaryData[3] = 1; 
 }
 
 void extrasStop(void)
@@ -218,7 +228,6 @@ void extrasStop(void)
 uint8_t Board::serialAvailableBytes(void)
 {
     return mspFromServerLen;
-}
 }
 
 uint8_t Board::serialReadByte(void)
