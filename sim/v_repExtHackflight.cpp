@@ -42,11 +42,6 @@ static controller_t controller;
 // Stick demands from controller
 static int demands[5];
 
-// MSP message support
-static char mspFromServer[200];
-static int  mspFromServerLen;
-static int  mspFromServerIndex;
-
 // Keyboard support for any OS
 static const float KEYBOARD_INC = 10;
 static void kbchange(int index, int dir)
@@ -363,6 +358,9 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
     if (!ready)
         return NULL;
 
+    // Handle messages mission-specifically
+    extrasMessage(message, auxiliaryData, customData);
+
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
     simSetIntegerParameter(sim_intparam_error_report_mode,sim_api_errormessage_ignore);
@@ -517,21 +515,6 @@ uint16_t Board::readPWM(uint8_t chan)
 }
 
 void Board::reboot(void)
-{
-}
-
-uint8_t Board::serialAvailableBytes(void)
-{
-    return mspFromServerLen;
-}
-
-uint8_t Board::serialReadByte(void)
-{
-    mspFromServerLen--;
-    return mspFromServer[mspFromServerIndex++];
-}
-
-void Board::serialWriteByte(uint8_t c)
 {
 }
 

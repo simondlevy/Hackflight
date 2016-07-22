@@ -17,8 +17,13 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdint.h>
+#include <board.hpp>
+
 void extrasStart(void);
 
 void extrasUpdate(void);
+
+void extrasMessage(int message, int * auxiliaryData, void * customData);
 
 void extrasStop(void);

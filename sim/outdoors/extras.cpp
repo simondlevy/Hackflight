@@ -27,6 +27,26 @@ void extrasUpdate(void)
 {
 }
 
+void extrasMessage(int message, int * auxiliaryData, void * customData)
+{
+}
+
 void extrasStop(void)
 {
 }
+
+uint8_t Board::serialAvailableBytes(void)
+{
+    return 0;
+}
+
+uint8_t Board::serialReadByte(void)
+{
+    return 0;
+}
+
+void Board::serialWriteByte(uint8_t c)
+{
+}
+
+
