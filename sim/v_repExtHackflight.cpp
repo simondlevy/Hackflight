@@ -196,6 +196,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
         // PS3 spring-mounted throttle requires special handling
         if (controller == PS3) {
+
             throttleDemand += (int)(demands[3] * PS3_THROTTLE_INC);     
             if (throttleDemand < -1000)
                 throttleDemand = -1000;
@@ -506,7 +507,13 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
+    // Special handling for throttle
     int demand = (chan == 3) ? throttleDemand : demands[chan];
+
+    // Special handling for pitch, roll on PS3
+    if (controller == PS3 && chan < 2) {
+        demand /= 2;
+    }
 
     // V-REP sends joystick demands in [-1000,+1000]
     int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
