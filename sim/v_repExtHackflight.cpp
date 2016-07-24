@@ -17,6 +17,12 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// Physics simulation parameters
+
+static const int PARTICLE_COUNT_PER_SECOND = 750;
+static const int PARTICLE_DENSITY          = 20000;
+static const float PARTICLE_SIZE           = .005;
+
 #include "v_repExtHackflight.h"
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
@@ -185,6 +191,8 @@ static const int inArgs_UPDATE[]={
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
+    printf("update\n");
+
     CScriptFunctionData D;
 
     if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
@@ -358,6 +366,8 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
     // Don't do anything till start() has been called
     if (!ready)
         return NULL;
+
+    printf("message\n");
 
     // Handle messages mission-specifically
     extrasMessage(message, auxiliaryData, customData);

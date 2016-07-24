@@ -252,7 +252,7 @@ void Navigation::perform(void)
 
     } // if this->flightMode
 
-   printf("est alt: %d cm\n", this->estAlt);
+   //printf("est alt: %d cm\n", this->estAlt);
 
 
 } // updatePid
