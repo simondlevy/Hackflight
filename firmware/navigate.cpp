@@ -150,7 +150,7 @@ void Navigation::updateAltitudePid(bool armed)
     // complementary filter for altitude estimation (baro & acc)
     accelAlt = complementaryFilter((float)accelAlt, (float)fusedBarosonarAlt, (float)CONFIG_BARO_CF_ALT);
 
-    //this->estAlt = sonarInRange() ? fusedBarosonarAlt : (int32_t)accelAlt;
+    this->estAlt = sonarInRange() ? fusedBarosonarAlt : (int32_t)accelAlt;
 
     // reset acceleromter sum
     this->imu->resetAccelSum();
@@ -209,9 +209,10 @@ void Navigation::perform(void)
     return;
 #endif
 
-    if (this->flightMode) {
+    if (this->flightMode) { // alt-hold or guided
 
         static bool isaltHoldChanged = false;
+
         if (CONFIG_HOVER_ALT_HOLD_FAST_CHANGE) {
             // rapid alt changes
             if (abs(this->rc->command[THROTTLE] - this->initialThrottleHold) > CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL) {
@@ -227,7 +228,9 @@ void Navigation::perform(void)
                 this->rc->command[THROTTLE] = constrain(this->initialThrottleHold + this->altPID, 
                         CONFIG_PWM_MIN, CONFIG_PWM_MAX);
             }
-        } else {
+        } 
+        
+        else {
             // slow alt changes
             if (abs(this->rc->command[THROTTLE] - this->initialThrottleHold) > CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL) {
                 // set velocity proportional to stick movement +100 throttle gives ~ +50 cm/s
@@ -239,15 +242,17 @@ void Navigation::perform(void)
                 this->verticalVelocityControl = false;
                 isaltHoldChanged = false;
             }
-            this->rc->command[THROTTLE] = constrain(this->initialThrottleHold + this->altPID, CONFIG_PWM_MIN, CONFIG_PWM_MAX);
+            this->rc->command[THROTTLE] = constrain(this->initialThrottleHold + this->altPID, 
+                    CONFIG_PWM_MIN, CONFIG_PWM_MAX);
         }
 
         if (this->flightMode == MODE_GUIDED) {
-            printf("guided\n");
         }
 
 
     } // if this->flightMode
+
+   printf("est alt: %d cm\n", this->estAlt);
 
 
 } // updatePid
