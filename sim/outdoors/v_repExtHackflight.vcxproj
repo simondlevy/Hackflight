@@ -50,7 +50,7 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\levys\Desktop\hackflight\sim;C:\Users\levys\Desktop\hackflight\firmware;C:\Program Files %28x86%29\V-REP3\V-REP_PRO_EDU\programming\include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\levys\Desktop\hackflight\sim\outdoors;C:\Users\levys\Desktop\hackflight\sim;C:\Users\levys\Desktop\hackflight\firmware;C:\Program Files %28x86%29\V-REP3\V-REP_PRO_EDU\programming\include;$(IncludePath)</IncludePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\levys\Desktop\hackflight\firmware;C:\Users\levys\Desktop\hackflight\sim;C:\Program Files %28x86%29\V-REP3\V-REP_PRO_EDU\programming\include;$(IncludePath)</IncludePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\levys\Desktop\hackflight\firmware;$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
@@ -131,6 +131,7 @@
     <ClCompile Include="extras.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="pidvals.hpp" />
     <ClInclude Include="v_repExtHackflight.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
