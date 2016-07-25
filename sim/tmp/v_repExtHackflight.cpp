@@ -86,19 +86,6 @@ void kbRespond(char key, char * keys)
         }
 }
 
-// Debugging support
-/*
-void printf(const char * format, ...)
-{
-    char buffer[256];
-    va_list args;
-    va_start (args, format);
-    VSNPRINTF(buffer, 255, format, args);
-    simSetStringSignal("debug", buffer, strlen(buffer));
-    va_end (args);
-}
-*/
-
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
@@ -248,6 +235,14 @@ static void set_indexed_float_signal(const char * name, int i, int k, float valu
     simSetFloatSignal(tmp, value);
 }
 
+static void set_indexed_float_signal(const char * name, int i, float value)
+{
+    char tmp[100];
+    sprintf(tmp, "%s%d", name, i);
+    simSetFloatSignal(tmp, value);
+}
+
+
 static void scalarTo3D(float s, float a[12], float out[3])
 {
     out[0] = s*a[2];
@@ -312,11 +307,8 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         }
 
         // Set thrust for each motor
-        for (int i=0; i<4; ++i) {
-            char signame[10];
-            SPRINTF(signame, "thrust%d", i+1);
-            simSetFloatSignal(signame, thrusts[i]);
-        }
+        for (int i=0; i<4; ++i) 
+            set_indexed_float_signal("thrust", i+1, thrusts[i]);
     }
 
     // Increment microsecond count
@@ -331,13 +323,15 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     for (int i=0; i<4; ++i) {
 
         // Get motor thrust in interval [0,1] from plugin
-        float thrust = get_indexed_float_signal("thrust", i);
+        float thrust = get_indexed_float_signal("thrust", i+1);
+
+        printf("%d: %f    ", i, thrust);
 
         // Simulate prop spin as a function of thrust
         float jointAngleOld;
         simGetJointPosition(motorJointList[i], &jointAngleOld);
         float jointAngleNew = jointAngleOld + propDirections[i] * thrust * 1.25;
-        //simSetJointPosition(motorJointList[i], jointAngleNew);
+        simSetJointPosition(motorJointList[i], jointAngleNew);
 
         // Convert thrust to force and torque
         float force = particleCount * PARTICLE_DENSITY * thrust * M_PI * pow(PARTICLE_SIZE,3) / timestep;
@@ -365,6 +359,8 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         }
 
     } // loop over motors
+
+    printf("\n");
 
     // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true)); 
