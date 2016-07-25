@@ -329,7 +329,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         float jointAngleOld;
         simGetJointPosition(motorJointList[i], &jointAngleOld);
         float jointAngleNew = jointAngleOld + propDirections[i] * thrust * 1.25;
-        printf("%d: %f => %f    ", motorJointList[i], jointAngleOld, jointAngleNew);
         simSetJointPosition(motorJointList[i], jointAngleNew);
 
         // Convert thrust to force and torque
@@ -337,7 +336,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         float torque = tsigns[i] * thrust;
 
         // Compute force and torque signals based on thrust
-        //set_indexed_suffixed_float_signal("Motor", i, "respondable", motorRespondableList[i]);
+        set_indexed_suffixed_float_signal("Motor", i, "respondable", motorRespondableList[i]);
 
         // Get motor matrix
         float motorMatrix[12];
@@ -353,13 +352,11 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
         // Send forces and torques to props
         for (int k=0; k<3; ++k) {
-            //set_indexed_float_signal("force",  i, k, forces[k]);
-            //set_indexed_float_signal("torque", i, k, torques[k]);
+            set_indexed_float_signal("force",  i, k, forces[k]);
+            set_indexed_float_signal("torque", i, k, torques[k]);
         }
 
     } // loop over motors
-
-    printf("\n");
 
     // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true)); 
