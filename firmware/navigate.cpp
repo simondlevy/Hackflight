@@ -209,6 +209,8 @@ void Navigation::perform(void)
     return;
 #endif
 
+    printf("%d\n", this->flightMode);
+
     if (this->flightMode) { // alt-hold or guided
 
         static bool isaltHoldChanged = false;

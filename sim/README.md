@@ -31,7 +31,9 @@ to launch V-REP.
 update rate, agree.  You may have to do this three times.
 <p><li>If the vehicle takes off immediately, make sure your throttle is down by
 raising it slightly and then lowering it all the way down.  You may also need to wiggle
-the sticks a little at first for the simulator to detect them.
+the sticks a little at first for the simulator to detect them.  Inexpensive clones of 
+controllers like the XBOX360 tend to give a noisy signal (nonzero values when
+centered).
 </ul>
 <p><li>Press the square stop button at the top of V-REP to stop the simulation.
 </ol>
