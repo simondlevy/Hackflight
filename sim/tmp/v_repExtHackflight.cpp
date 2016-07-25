@@ -21,7 +21,7 @@
 
 static const int PARTICLE_COUNT_PER_SECOND = 750;
 static const int PARTICLE_DENSITY          = 20000;
-static const float PARTICLE_SIZE           = .005;
+static const float PARTICLE_SIZE           = .005f;
 
 #include "v_repExtHackflight.h"
 #include "scriptFunctionData.h"
@@ -126,7 +126,20 @@ static int baroPressure;
 static float thrusts[4];
 
 // 100 Hz timestep, used for simulating microsend timer
-static double timestep = .01;
+static float timestep;
+
+static int particleCount;
+
+static const int propDirections[4] = {-1,+1,+1,-1};
+
+static int motorList[4];
+static int motorRespondableList[4];
+static int motorJointList[4];
+
+static int quadcopterHandle;
+static int accelHandle;
+static int greenLedHandle;
+static int redLedHandle;
 
 
 // --------------------------------------------------------------------------------------
@@ -135,8 +148,41 @@ static double timestep = .01;
 #define LUA_START_COMMAND  "simExtHackflight_start"
 
 
+static int get_indexed_object_handle(const char * name, int index)
+{
+    char tmp[100];
+    sprintf(tmp, "%s%d", name, index);
+    return simGetObjectHandle(tmp);
+}
+
+static int get_indexed_suffixed_object_handle(const char * name, int index, const char * suffix)
+{
+    char tmp[100];
+    sprintf(tmp, "%s%d_%s", name, index, suffix);
+    return simGetObjectHandle(tmp);
+}
+
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
+
+    // Get the object handles for the motors, joints, respondables
+    for (int i=0; i<4; ++i) {
+        motorList[i]            = get_indexed_object_handle("Motor", i);
+        motorRespondableList[i] = get_indexed_suffixed_object_handle("Motor", i, "_respondable");
+        motorJointList[i]       = get_indexed_suffixed_object_handle("Motor", i, "_joint");
+    }
+
+    // Get handle for objects we'll access
+    quadcopterHandle   = simGetObjectHandle("Quadcopter");
+    accelHandle        = simGetObjectHandle("Accelerometer_forceSensor");
+    greenLedHandle     = simGetObjectHandle("Green_LED_visible");
+    redLedHandle       = simGetObjectHandle("Red_LED_visible");
+
+    // Timestep is used in various places
+    timestep = simGetSimulationTimeStep();
+
+    particleCount = (int)(PARTICLE_COUNT_PER_SECOND * timestep);
+
     CScriptFunctionData D;
 
      // Run Hackflight setup()
