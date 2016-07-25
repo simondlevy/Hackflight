@@ -21,7 +21,7 @@
 
 static const int PARTICLE_COUNT_PER_SECOND = 750;
 static const int PARTICLE_DENSITY          = 20000;
-static const float PARTICLE_SIZE           = .005;
+static const float PARTICLE_SIZE           = .005f;
 
 #include "v_repExtHackflight.h"
 #include "scriptFunctionData.h"
@@ -36,7 +36,7 @@ static const float PARTICLE_SIZE           = .005;
 #include <iostream>
 using namespace std;
 
-// WIN32 support
+// Cross-platform support for firmware
 #include <crossplatform.h>
 
 #include "controller.hpp"
@@ -96,14 +96,13 @@ void printf(const char * format, ...)
 }
 */
 
-#ifdef _WIN32 // ===================================================================
-
-
+#ifdef _WIN32
+#include "Shlwapi.h"
 #else
 #include <unistd.h>
 #include <fcntl.h>
 #include "posix.hpp"
-#endif // not _WIN32
+#endif 
 
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
@@ -262,25 +261,17 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 }
 // --------------------------------------------------------------------------------------
 
-#ifdef _WIN32
-#include "Shlwapi.h"
-#endif
+
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
-{ // This is called just once, at the start of V-REP.
-    // Dynamically load and bind V-REP functions:
+{ 
     char curDirAndFile[1024];
+
 #ifdef _WIN32
-#ifdef QT_COMPIL
-    _getcwd(curDirAndFile, sizeof(curDirAndFile));
-#else
     GetModuleFileName(NULL,curDirAndFile,1023);
     PathRemoveFileSpec(curDirAndFile);
-#endif
-
-// Posix
-#elif defined (__linux) || defined (__APPLE__)
-    getcwd(curDirAndFile, sizeof(curDirAndFile));
+#else // Posix
+	getcwd(curDirAndFile, sizeof(curDirAndFile));
 #endif
 
     std::string currentDirAndPath(curDirAndFile);
@@ -521,7 +512,7 @@ uint16_t Board::readPWM(uint8_t chan)
        if (controller == PS3)
         demand /= 2;
        if (controller == XBOX360)
-        demand /= 1.5;
+        demand = (int)(demand / 1.5);
     }
 
     // V-REP sends joystick demands in [-1000,+1000]

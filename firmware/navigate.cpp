@@ -192,7 +192,7 @@ void Navigation::updateAltitudePid(bool armed)
         this->altPID += errorVerticalVelocityI / 8196;     // I in the range of +/-200
 
         // D
-        this->altPID -= constrain(CONFIG_HOVER_VEL_D * (this->accelZ + this->accelZ_prev) / 512, -150, 150);
+        this->altPID -= (int32_t)constrain(CONFIG_HOVER_VEL_D * (this->accelZ + this->accelZ_prev) / 512, -150, 150);
 
     } else 
         this->altPID = 0;
