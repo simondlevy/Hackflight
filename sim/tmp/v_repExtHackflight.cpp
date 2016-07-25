@@ -167,7 +167,6 @@ static int get_indexed_suffixed_object_handle(const char * name, int index, cons
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
-
     // Get the object handles for the motors, joints, respondables
     for (int i=0; i<4; ++i) {
         motorList[i]            = get_indexed_object_handle("Motor", i);
@@ -244,10 +243,9 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     float angles[3];
     angles[0] =  sin(euler[2])*euler[0] - cos(euler[2])*euler[1];
     angles[1] = -cos(euler[2])*euler[0] - sin(euler[2])*euler[1]; 
-    angles[2] = -euler[3]; // yaw direct from Euler
+    angles[2] = -euler[2]; // yaw direct from Euler
 
     // Compute pitch, roll, yaw first derivative to simulate gyro
-    float gyro[3];
     for (int k=0; k<3; ++k) {
         gyro[k] = (angles[k] - anglesPrev[k]) / timestep;
         anglesPrev[k] = angles[k];
@@ -261,12 +259,10 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     // (See https://en.wikipedia.org/wiki/Atmospheric_pressure#Altitude_variation)
     float position[3];
     simGetObjectPosition(quadcopterHandle, -1, position);
-    int baro = (int)(1000 * (101.325 - 1.2 * position[2] / 100));
+    baroPressure = (int)(1000 * (101.325 - 1.2 * position[2] / 100));
     
     // Add some simulated measurement noise to the baro    
-    baro += rand() % (2*BARO_NOISE_PASCALS + 1) - BARO_NOISE_PASCALS;
-
-    printf("%d\n", baro);
+    baroPressure += rand() % (2*BARO_NOISE_PASCALS + 1) - BARO_NOISE_PASCALS;
 
     if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
 
@@ -290,12 +286,12 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
         // Read gyro, accelerometer
         for (int k=0; k<3; ++k) {
-            gyro[k]   = inData->at(4).doubleData[k]; 
-            accel[k]  = inData->at(5).doubleData[k]; 
+            //gyro[k]   = inData->at(4).doubleData[k]; 
+            //accel[k]  = inData->at(5).doubleData[k]; 
         }
 
         // Read barometer
-        baroPressure  = inData->at(6).int32Data[0];
+        //baroPressure  = inData->at(6).int32Data[0];
 
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
