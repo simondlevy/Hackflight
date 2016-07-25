@@ -16,8 +16,8 @@
  */
 
 // Level (accelerometer)
-#define CONFIG_LEVEL_P            0//10 
-#define CONFIG_LEVEL_I            0
+#define CONFIG_LEVEL_P            10 
+#define CONFIG_LEVEL_I            5
 
 // Rate (gyro): P must be positive
 #define  CONFIG_RATE_PITCHROLL_P  10
