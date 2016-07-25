@@ -250,6 +250,20 @@ static void scalarTo3D(float s, float a[12], float out[3])
     out[2] = s*a[10];
 }
 
+static void setColor(int handle, const char * signalName, float r, float g, float b)
+{
+    int signalValue;
+    simGetIntegerSignal(signalName, &signalValue);
+    float color[3];
+    if (!signalValue)
+        r = g = b = 0;
+    color[0] = r; 
+    color[1] = g;
+    color[2] = b;
+    simSetShapeColor(handle, NULL, 0, color);
+}
+
+
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
@@ -358,6 +372,11 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
     } // loop over motors
 
+    // Set LEDs based on signals from plugin
+    setColor(greenLedHandle, "greenLED", 0, 1, 0);
+    setColor(redLedHandle,   "redLED",   1, 0, 0);
+
+
     // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true)); 
     D.writeDataToStack(cb->stackID);
@@ -374,6 +393,11 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
     controllerClose();
+
+    // Turn off LEDs
+    setColor(greenLedHandle, "greenLED", 0, 0, 0);
+    setColor(redLedHandle,   "redLED",   0, 0, 0);
+
 
     // Do any extra shutdown needed
     extrasStop();
