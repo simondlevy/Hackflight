@@ -23,10 +23,13 @@ static const int PARTICLE_COUNT_PER_SECOND = 750;
 static const int PARTICLE_DENSITY          = 20000;
 static const float PARTICLE_SIZE           = .005f;
 
+static const int BARO_NOISE_PASCALS        = 3;
+
 #include "v_repExtHackflight.h"
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
+#include <stdlib.h>
 #include <stdint.h>
 #include <stdarg.h>
 #include <string.h>
@@ -116,8 +119,8 @@ static int throttleDemand;
 static const float PS3_THROTTLE_INC = .01f;
 
 // IMU support
-static double accel[3];
-static double gyro[3];
+static float accel[3];
+static float gyro[3];
 
 // Barometer support
 static int baroPressure;
@@ -229,6 +232,41 @@ static const int inArgs_UPDATE[]={
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
+
+    // For simulating gyro
+    static float anglesPrev[3];
+
+    // Get Euler angles for gyroscope simulation
+    float euler[3];
+    simGetObjectOrientation(quadcopterHandle, -1, euler);
+
+    // Convert Euler angles to pitch and roll via rotation formula
+    float angles[3];
+    angles[0] =  sin(euler[2])*euler[0] - cos(euler[2])*euler[1];
+    angles[1] = -cos(euler[2])*euler[0] - sin(euler[2])*euler[1]; 
+    angles[2] = -euler[3]; // yaw direct from Euler
+
+    // Compute pitch, roll, yaw first derivative to simulate gyro
+    float gyro[3];
+    for (int k=0; k<3; ++k) {
+        gyro[k] = (angles[k] - anglesPrev[k]) / timestep;
+        anglesPrev[k] = angles[k];
+    }
+
+    // Read accelerometer
+    simReadForceSensor(accelHandle, accel, NULL);
+
+    // Convert vehicle's Z coordinate in meters to barometric pressure in Pascals (millibars)
+    // At low altitudes above the sea level, the pressure decreases by about 1200 Pa for every 100 meters
+    // (See https://en.wikipedia.org/wiki/Atmospheric_pressure#Altitude_variation)
+    float position[3];
+    simGetObjectPosition(quadcopterHandle, -1, position);
+    int baro = (int)(1000 * (101.325 - 1.2 * position[2] / 100));
+    
+    // Add some simulated measurement noise to the baro    
+    baro += rand() % (2*BARO_NOISE_PASCALS + 1) - BARO_NOISE_PASCALS;
+
+    printf("%d\n", baro);
 
     if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
 
