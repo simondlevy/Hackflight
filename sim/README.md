@@ -16,6 +16,7 @@ to the V-REP folder where the other DLLs are. On my computer this is
 <p><li>Spektrum DX-8 transmitter with GWS adapter cable (unfortunately no longer sold)
 <p><li>Logitch Extreme 3D Pro joystick
 <p><li>Nyko Core Controller for PS3
+<p><li>XBOX360 controller
 <p><li>Keyboard, using the Microsoft Flight Controller numeric keypad 
 <a href="http://www.flightsimbooks.com/flightsimhandbook/keyboardcontrols.php">mappings</a>,
 if none of the above are connected: not recommended because it requires you 

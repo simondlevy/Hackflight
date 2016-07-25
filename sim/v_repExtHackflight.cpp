@@ -191,8 +191,6 @@ static const int inArgs_UPDATE[]={
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
-    printf("update\n");
-
     CScriptFunctionData D;
 
     if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
@@ -367,8 +365,6 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
     if (!ready)
         return NULL;
 
-    printf("message\n");
-
     // Handle messages mission-specifically
     extrasMessage(message, auxiliaryData, customData);
 
@@ -520,9 +516,12 @@ uint16_t Board::readPWM(uint8_t chan)
     // Special handling for throttle
     int demand = (chan == 3) ? throttleDemand : demands[chan];
 
-    // Special handling for pitch, roll on PS3
-    if (controller == PS3 && chan < 2) {
+    // Special handling for pitch, roll on PS3, XBOX360
+    if (chan < 2) {
+       if (controller == PS3)
         demand /= 2;
+       if (controller == XBOX360)
+        demand /= 1.5;
     }
 
     // V-REP sends joystick demands in [-1000,+1000]
