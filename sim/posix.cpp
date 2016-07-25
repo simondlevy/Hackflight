@@ -80,7 +80,7 @@ controller_t posixControllerInit(char * name, const char * ps3name)
 {
     controller_t controller = KEYBOARD;
 
-    for (int k=0; k<5; ++k)
+    for (int k=0; k<6; ++k)
         axisdir[k] = +1;
 
     if (strstr(name, "Taranis")) {
@@ -114,6 +114,15 @@ controller_t posixControllerInit(char * name, const char * ps3name)
         axismap[1] = 1;
         axismap[2] = 2;
         axismap[3] = 3;
+        axisdir[1] = -1;
+        axisdir[3] = -1;
+    }
+    else if (strstr(name, "Generic X-Box pad")) {
+        controller = XBOX360;
+        axismap[0] = 3; //roll
+        axismap[1] = 4; //pitch
+        axismap[2] = 0; //yaw
+        axismap[3] = 1; //throttle
         axisdir[1] = -1;
         axisdir[3] = -1;
     }

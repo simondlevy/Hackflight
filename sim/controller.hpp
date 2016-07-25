@@ -20,7 +20,7 @@
 */
 
 // We currently support these controllers
-enum controller_t { KEYBOARD, TARANIS, SPEKTRUM, EXTREME3D, PS3 };
+enum controller_t { KEYBOARD, TARANIS, SPEKTRUM, EXTREME3D, PS3 , XBOX360 };
 
 controller_t controllerInit(void);
 void         controllerRead(controller_t controller, int * demands, void * ignore);
