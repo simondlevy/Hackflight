@@ -31,7 +31,7 @@ PLUGIN = libv_repExtHackflight.so
 
 all: $(PLUGIN) 
 
-libv_repExtHackflight.so: *.cpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp Makefile
+libv_repExtHackflight.so: *.cpp ../*.cpp *.hpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp Makefile
 	g++ $(CFLAGS) -c  ../v_repExtHackflight.cpp 
 	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_DIR)\" extras.cpp 
 	g++ $(CFLAGS) -c ../posix.cpp 
