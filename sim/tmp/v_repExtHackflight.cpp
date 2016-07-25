@@ -36,7 +36,7 @@ static const float PARTICLE_SIZE           = .005;
 #include <iostream>
 using namespace std;
 
-// WIN32 support
+// Cross-platform support for firmware
 #include <crossplatform.h>
 
 #include "controller.hpp"
@@ -95,15 +95,6 @@ void printf(const char * format, ...)
     va_end (args);
 }
 */
-
-#ifdef _WIN32 // ===================================================================
-
-
-#else
-#include <unistd.h>
-#include <fcntl.h>
-#include "posix.hpp"
-#endif // not _WIN32
 
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
@@ -264,7 +255,11 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 
 #ifdef _WIN32
 #include "Shlwapi.h"
-#endif
+#else
+#include <unistd.h>
+#include <fcntl.h>
+#include "posix.hpp"
+#endif 
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 { // This is called just once, at the start of V-REP.
