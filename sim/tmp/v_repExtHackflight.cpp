@@ -141,14 +141,14 @@ static int redLedHandle;
 static int get_indexed_object_handle(const char * name, int index)
 {
     char tmp[100];
-    sprintf(tmp, "%s%d", name, index);
+    sprintf(tmp, "%s%d", name, index+1);
     return simGetObjectHandle(tmp);
 }
 
 static int get_indexed_suffixed_object_handle(const char * name, int index, const char * suffix)
 {
     char tmp[100];
-    sprintf(tmp, "%s%d_%s", name, index, suffix);
+    sprintf(tmp, "%s%d_%s", name, index+1, suffix);
     return simGetObjectHandle(tmp);
 }
 
@@ -157,8 +157,8 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     // Get the object handles for the motors, joints, respondables
     for (int i=0; i<4; ++i) {
         motorList[i]            = get_indexed_object_handle("Motor", i);
-        motorRespondableList[i] = get_indexed_suffixed_object_handle("Motor", i, "_respondable");
-        motorJointList[i]       = get_indexed_suffixed_object_handle("Motor", i, "_joint");
+        motorRespondableList[i] = get_indexed_suffixed_object_handle("Motor", i, "respondable");
+        motorJointList[i]       = get_indexed_suffixed_object_handle("Motor", i, "joint");
     }
 
     // Get handle for objects we'll access
@@ -224,21 +224,21 @@ static float get_indexed_float_signal(const char * name, int index)
 static void set_indexed_suffixed_float_signal(const char * name, int index, const char * suffix, float value)
 {
     char tmp[100];
-    sprintf(tmp, "%s%d%s", name, index, suffix);
+    sprintf(tmp, "%s%d_%s", name, index+1, suffix);
     simSetFloatSignal(tmp, value);
 }
 
 static void set_indexed_float_signal(const char * name, int i, int k, float value)
 {
     char tmp[100];
-    sprintf(tmp, "%s%d%d", name, i, k);
+    sprintf(tmp, "%s%d%d", name, i+1, k+1);
     simSetFloatSignal(tmp, value);
 }
 
 static void set_indexed_float_signal(const char * name, int i, float value)
 {
     char tmp[100];
-    sprintf(tmp, "%s%d", name, i);
+    sprintf(tmp, "%s%d", name, i+1);
     simSetFloatSignal(tmp, value);
 }
 
@@ -308,7 +308,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
         // Set thrust for each motor
         for (int i=0; i<4; ++i) 
-            set_indexed_float_signal("thrust", i+1, thrusts[i]);
+            set_indexed_float_signal("thrust", i, thrusts[i]);
     }
 
     // Increment microsecond count
@@ -325,12 +325,11 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         // Get motor thrust in interval [0,1] from plugin
         float thrust = get_indexed_float_signal("thrust", i+1);
 
-        printf("%d: %f    ", i, thrust);
-
         // Simulate prop spin as a function of thrust
         float jointAngleOld;
         simGetJointPosition(motorJointList[i], &jointAngleOld);
         float jointAngleNew = jointAngleOld + propDirections[i] * thrust * 1.25;
+        printf("%d: %f => %f    ", motorJointList[i], jointAngleOld, jointAngleNew);
         simSetJointPosition(motorJointList[i], jointAngleNew);
 
         // Convert thrust to force and torque
@@ -338,7 +337,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         float torque = tsigns[i] * thrust;
 
         // Compute force and torque signals based on thrust
-        //set_indexed_suffixed_float_signal("Motor", i, "_respondable", motorRespondableList[i]);
+        //set_indexed_suffixed_float_signal("Motor", i, "respondable", motorRespondableList[i]);
 
         // Get motor matrix
         float motorMatrix[12];
