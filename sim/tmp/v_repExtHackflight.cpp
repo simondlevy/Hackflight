@@ -131,6 +131,54 @@ static int accelHandle;
 static int greenLedHandle;
 static int redLedHandle;
 
+// LED support
+
+class LED {
+
+    private:
+
+        int handle;
+        float color[3];
+        bool on;
+
+        void set(bool status)
+        {
+            this->on = status;
+            float black[3] = {0,0,0};
+            simSetShapeColor(this->handle, NULL, 0, this->on ? this->color : black);
+        }
+
+    public:
+
+        LED(void) { }
+
+        void init(int _handle, float r, float g, float b)
+        {
+            this->handle = _handle;
+            this->color[0] = r;
+            this->color[1] = g;
+            this->color[2] = b;
+            this->on = false;
+        }
+
+        void turnOff(void) 
+        {
+            this->set(false);
+        }
+
+        void turnOn(void) 
+        {
+            this->set(true);
+        }
+
+        void toggle(void) 
+        {
+            this->set(!this->on);
+        }
+};
+
+static LED greenLED, redLED;
+
 
 // --------------------------------------------------------------------------------------
 // simExtHackflight_start
@@ -250,20 +298,6 @@ static void scalarTo3D(float s, float a[12], float out[3])
     out[2] = s*a[10];
 }
 
-static void setColor(int handle, const char * signalName, float r, float g, float b)
-{
-    int signalValue;
-    simGetIntegerSignal(signalName, &signalValue);
-    float color[3];
-    if (!signalValue)
-        r = g = b = 0;
-    color[0] = r; 
-    color[1] = g;
-    color[2] = b;
-    simSetShapeColor(handle, NULL, 0, color);
-}
-
-
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
@@ -372,11 +406,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
     } // loop over motors
 
-    // Set LEDs based on signals from plugin
-    setColor(greenLedHandle, "greenLED", 0, 1, 0);
-    setColor(redLedHandle,   "redLED",   1, 0, 0);
-
-
     // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true)); 
     D.writeDataToStack(cb->stackID);
@@ -395,9 +424,8 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
     controllerClose();
 
     // Turn off LEDs
-    setColor(greenLedHandle, "greenLED", 0, 0, 0);
-    setColor(redLedHandle,   "redLED",   0, 0, 0);
-
+    greenLED.turnOff();
+    redLED.turnOff();
 
     // Do any extra shutdown needed
     extrasStop();
@@ -531,47 +559,6 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
 #include <board.hpp>
 #include <rc.hpp>
 
-class LED {
-
-    private:
-
-        char signame[10];
-        bool on;
-
-        void set(bool status)
-        {
-            this->on = status;
-            simSetIntegerSignal(this->signame, this->on ? 1 : 0);
-        }
-
-    public:
-
-        LED(void) { }
-
-        void init(const char * _signame)
-        {
-            STRCPY(this->signame, _signame);
-            this->on = false;
-        }
-
-        void turnOff(void) 
-        {
-            this->set(false);
-        }
-
-        void turnOn(void) 
-        {
-            this->set(true);
-        }
-
-        void toggle(void) 
-        {
-            this->set(!this->on);
-        }
-};
-
-static LED greenLED, redLED;
-
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     // Mimic MPU6050
@@ -597,8 +584,8 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     looptimeMicroseconds = 10000;
     calibratingGyroMsec = 100;  // long enough to see but not to annoy
 
-    greenLED.init("greenLED");
-    redLED.init("redLED");
+    greenLED.init(greenLedHandle, 0, 1, 0);
+    redLED.init(redLedHandle, 1, 0, 0);
 }
 
 bool Board::baroInit(void)
