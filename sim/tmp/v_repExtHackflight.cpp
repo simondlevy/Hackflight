@@ -225,6 +225,36 @@ static const int inArgs_UPDATE[]={
 	sim_script_arg_int32,0                        // buttons (as bit-coded integer)
 };
 
+static float get_indexed_float_signal(const char * name, int index)
+{
+    char tmp[100];
+    sprintf(tmp, "%s%d", name, index);
+    float signal;
+    simGetFloatSignal(tmp, &signal);
+    return signal;
+}
+
+static void set_indexed_suffixed_float_signal(const char * name, int index, const char * suffix, float value)
+{
+    char tmp[100];
+    sprintf(tmp, "%s%d%s", name, index, suffix);
+    simSetFloatSignal(tmp, value);
+}
+
+static void set_indexed_float_signal(const char * name, int i, int k, float value)
+{
+    char tmp[100];
+    sprintf(tmp, "%s%d%d", name, i, k);
+    simSetFloatSignal(tmp, value);
+}
+
+static void scalarTo3D(float s, float a[12], float out[3])
+{
+    out[0] = s*a[2];
+    out[1] = s*a[6];
+    out[2] = s*a[10];
+}
+
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
@@ -294,6 +324,47 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
     // Do any extra update needed
     extrasUpdate();
+
+    float tsigns[4] = {+1, -1, -1, +1};
+
+    // Loop over motors
+    for (int i=0; i<4; ++i) {
+
+        // Get motor thrust in interval [0,1] from plugin
+        float thrust = get_indexed_float_signal("thrust", i);
+
+        // Simulate prop spin as a function of thrust
+        float jointAngleOld;
+        simGetJointPosition(motorJointList[i], &jointAngleOld);
+        float jointAngleNew = jointAngleOld + propDirections[i] * thrust * 1.25;
+        //simSetJointPosition(motorJointList[i], jointAngleNew);
+
+        // Convert thrust to force and torque
+        float force = particleCount * PARTICLE_DENSITY * thrust * M_PI * pow(PARTICLE_SIZE,3) / timestep;
+        float torque = tsigns[i] * thrust;
+
+        // Compute force and torque signals based on thrust
+        //set_indexed_suffixed_float_signal("Motor", i, "_respondable", motorRespondableList[i]);
+
+        // Get motor matrix
+        float motorMatrix[12];
+        simGetObjectMatrix(motorList[i],-1, motorMatrix);
+
+        // Convert force to 3D forces
+        float forces[3];
+        scalarTo3D(force, motorMatrix, forces);
+
+        // Convert force to 3D torques
+        float torques[3];
+        scalarTo3D(torque, motorMatrix,torques);
+
+        // Send forces and torques to props
+        for (int k=0; k<3; ++k) {
+            //set_indexed_float_signal("force",  i, k, forces[k]);
+            //set_indexed_float_signal("torque", i, k, torques[k]);
+        }
+
+    } // loop over motors
 
     // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true)); 
