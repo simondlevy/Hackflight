@@ -20,15 +20,15 @@
 #define CONFIG_LEVEL_I            0
 
 // Rate (gyro): P must be positive
-#define  CONFIG_RATE_PITCHROLL_P  10
+#define  CONFIG_RATE_PITCHROLL_P  1 //10
 #define  CONFIG_RATE_PITCHROLL_I  0
 #define  CONFIG_RATE_PITCHROLL_D  0
 
 // Yaw: P must be positive
-#define  CONFIG_YAW_P             10
+#define  CONFIG_YAW_P             1 //10
 #define  CONFIG_YAW_I             0
 
-// For altitude hover
+// For altitude hover (unused for FPV racing)
 #define CONFIG_HOVER_ALT_P  200
 #define CONFIG_HOVER_VEL_P  100
 #define CONFIG_HOVER_VEL_I  45
