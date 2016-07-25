@@ -218,14 +218,11 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
 static const int inArgs_UPDATE[]={
-    7,
+    4,
     sim_script_arg_int32|sim_script_arg_table,3,  // axes
 	sim_script_arg_int32|sim_script_arg_table,3,  // rotAxes
 	sim_script_arg_int32|sim_script_arg_table,2,  // sliders
-	sim_script_arg_int32,0,                       // buttons (as bit-coded integer)
-    sim_script_arg_double|sim_script_arg_table,3, // Gyro values
-    sim_script_arg_double|sim_script_arg_table,3, // Accelerometer values
-    sim_script_arg_int32,0                        // Barometric pressure
+	sim_script_arg_int32,0                        // buttons (as bit-coded integer)
 };
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
@@ -283,15 +280,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         else {
             throttleDemand = demands[3];
         }
-
-        // Read gyro, accelerometer
-        for (int k=0; k<3; ++k) {
-            //gyro[k]   = inData->at(4).doubleData[k]; 
-            //accel[k]  = inData->at(5).doubleData[k]; 
-        }
-
-        // Read barometer
-        //baroPressure  = inData->at(6).int32Data[0];
 
         // Set thrust for each motor
         for (int i=0; i<4; ++i) {
