@@ -262,18 +262,14 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 #endif 
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
-{ // This is called just once, at the start of V-REP.
-    // Dynamically load and bind V-REP functions:
+{ 
     char curDirAndFile[1024];
+
 #ifdef _WIN32
-#ifdef QT_COMPIL
-    _getcwd(curDirAndFile, sizeof(curDirAndFile));
-#else
+
     GetModuleFileName(NULL,curDirAndFile,1023);
     PathRemoveFileSpec(curDirAndFile);
-#endif
 
-// Posix
 #elif defined (__linux) || defined (__APPLE__)
     getcwd(curDirAndFile, sizeof(curDirAndFile));
 #endif
@@ -287,7 +283,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
     temp+="/libv_rep.so";
 #elif defined (__APPLE__)
     temp+="/libv_rep.dylib";
-#endif /* __linux || __APPLE__ */
+#endif
+
 // Posix
     vrepLib=loadVrepLibrary(temp.c_str());
     if (vrepLib==NULL)

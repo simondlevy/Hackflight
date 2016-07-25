@@ -127,8 +127,8 @@
     <ClCompile Include="..\..\firmware\rc.cpp" />
     <ClCompile Include="..\..\firmware\stabilize.cpp" />
     <ClCompile Include="..\controller_Windows.cpp" />
-    <ClCompile Include="..\v_repExtHackflight.cpp" />
     <ClCompile Include="extras.cpp" />
+    <ClCompile Include="v_repExtHackflight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pidvals.hpp" />
