@@ -260,15 +260,6 @@ static const int inArgs_UPDATE[]={
 	sim_script_arg_int32,0                        // buttons (as bit-coded integer)
 };
 
-static float get_indexed_float_signal(const char * name, int index)
-{
-    char tmp[100];
-    sprintf(tmp, "%s%d", name, index);
-    float signal;
-    simGetFloatSignal(tmp, &signal);
-    return signal;
-}
-
 static void set_indexed_suffixed_float_signal(const char * name, int index, const char * suffix, float value)
 {
     char tmp[100];
@@ -282,14 +273,6 @@ static void set_indexed_float_signal(const char * name, int i, int k, float valu
     sprintf(tmp, "%s%d%d", name, i+1, k+1);
     simSetFloatSignal(tmp, value);
 }
-
-static void set_indexed_float_signal(const char * name, int i, float value)
-{
-    char tmp[100];
-    sprintf(tmp, "%s%d", name, i+1);
-    simSetFloatSignal(tmp, value);
-}
-
 
 static void scalarTo3D(float s, float a[12], float out[3])
 {
@@ -334,6 +317,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     // Add some simulated measurement noise to the baro    
     baroPressure += rand() % (2*BARO_NOISE_PASCALS + 1) - BARO_NOISE_PASCALS;
 
+    // Get demands from controller
     if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
 
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
@@ -353,10 +337,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         else {
             throttleDemand = demands[3];
         }
-
-        // Set thrust for each motor
-        for (int i=0; i<4; ++i) 
-            set_indexed_float_signal("thrust", i, thrusts[i]);
     }
 
     // Increment microsecond count
@@ -371,7 +351,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     for (int i=0; i<4; ++i) {
 
         // Get motor thrust in interval [0,1] from plugin
-        float thrust = get_indexed_float_signal("thrust", i+1);
+        float thrust = thrusts[i];
 
         // Simulate prop spin as a function of thrust
         float jointAngleOld;
