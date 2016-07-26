@@ -42,6 +42,9 @@ using namespace std;
 // Cross-platform support for firmware
 #include <crossplatform.h>
 
+#include "controller.hpp"
+#include "extras.hpp"
+
 #ifdef _WIN32
 #include "Shlwapi.h"
 #define sprintf sprintf_s
@@ -50,9 +53,6 @@ using namespace std;
 #include <fcntl.h>
 #include "posix.hpp"
 #endif 
-
-#include "controller.hpp"
-#include "extras.hpp"
 
 // Controller type
 static controller_t controller;
@@ -206,21 +206,12 @@ static int get_indexed_suffixed_object_handle(const char * name, int index, cons
     return simGetObjectHandle(tmp);
 }
 
-static void set_indexed_suffixed_float_signal(const char * name, int index, const char * suffix, int value)
-{
-    char tmp[100];
-    sprintf(tmp, "%s%d_%s", name, index+1, suffix);
-    simSetFloatSignal(tmp, value);
-}
-
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     // Get the object handles for the motors, joints, respondables
     for (int i=0; i<4; ++i) {
         motorList[i]         = get_indexed_object_handle("Motor", i);
 		motorJointList[i]    = get_indexed_suffixed_object_handle("Motor", i, "joint");
-        int motorRespondable = get_indexed_suffixed_object_handle("Motor", i, "respondable");
-        set_indexed_suffixed_float_signal("Motor", i, "respondable", motorRespondable);
     }
 
     // Get handle for objects we'll access
