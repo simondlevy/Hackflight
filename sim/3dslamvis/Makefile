@@ -42,6 +42,7 @@ PLUGIN = libv_repExt3DSLAM.$(EXT)
 
 libv_repExt3DSLAM.$(EXT): v_repExt3DSLAM.cpp
 	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" v_repExt3DSLAM.cpp 
+	g++ $(CFLAGS) -c ../socketutils.cpp
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
 	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp

@@ -18,6 +18,7 @@
 */
 
 #include "extras.hpp"
+#include "socketutils.hpp"
 
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
@@ -36,43 +37,10 @@ static int  mspFromServerIndex;
 #include <opencv2/imgproc/imgproc.hpp>
 using namespace cv;
 
-#include <fcntl.h>
-#include <netdb.h>
-#include <unistd.h>
 #include <signal.h>
-#include <sys/types.h>
+#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <time.h> 
-
-static int connect_to_server(int port, const char * hostname="localhost")
-{
-    // http://web.eecs.utk.edu/~plank/plank/classes/cs360/360/notes/Sockets/sockettome.c
-    struct sockaddr_in sn;
-    struct hostent *he;
-    if (!(he = gethostbyname(hostname))) {
-        printf("can't get host id for %s\n", hostname);
-    }
-    int ok = 0;
-    int sockfd = 0;
-    while (!ok) {
-        sn.sin_family = AF_INET;
-        sn.sin_port  = htons(port);
-        sn.sin_addr.s_addr = *(u_long*)(he->h_addr_list[0]);
-
-        if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-            perror("socket()");
-        }
-        ok = (connect(sockfd, (struct sockaddr*)&sn, sizeof(sn)) != -1);
-        if (!ok) sleep (1);
-    }  
-    return sockfd;
-}
 
 static const int CAMERA_PORT          = 5000;
 static const int COMMS_IN_PORT        = 5001;

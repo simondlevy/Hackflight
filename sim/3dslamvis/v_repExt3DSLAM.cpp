@@ -23,15 +23,10 @@ static const int PORT = 20000;
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
+#include "socketutils.hpp"
+
 #include <stdio.h>
-#include <netdb.h>
-#include <sys/socket.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <sys/socket.h>
-#include <sys/select.h>
 #include <unistd.h>
-#include <string.h>
 
 #include <iostream>
 using namespace std;
@@ -42,88 +37,6 @@ using namespace std;
 #define PLUGIN_NAME  "3DSLAM"
 
 LIBRARY vrepLib;
-
-// http://web.eecs.utk.edu/~plank/plank/classes/cs360/360/notes/Sockets/sockettome.c
-static int serve_socket(int port)
-{
-    int s;
-    struct sockaddr_in sn;
-    struct hostent *he;
-
-    if (!(he = gethostbyname("localhost"))) {
-        puts("can't gethostname");
-        exit(1);
-    }
-
-    memset((char*)&sn, 0, sizeof(sn));
-    sn.sin_family = AF_INET;
-    sn.sin_port = htons((short)port);
-    sn.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    if ((s = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        perror("socket()");
-        exit(1);
-    }
-
-    if (bind(s, (struct sockaddr *)&sn, sizeof(sn)) == -1) {
-        perror("bind()");
-        exit(1);
-    }
-
-    return s;
-}
-
-static int accept_connection(int s)
-{
-    int x;
-    struct sockaddr_in sn;
-
-    if(listen(s, 1) == -1) {
-        perror("listen()");
-        exit(1);
-    }
-
-    bzero((char *)&sn, sizeof(sn));
-    
-    if((x = accept(s, (struct sockaddr *)NULL, NULL)) == -1) {
-        perror("accept()");
-        exit(1);
-    }
-    return x;
-}
-
-static int read_from_socket(int clientfd, char * buf, int n)
-// http://developerweb.net/viewtopic.php?id=2933
-{
-    fd_set readset;
-    int result = 0;
-
-    do {
-        FD_ZERO(&readset);
-        FD_SET(clientfd, &readset);
-        result = select(clientfd + 1, &readset, NULL, NULL, NULL);
-    } while (result == -1 && errno == EINTR);
-
-    if (result > 0) {
-
-        if (FD_ISSET(clientfd, &readset)) {
-
-            // The clientfd has data available to be read 
-            result = recv(clientfd, buf, n, 0);
-
-            if (result == 0) {
-                // This means the other side closed the socket
-                close(clientfd);
-            }
-
-            else {
-                return n; // Success!
-            }
-        }
-    }
-
-    return 0;
-}
 
 static int sockfd, clientfd;
 
