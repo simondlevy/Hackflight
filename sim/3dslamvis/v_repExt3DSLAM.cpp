@@ -72,7 +72,26 @@ static int serve_socket(int port)
     return s;
 }
 
-static int sockfd;
+static int accept_connection(int s)
+{
+    int x;
+    struct sockaddr_in sn;
+
+    if(listen(s, 1) == -1) {
+        perror("listen()");
+        exit(1);
+    }
+
+    bzero((char *)&sn, sizeof(sn));
+    
+    if((x = accept(s, (struct sockaddr *)NULL, NULL)) == -1) {
+        perror("accept()");
+        exit(1);
+    }
+    return x;
+}
+
+static int sockfd, clientfd;
 
 // --------------------------------------------------------------------------------------
 // simExt3DSLAM_start
@@ -88,6 +107,10 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     D.writeDataToStack(cb->stackID);
 
     sockfd = serve_socket(PORT);
+    printf("Waiting for client ...");
+    fflush(stdout);
+    clientfd = accept_connection(sockfd);
+    printf("\nClient connected\n");
 }
 
 // --------------------------------------------------------------------------------------
@@ -103,8 +126,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true)); 
     D.writeDataToStack(cb->stackID);
-
-    printf("%d\n", sockfd);
 
 } // LUA_UPDATE_COMMAND
 
