@@ -29,6 +29,7 @@ static const int PORT = 20000;
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 #include <unistd.h>
 #include <string.h>
 
@@ -121,6 +122,39 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
+
+    fd_set readset;
+    int result = 0;
+
+    do {
+        FD_ZERO(&readset);
+        FD_SET(clientfd, &readset);
+        result = select(clientfd + 1, &readset, NULL, NULL, NULL);
+    } while (result == -1 && errno == EINTR);
+
+    if (result > 0) {
+
+        if (FD_ISSET(clientfd, &readset)) {
+
+            // The clientfd has data available to be read 
+            char c;
+            result = recv(clientfd, &c, 1, 0);
+
+            if (result == 0) {
+                // This means the other side closed the socket
+                close(clientfd);
+            }
+
+            else {
+                printf("Got client data: %c\n", c);
+            }
+        }
+    }
+    else if (result < 0) {
+        // An error ocurred, just print it to stdout 
+        printf("Error on select(): %s\n", strerror(errno));
+    }
+
     CScriptFunctionData D;
 
     // Return success to V-REP
@@ -142,6 +176,7 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);
 
+    close(clientfd);
     close(sockfd);
 }
 
