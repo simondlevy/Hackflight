@@ -23,12 +23,10 @@
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
-#ifdef QT_COMPIL
 #include <direct.h>
-#else
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
-#endif
+
 
 #include <conio.h>
 
