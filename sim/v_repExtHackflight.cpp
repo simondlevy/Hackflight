@@ -42,6 +42,15 @@ using namespace std;
 // Cross-platform support for firmware
 #include <crossplatform.h>
 
+#ifdef _WIN32
+#include "Shlwapi.h"
+#define sprintf sprintf_s
+#else
+#include <unistd.h>
+#include <fcntl.h>
+#include "posix.hpp"
+#endif 
+
 #include "controller.hpp"
 #include "extras.hpp"
 
@@ -356,7 +365,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         // Simulate prop spin as a function of thrust
         float jointAngleOld;
         simGetJointPosition(motorJointList[i], &jointAngleOld);
-        float jointAngleNew = jointAngleOld + propDirections[i] * thrust * 1.25;
+        float jointAngleNew = jointAngleOld + propDirections[i] * thrust * 1.25f;
         simSetJointPosition(motorJointList[i], jointAngleNew);
 
         // Convert thrust to force and torque
@@ -416,13 +425,7 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 }
 // --------------------------------------------------------------------------------------
 
-#ifdef _WIN32
-#include "Shlwapi.h"
-#else
-#include <unistd.h>
-#include <fcntl.h>
-#include "posix.hpp"
-#endif 
+
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 { 
@@ -635,7 +638,7 @@ uint16_t Board::readPWM(uint8_t chan)
        if (controller == PS3)
         demand /= 2;
        if (controller == XBOX360)
-        demand /= 1.5;
+        demand = (int)(demand / 1.5f);
     }
 
     // V-REP sends joystick demands in [-1000,+1000]
