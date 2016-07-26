@@ -92,6 +92,39 @@ static int accept_connection(int s)
     return x;
 }
 
+static int read_from_socket(int clientfd, char * buf, int n)
+// http://developerweb.net/viewtopic.php?id=2933
+{
+    fd_set readset;
+    int result = 0;
+
+    do {
+        FD_ZERO(&readset);
+        FD_SET(clientfd, &readset);
+        result = select(clientfd + 1, &readset, NULL, NULL, NULL);
+    } while (result == -1 && errno == EINTR);
+
+    if (result > 0) {
+
+        if (FD_ISSET(clientfd, &readset)) {
+
+            // The clientfd has data available to be read 
+            result = recv(clientfd, buf, n, 0);
+
+            if (result == 0) {
+                // This means the other side closed the socket
+                close(clientfd);
+            }
+
+            else {
+                return n; // Success!
+            }
+        }
+    }
+
+    return 0;
+}
+
 static int sockfd, clientfd;
 
 // --------------------------------------------------------------------------------------
@@ -122,38 +155,9 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
-
-    fd_set readset;
-    int result = 0;
-
-    do {
-        FD_ZERO(&readset);
-        FD_SET(clientfd, &readset);
-        result = select(clientfd + 1, &readset, NULL, NULL, NULL);
-    } while (result == -1 && errno == EINTR);
-
-    if (result > 0) {
-
-        if (FD_ISSET(clientfd, &readset)) {
-
-            // The clientfd has data available to be read 
-            char c;
-            result = recv(clientfd, &c, 1, 0);
-
-            if (result == 0) {
-                // This means the other side closed the socket
-                close(clientfd);
-            }
-
-            else {
-                printf("Got client data: %c\n", c);
-            }
-        }
-    }
-    else if (result < 0) {
-        // An error ocurred, just print it to stdout 
-        printf("Error on select(): %s\n", strerror(errno));
-    }
+    char c;
+    if (read_from_socket(clientfd, &c, 1))
+        printf("%c", c);
 
     CScriptFunctionData D;
 
