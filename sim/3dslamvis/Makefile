@@ -1,7 +1,7 @@
 #
-#   Makefile for V-REP simulator using Hackflight
+#   Makefile for 3DSLAM visiualization V-REP simulator plugin 
 #
-#   Copyright (C) Simon D. Levy and Matt Lubas 2016
+#   Copyright (C) Simon D. Levy 2016
 #
 #   This file is part of Hackflight.
 #
@@ -38,28 +38,14 @@ else
     VREP_LIBDIR = $(VREP_DIR)/vrep.app/Contents/MacOS/
 endif
 
-PLUGIN = libv_repExtHackflight.$(EXT)
+PLUGIN = libv_repExt3DSLAM.$(EXT)
 
-all: $(PLUGIN)
-
-libv_repExtHackflight.$(EXT): *.cpp ../*.cpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp
-	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" ../v_repExtHackflight.cpp 
-	g++ $(CFLAGS) -c extras.cpp 
-	g++ $(CFLAGS) -c ../posix.cpp 
-	g++ $(CFLAGS) -c ../controller_$(OS).cpp 
+libv_repExt3DSLAM.$(EXT): v_repExt3DSLAM.cpp
+	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" v_repExt3DSLAM.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
 	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp
-	g++ $(CFLAGS) -c ../../firmware/imu.cpp
-	g++ $(CFLAGS) -c ../../firmware/mixer.cpp
-	g++ $(CFLAGS) -c ../../firmware/msp.cpp
-	g++ $(CFLAGS) -c ../../firmware/mw.cpp
-	g++ $(CFLAGS) -c ../../firmware/stabilize.cpp
-	g++ $(CFLAGS) -c ../../firmware/rc.cpp
-	g++ $(CFLAGS) -c ../../firmware/baro.cpp
-	g++ $(CFLAGS) -c ../../firmware/navigate.cpp
-	g++ $(CFLAGS) -c ../../firmware/filters.cpp
-	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared $(JOYLIB)
+	g++ *.o -o libv_repExt3DSLAM.$(EXT) -lpthread -shared
 
 install: $(PLUGIN)
 	cp $(PLUGIN) $(VREP_LIBDIR)
