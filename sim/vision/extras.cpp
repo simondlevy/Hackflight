@@ -19,7 +19,6 @@
 
 #include "extras.hpp"
 
-#include "v_repExtHackflight.h"
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 

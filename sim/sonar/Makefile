@@ -38,7 +38,8 @@ else
     VREP_LIBDIR = $(VREP_DIR)/vrep.app/Contents/MacOS/
 endif
 
-PLUGIN = libv_repExtHackflight.$(EXT)
+PLUGIN1 = libv_repExtHackflight.$(EXT)
+PLUGIN2 = libv_repExt3DSLAM.$(EXT)
 
 all: $(PLUGIN) 
 
@@ -61,21 +62,15 @@ libv_repExtHackflight.$(EXT): *.cpp ../*.cpp ../*.hpp ../../firmware/*.cpp ../..
 	g++ $(CFLAGS) -c ../../firmware/filters.cpp
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared $(JOYLIB)
 
-install: $(PLUGIN)
-	cp $(PLUGIN) $(VREP_LIBDIR)
+libv_repExt3DSLAM.$(EXT): v_repExt3DSLAM.cpp v_repExt3DSLAM.h Makefile
+	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" v_repExt3DSLAM.cpp 
+	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
+	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
+	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp
+	g++ *.o -o libv_repExt3DSLAM.$(EXT) -lpthread -shared
 
-uninstall:
-	rm -f $(VREP_DIR)/$(PLUGIN)
-
-edit:
-	vim v_repExtHackflight.cpp
-
-release: $(PLUGIN)
-	cp $(PLUGIN) Release
-
-commit:
-	git commit -a --allow-empty-message -m ""
-	git push
+install: $(PLUGIN1)
+	cp $(PLUGIN1) $(VREP_LIBDIR)
 
 clean:
 	rm -f *.o *.$(EXT) *.pyc *~

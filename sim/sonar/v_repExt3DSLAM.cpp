@@ -25,7 +25,7 @@ static const float PARTICLE_SIZE           = .005f;
 
 static const int BARO_NOISE_PASCALS        = 3;
 
-#include "v_repExt.h"
+#include "v_repExtHackflight.h"
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
