@@ -158,6 +158,16 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     char c;
     if (read_from_socket(clientfd, &c, 1))
         printf("%c", c);
+/*
+
+   cube = simCreatePureShape(0,          -- cube
+   16,         -- static
+   {CUBESIZE, CUBESIZE, CUBESIZE},
+   0)          -- mass
+
+   simSetObjectPosition(cube, -1, {x,y,z}) -- -1 = absolute position 
+
+*/
 
     CScriptFunctionData D;
 
