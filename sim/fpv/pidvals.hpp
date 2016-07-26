@@ -16,7 +16,7 @@
  */
 
 // Level (accelerometer): rate mode for FPV racing!
-#define CONFIG_LEVEL_P            3
+#define CONFIG_LEVEL_P            0
 #define CONFIG_LEVEL_I            0
 
 // Rate (gyro): P must be positive
