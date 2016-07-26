@@ -23,10 +23,13 @@ static const int PARTICLE_COUNT_PER_SECOND = 750;
 static const int PARTICLE_DENSITY          = 20000;
 static const float PARTICLE_SIZE           = .005f;
 
+static const int BARO_NOISE_PASCALS        = 3;
+
 #include "v_repExtHackflight.h"
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
+#include <stdlib.h>
 #include <stdint.h>
 #include <stdarg.h>
 #include <string.h>
@@ -83,27 +86,6 @@ void kbRespond(char key, char * keys)
         }
 }
 
-// Debugging support
-/*
-void printf(const char * format, ...)
-{
-    char buffer[256];
-    va_list args;
-    va_start (args, format);
-    VSNPRINTF(buffer, 255, format, args);
-    simSetStringSignal("debug", buffer, strlen(buffer));
-    va_end (args);
-}
-*/
-
-#ifdef _WIN32
-#include "Shlwapi.h"
-#else
-#include <unistd.h>
-#include <fcntl.h>
-#include "posix.hpp"
-#endif 
-
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
@@ -124,8 +106,8 @@ static int throttleDemand;
 static const float PS3_THROTTLE_INC = .01f;
 
 // IMU support
-static double accel[3];
-static double gyro[3];
+static float accel[3];
+static float gyro[3];
 
 // Barometer support
 static int baroPressure;
@@ -134,7 +116,68 @@ static int baroPressure;
 static float thrusts[4];
 
 // 100 Hz timestep, used for simulating microsend timer
-static double timestep = .01;
+static float timestep;
+
+static int particleCount;
+
+static const int propDirections[4] = {-1,+1,+1,-1};
+
+static int motorList[4];
+static int motorRespondableList[4];
+static int motorJointList[4];
+
+static int quadcopterHandle;
+static int accelHandle;
+static int greenLedHandle;
+static int redLedHandle;
+
+// LED support
+
+class LED {
+
+    private:
+
+        int handle;
+        float color[3];
+        bool on;
+
+        void set(bool status)
+        {
+            this->on = status;
+            float black[3] = {0,0,0};
+            simSetShapeColor(this->handle, NULL, 0, this->on ? this->color : black);
+        }
+
+    public:
+
+        LED(void) { }
+
+        void init(int _handle, float r, float g, float b)
+        {
+            this->handle = _handle;
+            this->color[0] = r;
+            this->color[1] = g;
+            this->color[2] = b;
+            this->on = false;
+        }
+
+        void turnOff(void) 
+        {
+            this->set(false);
+        }
+
+        void turnOn(void) 
+        {
+            this->set(true);
+        }
+
+        void toggle(void) 
+        {
+            this->set(!this->on);
+        }
+};
+
+static LED greenLED, redLED;
 
 
 // --------------------------------------------------------------------------------------
@@ -143,8 +186,40 @@ static double timestep = .01;
 #define LUA_START_COMMAND  "simExtHackflight_start"
 
 
+static int get_indexed_object_handle(const char * name, int index)
+{
+    char tmp[100];
+    sprintf(tmp, "%s%d", name, index+1);
+    return simGetObjectHandle(tmp);
+}
+
+static int get_indexed_suffixed_object_handle(const char * name, int index, const char * suffix)
+{
+    char tmp[100];
+    sprintf(tmp, "%s%d_%s", name, index+1, suffix);
+    return simGetObjectHandle(tmp);
+}
+
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
+    // Get the object handles for the motors, joints, respondables
+    for (int i=0; i<4; ++i) {
+        motorList[i]            = get_indexed_object_handle("Motor", i);
+        motorRespondableList[i] = get_indexed_suffixed_object_handle("Motor", i, "respondable");
+        motorJointList[i]       = get_indexed_suffixed_object_handle("Motor", i, "joint");
+    }
+
+    // Get handle for objects we'll access
+    quadcopterHandle   = simGetObjectHandle("Quadcopter");
+    accelHandle        = simGetObjectHandle("Accelerometer_forceSensor");
+    greenLedHandle     = simGetObjectHandle("Green_LED_visible");
+    redLedHandle       = simGetObjectHandle("Red_LED_visible");
+
+    // Timestep is used in various places
+    timestep = simGetSimulationTimeStep();
+
+    particleCount = (int)(PARTICLE_COUNT_PER_SECOND * timestep);
+
     CScriptFunctionData D;
 
      // Run Hackflight setup()
@@ -178,20 +253,71 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
 static const int inArgs_UPDATE[]={
-    7,
+    4,
     sim_script_arg_int32|sim_script_arg_table,3,  // axes
 	sim_script_arg_int32|sim_script_arg_table,3,  // rotAxes
 	sim_script_arg_int32|sim_script_arg_table,2,  // sliders
-	sim_script_arg_int32,0,                       // buttons (as bit-coded integer)
-    sim_script_arg_double|sim_script_arg_table,3, // Gyro values
-    sim_script_arg_double|sim_script_arg_table,3, // Accelerometer values
-    sim_script_arg_int32,0                        // Barometric pressure
+	sim_script_arg_int32,0                        // buttons (as bit-coded integer)
 };
+
+static void set_indexed_suffixed_float_signal(const char * name, int index, const char * suffix, float value)
+{
+    char tmp[100];
+    sprintf(tmp, "%s%d_%s", name, index+1, suffix);
+    simSetFloatSignal(tmp, value);
+}
+
+static void set_indexed_float_signal(const char * name, int i, int k, float value)
+{
+    char tmp[100];
+    sprintf(tmp, "%s%d%d", name, i+1, k+1);
+    simSetFloatSignal(tmp, value);
+}
+
+static void scalarTo3D(float s, float a[12], float out[3])
+{
+    out[0] = s*a[2];
+    out[1] = s*a[6];
+    out[2] = s*a[10];
+}
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
 
+    // For simulating gyro
+    static float anglesPrev[3];
+
+    // Get Euler angles for gyroscope simulation
+    float euler[3];
+    simGetObjectOrientation(quadcopterHandle, -1, euler);
+
+    // Convert Euler angles to pitch and roll via rotation formula
+    float angles[3];
+    angles[0] =  sin(euler[2])*euler[0] - cos(euler[2])*euler[1];
+    angles[1] = -cos(euler[2])*euler[0] - sin(euler[2])*euler[1]; 
+    angles[2] = -euler[2]; // yaw direct from Euler
+
+    // Compute pitch, roll, yaw first derivative to simulate gyro
+    for (int k=0; k<3; ++k) {
+        gyro[k] = (angles[k] - anglesPrev[k]) / timestep;
+        anglesPrev[k] = angles[k];
+    }
+
+    // Read accelerometer
+    simReadForceSensor(accelHandle, accel, NULL);
+
+    // Convert vehicle's Z coordinate in meters to barometric pressure in Pascals (millibars)
+    // At low altitudes above the sea level, the pressure decreases by about 1200 Pa for every 100 meters
+    // (See https://en.wikipedia.org/wiki/Atmospheric_pressure#Altitude_variation)
+    float position[3];
+    simGetObjectPosition(quadcopterHandle, -1, position);
+    baroPressure = (int)(1000 * (101.325 - 1.2 * position[2] / 100));
+    
+    // Add some simulated measurement noise to the baro    
+    baroPressure += rand() % (2*BARO_NOISE_PASCALS + 1) - BARO_NOISE_PASCALS;
+
+    // Get demands from controller
     if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
 
         std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
@@ -211,22 +337,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         else {
             throttleDemand = demands[3];
         }
-
-        // Read gyro, accelerometer
-        for (int k=0; k<3; ++k) {
-            gyro[k]   = inData->at(4).doubleData[k]; 
-            accel[k]  = inData->at(5).doubleData[k]; 
-        }
-
-        // Read barometer
-        baroPressure  = inData->at(6).int32Data[0];
-
-        // Set thrust for each motor
-        for (int i=0; i<4; ++i) {
-            char signame[10];
-            SPRINTF(signame, "thrust%d", i+1);
-            simSetFloatSignal(signame, thrusts[i]);
-        }
     }
 
     // Increment microsecond count
@@ -234,6 +344,47 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
     // Do any extra update needed
     extrasUpdate();
+
+    float tsigns[4] = {+1, -1, -1, +1};
+
+    // Loop over motors
+    for (int i=0; i<4; ++i) {
+
+        // Get motor thrust in interval [0,1] from plugin
+        float thrust = thrusts[i];
+
+        // Simulate prop spin as a function of thrust
+        float jointAngleOld;
+        simGetJointPosition(motorJointList[i], &jointAngleOld);
+        float jointAngleNew = jointAngleOld + propDirections[i] * thrust * 1.25;
+        simSetJointPosition(motorJointList[i], jointAngleNew);
+
+        // Convert thrust to force and torque
+        float force = particleCount * PARTICLE_DENSITY * thrust * M_PI * pow(PARTICLE_SIZE,3) / timestep;
+        float torque = tsigns[i] * thrust;
+
+        // Compute force and torque signals based on thrust
+        set_indexed_suffixed_float_signal("Motor", i, "respondable", motorRespondableList[i]);
+
+        // Get motor matrix
+        float motorMatrix[12];
+        simGetObjectMatrix(motorList[i],-1, motorMatrix);
+
+        // Convert force to 3D forces
+        float forces[3];
+        scalarTo3D(force, motorMatrix, forces);
+
+        // Convert force to 3D torques
+        float torques[3];
+        scalarTo3D(torque, motorMatrix,torques);
+
+        // Send forces and torques to props
+        for (int k=0; k<3; ++k) {
+            set_indexed_float_signal("force",  i, k, forces[k]);
+            set_indexed_float_signal("torque", i, k, torques[k]);
+        }
+
+    } // loop over motors
 
     // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true)); 
@@ -252,6 +403,10 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
     controllerClose();
 
+    // Turn off LEDs
+    greenLED.turnOff();
+    redLED.turnOff();
+
     // Do any extra shutdown needed
     extrasStop();
 
@@ -261,17 +416,25 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 }
 // --------------------------------------------------------------------------------------
 
-
+#ifdef _WIN32
+#include "Shlwapi.h"
+#else
+#include <unistd.h>
+#include <fcntl.h>
+#include "posix.hpp"
+#endif 
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 { 
     char curDirAndFile[1024];
 
 #ifdef _WIN32
+
     GetModuleFileName(NULL,curDirAndFile,1023);
     PathRemoveFileSpec(curDirAndFile);
-#else // Posix
-	getcwd(curDirAndFile, sizeof(curDirAndFile));
+
+#elif defined (__linux) || defined (__APPLE__)
+    getcwd(curDirAndFile, sizeof(curDirAndFile));
 #endif
 
     std::string currentDirAndPath(curDirAndFile);
@@ -283,7 +446,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
     temp+="/libv_rep.so";
 #elif defined (__APPLE__)
     temp+="/libv_rep.dylib";
-#endif /* __linux || __APPLE__ */
+#endif
+
 // Posix
     vrepLib=loadVrepLibrary(temp.c_str());
     if (vrepLib==NULL)
@@ -375,47 +539,6 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
 #include <board.hpp>
 #include <rc.hpp>
 
-class LED {
-
-    private:
-
-        char signame[10];
-        bool on;
-
-        void set(bool status)
-        {
-            this->on = status;
-            simSetIntegerSignal(this->signame, this->on ? 1 : 0);
-        }
-
-    public:
-
-        LED(void) { }
-
-        void init(const char * _signame)
-        {
-            STRCPY(this->signame, _signame);
-            this->on = false;
-        }
-
-        void turnOff(void) 
-        {
-            this->set(false);
-        }
-
-        void turnOn(void) 
-        {
-            this->set(true);
-        }
-
-        void toggle(void) 
-        {
-            this->set(!this->on);
-        }
-};
-
-static LED greenLED, redLED;
-
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     // Mimic MPU6050
@@ -441,8 +564,8 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     looptimeMicroseconds = 10000;
     calibratingGyroMsec = 100;  // long enough to see but not to annoy
 
-    greenLED.init("greenLED");
-    redLED.init("redLED");
+    greenLED.init(greenLedHandle, 0, 1, 0);
+    redLED.init(redLedHandle, 1, 0, 0);
 }
 
 bool Board::baroInit(void)
@@ -512,7 +635,7 @@ uint16_t Board::readPWM(uint8_t chan)
        if (controller == PS3)
         demand /= 2;
        if (controller == XBOX360)
-        demand = (int)(demand / 1.5);
+        demand /= 1.5;
     }
 
     // V-REP sends joystick demands in [-1000,+1000]
