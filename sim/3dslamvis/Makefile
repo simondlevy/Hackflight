@@ -50,6 +50,10 @@ libv_repExt3DSLAM.$(EXT): v_repExt3DSLAM.cpp
 install: $(PLUGIN)
 	cp $(PLUGIN) $(VREP_LIBDIR)
 
+edit:
+	vim v_repExt3DSLAM.cpp
+
 clean:
 	rm -f *.o *.$(EXT) *.pyc *~
+
 

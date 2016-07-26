@@ -17,25 +17,20 @@
    along with 3DSLAM.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+static const int PORT = 20000;
+
 #include "v_repExt.h"
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdarg.h>
-#include <string.h>
 #include <stdio.h>
-#include <math.h>
-
-#ifdef _WIN32
-#include "Shlwapi.h"
-#define sprintf sprintf_s
-#else
+#include <netdb.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <sys/socket.h>
 #include <unistd.h>
-#include <fcntl.h>
-#endif 
-
+#include <string.h>
 
 #include <iostream>
 using namespace std;
@@ -47,6 +42,37 @@ using namespace std;
 
 LIBRARY vrepLib;
 
+// http://web.eecs.utk.edu/~plank/plank/classes/cs360/360/notes/Sockets/sockettome.c
+static int serve_socket(int port)
+{
+    int s;
+    struct sockaddr_in sn;
+    struct hostent *he;
+
+    if (!(he = gethostbyname("localhost"))) {
+        puts("can't gethostname");
+        exit(1);
+    }
+
+    memset((char*)&sn, 0, sizeof(sn));
+    sn.sin_family = AF_INET;
+    sn.sin_port = htons((short)port);
+    sn.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    if ((s = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+        perror("socket()");
+        exit(1);
+    }
+
+    if (bind(s, (struct sockaddr *)&sn, sizeof(sn)) == -1) {
+        perror("bind()");
+        exit(1);
+    }
+
+    return s;
+}
+
+static int sockfd;
 
 // --------------------------------------------------------------------------------------
 // simExt3DSLAM_start
@@ -60,6 +86,8 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);
+
+    sockfd = serve_socket(PORT);
 }
 
 // --------------------------------------------------------------------------------------
@@ -76,6 +104,8 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     D.pushOutData(CScriptFunctionDataItem(true)); 
     D.writeDataToStack(cb->stackID);
 
+    printf("%d\n", sockfd);
+
 } // LUA_UPDATE_COMMAND
 
 
@@ -90,7 +120,10 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);
+
+    close(sockfd);
 }
+
 // --------------------------------------------------------------------------------------
 
 
@@ -99,27 +132,13 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 { 
     char curDirAndFile[1024];
 
-#ifdef _WIN32
-
-    GetModuleFileName(NULL,curDirAndFile,1023);
-    PathRemoveFileSpec(curDirAndFile);
-
-#elif defined (__linux) || defined (__APPLE__)
     getcwd(curDirAndFile, sizeof(curDirAndFile));
-#endif
 
     std::string currentDirAndPath(curDirAndFile);
     std::string temp(currentDirAndPath);
 
-#ifdef _WIN32
-    temp+="\\v_rep.dll";
-#elif defined (__linux)
     temp+="/libv_rep.so";
-#elif defined (__APPLE__)
-    temp+="/libv_rep.dylib";
-#endif
 
-// Posix
     vrepLib=loadVrepLibrary(temp.c_str());
     if (vrepLib==NULL)
     {
