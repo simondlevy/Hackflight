@@ -18,7 +18,7 @@
 */
 
 #include "controller.hpp"
-#include "posix.hpp"
+#include "controller_Posix.hpp"
 
 #include <SDL.h>
 

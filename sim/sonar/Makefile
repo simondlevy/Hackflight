@@ -45,7 +45,7 @@ all: $(PLUGIN)
 libv_repExtHackflight.$(EXT): *.cpp ../*.cpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp
 	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" ../v_repExtHackflight.cpp 
 	g++ $(CFLAGS) -c extras.cpp 
-	g++ $(CFLAGS) -c ../posix.cpp 
+	g++ $(CFLAGS) -c ../controller_Posix.cpp 
 	g++ $(CFLAGS) -c ../controller_$(OS).cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp

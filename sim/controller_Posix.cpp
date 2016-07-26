@@ -27,7 +27,7 @@
 #include <sys/time.h>
 
 #include "controller.hpp"
-#include "posix.hpp"
+#include "controller_Posix.hpp"
 
 static int axisdir[5];
 static int axismap[5];

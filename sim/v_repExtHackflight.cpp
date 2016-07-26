@@ -51,7 +51,7 @@ using namespace std;
 #else
 #include <unistd.h>
 #include <fcntl.h>
-#include "posix.hpp"
+#include "controller_Posix.hpp"
 #endif 
 
 // Controller type

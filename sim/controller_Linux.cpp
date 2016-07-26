@@ -20,7 +20,7 @@
 static const char * JOY_DEV = "/dev/input/js0";
 
 #include "controller.hpp"
-#include "posix.hpp"
+#include "controller_Posix.hpp"
 
 #include <fcntl.h>
 #include <stdio.h>
