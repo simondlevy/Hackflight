@@ -129,10 +129,7 @@ static float timestep;
 
 static int particleCount;
 
-static const int propDirections[4] = {-1,+1,+1,-1};
-
 static int motorList[4];
-static int motorRespondableList[4];
 static int motorJointList[4];
 
 static int quadcopterHandle;
@@ -209,13 +206,21 @@ static int get_indexed_suffixed_object_handle(const char * name, int index, cons
     return simGetObjectHandle(tmp);
 }
 
+static void set_indexed_suffixed_float_signal(const char * name, int index, const char * suffix, int value)
+{
+    char tmp[100];
+    sprintf(tmp, "%s%d_%s", name, index+1, suffix);
+    simSetFloatSignal(tmp, value);
+}
+
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     // Get the object handles for the motors, joints, respondables
     for (int i=0; i<4; ++i) {
-        motorList[i]            = get_indexed_object_handle("Motor", i);
-        motorRespondableList[i] = get_indexed_suffixed_object_handle("Motor", i, "respondable");
-        motorJointList[i]       = get_indexed_suffixed_object_handle("Motor", i, "joint");
+        motorList[i]         = get_indexed_object_handle("Motor", i);
+		motorJointList[i]    = get_indexed_suffixed_object_handle("Motor", i, "joint");
+        int motorRespondable = get_indexed_suffixed_object_handle("Motor", i, "respondable");
+        set_indexed_suffixed_float_signal("Motor", i, "respondable", motorRespondable);
     }
 
     // Get handle for objects we'll access
@@ -269,12 +274,7 @@ static const int inArgs_UPDATE[]={
 	sim_script_arg_int32,0                        // buttons (as bit-coded integer)
 };
 
-static void set_indexed_suffixed_float_signal(const char * name, int index, const char * suffix, float value)
-{
-    char tmp[100];
-    sprintf(tmp, "%s%d_%s", name, index+1, suffix);
-    simSetFloatSignal(tmp, value);
-}
+
 
 static void set_indexed_float_signal(const char * name, int i, int k, float value)
 {
@@ -354,7 +354,8 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     // Do any extra update needed
     extrasUpdate();
 
-    float tsigns[4] = {+1, -1, -1, +1};
+    const float tsigns[4] = {+1, -1, -1, +1};
+	const int propDirections[4] = {-1,+1,+1,-1};
 
     // Loop over motors
     for (int i=0; i<4; ++i) {
@@ -371,9 +372,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         // Convert thrust to force and torque
         float force = particleCount * PARTICLE_DENSITY * thrust * M_PI * pow(PARTICLE_SIZE,3) / timestep;
         float torque = tsigns[i] * thrust;
-
-        // Compute force and torque signals based on thrust
-        set_indexed_suffixed_float_signal("Motor", i, "respondable", motorRespondableList[i]);
 
         // Get motor matrix
         float motorMatrix[12];
