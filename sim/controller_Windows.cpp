@@ -19,7 +19,7 @@
 
 #include "controller.hpp"
 
-#include "v_repExtHackflight.h"
+#include "v_repExt.h"
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
