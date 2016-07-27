@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 '''
-   visclient.py : test-client program for 3D SLAM visualization server
+   slamproxy.py : phony SLAM data provider for testing 3DSLAM visualiztion
 
    This file is part of Hackflight.
 
@@ -22,6 +22,8 @@ CUBESIZE = 0.1
 import socket
 import time
 import sys
+
+import msppg
 
 if __name__ == '__main__':
 
