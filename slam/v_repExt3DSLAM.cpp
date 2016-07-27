@@ -23,6 +23,7 @@ static const int PORT = 20000;
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
+#include "msppg.h"
 #include "socketutils.hpp"
 
 #include <stdio.h>

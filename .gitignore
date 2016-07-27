@@ -23,4 +23,4 @@ ipch
 *.cache
 sim/*/*.so
 sim/*/*.dylib
-
+slam/*.so
