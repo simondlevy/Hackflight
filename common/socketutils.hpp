@@ -1,5 +1,5 @@
 /*
-   socketutils.cpp: function declarations for socket utilities
+   socketutils.hpp: class declarations for socket utilities
 
    This file is part of Hackflight.
 
@@ -27,6 +27,27 @@ class SocketServer {
         SocketServer(void);
 
         void connect(const char * hostname = "localhost", int port = 20000);
+
+        int recv(char * buf, int count);
+
+        void send(char * buf, int count);
+
+        void halt(void); 
+};
+
+class SocketClient {
+
+    private:
+
+        int sockfd;
+
+    public:
+
+        SocketClient(void);
+
+        void connectToServer(const char * hostname = "localhost", int port = 20000);
+
+        int available(void);
 
         int recv(char * buf, int count);
 

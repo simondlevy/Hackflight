@@ -54,9 +54,11 @@ class CompanionBoard {
     private:
 
         int procid;
-        int camerasync_sockfd;
-        int comms_in_sockfd;
-        int comms_out_sockfd;
+
+        SocketClient cameraSyncSocket;
+        SocketClient commsInSocket;
+        SocketClient commsOutSocket;
+
         int imgsize;
 
     public:
@@ -94,9 +96,9 @@ class CompanionBoard {
             }
 
             // Open a socket for syncing camera images with the server, and sockets for comms
-            this->camerasync_sockfd = connect_to_server(CAMERA_PORT);
-            this->comms_in_sockfd = connect_to_server(COMMS_IN_PORT);
-            this->comms_out_sockfd = connect_to_server(COMMS_OUT_PORT);
+            this->cameraSyncSocket.connectToServer("localhost", CAMERA_PORT);
+            this->commsInSocket.connectToServer("localhost", COMMS_IN_PORT);
+            this->commsOutSocket.connectToServer("localhost", COMMS_OUT_PORT);
         }
 
         void update(char * imageBytes, int imageWidth, int imageHeight,
@@ -111,7 +113,7 @@ class CompanionBoard {
             // Send sync byte to Python server, which will open the image, process it, and
             // write the processed image to another file
             char sync = 0;
-            write(this->camerasync_sockfd, &sync, 1);
+            this->cameraSyncSocket.send(&sync, 1);
 
             // If server has created a file for the processed image, open it copy its bytes back to V-REP's camera image
             struct stat fileStat; 
@@ -123,13 +125,12 @@ class CompanionBoard {
             }
 
             // Check whether bytes are available from server
-            int avail;
-            ioctl(this->comms_in_sockfd, FIONREAD, &avail);
+            int avail = this->commsInSocket.available();
 
             // Ignore OOB values for available bytes
             if (avail > 0 && avail < MAXMSG) {
                 char msg[MAXMSG];
-                read(this->comms_in_sockfd, msg, avail);
+                this->commsInSocket.recv(msg, avail);
                 memcpy(requestStr, msg, avail);
                 requestLen = avail;
             }
@@ -137,15 +138,15 @@ class CompanionBoard {
 
         void sendByte(uint8_t b)
         {
-            write(this->comms_out_sockfd, &b, 1);
+            this->commsOutSocket.send((char *)&b, 1);
         }
 
         void halt(void)
         {
             if (this->procid) {
-                close(this->camerasync_sockfd);
-                close(this->comms_in_sockfd);
-                close(this->comms_out_sockfd);
+                this->cameraSyncSocket.halt();
+                this->commsInSocket.halt();
+                this->commsOutSocket.halt();
                 kill(this->procid, SIGKILL);
             }
         }

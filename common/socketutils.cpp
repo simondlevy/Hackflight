@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <netdb.h>
 #include <sys/socket.h>
+#include <sys/ioctl.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/socket.h>
@@ -110,30 +111,6 @@ static int read_from_socket(int clientfd, char * buf, int n)
     return 0;
 }
 
-static int connect_to_server(int port, const char * hostname)
-{
-    // http://web.eecs.utk.edu/~plank/plank/classes/cs360/360/notes/Sockets/sockettome.c
-    struct sockaddr_in sn;
-    struct hostent *he;
-    if (!(he = gethostbyname(hostname))) {
-        printf("can't get host id for %s\n", hostname);
-    }
-    int ok = 0;
-    int sockfd = 0;
-    while (!ok) {
-        sn.sin_family = AF_INET;
-        sn.sin_port  = htons(port);
-        sn.sin_addr.s_addr = *(u_long*)(he->h_addr_list[0]);
-
-        if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-            perror("socket()");
-        }
-        ok = (connect(sockfd, (struct sockaddr*)&sn, sizeof(sn)) != -1);
-        if (!ok) sleep (1);
-    }  
-    return sockfd;
-}
-
 SocketServer::SocketServer(void) 
 {
 }
@@ -165,3 +142,54 @@ void SocketServer::halt(void)
     close(this->sockfd);
     close(this->clientfd);
 }
+
+SocketClient::SocketClient(void)
+{
+}
+
+void SocketClient::connectToServer(const char * hostname, int port)
+{
+    // http://web.eecs.utk.edu/~plank/plank/classes/cs360/360/notes/Sockets/sockettome.c
+    struct sockaddr_in sn;
+    struct hostent *he;
+    if (!(he = gethostbyname(hostname))) {
+        printf("can't get host id for %s\n", hostname);
+    }
+    int ok = 0;
+    this->sockfd = 0;
+    while (!ok) {
+        sn.sin_family = AF_INET;
+        sn.sin_port  = htons(port);
+        sn.sin_addr.s_addr = *(u_long*)(he->h_addr_list[0]);
+
+        if ((this->sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+            perror("socket()");
+        }
+        ok = (connect(this->sockfd, (struct sockaddr*)&sn, sizeof(sn)) != -1);
+        if (!ok) sleep (1);
+    }  
+}
+
+int SocketClient::available(void)
+{
+    int avail;
+    ioctl(this->sockfd, FIONREAD, &avail);
+    return avail;
+}
+
+int SocketClient::recv(char * buf, int count)
+{
+    return read_from_socket(this->sockfd, buf, count);
+}
+
+void SocketClient::send(char * buf, int count)
+{
+    write(this->sockfd, buf, count);
+}
+
+void SocketClient::halt(void)
+{
+    close(this->sockfd);
+}
+
+
