@@ -54,7 +54,13 @@ if __name__ == '__main__':
     # Loop forever, fielding SLAM update requests from visualization server
     while True:
 
-        parser.parse(sock.recv(1))
+        try:
+
+            parser.parse(sock.recv(1))
+
+        except:
+
+            break
 
 
     '''
