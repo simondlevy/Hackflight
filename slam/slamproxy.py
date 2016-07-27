@@ -27,8 +27,11 @@ import sys
 
 import msppg
 
-def handlePoseRequest():
-    print('got pose request')
+class SLAM_Parser(msppg.MSP_Parser):
+
+    def handlePoseRequest(self):
+
+        print('got pose request')
 
 if __name__ == '__main__':
 
@@ -45,8 +48,8 @@ if __name__ == '__main__':
         exit(1)
 
     # Create an MSP parser to handle pose message requests
-    parser = msppg.MSP_Parser()
-    parser.set_SLAM_POSE_Request_Handler(handlePoseRequest)
+    parser = SLAM_Parser()
+    parser.set_SLAM_POSE_Request_Handler(parser.handlePoseRequest)
 
     # Loop forever, fielding SLAM update requests from visualization server
     while True:
