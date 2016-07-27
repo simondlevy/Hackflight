@@ -3,6 +3,9 @@
 '''
    slamproxy.py : phony SLAM data provider for testing 3DSLAM visualiztion
 
+   Allow us to test our SLAM visualizer without running a flight simulator
+   or actual vehicle.
+
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify
@@ -39,10 +42,10 @@ if __name__ == '__main__':
         print('Connection resfused: make sure visualization server is running')
         exit(1)
 
-    x = 0
-    y = 0
-    z = 1
+    # Create an MSP parser to handle pose message requests
+    parser = msppg.MSP_Parser()
 
+    '''
     for count in range(20):
 
             try:
@@ -53,3 +56,4 @@ if __name__ == '__main__':
             x += CUBESIZE
 
             time.sleep(1)
+    '''

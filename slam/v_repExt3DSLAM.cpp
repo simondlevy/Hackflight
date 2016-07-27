@@ -48,17 +48,21 @@ static int sockfd, clientfd;
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
-    CScriptFunctionData D;
-
-    // Return success to V-REP
-    D.pushOutData(CScriptFunctionDataItem(true));
-    D.writeDataToStack(cb->stackID);
-
+    // Create a SLAM data request message
+    
+    
+    // Listen for clients that will provide SLAM data to us
     sockfd = serve_socket(PORT);
     printf("Waiting for client ...");
     fflush(stdout);
     clientfd = accept_connection(sockfd);
     printf("\nClient connected\n");
+    
+    // Return success to V-REP
+    CScriptFunctionData D;
+    D.pushOutData(CScriptFunctionDataItem(true));
+    D.writeDataToStack(cb->stackID);
+
 }
 
 // --------------------------------------------------------------------------------------
@@ -69,10 +73,13 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
+    MSP_Message poseRequest = MSP_Parser::serialize_SLAM_POSE_Request();
 
+    /*
     char c;
     if (read_from_socket(clientfd, &c, 1))
         printf("%c", c);
+        */
 
     /*
 
