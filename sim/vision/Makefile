@@ -21,7 +21,7 @@
 VREP_DIR = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
 
 COMMON = $(VREP_DIR)/programming/common/
-CFLAGS = -Wall -D_SIM -I$(VREP_DIR)/programming/include/ -I. -I.. -I../../firmware -Wall -fPIC -static
+CFLAGS = -Wall -D_SIM -I$(VREP_DIR)/programming/include/ -I. -I.. -I../../common -I../../firmware -Wall -fPIC -static
 
 # Un-comment if you want to build for the companion board:
 # Linux only, requires OpenCV
@@ -36,7 +36,7 @@ libv_repExtHackflight.so: *.cpp ../*.cpp *.hpp ../*.hpp ../../firmware/*.cpp ../
 	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_DIR)\" extras.cpp 
 	g++ $(CFLAGS) -c ../controller_Posix.cpp 
 	g++ $(CFLAGS) -c ../controller_Linux.cpp 
-	g++ $(CFLAGS) -c ../socketutils.cpp 
+	g++ $(CFLAGS) -c ../../common/socketutils.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
 	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp

@@ -68,15 +68,17 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
+
     char c;
     if (read_from_socket(clientfd, &c, 1))
         printf("%c", c);
-/*
 
-   cube = simCreatePureShape(0,          -- cube
-   16,         -- static
-   {CUBESIZE, CUBESIZE, CUBESIZE},
-   0)          -- mass
+    /*
+
+       cube = simCreatePureShape(0,          -- cube
+       16,         -- static
+       {CUBESIZE, CUBESIZE, CUBESIZE},
+       0)          -- mass
 
    simSetObjectPosition(cube, -1, {x,y,z}) -- -1 = absolute position 
 
@@ -105,6 +107,7 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 
     close(clientfd);
     close(sockfd);
+
 }
 
 // --------------------------------------------------------------------------------------
@@ -167,7 +170,6 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
     simSetIntegerParameter(sim_intparam_error_report_mode,sim_api_errormessage_ignore);
     simSetIntegerParameter(sim_intparam_error_report_mode,errorModeSaved); // restore previous settings
-
 
     return NULL;
 }
