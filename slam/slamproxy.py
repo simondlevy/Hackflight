@@ -27,6 +27,9 @@ import sys
 
 import msppg
 
+INCOMING_PORT = 20001
+OUTGOING_PORT = 20000
+
 class SLAM_Parser(msppg.MSP_Parser):
 
     def handlePoseRequest(self):
@@ -35,13 +38,12 @@ class SLAM_Parser(msppg.MSP_Parser):
 
 if __name__ == '__main__':
 
-    host =     sys.argv[1]  if len(sys.argv) > 1 else 'localhost'
-    port = int(sys.argv[2]) if len(sys.argv) > 2 else 20000
+    host = sys.argv[1]  if len(sys.argv) > 1 else 'localhost'
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    insock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try :
-        sock.connect((host, port))
+        insock.connect((host, INCOMING_PORT))
 
     except:
         print('Connection resfused: make sure visualization server is running')
@@ -56,7 +58,7 @@ if __name__ == '__main__':
 
         try:
 
-            parser.parse(sock.recv(1))
+            parser.parse(insock.recv(1))
 
         except:
 

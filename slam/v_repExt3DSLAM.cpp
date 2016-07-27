@@ -17,7 +17,8 @@
    along with 3DSLAM.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-static const int PORT = 20000;
+static const int INCOMING_PORT = 20000;
+static const int OUTGOING_PORT = 20001;
 
 #include "v_repExt.h"
 #include "scriptFunctionData.h"
@@ -40,7 +41,8 @@ using namespace std;
 
 LIBRARY vrepLib;
 
-static SocketServer socketServer;
+static SocketServer incomingSocketServer;
+static SocketServer outgoingSocketServer;
 
 // --------------------------------------------------------------------------------------
 // simExt3DSLAM_start
@@ -51,7 +53,8 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     
     // Listen for clients that will provide SLAM data to us
-    socketServer.connect("localhost", 20000);
+    //incomingSocketServer.connect("localhost", INCOMING_PORT);
+    outgoingSocketServer.connect("localhost", OUTGOING_PORT);
     
     // Return success to V-REP
     CScriptFunctionData D;
@@ -75,7 +78,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     gettimeofday(&tv,NULL);
     if (tv.tv_usec - usec_start > 500000) {
         for (byte b = poseRequest.start(); poseRequest.hasNext(); b = poseRequest.getNext())
-            socketServer.send((char *)&b, 1);
+            outgoingSocketServer.send((char *)&b, 1);
         usec_start = tv.tv_usec;
     }
 
@@ -111,8 +114,8 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);
 
-    socketServer.halt();
-
+    //incomingSocketServer.halt();
+    outgoingSocketServer.halt();
 }
 
 // --------------------------------------------------------------------------------------
