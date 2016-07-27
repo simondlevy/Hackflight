@@ -51,7 +51,7 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     
     // Listen for clients that will provide SLAM data to us
-    socketServer.connect();
+    socketServer.connect("localhost", 20000);
     
     // Return success to V-REP
     CScriptFunctionData D;

@@ -40,7 +40,6 @@ using namespace cv;
 #include <signal.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include <sys/ioctl.h>
 
 static const int CAMERA_PORT          = 5000;
 static const int COMMS_IN_PORT        = 5001;
