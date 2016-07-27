@@ -32,7 +32,12 @@ if __name__ == '__main__':
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    sock.connect((host, port))
+    try :
+        sock.connect((host, port))
+
+    except:
+        print('Connection resfused: make sure visualization server is running')
+        exit(1)
 
     x = 0
     y = 0
