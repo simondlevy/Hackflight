@@ -45,6 +45,16 @@ if __name__ == '__main__':
     # Create an MSP parser to handle pose message requests
     parser = msppg.MSP_Parser()
 
+    # Loop forever, fielding SLAM update requests from visualization server
+    while True:
+
+        print('looping')
+        time.sleep(.5)
+
+        #b = sock.recv(1)
+
+        #print('0X%02x' % ord(b))
+
     '''
     for count in range(20):
 

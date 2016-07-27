@@ -75,6 +75,10 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
     MSP_Message poseRequest = MSP_Parser::serialize_SLAM_POSE_Request();
 
+    for (byte b = poseRequest.start(); poseRequest.hasNext(); b = poseRequest.getNext())
+        printf("%02X\n", b);
+    printf("\n");
+
     /*
     char c;
     if (read_from_socket(clientfd, &c, 1))
