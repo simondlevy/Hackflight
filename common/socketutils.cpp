@@ -1,5 +1,5 @@
 /*
-   socket.cpp: socket utilities for HackflightSim
+   socketutils.cpp: socket utilities for HackflightSim
 
    This file is part of Hackflight.
 
@@ -28,13 +28,13 @@
 #include <string.h>
 
 // http://web.eecs.utk.edu/~plank/plank/classes/cs360/360/notes/Sockets/sockettome.c
-int serve_socket(int port)
+static int serve_socket(const char *hostname, int port)
 {
     int s;
     struct sockaddr_in sn;
     struct hostent *he;
 
-    if (!(he = gethostbyname("localhost"))) {
+    if (!(he = gethostbyname(hostname))) {
         puts("can't gethostname");
         exit(1);
     }
@@ -57,7 +57,7 @@ int serve_socket(int port)
     return s;
 }
 
-int accept_connection(int sockfd)
+static int accept_connection(int sockfd)
 {
     int x;
     struct sockaddr_in sn;
@@ -77,7 +77,7 @@ int accept_connection(int sockfd)
     return x;
 }
 
-int read_from_socket(int clientfd, char * buf, int n)
+static int read_from_socket(int clientfd, char * buf, int n)
 // http://developerweb.net/viewtopic.php?id=2933
 {
     fd_set readset;
@@ -110,7 +110,7 @@ int read_from_socket(int clientfd, char * buf, int n)
     return 0;
 }
 
-int connect_to_server(int port, const char * hostname)
+static int connect_to_server(int port, const char * hostname)
 {
     // http://web.eecs.utk.edu/~plank/plank/classes/cs360/360/notes/Sockets/sockettome.c
     struct sockaddr_in sn;
@@ -134,3 +134,34 @@ int connect_to_server(int port, const char * hostname)
     return sockfd;
 }
 
+SocketServer::SocketServer(void) 
+{
+}
+
+
+void SocketServer::connect(const char * hostname, int port)
+{
+    this->sockfd = serve_socket(hostname, port);
+
+    printf("Listening for client on host %s at port %d\n", hostname, port);
+
+    this->clientfd = accept_connection(sockfd);
+
+    printf("Accepted connection\n");
+}
+
+int SocketServer::recv(char * buf, int count)
+{
+    return read_from_socket(this->clientfd, buf, count);
+}
+
+void SocketServer::send(char * buf, int count)
+{
+    write(this->clientfd, buf, count);
+}
+
+void SocketServer::halt(void)
+{
+    close(this->sockfd);
+    close(this->clientfd);
+}

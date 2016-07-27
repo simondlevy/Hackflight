@@ -15,12 +15,22 @@
    along with 3DSLAM.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+class SocketServer {
 
-int serve_socket(int port);
+    private:
 
-int accept_connection(int sockfd);
+        int sockfd;
+        int clientfd;
 
-int read_from_socket(int clientfd, char * buf, int n);
+    public:
 
-int connect_to_server(int port, const char * hostname="localhost");
+        SocketServer(void);
 
+        void connect(const char * hostname = "localhost", int port = 20000);
+
+        int recv(char * buf, int count);
+
+        void send(char * buf, int count);
+
+        void halt(void); 
+};

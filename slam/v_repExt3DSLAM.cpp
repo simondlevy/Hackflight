@@ -40,7 +40,7 @@ using namespace std;
 
 LIBRARY vrepLib;
 
-static int sockfd, clientfd;
+static SocketServer socketServer;
 
 // --------------------------------------------------------------------------------------
 // simExt3DSLAM_start
@@ -49,21 +49,14 @@ static int sockfd, clientfd;
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
-    // Create a SLAM data request message
-    
     
     // Listen for clients that will provide SLAM data to us
-    sockfd = serve_socket(PORT);
-    printf("Waiting for client ...");
-    fflush(stdout);
-    clientfd = accept_connection(sockfd);
-    printf("\nClient connected\n");
+    socketServer.connect();
     
     // Return success to V-REP
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);
-
 }
 
 // --------------------------------------------------------------------------------------
@@ -82,15 +75,9 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     gettimeofday(&tv,NULL);
     if (tv.tv_usec - usec_start > 500000) {
         for (byte b = poseRequest.start(); poseRequest.hasNext(); b = poseRequest.getNext())
-            write(clientfd, &b, 1);
+            socketServer.send((char *)&b, 1);
         usec_start = tv.tv_usec;
     }
-
-    /*
-    char c;
-    if (read_from_socket(clientfd, &c, 1))
-        printf("%c", c);
-        */
 
     /*
 
@@ -124,8 +111,7 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);
 
-    close(clientfd);
-    close(sockfd);
+    socketServer.halt();
 
 }
 
