@@ -36,18 +36,25 @@ class SLAM_Parser(msppg.MSP_Parser):
 
         print('got pose request')
 
-if __name__ == '__main__':
+def connectToServer(host, port):
 
-    host = sys.argv[1]  if len(sys.argv) > 1 else 'localhost'
-
-    insock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try :
-        insock.connect((host, INCOMING_PORT))
+        sock.connect((host, port))
 
     except:
         print('Connection resfused: make sure visualization server is running')
         exit(1)
+
+    return sock
+
+if __name__ == '__main__':
+
+    host = sys.argv[1]  if len(sys.argv) > 1 else 'localhost'
+
+    # Make socket connections to visualization server
+    insock = connectToServer(host, INCOMING_PORT)
 
     # Create an MSP parser to handle pose message requests
     parser = SLAM_Parser()
