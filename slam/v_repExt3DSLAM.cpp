@@ -28,6 +28,7 @@ static const int PORT = 20000;
 
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #include <iostream>
 using namespace std;
@@ -75,8 +76,15 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
     MSP_Message poseRequest = MSP_Parser::serialize_SLAM_POSE_Request();
 
-    for (byte b = poseRequest.start(); poseRequest.hasNext(); b = poseRequest.getNext())
-        write(clientfd, &b, 1);
+    // Every 500 msec, send a pose request 
+    static unsigned long usec_start;
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+    if (tv.tv_usec - usec_start > 500000) {
+        for (byte b = poseRequest.start(); poseRequest.hasNext(); b = poseRequest.getNext())
+            write(clientfd, &b, 1);
+        usec_start = tv.tv_usec;
+    }
 
     /*
     char c;
