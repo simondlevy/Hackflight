@@ -36,7 +36,7 @@ class MSP_Parser(object):
             else: # restart and try again
                 self.state = 0
 
-        elif self.state ==  2: # direction (should be >)
+        elif self.state ==  2: # direction
             if byte == 62:  # >
                 self.message_direction = 1
             else: # <

@@ -5,6 +5,8 @@ msppg.py Multiwii Serial Protocol Parser Generator
 
 Copyright (C) Rob Jones, Alec Singer, Chris Lavin, Blake Liebling, Simon D. Levy 2015
 
+This program is part of Hackflight
+
 This code is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as 
 published by the Free Software Foundation, either version 3 of the 
@@ -19,8 +21,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-from sys import exit, argv, stderr
-from subprocess import call
+from sys import exit, argv
 import os
 import json
 from pkg_resources import resource_string
@@ -137,8 +138,12 @@ class Python_Emitter(CodeEmitter):
             msgid = msgstuff[0]
             if msgid < 200:
                 self._write(4*self.indent + ('if self.message_id == %d:\n\n' % msgstuff[0]))
-                self._write(5*self.indent + 'if hasattr(self, \'' +  msgtype + '_Handler\'):\n\n')
-                self._write(6*self.indent + 'self.%s_Handler(*struct.unpack(\'=' % msgtype)
+                self._write(5*self.indent + ('if self.message_direction == 0:\n\n'))
+                self._write(6*self.indent + 'if hasattr(self, \'' +  msgtype + '_Request_Handler\'):\n\n')
+                self._write(7*self.indent + 'self.%s_Request_Handler()\n\n' % msgtype)
+                self._write(5*self.indent + 'else:\n\n')
+                self._write(6*self.indent + 'if hasattr(self, \'' +  msgtype + '_Handler\'):\n\n')
+                self._write(7*self.indent + 'self.%s_Handler(*struct.unpack(\'=' % msgtype)
                 for argtype in self._getargtypes(msgstuff):
                     self._write('%s' % self.type2pack[argtype])
                 self._write("\'" + ', self.message_buffer))\n\n')
@@ -155,6 +160,9 @@ class Python_Emitter(CodeEmitter):
 
                 self._write(self.indent + 'def set_%s_Handler(self, handler):\n\n' % msgtype) 
                 self._write(2*self.indent + 'self.%s_Handler = handler\n\n' % msgtype)
+
+                self._write(self.indent + 'def set_%s_Request_Handler(self, handler):\n\n' % msgtype) 
+                self._write(2*self.indent + 'self.%s_Request_Handler = handler\n\n' % msgtype)
 
         # Emit serializer functions for module
         for msgtype in msgdict.keys():

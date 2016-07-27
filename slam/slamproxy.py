@@ -27,6 +27,9 @@ import sys
 
 import msppg
 
+def handlePoseRequest():
+    print('got pose request')
+
 if __name__ == '__main__':
 
     host =     sys.argv[1]  if len(sys.argv) > 1 else 'localhost'
@@ -43,13 +46,13 @@ if __name__ == '__main__':
 
     # Create an MSP parser to handle pose message requests
     parser = msppg.MSP_Parser()
+    parser.set_SLAM_POSE_Request_Handler(handlePoseRequest)
 
     # Loop forever, fielding SLAM update requests from visualization server
     while True:
 
-        b = sock.recv(1)
+        parser.parse(sock.recv(1))
 
-        print('0X%02x' % ord(b))
 
     '''
     for count in range(20):
