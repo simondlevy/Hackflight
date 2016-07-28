@@ -31,7 +31,7 @@
 // http://web.eecs.utk.edu/~plank/plank/classes/cs360/360/notes/Sockets/sockettome.c
 static int serve_socket(const char *hostname, int port)
 {
-    int s;
+    int sockfd;
     struct sockaddr_in sn;
     struct hostent *he;
 
@@ -45,17 +45,21 @@ static int serve_socket(const char *hostname, int port)
     sn.sin_port = htons((short)port);
     sn.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    if ((s = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
         perror("socket()");
         exit(1);
     }
 
-    if (bind(s, (struct sockaddr *)&sn, sizeof(sn)) == -1) {
+    int option = 1;
+    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+
+
+    if (bind(sockfd, (struct sockaddr *)&sn, sizeof(sn)) == -1) {
         perror("bind()");
         exit(1);
     }
 
-    return s;
+    return sockfd;
 }
 
 static int accept_connection(int sockfd)
@@ -122,7 +126,7 @@ void SocketServer::acceptConnection(void)
 {
     this->sockfd = serve_socket(this->hostname, this->port);
 
-    printf("Listening for client on host %s at port %d\n", this->hostname, this->port);
+    printf("Listening for %s:%d\n", this->hostname, this->port);
 
     this->clientfd = accept_connection(sockfd);
 
@@ -141,6 +145,8 @@ void SocketServer::send(char * buf, int count)
 
 void SocketServer::halt(void)
 {
+    printf("Halting %s:%d\n", this->hostname, this->port);
+
     close(this->sockfd);
     close(this->clientfd);
 }
