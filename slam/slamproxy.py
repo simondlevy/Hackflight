@@ -26,12 +26,18 @@ import socket
 import sys
 import time
 
-import msppg
+from msppg import MSP_Parser
 
 INCOMING_PORT = 20001
 OUTGOING_PORT = 20000
 
-class SLAM_Parser(msppg.MSP_Parser):
+class SLAM_Parser(MSP_Parser):
+
+    def __init__(self, outsock):
+
+        MSP_Parser.__init__(self)
+
+        self.outsock = outsock
 
     def handlePoseRequest(self):
 
@@ -60,30 +66,15 @@ if __name__ == '__main__':
     insock  = connectToServer(host, INCOMING_PORT)
 
     # Create an MSP parser to handle pose message requests
-    parser = SLAM_Parser()
+    parser = SLAM_Parser(outsock)
     parser.set_SLAM_POSE_Request_Handler(parser.handlePoseRequest)
 
     # Loop forever, fielding SLAM update requests from visualization server
     while True:
 
         try:
-
             parser.parse(insock.recv(1))
 
         except:
-
             break
 
-
-    '''
-    for count in range(20):
-
-            try:
-                sock.send(('%f,%f,%f\n' % (x,y,z)).encode('utf-8'))
-            except:
-                break
-
-            x += CUBESIZE
-
-            time.sleep(1)
-    '''
