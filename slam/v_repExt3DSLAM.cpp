@@ -41,8 +41,8 @@ using namespace std;
 
 LIBRARY vrepLib;
 
-static SocketServer incomingSocketServer;
-static SocketServer outgoingSocketServer;
+static SocketServer incomingSocketServer("localhost", INCOMING_PORT);
+static SocketServer outgoingSocketServer("localhost", OUTGOING_PORT);
 
 // --------------------------------------------------------------------------------------
 // simExt3DSLAM_start
@@ -53,8 +53,9 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     
     // Listen for clients that will provide SLAM data to us
-    //incomingSocketServer.connect("localhost", INCOMING_PORT);
-    outgoingSocketServer.connect("localhost", OUTGOING_PORT);
+    incomingSocketServer.acceptConnection();
+    sleep(1);
+    outgoingSocketServer.acceptConnection();
     
     // Return success to V-REP
     CScriptFunctionData D;
@@ -114,7 +115,7 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);
 
-    //incomingSocketServer.halt();
+    incomingSocketServer.halt();
     outgoingSocketServer.halt();
 }
 

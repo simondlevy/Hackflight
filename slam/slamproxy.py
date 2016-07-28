@@ -24,6 +24,7 @@ CUBESIZE = 0.1
 
 import socket
 import sys
+import time
 
 import msppg
 
@@ -44,7 +45,7 @@ def connectToServer(host, port):
         sock.connect((host, port))
 
     except:
-        print('Connection resfused: make sure visualization server is running')
+        print('Connection to %s:%d resfused: make sure visualization server is running' % (host,port))
         exit(1)
 
     return sock
@@ -54,7 +55,9 @@ if __name__ == '__main__':
     host = sys.argv[1]  if len(sys.argv) > 1 else 'localhost'
 
     # Make socket connections to visualization server
-    insock = connectToServer(host, INCOMING_PORT)
+    outsock = connectToServer(host, OUTGOING_PORT)
+    time.sleep(1)
+    insock  = connectToServer(host, INCOMING_PORT)
 
     # Create an MSP parser to handle pose message requests
     parser = SLAM_Parser()

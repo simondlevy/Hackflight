@@ -40,7 +40,7 @@ endif
 
 PLUGIN = libv_repExt3DSLAM.$(EXT)
 
-libv_repExt3DSLAM.$(EXT): v_repExt3DSLAM.cpp
+libv_repExt3DSLAM.$(EXT): v_repExt3DSLAM.cpp ../common/socketutils.cpp ../common/socketutils.hpp
 	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" v_repExt3DSLAM.cpp 
 	g++ $(CFLAGS) -c msppg.cpp
 	g++ $(CFLAGS) -c ../common/socketutils.cpp

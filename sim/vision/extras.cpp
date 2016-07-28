@@ -95,9 +95,12 @@ class CompanionBoard {
             }
 
             // Open a socket for syncing camera images with the server, and sockets for comms
-            this->cameraSyncSocket.connectToServer("localhost", CAMERA_PORT);
-            this->commsInSocket.connectToServer("localhost", COMMS_IN_PORT);
-            this->commsOutSocket.connectToServer("localhost", COMMS_OUT_PORT);
+            this->cameraSyncSocket = SocketClient("localhost", CAMERA_PORT);
+            this->cameraSyncSocket.connectToServer();
+            this->commsInSocket = SocketClient("localhost", COMMS_IN_PORT);
+            this->commsInSocket.connectToServer();
+            this->commsOutSocket = SocketClient("localhost", COMMS_OUT_PORT);
+            this->commsOutSocket.connectToServer();
         }
 
         void update(char * imageBytes, int imageWidth, int imageHeight,

@@ -19,14 +19,16 @@ class SocketServer {
 
     private:
 
+        char hostname[100];
+        int port;
         int sockfd;
         int clientfd;
 
     public:
 
-        SocketServer(void);
+        SocketServer(const char * hostname = "localhost", int port = 20000);
 
-        void connect(const char * hostname = "localhost", int port = 20000);
+        void acceptConnection(void);
 
         int recv(char * buf, int count);
 
@@ -39,13 +41,15 @@ class SocketClient {
 
     private:
 
+        char hostname[100];
+        int port;
         int sockfd;
 
     public:
 
-        SocketClient(void);
+        SocketClient(const char * hostname = "localhost", int port = 20000);
 
-        void connectToServer(const char * hostname = "localhost", int port = 20000);
+        void connectToServer(void);
 
         int available(void);
 

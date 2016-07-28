@@ -111,16 +111,18 @@ static int read_from_socket(int clientfd, char * buf, int n)
     return 0;
 }
 
-SocketServer::SocketServer(void) 
+SocketServer::SocketServer(const char * _hostname, int _port)
 {
+    strcpy(this->hostname, _hostname);
+    this->port = _port;
 }
 
 
-void SocketServer::connect(const char * hostname, int port)
+void SocketServer::acceptConnection(void)
 {
-    this->sockfd = serve_socket(hostname, port);
+    this->sockfd = serve_socket(this->hostname, this->port);
 
-    printf("Listening for client on host %s at port %d\n", hostname, port);
+    printf("Listening for client on host %s at port %d\n", this->hostname, this->port);
 
     this->clientfd = accept_connection(sockfd);
 
@@ -143,17 +145,19 @@ void SocketServer::halt(void)
     close(this->clientfd);
 }
 
-SocketClient::SocketClient(void)
+SocketClient::SocketClient(const char * _hostname, int _port)
 {
+    strcpy(this->hostname, _hostname);
+    this->port = _port;
 }
 
-void SocketClient::connectToServer(const char * hostname, int port)
+void SocketClient::connectToServer(void)
 {
     // http://web.eecs.utk.edu/~plank/plank/classes/cs360/360/notes/Sockets/sockettome.c
     struct sockaddr_in sn;
     struct hostent *he;
-    if (!(he = gethostbyname(hostname))) {
-        printf("can't get host id for %s\n", hostname);
+    if (!(he = gethostbyname(this->hostname))) {
+        printf("can't get host id for %s\n", this->hostname);
     }
     int ok = 0;
     this->sockfd = 0;
