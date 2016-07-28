@@ -42,6 +42,7 @@ class SLAM_Parser(MSP_Parser):
     def handlePoseRequest(self):
 
         print('got pose request')
+        self.outsock.send('a')
 
 def connectToServer(host, port):
 
@@ -76,5 +77,6 @@ if __name__ == '__main__':
             parser.parse(insock.recv(1))
 
         except:
+            print('error in receive')
             break
 
