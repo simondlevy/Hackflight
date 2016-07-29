@@ -13,8 +13,14 @@ int main(int argc, char ** argv)
 
     SerialConnection s(argv[1]);
 
-    while (true)
-        printf("avail: %d\n", s.bytesAvailable());
+    while (true) {
+
+        while (s.bytesAvailable()) {
+            char c;
+            s.readBytes(&c, 1);
+            printf("%c\n", c);
+        }
+    }
 
     s.closeConnection();
 
