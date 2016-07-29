@@ -17,6 +17,9 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+static const char * PORTNAME = "/dev/ttyUSB0";
+static const int    BAUDRATE = 57600;
+
 #include "extras.hpp"
 #include "serial.hpp"
 
@@ -31,7 +34,7 @@ static const char * sonarNames[5] = {"Sonar_Back", "Sonar_Bottom", "Sonar_Front"
 
 static int sonarHandles[5];
 
-static SerialConnection serialConnection("/dev/ttyUSB0");
+static SerialConnection serialConnection(PORTNAME, BAUDRATE);
 
 void extrasStart(void)
 {
