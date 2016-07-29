@@ -34,8 +34,8 @@ toolchain](https://launchpad.net/gcc-arm-embedded) installed, and you'll need
 to grab the [BreezySTM32](https://github.com/simondlevy/BreezySTM32)
 repository.  
 
-In <tt>hackflight/firmware/naze/130mm</tt> there's code that uses PID values (<tt>pidvals.hpp</tt>)
-appropriate that worked well on my 130mm quadcopter.  Likewise, <tt>hackflight/firmware/naze/250mm</tt> 
+In <tt>hackflight/boards/naze/130mm</tt> there's code that uses PID values (<tt>pidvals.hpp</tt>)
+appropriate that worked well on my 130mm quadcopter.  Likewise, <tt>hackflight/boards/naze/250mm</tt> 
 contains code that uses values that worked on a 250mm quad.   So choose whichever is closest to your 
 vehicle, cd to that folder, and edit the Makeke to reflect where you put BreezySTM32. Then type <tt>make</tt>,
 which will build the firmware binary in the <tt>obj</tt> directory.  If you've
