@@ -18,7 +18,7 @@
 */
 
 #include "extras.hpp"
-#include "socketutils.hpp"
+#include "sockets.hpp"
 
 #include "scriptFunctionData.h"
 #include "v_repLib.h"

@@ -15,7 +15,7 @@
    along with 3DSLAM.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "socketutils.hpp"
+#include "sockets.hpp"
 
 #include <stdio.h>
 #include <netdb.h>
