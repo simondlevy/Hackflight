@@ -24,7 +24,7 @@ extern "C" {
 #include <breezystm32.h>
 #include <math.h>
 
-#include "../board.hpp"
+#include "board.hpp"
 
 #define BOARD_VERSION     5
 #define USE_CPPM          1

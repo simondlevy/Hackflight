@@ -168,49 +168,51 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 
 # C++ support
 
-mw.o: ../../mw.cpp ../../mw.hpp ../../rc.hpp
-	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o mw.o ../../mw.cpp
+FIRMDIR = ../../../firmware
 
-imu.o: ../../imu.cpp ../../imu.hpp
+mw.o: $(FIRMDIR)/mw.cpp $(FIRMDIR)/mw.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o imu.o ../../imu.cpp
+	@$(CC) $(CFLAGS) -c -o mw.o $(FIRMDIR)/mw.cpp
 
-mixer.o: ../../mixer.cpp ../../mixer.hpp ../../rc.hpp
+imu.o: $(FIRMDIR)/imu.cpp $(FIRMDIR)/imu.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o mixer.o ../../mixer.cpp
+	@$(CC) $(CFLAGS) -c -o imu.o $(FIRMDIR)/imu.cpp
 
-stabilize.o: ../../stabilize.cpp ../../stabilize.hpp
+mixer.o: $(FIRMDIR)/mixer.cpp $(FIRMDIR)/mixer.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o stabilize.o ../../stabilize.cpp
+	@$(CC) $(CFLAGS) -c -o mixer.o $(FIRMDIR)/mixer.cpp
 
-msp.o: ../../msp.cpp ../../msp.hpp ../../rc.hpp
+stabilize.o: $(FIRMDIR)/stabilize.cpp $(FIRMDIR)/stabilize.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o msp.o ../../msp.cpp
+	@$(CC) $(CFLAGS) -c -o stabilize.o $(FIRMDIR)/stabilize.cpp
 
-baro.o: ../../baro.cpp ../../baro.hpp
+msp.o: $(FIRMDIR)/msp.cpp $(FIRMDIR)/msp.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o baro.o ../../baro.cpp
+	@$(CC) $(CFLAGS) -c -o msp.o $(FIRMDIR)/msp.cpp
 
-rc.o: ../../rc.cpp ../../rc.hpp
+baro.o: $(FIRMDIR)/baro.cpp $(FIRMDIR)/baro.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o rc.o ../../rc.cpp
+	@$(CC) $(CFLAGS) -c -o baro.o $(FIRMDIR)/baro.cpp
 
-navigate.o: ../../navigate.cpp ../../navigate.hpp ../../rc.hpp
+rc.o: $(FIRMDIR)/rc.cpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o navigate.o ../../navigate.cpp
+	@$(CC) $(CFLAGS) -c -o rc.o $(FIRMDIR)/rc.cpp
 
-hover.o: ../../hover.cpp ../../hover.hpp ../../rc.hpp
+navigate.o: $(FIRMDIR)/navigate.cpp $(FIRMDIR)/navigate.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o hover.o ../../hover.cpp
+	@$(CC) $(CFLAGS) -c -o navigate.o $(FIRMDIR)/navigate.cpp
 
-filters.o: ../../filters.cpp ../../filters.hpp ../../rc.hpp
+hover.o: $(FIRMDIR)/hover.cpp $(FIRMDIR)/hover.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o filters.o ../../filters.cpp
+	@$(CC) $(CFLAGS) -c -o hover.o $(FIRMDIR)/hover.cpp
 
-board.o: ../board.cpp ../../board.hpp
+filters.o: $(FIRMDIR)/filters.cpp $(FIRMDIR)/filters.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o board.o ../board.cpp
+	@$(CC) $(CFLAGS) -c -o filters.o $(FIRMDIR)/filters.cpp
+
+board.o: ../board.cpp $(FIRMDIR)/board.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -I$(FIRMDIR) -c -o board.o ../board.cpp
 
 clean:
 	rm -rf *.o obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)

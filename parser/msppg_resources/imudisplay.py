@@ -24,10 +24,9 @@ FMUPORT = '/dev/ttyUSB0'
 VEHICLE_SCALE = 0.10
 UPDATE_MSEC = 10
 
-from tkinter import *
+import tkinter
 import threading
 import serial
-import time
 import msppg
 from math import sin, cos, radians, degrees
 import numpy as np
@@ -130,7 +129,7 @@ class Display(object):
 
     def _create_window(self, x, widget):
 
-        return self.driver.canvas.create_window(x, 10, anchor=NW, window=widget)
+        return self.driver.canvas.create_window(x, 10, anchor=tkinter.NW, window=widget)
 
     def _check_quit(self, event):
 
@@ -516,7 +515,6 @@ class Display(object):
                  (64,65,66,67),(65,69,70,66),(68,64,67,71),(64,68,69,65),(67,66,70,71),(69,73,74,70),(72,68,71,75),(68,72,73,69),(71,70,74,75),(73,77,78,74),(76,72,75,79),(72,76,77,73),(75,74,78,79),(77,81,82,78),(80,76,79,83),(76,80,81,77),(79,78,82,83),(81,85,86,82),(84,80,83,87),(80,84,85,81),(83,82,86,87),(85,89,90,86),(89,88,91,90),(88,84,87,91),(84,88,89,85),(87,86,90,91),   #prop 1
                  ]
 
-        lightestGrey = '#d1c0c0'
         lightGrey = '#72716d'
         grey = '#665f59'
         darkGrey ='#4c4641'
@@ -631,11 +629,11 @@ if __name__ == "__main__":
     width = 800
     height = 800
 
-    root = Tk()
+    root = tkinter.Tk()
 
     root.geometry('%dx%d+%d+%d' % (width, height, 200, 200))
 
-    canvas = Canvas(root, width=width, height=height, background='black')
+    canvas = tkinter.Canvas(root, width=width, height=height, background='black')
 
     driver = MSPDriver(root, canvas)
 
@@ -643,4 +641,4 @@ if __name__ == "__main__":
 
     Display(driver, simulation=True).start()
 
-    mainloop()
+    tkinter.mainloop()
