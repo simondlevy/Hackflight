@@ -40,7 +40,7 @@ endif
 
 PLUGIN = libv_repExtHackflight.$(EXT)
 
-all: $(PLUGIN)
+all: $(PLUGIN) getimu
 
 libv_repExtHackflight.$(EXT): *.cpp ../*.cpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp
 	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" ../v_repExtHackflight.cpp 
@@ -61,6 +61,9 @@ libv_repExtHackflight.$(EXT): *.cpp ../*.cpp ../*.hpp ../../firmware/*.cpp ../..
 	g++ $(CFLAGS) -c ../../firmware/navigate.cpp
 	g++ $(CFLAGS) -c ../../firmware/filters.cpp
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared $(JOYLIB)
+
+getimu: getimu.cpp
+	g++ -o getimu getimu.cpp msppg.cpp
 
 edit:
 	vim extras.cpp
