@@ -11,7 +11,12 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
+    SerialConnection s(argv[1]);
 
+    while (true)
+        printf("avail: %d\n", s.bytesAvailable());
+
+    s.closeConnection();
 
     return 0;
 }

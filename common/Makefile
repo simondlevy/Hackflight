@@ -1,4 +1,7 @@
-all: serialtest
+all: readserial
 
-serialtest: serialtest.cpp serial.cpp serial.hpp
-	g++ -o serialtest serialtest.cpp serial.cpp serial.hpp
+readserial: readserial.cpp serial.cpp serial.hpp
+	g++ -o readserial readserial.cpp serial.cpp serial.hpp
+
+clean:
+	rm -f readserial
