@@ -31,6 +31,8 @@ static const char * sonarNames[5] = {"Sonar_Back", "Sonar_Bottom", "Sonar_Front"
 
 static int sonarHandles[5];
 
+static SerialConnection serialConnection("/dev/ttyUSB0");
+
 void extrasStart(void)
 {
     for (int k=0; k<5; ++k)
@@ -70,16 +72,17 @@ void extrasStop(void)
 
 uint8_t Board::serialAvailableBytes(void)
 {
-    return 0;
+    return serialConnection.bytesAvailable();
 }
 
 uint8_t Board::serialReadByte(void)
 {
-    return 0;
+    uint8_t c = 0;
+    serialConnection.readBytes((char *)&c, 1);
+    return c;
 }
 
 void Board::serialWriteByte(uint8_t c)
 {
+    serialConnection.writeBytes((char *)&c, 1);
 }
-
-
