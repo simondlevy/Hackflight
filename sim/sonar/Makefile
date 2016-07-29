@@ -63,7 +63,7 @@ libv_repExtHackflight.$(EXT): *.cpp ../*.cpp ../*.hpp ../../firmware/*.cpp ../..
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared $(JOYLIB)
 
 getimu: getimu.cpp
-	g++ -o getimu getimu.cpp msppg.cpp
+	g++ -o getimu -I../../common getimu.cpp msppg.cpp ../../common/serial.cpp
 
 edit:
 	vim extras.cpp
