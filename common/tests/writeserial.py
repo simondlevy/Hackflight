@@ -24,12 +24,12 @@
 from serial import Serial
 from sys import argv
 
-if len(argv) < 2:
-    print('Usage:   %s PORTNAME' % argv[0])
-    print('Example: %s /dev/ttyUSB0' % argv[0])
+if len(argv) < 3:
+    print('Usage:   %s PORTNAME BAUDRATE' % argv[0])
+    print('Example: %s /dev/ttyUSB0 115200' % argv[0])
     exit(1)
 
-s = Serial(argv[1])
+s = Serial(argv[1], int(argv[2]))
 
 k = 0
 
