@@ -6,8 +6,8 @@ read: readserial
 write: 
 	./writeserial.py /dev/ttyUSB1
 
-readserial: readserial.cpp serial.cpp serial.hpp
-	g++ -o readserial readserial.cpp serial.cpp serial.hpp
+readserial: readserial.cpp ../serial.cpp ../serial.hpp
+	g++ -o readserial -I.. readserial.cpp ../serial.cpp 
 
 clean:
 	rm -f readserial

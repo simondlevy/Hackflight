@@ -18,6 +18,7 @@
 */
 
 #include "extras.hpp"
+#include "serial.hpp"
 
 #include "scriptFunctionData.h"
 #include "v_repLib.h"

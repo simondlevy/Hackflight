@@ -1,6 +1,6 @@
 parser/output
 sim/libv_repExtHackflight.*
-common/readserial
+common/tests/readserial
 *.o
 *.swp
 *~

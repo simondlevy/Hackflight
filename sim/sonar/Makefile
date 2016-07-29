@@ -45,6 +45,7 @@ all: $(PLUGIN)
 libv_repExtHackflight.$(EXT): *.cpp ../*.cpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp
 	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" ../v_repExtHackflight.cpp 
 	g++ $(CFLAGS) -c extras.cpp 
+	g++ $(CFLAGS) -c ../../common/serial.cpp
 	g++ $(CFLAGS) -c ../controller_Posix.cpp 
 	g++ $(CFLAGS) -c ../controller_$(OS).cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
@@ -60,6 +61,9 @@ libv_repExtHackflight.$(EXT): *.cpp ../*.cpp ../*.hpp ../../firmware/*.cpp ../..
 	g++ $(CFLAGS) -c ../../firmware/navigate.cpp
 	g++ $(CFLAGS) -c ../../firmware/filters.cpp
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared $(JOYLIB)
+
+edit:
+	vim extras.cpp
 
 install: $(PLUGIN)
 	cp $(PLUGIN) $(VREP_LIBDIR)
