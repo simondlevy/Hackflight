@@ -1,5 +1,7 @@
 /*
-   socketutils.hpp: class declarations for socket utilities
+   sockets.hpp: class declarations for socket utilities
+
+   Copyright (C) Simon D. Levy 2016
 
    This file is part of Hackflight.
 

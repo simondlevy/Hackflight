@@ -1,5 +1,7 @@
 /*
-   socketutils.cpp: socket utilities for HackflightSim
+   sockets.cpp: Implementation of socket classes
+
+   Copyright (C) Simon D. Levy 2016
 
    This file is part of Hackflight.
 
