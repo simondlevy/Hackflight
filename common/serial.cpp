@@ -6,6 +6,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <sys/ioctl.h>
 
 #include "serial.hpp"
 
@@ -116,6 +117,13 @@ SerialConnection::SerialConnection(const char * portname, int baudrate, bool blo
     set_interface_attribs (this->fd, baudrate, parity);
 
     set_blocking (this->fd, blocking);
+}
+
+int SerialConnection::bytesAvailable(void)
+{
+    int avail = 0;
+    ioctl(this->fd, FIONREAD, &avail);
+    return avail;
 }
 
 int SerialConnection::readBytes(char * buf, int size)

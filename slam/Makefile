@@ -40,19 +40,16 @@ endif
 
 PLUGIN = libv_repExt3DSLAM.$(EXT)
 
-all: $(PLUGIN) visproxy
+all: $(PLUGIN)
 
-libv_repExt3DSLAM.$(EXT): v_repExt3DSLAM.cpp ../common/socketutils.cpp ../common/socketutils.hpp
+libv_repExt3DSLAM.$(EXT): v_repExt3DSLAM.cpp ../common/serial.cpp ../common/serial.hpp
 	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" v_repExt3DSLAM.cpp 
 	g++ $(CFLAGS) -c msppg.cpp
-	g++ $(CFLAGS) -c ../common/socketutils.cpp
+	g++ $(CFLAGS) -c ../common/serial.cpp
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
 	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp
 	g++ *.o -o libv_repExt3DSLAM.$(EXT) -lpthread -shared
-
-visproxy: visproxy.cpp ../common/serial.cpp ../common/serial.hpp
-	g++ -o visproxy -I../common visproxy.cpp msppg.cpp ../common/serial.cpp 
 
 install: $(PLUGIN)
 	cp $(PLUGIN) $(VREP_LIBDIR)

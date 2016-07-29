@@ -4,6 +4,8 @@ class SerialConnection {
 
         SerialConnection(const char * portname, int baudrate=9600, bool blocking=true, int parity=0);
 
+        int bytesAvailable(void);
+
         int readBytes(char * buf, int size);
 
         int writeBytes(char * buf, int size);
