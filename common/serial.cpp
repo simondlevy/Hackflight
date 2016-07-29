@@ -7,7 +7,9 @@
 #include <unistd.h>
 #include <stdio.h>
 
-int set_interface_attribs (int fd, int speed, int parity)
+#include "serial.hpp"
+
+static int set_interface_attribs (int fd, int speed, int parity)
 {
     struct termios tty;
     memset (&tty, 0, sizeof tty);
@@ -47,7 +49,7 @@ int set_interface_attribs (int fd, int speed, int parity)
     return 0;
 }
 
-void set_blocking (int fd, int should_block)
+static void set_blocking (int fd, bool should_block)
 {
     struct termios tty;
     memset (&tty, 0, sizeof tty);
@@ -64,24 +66,69 @@ void set_blocking (int fd, int should_block)
         fprintf(stderr, "error %d setting term attributes", errno);
 }
 
-int main(int argc, char ** argv)
+SerialConnection::SerialConnection(const char * portname, int baudrate, bool blocking, int parity)
 {
-    const char *portname = "/dev/ttyUSB1";
+    this->fd = open (portname, O_RDWR | O_NOCTTY | O_SYNC);
 
-    int fd = open (portname, O_RDWR | O_NOCTTY | O_SYNC);
-    if (fd < 0)
-    {
+    if (this->fd < 0) {
         fprintf(stderr, "error %d opening %s: %s", errno, portname, strerror (errno));
-        return -1;
     }
 
-    set_interface_attribs (fd, B115200, 0);  // set speed to 115,200 bps, 8n1 (no parity)
-    set_blocking (fd, 0);                // set no blocking
+    switch (baudrate) {
+        case 110:
+            baudrate = B110;
+            break;
+        case 300:
+            baudrate = B300;
+            break;
+        case 600:
+            baudrate = B600;
+            break;
+        case 1200:
+            baudrate = B1200;
+            break;
+        case 2400:
+            baudrate = B2400;
+            break;
+        case 4800:
+            baudrate = B4800;
+            break;
+        case 9600:
+            baudrate = B9600;
+            break;
+        case 19200:
+            baudrate = B19200;
+            break;
+        case 38400:
+            baudrate = B38400;
+            break;
+        case 57600:
+            baudrate = B57600;
+            break;
+        case 115200:
+            baudrate = B115200;
+            break;
+        default:
+            fprintf(stderr, "unrecognized baudrate %d\n", baudrate);
+            return;
+    }
 
-    write (fd, "hello!\n", 7);           // send 7 character greeting
+    set_interface_attribs (this->fd, baudrate, parity);
 
-    usleep ((7 + 25) * 100);             // sleep enough to transmit the 7 plus
-    // receive 25:  approx 100 uS per char transmit
-    char buf [100];
-    int n = read (fd, buf, sizeof buf);  // read up to 100 characters if ready to read
+    set_blocking (this->fd, blocking);
+}
+
+int SerialConnection::readBytes(char * buf, int size)
+{
+    return read(this->fd, buf, size);
+}
+
+int SerialConnection::writeBytes(char * buf, int size)
+{
+    return write(this->fd, buf, size);
+}
+
+void SerialConnection::closeConnection(void)
+{
+    close(this->fd);
 }
