@@ -6,6 +6,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/ioctl.h>
 
 #include "serial.hpp"
@@ -72,7 +73,8 @@ SerialConnection::SerialConnection(const char * portname, int baudrate, bool blo
     this->fd = open (portname, O_RDWR | O_NOCTTY | O_SYNC);
 
     if (this->fd < 0) {
-        fprintf(stderr, "error %d opening %s: %s", errno, portname, strerror (errno));
+        fprintf(stderr, "error %d opening %s: %s\n", errno, portname, strerror (errno));
+        exit(1);
     }
 
     switch (baudrate) {
