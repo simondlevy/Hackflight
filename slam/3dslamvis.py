@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 
+FLOOR_X      =   0
+FLOOR_Y      = -30
+FLOOR_Z      =  20
+FLOOR_S      = 100
+
+CONE_LENGTH  =   3
+CONE_YOFFSET =   2
+CONE_RADIUS  =   1
+
 from visual import box, display, cone, color, rate, vector, materials
 from time import sleep
 from math import pi, radians
@@ -10,14 +19,12 @@ class ThreeDSlamVis(object):
 
         display(width=display_size,height=display_size,title='3D SLAM')
 
-        X = 0
-        Y = -30
-        Z = 20
-        S = 100
+        floor = box(pos = (FLOOR_X, FLOOR_Y, FLOOR_Z), 
+                length=FLOOR_S, height=1, width=FLOOR_S, 
+                material=materials.rough)
 
-        floor = box(pos = (X, Y, Z), length=S, height=1, width=S, material=materials.rough)
-
-        self.vehicle = cone(pos = (X, Y, Z), axis=(3,0,0), radius=1, color=color.red)
+        self.vehicle = cone(pos = (FLOOR_X, FLOOR_Y+CONE_YOFFSET, FLOOR_Z), 
+                axis=(CONE_LENGTH,0,0), radius=CONE_RADIUS, color=color.red)
 
         self.pose = 0,0,0,0
 
