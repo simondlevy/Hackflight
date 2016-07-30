@@ -8,9 +8,13 @@ class ThreeDSlamVis(object):
 
         display(width=display_size,height=display_size,title='3D SLAM')
 
-        box(pos=(0,-30,20), length=80, height=0.2, width=80)
+        X = 0
+        Y = -30
+        Z = 20
 
-        cone(pos=(0,-1, 2), axis=(3,0,0), radius=1, color=color.red)
+        box(pos = (X, Y, Z), length=100, height=1, width=100)
+
+        self.vehicle = cone(pos = (X,Y+10, Z), axis=(3,0,0), radius=1, color=color.red)
       
     def addObstacle(self, x, y, z):
 
