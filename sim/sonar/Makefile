@@ -40,7 +40,9 @@ endif
 
 PLUGIN = libv_repExtHackflight.$(EXT)
 
-all: $(PLUGIN) getimu
+ALL = $(PLUGIN) getimu
+
+all: $(ALL)
 
 libv_repExtHackflight.$(EXT): *.cpp ../*.cpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp
 	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" ../v_repExtHackflight.cpp 
@@ -72,5 +74,5 @@ install: $(PLUGIN)
 	cp $(PLUGIN) $(VREP_LIBDIR)
 
 clean:
-	rm -f *.o *.$(EXT) *.pyc *~
+	rm -f $(ALL) *.o *.pyc *~
 
