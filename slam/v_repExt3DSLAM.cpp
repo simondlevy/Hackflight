@@ -41,7 +41,11 @@ using namespace std;
 
 LIBRARY vrepLib;
 
-SerialConnection serialConnection(PORTNAME, BAUDRATE);
+static SerialConnection serialConnection(PORTNAME, BAUDRATE);
+
+static MSP_Parser parser;
+
+static bool ready;
 
 class My_ATTITUDE_Handler : public ATTITUDE_Handler {
 
@@ -60,7 +64,7 @@ class My_ATTITUDE_Handler : public ATTITUDE_Handler {
 
             printf("%+3d %+3d %+3d\n", angx, angy, heading);
 
-            this->sendAttitudeRequest();
+            //this->sendAttitudeRequest();
         }
 
         void sendAttitudeRequest(void) {
@@ -83,10 +87,6 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     serialConnection.openConnection();
 
-    MSP_Parser parser;
-
-    MSP_Message request = MSP_Parser::serialize_ATTITUDE_Request();
-
     My_ATTITUDE_Handler handler(&serialConnection);
 
     parser.set_ATTITUDE_Handler(&handler);
@@ -97,6 +97,8 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);
+
+    ready = true;
 }
 
 // --------------------------------------------------------------------------------------
@@ -107,6 +109,14 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
+    if (ready) {
+        while (serialConnection.bytesAvailable() > 0) {
+            char c = 0;
+            serialConnection.readBytes(&c, 1);
+            parser.parse(c&0xFF);
+        }
+    }
+
     /*
 
        cube = simCreatePureShape(0,          -- cube
@@ -135,11 +145,14 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
+    ready = false;
+
     serialConnection.closeConnection();
 
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);
+
 }
 
 // --------------------------------------------------------------------------------------
@@ -198,12 +211,6 @@ VREP_DLLEXPORT void v_repEnd()
 
 VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * customData, int * replyData)
 {
-    while (serialConnection.bytesAvailable() > 0) {
-        char c = 0;
-        serialConnection.readBytes(&c, 1);
-        printf("%02X\n", c);
-    }
-
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
     simSetIntegerParameter(sim_intparam_error_report_mode,sim_api_errormessage_ignore);
