@@ -90,55 +90,64 @@ static void set_blocking (int fd, bool should_block)
 
 SerialConnection::SerialConnection(const char * portname, int baudrate, bool blocking, int parity)
 {
-    this->fd = open (portname, O_RDWR | O_NOCTTY | O_SYNC);
-
-    if (this->fd < 0) {
-        fprintf(stderr, "error %d opening %s: %s\n", errno, portname, strerror (errno));
-        exit(1);
-    }
+    strcpy(this->portname, portname);
+    this->blocking = blocking;
+    this->parity = parity;
 
     switch (baudrate) {
         case 110:
-            baudrate = B110;
+            this->baudrate = B110;
             break;
         case 300:
-            baudrate = B300;
+            this->baudrate = B300;
             break;
         case 600:
-            baudrate = B600;
+            this->baudrate = B600;
             break;
         case 1200:
-            baudrate = B1200;
+            this->baudrate = B1200;
             break;
         case 2400:
-            baudrate = B2400;
+            this->baudrate = B2400;
             break;
         case 4800:
-            baudrate = B4800;
+            this->baudrate = B4800;
             break;
         case 9600:
-            baudrate = B9600;
+            this->baudrate = B9600;
             break;
         case 19200:
-            baudrate = B19200;
+            this->baudrate = B19200;
             break;
         case 38400:
-            baudrate = B38400;
+            this->baudrate = B38400;
             break;
         case 57600:
-            baudrate = B57600;
+            this->baudrate = B57600;
             break;
         case 115200:
-            baudrate = B115200;
+            this->baudrate = B115200;
             break;
         default:
             fprintf(stderr, "unrecognized baudrate %d\n", baudrate);
             return;
     }
 
-    set_interface_attribs (this->fd, baudrate, parity);
+}
 
-    set_blocking (this->fd, blocking);
+void SerialConnection::openConnection(void)
+{
+
+    this->fd = open (portname, O_RDWR | O_NOCTTY | O_SYNC);
+
+    if (this->fd < 0) {
+        fprintf(stderr, "error %d opening %s: %s\n", errno, this->portname, strerror (errno));
+        exit(1);
+    }
+
+    set_interface_attribs (this->fd, this->baudrate, this->parity);
+
+    set_blocking (this->fd, this->blocking);
 }
 
 int SerialConnection::bytesAvailable(void)

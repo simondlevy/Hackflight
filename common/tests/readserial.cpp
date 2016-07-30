@@ -26,11 +26,13 @@ int main(int argc, char ** argv)
 {
     if (argc < 3) {
         fprintf(stderr, "Usage:   %s PORTNAME BAUDRATE\n", argv[0]);
-        fprintf(stderr, "Example: %s /dev/ttyUSB0\n", argv[0]);
+        fprintf(stderr, "Example: %s /dev/ttyUSB0 57600\n", argv[0]);
         exit(1);
     }
 
     SerialConnection s(argv[1], atoi(argv[2]));
+
+    s.openConnection();
 
     while (true) {
 

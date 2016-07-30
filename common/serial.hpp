@@ -23,6 +23,8 @@ class SerialConnection {
 
         SerialConnection(const char * portname, int baudrate=9600, bool blocking=true, int parity=0);
 
+        void openConnection(void);
+
         int bytesAvailable(void);
 
         int readBytes(char * buf, int size);
@@ -34,4 +36,9 @@ class SerialConnection {
     private:
 
         int fd;
+        char portname[100];
+        int baudrate;
+        bool blocking;
+        int parity;
+
 };

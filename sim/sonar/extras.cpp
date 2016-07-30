@@ -40,6 +40,8 @@ void extrasStart(void)
 {
     for (int k=0; k<5; ++k)
         sonarHandles[k] = simGetObjectHandle(sonarNames[k]);
+
+    serialConnection.openConnection();
 }
 
 void extrasUpdate(void)
@@ -71,6 +73,7 @@ void extrasMessage(int message, int * auxiliaryData, void * customData)
 
 void extrasStop(void)
 {
+    serialConnection.closeConnection();
 }
 
 uint8_t Board::serialAvailableBytes(void)
