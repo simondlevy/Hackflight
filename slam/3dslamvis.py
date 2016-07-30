@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-from visual import box, display, cone, color
+from visual import box, display, cone, color, rate, vector
+from time import sleep
+from math import pi
 
 class ThreeDSlamVis(object):
 
@@ -12,7 +14,7 @@ class ThreeDSlamVis(object):
         Y = -30
         Z = 20
 
-        box(pos = (X, Y, Z), length=100, height=1, width=100)
+        self.floor = box(pos = (X, Y, Z), length=100, height=1, width=100)
 
         self.vehicle = cone(pos = (X,Y+10, Z), axis=(3,0,0), radius=1, color=color.red)
       
@@ -27,4 +29,10 @@ class ThreeDSlamVis(object):
 if __name__ == '__main__':
 
     slamvis = ThreeDSlamVis()
+
+    while True:
+
+        slamvis.vehicle.rotate(angle=pi/4, axis=(0,1,0))
+
+        sleep(.5)
 
