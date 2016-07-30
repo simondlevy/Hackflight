@@ -20,6 +20,6 @@ while 1:
     if ball.y < 1:
         ball.velocity.y = -ball.velocity.y
     else:
-		ball.velocity.y = ball.velocity.y + ball.acceleration.y*dt
-		ball.acceleration.y = -9.8 - sign(ball.velocity.y) * constant * ball.radius * ball.velocity.y ** power
-		
+        ball.velocity.y = ball.velocity.y + ball.acceleration.y*dt
+        ball.acceleration.y = -9.8 - sign(ball.velocity.y) * constant * ball.radius * ball.velocity.y ** power
+        
