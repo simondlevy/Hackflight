@@ -46,6 +46,8 @@ int main(int argc, char ** argv)
 
     SerialConnection serialConnection(argv[1], atoi(argv[2]));
 
+    serialConnection.openConnection();
+
     MSP_Parser parser;
 
     MSP_Message request = MSP_Parser::serialize_ATTITUDE_Request();
