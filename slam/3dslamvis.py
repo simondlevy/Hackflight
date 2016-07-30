@@ -2,7 +2,7 @@
 
 from visual import box, display, cone, color, rate, vector
 from time import sleep
-from math import pi
+from math import pi, radians
 
 class ThreeDSlamVis(object):
 
@@ -17,14 +17,18 @@ class ThreeDSlamVis(object):
         self.floor = box(pos = (X, Y, Z), length=100, height=1, width=100)
 
         self.vehicle = cone(pos = (X,Y+10, Z), axis=(3,0,0), radius=1, color=color.red)
-      
+
+        self.pose = 0,0,0,0
+
     def addObstacle(self, x, y, z):
 
         return
 
     def setPose(self, x, y, z, theta):
 
-        return
+        self.vehicle.rotate(angle=radians(self.pose[3] - theta), axis=(0,1,0))
+
+        self.pose = x, y, z, theta
 
 if __name__ == '__main__':
 
@@ -32,7 +36,6 @@ if __name__ == '__main__':
 
     while True:
 
-        slamvis.vehicle.rotate(angle=pi/4, axis=(0,1,0))
+        theta = int(raw_input('> '))
 
-        sleep(.5)
-
+        slamvis.setPose(0,0,0,theta)
