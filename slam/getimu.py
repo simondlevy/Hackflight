@@ -18,22 +18,20 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-BAUD = 57600
-
 from msppg import MSP_Parser as Parser, serialize_ATTITUDE_Request
 import serial
 
 from sys import argv
 
-if len(argv) < 2:
+if len(argv) < 3:
 
-    print('Usage: python3 %s PORT' % argv[0])
-    print('Example: python3 %s /dev/ttyUSB0' % argv[0])
+    print('Usage: python3 %s PORT BAUD' % argv[0])
+    print('Example: python3 %s /dev/ttyUSB0 57600' % argv[0])
     exit(1)
 
 parser = Parser()
 request = serialize_ATTITUDE_Request()
-port = serial.Serial(argv[1], BAUD)
+port = serial.Serial(argv[1], int(argv[2]))
 
 def handler(pitch, roll, yaw):
 

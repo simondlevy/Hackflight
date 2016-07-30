@@ -26,3 +26,4 @@ ipch
 sim/*/*.so
 sim/*/*.dylib
 slam/*.so
+slam/getimu

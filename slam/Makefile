@@ -40,7 +40,9 @@ endif
 
 PLUGIN = libv_repExt3DSLAM.$(EXT)
 
-all: $(PLUGIN)
+ALL = $(PLUGIN) getimu
+
+all: $(ALL)
 
 libv_repExt3DSLAM.$(EXT): v_repExt3DSLAM.cpp ../common/serial.cpp ../common/serial.hpp
 	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" v_repExt3DSLAM.cpp 
@@ -53,6 +55,9 @@ libv_repExt3DSLAM.$(EXT): v_repExt3DSLAM.cpp ../common/serial.cpp ../common/seri
 
 install: $(PLUGIN)
 	cp $(PLUGIN) $(VREP_LIBDIR)
+
+getimu: getimu.cpp
+	g++ -o getimu -I../common getimu.cpp msppg.cpp ../common/serial.cpp
 
 edit:
 	vim v_repExt3DSLAM.cpp
