@@ -31,7 +31,7 @@ static const char * sonarNames[5] = {"Sonar_Back", "Sonar_Bottom", "Sonar_Front"
 
 static int sonarHandles[5];
 
-static SerialConnection serialConnection("/dev/ttyUSB0");
+static SerialConnection serialConnection("/dev/ttyUSB0", 57600);
 
 void extrasStart(void)
 {
