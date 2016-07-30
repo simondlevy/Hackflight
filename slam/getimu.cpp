@@ -50,8 +50,6 @@ int main(int argc, char ** argv)
 
     MSP_Parser parser;
 
-    MSP_Message request = MSP_Parser::serialize_ATTITUDE_Request();
-
     My_ATTITUDE_Handler handler(&serialConnection);
 
     parser.set_ATTITUDE_Handler(&handler);

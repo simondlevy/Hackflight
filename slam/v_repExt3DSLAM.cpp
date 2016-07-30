@@ -43,6 +43,37 @@ LIBRARY vrepLib;
 
 SerialConnection serialConnection(PORTNAME, BAUDRATE);
 
+class My_ATTITUDE_Handler : public ATTITUDE_Handler {
+
+    private:
+
+        SerialConnection * serialConnection;
+
+    public:
+
+        My_ATTITUDE_Handler(SerialConnection * s) : ATTITUDE_Handler() {
+
+            this->serialConnection = s;
+        }
+
+        void handle_ATTITUDE(short angx, short angy, short heading) {
+
+            printf("%+3d %+3d %+3d\n", angx, angy, heading);
+
+            this->sendAttitudeRequest();
+        }
+
+        void sendAttitudeRequest(void) {
+
+            MSP_Message request = MSP_Parser::serialize_ATTITUDE_Request();
+
+            for (byte b=request.start(); request.hasNext(); b=request.getNext())
+                this->serialConnection->writeBytes((char *)&b, 1);
+        }
+
+};
+
+
 // --------------------------------------------------------------------------------------
 // simExt3DSLAM_start
 // --------------------------------------------------------------------------------------
@@ -51,7 +82,17 @@ SerialConnection serialConnection(PORTNAME, BAUDRATE);
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
     serialConnection.openConnection();
-    
+
+    MSP_Parser parser;
+
+    MSP_Message request = MSP_Parser::serialize_ATTITUDE_Request();
+
+    My_ATTITUDE_Handler handler(&serialConnection);
+
+    parser.set_ATTITUDE_Handler(&handler);
+
+    handler.sendAttitudeRequest();
+
     // Return success to V-REP
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true));
@@ -157,6 +198,12 @@ VREP_DLLEXPORT void v_repEnd()
 
 VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * customData, int * replyData)
 {
+    while (serialConnection.bytesAvailable() > 0) {
+        char c = 0;
+        serialConnection.readBytes(&c, 1);
+        printf("%02X\n", c);
+    }
+
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
     simSetIntegerParameter(sim_intparam_error_report_mode,sim_api_errormessage_ignore);
