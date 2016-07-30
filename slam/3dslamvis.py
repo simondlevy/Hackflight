@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from visual import box, display, cone, color, rate, vector
+from visual import box, display, cone, color, rate, vector, materials
 from time import sleep
 from math import pi, radians
 
@@ -13,10 +13,11 @@ class ThreeDSlamVis(object):
         X = 0
         Y = -30
         Z = 20
+        S = 100
 
-        self.floor = box(pos = (X, Y, Z), length=100, height=1, width=100)
+        floor = box(pos = (X, Y, Z), length=S, height=1, width=S, material=materials.rough)
 
-        self.vehicle = cone(pos = (X,Y+10, Z), axis=(3,0,0), radius=1, color=color.red)
+        self.vehicle = cone(pos = (X, Y, Z), axis=(3,0,0), radius=1, color=color.red)
 
         self.pose = 0,0,0,0
 
