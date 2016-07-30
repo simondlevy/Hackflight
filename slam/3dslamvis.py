@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from visual import box, display
+from visual import box, display, cone, color
 
 class ThreeDSlamVis(object):
 
@@ -8,8 +8,9 @@ class ThreeDSlamVis(object):
 
         display(width=display_size,height=display_size,title='3D SLAM')
 
-        box(pos=(0,-3,2), length=8, height=0.2, width=8)
+        box(pos=(0,-30,20), length=80, height=0.2, width=80)
 
+        cone(pos=(0,-1, 2), axis=(3,0,0), radius=1, color=color.red)
       
     def addObstacle(self, x, y, z):
 
