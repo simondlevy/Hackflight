@@ -34,8 +34,12 @@ if __name__ == '__main__':
 
     slamvis = ThreeDSlamVis()
 
+    theta = 0
+
     while True:
 
-        theta = int(raw_input('> '))
-
         slamvis.setPose(0,0,0,theta)
+
+        sleep(.01)
+
+        theta = (theta + 1) % 360
