@@ -17,8 +17,8 @@
    along with 3DSLAM.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-static const int INCOMING_PORT = 20000;
-static const int OUTGOING_PORT = 20001;
+static const char * PORTNAME = "/dev/ttyUSB0";
+static const int   BAUDRATE = 57600;
 
 #include "v_repExt.h"
 #include "scriptFunctionData.h"
@@ -41,6 +41,7 @@ using namespace std;
 
 LIBRARY vrepLib;
 
+SerialConnection serialConnection(PORTNAME, BAUDRATE);
 
 // --------------------------------------------------------------------------------------
 // simExt3DSLAM_start
@@ -49,6 +50,7 @@ LIBRARY vrepLib;
 
 void LUA_START_CALLBACK(SScriptCallBack* cb)
 {
+    serialConnection.openConnection();
     
     // Return success to V-REP
     CScriptFunctionData D;
@@ -64,18 +66,6 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
-    MSP_Message poseRequest = MSP_Parser::serialize_SLAM_POSE_Request();
-
-    // Every 500 msec, send a pose request 
-    static unsigned long usec_start;
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-    if (tv.tv_usec - usec_start > 500000) {
-        for (byte b = poseRequest.start(); poseRequest.hasNext(); b = poseRequest.getNext())
-            ; //outgoingSocketServer.send((char *)&b, 1);
-        usec_start = tv.tv_usec;
-    }
-
     /*
 
        cube = simCreatePureShape(0,          -- cube
@@ -104,6 +94,8 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
+    serialConnection.closeConnection();
+
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);
