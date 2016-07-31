@@ -16,7 +16,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License 
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
-
 '''
 
 # proportional 
@@ -48,6 +47,7 @@ class ThreeDSlamVis(object):
 
         self.obstacle_size_cm = obstacle_size_cm
 
+        # Store vehicle heading angle for rotation by setPose()
         self.theta = 0
 
     def addObstacle(self, x, y, z):
@@ -80,12 +80,20 @@ if __name__ == '__main__':
 
     x,y,z,theta = 0,0,0,0
 
+    ox,oy,oz = 0,0,0
+
     while True:
 
         slamvis.setPose(x,y,z,theta)
+
+        slamvis.addObstacle(ox,oy,oz)
 
         sleep(.1)
 
         theta = (theta + 10) % 360
         z += 2
+
+        ox += 1
+        oy += 1
+        oz += 1
 
