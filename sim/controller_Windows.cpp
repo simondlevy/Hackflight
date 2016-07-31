@@ -117,10 +117,8 @@ controller_t controllerInit(void)
 }
 
 // Turns button value into aux-switch demand
-static void buttonToAuxDemand(int * demands, std::vector<CScriptFunctionDataItem>* inData)
+static void buttonToAuxDemand(int * demands, int buttons)
 {
-    int buttons = inData->at(3).int32Data[0];
-
     if (buttons == 1)
         demands[4] = -1000;
 
@@ -147,15 +145,22 @@ void controllerRead(controller_t controller, int * demands, void * inDataPtr)
 
 	std::vector<CScriptFunctionDataItem>* inData = (std::vector<CScriptFunctionDataItem>*)inDataPtr;
 
+	/*
+	printf("X:%d Y:%d Z:%d   U:%d V:%d R:%d  b:%d\n", 
+				joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
+				joyState.dwUpos, joyState.dwVpos, joyState.dwRpos,
+				joyState.dwButtons);
+	*/
+
     // Handle each controller differently
     switch (controller) {
 
         case TARANIS:
-            demands[0] = inData->at(0).int32Data[0];    // roll
-            demands[1] = inData->at(0).int32Data[1];    // pitch
-            demands[2] = inData->at(0).int32Data[2];    // yaw
-            demands[3] = inData->at(1).int32Data[0];    // throttle			
-            demands[4] = inData->at(1).int32Data[1];    // aux switch
+            demands[0] =  joynorm(joyState.dwXpos);		// roll
+			demands[1] =  joynorm(joyState.dwYpos);		// pitch
+			demands[2] =  joynorm(joyState.dwZpos);		// yaw
+			demands[3] =  joynorm(joyState.dwVpos);		// throttle		
+            demands[4] = -1000;							// XXX need to map aux switch
             break;
 
         case SPEKTRUM:
@@ -171,22 +176,15 @@ void controllerRead(controller_t controller, int * demands, void * inDataPtr)
             demands[1] = -inData->at(0).int32Data[1];	// pitch
             demands[2] =  inData->at(1).int32Data[2];	// yaw
             demands[3] = -inData->at(2).int32Data[0];	// throttle
-            buttonToAuxDemand(demands, inData);		    // aux switch
+            //buttonToAuxDemand(demands, inData);		    // aux switch
             break;
 
         case PS3:
-
-			printf("X:%d Y:%d Z:%d   U:%d V:%d R:%d  b:%d\n", 
-				joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
-				joyState.dwUpos, joyState.dwVpos, joyState.dwRpos,
-				joyState.dwButtons);
-
-            demands[0] =  joynorm(joyState.dwZpos);     // roll
-			demands[1] = -joynorm(joyState.dwRpos);		// pitch
-			demands[2] =  joynorm(joyState.dwXpos);		// yaw
-			demands[3] = -joynorm(joyState.dwYpos);		// throttle
-
-            buttonToAuxDemand(demands, inData);  // aux switch
+            demands[0] =  joynorm(joyState.dwZpos);			// roll
+			demands[1] = -joynorm(joyState.dwRpos);			// pitch
+			demands[2] =  joynorm(joyState.dwXpos);			// yaw
+			demands[3] = -joynorm(joyState.dwYpos);			// throttle
+			buttonToAuxDemand(demands, joyState.dwButtons); // aux switch
             break;
 
         default:
