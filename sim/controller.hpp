@@ -23,7 +23,7 @@
 enum controller_t { KEYBOARD, TARANIS, SPEKTRUM, EXTREME3D, PS3 , XBOX360 };
 
 controller_t controllerInit(void);
-void         controllerRead(controller_t controller, int * demands);
+void         controllerRead(controller_t controller, float * demands);
 void         controllerClose(void);
 
 // in v_repExtHackflight.cpp

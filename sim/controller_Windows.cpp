@@ -31,8 +31,8 @@
 #include <iostream>
 using namespace std;
 
+// Adapted from http://olek.matthewm.com.pl//courses/ee-ces/examples/02_JOYSTICK_WIN32.C.HTML
 
-// Adapted from http://cboard.cprogramming.com/windows-programming/114294-getting-list-usb-devices-listed-system.html
 controller_t controllerInit(void)
 { 
 	controller_t controller = KEYBOARD;
@@ -62,27 +62,26 @@ controller_t controllerInit(void)
 }
 
 // Turns button value into aux-switch demand
-static void buttonToAuxDemand(int * demands, int buttons)
+static void buttonToAuxDemand(float * demands, int buttons)
 {
     if (buttons == 1)
-        demands[4] = -1000;
+        demands[4] = -1;
 
     if (buttons == 2)
         demands[4] = 0;
 
     if (buttons == 4)
-        demands[4] = +1000;
+        demands[4] = +1;
 }
 
-static int joynorm(int axisval) 
+static float joynorm(int axisval) 
 {
-	return (int)((axisval - 32767.)/32767 * 1000);
+	return (axisval - (float)32767) / 32767;
 }
 
 
-void controllerRead(controller_t controller, int * demands) 
+void controllerRead(controller_t controller, float * demands) 
 {
-	// Adapted from http://olek.matthewm.com.pl//courses/ee-ces/examples/02_JOYSTICK_WIN32.C.HTML
     JOYINFOEX joyState;
     joyState.dwSize=sizeof(joyState);
     joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
@@ -105,7 +104,7 @@ void controllerRead(controller_t controller, int * demands)
 			demands[1] =  joynorm(joyState.dwYpos);		// pitch
 			demands[2] =  joynorm(joyState.dwZpos);		// yaw
 			demands[3] =  joynorm(joyState.dwVpos);		// throttle		
-            demands[4] = -1000;							// XXX need to map aux switch
+            demands[4] = -1;							// XXX need to map aux switch
             break;
 
         case SPEKTRUM:

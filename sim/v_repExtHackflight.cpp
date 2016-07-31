@@ -58,19 +58,19 @@ using namespace std;
 static controller_t controller;
 
 // Stick demands from controller
-static int demands[5];
+static float demands[5];
 
 // Keyboard support for any OS
-static const float KEYBOARD_INC = 10;
+static const float KEYBOARD_INC = .01f;
 static void kbchange(int index, int dir)
 {
     demands[index] += (int)(dir*KEYBOARD_INC);
 
-    if (demands[index] > 1000)
-        demands[index] = 1000;
+    if (demands[index] > 1)
+        demands[index] = 1;
 
-    if (demands[index] < -1000)
-        demands[index] = -1000;
+    if (demands[index] < -1)
+        demands[index] = -1;
 }
 
 
@@ -111,7 +111,7 @@ static uint32_t micros;
 static bool ready;
 
 // needed for spring-mounted throttle stick
-static int throttleDemand;
+static float throttleDemand;
 static const float PS3_THROTTLE_INC = .01f;
 
 // IMU support
@@ -231,11 +231,11 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     setup();
 
     // Need this for throttle on keyboard and PS3
-    throttleDemand = -1000;
+    throttleDemand = -1;
 
     // For safety, all controllers start at minimum throttle, aux switch off
-    demands[3] = -1000;
-	demands[4] = -1000;
+    demands[3] = -1;
+	demands[4] = -1;
 
     // Each input device has its own axis and button mappings
     controller = controllerInit();
@@ -324,10 +324,10 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     if (controller == PS3) {
 
         throttleDemand += (int)(demands[3] * PS3_THROTTLE_INC);     
-        if (throttleDemand < -1000)
-            throttleDemand = -1000;
-        if (throttleDemand > 1000)
-            throttleDemand = 1000;
+        if (throttleDemand < -1)
+            throttleDemand = -1;
+        if (throttleDemand > 1)
+            throttleDemand = 1;
     }
     else 
         throttleDemand = demands[3];
@@ -481,11 +481,11 @@ static void change(int index, int dir)
 {
     demands[index] += dir*KEYBOARD_INC;
 
-    if (demands[index] > 1000)
-        demands[index] = 1000;
+    if (demands[index] > 1)
+        demands[index] = 1;
 
-    if (demands[index] < -1000)
-        demands[index] = -1000;
+    if (demands[index] < -1)
+        demands[index] = -1;
 }
 
 static void increment(int index) 
@@ -613,18 +613,18 @@ void Board::ledRedToggle(void)
 uint16_t Board::readPWM(uint8_t chan)
 {
     // Special handling for throttle
-    int demand = (chan == 3) ? throttleDemand : demands[chan];
+    float demand = (chan == 3) ? throttleDemand : demands[chan];
 
     // Special handling for pitch, roll on PS3, XBOX360
     if (chan < 2) {
        if (controller == PS3)
         demand /= 2;
        if (controller == XBOX360)
-        demand = (int)(demand / 1.5f);
+        demand /= 1.5;
     }
 
-    // V-REP sends joystick demands in [-1000,+1000]
-    int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1000) / 2000. * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
+    // Joystick demands are in [-1,+1]
+    int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1) / 2 * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
 
     return pwm;
 }
