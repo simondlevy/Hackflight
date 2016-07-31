@@ -87,6 +87,10 @@ if __name__ == '__main__':
 
         slamvis.setPose(x,y,z,theta)
 
+        ox,oy,oz = (int(uniform(-500,500)) for k in range(3))
+
+        slamvis.addObstacle(ox,oy,oz)
+
         sleep(.05)
 
         theta = (theta + 10) % 360
