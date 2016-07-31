@@ -27,4 +27,5 @@ void         controllerRead(controller_t controller, float * demands);
 void         controllerClose(void);
 
 // in v_repExtHackflight.cpp
-extern void kbRespond(char key, char * keys);
+// rollLeft, rollRight, pitchForward, pitchBack, yawLeft, yawRight, throttleDown, throttleUp
+extern void kbRespond(char key, char keys[8]);

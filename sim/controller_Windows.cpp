@@ -134,7 +134,8 @@ void controllerRead(controller_t controller, float * demands)
         default:
             if (_kbhit()) {
                 char c = _getch();
-                char keys[8] = {52, 54, 50, 56, 48, 13, 51, 57};
+				printf("%d\n", c);
+                char keys[8] = {75,77, 80,72, 82,13, 81,73};
                 kbRespond(c, keys);
             }
     }

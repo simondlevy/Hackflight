@@ -64,13 +64,15 @@ static float demands[5];
 static const float KEYBOARD_INC = .01f;
 static void kbchange(int index, int dir)
 {
-    demands[index] += (int)(dir*KEYBOARD_INC);
+    demands[index] += dir*KEYBOARD_INC;
 
     if (demands[index] > 1)
         demands[index] = 1;
 
     if (demands[index] < -1)
         demands[index] = -1;
+
+	printf("%d %f\n", index, demands[index]);
 }
 
 
@@ -84,7 +86,7 @@ static void kbdecrement(int index)
     kbchange(index, -1);
 }
 
-void kbRespond(char key, char * keys) 
+void kbRespond(char key, char keys[8]) 
 {
 	for (int k=0; k<8; ++k)
 		if (key == keys[k]) {
