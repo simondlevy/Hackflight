@@ -53,7 +53,7 @@ class ThreeDSlamVis(object):
 
         box(pos = (x, z,y), 
             length=self.obstacle_size_cm, height=self.obstacle_size_cm, width=self.obstacle_size_cm, 
-            material=materials.rough)
+            material=materials.diffuse)
 
 
     def setPose(self, x, y, z, theta):
@@ -87,7 +87,9 @@ if __name__ == '__main__':
 
         slamvis.setPose(x,y,z,theta)
 
-        ox,oy,oz = (int(uniform(-500,500)) for k in range(3))
+        ox = int(uniform(-500,500))
+        oy = int(uniform(-500,500))
+        oz = int(uniform(10,500))
 
         slamvis.addObstacle(ox,oy,oz)
 
