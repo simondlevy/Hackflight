@@ -55,12 +55,14 @@ class ThreeDSlamVis(object):
         return
 
     def setPose(self, x, y, z, theta):
+        '''
+        Sets vehicle pose (X,Y,Z coordinates in cm and heading theta in degrees).
+        '''
 
         self.vehicle.rotate(angle=radians(self.pose[3] - theta), axis=(0,1,0))
 
-        self.vehicle.pos += vector(0,10,0)
-
-        print([v for v in self.vehicle.pos])
+        # VPython uses Y for up/down; we use Z
+        self.vehicle.pos = vector(x, z, y)
 
         self.pose = x, y, z, theta
 
@@ -68,12 +70,16 @@ if __name__ == '__main__':
 
     slamvis = ThreeDSlamVis()
 
-    theta = 0
+    x,y,z,theta = 0,0,0,0
 
     while True:
 
-        slamvis.setPose(0,0,0,theta)
+        slamvis.setPose(x,y,z,theta)
 
         sleep(.1)
 
         theta = (theta + 10) % 360
+        x += 10
+        y += 20
+        x += 10
+
