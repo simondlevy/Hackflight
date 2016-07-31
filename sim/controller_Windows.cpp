@@ -23,10 +23,8 @@
 #include "scriptFunctionData.h"
 #include "v_repLib.h"
 
-#include <direct.h>
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
-
 
 #include <conio.h>
 
@@ -133,9 +131,20 @@ static void buttonToAuxDemand(int * demands, std::vector<CScriptFunctionDataItem
         demands[4] = +1000;
 }
 
+static int joynorm(int axisval) 
+{
+	return (int)((axisval - 32767.)/32767 * 1000);
+}
+
 // Grabs stick demands from script via Windows plugin
 void controllerRead(controller_t controller, int * demands, void * inDataPtr) 
 {
+	// Adapted from http://olek.matthewm.com.pl//courses/ee-ces/examples/02_JOYSTICK_WIN32.C.HTML
+    JOYINFOEX joyState;
+    joyState.dwSize=sizeof(joyState);
+    joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
+	joyGetPosEx(JOYSTICKID1, &joyState);
+
 	std::vector<CScriptFunctionDataItem>* inData = (std::vector<CScriptFunctionDataItem>*)inDataPtr;
 
     // Handle each controller differently
@@ -166,10 +175,19 @@ void controllerRead(controller_t controller, int * demands, void * inDataPtr)
             break;
 
         case PS3:
-            demands[0] =  inData->at(0).int32Data[2];	// roll
+
+			/*printf("%d %d %d   %d %d %d  %d\n", 
+				joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
+				joyState.dwUpos, joyState.dwVpos, joyState.dwRpos,
+				joyState.dwButtons);*/
+
+			printf("%d %d\n", inData->at(0).int32Data[2], (int)((joyState.dwZpos - 32767.)/32767) * 1000);
+
+            demands[0] =  joynorm(joyState.dwZpos);     // roll
             demands[1] = -inData->at(1).int32Data[2];	// pitch
             demands[2] =  inData->at(0).int32Data[0];	// yaw
             demands[3] = -inData->at(0).int32Data[1];	// throttle
+
             buttonToAuxDemand(demands, inData);  // aux switch
             break;
 
