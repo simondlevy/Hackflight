@@ -28,7 +28,6 @@ CONE_YOFFSET =   20
 CONE_RADIUS  =   10
 
 from visual import box, display, cone, color, vector, materials
-from time import sleep
 from math import radians
 
 class ThreeDSlamVis(object):
@@ -76,24 +75,26 @@ class ThreeDSlamVis(object):
 
 if __name__ == '__main__':
 
+    from random import uniform
+    from time import sleep
+
     slamvis = ThreeDSlamVis()
 
     x,y,z,theta = 0,0,0,0
-
-    ox,oy,oz = 0,0,0
+    zdir = +1
 
     while True:
 
         slamvis.setPose(x,y,z,theta)
 
-        slamvis.addObstacle(ox,oy,oz)
-
-        sleep(.1)
+        sleep(.05)
 
         theta = (theta + 10) % 360
-        z += 2
 
-        ox += 1
-        oy += 1
-        oz += 1
+        z += 2 * zdir
+
+        if z > 500:
+            zdir = -1
+        if z < 10:
+            zdir = +1
 
