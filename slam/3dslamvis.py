@@ -34,19 +34,16 @@ from math import pi, radians
 
 class ThreeDSlamVis(object):
 
-    def __init__(self, size_pixels=1000, size_cm=1000):
+    def __init__(self, display_size_pixels=1000, map_size_cm=1000):
 
-        display(width=size_pixels,height=size_pixels,title='3D SLAM')
+        display(width=display_size_pixels,height=display_size_pixels,title='3D SLAM')
 
-        floor = box(pos = (0, size_cm*FLOOR_Y, size_cm*FLOOR_Z), 
-                length=size_cm, height=1, width=size_cm, 
+        floor = box(pos = (0, map_size_cm*FLOOR_Y, map_size_cm*FLOOR_Z), 
+                length=map_size_cm, height=1, width=map_size_cm, 
                 material=materials.rough)
 
-        self.vehicle = cone(pos = (0, size_cm*FLOOR_Y+CONE_YOFFSET, size_cm*FLOOR_Z), 
+        self.vehicle = cone(pos = (0, map_size_cm*FLOOR_Y+CONE_YOFFSET, map_size_cm*FLOOR_Z), 
                 axis=(CONE_LENGTH,0,0), radius=CONE_RADIUS, color=color.red)
-
-        self.size_pixels = size_pixels
-        self.size_cm = size_cm
 
         self.pose = 0,0,0,0
 
