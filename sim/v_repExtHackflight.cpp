@@ -323,7 +323,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     // PS3 spring-mounted throttle requires special handling
     if (controller == PS3) {
 
-        throttleDemand += (int)(demands[3] * PS3_THROTTLE_INC);     
+        throttleDemand += demands[3] * PS3_THROTTLE_INC;     
         if (throttleDemand < -1)
             throttleDemand = -1;
         if (throttleDemand > 1)
