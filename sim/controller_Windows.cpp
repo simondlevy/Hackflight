@@ -172,11 +172,11 @@ void controllerRead(controller_t controller, int * demands, void * inDataPtr)
             break;
 
         case EXTREME3D:
-            demands[0] =  inData->at(0).int32Data[0];	// roll
-            demands[1] = -inData->at(0).int32Data[1];	// pitch
-            demands[2] =  inData->at(1).int32Data[2];	// yaw
-            demands[3] = -inData->at(2).int32Data[0];	// throttle
-            //buttonToAuxDemand(demands, inData);		    // aux switch
+            demands[0] =  joynorm(joyState.dwXpos);			// roll
+			demands[1] = -joynorm(joyState.dwYpos);			// pitch
+			demands[2] =  joynorm(joyState.dwRpos);			// yaw
+			demands[3] = -joynorm(joyState.dwZpos);			// throttle
+			buttonToAuxDemand(demands, joyState.dwButtons); // aux switch
             break;
 
         case PS3:
