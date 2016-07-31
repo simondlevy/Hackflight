@@ -71,8 +71,6 @@ static void kbchange(int index, int dir)
 
     if (demands[index] < -1)
         demands[index] = -1;
-
-	printf("%d %f\n", index, demands[index]);
 }
 
 
@@ -114,7 +112,7 @@ static bool ready;
 
 // needed for spring-mounted throttle stick
 static float throttleDemand;
-static const float PS3_THROTTLE_INC = .01f;
+static const float SPRINGY_THROTTLE_INC = .01f;
 
 // IMU support
 static float accel[3];
@@ -323,17 +321,19 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     controllerRead(controller, demands);
 
     // PS3 spring-mounted throttle requires special handling
-    if (controller == PS3) {
-
-        throttleDemand += demands[3] * PS3_THROTTLE_INC;     
+	switch (controller) {
+	case PS3:
+	case XBOX360:
+        throttleDemand += demands[3] * SPRINGY_THROTTLE_INC;     
         if (throttleDemand < -1)
             throttleDemand = -1;
         if (throttleDemand > 1)
             throttleDemand = 1;
-    }
-    else 
+		break;
+	default:
         throttleDemand = demands[3];
-    
+	}
+
     // Increment microsecond count
     micros += (uint32_t)(1e6 * timestep);
 

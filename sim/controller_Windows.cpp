@@ -38,7 +38,8 @@ controller_t controllerInit(void)
 	controller_t controller = KEYBOARD;
 
    JOYCAPS joycaps;
-   if (joyGetDevCaps(JOYSTICKID1, &joycaps, sizeof(joycaps))==JOYERR_NOERROR)
+   if (joyGetDevCaps(JOYSTICKID1, &joycaps, sizeof(joycaps))==JOYERR_NOERROR) {
+
        switch (joycaps.wMid) {
 
             case 3727:
@@ -54,10 +55,15 @@ controller_t controllerInit(void)
                 break;
 
             case 1133:
-                controller = EXTREME3D; // XXX product ID = 49685
+                controller = EXTREME3D;
                 break;
+
+			case 9414:
+				controller = XBOX360;
+				break;
         }
- 
+   }
+
 	return controller;
 }
 
@@ -88,13 +94,12 @@ void controllerRead(controller_t controller, float * demands)
 	joyGetPosEx(JOYSTICKID1, &joyState);
 	
 	/*
-	printf("X:%d Y:%d Z:%d   U:%d V:%d R:%d  b:%d\t", 
+	printf("X:%d Y:%d Z:%d   U:%d V:%d R:%d  b:%d\n", 
 				joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
 				joyState.dwUpos, joyState.dwVpos, joyState.dwRpos,
 				joyState.dwButtons);
+	
 	*/
-
-	//printf("%d\n", (int)controller);
 
     // Handle each controller differently
     switch (controller) {
@@ -131,10 +136,17 @@ void controllerRead(controller_t controller, float * demands)
 			buttonToAuxDemand(demands, joyState.dwButtons); // aux switch
             break;
 
+        case XBOX360:
+            demands[0] =  joynorm(joyState.dwUpos);			// roll
+			demands[1] = -joynorm(joyState.dwRpos);			// pitch
+			demands[2] =  joynorm(joyState.dwXpos);			// yaw
+			demands[3] = -joynorm(joyState.dwYpos);			// throttle
+			buttonToAuxDemand(demands, joyState.dwButtons); // aux switch
+            break;
+
         default:
             if (_kbhit()) {
                 char c = _getch();
-				printf("%d\n", c);
                 char keys[8] = {75,77, 80,72, 82,13, 81,73};
                 kbRespond(c, keys);
             }
