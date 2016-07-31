@@ -19,14 +19,14 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 '''
 
-FLOOR_X      =   0
-FLOOR_Y      = -30
-FLOOR_Z      =  20
-FLOOR_S      = 100
+# proportional 
+FLOOR_Y      = -.3
+FLOOR_Z      =  .2
 
-CONE_LENGTH  =   3
-CONE_YOFFSET =   2
-CONE_RADIUS  =   1
+# centimeters
+CONE_LENGTH  =   30
+CONE_YOFFSET =   20
+CONE_RADIUS  =   10
 
 from visual import box, display, cone, color, rate, vector, materials
 from time import sleep
@@ -34,15 +34,15 @@ from math import pi, radians
 
 class ThreeDSlamVis(object):
 
-    def __init__(self, size_pixels=800, size_cm=10000):
+    def __init__(self, size_pixels=1000, size_cm=1000):
 
         display(width=size_pixels,height=size_pixels,title='3D SLAM')
 
-        floor = box(pos = (FLOOR_X, FLOOR_Y, FLOOR_Z), 
-                length=FLOOR_S, height=1, width=FLOOR_S, 
+        floor = box(pos = (0, size_cm*FLOOR_Y, size_cm*FLOOR_Z), 
+                length=size_cm, height=1, width=size_cm, 
                 material=materials.rough)
 
-        self.vehicle = cone(pos = (FLOOR_X, FLOOR_Y+CONE_YOFFSET, FLOOR_Z), 
+        self.vehicle = cone(pos = (0, size_cm*FLOOR_Y+CONE_YOFFSET, size_cm*FLOOR_Z), 
                 axis=(CONE_LENGTH,0,0), radius=CONE_RADIUS, color=color.red)
 
         self.size_pixels = size_pixels
@@ -58,9 +58,9 @@ class ThreeDSlamVis(object):
 
         self.vehicle.rotate(angle=radians(self.pose[3] - theta), axis=(0,1,0))
 
-        self.vehicle.pos += vector(0,1,0)
+        self.vehicle.pos += vector(0,10,0)
 
-        print(self.vehicle.pos[1])
+        print([v for v in self.vehicle.pos])
 
         self.pose = x, y, z, theta
 
@@ -76,4 +76,4 @@ if __name__ == '__main__':
 
         sleep(.1)
 
-        #theta = (theta + 1) % 360
+        theta = (theta + 10) % 360
