@@ -35,60 +35,11 @@ using namespace std;
 // Adapted from http://cboard.cprogramming.com/windows-programming/114294-getting-list-usb-devices-listed-system.html
 controller_t controllerInit(void)
 { 
-    // Get Number Of Devices
-    UINT nDevices = 0;
-    GetRawInputDeviceList( NULL, &nDevices, sizeof( RAWINPUTDEVICELIST ) );
-
-    // Got Any?
-    if(nDevices < 1)
-        return KEYBOARD;
-
-    // Allocate Memory For Device List
-    PRAWINPUTDEVICELIST pRawInputDeviceList;
-    pRawInputDeviceList = new RAWINPUTDEVICELIST[ sizeof( RAWINPUTDEVICELIST ) * nDevices ];
-
-    // Got Memory?
-    if( pRawInputDeviceList == NULL ) {
-        // Error
-        cout << "ERR: Could not allocate memory for Device List.";
-        return KEYBOARD;
-    }
-
-    // Fill Device List Buffer
-    int nResult;
-    nResult = GetRawInputDeviceList( pRawInputDeviceList, &nDevices, sizeof( RAWINPUTDEVICELIST ) );
-
-    // Got Device List?
-    if( nResult < 0 ) {
-        // Clean Up
-        delete [] pRawInputDeviceList;
-
-        // Error
-        cout << "ERR: Could not get device list.";
-        return KEYBOARD;
-    }
-
-    // Set Device Info & Buffer Size
-    RID_DEVICE_INFO rdiDeviceInfo;
-    rdiDeviceInfo.cbSize = sizeof( RID_DEVICE_INFO );
-    UINT nBufferSize = rdiDeviceInfo.cbSize;
-
-    // Get Device Info
-    nResult = GetRawInputDeviceInfo(pRawInputDeviceList[0].hDevice, RIDI_DEVICEINFO, &rdiDeviceInfo, &nBufferSize );
-
-    // Got All Buffer?
-    if(nResult < 0 ) {
-        // Error
-        cout << "ERR: Unable to read Device Info." << endl;
-        return KEYBOARD;
-    }
-
 	controller_t controller = KEYBOARD;
 
-    // Some HID
-    if (rdiDeviceInfo.dwType == RIM_TYPEHID) {
-
-        switch (rdiDeviceInfo.hid.dwVendorId) {
+   JOYCAPS joycaps;
+   if (joyGetDevCaps(JOYSTICKID1, &joycaps, sizeof(joycaps))==JOYERR_NOERROR)
+       switch (joycaps.wMid) {
 
             case 3727:
                 controller = PS3;
@@ -106,13 +57,7 @@ controller_t controllerInit(void)
                 controller = EXTREME3D; // XXX product ID = 49685
                 break;
         }
-
-        // XXX could also use if needed: rdiDeviceInfo.hid.dwProductId
-    }
-
-    // Clean Up - Free Memory
-    delete [] pRawInputDeviceList;
-
+ 
 	return controller;
 }
 
@@ -134,23 +79,23 @@ static int joynorm(int axisval)
 	return (int)((axisval - 32767.)/32767 * 1000);
 }
 
-// Grabs stick demands from script via Windows plugin
-void controllerRead(controller_t controller, int * demands, void * inDataPtr) 
+
+void controllerRead(controller_t controller, int * demands) 
 {
 	// Adapted from http://olek.matthewm.com.pl//courses/ee-ces/examples/02_JOYSTICK_WIN32.C.HTML
     JOYINFOEX joyState;
     joyState.dwSize=sizeof(joyState);
     joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
 	joyGetPosEx(JOYSTICKID1, &joyState);
-
-	std::vector<CScriptFunctionDataItem>* inData = (std::vector<CScriptFunctionDataItem>*)inDataPtr;
-
 	
-	printf("X:%d Y:%d Z:%d   U:%d V:%d R:%d  b:%d\n", 
+	/*
+	printf("X:%d Y:%d Z:%d   U:%d V:%d R:%d  b:%d\t", 
 				joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
 				joyState.dwUpos, joyState.dwVpos, joyState.dwRpos,
 				joyState.dwButtons);
-	
+	*/
+
+	//printf("%d\n", (int)controller);
 
     // Handle each controller differently
     switch (controller) {

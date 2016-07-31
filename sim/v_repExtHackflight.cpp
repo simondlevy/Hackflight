@@ -318,27 +318,20 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     baroPressure += rand() % (2*BARO_NOISE_PASCALS + 1) - BARO_NOISE_PASCALS;
 
     // Get demands from controller
-    if (D.readDataFromStack(cb->stackID,inArgs_UPDATE,inArgs_UPDATE[0],LUA_UPDATE_COMMAND)) {
+    controllerRead(controller, demands);
 
-        std::vector<CScriptFunctionDataItem>* inData=D.getInDataPtr();
+    // PS3 spring-mounted throttle requires special handling
+    if (controller == PS3) {
 
-        // Controller values from script will be used in Windows only
-        controllerRead(controller, demands, inData);
-
-        // PS3 spring-mounted throttle requires special handling
-        if (controller == PS3) {
-
-            throttleDemand += (int)(demands[3] * PS3_THROTTLE_INC);     
-            if (throttleDemand < -1000)
-                throttleDemand = -1000;
-            if (throttleDemand > 1000)
-                throttleDemand = 1000;
-        }
-        else {
-            throttleDemand = demands[3];
-        }
+        throttleDemand += (int)(demands[3] * PS3_THROTTLE_INC);     
+        if (throttleDemand < -1000)
+            throttleDemand = -1000;
+        if (throttleDemand > 1000)
+            throttleDemand = 1000;
     }
-
+    else 
+        throttleDemand = demands[3];
+    
     // Increment microsecond count
     micros += (uint32_t)(1e6 * timestep);
 
