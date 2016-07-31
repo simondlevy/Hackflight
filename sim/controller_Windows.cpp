@@ -176,17 +176,15 @@ void controllerRead(controller_t controller, int * demands, void * inDataPtr)
 
         case PS3:
 
-			/*printf("%d %d %d   %d %d %d  %d\n", 
+			printf("X:%d Y:%d Z:%d   U:%d V:%d R:%d  b:%d\n", 
 				joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
 				joyState.dwUpos, joyState.dwVpos, joyState.dwRpos,
-				joyState.dwButtons);*/
-
-			printf("%d %d\n", inData->at(0).int32Data[2], (int)((joyState.dwZpos - 32767.)/32767) * 1000);
+				joyState.dwButtons);
 
             demands[0] =  joynorm(joyState.dwZpos);     // roll
-            demands[1] = -inData->at(1).int32Data[2];	// pitch
-            demands[2] =  inData->at(0).int32Data[0];	// yaw
-            demands[3] = -inData->at(0).int32Data[1];	// throttle
+			demands[1] = -joynorm(joyState.dwRpos);		// pitch
+			demands[2] =  joynorm(joyState.dwXpos);		// yaw
+			demands[3] = -joynorm(joyState.dwYpos);		// throttle
 
             buttonToAuxDemand(demands, inData);  // aux switch
             break;
