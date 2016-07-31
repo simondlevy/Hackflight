@@ -89,9 +89,8 @@ if __name__ == '__main__':
 
         ox = int(uniform(-500,500))
         oy = int(uniform(-500,500))
-        oz = int(uniform(10,500))
 
-        slamvis.addObstacle(ox,oy,oz)
+        slamvis.addObstacle(ox,oy,z)
 
         sleep(.05)
 
