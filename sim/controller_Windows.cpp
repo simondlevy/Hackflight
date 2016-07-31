@@ -145,12 +145,12 @@ void controllerRead(controller_t controller, int * demands, void * inDataPtr)
 
 	std::vector<CScriptFunctionDataItem>* inData = (std::vector<CScriptFunctionDataItem>*)inDataPtr;
 
-	/*
+	
 	printf("X:%d Y:%d Z:%d   U:%d V:%d R:%d  b:%d\n", 
 				joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
 				joyState.dwUpos, joyState.dwVpos, joyState.dwRpos,
 				joyState.dwButtons);
-	*/
+	
 
     // Handle each controller differently
     switch (controller) {
@@ -164,11 +164,11 @@ void controllerRead(controller_t controller, int * demands, void * inDataPtr)
             break;
 
         case SPEKTRUM:
-            demands[0] = inData->at(0).int32Data[1];	// roll
-            demands[1] = inData->at(0).int32Data[2];	// pitch
-            demands[2] = inData->at(1).int32Data[2];	// yaw
-            demands[3] = inData->at(0).int32Data[0];	// throttle
-            demands[4] = inData->at(1).int32Data[0];    // aux switch
+            demands[0] =  joynorm(joyState.dwYpos);		// roll
+			demands[1] =  joynorm(joyState.dwZpos);		// pitch
+			demands[2] =  joynorm(joyState.dwRpos);		// yaw
+			demands[3] =  joynorm(joyState.dwXpos);		// throttle		
+            demands[4] =  joynorm(joyState.dwVpos);		// aux switch		
             break;
 
         case EXTREME3D:
