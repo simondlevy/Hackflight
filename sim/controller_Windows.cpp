@@ -98,11 +98,11 @@ void controllerRead(controller_t controller, float * demands)
     switch (controller) {
 
         case TARANIS:
-            demands[0] =  joynorm(joyState.dwXpos);        // roll
-            demands[1] =  joynorm(joyState.dwYpos);        // pitch
-            demands[2] =  joynorm(joyState.dwZpos);        // yaw
-            demands[3] =  joynorm(joyState.dwVpos);        // throttle        
-            demands[4] = -1;                            // XXX need to map aux switch
+            demands[0] =  joynorm(joyState.dwXpos);			// roll
+            demands[1] =  joynorm(joyState.dwYpos);			// pitch
+            demands[2] =  joynorm(joyState.dwZpos);			// yaw
+            demands[3] =  joynorm(joyState.dwVpos);			// throttle        
+            demands[4] =  joynorm(joyState.dwRpos);			// aux switch (from channel 6)
             break;
 
         case SPEKTRUM:
