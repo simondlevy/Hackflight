@@ -17,14 +17,25 @@
 # along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 # Change this to match your desired install directory
-INSTALLDIR = /home/levys/Arduino/libraries
+INSTALL_ROOT = /usr/local
 
-ALL = example
+ALL = libmsppg.so example
+CFLAGS = -Wall -fPIC -static
 
-all: $(ALL)
+OS = $(shell uname -s)
+ifeq ($(OS), Linux)
+	EXT = so
+else
+	EXT = dylib
+endif
+
+libmsppg.$(EXT): 
+	g++ $(CFLAGS) -c msppg/msppg.cpp
+	g++ *.o -o libmsppg.$(EXT) -lpthread -shared
 
 install: 
-	cp -r msppg $(INSTALLDIR)
+	cp msppg/msppg.h $(INSTALL_ROOT)/include
+	cp libmsppg.so $(INSTALL_ROOT)/lib
 
 test: example
 	./example

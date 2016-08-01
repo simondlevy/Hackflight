@@ -22,7 +22,7 @@ VREP_DIR_LINUX = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
 VREP_DIR_OSX   = /Applications/V-REP_PRO_EDU_V3_3_1_Mac
 
 COMMON = $(VREP_DIR)/programming/common/
-CFLAGS = -Wall -D_SIM -I$(VREP_DIR)/programming/include/ -I. -I.. -I../../common -I../../firmware -Wall -fPIC -static
+CFLAGS = -Wall -D_SIM -I$(VREP_DIR)/programming/include/ -I. -I.. -I../../common -I../../firmware -fPIC -static
 
 OS = $(shell uname -s)
 ifeq ($(OS), Linux)

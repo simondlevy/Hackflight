@@ -20,12 +20,12 @@
                {"altitude": "int"}, 
                {"vario"   : "short"}],
 
-  "SLAM_POSE": [{"ID": 127},
-                {"comment": "ad-hoc ID not from official Multiwii protocol. Is theta redundant with heading?"}, 
-                {"x"     : "short"}, 
-                {"y"     : "short"}, 
-                {"z"     : "short"}, 
-                {"theta" : "short"}],
+  "SONARS":   [{"ID": 127},
+                {"comment": "four horizontal-facing sonars"}, 
+                {"forward" : "short"}, 
+                {"back"    : "short"}, 
+                {"left"    : "short"}, 
+                {"right"   : "short"}],
 
   "SET_RAW_RC": [{"ID": 200},
                  {"comment": "16 channels in http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol"}, 
