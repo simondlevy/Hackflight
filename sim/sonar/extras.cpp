@@ -36,12 +36,14 @@ static int sonarHandles[5];
 
 static SerialConnection serialConnection(PORTNAME, BAUDRATE);
 
+static bool serialConnected;
+
 void extrasStart(void)
 {
     for (int k=0; k<5; ++k)
         sonarHandles[k] = simGetObjectHandle(sonarNames[k]);
 
-    serialConnection.openConnection();
+    serialConnected = serialConnection.openConnection();
 }
 
 void extrasUpdate(void)
@@ -73,22 +75,25 @@ void extrasMessage(int message, int * auxiliaryData, void * customData)
 
 void extrasStop(void)
 {
-    serialConnection.closeConnection();
+    if (serialConnected)
+        serialConnection.closeConnection();
 }
 
 uint8_t Board::serialAvailableBytes(void)
 {
-    return serialConnection.bytesAvailable();
+    return serialConnected ? serialConnection.bytesAvailable() : 0;
 }
 
 uint8_t Board::serialReadByte(void)
 {
     uint8_t c = 0;
-    serialConnection.readBytes((char *)&c, 1);
+    if (serialConnected)
+        serialConnection.readBytes((char *)&c, 1);
     return c;
 }
 
 void Board::serialWriteByte(uint8_t c)
 {
-    serialConnection.writeBytes((char *)&c, 1);
+    if (serialConnected)
+        serialConnection.writeBytes((char *)&c, 1);
 }

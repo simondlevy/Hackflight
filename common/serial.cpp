@@ -135,19 +135,21 @@ SerialConnection::SerialConnection(const char * portname, int baudrate, bool blo
 
 }
 
-void SerialConnection::openConnection(void)
+bool SerialConnection::openConnection(void)
 {
 
     this->fd = open (portname, O_RDWR | O_NOCTTY | O_SYNC);
 
     if (this->fd < 0) {
         fprintf(stderr, "error %d opening %s: %s\n", errno, this->portname, strerror (errno));
-        exit(1);
+        return false;
     }
 
     set_interface_attribs (this->fd, this->baudrate, this->parity);
 
     set_blocking (this->fd, this->blocking);
+
+    return true;
 }
 
 int SerialConnection::bytesAvailable(void)
