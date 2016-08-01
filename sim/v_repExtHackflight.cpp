@@ -257,16 +257,6 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
 #define LUA_UPDATE_COMMAND "simExtHackflight_update"
 
-static const int inArgs_UPDATE[]={
-    4,
-    sim_script_arg_int32|sim_script_arg_table,3,  // axes
-	sim_script_arg_int32|sim_script_arg_table,3,  // rotAxes
-	sim_script_arg_int32|sim_script_arg_table,2,  // sliders
-	sim_script_arg_int32,0                        // buttons (as bit-coded integer)
-};
-
-
-
 static void set_indexed_float_signal(const char * name, int i, int k, float value)
 {
     char tmp[100];

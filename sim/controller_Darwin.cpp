@@ -46,7 +46,7 @@ controller_t controllerInit(void)
     return posixControllerInit(name, "2In1 USB Joystick");
 }
 
-void controllerRead(controller_t controller, int * demands)
+void controllerRead(controller_t controller, float * demands)
 {
     if (joystick) {
 
