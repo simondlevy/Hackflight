@@ -33,7 +33,7 @@ libmsppg.$(EXT):
 	g++ $(CFLAGS) -c msppg/msppg.cpp
 	g++ *.o -o libmsppg.$(EXT) -lpthread -shared
 
-install: 
+install: libmsppg.so
 	cp msppg/msppg.h $(INSTALL_ROOT)/include
 	cp libmsppg.so $(INSTALL_ROOT)/lib
 
@@ -48,3 +48,6 @@ example.o: example.cpp msppg/msppg.h
   
 msppg.o: msppg/msppg.cpp msppg/msppg.h
 	g++ -std=c++11 -Wall -c msppg/msppg.cpp
+
+clean:
+	rm -f *.so *.o *~
