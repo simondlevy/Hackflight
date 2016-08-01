@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 '''
-getimu.py Uses MSPPG to request and handle ATTITUDE messages from flight controller IMU
+getsonars.py Uses MSPPG to request and handle SONARS messages from flight controller or simulator
 
-Copyright (C) Rob Jones, Alec Singer, Chris Lavin, Blake Liebling, Simon D. Levy 2015
+Copyright (C) Matt Lubas & Simon D. Levy 2016
 
 This code is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as 
@@ -18,7 +18,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-from msppg import MSP_Parser as Parser, serialize_ATTITUDE_Request
+from msppg import MSP_Parser as Parser, serialize_SONARS_Request
 import serial
 
 from sys import argv
@@ -30,15 +30,15 @@ if len(argv) < 3:
     exit(1)
 
 parser = Parser()
-request = serialize_ATTITUDE_Request()
+request = serialize_SONARS_Request()
 port = serial.Serial(argv[1], int(argv[2]))
 
-def handler(pitch, roll, yaw):
+def handler(forward, back, left, right):
 
-    print(pitch, roll, yaw)
+    print(forward, back, left, right)
     port.write(request)
 
-parser.set_ATTITUDE_Handler(handler)
+parser.set_SONARS_Handler(handler)
 
 port.write(request)
 
