@@ -39,7 +39,7 @@ extern "C" {
 
 void MSP::serialize8(uint8_t a)
 {
-    this->board->serialWriteByte(a);
+    Board::serialWriteByte(a);
     portState.checksum ^= a;
 }
 
@@ -102,9 +102,8 @@ void MSP::tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-void MSP::init(class Board * _board, class IMU * _imu, class Navigation * _nav, class Mixer * _mixer, class RC * _rc)
+void MSP::init(class IMU * _imu, class Navigation * _nav, class Mixer * _mixer, class RC * _rc)
 {
-    this->board = _board;
     this->imu = _imu;
     this->nav = _nav;
     this->mixer = _mixer;
@@ -118,11 +117,11 @@ void MSP::update(bool armed)
     static bool pendReboot;
 
     // pendReboot will be set for flashing
-    this->board->checkReboot(pendReboot);
+    Board::checkReboot(pendReboot);
 
-    while (this->board->serialAvailableBytes()) {
+    while (Board::serialAvailableBytes()) {
 
-        uint8_t c = this->board->serialReadByte();
+        uint8_t c = Board::serialReadByte();
 
         if (portState.c_state == IDLE) {
             portState.c_state = (c == '$') ? HEADER_START : IDLE;
@@ -130,7 +129,7 @@ void MSP::update(bool armed)
                 if (c == '#')
                     ;
                 else if (c == CONFIG_REBOOT_CHARACTER) 
-                    this->board->reboot();
+                    Board::reboot();
             }
         } else if (portState.c_state == HEADER_START) {
             portState.c_state = (c == 'M') ? HEADER_M : IDLE;

@@ -28,7 +28,6 @@ class Navigation {
 
     private:
 
-        class Board * board;
         class IMU   * imu;
         class Baro  * baro;
         class RC    * rc;
@@ -71,7 +70,7 @@ class Navigation {
         // for heading
         int16_t headHold; 
   
-        void init(class Board * _board, class IMU * _imu, class Baro * _baro, class RC * _rc);
+        void init(class IMU * _imu, class Baro * _baro, class RC * _rc);
 
         void checkSwitch(void);
 

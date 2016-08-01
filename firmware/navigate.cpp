@@ -36,9 +36,8 @@ static bool sonarInRange(void)
 }
 
 
-void Navigation::init(Board * _board, IMU * _imu, Baro * _baro, RC * _rc)
+void Navigation::init(IMU * _imu, Baro * _baro, RC * _rc)
 {
-    this->board = _board;
     this->imu   = _imu;
     this->baro  = _baro;
     this->rc = _rc;
@@ -93,7 +92,7 @@ void Navigation::updateAltitudePid(bool armed)
 {
     this->tiltAngle = max(abs(this->imu->angle[ROLL]), abs(this->imu->angle[PITCH]));
 
-    uint32_t currentT = this->board->getMicros();
+    uint32_t currentT = Board::getMicros();
     uint32_t dTime = currentT - previousT;
 
     if (dTime < CONFIG_ALTITUDE_UPDATE_MSEC*1000) 

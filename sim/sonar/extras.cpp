@@ -18,7 +18,7 @@
 */
 
 static const char * PORTNAME = "/dev/ttyUSB0";
-static const int    BAUDRATE = 57600;
+static const int    BAUDRATE = 57600; // Fastest we could get from our XBees
 
 #include "extras.hpp"
 #include "serial.hpp"

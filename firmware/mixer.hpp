@@ -25,7 +25,6 @@ extern "C" {
 
         private:
 
-            class Board     * board;
             class RC        * rc;
             class Stabilize * stabilize;
         
@@ -33,7 +32,7 @@ extern "C" {
 
             int16_t  motorsDisarmed[4];
 
-            void init(class Board * _board, class RC * _rc, class Stabilize * _stabilize);
+            void init(class RC * _rc, class Stabilize * _stabilize);
 
             void update(bool armed);
     };

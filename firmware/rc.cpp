@@ -27,10 +27,8 @@ extern "C" {
 
 #include <string.h>
 
-void RC::init(class Board * _board)
+void RC::init(void)
 {
-    this->board = _board;
-
     this->midrc = (CONFIG_PWM_MAX + CONFIG_PWM_MIN) / 2;
 
     memset (this->dataAverage, 0, 8*4*sizeof(int16_t));
@@ -64,8 +62,7 @@ void RC::update(void)
     for (uint8_t chan = 0; chan < 8; chan++) {
     
         // get RC PWM
-        this->dataAverage[chan][this->averageIndex % 4] = 
-            this->board->readPWM(chan);
+        this->dataAverage[chan][this->averageIndex % 4] = Board::readPWM(chan);
 
         this->data[chan] = 0;
 

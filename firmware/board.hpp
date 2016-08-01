@@ -23,36 +23,32 @@ extern "C" {
 
     class Board {
 
-        private:
-
-            // add stuff as needed here
-
         public:
 
             // your implementation should support these methods
 
-            void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
+            static void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
 
-            bool     baroInit(void);
-            void     baroUpdate(void);
-            int32_t  baroGetPressure(void);
-            void     checkReboot(bool pendReboot);
-            void     delayMilliseconds(uint32_t msec);
-            uint32_t getMicros();
-            void     imuInit(uint16_t & acc1G, float & gyroScale);
-            void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
-            void     ledGreenOff(void);
-            void     ledGreenOn(void);
-            void     ledGreenToggle(void);
-            void     ledRedOff(void);
-            void     ledRedOn(void);
-            void     ledRedToggle(void);
-            uint16_t readPWM(uint8_t chan);
-            void     reboot(void);
-            uint8_t  serialAvailableBytes(void);
-            uint8_t  serialReadByte(void);
-            void     serialWriteByte(uint8_t c);
-            void     writeMotor(uint8_t index, uint16_t value);
+            static bool     baroInit(void);
+            static void     baroUpdate(void);
+            static int32_t  baroGetPressure(void);
+            static void     checkReboot(bool pendReboot);
+            static void     delayMilliseconds(uint32_t msec);
+            static uint32_t getMicros();
+            static void     imuInit(uint16_t & acc1G, float & gyroScale);
+            static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
+            static void     ledGreenOff(void);
+            static void     ledGreenOn(void);
+            static void     ledGreenToggle(void);
+            static void     ledRedOff(void);
+            static void     ledRedOn(void);
+            static void     ledRedToggle(void);
+            static uint16_t readPWM(uint8_t chan);
+            static void     reboot(void);
+            static uint8_t  serialAvailableBytes(void);
+            static uint8_t  serialReadByte(void);
+            static void     serialWriteByte(uint8_t c);
+            static void     writeMotor(uint8_t index, uint16_t value);
 
     }; // class Board
 

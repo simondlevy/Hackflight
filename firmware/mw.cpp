@@ -31,7 +31,6 @@ extern "C" {
 
 // Objects we use
 
-static Board      board;
 static IMU        imu;
 static RC         rc;
 static Mixer      mixer;
@@ -98,21 +97,21 @@ void setup(void)
     uint32_t calibratingGyroMsec;
 
     // Get particulars for board
-    board.init(imuLooptimeUsec, calibratingGyroMsec);
+    Board::init(imuLooptimeUsec, calibratingGyroMsec);
 
     // sleep for 100ms
-    board.delayMilliseconds(100);
+    Board::delayMilliseconds(100);
 
     // flash the LEDs to indicate startup
-    board.ledRedOn();
-    board.ledGreenOff();
+    Board::ledRedOn();
+    Board::ledGreenOff();
     for (uint8_t i = 0; i < 10; i++) {
-        board.ledRedToggle();
-        board.ledGreenToggle();
-        board.delayMilliseconds(50);
+        Board::ledRedToggle();
+        Board::ledGreenToggle();
+        Board::delayMilliseconds(50);
     }
-    board.ledRedOff();
-    board.ledGreenOff();
+    Board::ledRedOff();
+    Board::ledGreenOff();
 
     // compute cycles for calibration based on board's time constant
     calibratingGyroCycles = (uint16_t)(1000. * calibratingGyroMsec / imuLooptimeUsec);
@@ -125,12 +124,12 @@ void setup(void)
     altitudeEstimationTask.init(CONFIG_ALTITUDE_UPDATE_MSEC * 1000);
 
     // initialize our external objects with objects they need
-    rc.init(&board);
+    rc.init();
     stab.init(&rc, &imu);
-    imu.init(&board, calibratingGyroCycles, calibratingAccCycles);
-    mixer.init(&board, &rc, &stab); 
-    msp.init(&board, &imu, &nav, &mixer, &rc);
-    nav.init(&board, &imu, &baro, &rc);
+    imu.init(calibratingGyroCycles, calibratingAccCycles);
+    mixer.init(&rc, &stab); 
+    msp.init(&imu, &nav, &mixer, &rc);
+    nav.init(&imu, &baro, &rc);
 
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;
@@ -142,7 +141,7 @@ void setup(void)
     armed = false;
     
     // attempt to initialize barometer
-    baro.init(&board);
+    baro.init();
 
 } // setup
 
@@ -172,7 +171,7 @@ void loop(void)
                 if (rc.sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
                     if (armed) {
                         armed = false;
-                        // Reset disarm time so that it works next time we arm the board.
+                        // Reset disarm time so that it works next time we arm the Board::
                         if (disarmTime != 0)
                             disarmTime = 0;
                     }
@@ -229,7 +228,7 @@ void loop(void)
         }
     }
 
-    currentTime = board.getMicros();
+    currentTime = Board::getMicros();
 
     if (imuTask.checkAndUpdate(currentTime)) {
 
@@ -238,28 +237,28 @@ void loop(void)
         haveSmallAngle = abs(imu.angle[0]) < CONFIG_SMALL_ANGLE && abs(imu.angle[1]) < CONFIG_SMALL_ANGLE;
 
         // measure loop rate just afer reading the sensors
-        currentTime = board.getMicros();
+        currentTime = Board::getMicros();
 
         // compute exponential RC commands
         rc.computeExpo();
 
         // use LEDs to indicate calibration status
         if (calibratingA > 0 || calibratingG > 0) 
-            board.ledGreenOn();
+            Board::ledGreenOn();
         else {
             if (accCalibrated)
-                board.ledGreenOff();
+                Board::ledGreenOff();
             if (armed)
-                board.ledRedOn();
+                Board::ledRedOn();
             else
-                board.ledRedOff();
+                Board::ledRedOff();
         }
 
         // periodically update accelerometer calibration status
         if (accelCalibrationTask.check(currentTime)) {
             if (!haveSmallAngle) {
                 accCalibrated = false; 
-                board.ledGreenToggle();
+                Board::ledGreenToggle();
                 accelCalibrationTask.update(currentTime);
             } else {
                 accCalibrated = true;

@@ -40,9 +40,8 @@ static const motorMixer_t mixerQuadX[] = {
     { 1.0f,  1.0f, -1.0f, -1.0f },          // FRONT_L
 };
 
-void Mixer::init(class Board * _board, class RC * _rc, class Stabilize * _stabilize)
+void Mixer::init(class RC * _rc, class Stabilize * _stabilize)
 {
-    this->board = _board;
     this->stabilize = _stabilize;
     this->rc = _rc;
 
@@ -87,7 +86,7 @@ void Mixer::update(bool armed)
     }
 
     for (uint8_t i = 0; i < 4; i++)
-        this->board->writeMotor(i, motors[i]);
+        Board::writeMotor(i, motors[i]);
 }
 
 #ifdef __arm__

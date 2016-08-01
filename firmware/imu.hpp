@@ -31,8 +31,6 @@ extern "C" {
         
         private:
 
-            class Board * board;
-
             uint16_t calibratingGyroCycles;
             uint16_t calibratingAccCycles;
             uint16_t acc1G;
@@ -49,7 +47,7 @@ extern "C" {
             uint32_t accelTimeSum;
             float    accelVelScale;
 
-            void init(class Board * _board, uint16_t calibratingGyroCycles, uint16_t calibratingAccCycles);
+            void init(uint16_t calibratingGyroCycles, uint16_t calibratingAccCycles);
             void update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG);
             void resetAccelSum(void);
     };

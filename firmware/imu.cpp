@@ -115,11 +115,9 @@ static void rotateV(float v[3], float *delta)
     v[Z] = v_tmp[X] * mat[0][2] + v_tmp[Y] * mat[1][2] + v_tmp[Z] * mat[2][2];
 }
 
-void IMU::init(class Board * _board, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles) 
+void IMU::init(uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles) 
 {
-    this->board = _board;
-
-    this->board->imuInit(this->acc1G, this->gyroScale);
+    Board::imuInit(this->acc1G, this->gyroScale);
 
     // calculate RC time constant used in the accZ lpf    
     this->fcAcc = (float)(0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF)); 
@@ -160,7 +158,7 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
 
     previousTime = currentTime;
 
-    this->board->imuRead(accelADC, this->gyroADC);
+    Board::imuRead(accelADC, this->gyroADC);
 
     if (calibratingA > 0) {
 
