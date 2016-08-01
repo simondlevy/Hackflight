@@ -19,23 +19,16 @@
 
 #include "controller.hpp"
 
-#include "v_repExt.h"
-#include "scriptFunctionData.h"
-#include "v_repLib.h"
-
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
 
 #include <conio.h>
 
-#include <iostream>
-using namespace std;
-
 // Adapted from http://olek.matthewm.com.pl//courses/ee-ces/examples/02_JOYSTICK_WIN32.C.HTML
 
 controller_t controllerInit(void)
 { 
-	controller_t controller = KEYBOARD;
+    controller_t controller = KEYBOARD;
 
    JOYCAPS joycaps;
    if (joyGetDevCaps(JOYSTICKID1, &joycaps, sizeof(joycaps))==JOYERR_NOERROR) {
@@ -58,13 +51,13 @@ controller_t controllerInit(void)
                 controller = EXTREME3D;
                 break;
 
-			case 9414:
-				controller = XBOX360;
-				break;
+            case 9414:
+                controller = XBOX360;
+                break;
         }
    }
 
-	return controller;
+    return controller;
 }
 
 // Turns button value into aux-switch demand
@@ -82,7 +75,7 @@ static void buttonToAuxDemand(float * demands, int buttons)
 
 static float joynorm(int axisval) 
 {
-	return (axisval - (float)32767) / 32767;
+    return (axisval - (float)32767) / 32767;
 }
 
 
@@ -91,57 +84,57 @@ void controllerRead(controller_t controller, float * demands)
     JOYINFOEX joyState;
     joyState.dwSize=sizeof(joyState);
     joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
-	joyGetPosEx(JOYSTICKID1, &joyState);
-	
-	/*
-	printf("X:%d Y:%d Z:%d   U:%d V:%d R:%d  b:%d\n", 
-				joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
-				joyState.dwUpos, joyState.dwVpos, joyState.dwRpos,
-				joyState.dwButtons);
-	
-	*/
+    joyGetPosEx(JOYSTICKID1, &joyState);
+    
+    /*
+    printf("X:%d Y:%d Z:%d   U:%d V:%d R:%d  b:%d\n", 
+                joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
+                joyState.dwUpos, joyState.dwVpos, joyState.dwRpos,
+                joyState.dwButtons);
+    
+    */
 
     // Handle each controller differently
     switch (controller) {
 
         case TARANIS:
-            demands[0] =  joynorm(joyState.dwXpos);		// roll
-			demands[1] =  joynorm(joyState.dwYpos);		// pitch
-			demands[2] =  joynorm(joyState.dwZpos);		// yaw
-			demands[3] =  joynorm(joyState.dwVpos);		// throttle		
-            demands[4] = -1;							// XXX need to map aux switch
+            demands[0] =  joynorm(joyState.dwXpos);        // roll
+            demands[1] =  joynorm(joyState.dwYpos);        // pitch
+            demands[2] =  joynorm(joyState.dwZpos);        // yaw
+            demands[3] =  joynorm(joyState.dwVpos);        // throttle        
+            demands[4] = -1;                            // XXX need to map aux switch
             break;
 
         case SPEKTRUM:
-            demands[0] =  joynorm(joyState.dwYpos);		// roll
-			demands[1] =  joynorm(joyState.dwZpos);		// pitch
-			demands[2] =  joynorm(joyState.dwRpos);		// yaw
-			demands[3] =  joynorm(joyState.dwXpos);		// throttle		
-            demands[4] =  joynorm(joyState.dwVpos);		// aux switch		
+            demands[0] =  joynorm(joyState.dwYpos);        // roll
+            demands[1] =  joynorm(joyState.dwZpos);        // pitch
+            demands[2] =  joynorm(joyState.dwRpos);        // yaw
+            demands[3] =  joynorm(joyState.dwXpos);        // throttle        
+            demands[4] =  joynorm(joyState.dwVpos);        // aux switch        
             break;
 
         case EXTREME3D:
-            demands[0] =  joynorm(joyState.dwXpos);			// roll
-			demands[1] = -joynorm(joyState.dwYpos);			// pitch
-			demands[2] =  joynorm(joyState.dwRpos);			// yaw
-			demands[3] = -joynorm(joyState.dwZpos);			// throttle
-			buttonToAuxDemand(demands, joyState.dwButtons); // aux switch
+            demands[0] =  joynorm(joyState.dwXpos);            // roll
+            demands[1] = -joynorm(joyState.dwYpos);            // pitch
+            demands[2] =  joynorm(joyState.dwRpos);            // yaw
+            demands[3] = -joynorm(joyState.dwZpos);            // throttle
+            buttonToAuxDemand(demands, joyState.dwButtons); // aux switch
             break;
 
         case PS3:
-            demands[0] =  joynorm(joyState.dwZpos);			// roll
-			demands[1] = -joynorm(joyState.dwRpos);			// pitch
-			demands[2] =  joynorm(joyState.dwXpos);			// yaw
-			demands[3] = -joynorm(joyState.dwYpos);			// throttle
-			buttonToAuxDemand(demands, joyState.dwButtons); // aux switch
+            demands[0] =  joynorm(joyState.dwZpos);            // roll
+            demands[1] = -joynorm(joyState.dwRpos);            // pitch
+            demands[2] =  joynorm(joyState.dwXpos);            // yaw
+            demands[3] = -joynorm(joyState.dwYpos);            // throttle
+            buttonToAuxDemand(demands, joyState.dwButtons); // aux switch
             break;
 
         case XBOX360:
-            demands[0] =  joynorm(joyState.dwUpos);			// roll
-			demands[1] = -joynorm(joyState.dwRpos);			// pitch
-			demands[2] =  joynorm(joyState.dwXpos);			// yaw
-			demands[3] = -joynorm(joyState.dwYpos);			// throttle
-			buttonToAuxDemand(demands, joyState.dwButtons); // aux switch
+            demands[0] =  joynorm(joyState.dwUpos);            // roll
+            demands[1] = -joynorm(joyState.dwRpos);            // pitch
+            demands[2] =  joynorm(joyState.dwXpos);            // yaw
+            demands[3] = -joynorm(joyState.dwYpos);            // throttle
+            buttonToAuxDemand(demands, joyState.dwButtons); // aux switch
             break;
 
         default:
@@ -154,6 +147,5 @@ void controllerRead(controller_t controller, float * demands)
 }
 
 void controllerClose(void)
-{
-    // XXX no action needed (?)
+{ 
 }
