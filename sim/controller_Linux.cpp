@@ -56,7 +56,7 @@ controller_t controllerInit(void)
     return controller;
 } 
 
-void controllerRead(controller_t controller, int * demands, void * ignore)
+void controllerRead(controller_t controller, float * demands)
 {
     // Have a joystick; grab its axes
     if (joyfd > 0) {

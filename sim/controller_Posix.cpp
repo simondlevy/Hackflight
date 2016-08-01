@@ -133,7 +133,7 @@ controller_t posixControllerInit(char * name, const char * ps3name)
     return controller;
 }
 
-void posixControllerGrabAxis(controller_t controller, int * demands, int number, int value)
+void posixControllerGrabAxis(controller_t controller, float * demands, int number, int value)
 {
     // Look at all five axes for R/C transmitters, first four for other controllers
     int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
@@ -141,20 +141,20 @@ void posixControllerGrabAxis(controller_t controller, int * demands, int number,
     // Grab demands from axes
     for (int k=0; k<maxaxis; ++k)
         if (number == axismap[k]) 
-            demands[k] = axisdir[k] * (int)(1000. * value / 32767);
+            demands[k] = axisdir[k] * value / 32767.;
 }
 
-void posixControllerGrabButton(int * demands, int number)
+void posixControllerGrabButton(float * demands, int number)
 {
     switch (number) {
         case 0:
-            demands[4] = -1000;
+            demands[4] = -1;
             break;
         case 1:
-            demands[4] =     0;
+            demands[4] =  0;
             break;
         case 2:
-            demands[4] = +1000;
+            demands[4] = +1;
     }
 }
 
