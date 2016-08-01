@@ -62,7 +62,7 @@ libv_repExtHackflight.$(EXT): *.cpp ../*.cpp ../*.hpp ../../firmware/*.cpp ../..
 	g++ $(CFLAGS) -c ../../firmware/baro.cpp
 	g++ $(CFLAGS) -c ../../firmware/navigate.cpp
 	g++ $(CFLAGS) -c ../../firmware/filters.cpp
-	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared $(JOYLIB)
+	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared $(JOYLIB) -lmsppg
 
 edit:
 	vim extras.cpp
