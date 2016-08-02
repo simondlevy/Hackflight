@@ -40,9 +40,11 @@ bool Sonars::available(void)
 void Sonars::update(void)
 {
     // Update hardware
-    //Board::sonarUpdate(this->index);
+    Board::sonarUpdate(this->index);
 
-    //this->distances[this->index] = Board::sonarGetDistance(this->index);
+    this->distances[this->index] = Board::sonarGetDistance(this->index);
+
+    printf("%d: %d\n", this->index, this->distances[index]);
 
     // Address hardware cyclically
     this->index = (this->index + 1) % 4;
