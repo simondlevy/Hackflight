@@ -50,6 +50,7 @@ extern "C" {
             class Navigation * nav;
             class Mixer      * mixer;
             class RC         * rc;
+            class Sonars     * sonars;
 
             mspPortState_t portState;
 
@@ -66,7 +67,8 @@ extern "C" {
 
         public:
 
-            void init(class IMU * _imu, class Navigation * _nav, class Mixer * _mixer, class RC * _rc);
+            void init(class IMU * _imu, class Navigation * _nav, class Mixer * _mixer, 
+                    class RC * _rc, class Sonars * _sonars);
 
             void update(bool armed);
 

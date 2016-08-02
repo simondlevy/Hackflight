@@ -210,3 +210,18 @@ void Board::serialWriteByte(uint8_t c)
 {
     companionBoard.sendByte(c);
 }
+
+bool Board::sonarInit(uint8_t index) 
+{
+    return false;
+}
+
+void sonarUpdate(uint8_t index)
+{
+}
+
+uint16_t sonarGetDistance(uint8_t index)
+{
+    return 0;
+}
+ 

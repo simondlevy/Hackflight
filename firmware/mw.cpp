@@ -36,6 +36,7 @@ static RC         rc;
 static Mixer      mixer;
 static MSP        msp;
 static Baro       baro;
+static Sonars     sonars;
 static Navigation nav;
 static Stabilize  stab;
 
@@ -123,12 +124,16 @@ void setup(void)
     accelCalibrationTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
     altitudeEstimationTask.init(CONFIG_ALTITUDE_UPDATE_MSEC * 1000);
 
+    // attempt to initialize barometer, sonars
+    baro.init();
+    sonars.init();
+
     // initialize our external objects with objects they need
     rc.init();
     stab.init(&rc, &imu);
     imu.init(calibratingGyroCycles, calibratingAccCycles);
     mixer.init(&rc, &stab); 
-    msp.init(&imu, &nav, &mixer, &rc);
+    msp.init(&imu, &nav, &mixer, &rc, &sonars);
     nav.init(&imu, &baro, &rc);
 
     // always do gyro calibration at startup
@@ -140,9 +145,6 @@ void setup(void)
     // ensure not armed
     armed = false;
     
-    // attempt to initialize barometer
-    baro.init();
-
 } // setup
 
 void loop(void)
@@ -217,6 +219,8 @@ void loop(void)
                 taskOrder++;
                 break;
             case 2:
+                if (sonars.available())
+                    sonars.update();
                 taskOrder++;
                 break;
             case 3:

@@ -1,7 +1,5 @@
 /*
-   extras.cpp : Implementation of extra simulator functionality
-
-   Copyright (C) Simon D. Levy, Matt Lubas, and Julio Hidalgo Lopez 2016
+   sonars.hpp : Sonars class header
 
    This file is part of Hackflight.
 
@@ -15,52 +13,31 @@
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
-#include "extras.hpp"
+#ifdef __arm__
+extern "C" {
+#endif
 
-void extrasStart(void)
-{
-}
+    class Sonars {
+        
+        private:
 
-void extrasUpdate(void)
-{
-}
+            bool     avail;
+            uint8_t  index;
+            bool     ready;
 
-void extrasMessage(int message, int * auxiliaryData, void * customData)
-{
-}
+        public:
 
-void extrasStop(void)
-{
-}
+            uint16_t distances[4];
 
-uint8_t Board::serialAvailableBytes(void)
-{
-    return 0;
-}
+            void init(void);
 
-uint8_t Board::serialReadByte(void)
-{
-    return 0;
-}
+            bool available(void);
 
-void Board::serialWriteByte(uint8_t c)
-{
-}
+            void update(void);
+    };
 
-
-bool Board::sonarInit(uint8_t index) 
-{
-    return false;
-}
-
-void sonarUpdate(uint8_t index)
-{
-}
-
-uint16_t sonarGetDistance(uint8_t index)
-{
-    return 0;
-}
- 
+#ifdef __arm__
+} // extern "C"
+#endif

@@ -102,12 +102,14 @@ void MSP::tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-void MSP::init(class IMU * _imu, class Navigation * _nav, class Mixer * _mixer, class RC * _rc)
+void MSP::init(class IMU * _imu, class Navigation * _nav, 
+        class Mixer * _mixer, class RC * _rc, class Sonars * _sonars)
 {
     this->imu = _imu;
     this->nav = _nav;
     this->mixer = _mixer;
     this->rc = _rc;
+    this->sonars = _sonars;
 
     memset(&this->portState, 0, sizeof(this->portState));
 }
@@ -203,10 +205,8 @@ void MSP::update(bool armed)
 
                     case MSP_SONARS:
                         headSerialReply(8);
-                        serialize16(100);
-                        serialize16(200);
-                        serialize16(300);
-                        serialize16(400);
+                        for (uint8_t i = 0; i < 4; i++)
+                            serialize16(this->sonars->distances[i]);
                         break;
 
                     case MSP_REBOOT:

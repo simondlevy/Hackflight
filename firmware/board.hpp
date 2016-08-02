@@ -48,6 +48,9 @@ extern "C" {
             static uint8_t  serialAvailableBytes(void);
             static uint8_t  serialReadByte(void);
             static void     serialWriteByte(uint8_t c);
+            static bool     sonarInit(uint8_t index);
+            static void     sonarUpdate(uint8_t index);
+            static uint16_t sonarGetDistance(uint8_t index);
             static void     writeMotor(uint8_t index, uint16_t value);
 
     }; // class Board

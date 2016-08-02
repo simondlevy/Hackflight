@@ -30,17 +30,19 @@ static const int    BAUDRATE = 57600; // Fastest we could get from our XBees
 #include <algorithm>
 
 
-static const char * sonarNames[5] = {"Sonar_Back", "Sonar_Bottom", "Sonar_Front", "Sonar_Left", "Sonar_Right"};
+static const char * sonarNames[4] = {"Sonar_Back", "Sonar_Front", "Sonar_Left", "Sonar_Right"};
 
-static int sonarHandles[5];
+static int sonarHandles[4];
 
 static SerialConnection serialConnection(PORTNAME, BAUDRATE);
 
 static bool serialConnected;
 
+static int sonarDistances[4];
+
 void extrasStart(void)
 {
-    for (int k=0; k<5; ++k)
+    for (int k=0; k<4; ++k)
         sonarHandles[k] = simGetObjectHandle(sonarNames[k]);
 
     serialConnected = serialConnection.openConnection();
@@ -48,9 +50,7 @@ void extrasStart(void)
 
 void extrasUpdate(void)
 {
-    int sonarDistances[5];
-
-    for (int k=0; k<5; ++k) {
+    for (int k=0; k<4; ++k) {
 
         int sonarDistance = 0; 
 
@@ -96,4 +96,19 @@ void Board::serialWriteByte(uint8_t c)
 {
     if (serialConnected)
         serialConnection.writeBytes((char *)&c, 1);
+}            
+
+bool Board::sonarInit(uint8_t index) 
+{
+    return true;
 }
+
+void sonarUpdate(uint8_t index)
+{
+}
+
+uint16_t sonarGetDistance(uint8_t index)
+{
+    return sonarDistances[index];
+}
+ 
