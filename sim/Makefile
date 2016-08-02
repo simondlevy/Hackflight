@@ -18,25 +18,38 @@
 #
  
 # Edit this for where you installed V-REP
-VREP_DIR = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
+VREP_DIR_LINUX = $(HOME)/Software/V-REP_PRO_EDU_V3_3_1_64_Linux
+VREP_DIR_OSX   = /Applications/V-REP_PRO_EDU_V3_3_1_Mac
 
 COMMON = $(VREP_DIR)/programming/common/
 CFLAGS = -Wall -D_SIM -I$(VREP_DIR)/programming/include/ -I. -I.. -I../../common -I../../firmware -Wall -fPIC -static
 
-# Un-comment if you want to build for the companion board:
-# Linux only, requires OpenCV
-CFLAGS += -D_COMPANION
+OS = $(shell uname -s)
+ifeq ($(OS), Linux)
+	EXT = so
+	CFLAGS += -I/usr/include/SDL
+	VREP_DIR = $(VREP_DIR_LINUX)
+    VREP_LIBDIR = $(VREP_DIR)
+else
+	EXT = dylib
+	CFLAGS += -I/Library/Frameworks/SDL2.framework/Headers/
+	JOYLIB = -lSDL2
+	VREP_DIR = $(VREP_DIR_OSX)
+    VREP_LIBDIR = $(VREP_DIR)/vrep.app/Contents/MacOS/
+endif
 
-PLUGIN = libv_repExtHackflight.so
+PLUGIN = libv_repExtHackflight.$(EXT)
 
-all: $(PLUGIN) 
+ALL = $(PLUGIN) 
 
-libv_repExtHackflight.so: *.cpp ../*.cpp *.hpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp Makefile
-	g++ $(CFLAGS) -c  ../v_repExtHackflight.cpp 
-	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_DIR)\" extras.cpp 
+all: $(ALL)
+
+libv_repExtHackflight.$(EXT): *.cpp ../*.cpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp
+	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" ../v_repExtHackflight.cpp 
+	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" extras.cpp 
+	g++ $(CFLAGS) -c ../../common/serial.cpp
 	g++ $(CFLAGS) -c ../controller_Posix.cpp 
-	g++ $(CFLAGS) -c ../controller_Linux.cpp 
-	g++ $(CFLAGS) -c ../../common/sockets.cpp 
+	g++ $(CFLAGS) -c ../controller_$(OS).cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
 	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp
@@ -47,36 +60,17 @@ libv_repExtHackflight.so: *.cpp ../*.cpp *.hpp ../*.hpp ../../firmware/*.cpp ../
 	g++ $(CFLAGS) -c ../../firmware/stabilize.cpp
 	g++ $(CFLAGS) -c ../../firmware/rc.cpp
 	g++ $(CFLAGS) -c ../../firmware/baro.cpp
+	g++ $(CFLAGS) -c ../../firmware/sonars.cpp
 	g++ $(CFLAGS) -c ../../firmware/navigate.cpp
 	g++ $(CFLAGS) -c ../../firmware/filters.cpp
-	g++ *.o -o libv_repExtHackflight.so -lpthread -shared -lopencv_core -lopencv_highgui $(JOYLIB)
+	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared $(JOYLIB) -lmsppg
 
-install: $(PLUGIN) hackflight_companion.py
-	cp $(PLUGIN) $(VREP_DIR)
-	cp hackflight_companion.py $(VREP_DIR)
-	cp socket_server.py $(VREP_DIR)
+edit:
+	vim extras.cpp
 
-uninstall:
-	rm -f $(VREP_DIR)/$(PLUGIN)
-	rm -f $(VREP_DIR)/hackflight_companion.py
-	rm -f $(VREP_DIR)/image1.jpg
-	rm -f $(VREP_DIR)/image2.jpg
-
-vedit:
-	vim v_repExtHackflight.cpp
-
-pedit:
-	vim hackflight_companion.py
-
-flakes:
-	pyflakes hackflight_companion.py
-
-release: $(PLUGIN)
-	cp $(PLUGIN) Release
-
-commit:
-	git commit -a --allow-empty-message -m ""
-	git push
+install: $(PLUGIN)
+	cp $(PLUGIN) $(VREP_LIBDIR)
 
 clean:
-	rm -f *.o *.so *.pyc *~
+	rm -f $(ALL) *.o *.pyc *~
+
