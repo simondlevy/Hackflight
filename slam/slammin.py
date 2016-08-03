@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 
 '''
 slammin.py : Runs SLAM from sensor telemetry retrieved over comm port
@@ -21,7 +21,11 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 from msppg import MSP_Parser as Parser, serialize_SONARS_Request, serialize_ATTITUDE_Request
 import serial
 
-from sys import argv
+from sys import argv, version_info
+
+if version_info.major > 2:
+    print('Cannot run under Python3!')
+    exit(1)
 
 if len(argv) < 3:
 
