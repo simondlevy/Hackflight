@@ -52,17 +52,16 @@ void extrasUpdate(void)
 {
     for (int k=0; k<4; ++k) {
 
-        int sonarDistance = 0; 
-
         float detectedPoint[4];         // X,Y,Z,distance
 
         if (simReadProximitySensor(sonarHandles[k], detectedPoint, NULL, NULL) > 0)
-            sonarDistance = (int)(detectedPoint[3] * 100);   // m to cm
+            sonarDistances[k] = (int)(detectedPoint[3] * 100);   // m to cm
+        else // simulate max-out at 765 cm
+            sonarDistances[k] = 765;
 
-        // Keep in MB142 range
-        sonarDistances[k] = std::min(std::max(sonarDistance, 20), 765);
+        sonarDistances[k] = std::max(sonarDistances[k], 20);
 
-        //printf("%s: %d %c ", sonarNames[k], sonarDistances[k], k==3?'\n' : '|');
+        printf("%s: %d %c ", sonarNames[k], sonarDistances[k], k==3?'\n' : '|');
     }
 }
 
