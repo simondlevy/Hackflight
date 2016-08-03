@@ -44,8 +44,6 @@ void Sonars::update(void)
 
     this->distances[this->index] = Board::sonarGetDistance(this->index);
 
-    printf("%d: %d\n", this->index, this->distances[index]);
-
     // Address hardware cyclically
     this->index = (this->index + 1) % 4;
 

@@ -12,9 +12,9 @@
 
   "ATTITUDE": [{"ID": 108},
                {"comment" : "angles should be divided by 10"},
-               {"angx"    : "short"}, 
-               {"angy"    : "short"},
-               {"heading" : "short"}],
+               {"roll"    : "short"}, 
+               {"pitch"   : "short"},
+               {"yaw"     : "short"}],
 
   "ALTITUDE": [{"ID": 109},
                {"altitude": "int"}, 

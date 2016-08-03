@@ -18,7 +18,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-from msppg import MSP_Parser as Parser, serialize_SONARS_Request
+from msppg import MSP_Parser as Parser, serialize_SONARS_Request, serialize_ATTITUDE_Request
 import serial
 
 from sys import argv
@@ -29,18 +29,20 @@ if len(argv) < 3:
     print('Example: python3 %s /dev/ttyUSB0 57600' % argv[0])
     exit(1)
 
-parser = Parser()
-request = serialize_SONARS_Request()
 port = serial.Serial(argv[1], int(argv[2]))
 
-def handler(forward, back, left, right):
+parser = Parser()
 
-    print(forward, back, left, right)
-    port.write(request)
+sonars_request = serialize_SONARS_Request()
+attitude_request = serialize_ATTITUDE_Request()
 
-parser.set_SONARS_Handler(handler)
+def sonars_handler(forward, back, left, right):
+    print('Sonars: forward: %d   back: %d  left: %d  right: %d' % (forward, back, left, right))
+    port.write(sonars_request)
 
-port.write(request)
+parser.set_SONARS_Handler(sonars_handler)
+
+port.write(sonars_request)
 
 while True:
 
