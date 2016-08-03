@@ -14,7 +14,7 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 TARGET		?= NAZE
 
-CPP_OBJS = mw.o imu.o mixer.o msp.o rc.o baro.o board.o stabilize.o navigate.o filters.o
+CPP_OBJS = mw.o imu.o mixer.o msp.o rc.o baro.o sonars.o board.o stabilize.o navigate.o filters.o
 
 # Compile-time options
 OPTIONS		?=
@@ -193,6 +193,10 @@ msp.o: $(FIRMDIR)/msp.cpp $(FIRMDIR)/msp.hpp $(FIRMDIR)/rc.hpp
 baro.o: $(FIRMDIR)/baro.cpp $(FIRMDIR)/baro.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o baro.o $(FIRMDIR)/baro.cpp
+
+sonars.o: $(FIRMDIR)/sonars.cpp $(FIRMDIR)/sonars.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o sonars.o $(FIRMDIR)/sonars.cpp
 
 rc.o: $(FIRMDIR)/rc.cpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
