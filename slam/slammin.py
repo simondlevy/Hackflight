@@ -3,7 +3,7 @@
 '''
 slammin.py : Runs SLAM from sensor telemetry retrieved over comm port
 
-Copyright (C) Matt Lubas & Simon D. Levy 2016
+Copyright (C) Matt Lubas, Alfredo Rwagaju, and Simon D. Levy 2016
 
 This code is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as 
@@ -20,7 +20,6 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 from msppg import MSP_Parser as Parser, serialize_SONARS_Request, serialize_ATTITUDE_Request
 import serial
-
 from sys import argv, version_info
 
 if version_info.major > 2:
@@ -45,26 +44,26 @@ class MyParser(Parser):
         self.attitude_request = serialize_ATTITUDE_Request()
         self.set_SONARS_Handler(self.sonars_handler)
 
-    def start(self):
+    def send_requests(self):
         self.port.write(self.sonars_request)
 
     def sonars_handler(self, back, front, left, right):
         print('%4d: Sonars: back: %d   front: %d  left: %d  right: %d' % 
                 (self.count, back, front, left, right))
         self.count += 1
-        self.port.write(self.sonars_request)
+        self.send_requests()
 
 port = serial.Serial(argv[1], int(argv[2]), timeout=1)
 
 parser = MyParser(port)
 
-parser.start()
+parser.send_requests()
 
 while True:
 
     c = port.read(1)
 
-    if len(c) == 1:     # got a byte; parse it
+    if len(c) == 1:             # got a byte; parse it
         parser.parse(c)
     else:
-        parser.start()  # timed out; have parser a new set of requests
+        parser.send_requests()  # timed out; have parser a new set of requests
