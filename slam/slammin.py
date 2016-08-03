@@ -18,7 +18,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-from msppg import MSP_Parser as Parser, serialize_SONARS_Request, serialize_ATTITUDE_Request
+from msppg import MSP_Parser as Parser, serialize_SONARS_Request, serialize_ATTITUDE_Request, serialize_ALTITUDE_Request
 import serial
 from sys import argv, version_info
 
@@ -42,16 +42,38 @@ class MyParser(Parser):
         self.count = 0
         self.sonars_request = serialize_SONARS_Request()
         self.attitude_request = serialize_ATTITUDE_Request()
+        #XXX
+        #self.altitude_request = serialize_ALTITUDE_Request()
+
         self.set_SONARS_Handler(self.sonars_handler)
+        self.set_ATTITUDE_Handler(self.attitude_handler)
+
+        
+        #self.set_ALTITUDE_Handler(self.altitude_handler)
 
     def send_requests(self):
         self.port.write(self.sonars_request)
+        #self.port.write(self.attitude_request)
+        #self.port.write(self.altitude_request)
 
     def sonars_handler(self, back, front, left, right):
         print('%4d: Sonars: back: %d   front: %d  left: %d  right: %d' % 
                 (self.count, back, front, left, right))
         self.count += 1
         self.send_requests()
+
+    def attitude_handler(self, pitch, roll, heading):
+        print ('%3d: Attitude: Pitch: %d   Roll: %d  Heading: %d' % 
+                (self.count, pitch, roll, heading))
+        self.count += 1
+        self.send_requests()
+    
+    def altitude_handler(self, height):
+        print('%2d: Altitude: Height: %d  Vario: %d'  %
+                (self.count, height, vario))
+        self.count +=1
+        self.send_requests()
+
 
 port = serial.Serial(argv[1], int(argv[2]), timeout=1)
 
