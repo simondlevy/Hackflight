@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 '''
-getsonars.py Uses MSPPG to request and handle SONARS messages from flight controller or simulator
+slammin.py : Runs SLAM from sensor telemetry retrieved over comm port
 
 Copyright (C) Matt Lubas & Simon D. Levy 2016
 
