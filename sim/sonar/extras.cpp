@@ -62,7 +62,7 @@ void extrasUpdate(void)
         // Keep in MB142 range
         sonarDistances[k] = std::min(std::max(sonarDistance, 20), 765);
 
-        printf("%s: %d %c ", sonarNames[k], sonarDistances[k], k==3?'\n' : '|');
+        //printf("%s: %d %c ", sonarNames[k], sonarDistances[k], k==3?'\n' : '|');
     }
 }
 

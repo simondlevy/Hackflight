@@ -22,8 +22,8 @@
 
   "SONARS":   [{"ID": 127},
                 {"comment": "four horizontal-facing sonars"}, 
-                {"forward" : "short"}, 
                 {"back"    : "short"}, 
+                {"front"   : "short"}, 
                 {"left"    : "short"}, 
                 {"right"   : "short"}],
 
