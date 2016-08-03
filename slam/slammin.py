@@ -29,28 +29,38 @@ if len(argv) < 3:
     print('Example: python3 %s /dev/ttyUSB0 57600' % argv[0])
     exit(1)
 
-port = serial.Serial(argv[1], int(argv[2]))
+class MyParser(Parser):
 
-parser = Parser()
+    def __init__(self, port):
 
-sonars_request = serialize_SONARS_Request()
-attitude_request = serialize_ATTITUDE_Request()
+        Parser.__init__(self)
 
-def sonars_handler(forward, back, left, right):
-    print('Sonars: forward: %d   back: %d  left: %d  right: %d' % (forward, back, left, right))
-    port.write(sonars_request)
+        self.port = port
+        self.count = 0
+        self.sonars_request = serialize_SONARS_Request()
+        self.attitude_request = serialize_ATTITUDE_Request()
+        self.set_SONARS_Handler(self.sonars_handler)
 
-parser.set_SONARS_Handler(sonars_handler)
+    def start(self):
+        self.port.write(self.sonars_request)
 
-port.write(sonars_request)
+    def sonars_handler(self, back, front, left, right):
+        print('%4d: Sonars: back: %d   front: %d  left: %d  right: %d' % 
+                (self.count, back, front, left, right))
+        self.count += 1
+        self.port.write(self.sonars_request)
+
+port = serial.Serial(argv[1], int(argv[2]), timeout=1)
+
+parser = MyParser(port)
+
+parser.start()
 
 while True:
 
-    try:
+    c = port.read(1)
 
-        parser.parse(port.read(1))
-
-    except KeyboardInterrupt:
-
-        break
-
+    if len(c) == 1:     # got a byte; parse it
+        parser.parse(c)
+    else:
+        parser.start()  # timed out; have parser a new set of requests
