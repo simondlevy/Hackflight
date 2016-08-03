@@ -38,6 +38,10 @@ class MyParser(Parser):
 
         Parser.__init__(self)
 
+        self.attitude = (0,0,0)
+        self.altitude = 0
+        self.sonars   = (0,0,0,0)
+
         self.port = port
         self.count = 0
 
@@ -59,24 +63,35 @@ class MyParser(Parser):
         self.port.write(self.attitude_request)
 
     def sonars_handler(self, back, front, left, right):
-        print('%4d: Sonars: back: %d   front: %d  left: %d  right: %d' % 
-                (self.count, back, front, left, right))
-        self.count += 1
+        self.sonars = (back, front, left, right)
+        self.report()
         self.send_sonars_request()
 
     def attitude_handler(self, pitch, roll, heading):
-        print ('%3d: Attitude: Pitch: %d   Roll: %d  Heading: %d' % 
-                (self.count, pitch, roll, heading))
-        self.count += 1
+        self.attitude = (pitch, roll, heading)
+        self.report()
         self.send_attitude_request()
     
     def altitude_handler(self, height, vario):
-        """Vario does not change from 0 on simulator, so not displayed"""
-        print('%d: Altitude:  %d cm' %
-                (self.count, height))
-        self.count +=1
+        # Vario does not change from 0 on simulator, so not displayed
+        self.altitude = height
+        self.report()
         self.send_altitude_request()
 
+    def report(self):
+
+        print('%4d ------------------------' % self.count)
+
+        print('Sonars: back: %d cm  front: %d cm left: %d cm right: %d cm' % 
+                (self.sonars[0], self.sonars[1], self.sonars[2], self.sonars[3]))
+
+        print('Altitude: %d cm' % (self.altitude))
+
+        print ('Attitude: Pitch: %d   Roll: %d  Heading: %d' % 
+                (self.attitude[0], self.attitude[1], self.attitude[2]))
+
+        # Make sure we can see progress when vehicle is stationary
+        self.count += 1
 
 port = serial.Serial(argv[1], int(argv[2]), timeout=1)
 
