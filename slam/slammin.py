@@ -87,8 +87,8 @@ class MyParser(Parser):
 
         print('Altitude: %d cm' % (self.altitude))
 
-        print ('Attitude: Pitch: %d   Roll: %d  Heading: %d' % 
-                (self.attitude[0], self.attitude[1], self.attitude[2]))
+        print ('Attitude: Pitch: %+3.1f deg   Roll: %+3.1f deg  Heading: %+3.1f deg' % 
+                (self.attitude[0]/10., self.attitude[1]/10., self.attitude[2]/10.))
 
         # Make sure we can see progress when vehicle is stationary
         self.count += 1
