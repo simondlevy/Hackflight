@@ -61,7 +61,7 @@ void extrasUpdate(void)
 
         sonarDistances[k] = std::max(sonarDistances[k], 20);
 
-        printf("%s: %d %c ", sonarNames[k], sonarDistances[k], k==3?'\n' : '|');
+        //printf("%s: %d %c ", sonarNames[k], sonarDistances[k], k==3?'\n' : '|');
     }
 }
 
