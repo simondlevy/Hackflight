@@ -40,48 +40,51 @@ class MyParser(Parser):
 
         self.port = port
         self.count = 0
+
         self.sonars_request = serialize_SONARS_Request()
         self.attitude_request = serialize_ATTITUDE_Request()
-        #XXX
         self.altitude_request = serialize_ALTITUDE_Request()
 
         self.set_SONARS_Handler(self.sonars_handler)
         self.set_ATTITUDE_Handler(self.attitude_handler)
-
-        
         self.set_ALTITUDE_Handler(self.altitude_handler)
 
-    def send_requests(self):
-        """So far showing only one at a time"""
-        #self.port.write(self.sonars_request)
-        #self.port.write(self.attitude_request)
+    def send_sonars_request(self):
+        self.port.write(self.sonars_request)
+
+    def send_altitude_request(self):
         self.port.write(self.altitude_request)
+
+    def send_attitude_request(self):
+        self.port.write(self.attitude_request)
 
     def sonars_handler(self, back, front, left, right):
         print('%4d: Sonars: back: %d   front: %d  left: %d  right: %d' % 
                 (self.count, back, front, left, right))
         self.count += 1
-        self.send_requests()
+        self.send_sonars_request()
 
     def attitude_handler(self, pitch, roll, heading):
         print ('%3d: Attitude: Pitch: %d   Roll: %d  Heading: %d' % 
                 (self.count, pitch, roll, heading))
         self.count += 1
-        self.send_requests()
+        self.send_attitude_request()
     
     def altitude_handler(self, height, vario):
         """Vario does not change from 0 on simulator, so not displayed"""
-        print('%d: Altitude: Height: %d' %
+        print('%d: Altitude:  %d cm' %
                 (self.count, height))
         self.count +=1
-        self.send_requests()
+        self.send_altitude_request()
 
 
 port = serial.Serial(argv[1], int(argv[2]), timeout=1)
 
 parser = MyParser(port)
 
-parser.send_requests()
+parser.send_sonars_request()
+parser.send_altitude_request()
+parser.send_attitude_request()
 
 while True:
 
