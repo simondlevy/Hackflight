@@ -140,7 +140,7 @@ static int redLedHandle;
 // Support for "toast" dialog on arming
 static int      armingDialogHandle;
 static uint32_t armingDialogStartMicros; 
-static float    ARMING_DIALOG_DURATION_SEC = 1.5;
+static float    ARMING_DIALOG_DURATION_SEC = 0.5;
 
 // LED support
 
