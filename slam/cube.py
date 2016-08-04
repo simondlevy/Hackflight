@@ -1,12 +1,12 @@
+#!/usr/bin/env python
+
 # Adapted from
 # http://stackoverflow.com/questions/18853563/how-can-i-paint-the-faces-of-a-cube
 
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import numpy as np
 from itertools import product, combinations
-from numpy import sin, cos
-from matplotlib.patches import Rectangle, Circle, PathPatch
+from matplotlib.patches import Rectangle
 import mpl_toolkits.mplot3d.art3d as art3d
 
 fig = plt.figure()
