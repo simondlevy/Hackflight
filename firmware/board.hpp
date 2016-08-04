@@ -37,6 +37,7 @@ extern "C" {
             static uint32_t getMicros();
             static void     imuInit(uint16_t & acc1G, float & gyroScale);
             static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
+            static void     showArmedStatus(bool armed);
             static void     ledGreenOff(void);
             static void     ledGreenOn(void);
             static void     ledGreenToggle(void);

@@ -173,6 +173,7 @@ void loop(void)
                 if (rc.sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
                     if (armed) {
                         armed = false;
+                        Board::showArmedStatus(armed);
                         // Reset disarm time so that it works next time we arm the Board::
                         if (disarmTime != 0)
                             disarmTime = 0;
@@ -188,8 +189,10 @@ void loop(void)
                 if (rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE)
                     if (calibratingG == 0 && accCalibrated) 
                         if (!rc.auxState()) // aux switch must be in zero position
-                            if (!armed)          
+                            if (!armed) {
                                 armed = true;
+                                Board::showArmedStatus(armed);
+                            }
 
                 // accel calibration
                 if (rc.sticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)

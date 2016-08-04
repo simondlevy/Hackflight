@@ -129,13 +129,19 @@ static float timestep;
 
 static int particleCount;
 
+// Handles from scene
 static int motorList[4];
 static int motorJointList[4];
-
 static int quadcopterHandle;
 static int accelHandle;
 static int greenLedHandle;
 static int redLedHandle;
+
+// red background, black foreground
+static float DIALOG_COLORS[6] = {1,0,0, 0,0,0};
+
+// Handle to arm/disarm "toast" dialogs
+static int armingDialogHandle;
 
 // LED support
 
@@ -514,11 +520,8 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
 // Error handling
 void errorDialog(char * message)
 {
-    // red background, black foreground
-    float colors[6] = {1,0,0, 0,0,0};
-
     // no initial text or UI handle
-    simDisplayDialog("ERROR", message, sim_dlgstyle_ok, NULL, colors, colors, NULL);
+    simDisplayDialog("ERROR", message, sim_dlgstyle_ok, NULL, DIALOG_COLORS, DIALOG_COLORS, NULL);
 }
 
 // Board implementation ======================================================
@@ -639,3 +642,10 @@ void Board::writeMotor(uint8_t index, uint16_t value)
 {
     thrusts[index] = ((float)value - CONFIG_PWM_MIN) / (CONFIG_PWM_MAX - CONFIG_PWM_MIN);
 }
+
+void Board::showArmedStatus(bool armed)
+{
+    if (armed)
+        simDisplayDialog("", "ARMED", sim_dlgstyle_message, NULL, DIALOG_COLORS, DIALOG_COLORS, NULL);
+}
+ 

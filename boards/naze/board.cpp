@@ -166,6 +166,11 @@ uint16_t Board::sonarGetDistance(uint8_t index)
 {
     return 0;
 }
+
+void Board::showArmedStatus(bool armed)
+{
+    // XXX this would be a good place to sound a buzzer!
+}
  
 #ifdef __arm__
 } // extern "C"
