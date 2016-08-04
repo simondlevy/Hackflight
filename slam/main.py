@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 
 '''
-slammin.py : Runs SLAM from sensor telemetry retrieved over comm port
+main.py : Runs and displays 3D SLAM using sensor telemetry retrieved over comm port.
 
 Copyright (C) Matt Lubas, Alfredo Rwagaju, and Simon D. Levy 2016
 
@@ -18,25 +18,24 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-from msppg import MSP_Parser as Parser, serialize_SONARS_Request, serialize_ATTITUDE_Request, serialize_ALTITUDE_Request
+import msppg
 import serial
-from sys import argv, version_info
+import sys
 
-if version_info.major > 2:
+if sys.version_info.major > 2:
     print('Cannot run under Python3!')
     exit(1)
 
-if len(argv) < 3:
-
-    print('Usage: python3 %s PORT BAUD' % argv[0])
-    print('Example: python3 %s /dev/ttyUSB0 57600' % argv[0])
+if len(sys.argv) < 3:
+    print('Usage: python3 %s PORT BAUD' % sys.argv[0])
+    print('Example: python3 %s /dev/ttyUSB0 57600' % sys.argv[0])
     exit(1)
 
-class MyParser(Parser):
+class MyParser(msppg.MSP_Parser):
 
     def __init__(self, port):
 
-        Parser.__init__(self)
+        msppg.MSP_Parser.__init__(self)
 
         self.attitude = (0,0,0)
         self.altitude = 0
@@ -45,9 +44,9 @@ class MyParser(Parser):
         self.port = port
         self.count = 0
 
-        self.sonars_request = serialize_SONARS_Request()
-        self.attitude_request = serialize_ATTITUDE_Request()
-        self.altitude_request = serialize_ALTITUDE_Request()
+        self.sonars_request = msppg.serialize_SONARS_Request()
+        self.attitude_request = msppg.serialize_ATTITUDE_Request()
+        self.altitude_request = msppg.serialize_ALTITUDE_Request()
 
         self.set_SONARS_Handler(self.sonars_handler)
         self.set_ATTITUDE_Handler(self.attitude_handler)
@@ -93,13 +92,17 @@ class MyParser(Parser):
         # Make sure we can see progress when vehicle is stationary
         self.count += 1
 
-port = serial.Serial(argv[1], int(argv[2]), timeout=1)
+    def send_requests(self):
+        self.send_sonars_request()
+        self.send_altitude_request()
+        self.send_attitude_request()
+
+
+port = serial.Serial(sys.argv[1], int(sys.argv[2]), timeout=1)
 
 parser = MyParser(port)
 
-parser.send_sonars_request()
-parser.send_altitude_request()
-parser.send_attitude_request()
+parser.send_requests()
 
 while True:
 
