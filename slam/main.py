@@ -106,9 +106,16 @@ parser.send_requests()
 
 while True:
 
-    c = port.read(1)
+    # Read from serial port, exiting gracefully on CTRL-C
+    try:
+        c = port.read(1)
+    except KeyboardInterrupt:
+        break
 
-    if len(c) == 1:             # got a byte; parse it
+    # Got a byte; parse it
+    if len(c) == 1:             
         parser.parse(c)
+
+    # Timed out; have parser a new set of requests
     else:
-        parser.send_requests()  # timed out; have parser a new set of requests
+        parser.send_requests()  
