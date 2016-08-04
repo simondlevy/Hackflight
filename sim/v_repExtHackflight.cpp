@@ -137,8 +137,10 @@ static int accelHandle;
 static int greenLedHandle;
 static int redLedHandle;
 
-// Handle to arm/disarm "toast" dialogs
-static int armingDialogHandle;
+// Support for "toast" dialog on arming
+static int      armingDialogHandle;
+static uint32_t armingDialogStartMicros; 
+static float    ARMING_DIALOG_DURATION_SEC = 1.5;
 
 // LED support
 
@@ -189,18 +191,17 @@ class LED {
 static LED greenLED, redLED;
 
 // Dialog support
-static void displayRedDialog(const char * title, char * message, int style)
+static int displayRedDialog(const char * title, char * message, int style)
 {
    float colors[6] = {1,0,0, 0,0,0};
 
-   simDisplayDialog(title, message, style, NULL, colors, colors, NULL);
+   return simDisplayDialog(title, message, style, NULL, colors, colors, NULL);
 }
 
 // --------------------------------------------------------------------------------------
 // simExtHackflight_start
 // --------------------------------------------------------------------------------------
 #define LUA_START_COMMAND  "simExtHackflight_start"
-
 
 static int get_indexed_object_handle(const char * name, int index)
 {
@@ -255,6 +256,9 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
     // Now we're ready
     ready = true;
+
+    // No arming dialog yet
+    armingDialogHandle = -1;
 
     // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true));
@@ -378,6 +382,12 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         }
 
     } // loop over motors
+
+    // Hide arming dialog if needed
+    if (armingDialogHandle > -1 && (micros - armingDialogStartMicros) > ARMING_DIALOG_DURATION_SEC*1e6) {
+        simEndDialog(armingDialogHandle);
+        armingDialogHandle = -1;
+    }
 
     // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true)); 
@@ -650,7 +660,8 @@ void Board::writeMotor(uint8_t index, uint16_t value)
 void Board::showArmedStatus(bool armed)
 {
     if (armed) {
-        displayRedDialog("", (char *)"                    ARMED", sim_dlgstyle_message);
+        armingDialogHandle = displayRedDialog("", (char *)"                    ARMED", sim_dlgstyle_message);
+        armingDialogStartMicros = micros; 
     }
 }
  
