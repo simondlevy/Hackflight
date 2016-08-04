@@ -18,9 +18,10 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-import msppg
 import serial
 import sys
+import msppg
+import slamvis3d
 
 if sys.version_info.major > 2:
     print('Cannot run under Python3!')
