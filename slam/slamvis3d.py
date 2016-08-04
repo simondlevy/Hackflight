@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 '''
 3dslamvis.py : simple 3D SLAM visualization in Python
 
@@ -18,88 +19,46 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-# proportional 
-FLOOR_Y      = -.3
-FLOOR_Z      =  .2
 
-# centimeters
-CONE_LENGTH  =   30
-CONE_YOFFSET =   20
-CONE_RADIUS  =   10
+# Adapted from
+# http://stackoverflow.com/questions/18853563/how-can-i-paint-the-faces-of-a-cube
 
-from visual import box, display, cone, color, vector, materials
-from math import radians
+import matplotlib.pyplot as plt
+import numpy as np
+from itertools import product, combinations
+from matplotlib.patches import Rectangle
+import mpl_toolkits.mplot3d.art3d as art3d
 
 class ThreeDSlamVis(object):
 
     def __init__(self, display_size_pixels=1000, map_size_cm=1000, obstacle_size_cm=10):
 
-        display(width=display_size_pixels,height=display_size_pixels,title='3D SLAM')
+        fig = plt.figure()
+        self.ax = fig.gca(projection='3d')
+        self.ax.set_aspect("auto")
+        self.ax.set_autoscale_on(True)
 
-        # Floor for reference
-        box(pos = (0, map_size_cm*FLOOR_Y, map_size_cm*FLOOR_Z), 
-                   length=map_size_cm, height=1, width=map_size_cm, 
-                   material=materials.rough)
-
-        self.vehicle = cone(pos = (0, map_size_cm*FLOOR_Y+CONE_YOFFSET, map_size_cm*FLOOR_Z), 
-                axis=(CONE_LENGTH,0,0), radius=CONE_RADIUS, color=color.red)
+        R = map_size_cm
+        r = [-R, R]
+        for s, e in combinations(np.array(list(product(r,r,r))), 2):
+            if np.sum(np.abs(s-e)) == r[1]-r[0]:
+                self.ax.plot3D(*zip(s,e), color="b")
 
         self.obstacle_size_cm = obstacle_size_cm
 
-        # Store vehicle heading angle for rotation by setPose()
-        self.theta = 0
+    def addObstacle(self):
 
-    def addObstacle(self, x, y, z):
-
-        box(pos = (x, z,y), 
-            length=self.obstacle_size_cm, height=self.obstacle_size_cm, width=self.obstacle_size_cm, 
-            material=materials.diffuse)
-
-
-    def setPose(self, x, y, z, theta):
-        '''
-        Sets vehicle pose: 
-        X: left/right   (cm)
-        Y: forward/back (cm)
-        Z: up/down      (cm)
-        theta: degrees
-        '''
-
-        # Rotate vehicle by difference between current angle and desired angle
-        self.vehicle.rotate(angle=radians(self.theta - theta), axis=(0,1,0))
-
-        # VPython uses Y for up/down; we use Z
-        self.vehicle.pos = vector(x, z, y)
-
-        self.theta = theta
+        s = self.obstacle_size_cm
+        colors = ['b', 'g', 'r', 'c', 'm', 'y']
+        for i, (z, zdir) in enumerate(product([-s,s], ['x','y','z'])):
+            side = Rectangle((-s, -s), 2*s, 2*s, facecolor=colors[i])
+            self.ax.add_patch(side)
+            art3d.pathpatch_2d_to_3d(side, z=z, zdir=zdir)
 
 if __name__ == '__main__':
 
-    from random import uniform
-    from time import sleep
+    slam = ThreeDSlamVis()
 
-    slamvis = ThreeDSlamVis()
+    slam.addObstacle()
 
-    x,y,z,theta = 0,0,0,0
-    zdir = +1
-
-    while True:
-
-        slamvis.setPose(x,y,z,theta)
-
-        ox = int(uniform(-500,500))
-        oy = int(uniform(-500,500))
-
-        slamvis.addObstacle(ox,oy,z)
-
-        sleep(.05)
-
-        theta = (theta + 10) % 360
-
-        z += 2 * zdir
-
-        if z > 500:
-            zdir = -1
-        if z < 10:
-            zdir = +1
-
+    plt.show()
