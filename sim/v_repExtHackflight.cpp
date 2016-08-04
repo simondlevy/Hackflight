@@ -137,9 +137,6 @@ static int accelHandle;
 static int greenLedHandle;
 static int redLedHandle;
 
-// red background, black foreground
-static float DIALOG_COLORS[6] = {1,0,0, 0,0,0};
-
 // Handle to arm/disarm "toast" dialogs
 static int armingDialogHandle;
 
@@ -191,6 +188,13 @@ class LED {
 
 static LED greenLED, redLED;
 
+// Dialog support
+static void displayRedDialog(const char * title, char * message, int style)
+{
+   float colors[6] = {1,0,0, 0,0,0};
+
+   simDisplayDialog(title, message, style, NULL, colors, colors, NULL);
+}
 
 // --------------------------------------------------------------------------------------
 // simExtHackflight_start
@@ -521,7 +525,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
 void errorDialog(char * message)
 {
     // no initial text or UI handle
-    simDisplayDialog("ERROR", message, sim_dlgstyle_ok, NULL, DIALOG_COLORS, DIALOG_COLORS, NULL);
+    displayRedDialog("ERROR", message, sim_dlgstyle_ok);
 }
 
 // Board implementation ======================================================
@@ -645,7 +649,8 @@ void Board::writeMotor(uint8_t index, uint16_t value)
 
 void Board::showArmedStatus(bool armed)
 {
-    if (armed)
-        simDisplayDialog("", "ARMED", sim_dlgstyle_message, NULL, DIALOG_COLORS, DIALOG_COLORS, NULL);
+    if (armed) {
+        displayRedDialog("", (char *)"                    ARMED", sim_dlgstyle_message);
+    }
 }
  
