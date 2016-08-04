@@ -511,6 +511,12 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
     return NULL;
 }
 
+// Error handling
+void errorDialog(char * message)
+{
+    simDisplayDialog("ERROR", message, sim_dlgstyle_ok, NULL, NULL, NULL, NULL);
+}
+
 // Board implementation ======================================================
 
 #include <board.hpp>

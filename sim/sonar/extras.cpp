@@ -46,6 +46,12 @@ void extrasStart(void)
         sonarHandles[k] = simGetObjectHandle(sonarNames[k]);
 
     serialConnected = serialConnection.openConnection();
+
+    if (!serialConnected) {
+        char message[200];
+        sprintf(message, "Unable to connect to %s.  Please make sure adapter is plugged in.", PORTNAME);
+        errorDialog(message);
+    }
 }
 
 void extrasUpdate(void)
