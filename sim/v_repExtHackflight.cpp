@@ -514,7 +514,11 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
 // Error handling
 void errorDialog(char * message)
 {
-    simDisplayDialog("ERROR", message, sim_dlgstyle_ok, NULL, NULL, NULL, NULL);
+    // red background, black foreground
+    float colors[6] = {1,0,0, 0,0,0};
+
+    // no initial text or UI handle
+    simDisplayDialog("ERROR", message, sim_dlgstyle_ok, NULL, colors, colors, NULL);
 }
 
 // Board implementation ======================================================
