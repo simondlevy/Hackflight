@@ -31,15 +31,14 @@ import mpl_toolkits.mplot3d.art3d as art3d
 
 class ThreeDSlamVis(object):
 
-    def __init__(self, display_size_pixels=1000, map_size_cm=1000, obstacle_size_cm=10):
+    def __init__(self, map_size_cm=1000, obstacle_size_cm=10):
 
-        fig = plt.figure()
+        fig = plt.figure(figsize=(10,10))
         self.ax = fig.gca(projection='3d')
         self.ax.set_aspect("auto")
         self.ax.set_autoscale_on(True)
 
-        R = map_size_cm
-        r = [-R, R]
+        r = [-map_size_cm, map_size_cm]
         for s, e in combinations(np.array(list(product(r,r,r))), 2):
             if np.sum(np.abs(s-e)) == r[1]-r[0]:
                 self.ax.plot3D(*zip(s,e), color="b")
