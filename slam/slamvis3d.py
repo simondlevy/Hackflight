@@ -118,27 +118,40 @@ class ThreeDSlamVis(object):
 
     def _add_vehicle(self, x, y, z, theta):
 
-        # Create five vertices for vehcile
+        # Create five vertices for vehcile, centered at origin
         s = self.vehicle_size_cm
-        A = [x,     y,   z]
-        B = [x+s/2, y,   z]
-        C = [x+s/2, y,   z+s/3]
-        D = [x,     y,   z+s/3]
-        E = [x+s/4, y+s, z+s/6]
+        A = (0,   0,  0)
+        B = (s/2, 0,  0)
+        C = (s/2, 0,  s/3)
+        D = (0,   0,  s/3)
+        E = (s/4, s,  s/6)
+
+        # Rotate the vertices by the yaw (heading) angle theta
+
+        # Add the x,y,z offset to the vertices
+        A = self._translate(A, x, y, z)
+        B = self._translate(B, x, y, z)
+        C = self._translate(C, x, y, z)
+        D = self._translate(D, x, y, z)
+        E = self._translate(E, x, y, z)
 
         # Make a pyramid from five faces built from vertices
-        pyr = [
-                [A,B,C,D],
-                [B,C,E],
-                [C,D,E],
-                [A,D,E],
-                [A,B,E]
-                ]
+        pyr = (
+                (A,B,C,D),
+                (B,C,E),
+                (C,D,E),
+                (A,D,E),
+                (A,B,E)
+                )
 
         self.vehicle = Poly3DCollection(pyr, facecolors='red')
 
         self.ax.add_collection3d(self.vehicle)
 
+
+    def _translate(self, pt, x, y, z):
+
+        return pt[0]+x, pt[1]+y, pt[2]+z
 
 if __name__ == '__main__':
 
