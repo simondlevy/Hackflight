@@ -32,7 +32,7 @@ from time import sleep
 
 class ThreeDSlamVis(object):
 
-    def __init__(self, map_size_cm=1000, obstacle_size_cm=10):
+    def __init__(self, map_size_cm=1000, obstacle_size_cm=100):
 
         fig = plt.figure(figsize=(10,10))
         self.ax = fig.gca(projection='3d')
@@ -46,12 +46,26 @@ class ThreeDSlamVis(object):
 
         self.obstacle_size_cm = obstacle_size_cm
 
-    def addObstacle(self):
+        fig.canvas.mpl_connect('close_event', self._handle_close)
+        self.is_open = True
+
+    def _handle_close(self):
+
+        print('close')
+
+        self.is_open = False
+
+    def addObstacle(self, x, y, z):
+
+        if not self.is_open:
+            return
+
+        colors = ['b', 'g', 'r', 'c', 'm', 'y']
 
         s = self.obstacle_size_cm
-        colors = ['b', 'g', 'r', 'c', 'm', 'y']
+
         for i, (z, zdir) in enumerate(product([-s,s], ['x','y','z'])):
-            side = Rectangle((-s, -s), 2*s, 2*s, facecolor=colors[i])
+            side = Rectangle((x-s, y-s), 2*s, 2*s, facecolor=colors[i])
             self.ax.add_patch(side)
             art3d.pathpatch_2d_to_3d(side, z=z, zdir=zdir)
 
@@ -61,15 +75,17 @@ if __name__ == '__main__':
 
     plt.show(block=False)
 
-    count = 0
+    x,y,z = 0,0,0
 
-    while True:
+    while slam.is_open:
 
-        slam.addObstacle()
+        slam.addObstacle(x,y,z)
         plt.draw()
-        plt.pause(.1)
+        try:
+            plt.pause(1)
+        except:
+            break
 
-        count += 1
-        print(count)
+        x += 300
 
 
