@@ -76,9 +76,10 @@ class MyParser(msppg.MSP_Parser):
         # Update our SLAM algorithm with new telemetry, getting new pose and obstacles
         pose, obstacles = self.slam.update(self.sonars, self.attitude, self.altitude)
 
-        print(pose)
+        # Set the pose in our SLAM visualizer
+        self.vis.setPose(*pose)
         
-        # Redraw our SLAM visualizer, exiting if user closed the window
+        # Redraw the visualizer, exiting if user closed the window
         if not self.vis.redraw():
             exit(0)
 
