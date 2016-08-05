@@ -47,11 +47,11 @@ class ThreeDSlamVis(object):
 
         # Create five vertices for vehcile
         s = vehicle_size_cm
-        A = [0,   0,   0]
-        B = [s,   0,   0]
-        C = [s,   0,   s]
-        D = [0,   0,   s]
-        E = [s/2, s,   s/2]
+        A = [0,   0,  0]
+        B = [s/2, 0,  0]
+        C = [s/2, 0,  s/2]
+        D = [0,   0,  s/2]
+        E = [s/4, s,  s/4]
 
         # Make a pyramid from five faces
         pyr = [
