@@ -26,6 +26,14 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
+def _translate(pt, x, y, z):
+
+    return pt[0]+x, pt[1]+y, pt[2]+z
+
+def _rotate(pt, theta_degrees):
+
+    return pt[0], pt[1], pt[2]
+
 class ThreeDSlamVis(object):
 
     def __init__(self, map_size_cm=1000, obstacle_size_cm=10, vehicle_size_cm=25):
@@ -127,13 +135,18 @@ class ThreeDSlamVis(object):
         E = (s/4, s,  s/6)
 
         # Rotate the vertices by the yaw (heading) angle theta
+        A = _rotate(A, theta)
+        B = _rotate(B, theta)
+        C = _rotate(C, theta)
+        D = _rotate(D, theta)
+        E = _rotate(E, theta)
 
         # Add the x,y,z offset to the vertices
-        A = self._translate(A, x, y, z)
-        B = self._translate(B, x, y, z)
-        C = self._translate(C, x, y, z)
-        D = self._translate(D, x, y, z)
-        E = self._translate(E, x, y, z)
+        A = _translate(A, x, y, z)
+        B = _translate(B, x, y, z)
+        C = _translate(C, x, y, z)
+        D = _translate(D, x, y, z)
+        E = _translate(E, x, y, z)
 
         # Make a pyramid from five faces built from vertices
         pyr = (
@@ -148,10 +161,6 @@ class ThreeDSlamVis(object):
 
         self.ax.add_collection3d(self.vehicle)
 
-
-    def _translate(self, pt, x, y, z):
-
-        return pt[0]+x, pt[1]+y, pt[2]+z
 
 if __name__ == '__main__':
 
