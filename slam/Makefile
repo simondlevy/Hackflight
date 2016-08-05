@@ -8,3 +8,6 @@ slam: slammin.py
 edit:
 	vim slammin.py
 
+clean:
+	rm -f *.pyc *~
+

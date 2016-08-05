@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 '''
-3dslamvis.py : simple 3D SLAM visualization in Python
+slamvis3d.py : 3D SLAM visualization in Python
 
 Copyright (C) Simon D. Levy 2016
 
@@ -19,9 +19,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-
-# Adapted from
-# http://stackoverflow.com/questions/18853563/how-can-i-paint-the-faces-of-a-cube
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection

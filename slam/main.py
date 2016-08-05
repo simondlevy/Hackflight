@@ -22,6 +22,7 @@ import serial
 import sys
 import msppg
 import slamvis3d
+import microslam
 
 if sys.version_info.major > 2:
     print('Cannot run under Python3!')
