@@ -25,11 +25,6 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-import numpy as np
-from itertools import product, combinations
-from matplotlib.patches import Rectangle
-import mpl_toolkits.mplot3d.art3d as art3d
-from time import sleep
 
 class ThreeDSlamVis(object):
 
@@ -40,10 +35,9 @@ class ThreeDSlamVis(object):
         self.ax.set_aspect("auto")
         self.ax.set_autoscale_on(True)
 
-        r = [-map_size_cm, map_size_cm]
-        for s, e in combinations(np.array(list(product(r,r,r))), 2):
-            if np.sum(np.abs(s-e)) == r[1]-r[0]:
-                self.ax.plot3D(*zip(s,e), color="b")
+        self.ax.set_xlim([-map_size_cm, +map_size_cm])
+        self.ax.set_ylim([-map_size_cm, +map_size_cm])
+        self.ax.set_zlim([-map_size_cm, +map_size_cm])
 
         self.obstacle_size_cm = obstacle_size_cm
 
