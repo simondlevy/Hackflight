@@ -28,7 +28,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 class ThreeDSlamVis(object):
 
-    def __init__(self, map_size_cm=1000, obstacle_size_cm=100):
+    def __init__(self, map_size_cm=1000, obstacle_size_cm=10):
 
         fig = plt.figure(figsize=(10,10))
         self.ax = fig.gca(projection='3d')
