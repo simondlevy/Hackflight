@@ -65,6 +65,23 @@ class ThreeDSlamVis(object):
 
         self.ax.add_collection3d(Poly3DCollection(cube))
 
+    def redraw(self):
+
+        # Assume no use interruption
+        retval = True
+
+        # Redraw current objects without blocking
+        plt.draw()
+
+        # Refresh display, setting flag on window close or keyboard interrupt
+        try:
+            plt.pause(.1)
+        except:
+            retval = False
+
+        return retval
+
+
 if __name__ == '__main__':
 
     slam = ThreeDSlamVis()
@@ -77,12 +94,8 @@ if __name__ == '__main__':
 
         if x < 600:
             slam.addObstacle(x,y,z)
-        plt.draw()
-        try:
-            plt.pause(1)
-        except:
+        if not slam.redraw():
             break
-
         x += 300
 
 
