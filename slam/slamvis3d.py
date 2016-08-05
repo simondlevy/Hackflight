@@ -49,11 +49,11 @@ class ThreeDSlamVis(object):
         s = vehicle_size_cm
         A = [0,   0,  0]
         B = [s/2, 0,  0]
-        C = [s/2, 0,  s/2]
-        D = [0,   0,  s/2]
-        E = [s/4, s,  s/4]
+        C = [s/2, 0,  s/3]
+        D = [0,   0,  s/3]
+        E = [s/4, s,  s/6]
 
-        # Make a pyramid from five faces
+        # Make a pyramid from five faces built from vertices
         pyr = [
                 [A,B,C,D],
                 [B,C,E],
