@@ -51,9 +51,9 @@ class ThreeDSlamVis(object):
         self.ax.set_aspect("auto")
         self.ax.set_autoscale_on(True)
 
-        self.ax.set_xlim([-map_size_cm, +map_size_cm])
-        self.ax.set_ylim([-map_size_cm, +map_size_cm])
-        self.ax.set_zlim([-map_size_cm, +map_size_cm])
+        self.ax.set_xlim([-map_size_cm/2, map_size_cm/2])
+        self.ax.set_ylim([-map_size_cm/2, map_size_cm/2])
+        self.ax.set_zlim([0,              map_size_cm])
 
         self.ax.set_xlabel('X (cm)')
         self.ax.set_ylabel('Y (cm)')
@@ -181,8 +181,8 @@ if __name__ == '__main__':
 
         slamvis.setPose(x,y,z,theta)
 
-        ox = int(uniform(-mapsize_cm,mapsize_cm))
-        oy = int(uniform(-mapsize_cm,mapsize_cm))
+        ox = int(uniform(-mapsize_cm/2,mapsize_cm/2))
+        oy = int(uniform(-mapsize_cm/2,mapsize_cm/2))
 
         slamvis.addObstacle(ox,oy,z)
 
