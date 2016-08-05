@@ -43,6 +43,18 @@ class ThreeDSlamVis(object):
         self.ax.set_ylabel('Y (cm)')
         self.ax.set_zlabel('Z (cm)')
 
+        # White axes on black background
+        self.ax.set_axis_bgcolor('black')
+        self.ax.tick_params(axis='x', colors='white')
+        self.ax.tick_params(axis='y', colors='white')
+        self.ax.tick_params(axis='z', colors='white')
+        self.ax.xaxis.label.set_color('white')
+        self.ax.yaxis.label.set_color('white')
+        self.ax.zaxis.label.set_color('white')
+        self.ax.grid(False)
+        self.ax.w_xaxis.set_pane_color((0, 0, 0, 0))
+        self.ax.w_yaxis.set_pane_color((0, 0, 0, 0))
+        self.ax.w_zaxis.set_pane_color((0, 0, 0, 0))
         self.obstacle_size_cm = obstacle_size_cm
 
         # Create five vertices for vehcile
@@ -123,7 +135,7 @@ if __name__ == '__main__':
     from random import uniform
     from time import sleep
 
-    slamvis = ThreeDSlamVis()
+    slamvis = ThreeDSlamVis(map_size_cm=300)
 
     x,y,z,theta = 0,0,0,0
     zdir = +1
