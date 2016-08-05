@@ -126,13 +126,18 @@ class ThreeDSlamVis(object):
 
     def _add_vehicle(self, x, y, z, theta):
 
+        # Convert vehicle size to length, width, height
+        l = self.vehicle_size_cm
+        w = l / 2
+        h = l / 3
+
         # Create five vertices for vehcile, centered at origin
         s = self.vehicle_size_cm
         A = (0,   0,  0)
-        B = (s/2, 0,  0)
-        C = (s/2, 0,  s/3)
-        D = (0,   0,  s/3)
-        E = (s/4, s,  s/6)
+        B = (w,   0,  0)
+        C = (w,   0,  h)
+        D = (0,   0,  h)
+        E = (w/2, l,  h/2)
 
         # Rotate the vertices by the yaw (heading) angle theta
         A = _rotate(A, theta)
