@@ -28,6 +28,7 @@ import numpy as np
 from itertools import product, combinations
 from matplotlib.patches import Rectangle
 import mpl_toolkits.mplot3d.art3d as art3d
+from time import sleep
 
 class ThreeDSlamVis(object):
 
@@ -58,6 +59,17 @@ if __name__ == '__main__':
 
     slam = ThreeDSlamVis()
 
-    slam.addObstacle()
+    plt.show(block=False)
 
-    plt.show()
+    count = 0
+
+    while True:
+
+        slam.addObstacle()
+        plt.draw()
+        plt.pause(.1)
+
+        count += 1
+        print(count)
+
+
