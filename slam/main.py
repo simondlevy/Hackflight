@@ -22,10 +22,11 @@ import serial
 import sys
 import msppg
 import microslam
+import slamvis3d
 
 class MyParser(msppg.MSP_Parser):
 
-    def __init__(self, port, slam):
+    def __init__(self, port, slam, vis):
 
         msppg.MSP_Parser.__init__(self)
 
@@ -35,6 +36,7 @@ class MyParser(msppg.MSP_Parser):
 
         self.port = port
         self.slam = slam
+        self.vis = vis
 
         self.sonars_request = msppg.serialize_SONARS_Request()
         self.attitude_request = msppg.serialize_ATTITUDE_Request()
@@ -70,7 +72,13 @@ class MyParser(msppg.MSP_Parser):
         self.send_altitude_request()
 
     def update(self):
+
+        # Update our SLAM algorithm with new telemetry
         self.slam.update(self.sonars, self.attitude, self.altitude)
+        
+        # Redraw our SLAM visualizer, exiting if user closed the window
+        if not self.vis.redraw():
+            exit(0)
 
     def send_requests(self):
         self.send_sonars_request()
@@ -93,7 +101,9 @@ if __name__ == '__main__':
 
     slam = microslam.MicroSLAM()
 
-    parser = MyParser(port, slam)
+    vis = slamvis3d.ThreeDSlamVis()
+
+    parser = MyParser(port, slam, vis)
 
     parser.send_requests()
 
