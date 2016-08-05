@@ -28,6 +28,7 @@ class MicroSLAM(object):
 
     def update(self, sonars, attitude, altitude):
 
+        '''
         print('Sonars: back: %d cm  front: %d cm left: %d cm right: %d cm' % 
                 (sonars[0], sonars[1], sonars[2], sonars[3]))
             
@@ -35,7 +36,8 @@ class MicroSLAM(object):
         
         print ('Attitude: Pitch: %+3.1f deg   Roll: %+3.1f deg  Heading: %+3.1f deg' % 
                 (attitude[0]/10., attitude[1]/10., attitude[2]/10.))
+        '''
 
-        self.pose = self.pose[0], self.pose[1], altitude, self.pose[3]
+        self.pose = self.pose[0], self.pose[1], altitude, attitude[2]
 
         return self.pose, self.obstacles
