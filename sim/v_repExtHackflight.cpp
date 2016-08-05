@@ -138,8 +138,8 @@ static int greenLedHandle;
 static int redLedHandle;
 
 // Support for "toast" dialog on arming
-static int      armingDialogHandle;
-static uint32_t armingDialogStartMicros; 
+static int      toastDialogHandle;
+static uint32_t toastDialogStartMicros; 
 static float    ARMING_DIALOG_DURATION_SEC = 0.5;
 
 // LED support
@@ -191,9 +191,12 @@ class LED {
 static LED greenLED, redLED;
 
 // Dialog support
-static int displayRedDialog(const char * title, char * message, int style)
+static int displayDialog(const char * title, char * message, float r, float g, float b, int style)
 {
-   float colors[6] = {1,0,0, 0,0,0};
+   float colors[6] = {0,0,0, 0,0,0};
+   colors[0] = r;
+   colors[1] = g;
+   colors[2] = b;
 
    return simDisplayDialog(title, message, style, NULL, colors, colors, NULL);
 }
@@ -258,7 +261,7 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     ready = true;
 
     // No arming dialog yet
-    armingDialogHandle = -1;
+    toastDialogHandle = -1;
 
     // Return success to V-REP
     D.pushOutData(CScriptFunctionDataItem(true));
@@ -384,9 +387,9 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     } // loop over motors
 
     // Hide arming dialog if needed
-    if (armingDialogHandle > -1 && (micros - armingDialogStartMicros) > ARMING_DIALOG_DURATION_SEC*1e6) {
-        simEndDialog(armingDialogHandle);
-        armingDialogHandle = -1;
+    if (toastDialogHandle > -1 && (micros - toastDialogStartMicros) > ARMING_DIALOG_DURATION_SEC*1e6) {
+        simEndDialog(toastDialogHandle);
+        toastDialogHandle = -1;
     }
 
     // Return success to V-REP
@@ -535,7 +538,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
 void errorDialog(char * message)
 {
     // no initial text or UI handle
-    displayRedDialog("ERROR", message, sim_dlgstyle_ok);
+    displayDialog("ERROR", message, 1,0,0, sim_dlgstyle_ok);
 }
 
 // Board implementation ======================================================
@@ -660,8 +663,8 @@ void Board::writeMotor(uint8_t index, uint16_t value)
 void Board::showArmedStatus(bool armed)
 {
     if (armed) {
-        armingDialogHandle = displayRedDialog("", (char *)"                    ARMED", sim_dlgstyle_message);
-        armingDialogStartMicros = micros; 
+        toastDialogHandle = displayDialog("", (char *)"                    ARMED", 1,0,0, sim_dlgstyle_message);
+        toastDialogStartMicros = micros; 
     }
 }
  
