@@ -26,7 +26,7 @@ import microslam
 
 class MyParser(msppg.MSP_Parser):
 
-    def __init__(self, port):
+    def __init__(self, port, slam):
 
         msppg.MSP_Parser.__init__(self)
 
@@ -35,6 +35,9 @@ class MyParser(msppg.MSP_Parser):
         self.sonars   = (0,0,0,0)
 
         self.port = port
+        self.slam = slam
+
+        # For reporting
         self.count = 0
 
         self.sonars_request = msppg.serialize_SONARS_Request()
@@ -104,7 +107,9 @@ if __name__ == '__main__':
 
     port = serial.Serial(sys.argv[1], int(sys.argv[2]), timeout=1)
 
-    parser = MyParser(port)
+    slam = microslam.MicroSLAM()
+
+    parser = MyParser(port, slam)
 
     parser.send_requests()
 
