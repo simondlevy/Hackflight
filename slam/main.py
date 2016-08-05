@@ -21,7 +21,6 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 import serial
 import sys
 import msppg
-import slamvis3d
 import microslam
 
 class MyParser(msppg.MSP_Parser):
@@ -36,9 +35,6 @@ class MyParser(msppg.MSP_Parser):
 
         self.port = port
         self.slam = slam
-
-        # For reporting
-        self.count = 0
 
         self.sonars_request = msppg.serialize_SONARS_Request()
         self.attitude_request = msppg.serialize_ATTITUDE_Request()
@@ -74,21 +70,7 @@ class MyParser(msppg.MSP_Parser):
         self.send_altitude_request()
 
     def update(self):
-
-        print('%4d ------------------------' % self.count)
-
-        print('Sonars: back: %d cm  front: %d cm left: %d cm right: %d cm' % 
-                (self.sonars[0], self.sonars[1], self.sonars[2], self.sonars[3]))
-
-        print('Altitude: %d cm' % (self.altitude))
-
-        print ('Attitude: Pitch: %+3.1f deg   Roll: %+3.1f deg  Heading: %+3.1f deg' % 
-                (self.attitude[0]/10., self.attitude[1]/10., self.attitude[2]/10.))
-
         self.slam.update(self.sonars, self.attitude, self.altitude)
-
-        # Make sure we can see progress when vehicle is stationary
-        self.count += 1
 
     def send_requests(self):
         self.send_sonars_request()
