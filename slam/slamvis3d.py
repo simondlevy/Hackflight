@@ -59,30 +59,7 @@ class ThreeDSlamVis(object):
         self.obstacle_size_cm = obstacle_size_cm
         self.vehicle_size_cm = vehicle_size_cm
 
-        self.vehicle = self._make_vehicle(0,0,0)
-
-        self.ax.add_collection3d(self.vehicle)
-
-    def _make_vehicle(self, x, y, z):
-
-        # Create five vertices for vehcile
-        s = self.vehicle_size_cm
-        A = [x,     y,   z]
-        B = [x+s/2, y,   z]
-        C = [x+s/2, y,   z+s/3]
-        D = [x,     y,   z+s/3]
-        E = [x+s/4, y+s, z+s/6]
-
-        # Make a pyramid from five faces built from vertices
-        pyr = [
-                [A,B,C,D],
-                [B,C,E],
-                [C,D,E],
-                [A,D,E],
-                [A,B,E]
-                ]
-
-        return Poly3DCollection(pyr, facecolors='red')
+        self._add_vehicle(0,0,0,0)
 
     def addObstacle(self, x, y, z):
 
@@ -120,11 +97,9 @@ class ThreeDSlamVis(object):
         '''
 
         self.ax.collections.remove(self.vehicle)
+
+        self._add_vehicle(x, y, z, theta)
     
-        self.vehicle = self._make_vehicle(x,y,z)
-
-        self.ax.add_collection3d(self.vehicle)
-
     def redraw(self):
 
         # Assume no use interruption
@@ -140,6 +115,29 @@ class ThreeDSlamVis(object):
             retval = False
 
         return retval
+
+    def _add_vehicle(self, x, y, z, theta):
+
+        # Create five vertices for vehcile
+        s = self.vehicle_size_cm
+        A = [x,     y,   z]
+        B = [x+s/2, y,   z]
+        C = [x+s/2, y,   z+s/3]
+        D = [x,     y,   z+s/3]
+        E = [x+s/4, y+s, z+s/6]
+
+        # Make a pyramid from five faces built from vertices
+        pyr = [
+                [A,B,C,D],
+                [B,C,E],
+                [C,D,E],
+                [A,D,E],
+                [A,B,E]
+                ]
+
+        self.vehicle = Poly3DCollection(pyr, facecolors='red')
+
+        self.ax.add_collection3d(self.vehicle)
 
 
 if __name__ == '__main__':
