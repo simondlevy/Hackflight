@@ -24,6 +24,7 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 # http://stackoverflow.com/questions/18853563/how-can-i-paint-the-faces-of-a-cube
 
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import numpy as np
 from itertools import product, combinations
 from matplotlib.patches import Rectangle
@@ -46,28 +47,29 @@ class ThreeDSlamVis(object):
 
         self.obstacle_size_cm = obstacle_size_cm
 
-        fig.canvas.mpl_connect('close_event', self._handle_close)
-        self.is_open = True
-
-    def _handle_close(self):
-
-        print('close')
-
-        self.is_open = False
-
     def addObstacle(self, x, y, z):
-
-        if not self.is_open:
-            return
-
-        colors = ['b', 'g', 'r', 'c', 'm', 'y']
 
         s = self.obstacle_size_cm
 
-        for i, (z, zdir) in enumerate(product([-s,s], ['x','y','z'])):
-            side = Rectangle((x-s, y-s), 2*s, 2*s, facecolor=colors[i])
-            self.ax.add_patch(side)
-            art3d.pathpatch_2d_to_3d(side, z=z, zdir=zdir)
+        A = [x,   y,   z]
+        B = [x+s, y,   z]
+        C = [x+s, y+s, z]
+        D = [x,   y+s, z]
+        E = [x,   y,   z+s]
+        F = [x+s, y,   z+s]
+        G = [x+s, y+s, z+s]
+        H = [x,   y+s, z+s]
+
+        cube = [
+                [A, B, C, D],
+                [E, F, G, H],
+                [F, G, C, B],
+                [E, H, D, A],
+                [E, F, B, A],
+                [H, G, C, D],
+        ]
+
+        self.ax.add_collection3d(Poly3DCollection(cube))
 
 if __name__ == '__main__':
 
@@ -77,9 +79,10 @@ if __name__ == '__main__':
 
     x,y,z = 0,0,0
 
-    while slam.is_open:
+    while True:
 
-        slam.addObstacle(x,y,z)
+        if x < 600:
+            slam.addObstacle(x,y,z)
         plt.draw()
         try:
             plt.pause(1)
