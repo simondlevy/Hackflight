@@ -21,11 +21,10 @@ class MicroSLAM(object):
 
     def __init__(self):
 
-        self.pose = 0,0,0
+        # pose = <X,Y,Z,THETA>
+        self.pose = 0,0,0,0
+
         self.obstacles = ()
-
-        
-
 
     def update(self, sonars, attitude, altitude):
 
@@ -33,16 +32,10 @@ class MicroSLAM(object):
                 (sonars[0], sonars[1], sonars[2], sonars[3]))
             
         print('Altitude: %d cm' % (altitude))
-            
+        
         print ('Attitude: Pitch: %+3.1f deg   Roll: %+3.1f deg  Heading: %+3.1f deg' % 
                 (attitude[0]/10., attitude[1]/10., attitude[2]/10.))
 
-    def getPose(self):
+        self.pose = self.pose[0], self.pose[1], altitude, self.pose[3]
 
-        return self.pose
-
-    def getObstacles(self):
-
-        return self.obstacles
-
-
+        return self.pose, self.obstacles

@@ -5,6 +5,9 @@ BAUD = 57600
 slam: 
 	./main.py $(PORT) $(BAUD)
 
+flakes:
+	pyflakes main.py
+
 edit:
 	vim slammin.py
 

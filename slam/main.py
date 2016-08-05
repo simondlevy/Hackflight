@@ -73,8 +73,10 @@ class MyParser(msppg.MSP_Parser):
 
     def update(self):
 
-        # Update our SLAM algorithm with new telemetry
-        self.slam.update(self.sonars, self.attitude, self.altitude)
+        # Update our SLAM algorithm with new telemetry, getting new pose and obstacles
+        pose, obstacles = self.slam.update(self.sonars, self.attitude, self.altitude)
+
+        print(pose)
         
         # Redraw our SLAM visualizer, exiting if user closed the window
         if not self.vis.redraw():
@@ -97,16 +99,25 @@ if __name__ == '__main__':
         print('Example: python3 %s /dev/ttyUSB0 57600' % sys.argv[0])
         exit(1)
 
+    # Connect to our telemetry provider over a serial port
     port = serial.Serial(sys.argv[1], int(sys.argv[2]), timeout=1)
 
+    # Create a MicoSLAM algorithm object
     slam = microslam.MicroSLAM()
 
+    # Create a 3D visualization object
     vis = slamvis3d.ThreeDSlamVis()
 
+    # Create an MSP parser, which will use the SLAM algorithm and visualizer to 
+    # analyze telemetry and display SLAM.  We also pass it the comm port, so it
+    # can send new message requests.
     parser = MyParser(port, slam, vis)
 
+    # Kick off the telemetry by sending requests to the vehicle
     parser.send_requests()
 
+    # Loop forever, reading one byte at a time from the serial port and dispatching
+    # the byte to the parser
     while True:
 
         # Read from serial port, exiting gracefully on CTRL-C
@@ -119,6 +130,8 @@ if __name__ == '__main__':
         if len(c) == 1:             
             parser.parse(c)
 
-        # Timed out; have parser a new set of requests
+        # Timed out; have parser a new set of requests.  This allows us to start and
+        # stop the telemetry provider (vehicle, simulator) without having to restart
+        # this program.
         else:
             parser.send_requests()  
