@@ -39,6 +39,10 @@ class ThreeDSlamVis(object):
         self.ax.set_ylim([-map_size_cm, +map_size_cm])
         self.ax.set_zlim([-map_size_cm, +map_size_cm])
 
+        self.ax.set_xlabel('X (cm)')
+        self.ax.set_ylabel('Y (cm)')
+        self.ax.set_zlabel('Z (cm)')
+
         self.obstacle_size_cm = obstacle_size_cm
 
     def addObstacle(self, x, y, z):
