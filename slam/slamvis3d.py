@@ -131,13 +131,13 @@ class ThreeDSlamVis(object):
         w = l / 2
         h = l / 3
 
-        # Create five vertices for vehcile, centered at origin
+        # Create five vertices for vehcile, with rear face centered at origin
         s = self.vehicle_size_cm
-        A = (0,   0,  0)
-        B = (w,   0,  0)
-        C = (w,   0,  h)
-        D = (0,   0,  h)
-        E = (w/2, l,  h/2)
+        A = (-w/2, 0, -h/2)
+        B = ( w/2, 0, -h/2)
+        C = ( w/2, 0,  h/2)
+        D = (-w/2, 0,  h/2)
+        E = ( 0,   l,  0)
 
         # Rotate the vertices by the yaw (heading) angle theta
         A = _rotate(A, theta)
