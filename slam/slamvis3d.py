@@ -28,7 +28,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 class ThreeDSlamVis(object):
 
-    def __init__(self, map_size_cm=1000, obstacle_size_cm=10):
+    def __init__(self, map_size_cm=1000, obstacle_size_cm=10, vehicle_size_cm=25):
 
         fig = plt.figure(figsize=(10,10))
         self.ax = fig.gca(projection='3d')
@@ -45,10 +45,30 @@ class ThreeDSlamVis(object):
 
         self.obstacle_size_cm = obstacle_size_cm
 
+        # Create five vertices for vehcile
+        s = vehicle_size_cm
+        A = [0,   0,   0]
+        B = [s,   0,   0]
+        C = [s,   0,   s]
+        D = [0,   0,   s]
+        E = [s/2, s,   s/2]
+
+        # Make a pyramid from five faces
+        pyr = [
+                [A,B,C,D],
+                [B,C,E],
+                [C,D,E],
+                [A,D,E],
+                [A,B,E]
+                ]
+
+        self.ax.add_collection3d(Poly3DCollection(pyr, facecolors='red'))
+
     def addObstacle(self, x, y, z):
 
         s = self.obstacle_size_cm
 
+        # Create eight vertices for cube
         A = [x,   y,   z]
         B = [x+s, y,   z]
         C = [x+s, y+s, z]
@@ -58,6 +78,7 @@ class ThreeDSlamVis(object):
         G = [x+s, y+s, z+s]
         H = [x,   y+s, z+s]
 
+        # Make cube from six faces of four vertices each
         cube = [
                 [A, B, C, D],
                 [E, F, G, H],
