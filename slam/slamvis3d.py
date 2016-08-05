@@ -25,6 +25,7 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+from math import sin, cos, radians
 
 def _translate(pt, x, y, z):
 
@@ -32,7 +33,12 @@ def _translate(pt, x, y, z):
 
 def _rotate(pt, theta_degrees):
 
-    return pt[0], pt[1], pt[2]
+    x = pt[0]
+    y = pt[1]
+
+    theta = radians(theta_degrees)
+
+    return x*cos(theta)+y*sin(theta), -x*sin(theta)+y*cos(theta), pt[2]
 
 class ThreeDSlamVis(object):
 
