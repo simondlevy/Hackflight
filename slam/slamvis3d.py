@@ -65,6 +65,17 @@ class ThreeDSlamVis(object):
 
         self.ax.add_collection3d(Poly3DCollection(cube))
 
+    def setPose(self, x, y, z, theta):
+        '''
+        Sets vehicle pose: 
+        X: left/right   (cm)
+        Y: forward/back (cm)
+        Z: up/down      (cm)
+        theta: degrees
+        '''
+    
+        return
+
     def redraw(self):
 
         # Assume no use interruption
@@ -84,18 +95,35 @@ class ThreeDSlamVis(object):
 
 if __name__ == '__main__':
 
-    slam = ThreeDSlamVis()
+    from random import uniform
+    from time import sleep
 
-    plt.show(block=False)
+    slamvis = ThreeDSlamVis()
 
-    x,y,z = 0,0,0
+    x,y,z,theta = 0,0,0,0
+    zdir = +1
 
     while True:
 
-        if x < 600:
-            slam.addObstacle(x,y,z)
-        if not slam.redraw():
+        slamvis.setPose(x,y,z,theta)
+
+        ox = int(uniform(-500,500))
+        oy = int(uniform(-500,500))
+
+        slamvis.addObstacle(ox,oy,z)
+
+        if not slamvis.redraw():
             break
-        x += 300
+
+        sleep(.05)
+
+        theta = (theta + 10) % 360
+
+        z += 2 * zdir
+
+        if z > 500:
+            zdir = -1
+        if z < 10:
+            zdir = +1
 
 
