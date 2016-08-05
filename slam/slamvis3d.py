@@ -44,6 +44,9 @@ class ThreeDSlamVis(object):
         # Make a nice big (10"x10") figure
         fig = plt.figure(figsize=(10,10))
 
+        # Store Python ID of figure to detect window close
+        self.figid = id(fig)
+
         self.ax = fig.gca(projection='3d')
         self.ax.set_aspect("auto")
         self.ax.set_autoscale_on(True)
@@ -104,8 +107,9 @@ class ThreeDSlamVis(object):
     
     def redraw(self):
 
-        # Assume no use interruption
-        retval = True
+        # If we have a new figure, something went wrong (closing figure failed)
+        if self.figid != id(plt.gcf()):
+            return False
 
         # Redraw current objects without blocking
         plt.draw()
@@ -114,9 +118,9 @@ class ThreeDSlamVis(object):
         try:
             plt.pause(.1)
         except:
-            retval = False
+            return False
 
-        return retval
+        return True 
 
     def _add_vehicle(self, x, y, z, theta):
 
