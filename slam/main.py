@@ -59,21 +59,21 @@ class MyParser(msppg.MSP_Parser):
 
     def sonars_handler(self, back, front, left, right):
         self.sonars = (back, front, left, right)
-        self.report()
+        self.update()
         self.send_sonars_request()
 
     def attitude_handler(self, pitch, roll, heading):
         self.attitude = (pitch, roll, heading)
-        self.report()
+        self.update()
         self.send_attitude_request()
     
     def altitude_handler(self, height, vario):
         # Vario does not change from 0 on simulator, so not displayed
         self.altitude = height
-        self.report()
+        self.update()
         self.send_altitude_request()
 
-    def report(self):
+    def update(self):
 
         print('%4d ------------------------' % self.count)
 
@@ -84,6 +84,8 @@ class MyParser(msppg.MSP_Parser):
 
         print ('Attitude: Pitch: %+3.1f deg   Roll: %+3.1f deg  Heading: %+3.1f deg' % 
                 (self.attitude[0]/10., self.attitude[1]/10., self.attitude[2]/10.))
+
+        self.slam.update(self.sonars, self.attitude, self.altitude)
 
         # Make sure we can see progress when vehicle is stationary
         self.count += 1

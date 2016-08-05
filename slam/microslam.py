@@ -21,5 +21,18 @@ class MicroSLAM(object):
 
     def __init__(self):
 
+        self.pose = 0,0,0
+        self.obstacles = ()
+
+    def update(self, sonars, attitude, altitude):
+
         return
+
+    def getPose(self):
+
+        return self.pose
+
+    def getObstacles(self):
+
+        return self.obstacles
 
