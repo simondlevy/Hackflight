@@ -116,7 +116,7 @@ class ThreeDSlamVis(object):
 
         # Refresh display, setting flag on window close or keyboard interrupt
         try:
-            plt.pause(.1)
+            plt.pause(.01)
         except:
             return False
 

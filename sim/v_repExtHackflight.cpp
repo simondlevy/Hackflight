@@ -201,6 +201,11 @@ static int displayDialog(const char * title, char * message, float r, float g, f
    return simDisplayDialog(title, message, style, NULL, colors, colors, NULL);
 }
 
+static int displayRedDialog(const char * title, char * message, int style)
+{
+    return displayDialog(title, message, 1,0,0, style);
+}
+
 // --------------------------------------------------------------------------------------
 // simExtHackflight_start
 // --------------------------------------------------------------------------------------
@@ -538,7 +543,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
 void errorDialog(char * message)
 {
     // no initial text or UI handle
-    displayDialog("ERROR", message, 1,0,0, sim_dlgstyle_ok);
+    displayRedDialog("ERROR", message, sim_dlgstyle_ok);
 }
 
 // Board implementation ======================================================
@@ -663,7 +668,7 @@ void Board::writeMotor(uint8_t index, uint16_t value)
 void Board::showArmedStatus(bool armed)
 {
     if (armed) {
-        toastDialogHandle = displayDialog("", (char *)"                    ARMED", 1,0,0, sim_dlgstyle_message);
+        toastDialogHandle = displayRedDialog("", (char *)"                    ARMED", sim_dlgstyle_message);
         toastDialogStartMicros = micros; 
     }
 }
