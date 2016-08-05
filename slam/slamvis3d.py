@@ -55,15 +55,23 @@ class ThreeDSlamVis(object):
         self.ax.w_xaxis.set_pane_color((0, 0, 0, 0))
         self.ax.w_yaxis.set_pane_color((0, 0, 0, 0))
         self.ax.w_zaxis.set_pane_color((0, 0, 0, 0))
+
         self.obstacle_size_cm = obstacle_size_cm
+        self.vehicle_size_cm = vehicle_size_cm
+
+        self.vehicle = self._make_vehicle(0,0,0)
+
+        self.ax.add_collection3d(self.vehicle)
+
+    def _make_vehicle(self, x, y, z):
 
         # Create five vertices for vehcile
-        s = vehicle_size_cm
-        A = [0,   0,  0]
-        B = [s/2, 0,  0]
-        C = [s/2, 0,  s/3]
-        D = [0,   0,  s/3]
-        E = [s/4, s,  s/6]
+        s = self.vehicle_size_cm
+        A = [x,     y,   z]
+        B = [x+s/2, y,   z]
+        C = [x+s/2, y,   z+s/3]
+        D = [x,     y,   z+s/3]
+        E = [x+s/4, y+s, z+s/6]
 
         # Make a pyramid from five faces built from vertices
         pyr = [
@@ -74,7 +82,7 @@ class ThreeDSlamVis(object):
                 [A,B,E]
                 ]
 
-        self.ax.add_collection3d(Poly3DCollection(pyr, facecolors='red'))
+        return Poly3DCollection(pyr, facecolors='red')
 
     def addObstacle(self, x, y, z):
 
@@ -99,7 +107,7 @@ class ThreeDSlamVis(object):
                 [E, F, B, A],
                 [H, G, C, D],
         ]
-
+        
         self.ax.add_collection3d(Poly3DCollection(cube, facecolors='white'))
 
     def setPose(self, x, y, z, theta):
@@ -110,8 +118,12 @@ class ThreeDSlamVis(object):
         Z: up/down      (cm)
         theta: degrees
         '''
+
+        self.ax.collections.remove(self.vehicle)
     
-        return
+        self.vehicle = self._make_vehicle(x,y,z)
+
+        self.ax.add_collection3d(self.vehicle)
 
     def redraw(self):
 
