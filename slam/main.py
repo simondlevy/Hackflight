@@ -24,15 +24,6 @@ import msppg
 import slamvis3d
 import microslam
 
-if sys.version_info.major > 2:
-    print('Cannot run under Python3!')
-    exit(1)
-
-if len(sys.argv) < 3:
-    print('Usage: python3 %s PORT BAUD' % sys.argv[0])
-    print('Example: python3 %s /dev/ttyUSB0 57600' % sys.argv[0])
-    exit(1)
-
 class MyParser(msppg.MSP_Parser):
 
     def __init__(self, port):
@@ -100,24 +91,35 @@ class MyParser(msppg.MSP_Parser):
         self.send_attitude_request()
 
 
-port = serial.Serial(sys.argv[1], int(sys.argv[2]), timeout=1)
+if __name__ == '__main__':
 
-parser = MyParser(port)
+    if sys.version_info.major > 2:
+        print('Cannot run under Python3!')
+        exit(1)
 
-parser.send_requests()
+    if len(sys.argv) < 3:
+        print('Usage: python3 %s PORT BAUD' % sys.argv[0])
+        print('Example: python3 %s /dev/ttyUSB0 57600' % sys.argv[0])
+        exit(1)
 
-while True:
+    port = serial.Serial(sys.argv[1], int(sys.argv[2]), timeout=1)
 
-    # Read from serial port, exiting gracefully on CTRL-C
-    try:
-        c = port.read(1)
-    except KeyboardInterrupt:
-        break
+    parser = MyParser(port)
 
-    # Got a byte; parse it
-    if len(c) == 1:             
-        parser.parse(c)
+    parser.send_requests()
 
-    # Timed out; have parser a new set of requests
-    else:
-        parser.send_requests()  
+    while True:
+
+        # Read from serial port, exiting gracefully on CTRL-C
+        try:
+            c = port.read(1)
+        except KeyboardInterrupt:
+            break
+
+        # Got a byte; parse it
+        if len(c) == 1:             
+            parser.parse(c)
+
+        # Timed out; have parser a new set of requests
+        else:
+            parser.send_requests()  
