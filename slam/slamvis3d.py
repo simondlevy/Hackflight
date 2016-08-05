@@ -67,7 +67,7 @@ class ThreeDSlamVis(object):
                 [H, G, C, D],
         ]
 
-        self.ax.add_collection3d(Poly3DCollection(cube))
+        self.ax.add_collection3d(Poly3DCollection(cube, facecolors='white'))
 
     def setPose(self, x, y, z, theta):
         '''
