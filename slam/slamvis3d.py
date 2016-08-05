@@ -135,7 +135,9 @@ if __name__ == '__main__':
     from random import uniform
     from time import sleep
 
-    slamvis = ThreeDSlamVis(map_size_cm=300)
+    mapsize_cm = 300
+
+    slamvis = ThreeDSlamVis(map_size_cm=mapsize_cm)
 
     x,y,z,theta = 0,0,0,0
     zdir = +1
@@ -144,8 +146,8 @@ if __name__ == '__main__':
 
         slamvis.setPose(x,y,z,theta)
 
-        ox = int(uniform(-500,500))
-        oy = int(uniform(-500,500))
+        ox = int(uniform(-mapsize_cm,mapsize_cm))
+        oy = int(uniform(-mapsize_cm,mapsize_cm))
 
         slamvis.addObstacle(ox,oy,z)
 
