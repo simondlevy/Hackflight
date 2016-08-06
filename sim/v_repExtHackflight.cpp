@@ -137,11 +137,6 @@ static int accelHandle;
 static int greenLedHandle;
 static int redLedHandle;
 
-// Support for "toast" dialog on arming
-static int      toastDialogHandle;
-static uint32_t toastDialogStartMicros; 
-static float    TOAST_DIALOG_DURATION_SEC = 0.5;
-
 // Support for reporting status of aux switch (alt-hold, etc.)
 static uint8_t auxStatus;
 
@@ -203,6 +198,19 @@ static int displayDialog(const char * title, char * message, float r, float g, f
 
    return simDisplayDialog(title, message, style, NULL, colors, colors, NULL);
 }
+
+// "Toast" dialog support
+
+static int      toastDialogHandle;
+static uint32_t toastDialogStartMicros; 
+static float    TOAST_DIALOG_DURATION_SEC = 0.5;
+
+static void startToast(const char * message, int colorR, int colorG, int colorB)
+{
+    toastDialogHandle = displayDialog("", (char *)message, colorR,colorG,colorB, sim_dlgstyle_message);
+    toastDialogStartMicros = micros; 
+}
+
 
 // --------------------------------------------------------------------------------------
 // simExtHackflight_start
@@ -665,10 +673,8 @@ void Board::writeMotor(uint8_t index, uint16_t value)
 
 void Board::showArmedStatus(bool armed)
 {
-    if (armed) {
-        toastDialogHandle = displayDialog("", (char *)"                    ARMED", 1,0,0, sim_dlgstyle_message);
-        toastDialogStartMicros = micros; 
-    }
+    if (armed) 
+        startToast("                    ARMED", 1, 0, 0);
 }
 
 void Board::showAuxStatus(uint8_t status)
