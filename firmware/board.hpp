@@ -37,7 +37,6 @@ extern "C" {
             static uint32_t getMicros();
             static void     imuInit(uint16_t & acc1G, float & gyroScale);
             static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
-            static void     showArmedStatus(bool armed);
             static void     ledGreenOff(void);
             static void     ledGreenOn(void);
             static void     ledGreenToggle(void);
@@ -49,6 +48,8 @@ extern "C" {
             static uint8_t  serialAvailableBytes(void);
             static uint8_t  serialReadByte(void);
             static void     serialWriteByte(uint8_t c);
+            static void     showArmedStatus(bool armed);
+            static void     showAuxStatus(uint8_t status);
             static bool     sonarInit(uint8_t index);
             static void     sonarUpdate(uint8_t index);
             static uint16_t sonarGetDistance(uint8_t index);

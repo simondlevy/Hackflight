@@ -142,6 +142,9 @@ static int      toastDialogHandle;
 static uint32_t toastDialogStartMicros; 
 static float    ARMING_DIALOG_DURATION_SEC = 0.5;
 
+// Support for reporting status of aux switch (alt-hold, etc.)
+static uint8_t auxStatus;
+
 // LED support
 
 class LED {
@@ -671,5 +674,13 @@ void Board::showArmedStatus(bool armed)
         toastDialogHandle = displayRedDialog("", (char *)"                    ARMED", sim_dlgstyle_message);
         toastDialogStartMicros = micros; 
     }
+}
+
+void Board::showAuxStatus(uint8_t status)
+{
+    if (status != auxStatus)
+        printf("%d\n", status);
+
+    auxStatus = status;
 }
  

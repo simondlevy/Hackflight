@@ -172,6 +172,10 @@ void Board::showArmedStatus(bool armed)
     // XXX this would be a good place to sound a buzzer!
 }
  
+void Board::showAuxStatus(uint8_t status)
+{
+}
+ 
 #ifdef __arm__
 } // extern "C"
 #endif
