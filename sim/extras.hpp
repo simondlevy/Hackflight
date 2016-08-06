@@ -28,3 +28,4 @@ void extrasStop(void);
 
 // Implemented in v_repExtHackflight.cpp
 void errorDialog(char * message);
+

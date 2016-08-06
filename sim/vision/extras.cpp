@@ -157,7 +157,6 @@ class CompanionBoard {
 
 static CompanionBoard companionBoard;
 
-
 void extrasStart(void)
 {
     companionBoard.start();

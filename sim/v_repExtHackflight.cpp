@@ -418,15 +418,22 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
 void LUA_STOP_CALLBACK(SScriptCallBack* cb)
 {
+    // Disconnect from handheld controller
     controllerClose();
 
     // Turn off LEDs
     greenLED.turnOff();
     redLED.turnOff();
 
+    // Hide any toast dialogs that may still be visible
+    if (toastDialogHandle > -1) 
+        simEndDialog(toastDialogHandle);
+    toastDialogHandle = -1;
+
     // Do any extra shutdown needed
     extrasStop();
 
+    // Return success to V-REP
     CScriptFunctionData D;
     D.pushOutData(CScriptFunctionDataItem(true));
     D.writeDataToStack(cb->stackID);
@@ -679,8 +686,20 @@ void Board::showArmedStatus(bool armed)
 
 void Board::showAuxStatus(uint8_t status)
 {
-    if (status != auxStatus)
-        printf("%d\n", status);
+    if (status != auxStatus) {
+        char message[100];
+        switch (status) {
+            case 1:
+                sprintf(message, "ENTERING ALT-HOLD");
+                break;
+            case 2:
+                sprintf(message, "ENTERING GUIDED MODE");
+                break;
+            default:
+                sprintf(message, "ENTERING NORMAL MODE");
+        }
+        startToast(message, 1,1,0);
+    }
 
     auxStatus = status;
 }

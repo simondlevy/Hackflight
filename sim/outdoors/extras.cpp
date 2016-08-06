@@ -19,6 +19,8 @@
 
 #include "extras.hpp"
 
+#include <stdio.h>
+
 void extrasStart(void)
 {
 }

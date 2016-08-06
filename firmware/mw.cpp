@@ -162,7 +162,8 @@ void loop(void)
 		//printf("%d %d %d %d (%d)\n", rc.data[0], rc.data[1], rc.data[2], rc.data[3], rc.auxState());
 
         // useful for simulator
-        Board::showAuxStatus(rc.auxState());
+        if (armed)
+            Board::showAuxStatus(rc.auxState());
 
         // when landed, reset integral component of PID
         if (rc.throttleIsDown()) 
