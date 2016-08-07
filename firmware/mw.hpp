@@ -73,10 +73,6 @@ typedef enum {
     Z
 } sensor_axis_e;
 
-#ifndef  EXTERN
-#define  EXTERN  extern
-#endif
-
 // Config =====================================================
 
 #define CONFIG_MAGNETIC_DECLINATION                 0
@@ -88,5 +84,3 @@ typedef enum {
 #define CONFIG_CALIBRATE_ACCTIME_MSEC               500
 #define CONFIG_SMALL_ANGLE                          250  // tenths of a degree
 #define CONFIG_ALTITUDE_UPDATE_MSEC                 25   // based on accelerometer low-pass filter
-
-
