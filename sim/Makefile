@@ -71,6 +71,9 @@ edit:
 install: $(PLUGIN)
 	cp $(PLUGIN) $(VREP_LIBDIR)
 
+release: $(PLUGIN)
+	cp $(PLUGIN) Release
+
 clean:
 	rm -f $(ALL) *.o *.pyc *~
 
