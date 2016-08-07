@@ -24,7 +24,7 @@ extern "C" {
 #include "mw.hpp"
 #include "pidvals.hpp"
 
-static const bool     CONFIG_HOVER_ALT_HOLD_FAST_CHANGE       = true;
+static const bool     CONFIG_HOVER_ALT_HOLD_FAST_CHANGE       = false;
 static const uint16_t CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL  = 40;
 
 static const float CONFIG_BARO_CF_ALT = 0.965f;

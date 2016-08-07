@@ -205,12 +205,19 @@ static int      toastDialogHandle;
 static uint32_t toastDialogStartMicros; 
 static float    TOAST_DIALOG_DURATION_SEC = 0.5;
 
+static void hideToastDialog(void)
+{
+    if (toastDialogHandle > -1) 
+        simEndDialog(toastDialogHandle);
+    toastDialogHandle = -1;
+}
+
 static void startToast(const char * message, int colorR, int colorG, int colorB)
 {
+    hideToastDialog();
     toastDialogHandle = displayDialog("", (char *)message, colorR,colorG,colorB, sim_dlgstyle_message);
     toastDialogStartMicros = micros; 
 }
-
 
 // --------------------------------------------------------------------------------------
 // simExtHackflight_start
@@ -426,9 +433,7 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
     redLED.turnOff();
 
     // Hide any toast dialogs that may still be visible
-    if (toastDialogHandle > -1) 
-        simEndDialog(toastDialogHandle);
-    toastDialogHandle = -1;
+    hideToastDialog();
 
     // Do any extra shutdown needed
     extrasStop();
