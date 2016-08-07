@@ -24,7 +24,7 @@ extern "C" {
 #include "mw.hpp"
 #include "pidvals.hpp"
 
-static const bool     CONFIG_HOVER_ALT_HOLD_FAST_CHANGE       = false;
+// Throttle changes greater than this will cause alt-hold reset
 static const uint16_t CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL  = 40;
 
 static const float CONFIG_BARO_CF_ALT = 0.965f;
@@ -56,6 +56,7 @@ void Navigation::init(IMU * _imu, Baro * _baro, RC * _rc)
     this->flightMode = MODE_NORMAL;
     this->fusedBarosonarAlt = 0;
     this->initialThrottleHold = 0;
+    this->isAltHoldChanged = false;
     this->lastFusedBarosonarAlt = 0;
     this->previousT = 0;
     this->setVerticalVelocity = 0;
@@ -210,35 +211,14 @@ void Navigation::perform(void)
 
     if (this->flightMode) { // alt-hold or guided
 
-        static bool isaltHoldChanged = false;
-
-        if (CONFIG_HOVER_ALT_HOLD_FAST_CHANGE) {
-            // rapid alt changes
-            if (abs(this->rc->command[THROTTLE] - this->initialThrottleHold) > CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL) {
-                errorVerticalVelocityI = 0;
-                isaltHoldChanged = true;
-                this->rc->command[THROTTLE] += (this->rc->command[THROTTLE] > this->initialThrottleHold) 
-                    ? -CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL : CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL;
-            } else {
-                if (isaltHoldChanged) {
-                    this->altHoldValue = this->estAlt;
-                    isaltHoldChanged = false;
-                }
-                this->rc->command[THROTTLE] = constrain(this->initialThrottleHold + this->altPID, 
-                        CONFIG_PWM_MIN, CONFIG_PWM_MAX);
-            }
-        } 
-        
-        else {
-            // slow alt changes
-            if (abs(this->rc->command[THROTTLE] - this->initialThrottleHold) > CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL) {
-                // set velocity proportional to stick movement +100 throttle gives ~ +50 cm/s
-                this->setVerticalVelocity = (this->rc->command[THROTTLE] - this->initialThrottleHold) / 2;
-                this->verticalVelocityControl = true;
-                isaltHoldChanged = true;
-            } else if (isaltHoldChanged) {
+        if (abs(this->rc->command[THROTTLE] - this->initialThrottleHold) > CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL) {
+            errorVerticalVelocityI = 0;
+            isaltHoldChanged = true;
+            this->rc->command[THROTTLE] += (this->rc->command[THROTTLE] > this->initialThrottleHold) 
+                ? -CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL : CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL;
+        } else {
+            if (isaltHoldChanged) {
                 this->altHoldValue = this->estAlt;
-                this->verticalVelocityControl = false;
                 isaltHoldChanged = false;
             }
             this->rc->command[THROTTLE] = constrain(this->initialThrottleHold + this->altPID, 
@@ -251,7 +231,7 @@ void Navigation::perform(void)
 
     } // if this->flightMode
 
-   //printf("est alt: %d cm\n", this->estAlt);
+    //printf("est alt: %d cm\n", this->estAlt);
 
 
 } // updatePid
