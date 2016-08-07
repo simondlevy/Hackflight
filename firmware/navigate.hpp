@@ -49,7 +49,7 @@ class Navigation {
         int32_t  errorVerticalVelocityI;
         int32_t  fusedBarosonarAlt;
         int16_t  initialThrottleHold;
-        bool     isaltHoldChanged;
+        bool     isAltHoldChanged;
         int32_t  lastFusedBarosonarAlt;
         mode_t   flightMode;
         uint32_t previousT;

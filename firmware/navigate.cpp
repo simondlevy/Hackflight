@@ -211,16 +211,33 @@ void Navigation::perform(void)
 
     if (this->flightMode) { // alt-hold or guided
 
-        if (abs(this->rc->command[THROTTLE] - this->initialThrottleHold) > CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL) {
+        // Compute change in throttle command since alt-hold was last set
+        int16_t throttleChangeSinceHold = this->rc->command[THROTTLE] - this->initialThrottleHold;
+
+        // If throttle has changed significantly during alt-hold
+        if (abs(throttleChangeSinceHold) > CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL) {
+
+            // Reset integral of vertical velocity error
             errorVerticalVelocityI = 0;
-            isaltHoldChanged = true;
-            this->rc->command[THROTTLE] += (this->rc->command[THROTTLE] > this->initialThrottleHold) 
-                ? -CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL : CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL;
-        } else {
-            if (isaltHoldChanged) {
+
+            // Flag that alt-hold value has changed
+            this->isAltHoldChanged = true;
+
+            // If throttle has been raised, subtract from command; otherwise, add
+            this->rc->command[THROTTLE] -= sgn(throttleChangeSinceHold) *
+                CONFIG_HOVER_ALT_HOLD_THROTTLE_NEUTRAL;
+        } 
+        
+        // If throttle has NOT changed significantly during alt-hold
+        else {
+
+            // If we flagged for a new alt-hold value, set it
+            if (this->isAltHoldChanged) {
                 this->altHoldValue = this->estAlt;
-                isaltHoldChanged = false;
+                this->isAltHoldChanged = false;
             }
+
+            // Adjust the throttle command based on alt-hold PID
             this->rc->command[THROTTLE] = constrain(this->initialThrottleHold + this->altPID, 
                     CONFIG_PWM_MIN, CONFIG_PWM_MAX);
         }
@@ -232,7 +249,6 @@ void Navigation::perform(void)
     } // if this->flightMode
 
     //printf("est alt: %d cm\n", this->estAlt);
-
 
 } // updatePid
 
