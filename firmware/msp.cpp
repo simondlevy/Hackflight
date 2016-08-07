@@ -102,11 +102,11 @@ void MSP::tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-void MSP::init(class IMU * _imu, class Navigation * _nav, 
+void MSP::init(class IMU * _imu, class Hover * _hover, 
         class Mixer * _mixer, class RC * _rc, class Sonars * _sonars)
 {
     this->imu = _imu;
-    this->nav = _nav;
+    this->hover = _hover;
     this->mixer = _mixer;
     this->rc = _rc;
     this->sonars = _sonars;
@@ -175,7 +175,7 @@ void MSP::update(bool armed)
                         break;
 
                     case MSP_SET_HEAD: 
-                        this->nav->headHold = read16();
+                        this->hover->headHold = read16();
                         headSerialReply(0);
                         break;
 
@@ -199,8 +199,8 @@ void MSP::update(bool armed)
 
                     case MSP_ALTITUDE:
                         headSerialReply(6);
-                        serialize32(this->nav->estAlt);
-                        serialize16(this->nav->vario);
+                        serialize32(this->hover->estAlt);
+                        serialize16(this->hover->vario);
                         break;
 
                     case MSP_SONARS:

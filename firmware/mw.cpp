@@ -37,7 +37,7 @@ static Mixer      mixer;
 static MSP        msp;
 static Baro       baro;
 static Sonars     sonars;
-static Navigation nav;
+static Hover      hover;
 static Stabilize  stab;
 
 // support for timed tasks
@@ -133,8 +133,8 @@ void setup(void)
     stab.init(&rc, &imu);
     imu.init(calibratingGyroCycles, calibratingAccCycles);
     mixer.init(&rc, &stab); 
-    msp.init(&imu, &nav, &mixer, &rc, &sonars);
-    nav.init(&imu, &baro, &rc);
+    msp.init(&imu, &hover, &mixer, &rc, &sonars);
+    hover.init(&imu, &baro, &rc);
 
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;
@@ -207,7 +207,7 @@ void loop(void)
         } // rc.changed()
 
         // Switch to alt-hold when switch moves to position 1 or 2
-        nav.checkSwitch();
+        hover.checkSwitch();
 
     } else {                    // not in rc loop
 
@@ -221,7 +221,7 @@ void loop(void)
                 break;
             case 1:
                 if (baro.available() && altitudeEstimationTask.checkAndUpdate(currentTime)) {
-                    nav.updateAltitudePid(armed);
+                    hover.updateAltitudePid(armed);
                 }
                 taskOrder++;
                 break;
@@ -279,8 +279,8 @@ void loop(void)
         // handle serial communications
         msp.update(armed);
 
-        // perform navigation tasks (alt-hold etc.)
-        nav.perform();
+        // perform hover tasks (alt-hold etc.)
+        hover.perform();
 
         // update stability PID controller 
         stab.update();

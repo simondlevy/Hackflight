@@ -47,7 +47,7 @@ extern "C" {
         private:
 
             class IMU        * imu;
-            class Navigation * nav;
+            class Hover      * hover;
             class Mixer      * mixer;
             class RC         * rc;
             class Sonars     * sonars;
@@ -67,7 +67,7 @@ extern "C" {
 
         public:
 
-            void init(class IMU * _imu, class Navigation * _nav, class Mixer * _mixer, 
+            void init(class IMU * _imu, class Hover * _hover, class Mixer * _mixer, 
                     class RC * _rc, class Sonars * _sonars);
 
             void update(bool armed);

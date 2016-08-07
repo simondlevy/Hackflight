@@ -46,7 +46,7 @@ void debug(const char * format, ...);
 #include "baro.hpp"
 #include "sonars.hpp"
 #include "msp.hpp"
-#include "navigate.hpp"
+#include "hover.hpp"
 #include "filters.hpp"
 
 #ifndef abs

@@ -1,6 +1,5 @@
 /*
-   navigate.hpp : Class declaration for navigation functionality:
-                  altitude hold, hover in place, GPS, visual guidance, etc.
+   hover.hpp : Class declaration for hover-in-place functionality
 
    This file is part of Hackflight.
 
@@ -24,7 +23,7 @@ extern "C" {
 
 #include "mw.hpp"
 
-class Navigation {
+class Hover {
 
     private:
 
@@ -38,34 +37,18 @@ class Navigation {
             MODE_GUIDED
         } mode_t;
 
-        // for alt-hold
-        float    accelAlt;
-        float    accelZ_prev;
+        mode_t flightMode;
+
         int32_t  altHoldValue;
-        int32_t  altPID;
         int32_t  baroAlt;
         int32_t  baroAltBaseline;
-        int32_t  baroAlt_offset;
-        int32_t  errorVerticalVelocityI;
-        int32_t  fusedBarosonarAlt;
-        int16_t  initialThrottleHold;
-        bool     isAltHoldChanged;
-        int32_t  lastFusedBarosonarAlt;
-        mode_t   flightMode;
-        uint32_t previousT;
-        int32_t  setVerticalVelocity;
-        float    sonarTransition;
-        bool     verticalVelocityControl;
-        float    verticalVelocity;
         bool     wasArmed;
+
 
     public:
 
-        // for alt-hold
+        // For MSP
         int32_t  estAlt;
-        float    accelVel;
-        float    accelZ;
-        int16_t  tiltAngle;
         int32_t  vario; // XXX fixed at zero for now
 
         // for heading
