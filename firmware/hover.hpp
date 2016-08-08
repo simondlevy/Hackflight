@@ -42,12 +42,18 @@ class Hover {
         int32_t  altHoldValue;
         int32_t  baroAlt;
         int32_t  baroAltBaseline;
+        int16_t  baroPID;
+        int16_t  errorAltitudeI;
+        int16_t  initialThrottleHold;
+        int32_t  lastBaroAlt;
+        uint32_t previousT;
+        float    vel;
         bool     wasArmed;
 
 
     public:
 
-        // For MSP
+        // shared with MSP
         int32_t  estAlt;
         int32_t  vario; // XXX fixed at zero for now
 

@@ -15,7 +15,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Level (accelerometer)
+// Level (accelerometer): set values to 0 for "rate mode"
 #define CONFIG_LEVEL_P            10 
 #define CONFIG_LEVEL_I            5
 
@@ -29,9 +29,6 @@
 #define  CONFIG_YAW_I             0
 
 // For altitude hover
-#define CONFIG_HOVER_ALT_P  200
-#define CONFIG_HOVER_VEL_P  100
-#define CONFIG_HOVER_VEL_I  45
-#define CONFIG_HOVER_VEL_D  1
-
-
+#define CONFIG_HOVER_ALT_P  64
+#define CONFIG_HOVER_ALT_I  25
+#define CONFIG_HOVER_ALT_D  24

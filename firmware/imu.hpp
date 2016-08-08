@@ -31,6 +31,10 @@ extern "C" {
         
         private:
 
+            int32_t  accelSum[3];
+            int32_t  accelSumCount;
+            uint32_t accelTimeSum;
+            float    accelVelScale;
             uint16_t calibratingGyroCycles;
             uint16_t calibratingAccCycles;
             uint16_t acc1G;
@@ -39,17 +43,16 @@ extern "C" {
 
         public:
 
-            // XXX can we hide/move these?
+            // shared with MSP
             int16_t  angle[3];
             int16_t  gyroADC[3];
-            int32_t  accelSum[3];
-            int32_t  accelSumCount;
-            uint32_t accelTimeSum;
-            float    accelVelScale;
 
+            // called from MW
             void init(uint16_t calibratingGyroCycles, uint16_t calibratingAccCycles);
             void update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG);
-            void resetAccelSum(void);
+
+            // called from Hover
+            float computeAccelZ(void);
     };
 
 #ifdef __arm__

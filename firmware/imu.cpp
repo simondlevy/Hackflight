@@ -119,7 +119,7 @@ void IMU::init(uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles)
 {
     Board::imuInit(this->acc1G, this->gyroScale);
 
-    // calculate RC time constant used in the accZ lpf    
+    // calculate RC time constant used in the this->accelZ lpf    
     this->fcAcc = (float)(0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF)); 
 
     for (int k=0; k<3; ++k) {
@@ -303,15 +303,20 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     // Convert heading from [-180,+180] to [0,360]
     if (this->angle[YAW] < 0)
         this->angle[YAW] += 360;
-}
 
-void IMU::resetAccelSum(void)
+} // update
+
+float IMU::computeAccelZ(void)
 {
+    float accelZ = (float)this->accelSum[2] / (float)this->accelSumCount * (9.80665f / 10000.0f / this->acc1G);
+
     this->accelSum[0] = 0;
     this->accelSum[1] = 0;
     this->accelSum[2] = 0;
     this->accelSumCount = 0;
     this->accelTimeSum = 0;
+
+    return accelZ;
 }
 
 #ifdef __arm__
