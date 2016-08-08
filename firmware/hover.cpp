@@ -30,6 +30,8 @@ void Hover::init(IMU * _imu, Baro * _baro, RC * _rc)
     this->baro  = _baro;
     this->rc = _rc;
 
+    this->altHoldChanged = false;
+    this->altHoldCorrection = 0;
     this->altHoldValue = 0;
     this->baroAlt = 0;
     this->baroAltBaseline = 0;
@@ -104,7 +106,7 @@ void Hover::updateAltitudePid(bool armed)
         // Apply Complimentary Filter to keep the calculated vario based on baro velocity (i.e. near real velocity). 
         // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, 
         // i.e without delay.
-        this->vario = complementaryFilter(this->vario, baroVel, 0.985f);
+        this->vario = complementaryFilter(this->vario, baroVel, BARO_CF_VEL);
 
         // PID: P
         int16_t errorAltitudeP = constrain(this->altHoldValue - this->estAlt, -300, 300);
@@ -118,7 +120,6 @@ void Hover::updateAltitudePid(bool armed)
 
         // PID: D
         this->vario = deadbandFilter(this->vario, 5);
-        printf("%d\n", this->vario);
         this->baroPID -= constrain(CONFIG_HOVER_ALT_D * this->vario >>4, -150, 150);
     }
 
@@ -138,6 +139,32 @@ void Hover::perform(void)
     return;
 #endif
 
+    if (this->flightMode) { // alt-hold or guided
+
+        // If pilot moved throttle stick signficantly since initiating alt-hold
+        if (abs(this->rc->command[THROTTLE]-this->initialThrottleHold) > THROTTLE_NEUTRAL_ZONE) {
+
+            // Slowly increase/decrease AltHold proportional to stick movement ( +100 throttle gives ~ +50 cm in 1 
+            // second with cycle time about 3-4ms)
+            this->altHoldCorrection += this->rc->command[THROTTLE] - this->initialThrottleHold;
+            if(abs(this->altHoldCorrection) > 512) {
+                this->altHoldValue += this->altHoldCorrection/512;
+                this->altHoldCorrection %= 512;
+            }
+
+            this->altHoldChanged = true;
+        } 
+
+        // Otherwise, see whether alt-hold just changed
+        else if (this->altHoldChanged) {
+            this->altHoldValue = this->estAlt;
+            this->altHoldChanged = false;
+
+        }
+
+        // Adjust the throttle command via PID to maintain altitude
+        this->rc->command[THROTTLE] = this->initialThrottleHold + this->baroPID;
+    }
 } 
 
 
