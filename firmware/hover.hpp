@@ -44,12 +44,11 @@ class Hover {
         int32_t  altHoldValue;
         int32_t  baroAlt;
         int32_t  baroAltBaseline;
-        int16_t  baroPID;
+        int16_t  altHoldPID;
         int16_t  errorAltitudeI;
         int16_t  initialThrottleHold;
         int32_t  lastBaroAlt;
         uint32_t previousT;
-        float    vel;
         bool     wasArmed;
 
         static const uint16_t THROTTLE_NEUTRAL_ZONE  = 40;
@@ -59,19 +58,16 @@ class Hover {
 
         // shared with MSP
         int32_t  estAlt;
-        int32_t  vario; // XXX fixed at zero for now
+        int32_t  vario;
 
         // for heading
         int16_t headHold; 
   
+        // called by MW
         void init(class IMU * _imu, class Baro * _baro, class RC * _rc);
-
         void checkSwitch(void);
-
         void updateAltitudePid(bool armed);
-
         void perform(void);
-
 };
 
 

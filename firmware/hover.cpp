@@ -41,7 +41,6 @@ void Hover::init(IMU * _imu, Baro * _baro, RC * _rc)
     this->initialThrottleHold = 0;
     this->lastBaroAlt = 0;
     this->vario = 0;
-    this->vel = 0;
     this->wasArmed = false;
 }
 
@@ -58,7 +57,7 @@ void Hover::checkSwitch(void)
             this->initialThrottleHold = this->rc->command[THROTTLE];
 
             // reset PID values
-            this->baroPID = 0;
+            this->altHoldPID = 0;
             this->errorAltitudeI = 0;
         }
 
@@ -110,17 +109,17 @@ void Hover::updateAltitudePid(bool armed)
 
         // PID: P
         int16_t errorAltitudeP = constrain(this->altHoldValue - this->estAlt, -300, 300);
-        errorAltitudeP = deadbandFilter(errorAltitudeP, 10); //remove small P parameter to reduce noise near zero position
-        this->baroPID = constrain(CONFIG_HOVER_ALT_P * errorAltitudeP >>7, -150, +150);
+        errorAltitudeP = deadbandFilter(errorAltitudeP, 10); //remove small P param to reduce noise near zero position
+        this->altHoldPID = constrain(CONFIG_HOVER_ALT_P * errorAltitudeP >>7, -150, +150);
 
         // PID: I
         this->errorAltitudeI += CONFIG_HOVER_ALT_I * errorAltitudeP >>6;
         this->errorAltitudeI = constrain(this->errorAltitudeI,-30000,30000);
-        this->baroPID += errorAltitudeI>>9;    //I in range +/-60
+        this->altHoldPID += errorAltitudeI>>9;    //I in range +/-60
 
         // PID: D
         this->vario = deadbandFilter(this->vario, 5);
-        this->baroPID -= constrain(CONFIG_HOVER_ALT_D * this->vario >>4, -150, 150);
+        this->altHoldPID -= constrain(CONFIG_HOVER_ALT_D * this->vario >>4, -150, 150);
     }
 
     // If not armed, reset baro altitude
@@ -163,7 +162,7 @@ void Hover::perform(void)
         }
 
         // Adjust the throttle command via PID to maintain altitude
-        this->rc->command[THROTTLE] = this->initialThrottleHold + this->baroPID;
+        this->rc->command[THROTTLE] = this->initialThrottleHold + this->altHoldPID;
     }
 } 
 

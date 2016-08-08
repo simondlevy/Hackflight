@@ -47,7 +47,8 @@ libv_repExtHackflight.so: *.cpp ../*.cpp *.hpp ../*.hpp ../../firmware/*.cpp ../
 	g++ $(CFLAGS) -c ../../firmware/stabilize.cpp
 	g++ $(CFLAGS) -c ../../firmware/rc.cpp
 	g++ $(CFLAGS) -c ../../firmware/baro.cpp
-	g++ $(CFLAGS) -c ../../firmware/navigate.cpp
+	g++ $(CFLAGS) -c ../../firmware/sonars.cpp
+	g++ $(CFLAGS) -c ../../firmware/hover.cpp
 	g++ $(CFLAGS) -c ../../firmware/filters.cpp
 	g++ *.o -o libv_repExtHackflight.so -lpthread -shared -lopencv_core -lopencv_highgui $(JOYLIB)
 
