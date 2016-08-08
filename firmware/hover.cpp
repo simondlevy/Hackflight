@@ -105,7 +105,7 @@ void Hover::updateAltitudePid(bool armed)
         // Integrate IMU accelerator Z value to get vario (vertical velocity)
         this->vario += this->imu->computeAccelZ() * dTime;
 
-        // Apply Complimentary Filter to keep the calculated vario based on baro velocity (i.e. near real velocity). 
+        // Apply Complementary Filter to keep the calculated vario based on baro velocity (i.e. near real velocity). 
         // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, 
         // i.e without delay.
         this->vario = complementaryFilter(this->vario, baroVel, BARO_CF_VEL);
