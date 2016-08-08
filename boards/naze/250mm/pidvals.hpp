@@ -29,7 +29,6 @@ static const uint8_t CONFIG_YAW_P            = 85;
 static const uint8_t CONFIG_YAW_I            = 45;
 
 // For altitude hover
-#define CONFIG_HOVER_ALT_P  50
-#define CONFIG_HOVER_VEL_P  120
-#define CONFIG_HOVER_VEL_I  45
-#define CONFIG_HOVER_VEL_D  1
+#define CONFIG_HOVER_ALT_P  120
+#define CONFIG_HOVER_ALT_I  45
+#define CONFIG_HOVER_ALT_D  1
