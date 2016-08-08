@@ -44,7 +44,7 @@ ALL = $(PLUGIN)
 
 all: $(ALL)
 
-libv_repExtHackflight.$(EXT): *.cpp ../*.cpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp
+libv_repExtHackflight.$(EXT): *.cpp *.hpp ../*.cpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp
 	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" ../v_repExtHackflight.cpp 
 	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" extras.cpp 
 	g++ $(CFLAGS) -c ../../common/serial.cpp

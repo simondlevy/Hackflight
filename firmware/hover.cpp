@@ -163,6 +163,8 @@ void Hover::perform(void)
 
         // Adjust the throttle command via PID to maintain altitude
         this->rc->command[THROTTLE] = this->initialThrottleHold + this->altHoldPID;
+
+        printf("%d %d %d\n", this->initialThrottleHold, this->altHoldPID, this->rc->command[THROTTLE]);
     }
 } 
 
