@@ -15,6 +15,9 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define THROTTLE_NEUTRAL_ZONE  40
+#define BARO_CF_VEL            0.985f
+
 #include <math.h>
 
 #ifdef __arm__

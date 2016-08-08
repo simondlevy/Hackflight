@@ -51,9 +51,6 @@ class Hover {
         uint32_t previousT;
         bool     wasArmed;
 
-        static const uint16_t THROTTLE_NEUTRAL_ZONE  = 40;
-        static const float    BARO_CF_VEL            = 0.985f;
-
     public:
 
         // shared with MSP

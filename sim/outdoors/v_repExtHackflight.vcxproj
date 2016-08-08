@@ -120,12 +120,13 @@
     <ClCompile Include="..\..\..\..\..\..\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\common\v_repLib.cpp" />
     <ClCompile Include="..\..\firmware\baro.cpp" />
     <ClCompile Include="..\..\firmware\filters.cpp" />
+    <ClCompile Include="..\..\firmware\hover.cpp" />
     <ClCompile Include="..\..\firmware\imu.cpp" />
     <ClCompile Include="..\..\firmware\mixer.cpp" />
     <ClCompile Include="..\..\firmware\msp.cpp" />
     <ClCompile Include="..\..\firmware\mw.cpp" />
-    <ClCompile Include="..\..\firmware\navigate.cpp" />
     <ClCompile Include="..\..\firmware\rc.cpp" />
+    <ClCompile Include="..\..\firmware\sonars.cpp" />
     <ClCompile Include="..\..\firmware\stabilize.cpp" />
     <ClCompile Include="..\controller_Windows.cpp" />
     <ClCompile Include="..\v_repExtHackflight.cpp" />
