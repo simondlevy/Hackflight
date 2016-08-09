@@ -24,6 +24,18 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 from microslam import MicroSLAM
 from slamvis2d import TwoDSlamVis
 
+from time import sleep
+
 slam = MicroSLAM()
 
 disp = TwoDSlamVis()
+
+x,y,theta = 0,0,0
+
+while True:
+
+    try:
+        sleep(.25)
+    except KeyboardInterrupt:
+        break
+
