@@ -9,7 +9,7 @@ flakes:
 	pyflakes main.py
 
 edit:
-	vim slammin.py
+	vim microslam.py
 
 clean:
 	rm -f *.pyc *~
