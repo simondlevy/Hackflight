@@ -21,6 +21,7 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 
 import matplotlib.pyplot as plt
+from math import cos, sin, radians
 
 class TwoDSlamVis(object):
 
@@ -61,7 +62,11 @@ class TwoDSlamVis(object):
         theta: degrees
         '''
 
-        return
+        # remove old arrow
+        self.vehicle.remove()
+
+        # create a new arrow
+        self._add_vehicle(x, y, theta)
     
     def redraw(self):
 
@@ -86,8 +91,13 @@ class TwoDSlamVis(object):
         l = self.vehicle_size_cm
         w = l / 2
 
-        self.ax.arrow(0, 0, 0, 0, head_width=w, head_length=l, fc='r', ec='r')
+        # Use a very short arrow shaft to orient the head of the arrow
+        r = .01
+        theta = radians(theta)
+        dx = r * cos(theta)
+        dy = r * sin(theta)
 
+        self.vehicle = self.ax.arrow(x, y, dx, dy, head_width=w, head_length=l, fc='r', ec='r')
 
 if __name__ == '__main__':
 
