@@ -86,7 +86,7 @@ class TwoDSlamVis(object):
         l = self.vehicle_size_cm
         w = l / 2
 
-        self.ax.arrow(0, 0, 0.5, 0.5, head_width=0.05, head_length=0.1, fc='r', ec='r')
+        self.ax.arrow(0, 0, 0, 0, head_width=w, head_length=l, fc='r', ec='r')
 
 
 if __name__ == '__main__':
