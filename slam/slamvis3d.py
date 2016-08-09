@@ -47,6 +47,8 @@ class ThreeDSlamVis(object):
         # Store Python ID of figure to detect window close
         self.figid = id(fig)
 
+        fig.canvas.set_window_title('SLAM 3D')
+
         self.ax = fig.gca(projection='3d')
         self.ax.set_aspect("auto")
         self.ax.set_autoscale_on(True)

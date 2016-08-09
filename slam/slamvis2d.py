@@ -35,6 +35,8 @@ class TwoDSlamVis(object):
         # Store Python ID of figure to detect window close
         self.figid = id(fig)
 
+        fig.canvas.set_window_title('SLAM 2D')
+
         self.ax = fig.gca()
         self.ax.set_aspect("auto")
         self.ax.set_autoscale_on(True)
@@ -49,7 +51,7 @@ class TwoDSlamVis(object):
 
         self._add_vehicle(0,0,0)
 
-    def addObstacle(self, x, y, s):
+    def addObstacle(self, x, y, phi, s):
 
         return
 
@@ -117,6 +119,6 @@ if __name__ == '__main__':
         if not slamvis.redraw():
             break
 
-        sleep(.05)
+        sleep(.5)
 
         theta = (theta + 10) % 360
