@@ -23,6 +23,13 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D      
 from math import cos, sin, radians
 
+
+def _rotate(x, y, r, theta):
+    theta = radians(theta)
+    dx = r * cos(theta)
+    dy = r * sin(theta)
+    return x+dx, y+dy
+
 class TwoDSlamVis(object):
 
     def __init__(self, map_size_cm=1000, vehicle_size_cm=25):
@@ -62,12 +69,9 @@ class TwoDSlamVis(object):
         s:    obstacle size (cm)
         '''
 
-        phi = radians(phi)
+        x2, y2 = _rotate(x, y, s, phi)
 
-        xs = [x, x+s*cos(phi)]
-        ys = [y, y+s*sin(phi)]
-
-        self.ax.add_line(Line2D(xs, ys))
+        self.ax.add_line(Line2D([x,x2], [y,y2]))
 
     def setPose(self, x, y, theta):
         '''
@@ -110,10 +114,7 @@ class TwoDSlamVis(object):
         w = l / 2
 
         # Use a very short arrow shaft to orient the head of the arrow
-        r = .01
-        theta = radians(theta)
-        dx = r * cos(theta)
-        dy = r * sin(theta)
+        dx, dy = _rotate(x, y, .01, theta)
 
         self.vehicle = self.ax.arrow(x, y, dx, dy, head_width=w, head_length=l, fc='r', ec='r')
 
