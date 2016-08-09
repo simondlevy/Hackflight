@@ -19,13 +19,16 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D      
 from math import cos, sin, radians
 
 class TwoDSlamVis(object):
 
     def __init__(self, map_size_cm=1000, vehicle_size_cm=25):
+        '''
+        Creates a new 2D SLAM visualization.
+        '''
 
         self.vehicle_size_cm = vehicle_size_cm
 
@@ -52,16 +55,26 @@ class TwoDSlamVis(object):
         self._add_vehicle(0,0,0)
 
     def addObstacle(self, x, y, phi, s):
+        '''
+        Adds an obstacle:
+        x,y   coordinate of obstacle end
+        phi:  rotation angle of obstacle (degrees)
+        s:    obstacle size (cm)
+        '''
 
-        return
+        phi = radians(phi)
+
+        xs = [x, x+s*cos(phi)]
+        ys = [y, y+s*sin(phi)]
+
+        self.ax.add_line(Line2D(xs, ys))
 
     def setPose(self, x, y, theta):
         '''
         Sets vehicle pose: 
-        X: left/right   (cm)
-        Y: forward/back (cm)
-        Z: up/down      (cm)
-        theta: degrees
+        X:     left/right   (cm)
+        Y:     forward/back (cm)
+        theta: rotation (degrees)
         '''
 
         # remove old arrow
@@ -71,6 +84,9 @@ class TwoDSlamVis(object):
         self._add_vehicle(x, y, theta)
     
     def redraw(self):
+        '''
+        Redraws the display.  You should call this at regular intevals.
+        '''
 
         # If we have a new figure, something went wrong (closing figure failed)
         if self.figid != id(plt.gcf()):
@@ -113,6 +129,8 @@ if __name__ == '__main__':
     x,y,theta = 0,0,0
 
     while True:
+
+        slamvis.addObstacle(100, 100, 0, 25)
 
         slamvis.setPose(x,y,theta)
 
