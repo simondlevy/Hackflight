@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 '''
 microslam.py : minimal 3D SLAM algorithm
 
@@ -19,11 +21,17 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 class MicroSLAM(object):
 
-    def __init__(self):
+    def __init__(self, sensor_angles=(0,), min_distance_cm=0, max_distance_cm=1000):
 
-        # pose = <X,Y,Z,THETA>
-        self.pose = 0,0,0,0
+        # Store sensor parameters for later
+        self.sensor_angles = sensor_angles
+        self.sensor_min_distance_cm = min_distance_cm
+        self.sensor_max_distance_cm = max_distance_cm
 
+        # For now, just 2D: pose = <x,y,theta>
+        self.pose = 0,0,0
+
+        # No obstacles yet
         self.obstacles = ()
 
     def update(self, sonars, attitude, altitude):
@@ -38,6 +46,6 @@ class MicroSLAM(object):
                 (attitude[0]/10., attitude[1]/10., attitude[2]/10.))
         '''
 
-        self.pose = self.pose[0], self.pose[1], altitude, attitude[2]
+        self.pose = self.pose[0], self.pose[1], attitude[2]
 
         return self.pose, self.obstacles

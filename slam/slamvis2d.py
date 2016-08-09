@@ -130,9 +130,9 @@ if __name__ == '__main__':
 
     x,y,theta = 0,0,0
 
-    while True:
+    slamvis.addObstacle(100, 100, 0, 25)
 
-        slamvis.addObstacle(100, 100, 0, 25)
+    while True:
 
         slamvis.setPose(x,y,theta)
 

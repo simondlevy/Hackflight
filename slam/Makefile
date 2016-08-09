@@ -8,6 +8,9 @@ slam:
 flakes:
 	pyflakes main.py
 
+test:
+	./test.py
+
 edit:
 	vim microslam.py
 
