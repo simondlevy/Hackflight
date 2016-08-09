@@ -32,12 +32,13 @@ def _rotate(x, y, r, theta):
 
 class TwoDSlamVis(object):
 
-    def __init__(self, map_size_cm=1000, vehicle_size_cm=25):
+    def __init__(self, map_size_cm=1000, vehicle_size_cm=25, obstacle_thickness_cm=10):
         '''
         Creates a new 2D SLAM visualization.
         '''
 
         self.vehicle_size_cm = vehicle_size_cm
+        self.obstacle_thickness_cm = obstacle_thickness_cm
 
         # Make a nice big (10"x10") figure
         fig = plt.figure(figsize=(10,10))
@@ -71,7 +72,7 @@ class TwoDSlamVis(object):
 
         x2, y2 = _rotate(x, y, s, phi)
 
-        self.ax.add_line(Line2D([x,x2], [y,y2]))
+        self.ax.add_line(Line2D([x,x2], [y,y2], linewidth=self.obstacle_thickness_cm))
 
     def setPose(self, x, y, theta):
         '''
