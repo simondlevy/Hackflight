@@ -43,10 +43,7 @@ while True:
     angle = ((octant-1) // 2  + 1) * 90
     sign  = 2 * (octant % 2) - 1
 
-    t = theta
-
-    if octant > 0 and octant < 7:
-        t = sign*angle - sign*theta
+    t = sign*angle - sign*theta
 
     x = WALLDIST
     y = x * tan(radians(t))
