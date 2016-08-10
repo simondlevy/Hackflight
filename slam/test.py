@@ -40,25 +40,20 @@ while True:
 
     octant = theta // 45
 
+    angle = ((octant-1) // 2  + 1) * 90
+    sign  = 2 * (octant % 2) - 1
+
     t = theta
 
-    if octant == 1:
-        t = 90 - theta
-    elif octant == 2:
-        t = theta - 90
-    elif octant == 3:
-        t = 180 - theta
-    elif octant == 5:
-        t = 270 - theta
-    elif octant == 6:
-        t = theta - 270
+    if octant > 0 and octant < 7:
+        t = sign*angle - sign*theta
 
     x = WALLDIST
     y = x * tan(radians(t))
 
     d = int(sqrt(x*x + y*y))
 
-    print('%3d %3d %d %3d' % (theta, t, octant, d))
+    print('%3d %3d %d %3d %3d' % (theta, t, octant, angle, d))
 
     #slam.update((d,)
 
