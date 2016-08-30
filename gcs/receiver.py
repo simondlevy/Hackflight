@@ -21,7 +21,7 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 UPDATE_MSEC = 1
 
-PWM_MIN = 980
+PWM_MIN = 990
 PWM_MAX = 2030
 
 from Tkinter import *
