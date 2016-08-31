@@ -114,10 +114,10 @@ void RC::computeExpo(void)
             this->command[axis] = -this->command[axis];
     }
 
-    tmp = constrain(this->data[THROTTLE], CONFIG_MINCHECK, 2000);
+    tmp = constrain(this->data[DEMAND_THROTTLE], CONFIG_MINCHECK, 2000);
     tmp = (uint32_t)(tmp - CONFIG_MINCHECK) * 1000 / (2000 - CONFIG_MINCHECK);       // [MINCHECK;2000] -> [0;1000]
     tmp2 = tmp / 100;
-    this->command[THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
+    this->command[DEMAND_THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
             lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [PWM_MIN;PWM_MAX]
 
 } // computeExpo
@@ -131,7 +131,7 @@ uint8_t RC::auxState(void)
 
 bool RC::throttleIsDown(void)
 {
-    return this->data[THROTTLE] < CONFIG_MINCHECK;
+    return this->data[DEMAND_THROTTLE] < CONFIG_MINCHECK;
 }
 
 #ifdef __arm__

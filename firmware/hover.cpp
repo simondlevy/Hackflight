@@ -57,7 +57,7 @@ void Hover::checkSwitch(void)
 
             // grab altitude and throttle values for hold
             this->altHoldValue = this->estAlt;
-            this->initialThrottleHold = this->rc->command[THROTTLE];
+            this->initialThrottleHold = this->rc->command[DEMAND_THROTTLE];
 
             // reset PID values
             this->altHoldPID = 0;
@@ -144,11 +144,11 @@ void Hover::perform(void)
     if (this->flightMode) { // alt-hold or guided
 
         // If pilot moved throttle stick signficantly since initiating alt-hold
-        if (abs(this->rc->command[THROTTLE]-this->initialThrottleHold) > THROTTLE_NEUTRAL_ZONE) {
+        if (abs(this->rc->command[DEMAND_THROTTLE]-this->initialThrottleHold) > THROTTLE_NEUTRAL_ZONE) {
 
             // Slowly increase/decrease AltHold proportional to stick movement ( +100 throttle gives ~ +50 cm in 1 
             // second with cycle time about 3-4ms)
-            this->altHoldCorrection += this->rc->command[THROTTLE] - this->initialThrottleHold;
+            this->altHoldCorrection += this->rc->command[DEMAND_THROTTLE] - this->initialThrottleHold;
             if(abs(this->altHoldCorrection) > 512) {
                 this->altHoldValue += this->altHoldCorrection/512;
                 this->altHoldCorrection %= 512;
@@ -165,9 +165,10 @@ void Hover::perform(void)
         }
 
         // Adjust the throttle command via PID to maintain altitude
-        this->rc->command[THROTTLE] = this->initialThrottleHold + this->altHoldPID;
+        this->rc->command[DEMAND_THROTTLE] = this->initialThrottleHold + this->altHoldPID;
 
-        printf("Alt Hold: %d init Throt: %d PID: %d Throttle: %d\n", this->estAlt, this->initialThrottleHold, this->altHoldPID, this->rc->command[THROTTLE]);
+        printf("Alt Hold: %d init Throt: %d PID: %d Throttle: %d\n", 
+                this->estAlt, this->initialThrottleHold, this->altHoldPID, this->rc->command[DEMAND_THROTTLE]);
     }
 } 
 

@@ -23,18 +23,18 @@
 #define CONFIG_PWM_MAX  2010
 
 // For logical combinations of stick positions (low, center, high)
-#define ROL_LO (1 << (2 * ROLL))
-#define ROL_CE (3 << (2 * ROLL))
-#define ROL_HI (2 << (2 * ROLL))
-#define PIT_LO (1 << (2 * PITCH))
-#define PIT_CE (3 << (2 * PITCH))
-#define PIT_HI (2 << (2 * PITCH))
-#define YAW_LO (1 << (2 * YAW))
-#define YAW_CE (3 << (2 * YAW))
-#define YAW_HI (2 << (2 * YAW))
-#define THR_LO (1 << (2 * THROTTLE))
-#define THR_CE (3 << (2 * THROTTLE))
-#define THR_HI (2 << (2 * THROTTLE))
+#define ROL_LO (1 << (2 * DEMAND_ROLL))
+#define ROL_CE (3 << (2 * DEMAND_ROLL))
+#define ROL_HI (2 << (2 * DEMAND_ROLL))
+#define PIT_LO (1 << (2 * DEMAND_PITCH))
+#define PIT_CE (3 << (2 * DEMAND_PITCH))
+#define PIT_HI (2 << (2 * DEMAND_PITCH))
+#define YAW_LO (1 << (2 * DEMAND_YAW))
+#define YAW_CE (3 << (2 * DEMAND_YAW))
+#define YAW_HI (2 << (2 * DEMAND_YAW))
+#define THR_LO (1 << (2 * DEMAND_THROTTLE))
+#define THR_CE (3 << (2 * DEMAND_THROTTLE))
+#define THR_HI (2 << (2 * DEMAND_THROTTLE))
 
 #define CONFIG_RC_EXPO_8                            65
 #define CONFIG_RC_RATE_8                            90

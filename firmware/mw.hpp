@@ -58,14 +58,20 @@ void debug(const char * format, ...);
 #endif
 
 enum {
-    ROLL = 0,
-    PITCH,
-    YAW,
-    THROTTLE,
-    AUX1,
-    AUX2,
-    AUX3,
-    AUX4
+    DEMAND_ROLL = 0,
+    DEMAND_PITCH,
+    DEMAND_YAW,
+    DEMAND_THROTTLE,
+    DEMAND_AUX1,
+    DEMAND_AUX2,
+    DEMAND_AUX3,
+    DEMAND_AUX4
+};
+
+enum {
+    AXIS_ROLL = 0,
+    AXIS_PITCH,
+    AXIS_YAW
 };
 
 typedef enum {

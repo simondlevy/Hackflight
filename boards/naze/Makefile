@@ -206,10 +206,6 @@ hover.o: $(FIRMDIR)/hover.cpp $(FIRMDIR)/hover.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o hover.o $(FIRMDIR)/hover.cpp
 
-hover.o: $(FIRMDIR)/hover.cpp $(FIRMDIR)/hover.hpp $(FIRMDIR)/rc.hpp
-	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o hover.o $(FIRMDIR)/hover.cpp
-
 filters.o: $(FIRMDIR)/filters.cpp $(FIRMDIR)/filters.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o filters.o $(FIRMDIR)/filters.cpp

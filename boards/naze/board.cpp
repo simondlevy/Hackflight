@@ -155,25 +155,31 @@ void Board::writeMotor(uint8_t index, uint16_t value)
 
 bool Board::sonarInit(uint8_t index) 
 {
+    index = index; // avoid compiler warning about unused variable
     return false;
 }
 
 void Board::sonarUpdate(uint8_t index)
 {
+    index = index; // avoid compiler warning about unused variable
 }
 
 uint16_t Board::sonarGetDistance(uint8_t index)
 {
+    index = index; // avoid compiler warning about unused variable
     return 0;
 }
 
 void Board::showArmedStatus(bool armed)
 {
     // XXX this would be a good place to sound a buzzer!
+
+    armed = armed; // avoid compiler warning about unused variable
 }
  
 void Board::showAuxStatus(uint8_t status)
 {
+    status = status; // avoid compiler warning about unused variable
 }
  
 #ifdef __arm__

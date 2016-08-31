@@ -88,12 +88,12 @@ static void rotateV(float v[3], float *delta)
     float cosx, sinx, cosy, siny, cosz, sinz;
     float coszcosx, sinzcosx, coszsinx, sinzsinx;
 
-    cosx = cosf(delta[ROLL]);
-    sinx = sinf(delta[ROLL]);
-    cosy = cosf(delta[PITCH]);
-    siny = sinf(delta[PITCH]);
-    cosz = cosf(delta[YAW]);
-    sinz = sinf(delta[YAW]);
+    cosx = cosf(delta[AXIS_ROLL]);
+    sinx = sinf(delta[AXIS_ROLL]);
+    cosy = cosf(delta[AXIS_PITCH]);
+    siny = sinf(delta[AXIS_PITCH]);
+    cosz = cosf(delta[AXIS_YAW]);
+    sinz = sinf(delta[AXIS_YAW]);
 
     coszcosx = cosz * cosx;
     sinzcosx = sinz * cosx;
@@ -174,16 +174,16 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
         }
         // Calculate average, shift Z down by acc1G
         if (calibratingA == 1) {
-            accelZero[ROLL] = (a[ROLL] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles;
-            accelZero[PITCH] = (a[PITCH] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles;
-            accelZero[YAW] = (a[YAW] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles - this->acc1G;
+            accelZero[AXIS_ROLL] = (a[AXIS_ROLL] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles;
+            accelZero[AXIS_PITCH] = (a[AXIS_PITCH] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles;
+            accelZero[AXIS_YAW] = (a[AXIS_YAW] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles - this->acc1G;
         }
         calibratingA--;
     }
 
-    accelADC[ROLL]  -= accelZero[ROLL];
-    accelADC[PITCH] -= accelZero[PITCH];
-    accelADC[YAW]   -= accelZero[YAW];
+    accelADC[AXIS_ROLL]  -= accelZero[AXIS_ROLL];
+    accelADC[AXIS_PITCH] -= accelZero[AXIS_PITCH];
+    accelADC[AXIS_YAW]   -= accelZero[AXIS_YAW];
 
     // range: +/- 8192; +/- 2000 deg/sec
 
@@ -249,28 +249,28 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     }
 
     // Attitude of the estimated vector
-    anglerad[ROLL] = atan2f(EstG[Y], EstG[Z]);
-    anglerad[PITCH] = atan2f(-EstG[X], sqrtf(EstG[Y] * EstG[Y] + EstG[Z] * EstG[Z]));
+    anglerad[AXIS_ROLL] = atan2f(EstG[Y], EstG[Z]);
+    anglerad[AXIS_PITCH] = atan2f(-EstG[X], sqrtf(EstG[Y] * EstG[Y] + EstG[Z] * EstG[Z]));
 
     rotateV(EstN, deltaGyroAngle);
     normalizeV(EstN, EstN);
 
     // Calculate heading
-    float cosineRoll = cosf(anglerad[ROLL]);
-    float sineRoll = sinf(anglerad[ROLL]);
-    float cosinePitch = cosf(anglerad[PITCH]);
-    float sinePitch = sinf(anglerad[PITCH]);
+    float cosineRoll = cosf(anglerad[AXIS_ROLL]);
+    float sineRoll = sinf(anglerad[AXIS_ROLL]);
+    float cosinePitch = cosf(anglerad[AXIS_PITCH]);
+    float sinePitch = sinf(anglerad[AXIS_PITCH]);
     float Xh = EstN[X] * cosinePitch + EstN[Y] * sineRoll * sinePitch + EstN[Z] * sinePitch * cosineRoll;
     float Yh = EstN[Y] * cosineRoll - EstN[Z] * sineRoll;
-    anglerad[YAW] = atan2f(Yh, Xh); 
+    anglerad[AXIS_YAW] = atan2f(Yh, Xh); 
 
     // deltaT is measured in us ticks
     dT = (float)deltaT * 1e-6f;
 
     // the accel values have to be rotated into the earth frame
-    rpy[0] = -(float)anglerad[ROLL];
-    rpy[1] = -(float)anglerad[PITCH];
-    rpy[2] = -(float)anglerad[YAW];
+    rpy[0] = -(float)anglerad[AXIS_ROLL];
+    rpy[1] = -(float)anglerad[AXIS_PITCH];
+    rpy[2] = -(float)anglerad[AXIS_YAW];
 
     accel_ned[X] = accelSmooth[0];
     accel_ned[Y] = accelSmooth[1];
@@ -296,13 +296,13 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     this->accelSumCount++;
 
     // Convert angles from radians to tenths of a degrees
-    this->angle[ROLL]  = (int16_t)lrintf(anglerad[ROLL]  * (1800.0f / M_PI));
-    this->angle[PITCH] = (int16_t)lrintf(anglerad[PITCH] * (1800.0f / M_PI));
-    this->angle[YAW]   = (int16_t)(lrintf(anglerad[YAW]   * 1800.0f / M_PI + CONFIG_MAGNETIC_DECLINATION) / 10.0f);
+    this->angle[AXIS_ROLL]  = (int16_t)lrintf(anglerad[AXIS_ROLL]  * (1800.0f / M_PI));
+    this->angle[AXIS_PITCH] = (int16_t)lrintf(anglerad[AXIS_PITCH] * (1800.0f / M_PI));
+    this->angle[AXIS_YAW]   = (int16_t)(lrintf(anglerad[AXIS_YAW]   * 1800.0f / M_PI + CONFIG_MAGNETIC_DECLINATION) / 10.0f);
 
     // Convert heading from [-180,+180] to [0,360]
-    if (this->angle[YAW] < 0)
-        this->angle[YAW] += 360;
+    if (this->angle[AXIS_YAW] < 0)
+        this->angle[AXIS_YAW] += 360;
 
 } // update
 

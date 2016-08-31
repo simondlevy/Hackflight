@@ -62,7 +62,7 @@ void Stabilize::update(void)
         int32_t PTermGYRO = this->rc->command[axis];
 
         this->errorGyroI[axis] = constrain(this->errorGyroI[axis] + error, -16000, +16000); // WindUp
-        if ((abs(this->imu->gyroADC[axis]) > 640) || ((axis == YAW) && (abs(this->rc->command[axis]) > 100)))
+        if ((abs(this->imu->gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (abs(this->rc->command[axis]) > 100)))
             this->errorGyroI[axis] = 0;
         int32_t ITermGYRO = (this->errorGyroI[axis] / 125 * this->rate_i[axis]) >> 6;
 
@@ -82,7 +82,8 @@ void Stabilize::update(void)
             this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
             int32_t ITermACC = (this->errorAngleI[axis] * CONFIG_LEVEL_I) >> 12;
 
-            int32_t prop = max(abs(this->rc->command[PITCH]), abs(this->rc->command[ROLL])); // range [0;500]
+            int32_t prop = max(abs(this->rc->command[DEMAND_PITCH]), 
+                    abs(this->rc->command[DEMAND_ROLL])); // range [0;500]
 
             PTerm = (PTermACC * (500 - prop) + PTermGYRO * prop) / 500;
             ITerm = (ITermACC * (500 - prop) + ITermGYRO * prop) / 500;
@@ -99,16 +100,17 @@ void Stabilize::update(void)
     }
 
     // prevent "yaw jump" during yaw correction
-    this->axisPID[YAW] = constrain(this->axisPID[YAW], -100 - abs(this->rc->command[YAW]), +100 + abs(this->rc->command[YAW]));
+    this->axisPID[AXIS_YAW] = constrain(this->axisPID[AXIS_YAW], 
+            -100 - abs(this->rc->command[DEMAND_YAW]), +100 + abs(this->rc->command[DEMAND_YAW]));
 }
 
 void Stabilize::resetIntegral(void)
 {
-    this->errorGyroI[ROLL] = 0;
-    this->errorGyroI[PITCH] = 0;
-    this->errorGyroI[YAW] = 0;
-    this->errorAngleI[ROLL] = 0;
-    this->errorAngleI[PITCH] = 0;
+    this->errorGyroI[AXIS_ROLL] = 0;
+    this->errorGyroI[AXIS_PITCH] = 0;
+    this->errorGyroI[AXIS_YAW] = 0;
+    this->errorAngleI[AXIS_ROLL] = 0;
+    this->errorAngleI[AXIS_PITCH] = 0;
 }
 
 #ifdef __arm__
