@@ -179,6 +179,6 @@ class Motors(Dialog):
             self._turn_off_active()
 
     def _turn_off_active(self):
-        if self.active_motor > 0:
+        if self.driver.connected and self.active_motor > 0:
             self._send_motor_message(0)
 
