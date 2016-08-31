@@ -99,19 +99,20 @@ void RC::computeExpo(void)
 {
     int32_t tmp, tmp2;
 
-    for (uint8_t axis = 0; axis < 3; axis++) {
+    for (uint8_t channel = 0; channel < 3; channel++) {
 
-        tmp = min(abs(this->data[axis] - this->midrc), 500);
+        tmp = min(abs(this->data[channel] - this->midrc), 500);
 
-        if (axis != 2) {        // ROLL & PITCH
+        if (channel != DEMAND_YAW) { // roll, pitch
             tmp2 = tmp / 100;
-            this->command[axis] = lookupPitchRollRC[tmp2] + (tmp - tmp2 * 100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2]) / 100;
-        } else {                // YAW
-            this->command[axis] = tmp * -CONFIG_YAW_CONTROL_DIRECTION;
+            this->command[channel] = 
+                lookupPitchRollRC[tmp2] + (tmp - tmp2 * 100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2]) / 100;
+        } else {                    // yaw
+            this->command[channel] = tmp * -CONFIG_YAW_CONTROL_DIRECTION;
         }
 
-        if (this->data[axis] < this->midrc)
-            this->command[axis] = -this->command[axis];
+        if (this->data[channel] < this->midrc)
+            this->command[channel] = -this->command[channel];
     }
 
     tmp = constrain(this->data[DEMAND_THROTTLE], CONFIG_MINCHECK, 2000);
