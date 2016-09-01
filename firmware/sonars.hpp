@@ -23,13 +23,14 @@ extern "C" {
         
         private:
 
+            uint8_t  count;
             bool     avail;
             uint8_t  index;
             bool     ready;
 
         public:
 
-            uint16_t distances[4];
+            uint16_t distances[5];
 
             void init(void);
 

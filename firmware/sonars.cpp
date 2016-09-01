@@ -24,7 +24,8 @@ extern "C" {
 void Sonars::init(void)
 {
     this->avail = true;
-    for (int k=0; k<4; ++k) {
+    this->count = 4;
+    for (int k=0; k<this->count; ++k) {
         //this->avail = this->avail && Board::sonarInit(k);
         this->distances[k] = 0;
     }
@@ -45,10 +46,10 @@ void Sonars::update(void)
     this->distances[this->index] = Board::sonarGetDistance(this->index);
 
     // Address hardware cyclically
-    this->index = (this->index + 1) % 4;
+    this->index = (this->index + 1) % this->count;
 
-    // As soon as we've read all four sonars, we're ready to report their values
-    if (this->index == 3)
+    // As soon as we've read all sonars, we're ready to report their values
+    if (this->index == this->count-1)
         this->ready = true;
 }
 

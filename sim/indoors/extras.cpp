@@ -30,19 +30,19 @@ static const int    BAUDRATE = 57600; // Fastest we could get from our XBees
 #include <algorithm>
 
 
-static const char * sonarNames[4] = {"Sonar_Back", "Sonar_Front", "Sonar_Left", "Sonar_Right"};
+static const char * sonarNames[5] = {"Sonar_Back", "Sonar_Bottom", "Sonar_Front", "Sonar_Left", "Sonar_Right"};
 
-static int sonarHandles[4];
+static int sonarHandles[5];
 
 static SerialConnection serialConnection(PORTNAME, BAUDRATE);
 
 static bool serialConnected;
 
-static int sonarDistances[4];
+static int sonarDistances[5];
 
 void extrasStart(void)
 {
-    for (int k=0; k<4; ++k)
+    for (int k=0; k<5; ++k)
         sonarHandles[k] = simGetObjectHandle(sonarNames[k]);
 
     serialConnected = serialConnection.openConnection();
@@ -56,7 +56,7 @@ void extrasStart(void)
 
 void extrasUpdate(void)
 {
-    for (int k=0; k<4; ++k) {
+    for (int k=0; k<5; ++k) {
 
         float detectedPoint[4];         // X,Y,Z,distance
 
@@ -67,7 +67,7 @@ void extrasUpdate(void)
 
         sonarDistances[k] = std::max(sonarDistances[k], 20);
 
-        //printf("%s: %d %c ", sonarNames[k], sonarDistances[k], k==3?'\n' : '|');
+        printf("%s: %d %c ", sonarNames[k], sonarDistances[k], k==3?'\n' : '|');
     }
 }
 
