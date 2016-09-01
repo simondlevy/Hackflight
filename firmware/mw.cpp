@@ -35,7 +35,7 @@ static IMU        imu;
 static RC         rc;
 static Mixer      mixer;
 static MSP        msp;
-static Baro       baro;
+//static Baro       baro;
 static Sonars     sonars;
 static Hover      hover;
 static Stabilize  stab;
@@ -125,7 +125,7 @@ void setup(void)
     altitudeEstimationTask.init(CONFIG_ALTITUDE_UPDATE_MSEC * 1000);
 
     // attempt to initialize barometer, sonars
-    baro.init();
+    //baro.init();
     sonars.init();
 
     // initialize our external objects with objects they need
@@ -134,7 +134,7 @@ void setup(void)
     imu.init(calibratingGyroCycles, calibratingAccCycles);
     mixer.init(&rc, &stab); 
     msp.init(&imu, &hover, &mixer, &rc, &sonars);
-    hover.init(&imu, &baro, &rc);
+    hover.init(&imu, &sonars, &rc);
 
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;
@@ -215,13 +215,13 @@ void loop(void)
 
         switch (taskOrder) {
             case 0:
-                if (baro.available())
-                    baro.update();
+                //if (baro.available())
+                //    baro.update();
                 taskOrder++;
                 break;
             case 1:
-                if (baro.available() && altitudeEstimationTask.checkAndUpdate(currentTime)) {
-                    hover.updateAltitudePid(armed);
+                if (sonars.available() && altitudeEstimationTask.checkAndUpdate(currentTime)) {
+                    hover.updateAltitudePid();
                 }
                 taskOrder++;
                 break;

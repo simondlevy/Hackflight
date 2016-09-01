@@ -27,22 +27,20 @@ extern "C" {
 #include "mw.hpp"
 #include "pidvals.hpp"
 
-void Hover::init(IMU * _imu, Baro * _baro, RC * _rc)
+void Hover::init(IMU * _imu, Sonars * _sonars, RC * _rc)
 {
-    this->imu   = _imu;
-    this->baro  = _baro;
-    this->rc = _rc;
+    this->imu    = _imu;
+    this->sonars = _sonars;
+    this->rc     = _rc;
 
     this->altHoldChanged = false;
     this->altHoldCorrection = 0;
     this->altHoldValue = 0;
-    this->baroAlt = 0;
-    this->baroAltBaseline = 0;
     this->errorAltitudeI = 0;
     this->estAlt = 0;
     this->headHold = 0;
     this->initialThrottleHold = 0;
-    this->lastBaroAlt = 0;
+    this->lastSonarAlt = 0;
     this->vario = 0;
     this->wasArmed = false;
 }
@@ -71,7 +69,7 @@ void Hover::checkSwitch(void)
         this->flightMode = MODE_NORMAL;
 }
 
-void Hover::updateAltitudePid(bool armed)
+void Hover::updateAltitudePid(void)
 {
     uint32_t currentT = Board::getMicros();
     uint32_t dTime = currentT - this->previousT;
@@ -81,58 +79,40 @@ void Hover::updateAltitudePid(bool armed)
 
     this->previousT = currentT;
 
-    // Grab raw baro altitude
-    int32_t baroAltRaw = this->baro->getAltitude();
+    // Grab raw sonar altitude
+    uint16_t sonarAlt = this->sonars->getAltitude();
 
-    // Set baro baseline on arming
-    if (armed) {
+    // Apply additional LPF to reduce noise (faster by 30 µs)
+    this->estAlt = (this->estAlt * 6 + sonarAlt ) >> 3; 
 
-        if (!this->wasArmed) 
-            this->baroAltBaseline = baroAltRaw;
+    // Compute altitude velocity based on sonar
+    int16_t sonarVel = this->estAlt - this->lastSonarAlt;
+    this->lastSonarAlt = this->estAlt;
+    sonarVel = constrain(sonarVel, -300, 300); // constrain baro velocity +/- 300cm/s
+    sonarVel = deadbandFilter(sonarVel, 10); // to reduce noise near zero
 
-        // Compute current baro altitude as offset from baseline
-        this->baroAlt = baroAltRaw - this->baroAltBaseline;
-        
-        // Apply additional LPF to reduce baro noise (faster by 30 µs)
-        this->estAlt = (this->estAlt * 6 + this->baroAlt ) >> 3; 
+    // Integrate IMU accelerator Z value to get vario (vertical velocity)
+    this->vario += this->imu->computeAccelZ() * dTime;
 
-        // Compute altitude velocity based on barometer
-        int16_t baroVel = this->estAlt - this->lastBaroAlt;
-        this->lastBaroAlt = this->estAlt;
-        baroVel = constrain(baroVel, -300, 300); // constrain baro velocity +/- 300cm/s
-        baroVel = deadbandFilter(baroVel, 10); // to reduce noise near zero
+    // Apply Complementary Filter to keep the calculated vario based on baro velocity (i.e. near real velocity). 
+    // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, 
+    // i.e without delay.
+    this->vario = complementaryFilter(this->vario, sonarVel, BARO_CF_VEL);
 
-        // Integrate IMU accelerator Z value to get vario (vertical velocity)
-        this->vario += this->imu->computeAccelZ() * dTime;
+    // PID: P
+    int16_t errorAltitudeP = constrain(this->altHoldValue - this->estAlt, -300, 300);
+    errorAltitudeP = deadbandFilter(errorAltitudeP, 10); //remove small P param to reduce noise near zero position
+    this->altHoldPID = constrain(CONFIG_HOVER_ALT_P * errorAltitudeP >>7, -150, +150);
 
-        // Apply Complementary Filter to keep the calculated vario based on baro velocity (i.e. near real velocity). 
-        // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, 
-        // i.e without delay.
-        this->vario = complementaryFilter(this->vario, baroVel, BARO_CF_VEL);
+    // PID: I
+    this->errorAltitudeI += CONFIG_HOVER_ALT_I * errorAltitudeP >>6;
+    this->errorAltitudeI = constrain(this->errorAltitudeI,-30000,30000);
+    this->altHoldPID += errorAltitudeI>>9;    //I in range +/-60
 
-        // PID: P
-        int16_t errorAltitudeP = constrain(this->altHoldValue - this->estAlt, -300, 300);
-        errorAltitudeP = deadbandFilter(errorAltitudeP, 10); //remove small P param to reduce noise near zero position
-        this->altHoldPID = constrain(CONFIG_HOVER_ALT_P * errorAltitudeP >>7, -150, +150);
-
-        // PID: I
-        this->errorAltitudeI += CONFIG_HOVER_ALT_I * errorAltitudeP >>6;
-        this->errorAltitudeI = constrain(this->errorAltitudeI,-30000,30000);
-        this->altHoldPID += errorAltitudeI>>9;    //I in range +/-60
-
-        // PID: D
-        this->vario = deadbandFilter(this->vario, 5);
-        this->altHoldPID -= constrain(CONFIG_HOVER_ALT_D * this->vario >>4, -150, 150);
-    }
-
-    // If not armed, reset baro altitude
-    else 
-        this->baroAlt = 0;
-
-    // Track arming status to detect change
-    this->wasArmed = armed;
+    // PID: D
+    this->vario = deadbandFilter(this->vario, 5);
+    this->altHoldPID -= constrain(CONFIG_HOVER_ALT_D * this->vario >>4, -150, 150);
 }
-
 
 void Hover::perform(void)
 {

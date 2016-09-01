@@ -30,6 +30,8 @@ extern "C" {
 
         public:
 
+            uint16_t getAltitude(void);
+
             uint16_t distances[5];
 
             void init(void);

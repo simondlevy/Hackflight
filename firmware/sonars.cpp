@@ -24,7 +24,7 @@ extern "C" {
 void Sonars::init(void)
 {
     this->avail = true;
-    this->count = 4;
+    this->count = 5;
     for (int k=0; k<this->count; ++k) {
         //this->avail = this->avail && Board::sonarInit(k);
         this->distances[k] = 0;
@@ -36,6 +36,11 @@ void Sonars::init(void)
 bool Sonars::available(void)
 {
     return this->avail;
+}
+
+uint16_t Sonars::getAltitude(void)
+{
+    return this->distances[1]; // Back, Bottom, Front, Left, Right
 }
 
 void Sonars::update(void)

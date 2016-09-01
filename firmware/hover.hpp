@@ -27,9 +27,9 @@ class Hover {
 
     private:
 
-        class IMU   * imu;
-        class Baro  * baro;
-        class RC    * rc;
+        class IMU    * imu;
+        class Sonars * sonars;
+        class RC     * rc;
 
         typedef enum {
             MODE_NORMAL,
@@ -42,12 +42,10 @@ class Hover {
         bool     altHoldChanged;
         int16_t  altHoldCorrection;
         int32_t  altHoldValue;
-        int32_t  baroAlt;
-        int32_t  baroAltBaseline;
+        uint16_t lastSonarAlt;
         int16_t  altHoldPID;
         int16_t  errorAltitudeI;
         int16_t  initialThrottleHold;
-        int32_t  lastBaroAlt;
         uint32_t previousT;
         bool     wasArmed;
 
@@ -61,9 +59,9 @@ class Hover {
         int16_t headHold; 
   
         // called by MW
-        void init(class IMU * _imu, class Baro * _baro, class RC * _rc);
+        void init(class IMU * _imu, class Sonars * _sonars, class RC * _rc);
         void checkSwitch(void);
-        void updateAltitudePid(bool armed);
+        void updateAltitudePid(void);
         void perform(void);
 };
 
