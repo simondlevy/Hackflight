@@ -16,7 +16,7 @@
  */
 
 #define THROTTLE_NEUTRAL_ZONE  40
-#define BARO_CF_VEL            0.985f
+#define ALTHOLD_CF_VEL         0.985f
 
 #include <math.h>
 
@@ -88,30 +88,36 @@ void Hover::updateAltitudePid(void)
     // Compute altitude velocity based on sonar
     int16_t sonarVel = this->estAlt - this->lastSonarAlt;
     this->lastSonarAlt = this->estAlt;
-    sonarVel = constrain(sonarVel, -300, 300); // constrain baro velocity +/- 300cm/s
-    sonarVel = deadbandFilter(sonarVel, 10); // to reduce noise near zero
+    //sonarVel = constrain(sonarVel, -300, 300); // constrain velocity +/- 300cm/s
+    //sonarVel = deadbandFilter(sonarVel, 10); // to reduce noise near zero
 
     // Integrate IMU accelerator Z value to get vario (vertical velocity)
-    this->vario += this->imu->computeAccelZ() * dTime;
+    //this->vario += this->imu->computeAccelZ() * dTime;
 
-    // Apply Complementary Filter to keep the calculated vario based on baro velocity (i.e. near real velocity). 
+    // Apply Complementary Filter to keep the calculated vario based on velocity (i.e. near real velocity). 
     // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, 
     // i.e without delay.
-    this->vario = complementaryFilter(this->vario, sonarVel, BARO_CF_VEL);
+    this->vario = sonarVel; //complementaryFilter(this->vario, sonarVel, ALTHOLD_CF_VEL);
 
     // PID: P
-    int16_t errorAltitudeP = constrain(this->altHoldValue - this->estAlt, -300, 300);
-    errorAltitudeP = deadbandFilter(errorAltitudeP, 10); //remove small P param to reduce noise near zero position
-    this->altHoldPID = constrain(CONFIG_HOVER_ALT_P * errorAltitudeP >>7, -150, +150);
+    int16_t errorAltitudeP = this->altHoldValue - this->estAlt;
+    //errorAltitudeP = constrain(errorAltitudeP, -300, 300);
+    //errorAltitudeP = deadbandFilter(errorAltitudeP, 10); //remove small P param to reduce noise near zero position
+    this->altHoldPID = CONFIG_HOVER_ALT_P * errorAltitudeP>>7;
+    //this->altHoldPID = constrain(this->altHoldPID, -150, +150);
 
     // PID: I
     this->errorAltitudeI += CONFIG_HOVER_ALT_I * errorAltitudeP >>6;
-    this->errorAltitudeI = constrain(this->errorAltitudeI,-30000,30000);
+    //this->errorAltitudeI = constrain(this->errorAltitudeI,-30000,30000);
     this->altHoldPID += errorAltitudeI>>9;    //I in range +/-60
 
     // PID: D
-    this->vario = deadbandFilter(this->vario, 5);
-    this->altHoldPID -= constrain(CONFIG_HOVER_ALT_D * this->vario >>4, -150, 150);
+    //this->vario = deadbandFilter(this->vario, 5);
+    //int16_t errorAltitudeD = CONFIG_HOVER_ALT_D * this->vario>>4;
+    int16_t errorAltitudeD = CONFIG_HOVER_ALT_D * this->vario;
+    printf("%d\n", errorAltitudeD);
+    //errorAltitudeD = constrain(errorAltitudeD, -150, 150);
+    this->altHoldPID -= errorAltitudeD;
 }
 
 void Hover::perform(void)
@@ -147,8 +153,11 @@ void Hover::perform(void)
         // Adjust the throttle command via PID to maintain altitude
         this->rc->command[DEMAND_THROTTLE] = this->initialThrottleHold + this->altHoldPID;
 
-        printf("Alt Hold: %d init Throt: %d PID: %d Throttle: %d\n", 
-                this->estAlt, this->initialThrottleHold, this->altHoldPID, this->rc->command[DEMAND_THROTTLE]);
+        /*
+        printf("Alt: %d  Alt Hold: %d init Throt: %d PID: %d Throttle: %d\n", 
+                this->estAlt, this->altHoldValue, this->initialThrottleHold, 
+                this->altHoldPID, this->rc->command[DEMAND_THROTTLE]);
+                */
     }
 } 
 
