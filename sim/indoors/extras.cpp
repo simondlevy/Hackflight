@@ -45,12 +45,12 @@ void extrasStart(void)
     for (int k=0; k<5; ++k)
         sonarHandles[k] = simGetObjectHandle(sonarNames[k]);
 
-    serialConnected = serialConnection.openConnection();
+    //serialConnected = serialConnection.openConnection();
 
     if (!serialConnected) {
-        char message[200];
-        sprintf(message, "Unable to connect to %s.  Please make sure adapter is plugged in.", PORTNAME);
-        errorDialog(message);
+        //char message[200];
+        //sprintf(message, "Unable to connect to %s.  Please make sure adapter is plugged in.", PORTNAME);
+        //errorDialog(message);
     }
 }
 
@@ -67,7 +67,7 @@ void extrasUpdate(void)
 
         sonarDistances[k] = std::max(sonarDistances[k], 20);
 
-        printf("%s: %d %c ", sonarNames[k], sonarDistances[k], k==3?'\n' : '|');
+        //printf("%s: %d %c ", sonarNames[k], sonarDistances[k], k==3?'\n' : '|');
     }
 }
 
