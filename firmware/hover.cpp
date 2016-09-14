@@ -115,7 +115,6 @@ void Hover::updateAltitudePid(void)
     //this->vario = deadbandFilter(this->vario, 5);
     //int16_t errorAltitudeD = CONFIG_HOVER_ALT_D * this->vario>>4;
     int16_t errorAltitudeD = CONFIG_HOVER_ALT_D * this->vario;
-    printf("%d\n", errorAltitudeD);
     //errorAltitudeD = constrain(errorAltitudeD, -150, 150);
     this->altHoldPID -= errorAltitudeD;
 }
@@ -153,11 +152,9 @@ void Hover::perform(void)
         // Adjust the throttle command via PID to maintain altitude
         this->rc->command[DEMAND_THROTTLE] = this->initialThrottleHold + this->altHoldPID;
 
-        /*
         printf("Alt: %d  Alt Hold: %d init Throt: %d PID: %d Throttle: %d\n", 
                 this->estAlt, this->altHoldValue, this->initialThrottleHold, 
                 this->altHoldPID, this->rc->command[DEMAND_THROTTLE]);
-                */
     }
 } 
 
