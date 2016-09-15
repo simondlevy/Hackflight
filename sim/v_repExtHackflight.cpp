@@ -118,6 +118,9 @@ static const float SPRINGY_THROTTLE_INC = .01f;
 static float accel[3];
 static float gyro[3];
 
+// Barometer support
+static int baroPressure;
+
 // Motor support
 static float thrusts[4];
 
@@ -325,6 +328,16 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
         gyro[k] = (angles[k] - anglesPrev[k]) / timestep;
         anglesPrev[k] = angles[k];
     }
+
+    // Convert vehicle's Z coordinate in meters to barometric pressure in Pascals (millibars)
+    // At low altitudes above the sea level, the pressure decreases by about 1200 Pa for every 100 meters
+    // (See https://en.wikipedia.org/wiki/Atmospheric_pressure#Altitude_variation)
+    float position[3];
+    simGetObjectPosition(quadcopterHandle, -1, position);
+    baroPressure = (int)(1000 * (101.325 - 1.2 * position[2] / 100));
+    
+    // Add some simulated measurement noise to the baro    
+    baroPressure += rand() % (2*BARO_NOISE_PASCALS + 1) - BARO_NOISE_PASCALS;
 
     // Read accelerometer
     simReadForceSensor(accelHandle, accel, NULL);
@@ -585,6 +598,19 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     redLED.init(redLedHandle, 1, 0, 0);
 }
 
+bool Board::baroInit(void)
+{
+    return true;
+}
+
+void Board::baroUpdate(void)
+{
+}
+
+int32_t Board::baroGetPressure(void)
+{
+    return baroPressure;
+}
 void Board::checkReboot(bool pendReboot)
 {
 }
