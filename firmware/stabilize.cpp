@@ -23,7 +23,7 @@ extern "C" {
 #include <stdio.h>
 #endif
 
-#include "mw.hpp"
+#include "hackflight.hpp"
 #include "pidvals.hpp"
 
 void Stabilize::init(class RC * _rc, class IMU * _imu)

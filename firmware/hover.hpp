@@ -21,7 +21,7 @@ extern "C" {
 #include <stdio.h>
 #endif
 
-#include "mw.hpp"
+#include "hackflight.hpp"
 
 class Hover {
 

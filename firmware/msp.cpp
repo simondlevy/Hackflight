@@ -25,7 +25,7 @@ extern "C" {
 
 #include <string.h> // for memset
 
-#include "mw.hpp"
+#include "hackflight.hpp"
 
 #define MSP_REBOOT               68     
 #define MSP_RC                   105    

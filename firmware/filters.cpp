@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 
-#include "mw.hpp"
+#include "hackflight.hpp"
 
 // complementary filter
 float complementaryFilter(float a, float b, float c) 

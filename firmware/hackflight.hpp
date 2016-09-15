@@ -1,5 +1,5 @@
 /*
-   mw.hpp : general header
+   hackflight.hpp : general header
 
    This file is part of Hackflight.
 

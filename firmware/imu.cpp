@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 
-#include "mw.hpp"
+#include "hackflight.hpp"
 #include "filters.hpp"
 
 #define INV_GYR_CMPF_FACTOR   (1.0f / ((float)CONFIG_GYRO_CMPF_FACTOR + 1.0f))

@@ -17,7 +17,7 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 TARGET		?= NAZE
 
-CPP_OBJS = mw.o imu.o mixer.o msp.o rc.o baro.o sonars.o board.o stabilize.o hover.o filters.o
+CPP_OBJS = hackflight.o imu.o mixer.o msp.o rc.o baro.o sonars.o board.o stabilize.o hover.o filters.o
 
 # Compile-time options
 OPTIONS		?=
@@ -173,9 +173,9 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 
 FIRMDIR = $(HACKFLIGHT_DIR)/firmware
 
-mw.o: $(FIRMDIR)/mw.cpp $(FIRMDIR)/mw.hpp $(FIRMDIR)/rc.hpp
+hackflight.o: $(FIRMDIR)/hackflight.cpp $(FIRMDIR)/hackflight.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o mw.o $(FIRMDIR)/mw.cpp
+	@$(CC) $(CFLAGS) -c -o hackflight.o $(FIRMDIR)/hackflight.cpp
 
 imu.o: $(FIRMDIR)/imu.cpp $(FIRMDIR)/imu.hpp
 	@echo %% $(notdir $<)

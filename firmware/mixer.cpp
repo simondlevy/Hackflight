@@ -23,7 +23,7 @@ extern "C" {
 #include <stdio.h>
 #endif
 
-#include "mw.hpp"
+#include "hackflight.hpp"
 
 // Custom mixer data per motor
 typedef struct motorMixer_t {

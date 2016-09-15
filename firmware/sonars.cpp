@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 
-#include "mw.hpp"
+#include "hackflight.hpp"
 
 void Sonars::init(void)
 {

@@ -1,5 +1,5 @@
 /*
-   mw.cpp : setup() and loop() routines
+   hackflight.cpp : setup() and loop() routines
 
    Adapted from https://github.com/multiwii/baseflight/blob/master/src/mw.c
 
@@ -25,7 +25,7 @@ extern "C" {
 #include <stdio.h>
 #endif
 
-#include "mw.hpp"
+#include "hackflight.hpp"
 
 #include <string.h>
 

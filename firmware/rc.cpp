@@ -23,7 +23,7 @@ extern "C" {
 #include <stdio.h>
 #endif
 
-#include "mw.hpp"
+#include "hackflight.hpp"
 
 #include <string.h>
 
