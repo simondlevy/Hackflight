@@ -1,1 +1,1 @@
-../board.cpp
+../../board.cpp
