@@ -5,6 +5,9 @@
 # this stuff is worth it, you can buy me a beer in return
 ###############################################################################
 
+# Change this to wherever you put hackflight
+HACKFLIGHT_DIR = $(HOME)/Desktop/hackflight
+
 # Change this to wherever you put BreezySTM32
 BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
@@ -168,7 +171,7 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 
 # C++ support
 
-FIRMDIR = ../../../firmware
+FIRMDIR = $(HACKFLIGHT_DIR)/firmware
 
 mw.o: $(FIRMDIR)/mw.cpp $(FIRMDIR)/mw.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
@@ -210,9 +213,9 @@ filters.o: $(FIRMDIR)/filters.cpp $(FIRMDIR)/filters.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o filters.o $(FIRMDIR)/filters.cpp
 
-board.o: ../board.cpp $(FIRMDIR)/board.hpp
+board.o: board.cpp $(FIRMDIR)/board.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -I$(FIRMDIR) -c -o board.o ../board.cpp
+	@$(CC) $(CFLAGS) -I$(FIRMDIR) -c -o board.o board.cpp
 
 clean:
 	rm -rf *.o obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
