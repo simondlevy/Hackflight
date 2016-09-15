@@ -15,6 +15,8 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #define CONFIG_REBOOT_CHARACTER 'R'
 
 #ifdef __arm__

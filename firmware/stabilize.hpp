@@ -15,6 +15,8 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #define CONFIG_MAX_ANGLE_INCLINATION                500 /* 50 degrees */
 
 #ifdef __arm__

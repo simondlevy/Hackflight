@@ -1,5 +1,5 @@
 /*
-   sonars.hpp : Sonars class header
+   pidvals.hpp : PID values for a specific vehicle
 
    This file is part of Hackflight.
 
@@ -15,34 +15,22 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+// Level (accelerometer)
+static const uint8_t CONFIG_LEVEL_P          = 90;
+static const uint8_t CONFIG_LEVEL_I          = 10;
 
-#ifdef __arm__
-extern "C" {
-#endif
+// Rate (gyro): P must be positive
+static const uint8_t CONFIG_RATE_PITCHROLL_P = 33;
+static const uint8_t CONFIG_RATE_PITCHROLL_I = 30;
+static const uint8_t CONFIG_RATE_PITCHROLL_D = 23;
 
-    class Sonars {
-        
-        private:
+// Yaw: P must be positive
+static const uint8_t CONFIG_YAW_P            = 85;
+static const uint8_t CONFIG_YAW_I            = 45;
 
-            uint8_t  count;
-            bool     avail;
-            uint8_t  index;
-            bool     ready;
+// For altitude hover
+#define CONFIG_HOVER_ALT_P  120
+#define CONFIG_HOVER_ALT_I  45
+#define CONFIG_HOVER_ALT_D  1
 
-        public:
 
-            uint16_t getAltitude(void);
-
-            uint16_t distances[5];
-
-            void init(void);
-
-            bool available(void);
-
-            void update(void);
-    };
-
-#ifdef __arm__
-} // extern "C"
-#endif

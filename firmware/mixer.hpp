@@ -15,6 +15,8 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #define CONFIG_YAW_DIRECTION     1
 
 #ifdef __arm__

@@ -15,6 +15,14 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
+enum {
+    AXIS_ROLL = 0,
+    AXIS_PITCH,
+    AXIS_YAW
+};
+
 #define CONFIG_ACC_LPF_FACTOR     4
 #define CONFIG_ACCZ_DEADBAND      40
 #define CONFIG_ACCXY_DEADBAND     40

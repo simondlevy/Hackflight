@@ -15,8 +15,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 #include <stdint.h>
 #include <stdarg.h>
 #include <math.h>
@@ -56,29 +54,6 @@ void debug(const char * format, ...);
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
 #endif
-
-enum {
-    DEMAND_ROLL = 0,
-    DEMAND_PITCH,
-    DEMAND_YAW,
-    DEMAND_THROTTLE,
-    DEMAND_AUX1,
-    DEMAND_AUX2,
-    DEMAND_AUX3,
-    DEMAND_AUX4
-};
-
-enum {
-    AXIS_ROLL = 0,
-    AXIS_PITCH,
-    AXIS_YAW
-};
-
-typedef enum {
-    X = 0,
-    Y,
-    Z
-} sensor_axis_e;
 
 // Config =====================================================
 

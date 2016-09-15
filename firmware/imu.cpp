@@ -30,6 +30,12 @@ extern "C" {
 #define INV_GYR_CMPF_FACTOR   (1.0f / ((float)CONFIG_GYRO_CMPF_FACTOR + 1.0f))
 #define INV_GYR_CMPFM_FACTOR  (1.0f / ((float)CONFIG_GYRO_CMPFM_FACTOR + 1.0f))
 
+enum {
+    X = 0,
+    Y,
+    Z
+};
+
 
 typedef struct stdev_t {
     float m_oldM, m_newM, m_oldS, m_newS;

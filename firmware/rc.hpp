@@ -17,6 +17,20 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
+enum {
+    DEMAND_ROLL = 0,
+    DEMAND_PITCH,
+    DEMAND_YAW,
+    DEMAND_THROTTLE,
+    DEMAND_AUX1,
+    DEMAND_AUX2,
+    DEMAND_AUX3,
+    DEMAND_AUX4
+};
+
+
 // Define number of RC channels, and min/max PWM
 #define CONFIG_RC_CHANS 8
 #define CONFIG_PWM_MIN  990
