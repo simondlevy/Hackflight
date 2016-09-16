@@ -292,6 +292,22 @@ void loop(void)
 
 } // loop()
 
+
+void debug(const char * fmt, ...)
+{
+    va_list ap;       
+
+    va_start(ap, fmt);     
+
+    char buf[1000];
+
+    vsprintf(buf, fmt, ap);
+
+    Board::dump(buf);
+
+    va_end(ap);  
+}
+
 #ifdef __arm__
 } // extern "C"
 #endif

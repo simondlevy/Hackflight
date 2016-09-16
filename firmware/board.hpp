@@ -27,16 +27,16 @@ extern "C" {
 
             // your implementation should support these methods
 
-            static void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
-
             static bool     baroInit(void);
             static void     baroUpdate(void);
             static int32_t  baroGetPressure(void);
             static void     checkReboot(bool pendReboot);
+            static void     dump(char * msg);
             static void     delayMilliseconds(uint32_t msec);
             static uint32_t getMicros();
             static void     imuInit(uint16_t & acc1G, float & gyroScale);
             static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
+            static void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
             static void     ledGreenOff(void);
             static void     ledGreenOn(void);
             static void     ledGreenToggle(void);

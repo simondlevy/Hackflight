@@ -38,6 +38,12 @@ extern "C" {
    
 extern serialPort_t * Serial1;
 
+void Board::dump(char * msg)
+{
+    for (char * c = msg; *c; c++)
+        serialWrite(Serial1, (uint8_t)*c);
+}
+
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     mpu6050_init(false, &acc1G, &gyroScale, BOARD_VERSION);

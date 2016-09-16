@@ -19,6 +19,7 @@
 
 #include <math.h>
 #include <stdint.h>
+#include <stdarg.h>
 #include <Arduino.h>
 
 #include "board.hpp"
@@ -33,7 +34,13 @@
 // Parameters for brushed motors
 #define MOTOR_PWM_RATE          32000
 #define PWM_IDLE_PULSE          0
-    
+
+void Board::dump(char * msg)
+{
+    Serial.print(msg);
+}
+
+
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     //mpu6050_init(false, &acc1G, &gyroScale, BOARD_VERSION);

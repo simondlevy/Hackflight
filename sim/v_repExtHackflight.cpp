@@ -569,6 +569,11 @@ void errorDialog(char * message)
 #include <board.hpp>
 #include <rc.hpp>
 
+void Board::dump(char * msg)
+{
+    fputs(msg, stdout);
+}
+
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     // Mimic MPU6050

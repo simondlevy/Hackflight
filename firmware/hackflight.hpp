@@ -18,23 +18,14 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <math.h>
+#include <stdio.h>
 
 #include "crossplatform.h"
 
 #ifndef M_PI
 #endif
 
-#ifdef STM32F10X_MD 
-#include <printf.h>
-#endif
-
-#ifndef PRINTF
-#ifdef _SIM
 void debug(const char * format, ...);
-#else
-#define debug printf
-#endif
-#endif
 
 #include "board.hpp"
 #include "imu.hpp"
