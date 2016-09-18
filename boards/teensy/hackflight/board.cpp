@@ -23,6 +23,7 @@
 #include <Arduino.h>
 
 #include "board.hpp"
+#include <MPU6050.h>
 
 #define USE_CPPM                1
 #define PWM_FILTER              0     // 0 or 1
@@ -35,6 +36,32 @@
 #define MOTOR_PWM_RATE          32000
 #define PWM_IDLE_PULSE          0
 
+// We have just one LED --------------
+
+static MPU6050 accelgyro;
+static bool ledState;
+
+static void ledSet(uint8_t state)
+{
+    digitalWrite(13, state);
+}
+
+static void ledOff(void)
+{
+    ledSet(LOW);
+}
+
+static void ledOn(void)
+{
+    ledSet(HIGH);
+}
+
+static void ledToggle(void)
+{
+    ledState = !ledState;
+    ledSet(ledState ? HIGH : LOW);
+}
+
 void Board::dump(char * msg)
 {
     Serial.print(msg);
@@ -43,15 +70,18 @@ void Board::dump(char * msg)
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
-    //mpu6050_init(false, &acc1G, &gyroScale, BOARD_VERSION);
+    accelgyro.initialize();
 
-    gyroScale *= 0.000004f;
+    accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_2000);
+    accelgyro.setFullScaleAccelRange(MPU6050_ACCEL_FS_8);
+
+    acc1G     = 4096;
+    gyroScale = 4256./1e12;
 }
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
-    //mpu6050_read_accel(accADC);
-    //mpu6050_read_gyro(gyroADC);
+    accelgyro.getMotion6(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
 
     for (int k=0; k<3; ++k)
         gyroADC[k] /= 4;
@@ -59,29 +89,14 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
-    //i2cInit(I2CDEV_2);
-    //pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
+    pinMode(13, OUTPUT);
+    ledState = false;
+
+    Wire.begin(I2C_MASTER, 0x00, I2C_PINS_16_17, I2C_PULLUP_INT, I2C_RATE_400);
+    // XXX pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 
     looptimeMicroseconds = IMU_LOOPTIME_USEC;
     calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
-}
-
-bool Board::baroInit(void)
-{
-  return false;
-}
-
-void Board::baroUpdate(void)
-{
-}
-
-int32_t Board::baroGetPressure(void)
-{
-    return 0;
-}
-
-void Board::checkReboot(bool pendReboot)
-{
 }
 
 void Board::delayMilliseconds(uint32_t msec)
@@ -96,32 +111,32 @@ uint32_t Board::getMicros()
 
 void Board::ledGreenOff(void)
 {
-    //digitalHi(LED0_GPIO, LED0_PIN);
+    ledOff();
 }
 
 void Board::ledGreenOn(void)
 {
-    //digitalLo(LED0_GPIO, LED0_PIN);
+    ledOn();
 }
 
 void Board::ledGreenToggle(void)
 {
-    //digitalToggle(LED0_GPIO, LED0_PIN);
+    ledToggle();
 }
 
 void Board::ledRedOff(void)
 {
-    //digitalHi(LED1_GPIO, LED1_PIN);
+    ledOff();
 }
 
 void Board::ledRedOn(void)
 {
-    //digitalLo(LED1_GPIO, LED1_PIN);
+    ledOn();
 }
 
 void Board::ledRedToggle(void)
 {
-    //digitalToggle(LED1_GPIO, LED1_PIN);
+    ledToggle();
 }
 
 uint16_t Board::readPWM(uint8_t chan)
@@ -181,3 +196,24 @@ void Board::showAuxStatus(uint8_t status)
 {
     status = status; // avoid compiler warning about unused variable
 }
+
+
+bool Board::baroInit(void)
+{
+  return false;
+}
+
+void Board::baroUpdate(void)
+{
+}
+
+int32_t Board::baroGetPressure(void)
+{
+    return 0;
+}
+
+void Board::checkReboot(bool pendReboot)
+{
+}
+
+

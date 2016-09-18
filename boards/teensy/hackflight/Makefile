@@ -13,11 +13,14 @@
 #   You should have received a copy of the GNU General Public License
 #   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 
- verify:
+verify:
 	arduino --verify hackflight.ino
 
 flash:
 	arduino --upload hackflight.ino
+
+edit:
+	vim board.cpp
 
 listen:
 	miniterm.py /dev/ttyACM0 115200

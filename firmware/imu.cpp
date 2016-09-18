@@ -23,7 +23,6 @@ extern "C" {
 #include <stdio.h>
 #endif
 
-
 #include "hackflight.hpp"
 #include "filters.hpp"
 
@@ -241,6 +240,7 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
         }
         accMag += (int32_t)accelSmooth[axis] * accelSmooth[axis];
     }
+
     accMag = accMag * 100 / ((int32_t)this->acc1G * this->acc1G);
 
     rotateV(EstG, deltaGyroAngle);
@@ -249,10 +249,9 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     // If accel magnitude >1.15G or <0.85G and ACC vector outside of the limit
     // range => we neutralize the effect of accelerometers in the angle
     // estimation.  To do that, we just skip filter, as EstV already rotated by Gyro
-    if (72 < (uint16_t)accMag && (uint16_t)accMag < 133) {
+    if (72 < (uint16_t)accMag && (uint16_t)accMag < 133) 
         for (uint8_t axis = 0; axis < 3; axis++)
             EstG[axis] = (EstG[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + accelSmooth[axis]) * INV_GYR_CMPF_FACTOR;
-    }
 
     // Attitude of the estimated vector
     anglerad[AXIS_ROLL] = atan2f(EstG[Y], EstG[Z]);

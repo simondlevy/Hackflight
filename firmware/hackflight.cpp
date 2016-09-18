@@ -243,6 +243,7 @@ void loop(void)
 
     if (imuTask.checkAndUpdate(currentTime)) {
 
+
         imu.update(currentTime, armed, calibratingA, calibratingG);
 
         haveSmallAngle = abs(imu.angle[0]) < CONFIG_SMALL_ANGLE && abs(imu.angle[1]) < CONFIG_SMALL_ANGLE;
