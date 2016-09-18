@@ -150,17 +150,17 @@ void Board::reboot(void)
 
 uint8_t Board::serialAvailableBytes(void)
 {
-    return 0;//serialTotalBytesWaiting(Serial1);
+    return Serial.available();
 }
 
 uint8_t Board::serialReadByte(void)
 {
-    return 0;//serialRead(Serial1);
+    return Serial.read();
 }
 
 void Board::serialWriteByte(uint8_t c)
 {
-    //serialWrite(Serial1, c);
+    Serial.write(c);
 }
 
 void Board::writeMotor(uint8_t index, uint16_t value)
