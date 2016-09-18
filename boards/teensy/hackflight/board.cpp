@@ -20,14 +20,12 @@
 #include <math.h>
 #include <stdint.h>
 #include <stdarg.h>
+
 #include <Arduino.h>
+#include <MPU6050.h>
+#include <PulsePosition.h>
 
 #include "board.hpp"
-#include <MPU6050.h>
-
-#define USE_CPPM                1
-#define PWM_FILTER              0     // 0 or 1
-#define FAST_PWM                0     // 0 or 1
 
 #define IMU_LOOPTIME_USEC       3500
 #define CALIBRATING_GYRO_MSEC   3500
@@ -36,10 +34,11 @@
 #define MOTOR_PWM_RATE          32000
 #define PWM_IDLE_PULSE          0
 
-// We have just one LED --------------
+#define PPM_INPUT_PIN           5
 
 static MPU6050 accelgyro;
 static bool ledState;
+static PulsePositionInput ppmIn;
 
 static void ledSet(uint8_t state)
 {
@@ -93,7 +92,10 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     ledState = false;
 
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_16_17, I2C_PULLUP_INT, I2C_RATE_400);
+
     // XXX pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
+
+    ppmIn.begin(PPM_INPUT_PIN);
 
     looptimeMicroseconds = IMU_LOOPTIME_USEC;
     calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
@@ -141,11 +143,7 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    return 0;//pwmRead(chan);
-}
-
-void Board::reboot(void)
-{
+    return (uint16_t)ppmIn.read(chan+1);
 }
 
 uint8_t Board::serialAvailableBytes(void)
@@ -166,6 +164,12 @@ void Board::serialWriteByte(uint8_t c)
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
     //pwmWriteMotor(index, value);
+}
+
+// Non-essentials ----------------------------------------------------------------
+
+void Board::reboot(void)
+{
 }
 
 bool Board::sonarInit(uint8_t index) 
