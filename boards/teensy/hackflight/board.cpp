@@ -34,7 +34,7 @@
 #define MOTOR_PWM_RATE          32000
 #define PWM_IDLE_PULSE          0
 
-#define PPM_INPUT_PIN           5
+#define PPM_INPUT_PIN           10
 
 static MPU6050 accelgyro;
 static bool ledState;
