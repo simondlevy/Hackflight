@@ -66,7 +66,6 @@ void Board::dump(char * msg)
     Serial.print(msg);
 }
 
-
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     accelgyro.initialize();
@@ -91,7 +90,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     pinMode(13, OUTPUT);
     ledState = false;
 
-    Wire.begin(I2C_MASTER, 0x00, I2C_PINS_16_17, I2C_PULLUP_INT, I2C_RATE_400);
+    Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, I2C_RATE_400);
 
     // XXX pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 
