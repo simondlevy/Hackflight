@@ -23,6 +23,7 @@
 
 #include <Arduino.h>
 #include <MPU6050.h>
+#include <Servo.h>
 #include <PulsePosition.h>
 
 #include "board.hpp"
@@ -30,11 +31,10 @@
 #define IMU_LOOPTIME_USEC       3500
 #define CALIBRATING_GYRO_MSEC   3500
 
-// Parameters for brushed motors
-#define MOTOR_PWM_RATE          32000
-#define PWM_IDLE_PULSE          0
-
 #define PPM_INPUT_PIN           10
+
+static uint8_t MOTOR_PINS[4] = {2,3,4,5};
+Servo motors[4];
 
 static MPU6050 accelgyro;
 static bool ledState;
@@ -87,15 +87,24 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
+    // Set up LED
     pinMode(13, OUTPUT);
     ledState = false;
 
+    // Set up I^2C
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, I2C_RATE_400);
 
-    // XXX pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
-
+    // Set up motors (ESCs)
+    for (int k=0; k<4; ++k)
+        motors[k].attach(MOTOR_PINS[k]);
+    
+    // Set up PPM receiver
     ppmIn.begin(PPM_INPUT_PIN);
 
+    // Set up serial communication over USB
+    Serial.begin(115200);
+
+    // XXX these values should probably be #define'd generally for all physical (non-simulated) boards
     looptimeMicroseconds = IMU_LOOPTIME_USEC;
     calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
 }
@@ -162,7 +171,7 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
-    //pwmWriteMotor(index, value);
+    motors[index].writeMicroseconds(value);    
 }
 
 // Non-essentials ----------------------------------------------------------------
