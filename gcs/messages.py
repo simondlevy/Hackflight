@@ -23,7 +23,7 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 UPDATE_MSEC = 50
 SCROLLBAR_WIDTH = 20
 
-from Tkinter import *
+from tkcompat import *
 
 from dialog import Dialog
 

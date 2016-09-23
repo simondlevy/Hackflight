@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 main.py : starter script for  Hackflight GCS
@@ -38,7 +38,9 @@ import os
 
 from msppg import *
 
-from Tkinter import *
+from tkcompat import *
+
+
 from setup import Setup
 from motors import Motors
 from receiver import Receiver

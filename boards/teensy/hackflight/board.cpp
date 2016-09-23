@@ -95,7 +95,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, I2C_RATE_400);
 
     // Set up motors (ESCs)
-    for (int k=0; k<4; ++k)
+    for (int k=0; k<4; ++k) 
         motors[k].attach(MOTOR_PINS[k]);
     
     // Set up PPM receiver
