@@ -31,7 +31,7 @@ extern "C" {
             static void     baroUpdate(void);
             static int32_t  baroGetPressure(void);
             static void     checkReboot(bool pendReboot);
-            static void     dump(char * msg);
+            static void     debug(char c);
             static void     delayMilliseconds(uint32_t msec);
             static uint32_t getMicros();
             static void     imuInit(uint16_t & acc1G, float & gyroScale);

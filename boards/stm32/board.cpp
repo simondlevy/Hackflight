@@ -38,12 +38,6 @@ extern "C" {
    
 extern serialPort_t * Serial1;
 
-void Board::dump(char * msg)
-{
-    for (char * c = msg; *c; c++)
-        serialWrite(Serial1, (uint8_t)*c);
-}
-
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     mpu6050_init(false, &acc1G, &gyroScale, BOARD_VERSION);
@@ -67,6 +61,11 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
     looptimeMicroseconds = IMU_LOOPTIME_USEC;
     calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
+}
+
+void Board::debug(char c)
+{
+    serialWrite(Serial1, c);
 }
 
 bool Board::baroInit(void)

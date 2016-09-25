@@ -304,7 +304,8 @@ void debug(const char * fmt, ...)
 
     vsprintf(buf, fmt, ap);
 
-    Board::dump(buf);
+    for (char * c = buf; *c; c++)
+        Board::debug(*c);
 
     va_end(ap);  
 }

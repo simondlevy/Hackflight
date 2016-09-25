@@ -569,9 +569,9 @@ void errorDialog(char * message)
 #include <board.hpp>
 #include <rc.hpp>
 
-void Board::dump(char * msg)
+void Board::debug(char c)
 {
-    fputs(msg, stdout);
+    putchar(c);
 }
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
