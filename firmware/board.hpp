@@ -27,10 +27,7 @@ extern "C" {
 
             // your implementation should support these methods
 
-            static bool     baroInit(void);
-            static void     baroUpdate(void);
-            static int32_t  baroGetPressure(void);
-            static void     checkReboot(bool pendReboot);
+            // Essential
             static void     debug(char c);
             static void     delayMilliseconds(uint32_t msec);
             static uint32_t getMicros();
@@ -44,16 +41,26 @@ extern "C" {
             static void     ledRedOn(void);
             static void     ledRedToggle(void);
             static uint16_t readPWM(uint8_t chan);
-            static void     reboot(void);
             static uint8_t  serialAvailableBytes(void);
             static uint8_t  serialReadByte(void);
             static void     serialWriteByte(uint8_t c);
             static void     showArmedStatus(bool armed);
             static void     showAuxStatus(uint8_t status);
+            static void     writeMotor(uint8_t index, uint16_t value);
+
+            // STM32
+            static void     checkReboot(bool pendReboot);
+            static void     reboot(void);
+
+            // Baro
+            static bool     baroInit(void);
+            static void     baroUpdate(void);
+            static int32_t  baroGetPressure(void);
+
+            // Sonar
             static bool     sonarInit(uint8_t index);
             static void     sonarUpdate(uint8_t index);
             static uint16_t sonarGetDistance(uint8_t index);
-            static void     writeMotor(uint8_t index, uint16_t value);
 
     }; // class Board
 
