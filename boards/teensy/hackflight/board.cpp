@@ -70,7 +70,14 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     accelgyro.initialize();
 
-    accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_2000);
+    // Gyro config
+    accelgyro.setRate(0x00); // Sample Rate = Gyroscope Output Rate / (1 + SMPLRT_DIV)
+    accelgyro.setClockSource(MPU6050_CLOCK_PLL_ZGYRO); // Clock source = 3 (PLL with Z Gyro reference)
+    delay(10);    
+    accelgyro.setDLPFMode(MPU6050_DLPF_BW_42); // set DLPF
+    accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_2000); // full-scale 2kdps gyro range
+
+    // Accel scale 8g (4096 LSB/g) 
     accelgyro.setFullScaleAccelRange(MPU6050_ACCEL_FS_8);
 
     acc1G     = 4096;
