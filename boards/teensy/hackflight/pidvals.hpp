@@ -16,17 +16,17 @@
  */
 
 // Level (accelerometer)
-static const uint8_t CONFIG_LEVEL_P          = 90;
-static const uint8_t CONFIG_LEVEL_I          = 10;
+static const uint8_t CONFIG_LEVEL_P          = 40;
+static const uint8_t CONFIG_LEVEL_I          = 2;
 
 // Rate (gyro): P must be positive
-static const uint8_t CONFIG_RATE_PITCHROLL_P = 33;
-static const uint8_t CONFIG_RATE_PITCHROLL_I = 30;
-static const uint8_t CONFIG_RATE_PITCHROLL_D = 23;
+static const uint8_t CONFIG_RATE_PITCHROLL_P = 20;
+static const uint8_t CONFIG_RATE_PITCHROLL_I = 15;
+static const uint8_t CONFIG_RATE_PITCHROLL_D = 11;
 
 // Yaw: P must be positive
-static const uint8_t CONFIG_YAW_P            = 85;
-static const uint8_t CONFIG_YAW_I            = 45;
+static const uint8_t CONFIG_YAW_P            = 40;
+static const uint8_t CONFIG_YAW_I            = 20;
 
 // For altitude hover
 #define CONFIG_HOVER_ALT_P  120
