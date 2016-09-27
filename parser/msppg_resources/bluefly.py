@@ -41,12 +41,10 @@ class App:
 
         pygame.joystick.init()
 
-        self.my_joystick = None
- 
         self.joystick_name = pygame.joystick.Joystick(0).get_name()
  
-        self.my_joystick = pygame.joystick.Joystick(0)
-        self.my_joystick.init()
+        self.joystick = pygame.joystick.Joystick(0)
+        self.joystick.init()
  
     def main(self):
 
@@ -64,7 +62,7 @@ class App:
                 break
 
     def _chanval(self, index):
-        return self.my_joystick.get_axis(CHANMAP[index])
+        return self.joystick.get_axis(CHANMAP[index])
  
     def quit(self):
 
