@@ -31,24 +31,25 @@ from pygame.locals import KEYDOWN, K_ESCAPE, QUIT
 class App:
 
     def __init__(self):
+
         pygame.init()
  
+        if pygame.joystick.get_count() < 1:
+            print('No joy')
+            exit(1)
+
         pygame.display.set_caption("Bluefly")
  
         # Set up the joystick
+
         pygame.joystick.init()
- 
+
         self.my_joystick = None
-        self.joystick_names = []
  
-        # Enumerate joysticks
-        for i in range(0, pygame.joystick.get_count()):
-            self.joystick_names.append(pygame.joystick.Joystick(i).get_name())
+        self.joystick_name = pygame.joystick.Joystick(0).get_name()
  
-        # By default, load the first available joystick.
-        if (len(self.joystick_names) > 0):
-            self.my_joystick = pygame.joystick.Joystick(0)
-            self.my_joystick.init()
+        self.my_joystick = pygame.joystick.Joystick(0)
+        self.my_joystick.init()
  
         max_joy = max(self.my_joystick.get_numaxes(), 
                       self.my_joystick.get_numbuttons(), 
@@ -108,8 +109,7 @@ class App:
                     self.quit()
                     return
  
-            self.draw_text("Joystick Name:  %s" % self.joystick_names[0], 
-                           5, 5, (0, 255, 0))
+            self.draw_text("Joystick Name:  %s" % self.joystick_name, 5, 5, (0, 255, 0))
  
             self.draw_text("Axes (%d)" % self.my_joystick.get_numaxes(), 
                            5, 25, (255, 255, 255))
