@@ -21,6 +21,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
+PYTHON_EXAMPLES = ['getimu', 'getrc', 'imudisplay', 'blueimudisplay', 'setrc']
+
 from sys import exit, argv
 import os
 import json
@@ -114,12 +116,9 @@ class Python_Emitter(CodeEmitter):
     def __init__(self, msgdict):
 
         CodeEmitter.__init__(self, 'python', 'py')
-        
-        self._copy_example('getimu')
-        self._copy_example('getrc')
-        self._copy_example('imudisplay')
-        self._copy_example('blueimudisplay')
-        self._copy_example('setrc')
+
+        for example in PYTHON_EXAMPLES:
+            self._copy_example(example)
 
         mkdir_if_missing('output/python/msppg')
 
