@@ -26,14 +26,14 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 BT_ADDR = "00:06:66:73:e3:a6"
 
 import pygame
-from pygame.locals import *
+from pygame.locals import KEYDOWN, K_ESCAPE, QUIT
  
 class App:
 
     def __init__(self):
         pygame.init()
  
-        pygame.display.set_caption("Joystick Analyzer")
+        pygame.display.set_caption("Bluefly")
  
         # Set up the joystick
         pygame.joystick.init()
@@ -44,8 +44,6 @@ class App:
         # Enumerate joysticks
         for i in range(0, pygame.joystick.get_count()):
             self.joystick_names.append(pygame.joystick.Joystick(i).get_name())
- 
-        print(self.joystick_names)
  
         # By default, load the first available joystick.
         if (len(self.joystick_names) > 0):
