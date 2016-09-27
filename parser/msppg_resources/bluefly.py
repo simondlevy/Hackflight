@@ -3,8 +3,6 @@
 '''
 bluefly.py : Fly your quadcopter from a game controller using Bluetooth + PyGame + MSPPG
 
- Adapted from http://pygame.org/wiki/Joystick_analyzer
-
 **************************** BE CAREFUL ********************************
 
 Copyright (C) Simon D. Levy 2016
@@ -54,16 +52,7 @@ class App:
 
         while (True):
 
-            self.g_keys = pygame.event.get()
- 
-            for event in self.g_keys:
-                if (event.type == KEYDOWN and event.key == K_ESCAPE):
-                    self.quit()
-                    return
- 
-                elif (event.type == QUIT):
-                    self.quit()
-                    return
+            pygame.event.get()
  
             print('Roll: %+3.3f | Pitch: %+3.3f | Yaw: %+3.3f | Throttle: %+3.3f' % 
                     (self._chanval(0), self._chanval(1), self._chanval(2), self._chanval(3)))
