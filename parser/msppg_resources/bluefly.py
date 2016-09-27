@@ -52,12 +52,17 @@ class App:
 
         while (True):
 
-            pygame.event.get()
- 
-            print('Roll: %+3.3f | Pitch: %+3.3f | Yaw: %+3.3f | Throttle: %+3.3f' % 
-                    (self._chanval(0), self._chanval(1), self._chanval(2), self._chanval(3)))
+            try:
 
- 
+                pygame.event.get()
+     
+                print('Roll: %+3.3f | Pitch: %+3.3f | Yaw: %+3.3f | Throttle: %+3.3f' % 
+                        (self._chanval(0), self._chanval(1), self._chanval(2), self._chanval(3)))
+
+            except KeyboardInterrupt:
+
+                break
+
     def _chanval(self, index):
         return self.my_joystick.get_axis(CHANMAP[index])
  
