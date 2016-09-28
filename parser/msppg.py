@@ -179,7 +179,7 @@ class Python_Emitter(CodeEmitter):
             self._write(')\n\n')
             self._write(self.indent)
 
-            self._write('msg = chr(len(message_buffer)) + chr(%s) + message_buffer\n\n' % msgid)
+            self._write('msg = chr(len(message_buffer)) + chr(%s) + str(message_buffer)\n\n' % msgid)
             self._write(self.indent + 'return _bytes(\'$M%c\' + msg + chr(_CRC8(msg)))\n\n' %
                     ('>' if msgid < 200 else '<'))
 

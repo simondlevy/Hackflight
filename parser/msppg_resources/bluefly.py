@@ -36,6 +36,9 @@ PWMMAX = 2000
 import pygame
 
 from msppg import serialize_SET_RAW_RC
+
+# XXX test with serial for now
+from serial import Serial
  
 class App(object):
 
@@ -55,6 +58,8 @@ class App(object):
         self.joystick.init()
 
         self.throttle = -1
+
+        self.serial = Serial('/dev/ttyUSB0', 115200)
  
     def main(self):
 
@@ -67,12 +72,20 @@ class App(object):
                 # Special handling for throttle
                 self.throttle -= self._axval(3) * THROTINC
                 self.throttle = max(min(self.throttle, +1), -1)
+
+                chan1, chan2, chan3, chan4 =  \
+                  self._axis2pwm(0), self._axis2pwm(1,-1), self._axis2pwm(2), self._axval2pwm(self.throttle)
+
+                # Ignore channels 5-8 for now
+                msg = serialize_SET_RAW_RC(chan1, chan2, chan3, chan4, 0, 0, 0, 0)
+
+                print(msg)
      
-                print('Roll: %4d | Pitch: %4d | Yaw: %4d | Throttle: %4d' % 
-                        (self._axis2pwm(0), self._axis2pwm(1,-1), self._axis2pwm(2), self._axval2pwm(self.throttle)))
+                print('Roll: %4d | Pitch: %4d | Yaw: %4d | Throttle: %4d' % (chan1, chan2, chan3, chan4))
 
             except KeyboardInterrupt:
 
+                self.serial.close()
                 break
 
     def _axval(self, index):
