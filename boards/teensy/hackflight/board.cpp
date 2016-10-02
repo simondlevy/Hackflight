@@ -1,7 +1,9 @@
 /*
    board.cpp : implementation of board-specific routines
 
-   This implemenation is for Teensy 3.1 / 3.2
+   This implemenation is for Teensy 3.1 / 3.2 with MPU9250 IMU. 
+
+   MPU9250 code adapted from https://github.com/kriswiner/MPU-9250
 
    This file is part of Hackflight.
 
