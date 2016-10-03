@@ -33,7 +33,7 @@
 #define IMU_LOOPTIME_USEC       3500
 #define CALIBRATING_GYRO_MSEC   3500
 
-#define PPM_INPUT_PIN           23
+#define PPM_INPUT_PIN           5
 
 #define MPU9250_ADDRESS  0x68  
 
