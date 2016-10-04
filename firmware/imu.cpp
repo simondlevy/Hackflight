@@ -156,7 +156,7 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     float deltaGyroAngle[3];
     uint32_t deltaT_usec = currentTime - previousTime;
     float deltaT_sec = deltaT_usec * 0.000001f; 
-    float scale = deltaT_sec* this->gyroScale * 4; 
+    float scale = deltaT_sec* this->gyroScale; 
 
     // calculate RC time constant used in the this->accelZ lpf    
     int16_t  accelADC[3];
@@ -165,10 +165,6 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     previousTime = currentTime;
 
     Board::imuRead(accelADC, this->gyroADC);
-
-    // XXX why do we need this?
-    for (int k=0; k<3; ++k)
-        gyroADC[k] /= 4;
 
     if (calibratingA > 0) {
 

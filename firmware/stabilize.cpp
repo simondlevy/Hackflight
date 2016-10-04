@@ -58,6 +58,8 @@ void Stabilize::update(void)
 
         int32_t error = (int32_t)this->rc->command[axis] * 10 * 8 / this->rate_p[axis];
 
+        this->imu->gyroADC[axis] /= 4;
+
         error -= this->imu->gyroADC[axis];
 
         int32_t PTermGYRO = this->rc->command[axis];
