@@ -166,6 +166,10 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
 
     Board::imuRead(accelADC, this->gyroADC);
 
+    // XXX do we need this?
+    for (int k=0; k<3; ++k)
+        gyroADC[k] /= 4;
+
     if (calibratingA > 0) {
 
         for (uint8_t axis = 0; axis < 3; axis++) {

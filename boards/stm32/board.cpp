@@ -48,8 +48,6 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
     mpu6050_read_accel(accADC);
     mpu6050_read_gyro(gyroADC);
 
-    for (int k=0; k<3; ++k)
-        gyroADC[k] /= 4;
 }
 
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
