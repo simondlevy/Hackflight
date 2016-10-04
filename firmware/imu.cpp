@@ -151,12 +151,12 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     static uint32_t previousTime;
 
     int32_t accMag = 0;
-    float dT = 0;
     float rpy[3];
     float accel_ned[3];
     float deltaGyroAngle[3];
-    uint32_t deltaT = currentTime - previousTime;
-    float scale = deltaT * 0.000001f * this->gyroScale * 4; 
+    uint32_t deltaT_usec = currentTime - previousTime;
+    float deltaT_sec = deltaT_usec * 0.000001f; 
+    float scale = deltaT_sec* this->gyroScale * 4; 
 
     // calculate RC time constant used in the this->accelZ lpf    
     int16_t  accelADC[3];
@@ -274,9 +274,6 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     float Yh = EstN[Y] * cosineRoll - EstN[Z] * sineRoll;
     anglerad[AXIS_YAW] = atan2f(Yh, Xh); 
 
-    // deltaT is measured in us ticks
-    dT = (float)deltaT * 1e-6f;
-
     // the accel values have to be rotated into the earth frame
     rpy[0] = -(float)anglerad[AXIS_ROLL];
     rpy[1] = -(float)anglerad[AXIS_PITCH];
@@ -294,7 +291,7 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     }
     accel_ned[Z] -= accelZoffset / 64;  // compensate for gravitation on z-axis
 
-    accz_smooth = accz_smooth + (dT / (fcAcc + dT)) * (accel_ned[Z] - accz_smooth); // low pass filter
+    accz_smooth = accz_smooth + (deltaT_sec / (fcAcc + deltaT_sec)) * (accel_ned[Z] - accz_smooth); // low pass filter
 
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
@@ -302,7 +299,7 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     this->accelSum[Y] += deadbandFilter((int32_t)lrintf(accel_ned[Y]), CONFIG_ACCXY_DEADBAND);
     this->accelSum[Z] += deadbandFilter((int32_t)lrintf(accz_smooth), CONFIG_ACCZ_DEADBAND);
 
-    this->accelTimeSum += deltaT;
+    this->accelTimeSum += deltaT_usec;
     this->accelSumCount++;
 
     // Convert angles from radians to tenths of a degrees
