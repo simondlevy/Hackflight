@@ -219,8 +219,11 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
     writeByte(MPU9250_ADDRESS, INT_PIN_CFG, 0x22);    
     writeByte(MPU9250_ADDRESS, INT_ENABLE, 0x01);  // Enable data ready (bit 0) interrupt
  
-    acc1G     = 4096;
-    gyroScale = 4256./1e12;
+    // Accel scale 8g (4096 LSB/g)
+    acc1G = 4096;
+
+    // 16.4 dps/lsb scalefactor for all Invensense devices
+    gyroScale = (1.0f / 16.4f) * (M_PI / 180.0f);
 }
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
