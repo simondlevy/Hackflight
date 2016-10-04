@@ -32,7 +32,7 @@ void Stabilize::init(class RC * _rc, class IMU * _imu)
     this->imu = _imu;
 
     for (uint8_t axis=0; axis<3; ++axis) {
-        this->lastGyro[axis] = 0;
+        this->lastGyroError[axis] = 0;
         this->delta1[axis] = 0;
         this->delta2[axis] = 0;
     }
@@ -56,16 +56,14 @@ void Stabilize::update(void)
 {
     for (uint8_t axis = 0; axis < 3; axis++) {
 
-        int32_t error = (int32_t)this->rc->command[axis] * 10 * 8 / this->rate_p[axis];
+        int32_t gyroError = this->imu->gyroADC[axis] / 4;
 
-        this->imu->gyroADC[axis] /= 4;
-
-        error -= this->imu->gyroADC[axis];
+        int32_t error = (int32_t)this->rc->command[axis] * 10 * 8 / this->rate_p[axis] - gyroError;
 
         int32_t PTermGYRO = this->rc->command[axis];
 
         this->errorGyroI[axis] = constrain(this->errorGyroI[axis] + error, -16000, +16000); // WindUp
-        if ((abs(this->imu->gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (abs(this->rc->command[axis]) > 100)))
+        if ((abs(gyroError) > 640) || ((axis == AXIS_YAW) && (abs(this->rc->command[axis]) > 100)))
             this->errorGyroI[axis] = 0;
         int32_t ITermGYRO = (this->errorGyroI[axis] / 125 * this->rate_i[axis]) >> 6;
 
@@ -92,9 +90,9 @@ void Stabilize::update(void)
             ITerm = (ITermACC * (500 - prop) + ITermGYRO * prop) / 500;
         } 
 
-        PTerm -= (int32_t)this->imu->gyroADC[axis] * this->rate_p[axis] / 10 / 8; // 32 bits is needed for calculation
-        int32_t delta = this->imu->gyroADC[axis] - this->lastGyro[axis];
-        this->lastGyro[axis] = this->imu->gyroADC[axis];
+        PTerm -= gyroError * this->rate_p[axis] / 10 / 8; // 32 bits is needed for calculation
+        int32_t delta = gyroError - this->lastGyroError[axis];
+        this->lastGyroError[axis] = gyroError;
         int32_t deltaSum = this->delta1[axis] + this->delta2[axis] + delta;
         this->delta2[axis] = this->delta1[axis];
         this->delta1[axis] = delta;
