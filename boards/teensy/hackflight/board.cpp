@@ -72,31 +72,9 @@ static uint8_t Ascale = AFS_8G;
 static uint8_t MOTOR_PINS[4] = {2,3,4,5};
 Servo motors[4];
 
-// LED utility functions ---------------------------------------------------------------
 
-static bool ledState;
 static PulsePositionInput ppmIn;
 
-static void ledSet(uint8_t state)
-{
-    digitalWrite(13, state);
-}
-
-static void ledOff(void)
-{
-    ledSet(LOW);
-}
-
-static void ledOn(void)
-{
-    ledSet(HIGH);
-}
-
-static void ledToggle(void)
-{
-    ledState = !ledState;
-    ledSet(ledState ? HIGH : LOW);
-}
 
 // I^2C utility functions --------------------------------------------------------------
 
@@ -236,8 +214,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 {
     // Set up LED
     pinMode(13, OUTPUT);
-    ledState = false;
-
+    
     // Set up I^2C
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_16_17, I2C_PULLUP_INT, I2C_RATE_400);
 
@@ -266,34 +243,9 @@ uint32_t Board::getMicros()
     return micros();
 }
 
-void Board::ledGreenOff(void)
+void Board::ledSetState(uint8_t id, bool state)
 {
-    ledOff();
-}
-
-void Board::ledGreenOn(void)
-{
-    ledOn();
-}
-
-void Board::ledGreenToggle(void)
-{
-    ledToggle();
-}
-
-void Board::ledRedOff(void)
-{
-    ledOff();
-}
-
-void Board::ledRedOn(void)
-{
-    ledOn();
-}
-
-void Board::ledRedToggle(void)
-{
-    ledToggle();
+    digitalWrite(13, state); // we only have one LED
 }
 
 uint16_t Board::readPWM(uint8_t chan)

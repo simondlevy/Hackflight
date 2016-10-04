@@ -95,34 +95,17 @@ uint32_t Board::getMicros()
     return micros();
 }
 
-void Board::ledGreenOff(void)
+void Board::ledSetState(uint8_t id, bool state)
 {
-    digitalHi(LED0_GPIO, LED0_PIN);
-}
+    GPIO_TypeDef * gpio = id ? LED1_GPIO : LED0_GPIO;
+    uint8_t pin = id ? LED1_PIN  : LED0_PIN;
 
-void Board::ledGreenOn(void)
-{
-    digitalLo(LED0_GPIO, LED0_PIN);
-}
-
-void Board::ledGreenToggle(void)
-{
-    digitalToggle(LED0_GPIO, LED0_PIN);
-}
-
-void Board::ledRedOff(void)
-{
-    digitalHi(LED1_GPIO, LED1_PIN);
-}
-
-void Board::ledRedOn(void)
-{
-    digitalLo(LED1_GPIO, LED1_PIN);
-}
-
-void Board::ledRedToggle(void)
-{
-    digitalToggle(LED1_GPIO, LED1_PIN);
+    if (state) {
+        digitalLo(gpio, pin);
+    }
+    else {
+        digitalHi(gpio, pin);
+    }
 }
 
 uint16_t Board::readPWM(uint8_t chan)

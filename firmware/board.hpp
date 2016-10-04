@@ -27,26 +27,23 @@ extern "C" {
 
             // your implementation should support these methods
 
-            // Essential
+            // Core functionality
             static void     debug(char c);
             static void     delayMilliseconds(uint32_t msec);
             static uint32_t getMicros();
             static void     imuInit(uint16_t & acc1G, float & gyroScale);
             static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
             static void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
-            static void     ledGreenOff(void);
-            static void     ledGreenOn(void);
-            static void     ledGreenToggle(void);
-            static void     ledRedOff(void);
-            static void     ledRedOn(void);
-            static void     ledRedToggle(void);
+            static void     ledSetState(uint8_t id, bool state);
             static uint16_t readPWM(uint8_t chan);
             static uint8_t  serialAvailableBytes(void);
             static uint8_t  serialReadByte(void);
             static void     serialWriteByte(uint8_t c);
+            static void     writeMotor(uint8_t index, uint16_t value);
+
+            // Helps with simulation
             static void     showArmedStatus(bool armed);
             static void     showAuxStatus(uint8_t status);
-            static void     writeMotor(uint8_t index, uint16_t value);
 
             // STM32
             static void     checkReboot(bool pendReboot);

@@ -150,13 +150,6 @@ class LED {
         float color[3];
         bool on;
 
-        void set(bool status)
-        {
-            this->on = status;
-            float black[3] = {0,0,0};
-            simSetShapeColor(this->handle, NULL, 0, this->on ? this->color : black);
-        }
-
     public:
 
         LED(void) { }
@@ -170,23 +163,15 @@ class LED {
             this->on = false;
         }
 
-        void turnOff(void) 
+        void set(bool status)
         {
-            this->set(false);
-        }
-
-        void turnOn(void) 
-        {
-            this->set(true);
-        }
-
-        void toggle(void) 
-        {
-            this->set(!this->on);
+            this->on = status;
+            float black[3] = {0,0,0};
+            simSetShapeColor(this->handle, NULL, 0, this->on ? this->color : black);
         }
 };
 
-static LED greenLED, redLED;
+static LED leds[2];
 
 // Dialog support
 static int displayDialog(const char * title, char * message, float r, float g, float b, int style)
@@ -429,8 +414,8 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
     controllerClose();
 
     // Turn off LEDs
-    greenLED.turnOff();
-    redLED.turnOff();
+    leds[0].set(false);
+    leds[1].set(false);
 
     // Hide any toast dialogs that may still be visible
     hideToastDialog();
@@ -599,9 +584,15 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     looptimeMicroseconds = 10000;
     calibratingGyroMsec = 100;  // long enough to see but not to annoy
 
-    greenLED.init(greenLedHandle, 0, 1, 0);
-    redLED.init(redLedHandle, 1, 0, 0);
+    leds[0].init(greenLedHandle, 0, 1, 0);
+    leds[1].init(redLedHandle, 1, 0, 0);
 }
+
+void Board::ledSetState(uint8_t id, bool state)
+{
+    leds[id].set(state);
+}
+
 
 bool Board::baroInit(void)
 {
@@ -629,35 +620,6 @@ uint32_t Board::getMicros()
     return micros; 
 }
 
-void Board::ledGreenOff(void)
-{
-    greenLED.turnOff();
-}
-
-void Board::ledGreenOn(void)
-{
-    greenLED.turnOn();
-}
-
-void Board::ledGreenToggle(void)
-{
-    greenLED.toggle();
-}
-
-void Board::ledRedOff(void)
-{
-    redLED.turnOff();
-}
-
-void Board::ledRedOn(void)
-{
-    redLED.turnOn();
-}
-
-void Board::ledRedToggle(void)
-{
-    redLED.toggle();
-}
 
 uint16_t Board::readPWM(uint8_t chan)
 {

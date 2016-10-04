@@ -93,6 +93,22 @@ static uint16_t calibratingG;
 static bool     haveSmallAngle;
 static bool     armed;
 
+// LED support
+
+static bool ledGreenOn;
+
+static void toggleGreenLED(void)
+{
+    if (ledGreenOn) {
+        Board::ledSetState(0, true);
+        ledGreenOn = false;
+    }
+    else {
+        Board::ledSetState(0, false);
+        ledGreenOn = true;
+    }
+}
+
 void setup(void)
 {
     uint32_t calibratingGyroMsec;
@@ -103,16 +119,17 @@ void setup(void)
     // sleep for 100ms
     Board::delayMilliseconds(100);
 
-    // flash the LEDs to indicate startup
-    Board::ledRedOn();
-    Board::ledGreenOff();
+    // Turn off LEDs to start
+    Board::ledSetState(0, false);
+    Board::ledSetState(1, false);
+    ledGreenOn = false;
+
+    // flash the green LED to indicate startup
     for (uint8_t i = 0; i < 10; i++) {
-        Board::ledRedToggle();
-        Board::ledGreenToggle();
         Board::delayMilliseconds(50);
+        toggleGreenLED();
     }
-    Board::ledRedOff();
-    Board::ledGreenOff();
+    Board::ledSetState(0, false);
 
     // compute cycles for calibration based on board's time constant
     calibratingGyroCycles = (uint16_t)(1000. * calibratingGyroMsec / imuLooptimeUsec);
@@ -256,21 +273,21 @@ void loop(void)
 
         // use LEDs to indicate calibration status
         if (calibratingA > 0 || calibratingG > 0) 
-            Board::ledGreenOn();
+            Board::ledSetState(0, true);
         else {
             if (accCalibrated)
-                Board::ledGreenOff();
+                Board::ledSetState(0, false);
             if (armed)
-                Board::ledRedOn();
+                Board::ledSetState(1, true);
             else
-                Board::ledRedOff();
+                Board::ledSetState(1, false);
         }
 
         // periodically update accelerometer calibration status
         if (accelCalibrationTask.check(currentTime)) {
             if (!haveSmallAngle) {
                 accCalibrated = false; 
-                Board::ledGreenToggle();
+                toggleGreenLED();
                 accelCalibrationTask.update(currentTime);
             } else {
                 accCalibrated = true;
