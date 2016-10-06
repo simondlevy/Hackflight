@@ -69,7 +69,7 @@ static uint8_t Gscale = GFS_2000DPS;
 static uint8_t Ascale = AFS_8G;
 
 // https://www.tindie.com/products/onehorse/dc-motor-controller-board-for-teensy-31-/
-static const uint8_t MOTOR_PINS[4] = {23, 4, 3, 22};
+static const uint8_t MOTOR_PINS[4] = {23, 3, 4, 22};
 
 static PulsePositionInput ppmIn;
 
@@ -210,6 +210,11 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
+    // Stop motors
+    for (int k=0; k<4; ++k) {
+      analogWrite(MOTOR_PINS[k], 0);
+    }
+  
     // Set up LED
     pinMode(13, OUTPUT);
     
@@ -263,7 +268,7 @@ void Board::serialWriteByte(uint8_t c)
 }
 
 void Board::writeMotor(uint8_t index, uint16_t value)
-{  
+{ 
   analogWrite(MOTOR_PINS[index], map(value, CONFIG_PWM_MIN, CONFIG_PWM_MAX, 0, 255));
 }
 
