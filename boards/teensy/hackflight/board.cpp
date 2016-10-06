@@ -24,11 +24,11 @@
 #include <stdarg.h>
 
 #include <Arduino.h>
-#include <Servo.h>
 #include <PulsePosition.h>
 #include <I2Cdev.h>
 
 #include "board.hpp"
+#include "rc.hpp"
 
 #define IMU_LOOPTIME_USEC       3500
 #define CALIBRATING_GYRO_MSEC   3500
@@ -68,10 +68,8 @@ enum Gscale {
 static uint8_t Gscale = GFS_2000DPS;
 static uint8_t Ascale = AFS_8G;
 
-
-static uint8_t MOTOR_PINS[4] = {2,3,4,5};
-Servo motors[4];
-
+// https://www.tindie.com/products/onehorse/dc-motor-controller-board-for-teensy-31-/
+static const uint8_t MOTOR_PINS[4] = {23, 4, 3, 22};
 
 static PulsePositionInput ppmIn;
 
@@ -217,10 +215,6 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     
     // Set up I^2C
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_16_17, I2C_PULLUP_INT, I2C_RATE_400);
-
-    // Set up motors (ESCs)
-    for (int k=0; k<4; ++k) 
-        motors[k].attach(MOTOR_PINS[k]);
     
     // Set up PPM receiver
     ppmIn.begin(PPM_INPUT_PIN);
@@ -270,7 +264,7 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
-    motors[index].writeMicroseconds(value);    
+  analogWrite(MOTOR_PINS[index], map(value, CONFIG_PWM_MIN, CONFIG_PWM_MAX, 0, 255));
 }
 
 // Non-essentials ----------------------------------------------------------------
