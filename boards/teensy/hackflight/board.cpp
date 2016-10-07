@@ -77,7 +77,7 @@ static const uint8_t MOTOR_PINS[4] = {23, 3, 4, 22};
 
 
 
-int RX_PINS[5] = {5, 6, 20, 19, 18};
+int RX_PINS[5] = {5, 6, 18, 19, 20};
 
   
 
