@@ -45,6 +45,8 @@ MOTORS_TOP_Y    = 60
 MOTORS_BOTTOM_Y = 220
 MOTORS_RADIUS   = 20
 
+from receiver import PWM_MIN
+
 from tkcompat import *
 from math import sqrt
 
@@ -112,7 +114,7 @@ class Motors(Dialog):
             # Power down previous motor if needed
             if self.active_motor > 0:
 
-                self._send_motor_message(0)
+                self._send_motor_message(PWM_MIN)
 
             self.active_motor = index
 
@@ -180,5 +182,5 @@ class Motors(Dialog):
 
     def _turn_off_active(self):
         if self.driver.connected and self.active_motor > 0:
-            self._send_motor_message(0)
+            self._send_motor_message(PWM_MIN)
 

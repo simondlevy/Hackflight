@@ -69,9 +69,14 @@ static uint8_t Gscale = GFS_2000DPS;
 static uint8_t Ascale = AFS_8G;
 
 // https://www.tindie.com/products/onehorse/dc-motor-controller-board-for-teensy-31-/
+// Multiwii M1 = Controller M1 = Pin 23
+// Multiwii M2 = Controller M3 = Pin 3
+// Multiwii M3 = Controller M2 = Pin 4
+// Multiwii M4 = Controller M4 = Pin 22
 static const uint8_t MOTOR_PINS[4] = {23, 3, 4, 22};
 
 static PulsePositionInput ppmIn;
+static uint16_t channelInputs[5];
 
 
 // I^2C utility functions --------------------------------------------------------------
@@ -226,6 +231,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
     // Set up serial communication over USB
     Serial.begin(115200);
+    Serial1.begin(115200);
 
     // XXX these values should probably be #define'd generally for all physical (non-simulated) boards
     looptimeMicroseconds = IMU_LOOPTIME_USEC;
@@ -249,7 +255,11 @@ void Board::ledSetState(uint8_t id, bool state)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    return (uint16_t)ppmIn.read(chan+1);
+    if (ppmIn.available() > -1) {
+      channelInputs[chan] = (uint16_t)ppmIn.read(chan+1);
+    }
+    
+    return channelInputs[chan];
 }
 
 uint8_t Board::serialAvailableBytes(void)
@@ -267,9 +277,13 @@ void Board::serialWriteByte(uint8_t c)
     Serial.write(c);
 }
 
-void Board::writeMotor(uint8_t index, uint16_t value)
+void Board::writeMotor(uint8_t index, uint16_t pwmValue)
 { 
-  analogWrite(MOTOR_PINS[index], map(value, CONFIG_PWM_MIN, CONFIG_PWM_MAX, 0, 255));
+  uint8_t analogValue = map(pwmValue, CONFIG_PWM_MIN, CONFIG_PWM_MAX, 0, 255);
+
+  Serial1.printf("%d: %d  %d\n", index, pwmValue, analogValue);
+  
+  analogWrite(MOTOR_PINS[index], analogValue);
 }
 
 // Non-essentials ----------------------------------------------------------------

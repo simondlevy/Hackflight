@@ -25,7 +25,7 @@ BAUD            = 115200
 # Tune these for safety / performance
 UPDATE_RATE_HZ  = 200
 WAIT_TIME_SEC   = .1
-PWM_MIN         = 990
+PWM_MIN         = 1000
 PWM_MAX         = 2000
 
 # Values for outgoing message
