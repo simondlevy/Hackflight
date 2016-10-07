@@ -24,7 +24,7 @@
 #include <stdarg.h>
 
 #include <Arduino.h>
-#include <PulsePosition.h>
+#include <ArduinoRXInterrupt.h>
 #include <I2Cdev.h>
 
 #include "board.hpp"
@@ -33,7 +33,7 @@
 #define IMU_LOOPTIME_USEC       3500
 #define CALIBRATING_GYRO_MSEC   3500
 
-#define PPM_INPUT_PIN           5
+#define PPM_INPUT_PIN           6
 
 #define MPU9250_ADDRESS  0x68  
 
@@ -75,9 +75,11 @@ static uint8_t Ascale = AFS_8G;
 // Multiwii M4 = Controller M4 = Pin 22
 static const uint8_t MOTOR_PINS[4] = {23, 3, 4, 22};
 
-static PulsePositionInput ppmIn;
-static uint16_t channelInputs[5];
 
+
+int RX_PINS[5] = {5, 6, 20, 19, 18};
+
+  
 
 // I^2C utility functions --------------------------------------------------------------
 
@@ -226,8 +228,8 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     // Set up I^2C
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_16_17, I2C_PULLUP_INT, I2C_RATE_400);
     
-    // Set up PPM receiver
-    ppmIn.begin(PPM_INPUT_PIN);
+    // Set up PWM receiver
+    initChannels(RX_PINS, 5);
 
     // Set up serial communication over USB
     Serial.begin(115200);
@@ -255,11 +257,10 @@ void Board::ledSetState(uint8_t id, bool state)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    if (ppmIn.available() > -1) {
-      channelInputs[chan] = (uint16_t)ppmIn.read(chan+1);
-    }
-    
-    return channelInputs[chan];
+    short values[5];
+    updateChannels(values, 5);
+
+    return (int16_t)values[chan];
 }
 
 uint8_t Board::serialAvailableBytes(void)
@@ -280,8 +281,6 @@ void Board::serialWriteByte(uint8_t c)
 void Board::writeMotor(uint8_t index, uint16_t pwmValue)
 { 
   uint8_t analogValue = map(pwmValue, CONFIG_PWM_MIN, CONFIG_PWM_MAX, 0, 255);
-
-  Serial1.printf("%d: %d  %d\n", index, pwmValue, analogValue);
   
   analogWrite(MOTOR_PINS[index], analogValue);
 }
