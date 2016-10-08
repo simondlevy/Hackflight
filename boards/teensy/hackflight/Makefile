@@ -1,4 +1,7 @@
-#   Makefile for Teensy without Arduino IDE
+#
+#   Makefile for convenience in editing and uploading Hackflight firmware on Teensy
+#
+#   Copyright (C) Simon D. Levy and Matt Lubas 2016
 #
 #   This file is part of Hackflight.
 #
@@ -12,15 +15,13 @@
 #   GNU General Public License for more details.
 #   You should have received a copy of the GNU General Public License
 #   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+#
 
-verify:
-	arduino --verify hackflight.ino
+build:
+	arduino --verify hackflght.ino
 
 flash:
 	arduino --upload hackflight.ino
 
 edit:
 	vim board.cpp
-
-listen:
-	miniterm.py /dev/ttyACM0 115200
