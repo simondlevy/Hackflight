@@ -38,7 +38,7 @@ Although Hackflight was designed to be &ldquo;headless&rdquo; (no configurator p
 it is useful to get some visual feedback on things like vehicle orientation and RC receiver
 PWM values.  So in the <tt>gcs</tt> folder you'll find a Python program (<tt>main.py</tt>)
 that allows you to connect to the board and see what's going on.  To use this program you'll
-need to install [MSPPG](https://github.com/simondlevy/hackflight/parser), a
+need to install [MSPPG](https://github.com/simondlevy/hackflight/tree/master/parser), a
 parser generator for the Multiwii Serial Protocol (MSP) messages used by the
 firmware. Follow the directions in that repository to install MSPPG for Python.
 
