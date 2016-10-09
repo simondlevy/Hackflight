@@ -1,4 +1,4 @@
-# Running Hackflight on STM32 F103 flight controllers (Naze32, Flip32, Beef's Brushed Board)
+# Running Hackflight on STM32 F103 flight controllers (Naze32, Beef's Brushed Board)
 
 To try Hackflight on one of these boards, you'll need to be running Linux on
 your desktop/laptop computer, with the [GNU ARM
