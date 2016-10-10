@@ -25,7 +25,7 @@
 
 #include <Arduino.h>
 #include <ArduinoRXInterrupt.h>
-#include <I2Cdev.h>
+#include <i2c_t3.h>
 
 #include "board.hpp"
 #include "rc.hpp"
