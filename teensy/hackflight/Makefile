@@ -17,6 +17,10 @@
 #   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+gather:
+	cp ../../firmware/*.* .
+	mv hackflight.cpp hackflight.ino
+
 build:
 	arduino --verify hackflght.ino
 
