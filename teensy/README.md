@@ -11,8 +11,8 @@ latest fully-supported version for Teensy is Arduino 1.6.11, don't go any higher
 <b>hardware/teensy/avr/libraries</b> folder under your Arduino folder, and install the following two libraries
 there:
 <ul>
-<li> Bolderflight's MPU9250 [library](https://github.com/bolderflight/MPU9250)
-<p><li> My ArduinoRXInterrupt [library](https://github.com/simondlevy/ArduinoRXInterrupt)
+<li> Bolderflight's MPU9250 <a href="https://github.com/bolderflight/MPU9250">library</a>
+<p><li> My ArduinoRXInterrupt <a href="https://github.com/simondlevy/ArduinoRXInterrupt">library</a>
 </ul>
 
 Finally, copy everything in the <b>firmware</b> directory (above this one) to the 
