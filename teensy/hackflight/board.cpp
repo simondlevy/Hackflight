@@ -24,7 +24,11 @@
 #include <stdarg.h>
 
 #include <Arduino.h>
+
+// https://github.com/simondlevy/ArduinoRXInterrupt
 #include <ArduinoRXInterrupt.h>
+
+// https://github.com/bolderflight/MPU9250
 #include <MPU9250.h>
 
 #include "board.hpp"
