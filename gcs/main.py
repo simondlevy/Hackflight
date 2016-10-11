@@ -68,8 +68,10 @@ class GCS:
         self.frame = Frame(self.root)
 
         self.root.wm_iconbitmap(bitmap = "@media/icon.xbm")
-        
-        self.root.tk.call('wm', 'iconphoto', self.root._w, PhotoImage('icon.png'))
+
+        # Too much hassle on Windows
+        if 'nt' != os.name:
+            self.root.tk.call('wm', 'iconphoto', self.root._w, PhotoImage('icon.xbm'))
 
         self.root.protocol('WM_DELETE_WINDOW', self.quit)
 
@@ -114,7 +116,7 @@ class GCS:
         #self.maps = Maps(self, yoffset=-30)
 
         # Create a splash image
-        self.splashimage = PhotoImage(file='media/splash.png')
+        self.splashimage = PhotoImage(file='media/splash.gif')
         self._show_splash()
 
         # Create a message parser 
