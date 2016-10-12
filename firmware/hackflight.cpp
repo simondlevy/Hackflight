@@ -176,8 +176,6 @@ void loop(void)
         // update RC channels
         rc.update();
 
-		//printf("%d %d %d %d (%d)\n", rc.data[0], rc.data[1], rc.data[2], rc.data[3], rc.auxState());
-
         // useful for simulator
         if (armed)
             Board::showAuxStatus(rc.auxState());

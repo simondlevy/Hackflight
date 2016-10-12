@@ -31,18 +31,17 @@
 // https://github.com/bolderflight/MPU9250
 #include <MPU9250.h>
 
+// https://github.com/PaulStoffregen/PulsePosition
+//#include <PulsePosition.h>
+
 #include "board.hpp"
 #include "rc.hpp"
-
-#define IMU_LOOPTIME_USEC       3500
-#define CALIBRATING_GYRO_MSEC   3500
 
 // an MPU9250 object with its I2C address 
 // of 0x68 (ADDR to GRND) and on Teensy bus 0
 // using pins 16 and 17 instead of 18 and 19
 // and internal pullups instead of external.
 MPU9250 imu(0x68, 0, I2C_PINS_16_17, I2C_PULLUP_INT);
-
 
 // https://www.tindie.com/products/onehorse/dc-motor-controller-board-for-teensy-31-/
 // Multiwii M1 = Controller M1 = Pin 23
@@ -54,7 +53,8 @@ static const uint8_t MOTOR_PINS[4] = {23, 3, 4, 22};
 // for old-school PWM receiver like FrSky VD5M
 int RX_PINS[5] = {5, 6, 18, 19, 20};
 
-
+// for CPPM receivers like Beef's Micro FrSky
+//PulsePositionInput ppmIn;
 
 void Board::debug(char c)
 {
@@ -83,20 +83,24 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     // Set up LED
     pinMode(13, OUTPUT);
 
-    // Set up PWM receiver
+    // Set up receiver
     initChannels(RX_PINS, 5);
+    //ppmIn.begin(PPM_IN_PIN);
 
     // Set up serial communication over USB
     Serial.begin(115200);
 
-    // XXX these values should probably be #define'd generally for all physical (non-simulated) boards
-    looptimeMicroseconds = IMU_LOOPTIME_USEC;
-    calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
+    // Use default hardware loop times
+    looptimeMicroseconds = Board::DEFAULT_IMU_LOOPTIME_USEC; 
+    calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
 }
 
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
+    // For ordering, negation see:
+    // https://forum.pjrc.com/threads/37891-MPU-9250-Teensy-Library?p=118198&viewfull=1#post118198
+  
     imu.getMotion6Counts(&accADC[1], &accADC[0], &accADC[2], &gyroADC[1], &gyroADC[0], &gyroADC[2]);
 
     accADC[2]  = -accADC[2];

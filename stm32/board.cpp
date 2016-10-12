@@ -32,10 +32,6 @@ extern "C" {
 #define PWM_FILTER              0     // 0 or 1
 #define FAST_PWM                0     // 0 or 1
 
-#define IMU_LOOPTIME_USEC       3500
-#define CALIBRATING_GYRO_MSEC   3500
-
-   
 extern serialPort_t * Serial1;
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
@@ -55,8 +51,8 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     i2cInit(I2CDEV_2);
     pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 
-    looptimeMicroseconds = IMU_LOOPTIME_USEC;
-    calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
+    looptimeMicroseconds = Board::DEFAULT_IMU_LOOPTIME_USEC; 
+    calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
 }
 
 void Board::debug(char c)
