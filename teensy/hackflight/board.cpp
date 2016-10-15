@@ -25,14 +25,16 @@
 
 #include <Arduino.h>
 
-// https://github.com/simondlevy/ArduinoRXInterrupt
-#include <ArduinoRXInterrupt.h>
 
 // https://github.com/bolderflight/MPU9250
 #include <MPU9250.h>
 
-// https://github.com/PaulStoffregen/PulsePosition
-//#include <PulsePosition.h>
+// https://github.com/jrcutler/Spektrum_Satellite
+#include <Spektrum_Satellite.h>
+Spektrum_Satellite rx;
+#define SPEKTRUM_PORT Serial1
+static const uint8_t channel_map[5] = {1, 2, 3, 0, 6};
+static uint16_t chanvals[8];
 
 #include "board.hpp"
 #include "rc.hpp"
@@ -50,11 +52,6 @@ MPU9250 imu(0x68, 0, I2C_PINS_16_17, I2C_PULLUP_INT);
 // Multiwii M4 = Controller M4 = Pin 22
 static const uint8_t MOTOR_PINS[4] = {23, 3, 4, 22};
 
-// for old-school PWM receiver like FrSky VD5M
-int RX_PINS[5] = {5, 6, 18, 19, 20};
-
-// for CPPM receivers like Beef's Micro FrSky
-//PulsePositionInput ppmIn;
 
 void Board::debug(char c)
 {
@@ -84,8 +81,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     pinMode(13, OUTPUT);
 
     // Set up receiver
-    initChannels(RX_PINS, 5);
-    //ppmIn.begin(PPM_IN_PIN);
+    SPEKTRUM_PORT.begin(115200);
 
     // Set up serial communication over USB
     Serial.begin(115200);
@@ -122,12 +118,28 @@ void Board::ledSetState(uint8_t id, bool state)
     digitalWrite(13, state); // we only have one LED
 }
 
-uint16_t Board::readPWM(uint8_t chan)
+void Board::pollSpektrum(void)
 {
-    short values[5];
-    updateChannels(values, 5);
+  if (SPEKTRUM_PORT.available()) {
+    uint8_t c = SPEKTRUM_PORT.read();
+    if (rx.update(c)) {
 
-    return (int16_t)values[chan];
+      // Handle first four channels (sticks) the same
+      for (int k=0; k<4; ++k) {
+        uint16_t rawval = rx.getChannel(channel_map[k]);
+        chanvals[k] = map(rawval, 0, 2000, 1000, 2000);
+      }
+
+      // Special handling for aux switch
+      uint16_t rawval = rx.getChannel(channel_map[4]);
+      chanvals[4] = rawval > 1500 ? 1000 : (rawval > 500 ? 1500 : 2000);
+    }
+  }  
+}
+
+uint16_t Board::readPWM(uint8_t chan)
+{    
+  return chanvals[chan];
 }
 
 uint8_t Board::serialAvailableBytes(void)

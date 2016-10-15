@@ -607,13 +607,6 @@ int32_t Board::baroGetPressure(void)
 {
     return baroPressure;
 }
-void Board::checkReboot(bool pendReboot)
-{
-}
-
-void Board::delayMilliseconds(uint32_t msec)
-{
-}
 
 uint32_t Board::getMicros()
 {
@@ -638,10 +631,6 @@ uint16_t Board::readPWM(uint8_t chan)
     int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1) / 2 * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
 
     return pwm;
-}
-
-void Board::reboot(void)
-{
 }
 
 void Board::writeMotor(uint8_t index, uint16_t value)
@@ -674,4 +663,22 @@ void Board::showAuxStatus(uint8_t status)
 
     auxStatus = status;
 }
- 
+
+// Unused ==========================================================================================
+
+void Board::pollSpektrum(void)
+{
+}
+
+void Board::reboot(void)
+{
+}
+
+void Board::checkReboot(bool pendReboot)
+{
+}
+
+void Board::delayMilliseconds(uint32_t msec)
+{
+}
+
