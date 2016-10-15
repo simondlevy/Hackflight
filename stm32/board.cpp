@@ -163,10 +163,6 @@ void Board::showAuxStatus(uint8_t status)
     status = status; // avoid compiler warning about unused variable
 }
 
-void Board::pollSpektrum(void)
-{
-}
- 
 #ifdef __arm__
 } // extern "C"
 #endif
