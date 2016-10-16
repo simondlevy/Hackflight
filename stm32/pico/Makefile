@@ -54,6 +54,7 @@ NAZE_SRC = $(BREEZY_DIR)/main.c \
            $(BREEZY_DIR)/drv_gpio.c \
            $(BREEZY_DIR)/drv_uart.c \
            $(BREEZY_DIR)/drv_timer.c \
+           $(BREEZY_DIR)/drv_spektrum.c \
            $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
            $(CMSIS_SRC) \
            $(STDPERIPH_SRC)
