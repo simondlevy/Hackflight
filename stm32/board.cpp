@@ -34,6 +34,11 @@ extern "C" {
 
 extern serialPort_t * Serial1;
 
+bool Board::rcReady(void)
+{
+    return false;
+}
+
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     mpu6050_init(false, &acc1G, &gyroScale, BOARD_VERSION);

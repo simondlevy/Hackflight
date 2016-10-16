@@ -171,7 +171,7 @@ void loop(void)
     static uint32_t currentTime;
     static uint32_t disarmTime;
 
-    if (rcTask.checkAndUpdate(currentTime)) {
+    if (rcTask.checkAndUpdate(currentTime) || Board::rcReady()) {
 
         // update RC channels
         rc.update();

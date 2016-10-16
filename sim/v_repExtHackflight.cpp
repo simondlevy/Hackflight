@@ -554,6 +554,11 @@ void errorDialog(char * message)
 #include <board.hpp>
 #include <rc.hpp>
 
+bool Board::rcReady(void)
+{
+    return false;
+}
+
 void Board::debug(char c)
 {
     putchar(c);
@@ -665,10 +670,6 @@ void Board::showAuxStatus(uint8_t status)
 }
 
 // Unused ==========================================================================================
-
-void Board::pollSpektrum(void)
-{
-}
 
 void Board::reboot(void)
 {
