@@ -109,6 +109,11 @@ uint16_t Board::rcReadPWM(uint8_t chan)
     return pwmRead(chan);
 }
 
+bool Board::rcUseSerial(void)
+{
+    return false;
+}
+
 void Board::reboot(void)
 {
     systemReset(true);      // reboot to bootloader

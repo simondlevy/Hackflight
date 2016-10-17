@@ -36,6 +36,7 @@ extern "C" {
             static void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
             static void     ledSetState(uint8_t id, bool state);
             static uint16_t rcReadPWM(uint8_t chan);
+            static bool     rcUseSerial(void);
             static uint16_t rcReadSerial(uint8_t chan);
             static bool     rcSerialReady(void); 
             static uint8_t  serialAvailableBytes(void);

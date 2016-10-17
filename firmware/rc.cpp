@@ -37,6 +37,8 @@ void RC::init(void)
     this->sticks = 0;
     this->averageIndex = 0;
 
+    this->useSerial = Board::rcUseSerial();
+
     for (uint8_t i = 0; i < CONFIG_RC_CHANS; i++)
         this->data[i] = this->midrc;
 
@@ -57,9 +59,9 @@ void RC::init(void)
     }
 }
 
-void RC::update(bool rcSerialReady)
+void RC::update(void)
 {
-    if (rcSerialReady) {
+    if (this->useSerial) {
         for (uint8_t chan = 0; chan < 8; chan++) {
             this->data[chan] = Board::rcReadSerial(chan);
         }

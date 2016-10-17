@@ -90,6 +90,11 @@ void Board::ledSetState(uint8_t id, bool state)
     }
 }
 
+bool Board::rcUseSerial(void)
+{
+    return true;
+}
+
 bool Board::rcSerialReady(void)
 {
     return spektrumFrameComplete();
@@ -129,6 +134,7 @@ void Board::writeMotor(uint8_t index, uint16_t value)
 
 bool Board::baroInit(void)
 {
+    return false;
 }
 
 void Board::baroUpdate(void)
@@ -137,6 +143,7 @@ void Board::baroUpdate(void)
 
 int32_t Board::baroGetPressure(void)
 {
+    return 0;
 }
 
 

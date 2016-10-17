@@ -74,6 +74,7 @@ extern "C" {
             int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
             int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
             int16_t midrc;
+            bool    useSerial;
 
         public:
 
@@ -83,7 +84,7 @@ extern "C" {
             int16_t command[4];            // stick PWM values for mixer, MSP
             uint8_t sticks;                // stick positions for command combos
 
-            void update(bool rcSerialReady);
+            void update(void);
 
             bool changed(void);
 
