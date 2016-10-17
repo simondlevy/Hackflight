@@ -171,10 +171,12 @@ void loop(void)
     static uint32_t currentTime;
     static uint32_t disarmTime;
 
-    if (rcTask.checkAndUpdate(currentTime) || Board::rcReady()) {
+    bool rcSerialReady = Board::rcSerialReady();
+
+    if (rcTask.checkAndUpdate(currentTime) || rcSerialReady) {
 
         // update RC channels
-        rc.update();
+        rc.update(rcSerialReady);
 
         // useful for simulator
         if (armed)

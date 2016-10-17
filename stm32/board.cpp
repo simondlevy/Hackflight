@@ -34,11 +34,6 @@ extern "C" {
 
 extern serialPort_t * Serial1;
 
-bool Board::rcReady(void)
-{
-    return false;
-}
-
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     mpu6050_init(false, &acc1G, &gyroScale, BOARD_VERSION);
@@ -139,6 +134,13 @@ void Board::writeMotor(uint8_t index, uint16_t value)
     pwmWriteMotor(index, value);
 }
 
+// unused --------------------------------------------------------------------------
+
+bool Board::rcSerialReady(void)
+{
+    return false;
+}
+
 bool Board::sonarInit(uint8_t index) 
 {
     (void)index; // avoid compiler warning about unused variable
@@ -147,12 +149,12 @@ bool Board::sonarInit(uint8_t index)
 
 void Board::sonarUpdate(uint8_t index)
 {
-    (void)index; // avoid compiler warning about unused variable
+    (void)index; 
 }
 
 uint16_t Board::sonarGetDistance(uint8_t index)
 {
-    index = index; // avoid compiler warning about unused variable
+    index = index; 
     return 0;
 }
 
@@ -160,12 +162,12 @@ void Board::showArmedStatus(bool armed)
 {
     // XXX this would be a good place to sound a buzzer!
 
-    (void)armed; // avoid compiler warning about unused variable
+    (void)armed; 
 }
  
 void Board::showAuxStatus(uint8_t status)
 {
-    (void)status; // avoid compiler warning about unused variable
+    (void)status; 
 }
 
 #ifdef __arm__

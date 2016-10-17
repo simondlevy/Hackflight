@@ -34,7 +34,7 @@ extern "C" {
 
 extern serialPort_t * Serial1;
 
-bool Board::rcReady(void)
+bool Board::rcSerialReady(void)
 {
     return false;
 }
@@ -56,7 +56,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     i2cInit(I2CDEV_2);
     pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 
-    spektrumInit(/*SPEKTRUM_2048*/);
+    spektrumInit(SERIALRX_SPEKTRUM2048);
 
     looptimeMicroseconds = Board::DEFAULT_IMU_LOOPTIME_USEC; 
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;

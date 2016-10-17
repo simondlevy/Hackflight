@@ -83,7 +83,7 @@ extern "C" {
             int16_t command[4];            // stick PWM values for mixer, MSP
             uint8_t sticks;                // stick positions for command combos
 
-            void update(void);
+            void update(bool rcSerialReady);
 
             bool changed(void);
 
