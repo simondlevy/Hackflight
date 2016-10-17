@@ -554,11 +554,6 @@ void errorDialog(char * message)
 #include <board.hpp>
 #include <rc.hpp>
 
-bool Board::rcReady(void)
-{
-    return false;
-}
-
 void Board::debug(char c)
 {
     putchar(c);
@@ -619,7 +614,7 @@ uint32_t Board::getMicros()
 }
 
 
-uint16_t Board::readPWM(uint8_t chan)
+uint16_t Board::rcReadPWM(uint8_t chan)
 {
     // Special handling for throttle
     float demand = (chan == 3) ? throttleDemand : demands[chan];
@@ -670,6 +665,18 @@ void Board::showAuxStatus(uint8_t status)
 }
 
 // Unused ==========================================================================================
+
+
+bool Board::rcSerialReady(void)
+{
+    return false;
+}
+
+uint16_t Board::rcReadSerial(uint8_t chan)
+{
+    (void)chan;
+    return 0;
+}
 
 void Board::reboot(void)
 {

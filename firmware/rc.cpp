@@ -60,13 +60,15 @@ void RC::init(void)
 void RC::update(bool rcSerialReady)
 {
     if (rcSerialReady) {
+        for (uint8_t chan = 0; chan < 8; chan++)
+            this->data[chan] = Board::rcReadSerial(chan);
     }
 
     else {
         for (uint8_t chan = 0; chan < 8; chan++) {
 
             // get RC PWM
-            this->dataAverage[chan][this->averageIndex % 4] = Board::readPWM(chan);
+            this->dataAverage[chan][this->averageIndex % 4] = Board::rcReadPWM(chan);
 
             this->data[chan] = 0;
 

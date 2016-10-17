@@ -104,7 +104,7 @@ void Board::ledSetState(uint8_t id, bool state)
     }
 }
 
-uint16_t Board::readPWM(uint8_t chan)
+uint16_t Board::rcReadPWM(uint8_t chan)
 {
     return pwmRead(chan);
 }
@@ -141,9 +141,15 @@ bool Board::rcSerialReady(void)
     return false;
 }
 
+uint16_t Board::rcReadSerial(uint8_t chan)
+{
+    (void)chan;
+    return 0;
+}
+
 bool Board::sonarInit(uint8_t index) 
 {
-    (void)index; // avoid compiler warning about unused variable
+    (void)index; 
     return false;
 }
 
