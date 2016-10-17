@@ -43,7 +43,6 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
     mpu6050_read_accel(accADC);
     mpu6050_read_gyro(gyroADC);
-
 }
 
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
@@ -51,7 +50,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     i2cInit(I2CDEV_2);
     pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 
-    spektrumInit(SERIALRX_SPEKTRUM2048);
+    spektrumInit(SERIALRX_SPEKTRUM1024);
 
     looptimeMicroseconds = Board::DEFAULT_IMU_LOOPTIME_USEC; 
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
@@ -60,21 +59,6 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 void Board::debug(char c)
 {
     serialWrite(Serial1, c);
-}
-
-bool Board::baroInit(void)
-{
-    return ms5611_init();
-}
-
-void Board::baroUpdate(void)
-{
-    ms5611_update();
-}
-
-int32_t Board::baroGetPressure(void)
-{
-    return ms5611_read_pressure();
 }
 
 void Board::checkReboot(bool pendReboot)
@@ -142,6 +126,19 @@ void Board::writeMotor(uint8_t index, uint16_t value)
 }
 
 // unused ---------------------------------------------------------------------
+
+bool Board::baroInit(void)
+{
+}
+
+void Board::baroUpdate(void)
+{
+}
+
+int32_t Board::baroGetPressure(void)
+{
+}
+
 
 uint16_t Board::rcReadPWM(uint8_t chan)
 {

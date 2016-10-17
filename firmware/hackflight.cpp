@@ -178,6 +178,9 @@ void loop(void)
         // update RC channels
         rc.update(rcSerialReady);
 
+        debug("%4d %4d %4d %4d %4d\n", 
+                rc.data[0], rc.data[1], rc.data[2], rc.data[3], rc.data[4]);
+
         // useful for simulator
         if (armed)
             Board::showAuxStatus(rc.auxState());
