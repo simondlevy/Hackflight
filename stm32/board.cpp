@@ -160,7 +160,7 @@ void Board::sonarUpdate(uint8_t index)
 
 uint16_t Board::sonarGetDistance(uint8_t index)
 {
-    index = index; 
+    (void)index; 
     return 0;
 }
 
