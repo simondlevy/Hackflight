@@ -102,7 +102,8 @@ bool Board::rcSerialReady(void)
 
 uint16_t Board::rcReadSerial(uint8_t chan)
 {
-    return spektrumReadRawRC(chan);
+    static uint8_t chanmap[5] = {1, 2, 3, 0, 4};
+    return chan > 4 ? 0 : spektrumReadRawRC(chanmap[chan]);
 }
 
 void Board::reboot(void)
