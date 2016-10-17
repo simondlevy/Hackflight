@@ -60,8 +60,11 @@ void RC::init(void)
 void RC::update(bool rcSerialReady)
 {
     if (rcSerialReady) {
-        for (uint8_t chan = 0; chan < 8; chan++)
+        for (uint8_t chan = 0; chan < 8; chan++) {
             this->data[chan] = Board::rcReadSerial(chan);
+            debug("%4d ", this->data[chan]);
+        }
+        debug("\n");
     }
 
     else {

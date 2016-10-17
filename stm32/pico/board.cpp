@@ -108,13 +108,12 @@ void Board::ledSetState(uint8_t id, bool state)
 
 bool Board::rcSerialReady(void)
 {
-    return false;
+    return spektrumFrameComplete();
 }
 
 uint16_t Board::rcReadSerial(uint8_t chan)
 {
-    (void)chan;
-    return 1500;
+    return spektrumReadRawRC(chan);
 }
 
 void Board::reboot(void)
