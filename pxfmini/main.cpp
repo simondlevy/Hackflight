@@ -16,7 +16,18 @@
  */
 
 
+extern "C" {
+
 int main(int argc, char ** argv)
 {
+    extern void setup(), loop();
+
+    setup();
+
+    while (true)
+        loop();
+
     return 0;
+}
+
 }
