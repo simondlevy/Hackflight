@@ -59,6 +59,11 @@ void Board::ledSetState(uint8_t id, bool state)
 {
 }
 
+bool Board::rcUseSerial(void)
+{
+    return false;
+}
+
 uint16_t Board::rcReadPWM(uint8_t chan)
 {
     return 0;
