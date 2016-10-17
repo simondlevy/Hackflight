@@ -1,5 +1,5 @@
 /*
-   pidvals.hpp : PID values for a specific vehicle
+   main.cpp : Hackflight main() routine
 
    This file is part of Hackflight.
 
@@ -15,20 +15,8 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Level (accelerometer)
-static const uint8_t CONFIG_LEVEL_P          = 90;
-static const uint8_t CONFIG_LEVEL_I          = 10;
 
-// Rate (gyro): P must be positive
-static const uint8_t CONFIG_RATE_PITCHROLL_P = 40;
-static const uint8_t CONFIG_RATE_PITCHROLL_I = 30;
-static const uint8_t CONFIG_RATE_PITCHROLL_D = 23;
-
-// Yaw: P must be positive
-static const uint8_t CONFIG_YAW_P            = 85;
-static const uint8_t CONFIG_YAW_I            = 45;
-
-// For altitude hover
-#define CONFIG_HOVER_ALT_P  120
-#define CONFIG_HOVER_ALT_I  45
-#define CONFIG_HOVER_ALT_D  1
+int main(int argc, char ** argv)
+{
+    return 0;
+}

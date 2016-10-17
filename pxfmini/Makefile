@@ -17,32 +17,43 @@
 #   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-hackflight: board.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o
-	g++ -o hackflight board.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o
+CFLAGS = -Wall
+
+hackflight: main.o board.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o
+	g++ -o hackflight main.o board.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o
+
+main.o: main.cpp
+	g++ $(CFLAGS) -c -I ../firmware main.cpp
 
 board.o: board.cpp
-	g++ -c -I ../firmware board.cpp
+	g++ $(CFLAGS) -c -I ../firmware board.cpp
 
 hackflight.o: ../firmware/hackflight.cpp
-	g++ -c ../firmware/hackflight.cpp	
+	g++ $(CFLAGS) -c ../firmware/hackflight.cpp	
 
 filters.o: ../firmware/filters.cpp
-	g++ -c ../firmware/filters.cpp	
+	g++ $(CFLAGS) -c ../firmware/filters.cpp	
 
 imu.o: ../firmware/imu.cpp
-	g++ -c ../firmware/imu.cpp	
+	g++ $(CFLAGS) -c ../firmware/imu.cpp	
 
 mixer.o: ../firmware/mixer.cpp
-	g++ -c ../firmware/mixer.cpp	
+	g++ $(CFLAGS) -c ../firmware/mixer.cpp	
 
 msp.o: ../firmware/msp.cpp
-	g++ -c ../firmware/msp.cpp	
+	g++ $(CFLAGS) -c ../firmware/msp.cpp	
 
 rc.o: ../firmware/rc.cpp
-	g++ -c ../firmware/rc.cpp	
+	g++ $(CFLAGS) -c ../firmware/rc.cpp	
 
 stabilize.o: ../firmware/stabilize.cpp
-	g++ -c ../firmware/stabilize.cpp	
+	g++ $(CFLAGS) -c -I. ../firmware/stabilize.cpp	
+
+sonars.o: ../firmware/sonars.cpp
+	g++ $(CFLAGS) -c -I. ../firmware/sonars.cpp	
+
+hover.o: ../firmware/hover.cpp
+	g++ $(CFLAGS) -c -I. ../firmware/hover.cpp	
 
 clean:
 	rm -f hackflight *.o *~

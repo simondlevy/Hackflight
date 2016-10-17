@@ -17,10 +17,12 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <math.h>
+#include <stdint.h>
 
 #include "board.hpp"
 #include "motorpwm.hpp"
+
+// Essentials ---------------------------------------------------------------------------
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
@@ -40,18 +42,6 @@ void Board::debug(char c)
 {
 }
 
-bool Board::baroInit(void)
-{
-}
-
-void Board::baroUpdate(void)
-{
-}
-
-int32_t Board::baroGetPressure(void)
-{
-}
-
 void Board::checkReboot(bool pendReboot)
 {
 }
@@ -62,6 +52,7 @@ void Board::delayMilliseconds(uint32_t msec)
 
 uint32_t Board::getMicros()
 {
+    return 0;
 }
 
 void Board::ledSetState(uint8_t id, bool state)
@@ -70,18 +61,17 @@ void Board::ledSetState(uint8_t id, bool state)
 
 uint16_t Board::rcReadPWM(uint8_t chan)
 {
-}
-
-void Board::reboot(void)
-{
+    return 0;
 }
 
 uint8_t Board::serialAvailableBytes(void)
 {
+    return 0;
 }
 
 uint8_t Board::serialReadByte(void)
 {
+    return 0;
 }
 
 void Board::serialWriteByte(uint8_t c)
@@ -93,6 +83,24 @@ void Board::writeMotor(uint8_t index, uint16_t value)
 }
 
 // unused --------------------------------------------------------------------------
+
+bool Board::baroInit(void)
+{
+    return false;
+}
+
+void Board::baroUpdate(void)
+{
+}
+
+int32_t Board::baroGetPressure(void)
+{
+    return 0;
+}
+
+void Board::reboot(void)
+{
+}
 
 bool Board::rcSerialReady(void)
 {
