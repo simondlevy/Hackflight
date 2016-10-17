@@ -17,7 +17,11 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
+
+#include <wiringPi.h>
 
 #include "board.hpp"
 #include "motorpwm.hpp"
@@ -36,10 +40,13 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 {
     looptimeMicroseconds = Board::DEFAULT_IMU_LOOPTIME_USEC; 
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
+
+    exit(0);
 }
 
 void Board::debug(char c)
 {
+    putchar(c);    
 }
 
 void Board::checkReboot(bool pendReboot)
