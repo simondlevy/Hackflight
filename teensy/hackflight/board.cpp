@@ -118,7 +118,7 @@ void Board::ledSetState(uint8_t id, bool state)
     digitalWrite(13, state); // we only have one LED
 }
 
-uint16_t Board::readPWM(uint8_t chan)
+uint16_t Board::rcReadPWM(uint8_t chan)
 {
     short values[5];
     updateChannels(values, 5);
@@ -148,7 +148,18 @@ void Board::writeMotor(uint8_t index, uint16_t pwmValue)
   analogWrite(MOTOR_PINS[index], analogValue);
 }
 
-// Non-essentials ----------------------------------------------------------------
+// Unused -------------------------------------------------------------------------
+
+uint16_t Board::rcReadSerial(uint8_t chan)
+{
+    (void)chan;
+    return 0;
+}
+
+bool  Board::rcSerialReady(void)
+{
+    return false;
+}
 
 void Board::reboot(void)
 {
