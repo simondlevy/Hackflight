@@ -17,18 +17,16 @@
 #   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-WIRINGPI_DIR = $(HOME)/wiringPi
-
 CFLAGS = -Wall
 
 hackflight: main.o board.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o
-	g++ -o hackflight main.o board.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o
+	g++ -o hackflight main.o board.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o -lwiringPi
 
 main.o: main.cpp
 	g++ $(CFLAGS) -c -I ../firmware main.cpp
 
 board.o: board.cpp
-	g++ $(CFLAGS) -c -I ../firmware -I $(WIRINGPI_DIR)/wiringPi board.cpp
+	g++ $(CFLAGS) -c -I ../firmware board.cpp
 
 hackflight.o: ../firmware/hackflight.cpp
 	g++ $(CFLAGS) -c ../firmware/hackflight.cpp	
