@@ -40,8 +40,6 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 {
     looptimeMicroseconds = Board::DEFAULT_IMU_LOOPTIME_USEC; 
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
-
-    exit(0);
 }
 
 void Board::debug(char c)
@@ -55,11 +53,12 @@ void Board::checkReboot(bool pendReboot)
 
 void Board::delayMilliseconds(uint32_t msec)
 {
+    delay(msec);
 }
 
 uint32_t Board::getMicros()
 {
-    return 0;
+    return micros();
 }
 
 void Board::ledSetState(uint8_t id, bool state)
