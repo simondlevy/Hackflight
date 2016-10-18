@@ -20,7 +20,7 @@
 CFLAGS = -Wall
 
 hackflight: main.o board.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o
-	g++ -o hackflight main.o board.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o
+	g++ -o hackflight main.o board.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o -lwiringPi
 
 main.o: main.cpp
 	g++ $(CFLAGS) -c -I ../firmware main.cpp
@@ -60,3 +60,6 @@ clean:
 
 edit:
 	vim board.cpp
+
+run:
+	./hackflight

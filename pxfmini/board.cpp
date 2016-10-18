@@ -17,7 +17,11 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
+
+#include <wiringPi.h>
 
 #include "board.hpp"
 #include "motorpwm.hpp"
@@ -40,6 +44,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
 void Board::debug(char c)
 {
+    putchar(c);    
 }
 
 void Board::checkReboot(bool pendReboot)
@@ -48,15 +53,21 @@ void Board::checkReboot(bool pendReboot)
 
 void Board::delayMilliseconds(uint32_t msec)
 {
+    delay(msec);
 }
 
 uint32_t Board::getMicros()
 {
-    return 0;
+    return micros();
 }
 
 void Board::ledSetState(uint8_t id, bool state)
 {
+}
+
+bool Board::rcUseSerial(void)
+{
+    return false;
 }
 
 uint16_t Board::rcReadPWM(uint8_t chan)
