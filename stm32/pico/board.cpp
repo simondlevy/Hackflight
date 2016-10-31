@@ -113,7 +113,7 @@ void Board::reboot(void)
 
 uint8_t Board::serialAvailableBytes(void)
 {
-    return serialTotalBytesWaiting(Serial1);
+    return serialTotalRxBytesWaiting(Serial1);
 }
 
 uint8_t Board::serialReadByte(void)
