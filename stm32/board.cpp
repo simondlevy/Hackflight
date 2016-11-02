@@ -78,7 +78,7 @@ int32_t Board::baroGetPressure(void)
 void Board::checkReboot(bool pendReboot)
 {
     if (pendReboot)
-        systemReset(false); // noreturn
+        systemResetToBootloader(); // noreturn
 }
 
 void Board::delayMilliseconds(uint32_t msec)
@@ -116,7 +116,7 @@ bool Board::rcUseSerial(void)
 
 void Board::reboot(void)
 {
-    systemReset(true);      // reboot to bootloader
+    systemResetToBootloader();
 }
 
 uint8_t Board::serialAvailableBytes(void)

@@ -64,7 +64,7 @@ void Board::debug(char c)
 void Board::checkReboot(bool pendReboot)
 {
     if (pendReboot)
-        systemReset(false); // noreturn
+        systemResetToBootloader(); // noreturn
 }
 
 void Board::delayMilliseconds(uint32_t msec)
@@ -108,7 +108,7 @@ uint16_t Board::rcReadSerial(uint8_t chan)
 
 void Board::reboot(void)
 {
-    systemReset(true);      // reboot to bootloader
+    systemResetToBootloader();
 }
 
 uint8_t Board::serialAvailableBytes(void)
