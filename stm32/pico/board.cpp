@@ -22,6 +22,9 @@ extern "C" {
 #endif
 
 #include <breezystm32.h>
+#include <drivers/mpu6050.h>
+#include <drivers/spektrum.h>
+
 #include <math.h>
 
 #include "board.hpp"
