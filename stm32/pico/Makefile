@@ -44,14 +44,15 @@ STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 # Source files common to all targets
 NAZE_SRC = $(BREEZY_DIR)/main.c \
            $(BREEZY_DIR)/printf.c \
+           $(BREEZY_DIR)/drv_system.c \
            $(BREEZY_DIR)/drv_system_stm32f10x.c \
-           $(BREEZY_DIR)/drv_mpu6050.c \
-           $(BREEZY_DIR)/drv_ms5611.c \
-           $(BREEZY_DIR)/drv_mb1242.c \
-           $(BREEZY_DIR)/drv_i2c.c \
+           $(BREEZY_DIR)/drivers/mpu6050.c \
+           $(BREEZY_DIR)/drivers/ms5611.c \
+           $(BREEZY_DIR)/drivers/mb1242.c \
+           $(BREEZY_DIR)/drivers/spektrum.c \
+           $(BREEZY_DIR)/drv_i2c_stm32f10x.c \
            $(BREEZY_DIR)/drv_serial.c \
            $(BREEZY_DIR)/drv_pwm.c \
-           $(BREEZY_DIR)/drv_spektrum.c \
            $(BREEZY_DIR)/drv_gpio.c \
            $(BREEZY_DIR)/drv_uart_stm32f10x.c \
            $(BREEZY_DIR)/drv_timer.c \
