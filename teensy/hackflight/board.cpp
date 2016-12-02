@@ -126,6 +126,11 @@ uint16_t Board::rcReadPWM(uint8_t chan)
     return (int16_t)values[chan];
 }
 
+bool Board::rcUseSerial(void)
+{ 
+    return false;
+}
+
 uint8_t Board::serialAvailableBytes(void)
 {
     return Serial.available();
