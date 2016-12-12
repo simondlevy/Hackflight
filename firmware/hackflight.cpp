@@ -267,6 +267,8 @@ void loop(void)
 
         imu.update(currentTime, armed, calibratingA, calibratingG);
 
+        debug("%d %d %d\n", imu.angle[0], imu.angle[1], imu.angle[2]);
+
         haveSmallAngle = abs(imu.angle[0]) < CONFIG_SMALL_ANGLE && abs(imu.angle[1]) < CONFIG_SMALL_ANGLE;
 
         // measure loop rate just afer reading the sensors
@@ -313,23 +315,6 @@ void loop(void)
     } // IMU update
 
 } // loop()
-
-
-void debug(const char * fmt, ...)
-{
-    va_list ap;       
-
-    va_start(ap, fmt);     
-
-    char buf[1000];
-
-    vsprintf(buf, fmt, ap);
-
-    for (char * c = buf; *c; c++)
-        Board::debug(*c);
-
-    va_end(ap);  
-}
 
 #ifdef __arm__
 } // extern "C"
