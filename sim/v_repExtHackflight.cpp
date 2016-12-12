@@ -549,33 +549,10 @@ void errorDialog(char * message)
     displayDialog("ERROR", message, 1,0,0, sim_dlgstyle_ok);
 }
 
-// Debugging
-void debug(const char * fmt, ...)
-{
-    va_list ap;       
-
-    va_start(ap, fmt);     
-
-    char buf[1000];
-
-    vsprintf(buf, fmt, ap);
-
-    for (char * p = buf; *p; p++)
-        putchar(*p);
-
-    va_end(ap);  
-}
-
-
 // Board implementation ======================================================
 
 #include <board.hpp>
 #include <rc.hpp>
-
-void Board::debug(char c)
-{
-    putchar(c);
-}
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
@@ -654,6 +631,12 @@ uint16_t Board::rcReadPWM(uint8_t chan)
 
     return pwm;
 }
+
+void Board::serialDebugByte(uint8_t c)
+{
+    putchar(c);
+}
+
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {

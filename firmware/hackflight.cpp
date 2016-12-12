@@ -316,6 +316,22 @@ void loop(void)
 
 } // loop()
 
+void debug(const char * fmt, ...)
+{
+    va_list ap;       
+
+    va_start(ap, fmt);     
+
+    char buf[1000];
+
+    vsprintf(buf, fmt, ap);
+
+    for (char * p = buf; *p; p++)
+        Board::serialDebugByte(*p);
+
+    va_end(ap);  
+}
+#
 #ifdef __arm__
 } // extern "C"
 #endif

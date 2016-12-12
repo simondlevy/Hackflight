@@ -28,7 +28,6 @@ extern "C" {
             // your implementation should support these methods
 
             // Core functionality
-            static void     debug(char c);
             static void     delayMilliseconds(uint32_t msec);
             static uint32_t getMicros();
             static void     imuInit(uint16_t & acc1G, float & gyroScale);
@@ -40,6 +39,7 @@ extern "C" {
             static uint16_t rcReadSerial(uint8_t chan);
             static bool     rcSerialReady(void); 
             static uint8_t  serialAvailableBytes(void);
+            static void     serialDebugByte(uint8_t c);
             static uint8_t  serialReadByte(void);
             static void     serialWriteByte(uint8_t c);
             static void     writeMotor(uint8_t index, uint16_t value);

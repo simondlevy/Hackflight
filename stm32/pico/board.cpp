@@ -59,11 +59,6 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
 }
 
-void Board::debug(char c)
-{
-    serialWrite(Serial1, c);
-}
-
 void Board::checkReboot(bool pendReboot)
 {
     if (pendReboot)
@@ -125,6 +120,11 @@ uint8_t Board::serialReadByte(void)
 }
 
 void Board::serialWriteByte(uint8_t c)
+{
+    serialWrite(Serial1, c);
+}
+
+void Board::serialDebugByte(uint8_t c)
 {
     serialWrite(Serial1, c);
 }

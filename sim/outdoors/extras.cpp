@@ -51,7 +51,6 @@ void Board::serialWriteByte(uint8_t c)
 {
 }
 
-
 bool Board::sonarInit(uint8_t index) 
 {
     return false;

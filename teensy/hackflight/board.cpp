@@ -53,11 +53,6 @@ static const uint8_t MOTOR_PINS[4] = {23, 3, 4, 22};
 // for old-school PWM receiver like FrSky VD5M
 int RX_PINS[5] = {5, 6, 18, 19, 20};
 
-void Board::debug(char c)
-{
-    Serial1.write(c);
-}
-
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     // wake up device

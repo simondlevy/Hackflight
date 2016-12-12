@@ -58,11 +58,6 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
 }
 
-void Board::debug(char c)
-{
-    serialWrite(Serial1, c);
-}
-
 bool Board::baroInit(void)
 {
     return ms5611_init();
@@ -135,6 +130,13 @@ uint8_t Board::serialReadByte(void)
 void Board::serialWriteByte(uint8_t c)
 {
     serialWrite(Serial1, c);
+    while (!isSerialTransmitBufferEmpty(Serial1));
+}
+
+void Board::serialDebugByte(uint8_t c)
+{
+    serialWrite(Serial1, c);
+    while (!isSerialTransmitBufferEmpty(Serial1));
 }
 
 void Board::writeMotor(uint8_t index, uint16_t value)

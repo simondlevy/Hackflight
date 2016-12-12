@@ -42,11 +42,6 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
 }
 
-void Board::debug(char c)
-{
-    putchar(c);    
-}
-
 void Board::checkReboot(bool pendReboot)
 {
 }
