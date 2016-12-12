@@ -549,6 +549,24 @@ void errorDialog(char * message)
     displayDialog("ERROR", message, 1,0,0, sim_dlgstyle_ok);
 }
 
+// Debugging
+void debug(const char * fmt, ...)
+{
+    va_list ap;       
+
+    va_start(ap, fmt);     
+
+    char buf[1000];
+
+    vsprintf(buf, fmt, ap);
+
+    for (char * p = buf; *p; p++)
+        putchar(*p);
+
+    va_end(ap);  
+}
+
+
 // Board implementation ======================================================
 
 #include <board.hpp>
