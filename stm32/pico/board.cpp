@@ -39,7 +39,8 @@ extern serialPort_t * Serial1;
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
-    mpu6050_init(false, &acc1G, &gyroScale, BOARD_VERSION);
+    acc1G = mpu6050_init(INV_FSR_8G, INV_FSR_2000DPS);
+    gyroScale = MPU_GYRO_SCALE;
 }
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
