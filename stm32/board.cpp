@@ -73,12 +73,6 @@ int32_t Board::baroGetPressure(void)
     return ms5611_read_pressure();
 }
 
-void Board::checkReboot(bool pendReboot)
-{
-    if (pendReboot)
-        systemResetToBootloader(); // noreturn
-}
-
 void Board::delayMilliseconds(uint32_t msec)
 {
     delay(msec);

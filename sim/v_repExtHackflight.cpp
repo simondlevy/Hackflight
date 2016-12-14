@@ -687,10 +687,6 @@ void Board::reboot(void)
 {
 }
 
-void Board::checkReboot(bool pendReboot)
-{
-}
-
 void Board::delayMilliseconds(uint32_t msec)
 {
 }

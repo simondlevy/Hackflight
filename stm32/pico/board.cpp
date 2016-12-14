@@ -59,12 +59,6 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
 }
 
-void Board::checkReboot(bool pendReboot)
-{
-    if (pendReboot)
-        systemResetToBootloader(); // noreturn
-}
-
 void Board::delayMilliseconds(uint32_t msec)
 {
     delay(msec);
