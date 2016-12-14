@@ -27,7 +27,6 @@ extern "C" {
 
 #include "hackflight.hpp"
 
-#define MSP_REBOOT               68     
 #define MSP_RC                   105    
 #define MSP_ATTITUDE             108    
 #define MSP_ALTITUDE             109    
@@ -116,11 +115,6 @@ void MSP::init(class IMU * _imu, class Hover * _hover,
 
 void MSP::update(bool armed)
 {
-    static bool pendReboot;
-
-    // pendReboot will be set for flashing
-    Board::checkReboot(pendReboot);
-
     while (Board::serialAvailableBytes()) {
 
         uint8_t c = Board::serialReadByte();
@@ -207,11 +201,6 @@ void MSP::update(bool armed)
                         headSerialReply(8);
                         for (uint8_t i = 0; i < 4; i++)
                             serialize16(this->sonars->distances[i]);
-                        break;
-
-                    case MSP_REBOOT:
-                        headSerialReply(0);
-                        pendReboot = true;
                         break;
 
                     // don't know how to handle the (valid) message, indicate error MSP $M!
