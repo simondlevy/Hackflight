@@ -219,21 +219,24 @@ board.o: board.cpp $(FIRMDIR)/board.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -I$(FIRMDIR) -c -o board.o board.cpp
 
-clean:
-	rm -rf *.o obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
-
-flash_$(TARGET): $(TARGET_HEX)
-	stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
-	echo -n 'R' >$(SERIAL_DEVICE)
-	stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
+PRE_FLASH = stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
+DO_FLASH  = stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
 
 flash: flash_$(TARGET)
 
-unbrick_$(TARGET): $(TARGET_HEX)
-	stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
-	stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
+flash_$(TARGET): $(TARGET_HEX)
+	$(PRE_FLASH)	
+	echo -n 'R' >$(SERIAL_DEVICE)
+	$(DO_FLASH)
 
 unbrick: unbrick_$(TARGET)
+
+unbrick_$(TARGET): $(TARGET_HEX)
+	$(PRE_FLASH)
+	$(DO_FLASH)
+
+clean:
+	rm -rf *.o obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
 
 commit:
 	git commit -a --allow-empty-message -m ''
