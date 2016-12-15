@@ -130,11 +130,11 @@ uint16_t Board::rcReadSerial(uint8_t chan)
 {  
     static uint16_t values[5];
 
-    values[0] = 1500;
-    values[1] = 1500;
-    values[2] = 1500;
-    values[3] = 1500;
-    values[4] = 1500;
+    values[0] = rx.getChannelValue(1); // roll
+    values[1] = rx.getChannelValue(2); // pitch
+    values[2] = rx.getChannelValue(3); // throttle
+    values[3] = rx.getChannelValue(0); // yaw
+    values[4] = rx.getChannelValue(5); // aux
 
     return (int16_t)values[chan];
 }
