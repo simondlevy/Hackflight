@@ -25,14 +25,19 @@
 
 #include <Arduino.h>
 
-// https://github.com/simondlevy/ArduinoRXInterrupt
-#include <ArduinoRXInterrupt.h>
+// https://github.com/simondlevy/SpektrumDSM
+#include <SpektrumDSM.h>
+static SpektrumDSM2048 rx;
 
-// https://github.com/bolderflight/MPU9250
-#include <MPU9250.h>
+// https://github.com/simondlevy/ArduinoRXInterrupt
+//#include <ArduinoRXInterrupt.h>
+//int RX_PINS[5] = {5, 6, 18, 19, 20};
 
 // https://github.com/PaulStoffregen/PulsePosition
 //#include <PulsePosition.h>
+
+// https://github.com/bolderflight/MPU9250
+#include <MPU9250.h>
 
 #include "board.hpp"
 #include "rc.hpp"
@@ -49,9 +54,6 @@ MPU9250 imu(0x68, 0, I2C_PINS_16_17, I2C_PULLUP_INT);
 // Multiwii M3 = Controller M2 = Pin 4
 // Multiwii M4 = Controller M4 = Pin 22
 static const uint8_t MOTOR_PINS[4] = {23, 3, 4, 22};
-
-// for old-school PWM receiver like FrSky VD5M
-int RX_PINS[5] = {5, 6, 18, 19, 20};
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
@@ -75,8 +77,8 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     // Set up LED
     pinMode(13, OUTPUT);
 
-    // Set up receiver
-    initChannels(RX_PINS, 5);
+    // Start receiver
+    rx.begin();
 
     // Set up serial communication over USB
     Serial.begin(115200);
@@ -113,18 +115,32 @@ void Board::ledSetState(uint8_t id, bool state)
     digitalWrite(13, state); // we only have one LED
 }
 
-uint16_t Board::rcReadPWM(uint8_t chan)
+
+bool Board::rcUseSerial(void)
+{ 
+    return true;
+}
+
+bool  Board::rcSerialReady(void)
 {
-    short values[5];
-    updateChannels(values, 5);
+    return true;
+}
+
+uint16_t Board::rcReadSerial(uint8_t chan)
+{
+    Serial.println("RC\n");
+  
+    static uint16_t values[5];
+
+    values[0] = 1500;
+    values[1] = 1500;
+    values[2] = 1500;
+    values[3] = 1500;
+    values[4] = 1500;
 
     return (int16_t)values[chan];
 }
 
-bool Board::rcUseSerial(void)
-{ 
-    return false;
-}
 
 uint8_t Board::serialAvailableBytes(void)
 {
@@ -155,15 +171,11 @@ void Board::writeMotor(uint8_t index, uint16_t pwmValue)
 
 // Unused -------------------------------------------------------------------------
 
-uint16_t Board::rcReadSerial(uint8_t chan)
-{
-    (void)chan;
-    return 0;
-}
 
-bool  Board::rcSerialReady(void)
+uint16_t Board::rcReadPWM(uint8_t chan)
 {
-    return false;
+  (void)chan;
+  return 0;
 }
 
 void Board::reboot(void)
@@ -212,9 +224,5 @@ void Board::baroUpdate(void)
 int32_t Board::baroGetPressure(void)
 {
     return 0;
-}
-
-void Board::checkReboot(bool pendReboot)
-{
 }
 
