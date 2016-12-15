@@ -54,8 +54,6 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     i2cInit(I2CDEV_2);
     pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 
-    spektrumInit(USART2, SERIALRX_SPEKTRUM1024);
-
     looptimeMicroseconds = Board::DEFAULT_IMU_LOOPTIME_USEC; 
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
 }
@@ -85,6 +83,8 @@ void Board::ledSetState(uint8_t id, bool state)
 
 bool Board::rcUseSerial(void)
 {
+    spektrumInit(USART2, SERIALRX_SPEKTRUM1024);
+
     return true;
 }
 
