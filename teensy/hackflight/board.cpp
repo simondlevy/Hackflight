@@ -127,9 +127,7 @@ bool  Board::rcSerialReady(void)
 }
 
 uint16_t Board::rcReadSerial(uint8_t chan)
-{
-    Serial.println("RC\n");
-  
+{  
     static uint16_t values[5];
 
     values[0] = 1500;

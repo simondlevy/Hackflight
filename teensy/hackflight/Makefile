@@ -29,3 +29,6 @@ flash:
 
 edit:
 	vim board.cpp
+
+listen:
+	miniterm.py /dev/ttyACM1 115200
