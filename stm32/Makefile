@@ -17,7 +17,7 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 TARGET		?= NAZE
 
-CPP_OBJS = hackflight.o imu.o mixer.o msp.o rc.o baro.o sonars.o board.o stabilize.o hover.o filters.o
+CPP_OBJS = hackflight.o imu.o mixer.o msp.o rc.o baro.o sonars.o board.o board_rx.o stabilize.o hover.o filters.o
 
 # Compile-time options
 OPTIONS		?=
@@ -48,6 +48,7 @@ NAZE_SRC = $(BREEZY_DIR)/main.c \
            $(BREEZY_DIR)/drivers/mpu6050.c \
            $(BREEZY_DIR)/drivers/ms5611.c \
            $(BREEZY_DIR)/drivers/mb1242.c \
+           $(BREEZY_DIR)/drivers/spektrum.c \
            $(BREEZY_DIR)/i2c_stm32f10x.c \
            $(BREEZY_DIR)/serial.c \
            $(BREEZY_DIR)/pwm.c \
@@ -217,6 +218,10 @@ filters.o: $(FIRMDIR)/filters.cpp $(FIRMDIR)/filters.hpp $(FIRMDIR)/rc.hpp
 board.o: board.cpp $(FIRMDIR)/board.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -I$(FIRMDIR) -c -o board.o board.cpp
+
+board_rx.o: board_rx.cpp $(FIRMDIR)/board.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -I$(FIRMDIR) -c -o board_rx.o board_rx.cpp
 
 clean:
 	rm -rf *.o obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)

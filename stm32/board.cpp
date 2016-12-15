@@ -21,6 +21,10 @@
 extern "C" {
 #endif
 
+#define USE_CPPM                1
+#define PWM_FILTER              0     // 0 or 1
+#define FAST_PWM                0     // 0 or 1
+
 #include <breezystm32.h>
 #include <drivers/mpu6050.h>
 #include <drivers/ms5611.h>
@@ -29,10 +33,6 @@ extern "C" {
 
 #include "board.hpp"
 #include "motorpwm.hpp"
-
-#define USE_CPPM                1
-#define PWM_FILTER              0     // 0 or 1
-#define FAST_PWM                0     // 0 or 1
 
 extern serialPort_t * Serial1;
 
@@ -52,23 +52,25 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 {
     i2cInit(I2CDEV_2);
 
+    pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
+
     looptimeMicroseconds = Board::DEFAULT_IMU_LOOPTIME_USEC; 
+
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
 }
 
 bool Board::baroInit(void)
 {
-    return ms5611_init();
+    return false;
 }
 
 void Board::baroUpdate(void)
 {
-    ms5611_update();
 }
 
 int32_t Board::baroGetPressure(void)
 {
-    return ms5611_read_pressure();
+    return 0;
 }
 
 void Board::delayMilliseconds(uint32_t msec)
@@ -92,18 +94,6 @@ void Board::ledSetState(uint8_t id, bool state)
     else {
         digitalHi(gpio, pin);
     }
-}
-
-uint16_t Board::rcReadPWM(uint8_t chan)
-{
-    return pwmRead(chan);
-}
-
-bool Board::rcUseSerial(void)
-{
-    pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
-
-    return false;
 }
 
 void Board::reboot(void)
@@ -136,19 +126,6 @@ void Board::serialDebugByte(uint8_t c)
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
     pwmWriteMotor(index, value);
-}
-
-// unused --------------------------------------------------------------------------
-
-bool Board::rcSerialReady(void)
-{
-    return false;
-}
-
-uint16_t Board::rcReadSerial(uint8_t chan)
-{
-    (void)chan;
-    return 0;
 }
 
 bool Board::sonarInit(uint8_t index) 
