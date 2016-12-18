@@ -49,7 +49,33 @@ static SpektrumDSM2048 rx;
 MPU9250 imu(0x68, 0, I2C_PINS_16_17, I2C_PULLUP_INT);
 
 // https://www.tindie.com/products/onehorse/dc-motor-controller-board-for-teensy-31-/
+
 static const uint8_t MOTOR_PINS[4] = {20, 21, 22, 23};
+
+/*
+(23 / Blue-Red / CW )                        (21 / Black-White/ CCW)
+    M4---------.                              M2-----.  
+        #######|############################         |
+    GND---* m1 |                      m2 *---- VBAT  |
+        #      |                           #         |
+        #      |                           #         |
+        # o    |                         o #         |
+        #      |                           #         |
+        #      |                           #         |
+        # o    |                         o #         |
+        #      |                           #         |
+        #      |                           #         |
+        # o    `-------------------------* #         |
+        #         .----------------------------------'
+        #         |                        #
+        # *-------'                      *----. 
+        #                                  #  |
+        #                                  #  |
+    .-----* m3                        m4 o #  |
+    |   ####################################  |
+    M3                                        M1        
+(22 / Black-White / CCW )                 (20 / Blue-Red / CW)
+*/
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
