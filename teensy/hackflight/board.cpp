@@ -49,11 +49,7 @@ static SpektrumDSM2048 rx;
 MPU9250 imu(0x68, 0, I2C_PINS_16_17, I2C_PULLUP_INT);
 
 // https://www.tindie.com/products/onehorse/dc-motor-controller-board-for-teensy-31-/
-// Multiwii M1 = Controller M1 = Pin 23
-// Multiwii M2 = Controller M3 = Pin 3
-// Multiwii M3 = Controller M2 = Pin 4
-// Multiwii M4 = Controller M4 = Pin 22
-static const uint8_t MOTOR_PINS[4] = {23, 3, 4, 22};
+static const uint8_t MOTOR_PINS[4] = {20, 21, 22, 23};
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
