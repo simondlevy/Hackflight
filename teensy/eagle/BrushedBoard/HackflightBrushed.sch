@@ -3899,6 +3899,155 @@ part number 2062-2P from STA</description>
 </deviceset>
 </devicesets>
 </library>
+<library name="con-molex-picoblade">
+<description>&lt;b&gt;MOLEX PicoBlade Series Connectors&lt;/b&gt; - v1.01 (09/07/2010)&lt;p&gt;
+1.25MM (0.05") Wire-To-Board Connectors&lt;p&gt;
+&lt;p&gt;THIS LIBRARY IS PROVIDED AS IS AND WITHOUT WARRANTY OF ANY KIND, EXPRESSED OR IMPLIED.&lt;br&gt;
+USE AT YOUR OWN RISK!&lt;p&gt;
+&lt;author&gt;Copyright (C) 2010, Bob Starr&lt;br&gt; http://www.bobstarr.net&lt;br&gt;&lt;/author&gt;</description>
+<packages>
+<package name="53047-0210">
+<description>&lt;b&gt;HEADER&lt;/b&gt;</description>
+<wire x1="-2.215" y1="1.25" x2="2.215" y2="1.25" width="0.2032" layer="21"/>
+<wire x1="2.215" y1="1.25" x2="2.215" y2="-2.15" width="0.2032" layer="21"/>
+<wire x1="2.215" y1="-2.15" x2="-2.215" y2="-2.15" width="0.2032" layer="21"/>
+<wire x1="-2.215" y1="-2.15" x2="-2.215" y2="1.25" width="0.2032" layer="21"/>
+<wire x1="-1.778" y1="0.889" x2="1.778" y2="0.889" width="0.0508" layer="51"/>
+<wire x1="1.778" y1="0.889" x2="1.778" y2="-0.127" width="0.0508" layer="51"/>
+<wire x1="1.778" y1="-0.127" x2="1.778" y2="-0.762" width="0.0508" layer="51"/>
+<wire x1="1.778" y1="-0.762" x2="1.778" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="1.778" y1="-1.651" x2="1.524" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="-1.651" x2="1.27" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="1.27" y1="-1.651" x2="-1.27" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="-1.27" y1="-1.651" x2="-1.524" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="-1.524" y1="-1.651" x2="-1.778" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="-1.778" y1="-1.651" x2="-1.778" y2="-0.762" width="0.0508" layer="51"/>
+<wire x1="-1.778" y1="-0.762" x2="-1.778" y2="-0.127" width="0.0508" layer="51"/>
+<wire x1="-1.778" y1="-0.127" x2="-1.778" y2="0.889" width="0.0508" layer="51"/>
+<wire x1="-1.778" y1="-0.127" x2="-1.524" y2="-0.127" width="0.0508" layer="51"/>
+<wire x1="-1.524" y1="-0.127" x2="-1.524" y2="0.635" width="0.0508" layer="51"/>
+<wire x1="-1.524" y1="0.635" x2="1.524" y2="0.635" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="0.635" x2="1.524" y2="-0.127" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="-0.127" x2="1.778" y2="-0.127" width="0.0508" layer="51"/>
+<wire x1="-1.778" y1="-0.762" x2="-1.524" y2="-0.762" width="0.0508" layer="51"/>
+<wire x1="-1.524" y1="-0.762" x2="-1.524" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="-1.651" x2="1.524" y2="-0.762" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="-0.762" x2="1.778" y2="-0.762" width="0.0508" layer="51"/>
+<wire x1="-1.524" y1="0.635" x2="-1.778" y2="0.889" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="0.635" x2="1.778" y2="0.889" width="0.0508" layer="51"/>
+<wire x1="-1.778" y1="-1.651" x2="-2.132" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="2.132" y1="-1.651" x2="1.778" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="-1.651" x2="1.524" y2="-1.8161" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="-1.8161" x2="-1.524" y2="-1.8161" width="0.0508" layer="51"/>
+<wire x1="-1.524" y1="-1.8161" x2="-1.524" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="-1.27" y1="-1.651" x2="-1.27" y2="-2.032" width="0.0508" layer="51"/>
+<wire x1="1.27" y1="-1.651" x2="1.27" y2="-2.032" width="0.0508" layer="51"/>
+<pad name="1" x="0.625" y="0" drill="0.508" shape="long" rot="R270"/>
+<pad name="2" x="-0.625" y="0" drill="0.508" shape="long" rot="R270"/>
+<text x="-2.159" y="1.651" size="1.016" layer="25" ratio="18">&gt;NAME</text>
+<text x="-2.286" y="-3.302" size="0.8128" layer="27" ratio="10">&gt;VALUE</text>
+<rectangle x1="-0.879" y1="-0.508" x2="-0.371" y2="0.508" layer="51"/>
+<rectangle x1="0.371" y1="-0.508" x2="0.879" y2="0.508" layer="51"/>
+<polygon width="0.0508" layer="21">
+<vertex x="1.651" y="-1.651"/>
+<vertex x="1.905" y="-1.651"/>
+<vertex x="1.778" y="-1.905"/>
+</polygon>
+</package>
+</packages>
+<symbols>
+<symbol name="MA02-1">
+<wire x1="1.27" y1="0" x2="0" y2="0" width="0.6096" layer="94"/>
+<wire x1="1.27" y1="-2.54" x2="0" y2="-2.54" width="0.6096" layer="94"/>
+<wire x1="-1.27" y1="2.54" x2="3.81" y2="2.54" width="0.4064" layer="94"/>
+<wire x1="-1.27" y1="2.54" x2="-1.27" y2="-5.08" width="0.4064" layer="94"/>
+<wire x1="3.81" y1="2.54" x2="3.81" y2="-5.08" width="0.4064" layer="94"/>
+<wire x1="-1.27" y1="-5.08" x2="3.81" y2="-5.08" width="0.4064" layer="94"/>
+<text x="-1.27" y="3.175" size="1.778" layer="95">&gt;NAME</text>
+<text x="-1.27" y="-7.62" size="1.778" layer="95">&gt;VALUE</text>
+<pin name="1" x="-5.08" y="0" visible="pad" length="middle" direction="pas" swaplevel="1"/>
+<pin name="2" x="-5.08" y="-2.54" visible="pad" length="middle" direction="pas" swaplevel="1"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="53047-0210" prefix="P">
+<description>&lt;b&gt;HEADER&lt;/b&gt;</description>
+<gates>
+<gate name="G$1" symbol="MA02-1" x="0" y="0" swaplevel="1"/>
+</gates>
+<devices>
+<device name="" package="53047-0210">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
+<library name="jst">
+<packages>
+<package name="B3B-ZR">
+<description>&lt;b&gt;JST ZH Connector&lt;/b&gt;
+Top Entry type&lt;br&gt;
+3 pol, 1.5 mm Pitch&lt;br&gt;
+Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://www.jst-mfg.com/product/pdf/eng/eZH.pdf&lt;/a&gt;</description>
+<wire x1="-3" y1="1.3" x2="3" y2="1.3" width="0.127" layer="21"/>
+<wire x1="3" y1="1.3" x2="3" y2="-2.2" width="0.127" layer="21"/>
+<wire x1="3" y1="-2.2" x2="-3" y2="-2.2" width="0.127" layer="21"/>
+<wire x1="-3" y1="-2.2" x2="-3" y2="1.3" width="0.127" layer="21"/>
+<pad name="1" x="-1.5" y="0" drill="0.7" diameter="1.1"/>
+<pad name="2" x="0" y="0" drill="0.7" diameter="1.1"/>
+<pad name="3" x="1.5" y="0" drill="0.7" diameter="1.1"/>
+<text x="-3.75" y="1.5" size="1.27" layer="25">&gt;NAME</text>
+<text x="-3.75" y="-3.5" size="1.27" layer="27">&gt;VALUE</text>
+</package>
+</packages>
+<symbols>
+<symbol name="B3B-ZR">
+<pin name="1" x="-7.62" y="2.54" visible="pin" length="middle"/>
+<pin name="2" x="-7.62" y="0" visible="pin" length="middle"/>
+<pin name="3" x="-7.62" y="-2.54" visible="pin" length="middle"/>
+<text x="-2.54" y="5.842" size="1.27" layer="95">&gt;NAME</text>
+<text x="-2.54" y="-6.858" size="1.27" layer="96">&gt;VALUE</text>
+<wire x1="-5.08" y1="5.08" x2="2.54" y2="5.08" width="0.254" layer="94"/>
+<wire x1="2.54" y1="5.08" x2="2.54" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="2.54" y1="-5.08" x2="-5.08" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="-5.08" y1="-5.08" x2="-5.08" y2="5.08" width="0.254" layer="94"/>
+<circle x="-2.54" y="2.54" radius="0.915809375" width="0.254" layer="94"/>
+<circle x="-2.54" y="0" radius="0.915809375" width="0.254" layer="94"/>
+<circle x="-2.54" y="-2.54" radius="0.915809375" width="0.254" layer="94"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="B3B-ZR" prefix="CON">
+<description>&lt;b&gt;JST-ZH Connector&lt;/b&gt;&lt;br&gt;
+3 pol, 1.5mm pitch&lt;br&gt;
+Package: &lt;b&gt;B3B-ZR&lt;/b&gt;
+&lt;br&gt;&lt;br&gt;
+Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://www.jst-mfg.com/product/pdf/eng/eZH.pdf&lt;/a&gt;</description>
+<gates>
+<gate name="G$1" symbol="B3B-ZR" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="B3B-ZR">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+<connect gate="G$1" pin="3" pad="3"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -3916,6 +4065,11 @@ part number 2062-2P from STA</description>
 <part name="J4" library="SparkFun-Connectors" deviceset="CONN_04" device=""/>
 <part name="5VREG" library="SparkFun-Connectors" deviceset="CONN_03" device=""/>
 <part name="PWR" library="SparkFun-Connectors" deviceset="CONN_02" device=""/>
+<part name="M1" library="con-molex-picoblade" deviceset="53047-0210" device=""/>
+<part name="M2" library="con-molex-picoblade" deviceset="53047-0210" device=""/>
+<part name="M3" library="con-molex-picoblade" deviceset="53047-0210" device=""/>
+<part name="M4" library="con-molex-picoblade" deviceset="53047-0210" device=""/>
+<part name="RX" library="jst" deviceset="B3B-ZR" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -3929,6 +4083,11 @@ part number 2062-2P from STA</description>
 <instance part="J4" gate="G$1" x="17.78" y="7.62"/>
 <instance part="5VREG" gate="J$1" x="96.52" y="40.64"/>
 <instance part="PWR" gate="G$1" x="96.52" y="55.88"/>
+<instance part="M1" gate="G$1" x="116.84" y="7.62"/>
+<instance part="M2" gate="G$1" x="116.84" y="22.86"/>
+<instance part="M3" gate="G$1" x="99.06" y="7.62"/>
+<instance part="M4" gate="G$1" x="99.06" y="22.86"/>
+<instance part="RX" gate="G$1" x="109.22" y="78.74"/>
 </instances>
 <busses>
 </busses>
@@ -3956,12 +4115,36 @@ part number 2062-2P from STA</description>
 <wire x1="104.14" y1="38.1" x2="111.76" y2="38.1" width="0.1524" layer="91"/>
 <label x="104.14" y="38.1" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="RX" gate="G$1" pin="2"/>
+<wire x1="101.6" y1="78.74" x2="96.52" y2="78.74" width="0.1524" layer="91"/>
+<label x="99.06" y="78.74" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="VIN" class="0">
 <segment>
 <pinref part="5VREG" gate="J$1" pin="2"/>
 <wire x1="104.14" y1="40.64" x2="111.76" y2="40.64" width="0.1524" layer="91"/>
 <label x="104.14" y="40.64" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="3.3V" class="0">
+<segment>
+<pinref part="RX" gate="G$1" pin="1"/>
+<wire x1="101.6" y1="81.28" x2="96.52" y2="81.28" width="0.1524" layer="91"/>
+<label x="99.06" y="81.28" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="RX1" class="0">
+<segment>
+<pinref part="RX" gate="G$1" pin="3"/>
+<wire x1="101.6" y1="76.2" x2="96.52" y2="76.2" width="0.1524" layer="91"/>
+<label x="99.06" y="76.2" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="0/RX1/T"/>
+<wire x1="40.64" y1="76.2" x2="33.02" y2="76.2" width="0.1524" layer="91"/>
+<label x="35.56" y="76.2" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>

@@ -345,6 +345,82 @@ You are welcome to use this library for commercial purposes. For attribution, we
 </package>
 </packages>
 </library>
+<library name="con-molex-picoblade">
+<description>&lt;b&gt;MOLEX PicoBlade Series Connectors&lt;/b&gt; - v1.01 (09/07/2010)&lt;p&gt;
+1.25MM (0.05") Wire-To-Board Connectors&lt;p&gt;
+&lt;p&gt;THIS LIBRARY IS PROVIDED AS IS AND WITHOUT WARRANTY OF ANY KIND, EXPRESSED OR IMPLIED.&lt;br&gt;
+USE AT YOUR OWN RISK!&lt;p&gt;
+&lt;author&gt;Copyright (C) 2010, Bob Starr&lt;br&gt; http://www.bobstarr.net&lt;br&gt;&lt;/author&gt;</description>
+<packages>
+<package name="53047-0210">
+<description>&lt;b&gt;HEADER&lt;/b&gt;</description>
+<wire x1="-2.215" y1="1.25" x2="2.215" y2="1.25" width="0.2032" layer="21"/>
+<wire x1="2.215" y1="1.25" x2="2.215" y2="-2.15" width="0.2032" layer="21"/>
+<wire x1="2.215" y1="-2.15" x2="-2.215" y2="-2.15" width="0.2032" layer="21"/>
+<wire x1="-2.215" y1="-2.15" x2="-2.215" y2="1.25" width="0.2032" layer="21"/>
+<wire x1="-1.778" y1="0.889" x2="1.778" y2="0.889" width="0.0508" layer="51"/>
+<wire x1="1.778" y1="0.889" x2="1.778" y2="-0.127" width="0.0508" layer="51"/>
+<wire x1="1.778" y1="-0.127" x2="1.778" y2="-0.762" width="0.0508" layer="51"/>
+<wire x1="1.778" y1="-0.762" x2="1.778" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="1.778" y1="-1.651" x2="1.524" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="-1.651" x2="1.27" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="1.27" y1="-1.651" x2="-1.27" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="-1.27" y1="-1.651" x2="-1.524" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="-1.524" y1="-1.651" x2="-1.778" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="-1.778" y1="-1.651" x2="-1.778" y2="-0.762" width="0.0508" layer="51"/>
+<wire x1="-1.778" y1="-0.762" x2="-1.778" y2="-0.127" width="0.0508" layer="51"/>
+<wire x1="-1.778" y1="-0.127" x2="-1.778" y2="0.889" width="0.0508" layer="51"/>
+<wire x1="-1.778" y1="-0.127" x2="-1.524" y2="-0.127" width="0.0508" layer="51"/>
+<wire x1="-1.524" y1="-0.127" x2="-1.524" y2="0.635" width="0.0508" layer="51"/>
+<wire x1="-1.524" y1="0.635" x2="1.524" y2="0.635" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="0.635" x2="1.524" y2="-0.127" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="-0.127" x2="1.778" y2="-0.127" width="0.0508" layer="51"/>
+<wire x1="-1.778" y1="-0.762" x2="-1.524" y2="-0.762" width="0.0508" layer="51"/>
+<wire x1="-1.524" y1="-0.762" x2="-1.524" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="-1.651" x2="1.524" y2="-0.762" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="-0.762" x2="1.778" y2="-0.762" width="0.0508" layer="51"/>
+<wire x1="-1.524" y1="0.635" x2="-1.778" y2="0.889" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="0.635" x2="1.778" y2="0.889" width="0.0508" layer="51"/>
+<wire x1="-1.778" y1="-1.651" x2="-2.132" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="2.132" y1="-1.651" x2="1.778" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="-1.651" x2="1.524" y2="-1.8161" width="0.0508" layer="51"/>
+<wire x1="1.524" y1="-1.8161" x2="-1.524" y2="-1.8161" width="0.0508" layer="51"/>
+<wire x1="-1.524" y1="-1.8161" x2="-1.524" y2="-1.651" width="0.0508" layer="51"/>
+<wire x1="-1.27" y1="-1.651" x2="-1.27" y2="-2.032" width="0.0508" layer="51"/>
+<wire x1="1.27" y1="-1.651" x2="1.27" y2="-2.032" width="0.0508" layer="51"/>
+<pad name="1" x="0.625" y="0" drill="0.508" shape="long" rot="R270"/>
+<pad name="2" x="-0.625" y="0" drill="0.508" shape="long" rot="R270"/>
+<text x="-2.159" y="1.651" size="1.016" layer="25" ratio="18">&gt;NAME</text>
+<text x="-2.286" y="-3.302" size="0.8128" layer="27" ratio="10">&gt;VALUE</text>
+<rectangle x1="-0.879" y1="-0.508" x2="-0.371" y2="0.508" layer="51"/>
+<rectangle x1="0.371" y1="-0.508" x2="0.879" y2="0.508" layer="51"/>
+<polygon width="0.0508" layer="21">
+<vertex x="1.651" y="-1.651"/>
+<vertex x="1.905" y="-1.651"/>
+<vertex x="1.778" y="-1.905"/>
+</polygon>
+</package>
+</packages>
+</library>
+<library name="jst">
+<packages>
+<package name="B3B-ZR">
+<description>&lt;b&gt;JST ZH Connector&lt;/b&gt;
+Top Entry type&lt;br&gt;
+3 pol, 1.5 mm Pitch&lt;br&gt;
+Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://www.jst-mfg.com/product/pdf/eng/eZH.pdf&lt;/a&gt;</description>
+<wire x1="-3" y1="1.3" x2="3" y2="1.3" width="0.127" layer="21"/>
+<wire x1="3" y1="1.3" x2="3" y2="-2.2" width="0.127" layer="21"/>
+<wire x1="3" y1="-2.2" x2="-3" y2="-2.2" width="0.127" layer="21"/>
+<wire x1="-3" y1="-2.2" x2="-3" y2="1.3" width="0.127" layer="21"/>
+<pad name="1" x="-1.5" y="0" drill="0.7" diameter="1.1"/>
+<pad name="2" x="0" y="0" drill="0.7" diameter="1.1"/>
+<pad name="3" x="1.5" y="0" drill="0.7" diameter="1.1"/>
+<text x="-3.75" y="1.5" size="1.27" layer="25">&gt;NAME</text>
+<text x="-3.75" y="-3.5" size="1.27" layer="27">&gt;VALUE</text>
+</package>
+</packages>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -535,20 +611,25 @@ design rules under a new name.</description>
 </autorouter>
 <elements>
 <element name="U$1" library="Teensy_3_and_LC_Series_Boards_v1.4" package="TEENSY_3.0-3.2&amp;LC_DIL" value="TEENSY_3.1-3.2_DIL" x="59.69" y="20.32"/>
-<element name="J1" library="SparkFun-Connectors" package="1X06_NO_SILK" value="" x="29.21" y="12.7" rot="R90">
-<attribute name="PROD_ID" value="CONN-08437" x="29.21" y="12.7" size="1.778" layer="27" rot="R90" display="off"/>
+<element name="J1" library="SparkFun-Connectors" package="1X06_NO_SILK" value="" x="72.39" y="13.97" rot="R90">
+<attribute name="PROD_ID" value="CONN-08437" x="72.39" y="13.97" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
-<element name="J2" library="SparkFun-Connectors" package="1X06_NO_SILK" value="" x="44.45" y="12.7" rot="R90">
-<attribute name="PROD_ID" value="CONN-08437" x="44.45" y="12.7" size="1.778" layer="27" rot="R90" display="off"/>
+<element name="J2" library="SparkFun-Connectors" package="1X06_NO_SILK" value="" x="87.63" y="13.97" rot="R90">
+<attribute name="PROD_ID" value="CONN-08437" x="87.63" y="13.97" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
-<element name="J3" library="SparkFun-Connectors" package="1X04" value="" x="33.02" y="25.4">
-<attribute name="PROD_ID" value="CONN-09696" x="33.02" y="25.4" size="1.778" layer="27" display="off"/>
+<element name="J3" library="SparkFun-Connectors" package="1X04" value="" x="76.2" y="27.94">
+<attribute name="PROD_ID" value="CONN-09696" x="76.2" y="27.94" size="1.778" layer="27" display="off"/>
 </element>
-<element name="J4" library="SparkFun-Connectors" package="1X04" value="" x="33.02" y="12.7">
-<attribute name="PROD_ID" value="CONN-09696" x="33.02" y="12.7" size="1.778" layer="27" display="off"/>
+<element name="J4" library="SparkFun-Connectors" package="1X04" value="" x="76.2" y="13.97">
+<attribute name="PROD_ID" value="CONN-09696" x="76.2" y="13.97" size="1.778" layer="27" display="off"/>
 </element>
-<element name="5VREG" library="SparkFun-Connectors" package="1X03" value="" x="73.66" y="29.21"/>
+<element name="5VREG" library="SparkFun-Connectors" package="1X03" value="" x="77.47" y="33.02"/>
 <element name="PWR" library="SparkFun-Connectors" package="1X02" value="" x="58.42" y="44.45"/>
+<element name="M1" library="con-molex-picoblade" package="53047-0210" value="53047-0210" x="86.36" y="2.54"/>
+<element name="M2" library="con-molex-picoblade" package="53047-0210" value="53047-0210" x="86.36" y="8.89"/>
+<element name="M3" library="con-molex-picoblade" package="53047-0210" value="53047-0210" x="76.2" y="2.54"/>
+<element name="M4" library="con-molex-picoblade" package="53047-0210" value="53047-0210" x="76.2" y="8.89"/>
+<element name="RX" library="jst" package="B3B-ZR" value="B3B-ZR" x="80.01" y="40.64"/>
 </elements>
 <signals>
 <signal name="AGND">
@@ -556,23 +637,32 @@ design rules under a new name.</description>
 </signal>
 <signal name="3.3V">
 <contactref element="U$1" pad="3.3V"/>
+<contactref element="RX" pad="1"/>
+<wire x1="67.31" y1="31.75" x2="78.51" y2="40.64" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="VIN">
 <contactref element="U$1" pad="VIN"/>
 <contactref element="5VREG" pad="2"/>
-<wire x1="67.31" y1="36.83" x2="76.2" y2="29.21" width="0" layer="19" extent="1-1"/>
+<wire x1="67.31" y1="36.83" x2="80.01" y2="33.02" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GND">
 <contactref element="U$1" pad="GND"/>
 <contactref element="PWR" pad="1"/>
 <contactref element="5VREG" pad="1"/>
+<contactref element="RX" pad="2"/>
+<wire x1="77.47" y1="33.02" x2="80.01" y2="40.64" width="0" layer="19" extent="1-1"/>
+<wire x1="58.42" y1="44.45" x2="80.01" y2="40.64" width="0" layer="19" extent="1-1"/>
 <wire x1="52.07" y1="36.83" x2="58.42" y2="44.45" width="0" layer="19" extent="1-1"/>
-<wire x1="73.66" y1="29.21" x2="58.42" y2="44.45" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="VBAT">
 <contactref element="PWR" pad="2"/>
 <contactref element="5VREG" pad="3"/>
-<wire x1="60.96" y1="44.45" x2="78.74" y2="29.21" width="0" layer="19" extent="1-1"/>
+<wire x1="60.96" y1="44.45" x2="82.55" y2="33.02" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="RX1">
+<contactref element="RX" pad="3"/>
+<contactref element="U$1" pad="0"/>
+<wire x1="52.07" y1="34.29" x2="81.51" y2="40.64" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 </board>
