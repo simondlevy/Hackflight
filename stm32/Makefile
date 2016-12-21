@@ -187,9 +187,9 @@ mixer.o: $(FIRMDIR)/mixer.cpp $(FIRMDIR)/mixer.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o mixer.o $(FIRMDIR)/mixer.cpp
 
-stabilize.o: $(FIRMDIR)/stabilize.cpp $(FIRMDIR)/stabilize.hpp
+stabilize.o: $(FIRMDIR)/stabilize_multiwii.cpp $(FIRMDIR)/stabilize.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o stabilize.o $(FIRMDIR)/stabilize.cpp
+	@$(CC) $(CFLAGS) -c -o stabilize.o $(FIRMDIR)/stabilize_multiwii.cpp
 
 msp.o: $(FIRMDIR)/msp.cpp $(FIRMDIR)/msp.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
