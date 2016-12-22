@@ -35,6 +35,13 @@ extern "C" {
             int16_t axisPID[3];
 
             void init(class RC * _rc, class IMU * _imu)  { this->rc = _rc; this->imu = _imu; }
+
+#ifndef __arm__
+            
+            virtual void update(void) = 0;
+
+            virtual void resetIntegral(void) = 0;
+#endif
     }; 
 
 #ifdef __arm__
