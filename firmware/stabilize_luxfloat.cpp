@@ -34,39 +34,16 @@ int16_t axisPID[3];
 static const float PID_P_f[3] = {5.0f, 6.5f, 9.3f}; 
 static const float PID_I_f[3] = {1.0f, 1.5f, 1.75f};
 static const float PID_D_f[3] = {0.11f, 0.14f, 0.0f};
-
 static const uint8_t PID_WEIGHT[3] = {100, 100, 100};
-
 static const uint8_t PID_CONTROL_RATES[3] = {90, 90, 90};
-
 static const uint8_t PID_ANGLE_TRIMS_RAW[3] = {0, 0, 0};
+static const float KD_ATTENUATION_BREAK = 0.25f;
 
 static bool deltaStateIsSet;
 static biquad_t deltaBiQuadState[3];
-
 static filterStatePt1_t yawPTermState;
-
-static int32_t errorGyroI[3] = { 0, 0, 0 };
-static float errorGyroIf[3] = { 0.0f, 0.0f, 0.0f };
-
-static inline int constrain(int amt, int low, int high)
-{
-    if (amt < low)
-        return low;
-    else if (amt > high)
-        return high;
-    else
-        return amt;
-}
-static inline float constrainf(float amt, float low, float high)
-{
-    if (amt < low)
-        return low;
-    else if (amt > high)
-        return high;
-    else
-        return amt;
-}
+static int32_t errorGyroI[3];
+static float   errorGyroIf[3];
 
 static int32_t getRcStickDeflection(int16_t * rcData, int32_t axis, uint16_t midrc) {
     return MIN(ABS(rcData[axis] - midrc), 500);
@@ -93,6 +70,7 @@ void myPidLuxFloat(
         bool armed)
 {    
     static bool fullKiLatched;
+    static float lastError[3];
 
     float throttleP = constrainf( ((float)rcCommand[THROTTLE] - RX_MINCHECK) / (RX_MAXCHECK - RX_MINCHECK), 0, 100);
 
@@ -102,7 +80,6 @@ void myPidLuxFloat(
 
     float RateError, AngleRate, gyroRate;
     float ITerm,PTerm,DTerm;
-    static float lastError[3];
     float delta;
     int axis;
     float horizonLevelStrength = 1;
@@ -197,9 +174,8 @@ void myPidLuxFloat(
         delta *= (1.0f / dT);
 
         float D_f = PID_D_f[axis];
-        static float Kd_attenuation_break = 0.25f;
-        if (throttleP < Kd_attenuation_break) {
-        	float Kd_attenuation = constrainf((throttleP / Kd_attenuation_break) + 0.50f, 0, 1);
+        if (throttleP < KD_ATTENUATION_BREAK) {
+        	float Kd_attenuation = constrainf((throttleP / KD_ATTENUATION_BREAK) + 0.50f, 0, 1);
         	D_f = Kd_attenuation * D_f;
         }
         DTerm = constrainf(delta * (D_f/10) * PID_WEIGHT[axis] / 100, -300.0f, 300.0f);

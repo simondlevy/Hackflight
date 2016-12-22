@@ -57,7 +57,7 @@ libv_repExtHackflight.$(EXT): *.cpp *.hpp ../*.cpp ../*.hpp ../../firmware/*.cpp
 	g++ $(CFLAGS) -c ../../firmware/mixer.cpp
 	g++ $(CFLAGS) -c ../../firmware/msp.cpp
 	g++ $(CFLAGS) -c ../../firmware/hackflight.cpp
-	g++ $(CFLAGS) -c ../../firmware/stabilize.cpp
+	g++ $(CFLAGS) -c ../../firmware/stabilize_multiwii.cpp
 	g++ $(CFLAGS) -c ../../firmware/rc.cpp
 	g++ $(CFLAGS) -c ../../firmware/baro.cpp
 	g++ $(CFLAGS) -c ../../firmware/sonars.cpp

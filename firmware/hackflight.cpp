@@ -38,7 +38,7 @@ static MSP        msp;
 //static Baro       baro;
 static Sonars     sonars;
 static Hover      hover;
-static Stabilize  stab;
+static StabilizeMultiwii  stab;
 
 // support for timed tasks
 
