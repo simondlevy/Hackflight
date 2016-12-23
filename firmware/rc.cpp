@@ -57,7 +57,7 @@ void RC::init(void)
         lookupThrottleRC[i] = 10 * CONFIG_THR_MID_8 + tmp * (100 - CONFIG_THR_EXPO_8 + 
                 (int32_t)CONFIG_THR_EXPO_8 * (tmp * tmp) / (y * y)) / 10;
         lookupThrottleRC[i] = CONFIG_PWM_MIN + (int32_t)(CONFIG_PWM_MAX - CONFIG_PWM_MIN) * 
-            lookupThrottleRC[i] / 1000; // [PWM_MIN;PWM_MAX]
+            lookupThrottleRC[i] / CONFIG_PWM_MIN; // [PWM_MIN;PWM_MAX]
     }
 }
 
@@ -128,11 +128,11 @@ void RC::computeExpo(void)
             this->command[channel] = -this->command[channel];
     }
 
-    tmp = constrain(this->data[DEMAND_THROTTLE], this->minrc, 2000);
-    tmp = (uint32_t)(tmp - this->minrc) * 1000 / (2000 - this->minrc);       
+    tmp = constrain(this->data[DEMAND_THROTTLE], this->minrc, CONFIG_PWM_MAX);
+    tmp = (uint32_t)(tmp - this->minrc) * CONFIG_PWM_MIN / (CONFIG_PWM_MAX - this->minrc);       
     tmp2 = tmp / 100;
     this->command[DEMAND_THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
-            lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [PWM_MIN;PWM_MAX]
+            lookupThrottleRC[tmp2]) / 100;
 
 } // computeExpo
 
@@ -140,7 +140,7 @@ uint8_t RC::auxState(void)
 {
     int16_t aux = this->data[4];
 
-    return aux < 1500 ? 0 : (aux < 1700 ? 1 : 2);
+    return aux < this->midrc ? 0 : (aux < (this->midrc+CONFIG_RX_AUX_STEP) ? 1 : 2);
 }
 
 bool RC::throttleIsDown(void)

@@ -56,6 +56,8 @@ enum {
 // RX below (CONFIG_PWM_MIN+CONFIG_RX_MARGIN) or above (CONFIG_PWM_MAX-CONFIG_RX_MARGIN) is considered full-stick
 #define CONFIG_RX_MARGIN       100
 
+#define CONFIG_RX_AUX_STEP     200
+
 #define PITCH_LOOKUP_LENGTH    7
 #define THROTTLE_LOOKUP_LENGTH 12
 
