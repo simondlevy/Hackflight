@@ -115,7 +115,7 @@ CFLAGS	 = $(ARCH_FLAGS) \
 		   -DSTM32F10X_MD \
 		   -DUSE_STDPERIPH_DRIVER \
 		   -D$(TARGET) \
-		   -DEXTERNAL_DEBUG
+		   -DEXTERNAL_DEBUG 
 
 ASFLAGS		 = $(ARCH_FLAGS) \
 		   -x assembler-with-cpp \

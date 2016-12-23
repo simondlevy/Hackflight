@@ -1,5 +1,5 @@
 /*
-   stabilize.cpp : PID-based stability class implementation
+   stabilize.cpp : Old-school Multiwii PID-based stability class implementation
 
    Adapted from 
 

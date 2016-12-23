@@ -22,7 +22,7 @@ VREP_DIR_LINUX = $(HOME)/Software/V-REP_PRO_EDU_V3_3_2_64_Linux
 VREP_DIR_OSX   = /Applications/V-REP_PRO_EDU_V3_3_2_Mac
 
 COMMON = $(VREP_DIR)/programming/common/
-CFLAGS = -Wall -D_SIM -I$(VREP_DIR)/programming/include/ -I. -I.. -I../../common -I../../firmware -Wall -fPIC -static
+CFLAGS = -std=c++11 -Wall -D_SIM -I$(VREP_DIR)/programming/include/ -I. -I.. -I../../common -I../../firmware -Wall -fPIC -static
 
 OS = $(shell uname -s)
 ifeq ($(OS), Linux)
@@ -58,6 +58,8 @@ libv_repExtHackflight.$(EXT): *.cpp *.hpp ../*.cpp ../*.hpp ../../firmware/*.cpp
 	g++ $(CFLAGS) -c ../../firmware/msp.cpp
 	g++ $(CFLAGS) -c ../../firmware/hackflight.cpp
 	g++ $(CFLAGS) -c ../../firmware/stabilize_multiwii.cpp
+	g++ $(CFLAGS) -c ../../firmware/stabilize_luxfloat.cpp
+	g++ $(CFLAGS) -c ../../firmware/filters.cpp
 	g++ $(CFLAGS) -c ../../firmware/rc.cpp
 	g++ $(CFLAGS) -c ../../firmware/baro.cpp
 	g++ $(CFLAGS) -c ../../firmware/sonars.cpp

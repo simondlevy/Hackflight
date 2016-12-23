@@ -1,5 +1,5 @@
 /*
-   stabilize_multiwii.hpp : Class declaration for old-school Multiwii PID-based stablization
+   stabilize_multiwii.hpp : Class declaration for old-school LuxFloat PID-based stablization
 
    This file is part of Hackflight.
 
@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-    class StabilizeMultiwii : public Stabilize {
+    class StabilizeLuxFloat : public Stabilize {
 
         public:
 

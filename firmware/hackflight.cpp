@@ -39,6 +39,7 @@ static MSP        msp;
 static Sonars     sonars;
 static Hover      hover;
 static StabilizeMultiwii  stab;
+//static StabilizeLuxFloat  stab2;
 
 // support for timed tasks
 

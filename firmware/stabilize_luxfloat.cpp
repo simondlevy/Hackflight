@@ -1,188 +1,122 @@
-#include <stdint.h>
-#include <stdbool.h>
-#include <math.h>
+/*
+   stabilize.cpp : Old-school LuxFloat PID-based stability class implementation
 
-#include <common/filter.h>
+   Adapted from 
 
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define ABS(x) ((x) > 0 ? (x) : -(x))
+     https://github.com/multiwii/baseflight/blob/master/src/mw.c
 
-#define PID_DTERM_LPF_HZ     70
-#define PID_H_SENSITIVITY    100
-#define PID_A_LEVEL          3.0f
-#define PID_H_LEVEL          3.0f
-#define PID_YAW_PTERM_CUT_HZ 30
+     https://github.com/cleanflight/cleanflight/blob/master/src/main/flight/pid_luxfloat.c
 
-#define MAX_ANGLE_INCLINATION 700
+   This file is part of Hackflight.
 
-#define RX_MIDRC             1500
-#define RX_MINCHECK          1100
-#define RX_MAXCHECK          1900
+   Hackflight is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   Hackflight is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   You should have received a copy of the GNU General Public License
+   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#define ANGLE_MODE           false
-#define HORIZON_MODE         true
+#ifdef __arm__
+extern "C" {
+#else
+#include <stdio.h>
+#endif
 
-#define ROLL              0
-#define PITCH             1
-#define YAW               2
-#define THROTTLE          3
+#include "hackflight.hpp"
+#include "pidvals.hpp"
 
-int16_t axisPID[3];
-
-// indexed as roll / pitch / yaw
-static const float PID_P_f[3] = {5.0f, 6.5f, 9.3f}; 
-static const float PID_I_f[3] = {1.0f, 1.5f, 1.75f};
-static const float PID_D_f[3] = {0.11f, 0.14f, 0.0f};
-static const uint8_t PID_WEIGHT[3] = {100, 100, 100};
-static const uint8_t PID_CONTROL_RATES[3] = {90, 90, 90};
-static const uint8_t PID_ANGLE_TRIMS_RAW[3] = {0, 0, 0};
-static const float KD_ATTENUATION_BREAK = 0.25f;
-
-static bool deltaStateIsSet;
-static biquad_t deltaBiQuadState[3];
-static filterStatePt1_t yawPTermState;
-static int32_t errorGyroI[3];
-static float   errorGyroIf[3];
-
-static int32_t getRcStickDeflection(int16_t * rcData, int32_t axis, uint16_t midrc) {
-    return MIN(ABS(rcData[axis] - midrc), 500);
-}
-
-void pidResetErrorGyro(void)
+void StabilizeLuxFloat::init(class RC * _rc, class IMU * _imu)
 {
-    errorGyroI[ROLL] = 0;
-    errorGyroI[PITCH] = 0;
-    errorGyroI[YAW] = 0;
+    Stabilize::init(_rc, _imu);
 
-    errorGyroIf[ROLL] = 0.0f;
-    errorGyroIf[PITCH] = 0.0f;
-    errorGyroIf[YAW] = 0.0f;
+    for (uint8_t axis=0; axis<3; ++axis) {
+        this->lastGyroError[axis] = 0;
+        this->delta1[axis] = 0;
+        this->delta2[axis] = 0;
+    }
+
+    this->rate_p[0] = CONFIG_RATE_PITCHROLL_P;
+    this->rate_p[1] = CONFIG_RATE_PITCHROLL_P;
+    this->rate_p[2] = CONFIG_YAW_P;
+
+    this->rate_i[0] = CONFIG_RATE_PITCHROLL_I;
+    this->rate_i[1] = CONFIG_RATE_PITCHROLL_I;
+    this->rate_i[2] = CONFIG_YAW_I;
+
+    this->rate_d[0] = CONFIG_RATE_PITCHROLL_D;
+    this->rate_d[1] = CONFIG_RATE_PITCHROLL_D;
+    this->rate_d[2] = 0;
+
+    this->resetIntegral();
 }
 
-void myPidLuxFloat(
-        int16_t gyroADC[3], 
-        int16_t attitudeRaw[3], 
-        int16_t * rcCommand, 
-        int16_t * rcData, 
-        float gyroScale, 
-        float dT, 
-        bool armed)
-{    
-    static bool fullKiLatched;
-    static float lastError[3];
+void StabilizeLuxFloat::update(void)
+{
+    for (uint8_t axis = 0; axis < 3; axis++) {
 
-    float throttleP = constrainf( ((float)rcCommand[THROTTLE] - RX_MINCHECK) / (RX_MAXCHECK - RX_MINCHECK), 0, 100);
+        int32_t gyroError = this->imu->gyroADC[axis] / 4;
 
-    if ( (throttleP > 0.1f) && armed) {
-    	fullKiLatched = true;
+        int32_t error = (int32_t)this->rc->command[axis] * 10 * 8 / this->rate_p[axis] - gyroError;
+
+        int32_t PTermGYRO = this->rc->command[axis];
+
+        this->errorGyroI[axis] = constrain(this->errorGyroI[axis] + error, -16000, +16000); // WindUp
+        if ((abs(gyroError) > 640) || ((axis == AXIS_YAW) && (abs(this->rc->command[axis]) > 100)))
+            this->errorGyroI[axis] = 0;
+        int32_t ITermGYRO = (this->errorGyroI[axis] / 125 * this->rate_i[axis]) >> 6;
+
+        int32_t PTerm = PTermGYRO;
+        int32_t ITerm = ITermGYRO;
+
+        if (axis < 2) {
+
+            // 50 degrees max inclination
+            int32_t errorAngle = constrain(2 * this->rc->command[axis], 
+                                           -((int)CONFIG_MAX_ANGLE_INCLINATION), 
+                                           + CONFIG_MAX_ANGLE_INCLINATION) 
+                                 - this->imu->angle[axis];
+
+            int32_t PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
+
+            this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
+            int32_t ITermACC = (this->errorAngleI[axis] * CONFIG_LEVEL_I) >> 12;
+
+            int32_t prop = max(abs(this->rc->command[DEMAND_PITCH]), 
+                    abs(this->rc->command[DEMAND_ROLL])); // range [0;500]
+
+            PTerm = (PTermACC * (500 - prop) + PTermGYRO * prop) / 500;
+            ITerm = (ITermACC * (500 - prop) + ITermGYRO * prop) / 500;
+        } 
+
+        PTerm -= gyroError * this->rate_p[axis] / 10 / 8; // 32 bits is needed for calculation
+        int32_t delta = gyroError - this->lastGyroError[axis];
+        this->lastGyroError[axis] = gyroError;
+        int32_t deltaSum = this->delta1[axis] + this->delta2[axis] + delta;
+        this->delta2[axis] = this->delta1[axis];
+        this->delta1[axis] = delta;
+        int32_t DTerm = (deltaSum * this->rate_d[axis]) / 32;
+        this->axisPID[axis] = PTerm + ITerm - DTerm;
     }
 
-    float RateError, AngleRate, gyroRate;
-    float ITerm,PTerm,DTerm;
-    float delta;
-    int axis;
-    float horizonLevelStrength = 1;
-
-    if (!deltaStateIsSet && PID_DTERM_LPF_HZ) {
-    	for (axis = 0; axis < 3; axis++) BiQuadNewLpf(PID_DTERM_LPF_HZ, &deltaBiQuadState[axis], 0);
-        deltaStateIsSet = true;
-    }
-
-    if (HORIZON_MODE) {
-        // Figure out the raw stick positions
-        const int32_t stickPosAil = ABS(getRcStickDeflection(rcData, ROLL, RX_MIDRC));
-        const int32_t stickPosEle = ABS(getRcStickDeflection(rcData, PITCH, RX_MIDRC));
-        const int32_t mostDeflectedPos = MAX(stickPosAil, stickPosEle);
-        // Progressively turn off the horizon self level strength as the stick is banged over
-        horizonLevelStrength = (float)(500 - mostDeflectedPos) / 500;  // 1 at centre stick, 0 = max stick deflection
-        if(PID_H_SENSITIVITY == 0){
-            horizonLevelStrength = 0;
-        } else {
-            horizonLevelStrength = constrainf(((horizonLevelStrength - 1) * (100 / PID_H_SENSITIVITY)) + 1, 0, 1);
-        }
-    }
-
-    // ----------PID controller----------
-    for (axis = 0; axis < 3; axis++) {
-        // -----Get the desired angle rate depending on flight mode
-        uint8_t rate = PID_CONTROL_RATES[axis];
-
-        if (axis == YAW) {
-            // YAW is always gyro-controlled (MAG correction is applied to rcCommand) 100dps to 1100dps max yaw rate
-            AngleRate = (float)((rate + 10) * rcCommand[YAW]) / 50.0f;
-         } else {
-        	 int16_t factor = rcCommand[axis]; // 200dps to 1200dps max roll/pitch rate
-    		 AngleRate = (float)((rate + 20) * factor) / 50.0f; // 200dps to 1200dps max roll/pitch rate
-
-        	 //25 wf + 650
-
-             if (ANGLE_MODE || HORIZON_MODE) {
-                // calculate error angle and limit the angle to the max inclination
-                const float errorAngle = (constrain(rcCommand[axis], -((int) MAX_ANGLE_INCLINATION),
-                    +MAX_ANGLE_INCLINATION) - attitudeRaw[axis] + PID_ANGLE_TRIMS_RAW[axis]) / 10.0f; // 16 bits is ok here
-                if (ANGLE_MODE) {
-                    // ANGLE mode - control is angle based, so control loop is needed
-                    AngleRate = errorAngle * PID_A_LEVEL;
-                } else {
-                    // HORIZON mode - direct sticks control is applied to rate PID
-                    // mix up angle error to desired AngleRate to add a little auto-level feel
-                    AngleRate += errorAngle * PID_H_LEVEL * horizonLevelStrength;
-                }
-            }
-        }
-
-        gyroRate = gyroADC[axis] * gyroScale; // gyro output scaled to dps
-
-        // --------low-level gyro-based PID. ----------
-        // Used in stand-alone mode for ACRO, controlled by higher level regulators in other modes
-        // -----calculate scaled error.AngleRates
-        // multiplication of rcCommand corresponds to changing the sticks scaling here
-        RateError = AngleRate - gyroRate;
-
-        // -----calculate P component
-        PTerm = RateError * (PID_P_f[axis]/4) * PID_WEIGHT[axis] / 100;
-        if (!fullKiLatched) { PTerm = PTerm / 2; }
-
-        if (axis == YAW && PID_YAW_PTERM_CUT_HZ) {
-            PTerm = filterApplyPt1(PTerm, &yawPTermState, PID_YAW_PTERM_CUT_HZ, dT);
-        }
-
-        // -----calculate I component.
-        if (fullKiLatched) {
-            errorGyroIf[axis] = constrainf(errorGyroIf[axis] + RateError * dT * (PID_I_f[axis]/2)  * 10, -250.0f, 250.0f);
-        } else {
-            errorGyroIf[axis] = constrainf(errorGyroIf[axis] + RateError * dT * (PID_I_f[axis]/2)  * 10, -20.0f, 20.0f);
-        }
-
-
-        // limit maximum integrator value to prevent WindUp - accumulating extreme values when system is saturated.
-        // I coefficient (I8) moved before integration to make limiting independent from PID settings
-
-        ITerm = errorGyroIf[axis];
-
-        //-----calculate D-term
-        delta = RateError - lastError[axis];
-        lastError[axis] = RateError;
-
-        if (deltaStateIsSet) {
-        	delta = applyBiQuadFilter(delta, &deltaBiQuadState[axis]);
-        }
-
-        // Correct difference by cycle time. Cycle time is jittery (can be different 2 times), so calculated difference
-        // would be scaled by different dt each time. Division by dT fixes that.
-        delta *= (1.0f / dT);
-
-        float D_f = PID_D_f[axis];
-        if (throttleP < KD_ATTENUATION_BREAK) {
-        	float Kd_attenuation = constrainf((throttleP / KD_ATTENUATION_BREAK) + 0.50f, 0, 1);
-        	D_f = Kd_attenuation * D_f;
-        }
-        DTerm = constrainf(delta * (D_f/10) * PID_WEIGHT[axis] / 100, -300.0f, 300.0f);
-
-        // -----calculate total PID output
-        axisPID[axis] = constrain(lrintf(PTerm + ITerm + DTerm), -1000, 1000);
-    }
+    // prevent "yaw jump" during yaw correction
+    this->axisPID[AXIS_YAW] = constrain(this->axisPID[AXIS_YAW], 
+            -100 - abs(this->rc->command[DEMAND_YAW]), +100 + abs(this->rc->command[DEMAND_YAW]));
 }
 
+void StabilizeLuxFloat::resetIntegral(void)
+{
+    this->errorGyroI[AXIS_ROLL] = 0;
+    this->errorGyroI[AXIS_PITCH] = 0;
+    this->errorGyroI[AXIS_YAW] = 0;
+    this->errorAngleI[AXIS_ROLL] = 0;
+    this->errorAngleI[AXIS_PITCH] = 0;
+}
 
+#ifdef __arm__
+} // extern "C"
+#endif
