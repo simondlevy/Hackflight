@@ -241,6 +241,7 @@ flash: flash_$(TARGET)
 
 flash_$(TARGET): $(TARGET_HEX)
 	$(PRE_FLASH)	
+	sleep 1
 	echo -n 'R' >$(SERIAL_DEVICE)
 	$(DO_FLASH)
 

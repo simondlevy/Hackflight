@@ -33,22 +33,7 @@ extern "C" {
 
         private:
 
-            // indexed as roll / pitch / yaw
-            const float   PID_P_f[3] = {5.0f, 6.5f, 9.3f}; 
-            const float   PID_I_f[3] = {1.0f, 1.5f, 1.75f};
-            const float   PID_D_f[3] = {0.11f, 0.14f, 0.0f};
-            const uint8_t PID_WEIGHT[3] = {100, 100, 100};
-            const uint8_t PID_CONTROL_RATES[3] = {90, 90, 90};
-            const uint8_t PID_ANGLE_TRIMS_RAW[3] = {0, 0, 0};
-
-            const uint8_t ESCWriteDenominator = 1; // ESC Write at 1khz
-            const uint16_t gyroSamplePeriod = 125; // XXX estimated
-            const uint32_t targetESCwritetime = gyroSamplePeriod*ESCWriteDenominator;
-            const float dT = (float)targetESCwritetime * 0.000001f;
-
-            const float   KD_ATTENUATION_BREAK = 0.25f;
-
-            bool             deltaStateIsSet;
+           bool             deltaStateIsSet;
             biquad_t         deltaBiQuadState[3];
             int32_t          errorGyroI[3];
             float            errorGyroIf[3];
@@ -57,7 +42,10 @@ extern "C" {
             filterStatePt1_t yawPTermState;
 
             static int32_t getRcStickDeflection(int16_t * rcData, int32_t axis, uint16_t midrc);
-    }; 
+
+            // indexed as roll / pitch / yaw
+
+   };
 
 #ifdef __arm__
 } // extern "C"
