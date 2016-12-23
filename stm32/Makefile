@@ -17,7 +17,7 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 TARGET		?= NAZE
 
-CPP_OBJS = hackflight.o imu.o mixer.o msp.o rc.o baro.o sonars.o board.o board_rx.o stabilize.o hover.o filters.o
+CPP_OBJS = hackflight.o imu.o mixer.o msp.o rc.o baro.o sonars.o board.o board_rx.o stabilize_multiwii.o stabilize_luxfloat.o filters.o hover.o filters.o
 
 # Compile-time options
 OPTIONS		?=
@@ -187,9 +187,17 @@ mixer.o: $(FIRMDIR)/mixer.cpp $(FIRMDIR)/mixer.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o mixer.o $(FIRMDIR)/mixer.cpp
 
-stabilize.o: $(FIRMDIR)/stabilize_multiwii.cpp $(FIRMDIR)/stabilize_multiwii.hpp $(FIRMDIR)/stabilize.hpp
+stabilize_multiwii.o: $(FIRMDIR)/stabilize_multiwii.cpp $(FIRMDIR)/stabilize_multiwii.hpp $(FIRMDIR)/stabilize.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o stabilize.o $(FIRMDIR)/stabilize_multiwii.cpp
+	@$(CC) $(CFLAGS) -c -o stabilize_multiwii.o $(FIRMDIR)/stabilize_multiwii.cpp
+
+stabilize_luxfloat.o: $(FIRMDIR)/stabilize_luxfloat.cpp $(FIRMDIR)/stabilize_luxfloat.hpp $(FIRMDIR)/stabilize.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o stabilize_luxfloat.o $(FIRMDIR)/stabilize_luxfloat.cpp
+
+filters.o: $(FIRMDIR)/filters.cpp $(FIRMDIR)/filters.hpp $(FIRMDIR)/rc.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o filters.o $(FIRMDIR)/filters.cpp
 
 msp.o: $(FIRMDIR)/msp.cpp $(FIRMDIR)/msp.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)

@@ -39,7 +39,7 @@ static MSP        msp;
 static Sonars     sonars;
 static Hover      hover;
 static StabilizeMultiwii  stab;
-//static StabilizeLuxFloat  stab2;
+static StabilizeLuxFloat  stab2;
 
 // support for timed tasks
 
@@ -149,6 +149,7 @@ void setup(void)
     // initialize our external objects with objects they need
     rc.init();
     stab.init(&rc, &imu);
+    stab2.init(&rc, &imu);
     imu.init(calibratingGyroCycles, calibratingAccCycles);
     mixer.init(&rc, &stab); 
     msp.init(&imu, &hover, &mixer, &rc, &sonars);
@@ -188,8 +189,10 @@ void loop(void)
             Board::showAuxStatus(rc.auxState());
 
         // when landed, reset integral component of PID
-        if (rc.throttleIsDown()) 
+        if (rc.throttleIsDown()) {
             stab.resetIntegral();
+            stab2.resetIntegral();
+        }
 
         if (rc.changed()) {
 
@@ -307,6 +310,7 @@ void loop(void)
 
         // update stability PID controller 
         stab.update(armed);
+        stab2.update(armed);
 
         // update mixer
         mixer.update(armed);

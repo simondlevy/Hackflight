@@ -51,6 +51,10 @@ void debug(const char * format, ...);
 
 // Config =====================================================
 
+// min, max interval in usec for motors, RX PWM
+#define CONFIG_PWM_MIN  1000
+#define CONFIG_PWM_MAX  2000
+
 #define CONFIG_MAGNETIC_DECLINATION                 0
 
 #define CONFIG_CALIBRATING_ACC_MSEC                 1400

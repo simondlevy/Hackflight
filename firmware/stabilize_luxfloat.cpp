@@ -30,6 +30,8 @@ extern "C" {
 #include "hackflight.hpp"
 #include "pidvals.hpp"
 
+#include <strings.h>
+
 #define PID_DTERM_LPF_HZ     70
 #define PID_H_SENSITIVITY    100
 #define PID_A_LEVEL          3.0f
@@ -37,10 +39,6 @@ extern "C" {
 #define PID_YAW_PTERM_CUT_HZ 30
 
 #define MAX_ANGLE_INCLINATION 700
-
-#define RX_MIDRC             1500
-#define RX_MINCHECK          1100
-#define RX_MAXCHECK          1900
 
 #define ANGLE_MODE           false
 #define HORIZON_MODE         true
@@ -55,17 +53,25 @@ void StabilizeLuxFloat::init(class RC * _rc, class IMU * _imu)
 {
     Stabilize::init(_rc, _imu);
 
+    this->deltaStateIsSet = false;
+    this->fullKiLatched = false;
+    bzero(&this->yawPTermState, sizeof(filterStatePt1_t));
+    for (int axis=0; axis<3; ++axis) {
+        bzero(&this->deltaBiQuadState[axis], sizeof(biquad_t));
+        this->errorGyroI[axis] = 0;
+        this->errorGyroIf[axis] = 0;
+        this->lastError[axis] = 0;
+    }
 }
+
+#define dump debug
 
 void StabilizeLuxFloat::update(bool armed)
 {
-/*
-        int16_t gyroADC[3], 
-        int16_t * this->rc->command, 
-        int16_t * rcData, 
-        bool armed)
-        */
-    float throttleP = constrain( ((float)this->rc->command[THROTTLE] - RX_MINCHECK) / (RX_MAXCHECK - RX_MINCHECK), 0, 100);
+    float throttleP = constrain( ((float)this->rc->command[THROTTLE] - this->rc->minrc) / 
+            (this->rc->maxrc - this->rc->minrc), 0, 100);
+
+    dump("%d %d\n", this->rc->command[THROTTLE], this->rc->minrc);
 
     if ((throttleP > 0.1f) && armed) {
     	this->fullKiLatched = true;
@@ -78,8 +84,8 @@ void StabilizeLuxFloat::update(bool armed)
     }
 
     // Figure out the raw stick positions
-    const int32_t stickPosAil = abs(getRcStickDeflection(this->rc->data, ROLL, RX_MIDRC));
-    const int32_t stickPosEle = abs(getRcStickDeflection(this->rc->data, PITCH, RX_MIDRC));
+    const int32_t stickPosAil = abs(getRcStickDeflection(this->rc->data, ROLL, this->rc->midrc));
+    const int32_t stickPosEle = abs(getRcStickDeflection(this->rc->data, PITCH, this->rc->midrc));
     const int32_t mostDeflectedPos = max(stickPosAil, stickPosEle);
 
     // Progressively turn off the horizon self level strength as the stick is banged over
