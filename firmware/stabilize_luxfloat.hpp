@@ -27,7 +27,7 @@ extern "C" {
 
             void init(class RC * _rc, class IMU * _imu);
 
-            void update(void);
+            void update(bool armed);
 
             void resetIntegral(void);
 
@@ -40,6 +40,11 @@ extern "C" {
             const uint8_t PID_WEIGHT[3] = {100, 100, 100};
             const uint8_t PID_CONTROL_RATES[3] = {90, 90, 90};
             const uint8_t PID_ANGLE_TRIMS_RAW[3] = {0, 0, 0};
+
+            const uint8_t ESCWriteDenominator = 1; // ESC Write at 1khz
+            const uint16_t gyroSamplePeriod = 125; // XXX estimated
+            const uint32_t targetESCwritetime = gyroSamplePeriod*ESCWriteDenominator;
+            const float dT = (float)targetESCwritetime * 0.000001f;
 
             const float   KD_ATTENUATION_BREAK = 0.25f;
 

@@ -38,7 +38,7 @@ extern "C" {
 
 #ifndef __arm__
             
-            virtual void update(void) = 0;
+            virtual void update(bool armed) = 0;
 
             virtual void resetIntegral(void) = 0;
 #endif
