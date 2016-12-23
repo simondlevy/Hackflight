@@ -1,5 +1,5 @@
 /*
-   stabilize.hpp : Class declaration for PID-based stablization
+   stabilize.hpp : Abstract class declaration for PID-based stablization
 
    This file is part of Hackflight.
 

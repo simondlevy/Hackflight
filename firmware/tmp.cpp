@@ -172,9 +172,4 @@ void StabilizeLuxFloat::update(void)
 */
 }
 
-int32_t StabilizeLuxFloat::getRcStickDeflection(int16_t * rcData, int32_t axis, uint16_t midrc) 
-{
-    return MIN(ABS(rcData[axis] - midrc), 500);
-}
-
 

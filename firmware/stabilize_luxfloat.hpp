@@ -1,5 +1,5 @@
 /*
-   stabilize_multiwii.hpp : Class declaration for old-school LuxFloat PID-based stablization
+   stabilize_multiwii.hpp : Class declaration for LuxFloat PID-based stablization
 
    This file is part of Hackflight.
 
@@ -17,8 +17,6 @@
 
 #pragma once
 
-#define CONFIG_MAX_ANGLE_INCLINATION                500 /* 50 degrees */
-
 #ifdef __arm__
 extern "C" {
 #endif
@@ -35,15 +33,25 @@ extern "C" {
 
         private:
 
-            uint8_t rate_p[3];
-            uint8_t rate_i[3];
-            uint8_t rate_d[3];
+            // indexed as roll / pitch / yaw
+            const float   PID_P_f[3] = {5.0f, 6.5f, 9.3f}; 
+            const float   PID_I_f[3] = {1.0f, 1.5f, 1.75f};
+            const float   PID_D_f[3] = {0.11f, 0.14f, 0.0f};
+            const uint8_t PID_WEIGHT[3] = {100, 100, 100};
+            const uint8_t PID_CONTROL_RATES[3] = {90, 90, 90};
+            const uint8_t PID_ANGLE_TRIMS_RAW[3] = {0, 0, 0};
 
-            int16_t lastGyroError[3];
-            int32_t delta1[3]; 
-            int32_t delta2[3];
-            int32_t errorGyroI[3];
-            int32_t errorAngleI[2];
+            const float   KD_ATTENUATION_BREAK = 0.25f;
+
+            bool             deltaStateIsSet;
+            biquad_t         deltaBiQuadState[3];
+            int32_t          errorGyroI[3];
+            float            errorGyroIf[3];
+            bool             fullKiLatched;
+            float            lastError[3];
+            filterStatePt1_t yawPTermState;
+
+            static int32_t getRcStickDeflection(int16_t * rcData, int32_t axis, uint16_t midrc);
     }; 
 
 #ifdef __arm__
