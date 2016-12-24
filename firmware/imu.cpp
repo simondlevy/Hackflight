@@ -124,6 +124,9 @@ void IMU::init(uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles)
 {
     Board::imuInit(this->acc1G, this->gyroScale);
 
+    // XXX we should probably get it in degrees, then convert to radians here
+    this->gyroScaleDeg = 180 * this->gyroScale / M_PI;
+
     this->fcAcc = (float)(0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF)); 
 
     for (int k=0; k<3; ++k) {

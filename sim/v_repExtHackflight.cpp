@@ -552,7 +552,7 @@ void errorDialog(char * message)
 // Board implementation ======================================================
 
 #include <board.hpp>
-#include <rc.hpp>
+#include <hackflight.hpp>
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {

@@ -182,8 +182,6 @@ void loop(void)
 
         rcSerialReady = false;
 
-        //debug("%4d %4d %4d %4d %4d\n", rc.data[0], rc.data[1], rc.data[2], rc.data[3], rc.data[4]);
-
         // useful for simulator
         if (armed)
             Board::showAuxStatus(rc.auxState());
@@ -311,6 +309,10 @@ void loop(void)
         // update stability PID controller 
         stab.update(armed);
         stab2.update(armed);
+
+        debug("m: %4d %4d %4d  |  f: %4d %4d %4d\n",
+                stab.axisPID[0], stab.axisPID[1], stab.axisPID[2],
+                stab2.axisPID[0], stab2.axisPID[1], stab2.axisPID[2]);
 
         // update mixer
         mixer.update(armed);

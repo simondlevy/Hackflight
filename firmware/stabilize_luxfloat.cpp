@@ -57,7 +57,7 @@ static const float    KD_ATTENUATION_BREAK = 0.25f;
 static const float    PID_P_f[3] = {5.0f, 6.5f, 9.3f}; 
 static const float    PID_I_f[3] = {1.0f, 1.5f, 1.75f};
 static const float    PID_D_f[3] = {0.11f, 0.14f, 0.0f};
-static const uint8_t  PID_WEIGHT[3] = {100, 100, 100};
+static const uint8_t  PID_WEIGHT[3] = {2, 2, 2};
 static const uint8_t  PID_CONTROL_RATES[3] = {90, 90, 90};
 static const uint8_t  PID_ANGLE_TRIMS_RAW[3] = {0, 0, 0};
  
@@ -76,10 +76,10 @@ void StabilizeLuxFloat::init(class RC * _rc, class IMU * _imu)
     }
 }
 
-#define dump debug
-
 void StabilizeLuxFloat::update(bool armed)
 {
+    //debug("%d\n", (int)(1000*dT));
+
     float throttleP = constrain( ((float)rc->command[THROTTLE] - rc->minrc) / 
             (rc->maxrc - rc->minrc), 0, 100);
 
@@ -112,7 +112,7 @@ void StabilizeLuxFloat::update(bool armed)
         float AngleRate = 0;
         
         if (axis == YAW) {
-            // YAW is always gyro-controlled (MAG correction is applied to rc->command) 100dps to 1100dps max yaw rate
+            // YAW is always gyro-controlled (MAG correction is applied to RC command) 100dps to 1100dps max yaw rate
             AngleRate = (float)((rate + 10) * rc->command[YAW]) / 50.0f;
          } else {
         	 int16_t factor = rc->command[axis]; // 200dps to 1200dps max roll/pitch rate
@@ -124,15 +124,13 @@ void StabilizeLuxFloat::update(bool armed)
              AngleRate += errorAngle * PID_H_LEVEL * horizonLevelStrength;
          }
 
-        float gyroRate = imu->gyroADC[axis] * imu->gyroScale; // gyro output scaled to dps
+        float gyroRate = imu->gyroADC[axis] * imu->gyroScaleDeg; // gyro output scaled to dps
 
         // --------low-level gyro-based PID. ----------
         // Used in stand-alone mode for ACRO, controlled by higher level regulators in other modes
         // -----calculate scaled error.AngleRates
         // multiplication of rc->command corresponds to changing the sticks scaling here
         float RateError = AngleRate - gyroRate;
-
-        dump("%d%c", (int)(1000*PID_P_f[axis]), axis==2 ? '\n' : ' ');
 
         // -----calculate P component
         float PTerm = RateError * (PID_P_f[axis]/4) * PID_WEIGHT[axis] / 100;

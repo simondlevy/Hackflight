@@ -52,7 +52,8 @@ extern "C" {
 
             int16_t  angle[3];
             int16_t  gyroADC[3];
-            float    gyroScale;
+            float    gyroScale;     // radians
+            float    gyroScaleDeg;
 
             // called from MW
             void init(uint16_t calibratingGyroCycles, uint16_t calibratingAccCycles);
