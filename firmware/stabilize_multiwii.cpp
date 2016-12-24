@@ -5,8 +5,6 @@
 
      https://github.com/multiwii/baseflight/blob/master/src/mw.c
 
-     https://github.com/cleanflight/cleanflight/blob/master/src/main/flight/pid_luxfloat.c
-
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify
@@ -63,13 +61,18 @@ void StabilizeMultiwii::update(bool armed)
 
         int32_t gyroError = this->imu->gyroADC[axis] / 4;
 
-        int32_t error = (int32_t)this->rc->command[axis] * 10 * 8 / this->rate_p[axis] - gyroError;
+        int32_t error = (int32_t)this->rc->command[axis] * 10 * 8 / 
+            this->rate_p[axis] - gyroError;
 
         int32_t PTermGYRO = this->rc->command[axis];
 
-        this->errorGyroI[axis] = constrain(this->errorGyroI[axis] + error, -16000, +16000); // WindUp
-        if ((abs(gyroError) > 640) || ((axis == AXIS_YAW) && (abs(this->rc->command[axis]) > 100)))
+        this->errorGyroI[axis] = constrain(this->errorGyroI[axis] + error, 
+                -16000, +16000); // WindUp
+
+        if ((abs(gyroError) > 640) || ((axis == AXIS_YAW) && 
+                    (abs(this->rc->command[axis]) > 100)))
             this->errorGyroI[axis] = 0;
+
         int32_t ITermGYRO = (this->errorGyroI[axis] / 125 * this->rate_i[axis]) >> 6;
 
         int32_t PTerm = PTermGYRO;
@@ -85,7 +88,9 @@ void StabilizeMultiwii::update(bool armed)
 
             int32_t PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
 
-            this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
+            this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, 
+                    -10000, +10000); // WindUp
+
             int32_t ITermACC = (this->errorAngleI[axis] * CONFIG_LEVEL_I) >> 12;
 
             int32_t prop = max(abs(this->rc->command[DEMAND_PITCH]), 
@@ -95,7 +100,9 @@ void StabilizeMultiwii::update(bool armed)
             ITerm = (ITermACC * (500 - prop) + ITermGYRO * prop) / 500;
         } 
 
-        PTerm -= gyroError * this->rate_p[axis] / 10 / 8; // 32 bits is needed for calculation
+        // 32 bits is needed for calculation
+        PTerm -= gyroError * this->rate_p[axis] / 10 / 8; 
+
         int32_t delta = gyroError - this->lastGyroError[axis];
         this->lastGyroError[axis] = gyroError;
         int32_t deltaSum = this->delta1[axis] + this->delta2[axis] + delta;
@@ -107,7 +114,8 @@ void StabilizeMultiwii::update(bool armed)
 
     // prevent "yaw jump" during yaw correction
     this->axisPID[AXIS_YAW] = constrain(this->axisPID[AXIS_YAW], 
-            -100 - abs(this->rc->command[DEMAND_YAW]), +100 + abs(this->rc->command[DEMAND_YAW]));
+            -100 - abs(this->rc->command[DEMAND_YAW]), 
+            +100 + abs(this->rc->command[DEMAND_YAW]));
 }
 
 void StabilizeMultiwii::resetIntegral(void)
