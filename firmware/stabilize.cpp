@@ -1,5 +1,5 @@
 /*
-   stabilize.cpp : Old-school Multiwii PID-based stability class implementation
+   stabilize.cpp : Old-school  PID-based stability class implementation
 
    Adapted from 
 
@@ -28,7 +28,7 @@ extern "C" {
 #include "hackflight.hpp"
 #include "pidvals.hpp"
 
-void StabilizeMultiwii::init(class RC * _rc, class IMU * _imu)
+void Stabilize::init(class RC * _rc, class IMU * _imu)
 {
     this->rc = _rc;
     this->imu = _imu;
@@ -54,7 +54,7 @@ void StabilizeMultiwii::init(class RC * _rc, class IMU * _imu)
     this->resetIntegral();
 }
 
-void StabilizeMultiwii::update(bool armed)
+void Stabilize::update(bool armed)
 {
     (void)armed;
 
@@ -119,7 +119,7 @@ void StabilizeMultiwii::update(bool armed)
             +100 + abs(this->rc->command[DEMAND_YAW]));
 }
 
-void StabilizeMultiwii::resetIntegral(void)
+void Stabilize::resetIntegral(void)
 {
     this->errorGyroI[AXIS_ROLL] = 0;
     this->errorGyroI[AXIS_PITCH] = 0;

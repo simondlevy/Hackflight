@@ -35,10 +35,9 @@ static IMU        imu;
 static RC         rc;
 static Mixer      mixer;
 static MSP        msp;
-//static Baro       baro;
 static Sonars     sonars;
 static Hover      hover;
-static StabilizeMultiwii  stab;
+static Stabilize  stab;
 
 // support for timed tasks
 

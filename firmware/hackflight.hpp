@@ -32,7 +32,6 @@ void debug(const char * format, ...);
 #include "imu.hpp"
 #include "rc.hpp"
 #include "stabilize.hpp"
-#include "stabilize_multiwii.hpp"
 #include "mixer.hpp"
 #include "baro.hpp"
 #include "sonars.hpp"

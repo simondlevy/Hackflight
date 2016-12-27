@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-    class StabilizeMultiwii : public Stabilize {
+    class StabilizeMultiwii {
 
         public:
 
@@ -33,7 +33,12 @@ extern "C" {
 
             void resetIntegral(void);
 
+            int16_t axisPID[3];
+
         private:
+
+            class RC  * rc;
+            class IMU * imu;
 
             uint8_t rate_p[3];
             uint8_t rate_i[3];

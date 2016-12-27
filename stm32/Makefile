@@ -17,7 +17,7 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 TARGET		?= NAZE
 
-CPP_OBJS = hackflight.o imu.o mixer.o msp.o rc.o baro.o sonars.o board.o board_rx.o stabilize_multiwii.o \
+CPP_OBJS = hackflight.o imu.o mixer.o msp.o rc.o baro.o sonars.o board.o board_rx.o stabilize.o \
 		   filters.o hover.o filters.o
 
 # Compile-time options
@@ -192,9 +192,9 @@ mixer.o: $(FIRM_DIR)/mixer.cpp $(FIRM_DIR)/mixer.hpp $(FIRM_DIR)/rc.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o mixer.o $(FIRM_DIR)/mixer.cpp
 
-stabilize_multiwii.o: $(FIRM_DIR)/stabilize_multiwii.cpp $(FIRM_DIR)/stabilize_multiwii.hpp $(FIRM_DIR)/stabilize.hpp
+stabilize.o: $(FIRM_DIR)/stabilize.cpp $(FIRM_DIR)/stabilize.hpp $(FIRM_DIR)/stabilize.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o stabilize_multiwii.o $(FIRM_DIR)/stabilize_multiwii.cpp
+	@$(CC) $(CFLAGS) -c -o stabilize.o $(FIRM_DIR)/stabilize.cpp
 
 filters.o: $(FIRM_DIR)/filters.cpp $(FIRM_DIR)/filters.hpp $(FIRM_DIR)/rc.hpp
 	@echo %% $(notdir $<)
