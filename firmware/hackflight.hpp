@@ -33,7 +33,6 @@ void debug(const char * format, ...);
 #include "rc.hpp"
 #include "stabilize.hpp"
 #include "stabilize_multiwii.hpp"
-#include "stabilize_luxfloat.hpp"
 #include "mixer.hpp"
 #include "baro.hpp"
 #include "sonars.hpp"
