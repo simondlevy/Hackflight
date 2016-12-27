@@ -1,5 +1,5 @@
 /*
-   stabilize.hpp : Abstract class declaration for PID-based stablization
+   stabilize_multiwii.hpp : Class declaration for LuxFloat PID-based stablization
 
    This file is part of Hackflight.
 
@@ -17,32 +17,35 @@
 
 #pragma once
 
-#define CONFIG_MAX_ANGLE_INCLINATION                500 /* 50 degrees */
-
 #ifdef __arm__
 extern "C" {
 #endif
 
-    class Stabilize {
-
-        protected:
-
-            class RC  * rc;
-            class IMU * imu;
+    class StabilizeLuxFloat : public Stabilize {
 
         public:
 
-            int16_t axisPID[3];
+            void init(class RC * _rc, class IMU * _imu);
 
-            void init(class RC * _rc, class IMU * _imu)  { this->rc = _rc; this->imu = _imu; }
+            void update(bool armed);
 
-#ifndef __arm__
-            
-            virtual void update(bool armed) = 0;
+            void resetIntegral(void);
 
-            virtual void resetIntegral(void) = 0;
-#endif
-    }; 
+        private:
+
+           bool             deltaStateIsSet;
+            biquad_t         deltaBiQuadState[3];
+            int32_t          errorGyroI[3];
+            float            errorGyroIf[3];
+            bool             fullKiLatched;
+            float            lastError[3];
+            filterStatePt1_t yawPTermState;
+
+            static int32_t getRcStickDeflection(int16_t * rcData, int32_t axis, uint16_t midrc);
+
+            // indexed as roll / pitch / yaw
+
+   };
 
 #ifdef __arm__
 } // extern "C"

@@ -32,6 +32,8 @@ void debug(const char * format, ...);
 #include "imu.hpp"
 #include "rc.hpp"
 #include "stabilize.hpp"
+#include "stabilize_multiwii.hpp"
+#include "stabilize_luxfloat.hpp"
 #include "mixer.hpp"
 #include "baro.hpp"
 #include "sonars.hpp"
@@ -47,4 +49,4 @@ void debug(const char * format, ...);
 #define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
 #endif
 
-#include "config.hpp"
+#include <config.hpp>

@@ -1,5 +1,5 @@
 /*
-   stabilize.hpp : Abstract class declaration for PID-based stablization
+   stabilize_multiwii.hpp : Class declaration for old-school Multiwii PID-based stablization
 
    This file is part of Hackflight.
 
@@ -23,25 +23,27 @@
 extern "C" {
 #endif
 
-    class Stabilize {
-
-        protected:
-
-            class RC  * rc;
-            class IMU * imu;
+    class StabilizeMultiwii : public Stabilize {
 
         public:
 
-            int16_t axisPID[3];
+            void init(class RC * _rc, class IMU * _imu);
 
-            void init(class RC * _rc, class IMU * _imu)  { this->rc = _rc; this->imu = _imu; }
+            void update(bool armed);
 
-#ifndef __arm__
-            
-            virtual void update(bool armed) = 0;
+            void resetIntegral(void);
 
-            virtual void resetIntegral(void) = 0;
-#endif
+        private:
+
+            uint8_t rate_p[3];
+            uint8_t rate_i[3];
+            uint8_t rate_d[3];
+
+            int16_t lastGyroError[3];
+            int32_t delta1[3]; 
+            int32_t delta2[3];
+            int32_t errorGyroI[3];
+            int32_t errorAngleI[2];
     }; 
 
 #ifdef __arm__
