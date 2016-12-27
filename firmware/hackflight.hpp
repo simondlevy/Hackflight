@@ -49,4 +49,4 @@ void debug(const char * format, ...);
 #define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
 #endif
 
-#include <config.hpp>
+#include "config.hpp"
