@@ -1,1 +1,0 @@
-../../firmware/stabilize_multiwii.hpp

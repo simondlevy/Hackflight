@@ -24,6 +24,9 @@ hackflight.ino:
 	cp ../../firmware/*.* .
 	mv hackflight.cpp hackflight.ino
 
+upload:
+	arduino --upload hackflight.ino
+
 flash:
 	arduino --upload hackflight.ino
 
@@ -31,4 +34,4 @@ edit:
 	vim board.cpp
 
 listen:
-	miniterm.py /dev/ttyACM1 115200
+	miniterm.py /dev/ttyACM0 115200

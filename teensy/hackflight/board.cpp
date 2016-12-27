@@ -41,6 +41,7 @@ static SpektrumDSM2048 rx;
 
 #include "board.hpp"
 #include "rc.hpp"
+#include "config.hpp"
 
 // an MPU9250 object with its I2C address 
 // of 0x68 (ADDR to GRND) and on Teensy bus 0
