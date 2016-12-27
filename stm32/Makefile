@@ -34,29 +34,33 @@ SERIAL_DEVICE	?= /dev/ttyUSB0
 #
 
 # Working directories
-ROOT		 = ..
-HERE         = .
-SRC_DIR		 = $(ROOT)
-OBJECT_DIR	 = $(HERE)/obj
-BIN_DIR		 = $(HERE)/obj
-CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
+ROOT		  = ..
+HERE          = .
+SRC_DIR		  = $(ROOT)
+OBJECT_DIR	  = $(HERE)/obj
+BIN_DIR		  = $(HERE)/obj
+F1_DIR        = $(BREEZY_DIR)/f1
+DRIVERS_DIR   = $(BREEZY_DIR)/drivers
+CMSIS_DIR	  = $(BREEZY_DIR)/lib/CMSIS
 STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
+FIRM_DIR       = $(HACKFLIGHT_DIR)/firmware
+
 
 # Source files common to all targets
-NAZE_SRC = $(BREEZY_DIR)/main.c \
-           $(BREEZY_DIR)/system.c \
-           $(BREEZY_DIR)/system_stm32f10x.c \
-           $(BREEZY_DIR)/drivers/mpu6050.c \
-           $(BREEZY_DIR)/drivers/ms5611.c \
-           $(BREEZY_DIR)/drivers/mb1242.c \
-           $(BREEZY_DIR)/drivers/spektrum.c \
-           $(BREEZY_DIR)/i2c_stm32f10x.c \
-           $(BREEZY_DIR)/serial.c \
-           $(BREEZY_DIR)/pwm.c \
-           $(BREEZY_DIR)/gpio.c \
-           $(BREEZY_DIR)/uart_stm32f10x.c \
-           $(BREEZY_DIR)/timer.c \
-           $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
+NAZE_SRC = $(F1_DIR)/main.c \
+           $(F1_DIR)/system.c \
+           $(F1_DIR)/system_stm32f10x.c \
+           $(F1_DIR)/serial.c \
+           $(F1_DIR)/pwm.c \
+           $(F1_DIR)/gpio.c \
+           $(F1_DIR)/uart_stm32f10x.c \
+           $(F1_DIR)/timer.c \
+           $(F1_DIR)/startup_stm32f10x_md_gcc.S \
+           $(F1_DIR)/i2c_stm32f10x.c \
+           $(DRIVERS_DIR)/mpu.c \
+           $(DRIVERS_DIR)/ms5611.c \
+           $(DRIVERS_DIR)/mb1242.c \
+           $(DRIVERS_DIR)/spektrum.c \
            $(CMSIS_SRC) \
            $(STDPERIPH_SRC)
 
@@ -88,7 +92,9 @@ OBJCOPY	 = arm-none-eabi-objcopy
 # Tool options.
 #
 INCLUDE_DIRS = . \
+			   $(FIRM_DIR) \
 			   $(BREEZY_DIR) \
+			   $(F1_DIR) \
 			   $(STDPERIPH_DIR)/inc \
 			   $(CMSIS_DIR)/CM3/CoreSupport \
 			   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x
@@ -123,7 +129,7 @@ ASFLAGS		 = $(ARCH_FLAGS) \
 		   $(addprefix -I,$(INCLUDE_DIRS))
 
 # XXX Map/crossref output?
-LD_SCRIPT	 = $(BREEZY_DIR)/stm32_flash.ld
+LD_SCRIPT	 = $(F1_DIR)/stm32_flash.ld
 LDFLAGS	 = -lm \
 		   -nostartfiles \
 		   -lc \
@@ -174,59 +180,57 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 
 # C++ support
 
-FIRMDIR = $(HACKFLIGHT_DIR)/firmware
-
-hackflight.o: $(FIRMDIR)/hackflight.cpp $(FIRMDIR)/hackflight.hpp $(FIRMDIR)/rc.hpp
+hackflight.o: $(FIRM_DIR)/hackflight.cpp $(FIRM_DIR)/hackflight.hpp $(FIRM_DIR)/rc.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o hackflight.o $(FIRMDIR)/hackflight.cpp
+	@$(CC) $(CFLAGS) -c -o hackflight.o $(FIRM_DIR)/hackflight.cpp
 
-imu.o: $(FIRMDIR)/imu.cpp $(FIRMDIR)/imu.hpp
+imu.o: $(FIRM_DIR)/imu.cpp $(FIRM_DIR)/imu.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o imu.o $(FIRMDIR)/imu.cpp
+	@$(CC) $(CFLAGS) -c -o imu.o $(FIRM_DIR)/imu.cpp
 
-mixer.o: $(FIRMDIR)/mixer.cpp $(FIRMDIR)/mixer.hpp $(FIRMDIR)/rc.hpp
+mixer.o: $(FIRM_DIR)/mixer.cpp $(FIRM_DIR)/mixer.hpp $(FIRM_DIR)/rc.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o mixer.o $(FIRMDIR)/mixer.cpp
+	@$(CC) $(CFLAGS) -c -o mixer.o $(FIRM_DIR)/mixer.cpp
 
-stabilize_multiwii.o: $(FIRMDIR)/stabilize_multiwii.cpp $(FIRMDIR)/stabilize_multiwii.hpp $(FIRMDIR)/stabilize.hpp
+stabilize_multiwii.o: $(FIRM_DIR)/stabilize_multiwii.cpp $(FIRM_DIR)/stabilize_multiwii.hpp $(FIRM_DIR)/stabilize.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o stabilize_multiwii.o $(FIRMDIR)/stabilize_multiwii.cpp
+	@$(CC) $(CFLAGS) -c -o stabilize_multiwii.o $(FIRM_DIR)/stabilize_multiwii.cpp
 
-stabilize_luxfloat.o: $(FIRMDIR)/stabilize_luxfloat.cpp $(FIRMDIR)/stabilize_luxfloat.hpp $(FIRMDIR)/stabilize.hpp
+stabilize_luxfloat.o: $(FIRM_DIR)/stabilize_luxfloat.cpp $(FIRM_DIR)/stabilize_luxfloat.hpp $(FIRM_DIR)/stabilize.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o stabilize_luxfloat.o $(FIRMDIR)/stabilize_luxfloat.cpp
+	@$(CC) $(CFLAGS) -c -o stabilize_luxfloat.o $(FIRM_DIR)/stabilize_luxfloat.cpp
 
-filters.o: $(FIRMDIR)/filters.cpp $(FIRMDIR)/filters.hpp $(FIRMDIR)/rc.hpp
+filters.o: $(FIRM_DIR)/filters.cpp $(FIRM_DIR)/filters.hpp $(FIRM_DIR)/rc.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o filters.o $(FIRMDIR)/filters.cpp
+	@$(CC) $(CFLAGS) -c -o filters.o $(FIRM_DIR)/filters.cpp
 
-msp.o: $(FIRMDIR)/msp.cpp $(FIRMDIR)/msp.hpp $(FIRMDIR)/rc.hpp
+msp.o: $(FIRM_DIR)/msp.cpp $(FIRM_DIR)/msp.hpp $(FIRM_DIR)/rc.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o msp.o $(FIRMDIR)/msp.cpp
+	@$(CC) $(CFLAGS) -c -o msp.o $(FIRM_DIR)/msp.cpp
 
-baro.o: $(FIRMDIR)/baro.cpp $(FIRMDIR)/baro.hpp
+baro.o: $(FIRM_DIR)/baro.cpp $(FIRM_DIR)/baro.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o baro.o $(FIRMDIR)/baro.cpp
+	@$(CC) $(CFLAGS) -c -o baro.o $(FIRM_DIR)/baro.cpp
 
-sonars.o: $(FIRMDIR)/sonars.cpp $(FIRMDIR)/sonars.hpp
+sonars.o: $(FIRM_DIR)/sonars.cpp $(FIRM_DIR)/sonars.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o sonars.o $(FIRMDIR)/sonars.cpp
+	@$(CC) $(CFLAGS) -c -o sonars.o $(FIRM_DIR)/sonars.cpp
 
-rc.o: $(FIRMDIR)/rc.cpp $(FIRMDIR)/rc.hpp
+rc.o: $(FIRM_DIR)/rc.cpp $(FIRM_DIR)/rc.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o rc.o $(FIRMDIR)/rc.cpp
+	@$(CC) $(CFLAGS) -c -o rc.o $(FIRM_DIR)/rc.cpp
 
-hover.o: $(FIRMDIR)/hover.cpp $(FIRMDIR)/hover.hpp $(FIRMDIR)/rc.hpp
+hover.o: $(FIRM_DIR)/hover.cpp $(FIRM_DIR)/hover.hpp $(FIRM_DIR)/rc.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o hover.o $(FIRMDIR)/hover.cpp
+	@$(CC) $(CFLAGS) -c -o hover.o $(FIRM_DIR)/hover.cpp
 
-board.o: board.cpp $(FIRMDIR)/board.hpp
+board.o: board.cpp $(FIRM_DIR)/board.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -I$(FIRMDIR) -c -o board.o board.cpp
+	@$(CC) $(CFLAGS) -I$(FIRM_DIR) -c -o board.o board.cpp
 
-board_rx.o: board_rx.cpp $(FIRMDIR)/board.hpp
+board_rx.o: board_rx.cpp $(FIRM_DIR)/board.hpp
 	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -I$(FIRMDIR) -c -o board_rx.o board_rx.cpp
+	@$(CC) $(CFLAGS) -I$(FIRM_DIR) -c -o board_rx.o board_rx.cpp
 
 clean:
 	rm -rf *.o obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)

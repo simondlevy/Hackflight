@@ -49,18 +49,4 @@ void debug(const char * format, ...);
 #define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
 #endif
 
-// Config =====================================================
-
-// min, max interval in usec for motors, RX PWM
-#define CONFIG_PWM_MIN  1000
-#define CONFIG_PWM_MAX  2000
-
-#define CONFIG_MAGNETIC_DECLINATION                 0
-
-#define CONFIG_CALIBRATING_ACC_MSEC                 1400
-
-#define CONFIG_YAW_CONTROL_DIRECTION                1    // 1 or -1 
-#define CONFIG_RC_LOOPTIME_MSEC                     20
-#define CONFIG_CALIBRATE_ACCTIME_MSEC               500
-#define CONFIG_SMALL_ANGLE                          250  // tenths of a degree
-#define CONFIG_ALTITUDE_UPDATE_MSEC                 25   // based on accelerometer low-pass filter
+#include <config.hpp>

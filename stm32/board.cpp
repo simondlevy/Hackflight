@@ -26,7 +26,8 @@ extern "C" {
 #define FAST_PWM                0     // 0 or 1
 
 #include <breezystm32.h>
-#include <drivers/mpu6050.h>
+#include <pwm.h>
+#include <drivers/mpu.h>
 #include <drivers/ms5611.h>
 
 #include <math.h>
@@ -44,8 +45,8 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
-    mpu6050_read_accel(accADC);
-    mpu6050_read_gyro(gyroADC);
+    mpu_read_accel(accADC);
+    mpu_read_gyro(gyroADC);
 }
 
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
