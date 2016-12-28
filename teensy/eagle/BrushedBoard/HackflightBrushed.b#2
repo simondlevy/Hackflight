@@ -140,10 +140,10 @@
 </layers>
 <board>
 <plain>
-<wire x1="7.62" y1="27.94" x2="46.66" y2="27.94" width="0" layer="20"/>
+<wire x1="8.89" y1="27.94" x2="46.66" y2="27.94" width="0" layer="20"/>
 <wire x1="46.66" y1="27.94" x2="46.66" y2="77.46" width="0" layer="20"/>
-<wire x1="46.66" y1="77.46" x2="7.62" y2="77.46" width="0" layer="20"/>
-<wire x1="7.62" y1="77.46" x2="7.62" y2="27.94" width="0" layer="20"/>
+<wire x1="46.66" y1="77.46" x2="8.89" y2="77.46" width="0" layer="20"/>
+<wire x1="8.89" y1="77.46" x2="8.89" y2="27.94" width="0" layer="20"/>
 </plain>
 <libraries>
 <library name="SparkFun-Connectors">
@@ -695,7 +695,7 @@ design rules under a new name.</description>
 <element name="5VREG" library="SparkFun-Connectors" package="1X03" value="" x="31.75" y="74.93"/>
 <element name="M1" library="con-molex-picoblade" package="53047-0210" value="53047-0210" x="41.91" y="31.75"/>
 <element name="M2" library="con-molex-picoblade" package="53047-0210" value="53047-0210" x="41.91" y="74.93"/>
-<element name="M3" library="con-molex-picoblade" package="53047-0210" value="53047-0210" x="11.43" y="31.75"/>
+<element name="M3" library="con-molex-picoblade" package="53047-0210" value="53047-0210" x="12.7" y="31.75"/>
 <element name="M4" library="con-molex-picoblade" package="53047-0210" value="53047-0210" x="12.7" y="74.93"/>
 <element name="MLFT" library="SparkFun-Connectors" package="1X04" value="" x="31.75" y="40.64" rot="R90">
 <attribute name="PROD_ID" value="CONN-09696" x="31.75" y="40.64" size="1.778" layer="27" rot="R90" display="off"/>
@@ -738,15 +738,15 @@ design rules under a new name.</description>
 <contactref element="5VREG" pad="2"/>
 <wire x1="41.285" y1="31.75" x2="41.285" y2="74.93" width="0" layer="19" extent="1-1"/>
 <wire x1="12.075" y1="74.93" x2="41.285" y2="31.75" width="0" layer="19" extent="1-1"/>
-<wire x1="10.805" y1="31.75" x2="12.075" y2="74.93" width="0" layer="19" extent="1-1"/>
-<wire x1="11.43" y1="69.85" x2="10.805" y2="31.75" width="0" layer="19" extent="1-1"/>
+<wire x1="12.075" y1="31.75" x2="12.075" y2="74.93" width="0" layer="19" extent="1-1"/>
+<wire x1="11.43" y1="69.85" x2="12.075" y2="31.75" width="0" layer="19" extent="1-1"/>
 <wire x1="31.75" y1="48.26" x2="11.43" y2="69.85" width="0" layer="19" extent="1-1"/>
 <wire x1="34.29" y1="74.93" x2="31.75" y2="48.26" width="0" layer="19" extent="1-1"/>
 <wire x1="31.75" y1="40.64" x2="34.29" y2="74.93" width="0" layer="19" extent="1-1"/>
 <wire x1="44.45" y1="48.26" x2="31.75" y2="40.64" width="0" layer="19" extent="1-1"/>
 <wire x1="21.59" y1="74.93" x2="44.45" y2="48.26" width="0" layer="19" extent="1-1"/>
 <wire x1="44.45" y1="40.64" x2="44.45" y2="48.26" width="0" layer="19" extent="1-1"/>
-<wire x1="33.02" y1="58.42" x2="10.805" y2="31.75" width="0" layer="19" extent="1-1"/>
+<wire x1="33.02" y1="58.42" x2="12.075" y2="31.75" width="0" layer="19" extent="1-1"/>
 <wire x1="44.45" y1="52.07" x2="34.29" y2="74.93" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="3.3V">
@@ -762,7 +762,7 @@ design rules under a new name.</description>
 <signal name="M3+">
 <contactref element="M3" pad="1"/>
 <contactref element="MLFT" pad="2"/>
-<wire x1="12.055" y1="31.75" x2="31.75" y2="43.18" width="0" layer="19" extent="1-1"/>
+<wire x1="13.325" y1="31.75" x2="31.75" y2="43.18" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M4+">
 <contactref element="MRGT" pad="2"/>

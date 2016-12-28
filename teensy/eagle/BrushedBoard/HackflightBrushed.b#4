@@ -697,16 +697,16 @@ design rules under a new name.</description>
 <element name="M2" library="con-molex-picoblade" package="53047-0210" value="53047-0210" x="39.37" y="74.93"/>
 <element name="M3" library="con-molex-picoblade" package="53047-0210" value="53047-0210" x="11.43" y="30.48"/>
 <element name="M4" library="con-molex-picoblade" package="53047-0210" value="53047-0210" x="12.7" y="76.2"/>
-<element name="MBOT" library="SparkFun-Connectors" package="1X04" value="" x="31.75" y="40.64" rot="R90">
+<element name="MLFT" library="SparkFun-Connectors" package="1X04" value="" x="31.75" y="40.64" rot="R90">
 <attribute name="PROD_ID" value="CONN-09696" x="31.75" y="40.64" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
-<element name="MLFT" library="SparkFun-Connectors" package="1X06_NO_SILK" value="" x="31.75" y="36.83">
+<element name="MBOT" library="SparkFun-Connectors" package="1X06_NO_SILK" value="" x="31.75" y="36.83">
 <attribute name="PROD_ID" value="CONN-08437" x="31.75" y="36.83" size="1.778" layer="27" display="off"/>
 </element>
-<element name="MRGT" library="SparkFun-Connectors" package="1X06_NO_SILK" value="" x="31.75" y="52.07">
+<element name="MTOP" library="SparkFun-Connectors" package="1X06_NO_SILK" value="" x="31.75" y="52.07">
 <attribute name="PROD_ID" value="CONN-08437" x="31.75" y="52.07" size="1.778" layer="27" display="off"/>
 </element>
-<element name="MTOP" library="SparkFun-Connectors" package="1X04" value="" x="44.45" y="40.64" rot="R90">
+<element name="MRGT" library="SparkFun-Connectors" package="1X04" value="" x="44.45" y="40.64" rot="R90">
 <attribute name="PROD_ID" value="CONN-09696" x="44.45" y="40.64" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="PWR" library="SparkFun-Connectors" package="1X02" value="" x="21.59" y="74.93"/>
@@ -717,7 +717,7 @@ design rules under a new name.</description>
 <signals>
 <signal name="VBAT">
 <contactref element="PWR" pad="2"/>
-<contactref element="MLFT" pad="6"/>
+<contactref element="MBOT" pad="6"/>
 <contactref element="5VREG" pad="3"/>
 <wire x1="34.29" y1="74.93" x2="44.45" y2="36.83" width="0" layer="19" extent="1-1"/>
 <wire x1="24.13" y1="74.93" x2="34.29" y2="74.93" width="0" layer="19" extent="1-1"/>
@@ -725,14 +725,14 @@ design rules under a new name.</description>
 <signal name="GND">
 <contactref element="PWR" pad="1"/>
 <contactref element="RX" pad="2"/>
-<contactref element="MRGT" pad="6"/>
+<contactref element="MTOP" pad="6"/>
 <contactref element="M2" pad="2"/>
 <contactref element="M3" pad="2"/>
 <contactref element="M4" pad="2"/>
-<contactref element="MTOP" pad="4"/>
-<contactref element="MTOP" pad="1"/>
-<contactref element="MBOT" pad="1"/>
-<contactref element="MBOT" pad="4"/>
+<contactref element="MRGT" pad="4"/>
+<contactref element="MRGT" pad="1"/>
+<contactref element="MLFT" pad="1"/>
+<contactref element="MLFT" pad="4"/>
 <contactref element="M1" pad="2"/>
 <contactref element="TNSLFT" pad="14"/>
 <contactref element="5VREG" pad="2"/>
@@ -761,42 +761,42 @@ design rules under a new name.</description>
 </signal>
 <signal name="M3+">
 <contactref element="M3" pad="1"/>
-<contactref element="MBOT" pad="2"/>
+<contactref element="MLFT" pad="2"/>
 <wire x1="12.055" y1="30.48" x2="31.75" y2="43.18" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M4+">
-<contactref element="MTOP" pad="2"/>
+<contactref element="MRGT" pad="2"/>
 <contactref element="M4" pad="1"/>
 <wire x1="44.45" y1="43.18" x2="13.325" y2="76.2" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M2+">
 <contactref element="M2" pad="1"/>
-<contactref element="MTOP" pad="3"/>
+<contactref element="MRGT" pad="3"/>
 <wire x1="44.45" y1="45.72" x2="39.995" y2="74.93" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M1+">
 <contactref element="M1" pad="1"/>
-<contactref element="MBOT" pad="3"/>
+<contactref element="MLFT" pad="3"/>
 <wire x1="31.75" y1="45.72" x2="39.995" y2="30.48" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M1PWM">
 <contactref element="TNSRGT" pad="8"/>
-<contactref element="MLFT" pad="2"/>
+<contactref element="MBOT" pad="2"/>
 <wire x1="34.29" y1="36.83" x2="26.67" y2="54.61" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M4PWM">
 <contactref element="TNSRGT" pad="11"/>
-<contactref element="MLFT" pad="3"/>
+<contactref element="MBOT" pad="3"/>
 <wire x1="26.67" y1="62.23" x2="36.83" y2="36.83" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M3PWM">
 <contactref element="TNSRGT" pad="10"/>
-<contactref element="MRGT" pad="1"/>
+<contactref element="MTOP" pad="1"/>
 <wire x1="26.67" y1="59.69" x2="31.75" y2="52.07" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M2PWM">
 <contactref element="TNSRGT" pad="9"/>
-<contactref element="MRGT" pad="2"/>
+<contactref element="MTOP" pad="2"/>
 <wire x1="26.67" y1="57.15" x2="34.29" y2="52.07" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="5VREG">
