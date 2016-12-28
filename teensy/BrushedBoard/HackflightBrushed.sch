@@ -4564,10 +4564,10 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 </class>
 </classes>
 <parts>
-<part name="MLFT" library="SparkFun-Connectors" deviceset="CONN_06" device="NO_SILK_FEMALE_PTH"/>
-<part name="MRGT" library="SparkFun-Connectors" deviceset="CONN_06" device="NO_SILK_FEMALE_PTH"/>
-<part name="MTOP" library="SparkFun-Connectors" deviceset="CONN_04" device=""/>
-<part name="MBOT" library="SparkFun-Connectors" deviceset="CONN_04" device=""/>
+<part name="MTOP" library="SparkFun-Connectors" deviceset="CONN_06" device="NO_SILK_FEMALE_PTH"/>
+<part name="MBOT" library="SparkFun-Connectors" deviceset="CONN_06" device="NO_SILK_FEMALE_PTH"/>
+<part name="MLFT" library="SparkFun-Connectors" deviceset="CONN_04" device=""/>
+<part name="MRGT" library="SparkFun-Connectors" deviceset="CONN_04" device=""/>
 <part name="5VREG" library="SparkFun-Connectors" deviceset="CONN_03" device=""/>
 <part name="PWR" library="SparkFun-Connectors" deviceset="CONN_02" device=""/>
 <part name="M1" library="con-molex-picoblade" deviceset="53047-0210" device=""/>
@@ -4583,10 +4583,10 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <plain>
 </plain>
 <instances>
-<instance part="MLFT" gate="G$1" x="17.78" y="68.58"/>
-<instance part="MRGT" gate="G$1" x="17.78" y="45.72"/>
-<instance part="MTOP" gate="G$1" x="17.78" y="25.4"/>
-<instance part="MBOT" gate="G$1" x="17.78" y="7.62"/>
+<instance part="MTOP" gate="G$1" x="17.78" y="68.58"/>
+<instance part="MBOT" gate="G$1" x="17.78" y="45.72"/>
+<instance part="MLFT" gate="G$1" x="17.78" y="25.4"/>
+<instance part="MRGT" gate="G$1" x="17.78" y="7.62"/>
 <instance part="5VREG" gate="J$1" x="96.52" y="40.64"/>
 <instance part="PWR" gate="G$1" x="96.52" y="55.88"/>
 <instance part="M1" gate="G$1" x="116.84" y="7.62"/>
@@ -4607,7 +4607,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="104.14" y="58.42" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="MRGT" gate="G$1" pin="6"/>
+<pinref part="MBOT" gate="G$1" pin="6"/>
 <wire x1="22.86" y1="53.34" x2="27.94" y2="53.34" width="0.1524" layer="91"/>
 <label x="22.86" y="53.34" size="1.778" layer="95"/>
 </segment>
@@ -4629,7 +4629,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="99.06" y="78.74" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="MLFT" gate="G$1" pin="6"/>
+<pinref part="MTOP" gate="G$1" pin="6"/>
 <wire x1="22.86" y1="76.2" x2="27.94" y2="76.2" width="0.1524" layer="91"/>
 <label x="22.86" y="76.2" size="1.778" layer="95"/>
 </segment>
@@ -4649,22 +4649,22 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="88.9" y="20.32" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="MBOT" gate="G$1" pin="4"/>
+<pinref part="MRGT" gate="G$1" pin="4"/>
 <wire x1="22.86" y1="12.7" x2="27.94" y2="12.7" width="0.1524" layer="91"/>
 <label x="22.86" y="12.7" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="MBOT" gate="G$1" pin="1"/>
+<pinref part="MRGT" gate="G$1" pin="1"/>
 <wire x1="22.86" y1="5.08" x2="27.94" y2="5.08" width="0.1524" layer="91"/>
 <label x="22.86" y="5.08" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="MTOP" gate="G$1" pin="1"/>
+<pinref part="MLFT" gate="G$1" pin="1"/>
 <wire x1="22.86" y1="22.86" x2="27.94" y2="22.86" width="0.1524" layer="91"/>
 <label x="22.86" y="22.86" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="MTOP" gate="G$1" pin="4"/>
+<pinref part="MLFT" gate="G$1" pin="4"/>
 <wire x1="22.86" y1="30.48" x2="27.94" y2="30.48" width="0.1524" layer="91"/>
 <label x="22.86" y="30.48" size="1.778" layer="95"/>
 </segment>
@@ -4715,14 +4715,14 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="88.9" y="7.62" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="MTOP" gate="G$1" pin="2"/>
+<pinref part="MLFT" gate="G$1" pin="2"/>
 <wire x1="22.86" y1="25.4" x2="27.94" y2="25.4" width="0.1524" layer="91"/>
 <label x="22.86" y="25.4" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="M4+" class="0">
 <segment>
-<pinref part="MBOT" gate="G$1" pin="2"/>
+<pinref part="MRGT" gate="G$1" pin="2"/>
 <wire x1="22.86" y1="7.62" x2="27.94" y2="7.62" width="0.1524" layer="91"/>
 <label x="22.86" y="7.62" size="1.778" layer="95"/>
 </segment>
@@ -4739,7 +4739,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="106.68" y="22.86" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="MBOT" gate="G$1" pin="3"/>
+<pinref part="MRGT" gate="G$1" pin="3"/>
 <wire x1="22.86" y1="10.16" x2="27.94" y2="10.16" width="0.1524" layer="91"/>
 <label x="22.86" y="10.16" size="1.778" layer="95"/>
 </segment>
@@ -4751,7 +4751,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="106.68" y="7.62" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="MTOP" gate="G$1" pin="3"/>
+<pinref part="MLFT" gate="G$1" pin="3"/>
 <wire x1="22.86" y1="27.94" x2="27.94" y2="27.94" width="0.1524" layer="91"/>
 <label x="22.86" y="27.94" size="1.778" layer="95"/>
 </segment>
@@ -4763,14 +4763,14 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="81.28" y="48.26" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="MRGT" gate="G$1" pin="2"/>
+<pinref part="MBOT" gate="G$1" pin="2"/>
 <wire x1="22.86" y1="43.18" x2="27.94" y2="43.18" width="0.1524" layer="91"/>
 <label x="22.86" y="43.18" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$2" class="0">
 <segment>
-<pinref part="MRGT" gate="G$1" pin="5"/>
+<pinref part="MBOT" gate="G$1" pin="5"/>
 <wire x1="22.86" y1="50.8" x2="27.94" y2="50.8" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -4781,7 +4781,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="81.28" y="55.88" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="MRGT" gate="G$1" pin="3"/>
+<pinref part="MBOT" gate="G$1" pin="3"/>
 <wire x1="22.86" y1="45.72" x2="27.94" y2="45.72" width="0.1524" layer="91"/>
 <label x="22.86" y="45.72" size="1.778" layer="95"/>
 </segment>
@@ -4793,7 +4793,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="81.28" y="53.34" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="MLFT" gate="G$1" pin="1"/>
+<pinref part="MTOP" gate="G$1" pin="1"/>
 <wire x1="22.86" y1="63.5" x2="27.94" y2="63.5" width="0.1524" layer="91"/>
 <label x="22.86" y="63.5" size="1.778" layer="95"/>
 </segment>
@@ -4805,7 +4805,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="81.28" y="50.8" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="MLFT" gate="G$1" pin="2"/>
+<pinref part="MTOP" gate="G$1" pin="2"/>
 <wire x1="22.86" y1="66.04" x2="27.94" y2="66.04" width="0.1524" layer="91"/>
 <label x="22.86" y="66.04" size="1.778" layer="95"/>
 </segment>
