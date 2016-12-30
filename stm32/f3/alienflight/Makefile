@@ -227,7 +227,7 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.c
 	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $<
 
 # Compile
-$(OBJECT_DIR)/$(TARGET)/%.o: %.cpp
+$(OBJECT_DIR)/$(TARGET)/%.o: %.cpp $(FIRM_DIR)/*.hpp
 	$(V1) mkdir -p $(dir $@)
 	$(V1) echo "%% $(notdir $<)" "$(STDOUT)"
 	$(V1) $(CROSS_CC) -I$(FIRM_DIR) -c -o $@ $(CFLAGS) $<
