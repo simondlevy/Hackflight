@@ -19,6 +19,10 @@
    along with BreezySTM32.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __arm__
+extern "C" {
+#endif
+
 #include <breezystm32.h>
 #include <drivers/mpu.h>
 
@@ -39,3 +43,7 @@ void loop(void)
     mpu_read_gyro(gyro);
     debug("gx: %+04d  gy: %+04d  gz: %+04d\n", gyro[0], gyro[1], gyro[2]);
 }
+
+#ifdef __arm__
+} // extern "C"
+#endif

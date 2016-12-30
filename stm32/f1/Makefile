@@ -1,9 +1,21 @@
-###############################################################################
-# "THE BEER-WARE LICENSE" (Revision 42):
-# <msmith@FreeBSD.ORG> wrote this file. As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
-# this stuff is worth it, you can buy me a beer in return
-###############################################################################
+# Makefile for Hackflight STM32F1 examples
+#
+# Copyright (C) 2016 Simon D. Levy
+#
+# This file is part of Hackflight.
+#
+# Hackflight is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as 
+# published by the Free Software Foundation, either version 3 of the 
+# License, or (at your option) any later version.
+# 
+# This code is distributed in the hope that it will be useful,     
+# but WITHOUT ANY WARRANTY without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU Lesser General Public License 
+# along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
 # Change this to wherever you put hackflight
 HACKFLIGHT_DIR = $(HOME)/Desktop/hackflight
@@ -181,51 +193,39 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 # C++ support
 
 hackflight.o: $(FIRM_DIR)/hackflight.cpp $(FIRM_DIR)/hackflight.hpp $(FIRM_DIR)/rc.hpp
-	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o hackflight.o $(FIRM_DIR)/hackflight.cpp
 
 imu.o: $(FIRM_DIR)/imu.cpp $(FIRM_DIR)/imu.hpp
-	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o imu.o $(FIRM_DIR)/imu.cpp
 
 mixer.o: $(FIRM_DIR)/mixer.cpp $(FIRM_DIR)/mixer.hpp $(FIRM_DIR)/rc.hpp
-	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o mixer.o $(FIRM_DIR)/mixer.cpp
 
 stabilize.o: $(FIRM_DIR)/stabilize.cpp $(FIRM_DIR)/stabilize.hpp $(FIRM_DIR)/stabilize.hpp
-	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o stabilize.o $(FIRM_DIR)/stabilize.cpp
 
 filters.o: $(FIRM_DIR)/filters.cpp $(FIRM_DIR)/filters.hpp $(FIRM_DIR)/rc.hpp
-	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o filters.o $(FIRM_DIR)/filters.cpp
 
 msp.o: $(FIRM_DIR)/msp.cpp $(FIRM_DIR)/msp.hpp $(FIRM_DIR)/rc.hpp
-	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o msp.o $(FIRM_DIR)/msp.cpp
 
 baro.o: $(FIRM_DIR)/baro.cpp $(FIRM_DIR)/baro.hpp
-	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o baro.o $(FIRM_DIR)/baro.cpp
 
 sonars.o: $(FIRM_DIR)/sonars.cpp $(FIRM_DIR)/sonars.hpp
-	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o sonars.o $(FIRM_DIR)/sonars.cpp
 
 rc.o: $(FIRM_DIR)/rc.cpp $(FIRM_DIR)/rc.hpp
-	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o rc.o $(FIRM_DIR)/rc.cpp
 
 hover.o: $(FIRM_DIR)/hover.cpp $(FIRM_DIR)/hover.hpp $(FIRM_DIR)/rc.hpp
-	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o hover.o $(FIRM_DIR)/hover.cpp
 
 board.o: board.cpp $(FIRM_DIR)/board.hpp
-	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -I$(FIRM_DIR) -c -o board.o board.cpp
 
 board_rx.o: board_rx.cpp $(FIRM_DIR)/board.hpp
-	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -I$(FIRM_DIR) -c -o board_rx.o board_rx.cpp
 
 clean:

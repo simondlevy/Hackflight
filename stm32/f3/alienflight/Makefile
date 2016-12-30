@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License 
 # along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
-TARGET    ?= ALIENFLIGHTF3
+TARGET    ?= hackflight
 
 BREEZY_DIR ?= $(HOME)/Desktop/BreezySTM32
 
@@ -136,6 +136,7 @@ COMMON_SRC = \
 			$(F3_DIR)/target.c \
             $(F3_DIR)/timer.c \
             $(F3_DIR)/drivers/mpu.c \
+			./tmp.cpp \
             $(CMSIS_SRC) \
             $(DEVICE_STDPERIPH_SRC)
 
@@ -160,7 +161,7 @@ STM32F30x_COMMON_SRC = \
             $(F3_DIR)/system_stm32f30x.c \
             $(F3_DIR)/timer_stm32f30x.c
 
-TARGET_SRC := $(STM32F30x_COMMON_SRC) $(COMMON_SRC) $(VCP_SRC) tmp.c $(PROJECT_BREEZY_FILES)
+TARGET_SRC := $(STM32F30x_COMMON_SRC) $(COMMON_SRC) $(VCP_SRC) $(PROJECT_SRC_FILES) $(PROJECT_BREEZY_FILES)
 
 # Search path and source files for the ST stdperiph library
 VPATH        := $(VPATH):$(STDPERIPH_DIR)/src
@@ -207,7 +208,6 @@ CFLAGS      += $(ARCH_FLAGS) \
               $(addprefix -D,$(OPTIONS)) \
               $(addprefix -I,$(INCLUDE_DIRS)) \
               $(DEBUG_FLAGS) \
-              -std=gnu99 \
               -Wall -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion \
               -ffunction-sections \
               -fdata-sections \
@@ -278,6 +278,12 @@ $(TARGET_ELF):  $(TARGET_OBJS)
 
 # Compile
 $(OBJECT_DIR)/$(TARGET)/%.o: %.c
+	$(V1) mkdir -p $(dir $@)
+	$(V1) echo "%% $(notdir $<)" "$(STDOUT)"
+	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $<
+
+# Compile
+$(OBJECT_DIR)/$(TARGET)/%.o: %.cpp
 	$(V1) mkdir -p $(dir $@)
 	$(V1) echo "%% $(notdir $<)" "$(STDOUT)"
 	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $<
