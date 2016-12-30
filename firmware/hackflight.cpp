@@ -305,8 +305,6 @@ void loop(void)
         // update stability PID controller 
         stab.update(armed);
 
-        debug("m: %4d %4d %4d \n", stab.axisPID[0], stab.axisPID[1], stab.axisPID[2]);
-
         // update mixer
         mixer.update(armed);
 
