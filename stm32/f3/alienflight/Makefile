@@ -158,11 +158,12 @@ BREEZY_SRC = \
             $(F3_DIR)/startup_stm32f30x_md_gcc.S \
             $(F3_DIR)/system_stm32f30x.c \
             $(F3_DIR)/timer_stm32f30x.c \
-			./tmp.cpp \
             $(CMSIS_SRC) \
             $(DEVICE_STDPERIPH_SRC)
 
-TARGET_SRC := $(HACKFLIGHT_SRC) $(BREEZY_SRC) 
+BOARD_SRC := tmp.cpp
+
+TARGET_SRC := $(HACKFLIGHT_SRC) $(BREEZY_SRC) $(BOARD_SRC)
 
 # Search path and source files for the ST stdperiph library
 VPATH        := $(VPATH):$(STDPERIPH_DIR)/src
