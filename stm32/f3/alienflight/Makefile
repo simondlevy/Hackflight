@@ -164,25 +164,12 @@ SIZE        := $(ARM_SDK_PREFIX)size
 # Tool options.
 #
 
-ifeq ($(DEBUG),GDB)
-OPTIMIZE    = -O0
-LTO_FLAGS   = $(OPTIMIZE)
-else
-ifeq ($(TARGET),$(filter $(TARGET),$(F1_TARGETS)))
-OPTIMIZE    = -Os
-else
-OPTIMIZE    = -Ofast
-endif
-LTO_FLAGS   = -flto -fuse-linker-plugin $(OPTIMIZE)
-endif
-
-DEBUG_FLAGS = -ggdb3 -DDEBUG
+#LTO_FLAGS   = -flto -fuse-linker-plugin -Ofast
 
 CFLAGS      += $(ARCH_FLAGS) \
               $(LTO_FLAGS) \
               $(addprefix -D,$(OPTIONS)) \
               $(addprefix -I,$(INCLUDE_DIRS)) \
-              $(DEBUG_FLAGS) \
               -Wall -pedantic -Wextra -Wunsafe-loop-optimizations \
               -ffunction-sections \
               -fdata-sections \
@@ -204,7 +191,6 @@ LDFLAGS     = -lm \
               -lnosys \
               $(ARCH_FLAGS) \
               $(LTO_FLAGS) \
-              $(DEBUG_FLAGS) \
               -static \
               -Wl,-gc-sections,-Map,$(TARGET_MAP) \
               -Wl,--cref \
