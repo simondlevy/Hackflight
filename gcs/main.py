@@ -127,7 +127,7 @@ class GCS:
         self.rc_request = serialize_RC_Request()
 
         # No messages yet
-        self.yaw_pitch_roll = 0,0,0
+        self.roll_pitch_yaw = 0,0,0
         self.rxchannels = 0,0,0,0,0
 
         # A hack to support display in Setup dialog
@@ -147,14 +147,14 @@ class GCS:
 
         return self.rxchannels
 
-    def getYawPitchRoll(self):
+    def getRollPitchYaw(self):
 
         # configure button to show connected
         self._enable_buttons()
         self.button_connect['text'] = 'Disconnect'
         self._enable_button(self.button_connect)
 
-        return self.yaw_pitch_roll
+        return self.roll_pitch_yaw
 
     def checkArmed(self):
 
@@ -435,9 +435,9 @@ class GCS:
 
     def _handle_attitude(self, x, y, z):
 
-        self.yaw_pitch_roll = z, -y/10., x/10.
+        self.roll_pitch_yaw = x/10., -y/10., z  
 
-        self.messages.setCurrentMessage('Yaw/Pitch/Roll: %+3.3f %+3.3f %+3.3f' % self.yaw_pitch_roll)
+        self.messages.setCurrentMessage('Roll/Pitch/Yaw: %+3.3f %+3.3f %+3.3f' % self.roll_pitch_yaw)
 
         # As soon as we handle the callback from one request, send another request
         self._send_attitude_request()

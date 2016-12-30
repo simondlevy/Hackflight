@@ -17,9 +17,12 @@
 # You should have received a copy of the GNU Lesser General Public License 
 # along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
+# Change these to where you installed Hackflight, BreezySTM32
+HACKFLIGHT_DIR = $(HOME)/Desktop/hackflight
+BREEZY_DIR     = $(HOME)/Desktop/BreezySTM32
+
 TARGET    ?= hackflight
 
-BREEZY_DIR ?= $(HOME)/Desktop/BreezySTM32
 
 F3_DIR = $(BREEZY_DIR)/f3
 DRIVERS_DIR = $(F3_DIR)/drivers
@@ -120,7 +123,6 @@ INCLUDE_DIRS    := $(INCLUDE_DIRS) $(TARGET_DIR)
 
 VPATH           := $(VPATH):$(TARGET_DIR)
 
-HACKFLIGHT_DIR = /home/levys/Desktop/hackflight
 FIRM_DIR = $(HACKFLIGHT_DIR)/firmware
 
 BREEZY_SRC = \

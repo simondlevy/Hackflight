@@ -50,20 +50,6 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
 }
 
-bool Board::baroInit(void)
-{
-    return false;
-}
-
-void Board::baroUpdate(void)
-{
-}
-
-int32_t Board::baroGetPressure(void)
-{
-    return 0;
-}
-
 void Board::delayMilliseconds(uint32_t msec)
 {
     delay(msec);
@@ -120,6 +106,27 @@ void Board::writeMotor(uint8_t index, uint16_t value)
     (void)value;
 }
 
+uint16_t Board::rcReadSerial(uint8_t chan)
+{
+    return 1500;
+    static uint8_t chanmap[5] = {1, 2, 3, 0, 4};
+    return chan > 4 ? 0 : spektrumReadRawRC(chanmap[chan]);
+}
+
+bool Board::rcUseSerial(void)
+{
+    return false;
+    spektrumInit(USART2, SERIALRX_SPEKTRUM2048);
+    return true;
+}
+
+bool Board::rcSerialReady(void)
+{
+    return false;//spektrumFrameComplete();
+}
+
+// Unused =========================================================
+
 bool Board::sonarInit(uint8_t index) 
 {
     (void)index;
@@ -131,9 +138,20 @@ void Board::sonarUpdate(uint8_t index)
     (void)index; 
 }
 
+void Board::showAuxStatus(uint8_t status)
+{
+    (void)status; 
+}
+
 uint16_t Board::sonarGetDistance(uint8_t index)
 {
     (void)index; 
+    return 0;
+}
+
+uint16_t Board::rcReadPWM(uint8_t chan)
+{
+    (void)chan; // avoid compiler warning about unused variable
     return 0;
 }
 
@@ -143,36 +161,19 @@ void Board::showArmedStatus(bool armed)
 
     (void)armed; 
 }
- 
-void Board::showAuxStatus(uint8_t status)
-{
-    (void)status; 
-}
-
-uint16_t Board::rcReadSerial(uint8_t chan)
-{
-    static uint8_t chanmap[5] = {1, 2, 3, 0, 4};
-    return chan > 4 ? 0 : spektrumReadRawRC(chanmap[chan]);
-}
-
-bool Board::rcUseSerial(void)
-{
-    spektrumInit(USART2, SERIALRX_SPEKTRUM2048);
-    return true;
-}
-
-uint16_t Board::rcReadPWM(uint8_t chan)
-{
-    (void)chan; // avoid compiler warning about unused variable
-    return 0;
-}
-
-bool Board::rcSerialReady(void)
+ bool Board::baroInit(void)
 {
     return false;
 }
 
+void Board::baroUpdate(void)
+{
+}
 
+int32_t Board::baroGetPressure(void)
+{
+    return 0;
+}
 #ifdef __arm__
 } // extern "C"
 #endif

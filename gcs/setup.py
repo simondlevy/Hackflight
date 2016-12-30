@@ -56,7 +56,7 @@ class Setup(Dialog):
         self.vehicle_points, self.vehicle_faces, self.vehicle_face_colors = get_vehicle(W, D, L)
 
         # Assume no angles to start
-        self.yaw_pitch_roll = None
+        self.roll_pitch_yaw = None
 
         # Rotation matrices
         self.pitchrot = np.eye(3)
@@ -74,8 +74,8 @@ class Setup(Dialog):
 
         self.faces = []
 
-        self.yaw_pitch_roll_prev = None
-        self.yaw_pitch_roll_change = None
+        self.roll_pitch_yaw_prev = None
+        self.roll_pitch_yaw_change = None
 
 
     def stop(self):
@@ -93,7 +93,7 @@ class Setup(Dialog):
 
         if self.running:
 
-            self.yaw_pitch_roll = self.driver.getYawPitchRoll()
+            self.roll_pitch_yaw = self.driver.getRollPitchYaw()
 
             self._update()
 
@@ -155,23 +155,23 @@ class Setup(Dialog):
 
         # Convert angles to X,Y,Z rotation matrices
 
-        yawAngle   = -radians(self.yaw_pitch_roll[0])
-        self.yawrot[0,0] = +cos(yawAngle)
-        self.yawrot[0,2] = +sin(yawAngle)
-        self.yawrot[2,0] = -sin(yawAngle)
-        self.yawrot[2,2] = +cos(yawAngle)
+        rollAngle  = -radians(self.roll_pitch_yaw[0]) # negate so positive is roll rightward
+        self.rollrot[0,0] = +cos(rollAngle)
+        self.rollrot[0,1] = -sin(rollAngle)
+        self.rollrot[1,0] = +sin(rollAngle)
+        self.rollrot[1,1] = +cos(rollAngle)
 
-        pitchAngle = radians(self.yaw_pitch_roll[1]) 
+        pitchAngle = radians(self.roll_pitch_yaw[1]) 
         self.pitchrot[1,1] = +cos(pitchAngle) 
         self.pitchrot[1,2] = -sin(pitchAngle)
         self.pitchrot[2,1] = +sin(pitchAngle)
         self.pitchrot[2,2] = +cos(pitchAngle)
 
-        rollAngle  = -radians(self.yaw_pitch_roll[2]) # negate so positive is roll rightward
-        self.rollrot[0,0] = +cos(rollAngle)
-        self.rollrot[0,1] = -sin(rollAngle)
-        self.rollrot[1,0] = +sin(rollAngle)
-        self.rollrot[1,1] = +cos(rollAngle)
+        yawAngle   = -radians(self.roll_pitch_yaw[2])
+        self.yawrot[0,0] = +cos(yawAngle)
+        self.yawrot[0,2] = +sin(yawAngle)
+        self.yawrot[2,0] = -sin(yawAngle)
+        self.yawrot[2,2] = +cos(yawAngle)
 
         # Multiply matrices based on active axis
         if self.driver.active_axis == YAW_ACTIVE:
@@ -205,10 +205,10 @@ class Setup(Dialog):
                 self.faces.append(self.driver.canvas.create_polygon(*poly, fill=self.vehicle_face_colors[i]))
 
         # Update angle changes
-        if not self.yaw_pitch_roll_prev is None:
-            self.yaw_pitch_roll_change = [degrees(abs(pair[0]-pair[1])) 
-                    for pair in zip(self.yaw_pitch_roll,self.yaw_pitch_roll_prev)]
-        self.yaw_pitch_roll_prev = self.yaw_pitch_roll
+        if not self.roll_pitch_yaw_prev is None:
+            self.roll_pitch_yaw_change = [degrees(abs(pair[0]-pair[1])) 
+                    for pair in zip(self.roll_pitch_yaw,self.roll_pitch_yaw_prev)]
+        self.roll_pitch_yaw_prev = self.roll_pitch_yaw
 
     def _is_polygon_front_face(self, pts):
 
@@ -280,7 +280,7 @@ class SliderDriver(object):
         self.active_axis = ROLL_ACTIVE
         self.roll = int(valstr)
 
-    def getYawPitchRoll(self):
+    def getRollPitchYaw(self):
 
         return self.yaw, self.pitch, self.roll
 
