@@ -121,6 +121,9 @@ INCLUDE_DIRS    := $(INCLUDE_DIRS) $(TARGET_DIR)
 
 VPATH           := $(VPATH):$(TARGET_DIR)
 
+HACKFLIGHT_DIR = /home/levys/Desktop/hackflight
+FIRM_DIR = $(HACKFLIGHT_DIR)/firmware
+
 COMMON_SRC = \
             $(F3_DIR)/adc.c \
             $(F3_DIR)/buf_writer.c \
@@ -136,6 +139,7 @@ COMMON_SRC = \
 			$(F3_DIR)/target.c \
             $(F3_DIR)/timer.c \
             $(F3_DIR)/drivers/mpu.c \
+			$(FIRM_DIR)/imu.cpp \
 			./tmp.cpp \
             $(CMSIS_SRC) \
             $(DEVICE_STDPERIPH_SRC)
