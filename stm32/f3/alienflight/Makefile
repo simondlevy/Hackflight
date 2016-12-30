@@ -274,8 +274,5 @@ unbrick: unbrick_$(TARGET)
 # rebuild everything when makefile changes
 $(TARGET_OBJS) : Makefile
 
-# include auto-generated dependencies
--include $(TARGET_DEPS)
-
 listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
