@@ -24,6 +24,7 @@ extern "C" {
 #include <breezystm32.h>
 #include <board.hpp>
 #include <drivers/mpu.h>
+#include <drivers/spektrum.h>
 
 extern serialPort_t * Serial1;
 
@@ -150,12 +151,13 @@ void Board::showAuxStatus(uint8_t status)
 
 uint16_t Board::rcReadSerial(uint8_t chan)
 {
-    (void)chan;
-    return 0;
+    static uint8_t chanmap[5] = {1, 2, 3, 0, 4};
+    return chan > 4 ? 0 : spektrumReadRawRC(chanmap[chan]);
 }
 
 bool Board::rcUseSerial(void)
 {
+    spektrumInit(USART2, SERIALRX_SPEKTRUM2048);
     return true;
 }
 

@@ -155,10 +155,11 @@ BREEZY_SRC = \
             $(F3_DIR)/startup_stm32f30x_md_gcc.S \
             $(F3_DIR)/system_stm32f30x.c \
             $(F3_DIR)/timer_stm32f30x.c \
+            $(F3_DIR)/drivers/spektrum.c \
             $(CMSIS_SRC) \
             $(DEVICE_STDPERIPH_SRC)
 
-HACKFLIGHT_SRC = tmp.cpp \
+HACKFLIGHT_SRC = \
              $(FIRM_DIR)/hackflight.cpp \
              $(FIRM_DIR)/baro.cpp \
              $(FIRM_DIR)/filters.cpp \
@@ -330,9 +331,6 @@ POST_FLASH = dfu-util -a 0 -s 0x08000000:leave -D $(TARGET_BIN)
 
 preflash:
 	$(PRE_FLASH)
-
-postflash:
-	$(POST_FLASH)
 
 flash_$(TARGET): $(TARGET_BIN)
 	$(PRE_FLASH)
