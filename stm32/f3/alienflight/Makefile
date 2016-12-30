@@ -2,9 +2,9 @@
 #
 # Copyright (C) 2016 Simon D. Levy
 #
-# This file is part of BreezySTM32.
+# This file is part of Hackflight.
 #
-# BreezySTM32 is free software: you can redistribute it and/or modify
+# Hackflight is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as 
 # published by the Free Software Foundation, either version 3 of the 
 # License, or (at your option) any later version.
@@ -17,12 +17,13 @@
 # You should have received a copy of the GNU Lesser General Public License 
 # along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
-# Change these to where you installed Hackflight, BreezySTM32
+# Change these to where you installed Hackflight, Hackflight
 HACKFLIGHT_DIR = $(HOME)/Desktop/hackflight
 BREEZY_DIR     = $(HOME)/Desktop/BreezySTM32
 
-TARGET    ?= hackflight
+#############################################################
 
+TARGET    ?= hackflight
 
 F3_DIR = $(BREEZY_DIR)/f3
 DRIVERS_DIR = $(F3_DIR)/drivers
