@@ -1,4 +1,4 @@
-# Makefile for BreezySTM32F3 examples
+# Makefile for Hackflight AlienFlight F3 firmware
 #
 # Copyright (C) 2016 Simon D. Levy
 #
