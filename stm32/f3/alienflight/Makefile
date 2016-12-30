@@ -197,10 +197,6 @@ LDFLAGS     = -lm \
               -Wl,--no-wchar-size-warning \
               -T$(LD_SCRIPT)
 
-###############################################################################
-# No user-serviceable parts below
-###############################################################################
-
 # Things we will build
 #
 TARGET_BIN      = $(BIN_DIR)/$(TARGET).bin
@@ -209,9 +205,6 @@ TARGET_OBJS     = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename
 TARGET_DEPS     = $(addsuffix .d,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(TARGET_SRC))))
 TARGET_MAP      = $(OBJECT_DIR)/$(TARGET).map
 
-
-CLEAN_ARTIFACTS := $(TARGET_BIN)
-CLEAN_ARTIFACTS += $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
 
 # Make sure build date and revision is updated on every incremental build
 $(OBJECT_DIR)/$(TARGET)/build/version.o : $(TARGET_SRC)
@@ -250,29 +243,9 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 	$(V1) echo "%% $(notdir $<)" "$(STDOUT)"
 	$(V1) $(CROSS_CC) -c -o $@ $(ASFLAGS) $<
 
-## sample            : Build all sample (travis) targets
-sample: $(SAMPLE_TARGETS)
-
 ## clean             : clean up temporary / machine-generated files
 clean:
-	 echo "Cleaning $(TARGET)"
-	 rm -f $(CLEAN_ARTIFACTS)
 	 rm -rf $(OBJECT_DIR)
-	 echo "Cleaning $(TARGET) succeeded."
-
-## clean_<TARGET>    : clean up one specific target
-$(CLEAN_TARGETS) :
-	 $(MAKE) -j TARGET=$(subst clean_,,$@) clean
-
-## <TARGET>_clean    : clean up one specific target (alias for above)
-$(TARGETS_CLEAN) :
-	 $(MAKE) -j TARGET=$(subst _clean,,$@) clean
-
-## clean_all         : clean all valid targets
-clean_all:$(CLEAN_TARGETS)
-
-## all_clean         : clean all valid targets (alias for above)
-all_clean:$(TARGETS_CLEAN)
 
 PRE_FLASH = echo -n 'R' >$(SERIAL_DEVICE)
 
