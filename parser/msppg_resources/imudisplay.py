@@ -18,13 +18,14 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-FMUPORT = '/dev/ttyUSB0'
+FMUPORT = '/dev/ttyACM0'
+#FMUPORT = '/dev/ttyUSB0'
 #FMUPORT = 'COM3'
 
 VEHICLE_SCALE = 0.10
 UPDATE_MSEC = 10
 
-import tkinter
+import Tkinter as tk
 import threading
 import serial
 import msppg
@@ -129,7 +130,7 @@ class Display(object):
 
     def _create_window(self, x, widget):
 
-        return self.driver.canvas.create_window(x, 10, anchor=tkinter.NW, window=widget)
+        return self.driver.canvas.create_window(x, 10, anchor=tk.NW, window=widget)
 
     def _check_quit(self, event):
 
@@ -629,11 +630,11 @@ if __name__ == "__main__":
     width = 800
     height = 800
 
-    root = tkinter.Tk()
+    root = tk.Tk()
 
     root.geometry('%dx%d+%d+%d' % (width, height, 200, 200))
 
-    canvas = tkinter.Canvas(root, width=width, height=height, background='black')
+    canvas = tk.Canvas(root, width=width, height=height, background='black')
 
     driver = MSPDriver(root, canvas)
 
@@ -641,4 +642,4 @@ if __name__ == "__main__":
 
     Display(driver, simulation=True).start()
 
-    tkinter.mainloop()
+    tk.mainloop()
