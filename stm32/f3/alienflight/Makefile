@@ -21,6 +21,12 @@
 HACKFLIGHT_DIR = $(HOME)/Desktop/hackflight
 BREEZY_DIR     = $(HOME)/Desktop/BreezySTM32
 
+# Serial port/Device for flashing
+SERIAL_DEVICE   ?= /dev/ttyACM0
+
+# Comment this out for verbose compiling
+export V1    := @
+
 #############################################################
 
 TARGET    ?= hackflight
@@ -28,54 +34,12 @@ TARGET    ?= hackflight
 F3_DIR = $(BREEZY_DIR)/f3
 DRIVERS_DIR = $(F3_DIR)/drivers
 
-# Compile-time options
-OPTIONS   ?=
-
-# Debugger optons, must be empty or GDB
-DEBUG     ?=
-
-# Insert the debugging hardfault debugger
-# releases should not be built with this flag as it does not disable pwm output
-DEBUG_HARDFAULTS ?=
-
-# Serial port/Device for flashing
-SERIAL_DEVICE   ?= /dev/ttyACM0
-
-## V                 : Set verbosity level based on the V= parameter
-##                     V=0 Low
-##                     V=1 High
-export AT := @
-
-ifndef V
-export V1    := $(AT)
-export STDOUT   :=
-else ifeq ($(V), 0)
-export V1    := $(AT)
-export STDOUT:= "> /dev/null"
-export MAKE  := $(MAKE) --no-print-directory
-else ifeq ($(V), 1)
-export V1    :=
-export STDOUT   :=
-endif
-
-###############################################################################
-# Things that need to be maintained as the source changes
-#
-
 # Working directories
 ROOT            := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 SRC_DIR         = $(ROOT)
 OBJECT_DIR      = $(ROOT)/obj
 BIN_DIR         = $(ROOT)/obj
 CMSIS_DIR       = $(BREEZY_DIR)/lib/CMSIS
-
-FEATURES    = VCP
-
-ifeq ($(DEBUG_HARDFAULTS),F7)
-CFLAGS               += -DDEBUG_HARDFAULTS
-endif
-
-REVISION = $(shell git log -1 --format="%h")
 
 # Search path for sources
 VPATH           := $(SRC_DIR)
@@ -102,17 +66,13 @@ INCLUDE_DIRS    := $(SRC_DIR) \
                   $(F3_DIR) \
                   $(STDPERIPH_DIR)/inc \
                   $(CMSIS_DIR)/CM1/CoreSupport \
-                  $(CMSIS_DIR)/CM1/DeviceSupport/ST/STM32F30x
-
-ifneq ($(filter VCP, $(FEATURES)),)
-INCLUDE_DIRS    := $(INCLUDE_DIRS) \
-                   $(USBFS_DIR)/inc 
+                  $(CMSIS_DIR)/CM1/DeviceSupport/ST/STM32F30x \
+                  $(USBFS_DIR)/inc 
 
 VPATH           := $(VPATH):$(USBFS_DIR)/src
 
 DEVICE_STDPERIPH_SRC := $(DEVICE_STDPERIPH_SRC)\
                         $(USBPERIPH_SRC)
-endif
 
 LD_SCRIPT       = $(F3_DIR)/stm32_flash_f303_256k.ld
 
