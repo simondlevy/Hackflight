@@ -113,7 +113,6 @@ endif
 LD_SCRIPT       = $(F3_DIR)/stm32_flash_f303_256k.ld
 
 ARCH_FLAGS      = -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fsingle-precision-constant -Wdouble-promotion
-DEVICE_FLAGS    = -DSTM32F303xC -DSTM32F303
 
 .DEFAULT_GOAL := bin
 
@@ -123,8 +122,6 @@ VPATH           := $(VPATH):$(TARGET_DIR)
 
 HACKFLIGHT_DIR = /home/levys/Desktop/hackflight
 FIRM_DIR = $(HACKFLIGHT_DIR)/firmware
-
-HACKFLIGHT_SRC = $(FIRM_DIR)/imu.cpp
 
 BREEZY_SRC = \
             $(F3_DIR)/adc.c \
@@ -161,9 +158,9 @@ BREEZY_SRC = \
             $(CMSIS_SRC) \
             $(DEVICE_STDPERIPH_SRC)
 
-BOARD_SRC = tmp.cpp \
-	         $(FIRM_DIR)/imu.cpp \
-	         $(FIRM_DIR/baro.cpp \
+HACKFLIGHT_SRC = tmp.cpp \
+             $(FIRM_DIR)/hackflight.cpp \
+             $(FIRM_DIR)/baro.cpp \
              $(FIRM_DIR)/filters.cpp \
              $(FIRM_DIR)/hover.cpp \
              $(FIRM_DIR)/imu.cpp \
@@ -172,6 +169,8 @@ BOARD_SRC = tmp.cpp \
              $(FIRM_DIR)/rc.cpp \
              $(FIRM_DIR)/sonars.cpp \
              $(FIRM_DIR)/stabilize.cpp
+
+BOARD_SRC = ./board.cpp
 
 TARGET_SRC := $(HACKFLIGHT_SRC) $(BREEZY_SRC) $(BOARD_SRC)
 
@@ -220,18 +219,14 @@ CFLAGS      += $(ARCH_FLAGS) \
               $(addprefix -D,$(OPTIONS)) \
               $(addprefix -I,$(INCLUDE_DIRS)) \
               $(DEBUG_FLAGS) \
-              -Wall -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion \
+              -Wall -pedantic -Wextra -Wunsafe-loop-optimizations \
               -ffunction-sections \
               -fdata-sections \
-              -pedantic \
-              $(DEVICE_FLAGS) \
+              -DSTM32F303xC -DSTM32F303 \
               -DUSE_STDPERIPH_DRIVER \
               -D$(TARGET) \
               $(TARGET_FLAGS) \
-              -D'__TARGET__="$(TARGET)"' \
-              -D'__REVISION__="$(REVISION)"' \
-              -save-temps=obj \
-              -MMD -MP
+              -DEXTERNAL_DEBUG \
 
 ASFLAGS     = $(ARCH_FLAGS) \
               -x assembler-with-cpp \
@@ -240,7 +235,7 @@ ASFLAGS     = $(ARCH_FLAGS) \
 
 LDFLAGS     = -lm \
               -nostartfiles \
-              --specs=nano.specs \
+              --specs=rdimon.specs \
               -lc \
               -lnosys \
               $(ARCH_FLAGS) \
@@ -256,12 +251,6 @@ LDFLAGS     = -lm \
 # No user-serviceable parts below
 ###############################################################################
 
-CPPCHECK        = cppcheck $(CSOURCES) --enable=all --platform=unix64 \
-                  --std=c99 --inline-suppr --quiet --force \
-                  $(addprefix -I,$(INCLUDE_DIRS)) \
-                  -I/usr/include -I/usr/include/linux
-
-#
 # Things we will build
 #
 TARGET_BIN      = $(BIN_DIR)/$(TARGET).bin
@@ -298,7 +287,7 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.c
 $(OBJECT_DIR)/$(TARGET)/%.o: %.cpp
 	$(V1) mkdir -p $(dir $@)
 	$(V1) echo "%% $(notdir $<)" "$(STDOUT)"
-	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $<
+	$(V1) $(CROSS_CC) -I$(FIRM_DIR) -c -o $@ $(CFLAGS) $<
 
 # Assemble
 $(OBJECT_DIR)/$(TARGET)/%.o: %.s
@@ -361,13 +350,6 @@ unbrick_$(TARGET): $(TARGET_BIN)
 
 ## unbrick           : unbrick flight controller
 unbrick: unbrick_$(TARGET)
-
-## cppcheck          : run static analysis on C source code
-cppcheck: $(CSOURCES)
-	 $(CPPCHECK)
-
-cppcheck-result.xml: $(CSOURCES)
-	 $(CPPCHECK) --xml-version=2 2> cppcheck-result.xml
 
 # rebuild everything when makefile changes
 $(TARGET_OBJS) : Makefile

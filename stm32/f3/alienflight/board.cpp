@@ -21,25 +21,17 @@
 extern "C" {
 #endif
 
-#define USE_CPPM                1
-#define PWM_FILTER              0     // 0 or 1
-#define FAST_PWM                0     // 0 or 1
-
 #include <breezystm32.h>
-#include <pwm.h>
+#include <board.hpp>
 #include <drivers/mpu.h>
-#include <drivers/ms5611.h>
-
-#include <math.h>
-
-#include "board.hpp"
-#include "motorpwm.hpp"
 
 extern serialPort_t * Serial1;
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
-    acc1G = mpu6500(INV_FSR_8G, INV_FSR_2000DPS);
+    mpu6500_init(INV_FSR_8G, INV_FSR_2000DPS);
+
+    acc1G = 4096;
     gyroScale = MPU_GYRO_SCALE;
 }
 
@@ -52,11 +44,8 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
     i2cInit(I2CDEV_2);
-
-    pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
-
+    //pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
     looptimeMicroseconds = Board::DEFAULT_IMU_LOOPTIME_USEC; 
-
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
 }
 
@@ -86,15 +75,8 @@ uint32_t Board::getMicros()
 
 void Board::ledSetState(uint8_t id, bool state)
 {
-    GPIO_TypeDef * gpio = id ? LED1_GPIO : LED0_GPIO;
-    uint8_t pin = id ? LED1_PIN  : LED0_PIN;
-
-    if (state) {
-        digitalLo(gpio, pin);
-    }
-    else {
-        digitalHi(gpio, pin);
-    }
+    (void)id;
+    (void)state;
 }
 
 void Board::reboot(void)
@@ -104,7 +86,7 @@ void Board::reboot(void)
 
 uint8_t Board::serialAvailableBytes(void)
 {
-    return serialTotalRxBytesWaiting(Serial1);
+    return serialRxBytesWaiting(Serial1);
 }
 
 uint8_t Board::serialReadByte(void)
@@ -120,18 +102,18 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::serialDebugByte(uint8_t c)
 {
-    serialWrite(Serial1, c);
-    while (!isSerialTransmitBufferEmpty(Serial1));
+    (void)c;
 }
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
-    pwmWriteMotor(index, value);
+    (void)index;
+    (void)value;
 }
 
 bool Board::sonarInit(uint8_t index) 
 {
-    (void)index; 
+    (void)index;
     return false;
 }
 
@@ -157,6 +139,29 @@ void Board::showAuxStatus(uint8_t status)
 {
     (void)status; 
 }
+
+uint16_t Board::rcReadSerial(uint8_t chan)
+{
+    (void)chan;
+    return 0;
+}
+
+bool Board::rcUseSerial(void)
+{
+    return true;
+}
+
+uint16_t Board::rcReadPWM(uint8_t chan)
+{
+    (void)chan; // avoid compiler warning about unused variable
+    return 0;
+}
+
+bool Board::rcSerialReady(void)
+{
+    return false;
+}
+
 
 #ifdef __arm__
 } // extern "C"

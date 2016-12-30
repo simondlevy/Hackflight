@@ -26,14 +26,14 @@ extern "C" {
 #include <breezystm32.h>
 #include <drivers/mpu.h>
 
-void setup(void)
+void setups(void)
 {
     i2cInit(I2CDEV_2); 
 
     mpu6500_init(INV_FSR_8G, INV_FSR_2000DPS);
 } 
 
-void loop(void)
+void loops(void)
 {
     int16_t accel[3];
     mpu_read_accel(accel);
