@@ -141,11 +141,6 @@ BREEZY_SRC = \
 			$(F3_DIR)/target.c \
             $(F3_DIR)/timer.c \
             $(F3_DIR)/drivers/mpu.c \
-			./tmp.cpp \
-            $(CMSIS_SRC) \
-            $(DEVICE_STDPERIPH_SRC)
-
-VCP_SRC = \
             $(F3_DIR)/hw_config.c \
             $(F3_DIR)/serial_usb_vcp.c \
             $(F3_DIR)/stm32_it.c \
@@ -154,7 +149,10 @@ VCP_SRC = \
             $(F3_DIR)/usb_io.c \
             $(F3_DIR)/usb_istr.c \
             $(F3_DIR)/usb_prop.c \
-            $(F3_DIR)/usb_pwr.c
+            $(F3_DIR)/usb_pwr.c \
+			./tmp.cpp \
+            $(CMSIS_SRC) \
+            $(DEVICE_STDPERIPH_SRC)
 
 STM32F30x_COMMON_SRC = \
             $(F3_DIR)/adc_stm32f30x.c \
@@ -166,7 +164,7 @@ STM32F30x_COMMON_SRC = \
             $(F3_DIR)/system_stm32f30x.c \
             $(F3_DIR)/timer_stm32f30x.c
 
-TARGET_SRC := $(HACKFLIGHT_SRC) $(STM32F30x_COMMON_SRC) $(BREEZY_SRC) $(VCP_SRC) $(PROJECT_SRC_FILES) $(PROJECT_BREEZY_FILES)
+TARGET_SRC := $(HACKFLIGHT_SRC) $(STM32F30x_COMMON_SRC) $(BREEZY_SRC) $(PROJECT_SRC_FILES) $(PROJECT_BREEZY_FILES)
 
 # Search path and source files for the ST stdperiph library
 VPATH        := $(VPATH):$(STDPERIPH_DIR)/src
