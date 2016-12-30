@@ -161,7 +161,17 @@ BREEZY_SRC = \
             $(CMSIS_SRC) \
             $(DEVICE_STDPERIPH_SRC)
 
-BOARD_SRC := tmp.cpp
+BOARD_SRC = tmp.cpp \
+	         $(FIRM_DIR)/imu.cpp \
+	         $(FIRM_DIR/baro.cpp \
+             $(FIRM_DIR)/filters.cpp \
+             $(FIRM_DIR)/hover.cpp \
+             $(FIRM_DIR)/imu.cpp \
+             $(FIRM_DIR)/mixer.cpp \
+             $(FIRM_DIR)/msp.cpp \
+             $(FIRM_DIR)/rc.cpp \
+             $(FIRM_DIR)/sonars.cpp \
+             $(FIRM_DIR)/stabilize.cpp
 
 TARGET_SRC := $(HACKFLIGHT_SRC) $(BREEZY_SRC) $(BOARD_SRC)
 
