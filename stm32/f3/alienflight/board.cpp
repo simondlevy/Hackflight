@@ -75,8 +75,16 @@ uint32_t Board::getMicros()
 
 void Board::ledSetState(uint8_t id, bool state)
 {
-    (void)id;
-    (void)state;
+    if (id)
+        if (state)
+            LED1_ON;
+        else
+            LED1_OFF;
+    else
+        if (state)
+            LED0_ON;
+        else
+            LED0_OFF;
 }
 
 void Board::reboot(void)
