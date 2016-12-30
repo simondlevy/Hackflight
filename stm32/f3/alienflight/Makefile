@@ -164,7 +164,7 @@ STM32F30x_COMMON_SRC = \
             $(F3_DIR)/system_stm32f30x.c \
             $(F3_DIR)/timer_stm32f30x.c
 
-TARGET_SRC := $(HACKFLIGHT_SRC) $(STM32F30x_COMMON_SRC) $(BREEZY_SRC) $(PROJECT_SRC_FILES) $(PROJECT_BREEZY_FILES)
+TARGET_SRC := $(HACKFLIGHT_SRC) $(STM32F30x_COMMON_SRC) $(BREEZY_SRC) 
 
 # Search path and source files for the ST stdperiph library
 VPATH        := $(VPATH):$(STDPERIPH_DIR)/src
