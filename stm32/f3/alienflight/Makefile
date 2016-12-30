@@ -124,6 +124,8 @@ VPATH           := $(VPATH):$(TARGET_DIR)
 HACKFLIGHT_DIR = /home/levys/Desktop/hackflight
 FIRM_DIR = $(HACKFLIGHT_DIR)/firmware
 
+HACKFLIGHT_SRC = $(FIRM_DIR)/imu.cpp
+
 COMMON_SRC = \
             $(F3_DIR)/adc.c \
             $(F3_DIR)/buf_writer.c \
@@ -139,7 +141,6 @@ COMMON_SRC = \
 			$(F3_DIR)/target.c \
             $(F3_DIR)/timer.c \
             $(F3_DIR)/drivers/mpu.c \
-			$(FIRM_DIR)/imu.cpp \
 			./tmp.cpp \
             $(CMSIS_SRC) \
             $(DEVICE_STDPERIPH_SRC)
@@ -165,7 +166,7 @@ STM32F30x_COMMON_SRC = \
             $(F3_DIR)/system_stm32f30x.c \
             $(F3_DIR)/timer_stm32f30x.c
 
-TARGET_SRC := $(STM32F30x_COMMON_SRC) $(COMMON_SRC) $(VCP_SRC) $(PROJECT_SRC_FILES) $(PROJECT_BREEZY_FILES)
+TARGET_SRC := $(HACKFLIGHT_SRC) $(STM32F30x_COMMON_SRC) $(COMMON_SRC) $(VCP_SRC) $(PROJECT_SRC_FILES) $(PROJECT_BREEZY_FILES)
 
 # Search path and source files for the ST stdperiph library
 VPATH        := $(VPATH):$(STDPERIPH_DIR)/src
