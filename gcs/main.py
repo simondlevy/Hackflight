@@ -45,7 +45,7 @@ from setup import Setup
 from motors import Motors
 from receiver import Receiver
 #from maps import Maps
-from messages import Messages
+#from messages import Messages
 
 # GCS class runs the show =========================================================================================
 
@@ -84,7 +84,7 @@ class GCS:
         self.button_setup  = self._add_button('Setup',  self.pane2, self._setup_callback)
         self.button_motors = self._add_button('Motors', self.pane2, self._motors_button_callback)
         self.button_receiver = self._add_button('Receiver', self.pane2, self._receiver_button_callback)
-        self.button_messages = self._add_button('Messages', self.pane2, self._messages_button_callback)
+        #self.button_messages = self._add_button('Messages', self.pane2, self._messages_button_callback)
         #self.button_maps = self._add_button('Maps', self.pane2, self._maps_button_callback, disabled=False)
 
         # Prepare for adding ports as they are detected by our timer task
@@ -106,7 +106,7 @@ class GCS:
         self.receiver = Receiver(self)
 
         # Create messages dialog
-        self.messages = Messages(self)
+        #self.messages = Messages(self)
 
         # Create setup dialog
         self.setup = Setup(self)
@@ -133,6 +133,8 @@ class GCS:
         # A hack to support display in Setup dialog
         self.active_axis = 0
 
+        # On connect, we'll first display Setup dialog with attitude
+        self.showing_attitude = True
 
     def quit(self):
         self.motors.stop()
@@ -196,7 +198,7 @@ class GCS:
 
         self.motors.stop()
         self.receiver.stop()
-        self.messages.stop()
+        #self.messages.stop()
         #self.maps.stop()
 
         self.parser.set_ATTITUDE_Handler(self._handle_attitude)
@@ -209,7 +211,7 @@ class GCS:
         self.setup.start()
 
         self.parser.set_RC_Handler(self._handle_rc)
-        self._send_rc_request()
+        #self._send_rc_request()
 
     # Sends Attitude request to FC
     def _send_attitude_request(self):
@@ -229,7 +231,7 @@ class GCS:
         self.setup.stop()
         self.parser.set_ATTITUDE_Handler(self._handle_attitude)
         self.receiver.stop()
-        self.messages.stop()
+        #self.messages.stop()
         #self.maps.stop()
         self.motors.start()
 
@@ -244,7 +246,7 @@ class GCS:
 
         self.setup.stop()
         self.motors.stop()
-        self.messages.stop()
+        #self.messages.stop()
         #self.maps.stop()
 
         self.receiver.start()
@@ -287,7 +289,7 @@ class GCS:
             self.setup.stop()
             #self.maps.stop()
             self.motors.stop()
-            self.messages.stop()
+            #self.messages.stop()
             self.receiver.stop()
 
             if not self.comms is None:
@@ -376,14 +378,14 @@ class GCS:
         self._disable_button(self.button_setup)
         self._disable_button(self.button_motors)
         self._disable_button(self.button_receiver)
-        self._disable_button(self.button_messages)
+        #self._disable_button(self.button_messages)
 
     def _enable_buttons(self):
 
         self._enable_button(self.button_setup)
         self._enable_button(self.button_motors)
         self._enable_button(self.button_receiver)
-        self._enable_button(self.button_messages)
+        #self._enable_button(self.button_messages)
 
     def _enable_button(self, button):
 
@@ -437,7 +439,9 @@ class GCS:
 
         self.roll_pitch_yaw = x/10., -y/10., z  
 
-        self.messages.setCurrentMessage('Roll/Pitch/Yaw: %+3.3f %+3.3f %+3.3f' % self.roll_pitch_yaw)
+        #self.messages.setCurrentMessage('Roll/Pitch/Yaw: %+3.3f %+3.3f %+3.3f' % self.roll_pitch_yaw)
+
+        print(self.showing_attitude)
 
         # As soon as we handle the callback from one request, send another request
         self._send_attitude_request()
@@ -449,17 +453,18 @@ class GCS:
         # As soon as we handle the callback from one request, send another request
         self._send_rc_request()
 
-        self.messages.setCurrentMessage('Receiver: %04d %04d %04d %04d %04d' % (c1, c2, c3, c4, c5))
+        #self.messages.setCurrentMessage('Receiver: %04d %04d %04d %04d %04d' % (c1, c2, c3, c4, c5))
 
     def _handle_arm_status(self, armed):
 
         self.armed = armed
 
-        self.messages.setCurrentMessage('ArmStatus: %s' % ('ARMED' if armed else 'Disarmed'))
+        #self.messages.setCurrentMessage('ArmStatus: %s' % ('ARMED' if armed else 'Disarmed'))
 
     def _handle_battery_status(self, volts, amps):
 
-        self.messages.setCurrentMessage('BatteryStatus: %3.3f volts, %3.3f amps' % (volts, amps))
+        return
+        #self.messages.setCurrentMessage('BatteryStatus: %3.3f volts, %3.3f amps' % (volts, amps))
 
 # Comms class for communiating with flight controller ====================================================
 

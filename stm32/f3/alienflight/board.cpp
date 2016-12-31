@@ -108,21 +108,19 @@ void Board::writeMotor(uint8_t index, uint16_t value)
 
 uint16_t Board::rcReadSerial(uint8_t chan)
 {
-    return 1500;
-    static uint8_t chanmap[5] = {1, 2, 3, 0, 4};
-    return chan > 4 ? 0 : spektrumReadRawRC(chanmap[chan]);
+    static uint8_t chanmap[5] = {1, 2, 3, 0, 5};
+    return chan > 5 ? 0 : spektrumReadRawRC(chanmap[chan]);
 }
 
 bool Board::rcUseSerial(void)
 {
-    return false;
     spektrumInit(USART2, SERIALRX_SPEKTRUM2048);
     return true;
 }
 
 bool Board::rcSerialReady(void)
 {
-    return false;//spektrumFrameComplete();
+    return spektrumFrameComplete();
 }
 
 // Unused =========================================================
