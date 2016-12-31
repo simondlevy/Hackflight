@@ -133,9 +133,6 @@ class GCS:
         # A hack to support display in Setup dialog
         self.active_axis = 0
 
-        # On connect, we'll first display Setup dialog with attitude
-        self.showing_attitude = True
-
     def quit(self):
         self.motors.stop()
         self.root.destroy()
@@ -202,7 +199,6 @@ class GCS:
 
         self.parser.set_ATTITUDE_Handler(self._handle_attitude)
         self._send_attitude_request()
-        self.showing_attitude = True
         self.setup.start()
 
     def _start(self):
@@ -233,7 +229,6 @@ class GCS:
         self.receiver.stop()
         #self.messages.stop()
         #self.maps.stop()
-        self.showing_attitude = False
         self.motors.start()
 
     def _clear(self):
@@ -250,7 +245,6 @@ class GCS:
         #self.messages.stop()
         #self.maps.stop()
 
-        self.showing_attitude = False
         self._send_rc_request()
         self.receiver.start()
 
@@ -444,16 +438,16 @@ class GCS:
 
         #self.messages.setCurrentMessage('Roll/Pitch/Yaw: %+3.3f %+3.3f %+3.3f' % self.roll_pitch_yaw)
 
-        # As soon as we handle the callback from one request, send another request, if we're showing attitude
-        if self.showing_attitude:
+        # As soon as we handle the callback from one request, send another request, if setup dialog is running
+        if self.setup.running:
             self._send_attitude_request()
 
     def _handle_rc(self, c1, c2, c3, c4, c5, c6, c7, c8):
 
         self.rxchannels = c1, c2, c3, c4, c5
 
-        # As soon as we handle the callback from one request, send another request, if we're not showing attitude
-        if not self.showing_attitude:
+        # As soon as we handle the callback from one request, send another request, if receiver dialog is running
+        if self.receiver.running:
             self._send_rc_request()
 
         #self.messages.setCurrentMessage('Receiver: %04d %04d %04d %04d %04d' % (c1, c2, c3, c4, c5))
