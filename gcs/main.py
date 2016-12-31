@@ -202,6 +202,8 @@ class GCS:
         #self.maps.stop()
 
         self.parser.set_ATTITUDE_Handler(self._handle_attitude)
+        self._send_attitude_request()
+        self.showing_attitude = True
         self.setup.start()
 
     def _start(self):
@@ -233,6 +235,7 @@ class GCS:
         self.receiver.stop()
         #self.messages.stop()
         #self.maps.stop()
+        self.showing_attitude = False
         self.motors.start()
 
     def _clear(self):
@@ -248,6 +251,8 @@ class GCS:
         self.motors.stop()
         #self.messages.stop()
         #self.maps.stop()
+
+        self.showing_attitude = False
 
         self.receiver.start()
 
@@ -441,10 +446,9 @@ class GCS:
 
         #self.messages.setCurrentMessage('Roll/Pitch/Yaw: %+3.3f %+3.3f %+3.3f' % self.roll_pitch_yaw)
 
-        print(self.showing_attitude)
-
-        # As soon as we handle the callback from one request, send another request
-        self._send_attitude_request()
+        # As soon as we handle the callback from one request, send another request, if we're showing attitude
+        if self.showing_attitude:
+            self._send_attitude_request()
 
     def _handle_rc(self, c1, c2, c3, c4, c5, c6, c7, c8):
 
