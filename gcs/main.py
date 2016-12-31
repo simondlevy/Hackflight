@@ -225,7 +225,6 @@ class GCS:
         self._clear()
 
         self.setup.stop()
-        self.parser.set_ATTITUDE_Handler(self._handle_attitude)
         self.receiver.stop()
         #self.messages.stop()
         #self.maps.stop()
