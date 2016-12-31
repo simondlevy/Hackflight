@@ -213,7 +213,6 @@ class GCS:
         self.setup.start()
 
         self.parser.set_RC_Handler(self._handle_rc)
-        #self._send_rc_request()
 
     # Sends Attitude request to FC
     def _send_attitude_request(self):
@@ -253,7 +252,7 @@ class GCS:
         #self.maps.stop()
 
         self.showing_attitude = False
-
+        self._send_rc_request()
         self.receiver.start()
 
     # Callback for Messages button
@@ -454,8 +453,9 @@ class GCS:
 
         self.rxchannels = c1, c2, c3, c4, c5
 
-        # As soon as we handle the callback from one request, send another request
-        self._send_rc_request()
+        # As soon as we handle the callback from one request, send another request, if we're not showing attitude
+        if not self.showing_attitude:
+            self._send_rc_request()
 
         #self.messages.setCurrentMessage('Receiver: %04d %04d %04d %04d %04d' % (c1, c2, c3, c4, c5))
 
