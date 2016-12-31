@@ -38,6 +38,8 @@ class Receiver(Dialog):
 
     def start(self, delay_msec=UPDATE_MSEC):
 
+        Dialog.start(self)
+
         self.roll_gauge     = self._new_gauge(0, '    Roll', 'blue')
         self.pitch_gauge    = self._new_gauge(1, '   Pitch', 'green')
         self.yaw_gauge      = self._new_gauge(2, '     Yaw', 'orange')
@@ -46,11 +48,9 @@ class Receiver(Dialog):
 
         self.schedule_display_task(delay_msec)
 
-        self.running = True
-
     def stop(self):
 
-        self.running = False
+        Dialog.stop(self)
 
     def _task(self):
 

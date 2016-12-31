@@ -80,10 +80,14 @@ class Motors(Dialog):
 
     def start(self):
 
+        Dialog.start(self)
+
         self.warning_motors.place(x=MOTORS_WARNING_X, y=MOTORS_WARNING_Y)
         self._show_motors_image(self.label_motors)
 
     def stop(self):
+
+        Dialog.stop(self)
 
         self.warning_motors.deselect()
         self.hide(self.warning_motors)

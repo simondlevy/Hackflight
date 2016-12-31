@@ -22,6 +22,8 @@ class Dialog(object):
 
     def __init__(self, driver):
 
+        self.running = False
+
         self.driver = driver
 
         self.width = int(self.driver.canvas['width'])
@@ -44,6 +46,14 @@ class Dialog(object):
     def place(self, widget, x, y):
 
         widget.place(x=x, y=y, width=self.width, height=self.height)   
+
+    def start(self):
+
+        self.running = True
+
+    def stop(self):
+
+        self.running = False
 
     def _check_quit(self, event):
 

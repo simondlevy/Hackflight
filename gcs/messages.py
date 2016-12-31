@@ -33,8 +33,6 @@ class Messages(Dialog):
 
         Dialog.__init__(self, driver)
 
-        self.running = False
-
         self.message_count = 0
         self.current_message = None
         self.previous_message = None
@@ -53,9 +51,9 @@ class Messages(Dialog):
 
     def start(self, delay_msec=UPDATE_MSEC):
 
-        self.schedule_display_task(delay_msec)
+        Dialog.start(self)
 
-        self.running = True
+        self.schedule_display_task(delay_msec)
 
         height = int(self.driver.canvas['height'])-100
         self.scrollbar.place(x=0, y=0, width=SCROLLBAR_WIDTH, height=height)
@@ -67,8 +65,6 @@ class Messages(Dialog):
         self.hide(self.listbox)
         self.hide(self.scrollbar)
         self.hide(self.checkbox)
-
-        self.running = False
 
     def setCurrentMessage(self, message):
 

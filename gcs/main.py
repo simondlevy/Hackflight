@@ -140,7 +140,6 @@ class GCS:
         self.motors.stop()
         self.root.destroy()
 
-
     def hide(self, widget):
 
         widget.place(x=-9999)
