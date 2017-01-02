@@ -99,7 +99,8 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::serialDebugByte(uint8_t c)
 {
-    (void)c;
+    serialWrite(Serial1, c);
+    while (!isSerialTransmitBufferEmpty(Serial1));
 }
 
 void Board::writeMotor(uint8_t index, uint16_t value)
