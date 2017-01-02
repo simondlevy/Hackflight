@@ -26,6 +26,8 @@ extern "C" {
 #include <drivers/mpu.h>
 #include <drivers/spektrum.h>
 
+#include "motorpwm.hpp"
+
 extern serialPort_t * Serial1;
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
@@ -44,8 +46,11 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
+    motorConfig_t motorConfig;
+    resetMotorConfig(&motorConfig);
+
     i2cInit(I2CDEV_2);
-    //pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
+    motorInit(&motorConfig, PWM_IDLE_PULSE, 4);
     looptimeMicroseconds = Board::DEFAULT_IMU_LOOPTIME_USEC; 
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
 }
