@@ -102,6 +102,7 @@ BREEZY_SRC = \
             $(F3_DIR)/timer.c \
             $(F3_DIR)/drivers/mpu.c \
             $(F3_DIR)/hw_config.c \
+            $(F3_DIR)/pwm_output.c \
             $(F3_DIR)/serial_usb_vcp.c \
             $(F3_DIR)/stm32_it.c \
             $(F3_DIR)/usb_desc.c \
