@@ -46,11 +46,9 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
-    motorConfig_t motorConfig;
-    resetMotorConfig(&motorConfig);
 
     i2cInit(I2CDEV_2);
-    motorInit(&motorConfig, PWM_IDLE_PULSE, 4);
+    motorInit(PWM_IDLE_PULSE, 4);
     looptimeMicroseconds = Board::DEFAULT_IMU_LOOPTIME_USEC; 
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
 }
