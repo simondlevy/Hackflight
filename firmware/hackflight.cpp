@@ -303,7 +303,7 @@ void loop(void)
         hover.perform();
 
         // update stability PID controller 
-        stab.update(armed);
+        stab.update();
 
         // update mixer
         mixer.update(armed);

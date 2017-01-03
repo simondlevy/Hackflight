@@ -29,7 +29,7 @@ extern "C" {
 
             void init(class RC * _rc, class IMU * _imu);
 
-            void update(bool armed);
+            void update(void);
 
             void resetIntegral(void);
 

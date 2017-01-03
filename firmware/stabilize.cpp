@@ -54,7 +54,7 @@ void Stabilize::init(class RC * _rc, class IMU * _imu)
     this->resetIntegral();
 }
 
-void Stabilize::update(bool armed)
+void Stabilize::update(void)
 {
     (void)armed;
 
