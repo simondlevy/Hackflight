@@ -56,8 +56,6 @@ void Stabilize::init(class RC * _rc, class IMU * _imu)
 
 void Stabilize::update(void)
 {
-    (void)armed;
-
     for (uint8_t axis = 0; axis < 3; axis++) {
 
         int32_t gyroError = this->imu->gyroADC[axis] / 4;
