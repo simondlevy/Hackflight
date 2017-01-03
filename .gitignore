@@ -27,3 +27,16 @@ sim/*/*.so
 sim/*/*.dylib
 slam/*.so
 slam/getimu
+teensy/eagle/BrushedBoard/*.GBL
+teensy/eagle/BrushedBoard/*.GBO
+teensy/eagle/BrushedBoard/*.GBS
+teensy/eagle/BrushedBoard/*.GML
+teensy/eagle/BrushedBoard/*.GTL
+teensy/eagle/BrushedBoard/*.GTO
+teensy/eagle/BrushedBoard/*.GTP
+teensy/eagle/BrushedBoard/*.GTS
+teensy/eagle/BrushedBoard/*.TXT
+teensy/eagle/BrushedBoard/*.dri
+teensy/eagle/BrushedBoard/*.gpi
+teensy/eagle/BrushedBoard/*.pro
+teensy/eagle/BrushedBoard/*.s#5
