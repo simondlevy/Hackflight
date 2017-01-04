@@ -115,9 +115,8 @@ void Stabilize::update(void)
     }
 
     // prevent "yaw jump" during yaw correction
-    this->axisPID[AXIS_YAW] = constrain(this->axisPID[AXIS_YAW], 
-            -100 - abs(this->rc->command[DEMAND_YAW]), 
-            +100 + abs(this->rc->command[DEMAND_YAW]));
+    int16_t absYawDemand = abs(this->rc->command[DEMAND_YAW]);
+    this->axisPID[AXIS_YAW] = constrain(this->axisPID[AXIS_YAW], -absYawDemand-100, absYawDemand+100);
 }
 
 void Stabilize::resetIntegral(void)
