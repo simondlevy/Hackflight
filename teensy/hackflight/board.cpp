@@ -189,7 +189,7 @@ void Board::writeMotor(uint8_t index, uint16_t pwmValue, float fvalue)
 
   uint8_t analogValueNew = fvalue * 255;
 
-  Serial.printf("%d: %d (%d)%c", index, analogValue, analogValueNew, index==3?'\n':'\t');
+  Serial.printf("%d: %d (%d)%c", index+1, analogValue, analogValueNew, index==3?'\n':'\t');
   
   analogWrite(MOTOR_PINS[index], analogValue);
 }

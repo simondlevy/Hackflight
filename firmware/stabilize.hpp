@@ -40,6 +40,9 @@ extern "C" {
             class RC  * rc;
             class IMU * imu;
 
+            uint8_t level_p;
+            uint8_t level_i;
+
             uint8_t rate_p[3];
             uint8_t rate_i[3];
             uint8_t rate_d[3];

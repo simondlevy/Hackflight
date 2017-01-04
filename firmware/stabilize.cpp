@@ -39,16 +39,19 @@ void Stabilize::init(class RC * _rc, class IMU * _imu)
         this->delta2[axis] = 0;
     }
 
-    this->rate_p[0] = CONFIG_RATE_PITCHROLL_P;
-    this->rate_p[1] = CONFIG_RATE_PITCHROLL_P;
-    this->rate_p[2] = CONFIG_YAW_P;
+    this->level_p = (uint8_t)(CONFIG_LEVEL_P*10);
+    this->level_i = (uint8_t)(CONFIG_LEVEL_I*1000);
 
-    this->rate_i[0] = CONFIG_RATE_PITCHROLL_I;
-    this->rate_i[1] = CONFIG_RATE_PITCHROLL_I;
-    this->rate_i[2] = CONFIG_YAW_I;
+    this->rate_p[0] = (uint8_t)(CONFIG_RATE_PITCHROLL_P*10);
+    this->rate_p[1] = (uint8_t)(CONFIG_RATE_PITCHROLL_P*10);
+    this->rate_p[2] = (uint8_t)(CONFIG_YAW_P*10);
 
-    this->rate_d[0] = CONFIG_RATE_PITCHROLL_D;
-    this->rate_d[1] = CONFIG_RATE_PITCHROLL_D;
+    this->rate_i[0] = (uint8_t)(CONFIG_RATE_PITCHROLL_I*1000);
+    this->rate_i[1] = (uint8_t)(CONFIG_RATE_PITCHROLL_I*1000);
+    this->rate_i[2] = (uint8_t)(CONFIG_YAW_I*1000);
+
+    this->rate_d[0] = (uint8_t)CONFIG_RATE_PITCHROLL_D;
+    this->rate_d[1] = (uint8_t)CONFIG_RATE_PITCHROLL_D;
     this->rate_d[2] = 0;
 
     this->resetIntegral();
@@ -85,12 +88,12 @@ void Stabilize::update(void)
                                            + CONFIG_MAX_ANGLE_INCLINATION) 
                                  - this->imu->angle[axis];
 
-            int32_t PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
+            int32_t PTermACC = errorAngle * this->level_p / 100; 
 
             this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, 
                     -10000, +10000); // WindUp
 
-            int32_t ITermACC = (this->errorAngleI[axis] * CONFIG_LEVEL_I) >> 12;
+            int32_t ITermACC = (this->errorAngleI[axis] * this->level_i) >> 12;
 
             int32_t prop = max(abs(this->rc->command[DEMAND_PITCH]), 
                     abs(this->rc->command[DEMAND_ROLL])); // range [0;500]

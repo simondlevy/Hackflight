@@ -16,17 +16,17 @@
  */
 
 // Level (accelerometer): set values to 0 for "rate mode"
-#define CONFIG_LEVEL_P            10 
-#define CONFIG_LEVEL_I            5
+static const float CONFIG_LEVEL_P            = 1.0;
+static const float CONFIG_LEVEL_I            = 0.005;
 
 // Rate (gyro): P must be positive
-#define  CONFIG_RATE_PITCHROLL_P  10
-#define  CONFIG_RATE_PITCHROLL_I  0
-#define  CONFIG_RATE_PITCHROLL_D  0
+static const float  CONFIG_RATE_PITCHROLL_P  = 1.0;
+static const float  CONFIG_RATE_PITCHROLL_I  = 0;
+static const float  CONFIG_RATE_PITCHROLL_D  = 0;
 
 // Yaw: P must be positive
-#define  CONFIG_YAW_P             10
-#define  CONFIG_YAW_I             0
+static const float  CONFIG_YAW_P             = 1.0;
+static const float  CONFIG_YAW_I             = 0;
 
 // For altitude hover
 #define CONFIG_HOVER_ALT_P        15  //128
