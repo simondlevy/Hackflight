@@ -44,6 +44,10 @@ extern "C" {
             uint8_t rate_i[3];
             uint8_t rate_d[3];
 
+            float rate_p_f[3];
+            float rate_i_f[3];
+            float rate_d_f[3];
+
             int16_t lastGyroError[3];
             int32_t delta1[3]; 
             int32_t delta2[3];
