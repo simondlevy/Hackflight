@@ -92,9 +92,7 @@ void Mixer::update(bool armed)
 
     for (int i=0; i<4; ++i) {
         motorsf[i] = (motors[i] - 1000) / 1000.;
-        debug("%f ", motorsf[i]);
     }
-    debug("\n");
 
     for (uint8_t i = 0; i < 4; i++)
         Board::writeMotor(i, motors[i], motorsf[i]);
