@@ -55,12 +55,18 @@ void Mixer::update(bool armed)
     int16_t maxMotor;
     int16_t motors[4];
 
-    for (uint8_t i = 0; i < 4; i++)
+    float motorsf[4];
+
+    for (uint8_t i = 0; i < 4; i++) {
+
         motors[i] = (int16_t)
             (this->rc->command[DEMAND_THROTTLE] * mixerQuadX[i].throttle + 
              this->stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch + 
             this->stabilize->axisPID[AXIS_ROLL] * mixerQuadX[i].roll - 
             CONFIG_YAW_DIRECTION * this->stabilize->axisPID[AXIS_YAW] * mixerQuadX[i].yaw);
+
+        motorsf[i] = 0;
+    }
 
     maxMotor = motors[0];
 
@@ -86,7 +92,7 @@ void Mixer::update(bool armed)
     }
 
     for (uint8_t i = 0; i < 4; i++)
-        Board::writeMotor(i, motors[i]);
+        Board::writeMotor(i, motors[i], motorsf[i]);
 }
 
 #ifdef __arm__

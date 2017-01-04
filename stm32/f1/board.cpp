@@ -121,8 +121,9 @@ void Board::serialDebugByte(uint8_t c)
     while (!isSerialTransmitBufferEmpty(Serial1));
 }
 
-void Board::writeMotor(uint8_t index, uint16_t value)
+void Board::writeMotor(uint8_t index, uint16_t value, float fvalue)
 {
+    (void)fvalue;
     pwmWriteMotor(index, value);
 }
 

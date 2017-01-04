@@ -42,7 +42,7 @@ extern "C" {
             static void     serialDebugByte(uint8_t c);
             static uint8_t  serialReadByte(void);
             static void     serialWriteByte(uint8_t c);
-            static void     writeMotor(uint8_t index, uint16_t value);
+            static void     writeMotor(uint8_t index, uint16_t value, float fvalue);
 
             // Helps with simulation
             static void     showArmedStatus(bool armed);
