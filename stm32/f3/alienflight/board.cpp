@@ -46,6 +46,9 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
+    for (int i = 0; i < 4; i++)
+        pwmBrushedMotorConfig(&timerHardware[i], i, 32000);
+
     i2cInit(I2CDEV_2);
     looptimeMicroseconds = Board::DEFAULT_IMU_LOOPTIME_USEC; 
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
@@ -104,19 +107,17 @@ void Board::serialDebugByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, float value)
 {
-    pwmWriteMotor(index, (uint16_t)(1000+value*1000));
+    pwmWriteBrushed(index, (uint16_t)(1000+value*1000));
 }
 
 uint16_t Board::rcReadSerial(uint8_t chan)
 {
-    return 1500;
     static uint8_t chanmap[5] = {1, 2, 3, 0, 5};
     return chan > 5 ? 0 : spektrumReadRawRC(chanmap[chan]);
 }
 
 bool Board::rcUseSerial(void)
 {
-    return false;
     spektrumInit(USART2, SERIALRX_SPEKTRUM2048);
     return true;
 }
