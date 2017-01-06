@@ -98,7 +98,6 @@ BREEZY_SRC = \
             $(F3_DIR)/serial.c \
             $(F3_DIR)/serial_uart.c \
             $(F3_DIR)/system.c \
-			$(F3_DIR)/target.c \
             $(F3_DIR)/timer.c \
             $(F3_DIR)/drivers/mpu.c \
             $(F3_DIR)/hw_config.c \
