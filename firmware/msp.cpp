@@ -164,7 +164,7 @@ void MSP::update(bool armed)
 
                     case MSP_SET_MOTOR:
                         for (uint8_t i = 0; i < 4; i++)
-                            this->mixer->motorsDisarmed[i] = read16();
+                            this->mixer->motorsDisarmed[i] = read8() / 100.; // percentage to [0,1]
                         headSerialReply(0);
                         break;
 

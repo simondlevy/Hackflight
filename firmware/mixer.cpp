@@ -46,8 +46,9 @@ void Mixer::init(class RC * _rc, class Stabilize * _stabilize)
     this->rc = _rc;
 
     // set disarmed motor values
-    for (uint8_t i = 0; i < 4; i++)
-        this->motorsDisarmed[i] = CONFIG_PWM_MIN;
+    for (uint8_t i = 0; i < 4; i++) {
+        this->motorsDisarmed[i] = 0;
+    }
 }
 
 void Mixer::update(bool armed)
@@ -59,12 +60,11 @@ void Mixer::update(bool armed)
 
     for (uint8_t i = 0; i < 4; i++) {
 
-        motors[i] = (int16_t)
+    motors[i] = (int16_t)
             (this->rc->command[DEMAND_THROTTLE]   * mixerQuadX[i].throttle + 
              this->stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch + 
              this->stabilize->axisPID[AXIS_ROLL]  * mixerQuadX[i].roll - 
              this->stabilize->axisPID[AXIS_YAW]   * mixerQuadX[i].yaw);
-
     }
 
     maxMotor = motors[0];
@@ -84,18 +84,12 @@ void Mixer::update(bool armed)
         if (this->rc->throttleIsDown()) {
             motors[i] = CONFIG_PWM_MIN;
         } 
-
-        if (!armed) {
-            motors[i] = motorsDisarmed[i];
-        }
-    }
-
-    for (int i=0; i<4; ++i) {
-        motorsf[i] = (motors[i] - 1000) / 1000.;
+         
+        motorsf[i] = armed ? (motors[i] - 1000) / 1000. : this->motorsDisarmed[i];
     }
 
     for (uint8_t i = 0; i < 4; i++)
-        Board::writeMotor(i, motors[i], motorsf[i]);
+        Board::writeMotor(i, motorsf[i]);
 }
 
 #ifdef __arm__

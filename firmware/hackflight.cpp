@@ -225,6 +225,8 @@ void loop(void)
 
         } // rc.changed()
 
+        //debug("%d %d %d %d %d\n", rc.command[0], rc.command[1], rc.command[2], rc.command[3], rc.command[4]);
+
         // Switch to alt-hold when switch moves to position 1 or 2
         hover.checkSwitch();
 

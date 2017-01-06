@@ -393,7 +393,7 @@ class GCS:
 
     def sendMotorMessage(self, index, value):
 
-        values = [1000]*4
+        values = [0,0,0,0]
         values[index-1] = value
         self.comms.send_message(serialize_SET_MOTOR, values)
 

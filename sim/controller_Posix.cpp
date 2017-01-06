@@ -97,7 +97,7 @@ controller_t posixControllerInit(char * name, const char * ps3name)
         axismap[1] = 2;
         axismap[2] = 5;
         axismap[3] = 0;
-        axismap[4] = 3;
+        axismap[4] = 4;
     }
     else if (strstr(name, ps3name)) {
         controller = PS3;
@@ -140,8 +140,10 @@ void posixControllerGrabAxis(controller_t controller, float * demands, int numbe
 
     // Grab demands from axes
     for (int k=0; k<maxaxis; ++k)
-        if (number == axismap[k]) 
+        if (number == axismap[k]) {
             demands[k] = axisdir[k] * value / 32767.;
+            printf("%d %d %d\n", k, number, value);
+        }
 }
 
 void posixControllerGrabButton(float * demands, int number)

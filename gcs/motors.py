@@ -72,8 +72,11 @@ class Motors(Dialog):
                 text=MOTORS_WARNING_TEXT, font=('Heletica', 14),  fg='red', bg='black', highlightthickness=0)
 
         # A a scale for motors
-        self.scale = Scale(self.driver.canvas, from_=1850, to_=1000, command=self._scale_callback,
+        self.scale = Scale(self.driver.canvas, from_=100, to_=0, command=self._scale_callback,
                 orient=VERTICAL, length=MOTOR_SCALE_LENGTH, bg='black', fg='white')
+
+        # A label for the scale
+        self.scale_label = Label(self.driver.canvas, text='%', bg='black', fg='white')
 
         # Index of active motor (0 = none)
         self.active_motor = 0
@@ -93,6 +96,7 @@ class Motors(Dialog):
         self.hide(self.warning_motors)
         self.hide(self.label_motors)
         self.hide(self.scale)
+        self.hide(self.scale_label)
         self._hide_four_motors()
         self._turn_off_active()
 
@@ -118,7 +122,7 @@ class Motors(Dialog):
             # Power down previous motor if needed
             if self.active_motor > 0:
 
-                self._send_motor_message(PWM_MIN)
+                self._send_motor_message(0)
 
             self.active_motor = index
 
@@ -165,6 +169,7 @@ class Motors(Dialog):
             # Reset the scale and show it
             self.scale.set('0')
             self.scale.place(x=MOTOR_SCALE_X, y=MOTOR_SCALE_Y)
+            self.scale_label.place(x=MOTOR_SCALE_X+20, y=MOTOR_SCALE_Y+MOTOR_SCALE_LENGTH+10)
 
         # Unchecked
         else:
@@ -177,6 +182,7 @@ class Motors(Dialog):
 
             # Hide the scale
             self.hide(self.scale)
+            self.hide(self.scale_label)
 
             # Show the no-motors image
             self._show_motors_image(self.label_motors)
@@ -186,5 +192,5 @@ class Motors(Dialog):
 
     def _turn_off_active(self):
         if self.driver.connected and self.active_motor > 0:
-            self._send_motor_message(PWM_MIN)
+            self._send_motor_message(0)
 

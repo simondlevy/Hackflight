@@ -638,9 +638,9 @@ void Board::serialDebugByte(uint8_t c)
 }
 
 
-void Board::writeMotor(uint8_t index, uint16_t value, float fvalue)
+void Board::writeMotor(uint8_t index, float value)
 {
-    thrusts[index] = fvalue;
+    thrusts[index] = value;
 }
 
 void Board::showArmedStatus(bool armed)

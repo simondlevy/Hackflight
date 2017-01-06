@@ -103,10 +103,9 @@ void Board::serialDebugByte(uint8_t c)
     while (!isSerialTransmitBufferEmpty(Serial1));
 }
 
-void Board::writeMotor(uint8_t index, uint16_t value, float fvalue)
+void Board::writeMotor(uint8_t index, float value)
 {
-    (void)fvalue;
-    pwmWriteMotor(index, value);
+    pwmWriteMotor(index, (uint16_t)(1000+value*1000));
 }
 
 uint16_t Board::rcReadSerial(uint8_t chan)

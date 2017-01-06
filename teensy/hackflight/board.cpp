@@ -183,9 +183,9 @@ void Board::serialDebugByte(uint8_t c)
     Serial.write(c);
 }
 
-void Board::writeMotor(uint8_t index, uint16_t pwmValue, float fvalue)
+void Board::writeMotor(uint8_t index, float value)
 { 
-  uint8_t analogValue = (uint8_t)(fvalue * 255);
+  uint8_t analogValue = (uint8_t)(value * 255);
 
   analogWrite(MOTOR_PINS[index], analogValue);
 }
