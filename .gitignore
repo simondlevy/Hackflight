@@ -27,6 +27,7 @@ sim/*/*.so
 sim/*/*.dylib
 slam/*.so
 slam/getimu
+teensy/eagle/BrushedBoard/*.job
 teensy/eagle/BrushedBoard/*.GBL
 teensy/eagle/BrushedBoard/*.GBO
 teensy/eagle/BrushedBoard/*.GBS

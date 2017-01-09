@@ -37,9 +37,6 @@ static Mixer      mixer;
 static MSP        msp;
 static Stabilize  stab;
 
-//static Sonars     sonars;
-//static Hover      hover;
-
 // support for timed tasks
 
 class TimedTask {
@@ -141,17 +138,12 @@ void setup(void)
     accelCalibrationTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
     altitudeEstimationTask.init(CONFIG_ALTITUDE_UPDATE_MSEC * 1000);
 
-    // attempt to initialize barometer, sonars
-    //baro.init();
-    //sonars.init();
-
     // initialize our external objects with objects they need
     rc.init();
     stab.init(&rc, &imu);
     imu.init(calibratingGyroCycles, calibratingAccCycles);
     mixer.init(&rc, &stab); 
-    msp.init(&imu, &hover, &mixer, &rc/*, &sonars*/);
-    //hover.init(&imu, &sonars, &rc);
+    msp.init(&imu, &mixer, &rc);
 
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;
@@ -229,7 +221,7 @@ void loop(void)
         //debug("%d %d %d %d %d\n", rc.command[0], rc.command[1], rc.command[2], rc.command[3], rc.command[4]);
 
         // Switch to alt-hold when switch moves to position 1 or 2
-        hover.checkSwitch();
+        //hover.checkSwitch();
 
     } else {                    // not in rc loop
 
@@ -237,19 +229,12 @@ void loop(void)
 
         switch (taskOrder) {
             case 0:
-                //if (baro.available())
-                //    baro.update();
                 taskOrder++;
                 break;
             case 1:
-                //if (sonars.available() && altitudeEstimationTask.checkAndUpdate(currentTime)) {
-                //    hover.updateAltitudePid();
-                //}
                 taskOrder++;
                 break;
             case 2:
-                //if (sonars.available())
-                //    sonars.update();
                 taskOrder++;
                 break;
             case 3:
@@ -303,7 +288,7 @@ void loop(void)
         msp.update(armed);
 
         // perform hover tasks (alt-hold etc.)
-        hover.perform();
+        //hover.perform();
 
         // update stability PID controller 
         stab.update();

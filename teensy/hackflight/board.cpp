@@ -203,23 +203,6 @@ void Board::reboot(void)
 {
 }
 
-bool Board::sonarInit(uint8_t index) 
-{
-    (void)index; 
-    return false;
-}
-
-void Board::sonarUpdate(uint8_t index)
-{
-    (void)index; 
-}
-
-uint16_t Board::sonarGetDistance(uint8_t index)
-{
-    (void)index; 
-    return 0;
-}
-
 void Board::showArmedStatus(bool armed)
 {
     // XXX this would be a good place to sound a buzzer!
@@ -233,17 +216,4 @@ void Board::showAuxStatus(uint8_t status)
 }
 
 
-bool Board::baroInit(void)
-{
-  return false;
-}
-
-void Board::baroUpdate(void)
-{
-}
-
-int32_t Board::baroGetPressure(void)
-{
-    return 0;
-}
 

@@ -27,16 +27,14 @@
 
 void debug(const char * format, ...);
 
+// basics
 #include "filters.hpp"
 #include "board.hpp"
 #include "imu.hpp"
 #include "rc.hpp"
 #include "stabilize.hpp"
 #include "mixer.hpp"
-#include "baro.hpp"
-#include "sonars.hpp"
 #include "msp.hpp"
-#include "hover.hpp"
 #include "filters.hpp"
 
 #ifndef abs

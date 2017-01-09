@@ -63,8 +63,7 @@ void Stabilize::update(void)
 
         int32_t gyroError = this->imu->gyroADC[axis] / 4;
 
-        int32_t error = (int32_t)this->rc->command[axis] * 10 * 8 / 
-            this->rate_p[axis] - gyroError;
+        int32_t error = (int32_t)this->rc->command[axis] * 10 * 8 / this->rate_p[axis] - gyroError;
 
         int32_t PTermGYRO = this->rc->command[axis];
 
