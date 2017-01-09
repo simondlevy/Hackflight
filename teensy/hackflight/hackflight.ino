@@ -1,1 +1,1 @@
-../../firmware/hackflight-core.cpp
+../../firmware/hackflight.cpp

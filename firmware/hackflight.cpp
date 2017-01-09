@@ -36,9 +36,7 @@ static RC         rc;
 static Mixer      mixer;
 static MSP        msp;
 static Stabilize  stab;
-
-//static Sonars     sonars;
-//static Hover      hover;
+static Extras     extras;
 
 // support for timed tasks
 
@@ -141,17 +139,13 @@ void setup(void)
     accelCalibrationTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
     altitudeEstimationTask.init(CONFIG_ALTITUDE_UPDATE_MSEC * 1000);
 
-    // attempt to initialize barometer, sonars
-    //baro.init();
-    //sonars.init();
-
     // initialize our external objects with objects they need
     rc.init();
     stab.init(&rc, &imu);
     imu.init(calibratingGyroCycles, calibratingAccCycles);
     mixer.init(&rc, &stab); 
-    msp.init(&imu,  &mixer, &rc);
-    //hover.init(&imu, &sonars, &rc);
+    msp.init(&imu, &mixer, &rc);
+    extras.init();
 
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;
@@ -226,37 +220,19 @@ void loop(void)
 
         } // rc.changed()
 
-        // Switch to alt-hold when switch moves to position 1 or 2
-        //hover.checkSwitch();
+        // Detect aux switch changes for hover, altitude-hold, etc.
+        extras.checkSwitch();
 
     } else {                    // not in rc loop
 
         static int taskOrder;   // never call all functions in the same loop, to avoid high delay spikes
 
-        switch (taskOrder) {
-            case 0:
-                //if (baro.available())
-                //    baro.update();
-                taskOrder++;
-                break;
-            case 1:
-                //if (sonars.available() && altitudeEstimationTask.checkAndUpdate(currentTime)) {
-                //    hover.updateAltitudePid();
-                //}
-                taskOrder++;
-                break;
-            case 2:
-                //if (sonars.available())
-                //    sonars.update();
-                taskOrder++;
-                break;
-            case 3:
-                taskOrder++;
-                break;
-            case 4:
-                taskOrder = 0;
-                break;
-        }
+        extras.performTask(taskOrder);
+
+        taskOrder++;
+
+        if (taskOrder >= extras.getTaskCount()) // using >= supports zero or more tasks
+            taskOrder = 0;
     }
 
     currentTime = Board::getMicros();
@@ -301,7 +277,7 @@ void loop(void)
         msp.update(armed);
 
         // perform hover tasks (alt-hold etc.)
-        hover.perform();
+        //hover.perform();
 
         // update stability PID controller 
         stab.update();
