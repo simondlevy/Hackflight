@@ -1,5 +1,5 @@
 /*
-   extras.cpp : Implementation of extra simulator functionality
+   sim_extras.cpp : Implementation of extra simulator functionality
 
    Copyright (C) Simon D. Levy, Matt Lubas, and Julio Hidalgo Lopez 2016
 
@@ -20,7 +20,7 @@
 static const char * PORTNAME = "/dev/ttyUSB0";
 static const int    BAUDRATE = 57600; // Fastest we could get from our XBees
 
-#include "extras.hpp"
+#include "sim_extras.hpp"
 #include "serial.hpp"
 
 #include "scriptFunctionData.h"

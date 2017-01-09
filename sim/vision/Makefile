@@ -33,7 +33,7 @@ all: $(PLUGIN)
 
 libv_repExtHackflight.so: *.cpp ../*.cpp *.hpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp Makefile
 	g++ $(CFLAGS) -c  ../v_repExtHackflight.cpp 
-	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_DIR)\" extras.cpp 
+	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_DIR)\" sim_extras.cpp 
 	g++ $(CFLAGS) -c ../controller_Posix.cpp 
 	g++ $(CFLAGS) -c ../controller_Linux.cpp 
 	g++ $(CFLAGS) -c ../../common/sockets.cpp 
@@ -46,10 +46,10 @@ libv_repExtHackflight.so: *.cpp ../*.cpp *.hpp ../*.hpp ../../firmware/*.cpp ../
 	g++ $(CFLAGS) -c ../../firmware/hackflight.cpp
 	g++ $(CFLAGS) -c ../../firmware/stabilize.cpp
 	g++ $(CFLAGS) -c ../../firmware/rc.cpp
-	g++ $(CFLAGS) -c ../../firmware/baro.cpp
-	g++ $(CFLAGS) -c ../../firmware/sonars.cpp
-	g++ $(CFLAGS) -c ../../firmware/hover.cpp
 	g++ $(CFLAGS) -c ../../firmware/filters.cpp
+	g++ $(CFLAGS) -c ../../firmware/extras/baro.cpp
+	g++ $(CFLAGS) -c ../../firmware/extras/sonars.cpp
+	g++ $(CFLAGS) -c ../../firmware/extras/hover.cpp
 	g++ *.o -o libv_repExtHackflight.so -lpthread -shared -lopencv_core -lopencv_highgui $(JOYLIB)
 
 install: $(PLUGIN) hackflight_companion.py

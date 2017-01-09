@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 #include "hackflight.hpp"
+#include "baro.hpp"
 
 void Baro::init(void)
 {

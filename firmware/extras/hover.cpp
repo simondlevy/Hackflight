@@ -26,6 +26,7 @@ extern "C" {
 
 #include "hackflight.hpp"
 #include "pidvals.hpp"
+#include "hover.hpp"
 
 void Hover::init(IMU * _imu, Sonars * _sonars, RC * _rc)
 {

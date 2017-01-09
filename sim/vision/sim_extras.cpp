@@ -1,5 +1,5 @@
 /*
-   extras.cpp : Implementation of extra simulator functionality
+   sim_extras.cpp : Implementation of extra simulator functionality
 
    Copyright (C) Simon D. Levy, Matt Lubas, and Julio Hidalgo Lopez 2016
 
@@ -17,7 +17,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "extras.hpp"
+#include "sim_extras.hpp"
 #include "sockets.hpp"
 
 #include "scriptFunctionData.h"
