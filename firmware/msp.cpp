@@ -29,12 +29,13 @@ extern "C" {
 
 #define MSP_RC                   105    
 #define MSP_ATTITUDE             108    
+#define MSP_SET_RAW_RC           200    
+#define MSP_SET_MOTOR            214    
+
 #define MSP_ALTITUDE             109    
 #define MSP_BARO_SONAR_RAW       126    
 #define MSP_SONARS               127    
-#define MSP_SET_RAW_RC           200    
 #define MSP_SET_HEAD             211
-#define MSP_SET_MOTOR            214    
 
 void MSP::serialize8(uint8_t a)
 {
@@ -101,11 +102,12 @@ void MSP::tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-void MSP::init(class IMU * _imu, class Mixer * _mixer, class RC * _rc)
+void MSP::init(class IMU * _imu, class Mixer * _mixer, class RC * _rc, class Extras * _extras)
 {
     this->imu = _imu;
     this->mixer = _mixer;
     this->rc = _rc;
+    this->extras = _extras;
 
     memset(&this->portState, 0, sizeof(this->portState));
 }

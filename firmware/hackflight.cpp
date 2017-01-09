@@ -144,7 +144,7 @@ void setup(void)
     stab.init(&rc, &imu);
     imu.init(calibratingGyroCycles, calibratingAccCycles);
     mixer.init(&rc, &stab); 
-    msp.init(&imu, &mixer, &rc);
+    msp.init(&imu, &mixer, &rc, &extras);
     extras.init();
 
     // always do gyro calibration at startup
