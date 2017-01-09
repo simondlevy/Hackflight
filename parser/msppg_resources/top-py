@@ -23,6 +23,9 @@ class MSP_Parser(object):
         self.state = 0
 
     def parse(self, char):
+        '''
+        Parses one character, triggering pre-set handlers upon a successful parse.
+        '''
 
         byte = ord(char)
 
