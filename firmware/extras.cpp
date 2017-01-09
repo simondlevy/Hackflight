@@ -1,5 +1,5 @@
 /*
-   hackflight.hpp : general header
+   extras.cpp : Stubbed method implementations for extra functionality.
 
    This file is part of Hackflight.
 
@@ -15,35 +15,30 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdint.h>
-#include <stdarg.h>
-#include <math.h>
-#include <stdio.h>
-
-#include "crossplatform.h"
-
-#ifndef M_PI
+#ifdef __arm__
+extern "C" {
 #endif
 
-void debug(const char * format, ...);
-
-// basics
-#include "filters.hpp"
-#include "board.hpp"
-#include "imu.hpp"
-#include "rc.hpp"
-#include "stabilize.hpp"
-#include "mixer.hpp"
-#include "msp.hpp"
-#include "filters.hpp"
 #include "extras.hpp"
 
-#ifndef abs
-#define abs(x)    ((x) > 0 ? (x) : -(x))
-#define sgn(x)    ((x) > 0 ? +1 : -1)
-#define min(a, b) ((a) < (b) ? (a) : (b))
-#define max(a, b) ((a) > (b) ? (a) : (b))
-#define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
-#endif
+void Extras::init(void) 
+{ 
+}
 
-#include "config.hpp"
+void Extras::checkSwitch(void) 
+{ 
+}
+
+uint8_t Extras::getTaskCount(void)
+{
+    return 0;
+}
+
+void Extras::performTask(uint8_t taskIndex)
+{
+    (void)taskIndex;
+}
+
+#ifdef __arm__
+} // extern "C"
+#endif

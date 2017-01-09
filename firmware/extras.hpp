@@ -1,5 +1,5 @@
 /*
-   hackflight.hpp : general header
+   extras.hpp : Class declaration for extra functionality (altitude hold, hover, etc.)
 
    This file is part of Hackflight.
 
@@ -15,35 +15,29 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdint.h>
-#include <stdarg.h>
-#include <math.h>
+#pragma once
+
+#ifdef __arm__
+extern "C" {
+#else
 #include <stdio.h>
-
-#include "crossplatform.h"
-
-#ifndef M_PI
 #endif
 
-void debug(const char * format, ...);
+#include <stdint.h>
 
-// basics
-#include "filters.hpp"
-#include "board.hpp"
-#include "imu.hpp"
-#include "rc.hpp"
-#include "stabilize.hpp"
-#include "mixer.hpp"
-#include "msp.hpp"
-#include "filters.hpp"
-#include "extras.hpp"
+class Extras {
 
-#ifndef abs
-#define abs(x)    ((x) > 0 ? (x) : -(x))
-#define sgn(x)    ((x) > 0 ? +1 : -1)
-#define min(a, b) ((a) < (b) ? (a) : (b))
-#define max(a, b) ((a) > (b) ? (a) : (b))
-#define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
+    public:
+
+        void    init(void);
+
+        void    checkSwitch(void);
+
+        uint8_t getTaskCount(void);
+
+        void    performTask(uint8_t taskIndex);
+};
+
+#ifdef __arm__
+} // extern "C"
 #endif
-
-#include "config.hpp"
