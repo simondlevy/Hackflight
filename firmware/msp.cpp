@@ -27,15 +27,10 @@ extern "C" {
 
 #include "hackflight.hpp"
 
+// the basics
 #define MSP_RC                   105    
 #define MSP_ATTITUDE             108    
-#define MSP_SET_RAW_RC           200    
 #define MSP_SET_MOTOR            214    
-
-#define MSP_ALTITUDE             109    
-#define MSP_BARO_SONAR_RAW       126    
-#define MSP_SONARS               127    
-#define MSP_SET_HEAD             211
 
 void MSP::serialize8(uint8_t a)
 {
@@ -155,18 +150,6 @@ void MSP::update(bool armed)
 
                 switch (portState.cmdMSP) {
 
-                    case MSP_SET_RAW_RC:
-                        for (uint8_t i = 0; i < 8; i++)
-                            this->rc->data[i] = read16();
-                        headSerialReply(0);
-                        break;
-
-                    case MSP_SET_MOTOR:
-                        for (uint8_t i = 0; i < 4; i++)
-                            this->mixer->motorsDisarmed[i] = read8() / 100.; // percentage to [0,1]
-                        headSerialReply(0);
-                        break;
-
                     case MSP_RC:
                         headSerialReply(16);
                         for (uint8_t i = 0; i < 8; i++)
@@ -179,32 +162,16 @@ void MSP::update(bool armed)
                             serialize16(this->imu->angle[i]);
                         break;
 
-                    case MSP_SET_HEAD: 
-                        //this->hover->headHold = read16();
-                        //headSerialReply(0);
-                        break;
-
-                    case MSP_BARO_SONAR_RAW:
-                        //headSerialReply(8);
-                        //serialize32(baroPressure);
-                        //serialize32(sonarDistance);
-                        break;
-
-                    case MSP_ALTITUDE:
-                        //headSerialReply(6);
-                        //serialize32(this->hover->estAlt);
-                        //serialize16(this->hover->vario);
-                        break;
-
-                    case MSP_SONARS:
-                        //headSerialReply(8);
-                        //for (uint8_t i = 0; i < 4; i++)
-                        //    serialize16(this->sonars->distances[i]);
+                    case MSP_SET_MOTOR:
+                        for (uint8_t i = 0; i < 4; i++)
+                            this->mixer->motorsDisarmed[i] = read8() / 100.; // percentage to [0,1]
+                        headSerialReply(0);
                         break;
 
                     // don't know how to handle the (valid) message, indicate error MSP $M!
                     default:                   
-                        headSerialError(0);
+                        if (!this->extras->handleMSP(portState.cmdMSP))
+                            headSerialError(0);
                         break;
                 }
                 tailSerialReply();

@@ -35,6 +35,8 @@ class Extras {
 
         uint8_t getTaskCount(void);
 
+        bool    handleMSP(uint8_t command);
+
         void    performTask(uint8_t taskIndex);
 };
 

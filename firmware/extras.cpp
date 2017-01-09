@@ -39,6 +39,13 @@ void Extras::performTask(uint8_t taskIndex)
     (void)taskIndex;
 }
 
+bool Extras::handleMSP(uint8_t command)
+{
+    (void)command;
+
+    return true;
+}
+
 #ifdef __arm__
 } // extern "C"
 #endif
