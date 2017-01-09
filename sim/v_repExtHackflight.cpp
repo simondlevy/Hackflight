@@ -43,7 +43,7 @@ using namespace std;
 #include <crossplatform.h>
 
 #include "controller.hpp"
-#include "extras.hpp"
+#include "sim_extras.hpp"
 
 #ifdef _WIN32
 #include "Shlwapi.h"
@@ -258,7 +258,7 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
     controller = controllerInit();
 
     // Do any extra initialization needed
-    extrasStart();
+    simExtrasStart();
 
     // Now we're ready
     ready = true;
@@ -348,7 +348,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     micros += (uint32_t)(1e6 * timestep);
 
     // Do any extra update needed
-    extrasUpdate();
+    simExtrasUpdate();
 
     const float tsigns[4] = {+1, -1, -1, +1};
 	const int propDirections[4] = {-1,+1,+1,-1};
@@ -421,7 +421,7 @@ void LUA_STOP_CALLBACK(SScriptCallBack* cb)
     hideToastDialog();
 
     // Do any extra shutdown needed
-    extrasStop();
+    simExtrasStop();
 
     // Return success to V-REP
     CScriptFunctionData D;
@@ -529,7 +529,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
         return NULL;
 
     // Handle messages mission-specifically
-    extrasMessage(message, auxiliaryData, customData);
+    simExtrasMessage(message, auxiliaryData, customData);
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);

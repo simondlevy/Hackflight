@@ -46,7 +46,7 @@ all: $(ALL)
 
 libv_repExtHackflight.$(EXT): *.cpp *.hpp ../*.cpp ../*.hpp ../../firmware/*.cpp ../../firmware/*.hpp
 	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" ../v_repExtHackflight.cpp 
-	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" extras.cpp 
+	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" sim_extras.cpp 
 	g++ $(CFLAGS) -c ../../common/serial.cpp
 	g++ $(CFLAGS) -c ../controller_Posix.cpp 
 	g++ $(CFLAGS) -c ../controller_$(OS).cpp 
@@ -56,11 +56,12 @@ libv_repExtHackflight.$(EXT): *.cpp *.hpp ../*.cpp ../*.hpp ../../firmware/*.cpp
 	g++ $(CFLAGS) -c ../../firmware/imu.cpp
 	g++ $(CFLAGS) -c ../../firmware/mixer.cpp
 	g++ $(CFLAGS) -c ../../firmware/msp.cpp
-	g++ $(CFLAGS) -c ../../firmware/hackflight-core.cpp
+	g++ $(CFLAGS) -c ../../firmware/hackflight.cpp
 	g++ $(CFLAGS) -c ../../firmware/stabilize.cpp
 	g++ $(CFLAGS) -c ../../firmware/filters.cpp
 	g++ $(CFLAGS) -c ../../firmware/rc.cpp
 	g++ $(CFLAGS) -c ../../firmware/filters.cpp
+	g++ $(CFLAGS) -c ../../firmware/extras.cpp
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared $(JOYLIB) -lmsppg
 
 edit:

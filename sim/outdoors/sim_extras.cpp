@@ -1,5 +1,5 @@
 /*
-   extras.cpp : Implementation of extra simulator functionality
+   sim_extras.cpp : Implementation of extra simulator functionality
 
    Copyright (C) Simon D. Levy, Matt Lubas, and Julio Hidalgo Lopez 2016
 
@@ -17,23 +17,23 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "extras.hpp"
+#include "sim_extras.hpp"
 
 #include <stdio.h>
 
-void extrasStart(void)
+void simExtrasStart(void)
 {
 }
 
-void extrasUpdate(void)
+void simExtrasUpdate(void)
 {
 }
 
-void extrasMessage(int message, int * auxiliaryData, void * customData)
+void simExtrasMessage(int message, int * auxiliaryData, void * customData)
 {
 }
 
-void extrasStop(void)
+void simExtrasStop(void)
 {
 }
 

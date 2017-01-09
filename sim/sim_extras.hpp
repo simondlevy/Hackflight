@@ -21,10 +21,10 @@
 #include <board.hpp>
 
 // Implemented in extras.cpp for each scene
-void extrasStart(void);
-void extrasUpdate(void);
-void extrasMessage(int message, int * auxiliaryData, void * customData);
-void extrasStop(void);
+void simExtrasStart(void);
+void simExtrasUpdate(void);
+void simExtrasMessage(int message, int * auxiliaryData, void * customData);
+void simExtrasStop(void);
 
 // Implemented in v_repExtHackflight.cpp
 void errorDialog(char * message);
