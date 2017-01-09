@@ -158,6 +158,12 @@ class Python_Emitter(CodeEmitter):
             if msgid < 200:
 
                 self._write(self.indent + 'def set_%s_Handler(self, handler):\n\n' % msgtype) 
+                self._write(2*self.indent + "'''\n")
+                self._write(2*self.indent + 'Sets the handler method for when a %s message is successfully parsed.\n' %
+                        msgtype)
+                self._write(2*self.indent + 'You should declare this message with the following parameter(s):\n')
+                self._write(3*self.indent + ','.join(self._getargnames(msgstuff)))
+                self._write(2*self.indent + "\n'''\n")
                 self._write(2*self.indent + 'self.%s_Handler = handler\n\n' % msgtype)
 
                 self._write(self.indent + 'def set_%s_Request_Handler(self, handler):\n\n' % msgtype) 
