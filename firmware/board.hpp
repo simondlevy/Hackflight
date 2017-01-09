@@ -51,16 +51,6 @@ extern "C" {
             // STM32
             static void     reboot(void);
 
-            // Baro
-            static bool     baroInit(void);
-            static void     baroUpdate(void);
-            static int32_t  baroGetPressure(void);
-
-            // Sonar
-            static bool     sonarInit(uint8_t index);
-            static void     sonarUpdate(uint8_t index);
-            static uint16_t sonarGetDistance(uint8_t index);
-
             // Default constants
             static const uint32_t DEFAULT_IMU_LOOPTIME_USEC     = 3500;
             static const uint32_t DEFAULT_GYRO_CALIBRATION_MSEC = 3500;

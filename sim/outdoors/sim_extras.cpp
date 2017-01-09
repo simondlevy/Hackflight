@@ -50,18 +50,3 @@ uint8_t Board::serialReadByte(void)
 void Board::serialWriteByte(uint8_t c)
 {
 }
-
-bool Board::sonarInit(uint8_t index) 
-{
-    return false;
-}
-
-void Board::sonarUpdate(uint8_t index)
-{
-}
-
-uint16_t Board::sonarGetDistance(uint8_t index)
-{
-    return 0;
-}
- 

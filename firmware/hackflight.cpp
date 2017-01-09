@@ -223,6 +223,9 @@ void loop(void)
         // Detect aux switch changes for hover, altitude-hold, etc.
         extras.checkSwitch();
 
+        debug("%d %d %d %d %d\n", rc.command[0], rc.command[1], rc.command[2], rc.command[3], rc.command[4]);
+
+
     } else {                    // not in rc loop
 
         static int taskOrder;   // never call all functions in the same loop, to avoid high delay spikes

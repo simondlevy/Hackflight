@@ -589,20 +589,6 @@ void Board::ledSetState(uint8_t id, bool state)
 }
 
 
-bool Board::baroInit(void)
-{
-    return true;
-}
-
-void Board::baroUpdate(void)
-{
-}
-
-int32_t Board::baroGetPressure(void)
-{
-    return baroPressure;
-}
-
 uint32_t Board::getMicros()
 {
     return micros; 
