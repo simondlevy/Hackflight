@@ -150,7 +150,7 @@ void setup(void)
     stab.init(&rc, &imu);
     imu.init(calibratingGyroCycles, calibratingAccCycles);
     mixer.init(&rc, &stab); 
-    msp.init(&imu, &hover, &mixer, &rc/*, &sonars*/);
+    msp.init(&imu,  &mixer, &rc);
     //hover.init(&imu, &sonars, &rc);
 
     // always do gyro calibration at startup
@@ -229,7 +229,7 @@ void loop(void)
         //debug("%d %d %d %d %d\n", rc.command[0], rc.command[1], rc.command[2], rc.command[3], rc.command[4]);
 
         // Switch to alt-hold when switch moves to position 1 or 2
-        hover.checkSwitch();
+        //hover.checkSwitch();
 
     } else {                    // not in rc loop
 

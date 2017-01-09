@@ -56,13 +56,10 @@ libv_repExtHackflight.$(EXT): *.cpp *.hpp ../*.cpp ../*.hpp ../../firmware/*.cpp
 	g++ $(CFLAGS) -c ../../firmware/imu.cpp
 	g++ $(CFLAGS) -c ../../firmware/mixer.cpp
 	g++ $(CFLAGS) -c ../../firmware/msp.cpp
-	g++ $(CFLAGS) -c ../../firmware/hackflight.cpp
+	g++ $(CFLAGS) -c ../../firmware/hackflight-core.cpp
 	g++ $(CFLAGS) -c ../../firmware/stabilize.cpp
 	g++ $(CFLAGS) -c ../../firmware/filters.cpp
 	g++ $(CFLAGS) -c ../../firmware/rc.cpp
-	g++ $(CFLAGS) -c ../../firmware/baro.cpp
-	g++ $(CFLAGS) -c ../../firmware/sonars.cpp
-	g++ $(CFLAGS) -c ../../firmware/hover.cpp
 	g++ $(CFLAGS) -c ../../firmware/filters.cpp
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared $(JOYLIB) -lmsppg
 
