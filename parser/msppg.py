@@ -166,8 +166,8 @@ class Python_Emitter(CodeEmitter):
                 self._write('\n' + 2*self.indent + "'''\n")
                 self._write(2*self.indent + 'self.%s_Handler = handler\n\n' % msgtype)
 
-                self._write(self.indent + 'def set_%s_Request_Handler(self, handler):\n\n' % msgtype) 
-                self._write(2*self.indent + 'self.%s_Request_Handler = handler\n\n' % msgtype)
+                #self._write(self.indent + 'def set_%s_Request_Handler(self, handler):\n\n' % msgtype) 
+                #self._write(2*self.indent + 'self.%s_Request_Handler = handler\n\n' % msgtype)
 
         # Emit serializer functions for module
         for msgtype in msgdict.keys():
