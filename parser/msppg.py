@@ -176,6 +176,9 @@ class Python_Emitter(CodeEmitter):
             msgid = msgstuff[0]
 
             self._write('def serialize_' + msgtype + '(' + ', '.join(self._getargnames(msgstuff)) + '):\n\n')
+            self._write(self.indent + "'''\n")
+            self._write(self.indent + 'Serializes the contents of a message of type ' + msgtype + '.\n')
+            self._write(self.indent + "'''\n")
             self._write(self.indent + 'message_buffer = struct.pack(\'')
             for argtype in self._getargtypes(msgstuff):
                 self._write(self.type2pack[argtype])
@@ -192,6 +195,9 @@ class Python_Emitter(CodeEmitter):
             if msgid < 200:
 
                 self._write('def serialize_' + msgtype + '_Request():\n\n')
+                self._write(self.indent + "'''\n")
+                self._write(self.indent + 'Serializes a request for ' + msgtype + ' data.\n')
+                self._write(self.indent + "'''\n")
                 self._write(self.indent + 'return _bytes(\'$M<\' + chr(0) + chr(%s) + chr(%s))\n\n' % (msgid, msgid))
 
     def _write(self, s):
