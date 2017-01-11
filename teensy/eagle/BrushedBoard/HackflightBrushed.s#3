@@ -4768,12 +4768,6 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="22.86" y="43.18" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="N$2" class="0">
-<segment>
-<pinref part="MLFT" gate="G$1" pin="5"/>
-<wire x1="22.86" y1="50.8" x2="27.94" y2="50.8" width="0.1524" layer="91"/>
-</segment>
-</net>
 <net name="M4PWM" class="0">
 <segment>
 <pinref part="TNSRGT" gate="G$1" pin="11"/>

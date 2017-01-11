@@ -692,7 +692,7 @@ design rules under a new name.</description>
 </pass>
 </autorouter>
 <elements>
-<element name="POLOLU" library="SparkFun-Connectors" package="1X03" value="" x="40.64" y="67.31" rot="R270"/>
+<element name="POLOLU" library="SparkFun-Connectors" package="1X03" value="" x="40.64" y="68.58" rot="R270"/>
 <element name="M1" library="con-molex-picoblade" package="53047-0210" value="53047-0210" x="43.18" y="33.02"/>
 <element name="M2" library="con-molex-picoblade" package="53047-0210" value="53047-0210" x="43.18" y="74.93"/>
 <element name="M3" library="con-molex-picoblade" package="53047-0210" value="53047-0210" x="12.7" y="33.02"/>
@@ -719,8 +719,8 @@ design rules under a new name.</description>
 <contactref element="PWR" pad="2"/>
 <contactref element="MBOT" pad="6"/>
 <contactref element="POLOLU" pad="1"/>
-<wire x1="40.64" y1="67.31" x2="29.21" y2="74.93" width="0" layer="19" extent="1-1"/>
-<wire x1="44.45" y1="36.83" x2="40.64" y2="67.31" width="0" layer="19" extent="1-1"/>
+<wire x1="29.21" y1="74.93" x2="40.64" y2="68.58" width="0" layer="19" extent="1-1"/>
+<wire x1="44.45" y1="36.83" x2="40.64" y2="68.58" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GND">
 <contactref element="PWR" pad="1"/>
@@ -736,15 +736,15 @@ design rules under a new name.</description>
 <contactref element="M1" pad="2"/>
 <contactref element="TNSLFT" pad="14"/>
 <contactref element="POLOLU" pad="2"/>
-<wire x1="40.64" y1="64.77" x2="42.555" y2="74.93" width="0" layer="19" extent="1-1"/>
-<wire x1="26.67" y1="74.93" x2="40.64" y2="64.77" width="0" layer="19" extent="1-1"/>
-<wire x1="33.02" y1="58.42" x2="40.64" y2="64.77" width="0" layer="19" extent="1-1"/>
+<wire x1="40.64" y1="66.04" x2="42.555" y2="74.93" width="0" layer="19" extent="1-1"/>
+<wire x1="33.02" y1="58.42" x2="40.64" y2="66.04" width="0" layer="19" extent="1-1"/>
 <wire x1="31.75" y1="48.26" x2="33.02" y2="58.42" width="0" layer="19" extent="1-1"/>
 <wire x1="31.75" y1="40.64" x2="31.75" y2="48.26" width="0" layer="19" extent="1-1"/>
 <wire x1="44.45" y1="48.26" x2="31.75" y2="48.26" width="0" layer="19" extent="1-1"/>
 <wire x1="44.45" y1="52.07" x2="44.45" y2="48.26" width="0" layer="19" extent="1-1"/>
 <wire x1="44.45" y1="40.64" x2="44.45" y2="48.26" width="0" layer="19" extent="1-1"/>
 <wire x1="42.555" y1="33.02" x2="44.45" y2="40.64" width="0" layer="19" extent="1-1"/>
+<wire x1="26.67" y1="74.93" x2="42.555" y2="74.93" width="0" layer="19" extent="1-1"/>
 <wire x1="12.075" y1="74.93" x2="26.67" y2="74.93" width="0" layer="19" extent="1-1"/>
 <wire x1="11.43" y1="69.85" x2="12.075" y2="74.93" width="0" layer="19" extent="1-1"/>
 <wire x1="12.075" y1="33.02" x2="31.75" y2="40.64" width="0" layer="19" extent="1-1"/>
@@ -802,7 +802,7 @@ design rules under a new name.</description>
 <signal name="5VREG">
 <contactref element="TNSRGT" pad="14"/>
 <contactref element="POLOLU" pad="3"/>
-<wire x1="26.67" y1="69.85" x2="40.64" y2="62.23" width="0" layer="19" extent="1-1"/>
+<wire x1="26.67" y1="69.85" x2="40.64" y2="63.5" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 </board>

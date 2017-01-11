@@ -4568,7 +4568,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <part name="MBOT" library="SparkFun-Connectors" deviceset="CONN_06" device="NO_SILK_FEMALE_PTH"/>
 <part name="MLFT" library="SparkFun-Connectors" deviceset="CONN_04" device=""/>
 <part name="MRGT" library="SparkFun-Connectors" deviceset="CONN_04" device=""/>
-<part name="5VREG" library="SparkFun-Connectors" deviceset="CONN_03" device=""/>
+<part name="POLOLU" library="SparkFun-Connectors" deviceset="CONN_03" device=""/>
 <part name="PWR" library="SparkFun-Connectors" deviceset="CONN_02" device=""/>
 <part name="M1" library="con-molex-picoblade" deviceset="53047-0210" device=""/>
 <part name="M2" library="con-molex-picoblade" deviceset="53047-0210" device=""/>
@@ -4587,7 +4587,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <instance part="MBOT" gate="G$1" x="17.78" y="45.72"/>
 <instance part="MLFT" gate="G$1" x="17.78" y="25.4"/>
 <instance part="MRGT" gate="G$1" x="17.78" y="7.62"/>
-<instance part="5VREG" gate="J$1" x="96.52" y="40.64"/>
+<instance part="POLOLU" gate="J$1" x="96.52" y="40.64"/>
 <instance part="PWR" gate="G$1" x="96.52" y="55.88"/>
 <instance part="M1" gate="G$1" x="116.84" y="7.62"/>
 <instance part="M2" gate="G$1" x="116.84" y="22.86"/>
@@ -4612,9 +4612,9 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="22.86" y="53.34" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="5VREG" gate="J$1" pin="3"/>
-<wire x1="104.14" y1="43.18" x2="111.76" y2="43.18" width="0.1524" layer="91"/>
-<label x="104.14" y="43.18" size="1.778" layer="95"/>
+<pinref part="POLOLU" gate="J$1" pin="1"/>
+<wire x1="104.14" y1="38.1" x2="111.76" y2="38.1" width="0.1524" layer="91"/>
+<label x="104.14" y="38.1" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="GND" class="0">
@@ -4679,7 +4679,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="58.42" y="63.5" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="5VREG" gate="J$1" pin="2"/>
+<pinref part="POLOLU" gate="J$1" pin="2"/>
 <wire x1="104.14" y1="40.64" x2="111.76" y2="40.64" width="0.1524" layer="91"/>
 <label x="104.14" y="40.64" size="1.778" layer="95"/>
 </segment>
@@ -4811,9 +4811,9 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="81.28" y="63.5" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="5VREG" gate="J$1" pin="1"/>
-<wire x1="104.14" y1="38.1" x2="111.76" y2="38.1" width="0.1524" layer="91"/>
-<label x="104.14" y="38.1" size="1.778" layer="95"/>
+<pinref part="POLOLU" gate="J$1" pin="3"/>
+<wire x1="104.14" y1="43.18" x2="111.76" y2="43.18" width="0.1524" layer="91"/>
+<label x="104.14" y="43.18" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>

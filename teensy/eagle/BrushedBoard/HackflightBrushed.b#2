@@ -144,6 +144,8 @@
 <wire x1="46.66" y1="29.21" x2="46.66" y2="77.46" width="0" layer="20"/>
 <wire x1="46.66" y1="77.46" x2="8.89" y2="77.46" width="0" layer="20"/>
 <wire x1="8.89" y1="77.46" x2="8.89" y2="29.21" width="0" layer="20"/>
+<text x="25.4" y="72.39" size="1.778" layer="1">-</text>
+<text x="30.48" y="72.39" size="1.778" layer="1" rot="MR0">+</text>
 </plain>
 <libraries>
 <library name="SparkFun-Connectors">
