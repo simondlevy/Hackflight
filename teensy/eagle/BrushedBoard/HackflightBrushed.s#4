@@ -4778,6 +4778,13 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="104.14" y="43.18" size="1.778" layer="95"/>
 </segment>
 </net>
+<net name="M4-" class="0">
+<segment>
+<pinref part="M4" gate="G$1" pin="2"/>
+<wire x1="93.98" y1="20.32" x2="91.44" y2="20.32" width="0.1524" layer="91"/>
+<label x="88.9" y="20.32" size="1.778" layer="95"/>
+</segment>
+</net>
 </nets>
 </sheet>
 </sheets>

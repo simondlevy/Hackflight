@@ -4785,6 +4785,27 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="88.9" y="20.32" size="1.778" layer="95"/>
 </segment>
 </net>
+<net name="M2-" class="0">
+<segment>
+<pinref part="M2" gate="G$1" pin="2"/>
+<wire x1="111.76" y1="20.32" x2="109.22" y2="20.32" width="0.1524" layer="91"/>
+<label x="106.68" y="20.32" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="M1-" class="0">
+<segment>
+<pinref part="M1" gate="G$1" pin="2"/>
+<wire x1="111.76" y1="5.08" x2="109.22" y2="5.08" width="0.1524" layer="91"/>
+<label x="106.68" y="5.08" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="M3-" class="0">
+<segment>
+<pinref part="M3" gate="G$1" pin="2"/>
+<wire x1="93.98" y1="5.08" x2="91.44" y2="5.08" width="0.1524" layer="91"/>
+<label x="88.9" y="5.08" size="1.778" layer="95"/>
+</segment>
+</net>
 </nets>
 </sheet>
 </sheets>

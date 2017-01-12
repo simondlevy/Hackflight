@@ -384,7 +384,7 @@ UsedLibrary="/opt/eagle-7.7.0/lbr/SparkFun-Eagle-Libraries/User-Submitted.lbr"
 
 [Win_1]
 Type="Control Panel"
-Loc="346 226 1919 1079"
+Loc="1009 174 2582 1027"
 State=2
 Number=0
 

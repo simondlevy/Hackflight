@@ -4577,6 +4577,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <part name="RX" library="jst" deviceset="B3B-ZR" device=""/>
 <part name="TNSRGT" library="SparkFun-Connectors" deviceset="CONN_14" device=""/>
 <part name="TNSLFT" library="SparkFun-Connectors" deviceset="CONN_14" device=""/>
+<part name="TNSBOT" library="SparkFun-Connectors" deviceset="CONN_02" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -4596,6 +4597,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <instance part="RX" gate="G$1" x="109.22" y="78.74"/>
 <instance part="TNSRGT" gate="G$1" x="71.12" y="48.26"/>
 <instance part="TNSLFT" gate="G$1" x="48.26" y="48.26"/>
+<instance part="TNSBOT" gate="G$1" x="63.5" y="17.78" rot="R90"/>
 </instances>
 <busses>
 </busses>

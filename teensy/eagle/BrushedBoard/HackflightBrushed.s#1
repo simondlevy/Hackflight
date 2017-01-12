@@ -4787,6 +4787,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <segment>
 <pinref part="MRGT" gate="G$1" pin="1"/>
 <wire x1="22.86" y1="5.08" x2="27.94" y2="5.08" width="0.1524" layer="91"/>
+<label x="22.86" y="5.08" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="M2-" class="0">
@@ -4798,6 +4799,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <segment>
 <pinref part="MRGT" gate="G$1" pin="4"/>
 <wire x1="22.86" y1="12.7" x2="27.94" y2="12.7" width="0.1524" layer="91"/>
+<label x="22.86" y="12.7" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="M1-" class="0">
@@ -4809,6 +4811,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <segment>
 <pinref part="MLFT" gate="G$1" pin="4"/>
 <wire x1="22.86" y1="30.48" x2="27.94" y2="30.48" width="0.1524" layer="91"/>
+<label x="22.86" y="30.48" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="M3-" class="0">
@@ -4820,6 +4823,7 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <segment>
 <pinref part="MLFT" gate="G$1" pin="1"/>
 <wire x1="22.86" y1="22.86" x2="27.94" y2="22.86" width="0.1524" layer="91"/>
+<label x="22.86" y="22.86" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
