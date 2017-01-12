@@ -40,4 +40,4 @@ teensy/eagle/BrushedBoard/*.TXT
 teensy/eagle/BrushedBoard/*.dri
 teensy/eagle/BrushedBoard/*.gpi
 teensy/eagle/BrushedBoard/*.pro
-teensy/eagle/BrushedBoard/*.s#5
+teensy/eagle/BrushedBoard/*.s#*

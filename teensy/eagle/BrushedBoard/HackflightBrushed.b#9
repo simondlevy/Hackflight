@@ -143,7 +143,9 @@
 <wire x1="8.89" y1="29.21" x2="46.66" y2="29.21" width="0" layer="20"/>
 <wire x1="46.66" y1="29.21" x2="46.66" y2="77.46" width="0" layer="20"/>
 <wire x1="46.66" y1="77.46" x2="8.89" y2="77.46" width="0" layer="20"/>
-<wire x1="8.89" y1="77.46" x2="8.89" y2="29.21" width="0" layer="20"/>
+<text x="25.4" y="72.39" size="1.778" layer="1">-</text>
+<text x="30.48" y="72.39" size="1.778" layer="1" rot="MR0">+</text>
+<wire x1="8.56" y1="29.21" x2="8.56" y2="77.46" width="0" layer="20"/>
 </plain>
 <libraries>
 <library name="SparkFun-Connectors">
@@ -713,12 +715,14 @@ design rules under a new name.</description>
 <element name="RX" library="jst" package="B3B-ZR" value="B3B-ZR" x="33.02" y="58.42"/>
 <element name="TNSLFT" library="SparkFun-Connectors" package="1X14" value="" x="11.43" y="36.83" rot="R90"/>
 <element name="TNSRGT" library="SparkFun-Connectors" package="1X14" value="" x="26.67" y="36.83" rot="R90"/>
+<element name="TNSBOT" library="SparkFun-Connectors" package="1X02" value="" x="16.51" y="36.83"/>
 </elements>
 <signals>
 <signal name="VBAT">
 <contactref element="PWR" pad="2"/>
 <contactref element="MBOT" pad="6"/>
 <contactref element="POLOLU" pad="1"/>
+<wire x1="44.3484" y1="36.8046" x2="44.45" y2="36.83" width="0.254" layer="16"/>
 <wire x1="29.21" y1="74.93" x2="40.64" y2="68.58" width="0" layer="19" extent="1-1"/>
 <wire x1="44.45" y1="36.83" x2="40.64" y2="68.58" width="0" layer="19" extent="1-1"/>
 </signal>
@@ -726,28 +730,12 @@ design rules under a new name.</description>
 <contactref element="PWR" pad="1"/>
 <contactref element="RX" pad="2"/>
 <contactref element="MTOP" pad="6"/>
-<contactref element="M2" pad="2"/>
-<contactref element="M3" pad="2"/>
-<contactref element="M4" pad="2"/>
-<contactref element="MRGT" pad="4"/>
-<contactref element="MRGT" pad="1"/>
-<contactref element="MLFT" pad="1"/>
-<contactref element="MLFT" pad="4"/>
-<contactref element="M1" pad="2"/>
 <contactref element="TNSLFT" pad="14"/>
 <contactref element="POLOLU" pad="2"/>
-<wire x1="40.64" y1="66.04" x2="42.555" y2="74.93" width="0" layer="19" extent="1-1"/>
 <wire x1="33.02" y1="58.42" x2="40.64" y2="66.04" width="0" layer="19" extent="1-1"/>
-<wire x1="31.75" y1="48.26" x2="33.02" y2="58.42" width="0" layer="19" extent="1-1"/>
-<wire x1="31.75" y1="40.64" x2="31.75" y2="48.26" width="0" layer="19" extent="1-1"/>
-<wire x1="44.45" y1="48.26" x2="31.75" y2="48.26" width="0" layer="19" extent="1-1"/>
-<wire x1="44.45" y1="52.07" x2="44.45" y2="48.26" width="0" layer="19" extent="1-1"/>
-<wire x1="44.45" y1="40.64" x2="44.45" y2="48.26" width="0" layer="19" extent="1-1"/>
-<wire x1="42.555" y1="33.02" x2="44.45" y2="40.64" width="0" layer="19" extent="1-1"/>
-<wire x1="26.67" y1="74.93" x2="42.555" y2="74.93" width="0" layer="19" extent="1-1"/>
-<wire x1="12.075" y1="74.93" x2="26.67" y2="74.93" width="0" layer="19" extent="1-1"/>
-<wire x1="11.43" y1="69.85" x2="12.075" y2="74.93" width="0" layer="19" extent="1-1"/>
-<wire x1="12.075" y1="33.02" x2="31.75" y2="40.64" width="0" layer="19" extent="1-1"/>
+<wire x1="44.45" y1="52.07" x2="33.02" y2="58.42" width="0" layer="19" extent="1-1"/>
+<wire x1="26.67" y1="74.93" x2="40.64" y2="66.04" width="0" layer="19" extent="1-1"/>
+<wire x1="11.43" y1="69.85" x2="26.67" y2="74.93" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="3.3V">
 <contactref element="RX" pad="1"/>
@@ -777,12 +765,15 @@ design rules under a new name.</description>
 <signal name="M1+">
 <contactref element="M1" pad="1"/>
 <contactref element="MLFT" pad="3"/>
+<wire x1="31.7754" y1="45.72" x2="31.75" y2="45.72" width="0.254" layer="1"/>
 <wire x1="31.75" y1="45.72" x2="43.805" y2="33.02" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M1PWM">
 <contactref element="TNSRGT" pad="8"/>
 <contactref element="MBOT" pad="2"/>
-<wire x1="34.29" y1="36.83" x2="26.67" y2="54.61" width="0" layer="19" extent="1-1"/>
+<wire x1="26.7462" y1="53.9496" x2="26.7462" y2="54.4068" width="0.254" layer="16"/>
+<wire x1="26.7462" y1="54.4068" x2="26.67" y2="54.61" width="0.254" layer="16"/>
+<wire x1="34.29" y1="36.83" x2="26.7462" y2="53.9496" width="0" layer="19" extent="16-16"/>
 </signal>
 <signal name="M4PWM">
 <contactref element="TNSRGT" pad="11"/>
@@ -797,12 +788,33 @@ design rules under a new name.</description>
 <signal name="M2PWM">
 <contactref element="TNSRGT" pad="9"/>
 <contactref element="MTOP" pad="2"/>
-<wire x1="26.67" y1="57.15" x2="34.29" y2="52.07" width="0" layer="19" extent="1-1"/>
+<wire x1="34.29" y1="52.1208" x2="34.29" y2="52.07" width="0.254" layer="16"/>
+<wire x1="26.67" y1="57.15" x2="34.29" y2="52.1208" width="0" layer="19" extent="16-16"/>
 </signal>
 <signal name="5VREG">
 <contactref element="TNSRGT" pad="14"/>
 <contactref element="POLOLU" pad="3"/>
 <wire x1="26.67" y1="69.85" x2="40.64" y2="63.5" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="M4-">
+<contactref element="M4" pad="2"/>
+<contactref element="MRGT" pad="1"/>
+<wire x1="44.45" y1="40.64" x2="12.075" y2="74.93" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="M2-">
+<contactref element="M2" pad="2"/>
+<contactref element="MRGT" pad="4"/>
+<wire x1="44.45" y1="48.26" x2="42.555" y2="74.93" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="M1-">
+<contactref element="M1" pad="2"/>
+<contactref element="MLFT" pad="4"/>
+<wire x1="42.555" y1="33.02" x2="31.75" y2="48.26" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="M3-">
+<contactref element="M3" pad="2"/>
+<contactref element="MLFT" pad="1"/>
+<wire x1="12.075" y1="33.02" x2="31.75" y2="40.64" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 </board>
