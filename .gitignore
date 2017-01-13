@@ -41,3 +41,17 @@ teensy/eagle/BrushedBoard/*.dri
 teensy/eagle/BrushedBoard/*.gpi
 teensy/eagle/BrushedBoard/*.pro
 teensy/eagle/BrushedBoard/*.s#*
+teensy/eagle/BrushedBoard2/*.job
+teensy/eagle/BrushedBoard2/*.GBL
+teensy/eagle/BrushedBoard2/*.GBO
+teensy/eagle/BrushedBoard2/*.GBS
+teensy/eagle/BrushedBoard2/*.GML
+teensy/eagle/BrushedBoard2/*.GTL
+teensy/eagle/BrushedBoard2/*.GTO
+teensy/eagle/BrushedBoard2/*.GTP
+teensy/eagle/BrushedBoard2/*.GTS
+teensy/eagle/BrushedBoard2/*.TXT
+teensy/eagle/BrushedBoard2/*.dri
+teensy/eagle/BrushedBoard2/*.gpi
+teensy/eagle/BrushedBoard2/*.pro
+teensy/eagle/BrushedBoard2/*.s#*
