@@ -393,8 +393,8 @@ Type="Schematic Editor"
 Loc="91 39 1832 962"
 State=2
 Number=2
-File="HackflightBrushed.sch"
-View="2.97573 2.62571 125.313 92.9684"
+File="/home/levy/Desktop/hackflight/teensy/eagle/BrushedBoard/HackflightBrushed.sch"
+View="9.7547 -2.33003 132.092 88.0127"
 WireWidths=" 0 0.3048 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0.4064 0.1524"
 PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 PadDrills=" 0.5 0.6 0.7 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.8"
@@ -433,16 +433,15 @@ ArcDirection=0
 AddLevel=2
 PadsSameType=0
 Layer=91
-Views=" 1: 2.97573 2.62571 125.313 92.9684"
 Sheet="1"
 
 [Win_3]
 Type="Board Editor"
-Loc="301 107 1824 1036"
+Loc="233 70 1756 999"
 State=2
 Number=1
-File="HackflightBrushed.brd"
-View="20.6307 20.6561 58.9133 81.6192"
+File="/home/levy/Desktop/hackflight/teensy/eagle/BrushedBoard/HackflightBrushed.brd"
+View="20.5118 1.37991 100.014 86.5876"
 WireWidths=" 0 0.254 0.3048 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0.4064"
 PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 PadDrills=" 0.5 0.6 0.7 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.8"
@@ -480,7 +479,7 @@ SwapLevel=0
 ArcDirection=0
 AddLevel=2
 PadsSameType=0
-Layer=20
+Layer=16
 
 [Desktop]
 Screen="1920 1080"

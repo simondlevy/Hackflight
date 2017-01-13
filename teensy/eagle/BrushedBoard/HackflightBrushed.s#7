@@ -4636,46 +4636,6 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="22.86" y="76.2" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="M2" gate="G$1" pin="2"/>
-<wire x1="111.76" y1="20.32" x2="109.22" y2="20.32" width="0.1524" layer="91"/>
-<label x="106.68" y="20.32" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="M3" gate="G$1" pin="2"/>
-<wire x1="93.98" y1="5.08" x2="91.44" y2="5.08" width="0.1524" layer="91"/>
-<label x="88.9" y="5.08" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="M4" gate="G$1" pin="2"/>
-<wire x1="93.98" y1="20.32" x2="91.44" y2="20.32" width="0.1524" layer="91"/>
-<label x="88.9" y="20.32" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="MRGT" gate="G$1" pin="4"/>
-<wire x1="22.86" y1="12.7" x2="27.94" y2="12.7" width="0.1524" layer="91"/>
-<label x="22.86" y="12.7" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="MRGT" gate="G$1" pin="1"/>
-<wire x1="22.86" y1="5.08" x2="27.94" y2="5.08" width="0.1524" layer="91"/>
-<label x="22.86" y="5.08" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="MLFT" gate="G$1" pin="1"/>
-<wire x1="22.86" y1="22.86" x2="27.94" y2="22.86" width="0.1524" layer="91"/>
-<label x="22.86" y="22.86" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="MLFT" gate="G$1" pin="4"/>
-<wire x1="22.86" y1="30.48" x2="27.94" y2="30.48" width="0.1524" layer="91"/>
-<label x="22.86" y="30.48" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="M1" gate="G$1" pin="2"/>
-<wire x1="111.76" y1="5.08" x2="109.22" y2="5.08" width="0.1524" layer="91"/>
-<label x="106.68" y="5.08" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="TNSLFT" gate="G$1" pin="14"/>
 <wire x1="58.42" y1="63.5" x2="66.04" y2="63.5" width="0.1524" layer="91"/>
 <label x="58.42" y="63.5" size="1.778" layer="95"/>
@@ -4816,6 +4776,13 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <pinref part="POLOLU" gate="J$1" pin="3"/>
 <wire x1="104.14" y1="43.18" x2="111.76" y2="43.18" width="0.1524" layer="91"/>
 <label x="104.14" y="43.18" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="M4-" class="0">
+<segment>
+<pinref part="M4" gate="G$1" pin="2"/>
+<wire x1="93.98" y1="20.32" x2="91.44" y2="20.32" width="0.1524" layer="91"/>
+<label x="88.9" y="20.32" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
