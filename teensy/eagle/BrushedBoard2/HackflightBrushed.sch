@@ -4086,11 +4086,6 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="104.14" y="38.1" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="TNSRGT" gate="G$1" pin="14"/>
-<wire x1="81.28" y1="63.5" x2="86.36" y2="63.5" width="0.1524" layer="91"/>
-<label x="81.28" y="63.5" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="M4" gate="G$1" pin="1"/>
 <wire x1="93.98" y1="22.86" x2="91.44" y2="22.86" width="0.1524" layer="91"/>
 <label x="88.9" y="22.86" size="1.778" layer="95"/>
@@ -4108,6 +4103,12 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <segment>
 <pinref part="M1" gate="G$1" pin="1"/>
 <wire x1="111.76" y1="7.62" x2="109.22" y2="7.62" width="0.1524" layer="91"/>
+<label x="106.68" y="7.62" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="MTOP" gate="G$1" pin="2"/>
+<wire x1="22.86" y1="25.4" x2="27.94" y2="25.4" width="0.1524" layer="91"/>
+<label x="22.86" y="25.4" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="GND" class="0">
@@ -4158,34 +4159,6 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <pinref part="TNSLFT" gate="G$1" pin="13"/>
 <wire x1="58.42" y1="60.96" x2="66.04" y2="60.96" width="0.1524" layer="91"/>
 <label x="58.42" y="60.96" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="M3+" class="0">
-<segment>
-<pinref part="MTOP" gate="G$1" pin="2"/>
-<wire x1="22.86" y1="25.4" x2="27.94" y2="25.4" width="0.1524" layer="91"/>
-<label x="22.86" y="25.4" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="M4+" class="0">
-<segment>
-<pinref part="MBOT" gate="G$1" pin="2"/>
-<wire x1="22.86" y1="7.62" x2="27.94" y2="7.62" width="0.1524" layer="91"/>
-<label x="22.86" y="7.62" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="M2+" class="0">
-<segment>
-<pinref part="MBOT" gate="G$1" pin="3"/>
-<wire x1="22.86" y1="10.16" x2="27.94" y2="10.16" width="0.1524" layer="91"/>
-<label x="22.86" y="10.16" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="M1+" class="0">
-<segment>
-<pinref part="MTOP" gate="G$1" pin="3"/>
-<wire x1="22.86" y1="27.94" x2="27.94" y2="27.94" width="0.1524" layer="91"/>
-<label x="22.86" y="27.94" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="M1PWM" class="0">
@@ -4239,9 +4212,9 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <label x="104.14" y="43.18" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="TNSBOT" gate="G$1" pin="5"/>
-<wire x1="68.58" y1="20.32" x2="73.66" y2="20.32" width="0.1524" layer="91"/>
-<label x="68.58" y="20.32" size="1.778" layer="95"/>
+<pinref part="TNSBOT" gate="G$1" pin="1"/>
+<wire x1="68.58" y1="10.16" x2="73.66" y2="10.16" width="0.1524" layer="91"/>
+<label x="68.58" y="10.16" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="M4-" class="0">
@@ -4290,29 +4263,6 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eZH.pdf"&gt;http://ww
 <pinref part="MTOP" gate="G$1" pin="1"/>
 <wire x1="22.86" y1="22.86" x2="27.94" y2="22.86" width="0.1524" layer="91"/>
 <label x="22.86" y="22.86" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="N$2" class="0">
-<segment>
-<pinref part="TNSBOT" gate="G$1" pin="4"/>
-<wire x1="68.58" y1="17.78" x2="73.66" y2="17.78" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$3" class="0">
-<segment>
-<pinref part="TNSBOT" gate="G$1" pin="3"/>
-<wire x1="68.58" y1="15.24" x2="73.66" y2="15.24" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$4" class="0">
-<segment>
-<wire x1="66.04" y1="12.7" x2="73.66" y2="12.7" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$5" class="0">
-<segment>
-<pinref part="TNSBOT" gate="G$1" pin="1"/>
-<wire x1="68.58" y1="10.16" x2="73.66" y2="10.16" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
