@@ -101,6 +101,9 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     // Set up LED
     pinMode(13, OUTPUT);
 
+    // Set ADO low to guarantee 0x68 address
+    digitalWrite(24, LOW);
+
     // Start receiver
     rx.begin();
 
@@ -118,9 +121,7 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
     // For ordering, negation see:
     // https://forum.pjrc.com/threads/37891-MPU-9250-Teensy-Library?p=118198&viewfull=1#post118198
   
-    imu.getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[1], &gyroADC[0], &gyroADC[2]);
-
-    gyroADC[2] = -gyroADC[2];
+    imu.getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
 }
 
 void Board::delayMilliseconds(uint32_t msec)
