@@ -18,6 +18,7 @@
 */
 
 static const char * JOY_DEV = "/dev/input/js0";
+static const char * DSM_DEV = "/dev/ttyACM0";
 
 #include "controller.hpp"
 #include "controller_Posix.hpp"
@@ -25,18 +26,29 @@ static const char * JOY_DEV = "/dev/input/js0";
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include <linux/joystick.h>
 
 static int joyfd;
 
+static int dsmfd;
+static int dsmvals[5];
+
+static void * dsmthread(void * v)
+{
+    int count = 0;
+    while (1)
+        printf("%d\n", count++);
+}
+
 controller_t controllerInit(void)
 { 
+    // Default to keyboard controller
     controller_t controller = KEYBOARD;
 
-    joyfd = open(JOY_DEV, O_RDONLY);
-
-    if (joyfd > 0) {
+    // First try to open wired joystick device
+    if ((joyfd=open(JOY_DEV, O_RDONLY)) > 0) {
 
         fcntl(joyfd, F_SETFL, O_NONBLOCK);
 
@@ -49,9 +61,19 @@ controller_t controllerInit(void)
             controller = posixControllerInit(name, "MY-POWER CO.");
     }
 
-    // No joystick detected; use keyboard as fallback
-    else  
+    // Next try to open wireless DSM dongle
+    else if ((dsmfd=open(DSM_DEV, O_RDONLY)) > 0) {
+
+        pthread_t thread;
+        pthread_create(&thread, NULL, dsmthread, NULL);
+        controller = DSM;
+    }
+
+    // No joystick or dongle detected; use keyboard as fallback
+    else  {
         posixKbInit();
+    }
+
 
     return controller;
 } 
@@ -76,7 +98,13 @@ void controllerRead(controller_t controller, float * demands)
             posixControllerGrabButton(demands, js.number);
     }
 
-    // No joystick; use keyboard
+    // No joystick; try DSM dongle
+    else if (dsmfd > 0) {
+        for (int k=0; k<5; ++k)
+            demands[k] = 0;
+    }
+
+    // No joystick or DSM; use keyboard
     else  {
         char keys[8] = {68, 67, 66, 65, 50, 10, 54, 53};
         posixKbGrab(keys);
@@ -88,6 +116,9 @@ void controllerClose(void)
     if (joyfd > 0)
         close(joyfd);
 
-    else // reset keyboard if no joystick
+    else if (dsmfd > 0)
+        close(dsmfd);
+
+    else // reset keyboard if no joystick or DSM dongle
         posixKbClose();
 }
