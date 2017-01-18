@@ -37,9 +37,15 @@ static int dsmvals[5];
 
 static void * dsmthread(void * v)
 {
-    int count = 0;
-    while (1)
-        printf("%d\n", count++);
+    while (1) {
+        int avail;
+        ioctl(dsmfd, FIONREAD, &avail);
+        if (avail > 0) {
+            char c;
+            read(dsmfd, &c, 1);
+            printf("%c", c);
+        }
+    }
 }
 
 controller_t controllerInit(void)
