@@ -37,6 +37,7 @@ static SpektrumDSM2048 rx;
 //#include <PulsePosition.h>
 
 // https://github.com/bolderflight/MPU9250
+// https://www.tindie.com/products/onehorse/mpu9250-teensy-3x-add-on-shields/ (we're using micro shield)
 #include <MPU9250.h>
 
 #include "board.hpp"
@@ -47,7 +48,7 @@ static SpektrumDSM2048 rx;
 // of 0x68 (ADDR to GRND) and on Teensy bus 0
 // using pins 16 and 17 instead of 18 and 19
 // and internal pullups instead of external.
-MPU9250 imu(0x68, 0, I2C_PINS_16_17, I2C_PULLUP_INT);
+MPU9250 imu(0x68, 1, I2C_PINS_29_30, I2C_PULLUP_INT);
 
 // https://www.tindie.com/products/onehorse/dc-motor-controller-board-for-teensy-31-/
 
@@ -117,9 +118,8 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
     // For ordering, negation see:
     // https://forum.pjrc.com/threads/37891-MPU-9250-Teensy-Library?p=118198&viewfull=1#post118198
   
-    imu.getMotion6Counts(&accADC[1], &accADC[0], &accADC[2], &gyroADC[1], &gyroADC[0], &gyroADC[2]);
+    imu.getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[1], &gyroADC[0], &gyroADC[2]);
 
-    accADC[2]  = -accADC[2];
     gyroADC[2] = -gyroADC[2];
 }
 

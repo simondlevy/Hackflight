@@ -142,6 +142,7 @@ void IMU::init(uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles)
 
 void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
 {
+    // XXX these should be instance variables
     static float    accelLPF[3];
     static int32_t  accelZoffset;
     static float    accz_smooth;
