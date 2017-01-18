@@ -657,6 +657,25 @@ void Board::showAuxStatus(uint8_t status)
 
 // Unused ==========================================================================================
 
+void Board::extrasCheckSwitch(void)
+{
+}
+
+uint8_t  Board::extrasGetTaskCount(void){
+    return 0;
+}
+
+bool Board::extrasHandleMSP(uint8_t command)
+{
+    return true;
+}
+
+void Board::extrasPerformTask(uint8_t taskIndex)
+{
+    (void)taskIndex;
+}
+
+
 
 bool Board::rcSerialReady(void)
 {

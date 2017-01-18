@@ -61,11 +61,7 @@ libv_repExtHackflight.$(EXT): *.cpp *.hpp ../*.cpp ../*.hpp ../../firmware/*.cpp
 	g++ $(CFLAGS) -c ../../firmware/filters.cpp
 	g++ $(CFLAGS) -c ../../firmware/rc.cpp
 	g++ $(CFLAGS) -c ../../firmware/filters.cpp
-	g++ $(CFLAGS) -c ../../firmware/extras.cpp
 	g++ *.o -o libv_repExtHackflight.$(EXT) -lpthread -shared $(JOYLIB) -lmsppg
-
-edit:
-	vim extras.cpp
 
 install: $(PLUGIN)
 	cp $(PLUGIN) $(VREP_LIBDIR)
