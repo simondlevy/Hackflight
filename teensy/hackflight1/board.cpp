@@ -193,6 +193,24 @@ void Board::writeMotor(uint8_t index, float value)
 
 // Unused -------------------------------------------------------------------------
 
+void Board::extrasCheckSwitch(void)
+{
+}
+
+uint8_t  Board::extrasGetTaskCount(void){
+    return 0;
+}
+
+bool Board::extrasHandleMSP(uint8_t command)
+{
+    return true;
+}
+
+void Board::extrasPerformTask(uint8_t taskIndex)
+{
+    (void)taskIndex;
+}
+
 
 uint16_t Board::rcReadPWM(uint8_t chan)
 {

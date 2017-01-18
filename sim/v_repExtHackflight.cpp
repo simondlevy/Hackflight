@@ -554,6 +554,15 @@ void errorDialog(char * message)
 #include <board.hpp>
 #include <hackflight.hpp>
 
+void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
+{
+    looptimeMicroseconds = 10000;
+    calibratingGyroMsec = 100;  // long enough to see but not to annoy
+
+    leds[0].init(greenLedHandle, 0, 1, 0);
+    leds[1].init(redLedHandle, 1, 0, 0);
+}
+
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     // Mimic MPU6050
@@ -572,15 +581,6 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
     gyroADC[1] = -(int16_t)(1000 * gyro[0]);
     gyroADC[0] = -(int16_t)(1000 * gyro[1]);
     gyroADC[2] = -(int16_t)(1000 * gyro[2]);
-}
-
-void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
-{
-    looptimeMicroseconds = 10000;
-    calibratingGyroMsec = 100;  // long enough to see but not to annoy
-
-    leds[0].init(greenLedHandle, 0, 1, 0);
-    leds[1].init(redLedHandle, 1, 0, 0);
 }
 
 void Board::ledSetState(uint8_t id, bool state)

@@ -48,10 +48,9 @@ extern "C" {
 
         private:
 
-            class IMU        * imu;
-            class Mixer      * mixer;
-            class RC         * rc;
-            class Extras     * extras;
+            class IMU   * imu;
+            class Mixer * mixer;
+            class RC    * rc;
 
             mspPortState_t portState;
 
@@ -68,7 +67,7 @@ extern "C" {
 
         public:
 
-            void init(class IMU * _imu, class Mixer * _mixer, class RC * _rc, class Extras * _extras);
+            void init(class IMU * _imu, class Mixer * _mixer, class RC * _rc);
 
             void update(bool armed);
 

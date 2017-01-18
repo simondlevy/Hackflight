@@ -1,5 +1,5 @@
 /*
-   extras.cpp : Stubbed method implementations for extra functionality.
+   pidvals.hpp : PID values for a specific vehicle
 
    This file is part of Hackflight.
 
@@ -15,37 +15,21 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef __arm__
-extern "C" {
-#endif
+static const float CONFIG_LEVEL_P             = 9.0;
+static const float CONFIG_LEVEL_I             = 0.010;
 
-#include "extras.hpp"
+// Rate (gyro): P must be positive
+static const float CONFIG_RATE_PITCHROLL_P    = 3.3;
+static const float CONFIG_RATE_PITCHROLL_I    = 0.030;
+static const float CONFIG_RATE_PITCHROLL_D    = 23;
 
-void Extras::init(void) 
-{ 
-}
+// Yaw: P must be positive
+static const float CONFIG_YAW_P               = 8.5;
+static const float CONFIG_YAW_I               = 0.045;
 
-void Extras::checkSwitch(void) 
-{ 
-}
+// For altitude hover
+#define CONFIG_HOVER_ALT_P  120
+#define CONFIG_HOVER_ALT_I  45
+#define CONFIG_HOVER_ALT_D  1
 
-uint8_t Extras::getTaskCount(void)
-{
-    return 0;
-}
 
-void Extras::performTask(uint8_t taskIndex)
-{
-    (void)taskIndex;
-}
-
-bool Extras::handleMSP(uint8_t command)
-{
-    (void)command;
-
-    return true;
-}
-
-#ifdef __arm__
-} // extern "C"
-#endif

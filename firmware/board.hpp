@@ -44,6 +44,12 @@ extern "C" {
             static void     serialWriteByte(uint8_t c);
             static void     writeMotor(uint8_t index, float value); // index={0,1,2,3}, value=[0.0 .. 1.0]
 
+            // Extra functionality
+            static void     extrasCheckSwitch(void);
+            static uint8_t  extrasGetTaskCount(void);
+            static bool     extrasHandleMSP(uint8_t command);
+            static void     extrasPerformTask(uint8_t taskIndex);
+
             // Helps with simulation
             static void     showArmedStatus(bool armed);
             static void     showAuxStatus(uint8_t status);
