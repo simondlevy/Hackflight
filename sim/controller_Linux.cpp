@@ -34,11 +34,12 @@ static int joyfd;
 
 static int dsmfd;
 static int dsmvals[5];
+static bool dsmrunning;
 
 // A thread for grabbing serial-port input from the Spektrum DSM dongle
 static void * dsmthread(void * v)
 {
-    while (1) {
+    while (dsmrunning) {
         int avail;
         ioctl(dsmfd, FIONREAD, &avail);
         if (avail > 0) {
@@ -47,6 +48,10 @@ static void * dsmthread(void * v)
             printf("0X%0X\n", c&0xFF);
         }
     }
+
+    printf("========================\n");
+
+    pthread_exit(NULL);
 }
 
 controller_t controllerInit(void)
@@ -70,6 +75,8 @@ controller_t controllerInit(void)
 
     // Next try to open wireless DSM dongle
     else if ((dsmfd=open(DSM_DEV, O_RDONLY)) > 0) {
+
+        dsmrunning = true;
 
         pthread_t thread;
         pthread_create(&thread, NULL, dsmthread, NULL);
@@ -120,6 +127,8 @@ void controllerRead(controller_t controller, float * demands)
 
 void controllerClose(void)
 {
+    dsmrunning = false;
+
     if (joyfd > 0)
         close(joyfd);
 
