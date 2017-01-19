@@ -53,6 +53,7 @@ libv_repExtHackflight.$(EXT): *.cpp *.hpp ../*.cpp ../*.hpp ../../firmware/*.cpp
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionDataItem.cpp
 	g++ $(CFLAGS) -c $(COMMON)/v_repLib.cpp
+	g++ $(CFLAGS) -c ../MSPPG.cpp
 	g++ $(CFLAGS) -c ../../firmware/imu.cpp
 	g++ $(CFLAGS) -c ../../firmware/mixer.cpp
 	g++ $(CFLAGS) -c ../../firmware/msp.cpp
