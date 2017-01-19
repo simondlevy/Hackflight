@@ -228,8 +228,8 @@ class CPP_Emitter(CodeEmitter):
         self.coutput = _openw('output/cpp/msppg/msppg.cpp')
         self.houtput = _openw('output/cpp/msppg/msppg.h')
 
-        self.acoutput = _openw('output/arduino/MSPPG/msppg.cpp')
-        self.ahoutput = _openw('output/arduino/MSPPG/msppg.h')
+        self.acoutput = _openw('output/arduino/MSPPG/MSPPG.cpp')
+        self.ahoutput = _openw('output/arduino/MSPPG/MSPPG.h')
 
         self._cwrite(self.warning('//'))
 

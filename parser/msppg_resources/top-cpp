@@ -1,4 +1,4 @@
-#include "msppg.h"
+#include "MSPPG.h"
 
 #include <string.h>
 #include <stdio.h>
