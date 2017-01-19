@@ -142,7 +142,7 @@ void posixControllerGrabAxis(controller_t controller, float * demands, int numbe
     for (int k=0; k<maxaxis; ++k)
         if (number == axismap[k]) {
             demands[k] = axisdir[k] * value / 32767.;
-            printf("%d %d %d\n", k, number, value);
+            printf("%d %d %d %f\n", k, number, value, demands[k]);
         }
 }
 

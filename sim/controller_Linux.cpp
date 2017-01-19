@@ -33,6 +33,7 @@ static const char * DSM_DEV = "/dev/ttyACM0";
 
 static int joyfd;
 
+// Support for Spektrum DSM dongle
 static int dsmfd;
 static int dsmvals[5];
 static bool dsmrunning;
@@ -44,7 +45,11 @@ class My_RC_Handler : public RC_Handler {
 
         void handle_RC(short c1, short c2, short c3, short c4, short c5, short c6, short c7, short c8)
         {
-            printf("%d %d %d %d %d\n", c1, c2, c3, c4, c5);
+            dsmvals[0] = c1;
+            dsmvals[1] = c2;
+            dsmvals[2] = c3;
+            dsmvals[3] = c4;
+            dsmvals[4] = c5;
         }
 };
 
@@ -131,8 +136,11 @@ void controllerRead(controller_t controller, float * demands)
 
     // No joystick; try DSM dongle
     else if (dsmfd > 0) {
-        for (int k=0; k<5; ++k)
-            demands[k] = 0;
+        for (int k=0; k<5; ++k) {
+            demands[k] = (dsmvals[k] - 1500) / 500.;
+            printf("%f ", demands[k]);
+        }
+        printf("\n");
     }
 
     // No joystick or DSM; use keyboard
