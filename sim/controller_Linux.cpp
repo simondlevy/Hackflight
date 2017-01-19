@@ -136,11 +136,8 @@ void controllerRead(controller_t controller, float * demands)
 
     // No joystick; try DSM dongle
     else if (dsmfd > 0) {
-        for (int k=0; k<5; ++k) {
+        for (int k=0; k<5; ++k)
             demands[k] = (dsmvals[k] - 1500) / 500.;
-            printf("%f ", demands[k]);
-        }
-        printf("\n");
     }
 
     // No joystick or DSM; use keyboard
