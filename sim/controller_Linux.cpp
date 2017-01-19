@@ -35,6 +35,7 @@ static int joyfd;
 static int dsmfd;
 static int dsmvals[5];
 
+// A thread for grabbing serial-port input from the Spektrum DSM dongle
 static void * dsmthread(void * v)
 {
     while (1) {
@@ -43,7 +44,7 @@ static void * dsmthread(void * v)
         if (avail > 0) {
             char c;
             read(dsmfd, &c, 1);
-            printf("%c", c);
+            printf("0X%0X\n", c&0xFF);
         }
     }
 }
