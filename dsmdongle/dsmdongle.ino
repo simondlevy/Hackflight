@@ -36,20 +36,17 @@ void setup(void)
 
 void loop(void)
 {  
-    static uint16_t values[8];
+    short r = rx.getChannelValue(1); // roll
+    short p = rx.getChannelValue(2); // pitch
+    short t = rx.getChannelValue(3); // throttle
+    short y = rx.getChannelValue(0); // yaw
+    short a = rx.getChannelValue(5); // aux
 
-    values[0] = rx.getChannelValue(1); // roll
-    values[1] = rx.getChannelValue(2); // pitch
-    values[2] = rx.getChannelValue(3); // throttle
-    values[3] = rx.getChannelValue(0); // yaw
-    values[4] = rx.getChannelValue(5); // aux
+    MSP_Message msg = MSP_Parser::serialize_RC(r, p, t, y, a, 0, 0, 0);
 
-    // unused
-    values[5] = 0;
-    values[6] = 0;
-    values[7] = 0;
-
-    Serial.printf("%d %d %d %d %d\n", values[0], values[1], values[2], values[3], values[4]);
+    for (byte b=msg.start(); msg.hasNext(); b=msg.getNext()) {
+        Serial.write(b);
+    }
 }
 
 
