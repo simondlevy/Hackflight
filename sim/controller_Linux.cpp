@@ -22,6 +22,7 @@ static const char * DSM_DEV = "/dev/ttyACM0";
 
 #include "controller.hpp"
 #include "controller_Posix.hpp"
+#include "MSPPG.h"
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -36,20 +37,36 @@ static int dsmfd;
 static int dsmvals[5];
 static bool dsmrunning;
 
+// A class for handling RC messages from the Spektrum DSM dongle
+class My_RC_Handler : public RC_Handler {
+
+    public:
+
+        void handle_RC(short c1, short c2, short c3, short c4, short c5, short c6, short c7, short c8)
+        {
+            printf("%d %d %d %d %d\n", c1, c2, c3, c4, c5);
+        }
+};
+
+
 // A thread for grabbing serial-port input from the Spektrum DSM dongle
 static void * dsmthread(void * v)
 {
+    MSP_Parser parser;
+
+    My_RC_Handler handler;
+
+    parser.set_RC_Handler(&handler);
+
     while (dsmrunning) {
         int avail;
         ioctl(dsmfd, FIONREAD, &avail);
         if (avail > 0) {
             char c;
             read(dsmfd, &c, 1);
-            printf("0X%0X\n", c&0xFF);
+            parser.parse(c);
         }
     }
-
-    printf("========================\n");
 
     pthread_exit(NULL);
 }
