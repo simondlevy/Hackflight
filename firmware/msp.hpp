@@ -62,14 +62,10 @@ extern "C" {
 
             mspPortState_t portState;
 
-            void serialize8(uint8_t a);
-            void serialize16(int16_t a);
             uint8_t read8(void);
             uint16_t read16(void);
             uint32_t read32(void);
-            void serialize32(uint32_t a);
             void headSerialResponse(uint8_t err, uint8_t s);
-            void headSerialReply(uint8_t s);
             void headSerialError(uint8_t s);
             void tailSerialReply(void);
 
@@ -78,6 +74,12 @@ extern "C" {
             void init(class Board * _board, class IMU * _imu, class Mixer * _mixer, class RC * _rc);
 
             void update(bool armed);
+
+            // For use by board extras
+            void headSerialReply(uint8_t s);
+            void serialize8(uint8_t a);
+            void serialize16(int16_t a);
+            void serialize32(uint32_t a);
 
     }; // class MSP
 
