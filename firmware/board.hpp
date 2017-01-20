@@ -38,6 +38,7 @@ extern "C" {
             static uint32_t getMicros();
             static void     imuInit(uint16_t & acc1G, float & gyroScale);
             static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
+            static void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
             static void     ledSetState(uint8_t id, bool state);
             static uint16_t rcReadPWM(uint8_t chan);
             static bool     rcUseSerial(void);
@@ -50,6 +51,7 @@ extern "C" {
             static void     writeMotor(uint8_t index, float value); // index={0,1,2,3}, value=[0.0 .. 1.0]
 
             // extra functionality
+            void            extrasInit(class MSP * _msp);
             void            extrasCheckSwitch(void);
             static uint8_t  extrasGetTaskCount(void);
             bool            extrasHandleMSP(uint8_t command);

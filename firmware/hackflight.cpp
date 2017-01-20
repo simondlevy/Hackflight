@@ -112,7 +112,7 @@ void setup(void)
     uint32_t calibratingGyroMsec;
 
     // init particulars for board, getting IMU loop time and gyro calibration duration
-    board.init(&msp, imuLooptimeUsec, calibratingGyroMsec);
+    Board::init(imuLooptimeUsec, calibratingGyroMsec);
 
     // sleep for 100ms
     Board::delayMilliseconds(100);
@@ -145,6 +145,9 @@ void setup(void)
     imu.init(calibratingGyroCycles, calibratingAccCycles);
     mixer.init(&rc, &stab); 
     msp.init(&board, &imu, &mixer, &rc);
+
+    // do any extra initializations (baro, sonar, etc.)
+    board.extrasInit(&msp);
 
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;
