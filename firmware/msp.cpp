@@ -39,13 +39,6 @@ void MSP::serialize16(int16_t a)
     serialize8((a >> 8) & 0xFF);
 }
 
-void MSP::serializeArray16(int16_t * data, int len)
-{
-    headSerialReply(len<<1);
-    for (uint8_t i = 0; i < len; i++)
-        serialize16(data[i]);
-}
-
 uint8_t MSP::read8(void)
 {
     return portState.inBuf[portState.indRX++] & 0xff;
@@ -153,11 +146,15 @@ void MSP::update(bool armed)
                 switch (portState.cmdMSP) {
 
                     case MSP_RC:
-                        serializeArray16(this->rc->data, 8);
+                        headSerialReply(16);
+                        for (uint8_t i = 0; i < 8; i++)
+                            serialize16(this->rc->data[i]);
                         break;
 
                     case MSP_ATTITUDE:
-                        serializeArray16(this->imu->angle, 3);
+                        headSerialReply(6);
+                        for (uint8_t i = 0; i < 3; i++)
+                            serialize16(this->imu->angle[i]);
                         break;
 
                     case MSP_SET_MOTOR:

@@ -64,7 +64,6 @@ extern "C" {
 
             void serialize8(uint8_t a);
             void serialize16(int16_t a);
-            void serializeArray16(int16_t * data, int len);
             uint8_t read8(void);
             uint16_t read16(void);
             uint32_t read32(void);
