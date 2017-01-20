@@ -17,6 +17,13 @@
 
 #pragma once
 
+// the basics
+#define MSP_RC                   105    
+#define MSP_ATTITUDE             108    
+#define MSP_ALTITUDE             109    
+#define MSP_SET_MOTOR            214    
+
+
 #define CONFIG_REBOOT_CHARACTER 'R'
 
 #ifdef __arm__

@@ -27,11 +27,6 @@ extern "C" {
 
 #include "hackflight.hpp"
 
-// the basics
-#define MSP_RC                   105    
-#define MSP_ATTITUDE             108    
-#define MSP_SET_MOTOR            214    
-
 void MSP::serialize8(uint8_t a)
 {
     Board::serialWriteByte(a);

@@ -17,6 +17,7 @@
                {"yaw"     : "short"}],
 
   "ALTITUDE": [{"ID": 109},
+               {"comment" : "cm, cm/s"},
                {"altitude": "int"}, 
                {"vario"   : "short"}],
 
@@ -26,10 +27,6 @@
                 {"front"   : "short"}, 
                 {"left"    : "short"}, 
                 {"right"   : "short"}],
-
-  "SONAR":    [{"ID": 128},
-                {"comment": "one downward-facing sonar"}, 
-                {"distance" : "short"}],
 
   "SET_RAW_RC": [{"ID": 200},
                  {"comment": "16 channels in http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol"}, 
