@@ -49,7 +49,7 @@ to the V-REP folder where the other plugins are. On my computer this is
 <b>~/Software//V-REP_PRO_EDU_V3_3_1_64_Linux</b>.
 <p><li>Plug in your R/C transmitter, joystick, or game controller (see above).  On Linux you can
 also go wireless, using a Teensy 3.2 micrcontroller with Spektrum satellite (e.g., Lemon RX) attached.
-The Arduino sketch supporting this is in the <tt>dsmdongle</tt> directory in the main part of the repository.
+The Arduino sketch supporting this is in the <b>dsmdongle</b> directory in the main part of the repository.
 The Linux version checks for this setup by attempting to open <tt>/dev/ttyACM0</tt>.  So you may need
 to modify that setting in <b>controller_Linux.cpp</b>.
 <p><li> Open a terminal window, navigate to the V-REP folder, and do <b>./vrep.sh</b> to launch V-REP.
