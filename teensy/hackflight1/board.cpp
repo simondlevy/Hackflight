@@ -101,9 +101,6 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     // Set up LED
     pinMode(13, OUTPUT);
 
-    // Set ADO low to guarantee 0x68 address
-    digitalWrite(24, LOW);
-
     // Start receiver
     rx.begin();
 
