@@ -92,8 +92,9 @@ void MSP::tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-void MSP::init(class IMU * _imu, class Mixer * _mixer, class RC * _rc)
+void MSP::init(class Board * _board, class IMU * _imu, class Mixer * _mixer, class RC * _rc)
 {
+    this->board = _board;
     this->imu = _imu;
     this->mixer = _mixer;
     this->rc = _rc;
@@ -164,7 +165,7 @@ void MSP::update(bool armed)
 
                     // don't know how to handle the (valid) message, indicate error MSP $M!
                     default:                   
-                        if (!Board::extrasHandleMSP(portState.cmdMSP))
+                        if (!this->board->extrasHandleMSP(portState.cmdMSP))
                             headSerialError(0);
                         break;
                 }

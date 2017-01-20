@@ -40,9 +40,7 @@ static SpektrumDSM2048 rx;
 // https://www.tindie.com/products/onehorse/mpu9250-teensy-3x-add-on-shields/ (we're using mini shield)
 #include <MPU9250.h>
 
-#include "board.hpp"
-#include "rc.hpp"
-#include "config.hpp"
+#include "hackflight.hpp"
 
 // an MPU9250 object with its I2C address 
 // of 0x68 (ADDR to GRND) and on Teensy bus 0
@@ -91,8 +89,11 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
     gyroScale = (1.0f / 16.4f) * (M_PI / 180.0f);
 }
 
-void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
+void Board::init(class MSP * _msp, uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
+    // Basic implementation doesn't need MSP
+    (void)_msp;
+
     // Stop motors
     for (int k=0; k<4; ++k) {
       analogWrite(MOTOR_PINS[k], 0);

@@ -55,6 +55,7 @@ extern "C" {
 
         private:
 
+            class Board * board;
             class IMU   * imu;
             class Mixer * mixer;
             class RC    * rc;
@@ -74,7 +75,7 @@ extern "C" {
 
         public:
 
-            void init(class IMU * _imu, class Mixer * _mixer, class RC * _rc);
+            void init(class Board * _board, class IMU * _imu, class Mixer * _mixer, class RC * _rc);
 
             void update(bool armed);
 

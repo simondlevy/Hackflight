@@ -91,8 +91,11 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
     gyroScale = (1.0f / 16.4f) * (M_PI / 180.0f);
 }
 
-void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
+void Board::init(class MSP * _msp, uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
+    // Basic implementation doesn't need MSP
+    (void)_msp;
+
     // Stop motors
     for (int k=0; k<4; ++k) {
       analogWrite(MOTOR_PINS[k], 0);

@@ -23,16 +23,21 @@ extern "C" {
 
     class Board {
 
+        private:
+
+            class MSP * msp;
+
         public:
 
-            // your implementation should support these methods
+            // Your implementation should support these methods
 
-            // Core functionality
+            void            init(class MSP * _msp, uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
+
+            // hardware interaction
             static void     delayMilliseconds(uint32_t msec);
             static uint32_t getMicros();
             static void     imuInit(uint16_t & acc1G, float & gyroScale);
             static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
-            static void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
             static void     ledSetState(uint8_t id, bool state);
             static uint16_t rcReadPWM(uint8_t chan);
             static bool     rcUseSerial(void);
@@ -44,20 +49,20 @@ extern "C" {
             static void     serialWriteByte(uint8_t c);
             static void     writeMotor(uint8_t index, float value); // index={0,1,2,3}, value=[0.0 .. 1.0]
 
-            // Extra functionality
-            static void     extrasCheckSwitch(void);
+            // extra functionality
+            void            extrasCheckSwitch(void);
             static uint8_t  extrasGetTaskCount(void);
-            static bool     extrasHandleMSP(uint8_t command);
-            static void     extrasPerformTask(uint8_t taskIndex);
+            bool            extrasHandleMSP(uint8_t command);
+            void            extrasPerformTask(uint8_t taskIndex);
 
-            // Helps with simulation
+            // helps with simulation
             static void     showArmedStatus(bool armed);
             static void     showAuxStatus(uint8_t status);
 
             // STM32
             static void     reboot(void);
 
-            // Default constants
+            // default constants
             static const uint32_t DEFAULT_IMU_LOOPTIME_USEC     = 3500;
             static const uint32_t DEFAULT_GYRO_CALIBRATION_MSEC = 3500;
 

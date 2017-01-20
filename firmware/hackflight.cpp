@@ -36,6 +36,7 @@ static RC         rc;
 static Mixer      mixer;
 static MSP        msp;
 static Stabilize  stab;
+static Board      board;
 
 // support for timed tasks
 
@@ -110,8 +111,8 @@ void setup(void)
 {
     uint32_t calibratingGyroMsec;
 
-    // Get particulars for board
-    Board::init(imuLooptimeUsec, calibratingGyroMsec);
+    // init particulars for board, getting IMU loop time and gyro calibration duration
+    board.init(&msp, imuLooptimeUsec, calibratingGyroMsec);
 
     // sleep for 100ms
     Board::delayMilliseconds(100);
@@ -143,7 +144,7 @@ void setup(void)
     stab.init(&rc, &imu);
     imu.init(calibratingGyroCycles, calibratingAccCycles);
     mixer.init(&rc, &stab); 
-    msp.init(&imu, &mixer, &rc);
+    msp.init(&board, &imu, &mixer, &rc);
 
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;
@@ -219,7 +220,7 @@ void loop(void)
         } // rc.changed()
 
         // Detect aux switch changes for hover, altitude-hold, etc.
-        Board::extrasCheckSwitch();
+        board.extrasCheckSwitch();
 
         //debug("%d %d %d %d %d\n", rc.command[0], rc.command[1], rc.command[2], rc.command[3], rc.command[4]);
 
@@ -228,7 +229,7 @@ void loop(void)
 
         static int taskOrder;   // never call all functions in the same loop, to avoid high delay spikes
 
-        Board::extrasPerformTask(taskOrder);
+        board.extrasPerformTask(taskOrder);
 
         taskOrder++;
 
