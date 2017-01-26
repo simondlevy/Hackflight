@@ -52,7 +52,7 @@ MPU9250 imu(0x68, 1, I2C_PINS_29_30, I2C_PULLUP_INT);
 
 // https://www.tindie.com/products/onehorse/dc-motor-controller-board-for-teensy-31-/
 
-static const uint8_t MOTOR_PINS[4] = {20, 21, 22, 23};
+static const uint8_t MOTOR_PINS[4] = {20, 22, 21, 23};
 
 /*
 (23 / Blue-Red / CW )                        (21 / Black-White/ CCW)
@@ -155,7 +155,7 @@ uint16_t Board::rcReadSerial(uint8_t chan)
     values[1] = rx.getChannelValue(2); // pitch
     values[2] = rx.getChannelValue(3); // throttle
     values[3] = rx.getChannelValue(0); // yaw
-    values[4] = rx.getChannelValue(5); // aux
+    values[4] = rx.getChannelValue(5); // auxfi
 
     return (int16_t)values[chan];
 }
