@@ -50,35 +50,6 @@ static SpektrumDSM2048 rx;
 // and internal pullups instead of external.
 MPU9250 imu(0x68, 1, I2C_PINS_29_30, I2C_PULLUP_INT);
 
-// https://www.tindie.com/products/onehorse/dc-motor-controller-board-for-teensy-31-/
-
-static const uint8_t MOTOR_PINS[4] = {20, 22, 21, 23};
-
-/*
-(23 / Blue-Red / CW )                        (21 / Black-White/ CCW)
-    M4---------.                              M2-----.  
-        #######|############################         |
-    GND---* m1 |                      m2 *---- VBAT  |
-        #      |                           #         |
-        #      |                           #         |
-        # o    |                         o #         |
-        #      |                           #         |
-        #      |                           #         |
-        # o    |                         o #         |
-        #      |                           #         |
-        #      |                           #         |
-        # o    `-----------------------M4-* #        |
-        #         .-------------M2-------------------'
-        #         |                        #
-        # *--M2---'                    M1*----. 
-        #                                  #  |
-        #                                  #  |
-    .-----* m3                        m4 o #  |
-    |   ####################################  |
-    M3                                        M1        
-(22 / Black-White / CCW )                 (20 / Blue-Red / CW)
-*/
-
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     // wake up device
@@ -93,11 +64,7 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
-    // Stop motors
-    for (int k=0; k<4; ++k) {
-      pinMode(MOTOR_PINS[k], OUTPUT);
-      analogWrite(MOTOR_PINS[k], 0);
-    }
+    // XXX Stop motors
   
     // Set up LED
     pinMode(13, OUTPUT);
@@ -184,9 +151,7 @@ void Board::serialDebugByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, float value)
 { 
-  uint8_t analogValue = (uint8_t)(value * 255);
-
-  analogWrite(MOTOR_PINS[index], analogValue);
+    // XXX
 }
 
 // Unused -------------------------------------------------------------------------
