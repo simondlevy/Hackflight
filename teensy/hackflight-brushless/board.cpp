@@ -24,6 +24,7 @@
 #include <stdarg.h>
 
 #include <Arduino.h>
+#include <Servo.h>
 
 // https://github.com/simondlevy/SpektrumDSM
 #include <SpektrumDSM.h>
@@ -50,6 +51,10 @@ static SpektrumDSM2048 rx;
 // and internal pullups instead of external.
 MPU9250 imu(0x68, 1, I2C_PINS_29_30, I2C_PULLUP_INT);
 
+// motors
+Servo motors[4];
+static const uint8_t MOTOR_PINS[4] = {20, 21, 22, 23};
+
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     // wake up device
@@ -64,7 +69,11 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
-    // XXX Stop motors
+    // Set up motors
+    for (int k=0; k<4; ++k) {
+      motors[k].attach(MOTOR_PINS[k]);
+      motors[k].writeMicroseconds(1000);
+    }
   
     // Set up LED
     pinMode(13, OUTPUT);
@@ -151,7 +160,8 @@ void Board::serialDebugByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, float value)
 { 
-    // XXX
+    uint16_t usec = (uint16_t)(1000 + value*1000);
+    motors[index].writeMicroseconds(usec);
 }
 
 // Unused -------------------------------------------------------------------------
