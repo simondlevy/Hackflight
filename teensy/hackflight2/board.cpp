@@ -52,7 +52,7 @@ MPU9250 imu(0x68, 1, I2C_PINS_29_30, I2C_PULLUP_INT);
 
 // https://www.tindie.com/products/onehorse/dc-motor-controller-board-for-teensy-31-/
 
-static const uint8_t MOTOR_PINS[4] = {20, 22, 21, 23};
+static const uint8_t MOTOR_PINS[4] = {20, 21, 22, 23};
 
 /*
 (23 / Blue-Red / CW )                        (21 / Black-White/ CCW)
