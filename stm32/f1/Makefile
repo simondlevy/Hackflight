@@ -29,8 +29,7 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 TARGET		?= NAZE
 
-CPP_OBJS = hackflight.o imu.o mixer.o msp.o rc.o baro.o sonars.o board.o board_rx.o stabilize.o \
-		   filters.o hover.o filters.o
+CPP_OBJS = hackflight.o imu.o mixer.o msp.o rc.o board.o board_rx.o stabilize.o filters.o filters.o
 
 # Compile-time options
 OPTIONS		?=

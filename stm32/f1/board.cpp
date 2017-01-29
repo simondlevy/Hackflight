@@ -57,20 +57,6 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
 }
 
-bool Board::baroInit(void)
-{
-    return false;
-}
-
-void Board::baroUpdate(void)
-{
-}
-
-int32_t Board::baroGetPressure(void)
-{
-    return 0;
-}
-
 void Board::delayMilliseconds(uint32_t msec)
 {
     delay(msec);
@@ -126,23 +112,6 @@ void Board::writeMotor(uint8_t index, float value)
     pwmWriteMotor(index, (uint16_t)(1000+value*1000));
 }
 
-bool Board::sonarInit(uint8_t index) 
-{
-    (void)index; 
-    return false;
-}
-
-void Board::sonarUpdate(uint8_t index)
-{
-    (void)index; 
-}
-
-uint16_t Board::sonarGetDistance(uint8_t index)
-{
-    (void)index; 
-    return 0;
-}
-
 void Board::showArmedStatus(bool armed)
 {
     // XXX this would be a good place to sound a buzzer!
@@ -154,6 +123,33 @@ void Board::showAuxStatus(uint8_t status)
 {
     (void)status; 
 }
+
+void Board::extrasInit(class MSP * _msp)
+{
+    // Basic implementation doesn't need MSP
+    (void)_msp;
+}
+
+void Board::extrasCheckSwitch(void)
+{
+}
+
+uint8_t  Board::extrasGetTaskCount(void){
+    return 0;
+}
+
+bool Board::extrasHandleMSP(uint8_t command)
+{
+    (void)command;
+    return true;
+}
+
+void Board::extrasPerformTask(uint8_t taskIndex)
+{
+    (void)taskIndex;
+}
+
+
 
 #ifdef __arm__
 } // extern "C"
