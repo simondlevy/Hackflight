@@ -17,6 +17,13 @@
 
 #pragma once
 
+// the basics
+#define MSP_RC                   105    
+#define MSP_ATTITUDE             108    
+#define MSP_ALTITUDE             109    
+#define MSP_SET_MOTOR            214    
+
+
 #define CONFIG_REBOOT_CHARACTER 'R'
 
 #ifdef __arm__
@@ -48,31 +55,31 @@ extern "C" {
 
         private:
 
-            class IMU        * imu;
-            class Hover      * hover;
-            class Mixer      * mixer;
-            class RC         * rc;
-            class Sonars     * sonars;
+            class Board * board;
+            class IMU   * imu;
+            class Mixer * mixer;
+            class RC    * rc;
 
             mspPortState_t portState;
 
-            void serialize8(uint8_t a);
-            void serialize16(int16_t a);
             uint8_t read8(void);
             uint16_t read16(void);
             uint32_t read32(void);
-            void serialize32(uint32_t a);
             void headSerialResponse(uint8_t err, uint8_t s);
-            void headSerialReply(uint8_t s);
             void headSerialError(uint8_t s);
             void tailSerialReply(void);
 
         public:
 
-            void init(class IMU * _imu, class Hover * _hover, class Mixer * _mixer, 
-                    class RC * _rc, class Sonars * _sonars);
+            void init(class Board * _board, class IMU * _imu, class Mixer * _mixer, class RC * _rc);
 
             void update(bool armed);
+
+            // For use by board extras
+            void headSerialReply(uint8_t s);
+            void serialize8(uint8_t a);
+            void serialize16(int16_t a);
+            void serialize32(uint32_t a);
 
     }; // class MSP
 

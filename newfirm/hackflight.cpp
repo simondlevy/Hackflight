@@ -35,10 +35,8 @@ static IMU        imu;
 static RC         rc;
 static Mixer      mixer;
 static MSP        msp;
-//static Baro       baro;
-static Sonars     sonars;
-static Hover      hover;
 static Stabilize  stab;
+static Board      board;
 
 // support for timed tasks
 
@@ -93,26 +91,43 @@ static uint16_t calibratingG;
 static bool     haveSmallAngle;
 static bool     armed;
 
+// LED support
+
+static bool ledGreenOn;
+
+static void toggleGreenLED(void)
+{
+    if (ledGreenOn) {
+        Board::ledSetState(0, true);
+        ledGreenOn = false;
+    }
+    else {
+        Board::ledSetState(0, false);
+        ledGreenOn = true;
+    }
+}
+
 void setup(void)
 {
     uint32_t calibratingGyroMsec;
 
-    // Get particulars for board
+    // init particulars for board, getting IMU loop time and gyro calibration duration
     Board::init(imuLooptimeUsec, calibratingGyroMsec);
 
     // sleep for 100ms
     Board::delayMilliseconds(100);
 
-    // flash the LEDs to indicate startup
-    Board::ledRedOn();
-    Board::ledGreenOff();
+    // Turn off LEDs to start
+    Board::ledSetState(0, false);
+    Board::ledSetState(1, false);
+    ledGreenOn = false;
+
+    // flash the green LED to indicate startup
     for (uint8_t i = 0; i < 10; i++) {
-        Board::ledRedToggle();
-        Board::ledGreenToggle();
         Board::delayMilliseconds(50);
+        toggleGreenLED();
     }
-    Board::ledRedOff();
-    Board::ledGreenOff();
+    Board::ledSetState(0, false);
 
     // compute cycles for calibration based on board's time constant
     calibratingGyroCycles = (uint16_t)(1000. * calibratingGyroMsec / imuLooptimeUsec);
@@ -124,17 +139,15 @@ void setup(void)
     accelCalibrationTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
     altitudeEstimationTask.init(CONFIG_ALTITUDE_UPDATE_MSEC * 1000);
 
-    // attempt to initialize barometer, sonars
-    //baro.init();
-    sonars.init();
-
     // initialize our external objects with objects they need
     rc.init();
     stab.init(&rc, &imu);
     imu.init(calibratingGyroCycles, calibratingAccCycles);
     mixer.init(&rc, &stab); 
-    msp.init(&imu, &hover, &mixer, &rc, &sonars);
-    hover.init(&imu, &sonars, &rc);
+    msp.init(&board, &imu, &mixer, &rc);
+
+    // do any extra initializations (baro, sonar, etc.)
+    board.extrasInit(&msp);
 
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;
@@ -154,20 +167,23 @@ void loop(void)
     static uint32_t currentTime;
     static uint32_t disarmTime;
 
-    if (rcTask.checkAndUpdate(currentTime)) {
+    bool rcSerialReady = Board::rcSerialReady();
+
+    if (rcTask.checkAndUpdate(currentTime) || rcSerialReady) {
 
         // update RC channels
         rc.update();
 
-		//printf("%d %d %d %d (%d)\n", rc.data[0], rc.data[1], rc.data[2], rc.data[3], rc.auxState());
+        rcSerialReady = false;
 
         // useful for simulator
         if (armed)
             Board::showAuxStatus(rc.auxState());
 
         // when landed, reset integral component of PID
-        if (rc.throttleIsDown()) 
+        if (rc.throttleIsDown()) {
             stab.resetIntegral();
+        }
 
         if (rc.changed()) {
 
@@ -206,37 +222,22 @@ void loop(void)
 
         } // rc.changed()
 
-        // Switch to alt-hold when switch moves to position 1 or 2
-        hover.checkSwitch();
+        // Detect aux switch changes for hover, altitude-hold, etc.
+        board.extrasCheckSwitch();
+
+        //debug("%d %d %d %d %d\n", rc.command[0], rc.command[1], rc.command[2], rc.command[3], rc.command[4]);
+
 
     } else {                    // not in rc loop
 
         static int taskOrder;   // never call all functions in the same loop, to avoid high delay spikes
 
-        switch (taskOrder) {
-            case 0:
-                //if (baro.available())
-                //    baro.update();
-                taskOrder++;
-                break;
-            case 1:
-                if (sonars.available() && altitudeEstimationTask.checkAndUpdate(currentTime)) {
-                    hover.updateAltitudePid();
-                }
-                taskOrder++;
-                break;
-            case 2:
-                if (sonars.available())
-                    sonars.update();
-                taskOrder++;
-                break;
-            case 3:
-                taskOrder++;
-                break;
-            case 4:
-                taskOrder = 0;
-                break;
-        }
+        board.extrasPerformTask(taskOrder);
+
+        taskOrder++;
+
+        if (taskOrder >= Board::extrasGetTaskCount()) // using >= supports zero or more tasks
+            taskOrder = 0;
     }
 
     currentTime = Board::getMicros();
@@ -256,21 +257,21 @@ void loop(void)
 
         // use LEDs to indicate calibration status
         if (calibratingA > 0 || calibratingG > 0) 
-            Board::ledGreenOn();
+            Board::ledSetState(0, true);
         else {
             if (accCalibrated)
-                Board::ledGreenOff();
+                Board::ledSetState(0, false);
             if (armed)
-                Board::ledRedOn();
+                Board::ledSetState(1, true);
             else
-                Board::ledRedOff();
+                Board::ledSetState(1, false);
         }
 
         // periodically update accelerometer calibration status
         if (accelCalibrationTask.check(currentTime)) {
             if (!haveSmallAngle) {
                 accCalibrated = false; 
-                Board::ledGreenToggle();
+                toggleGreenLED();
                 accelCalibrationTask.update(currentTime);
             } else {
                 accCalibrated = true;
@@ -281,7 +282,7 @@ void loop(void)
         msp.update(armed);
 
         // perform hover tasks (alt-hold etc.)
-        hover.perform();
+        //hover.perform();
 
         // update stability PID controller 
         stab.update();
@@ -293,7 +294,6 @@ void loop(void)
 
 } // loop()
 
-
 void debug(const char * fmt, ...)
 {
     va_list ap;       
@@ -304,11 +304,12 @@ void debug(const char * fmt, ...)
 
     vsprintf(buf, fmt, ap);
 
-    Board::dump(buf);
+    for (char * p = buf; *p; p++)
+        Board::serialDebugByte(*p);
 
     va_end(ap);  
 }
-
+#
 #ifdef __arm__
 } // extern "C"
 #endif

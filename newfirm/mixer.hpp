@@ -1,5 +1,5 @@
 /*
-   pidvals.hpp : PID values for a specific vehicle
+   mixer.hpp : Mixer class header
 
    This file is part of Hackflight.
 
@@ -15,22 +15,28 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Level (accelerometer)
-static const float CONFIG_LEVEL_P          = 4.0;
-static const float CONFIG_LEVEL_I          = 0.020;
+#pragma once
 
-// Rate (gyro): P must be positive
-static const float CONFIG_RATE_PITCHROLL_P = 2.0;
-static const float CONFIG_RATE_PITCHROLL_I = 0.015;
-static const float CONFIG_RATE_PITCHROLL_D = 11;
+#ifdef __arm__
+extern "C" {
+#endif
 
-// Yaw: P must be positive
-static const float CONFIG_YAW_P            = 4.0;
-static const float CONFIG_YAW_I            = 0.020;
+    class Mixer {
 
-// For altitude hover
-#define CONFIG_HOVER_ALT_P  120
-#define CONFIG_HOVER_ALT_I  45
-#define CONFIG_HOVER_ALT_D  1
+        private:
 
+            class RC        * rc;
+            class Stabilize * stabilize;
+        
+        public:
 
+            float  motorsDisarmed[4]; // 0.0 .. 1.0
+
+            void init(class RC * _rc, class Stabilize * _stabilize);
+
+            void update(bool armed);
+    };
+
+#ifdef __arm__
+} // extern "C"
+#endif

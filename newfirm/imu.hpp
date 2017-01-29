@@ -47,13 +47,13 @@ extern "C" {
             uint16_t calibratingAccCycles;
             uint16_t acc1G;
             float    fcAcc;
-            float    gyroScale;
 
         public:
 
-            // shared with MSP
             int16_t  angle[3];
             int16_t  gyroADC[3];
+            float    gyroScale;     // radians
+            float    gyroScaleDeg;
 
             // called from MW
             void init(uint16_t calibratingGyroCycles, uint16_t calibratingAccCycles);

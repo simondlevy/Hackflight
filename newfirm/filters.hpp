@@ -1,5 +1,5 @@
 /*
-   pidvals.hpp : PID values for a specific vehicle
+   filters.hpp : filter function declarations
 
    This file is part of Hackflight.
 
@@ -15,20 +15,21 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Level (accelerometer)
-static const float CONFIG_LEVEL_P          = 9.0;
-static const float CONFIG_LEVEL_I          = 0.010;
+#pragma once
 
-// Rate (gyro): P must be positive
-static const float CONFIG_RATE_PITCHROLL_P = 4.0;
-static const float CONFIG_RATE_PITCHROLL_I = 0.030;
-static const float CONFIG_RATE_PITCHROLL_D = 23;
+#ifdef __arm__
+extern "C" {
+#else
+#include <stdio.h>
+#endif
 
-// Yaw: P must be positive
-static const float CONFIG_YAW_P            = 8.5;
-static const float CONFIG_YAW_I            = 0.045;
+// complementary filter
+float complementaryFilter(float a, float b, float c);
 
-// For altitude hover
-#define CONFIG_HOVER_ALT_P  120
-#define CONFIG_HOVER_ALT_I  45
-#define CONFIG_HOVER_ALT_D  1
+// deadband filter
+int32_t deadbandFilter(int32_t value, int32_t deadband);
+
+#ifdef __arm__
+} // extern "C"
+#endif
+

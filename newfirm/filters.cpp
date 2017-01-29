@@ -1,7 +1,5 @@
 /*
-   board_rx_dsm.cpp : implementation of board-specific routines for Spektrum DSM receivers
-
-   This implemenation is for STM32F103 boards (Naze32, Flip32, etc.)
+   filters.cpp : filter function implementations
 
    This file is part of Hackflight.
 
@@ -21,37 +19,26 @@
 extern "C" {
 #endif
 
-#include <breezystm32.h>
-#include <drivers/spektrum.h>
+#include "hackflight.hpp"
 
-#include <math.h>
-
-#include "board.hpp"
-
-uint16_t Board::rcReadSerial(uint8_t chan)
+// complementary filter
+float complementaryFilter(float a, float b, float c) 
 {
-    static uint8_t chanmap[5] = {1, 2, 3, 0, 4};
-    return chan > 4 ? 0 : spektrumReadRawRC(chanmap[chan]);
+    return a * c + b * (1 - c);
 }
 
-bool Board::rcUseSerial(void)
+// deadband filter
+int32_t deadbandFilter(int32_t value, int32_t deadband)
 {
-    spektrumInit(USART2, SERIALRX_SPEKTRUM1024);
-
-    return true;
+    if (abs(value) < deadband) {
+        value = 0;
+    } else if (value > 0) {
+        value -= deadband;
+    } else if (value < 0) {
+        value += deadband;
+    }
+    return value;
 }
-
-uint16_t Board::rcReadPWM(uint8_t chan)
-{
-    (void)chan; // avoid compiler warning about unused variable
-    return 0;
-}
-
-bool Board::rcSerialReady(void)
-{
-    return spektrumFrameComplete();
-}
-
 
 #ifdef __arm__
 } // extern "C"

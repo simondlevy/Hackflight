@@ -1,5 +1,5 @@
 /*
-   mixer.hpp : Mixer class header
+   crossplatform.h : support for compiling firmware on Windows
 
    This file is part of Hackflight.
 
@@ -15,30 +15,18 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 #pragma once
 
-#define CONFIG_YAW_DIRECTION     1
-
-#ifdef __arm__
-extern "C" {
-#endif
-
-    class Mixer {
-
-        private:
-
-            class RC        * rc;
-            class Stabilize * stabilize;
-        
-        public:
-
-            int16_t  motorsDisarmed[4];
-
-            void init(class RC * _rc, class Stabilize * _stabilize);
-
-            void update(bool armed);
-    };
-
-#ifdef __arm__
-} // extern "C"
+#ifdef _WIN32
+#define M_PI 3.14159265358979323846f
+#define SPRINTF sprintf_s
+#define STRCPY  strcpy_s
+#define VSNPRINTF vsnprintf_s
+#define lrintf(x) (float)(int)((x)+0.5)
+#else
+#define SPRINTF sprintf
+#define STRCPY  strcpy
+#define VSNPRINTF vsnprintf
+#include <stdbool.h>
 #endif

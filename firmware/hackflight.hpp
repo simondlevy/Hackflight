@@ -27,14 +27,15 @@
 
 void debug(const char * format, ...);
 
-// basics
-#include "filters.hpp"
 #include "board.hpp"
 #include "imu.hpp"
 #include "rc.hpp"
 #include "stabilize.hpp"
 #include "mixer.hpp"
+#include "baro.hpp"
+#include "sonars.hpp"
 #include "msp.hpp"
+#include "hover.hpp"
 #include "filters.hpp"
 
 #ifndef abs
@@ -45,4 +46,14 @@ void debug(const char * format, ...);
 #define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
 #endif
 
-#include "config.hpp"
+// Config =====================================================
+
+#define CONFIG_MAGNETIC_DECLINATION                 0
+
+#define CONFIG_CALIBRATING_ACC_MSEC                 1400
+
+#define CONFIG_YAW_CONTROL_DIRECTION                1    // 1 or -1 
+#define CONFIG_RC_LOOPTIME_MSEC                     20
+#define CONFIG_CALIBRATE_ACCTIME_MSEC               500
+#define CONFIG_SMALL_ANGLE                          250  // tenths of a degree
+#define CONFIG_ALTITUDE_UPDATE_MSEC                 25   // based on accelerometer low-pass filter

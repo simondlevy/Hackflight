@@ -1,7 +1,5 @@
 /*
-   board_rx_ppm.cpp : implementation of board-specific routines for PPM receivers
-
-   This implemenation is for STM32F103 boards (Naze32, Flip32, etc.)
+   pidvals.hpp : PID values for a specific vehicle
 
    This file is part of Hackflight.
 
@@ -17,40 +15,22 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef __arm__
-extern "C" {
-#endif
+// Level (accelerometer)
+static const uint8_t CONFIG_LEVEL_P          = 90;
+static const uint8_t CONFIG_LEVEL_I          = 10;
 
-#include <breezystm32.h>
+// Rate (gyro): P must be positive
+static const uint8_t CONFIG_RATE_PITCHROLL_P = 33;
+static const uint8_t CONFIG_RATE_PITCHROLL_I = 30;
+static const uint8_t CONFIG_RATE_PITCHROLL_D = 23;
 
-#include <math.h>
+// Yaw: P must be positive
+static const uint8_t CONFIG_YAW_P            = 85;
+static const uint8_t CONFIG_YAW_I            = 45;
 
-#include "board.hpp"
-#include "pwm.h"
-#include "motorpwm.hpp"
+// For altitude hover
+#define CONFIG_HOVER_ALT_P  120
+#define CONFIG_HOVER_ALT_I  45
+#define CONFIG_HOVER_ALT_D  1
 
-uint16_t Board::rcReadSerial(uint8_t chan)
-{
-    (void)chan;
-    return 0;
-}
 
-bool Board::rcUseSerial(void)
-{
-
-    return false;
-}
-
-uint16_t Board::rcReadPWM(uint8_t chan)
-{
-    return pwmRead(chan);
-}
-
-bool Board::rcSerialReady(void)
-{
-    return false;
-}
-
-#ifdef __arm__
-} // extern "C"
-#endif

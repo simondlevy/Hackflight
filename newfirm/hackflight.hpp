@@ -1,5 +1,5 @@
 /*
-   motorpwm.hpp : Motor PWM parameters
+   hackflight.hpp : general header
 
    This file is part of Hackflight.
 
@@ -15,7 +15,34 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdint.h>
+#include <stdarg.h>
+#include <math.h>
+#include <stdio.h>
 
-// for brushed motors
-#define MOTOR_PWM_RATE 32000
-#define PWM_IDLE_PULSE 0
+#include "crossplatform.h"
+
+#ifndef M_PI
+#endif
+
+void debug(const char * format, ...);
+
+// basics
+#include "filters.hpp"
+#include "board.hpp"
+#include "imu.hpp"
+#include "rc.hpp"
+#include "stabilize.hpp"
+#include "mixer.hpp"
+#include "msp.hpp"
+#include "filters.hpp"
+
+#ifndef abs
+#define abs(x)    ((x) > 0 ? (x) : -(x))
+#define sgn(x)    ((x) > 0 ? +1 : -1)
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
+#endif
+
+#include "config.hpp"

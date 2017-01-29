@@ -1,5 +1,5 @@
 /*
-   stabilize.hpp : Class declaration for PID-based stablization
+   baro.hpp : Baro class header
 
    This file is part of Hackflight.
 
@@ -17,39 +17,32 @@
 
 #pragma once
 
-#define CONFIG_MAX_ANGLE_INCLINATION                500 /* 50 degrees */
-
 #ifdef __arm__
 extern "C" {
 #endif
 
-    class Stabilize {
-
+    class Baro {
+        
         private:
 
-            class RC  * rc;
-            class IMU * imu;
+            bool avail;
 
-            uint8_t rate_p[3];
-            uint8_t rate_i[3];
-            uint8_t rate_d[3];
+            static const int TABLE_SIZE = 21;
 
-            int16_t lastGyro[3];
-            int32_t delta1[3]; 
-            int32_t delta2[3];
-            int32_t errorGyroI[3];
-            int32_t errorAngleI[2];
+            uint32_t pressureSum;
+            int32_t  historyTable[TABLE_SIZE];
+            int      historyIdx;
 
         public:
 
-            int16_t axisPID[3];
+            void init(void);
 
-            void init(class RC * _rc, class IMU * _imu);
+            bool available(void);
 
             void update(void);
 
-            void resetIntegral(void);
-    }; 
+            int32_t getAltitude(void);
+    };
 
 #ifdef __arm__
 } // extern "C"

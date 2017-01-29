@@ -1,7 +1,9 @@
 /*
-   stabilize.cpp : PID-based stability class implementation
+   stabilize.cpp : Old-school  PID-based stability class implementation
 
-   Adapted from https://github.com/multiwii/baseflight/blob/master/src/mw.c
+   Adapted from 
+
+     https://github.com/multiwii/baseflight/blob/master/src/mw.c
 
    This file is part of Hackflight.
 
@@ -32,21 +34,24 @@ void Stabilize::init(class RC * _rc, class IMU * _imu)
     this->imu = _imu;
 
     for (uint8_t axis=0; axis<3; ++axis) {
-        this->lastGyro[axis] = 0;
+        this->lastGyroError[axis] = 0;
         this->delta1[axis] = 0;
         this->delta2[axis] = 0;
     }
 
-    this->rate_p[0] = CONFIG_RATE_PITCHROLL_P;
-    this->rate_p[1] = CONFIG_RATE_PITCHROLL_P;
-    this->rate_p[2] = CONFIG_YAW_P;
+    this->level_p = (uint8_t)(CONFIG_LEVEL_P*10);
+    this->level_i = (uint8_t)(CONFIG_LEVEL_I*1000);
 
-    this->rate_i[0] = CONFIG_RATE_PITCHROLL_I;
-    this->rate_i[1] = CONFIG_RATE_PITCHROLL_I;
-    this->rate_i[2] = CONFIG_YAW_I;
+    this->rate_p[0] = (uint8_t)(CONFIG_RATE_PITCHROLL_P*10);
+    this->rate_p[1] = (uint8_t)(CONFIG_RATE_PITCHROLL_P*10);
+    this->rate_p[2] = (uint8_t)(CONFIG_YAW_P*10);
 
-    this->rate_d[0] = CONFIG_RATE_PITCHROLL_D;
-    this->rate_d[1] = CONFIG_RATE_PITCHROLL_D;
+    this->rate_i[0] = (uint8_t)(CONFIG_RATE_PITCHROLL_I*1000);
+    this->rate_i[1] = (uint8_t)(CONFIG_RATE_PITCHROLL_I*1000);
+    this->rate_i[2] = (uint8_t)(CONFIG_YAW_I*1000);
+
+    this->rate_d[0] = (uint8_t)CONFIG_RATE_PITCHROLL_D;
+    this->rate_d[1] = (uint8_t)CONFIG_RATE_PITCHROLL_D;
     this->rate_d[2] = 0;
 
     this->resetIntegral();
@@ -56,14 +61,19 @@ void Stabilize::update(void)
 {
     for (uint8_t axis = 0; axis < 3; axis++) {
 
-        int32_t error = (int32_t)this->rc->command[axis] * 10 * 8 / this->rate_p[axis];
-        error -= this->imu->gyroADC[axis];
+        int32_t gyroError = this->imu->gyroADC[axis] / 4;
+
+        int32_t error = (int32_t)this->rc->command[axis] * 10 * 8 / this->rate_p[axis] - gyroError;
 
         int32_t PTermGYRO = this->rc->command[axis];
 
-        this->errorGyroI[axis] = constrain(this->errorGyroI[axis] + error, -16000, +16000); // WindUp
-        if ((abs(this->imu->gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (abs(this->rc->command[axis]) > 100)))
+        this->errorGyroI[axis] = constrain(this->errorGyroI[axis] + error, 
+                -16000, +16000); // WindUp
+
+        if ((abs(gyroError) > 640) || ((axis == AXIS_YAW) && 
+                    (abs(this->rc->command[axis]) > 100)))
             this->errorGyroI[axis] = 0;
+
         int32_t ITermGYRO = (this->errorGyroI[axis] / 125 * this->rate_i[axis]) >> 6;
 
         int32_t PTerm = PTermGYRO;
@@ -77,10 +87,12 @@ void Stabilize::update(void)
                                            + CONFIG_MAX_ANGLE_INCLINATION) 
                                  - this->imu->angle[axis];
 
-            int32_t PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
+            int32_t PTermACC = errorAngle * this->level_p / 100; 
 
-            this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
-            int32_t ITermACC = (this->errorAngleI[axis] * CONFIG_LEVEL_I) >> 12;
+            this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, 
+                    -10000, +10000); // WindUp
+
+            int32_t ITermACC = (this->errorAngleI[axis] * this->level_i) >> 12;
 
             int32_t prop = max(abs(this->rc->command[DEMAND_PITCH]), 
                     abs(this->rc->command[DEMAND_ROLL])); // range [0;500]
@@ -89,9 +101,11 @@ void Stabilize::update(void)
             ITerm = (ITermACC * (500 - prop) + ITermGYRO * prop) / 500;
         } 
 
-        PTerm -= (int32_t)this->imu->gyroADC[axis] * this->rate_p[axis] / 10 / 8; // 32 bits is needed for calculation
-        int32_t delta = this->imu->gyroADC[axis] - this->lastGyro[axis];
-        this->lastGyro[axis] = this->imu->gyroADC[axis];
+        // 32 bits is needed for calculation
+        PTerm -= gyroError * this->rate_p[axis] / 10 / 8; 
+
+        int32_t delta = gyroError - this->lastGyroError[axis];
+        this->lastGyroError[axis] = gyroError;
         int32_t deltaSum = this->delta1[axis] + this->delta2[axis] + delta;
         this->delta2[axis] = this->delta1[axis];
         this->delta1[axis] = delta;
@@ -100,8 +114,8 @@ void Stabilize::update(void)
     }
 
     // prevent "yaw jump" during yaw correction
-    this->axisPID[AXIS_YAW] = constrain(this->axisPID[AXIS_YAW], 
-            -100 - abs(this->rc->command[DEMAND_YAW]), +100 + abs(this->rc->command[DEMAND_YAW]));
+    int16_t absYawDemand = abs(this->rc->command[DEMAND_YAW]);
+    this->axisPID[AXIS_YAW] = constrain(this->axisPID[AXIS_YAW], -absYawDemand-100, absYawDemand+100);
 }
 
 void Stabilize::resetIntegral(void)

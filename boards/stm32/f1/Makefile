@@ -1,27 +1,15 @@
-# Makefile for Hackflight STM32F1 examples
-#
-# Copyright (C) 2016 Simon D. Levy
-#
-# This file is part of Hackflight.
-#
-# Hackflight is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as 
-# published by the Free Software Foundation, either version 3 of the 
-# License, or (at your option) any later version.
-# 
-# This code is distributed in the hope that it will be useful,     
-# but WITHOUT ANY WARRANTY without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU Lesser General Public License 
-# along with this code.  If not, see <http://www.gnu.org/licenses/>.
+###############################################################################
+# "THE BEER-WARE LICENSE" (Revision 42):
+# <msmith@FreeBSD.ORG> wrote this file. As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return
+###############################################################################
 
 # Change this to wherever you put hackflight
 HACKFLIGHT_DIR = $(HOME)/Desktop/hackflight
 
 # Change this to wherever you put BreezySTM32
-BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
+BREEZY_DIR = $(HOME)/Desktop/BreezySTM32/f1
 
 ###############################################################################
 # Things that the user might override on the commandline
@@ -29,7 +17,7 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 TARGET		?= NAZE
 
-CPP_OBJS = hackflight.o imu.o mixer.o msp.o rc.o board.o board_rx.o stabilize.o filters.o filters.o
+CPP_OBJS = hackflight.o imu.o mixer.o msp.o rc.o baro.o sonars.o board.o stabilize.o hover.o filters.o
 
 # Compile-time options
 OPTIONS		?=
@@ -45,33 +33,28 @@ SERIAL_DEVICE	?= /dev/ttyUSB0
 #
 
 # Working directories
-ROOT		  = ..
-HERE          = .
-SRC_DIR		  = $(ROOT)
-OBJECT_DIR	  = $(HERE)/obj
-BIN_DIR		  = $(HERE)/obj
-F1_DIR        = $(BREEZY_DIR)/f1
-DRIVERS_DIR   = $(F1_DIR)/drivers
-CMSIS_DIR	  = $(BREEZY_DIR)/lib/CMSIS
+ROOT		 = ..
+HERE         = .
+SRC_DIR		 = $(ROOT)
+OBJECT_DIR	 = $(HERE)/obj
+BIN_DIR		 = $(HERE)/obj
+CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
 STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
-FIRM_DIR       = $(HACKFLIGHT_DIR)/firmware
-
 
 # Source files common to all targets
-NAZE_SRC = $(F1_DIR)/main.c \
-           $(F1_DIR)/system.c \
-           $(F1_DIR)/system_stm32f10x.c \
-           $(F1_DIR)/serial.c \
-           $(F1_DIR)/pwm.c \
-           $(F1_DIR)/gpio.c \
-           $(F1_DIR)/uart_stm32f10x.c \
-           $(F1_DIR)/timer.c \
-           $(F1_DIR)/startup_stm32f10x_md_gcc.S \
-           $(F1_DIR)/i2c_stm32f10x.c \
-           $(DRIVERS_DIR)/mpu.c \
-           $(DRIVERS_DIR)/ms5611.c \
-           $(DRIVERS_DIR)/mb1242.c \
-           $(DRIVERS_DIR)/spektrum.c \
+NAZE_SRC = $(BREEZY_DIR)/main.c \
+           $(BREEZY_DIR)/printf.c \
+           $(BREEZY_DIR)/drv_system.c \
+           $(BREEZY_DIR)/drv_mpu6050.c \
+           $(BREEZY_DIR)/drv_ms5611.c \
+           $(BREEZY_DIR)/drv_mb1242.c \
+           $(BREEZY_DIR)/drv_i2c.c \
+           $(BREEZY_DIR)/drv_serial.c \
+           $(BREEZY_DIR)/drv_pwm.c \
+           $(BREEZY_DIR)/drv_gpio.c \
+           $(BREEZY_DIR)/drv_uart.c \
+           $(BREEZY_DIR)/drv_timer.c \
+           $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
            $(CMSIS_SRC) \
            $(STDPERIPH_SRC)
 
@@ -103,9 +86,7 @@ OBJCOPY	 = arm-none-eabi-objcopy
 # Tool options.
 #
 INCLUDE_DIRS = . \
-			   $(FIRM_DIR) \
 			   $(BREEZY_DIR) \
-			   $(F1_DIR) \
 			   $(STDPERIPH_DIR)/inc \
 			   $(CMSIS_DIR)/CM3/CoreSupport \
 			   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x
@@ -132,15 +113,14 @@ CFLAGS	 = $(ARCH_FLAGS) \
 		   -fdata-sections \
 		   -DSTM32F10X_MD \
 		   -DUSE_STDPERIPH_DRIVER \
-		   -D$(TARGET) \
-		   -DEXTERNAL_DEBUG 
+		   -D$(TARGET)
 
 ASFLAGS		 = $(ARCH_FLAGS) \
 		   -x assembler-with-cpp \
 		   $(addprefix -I,$(INCLUDE_DIRS))
 
 # XXX Map/crossref output?
-LD_SCRIPT	 = $(F1_DIR)/stm32_flash.ld
+LD_SCRIPT	 = $(BREEZY_DIR)/stm32_flash.ld
 LDFLAGS	 = -lm \
 		   -nostartfiles \
 		   -lc \
@@ -191,61 +171,67 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 
 # C++ support
 
-hackflight.o: $(FIRM_DIR)/hackflight.cpp $(FIRM_DIR)/hackflight.hpp $(FIRM_DIR)/rc.hpp
-	@$(CC) $(CFLAGS) -c -o hackflight.o $(FIRM_DIR)/hackflight.cpp
+FIRMDIR = $(HACKFLIGHT_DIR)/firmware
 
-imu.o: $(FIRM_DIR)/imu.cpp $(FIRM_DIR)/imu.hpp
-	@$(CC) $(CFLAGS) -c -o imu.o $(FIRM_DIR)/imu.cpp
+hackflight.o: $(FIRMDIR)/hackflight.cpp $(FIRMDIR)/hackflight.hpp $(FIRMDIR)/rc.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o hackflight.o $(FIRMDIR)/hackflight.cpp
 
-mixer.o: $(FIRM_DIR)/mixer.cpp $(FIRM_DIR)/mixer.hpp $(FIRM_DIR)/rc.hpp
-	@$(CC) $(CFLAGS) -c -o mixer.o $(FIRM_DIR)/mixer.cpp
+imu.o: $(FIRMDIR)/imu.cpp $(FIRMDIR)/imu.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o imu.o $(FIRMDIR)/imu.cpp
 
-stabilize.o: $(FIRM_DIR)/stabilize.cpp $(FIRM_DIR)/stabilize.hpp $(FIRM_DIR)/stabilize.hpp
-	@$(CC) $(CFLAGS) -c -o stabilize.o $(FIRM_DIR)/stabilize.cpp
+mixer.o: $(FIRMDIR)/mixer.cpp $(FIRMDIR)/mixer.hpp $(FIRMDIR)/rc.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o mixer.o $(FIRMDIR)/mixer.cpp
 
-filters.o: $(FIRM_DIR)/filters.cpp $(FIRM_DIR)/filters.hpp $(FIRM_DIR)/rc.hpp
-	@$(CC) $(CFLAGS) -c -o filters.o $(FIRM_DIR)/filters.cpp
+stabilize.o: $(FIRMDIR)/stabilize.cpp $(FIRMDIR)/stabilize.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o stabilize.o $(FIRMDIR)/stabilize.cpp
 
-msp.o: $(FIRM_DIR)/msp.cpp $(FIRM_DIR)/msp.hpp $(FIRM_DIR)/rc.hpp
-	@$(CC) $(CFLAGS) -c -o msp.o $(FIRM_DIR)/msp.cpp
+msp.o: $(FIRMDIR)/msp.cpp $(FIRMDIR)/msp.hpp $(FIRMDIR)/rc.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o msp.o $(FIRMDIR)/msp.cpp
 
-baro.o: $(FIRM_DIR)/baro.cpp $(FIRM_DIR)/baro.hpp
-	@$(CC) $(CFLAGS) -c -o baro.o $(FIRM_DIR)/baro.cpp
+baro.o: $(FIRMDIR)/baro.cpp $(FIRMDIR)/baro.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o baro.o $(FIRMDIR)/baro.cpp
 
-sonars.o: $(FIRM_DIR)/sonars.cpp $(FIRM_DIR)/sonars.hpp
-	@$(CC) $(CFLAGS) -c -o sonars.o $(FIRM_DIR)/sonars.cpp
+sonars.o: $(FIRMDIR)/sonars.cpp $(FIRMDIR)/sonars.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o sonars.o $(FIRMDIR)/sonars.cpp
 
-rc.o: $(FIRM_DIR)/rc.cpp $(FIRM_DIR)/rc.hpp
-	@$(CC) $(CFLAGS) -c -o rc.o $(FIRM_DIR)/rc.cpp
+rc.o: $(FIRMDIR)/rc.cpp $(FIRMDIR)/rc.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o rc.o $(FIRMDIR)/rc.cpp
 
-hover.o: $(FIRM_DIR)/hover.cpp $(FIRM_DIR)/hover.hpp $(FIRM_DIR)/rc.hpp
-	@$(CC) $(CFLAGS) -c -o hover.o $(FIRM_DIR)/hover.cpp
+hover.o: $(FIRMDIR)/hover.cpp $(FIRMDIR)/hover.hpp $(FIRMDIR)/rc.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o hover.o $(FIRMDIR)/hover.cpp
 
-board.o: board.cpp $(FIRM_DIR)/board.hpp
-	@$(CC) $(CFLAGS) -I$(FIRM_DIR) -c -o board.o board.cpp
+filters.o: $(FIRMDIR)/filters.cpp $(FIRMDIR)/filters.hpp $(FIRMDIR)/rc.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o filters.o $(FIRMDIR)/filters.cpp
 
-board_rx.o: board_rx.cpp $(FIRM_DIR)/board.hpp
-	@$(CC) $(CFLAGS) -I$(FIRM_DIR) -c -o board_rx.o board_rx.cpp
+board.o: board.cpp $(FIRMDIR)/board.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -I$(FIRMDIR) -c -o board.o board.cpp
 
 clean:
 	rm -rf *.o obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
 
-PRE_FLASH = stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
-DO_FLASH  = stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
+flash_$(TARGET): $(TARGET_HEX)
+	stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
+	echo -n 'R' >$(SERIAL_DEVICE)
+	stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
 
 flash: flash_$(TARGET)
 
-flash_$(TARGET): $(TARGET_HEX)
-	$(PRE_FLASH)	
-	sleep 1
-	echo -n 'R' >$(SERIAL_DEVICE)
-	$(DO_FLASH)
+unbrick_$(TARGET): $(TARGET_HEX)
+	stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
+	stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
 
 unbrick: unbrick_$(TARGET)
-
-unbrick_$(TARGET): $(TARGET_HEX)
-	$(PRE_FLASH)
-	$(DO_FLASH)
 
 commit:
 	git commit -a --allow-empty-message -m ''

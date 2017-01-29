@@ -23,37 +23,50 @@ extern "C" {
 
     class Board {
 
+        private:
+
+            class MSP * msp;
+
         public:
 
-            // your implementation should support these methods
+            // Your implementation should support these methods
 
-            static bool     baroInit(void);
-            static void     baroUpdate(void);
-            static int32_t  baroGetPressure(void);
-            static void     checkReboot(bool pendReboot);
-            static void     dump(char * msg);
+            void            init(class MSP * _msp, uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
+
+            // hardware interaction
             static void     delayMilliseconds(uint32_t msec);
             static uint32_t getMicros();
             static void     imuInit(uint16_t & acc1G, float & gyroScale);
             static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
             static void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
-            static void     ledGreenOff(void);
-            static void     ledGreenOn(void);
-            static void     ledGreenToggle(void);
-            static void     ledRedOff(void);
-            static void     ledRedOn(void);
-            static void     ledRedToggle(void);
-            static uint16_t readPWM(uint8_t chan);
-            static void     reboot(void);
+            static void     ledSetState(uint8_t id, bool state);
+            static uint16_t rcReadPWM(uint8_t chan);
+            static bool     rcUseSerial(void);
+            static uint16_t rcReadSerial(uint8_t chan);
+            static bool     rcSerialReady(void); 
             static uint8_t  serialAvailableBytes(void);
+            static void     serialDebugByte(uint8_t c);
             static uint8_t  serialReadByte(void);
             static void     serialWriteByte(uint8_t c);
+            static void     writeMotor(uint8_t index, float value); // index={0,1,2,3}, value=[0.0 .. 1.0]
+
+            // extra functionality
+            void            extrasInit(class MSP * _msp);
+            void            extrasCheckSwitch(void);
+            static uint8_t  extrasGetTaskCount(void);
+            bool            extrasHandleMSP(uint8_t command);
+            void            extrasPerformTask(uint8_t taskIndex);
+
+            // helps with simulation
             static void     showArmedStatus(bool armed);
             static void     showAuxStatus(uint8_t status);
-            static bool     sonarInit(uint8_t index);
-            static void     sonarUpdate(uint8_t index);
-            static uint16_t sonarGetDistance(uint8_t index);
-            static void     writeMotor(uint8_t index, uint16_t value);
+
+            // STM32
+            static void     reboot(void);
+
+            // default constants
+            static const uint32_t DEFAULT_IMU_LOOPTIME_USEC     = 3500;
+            static const uint32_t DEFAULT_GYRO_CALIBRATION_MSEC = 3500;
 
     }; // class Board
 

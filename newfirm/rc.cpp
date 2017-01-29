@@ -29,6 +29,8 @@ extern "C" {
 
 void RC::init(void)
 {
+    this->minrc = CONFIG_PWM_MIN + CONFIG_RX_MARGIN;
+    this->maxrc = CONFIG_PWM_MAX - CONFIG_RX_MARGIN;
     this->midrc = (CONFIG_PWM_MAX + CONFIG_PWM_MIN) / 2;
 
     memset (this->dataAverage, 0, 8*4*sizeof(int16_t));
@@ -36,6 +38,8 @@ void RC::init(void)
     this->commandDelay = 0;
     this->sticks = 0;
     this->averageIndex = 0;
+
+    this->useSerial = Board::rcUseSerial();
 
     for (uint8_t i = 0; i < CONFIG_RC_CHANS; i++)
         this->data[i] = this->midrc;
@@ -53,33 +57,42 @@ void RC::init(void)
         lookupThrottleRC[i] = 10 * CONFIG_THR_MID_8 + tmp * (100 - CONFIG_THR_EXPO_8 + 
                 (int32_t)CONFIG_THR_EXPO_8 * (tmp * tmp) / (y * y)) / 10;
         lookupThrottleRC[i] = CONFIG_PWM_MIN + (int32_t)(CONFIG_PWM_MAX - CONFIG_PWM_MIN) * 
-            lookupThrottleRC[i] / 1000; // [PWM_MIN;PWM_MAX]
+            lookupThrottleRC[i] / CONFIG_PWM_MIN; // [PWM_MIN;PWM_MAX]
     }
 }
 
 void RC::update(void)
 {
-    for (uint8_t chan = 0; chan < 8; chan++) {
-    
-        // get RC PWM
-        this->dataAverage[chan][this->averageIndex % 4] = Board::readPWM(chan);
-
-        this->data[chan] = 0;
-
-        for (uint8_t i = 0; i < 4; i++)
-            this->data[chan] += this->dataAverage[chan][i];
-        this->data[chan] /= 4;
+    if (this->useSerial) {
+        for (uint8_t chan = 0; chan < 8; chan++) {
+            this->data[chan] = Board::rcReadSerial(chan);
+        }
     }
 
-    this->averageIndex++;
+    else {
+        for (uint8_t chan = 0; chan < 8; chan++) {
+
+            // get RC PWM
+            this->dataAverage[chan][this->averageIndex % 4] = Board::rcReadPWM(chan);
+
+            this->data[chan] = 0;
+
+            for (uint8_t i = 0; i < 4; i++)
+                this->data[chan] += this->dataAverage[chan][i];
+            this->data[chan] /= 4;
+        }
+
+        this->averageIndex++;
+    }
+
 
     // check stick positions, updating command delay
     uint8_t stTmp = 0;
     for (uint8_t i = 0; i < 4; i++) {
         stTmp >>= 2;
-        if (this->data[i] > CONFIG_MINCHECK)
+        if (this->data[i] > this->minrc)
             stTmp |= 0x80;  // check for MIN
-        if (this->data[i] < CONFIG_MAXCHECK)
+        if (this->data[i] < this->maxrc)
             stTmp |= 0x40;  // check for MAX
     }
     if (stTmp == this->sticks) {
@@ -92,7 +105,7 @@ void RC::update(void)
 
 bool RC::changed(void)
 {
-  return this->commandDelay == 20;
+    return this->commandDelay == 20;
 }
 
 void RC::computeExpo(void)
@@ -108,18 +121,18 @@ void RC::computeExpo(void)
             this->command[channel] = 
                 lookupPitchRollRC[tmp2] + (tmp - tmp2 * 100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2]) / 100;
         } else {                    // yaw
-            this->command[channel] = tmp * -CONFIG_YAW_CONTROL_DIRECTION;
+            this->command[channel] = -tmp;
         }
 
         if (this->data[channel] < this->midrc)
             this->command[channel] = -this->command[channel];
     }
 
-    tmp = constrain(this->data[DEMAND_THROTTLE], CONFIG_MINCHECK, 2000);
-    tmp = (uint32_t)(tmp - CONFIG_MINCHECK) * 1000 / (2000 - CONFIG_MINCHECK);       // [MINCHECK;2000] -> [0;1000]
+    tmp = constrain(this->data[DEMAND_THROTTLE], this->minrc, CONFIG_PWM_MAX);
+    tmp = (uint32_t)(tmp - this->minrc) * CONFIG_PWM_MIN / (CONFIG_PWM_MAX - this->minrc);       
     tmp2 = tmp / 100;
     this->command[DEMAND_THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
-            lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [PWM_MIN;PWM_MAX]
+            lookupThrottleRC[tmp2]) / 100;
 
 } // computeExpo
 
@@ -127,12 +140,12 @@ uint8_t RC::auxState(void)
 {
     int16_t aux = this->data[4];
 
-    return aux < 1500 ? 0 : (aux < 1700 ? 1 : 2);
+    return aux < this->midrc ? 0 : (aux < (this->midrc+CONFIG_RX_AUX_STEP) ? 1 : 2);
 }
 
 bool RC::throttleIsDown(void)
 {
-    return this->data[DEMAND_THROTTLE] < CONFIG_MINCHECK;
+    return this->data[DEMAND_THROTTLE] < this->minrc;
 }
 
 #ifdef __arm__
