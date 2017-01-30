@@ -8,4 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <color name="progressBackgroundTint">#d8ffffff</color>
+    <color name="checkBoxTextColor">#ff000000</color>
+    <color name="checkBoxButtonTint">#ffffffff</color>
+
 </resources>

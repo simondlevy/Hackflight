@@ -71,17 +71,16 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
 bool Board::baroInit(void)
 {
-    return ms5611_init();
+    return false;
 }
 
 void Board::baroUpdate(void)
 {
-    ms5611_update();
 }
 
 int32_t Board::baroGetPressure(void)
 {
-    return ms5611_read_pressure();
+    return 0;
 }
 
 void Board::checkReboot(bool pendReboot)
@@ -132,7 +131,8 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    return pwmRead(chan);
+    (void)chan;
+    return 1500;
 }
 
 void Board::reboot(void)
@@ -162,18 +162,18 @@ void Board::writeMotor(uint8_t index, uint16_t value)
 
 bool Board::sonarInit(uint8_t index) 
 {
-    index = index; // avoid compiler warning about unused variable
+    (void)index;
     return false;
 }
 
 void Board::sonarUpdate(uint8_t index)
 {
-    index = index; // avoid compiler warning about unused variable
+    (void)index;
 }
 
 uint16_t Board::sonarGetDistance(uint8_t index)
 {
-    index = index; // avoid compiler warning about unused variable
+    (void)index;
     return 0;
 }
 

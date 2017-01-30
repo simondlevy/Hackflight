@@ -1,5 +1,15 @@
 <resources>
+
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="toggle_button_port">100dp</dimen>
+    <dimen name="toggle_button_large_port">200dp</dimen>
+    <dimen name="toggle_button_land">125dp</dimen>
+    <dimen name="toggle_button_large_land">210dp</dimen>
+
+    <dimen name="motors_check_box_width">220dp</dimen>
+    <dimen name="motors_check_box_height">25dp</dimen>
+
 </resources>

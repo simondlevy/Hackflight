@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/relativeLayout1">
+
+        <ProgressBar
+            android:layout_width="270sp"
+            android:layout_height="30sp"
+            android:progress="@integer/bar1Progress"
+            android:progressDrawable="@drawable/blue_progress"
+            android:layout_gravity="center"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:id="@+id/roll_bar"
+            android:layout_marginRight="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_below="@+id/rollValue"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:indeterminate="false" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/startValue"
+            android:id="@+id/roll988"
+            android:layout_below="@+id/roll_bar"
+            android:layout_alignLeft="@+id/roll_bar"
+            android:layout_alignStart="@+id/roll_bar" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/endValue"
+            android:id="@+id/roll2011"
+            android:layout_alignTop="@+id/roll988"
+            android:layout_alignRight="@+id/roll_bar"
+            android:layout_alignEnd="@+id/roll_bar" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20sp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/startValue"
+            android:id="@+id/rollValue"
+            android:gravity="center"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/roll988"
+            android:layout_toEndOf="@+id/roll988"
+            android:layout_marginLeft="90dp"
+            android:layout_marginStart="90dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Roll"
+            android:id="@+id/rollText"
+            android:textSize="20sp"
+            android:layout_alignTop="@+id/roll_bar"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="110dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/relativeLayout2">
+        <ProgressBar
+            android:layout_width="270sp"
+            android:layout_height="30sp"
+            android:progress="@integer/bar1Progress"
+            android:progressDrawable="@drawable/green_progress"
+            android:layout_gravity="center"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:id="@+id/pitch_bar"
+            android:layout_marginRight="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_below="@+id/pitchValue"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/startValue"
+            android:id="@+id/pitch988"
+            android:layout_below="@+id/pitch_bar"
+            android:layout_alignLeft="@+id/pitch_bar"
+            android:layout_alignStart="@+id/pitch_bar" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/endValue"
+            android:id="@+id/pitch2011"
+            android:layout_alignTop="@+id/pitch988"
+            android:layout_alignRight="@+id/pitch_bar"
+            android:layout_alignEnd="@+id/pitch_bar" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20sp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/startValue"
+            android:id="@+id/pitchValue"
+            android:gravity="center"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/pitch988"
+            android:layout_toEndOf="@+id/pitch988"
+            android:layout_marginLeft="90dp"
+            android:layout_marginStart="90dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Pitch"
+            android:id="@+id/pitchText"
+            android:textSize="20sp"
+            android:layout_alignTop="@+id/pitch_bar"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="190dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/relativeLayout3">
+        <ProgressBar
+            android:layout_width="270sp"
+            android:layout_height="30sp"
+            android:progress="@integer/bar1Progress"
+            android:progressDrawable="@drawable/red_progress"
+            android:layout_gravity="center"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:id="@+id/throttle_bar"
+            android:layout_marginRight="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_below="@+id/throttleValue"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/startValue"
+            android:id="@+id/throttle988"
+            android:layout_below="@+id/throttle_bar"
+            android:layout_alignLeft="@+id/throttle_bar"
+            android:layout_alignStart="@+id/throttle_bar" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/endValue"
+            android:id="@+id/throttle2011"
+            android:layout_alignTop="@+id/throttle988"
+            android:layout_alignRight="@+id/throttle_bar"
+            android:layout_alignEnd="@+id/throttle_bar" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20sp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/startValue"
+            android:id="@+id/throttleValue"
+            android:gravity="center"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/throttle988"
+            android:layout_toEndOf="@+id/throttle988"
+            android:layout_marginLeft="90dp"
+            android:layout_marginStart="90dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Throttle"
+            android:id="@+id/throttleText"
+            android:textSize="20sp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="270dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/relativeLayout4">
+
+        <ProgressBar
+            android:layout_width="270sp"
+            android:layout_height="30sp"
+            android:progress="@integer/bar1Progress"
+            android:progressDrawable="@drawable/yellow_progress"
+            android:layout_gravity="center"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:id="@+id/yaw_bar"
+            android:layout_marginRight="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_below="@+id/yawValue"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/startValue"
+            android:id="@+id/yaw988"
+            android:layout_below="@+id/yaw_bar"
+            android:layout_alignLeft="@+id/yaw_bar"
+            android:layout_alignStart="@+id/yaw_bar" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/endValue"
+            android:id="@+id/yaw2011"
+            android:layout_alignTop="@+id/yaw988"
+            android:layout_alignRight="@+id/yaw_bar"
+            android:layout_alignEnd="@+id/yaw_bar" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20sp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/startValue"
+            android:id="@+id/yawValue"
+            android:gravity="center"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/yaw988"
+            android:layout_toEndOf="@+id/yaw988"
+            android:layout_marginLeft="90dp"
+            android:layout_marginStart="90dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Yaw"
+            android:id="@+id/yawText"
+            android:textSize="20sp"
+            android:layout_alignTop="@+id/yaw_bar"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="350dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/relativeLayout5">
+        <ProgressBar
+            android:layout_width="270sp"
+            android:layout_height="30sp"
+            android:progress="@integer/bar1Progress"
+            android:progressDrawable="@drawable/purple_progress"
+            android:layout_gravity="center"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:id="@+id/switch_bar"
+            android:layout_marginRight="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_below="@+id/switchValue"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/startValue"
+            android:id="@+id/switch988"
+            android:layout_below="@+id/switch_bar"
+            android:layout_alignLeft="@+id/switch_bar"
+            android:layout_alignStart="@+id/switch_bar" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/endValue"
+            android:id="@+id/switch2011"
+            android:layout_alignTop="@+id/switch988"
+            android:layout_alignRight="@+id/switch_bar"
+            android:layout_alignEnd="@+id/switch_bar" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20sp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/startValue"
+            android:id="@+id/switchValue"
+            android:gravity="center"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/switch988"
+            android:layout_toEndOf="@+id/switch988"
+            android:layout_marginLeft="90dp"
+            android:layout_marginStart="90dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Switch"
+            android:id="@+id/switchText"
+            android:textSize="20sp"
+            android:layout_alignTop="@+id/switch_bar"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
