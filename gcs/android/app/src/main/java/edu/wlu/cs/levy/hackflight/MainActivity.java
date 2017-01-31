@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +19,6 @@ import java.util.Set;
 
 import edu.wlu.cs.msppg.ATTITUDE_Handler;
 import edu.wlu.cs.msppg.Parser;
-import edu.wlu.cs.msppg.RC_Handler;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,21 +27,6 @@ public class MainActivity extends AppCompatActivity {
     private static boolean newAttitude;             //if true: new attitude message available.  if false: most recent attitude message has been processed by the appropriate fragment
     private static boolean newRC;                   //if true: new RC message available.        if false: most recent RC message has been processed by the appropriate fragment
     private static boolean AttitudeRequestBoolean;  //if true: current fragment can access attitude data.      if false: current fragment cannot access attitude data
-    private static boolean RcRequestBoolean;        //if true: current fragment can access RC data.            if false: current fragment cannot access RC data
-
-    //if true: ____Fragment view has been created and is running.  if false: ____Fragment view is not active.
-    //tabs are considered active by ViewPager if you are in a tab, or directly to the right/left of it.
-    private static boolean setupBoolean;
-    private static boolean motorBoolean;
-    private static boolean mapsBoolean;
-    private static boolean receiverBoolean;
-    private static boolean messagesBoolean;
-
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    ViewPager mViewPager;
 
     private MyHandler mHandler;
 
@@ -52,11 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //There cannot be a connected usb service as of this point, therefore we cannot send messages.
-        setAttitudeRequestBoolean(false);
-        setRcRequestBoolean(false);
-
+        
         startService(UsbService.class, usbConnection, null);        //starts the usb service
 
         mHandler = new MyHandler(this);
@@ -171,45 +150,9 @@ public class MainActivity extends AppCompatActivity {
 
         public void handle_ATTITUDE(short roll, short pitch, short yaw) {
             Log.d("TAG", "handle_ATTITUDE");
-            orientation = new Short[] {roll, pitch, yaw};
-            setNewAttitude(true);                           //sets this to true to indicate there is a new message
             sendAttitudeRequest();                          //sends a request to continue the call and response.
         }
 
-        public static String getAttitudeMessage(){
-            return "roll = " + addSpacingRoll("" + orientation[0]) + "pitch = " + addSpacingPitch("" + orientation[1]) + "yaw = " + orientation[2];
-        }
-
-        private static String addSpacingRoll(String value){
-            if (value.length() == 1)
-                value = value + "             \t";
-            else if (value.length() == 2)
-                value = value + "           \t";
-            else if (value.length() == 3)
-                value = value + "         \t";
-            else if (value.length() == 4)
-                value = value + "       \t";
-            else if (value.length() == 5)
-                value = value + "      \t";
-            return value;
-        }
-        private static String addSpacingPitch(String value){
-            if (value.length() == 1)
-                value = value + "               \t";
-            else if (value.length() == 2)
-                value = value + "              \t";
-            else if (value.length() == 3)
-                value = value + "            \t";
-            else if (value.length() == 4)
-                value = value + "         \t";
-            else if (value.length() == 5)
-                value = value + "      \t";
-            return value;
-        }
-
-        public static Short[] getOrientation() {
-            return orientation;
-        }
 
         @Override
         public void handleMessage(Message msg) {
@@ -240,41 +183,4 @@ public class MainActivity extends AppCompatActivity {
             MyHandler.sendRequest(MyHandler.attitude_request);
         }
     }
-
-
-    //Getters and setters for the newAttitude and newRC variables
-    public static void setNewAttitude(boolean value){
-        newAttitude = value;
-    }
-    public static boolean getNewAttitude(){
-        return newAttitude;
-    }
-
-    public static void setNewRC(boolean value){
-        newRC = value;
-    }
-    public static boolean getNewRC(){
-        return newRC;
-    }
-
-    //setters for AttitudeRequestBoolean and RcRequestBoolean
-    private static void setAttitudeRequestBoolean(boolean value){
-        AttitudeRequestBoolean = value;
-    }
-    private static void setRcRequestBoolean(boolean value){
-        RcRequestBoolean = value;
-    }
-
-
-    //get the data from the handler so they can be accessed by the fragments.
-    public String getAttitudeFromHandler(){
-        return MyHandler.getAttitudeMessage();
-    }
-    public static Short[] getOrientationFromHandler() {
-        return MyHandler.getOrientation();
-    }
-
-
-
-
 }
