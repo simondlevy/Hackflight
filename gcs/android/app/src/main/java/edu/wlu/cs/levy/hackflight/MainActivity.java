@@ -42,7 +42,7 @@ import edu.wlu.cs.msppg.Parser;
 public class MainActivity extends AppCompatActivity {
 
     private static UsbService usbService;
-    
+
     private MyHandler mHandler;
 
     @Override
