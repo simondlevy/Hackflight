@@ -11,7 +11,7 @@
     tools:context="edu.wlu.cs.levy.hackflight.MainActivity">
 
     <TextView
-        android:id="@+id/roll_Text"
+        android:id="@+id/attitude_Text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"

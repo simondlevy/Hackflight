@@ -34,7 +34,6 @@ import android.os.IBinder;
 import android.os.Handler;
 import android.os.Message;
 
-import java.lang.ref.WeakReference;
 import java.util.Set;
 
 import edu.wlu.cs.msppg.ATTITUDE_Handler;
@@ -46,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     private MyHandler mHandler;
 
-    private TextView rollText;
+    private TextView mAttitudeText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        rollText = (TextView)findViewById(R.id.roll_Text);
+        mAttitudeText = (TextView)findViewById(R.id.attitude_Text);
 
         startService(UsbService.class, usbConnection, null);        //starts the usb service
 
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void setAttitudeText(int roll, int pitch, int yaw) {
 
-        rollText.setText(String.format("Roll: %d", roll));
+        mAttitudeText.setText(String.format("Roll: %d  Pitch: %d    Yaw: %d", roll, pitch, yaw));
     }
 
     private void startService(Class<?> service, ServiceConnection serviceConnection, Bundle extras) {
@@ -149,8 +148,6 @@ public class MainActivity extends AppCompatActivity {
 
     public static class MyHandler extends Handler  implements ATTITUDE_Handler {
 
-        private final WeakReference<MainActivity> mActivity;
-
         private MainActivity mMainActivity;
 
         private Parser parser;
@@ -161,7 +158,6 @@ public class MainActivity extends AppCompatActivity {
 
         public MyHandler(MainActivity activity) {
             mMainActivity = activity;
-            mActivity = new WeakReference<MainActivity>(activity);
             parser    = new Parser();
             parser.set_ATTITUDE_Handler(this);
 
