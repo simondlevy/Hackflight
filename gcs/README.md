@@ -1,4 +1,4 @@
-# Hackflight GCS: Simpel Ground-Control Station for Hackflight firmware
+# Hackflight GCS: Simple Ground-Control Station for Hackflight firmware
 
 This directory contains Python and Java code for running a simple ground-control station to test the 
 Hackflight firmware.  The Python version lets you visualize the attitude (roll, pitch, yaw) of your 
