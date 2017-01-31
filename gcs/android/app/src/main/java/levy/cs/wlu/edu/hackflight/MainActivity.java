@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -52,6 +53,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //There cannot be a connected usb service as of this point, therefore we cannot send messages.
+        setAttitudeRequestBoolean(false);
+        setRcRequestBoolean(false);
+
         startService(UsbService.class, usbConnection, null);        //starts the usb service
 
         mHandler = new MyHandler(this);
@@ -65,8 +70,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startService(Class<?> service, ServiceConnection serviceConnection, Bundle extras) {
+
+
         if(!UsbService.SERVICE_CONNECTED)
         {
+
             Intent startService = new Intent(this, service);
             if(extras != null && !extras.isEmpty())
             {
@@ -170,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         public void handle_ATTITUDE(short roll, short pitch, short yaw) {
+            Log.d("TAG", "handle_ATTITUDE");
             orientation = new Short[] {roll, pitch, yaw};
             setNewAttitude(true);                           //sets this to true to indicate there is a new message
             sendAttitudeRequest();                          //sends a request to continue the call and response.
@@ -177,7 +186,6 @@ public class MainActivity extends AppCompatActivity {
 
         public void handle_RC(short c1, short c2, short c3, short c4, short c5, short c6, short c7, short c8){
             rcValues = new Short[] {c1, c2, c3, c4, c5, c6, c7, c8};
-            //Log.d("DEB", String.valueOf(rcValues[0]) + String.valueOf(rcValues[1]) + String.valueOf(rcValues[2]) + String.valueOf(rcValues[3]) + String.valueOf(rcValues[4]));
             setNewRC(true);
             sendRCRequest();
         }
@@ -242,6 +250,10 @@ public class MainActivity extends AppCompatActivity {
 
     //Sends an attitude request if the current tab allows for it.
     public static void sendAttitudeRequest(){
+
+        // XXX remove when app fully implemented
+        AttitudeRequestBoolean = true;
+
         if (AttitudeRequestBoolean) {
             MyHandler.sendRequest(MyHandler.attitude_request);
         }
@@ -330,6 +342,10 @@ public class MainActivity extends AppCompatActivity {
      * is set to false.  we then send out an attitude request to start the send and receive cycle.
      */
     public static void adjustMessages(){
+
+        // XXX remove when app fully implemented
+        sendAttitudeRequest();
+
         if (setupBoolean && motorBoolean && !mapsBoolean){              //in the SETUP tab
             setAttitudeRequestBoolean(true);
             setRcRequestBoolean(false);
