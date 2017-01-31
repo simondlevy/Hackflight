@@ -1,9 +1,14 @@
+/*
+  USB serial service class for Hackflight GCS.  Adapted from
+
+     https://github.com/felHR85/UsbSerial/blob/master/example/src/main/java/com/felhr/serialportexample/UsbService.java
+*/
+
 package edu.wlu.cs.levy.hackflight;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.felhr.usbserial.CDCSerialDevice;
 import com.felhr.usbserial.UsbSerialDevice;
