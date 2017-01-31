@@ -42,11 +42,7 @@ import edu.wlu.cs.msppg.Parser;
 public class MainActivity extends AppCompatActivity {
 
     private static UsbService usbService;
-
-    private static boolean newAttitude;             //if true: new attitude message available.  if false: most recent attitude message has been processed by the appropriate fragment
-    private static boolean newRC;                   //if true: new RC message available.        if false: most recent RC message has been processed by the appropriate fragment
-    private static boolean AttitudeRequestBoolean;  //if true: current fragment can access attitude data.      if false: current fragment cannot access attitude data
-
+    
     private MyHandler mHandler;
 
     @Override
@@ -129,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
             usbService = ((UsbService.UsbBinder) arg1).getService();
             usbService.setHandler(mHandler);
 
+            // When the connection is made, send the flight controller a request for ATTITUDE messages
             sendAttitudeRequest();
         }
 
@@ -181,11 +178,8 @@ public class MainActivity extends AppCompatActivity {
                 case UsbService.MESSAGE_FROM_SERIAL_PORT:
 
                     byte [] data = (byte []) msg.obj;
-
                     for (byte b : data) {
-
                         parser.parse(b);
-
                     }
                     break;
             }
@@ -195,11 +189,6 @@ public class MainActivity extends AppCompatActivity {
     //Sends an attitude request if the current tab allows for it.
     public static void sendAttitudeRequest(){
 
-        // XXX remove when app fully implemented
-        AttitudeRequestBoolean = true;
-
-        if (AttitudeRequestBoolean) {
-            MyHandler.sendRequest(MyHandler.attitude_request);
-        }
+        MyHandler.sendRequest(MyHandler.attitude_request);
     }
 }
