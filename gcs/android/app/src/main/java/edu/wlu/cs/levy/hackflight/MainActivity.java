@@ -1,4 +1,4 @@
-package levy.cs.wlu.edu.hackflight;
+package edu.wlu.cs.levy.hackflight;
 
 import android.content.Context;
 import android.content.Intent;
@@ -161,10 +161,6 @@ public class MainActivity extends AppCompatActivity {
             parser.set_RC_Handler(this);
 
             orientation = new Short[] {0,0,0};
-
-            short start = ReceiverFragment.getStart();
-            rcValues    = new Short[] {start, start, start, start, start, start, start, start};
-
             attitude_request = parser.serialize_ATTITUDE_Request();
             rc_request       = parser.serialize_RC_Request();
         }
@@ -305,12 +301,7 @@ public class MainActivity extends AppCompatActivity {
 
     //the setupFragment seems to leak over to the tab to the right of it. to stop this the view is removed when the setup tab is no longer selected.
     private static void adjustView(){
-        if (setupBoolean && motorBoolean && !mapsBoolean){              //in the SETUP tab
-            SetupFragment.showView();
-        }
-        else if (setupBoolean && motorBoolean && mapsBoolean){          //in the MOTOR tab
-            SetupFragment.hideView();
-        }
+
     }
 
     //see green text below to understand the need for this
@@ -331,7 +322,6 @@ public class MainActivity extends AppCompatActivity {
             messagesBoolean = value;
         }
         adjustMessages();
-        adjustView();
     }
 
     /**

@@ -1,4 +1,4 @@
-package levy.cs.wlu.edu.hackflight;
+package edu.wlu.cs.levy.hackflight;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
