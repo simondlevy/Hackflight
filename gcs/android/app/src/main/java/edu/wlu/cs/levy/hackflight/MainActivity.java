@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         startService(UsbService.class, usbConnection, null);        //starts the usb service
 
         mHandler = new MyHandler(this);
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         public void handle_ATTITUDE(short roll, short pitch, short yaw) {
-            Log.d("TAG", "handle_ATTITUDE");
+            Log.d("TAG", roll + " " + pitch + " " + yaw);
             sendAttitudeRequest();                          //sends a request to continue the call and response.
         }
 
