@@ -26,6 +26,7 @@ import android.content.ServiceConnection;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -45,11 +46,15 @@ public class MainActivity extends AppCompatActivity {
 
     private MyHandler mHandler;
 
+    private TextView rollText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        rollText = (TextView)findViewById(R.id.roll_Text);
 
         startService(UsbService.class, usbConnection, null);        //starts the usb service
 
@@ -61,6 +66,11 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         setFilters();  // Start listening notifications from UsbService
         startService(UsbService.class, usbConnection, null); // Start UsbService(if it was not started before) and Bind it
+    }
+
+    public void setAttitudeText(int roll, int pitch, int yaw) {
+
+        rollText.setText(String.format("Roll: %d", roll));
     }
 
     private void startService(Class<?> service, ServiceConnection serviceConnection, Bundle extras) {
@@ -141,6 +151,8 @@ public class MainActivity extends AppCompatActivity {
 
         private final WeakReference<MainActivity> mActivity;
 
+        private MainActivity mMainActivity;
+
         private Parser parser;
 
         public static Short[] orientation;
@@ -148,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         public MyHandler(MainActivity activity) {
+            mMainActivity = activity;
             mActivity = new WeakReference<MainActivity>(activity);
             parser    = new Parser();
             parser.set_ATTITUDE_Handler(this);
@@ -165,8 +178,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         public void handle_ATTITUDE(short roll, short pitch, short yaw) {
-            Log.d("TAG", roll + " " + pitch + " " + yaw);
-            sendAttitudeRequest();                          //sends a request to continue the call and response.
+
+            //rollText.setText(String.format("Roll: %d", roll))
+
+            mMainActivity.setAttitudeText(roll, pitch, yaw);
+
+            sendAttitudeRequest();  //sends a request to continue the call and response.
         }
 
 
