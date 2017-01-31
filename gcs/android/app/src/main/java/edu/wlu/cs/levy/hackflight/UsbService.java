@@ -180,22 +180,9 @@ public class UsbService extends Service
         @Override
         public void onReceivedData(byte[] buffer)
         {
-
-            try {
-                String data = new String(buffer, "UTF-8");
-
-                for (char c : data.toCharArray()) {
-
-                    //Log.d("DEBUG", String.format("%02X", (int)c));
-                }
-
-                if(mHandler != null)
-                    mHandler.obtainMessage(MESSAGE_FROM_SERIAL_PORT, buffer).sendToTarget();
-
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+            if(mHandler != null) {
+                mHandler.obtainMessage(MESSAGE_FROM_SERIAL_PORT, buffer).sendToTarget();
             }
-
         }
     };
 
