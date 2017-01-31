@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
             usbService = ((UsbService.UsbBinder) arg1).getService();
             usbService.setHandler(mHandler);
 
-            adjustMessages();
+            sendAttitudeRequest();
         }
 
         @Override
@@ -142,27 +142,23 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-    public static class MyHandler extends Handler  implements ATTITUDE_Handler, RC_Handler{
+    public static class MyHandler extends Handler  implements ATTITUDE_Handler {
 
         private final WeakReference<MainActivity> mActivity;
 
         private Parser parser;
 
         public static Short[] orientation;
-        public static Short[] rcValues;
         private static byte[] attitude_request;
-        private static byte[] rc_request;
 
 
         public MyHandler(MainActivity activity) {
             mActivity = new WeakReference<MainActivity>(activity);
             parser    = new Parser();
             parser.set_ATTITUDE_Handler(this);
-            parser.set_RC_Handler(this);
 
             orientation = new Short[] {0,0,0};
             attitude_request = parser.serialize_ATTITUDE_Request();
-            rc_request       = parser.serialize_RC_Request();
         }
 
         //Sends the request so long as a usb is plugged in
@@ -178,12 +174,6 @@ public class MainActivity extends AppCompatActivity {
             orientation = new Short[] {roll, pitch, yaw};
             setNewAttitude(true);                           //sets this to true to indicate there is a new message
             sendAttitudeRequest();                          //sends a request to continue the call and response.
-        }
-
-        public void handle_RC(short c1, short c2, short c3, short c4, short c5, short c6, short c7, short c8){
-            rcValues = new Short[] {c1, c2, c3, c4, c5, c6, c7, c8};
-            setNewRC(true);
-            sendRCRequest();
         }
 
         public static String getAttitudeMessage(){
@@ -221,10 +211,6 @@ public class MainActivity extends AppCompatActivity {
             return orientation;
         }
 
-        public static Short[] getRcValues() {
-            return rcValues;
-        }
-
         @Override
         public void handleMessage(Message msg) {
 
@@ -255,12 +241,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Sends an rc request if the current tab allows for it.
-    public static void sendRCRequest(){
-        if (RcRequestBoolean) {
-            MyHandler.sendRequest(MyHandler.rc_request);
-        }
-    }
 
     //Getters and setters for the newAttitude and newRC variables
     public static void setNewAttitude(boolean value){
@@ -293,73 +273,8 @@ public class MainActivity extends AppCompatActivity {
     public static Short[] getOrientationFromHandler() {
         return MyHandler.getOrientation();
     }
-    public static Short[] getRcValuesFromHandler() {
-        return MyHandler.getRcValues();
-    }
 
 
 
-    //the setupFragment seems to leak over to the tab to the right of it. to stop this the view is removed when the setup tab is no longer selected.
-    private static void adjustView(){
-
-    }
-
-    //see green text below to understand the need for this
-    public static void setTabBoolean(int tabNumber, boolean value){
-        if(tabNumber == 0){
-            setupBoolean = value;
-        }
-        else if(tabNumber == 1){
-            motorBoolean = value;
-        }
-        else if(tabNumber == 2){
-            mapsBoolean = value;
-        }
-        else if(tabNumber == 3){
-            receiverBoolean = value;
-        }
-        else{
-            messagesBoolean = value;
-        }
-        adjustMessages();
-    }
-
-    /**
-     * ViewPager creates the views of the tab to the left and right of the tab selected.  To determine if a tab is selected, we look at what views are active.
-     * if setup and motor are active, but maps is not then we must be in the Setup tab.  this is because the setup tab would be active because we are on it,
-     * and the motor tab is active because it is one tab away from the current tab.  With this information of what tab we are currently on we can tailor the
-     * messages allowed to be sent out.  Because the setup tab only requires the attitude to function, AttitudeRequestBoolean is set to true and RcRequestBoolean
-     * is set to false.  we then send out an attitude request to start the send and receive cycle.
-     */
-    public static void adjustMessages(){
-
-        // XXX remove when app fully implemented
-        sendAttitudeRequest();
-
-        if (setupBoolean && motorBoolean && !mapsBoolean){              //in the SETUP tab
-            setAttitudeRequestBoolean(true);
-            setRcRequestBoolean(false);
-            sendAttitudeRequest();
-        }
-        else if (setupBoolean && motorBoolean && mapsBoolean){          //in the MOTOR tab
-            setAttitudeRequestBoolean(false);
-            setRcRequestBoolean(false);
-        }
-        else if (motorBoolean && mapsBoolean && receiverBoolean){       //in the MAPS tab
-            setAttitudeRequestBoolean(false);
-            setRcRequestBoolean(false);
-        }
-        else if (mapsBoolean && receiverBoolean && messagesBoolean){    //in the RECEIVER tab
-            setAttitudeRequestBoolean(false);
-            setRcRequestBoolean(true);
-            sendRCRequest();
-        }
-        else if (!mapsBoolean && receiverBoolean && messagesBoolean){   //in the MESSAGES tab
-            setAttitudeRequestBoolean(true);
-            setRcRequestBoolean(true);
-            sendAttitudeRequest();
-            sendRCRequest();
-        }
-    }
 
 }
