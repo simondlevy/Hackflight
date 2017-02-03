@@ -23,14 +23,14 @@ extern "C" {
 
     class Board {
 
+        private:
+
+            class MSP * msp;
+
         public:
 
             // your implementation should support these methods
 
-            static bool     baroInit(void);
-            static void     baroUpdate(void);
-            static int32_t  baroGetPressure(void);
-            static void     checkReboot(bool pendReboot);
             static void     dump(char * msg);
             static void     delayMilliseconds(uint32_t msec);
             static uint32_t getMicros();
@@ -47,16 +47,29 @@ extern "C" {
             static bool     rcUseSerial(void);
             static uint16_t rcReadSerial(uint8_t chan);
             static uint16_t readPWM(uint8_t chan);
-            static void     reboot(void);
             static uint8_t  serialAvailableBytes(void);
             static uint8_t  serialReadByte(void);
             static void     serialWriteByte(uint8_t c);
+            static void     writeMotor(uint8_t index, uint16_t value);
+
+            // extra functionality
+            void            extrasInit(class MSP * _msp);
+            void            extrasCheckSwitch(void);
+            static uint8_t  extrasGetTaskCount(void);
+            bool            extrasHandleMSP(uint8_t command);
+            void            extrasPerformTask(uint8_t taskIndex);
+
+            // helps with simulation
             static void     showArmedStatus(bool armed);
             static void     showAuxStatus(uint8_t status);
-            static bool     sonarInit(uint8_t index);
-            static void     sonarUpdate(uint8_t index);
-            static uint16_t sonarGetDistance(uint8_t index);
-            static void     writeMotor(uint8_t index, uint16_t value);
+
+            // STM32
+            static void     checkReboot(bool pendReboot);
+            static void     reboot(void);
+
+            // default constants
+            static const uint32_t DEFAULT_IMU_LOOPTIME_USEC     = 3500;
+            static const uint32_t DEFAULT_GYRO_CALIBRATION_MSEC = 3500;
 
     }; // class Board
 

@@ -36,6 +36,7 @@ static RC         rc;
 static Mixer      mixer;
 static MSP        msp;
 static Stabilize  stab;
+static Board      board;
 
 // support for timed tasks
 
@@ -128,6 +129,9 @@ void setup(void)
     mixer.init(&rc, &stab); 
     msp.init(&imu, &mixer, &rc);
 
+    // do any extra initializations (baro, sonar, etc.)
+    board.extrasInit(&msp);
+
     // always do gyro calibration at startup
     calibratingG = calibratingGyroCycles;
 
@@ -202,28 +206,20 @@ void loop(void)
 
         } // rc.changed()
 
+        // Detect aux switch changes for hover, altitude-hold, etc.
+        board.extrasCheckSwitch();
+
     } else {                    // not in rc loop
 
         static int taskOrder;   // never call all functions in the same loop, to avoid high delay spikes
 
-        switch (taskOrder) {
-            case 0:
-                taskOrder++;
-                break;
-            case 1:
-                taskOrder++;
-                break;
-            case 2:
-                taskOrder++;
-                break;
-            case 3:
-                taskOrder++;
-                break;
-            case 4:
-                taskOrder = 0;
-                break;
-        }
-    }
+        board.extrasPerformTask(taskOrder);
+
+        taskOrder++;
+
+        if (taskOrder >= Board::extrasGetTaskCount()) // using >= supports zero or more tasks
+            taskOrder = 0;
+ }
 
     currentTime = Board::getMicros();
 

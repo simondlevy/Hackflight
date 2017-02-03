@@ -69,20 +69,6 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
 }
 
-bool Board::baroInit(void)
-{
-    return false;
-}
-
-void Board::baroUpdate(void)
-{
-}
-
-int32_t Board::baroGetPressure(void)
-{
-    return 0;
-}
-
 void Board::checkReboot(bool pendReboot)
 {
     if (pendReboot)
@@ -175,23 +161,6 @@ void Board::writeMotor(uint8_t index, uint16_t value)
     pwmWriteMotor(index, value);
 }
 
-bool Board::sonarInit(uint8_t index) 
-{
-    (void)index;
-    return false;
-}
-
-void Board::sonarUpdate(uint8_t index)
-{
-    (void)index;
-}
-
-uint16_t Board::sonarGetDistance(uint8_t index)
-{
-    (void)index;
-    return 0;
-}
-
 void Board::showArmedStatus(bool armed)
 {
     // XXX this would be a good place to sound a buzzer!
@@ -204,6 +173,31 @@ void Board::showAuxStatus(uint8_t status)
     status = status; // avoid compiler warning about unused variable
 }
  
+void Board::extrasInit(class MSP * _msp) 
+{
+    (void)_msp;
+}
+
+void Board::extrasCheckSwitch(void)
+{
+}
+
+uint8_t Board::extrasGetTaskCount(void)
+{
+    return 0;
+}
+
+bool Board::extrasHandleMSP(uint8_t command)
+{
+    (void)command;
+    return true;
+}
+
+void Board::extrasPerformTask(uint8_t taskIndex)
+{
+    (void)taskIndex;
+}
+
 #ifdef __arm__
 } // extern "C"
 #endif
