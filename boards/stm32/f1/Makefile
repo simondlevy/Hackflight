@@ -9,11 +9,13 @@
 HACKFLIGHT_DIR = $(HOME)/Desktop/hackflight
 
 # Change this to wherever you put BreezySTM32
-BREEZY_DIR = $(HOME)/Desktop/BreezySTM32/f1
+BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 ###############################################################################
 # Things that the user might override on the commandline
 #
+
+F1_DIR = $(BREEZY_DIR)/f1-arduino
 
 TARGET		?= NAZE
 
@@ -42,19 +44,19 @@ CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
 STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 
 # Source files common to all targets
-NAZE_SRC = $(BREEZY_DIR)/main.c \
-           $(BREEZY_DIR)/printf.c \
-           $(BREEZY_DIR)/drv_system.c \
-           $(BREEZY_DIR)/drv_mpu6050.c \
-           $(BREEZY_DIR)/drv_ms5611.c \
-           $(BREEZY_DIR)/drv_mb1242.c \
-           $(BREEZY_DIR)/drv_i2c.c \
-           $(BREEZY_DIR)/drv_serial.c \
-           $(BREEZY_DIR)/drv_pwm.c \
-           $(BREEZY_DIR)/drv_gpio.c \
-           $(BREEZY_DIR)/drv_uart.c \
-           $(BREEZY_DIR)/drv_timer.c \
-           $(BREEZY_DIR)/startup_stm32f10x_md_gcc.S \
+NAZE_SRC = $(F1_DIR)/main.c \
+           $(F1_DIR)/printf.c \
+           $(F1_DIR)/drv_system.c \
+           $(F1_DIR)/drv_mpu6050.c \
+           $(F1_DIR)/drv_ms5611.c \
+           $(F1_DIR)/drv_mb1242.c \
+           $(F1_DIR)/drv_i2c.c \
+           $(F1_DIR)/drv_serial.c \
+           $(F1_DIR)/drv_pwm.c \
+           $(F1_DIR)/drv_gpio.c \
+           $(F1_DIR)/drv_uart.c \
+           $(F1_DIR)/drv_timer.c \
+           $(F1_DIR)/startup_stm32f10x_md_gcc.S \
            $(CMSIS_SRC) \
            $(STDPERIPH_SRC)
 
@@ -86,8 +88,7 @@ OBJCOPY	 = arm-none-eabi-objcopy
 # Tool options.
 #
 INCLUDE_DIRS = . \
-			   $(BREEZY_DIR) \
-			   $(BREEZY_DIR)/arduino \
+			   $(F1_DIR) \
 			   $(STDPERIPH_DIR)/inc \
 			   $(CMSIS_DIR)/CM3/CoreSupport \
 			   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x
@@ -121,7 +122,7 @@ ASFLAGS		 = $(ARCH_FLAGS) \
 		   $(addprefix -I,$(INCLUDE_DIRS))
 
 # XXX Map/crossref output?
-LD_SCRIPT	 = $(BREEZY_DIR)/stm32_flash.ld
+LD_SCRIPT	 = $(F1_DIR)/stm32_flash.ld
 LDFLAGS	 = -lm \
 		   -nostartfiles \
 		   -lc \
@@ -175,8 +176,8 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 
 FIRMDIR = $(HACKFLIGHT_DIR)/firmware
 
-$(OBJECT_DIR)/Arduino.o: $(BREEZY_DIR)/arduino/Arduino.cpp
-	@$(CC) -c -o $(OBJECT_DIR)/Arduino.o $(CFLAGS) $(BREEZY_DIR)/arduino/Arduino.cpp
+$(OBJECT_DIR)/Arduino.o: $(F1_DIR)/Arduino.cpp
+	@$(CC) -c -o $(OBJECT_DIR)/Arduino.o $(CFLAGS) $(F1_DIR)/Arduino.cpp
 
 hackflight.o: $(FIRMDIR)/hackflight.cpp $(FIRMDIR)/hackflight.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
