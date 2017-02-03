@@ -37,6 +37,8 @@ void RC::init(void)
     this->sticks = 0;
     this->averageIndex = 0;
 
+    this->useSerial = Board::rcUseSerial();
+
     for (uint8_t i = 0; i < CONFIG_RC_CHANS; i++)
         this->data[i] = this->midrc;
 
@@ -59,19 +61,27 @@ void RC::init(void)
 
 void RC::update(void)
 {
-    for (uint8_t chan = 0; chan < 8; chan++) {
-    
-        // get RC PWM
-        this->dataAverage[chan][this->averageIndex % 4] = Board::readPWM(chan);
-
-        this->data[chan] = 0;
-
-        for (uint8_t i = 0; i < 4; i++)
-            this->data[chan] += this->dataAverage[chan][i];
-        this->data[chan] /= 4;
+    if (this->useSerial) {
+        for (uint8_t chan = 0; chan < 8; chan++) {
+            this->data[chan] = Board::rcReadSerial(chan);
+        }
     }
 
-    this->averageIndex++;
+    else {
+        for (uint8_t chan = 0; chan < 8; chan++) {
+
+            // get RC PWM
+            this->dataAverage[chan][this->averageIndex % 4] = Board::readPWM(chan);
+
+            this->data[chan] = 0;
+
+            for (uint8_t i = 0; i < 4; i++)
+                this->data[chan] += this->dataAverage[chan][i];
+            this->data[chan] /= 4;
+        }
+
+        this->averageIndex++;
+    }
 
     // check stick positions, updating command delay
     uint8_t stTmp = 0;
@@ -92,7 +102,7 @@ void RC::update(void)
 
 bool RC::changed(void)
 {
-  return this->commandDelay == 20;
+    return this->commandDelay == 20;
 }
 
 void RC::computeExpo(void)

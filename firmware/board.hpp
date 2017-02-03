@@ -44,6 +44,8 @@ extern "C" {
             static void     ledRedOn(void);
             static void     ledRedToggle(void);
             static bool     rcSerialReady(void);
+            static bool     rcUseSerial(void);
+            static uint16_t rcReadSerial(uint8_t chan);
             static uint16_t readPWM(uint8_t chan);
             static void     reboot(void);
             static uint8_t  serialAvailableBytes(void);

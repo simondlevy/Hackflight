@@ -134,6 +134,17 @@ bool Board::rcSerialReady(void)
     return false;
 }
 
+bool Board::rcUseSerial(void)
+{
+    return false;
+}
+
+uint16_t Board::rcReadSerial(uint8_t chan)
+{
+    (void)chan;
+    return 0;
+}
+
 uint16_t Board::readPWM(uint8_t chan)
 {
     return pwmRead(chan);
