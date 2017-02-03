@@ -393,8 +393,8 @@ class GCS:
 
     def sendMotorMessage(self, index, value):
 
-        values = [0,0,0,0]
-        values[index-1] = value
+        values = [1000]*4
+        values[index-1] += int(value/100.* 1000)
         self.comms.send_message(serialize_SET_MOTOR, values)
 
     def _show_splash(self):

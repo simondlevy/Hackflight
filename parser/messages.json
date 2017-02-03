@@ -44,8 +44,8 @@
 
   "SET_MOTOR": [{"ID": 214},
                  {"comment": "We send percent values, rather than PWM"}, 
-                 {"m1": "byte"},
-                 {"m2": "byte"},
-                 {"m3": "byte"},
-                 {"m4": "byte"}]
+                 {"m1": "short"},
+                 {"m2": "short"},
+                 {"m3": "short"},
+                 {"m4": "short"}]
 }
