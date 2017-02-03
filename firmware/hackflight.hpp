@@ -32,10 +32,7 @@ void debug(const char * format, ...);
 #include "rc.hpp"
 #include "stabilize.hpp"
 #include "mixer.hpp"
-#include "baro.hpp"
-#include "sonars.hpp"
 #include "msp.hpp"
-#include "hover.hpp"
 #include "filters.hpp"
 
 #ifndef abs

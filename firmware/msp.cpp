@@ -102,14 +102,11 @@ void MSP::tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-void MSP::init(class IMU * _imu, class Hover * _hover, 
-        class Mixer * _mixer, class RC * _rc, class Sonars * _sonars)
+void MSP::init(class IMU * _imu, class Mixer * _mixer, class RC * _rc)
 {
     this->imu = _imu;
-    this->hover = _hover;
     this->mixer = _mixer;
     this->rc = _rc;
-    this->sonars = _sonars;
 
     memset(&this->portState, 0, sizeof(this->portState));
 }
@@ -174,11 +171,6 @@ void MSP::update(bool armed)
                         headSerialReply(0);
                         break;
 
-                    case MSP_SET_HEAD: 
-                        this->hover->headHold = read16();
-                        headSerialReply(0);
-                        break;
-
                     case MSP_RC:
                         headSerialReply(16);
                         for (uint8_t i = 0; i < 8; i++)
@@ -189,24 +181,6 @@ void MSP::update(bool armed)
                         headSerialReply(6);
                         for (uint8_t i = 0; i < 3; i++)
                             serialize16(this->imu->angle[i]);
-                        break;
-
-                    case MSP_BARO_SONAR_RAW:
-                        //headSerialReply(8);
-                        //serialize32(baroPressure);
-                        //serialize32(sonarDistance);
-                        break;
-
-                    case MSP_ALTITUDE:
-                        headSerialReply(6);
-                        serialize32(this->hover->estAlt);
-                        serialize16(this->hover->vario);
-                        break;
-
-                    case MSP_SONARS:
-                        headSerialReply(8);
-                        for (uint8_t i = 0; i < 4; i++)
-                            serialize16(this->sonars->distances[i]);
                         break;
 
                     case MSP_REBOOT:
