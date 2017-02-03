@@ -131,8 +131,7 @@ void Board::ledRedToggle(void)
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    (void)chan;
-    return 1500;
+    return pwmRead(chan);
 }
 
 void Board::reboot(void)
