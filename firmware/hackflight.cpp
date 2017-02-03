@@ -154,10 +154,14 @@ void loop(void)
     static uint32_t currentTime;
     static uint32_t disarmTime;
 
-    if (rcTask.checkAndUpdate(currentTime)) {
+    bool rcSerialReady = Board::rcSerialReady();
+
+    if (rcTask.checkAndUpdate(currentTime)  || rcSerialReady) {
 
         // update RC channels
         rc.update();
+
+        rcSerialReady = false;
 
 		//printf("%d %d %d %d (%d)\n", rc.data[0], rc.data[1], rc.data[2], rc.data[3], rc.auxState());
 

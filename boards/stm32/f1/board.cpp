@@ -129,6 +129,11 @@ void Board::ledRedToggle(void)
     digitalToggle(LED1_GPIO, LED1_PIN);
 }
 
+bool Board::rcSerialReady(void)
+{
+    return false;
+}
+
 uint16_t Board::readPWM(uint8_t chan)
 {
     return pwmRead(chan);
