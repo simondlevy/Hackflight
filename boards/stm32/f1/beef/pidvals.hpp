@@ -16,11 +16,11 @@
  */
 
 // Level (accelerometer)
-static const uint8_t CONFIG_LEVEL_P          = 90;
+static const uint8_t CONFIG_LEVEL_P          = 40;
 static const uint8_t CONFIG_LEVEL_I          = 10;
 
 // Rate (gyro): P must be positive
-static const uint8_t CONFIG_RATE_PITCHROLL_P = 33;
+static const uint8_t CONFIG_RATE_PITCHROLL_P = 36;
 static const uint8_t CONFIG_RATE_PITCHROLL_I = 30;
 static const uint8_t CONFIG_RATE_PITCHROLL_D = 23;
 
