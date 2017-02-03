@@ -87,6 +87,7 @@ OBJCOPY	 = arm-none-eabi-objcopy
 #
 INCLUDE_DIRS = . \
 			   $(BREEZY_DIR) \
+			   $(BREEZY_DIR)/arduino \
 			   $(STDPERIPH_DIR)/inc \
 			   $(CMSIS_DIR)/CM3/CoreSupport \
 			   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x
@@ -142,7 +143,8 @@ LDFLAGS	 = -lm \
 
 TARGET_HEX	 = $(BIN_DIR)/hackflight_$(TARGET).hex
 TARGET_ELF	 = $(BIN_DIR)/hackflight_$(TARGET).elf
-TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC)))) $(CPP_OBJS)
+TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC)))) $(CPP_OBJS) \
+			   $(OBJECT_DIR)/Arduino.o
 TARGET_MAP   = $(OBJECT_DIR)/hackflight_$(TARGET).map
 
 # List of buildable ELF files and their object dependencies.
@@ -172,6 +174,9 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 # C++ support
 
 FIRMDIR = $(HACKFLIGHT_DIR)/firmware
+
+$(OBJECT_DIR)/Arduino.o: $(BREEZY_DIR)/arduino/Arduino.cpp
+	@$(CC) -c -o $(OBJECT_DIR)/Arduino.o $(CFLAGS) $(BREEZY_DIR)/arduino/Arduino.cpp
 
 hackflight.o: $(FIRMDIR)/hackflight.cpp $(FIRMDIR)/hackflight.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)

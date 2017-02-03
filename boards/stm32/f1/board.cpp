@@ -21,6 +21,7 @@
 extern "C" {
 #endif
 
+#include <Arduino.h>
 #include <breezystm32.h>
 #include <math.h>
 
@@ -62,6 +63,10 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
+    // Init LEDs
+    pinMode(8, OUTPUT);
+    pinMode(16, OUTPUT);
+
     i2cInit(I2CDEV_2);
     pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 
@@ -87,32 +92,22 @@ uint32_t Board::getMicros()
 
 void Board::ledGreenOff(void)
 {
-    digitalHi(LED0_GPIO, LED0_PIN);
+    digitalWrite(8, LOW);
 }
 
 void Board::ledGreenOn(void)
 {
-    digitalLo(LED0_GPIO, LED0_PIN);
-}
-
-void Board::ledGreenToggle(void)
-{
-    digitalToggle(LED0_GPIO, LED0_PIN);
+    digitalWrite(8, HIGH);
 }
 
 void Board::ledRedOff(void)
 {
-    digitalHi(LED1_GPIO, LED1_PIN);
+    digitalWrite(16, LOW);
 }
 
 void Board::ledRedOn(void)
 {
-    digitalLo(LED1_GPIO, LED1_PIN);
-}
-
-void Board::ledRedToggle(void)
-{
-    digitalToggle(LED1_GPIO, LED1_PIN);
+    digitalWrite(16, HIGH);
 }
 
 bool Board::rcSerialReady(void)

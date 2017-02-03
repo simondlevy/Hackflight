@@ -102,15 +102,16 @@ void setup(void)
     Board::delayMilliseconds(100);
 
     // flash the LEDs to indicate startup
-    Board::ledRedOn();
-    Board::ledGreenOff();
-    for (uint8_t i = 0; i < 10; i++) {
-        Board::ledRedToggle();
-        Board::ledGreenToggle();
-        Board::delayMilliseconds(50);
-    }
     Board::ledRedOff();
     Board::ledGreenOff();
+    for (uint8_t i = 0; i < 10; i++) {
+        Board::ledRedOn();
+        Board::ledGreenOn();
+        Board::delayMilliseconds(50);
+        Board::ledRedOff();
+        Board::ledGreenOff();
+        Board::delayMilliseconds(50);
+    }
 
     // compute cycles for calibration based on board's time constant
     calibratingGyroCycles = (uint16_t)(1000. * calibratingGyroMsec / imuLooptimeUsec);
@@ -237,8 +238,9 @@ void loop(void)
         rc.computeExpo();
 
         // use LEDs to indicate calibration status
-        if (calibratingA > 0 || calibratingG > 0) 
+        if (calibratingA > 0 || calibratingG > 0) {
             Board::ledGreenOn();
+        }
         else {
             if (accCalibrated)
                 Board::ledGreenOff();
@@ -249,10 +251,18 @@ void loop(void)
         }
 
         // periodically update accelerometer calibration status
+        static bool on;
         if (accelCalibrationTask.check(currentTime)) {
             if (!haveSmallAngle) {
                 accCalibrated = false; 
-                Board::ledGreenToggle();
+                if (on) {
+                    Board::ledGreenOff();
+                    on = false;
+                }
+                else {
+                    Board::ledGreenOn();
+                    on = true;
+                }
                 accelCalibrationTask.update(currentTime);
             } else {
                 accCalibrated = true;
