@@ -44,7 +44,7 @@ CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
 STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 
 # Source files common to all targets
-NAZE_SRC = $(F1_DIR)/main.c \
+NAZE_SRC = \
            $(F1_DIR)/printf.c \
            $(F1_DIR)/drv_system.c \
            $(F1_DIR)/drv_mpu6050.c \

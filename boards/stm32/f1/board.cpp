@@ -17,9 +17,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef __arm__
 extern "C" {
-#endif
 
 #include <Arduino.h>
 #include <breezystm32.h>
@@ -37,12 +35,10 @@ extern "C" {
 #define CALIBRATING_GYRO_MSEC   3500
 
    
-extern serialPort_t * Serial1;
-
 void Board::dump(char * msg)
 {
     for (char * c = msg; *c; c++)
-        serialWrite(Serial1, (uint8_t)*c);
+        Serial.write(*c);
 }
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
@@ -66,6 +62,8 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     // Init LEDs
     pinMode(8, OUTPUT);
     pinMode(16, OUTPUT);
+
+    Serial.begin(115200);
 
     i2cInit(I2CDEV_2);
     pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
@@ -138,17 +136,17 @@ void Board::reboot(void)
 
 uint8_t Board::serialAvailableBytes(void)
 {
-    return serialTotalBytesWaiting(Serial1);
+    return Serial.available();
 }
 
 uint8_t Board::serialReadByte(void)
 {
-    return serialRead(Serial1);
+    return Serial.read();
 }
 
 void Board::serialWriteByte(uint8_t c)
 {
-    serialWrite(Serial1, c);
+    Serial.write(c);
 }
 
 void Board::writeMotor(uint8_t index, uint16_t value)
@@ -193,6 +191,4 @@ void Board::extrasPerformTask(uint8_t taskIndex)
     (void)taskIndex;
 }
 
-#ifdef __arm__
 } // extern "C"
-#endif
