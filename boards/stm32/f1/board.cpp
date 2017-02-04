@@ -43,7 +43,7 @@ void Board::dump(char * msg)
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
-    mpu6050_init(false, &acc1G, &gyroScale, BOARD_VERSION);
+    mpu6050_init(&acc1G, &gyroScale);
 
     gyroScale *= 0.000004f;
 }
