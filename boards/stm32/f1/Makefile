@@ -142,7 +142,8 @@ LDFLAGS	 = -lm \
 TARGET_HEX	 = $(BIN_DIR)/hackflight_$(TARGET).hex
 TARGET_ELF	 = $(BIN_DIR)/hackflight_$(TARGET).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC)))) $(CPP_OBJS) \
-			   $(OBJECT_DIR)/Arduino.o
+			   $(OBJECT_DIR)/Arduino.o \
+			   $(OBJECT_DIR)/HardwareSerial.o
 TARGET_MAP   = $(OBJECT_DIR)/hackflight_$(TARGET).map
 
 # List of buildable ELF files and their object dependencies.
@@ -175,6 +176,9 @@ FIRMDIR = $(HACKFLIGHT_DIR)/firmware
 
 $(OBJECT_DIR)/Arduino.o: $(F1_DIR)/Arduino.cpp
 	@$(CC) -c -o $(OBJECT_DIR)/Arduino.o $(CFLAGS) $(F1_DIR)/Arduino.cpp
+
+$(OBJECT_DIR)/HardwareSerial.o: $(F1_DIR)/HardwareSerial.cpp
+	@$(CC) -c -o $(OBJECT_DIR)/HardwareSerial.o $(CFLAGS) $(F1_DIR)/HardwareSerial.cpp
 
 hackflight.o: $(FIRMDIR)/hackflight.cpp $(FIRMDIR)/hackflight.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
