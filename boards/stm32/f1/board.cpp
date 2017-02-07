@@ -67,8 +67,7 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 #ifdef NEW
     imu.getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
 #else
-    mpu6050_read_accel(accADC);
-    mpu6050_read_gyro(gyroADC);
+    mpu6050_getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
 #endif
 
     for (int k=0; k<3; ++k)
