@@ -52,7 +52,6 @@ NAZE_SRC = \
            $(F1_DIR)/drv_gpio.c \
            $(F1_DIR)/drv_uart.c \
            $(F1_DIR)/drv_timer.c \
-           $(F1_DIR)/drv_mpu6050.c \
            $(F1_DIR)/startup_stm32f10x_md_gcc.S \
            $(CMSIS_SRC) \
            $(STDPERIPH_SRC)

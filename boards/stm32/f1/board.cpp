@@ -19,10 +19,9 @@
 
 extern "C" {
 
-//#define NEW
+#define NEW
 
 #include <Arduino.h>
-#include <drv_mpu6050.h>
 
 #include <breezystm32.h>
 #include <math.h>
@@ -41,6 +40,8 @@ extern "C" {
 #ifdef NEW
 #include <MPU6050.h>
 MPU6050 imu;
+#else
+#include <drv_mpu6050.h>
 #endif
 
 void Board::dump(char * msg)
