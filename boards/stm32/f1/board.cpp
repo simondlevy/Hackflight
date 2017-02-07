@@ -19,8 +19,6 @@
 
 extern "C" {
 
-#define NEW
-
 #include <Arduino.h>
 
 #include <breezystm32.h>
@@ -37,12 +35,8 @@ extern "C" {
 #define IMU_LOOPTIME_USEC       3500
 #define CALIBRATING_GYRO_MSEC   3500
 
-#ifdef NEW
 #include <MPU6050.h>
 MPU6050 imu;
-#else
-#include <drv_mpu6050.h>
-#endif
 
 void Board::dump(char * msg)
 {
@@ -52,11 +46,7 @@ void Board::dump(char * msg)
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
-#ifdef NEW
     imu.begin(AFS_8G, GFS_2000DPS);
-#else
-    mpu6050_init(AFS_8G, GFS_2000DPS);
-#endif
 
     acc1G = 4096;
     gyroScale = (1.0f / 16.4f) * (M_PI / 180.0f);
@@ -65,11 +55,7 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
-#ifdef NEW
     imu.getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
-#else
-    mpu6050_getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
-#endif
 
     for (int k=0; k<3; ++k)
         gyroADC[k] /= 4;
