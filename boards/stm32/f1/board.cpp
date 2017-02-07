@@ -54,7 +54,7 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 #ifdef NEW
     imu.begin(AFS_8G, GFS_2000DPS);
 #else
-    mpu6050_init();
+    mpu6050_init(AFS_8G, GFS_2000DPS);
 #endif
 
     acc1G = 4096;
