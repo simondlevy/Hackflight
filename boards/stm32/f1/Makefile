@@ -46,13 +46,13 @@ STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 # Source files common to all targets
 NAZE_SRC = \
            $(F1_DIR)/drv_system.c \
-           $(F1_DIR)/drv_mpu6050.c \
            $(F1_DIR)/drv_i2c.c \
            $(F1_DIR)/drv_serial.c \
            $(F1_DIR)/drv_pwm.c \
            $(F1_DIR)/drv_gpio.c \
            $(F1_DIR)/drv_uart.c \
            $(F1_DIR)/drv_timer.c \
+           $(F1_DIR)/drv_mpu6050.c \
            $(F1_DIR)/startup_stm32f10x_md_gcc.S \
            $(CMSIS_SRC) \
            $(STDPERIPH_SRC)
@@ -143,7 +143,9 @@ TARGET_HEX	 = $(BIN_DIR)/hackflight_$(TARGET).hex
 TARGET_ELF	 = $(BIN_DIR)/hackflight_$(TARGET).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC)))) $(CPP_OBJS) \
 			   $(OBJECT_DIR)/Arduino.o \
-			   $(OBJECT_DIR)/HardwareSerial.o
+			   $(OBJECT_DIR)/HardwareSerial.o \
+			   $(OBJECT_DIR)/HardwareWire.o \
+			   $(OBJECT_DIR)/MPU6050.o
 TARGET_MAP   = $(OBJECT_DIR)/hackflight_$(TARGET).map
 
 # List of buildable ELF files and their object dependencies.
@@ -179,6 +181,12 @@ $(OBJECT_DIR)/Arduino.o: $(F1_DIR)/Arduino.cpp
 
 $(OBJECT_DIR)/HardwareSerial.o: $(F1_DIR)/HardwareSerial.cpp
 	@$(CC) -c -o $(OBJECT_DIR)/HardwareSerial.o $(CFLAGS) $(F1_DIR)/HardwareSerial.cpp
+
+$(OBJECT_DIR)/HardwareWire.o: $(F1_DIR)/HardwareWire.cpp
+	@$(CC) -c -o $(OBJECT_DIR)/HardwareWire.o $(CFLAGS) $(F1_DIR)/HardwareWire.cpp
+
+$(OBJECT_DIR)/MPU6050.o: $(F1_DIR)/MPU6050.cpp
+	@$(CC) -c -o $(OBJECT_DIR)/MPU6050.o $(CFLAGS) $(F1_DIR)/MPU6050.cpp
 
 hackflight.o: $(FIRMDIR)/hackflight.cpp $(FIRMDIR)/hackflight.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)

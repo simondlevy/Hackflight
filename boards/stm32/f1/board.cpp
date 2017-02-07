@@ -19,7 +19,11 @@
 
 extern "C" {
 
+//#define NEW
+
 #include <Arduino.h>
+#include <drv_mpu6050.h>
+
 #include <breezystm32.h>
 #include <math.h>
 
@@ -34,7 +38,11 @@ extern "C" {
 #define IMU_LOOPTIME_USEC       3500
 #define CALIBRATING_GYRO_MSEC   3500
 
-   
+#ifdef NEW
+#include <MPU6050.h>
+MPU6050 imu;
+#endif
+
 void Board::dump(char * msg)
 {
     for (char * c = msg; *c; c++)
@@ -43,15 +51,25 @@ void Board::dump(char * msg)
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
-    mpu6050_init(&acc1G, &gyroScale);
+#ifdef NEW
+    imu.begin(AFS_8G, GFS_2000DPS);
+#else
+    mpu6050_init();
+#endif
 
+    acc1G = 4096;
+    gyroScale = (1.0f / 16.4f) * (M_PI / 180.0f);
     gyroScale *= 0.000004f;
 }
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
+#ifdef NEW
+    imu.getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
+#else
     mpu6050_read_accel(accADC);
     mpu6050_read_gyro(gyroADC);
+#endif
 
     for (int k=0; k<3; ++k)
         gyroADC[k] /= 4;
@@ -65,7 +83,9 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
     Serial.begin(115200);
 
+    //Wire.begin();
     i2cInit(I2CDEV_2);
+
     pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 
     looptimeMicroseconds = IMU_LOOPTIME_USEC;
