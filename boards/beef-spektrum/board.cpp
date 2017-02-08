@@ -26,9 +26,7 @@ extern "C" {
 #include <math.h>
 
 #include "board.hpp"
-#include "motorpwm.hpp"
 
-#define BOARD_VERSION           5
 #define USE_CPPM                1
 #define PWM_FILTER              0     // 0 or 1
 #define FAST_PWM                0     // 0 or 1
@@ -74,7 +72,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
     Wire.begin();
 
-    pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
+    pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, 32000, 0);
 
     looptimeMicroseconds = IMU_LOOPTIME_USEC;
     calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
