@@ -62,7 +62,7 @@ void RC::init(void)
 void RC::update(void)
 {
     if (this->useSerial) {
-        for (uint8_t chan = 0; chan < 8; chan++) {
+        for (uint8_t chan = 0; chan < 5; chan++) {
             this->data[chan] = Board::rcReadSerial(chan);
         }
     }

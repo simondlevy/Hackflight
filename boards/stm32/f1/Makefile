@@ -8,7 +8,10 @@
 # Change this to wherever you put hackflight
 HACKFLIGHT_DIR = $(HOME)/Desktop/hackflight
 
-# Change this to wherever you put BreezySTM32
+# Change this to wherever you put Arduino libraries
+ARDUINO_DIR = $(HOME)/Development/arduino-1.6.13/hardware/teensy/avr/libraries
+
+## Change this to wherever you put BreezySTM32
 BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 ###############################################################################
@@ -16,6 +19,8 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 #
 
 F1_DIR = $(BREEZY_DIR)/f1-arduino
+
+SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM
 
 TARGET		?= NAZE
 
@@ -77,6 +82,7 @@ STDPERIPH_SRC	 = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
 #
 
 # Tool names
+C++		 = arm-none-eabi-g++
 CC		 = arm-none-eabi-gcc
 OBJCOPY	 = arm-none-eabi-objcopy
 
@@ -85,6 +91,7 @@ OBJCOPY	 = arm-none-eabi-objcopy
 #
 INCLUDE_DIRS = . \
 			   $(F1_DIR) \
+			   $(SPEKTRUM_DIR) \
 			   $(STDPERIPH_DIR)/inc \
 			   $(CMSIS_DIR)/CM3/CoreSupport \
 			   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x
@@ -142,6 +149,7 @@ TARGET_HEX	 = $(BIN_DIR)/hackflight_$(TARGET).hex
 TARGET_ELF	 = $(BIN_DIR)/hackflight_$(TARGET).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC)))) $(CPP_OBJS) \
 			   $(OBJECT_DIR)/Arduino.o \
+			   $(OBJECT_DIR)/SpektrumDSM.o \
 			   $(OBJECT_DIR)/HardwareSerial.o \
 			   $(OBJECT_DIR)/HardwareWire.o \
 			   $(OBJECT_DIR)/MPU6050.o
@@ -154,7 +162,7 @@ $(TARGET_HEX): $(TARGET_ELF)
 	$(OBJCOPY) -O ihex --set-start 0x8000000 $< $@
 
 $(TARGET_ELF):  $(TARGET_OBJS)
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(C++) -o $@ $^ $(LDFLAGS)
 	mv *.o obj
 
 MKDIR_OBJDIR = @mkdir -p $(dir $@)
@@ -187,7 +195,10 @@ $(OBJECT_DIR)/HardwareWire.o: $(F1_DIR)/HardwareWire.cpp
 $(OBJECT_DIR)/MPU6050.o: $(F1_DIR)/MPU6050.cpp
 	@$(CC) -c -o $(OBJECT_DIR)/MPU6050.o $(CFLAGS) $(F1_DIR)/MPU6050.cpp
 
-hackflight.o: $(FIRMDIR)/hackflight.cpp $(FIRMDIR)/hackflight.hpp $(FIRMDIR)/rc.hpp
+$(OBJECT_DIR)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h
+	@$(CC) -c -o $(OBJECT_DIR)/SpektrumDSM.o $(CFLAGS) $(SPEKTRUM_DIR)/SpektrumDSM.cpp
+
+hhackflight.o: $(FIRMDIR)/hackflight.cpp $(FIRMDIR)/hackflight.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o hackflight.o $(FIRMDIR)/hackflight.cpp
 
@@ -226,6 +237,10 @@ hover.o: $(FIRMDIR)/hover.cpp $(FIRMDIR)/hover.hpp $(FIRMDIR)/rc.hpp
 filters.o: $(FIRMDIR)/filters.cpp $(FIRMDIR)/filters.hpp $(FIRMDIR)/rc.hpp
 	@echo %% $(notdir $<)
 	@$(CC) $(CFLAGS) -c -o filters.o $(FIRMDIR)/filters.cpp
+
+hackflight.o: $(FIRMDIR)/hackflight.cpp $(FIRMDIR)/hackflight.hpp $(FIRMDIR)/rc.hpp
+	@echo %% $(notdir $<)
+	@$(CC) $(CFLAGS) -c -o hackflight.o $(FIRMDIR)/hackflight.cpp
 
 board.o: board.cpp $(FIRMDIR)/board.hpp
 	@echo %% $(notdir $<)

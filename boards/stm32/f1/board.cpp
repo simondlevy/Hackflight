@@ -20,6 +20,7 @@
 extern "C" {
 
 #include <Arduino.h>
+#include <SpektrumDSM.h>
 
 #include <breezystm32.h>
 #include <math.h>
@@ -37,6 +38,8 @@ extern "C" {
 
 #include <MPU6050.h>
 MPU6050 imu;
+
+SpektrumDSM2048 rx;
 
 void Board::dump(char * msg)
 {
@@ -70,7 +73,6 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     Serial.begin(115200);
 
     Wire.begin();
-    //i2cInit(I2CDEV_2);
 
     pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, MOTOR_PWM_RATE, PWM_IDLE_PULSE);
 
@@ -116,23 +118,25 @@ void Board::ledRedOn(void)
 
 bool Board::rcSerialReady(void)
 {
-    return false;
+    return rx.frameComplete();
 }
 
 bool Board::rcUseSerial(void)
 {
-    return false;
+    rx.begin();
+    return true;
 }
 
 uint16_t Board::rcReadSerial(uint8_t chan)
 {
-    (void)chan;
-    return 0;
+    uint8_t chanmap[5] = {1, 2, 3, 0, 5};
+    return rx.readRawRC(chanmap[chan]);
 }
 
 uint16_t Board::readPWM(uint8_t chan)
 {
-    return pwmRead(chan);
+    (void)chan;
+    return 0;
 }
 
 void Board::reboot(void)
