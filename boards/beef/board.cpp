@@ -27,8 +27,6 @@ extern "C" {
 
 #include "board.hpp"
 
-#define USE_CPPM                1
-
 #define IMU_LOOPTIME_USEC       3500
 #define CALIBRATING_GYRO_MSEC   3500
 
@@ -70,7 +68,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
     Wire.begin();
 
-    pwmInit(USE_CPPM, 32000, 0);
+    pwmInit(32000, 0);
 
     looptimeMicroseconds = IMU_LOOPTIME_USEC;
     calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
