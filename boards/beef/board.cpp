@@ -28,8 +28,6 @@ extern "C" {
 #include "board.hpp"
 
 #define USE_CPPM                1
-#define PWM_FILTER              0     // 0 or 1
-#define FAST_PWM                0     // 0 or 1
 
 #define IMU_LOOPTIME_USEC       3500
 #define CALIBRATING_GYRO_MSEC   3500
