@@ -155,7 +155,7 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
-    pwmWriteMotor(index, value);
+    pwmWriteBrushed(index, value);
 }
 
 void Board::showArmedStatus(bool armed)
