@@ -72,7 +72,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
     Wire.begin();
 
-    pwmInit(USE_CPPM, PWM_FILTER, FAST_PWM, 32000, 0);
+    pwmInit(USE_CPPM, 32000, 0);
 
     looptimeMicroseconds = IMU_LOOPTIME_USEC;
     calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
