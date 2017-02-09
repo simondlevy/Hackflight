@@ -18,7 +18,7 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 # Things that the user might override on the commandline
 #
 
-F1_DIR = $(BREEZY_DIR)/f1-arduino
+F1_DIR = $(BREEZY_DIR)/f1
 
 SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM
 
