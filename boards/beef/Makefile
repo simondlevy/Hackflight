@@ -22,7 +22,7 @@ F1_DIR = $(BREEZY_DIR)/f1
 
 SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM
 
-TARGET		?= NAZE
+TARGET		?= BEEF
 
 CPP_OBJS = hackflight.o imu.o mixer.o msp.o rc.o board.o stabilize.o filters.o
 
@@ -49,7 +49,7 @@ CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
 STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 
 # Source files common to all targets
-NAZE_SRC = \
+$(TARGET)_SRC = \
            $(F1_DIR)/drv_system.c \
            $(F1_DIR)/drv_i2c.c \
            $(F1_DIR)/drv_serial.c \
