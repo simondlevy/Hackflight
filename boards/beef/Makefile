@@ -116,8 +116,7 @@ CFLAGS	 = $(ARCH_FLAGS) \
 		   -ffunction-sections \
 		   -fdata-sections \
 		   -DSTM32F10X_MD \
-		   -DUSE_STDPERIPH_DRIVER \
-		   -D$(TARGET)
+		   -DUSE_STDPERIPH_DRIVER
 
 ASFLAGS		 = $(ARCH_FLAGS) \
 		   -x assembler-with-cpp \
@@ -151,7 +150,7 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(
 			   $(OBJECT_DIR)/SpektrumDSM.o \
 			   $(OBJECT_DIR)/HardwareSerial.o \
 			   $(OBJECT_DIR)/HardwareWire.o \
-			   $(OBJECT_DIR)/Servo.o \
+			   $(OBJECT_DIR)/Motor.o \
 			   $(OBJECT_DIR)/MPU6050.o
 TARGET_MAP   = $(OBJECT_DIR)/hackflight_$(TARGET).map
 
@@ -192,8 +191,8 @@ $(OBJECT_DIR)/HardwareSerial.o: $(F1_DIR)/HardwareSerial.cpp
 $(OBJECT_DIR)/HardwareWire.o: $(F1_DIR)/HardwareWire.cpp
 	@$(CC) -c -o $(OBJECT_DIR)/HardwareWire.o $(CFLAGS) $(F1_DIR)/HardwareWire.cpp
 
-$(OBJECT_DIR)/Servo.o: $(F1_DIR)/Servo.cpp
-	@$(CC) -c -o $(OBJECT_DIR)/Servo.o $(CFLAGS) $(F1_DIR)/Servo.cpp
+$(OBJECT_DIR)/Motor.o: $(F1_DIR)/Motor.cpp
+	@$(CC) -c -o $(OBJECT_DIR)/Motor.o $(CFLAGS) $(F1_DIR)/Motor.cpp
 
 $(OBJECT_DIR)/MPU6050.o: $(F1_DIR)/MPU6050.cpp
 	@$(CC) -c -o $(OBJECT_DIR)/MPU6050.o $(CFLAGS) $(F1_DIR)/MPU6050.cpp

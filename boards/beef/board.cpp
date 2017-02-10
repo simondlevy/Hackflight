@@ -18,7 +18,7 @@
  */
 
 #include <Arduino.h>
-#include <Servo.h>
+#include <Motor.h>
 #include <SpektrumDSM.h>
 #include <MPU6050.h>
 
@@ -33,7 +33,7 @@ MPU6050 imu;
 
 SpektrumDSM2048 rx;
 
-Servo motors[4];
+BrushedMotor motors[4];
 
 void Board::dump(char * msg)
 {
@@ -69,10 +69,10 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
     Wire.begin();
 
-    motors[0].attach(8,  32000, 0);
-    motors[1].attach(11, 32000, 0);
-    motors[2].attach(6,  32000, 0);
-    motors[3].attach(7,  32000, 0);
+    motors[0].attach(8);
+    motors[1].attach(11);
+    motors[2].attach(6);
+    motors[3].attach(7);
 
     looptimeMicroseconds = IMU_LOOPTIME_USEC;
     calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
@@ -159,7 +159,7 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
-    motors[index].writeBrushed(value);
+    motors[index].setSpeed(value);
 }
 
 void Board::showArmedStatus(bool armed)
