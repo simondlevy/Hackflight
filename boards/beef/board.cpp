@@ -61,8 +61,8 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
     // Init LEDs
-    pinMode(8, OUTPUT);
-    pinMode(16, OUTPUT);
+    pinMode(3, OUTPUT);
+    pinMode(4, OUTPUT);
 
     Serial.begin(115200);
 
@@ -92,22 +92,22 @@ uint32_t Board::getMicros()
 
 void Board::ledGreenOff(void)
 {
-    digitalWrite(8, LOW);
+    digitalWrite(3, LOW);
 }
 
 void Board::ledGreenOn(void)
 {
-    digitalWrite(8, HIGH);
+    digitalWrite(3, HIGH);
 }
 
 void Board::ledRedOff(void)
 {
-    digitalWrite(16, LOW);
+    digitalWrite(4, LOW);
 }
 
 void Board::ledRedOn(void)
 {
-    digitalWrite(16, HIGH);
+    digitalWrite(4, HIGH);
 }
 
 bool Board::rcSerialReady(void)
