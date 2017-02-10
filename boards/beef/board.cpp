@@ -58,6 +58,7 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
         gyroADC[k] /= 4;
 }
 
+
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
     // Init LEDs
@@ -68,7 +69,10 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
     Wire.begin();
 
-    pwmInit(32000, 0);
+    pwmInit(0, PWM9,  32000, 0);
+    pwmInit(1, PWM10, 32000, 0);
+    pwmInit(2, PWM11, 32000, 0);
+    pwmInit(3, PWM12, 32000, 0);
 
     looptimeMicroseconds = IMU_LOOPTIME_USEC;
     calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
