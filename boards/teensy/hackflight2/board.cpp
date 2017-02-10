@@ -25,6 +25,8 @@
 
 #include <Arduino.h>
 
+#include <Servo.h>
+
 // https://github.com/simondlevy/SpektrumDSM
 #include <SpektrumDSM.h>
 static SpektrumDSM2048 rx;
@@ -42,7 +44,6 @@ static SpektrumDSM2048 rx;
 
 #include "board.hpp"
 #include "rc.hpp"
-#include "config.hpp"
 
 // an MPU9250 object with its I2C address 
 // of 0x68 (ADDR to GRND) and on Teensy bus 0
@@ -79,6 +80,8 @@ static const uint8_t MOTOR_PINS[4] = {20, 21, 22, 23};
 (22 / Black-White / CCW )                 (20 / Blue-Red / CW)
 */
 
+Servo motors[4];
+
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     // wake up device
@@ -95,8 +98,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 {
     // Stop motors
     for (int k=0; k<4; ++k) {
-      pinMode(MOTOR_PINS[k], OUTPUT);
-      analogWrite(MOTOR_PINS[k], 0);
+        motors[k].attach(MOTOR_PINS[k]);
     }
   
     // Set up LED
@@ -132,9 +134,24 @@ uint32_t Board::getMicros()
     return micros();
 }
 
-void Board::ledSetState(uint8_t id, bool state)
+void Board::ledGreenOff(void)
 {
-    digitalWrite(13, state); // we only have one LED
+    digitalWrite(13, LOW);
+}
+
+void Board::ledGreenOn(void)
+{
+    digitalWrite(13, HIGH);
+}
+
+void Board::ledRedOff(void)
+{
+    digitalWrite(13, LOW);
+}
+
+void Board::ledRedOn(void)
+{
+    digitalWrite(13, HIGH);
 }
 
 
@@ -152,11 +169,11 @@ uint16_t Board::rcReadSerial(uint8_t chan)
 {  
     static uint16_t values[5];
 
-    values[0] = rx.getChannelValue(1); // roll
-    values[1] = rx.getChannelValue(2); // pitch
-    values[2] = rx.getChannelValue(3); // throttle
-    values[3] = rx.getChannelValue(0); // yaw
-    values[4] = rx.getChannelValue(5); // auxfi
+    values[0] = rx.readRawRC(1); // roll
+    values[1] = rx.readRawRC(2); // pitch
+    values[2] = rx.readRawRC(3); // throttle
+    values[3] = rx.readRawRC(0); // yaw
+    values[4] = rx.readRawRC(5); // auxfi
 
     return (int16_t)values[chan];
 }
@@ -177,19 +194,16 @@ void Board::serialWriteByte(uint8_t c)
     Serial.write(c);
 }
 
-void Board::serialDebugByte(uint8_t c)
-{
-    Serial.write(c);
-}
-
-void Board::writeMotor(uint8_t index, float value)
+void Board::writeMotor(uint8_t index, uint16_t value)
 { 
-  uint8_t analogValue = (uint8_t)(value * 255);
-
-  analogWrite(MOTOR_PINS[index], analogValue);
+    motors[index].writeMicroseconds(value);
 }
 
 // Unused -------------------------------------------------------------------------
+
+void Board::checkReboot(bool)
+{
+}
 
 void Board::extrasInit(class MSP * _msp)
 {
@@ -216,7 +230,7 @@ void Board::extrasPerformTask(uint8_t taskIndex)
 }
 
 
-uint16_t Board::rcReadPWM(uint8_t chan)
+uint16_t Board::readPWM(uint8_t chan)
 {
   (void)chan;
   return 0;
