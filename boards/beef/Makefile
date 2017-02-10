@@ -47,16 +47,7 @@ CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
 STDPERIPH_DIR = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 
 # Source files common to all targets
-$(TARGET)_SRC = \
-           $(F1_DIR)/drv_system.c \
-           $(F1_DIR)/drv_i2c.c \
-           $(F1_DIR)/drv_serial.c \
-           $(F1_DIR)/drv_gpio.c \
-           $(F1_DIR)/drv_uart.c \
-           $(F1_DIR)/drv_timer.c \
-           $(F1_DIR)/startup_stm32f10x_md_gcc.S \
-           $(CMSIS_SRC) \
-           $(STDPERIPH_SRC)
+$(TARGET)_SRC = $(CMSIS_SRC) $(STDPERIPH_SRC)
 
 # In some cases, %.s regarded as intermediate file, which is actually not.
 # This will prevent accidental deletion of startup code.
@@ -157,7 +148,15 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(
 			   $(OBJECT_DIR)/HardwareSerial.o \
 			   $(OBJECT_DIR)/HardwareWire.o \
 			   $(OBJECT_DIR)/Motor.o \
-			   $(OBJECT_DIR)/MPU6050.o
+			   $(OBJECT_DIR)/MPU6050.o \
+			   $(OBJECT_DIR)/drv_system.o \
+			   $(OBJECT_DIR)/drv_i2c.o \
+			   $(OBJECT_DIR)/drv_serial.o \
+			   $(OBJECT_DIR)/drv_gpio.o \
+			   $(OBJECT_DIR)/drv_uart.o \
+			   $(OBJECT_DIR)/drv_timer.o \
+			   $(OBJECT_DIR)/startup_stm32f10x_md_gcc.o
+
 TARGET_MAP   = $(OBJECT_DIR)/hackflight_$(TARGET).map
 
 # List of buildable ELF files and their object dependencies.
@@ -219,6 +218,27 @@ $(OBJECT_DIR)/HardwareSerial.o: $(F1_DIR)/HardwareSerial.cpp
 
 $(OBJECT_DIR)/HardwareWire.o: $(F1_DIR)/HardwareWire.cpp
 	@$(CC) -c -o $(OBJECT_DIR)/HardwareWire.o $(CFLAGS) $(F1_DIR)/HardwareWire.cpp
+
+$(OBJECT_DIR)/drv_system.o: $(F1_DIR)/drv_system.c
+	@$(CC) -c -o $(OBJECT_DIR)/drv_system.o $(CFLAGS) $(F1_DIR)/drv_system.c
+
+$(OBJECT_DIR)/drv_i2c.o: $(F1_DIR)/drv_i2c.c
+	@$(CC) -c -o $(OBJECT_DIR)/drv_i2c.o $(CFLAGS) $(F1_DIR)/drv_i2c.c
+
+$(OBJECT_DIR)/drv_serial.o: $(F1_DIR)/drv_serial.c
+	@$(CC) -c -o $(OBJECT_DIR)/drv_serial.o $(CFLAGS) $(F1_DIR)/drv_serial.c
+
+$(OBJECT_DIR)/drv_gpio.o: $(F1_DIR)/drv_gpio.c
+	@$(CC) -c -o $(OBJECT_DIR)/drv_gpio.o $(CFLAGS) $(F1_DIR)/drv_gpio.c
+
+$(OBJECT_DIR)/drv_uart.o: $(F1_DIR)/drv_uart.c
+	@$(CC) -c -o $(OBJECT_DIR)/drv_uart.o $(CFLAGS) $(F1_DIR)/drv_uart.c
+
+$(OBJECT_DIR)/drv_timer.o: $(F1_DIR)/drv_timer.c
+	@$(CC) -c -o $(OBJECT_DIR)/drv_timer.o $(CFLAGS) $(F1_DIR)/drv_timer.c
+
+$(OBJECT_DIR)/startup_stm32f10x_md_gcc.o: $(F1_DIR)/startup_stm32f10x_md_gcc.S
+	@$(CC) -c -o $(OBJECT_DIR)/startup_stm32f10x_md_gcc.o $(CFLAGS) $(F1_DIR)/startup_stm32f10x_md_gcc.S
 
 $(OBJECT_DIR)/Motor.o: $(F1_DIR)/Motor.cpp
 	@$(CC) -c -o $(OBJECT_DIR)/Motor.o $(CFLAGS) $(F1_DIR)/Motor.cpp
