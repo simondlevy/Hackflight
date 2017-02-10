@@ -17,33 +17,25 @@
 
 #pragma once
 
-#ifdef __arm__
-extern "C" {
-#endif
+class Baro {
 
-    class Baro {
-        
-        private:
+    private:
 
-            bool avail;
+        bool avail;
 
-            static const int TABLE_SIZE = 21;
+        static const int TABLE_SIZE = 21;
 
-            uint32_t pressureSum;
-            int32_t  historyTable[TABLE_SIZE];
-            int      historyIdx;
+        uint32_t pressureSum;
+        int32_t  historyTable[TABLE_SIZE];
+        int      historyIdx;
 
-        public:
+    public:
 
-            void init(void);
+        void init(void);
 
-            bool available(void);
+        bool available(void);
 
-            void update(void);
+        void update(void);
 
-            int32_t getAltitude(void);
-    };
-
-#ifdef __arm__
-} // extern "C"
-#endif
+        int32_t getAltitude(void);
+};

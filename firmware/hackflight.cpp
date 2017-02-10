@@ -19,12 +19,6 @@
 
 #include <math.h>
 
-#ifdef __arm__
-extern "C" {
-#else
-#include <stdio.h>
-#endif
-
 #include "hackflight.hpp"
 
 #include <string.h>
@@ -90,6 +84,8 @@ static uint16_t calibratingAccCycles;
 static uint16_t calibratingG;
 static bool     haveSmallAngle;
 static bool     armed;
+
+extern "C" {
 
 void setup(void)
 {
@@ -282,6 +278,7 @@ void loop(void)
 
 } // loop()
 
+} // extern "C"
 
 void debug(const char * fmt, ...)
 {
@@ -298,6 +295,3 @@ void debug(const char * fmt, ...)
     va_end(ap);  
 }
 
-#ifdef __arm__
-} // extern "C"
-#endif

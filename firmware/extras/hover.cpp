@@ -20,10 +20,6 @@
 
 #include <math.h>
 
-#ifdef __arm__
-extern "C" {
-#endif
-
 #include "hackflight.hpp"
 #include "pidvals.hpp"
 
@@ -159,8 +155,3 @@ void Hover::perform(void)
                 */
     }
 } 
-
-
-#ifdef __arm__
-} // extern "C"
-#endif

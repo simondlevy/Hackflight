@@ -17,12 +17,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef __arm__
-extern "C" {
-#else
-#include <stdio.h>
-#endif
-
 #include "hackflight.hpp"
 #include "filters.hpp"
 
@@ -323,7 +317,3 @@ float IMU::computeAccelZ(void)
 
     return accelZ;
 }
-
-#ifdef __arm__
-} // extern "C"
-#endif

@@ -17,12 +17,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef __arm__
-extern "C" {
-#else
-#include <stdio.h>
-#endif
-
 #include <string.h> // for memset
 
 #include "hackflight.hpp"
@@ -199,7 +193,3 @@ void MSP::update(bool armed)
         }
     }
 }
-
-#ifdef __arm__
-} // extern "C"
-#endif

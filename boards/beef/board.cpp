@@ -17,8 +17,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern "C" {
-
 #include <Arduino.h>
 #include <Servo.h>
 #include <SpektrumDSM.h>
@@ -198,5 +196,3 @@ void Board::extrasPerformTask(uint8_t taskIndex)
 {
     (void)taskIndex;
 }
-
-} // extern "C"

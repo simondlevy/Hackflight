@@ -15,10 +15,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef __arm__
-extern "C" {
-#endif
-
 #include "hackflight.hpp"
 
 // complementary filter
@@ -39,7 +35,3 @@ int32_t deadbandFilter(int32_t value, int32_t deadband)
     }
     return value;
 }
-
-#ifdef __arm__
-} // extern "C"
-#endif

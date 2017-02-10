@@ -20,10 +20,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef __arm__
-extern "C" {
-#endif
-
 #include "hackflight.hpp"
 
 void Baro::init(void)
@@ -61,7 +57,3 @@ int32_t Baro::getAltitude(void)
     return (int32_t)((1.0f - powf((float)(this->pressureSum / (Baro::TABLE_SIZE - 1)) 
                                         / 101325.0f, 0.190295f)) * 4433000.0f); // XYZ
 }
-
-#ifdef __arm__
-} // extern "C"
-#endif

@@ -17,12 +17,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef __arm__
-extern "C" {
-#else
-#include <stdio.h>
-#endif
-
 #include "hackflight.hpp"
 #include "pidvals.hpp"
 
@@ -112,7 +106,3 @@ void Stabilize::resetIntegral(void)
     this->errorAngleI[AXIS_ROLL] = 0;
     this->errorAngleI[AXIS_PITCH] = 0;
 }
-
-#ifdef __arm__
-} // extern "C"
-#endif

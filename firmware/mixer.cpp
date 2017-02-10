@@ -17,12 +17,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef __arm__
-extern "C" {
-#else
-#include <stdio.h>
-#endif
-
 #include "hackflight.hpp"
 
 // Custom mixer data per motor
@@ -88,7 +82,3 @@ void Mixer::update(bool armed)
     for (uint8_t i = 0; i < 4; i++)
         Board::writeMotor(i, motors[i]);
 }
-
-#ifdef __arm__
-} // extern "C"
-#endif

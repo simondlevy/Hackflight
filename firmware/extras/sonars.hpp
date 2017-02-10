@@ -17,32 +17,24 @@
 
 #pragma once
 
-#ifdef __arm__
-extern "C" {
-#endif
+class Sonars {
 
-    class Sonars {
-        
-        private:
+    private:
 
-            uint8_t  count;
-            bool     avail;
-            uint8_t  index;
-            bool     ready;
+        uint8_t  count;
+        bool     avail;
+        uint8_t  index;
+        bool     ready;
 
-        public:
+    public:
 
-            uint16_t getAltitude(void);
+        uint16_t getAltitude(void);
 
-            uint16_t distances[5];
+        uint16_t distances[5];
 
-            void init(void);
+        void init(void);
 
-            bool available(void);
+        bool available(void);
 
-            void update(void);
-    };
-
-#ifdef __arm__
-} // extern "C"
-#endif
+        void update(void);
+};

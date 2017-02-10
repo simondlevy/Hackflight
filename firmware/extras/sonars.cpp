@@ -15,10 +15,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef __arm__
-extern "C" {
-#endif
-
 #include "hackflight.hpp"
 
 void Sonars::init(void)
@@ -57,7 +53,3 @@ void Sonars::update(void)
     if (this->index == this->count-1)
         this->ready = true;
 }
-
-#ifdef __arm__
-} // extern "C"
-#endif
