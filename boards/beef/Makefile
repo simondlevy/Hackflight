@@ -22,9 +22,7 @@ F1_DIR = $(BREEZY_DIR)/f1
 
 SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM
 
-TARGET		?= BEEF
-
-CPP_OBJS = hackflight.o imu.o mixer.o msp.o rc.o board.o stabilize.o filters.o
+TARGET ?= BEEF
 
 # Compile-time options
 OPTIONS		?=
@@ -145,7 +143,15 @@ LDFLAGS	 = -lm \
 
 TARGET_HEX	 = $(BIN_DIR)/hackflight_$(TARGET).hex
 TARGET_ELF	 = $(BIN_DIR)/hackflight_$(TARGET).elf
-TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC)))) $(CPP_OBJS) \
+TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC)))) \
+			   $(OBJECT_DIR)/hackflight.o \
+			   $(OBJECT_DIR)/imu.o \
+			   $(OBJECT_DIR)/mixer.o \
+			   $(OBJECT_DIR)/msp.o \
+			   $(OBJECT_DIR)/rc.o \
+			   $(OBJECT_DIR)/stabilize.o \
+			   $(OBJECT_DIR)/filters.o \
+			   $(OBJECT_DIR)/board.o \
 			   $(OBJECT_DIR)/Arduino.o \
 			   $(OBJECT_DIR)/SpektrumDSM.o \
 			   $(OBJECT_DIR)/HardwareSerial.o \
@@ -162,7 +168,6 @@ $(TARGET_HEX): $(TARGET_ELF)
 
 $(TARGET_ELF):  $(TARGET_OBJS)
 	$(C++) -o $@ $^ $(LDFLAGS)
-	mv *.o obj
 
 MKDIR_OBJDIR = @mkdir -p $(dir $@)
 
@@ -182,6 +187,30 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 
 FIRMDIR = $(HACKFLIGHT_DIR)/firmware
 
+$(OBJECT_DIR)/hackflight.o: $(FIRMDIR)/hackflight.cpp $(FIRMDIR)/hackflight.hpp
+	@$(CC) -c -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) $(FIRMDIR)/hackflight.cpp
+
+$(OBJECT_DIR)/imu.o: $(FIRMDIR)/imu.cpp $(FIRMDIR)/imu.hpp
+	@$(CC) -c -o $(OBJECT_DIR)/imu.o $(CFLAGS) $(FIRMDIR)/imu.cpp
+
+$(OBJECT_DIR)/mixer.o: $(FIRMDIR)/mixer.cpp $(FIRMDIR)/mixer.hpp
+	@$(CC) -c -o $(OBJECT_DIR)/mixer.o $(CFLAGS) $(FIRMDIR)/mixer.cpp
+
+$(OBJECT_DIR)/msp.o: $(FIRMDIR)/msp.cpp $(FIRMDIR)/msp.hpp
+	@$(CC) -c -o $(OBJECT_DIR)/msp.o $(CFLAGS) $(FIRMDIR)/msp.cpp
+
+$(OBJECT_DIR)/rc.o: $(FIRMDIR)/rc.cpp $(FIRMDIR)/rc.hpp
+	@$(CC) -c -o $(OBJECT_DIR)/rc.o $(CFLAGS) $(FIRMDIR)/rc.cpp
+
+$(OBJECT_DIR)/stabilize.o: $(FIRMDIR)/stabilize.cpp $(FIRMDIR)/stabilize.hpp
+	@$(CC) -c -o $(OBJECT_DIR)/stabilize.o $(CFLAGS) $(FIRMDIR)/stabilize.cpp
+
+$(OBJECT_DIR)/filters.o: $(FIRMDIR)/filters.cpp $(FIRMDIR)/filters.hpp
+	@$(CC) -c -o $(OBJECT_DIR)/filters.o $(CFLAGS) $(FIRMDIR)/filters.cpp
+
+$(OBJECT_DIR)/board.o: board.cpp $(FIRMDIR)/board.hpp
+	@$(CC) -I$(FIRMDIR) -c -o $(OBJECT_DIR)/board.o $(CFLAGS) board.cpp
+
 $(OBJECT_DIR)/Arduino.o: $(F1_DIR)/Arduino.cpp
 	@$(CC) -c -o $(OBJECT_DIR)/Arduino.o $(CFLAGS) $(F1_DIR)/Arduino.cpp
 
@@ -199,54 +228,6 @@ $(OBJECT_DIR)/MPU6050.o: $(F1_DIR)/MPU6050.cpp
 
 $(OBJECT_DIR)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h
 	@$(CC) -c -o $(OBJECT_DIR)/SpektrumDSM.o $(CFLAGS) $(SPEKTRUM_DIR)/SpektrumDSM.cpp
-
-hhackflight.o: $(FIRMDIR)/hackflight.cpp $(FIRMDIR)/hackflight.hpp $(FIRMDIR)/rc.hpp
-	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o hackflight.o $(FIRMDIR)/hackflight.cpp
-
-imu.o: $(FIRMDIR)/imu.cpp $(FIRMDIR)/imu.hpp
-	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o imu.o $(FIRMDIR)/imu.cpp
-
-mixer.o: $(FIRMDIR)/mixer.cpp $(FIRMDIR)/mixer.hpp $(FIRMDIR)/rc.hpp
-	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o mixer.o $(FIRMDIR)/mixer.cpp
-
-stabilize.o: $(FIRMDIR)/stabilize.cpp $(FIRMDIR)/stabilize.hpp
-	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o stabilize.o $(FIRMDIR)/stabilize.cpp
-
-msp.o: $(FIRMDIR)/msp.cpp $(FIRMDIR)/msp.hpp $(FIRMDIR)/rc.hpp
-	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o msp.o $(FIRMDIR)/msp.cpp
-
-baro.o: $(FIRMDIR)/baro.cpp $(FIRMDIR)/baro.hpp
-	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o baro.o $(FIRMDIR)/baro.cpp
-
-sonars.o: $(FIRMDIR)/sonars.cpp $(FIRMDIR)/sonars.hpp
-	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o sonars.o $(FIRMDIR)/sonars.cpp
-
-rc.o: $(FIRMDIR)/rc.cpp $(FIRMDIR)/rc.hpp
-	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o rc.o $(FIRMDIR)/rc.cpp
-
-hover.o: $(FIRMDIR)/hover.cpp $(FIRMDIR)/hover.hpp $(FIRMDIR)/rc.hpp
-	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o hover.o $(FIRMDIR)/hover.cpp
-
-filters.o: $(FIRMDIR)/filters.cpp $(FIRMDIR)/filters.hpp $(FIRMDIR)/rc.hpp
-	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o filters.o $(FIRMDIR)/filters.cpp
-
-hackflight.o: $(FIRMDIR)/hackflight.cpp $(FIRMDIR)/hackflight.hpp $(FIRMDIR)/rc.hpp
-	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -c -o hackflight.o $(FIRMDIR)/hackflight.cpp
-
-board.o: board.cpp $(FIRMDIR)/board.hpp
-	@echo %% $(notdir $<)
-	@$(CC) $(CFLAGS) -I$(FIRMDIR) -c -o board.o board.cpp
 
 clean:
 	rm -rf *.o obj $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP)
