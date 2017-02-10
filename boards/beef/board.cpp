@@ -20,9 +20,10 @@
 extern "C" {
 
 #include <Arduino.h>
+#include <Servo.h>
 #include <SpektrumDSM.h>
+#include <MPU6050.h>
 
-#include <breezystm32.h>
 #include <math.h>
 
 #include "board.hpp"
@@ -30,7 +31,6 @@ extern "C" {
 #define IMU_LOOPTIME_USEC       3500
 #define CALIBRATING_GYRO_MSEC   3500
 
-#include <MPU6050.h>
 MPU6050 imu;
 
 SpektrumDSM2048 rx;
@@ -69,10 +69,10 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
     Wire.begin();
 
-    pwmInit(0, 8,  32000, 0);
-    pwmInit(1, 11, 32000, 0);
-    pwmInit(2, 6,  32000, 0);
-    pwmInit(3, 7,  32000, 0);
+    Servo::init(0, 8,  32000, 0);
+    Servo::init(1, 11, 32000, 0);
+    Servo::init(2, 6,  32000, 0);
+    Servo::init(3, 7,  32000, 0);
 
     looptimeMicroseconds = IMU_LOOPTIME_USEC;
     calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
@@ -159,7 +159,7 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
-    pwmWriteBrushed(index, value);
+    Servo::writeBrushed(index, value);
 }
 
 void Board::showArmedStatus(bool armed)
