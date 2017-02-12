@@ -25,7 +25,7 @@ FMUPORT = '/dev/ttyACM0'
 VEHICLE_SCALE = 0.10
 UPDATE_MSEC = 10
 
-import Tkinter as tk
+import tkinter as tk
 import threading
 import serial
 import msppg
