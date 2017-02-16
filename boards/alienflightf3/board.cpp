@@ -170,6 +170,7 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
+    (void)index;
     //motors[index].setSpeed(value);
 }
 
