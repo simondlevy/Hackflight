@@ -29,8 +29,6 @@ F3_DIR = $(BREEZY_DIR)/f3
 
 SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM
 
-MPU6050_DIR = $(ARDUINO_DIR)/MPU6050
-
 256K_TARGETS = ALIENFLIGHTF3 
 
 F3_TARGETS = ALIENFLIGHTF3 
@@ -92,7 +90,6 @@ CMSIS_SRC	 = $(notdir $(wildcard $(CMSIS_DIR)/CM1/CoreSupport/*.c \
 INCLUDE_DIRS := $(INCLUDE_DIRS) \
 		   $(STDPERIPH_DIR)/inc \
 		   $(SPEKTRUM_DIR) \
-		   $(MPU6050_DIR) \
 		   $(CMSIS_DIR)/CM1/CoreSupport \
 		   $(CMSIS_DIR)/CM1/DeviceSupport/ST/STM32F30x
 
@@ -173,6 +170,7 @@ VCP_SRC = \
 
 STM32F30x_COMMON_SRC = \
 		   startup_stm32f30x_md_gcc.S \
+		   bus_i2c_stm32f30x.c \
 		   target/system_stm32f30x.c \
 		   gpio_stm32f30x.c \
 		   light_led_stm32f30x.c \
@@ -295,7 +293,6 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(
 			   $(OBJECT_DIR)/$(TARGET)/filters.o \
 			   $(OBJECT_DIR)/$(TARGET)/board.o \
 			   $(OBJECT_DIR)/$(TARGET)/Arduino.o \
-			   $(OBJECT_DIR)/$(TARGET)/HardwareWire.o \
 			   $(OBJECT_DIR)/$(TARGET)/SpektrumDSM.o \
 			   $(OBJECT_DIR)/$(TARGET)/MPU6050.o \
 			   $(OBJECT_DIR)/$(TARGET)/Motor.o
@@ -426,8 +423,8 @@ $(OBJECT_DIR)/$(TARGET)/Motor.o: $(F3_DIR)/Motor.cpp $(F3_DIR)/Wire.h
 $(OBJECT_DIR)/$(TARGET)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/SpektrumDSM.o $(CFLAGS) $(SPEKTRUM_DIR)/SpektrumDSM.cpp
 
-$(OBJECT_DIR)/$(TARGET)/MPU6050.o: $(MPU6050_DIR)/MPU6050.cpp $(MPU6050_DIR)/MPU6050.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/MPU6050.o $(CFLAGS) $(MPU6050_DIR)/MPU6050.cpp
+$(OBJECT_DIR)/$(TARGET)/MPU6050.o: MPU6050.cpp MPU6050.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/MPU6050.o $(CFLAGS) MPU6050.cpp
 
 commit:
 	git commit -a --allow-empty-message -m ''
@@ -435,6 +432,3 @@ commit:
 
 listen:
 	miniterm.py $(SERIAL_DEVICE)
-
-# include auto-generated dependencies
--include $(TARGET_DEPS)

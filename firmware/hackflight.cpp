@@ -85,7 +85,7 @@ static uint16_t calibratingG;
 static bool     haveSmallAngle;
 static bool     armed;
 
-extern "C" {
+extern "C" { // necessary so that Arduino.cpp can call setup(), loop()
 
 void setup(void)
 {
@@ -149,14 +149,12 @@ void loop(void)
 
     bool rcSerialReady = Board::rcSerialReady();
 
-    if (rcTask.checkAndUpdate(currentTime)  || rcSerialReady) {
+    if (rcTask.checkAndUpdate(currentTime) || rcSerialReady) {
 
         // update RC channels
         rc.update();
 
         rcSerialReady = false;
-
-		//printf("%d %d %d %d (%d)\n", rc.data[0], rc.data[1], rc.data[2], rc.data[3], rc.auxState());
 
         // useful for simulator
         if (armed)
@@ -216,12 +214,11 @@ void loop(void)
 
         if (taskOrder >= Board::extrasGetTaskCount()) // using >= supports zero or more tasks
             taskOrder = 0;
- }
+    }
 
     currentTime = Board::getMicros();
 
     if (imuTask.checkAndUpdate(currentTime)) {
-
 
         imu.update(currentTime, armed, calibratingA, calibratingG);
 
@@ -275,6 +272,7 @@ void loop(void)
         mixer.update(armed);
 
     } // IMU update
+
 
 } // loop()
 

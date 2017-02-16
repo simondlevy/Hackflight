@@ -17,10 +17,13 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+extern "C" {
+
 #include <Arduino.h>
 #include <Motor.h>
 #include <SpektrumDSM.h>
 #include <MPU6050.h>
+#include <bus_i2c.h>
 
 #include <math.h>
 
@@ -78,7 +81,9 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
     Serial.begin(115200);
 
-    Wire.begin();
+    i2cInit(I2CDEV_2);
+
+    //Wire.begin();
 
     //motors[0].attach(8);
     //motors[1].attach(11);
@@ -209,4 +214,6 @@ bool Board::extrasHandleMSP(uint8_t command)
 void Board::extrasPerformTask(uint8_t taskIndex)
 {
     (void)taskIndex;
-}
+} 
+
+} // extern "C"
