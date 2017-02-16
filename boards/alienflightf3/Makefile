@@ -236,6 +236,7 @@ CFLAGS		 = $(ARCH_FLAGS) \
 		   -ffunction-sections \
 		   -fdata-sections \
 		   $(DEVICE_FLAGS) \
+		   -DEXTERNAL_DEBUG \
 		   -DUSE_STDPERIPH_DRIVER \
 		   $(TARGET_FLAGS) \
 		   -D'__TARGET__="$(TARGET)"' \

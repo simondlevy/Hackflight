@@ -54,7 +54,16 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
-    imu->getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
+    int16_t ax, ay, az, gx, gy, gz;
+
+    imu->getMotion6Counts(&ax, &ay, &az, &gx, &gy, &gz);
+
+    accADC[0]  = -ay;
+    accADC[1]  = ax;
+    accADC[2]  = az;
+    gyroADC[0] = -gy;
+    gyroADC[1] = gx;
+    gyroADC[2] = gz;
 
     for (int k=0; k<3; ++k)
         gyroADC[k] /= 4;
@@ -71,10 +80,10 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
     Wire.begin();
 
-    motors[0].attach(8);
-    motors[1].attach(11);
-    motors[2].attach(6);
-    motors[3].attach(7);
+    //motors[0].attach(8);
+    //motors[1].attach(11);
+    //motors[2].attach(6);
+    //motors[3].attach(7);
 
     looptimeMicroseconds = IMU_LOOPTIME_USEC;
     calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
@@ -161,19 +170,18 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
-    motors[index].setSpeed(value);
+    //motors[index].setSpeed(value);
 }
 
 void Board::showArmedStatus(bool armed)
 {
     // XXX this would be a good place to sound a buzzer!
-
-    armed = armed; // avoid compiler warning about unused variable
+    (void)armed;
 }
  
 void Board::showAuxStatus(uint8_t status)
 {
-    status = status; // avoid compiler warning about unused variable
+    (void)status;
 }
  
 void Board::extrasInit(class MSP * _msp) 
