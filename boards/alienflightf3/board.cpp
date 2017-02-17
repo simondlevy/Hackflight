@@ -20,10 +20,10 @@
 extern "C" {
 
 #include <Arduino.h>
+#include <Wire.h>
 #include <Motor.h>
 #include <SpektrumDSM.h>
 #include <MPU6050.h>
-#include <bus_i2c.h>
 
 #include <math.h>
 
@@ -81,7 +81,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
     Serial.begin(115200);
 
-    i2cInit(I2CDEV_2);
+    Wire.begin();
 
     //Wire.begin();
 

@@ -170,7 +170,6 @@ VCP_SRC = \
 
 STM32F30x_COMMON_SRC = \
 		   startup_stm32f30x_md_gcc.S \
-		   bus_i2c_stm32f30x.c \
 		   target/system_stm32f30x.c \
 		   gpio_stm32f30x.c \
 		   light_led_stm32f30x.c \
@@ -293,6 +292,7 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(
 			   $(OBJECT_DIR)/$(TARGET)/filters.o \
 			   $(OBJECT_DIR)/$(TARGET)/board.o \
 			   $(OBJECT_DIR)/$(TARGET)/Arduino.o \
+			   $(OBJECT_DIR)/$(TARGET)/HardwareWire.o \
 			   $(OBJECT_DIR)/$(TARGET)/SpektrumDSM.o \
 			   $(OBJECT_DIR)/$(TARGET)/MPU6050.o \
 			   $(OBJECT_DIR)/$(TARGET)/Motor.o
@@ -423,8 +423,8 @@ $(OBJECT_DIR)/$(TARGET)/Motor.o: $(F3_DIR)/Motor.cpp $(F3_DIR)/Wire.h
 $(OBJECT_DIR)/$(TARGET)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/SpektrumDSM.o $(CFLAGS) $(SPEKTRUM_DIR)/SpektrumDSM.cpp
 
-$(OBJECT_DIR)/$(TARGET)/MPU6050.o: MPU6050.cpp MPU6050.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/MPU6050.o $(CFLAGS) MPU6050.cpp
+$(OBJECT_DIR)/$(TARGET)/MPU6050.o: $(F3_DIR)/MPU6050.cpp $(F3_DIR)/MPU6050.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/MPU6050.o $(CFLAGS) $(F3_DIR)/MPU6050.cpp
 
 commit:
 	git commit -a --allow-empty-message -m ''
