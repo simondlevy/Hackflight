@@ -85,7 +85,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
     //Wire.begin();
 
-    //motors[0].attach(8);
+    motors[0].attach(7);
     //motors[1].attach(11);
     //motors[2].attach(6);
     //motors[3].attach(7);
@@ -175,9 +175,8 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
-    (void)index;
-    (void)value;
-    //motors[index].setSpeed(value);
+    if (index == 0)
+        motors[index].setSpeed(value);
 }
 
 void Board::showArmedStatus(bool armed)
