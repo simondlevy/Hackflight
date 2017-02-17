@@ -155,7 +155,7 @@ uint16_t Board::readPWM(uint8_t chan)
 
 void Board::reboot(void)
 {
-    systemReset();      // reboot to bootloader
+    systemResetToBootloader();
 }
 
 uint8_t Board::serialAvailableBytes(void)
