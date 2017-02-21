@@ -62,7 +62,7 @@ OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 #CMSIS_DIR	 = $(ROOT)/lib/CMSIS
 CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
-INCLUDE_DIRS = $(F3_DIR) $(SRC_DIR) $(SRC_DIR)/target $(FIRMWARE_DIR) .
+INCLUDE_DIRS = $(BREEZY_DIR) $(F3_DIR) $(SRC_DIR) $(SRC_DIR)/target $(FIRMWARE_DIR) .
 LINKER_DIR	 = $(SRC_DIR)/target
 
 # Search path for sources
@@ -417,10 +417,10 @@ $(OBJECT_DIR)/$(TARGET)/board.o: board.cpp
 $(OBJECT_DIR)/$(TARGET)/Arduino.o: $(F3_DIR)/Arduino.cpp $(F3_DIR)/Arduino.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/Arduino.o $(CFLAGS) $(F3_DIR)/Arduino.cpp
 
-$(OBJECT_DIR)/$(TARGET)/HardwareWire.o: $(F3_DIR)/HardwareWire.cpp $(F3_DIR)/Wire.h
+$(OBJECT_DIR)/$(TARGET)/HardwareWire.o: $(F3_DIR)/HardwareWire.cpp $(BREEZY_DIR)/Wire.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/HardwareWire.o $(CFLAGS) $(F3_DIR)/HardwareWire.cpp
 
-$(OBJECT_DIR)/$(TARGET)/Motor.o: $(F3_DIR)/Motor.cpp $(F3_DIR)/Wire.h
+$(OBJECT_DIR)/$(TARGET)/Motor.o: $(F3_DIR)/Motor.cpp 
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/Motor.o $(CFLAGS) $(F3_DIR)/Motor.cpp
 
 $(OBJECT_DIR)/$(TARGET)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h

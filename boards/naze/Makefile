@@ -80,6 +80,7 @@ OBJCOPY	 = arm-none-eabi-objcopy
 # Tool options.
 #
 INCLUDE_DIRS = . \
+			   $(BREEZY_DIR) \
 			   $(F1_DIR) \
 			   $(MPU6050_DIR) \
 			   $(SPEKTRUM_DIR) \
