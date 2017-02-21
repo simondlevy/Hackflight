@@ -20,7 +20,6 @@
 extern "C" {
 
 #include <Arduino.h>
-#include <Wire.h>
 #include <Motor.h>
 #include <SpektrumDSM.h>
 #include <MPU6050.h>
