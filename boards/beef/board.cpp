@@ -29,7 +29,7 @@
 #define IMU_LOOPTIME_USEC       3500
 #define CALIBRATING_GYRO_MSEC   3500
 
-MPU6050 imu;
+MPU6050 * imu;
 
 SpektrumDSM2048 rx;
 
@@ -43,7 +43,9 @@ void Board::dump(char * msg)
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
-    imu.begin(AFS_8G, GFS_2000DPS);
+    imu = new MPU6050();
+
+    imu->begin(AFS_8G, GFS_2000DPS);
 
     acc1G = 4096;
     gyroScale = (1.0f / 16.4f) * (M_PI / 180.0f);
@@ -52,7 +54,7 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
-    imu.getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
+    imu->getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
 
     for (int k=0; k<3; ++k)
         gyroADC[k] /= 4;

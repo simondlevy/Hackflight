@@ -20,6 +20,8 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 F1_DIR = $(BREEZY_DIR)/f1
 
+MPU6050_DIR = $(ARDUINO_DIR)/MPU6050
+
 SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM
 
 TARGET ?= BEEF
@@ -79,6 +81,7 @@ OBJCOPY	 = arm-none-eabi-objcopy
 #
 INCLUDE_DIRS = . \
 			   $(F1_DIR) \
+			   $(MPU6050_DIR) \
 			   $(SPEKTRUM_DIR) \
 			   $(STDPERIPH_DIR)/inc \
 			   $(CMSIS_DIR)/CM3/CoreSupport \
@@ -145,12 +148,10 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(
 			   $(OBJECT_DIR)/board.o \
 			   $(OBJECT_DIR)/Arduino.o \
 			   $(OBJECT_DIR)/SpektrumDSM.o \
-			   $(OBJECT_DIR)/HardwareSerial.o \
 			   $(OBJECT_DIR)/HardwareWire.o \
 			   $(OBJECT_DIR)/Motor.o \
 			   $(OBJECT_DIR)/MPU6050.o \
 			   $(OBJECT_DIR)/drv_system.o \
-			   $(OBJECT_DIR)/drv_i2c.o \
 			   $(OBJECT_DIR)/drv_serial.o \
 			   $(OBJECT_DIR)/drv_gpio.o \
 			   $(OBJECT_DIR)/drv_uart.o \
@@ -213,9 +214,6 @@ $(OBJECT_DIR)/board.o: board.cpp $(FIRMDIR)/board.hpp
 $(OBJECT_DIR)/Arduino.o: $(F1_DIR)/Arduino.cpp
 	@$(CC) -c -o $(OBJECT_DIR)/Arduino.o $(CFLAGS) $(F1_DIR)/Arduino.cpp
 
-$(OBJECT_DIR)/HardwareSerial.o: $(F1_DIR)/HardwareSerial.cpp
-	@$(CC) -c -o $(OBJECT_DIR)/HardwareSerial.o $(CFLAGS) $(F1_DIR)/HardwareSerial.cpp
-
 $(OBJECT_DIR)/HardwareWire.o: $(F1_DIR)/HardwareWire.cpp
 	@$(CC) -c -o $(OBJECT_DIR)/HardwareWire.o $(CFLAGS) $(F1_DIR)/HardwareWire.cpp
 
@@ -243,8 +241,8 @@ $(OBJECT_DIR)/startup_stm32f10x_md_gcc.o: $(F1_DIR)/startup_stm32f10x_md_gcc.S
 $(OBJECT_DIR)/Motor.o: $(F1_DIR)/Motor.cpp
 	@$(CC) -c -o $(OBJECT_DIR)/Motor.o $(CFLAGS) $(F1_DIR)/Motor.cpp
 
-$(OBJECT_DIR)/MPU6050.o: $(F1_DIR)/MPU6050.cpp
-	@$(CC) -c -o $(OBJECT_DIR)/MPU6050.o $(CFLAGS) $(F1_DIR)/MPU6050.cpp
+$(OBJECT_DIR)/MPU6050.o: $(MPU6050_DIR)/MPU6050.cpp $(MPU6050_DIR)/MPU6050.h
+	@$(CC) -c -o $(OBJECT_DIR)/MPU6050.o $(CFLAGS) $(MPU6050_DIR)/MPU6050.cpp
 
 $(OBJECT_DIR)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h
 	@$(CC) -c -o $(OBJECT_DIR)/SpektrumDSM.o $(CFLAGS) $(SPEKTRUM_DIR)/SpektrumDSM.cpp
