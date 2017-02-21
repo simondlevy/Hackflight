@@ -5,7 +5,7 @@ FIRMWARE_DIR = $(HOME)/Desktop/hackflight/firmware
 PROJECT = Hackflight
 
 # Change this to wherever you put Arduino libraries
-ARDUINO_DIR = $(HOME)/Development/arduino-1.6.13/hardware/teensy/avr/libraries
+ARDUINO_DIR = $(HOME)/Development/arduino-1.8.1/hardware/teensy/avr/libraries
 
 # The target to build, see VALID_TARGETS below
 TARGET		?= ALIENFLIGHTF3
@@ -25,7 +25,7 @@ FLASH_SIZE ?=
 
 ###############################################################################
 
-F3_DIR = $(BREEZY_DIR)/f3
+F3_DIR = $(BREEZY_DIR)/f3/alienflightf3
 
 SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM
 
