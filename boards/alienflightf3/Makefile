@@ -414,7 +414,7 @@ $(OBJECT_DIR)/$(TARGET)/filters.o: $(FIRMWARE_DIR)/filters.cpp
 $(OBJECT_DIR)/$(TARGET)/board.o: board.cpp 
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/board.o $(CFLAGS) board.cpp 
 
-$(OBJECT_DIR)/$(TARGET)/Arduino.o: $(F3_DIR)/Arduino.cpp $(F3_DIR)/Arduino.h
+$(OBJECT_DIR)/$(TARGET)/Arduino.o: $(F3_DIR)/Arduino.cpp $(BREEZY_DIR)/Arduino.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/Arduino.o $(CFLAGS) $(F3_DIR)/Arduino.cpp
 
 $(OBJECT_DIR)/$(TARGET)/HardwareWire.o: $(F3_DIR)/HardwareWire.cpp $(BREEZY_DIR)/Wire.h

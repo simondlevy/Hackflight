@@ -83,7 +83,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 void Board::checkReboot(bool pendReboot)
 {
     if (pendReboot)
-        systemReset(false); // noreturn
+        reset(); // noreturn
 }
 
 void Board::delayMilliseconds(uint32_t msec)
@@ -141,7 +141,7 @@ uint16_t Board::readPWM(uint8_t chan)
 
 void Board::reboot(void)
 {
-    systemReset(true);      // reboot to bootloader
+    resetToBootloader();
 }
 
 uint8_t Board::serialAvailableBytes(void)
