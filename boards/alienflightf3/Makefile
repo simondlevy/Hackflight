@@ -25,7 +25,8 @@ FLASH_SIZE ?=
 
 ###############################################################################
 
-F3_DIR = $(BREEZY_DIR)/f3/alienflightf3
+F3_DIR = $(BREEZY_DIR)/f3
+ALIENFLIGHTF3_DIR = $(F3_DIR)/alienflightf3
 
 SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM
 
@@ -57,12 +58,12 @@ REVISION := $(shell git log -1 --format="%h")
 # Working directories
 #ROOT		 := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
-SRC_DIR		 = $(F3_DIR)
+SRC_DIR		 = $(ALIENFLIGHTF3_DIR)
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 #CMSIS_DIR	 = $(ROOT)/lib/CMSIS
 CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
-INCLUDE_DIRS = $(BREEZY_DIR) $(F3_DIR) $(SRC_DIR) $(SRC_DIR)/target $(FIRMWARE_DIR) .
+INCLUDE_DIRS = $(BREEZY_DIR) $(ALIENFLIGHTF3_DIR) $(SRC_DIR) $(SRC_DIR)/target $(FIRMWARE_DIR) .
 LINKER_DIR	 = $(SRC_DIR)/target
 
 # Search path for sources
@@ -175,7 +176,6 @@ STM32F30x_COMMON_SRC = \
 		   startup_stm32f30x_md_gcc.S \
 		   target/system_stm32f30x.c \
 		   gpio_stm32f30x.c \
-		   light_led_stm32f30x.c \
 		   serial_uart.c \
 		   serial_uart_stm32f30x.c \
 		   system_stm32f30x.c
@@ -187,7 +187,8 @@ ALIENFLIGHTF3_SRC = \
 		   serial_usb_vcp.c \
 		   $(FC_COMMON_SRC) \
 		   $(SYSTEM_SRC) \
-		   $(VCP_SRC)
+		   $(VCP_SRC) \
+		   target.c
 
 VPATH		:= $(VPATH):$(STDPERIPH_DIR)/src
 
@@ -417,11 +418,11 @@ $(OBJECT_DIR)/$(TARGET)/board.o: board.cpp
 $(OBJECT_DIR)/$(TARGET)/Arduino.o: $(F3_DIR)/Arduino.cpp $(BREEZY_DIR)/Arduino.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/Arduino.o $(CFLAGS) $(F3_DIR)/Arduino.cpp
 
-$(OBJECT_DIR)/$(TARGET)/HardwareWire.o: $(F3_DIR)/HardwareWire.cpp $(BREEZY_DIR)/Wire.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/HardwareWire.o $(CFLAGS) $(F3_DIR)/HardwareWire.cpp
+$(OBJECT_DIR)/$(TARGET)/HardwareWire.o: $(ALIENFLIGHTF3_DIR)/HardwareWire.cpp $(BREEZY_DIR)/Wire.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/HardwareWire.o $(CFLAGS) $(ALIENFLIGHTF3_DIR)/HardwareWire.cpp
 
-$(OBJECT_DIR)/$(TARGET)/Motor.o: $(F3_DIR)/Motor.cpp 
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/Motor.o $(CFLAGS) $(F3_DIR)/Motor.cpp
+$(OBJECT_DIR)/$(TARGET)/Motor.o: $(ALIENFLIGHTF3_DIR)/Motor.cpp 
+	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/Motor.o $(CFLAGS) $(ALIENFLIGHTF3_DIR)/Motor.cpp
 
 $(OBJECT_DIR)/$(TARGET)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/SpektrumDSM.o $(CFLAGS) $(SPEKTRUM_DIR)/SpektrumDSM.cpp
