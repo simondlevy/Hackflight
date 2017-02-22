@@ -27,6 +27,7 @@ FLASH_SIZE ?=
 
 F3_DIR = $(BREEZY_DIR)/f3
 ALIENFLIGHTF3_DIR = $(F3_DIR)/alienflightf3
+VCP_DIR = $(ALIENFLIGHTF3_DIR)/vcp
 
 SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM
 
@@ -63,8 +64,8 @@ OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 #CMSIS_DIR	 = $(ROOT)/lib/CMSIS
 CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
-INCLUDE_DIRS = $(BREEZY_DIR) $(ALIENFLIGHTF3_DIR) $(SRC_DIR) $(SRC_DIR)/target $(FIRMWARE_DIR) .
-LINKER_DIR	 = $(SRC_DIR)/target
+INCLUDE_DIRS = $(BREEZY_DIR) $(F3_DIR) $(ALIENFLIGHTF3_DIR) $(SRC_DIR) $(SRC_DIR)/target $(FIRMWARE_DIR) .
+LINKER_DIR	 = $(F3_DIR)
 
 # Search path for sources
 VPATH		:= $(SRC_DIR):$(SRC_DIR)/startup
@@ -150,45 +151,45 @@ INCLUDE_DIRS := \
 VPATH		:= $(VPATH):$(TARGET_DIR)
 
 SYSTEM_SRC = \
-		   dma.c \
-		   serial.c \
-		   system.c \
+		   $(F3_DIR)/dma.c \
+		   $(F3_DIR)/serial.c \
+		   $(F3_DIR)/system.c \
 		   $(TARGET_SRC) \
 		   $(CMSIS_SRC) \
 		   $(DEVICE_STDPERIPH_SRC)
 
 FC_COMMON_SRC = \
-   	       exti.c \
-		   io.c \
+   	       $(F3_DIR)/exti.c \
+		   $(F3_DIR)/io.c \
 
 VCP_SRC = \
-		   vcp/hw_config.c \
-		   vcp/stm32_it.c \
-		   vcp/usb_desc.c \
-		   vcp/usb_endp.c \
-		   vcp/usb_istr.c \
-		   vcp/usb_prop.c \
-		   vcp/usb_pwr.c \
-		   serial_usb_vcp.c \
-		   usb_io.c
+		   $(VCP_DIR)/hw_config.c \
+		   $(VCP_DIR)/stm32_it.c \
+		   $(VCP_DIR)/usb_desc.c \
+		   $(VCP_DIR)/usb_endp.c \
+		   $(VCP_DIR)/usb_istr.c \
+		   $(VCP_DIR)/usb_prop.c \
+		   $(VCP_DIR)/usb_pwr.c \
+		   $(ALIENFLIGHTF3_DIR)/serial_usb_vcp.c \
+		   $(ALIENFLIGHTF3_DIR)/usb_io.c
 
 STM32F30x_COMMON_SRC = \
-		   startup_stm32f30x_md_gcc.S \
-		   target/system_stm32f30x.c \
-		   gpio_stm32f30x.c \
-		   serial_uart.c \
-		   serial_uart_stm32f30x.c \
-		   system_stm32f30x.c
+		   $(F3_DIR)/startup_stm32f30x_md_gcc.S \
+		   $(ALIENFLIGHTF3_DIR)/system_stm32f30x.c \
+		   $(F3_DIR)/gpio_stm32f30x.c \
+		   $(F3_DIR)/serial_uart.c \
+		   $(F3_DIR)/serial_uart_stm32f30x.c \
+		   $(F3_DIR)/system_stm32f30x.c
 
 ALIENFLIGHTF3_SRC = \
-		   $(STM32F30x_COMMON_SRC) \
-		   timer.c \
-		   timer_stm32f30x.c \
-		   serial_usb_vcp.c \
-		   $(FC_COMMON_SRC) \
 		   $(SYSTEM_SRC) \
-		   $(VCP_SRC) \
-		   target.c
+		   $(FC_COMMON_SRC) \
+		   $(STM32F30x_COMMON_SRC) \
+		   $(F3_DIR)/timer_stm32f30x.c \
+		   $(ALIENFLIGHTF3_DIR)/timer.c \
+		   $(ALIENFLIGHTF3_DIR)/serial_usb_vcp.c \
+		   $(ALIENFLIGHTF3_DIR)/target.c \
+		   $(VCP_SRC)
 
 VPATH		:= $(VPATH):$(STDPERIPH_DIR)/src
 
@@ -418,11 +419,11 @@ $(OBJECT_DIR)/$(TARGET)/board.o: board.cpp
 $(OBJECT_DIR)/$(TARGET)/Arduino.o: $(F3_DIR)/Arduino.cpp $(BREEZY_DIR)/Arduino.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/Arduino.o $(CFLAGS) $(F3_DIR)/Arduino.cpp
 
-$(OBJECT_DIR)/$(TARGET)/HardwareWire.o: $(ALIENFLIGHTF3_DIR)/HardwareWire.cpp $(BREEZY_DIR)/Wire.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/HardwareWire.o $(CFLAGS) $(ALIENFLIGHTF3_DIR)/HardwareWire.cpp
+$(OBJECT_DIR)/$(TARGET)/HardwareWire.o: $(F3_DIR)/HardwareWire.cpp $(BREEZY_DIR)/Wire.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/HardwareWire.o $(CFLAGS) $(F3_DIR)/HardwareWire.cpp
 
-$(OBJECT_DIR)/$(TARGET)/Motor.o: $(ALIENFLIGHTF3_DIR)/Motor.cpp 
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/Motor.o $(CFLAGS) $(ALIENFLIGHTF3_DIR)/Motor.cpp
+$(OBJECT_DIR)/$(TARGET)/Motor.o: $(F3_DIR)/Motor.cpp 
+	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/Motor.o $(CFLAGS) $(F3_DIR)/Motor.cpp
 
 $(OBJECT_DIR)/$(TARGET)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/SpektrumDSM.o $(CFLAGS) $(SPEKTRUM_DIR)/SpektrumDSM.cpp
