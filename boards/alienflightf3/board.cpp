@@ -80,9 +80,7 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
     Serial.begin(115200);
 
-    Wire.begin();
-
-    //Wire.begin();
+    Wire.begin(2);
 
     motors[0].attach(15);
     motors[1].attach(14);
