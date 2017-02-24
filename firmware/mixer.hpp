@@ -17,8 +17,6 @@
 
 #pragma once
 
-#define CONFIG_YAW_DIRECTION     1
-
 #ifdef __arm__
 extern "C" {
 #endif
