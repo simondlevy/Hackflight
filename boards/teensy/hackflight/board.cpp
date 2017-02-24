@@ -117,11 +117,25 @@ uint32_t Board::getMicros()
     return micros();
 }
 
-void Board::ledSetState(uint8_t id, bool state)
+void Board::ledGreenOff(void)
 {
-    digitalWrite(13, state); // we only have one LED
+    digitalWrite(13, LOW);
 }
 
+void Board::ledGreenOn(void)
+{
+    digitalWrite(13, HIGH);
+}
+
+void Board::ledRedOff(void)
+{
+    digitalWrite(13, LOW);
+}
+
+void Board::ledRedOn(void)
+{
+    digitalWrite(13, HIGH);
+}
 
 bool Board::rcUseSerial(void)
 { 
@@ -160,11 +174,10 @@ void Board::serialDebugByte(uint8_t c)
     Serial.write(c);
 }
 
-void Board::writeMotor(uint8_t index, float value)
+void Board::writeMotor(uint8_t index, uint16_t value)
 { 
-  uint8_t analogValue = (uint8_t)(value * 255);
-
-  analogWrite(MOTOR_PINS[index], analogValue);
+    (void)index;
+    (void)value;
 }
 
 // Unused -------------------------------------------------------------------------

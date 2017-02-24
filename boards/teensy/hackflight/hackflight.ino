@@ -92,20 +92,6 @@ static bool     armed;
 
 // LED support
 
-static bool ledGreenOn;
-
-static void toggleGreenLED(void)
-{
-    if (ledGreenOn) {
-        Board::ledSetState(0, true);
-        ledGreenOn = false;
-    }
-    else {
-        Board::ledSetState(0, false);
-        ledGreenOn = true;
-    }
-}
-
 void setup(void)
 {
     uint32_t calibratingGyroMsec;
@@ -117,16 +103,16 @@ void setup(void)
     Board::delayMilliseconds(100);
 
     // Turn off LEDs to start
-    Board::ledSetState(0, false);
-    Board::ledSetState(1, false);
-    ledGreenOn = false;
-
-    // flash the green LED to indicate startup
+    Board::ledRedOff();
+    Board::ledGreenOff();
     for (uint8_t i = 0; i < 10; i++) {
+        Board::ledRedOn();
+        Board::ledGreenOn();
         Board::delayMilliseconds(50);
-        toggleGreenLED();
+        Board::ledRedOff();
+        Board::ledGreenOff();
+        Board::delayMilliseconds(50);
     }
-    Board::ledSetState(0, false);
 
     // compute cycles for calibration based on board's time constant
     calibratingGyroCycles = (uint16_t)(1000. * calibratingGyroMsec / imuLooptimeUsec);
@@ -244,27 +230,37 @@ void loop(void)
         rc.computeExpo();
 
         // use LEDs to indicate calibration status
-        if (calibratingA > 0 || calibratingG > 0) 
-            Board::ledSetState(0, true);
+        if (calibratingA > 0 || calibratingG > 0)  {
+            Board::ledGreenOn();
+        }
         else {
             if (accCalibrated)
-                Board::ledSetState(0, false);
+                Board::ledGreenOff();
             if (armed)
-                Board::ledSetState(1, true);
+                Board::ledRedOn();
             else
-                Board::ledSetState(1, false);
+                Board::ledRedOff();
         }
 
         // periodically update accelerometer calibration status
+        static bool on;
         if (accelCalibrationTask.check(currentTime)) {
             if (!haveSmallAngle) {
                 accCalibrated = false; 
-                toggleGreenLED();
+                if (on) {
+                    Board::ledGreenOff();
+                    on = false;
+                }
+                else {
+                    Board::ledGreenOn();
+                    on = true;
+                }
                 accelCalibrationTask.update(currentTime);
             } else {
                 accCalibrated = true;
             }
         }
+
 
         // handle serial communications
         msp.update(armed);

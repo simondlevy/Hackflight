@@ -27,6 +27,7 @@ class Board {
 
         // your implementation should support these methods
 
+        // Core functionality
         static void     delayMilliseconds(uint32_t msec);
         static void     dump(char * msg);
         static uint32_t getMicros();

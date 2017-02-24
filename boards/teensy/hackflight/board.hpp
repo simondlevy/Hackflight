@@ -19,26 +19,41 @@
 
 class Board {
 
+    private:
+
+        class MSP * msp;
+
     public:
 
         // your implementation should support these methods
 
         // Core functionality
         static void     delayMilliseconds(uint32_t msec);
+        static void     dump(char * msg);
         static uint32_t getMicros();
         static void     imuInit(uint16_t & acc1G, float & gyroScale);
         static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
         static void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
-        static void     ledSetState(uint8_t id, bool state);
-        static bool     rcUseSerial(void);
+        static void     ledGreenOff(void);
+        static void     ledGreenOn(void);
+        static void     ledRedOff(void);
+        static void     ledRedOn(void);
         static uint16_t rcReadSerial(uint8_t chan);
+        static bool     rcUseSerial(void);
         static bool     rcSerialReady(void); 
         static uint16_t readPWM(uint8_t chan);
         static uint8_t  serialAvailableBytes(void);
         static void     serialDebugByte(uint8_t c);
         static uint8_t  serialReadByte(void);
         static void     serialWriteByte(uint8_t c);
-        static void     writeMotor(uint8_t index, float value); // index={0,1,2,3}, value=[0.0 .. 1.0]
+        static void     writeMotor(uint8_t index, uint16_t value);
+
+        // extra functionality
+        void            extrasCheckSwitch(void);
+        static uint8_t  extrasGetTaskCount(void);
+        bool            extrasHandleMSP(uint8_t command);
+        void            extrasInit(class MSP * _msp);
+        void            extrasPerformTask(uint8_t taskIndex);
 
         // Helps with simulation
         static void     showArmedStatus(bool armed);
