@@ -151,9 +151,9 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     float rpy[3];
     float accel_ned[3];
     float deltaGyroAngle[3];
-    uint32_t deltaT = currentTime - previousTime;
-    float dT = deltaT * 0.000001f; 
-    float scale = dT* this->gyroScale; 
+    uint32_t dT_usec = currentTime - previousTime;
+    float dT_sec = dT_usec * 1e-6;
+    float scale = dT_sec* this->gyroScale; 
     int16_t  accelADC[3];
     float anglerad[3];
 
@@ -286,7 +286,7 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     }
     accel_ned[Z] -= accelZoffset / 64;  // compensate for gravitation on z-axis
 
-    accz_smooth = accz_smooth + (dT / (fcAcc + dT)) * (accel_ned[Z] - accz_smooth); // low pass filter
+    accz_smooth = accz_smooth + (dT_sec / (fcAcc + dT_sec)) * (accel_ned[Z] - accz_smooth); // low pass filter
 
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
@@ -294,7 +294,7 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     this->accelSum[Y] += deadbandFilter((int32_t)lrintf(accel_ned[Y]), CONFIG_ACCXY_DEADBAND);
     this->accelSum[Z] += deadbandFilter((int32_t)lrintf(accz_smooth), CONFIG_ACCZ_DEADBAND);
 
-    this->accelTimeSum += deltaT;
+    this->accelTimeSum += dT_usec;
     this->accelSumCount++;
 
     // Convert angles from radians to tenths of a degrees
