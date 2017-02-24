@@ -42,6 +42,7 @@ static SpektrumDSM2048 rx;
 
 #include "board.hpp"
 #include "rc.hpp"
+//#include "config.hpp"
 
 // an MPU9250 object with its I2C address 
 // of 0x68 (ADDR to GRND) and on Teensy bus 0
@@ -197,6 +198,13 @@ uint16_t Board::rcReadPWM(uint8_t chan)
   (void)chan;
   return 0;
 }
+
+void Board::checkReboot(bool pendReboot)
+{
+    (void)pendReboot;
+}
+
+
 
 void Board::reboot(void)
 {

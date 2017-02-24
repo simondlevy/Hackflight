@@ -49,6 +49,7 @@ extern "C" {
             static void     showAuxStatus(uint8_t status);
 
             // STM32
+            static void     checkReboot(bool pendReboot);
             static void     reboot(void);
 
             // Default constants
