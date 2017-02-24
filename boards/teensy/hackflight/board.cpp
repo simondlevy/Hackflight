@@ -54,30 +54,7 @@ MPU9250 imu(0x68, 0, I2C_PINS_16_17, I2C_PULLUP_INT);
 
 static const uint8_t MOTOR_PINS[4] = {20, 21, 22, 23};
 
-/*
-(23 / Blue-Red / CW )                        (21 / Black-White/ CCW)
-    M4---------.                              M2-----.  
-        #######|############################         |
-    GND---* m1 |                      m2 *---- VBAT  |
-        #      |                           #         |
-        #      |                           #         |
-        # o    |                         o #         |
-        #      |                           #         |
-        #      |                           #         |
-        # o    |                         o #         |
-        #      |                           #         |
-        #      |                           #         |
-        # o    `-----------------------M4-* #        |
-        #         .-------------M2-------------------'
-        #         |                        #
-        # *--M2---'                    M1*----. 
-        #                                  #  |
-        #                                  #  |
-    .-----* m3                        m4 o #  |
-    |   ####################################  |
-    M3                                        M1        
-(22 / Black-White / CCW )                 (20 / Blue-Red / CW)
-*/
+
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
@@ -148,18 +125,18 @@ void Board::ledSetState(uint8_t id, bool state)
 
 bool Board::rcUseSerial(void)
 { 
-    return true;
-}
+    rx.begin();
+    return true;}
 
 bool  Board::rcSerialReady(void)
 {
-    return true;
+    return rx.frameComplete();
 }
 
 uint16_t Board::rcReadSerial(uint8_t chan)
 {  
-  (void)chan;
-  return 1500;
+    uint8_t chanmap[5] = {1, 2, 3, 0, 5};
+    return rx.readRawRC(chanmap[chan]);
 }
 
 
