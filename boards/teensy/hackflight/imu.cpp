@@ -118,7 +118,7 @@ void IMU::init(uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles)
 {
     Board::imuInit(this->acc1G, this->gyroScale);
 
-    // XXX we should probably get it in degrees, then convert to radians here
+    // calculate RC time constant used in the this->accelZ lpf    
     this->fcAcc = (float)(0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF)); 
 
     for (int k=0; k<3; ++k) {
@@ -134,7 +134,6 @@ void IMU::init(uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles)
 
 void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
 {
-    // XXX these should be instance variables
     static float    accelLPF[3];
     static int32_t  accelZoffset;
     static float    accz_smooth;
@@ -150,11 +149,9 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     float rpy[3];
     float accel_ned[3];
     float deltaGyroAngle[3];
-    uint32_t deltaT_usec = currentTime - previousTime;
-    float deltaT_sec = deltaT_usec * 0.000001f; 
+    uint32_t deltaT = currentTime - previousTime;
+    float deltaT_sec = deltaT * 0.000001f; 
     float scale = deltaT_sec* this->gyroScale; 
-
-    // calculate RC time constant used in the this->accelZ lpf    
     int16_t  accelADC[3];
     float anglerad[3];
 
@@ -291,7 +288,7 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     this->accelSum[Y] += deadbandFilter((int32_t)lrintf(accel_ned[Y]), CONFIG_ACCXY_DEADBAND);
     this->accelSum[Z] += deadbandFilter((int32_t)lrintf(accz_smooth), CONFIG_ACCZ_DEADBAND);
 
-    this->accelTimeSum += deltaT_usec;
+    this->accelTimeSum += deltaT;
     this->accelSumCount++;
 
     // Convert angles from radians to tenths of a degrees
