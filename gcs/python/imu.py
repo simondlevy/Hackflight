@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 '''
-setup.py : class for displaying vehicle orientation
+imu.py : class for displaying vehicle orientation
 
 Copyright (C) Alec Singer and Simon D. Levy 2016
 
@@ -40,7 +40,7 @@ from dialog import Dialog
 
 from vehicle import get_vehicle
 
-class Setup(Dialog):
+class IMU(Dialog):
 
     def __init__(self, driver, simulation=False):
 
@@ -296,7 +296,7 @@ if __name__ == "__main__":
     root = Tk()
 
     root.geometry('%dx%d+%d+%d' % (width, height+200, 200, 200))
-    root.title('Setup')
+    root.title('IMU')
 
     canvas = Canvas(root, width=width, height=height, background='black')
 
@@ -304,7 +304,7 @@ if __name__ == "__main__":
 
     canvas.pack()
 
-    sim = Setup(driver, simulation=True)
+    sim = IMU(driver, simulation=True)
 
     sim.start()
 

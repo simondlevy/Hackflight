@@ -41,7 +41,7 @@ from msppg import *
 from tkcompat import *
 
 
-from imu import Setup
+from imu import IMU
 from motors import Motors
 from receiver import Receiver
 #from maps import Maps
@@ -109,7 +109,7 @@ class GCS:
         #self.messages = Messages(self)
 
         # Create IMU dialog
-        self.imu = Setup(self)
+        self.imu = IMU(self)
         self._schedule_connection_task()
 
         # Create a maps dialog
@@ -130,7 +130,7 @@ class GCS:
         self.roll_pitch_yaw = 0,0,0
         self.rxchannels = 0,0,0,0,0
 
-        # A hack to support display in Setup dialog
+        # A hack to support display in IMU dialog
         self.active_axis = 0
 
     def quit(self):
