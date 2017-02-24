@@ -74,7 +74,7 @@ void Stabilize::update(void)
             int32_t PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
 
             this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
-            int32_t ITermACC = (this->errorAngleI[axis] * CONFIG_LEVEL_I) >> 12;
+            int32_t ITermACC = ((int32_t)(this->errorAngleI[axis] * CONFIG_LEVEL_I)) >> 12;
 
             int32_t prop = max(abs(this->rc->command[DEMAND_PITCH]), 
                     abs(this->rc->command[DEMAND_ROLL])); // range [0;500]

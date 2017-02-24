@@ -85,7 +85,9 @@ static uint16_t calibratingG;
 static bool     haveSmallAngle;
 static bool     armed;
 
+#if not defined(TEENSYDUINO)
 extern "C" { // necessary so that Arduino.cpp can call setup(), loop()
+#endif
 
 void setup(void)
 {
@@ -276,7 +278,9 @@ void loop(void)
 
 } // loop()
 
+#if not defined(TEENSYDUINO)
 } // extern "C"
+#endif
 
 void debug(const char * fmt, ...)
 {

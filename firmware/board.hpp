@@ -27,21 +27,19 @@ class Board {
 
         // your implementation should support these methods
 
-        static void     dump(char * msg);
         static void     delayMilliseconds(uint32_t msec);
+        static void     dump(char * msg);
         static uint32_t getMicros();
         static void     imuInit(uint16_t & acc1G, float & gyroScale);
         static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
         static void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
         static void     ledGreenOff(void);
         static void     ledGreenOn(void);
-        static void     ledGreenToggle(void);
         static void     ledRedOff(void);
         static void     ledRedOn(void);
-        static void     ledRedToggle(void);
+        static uint16_t rcReadSerial(uint8_t chan);
         static bool     rcSerialReady(void);
         static bool     rcUseSerial(void);
-        static uint16_t rcReadSerial(uint8_t chan);
         static uint16_t readPWM(uint8_t chan);
         static uint8_t  serialAvailableBytes(void);
         static uint8_t  serialReadByte(void);
@@ -49,10 +47,10 @@ class Board {
         static void     writeMotor(uint8_t index, uint16_t value);
 
         // extra functionality
-        void            extrasInit(class MSP * _msp);
         void            extrasCheckSwitch(void);
         static uint8_t  extrasGetTaskCount(void);
         bool            extrasHandleMSP(uint8_t command);
+        void            extrasInit(class MSP * _msp);
         void            extrasPerformTask(uint8_t taskIndex);
 
         // helps with simulation
