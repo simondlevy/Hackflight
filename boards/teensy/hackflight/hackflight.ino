@@ -288,8 +288,7 @@ void debug(const char * fmt, ...)
 
     vsprintf(buf, fmt, ap);
 
-    for (char * p = buf; *p; p++)
-        Board::serialDebugByte(*p);
+    Board::dump(buf);
 
     va_end(ap);  
 }

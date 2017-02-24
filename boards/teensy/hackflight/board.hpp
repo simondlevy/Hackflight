@@ -43,7 +43,6 @@ class Board {
         static bool     rcSerialReady(void); 
         static uint16_t readPWM(uint8_t chan);
         static uint8_t  serialAvailableBytes(void);
-        static void     serialDebugByte(uint8_t c);
         static uint8_t  serialReadByte(void);
         static void     serialWriteByte(uint8_t c);
         static void     writeMotor(uint8_t index, uint16_t value);

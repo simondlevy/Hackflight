@@ -54,6 +54,12 @@ MPU9250 imu(0x68, 0, I2C_PINS_16_17, I2C_PULLUP_INT);
 
 static const uint8_t MOTOR_PINS[4] = {20, 21, 22, 23};
 
+void Board::dump(char * msg)
+{
+    for (char * c = msg; *c; c++)
+        Serial.write(*c);
+}
+
 
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
@@ -165,11 +171,6 @@ uint8_t Board::serialReadByte(void)
 }
 
 void Board::serialWriteByte(uint8_t c)
-{
-    Serial.write(c);
-}
-
-void Board::serialDebugByte(uint8_t c)
 {
     Serial.write(c);
 }
