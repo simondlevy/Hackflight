@@ -40,7 +40,7 @@ static SpektrumDSM2048 rx;
 // of 0x68 (ADDR to GRND) and on Teensy bus 0
 // using pins 16 and 17 instead of 18 and 19
 // and internal pullups instead of external.
-MPU9250 imu(0x68, 1, I2C_PINS_29_30, I2C_PULLUP_INT);
+MPU9250 imu(0x68, 0, I2C_PINS_16_17, I2C_PULLUP_INT);
 
 void Board::dump(char * msg)
 {
