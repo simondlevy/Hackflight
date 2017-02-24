@@ -17,48 +17,39 @@
 
 #pragma once
 
-#ifdef __arm__
-extern "C" {
-#endif
+class Board {
 
-    class Board {
+    public:
 
-        public:
+        // your implementation should support these methods
 
-            // your implementation should support these methods
+        // Core functionality
+        static void     delayMilliseconds(uint32_t msec);
+        static uint32_t getMicros();
+        static void     imuInit(uint16_t & acc1G, float & gyroScale);
+        static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
+        static void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
+        static void     ledSetState(uint8_t id, bool state);
+        static bool     rcUseSerial(void);
+        static uint16_t rcReadSerial(uint8_t chan);
+        static bool     rcSerialReady(void); 
+        static uint16_t readPWM(uint8_t chan);
+        static uint8_t  serialAvailableBytes(void);
+        static void     serialDebugByte(uint8_t c);
+        static uint8_t  serialReadByte(void);
+        static void     serialWriteByte(uint8_t c);
+        static void     writeMotor(uint8_t index, float value); // index={0,1,2,3}, value=[0.0 .. 1.0]
 
-            // Core functionality
-            static void     delayMilliseconds(uint32_t msec);
-            static uint32_t getMicros();
-            static void     imuInit(uint16_t & acc1G, float & gyroScale);
-            static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
-            static void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
-            static void     ledSetState(uint8_t id, bool state);
-            static bool     rcUseSerial(void);
-            static uint16_t rcReadSerial(uint8_t chan);
-            static bool     rcSerialReady(void); 
-            static uint16_t readPWM(uint8_t chan);
-            static uint8_t  serialAvailableBytes(void);
-            static void     serialDebugByte(uint8_t c);
-            static uint8_t  serialReadByte(void);
-            static void     serialWriteByte(uint8_t c);
-            static void     writeMotor(uint8_t index, float value); // index={0,1,2,3}, value=[0.0 .. 1.0]
+        // Helps with simulation
+        static void     showArmedStatus(bool armed);
+        static void     showAuxStatus(uint8_t status);
 
-            // Helps with simulation
-            static void     showArmedStatus(bool armed);
-            static void     showAuxStatus(uint8_t status);
+        // STM32
+        static void     checkReboot(bool pendReboot);
+        static void     reboot(void);
 
-            // STM32
-            static void     checkReboot(bool pendReboot);
-            static void     reboot(void);
+        // Default constants
+        static const uint32_t DEFAULT_IMU_LOOPTIME_USEC     = 3500;
+        static const uint32_t DEFAULT_GYRO_CALIBRATION_MSEC = 3500;
 
-            // Default constants
-            static const uint32_t DEFAULT_IMU_LOOPTIME_USEC     = 3500;
-            static const uint32_t DEFAULT_GYRO_CALIBRATION_MSEC = 3500;
-
-    }; // class Board
-
-
-#ifdef __arm__
-} // extern "C"
-#endif
+}; // class Board
