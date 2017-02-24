@@ -118,6 +118,8 @@ void IMU::init(uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles)
 {
     Board::imuInit(this->acc1G, this->gyroScale);
 
+    this->gyroScale *= 0.000004f;
+
     // calculate RC time constant used in the this->accelZ lpf    
     this->fcAcc = (float)(0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF)); 
 
@@ -146,11 +148,11 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     static uint32_t previousTime;
 
     int32_t accMag = 0;
-    float dT = 0;
     float rpy[3];
     float accel_ned[3];
     float deltaGyroAngle[3];
     uint32_t deltaT = currentTime - previousTime;
+    float dT = 0;
     float scale = deltaT * this->gyroScale;
     int16_t  accelADC[3];
     float anglerad[3];

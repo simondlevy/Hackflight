@@ -49,7 +49,6 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 
     acc1G = 4096;
     gyroScale = (1.0f / 16.4f) * (M_PI / 180.0f);
-    gyroScale *= 0.000004f;
 }
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
