@@ -170,7 +170,7 @@ void Board::writeMotor(uint8_t index, float value)
 // Unused -------------------------------------------------------------------------
 
 
-uint16_t Board::rcReadPWM(uint8_t chan)
+uint16_t Board::readPWM(uint8_t chan)
 {
   (void)chan;
   return 0;

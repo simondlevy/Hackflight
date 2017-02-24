@@ -34,10 +34,10 @@ extern "C" {
             static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
             static void     init(uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
             static void     ledSetState(uint8_t id, bool state);
-            static uint16_t rcReadPWM(uint8_t chan);
             static bool     rcUseSerial(void);
             static uint16_t rcReadSerial(uint8_t chan);
             static bool     rcSerialReady(void); 
+            static uint16_t readPWM(uint8_t chan);
             static uint8_t  serialAvailableBytes(void);
             static void     serialDebugByte(uint8_t c);
             static uint8_t  serialReadByte(void);
