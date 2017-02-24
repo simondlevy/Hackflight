@@ -17,14 +17,14 @@
 #   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-build: hackflight3.ino
-	arduino --verify hackflight3.ino
+build: hackflight.ino
+	arduino --verify hackflight.ino
 
 upload:
-	arduino --upload hackflight3.ino
+	arduino --upload hackflight.ino
 
 flash:
-	arduino --upload hackflight3.ino
+	arduino --upload hackflight.ino
 
 edit:
 	vim board.cpp

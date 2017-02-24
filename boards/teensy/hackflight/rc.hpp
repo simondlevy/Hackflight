@@ -33,6 +33,8 @@ enum {
 
 // Define number of RC channels
 #define CONFIG_RC_CHANS 8
+#define CONFIG_PWM_MIN  990
+#define CONFIG_PWM_MAX  2010
 
 // For logical combinations of stick positions (low, center, high)
 #define ROL_LO (1 << (2 * DEMAND_ROLL))
