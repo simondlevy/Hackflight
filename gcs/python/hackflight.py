@@ -41,7 +41,7 @@ from msppg import *
 from tkcompat import *
 
 
-from setup import Setup
+from imu import Setup
 from motors import Motors
 from receiver import Receiver
 #from maps import Maps
@@ -81,7 +81,7 @@ class GCS:
 
         # Add a buttons
         self.button_connect = self._add_button('Connect', self.pane1, self._connect_callback)
-        self.button_setup  = self._add_button('Setup',  self.pane2, self._setup_callback)
+        self.button_imu  = self._add_button('IMU',  self.pane2, self._imu_callback)
         self.button_motors = self._add_button('Motors', self.pane2, self._motors_button_callback)
         self.button_receiver = self._add_button('Receiver', self.pane2, self._receiver_button_callback)
         #self.button_messages = self._add_button('Messages', self.pane2, self._messages_button_callback)
@@ -108,8 +108,8 @@ class GCS:
         # Create messages dialog
         #self.messages = Messages(self)
 
-        # Create setup dialog
-        self.setup = Setup(self)
+        # Create IMU dialog
+        self.imu = Setup(self)
         self._schedule_connection_task()
 
         # Create a maps dialog
@@ -187,8 +187,8 @@ class GCS:
         button.config(state = 'disabled' if disabled else 'normal')
         return button
 
-    # Callback for Setup button
-    def _setup_callback(self):
+    # Callback for IMU button
+    def _imu_callback(self):
 
         self._clear()
 
@@ -199,13 +199,13 @@ class GCS:
 
         self.parser.set_ATTITUDE_Handler(self._handle_attitude)
         self._send_attitude_request()
-        self.setup.start()
+        self.imu.start()
 
     def _start(self):
 
         self.parser.set_ATTITUDE_Handler(self._handle_attitude)
         self._send_attitude_request()
-        self.setup.start()
+        self.imu.start()
 
         self.parser.set_RC_Handler(self._handle_rc)
 
@@ -224,7 +224,7 @@ class GCS:
 
         self._clear()
 
-        self.setup.stop()
+        self.imu.stop()
         self.receiver.stop()
         #self.messages.stop()
         #self.maps.stop()
@@ -239,7 +239,7 @@ class GCS:
 
         self._clear()
 
-        self.setup.stop()
+        self.imu.stop()
         self.motors.stop()
         #self.messages.stop()
         #self.maps.stop()
@@ -252,7 +252,7 @@ class GCS:
 
         self._clear()
 
-        self.setup.stop()
+        self.imu.stop()
         self.motors.stop()
         #self.maps.stop()
         self.receiver.stop()
@@ -272,7 +272,7 @@ class GCS:
 
             self.receiver.stop()
             self.messages.stop()
-            self.setup.stop()
+            self.imu.stop()
             self.motors.stop()
 
         #self.maps.start()
@@ -282,7 +282,7 @@ class GCS:
 
         if self.connected:
 
-            self.setup.stop()
+            self.imu.stop()
             #self.maps.stop()
             self.motors.stop()
             #self.messages.stop()
@@ -371,14 +371,14 @@ class GCS:
 
     def _disable_buttons(self):
 
-        self._disable_button(self.button_setup)
+        self._disable_button(self.button_imu)
         self._disable_button(self.button_motors)
         self._disable_button(self.button_receiver)
         #self._disable_button(self.button_messages)
 
     def _enable_buttons(self):
 
-        self._enable_button(self.button_setup)
+        self._enable_button(self.button_imu)
         self._enable_button(self.button_motors)
         self._enable_button(self.button_receiver)
         #self._enable_button(self.button_messages)
@@ -420,14 +420,14 @@ class GCS:
 
     def _handle_calibrate_response(self):
 
-        self.setup.showCalibrated()
+        self.imu.showCalibrated()
 
     def _handle_params_response(self, pitchroll_kp_percent, yaw_kp_percent):
 
         # Only handle parms from firmware on a fresh connection
         if self.newconnect:
 
-            self.setup.setParams(pitchroll_kp_percent, yaw_kp_percent)
+            self.imu.setParams(pitchroll_kp_percent, yaw_kp_percent)
 
         self.newconnect = False
 
@@ -437,8 +437,8 @@ class GCS:
 
         #self.messages.setCurrentMessage('Roll/Pitch/Yaw: %+3.3f %+3.3f %+3.3f' % self.roll_pitch_yaw)
 
-        # As soon as we handle the callback from one request, send another request, if setup dialog is running
-        if self.setup.running:
+        # As soon as we handle the callback from one request, send another request, if IMU dialog is running
+        if self.imu.running:
             self._send_attitude_request()
 
     def _handle_rc(self, c1, c2, c3, c4, c5, c6, c7, c8):
