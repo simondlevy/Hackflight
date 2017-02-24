@@ -134,6 +134,7 @@ void IMU::init(uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles)
     this->calibratingAccCycles = _calibratingAccCycles;
 }
 
+
 void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
 {
     static float    accelLPF[3];
