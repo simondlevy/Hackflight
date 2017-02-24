@@ -64,14 +64,13 @@ void Board::dump(char * msg)
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
-    // wake up device
     imu.begin(ACCEL_RANGE_8G,GYRO_RANGE_2000DPS);
  
     // Accel scale 8g (4096 LSB/g)
     acc1G = 4096;
 
     // 16.4 dps/lsb scalefactor for all Invensense devices
-    gyroScale = (1.0f / 16.4f) * (M_PI / 180.0f);
+    gyroScale = 16.4f;
 }
 
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
@@ -101,9 +100,6 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
-    // For ordering, negation see:
-    // https://forum.pjrc.com/threads/37891-MPU-9250-Teensy-Library?p=118198&viewfull=1#post118198
-  
     // For ordering, negation see:
     // https://forum.pjrc.com/threads/37891-MPU-9250-Teensy-Library?p=118198&viewfull=1#post118198
 

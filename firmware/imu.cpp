@@ -118,7 +118,7 @@ void IMU::init(uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles)
 {
     Board::imuInit(this->acc1G, this->gyroScale);
 
-    this->gyroScale *= 4;
+    this->gyroScale = (4.0 / this->gyroScale) * (M_PI / 180.0f);
 
     // calculate RC time constant used in the this->accelZ lpf    
     this->fcAcc = (float)(0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF)); 
