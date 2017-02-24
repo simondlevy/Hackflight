@@ -150,8 +150,8 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     float accel_ned[3];
     float deltaGyroAngle[3];
     uint32_t deltaT = currentTime - previousTime;
-    float deltaT_sec = deltaT * 0.000001f; 
-    float scale = deltaT_sec* this->gyroScale; 
+    float dT = deltaT * 0.000001f; 
+    float scale = dT* this->gyroScale; 
     int16_t  accelADC[3];
     float anglerad[3];
 
@@ -280,7 +280,7 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     }
     accel_ned[Z] -= accelZoffset / 64;  // compensate for gravitation on z-axis
 
-    accz_smooth = accz_smooth + (deltaT_sec / (fcAcc + deltaT_sec)) * (accel_ned[Z] - accz_smooth); // low pass filter
+    accz_smooth = accz_smooth + (dT / (fcAcc + dT)) * (accel_ned[Z] - accz_smooth); // low pass filter
 
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
