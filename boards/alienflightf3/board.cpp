@@ -65,9 +65,6 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
     gyroADC[0] = -gy;
     gyroADC[1] = gx;
     gyroADC[2] = gz;
-
-    for (int k=0; k<3; ++k)
-        gyroADC[k] /= 4;
 }
 
 

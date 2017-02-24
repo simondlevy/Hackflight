@@ -118,7 +118,7 @@ void IMU::init(uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles)
 {
     Board::imuInit(this->acc1G, this->gyroScale);
 
-    this->gyroScale *= 0.000004f;
+    this->gyroScale *= 4;
 
     // calculate RC time constant used in the this->accelZ lpf    
     this->fcAcc = (float)(0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF)); 
@@ -152,14 +152,18 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     float accel_ned[3];
     float deltaGyroAngle[3];
     uint32_t deltaT = currentTime - previousTime;
-    float dT = 0;
-    float scale = deltaT * this->gyroScale;
+    float dT = deltaT * 0.000001f; 
+    float scale = dT* this->gyroScale; 
     int16_t  accelADC[3];
     float anglerad[3];
 
     previousTime = currentTime;
 
     Board::imuRead(accelADC, this->gyroADC);
+
+    for (int k=0; k<3; ++k) {
+        this->gyroADC[k] >>= 2;
+    }
 
     if (calibratingA > 0) {
 
@@ -265,9 +269,6 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     float Yh = EstN[Y] * cosineRoll - EstN[Z] * sineRoll;
     anglerad[AXIS_YAW] = atan2f(Yh, Xh); 
 
-    // deltaT is measured in us ticks
-    dT = (float)deltaT * 1e-6f;
-
     // the accel values have to be rotated into the earth frame
     rpy[0] = -(float)anglerad[AXIS_ROLL];
     rpy[1] = -(float)anglerad[AXIS_PITCH];
@@ -319,3 +320,4 @@ float IMU::computeAccelZ(void)
 
     return accelZ;
 }
+

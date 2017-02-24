@@ -54,9 +54,6 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
     imu->getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
-
-    for (int k=0; k<3; ++k)
-        gyroADC[k] /= 4;
 }
 
 
