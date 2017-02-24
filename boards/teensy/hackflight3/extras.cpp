@@ -1,5 +1,5 @@
 /*
-   filters.hpp : filter function declarations
+   extras.cpp : Stubbed method implementations for extra functionality.
 
    This file is part of Hackflight.
 
@@ -15,21 +15,37 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 #ifdef __arm__
 extern "C" {
-#else
-#include <stdio.h>
 #endif
 
-// complementary filter
-float complementaryFilter(float a, float b, float c);
+#include "extras.hpp"
 
-// deadband filter
-int32_t deadbandFilter(int32_t value, int32_t deadband);
+void Extras::init(void) 
+{ 
+}
+
+void Extras::checkSwitch(void) 
+{ 
+}
+
+uint8_t Extras::getTaskCount(void)
+{
+    return 0;
+}
+
+void Extras::performTask(uint8_t taskIndex)
+{
+    (void)taskIndex;
+}
+
+bool Extras::handleMSP(uint8_t command)
+{
+    (void)command;
+
+    return true;
+}
 
 #ifdef __arm__
 } // extern "C"
 #endif
-

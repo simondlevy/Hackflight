@@ -1,5 +1,5 @@
 /*
-   filters.hpp : filter function declarations
+   config.hpp : #define'd constants
 
    This file is part of Hackflight.
 
@@ -15,21 +15,15 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+// min, max interval in usec for motors, RX PWM
+#define CONFIG_PWM_MIN  1000
+#define CONFIG_PWM_MAX  2000
 
-#ifdef __arm__
-extern "C" {
-#else
-#include <stdio.h>
-#endif
+#define CONFIG_MAGNETIC_DECLINATION                 0
 
-// complementary filter
-float complementaryFilter(float a, float b, float c);
+#define CONFIG_CALIBRATING_ACC_MSEC                 1400
 
-// deadband filter
-int32_t deadbandFilter(int32_t value, int32_t deadband);
-
-#ifdef __arm__
-} // extern "C"
-#endif
-
+#define CONFIG_RC_LOOPTIME_MSEC                     20
+#define CONFIG_CALIBRATE_ACCTIME_MSEC               500
+#define CONFIG_SMALL_ANGLE                          250  // tenths of a degree
+#define CONFIG_ALTITUDE_UPDATE_MSEC                 25   // based on accelerometer low-pass filter

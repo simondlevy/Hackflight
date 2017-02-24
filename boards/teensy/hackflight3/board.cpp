@@ -29,12 +29,20 @@
 #include <SpektrumDSM.h>
 static SpektrumDSM2048 rx;
 
+// https://github.com/simondlevy/ArduinoRXInterrupt
+//#include <ArduinoRXInterrupt.h>
+//int RX_PINS[5] = {5, 6, 18, 19, 20};
+
+// https://github.com/PaulStoffregen/PulsePosition
+//#include <PulsePosition.h>
+
 // https://github.com/bolderflight/MPU9250
 // https://www.tindie.com/products/onehorse/mpu9250-teensy-3x-add-on-shields/ (we're using micro shield)
 #include <MPU9250.h>
 
 #include "board.hpp"
 #include "rc.hpp"
+#include "config.hpp"
 
 // an MPU9250 object with its I2C address 
 // of 0x68 (ADDR to GRND) and on Teensy bus 0
@@ -42,21 +50,34 @@ static SpektrumDSM2048 rx;
 // and internal pullups instead of external.
 MPU9250 imu(0x68, 0, I2C_PINS_16_17, I2C_PULLUP_INT);
 
-void Board::dump(char * msg)
-{
-    for (char * c = msg; *c; c++)
-        Serial.write(*c);
-}
+// https://www.tindie.com/products/onehorse/dc-motor-controller-board-for-teensy-31-/
 
-void Board::delayMilliseconds(uint32_t msec)
-{
-    delay(msec);
-}
+static const uint8_t MOTOR_PINS[4] = {20, 21, 22, 23};
 
-uint32_t Board::getMicros()
-{
-    return micros();
-}
+/*
+(23 / Blue-Red / CW )                        (21 / Black-White/ CCW)
+    M4---------.                              M2-----.  
+        #######|############################         |
+    GND---* m1 |                      m2 *---- VBAT  |
+        #      |                           #         |
+        #      |                           #         |
+        # o    |                         o #         |
+        #      |                           #         |
+        #      |                           #         |
+        # o    |                         o #         |
+        #      |                           #         |
+        #      |                           #         |
+        # o    `-----------------------M4-* #        |
+        #         .-------------M2-------------------'
+        #         |                        #
+        # *--M2---'                    M1*----. 
+        #                                  #  |
+        #                                  #  |
+    .-----* m3                        m4 o #  |
+    |   ####################################  |
+    M3                                        M1        
+(22 / Black-White / CCW )                 (20 / Blue-Red / CW)
+*/
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
@@ -70,19 +91,21 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
     gyroScale = (1.0f / 16.4f) * (M_PI / 180.0f);
 }
 
-void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
-{
-    imu.getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
-}
-
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
+    // Stop motors
+    for (int k=0; k<4; ++k) {
+      analogWrite(MOTOR_PINS[k], 0);
+    }
   
     // Set up LED
     pinMode(13, OUTPUT);
 
     // Set ADO low to guarantee 0x68 address
     digitalWrite(24, LOW);
+
+    // Start receiver
+    rx.begin();
 
     // Set up serial communication over USB
     Serial.begin(115200);
@@ -93,57 +116,50 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 }
 
 
-void Board::ledGreenOff(void)
+void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
-    digitalWrite(13, LOW);
+    // For ordering, negation see:
+    // https://forum.pjrc.com/threads/37891-MPU-9250-Teensy-Library?p=118198&viewfull=1#post118198
+  
+    // For ordering, negation see:
+    // https://forum.pjrc.com/threads/37891-MPU-9250-Teensy-Library?p=118198&viewfull=1#post118198
+
+    imu.getMotion6Counts(&accADC[1], &accADC[0], &accADC[2], &gyroADC[1], &gyroADC[0], &gyroADC[2]);
+
+    accADC[2]  = -accADC[2];
+    gyroADC[2] = -gyroADC[2];
+  }
+
+void Board::delayMilliseconds(uint32_t msec)
+{
+    delay(msec);
 }
 
-void Board::ledGreenOn(void)
+uint32_t Board::getMicros()
 {
-    digitalWrite(13, HIGH);
+    return micros();
 }
 
-void Board::ledRedOff(void)
+void Board::ledSetState(uint8_t id, bool state)
 {
-    digitalWrite(13, LOW);
-}
-
-void Board::ledRedOn(void)
-{
-    digitalWrite(13, HIGH);
+    digitalWrite(13, state); // we only have one LED
 }
 
 
-uint16_t Board::rcReadSerial(uint8_t chan)
-{  
-    static uint16_t values[5];
-
-    values[0] = rx.readRawRC(1); // roll
-    values[1] = rx.readRawRC(2); // pitch
-    values[2] = rx.readRawRC(3); // throttle
-    values[3] = rx.readRawRC(0); // yaw
-    values[4] = rx.readRawRC(5); // auxfi
-
-    return (int16_t)values[chan];
+bool Board::rcUseSerial(void)
+{ 
+    return true;
 }
 
 bool  Board::rcSerialReady(void)
 {
-    return rx.frameComplete();
-}
-
-bool Board::rcUseSerial(void)
-{ 
-    // Start receiver
-    rx.begin();
-
     return true;
 }
 
-uint16_t Board::readPWM(uint8_t chan)
-{
+uint16_t Board::rcReadSerial(uint8_t chan)
+{  
   (void)chan;
-  return 0;
+  return 1500;
 }
 
 
@@ -162,34 +178,29 @@ void Board::serialWriteByte(uint8_t c)
     Serial.write(c);
 }
 
-void Board::writeMotor(uint8_t index, uint16_t value)
+void Board::serialDebugByte(uint8_t c)
+{
+    Serial.write(c);
+}
+
+void Board::writeMotor(uint8_t index, float value)
 { 
-    (void)index;
-    (void)value;
+  uint8_t analogValue = (uint8_t)(value * 255);
+
+  analogWrite(MOTOR_PINS[index], analogValue);
 }
 
-void Board::extrasCheckSwitch(void)
+// Unused -------------------------------------------------------------------------
+
+
+uint16_t Board::rcReadPWM(uint8_t chan)
 {
+  (void)chan;
+  return 0;
 }
 
-uint8_t  Board::extrasGetTaskCount(void){
-    return 0;
-}
-
-bool Board::extrasHandleMSP(uint8_t command)
+void Board::reboot(void)
 {
-    return true;
-}
-
-void Board::extrasInit(class MSP * _msp)
-{
-    // Basic implementation doesn't need MSP
-    (void)_msp;
-}
-
-void Board::extrasPerformTask(uint8_t taskIndex)
-{
-    (void)taskIndex;
 }
 
 void Board::showArmedStatus(bool armed)
@@ -204,10 +215,5 @@ void Board::showAuxStatus(uint8_t status)
     (void)status; 
 }
 
-void Board::checkReboot(bool)
-{
-}
 
-void Board::reboot(void)
-{
-}
+

@@ -1,5 +1,5 @@
 /*
-   filters.hpp : filter function declarations
+   extras.hpp : Class declaration for extra functionality (altitude hold, hover, etc.)
 
    This file is part of Hackflight.
 
@@ -23,13 +23,23 @@ extern "C" {
 #include <stdio.h>
 #endif
 
-// complementary filter
-float complementaryFilter(float a, float b, float c);
+#include <stdint.h>
 
-// deadband filter
-int32_t deadbandFilter(int32_t value, int32_t deadband);
+class Extras {
+
+    public:
+
+        void    init(void);
+
+        void    checkSwitch(void);
+
+        uint8_t getTaskCount(void);
+
+        bool    handleMSP(uint8_t command);
+
+        void    performTask(uint8_t taskIndex);
+};
 
 #ifdef __arm__
 } // extern "C"
 #endif
-
