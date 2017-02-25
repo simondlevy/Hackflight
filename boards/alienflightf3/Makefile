@@ -241,8 +241,7 @@ CFLAGS		 = $(ARCH_FLAGS) \
 		   -DEXTERNAL_DEBUG \
 		   -DUSE_STDPERIPH_DRIVER \
 		   $(TARGET_FLAGS) \
-		   -D'__TARGET__="$(TARGET)"' \
-		   -D'__REVISION__="$(REVISION)"' \
+		   -DSTM32 \
 		   -fverbose-asm -ffat-lto-objects \
 		   -save-temps=obj \
 		   -MMD -MP

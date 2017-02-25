@@ -583,9 +583,24 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
     gyroADC[2] = -(int16_t)(1000 * gyro[2]);
 }
 
-void Board::ledSetState(uint8_t id, bool state)
+void Board::ledGreenOff(void)
 {
-    leds[id].set(state);
+    leds[0].set(false);
+}
+
+void Board::ledGreenOn(void)
+{
+    leds[0].set(true);
+}
+
+void Board::ledRedOff(void)
+{
+    leds[1].set(false);
+}
+
+void Board::ledRedOn(void)
+{
+    leds[1].set(true);
 }
 
 
@@ -599,7 +614,7 @@ bool Board::rcUseSerial(void)
     return false;
 }
 
-uint16_t Board::rcReadPWM(uint8_t chan)
+uint16_t Board::readPWM(uint8_t chan)
 {
     // Special handling for throttle
     float demand = (chan == 3) ? throttleDemand : demands[chan];
@@ -618,15 +633,15 @@ uint16_t Board::rcReadPWM(uint8_t chan)
     return pwm;
 }
 
-void Board::serialDebugByte(uint8_t c)
+void Board::dump(char * msg)
 {
-    putchar(c);
+    printf("%s\n", msg);
 }
 
 
-void Board::writeMotor(uint8_t index, float value)
+void Board::writeMotor(uint8_t index, uint16_t value)
 {
-    thrusts[index] = value;
+    thrusts[index] = (value - 1000) / 1000.;
 }
 
 void Board::showArmedStatus(bool armed)

@@ -36,11 +36,11 @@ void setup(void)
 
 void loop(void)
 {  
-    short r = rx.getChannelValue(1); // roll
-    short p = rx.getChannelValue(2); // pitch
-    short t = rx.getChannelValue(3); // throttle
-    short y = rx.getChannelValue(0); // yaw
-    short a = rx.getChannelValue(5); // aux
+    short r = rx.readRawRC(1); // roll
+    short p = rx.readRawRC(2); // pitch
+    short t = rx.readRawRC(3); // throttle
+    short y = rx.readRawRC(0); // yaw
+    short a = rx.readRawRC(5); // aux
 
     MSP_Message msg = MSP_Parser::serialize_RC(r, p, t, y, a, 0, 0, 0);
 
