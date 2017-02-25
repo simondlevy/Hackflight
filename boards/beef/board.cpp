@@ -52,7 +52,7 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 
     // 16.4 dps/lsb scalefactor for all Invensense devices
     gyroScale = 16.4f;
-}}
+}
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {

@@ -108,6 +108,7 @@ CFLAGS	 = $(ARCH_FLAGS) \
 		   -Wall -pedantic -Wextra -Wshadow -Wunsafe-loop-optimizations \
 		   -ffunction-sections \
 		   -fdata-sections \
+		   -DSTM32 \
 		   -DSTM32F10X_MD \
 		   -DUSE_STDPERIPH_DRIVER
 
