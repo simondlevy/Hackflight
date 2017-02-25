@@ -15,7 +15,8 @@ you and damage to your vehicle.
 
 Hackflight derives from the Baseflight firmware (which in turn derives from
 Multiwii), and currently works on STM32F103 flight-controller boards
-(Naze32 and clones like Flip32, MultiRC, etc.) and the Arduino-compatible Teensy 3.1/3.2
+(Naze32 and clones like Flip32, MultiRC, etc.), the Alienflight F3 board,
+and the Arduino-compatible Teensy 3.1/3.2
 microcontroller (with additional hardware).  As you'll see, the code follows
 the Arduino design pattern of a <tt>startup</tt> routine that calls the
 <tt>init()</tt> method of a few objects (<tt>IMU</tt>, <tt>RC</tt>,
