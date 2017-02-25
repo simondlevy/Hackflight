@@ -15,22 +15,22 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Level (accelerometer): set values to 0 for "rate mode"
-static const float CONFIG_LEVEL_P            = 1.0;
-static const float CONFIG_LEVEL_I            = 0.005;
+// Level (accelerometer)
+static const uint8_t CONFIG_LEVEL_P          = 10;
+static const uint8_t CONFIG_LEVEL_I          = 1;
 
 // Rate (gyro): P must be positive
-static const float  CONFIG_RATE_PITCHROLL_P  = 1.0;
-static const float  CONFIG_RATE_PITCHROLL_I  = 0;
-static const float  CONFIG_RATE_PITCHROLL_D  = 0;
+static const uint8_t CONFIG_RATE_PITCHROLL_P = 5;
+static const uint8_t CONFIG_RATE_PITCHROLL_I = 4;
+static const uint8_t CONFIG_RATE_PITCHROLL_D = 3;
 
 // Yaw: P must be positive
-static const float  CONFIG_YAW_P             = 1.0;
-static const float  CONFIG_YAW_I             = 0;
+static const uint8_t CONFIG_YAW_P            = 40;
+static const uint8_t CONFIG_YAW_I            = 20;
 
 // For altitude hover
-#define CONFIG_HOVER_ALT_P        15  //128
-#define CONFIG_HOVER_ALT_I        0  //25
-#define CONFIG_HOVER_ALT_D        2 //24
+#define CONFIG_HOVER_ALT_P  120
+#define CONFIG_HOVER_ALT_I  45
+#define CONFIG_HOVER_ALT_D  1
 
 

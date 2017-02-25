@@ -567,7 +567,7 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
     // Mimic MPU6050
     acc1G = 4096;
-    gyroScale = (1.0f / 16.4f) * (M_PI / 180.0f);
+    gyroScale = 16.4f;
 }
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
@@ -685,11 +685,15 @@ bool Board::extrasHandleMSP(uint8_t command)
     return true;
 }
 
+void Board::extrasInit(class MSP * _msp)
+{
+    (void)_msp;
+}
+
 void Board::extrasPerformTask(uint8_t taskIndex)
 {
     (void)taskIndex;
 }
-
 
 
 bool Board::rcSerialReady(void)
@@ -701,6 +705,11 @@ uint16_t Board::rcReadSerial(uint8_t chan)
 {
     (void)chan;
     return 0;
+}
+
+void Board::checkReboot(bool pendReboot)
+{
+    (void)pendReboot;
 }
 
 void Board::reboot(void)
