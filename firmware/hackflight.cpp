@@ -226,7 +226,7 @@ void loop(void)
 
         haveSmallAngle = abs(imu.angle[0]) < CONFIG_SMALL_ANGLE && abs(imu.angle[1]) < CONFIG_SMALL_ANGLE;
 
-        //debug("%d %d %d\n", imu.angle[0], imu.angle[1], imu.angle[2]);
+        debug("%d %d %d\n", imu.angle[0], imu.angle[1], imu.angle[2]);
 
         // measure loop rate just afer reading the sensors
         currentTime = Board::getMicros();

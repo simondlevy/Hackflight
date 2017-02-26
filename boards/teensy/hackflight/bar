@@ -1,3 +1,0 @@
-git rm -f $1
-ln -s ~/Desktop/hackflight/firmware/$1 .
-git add $1
