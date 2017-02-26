@@ -27,7 +27,7 @@ FLASH_SIZE ?=
 
 F3_DIR = $(BREEZY_DIR)/f3
 ALIENFLIGHTF3_DIR = $(F3_DIR)/alienflightf3
-VCP_DIR = $(ALIENFLIGHTF3_DIR)/vcp
+VCP_DIR = $(F3_DIR)/vcp
 
 SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM
 
@@ -64,7 +64,7 @@ OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 #CMSIS_DIR	 = $(ROOT)/lib/CMSIS
 CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
-INCLUDE_DIRS = $(BREEZY_DIR) $(F3_DIR) $(ALIENFLIGHTF3_DIR) $(SRC_DIR) $(SRC_DIR)/target $(FIRMWARE_DIR) .
+INCLUDE_DIRS = $(BREEZY_DIR) $(F3_DIR) $(VCP_DIR) $(ALIENFLIGHTF3_DIR) $(SRC_DIR) $(SRC_DIR)/target $(FIRMWARE_DIR) .
 LINKER_DIR	 = $(F3_DIR)
 
 # Search path for sources
@@ -170,12 +170,12 @@ VCP_SRC = \
 		   $(VCP_DIR)/usb_istr.c \
 		   $(VCP_DIR)/usb_prop.c \
 		   $(VCP_DIR)/usb_pwr.c \
-		   $(ALIENFLIGHTF3_DIR)/serial_usb_vcp.c \
-		   $(ALIENFLIGHTF3_DIR)/usb_io.c
+		   $(F3_DIR)/serial_usb_vcp.c \
+		   $(F3_DIR)/usb_io.c
 
 STM32F30x_COMMON_SRC = \
 		   $(F3_DIR)/startup_stm32f30x_md_gcc.S \
-		   $(ALIENFLIGHTF3_DIR)/system_stm32f30x.c \
+		   $(F3_DIR)/system_stm32f30x_extras.c \
 		   $(F3_DIR)/gpio_stm32f30x.c \
 		   $(F3_DIR)/serial_uart.c \
 		   $(F3_DIR)/serial_uart_stm32f30x.c \
@@ -187,7 +187,6 @@ ALIENFLIGHTF3_SRC = \
 		   $(STM32F30x_COMMON_SRC) \
 		   $(F3_DIR)/timer_stm32f30x.c \
 		   $(ALIENFLIGHTF3_DIR)/timer.c \
-		   $(ALIENFLIGHTF3_DIR)/serial_usb_vcp.c \
 		   $(ALIENFLIGHTF3_DIR)/target.c \
 		   $(VCP_SRC)
 
