@@ -89,7 +89,7 @@ static bool     armed;
 extern "C" { 
 #endif
 
-void setup(void)
+void Hackflight::setup(void)
 {
     uint32_t calibratingGyroMsec;
 
@@ -142,7 +142,7 @@ void setup(void)
     
 } // setup
 
-void loop(void)
+void Hackflight::loop(void)
 {
     static bool     accCalibrated;
     static uint16_t calibratingA;
@@ -278,6 +278,18 @@ void loop(void)
 
 } // loop()
 
+static Hackflight hackflight;
+
+void setup(void)
+{
+    hackflight.setup();
+}
+
+void loop(void)
+{
+    hackflight.loop();
+}
+
 #if defined(STM32)
 } // extern "C"
 #endif
@@ -296,4 +308,5 @@ void debug(const char * fmt, ...)
 
     va_end(ap);  
 }
+
 
