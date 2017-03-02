@@ -17,7 +17,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 int main(int argc, char ** argv)
 {
     // in hackflight.cpp
@@ -27,6 +26,7 @@ int main(int argc, char ** argv)
     setup();
 
     while (true) {
+
         loop();
     }
 

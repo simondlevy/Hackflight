@@ -41,3 +41,6 @@ $(TARGET): main.cpp $(FIRMDIR)/*.cpp $(FIRMDIR)/*.h
 clean:
 	rm -f $(TARGET) *.o *~
 
+run: $(TARGET)
+	./$(TARGET)
+

@@ -20,7 +20,8 @@
 #include <hackflight.hpp>
 #include <board.hpp>
 
-static uint32_t micros;
+#include <stdio.h>
+#include <time.h>
 
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
@@ -45,26 +46,9 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
     }
 }
 
-void Board::ledGreenOff(void)
-{
-}
-
-void Board::ledGreenOn(void)
-{
-}
-
-void Board::ledRedOff(void)
-{
-}
-
-void Board::ledRedOn(void)
-{
-}
-
-
 uint32_t Board::getMicros()
 {
-    return micros; 
+    return clock(); 
 }
 
 bool Board::rcUseSerial(void)
@@ -87,6 +71,8 @@ void Board::writeMotor(uint8_t index, uint16_t value)
 {
     printf("Motor %d = %d %c", index+1, value, index==3?'\n':'\t');
 }
+
+// Unused ======================================================================
 
 void Board::showArmedStatus(bool armed)
 {
@@ -160,4 +146,22 @@ void Board::serialWriteByte(uint8_t c)
 {
     (void)c;
 }
+
+void Board::ledGreenOff(void)
+{
+}
+
+void Board::ledGreenOn(void)
+{
+}
+
+void Board::ledRedOff(void)
+{
+}
+
+void Board::ledRedOn(void)
+{
+}
+
+
  
