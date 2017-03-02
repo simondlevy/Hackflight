@@ -59,6 +59,15 @@ void debug(const char * format, ...);
 
 class Hackflight {
 
+    private:
+
+        class IMU        imu;
+        class RC         rc;
+        class Mixer      mixer;
+        class MSP        msp;
+        class Stabilize  stab;
+        class Board      board;
+
     public:
 
         void setup(void);

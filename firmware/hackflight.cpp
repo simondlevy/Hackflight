@@ -23,15 +23,6 @@
 
 #include <string.h>
 
-// Objects we use
-
-static IMU        imu;
-static RC         rc;
-static Mixer      mixer;
-static MSP        msp;
-static Stabilize  stab;
-static Board      board;
-
 // support for timed tasks
 
 class TimedTask {
