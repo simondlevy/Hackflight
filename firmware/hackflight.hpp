@@ -55,7 +55,43 @@ void debug(const char * format, ...);
 #define CONFIG_SMALL_ANGLE                          250  // tenths of a degree
 #define CONFIG_ALTITUDE_UPDATE_MSEC                 25   // based on accelerometer low-pass filter
 
-// Hackflight class for testing / simulation
+
+class TimedTask {
+
+    private:
+
+        uint32_t usec;
+        uint32_t period;
+
+    public:
+
+        void init(uint32_t _period) {
+
+            this->period = _period;
+            this->usec = 0;
+        }
+
+        bool checkAndUpdate(uint32_t currentTime) {
+
+            bool result = (int32_t)(currentTime - this->usec) >= 0;
+
+            if (result)
+                this->update(currentTime);
+
+            return result;
+        }
+
+        void update(uint32_t currentTime) {
+
+            this->usec = currentTime + this->period;
+        }
+
+        bool check(uint32_t currentTime) {
+
+            return (int32_t)(currentTime - this->usec) >= 0;
+        }
+};
+
 
 class Hackflight {
 
@@ -67,6 +103,18 @@ class Hackflight {
         class MSP        msp;
         class Stabilize  stab;
         class Board      board;
+
+        class TimedTask imuTask;
+        class TimedTask rcTask;
+        class TimedTask accelCalibrationTask;
+        class TimedTask altitudeEstimationTask;
+
+        uint32_t imuLooptimeUsec;
+        uint16_t calibratingGyroCycles;
+        uint16_t calibratingAccCycles;
+        uint16_t calibratingG;
+        bool     haveSmallAngle;
+        bool     armed;
 
     public:
 

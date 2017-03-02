@@ -25,56 +25,6 @@
 
 // support for timed tasks
 
-class TimedTask {
-
-    private:
-
-        uint32_t usec;
-        uint32_t period;
-
-    public:
-
-        void init(uint32_t _period) {
-
-            this->period = _period;
-            this->usec = 0;
-        }
-
-        bool checkAndUpdate(uint32_t currentTime) {
-
-            bool result = (int32_t)(currentTime - this->usec) >= 0;
-
-            if (result)
-                this->update(currentTime);
-
-            return result;
-        }
-
-        void update(uint32_t currentTime) {
-
-            this->usec = currentTime + this->period;
-        }
-
-        bool check(uint32_t currentTime) {
-
-            return (int32_t)(currentTime - this->usec) >= 0;
-        }
-};
-
-
-// values initialized in setup()
-
-static TimedTask imuTask;
-static TimedTask rcTask;
-static TimedTask accelCalibrationTask;
-static TimedTask altitudeEstimationTask;
-
-static uint32_t imuLooptimeUsec;
-static uint16_t calibratingGyroCycles;
-static uint16_t calibratingAccCycles;
-static uint16_t calibratingG;
-static bool     haveSmallAngle;
-static bool     armed;
 
 #if defined(STM32)
 extern "C" { 
