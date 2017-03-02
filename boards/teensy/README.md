@@ -1,8 +1,8 @@
 # Running Hackflight on Teensy 3.2
 
-As described in this [blog post](http://diydrones.com/profiles/blogs/hackflight-teensycopter), you can run 
-Hackflight on the Teensy 3.2 Arduino-compatible microcontroller, but this will require additional hardware
-purchases and wiring.
+The code in board.cpp allows you to run Hackflight on Kris Winer's brushed-motor 
+(flight controller)[https://forum.pjrc.com/threads/32985-Teensy-Flight-Controller]
+based on Teensy 3.2.
 
 To build Hackflight for Teensy, you should first have the 
 [Arduino software](https://www.arduino.cc/en/Main/Software) installed on your computer.  (Make sure to install
