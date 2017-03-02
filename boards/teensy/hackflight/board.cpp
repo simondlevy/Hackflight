@@ -1,7 +1,7 @@
 /*
    board.cpp : implementation of board-specific routines
 
-   This implemenation is for Teensy 3.1 / 3.2 with MPU9250 IMU. 
+   This implemenation is for Kris Winer's brushed-motor Teensy board with MPU9250 IMU. 
 
    MPU9250 code adapted from https://github.com/kriswiner/MPU-9250
 
@@ -28,23 +28,20 @@
 
 // https://github.com/simondlevy/SpektrumDSM
 #include <SpektrumDSM.h>
-static SpektrumDSM2048 rx;
+//static SpektrumDSM2048 rx;
 
 // https://github.com/bolderflight/MPU9250
 // https://www.tindie.com/products/onehorse/mpu9250-teensy-3x-add-on-shields/ (we're using micro shield)
-#include <MPU9250.h>
+//#include <MPU9250.h>
 
 #include "board.hpp"
 #include "rc.hpp"
-//#include "config.hpp"
 
 // an MPU9250 object with its I2C address 
 // of 0x68 (ADDR to GRND) and on Teensy bus 0
 // using pins 16 and 17 instead of 18 and 19
 // and internal pullups instead of external.
-MPU9250 imu(0x68, 1, I2C_PINS_29_30, I2C_PULLUP_INT);
-
-// https://www.tindie.com/products/onehorse/dc-motor-controller-board-for-teensy-31-/
+//MPU9250 imu(0x68, 1, I2C_PINS_29_30, I2C_PULLUP_INT);
 
 static const uint8_t MOTOR_PINS[4] = {20, 21, 22, 23};
 
@@ -58,7 +55,7 @@ void Board::dump(char * msg)
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 {
-    imu.begin(ACCEL_RANGE_8G,GYRO_RANGE_2000DPS);
+    //imu.begin(ACCEL_RANGE_8G,GYRO_RANGE_2000DPS);
  
     // Accel scale 8g (4096 LSB/g)
     acc1G = 4096;
@@ -70,18 +67,19 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
     // Stop motors
-    for (int k=0; k<4; ++k) {
-      analogWrite(MOTOR_PINS[k], 0);
-    }
+    //for (int k=0; k<4; ++k) {
+    //  analogWrite(MOTOR_PINS[k], 0);
+    //}
   
-    // Set up LED
-    pinMode(13, OUTPUT);
+    // Set up LEDs
+    pinMode(27, OUTPUT); // green
+    pinMode(29, OUTPUT); // red
 
     // Set ADO low to guarantee 0x68 address
     digitalWrite(24, LOW);
 
     // Start receiver
-    rx.begin();
+    //rx.begin();
 
     // Set up serial communication over USB
     Serial.begin(115200);
@@ -94,10 +92,10 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
+    /*
     imu.getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
 
   
-  /*
     // For ordering, negation see:
     // https://forum.pjrc.com/threads/37891-MPU-9250-Teensy-Library?p=118198&viewfull=1#post118198
 
@@ -106,6 +104,11 @@ void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
     accADC[2]  = -accADC[2];
     gyroADC[2] = -gyroADC[2];
     */
+
+    for (int k=0; k<3; ++k) {
+        accADC[k] = 0;
+        gyroADC[k] = 0;
+    }
   }
 
 void Board::delayMilliseconds(uint32_t msec)
@@ -120,38 +123,38 @@ uint32_t Board::getMicros()
 
 void Board::ledGreenOff(void)
 {
-    digitalWrite(13, LOW);
+    digitalWrite(27, LOW);
 }
 
 void Board::ledGreenOn(void)
 {
-    digitalWrite(13, HIGH);
+    digitalWrite(27, HIGH);
 }
 
 void Board::ledRedOff(void)
 {
-    digitalWrite(13, LOW);
+    digitalWrite(29, LOW);
 }
 
 void Board::ledRedOn(void)
 {
-    digitalWrite(13, HIGH);
+    digitalWrite(29, HIGH);
 }
 
 bool Board::rcUseSerial(void)
 { 
-    rx.begin();
+    //rx.begin();
     return true;}
 
 bool  Board::rcSerialReady(void)
 {
-    return rx.frameComplete();
+    return true; //rx.frameComplete();
 }
 
 uint16_t Board::rcReadSerial(uint8_t chan)
 {  
-    uint8_t chanmap[5] = {1, 2, 3, 0, 5};
-    return rx.readRawRC(chanmap[chan]);
+    //uint8_t chanmap[5] = {1, 2, 3, 0, 5};
+    return 1500; //rx.readRawRC(chanmap[chan]);
 }
 
 
@@ -172,7 +175,6 @@ void Board::serialWriteByte(uint8_t c)
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 { 
-    analogWrite(MOTOR_PINS[index], map(value, 1000, 2000, 0, 180));
 }
 
 // Unused -------------------------------------------------------------------------
