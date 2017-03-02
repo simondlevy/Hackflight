@@ -25,7 +25,7 @@ FIRMDIR = ../firmware
 
 all: $(TARGET)
 
-$(TARGET): main.cpp $(FIRMDIR)/*.cpp $(FIRMDIR)/*.h
+$(TARGET): main.cpp board.cpp $(FIRMDIR)/*.cpp $(FIRMDIR)/*.h
 	g++ $(CFLAGS) -c -I$(FIRMDIR) main.cpp
 	g++ $(CFLAGS) -c -I$(FIRMDIR) board.cpp
 	g++ $(CFLAGS) -c $(FIRMDIR)/imu.cpp

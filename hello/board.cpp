@@ -23,10 +23,30 @@
 #include <stdio.h>
 #include <time.h>
 
+uint32_t Board::getMicros()
+{
+    return clock(); 
+}
+
+void Board::delayMilliseconds(uint32_t msec)
+{
+    uint32_t start = clock()/1000;
+
+    while ((clock()/1000 - start) < msec)
+        ;
+}
+
+void Board::dump(char * msg)
+{
+    printf("%s\n", msg);
+}
+
 void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
-    looptimeMicroseconds = 10000;
     calibratingGyroMsec = 100;  // long enough to see but not to annoy
+    looptimeMicroseconds = 10000;
+
+    printf("Calibrating...\n");
 }
 
 void Board::imuInit(uint16_t & acc1G, float & gyroScale)
@@ -38,130 +58,47 @@ void Board::imuInit(uint16_t & acc1G, float & gyroScale)
 
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
-    // Convert from radians to tenths of a degree
-
     for (int k=0; k<3; ++k) {
         accADC[k]  = 0;
         gyroADC[k] = 0;
     }
 }
 
-uint32_t Board::getMicros()
-{
-    return clock(); 
-}
-
-bool Board::rcUseSerial(void)
-{
-    return false;
-}
-
 uint16_t Board::readPWM(uint8_t chan)
 {
-    return chan == 4 ? 988 : 1500;
-}
 
-void Board::dump(char * msg)
-{
-    printf("%s\n", msg);
-}
+    uint16_t value = (chan == 4) ? 988 : 1500;
 
+    if (chan < 5) {
+        printf("chan%d=%d%c", chan+1, value, chan==4?'\n':'\t');
+    }
+
+    return value;
+}
 
 void Board::writeMotor(uint8_t index, uint16_t value)
 {
-    printf("Motor %d = %d %c", index+1, value, index==3?'\n':'\t');
+    printf("motor %d=%d %c", index+1, value, index==3?'\n':'\t');
 }
 
 // Unused ======================================================================
 
-void Board::showArmedStatus(bool armed)
-{
-    (void)armed;
-}
-
-void Board::showAuxStatus(uint8_t status)
-{
-    (void)status;
-}
-
-void Board::extrasCheckSwitch(void)
-{
-}
-
-uint8_t  Board::extrasGetTaskCount(void){
-    return 0;
-}
-
-bool Board::extrasHandleMSP(uint8_t command)
-{
-    return true;
-}
-
-void Board::extrasInit(class MSP * _msp)
-{
-    (void)_msp;
-}
-
-void Board::extrasPerformTask(uint8_t taskIndex)
-{
-    (void)taskIndex;
-}
-
-
-bool Board::rcSerialReady(void)
-{
-    return false;
-}
-
-uint16_t Board::rcReadSerial(uint8_t chan)
-{
-    (void)chan;
-    return 0;
-}
-
-void Board::checkReboot(bool pendReboot)
-{
-    (void)pendReboot;
-}
-
-void Board::reboot(void)
-{
-}
-
-void Board::delayMilliseconds(uint32_t msec)
-{
-}
-
-uint8_t Board::serialAvailableBytes(void)
-{
-    return 0;
-}
-
-uint8_t Board::serialReadByte(void)
-{
-    return 0;
-}
-
-void Board::serialWriteByte(uint8_t c)
-{
-    (void)c;
-}
-
-void Board::ledGreenOff(void)
-{
-}
-
-void Board::ledGreenOn(void)
-{
-}
-
-void Board::ledRedOff(void)
-{
-}
-
-void Board::ledRedOn(void)
-{
-}
-
-
- 
+void     Board::checkReboot(bool pendReboot) { (void)pendReboot; }
+void     Board::extrasCheckSwitch(void) { } 
+uint8_t  Board::extrasGetTaskCount(void){ return 0; } 
+bool     Board::extrasHandleMSP(uint8_t command) { return true; }
+void     Board::extrasInit(class MSP * _msp) { (void)_msp; }
+void     Board::extrasPerformTask(uint8_t taskIndex) { (void)taskIndex; }
+void     Board::ledGreenOff(void) { } 
+void     Board::ledGreenOn(void) { } 
+void     Board::ledRedOff(void) { } 
+void     Board::ledRedOn(void) { } 
+uint16_t Board::rcReadSerial(uint8_t chan) { (void)chan; return 0; }
+bool     Board::rcSerialReady(void) { return false; }
+bool     Board::rcUseSerial(void) { return false; }
+void     Board::reboot(void) { }
+uint8_t  Board::serialAvailableBytes(void) { return 0; }
+uint8_t  Board::serialReadByte(void) { return 0; }
+void     Board::serialWriteByte(uint8_t c) { (void)c; }
+void     Board::showArmedStatus(bool armed) { (void)armed; }
+void     Board::showAuxStatus(uint8_t status) { (void)status; }
