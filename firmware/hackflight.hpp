@@ -118,7 +118,7 @@ class Hackflight {
 
     public:
 
-        void setup(void);
-        void loop(void);
+        void initialize(void);
 
+        void update(void);
 };

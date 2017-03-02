@@ -1,5 +1,5 @@
 /*
-   hackflight.cpp : setup() and loop() routines
+   hackflight.cpp : Hackflight class implementation and hooks to setup(), loop()
 
    Adapted from https://github.com/multiwii/baseflight/blob/master/src/mw.c
 
@@ -30,7 +30,7 @@
 extern "C" { 
 #endif
 
-void Hackflight::setup(void)
+void Hackflight::initialize(void)
 {
     uint32_t calibratingGyroMsec;
 
@@ -83,7 +83,7 @@ void Hackflight::setup(void)
     
 } // setup
 
-void Hackflight::loop(void)
+void Hackflight::update(void)
 {
     static bool     accCalibrated;
     static uint16_t calibratingA;
@@ -224,12 +224,12 @@ static Hackflight hackflight;
 
 void setup(void)
 {
-    hackflight.setup();
+    hackflight.initialize();
 }
 
 void loop(void)
 {
-    hackflight.loop();
+    hackflight.update();
 }
 
 #if defined(STM32)
