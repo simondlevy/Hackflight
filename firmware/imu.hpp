@@ -47,9 +47,10 @@ class IMU {
 
     public:
 
-        // shared with MSP
-        int16_t  angle[3];
-        int16_t  gyroADC[3];
+        // shared with other classes
+        int16_t  angle[3];      // tenths of a degree
+        int16_t  gyroADC[3];    // [-4096,+4096]
+        int16_t  accelADC[3];   // [-4096,+4096]
 
         // called from MW
         void init(uint16_t calibratingGyroCycles, uint16_t calibratingAccCycles);

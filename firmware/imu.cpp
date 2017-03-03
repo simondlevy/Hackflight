@@ -155,12 +155,11 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     uint32_t dT_usec = currentTime - previousTime;
     float dT_sec = dT_usec * 1e-6;
     float scale = dT_sec* this->gyroScale; 
-    int16_t  accelADC[3];
     float anglerad[3];
 
     previousTime = currentTime;
 
-    Board::imuRead(accelADC, this->gyroADC);
+    Board::imuRead(this->accelADC, this->gyroADC);
 
     for (int k=0; k<3; ++k) {
         this->gyroADC[k] >>= 2;
@@ -173,9 +172,9 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
             if (calibratingA == this->calibratingAccCycles)
                 a[axis] = 0;
             // Sum up this->calibratingAccCycles readings
-            a[axis] += accelADC[axis];
+            a[axis] += this->accelADC[axis];
             // Clear global variables for next reading
-            accelADC[axis] = 0;
+            this->accelADC[axis] = 0;
             accelZero[axis] = 0;
         }
         // Calculate average, shift Z down by acc1G
@@ -187,9 +186,9 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
         calibratingA--;
     }
 
-    accelADC[AXIS_ROLL]  -= accelZero[AXIS_ROLL];
-    accelADC[AXIS_PITCH] -= accelZero[AXIS_PITCH];
-    accelADC[AXIS_YAW]   -= accelZero[AXIS_YAW];
+    this->accelADC[AXIS_ROLL]  -= accelZero[AXIS_ROLL];
+    this->accelADC[AXIS_PITCH] -= accelZero[AXIS_PITCH];
+    this->accelADC[AXIS_YAW]   -= accelZero[AXIS_YAW];
 
     // range: +/- 8192; +/- 2000 deg/sec
 
@@ -233,11 +232,11 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
     for (uint8_t axis = 0; axis < 3; axis++) {
         deltaGyroAngle[axis] = this->gyroADC[axis] * scale;
         if (CONFIG_ACC_LPF_FACTOR > 0) {
-            accelLPF[axis] = accelLPF[axis] * (1.0f - (1.0f / CONFIG_ACC_LPF_FACTOR)) + accelADC[axis] * 
+            accelLPF[axis] = accelLPF[axis] * (1.0f - (1.0f / CONFIG_ACC_LPF_FACTOR)) + this->accelADC[axis] * 
                 (1.0f / CONFIG_ACC_LPF_FACTOR);
             accelSmooth[axis] = (int16_t)accelLPF[axis];
         } else {
-            accelSmooth[axis] = accelADC[axis];
+            accelSmooth[axis] = this->accelADC[axis];
         }
         accMag += (int32_t)accelSmooth[axis] * accelSmooth[axis];
     }
