@@ -97,6 +97,13 @@ void Hackflight::setGyrolReading(int16_t angular_velocity[3])
     this->imu.gyroADC[2] = angular_velocity[2];
 }
 
+void Hackflight::setRC(float * channels, uint count)
+{
+    for (uint k=0; k<count; ++k) {
+        this->rc.command[k] = (int16_t)channels[k];
+    }
+}
+
 void Hackflight::update(void)
 {
     static bool     accCalibrated;
