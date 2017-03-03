@@ -121,7 +121,11 @@ class Hackflight {
 
     public:
 
-        void initialize(uint16_t acc1G, float gyroScale, uint32_t looptimeUsec, uint32_t gyroCalibrationMsec);
+        void initialize(
+                uint16_t acc1G=4096, 
+                float gyroScale=16.4f, 
+                uint32_t looptimeUsec=3500, 
+                uint32_t gyroCalibrationMsec=3500);
 
         void setAccelReading(int16_t linear_accel[3]);      // [-4096,+4096]
 
