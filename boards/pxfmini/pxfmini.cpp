@@ -26,15 +26,11 @@
 
 // Essentials ---------------------------------------------------------------------------
 
-void Board::imuInit(uint16_t & acc1G, float & gyroScale)
-{
-}
-
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
 }
 
-void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
+void Board::init(uint16_t & acc1G, float & gyroScale, uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
     looptimeMicroseconds = Board::DEFAULT_IMU_LOOPTIME_USEC; 
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;

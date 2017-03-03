@@ -141,6 +141,7 @@ TARGET_HEX	 = $(BIN_DIR)/hackflight_$(TARGET).hex
 TARGET_ELF	 = $(BIN_DIR)/hackflight_$(TARGET).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC)))) \
 			   $(OBJECT_DIR)/hackflight.o \
+			   $(OBJECT_DIR)/board.o \
 			   $(OBJECT_DIR)/imu.o \
 			   $(OBJECT_DIR)/mixer.o \
 			   $(OBJECT_DIR)/msp.o \
@@ -191,6 +192,9 @@ FIRMDIR = $(HACKFLIGHT_DIR)/firmware
 
 $(OBJECT_DIR)/hackflight.o: $(FIRMDIR)/hackflight.cpp $(FIRMDIR)/hackflight.hpp
 	@$(CC) -c -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) $(FIRMDIR)/hackflight.cpp
+
+$(OBJECT_DIR)/board.o: $(FIRMDIR)/board.cpp $(FIRMDIR)/hackflight.hpp $(FIRMDIR)/board.hpp
+	@$(CC) -c -o $(OBJECT_DIR)/board.o $(CFLAGS) $(FIRMDIR)/board.cpp
 
 $(OBJECT_DIR)/imu.o: $(FIRMDIR)/imu.cpp $(FIRMDIR)/imu.hpp
 	@$(CC) -c -o $(OBJECT_DIR)/imu.o $(CFLAGS) $(FIRMDIR)/imu.cpp

@@ -19,8 +19,8 @@
 
 CFLAGS = -Wall
 
-hackflight: main.o pxfmini.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o
-	g++ -o hackflight main.o pxfmini.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o -lwiringPi
+hackflight: main.o pxfmini.o hackflight.o board.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o
+	g++ -o hackflight board.o main.o pxfmini.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o -lwiringPi
 
 main.o: main.cpp
 	g++ $(CFLAGS) -c -I ../firmware main.cpp
@@ -30,6 +30,9 @@ pxfmini.o: pxfmini.cpp
 
 hackflight.o: ../firmware/hackflight.cpp
 	g++ $(CFLAGS) -c ../firmware/hackflight.cpp	
+
+board.o: ../firmware/board.cpp
+	g++ $(CFLAGS) -c ../firmware/board.cpp	
 
 filters.o: ../firmware/filters.cpp
 	g++ $(CFLAGS) -c ../firmware/filters.cpp	

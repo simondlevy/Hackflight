@@ -39,26 +39,13 @@ void Board::dump(char * msg)
         Serial.write(*c);
 }
 
-void Board::imuInit(uint16_t & acc1G, float & gyroScale)
-{
-    imu = new MPU6050();
-
-    imu->begin(AFS_8G, GFS_2000DPS);
-
-    // Accel scale 8g (4096 LSB/g)
-    acc1G = 4096;
-
-    // 16.4 dps/lsb scalefactor for all Invensense devices
-    gyroScale = 16.4f;
-}
-
 void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
     imu->getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
 }
 
 
-void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
+void Board::init(uint16_t & acc1G, float & gyroScale, uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
     // Init LEDs
     pinMode(3, OUTPUT);
@@ -75,6 +62,16 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
 
     looptimeMicroseconds = IMU_LOOPTIME_USEC;
     calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
+
+    imu = new MPU6050();
+
+    imu->begin(AFS_8G, GFS_2000DPS);
+
+    // Accel scale 8g (4096 LSB/g)
+    acc1G = 4096;
+
+    // 16.4 dps/lsb scalefactor for all Invensense devices
+    gyroScale = 16.4f;
 }
 
 void Board::checkReboot(bool pendReboot)

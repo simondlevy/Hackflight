@@ -50,18 +50,7 @@ void Board::dump(char * msg)
 
 
 
-void Board::imuInit(uint16_t & acc1G, float & gyroScale)
-{
-    //imu.begin(ACCEL_RANGE_8G,GYRO_RANGE_2000DPS);
- 
-    // Accel scale 8g (4096 LSB/g)
-    acc1G = 4096;
-
-    // 16.4 dps/lsb scalefactor for all Invensense devices
-    gyroScale = 16.4f;
-}
-
-void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
+void Board::init(uint16_t & acc1G, float & gyroScale, uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
     // Stop motors
     //for (int k=0; k<4; ++k) {
@@ -84,6 +73,14 @@ void Board::init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec
     // Use default hardware loop times
     looptimeMicroseconds = Board::DEFAULT_IMU_LOOPTIME_USEC; 
     calibratingGyroMsec  = Board::DEFAULT_GYRO_CALIBRATION_MSEC;
+
+    //imu.begin(ACCEL_RANGE_8G,GYRO_RANGE_2000DPS);
+ 
+    // Accel scale 8g (4096 LSB/g)
+    acc1G = 4096;
+
+    // 16.4 dps/lsb scalefactor for all Invensense devices
+    gyroScale = 16.4f;
 }
 
 
