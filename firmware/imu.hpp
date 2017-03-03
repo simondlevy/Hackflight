@@ -54,7 +54,8 @@ class IMU {
 
         // called from MW
         void init(uint16_t calibratingGyroCycles, uint16_t calibratingAccCycles);
-        void update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG);
+        void update(int16_t _accelADC[3], int16_t _gyroADC[3],
+                uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG);
 
         // called from Hover
         float computeAccelZ(void);

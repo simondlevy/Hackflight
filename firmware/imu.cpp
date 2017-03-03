@@ -135,7 +135,8 @@ void IMU::init(uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles)
 }
 
 
-void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
+void IMU::update(int16_t _accelADC[3], int16_t _gyroADC[3],
+        uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
 {
     static float    accelLPF[3];
     static int32_t  accelZoffset;
@@ -159,10 +160,9 @@ void IMU::update(uint32_t currentTime, bool armed, uint16_t & calibratingA, uint
 
     previousTime = currentTime;
 
-    Board::imuRead(this->accelADC, this->gyroADC);
-
     for (int k=0; k<3; ++k) {
-        this->gyroADC[k] >>= 2;
+        this->accelADC[k] = _accelADC[k];
+        this->gyroADC[k]  = _gyroADC[k] >> 2;
     }
 
     if (calibratingA > 0) {
