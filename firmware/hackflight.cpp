@@ -81,7 +81,21 @@ void Hackflight::initialize(void)
     // ensure not armed
     this->armed = false;
     
-} // setup
+} // intialize
+
+void Hackflight::setAccelReading(int16_t linear_accel[3]) 
+{
+    this->imu.accelADC[0] = linear_accel[0];
+    this->imu.accelADC[1] = linear_accel[1];
+    this->imu.accelADC[2] = linear_accel[2];
+}
+
+void Hackflight::setGyrolReading(int16_t angular_velocity[3])
+{
+    this->imu.gyroADC[0] = angular_velocity[0];
+    this->imu.gyroADC[1] = angular_velocity[1];
+    this->imu.gyroADC[2] = angular_velocity[2];
+}
 
 void Hackflight::update(void)
 {

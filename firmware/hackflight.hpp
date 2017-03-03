@@ -120,5 +120,9 @@ class Hackflight {
 
         void initialize(void);
 
+        void setAccelReading(int16_t linear_accel[3]);      // [-4096,+4096]
+
+        void setGyrolReading(int16_t angular_velocity[3]);  // [-4096,+4096]
+
         void update(void);
 };
