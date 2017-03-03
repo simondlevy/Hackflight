@@ -106,9 +106,16 @@ void Hackflight::setRC(float * channels, uint count)
 
 void Hackflight::getControls(float * controls, uint count)
 {
-    // XXX
-    (void)controls;
-    (void)count;
+    // update stability PID controller 
+    this->stab.update();
+
+    // update mixer
+    this->mixer.update(this->armed);
+
+    // grab motor values
+    for (uint k=0; k<count; ++k) {
+        controls[k] = this->mixer.motors[k];
+    }
 }
 
 void Hackflight::arm(void)
@@ -252,6 +259,10 @@ void Hackflight::update(void)
 
         // update mixer
         this->mixer.update(this->armed);
+
+        // spin motors
+        for (uint8_t i = 0; i < 4; i++)
+            Board::writeMotor(i, this->mixer.motors[i]);
 
     } // IMU update
 

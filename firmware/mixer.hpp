@@ -30,7 +30,9 @@ extern "C" {
         
         public:
 
-            int16_t  motorsDisarmed[4];
+            int16_t motors[4];
+
+            int16_t motorsDisarmed[4];
 
             void init(class RC * _rc, class Stabilize * _stabilize);
 

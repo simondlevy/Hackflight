@@ -47,38 +47,35 @@ void Mixer::init(class RC * _rc, class Stabilize * _stabilize)
 void Mixer::update(bool armed)
 {
     int16_t maxMotor;
-    int16_t motors[4];
 
     for (uint8_t i = 0; i < 4; i++)
-        motors[i] = (int16_t)
+        this->motors[i] = (int16_t)
             (this->rc->command[DEMAND_THROTTLE] * mixerQuadX[i].throttle + 
              this->stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch + 
              this->stabilize->axisPID[AXIS_ROLL] * mixerQuadX[i].roll - 
              this->stabilize->axisPID[AXIS_YAW] * mixerQuadX[i].yaw);
 
-    maxMotor = motors[0];
+    maxMotor = this->motors[0];
 
     for (uint8_t i = 1; i < 4; i++)
-        if (motors[i] > maxMotor)
-            maxMotor = motors[i];
+        if (this->motors[i] > maxMotor)
+            maxMotor = this->motors[i];
 
     for (uint8_t i = 0; i < 4; i++) {
 
         if (maxMotor > CONFIG_PWM_MAX)     
             // this is a way to still have good gyro corrections if at least one motor reaches its max.
-            motors[i] -= maxMotor - CONFIG_PWM_MAX;
+            this->motors[i] -= maxMotor - CONFIG_PWM_MAX;
 
-        motors[i] = constrain(motors[i], CONFIG_PWM_MIN, CONFIG_PWM_MAX);
+        this->motors[i] = constrain(this->motors[i], CONFIG_PWM_MIN, CONFIG_PWM_MAX);
 
         if (this->rc->throttleIsDown()) {
-            motors[i] = CONFIG_PWM_MIN;
+            this->motors[i] = CONFIG_PWM_MIN;
         } 
 
         if (!armed) {
-            motors[i] = motorsDisarmed[i];
+            this->motors[i] = motorsDisarmed[i];
         }
     }
 
-    for (uint8_t i = 0; i < 4; i++)
-        Board::writeMotor(i, motors[i]);
 }
