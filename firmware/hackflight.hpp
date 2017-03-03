@@ -131,9 +131,9 @@ class Hackflight {
 
         void setGyrolReading(int16_t angular_velocity[3]);  // [-4096,+4096]
 
-        void setRC(float * channels, uint count);           // [1000,2000], 4
+        void setRC(float * channels, uint8_t count);        // [1000,2000], 4
 
-        void getControls(float * controls, uint count);     // [1000,2000], 4
+        void getControls(float * controls, uint8_t count);  // [1000,2000], 4
 
         void arm(void);
 

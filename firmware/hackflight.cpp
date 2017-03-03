@@ -76,21 +76,21 @@ void Hackflight::setGyrolReading(int16_t angular_velocity[3])
     this->imu.gyroADC[2] = angular_velocity[2];
 }
 
-void Hackflight::setRC(float * channels, uint count)
+void Hackflight::setRC(float * channels, uint8_t count)
 {
-    for (uint k=0; k<count; ++k) {
+    for (uint8_t k=0; k<count; ++k) {
         this->rc.command[k] = (int16_t)channels[k];
     }
 }
 
-void Hackflight::getControls(float * controls, uint count)
+void Hackflight::getControls(float * controls, uint8_t count)
 {
 
    // update PIDs and compute motor values
    this->update();
 
     // grab motor values
-    for (uint k=0; k<count; ++k) {
+    for (uint8_t k=0; k<count; ++k) {
         controls[k] = this->mixer.motors[k];
     }
 }
