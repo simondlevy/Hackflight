@@ -121,7 +121,7 @@ class Hackflight {
 
     public:
 
-        void initialize(void);
+        void initialize(uint32_t looptimeUsec, uint32_t gyroCalibrationMsec);
 
         void setAccelReading(int16_t linear_accel[3]);      // [-4096,+4096]
 
@@ -136,5 +136,6 @@ class Hackflight {
         void disarm(void);
 
         // Arduino API support
+        void setup(void);
         void loop(void);
 };
