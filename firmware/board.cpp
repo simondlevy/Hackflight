@@ -224,7 +224,7 @@ void debug(const char * fmt, ...)
 
     char buf[1000];
 
-    vsprintf_s(buf, fmt, ap);
+    VSPRINTF(buf, fmt, ap);
 
     Board::dump(buf);
 

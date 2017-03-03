@@ -131,6 +131,7 @@
     <ClCompile Include="sim_extras.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\firmware\crossplatform.h" />
     <ClInclude Include="pidvals.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

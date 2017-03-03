@@ -38,12 +38,12 @@ void debug(const char * format, ...);
 #ifndef abs
 #define abs(x)    ((x) > 0 ? (x) : -(x))
 #define sgn(x)    ((x) > 0 ? +1 : -1)
-#define min(a, b) ((a) < (b) ? (a) : (b))
 #define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
 #endif
 
 #ifndef max
 #define max(a, b) ((a) > (b) ? (a) : (b))
+#define min(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
 // Config =====================================================

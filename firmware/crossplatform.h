@@ -22,11 +22,11 @@
 #define M_PI 3.14159265358979323846f
 #define SPRINTF sprintf_s
 #define STRCPY  strcpy_s
-#define VSNPRINTF vsnprintf_s
+#define VSPRINTF vsprintf_s
 #define lrintf(x) (float)(int)((x)+0.5)
 #else
 #define SPRINTF sprintf
 #define STRCPY  strcpy
-#define VSNPRINTF vsnprintf
+#define VSPRINTF vsprintf
 #include <stdbool.h>
 #endif
