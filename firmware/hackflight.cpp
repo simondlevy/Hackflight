@@ -104,6 +104,23 @@ void Hackflight::setRC(float * channels, uint count)
     }
 }
 
+void Hackflight::getControls(float * controls, uint count)
+{
+    // XXX
+    (void)controls;
+    (void)count;
+}
+
+void Hackflight::arm(void)
+{
+    this->armed = true;
+}
+
+void Hackflight::disarm(void)
+{
+    this->armed = false;
+}
+
 void Hackflight::update(void)
 {
     static bool     accCalibrated;

@@ -126,5 +126,11 @@ class Hackflight {
 
         void setRC(float * channels, uint count);           // [1000,2000], 4
 
+        void getControls(float * controls, uint count);     // [1000,2000], 4
+
+        void arm(void);
+
+        void disarm(void);
+
         void update(void);
 };
