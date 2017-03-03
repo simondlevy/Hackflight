@@ -1,7 +1,5 @@
 /*
-   board.cpp : implementation of board-specific routines
-
-   This implemenation is for STM32F103 boards (Naze32, Flip32, etc.)
+   alienflight.cpp : AlienflightF3 implementation of routines in board.hpp
 
    This file is part of Hackflight.
 

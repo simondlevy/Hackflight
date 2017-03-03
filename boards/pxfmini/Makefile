@@ -19,14 +19,14 @@
 
 CFLAGS = -Wall
 
-hackflight: main.o board.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o
-	g++ -o hackflight main.o board.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o -lwiringPi
+hackflight: main.o pxfmini.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o
+	g++ -o hackflight main.o pxfmini.o hackflight.o filters.o imu.o mixer.o msp.o rc.o stabilize.o sonars.o hover.o -lwiringPi
 
 main.o: main.cpp
 	g++ $(CFLAGS) -c -I ../firmware main.cpp
 
-board.o: board.cpp
-	g++ $(CFLAGS) -c -I ../firmware board.cpp
+pxfmini.o: pxfmini.cpp
+	g++ $(CFLAGS) -c -I ../firmware pxfmini.cpp
 
 hackflight.o: ../firmware/hackflight.cpp
 	g++ $(CFLAGS) -c ../firmware/hackflight.cpp	
@@ -59,7 +59,7 @@ clean:
 	rm -f hackflight *.o *~
 
 edit:
-	vim board.cpp
+	vim pxfmini.cpp
 
 run:
 	./hackflight

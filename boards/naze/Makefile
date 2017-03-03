@@ -147,7 +147,7 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(
 			   $(OBJECT_DIR)/rc.o \
 			   $(OBJECT_DIR)/stabilize.o \
 			   $(OBJECT_DIR)/filters.o \
-			   $(OBJECT_DIR)/board.o \
+			   $(OBJECT_DIR)/naze.o \
 			   $(OBJECT_DIR)/Arduino.o \
 			   $(OBJECT_DIR)/SpektrumDSM.o \
 			   $(OBJECT_DIR)/HardwareWire.o \
@@ -210,8 +210,8 @@ $(OBJECT_DIR)/stabilize.o: $(FIRMDIR)/stabilize.cpp $(FIRMDIR)/stabilize.hpp
 $(OBJECT_DIR)/filters.o: $(FIRMDIR)/filters.cpp $(FIRMDIR)/filters.hpp
 	@$(CC) -c -o $(OBJECT_DIR)/filters.o $(CFLAGS) $(FIRMDIR)/filters.cpp
 
-$(OBJECT_DIR)/board.o: board.cpp $(FIRMDIR)/board.hpp
-	@$(CC) -I$(FIRMDIR) -c -o $(OBJECT_DIR)/board.o $(CFLAGS) board.cpp
+$(OBJECT_DIR)/naze.o: naze.cpp $(FIRMDIR)/board.hpp
+	@$(CC) -I$(FIRMDIR) -c -o $(OBJECT_DIR)/naze.o $(CFLAGS) naze.cpp
 
 $(OBJECT_DIR)/Arduino.o: $(F1_DIR)/Arduino.cpp
 	@$(CC) -c -o $(OBJECT_DIR)/Arduino.o $(CFLAGS) $(F1_DIR)/Arduino.cpp

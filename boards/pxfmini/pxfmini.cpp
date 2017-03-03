@@ -1,7 +1,5 @@
 /*
-   board.cpp : implementation of board-specific routines
-
-   This implemenation is for the Erle Robotics PXFMini
+   pxfimini.cpp : PXFMini implementation of routines in board.hpp
 
    This file is part of Hackflight.
 

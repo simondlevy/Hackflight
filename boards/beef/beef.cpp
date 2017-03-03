@@ -1,7 +1,5 @@
 /*
-   board.cpp : implementation of board-specific routines
-
-   This implemenation is for STM32F103 boards (Naze32, Flip32, etc.)
+   beef.cpp : Beef's Brushed Board implementation of routines in board.hpp
 
    This file is part of Hackflight.
 
@@ -33,7 +31,7 @@ MPU6050 * imu;
 
 SpektrumDSM2048 rx;
 
-BrushlessMotor motors[4];
+BrushedMotor motors[4];
 
 void Board::dump(char * msg)
 {

@@ -1,9 +1,6 @@
 /*
-   board.cpp : implementation of board-specific routines
-
-   This implemenation is for Kris Winer's brushed-motor Teensy board with MPU9250 IMU. 
-
-   MPU9250 code adapted from https://github.com/kriswiner/MPU-9250
+   teensy.cpp : implementation of routines in board.hpp using Kris Winer's 
+   brushed-motor Teensy board with MPU9250 IMU. 
 
    This file is part of Hackflight.
 

@@ -293,7 +293,7 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(
 			   $(OBJECT_DIR)/$(TARGET)/rc.o \
 			   $(OBJECT_DIR)/$(TARGET)/stabilize.o \
 			   $(OBJECT_DIR)/$(TARGET)/filters.o \
-			   $(OBJECT_DIR)/$(TARGET)/board.o \
+			   $(OBJECT_DIR)/$(TARGET)/alienflightf3.o \
 			   $(OBJECT_DIR)/$(TARGET)/Arduino.o \
 			   $(OBJECT_DIR)/$(TARGET)/HardwareWire.o \
 			   $(OBJECT_DIR)/$(TARGET)/SpektrumDSM.o \
@@ -411,8 +411,8 @@ $(OBJECT_DIR)/$(TARGET)/stabilize.o: $(FIRMWARE_DIR)/stabilize.cpp
 $(OBJECT_DIR)/$(TARGET)/filters.o: $(FIRMWARE_DIR)/filters.cpp 
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/filters.o $(CFLAGS) $(FIRMWARE_DIR)/filters.cpp 
 
-$(OBJECT_DIR)/$(TARGET)/board.o: board.cpp 
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/board.o $(CFLAGS) board.cpp 
+$(OBJECT_DIR)/$(TARGET)/alienflightf3.o: alienflightf3.cpp 
+	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/alienflightf3.o $(CFLAGS) alienflightf3.cpp 
 
 $(OBJECT_DIR)/$(TARGET)/Arduino.o: $(F3_DIR)/Arduino.cpp $(BREEZY_DIR)/Arduino.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/Arduino.o $(CFLAGS) $(F3_DIR)/Arduino.cpp
