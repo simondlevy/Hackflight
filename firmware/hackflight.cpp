@@ -27,7 +27,7 @@
 extern "C" { 
 #endif
 
-void Hackflight::initialize(uint32_t looptimeUsec, uint32_t gyroCalibrationMsec)
+void Hackflight::initialize(uint16_t acc1G, float gyroScale, uint32_t looptimeUsec, uint32_t gyroCalibrationMsec)
 {
     this->imuLooptimeUsec = looptimeUsec;
     
@@ -44,7 +44,7 @@ void Hackflight::initialize(uint32_t looptimeUsec, uint32_t gyroCalibrationMsec)
     // initialize our external objects with objects they need
     this->rc.init();
     stab.init(&this->rc, &this->imu);
-    this->imu.init(this->calibratingGyroCycles, this->calibratingAccCycles);
+    this->imu.init(acc1G, gyroScale, this->calibratingGyroCycles, this->calibratingAccCycles);
     this->mixer.init(&this->rc, &this->stab); 
     this->msp.init(&this->imu, &this->mixer, &this->rc);
 

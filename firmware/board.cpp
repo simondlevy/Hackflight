@@ -31,11 +31,13 @@ extern "C" {
 
 void Hackflight::setup(void)
 {
+    uint16_t acc1G;
+    float    gyroScale;
     uint32_t looptimeUsec;
     uint32_t calibratingGyroMsec;
 
     // Get particulars for board
-    Board::init(looptimeUsec, calibratingGyroMsec);
+    Board::init(acc1G, gyroScale, looptimeUsec, calibratingGyroMsec);
 
     // sleep for 100ms
     Board::delayMilliseconds(100);
@@ -53,7 +55,7 @@ void Hackflight::setup(void)
     }
 
     // initialize the Hackflight object
-    this->initialize(looptimeUsec, calibratingGyroMsec);
+    this->initialize(acc1G, gyroScale, looptimeUsec, calibratingGyroMsec);
 
 } // setup
 

@@ -114,11 +114,12 @@ static void rotateV(float v[3], float *delta)
     v[Z] = v_tmp[X] * mat[0][2] + v_tmp[Y] * mat[1][2] + v_tmp[Z] * mat[2][2];
 }
 
-void IMU::init(uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles) 
+void IMU::init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles) 
 {
-    Board::imuInit(this->acc1G, this->gyroScale);
+    this->acc1G = _acc1G;
 
-    this->gyroScale = (4.0 / this->gyroScale) * (M_PI / 180.0f);
+    // Convert gyro scale from degrees to radians
+    this->gyroScale = (4.0 / _gyroScale) * (M_PI / 180.0f);
 
     // calculate RC time constant used in the this->accelZ lpf    
     this->fcAcc = (float)(0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF)); 
