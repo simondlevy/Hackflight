@@ -116,6 +116,9 @@ class Hackflight {
         bool     haveSmallAngle;
         bool     armed;
 
+        // computes PIDs and uses them to update motors
+        void update(void);
+
     public:
 
         void initialize(void);
@@ -132,5 +135,6 @@ class Hackflight {
 
         void disarm(void);
 
-        void update(void);
+        // Arduino API support
+        void loop(void);
 };

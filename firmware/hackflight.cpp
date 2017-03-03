@@ -23,9 +23,6 @@
 
 #include <string.h>
 
-// support for timed tasks
-
-
 #if defined(STM32)
 extern "C" { 
 #endif
@@ -106,11 +103,9 @@ void Hackflight::setRC(float * channels, uint count)
 
 void Hackflight::getControls(float * controls, uint count)
 {
-    // update stability PID controller 
-    this->stab.update();
 
-    // update mixer
-    this->mixer.update(this->armed);
+   // update PIDs and compute motor values
+   this->update();
 
     // grab motor values
     for (uint k=0; k<count; ++k) {
@@ -128,7 +123,7 @@ void Hackflight::disarm(void)
     this->armed = false;
 }
 
-void Hackflight::update(void)
+void Hackflight::loop(void)
 {
     static bool     accCalibrated;
     static uint16_t calibratingA;
@@ -251,14 +246,11 @@ void Hackflight::update(void)
             }
         }
 
+        // update PIDs and compute motor values
+        this->update();
+
         // handle serial communications
         this->msp.update(this->armed);
-
-        // update stability PID controller 
-        this->stab.update();
-
-        // update mixer
-        this->mixer.update(this->armed);
 
         // spin motors
         for (uint8_t i = 0; i < 4; i++)
@@ -266,8 +258,16 @@ void Hackflight::update(void)
 
     } // IMU update
 
+} // update()
 
-} // loop()
+void Hackflight::update(void)
+{
+    // update stability PID controller 
+    this->stab.update();
+
+    // update mixer
+    this->mixer.update(this->armed);
+}
 
 static Hackflight hackflight;
 
@@ -278,7 +278,7 @@ void setup(void)
 
 void loop(void)
 {
-    hackflight.update();
+    hackflight.loop();
 }
 
 #if defined(STM32)
