@@ -200,7 +200,7 @@ static void hideToastDialog(void)
 static void startToast(const char * message, int colorR, int colorG, int colorB)
 {
     hideToastDialog();
-    toastDialogHandle = displayDialog("", (char *)message, colorR,colorG,colorB, sim_dlgstyle_message);
+    toastDialogHandle = displayDialog("", (char *)message, (float)colorR, (float)colorG, (float)colorB, sim_dlgstyle_message);
     toastDialogStartMicros = micros; 
 }
 

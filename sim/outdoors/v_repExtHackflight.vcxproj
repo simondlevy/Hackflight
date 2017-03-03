@@ -118,6 +118,7 @@
     <ClCompile Include="..\..\..\..\..\..\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\common\scriptFunctionData.cpp" />
     <ClCompile Include="..\..\..\..\..\..\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\common\scriptFunctionDataItem.cpp" />
     <ClCompile Include="..\..\..\..\..\..\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\common\v_repLib.cpp" />
+    <ClCompile Include="..\..\firmware\board.cpp" />
     <ClCompile Include="..\..\firmware\filters.cpp" />
     <ClCompile Include="..\..\firmware\hackflight.cpp" />
     <ClCompile Include="..\..\firmware\imu.cpp" />

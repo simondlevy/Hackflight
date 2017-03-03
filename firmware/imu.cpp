@@ -119,7 +119,7 @@ void IMU::init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycle
     this->acc1G = _acc1G;
 
     // Convert gyro scale from degrees to radians
-    this->gyroScale = (4.0 / _gyroScale) * (M_PI / 180.0f);
+    this->gyroScale = (4.0f / _gyroScale) * (M_PI / 180.0f);
 
     // calculate RC time constant used in the this->accelZ lpf    
     this->fcAcc = (float)(0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF)); 
@@ -155,7 +155,7 @@ void IMU::update(int16_t _accelADC[3], int16_t _gyroADC[3],
     float accel_ned[3];
     float deltaGyroAngle[3];
     uint32_t dT_usec = currentTime - previousTime;
-    float dT_sec = dT_usec * 1e-6;
+    float dT_sec = dT_usec * 1e-6f;
     float scale = dT_sec* this->gyroScale; 
     float anglerad[3];
 
