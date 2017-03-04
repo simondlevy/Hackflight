@@ -71,9 +71,9 @@ void Hackflight::setAccelReading(int16_t linear_accel[3])
 
 void Hackflight::setGyrolReading(int16_t angular_velocity[3])
 {
-    this->imu.gyroADC[0] = angular_velocity[0];
-    this->imu.gyroADC[1] = angular_velocity[1];
-    this->imu.gyroADC[2] = angular_velocity[2];
+    this->gyroADC[0] = angular_velocity[0];
+    this->gyroADC[1] = angular_velocity[1];
+    this->gyroADC[2] = angular_velocity[2];
 }
 
 void Hackflight::setRC(float * channels, uint8_t count)
@@ -108,7 +108,7 @@ void Hackflight::disarm(void)
 void Hackflight::update(void)
 {
     // update stability PID controller 
-    this->stab.update(this->rc.command, this->imu.gyroADC, this->imu.angle);
+    this->stab.update(this->rc.command, this->gyroADC, this->imu.angle);
 
     // update mixer
     this->mixer.update(this->armed);

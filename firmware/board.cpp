@@ -139,9 +139,7 @@ void Hackflight::loop(void)
 
     if (this->imuTask.checkAndUpdate(currentTime)) {
 
-        int16_t gyroADC[3];
-
-        Board::imuRead(this->accelADC, gyroADC);
+        Board::imuRead(this->accelADC, this->gyroADC);
 
         this->imu.update(this->accelADC, gyroADC, currentTime, this->armed, calibratingA, this->calibratingG);
 

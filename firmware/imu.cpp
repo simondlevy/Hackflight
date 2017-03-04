@@ -125,7 +125,6 @@ void IMU::init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycle
     this->fcAcc = (float)(0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF)); 
 
     for (int k=0; k<3; ++k) {
-        this->gyroADC[k] = 0;
         this->accelSum[k] = 0;
     }
 
@@ -136,7 +135,7 @@ void IMU::init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycle
 }
 
 
-void IMU::update(int16_t accelADC[3], int16_t _gyroADC[3],
+void IMU::update(int16_t accelADC[3], int16_t gyroADC[3],
         uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
 {
     static float    accelLPF[3];
@@ -162,7 +161,7 @@ void IMU::update(int16_t accelADC[3], int16_t _gyroADC[3],
     previousTime = currentTime;
 
     for (int k=0; k<3; ++k) {
-        this->gyroADC[k]  = _gyroADC[k] >> 2;
+        gyroADC[k] >>= 2;
     }
 
     if (calibratingA > 0) {
@@ -203,10 +202,10 @@ void IMU::update(int16_t accelADC[3], int16_t _gyroADC[3],
                 devClear(&var[axis]);
             }
             // Sum up 1000 readings
-            g[axis] += this->gyroADC[axis];
-            devPush(&var[axis], this->gyroADC[axis]);
+            g[axis] += gyroADC[axis];
+            devPush(&var[axis], gyroADC[axis]);
             // Clear global variables for next reading
-            this->gyroADC[axis] = 0;
+            gyroADC[axis] = 0;
             gyroZero[axis] = 0;
             if (calibratingG == 1) {
                 float dev = devStandardDeviation(&var[axis]);
@@ -226,11 +225,11 @@ void IMU::update(int16_t accelADC[3], int16_t _gyroADC[3],
     }
 
     for (uint8_t axis = 0; axis < 3; axis++)
-        this->gyroADC[axis] -= gyroZero[axis];
+        gyroADC[axis] -= gyroZero[axis];
 
     // Initialization
     for (uint8_t axis = 0; axis < 3; axis++) {
-        deltaGyroAngle[axis] = this->gyroADC[axis] * scale;
+        deltaGyroAngle[axis] = gyroADC[axis] * scale;
         if (CONFIG_ACC_LPF_FACTOR > 0) {
             accelLPF[axis] = accelLPF[axis] * (1.0f - (1.0f / CONFIG_ACC_LPF_FACTOR)) + accelADC[axis] * 
                 (1.0f / CONFIG_ACC_LPF_FACTOR);

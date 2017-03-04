@@ -49,11 +49,10 @@ class IMU {
 
         // shared with other classes
         int16_t  angle[3];      // tenths of a degree
-        int16_t  gyroADC[3];    // [-4096,+4096]
 
         // called from core firmware
         void init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles);
-        void update(int16_t _accelADC[3], int16_t _gyroADC[3],
+        void update(int16_t accelADC[3], int16_t gyroADC[3],
                 uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG);
 
         // called from Hover
