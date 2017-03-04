@@ -118,6 +118,10 @@ void IMU::init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycle
 {
     this->acc1G = _acc1G;
 
+    this->EstN[0] = 1.0f;
+    this->EstN[1] = 1.0f;
+    this->EstN[2] = 0.0f;
+
     // Convert gyro scale from degrees to radians
     this->gyroScale = (4.0f / _gyroScale) * (M_PI / 180.0f);
 
@@ -138,27 +142,16 @@ void IMU::init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycle
 void IMU::update(int16_t accelADC[3], int16_t gyroADC[3],
         uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
 {
-    static float    accelLPF[3];
-    static int32_t  accelZoffset;
-    static float    accz_smooth;
-    static int16_t  accelZero[3];
-    static int32_t  a[3];
-    static int16_t  accelSmooth[3];
-    static float    EstG[3];
-    static float    EstN[3] = { 1.0f, 0.0f, 0.0f };
-    static int16_t  gyroZero[3];
-    static uint32_t previousTime;
-
     int32_t accMag = 0;
     float rpy[3];
     float accel_ned[3];
     float deltaGyroAngle[3];
-    uint32_t dT_usec = currentTime - previousTime;
+    uint32_t dT_usec = currentTime - this->previousTime;
     float dT_sec = dT_usec * 1e-6f;
     float scale = dT_sec* this->gyroScale; 
     float anglerad[3];
 
-    previousTime = currentTime;
+    this->previousTime = currentTime;
 
     for (int k=0; k<3; ++k) {
         gyroADC[k] >>= 2;
@@ -169,25 +162,25 @@ void IMU::update(int16_t accelADC[3], int16_t gyroADC[3],
         for (uint8_t axis = 0; axis < 3; axis++) {
             // Reset a[axis] at start of calibration
             if (calibratingA == this->calibratingAccCycles)
-                a[axis] = 0;
+                this->a[axis] = 0;
             // Sum up this->calibratingAccCycles readings
             a[axis] += accelADC[axis];
             // Clear global variables for next reading
             accelADC[axis] = 0;
-            accelZero[axis] = 0;
+            this->accelZero[axis] = 0;
         }
         // Calculate average, shift Z down by acc1G
         if (calibratingA == 1) {
-            accelZero[AXIS_ROLL] = (a[AXIS_ROLL] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles;
-            accelZero[AXIS_PITCH] = (a[AXIS_PITCH] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles;
-            accelZero[AXIS_YAW] = (a[AXIS_YAW] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles - this->acc1G;
+            this->accelZero[AXIS_ROLL] = (this->a[AXIS_ROLL] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles;
+            this->accelZero[AXIS_PITCH] = (this->a[AXIS_PITCH] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles;
+            this->accelZero[AXIS_YAW] = (this->a[AXIS_YAW] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles - this->acc1G;
         }
         calibratingA--;
     }
 
-    accelADC[AXIS_ROLL]  -= accelZero[AXIS_ROLL];
-    accelADC[AXIS_PITCH] -= accelZero[AXIS_PITCH];
-    accelADC[AXIS_YAW]   -= accelZero[AXIS_YAW];
+    accelADC[AXIS_ROLL]  -= this->accelZero[AXIS_ROLL];
+    accelADC[AXIS_PITCH] -= this->accelZero[AXIS_PITCH];
+    accelADC[AXIS_YAW]   -= this->accelZero[AXIS_YAW];
 
     // range: +/- 8192; +/- 2000 deg/sec
 
@@ -206,7 +199,7 @@ void IMU::update(int16_t accelADC[3], int16_t gyroADC[3],
             devPush(&var[axis], gyroADC[axis]);
             // Clear global variables for next reading
             gyroADC[axis] = 0;
-            gyroZero[axis] = 0;
+            this->gyroZero[axis] = 0;
             if (calibratingG == 1) {
                 float dev = devStandardDeviation(&var[axis]);
                 // check deviation and startover if idiot was moving the model
@@ -218,31 +211,31 @@ void IMU::update(int16_t accelADC[3], int16_t gyroADC[3],
                     g[0] = g[1] = g[2] = 0;
                     continue;
                 }
-                gyroZero[axis] = (g[axis] + (this->calibratingGyroCycles / 2)) / this->calibratingGyroCycles;
+                this->gyroZero[axis] = (g[axis] + (this->calibratingGyroCycles / 2)) / this->calibratingGyroCycles;
             }
         }
         calibratingG--;
     }
 
     for (uint8_t axis = 0; axis < 3; axis++)
-        gyroADC[axis] -= gyroZero[axis];
+        gyroADC[axis] -= this->gyroZero[axis];
 
     // Initialization
     for (uint8_t axis = 0; axis < 3; axis++) {
         deltaGyroAngle[axis] = gyroADC[axis] * scale;
         if (CONFIG_ACC_LPF_FACTOR > 0) {
-            accelLPF[axis] = accelLPF[axis] * (1.0f - (1.0f / CONFIG_ACC_LPF_FACTOR)) + accelADC[axis] * 
+            this->accelLPF[axis] = this->accelLPF[axis] * (1.0f - (1.0f / CONFIG_ACC_LPF_FACTOR)) + accelADC[axis] * 
                 (1.0f / CONFIG_ACC_LPF_FACTOR);
-            accelSmooth[axis] = (int16_t)accelLPF[axis];
+            this->accelSmooth[axis] = (int16_t)this->accelLPF[axis];
         } else {
-            accelSmooth[axis] = accelADC[axis];
+            this->accelSmooth[axis] = accelADC[axis];
         }
-        accMag += (int32_t)accelSmooth[axis] * accelSmooth[axis];
+        accMag += (int32_t)this->accelSmooth[axis] * this->accelSmooth[axis];
     }
 
     accMag = accMag * 100 / ((int32_t)this->acc1G * this->acc1G);
 
-    rotateV(EstG, deltaGyroAngle);
+    rotateV(this->EstG, deltaGyroAngle);
 
     // Apply complementary filter (Gyro drift correction)
     // If accel magnitude >1.15G or <0.85G and ACC vector outside of the limit
@@ -250,22 +243,22 @@ void IMU::update(int16_t accelADC[3], int16_t gyroADC[3],
     // estimation.  To do that, we just skip filter, as EstV already rotated by Gyro
     if (72 < (uint16_t)accMag && (uint16_t)accMag < 133) 
         for (uint8_t axis = 0; axis < 3; axis++)
-            EstG[axis] = (EstG[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + accelSmooth[axis]) * INV_GYR_CMPF_FACTOR;
+            this->EstG[axis] = (this->EstG[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + this->accelSmooth[axis]) * INV_GYR_CMPF_FACTOR;
 
     // Attitude of the estimated vector
-    anglerad[AXIS_ROLL] = atan2f(EstG[Y], EstG[Z]);
-    anglerad[AXIS_PITCH] = atan2f(-EstG[X], sqrtf(EstG[Y] * EstG[Y] + EstG[Z] * EstG[Z]));
+    anglerad[AXIS_ROLL] = atan2f(this->EstG[Y], this->EstG[Z]);
+    anglerad[AXIS_PITCH] = atan2f(-this->EstG[X], sqrtf(this->EstG[Y] * this->EstG[Y] + this->EstG[Z] * this->EstG[Z]));
 
-    rotateV(EstN, deltaGyroAngle);
-    normalizeV(EstN, EstN);
+    rotateV(this->EstN, deltaGyroAngle);
+    normalizeV(this->EstN, this->EstN);
 
     // Calculate heading
     float cosineRoll = cosf(anglerad[AXIS_ROLL]);
     float sineRoll = sinf(anglerad[AXIS_ROLL]);
     float cosinePitch = cosf(anglerad[AXIS_PITCH]);
     float sinePitch = sinf(anglerad[AXIS_PITCH]);
-    float Xh = EstN[X] * cosinePitch + EstN[Y] * sineRoll * sinePitch + EstN[Z] * sinePitch * cosineRoll;
-    float Yh = EstN[Y] * cosineRoll - EstN[Z] * sineRoll;
+    float Xh = this->EstN[X] * cosinePitch + this->EstN[Y] * sineRoll * sinePitch + this->EstN[Z] * sinePitch * cosineRoll;
+    float Yh = this->EstN[Y] * cosineRoll - this->EstN[Z] * sineRoll;
     anglerad[AXIS_YAW] = atan2f(Yh, Xh); 
 
     // the accel values have to be rotated into the earth frame
@@ -273,25 +266,25 @@ void IMU::update(int16_t accelADC[3], int16_t gyroADC[3],
     rpy[1] = -(float)anglerad[AXIS_PITCH];
     rpy[2] = -(float)anglerad[AXIS_YAW];
 
-    accel_ned[X] = accelSmooth[0];
-    accel_ned[Y] = accelSmooth[1];
-    accel_ned[Z] = accelSmooth[2];
+    accel_ned[X] = this->accelSmooth[0];
+    accel_ned[Y] = this->accelSmooth[1];
+    accel_ned[Z] = this->accelSmooth[2];
 
     rotateV(accel_ned, rpy);
 
     if (!armed) {
-        accelZoffset -= accelZoffset / 64;
-        accelZoffset += (int32_t)accel_ned[Z];
+        this->accelZoffset -= this->accelZoffset / 64;
+        this->accelZoffset += (int32_t)accel_ned[Z];
     }
-    accel_ned[Z] -= accelZoffset / 64;  // compensate for gravitation on z-axis
+    accel_ned[Z] -= this->accelZoffset / 64;  // compensate for gravitation on z-axis
 
-    accz_smooth = accz_smooth + (dT_sec / (fcAcc + dT_sec)) * (accel_ned[Z] - accz_smooth); // low pass filter
+    this->accz_smooth = this->accz_smooth + (dT_sec / (fcAcc + dT_sec)) * (accel_ned[Z] - this->accz_smooth); // low pass filter
 
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
     this->accelSum[X] += deadbandFilter((int32_t)lrintf(accel_ned[X]), CONFIG_ACCXY_DEADBAND);
     this->accelSum[Y] += deadbandFilter((int32_t)lrintf(accel_ned[Y]), CONFIG_ACCXY_DEADBAND);
-    this->accelSum[Z] += deadbandFilter((int32_t)lrintf(accz_smooth), CONFIG_ACCZ_DEADBAND);
+    this->accelSum[Z] += deadbandFilter((int32_t)lrintf(this->accz_smooth), CONFIG_ACCZ_DEADBAND);
 
     this->accelTimeSum += dT_usec;
     this->accelSumCount++;
