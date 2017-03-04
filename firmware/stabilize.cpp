@@ -20,9 +20,8 @@
 #include "hackflight.hpp"
 #include "pidvals.hpp"
 
-void Stabilize::init(class RC * _rc, class IMU * _imu)
+void Stabilize::init(class IMU * _imu)
 {
-    this->rc = _rc;
     this->imu = _imu;
 
     for (uint8_t axis=0; axis<3; ++axis) {
@@ -46,17 +45,17 @@ void Stabilize::init(class RC * _rc, class IMU * _imu)
     this->resetIntegral();
 }
 
-void Stabilize::update(void)
+void Stabilize::update(int16_t * rcCommand)
 {
     for (uint8_t axis = 0; axis < 3; axis++) {
 
-        int32_t error = (int32_t)this->rc->command[axis] * 10 * 8 / this->rate_p[axis];
+        int32_t error = (int32_t)rcCommand[axis] * 10 * 8 / this->rate_p[axis];
         error -= this->imu->gyroADC[axis];
 
-        int32_t PTermGYRO = this->rc->command[axis];
+        int32_t PTermGYRO = rcCommand[axis];
 
         this->errorGyroI[axis] = constrain(this->errorGyroI[axis] + error, -16000, +16000); // WindUp
-        if ((abs(this->imu->gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (abs(this->rc->command[axis]) > 100)))
+        if ((abs(this->imu->gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (abs(rcCommand[axis]) > 100)))
             this->errorGyroI[axis] = 0;
         int32_t ITermGYRO = (this->errorGyroI[axis] / 125 * this->rate_i[axis]) >> 6;
 
@@ -66,7 +65,7 @@ void Stabilize::update(void)
         if (axis < 2) {
 
             // 50 degrees max inclination
-            int32_t errorAngle = constrain(2 * this->rc->command[axis], 
+            int32_t errorAngle = constrain(2 * rcCommand[axis], 
                                            -((int)CONFIG_MAX_ANGLE_INCLINATION), 
                                            + CONFIG_MAX_ANGLE_INCLINATION) 
                                  - this->imu->angle[axis];
@@ -76,8 +75,8 @@ void Stabilize::update(void)
             this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
             int32_t ITermACC = ((int32_t)(this->errorAngleI[axis] * CONFIG_LEVEL_I)) >> 12;
 
-            int32_t prop = max(abs(this->rc->command[DEMAND_PITCH]), 
-                    abs(this->rc->command[DEMAND_ROLL])); // range [0;500]
+            int32_t prop = max(abs(rcCommand[DEMAND_PITCH]), 
+                    abs(rcCommand[DEMAND_ROLL])); // range [0;500]
 
             PTerm = (PTermACC * (500 - prop) + PTermGYRO * prop) / 500;
             ITerm = (ITermACC * (500 - prop) + ITermGYRO * prop) / 500;
@@ -95,7 +94,7 @@ void Stabilize::update(void)
 
     // prevent "yaw jump" during yaw correction
     this->axisPID[AXIS_YAW] = constrain(this->axisPID[AXIS_YAW], 
-            -100 - abs(this->rc->command[DEMAND_YAW]), +100 + abs(this->rc->command[DEMAND_YAW]));
+            -100 - abs(rcCommand[DEMAND_YAW]), +100 + abs(rcCommand[DEMAND_YAW]));
 }
 
 void Stabilize::resetIntegral(void)
