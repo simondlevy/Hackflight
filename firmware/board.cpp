@@ -139,11 +139,11 @@ void Hackflight::loop(void)
 
     if (this->imuTask.checkAndUpdate(currentTime)) {
 
-        int16_t accelADC[3], gyroADC[3];
+        int16_t gyroADC[3];
 
-        Board::imuRead(accelADC, gyroADC);
+        Board::imuRead(this->accelADC, gyroADC);
 
-        this->imu.update(accelADC, gyroADC, currentTime, this->armed, calibratingA, this->calibratingG);
+        this->imu.update(this->accelADC, gyroADC, currentTime, this->armed, calibratingA, this->calibratingG);
 
         this->haveSmallAngle = 
             abs(this->imu.angle[0]) < CONFIG_SMALL_ANGLE && abs(this->imu.angle[1]) < CONFIG_SMALL_ANGLE;

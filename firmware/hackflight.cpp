@@ -64,9 +64,9 @@ void Hackflight::initialize(uint16_t acc1G, float gyroScale, uint32_t looptimeUs
 
 void Hackflight::setAccelReading(int16_t linear_accel[3]) 
 {
-    this->imu.accelADC[0] = linear_accel[0];
-    this->imu.accelADC[1] = linear_accel[1];
-    this->imu.accelADC[2] = linear_accel[2];
+    this->accelADC[0] = linear_accel[0];
+    this->accelADC[1] = linear_accel[1];
+    this->accelADC[2] = linear_accel[2];
 }
 
 void Hackflight::setGyrolReading(int16_t angular_velocity[3])

@@ -50,7 +50,6 @@ class IMU {
         // shared with other classes
         int16_t  angle[3];      // tenths of a degree
         int16_t  gyroADC[3];    // [-4096,+4096]
-        int16_t  accelADC[3];   // [-4096,+4096]
 
         // called from core firmware
         void init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles);
