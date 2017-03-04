@@ -39,7 +39,6 @@ void Hackflight::initialize(uint16_t acc1G, float gyroScale, uint32_t looptimeUs
     this->imuTask.init(this->imuLooptimeUsec);
     this->rcTask.init(CONFIG_RC_LOOPTIME_MSEC * 1000);
     this->accelCalibrationTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
-    this->altitudeEstimationTask.init(CONFIG_ALTITUDE_UPDATE_MSEC * 1000);
 
     // initialize our external objects with objects they need
     this->stab.init();

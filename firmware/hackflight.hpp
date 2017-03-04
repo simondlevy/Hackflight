@@ -110,7 +110,6 @@ class Hackflight {
         class TimedTask imuTask;
         class TimedTask rcTask;
         class TimedTask accelCalibrationTask;
-        class TimedTask altitudeEstimationTask;
 
         int16_t  accelADC[3];   // [-4096,+4096]
         int16_t  gyroADC[3];    // [-4096,+4096]
