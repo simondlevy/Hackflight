@@ -52,7 +52,7 @@ void Hackflight::setAccelReading(int16_t linear_accel[3])
     this->accelADC[2] = linear_accel[2];
 }
 
-void Hackflight::setGyrolReading(int16_t angular_velocity[3])
+void Hackflight::setGyroReading(int16_t angular_velocity[3])
 {
     this->gyroADC[0] = angular_velocity[0];
     this->gyroADC[1] = angular_velocity[1];

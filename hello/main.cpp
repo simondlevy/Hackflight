@@ -20,17 +20,33 @@
 #include <hackflight.hpp>
 
 #include <stdio.h>
-#include <time.h>
+#include <stdint.h>
 
 int main(int argc, char ** argv)
 {
+    int16_t accel[3];
+    int16_t gyro[3];
+    float rcChannels[4];
+
     Hackflight hackflight;
 
     hackflight.initialize();
 
-    while (true) {
-        printf("%ld\n", clock());
+    hackflight.arm();
+
+    for (int k=0; k<3; ++k) {
+        accel[k] = 0;
+        gyro[k] = 0;
     }
+
+    rcChannels[0] = 1500;   // roll
+    rcChannels[1] = 1500;   // pitch
+    rcChannels[2] = 1500;   // yaw
+    rcChannels[3] = 1000;   // throttle
+    
+    hackflight.setAccelReading(accel);
+    hackflight.setGyroReading(gyro);
+    hackflight.setRC(rcChannels, 4);
 
     return 0;
 }
