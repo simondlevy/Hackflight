@@ -116,6 +116,28 @@ static void rotateV(float v[3], float *delta)
 
 void IMU::init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles) 
 {
+    for (int k=0; k<3; ++k) {
+        a[k] = 0;
+        accelLPF[k] = 0;
+        accelSmooth[k] = 0;
+        accelSum[k] = 0;
+        accelZero[k] = 0;
+        EstG[k] = 0;
+        gyroZero[k] = 0;
+    }
+
+    this->accelSumCount = 0;
+    this->accelTimeSum = 0;
+    this->accelVelScale = 0;
+    this->accelZoffset = 0;
+    this->accz_smooth = 0;
+    this->calibratingGyroCycles = 0;
+    this->calibratingAccCycles = 0;
+    this->acc1G = 0;
+    this->fcAcc = 0;
+    this->gyroScale = 0;
+    this->previousTimeUsec = 0;
+
     this->acc1G = _acc1G;
 
     this->EstN[0] = 1.0f;
