@@ -64,7 +64,6 @@ void Hackflight::loop(void)
     static bool     accCalibrated;
     static uint16_t calibratingA;
     static uint32_t currentTime;
-    static uint32_t disarmTime;
 
     bool rcSerialReady = Board::rcSerialReady();
 
@@ -92,9 +91,6 @@ void Hackflight::loop(void)
                     if (this->armed) {
                         armed = false;
                         Board::showArmedStatus(this->armed);
-                        // Reset disarm time so that it works next time we arm the Board::
-                        if (disarmTime != 0)
-                            disarmTime = 0;
                     }
                 }
             } else {         // actions during not armed

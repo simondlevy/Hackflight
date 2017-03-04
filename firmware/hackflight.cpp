@@ -85,6 +85,8 @@ void Hackflight::setRC(float * channels, uint8_t count)
 
 void Hackflight::getControls(float * controls, uint8_t count)
 {
+   // update IMU
+   //this->imu.update(this->accelADC, this->gyroADC, currentTime, this->armed);
 
    // update PIDs and compute motor values
    this->update();

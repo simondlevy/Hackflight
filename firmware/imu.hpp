@@ -35,26 +35,26 @@ class IMU {
 
     private:
 
-        float    accelLPF[3];
-        int32_t  accelZoffset;
-        float    accz_smooth;
-        int16_t  accelZero[3];
-        int32_t  a[3];
-        int16_t  accelSmooth[3];
-        float    EstG[3];
-        float    EstN[3];
-        int16_t  gyroZero[3];
-        uint32_t previousTime;
 
+        int32_t  a[3];
+        float    accelLPF[3];
+        int16_t  accelSmooth[3];
         int32_t  accelSum[3];
         int32_t  accelSumCount;
         uint32_t accelTimeSum;
         float    accelVelScale;
+        int16_t  accelZero[3];
+        int32_t  accelZoffset;
+        float    accz_smooth;
         uint16_t calibratingGyroCycles;
         uint16_t calibratingAccCycles;
         uint16_t acc1G;
+        float    EstG[3];
+        float    EstN[3];
         float    fcAcc;
         float    gyroScale;
+        int16_t  gyroZero[3];
+        uint32_t previousTime;
 
     public:
 
