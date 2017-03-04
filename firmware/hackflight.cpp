@@ -83,14 +83,17 @@ void Hackflight::setRC(float * channels, uint8_t count)
     }
 }
 
-void Hackflight::getControls(float * controls, uint8_t count)
+void Hackflight::setTime(uint32_t usec)
 {
    // update IMU
-   //this->imu.update(this->accelADC, this->gyroADC, currentTime, this->armed);
+   this->imu.update(this->accelADC, this->gyroADC, usec, this->armed);
 
    // update PIDs and compute motor values
    this->update();
+}
 
+void Hackflight::getControls(float * controls, uint8_t count)
+{
     // grab motor values
     for (uint8_t k=0; k<count; ++k) {
         controls[k] = this->mixer.motors[k];

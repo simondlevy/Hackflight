@@ -139,19 +139,19 @@ void IMU::init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycle
 }
 
 
-void IMU::update(int16_t accelADC[3], int16_t gyroADC[3], uint32_t currentTime, bool armed, 
+void IMU::update(int16_t accelADC[3], int16_t gyroADC[3], uint32_t currentTimeUsec, bool armed, 
         uint16_t calibratingA, uint16_t calibratingG)
 {
     int32_t accMag = 0;
     float rpy[3];
     float accel_ned[3];
     float deltaGyroAngle[3];
-    uint32_t dT_usec = currentTime - this->previousTime;
+    uint32_t dT_usec = currentTimeUsec - this->previousTimeUsec;
     float dT_sec = dT_usec * 1e-6f;
     float scale = dT_sec* this->gyroScale; 
     float anglerad[3];
 
-    this->previousTime = currentTime;
+    this->previousTimeUsec = currentTimeUsec;
 
     for (int k=0; k<3; ++k) {
         gyroADC[k] >>= 2;

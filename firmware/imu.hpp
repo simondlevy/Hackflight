@@ -54,7 +54,7 @@ class IMU {
         float    fcAcc;
         float    gyroScale;
         int16_t  gyroZero[3];
-        uint32_t previousTime;
+        uint32_t previousTimeUsec;
 
     public:
 
@@ -63,7 +63,7 @@ class IMU {
 
         // called from core firmware
         void init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles);
-        void update(int16_t accelADC[3], int16_t gyroADC[3], uint32_t currentTime, bool armed, 
+        void update(int16_t accelADC[3], int16_t gyroADC[3], uint32_t currentTimeUsec, bool armed, 
                 uint16_t calibratingA=0, uint16_t calibratingG=0);
 
         // called from Hover
