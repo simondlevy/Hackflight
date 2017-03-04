@@ -140,11 +140,6 @@ uint8_t RC::auxState(void)
     return aux < 1500 ? 0 : (aux < 1700 ? 1 : 2);
 }
 
-bool RC::throttleIsDown(void)
-{
-    return this->data[DEMAND_THROTTLE] < CONFIG_MINCHECK;
-}
-
 #ifdef __arm__
 } // extern "C"
 #endif

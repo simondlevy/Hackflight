@@ -35,21 +35,10 @@ void Hackflight::initialize(uint16_t acc1G, float gyroScale, uint32_t looptimeUs
     this->calibratingGyroCycles = (uint16_t)(1000. * gyroCalibrationMsec / this->imuLooptimeUsec);
     this->calibratingAccCycles  = (uint16_t)(1000. * CONFIG_CALIBRATING_ACC_MSEC  / this->imuLooptimeUsec);
 
-    // initializing timing tasks
-    this->imuTask.init(this->imuLooptimeUsec);
-    this->rcTask.init(CONFIG_RC_LOOPTIME_MSEC * 1000);
-    this->accelCalibrationTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
-
     // initialize our external objects with objects they need
     this->stab.init();
     this->imu.init(acc1G, gyroScale, this->calibratingGyroCycles, this->calibratingAccCycles);
     this->mixer.init(&this->rc, &this->stab); 
-
-    // always do gyro calibration at startup
-    this->calibratingG = this->calibratingGyroCycles;
-
-    // assume shallow angle (no accelerometer calibration needed)
-    this->haveSmallAngle = true;
 
     // ensure not armed
     this->armed = false;

@@ -91,8 +91,8 @@ extern "C" {
             void computeExpo(void);
 
             uint8_t auxState(void);
-
-            bool throttleIsDown(void);
+            
+            bool throttleIsDown(void) { return this->data[DEMAND_THROTTLE] < CONFIG_MINCHECK; }
     };
 
 #ifdef __arm__

@@ -60,6 +60,17 @@ void Hackflight::setup(void)
     // initialize the Hackflight object
     this->initialize(acc1G, gyroScale, looptimeUsec, calibratingGyroMsec);
 
+    // always do gyro calibration at startup
+    this->calibratingG = this->calibratingGyroCycles;
+
+    // assume shallow angle (no accelerometer calibration needed)
+    this->haveSmallAngle = true;
+
+    // initializing timing tasks
+    this->imuTask.init(this->imuLooptimeUsec);
+    this->rcTask.init(CONFIG_RC_LOOPTIME_MSEC * 1000);
+    this->accelCalibrationTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
+
     // initialize MSP comms
     this->msp.init(&this->imu, &this->mixer, &this->rc);
 
