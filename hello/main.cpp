@@ -17,18 +17,9 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <hackflight.hpp>
+
 int main(int argc, char ** argv)
 {
-    // in hackflight.cpp
-    void setup(void);
-    void loop(void);
-
-    setup();
-
-    while (true) {
-
-        loop();
-    }
-
     return 0;
 }

@@ -42,14 +42,9 @@ void Hackflight::initialize(uint16_t acc1G, float gyroScale, uint32_t looptimeUs
     this->altitudeEstimationTask.init(CONFIG_ALTITUDE_UPDATE_MSEC * 1000);
 
     // initialize our external objects with objects they need
-    this->rc.init();
     this->stab.init();
     this->imu.init(acc1G, gyroScale, this->calibratingGyroCycles, this->calibratingAccCycles);
     this->mixer.init(&this->rc, &this->stab); 
-    this->msp.init(&this->imu, &this->mixer, &this->rc);
-
-    // do any extra initializations (baro, sonar, etc.)
-    this->board.extrasInit(&msp);
 
     // always do gyro calibration at startup
     this->calibratingG = this->calibratingGyroCycles;

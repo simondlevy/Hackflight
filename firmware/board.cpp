@@ -54,8 +54,17 @@ void Hackflight::setup(void)
         Board::delayMilliseconds(50);
     }
 
+    // intialize the R/C object
+    this->rc.init();
+
     // initialize the Hackflight object
     this->initialize(acc1G, gyroScale, looptimeUsec, calibratingGyroMsec);
+
+    // initialize MSP comms
+    this->msp.init(&this->imu, &this->mixer, &this->rc);
+
+    // do any extra initializations (baro, sonar, etc.)
+    this->board.extrasInit(&msp);
 
 } // setup
 

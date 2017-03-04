@@ -25,16 +25,12 @@ FIRMDIR = ../firmware
 
 all: $(TARGET)
 
-$(TARGET): main.cpp board.cpp $(FIRMDIR)/*.cpp $(FIRMDIR)/*.h
+$(TARGET): main.cpp $(FIRMDIR)/*.cpp $(FIRMDIR)/*.h
 	g++ $(CFLAGS) -c -I$(FIRMDIR) main.cpp
-	g++ $(CFLAGS) -c -I$(FIRMDIR) board.cpp
 	g++ $(CFLAGS) -c $(FIRMDIR)/imu.cpp
 	g++ $(CFLAGS) -c $(FIRMDIR)/mixer.cpp
-	g++ $(CFLAGS) -c $(FIRMDIR)/msp.cpp
 	g++ $(CFLAGS) -c $(FIRMDIR)/hackflight.cpp
 	g++ $(CFLAGS) -c -I. $(FIRMDIR)/stabilize.cpp
-	g++ $(CFLAGS) -c $(FIRMDIR)/filters.cpp
-	g++ $(CFLAGS) -c $(FIRMDIR)/rc.cpp
 	g++ $(CFLAGS) -c $(FIRMDIR)/filters.cpp
 	g++ *.o -o $(TARGET)
 
