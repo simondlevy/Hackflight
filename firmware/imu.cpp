@@ -139,8 +139,8 @@ void IMU::init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycle
 }
 
 
-void IMU::update(int16_t accelADC[3], int16_t gyroADC[3],
-        uint32_t currentTime, bool armed, uint16_t & calibratingA, uint16_t & calibratingG)
+void IMU::update(int16_t accelADC[3], int16_t gyroADC[3], uint32_t currentTime, bool armed, 
+        uint16_t calibratingA, uint16_t calibratingG)
 {
     int32_t accMag = 0;
     float rpy[3];
@@ -175,7 +175,6 @@ void IMU::update(int16_t accelADC[3], int16_t gyroADC[3],
             this->accelZero[AXIS_PITCH] = (this->a[AXIS_PITCH] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles;
             this->accelZero[AXIS_YAW] = (this->a[AXIS_YAW] + (this->calibratingAccCycles / 2)) / this->calibratingAccCycles - this->acc1G;
         }
-        calibratingA--;
     }
 
     accelADC[AXIS_ROLL]  -= this->accelZero[AXIS_ROLL];
@@ -214,7 +213,6 @@ void IMU::update(int16_t accelADC[3], int16_t gyroADC[3],
                 this->gyroZero[axis] = (g[axis] + (this->calibratingGyroCycles / 2)) / this->calibratingGyroCycles;
             }
         }
-        calibratingG--;
     }
 
     for (uint8_t axis = 0; axis < 3; axis++)
