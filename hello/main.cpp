@@ -19,7 +19,18 @@
 
 #include <hackflight.hpp>
 
+#include <stdio.h>
+#include <time.h>
+
 int main(int argc, char ** argv)
 {
+    Hackflight hackflight;
+
+    hackflight.initialize();
+
+    while (true) {
+        printf("%ld\n", clock());
+    }
+
     return 0;
 }
