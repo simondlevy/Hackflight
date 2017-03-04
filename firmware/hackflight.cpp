@@ -43,7 +43,7 @@ void Hackflight::initialize(uint16_t acc1G, float gyroScale, uint32_t looptimeUs
 
     // initialize our external objects with objects they need
     this->rc.init();
-    this->stab.init(&this->imu);
+    this->stab.init();
     this->imu.init(acc1G, gyroScale, this->calibratingGyroCycles, this->calibratingAccCycles);
     this->mixer.init(&this->rc, &this->stab); 
     this->msp.init(&this->imu, &this->mixer, &this->rc);
@@ -108,7 +108,7 @@ void Hackflight::disarm(void)
 void Hackflight::update(void)
 {
     // update stability PID controller 
-    this->stab.update(this->rc.command);
+    this->stab.update(this->rc.command, this->imu.gyroADC, this->imu.angle);
 
     // update mixer
     this->mixer.update(this->armed);

@@ -23,8 +23,6 @@ class Stabilize {
 
     private:
 
-        class IMU * imu;
-
         uint8_t rate_p[3];
         uint8_t rate_i[3];
         uint8_t rate_d[3];
@@ -39,9 +37,9 @@ class Stabilize {
 
         int16_t axisPID[3];
 
-        void init(class IMU * _imu);
+        void init(void);
 
-        void update(int16_t * rcCommand);
+        void update(int16_t rcCommand[4], int16_t gyroADC[3], int16_t angle[3]);
 
         void resetIntegral(void);
 }; 
