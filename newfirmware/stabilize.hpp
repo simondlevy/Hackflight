@@ -112,8 +112,8 @@ void Stabilize::update(void)
             this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
             int32_t ITermACC = ((int32_t)(this->errorAngleI[axis] * CONFIG_LEVEL_I)) >> 12;
 
-            int32_t prop = std::max(abs(this->rc->command[DEMAND_PITCH]), 
-                std::abs(this->rc->command[DEMAND_ROLL])); // range [0;500]
+            int32_t prop = std::max(std::abs(this->rc->command[DEMAND_PITCH]), 
+                                    std::abs(this->rc->command[DEMAND_ROLL])); // range [0;500]
 
             PTerm = (PTermACC * (500 - prop) + PTermGYRO * prop) / 500;
             ITerm = (ITermACC * (500 - prop) + ITermGYRO * prop) / 500;

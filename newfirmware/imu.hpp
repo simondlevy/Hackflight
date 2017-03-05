@@ -69,14 +69,14 @@ private: //types
     } stdev_t;
 
 private: //methods
-    static void devClear(struct stdev_t *dev);
+    static void devClear(stdev_t *dev);
     static void devPush(stdev_t *dev, float x);
     static float devVariance(stdev_t *dev);
     static float devStandardDeviation(stdev_t *dev);
     static void normalizeV(float src[3], float dest[3]);
     static void rotateV(float v[3], float *delta);
-    uint16_t IMU::getGyroCalibrationCyclesTotal(const Config::ImuConfig& config) const;
-    uint16_t IMU::getAccelCalibrationCyclesTotal(const Config::ImuConfig& config) const;
+    uint16_t getGyroCalibrationCyclesTotal(const Config::ImuConfig& config) const;
+    uint16_t getAccelCalibrationCyclesTotal(const Config::ImuConfig& config) const;
 
 private: //fields
     int32_t  accelSum[3];
@@ -341,7 +341,7 @@ uint16_t IMU::getAccelCalibrationCyclesTotal(const Config::ImuConfig& config) co
     return  (uint16_t)(1000.0f * config.calibratingAccelMilli / config.imuLoopMicro);
 }
 
-void IMU::devClear(struct stdev_t *dev)
+void IMU::devClear(stdev_t *dev)
 {
     dev->m_n = 0;
 }

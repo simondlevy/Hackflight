@@ -15,17 +15,17 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 #include <cstdlib>
 #include <cstdarg>
+#include <cstdio>
+
 #include "board.hpp"
 #include "mixer.hpp"
 #include "msp.hpp"
 #include "common.hpp"
 #include "imu.hpp"
 #include "rc.hpp"
-#include "TimedTask.hpp"
+#include "timedtask.hpp"
 
 namespace hf {
 
@@ -39,7 +39,7 @@ private:
     void flashLeds(uint16_t onOffCount);
     void updateCalibrationState(bool& armed, bool& isMoving);
     void updateImu(bool armed);
-    void Hackflight::debug(const char * fmt, ...);
+    void debug(const char * fmt, ...);
 
 private:
     bool armed;
