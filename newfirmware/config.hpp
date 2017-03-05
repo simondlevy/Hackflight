@@ -1,5 +1,5 @@
 /*
-   pidvals.hpp : PID values for a specific vehicle
+   config.hpp : configuration values (PID etc.) for a specific vehicle
 
    This file is part of Hackflight.
 

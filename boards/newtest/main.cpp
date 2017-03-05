@@ -1,8 +1,12 @@
 #include <hackflight.hpp>
+#include <simboard.hpp>
 
-#include <stdio.h>
-
-int main(int argc, char ** argv)
+int main()
 {
-    return 0;
+    hf::Hackflight h;
+    h.init(new hf::SimBoard());
+
+    while (true) {
+
+    }
 }
