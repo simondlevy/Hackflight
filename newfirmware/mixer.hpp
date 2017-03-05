@@ -43,13 +43,12 @@ private:
         float yaw;
     } motorMixer_t;
 
-    static constexpr motorMixer_t mixerQuadX[] = {
+    /*static constexpr*/ motorMixer_t mixerQuadX[4] = {
         { 1.0f, -1.0f,  1.0f, -1.0f },          // REAR_R
         { 1.0f, -1.0f, -1.0f,  1.0f },          // FRONT_R
         { 1.0f,  1.0f,  1.0f,  1.0f },          // REAR_L
         { 1.0f,  1.0f, -1.0f, -1.0f },          // FRONT_L
     };
-
 };
 
 
