@@ -6,9 +6,9 @@ int main()
     hf::Hackflight h;
     h.init(new hf::SimBoard());
 
-    printf("read\n");
+    uint32_t count = 0;
 
     while (true) {
-
+        h.update();
     }
 }
