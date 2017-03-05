@@ -1,5 +1,5 @@
 #include <hackflight.hpp>
-#include <simboard.hpp>
+#include "mysimboard.hpp"
 
 int main()
 {
