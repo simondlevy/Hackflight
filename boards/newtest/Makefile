@@ -1,4 +1,4 @@
-newtest: main.cpp ../../newfirmware/*.hpp
+newtest: main.cpp mysimboard.hpp ../../newfirmware/*.hpp
 	g++ -std=gnu++11 -I../../newfirmware -o newtest main.cpp 
 
 run: newtest

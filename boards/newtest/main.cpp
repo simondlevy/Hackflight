@@ -6,6 +6,8 @@ int main()
     hf::Hackflight h;
     h.init(new hf::SimBoard());
 
+    printf("read\n");
+
     while (true) {
 
     }

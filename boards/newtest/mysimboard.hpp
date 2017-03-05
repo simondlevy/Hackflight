@@ -1,8 +1,9 @@
 // Board implementation ======================================================
 #include <cstdio>
 #include <cstdint>
-#include <chrono>
-#include <thread>
+
+#include <time.h>
+
 #include "board.hpp"
 #include "config.hpp"
 #include "common.hpp"
@@ -39,7 +40,7 @@ public:
 
     virtual uint64_t getMicros() override
     {
-        return static_cast<uint64_t>(getTimeSinceEpoch());
+        return clock() / 1000;
     }
 
     virtual bool rcUseSerial(void) override
@@ -110,34 +111,16 @@ public:
         if (msec <= 0)
             return;
 
-        //if duration is too small, use spin wait otherwise use spin wait
-        if (msec >= 10) {
-            static constexpr duration<double> MinSleepDuration(0);
-            clock::time_point start = clock::now();
-            double dt = msec * 1000;
-            //spin wait
-            while (duration<double>(clock::now() - start).count() < dt) {
-                std::this_thread::sleep_for(MinSleepDuration);
-            }
-        }
-        else {
-            std::this_thread::sleep_for(duration<double>(msec * 1000));
+        uint32_t msec_start = clock() / 1000;
+        while (true) {
+            uint32_t msec_curr = clock() / 1000;
+            if ((msec_curr-msec_start)>msec)
+                break;
         }
     }
 
 
 private:
-    double getTimeSinceEpoch()
-    {
-        using Clock = std::chrono::high_resolution_clock;
-        return std::chrono::duration<double>(Clock::now().time_since_epoch()).count();
-    }
-
-private:
-    typedef std::chrono::high_resolution_clock clock;
-    template <typename T>
-    using duration = std::chrono::duration<T>;
-
 
     // Launch support
     bool ready;
