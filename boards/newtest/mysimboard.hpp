@@ -69,7 +69,7 @@ public:
 
     virtual void dump(char * msg) override
     {
-        printf("%s\n", msg);
+        printf("%s", msg);
     }
 
 

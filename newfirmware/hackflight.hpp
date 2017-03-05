@@ -153,7 +153,7 @@ void Hackflight::updateImu(bool armed)
         imu.update(currentTimeMicro, armed, gyroAdc, accelAdc);
 
 
-        debug("%d %d %d\n", imu.angle[0], imu.angle[1], imu.angle[2]);
+        debug("armed: %d    imu: %d %d %d\n", armed, imu.angle[0], imu.angle[1], imu.angle[2]);
 
         // measure loop rate just afer reading the sensors
         currentTimeMicro = board->getMicros();
