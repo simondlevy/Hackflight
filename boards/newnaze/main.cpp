@@ -1,10 +1,10 @@
 #include <hackflight.hpp>
-#include "mysimboard.hpp"
+#include "naze.hpp"
 
 int main()
 {
     hf::Hackflight h;
-    h.init(new hf::SimBoard());
+    h.init(new hf::Naze());
 
     while (true) {
         h.update();

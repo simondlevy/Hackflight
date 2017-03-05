@@ -1,4 +1,4 @@
-// Board implementation ======================================================
+// Board implementation for Naze32 ======================================================
 #include <cstdio>
 #include <cstdint>
 
@@ -11,7 +11,8 @@
 
 namespace hf {
 
-class SimBoard : public Board {
+class Naze : public Board {
+
 public:
     virtual void init() override
     {

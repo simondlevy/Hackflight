@@ -4,7 +4,7 @@ hackflight.hex: hackflight.elf
 hackflight.elf: main.o
 	arm-none-eabi-g++ -o hackflight.elf main.o -lc -specs=nosys.specs
 
-main.o: main.cpp mysimboard.hpp ../../newfirmware/*.hpp
+main.o: main.cpp naze.hpp ../../newfirmware/*.hpp
 	arm-none-eabi-g++ -std=gnu++11 -I../../newfirmware -c -o main.o main.cpp
 
 clean:
