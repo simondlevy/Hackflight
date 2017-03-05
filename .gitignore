@@ -1,4 +1,6 @@
-boards/newtest/newtest
+boards/newtest/*.o
+boards/newtest/*.hex
+boards/newtest/*.elf
 parser/output
 sim/libv_repExtHackflight.*
 sim/sonar/getimu
