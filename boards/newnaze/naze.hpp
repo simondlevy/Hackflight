@@ -48,9 +48,18 @@ public:
         return 1500;
     }
 
+    virtual void setLed(uint8_t id, bool is_on, float max_brightness) override
+    {
+        (void)max_brightness;
+
+        while (true) {
+            Serial.printf("setLed %d %d\n", id, is_on);
+        }
+    }
+
     virtual void dump(char * msg) override
     {
-        printf("%s", msg);
+        Serial.printf("%s", msg);
     }
 
 
