@@ -1,18 +1,10 @@
-###############################################################################
-# "THE BEER-WARE LICENSE" (Revision 42):
-# <msmith@FreeBSD.ORG> wrote this file. As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
-# this stuff is worth it, you can buy me a beer in return
-
-###############################################################################
-
-# Change this to wherever you put BreezySTM32
 BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
-# Change this to whatever example you want
-PROJECT		?= hackflight
+FIRMWARE_DIR = $(HOME)/Desktop/hackflight/newfirmware
 
 ###############################################################################
+
+PROJECT		?= hackflight
 
 F1_DIR = $(BREEZY_DIR)/f1
 
@@ -60,7 +52,7 @@ STDPERIPH_SRC	 = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
 
 # Tool names
 C++		 = arm-none-eabi-g++
-CC		 = arm-none-eabi-gcc 
+CC		 = arm-none-eabi-g++
 OBJCOPY	 = arm-none-eabi-objcopy
 
 #
@@ -68,6 +60,7 @@ OBJCOPY	 = arm-none-eabi-objcopy
 #
 INCLUDE_DIRS	 = $(SRC_DIR) \
 		   $(BREEZY_DIR) \
+		   $(FIRMWARE_DIR) \
 		   $(F1_DIR) \
 		   $(STDPERIPH_DIR)/inc \
 		   $(CMSIS_DIR)/CM3/CoreSupport \
@@ -86,6 +79,7 @@ endif
 DEBUG_FLAGS	 = -ggdb3
 
 CFLAGS		 = $(ARCH_FLAGS) \
+		  -std=gnu++11 \
 		   $(LTO_FLAGS) \
 		   $(addprefix -D,$(OPTIONS)) \
 		   $(addprefix -I,$(INCLUDE_DIRS)) \

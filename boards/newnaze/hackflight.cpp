@@ -1,4 +1,5 @@
-extern "C" {
+#include <hackflight.hpp>
+#include "naze.hpp"
 
 #include <stm32f10x_conf.h>
 #include <drv_gpio.h>
@@ -14,15 +15,14 @@ int main(void)
     void SetSysClock(bool overclock);
     void systemInit(void);
 
-    // Configure clock, this figures out HSE for hardware autodetect
     SetSysClock(0);
 
     systemInit();
 
+    hf::Hackflight h;
+    h.init(new hf::Naze());
+
     while (true) {
+        h.update();
     }
 }
-
-} // extern "C"
-
-
