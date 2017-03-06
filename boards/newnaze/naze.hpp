@@ -22,16 +22,23 @@ public:
         pinMode(3, OUTPUT);
         pinMode(4, OUTPUT);
 
-        // Configure tasks
+        // Configure 
         config.imu.imuLoopMicro = 3500;
         config.rc.rcLoopMilli = 21; 
         config.imu.calibratingGyroMilli = 3500; 
         config.imu.accelCalibrationPeriodMilli = 1400; 
         config.imu.altitudeUpdatePeriodMilli = 25; 
         config.ledFlashCountOnStartup = 20;
+        config.imu.acc1G = 4096;// Accel scale 8g (4096 LSB/g)
+        config.imu.gyroScale = 16.4f;// 16.4 dps/lsb scalefactor for all Invensense devices
 
         // Start I^2C
         Wire.begin(2);
+
+        // Start IMU
+        imu = new MPU6050();
+        imu->begin(AFS_8G, GFS_2000DPS);
+
     }
 
     virtual const Config& getConfig() override
@@ -41,8 +48,9 @@ public:
 
     virtual void imuRead(int16_t gyroAdc[3], int16_t accelAdc[3]) override
     {
-        (void)gyroAdc;
-        (void)accelAdc;
+        imu->getMotion6Counts(
+                &accelAdc[0], &accelAdc[1], &accelAdc[2], 
+                &gyroAdc[0], &gyroAdc[1], &gyroAdc[2]);
     }
 
 
@@ -98,6 +106,9 @@ public:
 
 
 private:
+
+    // IMU support
+    MPU6050 * imu;
 
     // Launch support
     bool ready;
