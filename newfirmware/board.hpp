@@ -34,33 +34,33 @@ public: //interface
     virtual uint64_t getMicros() = 0;
     virtual uint16_t readPWM(uint8_t chan)  = 0;
     virtual void writeMotor(uint8_t index, uint16_t value)  = 0;
-    virtual void setLed(int8_t id, bool is_on, float max_brightness = 255) {}
-    virtual void checkReboot(bool pendReboot)  {}
+    virtual void setLed(int8_t id, bool is_on, float max_brightness = 255) { (void)id; (void)is_on; (void)max_brightness;}
+    virtual void checkReboot(bool pendReboot)  {(void)pendReboot;}
     virtual void reboot(void) {}
 
 
     //-------------------------------------------------- RC -----------------------------------------------------
     virtual bool rcUseSerial(void) { return false; }
-    virtual uint16_t rcReadSerial(uint8_t chan)  { return 0; }
+    virtual uint16_t rcReadSerial(uint8_t chan)  { (void)chan; return 0; }
     virtual bool rcSerialReady(void)  { return false; }
 
 
     //------------------------------------------------ Serial ---------------------------------------------------
     virtual uint8_t serialAvailableBytes(void) { return 0; };
     virtual uint8_t serialReadByte(void) { return 0; };
-    virtual void serialWriteByte(uint8_t c) {};
+    virtual void serialWriteByte(uint8_t c) {(void)c;};
 
 
     //------------------------------------------------ extras ---------------------------------------------------
     virtual void extrasCheckSwitch(void)  {}
     virtual uint8_t  extrasGetTaskCount(void) { return 0; }
-    virtual bool     extrasHandleMSP(uint8_t command) { return true; }
-    virtual void extrasPerformTask(uint8_t taskIndex) {}
+    virtual bool     extrasHandleMSP(uint8_t command) { (void)command; return true; }
+    virtual void extrasPerformTask(uint8_t taskIndex) {(void)taskIndex;}
     //virtual void extrasInit(MSP * _msp) {} //TODO:// this causes circular includes
 
     //----------------------------------------------- Simulation -------------------------------------------------
-    virtual void showArmedStatus(bool armed) {}
-    virtual void showAuxStatus(uint8_t status) {}
+    virtual void showArmedStatus(bool armed) {(void)armed;}
+    virtual void showAuxStatus(uint8_t status) {(void)status;}
 
 }; // class Board
 

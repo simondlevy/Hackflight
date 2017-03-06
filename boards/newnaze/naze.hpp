@@ -81,6 +81,7 @@ public:
 
     virtual void showArmedStatus(bool armed) override
     {
+        (void)armed;
         //TODO: provide implementtaion
         //if (armed) 
         //    startToast("                    ARMED", 1, 0, 0);
