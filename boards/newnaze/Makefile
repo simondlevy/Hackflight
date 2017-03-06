@@ -12,6 +12,8 @@ F1_DIR = $(BREEZY_DIR)/f1
 
 MPU6050_DIR = $(ARDUINO_DIR)/MPU6050
 
+SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM
+
 # Debugger optons, must be empty or GDB
 DEBUG ?=
 
@@ -64,6 +66,7 @@ INCLUDE_DIRS = $(SRC_DIR) \
 		   $(FIRMWARE_DIR) \
 		   $(F1_DIR) \
 		   $(MPU6050_DIR) \
+		   $(SPEKTRUM_DIR) \
 		   $(STDPERIPH_DIR)/inc \
 		   $(CMSIS_DIR)/CM3/CoreSupport \
 		   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x \

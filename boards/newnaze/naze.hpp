@@ -8,6 +8,8 @@
 #include "config.hpp"
 #include "common.hpp"
 
+#include <SpektrumDSM.h>
+#include <MPU6050.h>
 
 namespace hf {
 
@@ -27,6 +29,9 @@ public:
         config.imu.accelCalibrationPeriodMilli = 1400; 
         config.imu.altitudeUpdatePeriodMilli = 25; 
         config.ledFlashCountOnStartup = 20;
+
+        // Start I^2C
+        Wire.begin(2);
     }
 
     virtual const Config& getConfig() override
