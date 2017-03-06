@@ -35,6 +35,9 @@ public:
         // Start I^2C
         HardwareWire::init(I2CDEV_2);
 
+        // Hang a sec
+        delay(100);
+
         // Start IMU
         imu = new MPU6050();
         imu->begin(AFS_8G, GFS_2000DPS);
