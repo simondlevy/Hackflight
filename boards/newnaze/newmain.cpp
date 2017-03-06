@@ -1,4 +1,6 @@
-extern "C" {
+/*
+#include <hackflight.hpp>
+#include "naze.hpp"
 
 #include <stm32f10x_conf.h>
 #include <drv_gpio.h>
@@ -6,10 +8,9 @@ extern "C" {
 #include <drv_serial.h>
 #include <drv_uart.h>
 #include <drv_serial.h>
+*/
 
-#include <stdlib.h>
-
-int main(void)
+int main(int argc, char ** argv)
 {
     void SetSysClock(bool overclock);
     void systemInit(void);
@@ -19,10 +20,12 @@ int main(void)
 
     systemInit();
 
+    /*
+    hf::Hackflight h;
+    h.init(new hf::Naze());
+
     while (true) {
+        h.update();
     }
+    */
 }
-
-} // extern "C"
-
-
