@@ -106,12 +106,12 @@ void Hackflight::update(void)
 
 void Hackflight::initImuRc()
 {
-    //const Config& config = board->getConfig();
+    const Config& config = board->getConfig();
 
-    //board->delayMilliseconds(config.initDelayMs);
+    board->delayMilliseconds(config.initDelayMs);
 
     //flash the LEDs to indicate startup
-    flashLeds(10);//config.ledFlashCountOnStartup);
+    flashLeds(config.ledFlashCountOnStartup);
 
     //initialize timed tasks
     //imuTask.init(config.imu.imuLoopMicro);
