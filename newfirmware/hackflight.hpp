@@ -108,7 +108,7 @@ void Hackflight::initImuRc()
     board->delayMilliseconds(config.initDelayMs);
 
     //flash the LEDs to indicate startup
-    //flashLeds(config.ledFlashCountOnStartup);
+    flashLeds(config.ledFlashCountOnStartup);
 
     //initialize timed tasks
     //imuTask.init(config.imu.imuLoopMicro);
