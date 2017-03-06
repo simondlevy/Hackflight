@@ -114,10 +114,10 @@ void Hackflight::initImuRc()
     flashLeds(config.ledFlashCountOnStartup);
 
     //initialize timed tasks
-    //imuTask.init(config.imu.imuLoopMicro);
-    //rcTask.init(config.rc.rcLoopMilli * 1000);
-    //accelCalibrationTask.init(config.imu.accelCalibrationPeriodMilli * 1000);
-    //altitudeEstimationTask.init(config.imu.attitudeUpdatePeriodMilli * 1000);
+    imuTask.init(config.imu.imuLoopMicro);
+    rcTask.init(config.rc.rcLoopMilli * 1000);
+    accelCalibrationTask.init(config.imu.accelCalibrationPeriodMilli * 1000);
+    altitudeEstimationTask.init(config.imu.altitudeUpdatePeriodMilli * 1000);
 
     //imu.init(config.imu);
     //rc.init();

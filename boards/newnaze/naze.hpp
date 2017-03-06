@@ -20,8 +20,13 @@ public:
         pinMode(3, OUTPUT);
         pinMode(4, OUTPUT);
 
+        // Configure tasks
         config.imu.imuLoopMicro = 3500;
+        config.rc.rcLoopMilli = 21; 
         config.imu.calibratingGyroMilli = 3500; 
+        config.imu.accelCalibrationPeriodMilli = 1400; 
+        config.imu.altitudeUpdatePeriodMilli = 25; 
+        config.ledFlashCountOnStartup = 20;
     }
 
     virtual const Config& getConfig() override

@@ -32,7 +32,7 @@ struct Config {
         float gyroScale = 16.4f;
         uint32_t calibratingAccelMilli = 1400;
         uint32_t accelCalibrationPeriodMilli = 500;
-        uint32_t attitudeUpdatePeriodMilli = 500;   // based on accelerometer low-pass filter
+        uint32_t altitudeUpdatePeriodMilli = 500;   // based on accelerometer low-pass filter
 
         //uint16_t smallAngle = 250;  // tenths of a degree
 
