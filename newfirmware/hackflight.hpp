@@ -79,7 +79,7 @@ void Hackflight::init(Board* _board)
     mixer.init(&rc, &stab); 
     msp.init(&imu, &mixer, &rc, board);
 
-    //TODO: can't enable this because of circuler includes
+    //TODO: can't enable this because of circular includes
     //board->extrasInit(&msp);
 
     // ensure not armed
