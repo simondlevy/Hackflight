@@ -67,6 +67,8 @@ private:
 
 void Hackflight::init(Board* _board)
 {
+    return;
+
     board = _board;
     initImuRc();
 

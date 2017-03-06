@@ -6,9 +6,6 @@ ARDUINO_DIR = $(HOME)/Development/arduino-1.8.1/hardware/teensy/avr/libraries
 
 FIRMWARE_DIR = $(HOME)/Desktop/hackflight/newfirmware
 
-# Change this to whatever project name you want
-PROJECT		?= hackflight
-
 ###############################################################################
 
 F1_DIR = $(BREEZY_DIR)/f1
@@ -29,7 +26,7 @@ STDPERIPH_DIR	 = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
-$(PROJECT)_CSRC = \
+hackflight_CSRC = \
 		   $(F1_DIR)/startup_stm32f10x_md_gcc.S \
 		   $(F1_DIR)/drv_gpio.c \
 		   $(F1_DIR)/drv_system.c \
@@ -113,14 +110,14 @@ LDFLAGS		 = -lm \
 # Things we will build
 #
 
-TARGET_HEX	 = $(BIN_DIR)/$(PROJECT).hex
-TARGET_ELF	 = $(BIN_DIR)/$(PROJECT).elf
-TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $($(PROJECT)_CSRC)))) \
-			   $(OBJECT_DIR)/$(PROJECT)/Arduino.o \
-			   $(OBJECT_DIR)/$(PROJECT)/HardwareWire.o \
-			   $(OBJECT_DIR)/$(PROJECT)/MPU6050.o \
-			   $(OBJECT_DIR)/$(PROJECT).o
-TARGET_MAP   = $(OBJECT_DIR)/$(PROJECT).map
+TARGET_HEX	 = $(BIN_DIR)/hackflight.hex
+TARGET_ELF	 = $(BIN_DIR)/hackflight.elf
+TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/hackflight/,$(basename $(hackflight_CSRC)))) \
+			   $(OBJECT_DIR)/hackflight/Arduino.o \
+			   $(OBJECT_DIR)/hackflight/HardwareWire.o \
+			   $(OBJECT_DIR)/hackflight/MPU6050.o \
+			   $(OBJECT_DIR)/hackflight.o
+TARGET_MAP   = $(OBJECT_DIR)/hackflight.map
 
 # List of buildable ELF files and their object dependencies.
 
@@ -133,13 +130,13 @@ $(TARGET_ELF):  $(TARGET_OBJS)
 MKDIR_OBJDIR = @mkdir -p $(dir $@)
 
 # Compile
-$(OBJECT_DIR)/$(PROJECT)/%.o: %.c
+$(OBJECT_DIR)/hackflight/%.o: %.c
 	$(MKDIR_OBJDIR)
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(CFLAGS) $<
 
 # Assemble
-$(OBJECT_DIR)/$(PROJECT)/%.o: %.S
+$(OBJECT_DIR)/hackflight/%.o: %.S
 	$(MKDIR_OBJDIR)
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(ASFLAGS) $< 
@@ -148,17 +145,17 @@ $(OBJECT_DIR)/$(PROJECT)/%.o: %.S
 %.o: %.cpp
 	$(CC) -c $(CFLAGS) -o $@ $^
 
-$(OBJECT_DIR)/$(PROJECT)/Arduino.o: $(F1_DIR)/Arduino.cpp $(BREEZY_DIR)/Arduino.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/Arduino.o $(CFLAGS) $(F1_DIR)/Arduino.cpp
+$(OBJECT_DIR)/hackflight/Arduino.o: $(F1_DIR)/Arduino.cpp $(BREEZY_DIR)/Arduino.h
+	@$(CC) -c -o $(OBJECT_DIR)/hackflight/Arduino.o $(CFLAGS) $(F1_DIR)/Arduino.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/HardwareWire.o: $(F1_DIR)/HardwareWire.cpp $(BREEZY_DIR)/Wire.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/HardwareWire.o $(CFLAGS) $(F1_DIR)/HardwareWire.cpp
+$(OBJECT_DIR)/hackflight/HardwareWire.o: $(F1_DIR)/HardwareWire.cpp $(BREEZY_DIR)/Wire.h
+	@$(CC) -c -o $(OBJECT_DIR)/hackflight/HardwareWire.o $(CFLAGS) $(F1_DIR)/HardwareWire.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/MPU6050.o: $(MPU6050_DIR)/MPU6050.cpp $(MPU6050_DIR)/MPU6050.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/MPU6050.o $(CFLAGS) $(MPU6050_DIR)/MPU6050.cpp
+$(OBJECT_DIR)/hackflight/MPU6050.o: $(MPU6050_DIR)/MPU6050.cpp $(MPU6050_DIR)/MPU6050.h
+	@$(CC) -c -o $(OBJECT_DIR)/hackflight/MPU6050.o $(CFLAGS) $(MPU6050_DIR)/MPU6050.cpp
 
-$(OBJECT_DIR)/$(PROJECT).o: ./$(PROJECT).cpp
-	@$(C++) -c -std=gnu++11 -o $(OBJECT_DIR)/$(PROJECT).o $(CFLAGS) ./$(PROJECT).cpp
+$(OBJECT_DIR)/hackflight.o: ./hackflight.cpp
+	@$(C++) -c -std=gnu++11 -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) ./hackflight.cpp
 
 clean:
 	rm -rf $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP) *.o obj 
