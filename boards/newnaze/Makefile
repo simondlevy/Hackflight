@@ -150,11 +150,11 @@ $(OBJECT_DIR)/$(PROJECT).o: ./$(PROJECT).cpp
 clean:
 	rm -rf $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP) *.o obj 
 
-flash_$(PROJECT): $(TARGET_HEX)
+unbrick_$(PROJECT): $(TARGET_HEX)
 	stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
 	stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
 
-flash: flash_$(PROJECT)
+unbrick: unbrick_$(PROJECT)
 
 listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
