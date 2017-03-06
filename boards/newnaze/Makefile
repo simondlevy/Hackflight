@@ -10,7 +10,7 @@ FIRMWARE_DIR = $(HOME)/Desktop/hackflight/newfirmware
 
 F1_DIR = $(BREEZY_DIR)/f1
 
-MPU6050_DIR = $(ARDUINO_DIR)/MPU6050
+MPU6050_DIR = .
 
 SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM
 
@@ -151,8 +151,8 @@ $(OBJECT_DIR)/hackflight/%.o: %.S
 $(OBJECT_DIR)/hackflight/Arduino.o: $(F1_DIR)/Arduino.cpp $(BREEZY_DIR)/Arduino.h
 	@$(CC) -c -o $(OBJECT_DIR)/hackflight/Arduino.o $(CFLAGS) $(F1_DIR)/Arduino.cpp
 
-$(OBJECT_DIR)/hackflight/HardwareWire.o: $(F1_DIR)/HardwareWire.cpp $(BREEZY_DIR)/Wire.h
-	@$(CC) -c -o $(OBJECT_DIR)/hackflight/HardwareWire.o $(CFLAGS) $(F1_DIR)/HardwareWire.cpp
+$(OBJECT_DIR)/hackflight/HardwareWire.o: HardwareWire.cpp Wire.h
+	@$(CC) -c -o $(OBJECT_DIR)/hackflight/HardwareWire.o $(CFLAGS) HardwareWire.cpp
 
 $(OBJECT_DIR)/hackflight/MPU6050.o: $(MPU6050_DIR)/MPU6050.cpp $(MPU6050_DIR)/MPU6050.h
 	@$(CC) -c -o $(OBJECT_DIR)/hackflight/MPU6050.o $(CFLAGS) $(MPU6050_DIR)/MPU6050.cpp

@@ -39,6 +39,8 @@ public:
         imu = new MPU6050();
         imu->begin(AFS_8G, GFS_2000DPS);
 
+        // Start receiver
+        //rx = new SpektrumDSM();
     }
 
     virtual const Config& getConfig() override
@@ -109,6 +111,9 @@ private:
 
     // IMU support
     MPU6050 * imu;
+
+    // RC support
+    SpektrumDSM * rx;
 
     // Launch support
     bool ready;
