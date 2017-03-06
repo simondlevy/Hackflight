@@ -67,14 +67,14 @@ private:
 
 void Hackflight::init(Board* _board)
 {
-    return;
+    // =============================
 
     board = _board;
     initImuRc();
 
-    stab.init(&rc, &imu);
-    mixer.init(&rc, &stab); 
-    msp.init(&imu, &mixer, &rc, board);
+    //stab.init(&rc, &imu);
+    //mixer.init(&rc, &stab); 
+    //msp.init(&imu, &mixer, &rc, board);
 
     //TODO: can't enable this because of circuler includes
     //board->extrasInit(&msp);
@@ -108,16 +108,16 @@ void Hackflight::initImuRc()
     board->delayMilliseconds(config.initDelayMs);
 
     //flash the LEDs to indicate startup
-    flashLeds(config.ledFlashCountOnStartup);
+    //flashLeds(config.ledFlashCountOnStartup);
 
     //initialize timed tasks
-    imuTask.init(config.imu.imuLoopMicro);
-    rcTask.init(config.rc.rcLoopMilli * 1000);
-    accelCalibrationTask.init(config.imu.accelCalibrationPeriodMilli * 1000);
-    altitudeEstimationTask.init(config.imu.attitudeUpdatePeriodMilli * 1000);
+    //imuTask.init(config.imu.imuLoopMicro);
+    //rcTask.init(config.rc.rcLoopMilli * 1000);
+    //accelCalibrationTask.init(config.imu.accelCalibrationPeriodMilli * 1000);
+    //altitudeEstimationTask.init(config.imu.attitudeUpdatePeriodMilli * 1000);
 
-    imu.init(config.imu);
-    rc.init();
+    //imu.init(config.imu);
+    //rc.init();
 }
 
 void Hackflight::flashLeds(uint16_t onOffCount)

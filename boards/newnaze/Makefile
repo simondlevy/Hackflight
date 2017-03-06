@@ -154,7 +154,7 @@ $(OBJECT_DIR)/hackflight/HardwareWire.o: $(F1_DIR)/HardwareWire.cpp $(BREEZY_DIR
 $(OBJECT_DIR)/hackflight/MPU6050.o: $(MPU6050_DIR)/MPU6050.cpp $(MPU6050_DIR)/MPU6050.h
 	@$(CC) -c -o $(OBJECT_DIR)/hackflight/MPU6050.o $(CFLAGS) $(MPU6050_DIR)/MPU6050.cpp
 
-$(OBJECT_DIR)/hackflight.o: ./hackflight.cpp $(FIRMWARE_DIR)/*.hpp
+$(OBJECT_DIR)/hackflight.o: ./hackflight.cpp naze.hpp $(FIRMWARE_DIR)/*.hpp
 	@$(C++) -c -std=gnu++11 -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) ./hackflight.cpp
 
 clean:

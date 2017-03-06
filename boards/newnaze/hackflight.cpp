@@ -1,7 +1,7 @@
 #include <hackflight.hpp>
-#include "naze.hpp"
 
 #include <Arduino.h>
+#include "naze.hpp"
 
 hf::Hackflight h;
 
