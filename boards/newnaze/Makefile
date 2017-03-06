@@ -10,7 +10,7 @@
 BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 # Change this to whatever example you want
-PROJECT		?= Blink
+PROJECT		?= hackflight
 
 ###############################################################################
 
@@ -120,7 +120,6 @@ LDFLAGS		 = -lm \
 TARGET_HEX	 = $(BIN_DIR)/$(PROJECT).hex
 TARGET_ELF	 = $(BIN_DIR)/$(PROJECT).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $($(PROJECT)_CSRC)))) \
-			   $(OBJECT_DIR)/$(PROJECT)/main.o \
 			   $(OBJECT_DIR)/$(PROJECT).o
 TARGET_MAP   = $(OBJECT_DIR)/$(PROJECT).map
 
@@ -150,9 +149,6 @@ $(OBJECT_DIR)/$(PROJECT)/%.o: %.S
 # C++ support
 %.o: %.cpp
 	$(CC) -c $(CFLAGS) -o $@ $^
-
-$(OBJECT_DIR)/$(PROJECT)/main.o: main.cpp 
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/main.o $(CFLAGS) main.cpp
 
 $(OBJECT_DIR)/$(PROJECT).o: ./$(PROJECT).cpp
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT).o $(CFLAGS) ./$(PROJECT).cpp
