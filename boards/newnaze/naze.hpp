@@ -33,7 +33,7 @@ public:
         config.imu.gyroScale = 16.4f;// 16.4 dps/lsb scalefactor for all Invensense devices
 
         // Start I^2C
-        Wire.begin(2);
+        HardwareWire::init(I2CDEV_2);
 
         // Start IMU
         imu = new MPU6050();

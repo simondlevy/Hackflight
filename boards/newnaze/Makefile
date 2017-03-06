@@ -10,8 +10,6 @@ FIRMWARE_DIR = $(HOME)/Desktop/hackflight/newfirmware
 
 F1_DIR = $(BREEZY_DIR)/f1
 
-MPU6050_DIR = .
-
 SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM
 
 # Debugger optons, must be empty or GDB
@@ -65,7 +63,6 @@ INCLUDE_DIRS = $(SRC_DIR) \
 		   $(BREEZY_DIR) \
 		   $(FIRMWARE_DIR) \
 		   $(F1_DIR) \
-		   $(MPU6050_DIR) \
 		   $(SPEKTRUM_DIR) \
 		   $(STDPERIPH_DIR)/inc \
 		   $(CMSIS_DIR)/CM3/CoreSupport \
@@ -117,7 +114,7 @@ TARGET_HEX	 = $(BIN_DIR)/hackflight.hex
 TARGET_ELF	 = $(BIN_DIR)/hackflight.elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/hackflight/,$(basename $(hackflight_CSRC)))) \
 			   $(OBJECT_DIR)/hackflight/Arduino.o \
-			   $(OBJECT_DIR)/hackflight/HardwareWire.o \
+			   $(OBJECT_DIR)/hackflight/NewHardwareWire.o \
 			   $(OBJECT_DIR)/hackflight/MPU6050.o \
 			   $(OBJECT_DIR)/hackflight.o
 TARGET_MAP   = $(OBJECT_DIR)/hackflight.map
@@ -151,11 +148,11 @@ $(OBJECT_DIR)/hackflight/%.o: %.S
 $(OBJECT_DIR)/hackflight/Arduino.o: $(F1_DIR)/Arduino.cpp $(BREEZY_DIR)/Arduino.h
 	@$(CC) -c -o $(OBJECT_DIR)/hackflight/Arduino.o $(CFLAGS) $(F1_DIR)/Arduino.cpp
 
-$(OBJECT_DIR)/hackflight/HardwareWire.o: HardwareWire.cpp Wire.h
-	@$(CC) -c -o $(OBJECT_DIR)/hackflight/HardwareWire.o $(CFLAGS) HardwareWire.cpp
+$(OBJECT_DIR)/hackflight/NewHardwareWire.o: $(F1_DIR)/NewHardwareWire.cpp $(BREEZY_DIR)/NewWire.h
+	@$(CC) -c -o $(OBJECT_DIR)/hackflight/NewHardwareWire.o $(CFLAGS) $(F1_DIR)/NewHardwareWire.cpp
 
-$(OBJECT_DIR)/hackflight/MPU6050.o: $(MPU6050_DIR)/MPU6050.cpp $(MPU6050_DIR)/MPU6050.h
-	@$(CC) -c -o $(OBJECT_DIR)/hackflight/MPU6050.o $(CFLAGS) $(MPU6050_DIR)/MPU6050.cpp
+$(OBJECT_DIR)/hackflight/MPU6050.o: $(BREEZY_DIR)/MPU6050.cpp $(BREEZY_DIR)/MPU6050.h
+	@$(CC) -c -o $(OBJECT_DIR)/hackflight/MPU6050.o $(CFLAGS) $(BREEZY_DIR)/MPU6050.cpp
 
 $(OBJECT_DIR)/hackflight.o: ./hackflight.cpp naze.hpp $(FIRMWARE_DIR)/*.hpp
 	@$(C++) -c -std=gnu++11 -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) ./hackflight.cpp
