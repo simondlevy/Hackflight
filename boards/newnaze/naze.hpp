@@ -33,7 +33,8 @@ public:
         config.imu.gyroScale = 16.4f;// 16.4 dps/lsb scalefactor for all Invensense devices
 
         // Start I^2C
-        HardwareWire::init(I2CDEV_2);
+        //;/HardwareWire::init(I2CDEV_2);
+        Wire.begin(2);
 
         // Hang a sec
         delay(100);
