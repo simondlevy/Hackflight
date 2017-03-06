@@ -119,8 +119,8 @@ void Hackflight::initImuRc()
     accelCalibrationTask.init(config.imu.accelCalibrationPeriodMilli * 1000);
     altitudeEstimationTask.init(config.imu.altitudeUpdatePeriodMilli * 1000);
 
-    //imu.init(config.imu);
-    //rc.init();
+    imu.init(config.imu);
+    rc.init();
 }
 
 void Hackflight::flashLeds(uint16_t onOffCount)
