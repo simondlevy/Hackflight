@@ -72,6 +72,8 @@ void Hackflight::init(Board* _board)
     board = _board;
     initImuRc();
 
+    board->init();
+
     //stab.init(&rc, &imu);
     //mixer.init(&rc, &stab); 
     //msp.init(&imu, &mixer, &rc, board);

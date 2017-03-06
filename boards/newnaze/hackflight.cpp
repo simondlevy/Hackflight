@@ -13,5 +13,8 @@ void setup(void)
 
 void loop(void)
 {
-    Serial.printf("%ld\n", millis());
+    digitalWrite(4, HIGH);
+    delay(500);
+    digitalWrite(4, LOW);
+    delay(500);
 }

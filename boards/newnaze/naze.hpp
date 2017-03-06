@@ -16,6 +16,10 @@ class Naze : public Board {
 public:
     virtual void init() override
     {
+        // Init LEDs
+        pinMode(3, OUTPUT);
+        pinMode(4, OUTPUT);
+
         config.imu.imuLoopMicro = 3500;
         config.imu.calibratingGyroMilli = 3500; 
     }
@@ -52,9 +56,10 @@ public:
     {
         (void)max_brightness;
 
-        while (true) {
-            Serial.printf("setLed %d %d\n", id, is_on);
-        }
+        (void)id;
+        (void)is_on;
+
+        //digitalWrite(id ? 4 : 3, is_on ? HIGH : LOW);
     }
 
     virtual void dump(char * msg) override
