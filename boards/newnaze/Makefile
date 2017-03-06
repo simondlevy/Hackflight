@@ -20,8 +20,8 @@ SERIAL_DEVICE	?= /dev/ttyUSB0
 # Working directories
 ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
 SRC_DIR		 = $(ROOT)
-CMSIS_DIR	 = lib/CMSIS
-STDPERIPH_DIR = lib/STM32F10x_StdPeriph_Driver
+CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
+STDPERIPH_DIR	 = $(BREEZY_DIR)/lib/STM32F10x_StdPeriph_Driver
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 
