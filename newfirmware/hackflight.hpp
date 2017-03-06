@@ -75,9 +75,9 @@ void Hackflight::init(Board* _board)
     initImuRc();
 
 
-    //stab.init(&rc, &imu);
-    //mixer.init(&rc, &stab); 
-    //msp.init(&imu, &mixer, &rc, board);
+    stab.init(&rc, &imu);
+    mixer.init(&rc, &stab); 
+    msp.init(&imu, &mixer, &rc, board);
 
     //TODO: can't enable this because of circuler includes
     //board->extrasInit(&msp);
@@ -163,7 +163,6 @@ void Hackflight::updateImu(bool _armed)
     if (imuTask.checkAndUpdate(currentTimeMicro)) {
         board->imuRead(gyroAdc, accelAdc);
         imu.update(currentTimeMicro, _armed, gyroAdc, accelAdc);
-
 
         debug("armed: %d    imu: %d %d %d\n", _armed, imu.angle[0], imu.angle[1], imu.angle[2]);
 
