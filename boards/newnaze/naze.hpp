@@ -53,6 +53,8 @@ public:
         imu->getMotion6Counts(
                 &accelAdc[0], &accelAdc[1], &accelAdc[2], 
                 &gyroAdc[0], &gyroAdc[1], &gyroAdc[2]);
+
+        Serial.printf("%5d %5d %5d\n", accelAdc[0], accelAdc[1], accelAdc[2]);
     }
 
 
