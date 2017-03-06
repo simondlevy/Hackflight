@@ -1,15 +1,16 @@
 #include <Arduino.h>
 
-//#include <hackflight.hpp>
+#include <hackflight.hpp>
 #include "naze.hpp"
 
-//hf::Hackflight h;
+hf::Hackflight h;
 
 void setup(void)
 {
     Serial.begin(115200);
-    //h.init(new hf::Naze());
+    h.init(new hf::Naze());
 
+    /*
     hf::Board * board = new hf::Naze();
 
     board->init();
@@ -28,6 +29,7 @@ void setup(void)
 
     board->setLed(0, false);
     board->setLed(1, false);
+    */
 }
 
 void loop(void)

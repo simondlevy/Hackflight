@@ -70,9 +70,10 @@ void Hackflight::init(Board* _board)
     // =============================
 
     board = _board;
+    board->init();
+
     initImuRc();
 
-    board->init();
 
     //stab.init(&rc, &imu);
     //mixer.init(&rc, &stab); 
@@ -105,12 +106,12 @@ void Hackflight::update(void)
 
 void Hackflight::initImuRc()
 {
-    const Config& config = board->getConfig();
+    //const Config& config = board->getConfig();
 
-    board->delayMilliseconds(config.initDelayMs);
+    //board->delayMilliseconds(config.initDelayMs);
 
     //flash the LEDs to indicate startup
-    flashLeds(config.ledFlashCountOnStartup);
+    flashLeds(10);//config.ledFlashCountOnStartup);
 
     //initialize timed tasks
     //imuTask.init(config.imu.imuLoopMicro);
