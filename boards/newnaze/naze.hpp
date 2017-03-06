@@ -56,10 +56,7 @@ public:
     {
         (void)max_brightness;
 
-        (void)id;
-        (void)is_on;
-
-        //digitalWrite(id ? 4 : 3, is_on ? HIGH : LOW);
+        digitalWrite(id ? 4 : 3, is_on ? HIGH : LOW);
     }
 
     virtual void dump(char * msg) override

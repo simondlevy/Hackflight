@@ -126,11 +126,18 @@ void Hackflight::flashLeds(uint16_t onOffCount)
 {
     board->setLed(0, false);
     board->setLed(1, false);
+
     for (uint8_t i = 0; i < onOffCount; i++) {
-        board->setLed(0, i % 2 != 0);
-        board->setLed(1, i % 2 != 0);
+        board->setLed(0, true);
+        board->setLed(1, false);
         board->delayMilliseconds(50);
-    }
+        board->setLed(0, false);
+        board->setLed(1, true);
+        board->delayMilliseconds(50);
+     }
+
+    board->setLed(0, false);
+    board->setLed(1, false);
 }
 
 void Hackflight::debug(const char * fmt, ...)
