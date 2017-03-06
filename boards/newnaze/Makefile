@@ -1,15 +1,19 @@
+# Change this to wherever you put BreezySTM32
 BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
+
+# Change this to where you put your Arduino libraries
+ARDUINO_DIR = $(HOME)/Development/arduino-1.8.1/hardware/teensy/avr/libraries
 
 FIRMWARE_DIR = $(HOME)/Desktop/hackflight/newfirmware
 
-###############################################################################
-
+# Change this to whatever project name you want
 PROJECT		?= hackflight
+
+###############################################################################
 
 F1_DIR = $(BREEZY_DIR)/f1
 
-# Compile-time options
-OPTIONS		?=
+MPU6050_DIR = $(ARDUINO_DIR)/MPU6050
 
 # Debugger optons, must be empty or GDB
 DEBUG ?=
@@ -52,16 +56,17 @@ STDPERIPH_SRC	 = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
 
 # Tool names
 C++		 = arm-none-eabi-g++
-CC		 = arm-none-eabi-g++
+CC		 = arm-none-eabi-gcc 
 OBJCOPY	 = arm-none-eabi-objcopy
 
 #
 # Tool options.
 #
-INCLUDE_DIRS	 = $(SRC_DIR) \
+INCLUDE_DIRS = $(SRC_DIR) \
 		   $(BREEZY_DIR) \
 		   $(FIRMWARE_DIR) \
 		   $(F1_DIR) \
+		   $(MPU6050_DIR) \
 		   $(STDPERIPH_DIR)/inc \
 		   $(CMSIS_DIR)/CM3/CoreSupport \
 		   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x \
@@ -79,17 +84,14 @@ endif
 DEBUG_FLAGS	 = -ggdb3
 
 CFLAGS		 = $(ARCH_FLAGS) \
-		  -std=gnu++11 \
 		   $(LTO_FLAGS) \
-		   $(addprefix -D,$(OPTIONS)) \
 		   $(addprefix -I,$(INCLUDE_DIRS)) \
 		   $(DEBUG_FLAGS) \
 		   -Wall -pedantic -Wextra -Wshadow -Wunsafe-loop-optimizations \
 		   -ffunction-sections \
 		   -fdata-sections \
 		   -DSTM32F10X_MD \
-		   -DUSE_STDPERIPH_DRIVER \
-		   -D$(PROJECT)
+		   -DUSE_STDPERIPH_DRIVER 
 
 ASFLAGS		 = $(ARCH_FLAGS) \
 		   -x assembler-with-cpp \
@@ -114,17 +116,19 @@ LDFLAGS		 = -lm \
 TARGET_HEX	 = $(BIN_DIR)/$(PROJECT).hex
 TARGET_ELF	 = $(BIN_DIR)/$(PROJECT).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $($(PROJECT)_CSRC)))) \
+			   $(OBJECT_DIR)/$(PROJECT)/Arduino.o \
+			   $(OBJECT_DIR)/$(PROJECT)/HardwareWire.o \
+			   $(OBJECT_DIR)/$(PROJECT)/MPU6050.o \
 			   $(OBJECT_DIR)/$(PROJECT).o
 TARGET_MAP   = $(OBJECT_DIR)/$(PROJECT).map
 
 # List of buildable ELF files and their object dependencies.
-# It would be nice to compute these lists, but that seems to be just beyond make.
 
 $(TARGET_HEX): $(TARGET_ELF)
 	$(OBJCOPY) -O ihex --set-start 0x8000000 $< $@
 
 $(TARGET_ELF):  $(TARGET_OBJS)
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(C++) -o $@ $^ $(LDFLAGS)
 
 MKDIR_OBJDIR = @mkdir -p $(dir $@)
 
@@ -144,17 +148,26 @@ $(OBJECT_DIR)/$(PROJECT)/%.o: %.S
 %.o: %.cpp
 	$(CC) -c $(CFLAGS) -o $@ $^
 
+$(OBJECT_DIR)/$(PROJECT)/Arduino.o: $(F1_DIR)/Arduino.cpp $(BREEZY_DIR)/Arduino.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/Arduino.o $(CFLAGS) $(F1_DIR)/Arduino.cpp
+
+$(OBJECT_DIR)/$(PROJECT)/HardwareWire.o: $(F1_DIR)/HardwareWire.cpp $(BREEZY_DIR)/Wire.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/HardwareWire.o $(CFLAGS) $(F1_DIR)/HardwareWire.cpp
+
+$(OBJECT_DIR)/$(PROJECT)/MPU6050.o: $(MPU6050_DIR)/MPU6050.cpp $(MPU6050_DIR)/MPU6050.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/MPU6050.o $(CFLAGS) $(MPU6050_DIR)/MPU6050.cpp
+
 $(OBJECT_DIR)/$(PROJECT).o: ./$(PROJECT).cpp
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT).o $(CFLAGS) ./$(PROJECT).cpp
+	@$(C++) -c -std=gnu++11 -o $(OBJECT_DIR)/$(PROJECT).o $(CFLAGS) ./$(PROJECT).cpp
 
 clean:
 	rm -rf $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS) $(TARGET_MAP) *.o obj 
 
-unbrick_$(PROJECT): $(TARGET_HEX)
+flash_$(PROJECT): $(TARGET_HEX)
 	stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
 	stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
 
-unbrick: unbrick_$(PROJECT)
+flash: flash_$(PROJECT)
 
 listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
