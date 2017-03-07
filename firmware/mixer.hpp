@@ -7,6 +7,7 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
+
    Hackflight is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -17,28 +18,20 @@
 
 #pragma once
 
-#ifdef __arm__
-extern "C" {
-#endif
+class Mixer {
 
-    class Mixer {
+    public:
 
-        private:
+        int16_t motors[4];
 
-            class RC        * rc;
-            class Stabilize * stabilize;
-        
-        public:
+        int16_t motorsDisarmed[4];
 
-            int16_t motors[4];
+        void init(class RC * _rc, class Stabilize * _stabilize);
 
-            int16_t motorsDisarmed[4];
+        void update(bool armed);
 
-            void init(class RC * _rc, class Stabilize * _stabilize);
+    private:
 
-            void update(bool armed);
-    };
-
-#ifdef __arm__
-} // extern "C"
-#endif
+        class RC        * rc;
+        class Stabilize * stabilize;
+};

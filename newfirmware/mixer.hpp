@@ -106,14 +106,3 @@ void Mixer::update(bool armed, Board* board)
 
 
 } //namespace
-
-
-  
-
-#ifdef __arm__
-extern "C" {
-#endif
-    //TODO put interface for arm    
-#ifdef __arm__
-} // extern "C"
-#endif
