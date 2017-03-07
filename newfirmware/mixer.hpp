@@ -55,10 +55,10 @@ void Mixer::init(RC * _rc, Stabilize * _stabilize)
     this->stabilize = _stabilize;
     this->rc = _rc;
 
-    mixerQuadX[0] = { +1.0f, -1.0f,  +1.0f, -1.0f };
-    mixerQuadX[1] = { +1.0f, -1.0f,  -1.0f, +1.0f };
-    mixerQuadX[2] = { +1.0f, +1.0f,  +1.0f, +1.0f };
-    mixerQuadX[3] = { +1.0f, +1.0f,  -1.0f, -1.0f };
+    mixerQuadX[0] = { +1.0f, -1.0f,  +1.0f, -1.0f };    // right rear
+    mixerQuadX[1] = { +1.0f, -1.0f,  -1.0f, +1.0f };    // right front
+    mixerQuadX[2] = { +1.0f, +1.0f,  +1.0f, +1.0f };    // left rear
+    mixerQuadX[3] = { +1.0f, +1.0f,  -1.0f, -1.0f };    // left front
 
     // set disarmed motor values
     for (uint8_t i = 0; i < 4; i++)
