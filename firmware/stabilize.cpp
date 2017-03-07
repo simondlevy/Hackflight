@@ -43,6 +43,8 @@ void Stabilize::init(void)
     this->resetIntegral();
 }
 
+#define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
+
 void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], int16_t angle[3])
 {
     for (uint8_t axis = 0; axis < 3; axis++) {

@@ -292,7 +292,6 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(
 			   $(OBJECT_DIR)/$(TARGET)/msp.o \
 			   $(OBJECT_DIR)/$(TARGET)/rc.o \
 			   $(OBJECT_DIR)/$(TARGET)/stabilize.o \
-			   $(OBJECT_DIR)/$(TARGET)/filters.o \
 			   $(OBJECT_DIR)/$(TARGET)/alienflightf3.o \
 			   $(OBJECT_DIR)/$(TARGET)/Arduino.o \
 			   $(OBJECT_DIR)/$(TARGET)/HardwareWire.o \
@@ -391,28 +390,25 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 
 
 $(OBJECT_DIR)/$(TARGET)/hackflight.o: $(FIRMWARE_DIR)/hackflight.cpp 
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/hackflight.o $(CFLAGS) $(FIRMWARE_DIR)/hackflight.cpp 
+	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/hackflight.o $(CFLAGS) $(FIRMWARE_DIR)/hackflight.cpp 
 
 $(OBJECT_DIR)/$(TARGET)/imu.o: $(FIRMWARE_DIR)/imu.cpp 
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/imu.o $(CFLAGS) $(FIRMWARE_DIR)/imu.cpp 
+	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/imu.o $(CFLAGS) $(FIRMWARE_DIR)/imu.cpp 
 
 $(OBJECT_DIR)/$(TARGET)/mixer.o: $(FIRMWARE_DIR)/mixer.cpp 
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/mixer.o $(CFLAGS) $(FIRMWARE_DIR)/mixer.cpp 
+	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/mixer.o $(CFLAGS) $(FIRMWARE_DIR)/mixer.cpp 
 
 $(OBJECT_DIR)/$(TARGET)/msp.o: $(FIRMWARE_DIR)/msp.cpp 
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/msp.o $(CFLAGS) $(FIRMWARE_DIR)/msp.cpp 
+	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/msp.o $(CFLAGS) $(FIRMWARE_DIR)/msp.cpp 
 
 $(OBJECT_DIR)/$(TARGET)/rc.o: $(FIRMWARE_DIR)/rc.cpp 
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/rc.o $(CFLAGS) $(FIRMWARE_DIR)/rc.cpp 
+	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/rc.o $(CFLAGS) $(FIRMWARE_DIR)/rc.cpp 
 
 $(OBJECT_DIR)/$(TARGET)/stabilize.o: $(FIRMWARE_DIR)/stabilize.cpp 
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/stabilize.o $(CFLAGS) $(FIRMWARE_DIR)/stabilize.cpp 
-
-$(OBJECT_DIR)/$(TARGET)/filters.o: $(FIRMWARE_DIR)/filters.cpp 
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/filters.o $(CFLAGS) $(FIRMWARE_DIR)/filters.cpp 
+	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/stabilize.o $(CFLAGS) $(FIRMWARE_DIR)/stabilize.cpp 
 
 $(OBJECT_DIR)/$(TARGET)/alienflightf3.o: alienflightf3.cpp 
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/alienflightf3.o $(CFLAGS) alienflightf3.cpp 
+	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/alienflightf3.o $(CFLAGS) alienflightf3.cpp 
 
 $(OBJECT_DIR)/$(TARGET)/Arduino.o: $(F3_DIR)/Arduino.cpp $(BREEZY_DIR)/Arduino.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/Arduino.o $(CFLAGS) $(F3_DIR)/Arduino.cpp

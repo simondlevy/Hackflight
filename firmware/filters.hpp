@@ -15,8 +15,49 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
+#include <cstdint>
+
+//namespace hf {
+
+class Filters {
+public:
+    // complementary filter
+    static float complementaryFilter(float a, float b, float c);
+
+    // deadband filter
+    static int32_t deadbandFilter(int32_t value, int32_t deadband);
+
+};
+
+
+/********************************************* CPP ********************************************************/
+
+
 // complementary filter
-float complementaryFilter(float a, float b, float c);
+float Filters::complementaryFilter(float a, float b, float c) 
+{
+    return a * c + b * (1 - c);
+}
+
+
+// XXX see abs below
+#define abs(x)    ((x) > 0 ? (x) : -(x))
 
 // deadband filter
-int32_t deadbandFilter(int32_t value, int32_t deadband);
+int32_t Filters::deadbandFilter(int32_t value, int32_t deadband)
+{
+    if (/*std::*/abs(value) < deadband) {  // XXX restore std::
+        value = 0;
+    } else if (value > 0) {
+        value -= deadband;
+    } else if (value < 0) {
+        value += deadband;
+    }
+    return value;
+
+//}// namespace
+
+
+}

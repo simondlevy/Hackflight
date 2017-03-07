@@ -44,6 +44,8 @@ void Mixer::init(class RC * _rc, class Stabilize * _stabilize)
         this->motorsDisarmed[i] = CONFIG_PWM_MIN;
 }
 
+#define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
+
 void Mixer::update(bool armed)
 {
     int16_t maxMotor;

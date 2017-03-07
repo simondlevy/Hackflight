@@ -33,7 +33,6 @@ void debug(const char * format, ...);
 #include "stabilize.hpp"
 #include "mixer.hpp"
 #include "msp.hpp"
-#include "filters.hpp"
 
 #ifndef abs
 #define abs(x)    ((x) > 0 ? (x) : -(x))

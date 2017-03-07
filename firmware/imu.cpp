@@ -302,9 +302,9 @@ void IMU::update(int16_t accelADC[3], int16_t gyroADC[3], uint32_t currentTimeUs
 
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
-    this->accelSum[X] += deadbandFilter((int32_t)lrintf(accel_ned[X]), CONFIG_ACCXY_DEADBAND);
-    this->accelSum[Y] += deadbandFilter((int32_t)lrintf(accel_ned[Y]), CONFIG_ACCXY_DEADBAND);
-    this->accelSum[Z] += deadbandFilter((int32_t)lrintf(this->accz_smooth), CONFIG_ACCZ_DEADBAND);
+    this->accelSum[X] += Filters::deadbandFilter((int32_t)lrintf(accel_ned[X]), CONFIG_ACCXY_DEADBAND);
+    this->accelSum[Y] += Filters::deadbandFilter((int32_t)lrintf(accel_ned[Y]), CONFIG_ACCXY_DEADBAND);
+    this->accelSum[Z] += Filters::deadbandFilter((int32_t)lrintf(this->accz_smooth), CONFIG_ACCZ_DEADBAND);
 
     this->accelTimeSum += dT_usec;
     this->accelSumCount++;

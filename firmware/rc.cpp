@@ -105,6 +105,8 @@ bool RC::changed(void)
     return this->commandDelay == 20;
 }
 
+#define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
+
 void RC::computeExpo(void)
 {
     int32_t tmp, tmp2;
