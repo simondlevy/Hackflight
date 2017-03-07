@@ -287,7 +287,6 @@ TARGET_HEX	 = $(BIN_DIR)/$(TARGET).hex
 TARGET_ELF	 = $(OBJECT_DIR)/$(TARGET).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC)))) \
 			   $(OBJECT_DIR)/$(TARGET)/hackflight.o \
-			   $(OBJECT_DIR)/$(TARGET)/board.o \
 			   $(OBJECT_DIR)/$(TARGET)/imu.o \
 			   $(OBJECT_DIR)/$(TARGET)/mixer.o \
 			   $(OBJECT_DIR)/$(TARGET)/msp.o \
@@ -393,9 +392,6 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 
 $(OBJECT_DIR)/$(TARGET)/hackflight.o: $(FIRMWARE_DIR)/hackflight.cpp 
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/hackflight.o $(CFLAGS) $(FIRMWARE_DIR)/hackflight.cpp 
-
-$(OBJECT_DIR)/$(TARGET)/board.o: $(FIRMWARE_DIR)/board.cpp 
-	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/board.o $(CFLAGS) $(FIRMWARE_DIR)/board.cpp 
 
 $(OBJECT_DIR)/$(TARGET)/imu.o: $(FIRMWARE_DIR)/imu.cpp 
 	@$(CC) -c -o $(OBJECT_DIR)/$(TARGET)/imu.o $(CFLAGS) $(FIRMWARE_DIR)/imu.cpp 

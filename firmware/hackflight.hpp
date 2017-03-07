@@ -120,32 +120,9 @@ class Hackflight {
         bool     haveSmallAngle;
         bool     armed;
 
-        // computes PIDs and uses them to update motors
-        void update(void);
-
     public:
 
-        void initialize(
-                uint16_t acc1G=4096, 
-                float gyroScale=16.4f, 
-                uint32_t looptimeUsec=3500, 
-                uint32_t gyroCalibrationMsec=3500);
+        void initialize(void);
 
-        void setAccelReading(int16_t linear_accel[3]);      // [-4096,+4096]
-
-        void setGyroReading(int16_t angular_velocity[3]);  // [-4096,+4096]
-
-        void setRC(float * channels, uint8_t count);        // [1000,2000], 4
-
-        void setTime(uint32_t usec);
-
-        void getControls(float * controls, uint8_t count);  // [1000,2000], 4
-
-        void arm(void);
-
-        void disarm(void);
-
-        // Arduino API support
-        void setup(void);
-        void loop(void);
+        void update(void);
 };
