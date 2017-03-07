@@ -18,6 +18,7 @@
 #pragma once
 
 #include "board.hpp"
+#include "debug.hpp"
 #include "stabilize.hpp"
 
 
@@ -66,7 +67,7 @@ void Mixer::init(RC * _rc, Stabilize * _stabilize)
 
 void Mixer::update(bool armed, Board* board)
 {
-    int16_t maxMotor;
+    //int16_t maxMotor;
     int16_t motors[4];
 
     for (uint8_t i = 0; i < 4; i++)
@@ -76,6 +77,10 @@ void Mixer::update(bool armed, Board* board)
             this->stabilize->axisPID[AXIS_ROLL] * mixerQuadX[i].roll - 
             this->stabilize->axisPID[AXIS_YAW] * mixerQuadX[i].yaw);
 
+
+    debug(board, "%d\n", this->rc->command[DEMAND_THROTTLE]);
+
+    /*
     maxMotor = motors[0];
 
     for (uint8_t i = 1; i < 4; i++)
@@ -98,6 +103,7 @@ void Mixer::update(bool armed, Board* board)
             motors[i] = motorsDisarmed[i];
         }
     }
+    */
 
     for (uint8_t i = 0; i < 4; i++)
         board->writeMotor(i, motors[i]);

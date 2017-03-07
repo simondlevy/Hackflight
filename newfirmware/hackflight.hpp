@@ -26,6 +26,7 @@
 #include "imu.hpp"
 #include "rc.hpp"
 #include "timedtask.hpp"
+#include "debug.hpp"
 
 namespace hf {
 
@@ -39,7 +40,6 @@ private:
     void flashLeds(uint16_t onOffCount);
     void updateCalibrationState(bool& armed, bool& isMoving);
     void updateImu(bool armed);
-    void debug(const char * fmt, ...);
 
 private:
     bool armed;
@@ -138,21 +138,6 @@ void Hackflight::flashLeds(uint16_t onOffCount)
     board->setLed(1, false);
 }
 
-void Hackflight::debug(const char * fmt, ...)
-{
-    va_list ap;       
-
-    va_start(ap, fmt);     
-
-    char buf[1000];
-
-    vsprintf(buf, fmt, ap);
-
-    board->dump(buf);
-
-    va_end(ap);  
-}
-
 void Hackflight::updateImu(bool _armed)
 {
     uint64_t currentTimeMicro = board->getMicros();
@@ -163,15 +148,11 @@ void Hackflight::updateImu(bool _armed)
 
         imu.update(currentTimeMicro, _armed, gyroAdc, accelAdc);
 
-        //debug("armed: %d    imu: %d %d %d\n", _armed, imu.angle[0], imu.angle[1], imu.angle[2]);
-
         // measure loop rate just afer reading the sensors
         currentTimeMicro = board->getMicros();
 
         // compute exponential RC commands
         rc.computeExpo();
-
-        debug("%d %d %d %d %d\n", rc.data[0], rc.data[1], rc.data[2], rc.data[3], rc.data[4]);
 
     } // IMU update
 }
@@ -253,7 +234,5 @@ void Hackflight::updateCalibrationState(bool& _armed, bool& isMoving)
             board->setLed(1, false);
     }
 }
-
-
 
 } //namespace
