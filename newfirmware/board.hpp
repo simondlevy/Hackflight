@@ -35,9 +35,6 @@ public: //interface
     virtual uint16_t readPWM(uint8_t chan)  = 0;
     virtual void writeMotor(uint8_t index, uint16_t value)  = 0;
     virtual void setLed(uint8_t id, bool is_on, float max_brightness = 255) { (void)id; (void)is_on; (void)max_brightness;}
-    virtual void checkReboot(bool pendReboot)  {(void)pendReboot;}
-    virtual void reboot(void) {}
-
 
     //-------------------------------------------------- RC -----------------------------------------------------
     virtual bool rcUseSerial(void) { return false; }
@@ -50,6 +47,9 @@ public: //interface
     virtual uint8_t serialReadByte(void) { return 0; };
     virtual void serialWriteByte(uint8_t c) {(void)c;};
 
+    //------------------------------------------------ STM32 ---------------------------------------------------
+    virtual void checkReboot(bool pendReboot)  {(void)pendReboot;}
+    virtual void reboot(void) {}
 
     //------------------------------------------------ extras ---------------------------------------------------
     virtual void extrasCheckSwitch(void)  {}
