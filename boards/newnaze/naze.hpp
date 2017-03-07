@@ -47,6 +47,17 @@ public:
         rx = new SpektrumDSM2048();
     }
 
+    virtual void checkReboot(bool pendReboot) override
+    {
+        if (pendReboot)
+            reset(); // noreturn
+    }    
+
+    virtual void reboot(void) override
+    {
+        resetToBootloader();
+    }
+
     virtual const Config& getConfig() override
     {
         return config;
@@ -102,6 +113,20 @@ public:
         Serial.printf("%s", msg);
     }
 
+    virtual uint8_t serialAvailableBytes(void) override
+    {
+        return Serial.available();
+    }
+
+    virtual uint8_t serialReadByte(void) override
+    {
+        return Serial.read();
+    }
+
+    virtual void serialWriteByte(uint8_t c) override
+    {
+        Serial.write(c);
+    }
 
     virtual void writeMotor(uint8_t index, uint16_t value) override
     {
@@ -118,7 +143,7 @@ public:
     {
         (void)status;
     }
-    
+
     virtual void delayMilliseconds(uint32_t msec) override
     {
         delay(msec);

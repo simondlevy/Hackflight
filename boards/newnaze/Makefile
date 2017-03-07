@@ -170,6 +170,7 @@ clean:
 flash_$(TARGET): $(TARGET_HEX)
 	stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
 	echo -n 'R' >$(SERIAL_DEVICE)
+	sleep 2
 	stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
 
 flash: flash_$(TARGET)
