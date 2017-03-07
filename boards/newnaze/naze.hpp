@@ -44,7 +44,7 @@ public:
         imu->begin(AFS_8G, GFS_2000DPS);
 
         // Start receiver
-        rx = new SpektrumDSM();
+        rx = new SpektrumDSM2048();
     }
 
     virtual const Config& getConfig() override
@@ -69,13 +69,25 @@ public:
 
     virtual bool rcUseSerial(void) override
     {
-        return false;
+        rx->begin();
+        return true;
+    }
+
+    virtual bool rcSerialReady(void) override
+    { 
+        return rx->frameComplete();
+    }
+
+    virtual uint16_t rcReadSerial(uint8_t chan)  
+    { 
+        uint8_t chanmap[5] = {1, 2, 3, 0, 5};
+        return rx->readRawRC(chanmap[chan]);
     }
 
     virtual uint16_t readPWM(uint8_t chan) override
     {
         (void)chan;
-        return 1500;
+        return 0; // because we're using Spektrum serial RX
     }
 
     virtual void setLed(uint8_t id, bool is_on, float max_brightness) override
@@ -119,7 +131,7 @@ private:
     MPU6050 * imu;
 
     // RC support
-    SpektrumDSM * rx;
+    SpektrumDSM2048 * rx;
 
     // Launch support
     bool ready;
