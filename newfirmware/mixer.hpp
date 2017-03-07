@@ -44,12 +44,8 @@ private:
         float yaw;
     } motorMixer_t;
 
-    /*static constexpr*/ motorMixer_t mixerQuadX[4] = {
-        { 1.0f, -1.0f,  1.0f, -1.0f },          // REAR_R
-        { 1.0f, -1.0f, -1.0f,  1.0f },          // FRONT_R
-        { 1.0f,  1.0f,  1.0f,  1.0f },          // REAR_L
-        { 1.0f,  1.0f, -1.0f, -1.0f },          // FRONT_L
-    };
+    motorMixer_t mixerQuadX[4];
+
 };
 
 
@@ -59,6 +55,11 @@ void Mixer::init(RC * _rc, Stabilize * _stabilize)
 {
     this->stabilize = _stabilize;
     this->rc = _rc;
+
+    mixerQuadX[0] = { +1.0f, -1.0f,  +1.0f, -1.0f };
+    mixerQuadX[1] = { +1.0f, -1.0f,  -1.0f, +1.0f };
+    mixerQuadX[2] = { +1.0f, +1.0f,  +1.0f, +1.0f };
+    mixerQuadX[3] = { +1.0f, +1.0f,  -1.0f, -1.0f };
 
     // set disarmed motor values
     for (uint8_t i = 0; i < 4; i++)
@@ -72,13 +73,14 @@ void Mixer::update(bool armed, Board* board)
 
     for (uint8_t i = 0; i < 4; i++)
         motors[i] = (int16_t)
-        (this->rc->command[DEMAND_THROTTLE] * mixerQuadX[i].throttle + 
-            this->stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch + 
-            this->stabilize->axisPID[AXIS_ROLL] * mixerQuadX[i].roll - 
-            this->stabilize->axisPID[AXIS_YAW] * mixerQuadX[i].yaw);
+        (this->rc->command[DEMAND_THROTTLE]   * mixerQuadX[i].throttle + 
+         this->stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch + 
+         this->stabilize->axisPID[AXIS_ROLL]  * mixerQuadX[i].roll - 
+         this->stabilize->axisPID[AXIS_YAW]   * mixerQuadX[i].yaw);
 
 
-    debug(board, "%d\n", this->rc->command[DEMAND_THROTTLE]);
+    debug(board, "%d: (%d) %d %d %d %d\n", this->rc->command[DEMAND_THROTTLE], (int)mixerQuadX[0].throttle, 
+            motors[0], motors[1], motors[2], motors[3]);
 
     /*
     maxMotor = motors[0];
