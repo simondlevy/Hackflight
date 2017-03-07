@@ -24,14 +24,14 @@ public:
         pinMode(4, OUTPUT);
 
         // Configure 
-        config.imu.imuLoopMicro = 3500;
-        config.rc.rcLoopMilli = 21; 
-        config.imu.calibratingGyroMilli = 3500; 
-        config.imu.accelCalibrationPeriodMilli = 1400; 
-        config.imu.altitudeUpdatePeriodMilli = 25; 
-        config.ledFlashCountOnStartup = 20;
-        config.imu.acc1G = 4096;// Accel scale 8g (4096 LSB/g)
-        config.imu.gyroScale = 16.4f;// 16.4 dps/lsb scalefactor for all Invensense devices
+        config.imu.imuLoopMicro                 = 3500;
+        config.rc.rcLoopMilli                   = 21; 
+        config.imu.calibratingGyroMilli         = 3500; 
+        config.imu.accelCalibrationPeriodMilli  = 1400; 
+        config.imu.altitudeUpdatePeriodMilli    = 25; 
+        config.ledFlashCountOnStartup           = 20;
+        config.imu.acc1G                        = 4096;// Accel scale 8g (4096 LSB/g)
+        config.imu.gyroScale                    = 16.4f;// 16.4 dps/lsb scalefactor for all Invensense devices
 
         // Start I^2C
         //;/HardwareWire::init(I2CDEV_2);

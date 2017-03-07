@@ -86,6 +86,7 @@ private: //fields
     uint16_t acc1G;
     float    fcAcc;
     float    gyroScale;
+    uint16_t magneticDeclinationTenthsDegree;
 
     uint16_t gyroCalibrationCyclesTotal;
     uint16_t accelCalibrationCyclesTotal;
@@ -107,6 +108,7 @@ void IMU::init(const Config::ImuConfig& _imu_config)
 {
     this->acc1G = _imu_config.acc1G;
     this->gyroScale = (4.0f / _imu_config.gyroScale) * (M_PIf / 180.0f);
+    this->magneticDeclinationTenthsDegree = _imu_config.magneticDeclinationTenthsDegree;
 
     // calculate RC time constant used in the this->accelZ lpf    
     this->fcAcc = (float)(0.5f / (M_PIf * CONFIG_ACCZ_LPF_CUTOFF)); 
@@ -311,7 +313,7 @@ void IMU::update(uint64_t _currentTime, bool _armed, const int16_t _gyroAdc[3], 
     // Convert angles from radians to tenths of a degrees
     this->angle[AXIS_ROLL]  = (int16_t)lrintf(anglerad[AXIS_ROLL]  * (1800.0f / M_PI));
     this->angle[AXIS_PITCH] = (int16_t)lrintf(anglerad[AXIS_PITCH] * (1800.0f / M_PI));
-    this->angle[AXIS_YAW]   = (int16_t)(lrintf(anglerad[AXIS_YAW]   * 1800.0f / M_PI + CONFIG_MAGNETIC_DECLINATION) / 10.0f);
+    this->angle[AXIS_YAW]   = (int16_t)(lrintf(anglerad[AXIS_YAW]   * 1800.0f / M_PI + magneticDeclinationTenthsDegree) / 10.0f);
 
     // Convert heading from [-180,+180] to [0,360]
     if (this->angle[AXIS_YAW] < 0)

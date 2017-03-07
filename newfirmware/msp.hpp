@@ -22,6 +22,17 @@
 #include "rc.hpp"
 #include "mixer.hpp"
 
+// See http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol
+#define MSP_REBOOT               68     
+#define MSP_RC                   105    
+#define MSP_ATTITUDE             108    
+#define MSP_ALTITUDE             109    
+#define MSP_BARO_SONAR_RAW       126    
+#define MSP_SONARS               127    
+#define MSP_SET_RAW_RC           200    
+#define MSP_SET_HEAD             211
+#define MSP_SET_MOTOR            214    
+
 namespace hf {
 
 #define CONFIG_REBOOT_CHARACTER 'R'

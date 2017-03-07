@@ -23,7 +23,9 @@
 namespace hf {
 
 struct Config {
+
     struct ImuConfig {
+
         uint32_t imuLoopMicro;
         uint32_t calibratingGyroMilli;
 
@@ -33,6 +35,8 @@ struct Config {
         uint32_t calibratingAccelMilli = 1400;
         uint32_t accelCalibrationPeriodMilli = 500;
         uint32_t altitudeUpdatePeriodMilli = 500;   // based on accelerometer low-pass filter
+
+        uint16_t magneticDeclinationTenthsDegree = 0;
 
         //uint16_t smallAngle = 250;  // tenths of a degree
 
@@ -59,7 +63,6 @@ enum {
     DEMAND_AUX3,
     DEMAND_AUX4
 };
-
 
 // Define number of RC channels, and min/max PWM
 #define CONFIG_RC_CHANS 8
@@ -114,35 +117,12 @@ static const uint8_t CONFIG_YAW_I            = 20;
 
 
 //=========================================================================
-// IMU config
-//=========================================================================
-//default constants
-const uint32_t DEFAULT_IMU_LOOPTIME_USEC     = 3500;
-const uint32_t DEFAULT_GYRO_CALIBRATION_MSEC = 3500;
-
-//=========================================================================
 // MISC config
 //=========================================================================
-#define CONFIG_MAGNETIC_DECLINATION                 0
 
 #define CONFIG_YAW_CONTROL_DIRECTION                1    // 1 or -1 
 #define CONFIG_CALIBRATE_ACCTIME_MSEC               500
 #define CONFIG_MAX_ANGLE_INCLINATION                500 /* 50 degrees */
-
-
-//=========================================================================
-// MSP config
-//=========================================================================
-#define MSP_REBOOT               68     
-#define MSP_RC                   105    
-#define MSP_ATTITUDE             108    
-#define MSP_ALTITUDE             109    
-#define MSP_BARO_SONAR_RAW       126    
-#define MSP_SONARS               127    
-#define MSP_SET_RAW_RC           200    
-#define MSP_SET_HEAD             211
-#define MSP_SET_MOTOR            214    
-
 
 
 } //namespace
