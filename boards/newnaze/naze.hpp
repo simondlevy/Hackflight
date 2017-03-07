@@ -44,7 +44,7 @@ public:
         imu->begin(AFS_8G, GFS_2000DPS);
 
         // Start receiver
-        //rx = new SpektrumDSM();
+        rx = new SpektrumDSM();
     }
 
     virtual const Config& getConfig() override
