@@ -120,6 +120,7 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/hackflight/,$(basename $
 			   $(OBJECT_DIR)/hackflight/HardwareWire.o \
 			   $(OBJECT_DIR)/hackflight/MPU6050.o \
 			   $(OBJECT_DIR)/hackflight/SpektrumDSM.o \
+			   $(OBJECT_DIR)/hackflight/Motor.o \
 			   $(OBJECT_DIR)/hackflight.o
 TARGET_MAP   = $(OBJECT_DIR)/hackflight.map
 
@@ -160,6 +161,9 @@ $(OBJECT_DIR)/hackflight/MPU6050.o: $(MPU6050_DIR)/MPU6050.cpp $(MPU6050_DIR)/MP
 
 $(OBJECT_DIR)/hackflight/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h
 	@$(CC) -c -o $(OBJECT_DIR)/hackflight/SpektrumDSM.o $(CFLAGS) $(SPEKTRUM_DIR)/SpektrumDSM.cpp
+
+$(OBJECT_DIR)/hackflight/Motor.o: $(F1_DIR)/Motor.cpp
+	@$(CC) -c -o $(OBJECT_DIR)/hackflight/Motor.o $(CFLAGS) $(F1_DIR)/Motor.cpp
 
 $(OBJECT_DIR)/hackflight.o: ./hackflight.cpp naze.hpp $(FIRMWARE_DIR)/*.hpp
 	@$(C++) -c -std=gnu++11 -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) ./hackflight.cpp

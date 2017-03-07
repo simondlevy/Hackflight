@@ -10,6 +10,7 @@
 
 #include <SpektrumDSM.h>
 #include <MPU6050.h>
+#include <Motor.h>
 
 namespace hf {
 
@@ -45,6 +46,13 @@ public:
 
         // Start receiver
         rx = new SpektrumDSM2048();
+
+        // Connect to motors
+        motors[0].attach(8);
+        motors[1].attach(11);
+        motors[2].attach(6);
+        motors[3].attach(7);
+
     }
 
     virtual void checkReboot(bool pendReboot) override
@@ -130,8 +138,7 @@ public:
 
     virtual void writeMotor(uint8_t index, uint16_t value) override
     {
-        (void)index;
-        (void)value;
+        motors[index].setSpeed(value);
     }
 
     virtual void showArmedStatus(bool armed) override
@@ -157,6 +164,9 @@ private:
 
     // RC support
     SpektrumDSM2048 * rx;
+
+    // Motor support
+    BrushlessMotor motors[4];
 
     // Launch support
     bool ready;
