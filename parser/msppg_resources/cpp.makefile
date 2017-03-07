@@ -30,11 +30,11 @@ else
 endif
 
 libmsppg.$(EXT): 
-	g++ $(CFLAGS) -c msppg/msppg.cpp
+	g++ $(CFLAGS) -c msppg/MSPPG.cpp
 	g++ *.o -o libmsppg.$(EXT) -lpthread -shared
 
 install: libmsppg.so
-	cp msppg/msppg.h $(INSTALL_ROOT)/include
+	cp msppg/MSPPG.h $(INSTALL_ROOT)/include
 	cp libmsppg.so $(INSTALL_ROOT)/lib
 
 test: example
@@ -43,11 +43,11 @@ test: example
 example: example.o msppg.o
 	g++ -o example example.o msppg.o
   
-example.o: example.cpp msppg/msppg.h
+example.o: example.cpp msppg/MSPPG.h
 	g++ -Wall -c example.cpp
   
-msppg.o: msppg/msppg.cpp msppg/msppg.h
-	g++ -std=c++11 -Wall -c msppg/msppg.cpp
+msppg.o: msppg/MSPPG.cpp msppg/MSPPG.h
+	g++ -std=c++11 -Wall -c msppg/MSPPG.cpp
 
 clean:
 	rm -f *.so *.o *~
