@@ -20,6 +20,7 @@
 #include <math.h>
 
 #include "hackflight.hpp"
+#include "debug.hpp"
 
 #include <string.h>
 
@@ -168,6 +169,8 @@ void Hackflight::update(void)
 
         this->imu.update(this->accelADC, this->gyroADC, currentTime, this->armed, calibratingA, this->calibratingG);
 
+        debug(&this->board, "%d %d %d\n", this->imu.angle[0], this->imu.angle[1], this->imu.angle[2]);
+
         if (calibratingA > 0)
             calibratingA--;
 
@@ -247,21 +250,3 @@ void loop(void)
 #if defined(STM32)
 } // extern "C"
 #endif
-
-void debug(const char * fmt, ...)
-{
-    va_list ap;       
-
-    va_start(ap, fmt);     
-
-    char buf[1000];
-
-    VSPRINTF(buf, fmt, ap);
-
-    Board::dump(buf);
-
-    va_end(ap);  
-}
-
-
-
