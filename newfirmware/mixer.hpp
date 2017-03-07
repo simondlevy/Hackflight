@@ -45,7 +45,6 @@ private:
     } motorMixer_t;
 
     motorMixer_t mixerQuadX[4];
-
 };
 
 
@@ -68,7 +67,6 @@ void Mixer::init(RC * _rc, Stabilize * _stabilize)
 
 void Mixer::update(bool armed, Board* board)
 {
-    //int16_t maxMotor;
     int16_t motors[4];
 
     for (uint8_t i = 0; i < 4; i++)
@@ -79,11 +77,7 @@ void Mixer::update(bool armed, Board* board)
          this->stabilize->axisPID[AXIS_YAW]   * mixerQuadX[i].yaw);
 
 
-    debug(board, "%d: (%d) %d %d %d %d\n", this->rc->command[DEMAND_THROTTLE], (int)mixerQuadX[0].throttle, 
-            motors[0], motors[1], motors[2], motors[3]);
-
-    /*
-    maxMotor = motors[0];
+    int16_t maxMotor = motors[0];
 
     for (uint8_t i = 1; i < 4; i++)
         if (motors[i] > maxMotor)
@@ -105,7 +99,6 @@ void Mixer::update(bool armed, Board* board)
             motors[i] = motorsDisarmed[i];
         }
     }
-    */
 
     for (uint8_t i = 0; i < 4; i++)
         board->writeMotor(i, motors[i]);

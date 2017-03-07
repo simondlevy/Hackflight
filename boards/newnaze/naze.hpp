@@ -136,7 +136,6 @@ public:
 
     virtual void writeMotor(uint8_t index, uint16_t value) override
     {
-        //Serial.printf("m%d:%d%s", index+1, value, index==3 ? "\n" : "  ");
         motors[index].setSpeed(value);
     }
 
