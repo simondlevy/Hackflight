@@ -24,6 +24,7 @@
 
 #include "board.hpp"
 #include "hackflight.hpp"
+#include "alienflightf3.hpp"
 
 #define IMU_LOOPTIME_USEC       3500
 #define CALIBRATING_GYRO_MSEC   3500
