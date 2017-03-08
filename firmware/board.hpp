@@ -26,18 +26,18 @@ class Board {
 
         class MSP * msp;
 
-    public:
+    public: // interface
 
-        // your implementation should support these methods
+        virtual void     delayMilliseconds(uint32_t msec) = 0;
+        virtual uint32_t getMicros() = 0;
 
-        // Core functionality
-        static void     delayMilliseconds(uint32_t msec);
-        static void     dump(char * msg);
-        static uint32_t getMicros();
         static void     imuInit();
         static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
+
         static void     init(uint16_t & acc1G, float & gyroScale,
                              uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
+
+        static void     dump(char * msg);
 
         virtual void     ledGreenOff(void) = 0;
         virtual void     ledGreenOn(void) = 0;

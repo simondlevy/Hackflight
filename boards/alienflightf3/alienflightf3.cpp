@@ -94,12 +94,12 @@ void AlienflightF3::checkReboot(bool pendReboot)
         reset(); // noreturn
 }
 
-void Board::delayMilliseconds(uint32_t msec)
+void AlienflightF3::delayMilliseconds(uint32_t msec)
 {
     delay(msec);
 }
 
-uint32_t Board::getMicros()
+uint32_t AlienflightF3::getMicros()
 {
     return micros();
 }

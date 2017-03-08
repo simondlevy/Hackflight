@@ -22,6 +22,9 @@ namespace hf {
 
     class AlienflightF3 : public Board {
 
+        virtual void     delayMilliseconds(uint32_t msec) override;
+        virtual uint32_t getMicros() override;
+
         virtual uint16_t rcReadSerial(uint8_t chan) override;
         virtual bool     rcSerialReady(void) override;
         virtual bool     rcUseSerial(void) override;
