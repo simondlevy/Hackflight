@@ -34,19 +34,21 @@ class Board {
         virtual void extrasInit(class MSP * _msp) = 0;
         virtual void extrasPerformTask(uint8_t taskIndex) = 0;
 
-        // Core functionality
-        static void     delayMilliseconds(uint32_t msec);
-        static void     dump(char * msg);
-        static uint32_t getMicros();
-        static void     imuInit();
+        virtual void     delayMilliseconds(uint32_t msec) = 0;
+        virtual uint32_t getMicros() = 0;
+
+        virtual void     dump(char * msg) = 0;
+
+        virtual void     ledGreenOff(void) = 0;
+        virtual void     ledGreenOn(void) = 0;
+        virtual void     ledRedOff(void) = 0;
+        virtual void     ledRedOn(void) = 0;
+
+         // Core functionality
         static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
         static void     init(uint16_t & acc1G, float & gyroScale,
                              uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
-        static void     ledGreenOff(void);
-        static void     ledGreenOn(void);
-        static void     ledRedOff(void);
-        static void     ledRedOn(void);
-        static uint16_t rcReadSerial(uint8_t chan);
+       static uint16_t rcReadSerial(uint8_t chan);
         static bool     rcSerialReady(void);
         static bool     rcUseSerial(void);
         static uint16_t readPWM(uint8_t chan);

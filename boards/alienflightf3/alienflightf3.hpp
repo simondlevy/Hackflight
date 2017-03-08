@@ -27,6 +27,16 @@ namespace hf {
         virtual void extrasInit(class MSP * _msp) override;
         virtual void extrasPerformTask(uint8_t taskIndex) override;
 
+        virtual void     delayMilliseconds(uint32_t msec) override;
+        virtual uint32_t getMicros() override;
+
+        virtual void     dump(char * msg) override;
+
+        virtual void     ledGreenOff(void) override;
+        virtual void     ledGreenOn(void) override;
+        virtual void     ledRedOff(void) override;
+        virtual void     ledRedOn(void) override;
+
     };
 
 

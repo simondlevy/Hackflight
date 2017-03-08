@@ -115,18 +115,18 @@ inline void Hackflight::init(Board * _board)
     armed = false;
 
     // sleep for 100ms
-    Board::delayMilliseconds(100);
+    board->delayMilliseconds(100);
 
     // flash the LEDs to indicate startup
-    Board::ledRedOff();
-    Board::ledGreenOff();
+    board->ledRedOff();
+    board->ledGreenOff();
     for (uint8_t i = 0; i < 10; i++) {
-        Board::ledRedOn();
-        Board::ledGreenOn();
-        Board::delayMilliseconds(50);
-        Board::ledRedOff();
-        Board::ledGreenOff();
-        Board::delayMilliseconds(50);
+        board->ledRedOn();
+        board->ledGreenOn();
+        board->delayMilliseconds(50);
+        board->ledRedOff();
+        board->ledGreenOff();
+        board->delayMilliseconds(50);
     }
 
     // intialize the R/C object
@@ -224,7 +224,7 @@ inline void Hackflight::update(void)
             taskOrder = 0;
     }
 
-    currentTime = Board::getMicros();
+    currentTime = board->getMicros();
 
     if (imuTask.checkAndUpdate(currentTime)) {
 
@@ -240,22 +240,22 @@ inline void Hackflight::update(void)
             abs(imu.angle[0]) < CONFIG_SMALL_ANGLE && abs(imu.angle[1]) < CONFIG_SMALL_ANGLE;
 
         // measure loop rate just afer reading the sensors
-        currentTime = Board::getMicros();
+        currentTime = board->getMicros();
 
         // compute exponential RC commands
         rc.computeExpo();
 
         // use LEDs to indicate calibration status
         if (calibratingA > 0 || calibratingG > 0) {
-            Board::ledGreenOn();
+            board->ledGreenOn();
         }
         else {
             if (accCalibrated)
-                Board::ledGreenOff();
+                board->ledGreenOff();
             if (armed)
-                Board::ledRedOn();
+                board->ledRedOn();
             else
-                Board::ledRedOff();
+                board->ledRedOff();
         }
 
         // periodically update accelerometer calibration status
@@ -264,11 +264,11 @@ inline void Hackflight::update(void)
             if (!haveSmallAngle) {
                 accCalibrated = false; 
                 if (on) {
-                    Board::ledGreenOff();
+                    board->ledGreenOff();
                     on = false;
                 }
                 else {
-                    Board::ledGreenOn();
+                    board->ledGreenOn();
                     on = true;
                 }
                 accelCalibrationTask.update(currentTime);

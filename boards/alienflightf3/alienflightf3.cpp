@@ -37,7 +37,7 @@ BrushedMotor motors[4];
 
 namespace hf {
 
-void Board::dump(char * msg)
+void AlienflightF3::dump(char * msg)
 {
     for (char * c = msg; *c; c++)
         Serial.write(*c);
@@ -93,32 +93,32 @@ void Board::checkReboot(bool pendReboot)
         reset(); // noreturn
 }
 
-void Board::delayMilliseconds(uint32_t msec)
+void AlienflightF3::delayMilliseconds(uint32_t msec)
 {
     delay(msec);
 }
 
-uint32_t Board::getMicros()
+uint32_t AlienflightF3::getMicros()
 {
     return micros();
 }
 
-void Board::ledGreenOff(void)
+void AlienflightF3::ledGreenOff(void)
 {
     digitalWrite(3, LOW);
 }
 
-void Board::ledGreenOn(void)
+void AlienflightF3::ledGreenOn(void)
 {
     digitalWrite(3, HIGH);
 }
 
-void Board::ledRedOff(void)
+void AlienflightF3::ledRedOff(void)
 {
     digitalWrite(4, LOW);
 }
 
-void Board::ledRedOn(void)
+void AlienflightF3::ledRedOn(void)
 {
     digitalWrite(4, HIGH);
 }
