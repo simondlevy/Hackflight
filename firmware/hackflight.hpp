@@ -229,7 +229,7 @@ inline void Hackflight::update(void)
 
     if (this->imuTask.checkAndUpdate(currentTime)) {
 
-        this->imu.update(currentTime, this->armed, calibratingA, this->calibratingG);
+        this->imu.update(board, currentTime, this->armed, calibratingA, this->calibratingG);
 
         if (calibratingA > 0)
             calibratingA--;

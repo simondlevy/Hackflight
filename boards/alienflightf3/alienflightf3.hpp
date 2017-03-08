@@ -22,6 +22,8 @@ namespace hf {
 
     class AlienflightF3 : public Board {
 
+        virtual void     imuRead(int16_t accADC[3], int16_t gyroADC[3]) override;
+
         virtual void    init(uint16_t & acc1G, float & gyroScale,
                              uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec) override;
 

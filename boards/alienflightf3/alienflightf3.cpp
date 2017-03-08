@@ -44,18 +44,19 @@ void AlienflightF3::dump(char * msg)
         Serial.write(*c);
 }
 
-void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
+void AlienflightF3::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
     int16_t ax, ay, az, gx, gy, gz;
 
-    imu->getMotion6Counts(&ax, &ay, &az, &gx, &gy, &gz);
+    if (imu->getMotion6Counts(&ax, &ay, &az, &gx, &gy, &gz)) {
 
-    accADC[0]  = -ay;
-    accADC[1]  = ax;
-    accADC[2]  = az;
-    gyroADC[0] = -gy;
-    gyroADC[1] = gx;
-    gyroADC[2] = gz;
+        accADC[0]  = -ay;
+        accADC[1]  = ax;
+        accADC[2]  = az;
+        gyroADC[0] = -gy;
+        gyroADC[1] = gx;
+        gyroADC[2] = gz;
+    }
 }
 
 

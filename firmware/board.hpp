@@ -31,7 +31,7 @@ class Board {
         virtual void     delayMilliseconds(uint32_t msec) = 0;
         virtual uint32_t getMicros() = 0;
 
-        static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
+        virtual void     imuRead(int16_t accADC[3], int16_t gyroADC[3]) = 0;
 
         virtual void    init(uint16_t & acc1G, float & gyroScale,
                              uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec) = 0;
@@ -52,7 +52,7 @@ class Board {
         virtual uint8_t  serialReadByte(void) = 0;
         virtual void     serialWriteByte(uint8_t c) = 0;
 
-        virtual void    writeMotor(uint8_t index, uint16_t value) = 0;
+        virtual void     writeMotor(uint8_t index, uint16_t value) = 0;
 
         virtual void    extrasCheckSwitch(void) = 0;
         virtual uint8_t extrasGetTaskCount(void) = 0;

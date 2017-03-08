@@ -82,7 +82,8 @@ class IMU {
 
         // called from core firmware
         void init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles);
-        void update(uint32_t currentTimeUsec, bool armed, uint16_t calibratingA=0, uint16_t calibratingG=0);
+        void update(Board * board, 
+                uint32_t currentTimeUsec, bool armed, uint16_t calibratingA=0, uint16_t calibratingG=0);
 
         // called from Hover
         float computeAccelZ(void);
@@ -245,7 +246,8 @@ inline void IMU::init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGy
 }
 
 
-inline void IMU::update(uint32_t currentTimeUsec, bool armed, uint16_t calibratingA, uint16_t calibratingG)
+inline void IMU::update(Board * board,
+        uint32_t currentTimeUsec, bool armed, uint16_t calibratingA, uint16_t calibratingG)
 {
     int32_t accMag = 0;
     float rpy[3];
@@ -256,7 +258,7 @@ inline void IMU::update(uint32_t currentTimeUsec, bool armed, uint16_t calibrati
     float scale = dT_sec* this->gyroScale; 
     float anglerad[3];
 
-    Board::imuRead(this->accelADC, this->gyroADC);
+    board->imuRead(this->accelADC, this->gyroADC);
 
     this->previousTimeUsec = currentTimeUsec;
 
