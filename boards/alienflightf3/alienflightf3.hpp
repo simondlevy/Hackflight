@@ -106,27 +106,12 @@ class AlienflightF3 : public Board {
         return micros();
     }
 
-    virtual void ledGreenOff(void) override
-    {
-        digitalWrite(3, LOW);
-    }
+    virtual void ledSet(uint8_t id, bool is_on, float max_brightness) override
+    { 
+        (void)max_brightness;
 
-    virtual void ledGreenOn(void) override
-    {
-        digitalWrite(3, HIGH);
+        digitalWrite(id ? 4 : 3, is_on ? HIGH : LOW);
     }
-
-    virtual void ledRedOff(void) override
-    {
-        digitalWrite(4, LOW);
-    }
-
-    virtual void ledRedOn(void) override
-    {
-        digitalWrite(4, HIGH);
-    }
-
-    //virtual void setLed(uint8_t id, bool is_on, float max_brightness = 255) { (void)id; (void)is_on; (void)max_brightness;}
 
     virtual bool rcSerialReady(void) override
     {

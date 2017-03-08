@@ -35,11 +35,7 @@ class Board {
         virtual void     dump(char * msg) = 0;
         virtual uint32_t getMicros() = 0;
         virtual void     imuRead(int16_t accADC[3], int16_t gyroADC[3]) = 0;
-        virtual void     ledGreenOff(void) = 0;
-        virtual void     ledGreenOn(void) = 0;
-        virtual void     ledRedOff(void) = 0;
-        virtual void     ledRedOn(void) = 0;
-        //virtual void     setLed(uint8_t id, bool is_on, float max_brightness = 255) { (void)id; (void)is_on; (void)max_brightness;}
+        virtual void     ledSet(uint8_t id, bool is_on, float max_brightness = 255) { (void)id; (void)is_on; (void)max_brightness;}
 
     //-------------------------------------------------- RC -----------------------------------------------------
         virtual uint16_t rcReadSerial(uint8_t chan) = 0;

@@ -119,14 +119,14 @@ inline void Hackflight::init(Board * _board)
     board->delayMilliseconds(100);
 
     // flash the LEDs to indicate startup
-    board->ledRedOff();
-    board->ledGreenOff();
+    board->ledSet(0, false);
+    board->ledSet(1, false);
     for (uint8_t i = 0; i < 10; i++) {
-        board->ledRedOn();
-        board->ledGreenOn();
+        board->ledSet(1, true);
+        board->ledSet(0, true);
         board->delayMilliseconds(50);
-        board->ledRedOff();
-        board->ledGreenOff();
+        board->ledSet(1, false);
+        board->ledSet(0, false);
         board->delayMilliseconds(50);
     }
 
@@ -248,15 +248,15 @@ inline void Hackflight::update(void)
 
         // use LEDs to indicate calibration status
         if (calibratingA > 0 || this->calibratingG > 0) {
-            board->ledGreenOn();
+            board->ledSet(0, true);
         }
         else {
             if (accCalibrated)
-                board->ledGreenOff();
+                board->ledSet(0, false);
             if (this->armed)
-                board->ledRedOn();
+                board->ledSet(1, true);
             else
-                board->ledRedOff();
+                board->ledSet(1, false);
         }
 
         // periodically update accelerometer calibration status
@@ -265,11 +265,11 @@ inline void Hackflight::update(void)
             if (!this->haveSmallAngle) {
                 accCalibrated = false; 
                 if (on) {
-                    board->ledGreenOff();
+                    board->ledSet(0, false);
                     on = false;
                 }
                 else {
-                    board->ledGreenOn();
+                    board->ledSet(0, true);
                     on = true;
                 }
                 this->accelCalibrationTask.update(currentTime);
