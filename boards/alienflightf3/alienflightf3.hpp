@@ -29,6 +29,10 @@ namespace hf {
 
         virtual void     checkReboot(bool pendReboot) override;
         virtual void     reboot(void) override;
+
+        virtual void     showArmedStatus(bool armed)override;
+        virtual void     showAuxStatus(uint8_t status)override;
+
     };
 
 } // namespace

@@ -172,13 +172,13 @@ void Board::writeMotor(uint8_t index, uint16_t value)
     motors[index].setSpeed(value);
 }
 
-void Board::showArmedStatus(bool armed)
+void AlienflightF3::showArmedStatus(bool armed)
 {
     // XXX this would be a good place to sound a buzzer!
     (void)armed;
 }
  
-void Board::showAuxStatus(uint8_t status)
+void AlienflightF3::showAuxStatus(uint8_t status)
 {
     (void)status;
 }

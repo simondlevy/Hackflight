@@ -61,8 +61,8 @@ class Board {
         void            extrasPerformTask(uint8_t taskIndex);
 
         // helps with simulation
-        static void     showArmedStatus(bool armed);
-        static void     showAuxStatus(uint8_t status);
+        virtual void     showArmedStatus(bool armed) = 0;
+        virtual void     showAuxStatus(uint8_t status) = 0;
 
         // STM32
         virtual void     checkReboot(bool pendReboot) = 0;
