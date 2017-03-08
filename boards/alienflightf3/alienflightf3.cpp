@@ -34,13 +34,15 @@ SpektrumDSM2048 rx;
 
 BrushedMotor motors[4];
 
-void hf::Board::dump(char * msg)
+namespace hf {
+
+void Board::dump(char * msg)
 {
     for (char * c = msg; *c; c++)
         Serial.write(*c);
 }
 
-void hf::Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
+void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 {
     int16_t ax, ay, az, gx, gy, gz;
 
@@ -55,7 +57,7 @@ void hf::Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
 }
 
 
-void hf::Board::init(uint16_t & acc1G, float & gyroScale, uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
+void Board::init(uint16_t & acc1G, float & gyroScale, uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
 {
     // Init LEDs
     pinMode(3, OUTPUT);
@@ -84,122 +86,124 @@ void hf::Board::init(uint16_t & acc1G, float & gyroScale, uint32_t & looptimeMic
     gyroScale = 16.4f;
 }
 
-void hf::Board::checkReboot(bool pendReboot)
+void Board::checkReboot(bool pendReboot)
 {
     if (pendReboot)
         reset(); // noreturn
 }
 
-void hf::Board::delayMilliseconds(uint32_t msec)
+void Board::delayMilliseconds(uint32_t msec)
 {
     delay(msec);
 }
 
-uint32_t hf::Board::getMicros()
+uint32_t Board::getMicros()
 {
     return micros();
 }
 
-void hf::Board::ledGreenOff(void)
+void Board::ledGreenOff(void)
 {
     digitalWrite(3, LOW);
 }
 
-void hf::Board::ledGreenOn(void)
+void Board::ledGreenOn(void)
 {
     digitalWrite(3, HIGH);
 }
 
-void hf::Board::ledRedOff(void)
+void Board::ledRedOff(void)
 {
     digitalWrite(4, LOW);
 }
 
-void hf::Board::ledRedOn(void)
+void Board::ledRedOn(void)
 {
     digitalWrite(4, HIGH);
 }
 
-bool hf::Board::rcSerialReady(void)
+bool Board::rcSerialReady(void)
 {
     return rx.frameComplete();
 }
 
-bool hf::Board::rcUseSerial(void)
+bool Board::rcUseSerial(void)
 {
     rx.begin();
     return true;
 }
 
-uint16_t hf::Board::rcReadSerial(uint8_t chan)
+uint16_t Board::rcReadSerial(uint8_t chan)
 {
     uint8_t chanmap[5] = {1, 2, 3, 0, 5};
     return rx.readRawRC(chanmap[chan]);
 }
 
-uint16_t hf::Board::readPWM(uint8_t chan)
+uint16_t Board::readPWM(uint8_t chan)
 {
     (void)chan;
     return 0;
 }
 
-void hf::Board::reboot(void)
+void Board::reboot(void)
 {
     resetToBootloader();
 }
 
-uint8_t hf::Board::serialAvailableBytes(void)
+uint8_t Board::serialAvailableBytes(void)
 {
     return Serial.available();
 }
 
-uint8_t hf::Board::serialReadByte(void)
+uint8_t Board::serialReadByte(void)
 {
     return Serial.read();
 }
 
-void hf::Board::serialWriteByte(uint8_t c)
+void Board::serialWriteByte(uint8_t c)
 {
     Serial.write(c);
 }
 
-void hf::Board::writeMotor(uint8_t index, uint16_t value)
+void Board::writeMotor(uint8_t index, uint16_t value)
 {
     motors[index].setSpeed(value);
 }
 
-void hf::Board::showArmedStatus(bool armed)
+void Board::showArmedStatus(bool armed)
 {
     // XXX this would be a good place to sound a buzzer!
     (void)armed;
 }
  
-void hf::Board::showAuxStatus(uint8_t status)
+void Board::showAuxStatus(uint8_t status)
 {
     (void)status;
 }
  
-void hf::Board::extrasInit(class hf::MSP * _msp) 
+void Board::extrasInit(class MSP * _msp) 
 {
     (void)_msp;
 }
 
-void hf::Board::extrasCheckSwitch(void)
+void Board::extrasCheckSwitch(void)
 {
 }
 
-uint8_t hf::Board::extrasGetTaskCount(void)
+uint8_t Board::extrasGetTaskCount(void)
 {
     return 0;
 }
 
-bool hf::Board::extrasHandleMSP(uint8_t command)
+bool Board::extrasHandleMSP(uint8_t command)
 {
     (void)command;
     return true;
 }
 
-void hf::Board::extrasPerformTask(uint8_t taskIndex)
+void Board::extrasPerformTask(uint8_t taskIndex)
 {
     (void)taskIndex;
 } 
+
+} // namespace

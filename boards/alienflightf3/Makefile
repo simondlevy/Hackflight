@@ -244,19 +244,29 @@ ASFLAGS		 = $(ARCH_FLAGS) \
 		   $(addprefix -I,$(INCLUDE_DIRS)) \
 		  -MMD -MP
 
-LDFLAGS		 = -lm \
+#LDFLAGS		 = -lm \
 		   -nostartfiles \
-		   --specs=nano.specs \
 		   -lc \
-		   -lnosys \
+		   --specs=rdimon.specs \
 		   $(ARCH_FLAGS) \
 		   $(LTO_FLAGS) \
-		   $(WARN_FLAGS) \
 		   $(DEBUG_FLAGS) \
 		   -static \
 		   -Wl,-gc-sections,-Map,$(TARGET_MAP) \
 		   -Wl,-L$(LINKER_DIR) \
-		   -Wl,--cref \
+		   -T$(LD_SCRIPT)
+
+LDFLAGS = -lm \
+		   -nostartfiles \
+		   -lc \
+		   --specs=nano.specs \
+		   -lnosys \
+		   $(ARCH_FLAGS) \
+		   $(LTO_FLAGS) \
+		   $(DEBUG_FLAGS) \
+		   -static \
+		   -Wl,-gc-sections,-Map,$(TARGET_MAP) \
+		   -Wl,-L$(LINKER_DIR) \
 		   -T$(LD_SCRIPT)
 
 ###############################################################################
@@ -357,7 +367,6 @@ $(TARGET_BIN): $(TARGET_ELF)
 
 $(TARGET_ELF):  $(TARGET_OBJS)
 	$(C++) -o $@ $^ $(LDFLAGS)
-	$(SIZE) $(TARGET_ELF)
 
 # Compile
 $(OBJECT_DIR)/$(TARGET)/%.o: %.c
