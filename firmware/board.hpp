@@ -29,8 +29,7 @@ class Board {
     public: // interface
 
     //------------------------------------------- Core functionality ---------------------------------------------
-        virtual void    init(uint16_t & acc1G, float & gyroScale,
-                             uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec) = 0;
+        virtual void     init(uint16_t & acc1G, float & gyroScale, uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec) = 0;
         virtual void     delayMilliseconds(uint32_t msec) = 0;
         virtual void     dump(char * msg) = 0;
         virtual uint32_t getMicros() = 0;
@@ -51,7 +50,7 @@ class Board {
     //------------------------------------------------ Motors ---------------------------------------------------
         virtual void     writeMotor(uint8_t index, uint16_t value) = 0;
 
-    //------------------------------------------------ extras ---------------------------------------------------
+    //------------------------------------------------ Extras ---------------------------------------------------
         virtual void    extrasCheckSwitch(void) = 0;
         virtual uint8_t extrasGetTaskCount(void) = 0;
         virtual bool    extrasHandleMSP(uint8_t command) = 0;
@@ -65,10 +64,6 @@ class Board {
     //------------------------------------------------ STM32 ---------------------------------------------------
         virtual void     checkReboot(bool pendReboot) = 0;
         virtual void     reboot(void) = 0;
-
-        // default constants
-        static const uint32_t DEFAULT_IMU_LOOPTIME_USEC     = 3500;
-        static const uint32_t DEFAULT_GYRO_CALIBRATION_MSEC = 3500;
 
 }; // class Board
 
