@@ -19,82 +19,162 @@
 
 #pragma once
 
-enum {
-    DEMAND_ROLL = 0,
-    DEMAND_PITCH,
-    DEMAND_YAW,
-    DEMAND_THROTTLE,
-    DEMAND_AUX1,
-    DEMAND_AUX2,
-    DEMAND_AUX3,
-    DEMAND_AUX4
+#include <algorithm>
+#include <string.h>
+//#include "common.hpp"
+#include "board.hpp"
+#include "config.hpp"
+
+
+//namespace hf {
+
+class RC {
+private:
+    int16_t dataAverage[CONFIG_RC_CHANS][4];
+    uint8_t commandDelay;                               // cycles since most recent movement
+    int32_t averageIndex;
+    int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
+    int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
+    int16_t midrc;
+
+
+public:
+    void init();
+    void update(Board* _board);
+
+    int16_t data[CONFIG_RC_CHANS]; // raw PWM values for MSP
+    int16_t command[4];            // stick PWM values for mixer, MSP
+    uint8_t sticks;                // stick positions for command combos
+    
+    bool changed(void);
+
+    void computeExpo(void);
+
+    uint8_t auxState(void);
+
+    bool throttleIsDown(void);
 };
 
 
-// Define number of RC channels, and min/max PWM
-#define CONFIG_RC_CHANS 8
-#define CONFIG_PWM_MIN  990
-#define CONFIG_PWM_MAX  2010
+/********************************************* CPP ********************************************************/
 
-// For logical combinations of stick positions (low, center, high)
-#define ROL_LO (1 << (2 * DEMAND_ROLL))
-#define ROL_CE (3 << (2 * DEMAND_ROLL))
-#define ROL_HI (2 << (2 * DEMAND_ROLL))
-#define PIT_LO (1 << (2 * DEMAND_PITCH))
-#define PIT_CE (3 << (2 * DEMAND_PITCH))
-#define PIT_HI (2 << (2 * DEMAND_PITCH))
-#define YAW_LO (1 << (2 * DEMAND_YAW))
-#define YAW_CE (3 << (2 * DEMAND_YAW))
-#define YAW_HI (2 << (2 * DEMAND_YAW))
-#define THR_LO (1 << (2 * DEMAND_THROTTLE))
-#define THR_CE (3 << (2 * DEMAND_THROTTLE))
-#define THR_HI (2 << (2 * DEMAND_THROTTLE))
+inline void RC::init()
+{
+    this->midrc = (CONFIG_PWM_MAX + CONFIG_PWM_MIN) / 2;
 
-#define CONFIG_RC_EXPO_8                            65
-#define CONFIG_RC_RATE_8                            90
-#define CONFIG_THR_MID_8                            50
-#define CONFIG_THR_EXPO_8                           0
-#define CONFIG_MINCHECK                             1100
-#define CONFIG_MAXCHECK                             1900
+    memset (this->dataAverage, 0, 8*4*sizeof(int16_t));
 
-#define PITCH_LOOKUP_LENGTH    7
-#define THROTTLE_LOOKUP_LENGTH 12
+    this->commandDelay = 0;
+    this->sticks = 0;
+    this->averageIndex = 0;
 
-#ifdef __arm__
-extern "C" {
-#endif
+    for (uint8_t i = 0; i < CONFIG_RC_CHANS; i++)
+        this->data[i] = this->midrc;
 
-    class RC {
+    for (uint8_t i = 0; i < PITCH_LOOKUP_LENGTH; i++)
+        lookupPitchRollRC[i] = (2500 + CONFIG_RC_EXPO_8 * (i * i - 25)) * i * (int32_t)CONFIG_RC_RATE_8 / 2500;
 
-        private:
-
-            int16_t dataAverage[CONFIG_RC_CHANS][4];
-            uint8_t commandDelay;                               // cycles since most recent movement
-            int32_t averageIndex;
-            int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
-            int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
-            int16_t midrc;
-            bool    useSerial;
-
-        public:
-
-            void init(void);
-
-            int16_t data[CONFIG_RC_CHANS]; // raw PWM values for MSP
-            int16_t command[4];            // stick PWM values for mixer, MSP
-            uint8_t sticks;                // stick positions for command combos
-
-            void update(void);
-
-            bool changed(void);
-
-            void computeExpo(void);
-
-            uint8_t auxState(void);
-            
-            bool throttleIsDown(void) { return this->data[DEMAND_THROTTLE] < CONFIG_MINCHECK; }
-    };
-
-#ifdef __arm__
+    for (uint8_t i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
+        int16_t tmp = 10 * i - CONFIG_THR_MID_8;
+        uint8_t y = 1;
+        if (tmp > 0)
+            y = 100 - CONFIG_THR_MID_8;
+        if (tmp < 0)
+            y = CONFIG_THR_MID_8;
+        lookupThrottleRC[i] = 10 * CONFIG_THR_MID_8 + tmp * (100 - CONFIG_THR_EXPO_8 + 
+            (int32_t)CONFIG_THR_EXPO_8 * (tmp * tmp) / (y * y)) / 10;
+        lookupThrottleRC[i] = CONFIG_PWM_MIN + (int32_t)(CONFIG_PWM_MAX - CONFIG_PWM_MIN) * 
+            lookupThrottleRC[i] / 1000; // [PWM_MIN;PWM_MAX]
+    }
 }
-#endif
+
+inline void RC::update(Board* _board)
+{
+    if (_board->rcUseSerial()) {
+        for (uint8_t chan = 0; chan < 5; chan++) {
+            this->data[chan] = _board->rcReadSerial(chan);
+        }
+    }
+
+    else {
+        for (uint8_t chan = 0; chan < 8; chan++) {
+
+            // get RC PWM
+            this->dataAverage[chan][this->averageIndex % 4] = _board->readPWM(chan);
+
+            this->data[chan] = 0;
+
+            for (uint8_t i = 0; i < 4; i++)
+                this->data[chan] += this->dataAverage[chan][i];
+            this->data[chan] /= 4;
+        }
+
+        this->averageIndex++;
+    }
+
+    // check stick positions, updating command delay
+    uint8_t stTmp = 0;
+    for (uint8_t i = 0; i < 4; i++) {
+        stTmp >>= 2;
+        if (this->data[i] > CONFIG_MINCHECK)
+            stTmp |= 0x80;  // check for MIN
+        if (this->data[i] < CONFIG_MAXCHECK)
+            stTmp |= 0x40;  // check for MAX
+    }
+    if (stTmp == this->sticks) {
+        if (this->commandDelay < 250)
+            this->commandDelay++;
+    } else
+        this->commandDelay = 0;
+    this->sticks = stTmp;
+}
+
+inline bool RC::changed(void)
+{
+    return this->commandDelay == 20;
+}
+
+#define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
+
+inline void RC::computeExpo(void)
+{
+    int32_t tmp, tmp2;
+
+    for (uint8_t channel = 0; channel < 3; channel++) {
+
+        tmp = std::min(abs(this->data[channel] - this->midrc), 500);
+
+        if (channel != DEMAND_YAW) { // roll, pitch
+            tmp2 = tmp / 100;
+            this->command[channel] = 
+                lookupPitchRollRC[tmp2] + (tmp - tmp2 * 100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2]) / 100;
+        } else {                    // yaw
+            this->command[channel] = tmp * -CONFIG_YAW_CONTROL_DIRECTION;
+        }
+
+        if (this->data[channel] < this->midrc)
+            this->command[channel] = -this->command[channel];
+    }
+
+    tmp = constrain(this->data[DEMAND_THROTTLE], CONFIG_MINCHECK, 2000);
+    tmp = (uint32_t)(tmp - CONFIG_MINCHECK) * 1000 / (2000 - CONFIG_MINCHECK);       // [MINCHECK;2000] -> [0;1000]
+    tmp2 = tmp / 100;
+    this->command[DEMAND_THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
+        lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [PWM_MIN;PWM_MAX]
+
+} // computeExpo
+
+inline uint8_t RC::auxState(void) 
+{
+    int16_t aux = this->data[4];
+
+    return aux < 1500 ? 0 : (aux < 1700 ? 1 : 2);
+}
+
+inline bool RC::throttleIsDown(void)
+{
+    return this->data[DEMAND_THROTTLE] < CONFIG_MINCHECK;
+}
+
+
+// } //XXX namespace

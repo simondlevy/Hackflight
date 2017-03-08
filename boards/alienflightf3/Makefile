@@ -289,7 +289,6 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(
 			   $(OBJECT_DIR)/$(TARGET)/hackflight.o \
 			   $(OBJECT_DIR)/$(TARGET)/imu.o \
 			   $(OBJECT_DIR)/$(TARGET)/msp.o \
-			   $(OBJECT_DIR)/$(TARGET)/rc.o \
 			   $(OBJECT_DIR)/$(TARGET)/stabilize.o \
 			   $(OBJECT_DIR)/$(TARGET)/alienflightf3.o \
 			   $(OBJECT_DIR)/$(TARGET)/Arduino.o \
@@ -396,9 +395,6 @@ $(OBJECT_DIR)/$(TARGET)/imu.o: $(FIRMWARE_DIR)/imu.cpp
 
 $(OBJECT_DIR)/$(TARGET)/msp.o: $(FIRMWARE_DIR)/msp.cpp 
 	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/msp.o $(CFLAGS) $(FIRMWARE_DIR)/msp.cpp 
-
-$(OBJECT_DIR)/$(TARGET)/rc.o: $(FIRMWARE_DIR)/rc.cpp 
-	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/rc.o $(CFLAGS) $(FIRMWARE_DIR)/rc.cpp 
 
 $(OBJECT_DIR)/$(TARGET)/stabilize.o: $(FIRMWARE_DIR)/stabilize.cpp 
 	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/stabilize.o $(CFLAGS) $(FIRMWARE_DIR)/stabilize.cpp 

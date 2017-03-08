@@ -100,7 +100,7 @@ void Hackflight::update(void)
     if (this->rcTask.checkAndUpdate(currentTime) || rcSerialReady) {
 
         // update RC channels
-        this->rc.update();
+        this->rc.update(&this->board);
 
         rcSerialReady = false;
 

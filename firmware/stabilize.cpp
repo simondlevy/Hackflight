@@ -18,7 +18,6 @@
  */
 
 #include "hackflight.hpp"
-#include "pidvals.hpp"
 
 void Stabilize::init(void)
 {
