@@ -61,7 +61,7 @@ typedef  struct mspPortState_t {
 
 class MSP {
 public:
-    void init(class hf::IMU * _imu, class hf::Mixer * _mixer, class hf::RC * _rc, Board * _board);
+    void init(IMU * _imu, Mixer * _mixer, RC * _rc, Board * _board);
     void update(bool armed);
 
 private:
@@ -155,7 +155,7 @@ inline void MSP::tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-inline void MSP::init(class hf::IMU * _imu, class hf::Mixer * _mixer, class hf::RC * _rc, Board * _board)
+inline void MSP::init(IMU * _imu, Mixer * _mixer, RC * _rc, Board * _board)
 {
     this->imu = _imu;
     this->mixer = _mixer;
