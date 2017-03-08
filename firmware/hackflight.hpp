@@ -55,6 +55,8 @@
 #define CONFIG_SMALL_ANGLE                          250  // tenths of a degree
 #define CONFIG_ALTITUDE_UPDATE_MSEC                 25   // based on accelerometer low-pass filter
 
+namespace hf {
+
 class Hackflight {
 
     private:
@@ -282,4 +284,6 @@ inline void Hackflight::update(void)
 
     } // IMU update
 
-} // loop()
+} // update()
+
+} // namespace
