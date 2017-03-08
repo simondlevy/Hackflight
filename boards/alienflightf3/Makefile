@@ -286,6 +286,7 @@ TARGET_BIN	 = obj/$(TARGET).bin
 TARGET_HEX	 = $(BIN_DIR)/$(TARGET).hex
 TARGET_ELF	 = $(OBJECT_DIR)/$(TARGET).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC)))) \
+			   $(OBJECT_DIR)/$(TARGET)/hackflight.o \
 			   $(OBJECT_DIR)/$(TARGET)/alienflightf3.o \
 			   $(OBJECT_DIR)/$(TARGET)/Arduino.o \
 			   $(OBJECT_DIR)/$(TARGET)/HardwareWire.o \
@@ -382,6 +383,9 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(ASFLAGS) $<
 
+
+$(OBJECT_DIR)/$(TARGET)/hackflight.o: hackflight.cpp $(FIRMWARE_DIR)/*.hpp
+	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/hackflight.o $(CFLAGS) hackflight.cpp 
 
 $(OBJECT_DIR)/$(TARGET)/alienflightf3.o: alienflightf3.cpp $(FIRMWARE_DIR)/*.hpp
 	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/alienflightf3.o $(CFLAGS) alienflightf3.cpp 

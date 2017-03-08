@@ -203,15 +203,3 @@ void Board::extrasPerformTask(uint8_t taskIndex)
 {
     (void)taskIndex;
 } 
-
-static Hackflight hackflight;
-
-void setup(void)
-{
-    hackflight.initialize();
-}
-
-void loop(void)
-{
-    hackflight.update();
-}
