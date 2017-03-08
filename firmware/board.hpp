@@ -7,7 +7,6 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-
    Hackflight is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -29,25 +28,20 @@ class Board {
 
     public:
 
-        virtual void extrasCheckSwitch(void) = 0;
-        virtual bool extrasHandleMSP(uint8_t command) = 0;
-        virtual void extrasInit(class MSP * _msp) = 0;
-        virtual void extrasPerformTask(uint8_t taskIndex) = 0;
+        // your implementation should support these methods
 
-        virtual void     delayMilliseconds(uint32_t msec) = 0;
-        virtual uint32_t getMicros() = 0;
-
-        virtual void     dump(char * msg) = 0;
-
-        virtual void     ledGreenOff(void) = 0;
-        virtual void     ledGreenOn(void) = 0;
-        virtual void     ledRedOff(void) = 0;
-        virtual void     ledRedOn(void) = 0;
-
-         // Core functionality
+        // Core functionality
+        static void     delayMilliseconds(uint32_t msec);
+        static void     dump(char * msg);
+        static uint32_t getMicros();
+        static void     imuInit();
         static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
         static void     init(uint16_t & acc1G, float & gyroScale,
                              uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
+        static void     ledGreenOff(void);
+        static void     ledGreenOn(void);
+        static void     ledRedOff(void);
+        static void     ledRedOn(void);
         static uint16_t rcReadSerial(uint8_t chan);
         static bool     rcSerialReady(void);
         static bool     rcUseSerial(void);
@@ -58,14 +52,19 @@ class Board {
         static void     writeMotor(uint8_t index, uint16_t value);
 
         // extra functionality
-        virtual uint8_t  extrasGetTaskCount(void) = 0;
+        void            extrasCheckSwitch(void);
+        static uint8_t  extrasGetTaskCount(void);
+        bool            extrasHandleMSP(uint8_t command);
+        void            extrasInit(class MSP * _msp);
+        void            extrasPerformTask(uint8_t taskIndex);
+
         // helps with simulation
-        virtual void     showArmedStatus(bool armed) = 0;
-        virtual void     showAuxStatus(uint8_t status) = 0;
+        static void     showArmedStatus(bool armed);
+        static void     showAuxStatus(uint8_t status);
 
         // STM32
-        virtual void     checkReboot(bool pendReboot) = 0;
-        virtual void     reboot(void) = 0;
+        static void     checkReboot(bool pendReboot);
+        static void     reboot(void);
 
         // default constants
         static const uint32_t DEFAULT_IMU_LOOPTIME_USEC     = 3500;

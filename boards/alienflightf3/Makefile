@@ -230,13 +230,20 @@ DEBUG_FLAGS	 = -ggdb3 -DDEBUG
 CFLAGS		 = $(ARCH_FLAGS) \
 		   $(LTO_FLAGS) \
 		   $(WARN_FLAGS) \
+		   $(addprefix -D,$(OPTIONS)) \
 		   $(addprefix -I,$(INCLUDE_DIRS)) \
 		   $(DEBUG_FLAGS) \
-		   $(DEVICE_FLAGS) \
 		   -Wall -Wpedantic -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion -Wundef \
 		   -ffunction-sections \
 		   -fdata-sections \
-		   -DUSE_STDPERIPH_DRIVER
+		   $(DEVICE_FLAGS) \
+		   -DEXTERNAL_DEBUG \
+		   -DUSE_STDPERIPH_DRIVER \
+		   $(TARGET_FLAGS) \
+		   -DSTM32 \
+		   -fverbose-asm -ffat-lto-objects \
+		   -save-temps=obj \
+		   -MMD -MP
 
 ASFLAGS		 = $(ARCH_FLAGS) \
 		   $(WARN_FLAGS) \
@@ -244,29 +251,19 @@ ASFLAGS		 = $(ARCH_FLAGS) \
 		   $(addprefix -I,$(INCLUDE_DIRS)) \
 		  -MMD -MP
 
-#LDFLAGS		 = -lm \
+LDFLAGS		 = -lm \
 		   -nostartfiles \
-		   -lc \
-		   --specs=rdimon.specs \
-		   $(ARCH_FLAGS) \
-		   $(LTO_FLAGS) \
-		   $(DEBUG_FLAGS) \
-		   -static \
-		   -Wl,-gc-sections,-Map,$(TARGET_MAP) \
-		   -Wl,-L$(LINKER_DIR) \
-		   -T$(LD_SCRIPT)
-
-LDFLAGS = -lm \
-		   -nostartfiles \
-		   -lc \
 		   --specs=nano.specs \
+		   -lc \
 		   -lnosys \
 		   $(ARCH_FLAGS) \
 		   $(LTO_FLAGS) \
+		   $(WARN_FLAGS) \
 		   $(DEBUG_FLAGS) \
 		   -static \
 		   -Wl,-gc-sections,-Map,$(TARGET_MAP) \
 		   -Wl,-L$(LINKER_DIR) \
+		   -Wl,--cref \
 		   -T$(LD_SCRIPT)
 
 ###############################################################################
@@ -367,6 +364,7 @@ $(TARGET_BIN): $(TARGET_ELF)
 
 $(TARGET_ELF):  $(TARGET_OBJS)
 	$(C++) -o $@ $^ $(LDFLAGS)
+	$(SIZE) $(TARGET_ELF)
 
 # Compile
 $(OBJECT_DIR)/$(TARGET)/%.o: %.c
@@ -386,8 +384,8 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 	@$(CC) -c -o $@ $(ASFLAGS) $<
 
 
-$(OBJECT_DIR)/$(TARGET)/hackflight.o: hackflight.cpp $(FIRMWARE_DIR)/*.hpp alienflightf3.hpp
-	@$(C++) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/hackflight.o $(CFLAGS) hackflight.cpp 
+$(OBJECT_DIR)/$(TARGET)/hackflight.o: hackflight.cpp $(FIRMWARE_DIR)/*.hpp
+	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/hackflight.o $(CFLAGS) hackflight.cpp 
 
 $(OBJECT_DIR)/$(TARGET)/alienflightf3.o: alienflightf3.cpp $(FIRMWARE_DIR)/*.hpp
 	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/alienflightf3.o $(CFLAGS) alienflightf3.cpp 

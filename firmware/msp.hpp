@@ -61,13 +61,13 @@ typedef  struct mspPortState_t {
 
 class MSP {
 public:
-    void init(IMU * _imu, Mixer * _mixer, RC * _rc, Board * _board);
+    void init(class hf::IMU * _imu, class hf::Mixer * _mixer, class hf::RC * _rc, Board * _board);
     void update(bool armed);
 
 private:
-    IMU        * imu;
-    Mixer      * mixer;
-    RC         * rc;
+    hf::IMU        * imu;
+    hf::Mixer      * mixer;
+    hf::RC         * rc;
     Board      * board;
 
     mspPortState_t portState;
@@ -155,14 +155,14 @@ inline void MSP::tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-inline void MSP::init(class IMU * _imu, class Mixer * _mixer, class RC * _rc, Board * _board)
+inline void MSP::init(class hf::IMU * _imu, class hf::Mixer * _mixer, class hf::RC * _rc, Board * _board)
 {
-    imu = _imu;
-    mixer = _mixer;
-    rc = _rc;
-    board = _board;
+    this->imu = _imu;
+    this->mixer = _mixer;
+    this->rc = _rc;
+    this->board = _board;
 
-    memset(&portState, 0, sizeof(portState));
+    memset(&this->portState, 0, sizeof(this->portState));
 }
 
 inline void MSP::update(bool armed)
@@ -213,26 +213,26 @@ inline void MSP::update(bool armed)
 
                 case MSP_SET_RAW_RC:
                     for (uint8_t i = 0; i < 8; i++)
-                        rc->data[i] = read16();
+                        this->rc->data[i] = read16();
                     headSerialReply(0);
                     break;
 
                 case MSP_SET_MOTOR:
                     for (uint8_t i = 0; i < 4; i++)
-                        mixer->motorsDisarmed[i] = read16();
+                        this->mixer->motorsDisarmed[i] = read16();
                     headSerialReply(0);
                     break;
 
                 case MSP_RC:
                     headSerialReply(16);
                     for (uint8_t i = 0; i < 8; i++)
-                        serialize16(rc->data[i]);
+                        serialize16(this->rc->data[i]);
                     break;
 
                 case MSP_ATTITUDE:
                     headSerialReply(6);
                     for (uint8_t i = 0; i < 3; i++)
-                        serialize16(imu->angle[i]);
+                        serialize16(this->imu->angle[i]);
                     break;
 
                 case MSP_REBOOT:
