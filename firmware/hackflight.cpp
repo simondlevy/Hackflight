@@ -45,7 +45,7 @@ void Hackflight::initialize(void)
     this->calibratingAccCycles  = (uint16_t)(1000. * CONFIG_CALIBRATING_ACC_MSEC  / this->imuLooptimeUsec);
 
     // initialize our external objects with objects they need
-    this->stab.init();
+    this->stab.init(&this->rc, &this->imu);
     this->imu.init(acc1G, gyroScale, this->calibratingGyroCycles, this->calibratingAccCycles);
     this->mixer.init(&this->rc, &this->stab); 
 
@@ -165,9 +165,7 @@ void Hackflight::update(void)
 
     if (this->imuTask.checkAndUpdate(currentTime)) {
 
-        Board::imuRead(this->accelADC, this->gyroADC);
-
-        this->imu.update(this->accelADC, this->gyroADC, currentTime, this->armed, calibratingA, this->calibratingG);
+        this->imu.update(currentTime, this->armed, calibratingA, this->calibratingG);
 
         if (calibratingA > 0)
             calibratingA--;
@@ -217,7 +215,7 @@ void Hackflight::update(void)
         }
 
         // update stability PID controller 
-        this->stab.update(this->rc.command, this->gyroADC, this->imu.angle);
+        this->stab.update();
 
         // update mixer
         this->mixer.update(this->armed, &this->board);
