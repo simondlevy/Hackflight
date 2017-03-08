@@ -80,4 +80,8 @@ void Mixer::update(bool armed)
         }
     }
 
+    // spin motors
+    for (uint8_t i = 0; i < 4; i++)
+        Board::writeMotor(i, this->motors[i]);
+
 }

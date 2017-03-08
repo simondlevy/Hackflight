@@ -225,10 +225,6 @@ void Hackflight::update(void)
         // handle serial communications
         this->msp.update(this->armed);
 
-        // spin motors
-        for (uint8_t i = 0; i < 4; i++)
-            Board::writeMotor(i, this->mixer.motors[i]);
-
     } // IMU update
 
 } // loop()
