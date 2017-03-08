@@ -20,6 +20,8 @@
 
 #include "board.hpp"
 
+namespace hf {
+
 inline void debug(Board * board, const char * fmt, ...)
 {
     va_list ap;       
@@ -33,4 +35,6 @@ inline void debug(Board * board, const char * fmt, ...)
     board->dump(buf);
 
     va_end(ap);  
+}
+
 }
