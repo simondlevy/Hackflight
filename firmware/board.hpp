@@ -48,9 +48,9 @@ class Board {
         virtual bool     rcUseSerial(void) = 0;
         virtual uint16_t rcReadPwm(uint8_t chan) = 0;
 
-        static uint8_t  serialAvailableBytes(void);
-        static uint8_t  serialReadByte(void);
-        static void     serialWriteByte(uint8_t c);
+        virtual uint8_t  serialAvailableBytes(void) = 0;
+        virtual uint8_t  serialReadByte(void) = 0;
+        virtual void     serialWriteByte(uint8_t c) = 0;
 
         virtual void    writeMotor(uint8_t index, uint16_t value) = 0;
 

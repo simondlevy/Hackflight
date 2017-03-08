@@ -22,6 +22,10 @@ namespace hf {
 
     class AlienflightF3 : public Board {
 
+        virtual uint8_t  serialAvailableBytes(void) override;
+        virtual uint8_t  serialReadByte(void) override;
+        virtual void     serialWriteByte(uint8_t c) override;
+
         virtual void     dump(char * msg) override;
 
         virtual void     delayMilliseconds(uint32_t msec) override;

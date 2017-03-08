@@ -152,17 +152,17 @@ void AlienflightF3::reboot(void)
     resetToBootloader();
 }
 
-uint8_t Board::serialAvailableBytes(void)
+uint8_t AlienflightF3::serialAvailableBytes(void)
 {
     return Serial.available();
 }
 
-uint8_t Board::serialReadByte(void)
+uint8_t AlienflightF3::serialReadByte(void)
 {
     return Serial.read();
 }
 
-void Board::serialWriteByte(uint8_t c)
+void AlienflightF3::serialWriteByte(uint8_t c)
 {
     Serial.write(c);
 }
