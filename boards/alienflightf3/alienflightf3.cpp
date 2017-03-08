@@ -167,7 +167,7 @@ void Board::serialWriteByte(uint8_t c)
     Serial.write(c);
 }
 
-void Board::writeMotor(uint8_t index, uint16_t value)
+void AlienflightF3::writeMotor(uint8_t index, uint16_t value)
 {
     motors[index].setSpeed(value);
 }

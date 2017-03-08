@@ -43,6 +43,8 @@ namespace hf {
         virtual bool    extrasHandleMSP(uint8_t command) override;
         virtual void    extrasInit(class MSP * _msp) override;
         virtual void    extrasPerformTask(uint8_t taskIndex) override;
+
+        virtual void    writeMotor(uint8_t index, uint16_t value) override;
     };
 
 } // namespace

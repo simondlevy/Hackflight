@@ -52,7 +52,8 @@ class Board {
         static uint8_t  serialAvailableBytes(void);
         static uint8_t  serialReadByte(void);
         static void     serialWriteByte(uint8_t c);
-        static void     writeMotor(uint8_t index, uint16_t value);
+
+        virtual void    writeMotor(uint8_t index, uint16_t value) = 0;
 
         // extra functionality
         virtual void    extrasCheckSwitch(void) = 0;
