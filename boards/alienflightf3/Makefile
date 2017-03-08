@@ -230,20 +230,13 @@ DEBUG_FLAGS	 = -ggdb3 -DDEBUG
 CFLAGS		 = $(ARCH_FLAGS) \
 		   $(LTO_FLAGS) \
 		   $(WARN_FLAGS) \
-		   $(addprefix -D,$(OPTIONS)) \
 		   $(addprefix -I,$(INCLUDE_DIRS)) \
 		   $(DEBUG_FLAGS) \
+		   $(DEVICE_FLAGS) \
 		   -Wall -Wpedantic -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion -Wundef \
 		   -ffunction-sections \
 		   -fdata-sections \
-		   $(DEVICE_FLAGS) \
-		   -DEXTERNAL_DEBUG \
-		   -DUSE_STDPERIPH_DRIVER \
-		   $(TARGET_FLAGS) \
-		   -DSTM32 \
-		   -fverbose-asm -ffat-lto-objects \
-		   -save-temps=obj \
-		   -MMD -MP
+		   -DUSE_STDPERIPH_DRIVER
 
 ASFLAGS		 = $(ARCH_FLAGS) \
 		   $(WARN_FLAGS) \
