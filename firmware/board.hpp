@@ -38,10 +38,12 @@ class Board {
         static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
         static void     init(uint16_t & acc1G, float & gyroScale,
                              uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
-        static void     ledGreenOff(void);
-        static void     ledGreenOn(void);
-        static void     ledRedOff(void);
-        static void     ledRedOn(void);
+
+        virtual void     ledGreenOff(void) = 0;
+        virtual void     ledGreenOn(void) = 0;
+        virtual void     ledRedOff(void) = 0;
+        virtual void     ledRedOn(void) = 0;
+
         static uint16_t rcReadSerial(uint8_t chan);
         static bool     rcSerialReady(void);
         static bool     rcUseSerial(void);

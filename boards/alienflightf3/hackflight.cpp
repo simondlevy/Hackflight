@@ -17,17 +17,17 @@
  */
 
 #include <Arduino.h>
+#include <hackflight.hpp>
+#include "alienflightf3.hpp"
 
-#include "hackflight.hpp"
-
-static hf::Hackflight hackflight;
+static hf::Hackflight h;
 
 void setup(void)
 {
-    hackflight.init();
+    h.init(new hf::AlienflightF3());
 }
 
 void loop(void)
 {
-    hackflight.update();
+    h.update();
 }

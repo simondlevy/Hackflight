@@ -15,6 +15,8 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <stdint.h>
 #include <stdarg.h>
 #include <math.h>
@@ -66,7 +68,8 @@ class Hackflight {
         Mixer      mixer;
         MSP        msp;
         Stabilize  stab;
-        Board      board;
+
+        Board    * board;
 
         TimedTask imuTask;
         TimedTask rcTask;
@@ -81,13 +84,15 @@ class Hackflight {
 
     public:
 
-        void init(void);
+        void init(Board * _board);
 
         void update(void);
 };
 
-inline void Hackflight::init(void)
+inline void Hackflight::init(Board * _board)
 {
+    this->board = _board;
+
     uint16_t acc1G;
     float    gyroScale;
     uint32_t looptimeUsec;
@@ -114,14 +119,14 @@ inline void Hackflight::init(void)
     Board::delayMilliseconds(100);
 
     // flash the LEDs to indicate startup
-    Board::ledRedOff();
-    Board::ledGreenOff();
+    board->ledRedOff();
+    board->ledGreenOff();
     for (uint8_t i = 0; i < 10; i++) {
-        Board::ledRedOn();
-        Board::ledGreenOn();
+        board->ledRedOn();
+        board->ledGreenOn();
         Board::delayMilliseconds(50);
-        Board::ledRedOff();
-        Board::ledGreenOff();
+        board->ledRedOff();
+        board->ledGreenOff();
         Board::delayMilliseconds(50);
     }
 
@@ -140,10 +145,10 @@ inline void Hackflight::init(void)
     this->accelCalibrationTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
 
     // initialize MSP comms
-    this->msp.init(&this->imu, &this->mixer, &this->rc, &this->board);
+    this->msp.init(&this->imu, &this->mixer, &this->rc, board);
 
     // do any extra initializations (baro, sonar, etc.)
-    // XXX this->board.extrasInit(&msp);
+    // XXX board->extrasInit(&msp);
 
 } // intialize
 
@@ -159,7 +164,7 @@ inline void Hackflight::update(void)
     if (this->rcTask.checkAndUpdate(currentTime) || rcSerialReady) {
 
         // update RC channels
-        this->rc.update(&this->board);
+        this->rc.update(board);
 
         rcSerialReady = false;
 
@@ -206,13 +211,13 @@ inline void Hackflight::update(void)
         } // this->rc.changed()
 
         // Detect aux switch changes for hover, altitude-hold, etc.
-        this->board.extrasCheckSwitch();
+        board->extrasCheckSwitch();
 
     } else {                    // not in rc loop
 
         static int taskOrder;   // never call all functions in the same loop, to avoid high delay spikes
 
-        this->board.extrasPerformTask(taskOrder);
+        board->extrasPerformTask(taskOrder);
 
         taskOrder++;
 
@@ -243,15 +248,15 @@ inline void Hackflight::update(void)
 
         // use LEDs to indicate calibration status
         if (calibratingA > 0 || this->calibratingG > 0) {
-            Board::ledGreenOn();
+            board->ledGreenOn();
         }
         else {
             if (accCalibrated)
-                Board::ledGreenOff();
+                board->ledGreenOff();
             if (this->armed)
-                Board::ledRedOn();
+                board->ledRedOn();
             else
-                Board::ledRedOff();
+                board->ledRedOff();
         }
 
         // periodically update accelerometer calibration status
@@ -260,11 +265,11 @@ inline void Hackflight::update(void)
             if (!this->haveSmallAngle) {
                 accCalibrated = false; 
                 if (on) {
-                    Board::ledGreenOff();
+                    board->ledGreenOff();
                     on = false;
                 }
                 else {
-                    Board::ledGreenOn();
+                    board->ledGreenOn();
                     on = true;
                 }
                 this->accelCalibrationTask.update(currentTime);
@@ -277,7 +282,7 @@ inline void Hackflight::update(void)
         this->stab.update();
 
         // update mixer
-        this->mixer.update(this->armed, &this->board);
+        this->mixer.update(this->armed, board);
 
         // handle serial communications
         this->msp.update(this->armed);

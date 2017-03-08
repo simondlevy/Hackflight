@@ -22,8 +22,10 @@
 
 #include <math.h>
 
-#include "board.hpp"
-#include "hackflight.hpp"
+#include <board.hpp>
+#include <hackflight.hpp>
+
+#include "alienflightf3.hpp"
 
 #define IMU_LOOPTIME_USEC       3500
 #define CALIBRATING_GYRO_MSEC   3500
@@ -102,22 +104,22 @@ uint32_t Board::getMicros()
     return micros();
 }
 
-void Board::ledGreenOff(void)
+void AlienflightF3::ledGreenOff(void)
 {
     digitalWrite(3, LOW);
 }
 
-void Board::ledGreenOn(void)
+void AlienflightF3::ledGreenOn(void)
 {
     digitalWrite(3, HIGH);
 }
 
-void Board::ledRedOff(void)
+void AlienflightF3::ledRedOff(void)
 {
     digitalWrite(4, LOW);
 }
 
-void Board::ledRedOn(void)
+void AlienflightF3::ledRedOn(void)
 {
     digitalWrite(4, HIGH);
 }
