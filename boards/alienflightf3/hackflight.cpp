@@ -20,14 +20,14 @@
 
 #include "hackflight.hpp"
 
-static hf::Hackflight hackflight;
+static hf::Hackflight h;
 
 void setup(void)
 {
-    hackflight.initialize();
+    h.init();
 }
 
 void loop(void)
 {
-    hackflight.update();
+    h.update();
 }
