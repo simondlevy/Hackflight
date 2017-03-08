@@ -387,7 +387,7 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.S
 
 
 $(OBJECT_DIR)/$(TARGET)/hackflight.o: hackflight.cpp $(FIRMWARE_DIR)/*.hpp alienflightf3.hpp
-	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/hackflight.o $(CFLAGS) hackflight.cpp 
+	@$(C++) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/hackflight.o $(CFLAGS) hackflight.cpp 
 
 $(OBJECT_DIR)/$(TARGET)/alienflightf3.o: alienflightf3.cpp $(FIRMWARE_DIR)/*.hpp
 	@$(CC) -c -std=gnu++11 -o $(OBJECT_DIR)/$(TARGET)/alienflightf3.o $(CFLAGS) alienflightf3.cpp 

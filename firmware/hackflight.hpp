@@ -68,7 +68,7 @@ class Hackflight {
         Mixer      mixer;
         MSP        msp;
         Stabilize  stab;
-        Board      board;
+        Board    * board;
 
         TimedTask imuTask;
         TimedTask rcTask;
@@ -83,13 +83,15 @@ class Hackflight {
 
     public:
 
-        void init(void);
+        void init(Board * _board);
 
         void update(void);
 };
 
-inline void Hackflight::init(void)
+inline void Hackflight::init(Board * _board)
 {
+    this->board = _board;
+
     uint16_t acc1G;
     float    gyroScale;
     uint32_t looptimeUsec;
@@ -142,10 +144,10 @@ inline void Hackflight::init(void)
     accelCalibrationTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
 
     // initialize MSP comms
-    msp.init(&imu, &mixer, &rc, &board);
+    msp.init(&imu, &mixer, &rc, board);
 
     // do any extra initializations (baro, sonar, etc.)
-    board.extrasInit(&msp);
+    board->extrasInit(&msp);
 
 } // intialize
 
@@ -161,7 +163,7 @@ inline void Hackflight::update(void)
     if (rcTask.checkAndUpdate(currentTime) || rcSerialReady) {
 
         // update RC channels
-        rc.update(&board);
+        rc.update(board);
 
         rcSerialReady = false;
 
@@ -208,13 +210,13 @@ inline void Hackflight::update(void)
         } // rc.changed()
 
         // Detect aux switch changes for hover, altitude-hold, etc.
-        board.extrasCheckSwitch();
+        board->extrasCheckSwitch();
 
     } else {                    // not in rc loop
 
         static int taskOrder;   // never call all functions in the same loop, to avoid high delay spikes
 
-        board.extrasPerformTask(taskOrder);
+        board->extrasPerformTask(taskOrder);
 
         taskOrder++;
 
@@ -279,7 +281,7 @@ inline void Hackflight::update(void)
         stab.update();
 
         // update mixer
-        mixer.update(armed, &board);
+        mixer.update(armed, board);
 
         // handle serial communications
         msp.update(armed);

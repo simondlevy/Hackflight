@@ -19,12 +19,13 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
+#include "alienflightf3.hpp"
 
 static hf::Hackflight h;
 
 void setup(void)
 {
-    h.init();
+    h.init(new hf::AlienflightF3());
 }
 
 void loop(void)

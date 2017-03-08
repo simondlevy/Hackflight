@@ -22,6 +22,11 @@ namespace hf {
 
     class AlienflightF3 : public Board {
 
+        virtual void extrasCheckSwitch(void) override;
+        virtual bool extrasHandleMSP(uint8_t command) override;
+        virtual void extrasInit(class MSP * _msp) override;
+        virtual void extrasPerformTask(uint8_t taskIndex) override;
+
     };
 
 

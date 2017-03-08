@@ -29,7 +29,10 @@ class Board {
 
     public:
 
-        // your implementation should support these methods
+        virtual void extrasCheckSwitch(void) = 0;
+        virtual bool extrasHandleMSP(uint8_t command) = 0;
+        virtual void extrasInit(class MSP * _msp) = 0;
+        virtual void extrasPerformTask(uint8_t taskIndex) = 0;
 
         // Core functionality
         static void     delayMilliseconds(uint32_t msec);
@@ -53,12 +56,7 @@ class Board {
         static void     writeMotor(uint8_t index, uint16_t value);
 
         // extra functionality
-        void            extrasCheckSwitch(void);
         static uint8_t  extrasGetTaskCount(void);
-        bool            extrasHandleMSP(uint8_t command);
-        void            extrasInit(class MSP * _msp);
-        void            extrasPerformTask(uint8_t taskIndex);
-
         // helps with simulation
         static void     showArmedStatus(bool armed);
         static void     showAuxStatus(uint8_t status);
