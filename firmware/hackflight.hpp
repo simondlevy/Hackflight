@@ -99,7 +99,7 @@ inline void Hackflight::init(Board * _board)
     uint32_t gyroCalibrationMsec;
 
     // Get particulars for board
-    Board::init(acc1G, gyroScale, looptimeUsec, gyroCalibrationMsec);
+    board->init(acc1G, gyroScale, looptimeUsec, gyroCalibrationMsec);
 
     this->imuLooptimeUsec = looptimeUsec;
 

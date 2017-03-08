@@ -33,8 +33,8 @@ class Board {
 
         static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
 
-        static void     init(uint16_t & acc1G, float & gyroScale,
-                             uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
+        virtual void    init(uint16_t & acc1G, float & gyroScale,
+                             uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec) = 0;
 
         virtual void     dump(char * msg) = 0;
 

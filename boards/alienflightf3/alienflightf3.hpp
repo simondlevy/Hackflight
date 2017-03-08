@@ -22,6 +22,9 @@ namespace hf {
 
     class AlienflightF3 : public Board {
 
+        virtual void    init(uint16_t & acc1G, float & gyroScale,
+                             uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec) override;
+
         virtual uint8_t  serialAvailableBytes(void) override;
         virtual uint8_t  serialReadByte(void) override;
         virtual void     serialWriteByte(uint8_t c) override;
