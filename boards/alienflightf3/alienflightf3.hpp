@@ -37,7 +37,13 @@ namespace hf {
         virtual void     ledRedOff(void) override;
         virtual void     ledRedOn(void) override;
 
-    };
+        virtual void     checkReboot(bool pendReboot) override;
+        virtual void     reboot(void) override;
 
+        virtual uint8_t  extrasGetTaskCount(void) override;
+        virtual void     showArmedStatus(bool armed) override;
+        virtual void     showAuxStatus(uint8_t status) override;
+
+    };
 
 } // namespace

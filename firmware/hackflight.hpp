@@ -169,7 +169,7 @@ inline void Hackflight::update(void)
 
         // useful for simulator
         if (armed)
-            Board::showAuxStatus(rc.auxState());
+            board->showAuxStatus(rc.auxState());
 
         // when landed, reset integral component of PID
         if (rc.throttleIsDown()) 
@@ -183,7 +183,7 @@ inline void Hackflight::update(void)
                 if (rc.sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
                     if (armed) {
                         armed = false;
-                        Board::showArmedStatus(armed);
+                        board->showArmedStatus(armed);
                     }
                 }
             } else {         // actions during not armed
@@ -198,7 +198,7 @@ inline void Hackflight::update(void)
                         if (!rc.auxState()) // aux switch must be in zero position
                             if (!armed) {
                                 armed = true;
-                                Board::showArmedStatus(armed);
+                                board->showArmedStatus(armed);
                             }
 
                 // accel calibration
@@ -220,7 +220,7 @@ inline void Hackflight::update(void)
 
         taskOrder++;
 
-        if (taskOrder >= Board::extrasGetTaskCount()) // using >= supports zero or more tasks
+        if (taskOrder >= board->extrasGetTaskCount()) // using >= supports zero or more tasks
             taskOrder = 0;
     }
 

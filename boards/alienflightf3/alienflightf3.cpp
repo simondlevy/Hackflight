@@ -87,7 +87,7 @@ void Board::init(uint16_t & acc1G, float & gyroScale, uint32_t & looptimeMicrose
     gyroScale = 16.4f;
 }
 
-void Board::checkReboot(bool pendReboot)
+void AlienflightF3::checkReboot(bool pendReboot)
 {
     if (pendReboot)
         reset(); // noreturn
@@ -146,7 +146,7 @@ uint16_t Board::readPWM(uint8_t chan)
     return 0;
 }
 
-void Board::reboot(void)
+void AlienflightF3::reboot(void)
 {
     resetToBootloader();
 }
@@ -171,18 +171,18 @@ void Board::writeMotor(uint8_t index, uint16_t value)
     motors[index].setSpeed(value);
 }
 
-void Board::showArmedStatus(bool armed)
+void AlienflightF3::showArmedStatus(bool armed)
 {
     // XXX this would be a good place to sound a buzzer!
     (void)armed;
 }
  
-void Board::showAuxStatus(uint8_t status)
+void AlienflightF3::showAuxStatus(uint8_t status)
 {
     (void)status;
 }
  
-uint8_t Board::extrasGetTaskCount(void)
+uint8_t AlienflightF3::extrasGetTaskCount(void)
 {
     return 0;
 }

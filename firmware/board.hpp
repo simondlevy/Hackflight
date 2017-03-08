@@ -48,7 +48,7 @@ class Board {
         static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
         static void     init(uint16_t & acc1G, float & gyroScale,
                              uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
-       static uint16_t rcReadSerial(uint8_t chan);
+        static uint16_t rcReadSerial(uint8_t chan);
         static bool     rcSerialReady(void);
         static bool     rcUseSerial(void);
         static uint16_t readPWM(uint8_t chan);
@@ -58,14 +58,14 @@ class Board {
         static void     writeMotor(uint8_t index, uint16_t value);
 
         // extra functionality
-        static uint8_t  extrasGetTaskCount(void);
+        virtual uint8_t  extrasGetTaskCount(void) = 0;
         // helps with simulation
-        static void     showArmedStatus(bool armed);
-        static void     showAuxStatus(uint8_t status);
+        virtual void     showArmedStatus(bool armed) = 0;
+        virtual void     showAuxStatus(uint8_t status) = 0;
 
         // STM32
-        static void     checkReboot(bool pendReboot);
-        static void     reboot(void);
+        virtual void     checkReboot(bool pendReboot) = 0;
+        virtual void     reboot(void) = 0;
 
         // default constants
         static const uint32_t DEFAULT_IMU_LOOPTIME_USEC     = 3500;
