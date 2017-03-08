@@ -52,8 +52,8 @@ private:
 
 inline void Mixer::init(RC * _rc, Stabilize * _stabilize)
 {
-    this->stabilize = _stabilize;
-    this->rc = _rc;
+    stabilize = _stabilize;
+    rc = _rc;
 
     mixerQuadX[0] = { +1.0f, -1.0f,  +1.0f, -1.0f };    // right rear
     mixerQuadX[1] = { +1.0f, -1.0f,  -1.0f, +1.0f };    // right front
@@ -62,7 +62,7 @@ inline void Mixer::init(RC * _rc, Stabilize * _stabilize)
 
     // set disarmed motor values
     for (uint8_t i = 0; i < 4; i++)
-        this->motorsDisarmed[i] = CONFIG_PWM_MIN;
+        motorsDisarmed[i] = CONFIG_PWM_MIN;
 }
 
 #define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
@@ -73,10 +73,10 @@ inline void Mixer::update(bool armed, Board* board)
 
     for (uint8_t i = 0; i < 4; i++)
         motors[i] = (int16_t)
-        (this->rc->command[DEMAND_THROTTLE]   * mixerQuadX[i].throttle + 
-         this->stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch + 
-         this->stabilize->axisPID[AXIS_ROLL]  * mixerQuadX[i].roll - 
-         this->stabilize->axisPID[AXIS_YAW]   * mixerQuadX[i].yaw);
+        (rc->command[DEMAND_THROTTLE]   * mixerQuadX[i].throttle + 
+         stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch + 
+         stabilize->axisPID[AXIS_ROLL]  * mixerQuadX[i].roll - 
+         stabilize->axisPID[AXIS_YAW]   * mixerQuadX[i].yaw);
 
 
     int16_t maxMotor = motors[0];
@@ -93,7 +93,7 @@ inline void Mixer::update(bool armed, Board* board)
 
         motors[i] = constrain(motors[i], CONFIG_PWM_MIN, CONFIG_PWM_MAX);
 
-        if (this->rc->throttleIsDown()) {
+        if (rc->throttleIsDown()) {
             motors[i] = CONFIG_PWM_MIN;
         } 
 

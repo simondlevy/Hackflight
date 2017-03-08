@@ -157,12 +157,12 @@ inline void MSP::tailSerialReply(void)
 
 inline void MSP::init(class IMU * _imu, class Mixer * _mixer, class RC * _rc, Board * _board)
 {
-    this->imu = _imu;
-    this->mixer = _mixer;
-    this->rc = _rc;
-    this->board = _board;
+    imu = _imu;
+    mixer = _mixer;
+    rc = _rc;
+    board = _board;
 
-    memset(&this->portState, 0, sizeof(this->portState));
+    memset(&portState, 0, sizeof(portState));
 }
 
 inline void MSP::update(bool armed)
@@ -213,26 +213,26 @@ inline void MSP::update(bool armed)
 
                 case MSP_SET_RAW_RC:
                     for (uint8_t i = 0; i < 8; i++)
-                        this->rc->data[i] = read16();
+                        rc->data[i] = read16();
                     headSerialReply(0);
                     break;
 
                 case MSP_SET_MOTOR:
                     for (uint8_t i = 0; i < 4; i++)
-                        this->mixer->motorsDisarmed[i] = read16();
+                        mixer->motorsDisarmed[i] = read16();
                     headSerialReply(0);
                     break;
 
                 case MSP_RC:
                     headSerialReply(16);
                     for (uint8_t i = 0; i < 8; i++)
-                        serialize16(this->rc->data[i]);
+                        serialize16(rc->data[i]);
                     break;
 
                 case MSP_ATTITUDE:
                     headSerialReply(6);
                     for (uint8_t i = 0; i < 3; i++)
-                        serialize16(this->imu->angle[i]);
+                        serialize16(imu->angle[i]);
                     break;
 
                 case MSP_REBOOT:
