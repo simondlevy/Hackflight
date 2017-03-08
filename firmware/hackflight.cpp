@@ -82,7 +82,7 @@ void Hackflight::initialize(void)
     this->accelCalibrationTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
 
     // initialize MSP comms
-    this->msp.init(&this->imu, &this->mixer, &this->rc);
+    this->msp.init(&this->imu, &this->mixer, &this->rc, &this->board);
 
     // do any extra initializations (baro, sonar, etc.)
     this->board.extrasInit(&msp);
