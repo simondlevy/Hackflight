@@ -227,18 +227,6 @@ void Hackflight::update(void)
 
 } // loop()
 
-static Hackflight hackflight;
-
-void setup(void)
-{
-    hackflight.initialize();
-}
-
-void loop(void)
-{
-    hackflight.update();
-}
-
 #if defined(STM32)
 } // extern "C"
 #endif

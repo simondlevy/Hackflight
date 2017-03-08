@@ -15,8 +15,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern "C" {
-
 #include <Arduino.h>
 #include <Motor.h>
 #include <SpektrumDSM.h>
@@ -25,6 +23,7 @@ extern "C" {
 #include <math.h>
 
 #include "board.hpp"
+#include "hackflight.hpp"
 
 #define IMU_LOOPTIME_USEC       3500
 #define CALIBRATING_GYRO_MSEC   3500
@@ -205,4 +204,14 @@ void Board::extrasPerformTask(uint8_t taskIndex)
     (void)taskIndex;
 } 
 
-} // extern "C"
+static Hackflight hackflight;
+
+void setup(void)
+{
+    hackflight.initialize();
+}
+
+void loop(void)
+{
+    hackflight.update();
+}
