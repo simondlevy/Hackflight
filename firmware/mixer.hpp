@@ -22,7 +22,7 @@
 #include "stabilize.hpp"
 
 
-// XXX namespace hf {
+namespace hf {
 
 class Mixer {
 public:
@@ -107,4 +107,4 @@ inline void Mixer::update(bool armed, Board* board)
 }
 
 
-//} // XXX namespace
+} // namespace

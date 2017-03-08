@@ -25,7 +25,7 @@
 //#include <algorithm>
 //#include "common.hpp"
 
-// XXX namespace hf {
+namespace hf {
 
 class Stabilize {
 public:
@@ -145,4 +145,4 @@ inline void Stabilize::resetIntegral(void)
 }
 
 
-//} // XXX namespace
+} // namespace

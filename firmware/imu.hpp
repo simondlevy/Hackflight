@@ -45,6 +45,8 @@ enum {
 };
 
 
+namespace hf {
+
 class IMU {
 
     private:
@@ -402,4 +404,4 @@ inline void IMU::update(uint32_t currentTimeUsec, bool armed, uint16_t calibrati
         this->angle[AXIS_YAW] += 360;
 } // update
 
-
+} // namespace

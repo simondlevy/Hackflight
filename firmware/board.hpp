@@ -21,7 +21,7 @@ class Board {
 
     private:
 
-        class MSP * msp;
+        //class MSP * msp;
 
     public:
 
@@ -52,7 +52,7 @@ class Board {
         void            extrasCheckSwitch(void);
         static uint8_t  extrasGetTaskCount(void);
         bool            extrasHandleMSP(uint8_t command);
-        void            extrasInit(class MSP * _msp);
+        //void            extrasInit(class MSP * _msp);
         void            extrasPerformTask(uint8_t taskIndex);
 
         // helps with simulation

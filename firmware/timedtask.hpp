@@ -16,6 +16,8 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+namespace hf {
+
 class TimedTask {
 
     private:
@@ -51,3 +53,5 @@ class TimedTask {
             return (int32_t)(currentTime - this->usec) >= 0;
         }
 };
+
+}

@@ -59,16 +59,16 @@ class Hackflight {
 
     private:
 
-        class IMU        imu;
-        class RC         rc;
-        class Mixer      mixer;
-        class MSP        msp;
-        class Stabilize  stab;
+        class hf::IMU        imu;
+        class hf::RC         rc;
+        class hf::Mixer      mixer;
+        class hf::MSP        msp;
+        class hf::Stabilize  stab;
         class Board      board;
 
-        class TimedTask imuTask;
-        class TimedTask rcTask;
-        class TimedTask accelCalibrationTask;
+        class hf::TimedTask imuTask;
+        class hf::TimedTask rcTask;
+        class hf::TimedTask accelCalibrationTask;
 
         uint32_t imuLooptimeUsec;
         uint16_t calibratingGyroCycles;
@@ -141,7 +141,7 @@ inline void Hackflight::initialize(void)
     this->msp.init(&this->imu, &this->mixer, &this->rc, &this->board);
 
     // do any extra initializations (baro, sonar, etc.)
-    this->board.extrasInit(&msp);
+    // XXX this->board.extrasInit(&msp);
 
 } // intialize
 

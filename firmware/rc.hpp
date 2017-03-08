@@ -26,7 +26,7 @@
 #include "config.hpp"
 
 
-//namespace hf {
+namespace hf {
 
 class RC {
 private:
@@ -177,4 +177,4 @@ inline bool RC::throttleIsDown(void)
 }
 
 
-// } //XXX namespace
+} // namespace

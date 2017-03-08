@@ -179,10 +179,12 @@ void Board::showAuxStatus(uint8_t status)
     (void)status;
 }
  
+/*
 void Board::extrasInit(class MSP * _msp) 
 {
     (void)_msp;
 }
+*/
 
 void Board::extrasCheckSwitch(void)
 {
