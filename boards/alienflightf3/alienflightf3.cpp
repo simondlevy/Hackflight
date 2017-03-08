@@ -141,7 +141,7 @@ uint16_t Board::rcReadSerial(uint8_t chan)
     return rx.readRawRC(chanmap[chan]);
 }
 
-uint16_t Board::readPWM(uint8_t chan)
+uint16_t Board::rcReadPwm(uint8_t chan)
 {
     (void)chan;
     return 0;

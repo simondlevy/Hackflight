@@ -100,7 +100,7 @@ inline void RC::update(Board* _board)
         for (uint8_t chan = 0; chan < 8; chan++) {
 
             // get RC PWM
-            this->dataAverage[chan][this->averageIndex % 4] = _board->readPWM(chan);
+            this->dataAverage[chan][this->averageIndex % 4] = _board->rcReadPwm(chan);
 
             this->data[chan] = 0;
 
