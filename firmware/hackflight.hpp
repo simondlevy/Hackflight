@@ -61,16 +61,16 @@ class Hackflight {
 
     private:
 
-        class IMU        imu;
-        class RC         rc;
-        class Mixer      mixer;
-        class MSP        msp;
-        class Stabilize  stab;
-        class Board      board;
+        IMU        imu;
+        RC         rc;
+        Mixer      mixer;
+        MSP        msp;
+        Stabilize  stab;
+        Board      board;
 
-        class TimedTask imuTask;
-        class TimedTask rcTask;
-        class TimedTask accelCalibrationTask;
+        TimedTask imuTask;
+        TimedTask rcTask;
+        TimedTask accelCalibrationTask;
 
         uint32_t imuLooptimeUsec;
         uint16_t calibratingGyroCycles;

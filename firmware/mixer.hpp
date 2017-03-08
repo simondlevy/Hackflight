@@ -28,7 +28,7 @@ class Mixer {
 public:
     int16_t  motorsDisarmed[4];
 
-    void init(class RC * _rc, class Stabilize * _stabilize);
+    void init(RC * _rc, Stabilize * _stabilize);
 
     void update(bool armed, Board* board);
 

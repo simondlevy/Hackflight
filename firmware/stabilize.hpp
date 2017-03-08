@@ -38,8 +38,8 @@ public:
     void resetIntegral(void);
 
 private:
-    class RC  * rc;
-    class IMU * imu;
+    RC  * rc;
+    IMU * imu;
 
     uint8_t rate_p[3];
     uint8_t rate_i[3];

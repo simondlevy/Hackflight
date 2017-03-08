@@ -61,7 +61,7 @@ typedef  struct mspPortState_t {
 
 class MSP {
 public:
-    void init(class IMU * _imu, class Mixer * _mixer, class RC * _rc, Board * _board);
+    void init(IMU * _imu, Mixer * _mixer, RC * _rc, Board * _board);
     void update(bool armed);
 
 private:
