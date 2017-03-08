@@ -81,12 +81,12 @@ class Hackflight {
 
     public:
 
-        void initialize(void);
+        void init(void);
 
         void update(void);
 };
 
-inline void Hackflight::initialize(void)
+inline void Hackflight::init(void)
 {
     uint16_t acc1G;
     float    gyroScale;

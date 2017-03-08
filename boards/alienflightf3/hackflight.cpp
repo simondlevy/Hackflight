@@ -24,7 +24,7 @@ static hf::Hackflight hackflight;
 
 void setup(void)
 {
-    hackflight.initialize();
+    hackflight.init();
 }
 
 void loop(void)
