@@ -38,7 +38,7 @@ BrushedMotor motors[4];
 
 namespace hf {
 
-void Board::dump(char * msg)
+void AlienflightF3::dump(char * msg)
 {
     for (char * c = msg; *c; c++)
         Serial.write(*c);

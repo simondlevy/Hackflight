@@ -36,7 +36,7 @@ class Board {
         static void     init(uint16_t & acc1G, float & gyroScale,
                              uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec);
 
-        static void     dump(char * msg);
+        virtual void     dump(char * msg) = 0;
 
         virtual void     ledGreenOff(void) = 0;
         virtual void     ledGreenOn(void) = 0;
@@ -54,7 +54,6 @@ class Board {
 
         virtual void    writeMotor(uint8_t index, uint16_t value) = 0;
 
-        // extra functionality
         virtual void    extrasCheckSwitch(void) = 0;
         virtual uint8_t extrasGetTaskCount(void) = 0;
         virtual bool    extrasHandleMSP(uint8_t command) = 0;

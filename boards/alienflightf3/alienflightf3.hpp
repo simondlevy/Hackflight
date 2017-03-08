@@ -22,6 +22,8 @@ namespace hf {
 
     class AlienflightF3 : public Board {
 
+        virtual void     dump(char * msg) override;
+
         virtual void     delayMilliseconds(uint32_t msec) override;
         virtual uint32_t getMicros() override;
 
