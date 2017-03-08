@@ -220,7 +220,7 @@ void Hackflight::update(void)
         this->stab.update(this->rc.command, this->gyroADC, this->imu.angle);
 
         // update mixer
-        this->mixer.update(this->armed);
+        this->mixer.update(this->armed, &this->board);
 
         // handle serial communications
         this->msp.update(this->armed);

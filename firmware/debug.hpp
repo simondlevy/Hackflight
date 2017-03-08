@@ -20,7 +20,7 @@
 
 #include "board.hpp"
 
-void debug(Board * board, const char * fmt, ...)
+inline void debug(Board * board, const char * fmt, ...)
 {
     va_list ap;       
 

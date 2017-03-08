@@ -25,8 +25,6 @@
 #ifndef M_PI
 #endif
 
-void debug(const char * format, ...);
-
 #include "board.hpp"
 #include "imu.hpp"
 #include "rc.hpp"
