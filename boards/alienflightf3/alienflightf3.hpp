@@ -30,9 +30,14 @@ namespace hf {
         virtual void     checkReboot(bool pendReboot) override;
         virtual void     reboot(void) override;
 
-        virtual void     showArmedStatus(bool armed)override;
-        virtual void     showAuxStatus(uint8_t status)override;
+        virtual void     showArmedStatus(bool armed) override;
+        virtual void     showAuxStatus(uint8_t status) override;
 
+        virtual void    extrasCheckSwitch(void) override;
+        virtual uint8_t extrasGetTaskCount(void) override;
+        virtual bool    extrasHandleMSP(uint8_t command) override;
+        virtual void    extrasInit(class MSP * _msp) override;
+        virtual void    extrasPerformTask(uint8_t taskIndex) override;
     };
 
 } // namespace

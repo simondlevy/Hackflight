@@ -221,7 +221,7 @@ inline void Hackflight::update(void)
 
         taskOrder++;
 
-        if (taskOrder >= Board::extrasGetTaskCount()) // using >= supports zero or more tasks
+        if (taskOrder >= board->extrasGetTaskCount()) // using >= supports zero or more tasks
             taskOrder = 0;
     }
 

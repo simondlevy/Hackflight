@@ -54,11 +54,11 @@ class Board {
         static void     writeMotor(uint8_t index, uint16_t value);
 
         // extra functionality
-        void            extrasCheckSwitch(void);
-        static uint8_t  extrasGetTaskCount(void);
-        bool            extrasHandleMSP(uint8_t command);
-        void            extrasInit(class MSP * _msp);
-        void            extrasPerformTask(uint8_t taskIndex);
+        virtual void    extrasCheckSwitch(void) = 0;
+        virtual uint8_t extrasGetTaskCount(void) = 0;
+        virtual bool    extrasHandleMSP(uint8_t command) = 0;
+        virtual void    extrasInit(class MSP * _msp) = 0;
+        virtual void    extrasPerformTask(uint8_t taskIndex) = 0;
 
         // helps with simulation
         virtual void     showArmedStatus(bool armed) = 0;
