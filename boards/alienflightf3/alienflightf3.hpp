@@ -26,6 +26,9 @@ namespace hf {
         virtual void     ledGreenOn(void) override;
         virtual void     ledRedOff(void) override;
         virtual void     ledRedOn(void) override;
+
+        virtual void     checkReboot(bool pendReboot) override;
+        virtual void     reboot(void) override;
     };
 
 } // namespace

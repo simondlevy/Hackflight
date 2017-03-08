@@ -65,8 +65,8 @@ class Board {
         static void     showAuxStatus(uint8_t status);
 
         // STM32
-        static void     checkReboot(bool pendReboot);
-        static void     reboot(void);
+        virtual void     checkReboot(bool pendReboot) = 0;
+        virtual void     reboot(void) = 0;
 
         // default constants
         static const uint32_t DEFAULT_IMU_LOOPTIME_USEC     = 3500;

@@ -88,7 +88,7 @@ void Board::init(uint16_t & acc1G, float & gyroScale, uint32_t & looptimeMicrose
     gyroScale = 16.4f;
 }
 
-void Board::checkReboot(bool pendReboot)
+void AlienflightF3::checkReboot(bool pendReboot)
 {
     if (pendReboot)
         reset(); // noreturn
@@ -147,7 +147,7 @@ uint16_t Board::readPWM(uint8_t chan)
     return 0;
 }
 
-void Board::reboot(void)
+void AlienflightF3::reboot(void)
 {
     resetToBootloader();
 }
