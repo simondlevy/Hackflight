@@ -45,7 +45,6 @@
 
 // Config =====================================================
 
-#define CONFIG_MAGNETIC_DECLINATION                 0
 
 #define CONFIG_CALIBRATING_ACC_MSEC                 1400
 

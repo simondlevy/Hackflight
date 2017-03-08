@@ -122,6 +122,7 @@ static const uint8_t CONFIG_YAW_I            = 45;
 // MISC config
 //=========================================================================
 
+#define CONFIG_MAGNETIC_DECLINATION                 0
 #define CONFIG_YAW_CONTROL_DIRECTION                1    // 1 or -1 
 #define CONFIG_CALIBRATE_ACCTIME_MSEC               500
 #define CONFIG_MAX_ANGLE_INCLINATION                500 /* 50 degrees */

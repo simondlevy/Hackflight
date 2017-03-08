@@ -22,7 +22,7 @@
 #include "imu.hpp"
 #include <cstdint>
 #include "config.hpp"
-#include <algorithm>
+//#include <algorithm>
 //#include "common.hpp"
 
 // XXX namespace hf {
@@ -93,7 +93,7 @@ inline void Stabilize::update(void)
         int32_t PTermGYRO = this->rc->command[axis];
 
         this->errorGyroI[axis] = constrain(this->errorGyroI[axis] + error, -16000, +16000); // WindUp
-        if ((abs(this->imu->gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (abs(this->rc->command[axis]) > 100)))
+        if ((std::abs(this->imu->gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (std::abs(this->rc->command[axis]) > 100)))
             this->errorGyroI[axis] = 0;
         int32_t ITermGYRO = (this->errorGyroI[axis] / 125 * this->rate_i[axis]) >> 6;
 
@@ -132,7 +132,7 @@ inline void Stabilize::update(void)
 
     // prevent "yaw jump" during yaw correction
     this->axisPID[AXIS_YAW] = constrain(this->axisPID[AXIS_YAW], 
-        -100 - abs(this->rc->command[DEMAND_YAW]), +100 + abs(this->rc->command[DEMAND_YAW]));
+        -100 - std::abs(this->rc->command[DEMAND_YAW]), +100 + std::abs(this->rc->command[DEMAND_YAW]));
 }
 
 inline void Stabilize::resetIntegral(void)
