@@ -39,13 +39,13 @@ namespace hf {
 
 class AlienflightF3 : public Board {
 
-    void dump(char * msg)
+    virtual void dump(char * msg) override
     {
         for (char * c = msg; *c; c++)
             Serial.write(*c);
     }
 
-    void imuRead(int16_t accADC[3], int16_t gyroADC[3])
+    virtual void imuRead(int16_t accADC[3], int16_t gyroADC[3]) override
     {
         int16_t ax, ay, az, gx, gy, gz;
 
@@ -61,7 +61,7 @@ class AlienflightF3 : public Board {
     }
 
 
-    void init(uint16_t & acc1G, float & gyroScale, uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
+    virtual void init(uint16_t & acc1G, float & gyroScale, uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec) override
     {
         // Init LEDs
         pinMode(3, OUTPUT);
@@ -90,122 +90,124 @@ class AlienflightF3 : public Board {
         gyroScale = 16.4f;
     }
 
-    void checkReboot(bool pendReboot)
+    virtual void checkReboot(bool pendReboot) override
     {
         if (pendReboot)
             reset(); // noreturn
     }
 
-    void delayMilliseconds(uint32_t msec)
+    virtual void delayMilliseconds(uint32_t msec) override
     {
         delay(msec);
     }
 
-    uint32_t getMicros()
+    virtual uint32_t getMicros() override
     {
         return micros();
     }
 
-    void ledGreenOff(void)
+    virtual void ledGreenOff(void) override
     {
         digitalWrite(3, LOW);
     }
 
-    void ledGreenOn(void)
+    virtual void ledGreenOn(void) override
     {
         digitalWrite(3, HIGH);
     }
 
-    void ledRedOff(void)
+    virtual void ledRedOff(void) override
     {
         digitalWrite(4, LOW);
     }
 
-    void ledRedOn(void)
+    virtual void ledRedOn(void) override
     {
         digitalWrite(4, HIGH);
     }
 
-    bool rcSerialReady(void)
+    //virtual void setLed(uint8_t id, bool is_on, float max_brightness = 255) { (void)id; (void)is_on; (void)max_brightness;}
+
+    virtual bool rcSerialReady(void) override
     {
         return rx.frameComplete();
     }
 
-    bool rcUseSerial(void)
+    virtual bool rcUseSerial(void) override
     {
         rx.begin();
         return true;
     }
 
-    uint16_t rcReadSerial(uint8_t chan)
+    virtual uint16_t rcReadSerial(uint8_t chan) override
     {
         uint8_t chanmap[5] = {1, 2, 3, 0, 5};
         return rx.readRawRC(chanmap[chan]);
     }
 
-    uint16_t rcReadPwm(uint8_t chan)
+    virtual uint16_t rcReadPwm(uint8_t chan) override
     {
         (void)chan;
         return 0;
     }
 
-    void reboot(void)
+    virtual void reboot(void) override
     {
         resetToBootloader();
     }
 
-    uint8_t serialAvailableBytes(void)
+    virtual uint8_t serialAvailableBytes(void) override
     {
         return Serial.available();
     }
 
-    uint8_t serialReadByte(void)
+    virtual uint8_t serialReadByte(void) override
     {
         return Serial.read();
     }
 
-    void serialWriteByte(uint8_t c)
+    virtual void serialWriteByte(uint8_t c) override
     {
         Serial.write(c);
     }
 
-    void writeMotor(uint8_t index, uint16_t value)
+    virtual void writeMotor(uint8_t index, uint16_t value) override
     {
         motors[index].setSpeed(value);
     }
 
-    void showArmedStatus(bool armed)
+    virtual void showArmedStatus(bool armed) override
     {
         // XXX this would be a good place to sound a buzzer!
         (void)armed;
     }
 
-    void showAuxStatus(uint8_t status)
+    virtual void showAuxStatus(uint8_t status) override
     {
         (void)status;
     }
 
-    void extrasInit(class MSP * _msp) 
+    virtual void extrasInit(class MSP * _msp) override 
     {
         (void)_msp;
     }
 
-    void extrasCheckSwitch(void)
+    virtual void extrasCheckSwitch(void) override
     {
     }
 
-    uint8_t extrasGetTaskCount(void)
+    virtual uint8_t extrasGetTaskCount(void) override
     {
         return 0;
     }
 
-    bool extrasHandleMSP(uint8_t command)
+    virtual bool extrasHandleMSP(uint8_t command) override
     {
         (void)command;
         return true;
     }
 
-    void extrasPerformTask(uint8_t taskIndex)
+    virtual void extrasPerformTask(uint8_t taskIndex) override
     {
         (void)taskIndex;
     } 
