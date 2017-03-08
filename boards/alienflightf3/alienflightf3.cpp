@@ -179,12 +179,10 @@ void hf::Board::showAuxStatus(uint8_t status)
     (void)status;
 }
  
-/*
-void hf::Board::extrasInit(class MSP * _msp) 
+void hf::Board::extrasInit(class hf::MSP * _msp) 
 {
     (void)_msp;
 }
-*/
 
 void hf::Board::extrasCheckSwitch(void)
 {
