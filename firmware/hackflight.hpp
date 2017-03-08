@@ -61,16 +61,16 @@ class Hackflight {
 
     private:
 
-        class hf::IMU        imu;
-        class hf::RC         rc;
-        class hf::Mixer      mixer;
-        class hf::MSP        msp;
-        class hf::Stabilize  stab;
-        class hf::Board      board;
+        IMU        imu;
+        RC         rc;
+        Mixer      mixer;
+        MSP        msp;
+        Stabilize  stab;
+        Board      board;
 
-        class hf::TimedTask imuTask;
-        class hf::TimedTask rcTask;
-        class hf::TimedTask accelCalibrationTask;
+        TimedTask imuTask;
+        TimedTask rcTask;
+        TimedTask accelCalibrationTask;
 
         uint32_t imuLooptimeUsec;
         uint16_t calibratingGyroCycles;
@@ -94,7 +94,7 @@ inline void Hackflight::initialize(void)
     uint32_t gyroCalibrationMsec;
 
     // Get particulars for board
-    hf::Board::init(acc1G, gyroScale, looptimeUsec, gyroCalibrationMsec);
+    Board::init(acc1G, gyroScale, looptimeUsec, gyroCalibrationMsec);
 
     this->imuLooptimeUsec = looptimeUsec;
 
@@ -111,18 +111,18 @@ inline void Hackflight::initialize(void)
     this->armed = false;
 
     // sleep for 100ms
-    hf::Board::delayMilliseconds(100);
+    Board::delayMilliseconds(100);
 
     // flash the LEDs to indicate startup
-    hf::Board::ledRedOff();
-    hf::Board::ledGreenOff();
+    Board::ledRedOff();
+    Board::ledGreenOff();
     for (uint8_t i = 0; i < 10; i++) {
-        hf::Board::ledRedOn();
-        hf::Board::ledGreenOn();
-        hf::Board::delayMilliseconds(50);
-        hf::Board::ledRedOff();
-        hf::Board::ledGreenOff();
-        hf::Board::delayMilliseconds(50);
+        Board::ledRedOn();
+        Board::ledGreenOn();
+        Board::delayMilliseconds(50);
+        Board::ledRedOff();
+        Board::ledGreenOff();
+        Board::delayMilliseconds(50);
     }
 
     // intialize the R/C object
@@ -154,7 +154,7 @@ inline void Hackflight::update(void)
     static uint16_t calibratingA;
     static uint32_t currentTime;
 
-    bool rcSerialReady = hf::Board::rcSerialReady();
+    bool rcSerialReady = Board::rcSerialReady();
 
     if (this->rcTask.checkAndUpdate(currentTime) || rcSerialReady) {
 
@@ -165,7 +165,7 @@ inline void Hackflight::update(void)
 
         // useful for simulator
         if (this->armed)
-            hf::Board::showAuxStatus(this->rc.auxState());
+            Board::showAuxStatus(this->rc.auxState());
 
         // when landed, reset integral component of PID
         if (this->rc.throttleIsDown()) 
@@ -179,7 +179,7 @@ inline void Hackflight::update(void)
                 if (this->rc.sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
                     if (this->armed) {
                         armed = false;
-                        hf::Board::showArmedStatus(this->armed);
+                        Board::showArmedStatus(this->armed);
                     }
                 }
             } else {         // actions during not armed
@@ -194,7 +194,7 @@ inline void Hackflight::update(void)
                         if (!this->rc.auxState()) // aux switch must be in zero position
                             if (!this->armed) {
                                 this->armed = true;
-                                hf::Board::showArmedStatus(this->armed);
+                                Board::showArmedStatus(this->armed);
                             }
 
                 // accel calibration
@@ -216,11 +216,11 @@ inline void Hackflight::update(void)
 
         taskOrder++;
 
-        if (taskOrder >= hf::Board::extrasGetTaskCount()) // using >= supports zero or more tasks
+        if (taskOrder >= Board::extrasGetTaskCount()) // using >= supports zero or more tasks
             taskOrder = 0;
     }
 
-    currentTime = hf::Board::getMicros();
+    currentTime = Board::getMicros();
 
     if (this->imuTask.checkAndUpdate(currentTime)) {
 
@@ -236,22 +236,22 @@ inline void Hackflight::update(void)
             abs(this->imu.angle[0]) < CONFIG_SMALL_ANGLE && abs(this->imu.angle[1]) < CONFIG_SMALL_ANGLE;
 
         // measure loop rate just afer reading the sensors
-        currentTime = hf::Board::getMicros();
+        currentTime = Board::getMicros();
 
         // compute exponential RC commands
         this->rc.computeExpo();
 
         // use LEDs to indicate calibration status
         if (calibratingA > 0 || this->calibratingG > 0) {
-            hf::Board::ledGreenOn();
+            Board::ledGreenOn();
         }
         else {
             if (accCalibrated)
-                hf::Board::ledGreenOff();
+                Board::ledGreenOff();
             if (this->armed)
-                hf::Board::ledRedOn();
+                Board::ledRedOn();
             else
-                hf::Board::ledRedOff();
+                Board::ledRedOff();
         }
 
         // periodically update accelerometer calibration status
@@ -260,11 +260,11 @@ inline void Hackflight::update(void)
             if (!this->haveSmallAngle) {
                 accCalibrated = false; 
                 if (on) {
-                    hf::Board::ledGreenOff();
+                    Board::ledGreenOff();
                     on = false;
                 }
                 else {
-                    hf::Board::ledGreenOn();
+                    Board::ledGreenOn();
                     on = true;
                 }
                 this->accelCalibrationTask.update(currentTime);
