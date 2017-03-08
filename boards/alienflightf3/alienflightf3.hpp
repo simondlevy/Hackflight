@@ -22,6 +22,11 @@ namespace hf {
 
     class AlienflightF3 : public Board {
 
+        virtual uint16_t rcReadSerial(uint8_t chan) override;
+        virtual bool     rcSerialReady(void) override;
+        virtual bool     rcUseSerial(void) override;
+        virtual uint16_t rcReadPwm(uint8_t chan) override;
+
         virtual void     ledGreenOff(void) override;
         virtual void     ledGreenOn(void) override;
         virtual void     ledRedOff(void) override;

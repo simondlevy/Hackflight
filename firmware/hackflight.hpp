@@ -159,7 +159,7 @@ inline void Hackflight::update(void)
     static uint16_t calibratingA;
     static uint32_t currentTime;
 
-    bool rcSerialReady = Board::rcSerialReady();
+    bool rcSerialReady = board->rcSerialReady();
 
     if (this->rcTask.checkAndUpdate(currentTime) || rcSerialReady) {
 

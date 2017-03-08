@@ -44,10 +44,10 @@ class Board {
         virtual void     ledRedOff(void) = 0;
         virtual void     ledRedOn(void) = 0;
 
-        static uint16_t rcReadSerial(uint8_t chan);
-        static bool     rcSerialReady(void);
-        static bool     rcUseSerial(void);
-        static uint16_t rcReadPwm(uint8_t chan);
+        virtual uint16_t rcReadSerial(uint8_t chan) = 0;
+        virtual bool     rcSerialReady(void) = 0;
+        virtual bool     rcUseSerial(void) = 0;
+        virtual uint16_t rcReadPwm(uint8_t chan) = 0;
 
         static uint8_t  serialAvailableBytes(void);
         static uint8_t  serialReadByte(void);
