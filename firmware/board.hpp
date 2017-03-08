@@ -31,7 +31,6 @@ class Board {
         virtual void     delayMilliseconds(uint32_t msec) = 0;
         virtual uint32_t getMicros() = 0;
 
-        static void     imuInit();
         static void     imuRead(int16_t accADC[3], int16_t gyroADC[3]);
 
         static void     init(uint16_t & acc1G, float & gyroScale,
