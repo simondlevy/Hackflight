@@ -22,8 +22,7 @@
 #include "imu.hpp"
 #include <cstdint>
 #include "config.hpp"
-//#include <algorithm>
-//#include "common.hpp"
+#include "common.hpp"
 
 namespace hf {
 

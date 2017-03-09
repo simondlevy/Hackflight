@@ -7,6 +7,7 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
+
    Hackflight is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -64,8 +65,6 @@ inline void Mixer::init(RC * _rc, Stabilize * _stabilize)
     for (uint8_t i = 0; i < 4; i++)
         this->motorsDisarmed[i] = CONFIG_PWM_MIN;
 }
-
-#define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
 
 inline void Mixer::update(bool armed, Board* board)
 {

@@ -19,12 +19,12 @@
 
 #pragma once
 
-#include <algorithm>
 #include <string.h>
-//#include "common.hpp"
+
 #include "board.hpp"
 #include "config.hpp"
-
+#include "debug.hpp"
+#include "common.hpp"
 
 namespace hf {
 
@@ -133,8 +133,6 @@ inline bool RC::changed(void)
 {
     return this->commandDelay == 20;
 }
-
-#define constrain(val, lo, hi) (val) < (lo) ? lo : ((val) > hi ? hi : val) 
 
 inline void RC::computeExpo(void)
 {
