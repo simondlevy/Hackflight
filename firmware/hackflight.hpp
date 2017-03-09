@@ -62,7 +62,7 @@ class Hackflight {
         void updateCalibrationState(void);
 
     private:
-        bool     armed;
+        bool       armed;
 
         IMU        imu;
         RC         rc;
@@ -78,9 +78,9 @@ class Hackflight {
         bool     accCalibrated;
         uint32_t imuLooptimeUsec;
         uint16_t calibratingGyroCycles;
-        uint16_t calibratingAccCycles;
-        uint16_t calibratingA;
-        uint16_t calibratingG;
+        uint16_t calibratingAccelCycles;
+        uint16_t accelCalibrationCountdown;
+        uint16_t gyroCalibrationCountdown;
         bool     haveSmallAngle;
 
 };
@@ -159,11 +159,11 @@ inline bool Hackflight::gotRcUpdate(void)
 
             // gyro calibration
             if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) 
-                calibratingG = calibratingGyroCycles;
+                gyroCalibrationCountdown = calibratingGyroCycles;
 
             // Arm via throttle-low / yaw-right
             if (rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE)
-                if (calibratingG == 0 && accCalibrated) 
+                if (gyroCalibrationCountdown == 0 && accCalibrated) 
                     if (!rc.auxState()) // aux switch must be in zero position
                         if (!armed) {
                             armed = true;
@@ -172,7 +172,7 @@ inline bool Hackflight::gotRcUpdate(void)
 
             // accel calibration
             if (rc.sticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
-                calibratingA = calibratingAccCycles;
+                accelCalibrationCountdown = calibratingAccelCycles;
 
         } // not armed
 
@@ -193,7 +193,7 @@ inline void Hackflight::updateImu(void)
         // compute exponential RC commands
         rc.computeExpo();
 
-        imu.update(board, currentTime, armed, calibratingA, calibratingG);
+        imu.update(board, currentTime, armed, accelCalibrationCountdown, gyroCalibrationCountdown);
 
         // periodically update accelerometer calibration status
         updateCalibrationState();
@@ -208,11 +208,11 @@ inline void Hackflight::updateImu(void)
 
 inline void Hackflight::updateCalibrationState(void)
 {
-    if (calibratingA > 0)
-        calibratingA--;
+    if (accelCalibrationCountdown > 0)
+        accelCalibrationCountdown--;
 
-    if (calibratingG > 0)
-        calibratingG--;
+    if (gyroCalibrationCountdown > 0)
+        gyroCalibrationCountdown--;
 
     haveSmallAngle = 
         abs(imu.angle[0]) < CONFIG_SMALL_ANGLE && abs(imu.angle[1]) < CONFIG_SMALL_ANGLE;
@@ -220,7 +220,7 @@ inline void Hackflight::updateCalibrationState(void)
     uint32_t currentTime = board->getMicros();
 
     // use LEDs to indicate calibration and arming status
-    if (calibratingA > 0 || calibratingG > 0) {
+    if (accelCalibrationCountdown > 0 || gyroCalibrationCountdown > 0) {
         board->ledSet(0, true);
     }
     else {
@@ -286,15 +286,15 @@ inline void Hackflight::initImuRc(void)
 
     // compute cycles for calibration based on board's time constant
     calibratingGyroCycles = (uint16_t)(1000. * gyroCalibrationMsec / imuLooptimeUsec);
-    calibratingAccCycles  = (uint16_t)(1000. * CONFIG_CALIBRATING_ACC_MSEC  / imuLooptimeUsec);
+    calibratingAccelCycles  = (uint16_t)(1000. * CONFIG_CALIBRATING_ACC_MSEC  / imuLooptimeUsec);
 
     // always do gyro calibration at startup
-    calibratingG = calibratingGyroCycles;
+    gyroCalibrationCountdown = calibratingGyroCycles;
 
     // assume shallow angle (no accelerometer calibration needed)
     haveSmallAngle = true;
 
-    imu.init(acc1G, gyroScale, calibratingGyroCycles, calibratingAccCycles);
+    imu.init(acc1G, gyroScale, calibratingGyroCycles, calibratingAccelCycles);
 
     // sleep for 100ms
     board->delayMilliseconds(100);
