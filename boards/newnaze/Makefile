@@ -4,7 +4,7 @@ BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 # Change this to where you put your Arduino libraries
 ARDUINO_DIR = $(HOME)/Development/arduino-1.8.1/hardware/teensy/avr/libraries
 
-FIRMWARE_DIR = $(HOME)/Desktop/hackflight/newfirmware
+FIRMWARE_DIR = $(HOME)/Desktop/hackflight/firmware
 
 ###############################################################################
 

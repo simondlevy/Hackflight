@@ -17,42 +17,34 @@ namespace hf {
 class Naze : public Board {
 
 public:
-    virtual void init() override
+
+    virtual void init(uint16_t & acc1G, float & gyroScale, uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec) override
     {
         // Init LEDs
         pinMode(3, OUTPUT);
         pinMode(4, OUTPUT);
 
-        // Configure 
-        config.imu.imuLoopMicro                 = 3500;
-        config.rc.rcLoopMilli                   = 21; 
-        config.imu.calibratingGyroMilli         = 3500; 
-        config.imu.accelCalibrationPeriodMilli  = 1400; 
-        config.imu.altitudeUpdatePeriodMilli    = 25; 
-        config.ledFlashCountOnStartup           = 20;
-        config.imu.acc1G                        = 4096;// Accel scale 8g (4096 LSB/g)
-        config.imu.gyroScale                    = 16.4f;// 16.4 dps/lsb scalefactor for all Invensense devices
+        Serial.begin(115200);
 
-        // Start I^2C
-        //;/HardwareWire::init(I2CDEV_2);
         Wire.begin(2);
 
-        // Hang a sec
-        delay(100);
+        motors[0].attach(15);
+        motors[1].attach(14);
+        motors[2].attach(8);
+        motors[3].attach(0);
 
-        // Start IMU
+        looptimeMicroseconds = CONFIG_IMU_LOOPTIME_USEC;
+        calibratingGyroMsec  = CONFIG_CALIBRATING_GYRO_MSEC;
+
         imu = new MPU6050();
+
         imu->begin(AFS_8G, GFS_2000DPS);
 
-        // Start receiver
-        rx = new SpektrumDSM2048();
+        // Accel scale 8g (4096 LSB/g)
+        acc1G = 4096;
 
-        // Connect to motors
-        motors[0].attach(8);
-        motors[1].attach(11);
-        motors[2].attach(6);
-        motors[3].attach(7);
-
+        // 16.4 dps/lsb scalefactor for all Invensense devices
+        gyroScale = 16.4f;
     }
 
     virtual void checkReboot(bool pendReboot) override
@@ -79,7 +71,7 @@ public:
     }
 
 
-    virtual uint64_t getMicros() override
+    virtual uint32_t getMicros() override
     {
         return micros();
     }
@@ -101,13 +93,13 @@ public:
         return rx->readRawRC(chanmap[chan]);
     }
 
-    virtual uint16_t readPWM(uint8_t chan) override
+    virtual uint16_t rcReadPwm(uint8_t chan) override
     {
         (void)chan;
         return 0; // because we're using Spektrum serial RX
     }
 
-    virtual void setLed(uint8_t id, bool is_on, float max_brightness) override
+    virtual void ledSet(uint8_t id, bool is_on, float max_brightness) override
     {
         (void)max_brightness;
 

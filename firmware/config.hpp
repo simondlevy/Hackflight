@@ -83,6 +83,9 @@ enum {
 //IMU config
 //=========================================================================
 
+#define CONFIG_IMU_LOOPTIME_USEC       3500
+#define CONFIG_CALIBRATING_GYRO_MSEC   3500
+
 #define CONFIG_ACC_LPF_FACTOR     4
 #define CONFIG_ACCZ_DEADBAND      40
 #define CONFIG_ACCXY_DEADBAND     40

@@ -28,9 +28,6 @@
 #include <board.hpp>
 #include <hackflight.hpp>
 
-#define IMU_LOOPTIME_USEC       3500
-#define CALIBRATING_GYRO_MSEC   3500
-
 MPU6050 * imu;
 
 SpektrumDSM2048 rx;
@@ -78,8 +75,8 @@ class AlienflightF3 : public Board {
         motors[2].attach(8);
         motors[3].attach(0);
 
-        looptimeMicroseconds = IMU_LOOPTIME_USEC;
-        calibratingGyroMsec  = CALIBRATING_GYRO_MSEC;
+        looptimeMicroseconds = CONFIG_IMU_LOOPTIME_USEC;
+        calibratingGyroMsec  = CONFIG_CALIBRATING_GYRO_MSEC;
 
         imu = new MPU6050();
 
