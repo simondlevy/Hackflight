@@ -23,11 +23,6 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "crossplatform.h"
-
-#ifndef M_PI
-#endif
-
 #include "common.hpp"
 #include "board.hpp"
 #include "imu.hpp"
