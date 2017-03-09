@@ -21,6 +21,8 @@
 
 #include "config.hpp"
 
+namespace hf {
+
 enum {
     AXIS_ROLL = 0,
     AXIS_PITCH,
@@ -38,20 +40,44 @@ enum {
 #define INV_GYR_CMPF_FACTOR   (1.0f / ((float)CONFIG_GYRO_CMPF_FACTOR + 1.0f))
 #define INV_GYR_CMPFM_FACTOR  (1.0f / ((float)CONFIG_GYRO_CMPFM_FACTOR + 1.0f))
 
-enum {
-    X = 0,
-    Y,
-    Z
-};
-
-
-namespace hf {
-
 class IMU {
+    
+    public:
+        int16_t  accelADC[3];   // [-4096,+4096]
+        int16_t  gyroADC[3];    // [-4096,+4096]
 
-    private:
+        // shared with other classes
+        int16_t  angle[3];      // tenths of a degree
 
+        // called from core firmware
+        void init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles);
+        void update(Board * board, 
+                uint32_t currentTimeUsec, bool armed, uint16_t calibratingA=0, uint16_t calibratingG=0);
 
+        // called from Hover
+        float computeAccelZ(void);
+
+    private: // types
+        enum {
+            X = 0,
+            Y,
+            Z
+        };
+
+        typedef struct stdev_t {
+            float m_oldM, m_newM, m_oldS, m_newS;
+            int m_n;
+        } stdev_t;
+
+    private: //methods
+        static void devClear(stdev_t *dev);
+        static void devPush(stdev_t *dev, float x);
+        static float devVariance(stdev_t *dev);
+        static float devStandardDeviation(stdev_t *dev);
+        static void normalizeV(float src[3], float dest[3]);
+        static void rotateV(float v[3], float *delta);
+
+    private: //fields
         int32_t  a[3];
         float    accelLPF[3];
         int16_t  accelSmooth[3];
@@ -72,22 +98,9 @@ class IMU {
         int16_t  gyroZero[3];
         uint32_t previousTimeUsec;
 
-    public:
-
-        int16_t  accelADC[3];   // [-4096,+4096]
-        int16_t  gyroADC[3];    // [-4096,+4096]
-
-        // shared with other classes
-        int16_t  angle[3];      // tenths of a degree
-
-        // called from core firmware
-        void init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles);
-        void update(Board * board, 
-                uint32_t currentTimeUsec, bool armed, uint16_t calibratingA=0, uint16_t calibratingG=0);
-
-        // called from Hover
-        float computeAccelZ(void);
 };
+
+/********************************************* CPP ********************************************************/
 
 static int32_t deadbandFilter(int32_t value, int32_t deadband)
 {
@@ -102,7 +115,7 @@ static int32_t deadbandFilter(int32_t value, int32_t deadband)
 }
 
 // Rotate Estimated vector(s) with small angle approximation, according to the gyro data
-static void rotateV(float v[3], float *delta)
+void IMU::rotateV(float v[3], float *delta)
 {
     float * v_tmp = v;
 
@@ -152,17 +165,12 @@ inline float IMU::computeAccelZ(void)
 }
 
 
-typedef struct stdev_t {
-    float m_oldM, m_newM, m_oldS, m_newS;
-    int m_n;
-} stdev_t;
-
-static void devClear(struct stdev_t *dev)
+void IMU::devClear(stdev_t *dev)
 {
     dev->m_n = 0;
 }
 
-static void devPush(stdev_t *dev, float x)
+void IMU::devPush(stdev_t *dev, float x)
 {
     dev->m_n++;
     if (dev->m_n == 1) {
@@ -176,19 +184,18 @@ static void devPush(stdev_t *dev, float x)
     }
 }
 
-static float devVariance(stdev_t *dev)
+float IMU::devVariance(stdev_t *dev)
 {
     return ((dev->m_n > 1) ? dev->m_newS / (dev->m_n - 1) : 0.0f);
 }
 
-static float devStandardDeviation(stdev_t *dev)
+float IMU::devStandardDeviation(stdev_t *dev)
 {
     return sqrtf(devVariance(dev));
 }
 
 
-// Normalize a vector
-static void normalizeV(float src[3], float dest[3])
+void IMU::normalizeV(float src[3], float dest[3])
 {
     float length = sqrtf(src[X] * src[X] + src[Y] * src[Y] + src[Z] * src[Z]);
 
