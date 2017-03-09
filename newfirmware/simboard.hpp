@@ -7,7 +7,6 @@
 #include "config.hpp"
 #include "common.hpp"
 
-
 namespace hf {
 
 class SimBoard : public Board {

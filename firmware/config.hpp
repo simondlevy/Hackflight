@@ -22,7 +22,6 @@
 
 namespace hf {
 
-/*
 struct Config {
 
     struct ImuConfig {
@@ -50,7 +49,6 @@ struct Config {
     uint32_t initDelayMs = 100;
     uint32_t ledFlashCountOnStartup = 20;
 };
-*/
 
 //=========================================================================
 //RC config
@@ -67,7 +65,6 @@ enum {
     DEMAND_AUX4
 };
 
-// Define number of RC channels, and min/max PWM
 #define CONFIG_RC_CHANS 8
 #define CONFIG_PWM_MIN  990
 #define CONFIG_PWM_MAX  2010

@@ -92,6 +92,11 @@ class AlienflightF3 : public Board {
         gyroScale = 16.4f;
     }
 
+    virtual const Config& getConfig() override
+    {
+        return config;
+    }
+ 
     virtual void checkReboot(bool pendReboot) override
     {
         if (pendReboot)

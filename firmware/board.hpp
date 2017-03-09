@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "config.hpp"
+
 namespace hf {
 
 class Board {
@@ -26,10 +28,15 @@ class Board {
 
         class MSP * msp;
 
+    protected:
+
+        Config config;
+
     public: // interface
 
     //------------------------------------------- Core functionality ---------------------------------------------
         virtual void     init(uint16_t & acc1G, float & gyroScale, uint32_t & imuLooptimeUsec, uint32_t & calibratingGyroMsec) = 0;
+        virtual const    Config& getConfig() = 0;
         virtual void     delayMilliseconds(uint32_t msec) = 0;
         virtual void     dump(char * msg) = 0;
         virtual uint32_t getMicros() = 0;
