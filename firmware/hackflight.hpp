@@ -182,20 +182,12 @@ inline void Hackflight::updateImu(void)
 
     if (imuTask.checkAndUpdate(currentTime)) {
 
-        imu.update(board, currentTime, armed, calibratingA, calibratingG);
-
-        if (calibratingA > 0)
-            calibratingA--;
-
-        if (calibratingG > 0)
-            calibratingG--;
-
-        haveSmallAngle = 
-            abs(imu.angle[0]) < CONFIG_SMALL_ANGLE && abs(imu.angle[1]) < CONFIG_SMALL_ANGLE;
-
         // compute exponential RC commands
         rc.computeExpo();
 
+        imu.update(board, currentTime, armed, calibratingA, calibratingG);
+
+        // periodically update accelerometer calibration status
         updateCalibrationState();
 
         // Stabilization, mixing, and MSP are synced to IMU update
@@ -209,6 +201,15 @@ inline void Hackflight::updateImu(void)
 
 inline void Hackflight::updateCalibrationState(void)
 {
+    if (calibratingA > 0)
+        calibratingA--;
+
+    if (calibratingG > 0)
+        calibratingG--;
+
+    haveSmallAngle = 
+        abs(imu.angle[0]) < CONFIG_SMALL_ANGLE && abs(imu.angle[1]) < CONFIG_SMALL_ANGLE;
+
     uint32_t currentTime = board->getMicros();
 
     // use LEDs to indicate calibration status
@@ -224,7 +225,6 @@ inline void Hackflight::updateCalibrationState(void)
             board->ledSet(1, false);
     }
 
-    // periodically update accelerometer calibration status
     static bool on;
     if (accelCalibrationTask.check(currentTime)) {
         if (!haveSmallAngle) {
