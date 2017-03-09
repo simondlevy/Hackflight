@@ -80,8 +80,8 @@ class Naze : public Board {
         looptimeMicroseconds = CONFIG_IMU_LOOPTIME_USEC;
         calibratingGyroMsec  = CONFIG_CALIBRATING_GYRO_MSEC;
 
-        //imu = new MPU6050();
-        //imu->begin(AFS_8G, GFS_2000DPS);
+        imu = new MPU6050();
+        imu->begin(AFS_8G, GFS_2000DPS);
 
         // Accel scale 8g (4096 LSB/g)
         acc1G = 4096;
