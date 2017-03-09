@@ -55,6 +55,7 @@ class Hackflight {
 
     private:
         void flashLeds(void);
+        void blinkLedForTilt(void);
         void initImuRc(void);
         void updateImu(void);
         void updateCalibrationState(void);
@@ -212,7 +213,7 @@ inline void Hackflight::updateCalibrationState(void)
 
     uint32_t currentTime = board->getMicros();
 
-    // use LEDs to indicate calibration status
+    // use LEDs to indicate calibration and arming status
     if (calibratingA > 0 || calibratingG > 0) {
         board->ledSet(0, true);
     }
@@ -225,22 +226,29 @@ inline void Hackflight::updateCalibrationState(void)
             board->ledSet(1, false);
     }
 
-    static bool on;
+    // If angle too steep, restart accel calibration and flash LED
     if (accelCalibrationTask.check(currentTime)) {
         if (!haveSmallAngle) {
             accCalibrated = false; 
-            if (on) {
-                board->ledSet(0, false);
-                on = false;
-            }
-            else {
-                board->ledSet(0, true);
-                on = true;
-            }
+            blinkLedForTilt();
             accelCalibrationTask.update(currentTime);
         } else {
             accCalibrated = true;
         }
+    }
+}
+
+inline void Hackflight::blinkLedForTilt(void)
+{
+    static bool on;
+
+    if (on) {
+        board->ledSet(0, false);
+        on = false;
+    }
+    else {
+        board->ledSet(0, true);
+        on = true;
     }
 }
 
