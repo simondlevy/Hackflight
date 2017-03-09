@@ -57,6 +57,7 @@ class Hackflight {
         void flashLeds(void);
         void initImuRc(void);
         void updateImu(void);
+        void updateCalibrationState(void);
 
     private:
         bool     armed;
@@ -192,56 +193,56 @@ inline void Hackflight::updateImu(void)
         haveSmallAngle = 
             abs(imu.angle[0]) < CONFIG_SMALL_ANGLE && abs(imu.angle[1]) < CONFIG_SMALL_ANGLE;
 
-        // measure loop rate just afer reading the sensors
-        currentTime = board->getMicros();
-
         // compute exponential RC commands
         rc.computeExpo();
 
-        // use LEDs to indicate calibration status
-        if (calibratingA > 0 || calibratingG > 0) {
-            board->ledSet(0, true);
-        }
-        else {
-            if (accCalibrated)
-                board->ledSet(0, false);
-            if (armed)
-                board->ledSet(1, true);
-            else
-                board->ledSet(1, false);
-        }
+        updateCalibrationState();
 
-        // periodically update accelerometer calibration status
-        static bool on;
-        if (accelCalibrationTask.check(currentTime)) {
-            if (!haveSmallAngle) {
-                accCalibrated = false; 
-                if (on) {
-                    board->ledSet(0, false);
-                    on = false;
-                }
-                else {
-                    board->ledSet(0, true);
-                    on = true;
-                }
-                accelCalibrationTask.update(currentTime);
-            } else {
-                accCalibrated = true;
-            }
-        }
-
-        // update stability PID controller 
+        // Stabilization, mixing, and MSP are synced to IMU update
         stab.update();
-
-        // update mixer
         mixer.update(armed, board);
-
-        // handle serial communications
         msp.update(armed);
 
     } // IMU update
 
 } // update()
+
+inline void Hackflight::updateCalibrationState(void)
+{
+    uint32_t currentTime = board->getMicros();
+
+    // use LEDs to indicate calibration status
+    if (calibratingA > 0 || calibratingG > 0) {
+        board->ledSet(0, true);
+    }
+    else {
+        if (accCalibrated)
+            board->ledSet(0, false);
+        if (armed)
+            board->ledSet(1, true);
+        else
+            board->ledSet(1, false);
+    }
+
+    // periodically update accelerometer calibration status
+    static bool on;
+    if (accelCalibrationTask.check(currentTime)) {
+        if (!haveSmallAngle) {
+            accCalibrated = false; 
+            if (on) {
+                board->ledSet(0, false);
+                on = false;
+            }
+            else {
+                board->ledSet(0, true);
+                on = true;
+            }
+            accelCalibrationTask.update(currentTime);
+        } else {
+            accCalibrated = true;
+        }
+    }
+}
 
 inline void Hackflight::flashLeds(void)
 {
