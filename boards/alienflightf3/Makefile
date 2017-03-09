@@ -1,3 +1,22 @@
+# Makefile for Hackflight on AlienflightF3 board
+#
+# Requires: https://github.com/simondlevy/BreezySTM32
+#
+#   This file is part of Hackflight.
+#
+#   Hackflight is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   Hackflight is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#   You should have received a copy of the GNU General Public License
+#   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+
+
 BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 FIRMWARE_DIR = $(HOME)/Desktop/hackflight/firmware
@@ -41,18 +60,7 @@ VALID_TARGETS = $(256K_TARGETS)
 
 VCP_TARGETS = ALIENFLIGHTF3 
 
-# Configure default flash sizes for the targets
-ifeq ($(FLASH_SIZE),)
-ifeq ($(TARGET),$(filter $(TARGET),$(64K_TARGETS)))
-FLASH_SIZE = 64
-else ifeq ($(TARGET),$(filter $(TARGET),$(128K_TARGETS)))
-FLASH_SIZE = 128
-else ifeq ($(TARGET),$(filter $(TARGET),$(256K_TARGETS)))
 FLASH_SIZE = 256
-else
-$(error FLASH_SIZE not configured for target $(TARGET))
-endif
-endif
 
 REVISION := $(shell git log -1 --format="%h")
 
@@ -129,21 +137,6 @@ TARGET_DIR = $(ROOT)/target/$(TARGET)
 TARGET_SRC = $(notdir $(wildcard $(TARGET_DIR)/*.c))
 
 # VARIANTS
-ifeq ($(TARGET),ALIENFLIGHTF1)
-# ALIENFLIGHTF1 is a VARIANT of NAZE
-TARGET_FLAGS := $(TARGET_FLAGS) -DNAZE -DALIENFLIGHT
-TARGET_DIR = $(ROOT)/target/NAZE
-endif
-ifeq ($(TARGET),CHEBUZZF3)
-# CHEBUZZ is a VARIANT of STM32F3DISCOVERY
-TARGET_FLAGS := $(TARGET_FLAGS) -DSTM32F3DISCOVERY
-endif
-ifeq ($(TARGET),$(filter $(TARGET),RMDO IRCFUSIONF3))
-# RMDO and IRCFUSIONF3 are a VARIANT of SPRACINGF3
-TARGET_FLAGS := $(TARGET_FLAGS) -DSPRACINGF3
-endif
-
-# SMARTPORT F3
 # Use bidirectional feature of F3 processor for smartport, for F1 targets always use two pins to allow external inverter.
 ifeq ($(TARGET),$(filter $(TARGET),$(F3_TARGETS)))
 TARGET_FLAGS := $(TARGET_FLAGS) -DUSE_SMARTPORT_ONEWIRE
