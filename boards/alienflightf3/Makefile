@@ -1,6 +1,10 @@
 # Makefile for Hackflight on AlienflightF3 board
 #
-# Requires: https://github.com/simondlevy/BreezySTM32
+# Requires: 
+#
+#      https://github.com/simondlevy/BreezySTM32
+#      https://github.com/simondlevy/MPU6050
+#      https://github.com/simondlevy/SpektrumDSM
 #
 #   This file is part of Hackflight.
 #
@@ -16,16 +20,19 @@
 #   You should have received a copy of the GNU General Public License
 #   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 
+# Change these values according to where you put your repositories ----------------
 
 BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 FIRMWARE_DIR = $(HOME)/Desktop/hackflight/firmware
 
+ARDUINO_DIR = $(HOME)/Development/arduino-1.8.1/hardware/teensy/avr/libraries
+
+# Nothing below here should be changed ---------------------------------------------
+
 PROJECT = Hackflight
 
 # Change this to wherever you put Arduino libraries
-ARDUINO_DIR = $(HOME)/Development/arduino-1.8.1/hardware/teensy/avr/libraries
-
 # The target to build, see VALID_TARGETS below
 TARGET		?= ALIENFLIGHTF3
 
