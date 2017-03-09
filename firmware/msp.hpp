@@ -36,8 +36,6 @@
 
 namespace hf {
 
-#define CONFIG_REBOOT_CHARACTER 'R'
-
 static const int INBUF_SIZE = 128;
 
 typedef enum serialState_t {

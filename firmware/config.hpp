@@ -97,6 +97,18 @@ enum {
 #define THROTTLE_LOOKUP_LENGTH 12
 
 //=========================================================================
+//IMU config
+//=========================================================================
+
+#define CONFIG_ACC_LPF_FACTOR     4
+#define CONFIG_ACCZ_DEADBAND      40
+#define CONFIG_ACCXY_DEADBAND     40
+#define CONFIG_ACCZ_LPF_CUTOFF    5.0F
+#define CONFIG_GYRO_CMPF_FACTOR   600    
+#define CONFIG_GYRO_CMPFM_FACTOR  250  
+#define CONFIG_MORON_THRESHOLD     32
+
+//=========================================================================
 //PID config
 //=========================================================================
 
@@ -120,6 +132,12 @@ static const uint8_t CONFIG_YAW_I            = 45;
 
 
 //=========================================================================
+// STM32 reboot support
+//=========================================================================
+
+#define CONFIG_REBOOT_CHARACTER 'R'
+
+//=========================================================================
 // MISC config
 //=========================================================================
 
@@ -127,6 +145,11 @@ static const uint8_t CONFIG_YAW_I            = 45;
 #define CONFIG_YAW_CONTROL_DIRECTION                1    // 1 or -1 
 #define CONFIG_CALIBRATE_ACCTIME_MSEC               500
 #define CONFIG_MAX_ANGLE_INCLINATION                500 /* 50 degrees */
+
+#define CONFIG_CALIBRATING_ACC_MSEC                 1400
+#define CONFIG_RC_LOOPTIME_MSEC                     21
+#define CONFIG_CALIBRATE_ACCTIME_MSEC               500
+#define CONFIG_SMALL_ANGLE                          250  // tenths of a degree
 
 
 // } // XXX namespace

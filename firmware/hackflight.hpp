@@ -31,13 +31,6 @@
 #include "stabilize.hpp"
 #include "timedtask.hpp"
 
-// Config =====================================================
-
-#define CONFIG_CALIBRATING_ACC_MSEC                 1400
-#define CONFIG_RC_LOOPTIME_MSEC                     21
-#define CONFIG_CALIBRATE_ACCTIME_MSEC               500
-#define CONFIG_SMALL_ANGLE                          250  // tenths of a degree
-
 namespace hf {
 
 class Hackflight {
