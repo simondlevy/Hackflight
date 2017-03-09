@@ -34,8 +34,8 @@ private:
     int16_t dataAverage[CONFIG_RC_CHANS][4];
     uint8_t commandDelay;                               // cycles since most recent movement
     int32_t averageIndex;
-    int16_t lookupPitchRollRC[PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
-    int16_t lookupThrottleRC[THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
+    int16_t lookupPitchRollRC[CONFIG_PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
+    int16_t lookupThrottleRC[CONFIG_THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
     int16_t midrc;
 
 
@@ -72,10 +72,10 @@ void RC::init()
     for (uint8_t i = 0; i < CONFIG_RC_CHANS; i++)
         this->data[i] = this->midrc;
 
-    for (uint8_t i = 0; i < PITCH_LOOKUP_LENGTH; i++)
+    for (uint8_t i = 0; i < CONFIG_PITCH_LOOKUP_LENGTH; i++)
         lookupPitchRollRC[i] = (2500 + CONFIG_RC_EXPO_8 * (i * i - 25)) * i * (int32_t)CONFIG_RC_RATE_8 / 2500;
 
-    for (uint8_t i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
+    for (uint8_t i = 0; i < CONFIG_THROTTLE_LOOKUP_LENGTH; i++) {
         int16_t tmp = 10 * i - CONFIG_THR_MID_8;
         uint8_t y = 1;
         if (tmp > 0)

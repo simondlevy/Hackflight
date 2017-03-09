@@ -20,7 +20,6 @@
 
 #include <cstdint>
 
-
 namespace hf {
 
 /*
@@ -56,6 +55,7 @@ struct Config {
 //=========================================================================
 //RC config
 //=========================================================================
+
 enum {
     DEMAND_ROLL = 0,
     DEMAND_PITCH,
@@ -72,29 +72,15 @@ enum {
 #define CONFIG_PWM_MIN  990
 #define CONFIG_PWM_MAX  2010
 
-// For logical combinations of stick positions (low, center, high)
-#define ROL_LO (1 << (2 * DEMAND_ROLL))
-#define ROL_CE (3 << (2 * DEMAND_ROLL))
-#define ROL_HI (2 << (2 * DEMAND_ROLL))
-#define PIT_LO (1 << (2 * DEMAND_PITCH))
-#define PIT_CE (3 << (2 * DEMAND_PITCH))
-#define PIT_HI (2 << (2 * DEMAND_PITCH))
-#define YAW_LO (1 << (2 * DEMAND_YAW))
-#define YAW_CE (3 << (2 * DEMAND_YAW))
-#define YAW_HI (2 << (2 * DEMAND_YAW))
-#define THR_LO (1 << (2 * DEMAND_THROTTLE))
-#define THR_CE (3 << (2 * DEMAND_THROTTLE))
-#define THR_HI (2 << (2 * DEMAND_THROTTLE))
+#define CONFIG_RC_EXPO_8   65
+#define CONFIG_RC_RATE_8   90
+#define CONFIG_THR_MID_8   50
+#define CONFIG_THR_EXPO_8  0
+#define CONFIG_MINCHECK    1100
+#define CONFIG_MAXCHECK    1900
 
-#define CONFIG_RC_EXPO_8                            65
-#define CONFIG_RC_RATE_8                            90
-#define CONFIG_THR_MID_8                            50
-#define CONFIG_THR_EXPO_8                           0
-#define CONFIG_MINCHECK                             1100
-#define CONFIG_MAXCHECK                             1900
-
-#define PITCH_LOOKUP_LENGTH    7
-#define THROTTLE_LOOKUP_LENGTH 12
+#define CONFIG_PITCH_LOOKUP_LENGTH    7
+#define CONFIG_THROTTLE_LOOKUP_LENGTH 12
 
 //=========================================================================
 //IMU config
@@ -125,12 +111,6 @@ static const uint8_t CONFIG_RATE_PITCHROLL_D = 23;
 static const uint8_t CONFIG_YAW_P            = 85;
 static const uint8_t CONFIG_YAW_I            = 45;
 
-// For altitude hover
-#define CONFIG_HOVER_ALT_P  120
-#define CONFIG_HOVER_ALT_I  45
-#define CONFIG_HOVER_ALT_D  1
-
-
 //=========================================================================
 // STM32 reboot support
 //=========================================================================
@@ -150,6 +130,5 @@ static const uint8_t CONFIG_YAW_I            = 45;
 #define CONFIG_RC_LOOPTIME_MSEC                     20
 #define CONFIG_CALIBRATE_ACCTIME_MSEC               500
 #define CONFIG_SMALL_ANGLE                          250  // tenths of a degree
-
 
 } // namespace
