@@ -56,6 +56,7 @@ class Hackflight {
     private:
         void flashLeds(void);
         void initImuRc(void);
+        void updateImu(void);
 
     private:
         bool     armed;
@@ -71,9 +72,11 @@ class Hackflight {
         TimedTask rcTask;
         TimedTask accelCalibrationTask;
 
+        bool     accCalibrated;
         uint32_t imuLooptimeUsec;
         uint16_t calibratingGyroCycles;
         uint16_t calibratingAccCycles;
+        uint16_t calibratingA;
         uint16_t calibratingG;
         bool     haveSmallAngle;
 
@@ -91,22 +94,18 @@ inline void Hackflight::init(Board * _board)
     mixer.init(&rc, &stab); 
     msp.init(&imu, &mixer, &rc, board);
 
-    // do any extra initializations (baro, sonar, etc.)
     board->extrasInit(&msp);
 
-    // ensure not armed
     armed = false;
+    accCalibrated = false;
 
 } // intialize
 
 
 inline void Hackflight::update(void)
 {
-    static bool     accCalibrated;
-    static uint16_t calibratingA;
-    static uint32_t currentTime;
-
     bool rcSerialReady = board->rcSerialReady();
+    uint32_t currentTime = board->getMicros();
 
     if (rcTask.checkAndUpdate(currentTime) || rcSerialReady) {
 
@@ -172,7 +171,13 @@ inline void Hackflight::update(void)
             taskOrder = 0;
     }
 
-    currentTime = board->getMicros();
+    updateImu();
+
+} // update
+
+inline void Hackflight::updateImu(void)
+{
+    uint32_t currentTime = board->getMicros();
 
     if (imuTask.checkAndUpdate(currentTime)) {
 
