@@ -79,45 +79,23 @@ class Hackflight {
 
 };
 
+/********************************************* CPP ********************************************************/
+
 inline void Hackflight::init(Board * _board)
 {
     board = _board;
 
-    uint16_t acc1G;
-    float    gyroScale;
-    uint32_t looptimeUsec;
-    uint32_t gyroCalibrationMsec;
-
-    // Get particulars for board
-    board->init(acc1G, gyroScale, looptimeUsec, gyroCalibrationMsec);
-
-    imuLooptimeUsec = looptimeUsec;
-
-    // compute cycles for calibration based on board's time constant
-    calibratingGyroCycles = (uint16_t)(1000. * gyroCalibrationMsec / imuLooptimeUsec);
-    calibratingAccCycles  = (uint16_t)(1000. * CONFIG_CALIBRATING_ACC_MSEC  / imuLooptimeUsec);
-
-    // initialize our external objects with objects they need
-    stab.init(&rc, &imu);
-    imu.init(acc1G, gyroScale, calibratingGyroCycles, calibratingAccCycles);
-    mixer.init(&rc, &stab); 
-
-    // ensure not armed
-    armed = false;
-
     initImuRc();
 
-    // always do gyro calibration at startup
-    calibratingG = calibratingGyroCycles;
-
-    // assume shallow angle (no accelerometer calibration needed)
-    haveSmallAngle = true;
-
-    // initialize MSP comms
+    stab.init(&rc, &imu);
+    mixer.init(&rc, &stab); 
     msp.init(&imu, &mixer, &rc, board);
 
     // do any extra initializations (baro, sonar, etc.)
     board->extrasInit(&msp);
+
+    // ensure not armed
+    armed = false;
 
 } // intialize
 
@@ -273,8 +251,31 @@ inline void Hackflight::flashLeds(void)
         board->delayMilliseconds(50);
     }
 }
+
 inline void Hackflight::initImuRc(void)
 {
+    uint16_t acc1G;
+    float    gyroScale;
+    uint32_t looptimeUsec;
+    uint32_t gyroCalibrationMsec;
+
+    // Get particulars for board
+    board->init(acc1G, gyroScale, looptimeUsec, gyroCalibrationMsec);
+
+    imuLooptimeUsec = looptimeUsec;
+
+    // compute cycles for calibration based on board's time constant
+    calibratingGyroCycles = (uint16_t)(1000. * gyroCalibrationMsec / imuLooptimeUsec);
+    calibratingAccCycles  = (uint16_t)(1000. * CONFIG_CALIBRATING_ACC_MSEC  / imuLooptimeUsec);
+
+    // always do gyro calibration at startup
+    calibratingG = calibratingGyroCycles;
+
+    // assume shallow angle (no accelerometer calibration needed)
+    haveSmallAngle = true;
+
+    imu.init(acc1G, gyroScale, calibratingGyroCycles, calibratingAccCycles);
+
     // sleep for 100ms
     board->delayMilliseconds(100);
 
