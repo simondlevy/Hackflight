@@ -54,8 +54,9 @@ class Hackflight {
         void update(void);
 
     private:
-        void flashLeds(void);
         void blinkLedForTilt(void);
+        bool gotRcUpdate(void);
+        void flashLeds(void);
         void initImuRc(void);
         void updateImu(void);
         void updateCalibrationState(void);
@@ -103,67 +104,12 @@ inline void Hackflight::init(Board * _board)
 
 } // intialize
 
-
 inline void Hackflight::update(void)
 {
-    bool rcSerialReady = board->rcSerialReady();
-    uint32_t currentTime = board->getMicros();
+    // If we didn't get new RC values, we can use the time to perform any extra tasks ("outer loop")
+    if (!gotRcUpdate()) {
 
-    if (rcTask.checkAndUpdate(currentTime) || rcSerialReady) {
-
-        // update RC channels
-        rc.update(board);
-
-        rcSerialReady = false;
-
-        // useful for simulator
-        if (armed)
-            board->showAuxStatus(rc.auxState());
-
-        // when landed, reset integral component of PID
-        if (rc.throttleIsDown()) 
-            stab.resetIntegral();
-
-        if (rc.changed()) {
-
-            if (armed) {      // actions during armed
-
-                // Disarm on throttle down + yaw
-                if (rc.sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
-                    if (armed) {
-                        armed = false;
-                        board->showArmedStatus(armed);
-                    }
-                }
-            } else {         // actions during not armed
-
-                // gyro calibration
-                if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) 
-                    calibratingG = calibratingGyroCycles;
-
-                // Arm via throttle-low / yaw-right
-                if (rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE)
-                    if (calibratingG == 0 && accCalibrated) 
-                        if (!rc.auxState()) // aux switch must be in zero position
-                            if (!armed) {
-                                armed = true;
-                                board->showArmedStatus(armed);
-                            }
-
-                // accel calibration
-                if (rc.sticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
-                    calibratingA = calibratingAccCycles;
-
-            } // not armed
-
-        } // rc.changed()
-
-        // Detect aux switch changes for hover, altitude-hold, etc.
-        board->extrasCheckSwitch();
-
-    } else {                    // not in rc loop
-
-        static int taskOrder;   // never call all functions in the same loop, to avoid high delay spikes
+        static int taskOrder;
 
         board->extrasPerformTask(taskOrder);
 
@@ -173,9 +119,70 @@ inline void Hackflight::update(void)
             taskOrder = 0;
     }
 
+    // Regardless, we always update the IMU ("inner loop")
     updateImu();
 
 } // update
+
+inline bool Hackflight::gotRcUpdate(void)
+{
+    // if it's not time to update, and we have no new serial RC values, we're done
+    if (!rcTask.checkAndUpdate(board->getMicros()) && !board->rcSerialReady())
+        return false;
+
+    // update RC channels
+    rc.update(board);
+
+    // useful for simulator
+    if (armed)
+        board->showAuxStatus(rc.auxState());
+
+    // when landed, reset integral component of PID
+    if (rc.throttleIsDown()) 
+        stab.resetIntegral();
+
+    if (rc.changed()) {
+
+        // actions during armed
+        if (armed) {      
+
+            // Disarm on throttle down + yaw
+            if (rc.sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
+                if (armed) {
+                    armed = false;
+                    board->showArmedStatus(armed);
+                }
+            }
+
+        // actions during not armed
+        } else {         
+
+            // gyro calibration
+            if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) 
+                calibratingG = calibratingGyroCycles;
+
+            // Arm via throttle-low / yaw-right
+            if (rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE)
+                if (calibratingG == 0 && accCalibrated) 
+                    if (!rc.auxState()) // aux switch must be in zero position
+                        if (!armed) {
+                            armed = true;
+                            board->showArmedStatus(armed);
+                        }
+
+            // accel calibration
+            if (rc.sticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
+                calibratingA = calibratingAccCycles;
+
+        } // not armed
+
+    } // rc.changed()
+
+    // Detect aux switch changes for hover, altitude-hold, etc.
+    board->extrasCheckSwitch();
+
+    return true;
+}
 
 inline void Hackflight::updateImu(void)
 {
@@ -196,9 +203,8 @@ inline void Hackflight::updateImu(void)
         mixer.update(armed, board);
         msp.update(armed);
 
-    } // IMU update
-
-} // update()
+    } 
+} 
 
 inline void Hackflight::updateCalibrationState(void)
 {
