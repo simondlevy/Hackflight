@@ -64,7 +64,12 @@ OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 #CMSIS_DIR	 = $(ROOT)/lib/CMSIS
 CMSIS_DIR	 = $(BREEZY_DIR)/lib/CMSIS
-INCLUDE_DIRS = $(BREEZY_DIR) $(F3_DIR) $(VCP_DIR) $(ALIENFLIGHTF3_DIR) $(SRC_DIR) $(SRC_DIR)/target $(FIRMWARE_DIR) .
+INCLUDE_DIRS = $(BREEZY_DIR) \
+			   $(F3_DIR) \
+			   $(VCP_DIR) \
+			   $(ALIENFLIGHTF3_DIR) \
+			   $(SRC_DIR) \
+			   $(SRC_DIR)/target $(FIRMWARE_DIR) .
 LINKER_DIR	 = $(F3_DIR)
 
 # Search path for sources

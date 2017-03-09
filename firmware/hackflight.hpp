@@ -7,6 +7,7 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
+
    Hackflight is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -84,7 +85,7 @@ class Hackflight {
 
 /********************************************* CPP ********************************************************/
 
-inline void Hackflight::init(Board * _board)
+void Hackflight::init(Board * _board)
 {
     board = _board;
 
@@ -101,7 +102,7 @@ inline void Hackflight::init(Board * _board)
 
 } // intialize
 
-inline void Hackflight::update(void)
+void Hackflight::update(void)
 {
     // If we didn't get new RC values, we can use the time to perform any extra tasks ("outer loop")
     if (!gotRcUpdate()) {
@@ -121,7 +122,7 @@ inline void Hackflight::update(void)
 
 } // update
 
-inline bool Hackflight::gotRcUpdate(void)
+bool Hackflight::gotRcUpdate(void)
 {
     // if it's not time to update, and we have no new serial RC values, we're done
     if (!rcTask.checkAndUpdate(board->getMicros()) && !board->rcSerialReady())
@@ -181,7 +182,7 @@ inline bool Hackflight::gotRcUpdate(void)
     return true;
 }
 
-inline void Hackflight::updateImu(void)
+void Hackflight::updateImu(void)
 {
     uint32_t currentTime = board->getMicros();
 
@@ -203,7 +204,7 @@ inline void Hackflight::updateImu(void)
     } 
 } 
 
-inline void Hackflight::updateCalibrationState(void)
+void Hackflight::updateCalibrationState(void)
 {
     if (accelCalibrationCountdown > 0)
         accelCalibrationCountdown--;
@@ -241,7 +242,7 @@ inline void Hackflight::updateCalibrationState(void)
     }
 }
 
-inline void Hackflight::blinkLedForTilt(void)
+void Hackflight::blinkLedForTilt(void)
 {
     static bool on;
 
@@ -255,7 +256,7 @@ inline void Hackflight::blinkLedForTilt(void)
     }
 }
 
-inline void Hackflight::flashLeds(void)
+void Hackflight::flashLeds(void)
 {
     board->ledSet(0, false);
     board->ledSet(1, false);
@@ -269,7 +270,7 @@ inline void Hackflight::flashLeds(void)
     }
 }
 
-inline void Hackflight::initImuRc(void)
+void Hackflight::initImuRc(void)
 {
     uint16_t acc1G;
     float    gyroScale;
