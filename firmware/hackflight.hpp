@@ -18,19 +18,17 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <stdarg.h>
-#include <math.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdarg>
+#include <cstdio>
 
-
-#include "common.hpp"
 #include "board.hpp"
+#include "mixer.hpp"
+#include "msp.hpp"
+#include "common.hpp"
 #include "imu.hpp"
 #include "rc.hpp"
 #include "stabilize.hpp"
-#include "mixer.hpp"
-#include "msp.hpp"
 #include "timedtask.hpp"
 
 // Config =====================================================

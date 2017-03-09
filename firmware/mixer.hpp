@@ -22,7 +22,6 @@
 #include "debug.hpp"
 #include "stabilize.hpp"
 
-
 namespace hf {
 
 class Mixer {

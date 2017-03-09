@@ -18,9 +18,10 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "rc.hpp"
 #include "imu.hpp"
-#include <cstdint>
 #include "config.hpp"
 #include "common.hpp"
 
