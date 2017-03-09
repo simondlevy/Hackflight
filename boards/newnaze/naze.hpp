@@ -72,25 +72,22 @@ class Naze : public Board {
 
         delay(100);
 
-        /*
-        motors[0].attach(15);
-        motors[1].attach(14);
-        motors[2].attach(8);
-        motors[3].attach(0);
+        //motors[0].attach(15);
+        //motors[1].attach(14);
+        //motors[2].attach(8);
+        //motors[3].attach(0);
 
         looptimeMicroseconds = CONFIG_IMU_LOOPTIME_USEC;
         calibratingGyroMsec  = CONFIG_CALIBRATING_GYRO_MSEC;
 
-        imu = new MPU6050();
-
-        imu->begin(AFS_8G, GFS_2000DPS);
+        //imu = new MPU6050();
+        //imu->begin(AFS_8G, GFS_2000DPS);
 
         // Accel scale 8g (4096 LSB/g)
         acc1G = 4096;
 
         // 16.4 dps/lsb scalefactor for all Invensense devices
         gyroScale = 16.4f;
-        */
     }
 
     virtual const Config& getConfig() override
