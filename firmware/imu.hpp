@@ -152,7 +152,7 @@ void IMU::rotateV(float v[3], float *delta)
     v[Z] = v_tmp[X] * mat[0][2] + v_tmp[Y] * mat[1][2] + v_tmp[Z] * mat[2][2];
 }
 
-inline float IMU::computeAccelZ(void)
+float IMU::computeAccelZ(void)
 {
     float accelZ = (float)this->accelSum[2] / (float)this->accelSumCount * (9.80665f / 10000.0f / this->acc1G);
 
@@ -207,7 +207,7 @@ void IMU::normalizeV(float src[3], float dest[3])
     }
 }
 
-inline void IMU::init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles) 
+void IMU::init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles) 
 {
     for (int k=0; k<3; ++k) {
         a[k] = 0;
@@ -254,7 +254,7 @@ inline void IMU::init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGy
 }
 
 
-inline void IMU::update(Board * board,
+void IMU::update(Board * board,
         uint32_t currentTimeUsec, bool armed, uint16_t calibratingA, uint16_t calibratingG)
 {
     int32_t accMag = 0;

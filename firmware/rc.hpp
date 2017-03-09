@@ -59,7 +59,7 @@ public:
 
 /********************************************* CPP ********************************************************/
 
-inline void RC::init()
+void RC::init()
 {
     this->midrc = (CONFIG_PWM_MAX + CONFIG_PWM_MIN) / 2;
 
@@ -89,7 +89,7 @@ inline void RC::init()
     }
 }
 
-inline void RC::update(Board* _board)
+void RC::update(Board* _board)
 {
     if (_board->rcUseSerial()) {
         for (uint8_t chan = 0; chan < 5; chan++) {
@@ -130,12 +130,12 @@ inline void RC::update(Board* _board)
     this->sticks = stTmp;
 }
 
-inline bool RC::changed(void)
+bool RC::changed(void)
 {
     return this->commandDelay == 20;
 }
 
-inline void RC::computeExpo(void)
+void RC::computeExpo(void)
 {
     int32_t tmp, tmp2;
 
@@ -163,14 +163,14 @@ inline void RC::computeExpo(void)
 
 } // computeExpo
 
-inline uint8_t RC::auxState(void) 
+uint8_t RC::auxState(void) 
 {
     int16_t aux = this->data[4];
 
     return aux < 1500 ? 0 : (aux < 1700 ? 1 : 2);
 }
 
-inline bool RC::throttleIsDown(void)
+bool RC::throttleIsDown(void)
 {
     return this->data[DEMAND_THROTTLE] < CONFIG_MINCHECK;
 }

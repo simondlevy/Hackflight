@@ -22,7 +22,7 @@
 
 namespace hf {
 
-inline void debug(Board * board, const char * fmt, ...)
+void debug(Board * board, const char * fmt, ...)
 {
     va_list ap;       
 

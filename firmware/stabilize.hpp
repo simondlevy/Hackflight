@@ -56,7 +56,7 @@ private:
 
 
 
-inline void Stabilize::init(RC * _rc, IMU * _imu)
+void Stabilize::init(RC * _rc, IMU * _imu)
 {
     this->rc = _rc;
     this->imu = _imu;
@@ -82,7 +82,7 @@ inline void Stabilize::init(RC * _rc, IMU * _imu)
     this->resetIntegral();
 }
 
-inline void Stabilize::update(void)
+void Stabilize::update(void)
 {
     for (uint8_t axis = 0; axis < 3; axis++) {
 
@@ -134,7 +134,7 @@ inline void Stabilize::update(void)
         -100 - std::abs(this->rc->command[DEMAND_YAW]), +100 + std::abs(this->rc->command[DEMAND_YAW]));
 }
 
-inline void Stabilize::resetIntegral(void)
+void Stabilize::resetIntegral(void)
 {
     this->errorGyroI[AXIS_ROLL] = 0;
     this->errorGyroI[AXIS_PITCH] = 0;

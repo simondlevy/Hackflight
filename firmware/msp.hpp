@@ -90,38 +90,38 @@ private:
 /********************************************* CPP ********************************************************/
 
 
-inline void MSP::serialize8(uint8_t a)
+void MSP::serialize8(uint8_t a)
 {
     board->serialWriteByte(a);
     portState.checksum ^= a;
 }
 
-inline void MSP::serialize16(int16_t a)
+void MSP::serialize16(int16_t a)
 {
     serialize8(a & 0xFF);
     serialize8((a >> 8) & 0xFF);
 }
 
-inline uint8_t MSP::read8(void)
+uint8_t MSP::read8(void)
 {
     return portState.inBuf[portState.indRX++] & 0xff;
 }
 
-inline uint16_t MSP::read16(void)
+uint16_t MSP::read16(void)
 {
     uint16_t t = read8();
     t += (uint16_t)read8() << 8;
     return t;
 }
 
-inline uint32_t MSP::read32(void)
+uint32_t MSP::read32(void)
 {
     uint32_t t = read16();
     t += (uint32_t)read16() << 16;
     return t;
 }
 
-inline void MSP::serialize32(uint32_t a)
+void MSP::serialize32(uint32_t a)
 {
     serialize8(a & 0xFF);
     serialize8((a >> 8) & 0xFF);
@@ -130,7 +130,7 @@ inline void MSP::serialize32(uint32_t a)
 }
 
 
-inline void MSP::headSerialResponse(uint8_t err, uint8_t s)
+void MSP::headSerialResponse(uint8_t err, uint8_t s)
 {
     serialize8('$');
     serialize8('M');
@@ -140,22 +140,22 @@ inline void MSP::headSerialResponse(uint8_t err, uint8_t s)
     serialize8(portState.cmdMSP);
 }
 
-inline void MSP::headSerialReply(uint8_t s)
+void MSP::headSerialReply(uint8_t s)
 {
     headSerialResponse(0, s);
 }
 
-inline void MSP::headSerialError(uint8_t s)
+void MSP::headSerialError(uint8_t s)
 {
     headSerialResponse(1, s);
 }
 
-inline void MSP::tailSerialReply(void)
+void MSP::tailSerialReply(void)
 {
     serialize8(portState.checksum);
 }
 
-inline void MSP::init(IMU * _imu, Mixer * _mixer, RC * _rc, Board * _board)
+void MSP::init(IMU * _imu, Mixer * _mixer, RC * _rc, Board * _board)
 {
     this->imu = _imu;
     this->mixer = _mixer;
@@ -165,7 +165,7 @@ inline void MSP::init(IMU * _imu, Mixer * _mixer, RC * _rc, Board * _board)
     memset(&this->portState, 0, sizeof(this->portState));
 }
 
-inline void MSP::update(bool armed)
+void MSP::update(bool armed)
 {
     // pendReboot will be set for flashing
     board->checkReboot(pendReboot);

@@ -51,7 +51,7 @@ private:
 
 /********************************************* CPP ********************************************************/
 
-inline void Mixer::init(RC * _rc, Stabilize * _stabilize)
+void Mixer::init(RC * _rc, Stabilize * _stabilize)
 {
     this->stabilize = _stabilize;
     this->rc = _rc;
@@ -66,7 +66,7 @@ inline void Mixer::init(RC * _rc, Stabilize * _stabilize)
         this->motorsDisarmed[i] = CONFIG_PWM_MIN;
 }
 
-inline void Mixer::update(bool armed, Board* board)
+void Mixer::update(bool armed, Board* board)
 {
     int16_t motors[4];
 
