@@ -1,5 +1,5 @@
 /*
-   alienflight.hpp : AlienflightF3 implementation of routines in board.hpp
+   alienflightf3.hpp : AlienflightF3 implementation of routines in board.hpp
 
    This file is part of Hackflight.
 

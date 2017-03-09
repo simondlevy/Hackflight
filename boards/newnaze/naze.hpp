@@ -1,22 +1,64 @@
-// Board implementation for Naze32 ======================================================
-#include <cstdio>
-#include <cstdint>
+/*
+   naze.hpp : Naze32 implementation of routines in board.hpp
 
-#include <time.h>
+   This file is part of Hackflight.
 
-#include "board.hpp"
-#include "config.hpp"
-#include "common.hpp"
+   Hackflight is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
+   Hackflight is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   You should have received a copy of the GNU General Public License
+   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#pragma once
+
+#include <Arduino.h>
+#include <Motor.h>
 #include <SpektrumDSM.h>
 #include <MPU6050.h>
-#include <Motor.h>
+
+#include <math.h>
+
+#include <board.hpp>
+#include <hackflight.hpp>
+
+MPU6050 * imu;
+
+SpektrumDSM2048 rx;
+
+BrushlessMotor motors[4];
 
 namespace hf {
 
 class Naze : public Board {
 
-public:
+    virtual void dump(char * msg) override
+    {
+        for (char * c = msg; *c; c++)
+            Serial.write(*c);
+    }
+
+    virtual void imuRead(int16_t accADC[3], int16_t gyroADC[3]) override
+    {
+        int16_t ax, ay, az, gx, gy, gz;
+
+        if (imu->getMotion6Counts(&ax, &ay, &az, &gx, &gy, &gz)) {
+
+            accADC[0]  = -ay;
+            accADC[1]  = ax;
+            accADC[2]  = az;
+            gyroADC[0] = -gy;
+            gyroADC[1] = gx;
+            gyroADC[2] = gz;
+        }
+    }
+
 
     virtual void init(uint16_t & acc1G, float & gyroScale, uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec) override
     {
@@ -28,6 +70,9 @@ public:
 
         Wire.begin(2);
 
+        delay(100);
+
+        /*
         motors[0].attach(15);
         motors[1].attach(14);
         motors[2].attach(8);
@@ -45,70 +90,63 @@ public:
 
         // 16.4 dps/lsb scalefactor for all Invensense devices
         gyroScale = 16.4f;
-    }
-
-    virtual void checkReboot(bool pendReboot) override
-    {
-        if (pendReboot)
-            reset(); // noreturn
-    }    
-
-    virtual void reboot(void) override
-    {
-        resetToBootloader();
+        */
     }
 
     virtual const Config& getConfig() override
     {
         return config;
     }
-
-    virtual void imuRead(int16_t gyroAdc[3], int16_t accelAdc[3]) override
+ 
+    virtual void checkReboot(bool pendReboot) override
     {
-        imu->getMotion6Counts(
-                &accelAdc[0], &accelAdc[1], &accelAdc[2], 
-                &gyroAdc[0], &gyroAdc[1], &gyroAdc[2]);
+        if (pendReboot)
+            reset(); // noreturn
     }
 
+    virtual void delayMilliseconds(uint32_t msec) override
+    {
+        delay(msec);
+    }
 
     virtual uint32_t getMicros() override
     {
         return micros();
     }
 
-    virtual bool rcUseSerial(void) override
-    {
-        rx->begin();
-        return true;
-    }
-
-    virtual bool rcSerialReady(void) override
-    { 
-        return rx->frameComplete();
-    }
-
-    virtual uint16_t rcReadSerial(uint8_t chan)  
-    { 
-        uint8_t chanmap[5] = {1, 2, 3, 0, 5};
-        return rx->readRawRC(chanmap[chan]);
-    }
-
-    virtual uint16_t rcReadPwm(uint8_t chan) override
-    {
-        (void)chan;
-        return 0; // because we're using Spektrum serial RX
-    }
-
     virtual void ledSet(uint8_t id, bool is_on, float max_brightness) override
-    {
+    { 
         (void)max_brightness;
 
         digitalWrite(id ? 4 : 3, is_on ? HIGH : LOW);
     }
 
-    virtual void dump(char * msg) override
+    virtual bool rcSerialReady(void) override
     {
-        Serial.printf("%s", msg);
+        return rx.frameComplete();
+    }
+
+    virtual bool rcUseSerial(void) override
+    {
+        rx.begin();
+        return true;
+    }
+
+    virtual uint16_t rcReadSerial(uint8_t chan) override
+    {
+        uint8_t chanmap[5] = {1, 2, 3, 0, 5};
+        return rx.readRawRC(chanmap[chan]);
+    }
+
+    virtual uint16_t rcReadPwm(uint8_t chan) override
+    {
+        (void)chan;
+        return 0;
+    }
+
+    virtual void reboot(void) override
+    {
+        resetToBootloader();
     }
 
     virtual uint8_t serialAvailableBytes(void) override
@@ -133,6 +171,7 @@ public:
 
     virtual void showArmedStatus(bool armed) override
     {
+        // XXX this would be a good place to sound a buzzer!
         (void)armed;
     }
 
@@ -141,62 +180,31 @@ public:
         (void)status;
     }
 
-    virtual void delayMilliseconds(uint32_t msec) override
+    virtual void extrasInit(class MSP * _msp) override 
     {
-        delay(msec);
+        (void)_msp;
     }
 
+    virtual void extrasCheckSwitch(void) override
+    {
+    }
 
-private:
+    virtual uint8_t extrasGetTaskCount(void) override
+    {
+        return 0;
+    }
 
-    // IMU support
-    MPU6050 * imu;
+    virtual bool extrasHandleMSP(uint8_t command) override
+    {
+        (void)command;
+        return true;
+    }
 
-    // RC support
-    SpektrumDSM2048 * rx;
+    virtual void extrasPerformTask(uint8_t taskIndex) override
+    {
+        (void)taskIndex;
+    } 
 
-    // Motor support
-    BrushlessMotor motors[4];
+}; // class
 
-    // Launch support
-    bool ready;
-
-    // needed for spring-mounted throttle stick
-    float throttleDemand;
-    const float SPRINGY_THROTTLE_INC = .01f;
-
-    // IMU support
-    float accel[3];
-    float gyro[3];
-
-    // Barometer support
-    int baroPressure;
-
-    // Motor support
-    float thrusts[4];
-
-    // 100 Hz timestep, used for simulating microsend timer
-    float timestep;
-
-    int particleCount;
-
-    // Handles from scene
-    int motorList[4];
-    int motorJointList[4];
-    int quadcopterHandle;
-    int accelHandle;
-
-    // Support for reporting status of aux switch (alt-hold, etc.)
-    uint8_t auxStatus;
-    // Stick demands from controller
-    float demands[5];
-
-    // Controller type
-    // We currently support these controllers
-    enum controller_t { KEYBOARD, DSM, TARANIS, SPEKTRUM, EXTREME3D, PS3 , XBOX360 };
-    controller_t controller;
-
-    Config config;
-};
-
-} //namespace
+} // namespace

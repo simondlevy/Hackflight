@@ -13,5 +13,6 @@ void setup(void)
 
 void loop(void)
 {
-    h.update();
+    Serial.printf("%d\n", millis());
+    //h.update();
 }
