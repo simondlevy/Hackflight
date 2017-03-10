@@ -89,9 +89,7 @@ enum {
 #define CONFIG_ACCXY_DEADBAND         40
 #define CONFIG_ACCZ_LPF_CUTOFF        5.0F
 #define CONFIG_GYRO_CMPF_FACTOR       600    
-#define CONFIG_GYRO_CMPFM_FACTOR      250  
 #define CONFIG_MORON_THRESHOLD        32
-#define CONFIG_MAGNETIC_DECLINATION   0
 #define CONFIG_MAX_ANGLE_INCLINATION  500 /* 50 degrees */
 
 //=========================================================================
