@@ -92,7 +92,6 @@ enum {
 #define CONFIG_GYRO_CMPFM_FACTOR      250  
 #define CONFIG_MORON_THRESHOLD        32
 #define CONFIG_MAGNETIC_DECLINATION   0
-#define CONFIG_YAW_CONTROL_DIRECTION  1    // 1 or -1 
 #define CONFIG_MAX_ANGLE_INCLINATION  500 /* 50 degrees */
 
 //=========================================================================

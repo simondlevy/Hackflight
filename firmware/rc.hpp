@@ -148,7 +148,7 @@ void RC::computeExpo(void)
             this->command[channel] = 
                 lookupPitchRollRC[tmp2] + (tmp - tmp2 * 100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2]) / 100;
         } else {                    // yaw
-            this->command[channel] = tmp * -CONFIG_YAW_CONTROL_DIRECTION;
+            this->command[channel] = tmp * -1;
         }
 
         if (this->data[channel] < this->midrc)
