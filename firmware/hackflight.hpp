@@ -45,7 +45,6 @@
 #define THR_CE (3 << (2 * DEMAND_THROTTLE))
 #define THR_HI (2 << (2 * DEMAND_THROTTLE))
 
-uint16_t config_small_angle;
 
 namespace hf {
 
@@ -82,6 +81,7 @@ class Hackflight {
         uint16_t accelCalibrationCountdown;
         uint16_t gyroCalibrationCountdown;
         bool     haveSmallAngle;
+        uint16_t smallAngle;
 
         uint32_t foo, bar;
 
@@ -217,7 +217,7 @@ void Hackflight::updateCalibrationState(void)
         gyroCalibrationCountdown--;
 
     haveSmallAngle = 
-        abs(imu.angle[0]) < config_small_angle && abs(imu.angle[1]) < config_small_angle;
+        abs(imu.angle[0]) < smallAngle && abs(imu.angle[1]) < smallAngle;
 
     uint32_t currentTime = board->getMicros();
 
@@ -279,7 +279,8 @@ void Hackflight::initImuRc(void)
     // Get particulars for board
     const Config& config = board->getConfig();
 
-    config_small_angle = config.imu.smallAngle;
+    // Store some for later
+    smallAngle = config.imu.smallAngle;
 
     // Initialize board hardware
     board->init();
