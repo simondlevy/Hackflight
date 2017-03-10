@@ -60,7 +60,7 @@ class AlienflightF3 : public Board {
     }
 
 
-    virtual void init(uint16_t & acc1G, float & gyroScale, uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec) override
+    virtual void init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec) override
     {
         // Init LEDs
         pinMode(3, OUTPUT);
@@ -81,12 +81,6 @@ class AlienflightF3 : public Board {
         imu = new MPU6050();
 
         imu->begin(AFS_8G, GFS_2000DPS);
-
-        // Accel scale 8g (4096 LSB/g)
-        acc1G = 4096;
-
-        // 16.4 dps/lsb scalefactor for all Invensense devices
-        gyroScale = 16.4f;
     }
 
     virtual const Config& getConfig() override

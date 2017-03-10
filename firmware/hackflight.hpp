@@ -273,13 +273,15 @@ void Hackflight::flashLeds(void)
 
 void Hackflight::initImuRc(void)
 {
-    uint16_t acc1G;
-    float    gyroScale;
     uint32_t looptimeUsec;
     uint32_t gyroCalibrationMsec;
 
+
     // Get particulars for board
-    board->init(acc1G, gyroScale, looptimeUsec, gyroCalibrationMsec);
+    const Config& config = board->getConfig();
+
+    // Initialize board hardware
+    board->init(looptimeUsec, gyroCalibrationMsec);
 
     imuLooptimeUsec = looptimeUsec;
 
@@ -293,7 +295,7 @@ void Hackflight::initImuRc(void)
     // assume shallow angle (no accelerometer calibration needed)
     haveSmallAngle = true;
 
-    imu.init(acc1G, gyroScale, calibratingGyroCycles, calibratingAccelCycles);
+    imu.init(config.imu.acc1G, config.imu.gyroScale, calibratingGyroCycles, calibratingAccelCycles);
 
     // sleep for 100ms
     board->delayMilliseconds(100);
