@@ -37,9 +37,9 @@ struct Config {
         uint32_t accelCalibrationPeriodMilli = 500;
         uint32_t altitudeUpdatePeriodMilli = 500;   // based on accelerometer low-pass filter
 
-        uint16_t magneticDeclinationTenthsDegree = 0;
-
-        uint16_t smallAngle = 250;  // tenths of a degree
+        // angles in tenths of a degree
+        uint16_t magneticDeclination = 0;
+        uint16_t smallAngle = 250; 
 
     } imu;
 
@@ -84,13 +84,16 @@ enum {
 //IMU config
 //=========================================================================
 
-#define CONFIG_ACC_LPF_FACTOR     4
-#define CONFIG_ACCZ_DEADBAND      40
-#define CONFIG_ACCXY_DEADBAND     40
-#define CONFIG_ACCZ_LPF_CUTOFF    5.0F
-#define CONFIG_GYRO_CMPF_FACTOR   600    
-#define CONFIG_GYRO_CMPFM_FACTOR  250  
-#define CONFIG_MORON_THRESHOLD     32
+#define CONFIG_ACC_LPF_FACTOR         4
+#define CONFIG_ACCZ_DEADBAND          40
+#define CONFIG_ACCXY_DEADBAND         40
+#define CONFIG_ACCZ_LPF_CUTOFF        5.0F
+#define CONFIG_GYRO_CMPF_FACTOR       600    
+#define CONFIG_GYRO_CMPFM_FACTOR      250  
+#define CONFIG_MORON_THRESHOLD        32
+#define CONFIG_MAGNETIC_DECLINATION   0
+#define CONFIG_YAW_CONTROL_DIRECTION  1    // 1 or -1 
+#define CONFIG_MAX_ANGLE_INCLINATION  500 /* 50 degrees */
 
 //=========================================================================
 //PID config
@@ -114,16 +117,5 @@ static const uint8_t CONFIG_YAW_I            = 45;
 //=========================================================================
 
 #define CONFIG_REBOOT_CHARACTER 'R'
-
-//=========================================================================
-// MISC config
-//=========================================================================
-
-#define CONFIG_MAGNETIC_DECLINATION                 0
-#define CONFIG_YAW_CONTROL_DIRECTION                1    // 1 or -1 
-#define CONFIG_CALIBRATE_ACCTIME_MSEC               500
-#define CONFIG_MAX_ANGLE_INCLINATION                500 /* 50 degrees */
-
-#define CONFIG_CALIBRATE_ACCTIME_MSEC               500
 
 } // namespace
