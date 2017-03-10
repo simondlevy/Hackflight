@@ -124,7 +124,6 @@ static const uint8_t CONFIG_YAW_I            = 45;
 #define CONFIG_CALIBRATE_ACCTIME_MSEC               500
 #define CONFIG_MAX_ANGLE_INCLINATION                500 /* 50 degrees */
 
-#define CONFIG_RC_LOOPTIME_MSEC                     20
 #define CONFIG_CALIBRATE_ACCTIME_MSEC               500
 #define CONFIG_SMALL_ANGLE                          250  // tenths of a degree
 

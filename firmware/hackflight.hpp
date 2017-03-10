@@ -300,8 +300,8 @@ void Hackflight::initImuRc(void)
 
     // initializing timing tasks
     imuTask.init(config.imu.imuLoopMicro);
-    rcTask.init(CONFIG_RC_LOOPTIME_MSEC * 1000);
-    accelCalibrationTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
+    rcTask.init(config.rc.rcLoopMilli * 1000);
+    accelCalibrationTask.init(config.imu.accelCalibrationPeriodMilli * 1000);
 
     rc.init();
 }
