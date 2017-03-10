@@ -60,7 +60,7 @@ class AlienflightF3 : public Board {
     }
 
 
-    virtual void init(uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec) override
+    virtual void init(void) override
     {
         // Init LEDs
         pinMode(3, OUTPUT);
@@ -74,9 +74,6 @@ class AlienflightF3 : public Board {
         motors[1].attach(14);
         motors[2].attach(8);
         motors[3].attach(0);
-
-        looptimeMicroseconds = CONFIG_IMU_LOOPTIME_USEC;
-        calibratingGyroMsec  = CONFIG_CALIBRATING_GYRO_MSEC;
 
         imu = new MPU6050();
 

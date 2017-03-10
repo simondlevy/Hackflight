@@ -273,17 +273,14 @@ void Hackflight::flashLeds(void)
 
 void Hackflight::initImuRc(void)
 {
-    uint32_t looptimeUsec;
-    uint32_t gyroCalibrationMsec;
-
+    imuLooptimeUsec = CONFIG_IMU_LOOPTIME_USEC;
+    uint32_t gyroCalibrationMsec = CONFIG_CALIBRATING_GYRO_MSEC;
 
     // Get particulars for board
     const Config& config = board->getConfig();
 
     // Initialize board hardware
-    board->init(looptimeUsec, gyroCalibrationMsec);
-
-    imuLooptimeUsec = looptimeUsec;
+    board->init();
 
     // compute cycles for calibration based on board's time constant
     calibratingGyroCycles = (uint16_t)(1000. * gyroCalibrationMsec / imuLooptimeUsec);

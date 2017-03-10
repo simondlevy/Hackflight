@@ -29,9 +29,10 @@ struct Config {
         uint32_t imuLoopMicro;
         uint32_t calibratingGyroMilli;
 
-        //Defaults are for MPU6050
+        // Defaults are for Invensens IMUs (e.g., MPU6050)
         uint16_t acc1G = 4096;
         float gyroScale = 16.4f;
+
         uint32_t calibratingAccelMilli = 1400;
         uint32_t accelCalibrationPeriodMilli = 500;
         uint32_t altitudeUpdatePeriodMilli = 500;   // based on accelerometer low-pass filter
