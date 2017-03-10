@@ -26,7 +26,7 @@ struct Config {
 
     struct ImuConfig {
 
-        uint32_t imuLoopMicro;
+        uint32_t imuLoopMicro = 3500;
         uint32_t calibratingGyroMilli = 3500;
 
         // Defaults are for Invensens IMUs (e.g., MPU6050)
@@ -83,8 +83,6 @@ enum {
 //=========================================================================
 //IMU config
 //=========================================================================
-
-#define CONFIG_IMU_LOOPTIME_USEC       3500
 
 #define CONFIG_ACC_LPF_FACTOR     4
 #define CONFIG_ACCZ_DEADBAND      40

@@ -75,12 +75,13 @@ class Hackflight {
         TimedTask accelCalibrationTask;
 
         bool     accCalibrated;
-        uint32_t imuLooptimeUsec;
         uint16_t calibratingGyroCycles;
         uint16_t calibratingAccelCycles;
         uint16_t accelCalibrationCountdown;
         uint16_t gyroCalibrationCountdown;
         bool     haveSmallAngle;
+
+        uint32_t foo, bar;
 
 };
 
@@ -273,17 +274,15 @@ void Hackflight::flashLeds(void)
 
 void Hackflight::initImuRc(void)
 {
-    imuLooptimeUsec = CONFIG_IMU_LOOPTIME_USEC;
-
     // Get particulars for board
     const Config& config = board->getConfig();
 
     // Initialize board hardware
     board->init();
 
-    // compute cycles for calibration based on board's time constant
-    calibratingGyroCycles   = (uint16_t)(1000. * config.imu.calibratingGyroMilli  / imuLooptimeUsec);
-    calibratingAccelCycles  = (uint16_t)(1000. * config.imu.calibratingAccelMilli / imuLooptimeUsec);
+    // compute loop times based on config from board
+    calibratingGyroCycles   = (uint16_t)(1000. * config.imu.calibratingGyroMilli  / config.imu.imuLoopMicro);
+    calibratingAccelCycles  = (uint16_t)(1000. * config.imu.calibratingAccelMilli / config.imu.imuLoopMicro);
 
     // always do gyro calibration at startup
     gyroCalibrationCountdown = calibratingGyroCycles;
@@ -300,7 +299,7 @@ void Hackflight::initImuRc(void)
     flashLeds();
 
     // initializing timing tasks
-    imuTask.init(imuLooptimeUsec);
+    imuTask.init(config.imu.imuLoopMicro);
     rcTask.init(CONFIG_RC_LOOPTIME_MSEC * 1000);
     accelCalibrationTask.init(CONFIG_CALIBRATE_ACCTIME_MSEC * 1000);
 
