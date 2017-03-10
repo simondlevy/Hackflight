@@ -30,9 +30,6 @@ enum {
     AXIS_YAW
 };
 
-#define INV_GYR_CMPF_FACTOR   (1.0f / ((float)CONFIG_GYRO_CMPF_FACTOR + 1.0f))
-#define INV_GYR_CMPFM_FACTOR  (1.0f / ((float)CONFIG_GYRO_CMPFM_FACTOR + 1.0f))
-
 class IMU {
     
     public:
@@ -350,7 +347,8 @@ void IMU::update(Board * board,
     // estimation.  To do that, we just skip filter, as EstV already rotated by Gyro
     if (72 < (uint16_t)accMag && (uint16_t)accMag < 133) 
         for (uint8_t axis = 0; axis < 3; axis++)
-            EstG[axis] = (EstG[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + accelSmooth[axis]) * INV_GYR_CMPF_FACTOR;
+            EstG[axis] = (EstG[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + accelSmooth[axis]) * 
+                (1.0f / ((float)CONFIG_GYRO_CMPF_FACTOR + 1.0f));
 
     // Attitude of the estimated vector
     anglerad[AXIS_ROLL] = atan2f(EstG[Y], EstG[Z]);
