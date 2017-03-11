@@ -76,7 +76,7 @@ void RC::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig)
         this->data[i] = this->midrc;
 
     for (uint8_t i = 0; i < CONFIG_PITCH_LOOKUP_LENGTH; i++)
-        lookupPitchRollRC[i] = (2500 + config.expo8 * (i * i - 25)) * i * (int32_t)CONFIG_RC_RATE_8 / 2500;
+        lookupPitchRollRC[i] = (2500 + config.expo8 * (i * i - 25)) * i * (int32_t)config.rate8 / 2500;
 
     for (uint8_t i = 0; i < CONFIG_THROTTLE_LOOKUP_LENGTH; i++) {
         int16_t tmp = 10 * i - CONFIG_THR_MID_8;
