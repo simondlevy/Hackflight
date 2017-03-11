@@ -23,6 +23,26 @@
 namespace hf {
 
 //=========================================================================
+// PID config
+//=========================================================================
+
+struct PidConfig {
+
+    // Level (accelerometer)
+    uint8_t levelP          = 40;
+    uint8_t levelI          = 2;
+
+    // Rate (gyro): P must be positive
+    uint8_t ratePitchrollP = 36;
+    uint8_t ratePitchrollI = 30;
+    uint8_t ratePitchrollD = 23;
+
+    // Yaw: P must be positive
+    uint8_t yawP            = 85;
+    uint8_t yawI            = 45;
+};
+
+//=========================================================================
 // Loop time config
 //=========================================================================
 
@@ -55,25 +75,6 @@ struct ImuConfig {
     uint16_t smallAngle          = 250; 
 };
 
-//=========================================================================
-// PID config
-//=========================================================================
-
-struct PidConfig {
-
-// Level (accelerometer)
-    uint8_t levelP          = 40;
-    uint8_t levelI          = 2;
-
-    // Rate (gyro): P must be positive
-    uint8_t ratePitchrollP = 36;
-    uint8_t ratePitchrollI = 30;
-    uint8_t ratePitchrollD = 23;
-
-    // Yaw: P must be positive
-    uint8_t yawP            = 85;
-    uint8_t yawI            = 45;
-};
 
 //=========================================================================
 // PWM config

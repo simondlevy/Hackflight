@@ -30,8 +30,9 @@ design pattern of a <tt>startup</tt> routine that calls the
 abstraction (through the <tt>Board</tt> class) that should make it easy to use
 on other boards.  
 
-The only parameters you should need to adjust are the PID tuning params.  As
-with Baseflight, you get a gyro auto-calibration sequence on startup, indicated
+The only parameters you should need to adjust are the PID tuning 
+[params](https://github.com/simondlevy/hackflight/blob/master/boards/alienflightf3/config.hpp).  
+As with Baseflight, you get a gyro auto-calibration sequence on startup, indicated
 by  steady green LED that turns off when the calibration is done.  You can
 re-calibrate the gyro by putting the collective (left) stick in full upper-left
 and the cyclic (right) in full center-down position.  You can calibrate the
