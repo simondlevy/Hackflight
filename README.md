@@ -31,7 +31,7 @@ abstraction (through the <tt>Board</tt> class) that should make it easy to use
 on other boards.  
 
 The only parameters you should need to adjust are the PID tuning 
-[params](https://github.com/simondlevy/hackflight/blob/master/firmware/config.hpp#L25-43).  As 
+[params](https://github.com/simondlevy/hackflight/blob/master/firmware/config.hpp#L25-L43).  As 
 with Baseflight, you get a gyro auto-calibration sequence on startup, indicated
 by  steady green LED that turns off when the calibration is done.  You can
 re-calibrate the gyro by putting the collective (left) stick in full upper-left
