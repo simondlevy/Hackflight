@@ -22,26 +22,27 @@
 
 namespace hf {
 
+struct ImuConfig {
+
+    uint32_t imuLoopMicro = 3500;
+    uint32_t calibratingGyroMilli = 3500;
+
+    // Defaults are for Invensens IMUs (e.g., MPU6050)
+    uint16_t acc1G = 4096;
+    float gyroScale = 16.4f;
+
+    uint32_t calibratingAccelMilli = 1400;
+    uint32_t accelCalibrationPeriodMilli = 500;
+    uint32_t altitudeUpdatePeriodMilli = 500;   // based on accelerometer low-pass filter
+
+    // angles in tenths of a degree
+    uint16_t magneticDeclination = 0;
+    uint16_t smallAngle = 250; 
+};
+
 struct Config {
 
-    struct ImuConfig {
-
-        uint32_t imuLoopMicro = 3500;
-        uint32_t calibratingGyroMilli = 3500;
-
-        // Defaults are for Invensens IMUs (e.g., MPU6050)
-        uint16_t acc1G = 4096;
-        float gyroScale = 16.4f;
-
-        uint32_t calibratingAccelMilli = 1400;
-        uint32_t accelCalibrationPeriodMilli = 500;
-        uint32_t altitudeUpdatePeriodMilli = 500;   // based on accelerometer low-pass filter
-
-        // angles in tenths of a degree
-        uint16_t magneticDeclination = 0;
-        uint16_t smallAngle = 250; 
-
-    } imu;
+    struct ImuConfig imu;
 
     struct RcConfig {
         uint32_t rcLoopMilli = 20;

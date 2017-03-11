@@ -40,7 +40,7 @@ class IMU {
         int16_t  angle[3];      // tenths of a degree
 
         // called from core firmware
-        void init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles);
+        void init(ImuConfig & imuConfig, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles);
         void update(Board * board, 
                 uint32_t currentTimeUsec, bool armed, uint16_t calibratingA=0, uint16_t calibratingG=0);
 
@@ -196,7 +196,7 @@ void IMU::normalizeV(float src[3], float dest[3])
     }
 }
 
-void IMU::init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles) 
+void IMU::init(ImuConfig & imuConfig, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles)
 {
     for (int k=0; k<3; ++k) {
         a[k] = 0;
@@ -215,19 +215,17 @@ void IMU::init(uint16_t _acc1G, float _gyroScale, uint16_t _calibratingGyroCycle
     accz_smooth = 0;
     calibratingGyroCycles = 0;
     calibratingAccCycles = 0;
-    acc1G = 0;
     fcAcc = 0;
-    gyroScale = 0;
     previousTimeUsec = 0;
 
-    acc1G = _acc1G;
+    acc1G = imuConfig.acc1G;
 
     EstN[0] = 1.0f;
     EstN[1] = 1.0f;
     EstN[2] = 0.0f;
 
     // Convert gyro scale from degrees to radians
-    gyroScale = (4.0f / _gyroScale) * (M_PI / 180.0f);
+    gyroScale = (4.0f / imuConfig.gyroScale) * (M_PI / 180.0f);
 
     // calculate RC time constant used in the accelZ lpf    
     fcAcc = (float)(0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF)); 
