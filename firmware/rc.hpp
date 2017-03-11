@@ -86,7 +86,7 @@ void RC::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig)
         if (tmp < 0)
             y = config.thrMid8;
         lookupThrottleRC[i] = 10 * config.thrMid8 + tmp * (100 - config.thrExpo8 + 
-            (int32_t)config.thrExpo8 * (tmp * tmp) / (y * y)) / 10;
+            config.thrExpo8 * (tmp * tmp) / (y * y)) / 10;
         lookupThrottleRC[i] = pwmConfig.min + (int32_t)(pwmConfig.max - pwmConfig.min) * 
             lookupThrottleRC[i] / 1000; // [PWM_MIN;PWM_MAX]
     }

@@ -99,9 +99,10 @@ struct RcConfig {
     int32_t thrExpo8  = 0;
 };
 
-#define CONFIG_RC_CHANS    8
-#define CONFIG_PITCH_LOOKUP_LENGTH    7
-#define CONFIG_THROTTLE_LOOKUP_LENGTH 12
+// Keep these static const for now, to avoid dynamic memory allocation
+static const uint8_t CONFIG_RC_CHANS                = 8;
+static const uint8_t CONFIG_PITCH_LOOKUP_LENGTH     = 7;
+static const uint8_t CONFIG_THROTTLE_LOOKUP_LENGTH  = 12;
 
 //=========================================================================
 // all config
