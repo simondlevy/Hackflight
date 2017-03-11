@@ -22,32 +22,35 @@
 
 namespace hf {
 
+// NB: angles are in tenths of a degree
+
+struct LoopConfig {
+
+    uint32_t imuLoopMicro                = 3500;
+    uint32_t calibratingGyroMilli        = 3500;
+    uint32_t calibratingAccelMilli       = 1400;
+    uint32_t accelCalibrationPeriodMilli = 500;
+    uint32_t rcLoopMilli                 = 20;
+};
+
 struct ImuConfig {
 
-    uint32_t imuLoopMicro = 3500;
-    uint32_t calibratingGyroMilli = 3500;
-
-    // Defaults are for Invensens IMUs (e.g., MPU6050)
-    uint16_t acc1G = 4096;
-    float gyroScale = 16.4f;
-
-    uint32_t calibratingAccelMilli = 1400;
-    uint32_t accelCalibrationPeriodMilli = 500;
-    uint32_t altitudeUpdatePeriodMilli = 500;   // based on accelerometer low-pass filter
-
-    // angles in tenths of a degree
-    uint16_t magneticDeclination = 0;
-    uint16_t smallAngle = 250; 
+    uint16_t acc1G               = 4096;
+    float    accelLpfFactor      = 4.f;
+    int32_t  accelZDeadband      = 40;
+    int32_t  accelXyDeadband     = 40;
+    float    accelzLpfCutoff     = 5.f;
+    float    gyroCmpfFactor      = 600.f;
+    float    gyroScale           = 16.4f; // for Invensens IMUs (e.g., MPU6050)
+    uint16_t maxAngleInclination = 500;
+    float    moronThreshold      = 32.f;  // variance in motion that triggers recalibration
+    uint16_t smallAngle          = 250; 
 };
 
 struct Config {
 
-    struct ImuConfig imu;
-
-    struct RcConfig {
-        uint32_t rcLoopMilli = 20;
-    } rc;
-
+    struct   LoopConfig loop;
+    struct   ImuConfig imu;
     uint32_t initDelayMs = 100;
     uint32_t ledFlashCountOnStartup = 20;
 };
@@ -84,14 +87,6 @@ enum {
 //=========================================================================
 //IMU config
 //=========================================================================
-
-#define CONFIG_ACC_LPF_FACTOR         4
-#define CONFIG_ACCZ_DEADBAND          40
-#define CONFIG_ACCXY_DEADBAND         40
-#define CONFIG_ACCZ_LPF_CUTOFF        5.0F
-#define CONFIG_GYRO_CMPF_FACTOR       600    
-#define CONFIG_MORON_THRESHOLD        32
-#define CONFIG_MAX_ANGLE_INCLINATION  500 /* 50 degrees */
 
 //=========================================================================
 //PID config

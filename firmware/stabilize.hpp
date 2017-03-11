@@ -104,8 +104,8 @@ void Stabilize::update(void)
 
             // 50 degrees max inclination
             int32_t errorAngle = constrain(2 * this->rc->command[axis], 
-                -((int)CONFIG_MAX_ANGLE_INCLINATION), 
-                + CONFIG_MAX_ANGLE_INCLINATION) 
+                -imu->config.maxAngleInclination, 
+                + imu->config.maxAngleInclination) 
                 - this->imu->angle[axis];
 
             int32_t PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 

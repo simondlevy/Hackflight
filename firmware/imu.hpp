@@ -19,6 +19,7 @@
 #pragma once
 
 #include <cstdlib>
+#include <cstring>
 
 #include "config.hpp"
 
@@ -32,14 +33,13 @@ enum {
 
 class IMU {
     
-    public:
-        int16_t  accelADC[3];   // [-4096,+4096]
-        int16_t  gyroADC[3];    // [-4096,+4096]
+    public: // fields
+        int16_t   accelADC[3];   // [-4096,+4096]
+        int16_t   gyroADC[3];    // [-4096,+4096]
+        ImuConfig config;
+        int16_t   angle[3];      // tenths of a degree
 
-        // shared with other classes
-        int16_t  angle[3];      // tenths of a degree
-
-        // called from core firmware
+    public: // methods
         void init(ImuConfig & imuConfig, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles);
         void update(Board * board, 
                 uint32_t currentTimeUsec, bool armed, uint16_t calibratingA=0, uint16_t calibratingG=0);
@@ -69,7 +69,7 @@ class IMU {
 
     private: //fields
         int32_t  a[3];
-        float    accelLPF[3];
+        float    accelLpf[3];
         int16_t  accelSmooth[3];
         int32_t  accelSum[3];
         int32_t  accelSumCount;
@@ -80,10 +80,10 @@ class IMU {
         float    accz_smooth;
         uint16_t calibratingGyroCycles;
         uint16_t calibratingAccCycles;
-        uint16_t acc1G;
         float    EstG[3];
         float    EstN[3];
         float    fcAcc;
+        float    gyroCmpfFactor;
         float    gyroScale;
         int16_t  gyroZero[3];
         uint32_t previousTimeUsec;
@@ -143,7 +143,7 @@ void IMU::rotateV(float v[3], float *delta)
 
 float IMU::computeAccelZ(void)
 {
-    float accelZ = (float)accelSum[2] / (float)accelSumCount * (9.80665f / 10000.0f / acc1G);
+    float accelZ = (float)accelSum[2] / (float)accelSumCount * (9.80665f / 10000.0f / config.acc1G);
 
     accelSum[0] = 0;
     accelSum[1] = 0;
@@ -200,7 +200,7 @@ void IMU::init(ImuConfig & imuConfig, uint16_t _calibratingGyroCycles, uint16_t 
 {
     for (int k=0; k<3; ++k) {
         a[k] = 0;
-        accelLPF[k] = 0;
+        accelLpf[k] = 0;
         accelSmooth[k] = 0;
         accelSum[k] = 0;
         accelZero[k] = 0;
@@ -218,23 +218,23 @@ void IMU::init(ImuConfig & imuConfig, uint16_t _calibratingGyroCycles, uint16_t 
     fcAcc = 0;
     previousTimeUsec = 0;
 
-    acc1G = imuConfig.acc1G;
+    memcpy(&config, &imuConfig, sizeof(ImuConfig));
 
     EstN[0] = 1.0f;
     EstN[1] = 1.0f;
     EstN[2] = 0.0f;
 
     // Convert gyro scale from degrees to radians
-    gyroScale = (4.0f / imuConfig.gyroScale) * (M_PI / 180.0f);
+    gyroScale = (4.0f / config.gyroScale) * (M_PI / 180.0f);
 
     // calculate RC time constant used in the accelZ lpf    
-    fcAcc = (float)(0.5f / (M_PI * CONFIG_ACCZ_LPF_CUTOFF)); 
+    fcAcc = (float)(0.5f / (M_PI * config.accelzLpfCutoff)); 
 
     for (int k=0; k<3; ++k) {
         accelSum[k] = 0;
     }
 
-    accelVelScale = 9.80665f / acc1G / 10000.0f;
+    accelVelScale = 9.80665f / config.acc1G / 10000.0f;
 
     calibratingGyroCycles = _calibratingGyroCycles;
     calibratingAccCycles = _calibratingAccCycles;
@@ -277,7 +277,7 @@ void IMU::update(Board * board,
         if (calibratingA == 1) {
             accelZero[AXIS_ROLL] = (a[AXIS_ROLL] + (calibratingAccCycles / 2)) / calibratingAccCycles;
             accelZero[AXIS_PITCH] = (a[AXIS_PITCH] + (calibratingAccCycles / 2)) / calibratingAccCycles;
-            accelZero[AXIS_YAW] = (a[AXIS_YAW] + (calibratingAccCycles / 2)) / calibratingAccCycles - acc1G;
+            accelZero[AXIS_YAW] = (a[AXIS_YAW] + (calibratingAccCycles / 2)) / calibratingAccCycles - config.acc1G;
         }
     }
 
@@ -306,7 +306,7 @@ void IMU::update(Board * board,
             if (calibratingG == 1) {
                 float dev = devStandardDeviation(&var[axis]);
                 // check deviation and startover if idiot was moving the model
-                if (CONFIG_MORON_THRESHOLD && dev > CONFIG_MORON_THRESHOLD) {
+                if (config.moronThreshold && dev > config.moronThreshold) {
                     calibratingG = calibratingGyroCycles;
                     devClear(&var[0]);
                     devClear(&var[1]);
@@ -325,17 +325,17 @@ void IMU::update(Board * board,
     // Initialization
     for (uint8_t axis = 0; axis < 3; axis++) {
         deltaGyroAngle[axis] = gyroADC[axis] * scale;
-        if (CONFIG_ACC_LPF_FACTOR > 0) {
-            accelLPF[axis] = accelLPF[axis] * (1.0f - (1.0f / CONFIG_ACC_LPF_FACTOR)) + accelADC[axis] * 
-                (1.0f / CONFIG_ACC_LPF_FACTOR);
-            accelSmooth[axis] = (int16_t)accelLPF[axis];
+        if (config.accelLpfFactor > 0) {
+            accelLpf[axis] = accelLpf[axis] * (1.0f - (1.0f / config.accelLpfFactor)) + accelADC[axis] * 
+                (1.0f / config.accelLpfFactor);
+            accelSmooth[axis] = (int16_t)accelLpf[axis];
         } else {
             accelSmooth[axis] = accelADC[axis];
         }
         accMag += (int32_t)accelSmooth[axis] * accelSmooth[axis];
     }
 
-    accMag = accMag * 100 / ((int32_t)acc1G * acc1G);
+    accMag = accMag * 100 / ((int32_t)config.acc1G * config.acc1G);
 
     rotateV(EstG, deltaGyroAngle);
 
@@ -345,8 +345,8 @@ void IMU::update(Board * board,
     // estimation.  To do that, we just skip filter, as EstV already rotated by Gyro
     if (72 < (uint16_t)accMag && (uint16_t)accMag < 133) 
         for (uint8_t axis = 0; axis < 3; axis++)
-            EstG[axis] = (EstG[axis] * (float)CONFIG_GYRO_CMPF_FACTOR + accelSmooth[axis]) * 
-                (1.0f / ((float)CONFIG_GYRO_CMPF_FACTOR + 1.0f));
+            EstG[axis] = (EstG[axis] * config.gyroCmpfFactor + accelSmooth[axis]) * 
+                (1.0f / (config.gyroCmpfFactor + 1.0f));
 
     // Attitude of the estimated vector
     anglerad[AXIS_ROLL] = atan2f(EstG[Y], EstG[Z]);
@@ -385,9 +385,9 @@ void IMU::update(Board * board,
 
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
-    accelSum[X] += deadbandFilter((int32_t)lrintf(accel_ned[X]), CONFIG_ACCXY_DEADBAND);
-    accelSum[Y] += deadbandFilter((int32_t)lrintf(accel_ned[Y]), CONFIG_ACCXY_DEADBAND);
-    accelSum[Z] += deadbandFilter((int32_t)lrintf(accz_smooth), CONFIG_ACCZ_DEADBAND);
+    accelSum[X] += deadbandFilter((int32_t)lrintf(accel_ned[X]), config.accelXyDeadband);
+    accelSum[Y] += deadbandFilter((int32_t)lrintf(accel_ned[Y]), config.accelXyDeadband);
+    accelSum[Z] += deadbandFilter((int32_t)lrintf(accz_smooth),  config.accelZDeadband);
 
     accelTimeSum += dT_usec;
     accelSumCount++;
