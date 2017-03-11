@@ -20,7 +20,9 @@ and the Arduino-compatible Teensy 3.1/3.2
 microcontroller (with additional hardware).  Thanks to a major effort by
 [Sytelus](https://github.com/sytelus), the core Hackflight 
 [firmware ](https://github.com/simondlevy/hackflight/tree/master/firmware) now
-adheres to best practices for C++.  As you'll see, the code follows the Arduino
+adheres to best practices for C++.  As you can 
+[see](https://github.com/simondlevy/hackflight/blob/master/boards/alienflightf3/hackflight.cpp), 
+the code follows the Arduino
 design pattern of a <tt>startup</tt> routine that calls the
 <tt>init()</tt> method of a few objects (<tt>IMU</tt>, <tt>RC</tt>,
 <tt>PID</tt>, <tt>Board</tt>) and a <tt>loop</tt> routine that calls the
