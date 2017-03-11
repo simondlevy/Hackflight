@@ -95,10 +95,9 @@ struct RcConfig {
     uint16_t maxcheck = 1900;
     int16_t expo8     = 65;
     int16_t rate8     = 90;
+    int16_t thrMid8   = 50;
+    int32_t thrExpo8  = 0;
 };
-
-#define CONFIG_THR_MID_8   50
-#define CONFIG_THR_EXPO_8  0
 
 #define CONFIG_RC_CHANS    8
 #define CONFIG_PITCH_LOOKUP_LENGTH    7

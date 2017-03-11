@@ -79,14 +79,14 @@ void RC::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig)
         lookupPitchRollRC[i] = (2500 + config.expo8 * (i * i - 25)) * i * (int32_t)config.rate8 / 2500;
 
     for (uint8_t i = 0; i < CONFIG_THROTTLE_LOOKUP_LENGTH; i++) {
-        int16_t tmp = 10 * i - CONFIG_THR_MID_8;
+        int16_t tmp = 10 * i - config.thrMid8;
         uint8_t y = 1;
         if (tmp > 0)
-            y = 100 - CONFIG_THR_MID_8;
+            y = 100 - config.thrMid8;
         if (tmp < 0)
-            y = CONFIG_THR_MID_8;
-        lookupThrottleRC[i] = 10 * CONFIG_THR_MID_8 + tmp * (100 - CONFIG_THR_EXPO_8 + 
-            (int32_t)CONFIG_THR_EXPO_8 * (tmp * tmp) / (y * y)) / 10;
+            y = config.thrMid8;
+        lookupThrottleRC[i] = 10 * config.thrMid8 + tmp * (100 - config.thrExpo8 + 
+            (int32_t)config.thrExpo8 * (tmp * tmp) / (y * y)) / 10;
         lookupThrottleRC[i] = pwmConfig.min + (int32_t)(pwmConfig.max - pwmConfig.min) * 
             lookupThrottleRC[i] / 1000; // [PWM_MIN;PWM_MAX]
     }
