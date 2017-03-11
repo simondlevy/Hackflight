@@ -39,9 +39,6 @@ static const int BARO_NOISE_PASCALS        = 3;
 #include <iostream>
 using namespace std;
 
-// Cross-platform support for firmware
-#include <crossplatform.h>
-
 #include "controller.hpp"
 #include "sim_extras.hpp"
 
@@ -53,6 +50,10 @@ using namespace std;
 #include <fcntl.h>
 #include "controller_Posix.hpp"
 #endif 
+
+// Header-only Hackflight firmware
+#include <board.hpp>
+#include <hackflight.hpp>
 
 // Controller type
 static controller_t controller;
@@ -173,6 +174,182 @@ class LED {
 
 static LED leds[2];
 
+// forward declaration
+static void startToast(const char * message, int colorR, int colorG, int colorB);
+
+// Board implementation ======================================================
+
+#include "vrepsimboard.hpp"
+
+static uint16_t pwmMin;
+static uint16_t pwmMax;
+
+namespace hf {
+
+void VrepSimBoard::init(void)
+{
+
+    leds[0].init(greenLedHandle, 0, 1, 0);
+    leds[1].init(redLedHandle, 1, 0, 0);
+
+    pwmMin = config.pwm.min;
+    pwmMax = config.pwm.max;
+}
+
+const Config& VrepSimBoard::getConfig()
+{
+    // XXX
+    //looptimeMicroseconds = 10000;
+    //calibratingGyroMsec = 100;  // long enough to see but not to annoy
+
+    return config;
+}
+
+void VrepSimBoard::imuRead(int16_t accADC[3], int16_t gyroADC[3])
+{
+    // Convert from radians to tenths of a degree
+
+    for (int k=0; k<3; ++k) {
+        accADC[k]  = (int16_t)(400000 * accel[k]);
+    }
+
+    gyroADC[1] = -(int16_t)(1000 * gyro[0]);
+    gyroADC[0] = -(int16_t)(1000 * gyro[1]);
+    gyroADC[2] = -(int16_t)(1000 * gyro[2]);
+}
+
+void VrepSimBoard::ledSet(uint8_t id, bool is_on, float max_brightness) 
+{ 
+    (void)max_brightness;
+
+    leds[id].set(is_on);
+}
+
+uint32_t VrepSimBoard::getMicros()
+{
+    return micros; 
+}
+
+bool VrepSimBoard::rcUseSerial(void)
+{
+    return false;
+}
+
+uint16_t VrepSimBoard::rcReadPwm(uint8_t chan)
+{
+    // Special handling for throttle
+    float demand = (chan == 3) ? throttleDemand : demands[chan];
+
+    // Special handling for pitch, roll on PS3, XBOX360
+    if (chan < 2) {
+       if (controller == PS3)
+        demand /= 2;
+       if (controller == XBOX360)
+        demand /= 1.5;
+    }
+
+    // Joystick demands are in [-1,+1]
+    int pwm =  (int)(pwmMin + (demand + 1) / 2 * (pwmMax - pwmMin));
+
+    return pwm;
+}
+
+void VrepSimBoard::dump(char * msg)
+{
+    printf("%s\n", msg);
+}
+
+
+void VrepSimBoard::writeMotor(uint8_t index, uint16_t value)
+{
+    thrusts[index] = (value - 1000.f) / 1000.f;
+}
+
+
+void VrepSimBoard::showArmedStatus(bool armed)
+{
+    if (armed) 
+        startToast("                    ARMED", 1, 0, 0);
+}
+
+void VrepSimBoard::showAuxStatus(uint8_t status)
+{
+    if (status != auxStatus) {
+        char message[100];
+        switch (status) {
+            case 1:
+                sprintf(message, "ENTERING ALT-HOLD");
+                break;
+            case 2:
+                sprintf(message, "ENTERING GUIDED MODE");
+                break;
+            default:
+                sprintf(message, "ENTERING NORMAL MODE");
+        }
+        startToast(message, 1,1,0);
+    }
+
+    auxStatus = status;
+}
+
+void VrepSimBoard::extrasCheckSwitch(void)
+{
+}
+
+uint8_t VrepSimBoard::extrasGetTaskCount(void)
+{
+    return 0;
+}
+
+bool VrepSimBoard::extrasHandleMSP(uint8_t command)
+{
+    return true;
+}
+
+void VrepSimBoard::extrasInit(class MSP * _msp)
+{
+    (void)_msp;
+}
+
+void VrepSimBoard::extrasPerformTask(uint8_t taskIndex)
+{
+    (void)taskIndex;
+}
+
+
+bool VrepSimBoard::rcSerialReady(void)
+{
+    return false;
+}
+
+uint16_t VrepSimBoard::rcReadSerial(uint8_t chan)
+{
+    (void)chan;
+    return 0;
+}
+
+void VrepSimBoard::checkReboot(bool pendReboot)
+{
+    (void)pendReboot;
+}
+
+void VrepSimBoard::reboot(void)
+{
+}
+
+void VrepSimBoard::delayMilliseconds(uint32_t msec)
+{
+}
+
+} // namespace hf
+
+#include <sim_extras.hpp>
+
+// --------------------------------------------------------------------------------------------------
+
+// Hackflight object
+static hf::Hackflight h;
+
 // Dialog support
 static int displayDialog(const char * title, char * message, float r, float g, float b, int style)
 {
@@ -244,8 +421,8 @@ void LUA_START_CALLBACK(SScriptCallBack* cb)
 
     CScriptFunctionData D;
 
-     // Run Hackflight setup()
-    setup();
+    // Init Hackflight object
+    h.init(new hf::VrepSimBoard());
 
     // Need this for throttle on keyboard and PS3
     throttleDemand = -1;
@@ -536,8 +713,8 @@ VREP_DLLEXPORT void* v_repMessage(int message, int * auxiliaryData, void * custo
     simSetIntegerParameter(sim_intparam_error_report_mode,sim_api_errormessage_ignore);
     simSetIntegerParameter(sim_intparam_error_report_mode,errorModeSaved); // restore previous settings
 
-    // Call Hackflight loop() from here for most realistic simulation
-    loop();
+    // Call Hackflight::update() from here for most realistic simulation
+    h.update();
 
     return NULL;
 }
@@ -549,171 +726,4 @@ void errorDialog(char * message)
     displayDialog("ERROR", message, 1,0,0, sim_dlgstyle_ok);
 }
 
-// Board implementation ======================================================
-
-#include <board.hpp>
-#include <hackflight.hpp>
-
-void Board::init(uint16_t & acc1G, float & gyroScale, uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec)
-{
-    looptimeMicroseconds = 10000;
-    calibratingGyroMsec = 100;  // long enough to see but not to annoy
-
-    leds[0].init(greenLedHandle, 0, 1, 0);
-    leds[1].init(redLedHandle, 1, 0, 0);
-
-    // Mimic MPU6050
-    acc1G = 4096;
-    gyroScale = 16.4f;
-}
-
-void Board::imuRead(int16_t accADC[3], int16_t gyroADC[3])
-{
-    // Convert from radians to tenths of a degree
-
-    for (int k=0; k<3; ++k) {
-        accADC[k]  = (int16_t)(400000 * accel[k]);
-    }
-
-    gyroADC[1] = -(int16_t)(1000 * gyro[0]);
-    gyroADC[0] = -(int16_t)(1000 * gyro[1]);
-    gyroADC[2] = -(int16_t)(1000 * gyro[2]);
-}
-
-void Board::ledGreenOff(void)
-{
-    leds[0].set(false);
-}
-
-void Board::ledGreenOn(void)
-{
-    leds[0].set(true);
-}
-
-void Board::ledRedOff(void)
-{
-    leds[1].set(false);
-}
-
-void Board::ledRedOn(void)
-{
-    leds[1].set(true);
-}
-
-
-uint32_t Board::getMicros()
-{
-    return micros; 
-}
-
-bool Board::rcUseSerial(void)
-{
-    return false;
-}
-
-uint16_t Board::readPWM(uint8_t chan)
-{
-    // Special handling for throttle
-    float demand = (chan == 3) ? throttleDemand : demands[chan];
-
-    // Special handling for pitch, roll on PS3, XBOX360
-    if (chan < 2) {
-       if (controller == PS3)
-        demand /= 2;
-       if (controller == XBOX360)
-        demand /= 1.5;
-    }
-
-    // Joystick demands are in [-1,+1]
-    int pwm =  (int)(CONFIG_PWM_MIN + (demand + 1) / 2 * (CONFIG_PWM_MAX - CONFIG_PWM_MIN));
-
-    return pwm;
-}
-
-void Board::dump(char * msg)
-{
-    printf("%s\n", msg);
-}
-
-
-void Board::writeMotor(uint8_t index, uint16_t value)
-{
-    thrusts[index] = (value - 1000.f) / 1000.f;
-}
-
-void Board::showArmedStatus(bool armed)
-{
-    if (armed) 
-        startToast("                    ARMED", 1, 0, 0);
-}
-
-void Board::showAuxStatus(uint8_t status)
-{
-    if (status != auxStatus) {
-        char message[100];
-        switch (status) {
-            case 1:
-                sprintf(message, "ENTERING ALT-HOLD");
-                break;
-            case 2:
-                sprintf(message, "ENTERING GUIDED MODE");
-                break;
-            default:
-                sprintf(message, "ENTERING NORMAL MODE");
-        }
-        startToast(message, 1,1,0);
-    }
-
-    auxStatus = status;
-}
-
-// Unused ==========================================================================================
-
-void Board::extrasCheckSwitch(void)
-{
-}
-
-uint8_t  Board::extrasGetTaskCount(void){
-    return 0;
-}
-
-bool Board::extrasHandleMSP(uint8_t command)
-{
-    return true;
-}
-
-void Board::extrasInit(class MSP * _msp)
-{
-    (void)_msp;
-}
-
-void Board::extrasPerformTask(uint8_t taskIndex)
-{
-    (void)taskIndex;
-}
-
-
-bool Board::rcSerialReady(void)
-{
-    return false;
-}
-
-uint16_t Board::rcReadSerial(uint8_t chan)
-{
-    (void)chan;
-    return 0;
-}
-
-void Board::checkReboot(bool pendReboot)
-{
-    (void)pendReboot;
-}
-
-void Board::reboot(void)
-{
-}
-
-void Board::delayMilliseconds(uint32_t msec)
-{
-}
 

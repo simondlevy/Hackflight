@@ -22,6 +22,7 @@
 #include <cstdarg>
 #include <cstdio>
 
+#include "config.hpp"
 #include "board.hpp"
 #include "mixer.hpp"
 #include "msp.hpp"
