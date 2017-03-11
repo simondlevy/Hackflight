@@ -55,9 +55,30 @@ struct ImuConfig {
     uint16_t smallAngle          = 250; 
 };
 
+//=========================================================================
+// PID config
+//=========================================================================
+
+struct PidConfig {
+
+// Level (accelerometer)
+    uint8_t levelP          = 40;
+    uint8_t levelI          = 2;
+
+    // Rate (gyro): P must be positive
+    uint8_t ratePitchrollP = 36;
+    uint8_t ratePitchrollI = 30;
+    uint8_t ratePitchrollD = 23;
+
+    // Yaw: P must be positive
+    uint8_t yawP            = 85;
+    uint8_t yawI            = 45;
+};
+
 struct Config {
     struct   LoopConfig loop;
     struct   ImuConfig imu;
+    struct   PidConfig pid;
     uint32_t initDelayMs = 100;
     uint32_t ledFlashCountOnStartup = 20;
 };
@@ -90,23 +111,6 @@ enum {
 
 #define CONFIG_PITCH_LOOKUP_LENGTH    7
 #define CONFIG_THROTTLE_LOOKUP_LENGTH 12
-
-//=========================================================================
-//PID config
-//=========================================================================
-
-// Level (accelerometer)
-static const uint8_t CONFIG_LEVEL_P          = 40;
-static const uint8_t CONFIG_LEVEL_I          = 2;
-
-// Rate (gyro): P must be positive
-static const uint8_t CONFIG_RATE_PITCHROLL_P = 36;
-static const uint8_t CONFIG_RATE_PITCHROLL_I = 30;
-static const uint8_t CONFIG_RATE_PITCHROLL_D = 23;
-
-// Yaw: P must be positive
-static const uint8_t CONFIG_YAW_P            = 85;
-static const uint8_t CONFIG_YAW_I            = 45;
 
 //=========================================================================
 // STM32 reboot support

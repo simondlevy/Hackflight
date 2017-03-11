@@ -94,7 +94,7 @@ void Hackflight::init(Board * _board)
 
     initImuRc(config);
 
-    stab.init(&rc, &imu);
+    stab.init(config.pid, &rc, &imu);
     mixer.init(&rc, &stab); 
     msp.init(&imu, &mixer, &rc, board);
 

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstring>
 
 #include "rc.hpp"
 #include "imu.hpp"
@@ -31,13 +32,14 @@ class Stabilize {
 public:
     int16_t axisPID[3];
 
-    void init(RC * _rc, IMU * _imu);
+    void init(const PidConfig& config, RC * _rc, IMU * _imu);
 
     void update(void);
 
     void resetIntegral(void);
 
 private:
+
     RC  * rc;
     IMU * imu;
 
@@ -50,15 +52,17 @@ private:
     int32_t delta2[3];
     int32_t errorGyroI[3];
     int32_t errorAngleI[2];
+
+    PidConfig config;
 }; 
 
 
 /********************************************* CPP ********************************************************/
 
-
-
-void Stabilize::init(RC * _rc, IMU * _imu)
+void Stabilize::init(const PidConfig& pidConfig, RC * _rc, IMU * _imu)
 {
+    memcpy(&config, &pidConfig, sizeof(PidConfig));
+
     this->rc = _rc;
     this->imu = _imu;
 
@@ -68,16 +72,16 @@ void Stabilize::init(RC * _rc, IMU * _imu)
         this->delta2[axis] = 0;
     }
 
-    this->rate_p[0] = CONFIG_RATE_PITCHROLL_P;
-    this->rate_p[1] = CONFIG_RATE_PITCHROLL_P;
-    this->rate_p[2] = CONFIG_YAW_P;
+    this->rate_p[0] = config.ratePitchrollP;
+    this->rate_p[1] = config.ratePitchrollP;
+    this->rate_p[2] = config.yawP;
 
-    this->rate_i[0] = CONFIG_RATE_PITCHROLL_I;
-    this->rate_i[1] = CONFIG_RATE_PITCHROLL_I;
-    this->rate_i[2] = CONFIG_YAW_I;
+    this->rate_i[0] = config.ratePitchrollI;
+    this->rate_i[1] = config.ratePitchrollI;
+    this->rate_i[2] = config.yawI;
 
-    this->rate_d[0] = CONFIG_RATE_PITCHROLL_D;
-    this->rate_d[1] = CONFIG_RATE_PITCHROLL_D;
+    this->rate_d[0] = config.ratePitchrollD;
+    this->rate_d[1] = config.ratePitchrollD;
     this->rate_d[2] = 0;
 
     this->resetIntegral();
@@ -108,10 +112,10 @@ void Stabilize::update(void)
                 + imu->config.maxAngleInclination) 
                 - this->imu->angle[axis];
 
-            int32_t PTermACC = errorAngle * CONFIG_LEVEL_P / 100; 
+            int32_t PTermACC = errorAngle * config.levelP / 100; 
 
             this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
-            int32_t ITermACC = ((int32_t)(this->errorAngleI[axis] * CONFIG_LEVEL_I)) >> 12;
+            int32_t ITermACC = ((int32_t)(this->errorAngleI[axis] * config.levelI)) >> 12;
 
             int32_t prop = std::max(std::abs(this->rc->command[DEMAND_PITCH]), 
                                     std::abs(this->rc->command[DEMAND_ROLL])); // range [0;500]
