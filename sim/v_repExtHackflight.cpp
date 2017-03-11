@@ -198,8 +198,18 @@ void VrepSimBoard::init(void)
 
 const Config& VrepSimBoard::getConfig()
 {
+    // Loop timing
     config.loop.imuLoopMicro = 10000;        // VREP's shortest simulation period
     config.loop.calibratingGyroMilli = 100;  // long enough to see but not to annoy
+
+    // PIDs
+    config.pid.levelP          = 10;
+    config.pid.levelI          = 1;
+    config.pid.ratePitchrollP  = 5;
+    config.pid.ratePitchrollI  = 4;
+    config.pid.ratePitchrollD  = 3;
+    config.pid.yawP            = 40;
+    config.pid.yawI            = 20;
 
     return config;
 }
