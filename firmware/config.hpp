@@ -93,12 +93,9 @@ struct RcConfig {
 
     uint16_t mincheck = 1100;
     uint16_t maxcheck = 1900;
+    int16_t expo8     = 65;
 };
 
-#define CONFIG_MINCHECK    1100
-#define CONFIG_MAXCHECK    1900
-
-#define CONFIG_RC_EXPO_8   65
 #define CONFIG_RC_RATE_8   90
 #define CONFIG_THR_MID_8   50
 #define CONFIG_THR_EXPO_8  0
