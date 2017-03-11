@@ -308,7 +308,7 @@ void Hackflight::initImuRc(const Config& config)
     rcTask.init(loopConfig.rcLoopMilli * 1000);
     accelCalibrationTask.init(loopConfig.accelCalibrationPeriodMilli * 1000);
 
-    rc.init(config.pwm);
+    rc.init(config.rc, config.pwm);
 }
 
 } // namespace

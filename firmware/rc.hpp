@@ -38,9 +38,10 @@ private:
     int16_t lookupThrottleRC[CONFIG_THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
     int16_t midrc;
 
+    RcConfig config;
 
 public:
-    void init(const PwmConfig& pwmConfig);
+    void init(const RcConfig& rcConfig, const PwmConfig& pwmConfig);
     void update(Board* _board);
 
     int16_t data[CONFIG_RC_CHANS]; // raw PWM values for MSP
@@ -59,8 +60,10 @@ public:
 
 /********************************************* CPP ********************************************************/
 
-void RC::init(const PwmConfig& pwmConfig)
+void RC::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig)
 {
+    memcpy(&config, &rcConfig, sizeof(RcConfig));
+
     this->midrc = (pwmConfig.max + pwmConfig.min) / 2;
 
     memset (this->dataAverage, 0, 8*4*sizeof(int16_t));
@@ -117,9 +120,9 @@ void RC::update(Board* _board)
     uint8_t stTmp = 0;
     for (uint8_t i = 0; i < 4; i++) {
         stTmp >>= 2;
-        if (this->data[i] > CONFIG_MINCHECK)
+        if (this->data[i] > config.mincheck)
             stTmp |= 0x80;  // check for MIN
-        if (this->data[i] < CONFIG_MAXCHECK)
+        if (this->data[i] < config.maxcheck)
             stTmp |= 0x40;  // check for MAX
     }
     if (stTmp == this->sticks) {
@@ -155,8 +158,8 @@ void RC::computeExpo(void)
             this->command[channel] = -this->command[channel];
     }
 
-    tmp = constrain(this->data[DEMAND_THROTTLE], CONFIG_MINCHECK, 2000);
-    tmp = (uint32_t)(tmp - CONFIG_MINCHECK) * 1000 / (2000 - CONFIG_MINCHECK);       // [MINCHECK;2000] -> [0;1000]
+    tmp = constrain(this->data[DEMAND_THROTTLE], config.mincheck, 2000);
+    tmp = (uint32_t)(tmp - config.mincheck) * 1000 / (2000 - config.mincheck);       // [MINCHECK;2000] -> [0;1000]
     tmp2 = tmp / 100;
     this->command[DEMAND_THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
         lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [PWM_MIN;PWM_MAX]
@@ -172,7 +175,7 @@ uint8_t RC::auxState(void)
 
 bool RC::throttleIsDown(void)
 {
-    return this->data[DEMAND_THROTTLE] < CONFIG_MINCHECK;
+    return this->data[DEMAND_THROTTLE] < config.mincheck;
 }
 
 

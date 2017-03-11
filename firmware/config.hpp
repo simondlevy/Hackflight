@@ -89,14 +89,21 @@ struct PwmConfig {
 // RC config
 //=========================================================================
 
-// RC
-#define CONFIG_RC_CHANS    8
+struct RcConfig {
+
+    uint16_t mincheck = 1100;
+    uint16_t maxcheck = 1900;
+};
+
+#define CONFIG_MINCHECK    1100
+#define CONFIG_MAXCHECK    1900
+
 #define CONFIG_RC_EXPO_8   65
 #define CONFIG_RC_RATE_8   90
 #define CONFIG_THR_MID_8   50
 #define CONFIG_THR_EXPO_8  0
-#define CONFIG_MINCHECK    1100
-#define CONFIG_MAXCHECK    1900
+
+#define CONFIG_RC_CHANS    8
 #define CONFIG_PITCH_LOOKUP_LENGTH    7
 #define CONFIG_THROTTLE_LOOKUP_LENGTH 12
 
@@ -105,10 +112,11 @@ struct PwmConfig {
 //=========================================================================
 
 struct Config {
-    struct   LoopConfig loop;
-    struct   ImuConfig imu;
-    struct   PidConfig pid;
-    struct   PwmConfig pwm;
+    LoopConfig loop;
+    ImuConfig imu;
+    RcConfig rc;
+    PidConfig pid;
+    PwmConfig pwm;
     uint32_t initDelayMs = 100;
     uint32_t ledFlashCountOnStartup = 20;
 };
