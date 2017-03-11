@@ -57,7 +57,7 @@ class Hackflight {
         void blinkLedForTilt(void);
         bool gotRcUpdate(void);
         void flashLeds(void);
-        void initImuRc(void);
+        void initImuRc(const Config& config);
         void updateImu(void);
         void updateCalibrationState(void);
 
@@ -90,7 +90,9 @@ void Hackflight::init(Board * _board)
 {
     board = _board;
 
-    initImuRc();
+    const Config& config = board->getConfig();
+
+    initImuRc(config);
 
     stab.init(&rc, &imu);
     mixer.init(&rc, &stab); 
@@ -271,10 +273,9 @@ void Hackflight::flashLeds(void)
     }
 }
 
-void Hackflight::initImuRc(void)
+void Hackflight::initImuRc(const Config& config)
 {
     // Get particulars for board
-    const Config& config = board->getConfig();
     LoopConfig loopConfig = config.loop;
     ImuConfig imuConfig = config.imu;
 

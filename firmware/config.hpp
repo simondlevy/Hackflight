@@ -22,7 +22,9 @@
 
 namespace hf {
 
-// NB: angles are in tenths of a degree
+//=========================================================================
+// Loop time config
+//=========================================================================
 
 struct LoopConfig {
 
@@ -32,6 +34,12 @@ struct LoopConfig {
     uint32_t accelCalibrationPeriodMilli = 500;
     uint32_t rcLoopMilli                 = 20;
 };
+
+//=========================================================================
+// IMU config
+//=========================================================================
+
+// NB: angles are in tenths of a degree
 
 struct ImuConfig {
 
@@ -48,7 +56,6 @@ struct ImuConfig {
 };
 
 struct Config {
-
     struct   LoopConfig loop;
     struct   ImuConfig imu;
     uint32_t initDelayMs = 100;
@@ -56,7 +63,7 @@ struct Config {
 };
 
 //=========================================================================
-//RC config
+// RC config
 //=========================================================================
 
 enum {
@@ -70,10 +77,10 @@ enum {
     DEMAND_AUX4
 };
 
-#define CONFIG_RC_CHANS 8
 #define CONFIG_PWM_MIN  990
 #define CONFIG_PWM_MAX  2010
 
+#define CONFIG_RC_CHANS 8
 #define CONFIG_RC_EXPO_8   65
 #define CONFIG_RC_RATE_8   90
 #define CONFIG_THR_MID_8   50
@@ -83,10 +90,6 @@ enum {
 
 #define CONFIG_PITCH_LOOKUP_LENGTH    7
 #define CONFIG_THROTTLE_LOOKUP_LENGTH 12
-
-//=========================================================================
-//IMU config
-//=========================================================================
 
 //=========================================================================
 //PID config
