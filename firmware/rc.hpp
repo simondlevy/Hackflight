@@ -40,7 +40,7 @@ private:
 
 
 public:
-    void init();
+    void init(const PwmConfig& pwmConfig);
     void update(Board* _board);
 
     int16_t data[CONFIG_RC_CHANS]; // raw PWM values for MSP
@@ -59,9 +59,9 @@ public:
 
 /********************************************* CPP ********************************************************/
 
-void RC::init()
+void RC::init(const PwmConfig& pwmConfig)
 {
-    this->midrc = (CONFIG_PWM_MAX + CONFIG_PWM_MIN) / 2;
+    this->midrc = (pwmConfig.max + pwmConfig.min) / 2;
 
     memset (this->dataAverage, 0, 8*4*sizeof(int16_t));
 
@@ -84,7 +84,7 @@ void RC::init()
             y = CONFIG_THR_MID_8;
         lookupThrottleRC[i] = 10 * CONFIG_THR_MID_8 + tmp * (100 - CONFIG_THR_EXPO_8 + 
             (int32_t)CONFIG_THR_EXPO_8 * (tmp * tmp) / (y * y)) / 10;
-        lookupThrottleRC[i] = CONFIG_PWM_MIN + (int32_t)(CONFIG_PWM_MAX - CONFIG_PWM_MIN) * 
+        lookupThrottleRC[i] = pwmConfig.min + (int32_t)(pwmConfig.max - pwmConfig.min) * 
             lookupThrottleRC[i] / 1000; // [PWM_MIN;PWM_MAX]
     }
 }

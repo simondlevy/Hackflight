@@ -75,16 +75,46 @@ struct PidConfig {
     uint8_t yawI            = 45;
 };
 
+//=========================================================================
+// PWM config
+//=========================================================================
+
+struct PwmConfig {
+
+    uint16_t min = 900;
+    uint16_t max = 2010;
+};
+
+//=========================================================================
+// RC config
+//=========================================================================
+
+// RC
+#define CONFIG_RC_CHANS    8
+#define CONFIG_RC_EXPO_8   65
+#define CONFIG_RC_RATE_8   90
+#define CONFIG_THR_MID_8   50
+#define CONFIG_THR_EXPO_8  0
+#define CONFIG_MINCHECK    1100
+#define CONFIG_MAXCHECK    1900
+#define CONFIG_PITCH_LOOKUP_LENGTH    7
+#define CONFIG_THROTTLE_LOOKUP_LENGTH 12
+
+//=========================================================================
+// all config
+//=========================================================================
+
 struct Config {
     struct   LoopConfig loop;
     struct   ImuConfig imu;
     struct   PidConfig pid;
+    struct   PwmConfig pwm;
     uint32_t initDelayMs = 100;
     uint32_t ledFlashCountOnStartup = 20;
 };
 
 //=========================================================================
-// RC config
+// shared constants
 //=========================================================================
 
 enum {
@@ -97,20 +127,6 @@ enum {
     DEMAND_AUX3,
     DEMAND_AUX4
 };
-
-#define CONFIG_PWM_MIN  990
-#define CONFIG_PWM_MAX  2010
-
-#define CONFIG_RC_CHANS 8
-#define CONFIG_RC_EXPO_8   65
-#define CONFIG_RC_RATE_8   90
-#define CONFIG_THR_MID_8   50
-#define CONFIG_THR_EXPO_8  0
-#define CONFIG_MINCHECK    1100
-#define CONFIG_MAXCHECK    1900
-
-#define CONFIG_PITCH_LOOKUP_LENGTH    7
-#define CONFIG_THROTTLE_LOOKUP_LENGTH 12
 
 //=========================================================================
 // STM32 reboot support

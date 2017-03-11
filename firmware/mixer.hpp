@@ -22,17 +22,20 @@
 #include "debug.hpp"
 #include "stabilize.hpp"
 
+#include <cstring>
+
 namespace hf {
 
 class Mixer {
 public:
     int16_t  motorsDisarmed[4];
 
-    void init(RC * _rc, Stabilize * _stabilize);
+    void init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize);
 
     void update(bool armed, Board* board);
 
 private:
+    PwmConfig pwmConfig;
     RC        * rc;
     Stabilize * stabilize;
 
@@ -50,8 +53,10 @@ private:
 
 /********************************************* CPP ********************************************************/
 
-void Mixer::init(RC * _rc, Stabilize * _stabilize)
+void Mixer::init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize)
 {
+    memcpy(&pwmConfig, &_pwmConfig, sizeof(PwmConfig));
+
     this->stabilize = _stabilize;
     this->rc = _rc;
 
@@ -62,7 +67,7 @@ void Mixer::init(RC * _rc, Stabilize * _stabilize)
 
     // set disarmed motor values
     for (uint8_t i = 0; i < 4; i++)
-        this->motorsDisarmed[i] = CONFIG_PWM_MIN;
+        this->motorsDisarmed[i] = pwmConfig.min;
 }
 
 void Mixer::update(bool armed, Board* board)
@@ -85,14 +90,14 @@ void Mixer::update(bool armed, Board* board)
 
     for (uint8_t i = 0; i < 4; i++) {
 
-        if (maxMotor > CONFIG_PWM_MAX)     
+        if (maxMotor > pwmConfig.max)     
             // this is a way to still have good gyro corrections if at least one motor reaches its max.
-            motors[i] -= maxMotor - CONFIG_PWM_MAX;
+            motors[i] -= maxMotor - pwmConfig.max;
 
-        motors[i] = constrain(motors[i], CONFIG_PWM_MIN, CONFIG_PWM_MAX);
+        motors[i] = constrain(motors[i], pwmConfig.min, pwmConfig.max);
 
         if (this->rc->throttleIsDown()) {
-            motors[i] = CONFIG_PWM_MIN;
+            motors[i] = pwmConfig.min;
         } 
 
         if (!armed) {

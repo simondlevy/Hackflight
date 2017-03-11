@@ -95,7 +95,7 @@ void Hackflight::init(Board * _board)
     initImuRc(config);
 
     stab.init(config.pid, &rc, &imu);
-    mixer.init(&rc, &stab); 
+    mixer.init(config.pwm, &rc, &stab); 
     msp.init(&imu, &mixer, &rc, board);
 
     board->extrasInit(&msp);
@@ -308,7 +308,7 @@ void Hackflight::initImuRc(const Config& config)
     rcTask.init(loopConfig.rcLoopMilli * 1000);
     accelCalibrationTask.init(loopConfig.accelCalibrationPeriodMilli * 1000);
 
-    rc.init();
+    rc.init(config.pwm);
 }
 
 } // namespace
