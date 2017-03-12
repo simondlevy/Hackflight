@@ -72,10 +72,10 @@ class Naze : public Board {
 
         delay(100);
 
-        //motors[0].attach(15);
-        //motors[1].attach(14);
-        //motors[2].attach(8);
-        //motors[3].attach(0);
+        motors[0].attach(8);
+        motors[1].attach(11);
+        motors[2].attach(6);
+        motors[3].attach(7);
 
         imu = new MPU6050();
         imu->begin(AFS_8G, GFS_2000DPS);
