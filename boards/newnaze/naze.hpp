@@ -60,7 +60,7 @@ class Naze : public Board {
     }
 
 
-    virtual void init(uint16_t & acc1G, float & gyroScale, uint32_t & looptimeMicroseconds, uint32_t & calibratingGyroMsec) override
+    virtual void init(void) override
     {
         // Init LEDs
         pinMode(3, OUTPUT);
@@ -77,21 +77,21 @@ class Naze : public Board {
         //motors[2].attach(8);
         //motors[3].attach(0);
 
-        looptimeMicroseconds = CONFIG_IMU_LOOPTIME_USEC;
-        calibratingGyroMsec  = CONFIG_CALIBRATING_GYRO_MSEC;
-
         imu = new MPU6050();
         imu->begin(AFS_8G, GFS_2000DPS);
-
-        // Accel scale 8g (4096 LSB/g)
-        acc1G = 4096;
-
-        // 16.4 dps/lsb scalefactor for all Invensense devices
-        gyroScale = 16.4f;
     }
 
     virtual const Config& getConfig() override
     {
+        // PIDs
+        config.pid.levelP         = 40;
+        config.pid.levelI         = 2;
+        config.pid.ratePitchrollP = 20;
+        config.pid.ratePitchrollI = 15;
+        config.pid.ratePitchrollD = 11;
+        config.pid.yawP           = 40;
+        config.pid.yawI           = 20;
+
         return config;
     }
  
