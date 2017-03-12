@@ -46,17 +46,7 @@ class Naze : public Board {
 
     virtual void imuRead(int16_t accADC[3], int16_t gyroADC[3]) override
     {
-        int16_t ax, ay, az, gx, gy, gz;
-
-        if (imu->getMotion6Counts(&ax, &ay, &az, &gx, &gy, &gz)) {
-
-            accADC[0]  = -ay;
-            accADC[1]  = ax;
-            accADC[2]  = az;
-            gyroADC[0] = -gy;
-            gyroADC[1] = gx;
-            gyroADC[2] = gz;
-        }
+        imu->getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
     }
 
 
@@ -163,7 +153,7 @@ class Naze : public Board {
 
     virtual void writeMotor(uint8_t index, uint16_t value) override
     {
-        //motors[index].setSpeed(value);
+        motors[index].setSpeed(value);
     }
 
     virtual void showArmedStatus(bool armed) override
