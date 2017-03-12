@@ -47,13 +47,7 @@ private:
         float yaw;
     } motorMixer_t;
 
-	static constexpr motorMixer_t mixerQuadX[] = {
-		{ 1.0f, -1.0f,  1.0f, -1.0f },          // REAR_R
-		{ 1.0f, -1.0f, -1.0f,  1.0f },          // FRONT_R
-		{ 1.0f,  1.0f,  1.0f,  1.0f },          // REAR_L
-		{ 1.0f,  1.0f, -1.0f, -1.0f },          // FRONT_L
-	};
-
+	motorMixer_t mixerQuadX[4];
 };
 
 
@@ -61,6 +55,11 @@ private:
 
 void Mixer::init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize)
 {
+    mixerQuadX[0] = { +1.0f, -1.0f,  +1.0f, -1.0f };    // right rear
+    mixerQuadX[1] = { +1.0f, -1.0f,  -1.0f, +1.0f };    // right front
+    mixerQuadX[2] = { +1.0f, +1.0f,  +1.0f, +1.0f };    // left rear
+    mixerQuadX[3] = { +1.0f, +1.0f,  -1.0f, -1.0f };    // left front
+
     memcpy(&pwmConfig, &_pwmConfig, sizeof(PwmConfig));
 
     this->stabilize = _stabilize;
@@ -81,7 +80,6 @@ void Mixer::update(bool armed, Board* board)
          this->stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch + 
          this->stabilize->axisPID[AXIS_ROLL]  * mixerQuadX[i].roll - 
          this->stabilize->axisPID[AXIS_YAW]   * mixerQuadX[i].yaw);
-
 
     int16_t maxMotor = motors[0];
 
