@@ -82,12 +82,14 @@ class AlienflightF3 : public Board {
 
     virtual const Config& getConfig() override
     {
+        // Loop timing
         config.loop.imuLoopMicro                = 3500;
         config.loop.calibratingGyroMilli        = 3500;
         config.loop.calibratingAccelMilli       = 1400;
         config.loop.accelCalibrationPeriodMilli = 500;
         config.loop.rcLoopMilli                 = 20;
 
+        // PIDs
         config.pid.levelP         = 40;
         config.pid.levelI         = 2;
         config.pid.ratePitchrollP = 36;
@@ -96,6 +98,7 @@ class AlienflightF3 : public Board {
         config.pid.yawP           = 85;
         config.pid.yawI           = 45;
 
+        // IMU
         config.imu.acc1G               = 4096;
         config.imu.accelLpfFactor      = 4.f;
         config.imu.accelZDeadband      = 40;
@@ -107,9 +110,11 @@ class AlienflightF3 : public Board {
         config.imu.moronThreshold      = 32.f;  
         config.imu.smallAngle          = 250; 
 
+        // PWM
         config.pwm.min = 900;
         config.pwm.max = 2010;
 
+        // RC
         config.rc.mincheck = 1100;
         config.rc.maxcheck = 1900;
         config.rc.expo8     = 65;

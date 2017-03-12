@@ -199,8 +199,12 @@ void VrepSimBoard::init(void)
 const Config& VrepSimBoard::getConfig()
 {
     // Loop timing
-    config.loop.imuLoopMicro = 10000;        // VREP's shortest simulation period
-    config.loop.calibratingGyroMilli = 100;  // long enough to see but not to annoy
+    config.loop.imuLoopMicro                = 10000;        // VREP's shortest simulation period
+    config.loop.calibratingGyroMilli        = 100;  // long enough to see but not to annoy
+    config.loop.calibratingAccelMilli       = 1400;
+    config.loop.accelCalibrationPeriodMilli = 500;
+    config.loop.rcLoopMilli                 = 20;
+
 
     // PIDs
     config.pid.levelP          = 10;
@@ -210,6 +214,31 @@ const Config& VrepSimBoard::getConfig()
     config.pid.ratePitchrollD  = 3;
     config.pid.yawP            = 40;
     config.pid.yawI            = 20;
+
+    // IMU
+    config.imu.acc1G               = 4096;
+    config.imu.accelLpfFactor      = 4.f;
+    config.imu.accelZDeadband      = 40;
+    config.imu.accelXyDeadband     = 40;
+    config.imu.accelzLpfCutoff     = 5.f;
+    config.imu.gyroCmpfFactor      = 600.f;
+    config.imu.gyroScale           = 16.4f; // for Invensens IMUs (e.g., MPU6050)
+    config.imu.maxAngleInclination = 500;
+    config.imu.moronThreshold      = 32.f;  
+    config.imu.smallAngle          = 250; 
+
+    // PWM
+    config.pwm.min = 900;
+    config.pwm.max = 2010;
+
+    // RC
+    config.rc.mincheck = 1100;
+    config.rc.maxcheck = 1900;
+    config.rc.expo8     = 65;
+    config.rc.rate8     = 90;
+    config.rc.thrMid8   = 50;
+    config.rc.thrExpo8  = 0;
+
 
     return config;
 }
@@ -251,10 +280,10 @@ uint16_t VrepSimBoard::rcReadPwm(uint8_t chan)
 
     // Special handling for pitch, roll on PS3, XBOX360
     if (chan < 2) {
-       if (controller == PS3)
-        demand /= 2;
-       if (controller == XBOX360)
-        demand /= 1.5;
+        if (controller == PS3)
+            demand /= 2;
+        if (controller == XBOX360)
+            demand /= 1.5;
     }
 
     // Joystick demands are in [-1,+1]
