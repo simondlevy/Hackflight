@@ -29,17 +29,17 @@ namespace hf {
 struct PidConfig {
 
     // Level (accelerometer)
-    uint8_t levelP          = 40;
-    uint8_t levelI          = 2;
+    uint8_t levelP;
+    uint8_t levelI;
 
     // Rate (gyro): P must be positive
-    uint8_t ratePitchrollP = 36;
-    uint8_t ratePitchrollI = 30;
-    uint8_t ratePitchrollD = 23;
+    uint8_t ratePitchrollP;
+    uint8_t ratePitchrollI;
+    uint8_t ratePitchrollD;
 
     // Yaw: P must be positive
-    uint8_t yawP            = 85;
-    uint8_t yawI            = 45;
+    uint8_t yawP;
+    uint8_t yawI;
 };
 
 //=========================================================================
@@ -48,11 +48,11 @@ struct PidConfig {
 
 struct LoopConfig {
 
-    uint32_t imuLoopMicro                = 3500;
-    uint32_t calibratingGyroMilli        = 3500;
-    uint32_t calibratingAccelMilli       = 1400;
-    uint32_t accelCalibrationPeriodMilli = 500;
-    uint32_t rcLoopMilli                 = 20;
+    uint32_t imuLoopMicro;
+    uint32_t calibratingGyroMilli;
+    uint32_t calibratingAccelMilli;
+    uint32_t accelCalibrationPeriodMilli;
+    uint32_t rcLoopMilli;
 };
 
 //=========================================================================
@@ -63,16 +63,16 @@ struct LoopConfig {
 
 struct ImuConfig {
 
-    uint16_t acc1G               = 4096;
-    float    accelLpfFactor      = 4.f;
-    int32_t  accelZDeadband      = 40;
-    int32_t  accelXyDeadband     = 40;
-    float    accelzLpfCutoff     = 5.f;
-    float    gyroCmpfFactor      = 600.f;
-    float    gyroScale           = 16.4f; // for Invensens IMUs (e.g., MPU6050)
-    uint16_t maxAngleInclination = 500;
-    float    moronThreshold      = 32.f;  // variance in motion that triggers recalibration
-    uint16_t smallAngle          = 250; 
+    uint16_t acc1G;
+    float    accelLpfFactor;
+    int32_t  accelZDeadband;
+    int32_t  accelXyDeadband;
+    float    accelzLpfCutoff;
+    float    gyroCmpfFactor;
+    float    gyroScale; 
+    uint16_t maxAngleInclination;
+    float    moronThreshold;  // variance in motion that triggers recalibration
+    uint16_t smallAngle; 
 };
 
 
@@ -82,8 +82,8 @@ struct ImuConfig {
 
 struct PwmConfig {
 
-    uint16_t min = 900;
-    uint16_t max = 2010;
+    uint16_t min;
+    uint16_t max;
 };
 
 //=========================================================================
@@ -92,12 +92,12 @@ struct PwmConfig {
 
 struct RcConfig {
 
-    uint16_t mincheck = 1100;
-    uint16_t maxcheck = 1900;
-    int16_t expo8     = 65;
-    int16_t rate8     = 90;
-    int16_t thrMid8   = 50;
-    int32_t thrExpo8  = 0;
+    uint16_t mincheck;
+    uint16_t maxcheck;
+    int16_t expo8;
+    int16_t rate8;
+    int16_t thrMid8;
+    int32_t thrExpo8;
 };
 
 // Keep these static const for now, to avoid dynamic memory allocation

@@ -82,9 +82,44 @@ class AlienflightF3 : public Board {
 
     virtual const Config& getConfig() override
     {
+        config.loop.imuLoopMicro                = 3500;
+        config.loop.calibratingGyroMilli        = 3500;
+        config.loop.calibratingAccelMilli       = 1400;
+        config.loop.accelCalibrationPeriodMilli = 500;
+        config.loop.rcLoopMilli                 = 20;
+
+        config.pid.levelP         = 40;
+        config.pid.levelI         = 2;
+        config.pid.ratePitchrollP = 36;
+        config.pid.ratePitchrollI = 30;
+        config.pid.ratePitchrollD = 23;
+        config.pid.yawP           = 85;
+        config.pid.yawI           = 45;
+
+        config.imu.acc1G               = 4096;
+        config.imu.accelLpfFactor      = 4.f;
+        config.imu.accelZDeadband      = 40;
+        config.imu.accelXyDeadband     = 40;
+        config.imu.accelzLpfCutoff     = 5.f;
+        config.imu.gyroCmpfFactor      = 600.f;
+        config.imu.gyroScale           = 16.4f; // for Invensens IMUs (e.g., MPU6050)
+        config.imu.maxAngleInclination = 500;
+        config.imu.moronThreshold      = 32.f;  
+        config.imu.smallAngle          = 250; 
+
+        config.pwm.min = 900;
+        config.pwm.max = 2010;
+
+        config.rc.mincheck = 1100;
+        config.rc.maxcheck = 1900;
+        config.rc.expo8     = 65;
+        config.rc.rate8     = 90;
+        config.rc.thrMid8   = 50;
+        config.rc.thrExpo8  = 0;
+
         return config;
     }
- 
+
     virtual void checkReboot(bool pendReboot) override
     {
         if (pendReboot)
