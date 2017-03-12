@@ -47,7 +47,13 @@ private:
         float yaw;
     } motorMixer_t;
 
-    motorMixer_t mixerQuadX[4];
+	static constexpr motorMixer_t mixerQuadX[] = {
+		{ 1.0f, -1.0f,  1.0f, -1.0f },          // REAR_R
+		{ 1.0f, -1.0f, -1.0f,  1.0f },          // FRONT_R
+		{ 1.0f,  1.0f,  1.0f,  1.0f },          // REAR_L
+		{ 1.0f,  1.0f, -1.0f, -1.0f },          // FRONT_L
+	};
+
 };
 
 
@@ -59,11 +65,6 @@ void Mixer::init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize)
 
     this->stabilize = _stabilize;
     this->rc = _rc;
-
-    mixerQuadX[0] = { +1.0f, -1.0f,  +1.0f, -1.0f };    // right rear
-    mixerQuadX[1] = { +1.0f, -1.0f,  -1.0f, +1.0f };    // right front
-    mixerQuadX[2] = { +1.0f, +1.0f,  +1.0f, +1.0f };    // left rear
-    mixerQuadX[3] = { +1.0f, +1.0f,  -1.0f, -1.0f };    // left front
 
     // set disarmed motor values
     for (uint8_t i = 0; i < 4; i++)

@@ -20,7 +20,8 @@
 
 #pragma once
 
-#include <string.h>
+#include <cstring>
+#include <algorithm>
 
 #include "board.hpp"
 #include "config.hpp"
@@ -144,7 +145,7 @@ void RC::computeExpo(void)
 
     for (uint8_t channel = 0; channel < 3; channel++) {
 
-        tmp = std::min(abs(this->data[channel] - this->midrc), 500);
+        tmp = (std::min)(abs(this->data[channel] - this->midrc), 500);
 
         if (channel != DEMAND_YAW) { // roll, pitch
             tmp2 = tmp / 100;

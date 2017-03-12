@@ -225,7 +225,7 @@ void IMU::init(ImuConfig & imuConfig, uint16_t _calibratingGyroCycles, uint16_t 
     EstN[2] = 0.0f;
 
     // Convert gyro scale from degrees to radians
-    gyroScale = (4.0f / config.gyroScale) * (M_PI / 180.0f);
+    gyroScale = (float)(4.0f / config.gyroScale) * ((float)M_PI / 180.0f);
 
     // calculate RC time constant used in the accelZ lpf    
     fcAcc = (float)(0.5f / (M_PI * config.accelzLpfCutoff)); 

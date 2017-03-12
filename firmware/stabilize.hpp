@@ -20,6 +20,8 @@
 
 #include <cstdint>
 #include <cstring>
+#include <algorithm>
+#include <limits>
 
 #include "rc.hpp"
 #include "imu.hpp"
@@ -117,7 +119,7 @@ void Stabilize::update(void)
             this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
             int32_t ITermACC = ((int32_t)(this->errorAngleI[axis] * config.levelI)) >> 12;
 
-            int32_t prop = std::max(std::abs(this->rc->command[DEMAND_PITCH]), 
+            int32_t prop = (std::max)(std::abs(this->rc->command[DEMAND_PITCH]), 
                                     std::abs(this->rc->command[DEMAND_ROLL])); // range [0;500]
 
             PTerm = (PTermACC * (500 - prop) + PTermGYRO * prop) / 500;

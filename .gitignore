@@ -1,3 +1,6 @@
+sim/outdoors/Release/v_repExtHackflight.iobj
+sim/outdoors/Release/v_repExtHackflight.ipdb
+sim/outdoors/v_repExtHackflight.VC.db
 boards/newnaze/*.o
 boards/newnaze/*.hex
 boards/newnaze/*.elf

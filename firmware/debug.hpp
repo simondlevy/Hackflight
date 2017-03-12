@@ -19,6 +19,7 @@
 #pragma once
 
 #include "board.hpp"
+#include "common.hpp"
 
 namespace hf {
 
@@ -30,7 +31,7 @@ void debug(Board * board, const char * fmt, ...)
 
     char buf[1000];
 
-    vsprintf(buf, fmt, ap);
+    VSPRINTF(buf, fmt, ap);
 
     board->dump(buf);
 

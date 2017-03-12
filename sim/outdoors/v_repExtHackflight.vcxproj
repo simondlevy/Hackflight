@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -26,11 +26,16 @@
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -118,21 +123,8 @@
     <ClCompile Include="..\..\..\..\..\..\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\common\scriptFunctionData.cpp" />
     <ClCompile Include="..\..\..\..\..\..\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\common\scriptFunctionDataItem.cpp" />
     <ClCompile Include="..\..\..\..\..\..\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\common\v_repLib.cpp" />
-    <ClCompile Include="..\..\firmware\board.cpp" />
-    <ClCompile Include="..\..\firmware\filters.cpp" />
-    <ClCompile Include="..\..\firmware\hackflight.cpp" />
-    <ClCompile Include="..\..\firmware\imu.cpp" />
-    <ClCompile Include="..\..\firmware\mixer.cpp" />
-    <ClCompile Include="..\..\firmware\msp.cpp" />
-    <ClCompile Include="..\..\firmware\rc.cpp" />
-    <ClCompile Include="..\..\firmware\stabilize.cpp" />
     <ClCompile Include="..\controller_Windows.cpp" />
     <ClCompile Include="..\v_repExtHackflight.cpp" />
-    <ClCompile Include="sim_extras.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\firmware\crossplatform.h" />
-    <ClInclude Include="pidvals.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
