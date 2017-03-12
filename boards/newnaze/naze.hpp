@@ -163,7 +163,7 @@ class Naze : public Board {
 
     virtual void writeMotor(uint8_t index, uint16_t value) override
     {
-        motors[index].setSpeed(value);
+        //motors[index].setSpeed(value);
     }
 
     virtual void showArmedStatus(bool armed) override
