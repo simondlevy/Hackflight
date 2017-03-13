@@ -47,4 +47,6 @@
 #define M_PIl static_cast<long double>(3.1415926535897932384626433832795028841972)
 #endif
 
+#ifndef constrain
 #define constrain(val, lo, hi) (val) < (lo) ? (lo) : ((val) > (hi) ? (hi) : (val))
+#endif

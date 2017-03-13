@@ -1,1 +1,1 @@
-/home/levys/Desktop/hackflight/firmware/rc.hpp
+../../../firmware/rc.hpp
