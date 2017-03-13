@@ -1,5 +1,5 @@
 /*
-   hackflight.ino : Main Hackflight script for Teensy 3.2
+   hackflight.ino : Main Hackflight sketch for Teensy 3.2
 
    This file is part of Hackflight.
 
@@ -30,5 +30,5 @@ void setup(void)
 
 void loop(void)
 {
-    //h.update();
+    h.update();
 }
