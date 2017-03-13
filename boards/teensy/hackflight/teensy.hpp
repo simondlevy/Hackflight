@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <Arduino.h>
+#include <i2c_t3.h>
 #include <SpektrumDSM.h>
-#include <MPU6050.h>
+#include <EM7180.h>
 
 #include <math.h>
 
@@ -28,6 +28,8 @@
 #include "hackflight.hpp"
 
 SpektrumDSM2048 rx;
+
+EM7180 em7180;
 
 namespace hf {
 
@@ -40,11 +42,20 @@ class Teensy : public Board {
 
     virtual void imuRead(int16_t accADC[3], int16_t gyroADC[3]) override
     {
+        em7180.getRawIMU(accADC, gyroADC);
     }
 
 
     virtual void init(void) override
     {
+        // Setup for Master mode, pins 18/19, external pullups, 400kHz for Teensy 3.1
+        Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
+
+        // Begin serial comms
+        Serial.begin(15200);
+        
+        // Start the EM7180 (for now, only specify IMU params)
+        em7180.begin(AFS_8G, GFS_2000DPS);
     }
 
     virtual const Config& getConfig() override
