@@ -52,21 +52,6 @@ class Teensy : public Board {
         pinMode(27, OUTPUT);
         pinMode(29, OUTPUT);
 
-        pinMode(27, OUTPUT);
-        pinMode(29, OUTPUT);
-
-        for (int k=0; k<20; ++k) {
-          digitalWrite(27, LOW);
-          digitalWrite(29, HIGH);
-          delay(50);
-          digitalWrite(27, HIGH);
-          digitalWrite(29, LOW);
-          delay(50);  
-        }
-
-        digitalWrite(27, HIGH);
-        digitalWrite(29, HIGH);        
-
         // Setup for Master mode, pins 18/19, external pullups, 400kHz for Teensy 3.1
         //Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
 

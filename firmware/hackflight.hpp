@@ -91,7 +91,11 @@ void Hackflight::init(Board * _board)
 {  
     board = _board;
 
+    // Do hardware initialization
     board->init();
+
+    // Flash the LEDs to indicate startup
+    flashLeds();
 
     const Config& config = board->getConfig();
 
@@ -254,11 +258,11 @@ void Hackflight::blinkLedForTilt(void)
     static bool on;
 
     if (on) {
-        //board->ledSet(0, false);
+        board->ledSet(0, false);
         on = false;
     }
     else {
-        //board->ledSet(0, true);
+        board->ledSet(0, true);
         on = true;
     }
 }
@@ -268,11 +272,11 @@ void Hackflight::flashLeds(void)
     board->ledSet(0, false);
     board->ledSet(1, false);
     for (uint8_t i = 0; i < 20; i++) {
-        board->ledSet(1, true);
         board->ledSet(0, true);
-        board->delayMilliseconds(50);
         board->ledSet(1, false);
+        board->delayMilliseconds(50);
         board->ledSet(0, false);
+        board->ledSet(1, true);
         board->delayMilliseconds(50);
     }
     board->ledSet(0, false);
@@ -302,9 +306,6 @@ void Hackflight::initImuRc(const Config& config)
 
     // sleep for 100ms
     board->delayMilliseconds(100);
-
-    // flash the LEDs to indicate startup
-    flashLeds();
 
     // initializing timing tasks
     imuTask.init(loopConfig.imuLoopMicro);
