@@ -84,9 +84,9 @@ class Teensy : public Board {
         delay(msec);
     }
 
-    virtual uint32_t getMicros() override
+    virtual uint64_t getMicros() override
     {
-        return micros();
+        return (uint64_t)micros();
     }
 
     virtual void imuRead(int16_t accelADC[3], int16_t gyroADC[3]) override

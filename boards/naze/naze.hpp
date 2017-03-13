@@ -96,9 +96,9 @@ class Naze : public Board {
         delay(msec);
     }
 
-    virtual uint32_t getMicros() override
+    virtual uint64_t getMicros() override
     {
-        return micros();
+        return (int64_t)micros();
     }
 
     virtual void ledSet(uint8_t id, bool is_on, float max_brightness) override
