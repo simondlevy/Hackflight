@@ -106,7 +106,7 @@ LIBRARY vrepLib;
 // Hackflight interface
 extern void setup(void);
 extern void loop(void);
-static uint32_t micros;
+static uint64_t micros;
 
 // Launch support
 static bool ready;
@@ -234,7 +234,7 @@ void VrepSimBoard::ledSet(uint8_t id, bool is_on, float max_brightness)
     leds[id].set(is_on);
 }
 
-uint32_t VrepSimBoard::getMicros()
+uint64_t VrepSimBoard::getMicros()
 {
     return micros; 
 }
@@ -531,7 +531,7 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 	}
 
     // Increment microsecond count
-    micros += (uint32_t)(1e6 * timestep);
+    micros += (uint64_t)(1e6 * timestep);
 
     // Do any extra update needed
     simExtrasUpdate();

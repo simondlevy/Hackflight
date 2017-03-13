@@ -34,7 +34,7 @@ namespace hf {
             virtual const Config& getConfig() override;
             virtual void imuRead(int16_t accADC[3], int16_t gyroADC[3]) override;
             virtual void ledSet(uint8_t id, bool is_on, float max_brightness)  override;
-            virtual uint32_t getMicros() override;
+            virtual uint64_t getMicros() override;
             virtual bool rcUseSerial(void) override;
             virtual uint16_t rcReadPwm(uint8_t chan) override;
             virtual uint8_t serialAvailableBytes(void) override;
