@@ -61,7 +61,7 @@ class Beef : public Board {
         Wire.begin(2);
 
         delay(100);
-
+        
         motors[0].attach(8);
         motors[1].attach(11);
         motors[2].attach(6);
