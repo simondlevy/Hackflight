@@ -88,8 +88,10 @@ class Hackflight {
 /********************************************* CPP ********************************************************/
 
 void Hackflight::init(Board * _board)
-{
+{  
     board = _board;
+
+    board->init();
 
     const Config& config = board->getConfig();
 
@@ -233,6 +235,7 @@ void Hackflight::updateCalibrationState(void)
         else
             board->ledSet(1, false);
     }
+    
 
     // If angle too steep, restart accel calibration and flash LED
     if (accelCalibrationTask.check(currentTime)) {
@@ -251,11 +254,11 @@ void Hackflight::blinkLedForTilt(void)
     static bool on;
 
     if (on) {
-        board->ledSet(0, false);
+        //board->ledSet(0, false);
         on = false;
     }
     else {
-        board->ledSet(0, true);
+        //board->ledSet(0, true);
         on = true;
     }
 }
@@ -264,7 +267,7 @@ void Hackflight::flashLeds(void)
 {
     board->ledSet(0, false);
     board->ledSet(1, false);
-    for (uint8_t i = 0; i < 10; i++) {
+    for (uint8_t i = 0; i < 20; i++) {
         board->ledSet(1, true);
         board->ledSet(0, true);
         board->delayMilliseconds(50);
@@ -272,6 +275,8 @@ void Hackflight::flashLeds(void)
         board->ledSet(0, false);
         board->delayMilliseconds(50);
     }
+    board->ledSet(0, false);
+    board->ledSet(1, false);
 }
 
 void Hackflight::initImuRc(const Config& config)
@@ -282,9 +287,6 @@ void Hackflight::initImuRc(const Config& config)
 
     // Store some for later
     smallAngle = imuConfig.smallAngle;
-
-    // Initialize board hardware
-    board->init();
 
     // compute loop times based on config from board
     calibratingGyroCycles   = (uint16_t)(1000. * loopConfig.calibratingGyroMilli  / loopConfig.imuLoopMicro);

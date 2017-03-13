@@ -25,12 +25,10 @@ hf::Hackflight h;
 
 void setup(void)
 {
-    Serial.begin(115200);
     h.init(new hf::Teensy());
 }
 
 void loop(void)
 {
-    Serial.printf("%d\n", millis());
-    h.update();
+    //h.update();
 }

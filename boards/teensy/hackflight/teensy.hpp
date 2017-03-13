@@ -27,9 +27,9 @@
 #include "board.hpp"
 #include "hackflight.hpp"
 
-SpektrumDSM2048 rx;
+//SpektrumDSM2048 rx;
 
-EM7180 em7180;
+//EM7180 em7180;
 
 namespace hf {
 
@@ -42,20 +42,39 @@ class Teensy : public Board {
 
     virtual void imuRead(int16_t accADC[3], int16_t gyroADC[3]) override
     {
-        em7180.getRawIMU(accADC, gyroADC);
+        //em7180.getRawIMU(accADC, gyroADC);
     }
 
 
     virtual void init(void) override
     {
+        // Setup LEDs
+        pinMode(27, OUTPUT);
+        pinMode(29, OUTPUT);
+
+        pinMode(27, OUTPUT);
+        pinMode(29, OUTPUT);
+
+        for (int k=0; k<20; ++k) {
+          digitalWrite(27, LOW);
+          digitalWrite(29, HIGH);
+          delay(50);
+          digitalWrite(27, HIGH);
+          digitalWrite(29, LOW);
+          delay(50);  
+        }
+
+        digitalWrite(27, HIGH);
+        digitalWrite(29, HIGH);        
+
         // Setup for Master mode, pins 18/19, external pullups, 400kHz for Teensy 3.1
-        Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
+        //Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
 
         // Begin serial comms
-        Serial.begin(15200);
+        //Serial.begin(15200);
         
         // Start the EM7180 (for now, only specify IMU params)
-        em7180.begin(AFS_8G, GFS_2000DPS);
+        //em7180.begin(AFS_8G, GFS_2000DPS);
     }
 
     virtual const Config& getConfig() override
@@ -91,24 +110,24 @@ class Teensy : public Board {
     { 
         (void)max_brightness;
 
-        digitalWrite(id ? 27 : 28, is_on ? HIGH : LOW);
+        digitalWrite(id ? 27 : 29, is_on ? LOW : HIGH);
     }
 
     virtual bool rcSerialReady(void) override
     {
-        return rx.frameComplete();
+        return false;//rx.frameComplete();
     }
 
     virtual bool rcUseSerial(void) override
     {
-        rx.begin();
+        //rx.begin();
         return true;
     }
 
     virtual uint16_t rcReadSerial(uint8_t chan) override
     {
-        uint8_t chanmap[5] = {1, 2, 3, 0, 5};
-        return rx.readRawRC(chanmap[chan]);
+        //uint8_t chanmap[5] = {1, 2, 3, 0, 5};
+        return 1500;//rx.readRawRC(chanmap[chan]);
     }
 
     virtual uint16_t rcReadPwm(uint8_t chan) override
@@ -123,17 +142,17 @@ class Teensy : public Board {
 
     virtual uint8_t serialAvailableBytes(void) override
     {
-        return Serial.available();
+        return 0;//Serial.available();
     }
 
     virtual uint8_t serialReadByte(void) override
     {
-        return Serial.read();
+        return 0;//Serial.read();
     }
 
     virtual void serialWriteByte(uint8_t c) override
     {
-        Serial.write(c);
+        //Serial.write(c);
     }
 
     virtual void writeMotor(uint8_t index, uint16_t value) override
