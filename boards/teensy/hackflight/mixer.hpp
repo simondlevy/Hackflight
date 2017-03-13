@@ -1,1 +1,1 @@
-../../../firmware/mixer.hpp
+/home/levys/Desktop/hackflight/firmware/mixer.hpp
