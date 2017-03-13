@@ -37,14 +37,8 @@ class Teensy : public Board {
 
     virtual void dump(char * msg) override
     {
-        Serial.printf("%s\n", msg);
+        Serial.printf("%s", msg);
     }
-
-    virtual void imuRead(int16_t accADC[3], int16_t gyroADC[3]) override
-    {
-        em7180.getRawIMU(accADC, gyroADC);
-    }
-
 
     virtual void init(void) override
     {
@@ -57,13 +51,16 @@ class Teensy : public Board {
 
         // Begin serial comms
         Serial.begin(15200);
-        
+
         // Start the EM7180 (for now, only specify IMU params)
         em7180.begin(AFS_8G, GFS_2000DPS);
     }
 
     virtual const Config& getConfig() override
     {
+        // IMU
+        config.imu.acc1G = 2048;
+
         // PIDs
         config.pid.levelP         = 40;
         config.pid.levelI         = 2;
@@ -89,6 +86,11 @@ class Teensy : public Board {
     virtual uint32_t getMicros() override
     {
         return micros();
+    }
+
+    virtual void imuRead(int16_t accelADC[3], int16_t gyroADC[3]) override
+    {
+        em7180.getRawIMU(accelADC, gyroADC);
     }
 
     virtual void ledSet(uint8_t id, bool is_on, float max_brightness) override
