@@ -57,7 +57,7 @@ class Hackflight {
     private:
         void blinkLedForTilt(void);
         bool gotRcUpdate(void);
-        void flashLeds(void);
+        void flashLeds(const InitConfig& config);
         void initImuRc(const Config& config);
         void updateImu(void);
         void updateCalibrationState(void);
@@ -91,13 +91,14 @@ void Hackflight::init(Board * _board)
 {  
     board = _board;
 
-    // Do hardware initialization
+    // Do hardware initialization for board
     board->init();
 
-    // Flash the LEDs to indicate startup
-    flashLeds();
-
+    // Get board configuration
     const Config& config = board->getConfig();
+
+    // Flash the LEDs to indicate startup
+    flashLeds(config.init);
 
     initImuRc(config);
 
@@ -267,17 +268,18 @@ void Hackflight::blinkLedForTilt(void)
     }
 }
 
-void Hackflight::flashLeds(void)
+void Hackflight::flashLeds(const InitConfig& config)
 {
+    uint32_t pauseMilli = config.ledFlashMilli / config.ledFlashCount;
     board->ledSet(0, false);
     board->ledSet(1, false);
-    for (uint8_t i = 0; i < 20; i++) {
+    for (uint8_t i = 0; i < config.ledFlashCount; i++) {
         board->ledSet(0, true);
         board->ledSet(1, false);
-        board->delayMilliseconds(50);
+        board->delayMilliseconds(pauseMilli);
         board->ledSet(0, false);
         board->ledSet(1, true);
-        board->delayMilliseconds(50);
+        board->delayMilliseconds(pauseMilli);
     }
     board->ledSet(0, false);
     board->ledSet(1, false);
@@ -304,8 +306,8 @@ void Hackflight::initImuRc(const Config& config)
 
     imu.init(imuConfig, calibratingGyroCycles, calibratingAccelCycles);
 
-    // sleep for 100ms
-    board->delayMilliseconds(100);
+    // sleep  a bit to allow IMU to catch up
+    board->delayMilliseconds(config.init.delayMilli);
 
     // initializing timing tasks
     imuTask.init(loopConfig.imuLoopMicro);

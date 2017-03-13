@@ -100,10 +100,16 @@ struct RcConfig {
     int32_t thrExpo8	 = 0;
 };
 
-// Keep these static const for now, to avoid dynamic memory allocation
-static const uint8_t CONFIG_RC_CHANS                = 8;
-static const uint8_t CONFIG_PITCH_LOOKUP_LENGTH     = 7;
-static const uint8_t CONFIG_THROTTLE_LOOKUP_LENGTH  = 12;
+//=========================================================================
+// initialization config
+//=========================================================================
+
+struct InitConfig {
+
+    uint32_t delayMilli    = 100;
+    uint32_t ledFlashMilli = 1000;
+    uint32_t ledFlashCount = 20;
+};
 
 //=========================================================================
 // all config
@@ -115,8 +121,7 @@ struct Config {
     RcConfig rc;
     PidConfig pid;
     PwmConfig pwm;
-    uint32_t initDelayMs = 100;
-    uint32_t ledFlashCountOnStartup = 20;
+    InitConfig init;
 };
 
 //=========================================================================
@@ -133,6 +138,14 @@ enum {
     DEMAND_AUX3,
     DEMAND_AUX4
 };
+
+//=========================================================================
+// static constants, to avoid dynamic memory allocation
+//=========================================================================
+
+static const uint8_t CONFIG_RC_CHANS                = 8;
+static const uint8_t CONFIG_PITCH_LOOKUP_LENGTH     = 7;
+static const uint8_t CONFIG_THROTTLE_LOOKUP_LENGTH  = 12;
 
 //=========================================================================
 // STM32 reboot support
