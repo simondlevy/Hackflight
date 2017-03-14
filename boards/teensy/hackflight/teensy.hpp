@@ -52,6 +52,9 @@ class Teensy : public Board {
         // Begin serial comms
         Serial.begin(15200);
 
+        // Start the receiver
+        rx.begin();
+
         // Start the EM7180 (for now, only specify IMU params)
         em7180.begin(AFS_8G, GFS_2000DPS);
     }
@@ -114,8 +117,8 @@ class Teensy : public Board {
 
     virtual uint16_t rcReadSerial(uint8_t chan) override
     {
-        //uint8_t chanmap[5] = {1, 2, 3, 0, 5};
-        return 1500;//rx.readRawRC(chanmap[chan]);
+        uint8_t chanmap[5] = {1, 2, 3, 0, 5};
+        return rx.readRawRC(chanmap[chan]);
     }
 
     virtual uint16_t rcReadPwm(uint8_t chan) override
