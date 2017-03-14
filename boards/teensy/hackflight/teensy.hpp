@@ -52,9 +52,6 @@ class Teensy : public Board {
         // Begin serial comms
         Serial.begin(15200);
 
-        // Start the receiver
-        rx.begin();
-
         // Start the EM7180 (for now, only specify IMU params)
         em7180.begin(AFS_8G, GFS_2000DPS);
     }
@@ -106,12 +103,12 @@ class Teensy : public Board {
 
     virtual bool rcSerialReady(void) override
     {
-        return false;//rx.frameComplete();
+        return rx.frameComplete();
     }
 
     virtual bool rcUseSerial(void) override
     {
-        //rx.begin();
+        rx.begin();
         return true;
     }
 
