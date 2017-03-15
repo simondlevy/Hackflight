@@ -59,9 +59,10 @@ class Teensy : public Board {
     virtual const Config& getConfig() override
     {
         // IMU
-        config.imu.acc1G         = 2048;
-        config.imu.gyroScale     = 8.2f;
-        config.imu.directionYaw  = -1;
+        config.imu.acc1G          = 2048;
+        config.imu.gyroScale      = 8.2f;
+        config.imu.directionYaw   = -1;
+        config.imu.directionPitch = -1;
 
         // PIDs
         config.pid.levelP         = 40;
