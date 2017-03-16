@@ -22,13 +22,15 @@
 
 # Change these values according to where you put your repositories ----------------
 
-BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
+HACKFLIGHT_DIR = $(HOME)/Desktop/hackflight
 
-FIRMWARE_DIR = $(HOME)/Desktop/hackflight/firmware
+BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 ARDUINO_DIR = $(HOME)/Development/arduino-1.8.1/hardware/teensy/avr/libraries
 
 # Nothing below here should be changed ---------------------------------------------
+
+FIRMWARE_DIR = $(HACKFLIGHT_DIR)/include
 
 PROJECT = Hackflight
 
@@ -44,7 +46,7 @@ export OPTIONS
 DEBUG ?=
 
 # Serial port/Device for flashing
-SERIAL_DEVICE	?= /dev/ttyACM0
+SERIAL_DEVICE	?= /dev/ttyACM1
 
 # Flash size (KB).  Some low-end chips actually have more flash than advertised, use this to override.
 FLASH_SIZE ?=

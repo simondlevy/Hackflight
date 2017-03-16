@@ -1,1 +1,1 @@
-../../../firmware/board.hpp
+/home/levy/Desktop/hackflight/include/board.hpp

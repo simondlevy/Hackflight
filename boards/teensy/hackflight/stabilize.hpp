@@ -1,1 +1,1 @@
-../../../firmware/stabilize.hpp
+/home/levy/Desktop/hackflight/include/stabilize.hpp

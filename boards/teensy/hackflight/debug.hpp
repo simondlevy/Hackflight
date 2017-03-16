@@ -1,1 +1,1 @@
-../../../firmware/debug.hpp
+/home/levy/Desktop/hackflight/include/debug.hpp

@@ -1,1 +1,1 @@
-../../../firmware/config.hpp
+/home/levy/Desktop/hackflight/include/config.hpp

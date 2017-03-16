@@ -1,4 +1,4 @@
-# Hackflight: Simple quadcopter flight control firmware and simulator for C++ hackers
+# Hackflight: Simple quadcopter flight control firmware and simulation for C++ hackers
 
 Hackflight is simple header-only C++ firmware for quadcopter flight
 controllers and simulators.  It is geared toward people like me who want to
@@ -19,7 +19,7 @@ Multiwii), and currently works on STM32F103 flight-controller boards
 and the Arduino-compatible Teensy 3.1/3.2
 microcontroller (with additional hardware).  Thanks to a major effort by
 [Sytelus](https://github.com/sytelus), the core Hackflight 
-[firmware ](https://github.com/simondlevy/hackflight/tree/master/firmware) now
+[firmware ](https://github.com/simondlevy/hackflight/tree/master/include) now
 adheres to best practices for C++.  As you can 
 [see](https://github.com/simondlevy/hackflight/blob/master/boards/alienflightf3/hackflight.cpp), 
 the code follows the Arduino
@@ -31,7 +31,7 @@ abstraction (through the <tt>Board</tt> class) that should make it easy to use
 on other boards.  
 
 The only parameters you should need to adjust are the PID tuning 
-[params](https://github.com/simondlevy/hackflight/blob/master/firmware/config.hpp#L25-L43).  As 
+[params](https://github.com/simondlevy/hackflight/blob/master/include/config.hpp#L25-L43).  As 
 with Baseflight, you get a gyro auto-calibration sequence on startup, indicated
 by  steady green LED that turns off when the calibration is done.  You can
 re-calibrate the gyro by putting the collective (left) stick in full upper-left

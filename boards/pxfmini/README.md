@@ -1,1 +1,1 @@
-Experimental support for the Erle Robotics PXFMini board
+Experimental support for the Erle Robotics PXFMini board.  Not yet implemented.
