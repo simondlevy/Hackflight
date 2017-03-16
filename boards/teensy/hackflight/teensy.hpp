@@ -31,6 +31,8 @@ SpektrumDSM2048 rx;
 
 EM7180 em7180;
 
+static uint8_t motorPins[4] = {9, 22, 5, 23};
+
 namespace hf {
 
 class Teensy : public Board {
@@ -54,6 +56,12 @@ class Teensy : public Board {
 
         // Start the EM7180 (for now, only specify IMU params)
         em7180.begin(AFS_8G, GFS_2000DPS);
+
+        // Initialize the motors
+        for (int k=0; k<4; ++k) {
+              analogWriteFrequency(motorPins[k], 200);  
+              analogWrite(motorPins[k], 0);  
+        }
     }
 
     virtual const Config& getConfig() override
@@ -147,6 +155,11 @@ class Teensy : public Board {
 
     virtual void writeMotor(uint8_t index, uint16_t value) override
     {
+        uint8_t aval = map(value, 900, 1900, 0, 255);
+
+        analogWrite(motorPins[index], aval);
+
+        Serial.printf("%d:%d:%d%c", index, value, aval, index==3?'\n':'\t');
     }
 
     virtual void showArmedStatus(bool armed) override
