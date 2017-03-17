@@ -399,7 +399,6 @@ class GCS:
 
         values = [PWM_MIN]*4
         values[index-1] += int(percent/100. * (PWM_MAX-PWM_MIN))
-        print(values)
         self.comms.send_message(serialize_SET_MOTOR, values)
 
     def _show_splash(self):
