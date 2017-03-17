@@ -151,9 +151,9 @@ class Naze : public Board {
         Serial.write(c);
     }
 
-    virtual void writeMotor(uint8_t index, uint16_t value) override
+    virtual void writeMotor(uint8_t index, float value) override
     {
-        motors[index].setSpeed(value);
+        motors[index].setSpeed((uint16_t)(config.pwm.min + value*(config.pwm.max-config.pwm.min)));
     }
 
     virtual void showArmedStatus(bool armed) override
