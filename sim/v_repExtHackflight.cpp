@@ -269,9 +269,9 @@ void VrepSimBoard::dump(char * msg)
 }
 
 
-void VrepSimBoard::writeMotor(uint8_t index, uint16_t value)
+void VrepSimBoard::writeMotor(uint8_t index, float value)
 {
-    thrusts[index] = (value - 1000.f) / 1000.f;
+    thrusts[index] = value;
 }
 
 
