@@ -157,7 +157,7 @@ class Teensy : public Board {
     {
         uint8_t aval = map(value, 900, 1900, 0, 255);
 
-        analogWrite(motorPins[index], aval);
+        //analogWrite(motorPins[index], aval);
 
         Serial.printf("%d:%d:%d%c", index, value, aval, index==3?'\n':'\t');
     }
