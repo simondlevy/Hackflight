@@ -41,7 +41,7 @@ namespace hf {
             virtual uint8_t serialReadByte(void) override;
             virtual void serialWriteByte(uint8_t c) override;
             virtual void dump(char * msg) override;
-            virtual void writeMotor(uint8_t index, float value) override;
+            virtual void writeMotor(uint8_t index, uint16_t value) override;
             virtual void showArmedStatus(bool armed) override;
             virtual void showAuxStatus(uint8_t status) override;
             virtual void extrasCheckSwitch(void) override;

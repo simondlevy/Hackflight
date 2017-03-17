@@ -55,7 +55,7 @@ class Board {
         virtual void     serialWriteByte(uint8_t c) = 0;
 
     //------------------------------------------------ Motors ---------------------------------------------------
-        virtual void     writeMotor(uint8_t index, float value) = 0;
+        virtual void     writeMotor(uint8_t index, uint16_t value) = 0;
 
     //------------------------------------------------ Extras ---------------------------------------------------
         virtual void    extrasCheckSwitch(void) = 0;

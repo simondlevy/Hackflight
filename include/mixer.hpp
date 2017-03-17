@@ -89,10 +89,9 @@ void Mixer::update(bool armed, Board* board)
 
     for (uint8_t i = 0; i < 4; i++) {
 
-        if (maxMotor > pwmConfig.max) {
+        if (maxMotor > pwmConfig.max)     
             // this is a way to still have good gyro corrections if at least one motor reaches its max.
             motors[i] -= maxMotor - pwmConfig.max;
-        }
 
         motors[i] = constrain(motors[i], pwmConfig.min, pwmConfig.max);
 
@@ -105,9 +104,8 @@ void Mixer::update(bool armed, Board* board)
         }
     }
 
-    for (uint8_t i = 0; i < 4; i++) {
-        board->writeMotor(i, (motors[i]-pwmConfig.min) / (float)(pwmConfig.max-pwmConfig.min));
-    }
+    for (uint8_t i = 0; i < 4; i++)
+        board->writeMotor(i, motors[i]);
 }
 
 
