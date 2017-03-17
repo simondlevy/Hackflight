@@ -31,7 +31,7 @@ SpektrumDSM2048 rx;
 
 EM7180 em7180;
 
-static uint8_t motorPins[4] = {9, 22, 5, 23};
+//static uint8_t motorPins[4] = {9, 22, 5, 23};
 
 namespace hf {
 
@@ -39,29 +39,30 @@ class Teensy : public Board {
 
     virtual void dump(char * msg) override
     {
-        Serial.printf("%s", msg);
+        //Serial.printf("%s", msg);
     }
 
     virtual void init(void) override
     {
         // Setup LEDs
-        pinMode(27, OUTPUT);
-        pinMode(29, OUTPUT);
+        //pinMode(27, OUTPUT);
+        //pinMode(29, OUTPUT);
 
         // Setup for Master mode, pins 18/19, external pullups, 400kHz for Teensy 3.1
-        Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
+        //Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
 
         // Begin serial comms
-        Serial.begin(15200);
+        Serial.begin(115200);
+        Serial1.begin(115200);
 
         // Start the EM7180 (for now, only specify IMU params)
-        em7180.begin(AFS_8G, GFS_2000DPS);
+        //em7180.begin(AFS_8G, GFS_2000DPS);
 
         // Initialize the motors
-        for (int k=0; k<4; ++k) {
-              analogWriteFrequency(motorPins[k], 200);  
-              analogWrite(motorPins[k], 0);  
-        }
+        //for (int k=0; k<4; ++k) {
+        //      analogWriteFrequency(motorPins[k], 200);  
+        //      analogWrite(motorPins[k], 0);  
+       // }
     }
 
     virtual const Config& getConfig() override
@@ -101,11 +102,13 @@ class Teensy : public Board {
 
     virtual void imuRead(int16_t accelADC[3], int16_t gyroADC[3]) override
     {
+        return;
         em7180.getRawIMU(accelADC, gyroADC);
     }
 
     virtual void ledSet(uint8_t id, bool is_on, float max_brightness) override
     { 
+        return;
         (void)max_brightness;
 
         digitalWrite(id ? 29 : 27, is_on ? LOW : HIGH); // NB: on = LOW; off = HIGH
@@ -113,17 +116,19 @@ class Teensy : public Board {
 
     virtual bool rcSerialReady(void) override
     {
-        return rx.frameComplete();
+        return false;//rx.frameComplete();
     }
 
     virtual bool rcUseSerial(void) override
     {
+        return false;
         rx.begin();
         return true;
     }
 
     virtual uint16_t rcReadSerial(uint8_t chan) override
     {
+        return 0;
         uint8_t chanmap[5] = {1, 2, 3, 0, 5};
         return rx.readRawRC(chanmap[chan]);
     }
@@ -155,11 +160,11 @@ class Teensy : public Board {
 
     virtual void writeMotor(uint8_t index, uint16_t value) override
     {
-        uint8_t aval = map(value, 900, 1900, 0, 255);
+        uint8_t aval = map(value, config.pwm.min, config.pwm.max, 0, 255);
 
-        analogWrite(motorPins[index], aval);
+        //analogWrite(motorPins[index], aval);
 
-        Serial.printf("%d:%d:%d%c", index, value, aval, index==3?'\n':'\t');
+        Serial1.printf("%d:%d:%d%c", index, value, aval, index==3?'\n':'\t');
     }
 
     virtual void showArmedStatus(bool armed) override

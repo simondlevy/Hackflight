@@ -133,9 +133,9 @@ class Motors(Dialog):
         self.hide(self.label_motors3)
         self.hide(self.label_motors4)
 
-    def _send_motor_message(self, value):
+    def _send_motor_message(self, percent):
 
-        self.driver.sendMotorMessage(self.active_motor, value)
+        self.driver.sendMotorMessage(self.active_motor, percent)
 
     def _on_click(self, event):
 

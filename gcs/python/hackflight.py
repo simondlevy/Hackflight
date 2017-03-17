@@ -31,6 +31,10 @@ CONNECTION_DELAY_MSEC = 1000 #4000
 
 USB_UPDATE_MSEC = 200
 
+# These should agree with the values in firmware Config.PwmConfg
+PWM_MIN = 900
+PWM_MAX = 2010
+
 from serial import Serial
 from serial.tools.list_ports import comports
 from threading import Thread
@@ -391,10 +395,11 @@ class GCS:
 
         button['state'] = 'disabled'
 
-    def sendMotorMessage(self, index, value):
+    def sendMotorMessage(self, index, percent):
 
-        values = [1000]*4
-        values[index-1] += int(value/100.* 1000)
+        values = [PWM_MIN]*4
+        values[index-1] += int(percent/100. * (PWM_MAX-PWM_MIN))
+        print(values)
         self.comms.send_message(serialize_SET_MOTOR, values)
 
     def _show_splash(self):
