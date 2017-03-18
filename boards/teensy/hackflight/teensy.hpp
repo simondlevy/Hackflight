@@ -73,13 +73,13 @@ class Teensy : public Board {
         config.imu.directionPitch = -1;
 
         // PIDs
-        config.pid.levelP         = 40;
-        config.pid.levelI         = 2;
-        config.pid.ratePitchrollP = 36;
-        config.pid.ratePitchrollI = 30;
-        config.pid.ratePitchrollD = 23;
-        config.pid.yawP           = 85;
-        config.pid.yawI           = 45;
+        config.pid.levelP         = 0;//40;
+        config.pid.levelI         = 0;//2;
+        config.pid.ratePitchrollP = 1;//36;
+        config.pid.ratePitchrollI = 1;//30;
+        config.pid.ratePitchrollD = 1;//23;
+        config.pid.yawP           = 1;//85;
+        config.pid.yawI           = 1;//45;
 
         return config;
     }
@@ -159,7 +159,6 @@ class Teensy : public Board {
 
         analogWrite(motorPins[index], aval);
 
-        //Serial1.printf("%d:%d:%d%c", index, value, aval, index==3?'\n':'\t');
     }
 
     virtual void showArmedStatus(bool armed) override

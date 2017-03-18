@@ -62,24 +62,26 @@ void Mixer::init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize)
 
     memcpy(&pwmConfig, &_pwmConfig, sizeof(PwmConfig));
 
-    this->stabilize = _stabilize;
-    this->rc = _rc;
+    stabilize = _stabilize;
+    rc = _rc;
 
     // set disarmed motor values
     for (uint8_t i = 0; i < 4; i++)
-        this->motorsDisarmed[i] = pwmConfig.min;
+        motorsDisarmed[i] = pwmConfig.min;
 }
 
 void Mixer::update(bool armed, Board* board)
 {
     int16_t motors[4];
 
+    //debug(board, "%d\n", stabilize->axisPID[AXIS_YAW]);
+
     for (uint8_t i = 0; i < 4; i++)
         motors[i] = (int16_t)
-        (this->rc->command[DEMAND_THROTTLE]   * mixerQuadX[i].throttle + 
-         this->stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch + 
-         this->stabilize->axisPID[AXIS_ROLL]  * mixerQuadX[i].roll - 
-         this->stabilize->axisPID[AXIS_YAW]   * mixerQuadX[i].yaw);
+        (rc->command[DEMAND_THROTTLE]   * mixerQuadX[i].throttle + 
+         stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch + 
+         stabilize->axisPID[AXIS_ROLL]  * mixerQuadX[i].roll - 
+         stabilize->axisPID[AXIS_YAW]   * mixerQuadX[i].yaw);
 
     int16_t maxMotor = motors[0];
 
@@ -95,7 +97,7 @@ void Mixer::update(bool armed, Board* board)
 
         motors[i] = constrain(motors[i], pwmConfig.min, pwmConfig.max);
 
-        if (this->rc->throttleIsDown()) {
+        if (rc->throttleIsDown()) {
             motors[i] = pwmConfig.min;
         } 
 
@@ -104,8 +106,10 @@ void Mixer::update(bool armed, Board* board)
         }
     }
 
-    for (uint8_t i = 0; i < 4; i++)
+    for (uint8_t i = 0; i < 4; i++) {
+        //debug(board, "%d:%4d%c", i+1, motors[i], i==3?'\n':'\t');
         board->writeMotor(i, motors[i]);
+    }
 }
 
 

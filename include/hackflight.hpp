@@ -211,7 +211,6 @@ void Hackflight::updateImu(void)
         stab.update();
         mixer.update(armed, board);
         msp.update(armed);
-
     } 
 } 
 
