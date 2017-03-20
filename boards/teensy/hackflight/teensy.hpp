@@ -59,7 +59,7 @@ class Teensy : public Board {
 
         // Initialize the motors
         for (int k=0; k<4; ++k) {
-              analogWriteFrequency(motorPins[k], 200);  
+              analogWriteFrequency(motorPins[k], 10000);  
               analogWrite(motorPins[k], 0);  
         }
     }
@@ -73,13 +73,13 @@ class Teensy : public Board {
         config.imu.directionPitch = -1;
 
         // PIDs
-        config.pid.levelP         = 0;//40;
-        config.pid.levelI         = 0;//2;
-        config.pid.ratePitchrollP = 1;//36;
-        config.pid.ratePitchrollI = 1;//30;
-        config.pid.ratePitchrollD = 1;//23;
-        config.pid.yawP           = 1;//85;
-        config.pid.yawI           = 1;//45;
+        config.pid.levelP         = 80;//40;
+        config.pid.levelI         = 4;//2;
+        config.pid.ratePitchrollP = 72;//36;
+        config.pid.ratePitchrollI = 60;//30;
+        config.pid.ratePitchrollD = 46;//23;
+        config.pid.yawP           = 85;
+        config.pid.yawI           = 45;
 
         return config;
     }
