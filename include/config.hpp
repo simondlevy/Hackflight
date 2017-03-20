@@ -68,9 +68,6 @@ struct ImuConfig {
     int32_t  accelZDeadband	        = 40;
     int32_t  accelXyDeadband        = 40;
     float    accelzLpfCutoff        = 5.f;
-    int8_t   directionPitch         = +1;
-    int8_t   directionRoll          = +1;
-    int8_t   directionYaw           = +1;
     float    gyroCmpfFactor		    = 600.f;
     float    gyroScale			    = 16.4f;  // for Invensense MPU 
     uint16_t maxAngleInclination    = 500; 

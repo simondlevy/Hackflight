@@ -393,9 +393,9 @@ void IMU::update(Board * board,
     accelSumCount++;
 
     // Convert angles from radians to tenths of a degrees
-    angle[AXIS_ROLL]  = config.directionRoll  * (int16_t)lrintf(anglerad[AXIS_ROLL]  * (1800.0f / M_PI));
-    angle[AXIS_PITCH] = config.directionPitch * (int16_t)lrintf(anglerad[AXIS_PITCH] * (1800.0f / M_PI));
-    angle[AXIS_YAW]   = config.directionYaw   * (int16_t)(lrintf(anglerad[AXIS_YAW]   * 1800.0f / M_PI) / 10.0f);
+    angle[AXIS_ROLL]  = (int16_t)lrintf(anglerad[AXIS_ROLL]  * (1800.0f / M_PI));
+    angle[AXIS_PITCH] = (int16_t)lrintf(anglerad[AXIS_PITCH] * (1800.0f / M_PI));
+    angle[AXIS_YAW]   = (int16_t)(lrintf(anglerad[AXIS_YAW]   * 1800.0f / M_PI) / 10.0f);
 
     // Convert heading from [-180,+180] to [0,360]
     if (angle[AXIS_YAW] < 0)
