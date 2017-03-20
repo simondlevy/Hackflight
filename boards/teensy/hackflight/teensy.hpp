@@ -20,7 +20,7 @@
 
 #include <i2c_t3.h>
 #include <SpektrumDSM.h>
-#include <EM7180.h>
+#include <EM7180_passthru.h>
 
 #include <math.h>
 
@@ -29,7 +29,7 @@
 
 SpektrumDSM2048 rx;
 
-EM7180 em7180;
+EM7180_passthru em7180;
 
 static uint8_t motorPins[4] = {9, 22, 5, 23};
 
@@ -67,10 +67,8 @@ class Teensy : public Board {
     virtual const Config& getConfig() override
     {
         // IMU
-        config.imu.acc1G          = 2048;
-        config.imu.gyroScale      = 8.2f;
-        config.imu.directionYaw   = -1;
-        config.imu.directionPitch = -1;
+        //config.imu.directionYaw   = -1;
+        //config.imu.directionPitch = -1;
 
         // PIDs
         config.pid.levelP         = 80;//40;
@@ -101,7 +99,20 @@ class Teensy : public Board {
 
     virtual void imuRead(int16_t accelADC[3], int16_t gyroADC[3]) override
     {
-        em7180.getRawIMU(accelADC, gyroADC);
+        int16_t a[3];
+        int16_t g[3];
+
+        em7180.readAccelData(a); 
+        em7180.readGyroData(g);  
+
+        accelADC[0] =  a[1];
+        accelADC[1] = -a[0];
+        accelADC[2] =  a[2];
+
+        gyroADC[0] =  g[1];
+        gyroADC[1] = -g[0];
+        gyroADC[2] =  g[2];
+
     }
 
     virtual void ledSet(uint8_t id, bool is_on, float max_brightness) override

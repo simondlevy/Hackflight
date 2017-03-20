@@ -255,8 +255,6 @@ void IMU::update(Board * board,
 
     board->imuRead(accelADC, gyroADC);
 
-    //debug(board, "%5d %5d %5d %5d %5d %5d\n", accelADC[0], accelADC[1], accelADC[2], gyroADC[0], gyroADC[1], gyroADC[2]);
-
     previousTimeUsec = currentTimeUsec;
 
     for (int k=0; k<3; ++k) {
