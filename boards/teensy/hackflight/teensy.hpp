@@ -44,12 +44,15 @@ class Teensy : public Board {
 
     virtual void init(void) override
     {
-        // Setup LEDs
+        // Setup LEDs and turn them off
         pinMode(27, OUTPUT);
         pinMode(29, OUTPUT);
+        digitalWrite(27, HIGH);
+        digitalWrite(29, HIGH);
 
         // Setup for Master mode, pins 18/19, external pullups, 400kHz for Teensy 3.1
         Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
+        delay(1000);
 
         // Begin serial comms
         Serial.begin(115200);

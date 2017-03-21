@@ -111,7 +111,7 @@ void Hackflight::init(Board * _board)
     armed = false;
     accCalibrated = false;
 
-} // intialize
+} // init
 
 void Hackflight::update(void)
 {
