@@ -70,11 +70,11 @@ class Teensy : public Board {
     virtual const Config& getConfig() override
     {
         // PIDs
-        config.pid.levelP         = 80;//40;
-        config.pid.levelI         = 4;//2;
-        config.pid.ratePitchrollP = 72;//36;
-        config.pid.ratePitchrollI = 60;//30;
-        config.pid.ratePitchrollD = 46;//23;
+        config.pid.levelP         = 40;
+        config.pid.levelI         = 2;
+        config.pid.ratePitchrollP = 36;
+        config.pid.ratePitchrollI = 30;
+        config.pid.ratePitchrollD = 23;
         config.pid.yawP           = 85;
         config.pid.yawI           = 45;
 
