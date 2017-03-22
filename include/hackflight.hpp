@@ -166,7 +166,7 @@ bool Hackflight::gotRcUpdate(void)
         // actions during not armed
         } else {         
 
-            // gyro calibration
+            // Restart gyro calibration via throttle-low / yaw left
             if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) 
                 gyroCalibrationCountdown = calibratingGyroCycles;
 
@@ -179,7 +179,7 @@ bool Hackflight::gotRcUpdate(void)
                             board->showArmedStatus(armed);
                         }
 
-            // accel calibration
+            // Restart accel calibration via throttle-high / yaw-low / pitch low
             if (rc.sticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
                 accelCalibrationCountdown = calibratingAccelCycles;
 
@@ -199,12 +199,13 @@ void Hackflight::updateImu(void)
 
     if (imuTask.checkAndUpdate(currentTime)) {
 
-        // compute exponential RC commands
+        // Compute exponential RC commands
         rc.computeExpo();
 
+        // IMU update reads IMU raw angles and converts them to Euler angles
         imu.update(currentTime, armed, accelCalibrationCountdown, gyroCalibrationCountdown);
 
-        // periodically update accelerometer calibration status
+        // Periodically update accelerometer calibration status
         updateCalibrationState();
 
         // Stabilization, mixing, and MSP are synced to IMU update
@@ -225,8 +226,6 @@ void Hackflight::updateCalibrationState(void)
     haveSmallAngle = 
         abs(imu.angle[0]) < smallAngle && abs(imu.angle[1]) < smallAngle;
 
-    uint32_t currentTime = board->getMicros();
-
     // use LEDs to indicate calibration and arming status
     if (accelCalibrationCountdown > 0 || gyroCalibrationCountdown > 0) {
         board->ledSet(0, true);
@@ -241,6 +240,7 @@ void Hackflight::updateCalibrationState(void)
     }
 
     // If angle too steep, restart accel calibration and flash LED
+    uint32_t currentTime = board->getMicros();
     if (accelCalibrationTask.check(currentTime)) {
         if (!haveSmallAngle) {
             accCalibrated = false; 
