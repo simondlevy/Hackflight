@@ -74,7 +74,6 @@ class IMU {
         int32_t     accelSum[3];
         int32_t     accelSumCount;
         uint32_t    accelTimeSum;
-        float       accelVelScale;
         int16_t     accelZero[3];
         int32_t     accelZoffset;
         float       accz_smooth;
@@ -213,7 +212,6 @@ void IMU::init(ImuConfig & imuConfig, Board * _board, uint16_t _calibratingGyroC
 
     accelSumCount = 0;
     accelTimeSum = 0;
-    accelVelScale = 0;
     accelZoffset = 0;
     accz_smooth = 0;
     calibratingGyroCycles = 0;
@@ -236,8 +234,6 @@ void IMU::init(ImuConfig & imuConfig, Board * _board, uint16_t _calibratingGyroC
     for (int k=0; k<3; ++k) {
         accelSum[k] = 0;
     }
-
-    accelVelScale = 9.80665f / config.acc1G / 10000.0f;
 
     calibratingGyroCycles = _calibratingGyroCycles;
     calibratingAccCycles = _calibratingAccCycles;
