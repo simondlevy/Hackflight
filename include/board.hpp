@@ -58,15 +58,15 @@ class Board {
         virtual void     writeMotor(uint8_t index, uint16_t value) = 0;
 
     //------------------------------------------------ Extras ---------------------------------------------------
-        virtual void    extrasCheckSwitch(void) = 0;
-        virtual uint8_t extrasGetTaskCount(void) = 0;
-        virtual bool    extrasHandleMSP(uint8_t command) = 0;
-        virtual void    extrasInit(class MSP * _msp) = 0;
-        virtual void    extrasPerformTask(uint8_t taskIndex) = 0;
+        virtual void    extrasCheckSwitch(void) { }
+        virtual uint8_t extrasGetTaskCount(void)  { return 0; }
+        virtual bool    extrasHandleMSP(uint8_t command) { (void)command; return false; }
+        virtual void    extrasInit(class MSP * _msp) { (void)_msp; }
+        virtual void    extrasPerformTask(uint8_t taskIndex) { (void)taskIndex; }
 
     //----------------------------------------------- Simulation -------------------------------------------------
-        virtual void     showArmedStatus(bool armed) = 0;
-        virtual void     showAuxStatus(uint8_t status) = 0;
+        virtual void     showArmedStatus(bool armed) { (void)armed; }
+        virtual void     showAuxStatus(uint8_t status)  { (void)status; }
 
     //------------------------------------------------ STM32 ---------------------------------------------------
         virtual void     checkReboot(bool pendReboot) = 0;
