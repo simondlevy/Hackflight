@@ -51,7 +51,7 @@ struct LoopConfig {
     uint32_t imuLoopMicro					= 3500;
     uint32_t calibratingGyroMilli			= 3500;
     uint32_t calibratingAccelMilli			= 1400;
-    uint32_t accelCalibrationPeriodMilli	= 500;
+    uint32_t angleCheckMilli	            = 500;
     uint32_t rcLoopMilli					= 20;
 };
 

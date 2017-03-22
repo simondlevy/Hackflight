@@ -74,7 +74,7 @@ class Hackflight {
 
         TimedTask imuTask;
         TimedTask rcTask;
-        TimedTask accelCalibrationTask;
+        TimedTask angleCheckTask;
 
         bool     accCalibrated;
         uint16_t calibratingGyroCycles;
@@ -100,6 +100,7 @@ void Hackflight::init(Board * _board)
     // Flash the LEDs to indicate startup
     flashLeds(config.init);
 
+    // Initialize the IMU hardware
     initImuRc(config);
 
     stab.init(config.pid, &rc, &imu);
@@ -167,21 +168,25 @@ bool Hackflight::gotRcUpdate(void)
         } else {         
 
             // Restart gyro calibration via throttle-low / yaw left
-            if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) 
+            if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
                 gyroCalibrationCountdown = calibratingGyroCycles;
+            }
+
+            // Restart accel calibration via throttle-high / yaw-low / pitch low
+            if (rc.sticks == THR_HI + YAW_LO + PIT_LO + ROL_CE) {
+                accelCalibrationCountdown = calibratingAccelCycles;
+            }
 
             // Arm via throttle-low / yaw-right
-            if (rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE)
-                if (gyroCalibrationCountdown == 0 && accCalibrated) 
+            if (rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE) {
+                if (gyroCalibrationCountdown == 0 && accCalibrated) {
                     if (!rc.auxState()) // aux switch must be in zero position
                         if (!armed) {
                             armed = true;
                             board->showArmedStatus(armed);
                         }
-
-            // Restart accel calibration via throttle-high / yaw-low / pitch low
-            if (rc.sticks == THR_HI + YAW_LO + PIT_LO + ROL_CE)
-                accelCalibrationCountdown = calibratingAccelCycles;
+                }
+            }
 
         } // not armed
 
@@ -217,14 +222,14 @@ void Hackflight::updateImu(void)
 
 void Hackflight::updateCalibrationState(void)
 {
+    haveSmallAngle = 
+        abs(imu.angle[0]) < smallAngle && abs(imu.angle[1]) < smallAngle;
+
     if (accelCalibrationCountdown > 0)
         accelCalibrationCountdown--;
 
     if (gyroCalibrationCountdown > 0)
         gyroCalibrationCountdown--;
-
-    haveSmallAngle = 
-        abs(imu.angle[0]) < smallAngle && abs(imu.angle[1]) < smallAngle;
 
     // use LEDs to indicate calibration and arming status
     if (accelCalibrationCountdown > 0 || gyroCalibrationCountdown > 0) {
@@ -241,11 +246,11 @@ void Hackflight::updateCalibrationState(void)
 
     // If angle too steep, restart accel calibration and flash LED
     uint32_t currentTime = board->getMicros();
-    if (accelCalibrationTask.check(currentTime)) {
+    if (angleCheckTask.check(currentTime)) {
         if (!haveSmallAngle) {
             accCalibrated = false; 
             blinkLedForTilt();
-            accelCalibrationTask.update(currentTime);
+            angleCheckTask.update(currentTime);
         } else {
             accCalibrated = true;
         }
@@ -309,10 +314,10 @@ void Hackflight::initImuRc(const Config& config)
     // sleep  a bit to allow IMU to catch up
     board->delayMilliseconds(config.init.delayMilli);
 
-    // initializing timing tasks
+    // initialize timing tasks
     imuTask.init(loopConfig.imuLoopMicro);
     rcTask.init(loopConfig.rcLoopMilli * 1000);
-    accelCalibrationTask.init(loopConfig.accelCalibrationPeriodMilli * 1000);
+    angleCheckTask.init(loopConfig.angleCheckMilli * 1000);
 
     rc.init(config.rc, config.pwm);
 }
