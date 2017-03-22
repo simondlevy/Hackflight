@@ -78,11 +78,6 @@ class Hackflight {
 
         bool     safeToArm;
         uint16_t maxArmingAngle;
-
-        uint16_t calibratingGyroCycles;
-        uint16_t calibratingAccelCycles;
-        uint16_t accelCalibrationCountdown;
-        uint16_t gyroCalibrationCountdown;
 };
 
 /********************************************* CPP ********************************************************/
@@ -169,13 +164,12 @@ bool Hackflight::gotRcUpdate(void)
 
             // Restart IMU calibration via throttle-low / yaw left
             if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
-                gyroCalibrationCountdown = calibratingGyroCycles;
-                accelCalibrationCountdown = calibratingAccelCycles;
+                imu.restartCalibration();
             }
 
             // Arm via throttle-low / yaw-right
             if (rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE) {
-                if (gyroCalibrationCountdown == 0 && safeToArm) {
+                if (imu.gyroCalibrated() && safeToArm) {
                     if (!rc.auxState()) // aux switch must be in zero position
                         if (!armed) {
                             armed = true;
@@ -204,7 +198,7 @@ void Hackflight::updateImu(void)
         rc.computeExpo();
 
         // IMU update reads IMU raw angles and converts them to Euler angles
-        imu.update(currentTime, armed, accelCalibrationCountdown, gyroCalibrationCountdown);
+        imu.update(currentTime, armed);
 
         // Periodically update accelerometer calibration status
         updateCalibrationState();
@@ -218,14 +212,8 @@ void Hackflight::updateImu(void)
 
 void Hackflight::updateCalibrationState(void)
 {
-    if (accelCalibrationCountdown > 0)
-        accelCalibrationCountdown--;
-
-    if (gyroCalibrationCountdown > 0)
-        gyroCalibrationCountdown--;
-
     // use LEDs to indicate calibration and arming status
-    if (accelCalibrationCountdown > 0 || gyroCalibrationCountdown > 0) {
+    if (!imu.accelCalibrated() || !imu.gyroCalibrated()) {
         board->ledSet(0, true);
     }
     else {
@@ -292,14 +280,7 @@ void Hackflight::initImuRc(const Config& config)
     // Store some for later
     maxArmingAngle = imuConfig.maxArmingAngle;
 
-    // compute loop times based on config from board
-    calibratingGyroCycles   = (uint16_t)(1000. * imuConfig.calibratingGyroMilli  / loopConfig.imuLoopMicro);
-    calibratingAccelCycles  = (uint16_t)(1000. * imuConfig.calibratingAccelMilli / loopConfig.imuLoopMicro);
-
-    // always do gyro calibration at startup
-    gyroCalibrationCountdown = calibratingGyroCycles;
-
-    imu.init(imuConfig, board, calibratingGyroCycles, calibratingAccelCycles);
+    imu.init(imuConfig, board, loopConfig.imuLoopMicro);
 
     // sleep  a bit to allow IMU to catch up
     board->delayMilliseconds(config.init.delayMilli);

@@ -40,11 +40,15 @@
             int16_t   angle[3];      // tenths of a degree
 
         public: // methods
-            void init(ImuConfig & imuConfig, Board * _board, 
-                    uint16_t _gyroCalibrationCountdownCycles, uint16_t _accelCalibrationCountdownccCycles);
+            void init(ImuConfig & imuConfig, Board * _board, uint32_t imuLoopMicro);
 
-            void update(uint32_t currentTimeUsec, bool armed, 
-                    uint16_t accelCalibrationCountdown=0, uint16_t gyroCalibrationCountdown=0);
+            void update(uint32_t currentTimeUsec, bool armed);
+
+            void restartCalibration(void);
+
+            bool accelCalibrated(void);
+
+            bool gyroCalibrated(void);
 
             // called from Hover
             float computeAccelZ(void);
@@ -62,6 +66,7 @@
             } stdev_t;
 
         private: //methods
+
             static void devClear(stdev_t *dev);
             static void devPush(stdev_t *dev, float x);
             static void normalizeV(float src[3], float dest[3]);
@@ -70,24 +75,25 @@
         private: //fields
             int32_t     a[3];
             float       accelLpf[3];
-        int16_t     accelSmooth[3];
-        int32_t     accelSum[3];
-        int32_t     accelSumCount;
-        uint32_t    accelTimeSum;
-        int16_t     accelZero[3];
-        int32_t     accelZoffset;
-        float       accz_smooth;
-        Board *     board;
-        uint16_t    gyroCalibrationCountdownCycles;
-        uint16_t    accelCalibrationCountdownccCycles;
-        float       EstG[3];
-        float       EstN[3];
-        float       fcAcc;
-        float       gyroCmpfFactor;
-        float       gyroScale;
-        int16_t     gyroZero[3];
-        uint32_t    previousTimeUsec;
-
+            int16_t     accelSmooth[3];
+            int32_t     accelSum[3];
+            int32_t     accelSumCount;
+            uint32_t    accelTimeSum;
+            int16_t     accelZero[3];
+            int32_t     accelZoffset;
+            float       accz_smooth;
+            Board *     board;
+            float       EstG[3];
+            float       EstN[3];
+            float       fcAcc;
+            float       gyroCmpfFactor;
+            float       gyroScale;
+            int16_t     gyroZero[3];
+            uint32_t    previousTimeUsec;
+            uint16_t    calibratingGyroCycles;
+            uint16_t    calibratingAccelCycles;
+            uint16_t    accelCalibrationCountdown;
+            uint16_t    gyroCalibrationCountdown;
 };
 
 /********************************************* CPP ********************************************************/
@@ -185,7 +191,7 @@ void IMU::normalizeV(float src[3], float dest[3])
     }
 }
 
-void IMU::init(ImuConfig & imuConfig, Board * _board, uint16_t _gyroCalibrationCountdownCycles, uint16_t _accelCalibrationCountdownccCycles)
+void IMU::init(ImuConfig & imuConfig, Board * _board, uint32_t imuLoopMicro)
 {
     board = _board;
 
@@ -203,8 +209,6 @@ void IMU::init(ImuConfig & imuConfig, Board * _board, uint16_t _gyroCalibrationC
     accelTimeSum = 0;
     accelZoffset = 0;
     accz_smooth = 0;
-    gyroCalibrationCountdownCycles = 0;
-    accelCalibrationCountdownccCycles = 0;
     fcAcc = 0;
     previousTimeUsec = 0;
 
@@ -224,13 +228,31 @@ void IMU::init(ImuConfig & imuConfig, Board * _board, uint16_t _gyroCalibrationC
         accelSum[k] = 0;
     }
 
-    gyroCalibrationCountdownCycles = _gyroCalibrationCountdownCycles;
-    accelCalibrationCountdownccCycles = _accelCalibrationCountdownccCycles;
+    // compute loop times based on config from board
+    calibratingGyroCycles   = (uint16_t)(1000. * imuConfig.calibratingGyroMilli  / imuLoopMicro);
+    calibratingAccelCycles  = (uint16_t)(1000. * imuConfig.calibratingAccelMilli / imuLoopMicro);
+
+    // always calibrate gyro at startup
+    gyroCalibrationCountdown = calibratingGyroCycles;
 }
 
+void IMU::restartCalibration(void)
+{
+    gyroCalibrationCountdown = calibratingGyroCycles;
+    accelCalibrationCountdown = calibratingAccelCycles;
+}
 
-void IMU::update(uint32_t currentTimeUsec, bool armed, 
-        uint16_t accelCalibrationCountdown, uint16_t gyroCalibrationCountdown)
+bool IMU::accelCalibrated(void)
+{
+    return gyroCalibrationCountdown == 0;
+}
+
+bool IMU::gyroCalibrated(void)
+{
+    return gyroCalibrationCountdown == 0;
+}
+
+void IMU::update(uint32_t currentTimeUsec, bool armed)
 {
     int32_t accMag = 0;
     float rpy[3];
@@ -253,9 +275,9 @@ void IMU::update(uint32_t currentTimeUsec, bool armed,
 
         for (uint8_t axis = 0; axis < 3; axis++) {
             // Reset a[axis] at start of calibration
-            if (accelCalibrationCountdown == accelCalibrationCountdownccCycles)
+            if (accelCalibrationCountdown == calibratingAccelCycles)
                 a[axis] = 0;
-            // Sum up accelCalibrationCountdownccCycles readings
+            // Sum up calibratingAccelCycles readings
             a[axis] += accelADC[axis];
             // Clear global variables for next reading
             accelADC[axis] = 0;
@@ -263,9 +285,9 @@ void IMU::update(uint32_t currentTimeUsec, bool armed,
         }
         // Calculate average, shift Z down by acc1G
         if (accelCalibrationCountdown == 1) {
-            accelZero[AXIS_ROLL] = (a[AXIS_ROLL] + (accelCalibrationCountdownccCycles / 2)) / accelCalibrationCountdownccCycles;
-            accelZero[AXIS_PITCH] = (a[AXIS_PITCH] + (accelCalibrationCountdownccCycles / 2)) / accelCalibrationCountdownccCycles;
-            accelZero[AXIS_YAW] = (a[AXIS_YAW] + (accelCalibrationCountdownccCycles / 2)) / accelCalibrationCountdownccCycles - config.acc1G;
+            accelZero[AXIS_ROLL] = (a[AXIS_ROLL] + (calibratingAccelCycles / 2)) / calibratingAccelCycles;
+            accelZero[AXIS_PITCH] = (a[AXIS_PITCH] + (calibratingAccelCycles / 2)) / calibratingAccelCycles;
+            accelZero[AXIS_YAW] = (a[AXIS_YAW] + (calibratingAccelCycles / 2)) / calibratingAccelCycles - config.acc1G;
         }
     }
 
@@ -281,7 +303,7 @@ void IMU::update(uint32_t currentTimeUsec, bool armed,
     if (gyroCalibrationCountdown > 0) {
         for (uint8_t axis = 0; axis < 3; axis++) {
             // Reset g[axis] at start of calibration
-            if (gyroCalibrationCountdown == gyroCalibrationCountdownCycles) {
+            if (gyroCalibrationCountdown == calibratingGyroCycles) {
                 g[axis] = 0;
                 devClear(&var[axis]);
             }
@@ -292,7 +314,7 @@ void IMU::update(uint32_t currentTimeUsec, bool armed,
             gyroADC[axis] = 0;
             gyroZero[axis] = 0;
             if (gyroCalibrationCountdown == 1) {
-                gyroZero[axis] = (g[axis] + (gyroCalibrationCountdownCycles / 2)) / gyroCalibrationCountdownCycles;
+                gyroZero[axis] = (g[axis] + (calibratingGyroCycles / 2)) / calibratingGyroCycles;
             }
         }
     }
@@ -378,6 +400,13 @@ void IMU::update(uint32_t currentTimeUsec, bool armed,
     // Convert heading from [-180,+180] to [0,360]
     if (angle[AXIS_YAW] < 0)
         angle[AXIS_YAW] += 360;
+
+    // Decrement calibration countdowns
+    if (accelCalibrationCountdown > 0)
+        accelCalibrationCountdown--;
+    if (gyroCalibrationCountdown > 0)
+        gyroCalibrationCountdown--;
+
 } // update
 
 } // namespace
