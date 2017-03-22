@@ -65,16 +65,16 @@ void RC::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig)
 {
     memcpy(&config, &rcConfig, sizeof(RcConfig));
 
-    this->midrc = (pwmConfig.max + pwmConfig.min) / 2;
+    midrc = (pwmConfig.max + pwmConfig.min) / 2;
 
-    memset (this->dataAverage, 0, 8*4*sizeof(int16_t));
+    memset (dataAverage, 0, 8*4*sizeof(int16_t));
 
-    this->commandDelay = 0;
-    this->sticks = 0;
-    this->averageIndex = 0;
+    commandDelay = 0;
+    sticks = 0;
+    averageIndex = 0;
 
     for (uint8_t i = 0; i < CONFIG_RC_CHANS; i++)
-        this->data[i] = this->midrc;
+        data[i] = midrc;
 
     for (uint8_t i = 0; i < CONFIG_PITCH_LOOKUP_LENGTH; i++)
         lookupPitchRollRC[i] = (2500 + config.expo8 * (i * i - 25)) * i * (int32_t)config.rate8 / 2500;
@@ -97,7 +97,7 @@ void RC::update(Board* _board)
 {
     if (_board->rcUseSerial()) {
         for (uint8_t chan = 0; chan < 5; chan++) {
-            this->data[chan] = _board->rcReadSerial(chan);
+            data[chan] = _board->rcReadSerial(chan);
         }
     }
 
@@ -105,38 +105,38 @@ void RC::update(Board* _board)
         for (uint8_t chan = 0; chan < 8; chan++) {
 
             // get RC PWM
-            this->dataAverage[chan][this->averageIndex % 4] = _board->rcReadPwm(chan);
+            dataAverage[chan][averageIndex % 4] = _board->rcReadPwm(chan);
 
-            this->data[chan] = 0;
+            data[chan] = 0;
 
             for (uint8_t i = 0; i < 4; i++)
-                this->data[chan] += this->dataAverage[chan][i];
-            this->data[chan] /= 4;
+                data[chan] += dataAverage[chan][i];
+            data[chan] /= 4;
         }
 
-        this->averageIndex++;
+        averageIndex++;
     }
 
     // check stick positions, updating command delay
     uint8_t stTmp = 0;
     for (uint8_t i = 0; i < 4; i++) {
         stTmp >>= 2;
-        if (this->data[i] > config.mincheck)
+        if (data[i] > config.mincheck)
             stTmp |= 0x80;  // check for MIN
-        if (this->data[i] < config.maxcheck)
+        if (data[i] < config.maxcheck)
             stTmp |= 0x40;  // check for MAX
     }
-    if (stTmp == this->sticks) {
-        if (this->commandDelay < 250)
-            this->commandDelay++;
+    if (stTmp == sticks) {
+        if (commandDelay < 250)
+            commandDelay++;
     } else
-        this->commandDelay = 0;
-    this->sticks = stTmp;
+        commandDelay = 0;
+    sticks = stTmp;
 }
 
 bool RC::changed(void)
 {
-    return this->commandDelay == 20;
+    return commandDelay == 20;
 }
 
 void RC::computeExpo(void)
@@ -145,38 +145,38 @@ void RC::computeExpo(void)
 
     for (uint8_t channel = 0; channel < 3; channel++) {
 
-        tmp = (std::min)(abs(this->data[channel] - this->midrc), 500);
+        tmp = (std::min)(abs(data[channel] - midrc), 500);
 
         if (channel != DEMAND_YAW) { // roll, pitch
             tmp2 = tmp / 100;
-            this->command[channel] = 
+            command[channel] = 
                 lookupPitchRollRC[tmp2] + (tmp - tmp2 * 100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2]) / 100;
         } else {                    // yaw
-            this->command[channel] = tmp * -1;
+            command[channel] = tmp * -1;
         }
 
-        if (this->data[channel] < this->midrc)
-            this->command[channel] = -this->command[channel];
+        if (data[channel] < midrc)
+            command[channel] = -command[channel];
     }
 
-    tmp = constrain(this->data[DEMAND_THROTTLE], config.mincheck, 2000);
+    tmp = constrain(data[DEMAND_THROTTLE], config.mincheck, 2000);
     tmp = (uint32_t)(tmp - config.mincheck) * 1000 / (2000 - config.mincheck);       // [MINCHECK;2000] -> [0;1000]
     tmp2 = tmp / 100;
-    this->command[DEMAND_THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
+    command[DEMAND_THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
         lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [PWM_MIN;PWM_MAX]
 
 } // computeExpo
 
 uint8_t RC::auxState(void) 
 {
-    int16_t aux = this->data[4];
+    int16_t aux = data[4];
 
     return aux < 1500 ? 0 : (aux < 1700 ? 1 : 2);
 }
 
 bool RC::throttleIsDown(void)
 {
-    return this->data[DEMAND_THROTTLE] < config.mincheck;
+    return data[DEMAND_THROTTLE] < config.mincheck;
 }
 
 

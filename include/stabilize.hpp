@@ -65,43 +65,43 @@ void Stabilize::init(const PidConfig& pidConfig, RC * _rc, IMU * _imu)
 {
     memcpy(&config, &pidConfig, sizeof(PidConfig));
 
-    this->rc = _rc;
-    this->imu = _imu;
+    rc = _rc;
+    imu = _imu;
 
     for (uint8_t axis=0; axis<3; ++axis) {
-        this->lastGyro[axis] = 0;
-        this->delta1[axis] = 0;
-        this->delta2[axis] = 0;
+        lastGyro[axis] = 0;
+        delta1[axis] = 0;
+        delta2[axis] = 0;
     }
 
-    this->rate_p[0] = config.ratePitchrollP;
-    this->rate_p[1] = config.ratePitchrollP;
-    this->rate_p[2] = config.yawP;
+    rate_p[0] = config.ratePitchrollP;
+    rate_p[1] = config.ratePitchrollP;
+    rate_p[2] = config.yawP;
 
-    this->rate_i[0] = config.ratePitchrollI;
-    this->rate_i[1] = config.ratePitchrollI;
-    this->rate_i[2] = config.yawI;
+    rate_i[0] = config.ratePitchrollI;
+    rate_i[1] = config.ratePitchrollI;
+    rate_i[2] = config.yawI;
 
-    this->rate_d[0] = config.ratePitchrollD;
-    this->rate_d[1] = config.ratePitchrollD;
-    this->rate_d[2] = 0;
+    rate_d[0] = config.ratePitchrollD;
+    rate_d[1] = config.ratePitchrollD;
+    rate_d[2] = 0;
 
-    this->resetIntegral();
+    resetIntegral();
 }
 
 void Stabilize::update(void)
 {
     for (uint8_t axis = 0; axis < 3; axis++) {
 
-        int32_t error = (int32_t)this->rc->command[axis] * 10 * 8 / this->rate_p[axis];
-        error -= this->imu->gyroADC[axis];
+        int32_t error = (int32_t)rc->command[axis] * 10 * 8 / rate_p[axis];
+        error -= imu->gyroADC[axis];
 
-        int32_t PTermGYRO = this->rc->command[axis];
+        int32_t PTermGYRO = rc->command[axis];
 
-        this->errorGyroI[axis] = constrain(this->errorGyroI[axis] + error, -16000, +16000); // WindUp
-        if ((std::abs(this->imu->gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (std::abs(this->rc->command[axis]) > 100)))
-            this->errorGyroI[axis] = 0;
-        int32_t ITermGYRO = (this->errorGyroI[axis] / 125 * this->rate_i[axis]) >> 6;
+        errorGyroI[axis] = constrain(errorGyroI[axis] + error, -16000, +16000); // WindUp
+        if ((std::abs(imu->gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (std::abs(rc->command[axis]) > 100)))
+            errorGyroI[axis] = 0;
+        int32_t ITermGYRO = (errorGyroI[axis] / 125 * rate_i[axis]) >> 6;
 
         int32_t PTerm = PTermGYRO;
         int32_t ITerm = ITermGYRO;
@@ -109,45 +109,45 @@ void Stabilize::update(void)
         if (axis < 2) {
 
             // max inclination
-            int32_t errorAngle = constrain(2 * this->rc->command[axis], 
+            int32_t errorAngle = constrain(2 * rc->command[axis], 
                 -imu->config.maxAngleInclination, 
                 + imu->config.maxAngleInclination) 
-                - this->imu->angle[axis];
+                - imu->angle[axis];
 
             int32_t PTermACC = errorAngle * config.levelP / 100; 
 
-            this->errorAngleI[axis] = constrain(this->errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
-            int32_t ITermACC = ((int32_t)(this->errorAngleI[axis] * config.levelI)) >> 12;
+            errorAngleI[axis] = constrain(errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
+            int32_t ITermACC = ((int32_t)(errorAngleI[axis] * config.levelI)) >> 12;
 
-            int32_t prop = (std::max)(std::abs(this->rc->command[DEMAND_PITCH]), 
-                                    std::abs(this->rc->command[DEMAND_ROLL])); // range [0;500]
+            int32_t prop = (std::max)(std::abs(rc->command[DEMAND_PITCH]), 
+                                    std::abs(rc->command[DEMAND_ROLL])); // range [0;500]
 
             PTerm = (PTermACC * (500 - prop) + PTermGYRO * prop) / 500;
             ITerm = (ITermACC * (500 - prop) + ITermGYRO * prop) / 500;
         } 
 
-        PTerm -= (int32_t)this->imu->gyroADC[axis] * this->rate_p[axis] / 10 / 8; // 32 bits is needed for calculation
-        int32_t delta = this->imu->gyroADC[axis] - this->lastGyro[axis];
-        this->lastGyro[axis] = this->imu->gyroADC[axis];
-        int32_t deltaSum = this->delta1[axis] + this->delta2[axis] + delta;
-        this->delta2[axis] = this->delta1[axis];
-        this->delta1[axis] = delta;
-        int32_t DTerm = (deltaSum * this->rate_d[axis]) / 32;
-        this->axisPID[axis] = PTerm + ITerm - DTerm;
+        PTerm -= (int32_t)imu->gyroADC[axis] * rate_p[axis] / 10 / 8; // 32 bits is needed for calculation
+        int32_t delta = imu->gyroADC[axis] - lastGyro[axis];
+        lastGyro[axis] = imu->gyroADC[axis];
+        int32_t deltaSum = delta1[axis] + delta2[axis] + delta;
+        delta2[axis] = delta1[axis];
+        delta1[axis] = delta;
+        int32_t DTerm = (deltaSum * rate_d[axis]) / 32;
+        axisPID[axis] = PTerm + ITerm - DTerm;
     }
 
     // prevent "yaw jump" during yaw correction
-    this->axisPID[AXIS_YAW] = constrain(this->axisPID[AXIS_YAW], 
-        -100 - std::abs(this->rc->command[DEMAND_YAW]), +100 + std::abs(this->rc->command[DEMAND_YAW]));
+    axisPID[AXIS_YAW] = constrain(axisPID[AXIS_YAW], 
+        -100 - std::abs(rc->command[DEMAND_YAW]), +100 + std::abs(rc->command[DEMAND_YAW]));
 }
 
 void Stabilize::resetIntegral(void)
 {
-    this->errorGyroI[AXIS_ROLL] = 0;
-    this->errorGyroI[AXIS_PITCH] = 0;
-    this->errorGyroI[AXIS_YAW] = 0;
-    this->errorAngleI[AXIS_ROLL] = 0;
-    this->errorAngleI[AXIS_PITCH] = 0;
+    errorGyroI[AXIS_ROLL] = 0;
+    errorGyroI[AXIS_PITCH] = 0;
+    errorGyroI[AXIS_YAW] = 0;
+    errorAngleI[AXIS_ROLL] = 0;
+    errorAngleI[AXIS_PITCH] = 0;
 }
 
 
