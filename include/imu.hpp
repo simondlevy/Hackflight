@@ -40,7 +40,7 @@
             int16_t   angle[3];      // tenths of a degree
 
         public: // methods
-            void init(ImuConfig & imuConfig, Board * _board, uint32_t imuLoopMicro);
+            void init(ImuConfig & imuConfig, Board * _board);
 
             void update(uint32_t currentTimeUsec, bool armed);
 
@@ -74,6 +74,7 @@
 
         private: //fields
             int32_t     a[3];
+            uint16_t    accelCalibrationCountdown;
             float       accelLpf[3];
             int16_t     accelSmooth[3];
             int32_t     accelSum[3];
@@ -83,17 +84,16 @@
             int32_t     accelZoffset;
             float       accz_smooth;
             Board *     board;
+            uint16_t    calibratingAccelCycles;
+            uint16_t    calibratingGyroCycles;
             float       EstG[3];
             float       EstN[3];
             float       fcAcc;
+            uint16_t    gyroCalibrationCountdown;
             float       gyroCmpfFactor;
             float       gyroScale;
             int16_t     gyroZero[3];
             uint32_t    previousTimeUsec;
-            uint16_t    calibratingGyroCycles;
-            uint16_t    calibratingAccelCycles;
-            uint16_t    accelCalibrationCountdown;
-            uint16_t    gyroCalibrationCountdown;
 };
 
 /********************************************* CPP ********************************************************/
@@ -191,7 +191,7 @@ void IMU::normalizeV(float src[3], float dest[3])
     }
 }
 
-void IMU::init(ImuConfig & imuConfig, Board * _board, uint32_t imuLoopMicro)
+void IMU::init(ImuConfig & imuConfig, Board * _board)
 {
     board = _board;
 
@@ -229,8 +229,8 @@ void IMU::init(ImuConfig & imuConfig, Board * _board, uint32_t imuLoopMicro)
     }
 
     // compute loop times based on config from board
-    calibratingGyroCycles   = (uint16_t)(1000. * imuConfig.calibratingGyroMilli  / imuLoopMicro);
-    calibratingAccelCycles  = (uint16_t)(1000. * imuConfig.calibratingAccelMilli / imuLoopMicro);
+    calibratingGyroCycles   = (uint16_t)(1000. * imuConfig.calibratingGyroMilli  / imuConfig.loopMicro);
+    calibratingAccelCycles  = (uint16_t)(1000. * imuConfig.calibratingAccelMilli / imuConfig.loopMicro);
 
     // always calibrate gyro at startup
     gyroCalibrationCountdown = calibratingGyroCycles;

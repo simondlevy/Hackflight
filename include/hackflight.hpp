@@ -58,7 +58,6 @@ class Hackflight {
         void blinkLedForTilt(void);
         bool gotRcUpdate(void);
         void flashLeds(const InitConfig& config);
-        void initImuRc(const Config& config);
         void updateImu(void);
         void updateCalibrationState(void);
 
@@ -95,15 +94,39 @@ void Hackflight::init(Board * _board)
     // Flash the LEDs to indicate startup
     flashLeds(config.init);
 
-    // Initialize the IMU hardware
-    initImuRc(config);
+    // Initialize the IMU hardware on the board
+    board->imuInit();
 
+    // Get particulars for board
+    LoopConfig loopConfig = config.loop;
+    ImuConfig imuConfig = config.imu;
+
+    // Store some for later
+    maxArmingAngle = imuConfig.maxArmingAngle;
+
+    // Initialize the IMU
+    imu.init(imuConfig, board);
+
+    // Sleep  a bit to allow IMU to catch up
+    board->delayMilliseconds(config.init.delayMilli);
+
+    // Initialize timing tasks
+    imuTask.init(imuConfig.loopMicro);
+    rcTask.init(loopConfig.rcLoopMilli * 1000);
+    angleCheckTask.init(loopConfig.angleCheckMilli * 1000);
+
+    // Initialize the RC receiver
+    rc.init(config.rc, config.pwm);
+
+    // Initialize our stabilization, mixing, and MSP (serial comms)
     stab.init(config.pid, &rc, &imu);
     mixer.init(config.pwm, &rc, &stab); 
     msp.init(&imu, &mixer, &rc, board);
 
+    // Initialize any extra stuff you want to do with your board
     board->extrasInit(&msp);
 
+    // Ready to rock!
     armed = false;
     safeToArm = false;
 
@@ -267,30 +290,6 @@ void Hackflight::flashLeds(const InitConfig& config)
     }
     board->ledSet(0, false);
     board->ledSet(1, false);
-}
-
-void Hackflight::initImuRc(const Config& config)
-{
-    board->imuInit();
-
-    // Get particulars for board
-    LoopConfig loopConfig = config.loop;
-    ImuConfig imuConfig = config.imu;
-
-    // Store some for later
-    maxArmingAngle = imuConfig.maxArmingAngle;
-
-    imu.init(imuConfig, board, loopConfig.imuLoopMicro);
-
-    // sleep  a bit to allow IMU to catch up
-    board->delayMilliseconds(config.init.delayMilli);
-
-    // initialize timing tasks
-    imuTask.init(loopConfig.imuLoopMicro);
-    rcTask.init(loopConfig.rcLoopMilli * 1000);
-    angleCheckTask.init(loopConfig.angleCheckMilli * 1000);
-
-    rc.init(config.rc, config.pwm);
 }
 
 } // namespace
