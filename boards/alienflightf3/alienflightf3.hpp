@@ -75,8 +75,11 @@ class AlienflightF3 : public Board {
         motors[2].attach(8);
         motors[3].attach(0);
 
-        imu = new MPU6050();
+    }
 
+    virtual void imuInit(void) override
+    {
+        imu = new MPU6050();
         imu->begin(AFS_8G, GFS_2000DPS);
     }
 
