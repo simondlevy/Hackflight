@@ -167,13 +167,9 @@ bool Hackflight::gotRcUpdate(void)
         // actions during not armed
         } else {         
 
-            // Restart gyro calibration via throttle-low / yaw left
+            // Restart IMU calibration via throttle-low / yaw left
             if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
                 gyroCalibrationCountdown = calibratingGyroCycles;
-            }
-
-            // Restart accel calibration via throttle-high / yaw-low / pitch low
-            if (rc.sticks == THR_HI + YAW_LO + PIT_LO + ROL_CE) {
                 accelCalibrationCountdown = calibratingAccelCycles;
             }
 
