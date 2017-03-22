@@ -40,9 +40,9 @@ class IMU {
         int16_t   angle[3];      // tenths of a degree
 
     public: // methods
-        void init(ImuConfig & imuConfig, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles);
-        void update(Board * board, 
-                uint32_t currentTimeUsec, bool armed, uint16_t calibratingA=0, uint16_t calibratingG=0);
+        void init(ImuConfig & imuConfig, Board * _board, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles);
+
+        void update(uint32_t currentTimeUsec, bool armed, uint16_t calibratingA=0, uint16_t calibratingG=0);
 
         // called from Hover
         float computeAccelZ(void);
@@ -68,25 +68,26 @@ class IMU {
         static void rotateV(float v[3], float *delta);
 
     private: //fields
-        int32_t  a[3];
-        float    accelLpf[3];
-        int16_t  accelSmooth[3];
-        int32_t  accelSum[3];
-        int32_t  accelSumCount;
-        uint32_t accelTimeSum;
-        float    accelVelScale;
-        int16_t  accelZero[3];
-        int32_t  accelZoffset;
-        float    accz_smooth;
-        uint16_t calibratingGyroCycles;
-        uint16_t calibratingAccCycles;
-        float    EstG[3];
-        float    EstN[3];
-        float    fcAcc;
-        float    gyroCmpfFactor;
-        float    gyroScale;
-        int16_t  gyroZero[3];
-        uint32_t previousTimeUsec;
+        int32_t     a[3];
+        float       accelLpf[3];
+        int16_t     accelSmooth[3];
+        int32_t     accelSum[3];
+        int32_t     accelSumCount;
+        uint32_t    accelTimeSum;
+        float       accelVelScale;
+        int16_t     accelZero[3];
+        int32_t     accelZoffset;
+        float       accz_smooth;
+        Board *     board;
+        uint16_t    calibratingGyroCycles;
+        uint16_t    calibratingAccCycles;
+        float       EstG[3];
+        float       EstN[3];
+        float       fcAcc;
+        float       gyroCmpfFactor;
+        float       gyroScale;
+        int16_t     gyroZero[3];
+        uint32_t    previousTimeUsec;
 
 };
 
@@ -196,8 +197,10 @@ void IMU::normalizeV(float src[3], float dest[3])
     }
 }
 
-void IMU::init(ImuConfig & imuConfig, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles)
+void IMU::init(ImuConfig & imuConfig, Board * _board, uint16_t _calibratingGyroCycles, uint16_t _calibratingAccCycles)
 {
+    board = _board;
+
     for (int k=0; k<3; ++k) {
         a[k] = 0;
         accelLpf[k] = 0;
@@ -241,8 +244,7 @@ void IMU::init(ImuConfig & imuConfig, uint16_t _calibratingGyroCycles, uint16_t 
 }
 
 
-void IMU::update(Board * board,
-        uint32_t currentTimeUsec, bool armed, uint16_t calibratingA, uint16_t calibratingG)
+void IMU::update(uint32_t currentTimeUsec, bool armed, uint16_t calibratingA, uint16_t calibratingG)
 {
     int32_t accMag = 0;
     float rpy[3];

@@ -202,7 +202,7 @@ void Hackflight::updateImu(void)
         // compute exponential RC commands
         rc.computeExpo();
 
-        imu.update(board, currentTime, armed, accelCalibrationCountdown, gyroCalibrationCountdown);
+        imu.update(currentTime, armed, accelCalibrationCountdown, gyroCalibrationCountdown);
 
         // periodically update accelerometer calibration status
         updateCalibrationState();
@@ -239,7 +239,6 @@ void Hackflight::updateCalibrationState(void)
         else
             board->ledSet(1, false);
     }
-    
 
     // If angle too steep, restart accel calibration and flash LED
     if (accelCalibrationTask.check(currentTime)) {
@@ -303,7 +302,7 @@ void Hackflight::initImuRc(const Config& config)
     // assume shallow angle (no accelerometer calibration needed)
     haveSmallAngle = true;
 
-    imu.init(imuConfig, calibratingGyroCycles, calibratingAccelCycles);
+    imu.init(imuConfig, board, calibratingGyroCycles, calibratingAccelCycles);
 
     // sleep  a bit to allow IMU to catch up
     board->delayMilliseconds(config.init.delayMilli);
