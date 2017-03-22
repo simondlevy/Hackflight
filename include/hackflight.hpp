@@ -285,6 +285,8 @@ void Hackflight::flashLeds(const InitConfig& config)
 
 void Hackflight::initImuRc(const Config& config)
 {
+    board->imuInit();
+
     // Get particulars for board
     LoopConfig loopConfig = config.loop;
     ImuConfig imuConfig = config.imu;

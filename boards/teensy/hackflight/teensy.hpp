@@ -57,9 +57,6 @@ class Teensy : public Board {
         // Begin serial comms
         Serial.begin(115200);
 
-        // Start the EM7180 (for now, only specify IMU params)
-        em7180.begin(AFS_8G, GFS_2000DPS);
-
         // Initialize the motors
         for (int k=0; k<4; ++k) {
               analogWriteFrequency(motorPins[k], 10000);  
@@ -67,7 +64,13 @@ class Teensy : public Board {
         }
     }
 
-    virtual const Config& getConfig() override
+    virtual void imuInit(void) override 
+    {
+        // Start the EM7180 (for now, only specify IMU params)
+        em7180.begin(AFS_8G, GFS_2000DPS);
+    }
+
+    virtual const Config& getConfig(void) override
     {
         // PIDs
         config.pid.levelP         = 40;
