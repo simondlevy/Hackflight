@@ -76,13 +76,13 @@ class Hackflight {
         TimedTask rcTask;
         TimedTask angleCheckTask;
 
-        bool     accCalibrated;
+        bool     safeToArm;
+        uint16_t maxArmingAngle;
+
         uint16_t calibratingGyroCycles;
         uint16_t calibratingAccelCycles;
         uint16_t accelCalibrationCountdown;
         uint16_t gyroCalibrationCountdown;
-        bool     haveSmallAngle;
-        uint16_t smallAngle;
 };
 
 /********************************************* CPP ********************************************************/
@@ -110,7 +110,7 @@ void Hackflight::init(Board * _board)
     board->extrasInit(&msp);
 
     armed = false;
-    accCalibrated = false;
+    safeToArm = false;
 
 } // init
 
@@ -179,7 +179,7 @@ bool Hackflight::gotRcUpdate(void)
 
             // Arm via throttle-low / yaw-right
             if (rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE) {
-                if (gyroCalibrationCountdown == 0 && accCalibrated) {
+                if (gyroCalibrationCountdown == 0 && safeToArm) {
                     if (!rc.auxState()) // aux switch must be in zero position
                         if (!armed) {
                             armed = true;
@@ -222,9 +222,6 @@ void Hackflight::updateImu(void)
 
 void Hackflight::updateCalibrationState(void)
 {
-    haveSmallAngle = 
-        abs(imu.angle[0]) < smallAngle && abs(imu.angle[1]) < smallAngle;
-
     if (accelCalibrationCountdown > 0)
         accelCalibrationCountdown--;
 
@@ -236,7 +233,7 @@ void Hackflight::updateCalibrationState(void)
         board->ledSet(0, true);
     }
     else {
-        if (accCalibrated)
+        if (safeToArm)
             board->ledSet(0, false);
         if (armed)
             board->ledSet(1, true);
@@ -247,12 +244,12 @@ void Hackflight::updateCalibrationState(void)
     // If angle too steep, restart accel calibration and flash LED
     uint32_t currentTime = board->getMicros();
     if (angleCheckTask.check(currentTime)) {
-        if (!haveSmallAngle) {
-            accCalibrated = false; 
+        if (!(abs(imu.angle[0]) < maxArmingAngle && abs(imu.angle[1]) < maxArmingAngle)) {
+            safeToArm = false; 
             blinkLedForTilt();
             angleCheckTask.update(currentTime);
         } else {
-            accCalibrated = true;
+            safeToArm = true;
         }
     }
 }
@@ -297,7 +294,7 @@ void Hackflight::initImuRc(const Config& config)
     ImuConfig imuConfig = config.imu;
 
     // Store some for later
-    smallAngle = imuConfig.smallAngle;
+    maxArmingAngle = imuConfig.maxArmingAngle;
 
     // compute loop times based on config from board
     calibratingGyroCycles   = (uint16_t)(1000. * loopConfig.calibratingGyroMilli  / loopConfig.imuLoopMicro);
@@ -305,9 +302,6 @@ void Hackflight::initImuRc(const Config& config)
 
     // always do gyro calibration at startup
     gyroCalibrationCountdown = calibratingGyroCycles;
-
-    // assume shallow angle (no accelerometer calibration needed)
-    haveSmallAngle = true;
 
     imu.init(imuConfig, board, calibratingGyroCycles, calibratingAccelCycles);
 

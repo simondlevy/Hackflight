@@ -108,7 +108,7 @@ void Stabilize::update(void)
 
         if (axis < 2) {
 
-            // 50 degrees max inclination
+            // max inclination
             int32_t errorAngle = constrain(2 * this->rc->command[axis], 
                 -imu->config.maxAngleInclination, 
                 + imu->config.maxAngleInclination) 
