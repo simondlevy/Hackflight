@@ -171,42 +171,6 @@ class Teensy : public Board {
 
     }
 
-    virtual void showArmedStatus(bool armed) override
-    {
-        // XXX this would be a good place to sound a buzzer!
-        (void)armed;
-    }
-
-    virtual void showAuxStatus(uint8_t status) override
-    {
-        (void)status;
-    }
-
-    virtual void extrasInit(class MSP * _msp) override 
-    {
-        (void)_msp;
-    }
-
-    virtual void extrasCheckSwitch(void) override
-    {
-    }
-
-    virtual uint8_t extrasGetTaskCount(void) override
-    {
-        return 0;
-    }
-
-    virtual bool extrasHandleMSP(uint8_t command) override
-    {
-        (void)command;
-        return true;
-    }
-
-    virtual void extrasPerformTask(uint8_t taskIndex) override
-    {
-        (void)taskIndex;
-    } 
-
 }; // class
 
 } // namespace
