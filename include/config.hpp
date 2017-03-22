@@ -72,7 +72,6 @@ struct ImuConfig {
     float    gyroScale			    = 16.4f;  // for Invensense MPU 
     uint16_t maxAngleInclination    = 500; 
     uint16_t maxArmingAngle			= 250;		 
-    float    moronThreshold			= 32.f ;  // variance in motion that triggers recalibration
 };
 
 

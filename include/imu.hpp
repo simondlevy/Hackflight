@@ -1,20 +1,20 @@
-/*
-   imu.hpp : IMU class header
+    /*
+       imu.hpp : IMU class header
 
-   This file is part of Hackflight.
+       This file is part of Hackflight.
 
-   Hackflight is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+       Hackflight is free software: you can redistribute it and/or modify
+       it under the terms of the GNU General Public License as published by
+       the Free Software Foundation, either version 3 of the License, or
+       (at your option) any later version.
 
-   Hackflight is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-   You should have received a copy of the GNU General Public License
-   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
- */
+       Hackflight is distributed in the hope that it will be useful,
+       but WITHOUT ANY WARRANTY; without even the implied warranty of
+       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+       GNU General Public License for more details.
+       You should have received a copy of the GNU General Public License
+       along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+     */
 
 #pragma once
 
@@ -23,53 +23,53 @@
 
 #include "config.hpp"
 
-namespace hf {
+    namespace hf {
 
-enum {
-    AXIS_ROLL = 0,
-    AXIS_PITCH,
-    AXIS_YAW
-};
+    enum {
+        AXIS_ROLL = 0,
+        AXIS_PITCH,
+        AXIS_YAW
+    };
 
-class IMU {
-    
-    public: // fields
-        int16_t   accelADC[3];   // [-4096,+4096]
-        int16_t   gyroADC[3];    // [-4096,+4096]
-        ImuConfig config;
-        int16_t   angle[3];      // tenths of a degree
+    class IMU {
+        
+        public: // fields
+            int16_t   accelADC[3];   // [-4096,+4096]
+            int16_t   gyroADC[3];    // [-4096,+4096]
+            ImuConfig config;
+            int16_t   angle[3];      // tenths of a degree
 
-    public: // methods
-        void init(ImuConfig & imuConfig, Board * _board, uint16_t _gyroCalibrationCountdownCycles, uint16_t _accelCalibrationCountdownccCycles);
+        public: // methods
+            void init(ImuConfig & imuConfig, Board * _board, 
+                    uint16_t _gyroCalibrationCountdownCycles, uint16_t _accelCalibrationCountdownccCycles);
 
-        void update(uint32_t currentTimeUsec, bool armed, uint16_t accelCalibrationCountdown=0, uint16_t gyroCalibrationCountdown=0);
+            void update(uint32_t currentTimeUsec, bool armed, 
+                    uint16_t accelCalibrationCountdown=0, uint16_t gyroCalibrationCountdown=0);
 
-        // called from Hover
-        float computeAccelZ(void);
+            // called from Hover
+            float computeAccelZ(void);
 
-    private: // types
-        enum {
-            X = 0,
-            Y,
-            Z
-        };
+        private: // types
+            enum {
+                X = 0,
+                Y,
+                Z
+            };
 
-        typedef struct stdev_t {
-            float m_oldM, m_newM, m_oldS, m_newS;
-            int m_n;
-        } stdev_t;
+            typedef struct stdev_t {
+                float m_oldM, m_newM, m_oldS, m_newS;
+                int m_n;
+            } stdev_t;
 
-    private: //methods
-        static void devClear(stdev_t *dev);
-        static void devPush(stdev_t *dev, float x);
-        static float devVariance(stdev_t *dev);
-        static float devStandardDeviation(stdev_t *dev);
-        static void normalizeV(float src[3], float dest[3]);
-        static void rotateV(float v[3], float *delta);
+        private: //methods
+            static void devClear(stdev_t *dev);
+            static void devPush(stdev_t *dev, float x);
+            static void normalizeV(float src[3], float dest[3]);
+            static void rotateV(float v[3], float *delta);
 
-    private: //fields
-        int32_t     a[3];
-        float       accelLpf[3];
+        private: //fields
+            int32_t     a[3];
+            float       accelLpf[3];
         int16_t     accelSmooth[3];
         int32_t     accelSum[3];
         int32_t     accelSumCount;
@@ -174,17 +174,6 @@ void IMU::devPush(stdev_t *dev, float x)
     }
 }
 
-float IMU::devVariance(stdev_t *dev)
-{
-    return ((dev->m_n > 1) ? dev->m_newS / (dev->m_n - 1) : 0.0f);
-}
-
-float IMU::devStandardDeviation(stdev_t *dev)
-{
-    return sqrtf(devVariance(dev));
-}
-
-
 void IMU::normalizeV(float src[3], float dest[3])
 {
     float length = sqrtf(src[X] * src[X] + src[Y] * src[Y] + src[Z] * src[Z]);
@@ -240,7 +229,8 @@ void IMU::init(ImuConfig & imuConfig, Board * _board, uint16_t _gyroCalibrationC
 }
 
 
-void IMU::update(uint32_t currentTimeUsec, bool armed, uint16_t accelCalibrationCountdown, uint16_t gyroCalibrationCountdown)
+void IMU::update(uint32_t currentTimeUsec, bool armed, 
+        uint16_t accelCalibrationCountdown, uint16_t gyroCalibrationCountdown)
 {
     int32_t accMag = 0;
     float rpy[3];
@@ -302,16 +292,6 @@ void IMU::update(uint32_t currentTimeUsec, bool armed, uint16_t accelCalibration
             gyroADC[axis] = 0;
             gyroZero[axis] = 0;
             if (gyroCalibrationCountdown == 1) {
-                float dev = devStandardDeviation(&var[axis]);
-                // check deviation and startover if idiot was moving the model
-                if (config.moronThreshold && dev > config.moronThreshold) {
-                    gyroCalibrationCountdown = gyroCalibrationCountdownCycles;
-                    devClear(&var[0]);
-                    devClear(&var[1]);
-                    devClear(&var[2]);
-                    g[0] = g[1] = g[2] = 0;
-                    continue;
-                }
                 gyroZero[axis] = (g[axis] + (gyroCalibrationCountdownCycles / 2)) / gyroCalibrationCountdownCycles;
             }
         }
