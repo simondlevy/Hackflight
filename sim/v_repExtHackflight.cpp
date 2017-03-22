@@ -196,6 +196,10 @@ void VrepSimBoard::init(void)
     pwmMax = config.pwm.max;
 }
 
+void VrepSimBoard::imuInit(void)
+{
+}
+
 const Config& VrepSimBoard::getConfig()
 {
     // Loop timing overrides

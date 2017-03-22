@@ -30,29 +30,30 @@ namespace hf {
 
         public:
 
-            virtual void init(void) override;
-            virtual const Config& getConfig() override;
-            virtual void imuRead(int16_t accADC[3], int16_t gyroADC[3]) override;
-            virtual void ledSet(uint8_t id, bool is_on, float max_brightness)  override;
+            virtual void     init(void) override;
+            virtual const    Config& getConfig() override;
+            virtual void     imuInit(void) override;
+            virtual void     imuRead(int16_t accADC[3], int16_t gyroADC[3]) override;
+            virtual void     ledSet(uint8_t id, bool is_on, float max_brightness)  override;
             virtual uint64_t getMicros() override;
-            virtual bool rcUseSerial(void) override;
+            virtual bool     rcUseSerial(void) override;
             virtual uint16_t rcReadPwm(uint8_t chan) override;
-            virtual uint8_t serialAvailableBytes(void) override;
-            virtual uint8_t serialReadByte(void) override;
-            virtual void serialWriteByte(uint8_t c) override;
-            virtual void dump(char * msg) override;
-            virtual void writeMotor(uint8_t index, uint16_t value) override;
-            virtual void showArmedStatus(bool armed) override;
-            virtual void showAuxStatus(uint8_t status) override;
-            virtual void extrasCheckSwitch(void) override;
-            virtual uint8_t extrasGetTaskCount(void) override;
-            virtual bool extrasHandleMSP(uint8_t command) override;
-            virtual void extrasInit(class MSP * _msp) override;
-            virtual void extrasPerformTask(uint8_t taskIndex) override;
-            virtual bool rcSerialReady(void) override;
+            virtual uint8_t  serialAvailableBytes(void) override;
+            virtual uint8_t  serialReadByte(void) override;
+            virtual void     serialWriteByte(uint8_t c) override;
+            virtual void     dump(char * msg) override;
+            virtual void     writeMotor(uint8_t index, uint16_t value) override;
+            virtual void     showArmedStatus(bool armed) override;
+            virtual void     showAuxStatus(uint8_t status) override;
+            virtual void     extrasCheckSwitch(void) override;
+            virtual uint8_t  extrasGetTaskCount(void) override;
+            virtual bool     extrasHandleMSP(uint8_t command) override;
+            virtual void     extrasInit(class MSP * _msp) override;
+            virtual void     extrasPerformTask(uint8_t taskIndex) override;
+            virtual bool     rcSerialReady(void) override;
             virtual uint16_t rcReadSerial(uint8_t chan) override;
-            virtual void checkReboot(bool pendReboot) override;
-            virtual void reboot(void) override;
-            virtual void delayMilliseconds(uint32_t msec) override;
+            virtual void     checkReboot(bool pendReboot) override;
+            virtual void     reboot(void) override;
+            virtual void     delayMilliseconds(uint32_t msec) override;
     }; 
 } 
