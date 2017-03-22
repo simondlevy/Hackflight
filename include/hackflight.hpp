@@ -297,8 +297,8 @@ void Hackflight::initImuRc(const Config& config)
     maxArmingAngle = imuConfig.maxArmingAngle;
 
     // compute loop times based on config from board
-    calibratingGyroCycles   = (uint16_t)(1000. * loopConfig.calibratingGyroMilli  / loopConfig.imuLoopMicro);
-    calibratingAccelCycles  = (uint16_t)(1000. * loopConfig.calibratingAccelMilli / loopConfig.imuLoopMicro);
+    calibratingGyroCycles   = (uint16_t)(1000. * imuConfig.calibratingGyroMilli  / loopConfig.imuLoopMicro);
+    calibratingAccelCycles  = (uint16_t)(1000. * imuConfig.calibratingAccelMilli / loopConfig.imuLoopMicro);
 
     // always do gyro calibration at startup
     gyroCalibrationCountdown = calibratingGyroCycles;

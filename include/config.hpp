@@ -49,8 +49,6 @@ struct PidConfig {
 struct LoopConfig {
 
     uint32_t imuLoopMicro					= 3500;
-    uint32_t calibratingGyroMilli			= 3500;
-    uint32_t calibratingAccelMilli			= 1400;
     uint32_t angleCheckMilli	            = 500;
     uint32_t rcLoopMilli					= 20;
 };
@@ -68,6 +66,8 @@ struct ImuConfig {
     int32_t  accelZDeadband	        = 40;
     int32_t  accelXyDeadband        = 40;
     float    accelzLpfCutoff        = 5.f;
+    uint32_t calibratingGyroMilli	= 3500;
+    uint32_t calibratingAccelMilli	= 1400;
     float    gyroCmpfFactor		    = 600.f;
     float    gyroScale			    = 16.4f;  // for Invensense MPU 
     uint16_t maxAngleInclination    = 500; 
