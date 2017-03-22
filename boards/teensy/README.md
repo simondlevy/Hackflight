@@ -1,7 +1,7 @@
 # Running Hackflight on Teensy 3.2
 
 The code in the hackflight directory below allows you to run Hackflight on Kris Winer's brushed-motor 
-(flight controller)[https://forum.pjrc.com/threads/32985-Teensy-Flight-Controller]
+[flight controller](https://forum.pjrc.com/threads/32985-Teensy-Flight-Controller)
 based on Teensy 3.1.
 
 To build Hackflight for Teensy, you should first have the 
