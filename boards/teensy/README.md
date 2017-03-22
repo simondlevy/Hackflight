@@ -11,7 +11,7 @@ a version no higher than the latest one supporting Teensy.) Then install
 <b>hardware/teensy/avr/libraries</b> folder under your Arduino folder, and install the following two libraries
 there:
 <ul>
-<p><li> My [EM7180_passthru](https://github.com/simondlevy/EM7180_passthru) library
+<p><li> My [EM7180 passthru](https://github.com/simondlevy/EM7180_passthru) library
 <p><li> My [SpektrumDSM](https://github.com/simondlevy/SpektrumDSM) library
 </ul>
 
