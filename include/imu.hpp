@@ -49,6 +49,8 @@
 
             bool gyroCalibrated(void);
 
+            void getEulerAngles(int16_t eulerAngles[3]);
+
             // called from Hover
             float computeAccelZ(void);
 
@@ -408,5 +410,10 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
         gyroCalibrationCountdown--;
 
 } // update
+
+void IMU::getEulerAngles(int16_t eulerAngles[3])
+{
+    memcpy(eulerAngles, angle, 6);
+}
 
 } // namespace
