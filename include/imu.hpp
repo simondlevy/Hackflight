@@ -34,7 +34,6 @@
     class IMU {
         
         public: // fields
-            int16_t   angle[3];      // tenths of a degree
             int16_t   gyroADC[3];    // [-4096,+4096]
             ImuConfig config;
 
@@ -85,6 +84,7 @@
             int16_t     accelZero[3];
             int32_t     accelZoffset;
             float       accz_smooth;
+            int16_t     angle[3];      // tenths of a degree
             Board *     board;
             uint16_t    calibratingAccelCycles;
             uint16_t    calibratingGyroCycles;
