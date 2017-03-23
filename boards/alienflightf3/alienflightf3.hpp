@@ -70,17 +70,16 @@ class AlienflightF3 : public Board {
 
         Wire.begin(2);
 
+        delay(100);
+
+        imu = new MPU6050();
+        imu->begin(AFS_8G, GFS_2000DPS);
+
         motors[0].attach(15);
         motors[1].attach(14);
         motors[2].attach(8);
         motors[3].attach(0);
 
-    }
-
-    virtual void imuInit(void) override
-    {
-        imu = new MPU6050();
-        imu->begin(AFS_8G, GFS_2000DPS);
     }
 
     virtual const Config& getConfig() override

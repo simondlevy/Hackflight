@@ -40,7 +40,6 @@ class Board {
         virtual void     delayMilliseconds(uint32_t msec) = 0;
         virtual void     dump(char * msg) = 0;
         virtual uint64_t getMicros() = 0;
-        virtual void     imuInit(void) = 0;
         virtual void     imuRead(int16_t accADC[3], int16_t gyroADC[3]) = 0;
         virtual void     ledSet(uint8_t id, bool is_on, float max_brightness = 255) { (void)id; (void)is_on; (void)max_brightness;}
 

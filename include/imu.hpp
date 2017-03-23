@@ -195,9 +195,6 @@ void IMU::init(ImuConfig & imuConfig, Board * _board)
 {
     board = _board;
 
-    // Initialize the IMU hardware on the board
-    board->imuInit();
-
     for (int k=0; k<3; ++k) {
         a[k] = 0;
         accelLpf[k] = 0;

@@ -196,15 +196,11 @@ void VrepSimBoard::init(void)
     pwmMax = config.pwm.max;
 }
 
-void VrepSimBoard::imuInit(void)
-{
-}
-
 const Config& VrepSimBoard::getConfig()
 {
     // Loop timing overrides
-    config.loop.imuLoopMicro                = 10000;    // VREP's shortest simulation period
-    config.loop.calibratingGyroMilli        = 100;		// long enough to see but not to annoy
+    config.imu.loopMicro             = 10000;    // VREP's shortest simulation period
+    config.imu.calibratingGyroMilli  = 100;		// long enough to see but not to annoy
 
     // PIDs
     config.pid.levelP          = 10;

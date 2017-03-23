@@ -62,16 +62,13 @@ class Beef : public Board {
 
         delay(100);
         
+        imu = new MPU6050();
+        imu->begin(AFS_8G, GFS_2000DPS);
+
         motors[0].attach(8);
         motors[1].attach(11);
         motors[2].attach(6);
         motors[3].attach(7);
-    }
-
-    virtual void imuInit(void) override
-    {
-        imu = new MPU6050();
-        imu->begin(AFS_8G, GFS_2000DPS);
     }
 
     virtual const Config& getConfig() override

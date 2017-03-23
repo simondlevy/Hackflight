@@ -54,6 +54,9 @@ class Teensy : public Board {
         Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
         delay(1000);
 
+        // Start the EM7180 (for now, only specify IMU params)
+        em7180.begin(AFS_8G, GFS_2000DPS);
+
         // Begin serial comms
         Serial.begin(115200);
 
@@ -62,12 +65,6 @@ class Teensy : public Board {
               analogWriteFrequency(motorPins[k], 10000);  
               analogWrite(motorPins[k], 0);  
         }
-    }
-
-    virtual void imuInit(void) override 
-    {
-        // Start the EM7180 (for now, only specify IMU params)
-        em7180.begin(AFS_8G, GFS_2000DPS);
     }
 
     virtual const Config& getConfig(void) override
