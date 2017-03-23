@@ -34,7 +34,6 @@
     class IMU {
         
         public: // fields
-            int16_t   gyroADC[3];    // [-4096,+4096]
             ImuConfig config;
 
         public: // methods
@@ -49,6 +48,8 @@
             bool gyroCalibrated(void);
 
             void getEulerAngles(int16_t eulerAngles[3]);
+
+            void getRawGyro(int16_t gyroRaw[3]);
 
             // called from Hover
             float computeAccelZ(void);
@@ -91,6 +92,7 @@
             float       EstG[3];
             float       EstN[3];
             float       fcAcc;
+            int16_t     gyroADC[3];    // [-4096,+4096]
             uint16_t    gyroCalibrationCountdown;
             float       gyroCmpfFactor;
             float       gyroScale;
@@ -414,6 +416,11 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
 void IMU::getEulerAngles(int16_t eulerAngles[3])
 {
     memcpy(eulerAngles, angle, 6);
+}
+
+void IMU::getRawGyro(int16_t gyroRaw[3])
+{
+    memcpy(gyroRaw, gyroADC, 6);
 }
 
 } // namespace

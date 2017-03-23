@@ -222,14 +222,18 @@ void Hackflight::updateImu(void)
 
         // IMU update reads IMU raw angles and converts them to Euler angles
         imu.update(currentTime, armed);
+
+        // Get Euler angles and raw gyro from IMU
         int16_t eulerAngles[3];
         imu.getEulerAngles(eulerAngles);
+        int16_t gyroRaw[3];
+        imu.getRawGyro(gyroRaw);
 
         // Periodically update accelerometer calibration status using Euler angles
         updateCalibrationState(eulerAngles);
 
         // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
-        stab.update(rc.command, imu.gyroADC, eulerAngles);
+        stab.update(rc.command, gyroRaw, eulerAngles);
 
         mixer.update(armed, board);
         msp.update(armed);
