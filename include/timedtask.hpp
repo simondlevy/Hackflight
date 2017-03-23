@@ -31,28 +31,28 @@ class TimedTask {
 
         void init(uint32_t _period) {
 
-            this->period = _period;
-            this->usec = 0;
+            period = _period;
+            usec = 0;
         }
 
         bool checkAndUpdate(uint32_t currentTime) {
 
-            bool result = (int32_t)(currentTime - this->usec) >= 0;
+            bool result = (int32_t)(currentTime - usec) >= 0;
 
             if (result)
-                this->update(currentTime);
+                update(currentTime);
 
             return result;
         }
 
         void update(uint32_t currentTime) {
 
-            this->usec = currentTime + this->period;
+            usec = currentTime + period;
         }
 
         bool check(uint32_t currentTime) {
 
-            return (int32_t)(currentTime - this->usec) >= 0;
+            return (int32_t)(currentTime - usec) >= 0;
         }
 };
 
