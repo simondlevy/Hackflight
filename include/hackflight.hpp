@@ -59,7 +59,7 @@ class Hackflight {
         bool gotRcUpdate(void);
         void flashLeds(const InitConfig& config);
         void updateImu(void);
-        void updateCalibrationState(void);
+        void updateCalibrationState(int16_t eulerAngles[3]);
 
     private:
         bool       armed;
@@ -224,7 +224,7 @@ void Hackflight::updateImu(void)
         imu.update(currentTime, armed);
 
         // Periodically update accelerometer calibration status
-        updateCalibrationState();
+        updateCalibrationState(imu.angle);
 
         // Stabilization, mixing, and MSP are synced to IMU update
         stab.update(rc.command, imu.gyroADC, imu.angle);
@@ -233,7 +233,7 @@ void Hackflight::updateImu(void)
     } 
 } 
 
-void Hackflight::updateCalibrationState(void)
+void Hackflight::updateCalibrationState(int16_t eulerAngles[3])
 {
     // use LEDs to indicate calibration and arming status
     if (!imu.accelCalibrated() || !imu.gyroCalibrated()) {
@@ -251,7 +251,7 @@ void Hackflight::updateCalibrationState(void)
     // If angle too steep, restart accel calibration and flash LED
     uint32_t currentTime = board->getMicros();
     if (angleCheckTask.check(currentTime)) {
-        if (!(abs(imu.angle[0]) < maxArmingAngle && abs(imu.angle[1]) < maxArmingAngle)) {
+        if (!(abs(eulerAngles[0]) < maxArmingAngle && abs(eulerAngles[1]) < maxArmingAngle)) {
             safeToArm = false; 
             blinkLedForTilt();
             angleCheckTask.update(currentTime);
