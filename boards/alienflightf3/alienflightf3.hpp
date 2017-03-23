@@ -25,7 +25,7 @@
 
 #include <math.h>
 
-#include <board.hpp>
+#include <mw32.hpp>
 #include <hackflight.hpp>
 
 MPU6050 * imu;
@@ -36,7 +36,7 @@ BrushedMotor motors[4];
 
 namespace hf {
 
-class AlienflightF3 : public Board {
+class AlienflightF3 : public MW32 {
 
     virtual void dump(char * msg) override
     {

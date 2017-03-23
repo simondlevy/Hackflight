@@ -116,7 +116,7 @@ void Hackflight::init(Board * _board)
     rc.init(config.rc, config.pwm);
 
     // Initialize our stabilization, mixing, and MSP (serial comms)
-    stab.init(config.pid, &rc, &imu);
+    stab.init(config.pid, &imu);
     mixer.init(config.pwm, &rc, &stab); 
     msp.init(&imu, &mixer, &rc, board);
 
@@ -152,19 +152,22 @@ void Hackflight::update(void)
 bool Hackflight::gotRcUpdate(void)
 {
     // if it's not time to update, and we have no new serial RC values, we're done
-    if (!rcTask.checkAndUpdate(board->getMicros()) && !board->rcSerialReady())
+    if (!rcTask.checkAndUpdate(board->getMicros()) && !board->rcSerialReady()) {
         return false;
+    }
 
     // update RC channels
     rc.update(board);
 
     // useful for simulator
-    if (armed)
+    if (armed) {
         board->showAuxStatus(rc.auxState());
+    }
 
     // when landed, reset integral component of PID
-    if (rc.throttleIsDown()) 
+    if (rc.throttleIsDown()) {
         stab.resetIntegral();
+    }
 
     if (rc.changed()) {
 
@@ -224,7 +227,7 @@ void Hackflight::updateImu(void)
         updateCalibrationState();
 
         // Stabilization, mixing, and MSP are synced to IMU update
-        stab.update();
+        stab.update(rc.command);
         mixer.update(armed, board);
         msp.update(armed);
     } 

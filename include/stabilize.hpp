@@ -34,15 +34,14 @@ class Stabilize {
 public:
     int16_t axisPID[3];
 
-    void init(const PidConfig& config, RC * _rc, IMU * _imu);
+    void init(const PidConfig& config, IMU * _imu);
 
-    void update(void);
+    void update(int16_t rcCommand[4]);
 
     void resetIntegral(void);
 
 private:
 
-    RC  * rc;
     IMU * imu;
 
     uint8_t rate_p[3];
@@ -61,11 +60,10 @@ private:
 
 /********************************************* CPP ********************************************************/
 
-void Stabilize::init(const PidConfig& pidConfig, RC * _rc, IMU * _imu)
+void Stabilize::init(const PidConfig& pidConfig, IMU * _imu)
 {
     memcpy(&config, &pidConfig, sizeof(PidConfig));
 
-    rc = _rc;
     imu = _imu;
 
     for (uint8_t axis=0; axis<3; ++axis) {
@@ -89,17 +87,17 @@ void Stabilize::init(const PidConfig& pidConfig, RC * _rc, IMU * _imu)
     resetIntegral();
 }
 
-void Stabilize::update(void)
+void Stabilize::update(int16_t rcCommand[4])
 {
     for (uint8_t axis = 0; axis < 3; axis++) {
 
-        int32_t error = (int32_t)rc->command[axis] * 10 * 8 / rate_p[axis];
+        int32_t error = (int32_t)rcCommand[axis] * 10 * 8 / rate_p[axis];
         error -= imu->gyroADC[axis];
 
-        int32_t PTermGYRO = rc->command[axis];
+        int32_t PTermGYRO = rcCommand[axis];
 
         errorGyroI[axis] = constrain(errorGyroI[axis] + error, -16000, +16000); // WindUp
-        if ((std::abs(imu->gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (std::abs(rc->command[axis]) > 100)))
+        if ((std::abs(imu->gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (std::abs(rcCommand[axis]) > 100)))
             errorGyroI[axis] = 0;
         int32_t ITermGYRO = (errorGyroI[axis] / 125 * rate_i[axis]) >> 6;
 
@@ -109,7 +107,7 @@ void Stabilize::update(void)
         if (axis < 2) {
 
             // max inclination
-            int32_t errorAngle = constrain(2 * rc->command[axis], 
+            int32_t errorAngle = constrain(2 * rcCommand[axis], 
                 -imu->config.maxAngleInclination, 
                 + imu->config.maxAngleInclination) 
                 - imu->angle[axis];
@@ -119,8 +117,8 @@ void Stabilize::update(void)
             errorAngleI[axis] = constrain(errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
             int32_t ITermACC = ((int32_t)(errorAngleI[axis] * config.levelI)) >> 12;
 
-            int32_t prop = (std::max)(std::abs(rc->command[DEMAND_PITCH]), 
-                                    std::abs(rc->command[DEMAND_ROLL])); // range [0;500]
+            int32_t prop = (std::max)(std::abs(rcCommand[DEMAND_PITCH]), 
+                                    std::abs(rcCommand[DEMAND_ROLL])); // range [0;500]
 
             PTerm = (PTermACC * (500 - prop) + PTermGYRO * prop) / 500;
             ITerm = (ITermACC * (500 - prop) + ITermGYRO * prop) / 500;
@@ -138,7 +136,7 @@ void Stabilize::update(void)
 
     // prevent "yaw jump" during yaw correction
     axisPID[AXIS_YAW] = constrain(axisPID[AXIS_YAW], 
-        -100 - std::abs(rc->command[DEMAND_YAW]), +100 + std::abs(rc->command[DEMAND_YAW]));
+        -100 - std::abs(rcCommand[DEMAND_YAW]), +100 + std::abs(rcCommand[DEMAND_YAW]));
 }
 
 void Stabilize::resetIntegral(void)
