@@ -116,7 +116,7 @@ void Hackflight::init(Board * _board)
     rc.init(config.rc, config.pwm);
 
     // Initialize our stabilization, mixing, and MSP (serial comms)
-    stab.init(config.pid, &imu);
+    stab.init(config.pid, config.imu);
     mixer.init(config.pwm, &rc, &stab); 
     msp.init(&imu, &mixer, &rc, board);
 
@@ -227,7 +227,7 @@ void Hackflight::updateImu(void)
         updateCalibrationState();
 
         // Stabilization, mixing, and MSP are synced to IMU update
-        stab.update(rc.command);
+        stab.update(rc.command, imu.gyroADC, imu.angle);
         mixer.update(armed, board);
         msp.update(armed);
     } 
