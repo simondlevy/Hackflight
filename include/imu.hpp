@@ -34,10 +34,9 @@
     class IMU {
         
         public: // fields
-            int16_t   accelADC[3];   // [-4096,+4096]
+            int16_t   angle[3];      // tenths of a degree
             int16_t   gyroADC[3];    // [-4096,+4096]
             ImuConfig config;
-            int16_t   angle[3];      // tenths of a degree
 
         public: // methods
             void init(ImuConfig & imuConfig, Board * _board);
@@ -75,6 +74,7 @@
         private: //fields
             int32_t     a[3];
             uint16_t    accelCalibrationCountdown;
+            int16_t     accelADC[3];   // [-4096,+4096]
             float       accelLpf[3];
             int16_t     accelSmooth[3];
             int32_t     accelSum[3];
@@ -194,6 +194,9 @@ void IMU::normalizeV(float src[3], float dest[3])
 void IMU::init(ImuConfig & imuConfig, Board * _board)
 {
     board = _board;
+
+    // Initialize the IMU hardware on the board
+    board->imuInit();
 
     for (int k=0; k<3; ++k) {
         a[k] = 0;

@@ -94,9 +94,6 @@ void Hackflight::init(Board * _board)
     // Flash the LEDs to indicate startup
     flashLeds(config.init);
 
-    // Initialize the IMU hardware on the board
-    board->imuInit();
-
     // Get particulars for board
     LoopConfig loopConfig = config.loop;
     ImuConfig imuConfig = config.imu;
