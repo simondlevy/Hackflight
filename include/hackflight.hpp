@@ -27,7 +27,7 @@
 #include "mixer.hpp"
 #include "msp.hpp"
 #include "common.hpp"
-#include "imu.hpp"
+//#include "imu.hpp"
 #include "rc.hpp"
 #include "stabilize.hpp"
 #include "timedtask.hpp"
@@ -102,7 +102,8 @@ void Hackflight::init(Board * _board)
     maxArmingAngle = imuConfig.maxArmingAngle;
 
     // Initialize the IMU
-    imu.init(imuConfig, board);
+    //imu.init(imuConfig, board);
+    board->imuInit(imuConfig);
 
     // Sleep  a bit to allow IMU to catch up
     board->delayMilliseconds(config.init.delayMilli);
@@ -118,7 +119,7 @@ void Hackflight::init(Board * _board)
     // Initialize our stabilization, mixing, and MSP (serial comms)
     stab.init(config.pid, config.imu);
     mixer.init(config.pwm, &rc, &stab); 
-    msp.init(&imu, &mixer, &rc, board);
+    msp.init(&mixer, &rc, board);
 
     // Initialize any extra stuff you want to do with your board
     board->extrasInit(&msp);
@@ -187,12 +188,14 @@ bool Hackflight::gotRcUpdate(void)
 
             // Restart IMU calibration via throttle-low / yaw left
             if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
-                imu.restartCalibration();
+                //imu.restartCalibration();
+                board->imuRestartCalibration();
             }
 
             // Arm via throttle-low / yaw-right
             if (rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE) {
-                if (imu.gyroCalibrated() && safeToArm) {
+                if (board->imuGyroCalibrated() && safeToArm) {
+                //if (imu.gyroCalibrated() && safeToArm) {
                     if (!rc.auxState()) // aux switch must be in zero position
                         if (!armed) {
                             armed = true;
@@ -221,13 +224,16 @@ void Hackflight::updateImu(void)
         rc.computeExpo();
 
         // IMU update reads IMU raw angles and converts them to Euler angles
-        imu.update(currentTime, armed);
+        //imu.update(currentTime, armed);
+        board->imuUpdate(currentTime, armed);
 
         // Get Euler angles and raw gyro from IMU
         int16_t eulerAngles[3];
-        imu.getEulerAngles(eulerAngles);
+        //imu.getEulerAngles(eulerAngles);
+        board->imuGetEulerAngles(eulerAngles);
         int16_t gyroRaw[3];
-        imu.getRawGyro(gyroRaw);
+        //imu.getRawGyro(gyroRaw);
+        board->imuGetRawGyro(gyroRaw);
 
         // Periodically update accelerometer calibration status using Euler angles
         updateCalibrationState(eulerAngles);
@@ -243,7 +249,8 @@ void Hackflight::updateImu(void)
 void Hackflight::updateCalibrationState(int16_t eulerAngles[3])
 {
     // use LEDs to indicate calibration and arming status
-    if (!imu.accelCalibrated() || !imu.gyroCalibrated()) {
+    //if (!imu.accelCalibrated() || !imu.gyroCalibrated()) {
+    if (!board->imuAccelCalibrated() || !board->imuGyroCalibrated()) {
         board->ledSet(0, true);
     }
     else {

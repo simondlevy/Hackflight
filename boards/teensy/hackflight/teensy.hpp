@@ -24,7 +24,7 @@
 
 #include <math.h>
 
-#include "board.hpp"
+#include "mw32.hpp"
 #include "hackflight.hpp"
 
 SpektrumDSM2048 rx;
@@ -35,7 +35,7 @@ static uint8_t motorPins[4] = {9, 22, 5, 23};
 
 namespace hf {
 
-class Teensy : public Board {
+class Teensy : public MW32 {
 
     virtual void dump(char * msg) override
     {
@@ -96,7 +96,7 @@ class Teensy : public Board {
         return (uint64_t)micros();
     }
 
-    virtual void imuRead(int16_t accelADC[3], int16_t gyroADC[3]) override
+    virtual void imuReadRaw(int16_t accelADC[3], int16_t gyroADC[3]) override
     {
         int16_t a[3];
         int16_t g[3];

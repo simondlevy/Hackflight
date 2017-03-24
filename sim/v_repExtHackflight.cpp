@@ -214,7 +214,7 @@ const Config& VrepSimBoard::getConfig()
     return config;
 }
 
-void VrepSimBoard::imuRead(int16_t accADC[3], int16_t gyroADC[3])
+void VrepSimBoard::imuReadRaw(int16_t accADC[3], int16_t gyroADC[3])
 {
     // Convert from radians to tenths of a degree
 

@@ -44,7 +44,7 @@ class AlienflightF3 : public MW32 {
             Serial.write(*c);
     }
 
-    virtual void imuRead(int16_t accADC[3], int16_t gyroADC[3]) override
+    virtual void imuReadRaw(int16_t accADC[3], int16_t gyroADC[3]) override
     {
         int16_t ax, ay, az, gx, gy, gz;
 

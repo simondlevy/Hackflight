@@ -19,7 +19,6 @@
 #pragma once
 
 #include "board.hpp"
-#include "imu.hpp"
 #include "rc.hpp"
 #include "mixer.hpp"
 
@@ -59,13 +58,12 @@ typedef  struct mspPortState_t {
 
 class MSP {
 public:
-    void init(IMU * _imu, Mixer * _mixer, RC * _rc, Board * _board);
+    void init(Mixer * _mixer, RC * _rc, Board * _board);
     void update(bool armed);
 
 private:
-    hf::IMU        * imu;
-    hf::Mixer      * mixer;
-    hf::RC         * rc;
+    hf::Mixer  * mixer;
+    hf::RC     * rc;
     Board      * board;
 
     mspPortState_t portState;
@@ -153,11 +151,10 @@ void MSP::tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-void MSP::init(IMU * _imu, Mixer * _mixer, RC * _rc, Board * _board)
+void MSP::init(Mixer * _mixer, RC * _rc, Board * _board)
 {
-    imu = _imu;
     mixer = _mixer;
-    rc = _rc;
+    rc    = _rc;
     board = _board;
 
     memset(&portState, 0, sizeof(portState));
@@ -230,7 +227,7 @@ void MSP::update(bool armed)
                 case MSP_ATTITUDE: {
                     headSerialReply(6);
                     int16_t eulerAngles[3];
-                    imu->getEulerAngles(eulerAngles);
+                    board->imuGetEulerAngles(eulerAngles);
                     for (uint8_t i = 0; i < 3; i++)
                         serialize16(eulerAngles[i]);
                     }

@@ -267,7 +267,7 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
     float scale = dT_sec* gyroScale; 
     float anglerad[3];
 
-    board->imuRead(accelADC, gyroADC);
+    board->imuReadRaw(accelADC, gyroADC);
 
     previousTimeUsec = currentTimeUsec;
 

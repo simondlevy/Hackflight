@@ -21,15 +21,59 @@
 #include "board.hpp"
 #include "imu.hpp"
 
+
 namespace hf {
 
 class MW32 : public Board {
+
+    public:
+
+        virtual void imuInit(ImuConfig & imuConfig) override; 
+        virtual void imuRestartCalibration(void) override; 
+        virtual bool imuAccelCalibrated(void) override; 
+        virtual bool imuGyroCalibrated(void) override; 
+        virtual void imuUpdate(uint32_t currentTime, bool armed) override; 
+        virtual void imuGetEulerAngles(int16_t eulerAngles[3]) override; 
+        virtual void imuGetRawGyro(int16_t gyroRaw[3]) override; 
 
     private:
 
         IMU imu;
 
+}; // class MW32
 
-}; // class Board
+void MW32::imuInit(ImuConfig &imuConfig)
+{
+    imu.init(imuConfig, this);
+}
 
-} // namespace
+void MW32::imuRestartCalibration(void) 
+{
+    imu.restartCalibration();
+}
+
+bool MW32::imuAccelCalibrated(void) 
+{
+    return imu.accelCalibrated();
+}
+
+bool MW32::imuGyroCalibrated(void) 
+{
+    return imu.gyroCalibrated();
+}
+void MW32::imuUpdate(uint32_t currentTime, bool armed) 
+{
+    imu.update(currentTime, armed);
+}
+
+void MW32::imuGetEulerAngles(int16_t eulerAngles[3]) 
+{
+    imu.getEulerAngles(eulerAngles);
+}
+
+void MW32::imuGetRawGyro(int16_t gyroRaw[3]) 
+{
+    imu.getRawGyro(gyroRaw);
+}
+
+} // namespace hf
