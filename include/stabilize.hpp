@@ -24,7 +24,6 @@
 #include <limits>
 
 #include "rc.hpp"
-#include "imu.hpp"
 #include "config.hpp"
 #include "common.hpp"
 

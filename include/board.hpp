@@ -43,7 +43,7 @@ class Board {
         virtual void     ledSet(uint8_t id, bool is_on, float max_brightness = 255) { (void)id; (void)is_on; (void)max_brightness;}
 
     //------------------------------------------- IMU -----------------------------------------------------------
-        virtual void     imuInit(ImuConfig & imuConfig) = 0;
+        virtual void     imuInit(void) = 0;
         virtual void     imuRestartCalibration(void) = 0;
         virtual bool     imuAccelCalibrated(void) = 0;
         virtual bool     imuGyroCalibrated(void) = 0;

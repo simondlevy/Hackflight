@@ -44,18 +44,18 @@ class AlienflightF3 : public MW32 {
             Serial.write(*c);
     }
 
-    virtual void imuReadRaw(int16_t accADC[3], int16_t gyroADC[3]) override
+    virtual void imuReadRaw(int16_t _accADC[3], int16_t _gyroADC[3]) override
     {
         int16_t ax, ay, az, gx, gy, gz;
 
         if (mpu->getMotion6Counts(&ax, &ay, &az, &gx, &gy, &gz)) {
 
-            accADC[0]  = -ay;
-            accADC[1]  = ax;
-            accADC[2]  = az;
-            gyroADC[0] = -gy;
-            gyroADC[1] = gx;
-            gyroADC[2] = gz;
+            _accADC[0]  = -ay;
+            _accADC[1]  = ax;
+            _accADC[2]  = az;
+            _gyroADC[0] = -gy;
+            _gyroADC[1] = gx;
+            _gyroADC[2] = gz;
         }
     }
 

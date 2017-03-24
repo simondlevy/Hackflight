@@ -44,9 +44,9 @@ class Beef : public MW32 {
             Serial.write(*c);
     }
 
-    virtual void imuReadRaw(int16_t accADC[3], int16_t gyroADC[3]) override
+    virtual void imuReadRaw(int16_t _accADC[3], int16_t _gyroADC[3]) override
     {
-        mpu->getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
+        mpu->getMotion6Counts(&_accADC[0], &_accADC[1], &_accADC[2], &_gyroADC[0], &_gyroADC[1], &_gyroADC[2]);
     }
 
 

@@ -27,7 +27,6 @@
 #include "mixer.hpp"
 #include "msp.hpp"
 #include "common.hpp"
-//#include "imu.hpp"
 #include "rc.hpp"
 #include "stabilize.hpp"
 #include "timedtask.hpp"
@@ -64,7 +63,6 @@ class Hackflight {
     private:
         bool       armed;
 
-        IMU        imu;
         RC         rc;
         Mixer      mixer;
         MSP        msp;
@@ -102,8 +100,7 @@ void Hackflight::init(Board * _board)
     maxArmingAngle = imuConfig.maxArmingAngle;
 
     // Initialize the IMU
-    //imu.init(imuConfig, board);
-    board->imuInit(imuConfig);
+    board->imuInit();
 
     // Sleep  a bit to allow IMU to catch up
     board->delayMilliseconds(config.init.delayMilli);

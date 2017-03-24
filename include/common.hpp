@@ -50,3 +50,9 @@
 #ifndef constrain
 #define constrain(val, lo, hi) (val) < (lo) ? (lo) : ((val) > (hi) ? (hi) : (val))
 #endif
+
+enum {
+        AXIS_ROLL = 0,
+        AXIS_PITCH,
+        AXIS_YAW
+     };
