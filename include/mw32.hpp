@@ -19,10 +19,15 @@
 #pragma once
 
 #include "board.hpp"
+#include "imu.hpp"
 
 namespace hf {
 
 class MW32 : public Board {
+
+    private:
+
+        IMU imu;
 
 
 }; // class Board

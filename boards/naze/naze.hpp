@@ -28,7 +28,7 @@
 #include <board.hpp>
 #include <hackflight.hpp>
 
-MPU6050 * imu;
+MPU6050 * mpu;
 
 SpektrumDSM2048 rx;
 
@@ -46,7 +46,7 @@ class Naze : public Board {
 
     virtual void imuRead(int16_t accADC[3], int16_t gyroADC[3]) override
     {
-        imu->getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
+        mpu->getMotion6Counts(&accADC[0], &accADC[1], &accADC[2], &gyroADC[0], &gyroADC[1], &gyroADC[2]);
     }
 
 
@@ -62,8 +62,8 @@ class Naze : public Board {
 
         delay(100);
 
-        imu = new MPU6050();
-        imu->begin(AFS_8G, GFS_2000DPS);
+        mpu = new MPU6050();
+        mpu->begin(AFS_8G, GFS_2000DPS);
 
         motors[0].attach(8);
         motors[1].attach(11);

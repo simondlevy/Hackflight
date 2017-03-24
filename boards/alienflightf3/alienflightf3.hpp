@@ -28,7 +28,7 @@
 #include <mw32.hpp>
 #include <hackflight.hpp>
 
-MPU6050 * imu;
+MPU6050 * mpu;
 
 SpektrumDSM2048 rx;
 
@@ -48,7 +48,7 @@ class AlienflightF3 : public MW32 {
     {
         int16_t ax, ay, az, gx, gy, gz;
 
-        if (imu->getMotion6Counts(&ax, &ay, &az, &gx, &gy, &gz)) {
+        if (mpu->getMotion6Counts(&ax, &ay, &az, &gx, &gy, &gz)) {
 
             accADC[0]  = -ay;
             accADC[1]  = ax;
@@ -72,8 +72,8 @@ class AlienflightF3 : public MW32 {
 
         delay(100);
 
-        imu = new MPU6050();
-        imu->begin(AFS_8G, GFS_2000DPS);
+        mpu = new MPU6050();
+        mpu->begin(AFS_8G, GFS_2000DPS);
 
         motors[0].attach(15);
         motors[1].attach(14);
