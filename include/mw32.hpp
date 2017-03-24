@@ -28,10 +28,6 @@ namespace hf {
 
 class MW32 : public Board {
 
-    public: // data
-
-        Config config;
-
     public: // methods
 
         virtual void imuInit(void) override; 
