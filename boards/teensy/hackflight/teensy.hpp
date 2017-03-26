@@ -211,10 +211,9 @@ class Teensy : public MW32 {
         delay(1000);
 
         // Start the EM7180 in pass-through mode
-        if (!em7180p.begin()) {
-            Serial.println("Failed to start EM7180 in pass-through mode");
-            while (true) 
-                ;
+        uint8_t status = em7180p.begin();
+        while (status) {
+            Serial.println(EM7180::errorToString(status));
         }
 
         // Read the WHO_AM_I register, this is a good test of communication
