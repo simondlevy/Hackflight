@@ -182,7 +182,7 @@ static void readAccelData(int16_t * destination)
 
 
 SpektrumDSM2048 rx;
-EM7180 em7180;
+EM7180_Passthru em7180p;
 
 static uint8_t motorPins[4] = {9, 22, 5, 23};
 
@@ -210,16 +210,9 @@ class Teensy : public MW32 {
         Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
         delay(1000);
 
-        // Start the EM7180
-        em7180.begin();
-
-        // Put EM7180 SENtral into pass-through mode
-        em7180.usePassThroughMode();
-        delay(1000);
-
-        // Read first page of EEPROM
-        if (!em7180.readEepromSignature()) {
-            Serial.println("EEPROM read failed\n");
+        // Start the EM7180 in pass-through mode
+        if (!em7180p.begin()) {
+            Serial.println("Failed to start EM7180 in pass-through mode");
             while (true) 
                 ;
         }
