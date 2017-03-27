@@ -306,10 +306,6 @@ class Teensy : public MW32 {
         return 0;
     }
 
-    virtual void reboot(void) override
-    {
-    }
-
     virtual uint8_t serialAvailableBytes(void) override
     {
         return Serial.available();
