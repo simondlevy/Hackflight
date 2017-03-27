@@ -51,8 +51,6 @@ class Board {
         virtual void     imuGetEulerAngles(int16_t eulerAngles[3]) = 0;
         virtual void     imuGetRawGyro(int16_t gyroRaw[3]) = 0;
 
-        virtual void     imuReadRaw(int16_t accADC[3], int16_t gyroADC[3]) = 0;
-
     //-------------------------------------------------- RC -----------------------------------------------------
         virtual uint16_t rcReadSerial(uint8_t chan) = 0;
         virtual bool     rcSerialReady(void) = 0;
@@ -79,8 +77,8 @@ class Board {
         virtual void     showAuxStatus(uint8_t status)  { (void)status; }
 
     //------------------------------------------------ STM32 ---------------------------------------------------
-        virtual void     checkReboot(bool pendReboot) = 0;
-        virtual void     reboot(void) = 0;
+        virtual void     checkReboot(bool pendReboot) { (void)pendReboot; }
+        virtual void     reboot(void) { }
 
 }; // class Board
 
