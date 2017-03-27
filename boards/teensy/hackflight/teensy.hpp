@@ -248,11 +248,6 @@ class Teensy : public MW32 {
         return config;
     }
 
-    virtual void checkReboot(bool pendReboot) override
-    {
-        (void)pendReboot;
-    }
-
     virtual void delayMilliseconds(uint32_t msec) override
     {
         delay(msec);
