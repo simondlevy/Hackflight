@@ -22,8 +22,6 @@
 #include <SpektrumDSM.h>
 #include <EM7180.h>
 
-#include <math.h>
-
 #include "hackflight.hpp"
 
 SpektrumDSM2048 rx;
@@ -34,7 +32,7 @@ static uint8_t motorPins[4] = {9, 22, 5, 23};
 
 namespace hf {
 
-class Teensy : public Board {
+class Teensy2 : public Board {
 
     virtual void dump(char * msg) override
     {
@@ -168,16 +166,41 @@ class Teensy : public Board {
     {
         (void)currentTime;
         (void)armed;
+
+        uint8_t errorStatus = em7180.update();
+        
+        if (errorStatus) {
+            Serial.printf("ERROR: %s\n", EM7180::errorToString(errorStatus));
+            return;
+        }
     }
+        
 
     virtual void imuGetEulerAngles(int16_t eulerAngles[3]) override
     {
-        (void)eulerAngles;
+
+        static float q[4];
+        em7180.getQuaternions(q);
+
+        float yaw   = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
+        float pitch = -asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
+        float roll  = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
+        
+        pitch *= 180.0f / PI;
+        
+        yaw   *= 180.0f / PI; 
+        if(yaw < 0) yaw   += 360.0f ; // Ensure yaw stays between 0 and 360
+        
+        roll  *= 180.0f / PI;
+
+        eulerAngles[0] = int16_t(roll * 10);
+        eulerAngles[1] = int16_t(pitch * 10);
+        eulerAngles[2] = int16_t(yaw * 10);
     }
 
     virtual void imuGetRawGyro(int16_t gyroRaw[3]) override
     {
-        (void)gyroRaw;
+         em7180.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
     }
 
 

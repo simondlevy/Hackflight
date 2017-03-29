@@ -226,11 +226,12 @@ void Hackflight::updateImu(void)
 
         // Get Euler angles and raw gyro from IMU
         int16_t eulerAngles[3];
-        //imu.getEulerAngles(eulerAngles);
         board->imuGetEulerAngles(eulerAngles);
         int16_t gyroRaw[3];
-        //imu.getRawGyro(gyroRaw);
         board->imuGetRawGyro(gyroRaw);
+
+
+        //Serial.printf("%5d %5d %5d | %5d %5d %5d\n", eulerAngles[0], eulerAngles[1], eulerAngles[2], gyroRaw[0], gyroRaw[1], gyroRaw[2]);
 
         // Periodically update accelerometer calibration status using Euler angles
         updateCalibrationState(eulerAngles);

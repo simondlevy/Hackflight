@@ -19,13 +19,13 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "teensy.hpp"
+#include "teensy2.hpp"
 
 hf::Hackflight h;
 
 void setup(void)
 {
-    h.init(new hf::Teensy());
+    h.init(new hf::Teensy2());
 }
 
 void loop(void)
