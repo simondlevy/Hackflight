@@ -34,12 +34,11 @@ The only parameters you should need to adjust are the PID tuning
 [params](https://github.com/simondlevy/hackflight/blob/master/include/config.hpp#L25-L43).  As 
 with Baseflight, you get a gyro auto-calibration sequence on startup, indicated
 by  steady green LED that turns off when the calibration is done.  You can
-re-calibrate the gyro by putting the collective (left) stick in full upper-left
-and the cyclic (right) in full center-down position.  You can calibrate the
-accelerometer with collective lower-left and cyclic center-down.  As usual,
-collective lower-right arms the board, and lower-left disarms it, as indicated
-by the red LED.  The green LED will flash when the board is tilted by more than
-25 degrees.
+re-calibrate the accelerometer and gyroscope by putting the collective (left) stick in full lower-left
+and the cyclic (right) in full center-down position.  
+As usual, collective lower-right arms the board, and lower-left disarms it, as
+indicated by the red LED.  The green LED will flash when the board is tilted by
+more than 25 degrees.
 
 Although Hackflight was designed to be &ldquo;headless&rdquo; (no configurator program),
 it is useful to get some visual feedback on things like vehicle orientation and RC receiver
