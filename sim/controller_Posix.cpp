@@ -126,6 +126,16 @@ controller_t posixControllerInit(char * name, const char * ps3name)
         axisdir[1] = -1;
         axisdir[3] = -1;
     }
+    if (strstr(name, "DeviationTx Deviation GamePad")) {
+        controller = DEVIATION;
+        axismap[0] = 0;
+        axismap[1] = 1;
+        axismap[2] = 3;
+        axismap[3] = 2;
+        axismap[4] = 4;
+        axisdir[0] = -1;
+        axisdir[2] = -1;
+    }
     else {
         printf("Uknown controller: %s\n", name);
     }

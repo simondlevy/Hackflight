@@ -516,6 +516,10 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     // Get demands from controller
     controllerRead(controller, demands);
 
+    for (int k=0; k<5; ++k)
+        printf("%f  ", demands[k]);
+    printf("\n");
+
     // PS3 spring-mounted throttle requires special handling
 	switch (controller) {
 	case PS3:
