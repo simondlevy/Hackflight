@@ -132,7 +132,7 @@ controller_t posixControllerInit(char * name, const char * ps3name)
         axismap[1] = 1;
         axismap[2] = 3;
         axismap[3] = 2;
-        axismap[4] = 4;
+        axismap[4] = 5;
         axisdir[0] = -1;
         axisdir[2] = -1;
     }
@@ -146,7 +146,7 @@ controller_t posixControllerInit(char * name, const char * ps3name)
 void posixControllerGrabAxis(controller_t controller, float * demands, int number, int value)
 {
     // Look at all five axes for R/C transmitters, first four for other controllers
-    int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
+    int maxaxis = (controller == TARANIS || controller == SPEKTRUM || controller == DEVIATION) ? 5 : 4;
 
     // Grab demands from axes
     for (int k=0; k<maxaxis; ++k)
