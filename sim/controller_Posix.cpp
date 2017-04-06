@@ -83,7 +83,7 @@ controller_t posixControllerInit(char * name, const char * ps3name)
     for (int k=0; k<6; ++k)
         axisdir[k] = +1;
 
-    if (strstr(name, "Taranis")) {
+    if (strstr(name, "Taranis") || strstr(name, "DeviationTx Deviation GamePad")) {
         controller = TARANIS;
         axismap[0] = 0;
         axismap[1] = 1;
@@ -126,16 +126,6 @@ controller_t posixControllerInit(char * name, const char * ps3name)
         axisdir[1] = -1;
         axisdir[3] = -1;
     }
-    if (strstr(name, "DeviationTx Deviation GamePad")) {
-        controller = DEVIATION;
-        axismap[0] = 0;
-        axismap[1] = 1;
-        axismap[2] = 3;
-        axismap[3] = 2;
-        axismap[4] = 5;
-        axisdir[0] = -1;
-        axisdir[2] = -1;
-    }
     else {
         printf("Uknown controller: %s\n", name);
     }
@@ -146,7 +136,7 @@ controller_t posixControllerInit(char * name, const char * ps3name)
 void posixControllerGrabAxis(controller_t controller, float * demands, int number, int value)
 {
     // Look at all five axes for R/C transmitters, first four for other controllers
-    int maxaxis = (controller == TARANIS || controller == SPEKTRUM || controller == DEVIATION) ? 5 : 4;
+    int maxaxis = (controller == TARANIS || controller == SPEKTRUM) ? 5 : 4;
 
     // Grab demands from axes
     for (int k=0; k<maxaxis; ++k)
