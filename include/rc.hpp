@@ -41,9 +41,11 @@ private:
 
     RcConfig config;
 
+    Board * board;
+
 public:
-    void init(const RcConfig& rcConfig, const PwmConfig& pwmConfig);
-    void update(Board* _board);
+    void init(const RcConfig& rcConfig, const PwmConfig& pwmConfig, Board * _board);
+    void update(void);
 
     int16_t data[CONFIG_RC_CHANS]; // raw PWM values for MSP
     int16_t command[4];            // stick PWM values for mixer, MSP
@@ -61,8 +63,10 @@ public:
 
 /********************************************* CPP ********************************************************/
 
-void RC::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig)
+void RC::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig, Board * _board)
 {
+    board = _board;
+
     memcpy(&config, &rcConfig, sizeof(RcConfig));
 
     midrc = (pwmConfig.max + pwmConfig.min) / 2;
@@ -93,11 +97,11 @@ void RC::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig)
     }
 }
 
-void RC::update(Board* _board)
+void RC::update()
 {
-    if (_board->rcUseSerial()) {
+    if (board->rcUseSerial()) {
         for (uint8_t chan = 0; chan < 5; chan++) {
-            data[chan] = _board->rcReadSerial(chan);
+            data[chan] = board->rcReadSerial(chan);
         }
     }
 
@@ -105,7 +109,7 @@ void RC::update(Board* _board)
         for (uint8_t chan = 0; chan < 8; chan++) {
 
             // get RC PWM
-            dataAverage[chan][averageIndex % 4] = _board->rcReadPwm(chan);
+            dataAverage[chan][averageIndex % 4] = board->rcReadPwm(chan);
 
             data[chan] = 0;
 
@@ -150,7 +154,7 @@ void RC::computeExpo(void)
         if (channel != DEMAND_YAW) { // roll, pitch
             tmp2 = tmp / 100;
             command[channel] = 
-                lookupPitchRollRC[tmp2] + (tmp - tmp2 * 100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2]) / 100;
+                lookupPitchRollRC[tmp2] + (tmp-tmp2*100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2])/100;
         } else {                    // yaw
             command[channel] = tmp * -1;
         }

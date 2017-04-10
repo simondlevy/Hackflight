@@ -111,10 +111,10 @@ void Hackflight::init(Board * _board)
     angleCheckTask.init(loopConfig.angleCheckMilli * 1000);
 
     // Initialize the RC receiver
-    rc.init(config.rc, config.pwm);
+    rc.init(config.rc, config.pwm, board);
 
     // Initialize our stabilization, mixing, and MSP (serial comms)
-    stab.init(config.pid, config.imu);
+    stab.init(config.pid, config.imu, board);
     mixer.init(config.pwm, &rc, &stab); 
     msp.init(&mixer, &rc, board);
 
@@ -155,7 +155,7 @@ bool Hackflight::gotRcUpdate(void)
     }
 
     // update RC channels
-    rc.update(board);
+    rc.update();
 
     // useful for simulator
     if (armed) {
@@ -221,7 +221,6 @@ void Hackflight::updateImu(void)
         rc.computeExpo();
 
         // IMU update reads IMU raw angles and converts them to Euler angles
-        //imu.update(currentTime, armed);
         board->imuUpdate(currentTime, armed);
 
         // Get Euler angles and raw gyro from IMU
@@ -229,9 +228,6 @@ void Hackflight::updateImu(void)
         board->imuGetEulerAngles(eulerAngles);
         int16_t gyroRaw[3];
         board->imuGetRawGyro(gyroRaw);
-
-
-        //Serial.printf("%5d %5d %5d | %5d %5d %5d\n", eulerAngles[0], eulerAngles[1], eulerAngles[2], gyroRaw[0], gyroRaw[1], gyroRaw[2]);
 
         // Periodically update accelerometer calibration status using Euler angles
         updateCalibrationState(eulerAngles);

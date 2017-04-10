@@ -26,15 +26,10 @@ namespace hf {
 void debug(Board * board, const char * fmt, ...)
 {
     va_list ap;       
-
     va_start(ap, fmt);     
-
     char buf[1000];
-
     VSPRINTF(buf, fmt, ap);
-
     board->dump(buf);
-
     va_end(ap);  
 }
 

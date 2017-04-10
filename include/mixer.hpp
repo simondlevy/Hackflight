@@ -74,14 +74,15 @@ void Mixer::update(bool armed, Board* board)
 {
     int16_t motors[4];
 
-    //debug(board, "%d\n", stabilize->axisPID[AXIS_YAW]);
-
-    for (uint8_t i = 0; i < 4; i++)
+    for (uint8_t i = 0; i < 4; i++) {
         motors[i] = (int16_t)
         (rc->command[DEMAND_THROTTLE]   * mixerQuadX[i].throttle + 
          stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch + 
          stabilize->axisPID[AXIS_ROLL]  * mixerQuadX[i].roll - 
          stabilize->axisPID[AXIS_YAW]   * mixerQuadX[i].yaw);
+
+        //debug(board, "%d:%d   %c", i+1, motors[i], i==3?'\n':' ');
+    }
 
     int16_t maxMotor = motors[0];
 

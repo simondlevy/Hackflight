@@ -325,7 +325,9 @@ class Teensy : public MW32 {
     {
         uint8_t aval = map(value, config.pwm.min, config.pwm.max, 0, 255);
 
-        analogWrite(motorPins[index], aval);
+        Serial.printf("%d:%d|%d  %c", index+1, value, aval, index==3?'\n':' ');
+
+        //analogWrite(motorPins[index], aval);
 
     }
 
