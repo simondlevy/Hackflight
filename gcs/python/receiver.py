@@ -21,12 +21,12 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 UPDATE_MSEC = 1
 
-PWM_MIN = 1000
-PWM_MAX = 2000
 
 from tkcompat import *
 
 from dialog import Dialog
+
+from config import PWM_MAX, PWM_MIN
 
 class Receiver(Dialog):
 

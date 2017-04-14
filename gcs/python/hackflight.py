@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 '''
-main.py : starter script for  Hackflight GCS
+hackflight.py : starter script for  Hackflight GCS
 
 Copyright (C) Simon D. Levy 2016
 
@@ -32,8 +32,8 @@ CONNECTION_DELAY_MSEC = 1000 #4000
 USB_UPDATE_MSEC = 200
 
 # These should agree with the values in firmware Config.PwmConfg
-PWM_MIN = 900
-PWM_MAX = 2010
+PWM_MIN = 1000
+PWM_MAX = 2000
 
 from serial import Serial
 from serial.tools.list_ports import comports

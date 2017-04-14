@@ -1,6 +1,8 @@
 /*
    teensy.hpp : Teensy3.2 implementation of routines in board.hpp
 
+   Uses EM7180 SENtral Sensor Hub in master mode mode
+
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify

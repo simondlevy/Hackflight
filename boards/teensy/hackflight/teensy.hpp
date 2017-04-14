@@ -1,6 +1,8 @@
 /*
    teensy.hpp : Teensy3.2 implementation of routines in board.hpp
 
+   Uses EM7180 SENtral Sensor Hub in pass-through mode
+
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify
@@ -325,10 +327,9 @@ class Teensy : public MW32 {
     {
         uint8_t aval = map(value, config.pwm.min, config.pwm.max, 0, 255);
 
-        Serial.printf("%d:%d|%d  %c", index+1, value, aval, index==3?'\n':' ');
+        //Serial.printf("%d: %d/%d%c", index+1, value, aval, index==3?'\n':' ');
 
-        //analogWrite(motorPins[index], aval);
-
+        analogWrite(motorPins[index], aval);
     }
 
 }; // class

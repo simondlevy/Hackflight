@@ -45,7 +45,7 @@ MOTORS_TOP_Y    = 60
 MOTORS_BOTTOM_Y = 220
 MOTORS_RADIUS   = 20
 
-from receiver import PWM_MIN
+from config import PWM_MIN, PWM_MAX
 
 from tkcompat import *
 from math import sqrt
