@@ -56,7 +56,7 @@ class Teensy2 : public Board {
         Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
         delay(1000);
 
-        // Start the EM7180: accel and gyro scales matter; magnetometer is arbitrary for this app
+        // Start the EM7180
         uint8_t status = em7180.begin(8, 2000, 1000);
         while (status) {
             Serial.println(EM7180::errorToString(status));

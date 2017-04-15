@@ -94,8 +94,7 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], int16_t eulerAn
 {
     for (uint8_t axis = 0; axis < 3; axis++) {
 
-        int32_t error = (int32_t)rcCommand[axis] * 10 * 8 / rate_p[axis];
-        error -= gyroADC[axis];
+        int32_t error = ((int32_t)rcCommand[axis] * 10 * 8 / rate_p[axis]) - gyroADC[axis];
 
         int32_t PTermGyro = rcCommand[axis];
 
