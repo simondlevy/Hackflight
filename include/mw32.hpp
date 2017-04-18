@@ -389,6 +389,7 @@ void MW32::imuUpdate(uint32_t currentTimeUsec, bool armed)
     accelSumCount++;
 
     // Convert angles from radians to tenths of a degrees
+    // NB: roll, pitch in tenths of a degree; yaw in degrees
     angle[AXIS_ROLL]  = (int16_t)lrintf(anglerad[AXIS_ROLL]  * (1800.0f / M_PI));
     angle[AXIS_PITCH] = (int16_t)lrintf(anglerad[AXIS_PITCH] * (1800.0f / M_PI));
     angle[AXIS_YAW]   = (int16_t)(lrintf(anglerad[AXIS_YAW]   * 1800.0f / M_PI) / 10.0f);

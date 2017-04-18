@@ -143,7 +143,6 @@ class Teensy2 : public Board {
         uint8_t aval = map(value, config.pwm.min, config.pwm.max, 0, 255);
 
         analogWrite(motorPins[index], aval);
-
     }
 
     virtual void imuInit(void) override
@@ -185,6 +184,7 @@ class Teensy2 : public Board {
         em7180.getQuaternions(q);
 
         float yaw   = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
+
         float pitch = -asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
         float roll  = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
         
@@ -197,7 +197,7 @@ class Teensy2 : public Board {
 
         eulerAngles[0] = int16_t(roll * 10);
         eulerAngles[1] = int16_t(pitch * 10);
-        eulerAngles[2] = int16_t(yaw * 10);
+        eulerAngles[2] = int16_t(yaw);
     }
 
     virtual void imuGetRawGyro(int16_t gyroRaw[3]) override
