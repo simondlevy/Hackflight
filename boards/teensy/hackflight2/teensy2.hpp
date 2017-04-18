@@ -203,6 +203,9 @@ class Teensy2 : public Board {
     virtual void imuGetRawGyro(int16_t gyroRaw[3]) override
     {
          em7180.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
+
+         gyroRaw[1] = -gyroRaw[1];
+         gyroRaw[2] = -gyroRaw[2];
     }
 
 
