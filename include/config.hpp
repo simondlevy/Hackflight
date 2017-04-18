@@ -40,6 +40,9 @@ struct PidConfig {
     // Yaw: P must be positive
     uint8_t yawP;
     uint8_t yawI;
+
+    // Trim for a particular vehicle
+    int16_t softwareTrim[3] = {0, 0, 0};
 };
 
 //=========================================================================

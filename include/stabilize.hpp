@@ -62,7 +62,7 @@ private:
 
 void Stabilize::init(const PidConfig& _pidConfig, const ImuConfig& _imuConfig, Board * _board)
 {
-    // XXX temporary hack for debugging
+    // a hack for debugging
     board = _board;
 
     // We'll use PID, IMU config values in update() below
@@ -134,7 +134,7 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], int16_t eulerAn
         delta2[axis] = delta1[axis];
         delta1[axis] = delta;
         int32_t DTerm = (deltaSum * rate_d[axis]) / 32;
-        axisPID[axis] = PTerm + ITerm - DTerm;
+        axisPID[axis] = PTerm + ITerm - DTerm + pidConfig.softwareTrim[axis];
     }
 
     // prevent "yaw jump" during yaw correction
