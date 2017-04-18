@@ -195,9 +195,9 @@ class Teensy2 : public Board {
         
         roll  *= 180.0f / PI;
 
-        eulerAngles[0] = int16_t(roll * 10);
-        eulerAngles[1] = int16_t(pitch * 10);
-        eulerAngles[2] = int16_t(yaw);
+        eulerAngles[0] =  int16_t(roll * 10);
+        eulerAngles[1] = -int16_t(pitch * 10);
+        eulerAngles[2] =  int16_t(yaw);
     }
 
     virtual void imuGetRawGyro(int16_t gyroRaw[3]) override
