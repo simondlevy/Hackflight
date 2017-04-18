@@ -247,6 +247,9 @@ class Teensy : public MW32 {
         config.pid.yawP           = 85;
         config.pid.yawI           = 45;
 
+        // "Software trim"
+        config.pid.softwareTrim[AXIS_PITCH] = -50;
+
         return config;
     }
 
