@@ -34,7 +34,8 @@ class MW32 : public Board {
         virtual void imuRestartCalibration(void) override; 
         virtual bool imuAccelCalibrated(void) override; 
         virtual bool imuGyroCalibrated(void) override; 
-        virtual void imuUpdate(uint32_t currentTime, bool armed) override; 
+        virtual void imuUpdateFast(void) override; 
+        virtual void imuUpdateSlow(uint32_t currentTime, bool armed) override; 
         virtual void imuGetEulerAngles(int16_t eulerAngles[3]) override; 
         virtual void imuGetRawGyro(int16_t gyroRaw[3]) override; 
 
@@ -248,7 +249,11 @@ bool MW32::imuGyroCalibrated(void)
     return gyroCalibrationCountdown == 0;
 }
 
-void MW32::imuUpdate(uint32_t currentTimeUsec, bool armed)
+void MW32::imuUpdateFast(void)
+{
+}
+
+void MW32::imuUpdateSlow(uint32_t currentTimeUsec, bool armed)
 {
     int32_t accMag = 0;
     float rpy[3];

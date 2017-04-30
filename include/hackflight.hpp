@@ -157,6 +157,8 @@ bool Hackflight::gotRcUpdate(void)
     // update RC channels
     rc.update();
 
+    //debug(board, "%d %d %d %d\n", rc.data[0], rc.data[1], rc.data[2], rc.data[3]);
+
     // useful for simulator
     if (armed) {
         board->showAuxStatus(rc.auxState());
@@ -192,7 +194,6 @@ bool Hackflight::gotRcUpdate(void)
             // Arm via throttle-low / yaw-right
             if (rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE) {
                 if (board->imuGyroCalibrated() && safeToArm) {
-                //if (imu.gyroCalibrated() && safeToArm) {
                     if (!rc.auxState()) // aux switch must be in zero position
                         if (!armed) {
                             armed = true;
@@ -215,19 +216,24 @@ void Hackflight::updateImu(void)
 {
     uint32_t currentTime = board->getMicros();
 
+    board->imuUpdateFast();
+
     if (imuTask.checkAndUpdate(currentTime)) {
 
         // Compute exponential RC commands
         rc.computeExpo();
 
         // IMU update reads IMU raw angles and converts them to Euler angles
-        board->imuUpdate(currentTime, armed);
+        board->imuUpdateSlow(currentTime, armed);
 
         // Get Euler angles and raw gyro from IMU
         int16_t eulerAngles[3];
         board->imuGetEulerAngles(eulerAngles);
         int16_t gyroRaw[3];
         board->imuGetRawGyro(gyroRaw);
+
+        //debug(board, "%+05d %+05d %+05d\n", eulerAngles[0], eulerAngles[1], eulerAngles[2]);
+        //debug(board, "%+05d %+05d %+05d\n", gyroRaw[0], gyroRaw[1], gyroRaw[2]);
 
         // Periodically update accelerometer calibration status using Euler angles
         updateCalibrationState(eulerAngles);

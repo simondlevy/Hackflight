@@ -28,7 +28,7 @@
 
 SpektrumDSM2048 rx;
 
-EM7180 em7180;
+EM7180 imu;
 
 static uint8_t motorPins[4] = {9, 22, 5, 23};
 
@@ -57,7 +57,7 @@ class Teensy2 : public Board {
         delay(1000);
 
         // Start the EM7180
-        uint8_t status = em7180.begin(8, 2000, 1000);
+        uint8_t status = imu.begin(8, 2000, 1000);
         while (status) {
             Serial.println(EM7180::errorToString(status));
         }
@@ -163,12 +163,9 @@ class Teensy2 : public Board {
         return true;
     }
 
-    virtual void imuUpdate(uint32_t currentTime, bool armed) override
+    virtual void imuUpdateFast(void) override
     {
-        (void)currentTime;
-        (void)armed;
-
-        uint8_t errorStatus = em7180.update();
+        uint8_t errorStatus = imu.update();
         
         if (errorStatus) {
             Serial.printf("ERROR: %s\n", EM7180::errorToString(errorStatus));
@@ -177,11 +174,18 @@ class Teensy2 : public Board {
     }
         
 
+    virtual void imuUpdateSlow(uint32_t currentTime, bool armed) override
+    {
+        (void)currentTime;
+        (void)armed;
+    }
+        
+
     virtual void imuGetEulerAngles(int16_t eulerAngles[3]) override
     {
 
         static float q[4];
-        em7180.getQuaternions(q);
+        imu.getQuaternions(q);
 
         float yaw   = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
 
@@ -202,13 +206,11 @@ class Teensy2 : public Board {
 
     virtual void imuGetRawGyro(int16_t gyroRaw[3]) override
     {
-         em7180.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
+         imu.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
 
          gyroRaw[1] = -gyroRaw[1];
          gyroRaw[2] = -gyroRaw[2];
     }
-
-
 
 }; // class
 
