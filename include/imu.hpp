@@ -26,10 +26,23 @@ class IMU {
 private:
 
 public:
+
+    void init(void);
+    void update(uint32_t currentTime, bool armed);
 };
 
 
 /********************************************* CPP ********************************************************/
+
+void IMU::init(void)
+{
+}
+
+void IMU::update(uint32_t currentTime, bool armed)
+{
+    (void)currentTime;
+    (void)armed;
+}
 
 } // namespace hf
 

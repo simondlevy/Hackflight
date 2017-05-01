@@ -65,6 +65,7 @@ class Hackflight {
         bool       armed;
 
         RC         rc;
+        IMU        imu;
         Mixer      mixer;
         MSP        msp;
         Stabilize  stab;
@@ -101,6 +102,7 @@ void Hackflight::init(Board * _board)
     maxArmingAngle = imuConfig.maxArmingAngle;
 
     // Initialize the IMU
+    imu.init();
     board->imuInit();
 
     // Sleep  a bit to allow IMU to catch up
@@ -226,6 +228,7 @@ void Hackflight::updateImu(void)
 
         // IMU update reads IMU raw angles and converts them to Euler angles
         board->imuUpdateSlow(currentTime, armed);
+        imu.update(currentTime, armed);
 
         // Get Euler angles and raw gyro from IMU
         int16_t eulerAngles[3];
