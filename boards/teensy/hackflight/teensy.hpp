@@ -34,7 +34,7 @@ static uint8_t motorPins[4] = {9, 22, 5, 23};
 
 namespace hf {
 
-class Teensy2 : public Board {
+class Teensy : public Board {
 
     virtual void dump(char * msg) override
     {
