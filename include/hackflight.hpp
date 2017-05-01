@@ -28,6 +28,7 @@
 #include "msp.hpp"
 #include "common.hpp"
 #include "rc.hpp"
+#include "imu.hpp"
 #include "stabilize.hpp"
 #include "timedtask.hpp"
 
