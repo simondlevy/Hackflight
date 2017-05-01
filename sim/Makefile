@@ -18,7 +18,7 @@
 #
  
 # Edit this for where you installed V-REP
-VREP_DIR_LINUX = $(HOME)/Software/V-REP_PRO_EDU_V3_3_2_64_Linux
+VREP_DIR_LINUX = $(HOME)/Software/V-REP_PRO_EDU_V3_4_0_Linux
 VREP_DIR_OSX   = /Applications/V-REP_PRO_EDU_V3_3_2_Mac
 
 COMMON = $(VREP_DIR)/programming/common/
