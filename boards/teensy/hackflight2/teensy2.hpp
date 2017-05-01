@@ -72,13 +72,16 @@ class Teensy2 : public Board {
     virtual const Config& getConfig(void) override
     {
         // PIDs
-        config.pid.levelP         = 20;//40;
-        config.pid.levelI         = 1;//2;
-        config.pid.ratePitchrollP = 18;//36;
-        config.pid.ratePitchrollI = 15;//30;
-        config.pid.ratePitchrollD = 12;//23;
+        config.pid.levelP         = 20;
+        config.pid.levelI         = 1;
+        config.pid.ratePitchrollP = 18;
+        config.pid.ratePitchrollI = 15;
+        config.pid.ratePitchrollD = 12;
         config.pid.yawP           = 85;
         config.pid.yawI           = 45;
+
+        // "Software trim"
+        config.pid.softwareTrim[AXIS_PITCH] = -50;
 
         return config;
     }
