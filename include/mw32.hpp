@@ -39,9 +39,6 @@ class MW32 : public Board {
         virtual void imuGetEulerAngles(int16_t eulerAngles[3]) override; 
         virtual void imuGetRawGyro(int16_t gyroRaw[3]) override; 
 
-        // called from Hover
-        float computeAccelZ(void);
-
     protected:
 
         virtual void imuReadRaw(int16_t _accelADC[3], int16_t _gyroADC[3]) = 0;
@@ -73,9 +70,6 @@ class MW32 : public Board {
         int16_t     accelADC[3];   // [-4096,+4096]
         float       accelLpf[3];
         int16_t     accelSmooth[3];
-        int32_t     accelSum[3];
-        int32_t     accelSumCount;
-        uint32_t    accelTimeSum;
         int16_t     accelZero[3];
         int32_t     accelZoffset;
         float       accz_smooth;
@@ -96,18 +90,6 @@ class MW32 : public Board {
 
 
 /********************************************* CPP ********************************************************/
-
-static int32_t deadbandFilter(int32_t value, int32_t deadband)
-{
-    if (abs(value) < deadband) {
-        value = 0;
-    } else if (value > 0) {
-        value -= deadband;
-    } else if (value < 0) {
-        value += deadband;
-    }
-    return value;
-}
 
 // Rotate Estimated vector(s) with small angle approximation, according to the gyro data
 void MW32::rotateV(float v[3], float *delta)
@@ -144,19 +126,6 @@ void MW32::rotateV(float v[3], float *delta)
     v[X] = v_tmp[X] * mat[0][0] + v_tmp[Y] * mat[1][0] + v_tmp[Z] * mat[2][0];
     v[Y] = v_tmp[X] * mat[0][1] + v_tmp[Y] * mat[1][1] + v_tmp[Z] * mat[2][1];
     v[Z] = v_tmp[X] * mat[0][2] + v_tmp[Y] * mat[1][2] + v_tmp[Z] * mat[2][2];
-}
-
-float MW32::computeAccelZ(void)
-{
-    float accelZ = (float)accelSum[2] / (float)accelSumCount * (9.80665f / 10000.0f / config.imu.acc1G);
-
-    accelSum[0] = 0;
-    accelSum[1] = 0;
-    accelSum[2] = 0;
-    accelSumCount = 0;
-    accelTimeSum = 0;
-
-    return accelZ;
 }
 
 
@@ -197,14 +166,11 @@ void MW32::imuInit(void)
         accelAdcSum[k] = 0;
         accelLpf[k] = 0;
         accelSmooth[k] = 0;
-        accelSum[k] = 0;
         accelZero[k] = 0;
         EstG[k] = 0;
         gyroZero[k] = 0;
     }
 
-    accelSumCount = 0;
-    accelTimeSum = 0;
     accelZoffset = 0;
     accz_smooth = 0;
     fcAcc = 0;
@@ -219,10 +185,6 @@ void MW32::imuInit(void)
 
     // calculate RC time constant used in the accelZ lpf    
     fcAcc = (float)(0.5f / (M_PI * config.imu.accelzLpfCutoff)); 
-
-    for (int k=0; k<3; ++k) {
-        accelSum[k] = 0;
-    }
 
     // compute loop times based on config from board
     calibratingGyroCycles   = (uint16_t)(1000. * config.imu.calibratingGyroMilli  / config.imu.loopMicro);
@@ -383,15 +345,6 @@ void MW32::imuUpdateSlow(uint32_t currentTimeUsec, bool armed)
     accel_ned[Z] -= accelZoffset / 64;  // compensate for gravitation on z-axis
 
     accz_smooth = accz_smooth + (dT_sec / (fcAcc + dT_sec)) * (accel_ned[Z] - accz_smooth); // low pass filter
-
-    // apply Deadband to reduce integration drift and vibration influence and
-    // sum up Values for later integration to get velocity and distance
-    accelSum[X] += deadbandFilter((int32_t)lrintf(accel_ned[X]), config.imu.accelXyDeadband);
-    accelSum[Y] += deadbandFilter((int32_t)lrintf(accel_ned[Y]), config.imu.accelXyDeadband);
-    accelSum[Z] += deadbandFilter((int32_t)lrintf(accz_smooth),  config.imu.accelZDeadband);
-
-    accelTimeSum += dT_usec;
-    accelSumCount++;
 
     // Convert angles from radians to tenths of a degrees
     // NB: roll, pitch in tenths of a degree; yaw in degrees
