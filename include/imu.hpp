@@ -29,14 +29,15 @@ private:
     int32_t     accelSumCount;
     uint32_t    accelTimeSum;
 
+    Board       * board;
+
 public:
 
-    void init(void);
-    void update(uint32_t currentTime, bool armed);
+    void init(Board * _board);
+    void update(uint32_t currentTime, bool armed, int16_t eulerAngles[3], int16_t gyroRaw[3]);
 
     // called from Hover
     float computeAccelZ(void);
-
 };
 
 
@@ -56,18 +57,25 @@ static int32_t deadbandFilter(int32_t value, int32_t deadband)
 }
 */
 
-void IMU::init(void)
+void IMU::init(Board * _board)
 {
+    board = _board;
+    board->imuInit();
+
     for (int k=0; k<3; ++k)
         accelSum[0] = 0;
     accelSumCount = 0;
     accelTimeSum = 0;
 }
 
-void IMU::update(uint32_t currentTime, bool armed)
+void IMU::update(uint32_t currentTime, bool armed, int16_t eulerAngles[3], int16_t gyroRaw[3])
 {
-    (void)currentTime;
-    (void)armed;
+    board->imuUpdateSlow(currentTime, armed);
+
+    // Get Euler angles and raw gyro from IMU
+    board->imuGetEulerAngles(eulerAngles);
+    board->imuGetRawGyro(gyroRaw);
+
 
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance

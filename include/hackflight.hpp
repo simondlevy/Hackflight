@@ -102,8 +102,7 @@ void Hackflight::init(Board * _board)
     maxArmingAngle = imuConfig.maxArmingAngle;
 
     // Initialize the IMU
-    imu.init();
-    board->imuInit();
+    imu.init(board);
 
     // Sleep  a bit to allow IMU to catch up
     board->delayMilliseconds(config.init.delayMilli);
@@ -219,6 +218,7 @@ void Hackflight::updateImu(void)
 {
     uint32_t currentTime = board->getMicros();
 
+    // Special handling for EM7180 SENtral Sensor Fusion IMU
     board->imuUpdateFast();
 
     if (imuTask.checkAndUpdate(currentTime)) {
@@ -227,17 +227,9 @@ void Hackflight::updateImu(void)
         rc.computeExpo();
 
         // IMU update reads IMU raw angles and converts them to Euler angles
-        board->imuUpdateSlow(currentTime, armed);
-        imu.update(currentTime, armed);
-
-        // Get Euler angles and raw gyro from IMU
         int16_t eulerAngles[3];
-        board->imuGetEulerAngles(eulerAngles);
         int16_t gyroRaw[3];
-        board->imuGetRawGyro(gyroRaw);
-
-        //debug(board, "%+05d %+05d %+05d\n", eulerAngles[0], eulerAngles[1], eulerAngles[2]);
-        //debug(board, "%+05d %+05d %+05d\n", gyroRaw[0], gyroRaw[1], gyroRaw[2]);
+        imu.update(currentTime, armed, eulerAngles, gyroRaw);
 
         // Periodically update accelerometer calibration status using Euler angles
         updateCalibrationState(eulerAngles);
