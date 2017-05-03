@@ -118,7 +118,7 @@ void Hackflight::init(Board * _board)
     // Initialize our stabilization, mixing, and MSP (serial comms)
     stab.init(config.pid, config.imu, board);
     mixer.init(config.pwm, &rc, &stab); 
-    msp.init(&mixer, &rc, board);
+    msp.init(&imu, &mixer, &rc, board);
 
     // Initialize any extra stuff you want to do with your board
     board->extrasInit(&msp);
@@ -227,15 +227,13 @@ void Hackflight::updateImu(void)
         rc.computeExpo();
 
         // IMU update reads IMU raw angles and converts them to Euler angles
-        int16_t eulerAngles[3];
-        int16_t gyroRaw[3];
-        imu.update(currentTime, armed, eulerAngles, gyroRaw);
+        imu.update(currentTime, armed);
 
         // Periodically update accelerometer calibration status using Euler angles
-        updateCalibrationState(eulerAngles);
+        updateCalibrationState(imu.eulerAngles);
 
         // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
-        stab.update(rc.command, gyroRaw, eulerAngles);
+        stab.update(rc.command, imu.gyroRaw, imu.eulerAngles);
 
         mixer.update(armed, board);
         msp.update(armed);

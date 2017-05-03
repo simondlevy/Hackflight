@@ -49,7 +49,7 @@ class Board {
         virtual bool     imuGyroCalibrated(void) = 0;
         virtual void     imuUpdateFast(void) = 0;
         virtual void     imuUpdateSlow(uint32_t currentTime, bool armed) = 0;
-        virtual void     imuGetEulerAngles(int16_t eulerAngles[3]) = 0;
+        virtual void     imuGetEulerAngles(float eulerAnglesRadians[3]) = 0;
         virtual void     imuGetRawGyro(int16_t gyroRaw[3]) = 0;
 
     //-------------------------------------------------- RC -----------------------------------------------------

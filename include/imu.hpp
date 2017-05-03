@@ -33,8 +33,11 @@ private:
 
 public:
 
+    int16_t eulerAngles[3];
+    int16_t gyroRaw[3];
+
     void init(Board * _board);
-    void update(uint32_t currentTime, bool armed, int16_t eulerAngles[3], int16_t gyroRaw[3]);
+    void update(uint32_t currentTime, bool armed);
 
     // called from Hover
     float computeAccelZ(void);
@@ -68,14 +71,25 @@ void IMU::init(Board * _board)
     accelTimeSum = 0;
 }
 
-void IMU::update(uint32_t currentTime, bool armed, int16_t eulerAngles[3], int16_t gyroRaw[3])
+void IMU::update(uint32_t currentTime, bool armed)
 {
     board->imuUpdateSlow(currentTime, armed);
 
+    float eulerAnglesRadians[3];
+
     // Get Euler angles and raw gyro from IMU
-    board->imuGetEulerAngles(eulerAngles);
+    board->imuGetEulerAngles(eulerAnglesRadians);
     board->imuGetRawGyro(gyroRaw);
 
+    // Convert angles from radians to tenths of a degrees
+    // NB: roll, pitch in tenths of a degree; yaw in degrees
+    eulerAngles[AXIS_ROLL]  = (int16_t)lrintf(eulerAnglesRadians[AXIS_ROLL]  * (1800.0f / M_PI));
+    eulerAngles[AXIS_PITCH] = (int16_t)lrintf(eulerAnglesRadians[AXIS_PITCH] * (1800.0f / M_PI));
+    eulerAngles[AXIS_YAW]   = (int16_t)(lrintf(eulerAnglesRadians[AXIS_YAW]   * 1800.0f / M_PI) / 10.0f);
+
+    // Convert heading from [-180,+180] to [0,360]
+    if (eulerAngles[AXIS_YAW] < 0)
+        eulerAngles[AXIS_YAW] += 360;
 
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance

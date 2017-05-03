@@ -36,7 +36,7 @@ class MW32 : public Board {
         virtual bool imuGyroCalibrated(void) override; 
         virtual void imuUpdateFast(void) override; 
         virtual void imuUpdateSlow(uint32_t currentTime, bool armed) override; 
-        virtual void imuGetEulerAngles(int16_t eulerAngles[3]) override; 
+        virtual void imuGetEulerAngles(float eulerAnglesRadians[3]) override; 
         virtual void imuGetRawGyro(int16_t gyroRaw[3]) override; 
 
     protected:
@@ -73,7 +73,7 @@ class MW32 : public Board {
         int16_t     accelZero[3];
         int32_t     accelZoffset;
         float       accz_smooth;
-        int16_t     angle[3];      // tenths of a degree
+        float       anglerad[3];
         uint16_t    calibratingAccelCycles;
         uint16_t    calibratingGyroCycles;
         float       EstG[3];
@@ -224,7 +224,6 @@ void MW32::imuUpdateSlow(uint32_t currentTimeUsec, bool armed)
     uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
     float dT_sec = dT_usec * 1e-6f;
     float scale = dT_sec* gyroScale; 
-    float anglerad[3];
 
     imuReadRaw(accelADC, gyroADC);
 
@@ -346,15 +345,6 @@ void MW32::imuUpdateSlow(uint32_t currentTimeUsec, bool armed)
 
     accz_smooth = accz_smooth + (dT_sec / (fcAcc + dT_sec)) * (accel_ned[Z] - accz_smooth); // low pass filter
 
-    // Convert angles from radians to tenths of a degrees
-    // NB: roll, pitch in tenths of a degree; yaw in degrees
-    angle[AXIS_ROLL]  = (int16_t)lrintf(anglerad[AXIS_ROLL]  * (1800.0f / M_PI));
-    angle[AXIS_PITCH] = (int16_t)lrintf(anglerad[AXIS_PITCH] * (1800.0f / M_PI));
-    angle[AXIS_YAW]   = (int16_t)(lrintf(anglerad[AXIS_YAW]   * 1800.0f / M_PI) / 10.0f);
-
-    // Convert heading from [-180,+180] to [0,360]
-    if (angle[AXIS_YAW] < 0)
-        angle[AXIS_YAW] += 360;
 
     // Decrement calibration countdowns
     if (accelCalibrationCountdown > 0)
@@ -364,9 +354,9 @@ void MW32::imuUpdateSlow(uint32_t currentTimeUsec, bool armed)
 
 } // update
 
-void MW32::imuGetEulerAngles(int16_t eulerAngles[3])
+void MW32::imuGetEulerAngles(float eulerAnglesRadians[3])
 {
-    memcpy(eulerAngles, angle, 6);
+    memcpy(eulerAnglesRadians, anglerad, 3*sizeof(float));
 }
 
 void MW32::imuGetRawGyro(int16_t gyroRaw[3])

@@ -184,7 +184,7 @@ class Teensy : public Board {
     }
         
 
-    virtual void imuGetEulerAngles(int16_t eulerAngles[3]) override
+    virtual void imuGetEulerAngles(float  eulerAnglesRadians[3]) override
     {
 
         static float q[4];
@@ -194,17 +194,10 @@ class Teensy : public Board {
 
         float pitch = -asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
         float roll  = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
-        
-        pitch *= 180.0f / PI;
-        
-        yaw   *= 180.0f / PI; 
-        if(yaw < 0) yaw   += 360.0f ; // Ensure yaw stays between 0 and 360
-        
-        roll  *= 180.0f / PI;
 
-        eulerAngles[0] =  int16_t(roll * 10);
-        eulerAngles[1] = -int16_t(pitch * 10);
-        eulerAngles[2] =  int16_t(yaw);
+        eulerAnglesRadians[0] =  roll;
+        eulerAnglesRadians[1] = -pitch; // compensate for IMU orientation
+        eulerAnglesRadians[2] =  yaw;
     }
 
     virtual void imuGetRawGyro(int16_t gyroRaw[3]) override
