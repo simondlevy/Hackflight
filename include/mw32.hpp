@@ -68,7 +68,7 @@ class MW32 : public Board {
 
     private: // fields
 
-        int32_t     a[3];
+        int32_t     accelAdcSum[3];
         uint16_t    accelCalibrationCountdown;
         int16_t     accelADC[3];   // [-4096,+4096]
         float       accelLpf[3];
@@ -194,7 +194,7 @@ void MW32::normalizeV(float src[3], float dest[3])
 void MW32::imuInit(void)
 {
     for (int k=0; k<3; ++k) {
-        a[k] = 0;
+        accelAdcSum[k] = 0;
         accelLpf[k] = 0;
         accelSmooth[k] = 0;
         accelSum[k] = 0;
@@ -277,18 +277,18 @@ void MW32::imuUpdateSlow(uint32_t currentTimeUsec, bool armed)
         for (uint8_t axis = 0; axis < 3; axis++) {
             // Reset a[axis] at start of calibration
             if (accelCalibrationCountdown == calibratingAccelCycles)
-                a[axis] = 0;
-            // Sum up calibratingAccelCycles readings
-            a[axis] += accelADC[axis];
+                accelAdcSum[axis] = 0;
+            // Sum up accel readings
+            accelAdcSum[axis] += accelADC[axis];
             // Clear global variables for next reading
             accelADC[axis] = 0;
             accelZero[axis] = 0;
         }
         // Calculate average, shift Z down by acc1G
         if (accelCalibrationCountdown == 1) {
-            accelZero[AXIS_ROLL] = (a[AXIS_ROLL] + (calibratingAccelCycles / 2)) / calibratingAccelCycles;
-            accelZero[AXIS_PITCH] = (a[AXIS_PITCH] + (calibratingAccelCycles / 2)) / calibratingAccelCycles;
-            accelZero[AXIS_YAW] = (a[AXIS_YAW] + (calibratingAccelCycles / 2)) / calibratingAccelCycles - config.imu.acc1G;
+            accelZero[AXIS_ROLL] = (accelAdcSum[AXIS_ROLL] + (calibratingAccelCycles / 2)) / calibratingAccelCycles;
+            accelZero[AXIS_PITCH] = (accelAdcSum[AXIS_PITCH] + (calibratingAccelCycles / 2)) / calibratingAccelCycles;
+            accelZero[AXIS_YAW] = (accelAdcSum[AXIS_YAW] + (calibratingAccelCycles / 2)) / calibratingAccelCycles - config.imu.acc1G;
         }
     }
 
