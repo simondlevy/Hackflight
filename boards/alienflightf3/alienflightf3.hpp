@@ -164,7 +164,7 @@ class AlienflightF3 : public MW32 {
 
     virtual void writeMotor(uint8_t index, uint16_t value) override
     {
-        motors[index].setSpeed(value);
+        motors[index].writeMicroseconds(value);
     }
 
 }; // class
