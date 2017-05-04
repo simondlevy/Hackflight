@@ -35,13 +35,11 @@ class MW32 : public Board {
         virtual bool imuAccelCalibrated(void) override; 
         virtual bool imuGyroCalibrated(void) override; 
         virtual void imuUpdateFast(void) override; 
-        virtual void imuUpdateSlow(uint32_t currentTime, bool armed) override; 
-        virtual void imuGetEulerAngles(float eulerAnglesRadians[3]) override; 
-        virtual void imuGetRawGyro(int16_t gyroRaw[3]) override; 
+        virtual void imuGetEulerAngles(uint32_t currentTime, bool armed, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override; 
 
     protected:
 
-        virtual void imuReadRaw(int16_t _accelADC[3], int16_t _gyroADC[3]) = 0;
+        virtual void imuReadRaw(int16_t _accelRaw[3], int16_t _gyroRaw[3]) = 0;
 
     private: // types
 
@@ -67,19 +65,18 @@ class MW32 : public Board {
 
         int32_t     accelAdcSum[3];
         uint16_t    accelCalibrationCountdown;
-        int16_t     accelADC[3];   // [-4096,+4096]
+        int16_t     accelRaw[3];   // [-4096,+4096]
         float       accelLpf[3];
         int16_t     accelSmooth[3];
         int16_t     accelZero[3];
         int32_t     accelZoffset;
         float       accz_smooth;
-        float       anglerad[3];
         uint16_t    calibratingAccelCycles;
         uint16_t    calibratingGyroCycles;
         float       EstG[3];
         float       EstN[3];
         float       fcAcc;
-        int16_t     gyroADC[3];    // [-4096,+4096]
+        int16_t     gyroRaw[3];    // [-4096,+4096]
         uint16_t    gyroCalibrationCountdown;
         float       gyroCmpfFactor;
         float       gyroScale;
@@ -215,7 +212,7 @@ void MW32::imuUpdateFast(void)
 {
 }
 
-void MW32::imuUpdateSlow(uint32_t currentTimeUsec, bool armed)
+void MW32::imuGetEulerAngles(uint32_t currentTimeUsec, bool armed, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) 
 {
     int32_t accMag = 0;
     float rpy[3];
@@ -225,12 +222,10 @@ void MW32::imuUpdateSlow(uint32_t currentTimeUsec, bool armed)
     float dT_sec = dT_usec * 1e-6f;
     float scale = dT_sec* gyroScale; 
 
-    imuReadRaw(accelADC, gyroADC);
-
     previousTimeUsec = currentTimeUsec;
 
     for (int k=0; k<3; ++k) {
-        gyroADC[k] >>= 2;
+        gyroRaw[k] >>= 2;
     }
 
     if (accelCalibrationCountdown > 0) {
@@ -240,9 +235,9 @@ void MW32::imuUpdateSlow(uint32_t currentTimeUsec, bool armed)
             if (accelCalibrationCountdown == calibratingAccelCycles)
                 accelAdcSum[axis] = 0;
             // Sum up accel readings
-            accelAdcSum[axis] += accelADC[axis];
+            accelAdcSum[axis] += accelRaw[axis];
             // Clear global variables for next reading
-            accelADC[axis] = 0;
+            accelRaw[axis] = 0;
             accelZero[axis] = 0;
         }
         // Calculate average, shift Z down by acc1G
@@ -253,9 +248,9 @@ void MW32::imuUpdateSlow(uint32_t currentTimeUsec, bool armed)
         }
     }
 
-    accelADC[AXIS_ROLL]  -= accelZero[AXIS_ROLL];
-    accelADC[AXIS_PITCH] -= accelZero[AXIS_PITCH];
-    accelADC[AXIS_YAW]   -= accelZero[AXIS_YAW];
+    accelRaw[AXIS_ROLL]  -= accelZero[AXIS_ROLL];
+    accelRaw[AXIS_PITCH] -= accelZero[AXIS_PITCH];
+    accelRaw[AXIS_YAW]   -= accelZero[AXIS_YAW];
 
     // range: +/- 8192; +/- 2000 deg/sec
 
@@ -270,10 +265,10 @@ void MW32::imuUpdateSlow(uint32_t currentTimeUsec, bool armed)
                 devClear(&var[axis]);
             }
             // Sum up 1000 readings
-            g[axis] += gyroADC[axis];
-            devPush(&var[axis], gyroADC[axis]);
+            g[axis] += gyroRaw[axis];
+            devPush(&var[axis], gyroRaw[axis]);
             // Clear global variables for next reading
-            gyroADC[axis] = 0;
+            gyroRaw[axis] = 0;
             gyroZero[axis] = 0;
             if (gyroCalibrationCountdown == 1) {
                 gyroZero[axis] = (g[axis] + (calibratingGyroCycles / 2)) / calibratingGyroCycles;
@@ -282,17 +277,17 @@ void MW32::imuUpdateSlow(uint32_t currentTimeUsec, bool armed)
     }
 
     for (uint8_t axis = 0; axis < 3; axis++)
-        gyroADC[axis] -= gyroZero[axis];
+        gyroRaw[axis] -= gyroZero[axis];
 
     // Initialization
     for (uint8_t axis = 0; axis < 3; axis++) {
-        deltaGyroAngle[axis] = gyroADC[axis] * scale;
+        deltaGyroAngle[axis] = gyroRaw[axis] * scale;
         if (config.imu.accelLpfFactor > 0) {
-            accelLpf[axis] = accelLpf[axis] * (1.0f - (1.0f / config.imu.accelLpfFactor)) + accelADC[axis] * 
+            accelLpf[axis] = accelLpf[axis] * (1.0f - (1.0f / config.imu.accelLpfFactor)) + accelRaw[axis] * 
                 (1.0f / config.imu.accelLpfFactor);
             accelSmooth[axis] = (int16_t)accelLpf[axis];
         } else {
-            accelSmooth[axis] = accelADC[axis];
+            accelSmooth[axis] = accelRaw[axis];
         }
         accMag += (int32_t)accelSmooth[axis] * accelSmooth[axis];
     }
@@ -311,25 +306,25 @@ void MW32::imuUpdateSlow(uint32_t currentTimeUsec, bool armed)
                 (1.0f / (config.imu.gyroCmpfFactor + 1.0f));
 
     // Attitude of the estimated vector
-    anglerad[AXIS_ROLL] = atan2f(EstG[Y], EstG[Z]);
-    anglerad[AXIS_PITCH] = atan2f(-EstG[X], sqrtf(EstG[Y] * EstG[Y] + EstG[Z] * EstG[Z]));
+    eulerAnglesRadians[AXIS_ROLL] = atan2f(EstG[Y], EstG[Z]);
+    eulerAnglesRadians[AXIS_PITCH] = atan2f(-EstG[X], sqrtf(EstG[Y] * EstG[Y] + EstG[Z] * EstG[Z]));
 
     rotateV(EstN, deltaGyroAngle);
     normalizeV(EstN, EstN);
 
     // Calculate heading
-    float cosineRoll = cosf(anglerad[AXIS_ROLL]);
-    float sineRoll = sinf(anglerad[AXIS_ROLL]);
-    float cosinePitch = cosf(anglerad[AXIS_PITCH]);
-    float sinePitch = sinf(anglerad[AXIS_PITCH]);
+    float cosineRoll = cosf(eulerAnglesRadians[AXIS_ROLL]);
+    float sineRoll = sinf(eulerAnglesRadians[AXIS_ROLL]);
+    float cosinePitch = cosf(eulerAnglesRadians[AXIS_PITCH]);
+    float sinePitch = sinf(eulerAnglesRadians[AXIS_PITCH]);
     float Xh = EstN[X] * cosinePitch + EstN[Y] * sineRoll * sinePitch + EstN[Z] * sinePitch * cosineRoll;
     float Yh = EstN[Y] * cosineRoll - EstN[Z] * sineRoll;
-    anglerad[AXIS_YAW] = atan2f(Yh, Xh); 
+    eulerAnglesRadians[AXIS_YAW] = atan2f(Yh, Xh); 
 
     // the accel values have to be rotated into the earth frame
-    rpy[0] = -(float)anglerad[AXIS_ROLL];
-    rpy[1] = -(float)anglerad[AXIS_PITCH];
-    rpy[2] = -(float)anglerad[AXIS_YAW];
+    rpy[0] = -(float)eulerAnglesRadians[AXIS_ROLL];
+    rpy[1] = -(float)eulerAnglesRadians[AXIS_PITCH];
+    rpy[2] = -(float)eulerAnglesRadians[AXIS_YAW];
 
     accel_ned[X] = accelSmooth[0];
     accel_ned[Y] = accelSmooth[1];
@@ -352,16 +347,6 @@ void MW32::imuUpdateSlow(uint32_t currentTimeUsec, bool armed)
     if (gyroCalibrationCountdown > 0)
         gyroCalibrationCountdown--;
 
-} // update
-
-void MW32::imuGetEulerAngles(float eulerAnglesRadians[3])
-{
-    memcpy(eulerAnglesRadians, anglerad, 3*sizeof(float));
-}
-
-void MW32::imuGetRawGyro(int16_t gyroRaw[3])
-{
-    memcpy(gyroRaw, gyroADC, 6);
-}
+} // imuUpdateSlow
 
 } // namespace hf

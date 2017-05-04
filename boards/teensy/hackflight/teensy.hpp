@@ -176,17 +176,13 @@ class Teensy : public Board {
         }
     }
         
-
-    virtual void imuUpdateSlow(uint32_t currentTime, bool armed) override
+    virtual void imuGetEulerAngles(uint32_t currentTimeUsec, bool armed, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override
     {
-        (void)currentTime;
+        (void)currentTimeUsec;
         (void)armed;
-    }
+        (void)accelRaw;
+        (void)gyroRaw;
         
-
-    virtual void imuGetEulerAngles(float  eulerAnglesRadians[3]) override
-    {
-
         static float q[4];
         imu.getQuaternions(q);
 
@@ -200,8 +196,9 @@ class Teensy : public Board {
         eulerAnglesRadians[2] =  yaw;
     }
 
-    virtual void imuGetRawGyro(int16_t gyroRaw[3]) override
+    virtual void imuReadRaw(int16_t accelRaw[3], int16_t gyroRaw[3]) override
     {
+         imu.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
          imu.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
 
          gyroRaw[1] = -gyroRaw[1];

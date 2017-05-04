@@ -33,6 +33,7 @@ private:
 
 public:
 
+    // Used by Stabilize
     int16_t eulerAngles[3];
     int16_t gyroRaw[3];
 
@@ -73,13 +74,14 @@ void IMU::init(Board * _board)
 
 void IMU::update(uint32_t currentTime, bool armed)
 {
-    board->imuUpdateSlow(currentTime, armed);
-
+    int16_t accelRaw[3];
     float eulerAnglesRadians[3];
 
-    // Get Euler angles and raw gyro from IMU
-    board->imuGetEulerAngles(eulerAnglesRadians);
-    board->imuGetRawGyro(gyroRaw);
+    // Get raw acceleromater, gyro values from board
+    board->imuReadRaw(accelRaw, gyroRaw);
+
+    // Get Euler angles and raw gyro from board
+    board->imuGetEulerAngles(currentTime, armed, accelRaw, gyroRaw, eulerAnglesRadians);
 
     // Convert angles from radians to tenths of a degrees
     // NB: roll, pitch in tenths of a degree; yaw in degrees
