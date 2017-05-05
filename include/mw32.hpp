@@ -35,7 +35,7 @@ class MW32 : public Board {
         virtual bool imuAccelCalibrated(void) override; 
         virtual bool imuGyroCalibrated(void) override; 
         virtual void imuUpdateFast(void) override; 
-        virtual void imuGetEulerAngles(uint32_t currentTime, bool armed, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override; 
+        virtual void imuGetEulerAngles(uint32_t currentTime, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override; 
 
     protected:
 
@@ -212,11 +212,9 @@ void MW32::imuUpdateFast(void)
 {
 }
 
-void MW32::imuGetEulerAngles(uint32_t currentTimeUsec, bool armed, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) 
+void MW32::imuGetEulerAngles(uint32_t currentTimeUsec, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) 
 {
     int32_t accMag = 0;
-    float rpy[3];
-    float accel_ned[3];
     float deltaGyroAngle[3];
     uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
     float dT_sec = dT_usec * 1e-6f;
@@ -276,10 +274,15 @@ void MW32::imuGetEulerAngles(uint32_t currentTimeUsec, bool armed, int16_t accel
         }
     }
 
+    // Decrement calibration countdowns
+    if (accelCalibrationCountdown > 0)
+        accelCalibrationCountdown--;
+    if (gyroCalibrationCountdown > 0)
+        gyroCalibrationCountdown--;
+
     for (uint8_t axis = 0; axis < 3; axis++)
         gyroRaw[axis] -= gyroZero[axis];
 
-    // Initialization
     for (uint8_t axis = 0; axis < 3; axis++) {
         deltaGyroAngle[axis] = gyroRaw[axis] * scale;
         if (config.imu.accelLpfFactor > 0) {
@@ -320,32 +323,6 @@ void MW32::imuGetEulerAngles(uint32_t currentTimeUsec, bool armed, int16_t accel
     float Xh = EstN[X] * cosinePitch + EstN[Y] * sineRoll * sinePitch + EstN[Z] * sinePitch * cosineRoll;
     float Yh = EstN[Y] * cosineRoll - EstN[Z] * sineRoll;
     eulerAnglesRadians[AXIS_YAW] = atan2f(Yh, Xh); 
-
-    // the accel values have to be rotated into the earth frame
-    rpy[0] = -(float)eulerAnglesRadians[AXIS_ROLL];
-    rpy[1] = -(float)eulerAnglesRadians[AXIS_PITCH];
-    rpy[2] = -(float)eulerAnglesRadians[AXIS_YAW];
-
-    accel_ned[X] = accelSmooth[0];
-    accel_ned[Y] = accelSmooth[1];
-    accel_ned[Z] = accelSmooth[2];
-
-    rotateV(accel_ned, rpy);
-
-    if (!armed) {
-        accelZoffset -= accelZoffset / 64;
-        accelZoffset += (int32_t)accel_ned[Z];
-    }
-    accel_ned[Z] -= accelZoffset / 64;  // compensate for gravitation on z-axis
-
-    accz_smooth = accz_smooth + (dT_sec / (fcAcc + dT_sec)) * (accel_ned[Z] - accz_smooth); // low pass filter
-
-
-    // Decrement calibration countdowns
-    if (accelCalibrationCountdown > 0)
-        accelCalibrationCountdown--;
-    if (gyroCalibrationCountdown > 0)
-        gyroCalibrationCountdown--;
 
 } // imuUpdateSlow
 

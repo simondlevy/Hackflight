@@ -25,6 +25,7 @@ namespace hf {
 class IMU {
 private:
 
+    float       accelNed[3];
     int32_t     accelSum[3];
     int32_t     accelSumCount;
     uint32_t    accelTimeSum;
@@ -74,6 +75,8 @@ void IMU::init(Board * _board)
 
 void IMU::update(uint32_t currentTime, bool armed)
 {
+    (void)armed;
+
     int16_t accelRaw[3];
     float eulerAnglesRadians[3];
 
@@ -81,7 +84,7 @@ void IMU::update(uint32_t currentTime, bool armed)
     board->imuReadRaw(accelRaw, gyroRaw);
 
     // Get Euler angles and raw gyro from board
-    board->imuGetEulerAngles(currentTime, armed, accelRaw, gyroRaw, eulerAnglesRadians);
+    board->imuGetEulerAngles(currentTime, accelRaw, gyroRaw, eulerAnglesRadians);
 
     // Convert angles from radians to tenths of a degrees
     // NB: roll, pitch in tenths of a degree; yaw in degrees
@@ -96,14 +99,33 @@ void IMU::update(uint32_t currentTime, bool armed)
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
     /*
-    accelSum[X] += deadbandFilter((int32_t)lrintf(accel_ned[X]), config.imu.accelXyDeadband);
-    accelSum[Y] += deadbandFilter((int32_t)lrintf(accel_ned[Y]), config.imu.accelXyDeadband);
-    accelSum[Z] += deadbandFilter((int32_t)lrintf(accz_smooth),  config.imu.accelZDeadband);
+    accelSum[X] += deadbandFilter((int32_t)lrintf(accelNed[X]), config.imu.accelXyDeadband);
+    accelSum[Y] += deadbandFilter((int32_t)lrintf(accelNed[Y]), config.imu.accelXyDeadband);
+    accelSum[Z] += deadbandFilter((int32_t)lrintf(accelZSmooth),  config.imu.accelZDeadband);
 
     accelTimeSum += dT_usec;
     accelSumCount++;
-    */
 
+    // the accel values have to be rotated into the earth frame
+    float rpy[3];
+    rpy[0] = -(float)eulerAnglesRadians[AXIS_ROLL];
+    rpy[1] = -(float)eulerAnglesRadians[AXIS_PITCH];
+    rpy[2] = -(float)eulerAnglesRadians[AXIS_YAW];
+
+    accelNed[X] = accelSmooth[0];
+    accelNed[Y] = accelSmooth[1];
+    accelNed[Z] = accelSmooth[2];
+
+    rotateV(accelNed, rpy);
+
+    if (!armed) {
+        accelZoffset -= accelZoffset / 64;
+        accelZoffset += (int32_t)accelNed[Z];
+    }
+    accelNed[Z] -= accelZoffset / 64;  // compensate for gravitation on z-axis
+
+    accelZSmooth = accelZSmooth + (dT_sec / (fcAcc + dT_sec)) * (accelNed[Z] - accelZSmooth); // low pass filter
+    */
 }
 
 float IMU::computeAccelZ(void)

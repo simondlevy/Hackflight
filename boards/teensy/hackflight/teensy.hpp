@@ -176,10 +176,9 @@ class Teensy : public Board {
         }
     }
         
-    virtual void imuGetEulerAngles(uint32_t currentTimeUsec, bool armed, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override
+    virtual void imuGetEulerAngles(uint32_t currentTimeUsec, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override
     {
         (void)currentTimeUsec;
-        (void)armed;
         (void)accelRaw;
         (void)gyroRaw;
         
