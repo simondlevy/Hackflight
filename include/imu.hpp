@@ -20,16 +20,23 @@
 
 #pragma once
 
+#include "board.hpp"
+#include "config.hpp"
+
 namespace hf {
 
 class IMU {
 private:
 
+    float       accelLpf[3];
+    int16_t     accelSmooth[3];
     float       accelNed[3];
     int32_t     accelSum[3];
     int32_t     accelSumCount;
     uint32_t    accelTimeSum;
     uint32_t    previousTimeUsec;
+
+    ImuConfig   imuConfig;
 
     Board       * board;
 
@@ -39,7 +46,7 @@ public:
     int16_t eulerAngles[3];
     int16_t gyroRaw[3];
 
-    void init(Board * _board);
+    void init(ImuConfig& _imuConfig, Board * _board);
     void update(uint32_t currentTime, bool armed);
 
     // called from Hover
@@ -63,13 +70,17 @@ static int32_t deadbandFilter(int32_t value, int32_t deadband)
 }
 */
 
-void IMU::init(Board * _board)
+void IMU::init(ImuConfig& _imuConfig, Board * _board)
 {
+    memcpy(&imuConfig, &_imuConfig, sizeof(ImuConfig));
     board = _board;
     board->imuInit();
 
-    for (int k=0; k<3; ++k)
+    for (int k=0; k<3; ++k) {
         accelSum[0] = 0;
+        accelLpf[k] = 0;
+        accelSmooth[k] = 0;
+    }
     accelSumCount = 0;
     accelTimeSum = 0;
     previousTimeUsec = 0;
@@ -93,8 +104,18 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
     // Calibrate raw values
     board->imuCalibrate(accelRaw, gyroRaw);
 
-    // Get Euler angles and raw gyro from board
-    board->imuGetEulerAngles(dT_sec, accelRaw, gyroRaw, eulerAnglesRadians);
+    // Smoothe the accelerometer values
+    for (uint8_t axis = 0; axis < 3; axis++) {
+        if (imuConfig.accelLpfFactor > 0) {
+            accelLpf[axis] = accelLpf[axis] * (1.0f - (1.0f / imuConfig.accelLpfFactor)) + accelRaw[axis] * (1.0f / imuConfig.accelLpfFactor);
+            accelSmooth[axis] = (int16_t)accelLpf[axis];
+        } else {
+            accelSmooth[axis] = accelRaw[axis];
+        }
+    }
+
+    // Get Euler angles from smoothed accel and raw gyro
+    board->imuGetEulerAngles(dT_sec, accelSmooth, gyroRaw, eulerAnglesRadians);
 
     // Convert angles from radians to tenths of a degrees
     // NB: roll, pitch in tenths of a degree; yaw in degrees
@@ -109,9 +130,9 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
     /*
-    accelSum[X] += deadbandFilter((int32_t)lrintf(accelNed[X]), config.imu.accelXyDeadband);
-    accelSum[Y] += deadbandFilter((int32_t)lrintf(accelNed[Y]), config.imu.accelXyDeadband);
-    accelSum[Z] += deadbandFilter((int32_t)lrintf(accelZSmooth),  config.imu.accelZDeadband);
+    accelSum[X] += deadbandFilter((int32_t)lrintf(accelNed[X]), imuConfig.accelXyDeadband);
+    accelSum[Y] += deadbandFilter((int32_t)lrintf(accelNed[Y]), imuConfig.accelXyDeadband);
+    accelSum[Z] += deadbandFilter((int32_t)lrintf(accelZSmooth),  imuConfig.accelZDeadband);
 
     accelTimeSum += dT_usec;
     accelSumCount++;
@@ -140,7 +161,7 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
 
 float IMU::computeAccelZ(void)
 {
-    float accelZ = 0; //(float)accelSum[2] / (float)accelSumCount * (9.80665f / 10000.0f / config.imu.acc1G);
+    float accelZ = 0; //(float)accelSum[2] / (float)accelSumCount * (9.80665f / 10000.0f / imuConfig.acc1G);
 
     accelSum[0] = 0;
     accelSum[1] = 0;

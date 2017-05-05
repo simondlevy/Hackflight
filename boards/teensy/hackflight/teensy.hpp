@@ -182,11 +182,11 @@ class Teensy : public Board {
         }
     }
         
-    virtual void imuGetEulerAngles(float dT_sec, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override
+    virtual void imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override
     {
-        // We can ignore these values, using quaternions instead
+        // We ignore these values inputs, using quaternions instead
         (void)dT_sec;
-        (void)accelRaw;
+        (void)accelSmooth;
         (void)gyroRaw;
         
         static float q[4];

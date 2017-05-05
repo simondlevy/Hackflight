@@ -36,7 +36,7 @@ class MW32 : public Board {
         virtual bool imuAccelCalibrated(void) override; 
         virtual bool imuGyroCalibrated(void) override; 
         virtual void imuUpdateFast(void) override; 
-        virtual void imuGetEulerAngles(float dT_sec, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override; 
+        virtual void imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override; 
 
     protected:
 
@@ -67,8 +67,6 @@ class MW32 : public Board {
         int32_t     accelAdcSum[3];
         uint16_t    accelCalibrationCountdown;
         int16_t     accelRaw[3];   // [-4096,+4096]
-        float       accelLpf[3];
-        int16_t     accelSmooth[3];
         int16_t     accelZero[3];
         int32_t     accelZoffset;
         float       accz_smooth;
@@ -161,8 +159,6 @@ void MW32::imuInit(void)
 {
     for (int k=0; k<3; ++k) {
         accelAdcSum[k] = 0;
-        accelLpf[k] = 0;
-        accelSmooth[k] = 0;
         accelZero[k] = 0;
         EstG[k] = 0;
         gyroZero[k] = 0;
@@ -177,16 +173,17 @@ void MW32::imuInit(void)
     EstN[2] = 0.0f;
 
     // Convert gyro scale from degrees to radians
+    // Config is available because MW32 is a subclass of Board
     gyroScale = (float)(4.0f / config.imu.gyroScale) * ((float)M_PI / 180.0f);
 
-    // calculate RC time constant used in the accelZ lpf    
+    // Calculate RC time constant used in the accelZ lpf    
     fcAcc = (float)(0.5f / (M_PI * config.imu.accelzLpfCutoff)); 
 
-    // compute loop times based on config from board
+    // Compute loop times based on config from board
     calibratingGyroCycles   = (uint16_t)(1000. * config.imu.calibratingGyroMilli  / config.imu.loopMicro);
     calibratingAccelCycles  = (uint16_t)(1000. * config.imu.calibratingAccelMilli / config.imu.loopMicro);
 
-    // always calibrate gyro at startup
+    // Always calibrate gyro at startup
     gyroCalibrationCountdown = calibratingGyroCycles;
 }
 
@@ -276,21 +273,15 @@ void MW32::imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3])
 
 }
 
-void MW32::imuGetEulerAngles(float dT_sec, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) 
+void MW32::imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) 
 {
     float deltaGyroAngle[3];
     float scale = dT_sec* gyroScale; 
+
     int32_t accMag = 0;
 
     for (uint8_t axis = 0; axis < 3; axis++) {
         deltaGyroAngle[axis] = gyroRaw[axis] * scale;
-        if (config.imu.accelLpfFactor > 0) {
-            accelLpf[axis] = accelLpf[axis] * (1.0f - (1.0f / config.imu.accelLpfFactor)) + accelRaw[axis] * 
-                (1.0f / config.imu.accelLpfFactor);
-            accelSmooth[axis] = (int16_t)accelLpf[axis];
-        } else {
-            accelSmooth[axis] = accelRaw[axis];
-        }
         accMag += (int32_t)accelSmooth[axis] * accelSmooth[axis];
     }
 
@@ -304,8 +295,7 @@ void MW32::imuGetEulerAngles(float dT_sec, int16_t accelRaw[3], int16_t gyroRaw[
     // estimation.  To do that, we just skip filter, as EstV already rotated by Gyro
     if (72 < (uint16_t)accMag && (uint16_t)accMag < 133) 
         for (uint8_t axis = 0; axis < 3; axis++)
-            EstG[axis] = (EstG[axis] * config.imu.gyroCmpfFactor + accelSmooth[axis]) * 
-                (1.0f / (config.imu.gyroCmpfFactor + 1.0f));
+            EstG[axis] = (EstG[axis] * config.imu.gyroCmpfFactor + accelSmooth[axis]) * (1.0f / (config.imu.gyroCmpfFactor + 1.0f));
 
     // Attitude of the estimated vector
     eulerAnglesRadians[AXIS_ROLL] = atan2f(EstG[Y], EstG[Z]);
