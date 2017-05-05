@@ -44,6 +44,7 @@ class Board {
 
     //------------------------------------------- IMU -----------------------------------------------------------
         virtual void     imuInit(void) = 0;
+        virtual void     imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3])  = 0;
         virtual void     imuRestartCalibration(void) = 0;
         virtual bool     imuAccelCalibrated(void) = 0;
         virtual bool     imuGyroCalibrated(void) = 0;

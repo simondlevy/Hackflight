@@ -152,6 +152,12 @@ class Teensy : public Board {
     {
     }
 
+    virtual void imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3]) 
+    {
+        (void)accelRaw;
+        (void)gyroRaw;
+    }
+
     virtual void imuRestartCalibration(void) override
     {
     }

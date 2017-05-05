@@ -90,6 +90,9 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
     // Get raw acceleromater, gyro values from board
     board->imuReadRaw(accelRaw, gyroRaw);
 
+    // Calibrate raw values
+    board->imuCalibrate(accelRaw, gyroRaw);
+
     // Get Euler angles and raw gyro from board
     board->imuGetEulerAngles(dT_sec, accelRaw, gyroRaw, eulerAnglesRadians);
 
