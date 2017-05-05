@@ -35,7 +35,7 @@ class MW32 : public Board {
         virtual bool imuAccelCalibrated(void) override; 
         virtual bool imuGyroCalibrated(void) override; 
         virtual void imuUpdateFast(void) override; 
-        virtual void imuGetEulerAngles(uint32_t currentTime, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override; 
+        virtual void imuGetEulerAngles(float dT_sec, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override; 
 
     protected:
 
@@ -81,7 +81,6 @@ class MW32 : public Board {
         float       gyroCmpfFactor;
         float       gyroScale;
         int16_t     gyroZero[3];
-        uint32_t    previousTimeUsec;
 
 }; // class MW32
 
@@ -171,7 +170,6 @@ void MW32::imuInit(void)
     accelZoffset = 0;
     accz_smooth = 0;
     fcAcc = 0;
-    previousTimeUsec = 0;
 
     EstN[0] = 1.0f;
     EstN[1] = 1.0f;
@@ -212,15 +210,11 @@ void MW32::imuUpdateFast(void)
 {
 }
 
-void MW32::imuGetEulerAngles(uint32_t currentTimeUsec, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) 
+void MW32::imuGetEulerAngles(float dT_sec, int16_t accelRaw[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) 
 {
     int32_t accMag = 0;
     float deltaGyroAngle[3];
-    uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
-    float dT_sec = dT_usec * 1e-6f;
     float scale = dT_sec* gyroScale; 
-
-    previousTimeUsec = currentTimeUsec;
 
     for (int k=0; k<3; ++k) {
         gyroRaw[k] >>= 2;
@@ -282,6 +276,8 @@ void MW32::imuGetEulerAngles(uint32_t currentTimeUsec, int16_t accelRaw[3], int1
 
     for (uint8_t axis = 0; axis < 3; axis++)
         gyroRaw[axis] -= gyroZero[axis];
+
+    // ===============================================
 
     for (uint8_t axis = 0; axis < 3; axis++) {
         deltaGyroAngle[axis] = gyroRaw[axis] * scale;

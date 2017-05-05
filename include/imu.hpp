@@ -29,6 +29,7 @@ private:
     int32_t     accelSum[3];
     int32_t     accelSumCount;
     uint32_t    accelTimeSum;
+    uint32_t    previousTimeUsec;
 
     Board       * board;
 
@@ -71,11 +72,17 @@ void IMU::init(Board * _board)
         accelSum[0] = 0;
     accelSumCount = 0;
     accelTimeSum = 0;
+    previousTimeUsec = 0;
 }
 
-void IMU::update(uint32_t currentTime, bool armed)
+void IMU::update(uint32_t currentTimeUsec, bool armed)
 {
     (void)armed;
+
+    // Track delta time
+    uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
+    float dT_sec = dT_usec * 1e-6f;
+    previousTimeUsec = currentTimeUsec;
 
     int16_t accelRaw[3];
     float eulerAnglesRadians[3];
@@ -84,7 +91,7 @@ void IMU::update(uint32_t currentTime, bool armed)
     board->imuReadRaw(accelRaw, gyroRaw);
 
     // Get Euler angles and raw gyro from board
-    board->imuGetEulerAngles(currentTime, accelRaw, gyroRaw, eulerAnglesRadians);
+    board->imuGetEulerAngles(dT_sec, accelRaw, gyroRaw, eulerAnglesRadians);
 
     // Convert angles from radians to tenths of a degrees
     // NB: roll, pitch in tenths of a degree; yaw in degrees
