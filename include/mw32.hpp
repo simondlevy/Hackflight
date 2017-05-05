@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "imu.hpp"
 #include "board.hpp"
 #include "config.hpp"
 
@@ -44,12 +45,6 @@ class MW32 : public Board {
 
     private: // types
 
-        enum {
-            X = 0,
-            Y,
-            Z
-        };
-
         typedef struct stdev_t {
             float m_oldM, m_newM, m_oldS, m_newS;
             int m_n;
@@ -60,7 +55,6 @@ class MW32 : public Board {
         static void devClear(stdev_t *dev);
         static void devPush(stdev_t *dev, float x);
         static void normalizeV(float src[3], float dest[3]);
-        static void rotateV(float v[3], float *delta);
 
     private: // fields
 
@@ -68,13 +62,10 @@ class MW32 : public Board {
         uint16_t    accelCalibrationCountdown;
         int16_t     accelRaw[3];   // [-4096,+4096]
         int16_t     accelZero[3];
-        int32_t     accelZoffset;
-        float       accz_smooth;
         uint16_t    calibratingAccelCycles;
         uint16_t    calibratingGyroCycles;
         float       EstG[3];
         float       EstN[3];
-        float       fcAcc;
         int16_t     gyroRaw[3];    // [-4096,+4096]
         uint16_t    gyroCalibrationCountdown;
         float       gyroCmpfFactor;
@@ -85,43 +76,6 @@ class MW32 : public Board {
 
 
 /********************************************* CPP ********************************************************/
-
-// Rotate Estimated vector(s) with small angle approximation, according to the gyro data
-void MW32::rotateV(float v[3], float *delta)
-{
-    float * v_tmp = v;
-
-    // This does a  "proper" matrix rotation using gyro deltas without small-angle approximation
-    float mat[3][3];
-    float cosx, sinx, cosy, siny, cosz, sinz;
-    float coszcosx, sinzcosx, coszsinx, sinzsinx;
-
-    cosx = cosf(delta[AXIS_ROLL]);
-    sinx = sinf(delta[AXIS_ROLL]);
-    cosy = cosf(delta[AXIS_PITCH]);
-    siny = sinf(delta[AXIS_PITCH]);
-    cosz = cosf(delta[AXIS_YAW]);
-    sinz = sinf(delta[AXIS_YAW]);
-
-    coszcosx = cosz * cosx;
-    sinzcosx = sinz * cosx;
-    coszsinx = sinx * cosz;
-    sinzsinx = sinx * sinz;
-
-    mat[0][0] = cosz * cosy;
-    mat[0][1] = -cosy * sinz;
-    mat[0][2] = siny;
-    mat[1][0] = sinzcosx + (coszsinx * siny);
-    mat[1][1] = coszcosx - (sinzsinx * siny);
-    mat[1][2] = -sinx * cosy;
-    mat[2][0] = (sinzsinx) - (coszcosx * siny);
-    mat[2][1] = (coszsinx) + (sinzcosx * siny);
-    mat[2][2] = cosy * cosx;
-
-    v[X] = v_tmp[X] * mat[0][0] + v_tmp[Y] * mat[1][0] + v_tmp[Z] * mat[2][0];
-    v[Y] = v_tmp[X] * mat[0][1] + v_tmp[Y] * mat[1][1] + v_tmp[Z] * mat[2][1];
-    v[Z] = v_tmp[X] * mat[0][2] + v_tmp[Y] * mat[1][2] + v_tmp[Z] * mat[2][2];
-}
 
 
 void MW32::devClear(stdev_t *dev)
@@ -164,9 +118,6 @@ void MW32::imuInit(void)
         gyroZero[k] = 0;
     }
 
-    accelZoffset = 0;
-    accz_smooth = 0;
-    fcAcc = 0;
 
     EstN[0] = 1.0f;
     EstN[1] = 1.0f;
@@ -175,9 +126,6 @@ void MW32::imuInit(void)
     // Convert gyro scale from degrees to radians
     // Config is available because MW32 is a subclass of Board
     gyroScale = (float)(4.0f / config.imu.gyroScale) * ((float)M_PI / 180.0f);
-
-    // Calculate RC time constant used in the accelZ lpf    
-    fcAcc = (float)(0.5f / (M_PI * config.imu.accelzLpfCutoff)); 
 
     // Compute loop times based on config from board
     calibratingGyroCycles   = (uint16_t)(1000. * config.imu.calibratingGyroMilli  / config.imu.loopMicro);
@@ -287,7 +235,7 @@ void MW32::imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroR
 
     accMag = accMag * 100 / ((int32_t)config.imu.acc1G * config.imu.acc1G);
 
-    rotateV(EstG, deltaGyroAngle);
+    IMU::rotateV(EstG, deltaGyroAngle);
 
     // Apply complementary filter (Gyro drift correction)
     // If accel magnitude >1.15G or <0.85G and ACC vector outside of the limit
@@ -301,7 +249,7 @@ void MW32::imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroR
     eulerAnglesRadians[AXIS_ROLL] = atan2f(EstG[Y], EstG[Z]);
     eulerAnglesRadians[AXIS_PITCH] = atan2f(-EstG[X], sqrtf(EstG[Y] * EstG[Y] + EstG[Z] * EstG[Z]));
 
-    rotateV(EstN, deltaGyroAngle);
+    IMU::rotateV(EstN, deltaGyroAngle);
     normalizeV(EstN, EstN);
 
     // Calculate heading

@@ -23,6 +23,14 @@
 #include "board.hpp"
 #include "config.hpp"
 
+// Used by MW32
+enum {
+    X = 0,
+    Y,
+    Z
+};
+
+
 namespace hf {
 
 class IMU {
@@ -34,6 +42,9 @@ private:
     int32_t     accelSum[3];
     int32_t     accelSumCount;
     uint32_t    accelTimeSum;
+    int32_t     accelZOffset;
+    float       accelZSmooth;
+    float       fcAcc;
     uint32_t    previousTimeUsec;
 
     ImuConfig   imuConfig;
@@ -46,6 +57,9 @@ public:
     int16_t eulerAngles[3];
     int16_t gyroRaw[3];
 
+    // Used by MW32
+    static void rotateV(float v[3], float *delta);
+
     void init(ImuConfig& _imuConfig, Board * _board);
     void update(uint32_t currentTime, bool armed);
 
@@ -56,7 +70,44 @@ public:
 
 /********************************************* CPP ********************************************************/
 
-/*
+// Rotate Estimated vector(s) with small angle approximation, according to the gyro data
+void IMU::rotateV(float v[3], float *delta)
+{
+    float * v_tmp = v;
+
+    // This does a  "proper" matrix rotation using gyro deltas without small-angle approximation
+    float mat[3][3];
+    float cosx, sinx, cosy, siny, cosz, sinz;
+    float coszcosx, sinzcosx, coszsinx, sinzsinx;
+
+    cosx = cosf(delta[AXIS_ROLL]);
+    sinx = sinf(delta[AXIS_ROLL]);
+    cosy = cosf(delta[AXIS_PITCH]);
+    siny = sinf(delta[AXIS_PITCH]);
+    cosz = cosf(delta[AXIS_YAW]);
+    sinz = sinf(delta[AXIS_YAW]);
+
+    coszcosx = cosz * cosx;
+    sinzcosx = sinz * cosx;
+    coszsinx = sinx * cosz;
+    sinzsinx = sinx * sinz;
+
+    mat[0][0] = cosz * cosy;
+    mat[0][1] = -cosy * sinz;
+    mat[0][2] = siny;
+    mat[1][0] = sinzcosx + (coszsinx * siny);
+    mat[1][1] = coszcosx - (sinzsinx * siny);
+    mat[1][2] = -sinx * cosy;
+    mat[2][0] = (sinzsinx) - (coszcosx * siny);
+    mat[2][1] = (coszsinx) + (sinzcosx * siny);
+    mat[2][2] = cosy * cosx;
+
+    v[X] = v_tmp[X] * mat[0][0] + v_tmp[Y] * mat[1][0] + v_tmp[Z] * mat[2][0];
+    v[Y] = v_tmp[X] * mat[0][1] + v_tmp[Y] * mat[1][1] + v_tmp[Z] * mat[2][1];
+    v[Z] = v_tmp[X] * mat[0][2] + v_tmp[Y] * mat[1][2] + v_tmp[Z] * mat[2][2];
+}
+
+
 static int32_t deadbandFilter(int32_t value, int32_t deadband)
 {
     if (abs(value) < deadband) {
@@ -68,7 +119,6 @@ static int32_t deadbandFilter(int32_t value, int32_t deadband)
     }
     return value;
 }
-*/
 
 void IMU::init(ImuConfig& _imuConfig, Board * _board)
 {
@@ -83,7 +133,12 @@ void IMU::init(ImuConfig& _imuConfig, Board * _board)
     }
     accelSumCount = 0;
     accelTimeSum = 0;
+    accelZOffset = 0;
+    accelZSmooth = 0;
     previousTimeUsec = 0;
+
+    // Calculate RC time constant used in the accelZ lpf    
+    fcAcc = (float)(0.5f / (M_PI * imuConfig.accelzLpfCutoff)); 
 }
 
 void IMU::update(uint32_t currentTimeUsec, bool armed)
@@ -129,7 +184,6 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
 
     // apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
-    /*
     accelSum[X] += deadbandFilter((int32_t)lrintf(accelNed[X]), imuConfig.accelXyDeadband);
     accelSum[Y] += deadbandFilter((int32_t)lrintf(accelNed[Y]), imuConfig.accelXyDeadband);
     accelSum[Z] += deadbandFilter((int32_t)lrintf(accelZSmooth),  imuConfig.accelZDeadband);
@@ -139,24 +193,23 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
 
     // the accel values have to be rotated into the earth frame
     float rpy[3];
-    rpy[0] = -(float)eulerAnglesRadians[AXIS_ROLL];
-    rpy[1] = -(float)eulerAnglesRadians[AXIS_PITCH];
-    rpy[2] = -(float)eulerAnglesRadians[AXIS_YAW];
+    rpy[X] = -(float)eulerAnglesRadians[AXIS_ROLL];
+    rpy[Y] = -(float)eulerAnglesRadians[AXIS_PITCH];
+    rpy[Z] = -(float)eulerAnglesRadians[AXIS_YAW];
 
-    accelNed[X] = accelSmooth[0];
-    accelNed[Y] = accelSmooth[1];
-    accelNed[Z] = accelSmooth[2];
+    accelNed[X] = accelSmooth[X];
+    accelNed[Y] = accelSmooth[Y];
+    accelNed[Z] = accelSmooth[Z];
 
     rotateV(accelNed, rpy);
 
     if (!armed) {
-        accelZoffset -= accelZoffset / 64;
-        accelZoffset += (int32_t)accelNed[Z];
+        accelZOffset -= accelZOffset / 64;
+        accelZOffset += (int32_t)accelNed[Z];
     }
-    accelNed[Z] -= accelZoffset / 64;  // compensate for gravitation on z-axis
+    accelNed[Z] -= accelZOffset / 64;  // compensate for gravitation on z-axis
 
     accelZSmooth = accelZSmooth + (dT_sec / (fcAcc + dT_sec)) * (accelNed[Z] - accelZSmooth); // low pass filter
-    */
 }
 
 float IMU::computeAccelZ(void)
