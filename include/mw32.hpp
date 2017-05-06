@@ -60,13 +60,11 @@ class MW32 : public Board {
 
         int32_t     accelAdcSum[3];
         uint16_t    accelCalibrationCountdown;
-        int16_t     accelRaw[3];   // [-4096,+4096]
         int16_t     accelZero[3];
         uint16_t    calibratingAccelCycles;
         uint16_t    calibratingGyroCycles;
         float       EstG[3];
         float       EstN[3];
-        int16_t     gyroRaw[3];    // [-4096,+4096]
         uint16_t    gyroCalibrationCountdown;
         float       gyroCmpfFactor;
         float       gyroScale;
