@@ -30,7 +30,6 @@ enum {
     Z
 };
 
-
 namespace hf {
 
 class IMU {
@@ -181,16 +180,6 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
     if (eulerAngles[AXIS_YAW] < 0)
         eulerAngles[AXIS_YAW] += 360;
 
-    // Apply Deadband to reduce integration drift and vibration influence and
-    // sum up Values for later integration to get velocity and distance
-    accelSum[X] += deadbandFilter((int32_t)lrintf(accelNed[X]), imuConfig.accelXyDeadband);
-    accelSum[Y] += deadbandFilter((int32_t)lrintf(accelNed[Y]), imuConfig.accelXyDeadband);
-    accelSum[Z] += deadbandFilter((int32_t)lrintf(accelZSmooth),  imuConfig.accelZDeadband);
-
-    // Accumulate time and count for integrating accelerometer values
-    accelTimeSum += dT_usec;
-    accelSumCount++;
-
     // Rotate accel values into the earth frame
     float rpy[3];
     rpy[X] = -(float)eulerAnglesRadians[AXIS_ROLL];
@@ -201,19 +190,30 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
     accelNed[Z] = accelSmooth[Z];
     rotateV(accelNed, rpy);
 
+    // Compute vertical acceleration offset at rest
     if (!armed) {
         accelZOffset -= accelZOffset / 64;
         accelZOffset += (int32_t)accelNed[Z];
     }
 
+    // Compute smoothed vertical acceleration
     accelNed[Z] -= accelZOffset / 64;  // compensate for gravitation on z-axis
-
     accelZSmooth = accelZSmooth + (dT_sec / (fcAcc + dT_sec)) * (accelNed[Z] - accelZSmooth); // low pass filter
+
+    // Apply Deadband to reduce integration drift and vibration influence and
+    // sum up Values for later integration to get velocity and distance
+    accelSum[X] += deadbandFilter((int32_t)lrintf(accelNed[X]), imuConfig.accelXyDeadband);
+    accelSum[Y] += deadbandFilter((int32_t)lrintf(accelNed[Y]), imuConfig.accelXyDeadband);
+    accelSum[Z] += deadbandFilter((int32_t)lrintf(accelZSmooth),  imuConfig.accelZDeadband);
+
+    // Accumulate time and count for integrating accelerometer values
+    accelTimeSum += dT_usec;
+    accelSumCount++;
 }
 
 float IMU::computeAccelZ(void)
 {
-    float accelZ = (float)accelSum[2] / (float)accelSumCount * (9.80665f / 10000.0f / imuConfig.acc1G);
+    float accelZ = (float)accelSum[Z] / (float)accelSumCount * (9.80665f / 10000.0f / imuConfig.acc1G);
 
     accelSum[0] = 0;
     accelSum[1] = 0;

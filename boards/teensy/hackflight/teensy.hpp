@@ -148,7 +148,7 @@ class Teensy : public Board {
         analogWrite(motorPins[index], aval);
     }
 
-    virtual void imuUpdateFast(void) override
+    virtual void imuUpdate(void) override
     {
         uint8_t errorStatus = imu.update();
         

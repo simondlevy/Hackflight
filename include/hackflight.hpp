@@ -159,8 +159,6 @@ bool Hackflight::gotRcUpdate(void)
     // update RC channels
     rc.update();
 
-    //debug(board, "%d %d %d %d\n", rc.data[0], rc.data[1], rc.data[2], rc.data[3]);
-
     // useful for simulator
     if (armed) {
         board->showAuxStatus(rc.auxState());
@@ -219,7 +217,7 @@ void Hackflight::updateImu(void)
     uint32_t currentTime = board->getMicros();
 
     // Special handling for EM7180 SENtral Sensor Fusion IMU
-    board->imuUpdateFast();
+    board->imuUpdate();
 
     if (imuTask.checkAndUpdate(currentTime)) {
 
@@ -234,7 +232,6 @@ void Hackflight::updateImu(void)
 
         // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
         stab.update(rc.command, imu.gyroRaw, imu.eulerAngles);
-
         mixer.update(armed, board);
         msp.update(armed);
     } 
