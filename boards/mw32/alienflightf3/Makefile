@@ -86,6 +86,7 @@ INCLUDE_DIRS = $(BREEZY_DIR) \
 			   $(VCP_DIR) \
 			   $(ALIENFLIGHTF3_DIR) \
 			   $(SRC_DIR) \
+			   .. \
 			   $(SRC_DIR)/target $(FIRMWARE_DIR) .
 LINKER_DIR	 = $(F3_DIR)
 

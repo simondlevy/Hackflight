@@ -87,6 +87,7 @@ OBJCOPY	 = arm-none-eabi-objcopy
 # Tool options.
 #
 INCLUDE_DIRS = $(SRC_DIR) \
+		   $(SRC_DIR)/.. \
 		   $(BREEZY_DIR) \
 		   $(FIRMWARE_DIR) \
 		   $(F1_DIR) \
@@ -94,7 +95,7 @@ INCLUDE_DIRS = $(SRC_DIR) \
 		   $(MPU6050_DIR) \
 		   $(STDPERIPH_DIR)/inc \
 		   $(CMSIS_DIR)/CM3/CoreSupport \
-		   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x \
+		   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x
 
 ARCH_FLAGS	 = -mthumb -mcpu=cortex-m3
 

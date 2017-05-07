@@ -143,8 +143,6 @@ void IMU::init(ImuConfig& _imuConfig, Board * _board)
 
 void IMU::update(uint32_t currentTimeUsec, bool armed)
 {
-    (void)armed;
-
     // Track delta time
     uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
     float dT_sec = dT_usec * 1e-6f;
@@ -162,7 +160,8 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
     // Smoothe the accelerometer values
     for (uint8_t axis = 0; axis < 3; axis++) {
         if (imuConfig.accelLpfFactor > 0) {
-            accelLpf[axis] = accelLpf[axis] * (1.0f - (1.0f / imuConfig.accelLpfFactor)) + accelRaw[axis] * (1.0f / imuConfig.accelLpfFactor);
+            accelLpf[axis] = accelLpf[axis] * (1.0f - (1.0f / imuConfig.accelLpfFactor)) + 
+                accelRaw[axis] * (1.0f / imuConfig.accelLpfFactor);
             accelSmooth[axis] = (int16_t)accelLpf[axis];
         } else {
             accelSmooth[axis] = accelRaw[axis];
@@ -182,31 +181,31 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
     if (eulerAngles[AXIS_YAW] < 0)
         eulerAngles[AXIS_YAW] += 360;
 
-    // apply Deadband to reduce integration drift and vibration influence and
+    // Apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
     accelSum[X] += deadbandFilter((int32_t)lrintf(accelNed[X]), imuConfig.accelXyDeadband);
     accelSum[Y] += deadbandFilter((int32_t)lrintf(accelNed[Y]), imuConfig.accelXyDeadband);
     accelSum[Z] += deadbandFilter((int32_t)lrintf(accelZSmooth),  imuConfig.accelZDeadband);
 
+    // Accumulate time and count for integrating accelerometer values
     accelTimeSum += dT_usec;
     accelSumCount++;
 
-    // the accel values have to be rotated into the earth frame
+    // Rotate accel values into the earth frame
     float rpy[3];
     rpy[X] = -(float)eulerAnglesRadians[AXIS_ROLL];
     rpy[Y] = -(float)eulerAnglesRadians[AXIS_PITCH];
     rpy[Z] = -(float)eulerAnglesRadians[AXIS_YAW];
-
     accelNed[X] = accelSmooth[X];
     accelNed[Y] = accelSmooth[Y];
     accelNed[Z] = accelSmooth[Z];
-
     rotateV(accelNed, rpy);
 
     if (!armed) {
         accelZOffset -= accelZOffset / 64;
         accelZOffset += (int32_t)accelNed[Z];
     }
+
     accelNed[Z] -= accelZOffset / 64;  // compensate for gravitation on z-axis
 
     accelZSmooth = accelZSmooth + (dT_sec / (fcAcc + dT_sec)) * (accelNed[Z] - accelZSmooth); // low pass filter
@@ -214,7 +213,7 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
 
 float IMU::computeAccelZ(void)
 {
-    float accelZ = 0; //(float)accelSum[2] / (float)accelSumCount * (9.80665f / 10000.0f / imuConfig.acc1G);
+    float accelZ = (float)accelSum[2] / (float)accelSumCount * (9.80665f / 10000.0f / imuConfig.acc1G);
 
     accelSum[0] = 0;
     accelSum[1] = 0;
@@ -224,7 +223,6 @@ float IMU::computeAccelZ(void)
 
     return accelZ;
 }
-
 
 } // namespace hf
 

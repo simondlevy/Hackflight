@@ -87,6 +87,7 @@ OBJCOPY	 = arm-none-eabi-objcopy
 # Tool options.
 #
 INCLUDE_DIRS = $(SRC_DIR) \
+		   $(SRC_DIR)/.. \
 		   $(BREEZY_DIR) \
 		   $(FIRMWARE_DIR) \
 		   $(F1_DIR) \

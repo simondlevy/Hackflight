@@ -148,30 +148,6 @@ class Teensy : public Board {
         analogWrite(motorPins[index], aval);
     }
 
-    virtual void imuInit(void) override
-    {
-    }
-
-    virtual void imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3]) 
-    {
-        (void)accelRaw;
-        (void)gyroRaw;
-    }
-
-    virtual void imuRestartCalibration(void) override
-    {
-    }
-
-    virtual bool imuAccelCalibrated(void) override
-    {
-        return true;
-    }
-
-    virtual bool imuGyroCalibrated(void) override
-    {
-        return true;
-    }
-
     virtual void imuUpdateFast(void) override
     {
         uint8_t errorStatus = imu.update();

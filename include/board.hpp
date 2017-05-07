@@ -43,12 +43,12 @@ class Board {
         virtual void     ledSet(uint8_t id, bool is_on, float max_brightness = 255) { (void)id; (void)is_on; (void)max_brightness;}
 
     //------------------------------------------- IMU -----------------------------------------------------------
-        virtual void     imuInit(void) = 0;
-        virtual void     imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3])  = 0;
-        virtual void     imuRestartCalibration(void) = 0;
-        virtual bool     imuAccelCalibrated(void) = 0;
-        virtual bool     imuGyroCalibrated(void) = 0;
-        virtual void     imuUpdateFast(void) = 0;
+        virtual void     imuInit(void) { }
+        virtual void     imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3]) { (void)accelRaw; (void)gyroRaw; }
+        virtual void     imuRestartCalibration(void) { }
+        virtual bool     imuAccelCalibrated(void) { return true; }
+        virtual bool     imuGyroCalibrated(void)  { return true; }
+        virtual void     imuUpdateFast(void) { }
         virtual void     imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) = 0;
         virtual void     imuReadRaw(int16_t accelRaw[3], int16_t gyroRaw[3]) = 0;
 

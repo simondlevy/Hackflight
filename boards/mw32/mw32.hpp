@@ -36,7 +36,6 @@ class MW32 : public Board {
         virtual void imuRestartCalibration(void) override; 
         virtual bool imuAccelCalibrated(void) override; 
         virtual bool imuGyroCalibrated(void) override; 
-        virtual void imuUpdateFast(void) override; 
         virtual void imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override; 
 
     protected:
@@ -58,7 +57,7 @@ class MW32 : public Board {
 
     private: // fields
 
-        int32_t     accelAdcSum[3];
+        int32_t     accelRawSum[3];
         uint16_t    accelCalibrationCountdown;
         int16_t     accelZero[3];
         uint16_t    calibratingAccelCycles;
@@ -110,7 +109,7 @@ void MW32::normalizeV(float src[3], float dest[3])
 void MW32::imuInit(void)
 {
     for (int k=0; k<3; ++k) {
-        accelAdcSum[k] = 0;
+        accelRawSum[k] = 0;
         accelZero[k] = 0;
         EstG[k] = 0;
         gyroZero[k] = 0;
@@ -150,10 +149,6 @@ bool MW32::imuGyroCalibrated(void)
     return gyroCalibrationCountdown == 0;
 }
 
-void MW32::imuUpdateFast(void)
-{
-}
-
 void MW32::imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3]) 
 {
     for (int k=0; k<3; ++k) {
@@ -165,18 +160,18 @@ void MW32::imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3])
         for (uint8_t axis = 0; axis < 3; axis++) {
             // Reset a[axis] at start of calibration
             if (accelCalibrationCountdown == calibratingAccelCycles)
-                accelAdcSum[axis] = 0;
+                accelRawSum[axis] = 0;
             // Sum up accel readings
-            accelAdcSum[axis] += accelRaw[axis];
+            accelRawSum[axis] += accelRaw[axis];
             // Clear global variables for next reading
             accelRaw[axis] = 0;
             accelZero[axis] = 0;
         }
         // Calculate average, shift Z down by acc1G
         if (accelCalibrationCountdown == 1) {
-            accelZero[AXIS_ROLL] = (accelAdcSum[AXIS_ROLL] + (calibratingAccelCycles / 2)) / calibratingAccelCycles;
-            accelZero[AXIS_PITCH] = (accelAdcSum[AXIS_PITCH] + (calibratingAccelCycles / 2)) / calibratingAccelCycles;
-            accelZero[AXIS_YAW] = (accelAdcSum[AXIS_YAW] + (calibratingAccelCycles / 2)) / calibratingAccelCycles - config.imu.acc1G;
+            accelZero[AXIS_ROLL] = (accelRawSum[AXIS_ROLL] + (calibratingAccelCycles / 2)) / calibratingAccelCycles;
+            accelZero[AXIS_PITCH] = (accelRawSum[AXIS_PITCH] + (calibratingAccelCycles / 2)) / calibratingAccelCycles;
+            accelZero[AXIS_YAW] = (accelRawSum[AXIS_YAW] + (calibratingAccelCycles / 2)) / calibratingAccelCycles - config.imu.acc1G;
         }
     }
 
