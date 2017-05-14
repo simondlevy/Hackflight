@@ -1,13 +1,13 @@
-# Running Hackflight on Teensy 3.2
+# Running Hackflight on the Ladybug Flight Controller
 
 The code in the hackflight directory below allows you to run Hackflight on Kris Winer's brushed-motor 
 [flight controller](https://www.oshpark.com/shared_projects/HwGC0Gj3)
 based on his STM32L432 "Ladybug" design.
 
-To build Hackflight for Teensy, you should first have the 
+To build Hackflight for Ladybug, you should first have the 
 [Arduino software](https://www.arduino.cc/en/Main/Software) installed on your computer.  (Make sure to install
-a version no higher than the latest one supporting Teensy.) Then install 
-[Teensyduino](http://www.pjrc.com/teensy/td_download.html). Once you've done that, find the
+a version no higher than the latest one supporting Ladybug.) Then install 
+[Ladybugduino](http://www.pjrc.com/teensy/td_download.html). Once you've done that, find the
 <b>hardware/teensy/avr/libraries</b> folder under your Arduino folder, and install the following two libraries
 there:
 <ul>
@@ -17,5 +17,5 @@ there:
 
 Finally, copy everything in the <b>include</b> directory (two levels above this one) to the 
 <b>hackflight</b> directory (below this one).  You should then be able to
-launch the Arduino IDE and build and flash the firmware onto your Teensy.
+launch the Arduino IDE and build and flash the firmware onto your Ladybug.
 
