@@ -63,7 +63,7 @@ struct LoopConfig {
 
 struct ImuConfig {
 
-    uint16_t acc1G			        = 4096;
+    uint16_t accel1G			    = 4096;
     float    accelLpfFactor	        = 4.f;
     int32_t  accelZDeadband	        = 40;
     int32_t  accelXyDeadband        = 40;

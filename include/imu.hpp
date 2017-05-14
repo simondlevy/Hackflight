@@ -50,6 +50,8 @@ private:
 
     Board       * board;
 
+    static int32_t deadbandFilter(int32_t value, int32_t deadband);
+
 public:
 
     // Used by Stabilize
@@ -107,7 +109,7 @@ void IMU::rotateV(float v[3], float *delta)
 }
 
 
-static int32_t deadbandFilter(int32_t value, int32_t deadband)
+int32_t IMU::deadbandFilter(int32_t value, int32_t deadband)
 {
     if (abs(value) < deadband) {
         value = 0;
@@ -213,7 +215,7 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
 
 float IMU::computeAccelZ(void)
 {
-    float accelZ = (float)accelSum[Z] / (float)accelSumCount * (9.80665f / 10000.0f / imuConfig.acc1G);
+    float accelZ = (float)accelSum[Z] / (float)accelSumCount * (9.80665f / 10000.0f / imuConfig.accel1G);
 
     accelSum[0] = 0;
     accelSum[1] = 0;

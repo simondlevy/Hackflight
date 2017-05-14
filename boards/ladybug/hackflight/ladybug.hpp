@@ -1,5 +1,5 @@
 /*
-   teensy.hpp : Teensy3.2 implementation of routines in board.hpp
+   ladybug.hpp : STM32L432 implementation of routines in board.hpp
 
    Uses EM7180 SENtral Sensor Hub in master mode mode
 
@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <i2c_t3.h>
+#include <Wire.h>
 
 #include <SpektrumDSM.h>
 #include <EM7180.h>
@@ -35,7 +35,7 @@ static uint8_t motorPins[4] = {9, 22, 5, 23};
 
 namespace hf {
 
-class Teensy : public Board {
+class Ladybug : public Board {
 
     virtual void dump(char * msg) override
     {
@@ -47,14 +47,12 @@ class Teensy : public Board {
         // Begin serial comms
         Serial.begin(115200);
 
-        // Setup LEDs and turn them off
-        pinMode(27, OUTPUT);
-        pinMode(29, OUTPUT);
-        digitalWrite(27, HIGH);
-        digitalWrite(29, HIGH);
+        // Setup LED and turn it off
+        pinMode(A1, OUTPUT);
+        digitalWrite(A1, LOW);
 
-        Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
-        
+        Wire.begin();        
+
         delay(1000);
 
         // Start the EM7180
@@ -99,9 +97,10 @@ class Teensy : public Board {
 
     virtual void ledSet(uint8_t id, bool is_on, float max_brightness) override
     { 
+        (void)id;
         (void)max_brightness;
 
-        digitalWrite(id ? 29 : 27, is_on ? LOW : HIGH); // NB: on = LOW; off = HIGH
+        digitalWrite(A1, is_on ? HIGH : LOW);
     }
 
     virtual bool rcSerialReady(void) override

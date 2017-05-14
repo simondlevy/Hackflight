@@ -167,11 +167,11 @@ void MW32::imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3])
             accelRaw[axis] = 0;
             accelZero[axis] = 0;
         }
-        // Calculate average, shift Z down by acc1G
+        // Calculate average, shift Z down by accel1G
         if (accelCalibrationCountdown == 1) {
             accelZero[AXIS_ROLL] = (accelRawSum[AXIS_ROLL] + (calibratingAccelCycles / 2)) / calibratingAccelCycles;
             accelZero[AXIS_PITCH] = (accelRawSum[AXIS_PITCH] + (calibratingAccelCycles / 2)) / calibratingAccelCycles;
-            accelZero[AXIS_YAW] = (accelRawSum[AXIS_YAW] + (calibratingAccelCycles / 2)) / calibratingAccelCycles - config.imu.acc1G;
+            accelZero[AXIS_YAW] = (accelRawSum[AXIS_YAW] + (calibratingAccelCycles / 2)) / calibratingAccelCycles - config.imu.accel1G;
         }
     }
 
@@ -219,14 +219,14 @@ void MW32::imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroR
     float deltaGyroAngle[3];
     float scale = dT_sec* gyroScale; 
 
-    int32_t accMag = 0;
+    int32_t accelMag = 0;
 
     for (uint8_t axis = 0; axis < 3; axis++) {
         deltaGyroAngle[axis] = gyroRaw[axis] * scale;
-        accMag += (int32_t)accelSmooth[axis] * accelSmooth[axis];
+        accelMag += (int32_t)accelSmooth[axis] * accelSmooth[axis];
     }
 
-    accMag = accMag * 100 / ((int32_t)config.imu.acc1G * config.imu.acc1G);
+    accelMag = accelMag * 100 / ((int32_t)config.imu.accel1G * config.imu.accel1G);
 
     IMU::rotateV(EstG, deltaGyroAngle);
 
@@ -234,7 +234,7 @@ void MW32::imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroR
     // If accel magnitude >1.15G or <0.85G and ACC vector outside of the limit
     // range => we neutralize the effect of accelerometers in the angle
     // estimation.  To do that, we just skip filter, as EstV already rotated by Gyro
-    if (72 < (uint16_t)accMag && (uint16_t)accMag < 133) 
+    if (72 < (uint16_t)accelMag && (uint16_t)accelMag < 133) 
         for (uint8_t axis = 0; axis < 3; axis++)
             EstG[axis] = (EstG[axis] * config.imu.gyroCmpfFactor + accelSmooth[axis]) * (1.0f / (config.imu.gyroCmpfFactor + 1.0f));
 
