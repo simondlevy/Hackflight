@@ -7,7 +7,7 @@ based on his STM32L432 "Ladybug" design.
 To build Hackflight for Ladybug, you should first have the 
 [Arduino software](https://www.arduino.cc/en/Main/Software) installed on your computer.  (Make sure to install
 a version no higher than the latest one supporting Ladybug.) Then install 
-[Ladybugduino](http://www.pjrc.com/teensy/td_download.html). Once you've done that, find the
+[arduino-STM32L4](https://github.com/GrumpyOldPizza/arduino-STM32L4). Once you've done that, find the
 <b>hardware/teensy/avr/libraries</b> folder under your Arduino folder, and install the following two libraries
 there:
 <ul>
