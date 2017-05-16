@@ -59,7 +59,7 @@ class Hackflight {
         bool gotRcUpdate(void);
         void flashLeds(const InitConfig& config);
         void updateImu(void);
-        void updateCalibrationState(int16_t eulerAngles[3]);
+        void updateReadyState(int16_t eulerAngles[3]);
 
     private:
         bool       armed;
@@ -187,7 +187,6 @@ bool Hackflight::gotRcUpdate(void)
 
             // Restart IMU calibration via throttle-low / yaw left
             if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
-                //imu.restartCalibration();
                 board->imuRestartCalibration();
             }
 
@@ -228,7 +227,7 @@ void Hackflight::updateImu(void)
         imu.update(currentTime, armed);
 
         // Periodically update accelerometer calibration status using Euler angles
-        updateCalibrationState(imu.eulerAngles);
+        updateReadyState(imu.eulerAngles);
 
         // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
         stab.update(rc.command, imu.gyroRaw, imu.eulerAngles);
@@ -237,10 +236,9 @@ void Hackflight::updateImu(void)
     } 
 } 
 
-void Hackflight::updateCalibrationState(int16_t eulerAngles[3])
+void Hackflight::updateReadyState(int16_t eulerAngles[3])
 {
     // use LEDs to indicate calibration and arming status
-    //if (!imu.accelCalibrated() || !imu.gyroCalibrated()) {
     if (!board->imuAccelCalibrated() || !board->imuGyroCalibrated()) {
         board->ledSet(0, true);
     }
