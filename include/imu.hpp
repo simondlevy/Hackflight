@@ -37,7 +37,6 @@ private:
 
     float       accelLpf[3];
     int16_t     accelSmooth[3];
-    float       accelNed[3];
     int32_t     accelSum[3];
     int32_t     accelSumCount;
     uint32_t    accelTimeSum;
@@ -183,10 +182,13 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
         eulerAngles[AXIS_YAW] += 360;
 
     // Rotate accel values into the earth frame
+
     float rpy[3];
     rpy[X] = -(float)eulerAnglesRadians[AXIS_ROLL];
     rpy[Y] = -(float)eulerAnglesRadians[AXIS_PITCH];
     rpy[Z] = -(float)eulerAnglesRadians[AXIS_YAW];
+
+    float       accelNed[3];
     accelNed[X] = accelSmooth[X];
     accelNed[Y] = accelSmooth[Y];
     accelNed[Z] = accelSmooth[Z];
