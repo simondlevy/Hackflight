@@ -1,1 +1,1 @@
-../../../include/stabilize.hpp
+../../../inc/stabilize.hpp

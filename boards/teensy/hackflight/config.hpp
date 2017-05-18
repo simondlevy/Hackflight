@@ -1,1 +1,1 @@
-../../../include/config.hpp
+../../../inc/config.hpp

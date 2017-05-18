@@ -31,7 +31,7 @@ ARDUINO_DIR = $(HOME)/Development/arduino-1.8.1/hardware/teensy/avr/libraries
 
 ###############################################################################
 
-FIRMWARE_DIR = $(HACKFLIGHT_DIR)/include
+FIRMWARE_DIR = $(HACKFLIGHT_DIR)/inc
 
 F1_DIR = $(BREEZY_DIR)/f1
 

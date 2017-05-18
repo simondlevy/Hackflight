@@ -1,1 +1,1 @@
-../../../include/board.hpp
+../../../inc/board.hpp
