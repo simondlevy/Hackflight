@@ -23,7 +23,7 @@ VREP_DIR_OSX   = /Applications/V-REP_PRO_EDU_V3_3_2_Mac
 
 COMMON = $(VREP_DIR)/programming/common/
 CFLAGS = -std=c++11 -Wall -D_SIM \
-		 -I$(VREP_DIR)/programming/include/ -I. -I.. -I../../common -I../../include -I ../../boards/mw32 \
+		 -I$(VREP_DIR)/programming/include/ -I. -I.. -I../../common -I../../include \
 		 -Wall -fPIC -static
 
 OS = $(shell uname -s)

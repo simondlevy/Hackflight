@@ -21,12 +21,12 @@
 #pragma once
 
 #include <hackflight.hpp>
-#include <mw32.hpp>
+#include <fake.hpp>
 #include <config.hpp>
 
 namespace hf {
 
-    class VrepSimBoard : public MW32 {
+    class VrepSimBoard : public Fake {
 
         public:
 
