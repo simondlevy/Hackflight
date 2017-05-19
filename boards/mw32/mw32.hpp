@@ -254,6 +254,6 @@ void MW32::imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroR
     float Yh = EstN[Y] * cosineRoll - EstN[Z] * sineRoll;
     eulerAnglesRadians[AXIS_YAW] = atan2f(Yh, Xh); 
 
-} // imuUpdateSlow
+} // imuGetEulerAngles
 
 } // namespace hf
