@@ -350,6 +350,97 @@ void VrepSimBoard::delayMilliseconds(uint32_t msec)
 {
 }
 
+void VrepSimBoard::normalizeV(float src[3], float dest[3])
+{
+    float length = sqrtf(src[X] * src[X] + src[Y] * src[Y] + src[Z] * src[Z]);
+
+    if (length != 0) {
+        dest[X] = src[X] / length;
+        dest[Y] = src[Y] / length;
+        dest[Z] = src[Z] / length;
+    }
+}
+
+
+void VrepSimBoard::imuInit(void)
+{
+    for (int k=0; k<3; ++k) {
+        EstG[k] = 0;
+    }
+
+    EstN[0] = 1.0f;
+    EstN[1] = 1.0f;
+    EstN[2] = 0.0f;
+
+    // Convert gyro scale from degrees to radians
+    // Config is available because VrepSimBoard is a subclass of Board
+    gyroScale = (float)(4.0f / config.imu.gyroScale) * ((float)M_PI / 180.0f);
+}
+
+void VrepSimBoard::imuRestartCalibration(void) 
+{
+}
+
+bool VrepSimBoard::imuAccelCalibrated(void) 
+{
+    return true;
+}
+
+
+bool VrepSimBoard::imuGyroCalibrated(void)
+{
+    return true;
+}
+
+void VrepSimBoard::imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3]) 
+{
+    (void)accelRaw;
+    (void)gyroRaw;
+}
+
+void VrepSimBoard::imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) 
+{
+    float deltaGyroAngle[3];
+    float scale = dT_sec* gyroScale; 
+
+    int32_t accelMag = 0;
+
+    for (uint8_t axis = 0; axis < 3; axis++) {
+        deltaGyroAngle[axis] = gyroRaw[axis] * scale;
+        accelMag += (int32_t)accelSmooth[axis] * accelSmooth[axis];
+    }
+
+    accelMag = accelMag * 100 / ((int32_t)config.imu.accel1G * config.imu.accel1G);
+
+    IMU::rotateV(EstG, deltaGyroAngle);
+
+    // Apply complementary filter (Gyro drift correction)
+    // If accel magnitude >1.15G or <0.85G and ACC vector outside of the limit
+    // range => we neutralize the effect of accelerometers in the angle
+    // estimation.  To do that, we just skip filter, as EstV already rotated by Gyro
+    if (72 < (uint16_t)accelMag && (uint16_t)accelMag < 133) 
+        for (uint8_t axis = 0; axis < 3; axis++)
+            EstG[axis] = (EstG[axis] * config.imu.gyroCmpfFactor + accelSmooth[axis]) * (1.0f / (config.imu.gyroCmpfFactor + 1.0f));
+
+    // Attitude of the estimated vector
+    eulerAnglesRadians[AXIS_ROLL] = atan2f(EstG[Y], EstG[Z]);
+    eulerAnglesRadians[AXIS_PITCH] = atan2f(-EstG[X], sqrtf(EstG[Y] * EstG[Y] + EstG[Z] * EstG[Z]));
+
+    IMU::rotateV(EstN, deltaGyroAngle);
+    normalizeV(EstN, EstN);
+
+    // Calculate heading
+    float cosineRoll = cosf(eulerAnglesRadians[AXIS_ROLL]);
+    float sineRoll = sinf(eulerAnglesRadians[AXIS_ROLL]);
+    float cosinePitch = cosf(eulerAnglesRadians[AXIS_PITCH]);
+    float sinePitch = sinf(eulerAnglesRadians[AXIS_PITCH]);
+    float Xh = EstN[X] * cosinePitch + EstN[Y] * sineRoll * sinePitch + EstN[Z] * sinePitch * cosineRoll;
+    float Yh = EstN[Y] * cosineRoll - EstN[Z] * sineRoll;
+    eulerAnglesRadians[AXIS_YAW] = atan2f(Yh, Xh); 
+
+} // imuGetEulerAngles
+
+
 } // namespace hf
 
 #include <sim_extras.hpp>
@@ -516,9 +607,11 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     // Get demands from controller
     controllerRead(controller, demands);
 
+    /*
     for (int k=0; k<5; ++k)
         printf("%f  ", demands[k]);
     printf("\n");
+    */
 
     // PS3 spring-mounted throttle requires special handling
 	switch (controller) {

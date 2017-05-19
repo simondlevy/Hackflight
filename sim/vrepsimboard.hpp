@@ -21,15 +21,23 @@
 #pragma once
 
 #include <hackflight.hpp>
-#include <fake.hpp>
+#include <board.hpp>
 #include <config.hpp>
 
 namespace hf {
 
-    class VrepSimBoard : public Fake {
+    class VrepSimBoard : public Board {
 
         public:
 
+        virtual void imuInit(void) override; 
+        virtual void imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3]) override;
+        virtual void imuRestartCalibration(void) override; 
+        virtual bool imuAccelCalibrated(void) override; 
+        virtual bool imuGyroCalibrated(void) override; 
+        virtual void imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override; 
+
+ 
             virtual void     init(void) override;
             virtual const    Config& getConfig() override;
             virtual void     imuReadRaw(int16_t accADC[3], int16_t gyroADC[3]) override;
@@ -54,5 +62,26 @@ namespace hf {
             virtual void     checkReboot(bool pendReboot) override;
             virtual void     reboot(void) override;
             virtual void     delayMilliseconds(uint32_t msec) override;
-    }; 
-} 
+
+    private: // types
+
+        typedef struct stdev_t {
+            float m_oldM, m_newM, m_oldS, m_newS;
+            int m_n;
+        } stdev_t;
+
+    private: //methods
+
+        static void normalizeV(float src[3], float dest[3]);
+
+    private: // fields
+
+        float       EstG[3];
+        float       EstN[3];
+        uint16_t    gyroCalibrationCountdown;
+        float       gyroCmpfFactor;
+        float       gyroScale;
+
+    };  // class VrepSimBoard
+
+}  // namespace hf
