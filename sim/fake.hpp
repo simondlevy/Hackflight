@@ -152,64 +152,6 @@ void Fake::imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3])
     for (int k=0; k<3; ++k) {
         gyroRaw[k] >>= 2;
     }
-
-    if (accelCalibrationCountdown > 0) {
-
-        for (uint8_t axis = 0; axis < 3; axis++) {
-            // Reset a[axis] at start of calibration
-            if (accelCalibrationCountdown == calibratingAccelCycles)
-                accelRawSum[axis] = 0;
-            // Sum up accel readings
-            accelRawSum[axis] += accelRaw[axis];
-            // Clear global variables for next reading
-            accelRaw[axis] = 0;
-            accelZero[axis] = 0;
-        }
-        // Calculate average, shift Z down by accel1G
-        if (accelCalibrationCountdown == 1) {
-            accelZero[AXIS_ROLL] = (accelRawSum[AXIS_ROLL] + (calibratingAccelCycles / 2)) / calibratingAccelCycles;
-            accelZero[AXIS_PITCH] = (accelRawSum[AXIS_PITCH] + (calibratingAccelCycles / 2)) / calibratingAccelCycles;
-            accelZero[AXIS_YAW] = (accelRawSum[AXIS_YAW] + (calibratingAccelCycles / 2)) / calibratingAccelCycles - config.imu.accel1G;
-        }
-    }
-
-    accelRaw[AXIS_ROLL]  -= accelZero[AXIS_ROLL];
-    accelRaw[AXIS_PITCH] -= accelZero[AXIS_PITCH];
-    accelRaw[AXIS_YAW]   -= accelZero[AXIS_YAW];
-
-    // range: +/- 8192; +/- 2000 deg/sec
-
-    static int32_t g[3];
-    static stdev_t var[3];
-
-    if (gyroCalibrationCountdown > 0) {
-        for (uint8_t axis = 0; axis < 3; axis++) {
-            // Reset g[axis] at start of calibration
-            if (gyroCalibrationCountdown == calibratingGyroCycles) {
-                g[axis] = 0;
-                devClear(&var[axis]);
-            }
-            // Sum up 1000 readings
-            g[axis] += gyroRaw[axis];
-            devPush(&var[axis], gyroRaw[axis]);
-            // Clear global variables for next reading
-            gyroRaw[axis] = 0;
-            gyroZero[axis] = 0;
-            if (gyroCalibrationCountdown == 1) {
-                gyroZero[axis] = (g[axis] + (calibratingGyroCycles / 2)) / calibratingGyroCycles;
-            }
-        }
-    }
-
-    // Decrement calibration countdowns
-    if (accelCalibrationCountdown > 0)
-        accelCalibrationCountdown--;
-    if (gyroCalibrationCountdown > 0)
-        gyroCalibrationCountdown--;
-
-    for (uint8_t axis = 0; axis < 3; axis++)
-        gyroRaw[axis] -= gyroZero[axis];
-
 }
 
 void Fake::imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) 
