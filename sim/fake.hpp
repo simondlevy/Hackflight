@@ -134,19 +134,17 @@ void Fake::imuInit(void)
 
 void Fake::imuRestartCalibration(void) 
 {
-    gyroCalibrationCountdown = calibratingGyroCycles;
-    accelCalibrationCountdown = calibratingAccelCycles;
 }
 
 bool Fake::imuAccelCalibrated(void) 
 {
-    return gyroCalibrationCountdown == 0;
+    return true;
 }
 
 
 bool Fake::imuGyroCalibrated(void)
 {
-    return gyroCalibrationCountdown == 0;
+    return true;
 }
 
 void Fake::imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3]) 
