@@ -222,9 +222,9 @@ void VrepSimBoard::imuReadRaw(int16_t accelRaw[3], int16_t gyroRaw[3])
         accelRaw[k]  = (int16_t)(400000 * accel[k]);
     }
 
-    gyroRaw[1] = -(int16_t)(1000 * gyro[0]);
-    gyroRaw[0] = -(int16_t)(1000 * gyro[1]);
-    gyroRaw[2] = -(int16_t)(1000 * gyro[2]);
+    gyroRaw[1] = -(int16_t)(250 * gyro[0]);
+    gyroRaw[0] = -(int16_t)(250 * gyro[1]);
+    gyroRaw[2] = -(int16_t)(250 * gyro[2]);
 }
 
 void VrepSimBoard::ledSet(uint8_t id, bool is_on, float max_brightness) 

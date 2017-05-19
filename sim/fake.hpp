@@ -111,9 +111,8 @@ bool Fake::imuGyroCalibrated(void)
 
 void Fake::imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3]) 
 {
-    for (int k=0; k<3; ++k) {
-        gyroRaw[k] >>= 2;
-    }
+    (void)accelRaw;
+    (void)gyroRaw;
 }
 
 void Fake::imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) 
