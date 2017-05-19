@@ -51,48 +51,21 @@ class Fake : public Board {
 
     private: //methods
 
-        static void devClear(stdev_t *dev);
-        static void devPush(stdev_t *dev, float x);
         static void normalizeV(float src[3], float dest[3]);
 
     private: // fields
 
-        int32_t     accelRawSum[3];
-        uint16_t    accelCalibrationCountdown;
-        int16_t     accelZero[3];
-        uint16_t    calibratingAccelCycles;
-        uint16_t    calibratingGyroCycles;
         float       EstG[3];
         float       EstN[3];
         uint16_t    gyroCalibrationCountdown;
         float       gyroCmpfFactor;
         float       gyroScale;
-        int16_t     gyroZero[3];
 
 }; // class Fake
 
 
 /********************************************* CPP ********************************************************/
 
-
-void Fake::devClear(stdev_t *dev)
-{
-    dev->m_n = 0;
-}
-
-void Fake::devPush(stdev_t *dev, float x)
-{
-    dev->m_n++;
-    if (dev->m_n == 1) {
-        dev->m_oldM = dev->m_newM = x;
-        dev->m_oldS = 0.0f;
-    } else {
-        dev->m_newM = dev->m_oldM + (x - dev->m_oldM) / dev->m_n;
-        dev->m_newS = dev->m_oldS + (x - dev->m_oldM) * (x - dev->m_newM);
-        dev->m_oldM = dev->m_newM;
-        dev->m_oldS = dev->m_newS;
-    }
-}
 
 void Fake::normalizeV(float src[3], float dest[3])
 {
@@ -109,10 +82,7 @@ void Fake::normalizeV(float src[3], float dest[3])
 void Fake::imuInit(void)
 {
     for (int k=0; k<3; ++k) {
-        accelRawSum[k] = 0;
-        accelZero[k] = 0;
         EstG[k] = 0;
-        gyroZero[k] = 0;
     }
 
 
@@ -123,13 +93,6 @@ void Fake::imuInit(void)
     // Convert gyro scale from degrees to radians
     // Config is available because Fake is a subclass of Board
     gyroScale = (float)(4.0f / config.imu.gyroScale) * ((float)M_PI / 180.0f);
-
-    // Compute loop times based on config from board
-    calibratingGyroCycles   = (uint16_t)(1000. * config.imu.calibratingGyroMilli  / config.imu.loopMicro);
-    calibratingAccelCycles  = (uint16_t)(1000. * config.imu.calibratingAccelMilli / config.imu.loopMicro);
-
-    // Always calibrate gyro at startup
-    gyroCalibrationCountdown = calibratingGyroCycles;
 }
 
 void Fake::imuRestartCalibration(void) 
