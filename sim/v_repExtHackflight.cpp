@@ -214,17 +214,17 @@ const Config& VrepSimBoard::getConfig()
     return config;
 }
 
-void VrepSimBoard::imuReadRaw(int16_t accADC[3], int16_t gyroADC[3])
+void VrepSimBoard::imuReadRaw(int16_t accelRaw[3], int16_t gyroRaw[3])
 {
     // Convert from radians to tenths of a degree
 
     for (int k=0; k<3; ++k) {
-        accADC[k]  = (int16_t)(400000 * accel[k]);
+        accelRaw[k]  = (int16_t)(400000 * accel[k]);
     }
 
-    gyroADC[1] = -(int16_t)(1000 * gyro[0]);
-    gyroADC[0] = -(int16_t)(1000 * gyro[1]);
-    gyroADC[2] = -(int16_t)(1000 * gyro[2]);
+    gyroRaw[1] = -(int16_t)(1000 * gyro[0]);
+    gyroRaw[0] = -(int16_t)(1000 * gyro[1]);
+    gyroRaw[2] = -(int16_t)(1000 * gyro[2]);
 }
 
 void VrepSimBoard::ledSet(uint8_t id, bool is_on, float max_brightness) 

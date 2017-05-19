@@ -85,7 +85,6 @@ void Fake::imuInit(void)
         EstG[k] = 0;
     }
 
-
     EstN[0] = 1.0f;
     EstN[1] = 1.0f;
     EstN[2] = 0.0f;
