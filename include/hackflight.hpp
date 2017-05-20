@@ -159,6 +159,8 @@ bool Hackflight::gotRcUpdate(void)
     // update RC channels
     rc.update();
 
+	debug(board, "%d %d %d %d %d", rc.data[0], rc.data[1], rc.data[2], rc.data[3], rc.data[4]);
+
     // useful for simulator
     if (armed) {
         board->showAuxStatus(rc.auxState());
