@@ -30,14 +30,12 @@ namespace hf {
 
         public:
 
-        virtual void imuInit(void) override; 
-        virtual void imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3]) override;
-        virtual void imuRestartCalibration(void) override; 
-        virtual bool imuAccelCalibrated(void) override; 
-        virtual bool imuGyroCalibrated(void) override; 
-        virtual void imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override; 
-
- 
+            virtual void     imuInit(void) override; 
+            virtual void     imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3]) override;
+            virtual void     imuRestartCalibration(void) override; 
+            virtual bool     imuAccelCalibrated(void) override; 
+            virtual bool     imuGyroCalibrated(void) override; 
+            virtual void     imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override; 
             virtual void     init(void) override;
             virtual const    Config& getConfig() override;
             virtual void     imuReadRaw(int16_t accADC[3], int16_t gyroADC[3]) override;

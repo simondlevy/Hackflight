@@ -118,6 +118,7 @@ static const float SPRINGY_THROTTLE_INC = .01f;
 // IMU support
 static float accel[3];
 static float gyro[3];
+static float eulerAngles[3];
 
 // Barometer support
 static int baroPressure;
@@ -438,6 +439,8 @@ void VrepSimBoard::imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16
     float Yh = EstN[Y] * cosineRoll - EstN[Z] * sineRoll;
     eulerAnglesRadians[AXIS_YAW] = atan2f(Yh, Xh); 
 
+    //printf(">: %+2.2f %+2.2f %+2.2f\n", eulerAnglesRadians[0], eulerAnglesRadians[1], eulerAnglesRadians[2]);
+
 } // imuGetEulerAngles
 
 
@@ -571,24 +574,25 @@ static void scalarTo3D(float s, float a[12], float out[3])
 void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 {
     CScriptFunctionData D;
+    float eulerFromSim[3];
 
     // For simulating gyro
     static float anglesPrev[3];
 
     // Get Euler angles for gyroscope simulation
-    float euler[3];
-    simGetObjectOrientation(quadcopterHandle, -1, euler);
+    simGetObjectOrientation(quadcopterHandle, -1, eulerFromSim);
 
     // Convert Euler angles to pitch and roll via rotation formula
-    float angles[3];
-    angles[0] =  sin(euler[2])*euler[0] - cos(euler[2])*euler[1];
-    angles[1] = -cos(euler[2])*euler[0] - sin(euler[2])*euler[1]; 
-    angles[2] = -euler[2]; // yaw direct from Euler
+    eulerAngles[0] =  sin(eulerFromSim[2])*eulerFromSim[0] - cos(eulerFromSim[2])*eulerFromSim[1];
+    eulerAngles[1] = -cos(eulerFromSim[2])*eulerFromSim[0] - sin(eulerFromSim[2])*eulerFromSim[1]; 
+    eulerAngles[2] = -eulerFromSim[2]; // yaw direct from Euler
+
+    printf("%+2.2f %+2.2f %+2.2f\n", -eulerAngles[1], -eulerAngles[0], eulerAngles[2]);
 
     // Compute pitch, roll, yaw first derivative to simulate gyro
     for (int k=0; k<3; ++k) {
-        gyro[k] = (angles[k] - anglesPrev[k]) / timestep;
-        anglesPrev[k] = angles[k];
+        gyro[k] = (eulerAngles[k] - anglesPrev[k]) / timestep;
+        anglesPrev[k] = eulerAngles[k];
     }
 
     // Convert vehicle's Z coordinate in meters to barometric pressure in Pascals (millibars)
@@ -606,12 +610,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
 
     // Get demands from controller
     controllerRead(controller, demands);
-
-    /*
-    for (int k=0; k<5; ++k)
-        printf("%f  ", demands[k]);
-    printf("\n");
-    */
 
     // PS3 spring-mounted throttle requires special handling
 	switch (controller) {
@@ -831,5 +829,3 @@ void errorDialog(char * message)
     // 1,0,0 = red
     displayDialog("ERROR", message, 1,0,0, sim_dlgstyle_ok);
 }
-
-
