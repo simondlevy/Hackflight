@@ -90,6 +90,8 @@ controller_t posixControllerInit(char * name, const char * ps3name)
         axismap[2] = 2;
         axismap[3] = 3;
         axismap[4] = 4;
+        axisdir[0] = -1;
+        axisdir[1] = -1;
     }
     else if (strstr(name, "PPM TO USB Adapter")) {
         controller = SPEKTRUM;
