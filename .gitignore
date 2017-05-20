@@ -1,5 +1,9 @@
+sim/outdoors/x64/Release/v_repExtHackflight.iobj
+sim/outdoors/x64/Release/v_repExtHackflight.ipdb
+sim/outdoors/x64/Release/v_repExtHackflight.dll
 sim/outdoors/Release/v_repExtHackflight.iobj
 sim/outdoors/Release/v_repExtHackflight.ipdb
+sim/outdoors/Release/v_repExtHackflight.dll
 sim/outdoors/v_repExtHackflight.VC.db
 boards/newnaze/*.o
 boards/newnaze/*.hex
