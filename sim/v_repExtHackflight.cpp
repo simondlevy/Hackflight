@@ -401,50 +401,18 @@ void VrepSimBoard::imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3])
 
 void VrepSimBoard::imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) 
 {
-    float deltaGyroAngle[3];
-    float scale = dT_sec* gyroScale; 
+    (void)dT_sec;
+    (void)accelSmooth;
+    (void)gyroRaw;
 
-    int32_t accelMag = 0;
-
-    for (uint8_t axis = 0; axis < 3; axis++) {
-        deltaGyroAngle[axis] = gyroRaw[axis] * scale;
-        accelMag += (int32_t)accelSmooth[axis] * accelSmooth[axis];
-    }
-
-    accelMag = accelMag * 100 / ((int32_t)config.imu.accel1G * config.imu.accel1G);
-
-    IMU::rotateV(EstG, deltaGyroAngle);
-
-    // Apply complementary filter (Gyro drift correction)
-    // If accel magnitude >1.15G or <0.85G and ACC vector outside of the limit
-    // range => we neutralize the effect of accelerometers in the angle
-    // estimation.  To do that, we just skip filter, as EstV already rotated by Gyro
-    if (72 < (uint16_t)accelMag && (uint16_t)accelMag < 133) 
-        for (uint8_t axis = 0; axis < 3; axis++)
-            EstG[axis] = (EstG[axis] * config.imu.gyroCmpfFactor + accelSmooth[axis]) * (1.0f / (config.imu.gyroCmpfFactor + 1.0f));
-
-    // Attitude of the estimated vector
-    eulerAnglesRadians[AXIS_ROLL] = atan2f(EstG[Y], EstG[Z]);
-    eulerAnglesRadians[AXIS_PITCH] = atan2f(-EstG[X], sqrtf(EstG[Y] * EstG[Y] + EstG[Z] * EstG[Z]));
-
-    IMU::rotateV(EstN, deltaGyroAngle);
-    normalizeV(EstN, EstN);
-
-    // Calculate heading
-    float cosineRoll = cosf(eulerAnglesRadians[AXIS_ROLL]);
-    float sineRoll = sinf(eulerAnglesRadians[AXIS_ROLL]);
-    float cosinePitch = cosf(eulerAnglesRadians[AXIS_PITCH]);
-    float sinePitch = sinf(eulerAnglesRadians[AXIS_PITCH]);
-    float Xh = EstN[X] * cosinePitch + EstN[Y] * sineRoll * sinePitch + EstN[Z] * sinePitch * cosineRoll;
-    float Yh = EstN[Y] * cosineRoll - EstN[Z] * sineRoll;
-    eulerAnglesRadians[AXIS_YAW] = atan2f(Yh, Xh); 
-
-    //printf(">: %+2.2f %+2.2f %+2.2f\n", eulerAnglesRadians[0], eulerAnglesRadians[1], eulerAnglesRadians[2]);
+    eulerAnglesRadians[0] = -eulerAngles[1];
+    eulerAnglesRadians[1] = -eulerAngles[0];
+    eulerAnglesRadians[2] =  eulerAngles[2];
 
 } // imuGetEulerAngles
 
 
-} // namespace hf
+     } // namespace hf
 
 #include <sim_extras.hpp>
 
@@ -586,8 +554,6 @@ void LUA_UPDATE_CALLBACK(SScriptCallBack* cb)
     eulerAngles[0] =  sin(eulerFromSim[2])*eulerFromSim[0] - cos(eulerFromSim[2])*eulerFromSim[1];
     eulerAngles[1] = -cos(eulerFromSim[2])*eulerFromSim[0] - sin(eulerFromSim[2])*eulerFromSim[1]; 
     eulerAngles[2] = -eulerFromSim[2]; // yaw direct from Euler
-
-    printf("%+2.2f %+2.2f %+2.2f\n", -eulerAngles[1], -eulerAngles[0], eulerAngles[2]);
 
     // Compute pitch, roll, yaw first derivative to simulate gyro
     for (int k=0; k<3; ++k) {
