@@ -52,7 +52,7 @@ struct PidConfig {
 struct LoopConfig {
 
     uint32_t angleCheckMilli	            = 500;
-    uint32_t rcLoopMilli					= 20;
+    uint32_t rcLoopMilli					= 10;
 };
 
 //=========================================================================

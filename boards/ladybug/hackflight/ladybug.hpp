@@ -22,12 +22,14 @@
 
 #include <Wire.h>
 
-#include <SpektrumDSM.h>
+#include <SpektrumSatellite.h>
+//#include <SpektrumDSM.h>
 #include <EM7180.h>
 
 #include "hackflight.hpp"
 
-SpektrumDSM2048 rx;
+SpektrumSatellite rx;
+//SpektrumDSM2048 rx;
 
 EM7180 imu;
 
