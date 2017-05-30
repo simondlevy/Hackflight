@@ -4,7 +4,6 @@
 #
 #      https://github.com/simondlevy/BreezySTM32
 #      https://github.com/simondlevy/MPU6050
-#      https://github.com/simondlevy/SpektrumDSM
 #
 #   This file is part of Hackflight.
 #
@@ -57,7 +56,7 @@ F3_DIR = $(BREEZY_DIR)/f3
 ALIENFLIGHTF3_DIR = $(F3_DIR)/alienflightf3
 VCP_DIR = $(F3_DIR)/vcp
 
-SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM
+SPEKTRUM_DIR = $(F3_DIR)/libraries/SpektrumDSM
 
 MPU6050_DIR = $(ARDUINO_DIR)/MPU6050
 

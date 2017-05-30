@@ -22,18 +22,16 @@
 
 #include <Wire.h>
 
-#include <SpektrumSatellite.h>
-//#include <SpektrumDSM.h>
+#include <SpektrumDSM.h>
 #include <EM7180.h>
 
 #include "hackflight.hpp"
 
-SpektrumSatellite rx;
-//SpektrumDSM2048 rx;
-
 EM7180 imu;
 
 static uint8_t motorPins[4] = {11, 1, 3, 13};
+
+extern uint16_t rcValue[];
 
 namespace hf {
 
@@ -107,19 +105,19 @@ class Ladybug : public Board {
 
     virtual bool rcSerialReady(void) override
     {
-        return rx.frameComplete();
+        return true;
     }
 
     virtual bool rcUseSerial(void) override
     {
-        rx.begin();
+        initRX();
         return true;
     }
 
     virtual uint16_t rcReadSerial(uint8_t chan) override
     {
         uint8_t chanmap[5] = {1, 2, 3, 0, 5};
-        return rx.readRawRC(chanmap[chan]);
+        return rcValue[chanmap[chan]];
     }
 
     virtual uint16_t rcReadPwm(uint8_t chan) override

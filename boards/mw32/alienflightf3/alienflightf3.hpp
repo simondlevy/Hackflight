@@ -30,9 +30,9 @@
 
 MPU6050 * mpu;
 
-SpektrumDSM2048 rx;
-
 BrushedMotor motors[4];
+
+SpektrumDSM2048 rx;
 
 namespace hf {
 
