@@ -29,10 +29,8 @@
 #include <hackflight.hpp>
 
 MPU6050 * mpu;
-
-BrushedMotor motors[4];
-
 SpektrumDSM2048 rx;
+BrushedMotor motors[4];
 
 namespace hf {
 

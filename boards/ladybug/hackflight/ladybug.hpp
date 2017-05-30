@@ -28,10 +28,9 @@
 #include "hackflight.hpp"
 
 EM7180 imu;
+SpektrumDSM2048 rx;
 
 static uint8_t motorPins[4] = {11, 1, 3, 13};
-
-extern uint16_t rcValue[];
 
 namespace hf {
 
@@ -110,14 +109,14 @@ class Ladybug : public Board {
 
     virtual bool rcUseSerial(void) override
     {
-        initRX();
+        rx.begin();
         return true;
     }
 
     virtual uint16_t rcReadSerial(uint8_t chan) override
     {
         uint8_t chanmap[5] = {1, 2, 3, 0, 5};
-        return rcValue[chanmap[chan]];
+        return rx.getChannelValue(chanmap[chan]);
     }
 
     virtual uint16_t rcReadPwm(uint8_t chan) override

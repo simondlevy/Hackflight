@@ -29,9 +29,7 @@
 #include <hackflight.hpp>
 
 MPU6050 * mpu;
-
-extern uint16_t rcValue[];
-
+SpektrumDSM2048 * rx;
 BrushedMotor motors[4];
 
 namespace hf {
@@ -64,6 +62,8 @@ class Beef : public MW32 {
         
         mpu = new MPU6050();
         mpu->begin(AFS_8G, GFS_2000DPS);
+
+        rx = new SpektrumDSM2048();
 
         motors[0].attach(8);
         motors[1].attach(11);
@@ -115,14 +115,14 @@ class Beef : public MW32 {
 
     virtual bool rcUseSerial(void) override
     {
-        initRX();
+        rx->begin();
         return true;
     }
 
     virtual uint16_t rcReadSerial(uint8_t chan) override
     {
         uint8_t chanmap[5] = {1, 2, 3, 0, 5};
-        return rcValue[chanmap[chan]];
+        return rx->getChannelValue(chanmap[chan]);
     }
 
     virtual uint16_t rcReadPwm(uint8_t chan) override
