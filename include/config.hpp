@@ -51,7 +51,7 @@ struct PidConfig {
 
 struct LoopConfig {
 
-    uint32_t angleCheckMilli	            = 500;
+    uint32_t angleCheckMilli	    = 500;
     uint32_t rcLoopMilli					= 10;
 };
 
@@ -63,18 +63,18 @@ struct LoopConfig {
 
 struct ImuConfig {
 
-    uint16_t accel1G			    = 4096;
+    uint16_t accel1G			          = 4096;
     float    accelLpfFactor	        = 4.f;
     int32_t  accelZDeadband	        = 40;
     int32_t  accelXyDeadband        = 40;
     float    accelzLpfCutoff        = 5.f;
-    uint32_t calibratingGyroMilli	= 3500;
+    uint32_t calibratingGyroMilli	  = 3500;
     uint32_t calibratingAccelMilli	= 1400;
-    float    gyroCmpfFactor		    = 600.f;
-    float    gyroScale			    = 16.4f;  // for Invensense MPU 
-    uint32_t loopMicro				= 3500;
+    float    gyroCmpfFactor		      = 600.f;
+    float    gyroScale			        = 16.4f;  // for Invensense MPU 
+    uint32_t loopMicro				      = 3500;
     uint16_t maxAngleInclination    = 500; 
-    uint16_t maxArmingAngle			= 250;		 
+    uint16_t maxArmingAngle			    = 250;		 
 };
 
 
@@ -96,10 +96,10 @@ struct RcConfig {
 
     uint16_t mincheck	= 1100;
     uint16_t maxcheck	= 1900;
-    int16_t expo8		= 65;
-    int16_t rate8		= 90;
+    int16_t expo8		  = 65;
+    int16_t rate8		  = 90;
     int8_t  thrMid8		= 50;
-    int32_t thrExpo8	 = 0;
+    int32_t thrExpo8	= 0;
 };
 
 //=========================================================================

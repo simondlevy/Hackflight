@@ -70,7 +70,7 @@ class Ladybug : public Board {
     virtual const Config& getConfig(void) override
     {
         // PIDs
-        config.pid.levelP         = 20;
+        config.pid.levelP         = 40;
         config.pid.levelI         = 1;
         config.pid.ratePitchrollP = 18;
         config.pid.ratePitchrollI = 15;
