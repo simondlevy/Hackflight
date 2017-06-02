@@ -30,7 +30,7 @@
 EM7180 imu;
 SpektrumDSM2048 rx;
 
-static uint8_t motorPins[4] = {11, 1, 3, 13};
+static uint8_t motorPins[4] = {13, 3, 1, 11};
 
 namespace hf {
 
