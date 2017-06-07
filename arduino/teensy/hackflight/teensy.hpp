@@ -154,18 +154,12 @@ class Teensy : public Board {
         }
     }
         
-    virtual void imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) override
+    virtual void imuGetEulerAngles(float eulerAnglesRadians[3]) override
     {
-        // We ignore these values inputs, using quaternions instead
-        (void)dT_sec;
-        (void)accelSmooth;
-        (void)gyroRaw;
-        
         static float q[4];
         imu.getQuaternions(q);
 
         float yaw   = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
-
         float pitch = -asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
         float roll  = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
 
@@ -174,11 +168,9 @@ class Teensy : public Board {
         eulerAnglesRadians[2] =  yaw;
     }
 
-    virtual void imuReadRaw(int16_t accelRaw[3], int16_t gyroRaw[3]) override
+    virtual void imuGetGyro(int16_t gyroRaw[3]) override
     {
-         imu.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
          imu.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
-
          gyroRaw[1] = -gyroRaw[1];
          gyroRaw[2] = -gyroRaw[2];
     }

@@ -217,7 +217,7 @@ void Hackflight::updateImu(void)
         rc.computeExpo();
 
         // IMU update reads IMU raw angles and converts them to Euler angles
-        imu.update(currentTime, armed);
+        imu.update();
 
         // Periodically update status using Euler angles
         updateReadyState(imu.eulerAngles);

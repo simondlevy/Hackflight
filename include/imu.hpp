@@ -23,33 +23,14 @@
 #include "board.hpp"
 #include "config.hpp"
 
-// Used by MW32
-enum {
-    X = 0,
-    Y,
-    Z
-};
-
 namespace hf {
 
 class IMU {
 private:
 
-    float       accelLpf[3];
-    int16_t     accelSmooth[3];
-    int32_t     accelSum[3];
-    int32_t     accelSumCount;
-    uint32_t    accelTimeSum;
-    int32_t     accelZOffset;
-    float       accelZSmooth;
-    float       fcAcc;
-    uint32_t    previousTimeUsec;
-
     ImuConfig   imuConfig;
 
     Board       * board;
-
-    static int32_t deadbandFilter(int32_t value, int32_t deadband);
 
 public:
 
@@ -57,11 +38,8 @@ public:
     int16_t eulerAngles[3];
     int16_t gyroRaw[3];
 
-    // Used by MW32
-    static void rotateV(float v[3], float *delta);
-
     void init(ImuConfig& _imuConfig, Board * _board);
-    void update(uint32_t currentTime, bool armed);
+    void update(void);
 
     // called from Hover
     float computeAccelZ(void);
@@ -70,103 +48,22 @@ public:
 
 /********************************************* CPP ********************************************************/
 
-// Rotate Estimated vector(s) with small angle approximation, according to the gyro data
-void IMU::rotateV(float v[3], float *delta)
-{
-    float * v_tmp = v;
-
-    // This does a  "proper" matrix rotation using gyro deltas without small-angle approximation
-    float mat[3][3];
-    float cosx, sinx, cosy, siny, cosz, sinz;
-    float coszcosx, sinzcosx, coszsinx, sinzsinx;
-
-    cosx = cosf(delta[AXIS_ROLL]);
-    sinx = sinf(delta[AXIS_ROLL]);
-    cosy = cosf(delta[AXIS_PITCH]);
-    siny = sinf(delta[AXIS_PITCH]);
-    cosz = cosf(delta[AXIS_YAW]);
-    sinz = sinf(delta[AXIS_YAW]);
-
-    coszcosx = cosz * cosx;
-    sinzcosx = sinz * cosx;
-    coszsinx = sinx * cosz;
-    sinzsinx = sinx * sinz;
-
-    mat[0][0] = cosz * cosy;
-    mat[0][1] = -cosy * sinz;
-    mat[0][2] = siny;
-    mat[1][0] = sinzcosx + (coszsinx * siny);
-    mat[1][1] = coszcosx - (sinzsinx * siny);
-    mat[1][2] = -sinx * cosy;
-    mat[2][0] = (sinzsinx) - (coszcosx * siny);
-    mat[2][1] = (coszsinx) + (sinzcosx * siny);
-    mat[2][2] = cosy * cosx;
-
-    v[X] = v_tmp[X] * mat[0][0] + v_tmp[Y] * mat[1][0] + v_tmp[Z] * mat[2][0];
-    v[Y] = v_tmp[X] * mat[0][1] + v_tmp[Y] * mat[1][1] + v_tmp[Z] * mat[2][1];
-    v[Z] = v_tmp[X] * mat[0][2] + v_tmp[Y] * mat[1][2] + v_tmp[Z] * mat[2][2];
-}
-
-
-int32_t IMU::deadbandFilter(int32_t value, int32_t deadband)
-{
-    if (abs(value) < deadband) {
-        value = 0;
-    } else if (value > 0) {
-        value -= deadband;
-    } else if (value < 0) {
-        value += deadband;
-    }
-    return value;
-}
-
 void IMU::init(ImuConfig& _imuConfig, Board * _board)
 {
     memcpy(&imuConfig, &_imuConfig, sizeof(ImuConfig));
     board = _board;
     board->imuInit();
-
-    for (int k=0; k<3; ++k) {
-        accelSum[0] = 0;
-        accelLpf[k] = 0;
-        accelSmooth[k] = 0;
-    }
-    accelSumCount = 0;
-    accelTimeSum = 0;
-    accelZOffset = 0;
-    accelZSmooth = 0;
-    previousTimeUsec = 0;
-
-    // Calculate RC time constant used in the accelZ lpf    
-    fcAcc = (float)(0.5f / (M_PI * imuConfig.accelzLpfCutoff)); 
 }
 
-void IMU::update(uint32_t currentTimeUsec, bool armed)
+void IMU::update(void)
 {
-    // Track delta time
-    uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
-    float dT_sec = dT_usec * 1e-6f;
-    previousTimeUsec = currentTimeUsec;
-
-    int16_t accelRaw[3];
     float eulerAnglesRadians[3];
 
-    // Get raw acceleromater, gyro values from board
-    board->imuReadRaw(accelRaw, gyroRaw);
-
-    // Smoothe the accelerometer values
-    for (uint8_t axis = 0; axis < 3; axis++) {
-        if (imuConfig.accelLpfFactor > 0) {
-            accelLpf[axis] = accelLpf[axis] * (1.0f - (1.0f / imuConfig.accelLpfFactor)) + 
-                accelRaw[axis] * (1.0f / imuConfig.accelLpfFactor);
-            accelSmooth[axis] = (int16_t)accelLpf[axis];
-        } else {
-            accelSmooth[axis] = accelRaw[axis];
-        }
-    }
+    // Get raw gyro values from board
+    board->imuGetGyro(gyroRaw);
 
     // Get Euler angles from smoothed accel and raw gyro
-    board->imuGetEulerAngles(dT_sec, accelSmooth, gyroRaw, eulerAnglesRadians);
+    board->imuGetEulerAngles(eulerAnglesRadians);
 
     // Convert angles from radians to tenths of a degrees
     // NB: roll, pitch in tenths of a degree; yaw in degrees
@@ -177,52 +74,6 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
     // Convert heading from [-180,+180] to [0,360]
     if (eulerAngles[AXIS_YAW] < 0)
         eulerAngles[AXIS_YAW] += 360;
-
-    // Rotate accel values into the earth frame
-
-    float rpy[3];
-    rpy[X] = -(float)eulerAnglesRadians[AXIS_ROLL];
-    rpy[Y] = -(float)eulerAnglesRadians[AXIS_PITCH];
-    rpy[Z] = -(float)eulerAnglesRadians[AXIS_YAW];
-
-    float       accelNed[3];
-    accelNed[X] = accelSmooth[X];
-    accelNed[Y] = accelSmooth[Y];
-    accelNed[Z] = accelSmooth[Z];
-    rotateV(accelNed, rpy);
-
-    // Compute vertical acceleration offset at rest
-    if (!armed) {
-        accelZOffset -= accelZOffset / 64;
-        accelZOffset += (int32_t)accelNed[Z];
-    }
-
-    // Compute smoothed vertical acceleration
-    accelNed[Z] -= accelZOffset / 64;  // compensate for gravitation on z-axis
-    accelZSmooth = accelZSmooth + (dT_sec / (fcAcc + dT_sec)) * (accelNed[Z] - accelZSmooth); // low pass filter
-
-    // Apply deadband to reduce integration drift and vibration influence and
-    // sum up values for later integration to get velocity and distance
-    accelSum[X] += deadbandFilter((int32_t)lrintf(accelNed[X]), imuConfig.accelXyDeadband);
-    accelSum[Y] += deadbandFilter((int32_t)lrintf(accelNed[Y]), imuConfig.accelXyDeadband);
-    accelSum[Z] += deadbandFilter((int32_t)lrintf(accelZSmooth),  imuConfig.accelZDeadband);
-
-    // Accumulate time and count for integrating accelerometer values
-    accelTimeSum += dT_usec;
-    accelSumCount++;
-}
-
-float IMU::computeAccelZ(void)
-{
-    float accelZ = (float)accelSum[Z] / (float)accelSumCount * (9.80665f / 10000.0f / imuConfig.accel1G);
-
-    accelSum[0] = 0;
-    accelSum[1] = 0;
-    accelSum[2] = 0;
-    accelSumCount = 0;
-    accelTimeSum = 0;
-
-    return accelZ;
 }
 
 } // namespace hf

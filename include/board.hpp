@@ -45,8 +45,8 @@ class Board {
     //------------------------------------------- IMU -----------------------------------------------------------
         virtual void     imuInit(void) { }
         virtual void     imuUpdate(void) { }
-        virtual void     imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) = 0;
-        virtual void     imuReadRaw(int16_t accelRaw[3], int16_t gyroRaw[3]) = 0;
+        virtual void     imuGetEulerAngles(float eulerAnglesRadians[3]) = 0;
+        virtual void     imuGetGyro(int16_t gyroRaw[3]) = 0;
 
     //-------------------------------------------------- RC -----------------------------------------------------
         virtual uint16_t rcReadSerial(uint8_t chan) = 0;
