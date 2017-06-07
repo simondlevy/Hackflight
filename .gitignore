@@ -37,3 +37,4 @@ ipch
 *.cache
 sim/*/*.so
 sim/*/*.dylib
+legacy/*/obj

@@ -29,6 +29,7 @@
 #include <hackflight.hpp>
 
 MPU6050 * mpu;
+SpektrumDSM2048 * rx;
 
 extern uint16_t rcValue[];
 
@@ -64,6 +65,8 @@ class Naze : public MW32 {
 
         mpu = new MPU6050();
         mpu->begin(AFS_8G, GFS_2000DPS);
+
+        rx = new SpektrumDSM2048();
 
         motors[0].attach(8);
         motors[1].attach(11);
@@ -115,7 +118,7 @@ class Naze : public MW32 {
 
     virtual bool rcUseSerial(void) override
     {
-        initRX();
+        rx->begin();
         return true;
     }
 

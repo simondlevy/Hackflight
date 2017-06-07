@@ -1,4 +1,4 @@
-# Makefile for Hackflight on Naze32 boards
+# Makefile for Hackflight on Beef's Brushed Boardboard
 #
 # Requires: 
 #
@@ -31,7 +31,7 @@ ARDUINO_DIR = $(HOME)/Development/arduino-1.8.1/hardware/teensy/avr/libraries
 
 ###############################################################################
 
-FIRMWARE_DIR = $(HACKFLIGHT_DIR)/include
+FIRMWARE_DIR = $(HACKFLIGHT_DIR)/legacy
 
 F1_DIR = $(BREEZY_DIR)/f1
 
@@ -95,7 +95,7 @@ INCLUDE_DIRS = $(SRC_DIR) \
 		   $(MPU6050_DIR) \
 		   $(STDPERIPH_DIR)/inc \
 		   $(CMSIS_DIR)/CM3/CoreSupport \
-		   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x
+		   $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x \
 
 ARCH_FLAGS	 = -mthumb -mcpu=cortex-m3
 
@@ -144,9 +144,9 @@ TARGET_ELF	 = $(BIN_DIR)/hackflight.elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/hackflight/,$(basename $(hackflight_CSRC)))) \
 			   $(OBJECT_DIR)/hackflight/Arduino.o \
 			   $(OBJECT_DIR)/hackflight/HardwareWire.o \
+			   $(OBJECT_DIR)/hackflight/Motor.o \
 			   $(OBJECT_DIR)/hackflight/MPU6050.o \
 			   $(OBJECT_DIR)/hackflight/SpektrumDSM.o \
-			   $(OBJECT_DIR)/hackflight/Motor.o \
 			   $(OBJECT_DIR)/hackflight.o
 TARGET_MAP   = $(OBJECT_DIR)/hackflight.map
 
@@ -182,16 +182,16 @@ $(OBJECT_DIR)/hackflight/Arduino.o: $(F1_DIR)/Arduino.cpp $(BREEZY_DIR)/Arduino.
 $(OBJECT_DIR)/hackflight/HardwareWire.o: $(F1_DIR)/HardwareWire.cpp $(BREEZY_DIR)/Wire.h
 	@$(CC) -c -o $(OBJECT_DIR)/hackflight/HardwareWire.o $(CFLAGS) $(F1_DIR)/HardwareWire.cpp
 
+$(OBJECT_DIR)/hackflight/Motor.o: $(F1_DIR)/Motor.cpp $(BREEZY_DIR)/Motor.h
+	@$(CC) -c -o $(OBJECT_DIR)/hackflight/Motor.o $(CFLAGS) $(F1_DIR)/Motor.cpp
+
 $(OBJECT_DIR)/hackflight/MPU6050.o: $(MPU6050_DIR)/MPU6050.cpp $(MPU6050_DIR)/MPU6050.h
 	@$(CC) -c -o $(OBJECT_DIR)/hackflight/MPU6050.o $(CFLAGS) $(MPU6050_DIR)/MPU6050.cpp
 
 $(OBJECT_DIR)/hackflight/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h
 	@$(CC) -c -o $(OBJECT_DIR)/hackflight/SpektrumDSM.o $(CFLAGS) $(SPEKTRUM_DIR)/SpektrumDSM.cpp
 
-$(OBJECT_DIR)/hackflight/Motor.o: $(F1_DIR)/Motor.cpp
-	@$(CC) -c -o $(OBJECT_DIR)/hackflight/Motor.o $(CFLAGS) $(F1_DIR)/Motor.cpp
-
-$(OBJECT_DIR)/hackflight.o: ./hackflight.cpp naze.hpp $(FIRMWARE_DIR)/*.hpp
+$(OBJECT_DIR)/hackflight.o: ./hackflight.cpp beef.hpp $(FIRMWARE_DIR)/*.hpp
 	@$(C++) -c -std=gnu++11 -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) ./hackflight.cpp
 
 clean:

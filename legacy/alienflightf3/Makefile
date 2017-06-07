@@ -29,7 +29,7 @@ ARDUINO_DIR = $(HOME)/Development/arduino-1.8.1/hardware/teensy/avr/libraries
 
 # Nothing below here should be changed ---------------------------------------------
 
-FIRMWARE_DIR = $(HACKFLIGHT_DIR)/include
+FIRMWARE_DIR = $(HACKFLIGHT_DIR)/legacy
 
 PROJECT = Hackflight
 
