@@ -215,9 +215,6 @@ void Hackflight::updateImu(void)
 {
     uint32_t currentTime = board->getMicros();
 
-    // Special handling for EM7180 SENtral Sensor Fusion IMU
-    board->imuUpdate();
-
     if (imuTask.checkAndUpdate(currentTime)) {
 
         // Compute exponential RC commands
