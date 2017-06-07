@@ -56,8 +56,8 @@ class Hackflight {
 
     private:
         void blinkLedForTilt(void);
-        bool gotRcUpdate(void);
         void flashLeds(const InitConfig& config);
+        void updateRc(void);
         void updateImu(void);
         void updateReadyState(int16_t eulerAngles[3]);
 
@@ -131,8 +131,13 @@ void Hackflight::init(Board * _board)
 
 void Hackflight::update(void)
 {
-    // If we didn't get new RC values, we can use the time to perform any extra tasks ("outer loop")
-    if (!gotRcUpdate()) {
+    // Time to update RC
+    if (rcTask.checkAndUpdate(board->getMicros())) {
+        updateRc();
+    }
+
+    // Not time to update RC; perform extra tasks
+    else {
 
         static int taskOrder;
 
@@ -149,13 +154,8 @@ void Hackflight::update(void)
 
 } // update
 
-bool Hackflight::gotRcUpdate(void)
+void Hackflight::updateRc(void)
 {
-    // if it's not time to update, and we have no new serial RC values, we're done
-    if (!rcTask.checkAndUpdate(board->getMicros())) {
-        return false;
-    }
-
     // update RC channels
     rc.update();
 
@@ -202,8 +202,6 @@ bool Hackflight::gotRcUpdate(void)
 
     // Detect aux switch changes for hover, altitude-hold, etc.
     board->extrasCheckSwitch();
-
-    return true;
 }
 
 void Hackflight::updateImu(void)
