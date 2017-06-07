@@ -16,6 +16,9 @@
 #   You should have received a copy of the GNU General Public License
 #   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 #
+
+# Edit this for where you installed Hackflight
+HACKFLIGHT_DIR = $(HOME)/Desktop/hackflight
  
 # Edit this for where you installed V-REP
 VREP_DIR_LINUX = $(HOME)/Software/V-REP_PRO_EDU_V3_4_0_Linux
@@ -23,7 +26,7 @@ VREP_DIR_OSX   = /Applications/V-REP_PRO_EDU_V3_3_2_Mac
 
 COMMON = $(VREP_DIR)/programming/common/
 CFLAGS = -std=c++11 -Wall -D_SIM \
-		 -I$(VREP_DIR)/programming/include/ -I. -I.. -I../../common -I../../include \
+		 -I$(VREP_DIR)/programming/include/ -I. -I.. -I$(HACKFLIGHT_DIR)/common -I$(HACKFLIGHT_DIR)/include \
 		 -Wall -fPIC -static
 
 OS = $(shell uname -s)
@@ -46,9 +49,9 @@ ALL = $(PLUGIN)
 
 all: $(ALL)
 
-libv_repExtHackflight.$(EXT): *.hpp ../*.cpp ../*.hpp ../../include/*.hpp 
+libv_repExtHackflight.$(EXT): *.hpp ../*.cpp ../*.hpp $(HACKFLIGHT_DIR)/include/*.hpp 
 	g++ $(CFLAGS) -c -DVREP_DIR=\"$(VREP_LIBDIR)\" ../v_repExtHackflight.cpp 
-	g++ $(CFLAGS) -c ../../common/serial.cpp
+	g++ $(CFLAGS) -c $(HACKFLIGHT_DIR)/common/serial.cpp
 	g++ $(CFLAGS) -c ../controller_Posix.cpp 
 	g++ $(CFLAGS) -c ../controller_$(OS).cpp 
 	g++ $(CFLAGS) -c $(COMMON)/scriptFunctionData.cpp 

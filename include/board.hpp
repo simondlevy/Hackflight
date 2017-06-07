@@ -44,17 +44,12 @@ class Board {
 
     //------------------------------------------- IMU -----------------------------------------------------------
         virtual void     imuInit(void) { }
-        virtual void     imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3]) { (void)accelRaw; (void)gyroRaw; }
-        virtual void     imuRestartCalibration(void) { }
-        virtual bool     imuAccelCalibrated(void) { return true; }
-        virtual bool     imuGyroCalibrated(void)  { return true; }
         virtual void     imuUpdate(void) { }
         virtual void     imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) = 0;
         virtual void     imuReadRaw(int16_t accelRaw[3], int16_t gyroRaw[3]) = 0;
 
     //-------------------------------------------------- RC -----------------------------------------------------
         virtual uint16_t rcReadSerial(uint8_t chan) = 0;
-        virtual bool     rcSerialReady(void) = 0;
         virtual bool     rcUseSerial(void) = 0;
         virtual uint16_t rcReadPwm(uint8_t chan) = 0;
 
@@ -76,10 +71,6 @@ class Board {
     //----------------------------------------------- Simulation -------------------------------------------------
         virtual void     showArmedStatus(bool armed) { (void)armed; }
         virtual void     showAuxStatus(uint8_t status)  { (void)status; }
-
-    //------------------------------------------------ STM32 ---------------------------------------------------
-        virtual void     checkReboot(bool pendReboot) { (void)pendReboot; }
-        virtual void     reboot(void) { }
 
 }; // class Board
 

@@ -201,7 +201,6 @@ const Config& VrepSimBoard::getConfig()
 {
     // Loop timing overrides
     config.imu.loopMicro             = 10000;    // VREP's shortest simulation period
-    config.imu.calibratingGyroMilli  = 100;		// long enough to see but not to annoy
 
     // PIDs
     config.pid.levelP          = 10;
@@ -376,27 +375,6 @@ void VrepSimBoard::imuInit(void)
     // Convert gyro scale from degrees to radians
     // Config is available because VrepSimBoard is a subclass of Board
     gyroScale = (float)(4.0f / config.imu.gyroScale) * ((float)M_PI / 180.0f);
-}
-
-void VrepSimBoard::imuRestartCalibration(void) 
-{
-}
-
-bool VrepSimBoard::imuAccelCalibrated(void) 
-{
-    return true;
-}
-
-
-bool VrepSimBoard::imuGyroCalibrated(void)
-{
-    return true;
-}
-
-void VrepSimBoard::imuCalibrate(int16_t accelRaw[3], int16_t gyroRaw[3]) 
-{
-    (void)accelRaw;
-    (void)gyroRaw;
 }
 
 void VrepSimBoard::imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) 

@@ -35,6 +35,6 @@ ipch
 *.log
 *.pdb
 *.cache
-sim/*/*.so
+sim/vrep/*/*.so
 sim/*/*.dylib
 legacy/*/obj

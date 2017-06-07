@@ -152,7 +152,7 @@ void Hackflight::update(void)
 bool Hackflight::gotRcUpdate(void)
 {
     // if it's not time to update, and we have no new serial RC values, we're done
-    if (!rcTask.checkAndUpdate(board->getMicros()) && !board->rcSerialReady()) {
+    if (!rcTask.checkAndUpdate(board->getMicros())) {
         return false;
     }
 
@@ -185,14 +185,9 @@ bool Hackflight::gotRcUpdate(void)
         // actions during not armed
         } else {         
 
-            // Restart IMU calibration via throttle-low / yaw left
-            if (rc.sticks == THR_LO + YAW_LO + PIT_LO + ROL_CE) {
-                board->imuRestartCalibration();
-            }
-
             // Arm via throttle-low / yaw-right
             if (rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE) {
-                if (board->imuGyroCalibrated() && safeToArm) {
+                if (safeToArm) {
                     if (!rc.auxState()) // aux switch must be in zero position
                         if (!armed) {
                             armed = true;
@@ -226,7 +221,7 @@ void Hackflight::updateImu(void)
         // IMU update reads IMU raw angles and converts them to Euler angles
         imu.update(currentTime, armed);
 
-        // Periodically update accelerometer calibration status using Euler angles
+        // Periodically update status using Euler angles
         updateReadyState(imu.eulerAngles);
 
         // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
@@ -238,20 +233,14 @@ void Hackflight::updateImu(void)
 
 void Hackflight::updateReadyState(int16_t eulerAngles[3])
 {
-    // use LEDs to indicate calibration and arming status
-    if (!board->imuAccelCalibrated() || !board->imuGyroCalibrated()) {
-        board->ledSet(0, true);
-    }
-    else {
-        if (safeToArm)
-            board->ledSet(0, false);
-        if (armed)
-            board->ledSet(1, true);
-        else
-            board->ledSet(1, false);
-    }
+    if (safeToArm)
+        board->ledSet(0, false);
+    if (armed)
+        board->ledSet(1, true);
+    else
+        board->ledSet(1, false);
 
-    // If angle too steep, restart accel calibration and flash LED
+    // If angle too steep, flash LED
     uint32_t currentTime = board->getMicros();
     if (angleCheckTask.check(currentTime)) {
         if (!(abs(eulerAngles[0]) < maxArmingAngle && abs(eulerAngles[1]) < maxArmingAngle)) {

@@ -154,9 +154,6 @@ void IMU::update(uint32_t currentTimeUsec, bool armed)
     // Get raw acceleromater, gyro values from board
     board->imuReadRaw(accelRaw, gyroRaw);
 
-    // Calibrate raw values
-    board->imuCalibrate(accelRaw, gyroRaw);
-
     // Smoothe the accelerometer values
     for (uint8_t axis = 0; axis < 3; axis++) {
         if (imuConfig.accelLpfFactor > 0) {

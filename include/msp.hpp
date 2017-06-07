@@ -69,7 +69,6 @@ private:
     Board  * board;
 
     mspPortState_t portState;
-    bool pendReboot;
 
     void serialize8(uint8_t a);
     void serialize16(int16_t a);
@@ -165,9 +164,6 @@ void MSP::init(IMU * _imu, Mixer * _mixer, RC * _rc, Board * _board)
 
 void MSP::update(bool armed)
 {
-    // pendReboot will be set for flashing
-    board->checkReboot(pendReboot);
-
     while (board->serialAvailableBytes()) {
 
         uint8_t c = board->serialReadByte();
@@ -175,10 +171,6 @@ void MSP::update(bool armed)
         if (portState.c_state == IDLE) {
             portState.c_state = (c == '$') ? HEADER_START : IDLE;
             if (portState.c_state == IDLE && !armed) {
-                if (c == '#')
-                    ;
-                else if (c == CONFIG_REBOOT_CHARACTER) 
-                    board->reboot();
             }
         } else if (portState.c_state == HEADER_START) {
             portState.c_state = (c == 'M') ? HEADER_M : IDLE;
@@ -232,11 +224,6 @@ void MSP::update(bool armed)
                     for (uint8_t i = 0; i < 3; i++)
                         serialize16(imu->eulerAngles[i]);
                     }
-                    break;
-
-                case MSP_REBOOT:
-                    headSerialReply(0);
-                    pendReboot = true;
                     break;
 
                     // don't know how to handle the (valid) message, indicate error MSP $M!
