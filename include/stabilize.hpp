@@ -116,14 +116,14 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
 
             int32_t PTermAccel = errorAngle * pidConfig.levelP; 
 
-            errorAngleI[axis] = constrain(errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
-            int32_t ITermAccel = ((int32_t)(errorAngleI[axis] * pidConfig.levelI)) >> 12;
+            // Avoid integral windup
+            errorAngleI[axis] = constrain(errorAngleI[axis] + errorAngle, -10000, +10000);
 
             int32_t prop = (std::max)(std::abs(rcCommand[DEMAND_PITCH]), 
                                     std::abs(rcCommand[DEMAND_ROLL])); // range [0;500]
 
             PTerm = (PTermAccel * (500 - prop) + PTermGyro * prop) / 500;
-            ITerm = (ITermAccel * (500 - prop) + ITermGyro * prop) / 500;
+            ITerm = (ITermGyro * prop) / 500;
         } 
 
         PTerm -= (int32_t)gyroADC[axis] * rate_p[axis] / 80; // 32 bits is needed for calculation

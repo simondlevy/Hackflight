@@ -30,7 +30,6 @@ struct PidConfig {
 
     // Level (accelerometer)
     float   levelP;
-    uint8_t levelI;
 
     // Rate (gyro): P must be positive
     uint8_t ratePitchrollP;
@@ -41,7 +40,7 @@ struct PidConfig {
     uint8_t yawP;
     uint8_t yawI;
 
-    // Trim for a particular vehicle
+    // Trim for a particular vehicle: roll, pitch, yaw
     int16_t softwareTrim[3] = {0, 0, 0};
 };
 

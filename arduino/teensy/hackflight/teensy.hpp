@@ -73,10 +73,11 @@ class Teensy : public Board {
     {
         // PIDs
         config.pid.levelP         = 0.20f;
-        config.pid.levelI         = 1;
+        
         config.pid.ratePitchrollP = 18;
         config.pid.ratePitchrollI = 15;
         config.pid.ratePitchrollD = 12;
+
         config.pid.yawP           = 85;
         config.pid.yawI           = 45;
 
