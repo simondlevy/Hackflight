@@ -73,8 +73,8 @@ struct ImuConfig {
     float    gyroCmpfFactor		    = 600.f;
     float    gyroScale			    = 16.4f;  // for Invensense MPU 
     uint32_t loopMicro				= 3500;
-    uint16_t maxAngleInclination    = 500; 
-    uint16_t maxArmingAngle			= 250;		 
+    float maxAngleInclination       = 50.f; 
+    float maxArmingAngle			= 25.f;		 
 };
 
 

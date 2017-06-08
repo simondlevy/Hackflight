@@ -59,7 +59,7 @@ class Hackflight {
         void updateRc(void);
         void updateImu(void);
         void updateExtras(void);
-        void updateReadyState(int16_t eulerAngles[3]);
+        void updateReadyState(float eulerAngles[3]);
 
     private:
         bool       armed;
@@ -213,19 +213,18 @@ void Hackflight::updateImu(void)
     board->imuGetGyro(gyroRaw);
 
     // Get Euler angles from board
-    float eulerAnglesRadians[3];
-    board->imuGetEulerAngles(eulerAnglesRadians);
+    float eulerAngles[3];
+    board->imuGetEulerAngles(eulerAngles);
 
     // Convert angles from radians to degrees
-    // NB: roll, pitch in tenths of a degree; yaw in degrees
-    int16_t eulerAngles[3];
-    eulerAngles[AXIS_ROLL]  = (int16_t)lrintf(eulerAnglesRadians[AXIS_ROLL]  * (1800.0f / M_PI));
-    eulerAngles[AXIS_PITCH] = (int16_t)lrintf(eulerAnglesRadians[AXIS_PITCH] * (1800.0f / M_PI));
-    eulerAngles[AXIS_YAW]   = (int16_t)(lrintf(eulerAnglesRadians[AXIS_YAW]  * 180.0f / M_PI));
+    for (int k=0; k<3; ++k) {
+        eulerAngles[k]  = eulerAngles[k]  * 180.0f / M_PI;
+    }
 
     // Convert heading from [-180,+180] to [0,360]
-    if (eulerAngles[AXIS_YAW] < 0)
+    if (eulerAngles[AXIS_YAW] < 0) {
         eulerAngles[AXIS_YAW] += 360;
+    }
 
     // Periodically update status using Euler angles
     updateReadyState(eulerAngles);
@@ -236,7 +235,7 @@ void Hackflight::updateImu(void)
     msp.update(eulerAngles, armed);
 } 
 
-void Hackflight::updateReadyState(int16_t eulerAngles[3])
+void Hackflight::updateReadyState(float eulerAngles[3])
 {
     if (safeToArm)
         board->ledSet(0, false);

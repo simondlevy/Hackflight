@@ -35,7 +35,7 @@ public:
 
     void init(const PidConfig& _pidConfig, const ImuConfig& _imuConfig, Board * _board);
 
-    void update(int16_t rcCommand[4], int16_t gyroADC[3], int16_t eulerAngles[3]);
+    void update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3]);
 
     void resetIntegral(void);
 
@@ -90,7 +90,7 @@ void Stabilize::init(const PidConfig& _pidConfig, const ImuConfig& _imuConfig, B
     resetIntegral();
 }
 
-void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], int16_t eulerAngles[3])
+void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3])
 {
     for (uint8_t axis = 0; axis < 3; axis++) {
 
@@ -112,7 +112,7 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], int16_t eulerAn
             int32_t errorAngle = constrain(2 * rcCommand[axis], 
                 - imuConfig.maxAngleInclination, 
                 + imuConfig.maxAngleInclination) 
-                - eulerAngles[axis];
+                - 10*eulerAngles[axis];
 
             int32_t PTermAccel = errorAngle * pidConfig.levelP / 100; 
 

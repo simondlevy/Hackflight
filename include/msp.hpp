@@ -59,7 +59,7 @@ typedef  struct mspPortState_t {
 class MSP {
 public:
     void init(Mixer * _mixer, RC * _rc, Board * _board);
-    void update(int16_t eulerAngles[3], bool armed);
+    void update(float eulerAngles[3], bool armed);
 
 private:
     Mixer  * mixer;
@@ -159,7 +159,7 @@ void MSP::init(Mixer * _mixer, RC * _rc, Board * _board)
     memset(&portState, 0, sizeof(portState));
 }
 
-void MSP::update(int16_t eulerAngles[3], bool armed)
+void MSP::update(float eulerAngles[3], bool armed)
 {
     while (board->serialAvailableBytes()) {
 
@@ -216,11 +216,11 @@ void MSP::update(int16_t eulerAngles[3], bool armed)
                         serialize16(rc->data[i]);
                     break;
 
-                case MSP_ATTITUDE: {
+                case MSP_ATTITUDE: 
                     headSerialReply(6);
-                    for (uint8_t i = 0; i < 3; i++)
-                        serialize16(eulerAngles[i]);
-                    }
+                    serialize16((int16_t)(10*eulerAngles[0]));
+                    serialize16((int16_t)(10*eulerAngles[1]));
+                    serialize16((int16_t)(eulerAngles[2]));
                     break;
 
                     // don't know how to handle the (valid) message, indicate error MSP $M!
