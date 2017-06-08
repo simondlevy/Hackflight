@@ -28,7 +28,6 @@
 #include "msp.hpp"
 #include "common.hpp"
 #include "rc.hpp"
-#include "imu.hpp"
 #include "stabilize.hpp"
 #include "timedtask.hpp"
 
@@ -66,7 +65,6 @@ class Hackflight {
         bool       armed;
 
         RC         rc;
-        IMU        imu;
         Mixer      mixer;
         MSP        msp;
         Stabilize  stab;
@@ -103,7 +101,7 @@ void Hackflight::init(Board * _board)
     maxArmingAngle = imuConfig.maxArmingAngle;
 
     // Initialize the IMU
-    imu.init(imuConfig, board);
+    board->imuInit();
 
     // Sleep  a bit to allow IMU to catch up
     board->delayMilliseconds(config.init.delayMilli);
@@ -119,7 +117,7 @@ void Hackflight::init(Board * _board)
     // Initialize our stabilization, mixing, and MSP (serial comms)
     stab.init(config.pid, config.imu, board);
     mixer.init(config.pwm, &rc, &stab); 
-    msp.init(&imu, &mixer, &rc, board);
+    msp.init(&mixer, &rc, board);
 
     // Initialize any extra stuff you want to do with your board
     board->extrasInit(&msp);
@@ -142,7 +140,6 @@ void Hackflight::update(void)
 
     // Not time to update RC; perform extra tasks
     else {
-
         updateExtras();
    }
 
@@ -211,16 +208,32 @@ void Hackflight::updateImu(void)
     // Compute exponential RC commands
     rc.computeExpo();
 
-    // IMU update reads IMU raw angles and converts them to Euler angles
-    imu.update();
+    // Get raw gyro values from board
+    int16_t gyroRaw[3];
+    board->imuGetGyro(gyroRaw);
+
+    // Get Euler angles from board
+    float eulerAnglesRadians[3];
+    board->imuGetEulerAngles(eulerAnglesRadians);
+
+    // Convert angles from radians to degrees
+    // NB: roll, pitch in tenths of a degree; yaw in degrees
+    int16_t eulerAngles[3];
+    eulerAngles[AXIS_ROLL]  = (int16_t)lrintf(eulerAnglesRadians[AXIS_ROLL]  * (1800.0f / M_PI));
+    eulerAngles[AXIS_PITCH] = (int16_t)lrintf(eulerAnglesRadians[AXIS_PITCH] * (1800.0f / M_PI));
+    eulerAngles[AXIS_YAW]   = (int16_t)(lrintf(eulerAnglesRadians[AXIS_YAW]  * 180.0f / M_PI));
+
+    // Convert heading from [-180,+180] to [0,360]
+    if (eulerAngles[AXIS_YAW] < 0)
+        eulerAngles[AXIS_YAW] += 360;
 
     // Periodically update status using Euler angles
-    updateReadyState(imu.eulerAngles);
+    updateReadyState(eulerAngles);
 
     // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
-    stab.update(rc.command, imu.gyroRaw, imu.eulerAngles);
+    stab.update(rc.command, gyroRaw, eulerAngles);
     mixer.update(armed, board);
-    msp.update(armed);
+    msp.update(eulerAngles, armed);
 } 
 
 void Hackflight::updateReadyState(int16_t eulerAngles[3])

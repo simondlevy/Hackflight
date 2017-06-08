@@ -21,7 +21,6 @@
 #include "board.hpp"
 #include "rc.hpp"
 #include "mixer.hpp"
-#include "imu.hpp"
 
 // See http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol
 #define MSP_REBOOT               68     
@@ -59,11 +58,10 @@ typedef  struct mspPortState_t {
 
 class MSP {
 public:
-    void init(IMU * _imu, Mixer * _mixer, RC * _rc, Board * _board);
-    void update(bool armed);
+    void init(Mixer * _mixer, RC * _rc, Board * _board);
+    void update(int16_t eulerAngles[3], bool armed);
 
 private:
-    IMU    * imu;
     Mixer  * mixer;
     RC     * rc;
     Board  * board;
@@ -152,9 +150,8 @@ void MSP::tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-void MSP::init(IMU * _imu, Mixer * _mixer, RC * _rc, Board * _board)
+void MSP::init(Mixer * _mixer, RC * _rc, Board * _board)
 {
-    imu   = _imu;
     mixer = _mixer;
     rc    = _rc;
     board = _board;
@@ -162,7 +159,7 @@ void MSP::init(IMU * _imu, Mixer * _mixer, RC * _rc, Board * _board)
     memset(&portState, 0, sizeof(portState));
 }
 
-void MSP::update(bool armed)
+void MSP::update(int16_t eulerAngles[3], bool armed)
 {
     while (board->serialAvailableBytes()) {
 
@@ -222,7 +219,7 @@ void MSP::update(bool armed)
                 case MSP_ATTITUDE: {
                     headSerialReply(6);
                     for (uint8_t i = 0; i < 3; i++)
-                        serialize16(imu->eulerAngles[i]);
+                        serialize16(eulerAngles[i]);
                     }
                     break;
 
