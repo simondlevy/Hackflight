@@ -29,7 +29,7 @@ namespace hf {
 struct PidConfig {
 
     // Level (accelerometer)
-    uint8_t levelP;
+    float   levelP;
     uint8_t levelI;
 
     // Rate (gyro): P must be positive

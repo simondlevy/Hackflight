@@ -114,7 +114,7 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
                 + imuConfig.maxAngleInclination) 
                 - 10*eulerAngles[axis];
 
-            int32_t PTermAccel = errorAngle * pidConfig.levelP / 100; 
+            int32_t PTermAccel = errorAngle * pidConfig.levelP; 
 
             errorAngleI[axis] = constrain(errorAngleI[axis] + errorAngle, -10000, +10000); // WindUp
             int32_t ITermAccel = ((int32_t)(errorAngleI[axis] * pidConfig.levelI)) >> 12;
