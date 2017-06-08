@@ -59,6 +59,7 @@ class Hackflight {
         void flashLeds(const InitConfig& config);
         void updateRc(void);
         void updateImu(void);
+        void updateExtras(void);
         void updateReadyState(int16_t eulerAngles[3]);
 
     private:
@@ -131,26 +132,27 @@ void Hackflight::init(Board * _board)
 
 void Hackflight::update(void)
 {
-    // Time to update RC
-    if (rcTask.checkAndUpdate(board->getMicros())) {
+    // Grab current time for various loops
+    uint32_t currentTime = board->getMicros();
+
+    // Outer (slow) loop: update RC
+    if (rcTask.checkAndUpdate(currentTime)) {
         updateRc();
     }
 
     // Not time to update RC; perform extra tasks
     else {
 
-        static int taskOrder;
+        updateExtras();
+   }
 
-        board->extrasPerformTask(taskOrder);
+    // Special handling for EM7180 SENtral Sensor Fusion IMU
+    board->imuUpdate();
 
-        taskOrder++;
-
-        if (taskOrder >= board->extrasGetTaskCount()) // using >= supports zero or more tasks
-            taskOrder = 0;
+    // Inner (fast) loop: update IMU
+    if (imuTask.checkAndUpdate(currentTime)) {
+        updateImu();
     }
-
-    // Regardless, we always update the IMU ("inner loop")
-    updateImu();
 
 } // update
 
@@ -206,27 +208,19 @@ void Hackflight::updateRc(void)
 
 void Hackflight::updateImu(void)
 {
-    uint32_t currentTime = board->getMicros();
+    // Compute exponential RC commands
+    rc.computeExpo();
 
-    // Special handling for EM7180 SENtral Sensor Fusion IMU
-    board->imuUpdate();
+    // IMU update reads IMU raw angles and converts them to Euler angles
+    imu.update();
 
-    if (imuTask.checkAndUpdate(currentTime)) {
+    // Periodically update status using Euler angles
+    updateReadyState(imu.eulerAngles);
 
-        // Compute exponential RC commands
-        rc.computeExpo();
-
-        // IMU update reads IMU raw angles and converts them to Euler angles
-        imu.update();
-
-        // Periodically update status using Euler angles
-        updateReadyState(imu.eulerAngles);
-
-        // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
-        stab.update(rc.command, imu.gyroRaw, imu.eulerAngles);
-        mixer.update(armed, board);
-        msp.update(armed);
-    } 
+    // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
+    stab.update(rc.command, imu.gyroRaw, imu.eulerAngles);
+    mixer.update(armed, board);
+    msp.update(armed);
 } 
 
 void Hackflight::updateReadyState(int16_t eulerAngles[3])
@@ -249,6 +243,15 @@ void Hackflight::updateReadyState(int16_t eulerAngles[3])
             safeToArm = true;
         }
     }
+}
+
+void Hackflight::updateExtras(void)
+{
+    static int taskOrder;
+    board->extrasPerformTask(taskOrder);
+    taskOrder++;
+    if (taskOrder >= board->extrasGetTaskCount()) // using >= supports zero or more tasks
+        taskOrder = 0;
 }
 
 void Hackflight::blinkLedForTilt(void)
