@@ -42,7 +42,7 @@ public:
 private:
 
     float rate_p[3];
-    uint8_t rate_i[3];
+    float rate_i[3];
     uint8_t rate_d[3];
 
     int16_t lastGyro[3];
@@ -85,7 +85,7 @@ void Stabilize::init(const PidConfig& _pidConfig, const ImuConfig& _imuConfig, B
 
     rate_d[0] = pidConfig.ratePitchrollD;
     rate_d[1] = pidConfig.ratePitchrollD;
-    rate_d[2] = 0;
+    rate_d[2] = 0; // no D for yaw
 
     resetIntegral();
 }
@@ -101,7 +101,9 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
         errorGyroI[axis] = constrain(errorGyroI[axis] + error, -16000, +16000); // WindUp
         if ((std::abs(gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (std::abs(rcCommand[axis]) > 100)))
             errorGyroI[axis] = 0;
-        int32_t ITermGyro = (errorGyroI[axis] / 125 * rate_i[axis]) >> 6;
+        int32_t ITermGyro = ((int32_t)(errorGyroI[axis] * rate_i[axis])) >> 6;
+
+        debug(board, "%d\n", ITermGyro);
 
         int32_t PTerm = PTermGyro;
         int32_t ITerm = ITermGyro;

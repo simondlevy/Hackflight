@@ -33,12 +33,12 @@ struct PidConfig {
 
     // Rate (gyro): P must be positive
     float   ratePitchrollP;
-    uint8_t ratePitchrollI;
+    float   ratePitchrollI;
     uint8_t ratePitchrollD;
 
     // Yaw: P must be positive
     float   yawP;
-    uint8_t yawI;
+    float   yawI;
 
     // Trim for a particular vehicle: roll, pitch, yaw
     int16_t softwareTrim[3] = {0, 0, 0};

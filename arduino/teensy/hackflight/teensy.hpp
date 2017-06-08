@@ -75,11 +75,11 @@ class Teensy : public Board {
         config.pid.levelP         = 0.20f;
         
         config.pid.ratePitchrollP = 0.225f;
-        config.pid.ratePitchrollI = 15;
+        config.pid.ratePitchrollI = 0.12f;
         config.pid.ratePitchrollD = 12;
 
         config.pid.yawP           = 1.0625f;
-        config.pid.yawI           = 45;
+        config.pid.yawI           = 0.36f;
 
         // "Software trim"
         config.pid.softwareTrim[AXIS_PITCH] = -50;
