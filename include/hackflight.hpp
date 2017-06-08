@@ -45,7 +45,6 @@
 #define THR_CE (3 << (2 * DEMAND_THROTTLE))
 #define THR_HI (2 << (2 * DEMAND_THROTTLE))
 
-
 namespace hf {
 
 class Hackflight {
@@ -143,7 +142,7 @@ void Hackflight::update(void)
         updateExtras();
    }
 
-    // Special handling for EM7180 SENtral Sensor Fusion IMU
+    // Polling for EM7180 SENtral Sensor Fusion IMU
     board->imuUpdate();
 
     // Inner (fast) loop: update IMU
@@ -155,19 +154,20 @@ void Hackflight::update(void)
 
 void Hackflight::updateRc(void)
 {
-    // update RC channels
+    // Update RC channels
     rc.update();
 
-    // useful for simulator
+    // Jseful for simulator
     if (armed) {
         board->showAuxStatus(rc.auxState());
     }
 
-    // when landed, reset integral component of PID
+    // When landed, reset integral component of PID
     if (rc.throttleIsDown()) {
         stab.resetIntegral();
     }
 
+    // Certain actions (arming, disarming) need checking every time
     if (rc.changed()) {
 
         // actions during armed
@@ -181,7 +181,7 @@ void Hackflight::updateRc(void)
                 }
             }
 
-        // actions during not armed
+        // Actions during not armed
         } else {         
 
             // Arm via throttle-low / yaw-right

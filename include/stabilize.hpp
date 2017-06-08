@@ -94,7 +94,7 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
 {
     for (uint8_t axis = 0; axis < 3; axis++) {
 
-        int32_t error = ((int32_t)rcCommand[axis] * 10 * 8 / rate_p[axis]) - gyroADC[axis];
+        int32_t error = ((int32_t)rcCommand[axis] * 80 / rate_p[axis]) - gyroADC[axis];
 
         int32_t PTermGyro = rcCommand[axis];
 
@@ -126,7 +126,7 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
             ITerm = (ITermAccel * (500 - prop) + ITermGyro * prop) / 500;
         } 
 
-        PTerm -= (int32_t)gyroADC[axis] * rate_p[axis] / 10 / 8; // 32 bits is needed for calculation
+        PTerm -= (int32_t)gyroADC[axis] * rate_p[axis] / 80; // 32 bits is needed for calculation
 
         int32_t delta = gyroADC[axis] - lastGyro[axis];
         lastGyro[axis] = gyroADC[axis];
@@ -150,6 +150,5 @@ void Stabilize::resetIntegral(void)
     errorAngleI[AXIS_ROLL] = 0;
     errorAngleI[AXIS_PITCH] = 0;
 }
-
 
 } // namespace
