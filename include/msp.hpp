@@ -218,9 +218,8 @@ void MSP::update(float eulerAngles[3], bool armed)
 
                 case MSP_ATTITUDE: 
                     headSerialReply(6);
-                    serialize16((int16_t)(10*eulerAngles[0]));
-                    serialize16((int16_t)(10*eulerAngles[1]));
-                    serialize16((int16_t)(eulerAngles[2]));
+                    for (uint8_t i = 0; i < 3; i++)
+                        serialize16((int16_t)(eulerAngles[i]));
                     break;
 
                     // don't know how to handle the (valid) message, indicate error MSP $M!

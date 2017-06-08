@@ -227,11 +227,11 @@ void MSP::update(bool armed)
                         serialize16(rc->data[i]);
                     break;
 
-                case MSP_ATTITUDE: {
+                case MSP_ATTITUDE:
                     headSerialReply(6);
-                    for (uint8_t i = 0; i < 3; i++)
-                        serialize16(imu->eulerAngles[i]);
-                    }
+                    serialize16(imu->eulerAngles[0]/10);
+                    serialize16(imu->eulerAngles[1]/10);
+                    serialize16(imu->eulerAngles[2]);
                     break;
 
                 case MSP_REBOOT:

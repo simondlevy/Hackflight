@@ -27,7 +27,7 @@ DISPLAY_HEIGHT = 500
 
 BACKGROUND_COLOR = 'white'
 
-CONNECTION_DELAY_MSEC = 1000 #4000
+CONNECTION_DELAY_MSEC = 1000
 
 USB_UPDATE_MSEC = 200
 
@@ -437,7 +437,7 @@ class GCS:
 
     def _handle_attitude(self, x, y, z):
 
-        self.roll_pitch_yaw = x/10., -y/10., z  
+        self.roll_pitch_yaw = x, -y, z  
 
         #self.messages.setCurrentMessage('Roll/Pitch/Yaw: %+3.3f %+3.3f %+3.3f' % self.roll_pitch_yaw)
 
