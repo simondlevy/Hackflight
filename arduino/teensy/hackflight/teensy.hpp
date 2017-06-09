@@ -76,7 +76,7 @@ class Teensy : public Board {
         
         config.pid.ratePitchrollP = 0.225f;
         config.pid.ratePitchrollI = 0.12f;
-        config.pid.ratePitchrollD = 12;
+        config.pid.ratePitchrollD = 0.375f;
 
         config.pid.yawP           = 1.0625f;
         config.pid.yawI           = 0.36f;

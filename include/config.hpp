@@ -29,16 +29,16 @@ namespace hf {
 struct PidConfig {
 
     // Level (accelerometer)
-    float   levelP;
+    float levelP;
 
     // Rate (gyro): P must be positive
-    float   ratePitchrollP;
-    float   ratePitchrollI;
-    uint8_t ratePitchrollD;
+    float ratePitchrollP;
+    float ratePitchrollI;
+    float ratePitchrollD;
 
     // Yaw: P must be positive
-    float   yawP;
-    float   yawI;
+    float yawP;
+    float yawI;
 
     // Trim for a particular vehicle: roll, pitch, yaw
     int16_t softwareTrim[3] = {0, 0, 0};
@@ -62,18 +62,18 @@ struct LoopConfig {
 
 struct ImuConfig {
 
-    uint16_t accel1G			    = 4096;
-    float    accelLpfFactor	        = 4.f;
-    int32_t  accelZDeadband	        = 40;
+    uint16_t accel1G                = 4096;
+    float    accelLpfFactor         = 4.f;
+    int32_t  accelZDeadband         = 40;
     int32_t  accelXyDeadband        = 40;
     float    accelzLpfCutoff        = 5.f;
-    uint32_t calibratingGyroMilli	= 3500;
-    uint32_t calibratingAccelMilli	= 1400;
-    float    gyroCmpfFactor		    = 600.f;
-    float    gyroScale			    = 16.4f;  // for Invensense MPU 
-    uint32_t loopMicro				= 3500;
+    uint32_t calibratingGyroMilli   = 3500;
+    uint32_t calibratingAccelMilli  = 1400;
+    float    gyroCmpfFactor         = 600.f;
+    float    gyroScale              = 16.4f;  // for Invensense MPU 
+    uint32_t loopMicro              = 3500;
     float maxAngleInclination       = 50.f; 
-    float maxArmingAngle			= 25.f;		 
+    float maxArmingAngle            = 25.f;         
 };
 
 
@@ -93,12 +93,12 @@ struct PwmConfig {
 
 struct RcConfig {
 
-    uint16_t mincheck	= 1100;
-    uint16_t maxcheck	= 1900;
-    int16_t expo8		= 65;
-    int16_t rate8		= 90;
-    int8_t  thrMid8		= 50;
-    int32_t thrExpo8	= 0;
+    uint16_t mincheck   = 1100;
+    uint16_t maxcheck   = 1900;
+    int16_t expo8       = 65;
+    int16_t rate8       = 90;
+    int8_t  thrMid8     = 50;
+    int32_t thrExpo8    = 0;
 };
 
 //=========================================================================

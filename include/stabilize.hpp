@@ -43,7 +43,7 @@ private:
 
     float rate_p[3];
     float rate_i[3];
-    uint8_t rate_d[3];
+    float rate_d[3];
 
     int16_t lastGyro[3];
     int32_t delta1[3]; 
@@ -103,8 +103,6 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
             errorGyroI[axis] = 0;
         int32_t ITermGyro = ((int32_t)(errorGyroI[axis] * rate_i[axis])) >> 6;
 
-        debug(board, "%d\n", ITermGyro);
-
         int32_t PTerm = PTermGyro;
         int32_t ITerm = ITermGyro;
 
@@ -135,7 +133,7 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
         int32_t deltaSum = delta1[axis] + delta2[axis] + delta;
         delta2[axis] = delta1[axis];
         delta1[axis] = delta;
-        int32_t DTerm = (deltaSum * rate_d[axis]) / 32;
+        int32_t DTerm = deltaSum * rate_d[axis];
         axisPID[axis] = PTerm + ITerm - DTerm + pidConfig.softwareTrim[axis];
     }
 
