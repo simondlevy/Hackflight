@@ -96,8 +96,6 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
 
         int32_t error = ((int32_t)rcCommand[axis] * rate_p[axis]) - gyroADC[axis];
 
-        int32_t PTermGyro = rcCommand[axis];
-
         // Avoid integral windup
         errorGyroI[axis] = constrain(errorGyroI[axis] + error, -16000, +16000);
 
@@ -105,10 +103,8 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
             errorGyroI[axis] = 0;
         int32_t ITermGyro = ((int32_t)(errorGyroI[axis] * rate_i[axis])) >> 6;
 
-        int32_t PTerm = PTermGyro;
-        int32_t ITerm = ITermGyro;
-
-        // D for roll and pitch, not yaw
+        int32_t PTerm = 0;
+        int32_t ITerm = 0;
         int32_t DTerm = 0;
 
         // roll, pitch
@@ -128,7 +124,7 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
             int32_t prop = (std::max)(std::abs(rcCommand[DEMAND_PITCH]), 
                                     std::abs(rcCommand[DEMAND_ROLL])); // range [0;500]
 
-            PTerm = (PTermAccel * (500 - prop) + PTermGyro * prop) / 500;
+            PTerm = (PTermAccel * (500 - prop) + rcCommand[axis] * prop) / 500;
             ITerm = (ITermGyro * prop) / 500;
 
             int32_t delta = gyroADC[axis] - lastGyro[axis];
@@ -139,8 +135,12 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
             DTerm = deltaSum * rate_d[axis];
         } 
 
-        PTerm -= (int32_t)gyroADC[axis] * rate_p[axis]; 
+        else {
+            PTerm = rcCommand[axis];
+            ITerm = ITermGyro;
+        }
 
+        PTerm -= (int32_t)gyroADC[axis] * rate_p[axis]; 
         axisPID[axis] = PTerm + ITerm - DTerm + pidConfig.softwareTrim[axis];
     }
 
