@@ -55,6 +55,8 @@ private:
 
     ImuConfig imuConfig;
     PidConfig pidConfig;
+
+    int32_t computeITermGyro(int16_t rcCommand[4], int16_t gyroADC[3], uint8_t axis);
 }; 
 
 
@@ -90,18 +92,24 @@ void Stabilize::init(const PidConfig& _pidConfig, const ImuConfig& _imuConfig, B
     resetIntegral();
 }
 
+int32_t Stabilize::computeITermGyro(int16_t rcCommand[4], int16_t gyroADC[3], uint8_t axis)
+{
+    int32_t error = ((int32_t)rcCommand[axis] * rate_p[axis]) - gyroADC[axis];
+
+    // Avoid integral windup
+    errorGyroI[axis] = constrain(errorGyroI[axis] + error, -16000, +16000);
+
+    if ((std::abs(gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (std::abs(rcCommand[axis]) > 100)))
+        errorGyroI[axis] = 0;
+
+    return ((int32_t)(errorGyroI[axis] * rate_i[axis])) >> 6;
+}
+
 void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3])
 {
     for (uint8_t axis = 0; axis < 3; axis++) {
 
-        int32_t error = ((int32_t)rcCommand[axis] * rate_p[axis]) - gyroADC[axis];
-
-        // Avoid integral windup
-        errorGyroI[axis] = constrain(errorGyroI[axis] + error, -16000, +16000);
-
-        if ((std::abs(gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (std::abs(rcCommand[axis]) > 100)))
-            errorGyroI[axis] = 0;
-        int32_t ITermGyro = ((int32_t)(errorGyroI[axis] * rate_i[axis])) >> 6;
+        int32_t ITermGyro = computeITermGyro(rcCommand, gyroADC, axis);
 
         int32_t PTerm = 0;
         int32_t ITerm = 0;
