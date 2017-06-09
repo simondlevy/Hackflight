@@ -57,6 +57,7 @@ private:
     PidConfig pidConfig;
 
     int32_t computeITermGyro(int16_t rcCommand[4], int16_t gyroADC[3], uint8_t axis);
+    int16_t computePid(int32_t PTerm, int32_t ITerm, int32_t DTerm, int16_t gyroADC[3], uint8_t axis);
 }; 
 
 
@@ -105,6 +106,12 @@ int32_t Stabilize::computeITermGyro(int16_t rcCommand[4], int16_t gyroADC[3], ui
     return ((int32_t)(errorGyroI[axis] * rate_i[axis])) >> 6;
 }
 
+int16_t Stabilize::computePid(int32_t PTerm, int32_t ITerm, int32_t DTerm, int16_t gyroADC[3], uint8_t axis)
+{
+    PTerm -= (int32_t)gyroADC[axis] * rate_p[axis]; 
+    return PTerm + ITerm - DTerm + pidConfig.softwareTrim[axis];
+}
+
 void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3])
 {
     for (uint8_t axis = 0; axis < 3; axis++) {
@@ -148,8 +155,7 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
             ITerm = ITermGyro;
         }
 
-        PTerm -= (int32_t)gyroADC[axis] * rate_p[axis]; 
-        axisPID[axis] = PTerm + ITerm - DTerm + pidConfig.softwareTrim[axis];
+        axisPID[axis] = computePid(PTerm, ITerm, DTerm, gyroADC, axis);
     }
 
     // prevent "yaw jump" during yaw correction
