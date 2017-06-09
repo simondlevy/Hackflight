@@ -45,9 +45,9 @@ private:
     float rate_i[3];
     float rate_d[2];
 
-    int16_t lastGyro[3];
-    int32_t delta1[3]; 
-    int32_t delta2[3];
+    int16_t lastGyro[2];
+    int32_t delta1[2]; 
+    int32_t delta2[2];
     int32_t errorGyroI[3];
     int32_t errorAngleI[2];
 
@@ -69,7 +69,8 @@ void Stabilize::init(const PidConfig& _pidConfig, const ImuConfig& _imuConfig, B
     memcpy(&pidConfig, &_pidConfig, sizeof(PidConfig));
     memcpy(&imuConfig, &_imuConfig, sizeof(ImuConfig));
 
-    for (uint8_t axis=0; axis<3; ++axis) {
+    // Zero-out previous values for D term
+    for (uint8_t axis=0; axis<2; ++axis) {
         lastGyro[axis] = 0;
         delta1[axis] = 0;
         delta2[axis] = 0;
