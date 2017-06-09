@@ -41,9 +41,6 @@ public:
 
 private:
 
-    float rate_p[3];
-    float rate_i[3];
-
     int16_t lastGyro[2];
     int32_t delta1[2]; 
     int32_t delta2[2];
@@ -55,7 +52,7 @@ private:
     ImuConfig imuConfig;
     PidConfig pidConfig;
 
-    int32_t computeITermGyro(float rateP, int16_t rcCommand[4], int16_t gyroADC[3], uint8_t axis);
+    int32_t computeITermGyro(float rateP, float rateI, int16_t rcCommand[4], int16_t gyroADC[3], uint8_t axis);
     int16_t computePid(float rateP, int32_t PTerm, int32_t ITerm, int32_t DTerm, int16_t gyroADC[3], uint8_t axis);
     int16_t computeLevelPid(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3], uint8_t axis);
 }; 
@@ -79,14 +76,10 @@ void Stabilize::init(const PidConfig& _pidConfig, const ImuConfig& _imuConfig, B
         delta2[axis] = 0;
     }
 
-    rate_i[0] = pidConfig.ratePitchrollI;
-    rate_i[1] = pidConfig.ratePitchrollI;
-    rate_i[2] = pidConfig.yawI;
-
     resetIntegral();
 }
 
-int32_t Stabilize::computeITermGyro(float rateP, int16_t rcCommand[4], int16_t gyroADC[3], uint8_t axis)
+int32_t Stabilize::computeITermGyro(float rateP, float rateI, int16_t rcCommand[4], int16_t gyroADC[3], uint8_t axis)
 {
     int32_t error = ((int32_t)rcCommand[axis] * rateP) - gyroADC[axis];
 
@@ -96,7 +89,7 @@ int32_t Stabilize::computeITermGyro(float rateP, int16_t rcCommand[4], int16_t g
     if ((std::abs(gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (std::abs(rcCommand[axis]) > 100)))
         errorGyroI[axis] = 0;
 
-    return ((int32_t)(errorGyroI[axis] * rate_i[axis])) >> 6;
+    return ((int32_t)(errorGyroI[axis] * rateI)) >> 6;
 }
 
 int16_t Stabilize::computePid(float rateP, int32_t PTerm, int32_t ITerm, int32_t DTerm, int16_t gyroADC[3], uint8_t axis)
@@ -107,7 +100,7 @@ int16_t Stabilize::computePid(float rateP, int32_t PTerm, int32_t ITerm, int32_t
 
 int16_t Stabilize::computeLevelPid(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3], uint8_t axis)
 {
-    int32_t ITermGyro = computeITermGyro(pidConfig.ratePitchrollP, rcCommand, gyroADC, axis);
+    int32_t ITermGyro = computeITermGyro(pidConfig.ratePitchrollP, pidConfig.ratePitchrollI, rcCommand, gyroADC, axis);
 
     // max inclination
     int32_t errorAngle = constrain(2 * rcCommand[axis], 
@@ -138,13 +131,15 @@ int16_t Stabilize::computeLevelPid(int16_t rcCommand[4], int16_t gyroADC[3], flo
 
 void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3])
 {
+    // Pitch, roll use leveling based on Euler angles
     axisPID[AXIS_ROLL]  = computeLevelPid(rcCommand, gyroADC, eulerAngles, AXIS_ROLL);
     axisPID[AXIS_PITCH] = computeLevelPid(rcCommand, gyroADC, eulerAngles, AXIS_PITCH);
 
-    int32_t ITermGyroYaw = computeITermGyro(pidConfig.yawP, rcCommand, gyroADC, AXIS_YAW);
+    // For yaw, P term comes directly from RC command, and D term is zero
+    int32_t ITermGyroYaw = computeITermGyro(pidConfig.yawP, pidConfig.yawI, rcCommand, gyroADC, AXIS_YAW);
     axisPID[AXIS_YAW] = computePid(pidConfig.yawP, rcCommand[AXIS_YAW], ITermGyroYaw, 0, gyroADC, AXIS_YAW);
 
-    // prevent "yaw jump" during yaw correction
+    // Prevent "yaw jump" during yaw correction
     axisPID[AXIS_YAW] = constrain(axisPID[AXIS_YAW], 
             -100 - std::abs(rcCommand[DEMAND_YAW]), +100 + std::abs(rcCommand[DEMAND_YAW]));
 }
