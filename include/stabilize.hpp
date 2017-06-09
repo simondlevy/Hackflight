@@ -114,49 +114,39 @@ int16_t Stabilize::computePid(int32_t PTerm, int32_t ITerm, int32_t DTerm, int16
 
 void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3])
 {
-    for (uint8_t axis = 0; axis < 3; axis++) {
+    for (uint8_t axis = 0; axis < 2; axis++) {
 
         int32_t ITermGyro = computeITermGyro(rcCommand, gyroADC, axis);
 
-        int32_t PTerm = 0;
-        int32_t ITerm = 0;
-        int32_t DTerm = 0;
-
-        // roll, pitch
-        if (axis < 2) {
-
-            // max inclination
-            int32_t errorAngle = constrain(2 * rcCommand[axis], 
+        // max inclination
+        int32_t errorAngle = constrain(2 * rcCommand[axis], 
                 - imuConfig.maxAngleInclination, 
                 + imuConfig.maxAngleInclination) 
-                - 10*eulerAngles[axis];
+            - 10*eulerAngles[axis];
 
-            int32_t PTermAccel = errorAngle * pidConfig.levelP; 
+        int32_t PTermAccel = errorAngle * pidConfig.levelP; 
 
-            // Avoid integral windup
-            errorAngleI[axis] = constrain(errorAngleI[axis] + errorAngle, -10000, +10000);
+        // Avoid integral windup
+        errorAngleI[axis] = constrain(errorAngleI[axis] + errorAngle, -10000, +10000);
 
-            int32_t prop = (std::max)(std::abs(rcCommand[DEMAND_PITCH]), 
-                                    std::abs(rcCommand[DEMAND_ROLL])); // range [0;500]
+        int32_t prop = (std::max)(std::abs(rcCommand[DEMAND_PITCH]), 
+                std::abs(rcCommand[DEMAND_ROLL])); // range [0;500]
 
-            PTerm = (PTermAccel * (500 - prop) + rcCommand[axis] * prop) / 500;
-            ITerm = (ITermGyro * prop) / 500;
+        int32_t PTerm = (PTermAccel * (500 - prop) + rcCommand[axis] * prop) / 500;
+        int32_t ITerm = (ITermGyro * prop) / 500;
 
-            int32_t delta = gyroADC[axis] - lastGyro[axis];
-            lastGyro[axis] = gyroADC[axis];
-            int32_t deltaSum = delta1[axis] + delta2[axis] + delta;
-            delta2[axis] = delta1[axis];
-            delta1[axis] = delta;
-            DTerm = deltaSum * rate_d[axis];
-        } 
-
-        else {
-            PTerm = rcCommand[axis];
-            ITerm = ITermGyro;
-        }
+        int32_t delta = gyroADC[axis] - lastGyro[axis];
+        lastGyro[axis] = gyroADC[axis];
+        int32_t deltaSum = delta1[axis] + delta2[axis] + delta;
+        delta2[axis] = delta1[axis];
+        delta1[axis] = delta;
+        int32_t DTerm = deltaSum * rate_d[axis];
 
         axisPID[axis] = computePid(PTerm, ITerm, DTerm, gyroADC, axis);
     }
+
+    int32_t ITermGyroYaw = computeITermGyro(rcCommand, gyroADC, AXIS_YAW);
+    axisPID[AXIS_YAW] = computePid(rcCommand[AXIS_YAW], ITermGyroYaw, 0, gyroADC, AXIS_YAW);
 
     // prevent "yaw jump" during yaw correction
     axisPID[AXIS_YAW] = constrain(axisPID[AXIS_YAW], 
