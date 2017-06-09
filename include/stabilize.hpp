@@ -58,6 +58,7 @@ private:
 
     int32_t computeITermGyro(int16_t rcCommand[4], int16_t gyroADC[3], uint8_t axis);
     int16_t computePid(int32_t PTerm, int32_t ITerm, int32_t DTerm, int16_t gyroADC[3], uint8_t axis);
+    int16_t computeLevelPid(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3], uint8_t axis);
 }; 
 
 
@@ -112,38 +113,41 @@ int16_t Stabilize::computePid(int32_t PTerm, int32_t ITerm, int32_t DTerm, int16
     return PTerm + ITerm - DTerm + pidConfig.softwareTrim[axis];
 }
 
+int16_t Stabilize::computeLevelPid(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3], uint8_t axis)
+{
+    int32_t ITermGyro = computeITermGyro(rcCommand, gyroADC, axis);
+
+    // max inclination
+    int32_t errorAngle = constrain(2 * rcCommand[axis], 
+            - imuConfig.maxAngleInclination, 
+            + imuConfig.maxAngleInclination) 
+        - 10*eulerAngles[axis];
+
+    int32_t PTermAccel = errorAngle * pidConfig.levelP; 
+
+    // Avoid integral windup
+    errorAngleI[axis] = constrain(errorAngleI[axis] + errorAngle, -10000, +10000);
+
+    int32_t prop = (std::max)(std::abs(rcCommand[DEMAND_PITCH]), 
+            std::abs(rcCommand[DEMAND_ROLL])); // range [0;500]
+
+    int32_t PTerm = (PTermAccel * (500 - prop) + rcCommand[axis] * prop) / 500;
+    int32_t ITerm = (ITermGyro * prop) / 500;
+
+    int32_t delta = gyroADC[axis] - lastGyro[axis];
+    lastGyro[axis] = gyroADC[axis];
+    int32_t deltaSum = delta1[axis] + delta2[axis] + delta;
+    delta2[axis] = delta1[axis];
+    delta1[axis] = delta;
+    int32_t DTerm = deltaSum * rate_d[axis];
+
+    return computePid(PTerm, ITerm, DTerm, gyroADC, axis);
+}
+
 void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3])
 {
-    for (uint8_t axis = 0; axis < 2; axis++) {
-
-        int32_t ITermGyro = computeITermGyro(rcCommand, gyroADC, axis);
-
-        // max inclination
-        int32_t errorAngle = constrain(2 * rcCommand[axis], 
-                - imuConfig.maxAngleInclination, 
-                + imuConfig.maxAngleInclination) 
-            - 10*eulerAngles[axis];
-
-        int32_t PTermAccel = errorAngle * pidConfig.levelP; 
-
-        // Avoid integral windup
-        errorAngleI[axis] = constrain(errorAngleI[axis] + errorAngle, -10000, +10000);
-
-        int32_t prop = (std::max)(std::abs(rcCommand[DEMAND_PITCH]), 
-                std::abs(rcCommand[DEMAND_ROLL])); // range [0;500]
-
-        int32_t PTerm = (PTermAccel * (500 - prop) + rcCommand[axis] * prop) / 500;
-        int32_t ITerm = (ITermGyro * prop) / 500;
-
-        int32_t delta = gyroADC[axis] - lastGyro[axis];
-        lastGyro[axis] = gyroADC[axis];
-        int32_t deltaSum = delta1[axis] + delta2[axis] + delta;
-        delta2[axis] = delta1[axis];
-        delta1[axis] = delta;
-        int32_t DTerm = deltaSum * rate_d[axis];
-
-        axisPID[axis] = computePid(PTerm, ITerm, DTerm, gyroADC, axis);
-    }
+    axisPID[AXIS_ROLL]  = computeLevelPid(rcCommand, gyroADC, eulerAngles, AXIS_ROLL);
+    axisPID[AXIS_PITCH] = computeLevelPid(rcCommand, gyroADC, eulerAngles, AXIS_PITCH);
 
     int32_t ITermGyroYaw = computeITermGyro(rcCommand, gyroADC, AXIS_YAW);
     axisPID[AXIS_YAW] = computePid(rcCommand[AXIS_YAW], ITermGyroYaw, 0, gyroADC, AXIS_YAW);
