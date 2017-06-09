@@ -43,7 +43,6 @@ private:
 
     float rate_p[3];
     float rate_i[3];
-    float rate_d[2];
 
     int16_t lastGyro[2];
     int32_t delta1[2]; 
@@ -87,9 +86,6 @@ void Stabilize::init(const PidConfig& _pidConfig, const ImuConfig& _imuConfig, B
     rate_i[0] = pidConfig.ratePitchrollI;
     rate_i[1] = pidConfig.ratePitchrollI;
     rate_i[2] = pidConfig.yawI;
-
-    rate_d[0] = pidConfig.ratePitchrollD;
-    rate_d[1] = pidConfig.ratePitchrollD;
 
     resetIntegral();
 }
@@ -139,7 +135,7 @@ int16_t Stabilize::computeLevelPid(int16_t rcCommand[4], int16_t gyroADC[3], flo
     int32_t deltaSum = delta1[axis] + delta2[axis] + delta;
     delta2[axis] = delta1[axis];
     delta1[axis] = delta;
-    int32_t DTerm = deltaSum * rate_d[axis];
+    int32_t DTerm = deltaSum * pidConfig.ratePitchrollD;
 
     return computePid(PTerm, ITerm, DTerm, gyroADC, axis);
 }
