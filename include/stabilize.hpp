@@ -43,7 +43,7 @@ private:
 
     float rate_p[3];
     float rate_i[3];
-    float rate_d[3];
+    float rate_d[2];
 
     int16_t lastGyro[3];
     int32_t delta1[3]; 
@@ -85,7 +85,6 @@ void Stabilize::init(const PidConfig& _pidConfig, const ImuConfig& _imuConfig, B
 
     rate_d[0] = pidConfig.ratePitchrollD;
     rate_d[1] = pidConfig.ratePitchrollD;
-    rate_d[2] = 0; // no D for yaw
 
     resetIntegral();
 }
@@ -98,7 +97,9 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
 
         int32_t PTermGyro = rcCommand[axis];
 
-        errorGyroI[axis] = constrain(errorGyroI[axis] + error, -16000, +16000); // WindUp
+        // Avoid integral windup
+        errorGyroI[axis] = constrain(errorGyroI[axis] + error, -16000, +16000);
+
         if ((std::abs(gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (std::abs(rcCommand[axis]) > 100)))
             errorGyroI[axis] = 0;
         int32_t ITermGyro = ((int32_t)(errorGyroI[axis] * rate_i[axis])) >> 6;
@@ -106,6 +107,10 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
         int32_t PTerm = PTermGyro;
         int32_t ITerm = ITermGyro;
 
+        // D for roll and pitch, not yaw
+        int32_t DTerm = 0;
+
+        // roll, pitch
         if (axis < 2) {
 
             // max inclination
@@ -124,22 +129,23 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
 
             PTerm = (PTermAccel * (500 - prop) + PTermGyro * prop) / 500;
             ITerm = (ITermGyro * prop) / 500;
+
+            int32_t delta = gyroADC[axis] - lastGyro[axis];
+            lastGyro[axis] = gyroADC[axis];
+            int32_t deltaSum = delta1[axis] + delta2[axis] + delta;
+            delta2[axis] = delta1[axis];
+            delta1[axis] = delta;
+            DTerm = deltaSum * rate_d[axis];
         } 
 
         PTerm -= (int32_t)gyroADC[axis] * rate_p[axis]; 
 
-        int32_t delta = gyroADC[axis] - lastGyro[axis];
-        lastGyro[axis] = gyroADC[axis];
-        int32_t deltaSum = delta1[axis] + delta2[axis] + delta;
-        delta2[axis] = delta1[axis];
-        delta1[axis] = delta;
-        int32_t DTerm = deltaSum * rate_d[axis];
         axisPID[axis] = PTerm + ITerm - DTerm + pidConfig.softwareTrim[axis];
     }
 
     // prevent "yaw jump" during yaw correction
     axisPID[AXIS_YAW] = constrain(axisPID[AXIS_YAW], 
-        -100 - std::abs(rcCommand[DEMAND_YAW]), +100 + std::abs(rcCommand[DEMAND_YAW]));
+            -100 - std::abs(rcCommand[DEMAND_YAW]), +100 + std::abs(rcCommand[DEMAND_YAW]));
 }
 
 void Stabilize::resetIntegral(void)
