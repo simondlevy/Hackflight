@@ -305,27 +305,6 @@ void VrepSimBoard::extrasHandleAuxSwitch(uint8_t status)
     auxStatus = status;
 }
 
-uint8_t VrepSimBoard::extrasGetTaskCount(void)
-{
-    return 0;
-}
-
-bool VrepSimBoard::extrasHandleMSP(uint8_t command)
-{
-    return true;
-}
-
-void VrepSimBoard::extrasInit(class MSP * _msp)
-{
-    (void)_msp;
-}
-
-void VrepSimBoard::extrasPerformTask(uint8_t taskIndex)
-{
-    (void)taskIndex;
-}
-
-
 uint16_t VrepSimBoard::rcReadSerial(uint8_t chan)
 {
     (void)chan;

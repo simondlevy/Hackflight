@@ -43,10 +43,6 @@ namespace hf {
             virtual void     dump(char * msg) override;
             virtual void     writeMotor(uint8_t index, uint16_t value) override;
             virtual void     extrasHandleAuxSwitch(uint8_t status) override;
-            virtual uint8_t  extrasGetTaskCount(void) override;
-            virtual bool     extrasHandleMSP(uint8_t command) override;
-            virtual void     extrasInit(class MSP * _msp) override;
-            virtual void     extrasPerformTask(uint8_t taskIndex) override;
             virtual uint16_t rcReadSerial(uint8_t chan) override;
             virtual void     delayMilliseconds(uint32_t msec) override;
 

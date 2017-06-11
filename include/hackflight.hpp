@@ -120,9 +120,6 @@ void Hackflight::init(Board * _board)
     mixer.init(config.pwm, &rc, &stab); 
     msp.init(&mixer, &rc, board);
 
-    // Initialize any extra stuff you want to do with your board
-    board->extrasInit(&msp);
-
     // Ready to rock!
     armed = false;
     safeToArm = false;

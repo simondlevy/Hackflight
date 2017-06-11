@@ -62,8 +62,6 @@ class Board {
     //------------------------------------------ Extras ---------------------------------------------------------
         virtual void    extrasHandleAuxSwitch(uint8_t auxState) { (void)auxState; }
         virtual uint8_t extrasGetTaskCount(void)  { return 0; }
-        virtual bool    extrasHandleMSP(uint8_t command) { (void)command; return false; }
-        virtual void    extrasInit(class MSP * _msp) { (void)_msp; }
         virtual void    extrasPerformTask(uint8_t taskIndex) { (void)taskIndex; }
         virtual void    extrasUpdateAccelZ(bool armed) { (void)armed; }
 
