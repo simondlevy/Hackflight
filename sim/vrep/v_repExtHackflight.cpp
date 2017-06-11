@@ -227,17 +227,7 @@ void VrepSimBoard::ledSet(uint8_t id, bool is_on, float max_brightness)
 { 
     (void)max_brightness;
 
-    static bool wasArmed;
-
     leds[id].set(is_on);
-
-    bool armed = id == 1 && is_on;
-
-    if (armed && !wasArmed) {
-        startToast("                    ARMED", 1, 0, 0);
-    }
-
-    wasArmed = armed;
 }
 
 uint64_t VrepSimBoard::getMicros()
