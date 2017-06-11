@@ -45,8 +45,7 @@ class Board {
     //------------------------------------------- IMU -----------------------------------------------------------
         virtual void     imuInit(void) { }
         virtual void     imuUpdate(void) { }
-        virtual void     imuGetEulerAngles(float eulerAnglesRadians[3]) = 0;
-        virtual void     imuGetGyro(int16_t gyroRaw[3]) = 0;
+        virtual void     imuGetEulerAndGyro(float eulerAnglesRadians[3], int16_t gyroRaw[3]) = 0;
 
     //-------------------------------------------- RC -----------------------------------------------------
         virtual uint16_t rcReadSerial(uint8_t chan) = 0;
@@ -67,6 +66,7 @@ class Board {
         virtual bool    extrasHandleMSP(uint8_t command) { (void)command; return false; }
         virtual void    extrasInit(class MSP * _msp) { (void)_msp; }
         virtual void    extrasPerformTask(uint8_t taskIndex) { (void)taskIndex; }
+        virtual void    extrasUpdateAccelZ(bool armed) { (void)armed; }
 
 }; // class Board
 

@@ -31,10 +31,9 @@ namespace hf {
         public:
 
             virtual void     imuInit(void) override; 
-            virtual void     imuGetEulerAngles(float eulerAnglesRadians[3]) override;
+            virtual void     imuGetEulerAndGyro(float eulerAnglesRadians[3], int16_t gyroADC[3]) override;
             virtual void     init(void) override;
             virtual const    Config& getConfig() override;
-            virtual void     imuGetGyro(int16_t gyroADC[3]) override;
             virtual void     ledSet(uint8_t id, bool is_on, float max_brightness)  override;
             virtual uint64_t getMicros() override;
             virtual bool     rcUseSerial(void) override;

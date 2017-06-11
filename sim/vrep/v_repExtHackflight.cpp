@@ -215,9 +215,12 @@ const Config& VrepSimBoard::getConfig()
     return config;
 }
 
-void VrepSimBoard::imuGetGyro(int16_t gyroADC[3]) 
+void VrepSimBoard::imuGetEulerAndGyro(float eulerAnglesRadians[3], int16_t gyroADC[3])
 {
-    // Convert from radians to tenths of a degree
+    eulerAnglesRadians[0] = -eulerAngles[1];
+    eulerAnglesRadians[1] = -eulerAngles[0];
+    eulerAnglesRadians[2] =  eulerAngles[2];
+
     gyroADC[1] = -(int16_t)(250 * gyro[0]);
     gyroADC[0] = -(int16_t)(250 * gyro[1]);
     gyroADC[2] = -(int16_t)(250 * gyro[2]);
@@ -349,16 +352,8 @@ void VrepSimBoard::imuInit(void)
     gyroScale = (float)(4.0f / config.imu.gyroScale) * ((float)M_PI / 180.0f);
 }
 
-void VrepSimBoard::imuGetEulerAngles(float eulerAnglesRadians[3]) 
-{
-    eulerAnglesRadians[0] = -eulerAngles[1];
-    eulerAnglesRadians[1] = -eulerAngles[0];
-    eulerAnglesRadians[2] =  eulerAngles[2];
 
-} // imuGetEulerAngles
-
-
-     } // namespace hf
+} // namespace hf
 
 #include <sim_extras.hpp>
 

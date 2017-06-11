@@ -210,13 +210,10 @@ void Hackflight::updateImu(void)
     // Compute exponential RC commands
     rc.computeExpo();
 
-    // Get raw gyro values from board
-    int16_t gyroRaw[3];
-    board->imuGetGyro(gyroRaw);
-
-    // Get Euler angles from board
+    // Get Eulaer angles and raw gyro values from board
     float eulerAngles[3];
-    board->imuGetEulerAngles(eulerAngles);
+    int16_t gyroRaw[3];
+    board->imuGetEulerAndGyro(eulerAngles, gyroRaw);
 
     // Convert angles from radians to degrees
     for (int k=0; k<3; ++k) {
