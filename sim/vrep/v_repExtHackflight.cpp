@@ -271,7 +271,7 @@ void VrepSimBoard::writeMotor(uint8_t index, uint16_t value)
 }
 
 
-void VrepSimBoard::extrasCheckSwitch(uint8_t status)
+void VrepSimBoard::extrasHandleAuxSwitch(uint8_t status)
 {
     if (status != auxStatus) {
         char message[100];

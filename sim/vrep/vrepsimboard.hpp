@@ -44,7 +44,7 @@ namespace hf {
             virtual void     serialWriteByte(uint8_t c) override;
             virtual void     dump(char * msg) override;
             virtual void     writeMotor(uint8_t index, uint16_t value) override;
-            virtual void     extrasCheckSwitch(uint8_t status) override;
+            virtual void     extrasHandleAuxSwitch(uint8_t status) override;
             virtual uint8_t  extrasGetTaskCount(void) override;
             virtual bool     extrasHandleMSP(uint8_t command) override;
             virtual void     extrasInit(class MSP * _msp) override;

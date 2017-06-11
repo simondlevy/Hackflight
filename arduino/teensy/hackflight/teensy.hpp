@@ -176,6 +176,11 @@ class Teensy : public Board {
          gyroRaw[2] = -gyroRaw[2];
     }
 
+    virtual void extrasHandleAuxSwitch(uint8_t auxState) 
+    { 
+        Serial.println(auxState);
+    }
+
 }; // class
 
 } // namespace

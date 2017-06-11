@@ -62,7 +62,7 @@ class Board {
         virtual void     writeMotor(uint8_t index, uint16_t value) = 0;
 
     //------------------------------------------ Extras ---------------------------------------------------------
-        virtual void    extrasCheckSwitch(uint8_t auxState) { (void)auxState; }
+        virtual void    extrasHandleAuxSwitch(uint8_t auxState) { (void)auxState; }
         virtual uint8_t extrasGetTaskCount(void)  { return 0; }
         virtual bool    extrasHandleMSP(uint8_t command) { (void)command; return false; }
         virtual void    extrasInit(class MSP * _msp) { (void)_msp; }

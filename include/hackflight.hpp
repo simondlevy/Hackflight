@@ -66,6 +66,7 @@ class Hackflight {
     private:
 
         bool       armed;
+        uint8_t    auxState;
 
         RC         rc;
         Mixer      mixer;
@@ -185,7 +186,8 @@ void Hackflight::updateRc(void)
             // Arm via throttle-low / yaw-right
             if (rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE) {
                 if (safeToArm) {
-                    if (!rc.getAuxState()) // aux switch must be in zero position
+                    auxState = rc.getAuxState();
+                    if (!auxState) // aux switch must be in zero position
                         if (!armed) {
                             armed = true;
                         }
@@ -197,7 +199,10 @@ void Hackflight::updateRc(void)
     } // rc.changed()
 
     // Detect aux switch changes for hover, altitude-hold, etc.
-    board->extrasCheckSwitch(rc.getAuxState());
+    if (rc.getAuxState() != auxState) {
+        board->extrasHandleAuxSwitch(rc.getAuxState());
+        auxState = rc.getAuxState();
+    }
 }
 
 void Hackflight::updateImu(void)
