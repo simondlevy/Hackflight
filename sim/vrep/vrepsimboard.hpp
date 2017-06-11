@@ -30,7 +30,6 @@ namespace hf {
 
         public:
 
-            virtual void     imuInit(void) override; 
             virtual void     imuGetEulerAndGyro(float eulerAnglesRadians[3], int16_t gyroADC[3]) override;
             virtual void     init(void) override;
             virtual const    Config& getConfig() override;

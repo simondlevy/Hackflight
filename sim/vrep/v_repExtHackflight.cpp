@@ -190,6 +190,17 @@ namespace hf {
 void VrepSimBoard::init(void)
 {
 
+    for (int k=0; k<3; ++k) {
+        EstG[k] = 0;
+    }
+
+    EstN[0] = 1.0f;
+    EstN[1] = 1.0f;
+    EstN[2] = 0.0f;
+
+    // Convert gyro scale from degrees to radians
+    // Config is available because VrepSimBoard is a subclass of Board
+    gyroScale = (float)(4.0f / config.imu.gyroScale) * ((float)M_PI / 180.0f);
     leds[0].init(greenLedHandle, 0, 1, 0);
     leds[1].init(redLedHandle, 1, 0, 0);
 
@@ -334,22 +345,6 @@ void VrepSimBoard::normalizeV(float src[3], float dest[3])
         dest[1] = src[1] / length;
         dest[2] = src[2] / length;
     }
-}
-
-
-void VrepSimBoard::imuInit(void)
-{
-    for (int k=0; k<3; ++k) {
-        EstG[k] = 0;
-    }
-
-    EstN[0] = 1.0f;
-    EstN[1] = 1.0f;
-    EstN[2] = 0.0f;
-
-    // Convert gyro scale from degrees to radians
-    // Config is available because VrepSimBoard is a subclass of Board
-    gyroScale = (float)(4.0f / config.imu.gyroScale) * ((float)M_PI / 180.0f);
 }
 
 

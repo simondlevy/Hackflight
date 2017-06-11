@@ -43,7 +43,6 @@ class Board {
         virtual void     ledSet(uint8_t id, bool is_on, float max_brightness = 255) { (void)id; (void)is_on; (void)max_brightness;}
 
     //------------------------------------------- IMU -----------------------------------------------------------
-        virtual void     imuInit(void) { }
         virtual void     imuUpdate(void) { }
         virtual void     imuGetEulerAndGyro(float eulerAnglesRadians[3], int16_t gyroRaw[3]) = 0;
 

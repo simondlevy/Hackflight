@@ -104,9 +104,6 @@ void Hackflight::init(Board * _board)
     // Store some for later
     maxArmingAngle = imuConfig.maxArmingAngle;
 
-    // Initialize the IMU
-    board->imuInit();
-
     // Sleep  a bit to allow IMU to catch up
     board->delayMilliseconds(config.init.delayMilli);
 
