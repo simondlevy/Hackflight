@@ -27,14 +27,17 @@
 namespace hf {
 
 class Mixer {
+
 public:
+
+    // This is set by MSP
     int16_t  motorsDisarmed[4];
 
     void init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize);
-
     void update(bool armed, Board* board);
 
 private:
+
     PwmConfig pwmConfig;
     RC        * rc;
     Stabilize * stabilize;
@@ -92,26 +95,27 @@ void Mixer::update(bool armed, Board* board)
 
     for (uint8_t i = 0; i < 4; i++) {
 
-        if (maxMotor > pwmConfig.max)     
-            // this is a way to still have good gyro corrections if at least one motor reaches its max.
+        // This is a way to still have good gyro corrections if at least one motor reaches its max
+        if (maxMotor > pwmConfig.max) {
             motors[i] -= maxMotor - pwmConfig.max;
+        }
 
         motors[i] = constrain(motors[i], pwmConfig.min, pwmConfig.max);
 
+        // Avoid sudden motor jump from right yaw while arming
         if (rc->throttleIsDown()) {
             motors[i] = pwmConfig.min;
         } 
 
+        // This is how we can spin the motors from the GCS
         if (!armed) {
             motors[i] = motorsDisarmed[i];
         }
     }
 
     for (uint8_t i = 0; i < 4; i++) {
-        //debug(board, "%d:%4d%c", i+1, motors[i], i==3?'\n':'\t');
         board->writeMotor(i, motors[i]);
     }
 }
-
 
 } // namespace

@@ -55,7 +55,7 @@ public:
 
     void computeExpo(void);
 
-    uint8_t auxState(void);
+    uint8_t getAuxState(void);
 
     bool throttleIsDown(void);
 };
@@ -171,7 +171,7 @@ void RC::computeExpo(void)
 
 } // computeExpo
 
-uint8_t RC::auxState(void) 
+uint8_t RC::getAuxState(void) 
 {
     int16_t aux = data[4];
 

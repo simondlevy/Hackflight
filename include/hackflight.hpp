@@ -1,5 +1,5 @@
 /*
-   hackflight.hpp : general header
+   hackflight.hpp : general header, plus init and update methods
 
    This file is part of Hackflight.
 
@@ -48,11 +48,14 @@
 namespace hf {
 
 class Hackflight {
+
     public:
+
         void init(Board * _board);
         void update(void);
 
     private:
+
         void blinkLedForTilt(void);
         void flashLeds(const InitConfig& config);
         void updateRc(void);
@@ -61,6 +64,7 @@ class Hackflight {
         void updateReadyState(float eulerAngles[3]);
 
     private:
+
         bool       armed;
 
         RC         rc;
@@ -157,11 +161,6 @@ void Hackflight::updateRc(void)
     // Update RC channels
     rc.update();
 
-    // Jseful for simulator
-    if (armed) {
-        board->showAuxStatus(rc.auxState());
-    }
-
     // When landed, reset integral component of PID
     if (rc.throttleIsDown()) {
         stab.resetIntegral();
@@ -177,7 +176,6 @@ void Hackflight::updateRc(void)
             if (rc.sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
                 if (armed) {
                     armed = false;
-                    board->showArmedStatus(armed);
                 }
             }
 
@@ -187,10 +185,9 @@ void Hackflight::updateRc(void)
             // Arm via throttle-low / yaw-right
             if (rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE) {
                 if (safeToArm) {
-                    if (!rc.auxState()) // aux switch must be in zero position
+                    if (!rc.getAuxState()) // aux switch must be in zero position
                         if (!armed) {
                             armed = true;
-                            board->showArmedStatus(armed);
                         }
                 }
             }
@@ -200,7 +197,7 @@ void Hackflight::updateRc(void)
     } // rc.changed()
 
     // Detect aux switch changes for hover, altitude-hold, etc.
-    board->extrasCheckSwitch();
+    board->extrasCheckSwitch(rc.getAuxState());
 }
 
 void Hackflight::updateImu(void)

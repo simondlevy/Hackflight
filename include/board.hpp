@@ -34,7 +34,7 @@ class Board {
 
     public: // interface
 
-    //------------------------------------------- Core functionality ---------------------------------------------
+    //------------------------------------ Core functionality ----------------------------------------------------
         virtual void     init(void) = 0;
         virtual const    Config& getConfig() = 0;
         virtual void     delayMilliseconds(uint32_t msec) = 0;
@@ -48,29 +48,25 @@ class Board {
         virtual void     imuGetEulerAngles(float eulerAnglesRadians[3]) = 0;
         virtual void     imuGetGyro(int16_t gyroRaw[3]) = 0;
 
-    //-------------------------------------------------- RC -----------------------------------------------------
+    //-------------------------------------------- RC -----------------------------------------------------
         virtual uint16_t rcReadSerial(uint8_t chan) = 0;
         virtual bool     rcUseSerial(void) = 0;
         virtual uint16_t rcReadPwm(uint8_t chan) = 0;
 
-    //------------------------------------------------ Serial ---------------------------------------------------
+    //------------------------------------------ Serial ---------------------------------------------------------
         virtual uint8_t  serialAvailableBytes(void) = 0;
         virtual uint8_t  serialReadByte(void) = 0;
         virtual void     serialWriteByte(uint8_t c) = 0;
 
-    //------------------------------------------------ Motors ---------------------------------------------------
+    //------------------------------------------ Motors ---------------------------------------------------------
         virtual void     writeMotor(uint8_t index, uint16_t value) = 0;
 
-    //------------------------------------------------ Extras ---------------------------------------------------
-        virtual void    extrasCheckSwitch(void) { }
+    //------------------------------------------ Extras ---------------------------------------------------------
+        virtual void    extrasCheckSwitch(uint8_t auxState) { (void)auxState; }
         virtual uint8_t extrasGetTaskCount(void)  { return 0; }
         virtual bool    extrasHandleMSP(uint8_t command) { (void)command; return false; }
         virtual void    extrasInit(class MSP * _msp) { (void)_msp; }
         virtual void    extrasPerformTask(uint8_t taskIndex) { (void)taskIndex; }
-
-    //----------------------------------------------- Simulation -------------------------------------------------
-        virtual void     showArmedStatus(bool armed) { (void)armed; }
-        virtual void     showAuxStatus(uint8_t status)  { (void)status; }
 
 }; // class Board
 

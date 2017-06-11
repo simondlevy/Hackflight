@@ -203,35 +203,41 @@ const Config& VrepSimBoard::getConfig()
     config.imu.loopMicro             = 10000;    // VREP's shortest simulation period
 
     // PIDs
-    config.pid.levelP          = 10;
-    config.pid.levelI          = 1;
-    config.pid.ratePitchrollP  = 5;
-    config.pid.ratePitchrollI  = 4;
-    config.pid.ratePitchrollD  = 3;
-    config.pid.yawP            = 40;
-    config.pid.yawI            = 20;
+    config.pid.levelP          = 0.10f;
+
+    config.pid.ratePitchrollP  = 0.225f;
+    config.pid.ratePitchrollI  = 0.12f;
+    config.pid.ratePitchrollD  = 0.375f;
+
+    config.pid.yawP            = 1.0f;
+    config.pid.yawI            = 0.3f;
 
     return config;
 }
 
-void VrepSimBoard::imuReadRaw(int16_t accelRaw[3], int16_t gyroRaw[3])
+void VrepSimBoard::imuGetGyro(int16_t gyroADC[3]) 
 {
     // Convert from radians to tenths of a degree
-
-    for (int k=0; k<3; ++k) {
-        accelRaw[k]  = (int16_t)(400000 * accel[k]);
-    }
-
-    gyroRaw[1] = -(int16_t)(250 * gyro[0]);
-    gyroRaw[0] = -(int16_t)(250 * gyro[1]);
-    gyroRaw[2] = -(int16_t)(250 * gyro[2]);
+    gyroADC[1] = -(int16_t)(250 * gyro[0]);
+    gyroADC[0] = -(int16_t)(250 * gyro[1]);
+    gyroADC[2] = -(int16_t)(250 * gyro[2]);
 }
 
 void VrepSimBoard::ledSet(uint8_t id, bool is_on, float max_brightness) 
 { 
     (void)max_brightness;
 
+    static bool wasArmed;
+
     leds[id].set(is_on);
+
+    bool armed = id == 1 && is_on;
+
+    if (armed && !wasArmed) {
+        startToast("                    ARMED", 1, 0, 0);
+    }
+
+    wasArmed = armed;
 }
 
 uint64_t VrepSimBoard::getMicros()
@@ -275,13 +281,7 @@ void VrepSimBoard::writeMotor(uint8_t index, uint16_t value)
 }
 
 
-void VrepSimBoard::showArmedStatus(bool armed)
-{
-    if (armed) 
-        startToast("                    ARMED", 1, 0, 0);
-}
-
-void VrepSimBoard::showAuxStatus(uint8_t status)
+void VrepSimBoard::extrasCheckSwitch(uint8_t status)
 {
     if (status != auxStatus) {
         char message[100];
@@ -299,10 +299,6 @@ void VrepSimBoard::showAuxStatus(uint8_t status)
     }
 
     auxStatus = status;
-}
-
-void VrepSimBoard::extrasCheckSwitch(void)
-{
 }
 
 uint8_t VrepSimBoard::extrasGetTaskCount(void)
@@ -326,24 +322,10 @@ void VrepSimBoard::extrasPerformTask(uint8_t taskIndex)
 }
 
 
-bool VrepSimBoard::rcSerialReady(void)
-{
-    return false;
-}
-
 uint16_t VrepSimBoard::rcReadSerial(uint8_t chan)
 {
     (void)chan;
     return 0;
-}
-
-void VrepSimBoard::checkReboot(bool pendReboot)
-{
-    (void)pendReboot;
-}
-
-void VrepSimBoard::reboot(void)
-{
 }
 
 void VrepSimBoard::delayMilliseconds(uint32_t msec)
@@ -352,12 +334,12 @@ void VrepSimBoard::delayMilliseconds(uint32_t msec)
 
 void VrepSimBoard::normalizeV(float src[3], float dest[3])
 {
-    float length = sqrtf(src[X] * src[X] + src[Y] * src[Y] + src[Z] * src[Z]);
+    float length = sqrtf(src[0] * src[0] + src[1] * src[1] + src[2] * src[2]);
 
     if (length != 0) {
-        dest[X] = src[X] / length;
-        dest[Y] = src[Y] / length;
-        dest[Z] = src[Z] / length;
+        dest[0] = src[0] / length;
+        dest[1] = src[1] / length;
+        dest[2] = src[2] / length;
     }
 }
 
@@ -377,12 +359,8 @@ void VrepSimBoard::imuInit(void)
     gyroScale = (float)(4.0f / config.imu.gyroScale) * ((float)M_PI / 180.0f);
 }
 
-void VrepSimBoard::imuGetEulerAngles(float dT_sec, int16_t accelSmooth[3], int16_t gyroRaw[3], float eulerAnglesRadians[3]) 
+void VrepSimBoard::imuGetEulerAngles(float eulerAnglesRadians[3]) 
 {
-    (void)dT_sec;
-    (void)accelSmooth;
-    (void)gyroRaw;
-
     eulerAnglesRadians[0] = -eulerAngles[1];
     eulerAnglesRadians[1] = -eulerAngles[0];
     eulerAnglesRadians[2] =  eulerAngles[2];
