@@ -200,17 +200,17 @@ void VrepSimBoard::init(void)
 const Config& VrepSimBoard::getConfig()
 {
     // Loop timing overrides
-    config.imu.loopMicro             = 10000;    // VREP's shortest simulation period
+    config.imu.loopMicro       = 10000;    // VREP's shortest simulation period
 
     // PIDs
     config.pid.levelP          = 0.10f;
 
-    config.pid.ratePitchrollP  = 0.225f;
-    config.pid.ratePitchrollI  = 0.12f;
-    config.pid.ratePitchrollD  = 0.375f;
+    config.pid.ratePitchrollP  = 0.125f;
+    config.pid.ratePitchrollI  = 0.05f;
+    config.pid.ratePitchrollD  = 0.01f;
 
-    config.pid.yawP            = 1.0f;
-    config.pid.yawI            = 0.3f;
+    config.pid.yawP            = 0.1f;
+    config.pid.yawI            = 0.05f;
 
     return config;
 }
