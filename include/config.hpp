@@ -52,23 +52,23 @@ struct LoopConfig {
 
     uint32_t angleCheckMilli = 500;
     uint32_t rcLoopMilli     = 10;
+    uint32_t imuLoopMicro    = 3500;
 };
 
 //=========================================================================
 // IMU config
 //=========================================================================
 
-// NB: angles are in tenths of a degree
-
 struct ImuConfig {
 
-    uint16_t accel1G                = 4096;
-    float    accelLpfFactor         = 4.f;
-    int32_t  accelZDeadband         = 40;
-    float    accelZLpfCutoff        = 5.f;
-    uint32_t loopMicro              = 3500;
     float    maxAngleInclination    = 50.f; 
     float    maxArmingAngle         = 25.f;         
+
+    // For altitude estimation
+    uint16_t accel1G                = 4096;
+    int32_t  accelZDeadband         = 40;
+    float    accelZLpfCutoff        = 5.0f;
+    uint32_t accelZCalcMicro        = 25000;
 };
 
 

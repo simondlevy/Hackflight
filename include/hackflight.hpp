@@ -108,7 +108,7 @@ void Hackflight::init(Board * _board)
     board->delayMilliseconds(config.init.delayMilli);
 
     // Initialize timing tasks
-    imuTask.init(imuConfig.loopMicro);
+    imuTask.init(loopConfig.imuLoopMicro);
     rcTask.init(loopConfig.rcLoopMilli * 1000);
     angleCheckTask.init(loopConfig.angleCheckMilli * 1000);
 
