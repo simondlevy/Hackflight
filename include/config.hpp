@@ -65,15 +65,10 @@ struct ImuConfig {
     uint16_t accel1G                = 4096;
     float    accelLpfFactor         = 4.f;
     int32_t  accelZDeadband         = 40;
-    int32_t  accelXyDeadband        = 40;
     float    accelZLpfCutoff        = 5.f;
-    uint32_t calibratingGyroMilli   = 3500;
-    uint32_t calibratingAccelMilli  = 1400;
-    float    gyroCmpfFactor         = 600.f;
-    float    gyroScale              = 16.4f;  // for Invensense MPU 
     uint32_t loopMicro              = 3500;
-    float maxAngleInclination       = 50.f; 
-    float maxArmingAngle            = 25.f;         
+    float    maxAngleInclination    = 50.f; 
+    float    maxArmingAngle         = 25.f;         
 };
 
 

@@ -28,7 +28,6 @@
 #include "hackflight.hpp"
 #include "accelz.hpp"
 
-
 namespace hf {
 
 class Teensy : public Board {
@@ -202,6 +201,16 @@ class Teensy : public Board {
             Serial.println(auxState);
         }
 
+        virtual uint8_t extrasGetTaskCount(void) override
+        { 
+            return 1; 
+        }
+
+        virtual void extrasPerformTask(uint8_t taskIndex) 
+        { 
+            Serial.println(taskIndex);
+        }
+ 
 }; // class
 
 } // namespace

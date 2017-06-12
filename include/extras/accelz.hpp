@@ -21,6 +21,7 @@
 #pragma once
 
 #include "config.hpp"
+#include "timedtask.hpp"
 
 namespace hf {
 
