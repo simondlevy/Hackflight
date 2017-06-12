@@ -66,7 +66,7 @@ struct ImuConfig {
     float    accelLpfFactor         = 4.f;
     int32_t  accelZDeadband         = 40;
     int32_t  accelXyDeadband        = 40;
-    float    accelzLpfCutoff        = 5.f;
+    float    accelZLpfCutoff        = 5.f;
     uint32_t calibratingGyroMilli   = 3500;
     uint32_t calibratingAccelMilli  = 1400;
     float    gyroCmpfFactor         = 600.f;

@@ -26,6 +26,7 @@
 #include <EM7180.h>
 
 #include "hackflight.hpp"
+#include "accelz.hpp"
 
 EM7180 imu;
 SpektrumDSM2048 rx;
