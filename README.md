@@ -14,10 +14,14 @@ have safety mechanisms that Hackflight lacks, which will help avoid injury to
 you and damage to your vehicle.
 
 Hackflight derives from the Baseflight firmware (which in turn derives from
-Multiwii), and currently works on STM32F103 flight-controller boards
-(Naze32 and clones like Flip32, MultiRC, etc.), the Alienflight F3 board,
-and the Arduino-compatible Teensy 3.1/3.2
-microcontroller (with additional hardware).  Thanks to a major effort by
+Multiwii).  Although there is [legacy support](https://github.com/simondlevy/hackflight/tree/master/legacy) 
+for STM32F103 flight-controller boards
+(Naze32 and clones like Flip32, MultiRC, etc.) and the Alienflight F3 board,
+the hardware focus of the project has shifted to the Arduino-compatible boards designed
+by Pesky Products: the [Teensy Flight Controller](https://forum.pjrc.com/threads/32985-Teensy-Flight-Controller)
+and the STM32L4-based [Ladybug FC](http://diydrones.com/profiles/blogs/flight-of-the-ladybug).
+
+Thanks to a major effort by
 [Sytelus](https://github.com/sytelus), the core Hackflight 
 [firmware ](https://github.com/simondlevy/hackflight/tree/master/include) now
 adheres to best practices for C++.  As you can 
@@ -28,21 +32,21 @@ design pattern of a <tt>startup</tt> routine that calls the
 <tt>PID</tt>, <tt>Board</tt>) and a <tt>loop</tt> routine that calls the
 <tt>update()</tt> method and other methods of those objects.  The code provides
 abstraction (through the <tt>Board</tt> class) that should make it easy to use
-on other boards.  
+on other boards.  The <tt>Board</tt> class declares the pure virtual methods that you must override
+for implementation on a particular board or simulator, as well as a few &ldquo;extras&rdquo,
+virtual methods that you can override for additional functionality like altitude-hold, hover-in-place,
+etc.  Support for these extra methods can be found in the <tt>include/extras</tt> folder; for example,
+there is a <tt>Baro</tt> class that performs typical functions of a barometer.
 
 The only parameters you should need to adjust are the PID tuning 
-[params](https://github.com/simondlevy/hackflight/blob/master/include/config.hpp#L25-L43).  As 
-with Baseflight, you get a gyro auto-calibration sequence on startup, indicated
-by  steady green LED that turns off when the calibration is done.  You can
-re-calibrate the accelerometer and gyroscope by putting the collective (left) stick in full lower-left
-and the cyclic (right) in full center-down position.  As usual, collective
-lower-right arms the board, and lower-left disarms it, as indicated by the red
-LED.  The green LED will flash when the board is tilted by more than 25
-degrees.
+[params](https://github.com/simondlevy/hackflight/blob/master/include/config.hpp#L25-L43). 
+As usual, collective lower-right arms the board, and lower-left disarms it, as
+indicated by the red LED.  The green LED will flash when the board is tilted by
+more than 25 degrees.
 
 Although Hackflight was designed to be &ldquo;headless&rdquo; (no configurator program),
 it is useful to get some visual feedback on things like vehicle orientation and RC receiver
-PWM values.  So in the <tt>gcs</tt> folder you'll find a Python program (<tt>main.py</tt>)
+PWM values.  So in the <tt>gcs</tt> folder you'll find a Python program (<tt>hackflight.py</tt>)
 that allows you to connect to the board and see what's going on.  To use this program you'll
 need to install [MSPPG](https://github.com/simondlevy/hackflight/tree/master/parser), a
 parser generator for the Multiwii Serial Protocol (MSP) messages used by the
@@ -52,5 +56,3 @@ If you find Hackflight useful, please consider donating
 to the [Baseflight](https://goo.gl/3tyFhz) or 
 [Cleanflight](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TSQKVT6UYKGL6)
 projects from which it is derived.
-
-
