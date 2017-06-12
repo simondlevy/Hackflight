@@ -34,7 +34,7 @@ on other boards.  The <b>Board</b> class declares the pure virtual methods that 
 for implementation on a particular board or simulator, as well as a few &ldquo;extras&rdquo;,
 virtual methods that you can override for additional functionality like altitude-hold, hover-in-place,
 etc.  Support for these extra methods can be found in the <b>include/extras</b> folder; for example,
-there is a <b>Baro</b> class that performs typical functions of a barometer.
+there is a <b>Baro</b> class that performs typical functions of a barometer. 
 
 The only parameters you should need to adjust are the PID tuning 
 [params](https://github.com/simondlevy/hackflight/blob/master/include/config.hpp#L25-L43). 

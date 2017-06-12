@@ -61,9 +61,11 @@ class Teensy : public Board {
             digitalWrite(27, HIGH);
             digitalWrite(29, HIGH);
 
+            // Start I^2C
             Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
 
-            delay(1000);
+            // Hang a bit before starting up the EM7180
+            delay(100);
 
             // Start the EM7180
             uint8_t status = imu.begin(8, 2000, 1000);
