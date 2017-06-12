@@ -219,8 +219,11 @@ void Hackflight::updateImu(void)
         eulerAngles[AXIS_YAW] += 360;
     }
 
-    // Periodically update status using Euler angles
+    // Update status using Euler angles
     updateReadyState(eulerAngles);
+
+    // Compute accelerometer-based altitude if indicated
+    board->extrasUpdateAccelZ(armed);
 
     // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
     stab.update(rc.command, gyroRaw, eulerAngles);
