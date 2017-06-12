@@ -24,19 +24,17 @@ and the STM32L4-based [Ladybug FC](http://diydrones.com/profiles/blogs/flight-of
 Thanks to a major effort by
 [Sytelus](https://github.com/sytelus), the core Hackflight 
 [firmware ](https://github.com/simondlevy/hackflight/tree/master/include) now
-adheres to best practices for C++.  As you can 
-[see](https://github.com/simondlevy/hackflight/blob/master/boards/alienflightf3/hackflight.cpp), 
-the code follows the Arduino
-design pattern of a <tt>startup</tt> routine that calls the
-<tt>init()</tt> method of a few objects (<tt>IMU</tt>, <tt>RC</tt>,
-<tt>PID</tt>, <tt>Board</tt>) and a <tt>loop</tt> routine that calls the
-<tt>update()</tt> method and other methods of those objects.  The code provides
-abstraction (through the <tt>Board</tt> class) that should make it easy to use
-on other boards.  The <tt>Board</tt> class declares the pure virtual methods that you must override
+adheres to standard practices for C++.  As you can see, the code
+follows the Arduino design pattern of a <b>startup</b> routine that calls the
+<b>init()</b> method of a few objects (<b>IMU</b>, <b>RC</b>,
+<b>PID</b>, <b>Board</b>) and a <b>loop</b> routine that calls the
+<b>update()</b> method and other methods of those objects.  The code provides
+abstraction (through the <b>Board</b> class) that should make it easy to use
+on other boards.  The <b>Board</b> class declares the pure virtual methods that you must override
 for implementation on a particular board or simulator, as well as a few &ldquo;extras&rdquo,
 virtual methods that you can override for additional functionality like altitude-hold, hover-in-place,
-etc.  Support for these extra methods can be found in the <tt>include/extras</tt> folder; for example,
-there is a <tt>Baro</tt> class that performs typical functions of a barometer.
+etc.  Support for these extra methods can be found in the <b>include/extras</b> folder; for example,
+there is a <b>Baro</b> class that performs typical functions of a barometer.
 
 The only parameters you should need to adjust are the PID tuning 
 [params](https://github.com/simondlevy/hackflight/blob/master/include/config.hpp#L25-L43). 
@@ -46,7 +44,7 @@ more than 25 degrees.
 
 Although Hackflight was designed to be &ldquo;headless&rdquo; (no configurator program),
 it is useful to get some visual feedback on things like vehicle orientation and RC receiver
-PWM values.  So in the <tt>gcs</tt> folder you'll find a Python program (<tt>hackflight.py</tt>)
+PWM values.  So in the <b>gcs</b> folder you'll find a Python program (<b>hackflight.py</b>)
 that allows you to connect to the board and see what's going on.  To use this program you'll
 need to install [MSPPG](https://github.com/simondlevy/hackflight/tree/master/parser), a
 parser generator for the Multiwii Serial Protocol (MSP) messages used by the
