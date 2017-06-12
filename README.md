@@ -25,13 +25,13 @@ Thanks to a major effort by
 [Sytelus](https://github.com/sytelus), the core Hackflight 
 [firmware ](https://github.com/simondlevy/hackflight/tree/master/include) now
 adheres to standard practices for C++.  As you can see, the code
-follows the Arduino design pattern of a <b>startup</b> routine that calls the
+follows the Arduino design pattern of a <b>setup()</b> routine that calls the
 <b>init()</b> method of a few objects (<b>IMU</b>, <b>RC</b>,
-<b>PID</b>, <b>Board</b>) and a <b>loop</b> routine that calls the
+<b>PID</b>, <b>Board</b>) and a <b>loop()</b> routine that calls the
 <b>update()</b> method and other methods of those objects.  The code provides
 abstraction (through the <b>Board</b> class) that should make it easy to use
 on other boards.  The <b>Board</b> class declares the pure virtual methods that you must override
-for implementation on a particular board or simulator, as well as a few &ldquo;extras&rdquo,
+for implementation on a particular board or simulator, as well as a few &ldquo;extras&rdquo;,
 virtual methods that you can override for additional functionality like altitude-hold, hover-in-place,
 etc.  Support for these extra methods can be found in the <b>include/extras</b> folder; for example,
 there is a <b>Baro</b> class that performs typical functions of a barometer.
