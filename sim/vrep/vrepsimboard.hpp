@@ -30,20 +30,20 @@ namespace hf {
 
         public:
 
-            virtual void     imuGetEulerAndGyro(float eulerAnglesRadians[3], int16_t gyroADC[3]) override;
+            virtual void     imuGetEuler(float eulerAnglesRadians[3]) override;
+            virtual void     imuGetGyro(int16_t gyroADC[3]) override;
             virtual void     init(void) override;
             virtual const    Config& getConfig() override;
             virtual void     ledSet(uint8_t id, bool is_on, float max_brightness)  override;
             virtual uint64_t getMicros() override;
             virtual bool     rcUseSerial(void) override;
-            virtual uint16_t rcReadPwm(uint8_t chan) override;
+            virtual uint16_t rcReadChannel(uint8_t chan) override;
             virtual uint8_t  serialAvailableBytes(void) override;
             virtual uint8_t  serialReadByte(void) override;
             virtual void     serialWriteByte(uint8_t c) override;
-            virtual void     dump(char * msg) override;
+            virtual void     debug(char * msg) override;
             virtual void     writeMotor(uint8_t index, uint16_t value) override;
             virtual void     extrasHandleAuxSwitch(uint8_t status) override;
-            virtual uint16_t rcReadSerial(uint8_t chan) override;
             virtual void     delayMilliseconds(uint32_t msec) override;
 
     private: // types

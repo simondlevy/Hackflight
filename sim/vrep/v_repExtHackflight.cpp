@@ -200,7 +200,6 @@ void VrepSimBoard::init(void)
 
     // Convert gyro scale from degrees to radians
     // Config is available because VrepSimBoard is a subclass of Board
-    gyroScale = (float)(4.0f / config.imu.gyroScale) * ((float)M_PI / 180.0f);
     leds[0].init(greenLedHandle, 0, 1, 0);
     leds[1].init(redLedHandle, 1, 0, 0);
 
@@ -211,7 +210,7 @@ void VrepSimBoard::init(void)
 const Config& VrepSimBoard::getConfig()
 {
     // Loop timing overrides
-    config.imu.loopMicro       = 10000;    // VREP's shortest simulation period
+    config.loop.imuLoopMicro       = 10000;    // VREP's shortest simulation period
 
     // PIDs
     config.pid.levelP          = 0.10f;
@@ -226,12 +225,15 @@ const Config& VrepSimBoard::getConfig()
     return config;
 }
 
-void VrepSimBoard::imuGetEulerAndGyro(float eulerAnglesRadians[3], int16_t gyroADC[3])
+void VrepSimBoard::imuGetEuler(float eulerAnglesRadians[3])
 {
     eulerAnglesRadians[0] = -eulerAngles[1];
     eulerAnglesRadians[1] = -eulerAngles[0];
     eulerAnglesRadians[2] =  eulerAngles[2];
+}
 
+void VrepSimBoard::imuGetGyro(int16_t gyroADC[3])
+{
     gyroADC[1] = -(int16_t)(250 * gyro[0]);
     gyroADC[0] = -(int16_t)(250 * gyro[1]);
     gyroADC[2] = -(int16_t)(250 * gyro[2]);
@@ -251,10 +253,10 @@ uint64_t VrepSimBoard::getMicros()
 
 bool VrepSimBoard::rcUseSerial(void)
 {
-    return false;
+    return true;
 }
 
-uint16_t VrepSimBoard::rcReadPwm(uint8_t chan)
+uint16_t VrepSimBoard::rcReadChannel(uint8_t chan)
 {
     // Special handling for throttle
     float demand = (chan == 3) ? throttleDemand : demands[chan];
@@ -273,7 +275,7 @@ uint16_t VrepSimBoard::rcReadPwm(uint8_t chan)
     return pwm;
 }
 
-void VrepSimBoard::dump(char * msg)
+void VrepSimBoard::debug(char * msg)
 {
     printf("%s\n", msg);
 }
@@ -305,11 +307,6 @@ void VrepSimBoard::extrasHandleAuxSwitch(uint8_t status)
     auxStatus = status;
 }
 
-uint16_t VrepSimBoard::rcReadSerial(uint8_t chan)
-{
-    (void)chan;
-    return 0;
-}
 
 void VrepSimBoard::delayMilliseconds(uint32_t msec)
 {
