@@ -99,25 +99,23 @@ void RC::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig, Board * _boa
 
 void RC::update()
 {
+    // Serial receivers provide clean data and can be read directly
     if (board->rcUseSerial()) {
         for (uint8_t chan = 0; chan < 5; chan++) {
-            data[chan] = board->rcReadSerial(chan);
+            data[chan] = board->rcReadChannel(chan);
         }
     }
 
+    // Other kinds of receivers require average of channel values to remove noise
     else {
+
         for (uint8_t chan = 0; chan < 8; chan++) {
-
-            // get RC PWM
-            dataAverage[chan][averageIndex % 4] = board->rcReadPwm(chan);
-
+            dataAverage[chan][averageIndex % 4] = board->rcReadChannel(chan);
             data[chan] = 0;
-
             for (uint8_t i = 0; i < 4; i++)
                 data[chan] += dataAverage[chan][i];
             data[chan] /= 4;
         }
-
         averageIndex++;
     }
 

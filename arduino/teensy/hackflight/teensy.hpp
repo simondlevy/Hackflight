@@ -118,16 +118,10 @@ class Teensy : public Board {
             return true;
         }
 
-        virtual uint16_t rcReadSerial(uint8_t chan) override
+        virtual uint16_t rcReadChannel(uint8_t chan) override
         {
             uint8_t chanmap[5] = {1, 2, 3, 0, 5};
             return rx.getChannelValue(chanmap[chan]);
-        }
-
-        virtual uint16_t rcReadPwm(uint8_t chan) override
-        {
-            (void)chan;
-            return 0;
         }
 
         virtual uint8_t serialAvailableBytes(void) override
