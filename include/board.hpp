@@ -64,8 +64,6 @@ class Board {
         virtual bool    extrasHaveBaro(void) { return false; }
         virtual void    extrasImuGetAccel(int16_t accelRaw[3]) { (void)accelRaw; }
         virtual void    extrasImuPoll(void) { }
-        virtual uint8_t extrasGetTaskCount(void)  { return 0; }
-        virtual void    extrasPerformTask(uint8_t taskIndex) { (void)taskIndex; }
 
 }; // class Board
 

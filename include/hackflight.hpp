@@ -61,7 +61,6 @@ class Hackflight {
         void flashLeds(const InitConfig& config);
         void updateRc(void);
         void updateImu(void);
-        void updateExtras(void);
         void updateReadyState(float eulerAngles[3]);
 
     private:
@@ -80,6 +79,7 @@ class Hackflight {
         TimedTask imuTask;
         TimedTask rcTask;
         TimedTask angleCheckTask;
+        TimedTask altitudeTask;
 
         bool     safeToArm;
         uint16_t maxArmingAngle;
@@ -114,6 +114,7 @@ void Hackflight::init(Board * _board)
     imuTask.init(loopConfig.imuLoopMicro);
     rcTask.init(loopConfig.rcLoopMilli * 1000);
     angleCheckTask.init(loopConfig.angleCheckMilli * 1000);
+    altitudeTask.init(loopConfig.altHoldLoopMilli * 1000);
 
     // Initialize the RC receiver
     rc.init(config.rc, config.pwm, board);
@@ -141,11 +142,6 @@ void Hackflight::update(void)
     if (rcTask.checkAndUpdate(currentTime)) {
         updateRc();
     }
-
-    // Not time to update RC; perform extra tasks
-    else {
-        updateExtras();
-   }
 
     // Polling for EM7180 SENtral Sensor Fusion IMU
     board->extrasImuPoll();
@@ -264,15 +260,6 @@ void Hackflight::updateReadyState(float eulerAngles[3])
             safeToArm = true;
         }
     }
-}
-
-void Hackflight::updateExtras(void)
-{
-    static int taskOrder;
-    board->extrasPerformTask(taskOrder);
-    taskOrder++;
-    if (taskOrder >= board->extrasGetTaskCount()) // using >= supports zero or more tasks
-        taskOrder = 0;
 }
 
 void Hackflight::blinkLedForTilt(void)
