@@ -157,9 +157,9 @@ class Teensy : public Board {
             analogWrite(motorPins[index], aval);
         }
 
-        virtual void imuUpdate(void) override
+        virtual void extrasImuPoll(void) override
         {
-            uint8_t errorStatus = imu.update();
+            uint8_t errorStatus = imu.poll();
 
             if (errorStatus) {
                 Serial.print("ERROR: ");

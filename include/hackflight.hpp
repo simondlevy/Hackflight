@@ -142,7 +142,7 @@ void Hackflight::update(void)
    }
 
     // Polling for EM7180 SENtral Sensor Fusion IMU
-    board->imuUpdate();
+    board->extrasImuPoll();
 
     // Inner (fast) loop: update IMU
     if (imuTask.checkAndUpdate(currentTime)) {
