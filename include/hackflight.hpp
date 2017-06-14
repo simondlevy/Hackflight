@@ -204,10 +204,9 @@ void Hackflight::updateImu(void)
     // Compute exponential RC commands
     rc.computeExpo();
 
-    // Get Eulaer angles and raw gyro values from board
+    // Get Euler angles from board
     float eulerAngles[3];
-    int16_t gyroRaw[3];
-    board->imuGetEulerAndGyro(eulerAngles, gyroRaw);
+    board->imuGetEuler(eulerAngles);
 
     // Convert angles from radians to degrees
     for (int k=0; k<3; ++k) {
@@ -222,8 +221,13 @@ void Hackflight::updateImu(void)
     // Update status using Euler angles
     updateReadyState(eulerAngles);
 
-    // Compute accelerometer-based altitude if indicated
-    board->extrasUpdateAccelZ(armed);
+    // If barometer avaialble, compute accelerometer-based altitude for fusion with baro altitude
+    if (board->extrasHaveBaro()) {
+    }
+
+    // Get raw gyro values from board
+    int16_t gyroRaw[3];
+    board->imuGetGyro(gyroRaw);
 
     // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
     stab.update(rc.command, gyroRaw, eulerAngles);

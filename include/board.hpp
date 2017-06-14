@@ -43,7 +43,8 @@ class Board {
         virtual void     ledSet(uint8_t id, bool is_on, float max_brightness = 255) { (void)id; (void)is_on; (void)max_brightness;}
 
     //------------------------------------------- IMU -----------------------------------------------------------
-        virtual void     imuGetEulerAndGyro(float eulerAnglesRadians[3], int16_t gyroRaw[3]) = 0;
+        virtual void     imuGetEuler(float eulerAnglesRadians[3]) = 0;
+        virtual void     imuGetGyro(int16_t gyroRaw[3]) = 0;
 
     //-------------------------------------------- RC -----------------------------------------------------
         virtual uint16_t rcReadSerial(uint8_t chan) = 0;
@@ -60,10 +61,10 @@ class Board {
 
     //------------------------------------------ Extras ---------------------------------------------------------
         virtual void    extrasHandleAuxSwitch(uint8_t auxState) { (void)auxState; }
+        virtual bool    extrasHaveBaro(void) { return false; }
         virtual void    extrasImuPoll(void) { }
         virtual uint8_t extrasGetTaskCount(void)  { return 0; }
         virtual void    extrasPerformTask(uint8_t taskIndex) { (void)taskIndex; }
-        virtual void    extrasUpdateAccelZ(bool armed) { (void)armed; }
 
 }; // class Board
 

@@ -168,7 +168,7 @@ class Teensy : public Board {
             }
         }
 
-        virtual void imuGetEulerAndGyro(float _eulerAngles[3], int16_t gyroRaw[3]) override
+        virtual void imuGetEuler(float _eulerAngles[3]) override
         {
             static float q[4];
             imu.getQuaternions(q);
@@ -181,19 +181,15 @@ class Teensy : public Board {
             _eulerAngles[1] = -pitch; // compensate for IMU orientation
             _eulerAngles[2] =  yaw;
 
-            imu.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
-            gyroRaw[1] = -gyroRaw[1];
-            gyroRaw[2] = -gyroRaw[2];
-
             // Store Euler angles for extrasUpdateAccelZ()
             memcpy(eulerAngles, _eulerAngles, 3*sizeof(float));
         }
 
-        virtual void extrasUpdateAccelZ(bool armed) override
-        { 
-            int16_t accelRaw[3];
-            imu.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
-            accelZ.update(accelRaw, eulerAngles, micros(), armed);
+        virtual void imuGetGyro(int16_t gyroRaw[3]) override
+        {
+            imu.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
+            gyroRaw[1] = -gyroRaw[1];
+            gyroRaw[2] = -gyroRaw[2];
         }
 
         virtual void extrasHandleAuxSwitch(uint8_t auxState) override
