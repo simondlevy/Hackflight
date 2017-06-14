@@ -44,7 +44,7 @@ class Teensy : public Board {
 
     protected:
 
-        virtual void dump(char * msg) override
+        virtual void debug(char * msg) override
         {
             Serial.print(msg);
         }
@@ -192,21 +192,16 @@ class Teensy : public Board {
             gyroRaw[2] = -gyroRaw[2];
         }
 
-        virtual void extrasHandleAuxSwitch(uint8_t auxState) override
+        virtual bool extrasHaveBaro(void) override
         { 
-            Serial.println(auxState);
+            return true; 
         }
 
-        virtual uint8_t extrasGetTaskCount(void) override
-        { 
-            return 1; 
+        virtual void extrasImuGetAccel(int16_t accelRaw[3]) override
+        {
+            imu.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
         }
 
-        virtual void extrasPerformTask(uint8_t taskIndex) 
-        { 
-            Serial.println(taskIndex);
-        }
- 
 }; // class
 
 } // namespace

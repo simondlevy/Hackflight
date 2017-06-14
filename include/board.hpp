@@ -38,7 +38,7 @@ class Board {
         virtual void     init(void) = 0;
         virtual const    Config& getConfig() = 0;
         virtual void     delayMilliseconds(uint32_t msec) = 0;
-        virtual void     dump(char * msg) = 0;
+        virtual void     debug(char * msg) = 0;
         virtual uint64_t getMicros() = 0;
         virtual void     ledSet(uint8_t id, bool is_on, float max_brightness = 255) { (void)id; (void)is_on; (void)max_brightness;}
 
@@ -62,6 +62,7 @@ class Board {
     //------------------------------------------ Extras ---------------------------------------------------------
         virtual void    extrasHandleAuxSwitch(uint8_t auxState) { (void)auxState; }
         virtual bool    extrasHaveBaro(void) { return false; }
+        virtual void    extrasImuGetAccel(int16_t accelRaw[3]) { (void)accelRaw; }
         virtual void    extrasImuPoll(void) { }
         virtual uint8_t extrasGetTaskCount(void)  { return 0; }
         virtual void    extrasPerformTask(uint8_t taskIndex) { (void)taskIndex; }

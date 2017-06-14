@@ -19,7 +19,6 @@
 #pragma once
 
 #include "board.hpp"
-#include "debug.hpp"
 #include "stabilize.hpp"
 
 #include <cstring>
@@ -83,8 +82,6 @@ void Mixer::update(bool armed, Board* board)
          stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch + 
          stabilize->axisPID[AXIS_ROLL]  * mixerQuadX[i].roll - 
          stabilize->axisPID[AXIS_YAW]   * mixerQuadX[i].yaw);
-
-        //debug(board, "%d:%d   %c", i+1, motors[i], i==3?'\n':' ');
     }
 
     int16_t maxMotor = motors[0];
