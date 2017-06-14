@@ -29,6 +29,7 @@
 #include "common.hpp"
 #include "rc.hpp"
 #include "stabilize.hpp"
+#include "altitude.hpp"
 #include "timedtask.hpp"
 
 // For logical combinations of stick positions (low, center, high)
@@ -72,6 +73,8 @@ class Hackflight {
         Mixer      mixer;
         MSP        msp;
         Stabilize  stab;
+        Altitude   alti;
+
         Board    * board;
 
         TimedTask imuTask;
@@ -119,6 +122,9 @@ void Hackflight::init(Board * _board)
     stab.init(config.pid, config.imu, board);
     mixer.init(config.pwm, &rc, &stab); 
     msp.init(&mixer, &rc, board);
+
+    // Initialize altitude estimator, which will be used if there's a barometer
+    alti.init(config.alti);
 
     // Ready to rock!
     armed = false;
@@ -221,10 +227,6 @@ void Hackflight::updateImu(void)
     // Update status using Euler angles
     updateReadyState(eulerAngles);
 
-    // If barometer avaialble, compute accelerometer-based altitude for fusion with baro altitude
-    if (board->extrasHaveBaro()) {
-    }
-
     // Get raw gyro values from board
     int16_t gyroRaw[3];
     board->imuGetGyro(gyroRaw);
@@ -233,6 +235,13 @@ void Hackflight::updateImu(void)
     stab.update(rc.command, gyroRaw, eulerAngles);
     mixer.update(armed, board);
     msp.update(eulerAngles, armed);
+
+    // If barometer avaialble, compute accelerometer-based altitude for fusion with baro altitude
+    if (board->extrasHaveBaro()) {
+        int16_t accelRaw[3];
+        board->extrasImuGetAccel(accelRaw);
+        alti.update(accelRaw, eulerAngles, board->getMicros(), armed);
+    }
 } 
 
 void Hackflight::updateReadyState(float eulerAngles[3])

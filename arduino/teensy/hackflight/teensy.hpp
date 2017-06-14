@@ -26,7 +26,6 @@
 #include <EM7180.h>
 
 #include "hackflight.hpp"
-#include "accelz.hpp"
 
 namespace hf {
 
@@ -40,7 +39,6 @@ class Teensy : public Board {
 
         EM7180 imu;
         SpektrumDSM2048 rx;
-        AccelZ accelZ;
 
     protected:
 
@@ -77,9 +75,6 @@ class Teensy : public Board {
                 analogWriteFrequency(motorPins[k], 10000);  
                 analogWrite(motorPins[k], 0);  
             }
-
-            // Initialize the accelerometer Z for altitude
-            accelZ.init(config.imu);
         }
 
         virtual const Config& getConfig(void) override

@@ -64,8 +64,14 @@ struct ImuConfig {
 
     float    maxAngleInclination    = 50.f; 
     float    maxArmingAngle         = 25.f;         
+};
 
-    // For altitude estimation
+//=========================================================================
+// Altitude estimation config
+//=========================================================================
+
+struct AltitudeConfig {
+
     uint16_t accel1G                = 4096;
     int32_t  accelZDeadband         = 40;
     float    accelZLpfCutoff        = 5.0f;
@@ -112,12 +118,13 @@ struct InitConfig {
 //=========================================================================
 
 struct Config {
-    LoopConfig loop;
-    ImuConfig imu;
-    RcConfig rc;
-    PidConfig pid;
-    PwmConfig pwm;
-    InitConfig init;
+    LoopConfig     loop;
+    ImuConfig      imu;
+    AltitudeConfig alti;
+    RcConfig       rc;
+    PidConfig      pid;
+    PwmConfig      pwm;
+    InitConfig     init;
 };
 
 //=========================================================================

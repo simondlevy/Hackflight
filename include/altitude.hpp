@@ -1,5 +1,5 @@
 /*
-   accelz.hpp : Support for integrating accelerometer Z axis for estimating altitude
+   altitude.hpp : Altitude estimation
 
    Adapted from https://github.com/multiwii/baseflight/blob/master/src/imu.c
 
@@ -25,11 +25,11 @@
 
 namespace hf {
 
-class AccelZ {
+class Altitude {
 
     private:
 
-        ImuConfig imuConfig;
+        AltitudeConfig altiConfig;
 
         int32_t   accelZSum;
         float     accelVelScale;
@@ -45,18 +45,18 @@ class AccelZ {
 
     public:
 
-        void  init(ImuConfig& _imuConfig);
+        void  init(const AltitudeConfig& _altiConfig);
         void  update(int16_t accelRaw[3], float eulerAngles[3], uint32_t currentTimeUsec, bool armed);
         float compute(void);
 };
 
 /********************************************* CPP ********************************************************/
 
-void AccelZ::init(ImuConfig& _imuConfig)
+void Altitude::init(const AltitudeConfig& _altiConfig)
 {
-    memcpy(&imuConfig, &_imuConfig, sizeof(ImuConfig));
+    memcpy(&altiConfig, &_altiConfig, sizeof(altiConfig));
 
-    accelVelScale = 9.80665f / imuConfig.accel1G / 10000.0f;
+    accelVelScale = 9.80665f / altiConfig.accel1G / 10000.0f;
 
     for (int k=0; k<3; ++k) {
         accelSmooth[k] = 0;
@@ -68,10 +68,10 @@ void AccelZ::init(ImuConfig& _imuConfig)
     accelZSum = 0;
 
     // Calculate RC time constant used in the accelZ lpf    
-    fcAcc = (float)(0.5f / (M_PI * imuConfig.accelZLpfCutoff)); 
+    fcAcc = (float)(0.5f / (M_PI * altiConfig.accelZLpfCutoff)); 
 }
 
-void AccelZ::update(int16_t accelRaw[3], float eulerAngles[3], uint32_t currentTimeUsec, bool armed)
+void Altitude::update(int16_t accelRaw[3], float eulerAngles[3], uint32_t currentTimeUsec, bool armed)
 {
     // Track delta time
     static uint32_t previousTimeUsec;
@@ -104,15 +104,15 @@ void AccelZ::update(int16_t accelRaw[3], float eulerAngles[3], uint32_t currentT
 
     // Apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
-    accelZSum += deadbandFilter((int32_t)lrintf(accelZSmooth),  imuConfig.accelZDeadband);
+    accelZSum += deadbandFilter((int32_t)lrintf(accelZSmooth),  altiConfig.accelZDeadband);
 
     // Accumulate time and count for integrating accelerometer values
     accelTimeSum += dT_usec;
-    accelZSum += deadbandFilter((int32_t)lrintf(accelZSmooth),  imuConfig.accelZDeadband);
+    accelZSum += deadbandFilter((int32_t)lrintf(accelZSmooth),  altiConfig.accelZDeadband);
 }
 
 
-float AccelZ::compute(void)
+float Altitude::compute(void)
 {
     // altitude in cm
     static float accelAlt;
@@ -133,7 +133,7 @@ float AccelZ::compute(void)
 }
 
 
-void AccelZ::rotateV(float v[3], float *delta)
+void Altitude::rotateV(float v[3], float *delta)
 {
     float * v_tmp = v;
 
@@ -170,7 +170,7 @@ void AccelZ::rotateV(float v[3], float *delta)
 }
 
 
-int32_t AccelZ::deadbandFilter(int32_t value, int32_t deadband)
+int32_t Altitude::deadbandFilter(int32_t value, int32_t deadband)
 {
     if (abs(value) < deadband) {
         value = 0;
