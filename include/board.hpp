@@ -59,7 +59,6 @@ class Board {
         virtual void     writeMotor(uint8_t index, uint16_t value) = 0;
 
     //------------------------------------------ Extras ---------------------------------------------------------
-        virtual void    extrasHandleAuxSwitch(uint8_t auxState) { (void)auxState; }
         virtual bool    extrasHaveBaro(void) { return false; }
         virtual void    extrasImuGetAccel(int16_t accelRaw[3]) { (void)accelRaw; }
         virtual void    extrasImuPoll(void) { }

@@ -196,7 +196,7 @@ void Hackflight::updateRc(void)
 
     // Detect aux switch changes for hover, altitude-hold, etc.
     if (rc.getAuxState() != auxState) {
-        board->extrasHandleAuxSwitch(rc.getAuxState());
+        debug(board, "%d\n", auxState);
         auxState = rc.getAuxState();
     }
 }

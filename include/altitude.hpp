@@ -1,7 +1,10 @@
-/*
-   altitude.hpp : Altitude estimation
+/* 
+   altitude.hpp: Altitude estimator using baro + accelerometer fusion
 
-   Adapted from https://github.com/multiwii/baseflight/blob/master/src/imu.c
+   Adapted from
+
+    https://github.com/multiwii/baseflight/blob/master/src/imu.c
+    https://github.com/multiwii/baseflight/blob/master/src/sensors.c
 
    This file is part of Hackflight.
 
@@ -15,22 +18,48 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
-   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+   along with EM7180.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+// XXX we should put these in config.hpp
+
+#define ACCEL_1G             2048
+#define ACCEL_Z_LPF_CUTOFF   5.0f
+#define ACCEL_Z_DEADBAND     40
+#define ACCEL_LPF_FACTOR     4
+
+#define BARO_TAB_SIZE        48
+#define BARO_CALIBRATION_SEC 8
+#define BARO_NOISE_LPF       0.5f
+#define BARO_CF_ALT          0.965f
+#define BARO_CF_VEL          0.985f
+
+#define PID_ALT_P            50
+
+#define PID_VEL_P            120
+#define PID_VEL_I            45
+#define PID_VEL_D            1
 
 #include "config.hpp"
-#include "timedtask.hpp"
 
 namespace hf {
-
+ 
 class Altitude {
+
+    public:
+
+        void init(const AltitudeConfig & _config);
+
+        void updateImu(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed);
+
+        void computePid(float pressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec, int32_t AltHold, int32_t setVelocity, bool velocityControl);
 
     private:
 
-        AltitudeConfig altiConfig;
+        // IMU
 
+        float     accelAlt;
+        float     accelLpf[3];
         int32_t   accelZSum;
         float     accelVelScale;
         int32_t   accelZOffset;
@@ -38,38 +67,70 @@ class Altitude {
         int16_t   accelSmooth[3];
         uint32_t  accelTimeSum;
         int32_t   accelSumCount;
-        float     fcAcc;
+        float     accelFc;
+        float     accelZOld;
 
         static int32_t deadbandFilter(int32_t value, int32_t deadband);
         static void    rotateV(float v[3], float *delta);
 
-    public:
+        // Baro
 
-        void  init(const AltitudeConfig& _altiConfig);
-        void  updateImu(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed);
-        float compute(void);
+        uint32_t baroPressureSum;
+        int32_t  baroHistTab[BARO_TAB_SIZE];
+        int      baroHistIdx;
+        int32_t  baroGroundPressure;
+        int32_t  baroGroundAltitude;
+        int32_t  BaroAlt;
+        uint32_t baroCalibrationStart;
+        int32_t  lastBaroAlt;
+
+        static float paToCm(uint32_t pa);
+
+        // Fused
+        int32_t BaroPID;
+        float vel;
+        int32_t errorVelocityI;
 };
 
 /********************************************* CPP ********************************************************/
 
-void Altitude::init(const AltitudeConfig& _altiConfig)
+void Altitude::init(const AltitudeConfig & _config)
 {
-    memcpy(&altiConfig, &_altiConfig, sizeof(altiConfig));
-
-    accelVelScale = 9.80665f / altiConfig.accel1G / 10000.0f;
+    accelVelScale = 9.80665f / ACCEL_1G / 10000.0f;
 
     for (int k=0; k<3; ++k) {
         accelSmooth[k] = 0;
+        accelLpf[k] = 0;
     }
+
+    accelAlt = 0;
     accelZOffset = 0;
     accelTimeSum = 0;
     accelSumCount = 0;
     accelZSmooth = 0;
     accelZSum = 0;
+    accelZOld = 0;
 
     // Calculate RC time constant used in the accelZ lpf    
-    fcAcc = (float)(0.5f / (M_PI * altiConfig.accelZLpfCutoff)); 
+    accelFc = (float)(0.5f / (M_PI * ACCEL_Z_LPF_CUTOFF)); 
+
+    baroPressureSum = 0;
+    baroHistIdx = 0;
+    baroGroundPressure = 0;
+    baroGroundAltitude = 0;
+    BaroAlt = 0;
+    baroCalibrationStart = 0;
+    lastBaroAlt = 0;
+
+    for (int k=0; k<BARO_TAB_SIZE; ++k) {
+        baroHistTab[k] = 0;
+    }
+
+    BaroPID = 0;
+    vel = 0;
+    errorVelocityI = 0;
 }
+
 
 void Altitude::updateImu(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed)
 {
@@ -77,6 +138,15 @@ void Altitude::updateImu(int16_t accelRaw[3], float eulerAnglesRadians[3], uint3
     static uint32_t previousTimeUsec;
     uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
     previousTimeUsec = currentTimeUsec;
+
+    for (uint8_t k=0; k<3; k++) {
+        if (ACCEL_LPF_FACTOR > 0) {
+            accelLpf[k] = accelLpf[k] * (1.0f - (1.0f / ACCEL_LPF_FACTOR)) + accelRaw[k] * (1.0f / ACCEL_LPF_FACTOR);
+            accelSmooth[k] = accelLpf[k];
+        } else {
+            accelSmooth[k] = accelRaw[k];
+        }
+    }
 
     // Rotate accel values into the earth frame
 
@@ -100,37 +170,120 @@ void Altitude::updateImu(int16_t accelRaw[3], float eulerAnglesRadians[3], uint3
     // Compute smoothed vertical acceleration
     accelNed[2] -= accelZOffset / 64;  // compensate for gravitation on z-axis
     float dT_sec = dT_usec * 1e-6f;
-    accelZSmooth = accelZSmooth + (dT_sec / (fcAcc + dT_sec)) * (accelNed[2] - accelZSmooth); // low pass filter
+    accelZSmooth = accelZSmooth + (dT_sec / (accelFc + dT_sec)) * (accelNed[2] - accelZSmooth); // low pass filter
 
     // Apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
-    accelZSum += deadbandFilter((int32_t)lrintf(accelZSmooth),  altiConfig.accelZDeadband);
+    accelZSum += deadbandFilter((int32_t)lrintf(accelZSmooth),  ACCEL_Z_DEADBAND);
 
     // Accumulate time and count for integrating accelerometer values
     accelTimeSum += dT_usec;
-    accelZSum += deadbandFilter((int32_t)lrintf(accelZSmooth),  altiConfig.accelZDeadband);
-}
+    accelSumCount++;
 
+} // updateImu
 
-float Altitude::compute(void)
-{
-    // altitude in cm
-    static float accelAlt;
+void Altitude::computePid(float pressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec, int32_t AltHold, int32_t setVelocity, bool velocityControl)
+{  
+    static uint32_t previousTimeUsec;
+    uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
+    previousTimeUsec = currentTimeUsec;
 
-    float accZ_tmp = (float)accelZSum / (float)accelSumCount;
-    float vel_acc = accZ_tmp * accelVelScale * (float)accelTimeSum;
+    // Start baro calibration if not yet started
+    if (!baroCalibrationStart) 
+        baroCalibrationStart = millis();
 
-    // Integrate velocity to get distance (x= a/2 * t^2)
+    // Smoothe baro pressure using history
+    uint8_t indexplus1 = (baroHistIdx + 1) % BARO_TAB_SIZE;
+    baroHistTab[baroHistIdx] = (int32_t)pressure;
+    baroPressureSum += baroHistTab[baroHistIdx];
+    baroPressureSum -= baroHistTab[indexplus1];
+    baroHistIdx = indexplus1;
+
+    // Compute baro ground altitude during calibration
+    if (millis() - baroCalibrationStart < 1000*BARO_CALIBRATION_SEC) {
+        baroGroundPressure -= baroGroundPressure / 8;
+        baroGroundPressure += baroPressureSum / (BARO_TAB_SIZE - 1);
+        baroGroundAltitude = paToCm(baroGroundPressure/8);
+        vel = 0;
+        accelAlt = 0;
+    }
+
+    int32_t BaroAlt_tmp = paToCm((float)baroPressureSum/(BARO_TAB_SIZE-1)); 
+    BaroAlt_tmp -= baroGroundAltitude;
+    BaroAlt = lrintf((float)BaroAlt * BARO_NOISE_LPF + (float)BaroAlt_tmp * (1.0f - BARO_NOISE_LPF)); // additional LPF to reduce baro noise
+
     float dt = accelTimeSum * 1e-6f; // delta acc reading time in seconds
-    accelAlt += (vel_acc * 0.5f) * dt;
 
-    // Reset accumulated values
+    // Integrate acceleration to get velocity in cm/sec
+    float accelZTmp = (float)accelZSum / (float)accelSumCount;
+    float vel_acc = accelZTmp * accelVelScale * (float)accelTimeSum;
+
+    // Integrate velocity to get altitude in cm: x= a/2 * t^2
+    accelAlt += (vel_acc * 0.5f) * dt + vel * dt;                                         
+
+    // Apply complementary filter to fuse baro and accel
+    accelAlt = accelAlt * BARO_CF_ALT + (float)BaroAlt * (1.0f - BARO_CF_ALT);      
+
+    int32_t EstAlt = BaroAlt; 
+
+    /*
+    if (sonarAlt > 0 && sonarAlt < 200)
+        EstAlt = BaroAlt;
+    else
+        EstAlt = accAlt;
+    */
+
+    vel += vel_acc;
+
+    // Now that computed acceleration, reset it for next time
     accelZSum = 0;
-    accelTimeSum = 0;
     accelSumCount = 0;
+    accelTimeSum = 0;
 
-    return accelAlt;
-}
+    // Compute velocity from barometer
+    int32_t baroVel = (BaroAlt - lastBaroAlt) * 1000000.0f / dT_usec;
+    lastBaroAlt = BaroAlt;
+    baroVel = constrain(baroVel, -1500, 1500);    // constrain baro velocity +/- 1500cm/s
+    baroVel = deadbandFilter(baroVel, 10);         // to reduce noise near zero
+
+    // Apply complementary filter to keep the calculated velocity based on baro velocity (i.e. near real velocity).
+    // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
+    vel = vel * BARO_CF_VEL + baroVel * (1 - BARO_CF_VEL);
+    int32_t vel_tmp = lrintf(vel);
+
+    // only calculate pid if the copters thrust is facing downwards(<80deg)
+    BaroPID = 0;
+    uint16_t tiltAngle = (abs(eulerAnglesDegrees[0]) >  abs(eulerAnglesDegrees[1])) ? abs(eulerAnglesDegrees[0]) : abs(eulerAnglesDegrees[1]);
+    if (tiltAngle < 800) { 
+
+        int32_t setVel = setVelocity;
+        int32_t error = 0;
+
+        // Altitude P-Controller
+        if (!velocityControl) {
+            error = constrain(AltHold - EstAlt, -500, 500);
+            error = deadbandFilter(error, 10);       // remove small P parametr to reduce noise near zero position
+            setVel = constrain((PID_ALT_P * error / 128), -300, +300); // limit velocity to +/- 3 m/s
+        } 
+
+        // Velocity PID-Controller
+        // P
+        error = setVel - vel_tmp;
+        BaroPID = constrain((PID_VEL_P * error / 32), -300, +300);
+
+        // I
+        errorVelocityI += (PID_VEL_I * error);
+        errorVelocityI = constrain(errorVelocityI, -(8196 * 200), (8196 * 200));
+        BaroPID += errorVelocityI / 8196;     // I in the range of +/-200
+
+        // D
+        BaroPID -= constrain(PID_VEL_D * (accelZTmp + accelZOld) / 512, -150, 150);
+
+    } 
+
+    accelZOld = accelZTmp;
+
+} // computePid
 
 
 void Altitude::rotateV(float v[3], float *delta)
@@ -182,5 +335,10 @@ int32_t Altitude::deadbandFilter(int32_t value, int32_t deadband)
     return value;
 }
 
-} // namespace hf
+// Pressure in Pascals to altitude in centimeters
+float Altitude::paToCm(uint32_t pa)
+{
+    return (1.0f - powf(pa / 101325.0f, 0.190295f)) * 4433000.0f;
+}
 
+} // namespace hf
