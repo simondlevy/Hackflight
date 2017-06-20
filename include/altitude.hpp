@@ -46,7 +46,7 @@ class Altitude {
     public:
 
         void  init(const AltitudeConfig& _altiConfig);
-        void  update(int16_t accelRaw[3], float eulerAngles[3], uint32_t currentTimeUsec, bool armed);
+        void  updateImu(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed);
         float compute(void);
 };
 
@@ -71,7 +71,7 @@ void Altitude::init(const AltitudeConfig& _altiConfig)
     fcAcc = (float)(0.5f / (M_PI * altiConfig.accelZLpfCutoff)); 
 }
 
-void Altitude::update(int16_t accelRaw[3], float eulerAngles[3], uint32_t currentTimeUsec, bool armed)
+void Altitude::updateImu(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed)
 {
     // Track delta time
     static uint32_t previousTimeUsec;
@@ -81,9 +81,9 @@ void Altitude::update(int16_t accelRaw[3], float eulerAngles[3], uint32_t curren
     // Rotate accel values into the earth frame
 
     float rpy[3];
-    rpy[0] = -(float)eulerAngles[0];
-    rpy[1] = -(float)eulerAngles[1];
-    rpy[2] = -(float)eulerAngles[2];
+    rpy[0] = -(float)eulerAnglesRadians[0];
+    rpy[1] = -(float)eulerAnglesRadians[1];
+    rpy[2] = -(float)eulerAnglesRadians[2];
 
     float       accelNed[3];
     accelNed[0] = accelSmooth[0];

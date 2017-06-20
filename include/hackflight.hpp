@@ -61,7 +61,7 @@ class Hackflight {
         void flashLeds(const InitConfig& config);
         void updateRc(void);
         void updateImu(void);
-        void updateReadyState(float eulerAngles[3]);
+        void updateReadyState(float eulerAnglesDegrees[3]);
 
     private:
 
@@ -207,40 +207,41 @@ void Hackflight::updateImu(void)
     rc.computeExpo();
 
     // Get Euler angles from board
-    float eulerAngles[3];
-    board->imuGetEuler(eulerAngles);
+    float eulerAnglesRadians[3];
+    board->imuGetEuler(eulerAnglesRadians);
 
     // Convert angles from radians to degrees
+    float eulerAnglesDegrees[3];
     for (int k=0; k<3; ++k) {
-        eulerAngles[k]  = eulerAngles[k]  * 180.0f / M_PI;
+        eulerAnglesDegrees[k]  = eulerAnglesRadians[k]  * 180.0f / M_PI;
     }
 
     // Convert heading from [-180,+180] to [0,360]
-    if (eulerAngles[AXIS_YAW] < 0) {
-        eulerAngles[AXIS_YAW] += 360;
+    if (eulerAnglesDegrees[AXIS_YAW] < 0) {
+        eulerAnglesDegrees[AXIS_YAW] += 360;
     }
 
     // Update status using Euler angles
-    updateReadyState(eulerAngles);
+    updateReadyState(eulerAnglesDegrees);
 
     // Get raw gyro values from board
     int16_t gyroRaw[3];
     board->imuGetGyro(gyroRaw);
 
     // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
-    stab.update(rc.command, gyroRaw, eulerAngles);
+    stab.update(rc.command, gyroRaw, eulerAnglesDegrees);
     mixer.update(armed, board);
-    msp.update(eulerAngles, armed);
+    msp.update(eulerAnglesDegrees, armed);
 
     // If barometer avaialble, compute accelerometer-based altitude for fusion with baro altitude
     if (board->extrasHaveBaro()) {
         int16_t accelRaw[3];
         board->extrasImuGetAccel(accelRaw);
-        alti.update(accelRaw, eulerAngles, board->getMicros(), armed);
+        alti.updateImu(accelRaw, eulerAnglesRadians, board->getMicros(), armed);
     }
 } 
 
-void Hackflight::updateReadyState(float eulerAngles[3])
+void Hackflight::updateReadyState(float eulerAnglesDegrees[3])
 {
     if (safeToArm)
         board->ledSet(0, false);
@@ -252,7 +253,7 @@ void Hackflight::updateReadyState(float eulerAngles[3])
     // If angle too steep, flash LED
     uint32_t currentTime = board->getMicros();
     if (angleCheckTask.check(currentTime)) {
-        if (!(abs(eulerAngles[0]) < maxArmingAngle && abs(eulerAngles[1]) < maxArmingAngle)) {
+        if (!(abs(eulerAnglesDegrees[0]) < maxArmingAngle && abs(eulerAnglesDegrees[1]) < maxArmingAngle)) {
             safeToArm = false; 
             blinkLedForTilt();
             angleCheckTask.update(currentTime);
