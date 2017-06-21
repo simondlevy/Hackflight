@@ -98,6 +98,16 @@ class Altitude {
 
 /********************************************* CPP ********************************************************/
 
+static void dump(const char * label, int32_t value, const char * end)
+{
+    Serial.print(label);
+    Serial.print(": ");
+    if (value>0) 
+        Serial.print("+"); 
+    Serial.print(value);
+    Serial.print(end);
+}
+
 void Altitude::init(const AltitudeConfig & _config)
 {
     accelVelScale = 9.80665f / ACCEL_1G / 10000.0f;
@@ -284,6 +294,11 @@ void Altitude::computePid(float pressure, float eulerAnglesDegrees[3], uint32_t 
         BaroPID -= constrain(PID_VEL_D * (accelZTmp + accelZOld) / 512, -150, 150);
 
     } 
+
+    dump("AltHold", AltHold, "    ");
+    dump("setVelocity", setVelocity, "    ");
+    dump("velocityControl", velocityControl, "    ");
+    dump("BaroPID", BaroPID, "\n");
 
     accelZOld = accelZTmp;
 
