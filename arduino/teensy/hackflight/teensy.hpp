@@ -37,7 +37,7 @@ class Teensy : public Board {
 
         float eulerAngles[3];
 
-        EM7180 imu;
+        EM7180 sentral;
         SpektrumDSM2048 rx;
 
     protected:
@@ -65,7 +65,7 @@ class Teensy : public Board {
             delay(100);
 
             // Start the EM7180
-            uint8_t status = imu.begin(8, 2000, 1000);
+            uint8_t status = sentral.begin(8, 2000, 1000);
             while (status) {
                 Serial.println(EM7180::errorToString(status));
             }
@@ -148,7 +148,7 @@ class Teensy : public Board {
 
         virtual void extrasImuPoll(void) override
         {
-            uint8_t errorStatus = imu.poll();
+            uint8_t errorStatus = sentral.poll();
 
             if (errorStatus) {
                 Serial.print("ERROR: ");
@@ -160,7 +160,7 @@ class Teensy : public Board {
         virtual void imuGetEuler(float _eulerAngles[3]) override
         {
             static float q[4];
-            imu.getQuaternions(q);
+            sentral.getQuaternions(q);
 
             float yaw   = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
             float pitch = -asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
@@ -176,7 +176,7 @@ class Teensy : public Board {
 
         virtual void imuGetGyro(int16_t gyroRaw[3]) override
         {
-            imu.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
+            sentral.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
             gyroRaw[1] = -gyroRaw[1];
             gyroRaw[2] = -gyroRaw[2];
         }
@@ -186,9 +186,16 @@ class Teensy : public Board {
             return true; 
         }
 
+        virtual float extrasGetBaroPressure(void) override 
+        {
+            float pressure, temperature;
+            sentral.getBaro(pressure, temperature);
+            return pressure;
+        }
+
         virtual void extrasImuGetAccel(int16_t accelRaw[3]) override
         {
-            imu.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
+            sentral.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
         }
 
 }; // class

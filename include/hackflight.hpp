@@ -152,9 +152,9 @@ void Hackflight::update(void)
 
     // Altithude-PID task (never called in same loop iteration as RC update)
     else if (board->extrasHaveBaro() && altitudeTask.checkAndUpdate(currentTime)) {
-        //int32_t setVelocity = 0;      // XXX
-        //bool velocityControl = false; // XXX
-        //alti.computePid(pressure, eulerAnglesDegrees, board->getMicros(, setVelocity, velocityControl);
+        int32_t setVelocity = 0;      // XXX
+        bool velocityControl = false; // XXX
+        alti.computePid(board->extrasGetBaroPressure(), eulerAnglesDegrees, board->getMicros(), setVelocity, velocityControl);
     }
 
     // Polling for EM7180 SENtral Sensor Fusion IMU
