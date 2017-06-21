@@ -52,7 +52,9 @@ class Altitude {
 
         void updateImu(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed);
 
-        void computePid(float pressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec, int32_t AltHold, int32_t setVelocity, bool velocityControl);
+        void computePid(float pressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec, int32_t setVelocity, bool velocityControl);
+
+        void startHold(void);
 
     private:
 
@@ -87,7 +89,9 @@ class Altitude {
         static float paToCm(uint32_t pa);
 
         // Fused
+        int32_t AltHold;
         int32_t BaroPID;
+        int32_t EstAlt;
         float vel;
         int32_t errorVelocityI;
 };
@@ -182,7 +186,7 @@ void Altitude::updateImu(int16_t accelRaw[3], float eulerAnglesRadians[3], uint3
 
 } // updateImu
 
-void Altitude::computePid(float pressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec, int32_t AltHold, int32_t setVelocity, bool velocityControl)
+void Altitude::computePid(float pressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec, int32_t setVelocity, bool velocityControl)
 {  
     static uint32_t previousTimeUsec;
     uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
@@ -224,7 +228,7 @@ void Altitude::computePid(float pressure, float eulerAnglesDegrees[3], uint32_t 
     // Apply complementary filter to fuse baro and accel
     accelAlt = accelAlt * BARO_CF_ALT + (float)BaroAlt * (1.0f - BARO_CF_ALT);      
 
-    int32_t EstAlt = BaroAlt; 
+    EstAlt = BaroAlt; 
 
     /*
     if (sonarAlt > 0 && sonarAlt < 200)
@@ -285,6 +289,12 @@ void Altitude::computePid(float pressure, float eulerAnglesDegrees[3], uint32_t 
 
 } // computePid
 
+void Altitude::startHold(void)
+{
+    AltHold = EstAlt;
+    errorVelocityI = 0;
+    BaroPID = 0;
+}
 
 void Altitude::rotateV(float v[3], float *delta)
 {

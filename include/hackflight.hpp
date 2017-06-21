@@ -61,12 +61,13 @@ class Hackflight {
         void flashLeds(const InitConfig& config);
         void updateRc(void);
         void updateImu(void);
-        void updateReadyState(float eulerAnglesDegrees[3]);
+        void updateReadyState(void);
 
     private:
 
         bool       armed;
         uint8_t    auxState;
+        bool       holdingAltitude;
 
         RC         rc;
         Mixer      mixer;
@@ -81,8 +82,10 @@ class Hackflight {
         TimedTask angleCheckTask;
         TimedTask altitudeTask;
 
+        float    eulerAnglesDegrees[3];
         bool     safeToArm;
         uint16_t maxArmingAngle;
+        int16_t  initialThrottleHold;
 };
 
 /********************************************* CPP ********************************************************/
@@ -127,9 +130,13 @@ void Hackflight::init(Board * _board)
     // Initialize altitude estimator, which will be used if there's a barometer
     alti.init(config.alti);
 
-    // Ready to rock!
+    // Initialize state varriables
+    for (int k=0; k<3; ++k) {
+        eulerAnglesDegrees[k] = 0;
+    }
     armed = false;
     safeToArm = false;
+    initialThrottleHold = 0;
 
 } // init
 
@@ -141,6 +148,13 @@ void Hackflight::update(void)
     // Outer (slow) loop: update RC
     if (rcTask.checkAndUpdate(currentTime)) {
         updateRc();
+    }
+
+    // Altithude-PID task (never called in same loop iteration as RC update)
+    else if (board->extrasHaveBaro() && altitudeTask.checkAndUpdate(currentTime)) {
+        //int32_t setVelocity = 0;      // XXX
+        //bool velocityControl = false; // XXX
+        //alti.computePid(pressure, eulerAnglesDegrees, board->getMicros(, setVelocity, velocityControl);
     }
 
     // Polling for EM7180 SENtral Sensor Fusion IMU
@@ -194,10 +208,19 @@ void Hackflight::updateRc(void)
 
     } // rc.changed()
 
-    // Detect aux switch changes for hover, altitude-hold, etc.
+    // Detect aux switch changes for altitude-hold
     if (rc.getAuxState() != auxState) {
-        debug(board, "%d\n", auxState);
         auxState = rc.getAuxState();
+        if (board->extrasHaveBaro()) {
+            if (auxState > 0) {
+                holdingAltitude = true;
+                initialThrottleHold = rc.command[DEMAND_THROTTLE];
+                alti.startHold();
+            }
+            else {
+                holdingAltitude = false;
+            }
+        }
     }
 }
 
@@ -211,7 +234,6 @@ void Hackflight::updateImu(void)
     board->imuGetEuler(eulerAnglesRadians);
 
     // Convert angles from radians to degrees
-    float eulerAnglesDegrees[3];
     for (int k=0; k<3; ++k) {
         eulerAnglesDegrees[k]  = eulerAnglesRadians[k]  * 180.0f / M_PI;
     }
@@ -222,7 +244,7 @@ void Hackflight::updateImu(void)
     }
 
     // Update status using Euler angles
-    updateReadyState(eulerAnglesDegrees);
+    updateReadyState();
 
     // Get raw gyro values from board
     int16_t gyroRaw[3];
@@ -241,7 +263,7 @@ void Hackflight::updateImu(void)
     }
 } 
 
-void Hackflight::updateReadyState(float eulerAnglesDegrees[3])
+void Hackflight::updateReadyState(void)
 {
     if (safeToArm)
         board->ledSet(0, false);
