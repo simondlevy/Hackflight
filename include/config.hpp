@@ -67,7 +67,7 @@ struct ImuConfig {
 };
 
 //=========================================================================
-// Altitude estimation config
+// Altitude-hold config
 //=========================================================================
 
 struct AltitudeConfig {
@@ -75,6 +75,10 @@ struct AltitudeConfig {
     uint16_t accel1G                = 4096;
     int32_t  accelZDeadband         = 40;
     float    accelZLpfCutoff        = 5.0f;
+    bool     fastChange             = true;
+    uint8_t  throttleNeutral        = 40;
+    uint16_t throttleMin            = 1150;
+    uint16_t throttleMax            = 1850;
 };
 
 

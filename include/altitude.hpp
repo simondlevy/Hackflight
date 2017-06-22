@@ -48,15 +48,14 @@ class Altitude {
 
     public:
 
-        void init(const AltitudeConfig & _config);
-
-        void updateImu(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed);
-
-        void computePid(float pressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec, int32_t setVelocity, bool velocityControl);
-
-        void startHold(void);
+        void     init(const AltitudeConfig & _config);
+        uint16_t getThrottle(uint16_t throttleDemand, int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed);
+        void     computePid(float pressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec);
+        void     handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand);
 
     private:
+
+        AltitudeConfig config;
 
         // IMU
 
@@ -89,15 +88,21 @@ class Altitude {
         static float paToCm(uint32_t pa);
 
         // Fused
-        int32_t AltHold;
-        int32_t BaroPID;
-        int32_t EstAlt;
-        float vel;
-        int32_t errorVelocityI;
+        int32_t  AltHold;
+        int32_t  BaroPID;
+        int32_t  EstAlt;
+        float    vel;
+        bool     holdingAltitude;
+        int32_t  errorVelocityI;
+        int32_t  setVelocity;      
+        bool     velocityControl; 
+        int16_t  initialThrottleHold;
+        bool     isAltHoldChanged;
 };
 
 /********************************************* CPP ********************************************************/
 
+/*
 static void dump(const char * label, int32_t value, const char * end)
 {
     Serial.print(label);
@@ -107,10 +112,16 @@ static void dump(const char * label, int32_t value, const char * end)
     Serial.print(value);
     Serial.print(end);
 }
+*/
 
 void Altitude::init(const AltitudeConfig & _config)
 {
+    memcpy(&config, &_config, sizeof(AltitudeConfig));
+
     accelVelScale = 9.80665f / ACCEL_1G / 10000.0f;
+
+    // Calculate RC time constant used in the accelZ lpf    
+    accelFc = (float)(0.5f / (M_PI * ACCEL_Z_LPF_CUTOFF)); 
 
     for (int k=0; k<3; ++k) {
         accelSmooth[k] = 0;
@@ -125,9 +136,6 @@ void Altitude::init(const AltitudeConfig & _config)
     accelZSum = 0;
     accelZOld = 0;
 
-    // Calculate RC time constant used in the accelZ lpf    
-    accelFc = (float)(0.5f / (M_PI * ACCEL_Z_LPF_CUTOFF)); 
-
     baroPressureSum = 0;
     baroHistIdx = 0;
     baroGroundPressure = 0;
@@ -140,13 +148,18 @@ void Altitude::init(const AltitudeConfig & _config)
         baroHistTab[k] = 0;
     }
 
+    initialThrottleHold = 0;
+    setVelocity = 0;      
+    velocityControl = false; 
     BaroPID = 0;
     vel = 0;
     errorVelocityI = 0;
+    holdingAltitude = false;
+    isAltHoldChanged = false;
 }
 
 
-void Altitude::updateImu(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed)
+uint16_t Altitude::getThrottle(uint16_t throttleDemand, int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed)
 {
     // Track delta time
     static uint32_t previousTimeUsec;
@@ -194,9 +207,41 @@ void Altitude::updateImu(int16_t accelRaw[3], float eulerAnglesRadians[3], uint3
     accelTimeSum += dT_usec;
     accelSumCount++;
 
-} // updateImu
+    if (holdingAltitude) {
+        if (config.fastChange) {
+            // rapid alt changes
+            if (abs(throttleDemand - initialThrottleHold) > config.throttleNeutral) {
+                errorVelocityI = 0;
+                isAltHoldChanged = true;
+                throttleDemand += (throttleDemand > initialThrottleHold) ? -config.throttleNeutral : config.throttleNeutral;
+            } else {
+                if (isAltHoldChanged) {
+                    AltHold = EstAlt;
+                    isAltHoldChanged = false;
+                }
+                throttleDemand = constrain(initialThrottleHold + BaroPID, config.throttleMin, config.throttleMax);
+            }
+        } else {
+            // slow alt changes
+            if (abs(throttleDemand - initialThrottleHold) > config.throttleNeutral) {
+                // set velocity proportional to stick movement +100 throttle gives ~ +50 cm/s
+                setVelocity = (throttleDemand - initialThrottleHold) / 2;
+                velocityControl = true;
+                isAltHoldChanged = true;
+            } else if (isAltHoldChanged) {
+                AltHold = EstAlt;
+                velocityControl = false;
+                isAltHoldChanged = false;
+            }
+            throttleDemand = constrain(initialThrottleHold + BaroPID, config.throttleMin, config.throttleMax);
+        }
+    }
 
-void Altitude::computePid(float pressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec, int32_t setVelocity, bool velocityControl)
+    return throttleDemand;
+
+} // getThrottle
+
+void Altitude::computePid(float pressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec)
 {  
     static uint32_t previousTimeUsec;
     uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
@@ -241,11 +286,11 @@ void Altitude::computePid(float pressure, float eulerAnglesDegrees[3], uint32_t 
     EstAlt = BaroAlt; 
 
     /*
-    if (sonarAlt > 0 && sonarAlt < 200)
-        EstAlt = BaroAlt;
-    else
-        EstAlt = accAlt;
-    */
+       if (sonarAlt > 0 && sonarAlt < 200)
+       EstAlt = BaroAlt;
+       else
+       EstAlt = accAlt;
+     */
 
     vel += vel_acc;
 
@@ -295,21 +340,31 @@ void Altitude::computePid(float pressure, float eulerAnglesDegrees[3], uint32_t 
 
     } 
 
+    /*
     dump("AltHold", AltHold, "    ");
     dump("setVelocity", setVelocity, "    ");
     dump("velocityControl", velocityControl, "    ");
     dump("BaroPID", BaroPID, "\n");
+    */
 
     accelZOld = accelZTmp;
 
 } // computePid
 
-void Altitude::startHold(void)
+void Altitude::handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand)
 {
-    AltHold = EstAlt;
-    errorVelocityI = 0;
-    BaroPID = 0;
+    if (auxState > 0) {
+        holdingAltitude = true;
+        initialThrottleHold = throttleDemand;
+        AltHold = EstAlt;
+        errorVelocityI = 0;
+        BaroPID = 0;
+    }
+    else {
+        holdingAltitude = false;
+    }
 }
+
 
 void Altitude::rotateV(float v[3], float *delta)
 {

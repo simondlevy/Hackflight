@@ -63,12 +63,6 @@ class Hackflight {
         void updateImu(void);
         void updateReadyState(void);
 
-    private:
-
-        bool       armed;
-        uint8_t    auxState;
-        bool       holdingAltitude;
-
         RC         rc;
         Mixer      mixer;
         MSP        msp;
@@ -82,10 +76,11 @@ class Hackflight {
         TimedTask angleCheckTask;
         TimedTask altitudeTask;
 
+        bool     armed;
+        uint8_t  auxState;
         float    eulerAnglesDegrees[3];
         bool     safeToArm;
         uint16_t maxArmingAngle;
-        int16_t  initialThrottleHold;
 };
 
 /********************************************* CPP ********************************************************/
@@ -136,7 +131,6 @@ void Hackflight::init(Board * _board)
     }
     armed = false;
     safeToArm = false;
-    initialThrottleHold = 0;
 
 } // init
 
@@ -152,9 +146,7 @@ void Hackflight::update(void)
 
     // Altithude-PID task (never called in same loop iteration as RC update)
     else if (board->extrasHaveBaro() && altitudeTask.checkAndUpdate(currentTime)) {
-        int32_t setVelocity = 0;      // XXX
-        bool velocityControl = false; // XXX
-        alti.computePid(board->extrasGetBaroPressure(), eulerAnglesDegrees, board->getMicros(), setVelocity, velocityControl);
+        alti.computePid(board->extrasGetBaroPressure(), eulerAnglesDegrees, board->getMicros());
     }
 
     // Polling for EM7180 SENtral Sensor Fusion IMU
@@ -212,14 +204,7 @@ void Hackflight::updateRc(void)
     if (rc.getAuxState() != auxState) {
         auxState = rc.getAuxState();
         if (board->extrasHaveBaro()) {
-            if (auxState > 0) {
-                holdingAltitude = true;
-                initialThrottleHold = rc.command[DEMAND_THROTTLE];
-                alti.startHold();
-            }
-            else {
-                holdingAltitude = false;
-            }
+            alti.handleAuxSwitch(auxState, rc.command[DEMAND_THROTTLE]);
         }
     }
 }
@@ -254,8 +239,8 @@ void Hackflight::updateImu(void)
     if (board->extrasHaveBaro()) {
         int16_t accelRaw[3];
         board->extrasImuGetAccel(accelRaw);
-        alti.updateImu(accelRaw, eulerAnglesRadians, board->getMicros(), armed);
-        // XXX baseflight/src/mw.c:967-1006 belong here
+        rc.command[DEMAND_THROTTLE] = alti.getThrottle(rc.command[DEMAND_THROTTLE], accelRaw, eulerAnglesRadians, board->getMicros(), armed);
+
     }
 
     // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
