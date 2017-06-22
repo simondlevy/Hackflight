@@ -250,17 +250,18 @@ void Hackflight::updateImu(void)
     int16_t gyroRaw[3];
     board->imuGetGyro(gyroRaw);
 
-    // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
-    stab.update(rc.command, gyroRaw, eulerAnglesDegrees);
-    mixer.update(armed, board);
-    msp.update(eulerAnglesDegrees, armed);
-
     // If barometer avaialble, compute accelerometer-based altitude for fusion with baro altitude
     if (board->extrasHaveBaro()) {
         int16_t accelRaw[3];
         board->extrasImuGetAccel(accelRaw);
         alti.updateImu(accelRaw, eulerAnglesRadians, board->getMicros(), armed);
+        // XXX baseflight/src/mw.c:967-1006 belong here
     }
+
+    // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
+    stab.update(rc.command, gyroRaw, eulerAnglesDegrees);
+    mixer.update(armed, board);
+    msp.update(eulerAnglesDegrees, armed);
 } 
 
 void Hackflight::updateReadyState(void)
