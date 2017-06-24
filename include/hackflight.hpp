@@ -240,7 +240,6 @@ void Hackflight::updateImu(void)
         int16_t accelRaw[3];
         board->extrasImuGetAccel(accelRaw);
         rc.command[DEMAND_THROTTLE] = alti.getThrottle(rc.command[DEMAND_THROTTLE], accelRaw, eulerAnglesRadians, board->getMicros(), armed);
-
     }
 
     // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
