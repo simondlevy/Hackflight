@@ -88,8 +88,8 @@ class Ladybug : public Board {
             config.pid.yawI           = 0.36f;
 
             // "Software trim"
-            config.pid.softwareTrim[AXIS_ROLL]  = +25;
-            config.pid.softwareTrim[AXIS_PITCH] = -25;
+            config.pid.softwareTrim[AXIS_ROLL]  = +37;
+            config.pid.softwareTrim[AXIS_PITCH] = -37;
 
             return config;
         }
