@@ -72,10 +72,12 @@ struct ImuConfig {
 
 struct AltitudeConfig {
 
-    uint16_t accel1G                = 4096;
+    uint16_t accel1G                = 4096; // Raw accelerometer value when board is level
+    uint8_t  accelLpfFactor         = 4;
     int32_t  accelZDeadband         = 40;
     float    accelZLpfCutoff        = 5.0f;
     bool     fastChange             = true;
+    uint8_t  maxTiltAngle           = 80;
     uint8_t  throttleNeutral        = 40;
     uint16_t throttleMin            = 1150;
     uint16_t throttleMax            = 1850;
@@ -124,7 +126,7 @@ struct InitConfig {
 struct Config {
     LoopConfig     loop;
     ImuConfig      imu;
-    AltitudeConfig alti;
+    AltitudeConfig altitude;
     RcConfig       rc;
     PidConfig      pid;
     PwmConfig      pwm;

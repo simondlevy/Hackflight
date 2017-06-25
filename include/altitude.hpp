@@ -23,11 +23,6 @@
 
 // XXX we should put these in config.hpp
 
-#define ACCEL_1G             2048
-#define ACCEL_Z_LPF_CUTOFF   5.0f
-#define ACCEL_Z_DEADBAND     40
-#define ACCEL_LPF_FACTOR     4
-
 #define BARO_TAB_SIZE        48
 #define BARO_CALIBRATION_SEC 8
 #define BARO_NOISE_LPF       0.5f
@@ -35,7 +30,6 @@
 #define BARO_CF_VEL          0.985f
 
 #define PID_ALT_P            50
-
 #define PID_VEL_P            120
 #define PID_VEL_I            45
 #define PID_VEL_D            1
@@ -118,10 +112,10 @@ void Altitude::init(const AltitudeConfig & _config)
 {
     memcpy(&config, &_config, sizeof(AltitudeConfig));
 
-    accelVelScale = 9.80665f / ACCEL_1G / 10000.0f;
+    accelVelScale = 9.80665f / config.accel1G / 10000.0f;
 
     // Calculate RC time constant used in the accelZ lpf    
-    accelFc = (float)(0.5f / (M_PI * ACCEL_Z_LPF_CUTOFF)); 
+    accelFc = (float)(0.5f / (M_PI * config.accelZLpfCutoff)); 
 
     for (int k=0; k<3; ++k) {
         accelSmooth[k] = 0;
@@ -167,8 +161,8 @@ uint16_t Altitude::getThrottle(uint16_t throttleDemand, int16_t accelRaw[3], flo
     previousTimeUsec = currentTimeUsec;
 
     for (uint8_t k=0; k<3; k++) {
-        if (ACCEL_LPF_FACTOR > 0) {
-            accelLpf[k] = accelLpf[k] * (1.0f - (1.0f / ACCEL_LPF_FACTOR)) + accelRaw[k] * (1.0f / ACCEL_LPF_FACTOR);
+        if (config.accelLpfFactor > 0) {
+            accelLpf[k] = accelLpf[k] * (1.0f - (1.0f / config.accelLpfFactor)) + accelRaw[k] * (1.0f / config.accelLpfFactor);
             accelSmooth[k] = accelLpf[k];
         } else {
             accelSmooth[k] = accelRaw[k];
@@ -201,7 +195,7 @@ uint16_t Altitude::getThrottle(uint16_t throttleDemand, int16_t accelRaw[3], flo
 
     // Apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
-    accelZSum += deadbandFilter((int32_t)lrintf(accelZSmooth),  ACCEL_Z_DEADBAND);
+    accelZSum += deadbandFilter((int32_t)lrintf(accelZSmooth),  config.accelZDeadband);
 
     // Accumulate time and count for integrating accelerometer values
     accelTimeSum += dT_usec;
@@ -313,7 +307,8 @@ void Altitude::computePid(float pressure, float eulerAnglesDegrees[3], uint32_t 
     // only calculate pid if the copters thrust is facing downwards(<80deg)
     BaroPID = 0;
     uint16_t tiltAngle = (abs(eulerAnglesDegrees[0]) >  abs(eulerAnglesDegrees[1])) ? abs(eulerAnglesDegrees[0]) : abs(eulerAnglesDegrees[1]);
-    if (tiltAngle < 800) { 
+
+    if (tiltAngle < config.maxTiltAngle) { 
 
         int32_t setVel = setVelocity;
         int32_t error = 0;

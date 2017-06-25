@@ -123,7 +123,7 @@ void Hackflight::init(Board * _board)
     msp.init(&mixer, &rc, board);
 
     // Initialize altitude estimator, which will be used if there's a barometer
-    alti.init(config.alti);
+    alti.init(config.altitude);
 
     // Initialize state varriables
     for (int k=0; k<3; ++k) {

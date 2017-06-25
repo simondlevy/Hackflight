@@ -91,6 +91,9 @@ class Ladybug : public Board {
             config.pid.softwareTrim[AXIS_ROLL]  = +37;
             config.pid.softwareTrim[AXIS_PITCH] = -37;
 
+            // Altitude-hold
+            config.altitude.accel1G = 2048;
+
             return config;
         }
 
