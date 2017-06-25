@@ -33,7 +33,7 @@ class Ladybug : public Board {
 
     private:
 
-        uint8_t motorPins[4] = {13, 16, 3, 11};
+        uint8_t motorPins[4] = {13, A2, 3, 11};
 
         float eulerAngles[3];
 
