@@ -1,0 +1,11 @@
+altitude.hpp
+board.hpp
+common.hpp
+config.hpp
+debug.hpp
+hackflight.hpp
+mixer.hpp
+msp.hpp
+rc.hpp
+stabilize.hpp
+timedtask.hpp
