@@ -14,12 +14,12 @@ have safety mechanisms that Hackflight lacks, which will help avoid injury to
 you and damage to your vehicle.
 
 Hackflight derives from the Baseflight firmware (which in turn derives from
-Multiwii).  Although there is [legacy support](https://github.com/simondlevy/hackflight/tree/master/legacy) 
-for STM32F103 flight-controller boards
-(Naze32 and clones like Flip32, MultiRC, etc.) and the Alienflight F3 board,
-the hardware focus of the project has shifted to the Arduino-compatible boards designed
-by Pesky Products: the [Teensy Flight Controller](https://forum.pjrc.com/threads/32985-Teensy-Flight-Controller)
-and the STM32L4-based [Ladybug FC](http://diydrones.com/profiles/blogs/flight-of-the-ladybug).
+Multiwii).  Although there is [legacy
+support](https://github.com/simondlevy/hackflight/tree/master/legacy) for
+STM32F103 flight-controller boards (Naze32 and clones like Flip32, MultiRC,
+etc.) the Alienflight F3 board, and a Teensy 3.2-based controller, 
+the hardware focus of the project has shifted to the Arduino-compatible, the
+STM32L4-based [Ladybug FC](http://diydrones.com/profiles/blogs/flight-of-the-ladybug).
 
 Thanks to a major effort by
 [Sytelus](https://github.com/sytelus), the core Hackflight 
