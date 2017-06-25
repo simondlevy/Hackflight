@@ -143,7 +143,14 @@ class Ladybug : public Board {
         {
             uint8_t aval = map(value, config.pwm.min, config.pwm.max, 0, 255);
 
-            analogWrite(motorPins[index], aval);
+            // Avoid sending the motor the same value over and over
+            static uint8_t avalPrev[4];
+
+            if (aval != avalPrev[index]) {
+                analogWrite(motorPins[index], aval);
+            }
+
+            avalPrev[index] = aval;
         }
 
         virtual void extrasImuPoll(void) override

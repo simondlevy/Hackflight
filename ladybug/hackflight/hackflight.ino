@@ -1,5 +1,5 @@
 /*
-   hackflight.ino : Main Hackflight sketch for Teensy 3.2
+   hackflight.ino : Main Hackflight sketch for Ladybug Flight Controller
 
    This file is part of Hackflight.
 

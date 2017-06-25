@@ -1,1 +1,0 @@
-/home/levy/Desktop/hackflight/include/stabilize.hpp
