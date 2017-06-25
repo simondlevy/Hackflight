@@ -18,4 +18,3 @@ there:
 Finally, copy everything in the <b>include</b> directory (two levels above this one) to the 
 <b>hackflight</b> directory (below this one).  You should then be able to
 launch the Arduino IDE and build and flash the firmware onto your Ladybug.
-
