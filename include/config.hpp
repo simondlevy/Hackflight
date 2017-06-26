@@ -67,22 +67,49 @@ struct ImuConfig {
 };
 
 //=========================================================================
+// Barometer config
+//=========================================================================
+
+struct BarometerConfig {
+
+    uint8_t  calibrationSeconds = 8;
+    float    noiseLpf           = 0.5f;
+
+    static const uint8_t HISTORY_SIZE = 48;
+};
+
+//=========================================================================
 // Altitude-hold config
 //=========================================================================
 
 struct AltitudeConfig {
 
+    // PID
+    float    pidAltP                = 0.40f;
+    float    pidVelP                = 3.75f;
+    float    pidVelI                = 0.005f;
+    float    pidVelD                = 0.002f;
+
+    // Barometer
+    BarometerConfig baro;
+
+    // Complementry filter for accel/baro
+    float    cfAlt                  = 0.965f;
+    float    cfVel                  = 0.985f;
+
+    // Accelerometer
     uint16_t accel1G                = 4096; // Raw accelerometer value when board is level
     uint8_t  accelLpfFactor         = 4;
     int32_t  accelZDeadband         = 40;
     float    accelZLpfCutoff        = 5.0f;
+
+    // Fused
     bool     fastChange             = true;
     uint8_t  maxTiltAngle           = 80;
     uint8_t  throttleNeutral        = 40;
     uint16_t throttleMin            = 1150;
     uint16_t throttleMax            = 1850;
 };
-
 
 //=========================================================================
 // PWM config

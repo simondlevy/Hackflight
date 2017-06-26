@@ -1,4 +1,5 @@
 altitude.hpp
+barometer.hpp
 board.hpp
 common.hpp
 config.hpp

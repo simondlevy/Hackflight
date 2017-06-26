@@ -1,10 +1,9 @@
 /* 
-   altitude.hpp: Altitude estimator using baro + accelerometer fusion
+   altitude.hpp: Altitude estimator
 
    Adapted from
 
     https://github.com/multiwii/baseflight/blob/master/src/imu.c
-    https://github.com/multiwii/baseflight/blob/master/src/sensors.c
 
    This file is part of Hackflight.
 
@@ -21,20 +20,8 @@
    along with EM7180.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// XXX we should put these in config.hpp
-
-#define BARO_TAB_SIZE        48
-#define BARO_CALIBRATION_SEC 8
-#define BARO_NOISE_LPF       0.5f
-#define BARO_CF_ALT          0.965f
-#define BARO_CF_VEL          0.985f
-
-#define PID_ALT_P            50
-#define PID_VEL_P            120
-#define PID_VEL_I            45
-#define PID_VEL_D            1
-
 #include "config.hpp"
+#include "barometer.hpp"
 
 namespace hf {
  
@@ -43,13 +30,19 @@ class Altitude {
     public:
 
         void     init(const AltitudeConfig & _config);
-        uint16_t getThrottle(uint16_t throttleDemand, int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed);
-        void     computePid(float pressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec);
+        void     computePid(float baroPressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec);
         void     handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand);
+        void     updateAccelSum(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed);
+        uint16_t modifyThrottleDemand(uint16_t throttleDemand);
 
     private:
 
         AltitudeConfig config;
+
+        // Barometer
+        Barometer baro;
+        uint32_t  baroCalibrationStart;
+        int32_t   lastBaroAltCm;
 
         // IMU
 
@@ -65,33 +58,20 @@ class Altitude {
         float     accelFc;
         float     accelZOld;
 
-        static int32_t deadbandFilter(int32_t value, int32_t deadband);
-        static void    rotateV(float v[3], float *delta);
+        static void rotateV(float v[3], float *delta);
 
-        // Baro
-
-        uint32_t baroPressureSum;
-        int32_t  baroHistTab[BARO_TAB_SIZE];
-        int      baroHistIdx;
-        int32_t  baroGroundPressure;
-        int32_t  baroGroundAltitude;
-        int32_t  BaroAlt;
-        uint32_t baroCalibrationStart;
-        int32_t  lastBaroAlt;
-
-        static float paToCm(uint32_t pa);
-
-        // Fused
-        int32_t  AltHold;
-        int32_t  BaroPID;
-        int32_t  EstAlt;
-        float    vel;
-        bool     holdingAltitude;
+        int32_t  altHoldCm;
+        int32_t  altPid;
         int32_t  errorVelocityI;
-        int32_t  setVelocity;      
-        bool     velocityControl; 
+        int32_t  estimAltCm;
+        bool     holdingAltitude;
         int16_t  initialThrottleHold;
         bool     isAltHoldChanged;
+        int32_t  setVelocity;      
+        float    velocityCmPerSec;
+        bool     velocityControl; 
+        
+        static int32_t deadbandFilter(int32_t value, int32_t deadband);
 };
 
 /********************************************* CPP ********************************************************/
@@ -112,6 +92,10 @@ void Altitude::init(const AltitudeConfig & _config)
 {
     memcpy(&config, &_config, sizeof(AltitudeConfig));
 
+    baro.init(config.baro);
+    baroCalibrationStart = 0;
+    lastBaroAltCm = 0;
+
     accelVelScale = 9.80665f / config.accel1G / 10000.0f;
 
     // Calculate RC time constant used in the accelZ lpf    
@@ -130,30 +114,18 @@ void Altitude::init(const AltitudeConfig & _config)
     accelZSum = 0;
     accelZOld = 0;
 
-    baroPressureSum = 0;
-    baroHistIdx = 0;
-    baroGroundPressure = 0;
-    baroGroundAltitude = 0;
-    BaroAlt = 0;
-    baroCalibrationStart = 0;
-    lastBaroAlt = 0;
-
-    for (int k=0; k<BARO_TAB_SIZE; ++k) {
-        baroHistTab[k] = 0;
-    }
-
     initialThrottleHold = 0;
     setVelocity = 0;      
     velocityControl = false; 
-    BaroPID = 0;
-    vel = 0;
+    altPid = 0;
+    velocityCmPerSec = 0;
     errorVelocityI = 0;
     holdingAltitude = false;
     isAltHoldChanged = false;
 }
 
 
-uint16_t Altitude::getThrottle(uint16_t throttleDemand, int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed)
+void Altitude::updateAccelSum(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed)
 {
     // Track delta time
     static uint32_t previousTimeUsec;
@@ -201,6 +173,10 @@ uint16_t Altitude::getThrottle(uint16_t throttleDemand, int16_t accelRaw[3], flo
     accelTimeSum += dT_usec;
     accelSumCount++;
 
+} // updateAccelSum
+
+uint16_t Altitude::modifyThrottleDemand(uint16_t throttleDemand)
+{
     if (holdingAltitude) {
         if (config.fastChange) {
             // rapid alt changes
@@ -210,10 +186,10 @@ uint16_t Altitude::getThrottle(uint16_t throttleDemand, int16_t accelRaw[3], flo
                 throttleDemand += (throttleDemand > initialThrottleHold) ? -config.throttleNeutral : config.throttleNeutral;
             } else {
                 if (isAltHoldChanged) {
-                    AltHold = EstAlt;
+                    altHoldCm = estimAltCm;
                     isAltHoldChanged = false;
                 }
-                throttleDemand = constrain(initialThrottleHold + BaroPID, config.throttleMin, config.throttleMax);
+                throttleDemand = constrain(initialThrottleHold + altPid, config.throttleMin, config.throttleMax);
             }
         } else {
             // slow alt changes
@@ -223,19 +199,21 @@ uint16_t Altitude::getThrottle(uint16_t throttleDemand, int16_t accelRaw[3], flo
                 velocityControl = true;
                 isAltHoldChanged = true;
             } else if (isAltHoldChanged) {
-                AltHold = EstAlt;
+                altHoldCm = estimAltCm;
                 velocityControl = false;
                 isAltHoldChanged = false;
             }
-            throttleDemand = constrain(initialThrottleHold + BaroPID, config.throttleMin, config.throttleMax);
+            throttleDemand = constrain(initialThrottleHold + altPid, config.throttleMin, config.throttleMax);
         }
     }
 
+    Serial.println(throttleDemand);
+
     return throttleDemand;
 
-} // getThrottle
+} // modifyThrottleDemand
 
-void Altitude::computePid(float pressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec)
+void Altitude::computePid(float baroPressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec)
 {  
     static uint32_t previousTimeUsec;
     uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
@@ -243,50 +221,37 @@ void Altitude::computePid(float pressure, float eulerAnglesDegrees[3], uint32_t 
 
     // Start baro calibration if not yet started
     if (!baroCalibrationStart) 
-        baroCalibrationStart = millis();
+        baroCalibrationStart = currentTimeUsec;
 
-    // Smoothe baro pressure using history
-    uint8_t indexplus1 = (baroHistIdx + 1) % BARO_TAB_SIZE;
-    baroHistTab[baroHistIdx] = (int32_t)pressure;
-    baroPressureSum += baroHistTab[baroHistIdx];
-    baroPressureSum -= baroHistTab[indexplus1];
-    baroHistIdx = indexplus1;
+    // Update the baro with the current pressure reading
+    baro.update(baroPressure);
 
-    // Compute baro ground altitude during calibration
-    if (millis() - baroCalibrationStart < 1000*BARO_CALIBRATION_SEC) {
-        baroGroundPressure -= baroGroundPressure / 8;
-        baroGroundPressure += baroPressureSum / (BARO_TAB_SIZE - 1);
-        baroGroundAltitude = paToCm(baroGroundPressure/8);
-        vel = 0;
+    // Reset velocity and acceleration during baro calibration
+    if (currentTimeUsec - baroCalibrationStart < 1e6*config.baro.calibrationSeconds) {
+        baro.calibrate();
+        velocityCmPerSec = 0;
         accelAlt = 0;
     }
 
-    int32_t BaroAlt_tmp = paToCm((float)baroPressureSum/(BARO_TAB_SIZE-1)); 
-    BaroAlt_tmp -= baroGroundAltitude;
-    BaroAlt = lrintf((float)BaroAlt * BARO_NOISE_LPF + (float)BaroAlt_tmp * (1.0f - BARO_NOISE_LPF)); // additional LPF to reduce baro noise
+    // Get estimated altitude from baro
+    int32_t baroAltCm = baro.computeAltitude();
 
-    float dt = accelTimeSum * 1e-6f; // delta acc reading time in seconds
+    // Compute dt for acceleration
+    float dt = accelTimeSum * 1e-6f;
 
     // Integrate acceleration to get velocity in cm/sec
     float accelZTmp = (float)accelZSum / (float)accelSumCount;
     float vel_acc = accelZTmp * accelVelScale * (float)accelTimeSum;
 
     // Integrate velocity to get altitude in cm: x= a/2 * t^2
-    accelAlt += (vel_acc * 0.5f) * dt + vel * dt;                                         
+    accelAlt += (vel_acc * 0.5f) * dt + velocityCmPerSec * dt;                                         
 
     // Apply complementary filter to fuse baro and accel
-    accelAlt = accelAlt * BARO_CF_ALT + (float)BaroAlt * (1.0f - BARO_CF_ALT);      
+    accelAlt = accelAlt * config.cfAlt + (float)baroAltCm * (1.0f - config.cfAlt);      
 
-    EstAlt = BaroAlt; 
+    estimAltCm = baroAltCm; 
 
-    /*
-       if (sonarAlt > 0 && sonarAlt < 200)
-       EstAlt = BaroAlt;
-       else
-       EstAlt = accAlt;
-     */
-
-    vel += vel_acc;
+    velocityCmPerSec += vel_acc;
 
     // Now that computed acceleration, reset it for next time
     accelZSum = 0;
@@ -294,18 +259,18 @@ void Altitude::computePid(float pressure, float eulerAnglesDegrees[3], uint32_t 
     accelTimeSum = 0;
 
     // Compute velocity from barometer
-    int32_t baroVel = (BaroAlt - lastBaroAlt) * 1000000.0f / dT_usec;
-    lastBaroAlt = BaroAlt;
+    int32_t baroVel = (baroAltCm - lastBaroAltCm) * 1000000.0f / dT_usec;
+    lastBaroAltCm = baroAltCm;
     baroVel = constrain(baroVel, -1500, 1500);    // constrain baro velocity +/- 1500cm/s
     baroVel = deadbandFilter(baroVel, 10);         // to reduce noise near zero
 
     // Apply complementary filter to keep the calculated velocity based on baro velocity (i.e. near real velocity).
     // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
-    vel = vel * BARO_CF_VEL + baroVel * (1 - BARO_CF_VEL);
-    int32_t vel_tmp = lrintf(vel);
+    velocityCmPerSec = velocityCmPerSec * config.cfVel + baroVel * (1 - config.cfVel);
+    int32_t vel_tmp = lrintf(velocityCmPerSec);
 
     // only calculate pid if the copters thrust is facing downwards(<80deg)
-    BaroPID = 0;
+    altPid = 0;
     uint16_t tiltAngle = (abs(eulerAnglesDegrees[0]) >  abs(eulerAnglesDegrees[1])) ? abs(eulerAnglesDegrees[0]) : abs(eulerAnglesDegrees[1]);
 
     if (tiltAngle < config.maxTiltAngle) { 
@@ -315,32 +280,25 @@ void Altitude::computePid(float pressure, float eulerAnglesDegrees[3], uint32_t 
 
         // Altitude P-Controller
         if (!velocityControl) {
-            error = constrain(AltHold - EstAlt, -500, 500);
+            error = constrain(altHoldCm - estimAltCm, -500, 500);
             error = deadbandFilter(error, 10);       // remove small P parametr to reduce noise near zero position
-            setVel = constrain((PID_ALT_P * error / 128), -300, +300); // limit velocity to +/- 3 m/s
+            setVel = constrain(config.pidAltP * error, -300, +300); // limit velocity to +/- 3 m/s
         } 
 
         // Velocity PID-Controller
         // P
         error = setVel - vel_tmp;
-        BaroPID = constrain((PID_VEL_P * error / 32), -300, +300);
+        altPid = constrain(config.pidVelP * error, -300, +300);
 
         // I
-        errorVelocityI += (PID_VEL_I * error);
-        errorVelocityI = constrain(errorVelocityI, -(8196 * 200), (8196 * 200));
-        BaroPID += errorVelocityI / 8196;     // I in the range of +/-200
+        errorVelocityI += (config.pidVelI * error);
+        errorVelocityI = constrain(errorVelocityI, -200, +200);
+        altPid += errorVelocityI;
 
         // D
-        BaroPID -= constrain(PID_VEL_D * (accelZTmp + accelZOld) / 512, -150, 150);
+        altPid -= constrain(config.pidVelD * (accelZTmp + accelZOld), -150, 150);
 
     } 
-
-    /*
-    dump("AltHold", AltHold, "    ");
-    dump("setVelocity", setVelocity, "    ");
-    dump("velocityControl", velocityControl, "    ");
-    dump("BaroPID", BaroPID, "\n");
-    */
 
     accelZOld = accelZTmp;
 
@@ -351,9 +309,9 @@ void Altitude::handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand)
     if (auxState > 0) {
         holdingAltitude = true;
         initialThrottleHold = throttleDemand;
-        AltHold = EstAlt;
+        altHoldCm = estimAltCm;
         errorVelocityI = 0;
-        BaroPID = 0;
+        altPid = 0;
     }
     else {
         holdingAltitude = false;
@@ -408,12 +366,6 @@ int32_t Altitude::deadbandFilter(int32_t value, int32_t deadband)
         value += deadband;
     }
     return value;
-}
-
-// Pressure in Pascals to altitude in centimeters
-float Altitude::paToCm(uint32_t pa)
-{
-    return (1.0f - powf(pa / 101325.0f, 0.190295f)) * 4433000.0f;
 }
 
 } // namespace hf
