@@ -22,6 +22,7 @@
 
 #include "config.hpp"
 #include "barometer.hpp"
+#include "filter.hpp"
 
 namespace hf {
  
@@ -70,8 +71,6 @@ class Altitude {
         int32_t  setVelocity;      
         float    velocityCmPerSec;
         bool     velocityControl; 
-        
-        static int32_t deadbandFilter(int32_t value, int32_t deadband);
 };
 
 /********************************************* CPP ********************************************************/
@@ -96,10 +95,10 @@ void Altitude::init(const AltitudeConfig & _config)
     baroCalibrationStart = 0;
     lastBaroAltCm = 0;
 
-    accelVelScale = 9.80665f / config.accel1G / 10000.0f;
+    accelVelScale = 9.80665f / config.accel.oneG / 10000.0f;
 
     // Calculate RC time constant used in the accelZ lpf    
-    accelFc = (float)(0.5f / (M_PI * config.accelZLpfCutoff)); 
+    accelFc = (float)(0.5f / (M_PI * config.accel.lpfCutoff)); 
 
     for (int k=0; k<3; ++k) {
         accelSmooth[k] = 0;
@@ -133,8 +132,8 @@ void Altitude::updateAccelSum(int16_t accelRaw[3], float eulerAnglesRadians[3], 
     previousTimeUsec = currentTimeUsec;
 
     for (uint8_t k=0; k<3; k++) {
-        if (config.accelLpfFactor > 0) {
-            accelLpf[k] = accelLpf[k] * (1.0f - (1.0f / config.accelLpfFactor)) + accelRaw[k] * (1.0f / config.accelLpfFactor);
+        if (config.accel.lpfFactor > 0) {
+            accelLpf[k] = accelLpf[k] * (1.0f - (1.0f / config.accel.lpfFactor)) + accelRaw[k] * (1.0f / config.accel.lpfFactor);
             accelSmooth[k] = accelLpf[k];
         } else {
             accelSmooth[k] = accelRaw[k];
@@ -167,7 +166,7 @@ void Altitude::updateAccelSum(int16_t accelRaw[3], float eulerAnglesRadians[3], 
 
     // Apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
-    accelZSum += deadbandFilter((int32_t)lrintf(accelZSmooth),  config.accelZDeadband);
+    accelZSum += Filter::deadband((int32_t)lrintf(accelZSmooth),  config.accel.deadband);
 
     // Accumulate time and count for integrating accelerometer values
     accelTimeSum += dT_usec;
@@ -247,7 +246,7 @@ void Altitude::computePid(float baroPressure, float eulerAnglesDegrees[3], uint3
     accelAlt += (vel_acc * 0.5f) * dt + velocityCmPerSec * dt;                                         
 
     // Apply complementary filter to fuse baro and accel
-    accelAlt = accelAlt * config.cfAlt + (float)baroAltCm * (1.0f - config.cfAlt);      
+    accelAlt = Filter::complementary(accelAlt, baroAltCm, config.cfAlt);
 
     estimAltCm = baroAltCm; 
 
@@ -262,11 +261,11 @@ void Altitude::computePid(float baroPressure, float eulerAnglesDegrees[3], uint3
     int32_t baroVel = (baroAltCm - lastBaroAltCm) * 1000000.0f / dT_usec;
     lastBaroAltCm = baroAltCm;
     baroVel = constrain(baroVel, -1500, 1500);    // constrain baro velocity +/- 1500cm/s
-    baroVel = deadbandFilter(baroVel, 10);         // to reduce noise near zero
+    baroVel = Filter::deadband(baroVel, 10);         // to reduce noise near zero
 
     // Apply complementary filter to keep the calculated velocity based on baro velocity (i.e. near real velocity).
     // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
-    velocityCmPerSec = velocityCmPerSec * config.cfVel + baroVel * (1 - config.cfVel);
+    velocityCmPerSec = Filter::complementary(velocityCmPerSec, baroVel, config.cfVel);
     int32_t vel_tmp = lrintf(velocityCmPerSec);
 
     // only calculate pid if the copters thrust is facing downwards(<80deg)
@@ -281,7 +280,7 @@ void Altitude::computePid(float baroPressure, float eulerAnglesDegrees[3], uint3
         // Altitude P-Controller
         if (!velocityControl) {
             error = constrain(altHoldCm - estimAltCm, -500, 500);
-            error = deadbandFilter(error, 10);       // remove small P parametr to reduce noise near zero position
+            error = Filter::deadband(error, 10);       // remove small P parametr to reduce noise near zero position
             setVel = constrain(config.pidAltP * error, -300, +300); // limit velocity to +/- 3 m/s
         } 
 
@@ -353,19 +352,6 @@ void Altitude::rotateV(float v[3], float *delta)
     v[0] = v_tmp[0] * mat[0][0] + v_tmp[1] * mat[1][0] + v_tmp[2] * mat[2][0];
     v[1] = v_tmp[0] * mat[0][1] + v_tmp[1] * mat[1][1] + v_tmp[2] * mat[2][1];
     v[2] = v_tmp[0] * mat[0][2] + v_tmp[1] * mat[1][2] + v_tmp[2] * mat[2][2];
-}
-
-
-int32_t Altitude::deadbandFilter(int32_t value, int32_t deadband)
-{
-    if (abs(value) < deadband) {
-        value = 0;
-    } else if (value > 0) {
-        value -= deadband;
-    } else if (value < 0) {
-        value += deadband;
-    }
-    return value;
 }
 
 } // namespace hf

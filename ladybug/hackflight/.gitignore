@@ -4,6 +4,7 @@ board.hpp
 common.hpp
 config.hpp
 debug.hpp
+filter.hpp
 hackflight.hpp
 mixer.hpp
 msp.hpp

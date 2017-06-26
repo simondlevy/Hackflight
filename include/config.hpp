@@ -79,6 +79,18 @@ struct BarometerConfig {
 };
 
 //=========================================================================
+// Accelerometer config (for atltitude hold)
+//=========================================================================
+
+struct AccelerometerConfig {
+
+    uint16_t oneG        = 4096; // Raw accelerometer value when board is level
+    float    lpfCutoff   = 5.0f;
+    uint8_t  lpfFactor   = 4;
+    int32_t  deadband    = 40;
+};
+
+//=========================================================================
 // Altitude-hold config
 //=========================================================================
 
@@ -93,15 +105,12 @@ struct AltitudeConfig {
     // Barometer
     BarometerConfig baro;
 
+    // Acceleromter
+    AccelerometerConfig accel;
+
     // Complementry filter for accel/baro
     float    cfAlt                  = 0.965f;
     float    cfVel                  = 0.985f;
-
-    // Accelerometer
-    uint16_t accel1G                = 4096; // Raw accelerometer value when board is level
-    uint8_t  accelLpfFactor         = 4;
-    int32_t  accelZDeadband         = 40;
-    float    accelZLpfCutoff        = 5.0f;
 
     // Fused
     bool     fastChange             = true;
