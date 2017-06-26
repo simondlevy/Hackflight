@@ -239,7 +239,7 @@ void Hackflight::updateImu(void)
     if (board->extrasHaveBaro()) {
         int16_t accelRaw[3];
         board->extrasImuGetAccel(accelRaw);
-        alti.updateAccelSum(accelRaw, eulerAnglesRadians, board->getMicros(), armed);
+        alti.updateAccel(accelRaw, eulerAnglesRadians, board->getMicros(), armed);
         rc.command[DEMAND_THROTTLE] = alti.modifyThrottleDemand(rc.command[DEMAND_THROTTLE]);
     }
 

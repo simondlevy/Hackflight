@@ -31,7 +31,7 @@ class Barometer {
         void    init(const BarometerConfig & _config);
         void    calibrate(void);
         void    update(float pressure);
-        int32_t computeAltitude(void);
+        int32_t getAltitude(void);
 
     private:
 
@@ -82,7 +82,7 @@ void Barometer::update(float pressure)
     historyIdx = indexplus1;
 }
 
-int32_t Barometer::computeAltitude(void)
+int32_t Barometer::getAltitude(void)
 {
     int32_t altCm_tmp = paToCm((float)pressureSum/(BarometerConfig::HISTORY_SIZE-1)); 
     altCm_tmp -= groundAltitude;

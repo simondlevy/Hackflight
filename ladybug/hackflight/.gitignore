@@ -1,3 +1,4 @@
+accelerometer.hpp
 altitude.hpp
 barometer.hpp
 board.hpp
