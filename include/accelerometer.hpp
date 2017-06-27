@@ -1,5 +1,5 @@
 /* 
-   accelerometer.hpp: Altitude estimation via accelerometer Z integration
+   accelerometer.hpp: Altitude estimation via accelerometer Z-axis integration
 
    Adapted from
 
@@ -30,6 +30,7 @@ class Accelerometer {
         void  update(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed);
         float getAltitude(void);
         float getVelocity(void);
+        void  adjustVelocity(float fusedVelocity);
         float getAcceleration(void);
         void  reset(void);
         void  integrate(void);
@@ -149,14 +150,13 @@ void Accelerometer::integrate(void)
 
     // Integrate acceleration to get velocity in cm/sec
     float zTmp = (float)zSum / (float)sumCount;
-    Serial.println(zTmp);
-    float vel = zTmp * velScale * (float)timeSum;
+    float velAcc = zTmp * velScale * (float)timeSum;
     acceleration = zTmp + zOld;
     zOld = zTmp;
 
     // Integrate velocity to get altitude in cm: x= a/2 * t^2
-    altitude += (vel * 0.5f) * dt + velocity * dt;                                         
-    velocity += vel;
+    altitude += (velAcc * 0.5f) * dt + velocity * dt;                                         
+    velocity += velAcc;
 
     // Now that computed acceleration, reset it for next time
     zSum = 0;
@@ -172,6 +172,11 @@ float Accelerometer::getAltitude(void)
 float Accelerometer::getVelocity(void)
 {
     return velocity;
+}
+
+void Accelerometer::adjustVelocity(float fusedVelocity)
+{
+    velocity = fusedVelocity;
 }
 
 float Accelerometer::getAcceleration(void)

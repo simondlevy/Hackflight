@@ -95,7 +95,7 @@ int32_t Barometer::getAltitude(void)
 // Pressure in Pascals to altitude in centimeters
 float Barometer::paToCm(uint32_t pa)
 {
-        return (1.0f - powf(pa / 101325.0f, 0.190295f)) * 4433000.0f;
+    return (1.0f - powf(pa / 101325.0f, 0.190295f)) * 4433000.0f;
 }
 
 } // namespace hf

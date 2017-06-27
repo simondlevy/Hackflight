@@ -63,18 +63,6 @@ class Altitude {
 
 /********************************************* CPP ********************************************************/
 
-/*
-static void dump(const char * label, int32_t value, const char * end)
-{
-    Serial.print(label);
-    Serial.print(": ");
-    if (value>0) 
-        Serial.print("+"); 
-    Serial.print(value);
-    Serial.print(end);
-}
-*/
-
 void Altitude::init(const AltitudeConfig & _config)
 {
     memcpy(&config, &_config, sizeof(AltitudeConfig));
@@ -162,7 +150,7 @@ void Altitude::computePid(float baroPressure, float eulerAnglesDegrees[3], uint3
     // Integrate accelerometer to get altitude and velocity
     accel.integrate();
 
-    // Apply complementary filter to fuse baro and accel
+    // Apply complementary filter to fuse baro and accel altitude
     estimAlt = Filter::complementary(accel.getAltitude(), baroAltitude, config.cfAlt);
 
     // Compute velocity from barometer
@@ -174,6 +162,7 @@ void Altitude::computePid(float baroPressure, float eulerAnglesDegrees[3], uint3
     // Apply complementary filter to keep the calculated velocity based on baro velocity (i.e. near real velocity).
     // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
     float fusedVelocity = Filter::complementary(accel.getVelocity(), baroVelocity, config.cfVel);
+    accel.adjustVelocity(fusedVelocity);
 
     // only calculate pid if the copters thrust is facing downwards(<80deg)
     altPid = 0;
