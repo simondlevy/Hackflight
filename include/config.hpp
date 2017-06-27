@@ -113,7 +113,6 @@ struct AltitudeConfig {
     float    cfVel                  = 0.985f;
 
     // Fused
-    bool     fastChange             = true;
     uint8_t  maxTiltAngle           = 80;
     uint8_t  throttleNeutral        = 40;
     uint16_t throttleMin            = 1150;

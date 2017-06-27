@@ -92,33 +92,18 @@ void Altitude::updateAccel(int16_t accelRaw[3], float eulerAnglesRadians[3], uin
 uint16_t Altitude::modifyThrottleDemand(uint16_t throttleDemand)
 {
     if (holdingAltitude) {
-        if (config.fastChange) {
-            // rapid alt changes
-            if (abs(throttleDemand - initialThrottleHold) > config.throttleNeutral) {
-                errorVelocityI = 0;
-                isAltHoldChanged = true;
-                throttleDemand += (throttleDemand > initialThrottleHold) ? -config.throttleNeutral : config.throttleNeutral;
-            } else {
-                if (isAltHoldChanged) {
-                    altHold = estimAlt;
-                    isAltHoldChanged = false;
-                }
-                throttleDemand = constrain(initialThrottleHold + altPid, config.throttleMin, config.throttleMax);
-            }
-        } else {
-            // slow alt changes
-            if (abs(throttleDemand - initialThrottleHold) > config.throttleNeutral) {
-                // set velocity proportional to stick movement +100 throttle gives ~ +50 cm/s
-                setVelocity = (throttleDemand - initialThrottleHold) / 2;
-                velocityControl = true;
-                isAltHoldChanged = true;
-            } else if (isAltHoldChanged) {
-                altHold = estimAlt;
-                velocityControl = false;
-                isAltHoldChanged = false;
-            }
-            throttleDemand = constrain(initialThrottleHold + altPid, config.throttleMin, config.throttleMax);
+
+        if (abs(throttleDemand - initialThrottleHold) > config.throttleNeutral) {
+            // set velocity proportional to stick movement +100 throttle gives ~ +50 cm/s
+            setVelocity = (throttleDemand - initialThrottleHold) / 2;
+            velocityControl = true;
+            isAltHoldChanged = true;
+        } else if (isAltHoldChanged) {
+            altHold = estimAlt;
+            velocityControl = false;
+            isAltHoldChanged = false;
         }
+        throttleDemand = constrain(initialThrottleHold + altPid, config.throttleMin, config.throttleMax);
     }
 
     return throttleDemand;
