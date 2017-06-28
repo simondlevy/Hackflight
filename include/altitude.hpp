@@ -52,15 +52,11 @@ class Altitude {
         Accelerometer accel;
 
         // Fused
-        int32_t  altHold;
-        int32_t  altPid;
-        int32_t  errorVelocityI;
-        int32_t  estimAlt;
+        int32_t  AltHold;
+        int32_t  BaroPID;
+        int32_t  EstAlt;
         bool     holdingAltitude;
         int16_t  initialThrottleHold;
-        bool     isAltHoldChanged;
-
-        int32_t computeBaroVelocity(int32_t baroAltitude);
 };
 
 /********************************************* CPP ********************************************************/
@@ -78,10 +74,8 @@ void Altitude::init(const AltitudeConfig & _config, Board * _board)
     accel.init(config.accel);
 
     initialThrottleHold = 0;
-    altPid = 0;
-    errorVelocityI = 0;
+    BaroPID = 0;
     holdingAltitude = false;
-    isAltHoldChanged = false;
 }
 
 void Altitude::handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand)
@@ -89,9 +83,8 @@ void Altitude::handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand)
     if (auxState > 0) {
         holdingAltitude = true;
         initialThrottleHold = throttleDemand;
-        altHold = estimAlt;
-        errorVelocityI = 0;
-        altPid = 0;
+        AltHold = EstAlt;
+        BaroPID = 0;
     }
     else {
         holdingAltitude = false;
@@ -102,7 +95,7 @@ void Altitude::modifyThrottleDemand(int16_t & throttleDemand)
 {
     if (holdingAltitude) {
 
-        throttleDemand = constrain(initialThrottleHold + altPid, config.throttleMin, config.throttleMax);
+        throttleDemand = constrain(initialThrottleHold + BaroPID, config.throttleMin, config.throttleMax);
     }
 }
 
@@ -118,12 +111,50 @@ void Altitude::computePid(bool armed)
     }
 
     // Get estimated altitude from baro
-    int32_t baroAltitude = baro.getAltitude();
+    int32_t BaroAlt = baro.getAltitude();
 
-    float accZ = Filter::deadband(accel.accZ, config.accel.deadband);
+    EstAlt = BaroAlt;
 
-    Serial.println(accZ);
+    // Apply deadband filter to accelerometer Z
+    //float accZ = Filter::deadband(accel.accZ, config.accel.deadband);
 
+    //P
+    int16_t error16 = constrain(AltHold - EstAlt, -300, 300);
+    error16 = Filter::deadband(error16, 10); //remove small P parametr to reduce noise near zero position
+    BaroPID = constrain((config.pidP * error16 >>7), -150, +150);
+
+    Serial.println(BaroPID);
+
+    /*
+    //I
+    errorAltitudeI += conf.pid[PIDALT].I8 * error16 >>6;
+    errorAltitudeI = constrain(errorAltitudeI,-30000,30000);
+    BaroPID += errorAltitudeI>>9; //I in range +/-60
+ 
+    applyDeadband(accZ, ACC_Z_DEADBAND);
+
+    static int32_t lastBaroAlt;
+    // could only overflow with a difference of 320m, which is highly improbable here
+    int16_t baroVel = mul((EstAlt - lastBaroAlt) , (1000000 / UPDATE_INTERVAL));
+
+    lastBaroAlt = EstAlt;
+
+    baroVel = constrain(baroVel, -300, 300); // constrain baro velocity +/- 300cm/s
+    applyDeadband(baroVel, 10); // to reduce noise near zero
+
+    // Integrator - velocity, cm/sec
+    vel += accZ * ACC_VelScale * dTime;
+
+    // apply Complimentary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
+    // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
+    vel = vel * 0.985f + baroVel * 0.015f;
+
+    //D
+    vario = vel;
+    applyDeadband(vario, 5);
+    BaroPID -= constrain(conf.pid[PIDALT].D8 * vario >>4, -150, 150);
+    */
+ 
 } // computePid
 
 void Altitude::updateAccelerometer(float eulerAnglesRadians[3], bool armed)
@@ -132,18 +163,6 @@ void Altitude::updateAccelerometer(float eulerAnglesRadians[3], bool armed)
     int16_t accelRaw[3];
     board->extrasImuGetAccel(accelRaw);
     accel.update(accelRaw, eulerAnglesRadians, board->getMicros(), armed);
-}
-
-int32_t Altitude::computeBaroVelocity(int32_t baroAltitude)
-{
-    static uint32_t previousTimeUsec;
-    uint32_t currentTimeUsec = board->getMicros();
-    uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
-    previousTimeUsec = currentTimeUsec;
-    int32_t baroVelocity = (baroAltitude - lastBaroAlt) * 1000000.0f / dT_usec;
-    lastBaroAlt = baroAltitude;
-    baroVelocity = constrain(baroVelocity, -1500, 1500);    // constrain baro velocity +/- 1500cm/s
-    return Filter::deadband(baroVelocity, 10);         // to reduce noise near zero
 }
 
 } // namespace hf

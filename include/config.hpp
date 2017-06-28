@@ -95,10 +95,9 @@ struct AccelerometerConfig {
 struct AltitudeConfig {
 
     // PID
-    float    pidAltP                = 0.40f;
-    float    pidVelP                = 3.75f;
-    float    pidVelI                = 0.005f;
-    float    pidVelD                = 0.002f;
+    uint8_t pidP   = 64; 
+    uint8_t pidI   = 25; 
+    uint8_t pidD   = 24;
 
     // Barometer
     BarometerConfig baro;
