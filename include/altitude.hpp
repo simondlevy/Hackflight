@@ -120,6 +120,10 @@ void Altitude::computePid(bool armed)
     // Get estimated altitude from baro
     int32_t baroAltitude = baro.getAltitude();
 
+    float accZ = Filter::deadband(accel.accZ, config.accel.deadband);
+
+    Serial.println(accZ);
+
 } // computePid
 
 void Altitude::updateAccelerometer(float eulerAnglesRadians[3], bool armed)
