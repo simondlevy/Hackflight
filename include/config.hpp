@@ -72,9 +72,7 @@ struct ImuConfig {
 
 struct BarometerConfig {
 
-    uint8_t  calibrationSeconds = 8;
-    float    noiseLpf           = 0.5f;
-
+    float                noiseLpf     = 0.5f;
     static const uint8_t HISTORY_SIZE = 48;
 };
 

@@ -33,7 +33,7 @@ class Stabilize {
 public:
     int16_t axisPID[3];
 
-    void init(const PidConfig& _pidConfig, const ImuConfig& _imuConfig, Board * _board);
+    void init(const PidConfig& _pidConfig, const ImuConfig& _imuConfig);
 
     void update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3]);
 
@@ -60,11 +60,8 @@ private:
 
 /********************************************* CPP ********************************************************/
 
-void Stabilize::init(const PidConfig& _pidConfig, const ImuConfig& _imuConfig, Board * _board)
+void Stabilize::init(const PidConfig& _pidConfig, const ImuConfig& _imuConfig)
 {
-    // a hack for debugging
-    board = _board;
-
     // We'll use PID, IMU config values in update() below
     memcpy(&pidConfig, &_pidConfig, sizeof(PidConfig));
     memcpy(&imuConfig, &_imuConfig, sizeof(ImuConfig));

@@ -52,6 +52,7 @@ class Accelerometer {
         int32_t   zSum;
         float     zOld;
 
+        void        resetIntegral(void);
         static void rotateV(float v[3], float *delta);
 
         AccelerometerConfig config;
@@ -92,9 +93,9 @@ void Accelerometer::update(int16_t accelRaw[3], float eulerAnglesRadians[3], uin
     uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
     previousTimeUsec = currentTimeUsec;
 
+    // Smooth the raw values if indicated
     for (uint8_t k=0; k<3; k++) {
         if (config.lpfFactor > 0) {
-
             // XXX should use Filter::lpf()
             lpf[k] = lpf[k] * (1.0f - (1.0f / config.lpfFactor)) + accelRaw[k] * (1.0f / config.lpfFactor);
             smooth[k] = lpf[k];
@@ -110,22 +111,22 @@ void Accelerometer::update(int16_t accelRaw[3], float eulerAnglesRadians[3], uin
     rpy[1] = -(float)eulerAnglesRadians[1];
     rpy[2] = -(float)eulerAnglesRadians[2];
 
-    float       accelNed[3];
-    accelNed[0] = smooth[0];
-    accelNed[1] = smooth[1];
-    accelNed[2] = smooth[2];
-    Accelerometer::rotateV(accelNed, rpy);
+    float ned[3];
+    ned[0] = smooth[0];
+    ned[1] = smooth[1];
+    ned[2] = smooth[2];
+    Accelerometer::rotateV(ned, rpy);
 
     // Compute vertical acceleration offset at rest
     if (!armed) {
         zOffset -= zOffset / 64;
-        zOffset += (int32_t)accelNed[2];
+        zOffset += (int32_t)ned[2];
     }
+    ned[2] -= zOffset / 64;
 
     // Compute smoothed vertical acceleration
-    accelNed[2] -= zOffset / 64;  // compensate for gravitation on z-axis
     float dT_sec = dT_usec * 1e-6f;
-    zSmooth = zSmooth + (dT_sec / (fc + dT_sec)) * (accelNed[2] - zSmooth); // XXX Should user Filter::____
+    zSmooth = zSmooth + (dT_sec / (fc + dT_sec)) * (ned[2] - zSmooth); // XXX Should user Filter::____
 
     // Apply Deadband to reduce integration drift and vibration influence and
     // sum up Values for later integration to get velocity and distance
@@ -141,6 +142,8 @@ void Accelerometer::reset()
 {
     velocity = 0;
     altitude = 0;
+
+    resetIntegral();
 }
 
 void Accelerometer::integrate(void)
@@ -159,9 +162,7 @@ void Accelerometer::integrate(void)
     velocity += velAcc;
 
     // Now that computed acceleration, reset it for next time
-    zSum = 0;
-    sumCount = 0;
-    timeSum = 0;
+    resetIntegral();
 }
 
 float Accelerometer::getAltitude(void)
@@ -182,6 +183,13 @@ void Accelerometer::adjustVelocity(float fusedVelocity)
 float Accelerometer::getAcceleration(void)
 {
     return acceleration;
+}
+
+void Accelerometer::resetIntegral(void)
+{
+    zSum = 0;
+    sumCount = 0;
+    timeSum = 0;
 }
 
 void Accelerometer::rotateV(float v[3], float *delta)

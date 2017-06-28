@@ -32,7 +32,7 @@ class Altitude {
     public:
 
         void     init(const AltitudeConfig & _config);
-        void     computePid(float baroPressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec);
+        void     computePid(float baroPressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec, bool armed);
         void     handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand);
         void     updateAccel(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed);
         uint16_t modifyThrottleDemand(uint16_t throttleDemand);
@@ -110,23 +110,16 @@ uint16_t Altitude::modifyThrottleDemand(uint16_t throttleDemand)
 
 } // modifyThrottleDemand
 
-void Altitude::computePid(float baroPressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec)
+void Altitude::computePid(float baroPressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec, bool armed)
 {  
-    static uint32_t previousTimeUsec;
-    uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
-    previousTimeUsec = currentTimeUsec;
-
-    // Start baro calibration if not yet started
-    if (!baroCalibrationStart) 
-        baroCalibrationStart = currentTimeUsec;
-
     // Update the baro with the current pressure reading
     baro.update(baroPressure);
 
-    // Reset velocity and acceleration during baro calibration
-    if (currentTimeUsec - baroCalibrationStart < 1e6*config.baro.calibrationSeconds) {
+    // Calibrate baro while not armed
+    if (!armed) {
         baro.calibrate();
         accel.reset();
+        return;
     }
 
     // Get estimated altitude from baro
@@ -139,6 +132,9 @@ void Altitude::computePid(float baroPressure, float eulerAnglesDegrees[3], uint3
     estimAlt = Filter::complementary(accel.getAltitude(), baroAltitude, config.cfAlt);
 
     // Compute velocity from barometer
+    static uint32_t previousTimeUsec;
+    uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
+    previousTimeUsec = currentTimeUsec;
     int32_t baroVelocity = (baroAltitude - lastBaroAlt) * 1000000.0f / dT_usec;
     lastBaroAlt = baroAltitude;
     baroVelocity = constrain(baroVelocity, -1500, 1500);    // constrain baro velocity +/- 1500cm/s
@@ -146,8 +142,8 @@ void Altitude::computePid(float baroPressure, float eulerAnglesDegrees[3], uint3
 
     // Apply complementary filter to keep the calculated velocity based on baro velocity (i.e. near real velocity).
     // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
-    float fusedVelocity = Filter::complementary(accel.getVelocity(), baroVelocity, config.cfVel);
-    accel.adjustVelocity(fusedVelocity);
+    float estimVel = Filter::complementary(accel.getVelocity(), baroVelocity, config.cfVel);
+    accel.adjustVelocity(estimVel);
 
     // only calculate pid if the copters thrust is facing downwards(<80deg)
     altPid = 0;
@@ -167,7 +163,7 @@ void Altitude::computePid(float baroPressure, float eulerAnglesDegrees[3], uint3
 
         // Velocity PID-Controller
         // P
-        error = setVel - (int32_t)lrintf(fusedVelocity);
+        error = setVel - (int32_t)lrintf(estimVel);
         altPid = constrain(config.pidVelP * error, -300, +300);
 
         // I

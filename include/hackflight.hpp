@@ -118,8 +118,8 @@ void Hackflight::init(Board * _board)
     rc.init(config.rc, config.pwm, board);
 
     // Initialize our stabilization, mixing, and MSP (serial comms)
-    stab.init(config.pid, config.imu, board);
-    mixer.init(config.pwm, &rc, &stab); 
+    stab.init(config.pid, config.imu);
+    mixer.init(config.pwm, &rc, &stab, board); 
     msp.init(&mixer, &rc, board);
 
     // Initialize altitude estimator, which will be used if there's a barometer
@@ -146,7 +146,7 @@ void Hackflight::update(void)
 
     // Altithude-PID task (never called in same loop iteration as RC update)
     else if (board->extrasHaveBaro() && altitudeTask.checkAndUpdate(currentTime)) {
-        alti.computePid(board->extrasGetBaroPressure(), eulerAnglesDegrees, board->getMicros());
+        alti.computePid(board->extrasGetBaroPressure(), eulerAnglesDegrees, board->getMicros(), armed);
     }
 
     // Polling for EM7180 SENtral Sensor Fusion IMU
@@ -231,10 +231,6 @@ void Hackflight::updateImu(void)
     // Update status using Euler angles
     updateReadyState();
 
-    // Get raw gyro values from board
-    int16_t gyroRaw[3];
-    board->imuGetGyro(gyroRaw);
-
     // If barometer avaialble, compute accelerometer-based altitude for fusion with baro altitude
     if (board->extrasHaveBaro()) {
         int16_t accelRaw[3];
@@ -243,9 +239,13 @@ void Hackflight::updateImu(void)
         rc.command[DEMAND_THROTTLE] = alti.modifyThrottleDemand(rc.command[DEMAND_THROTTLE]);
     }
 
+    // Get raw gyro values from board
+    int16_t gyroRaw[3];
+    board->imuGetGyro(gyroRaw);
+
     // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
     stab.update(rc.command, gyroRaw, eulerAnglesDegrees);
-    mixer.update(armed, board);
+    mixer.update(armed);
     msp.update(eulerAnglesDegrees, armed);
 } 
 

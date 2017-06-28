@@ -32,14 +32,16 @@ public:
     // This is set by MSP
     int16_t  motorsDisarmed[4];
 
-    void init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize);
-    void update(bool armed, Board* board);
+    void init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize, Board * _board);
+    void update(bool armed);
 
 private:
 
     PwmConfig pwmConfig;
     RC        * rc;
     Stabilize * stabilize;
+
+    Board * board;
 
     // Custom mixer data per motor
     typedef struct motorMixer_t {
@@ -55,7 +57,7 @@ private:
 
 /********************************************* CPP ********************************************************/
 
-void Mixer::init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize)
+void Mixer::init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize, Board * _board)
 {
     mixerQuadX[0] = { +1.0f, -1.0f,  +1.0f, -1.0f };    // right rear
     mixerQuadX[1] = { +1.0f, -1.0f,  -1.0f, +1.0f };    // right front
@@ -66,13 +68,14 @@ void Mixer::init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize)
 
     stabilize = _stabilize;
     rc = _rc;
+    board = _board;
 
     // set disarmed motor values
     for (uint8_t i = 0; i < 4; i++)
         motorsDisarmed[i] = pwmConfig.min;
 }
 
-void Mixer::update(bool armed, Board* board)
+void Mixer::update(bool armed)
 {
     int16_t motors[4];
 

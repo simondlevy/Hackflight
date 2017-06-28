@@ -108,7 +108,6 @@ void RC::update()
 
     // Other kinds of receivers require average of channel values to remove noise
     else {
-
         for (uint8_t chan = 0; chan < 8; chan++) {
             dataAverage[chan][averageIndex % 4] = board->rcReadChannel(chan);
             data[chan] = 0;
