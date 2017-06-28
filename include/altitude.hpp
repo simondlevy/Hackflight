@@ -103,6 +103,8 @@ void Altitude::modifyThrottleDemand(int16_t & throttleDemand)
 {
     if (holdingAltitude) {
 
+        Serial.println(BaroPID);
+
         throttleDemand = constrain(initialThrottleHold + BaroPID, config.throttleMin, config.throttleMax);
     }
 }
@@ -157,18 +159,10 @@ void Altitude::computePid(bool armed)
     // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
     vel = Filter::complementary(vel, baroVel, config.cfVel);
 
-     if (vel>0) Serial.print("+"); Serial.println(vel);
-
-    /*
-    // apply Complimentary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
-    // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
-    vel = vel * 0.985f + baroVel * 0.015f;
-
     //D
-    vario = vel;
-    applyDeadband(vario, 5);
-    BaroPID -= constrain(conf.pid[PIDALT].D8 * vario >>4, -150, 150);
-    */
+    int32_t vario = vel;
+    vario = Filter::deadband(vario, 5);
+    BaroPID -= constrain(config.pidD * vario >>4, -150, 150);
  
 } // computePid
 
