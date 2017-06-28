@@ -32,7 +32,8 @@ class Altitude {
     public:
 
         void init(const AltitudeConfig & _config, Board * _board);
-        void handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand);
+        void start(uint16_t throttleDemand);
+        void stop(void);
         void computePid(bool armed);
         void updateAccelerometer(float eulerAnglesRadians[3], bool armed);
         void modifyThrottleDemand(int16_t & throttleDemand);
@@ -55,8 +56,9 @@ class Altitude {
         int32_t  AltHold;
         int32_t  BaroPID;
         int32_t  EstAlt;
+        int16_t  errorAltitudeI;
         bool     holdingAltitude;
-        int16_t  initialThrottleHold;
+        int16_t  initialThrottleHold; 
 };
 
 /********************************************* CPP ********************************************************/
@@ -76,19 +78,21 @@ void Altitude::init(const AltitudeConfig & _config, Board * _board)
     initialThrottleHold = 0;
     BaroPID = 0;
     holdingAltitude = false;
+    errorAltitudeI = 0;
 }
 
-void Altitude::handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand)
+void Altitude::start(uint16_t throttleDemand)
 {
-    if (auxState > 0) {
-        holdingAltitude = true;
-        initialThrottleHold = throttleDemand;
-        AltHold = EstAlt;
-        BaroPID = 0;
-    }
-    else {
-        holdingAltitude = false;
-    }
+    holdingAltitude = true;
+    initialThrottleHold = throttleDemand;
+    AltHold = EstAlt;
+    BaroPID = 0;
+    errorAltitudeI = 0;
+}
+
+void Altitude::stop(void)
+{
+    holdingAltitude = false;
 }
 
 void Altitude::modifyThrottleDemand(int16_t & throttleDemand)
@@ -127,7 +131,7 @@ void Altitude::computePid(bool armed)
 
     /*
     //I
-    errorAltitudeI += conf.pid[PIDALT].I8 * error16 >>6;
+    errorAltitudeI += config.pidI * error16 >>6;
     errorAltitudeI = constrain(errorAltitudeI,-30000,30000);
     BaroPID += errorAltitudeI>>9; //I in range +/-60
  

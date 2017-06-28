@@ -94,7 +94,7 @@ struct AccelerometerConfig {
 
 struct AltitudeConfig {
 
-    // PID
+    // PID: XXX should be floating-point
     uint8_t pidP   = 64; 
     uint8_t pidI   = 25; 
     uint8_t pidD   = 24;

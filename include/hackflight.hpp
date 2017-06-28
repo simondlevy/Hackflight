@@ -204,7 +204,12 @@ void Hackflight::updateRc(void)
     if (rc.getAuxState() != auxState) {
         auxState = rc.getAuxState();
         if (board->extrasHaveBaro()) {
-            alti.handleAuxSwitch(auxState, rc.command[DEMAND_THROTTLE]);
+            if (auxState > 0) {
+                alti.start(rc.command[DEMAND_THROTTLE]);
+            }
+            else {
+                alti.stop();
+            }
         }
     }
 }
