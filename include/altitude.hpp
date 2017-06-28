@@ -61,6 +61,9 @@ class Altitude {
         bool     isAltHoldChanged;
         int32_t  setVelocity;      
         bool     velocityControl; 
+
+        int32_t computeBaroVelocity(int32_t baroAltitude);
+        int32_t updatePid(float estimVel);
 };
 
 /********************************************* CPP ********************************************************/
@@ -101,13 +104,7 @@ void Altitude::handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand)
     }
 }
 
-void Altitude::updateAccelerometer(float eulerAnglesRadians[3], bool armed)
-{
-    // Throttle modification is synched to aquisition of new IMU data
-    int16_t accelRaw[3];
-    board->extrasImuGetAccel(accelRaw);
-    accel.update(accelRaw, eulerAnglesRadians, board->getMicros(), armed);
-}
+
 
 void Altitude::modifyThrottleDemand(int16_t & throttleDemand)
 {
@@ -149,14 +146,7 @@ void Altitude::computePid(float eulerAnglesDegrees[3], bool armed)
     estimAlt = Filter::complementary(accel.getAltitude(), baroAltitude, config.cfAlt);
 
     // Compute velocity from barometer
-    static uint32_t previousTimeUsec;
-    uint32_t currentTimeUsec = board->getMicros();
-    uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
-    previousTimeUsec = currentTimeUsec;
-    int32_t baroVelocity = (baroAltitude - lastBaroAlt) * 1000000.0f / dT_usec;
-    lastBaroAlt = baroAltitude;
-    baroVelocity = constrain(baroVelocity, -1500, 1500);    // constrain baro velocity +/- 1500cm/s
-    baroVelocity = Filter::deadband(baroVelocity, 10);         // to reduce noise near zero
+    int32_t baroVelocity = computeBaroVelocity(baroAltitude);
 
     // Apply complementary filter to keep the calculated velocity based on baro velocity (i.e. near real velocity).
     // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
@@ -164,35 +154,56 @@ void Altitude::computePid(float eulerAnglesDegrees[3], bool armed)
     accel.adjustVelocity(estimVel);
 
     // only calculate pid if the copters thrust is facing downwards(<80deg)
-    altPid = 0;
-    float tiltAngle = Filter::max(abs(eulerAnglesDegrees[0]), abs(eulerAnglesDegrees[1]));
-
-    if (tiltAngle < config.maxTiltAngle) { 
-
-        int32_t setVel = setVelocity;
-        int32_t error = 0;
-
-        // Altitude P-Controller
-        if (!velocityControl) {
-            error = constrain(altHold - estimAlt, -500, 500);
-            error = Filter::deadband(error, 10);       // remove small P parametr to reduce noise near zero position
-            setVel = constrain(config.pidAltP * error, -300, +300); // limit velocity to +/- 3 m/s
-        } 
-
-        // Velocity PID-Controller
-        // P
-        error = setVel - (int32_t)lrintf(estimVel);
-        altPid = constrain(config.pidVelP * error, -300, +300);
-
-        // I
-        errorVelocityI += (config.pidVelI * error);
-        errorVelocityI = constrain(errorVelocityI, -200, +200);
-        altPid += errorVelocityI;
-
-        // D
-        altPid -= constrain(config.pidVelD * accel.getAcceleration(), -150, 150);
-    } 
+    altPid = (Filter::max(abs(eulerAnglesDegrees[0]), abs(eulerAnglesDegrees[1])) < config.maxTiltAngle) ?  updatePid(estimVel) : 0;
 
 } // computePid
+
+void Altitude::updateAccelerometer(float eulerAnglesRadians[3], bool armed)
+{
+    // Throttle modification is synched to aquisition of new IMU data
+    int16_t accelRaw[3];
+    board->extrasImuGetAccel(accelRaw);
+    accel.update(accelRaw, eulerAnglesRadians, board->getMicros(), armed);
+}
+
+int32_t Altitude::updatePid(float estimVel)
+{
+    int32_t setVel = setVelocity;
+    int32_t error = 0;
+
+    // Altitude P-Controller
+    if (!velocityControl) {
+        error = constrain(altHold - estimAlt, -500, 500);
+        error = Filter::deadband(error, 10);       // remove small P parametr to reduce noise near zero position
+        setVel = constrain(config.pidAltP * error, -300, +300); // limit velocity to +/- 3 m/s
+    } 
+
+    // Velocity PID-Controller
+    // P
+    error = setVel - (int32_t)lrintf(estimVel);
+    int32_t newPid = constrain(config.pidVelP * error, -300, +300);
+
+    // I
+    errorVelocityI += (config.pidVelI * error);
+    errorVelocityI = constrain(errorVelocityI, -200, +200);
+    newPid += errorVelocityI;
+
+    // D
+    newPid -= constrain(config.pidVelD * accel.getAcceleration(), -150, 150);
+
+    return newPid;
+}
+
+int32_t Altitude::computeBaroVelocity(int32_t baroAltitude)
+{
+    static uint32_t previousTimeUsec;
+    uint32_t currentTimeUsec = board->getMicros();
+    uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
+    previousTimeUsec = currentTimeUsec;
+    int32_t baroVelocity = (baroAltitude - lastBaroAlt) * 1000000.0f / dT_usec;
+    lastBaroAlt = baroAltitude;
+    baroVelocity = constrain(baroVelocity, -1500, 1500);    // constrain baro velocity +/- 1500cm/s
+    return Filter::deadband(baroVelocity, 10);         // to reduce noise near zero
+}
 
 } // namespace hf
