@@ -31,14 +31,11 @@ class Altitude {
 
     public:
 
-        void     init(const AltitudeConfig & _config, Board * _board);
-        void     handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand);
-
-        void     getAttitude(void);
-        void     getAltitude(void);
-
-        //void     computePid(float eulerAnglesDegrees[3], bool armed);
-        //uint16_t modifyThrottleDemand(float eulerAnglesRadians[3], bool armed, uint16_t throttleDemand);
+        void init(const AltitudeConfig & _config, Board * _board);
+        void handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand);
+        void computePid(float eulerAnglesDegrees[3], bool armed);
+        void updateAccelerometer(float eulerAnglesRadians[3], bool armed);
+        void modifyThrottleDemand(int16_t & throttleDemand);
 
     private:
 
@@ -104,21 +101,16 @@ void Altitude::handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand)
     }
 }
 
-void Altitude::getAttitude(void)
+void Altitude::updateAccelerometer(float eulerAnglesRadians[3], bool armed)
 {
-}
-
-void Altitude::getAltitude(void)
-{
-}
-
-/*
-uint16_t Altitude::modifyThrottleDemand(float eulerAnglesRadians[3], bool armed, uint16_t throttleDemand)
-{
+    // Throttle modification is synched to aquisition of new IMU data
     int16_t accelRaw[3];
     board->extrasImuGetAccel(accelRaw);
     accel.update(accelRaw, eulerAnglesRadians, board->getMicros(), armed);
+}
 
+void Altitude::modifyThrottleDemand(int16_t & throttleDemand)
+{
     if (holdingAltitude) {
 
         if (abs(throttleDemand - initialThrottleHold) > config.throttleNeutral) {
@@ -133,10 +125,7 @@ uint16_t Altitude::modifyThrottleDemand(float eulerAnglesRadians[3], bool armed,
         }
         throttleDemand = constrain(initialThrottleHold + altPid, config.throttleMin, config.throttleMax);
     }
-
-    return throttleDemand;
-
-} // modifyThrottleDemand
+}
 
 void Altitude::computePid(float eulerAnglesDegrees[3], bool armed)
 {  
@@ -205,6 +194,5 @@ void Altitude::computePid(float eulerAnglesDegrees[3], bool armed)
     } 
 
 } // computePid
-*/
 
 } // namespace hf

@@ -146,7 +146,7 @@ void Hackflight::update(void)
 
     // Altithude-PID task (never called in same loop iteration as RC update)
     else if (board->extrasHaveBaro() && altitudeTask.checkAndUpdate(currentTime)) {
-        alti.getAltitude();
+        alti.computePid(eulerAnglesDegrees, armed);
     }
 
     // Polling for EM7180 SENtral Sensor Fusion IMU
@@ -231,9 +231,10 @@ void Hackflight::updateImu(void)
     // Update status using Euler angles
     updateReadyState();
 
-    // If barometer avaialble, compute accelerometer-based altitude for fusion with baro altitude
+    // If barometer avaialble, update accelerometer for altitude fusion, then modify throttle demand
     if (board->extrasHaveBaro()) {
-        alti.getAttitude();
+        alti.updateAccelerometer(eulerAnglesRadians, armed);
+        alti.modifyThrottleDemand(rc.command[DEMAND_THROTTLE]);
     }
 
     // Get raw gyro values from board
