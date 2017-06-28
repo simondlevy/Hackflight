@@ -155,7 +155,7 @@ void Altitude::computePid(bool armed)
 
     // apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
     // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
-    vel = vel * 0.985f + baroVel * 0.015f;
+    vel = Filter::complementary(vel, baroVel, config.cfVel);
 
      if (vel>0) Serial.print("+"); Serial.println(vel);
 
