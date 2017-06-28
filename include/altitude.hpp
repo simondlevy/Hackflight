@@ -31,15 +31,20 @@ class Altitude {
 
     public:
 
-        void     init(const AltitudeConfig & _config);
-        void     computePid(float baroPressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec, bool armed);
+        void     init(const AltitudeConfig & _config, Board * _board);
         void     handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand);
-        void     updateAccel(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed);
-        uint16_t modifyThrottleDemand(uint16_t throttleDemand);
+
+        void     getAttitude(void);
+        void     getAltitude(void);
+
+        //void     computePid(float eulerAnglesDegrees[3], bool armed);
+        //uint16_t modifyThrottleDemand(float eulerAnglesRadians[3], bool armed, uint16_t throttleDemand);
 
     private:
 
         AltitudeConfig config;
+
+        Board * board;
 
         // Barometer
         Barometer baro;
@@ -63,9 +68,11 @@ class Altitude {
 
 /********************************************* CPP ********************************************************/
 
-void Altitude::init(const AltitudeConfig & _config)
+void Altitude::init(const AltitudeConfig & _config, Board * _board)
 {
     memcpy(&config, &_config, sizeof(AltitudeConfig));
+
+    board = _board;
 
     baro.init(config.baro);
     baroCalibrationStart = 0;
@@ -83,14 +90,35 @@ void Altitude::init(const AltitudeConfig & _config)
 }
 
 
-void Altitude::updateAccel(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed)
+void Altitude::handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand)
 {
-    accel.update(accelRaw, eulerAnglesRadians, currentTimeUsec, armed);
-
+    if (auxState > 0) {
+        holdingAltitude = true;
+        initialThrottleHold = throttleDemand;
+        altHold = estimAlt;
+        errorVelocityI = 0;
+        altPid = 0;
+    }
+    else {
+        holdingAltitude = false;
+    }
 }
 
-uint16_t Altitude::modifyThrottleDemand(uint16_t throttleDemand)
+void Altitude::getAttitude(void)
 {
+}
+
+void Altitude::getAltitude(void)
+{
+}
+
+/*
+uint16_t Altitude::modifyThrottleDemand(float eulerAnglesRadians[3], bool armed, uint16_t throttleDemand)
+{
+    int16_t accelRaw[3];
+    board->extrasImuGetAccel(accelRaw);
+    accel.update(accelRaw, eulerAnglesRadians, board->getMicros(), armed);
+
     if (holdingAltitude) {
 
         if (abs(throttleDemand - initialThrottleHold) > config.throttleNeutral) {
@@ -110,10 +138,10 @@ uint16_t Altitude::modifyThrottleDemand(uint16_t throttleDemand)
 
 } // modifyThrottleDemand
 
-void Altitude::computePid(float baroPressure, float eulerAnglesDegrees[3], uint32_t currentTimeUsec, bool armed)
+void Altitude::computePid(float eulerAnglesDegrees[3], bool armed)
 {  
     // Update the baro with the current pressure reading
-    baro.update(baroPressure);
+    baro.update(board->extrasGetBaroPressure());
 
     // Calibrate baro while not armed
     if (!armed) {
@@ -133,6 +161,7 @@ void Altitude::computePid(float baroPressure, float eulerAnglesDegrees[3], uint3
 
     // Compute velocity from barometer
     static uint32_t previousTimeUsec;
+    uint32_t currentTimeUsec = board->getMicros();
     uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
     previousTimeUsec = currentTimeUsec;
     int32_t baroVelocity = (baroAltitude - lastBaroAlt) * 1000000.0f / dT_usec;
@@ -176,19 +205,6 @@ void Altitude::computePid(float baroPressure, float eulerAnglesDegrees[3], uint3
     } 
 
 } // computePid
-
-void Altitude::handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand)
-{
-    if (auxState > 0) {
-        holdingAltitude = true;
-        initialThrottleHold = throttleDemand;
-        altHold = estimAlt;
-        errorVelocityI = 0;
-        altPid = 0;
-    }
-    else {
-        holdingAltitude = false;
-    }
-}
+*/
 
 } // namespace hf

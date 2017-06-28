@@ -123,7 +123,7 @@ void Hackflight::init(Board * _board)
     msp.init(&mixer, &rc, board);
 
     // Initialize altitude estimator, which will be used if there's a barometer
-    alti.init(config.altitude);
+    alti.init(config.altitude, board);
 
     // Initialize state varriables
     for (int k=0; k<3; ++k) {
@@ -146,7 +146,7 @@ void Hackflight::update(void)
 
     // Altithude-PID task (never called in same loop iteration as RC update)
     else if (board->extrasHaveBaro() && altitudeTask.checkAndUpdate(currentTime)) {
-        alti.computePid(board->extrasGetBaroPressure(), eulerAnglesDegrees, board->getMicros(), armed);
+        alti.getAltitude();
     }
 
     // Polling for EM7180 SENtral Sensor Fusion IMU
@@ -233,10 +233,7 @@ void Hackflight::updateImu(void)
 
     // If barometer avaialble, compute accelerometer-based altitude for fusion with baro altitude
     if (board->extrasHaveBaro()) {
-        int16_t accelRaw[3];
-        board->extrasImuGetAccel(accelRaw);
-        alti.updateAccel(accelRaw, eulerAnglesRadians, board->getMicros(), armed);
-        rc.command[DEMAND_THROTTLE] = alti.modifyThrottleDemand(rc.command[DEMAND_THROTTLE]);
+        alti.getAttitude();
     }
 
     // Get raw gyro values from board
