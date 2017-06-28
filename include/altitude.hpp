@@ -47,10 +47,13 @@ class Altitude {
         // Barometer
         Barometer baro;
         uint32_t  baroCalibrationStart;
-        int32_t   lastBaroAlt;
 
-        // IMU
+        int32_t computeBaroVelocity(void);
+
+        // Accelerometer
         Accelerometer accel;
+        float ACC_VelScale;
+
 
         // Fused
         int32_t  AltHold;
@@ -71,9 +74,10 @@ void Altitude::init(const AltitudeConfig & _config, Board * _board)
 
     baro.init(config.baro);
     baroCalibrationStart = 0;
-    lastBaroAlt = 0;
 
     accel.init(config.accel);
+
+    ACC_VelScale = (9.80665f / 10000.0f / config.accel.oneG);
 
     initialThrottleHold = 0;
     BaroPID = 0;
@@ -132,23 +136,30 @@ void Altitude::computePid(bool armed)
     errorAltitudeI = constrain(errorAltitudeI,-30000,30000);
     BaroPID += errorAltitudeI>>9; //I in range +/-60
  
-    Serial.println(BaroPID);
-
-    /*
-    applyDeadband(accZ, ACC_Z_DEADBAND);
+    static uint32_t previousT;
+    uint32_t currentT = board->getMicros();
+    uint32_t dTime = currentT - previousT;
+    previousT = currentT;
 
     static int32_t lastBaroAlt;
-    // could only overflow with a difference of 320m, which is highly improbable here
-    int16_t baroVel = mul((EstAlt - lastBaroAlt) , (1000000 / UPDATE_INTERVAL));
-
+    int32_t baroVel = (BaroAlt - lastBaroAlt) * 1000000.0f / dTime;
     lastBaroAlt = EstAlt;
+    baroVel = constrain(baroVel, -300, 300); 
+    baroVel = Filter::deadband(baroVel, 10);
 
-    baroVel = constrain(baroVel, -300, 300); // constrain baro velocity +/- 300cm/s
-    applyDeadband(baroVel, 10); // to reduce noise near zero
+    float accZ = Filter::deadband(accel.accZ, config.accel.deadband);
 
     // Integrator - velocity, cm/sec
+    static float vel;
     vel += accZ * ACC_VelScale * dTime;
 
+    // apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
+    // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
+    vel = vel * 0.985f + baroVel * 0.015f;
+
+     if (vel>0) Serial.print("+"); Serial.println(vel);
+
+    /*
     // apply Complimentary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
     // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
     vel = vel * 0.985f + baroVel * 0.015f;
