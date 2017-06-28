@@ -33,7 +33,7 @@ class Altitude {
 
         void init(const AltitudeConfig & _config, Board * _board);
         void handleAuxSwitch(uint8_t auxState, uint16_t throttleDemand);
-        void computePid(bool armed);
+        void computePid(float eulerAnglesDegrees[3], bool armed);
         void updateAccelerometer(float eulerAnglesRadians[3], bool armed);
         void modifyThrottleDemand(int16_t & throttleDemand);
 
@@ -59,8 +59,11 @@ class Altitude {
         bool     holdingAltitude;
         int16_t  initialThrottleHold;
         bool     isAltHoldChanged;
+        int32_t  setVelocity;      
+        bool     velocityControl; 
 
         int32_t computeBaroVelocity(int32_t baroAltitude);
+        int32_t updatePid(float estimVel);
 };
 
 /********************************************* CPP ********************************************************/
@@ -78,6 +81,8 @@ void Altitude::init(const AltitudeConfig & _config, Board * _board)
     accel.init(config.accel);
 
     initialThrottleHold = 0;
+    setVelocity = 0;      
+    velocityControl = false; 
     altPid = 0;
     errorVelocityI = 0;
     holdingAltitude = false;
@@ -102,11 +107,21 @@ void Altitude::modifyThrottleDemand(int16_t & throttleDemand)
 {
     if (holdingAltitude) {
 
+        if (abs(throttleDemand - initialThrottleHold) > config.throttleNeutral) {
+            // set velocity proportional to stick movement +100 throttle gives ~ +50 cm/s
+            setVelocity = (throttleDemand - initialThrottleHold) / 2;
+            velocityControl = true;
+            isAltHoldChanged = true;
+        } else if (isAltHoldChanged) {
+            altHold = estimAlt;
+            velocityControl = false;
+            isAltHoldChanged = false;
+        }
         throttleDemand = constrain(initialThrottleHold + altPid, config.throttleMin, config.throttleMax);
     }
 }
 
-void Altitude::computePid(bool armed)
+void Altitude::computePid(float eulerAnglesDegrees[3], bool armed)
 {  
     // Update the baro with the current pressure reading
     baro.update(board->extrasGetBaroPressure());
@@ -114,11 +129,29 @@ void Altitude::computePid(bool armed)
     // Calibrate baro while not armed
     if (!armed) {
         baro.calibrate();
+        accel.reset();
         return;
     }
 
     // Get estimated altitude from baro
     int32_t baroAltitude = baro.getAltitude();
+
+    // Integrate accelerometer to get altitude and velocity
+    accel.integrate();
+
+    // Apply complementary filter to fuse baro and accel altitude
+    estimAlt = Filter::complementary(accel.getAltitude(), baroAltitude, config.cfAlt);
+
+    // Compute velocity from barometer
+    int32_t baroVelocity = computeBaroVelocity(baroAltitude);
+
+    // Apply complementary filter to keep the calculated velocity based on baro velocity (i.e. near real velocity).
+    // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
+    float estimVel = Filter::complementary(accel.getVelocity(), baroVelocity, config.cfVel);
+    accel.adjustVelocity(estimVel);
+
+    // only calculate pid if the copters thrust is facing downwards(<80deg)
+    altPid = (Filter::max(abs(eulerAnglesDegrees[0]), abs(eulerAnglesDegrees[1])) < config.maxTiltAngle) ?  updatePid(estimVel) : 0;
 
 } // computePid
 
@@ -128,6 +161,34 @@ void Altitude::updateAccelerometer(float eulerAnglesRadians[3], bool armed)
     int16_t accelRaw[3];
     board->extrasImuGetAccel(accelRaw);
     accel.update(accelRaw, eulerAnglesRadians, board->getMicros(), armed);
+}
+
+int32_t Altitude::updatePid(float estimVel)
+{
+    int32_t setVel = setVelocity;
+    int32_t error = 0;
+
+    // Altitude P-Controller
+    if (!velocityControl) {
+        error = constrain(altHold - estimAlt, -500, 500);
+        error = Filter::deadband(error, 10);       // remove small P parametr to reduce noise near zero position
+        setVel = constrain(config.pidAltP * error, -300, +300); // limit velocity to +/- 3 m/s
+    } 
+
+    // Velocity PID-Controller
+    // P
+    error = setVel - (int32_t)lrintf(estimVel);
+    int32_t newPid = constrain(config.pidVelP * error, -300, +300);
+
+    // I
+    errorVelocityI += (config.pidVelI * error);
+    errorVelocityI = constrain(errorVelocityI, -200, +200);
+    newPid += errorVelocityI;
+
+    // D
+    newPid -= constrain(config.pidVelD * accel.getAcceleration(), -150, 150);
+
+    return newPid;
 }
 
 int32_t Altitude::computeBaroVelocity(int32_t baroAltitude)

@@ -21,19 +21,20 @@ etc.) the Alienflight F3 board, and a Teensy 3.2-based controller,
 the hardware focus of the project has shifted to the Arduino-compatible, the
 STM32L4-based [Ladybug FC](http://diydrones.com/profiles/blogs/flight-of-the-ladybug).
 
-Thanks to a major effort by
-[Sytelus](https://github.com/sytelus), the core Hackflight 
-[firmware ](https://github.com/simondlevy/hackflight/tree/master/include) now
-adheres to standard practices for C++.  As you can see, the code
-follows the Arduino design pattern of a <b>setup()</b> routine that calls the
-<b>init()</b> method of a few objects (<b>IMU</b>, <b>RC</b>,
-<b>PID</b>, <b>Board</b>) and a <b>loop()</b> routine that calls the
-<b>update()</b> method and other methods of those objects.  The code provides
-abstraction (through the <b>Board</b> class) that should make it easy to use
-on other boards.  The <b>Board</b> class declares the pure virtual methods that you must override
-for implementation on a particular board or simulator, as well as a few &ldquo;extras&rdquo;,
-virtual methods that you can override for additional functionality like altitude-hold, hover-in-place,
-etc.  
+Thanks to some help from [Sytelus](https://github.com/sytelus), the core
+Hackflight [firmware](https://github.com/simondlevy/hackflight/tree/master/include) adheres to
+standard practices for C++, notably, short, simple methods and avoidance of
+compiler macros like <b>#ifdef</b> that can make it difficult to follow
+what the code is doing.  As you can see, the code follows the Arduino
+design pattern of a <b>setup()</b> routine that calls the <b>init()</b> method
+of a few objects (<b>IMU</b>, <b>RC</b>, <b>PID</b>, <b>Board</b>) and a
+<b>loop()</b> routine that calls the <b>update()</b> method and other methods
+of those objects.  The code provides abstraction (through the <b>Board</b>
+class) that should make it easy to use on other boards.  The <b>Board</b> class
+declares the pure virtual methods that you must override for implementation on
+a particular board or simulator, as well as a few &ldquo;extras&rdquo;, virtual
+methods that you can override for additional functionality like altitude-hold,
+hover-in-place, etc.  
 
 The only parameters you should need to adjust are the PID tuning 
 [params](https://github.com/simondlevy/hackflight/blob/master/include/config.hpp#L25-L43). 

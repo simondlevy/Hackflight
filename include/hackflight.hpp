@@ -146,7 +146,7 @@ void Hackflight::update(void)
 
     // Altithude-PID task (never called in same loop iteration as RC update)
     else if (board->extrasHaveBaro() && altitudeTask.checkAndUpdate(currentTime)) {
-        alti.computePid(eulerAnglesDegrees, armed);
+        alti.computePid(armed);
     }
 
     // Polling for EM7180 SENtral Sensor Fusion IMU

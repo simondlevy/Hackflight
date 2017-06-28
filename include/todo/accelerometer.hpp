@@ -28,16 +28,31 @@ class Accelerometer {
 
         void  init(const AccelerometerConfig & _config);
         void  update(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed);
-
-        float accZ;
+        float getAltitude(void);
+        float getVelocity(void);
+        void  adjustVelocity(float fusedVelocity);
+        float getAcceleration(void);
+        void  reset(void);
+        void  integrate(void);
 
     private:
+
+        float     altitude;
+        float     velocity;
+        float     acceleration;
 
         float     fc;
         float     lpf[3];
         int16_t   smooth[3];
+        int32_t   sumCount;
+        uint32_t  timeSum;
+        float     velScale;
         int32_t   zOffset;
+        float     zSmooth;
+        int32_t   zSum;
+        float     zOld;
 
+        void        resetIntegral(void);
         static void rotateV(float v[3], float *delta);
 
         AccelerometerConfig config;
@@ -49,6 +64,8 @@ void Accelerometer::init(const AccelerometerConfig & _config)
 {
     memcpy(&config, &_config, sizeof(AccelerometerConfig));
 
+    velScale = 9.80665f / config.oneG / 10000.0f;
+
     // Calculate RC time constant used in the low-pass filte
     fc = (float)(0.5f / (M_PI * config.lpfCutoff)); 
 
@@ -57,8 +74,16 @@ void Accelerometer::init(const AccelerometerConfig & _config)
         lpf[k] = 0;
     }
 
+    velocity = 0;
+    altitude = 0;
+    acceleration = 0;
+
     zOffset = 0;
-    accZ = 0;
+    timeSum = 0;
+    sumCount = 0;
+    zSmooth = 0;
+    zSum = 0;
+    zOld = 0;
 }
 
 void Accelerometer::update(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed)
@@ -101,9 +126,71 @@ void Accelerometer::update(int16_t accelRaw[3], float eulerAnglesRadians[3], uin
 
     // Compute smoothed vertical acceleration
     float dT_sec = dT_usec * 1e-6f;
-    accZ = accZ + (dT_sec / (fc + dT_sec)) * (ned[2] - accZ); // XXX Should user Filter::____
+    zSmooth = zSmooth + (dT_sec / (fc + dT_sec)) * (ned[2] - zSmooth); // XXX Should user Filter::____
+
+    // Apply Deadband to reduce integration drift and vibration influence and
+    // sum up Values for later integration to get velocity and distance
+    zSum += Filter::deadband((int32_t)lrintf(zSmooth),  config.deadband);
+
+    // Accumulate time and count for integrating accelerometer values
+    timeSum += dT_usec;
+    sumCount++;
 
 } // update
+
+void Accelerometer::reset()
+{
+    velocity = 0;
+    altitude = 0;
+
+    resetIntegral();
+}
+
+void Accelerometer::integrate(void)
+{
+    // Compute dt for acceleration
+    float dt = timeSum * 1e-6f;
+
+    // Integrate acceleration to get velocity in cm/sec
+    float zTmp = (float)zSum / (float)sumCount;
+    float velAcc = zTmp * velScale * (float)timeSum;
+    acceleration = zTmp + zOld;
+    zOld = zTmp;
+
+    // Integrate velocity to get altitude in cm: x= a/2 * t^2
+    altitude += (velAcc * 0.5f) * dt + velocity * dt;                                         
+    velocity += velAcc;
+
+    // Now that computed acceleration, reset it for next time
+    resetIntegral();
+}
+
+float Accelerometer::getAltitude(void)
+{
+    return altitude;
+}
+
+float Accelerometer::getVelocity(void)
+{
+    return velocity;
+}
+
+void Accelerometer::adjustVelocity(float fusedVelocity)
+{
+    velocity = fusedVelocity;
+}
+
+float Accelerometer::getAcceleration(void)
+{
+    return acceleration;
+}
+
+void Accelerometer::resetIntegral(void)
+{
+    zSum = 0;
+    sumCount = 0;
+    timeSum = 0;
+}
 
 void Accelerometer::rotateV(float v[3], float *delta)
 {
