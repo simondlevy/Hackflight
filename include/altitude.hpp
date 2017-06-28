@@ -127,14 +127,14 @@ void Altitude::computePid(bool armed)
     error16 = Filter::deadband(error16, 10); //remove small P parametr to reduce noise near zero position
     BaroPID = constrain((config.pidP * error16 >>7), -150, +150);
 
-    Serial.println(BaroPID);
-
-    /*
     //I
     errorAltitudeI += config.pidI * error16 >>6;
     errorAltitudeI = constrain(errorAltitudeI,-30000,30000);
     BaroPID += errorAltitudeI>>9; //I in range +/-60
  
+    Serial.println(BaroPID);
+
+    /*
     applyDeadband(accZ, ACC_Z_DEADBAND);
 
     static int32_t lastBaroAlt;
