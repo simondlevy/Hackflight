@@ -89,7 +89,6 @@ class Ladybug : public Board {
 
             // "Software trim"
             config.pid.softwareTrim[AXIS_ROLL]  = +37;
-            config.pid.softwareTrim[AXIS_PITCH] = -37;
 
             // Altitude-hold
             config.altitude.accel.oneG = 2048;

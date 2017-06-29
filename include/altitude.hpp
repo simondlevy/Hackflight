@@ -103,8 +103,6 @@ void Altitude::modifyThrottleDemand(int16_t & throttleDemand)
 {
     if (holdingAltitude) {
 
-        Serial.println(BaroPID);
-
         throttleDemand = constrain(initialThrottleHold + BaroPID, config.throttleMin, config.throttleMax);
     }
 }
