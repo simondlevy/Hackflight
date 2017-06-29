@@ -20,6 +20,7 @@
 
 #include "board.hpp"
 #include "stabilize.hpp"
+#include "filter.hpp"
 
 #include <cstring>
 
@@ -100,7 +101,7 @@ void Mixer::update(bool armed)
             motors[i] -= maxMotor - pwmConfig.max;
         }
 
-        motors[i] = constrain(motors[i], pwmConfig.min, pwmConfig.max);
+        motors[i] = Filter::constrainMinMax(motors[i], pwmConfig.min, pwmConfig.max);
 
         // Avoid sudden motor jump from right yaw while arming
         if (rc->throttleIsDown()) {

@@ -94,10 +94,15 @@ struct AccelerometerConfig {
 
 struct AltitudeConfig {
 
-    // PID: XXX should be floating-point
+    // PID tuning: XXX should be floating-point
     uint8_t pidP   = 64; 
     uint8_t pidI   = 25; 
     uint8_t pidD   = 24;
+
+    // Bounds
+    uint16_t pidMax    = 150;
+    uint16_t pErrorMax = 300;
+    uint16_t iErrorMax = 30000;
 
     // Barometer
     BarometerConfig baro;

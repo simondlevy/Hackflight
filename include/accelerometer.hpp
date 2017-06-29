@@ -28,11 +28,11 @@ class Accelerometer {
 
         void  init(const AccelerometerConfig & _config);
         void  update(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed);
-
-        float accZ;
+        float getAccZ(void);
 
     private:
 
+        float     accZ;
         float     fc;
         float     lpf[3];
         int16_t   smooth[3];
@@ -104,6 +104,12 @@ void Accelerometer::update(int16_t accelRaw[3], float eulerAnglesRadians[3], uin
     accZ = accZ + (dT_sec / (fc + dT_sec)) * (ned[2] - accZ); // XXX Should user Filter::____
 
 } // update
+
+
+float Accelerometer::getAccZ(void)
+{
+    return accZ;
+}
 
 void Accelerometer::rotateV(float v[3], float *delta)
 {

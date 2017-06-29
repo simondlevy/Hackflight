@@ -26,7 +26,7 @@
 #include "board.hpp"
 #include "config.hpp"
 #include "debug.hpp"
-#include "common.hpp"
+#include "filter.hpp"
 
 namespace hf {
 
@@ -160,7 +160,7 @@ void RC::computeExpo(void)
             command[channel] = -command[channel];
     }
 
-    tmp = constrain(data[DEMAND_THROTTLE], config.mincheck, 2000);
+    tmp = Filter::constrainMinMax(data[DEMAND_THROTTLE], config.mincheck, 2000);
     tmp = (uint32_t)(tmp - config.mincheck) * 1000 / (2000 - config.mincheck);       // [MINCHECK;2000] -> [0;1000]
     tmp2 = tmp / 100;
     command[DEMAND_THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 

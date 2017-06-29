@@ -20,6 +20,8 @@
    along with EM7180.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 namespace hf {
  
 class Filter {
@@ -27,10 +29,10 @@ class Filter {
     public:
         
         static int32_t deadband(int32_t value, int32_t deadband);
-
         static float   complementary(float a, float b, float c);
-
         static float   max(float a, float b);
+        static int32_t constrainMinMax(int32_t val, int32_t min, int32_t max);
+        static int32_t constrainAbs(int32_t val, int32_t max);
 };
 
 /********************************************* CPP ********************************************************/
@@ -55,6 +57,16 @@ float Filter::complementary(float a, float b, float c)
 float Filter::max(float a, float b)
 {
     return a > b ? a : b;
+}
+
+int32_t Filter::constrainMinMax(int32_t val, int32_t min, int32_t max)
+{
+    return (val<min) ? min : ((val>max) ? max : val);
+}
+
+int32_t Filter::constrainAbs(int32_t val, int32_t max)
+{
+    return constrainMinMax(val, -max, +max);
 }
 
 } // namespace hf

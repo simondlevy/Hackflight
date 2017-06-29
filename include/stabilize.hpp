@@ -26,6 +26,7 @@
 #include "rc.hpp"
 #include "config.hpp"
 #include "common.hpp"
+#include "filter.hpp"
 
 namespace hf {
 
@@ -81,7 +82,7 @@ int32_t Stabilize::computeITermGyro(float rateP, float rateI, int16_t rcCommand[
     int32_t error = ((int32_t)rcCommand[axis] * rateP) - gyroADC[axis];
 
     // Avoid integral windup
-    errorGyroI[axis] = constrain(errorGyroI[axis] + error, -16000, +16000);
+    errorGyroI[axis] = Filter::constrainAbs(errorGyroI[axis] + error, 16000);
 
     if ((std::abs(gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (std::abs(rcCommand[axis]) > 100)))
         errorGyroI[axis] = 0;
@@ -100,15 +101,12 @@ int16_t Stabilize::computeLevelPid(int16_t rcCommand[4], int16_t gyroADC[3], flo
     int32_t ITermGyro = computeITermGyro(pidConfig.ratePitchrollP, pidConfig.ratePitchrollI, rcCommand, gyroADC, axis);
 
     // max inclination
-    int32_t errorAngle = constrain(2 * rcCommand[axis], 
-            - imuConfig.maxAngleInclination, 
-            + imuConfig.maxAngleInclination) 
-        - 10*eulerAngles[axis];
+    int32_t errorAngle = Filter::constrainAbs(2*rcCommand[axis], imuConfig.maxAngleInclination) - 10*eulerAngles[axis];
 
     int32_t PTermAccel = errorAngle * pidConfig.levelP; 
 
     // Avoid integral windup
-    errorAngleI[axis] = constrain(errorAngleI[axis] + errorAngle, -10000, +10000);
+    errorAngleI[axis] = Filter::constrainAbs(errorAngleI[axis] + errorAngle, 10000);
 
     int32_t prop = (std::max)(std::abs(rcCommand[DEMAND_PITCH]), 
             std::abs(rcCommand[DEMAND_ROLL])); // range [0;500]
@@ -137,8 +135,7 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
     axisPID[AXIS_YAW] = computePid(pidConfig.yawP, rcCommand[AXIS_YAW], ITermGyroYaw, 0, gyroADC, AXIS_YAW);
 
     // Prevent "yaw jump" during yaw correction
-    axisPID[AXIS_YAW] = constrain(axisPID[AXIS_YAW], 
-            -100 - std::abs(rcCommand[DEMAND_YAW]), +100 + std::abs(rcCommand[DEMAND_YAW]));
+    axisPID[AXIS_YAW] = Filter::constrainAbs(axisPID[AXIS_YAW], 100 + std::abs(rcCommand[DEMAND_YAW]));
 }
 
 void Stabilize::resetIntegral(void)
