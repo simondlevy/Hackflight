@@ -35,10 +35,12 @@ class Accelerometer {
         float     accZ;
         float     fc;
         float     lpf[3];
+        uint32_t  previousTimeUsec;
         int16_t   smooth[3];
+        float     velScale;
         int32_t   zOffset;
 
-        static float rotateV(int16_t ned[3], float * angles);
+        static float rotate(int16_t ned[3], float * angles);
 
         AccelerometerConfig config;
 };
@@ -49,6 +51,8 @@ void Accelerometer::init(const AccelerometerConfig & _config)
 {
     memcpy(&config, &_config, sizeof(AccelerometerConfig));
 
+    velScale = (9.80665f / 10000.0f / config.oneG);
+
     // Calculate RC time constant used in the low-pass filte
     fc = (float)(0.5f / (M_PI * config.lpfCutoff)); 
 
@@ -57,6 +61,7 @@ void Accelerometer::init(const AccelerometerConfig & _config)
         lpf[k] = 0;
     }
 
+    previousTimeUsec = 0;
     zOffset = 0;
     accZ = 0;
 }
@@ -64,7 +69,6 @@ void Accelerometer::init(const AccelerometerConfig & _config)
 void Accelerometer::update(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed)
 {
     // Track delta time
-    static uint32_t previousTimeUsec;
     uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
     previousTimeUsec = currentTimeUsec;
 
@@ -80,7 +84,7 @@ void Accelerometer::update(int16_t accelRaw[3], float eulerAnglesRadians[3], uin
     }
 
     // Rotate accel values into the earth frame
-    float rotatedZ = Accelerometer::rotateV(smooth, eulerAnglesRadians);
+    float rotatedZ = Accelerometer::rotate(smooth, eulerAnglesRadians);
 
     // Compute vertical acceleration offset at rest
     if (!armed) {
@@ -98,11 +102,10 @@ void Accelerometer::update(int16_t accelRaw[3], float eulerAnglesRadians[3], uin
 
 float Accelerometer::getAccZ(void)
 {
-    Serial.println(accZ);
-    return accZ;
+    return Filter::deadband(accZ, config.deadband) * velScale;
 }
 
-float Accelerometer::rotateV(int16_t ned[3], float * angles)
+float Accelerometer::rotate(int16_t ned[3], float * angles)
 {
     float cosx = cosf(-angles[0]);
     float sinx = sinf(-angles[0]);
