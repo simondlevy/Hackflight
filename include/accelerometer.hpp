@@ -38,7 +38,7 @@ class Accelerometer {
         int16_t   smooth[3];
         int32_t   zOffset;
 
-        static void rotateV(float v[3], float *delta);
+        static float rotateV(int16_t ned[3], float * angles);
 
         AccelerometerConfig config;
 };
@@ -80,71 +80,36 @@ void Accelerometer::update(int16_t accelRaw[3], float eulerAnglesRadians[3], uin
     }
 
     // Rotate accel values into the earth frame
-
-    float rpy[3];
-    rpy[0] = -(float)eulerAnglesRadians[0];
-    rpy[1] = -(float)eulerAnglesRadians[1];
-    rpy[2] = -(float)eulerAnglesRadians[2];
-
-    float ned[3];
-    ned[0] = smooth[0];
-    ned[1] = smooth[1];
-    ned[2] = smooth[2];
-    Accelerometer::rotateV(ned, rpy);
+    float rotatedZ = Accelerometer::rotateV(smooth, eulerAnglesRadians);
 
     // Compute vertical acceleration offset at rest
     if (!armed) {
         zOffset -= zOffset / 64;
-        zOffset += (int32_t)ned[2];
+        zOffset += (int32_t)rotatedZ;
     }
-    ned[2] -= zOffset / 64;
+    rotatedZ -= zOffset / 64;
 
     // Compute smoothed vertical acceleration
     float dT_sec = dT_usec * 1e-6f;
-    accZ = accZ + (dT_sec / (fc + dT_sec)) * (ned[2] - accZ); // XXX Should user Filter::____
+    accZ = accZ + (dT_sec / (fc + dT_sec)) * (rotatedZ - accZ); // XXX Should user Filter::____
 
 } // update
 
 
 float Accelerometer::getAccZ(void)
 {
+    Serial.println(accZ);
     return accZ;
 }
 
-void Accelerometer::rotateV(float v[3], float *delta)
+float Accelerometer::rotateV(int16_t ned[3], float * angles)
 {
-    float * v_tmp = v;
+    float cosx = cosf(-angles[0]);
+    float sinx = sinf(-angles[0]);
+    float cosy = cosf(-angles[1]);
+    float siny = sinf(-angles[1]);
 
-    // This does a  "proper" matrix rotation using gyro deltas without small-angle approximation
-    float mat[3][3];
-    float cosx, sinx, cosy, siny, cosz, sinz;
-    float coszcosx, sinzcosx, coszsinx, sinzsinx;
-
-    cosx = cosf(delta[0]);
-    sinx = sinf(delta[0]);
-    cosy = cosf(delta[1]);
-    siny = sinf(delta[1]);
-    cosz = cosf(delta[2]);
-    sinz = sinf(delta[2]);
-
-    coszcosx = cosz * cosx;
-    sinzcosx = sinz * cosx;
-    coszsinx = sinx * cosz;
-    sinzsinx = sinx * sinz;
-
-    mat[0][0] = cosz * cosy;
-    mat[0][1] = -cosy * sinz;
-    mat[0][2] = siny;
-    mat[1][0] = sinzcosx + (coszsinx * siny);
-    mat[1][1] = coszcosx - (sinzsinx * siny);
-    mat[1][2] = -sinx * cosy;
-    mat[2][0] = (sinzsinx) - (coszcosx * siny);
-    mat[2][1] = (coszsinx) + (sinzcosx * siny);
-    mat[2][2] = cosy * cosx;
-
-    v[0] = v_tmp[0] * mat[0][0] + v_tmp[1] * mat[1][0] + v_tmp[2] * mat[2][0];
-    v[1] = v_tmp[0] * mat[0][1] + v_tmp[1] * mat[1][1] + v_tmp[2] * mat[2][1];
-    v[2] = v_tmp[0] * mat[0][2] + v_tmp[1] * mat[1][2] + v_tmp[2] * mat[2][2];
+    return ned[0] * siny + ned[1] * (-sinx * cosy) + ned[2] * (cosy * cosx);
 }
 
 } // namespace hf
