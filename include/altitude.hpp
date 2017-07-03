@@ -135,17 +135,17 @@ void Altitude::computePid(bool armed)
 
     // P
     int16_t error16 = Filter::constrainAbs(altHold - baroAlt, config.pErrorMax);
-    error16 = Filter::deadband(error16, config.pDeadband); //remove small P parametr to reduce noise near zero position
-    pid = Filter::constrainAbs((config.pidP * error16 >>7), config.pidMax);
+    error16 = Filter::deadband(error16, config.pDeadband); 
+    pid = Filter::constrainAbs((int16_t)(config.pidP * error16), config.pidMax);
 
     // I
-    errorAltitudeI += config.pidI * error16 >>6;
+    errorAltitudeI += (int16_t)(config.pidI * error16);
     errorAltitudeI = Filter::constrainAbs(errorAltitudeI, config.iErrorMax);
-    pid += errorAltitudeI>>9; //I in range +/-60
+    pid += errorAltitudeI / config.iErrorDiv;
 
     // D
-    int32_t vario = Filter::deadband(velocity, config.dDeadband) >> 4;
-    pid -= Filter::constrainAbs(config.pidD * vario, config.pidMax);
+    int32_t vario = Filter::deadband(velocity, config.dDeadband);
+    pid -= Filter::constrainAbs((int16_t)(config.pidD * vario), config.pidMax);
 
 } // computePid
 
