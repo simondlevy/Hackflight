@@ -47,7 +47,6 @@ class Altitude {
         // Barometer
         Barometer baro;
         uint32_t  baroCalibrationStart;
-        int32_t   getBaroVelocity(int32_t BaroAlt, uint32_t dTimeMicros);
 
         // Accelerometer
         Accelerometer accel;
@@ -55,7 +54,7 @@ class Altitude {
         // Fused
         int32_t  altHold;
         int16_t  errorAltitudeI;
-        int32_t  estAlt;               // cm
+        int32_t  baroAlt;               // cm
         bool     holdingAltitude;
         int16_t  initialThrottleHold; 
         int32_t  pid;
@@ -73,10 +72,10 @@ void Altitude::init(const AltitudeConfig & _config, Board * _board)
 
     board = _board;
 
-    baro.init(config.baro);
+    baro.init(config.baro, _board);
     baroCalibrationStart = 0;
 
-    accel.init(config.accel);
+    accel.init(config.accel, _board);
 
     initialThrottleHold = 0;
     pid = 0;
@@ -89,7 +88,7 @@ void Altitude::start(uint16_t throttleDemand)
 {
     holdingAltitude = true;
     initialThrottleHold = throttleDemand;
-    altHold = estAlt;
+    altHold = baroAlt;
     pid = 0;
     errorAltitudeI = 0;
 }
@@ -113,7 +112,7 @@ void Altitude::computePid(bool armed)
     uint32_t dTimeMicros = updateTime();
  
     // Update the baro with the current pressure reading
-    baro.update(board->extrasGetBaroPressure());
+    baro.update();
 
     // Calibrate baro AGL while not armed
     if (!armed) {
@@ -122,8 +121,7 @@ void Altitude::computePid(bool armed)
     }
 
     // Get estimated altitude from baro
-    int32_t BaroAlt = baro.getAltitude();
-    estAlt = BaroAlt;
+    baroAlt = baro.getAltitude();
 
     // Integrate vertical acceleration to compute IMU velocity in cm/sec
     float accZ = accel.getAccZ();
@@ -132,12 +130,12 @@ void Altitude::computePid(bool armed)
     // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
     // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, 
     // i.e without delay.
-    int32_t baroVel = getBaroVelocity(BaroAlt, dTimeMicros);
+    int32_t baroVel = baro.getVelocity(dTimeMicros);
     velocity = Filter::complementary(velocity, baroVel, config.cfVel);
 
     // P
-    int16_t error16 = Filter::constrainAbs(altHold - estAlt, config.pErrorMax);
-    error16 = Filter::deadband(error16, 10); //remove small P parametr to reduce noise near zero position
+    int16_t error16 = Filter::constrainAbs(altHold - baroAlt, config.pErrorMax);
+    error16 = Filter::deadband(error16, config.pDeadband); //remove small P parametr to reduce noise near zero position
     pid = Filter::constrainAbs((config.pidP * error16 >>7), config.pidMax);
 
     // I
@@ -146,17 +144,15 @@ void Altitude::computePid(bool armed)
     pid += errorAltitudeI>>9; //I in range +/-60
 
     // D
-    int32_t vario = Filter::deadband(velocity, 5) >> 4;
+    int32_t vario = Filter::deadband(velocity, config.dDeadband) >> 4;
     pid -= Filter::constrainAbs(config.pidD * vario, config.pidMax);
- 
+
 } // computePid
 
 void Altitude::updateAccelerometer(float eulerAnglesRadians[3], bool armed)
 {
     // Throttle modification is synched to aquisition of new IMU data
-    int16_t accelRaw[3];
-    board->extrasImuGetAccel(accelRaw);
-    accel.update(accelRaw, eulerAnglesRadians, board->getMicros(), armed);
+    accel.update(eulerAnglesRadians, armed);
 }
 
 uint32_t Altitude::updateTime(void)
@@ -166,15 +162,6 @@ uint32_t Altitude::updateTime(void)
     uint32_t dTimeMicros = currentT - previousT;
     previousT = currentT;
     return dTimeMicros;
-}
-
-int32_t Altitude::getBaroVelocity(int32_t BaroAlt, uint32_t dTimeMicros)
-{
-    static int32_t lastBaroAlt;
-    int32_t baroVel = (BaroAlt - lastBaroAlt) * 1000000.0f / dTimeMicros;
-    lastBaroAlt = estAlt;
-    baroVel = Filter::constrainAbs(baroVel, 300); 
-    return Filter::deadband(baroVel, 10);
 }
 
 } // namespace hf

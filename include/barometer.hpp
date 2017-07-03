@@ -28,21 +28,24 @@ class Barometer {
 
     public:
 
-        void    init(const BarometerConfig & _config);
+        void    init(const BarometerConfig & _config, Board * _board);
         void    calibrate(void);
-        void    update(float pressure);
+        void    update(void);
         int32_t getAltitude(void);
+        int32_t getVelocity(uint32_t dTimeMicros);
 
     private:
 
         BarometerConfig config;
 
-        int32_t  altCm;
+        Board * board;
+
+        int32_t  alt;
         int32_t  history[BarometerConfig::HISTORY_SIZE];
         int      historyIdx;
         int32_t  groundPressure;
         int32_t  groundAltitude;
-        int32_t  lastAltCm;
+        int32_t  lastAlt;
         uint32_t pressureSum;
 
         static float paToCm(uint32_t pa);
@@ -50,16 +53,18 @@ class Barometer {
 
 /********************************************* CPP ********************************************************/
 
-void Barometer::init(const BarometerConfig & _config)
+void Barometer::init(const BarometerConfig & _config, Board * _board)
 {
     memcpy(&config, &_config, sizeof(BarometerConfig));
+
+    board = _board;
 
     pressureSum = 0;
     historyIdx = 0;
     groundPressure = 0;
     groundAltitude = 0;
-    altCm = 0;
-    lastAltCm = 0;
+    alt = 0;
+    lastAlt = 0;
 
     for (int k=0; k<BarometerConfig::HISTORY_SIZE; ++k) {
         history[k] = 0;
@@ -73,8 +78,10 @@ void Barometer::calibrate(void)
     groundAltitude = paToCm(groundPressure/8);
 }
 
-void Barometer::update(float pressure)
+void Barometer::update()
 {
+    float pressure = board->extrasGetBaroPressure();
+
     uint8_t indexplus1 = (historyIdx + 1) % BarometerConfig::HISTORY_SIZE;
     history[historyIdx] = (int32_t)pressure;
     pressureSum += history[historyIdx];
@@ -84,11 +91,20 @@ void Barometer::update(float pressure)
 
 int32_t Barometer::getAltitude(void)
 {
-    int32_t altCm_tmp = paToCm((float)pressureSum/(BarometerConfig::HISTORY_SIZE-1)); 
-    altCm_tmp -= groundAltitude;
-    altCm = lrintf((float)altCm * config.noiseLpf + (float)altCm_tmp * (1.0f - config.noiseLpf));
+    int32_t alt_tmp = paToCm((float)pressureSum/(BarometerConfig::HISTORY_SIZE-1)); 
+    alt_tmp -= groundAltitude;
+    alt = lrintf((float)alt * config.noiseLpf + (float)alt_tmp * (1.0f - config.noiseLpf));
 
-    return altCm;
+    return alt;
+}
+
+int32_t Barometer::getVelocity(uint32_t dTimeMicros)
+{
+    static int32_t lastAlt;
+    int32_t vel = (alt - lastAlt) * 1000000.0f / dTimeMicros;
+    lastAlt = alt;
+    vel = Filter::constrainAbs(vel, config.velocityBound); 
+    return Filter::deadband(vel, config.velocityDeadband);
 }
 
 

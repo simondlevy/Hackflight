@@ -26,8 +26,8 @@ class Accelerometer {
 
     public:
 
-        void  init(const AccelerometerConfig & _config);
-        void  update(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed);
+        void  init(const AccelerometerConfig & _config, Board * _board);
+        void  update(float eulerAnglesRadians[3], bool armed);
         float getAccZ(void);
 
     private:
@@ -43,13 +43,17 @@ class Accelerometer {
         static float rotate(int16_t ned[3], float * angles);
 
         AccelerometerConfig config;
+
+        Board * board;
 };
 
 /********************************************* CPP ********************************************************/
 
-void Accelerometer::init(const AccelerometerConfig & _config)
+void Accelerometer::init(const AccelerometerConfig & _config, Board * _board)
 {
     memcpy(&config, &_config, sizeof(AccelerometerConfig));
+
+    board = _board;
 
     velScale = (9.80665f / 10000.0f / config.oneG);
 
@@ -66,8 +70,15 @@ void Accelerometer::init(const AccelerometerConfig & _config)
     accZ = 0;
 }
 
-void Accelerometer::update(int16_t accelRaw[3], float eulerAnglesRadians[3], uint32_t currentTimeUsec, bool armed)
+void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
 {
+    // Get current time in microseconds
+    uint32_t currentTimeUsec = board->getMicros();
+
+    // Get raw accelerometer values    
+    int16_t accelRaw[3];
+    board->extrasImuGetAccel(accelRaw);
+
     // Track delta time
     uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
     previousTimeUsec = currentTimeUsec;
@@ -88,10 +99,10 @@ void Accelerometer::update(int16_t accelRaw[3], float eulerAnglesRadians[3], uin
 
     // Compute vertical acceleration offset at rest
     if (!armed) {
-        zOffset -= zOffset / 64;
+        zOffset -= zOffset / config.zOffsetDiv;
         zOffset += (int32_t)rotatedZ;
     }
-    rotatedZ -= zOffset / 64;
+    rotatedZ -= zOffset / config.zOffsetDiv;
 
     // Compute smoothed vertical acceleration
     float dT_sec = dT_usec * 1e-6f;

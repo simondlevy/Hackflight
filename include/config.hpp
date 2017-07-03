@@ -72,8 +72,10 @@ struct ImuConfig {
 
 struct BarometerConfig {
 
-    float                noiseLpf     = 0.5f;
-    static const uint8_t HISTORY_SIZE = 48;
+    float                noiseLpf         = 0.5f;
+    uint16_t             velocityBound    = 300;
+    uint16_t             velocityDeadband = 10;
+    static const uint8_t HISTORY_SIZE     = 48;
 };
 
 //=========================================================================
@@ -82,10 +84,14 @@ struct BarometerConfig {
 
 struct AccelerometerConfig {
 
-    uint16_t oneG        = 4096; // Raw accelerometer value when board is level
+    // Raw accelerometer value when board is level
+    uint16_t oneG        = 4096; 
+
+    // These probably don't need to be changed
     float    lpfCutoff   = 5.0f;
     uint8_t  lpfFactor   = 4;
     int32_t  deadband    = 40;
+    uint8_t  zOffsetDiv  = 64;
 };
 
 //=========================================================================
@@ -101,6 +107,8 @@ struct AltitudeConfig {
 
     // Bounds
     uint16_t pidMax    = 150;
+    uint8_t  pDeadband = 10;
+    uint8_t  dDeadband = 5;
     uint16_t pErrorMax = 300;
     uint16_t iErrorMax = 30000;
 
