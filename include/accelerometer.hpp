@@ -57,7 +57,7 @@ void Accelerometer::init(const AccelerometerConfig & _config, Board * _board)
 
     velScale = (9.80665f / 10000.0f / config.oneG);
 
-    // Calculate RC time constant used in the low-pass filte
+    // Calculate RC time constant used in the low-pass filter
     fc = (float)(0.5f / (M_PI * config.lpfCutoff)); 
 
     for (int k=0; k<3; ++k) {
@@ -86,8 +86,7 @@ void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
     // Smooth the raw values if indicated
     for (uint8_t k=0; k<3; k++) {
         if (config.lpfFactor > 0) {
-            // XXX should use Filter::lpf()
-            lpf[k] = lpf[k] * (1.0f - (1.0f / config.lpfFactor)) + accelRaw[k] * (1.0f / config.lpfFactor);
+            lpf[k] = Filter::complementary(accelRaw[k], lpf[k], config.lpfFactor);
             smooth[k] = lpf[k];
         } else {
             smooth[k] = accelRaw[k];
@@ -106,7 +105,7 @@ void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
 
     // Compute smoothed vertical acceleration
     float dT_sec = dT_usec * 1e-6f;
-    accZ = accZ + (dT_sec / (fc + dT_sec)) * (rotatedZ - accZ); // XXX Should user Filter::____
+    accZ = accZ + (dT_sec / (fc + dT_sec)) * (rotatedZ - accZ);
 
 } // update
 

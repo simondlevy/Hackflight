@@ -88,10 +88,10 @@ struct AccelerometerConfig {
     uint16_t oneG        = 4096; 
 
     // These probably don't need to be changed
-    float    lpfCutoff   = 5.0f;
-    uint8_t  lpfFactor   = 4;
-    int32_t  deadband    = 40;
-    uint8_t  zOffsetDiv  = 64;
+    float    lpfCutoff  = 5.0f;
+    float    lpfFactor  = 0.25f;
+    int32_t  deadband   = 40;
+    uint8_t  zOffsetDiv = 64;
 };
 
 //=========================================================================
