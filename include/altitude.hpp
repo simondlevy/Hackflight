@@ -131,12 +131,12 @@ void Altitude::computePid(bool armed)
     velocity = Filter::complementary(velocity, baroVel, config.cfVel);
 
     // P
-    int16_t error16 = Filter::constrainAbs(altHold - baroAlt, config.pErrorMax);
-    error16 = Filter::deadband(error16, config.pDeadband); 
-    pid = Filter::constrainAbs((int16_t)(config.pidP * error16), config.pidMax);
+    int32_t error = Filter::constrainAbs(altHold - baroAlt, config.pErrorMax);
+    error = Filter::deadband(error, config.pDeadband); 
+    pid = Filter::constrainAbs((int16_t)(config.pidP * error), config.pidMax);
 
     // I
-    errorAltitudeI += (int16_t)(config.pidI * error16);
+    errorAltitudeI += (int16_t)(config.pidI * error);
     errorAltitudeI = Filter::constrainAbs(errorAltitudeI, config.iErrorMax);
     pid += errorAltitudeI / config.iErrorDiv;
 
