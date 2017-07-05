@@ -42,6 +42,12 @@ struct StabilizeConfig {
 
     // Trim for a particular vehicle: roll, pitch, yaw
     int16_t softwareTrim[3] = {0, 0, 0};
+
+    // Resetting thresholds for PID Integral term
+    uint32_t angleWindupMax = 10000;
+    uint32_t gyroWindupMax  = 16000;
+    uint16_t bigGyro        = 640;
+    uint16_t bigYawDemand   = 100;
 };
 
 //=========================================================================

@@ -82,9 +82,10 @@ int32_t Stabilize::computeITermGyro(float rateP, float rateI, int16_t rcCommand[
     int32_t error = ((int32_t)rcCommand[axis] * rateP) - gyroADC[axis];
 
     // Avoid integral windup
-    errorGyroI[axis] = Filter::constrainAbs(errorGyroI[axis] + error, 16000);
+    errorGyroI[axis] = Filter::constrainAbs(errorGyroI[axis] + error, config.gyroWindupMax);
 
-    if ((std::abs(gyroADC[axis]) > 640) || ((axis == AXIS_YAW) && (std::abs(rcCommand[axis]) > 100)))
+    // Reset integral on quick gyro change or large yaw command
+    if ((std::abs(gyroADC[axis]) > config.bigGyro) || ((axis == AXIS_YAW) && (std::abs(rcCommand[axis]) > config.bigYawDemand)))
         errorGyroI[axis] = 0;
 
     return (int32_t)(errorGyroI[axis] * rateI);
@@ -106,7 +107,7 @@ int16_t Stabilize::computeLevelPid(int16_t rcCommand[4], int16_t gyroADC[3], flo
     int32_t PTermAccel = errorAngle * config.levelP; 
 
     // Avoid integral windup
-    errorAngleI[axis] = Filter::constrainAbs(errorAngleI[axis] + errorAngle, 10000);
+    errorAngleI[axis] = Filter::constrainAbs(errorAngleI[axis] + errorAngle, config.angleWindupMax);
 
     int32_t prop = (std::max)(std::abs(rcCommand[DEMAND_PITCH]), 
             std::abs(rcCommand[DEMAND_ROLL])); // range [0;500]
