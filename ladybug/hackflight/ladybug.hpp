@@ -78,17 +78,17 @@ class Ladybug : public Board {
         virtual const Config& getConfig(void) override
         {
             // PIDs
-            config.pid.levelP         = 0.20f;
+            config.stabilize.levelP         = 0.20f;
 
-            config.pid.ratePitchrollP = 0.225f;
-            config.pid.ratePitchrollI = 0.12f;
-            config.pid.ratePitchrollD = 0.375f;
+            config.stabilize.ratePitchrollP = 0.225f;
+            config.stabilize.ratePitchrollI = 0.001875f;
+            config.stabilize.ratePitchrollD = 0.375f;
 
-            config.pid.yawP           = 1.0625f;
-            config.pid.yawI           = 0.36f;
+            config.stabilize.yawP           = 1.0625f;
+            config.stabilize.yawI           = 0.005625f;
 
             // "Software trim"
-            //config.pid.softwareTrim[AXIS_ROLL]  = +37;
+            //config.stabilize.softwareTrim[AXIS_ROLL]  = +37;
 
             // Altitude-hold
             config.altitude.accel.oneG = 2048;

@@ -23,10 +23,10 @@
 namespace hf {
 
 //=========================================================================
-// PID config: YOU MUST SET THESE VALUES FOR EACH MODEL
+// Stabilization PID config: YOU MUST SET THESE VALUES FOR EACH MODEL
 //=========================================================================
 
-struct PidConfig {
+struct StabilizeConfig {
 
     // Level (accelerometer)
     float levelP;
@@ -170,13 +170,13 @@ struct InitConfig {
 //=========================================================================
 
 struct Config {
-    LoopConfig     loop;
-    ImuConfig      imu;
-    AltitudeConfig altitude;
-    RcConfig       rc;
-    PidConfig      pid;
-    PwmConfig      pwm;
-    InitConfig     init;
+    LoopConfig       loop;
+    ImuConfig        imu;
+    AltitudeConfig   altitude;
+    RcConfig         rc;
+    StabilizeConfig  stabilize;
+    PwmConfig        pwm;
+    InitConfig       init;
 };
 
 //=========================================================================
