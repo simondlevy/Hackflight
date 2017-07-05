@@ -109,11 +109,12 @@ int16_t Stabilize::computeLevelPid(int16_t rcCommand[4], int16_t gyroADC[3], flo
     // Avoid integral windup
     errorAngleI[axis] = Filter::constrainAbs(errorAngleI[axis] + errorAngle, config.angleWindupMax);
 
-    int32_t prop = (std::max)(std::abs(rcCommand[DEMAND_PITCH]), 
-            std::abs(rcCommand[DEMAND_ROLL])); // range [0;500]
+    // Compute proportion of cyclic demand compared to its maximum
+    float prop = (std::max)(std::abs(rcCommand[DEMAND_PITCH]), std::abs(rcCommand[DEMAND_ROLL])) / 500.f;
 
-    int32_t PTerm = (PTermAccel * (500 - prop) + rcCommand[axis] * prop) / 500;
-    int32_t ITerm = (ITermGyro * prop) / 500;
+    int32_t PTerm = Filter::complementary(rcCommand[axis], PTermAccel, prop);
+
+    int32_t ITerm = ITermGyro * prop;
 
     int32_t delta = gyroADC[axis] - lastGyro[axis];
     lastGyro[axis] = gyroADC[axis];
