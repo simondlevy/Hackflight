@@ -18,7 +18,7 @@ Multiwii).  Although there is [legacy
 support](https://github.com/simondlevy/hackflight/tree/master/legacy) for
 STM32F103 flight-controller boards (Naze32 and clones like Flip32, MultiRC,
 etc.) the Alienflight F3 board, and a Teensy 3.2-based controller, 
-the hardware focus of the project has shifted to the Arduino-compatible, the
+the hardware focus of the project has shifted to the Arduino-compatible,
 STM32L4-based [Ladybug FC](http://diydrones.com/profiles/blogs/flight-of-the-ladybug).
 
 Thanks to some help from [Sytelus](https://github.com/sytelus), the core
