@@ -28,7 +28,7 @@ class Accelerometer {
 
         void  init(const AccelerometerConfig & _config, Board * _board);
         void  update(float eulerAnglesRadians[3], bool armed);
-        float getAccZ(void);
+        float getVelocity(uint32_t dTimeMicros);
 
     private:
 
@@ -110,9 +110,10 @@ void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
 } // update
 
 
-float Accelerometer::getAccZ(void)
+float Accelerometer::getVelocity(uint32_t dTimeMicros)
 {
-    return Filter::deadband(accZ, config.deadband) * velScale;
+    // Integrate vertical acceleration to compute IMU velocity in cm/sec
+    return Filter::deadband(accZ, config.deadband) * velScale * dTimeMicros;
 }
 
 float Accelerometer::rotate(int16_t ned[3], float * angles)

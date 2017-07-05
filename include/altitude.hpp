@@ -46,7 +46,7 @@ class Altitude {
 
         // Barometer
         Barometer baro;
-        uint32_t  baroCalibrationStart;
+        int32_t   baroAlt;               // cm
 
         // Accelerometer
         Accelerometer accel;
@@ -54,9 +54,8 @@ class Altitude {
         // Fused
         int32_t  altHold;
         int16_t  errorAltitudeI;
-        int32_t  baroAlt;               // cm
         bool     holdingAltitude;
-        int16_t  initialThrottleHold; 
+        uint16_t initialThrottleHold;  // PWM usec
         int32_t  pid;
         float    velocity;             // cm/sec
 
@@ -73,7 +72,6 @@ void Altitude::init(const AltitudeConfig & _config, Board * _board)
     board = _board;
 
     baro.init(config.baro, _board);
-    baroCalibrationStart = 0;
 
     accel.init(config.accel, _board);
 
@@ -120,15 +118,14 @@ void Altitude::computePid(bool armed)
         return;
     }
 
-    // Get estimated altitude from baro
+    // Get estimated altitude from barometer
     baroAlt = baro.getAltitude();
 
-    // Integrate vertical acceleration to compute IMU velocity in cm/sec
-    float accZ = accel.getAccZ();
-    velocity += accZ * dTimeMicros;
+    // Get estimated vertical velocity from accelerometer
+    velocity += accel.getVelocity(dTimeMicros);
 
     // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
-    // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, 
+    // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
     // i.e without delay.
     int32_t baroVel = baro.getVelocity(dTimeMicros);
     velocity = Filter::complementary(velocity, baroVel, config.cfVel);
