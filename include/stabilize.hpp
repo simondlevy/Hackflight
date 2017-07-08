@@ -36,7 +36,7 @@ public:
 
     void init(const StabilizeConfig& _config, const ImuConfig& _imuConfig);
 
-    void update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3]);
+    void update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAnglesDegrees[3]);
 
     void resetIntegral(void);
 
@@ -55,7 +55,7 @@ private:
 
     int32_t computeITermGyro(float rateP, float rateI, int16_t rcCommand[4], int16_t gyroADC[3], uint8_t axis);
     int16_t computePid(float rateP, int32_t PTerm, int32_t ITerm, int32_t DTerm, int16_t gyroADC[3], uint8_t axis);
-    int16_t computeLevelPid(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3], uint8_t axis);
+    int16_t computeLevelPid(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAnglesDegrees[3], uint8_t axis);
 }; 
 
 
@@ -97,12 +97,16 @@ int16_t Stabilize::computePid(float rateP, int32_t PTerm, int32_t ITerm, int32_t
     return PTerm + ITerm - DTerm + config.softwareTrim[axis];
 }
 
-int16_t Stabilize::computeLevelPid(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3], uint8_t axis)
+// Computes PID for pitch or roll
+int16_t Stabilize::computeLevelPid(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAnglesDegrees[3], uint8_t axis)
 {
     int32_t ITermGyro = computeITermGyro(config.ratePitchrollP, config.ratePitchrollI, rcCommand, gyroADC, axis);
 
-    // max inclination
-    int32_t errorAngle = Filter::constrainAbs(2*rcCommand[axis], imuConfig.maxAngleInclination) - 10*eulerAngles[axis];
+    Serial.println(rcCommand[axis]);
+
+    // RC command is in [-500,+500].  We compute error by scaling it up to [-1000,+1000], then treating this value as tenths
+    // of a degree and subtracting off corresponding pitch or roll angle obtained from IMU.
+    int32_t errorAngle = Filter::constrainAbs(2*rcCommand[axis], 10*imuConfig.maxAngleInclination) - 10*eulerAnglesDegrees[axis];
 
     int32_t PTermAccel = errorAngle * config.levelP; 
 
@@ -126,11 +130,11 @@ int16_t Stabilize::computeLevelPid(int16_t rcCommand[4], int16_t gyroADC[3], flo
     return computePid(config.ratePitchrollP, PTerm, ITerm, DTerm, gyroADC, axis);
 }
 
-void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngles[3])
+void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAnglesDegrees[3])
 {
     // Pitch, roll use leveling based on Euler angles
-    axisPID[AXIS_ROLL]  = computeLevelPid(rcCommand, gyroADC, eulerAngles, AXIS_ROLL);
-    axisPID[AXIS_PITCH] = computeLevelPid(rcCommand, gyroADC, eulerAngles, AXIS_PITCH);
+    axisPID[AXIS_ROLL]  = computeLevelPid(rcCommand, gyroADC, eulerAnglesDegrees, AXIS_ROLL);
+    axisPID[AXIS_PITCH] = computeLevelPid(rcCommand, gyroADC, eulerAnglesDegrees, AXIS_PITCH);
 
     // For yaw, P term comes directly from RC command, and D term is zero
     int32_t ITermGyroYaw = computeITermGyro(config.yawP, config.yawI, rcCommand, gyroADC, AXIS_YAW);
