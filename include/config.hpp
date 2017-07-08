@@ -108,7 +108,7 @@ struct AltitudeConfig {
 
     // PID tuning
     float pidP = 0.5f; 
-    float pidI = 0.39f; 
+    float pidI = 0.02f; 
     float pidD = 1.7f;
 
     // Bounds
@@ -117,7 +117,6 @@ struct AltitudeConfig {
     uint8_t  dDeadband = 5;
     uint16_t pErrorMax = 300;
     uint16_t iErrorMax = 30000;
-    uint16_t iErrorDiv = 512;
 
     // Barometer
     BarometerConfig baro;

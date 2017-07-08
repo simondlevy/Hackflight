@@ -102,8 +102,6 @@ int16_t Stabilize::computeLevelPid(int16_t rcCommand[4], int16_t gyroADC[3], flo
 {
     int32_t ITermGyro = computeITermGyro(config.ratePitchrollP, config.ratePitchrollI, rcCommand, gyroADC, axis);
 
-    Serial.println(rcCommand[axis]);
-
     // RC command is in [-500,+500].  We compute error by scaling it up to [-1000,+1000], then treating this value as tenths
     // of a degree and subtracting off corresponding pitch or roll angle obtained from IMU.
     int32_t errorAngle = Filter::constrainAbs(2*rcCommand[axis], 10*imuConfig.maxAngleInclination) - 10*eulerAnglesDegrees[axis];

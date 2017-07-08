@@ -138,7 +138,7 @@ void Altitude::computePid(bool armed)
     // I
     errorAltitudeI += (int16_t)(config.pidI * error);
     errorAltitudeI = Filter::constrainAbs(errorAltitudeI, config.iErrorMax);
-    pid += errorAltitudeI / config.iErrorDiv;
+    pid += errorAltitudeI * (dTimeMicros/1e6);
 
     // D
     int32_t vario = Filter::deadband(velocity, config.dDeadband);
