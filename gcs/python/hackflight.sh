@@ -1,2 +1,2 @@
-cd $HOME/Desktop/hackflight/gcs/python
+cd $HOME/Desktop/Hackflight/gcs/python
 ./hackflight.py
