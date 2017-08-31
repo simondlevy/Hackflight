@@ -30,7 +30,7 @@ class Filter {
         
         static int32_t deadband(int32_t value, int32_t deadband);
         static float   complementary(float a, float b, float c);
-        static float   max(float a, float b);
+        static float   fmax(float a, float b);
         static int32_t constrainMinMax(int32_t val, int32_t min, int32_t max);
         static int32_t constrainAbs(int32_t val, int32_t max);
 };
@@ -54,7 +54,7 @@ float Filter::complementary(float a, float b, float c)
     return a * c + b * (1 - c);
 }
 
-float Filter::max(float a, float b)
+float Filter::fmax(float a, float b)
 {
     return a > b ? a : b;
 }
