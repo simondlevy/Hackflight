@@ -125,7 +125,7 @@ class Naze : public MW32 {
     virtual uint16_t rcReadSerial(uint8_t chan) override
     {
         uint8_t chanmap[5] = {1, 2, 3, 0, 5};
-        return rcValue[chanmap[chan]];
+        return rx->getChannelValue(chanmap[chan]);
     }
 
     virtual uint16_t rcReadPwm(uint8_t chan) override

@@ -21,23 +21,23 @@
 #   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 
 # Change this to wherever you put Hackflight
-HACKFLIGHT_DIR = $(HOME)/Desktop/hackflight
+HACKFLIGHT_DIR = $(HOME)/Desktop/Hackflight
 
 # Change this to wherever you put BreezySTM32
 BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
 # Change this to where you put your Arduino libraries
-ARDUINO_DIR = $(HOME)/Development/arduino-1.8.1/hardware/teensy/avr/libraries
+ARDUINO_DIR = $(HOME)/Development/arduino-1.8.4/libraries
 
 ###############################################################################
 
-FIRMWARE_DIR = $(HACKFLIGHT_DIR)/legacy
+FIRMWARE_DIR = $(HACKFLIGHT_DIR)/legacy/mw32
 
 F1_DIR = $(BREEZY_DIR)/f1
 
-SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM
+SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM/src
 
-MPU6050_DIR = $(ARDUINO_DIR)/MPU6050
+MPU6050_DIR = $(ARDUINO_DIR)/MPU6050/src
 
 # Debugger optons, must be empty or GDB
 DEBUG ?=

@@ -21,15 +21,15 @@
 
 # Change these values according to where you put your repositories ----------------
 
-HACKFLIGHT_DIR = $(HOME)/Desktop/hackflight
+HACKFLIGHT_DIR = $(HOME)/Desktop/Hackflight
 
 BREEZY_DIR = $(HOME)/Desktop/BreezySTM32
 
-ARDUINO_DIR = $(HOME)/Development/arduino-1.8.1/hardware/teensy/avr/libraries
+ARDUINO_DIR = $(HOME)/Development/arduino-1.8.4/libraries
 
 # Nothing below here should be changed ---------------------------------------------
 
-FIRMWARE_DIR = $(HACKFLIGHT_DIR)/legacy
+FIRMWARE_DIR = $(HACKFLIGHT_DIR)/legacy/mw32
 
 PROJECT = Hackflight
 
@@ -58,7 +58,7 @@ VCP_DIR = $(F3_DIR)/vcp
 
 SPEKTRUM_DIR = $(F3_DIR)/libraries/SpektrumDSM
 
-MPU6050_DIR = $(ARDUINO_DIR)/MPU6050
+MPU6050_DIR = $(ARDUINO_DIR)/MPU6050/src
 
 256K_TARGETS = ALIENFLIGHTF3 
 
