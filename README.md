@@ -1,6 +1,7 @@
 # Hackflight: Simple quadcopter flight control firmware for Arduino / C++ hackers
 
-Hackflight is simple header-only C++ firmware for quadcopter flight controllers
+Hackflight is simple, platform-independent, header-only C++ firmware for quadcopter 
+[flight controllers](http://diydrones.com/profiles/blogs/flight-of-the-ladybug)
 and <a href="https://github.com/simondlevy/Hackflight-VREP">simulators</a>.  It
 is geared toward people like me who want to tinker with flight-control
 firmware, and use it to teach students about ideas like inertial measurement
