@@ -80,17 +80,17 @@ class Teensy : public Board {
         virtual const Config& getConfig(void) override
         {
             // PIDs
-            config.pid.levelP         = 0.20f;
+            config.stabilize.levelP         = 0.20f;
 
-            config.pid.ratePitchrollP = 0.225f;
-            config.pid.ratePitchrollI = 0.12f;
-            config.pid.ratePitchrollD = 0.375f;
+            config.stabilize.ratePitchrollP = 0.225f;
+            config.stabilize.ratePitchrollI = 0.12f;
+            config.stabilize.ratePitchrollD = 0.375f;
 
-            config.pid.yawP           = 1.0625f;
-            config.pid.yawI           = 0.36f;
+            config.stabilize.yawP           = 1.0625f;
+            config.stabilize.yawI           = 0.36f;
 
             // "Software trim"
-            config.pid.softwareTrim[AXIS_PITCH] = -50;
+            config.stabilize.softwareTrim[AXIS_PITCH] = -50;
 
             return config;
         }
