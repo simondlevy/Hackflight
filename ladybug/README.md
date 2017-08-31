@@ -2,7 +2,9 @@
 
 The code in the hackflight directory below allows you to run Hackflight on Kris Winer's brushed-motor 
 [flight controller](https://www.oshpark.com/shared_projects/HwGC0Gj3)
-based on his STM32L432 "Ladybug" design.
+based on his STM32L432 "Ladybug" design. The first production run of LadybugFCs
+is currently undergoing beta testing, after which we plan to sell it on <a
+href="https://www.tindie.com/">Tindie</a>.
 
 To build Hackflight for Ladybug, you should first have the 
 [Arduino software](https://www.arduino.cc/en/Main/Software) installed on your computer.  (Make sure to install

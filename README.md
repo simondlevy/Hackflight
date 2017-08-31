@@ -1,7 +1,8 @@
-# Hackflight: Simple quadcopter flight control firmware and simulation for C++ hackers
+# Hackflight: Simple quadcopter flight control firmware for Arduino / C++ hackers
 
 Hackflight is simple header-only C++ firmware for quadcopter flight
-controllers and simulators.  It is geared toward people like me who want to
+controllers and <a href="https://github.com/simondlevy/Hackflight-Sim">simulators</a>.  
+It is geared toward people like me who want to
 tinker with flight-control firmware, and use it to teach students about ideas
 like inertial measurement and PID tuning.  <b>If you are in the 99% percent of
 users who just want to get your vehicle flying without getting into firmware
@@ -20,6 +21,8 @@ STM32F103 flight-controller boards (Naze32 and clones like Flip32, MultiRC,
 etc.) the Alienflight F3 board, and a Teensy 3.2-based controller, 
 the hardware focus of the project has shifted to the Arduino-compatible,
 STM32L4-based [Ladybug FC](http://diydrones.com/profiles/blogs/flight-of-the-ladybug).
+The first production run of LadybugFCs is currently undergoing beta testing,
+after which we plan to sell it on <a href="https://www.tindie.com/">Tindie</a>.
 
 Thanks to some help from [Sytelus](https://github.com/sytelus), the core
 Hackflight
