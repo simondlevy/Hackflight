@@ -22,7 +22,6 @@
 
 #include <Wire.h>
 
-#include <SpektrumDSM.h>
 #include <EM7180.h>
 
 #include "hackflight.hpp"
@@ -38,7 +37,6 @@ class Ladybug : public Board {
         float eulerAngles[3];
 
         EM7180 sentral;
-        SpektrumDSM2048 rx;
 
     protected:
 
@@ -114,21 +112,10 @@ class Ladybug : public Board {
             digitalWrite(A1, is_on ? HIGH : LOW);
         }
 
-        virtual void rcInit(void) override
-        {
-            rx.begin();
-        }
-
-        virtual bool rcUseSerial(void) override
-        {
-            return true;
-        }
-
-        virtual uint16_t rcReadChannel(uint8_t chan) override
-        {
-            uint8_t chanmap[5] = {1, 2, 3, 0, 5};
-            return rx.getChannelValue(chanmap[chan]);
-        }
+        // Implemented in cppm.hpp, dsmx.hpp
+        virtual void rcInit(void) override;
+        virtual bool rcUseSerial(void) override;
+        virtual uint16_t rcReadChannel(uint8_t chan) override;
 
         virtual uint8_t serialAvailableBytes(void) override
         {

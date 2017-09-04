@@ -1,6 +1,5 @@
-
 /*
-   hackflight.ino : Main Hackflight sketch for Ladybug Flight Controller
+   cppm.hpp : CPPM receiver support for Ladybug Flight Controller
 
    This file is part of Hackflight.
 
@@ -17,23 +16,35 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
+#pragma once
 
-#include "hackflight.hpp"
-#include "ladybug.hpp"
+#include <BreezyCPPM.h>
 
-// Pick one
-#include "dsmx.hpp"
-//#include "cppm.hpp"
+// Interrupt on pin 0, using 5 channels
+static BreezyCPPM rx(0, 5);
 
-hf::Hackflight h;
+namespace hf {
 
-void setup(void)
-{
-    h.init(new hf::Ladybug());
-}
+    void Ladybug::rcInit(void)
+    {
+        rx.begin();
+    }
 
-void loop(void)
-{
-    h.update();
-}
+    bool Ladybug::rcUseSerial(void)
+    {
+        return false;
+    }
+
+    uint16_t Ladybug::rcReadChannel(uint8_t chan)
+    {
+        static int16_t chanvals[5];
+
+        // Only need to read channels once
+        if (chan == 0) {
+            rx.computeRC(chanvals);
+        }
+
+        return chanvals[chan];
+    }
+
+} // namespace

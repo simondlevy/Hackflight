@@ -1,6 +1,5 @@
-
 /*
-   hackflight.ino : Main Hackflight sketch for Ladybug Flight Controller
+   dsmx.hpp : Spektrum DSMX support for Ladybug Flight Controller
 
    This file is part of Hackflight.
 
@@ -17,23 +16,28 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
+#pragma once
 
-#include "hackflight.hpp"
-#include "ladybug.hpp"
+#include <SpektrumDSM.h>
 
-// Pick one
-#include "dsmx.hpp"
-//#include "cppm.hpp"
+static SpektrumDSM2048 rx;
 
-hf::Hackflight h;
+namespace hf {
 
-void setup(void)
-{
-    h.init(new hf::Ladybug());
-}
+    void Ladybug::rcInit(void)
+    {
+        rx.begin();
+    }
 
-void loop(void)
-{
-    h.update();
-}
+    bool Ladybug::rcUseSerial(void)
+    {
+        return true;
+    }
+
+    uint16_t Ladybug::rcReadChannel(uint8_t chan)
+    {
+        uint8_t chanmap[5] = {1, 2, 3, 0, 5};
+        return rx.getChannelValue(chanmap[chan]);
+    }
+
+} // namespace
