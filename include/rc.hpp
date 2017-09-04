@@ -67,6 +67,8 @@ void RC::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig, Board * _boa
 {
     board = _board;
 
+    board->rcInit();
+
     memcpy(&config, &rcConfig, sizeof(RcConfig));
 
     midrc = (pwmConfig.max + pwmConfig.min) / 2;

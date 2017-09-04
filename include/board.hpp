@@ -47,6 +47,7 @@ class Board {
         virtual void     imuGetGyro(int16_t gyroRaw[3]) = 0;
 
     //-------------------------------------------- RC -----------------------------------------------------
+        virtual void     rcInit(void) = 0;
         virtual bool     rcUseSerial(void) = 0;
         virtual uint16_t rcReadChannel(uint8_t chan) = 0;
 

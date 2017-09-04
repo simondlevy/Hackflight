@@ -114,9 +114,13 @@ class Ladybug : public Board {
             digitalWrite(A1, is_on ? HIGH : LOW);
         }
 
-        virtual bool rcUseSerial(void) override
+        virtual void rcInit(void) override
         {
             rx.begin();
+        }
+
+        virtual bool rcUseSerial(void) override
+        {
             return true;
         }
 
