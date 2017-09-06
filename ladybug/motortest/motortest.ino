@@ -21,7 +21,10 @@
 
 #include <Arduino.h>
 
-static uint8_t MOTOR_PIN = 13; // Possibilites are: 13, A2, 3, 11
+static uint8_t MOTOR_PIN = 13; // Motor 1: right rear
+//static uint8_t MOTOR_PIN = A2; // Motor 2: right front
+//static uint8_t MOTOR_PIN = 3;  // Motor 3: left rear
+//static uint8_t MOTOR_PIN = 11; // Motor 4: left front
 
 static uint8_t val;
 static uint8_t inc;
