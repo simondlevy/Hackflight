@@ -1,8 +1,4 @@
-boards/newnaze/*.o
-boards/newnaze/*.hex
-boards/newnaze/*.elf
 parser/output
-hello/HelloHackflight
 *.o
 *.swp
 *~
@@ -24,6 +20,6 @@ ipch
 *.log
 *.pdb
 *.cache
-sim/vrep/*/*.so
-sim/*/*.dylib
 legacy/*/obj
+gcs/python/build
+gcs/python/dist

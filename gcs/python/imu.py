@@ -53,7 +53,10 @@ class IMU(Dialog):
 
         #Let these be in World-coordinates (worldview-matrix already applied)
         ####In right-handed, counter-clockwise order
-        self.vehicle_points, self.vehicle_faces, self.vehicle_face_colors = get_vehicle(W, D, L)
+        vehicle_points, self.vehicle_faces, self.vehicle_face_colors = get_vehicle(W, D, L)
+
+        # For now, use NumPy for points
+        self.vehicle_points = np.array(vehicle_points) 
 
         # Assume no angles to start
         self.roll_pitch_yaw = None

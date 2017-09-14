@@ -18,8 +18,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-import numpy as np
-
 def get_vehicle(width, depth, length):
 
     #creates constants
@@ -63,7 +61,7 @@ def get_vehicle(width, depth, length):
     closeBU = farBU - constant1
     closeBL = farBL + constant2
 
-    points = np.array([
+    points = [
 
             #creates arm 1
             [+width - armWidth, +depth/2 , +length + armWidth], #0   0
@@ -315,7 +313,7 @@ def get_vehicle(width, depth, length):
             [-width-armLength + propLength + propNarrowWidth, +tipTU, +length+armLength + propLength - propNarrowWidth],     #1   173
             [-width-armLength + propLength + propNarrowWidth, +tipBU, +length+armLength + propLength - propNarrowWidth],     #2  174
             [-width-armLength + propLength - propNarrowWidth, +tipBL, +length+armLength + propLength + propNarrowWidth]      #3  175
-            ])
+            ]
 
     # Each face contains indices into points array above
     faces = [(50,49,48,51),(59,51,48,56),(58,59,56,57), #top of the Box
