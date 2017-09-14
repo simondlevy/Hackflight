@@ -23,8 +23,8 @@
 #include "ladybug.hpp"
 
 // Pick one
-#include "dsmx.hpp"
-//#include "cppm.hpp"
+//#include "dsmx.hpp"
+#include "cppm.hpp"
 
 hf::Hackflight h;
 

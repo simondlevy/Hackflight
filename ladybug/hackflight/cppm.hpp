@@ -37,14 +37,17 @@ namespace hf {
 
     uint16_t Ladybug::rcReadChannel(uint8_t chan)
     {
-        static int16_t chanvals[5];
+        static uint16_t chanvals[5];
 
         // Only need to read channels once
         if (chan == 0) {
             rx.computeRC(chanvals);
         }
 
-        return chanvals[chan];
+	// map TAER to AETR
+	uint8_t chanmap[5] = {1, 2, 3, 0, 4};
+
+        return chanvals[chanmap[chan]];
     }
 
 } // namespace
