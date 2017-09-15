@@ -35,7 +35,7 @@ from tkcompat import *
 
 from math import sin, cos, radians, degrees
 
-from numpy import eye, array, dot
+from numpy import eye, array, dot, transpose
 
 from dialog import Dialog
 
@@ -191,7 +191,7 @@ class IMU(Dialog):
                 v = self.vehicle_points[self.vehicle_faces[i][j]]
 
                 # Transform the point from 3D to 2D
-                ps = dot(v, rot.T)
+                ps = dot(v, transpose(rot))
                 p = self._to_screen_coords(ps)
                
                 # Put the screenpoint in the list of transformed vertices
