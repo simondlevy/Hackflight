@@ -35,11 +35,14 @@ from tkcompat import *
 
 from math import sin, cos, radians, degrees
 
-from numpy import array, dot, transpose
-
 from dialog import Dialog
 
 from vehicle import get_vehicle
+
+# Helpers so we don't have to use NumPy -----------------------
+
+def _eye3():
+    return [[1,0,0],[0,1,0],[0,0,1]]
 
 def _dotv(v,a):
     d = [0,0,0]
@@ -49,10 +52,12 @@ def _dotv(v,a):
     return d
 
 def _dotm(a,b):
-    return dot(array(a), array(b))
-
-def _eye3():
-    return [[1,0,0],[0,1,0],[0,0,1]]
+    _d = [[0,0,0],[0,0,0],[0,0,0]]
+    for i in range(3):
+        for j in range(3):
+            for k in range(3):
+                _d[i][j] += a[i][k]*b[k][j]
+    return _d
 
 def _transpose(a):
     _t = _eye3()
@@ -60,6 +65,8 @@ def _transpose(a):
         for k in range(3):
             _t[j][k] = a[k][j]
     return _t
+
+# IMU class ---------------------------------------------------
 
 class IMU(Dialog):
 
@@ -74,10 +81,7 @@ class IMU(Dialog):
 
         #Let these be in World-coordinates (worldview-matrix already applied)
         ####In right-handed, counter-clockwise order
-        vehicle_points, self.vehicle_faces, self.vehicle_face_colors = get_vehicle(W, D, L)
-
-        # For now, use NumPy for points
-        self.vehicle_points = array(vehicle_points) 
+        self.vehicle_points, self.vehicle_faces, self.vehicle_face_colors = get_vehicle(W, D, L)
 
         # Assume no angles to start
         self.roll_pitch_yaw = None
