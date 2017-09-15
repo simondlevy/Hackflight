@@ -29,4 +29,4 @@ system('mkdir dist\media')
 system('copy media\icon.xbm dist\media')
 system('copy media\*.gif dist\media')
 
-setup(console = ['hackflight.py'])
+setup(windows = ['hackflight.py'])
