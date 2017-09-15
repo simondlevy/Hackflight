@@ -111,7 +111,7 @@ class IMU(Dialog):
         y = -height/2*pv[1] + height/2
         z = pv[2]
 
-        return np.array([x, y, z])
+        return [x, y, z]
 
     def _save(self):
 
