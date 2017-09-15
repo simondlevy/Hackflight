@@ -41,7 +41,14 @@ from dialog import Dialog
 
 from vehicle import get_vehicle
 
-def _dot(a,b):
+def _dotv(v,a):
+    d = [0,0,0]
+    d[0] = v[0]*a[0][0] + v[1]*a[1][0] + v[2]*a[2][0]
+    d[1] = v[0]*a[0][1] + v[1]*a[1][1] + v[2]*a[2][1]
+    d[2] = v[0]*a[0][2] + v[1]*a[1][2] + v[2]*a[2][2]
+    return d
+
+def _dotm(a,b):
     return dot(array(a), array(b))
 
 def _eye3():
@@ -178,11 +185,11 @@ class IMU(Dialog):
 
         # Multiply matrices based on active axis
         if self.driver.active_axis == YAW_ACTIVE:
-            rot = _dot(_dot(self.rollrot, self.pitchrot), self.yawrot)
+            rot = _dotm(_dotm(self.rollrot, self.pitchrot), self.yawrot)
         elif self.driver.active_axis == PITCH_ACTIVE:
-            rot = _dot(_dot(self.yawrot, self.rollrot), self.pitchrot)
+            rot = _dotm(_dotm(self.yawrot, self.rollrot), self.pitchrot)
         else:
-            rot = _dot(_dot(self.yawrot, self.pitchrot), self.rollrot)
+            rot = _dotm(_dotm(self.yawrot, self.pitchrot), self.rollrot)
 
         # Add a label for arming if needed
         self.driver.checkArmed()
@@ -197,7 +204,7 @@ class IMU(Dialog):
                 v = self.vehicle_points[self.vehicle_faces[i][j]]
 
                 # Transform the point from 3D to 2D
-                ps = _dot(v, transpose(rot))
+                ps = _dotv(v, transpose(rot))
                 p = self._to_screen_coords(ps)
                
                 # Put the screenpoint in the list of transformed vertices
