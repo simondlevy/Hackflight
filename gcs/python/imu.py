@@ -54,6 +54,13 @@ def _dotm(a,b):
 def _eye3():
     return [[1,0,0],[0,1,0],[0,0,1]]
 
+def _transpose(a):
+    _t = _eye3()
+    for j in range(3):
+        for k in range(3):
+            _t[j][k] = a[k][j]
+    return _t
+
 class IMU(Dialog):
 
     def __init__(self, driver, simulation=False):
@@ -204,7 +211,7 @@ class IMU(Dialog):
                 v = self.vehicle_points[self.vehicle_faces[i][j]]
 
                 # Transform the point from 3D to 2D
-                ps = _dotv(v, transpose(rot))
+                ps = _dotv(v, _transpose(rot))
                 p = self._to_screen_coords(ps)
                
                 # Put the screenpoint in the list of transformed vertices
