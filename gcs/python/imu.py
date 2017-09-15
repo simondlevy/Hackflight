@@ -35,11 +35,17 @@ from tkcompat import *
 
 from math import sin, cos, radians, degrees
 
-from numpy import eye, array, dot, transpose
+from numpy import array, dot, transpose
 
 from dialog import Dialog
 
 from vehicle import get_vehicle
+
+def _dot(a,b):
+    return dot(array(a), array(b))
+
+def _eye3():
+    return [[1,0,0],[0,1,0],[0,0,1]]
 
 class IMU(Dialog):
 
@@ -63,9 +69,9 @@ class IMU(Dialog):
         self.roll_pitch_yaw = None
 
         # Rotation matrices
-        self.pitchrot = eye(3)
-        self.yawrot = eye(3)
-        self.rollrot = eye(3)
+        self.pitchrot = _eye3()
+        self.yawrot = _eye3()
+        self.rollrot = _eye3()
 
         self.simulation = simulation
         self.running = False
@@ -153,30 +159,30 @@ class IMU(Dialog):
         # Convert angles to X,Y,Z rotation matrices
 
         rollAngle  = -radians(self.roll_pitch_yaw[0]) # negate so positive is roll rightward
-        self.rollrot[0,0] = +cos(rollAngle)
-        self.rollrot[0,1] = -sin(rollAngle)
-        self.rollrot[1,0] = +sin(rollAngle)
-        self.rollrot[1,1] = +cos(rollAngle)
+        self.rollrot[0][0] = +cos(rollAngle)
+        self.rollrot[0][1] = -sin(rollAngle)
+        self.rollrot[1][0] = +sin(rollAngle)
+        self.rollrot[1][1] = +cos(rollAngle)
 
         pitchAngle = radians(self.roll_pitch_yaw[1]) 
-        self.pitchrot[1,1] = +cos(pitchAngle) 
-        self.pitchrot[1,2] = -sin(pitchAngle)
-        self.pitchrot[2,1] = +sin(pitchAngle)
-        self.pitchrot[2,2] = +cos(pitchAngle)
+        self.pitchrot[1][1] = +cos(pitchAngle) 
+        self.pitchrot[1][2] = -sin(pitchAngle)
+        self.pitchrot[2][1] = +sin(pitchAngle)
+        self.pitchrot[2][2] = +cos(pitchAngle)
 
         yawAngle   = -radians(self.roll_pitch_yaw[2])
-        self.yawrot[0,0] = +cos(yawAngle)
-        self.yawrot[0,2] = +sin(yawAngle)
-        self.yawrot[2,0] = -sin(yawAngle)
-        self.yawrot[2,2] = +cos(yawAngle)
+        self.yawrot[0][0] = +cos(yawAngle)
+        self.yawrot[0][2] = +sin(yawAngle)
+        self.yawrot[2][0] = -sin(yawAngle)
+        self.yawrot[2][2] = +cos(yawAngle)
 
         # Multiply matrices based on active axis
         if self.driver.active_axis == YAW_ACTIVE:
-            rot = dot(dot(self.rollrot, self.pitchrot), self.yawrot)
+            rot = _dot(_dot(self.rollrot, self.pitchrot), self.yawrot)
         elif self.driver.active_axis == PITCH_ACTIVE:
-            rot = dot(dot(self.yawrot, self.rollrot), self.pitchrot)
+            rot = _dot(_dot(self.yawrot, self.rollrot), self.pitchrot)
         else:
-            rot = dot(dot(self.yawrot, self.pitchrot), self.rollrot)
+            rot = _dot(_dot(self.yawrot, self.pitchrot), self.rollrot)
 
         # Add a label for arming if needed
         self.driver.checkArmed()
@@ -191,7 +197,7 @@ class IMU(Dialog):
                 v = self.vehicle_points[self.vehicle_faces[i][j]]
 
                 # Transform the point from 3D to 2D
-                ps = dot(v, transpose(rot))
+                ps = _dot(v, transpose(rot))
                 p = self._to_screen_coords(ps)
                
                 # Put the screenpoint in the list of transformed vertices
