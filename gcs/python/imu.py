@@ -114,9 +114,9 @@ class IMU(Dialog):
         SC[0,3] = width/2
         SC[1,3] = height/2
 
-        x = SC[0,0]*pv[0]+SC[0,1]*pv[1]+SC[0,2]*pv[2]+SC[0,3]
-        y = SC[1,0]*pv[0]+SC[1,1]*pv[1]+SC[1,2]*pv[2]+SC[1,3]
-        z = SC[2,0]*pv[0]+SC[2,1]*pv[1]+SC[2,2]*pv[2]+SC[2,3]
+        x = SC[0,0]*pv[0] + SC[0,3]
+        y = SC[1,1]*pv[1] + SC[1,3]
+        z = SC[2,2]*pv[2]
 
         return np.array([x, y, z])
 
