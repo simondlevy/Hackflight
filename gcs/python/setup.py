@@ -20,7 +20,13 @@ from distutils.core import setup
 '''
 
 from distutils.core import setup
+from subprocess import call
 import py2exe
+from os import system
 
-import py2exe
-setup(console=['hackflight.py'])
+system('mkdir dist')
+system('mkdir dist\media')
+system('copy media\icon.xbm dist\media')
+system('copy media\*.gif dist\media')
+
+setup(console = ['hackflight.py'])
