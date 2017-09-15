@@ -30,3 +30,5 @@ system('copy media\icon.xbm dist\media')
 system('copy media\*.gif dist\media')
 
 setup(windows = ['hackflight.py'])
+
+system('move dist hackflight-gcs')
