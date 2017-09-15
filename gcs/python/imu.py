@@ -107,16 +107,9 @@ class IMU(Dialog):
         dims = [int(s) for s in str(self.driver.root.geometry()).split('+')[0].split('x')]
         width, height = dims[0], dims[1]
 
-        SC = np.eye(4)
-
-        SC[0,0] = width/2
-        SC[1,1] = -height/2
-        SC[0,3] = width/2
-        SC[1,3] = height/2
-
-        x = SC[0,0]*pv[0] + SC[0,3]
-        y = SC[1,1]*pv[1] + SC[1,3]
-        z = SC[2,2]*pv[2]
+        x = width/2*pv[0] + width/2
+        y = -height/2*pv[1] + height/2
+        z = pv[2]
 
         return np.array([x, y, z])
 
