@@ -46,10 +46,10 @@ private:
 
     // Custom mixer data per motor
     typedef struct motorMixer_t {
-        float throttle; // T
-        float roll;	// A
-        float pitch;	// E
-        float yaw;	// R
+        int8_t throttle; // T
+        int8_t roll; 	 // A
+        int8_t pitch;	 // E
+        int8_t yaw;	     // R
     } motorMixer_t;
 
     motorMixer_t mixerQuadX[4];
@@ -61,10 +61,10 @@ private:
 void Mixer::init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize, Board * _board)
 {
 	            // T      A       E      R
-    mixerQuadX[0] = { +1.0f, -1.0f,  +1.0f, -1.0f };    // right rear
-    mixerQuadX[1] = { +1.0f, -1.0f,  -1.0f, +1.0f };    // right front
-    mixerQuadX[2] = { +1.0f, +1.0f,  +1.0f, +1.0f };    // left rear
-    mixerQuadX[3] = { +1.0f, +1.0f,  -1.0f, -1.0f };    // left front
+    mixerQuadX[0] = { +1, -1,  +1, -1 };    // right rear
+    mixerQuadX[1] = { +1, -1,  -1, +1 };    // right front
+    mixerQuadX[2] = { +1, +1,  +1, +1 };    // left rear
+    mixerQuadX[3] = { +1, +1,  -1, -1 };    // left front
 
     memcpy(&pwmConfig, &_pwmConfig, sizeof(PwmConfig));
 

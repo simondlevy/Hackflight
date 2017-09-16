@@ -144,6 +144,13 @@ class Ladybug : public Board {
             }
 
             avalPrev[index] = aval;
+
+            Serial.print(index);
+            Serial.print(": ");
+            Serial.print(aval);
+            Serial.print("    ");
+            if (index == 3) 
+                Serial.println();
         }
 
         virtual void extrasImuPoll(void) override
