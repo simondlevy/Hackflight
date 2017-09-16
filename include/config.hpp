@@ -189,10 +189,10 @@ struct Config {
 //=========================================================================
 
 enum {
-    DEMAND_ROLL = 0,
-    DEMAND_PITCH,
-    DEMAND_YAW,
-    DEMAND_THROTTLE,
+    DEMAND_THROTTLE, // T
+    DEMAND_ROLL,     // A
+    DEMAND_PITCH,    // E
+    DEMAND_YAW,      // R
     DEMAND_AUX1,
     DEMAND_AUX2,
     DEMAND_AUX3,

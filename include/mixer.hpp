@@ -46,13 +46,13 @@ private:
 
     // Custom mixer data per motor
     typedef struct motorMixer_t {
-        float throttle;
-        float roll;
-        float pitch;
-        float yaw;
+        float throttle; // T
+        float roll;	// A
+        float pitch;	// E
+        float yaw;	// R
     } motorMixer_t;
 
-	motorMixer_t mixerQuadX[4];
+    motorMixer_t mixerQuadX[4];
 };
 
 
@@ -60,6 +60,7 @@ private:
 
 void Mixer::init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize, Board * _board)
 {
+	            // T      A       E      R
     mixerQuadX[0] = { +1.0f, -1.0f,  +1.0f, -1.0f };    // right rear
     mixerQuadX[1] = { +1.0f, -1.0f,  -1.0f, +1.0f };    // right front
     mixerQuadX[2] = { +1.0f, +1.0f,  +1.0f, +1.0f };    // left rear
@@ -82,10 +83,10 @@ void Mixer::update(bool armed)
 
     for (uint8_t i = 0; i < 4; i++) {
         motors[i] = (int16_t)
-        (rc->command[DEMAND_THROTTLE]   * mixerQuadX[i].throttle + 
-         stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch + 
-         stabilize->axisPID[AXIS_ROLL]  * mixerQuadX[i].roll - 
-         stabilize->axisPID[AXIS_YAW]   * mixerQuadX[i].yaw);
+        (rc->command[DEMAND_THROTTLE]   * mixerQuadX[i].throttle + // T
+         stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch +    // A
+         stabilize->axisPID[AXIS_ROLL]  * mixerQuadX[i].roll -     // E
+         stabilize->axisPID[AXIS_YAW]   * mixerQuadX[i].yaw);      // R
     }
 
     int16_t maxMotor = motors[0];

@@ -44,10 +44,8 @@ namespace hf {
             rx.computeRC(chanvals);
         }
 
-	// map TAER to AETR
-	uint8_t chanmap[5] = {1, 2, 3, 0, 4};
-
-        return chanvals[chanmap[chan]];
+	// TAER
+        return chanvals[chan];
     }
 
 } // namespace

@@ -40,10 +40,10 @@ class Receiver(Dialog):
 
         Dialog.start(self)
 
-        self.roll_gauge     = self._new_gauge(0, '    Roll', 'blue')
-        self.pitch_gauge    = self._new_gauge(1, '   Pitch', 'green')
-        self.yaw_gauge      = self._new_gauge(2, '     Yaw', 'orange')
-        self.throttle_gauge = self._new_gauge(3, 'Throttle', 'red')
+        self.throttle_gauge = self._new_gauge(0, 'Throttle', 'red')     # T
+        self.roll_gauge     = self._new_gauge(1, '    Roll', 'blue')    # A
+        self.pitch_gauge    = self._new_gauge(2, '   Pitch', 'green')   # E
+        self.yaw_gauge      = self._new_gauge(3, '     Yaw', 'orange')  # R
         self.switch_gauge   = self._new_gauge(4, '     Aux', 'purple')
 
         self.schedule_display_task(delay_msec)
@@ -58,10 +58,10 @@ class Receiver(Dialog):
 
             channels = self.driver.getChannels()
 
-            self.roll_gauge.update    (channels[0])
-            self.pitch_gauge.update   (channels[1])
-            self.throttle_gauge.update(channels[3])
-            self.yaw_gauge.update     (channels[2])
+            self.throttle_gauge.update(channels[0]) # T
+            self.roll_gauge.update    (channels[1]) # A
+            self.pitch_gauge.update   (channels[2]) # E
+            self.yaw_gauge.update     (channels[3]) # R
             self.switch_gauge.update  (channels[4])
 
             self.schedule_display_task(UPDATE_MSEC)

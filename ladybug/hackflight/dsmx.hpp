@@ -36,7 +36,8 @@ namespace hf {
 
     uint16_t Ladybug::rcReadChannel(uint8_t chan)
     {
-        uint8_t chanmap[5] = {1, 2, 3, 0, 5};
+	// TAER
+        uint8_t chanmap[5] = {0, 1, 2, 3, 5};
         return rx.getChannelValue(chanmap[chan]);
     }
 
