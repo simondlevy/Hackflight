@@ -19,7 +19,7 @@
 #pragma once
 
 #include "board.hpp"
-#include "rc.hpp"
+#include "receiver.hpp"
 #include "mixer.hpp"
 
 // See http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol

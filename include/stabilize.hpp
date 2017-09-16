@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <limits>
 
-#include "rc.hpp"
+#include "receiver.hpp"
 #include "config.hpp"
 #include "common.hpp"
 #include "filter.hpp"

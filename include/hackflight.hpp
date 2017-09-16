@@ -27,7 +27,7 @@
 #include "mixer.hpp"
 #include "msp.hpp"
 #include "common.hpp"
-#include "rc.hpp"
+#include "receiver.hpp"
 #include "stabilize.hpp"
 #include "altitude.hpp"
 #include "timedtask.hpp"
