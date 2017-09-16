@@ -146,7 +146,7 @@ void RC::computeExpo(void)
 {
     int32_t tmp, tmp2;
 
-    for (uint8_t channel = 0; channel < 3; channel++) {
+    for (uint8_t channel = 1; channel < 4; channel++) {
 
         tmp = (std::min)(abs(data[channel] - midrc), 500);
 

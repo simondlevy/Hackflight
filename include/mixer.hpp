@@ -60,11 +60,11 @@ private:
 
 void Mixer::init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize, Board * _board)
 {
-	            // T      A       E      R
-    mixerQuadX[0] = { +1, -1,  +1, -1 };    // right rear
-    mixerQuadX[1] = { +1, -1,  -1, +1 };    // right front
-    mixerQuadX[2] = { +1, +1,  +1, +1 };    // left rear
-    mixerQuadX[3] = { +1, +1,  -1, -1 };    // left front
+	               //  T   A    E   R
+    mixerQuadX[0] = { +1, -1,  +1, +1 };    // right rear
+    mixerQuadX[1] = { +1, -1,  -1, -1 };    // right front
+    mixerQuadX[2] = { +1, +1,  +1, -1 };    // left rear
+    mixerQuadX[3] = { +1, +1,  -1, +1 };    // left front
 
     memcpy(&pwmConfig, &_pwmConfig, sizeof(PwmConfig));
 
@@ -85,7 +85,7 @@ void Mixer::update(bool armed)
         motors[i] = (int16_t)
         (rc->command[DEMAND_THROTTLE]   * mixerQuadX[i].throttle + // T
          stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch +    // A
-         stabilize->axisPID[AXIS_ROLL]  * mixerQuadX[i].roll -     // E
+         stabilize->axisPID[AXIS_ROLL]  * mixerQuadX[i].roll +     // E
          stabilize->axisPID[AXIS_YAW]   * mixerQuadX[i].yaw);      // R
     }
 

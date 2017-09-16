@@ -143,14 +143,13 @@ class Ladybug : public Board {
                 analogWrite(motorPins[index], aval);
             }
 
-            avalPrev[index] = aval;
-
+            /*
             Serial.print(index);
             Serial.print(": ");
             Serial.print(aval);
-            Serial.print("    ");
-            if (index == 3) 
-                Serial.println();
+            Serial.print(index==3?"\n":"\t");
+            */
+            avalPrev[index] = aval;
         }
 
         virtual void extrasImuPoll(void) override
