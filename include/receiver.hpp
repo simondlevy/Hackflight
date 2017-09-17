@@ -34,12 +34,13 @@ class RC {
 private:
     void computeCommand(uint8_t channel);
     void adjustCommand(uint8_t channel);
+    void lookupRollPitch(uint8_t channel);
 
     int16_t dataAverage[CONFIG_RC_CHANS][4];
     uint8_t commandDelay;                               // cycles since most recent movement
     int32_t averageIndex;
-    int16_t lookupPitchRollRC[CONFIG_PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
-    int16_t lookupThrottleRC[CONFIG_THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
+    int16_t pitchRollLookupTable[CONFIG_PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
+    int16_t throttleLookupTable[CONFIG_THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
     int16_t midrc;
 
     RcConfig config;
@@ -86,7 +87,7 @@ void RC::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig, Board * _boa
         data[i] = midrc;
 
     for (uint8_t i = 0; i < CONFIG_PITCH_LOOKUP_LENGTH; i++)
-        lookupPitchRollRC[i] = (2500 + config.expo8 * (i * i - 25)) * i * (int32_t)config.rate8 / 2500;
+        pitchRollLookupTable[i] = (2500 + config.expo8 * (i * i - 25)) * i * (int32_t)config.rate8 / 2500;
 
     for (uint8_t i = 0; i < CONFIG_THROTTLE_LOOKUP_LENGTH; i++) {
         int16_t tmp = 10 * i - config.thrMid8;
@@ -95,10 +96,10 @@ void RC::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig, Board * _boa
             y = 100 - config.thrMid8;
         if (tmp < 0)
             y = config.thrMid8;
-        lookupThrottleRC[i] = 10 * config.thrMid8 + tmp * (100 - config.thrExpo8 + 
+        throttleLookupTable[i] = 10 * config.thrMid8 + tmp * (100 - config.thrExpo8 + 
             config.thrExpo8 * (tmp * tmp) / (y * y)) / 10;
-        lookupThrottleRC[i] = pwmConfig.min + (int32_t)(pwmConfig.max - pwmConfig.min) * 
-            lookupThrottleRC[i] / 1000; // [PWM_MIN;PWM_MAX]
+        throttleLookupTable[i] = pwmConfig.min + (int32_t)(pwmConfig.max - pwmConfig.min) * 
+            throttleLookupTable[i] / 1000; // [PWM_MIN;PWM_MAX]
     }
 }
 
@@ -151,12 +152,8 @@ void RC::computeExpo(void)
     computeCommand(DEMAND_PITCH);
     computeCommand(DEMAND_YAW);
 
-    for (uint8_t channel = 1; channel < 3; channel++) {
-        int32_t tmp = command[channel];
-        int32_t tmp2 = tmp / 100;
-        command[channel] = 
-            lookupPitchRollRC[tmp2] + (tmp-tmp2*100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2])/100;
-    }
+    lookupRollPitch(DEMAND_ROLL);
+    lookupRollPitch(DEMAND_PITCH);
 
     adjustCommand(DEMAND_ROLL);
     adjustCommand(DEMAND_PITCH);
@@ -168,10 +165,18 @@ void RC::computeExpo(void)
     int32_t tmp = Filter::constrainMinMax(data[DEMAND_THROTTLE], config.mincheck, 2000);
     tmp = (uint32_t)(tmp - config.mincheck) * 1000 / (2000 - config.mincheck);       // [MINCHECK;2000] -> [0;1000]
     int32_t tmp2 = tmp / 100;
-    command[DEMAND_THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
-        lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [PWM_MIN;PWM_MAX]
+    command[DEMAND_THROTTLE] = throttleLookupTable[tmp2] + (tmp - tmp2 * 100) * (throttleLookupTable[tmp2 + 1] - 
+        throttleLookupTable[tmp2]) / 100;    // [0;1000] -> expo -> [PWM_MIN;PWM_MAX]
 
 } // computeExpo
+
+void RC::lookupRollPitch(uint8_t channel)
+{
+    int32_t tmp = command[channel];
+    int32_t tmp2 = tmp / 100;
+    command[channel] = 
+        pitchRollLookupTable[tmp2] + (tmp-tmp2*100) * (pitchRollLookupTable[tmp2 + 1] - pitchRollLookupTable[tmp2])/100;
+}
 
 void RC::computeCommand(uint8_t channel)
 {
