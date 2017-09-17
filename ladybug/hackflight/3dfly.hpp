@@ -35,9 +35,12 @@ namespace hf {
         config.stabilize.yawI           = 0.005625f;
 
         // "Software trim"
-        //config.stabilize.softwareTrim[AXIS_ROLL]  = +37;
 
-        // Altitude-hold
+        config.stabilize.softwareTrim[AXIS_ROLL]  = 0;
+        config.stabilize.softwareTrim[AXIS_PITCH] = 0;
+        config.stabilize.softwareTrim[AXIS_YAW]   = 0;
+
+        // Altitude-hold XXX not tuneable; belongs elsewhere
         config.altitude.accel.oneG = 2048;
 
         return config;
