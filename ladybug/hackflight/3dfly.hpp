@@ -35,7 +35,6 @@ namespace hf {
         config.stabilize.yawI           = 0.005625f;
 
         // "Software trim"
-
         config.stabilize.softwareTrim[AXIS_ROLL]  = 0;
         config.stabilize.softwareTrim[AXIS_PITCH] = 0;
         config.stabilize.softwareTrim[AXIS_YAW]   = 0;
