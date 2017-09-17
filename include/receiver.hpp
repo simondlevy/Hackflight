@@ -35,6 +35,7 @@ private:
     void computeCommand(uint8_t channel);
     void adjustCommand(uint8_t channel);
     void lookupRollPitch(uint8_t channel);
+    void lookupCommand(uint8_t channel, int16_t * table);
 
     int16_t dataAverage[CONFIG_RC_CHANS][4];
     uint8_t commandDelay;                               // cycles since most recent movement
@@ -162,20 +163,25 @@ void RC::computeExpo(void)
     // Yaw demand needs to be reversed
     command[DEMAND_YAW] = -command[DEMAND_YAW];
 
+    // Special handling for throttle
     int32_t tmp = Filter::constrainMinMax(data[DEMAND_THROTTLE], config.mincheck, 2000);
     tmp = (uint32_t)(tmp - config.mincheck) * 1000 / (2000 - config.mincheck);       // [MINCHECK;2000] -> [0;1000]
     int32_t tmp2 = tmp / 100;
-    command[DEMAND_THROTTLE] = throttleLookupTable[tmp2] + (tmp - tmp2 * 100) * (throttleLookupTable[tmp2 + 1] - 
-        throttleLookupTable[tmp2]) / 100;    // [0;1000] -> expo -> [PWM_MIN;PWM_MAX]
+    command[DEMAND_THROTTLE] = 
+        throttleLookupTable[tmp2] + (tmp-tmp2 * 100) * (throttleLookupTable[tmp2+1] - throttleLookupTable[tmp2])/100; 
 
 } // computeExpo
 
 void RC::lookupRollPitch(uint8_t channel)
 {
+    lookupCommand(channel, pitchRollLookupTable);
+}
+
+void RC::lookupCommand(uint8_t channel, int16_t * table)
+{
     int32_t tmp = command[channel];
     int32_t tmp2 = tmp / 100;
-    command[channel] = 
-        pitchRollLookupTable[tmp2] + (tmp-tmp2*100) * (pitchRollLookupTable[tmp2 + 1] - pitchRollLookupTable[tmp2])/100;
+    command[channel] = table[tmp2] + (tmp-tmp2*100) * (table[tmp2+1] - table[tmp2])/100;
 }
 
 void RC::computeCommand(uint8_t channel)
