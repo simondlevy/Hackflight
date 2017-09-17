@@ -32,6 +32,9 @@ namespace hf {
 
 class RC {
 private:
+    void computeCommand(uint8_t channel);
+    void adjustCommand(uint8_t channel);
+
     int16_t dataAverage[CONFIG_RC_CHANS][4];
     uint8_t commandDelay;                               // cycles since most recent movement
     int32_t averageIndex;
@@ -144,31 +147,42 @@ bool RC::changed(void)
 
 void RC::computeExpo(void)
 {
-    int32_t tmp, tmp2;
+    computeCommand(DEMAND_ROLL);
+    computeCommand(DEMAND_PITCH);
+    computeCommand(DEMAND_YAW);
 
-    for (uint8_t channel = 1; channel < 4; channel++) {
-
-        tmp = (std::min)(abs(data[channel] - midrc), 500);
-
-        if (channel != DEMAND_YAW) { // roll, pitch
-            tmp2 = tmp / 100;
-            command[channel] = 
-                lookupPitchRollRC[tmp2] + (tmp-tmp2*100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2])/100;
-        } else {                    // yaw
-            command[channel] = tmp * -1;
-        }
-
-        if (data[channel] < midrc)
-            command[channel] = -command[channel];
+    for (uint8_t channel = 1; channel < 3; channel++) {
+        int32_t tmp = command[channel];
+        int32_t tmp2 = tmp / 100;
+        command[channel] = 
+            lookupPitchRollRC[tmp2] + (tmp-tmp2*100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2])/100;
     }
 
-    tmp = Filter::constrainMinMax(data[DEMAND_THROTTLE], config.mincheck, 2000);
+    adjustCommand(DEMAND_ROLL);
+    adjustCommand(DEMAND_PITCH);
+    adjustCommand(DEMAND_YAW);
+
+    // Yaw demand needs to be reversed
+    command[DEMAND_YAW] = -command[DEMAND_YAW];
+
+    int32_t tmp = Filter::constrainMinMax(data[DEMAND_THROTTLE], config.mincheck, 2000);
     tmp = (uint32_t)(tmp - config.mincheck) * 1000 / (2000 - config.mincheck);       // [MINCHECK;2000] -> [0;1000]
-    tmp2 = tmp / 100;
+    int32_t tmp2 = tmp / 100;
     command[DEMAND_THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - 
         lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [PWM_MIN;PWM_MAX]
 
 } // computeExpo
+
+void RC::computeCommand(uint8_t channel)
+{
+    command[channel] = (std::min)(abs(data[channel] - midrc), 500);
+}
+
+void RC::adjustCommand(uint8_t channel)
+{
+    if (data[channel] < midrc)
+        command[channel] = -command[channel];
+}
 
 uint8_t RC::getAuxState(void) 
 {
