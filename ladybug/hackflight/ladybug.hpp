@@ -40,6 +40,9 @@ class Ladybug : public Board {
 
     protected:
 
+        // Implement this for each model
+        virtual const Config& getConfig(void) override;
+
         virtual void debug(char * msg) override
         {
             Serial.print(msg);
@@ -73,6 +76,7 @@ class Ladybug : public Board {
             }
         }
 
+        /*
         virtual const Config& getConfig(void) override
         {
             // PIDs
@@ -93,6 +97,7 @@ class Ladybug : public Board {
 
             return config;
         }
+        */
 
         virtual void delayMilliseconds(uint32_t msec) override
         {

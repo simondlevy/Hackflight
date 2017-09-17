@@ -1,6 +1,5 @@
-
 /*
-   hackflight.ino : Main Hackflight sketch for Ladybug Flight Controller
+   3dfly.hpp : 3DFly PIDs for Ladybug Flight Controller 
 
    This file is part of Hackflight.
 
@@ -17,26 +16,31 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
+#pragma once
 
-#include "hackflight.hpp"
 #include "ladybug.hpp"
 
-// Pick one
-#include "3dfly.hpp"
+namespace hf {
 
-// Pick one
-//#include "dsmx.hpp"
-#include "cppm.hpp"
+    const Config& Ladybug::getConfig(void)
+    {
+        // PIDs
+        config.stabilize.levelP         = 0.20f;
 
-hf::Hackflight h;
+        config.stabilize.ratePitchrollP = 0.225f;
+        config.stabilize.ratePitchrollI = 0.001875f;
+        config.stabilize.ratePitchrollD = 0.375f;
 
-void setup(void)
-{
-    h.init(new hf::Ladybug());
-}
+        config.stabilize.yawP           = 1.0625f;
+        config.stabilize.yawI           = 0.005625f;
 
-void loop(void)
-{
-    h.update();
-}
+        // "Software trim"
+        //config.stabilize.softwareTrim[AXIS_ROLL]  = +37;
+
+        // Altitude-hold
+        config.altitude.accel.oneG = 2048;
+
+        return config;
+    }
+
+} // namespace
