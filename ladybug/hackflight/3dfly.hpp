@@ -34,7 +34,7 @@ namespace hf {
         config.stabilize.yawP           = 1.0625f;
         config.stabilize.yawI           = 0.005625f;
 
-        // "Software trim"
+        // "Software trim": PWM values in microseconds; keep in [-300,+300]
         config.stabilize.softwareTrim[AXIS_ROLL]  = 0;
         config.stabilize.softwareTrim[AXIS_PITCH] = 0;
         config.stabilize.softwareTrim[AXIS_YAW]   = 0;
