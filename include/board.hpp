@@ -59,6 +59,9 @@ class Board {
     //------------------------------------------ Motors ---------------------------------------------------------
         virtual void     writeMotor(uint8_t index, uint16_t value) = 0;
 
+    //------------------------------------------ Simulation  ----------------------------------------------------
+        virtual bool     skipArming(void) { return false; }
+
     //------------------------------------------ Extras ---------------------------------------------------------
         virtual bool    extrasHaveBaro(void) { return false; }
         virtual float   extrasGetBaroPressure(void) { return 0; }

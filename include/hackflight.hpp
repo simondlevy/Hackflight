@@ -129,8 +129,10 @@ void Hackflight::init(Board * _board)
     for (int k=0; k<3; ++k) {
         eulerAnglesDegrees[k] = 0;
     }
-    armed = false;
-    safeToArm = false;
+    
+    // Start in unarmed mode, except for simulator
+    armed = board->skipArming();
+    safeToArm = board->skipArming();
 
 } // init
 
@@ -178,7 +180,7 @@ void Hackflight::updateRc(void)
             // Disarm on throttle down + yaw
             if (rc.sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
                 if (armed) {
-                    armed = false;
+                    armed = board->skipArming();
                 }
             }
 
