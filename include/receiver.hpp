@@ -165,10 +165,8 @@ void RC::computeExpo(void)
 
     // Special handling for throttle
     int32_t tmp = Filter::constrainMinMax(data[DEMAND_THROTTLE], config.mincheck, 2000);
-    tmp = (uint32_t)(tmp - config.mincheck) * 1000 / (2000 - config.mincheck);       // [MINCHECK;2000] -> [0;1000]
-    int32_t tmp2 = tmp / 100;
-    command[DEMAND_THROTTLE] = 
-        throttleLookupTable[tmp2] + (tmp-tmp2 * 100) * (throttleLookupTable[tmp2+1] - throttleLookupTable[tmp2])/100; 
+    command[DEMAND_THROTTLE] = (uint32_t)(tmp - config.mincheck) * 1000 / (2000 - config.mincheck); // [MINCHECK;2000] -> [0;1000]
+    lookupCommand(DEMAND_THROTTLE, throttleLookupTable);
 
 } // computeExpo
 
