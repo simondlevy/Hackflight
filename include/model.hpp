@@ -22,10 +22,6 @@
 
 namespace hf {
 
-//=========================================================================
-// Stabilization PID config: YOU MUST SET THESE VALUES FOR EACH MODEL
-//=========================================================================
-
 class Model {
 
     public:
