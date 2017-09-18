@@ -1,5 +1,5 @@
 /*
-   rc.hpp : RC receiver class header
+   receiver.hpp : RC receiver class header
 
    Adapted from https://github.com/multiwii/baseflight/blob/master/src/mw.h
 

@@ -37,10 +37,10 @@ of a few objects (<b>IMU</b>, <b>Receiver</b>, <b>PID</b>, <b>Board</b>) and a
 of those objects.  
 
 Because a quadcopter build typically involves choosing a flight-control board, 
-receiver, and model (airframe), Hackflight provides a separate C++ class for
+radio receiver, and model (airframe), Hackflight provides a separate C++ class for
 each of these components.  The
 [Board](https://github.com/simondlevy/Hackflight/blob/master/include/board.hpp)
-class specifies a set of abstract (pure virtual methods) that you implement
+class specifies a set of abstract (pure virtual) methods that you implement
 for a particular flight controller or simulator: getting values from the IMU,
 sending commands to the motors, etc.  The
 [Receiver](https://github.com/simondlevy/Hackflight/blob/master/include/receiver.hpp)
