@@ -27,6 +27,7 @@
 #include "config.hpp"
 #include "common.hpp"
 #include "filter.hpp"
+#include "model.hpp"
 
 namespace hf {
 
@@ -34,7 +35,7 @@ class Stabilize {
 public:
     int16_t axisPID[3];
 
-    void init(const StabilizeConfig& _config, const ImuConfig& _imuConfig);
+    void init(const StabilizeConfig& _config, const ImuConfig& _imuConfig, Model * _model);
 
     void update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAnglesDegrees[3]);
 
@@ -49,6 +50,7 @@ private:
     int32_t errorAngleI[2];
 
     Board * board;
+    Model * model;
 
     ImuConfig imuConfig;
     StabilizeConfig config;
@@ -61,11 +63,12 @@ private:
 
 /********************************************* CPP ********************************************************/
 
-void Stabilize::init(const StabilizeConfig& _config, const ImuConfig& _imuConfig)
+void Stabilize::init(const StabilizeConfig& _config, const ImuConfig& _imuConfig, Model * _model)
 {
     // We'll use PID, IMU config values in update() below
     memcpy(&config, &_config, sizeof(StabilizeConfig));
     memcpy(&imuConfig, &_imuConfig, sizeof(ImuConfig));
+    model = _model;
 
     // Zero-out previous values for D term
     for (uint8_t axis=0; axis<2; ++axis) {
@@ -94,19 +97,19 @@ int32_t Stabilize::computeITermGyro(float rateP, float rateI, int16_t rcCommand,
 int16_t Stabilize::computePid(float rateP, int32_t PTerm, int32_t ITerm, int32_t DTerm, int16_t gyroADC[3], uint8_t axis)
 {
     PTerm -= (int32_t)gyroADC[axis] * rateP;
-    return PTerm + ITerm - DTerm + config.softwareTrim[axis];
+    return PTerm + ITerm - DTerm + model->softwareTrim[axis];
 }
 
 // Computes PID for pitch or roll
 int16_t Stabilize::computeLevelPid(int16_t rcCommand[4], uint8_t rcAxis, int16_t gyroADC[3], float eulerAnglesDegrees[3], uint8_t imuAxis)
 {
-    int32_t ITermGyro = computeITermGyro(config.ratePitchrollP, config.ratePitchrollI, rcCommand[rcAxis], gyroADC, imuAxis);
+    int32_t ITermGyro = computeITermGyro(model->ratePitchrollP, model->ratePitchrollI, rcCommand[rcAxis], gyroADC, imuAxis);
 
     // RC command is in [-500,+500].  We compute error by scaling it up to [-1000,+1000], then treating this value as tenths
     // of a degree and subtracting off corresponding pitch or roll angle obtained from IMU.
     int32_t errorAngle = Filter::constrainAbs(2*rcCommand[rcAxis], 10*imuConfig.maxAngleInclination) - 10*eulerAnglesDegrees[imuAxis];
 
-    int32_t PTermAccel = errorAngle * config.levelP; 
+    int32_t PTermAccel = errorAngle * model->levelP; 
 
     // Avoid integral windup
     errorAngleI[imuAxis] = Filter::constrainAbs(errorAngleI[imuAxis] + errorAngle, config.angleWindupMax);
@@ -123,9 +126,9 @@ int16_t Stabilize::computeLevelPid(int16_t rcCommand[4], uint8_t rcAxis, int16_t
     int32_t deltaSum = delta1[imuAxis] + delta2[imuAxis] + delta;
     delta2[imuAxis] = delta1[imuAxis];
     delta1[imuAxis] = delta;
-    int32_t DTerm = deltaSum * config.ratePitchrollD;
+    int32_t DTerm = deltaSum * model->ratePitchrollD;
 
-    return computePid(config.ratePitchrollP, PTerm, ITerm, DTerm, gyroADC, imuAxis);
+    return computePid(model->ratePitchrollP, PTerm, ITerm, DTerm, gyroADC, imuAxis);
 }
 
 void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAnglesDegrees[3])
@@ -135,8 +138,8 @@ void Stabilize::update(int16_t rcCommand[4], int16_t gyroADC[3], float eulerAngl
     axisPID[AXIS_PITCH] = computeLevelPid(rcCommand, DEMAND_PITCH, gyroADC, eulerAnglesDegrees, AXIS_PITCH);
 
     // For yaw, P term comes directly from RC command, and D term is zero
-    int32_t ITermGyroYaw = computeITermGyro(config.yawP, config.yawI, rcCommand[DEMAND_YAW], gyroADC, AXIS_YAW);
-    axisPID[AXIS_YAW] = computePid(config.yawP, rcCommand[DEMAND_YAW], ITermGyroYaw, 0, gyroADC, AXIS_YAW);
+    int32_t ITermGyroYaw = computeITermGyro(model->yawP, model->yawI, rcCommand[DEMAND_YAW], gyroADC, AXIS_YAW);
+    axisPID[AXIS_YAW] = computePid(model->yawP, rcCommand[DEMAND_YAW], ITermGyroYaw, 0, gyroADC, AXIS_YAW);
 
     // Prevent "yaw jump" during yaw correction
     axisPID[AXIS_YAW] = Filter::constrainAbs(axisPID[AXIS_YAW], 100 + std::abs(rcCommand[DEMAND_YAW]));

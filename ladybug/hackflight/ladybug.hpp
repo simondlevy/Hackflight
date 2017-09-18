@@ -1,5 +1,5 @@
 /*
-   ladybug.hpp : Ladybug Flight Controller implementation of routines in board.hpp
+   ladybug.hpp : Ladybug Flight Controller implementation of Hackflight Board routines
 
    Uses EM7180 SENtral Sensor Hub in master mode mode
 
@@ -40,8 +40,14 @@ class Ladybug : public Board {
 
     protected:
 
-        // Implement this for each model
-        virtual const Config& getConfig(void) override;
+        const Config& getConfig(void)
+        {
+            // Accelerometer reading at 1G (vehicle resting flat)
+            config.altitude.accel.oneG = 2048; // default is 4096
+
+            return config;
+        }
+
 
         virtual void debug(char * msg) override
         {

@@ -1,5 +1,5 @@
 /*
-   3dfly.hpp : 3DFly PIDs for Ladybug Flight Controller 
+   3dfly.hpp : 3DFly model (PIDs) for Hackflight
 
    This file is part of Hackflight.
 
@@ -18,31 +18,38 @@
 
 #pragma once
 
-#include "ladybug.hpp"
+#include "model.hpp"
 
 namespace hf {
 
-    const Config& Ladybug::getConfig(void)
-    {
-        // PIDs
-        config.stabilize.levelP         = 0.20f;
+    class ThreeDFly : public Model {
 
-        config.stabilize.ratePitchrollP = 0.225f;
-        config.stabilize.ratePitchrollI = 0.001875f;
-        config.stabilize.ratePitchrollD = 0.375f;
+        public:
 
-        config.stabilize.yawP           = 1.0625f;
-        config.stabilize.yawI           = 0.005625f;
+            ThreeDFly(void) {
 
-        // "Software trim": PWM values in microseconds; keep in [-300,+300]
-        config.stabilize.softwareTrim[AXIS_ROLL]  = 0;
-        config.stabilize.softwareTrim[AXIS_PITCH] = 0;
-        config.stabilize.softwareTrim[AXIS_YAW]   = 0;
+                // Level (accelerometer)
+                levelP         = 0.20f;
 
-        // Altitude-hold XXX not tuneable; belongs elsewhere
-        config.altitude.accel.oneG = 2048;
+                // Rate (gyro): P must be positive
+                ratePitchrollP = 0.225f;
+                ratePitchrollI = 0.001875f;
+                ratePitchrollD = 0.375f;
 
-        return config;
-    }
+                // Yaw: P must be positive
+                yawP           = 1.0625f;
+                yawI           = 0.005625f;
+
+                // Trim for a particular vehicle: roll, pitch, yaw
+                softwareTrim[AXIS_ROLL]  = 0;
+                softwareTrim[AXIS_PITCH] = 0;
+                softwareTrim[AXIS_YAW]   = 0;
+
+                // Altitude 
+                altP = 0.5f;
+                altI = 0.02f; 
+                altD = 1.7f;
+            }
+    };
 
 } // namespace

@@ -20,10 +20,13 @@
    along with EM7180.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include "filter.hpp"
 #include "config.hpp"
 #include "barometer.hpp"
 #include "accelerometer.hpp"
+#include "model.hpp"
 
 namespace hf {
  
@@ -31,7 +34,7 @@ class Altitude {
 
     public:
 
-        void init(const AltitudeConfig & _config, Board * _board);
+        void init(const AltitudeConfig & _config, Board * _board, Model * _model);
         void start(uint16_t throttleDemand);
         void stop(void);
         void computePid(bool armed);
@@ -43,6 +46,7 @@ class Altitude {
         AltitudeConfig config;
 
         Board * board;
+        Model * model;
 
         // Barometer
         Barometer baro;
@@ -65,11 +69,12 @@ class Altitude {
 
 /********************************************* CPP ********************************************************/
 
-void Altitude::init(const AltitudeConfig & _config, Board * _board)
+void Altitude::init(const AltitudeConfig & _config, Board * _board, Model * _model)
 {
     memcpy(&config, &_config, sizeof(AltitudeConfig));
 
     board = _board;
+    model = _model;
 
     baro.init(config.baro, _board);
 
@@ -133,16 +138,16 @@ void Altitude::computePid(bool armed)
     // P
     int32_t error = Filter::constrainAbs(altHold - baroAlt, config.pErrorMax);
     error = Filter::deadband(error, config.pDeadband); 
-    pid = Filter::constrainAbs((int16_t)(config.pidP * error), config.pidMax);
+    pid = Filter::constrainAbs((int16_t)(model->altP * error), config.pidMax);
 
     // I
-    errorAltitudeI += (int16_t)(config.pidI * error);
+    errorAltitudeI += (int16_t)(model->altI * error);
     errorAltitudeI = Filter::constrainAbs(errorAltitudeI, config.iErrorMax);
     pid += errorAltitudeI * (dTimeMicros/1e6);
 
     // D
     int32_t vario = Filter::deadband(velocity, config.dDeadband);
-    pid -= Filter::constrainAbs((int16_t)(config.pidD * vario), config.pidMax);
+    pid -= Filter::constrainAbs((int16_t)(model->altD * vario), config.pidMax);
 
 } // computePid
 

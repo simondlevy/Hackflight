@@ -28,20 +28,7 @@ namespace hf {
 
 struct StabilizeConfig {
 
-    // Level (accelerometer)
-    float levelP;
-
-    // Rate (gyro): P must be positive
-    float ratePitchrollP;
-    float ratePitchrollI;
-    float ratePitchrollD;
-
-    // Yaw: P must be positive
-    float yawP;
-    float yawI;
-
-    // Trim for a particular vehicle: roll, pitch, yaw
-    int16_t softwareTrim[3] = {0, 0, 0};
+    // PIDs are in model.hpp
 
     // Resetting thresholds for PID Integral term
     uint32_t angleWindupMax = 10000;
@@ -106,10 +93,7 @@ struct AccelerometerConfig {
 
 struct AltitudeConfig {
 
-    // PID tuning
-    float pidP = 0.5f; 
-    float pidI = 0.02f; 
-    float pidD = 1.7f;
+    // PIDs are in model.hpp
 
     // Bounds
     uint16_t pidMax    = 150;

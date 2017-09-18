@@ -25,12 +25,14 @@
 #include "config.hpp"
 #include "board.hpp"
 #include "mixer.hpp"
+#include "model.hpp"
 #include "msp.hpp"
 #include "common.hpp"
 #include "receiver.hpp"
 #include "stabilize.hpp"
 #include "altitude.hpp"
 #include "timedtask.hpp"
+#include "model.hpp"
 
 // For logical combinations of stick positions (low, center, high)
 #define ROL_LO (1 << (2 * DEMAND_ROLL))
@@ -52,7 +54,7 @@ class Hackflight {
 
     public:
 
-        void init(Board * _board, Receiver *_receiver);
+        void init(Board * _board, Receiver *_receiver, Model * _model);
         void update(void);
 
     private:
@@ -85,7 +87,7 @@ class Hackflight {
 
 /********************************************* CPP ********************************************************/
 
-void Hackflight::init(Board * _board, Receiver * _receiver)
+void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
 {  
     board = _board;
     receiver = _receiver;
@@ -119,12 +121,12 @@ void Hackflight::init(Board * _board, Receiver * _receiver)
     receiver->init(config.rc, config.pwm);
 
     // Initialize our stabilization, mixing, and MSP (serial comms)
-    stab.init(config.stabilize, config.imu);
+    stab.init(config.stabilize, config.imu, _model);
     mixer.init(config.pwm, receiver, &stab, board); 
     msp.init(&mixer, receiver, board);
 
     // Initialize altitude estimator, which will be used if there's a barometer
-    alti.init(config.altitude, board);
+    alti.init(config.altitude, board, _model);
 
     // Initialize state varriables
     for (int k=0; k<3; ++k) {

@@ -25,18 +25,21 @@
 hf::Hackflight h;
 
 // Choose a model --------------------
+
 #include "3dfly.hpp"
+hf::ThreeDFly model;
 
 // Choose a receiver -----------------
-#include "dsmx.hpp"
-hf::DSMX_Receiver rc;
 
-//#include "cppm.hpp"
-//hf::CPPM_Receiver rc;
+//#include "dsmx.hpp"
+//hf::DSMX_Receiver rc;
+
+#include "cppm.hpp"
+hf::CPPM_Receiver rc;
 
 void setup(void)
 {
-    h.init(new hf::Ladybug(), &rc);
+    h.init(new hf::Ladybug(), &rc, &model);
 }
 
 void loop(void)

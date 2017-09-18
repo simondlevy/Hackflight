@@ -12,6 +12,7 @@ ladybug/hackflight/msp.hpp
 ladybug/hackflight/receiver.hpp
 ladybug/hackflight/stabilize.hpp
 ladybug/hackflight/timedtask.hpp
+ladybug/hackflight/model.hpp
 
 parser/output
 
