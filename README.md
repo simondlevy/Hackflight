@@ -32,20 +32,23 @@ adheres to standard practices for C++, notably, short, simple methods and
 avoidance of compiler macros like <b>#ifdef</b> that can make it difficult to
 follow what the code is doing.  As you can see, the code follows the Arduino
 design pattern of a <b>setup()</b> routine that calls the <b>init()</b> method
-of a few objects (<b>IMU</b>, <b>RC</b>, <b>PID</b>, <b>Board</b>) and a
+of a few objects (<b>IMU</b>, <b>Receiver</b>, <b>PID</b>, <b>Board</b>) and a
 <b>loop()</b> routine that calls the <b>update()</b> method and other methods
-of those objects.  The code provides abstraction (through the <b>Board</b>
-class) that should make it easy to use on other boards.  The <b>Board</b> class
-declares the pure virtual methods that you must override for implementation on
-a particular board or simulator, as well as a few &ldquo;extras&rdquo;, virtual
-methods that you can override for additional functionality like altitude-hold,
-hover-in-place, etc.  
+of those objects.  
 
-The only parameters you should need to adjust are the PID tuning 
-[params](https://github.com/simondlevy/hackflight/blob/master/include/config.hpp#L25-L43). 
-As usual, collective lower-right arms the board, and lower-left disarms it, as
-indicated by the LED.  The LED will flash when the board is tilted by
-more than 25 degrees.
+Because a quadcopter build typically involves choosing a flight-control board, 
+receiver, and model (airframe), Hackflight provides a separate C++ class for
+each of these components.  The
+[Board](https://github.com/simondlevy/Hackflight/blob/master/include/board.hpp)
+class specifies a set of abstract (pure virtual methods) that you implement
+for a particular flight controller or simulator: getting values from the IMU,
+sending commands to the motors, etc.  The
+[Receiver](https://github.com/simondlevy/Hackflight/blob/master/include/receiver.hpp)
+class performs basic functions associated with R/C control (tracking stick positions,
+checking switches) and specifies a set of abstract methods that you implement for
+a particular receiver (reading channels values).  The
+[Model](https://github.com/simondlevy/Hackflight/blob/master/include/model.hpp)
+class is where you specify the PID values for your model.
 
 Although Hackflight was designed to be &ldquo;headless&rdquo; (no configurator program),
 it is useful to get some visual feedback on things like vehicle orientation and RC receiver
