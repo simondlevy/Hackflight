@@ -19,33 +19,38 @@
 #pragma once
 
 #include <BreezyCPPM.h>
+#include "receiver.hpp"
 
 // Interrupt on pin 0, using 5 channels
 static BreezyCPPM rx(0, 5);
 
 namespace hf {
 
-    void Ladybug::rcInit(void)
-    {
-        rx.begin();
-    }
+    class CPPM_Receiver : public Receiver {
 
-    bool Ladybug::rcUseSerial(void)
-    {
-        return false;
-    }
-
-    uint16_t Ladybug::rcReadChannel(uint8_t chan)
-    {
-        static uint16_t chanvals[5];
-
-        // Only need to read channels once
-        if (chan == 0) {
-            rx.computeRC(chanvals);
+        void begin(void)
+        {
+            rx.begin();
         }
 
-	// TAER
-        return chanvals[chan];
-    }
+        bool useSerial(void)
+        {
+            return false;
+        }
+
+        uint16_t readChannel(uint8_t chan)
+        {
+            static uint16_t chanvals[5];
+
+            // Only need to read channels once
+            if (chan == 0) {
+                rx.computeRC(chanvals);
+            }
+
+            // TAER
+            return chanvals[chan];
+        }
+
+    }; // class CPPM_Receiver
 
 } // namespace

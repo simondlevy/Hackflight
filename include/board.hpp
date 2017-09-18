@@ -46,11 +46,6 @@ class Board {
         virtual void     imuGetEuler(float eulerAnglesRadians[3]) = 0;
         virtual void     imuGetGyro(int16_t gyroRaw[3]) = 0;
 
-    //-------------------------------------------- RC -----------------------------------------------------
-        virtual void     rcInit(void) = 0;
-        virtual bool     rcUseSerial(void) = 0;
-        virtual uint16_t rcReadChannel(uint8_t chan) = 0;
-
     //------------------------------------------ Serial ---------------------------------------------------------
         virtual uint8_t  serialAvailableBytes(void) = 0;
         virtual uint8_t  serialReadByte(void) = 0;

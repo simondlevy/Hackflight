@@ -10,7 +10,7 @@
 
    Hackflight is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   MEReceiverHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
@@ -33,13 +33,13 @@ public:
     // This is set by MSP
     int16_t  motorsDisarmed[4];
 
-    void init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize, Board * _board);
+    void init(const PwmConfig& _pwmConfig, Receiver * _rc, Stabilize * _stabilize, Board * _board);
     void update(bool armed);
 
 private:
 
     PwmConfig pwmConfig;
-    RC        * rc;
+    Receiver        * rc;
     Stabilize * stabilize;
 
     Board * board;
@@ -58,7 +58,7 @@ private:
 
 /********************************************* CPP ********************************************************/
 
-void Mixer::init(const PwmConfig& _pwmConfig, RC * _rc, Stabilize * _stabilize, Board * _board)
+void Mixer::init(const PwmConfig& _pwmConfig, Receiver * _rc, Stabilize * _stabilize, Board * _board)
 {
 	               //  T   A    E   R
     mixerQuadX[0] = { +1, -1,  +1, +1 };    // right rear

@@ -12,7 +12,7 @@
 
    Hackflight is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   MEReceiverHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
@@ -23,14 +23,13 @@
 #include <cstring>
 #include <algorithm>
 
-#include "board.hpp"
 #include "config.hpp"
 #include "debug.hpp"
 #include "filter.hpp"
 
 namespace hf {
 
-class RC {
+class Receiver {
 private:
     void computeCommand(uint8_t channel);
     void adjustCommand(uint8_t channel);
@@ -40,16 +39,14 @@ private:
     int16_t dataAverage[CONFIG_RC_CHANS][4];
     uint8_t commandDelay;                               // cycles since most recent movement
     int32_t averageIndex;
-    int16_t pitchRollLookupTable[CONFIG_PITCH_LOOKUP_LENGTH];     // lookup table for expo & RC rate PITCH+ROLL
+    int16_t pitchRollLookupTable[CONFIG_PITCH_LOOKUP_LENGTH];     // lookup table for expo & Receiver rate PITCH+ROLL
     int16_t throttleLookupTable[CONFIG_THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
     int16_t midrc;
 
     RcConfig config;
 
-    Board * board;
-
 public:
-    void init(const RcConfig& rcConfig, const PwmConfig& pwmConfig, Board * _board);
+    void init(const RcConfig& rcConfig, const PwmConfig& pwmConfig);
     void update(void);
 
     int16_t data[CONFIG_RC_CHANS]; // raw PWM values for MSP
@@ -63,16 +60,21 @@ public:
     uint8_t getAuxState(void);
 
     bool throttleIsDown(void);
+
+protected: // Implemented different for each receiver
+    virtual void     begin(void) = 0;
+    virtual bool     useSerial(void) = 0;
+    virtual uint16_t readChannel(uint8_t chan) = 0;
+
 };
 
 
 /********************************************* CPP ********************************************************/
 
-void RC::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig, Board * _board)
+void Receiver::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig)
 {
-    board = _board;
-
-    board->rcInit();
+    // Do hardware initialization
+    begin();
 
     memcpy(&config, &rcConfig, sizeof(RcConfig));
 
@@ -104,19 +106,19 @@ void RC::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig, Board * _boa
     }
 }
 
-void RC::update()
+void Receiver::update()
 {
     // Serial receivers provide clean data and can be read directly
-    if (board->rcUseSerial()) {
+    if (useSerial()) {
         for (uint8_t chan = 0; chan < 5; chan++) {
-            data[chan] = board->rcReadChannel(chan);
+            data[chan] = readChannel(chan);
         }
     }
 
     // Other kinds of receivers require average of channel values to remove noise
     else {
         for (uint8_t chan = 0; chan < 8; chan++) {
-            dataAverage[chan][averageIndex % 4] = board->rcReadChannel(chan);
+            dataAverage[chan][averageIndex % 4] = readChannel(chan);
             data[chan] = 0;
             for (uint8_t i = 0; i < 4; i++)
                 data[chan] += dataAverage[chan][i];
@@ -142,12 +144,12 @@ void RC::update()
     sticks = stTmp;
 }
 
-bool RC::changed(void)
+bool Receiver::changed(void)
 {
     return commandDelay == 20;
 }
 
-void RC::computeExpo(void)
+void Receiver::computeExpo(void)
 {
     computeCommand(DEMAND_ROLL);
     computeCommand(DEMAND_PITCH);
@@ -170,37 +172,37 @@ void RC::computeExpo(void)
 
 } // computeExpo
 
-void RC::lookupRollPitch(uint8_t channel)
+void Receiver::lookupRollPitch(uint8_t channel)
 {
     lookupCommand(channel, pitchRollLookupTable);
 }
 
-void RC::lookupCommand(uint8_t channel, int16_t * table)
+void Receiver::lookupCommand(uint8_t channel, int16_t * table)
 {
     int32_t tmp = command[channel];
     int32_t tmp2 = tmp / 100;
     command[channel] = table[tmp2] + (tmp-tmp2*100) * (table[tmp2+1] - table[tmp2])/100;
 }
 
-void RC::computeCommand(uint8_t channel)
+void Receiver::computeCommand(uint8_t channel)
 {
     command[channel] = (std::min)(abs(data[channel] - midrc), 500);
 }
 
-void RC::adjustCommand(uint8_t channel)
+void Receiver::adjustCommand(uint8_t channel)
 {
     if (data[channel] < midrc)
         command[channel] = -command[channel];
 }
 
-uint8_t RC::getAuxState(void) 
+uint8_t Receiver::getAuxState(void) 
 {
     int16_t aux = data[4];
 
     return aux < 1500 ? 0 : (aux < 1700 ? 1 : 2);
 }
 
-bool RC::throttleIsDown(void)
+bool Receiver::throttleIsDown(void)
 {
     return data[DEMAND_THROTTLE] < config.mincheck;
 }

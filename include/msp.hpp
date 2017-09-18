@@ -10,7 +10,7 @@
 
    Hackflight is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   MEReceiverHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
@@ -58,12 +58,12 @@ typedef  struct mspPortState_t {
 
 class MSP {
 public:
-    void init(Mixer * _mixer, RC * _rc, Board * _board);
+    void init(Mixer * _mixer, Receiver * _rc, Board * _board);
     void update(float eulerAngles[3], bool armed);
 
 private:
     Mixer  * mixer;
-    RC     * rc;
+    Receiver     * rc;
     Board  * board;
 
     mspPortState_t portState;
@@ -150,7 +150,7 @@ void MSP::tailSerialReply(void)
     serialize8(portState.checksum);
 }
 
-void MSP::init(Mixer * _mixer, RC * _rc, Board * _board)
+void MSP::init(Mixer * _mixer, Receiver * _rc, Board * _board)
 {
     mixer = _mixer;
     rc    = _rc;

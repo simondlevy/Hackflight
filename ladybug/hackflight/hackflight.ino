@@ -22,18 +22,21 @@
 #include "hackflight.hpp"
 #include "ladybug.hpp"
 
-// Pick one
+hf::Hackflight h;
+
+// Choose a model --------------------
 #include "3dfly.hpp"
 
-// Pick one
-//#include "dsmx.hpp"
-#include "cppm.hpp"
+// Choose a receiver -----------------
+#include "dsmx.hpp"
+hf::DSMX_Receiver rc;
 
-hf::Hackflight h;
+//#include "cppm.hpp"
+//hf::CPPM_Receiver rc;
 
 void setup(void)
 {
-    h.init(new hf::Ladybug());
+    h.init(new hf::Ladybug(), &rc);
 }
 
 void loop(void)

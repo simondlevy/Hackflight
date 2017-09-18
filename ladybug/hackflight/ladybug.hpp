@@ -76,29 +76,6 @@ class Ladybug : public Board {
             }
         }
 
-        /*
-        virtual const Config& getConfig(void) override
-        {
-            // PIDs
-            config.stabilize.levelP         = 0.20f;
-
-            config.stabilize.ratePitchrollP = 0.225f;
-            config.stabilize.ratePitchrollI = 0.001875f;
-            config.stabilize.ratePitchrollD = 0.375f;
-
-            config.stabilize.yawP           = 1.0625f;
-            config.stabilize.yawI           = 0.005625f;
-
-            // "Software trim"
-            //config.stabilize.softwareTrim[AXIS_ROLL]  = +37;
-
-            // Altitude-hold
-            config.altitude.accel.oneG = 2048;
-
-            return config;
-        }
-        */
-
         virtual void delayMilliseconds(uint32_t msec) override
         {
             delay(msec);
@@ -116,11 +93,6 @@ class Ladybug : public Board {
 
             digitalWrite(A1, is_on ? HIGH : LOW);
         }
-
-        // Implemented in cppm.hpp, dsmx.hpp
-        virtual void rcInit(void) override;
-        virtual bool rcUseSerial(void) override;
-        virtual uint16_t rcReadChannel(uint8_t chan) override;
 
         virtual uint8_t serialAvailableBytes(void) override
         {

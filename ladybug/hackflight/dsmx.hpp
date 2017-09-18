@@ -18,27 +18,32 @@
 
 #pragma once
 
+#include "receiver.hpp"
 #include <SpektrumDSM.h>
 
 static SpektrumDSM2048 rx;
 
 namespace hf {
 
-    void Ladybug::rcInit(void)
-    {
-        rx.begin();
-    }
+    class DSMX_Receiver : public Receiver {
 
-    bool Ladybug::rcUseSerial(void)
-    {
-        return true;
-    }
+        void begin(void)
+        {
+            rx.begin();
+        }
 
-    uint16_t Ladybug::rcReadChannel(uint8_t chan)
-    {
-	// TAER
-        uint8_t chanmap[5] = {0, 1, 2, 3, 5};
-        return rx.getChannelValue(chanmap[chan]);
-    }
+        bool useSerial(void)
+        {
+            return true;
+        }
+
+        uint16_t readChannel(uint8_t chan)
+        {
+            // TAER
+            uint8_t chanmap[5] = {0, 1, 2, 3, 5};
+            return rx.getChannelValue(chanmap[chan]);
+        }
+
+    }; // class DSMX_Receiver
 
 } // namespace

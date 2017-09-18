@@ -10,7 +10,7 @@
 
    Hackflight is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   MEReceiverHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
@@ -52,7 +52,7 @@ class Hackflight {
 
     public:
 
-        void init(Board * _board);
+        void init(Board * _board, Receiver *_receiver);
         void update(void);
 
     private:
@@ -63,13 +63,13 @@ class Hackflight {
         void updateImu(void);
         void updateReadyState(void);
 
-        RC         rc;
         Mixer      mixer;
         MSP        msp;
         Stabilize  stab;
         Altitude   alti;
 
         Board    * board;
+        Receiver * receiver;
 
         TimedTask imuTask;
         TimedTask rcTask;
@@ -85,9 +85,10 @@ class Hackflight {
 
 /********************************************* CPP ********************************************************/
 
-void Hackflight::init(Board * _board)
+void Hackflight::init(Board * _board, Receiver * _receiver)
 {  
     board = _board;
+    receiver = _receiver;
 
     // Do hardware initialization for board
     board->init();
@@ -114,13 +115,13 @@ void Hackflight::init(Board * _board)
     angleCheckTask.init(loopConfig.angleCheckMilli * 1000);
     altitudeTask.init(loopConfig.altHoldLoopMilli * 1000);
 
-    // Initialize the RC receiver
-    rc.init(config.rc, config.pwm, board);
+    // Initialize the receiver
+    receiver->init(config.rc, config.pwm);
 
     // Initialize our stabilization, mixing, and MSP (serial comms)
     stab.init(config.stabilize, config.imu);
-    mixer.init(config.pwm, &rc, &stab, board); 
-    msp.init(&mixer, &rc, board);
+    mixer.init(config.pwm, receiver, &stab, board); 
+    msp.init(&mixer, receiver, board);
 
     // Initialize altitude estimator, which will be used if there's a barometer
     alti.init(config.altitude, board);
@@ -141,12 +142,12 @@ void Hackflight::update(void)
     // Grab current time for various loops
     uint32_t currentTime = board->getMicros();
 
-    // Outer (slow) loop: update RC
+    // Outer (slow) loop: update Receiver
     if (rcTask.checkAndUpdate(currentTime)) {
         updateRc();
     }
 
-    // Altithude-PID task (never called in same loop iteration as RC update)
+    // Altithude-PID task (never called in same loop iteration as Receiver update)
     else if (board->extrasHaveBaro() && altitudeTask.checkAndUpdate(currentTime)) {
         alti.computePid(armed);
     }
@@ -163,22 +164,22 @@ void Hackflight::update(void)
 
 void Hackflight::updateRc(void)
 {
-    // Update RC channels
-    rc.update();
+    // Update Receiver channels
+    receiver->update();
 
     // When landed, reset integral component of PID
-    if (rc.throttleIsDown()) {
+    if (receiver->throttleIsDown()) {
         stab.resetIntegral();
     }
 
     // Certain actions (arming, disarming) need checking every time
-    if (rc.changed()) {
+    if (receiver->changed()) {
 
         // actions during armed
         if (armed) {      
 
             // Disarm on throttle down + yaw
-            if (rc.sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
+            if (receiver->sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
                 if (armed) {
                     armed = board->skipArming();
                 }
@@ -188,9 +189,9 @@ void Hackflight::updateRc(void)
         } else {         
 
             // Arm via throttle-low / yaw-right
-            if (rc.sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE) {
+            if (receiver->sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE) {
                 if (safeToArm) {
-                    auxState = rc.getAuxState();
+                    auxState = receiver->getAuxState();
                     if (!auxState) // aux switch must be in zero position
                         if (!armed) {
                             armed = true;
@@ -200,14 +201,14 @@ void Hackflight::updateRc(void)
 
         } // not armed
 
-    } // rc.changed()
+    } // receiver->changed()
 
     // Detect aux switch changes for altitude-hold
-    if (rc.getAuxState() != auxState) {
-        auxState = rc.getAuxState();
+    if (receiver->getAuxState() != auxState) {
+        auxState = receiver->getAuxState();
         if (board->extrasHaveBaro()) {
             if (auxState > 0) {
-                alti.start(rc.command[DEMAND_THROTTLE]);
+                alti.start(receiver->command[DEMAND_THROTTLE]);
             }
             else {
                 alti.stop();
@@ -218,8 +219,8 @@ void Hackflight::updateRc(void)
 
 void Hackflight::updateImu(void)
 {
-    // Compute exponential RC commands
-    rc.computeExpo();
+    // Compute exponential Receiver commands
+    receiver->computeExpo();
 
     // Get Euler angles from board
     float eulerAnglesRadians[3];
@@ -241,7 +242,7 @@ void Hackflight::updateImu(void)
     // If barometer avaialble, update accelerometer for altitude fusion, then modify throttle demand
     if (board->extrasHaveBaro()) {
         alti.updateAccelerometer(eulerAnglesRadians, armed);
-        alti.modifyThrottleDemand(rc.command[DEMAND_THROTTLE]);
+        alti.modifyThrottleDemand(receiver->command[DEMAND_THROTTLE]);
     }
 
     // Get raw gyro values from board
@@ -249,7 +250,7 @@ void Hackflight::updateImu(void)
     board->imuGetGyro(gyroRaw);
 
     // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
-    stab.update(rc.command, gyroRaw, eulerAnglesDegrees);
+    stab.update(receiver->command, gyroRaw, eulerAnglesDegrees);
     mixer.update(armed);
     msp.update(eulerAnglesDegrees, armed);
 } 
