@@ -27,7 +27,7 @@ after which we plan to sell it on <a href="https://www.tindie.com/">Tindie</a>.
 
 Thanks to some help from [Sytelus](https://github.com/sytelus), the core
 Hackflight
-[firmware](https://github.com/simondlevy/hackflight/tree/master/include)
+[firmware](https://github.com/simondlevy/hackflight/tree/master/src)
 adheres to standard practices for C++, notably, short, simple methods and
 avoidance of compiler macros like <b>#ifdef</b> that can make it difficult to
 follow what the code is doing.  As you can see, the code follows the Arduino
@@ -39,21 +39,21 @@ of those objects.
 Because a quadcopter build typically involves choosing a flight-control board, 
 radio receiver, and model (airframe), Hackflight provides a separate C++ class for
 each of these components.  The
-[Board](https://github.com/simondlevy/Hackflight/blob/master/include/board.hpp)
+[Board](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp)
 class specifies a set of abstract (pure virtual) methods that you implement
 for a particular flight controller or simulator: getting values from the IMU,
 sending commands to the motors, etc.  The
-[Receiver](https://github.com/simondlevy/Hackflight/blob/master/include/receiver.hpp)
+[Receiver](https://github.com/simondlevy/Hackflight/blob/master/src/receiver.hpp)
 class performs basic functions associated with R/C control (tracking stick positions,
 checking switches) and specifies a set of abstract methods that you implement for
 a particular receiver (reading channels values).  The
-[Model](https://github.com/simondlevy/Hackflight/blob/master/include/model.hpp)
+[Model](https://github.com/simondlevy/Hackflight/blob/master/src/model.hpp)
 class is where you specify the PID values for your model.
 
 Although Hackflight was designed to be &ldquo;headless&rdquo; (no configurator program),
 it is useful to get some visual feedback on things like vehicle orientation and RC receiver
 PWM values.  So in the <b>gcs</b> folder you'll find a Python program (<b>hackflight.py</b>)
 that allows you to connect to the board and see what's going on.  To use this program you'll
-need to install [MSPPG](https://github.com/simondlevy/hackflight/tree/master/parser), a
+need to install [MSPPG](https://github.com/simondlevy/hackflight/tree/master/extras/parser), a
 parser generator for the Multiwii Serial Protocol (MSP) messages used by the
 firmware. Follow the directions in that repository to install MSPPG for Python.
