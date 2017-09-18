@@ -19,14 +19,15 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "ladybug.hpp"
+
+#include "boards/ladybug.hpp"
+#include "models/3dfly.hpp"
+#include "receivers/dsmx.hpp"
 
 hf::Hackflight h;
 
-#include "3dfly.hpp"
 hf::ThreeDFly model;
 
-#include "dsmx.hpp"
 hf::DSMX_Receiver rc;
 
 void setup(void)

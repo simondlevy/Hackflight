@@ -20,14 +20,15 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "ladybug.hpp"
+
+#include "boards/ladybug.hpp"
+#include "models/3dfly.hpp"
+#include "receivers/cppm.hpp"
 
 hf::Hackflight h;
 
-#include "3dfly.hpp"
 hf::ThreeDFly model;
 
-#include "cppm.hpp"
 hf::CPPM_Receiver rc;
 
 void setup(void)
