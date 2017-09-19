@@ -61,7 +61,7 @@ public:
 
     bool throttleIsDown(void);
 
-protected: // Implemented different for each receiver
+protected: // Implemented differently for each receiver
     virtual void     begin(void) = 0;
     virtual bool     useSerial(void) = 0;
     virtual uint16_t readChannel(uint8_t chan) = 0;
