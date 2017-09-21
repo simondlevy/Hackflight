@@ -1,0 +1,7 @@
+This directory contains a C++ library that allows you to use various controllers for writing flight simulators
+on Windows, Linus, and OS X:
+
+* Taranis DX9
+* XBox 360 controller
+* PS3 controller
+* Logitech Extreme Pro 3D joystick
