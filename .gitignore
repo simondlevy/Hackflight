@@ -43,3 +43,6 @@ legacy/*/obj
 gcs/python/build
 gcs/python/dist
 gcs/python/hackflight-gcs
+
+extras/controller/test_controller
+extras/controller/*.o
