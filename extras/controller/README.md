@@ -6,6 +6,8 @@ on Windows, Linus, and OS X:
 * PS3 controller
 * Logitech Extreme Pro 3D joystick
 
+The API is very simple:
+
 ``` controller_t controller; // TARANIS, PS3, XBOX360, etc.
 
     controller = controllerInit();
