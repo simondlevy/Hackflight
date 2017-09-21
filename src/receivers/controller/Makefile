@@ -6,7 +6,7 @@ test: test_controller
 test_controller: test_controller.o 
 	g++ -o test_controller test_controller.o 
 
-test_controller.o: test_controller.cpp controller2.hpp
+test_controller.o: test_controller.cpp controller.hpp
 	g++ -c -Wall -I../.. test_controller.cpp
 
 clean:

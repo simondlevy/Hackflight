@@ -1,5 +1,5 @@
 #include "hackflight.hpp"
-#include "controller2.hpp"
+#include "controller.hpp"
 
 int main(int argc, char ** argv)
 {

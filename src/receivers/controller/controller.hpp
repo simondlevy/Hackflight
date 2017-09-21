@@ -1,9 +1,7 @@
 /*
-   controller.hpp : Common declarations for controller input functions in simulator
+   controller.hpp : USB controller support for Hackflight
 
-   Each OS handles controllers differently.
-
-   Copyright (C) Simon D. Levy, Matt Lubas, and Julio Hidalgo Lopez 2016
+   Controller class subclasses Receiver
 
    This file is part of Hackflight.
 
@@ -18,15 +16,36 @@
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
-*/
+   */
 
-// We currently support these controllers
-enum controller_t { TARANIS, EXTREME3D, PS3 , XBOX360};
+#include "receiver.hpp"
 
-controller_t controllerInit(void);
-void         controllerRead(controller_t controller, float * demands);
-void         controllerClose(void);
+#pragma once
 
-// in v_repExtHackflight.cpp
-// rollLeft, rollRight, pitchForward, pitchBack, yawLeft, yawRight, throttleDown, throttleUp
-extern void kbRespond(char key, char keys[8]);
+namespace hf {
+
+    class Controller : public Receiver{
+
+
+        void begin(void)
+        {
+        }
+
+        bool useSerial(void)
+        {
+            return true;
+        }
+
+        uint16_t readChannel(uint8_t chan)
+        {
+            return 0;
+        }
+        
+        private:
+
+        // We currently support these controllers
+        enum controller_t { TARANIS, EXTREME3D, PS3 , XBOX360};
+
+    };
+
+} // namespace
