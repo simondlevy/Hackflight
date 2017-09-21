@@ -7,7 +7,6 @@ on Windows, Linus, and OS X:
 * Logitech Extreme Pro 3D joystick
 
 The API is very simple:
-
 ``` controller_t controller; // TARANIS, PS3, XBOX360, etc.
 
     controller = controllerInit();
@@ -16,7 +15,6 @@ The API is very simple:
 
     controllerClose();
 ```
-
 The <b>controllerInit()</b> method automatically figures out what kind of controller you have, and returns
 a value (<b>TARANIS</b>, <b>PS3</b>, etc.) that you can use to treat different controllers differently if you
 need to.
