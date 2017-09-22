@@ -24,7 +24,6 @@
 #include <algorithm>
 
 #include "config.hpp"
-#include "debug.hpp"
 #include "filter.hpp"
 
 namespace hf {

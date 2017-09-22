@@ -48,12 +48,6 @@ class Ladybug : public Board {
             return config;
         }
 
-
-        virtual void debug(char * msg) override
-        {
-            Serial.print(msg);
-        }
-
         virtual void init(void) override
         {
             // Begin serial comms

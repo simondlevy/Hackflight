@@ -18,16 +18,11 @@
 
 #pragma once
 
-#include <cstdlib>
-#include <cstdarg>
-#include <cstdio>
-
 #include "config.hpp"
 #include "board.hpp"
 #include "mixer.hpp"
 #include "model.hpp"
 #include "msp.hpp"
-#include "common.hpp"
 #include "receiver.hpp"
 #include "stabilize.hpp"
 #include "altitude.hpp"

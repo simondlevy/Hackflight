@@ -25,11 +25,16 @@
 
 #include "receiver.hpp"
 #include "config.hpp"
-#include "common.hpp"
 #include "filter.hpp"
 #include "model.hpp"
 
 namespace hf {
+
+enum {
+    AXIS_ROLL = 0,
+    AXIS_PITCH,
+    AXIS_YAW
+};
 
 class Stabilize {
 public:

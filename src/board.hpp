@@ -38,7 +38,6 @@ class Board {
         virtual void     init(void) = 0;
         virtual const    Config& getConfig() = 0;
         virtual void     delayMilliseconds(uint32_t msec) = 0;
-        virtual void     debug(char * msg) = 0;
         virtual void     imuGetEuler(float eulerAnglesRadians[3]) = 0;
         virtual void     imuGetGyro(int16_t gyroRaw[3]) = 0;
         virtual uint64_t getMicros() = 0;
