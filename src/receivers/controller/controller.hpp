@@ -72,16 +72,7 @@ namespace hf {
                         _axismap[3] = 3;
                         _axismap[4] = 4;
                     }
-                    else if (strstr(prodname, "PS3")) {
-                        _product = PS3;
-                        _axismap[0] = 1;
-                        _axismap[1] = 2;
-                        _axismap[2] = 3;
-                        _axismap[3] = 0;
-                        _axisdir[0] = -1;
-                        _axisdir[1] = -1;
-                    }
-                    else if (strstr(prodname, "Extreme 3D")) {
+                   else if (strstr(prodname, "Extreme 3D")) {
                         _product = EXTREME3D;
                         _axismap[0] = 3;
                         _axismap[1] = 0;
@@ -99,8 +90,14 @@ namespace hf {
                         _axisdir[0] = -1;
                         _axisdir[2] = -1;
                     }
-                    else {
-                        printf("Uknown controller: %s\n", prodname);
+                    else { // default to PS3
+                        _product = PS3;
+                        _axismap[0] = 1;
+                        _axismap[1] = 2;
+                        _axismap[2] = 3;
+                        _axismap[3] = 0;
+                        _axisdir[0] = -1;
+                        _axisdir[2] = -1;
                     }
                 }
 
