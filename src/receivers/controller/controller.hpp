@@ -79,7 +79,7 @@ namespace hf {
                         _axismap[2] = 1;
                         _axismap[3] = 2;
                         _axisdir[0] = -1;
-                        _axisdir[1] = -1;
+                        _axisdir[2] = -1;
                     }
                     else if (strstr(prodname, "Generic X-Box pad")) {
                         _product = XBOX360;
