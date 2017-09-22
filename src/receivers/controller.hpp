@@ -16,21 +16,28 @@
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
-   */
+ */
 
 #pragma once
 
 #include "receiver.hpp"
-
-#include <stdint.h>
 #include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <termios.h>
-#include <math.h>
+#include <stdint.h>
 #include <string.h>
+#include <math.h>
+#include <fcntl.h>
+
+#ifdef _WIN32
+
+#include <shlwapi.h>
+#pragma comment(lib, "Shlwapi.lib")
+#include <conio.h>
+
+#else
+#include <unistd.h>
 #include <sys/time.h>
 #include <linux/joystick.h>
+#endif
 
 namespace hf {
 
@@ -49,10 +56,37 @@ namespace hf {
 
                 for (int k=0; k<6; ++k)
                     _axisdir[k] = +1;
+
+                _joyfd = 0;
             }
 
             void begin(void)
             {
+#ifdef _WIN32
+                JOYCAPS joycaps;
+                if (joyGetDevCaps(JOYSTICKID1, &joycaps, sizeof(joycaps))==JOYERR_NOERROR) {
+
+                    switch (joycaps.wMid) {
+
+                        case 3727:
+                            _product = PS3;
+                            break;
+
+                        case 1155:
+                            _product = TARANIS;
+                            break;
+
+                        case 1133:
+                            _product = EXTREME3D;
+                            break;
+
+                        case 9414:
+                            _product = XBOX360;
+                            break;
+                    }
+                }
+
+#else
                 if ((_joyfd=open(_devname, O_RDONLY)) > 0) {
 
                     fcntl(_joyfd, F_SETFL, O_NONBLOCK);
@@ -72,7 +106,7 @@ namespace hf {
                         _axismap[3] = 3;
                         _axismap[4] = 4;
                     }
-                   else if (strstr(prodname, "Extreme 3D")) {
+                    else if (strstr(prodname, "Extreme 3D")) {
                         _product = EXTREME3D;
                         _axismap[0] = 3;
                         _axismap[1] = 0;
@@ -100,7 +134,7 @@ namespace hf {
                         _axisdir[2] = -1;
                     }
                 }
-
+#endif
                 _throttleDemand = -1.f;
             }
 
@@ -126,16 +160,67 @@ namespace hf {
                 return (uint16_t)(demand*500 + 1500);
             }
 
-           void halt(void)
+            void halt(void)
             {
+#ifndef _WIN32
                 if (_joyfd > 0)
                     close(_joyfd);
+#endif
             }
 
         private:
 
             void poll(void)
             {
+#ifdef _WIN32
+                JOYINFOEX joyState;
+                joyState.dwSize=sizeof(joyState);
+                joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
+                joyGetPosEx(JOYSTICKID1, &joyState);
+
+                /*
+                   printf("X:%d Y:%d Z:%d   R:%d U:%d V:%d  b:%d\n", 
+                   joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
+                   joyState.dwRpos, joyState.dwUpos, joyState.dwVpos,
+                   joyState.dwButtons);
+                 */
+
+                // Handle each controller differently
+                switch (_product) {
+
+                    case TARANIS:
+                        _demands[0] =   joynorm(joyState.dwXpos);			// throttle        
+                        _demands[1] =   joynorm(joyState.dwYpos);			// roll
+                        _demands[2] =   joynorm(joyState.dwZpos);			// pitch
+                        _demands[3] =   joynorm(joyState.dwVpos);			// yaw
+                        _demands[4] =   -1;			                        // aux switch
+                        break;
+
+                    case PS3:
+                        _demands[0] = -joynorm(joyState.dwYpos);            // throttle
+                        _demands[1] = -joynorm(joyState.dwZpos);            // roll
+                        _demands[2] =  joynorm(joyState.dwRpos);            // pitch
+                        _demands[3] =  joynorm(joyState.dwXpos);            // yaw
+                        //buttonToAuxDemand(_demands, joyState.dwButtons);    // aux switch
+                        break;
+
+                    case XBOX360:
+                        _demands[0] = -joynorm(joyState.dwYpos);            // throttle
+                        _demands[1] = -joynorm(joyState.dwUpos);            // roll
+                        _demands[2] =  joynorm(joyState.dwRpos);            // pitch
+                        _demands[3] =  joynorm(joyState.dwXpos);            // yaw
+                        //buttonToAuxDemand(_demands, joyState.dwButtons); // aux switch
+                        break;
+
+                    case EXTREME3D:
+                        _demands[0] = -joynorm(joyState.dwZpos);            // throttle
+                        _demands[1] = -joynorm(joyState.dwXpos);            // roll
+                        _demands[2] =  joynorm(joyState.dwYpos);            // pitch
+                        _demands[3] =  joynorm(joyState.dwRpos);            // yaw
+                        //buttonToAuxDemand(_demands, joyState.dwButtons); // aux switch
+                        break;
+                }
+#else
                 if (_joyfd <= 0) return;
 
                 struct js_event js;
@@ -157,7 +242,7 @@ namespace hf {
                         }
                     }
                 }
-
+#endif
                 // game-controller spring-mounted throttle requires special handling
                 switch (_product) {
                     case PS3:
@@ -174,7 +259,11 @@ namespace hf {
                     default:
                         _throttleDemand = _demands[0];
                 }
+            }
 
+            static float joynorm(int axisval) 
+            {
+                return (axisval - (float)32767) / 32767;
             }
 
             // We currently support these controllers
@@ -191,5 +280,3 @@ namespace hf {
     };
 
 } // namespace
-
-
