@@ -214,8 +214,8 @@ namespace hf {
 
                     case EXTREME3D:
                         _demands[0] = -joynorm(joyState.dwZpos);            // throttle
-                        _demands[1] = -joynorm(joyState.dwXpos);            // roll
-                        _demands[2] =  joynorm(joyState.dwYpos);            // pitch
+                        _demands[1] =  joynorm(joyState.dwXpos);            // roll
+                        _demands[2] = -joynorm(joyState.dwYpos);            // pitch
                         _demands[3] =  joynorm(joyState.dwRpos);            // yaw
                         //buttonToAuxDemand(_demands, joyState.dwButtons); // aux switch
                         break;
