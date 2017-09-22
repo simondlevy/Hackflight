@@ -198,8 +198,8 @@ namespace hf {
 
                     case PS3:
                         _demands[0] = -joynorm(joyState.dwYpos);            // throttle
-                        _demands[1] = -joynorm(joyState.dwZpos);            // roll
-                        _demands[2] =  joynorm(joyState.dwRpos);            // pitch
+                        _demands[1] =  joynorm(joyState.dwZpos);            // roll
+                        _demands[2] = -joynorm(joyState.dwRpos);            // pitch
                         _demands[3] =  joynorm(joyState.dwXpos);            // yaw
                         //buttonToAuxDemand(_demands, joyState.dwButtons);    // aux switch
                         break;
