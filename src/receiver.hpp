@@ -112,7 +112,7 @@ void Receiver::update()
     if (useSerial()) {
         for (uint8_t chan = 0; chan < 5; chan++) {
             data[chan] = readChannel(chan);
-            printf("%d: %d%c", chan, data[chan], chan==4?'\n':'\t');
+            //printf("%d: %d%c", chan, data[chan], chan==4?'\n':'\t');
         }
     }
 

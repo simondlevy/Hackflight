@@ -1,7 +1,7 @@
 /*
-   controller.hpp : USB controller support for Hackflight
+   sim.hpp : Support USB controller for flight simulators
 
-   Controller class subclasses Receiver
+   Controller subclasses Receiver
 
    This file is part of Hackflight.
 
@@ -178,12 +178,10 @@ namespace hf {
                 joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
                 joyGetPosEx(JOYSTICKID1, &joyState);
 
-                /*
                    printf("X:%d Y:%d Z:%d   R:%d U:%d V:%d  b:%d\n", 
                    joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
                    joyState.dwRpos, joyState.dwUpos, joyState.dwVpos,
                    joyState.dwButtons);
-                 */
 
                 // Handle each controller differently
                 switch (_product) {
@@ -205,10 +203,10 @@ namespace hf {
                         break;
 
                     case XBOX360:
-                        _demands[0] = -joynorm(joyState.dwYpos);            // throttle
+                        _demands[3] = -joynorm(joyState.dwYpos);            // throttle
                         _demands[1] = -joynorm(joyState.dwUpos);            // roll
                         _demands[2] =  joynorm(joyState.dwRpos);            // pitch
-                        _demands[3] =  joynorm(joyState.dwXpos);            // yaw
+                        _demands[0] =  joynorm(joyState.dwXpos);            // yaw
                         //buttonToAuxDemand(_demands, joyState.dwButtons); // aux switch
                         break;
 
