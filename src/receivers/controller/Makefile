@@ -3,6 +3,9 @@ all: tester
 test: tester
 	./tester
 
+run: tester
+	./tester
+
 tester: tester.o 
 	g++ -o tester tester.o 
 

@@ -105,6 +105,8 @@ namespace hf {
                         printf("Uknown controller: %s\n", prodname);
                     }
                 }
+
+                _throttleDemand = -1.f;
             }
 
             uint16_t readChannel(uint8_t chan)
@@ -126,7 +128,7 @@ namespace hf {
 
             void update(void)
             {
-                if (_joyfd <= 0);
+                if (_joyfd <= 0) return;
 
                 struct js_event js;
 
@@ -147,6 +149,21 @@ namespace hf {
                         }
                     }
                 }
+
+                // game-controller spring-mounted throttle requires special handling
+                switch (_product) {
+                    case PS3:
+                    case XBOX360:
+                        _throttleDemand += _demands[0] * .01f;
+                        if (_throttleDemand < -1)
+                            _throttleDemand = -1;
+                        if (_throttleDemand > 1)
+                            _throttleDemand = 1;
+                        break;
+                    default:
+                        _throttleDemand = _demands[0];
+                }
+
             }
 
             void halt(void)
