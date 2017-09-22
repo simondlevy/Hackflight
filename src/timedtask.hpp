@@ -37,7 +37,7 @@ class TimedTask {
 
         bool checkAndUpdate(uint32_t currentTime) {
 
-            bool result = (int32_t)(currentTime - usec) >= 0;
+            bool result = ready(currentTime);
 
             if (result)
                 update(currentTime);
@@ -50,7 +50,7 @@ class TimedTask {
             usec = currentTime + period;
         }
 
-        bool check(uint32_t currentTime) {
+        bool ready(uint32_t currentTime) {
 
             return (int32_t)(currentTime - usec) >= 0;
         }
