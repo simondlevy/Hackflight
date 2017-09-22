@@ -178,10 +178,12 @@ namespace hf {
                 joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
                 joyGetPosEx(JOYSTICKID1, &joyState);
 
-                   printf("X:%d Y:%d Z:%d   R:%d U:%d V:%d  b:%d\n", 
-                   joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
-                   joyState.dwRpos, joyState.dwUpos, joyState.dwVpos,
-                   joyState.dwButtons);
+                /*
+                printf("%d    X:%d Y:%d Z:%d   R:%d U:%d V:%d  b:%d\n", 
+                        _product,
+                        joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
+                        joyState.dwRpos, joyState.dwUpos, joyState.dwVpos,
+                        joyState.dwButtons);*/
 
                 // Handle each controller differently
                 switch (_product) {
@@ -203,10 +205,10 @@ namespace hf {
                         break;
 
                     case XBOX360:
-                        _demands[3] = -joynorm(joyState.dwYpos);            // throttle
-                        _demands[1] = -joynorm(joyState.dwUpos);            // roll
-                        _demands[2] =  joynorm(joyState.dwRpos);            // pitch
-                        _demands[0] =  joynorm(joyState.dwXpos);            // yaw
+                        _demands[0] = -joynorm(joyState.dwYpos);            // throttle
+                        _demands[1] =  joynorm(joyState.dwUpos);            // roll
+                        _demands[2] = -joynorm(joyState.dwRpos);            // pitch
+                        _demands[3] =  joynorm(joyState.dwXpos);            // yaw
                         //buttonToAuxDemand(_demands, joyState.dwButtons); // aux switch
                         break;
 
@@ -248,7 +250,7 @@ namespace hf {
                         if (abs(_demands[0]) < .15) {
                             _demands[0] = 0; // deadband filter
                         }
-                        _throttleDemand += _demands[0] * .00001f;
+                        _throttleDemand += _demands[0] * .01f; // XXX need to make this deltaT computable
                         if (_throttleDemand < -1)
                             _throttleDemand = -1;
                         if (_throttleDemand > 1)
