@@ -48,7 +48,7 @@ class Barometer {
         int32_t  lastAlt;
         uint32_t pressureSum;
 
-        static float paToCm(uint32_t pa);
+        static int32_t paToCm(uint32_t pa);
 };
 
 /********************************************* CPP ********************************************************/
@@ -91,7 +91,7 @@ void Barometer::update()
 
 int32_t Barometer::getAltitude(void)
 {
-    int32_t alt_tmp = paToCm((float)pressureSum/(BarometerConfig::HISTORY_SIZE-1)); 
+    int32_t alt_tmp = paToCm(pressureSum/(BarometerConfig::HISTORY_SIZE-1)); 
     alt_tmp -= groundAltitude;
     alt = lrintf((float)alt * config.noiseLpf + (float)alt_tmp * (1.0f - config.noiseLpf));
 
@@ -101,7 +101,7 @@ int32_t Barometer::getAltitude(void)
 int32_t Barometer::getVelocity(uint32_t dTimeMicros)
 {
     static int32_t lastAlt;
-    int32_t vel = (alt - lastAlt) * 1000000.0f / dTimeMicros;
+    int32_t vel = (int32_t)((alt - lastAlt) * 1000000.0f / dTimeMicros);
     lastAlt = alt;
     vel = Filter::constrainAbs(vel, config.velocityBound); 
     return Filter::deadband(vel, config.velocityDeadband);
@@ -109,9 +109,9 @@ int32_t Barometer::getVelocity(uint32_t dTimeMicros)
 
 
 // Pressure in Pascals to altitude in centimeters
-float Barometer::paToCm(uint32_t pa)
+int32_t Barometer::paToCm(uint32_t pa)
 {
-    return (1.0f - powf(pa / 101325.0f, 0.190295f)) * 4433000.0f;
+    return (int32_t)((1.0f - powf(pa / 101325.0f, 0.190295f)) * 4433000.0f);
 }
 
 } // namespace hf

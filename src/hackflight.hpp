@@ -137,7 +137,7 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
 void Hackflight::update(void)
 {
     // Grab current time for various loops
-    uint32_t currentTime = board->getMicros();
+    uint32_t currentTime = (uint32_t)board->getMicros();
 
     // Outer (slow) loop: update Receiver
     if (rcTask.checkAndUpdate(currentTime)) {
@@ -225,7 +225,7 @@ void Hackflight::updateImu(void)
 
     // Convert angles from radians to degrees
     for (int k=0; k<3; ++k) {
-        eulerAnglesDegrees[k]  = eulerAnglesRadians[k]  * 180.0f / M_PI;
+        eulerAnglesDegrees[k]  = eulerAnglesRadians[k]  * 180.0f / (float)M_PI;
     }
 
     // Convert heading from [-180,+180] to [0,360]
@@ -262,7 +262,7 @@ void Hackflight::updateReadyState(void)
         board->ledSet(1, false);
 
     // If angle too steep, flash LED
-    uint32_t currentTime = board->getMicros();
+    uint32_t currentTime = (uint32_t)board->getMicros();
     if (angleCheckTask.check(currentTime)) {
         if (!(abs(eulerAnglesDegrees[0]) < maxArmingAngle && abs(eulerAnglesDegrees[1]) < maxArmingAngle)) {
             safeToArm = false; 

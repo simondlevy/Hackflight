@@ -94,7 +94,7 @@ void Stabilize::init(const StabilizeConfig& _config, const ImuConfig& _imuConfig
 
 int32_t Stabilize::computeITermGyro(float rateP, float rateI, int16_t rcCommand, int16_t gyroADC[3], uint8_t axis)
 {
-    int32_t error = ((int32_t)rcCommand * rateP) - gyroADC[axis];
+    int32_t error = (int32_t)(rcCommand * rateP) - gyroADC[axis];
 
     // Avoid integral windup
     errorGyroI[axis] = Filter::constrainAbs(errorGyroI[axis] + error, config.gyroWindupMax);
@@ -108,7 +108,7 @@ int32_t Stabilize::computeITermGyro(float rateP, float rateI, int16_t rcCommand,
 
 int16_t Stabilize::computePid(float rateP, int32_t PTerm, int32_t ITerm, int32_t DTerm, int16_t gyroADC[3], uint8_t axis)
 {
-    PTerm -= (int32_t)gyroADC[axis] * rateP;
+    PTerm -= (int32_t)(gyroADC[axis] * rateP);
     return PTerm + ITerm - DTerm + softwareTrim[axis];
 }
 
@@ -119,9 +119,10 @@ int16_t Stabilize::computeLevelPid(int16_t rcCommand[4], uint8_t rcAxis, int16_t
 
     // RC command is in [-500,+500].  We compute error by scaling it up to [-1000,+1000], then treating this value as tenths
     // of a degree and subtracting off corresponding pitch or roll angle obtained from IMU.
-    int32_t errorAngle = Filter::constrainAbs(2*rcCommand[rcAxis], 10*imuConfig.maxAngleInclination) - 10*eulerAnglesDegrees[imuAxis];
+    int32_t errorAngle = Filter::constrainAbs(2*rcCommand[rcAxis], (int32_t)(10*imuConfig.maxAngleInclination)) - 
+        (int32_t)(10*eulerAnglesDegrees[imuAxis]);
 
-    int32_t PTermAccel = errorAngle * model->levelP; 
+    int32_t PTermAccel = (int32_t)(errorAngle * model->levelP); 
 
     // Avoid integral windup
     errorAngleI[imuAxis] = Filter::constrainAbs(errorAngleI[imuAxis] + errorAngle, config.angleWindupMax);
@@ -129,16 +130,16 @@ int16_t Stabilize::computeLevelPid(int16_t rcCommand[4], uint8_t rcAxis, int16_t
     // Compute proportion of cyclic demand compared to its maximum
     float prop = (std::max)(std::abs(rcCommand[DEMAND_PITCH]), std::abs(rcCommand[DEMAND_ROLL])) / 500.f;
 
-    int32_t PTerm = Filter::complementary(rcCommand[rcAxis], PTermAccel, prop);
+    int32_t PTerm = (int32_t)Filter::complementary((float)rcCommand[rcAxis], (float)PTermAccel, prop);
 
-    int32_t ITerm = ITermGyro * prop;
+    int32_t ITerm = (int32_t)(ITermGyro * prop);
 
     int32_t delta = gyroADC[imuAxis] - lastGyro[imuAxis];
     lastGyro[imuAxis] = gyroADC[imuAxis];
     int32_t deltaSum = delta1[imuAxis] + delta2[imuAxis] + delta;
     delta2[imuAxis] = delta1[imuAxis];
     delta1[imuAxis] = delta;
-    int32_t DTerm = deltaSum * model->ratePitchrollD;
+    int32_t DTerm = (int32_t)(deltaSum * model->ratePitchrollD);
 
     return computePid(model->ratePitchrollP, PTerm, ITerm, DTerm, gyroADC, imuAxis);
 }

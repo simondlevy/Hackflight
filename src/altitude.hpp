@@ -133,7 +133,7 @@ void Altitude::computePid(bool armed)
     // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
     // i.e without delay.
     int32_t baroVel = baro.getVelocity(dTimeMicros);
-    velocity = Filter::complementary(velocity, baroVel, config.cfVel);
+    velocity = Filter::complementary(velocity, (float)baroVel, config.cfVel);
 
     // P
     int32_t error = Filter::constrainAbs(altHold - baroAlt, config.pErrorMax);
@@ -143,10 +143,10 @@ void Altitude::computePid(bool armed)
     // I
     errorAltitudeI += (int16_t)(model->altI * error);
     errorAltitudeI = Filter::constrainAbs(errorAltitudeI, config.iErrorMax);
-    pid += errorAltitudeI * (dTimeMicros/1e6);
+    pid += (int32_t)(errorAltitudeI * (dTimeMicros/1e6));
 
     // D
-    int32_t vario = Filter::deadband(velocity, config.dDeadband);
+    int32_t vario = Filter::deadband((int32_t)velocity, config.dDeadband);
     pid -= Filter::constrainAbs((int16_t)(model->altD * vario), config.pidMax);
 
 } // computePid
@@ -160,7 +160,7 @@ void Altitude::updateAccelerometer(float eulerAnglesRadians[3], bool armed)
 uint32_t Altitude::updateTime(void)
 {
     static uint32_t previousT;
-    uint32_t currentT = board->getMicros();
+    uint32_t currentT = (uint32_t)board->getMicros();
     uint32_t dTimeMicros = currentT - previousT;
     previousT = currentT;
     return dTimeMicros;

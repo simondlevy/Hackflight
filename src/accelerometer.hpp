@@ -73,7 +73,7 @@ void Accelerometer::init(const AccelerometerConfig & _config, Board * _board)
 void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
 {
     // Get current time in microseconds
-    uint32_t currentTimeUsec = board->getMicros();
+    uint32_t currentTimeUsec = (uint32_t)board->getMicros();
 
     // Get raw accelerometer values    
     int16_t accelRaw[3];
@@ -87,7 +87,7 @@ void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
     for (uint8_t k=0; k<3; k++) {
         if (config.lpfFactor > 0) {
             lpf[k] = Filter::complementary(accelRaw[k], lpf[k], config.lpfFactor);
-            smooth[k] = lpf[k];
+            smooth[k] = (int16_t)lpf[k];
         } else {
             smooth[k] = accelRaw[k];
         }
@@ -113,7 +113,7 @@ void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
 float Accelerometer::getVelocity(uint32_t dTimeMicros)
 {
     // Integrate vertical acceleration to compute IMU velocity in cm/sec
-    return Filter::deadband(accZ, config.deadband) * velScale * dTimeMicros;
+    return Filter::deadband((int32_t)accZ, config.deadband) * velScale * dTimeMicros;
 }
 
 float Accelerometer::rotate(int16_t ned[3], float * angles)

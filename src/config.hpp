@@ -55,8 +55,8 @@ struct LoopConfig {
 
 struct ImuConfig {
 
-    float    maxAngleInclination    = 50.f; 
-    float    maxArmingAngle         = 25.f;         
+    uint8_t  maxAngleInclination  = 50; 
+    uint8_t  maxArmingAngle       = 25;         
 };
 
 //=========================================================================
