@@ -71,8 +71,6 @@ namespace hf {
                         _axismap[2] = 2;
                         _axismap[3] = 3;
                         _axismap[4] = 4;
-                        _axisdir[1] = -1;
-                        _axisdir[2] = -1;
                     }
                     else if (strstr(prodname, "PS3")) {
                         _product = PS3;
