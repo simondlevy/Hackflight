@@ -97,7 +97,7 @@ namespace hf {
                         _axismap[2] = 4; 
                         _axismap[3] = 0; 
                         _axisdir[0] = -1;
-                        _axisdir[1] = -1;
+                        _axisdir[2] = -1;
                     }
                     else {
                         printf("Uknown controller: %s\n", prodname);
@@ -152,7 +152,10 @@ namespace hf {
                 switch (_product) {
                     case PS3:
                     case XBOX360:
-                        _throttleDemand += _demands[0] * .01f;
+                        if (abs(_demands[0]) < .15) {
+                            _demands[0] = 0; // deadband filter
+                        }
+                        _throttleDemand += _demands[0] * .00001f;
                         if (_throttleDemand < -1)
                             _throttleDemand = -1;
                         if (_throttleDemand > 1)

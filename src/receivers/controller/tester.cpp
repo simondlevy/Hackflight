@@ -11,7 +11,7 @@ int main(int argc, char ** argv)
 
     while (true) {
         controller.update();
-        for (int k=0; k<5; ++k) {
+        for (int k=0; k<4; ++k) {
             printf("%4d    ", controller.readChannel(k));
         }
         printf("\n");
