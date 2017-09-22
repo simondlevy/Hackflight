@@ -39,20 +39,18 @@ class Board {
         virtual const    Config& getConfig() = 0;
         virtual void     delayMilliseconds(uint32_t msec) = 0;
         virtual void     debug(char * msg) = 0;
-        virtual uint64_t getMicros() = 0;
-        virtual void     ledSet(uint8_t id, bool is_on, float max_brightness = 255) { (void)id; (void)is_on; (void)max_brightness;}
-
-    //------------------------------------------- IMU -----------------------------------------------------------
         virtual void     imuGetEuler(float eulerAnglesRadians[3]) = 0;
         virtual void     imuGetGyro(int16_t gyroRaw[3]) = 0;
+        virtual uint64_t getMicros() = 0;
+        virtual void     writeMotor(uint8_t index, uint16_t value) = 0;
+
+    //------------------------------------------ LED ------------------------------------------------------------
+        virtual void     ledSet(uint8_t id, bool is_on) { (void)id; (void)is_on; }
 
     //------------------------------------------ Serial ---------------------------------------------------------
-        virtual uint8_t  serialAvailableBytes(void) = 0;
-        virtual uint8_t  serialReadByte(void) = 0;
-        virtual void     serialWriteByte(uint8_t c) = 0;
-
-    //------------------------------------------ Motors ---------------------------------------------------------
-        virtual void     writeMotor(uint8_t index, uint16_t value) = 0;
+        virtual uint8_t  serialAvailableBytes(void) { return 0; }
+        virtual uint8_t  serialReadByte(void)  { return 0; }
+        virtual void     serialWriteByte(uint8_t c) { (void)c; }
 
     //------------------------------------------ Simulation  ----------------------------------------------------
         virtual bool     skipArming(void) { return false; }
