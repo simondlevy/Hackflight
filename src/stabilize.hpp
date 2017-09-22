@@ -49,6 +49,8 @@ private:
     int32_t errorGyroI[3];
     int32_t errorAngleI[2];
 
+    int16_t softwareTrim[3];
+
     Board * board;
     Model * model;
 
@@ -77,6 +79,11 @@ void Stabilize::init(const StabilizeConfig& _config, const ImuConfig& _imuConfig
         delta2[axis] = 0;
     }
 
+    // Store software trims in a convenient form 
+    softwareTrim[AXIS_ROLL]  = _model->softwareTrimRoll;
+    softwareTrim[AXIS_PITCH] = _model->softwareTrimPitch;
+    softwareTrim[AXIS_YAW]   = _model->softwareTrimYaw;
+
     resetIntegral();
 }
 
@@ -97,7 +104,7 @@ int32_t Stabilize::computeITermGyro(float rateP, float rateI, int16_t rcCommand,
 int16_t Stabilize::computePid(float rateP, int32_t PTerm, int32_t ITerm, int32_t DTerm, int16_t gyroADC[3], uint8_t axis)
 {
     PTerm -= (int32_t)gyroADC[axis] * rateP;
-    return PTerm + ITerm - DTerm + model->softwareTrim[axis];
+    return PTerm + ITerm - DTerm + softwareTrim[axis];
 }
 
 // Computes PID for pitch or roll

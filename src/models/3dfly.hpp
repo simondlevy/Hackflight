@@ -41,9 +41,9 @@ namespace hf {
                 yawI           = 0.005625f;
 
                 // Trim for a particular vehicle: roll, pitch, yaw
-                softwareTrim[AXIS_ROLL]  = 0;
-                softwareTrim[AXIS_PITCH] = 0;
-                softwareTrim[AXIS_YAW]   = 0;
+                softwareTrimRoll  = 0;
+                softwareTrimPitch = 0;
+                softwareTrimYaw   = 0;
 
                 // Altitude 
                 altP = 0.5f;
