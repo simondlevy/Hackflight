@@ -115,6 +115,7 @@ void Receiver::update()
         }
     }
 
+
     // Other kinds of receivers require average of channel values to remove noise
     else {
         for (uint8_t chan = 0; chan < 8; chan++) {

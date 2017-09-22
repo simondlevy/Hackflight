@@ -34,7 +34,7 @@
 
 namespace hf {
 
-    class Controller : protected Receiver {
+    class Controller : public Receiver {
 
         public:
 
@@ -106,6 +106,11 @@ namespace hf {
 
             uint16_t readChannel(uint8_t chan)
             {
+                // Poll on first channel request
+                if (chan == 0) {
+                    poll();
+                }
+
                 // Special handling for throttle
                 float demand = (chan == 0) ? _throttleDemand : _demands[chan];
 
@@ -121,7 +126,15 @@ namespace hf {
                 return (uint16_t)(demand*500 + 1500);
             }
 
-            void update(void)
+           void halt(void)
+            {
+                if (_joyfd > 0)
+                    close(_joyfd);
+            }
+
+        private:
+
+            void poll(void)
             {
                 if (_joyfd <= 0) return;
 
@@ -163,14 +176,6 @@ namespace hf {
                 }
 
             }
-
-            void halt(void)
-            {
-                if (_joyfd > 0)
-                    close(_joyfd);
-            }
-
-        private:
 
             // We currently support these controllers
             enum controller_t { TARANIS, EXTREME3D, PS3 , XBOX360};
