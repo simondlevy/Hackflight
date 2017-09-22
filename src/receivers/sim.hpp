@@ -32,11 +32,13 @@
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
 #include <conio.h>
+#define STRCPY strcpy_s
 
 #else
 #include <unistd.h>
 #include <sys/time.h>
 #include <linux/joystick.h>
+#define STRCPY strcpy
 #endif
 
 namespace hf {
@@ -52,7 +54,7 @@ namespace hf {
 
             Controller(const char * devname = "/dev/input/js0")
             {
-                strcpy(_devname, devname);
+                STRCPY(_devname, devname);
 
                 for (int k=0; k<6; ++k)
                     _axisdir[k] = +1;
