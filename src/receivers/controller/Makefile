@@ -1,15 +1,15 @@
-all: test_controller
+all: tester
 
-test: test_controller
-	./test_controller
+test: tester
+	./tester
 
-test_controller: test_controller.o 
-	g++ -o test_controller test_controller.o 
+tester: tester.o 
+	g++ -o tester tester.o 
 
-test_controller.o: test_controller.cpp controller.hpp
-	g++ -c -Wall -I../.. test_controller.cpp
+tester.o: tester.cpp *.hpp
+	g++ -c -Wall -I../.. tester.cpp
 
 clean:
-	rm -f test_controller *.o *~
+	rm -f tester *.o *~
 
 
