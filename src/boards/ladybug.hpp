@@ -40,12 +40,10 @@ class Ladybug : public Board {
 
     protected:
 
-        const Config& getConfig(void)
+        virtual void modifyConfig(Config& config) override
         {
             // Accelerometer reading at 1G (vehicle resting flat)
             config.altitude.accel.oneG = 2048; // default is 4096
-
-            return config;
         }
 
         virtual void init(void) override

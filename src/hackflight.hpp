@@ -90,8 +90,9 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     // Do hardware initialization for board
     board->init();
 
-    // Get board configuration
-    const Config& config = board->getConfig();
+    // Modify default board configuration as needed
+    Config config;
+    board->modifyConfig(config);
 
     // Flash the LEDs to indicate startup
     flashLeds(config.init);
