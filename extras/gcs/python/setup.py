@@ -27,6 +27,7 @@ from os import system
 system('mkdir dist')
 system('mkdir dist\media')
 system('copy media\icon.xbm dist\media')
+system('copy media\hackflight.ico dist\media')
 system('copy media\*.gif dist\media')
 
 setup(windows = ['hackflight.py'])

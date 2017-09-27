@@ -40,9 +40,9 @@ ipch
 
 legacy/*/obj
 
-gcs/python/build
-gcs/python/dist
-gcs/python/hackflight-gcs
+extras/gcs/python/build
+extras/gcs/python/dist/*
+extras/gcs/python/hackflight-gcs
 
 src/receivers/controller/test_controller
 src/receivers/controller/*.o
