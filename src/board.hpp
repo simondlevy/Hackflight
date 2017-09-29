@@ -35,15 +35,12 @@ class Board {
     public: // interface
 
     //------------------------------------ Core functionality ----------------------------------------------------
-        virtual void     init(void) = 0;
+        virtual void     init(Config& config) = 0;
         virtual void     delayMilliseconds(uint32_t msec) = 0;
         virtual void     imuGetEuler(float eulerAnglesRadians[3]) = 0;
         virtual void     imuGetGyro(int16_t gyroRaw[3]) = 0;
         virtual uint64_t getMicros() = 0;
         virtual void     writeMotor(uint8_t index, uint16_t value) = 0;
-
-    //------------------------------------ Configuration --------------------------------------------------------
-        virtual void     modifyConfig(Config& config) { (void)config; }
 
     //------------------------------------------ LED ------------------------------------------------------------
         virtual void     ledSet(uint8_t id, bool is_on) { (void)id; (void)is_on; }

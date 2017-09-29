@@ -40,14 +40,11 @@ class Ladybug : public Board {
 
     protected:
 
-        virtual void modifyConfig(Config& config) override
+        virtual void init(Config &config) override
         {
             // Accelerometer reading at 1G (vehicle resting flat)
             config.altitude.accel.oneG = 2048; // default is 4096
-        }
 
-        virtual void init(void) override
-        {
             // Begin serial comms
             Serial.begin(115200);
 
