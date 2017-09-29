@@ -218,9 +218,10 @@ void Hackflight::updateImu(void)
     // Compute exponential Receiver commands
     receiver->computeExpo();
 
-    // Get Euler angles from board
+    // Get Euler angles and raw gyro from board
     float eulerAnglesRadians[3];
-    board->imuGetEuler(eulerAnglesRadians);
+    int16_t gyroRaw[3];
+    board->getImu(eulerAnglesRadians, gyroRaw);
 
     // Convert angles from radians to degrees
     for (int k=0; k<3; ++k) {
@@ -240,10 +241,6 @@ void Hackflight::updateImu(void)
         alti.updateAccelerometer(eulerAnglesRadians, armed);
         alti.modifyThrottleDemand(receiver->command[DEMAND_THROTTLE]);
     }
-
-    // Get raw gyro values from board
-    int16_t gyroRaw[3];
-    board->imuGetGyro(gyroRaw);
 
     // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
     stab.update(receiver->command, gyroRaw, eulerAnglesDegrees);

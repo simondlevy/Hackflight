@@ -32,11 +32,11 @@ class Ladybug : public Board {
 
     private:
 
-        uint8_t motorPins[4] = {13, A2, 3, 11};
+        uint8_t _motorPins[4] = {13, A2, 3, 11};
 
-        float eulerAngles[3];
+        float _eulerAngles[3];
 
-        EM7180 sentral;
+        EM7180 _sentral;
 
     protected:
 
@@ -59,15 +59,15 @@ class Ladybug : public Board {
             delay(100);
 
             // Start the EM7180
-            uint8_t status = sentral.begin(8, 2000, 1000);
+            uint8_t status = _sentral.begin(8, 2000, 1000);
             while (status) {
                 Serial.println(EM7180::errorToString(status));
             }
 
             // Initialize the motors
             for (int k=0; k<4; ++k) {
-                analogWriteFrequency(motorPins[k], 10000);  
-                analogWrite(motorPins[k], 0);  
+                analogWriteFrequency(_motorPins[k], 10000);  
+                analogWrite(_motorPins[k], 0);  
             }
         }
 
@@ -111,7 +111,7 @@ class Ladybug : public Board {
             static uint8_t avalPrev[4];
 
             if (aval != avalPrev[index]) {
-                analogWrite(motorPins[index], aval);
+                analogWrite(_motorPins[index], aval);
             }
 
             //Serial.print(index+1); Serial.print(": "); Serial.print(aval); Serial.print(index==3?"\n":"\t"); 
@@ -121,7 +121,7 @@ class Ladybug : public Board {
 
         virtual void extrasImuPoll(void) override
         {
-            uint8_t errorStatus = sentral.poll();
+            uint8_t errorStatus = _sentral.poll();
 
             if (errorStatus) {
                 Serial.print("ERROR: ");
@@ -130,26 +130,21 @@ class Ladybug : public Board {
             }
         }
 
-        virtual void imuGetEuler(float _eulerAngles[3]) override
+        virtual void getImu(float eulerAngles[3], int16_t gyroRaw[3]) override
         {
             static float q[4];
-            sentral.getQuaternions(q);
+            _sentral.getQuaternions(q);
 
             float yaw   = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
             float pitch = -asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
             float roll  = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
 
-            _eulerAngles[0] =  roll;
-            _eulerAngles[1] = -pitch; // compensate for IMU orientation
-            _eulerAngles[2] =  yaw;
+            // Also store Euler angles for extrasUpdateAccelZ()
+            _eulerAngles[0] =  eulerAngles[0] = roll;
+            _eulerAngles[1] =  eulerAngles[1] = -pitch; // compensate for IMU orientation
+            _eulerAngles[2] =  eulerAngles[2] = yaw;
 
-            // Store Euler angles for extrasUpdateAccelZ()
-            memcpy(eulerAngles, _eulerAngles, 3*sizeof(float));
-        }
-
-        virtual void imuGetGyro(int16_t gyroRaw[3]) override
-        {
-            sentral.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
+            _sentral.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
             gyroRaw[1] = -gyroRaw[1];
             gyroRaw[2] = -gyroRaw[2];
         }
@@ -162,13 +157,13 @@ class Ladybug : public Board {
         virtual float extrasGetBaroPressure(void) override 
         {
             float pressure, temperature;
-            sentral.getBaro(pressure, temperature);
+            _sentral.getBaro(pressure, temperature);
             return pressure;
         }
 
         virtual void extrasImuGetAccel(int16_t accelRaw[3]) override
         {
-            sentral.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
+            _sentral.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
         }
 
 }; // class

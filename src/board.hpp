@@ -37,8 +37,7 @@ class Board {
     //------------------------------------ Core functionality ----------------------------------------------------
         virtual void     init(Config& config) = 0;
         virtual void     delayMilliseconds(uint32_t msec) = 0;
-        virtual void     imuGetEuler(float eulerAnglesRadians[3]) = 0;
-        virtual void     imuGetGyro(int16_t gyroRaw[3]) = 0;
+        virtual void     getImu(float eulerAnglesRadians[3], int16_t gyroRaw[3]) = 0;
         virtual uint64_t getMicros() = 0;
         virtual void     writeMotor(uint8_t index, uint16_t value) = 0;
 
