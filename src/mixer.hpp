@@ -33,12 +33,11 @@ public:
     // This is set by MSP
     int16_t  motorsDisarmed[4];
 
-    void init(const PwmConfig& _pwmConfig, Receiver * _rc, Stabilize * _stabilize, Board * _board);
+    void init(Receiver * _rc, Stabilize * _stabilize, Board * _board);
     void update(bool armed);
 
 private:
 
-    PwmConfig pwmConfig;
     Receiver        * rc;
     Stabilize * stabilize;
 
@@ -58,7 +57,7 @@ private:
 
 /********************************************* CPP ********************************************************/
 
-void Mixer::init(const PwmConfig& _pwmConfig, Receiver * _rc, Stabilize * _stabilize, Board * _board)
+void Mixer::init(Receiver * _rc, Stabilize * _stabilize, Board * _board)
 {
 	               //  T   A    E   R
     mixerQuadX[0] = { +1, -1,  +1, +1 };    // right rear
@@ -66,15 +65,13 @@ void Mixer::init(const PwmConfig& _pwmConfig, Receiver * _rc, Stabilize * _stabi
     mixerQuadX[2] = { +1, +1,  +1, -1 };    // left rear
     mixerQuadX[3] = { +1, +1,  -1, +1 };    // left front
 
-    memcpy(&pwmConfig, &_pwmConfig, sizeof(PwmConfig));
-
     stabilize = _stabilize;
     rc = _rc;
     board = _board;
 
     // set disarmed motor values
     for (uint8_t i = 0; i < 4; i++)
-        motorsDisarmed[i] = pwmConfig.min;
+        motorsDisarmed[i] = 1000;
 }
 
 void Mixer::update(bool armed)
@@ -98,15 +95,15 @@ void Mixer::update(bool armed)
     for (uint8_t i = 0; i < 4; i++) {
 
         // This is a way to still have good gyro corrections if at least one motor reaches its max
-        if (maxMotor > pwmConfig.max) {
-            motors[i] -= maxMotor - pwmConfig.max;
+        if (maxMotor > 2000) {
+            motors[i] -= maxMotor - 2000;
         }
 
-        motors[i] = Filter::constrainMinMax(motors[i], pwmConfig.min, pwmConfig.max);
+        motors[i] = Filter::constrainMinMax(motors[i], 1000, 2000);
 
         // Avoid sudden motor jump from right yaw while arming
         if (rc->throttleIsDown()) {
-            motors[i] = pwmConfig.min;
+            motors[i] = 1000;
         } 
 
         // This is how we can spin the motors from the GCS

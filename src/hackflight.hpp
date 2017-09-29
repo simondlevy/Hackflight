@@ -112,11 +112,11 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     altitudeTask.init(loopConfig.altHoldLoopMilli * 1000);
 
     // Initialize the receiver
-    receiver->init(config.rc, config.pwm);
+    receiver->init(config.rc);
 
     // Initialize our stabilization, mixing, and MSP (serial comms)
     stab.init(config.stabilize, config.imu, _model);
-    mixer.init(config.pwm, receiver, &stab, board); 
+    mixer.init(receiver, &stab, board); 
     msp.init(&mixer, receiver, board);
 
     // Initialize altitude estimator, which will be used if there's a barometer

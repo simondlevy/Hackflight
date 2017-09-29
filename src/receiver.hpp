@@ -45,7 +45,7 @@ private:
     RcConfig config;
 
 public:
-    void init(const RcConfig& rcConfig, const PwmConfig& pwmConfig);
+    void init(const RcConfig& rcConfig);
     void update(void);
 
     int16_t data[CONFIG_RC_CHANS]; // raw PWM values for MSP
@@ -70,14 +70,14 @@ protected: // Implemented differently for each receiver
 
 /********************************************* CPP ********************************************************/
 
-void Receiver::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig)
+void Receiver::init(const RcConfig& rcConfig)
 {
     // Do hardware initialization
     begin();
 
     memcpy(&config, &rcConfig, sizeof(RcConfig));
 
-    midrc = (pwmConfig.max + pwmConfig.min) / 2;
+    midrc = 1500;
 
     memset (dataAverage, 0, 8*4*sizeof(int16_t));
 
@@ -100,8 +100,7 @@ void Receiver::init(const RcConfig& rcConfig, const PwmConfig& pwmConfig)
             y = config.thrMid8;
         throttleLookupTable[i] = 10 * config.thrMid8 + tmp * (100 - config.thrExpo8 + 
             config.thrExpo8 * (tmp * tmp) / (y * y)) / 10;
-        throttleLookupTable[i] = pwmConfig.min + (int32_t)(pwmConfig.max - pwmConfig.min) * 
-            throttleLookupTable[i] / 1000; // [PWM_MIN;PWM_MAX]
+        throttleLookupTable[i] += 1000;
     }
 }
 

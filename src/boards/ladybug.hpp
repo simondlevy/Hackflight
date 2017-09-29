@@ -105,7 +105,7 @@ class Ladybug : public Board {
 
         virtual void writeMotor(uint8_t index, uint16_t value) override
         {
-            uint8_t aval = map(value, config.pwm.min, config.pwm.max, 0, 255);
+            uint8_t aval = map(value, 1000, 2000, 0, 255);
 
             // Avoid sending the motor the same value over and over
             static uint8_t avalPrev[4];
