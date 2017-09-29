@@ -103,9 +103,10 @@ class Ladybug : public Board {
             Serial.write(c);
         }
 
-        virtual void writeMotor(uint8_t index, uint16_t value) override
+        virtual void writeMotor(uint8_t index, float value) override
         {
-            uint8_t aval = map(value, 1000, 2000, 0, 255);
+            // Scale motor value from [0,1] to [0,255]
+            uint8_t aval = (uint8_t)(value * 255);
 
             // Avoid sending the motor the same value over and over
             static uint8_t avalPrev[4];

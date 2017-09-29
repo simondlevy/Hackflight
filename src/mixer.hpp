@@ -113,7 +113,7 @@ void Mixer::update(bool armed)
     }
 
     for (uint8_t i = 0; i < 4; i++) {
-        board->writeMotor(i, motors[i]);
+        board->writeMotor(i, (motors[i]-1000)/1000.);
     }
 }
 
