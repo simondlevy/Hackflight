@@ -24,15 +24,7 @@ namespace hf {
 
 class Board {
 
-    private:
-
-        class MSP * msp;
-
-    protected:
-
-        Config config;
-
-    public: // interface
+    public:
 
     //------------------------------------ Core functionality ----------------------------------------------------
         virtual void     init(Config& config) = 0;
