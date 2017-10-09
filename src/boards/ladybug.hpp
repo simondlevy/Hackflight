@@ -21,9 +21,8 @@
 #pragma once
 
 #include <Wire.h>
-
 #include <EM7180.h>
-
+#include <stdarg.h>
 #include "hackflight.hpp"
 
 namespace hf {
@@ -166,6 +165,18 @@ class Ladybug : public Board {
         virtual void extrasImuGetAccel(int16_t accelRaw[3]) override
         {
             _sentral.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
+        }
+
+        virtual void  dprintf(const char * fmt, ...) override
+        { 
+            va_list ap;
+            va_start(ap, fmt);
+            char buf[200];
+            vsprintf(buf, fmt, ap);
+            for (char* p=buf; *p; p++) {
+                Serial.print(*p);
+            }
+            va_end(ap);
         }
 
 }; // class

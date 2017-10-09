@@ -44,6 +44,9 @@ class Board {
     //------------------------------------------ Simulation  ----------------------------------------------------
         virtual bool     skipArming(void) { return false; }
 
+    //------------------------------------------ Debugging  -----------------------------------------------------
+        virtual void     dprintf(const char * fmt, ...) { (void)fmt; }
+
     //------------------------------------------ Extras ---------------------------------------------------------
         virtual bool    extrasHaveBaro(void) { return false; }
         virtual float   extrasGetBaroPressure(void) { return 0; }
