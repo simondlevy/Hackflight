@@ -146,6 +146,7 @@ class Ladybug : public Board {
             _eulerAngles[2] =  eulerAngles[2] = yaw;
 
             _sentral.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
+
             gyroRaw[1] = -gyroRaw[1];
             gyroRaw[2] = -gyroRaw[2];
         }
