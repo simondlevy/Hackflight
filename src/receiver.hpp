@@ -64,7 +64,6 @@ protected: // Implemented differently for each receiver
     virtual void     begin(void) = 0;
     virtual bool     useSerial(void) = 0;
     virtual uint16_t readChannel(uint8_t chan) = 0;
-
 };
 
 
@@ -110,7 +109,6 @@ void Receiver::update()
     if (useSerial()) {
         for (uint8_t chan = 0; chan < 5; chan++) {
             data[chan] = readChannel(chan);
-            //printf("%d: %d%c", chan, data[chan], chan==4?'\n':'\t');
         }
     }
 

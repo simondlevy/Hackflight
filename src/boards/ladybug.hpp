@@ -167,7 +167,7 @@ class Ladybug : public Board {
             _sentral.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
         }
 
-        virtual void  dprintf(const char * fmt, ...) override
+        static void  dprintf(const char * fmt, ...) 
         { 
             va_list ap;
             va_start(ap, fmt);

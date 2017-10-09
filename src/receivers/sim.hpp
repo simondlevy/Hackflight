@@ -41,6 +41,8 @@
 #define STRCPY strcpy
 #endif
 
+#include <board.hpp>
+
 namespace hf {
 
     class Controller : public Receiver {
@@ -96,7 +98,7 @@ namespace hf {
                     char prodname[128];
 
                     if (ioctl(_joyfd, JSIOCGNAME(sizeof(prodname)), prodname) < 0) {
-                        printf("Uknown controller\n");
+                        Board::dprintf("Uknown controller\n");
                         return;
                     }
 
@@ -180,12 +182,11 @@ namespace hf {
                 joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
                 joyGetPosEx(JOYSTICKID1, &joyState);
 
-                /*
-                printf("%d    X:%d Y:%d Z:%d   R:%d U:%d V:%d  b:%d\n", 
+                Board::dprintf("%d    X:%d Y:%d Z:%d   R:%d U:%d V:%d  b:%d\n", 
                         _product,
                         joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
                         joyState.dwRpos, joyState.dwUpos, joyState.dwVpos,
-                        joyState.dwButtons);*/
+                        joyState.dwButtons);
 
                 // Handle each controller differently
                 switch (_product) {

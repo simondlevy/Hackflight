@@ -114,7 +114,6 @@ void Mixer::update(bool armed)
 
     // Normalize [1000,2000] -> [0,1]
     for (uint8_t i = 0; i < 4; i++) {
-        board->dprintf("%d%c", motors[i], i==3?'\n':' ');
         board->writeMotor(i, (motors[i]-1000)/1000.);
     }
 }

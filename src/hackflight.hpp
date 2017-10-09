@@ -163,6 +163,9 @@ void Hackflight::updateRc(void)
     // Update Receiver channels
     receiver->update();
 
+    //for (uint8_t k=0; k<4; ++k)
+    //    Board::dprintf("%d: %d%c", k, receiver->data[k], k==3?'\n':'\t');
+
    // When landed, reset integral component of PID
     if (receiver->throttleIsDown()) {
         stab.resetIntegral();
