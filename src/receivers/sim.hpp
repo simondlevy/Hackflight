@@ -152,14 +152,6 @@ namespace hf {
                 // Special handling for throttle
                 float demand = (chan == 0) ? _throttleDemand : _demands[chan];
 
-                // Special handling for pitch, roll on PS3, XBOX360
-                if (chan == 1 || chan == 2) {
-                    if (_product == PS3)
-                        demand /= 2;
-                    if (_product == XBOX360)
-                        demand /= 1.5;
-                }
-
                 // Joystick demands are in [-1,+1]; convert to [1000,2000]
                 return (uint16_t)(demand*500 + 1500);
             }
@@ -182,11 +174,12 @@ namespace hf {
                 joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
                 joyGetPosEx(JOYSTICKID1, &joyState);
 
-                Board::dprintf("%d    X:%d Y:%d Z:%d   R:%d U:%d V:%d  b:%d\n", 
+                /*
+                printf(tmp, "%d    X:%d Y:%d Z:%d   R:%d U:%d V:%d  b:%d\n", 
                         _product,
                         joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
                         joyState.dwRpos, joyState.dwUpos, joyState.dwVpos,
-                        joyState.dwButtons);
+                        joyState.dwButtons);*/
 
                 // Handle each controller differently
                 switch (_product) {

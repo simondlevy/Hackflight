@@ -45,20 +45,15 @@ private:
     RcConfig config;
 
 public:
-    void init(const RcConfig& rcConfig);
-    void update(void);
-
+    void    init(const RcConfig& rcConfig);
+    void    update(void);
     int16_t data[CONFIG_RC_CHANS]; // raw PWM values for MSP
     int16_t command[4];            // stick PWM values for mixer, MSP
     uint8_t sticks;                // stick positions for command combos
-    
-    bool changed(void);
-
-    void computeExpo(void);
-
+    bool    changed(void);
+    void    computeExpo(void);
     uint8_t getAuxState(void);
-
-    bool throttleIsDown(void);
+    bool    throttleIsDown(void);
 
 protected: // Implemented differently for each receiver
     virtual void     begin(void) = 0;
