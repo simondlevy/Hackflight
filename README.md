@@ -54,8 +54,15 @@ class is where you specify the PID values for your model.
 
 Although Hackflight was designed to be &ldquo;headless&rdquo; (no configurator program),
 it is useful to get some visual feedback on things like vehicle orientation and RC receiver
-PWM values.  So in the <b>gcs</b> folder you'll find a Python program (<b>hackflight.py</b>)
-that allows you to connect to the board and see what's going on.  To use this program you'll
+PWM values.  So we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program.
+that allows you to connect to the board and see what's going on. Windows users
+can [download](http://home.wlu.edu/~levys/hackflight-gcs.zip) this program
+directly; just unzip the file open the folder, and double-click on <b>hackflight.exe</b>.
+Others can run the <b>hackflight.py</b> Python script in the
+<b>extras/gcs/python</b> folder.  To run the Python script you'll
 need to install [MSPPG](https://github.com/simondlevy/hackflight/tree/master/extras/parser), a
 parser generator for the Multiwii Serial Protocol (MSP) messages used by the
 firmware. Follow the directions in that repository to install MSPPG for Python.
+
+For more information, check out the Hackflight 
+[wiki](https://github.com/simondlevy/Hackflight/wik://github.com/simondlevy/Hackflight/wiki).
