@@ -64,5 +64,4 @@ need to install [MSPPG](https://github.com/simondlevy/hackflight/tree/master/ext
 parser generator for the Multiwii Serial Protocol (MSP) messages used by the
 firmware. Follow the directions in that repository to install MSPPG for Python.
 
-For more information, check out the Hackflight 
-[wiki](https://github.com/simondlevy/Hackflight/wik://github.com/simondlevy/Hackflight/wiki).
+For more information, check out the Hackflight [wiki](https://github.com/simondlevy/Hackflight/wiki).
