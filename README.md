@@ -54,10 +54,10 @@ class is where you specify the PID values for your model.
 
 Although Hackflight was designed to be &ldquo;headless&rdquo; (no configurator program),
 it is useful to get some visual feedback on things like vehicle orientation and RC receiver
-PWM values.  So we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program.
+channel values.  So we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program.
 that allows you to connect to the board and see what's going on. Windows users
-can [download](http://home.wlu.edu/~levys/hackflight-gcs.zip) this program
-directly; just unzip the file open the folder, and double-click on <b>hackflight.exe</b>.
+can run this program directly: just download [this zipfile](http://home.wlu.edu/~levys/hackflight-gcs.zip),
+unzip the file, open the folder, and double-click on <b>hackflight.exe</b>.
 Others can run the <b>hackflight.py</b> Python script in the
 <b>extras/gcs/python</b> folder.  To run the Python script you'll
 need to install [MSPPG](https://github.com/simondlevy/hackflight/tree/master/extras/parser), a
