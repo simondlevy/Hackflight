@@ -1,6 +1,6 @@
 
 /*
-   3DFlyCPPM.ino : Arduino sketech for Hackflight using Ladybug Flight Controller, 3DFly frame, CPPM receiver
+   ThreeDFlyCPPM.ino : Arduino sketech for Hackflight using Ladybug Flight Controller, 3DFly frame, CPPM receiver
 
    This file is part of Hackflight.
 

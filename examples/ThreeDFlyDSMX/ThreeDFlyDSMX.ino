@@ -1,5 +1,5 @@
 /*
-   3DFlyDSMX.ino : Hackflight sketch for Ladybug Flight Controller with 3DFly frame and Spektrum DSMX receiver
+   ThreeDFlyDSMX.ino : Hackflight sketch for Ladybug Flight Controller with 3DFly frame and Spektrum DSMX receiver
 
    This file is part of Hackflight.
 
