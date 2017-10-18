@@ -114,8 +114,6 @@ class Ladybug : public Board {
                 analogWrite(_motorPins[index], aval);
             }
 
-            //Serial.print(index+1); Serial.print(": "); Serial.print(aval); Serial.print(index==3?"\n":"\t"); 
-
             avalPrev[index] = aval;
         }
 

@@ -55,7 +55,11 @@ public:
     uint8_t getAuxState(void);
     bool    throttleIsDown(void);
 
-protected: // Implemented differently for each receiver
+    // Override this if your receiver provides RSSI or other weak-signal detection
+    virtual bool     lostSignal(void) { return false; }
+
+protected: 
+    // These must be overridden for each receiver
     virtual void     begin(void) = 0;
     virtual bool     useSerial(void) = 0;
     virtual uint16_t readChannel(uint8_t chan) = 0;

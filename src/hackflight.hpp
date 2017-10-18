@@ -148,6 +148,13 @@ void Hackflight::update(void)
         alti.computePid(armed);
     }
 
+    // Failsafe
+    if (receiver->lostSignal()) {
+        mixer.cutMotors();
+        board->ledSet(0, false);
+        return;
+    }
+
     // Polling for EM7180 SENtral Sensor Fusion IMU
     board->extrasImuPoll();
 
@@ -162,9 +169,6 @@ void Hackflight::updateRc(void)
 {
     // Update Receiver channels
     receiver->update();
-
-    for (uint8_t k=0; k<4; ++k)
-        board->dprintf("%d: %d%c", k, receiver->data[k], k==3?'\n':'\t');
 
    // When landed, reset integral component of PID
     if (receiver->throttleIsDown()) {

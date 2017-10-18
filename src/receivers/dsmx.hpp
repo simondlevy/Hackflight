@@ -44,6 +44,12 @@ namespace hf {
             return rx.getChannelValue(chanmap[chan]);
         }
 
+        bool lostSignal(void)
+        {
+            // Perhaps we should tolerate a higher fade count?
+            return rx.timedOut() || (rx.getFadeCount() > 0);
+        }
+
     }; // class DSMX_Receiver
 
 } // namespace
