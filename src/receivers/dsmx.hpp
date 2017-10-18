@@ -40,7 +40,7 @@ namespace hf {
         uint16_t readChannel(uint8_t chan)
         {
             // TAER
-            uint8_t chanmap[5] = {0, 1, 2, 3, 5};
+            uint8_t chanmap[5] = {0, 1, 2, 3, 4};
             return rx.getChannelValue(chanmap[chan]);
         }
 
