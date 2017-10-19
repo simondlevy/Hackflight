@@ -77,7 +77,7 @@ namespace hf {
                             break;
 
                         case 1155:
-                            _product = TARANIS;
+                            _product = joycaps.wPid == 22288 ? TARANIS : SPEKTRUM;
                             break;
 
                         case 1133:
@@ -192,6 +192,14 @@ namespace hf {
                         _demands[4] =   -1;			                        // aux switch
                         break;
 
+                    case SPEKTRUM:
+                        _demands[0] =   joynorm(joyState.dwYpos);			// throttle        
+                        _demands[1] =   joynorm(joyState.dwZpos);			// roll
+                        _demands[2] =   joynorm(joyState.dwVpos);			// pitch
+                        _demands[3] =   joynorm(joyState.dwXpos);			// yaw
+                        _demands[4] =   -1;			                        // aux switch
+                        break;
+
                     case PS3:
                         _demands[0] = -joynorm(joyState.dwYpos);            // throttle
                         _demands[1] =  joynorm(joyState.dwZpos);            // roll
@@ -263,7 +271,7 @@ namespace hf {
             }
 
             // We currently support these controllers
-            enum controller_t { TARANIS, EXTREME3D, PS3 , XBOX360};
+            enum controller_t { TARANIS, SPEKTRUM, EXTREME3D, PS3 , XBOX360};
 
             controller_t _product;
             char         _devname[100];
