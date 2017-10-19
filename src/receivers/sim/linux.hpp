@@ -98,7 +98,7 @@ namespace hf {
                     char prodname[128];
 
                     if (ioctl(_joyfd, JSIOCGNAME(sizeof(prodname)), prodname) < 0) {
-                        Board::dprintf("Uknown controller\n");
+                        printf("Uknown controller\n");
                         return;
                     }
 
