@@ -57,28 +57,7 @@ namespace hf {
 
             void begin(void)
             {
-                JOYCAPS joycaps;
-                if (joyGetDevCaps(JOYSTICKID1, &joycaps, sizeof(joycaps))==JOYERR_NOERROR) {
-
-                    switch (joycaps.wMid) {
-
-                        case 3727:
-                            _product = PS3;
-                            break;
-
-                        case 1155:
-                            _product = joycaps.wPid == 22288 ? TARANIS : SPEKTRUM;
-                            break;
-
-                        case 1133:
-                            _product = EXTREME3D;
-                            break;
-
-                        case 9414:
-                            _product = XBOX360;
-                            break;
-                    }
-                }
+               getProduct();
                 _throttleDemand = -1.f;
             }
 
@@ -101,6 +80,8 @@ namespace hf {
             }
 
         private:
+
+            void getProduct(void);
 
             void poll(void)
             {
@@ -195,5 +176,31 @@ namespace hf {
             int8_t       _axisdir[8];
 
     };
+
+    void Controller::getProduct(void)
+    {
+        JOYCAPS joycaps;
+        if (joyGetDevCaps(JOYSTICKID1, &joycaps, sizeof(joycaps))==JOYERR_NOERROR) {
+
+            switch (joycaps.wMid) {
+
+                case 3727:
+                    _product = PS3;
+                    break;
+
+                case 1155:
+                    _product = joycaps.wPid == 22288 ? TARANIS : SPEKTRUM;
+                    break;
+
+                case 1133:
+                    _product = EXTREME3D;
+                    break;
+
+                case 9414:
+                    _product = XBOX360;
+                    break;
+            }
+        }
+    } 
 
 } // namespace
