@@ -1,5 +1,5 @@
 /*
-   sim.hpp : Support USB controller for flight simulators
+   linux.hpp : Linux support for USB controller for flight simulators
 
    Controller subclasses Receiver
 
@@ -27,19 +27,10 @@
 #include <math.h>
 #include <fcntl.h>
 
-#ifdef _WIN32
-
-#include <shlwapi.h>
-#pragma comment(lib, "Shlwapi.lib")
-#include <conio.h>
-#define STRCPY strcpy_s
-
-#else
 #include <unistd.h>
 #include <sys/time.h>
 #include <linux/joystick.h>
 #define STRCPY strcpy
-#endif
 
 #include <board.hpp>
 
@@ -66,31 +57,6 @@ namespace hf {
 
             void begin(void)
             {
-#ifdef _WIN32
-                JOYCAPS joycaps;
-                if (joyGetDevCaps(JOYSTICKID1, &joycaps, sizeof(joycaps))==JOYERR_NOERROR) {
-
-                    switch (joycaps.wMid) {
-
-                        case 3727:
-                            _product = PS3;
-                            break;
-
-                        case 1155:
-                            _product = joycaps.wPid == 22288 ? TARANIS : SPEKTRUM;
-                            break;
-
-                        case 1133:
-                            _product = EXTREME3D;
-                            break;
-
-                        case 9414:
-                            _product = XBOX360;
-                            break;
-                    }
-                }
-
-#else
                 if ((_joyfd=open(_devname, O_RDONLY)) > 0) {
 
                     fcntl(_joyfd, F_SETFL, O_NONBLOCK);
@@ -138,7 +104,6 @@ namespace hf {
                         _axisdir[2] = -1;
                     }
                 }
-#endif
                 _throttleDemand = -1.f;
             }
 
@@ -158,73 +123,14 @@ namespace hf {
 
             void halt(void)
             {
-#ifndef _WIN32
                 if (_joyfd > 0)
                     close(_joyfd);
-#endif
             }
 
         private:
 
             void poll(void)
             {
-#ifdef _WIN32
-                JOYINFOEX joyState;
-                joyState.dwSize=sizeof(joyState);
-                joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
-                joyGetPosEx(JOYSTICKID1, &joyState);
-
-                /*
-                printf(tmp, "%d    X:%d Y:%d Z:%d   R:%d U:%d V:%d  b:%d\n", 
-                        _product,
-                        joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
-                        joyState.dwRpos, joyState.dwUpos, joyState.dwVpos,
-                        joyState.dwButtons);*/
-
-                // Handle each controller differently
-                switch (_product) {
-
-                    case TARANIS:
-                        _demands[0] =   joynorm(joyState.dwXpos);			// throttle        
-                        _demands[1] =   joynorm(joyState.dwYpos);			// roll
-                        _demands[2] =   joynorm(joyState.dwZpos);			// pitch
-                        _demands[3] =   joynorm(joyState.dwVpos);			// yaw
-                        _demands[4] =   -1;			                        // aux switch
-                        break;
-
-                    case SPEKTRUM:
-                        _demands[0] =   joynorm(joyState.dwYpos);			// throttle        
-                        _demands[1] =   joynorm(joyState.dwZpos);			// roll
-                        _demands[2] =   joynorm(joyState.dwVpos);			// pitch
-                        _demands[3] =   joynorm(joyState.dwXpos);			// yaw
-                        _demands[4] =   -1;			                        // aux switch
-                        break;
-
-                    case PS3:
-                        _demands[0] = -joynorm(joyState.dwYpos);            // throttle
-                        _demands[1] =  joynorm(joyState.dwZpos);            // roll
-                        _demands[2] = -joynorm(joyState.dwRpos);            // pitch
-                        _demands[3] =  joynorm(joyState.dwXpos);            // yaw
-                        //buttonToAuxDemand(_demands, joyState.dwButtons);    // aux switch
-                        break;
-
-                    case XBOX360:
-                        _demands[0] = -joynorm(joyState.dwYpos);            // throttle
-                        _demands[1] =  joynorm(joyState.dwUpos);            // roll
-                        _demands[2] = -joynorm(joyState.dwRpos);            // pitch
-                        _demands[3] =  joynorm(joyState.dwXpos);            // yaw
-                        //buttonToAuxDemand(_demands, joyState.dwButtons); // aux switch
-                        break;
-
-                    case EXTREME3D:
-                        _demands[0] = -joynorm(joyState.dwZpos);            // throttle
-                        _demands[1] =  joynorm(joyState.dwXpos);            // roll
-                        _demands[2] = -joynorm(joyState.dwYpos);            // pitch
-                        _demands[3] =  joynorm(joyState.dwRpos);            // yaw
-                        //buttonToAuxDemand(_demands, joyState.dwButtons); // aux switch
-                        break;
-                }
-#else
                 if (_joyfd <= 0) return;
 
                 struct js_event js;
@@ -246,7 +152,7 @@ namespace hf {
                         }
                     }
                 }
-#endif
+
                 // game-controller spring-mounted throttle requires special handling
                 switch (_product) {
                     case PS3:
