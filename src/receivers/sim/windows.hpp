@@ -81,65 +81,13 @@ namespace hf {
 
         private:
 
+            // implemented differently for each OS
             void getProduct(void);
+            void pollProduct(void);
 
             void poll(void)
             {
-                JOYINFOEX joyState;
-                joyState.dwSize=sizeof(joyState);
-                joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
-                joyGetPosEx(JOYSTICKID1, &joyState);
-
-                /*
-                printf(tmp, "%d    X:%d Y:%d Z:%d   R:%d U:%d V:%d  b:%d\n", 
-                        _product,
-                        joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
-                        joyState.dwRpos, joyState.dwUpos, joyState.dwVpos,
-                        joyState.dwButtons);*/
-
-                // Handle each controller differently
-                switch (_product) {
-
-                    case TARANIS:
-                        _demands[0] =   joynorm(joyState.dwXpos);			// throttle        
-                        _demands[1] =   joynorm(joyState.dwYpos);			// roll
-                        _demands[2] =   joynorm(joyState.dwZpos);			// pitch
-                        _demands[3] =   joynorm(joyState.dwVpos);			// yaw
-                        _demands[4] =   -1;			                        // aux switch
-                        break;
-
-                    case SPEKTRUM:
-                        _demands[0] =   joynorm(joyState.dwYpos);			// throttle        
-                        _demands[1] =   joynorm(joyState.dwZpos);			// roll
-                        _demands[2] =   joynorm(joyState.dwVpos);			// pitch
-                        _demands[3] =   joynorm(joyState.dwXpos);			// yaw
-                        _demands[4] =   -1;			                        // aux switch
-                        break;
-
-                    case PS3:
-                        _demands[0] = -joynorm(joyState.dwYpos);            // throttle
-                        _demands[1] =  joynorm(joyState.dwZpos);            // roll
-                        _demands[2] = -joynorm(joyState.dwRpos);            // pitch
-                        _demands[3] =  joynorm(joyState.dwXpos);            // yaw
-                        //buttonToAuxDemand(_demands, joyState.dwButtons);    // aux switch
-                        break;
-
-                    case XBOX360:
-                        _demands[0] = -joynorm(joyState.dwYpos);            // throttle
-                        _demands[1] =  joynorm(joyState.dwUpos);            // roll
-                        _demands[2] = -joynorm(joyState.dwRpos);            // pitch
-                        _demands[3] =  joynorm(joyState.dwXpos);            // yaw
-                        //buttonToAuxDemand(_demands, joyState.dwButtons); // aux switch
-                        break;
-
-                    case EXTREME3D:
-                        _demands[0] = -joynorm(joyState.dwZpos);            // throttle
-                        _demands[1] =  joynorm(joyState.dwXpos);            // roll
-                        _demands[2] = -joynorm(joyState.dwYpos);            // pitch
-                        _demands[3] =  joynorm(joyState.dwRpos);            // yaw
-                        //buttonToAuxDemand(_demands, joyState.dwButtons); // aux switch
-                        break;
-                }
+                pollProduct();
 
                 // game-controller spring-mounted throttle requires special handling
                 switch (_product) {
@@ -202,5 +150,64 @@ namespace hf {
             }
         }
     } 
+
+    void Controller::pollProduct(void)
+    {
+        JOYINFOEX joyState;
+        joyState.dwSize=sizeof(joyState);
+        joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
+        joyGetPosEx(JOYSTICKID1, &joyState);
+
+        /*
+           printf(tmp, "%d    X:%d Y:%d Z:%d   R:%d U:%d V:%d  b:%d\n", 
+           _product,
+           joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
+           joyState.dwRpos, joyState.dwUpos, joyState.dwVpos,
+           joyState.dwButtons);*/
+
+        // Handle each controller differently
+        switch (_product) {
+
+            case TARANIS:
+                _demands[0] =   joynorm(joyState.dwXpos);			// throttle        
+                _demands[1] =   joynorm(joyState.dwYpos);			// roll
+                _demands[2] =   joynorm(joyState.dwZpos);			// pitch
+                _demands[3] =   joynorm(joyState.dwVpos);			// yaw
+                _demands[4] =   -1;			                        // aux switch
+                break;
+
+            case SPEKTRUM:
+                _demands[0] =   joynorm(joyState.dwYpos);			// throttle        
+                _demands[1] =   joynorm(joyState.dwZpos);			// roll
+                _demands[2] =   joynorm(joyState.dwVpos);			// pitch
+                _demands[3] =   joynorm(joyState.dwXpos);			// yaw
+                _demands[4] =   -1;			                        // aux switch
+                break;
+
+            case PS3:
+                _demands[0] = -joynorm(joyState.dwYpos);            // throttle
+                _demands[1] =  joynorm(joyState.dwZpos);            // roll
+                _demands[2] = -joynorm(joyState.dwRpos);            // pitch
+                _demands[3] =  joynorm(joyState.dwXpos);            // yaw
+                //buttonToAuxDemand(_demands, joyState.dwButtons);    // aux switch
+                break;
+
+            case XBOX360:
+                _demands[0] = -joynorm(joyState.dwYpos);            // throttle
+                _demands[1] =  joynorm(joyState.dwUpos);            // roll
+                _demands[2] = -joynorm(joyState.dwRpos);            // pitch
+                _demands[3] =  joynorm(joyState.dwXpos);            // yaw
+                //buttonToAuxDemand(_demands, joyState.dwButtons); // aux switch
+                break;
+
+            case EXTREME3D:
+                _demands[0] = -joynorm(joyState.dwZpos);            // throttle
+                _demands[1] =  joynorm(joyState.dwXpos);            // roll
+                _demands[2] = -joynorm(joyState.dwYpos);            // pitch
+                _demands[3] =  joynorm(joyState.dwRpos);            // yaw
+                //buttonToAuxDemand(_demands, joyState.dwButtons); // aux switch
+                break;
+        }
+    }
 
 } // namespace
