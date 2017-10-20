@@ -20,173 +20,90 @@
 
 #pragma once
 
-#include "receiver.hpp"
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include <math.h>
-#include <fcntl.h>
+#include "sim.hpp"
 
 #include <unistd.h>
 #include <sys/time.h>
 #include <linux/joystick.h>
-#define STRCPY strcpy
 
-#include <board.hpp>
+static const char * DEVNAME = "/dev/input/js0";
 
 namespace hf {
 
-    class Controller : public Receiver {
+    void Controller::getProduct(void)
+    {
+        if ((_joyfd=open(DEVNAME, O_RDONLY)) > 0) {
 
-        public:
+            fcntl(_joyfd, F_SETFL, O_NONBLOCK);
 
-            bool useSerial(void)
-            {
-                return true;
+            char prodname[128];
+
+            if (ioctl(_joyfd, JSIOCGNAME(sizeof(prodname)), prodname) < 0) {
+                printf("Uknown controller\n");
+                return;
             }
 
-            Controller(const char * devname = "/dev/input/js0")
-            {
-                STRCPY(_devname, devname);
-
-                for (int k=0; k<6; ++k)
-                    _axisdir[k] = +1;
-
-                _joyfd = 0;
+            if (strstr(prodname, "Taranis") || strstr(prodname, "DeviationTx Deviation GamePad")) {
+                _product = TARANIS;
+                _axismap[0] = 0;
+                _axismap[1] = 1;
+                _axismap[2] = 2;
+                _axismap[3] = 3;
+                _axismap[4] = 4;
             }
-
-            void begin(void)
-            {
-                if ((_joyfd=open(_devname, O_RDONLY)) > 0) {
-
-                    fcntl(_joyfd, F_SETFL, O_NONBLOCK);
-
-                    char prodname[128];
-
-                    if (ioctl(_joyfd, JSIOCGNAME(sizeof(prodname)), prodname) < 0) {
-                        printf("Uknown controller\n");
-                        return;
-                    }
-
-                    if (strstr(prodname, "Taranis") || strstr(prodname, "DeviationTx Deviation GamePad")) {
-                        _product = TARANIS;
-                        _axismap[0] = 0;
-                        _axismap[1] = 1;
-                        _axismap[2] = 2;
-                        _axismap[3] = 3;
-                        _axismap[4] = 4;
-                    }
-                    else if (strstr(prodname, "Extreme 3D")) {
-                        _product = EXTREME3D;
-                        _axismap[0] = 3;
-                        _axismap[1] = 0;
-                        _axismap[2] = 1;
-                        _axismap[3] = 2;
-                        _axisdir[0] = -1;
-                        _axisdir[2] = -1;
-                    }
-                    else if (strstr(prodname, "Generic X-Box pad")) {
-                        _product = XBOX360;
-                        _axismap[0] = 1; 
-                        _axismap[1] = 3; 
-                        _axismap[2] = 4; 
-                        _axismap[3] = 0; 
-                        _axisdir[0] = -1;
-                        _axisdir[2] = -1;
-                    }
-                    else { // default to PS3
-                        _product = PS3;
-                        _axismap[0] = 1;
-                        _axismap[1] = 2;
-                        _axismap[2] = 3;
-                        _axismap[3] = 0;
-                        _axisdir[0] = -1;
-                        _axisdir[2] = -1;
-                    }
-                }
-                _throttleDemand = -1.f;
+            else if (strstr(prodname, "Extreme 3D")) {
+                _product = EXTREME3D;
+                _axismap[0] = 3;
+                _axismap[1] = 0;
+                _axismap[2] = 1;
+                _axismap[3] = 2;
+                _axisdir[0] = -1;
+                _axisdir[2] = -1;
             }
-
-            uint16_t readChannel(uint8_t chan)
-            {
-                // Poll on first channel request
-                if (chan == 0) {
-                    poll();
-                }
-
-                // Special handling for throttle
-                float demand = (chan == 0) ? _throttleDemand : _demands[chan];
-
-                // Joystick demands are in [-1,+1]; convert to [1000,2000]
-                return (uint16_t)(demand*500 + 1500);
+            else if (strstr(prodname, "Generic X-Box pad")) {
+                _product = XBOX360;
+                _axismap[0] = 1; 
+                _axismap[1] = 3; 
+                _axismap[2] = 4; 
+                _axismap[3] = 0; 
+                _axisdir[0] = -1;
+                _axisdir[2] = -1;
             }
-
-            void halt(void)
-            {
-                if (_joyfd > 0)
-                    close(_joyfd);
+            else { // default to PS3
+                _product = PS3;
+                _axismap[0] = 1;
+                _axismap[1] = 2;
+                _axismap[2] = 3;
+                _axismap[3] = 0;
+                _axisdir[0] = -1;
+                _axisdir[2] = -1;
             }
+        }
+    }
 
-        private:
+    void Controller::pollProduct(void)
+    {
+        if (_joyfd <= 0) return;
 
-            void poll(void)
-            {
-                if (_joyfd <= 0) return;
+        struct js_event js;
 
-                struct js_event js;
+        read(_joyfd, &js, sizeof(struct js_event));
 
-                read(_joyfd, &js, sizeof(struct js_event));
+        int jstype = js.type & ~JS_EVENT_INIT;
 
-                int jstype = js.type & ~JS_EVENT_INIT;
+        // Grab demands from axes
+        if (jstype == JS_EVENT_AXIS)  {
 
-                // Grab demands from axes
-                if (jstype == JS_EVENT_AXIS)  {
+            // Look at all five axes for R/C transmitters, first four for other controllers
+            int maxaxis = (_product == TARANIS) ? 5 : 4;
 
-                    // Look at all five axes for R/C transmitters, first four for other controllers
-                    int maxaxis = (_product == TARANIS) ? 5 : 4;
-
-                    // Grab demands from axes
-                    for (int k=0; k<maxaxis; ++k) {
-                        if (js.number == _axismap[k]) {
-                            _demands[k] = _axisdir[k] * js.value / 32767.;
-                        }
-                    }
-                }
-
-                // game-controller spring-mounted throttle requires special handling
-                switch (_product) {
-                    case PS3:
-                    case XBOX360:
-                        if (abs(_demands[0]) < .15) {
-                            _demands[0] = 0; // deadband filter
-                        }
-                        _throttleDemand += _demands[0] * .01f; // XXX need to make this deltaT computable
-                        if (_throttleDemand < -1)
-                            _throttleDemand = -1;
-                        if (_throttleDemand > 1)
-                            _throttleDemand = 1;
-                        break;
-                    default:
-                        _throttleDemand = _demands[0];
+            // Grab demands from axes
+            for (int k=0; k<maxaxis; ++k) {
+                if (js.number == _axismap[k]) {
+                    _demands[k] = _axisdir[k] * js.value / 32767.;
                 }
             }
+        }
+    }
 
-            static float joynorm(int axisval) 
-            {
-                return (axisval - (float)32767) / 32767;
-            }
-
-            // We currently support these controllers
-            enum controller_t { TARANIS, SPEKTRUM, EXTREME3D, PS3 , XBOX360};
-
-            controller_t _product;
-            char         _devname[100];
-            float        _throttleDemand;
-            int          _joyfd;
-            float        _demands[8];
-            uint8_t      _axismap[8];
-            int8_t       _axisdir[8];
-
-    };
-
-} // namespace
+} // namespace hf

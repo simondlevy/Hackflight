@@ -114,10 +114,10 @@ namespace hf {
             uint16_t     _vendorId;
             uint16_t     _productId;
             float        _throttleDemand;
-            int          _joyfd;
             float        _demands[8];
             uint8_t      _axismap[8];
             int8_t       _axisdir[8];
+            int          _joyfd; // needed for Linux only
 
     }; // class Controller
 
