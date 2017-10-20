@@ -28,31 +28,14 @@
 
 namespace hf {    
     
-    void Controller::getProduct(void)
+    void Controller::getProduct(uint16_t & vendorId, uint16_t & productId)
     {
         JOYCAPS joycaps;
         if (joyGetDevCaps(JOYSTICKID1, &joycaps, sizeof(joycaps))==JOYERR_NOERROR) {
-
-            switch (joycaps.wMid) {
-
-                case 3727:
-                    _product = PS3;
-                    break;
-
-                case 1155:
-                    _product = joycaps.wPid == 22288 ? TARANIS : SPEKTRUM;
-                    break;
-
-                case 1133:
-                    _product = EXTREME3D;
-                    break;
-
-                case 9414:
-                    _product = XBOX360;
-                    break;
-            }
+            vendorId  = joycaps.wMid;
+            productId = joycaps.wPid;
         }
-    } 
+    }
 
     void Controller::pollProduct(void)
     {
@@ -62,25 +45,26 @@ namespace hf {
         joyGetPosEx(JOYSTICKID1, &joyState);
 
         // Handle each controller differently
-        switch (_product) {
+        switch (_vendorId) {
 
-            case TARANIS:
-                _demands[0] =   joynorm(joyState.dwXpos);			// throttle        
-                _demands[1] =   joynorm(joyState.dwYpos);			// roll
-                _demands[2] =   joynorm(joyState.dwZpos);			// pitch
-                _demands[3] =   joynorm(joyState.dwVpos);			// yaw
-                _demands[4] =   -1;			                        // aux switch
+            case VENDOR_STM:
+                if (_productId == PRODUCT_TARANIS) {
+                    _demands[0] =   joynorm(joyState.dwXpos);			// throttle        
+                    _demands[1] =   joynorm(joyState.dwYpos);			// roll
+                    _demands[2] =   joynorm(joyState.dwZpos);			// pitch
+                    _demands[3] =   joynorm(joyState.dwVpos);			// yaw
+                    _demands[4] =   -1;			                        // aux switch
+                }
+                else { // Spektrum
+                    _demands[0] =   joynorm(joyState.dwYpos);			// throttle        
+                    _demands[1] =   joynorm(joyState.dwZpos);			// roll
+                    _demands[2] =   joynorm(joyState.dwVpos);			// pitch
+                    _demands[3] =   joynorm(joyState.dwXpos);			// yaw
+                    _demands[4] =   -1;			                        // aux switch
+                }
                 break;
 
-            case SPEKTRUM:
-                _demands[0] =   joynorm(joyState.dwYpos);			// throttle        
-                _demands[1] =   joynorm(joyState.dwZpos);			// roll
-                _demands[2] =   joynorm(joyState.dwVpos);			// pitch
-                _demands[3] =   joynorm(joyState.dwXpos);			// yaw
-                _demands[4] =   -1;			                        // aux switch
-                break;
-
-            case PS3:
+            case VENDOR_SONY:
                 _demands[0] = -joynorm(joyState.dwYpos);            // throttle
                 _demands[1] =  joynorm(joyState.dwZpos);            // roll
                 _demands[2] = -joynorm(joyState.dwRpos);            // pitch
@@ -88,7 +72,7 @@ namespace hf {
                 //buttonToAuxDemand(_demands, joyState.dwButtons);    // aux switch
                 break;
 
-            case XBOX360:
+            case VENDOR_MICROSOFT: // XBox 360
                 _demands[0] = -joynorm(joyState.dwYpos);            // throttle
                 _demands[1] =  joynorm(joyState.dwUpos);            // roll
                 _demands[2] = -joynorm(joyState.dwRpos);            // pitch
@@ -96,7 +80,7 @@ namespace hf {
                 //buttonToAuxDemand(_demands, joyState.dwButtons); // aux switch
                 break;
 
-            case EXTREME3D:
+            case VENDOR_LOGITECH: // Extreme Pro 3D
                 _demands[0] = -joynorm(joyState.dwZpos);            // throttle
                 _demands[1] =  joynorm(joyState.dwXpos);            // roll
                 _demands[2] = -joynorm(joyState.dwYpos);            // pitch

@@ -50,7 +50,7 @@ namespace hf {
 
             void begin(void)
             {
-               getProduct();
+               getProduct(_vendorId, _productId);
                 _throttleDemand = -1.f;
             }
 
@@ -74,8 +74,14 @@ namespace hf {
 
         private:
 
+            static const uint16_t VENDOR_SONY      = 0x0e8f;
+            static const uint16_t VENDOR_STM       = 0x0483;
+            static const uint16_t VENDOR_LOGITECH  = 0x046d;
+            static const uint16_t VENDOR_MICROSOFT = 0x24c6;
+            static const uint16_t PRODUCT_TARANIS  = 0x5710;
+
             // implemented differently for each OS
-            void getProduct(void);
+            void getProduct(uint16_t & vendorId, uint16_t & productId);
             void pollProduct(void);
 
             void poll(void)
@@ -83,9 +89,9 @@ namespace hf {
                 pollProduct();
 
                 // game-controller spring-mounted throttle requires special handling
-                switch (_product) {
-                    case PS3:
-                    case XBOX360:
+                switch (_vendorId) {
+                    case VENDOR_SONY:
+                    case VENDOR_MICROSOFT:
                         if (abs(_demands[0]) < .15) {
                             _demands[0] = 0; // deadband filter
                         }
@@ -105,10 +111,8 @@ namespace hf {
                 return (axisval - (float)32767) / 32767;
             }
 
-            // We currently support these controllers
-            enum controller_t { TARANIS, SPEKTRUM, EXTREME3D, PS3 , XBOX360};
-
-            controller_t _product;
+            uint16_t     _vendorId;
+            uint16_t     _productId;
             float        _throttleDemand;
             int          _joyfd;
             float        _demands[8];
