@@ -185,4 +185,80 @@ namespace hf {
 
     }; // class Controller
 
+// Windows support -----------------------------------------------------------------------------
+
+#ifdef _WIN32
+
+#include <shlwapi.h>
+#pragma comment(lib, "Shlwapi.lib")
+#include <conio.h>
+
+    void Controller::getProduct(uint16_t & vendorId, uint16_t & productId)
+    {
+        JOYCAPS joycaps;
+        if (joyGetDevCaps(JOYSTICKID1, &joycaps, sizeof(joycaps))==JOYERR_NOERROR) {
+            vendorId  = joycaps.wMid;
+            productId = joycaps.wPid;
+        }
+    }
+
+    void Controller::pollProduct(int32_t axes[6])
+    {
+        JOYINFOEX joyState;
+        joyState.dwSize=sizeof(joyState);
+        joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
+        joyGetPosEx(JOYSTICKID1, &joyState);
+
+        axes[0] = joyState.dwXpos;
+        axes[1] = joyState.dwYpos;
+        axes[2] = joyState.dwZpos;
+        axes[3] = joyState.dwRpos;
+        axes[4] = joyState.dwUpos;
+        axes[5] = joyState.dwVpos;
+    }
+    
+// Linux support -----------------------------------------------------------------------------
+#else
+
+#include <unistd.h>
+#include <sys/time.h>
+#include <linux/joystick.h>
+
+    static const char * DEVNAME = "/dev/input/js0";
+
+    void Controller::getProduct(uint16_t & vendorId, uint16_t & productId)
+    {
+        if ((_joyfd=open(DEVNAME, O_RDONLY)) > 0) {
+
+            fcntl(_joyfd, F_SETFL, O_NONBLOCK);
+
+            char prodname[128];
+
+            if (ioctl(_joyfd, JSIOCGNAME(sizeof(prodname)), prodname) > 0) {
+            }
+        }
+    }
+
+    void Controller::pollProduct(int32_t axes[6])
+    {
+        if (_joyfd <= 0) return;
+
+        struct js_event js;
+
+        read(_joyfd, &js, sizeof(struct js_event));
+
+        int jstype = js.type & ~JS_EVENT_INIT;
+
+        // Grab demands from axes
+        if (jstype == JS_EVENT_AXIS)  {
+
+            // Grab demands from axes
+            for (int k=0; k<6; ++k) {
+                axes[k] = js.value;
+            }
+        }
+    }
+
+#endif
+
 } // namespace hf
