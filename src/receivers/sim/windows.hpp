@@ -37,57 +37,19 @@ namespace hf {
         }
     }
 
-    void Controller::pollProduct(void)
+    void Controller::pollProduct(int32_t axes[6])
     {
         JOYINFOEX joyState;
         joyState.dwSize=sizeof(joyState);
         joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
         joyGetPosEx(JOYSTICKID1, &joyState);
 
-        // Handle each controller differently
-        switch (_vendorId) {
-
-            case VENDOR_STM:
-                if (_productId == PRODUCT_TARANIS) {
-                    _demands[0] =   joynorm(joyState.dwXpos);			// throttle        
-                    _demands[1] =   joynorm(joyState.dwYpos);			// roll
-                    _demands[2] =   joynorm(joyState.dwZpos);			// pitch
-                    _demands[3] =   joynorm(joyState.dwVpos);			// yaw
-                    _demands[4] =   -1;			                        // aux switch
-                }
-                else { // Spektrum
-                    _demands[0] =   joynorm(joyState.dwYpos);			// throttle        
-                    _demands[1] =   joynorm(joyState.dwZpos);			// roll
-                    _demands[2] =   joynorm(joyState.dwVpos);			// pitch
-                    _demands[3] =   joynorm(joyState.dwXpos);			// yaw
-                    _demands[4] =   -1;			                        // aux switch
-                }
-                break;
-
-            case VENDOR_SONY:
-                _demands[0] = -joynorm(joyState.dwYpos);            // throttle
-                _demands[1] =  joynorm(joyState.dwZpos);            // roll
-                _demands[2] = -joynorm(joyState.dwRpos);            // pitch
-                _demands[3] =  joynorm(joyState.dwXpos);            // yaw
-                //buttonToAuxDemand(_demands, joyState.dwButtons);    // aux switch
-                break;
-
-            case VENDOR_MICROSOFT: // XBox 360
-                _demands[0] = -joynorm(joyState.dwYpos);            // throttle
-                _demands[1] =  joynorm(joyState.dwUpos);            // roll
-                _demands[2] = -joynorm(joyState.dwRpos);            // pitch
-                _demands[3] =  joynorm(joyState.dwXpos);            // yaw
-                //buttonToAuxDemand(_demands, joyState.dwButtons); // aux switch
-                break;
-
-            case VENDOR_LOGITECH: // Extreme Pro 3D
-                _demands[0] = -joynorm(joyState.dwZpos);            // throttle
-                _demands[1] =  joynorm(joyState.dwXpos);            // roll
-                _demands[2] = -joynorm(joyState.dwYpos);            // pitch
-                _demands[3] =  joynorm(joyState.dwRpos);            // yaw
-                //buttonToAuxDemand(_demands, joyState.dwButtons); // aux switch
-                break;
-        }
+        axes[0] = joyState.dwXpos;
+        axes[1] = joyState.dwYpos;
+        axes[2] = joyState.dwZpos;
+        axes[3] = joyState.dwRpos;
+        axes[4] = joyState.dwUpos;
+        axes[5] = joyState.dwVpos;
     }
 
 } // namespace

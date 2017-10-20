@@ -42,27 +42,80 @@ namespace hf {
 
             Controller(void)
             {
-                for (int k=0; k<6; ++k)
+                for (int k=0; k<4; ++k)
                     _axisdir[k] = +1;
 
+                _springyThrottle = false;
                 _joyfd = 0;
             }
 
             void begin(void)
             {
-               getProduct(_vendorId, _productId);
+                uint16_t     vendorId, productId;
+                getProduct(vendorId, productId);
+
+                // Set up each controller differently
+                switch (vendorId) {
+
+                    case VENDOR_STM:
+                        if (productId == PRODUCT_TARANIS) {
+                            _axismap[0] =   0;
+                            _axismap[1] =   1;
+                            _axismap[2] =   2;
+                            _axismap[3] =   3;
+                        }
+                        else { // Spektrum
+                            _axismap[0] =   1;
+                            _axismap[1] =   2;
+                            _axismap[2] =   5;
+                            _axismap[3] =   0;
+                        }
+                        break;
+
+                    case VENDOR_SONY:      // PS3
+                        _axismap[0] = 1;
+                        _axismap[1] = 2;
+                        _axismap[2] = 3;
+                        _axismap[3] = 0;
+                        _axisdir[0] = -1;
+                        _axisdir[2] = -1;
+                        _springyThrottle = true;
+                        break;
+
+                    case VENDOR_MICROSOFT: // XBox 360
+                        _axismap[0] = 1;
+                        _axismap[1] = 4;
+                        _axismap[2] = 3;
+                        _axismap[3] = 0;
+                        _axisdir[0] = -1;
+                        _axisdir[2] = -1;
+                         _springyThrottle = true;
+                        break;
+
+                    case VENDOR_LOGITECH:  // Extreme Pro 3D
+                        _axismap[0] = 2;
+                        _axismap[1] = 0;
+                        _axismap[2] = 1;
+                        _axismap[3] = 3;
+                         _axisdir[0] = -1;
+                        _axisdir[2] = -1;
+                        break;
+                }
+
                 _throttleDemand = -1.f;
             }
 
             uint16_t readChannel(uint8_t chan)
             {
+                float demands[4];
+
                 // Poll on first channel request
                 if (chan == 0) {
-                    poll();
+                    poll(demands);
                 }
 
                 // Special handling for throttle
-                float demand = (chan == 0) ? _throttleDemand : _demands[chan];
+                float demand = (chan == 0) ? _throttleDemand : demands[chan];
 
                 // Joystick demands are in [-1,+1]; convert to [1000,2000]
                 return (uint16_t)(demand*500 + 1500);
@@ -74,50 +127,53 @@ namespace hf {
 
         private:
 
+            // implemented differently for each OS
+            void getProduct(uint16_t & vendorId, uint16_t & productId);
+            void pollProduct(int32_t axes[6]);
+
             static const uint16_t VENDOR_SONY      = 0x0e8f;
             static const uint16_t VENDOR_STM       = 0x0483;
             static const uint16_t VENDOR_LOGITECH  = 0x046d;
             static const uint16_t VENDOR_MICROSOFT = 0x24c6;
             static const uint16_t PRODUCT_TARANIS  = 0x5710;
 
-            // implemented differently for each OS
-            void getProduct(uint16_t & vendorId, uint16_t & productId);
-            void pollProduct(void);
+            bool         _springyThrottle;
+            float        _throttleDemand;
+            uint8_t      _axismap[4];
+            int8_t       _axisdir[4];
+            int          _joyfd; // needed for Linux only
 
-            void poll(void)
+            void poll(float demands[4])
             {
-                pollProduct();
+                // grab the axis values in an OS-specific way
+                int32_t axes[6];
+                pollProduct(axes);
+
+                // normalize the axes to demands in [-1,+1]
+                for (uint8_t k=0; k<4; ++k) {
+
+                    demands[k] = _axisdir[k] * (axes[_axismap[k]] - (float)32767) / 32767;
+
+                    char tmp[100];
+                    sprintf_s(tmp, "%d: %d (%f) %c", k, axes[k], demands[k], k==3?'\n':'\t');
+                    OutputDebugStringA(tmp);
+                }
 
                 // game-controller spring-mounted throttle requires special handling
-                switch (_vendorId) {
-                    case VENDOR_SONY:
-                    case VENDOR_MICROSOFT:
-                        if (abs(_demands[0]) < .15) {
-                            _demands[0] = 0; // deadband filter
-                        }
-                        _throttleDemand += _demands[0] * .01f; // XXX need to make this deltaT computable
-                        if (_throttleDemand < -1)
-                            _throttleDemand = -1;
-                        if (_throttleDemand > 1)
-                            _throttleDemand = 1;
-                        break;
-                    default:
-                        _throttleDemand = _demands[0];
+                if (_springyThrottle) {
+                    if (abs(demands[0]) < .15) {
+                        demands[0] = 0; // deadband filter
+                    }
+                    _throttleDemand += demands[0] * .01f; // XXX need to make this deltaT computable
+                    if (_throttleDemand < -1)
+                        _throttleDemand = -1;
+                    if (_throttleDemand > 1)
+                        _throttleDemand = 1;
+                }
+                else {
+                    _throttleDemand = demands[0];
                 }
             }
-
-            static float joynorm(int axisval) 
-            {
-                return (axisval - (float)32767) / 32767;
-            }
-
-            uint16_t     _vendorId;
-            uint16_t     _productId;
-            float        _throttleDemand;
-            float        _demands[8];
-            uint8_t      _axismap[8];
-            int8_t       _axisdir[8];
-            int          _joyfd; // needed for Linux only
 
     }; // class Controller
 
