@@ -136,6 +136,8 @@ namespace hf {
 
     }; // class Controller
 
+} // namespace hf
+
 // Windows support -----------------------------------------------------------------------------
 
 #ifdef _WIN32
@@ -144,85 +146,85 @@ namespace hf {
 #pragma comment(lib, "Shlwapi.lib")
 #include <conio.h>
 
-    void Controller::getProduct(void)
-    {
-        JOYCAPS joycaps;
-        if (joyGetDevCaps(JOYSTICKID1, &joycaps, sizeof(joycaps))==JOYERR_NOERROR) {
+void hf::Controller::getProduct(void)
+{
+    JOYCAPS joycaps;
+    if (joyGetDevCaps(JOYSTICKID1, &joycaps, sizeof(joycaps))==JOYERR_NOERROR) {
 
-            uint16_t vendorId  = joycaps.wMid;
-            uint16_t productId = joycaps.wPid;
+        uint16_t vendorId  = joycaps.wMid;
+        uint16_t productId = joycaps.wPid;
 
-            // R/C transmitter
-            if (vendorId == VENDOR_STM) {
+        // R/C transmitter
+        if (vendorId == VENDOR_STM) {
 
-                if (productId == PRODUCT_TARANIS) {
-                    _axismap[0] =   0;
-                    _axismap[1] =   1;
-                    _axismap[2] =   2;
-                    _axismap[3] =   3;
-                }
-                else { // Spektrum
-                    _axismap[0] =   1;
-                    _axismap[1] =   2;
-                    _axismap[2] =   5;
-                    _axismap[3] =   0;
-                }
+            if (productId == PRODUCT_TARANIS) {
+                _axismap[0] =   0;
+                _axismap[1] =   1;
+                _axismap[2] =   2;
+                _axismap[3] =   3;
             }
+            else { // Spektrum
+                _axismap[0] =   1;
+                _axismap[1] =   2;
+                _axismap[2] =   5;
+                _axismap[3] =   0;
+            }
+        }
 
-            else {
+        else {
 
-                _reversedVerticals = true;
+            _reversedVerticals = true;
 
-                switch (vendorId) {
+            switch (vendorId) {
 
-                    case VENDOR_SONY:      // PS3
-                        _axismap[0] = 1;
-                        _axismap[1] = 2;
-                        _axismap[2] = 3;
-                        _axismap[3] = 0;
-                        _springyThrottle = true;
-                        break;
+                case VENDOR_SONY:      // PS3
+                    _axismap[0] = 1;
+                    _axismap[1] = 2;
+                    _axismap[2] = 3;
+                    _axismap[3] = 0;
+                    _springyThrottle = true;
+                    break;
 
-                    case VENDOR_MICROSOFT: // XBox 360
-                        _axismap[0] = 1;
-                        _axismap[1] = 4;
-                        _axismap[2] = 3;
-                        _axismap[3] = 0;
-                        _springyThrottle = true;
-                        break;
+                case VENDOR_MICROSOFT: // XBox 360
+                    _axismap[0] = 1;
+                    _axismap[1] = 4;
+                    _axismap[2] = 3;
+                    _axismap[3] = 0;
+                    _springyThrottle = true;
+                    break;
 
-                    case VENDOR_LOGITECH:  // Extreme Pro 3D
-                        _axismap[0] = 2;
-                        _axismap[1] = 0;
-                        _axismap[2] = 1;
-                        _axismap[3] = 3;
-                        break;
-                }
-
+                case VENDOR_LOGITECH:  // Extreme Pro 3D
+                    _axismap[0] = 2;
+                    _axismap[1] = 0;
+                    _axismap[2] = 1;
+                    _axismap[3] = 3;
+                    break;
             }
 
         }
+
     }
+}
 
-    void Controller::pollProduct(int32_t axes[6])
-    {
-        JOYINFOEX joyState;
-        joyState.dwSize=sizeof(joyState);
-        joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
-        joyGetPosEx(JOYSTICKID1, &joyState);
+void hf::Controller::pollProduct(int32_t axes[6])
+{
+    JOYINFOEX joyState;
+    joyState.dwSize=sizeof(joyState);
+    joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
+    joyGetPosEx(JOYSTICKID1, &joyState);
 
-        axes[0] = joyState.dwXpos;
-        axes[1] = joyState.dwYpos;
-        axes[2] = joyState.dwZpos;
-        axes[3] = joyState.dwRpos;
-        axes[4] = joyState.dwUpos;
-        axes[5] = joyState.dwVpos;
-    }
+    axes[0] = joyState.dwXpos;
+    axes[1] = joyState.dwYpos;
+    axes[2] = joyState.dwZpos;
+    axes[3] = joyState.dwRpos;
+    axes[4] = joyState.dwUpos;
+    axes[5] = joyState.dwVpos;
+}
 
-    // Linux support -----------------------------------------------------------------------------
+
+// Linux support -----------------------------------------------------------------------------
 #else
 
 
 #endif
 
-} // namespace hf
