@@ -20,111 +20,14 @@
 
 #pragma once
 
-#include "receiver.hpp"
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include <math.h>
-#include <fcntl.h>
+#include "sim.hpp"
 
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
 #include <conio.h>
-#define STRCPY strcpy_s
 
-#include <board.hpp>
-
-namespace hf {
-
-    class Controller : public Receiver {
-
-        public:
-
-            bool useSerial(void)
-            {
-                return true;
-            }
-
-            Controller(const char * devname = "/dev/input/js0")
-            {
-                STRCPY(_devname, devname);
-
-                for (int k=0; k<6; ++k)
-                    _axisdir[k] = +1;
-
-                _joyfd = 0;
-            }
-
-            void begin(void)
-            {
-               getProduct();
-                _throttleDemand = -1.f;
-            }
-
-            uint16_t readChannel(uint8_t chan)
-            {
-                // Poll on first channel request
-                if (chan == 0) {
-                    poll();
-                }
-
-                // Special handling for throttle
-                float demand = (chan == 0) ? _throttleDemand : _demands[chan];
-
-                // Joystick demands are in [-1,+1]; convert to [1000,2000]
-                return (uint16_t)(demand*500 + 1500);
-            }
-
-            void halt(void)
-            {
-            }
-
-        private:
-
-            // implemented differently for each OS
-            void getProduct(void);
-            void pollProduct(void);
-
-            void poll(void)
-            {
-                pollProduct();
-
-                // game-controller spring-mounted throttle requires special handling
-                switch (_product) {
-                    case PS3:
-                    case XBOX360:
-                        if (abs(_demands[0]) < .15) {
-                            _demands[0] = 0; // deadband filter
-                        }
-                        _throttleDemand += _demands[0] * .01f; // XXX need to make this deltaT computable
-                        if (_throttleDemand < -1)
-                            _throttleDemand = -1;
-                        if (_throttleDemand > 1)
-                            _throttleDemand = 1;
-                        break;
-                    default:
-                        _throttleDemand = _demands[0];
-                }
-            }
-
-            static float joynorm(int axisval) 
-            {
-                return (axisval - (float)32767) / 32767;
-            }
-
-            // We currently support these controllers
-            enum controller_t { TARANIS, SPEKTRUM, EXTREME3D, PS3 , XBOX360};
-
-            controller_t _product;
-            char         _devname[100];
-            float        _throttleDemand;
-            int          _joyfd;
-            float        _demands[8];
-            uint8_t      _axismap[8];
-            int8_t       _axisdir[8];
-
-    };
-
+namespace hf {    
+    
     void Controller::getProduct(void)
     {
         JOYCAPS joycaps;
@@ -157,13 +60,6 @@ namespace hf {
         joyState.dwSize=sizeof(joyState);
         joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
         joyGetPosEx(JOYSTICKID1, &joyState);
-
-        /*
-           printf(tmp, "%d    X:%d Y:%d Z:%d   R:%d U:%d V:%d  b:%d\n", 
-           _product,
-           joyState.dwXpos, joyState.dwYpos, joyState.dwZpos, 
-           joyState.dwRpos, joyState.dwUpos, joyState.dwVpos,
-           joyState.dwButtons);*/
 
         // Handle each controller differently
         switch (_product) {

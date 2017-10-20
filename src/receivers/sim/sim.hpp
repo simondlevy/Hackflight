@@ -40,9 +40,17 @@ namespace hf {
                 return true;
             }
 
+            Controller(void)
+            {
+                for (int k=0; k<6; ++k)
+                    _axisdir[k] = +1;
+
+                _joyfd = 0;
+            }
 
             void begin(void)
             {
+               getProduct();
                 _throttleDemand = -1.f;
             }
 
@@ -66,8 +74,14 @@ namespace hf {
 
         private:
 
+            // implemented differently for each OS
+            void getProduct(void);
+            void pollProduct(void);
+
             void poll(void)
             {
+                pollProduct();
+
                 // game-controller spring-mounted throttle requires special handling
                 switch (_product) {
                     case PS3:
@@ -95,13 +109,12 @@ namespace hf {
             enum controller_t { TARANIS, SPEKTRUM, EXTREME3D, PS3 , XBOX360};
 
             controller_t _product;
-            char         _devname[100];
             float        _throttleDemand;
             int          _joyfd;
             float        _demands[8];
             uint8_t      _axismap[8];
             int8_t       _axisdir[8];
 
-    };
+    }; // class Controller
 
-} // namespace
+} // namespace hf
