@@ -49,59 +49,10 @@ namespace hf {
 
             void begin(void)
             {
-                // Get vendor, product
-                uint16_t     vendorId, productId;
-                getProduct(vendorId, productId);
+                // Set up axes based on OS and controller
+                getProduct();
 
-                // R/C transmitter
-                if (vendorId == VENDOR_STM) {
-
-                    if (productId == PRODUCT_TARANIS) {
-                        _axismap[0] =   0;
-                        _axismap[1] =   1;
-                        _axismap[2] =   2;
-                        _axismap[3] =   3;
-                    }
-                    else { // Spektrum
-                        _axismap[0] =   1;
-                        _axismap[1] =   2;
-                        _axismap[2] =   5;
-                        _axismap[3] =   0;
-                    }
-                }
-
-                else {
-
-                    _reversedVerticals = true;
-
-                    switch (vendorId) {
-
-                        case VENDOR_SONY:      // PS3
-                            _axismap[0] = 1;
-                            _axismap[1] = 2;
-                            _axismap[2] = 3;
-                            _axismap[3] = 0;
-                            _springyThrottle = true;
-                            break;
-
-                        case VENDOR_MICROSOFT: // XBox 360
-                            _axismap[0] = 1;
-                            _axismap[1] = 4;
-                            _axismap[2] = 3;
-                            _axismap[3] = 0;
-                            _springyThrottle = true;
-                            break;
-
-                        case VENDOR_LOGITECH:  // Extreme Pro 3D
-                            _axismap[0] = 2;
-                            _axismap[1] = 0;
-                            _axismap[2] = 1;
-                            _axismap[3] = 3;
-                            break;
-                    }
-
-                }
-
+                // Useful for springy-throttle controllers (XBox, PS3)
                 _throttleDemand = -1.f;
             }
 
@@ -128,7 +79,7 @@ namespace hf {
         private:
 
             // implemented differently for each OS
-            void getProduct(uint16_t & vendorId, uint16_t & productId);
+            void getProduct(void);
             void pollProduct(int32_t axes[6]);
 
             static const uint16_t VENDOR_SONY      = 0x0e8f;
@@ -193,12 +144,63 @@ namespace hf {
 #pragma comment(lib, "Shlwapi.lib")
 #include <conio.h>
 
-    void Controller::getProduct(uint16_t & vendorId, uint16_t & productId)
+    void Controller::getProduct(void)
     {
         JOYCAPS joycaps;
         if (joyGetDevCaps(JOYSTICKID1, &joycaps, sizeof(joycaps))==JOYERR_NOERROR) {
-            vendorId  = joycaps.wMid;
-            productId = joycaps.wPid;
+
+            uint16_t vendorId  = joycaps.wMid;
+            uint16_t productId = joycaps.wPid;
+
+            // R/C transmitter
+            if (vendorId == VENDOR_STM) {
+
+                if (productId == PRODUCT_TARANIS) {
+                    _axismap[0] =   0;
+                    _axismap[1] =   1;
+                    _axismap[2] =   2;
+                    _axismap[3] =   3;
+                }
+                else { // Spektrum
+                    _axismap[0] =   1;
+                    _axismap[1] =   2;
+                    _axismap[2] =   5;
+                    _axismap[3] =   0;
+                }
+            }
+
+            else {
+
+                _reversedVerticals = true;
+
+                switch (vendorId) {
+
+                    case VENDOR_SONY:      // PS3
+                        _axismap[0] = 1;
+                        _axismap[1] = 2;
+                        _axismap[2] = 3;
+                        _axismap[3] = 0;
+                        _springyThrottle = true;
+                        break;
+
+                    case VENDOR_MICROSOFT: // XBox 360
+                        _axismap[0] = 1;
+                        _axismap[1] = 4;
+                        _axismap[2] = 3;
+                        _axismap[3] = 0;
+                        _springyThrottle = true;
+                        break;
+
+                    case VENDOR_LOGITECH:  // Extreme Pro 3D
+                        _axismap[0] = 2;
+                        _axismap[1] = 0;
+                        _axismap[2] = 1;
+                        _axismap[3] = 3;
+                        break;
+                }
+
+            }
+
         }
     }
 
@@ -216,43 +218,10 @@ namespace hf {
         axes[4] = joyState.dwUpos;
         axes[5] = joyState.dwVpos;
     }
-    
-// Linux support -----------------------------------------------------------------------------
+
+    // Linux support -----------------------------------------------------------------------------
 #else
 
-#include <unistd.h>
-#include <sys/time.h>
-#include <linux/joystick.h>
-
-    static const char * DEVNAME = "/dev/input/js0";
-
-    void Controller::getProduct(uint16_t & vendorId, uint16_t & productId)
-    {
-        if ((_joyfd=open(DEVNAME, O_RDONLY)) > 0) {
-
-            fcntl(_joyfd, F_SETFL, O_NONBLOCK);
-
-            char prodname[128];
-
-            if (ioctl(_joyfd, JSIOCGNAME(sizeof(prodname)), prodname) > 0) {
-            }
-        }
-    }
-
-    void Controller::pollProduct(int32_t axes[6])
-    {
-        if (_joyfd <= 0) return;
-
-        struct js_event js;
-
-        read(_joyfd, &js, sizeof(struct js_event));
-
-        int jstype = js.type & ~JS_EVENT_INIT;
-
-        if (jstype == JS_EVENT_AXIS && js.number < 6)  {
-            axes[js.number] = js.value;
-        }
-    }
 
 #endif
 
