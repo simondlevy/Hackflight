@@ -249,13 +249,8 @@ namespace hf {
 
         int jstype = js.type & ~JS_EVENT_INIT;
 
-        // Grab demands from axes
-        if (jstype == JS_EVENT_AXIS)  {
-
-            // Grab demands from axes
-            for (int k=0; k<6; ++k) {
-                axes[k] = js.value;
-            }
+        if (jstype == JS_EVENT_AXIS && js.number < 6)  {
+            axes[js.number] = js.value;
         }
     }
 
