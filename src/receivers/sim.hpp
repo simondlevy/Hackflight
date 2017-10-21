@@ -50,7 +50,7 @@ namespace hf {
             void begin(void)
             {
                 // Set up axes based on OS and controller
-                getProduct();
+                productInit();
 
                 // Useful for springy-throttle controllers (XBox, PS3)
                 _throttleDemand = -1.f;
@@ -79,14 +79,9 @@ namespace hf {
         private:
 
             // implemented differently for each OS
-            void getProduct(void);
-            void pollProduct(int32_t axes[6]);
-
-            static const uint16_t VENDOR_SONY      = 0x0e8f;
-            static const uint16_t VENDOR_STM       = 0x0483;
-            static const uint16_t VENDOR_LOGITECH  = 0x046d;
-            static const uint16_t VENDOR_MICROSOFT = 0x24c6;
-            static const uint16_t PRODUCT_TARANIS  = 0x5710;
+            void     productInit(void);
+            void     productPoll(int32_t axes[6]);
+            int32_t  productGetBaseline(void);
 
             bool         _reversedVerticals;
             bool         _springyThrottle;
@@ -96,19 +91,16 @@ namespace hf {
 
             void poll(float * demands)
             {
+                static int32_t axes[6];
+
                 // grab the axis values in an OS-specific way
-                int32_t axes[6];
-                pollProduct(axes);
+                productPoll(axes);
 
                 // normalize the axes to demands in [-1,+1]
                 for (uint8_t k=0; k<4; ++k) {
-                    //demands[k] = (axes[_axismap[k]] - (float)32767) / 32767;
+                    demands[k] = (axes[_axismap[k]] - productGetBaseline()) / 32767.f;
                 }
 
-                demands[0] = (axes[_axismap[0]] - (float)32767) / 32767;
-                demands[1] =  0;
-                demands[2] =  0;
-                demands[3] =  0;
 
                 // invert throttle, pitch if indicated
                 if (_reversedVerticals) {
@@ -131,7 +123,8 @@ namespace hf {
                     _throttleDemand = demands[0];
                 }
 
-                printf("%f\n", _throttleDemand);
+                printf("T:%f A:%f E:%f R:%f\n", _throttleDemand, demands[1], demands[2], demands[3]);
+                
             }
 
     }; // class Controller
@@ -146,7 +139,14 @@ namespace hf {
 #pragma comment(lib, "Shlwapi.lib")
 #include <conio.h>
 
-void hf::Controller::getProduct(void)
+static const uint16_t VENDOR_SONY      = 0x0e8f;
+static const uint16_t VENDOR_STM       = 0x0483;
+static const uint16_t VENDOR_LOGITECH  = 0x046d;
+static const uint16_t VENDOR_MICROSOFT = 0x24c6;
+static const uint16_t PRODUCT_TARANIS  = 0x5710;
+
+
+void hf::Controller::productInit(void)
 {
     JOYCAPS joycaps;
     if (joyGetDevCaps(JOYSTICKID1, &joycaps, sizeof(joycaps))==JOYERR_NOERROR) {
@@ -206,7 +206,7 @@ void hf::Controller::getProduct(void)
     }
 }
 
-void hf::Controller::pollProduct(int32_t axes[6])
+void hf::Controller::productPoll(int32_t axes[6])
 {
     JOYINFOEX joyState;
     joyState.dwSize=sizeof(joyState);
@@ -221,6 +221,10 @@ void hf::Controller::pollProduct(int32_t axes[6])
     axes[5] = joyState.dwVpos;
 }
 
+int32_t hf::Controller::productGetBaseline(void)
+{
+    return 32767;
+}
 
 // Linux support -----------------------------------------------------------------------------
 #else
@@ -231,7 +235,7 @@ void hf::Controller::pollProduct(int32_t axes[6])
 
 static const char * DEVNAME = "/dev/input/js0";
 
-void hf::Controller::getProduct(void)
+void hf::Controller::productInit(void)
 {
     if ((_joyfd=open(DEVNAME, O_RDONLY)) > 0) {
 
@@ -248,33 +252,40 @@ void hf::Controller::getProduct(void)
             _axismap[1] = 1;
             _axismap[2] = 2;
             _axismap[3] = 3;
-            _axismap[4] = 4;
+        }
+        else if (strstr(prodname, "Horizon Hobby SPEKTRUM")) {
+            _axismap[0] = 1;
+            _axismap[1] = 2;
+            _axismap[2] = 3;
+            _axismap[3] = 0;
         }
         else if (strstr(prodname, "Extreme 3D")) {
             _axismap[0] = 3;
             _axismap[1] = 0;
             _axismap[2] = 1;
             _axismap[3] = 2;
-            _reversedVerticals = false;
+            _reversedVerticals = true;
         }
         else if (strstr(prodname, "Generic X-Box pad")) {
             _axismap[0] = 1;
             _axismap[1] = 3;
             _axismap[2] = 4;
             _axismap[3] = 0;
-            _reversedVerticals = false;
+            _springyThrottle = true;
+            _reversedVerticals = true;
         }
         else { // default to PS3
             _axismap[0] = 1;
             _axismap[1] = 2;
             _axismap[2] = 3;
             _axismap[3] = 0;
-            _reversedVerticals = false;
+            _springyThrottle = true;
+            _reversedVerticals = true;
         }
     }
 }
 
-void hf::Controller::pollProduct(int32_t axes[6])
+void hf::Controller::productPoll(int32_t axes[6])
 {
     if (_joyfd <= 0) return;
 
@@ -286,9 +297,13 @@ void hf::Controller::pollProduct(int32_t axes[6])
 
     if (jstype == JS_EVENT_AXIS)  {
 
-        if (js.number == 1) 
-            axes[js.number] = js.value;
+        axes[js.number] = js.value;
     }
+}
+
+int32_t hf::Controller::productGetBaseline(void)
+{
+    return 0;
 }
 
 #endif
