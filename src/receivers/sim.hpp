@@ -102,21 +102,19 @@ namespace hf {
 
                 // normalize the axes to demands in [-1,+1]
                 for (uint8_t k=0; k<4; ++k) {
-                    demands[k] = (axes[_axismap[k]] - (float)32767) / 32767;
+                    //demands[k] = (axes[_axismap[k]] - (float)32767) / 32767;
                 }
+
+                demands[0] = (axes[_axismap[0]] - (float)32767) / 32767;
+                demands[1] =  0;
+                demands[2] =  0;
+                demands[3] =  0;
 
                 // invert throttle, pitch if indicated
                 if (_reversedVerticals) {
                     demands[0] = -demands[0];
                     demands[2] = -demands[2];
                 }
-
-                /*
-                char tmp[200];
-                sprintf_s(tmp, "%d    T: %f    A: %f    E: %f    R: %f\n", 
-                        _reversedVerticals, demands[0], demands[1], demands[2], demands[3]);
-                OutputDebugStringA(tmp);
-                */
 
                 // game-controller spring-mounted throttle requires special handling
                 if (_springyThrottle) {
@@ -132,6 +130,8 @@ namespace hf {
                 else {
                     _throttleDemand = demands[0];
                 }
+
+                printf("%f\n", _throttleDemand);
             }
 
     }; // class Controller
@@ -225,6 +225,70 @@ void hf::Controller::pollProduct(int32_t axes[6])
 // Linux support -----------------------------------------------------------------------------
 #else
 
+#include <unistd.h>
+#include <sys/time.h>
+#include <linux/joystick.h>
+
+static const char * DEVNAME = "/dev/input/js0";
+
+void hf::Controller::getProduct(void)
+{
+    if ((_joyfd=open(DEVNAME, O_RDONLY)) > 0) {
+
+        fcntl(_joyfd, F_SETFL, O_NONBLOCK);
+
+        char prodname[128];
+
+        if (ioctl(_joyfd, JSIOCGNAME(sizeof(prodname)), prodname) < 0) {
+            return;
+        }
+
+        if (strstr(prodname, "Taranis") || strstr(prodname, "DeviationTx Deviation GamePad")) {
+            _axismap[0] = 0;
+            _axismap[1] = 1;
+            _axismap[2] = 2;
+            _axismap[3] = 3;
+            _axismap[4] = 4;
+        }
+        else if (strstr(prodname, "Extreme 3D")) {
+            _axismap[0] = 3;
+            _axismap[1] = 0;
+            _axismap[2] = 1;
+            _axismap[3] = 2;
+            _reversedVerticals = false;
+        }
+        else if (strstr(prodname, "Generic X-Box pad")) {
+            _axismap[0] = 1;
+            _axismap[1] = 3;
+            _axismap[2] = 4;
+            _axismap[3] = 0;
+            _reversedVerticals = false;
+        }
+        else { // default to PS3
+            _axismap[0] = 1;
+            _axismap[1] = 2;
+            _axismap[2] = 3;
+            _axismap[3] = 0;
+            _reversedVerticals = false;
+        }
+    }
+}
+
+void hf::Controller::pollProduct(int32_t axes[6])
+{
+    if (_joyfd <= 0) return;
+
+    struct js_event js;
+
+    read(_joyfd, &js, sizeof(struct js_event));
+
+    int jstype = js.type & ~JS_EVENT_INIT;
+
+    if (jstype == JS_EVENT_AXIS)  {
+
+        if (js.number == 1) 
+            axes[js.number] = js.value;
+    }
+}
 
 #endif
-
