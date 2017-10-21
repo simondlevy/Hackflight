@@ -34,6 +34,9 @@ class NullBoard : public Board {
 
     virtual void delayMilliseconds(uint32_t msec) override
     {
+        uint64_t micros = getMicros();
+        while ((getMicros()-micros) < (1000*msec))
+            ;
     }
 
     virtual void getImu(float eulerAnglesRadians[3], int16_t gyroRaw[3]) override
