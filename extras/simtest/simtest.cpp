@@ -1,6 +1,9 @@
 #include <math.h>
+#include <time.h>
 
 #include <hackflight.hpp>
+#include <models/3dfly.hpp> // arbitrary
+#include <receivers/sim.hpp>
 
 namespace hf {
 
@@ -25,7 +28,9 @@ class NullBoard : public Board {
 
     virtual uint64_t getMicros() override
     {
-        return 0;
+        struct timespec t;
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t);
+        return 1000000*t.tv_sec + t.tv_nsec/1000;
     }
 
     virtual void writeMotor(uint8_t index, float value) override
@@ -41,5 +46,16 @@ class NullBoard : public Board {
 
 int main(int argc, char ** argv)
 {
+    hf::Hackflight h;
+    hf::NullBoard  board;
+    hf::Controller controller;
+    hf::ThreeDFly  model;
+
+    h.init(&board, &controller, &model);
+
+    while (true) {
+        h.update();
+    }
+
     return 0;
 }
