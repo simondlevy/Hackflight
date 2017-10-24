@@ -38,7 +38,7 @@ namespace hf {
             return false;
         }
 
-        uint16_t readChannel(uint8_t chan)
+        float readChannel(uint8_t chan)
         {
             static uint16_t chanvals[5];
 
@@ -48,7 +48,7 @@ namespace hf {
             }
 
             // TAER
-            return chanvals[chan];
+            return (chanvals[chan] - 1000) / 500.f - 1;
         }
 
     }; // class CPPM_Receiver

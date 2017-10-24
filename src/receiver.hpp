@@ -29,6 +29,13 @@
 namespace hf {
 
 class Receiver {
+
+protected: 
+    // These must be overridden for each receiver
+    virtual void  begin(void) = 0;
+    virtual bool  useSerial(void) = 0;
+    virtual float readChannel(uint8_t chan) = 0;
+
 private:
     void computeCommand(uint8_t channel);
     void adjustCommand(uint8_t channel);
@@ -58,11 +65,6 @@ public:
     // Override this if your receiver provides RSSI or other weak-signal detection
     virtual bool     lostSignal(void) { return false; }
 
-protected: 
-    // These must be overridden for each receiver
-    virtual void     begin(void) = 0;
-    virtual bool     useSerial(void) = 0;
-    virtual uint16_t readChannel(uint8_t chan) = 0;
 };
 
 
@@ -107,7 +109,7 @@ void Receiver::update()
     // Serial receivers provide clean data and can be read directly
     if (useSerial()) {
         for (uint8_t chan = 0; chan < 5; chan++) {
-            data[chan] = readChannel(chan);
+            data[chan] = 1000 + 500*(readChannel(chan)+1);
         }
     }
 
