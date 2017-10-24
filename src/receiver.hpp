@@ -52,13 +52,15 @@ private:
 public:
     void    init(const RcConfig& rcConfig);
     void    update(void);
-    int16_t raw[CONFIG_RC_CHANS]; // raw PWM values for MSP
-    int16_t command[4];            // stick PWM values for mixer, MSP
+    float   raw[CONFIG_RC_CHANS];  // raw [-1,+1] from receiver
+    int16_t command[4];            // stick PWM values 
     uint8_t sticks;                // stick positions for command combos
     bool    changed(void);
     void    computeExpo(void);
     uint8_t getAuxState(void);
     bool    throttleIsDown(void);
+
+    int16_t scaleup(float x, float in_min, float in_max, int16_t out_min, int16_t out_max);
 
     // Override this if your receiver provides RSSI or other weak-signal detection
     virtual bool     lostSignal(void) { return false; }
@@ -79,8 +81,8 @@ void Receiver::init(const RcConfig& rcConfig)
     sticks = 0;
     averageIndex = 0;
 
-    for (uint8_t i = 0; i < CONFIG_RC_CHANS; i++)
-        raw[i] = 1500;
+    for (uint8_t i = 0; i < CONFIG_RC_CHANS; i++) 
+        raw[i] = 0;
 
     for (uint8_t i = 0; i < CONFIG_PITCH_LOOKUP_LENGTH; i++)
         pitchRollLookupTable[i] = (2500 + config.expo8 * (i * i - 25)) * i * (int32_t)config.rate8 / 2500;
@@ -100,40 +102,34 @@ void Receiver::init(const RcConfig& rcConfig)
 
 void Receiver::update()
 {
-    float rawfloat[5];
-    float rawDataAverage[5][4];
+    float averageRaw[5][4];
 
     // Serial receivers provide clean data and can be read directly
     if (useSerial()) {
         for (uint8_t chan = 0; chan < 5; chan++) {
-            rawfloat[chan] = readChannel(chan);
+            raw[chan] = readChannel(chan);
         }
     }
 
     // Other kinds of receivers require average of channel values to remove noise
     else {
         for (uint8_t chan = 0; chan < 5; chan++) {
-            rawDataAverage[chan][averageIndex % 4] = readChannel(chan);
-            rawfloat[chan] = 0;
+            averageRaw[chan][averageIndex % 4] = readChannel(chan);
+            raw[chan] = 0;
             for (uint8_t i = 0; i < 4; i++)
-                rawfloat[chan] += rawDataAverage[chan][i];
-            rawfloat[chan] /= 4;
+                raw[chan] += averageRaw[chan][i];
+            raw[chan] /= 4;
         }
         averageIndex++;
-    }
-
-    // For now, convert channel values from [-1,+1] to [1000,2000]
-    for (uint8_t chan = 0; chan < 5; chan++) {
-        raw[chan] = 1000 + 500*(rawfloat[chan]+1);
     }
 
     // check stick positions, updating command delay
     uint8_t stTmp = 0;
     for (uint8_t i = 0; i < 4; i++) {
         stTmp >>= 2;
-        if (raw[i] > config.mincheck)
+        if (raw[i] > -1 + config.margin)
             stTmp |= 0x80;  // check for MIN
-        if (raw[i] < config.maxcheck)
+        if (raw[i] < +1 - config.margin)
             stTmp |= 0x40;  // check for MAX
     }
     if (stTmp == sticks) {
@@ -166,8 +162,9 @@ void Receiver::computeExpo(void)
     command[DEMAND_YAW] = -command[DEMAND_YAW];
 
     // Special handling for throttle
-    int32_t tmp = Filter::constrainMinMax(raw[DEMAND_THROTTLE], config.mincheck, 2000);
-    command[DEMAND_THROTTLE] = (uint32_t)(tmp - config.mincheck) * 1000 / (2000 - config.mincheck); // [MINCHECK;2000] -> [0;1000]
+    float mincheck = -1 + config.margin;
+    float tmp = Filter::constrainMinMaxFloat(raw[DEMAND_THROTTLE], mincheck, +1);
+    command[DEMAND_THROTTLE] = (uint32_t)scaleup(tmp, mincheck, +1, 0, 1000);
     lookupCommand(DEMAND_THROTTLE, throttleLookupTable);
 
 } // computeExp
@@ -186,26 +183,31 @@ void Receiver::lookupCommand(uint8_t channel, int16_t * table)
 
 void Receiver::computeCommand(uint8_t channel)
 {
-    command[channel] = (std::min)(abs(raw[channel] - 1500), 500);
+    int16_t tmp = scaleup(raw[channel], -1, +1, 1000, 2000);
+    command[channel] = (std::min)(abs(tmp - 1500), 500);
 }
 
 void Receiver::adjustCommand(uint8_t channel)
 {
-    if (raw[channel] < 1500)
+    if (raw[channel] < 0)
         command[channel] = -command[channel];
 }
 
 uint8_t Receiver::getAuxState(void) 
 {
-    int16_t aux = raw[4];
+    float aux = raw[4];
 
-    return aux < 1500 ? 0 : (aux < 1700 ? 1 : 2);
+    return aux < 0 ? 0 : (aux < 0.4 ? 1 : 2);
 }
 
 bool Receiver::throttleIsDown(void)
 {
-    return raw[DEMAND_THROTTLE] < config.mincheck;
+    return raw[DEMAND_THROTTLE] < -1 + config.margin;
 }
 
+int16_t Receiver::scaleup(float x, float in_min, float in_max, int16_t out_min, int16_t out_max)
+{
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 
 } // namespace

@@ -198,12 +198,6 @@ void MSP::update(float eulerAngles[3], bool armed)
 
                 switch (portState.cmdMSP) {
 
-                case MSP_SET_RAW_RC:
-                    for (uint8_t i = 0; i < 8; i++)
-                        rc->raw[i] = read16();
-                    headSerialReply(0);
-                    break;
-
                 case MSP_SET_MOTOR:
                     for (uint8_t i = 0; i < 4; i++)
                         mixer->motorsDisarmed[i] = read16();
@@ -213,7 +207,7 @@ void MSP::update(float eulerAngles[3], bool armed)
                 case MSP_RC:
                     headSerialReply(16);
                     for (uint8_t i = 0; i < 8; i++)
-                        serialize16(rc->raw[i]);
+                        serialize16(rc->scaleup(rc->raw[i], -1, +1, 1000, 2000));
                     break;
 
                 case MSP_ATTITUDE: 

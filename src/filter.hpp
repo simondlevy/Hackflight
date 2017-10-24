@@ -31,6 +31,7 @@ class Filter {
         static int32_t deadband(int32_t value, int32_t deadband);
         static float   complementary(float a, float b, float c);
         static int32_t constrainMinMax(int32_t val, int32_t min, int32_t max);
+        static float   constrainMinMaxFloat(float val, float min, float max);
         static int32_t constrainAbs(int32_t val, int32_t max);
 };
 
@@ -54,6 +55,11 @@ float Filter::complementary(float a, float b, float c)
 }
 
 int32_t Filter::constrainMinMax(int32_t val, int32_t min, int32_t max)
+{
+    return (val<min) ? min : ((val>max) ? max : val);
+}
+
+float Filter::constrainMinMaxFloat(float val, float min, float max)
 {
     return (val<min) ? min : ((val>max) ? max : val);
 }

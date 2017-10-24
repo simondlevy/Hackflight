@@ -125,8 +125,7 @@ struct AltitudeConfig {
 
 struct RcConfig {
 
-    uint16_t mincheck   = 1100;
-    uint16_t maxcheck   = 1900;
+    float   margin      = 0.1f;
     int16_t expo8       = 65;
     int16_t rate8       = 90;
     int8_t  thrMid8     = 50;
