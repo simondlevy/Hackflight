@@ -200,7 +200,7 @@ void MSP::update(float eulerAngles[3], bool armed)
 
                 case MSP_SET_RAW_RC:
                     for (uint8_t i = 0; i < 8; i++)
-                        rc->data[i] = read16();
+                        rc->raw[i] = read16();
                     headSerialReply(0);
                     break;
 
@@ -213,7 +213,7 @@ void MSP::update(float eulerAngles[3], bool armed)
                 case MSP_RC:
                     headSerialReply(16);
                     for (uint8_t i = 0; i < 8; i++)
-                        serialize16(rc->data[i]);
+                        serialize16(rc->raw[i]);
                     break;
 
                 case MSP_ATTITUDE: 
