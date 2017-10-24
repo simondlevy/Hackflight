@@ -56,7 +56,7 @@ namespace hf {
                 _throttleDemand = -1.f;
             }
 
-            uint16_t readChannel(uint8_t chan)
+            float readChannel(uint8_t chan)
             {
                 static float demands[5];
 
@@ -66,10 +66,7 @@ namespace hf {
                 }
 
                 // Special handling for throttle
-                float demand = (chan == 0) ? _throttleDemand : demands[chan];
-
-                // Joystick demands are in [-1,+1]; convert to [1000,2000]
-                return (uint16_t)(demand*500 + 1500);
+                return (chan == 0) ? _throttleDemand : demands[chan];
             }
 
             void halt(void)
