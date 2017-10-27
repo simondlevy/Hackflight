@@ -125,11 +125,11 @@ struct AltitudeConfig {
 
 struct RcConfig {
 
-    float   margin      = 0.1f;
-    int16_t expo8       = 65;
-    int16_t rate8       = 90;
-    int8_t  thrMid8     = 50;
-    int32_t thrExpo8    = 0;
+    float   margin         = 0.1f;
+    int16_t pitchRollExpo8 = 65;
+    int16_t pitchRollRate8 = 90;
+    int8_t  throttleMid8   = 50;
+    int32_t throttleExpo8  = 0;
 };
 
 //=========================================================================
@@ -176,7 +176,7 @@ enum {
 //=========================================================================
 
 static const uint8_t CONFIG_RC_CHANS                = 8;
-static const uint8_t CONFIG_PITCH_LOOKUP_LENGTH     = 7;
+static const uint8_t CONFIG_PITCHROLL_LOOKUP_LENGTH = 7;
 static const uint8_t CONFIG_THROTTLE_LOOKUP_LENGTH  = 12;
 
 //=========================================================================

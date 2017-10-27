@@ -44,7 +44,7 @@ private:
 
     uint8_t commandDelay;                               // cycles since most recent movement
     int32_t averageIndex;
-    int16_t pitchRollLookupTable[CONFIG_PITCH_LOOKUP_LENGTH];     // lookup table for expo & Receiver rate PITCH+ROLL
+    int16_t pitchRollLookupTable[CONFIG_PITCHROLL_LOOKUP_LENGTH];     // lookup table for expo & Receiver rate PITCH+ROLL
     int16_t throttleLookupTable[CONFIG_THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
     RcConfig config;
@@ -84,18 +84,17 @@ void Receiver::init(const RcConfig& rcConfig)
     for (uint8_t i = 0; i < CONFIG_RC_CHANS; i++) 
         raw[i] = 0;
 
-    for (uint8_t i = 0; i < CONFIG_PITCH_LOOKUP_LENGTH; i++)
-        pitchRollLookupTable[i] = (2500 + config.expo8 * (i * i - 25)) * i * (int32_t)config.rate8 / 2500;
+    for (uint8_t i = 0; i < CONFIG_PITCHROLL_LOOKUP_LENGTH; i++)
+        pitchRollLookupTable[i] = (2500 + config.pitchRollExpo8 * (i * i - 25)) * i * (int32_t)config.pitchRollRate8 / 2500;
 
     for (uint8_t i = 0; i < CONFIG_THROTTLE_LOOKUP_LENGTH; i++) {
-        int16_t tmp = 10 * i - config.thrMid8;
+        int16_t tmp = 10 * i - config.throttleMid8;
         uint8_t y = 1;
         if (tmp > 0)
-            y = 100 - config.thrMid8;
+            y = 100 - config.throttleMid8;
         if (tmp < 0)
-            y = config.thrMid8;
-        throttleLookupTable[i] = 10 * config.thrMid8 + tmp * (100 - config.thrExpo8 + 
-            config.thrExpo8 * (tmp * tmp) / (y * y)) / 10;
+            y = config.throttleMid8;
+        throttleLookupTable[i] = 10 * config.throttleMid8 + tmp * (100 - config.throttleExpo8 + config.throttleExpo8 * (tmp * tmp) / (y * y)) / 10;
         throttleLookupTable[i] += 1000;
     }
 }
@@ -147,13 +146,16 @@ bool Receiver::changed(void)
 
 void Receiver::computeExpo(void)
 {
+    // Converts raw [-1,+1] to absolute value [0,500]
     computeCommand(DEMAND_ROLL);
     computeCommand(DEMAND_PITCH);
     computeCommand(DEMAND_YAW);
 
+    // Applies nonlinear lookup table to [0,500]
     lookupRollPitch(DEMAND_ROLL);
     lookupRollPitch(DEMAND_PITCH);
 
+    // Puts sign back on command, yielding [-500,+500]
     adjustCommand(DEMAND_ROLL);
     adjustCommand(DEMAND_PITCH);
     adjustCommand(DEMAND_YAW);

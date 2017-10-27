@@ -39,9 +39,7 @@ namespace hf {
 
         float readChannel(uint8_t chan)
         {
-            // TAER
-            uint8_t chanmap[5] = {0, 1, 2, 3, 4};
-            return rx.getChannelValueNormalized(chanmap[chan]);
+            return rx.getChannelValueNormalized(chan);
         }
 
         bool lostSignal(void)
