@@ -40,10 +40,10 @@ class Receiver(Dialog):
 
         Dialog.start(self)
 
-        self.throttle_gauge = self._new_gauge(0, 'Throttle', 'red')     # T
-        self.roll_gauge     = self._new_gauge(1, '    Roll', 'blue')    # A
-        self.pitch_gauge    = self._new_gauge(2, '   Pitch', 'green')   # E
-        self.yaw_gauge      = self._new_gauge(3, '     Yaw', 'orange')  # R
+        self.throttle_gauge = self._new_gauge(0, 'Throttle', 'red', minval=0)   # T
+        self.roll_gauge     = self._new_gauge(1, '    Roll', 'blue')            # A
+        self.pitch_gauge    = self._new_gauge(2, '   Pitch', 'green')           # E
+        self.yaw_gauge      = self._new_gauge(3, '     Yaw', 'orange')          # R
         self.switch_gauge   = self._new_gauge(4, '     Aux', 'purple')
 
         self.schedule_display_task(delay_msec)
@@ -69,9 +69,9 @@ class Receiver(Dialog):
             # Add a label for arming if needed
             self.driver.checkArmed() 
 
-    def _new_gauge(self, offset, name, color):
+    def _new_gauge(self, offset, name, color, minval=-1):
 
-        return HorizontalGauge(self, 100, 60+85*offset, 600, 40, color, name, PWM_MIN, PWM_MAX, '%4d')
+        return HorizontalGauge(self, 100, 60+85*offset, 600, 40, color, name, minval, +1, '%0.2f')
 
 class HorizontalGauge(object):
 
@@ -105,7 +105,7 @@ class HorizontalGauge(object):
         bbox = self.bbox
         self.owner.driver.canvas.coords(self.rect, (bbox[0], bbox[1], bbox[0]+new_width, bbox[3]))
 
-        self.owner.driver.canvas.itemconfigure(self.label, text=('%4d' % newval))
+        self.owner.driver.canvas.itemconfigure(self.label, text=('%0.2f' % newval))
 
     def _create_label(self, x, y, text=''):
 

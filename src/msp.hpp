@@ -23,7 +23,7 @@
 #include "mixer.hpp"
 
 // See http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol
-#define MSP_RC                   105    
+#define MSP_RC_NORMAL            121    
 #define MSP_ATTITUDE             108    
 #define MSP_SET_MOTOR_NORMAL     215    
 
@@ -62,17 +62,18 @@ private:
 
     mspPortState_t portState;
 
-    void serialize8(uint8_t a);
-    void serialize16(int16_t a);
-    uint8_t read8(void);
+    void     serialize8(uint8_t a);
+    void     serialize16(int16_t a);
+    uint8_t  read8(void);
     uint16_t read16(void);
     uint32_t read32(void);
     float    readFloat(void);
-    void serialize32(uint32_t a);
-    void headSerialResponse(uint8_t err, uint8_t s);
-    void headSerialReply(uint8_t s);
-    void headSerialError(uint8_t s);
-    void tailSerialReply(void);
+    void     serializeFloat(float f);
+    void     serialize32(uint32_t a);
+    void     headSerialResponse(uint8_t err, uint8_t s);
+    void     headSerialReply(uint8_t s);
+    void     headSerialError(uint8_t s);
+    void     tailSerialReply(void);
 
 }; // class MSP
 
@@ -117,6 +118,13 @@ float MSP::readFloat(void)
     uint32_t t = read32();
     memcpy(&f, &t, 4);
     return f;
+}
+
+void MSP::serializeFloat(float f)
+{
+    uint32_t a;
+    memcpy(&a, &f, 4);
+    serialize32(a);
 }
 
 void MSP::serialize32(uint32_t a)
@@ -207,10 +215,10 @@ void MSP::update(float eulerAngles[3], bool armed)
                     headSerialReply(0);
                     break;
 
-                case MSP_RC:
-                    headSerialReply(16);
+                case MSP_RC_NORMAL:
+                    headSerialReply(32);
                     for (uint8_t i = 0; i < 8; i++)
-                        serialize16(rc->scaleup(rc->raw[i], -1, +1, 1000, 2000));
+                        serializeFloat(rc->raw[i]);
                     break;
 
                 case MSP_ATTITUDE: 
