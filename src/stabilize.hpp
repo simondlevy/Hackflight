@@ -38,7 +38,7 @@ enum {
 
 class Stabilize {
 public:
-    int16_t axisPID[3];
+    int16_t axisPids[3];
 
     void init(const StabilizeConfig& _config, const ImuConfig& _imuConfig, Model * _model);
 
@@ -147,15 +147,15 @@ int16_t Stabilize::computeLevelPid(int16_t rcCommands[4], uint8_t rcAxis, int16_
 void Stabilize::update(int16_t rcCommands[4], int16_t gyroRaw[3], float eulerAnglesDegrees[3])
 {
     // Pitch, roll use leveling based on Euler angles
-    axisPID[AXIS_ROLL]  = computeLevelPid(rcCommands, DEMAND_ROLL,  gyroRaw, eulerAnglesDegrees, AXIS_ROLL);
-    axisPID[AXIS_PITCH] = computeLevelPid(rcCommands, DEMAND_PITCH, gyroRaw, eulerAnglesDegrees, AXIS_PITCH);
+    axisPids[AXIS_ROLL]  = computeLevelPid(rcCommands, DEMAND_ROLL,  gyroRaw, eulerAnglesDegrees, AXIS_ROLL);
+    axisPids[AXIS_PITCH] = computeLevelPid(rcCommands, DEMAND_PITCH, gyroRaw, eulerAnglesDegrees, AXIS_PITCH);
 
     // For yaw, P term comes directly from RC command, and D term is zero
     int32_t ITermGyroYaw = computeITermGyro(model->yawP, model->yawI, rcCommands[DEMAND_YAW], gyroRaw, AXIS_YAW);
-    axisPID[AXIS_YAW] = computePid(model->yawP, rcCommands[DEMAND_YAW], ITermGyroYaw, 0, gyroRaw, AXIS_YAW);
+    axisPids[AXIS_YAW] = computePid(model->yawP, rcCommands[DEMAND_YAW], ITermGyroYaw, 0, gyroRaw, AXIS_YAW);
 
     // Prevent "yaw jump" during yaw correction
-    axisPID[AXIS_YAW] = Filter::constrainAbs(axisPID[AXIS_YAW], 100 + std::abs(rcCommands[DEMAND_YAW]));
+    axisPids[AXIS_YAW] = Filter::constrainAbs(axisPids[AXIS_YAW], 100 + std::abs(rcCommands[DEMAND_YAW]));
 }
 
 void Stabilize::resetIntegral(void)
