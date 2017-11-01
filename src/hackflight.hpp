@@ -251,7 +251,17 @@ void Hackflight::updateImu(void)
 
     // Stabilization, mixing, and MSP are synced to IMU update.  Stabilizer also uses raw gyro values.
     stab.update(receiver->commands, gyroRaw, eulerAnglesDegrees);
-    mixer.update(receiver->commands[DEMAND_THROTTLE], stab.axisPids[AXIS_ROLL], stab.axisPids[AXIS_PITCH], stab.axisPids[AXIS_YAW], armed);
+
+    // Convert throttle, PIDs to floating-point for mixer
+    float throttle = (receiver->commands[DEMAND_THROTTLE]-1000) / 1000.;
+    float pidRoll  = stab.axisPids[AXIS_ROLL]  / 1000.;
+    float pidPitch = stab.axisPids[AXIS_PITCH]  / 1000.;
+    float pidYaw   = stab.axisPids[AXIS_YAW]  / 1000.;
+
+    // Update mixer
+    mixer.update(throttle, pidRoll, pidPitch, pidYaw, armed);
+
+    // Update serial comms
     msp.update(eulerAnglesDegrees, armed);
 } 
 

@@ -34,7 +34,7 @@ public:
     float  motorsDisarmed[4];
 
     void init(Receiver * _rc, Stabilize * _stabilize, Board * _board);
-    void update(int16_t throttle, int16_t pidRoll, int16_t pidPitch, int16_t pidYaw, bool armed);
+    void update(float throttle, float pidRoll, float pidPitch, float pidYaw, bool armed);
     void cutMotors(void);
 
 private:
@@ -75,18 +75,17 @@ void Mixer::init(Receiver * _rc, Stabilize * _stabilize, Board * _board)
         motorsDisarmed[i] = 0;
 }
 
-void Mixer::update(int16_t throttle, int16_t pidRoll, int16_t pidPitch, int16_t pidYaw, bool armed)
+void Mixer::update(float throttle, float pidRoll, float pidPitch, float pidYaw, bool armed)
 {
     float motors[4];
 
     for (uint8_t i = 0; i < 4; i++) {
-        int16_t motor = (int16_t)
-        (throttle * mixerQuadX[i].throttle + 
-         pidRoll  * mixerQuadX[i].roll +     
-         pidPitch * mixerQuadX[i].pitch +   
-         pidYaw   * mixerQuadX[i].yaw);      
 
-        motors[i] = (motor - 1000) / 1000.;
+        motors[i] = 
+            (throttle * mixerQuadX[i].throttle + 
+             pidRoll  * mixerQuadX[i].roll +     
+             pidPitch * mixerQuadX[i].pitch +   
+             pidYaw   * mixerQuadX[i].yaw);      
     }
 
     float maxMotor = motors[0];
