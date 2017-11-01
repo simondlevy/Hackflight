@@ -54,6 +54,7 @@ public:
     void    update(void);
     float   rawvals[CONFIG_RC_CHANS];  // raw [-1,+1] from receiver
     int16_t commands[4];            // stick PWM values 
+    float   commandsf[4];
     uint8_t sticks;                // stick positions for command combos
     bool    changed(void);
     void    computeExpo(void);
@@ -85,16 +86,16 @@ void Receiver::init(const RcConfig& rcConfig)
         rawvals[i] = 0;
 
     for (uint8_t i = 0; i < CONFIG_PITCHROLL_LOOKUP_LENGTH; i++)
-        pitchRollLookupTable[i] = (2500 + config.pitchRollExpo8 * (i * i - 25)) * i * (int32_t)config.pitchRollRate8 / 2500;
+        pitchRollLookupTable[i] = (2500 + config.pitchRollExpo * (i * i - 25)) * i * (int32_t)config.pitchRollRate / 2500;
 
     for (uint8_t i = 0; i < CONFIG_THROTTLE_LOOKUP_LENGTH; i++) {
-        int16_t tmp = 10 * i - config.throttleMid8;
+        int16_t tmp = 10 * i - config.throttleMid;
         uint8_t y = 1;
         if (tmp > 0)
-            y = 100 - config.throttleMid8;
+            y = 100 - config.throttleMid;
         if (tmp < 0)
-            y = config.throttleMid8;
-        throttleLookupTable[i] = 10 * config.throttleMid8 + tmp * (100 - config.throttleExpo8 + config.throttleExpo8 * (tmp * tmp) / (y * y)) / 10;
+            y = config.throttleMid;
+        throttleLookupTable[i] = 10 * config.throttleMid + tmp * (100 - config.throttleExpo + config.throttleExpo * (tmp * tmp) / (y * y)) / 10;
         throttleLookupTable[i] += 1000;
     }
 }

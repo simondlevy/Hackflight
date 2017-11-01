@@ -125,11 +125,11 @@ struct AltitudeConfig {
 
 struct RcConfig {
 
-    float   margin         = 0.1f;
-    int16_t pitchRollExpo8 = 65;
-    int16_t pitchRollRate8 = 90;
-    int8_t  throttleMid8   = 50;
-    int32_t throttleExpo8  = 0;
+    float   margin        = 0.1f;
+    int16_t pitchRollExpo = 65;
+    int16_t pitchRollRate = 90;
+    int8_t  throttleMid   = 50;
+    int32_t throttleExpo  = 20;
 };
 
 //=========================================================================
