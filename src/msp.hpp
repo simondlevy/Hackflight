@@ -218,7 +218,7 @@ void MSP::update(float eulerAngles[3], bool armed)
                 case MSP_RC_NORMAL:
                     headSerialReply(32);
                     for (uint8_t i = 0; i < 8; i++)
-                        serializeFloat(rc->raw[i]);
+                        serializeFloat(rc->rawvals[i]);
                     break;
 
                 case MSP_ATTITUDE: 

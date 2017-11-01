@@ -81,7 +81,7 @@ void Mixer::update(bool armed)
 
     for (uint8_t i = 0; i < 4; i++) {
         int16_t motor = (int16_t)
-        (rc->command[DEMAND_THROTTLE]   * mixerQuadX[i].throttle + // T
+        (rc->commands[DEMAND_THROTTLE]   * mixerQuadX[i].throttle + // T
          stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch +    // A
          stabilize->axisPID[AXIS_ROLL]  * mixerQuadX[i].roll +     // E
          stabilize->axisPID[AXIS_YAW]   * mixerQuadX[i].yaw);      // R

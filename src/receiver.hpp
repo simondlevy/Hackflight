@@ -52,8 +52,8 @@ private:
 public:
     void    init(const RcConfig& rcConfig);
     void    update(void);
-    float   raw[CONFIG_RC_CHANS];  // raw [-1,+1] from receiver
-    int16_t command[4];            // stick PWM values 
+    float   rawvals[CONFIG_RC_CHANS];  // raw [-1,+1] from receiver
+    int16_t commands[4];            // stick PWM values 
     uint8_t sticks;                // stick positions for command combos
     bool    changed(void);
     void    computeExpo(void);
@@ -82,7 +82,7 @@ void Receiver::init(const RcConfig& rcConfig)
     averageIndex = 0;
 
     for (uint8_t i = 0; i < CONFIG_RC_CHANS; i++) 
-        raw[i] = 0;
+        rawvals[i] = 0;
 
     for (uint8_t i = 0; i < CONFIG_PITCHROLL_LOOKUP_LENGTH; i++)
         pitchRollLookupTable[i] = (2500 + config.pitchRollExpo8 * (i * i - 25)) * i * (int32_t)config.pitchRollRate8 / 2500;
@@ -106,7 +106,7 @@ void Receiver::update()
     // Serial receivers provide clean data and can be read directly
     if (useSerial()) {
         for (uint8_t chan = 0; chan < 5; chan++) {
-            raw[chan] = readChannel(chan);
+            rawvals[chan] = readChannel(chan);
         }
     }
 
@@ -114,10 +114,10 @@ void Receiver::update()
     else {
         for (uint8_t chan = 0; chan < 5; chan++) {
             averageRaw[chan][averageIndex % 4] = readChannel(chan);
-            raw[chan] = 0;
+            rawvals[chan] = 0;
             for (uint8_t i = 0; i < 4; i++)
-                raw[chan] += averageRaw[chan][i];
-            raw[chan] /= 4;
+                rawvals[chan] += averageRaw[chan][i];
+            rawvals[chan] /= 4;
         }
         averageIndex++;
     }
@@ -126,9 +126,9 @@ void Receiver::update()
     uint8_t stTmp = 0;
     for (uint8_t i = 0; i < 4; i++) {
         stTmp >>= 2;
-        if (raw[i] > -1 + config.margin)
+        if (rawvals[i] > -1 + config.margin)
             stTmp |= 0x80;  // check for MIN
-        if (raw[i] < +1 - config.margin)
+        if (rawvals[i] < +1 - config.margin)
             stTmp |= 0x40;  // check for MAX
     }
     if (stTmp == sticks) {
@@ -161,12 +161,12 @@ void Receiver::computeExpo(void)
     adjustCommand(DEMAND_YAW);
 
     // Yaw demand needs to be reversed
-    command[DEMAND_YAW] = -command[DEMAND_YAW];
+    commands[DEMAND_YAW] = -commands[DEMAND_YAW];
 
     // Special handling for throttle
     float mincheck = -1 + config.margin;
-    float tmp = Filter::constrainMinMaxFloat(raw[DEMAND_THROTTLE], mincheck, +1);
-    command[DEMAND_THROTTLE] = (uint32_t)scaleup(tmp, mincheck, +1, 0, 1000);
+    float tmp = Filter::constrainMinMaxFloat(rawvals[DEMAND_THROTTLE], mincheck, +1);
+    commands[DEMAND_THROTTLE] = (uint32_t)scaleup(tmp, mincheck, +1, 0, 1000);
     lookupCommand(DEMAND_THROTTLE, throttleLookupTable);
 
 } // computeExp
@@ -178,33 +178,33 @@ void Receiver::lookupRollPitch(uint8_t channel)
 
 void Receiver::lookupCommand(uint8_t channel, int16_t * table)
 {
-    int32_t tmp = command[channel];
+    int32_t tmp = commands[channel];
     int32_t tmp2 = tmp / 100;
-    command[channel] = table[tmp2] + (tmp-tmp2*100) * (table[tmp2+1] - table[tmp2])/100;
+    commands[channel] = table[tmp2] + (tmp-tmp2*100) * (table[tmp2+1] - table[tmp2])/100;
 }
 
 void Receiver::computeCommand(uint8_t channel)
 {
-    int16_t tmp = scaleup(raw[channel], -1, +1, 1000, 2000);
-    command[channel] = (std::min)(abs(tmp - 1500), 500);
+    int16_t tmp = scaleup(rawvals[channel], -1, +1, 1000, 2000);
+    commands[channel] = (std::min)(abs(tmp - 1500), 500);
 }
 
 void Receiver::adjustCommand(uint8_t channel)
 {
-    if (raw[channel] < 0)
-        command[channel] = -command[channel];
+    if (rawvals[channel] < 0)
+        commands[channel] = -commands[channel];
 }
 
 uint8_t Receiver::getAuxState(void) 
 {
-    float aux = raw[4];
+    float aux = rawvals[4];
 
     return aux < 0 ? 0 : (aux < 0.4 ? 1 : 2);
 }
 
 bool Receiver::throttleIsDown(void)
 {
-    return raw[DEMAND_THROTTLE] < -1 + config.margin;
+    return rawvals[DEMAND_THROTTLE] < -1 + config.margin;
 }
 
 int16_t Receiver::scaleup(float x, float in_min, float in_max, int16_t out_min, int16_t out_max)
