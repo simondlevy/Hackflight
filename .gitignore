@@ -1,3 +1,4 @@
+extras/parser/output
 ladybug/hackflight/accelerometer.hpp
 ladybug/hackflight/altitude.hpp
 ladybug/hackflight/barometer.hpp

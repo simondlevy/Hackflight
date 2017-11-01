@@ -23,15 +23,9 @@
 #include "mixer.hpp"
 
 // See http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol
-#define MSP_REBOOT               68     
 #define MSP_RC                   105    
 #define MSP_ATTITUDE             108    
-#define MSP_ALTITUDE             109    
-#define MSP_BARO_SONAR_RAW       126    
-#define MSP_SONARS               127    
-#define MSP_SET_RAW_RC           200    
-#define MSP_SET_HEAD             211
-#define MSP_SET_MOTOR            214    
+#define MSP_SET_MOTOR_NORMAL     215    
 
 namespace hf {
 
@@ -73,6 +67,7 @@ private:
     uint8_t read8(void);
     uint16_t read16(void);
     uint32_t read32(void);
+    float    readFloat(void);
     void serialize32(uint32_t a);
     void headSerialResponse(uint8_t err, uint8_t s);
     void headSerialReply(uint8_t s);
@@ -114,6 +109,14 @@ uint32_t MSP::read32(void)
     uint32_t t = read16();
     t += (uint32_t)read16() << 16;
     return t;
+}
+
+float MSP::readFloat(void)
+{
+    float f = 0;
+    uint32_t t = read32();
+    memcpy(&f, &t, 4);
+    return f;
 }
 
 void MSP::serialize32(uint32_t a)
@@ -198,9 +201,9 @@ void MSP::update(float eulerAngles[3], bool armed)
 
                 switch (portState.cmdMSP) {
 
-                case MSP_SET_MOTOR:
+                case MSP_SET_MOTOR_NORMAL:
                     for (uint8_t i = 0; i < 4; i++)
-                        mixer->motorsDisarmed[i] = read16();
+                        mixer->motorsDisarmed[i] = (int16_t)(1000 + 1000*readFloat());
                     headSerialReply(0);
                     break;
 

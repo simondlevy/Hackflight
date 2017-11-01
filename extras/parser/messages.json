@@ -16,36 +16,11 @@
                {"pitch"   : "short"},
                {"yaw"     : "short"}],
 
-  "ALTITUDE": [{"ID": 109},
-               {"comment" : "cm, cm/s"},
-               {"altitude": "int"}, 
-               {"vario"   : "short"}],
+  "SET_MOTOR_NORMAL": [{"ID": 215},
+                       {"comment": "We send floating-point values in [0,1], rather than PWM"}, 
+                       {"m1": "float"},
+                       {"m2": "float"},
+                       {"m3": "float"},
+                       {"m4": "float"}]
 
-  "SONARS":   [{"ID": 127},
-                {"comment": "four horizontal-facing sonars"}, 
-                {"back"    : "short"}, 
-                {"front"   : "short"}, 
-                {"left"    : "short"}, 
-                {"right"   : "short"}],
-
-  "SET_RAW_RC": [{"ID": 200},
-                 {"comment": "16 channels in http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol"}, 
-                 {"c1": "short"}, 
-                 {"c2": "short"}, 
-                 {"c3": "short"}, 
-                 {"c4": "short"}, 
-                 {"c5": "short"}, 
-                 {"c6": "short"}, 
-                 {"c7": "short"}, 
-                 {"c8": "short"}],
-
-  "SET_HEAD": [{"ID": 205},
-               {"head": "short"}],
-
-  "SET_MOTOR": [{"ID": 214},
-                 {"comment": "We send percent values, rather than PWM"}, 
-                 {"m1": "short"},
-                 {"m2": "short"},
-                 {"m3": "short"},
-                 {"m4": "short"}]
 }
