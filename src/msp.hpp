@@ -203,7 +203,7 @@ void MSP::update(float eulerAngles[3], bool armed)
 
                 case MSP_SET_MOTOR_NORMAL:
                     for (uint8_t i = 0; i < 4; i++)
-                        mixer->motorsDisarmed[i] = (int16_t)(1000 + 1000*readFloat());
+                        mixer->motorsDisarmed[i] = readFloat();
                     headSerialReply(0);
                     break;
 

@@ -31,7 +31,7 @@ class Mixer {
 public:
 
     // This is set by MSP
-    int16_t  motorsDisarmed[4];
+    float  motorsDisarmed[4];
 
     void init(Receiver * _rc, Stabilize * _stabilize, Board * _board);
     void update(bool armed);
@@ -72,22 +72,24 @@ void Mixer::init(Receiver * _rc, Stabilize * _stabilize, Board * _board)
 
     // set disarmed motor values
     for (uint8_t i = 0; i < 4; i++)
-        motorsDisarmed[i] = 1000;
+        motorsDisarmed[i] = 0;
 }
 
 void Mixer::update(bool armed)
 {
-    int16_t motors[4];
+    float motors[4];
 
     for (uint8_t i = 0; i < 4; i++) {
-        motors[i] = (int16_t)
+        int16_t motor = (int16_t)
         (rc->command[DEMAND_THROTTLE]   * mixerQuadX[i].throttle + // T
          stabilize->axisPID[AXIS_PITCH] * mixerQuadX[i].pitch +    // A
          stabilize->axisPID[AXIS_ROLL]  * mixerQuadX[i].roll +     // E
          stabilize->axisPID[AXIS_YAW]   * mixerQuadX[i].yaw);      // R
+
+        motors[i] = (motor - 1000) / 1000.;
     }
 
-    int16_t maxMotor = motors[0];
+    float maxMotor = motors[0];
 
     for (uint8_t i = 1; i < 4; i++)
         if (motors[i] > maxMotor)
@@ -96,15 +98,15 @@ void Mixer::update(bool armed)
     for (uint8_t i = 0; i < 4; i++) {
 
         // This is a way to still have good gyro corrections if at least one motor reaches its max
-        if (maxMotor > 2000) {
-            motors[i] -= maxMotor - 2000;
+        if (maxMotor > 1) {
+            motors[i] -= maxMotor - 1;
         }
 
-        motors[i] = Filter::constrainMinMax(motors[i], 1000, 2000);
+        motors[i] = Filter::constrainMinMaxFloat(motors[i], 0, 1);
 
         // Avoid sudden motor jump from right yaw while arming
         if (rc->throttleIsDown()) {
-            motors[i] = 1000;
+            motors[i] = 0;
         } 
 
         // This is how we can spin the motors from the GCS
@@ -113,10 +115,8 @@ void Mixer::update(bool armed)
         }
     }
 
-    // Normalize [1000,2000] -> [0,1]
     for (uint8_t i = 0; i < 4; i++) {
-        //board->dprintf("1: %d    2: %d    3: %d    4: %d\n", motors[0], motors[1], motors[2], motors[3]);
-        board->writeMotor(i, (motors[i]-1000)/1000.);
+        board->writeMotor(i, motors[i]);
     }
 }
 
