@@ -39,10 +39,7 @@ protected:
 
 private:
 
-    void computeCommand(uint8_t channel);
     void adjustCommand(uint8_t channel);
-    void lookupRollPitch(uint8_t channel);
-    void lookupCommand(uint8_t channel, int16_t * table);
 
     void applyPitchRollFunction(uint8_t channel);
     void makePositiveCommand(uint8_t channel);
@@ -52,17 +49,15 @@ private:
 
     uint8_t commandDelay;                               // cycles since most recent movement
     int32_t averageIndex;
-    int16_t pitchRollLookupTable[CONFIG_PITCHROLL_LOOKUP_LENGTH];     // lookup table for expo & Receiver rate PITCH+ROLL
-    int16_t throttleLookupTable[CONFIG_THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
     ReceiverConfig config;
 
 public:
+
     void    init(const ReceiverConfig& rcConfig);
     void    update(void);
     float   rawvals[CONFIG_RC_CHANS];  // raw [-1,+1] from receiver
-    int16_t commands[4];            // stick PWM values 
-    float   commandsf[4];
+    float   commands[4];
     uint8_t sticks;                // stick positions for command combos
     bool    changed(void);
     void    computeExpo(void);
@@ -89,28 +84,6 @@ void Receiver::init(const ReceiverConfig& rcConfig)
     commandDelay = 0;
     sticks = 0;
     averageIndex = 0;
-
-    int8_t pitchRollExpo = 100 * config.pitchRollExpo;
-    int8_t pitchRollRate = 100 * config.pitchRollRate;
-    int8_t throttleMid   = 100 * config.throttleMid;
-    int8_t throttleExpo  = 100 * config.throttleExpo;
-    
-    for (uint8_t i = 0; i < CONFIG_RC_CHANS; i++) 
-        rawvals[i] = 0;
-
-    for (uint8_t i = 0; i < CONFIG_PITCHROLL_LOOKUP_LENGTH; i++)
-        pitchRollLookupTable[i] = (2500 + pitchRollExpo * (i * i - 25)) * i * (int32_t)pitchRollRate / 2500;
-
-    for (uint8_t i = 0; i < CONFIG_THROTTLE_LOOKUP_LENGTH; i++) {
-        int16_t tmp = 10 * i - throttleMid;
-        uint8_t y = 1;
-        if (tmp > 0)
-            y = 100 - throttleMid;
-        if (tmp < 0)
-            y = throttleMid;
-        throttleLookupTable[i] = 10 * throttleMid + tmp * (100 - throttleExpo + throttleExpo * (tmp * tmp) / (y * y)) / 10;
-        throttleLookupTable[i] += 1000;
-    }
 }
 
 void Receiver::update()
@@ -160,47 +133,32 @@ bool Receiver::changed(void)
 
 void Receiver::computeExpo(void)
 {
-    // XXX Convert raw [-1,+1] to absolute value [0,500]
-    computeCommand(DEMAND_ROLL);
-    computeCommand(DEMAND_PITCH);
-    computeCommand(DEMAND_YAW);
-
     // Convert raw [-1,+1] to absolute value
     makePositiveCommand(DEMAND_ROLL);
     makePositiveCommand(DEMAND_PITCH);
     makePositiveCommand(DEMAND_YAW);
 
-    // XXX Apply nonlinear lookup table to [0,500]
-    lookupRollPitch(DEMAND_ROLL);
-    lookupRollPitch(DEMAND_PITCH);
-
     // Apply expo nonlinearity to roll, pitch
     applyPitchRollFunction(DEMAND_ROLL);
     applyPitchRollFunction(DEMAND_PITCH);
 
-    // Put sign back on command, yielding [-500,+500]
+    // Put sign back on command, yielding [-0.5,+0.5]
     adjustCommand(DEMAND_ROLL);
     adjustCommand(DEMAND_PITCH);
     adjustCommand(DEMAND_YAW);
 
     // Yaw demand needs to be reversed
-    commands[DEMAND_YAW]  = -commands[DEMAND_YAW];
-    commandsf[DEMAND_YAW] = -commandsf[DEMAND_YAW];
+    commands[DEMAND_YAW] = -commands[DEMAND_YAW];
 
     // Special handling for throttle
-    float mincheck = -1 + config.margin;
-    float tmp = Filter::constrainMinMaxFloat(rawvals[DEMAND_THROTTLE], mincheck, +1);
-    commands[DEMAND_THROTTLE] = (uint32_t)scaleup(tmp, mincheck, +1, 0, 1000);
-    lookupCommand(DEMAND_THROTTLE, throttleLookupTable);
-
-    float tmp2 = (rawvals[DEMAND_THROTTLE] + 1) / 2;
-    commandsf[DEMAND_THROTTLE] = throttleFun(tmp2, config.throttleExpo, config.throttleMid);
+    float tmp = (rawvals[DEMAND_THROTTLE] + 1) / 2; // [-1,+1] -> [0,1]
+    commands[DEMAND_THROTTLE] = throttleFun(tmp, config.throttleExpo, config.throttleMid);
 
 } // computeExp
 
 void Receiver::applyPitchRollFunction(uint8_t channel)
 {
-    commandsf[channel] = rcFun(commandsf[channel], config.pitchRollExpo, config.pitchRollRate);
+    commands[channel] = rcFun(commands[channel], config.pitchRollExpo, config.pitchRollRate);
 }
 
 float Receiver::rcFun(float x, float e, float r)
@@ -217,34 +175,15 @@ float Receiver::throttleFun(float x, float e, float mid)
 
 void Receiver::makePositiveCommand(uint8_t channel)
 {
-    commandsf[channel] = std::abs(rawvals[channel]);
-}
-
-void Receiver::lookupRollPitch(uint8_t channel)
-{
-    lookupCommand(channel, pitchRollLookupTable);
-}
-
-void Receiver::lookupCommand(uint8_t channel, int16_t * table)
-{
-    int32_t tmp = commands[channel];
-    int32_t tmp2 = tmp / 100;
-    commands[channel] = table[tmp2] + (tmp-tmp2*100) * (table[tmp2+1] - table[tmp2])/100;
-}
-
-void Receiver::computeCommand(uint8_t channel)
-{
-    int16_t tmp = scaleup(rawvals[channel], -1, +1, 1000, 2000);
-    commands[channel] = (std::min)(abs(tmp - 1500), 500);
+    commands[channel] = std::abs(rawvals[channel]);
 }
 
 void Receiver::adjustCommand(uint8_t channel)
 {
-    commandsf[channel] /= 2;
+    commands[channel] /= 2;
 
     if (rawvals[channel] < 0) {
         commands[channel] = -commands[channel];
-        commandsf[channel] = -commandsf[channel];
     }
 }
 

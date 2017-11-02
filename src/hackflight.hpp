@@ -250,20 +250,20 @@ void Hackflight::updateImu(void)
     }
 
     // XXX Convert receiver demands to integers for stabilizer
-    int16_t demandRoll  = 1000 * receiver->commandsf[DEMAND_ROLL];
-    int16_t demandPitch = 1000 * receiver->commandsf[DEMAND_PITCH];
-    int16_t demandYaw   = 1000 * receiver->commandsf[DEMAND_YAW];
+    int16_t demandRoll  = 1000 * receiver->commands[DEMAND_ROLL];
+    int16_t demandPitch = 1000 * receiver->commands[DEMAND_PITCH];
+    int16_t demandYaw   = 1000 * receiver->commands[DEMAND_YAW];
 
     // Stabilization is synced to IMU update.  Stabilizer also uses raw gyro values.
     stab.update(demandRoll, demandPitch, demandYaw, gyroRaw, eulerAnglesDegrees);
 
-    // Convert throttle, PIDs to floating-point for mixer
+    // XXX Convert throttle, PIDs to floating-point for mixer
     float pidRoll  = stab.axisPids[AXIS_ROLL]  / 1000.;
     float pidPitch = stab.axisPids[AXIS_PITCH]  / 1000.;
     float pidYaw   = stab.axisPids[AXIS_YAW]  / 1000.;
 
     // Update mixer
-    mixer.update(receiver->commandsf[DEMAND_THROTTLE], pidRoll, pidPitch, pidYaw, armed);
+    mixer.update(receiver->commands[DEMAND_THROTTLE], pidRoll, pidPitch, pidYaw, armed);
 
     // Update serial comms
     msp.update(eulerAnglesDegrees, armed);

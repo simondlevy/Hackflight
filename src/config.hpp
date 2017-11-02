@@ -176,13 +176,5 @@ enum {
 //=========================================================================
 
 static const uint8_t CONFIG_RC_CHANS                = 8;
-static const uint8_t CONFIG_PITCHROLL_LOOKUP_LENGTH = 7;
-static const uint8_t CONFIG_THROTTLE_LOOKUP_LENGTH  = 12;
-
-//=========================================================================
-// STM32 reboot support
-//=========================================================================
-
-#define CONFIG_REBOOT_CHARACTER 'R'
 
 } // namespace
