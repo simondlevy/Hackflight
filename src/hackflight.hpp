@@ -249,7 +249,7 @@ void Hackflight::updateImu(void)
         //alti.modifyThrottleDemand(receiver->demandThrottle);
     }
 
-   // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.
+    // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.
     stab.update(receiver->demandRoll, receiver->demandPitch, receiver->demandYaw, gyroRaw, eulerAnglesDegrees);
 
     // Update mixer

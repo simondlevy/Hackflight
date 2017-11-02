@@ -71,8 +71,8 @@ private:
     StabilizeConfig config;
 
     int32_t computeITermGyro(float rateP, float rateI, int16_t rcCommand, int16_t gyroRaw[3], uint8_t axis);
-    int16_t computePid(float rateP, int32_t PTerm, int32_t ITerm, int32_t DTerm, int16_t gyroRaw[3], uint8_t axis);
-    int16_t computePitchRollPid(int16_t rcCommand, float prop, int16_t gyroRaw[3], float eulerAnglesDegrees[3], uint8_t imuAxis);
+    float computePid(float rateP, int32_t PTerm, int32_t ITerm, int32_t DTerm, int16_t gyroRaw[3], uint8_t axis);
+    float computePitchRollPid(int16_t rcCommand, float prop, int16_t gyroRaw[3], float eulerAnglesDegrees[3], uint8_t imuAxis);
 }; 
 
 
@@ -118,14 +118,14 @@ int32_t Stabilize::computeITermGyro(float rateP, float rateI, int16_t rcCommand,
     return (int32_t)(errorGyroI[axis] * rateI);
 }
 
-int16_t Stabilize::computePid(float rateP, int32_t PTerm, int32_t ITerm, int32_t DTerm, int16_t gyroRaw[3], uint8_t axis)
+float Stabilize::computePid(float rateP, int32_t PTerm, int32_t ITerm, int32_t DTerm, int16_t gyroRaw[3], uint8_t axis)
 {
     PTerm -= (int32_t)(gyroRaw[axis] * rateP);
-    return PTerm + ITerm - DTerm + softwareTrim[axis];
+    return (PTerm + ITerm - DTerm + softwareTrim[axis]) / 1000.; // XXX
 }
 
 // Computes leveling PID for pitch or roll
-int16_t Stabilize::computePitchRollPid(int16_t rcCommand, float prop, int16_t gyroRaw[3], float eulerAnglesDegrees[3], uint8_t imuAxis)
+float Stabilize::computePitchRollPid(int16_t rcCommand, float prop, int16_t gyroRaw[3], float eulerAnglesDegrees[3], uint8_t imuAxis)
 {
     int32_t ITermGyro = computeITermGyro(model->ratePitchRollP, model->ratePitchRollI, rcCommand, gyroRaw, imuAxis);
 
@@ -165,20 +165,15 @@ void Stabilize::update(float rcCommandRoll, float rcCommandPitch, float rcComman
     int16_t demandYaw   = 1000 * rcCommandYaw;
 
     // Pitch, roll use leveling based on Euler angles
-    axisPids[AXIS_ROLL]  = computePitchRollPid(demandRoll,  prop, gyroRaw, eulerAnglesDegrees, AXIS_ROLL);
-    axisPids[AXIS_PITCH] = computePitchRollPid(demandPitch, prop, gyroRaw, eulerAnglesDegrees, AXIS_PITCH);
+    pidRoll  = computePitchRollPid(demandRoll,  prop, gyroRaw, eulerAnglesDegrees, AXIS_ROLL);
+    pidPitch = computePitchRollPid(demandPitch, prop, gyroRaw, eulerAnglesDegrees, AXIS_PITCH);
 
     // For yaw, P term comes directly from RC command, and D term is zero
     int32_t ITermGyroYaw = computeITermGyro(model->yawP, model->yawI, demandYaw, gyroRaw, AXIS_YAW);
-    axisPids[AXIS_YAW] = computePid(model->yawP, demandYaw, ITermGyroYaw, 0, gyroRaw, AXIS_YAW);
+    pidYaw = computePid(model->yawP, demandYaw, ITermGyroYaw, 0, gyroRaw, AXIS_YAW);
 
     // Prevent "yaw jump" during yaw correction
-    axisPids[AXIS_YAW] = Filter::constrainAbs(axisPids[AXIS_YAW], 100 + std::abs(demandYaw));
-
-    // XXX Convert throttle, PIDs to floating-point for mixer
-    pidRoll  = axisPids[AXIS_ROLL]  / 1000.;
-    pidPitch = axisPids[AXIS_PITCH]  / 1000.;
-    pidYaw   = axisPids[AXIS_YAW]  / 1000.;
+    pidYaw = Filter::constrainAbsFloat(pidYaw, 0.1 + std::abs(rcCommandYaw));
 }
 
 void Stabilize::resetIntegral(void)

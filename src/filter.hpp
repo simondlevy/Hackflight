@@ -33,6 +33,7 @@ class Filter {
         static int32_t constrainMinMax(int32_t val, int32_t min, int32_t max);
         static float   constrainMinMaxFloat(float val, float min, float max);
         static int32_t constrainAbs(int32_t val, int32_t max);
+        static float   constrainAbsFloat(float val, float max);
 };
 
 /********************************************* CPP ********************************************************/
@@ -67,6 +68,11 @@ float Filter::constrainMinMaxFloat(float val, float min, float max)
 int32_t Filter::constrainAbs(int32_t val, int32_t max)
 {
     return constrainMinMax(val, -max, +max);
+}
+
+float Filter::constrainAbsFloat(float val, float max)
+{
+    return constrainMinMaxFloat(val, -max, +max);
 }
 
 } // namespace hf
