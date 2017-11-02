@@ -120,16 +120,16 @@ struct AltitudeConfig {
 };
 
 //=========================================================================
-// RC config
+// Receiver config
 //=========================================================================
 
-struct RcConfig {
+struct ReceiverConfig {
 
-    float   margin        = 0.1f;
-    int16_t pitchRollExpo = 65;
-    int16_t pitchRollRate = 90;
-    int8_t  throttleMid   = 50;
-    int32_t throttleExpo  = 20;
+    float margin        = 0.1f;
+    float pitchRollExpo = 0.65f;
+    float pitchRollRate = 0.90f;
+    float throttleMid   = 0.50f;
+    float throttleExpo  = 0.20f;
 };
 
 //=========================================================================
@@ -151,7 +151,7 @@ struct Config {
     LoopConfig       loop;
     ImuConfig        imu;
     AltitudeConfig   altitude;
-    RcConfig         rc;
+    ReceiverConfig   receiver;
     StabilizeConfig  stabilize;
     InitConfig       init;
 };

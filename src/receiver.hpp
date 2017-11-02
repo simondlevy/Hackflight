@@ -47,10 +47,10 @@ private:
     int16_t pitchRollLookupTable[CONFIG_PITCHROLL_LOOKUP_LENGTH];     // lookup table for expo & Receiver rate PITCH+ROLL
     int16_t throttleLookupTable[CONFIG_THROTTLE_LOOKUP_LENGTH];   // lookup table for expo & mid THROTTLE
 
-    RcConfig config;
+    ReceiverConfig config;
 
 public:
-    void    init(const RcConfig& rcConfig);
+    void    init(const ReceiverConfig& rcConfig);
     void    update(void);
     float   rawvals[CONFIG_RC_CHANS];  // raw [-1,+1] from receiver
     int16_t commands[4];            // stick PWM values 
@@ -71,31 +71,36 @@ public:
 
 /********************************************* CPP ********************************************************/
 
-void Receiver::init(const RcConfig& rcConfig)
+void Receiver::init(const ReceiverConfig& rcConfig)
 {
     // Do hardware initialization
     begin();
 
-    memcpy(&config, &rcConfig, sizeof(RcConfig));
+    memcpy(&config, &rcConfig, sizeof(ReceiverConfig));
 
     commandDelay = 0;
     sticks = 0;
     averageIndex = 0;
 
+    int8_t pitchRollExpo = 100 * config.pitchRollExpo;
+    int8_t pitchRollRate = 100 * config.pitchRollRate;
+    int8_t throttleMid   = 100 * config.throttleMid;
+    int8_t throttleExpo  = 100 * config.throttleExpo;
+    
     for (uint8_t i = 0; i < CONFIG_RC_CHANS; i++) 
         rawvals[i] = 0;
 
     for (uint8_t i = 0; i < CONFIG_PITCHROLL_LOOKUP_LENGTH; i++)
-        pitchRollLookupTable[i] = (2500 + config.pitchRollExpo * (i * i - 25)) * i * (int32_t)config.pitchRollRate / 2500;
+        pitchRollLookupTable[i] = (2500 + pitchRollExpo * (i * i - 25)) * i * (int32_t)pitchRollRate / 2500;
 
     for (uint8_t i = 0; i < CONFIG_THROTTLE_LOOKUP_LENGTH; i++) {
-        int16_t tmp = 10 * i - config.throttleMid;
+        int16_t tmp = 10 * i - throttleMid;
         uint8_t y = 1;
         if (tmp > 0)
-            y = 100 - config.throttleMid;
+            y = 100 - throttleMid;
         if (tmp < 0)
-            y = config.throttleMid;
-        throttleLookupTable[i] = 10 * config.throttleMid + tmp * (100 - config.throttleExpo + config.throttleExpo * (tmp * tmp) / (y * y)) / 10;
+            y = throttleMid;
+        throttleLookupTable[i] = 10 * throttleMid + tmp * (100 - throttleExpo + throttleExpo * (tmp * tmp) / (y * y)) / 10;
         throttleLookupTable[i] += 1000;
     }
 }

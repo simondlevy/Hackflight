@@ -112,7 +112,7 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     altitudeTask.init(loopConfig.altHoldLoopMilli * 1000);
 
     // Initialize the receiver
-    receiver->init(config.rc);
+    receiver->init(config.receiver);
 
     // Initialize our stabilization, mixing, and MSP (serial comms)
     stab.init(config.stabilize, config.imu, _model);
