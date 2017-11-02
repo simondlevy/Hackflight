@@ -31,16 +31,24 @@ namespace hf {
 class Receiver {
 
 protected: 
+
     // These must be overridden for each receiver
     virtual void  begin(void) = 0;
     virtual bool  useSerial(void) = 0;
     virtual float readChannel(uint8_t chan) = 0;
 
 private:
+
     void computeCommand(uint8_t channel);
     void adjustCommand(uint8_t channel);
     void lookupRollPitch(uint8_t channel);
     void lookupCommand(uint8_t channel, int16_t * table);
+
+    void applyPitchRollFunction(uint8_t channel);
+    void makePositiveCommand(uint8_t channel);
+
+    static float rcFun(float x, float e, float r);
+    static float throttleFun(float x, float e, float m);
 
     uint8_t commandDelay;                               // cycles since most recent movement
     int32_t averageIndex;
@@ -152,22 +160,32 @@ bool Receiver::changed(void)
 
 void Receiver::computeExpo(void)
 {
-    // Converts raw [-1,+1] to absolute value [0,500]
+    // XXX Convert raw [-1,+1] to absolute value [0,500]
     computeCommand(DEMAND_ROLL);
     computeCommand(DEMAND_PITCH);
     computeCommand(DEMAND_YAW);
 
-    // Applies nonlinear lookup table to [0,500]
+    // Convert raw [-1,+1] to absolute value
+    makePositiveCommand(DEMAND_ROLL);
+    makePositiveCommand(DEMAND_PITCH);
+    makePositiveCommand(DEMAND_YAW);
+
+    // XXX Apply nonlinear lookup table to [0,500]
     lookupRollPitch(DEMAND_ROLL);
     lookupRollPitch(DEMAND_PITCH);
 
-    // Puts sign back on command, yielding [-500,+500]
+    // Apply expo nonlinearity to roll, pitch
+    applyPitchRollFunction(DEMAND_ROLL);
+    applyPitchRollFunction(DEMAND_PITCH);
+
+    // Put sign back on command, yielding [-500,+500]
     adjustCommand(DEMAND_ROLL);
     adjustCommand(DEMAND_PITCH);
     adjustCommand(DEMAND_YAW);
 
     // Yaw demand needs to be reversed
-    commands[DEMAND_YAW] = -commands[DEMAND_YAW];
+    commands[DEMAND_YAW]  = -commands[DEMAND_YAW];
+    commandsf[DEMAND_YAW] = -commandsf[DEMAND_YAW];
 
     // Special handling for throttle
     float mincheck = -1 + config.margin;
@@ -175,7 +193,32 @@ void Receiver::computeExpo(void)
     commands[DEMAND_THROTTLE] = (uint32_t)scaleup(tmp, mincheck, +1, 0, 1000);
     lookupCommand(DEMAND_THROTTLE, throttleLookupTable);
 
+    float tmp2 = (rawvals[DEMAND_THROTTLE] + 1) / 2;
+    commandsf[DEMAND_THROTTLE] = throttleFun(tmp2, config.throttleExpo, config.throttleMid);
+
 } // computeExp
+
+void Receiver::applyPitchRollFunction(uint8_t channel)
+{
+    commandsf[channel] = rcFun(commandsf[channel], config.pitchRollExpo, config.pitchRollRate);
+}
+
+float Receiver::rcFun(float x, float e, float r)
+{
+    return (1 + e*(x*x - 1)) * x * r;
+}
+
+float Receiver::throttleFun(float x, float e, float mid)
+{
+    float tmp   = x - mid;
+    float y = tmp>0 ? 1-mid : (tmp<0 ? mid : 1);
+    return mid + tmp*(1-e + e * (tmp*tmp) / (y*y));
+}
+
+void Receiver::makePositiveCommand(uint8_t channel)
+{
+    commandsf[channel] = std::abs(rawvals[channel]);
+}
 
 void Receiver::lookupRollPitch(uint8_t channel)
 {
@@ -197,8 +240,12 @@ void Receiver::computeCommand(uint8_t channel)
 
 void Receiver::adjustCommand(uint8_t channel)
 {
-    if (rawvals[channel] < 0)
+    commandsf[channel] /= 2;
+
+    if (rawvals[channel] < 0) {
         commands[channel] = -commands[channel];
+        commandsf[channel] = -commandsf[channel];
+    }
 }
 
 uint8_t Receiver::getAuxState(void) 
