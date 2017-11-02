@@ -42,7 +42,7 @@ public:
 
     void init(const StabilizeConfig& _config, const ImuConfig& _imuConfig, Model * _model);
 
-    void update(int16_t rcCommandRoll, int16_t rcCommandPitch, int16_t rcCommandYaw, 
+    void update(float rcCommandRoll, float rcCommandPitch, float rcCommandYaw, 
             int16_t gyroRaw[3], float eulerAnglesDegrees[3]);
 
     void resetIntegral(void);
@@ -142,23 +142,27 @@ int16_t Stabilize::computeLevelPid(int16_t rcCommand, float prop, int16_t gyroRa
     return computePid(model->ratePitchrollP, PTerm, ITerm, DTerm, gyroRaw, imuAxis);
 }
 
-void Stabilize::update(int16_t rcCommandRoll, int16_t rcCommandPitch, int16_t rcCommandYaw, 
+void Stabilize::update(float rcCommandRoll, float rcCommandPitch, float rcCommandYaw, 
             int16_t gyroRaw[3], float eulerAnglesDegrees[3])
-
 {
-    // Compute proportion of cyclic demand compared to its maximum
-    float prop = (std::max)(std::abs(rcCommandPitch), std::abs(rcCommandRoll)) / 500.f;
+    // XXX Convert receiver demands to integers for stabilizer
+    int16_t demandRoll  = 1000 * rcCommandRoll;
+    int16_t demandPitch = 1000 * rcCommandPitch;
+    int16_t demandYaw   = 1000 * rcCommandYaw;
+
+     // Compute proportion of cyclic demand compared to its maximum
+    float prop = (std::max)(std::abs(demandRoll), std::abs(demandPitch)) / 500.f;
 
     // Pitch, roll use leveling based on Euler angles
-    axisPids[AXIS_ROLL]  = computeLevelPid(rcCommandRoll,  prop, gyroRaw, eulerAnglesDegrees, AXIS_ROLL);
-    axisPids[AXIS_PITCH] = computeLevelPid(rcCommandPitch, prop, gyroRaw, eulerAnglesDegrees, AXIS_PITCH);
+    axisPids[AXIS_ROLL]  = computeLevelPid(demandRoll,  prop, gyroRaw, eulerAnglesDegrees, AXIS_ROLL);
+    axisPids[AXIS_PITCH] = computeLevelPid(demandPitch, prop, gyroRaw, eulerAnglesDegrees, AXIS_PITCH);
 
     // For yaw, P term comes directly from RC command, and D term is zero
-    int32_t ITermGyroYaw = computeITermGyro(model->yawP, model->yawI, rcCommandYaw, gyroRaw, AXIS_YAW);
-    axisPids[AXIS_YAW] = computePid(model->yawP, rcCommandYaw, ITermGyroYaw, 0, gyroRaw, AXIS_YAW);
+    int32_t ITermGyroYaw = computeITermGyro(model->yawP, model->yawI, demandYaw, gyroRaw, AXIS_YAW);
+    axisPids[AXIS_YAW] = computePid(model->yawP, demandYaw, ITermGyroYaw, 0, gyroRaw, AXIS_YAW);
 
     // Prevent "yaw jump" during yaw correction
-    axisPids[AXIS_YAW] = Filter::constrainAbs(axisPids[AXIS_YAW], 100 + std::abs(rcCommandYaw));
+    axisPids[AXIS_YAW] = Filter::constrainAbs(axisPids[AXIS_YAW], 100 + std::abs(demandYaw));
 }
 
 void Stabilize::resetIntegral(void)

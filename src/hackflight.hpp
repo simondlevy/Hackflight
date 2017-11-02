@@ -249,13 +249,9 @@ void Hackflight::updateImu(void)
         //alti.modifyThrottleDemand(receiver->commands[DEMAND_THROTTLE]);
     }
 
-    // XXX Convert receiver demands to integers for stabilizer
-    int16_t demandRoll  = 1000 * receiver->commands[DEMAND_ROLL];
-    int16_t demandPitch = 1000 * receiver->commands[DEMAND_PITCH];
-    int16_t demandYaw   = 1000 * receiver->commands[DEMAND_YAW];
-
-    // Stabilization is synced to IMU update.  Stabilizer also uses raw gyro values.
-    stab.update(demandRoll, demandPitch, demandYaw, gyroRaw, eulerAnglesDegrees);
+   // Stabilization is synced to IMU update.  Stabilizer also uses raw gyro values.
+    stab.update(receiver->commands[DEMAND_ROLL], receiver->commands[DEMAND_PITCH], receiver->commands[DEMAND_YAW],
+            gyroRaw, eulerAnglesDegrees);
 
     // XXX Convert throttle, PIDs to floating-point for mixer
     float pidRoll  = stab.axisPids[AXIS_ROLL]  / 1000.;
