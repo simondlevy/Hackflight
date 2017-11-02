@@ -253,13 +253,8 @@ void Hackflight::updateImu(void)
     stab.update(receiver->commands[DEMAND_ROLL], receiver->commands[DEMAND_PITCH], receiver->commands[DEMAND_YAW],
             gyroRaw, eulerAnglesDegrees);
 
-    // XXX Convert throttle, PIDs to floating-point for mixer
-    float pidRoll  = stab.axisPids[AXIS_ROLL]  / 1000.;
-    float pidPitch = stab.axisPids[AXIS_PITCH]  / 1000.;
-    float pidYaw   = stab.axisPids[AXIS_YAW]  / 1000.;
-
     // Update mixer
-    mixer.update(receiver->commands[DEMAND_THROTTLE], pidRoll, pidPitch, pidYaw, armed);
+    mixer.update(receiver->commands[DEMAND_THROTTLE], stab.pidRoll, stab.pidPitch, stab.pidYaw, armed);
 
     // Update serial comms
     msp.update(eulerAnglesDegrees, armed);

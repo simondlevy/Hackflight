@@ -38,8 +38,6 @@ enum {
 
 class Stabilize {
 public:
-    int16_t axisPids[3];
-
     void init(const StabilizeConfig& _config, const ImuConfig& _imuConfig, Model * _model);
 
     void update(float rcCommandRoll, float rcCommandPitch, float rcCommandYaw, 
@@ -47,7 +45,13 @@ public:
 
     void resetIntegral(void);
 
+    float pidRoll;
+    float pidPitch;
+    float pidYaw;
+
 private:
+
+    int16_t axisPids[3];
 
     int16_t lastGyro[2];
     int32_t delta1[2]; 
@@ -89,6 +93,10 @@ void Stabilize::init(const StabilizeConfig& _config, const ImuConfig& _imuConfig
     softwareTrim[AXIS_ROLL]  = _model->softwareTrimRoll;
     softwareTrim[AXIS_PITCH] = _model->softwareTrimPitch;
     softwareTrim[AXIS_YAW]   = _model->softwareTrimYaw;
+
+    pidRoll = 0;
+    pidPitch = 0;
+    pidYaw = 0;
 
     resetIntegral();
 }
@@ -163,6 +171,11 @@ void Stabilize::update(float rcCommandRoll, float rcCommandPitch, float rcComman
 
     // Prevent "yaw jump" during yaw correction
     axisPids[AXIS_YAW] = Filter::constrainAbs(axisPids[AXIS_YAW], 100 + std::abs(demandYaw));
+
+    // XXX Convert throttle, PIDs to floating-point for mixer
+    pidRoll  = axisPids[AXIS_ROLL]  / 1000.;
+    pidPitch = axisPids[AXIS_PITCH]  / 1000.;
+    pidYaw   = axisPids[AXIS_YAW]  / 1000.;
 }
 
 void Stabilize::resetIntegral(void)
