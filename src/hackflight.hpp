@@ -211,7 +211,7 @@ void Hackflight::updateRc(void)
         auxState = receiver->getAuxState();
         if (board->extrasHaveBaro()) {
             if (auxState > 0) {
-                //alti.start(receiver->commands[DEMAND_THROTTLE]);
+                //alti.start(receiver->demandThrottle);
             }
             else {
                 //alti.stop();
@@ -246,15 +246,14 @@ void Hackflight::updateImu(void)
     // If barometer avaialble, update accelerometer for altitude fusion, then modify throttle demand
     if (board->extrasHaveBaro()) {
         alti.updateAccelerometer(eulerAnglesRadians, armed);
-        //alti.modifyThrottleDemand(receiver->commands[DEMAND_THROTTLE]);
+        //alti.modifyThrottleDemand(receiver->demandThrottle);
     }
 
-   // Stabilization is synced to IMU update.  Stabilizer also uses raw gyro values.
-    stab.update(receiver->commands[DEMAND_ROLL], receiver->commands[DEMAND_PITCH], receiver->commands[DEMAND_YAW],
-            gyroRaw, eulerAnglesDegrees);
+   // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.
+    stab.update(receiver->demandRoll, receiver->demandPitch, receiver->demandYaw, gyroRaw, eulerAnglesDegrees);
 
     // Update mixer
-    mixer.update(receiver->commands[DEMAND_THROTTLE], stab.pidRoll, stab.pidPitch, stab.pidYaw, armed);
+    mixer.update(receiver->demandThrottle, stab.pidRoll, stab.pidPitch, stab.pidYaw, armed);
 
     // Update serial comms
     msp.update(eulerAnglesDegrees, armed);
