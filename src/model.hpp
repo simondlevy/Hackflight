@@ -39,9 +39,9 @@ class Model {
         float yawI;
 
         // Trim for a particular vehicle
-        int16_t softwareTrimRoll  = 0;
-        int16_t softwareTrimPitch = 0;
-        int16_t softwareTrimYaw   = 0;
+        float softwareTrimRoll  = 0;
+        float softwareTrimPitch = 0;
+        float softwareTrimYaw   = 0;
 
         // Altitude 
         float altP;

@@ -92,10 +92,10 @@ void Stabilize::init(const StabilizeConfig& _config, const ImuConfig& _imuConfig
         delta2[axis] = 0;
     }
 
-    // Store software trims in a convenient form 
-    softwareTrim[AXIS_ROLL]  = _model->softwareTrimRoll;
-    softwareTrim[AXIS_PITCH] = _model->softwareTrimPitch;
-    softwareTrim[AXIS_YAW]   = _model->softwareTrimYaw;
+    // Store software trims in a convenient form XXX should store as floats in [-1,+1]
+    softwareTrim[AXIS_ROLL]  = 1000 * _model->softwareTrimRoll;
+    softwareTrim[AXIS_PITCH] = 1000 * _model->softwareTrimPitch;
+    softwareTrim[AXIS_YAW]   = 1000 * _model->softwareTrimYaw;
 
     pidRoll = 0;
     pidPitch = 0;
