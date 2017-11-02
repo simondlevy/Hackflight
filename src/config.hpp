@@ -175,6 +175,6 @@ enum {
 // static constants, to avoid dynamic memory allocation
 //=========================================================================
 
-static const uint8_t CONFIG_RC_CHANS                = 8;
+static const uint8_t CONFIG_RC_CHANS = 8;
 
 } // namespace

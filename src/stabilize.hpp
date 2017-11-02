@@ -30,6 +30,7 @@
 
 namespace hf {
 
+// shared with Hackflight class
 enum {
     AXIS_ROLL = 0,
     AXIS_PITCH,
@@ -37,7 +38,9 @@ enum {
 };
 
 class Stabilize {
+
 public:
+
     void init(const StabilizeConfig& _config, const ImuConfig& _imuConfig, Model * _model);
 
     void update(float rcCommandRoll, float rcCommandPitch, float rcCommandYaw, 
@@ -69,7 +72,7 @@ private:
 
     int32_t computeITermGyro(float rateP, float rateI, int16_t rcCommand, int16_t gyroRaw[3], uint8_t axis);
     int16_t computePid(float rateP, int32_t PTerm, int32_t ITerm, int32_t DTerm, int16_t gyroRaw[3], uint8_t axis);
-    int16_t computeLevelPid(int16_t rcCommand, float prop, int16_t gyroRaw[3], float eulerAnglesDegrees[3], uint8_t imuAxis);
+    int16_t computePitchRollPid(int16_t rcCommand, float prop, int16_t gyroRaw[3], float eulerAnglesDegrees[3], uint8_t imuAxis);
 }; 
 
 
@@ -121,10 +124,10 @@ int16_t Stabilize::computePid(float rateP, int32_t PTerm, int32_t ITerm, int32_t
     return PTerm + ITerm - DTerm + softwareTrim[axis];
 }
 
-// Computes PID for pitch or roll
-int16_t Stabilize::computeLevelPid(int16_t rcCommand, float prop, int16_t gyroRaw[3], float eulerAnglesDegrees[3], uint8_t imuAxis)
+// Computes leveling PID for pitch or roll
+int16_t Stabilize::computePitchRollPid(int16_t rcCommand, float prop, int16_t gyroRaw[3], float eulerAnglesDegrees[3], uint8_t imuAxis)
 {
-    int32_t ITermGyro = computeITermGyro(model->ratePitchrollP, model->ratePitchrollI, rcCommand, gyroRaw, imuAxis);
+    int32_t ITermGyro = computeITermGyro(model->ratePitchRollP, model->ratePitchRollI, rcCommand, gyroRaw, imuAxis);
 
     // RC command is in [-500,+500].  We compute error by scaling it up to [-1000,+1000], then treating this value as tenths
     // of a degree and subtracting off corresponding pitch or roll angle obtained from IMU.
@@ -145,25 +148,25 @@ int16_t Stabilize::computeLevelPid(int16_t rcCommand, float prop, int16_t gyroRa
     int32_t deltaSum = delta1[imuAxis] + delta2[imuAxis] + delta;
     delta2[imuAxis] = delta1[imuAxis];
     delta1[imuAxis] = delta;
-    int32_t DTerm = (int32_t)(deltaSum * model->ratePitchrollD);
+    int32_t DTerm = (int32_t)(deltaSum * model->ratePitchRollD);
 
-    return computePid(model->ratePitchrollP, PTerm, ITerm, DTerm, gyroRaw, imuAxis);
+    return computePid(model->ratePitchRollP, PTerm, ITerm, DTerm, gyroRaw, imuAxis);
 }
 
 void Stabilize::update(float rcCommandRoll, float rcCommandPitch, float rcCommandYaw, 
             int16_t gyroRaw[3], float eulerAnglesDegrees[3])
 {
+    // Compute proportion of cyclic demand compared to its maximum
+    float prop = (std::max)(std::abs(rcCommandRoll), std::abs(rcCommandPitch)) / 0.5f;
+
     // XXX Convert receiver demands to integers for stabilizer
     int16_t demandRoll  = 1000 * rcCommandRoll;
     int16_t demandPitch = 1000 * rcCommandPitch;
     int16_t demandYaw   = 1000 * rcCommandYaw;
 
-     // Compute proportion of cyclic demand compared to its maximum
-    float prop = (std::max)(std::abs(demandRoll), std::abs(demandPitch)) / 500.f;
-
     // Pitch, roll use leveling based on Euler angles
-    axisPids[AXIS_ROLL]  = computeLevelPid(demandRoll,  prop, gyroRaw, eulerAnglesDegrees, AXIS_ROLL);
-    axisPids[AXIS_PITCH] = computeLevelPid(demandPitch, prop, gyroRaw, eulerAnglesDegrees, AXIS_PITCH);
+    axisPids[AXIS_ROLL]  = computePitchRollPid(demandRoll,  prop, gyroRaw, eulerAnglesDegrees, AXIS_ROLL);
+    axisPids[AXIS_PITCH] = computePitchRollPid(demandPitch, prop, gyroRaw, eulerAnglesDegrees, AXIS_PITCH);
 
     // For yaw, P term comes directly from RC command, and D term is zero
     int32_t ITermGyroYaw = computeITermGyro(model->yawP, model->yawI, demandYaw, gyroRaw, AXIS_YAW);

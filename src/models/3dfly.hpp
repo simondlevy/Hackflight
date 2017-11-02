@@ -32,9 +32,9 @@ namespace hf {
                 levelP         = 0.20f;
 
                 // Rate (gyro): P must be positive
-                ratePitchrollP = 0.225f;
-                ratePitchrollI = 0.001875f;
-                ratePitchrollD = 0.375f;
+                ratePitchRollP = 0.225f;
+                ratePitchRollI = 0.001875f;
+                ratePitchRollD = 0.375f;
 
                 // Yaw: P must be positive
                 yawP           = 1.0625f;

@@ -30,9 +30,9 @@ class Model {
         float levelP;
 
         // Rate (gyro): P must be positive
-        float ratePitchrollP;
-        float ratePitchrollI;
-        float ratePitchrollD;
+        float ratePitchRollP;
+        float ratePitchRollI;
+        float ratePitchRollD;
 
         // Yaw: P must be positive
         float yawP;
