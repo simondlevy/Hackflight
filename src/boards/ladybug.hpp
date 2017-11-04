@@ -33,9 +33,11 @@ class Ladybug : public Board {
 
         uint8_t _motorPins[4] = {13, A2, 3, 11};
 
-        float _eulerAngles[3];
+        float _eulerAnglesRadians[3];
 
         EM7180 _sentral;
+
+        static const uint16_t GYRO_RES_DEGREES_PER_SECOND = 2000;
 
     protected:
 
@@ -57,7 +59,7 @@ class Ladybug : public Board {
             // Hang a bit before starting up the EM7180
             delay(100);
 
-            // Start the EM7180
+            // Start the EM7180: ranges = accel +/-8G, gyro +/-2000 deg/sec; mag +/-1000 Tesla
             uint8_t status = _sentral.begin(8, 2000, 1000);
             while (status) {
                 Serial.println(EM7180::errorToString(status));
@@ -128,7 +130,7 @@ class Ladybug : public Board {
             }
         }
 
-        virtual void getImu(float eulerAngles[3], int16_t gyroRaw[3]) override
+        virtual void getImu(float eulerAnglesRadians[3], float gyroDegreesPerSecond[3], int16_t gyroRaw[3]) override
         {
             static float q[4];
             _sentral.getQuaternions(q);
@@ -138,14 +140,18 @@ class Ladybug : public Board {
             float roll  = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
 
             // Also store Euler angles for extrasUpdateAccelZ()
-            _eulerAngles[0] =  eulerAngles[0] = roll;
-            _eulerAngles[1] =  eulerAngles[1] = -pitch; // compensate for IMU orientation
-            _eulerAngles[2] =  eulerAngles[2] = yaw;
+            _eulerAnglesRadians[0] =  eulerAnglesRadians[0] = roll;
+            _eulerAnglesRadians[1] =  eulerAnglesRadians[1] = -pitch; // compensate for IMU orientation
+            _eulerAnglesRadians[2] =  eulerAnglesRadians[2] = yaw;
 
             _sentral.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
 
             gyroRaw[1] = -gyroRaw[1];
             gyroRaw[2] = -gyroRaw[2];
+
+            for (uint8_t k=0; k<3; ++k) {
+                gyroDegreesPerSecond[k] = (float)GYRO_RES_DEGREES_PER_SECOND * gyroRaw[k] / (1<<15);
+            }
         }
 
         virtual bool extrasHaveBaro(void) override
