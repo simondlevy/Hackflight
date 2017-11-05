@@ -230,14 +230,14 @@ void Hackflight::updateImu(void)
     float gyroDegreesPerSecond[3];
     board->getImu(eulerAnglesRadians, gyroDegreesPerSecond);
 
+    // Convert heading from [-pi,+pi] to [0,2*pi]
+    if (eulerAnglesRadians[AXIS_YAW] < 0) {
+        eulerAnglesRadians[AXIS_YAW] += 2*M_PI;
+    }
+
     // Convert angles from radians to degrees
     for (int k=0; k<3; ++k) {
         eulerAnglesDegrees[k]  = eulerAnglesRadians[k]  * 180.0f / (float)M_PI;
-    }
-
-    // Convert heading from [-180,+180] to [0,360]
-    if (eulerAnglesDegrees[AXIS_YAW] < 0) {
-        eulerAnglesDegrees[AXIS_YAW] += 360;
     }
 
     // Update status using Euler angles
