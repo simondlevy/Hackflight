@@ -75,7 +75,6 @@ class Hackflight {
 
         bool     armed;
         uint8_t  auxState;
-        float    eulerAnglesDegrees[3];
         float    eulerAnglesRadians[3];
         bool     safeToArm;
         float    maxArmingAngleRadians;
@@ -227,6 +226,7 @@ void Hackflight::updateImu(void)
     }
 
     // Convert angles from radians to degrees
+    float eulerAnglesDegrees[3];
     for (int k=0; k<3; ++k) {
         eulerAnglesDegrees[k]  = eulerAnglesRadians[k]  * 180.0f / (float)M_PI;
     }
