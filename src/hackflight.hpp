@@ -225,12 +225,6 @@ void Hackflight::updateImu(void)
         eulerAnglesRadians[AXIS_YAW] += 2*M_PI;
     }
 
-    // Convert angles from radians to degrees
-    float eulerAnglesDegrees[3];
-    for (int k=0; k<3; ++k) {
-        eulerAnglesDegrees[k]  = eulerAnglesRadians[k]  * 180.0f / (float)M_PI;
-    }
-
     // Update status using Euler angles
     updateReadyState();
 
@@ -241,7 +235,7 @@ void Hackflight::updateImu(void)
     }
 
     // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.
-    stab.update(receiver->demandRoll, receiver->demandPitch, receiver->demandYaw, eulerAnglesDegrees, gyroDegreesPerSecond);
+    stab.update(receiver->demandRoll, receiver->demandPitch, receiver->demandYaw, eulerAnglesRadians, gyroDegreesPerSecond);
 
     //board->dprintf("%+2.2f %+2.2f %+2.2f\n", stab.pidRoll, stab.pidPitch, stab.pidYaw); 
 

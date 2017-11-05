@@ -59,7 +59,7 @@ public:
     void init(const StabilizeConfig& _config, const ImuConfig& _imuConfig, Model * _model);
 
     void update(float rcCommandRoll, float rcCommandPitch, float rcCommandYaw, 
-            float eulerAnglesDegrees[3], float gyroDegreesPerSecond[3]);
+            float eulerAnglesRadians[3], float gyroDegreesPerSecond[3]);
 
     void resetIntegral(void);
 
@@ -180,8 +180,14 @@ float Stabilize::computePitchRollPid(
 }
 
 void Stabilize::update(float rcCommandRoll, float rcCommandPitch, float rcCommandYaw, 
-            float eulerAnglesDegrees[3], float gyroDegreesPerSecond[3])
+            float eulerAnglesRadians[3], float gyroDegreesPerSecond[3])
 {
+    // Convert angles from radians to degrees
+    float eulerAnglesDegrees[3];
+    for (int k=0; k<3; ++k) {
+        eulerAnglesDegrees[k]  = eulerAnglesRadians[k]  * 180.0f / (float)M_PI;
+    }
+
     // Compute proportion of cyclic demand compared to its maximum
     float prop = (std::max)(std::abs(rcCommandRoll), std::abs(rcCommandPitch)) / 0.5f;
 
