@@ -76,6 +76,7 @@ class Hackflight {
         bool     armed;
         uint8_t  auxState;
         float    eulerAnglesDegrees[3];
+        float    eulerAnglesRadians[3];
         bool     safeToArm;
         uint16_t maxArmingAngle;
 };
@@ -226,7 +227,6 @@ void Hackflight::updateImu(void)
     receiver->computeExpo();
 
     // Get Euler angles and raw gyro from board
-    float eulerAnglesRadians[3];
     float gyroDegreesPerSecond[3];
     board->getImu(eulerAnglesRadians, gyroDegreesPerSecond);
 
@@ -258,7 +258,7 @@ void Hackflight::updateImu(void)
     mixer.update(receiver->demandThrottle, stab.pidRoll, stab.pidPitch, stab.pidYaw, armed);
 
     // Update serial comms
-    msp.update(eulerAnglesDegrees, armed);
+    msp.update(eulerAnglesRadians, armed);
 } 
 
 void Hackflight::updateReadyState(void)

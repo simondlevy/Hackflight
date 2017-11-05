@@ -33,7 +33,7 @@ ROLL_ACTIVE = 3
 
 from tkcompat import *
 
-from math import sin, cos, radians, degrees
+from math import sin, cos
 
 from dialog import Dialog
 
@@ -176,19 +176,19 @@ class IMU(Dialog):
 
         # Convert angles to X,Y,Z rotation matrices
 
-        rollAngle  = -radians(self.roll_pitch_yaw[0]) # negate so positive is roll rightward
+        rollAngle  = -self.roll_pitch_yaw[0] # negate so positive is roll rightward
         self.rollrot[0][0] = +cos(rollAngle)
         self.rollrot[0][1] = -sin(rollAngle)
         self.rollrot[1][0] = +sin(rollAngle)
         self.rollrot[1][1] = +cos(rollAngle)
 
-        pitchAngle = radians(self.roll_pitch_yaw[1]) 
+        pitchAngle = self.roll_pitch_yaw[1] 
         self.pitchrot[1][1] = +cos(pitchAngle) 
         self.pitchrot[1][2] = -sin(pitchAngle)
         self.pitchrot[2][1] = +sin(pitchAngle)
         self.pitchrot[2][2] = +cos(pitchAngle)
 
-        yawAngle   = -radians(self.roll_pitch_yaw[2])
+        yawAngle   = -self.roll_pitch_yaw[2]
         self.yawrot[0][0] = +cos(yawAngle)
         self.yawrot[0][2] = +sin(yawAngle)
         self.yawrot[2][0] = -sin(yawAngle)
@@ -227,7 +227,7 @@ class IMU(Dialog):
 
         # Update angle changes
         if not self.roll_pitch_yaw_prev is None:
-            self.roll_pitch_yaw_change = [degrees(abs(pair[0]-pair[1])) 
+            self.roll_pitch_yaw_change = [abs(pair[0]-pair[1]) 
                     for pair in zip(self.roll_pitch_yaw,self.roll_pitch_yaw_prev)]
         self.roll_pitch_yaw_prev = self.roll_pitch_yaw
 

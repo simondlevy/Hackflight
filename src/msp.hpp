@@ -24,7 +24,7 @@
 
 // See http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol
 #define MSP_RC_NORMAL            121    
-#define MSP_ATTITUDE             108    
+#define MSP_ATTITUDE_RADIANS     122    
 #define MSP_SET_MOTOR_NORMAL     215    
 
 namespace hf {
@@ -53,7 +53,7 @@ typedef  struct mspPortState_t {
 class MSP {
 public:
     void init(Mixer * _mixer, Receiver * _rc, Board * _board);
-    void update(float eulerAngles[3], bool armed);
+    void update(float eulerAnglesRadians[3], bool armed);
 
 private:
     Mixer  * mixer;
@@ -68,7 +68,7 @@ private:
     uint16_t read16(void);
     uint32_t read32(void);
     float    readFloat(void);
-    void     serializeFloat(float f);
+    void     serializeFloats(float f[], uint8_t n);
     void     serialize32(uint32_t a);
     void     headSerialResponse(uint8_t err, uint8_t s);
     void     headSerialReply(uint8_t s);
@@ -120,11 +120,15 @@ float MSP::readFloat(void)
     return f;
 }
 
-void MSP::serializeFloat(float f)
+void MSP::serializeFloats(float f[], uint8_t n)
 {
-    uint32_t a;
-    memcpy(&a, &f, 4);
-    serialize32(a);
+    headSerialReply(4*n);
+
+    for (uint8_t k=0; k<n; ++k) {
+        uint32_t a;
+        memcpy(&a, &f[k], 4);
+        serialize32(a);
+    }
 }
 
 void MSP::serialize32(uint32_t a)
@@ -170,7 +174,7 @@ void MSP::init(Mixer * _mixer, Receiver * _rc, Board * _board)
     memset(&portState, 0, sizeof(portState));
 }
 
-void MSP::update(float eulerAngles[3], bool armed)
+void MSP::update(float eulerAnglesRadians[3], bool armed)
 {
     while (board->serialAvailableBytes()) {
 
@@ -216,15 +220,11 @@ void MSP::update(float eulerAngles[3], bool armed)
                     break;
 
                 case MSP_RC_NORMAL:
-                    headSerialReply(32);
-                    for (uint8_t i = 0; i < 8; i++)
-                        serializeFloat(rc->rawvals[i]);
+                    serializeFloats(rc->rawvals, 8);
                     break;
 
-                case MSP_ATTITUDE: 
-                    headSerialReply(6);
-                    for (uint8_t i = 0; i < 3; i++)
-                        serialize16((int16_t)(eulerAngles[i]));
+                case MSP_ATTITUDE_RADIANS: 
+                    serializeFloats(eulerAnglesRadians, 3);
                     break;
 
                     // don't know how to handle the (valid) message, indicate error MSP $M!

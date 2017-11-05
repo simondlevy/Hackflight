@@ -10,11 +10,10 @@
                 {"c7": "float"}, 
                 {"c8": "float"}],
 
-  "ATTITUDE": [{"ID": 108},
-               {"comment" : "angles should be divided by 10"},
-               {"roll"    : "short"}, 
-               {"pitch"   : "short"},
-               {"yaw"     : "short"}],
+  "ATTITUDE_RADIANS": [{"ID": 122},
+                       {"roll"    : "float"}, 
+                       {"pitch"   : "float"},
+                       {"yaw"     : "float"}],
 
   "SET_MOTOR_NORMAL": [{"ID": 215},
                        {"comment": "We send floating-point values in [0,1], rather than PWM"}, 

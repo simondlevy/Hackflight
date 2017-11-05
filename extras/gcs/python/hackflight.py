@@ -127,7 +127,7 @@ class GCS:
         self.parser = MSP_Parser()
 
         # Set up parser's request strings
-        self.attitude_request = serialize_ATTITUDE_Request()
+        self.attitude_request = serialize_ATTITUDE_RADIANS_Request()
         self.rc_request = serialize_RC_NORMAL_Request()
 
         # No messages yet
@@ -201,13 +201,13 @@ class GCS:
         #self.messages.stop()
         #self.maps.stop()
 
-        self.parser.set_ATTITUDE_Handler(self._handle_attitude)
+        self.parser.set_ATTITUDE_RADIANS_Handler(self._handle_attitude)
         self._send_attitude_request()
         self.imu.start()
 
     def _start(self):
 
-        self.parser.set_ATTITUDE_Handler(self._handle_attitude)
+        self.parser.set_ATTITUDE_RADIANS_Handler(self._handle_attitude)
         self._send_attitude_request()
         self.imu.start()
 
@@ -436,6 +436,8 @@ class GCS:
         self.newconnect = False
 
     def _handle_attitude(self, x, y, z):
+
+        print(x, y, z)
 
         self.roll_pitch_yaw = x, -y, z  
 
