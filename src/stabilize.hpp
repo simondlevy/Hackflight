@@ -157,7 +157,7 @@ float Stabilize::computePitchRollPid(
 
     // RC command is in [-500,+500].  We compute error by scaling it up to [-1000,+1000], then treating this value as tenths
     // of a degree and subtracting off corresponding pitch or roll angle obtained from IMU.
-    float errorAngle = Filter::constrainAbs(2*rcCommand, (float)(10*imuConfig.maxAngleInclination)) - 
+    float errorAngle = Filter::constrainAbs(2*rcCommand, (float)(10*imuConfig.maxAngleInclinationDegrees)) - 
         (float)(10*eulerAnglesDegrees[imuAxis]);
 
     float PTermAccel = (float)(errorAngle * model->levelP); 

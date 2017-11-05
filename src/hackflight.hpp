@@ -78,7 +78,7 @@ class Hackflight {
         float    eulerAnglesDegrees[3];
         float    eulerAnglesRadians[3];
         bool     safeToArm;
-        uint16_t maxArmingAngle;
+        float    maxArmingAngleRadians;
 };
 
 /********************************************* CPP ********************************************************/
@@ -96,21 +96,17 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     // Flash the LEDs to indicate startup
     flashLeds(config.init);
 
-    // Get particulars for board
-    LoopConfig loopConfig = config.loop;
-    ImuConfig imuConfig = config.imu;
-
-    // Store some for later
-    maxArmingAngle = imuConfig.maxArmingAngle;
+    // Convert max arming angle to radians for use later
+    maxArmingAngleRadians = M_PI * config.imu.maxArmingAngleDegrees / 180.;
 
     // Sleep  a bit to allow IMU to catch up
     board->delayMilliseconds(config.init.delayMilli);
 
     // Initialize timing tasks
-    imuTask.init(loopConfig.imuLoopMicro);
-    rcTask.init(loopConfig.rcLoopMilli * 1000);
-    angleCheckTask.init(loopConfig.angleCheckMilli * 1000);
-    altitudeTask.init(loopConfig.altHoldLoopMilli * 1000);
+    imuTask.init(config.loop.imuLoopMicro);
+    rcTask.init(config.loop.rcLoopMilli * 1000);
+    angleCheckTask.init(config.loop.angleCheckMilli * 1000);
+    altitudeTask.init(config.loop.altHoldLoopMilli * 1000);
 
     // Initialize the receiver
     receiver->init(config.receiver);
@@ -273,7 +269,8 @@ void Hackflight::updateReadyState(void)
     // If angle too steep, flash LED
     uint32_t currentTime = (uint32_t)board->getMicros();
     if (angleCheckTask.ready(currentTime)) {
-        if (!(abs(eulerAnglesDegrees[0]) < maxArmingAngle && abs(eulerAnglesDegrees[1]) < maxArmingAngle)) {
+        if (fabs(eulerAnglesRadians[AXIS_ROLL])  > maxArmingAngleRadians ||
+            fabs(eulerAnglesRadians[AXIS_PITCH]) > maxArmingAngleRadians) {
             safeToArm = false; 
             blinkLedForTilt();
             angleCheckTask.update(currentTime);
