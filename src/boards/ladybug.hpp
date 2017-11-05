@@ -130,7 +130,7 @@ class Ladybug : public Board {
             }
         }
 
-        virtual void getImu(float eulerAnglesRadians[3], float gyroDegreesPerSecond[3]) override
+        virtual void getImu(float eulerAnglesRadians[3], float gyroRadiansPerSecond[3]) override
         {
             static float q[4];
             _sentral.getQuaternions(q);
@@ -152,7 +152,8 @@ class Ladybug : public Board {
             gyroRaw[2] = -gyroRaw[2];
 
             for (uint8_t k=0; k<3; ++k) {
-                gyroDegreesPerSecond[k] = (float)GYRO_RES_DEGREES_PER_SECOND * gyroRaw[k] / (1<<15);
+                gyroRadiansPerSecond[k] = (float)GYRO_RES_DEGREES_PER_SECOND * gyroRaw[k] / (1<<15); // raw to degrees
+                gyroRadiansPerSecond[k] = M_PI * gyroRadiansPerSecond[k] / 180.; // degrees to radians
             }
         }
 

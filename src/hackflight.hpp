@@ -217,8 +217,8 @@ void Hackflight::updateImu(void)
     receiver->computeExpo();
 
     // Get Euler angles and raw gyro from board
-    float gyroDegreesPerSecond[3];
-    board->getImu(eulerAnglesRadians, gyroDegreesPerSecond);
+    float gyroRadiansPerSecond[3];
+    board->getImu(eulerAnglesRadians, gyroRadiansPerSecond);
 
     // Convert heading from [-pi,+pi] to [0,2*pi]
     if (eulerAnglesRadians[AXIS_YAW] < 0) {
@@ -235,9 +235,9 @@ void Hackflight::updateImu(void)
     }
 
     // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.
-    stab.update(receiver->demandRoll, receiver->demandPitch, receiver->demandYaw, eulerAnglesRadians, gyroDegreesPerSecond);
+    stab.update(receiver->demandRoll, receiver->demandPitch, receiver->demandYaw, eulerAnglesRadians, gyroRadiansPerSecond);
 
-    //board->dprintf("%+2.2f %+2.2f %+2.2f\n", stab.pidRoll, stab.pidPitch, stab.pidYaw); 
+    board->dprintf("%+2.2f %+2.2f %+2.2f\n", stab.pidRoll, stab.pidPitch, stab.pidYaw); 
 
     // Update mixer
     mixer.update(receiver->demandThrottle, stab.pidRoll, stab.pidPitch, stab.pidYaw, armed);
