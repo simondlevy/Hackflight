@@ -33,7 +33,7 @@ struct StabilizeConfig {
     // Resetting thresholds for PID Integral term
     uint32_t angleWindupMax = 10000;
     uint32_t gyroWindupMax  = 16000;
-    uint16_t bigGyro        = 640;
+    float    bigGyro        = 40.f; // degrees per second
     uint16_t bigYawDemand   = 100;
 };
 

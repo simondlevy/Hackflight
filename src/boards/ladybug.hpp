@@ -130,7 +130,7 @@ class Ladybug : public Board {
             }
         }
 
-        virtual void getImu(float eulerAnglesRadians[3], float gyroDegreesPerSecond[3], int16_t gyroRaw[3]) override
+        virtual void getImu(float eulerAnglesRadians[3], float gyroDegreesPerSecond[3]) override
         {
             static float q[4];
             _sentral.getQuaternions(q);
@@ -143,6 +143,8 @@ class Ladybug : public Board {
             _eulerAnglesRadians[0] =  eulerAnglesRadians[0] = roll;
             _eulerAnglesRadians[1] =  eulerAnglesRadians[1] = -pitch; // compensate for IMU orientation
             _eulerAnglesRadians[2] =  eulerAnglesRadians[2] = yaw;
+
+            int16_t gyroRaw[3];
 
             _sentral.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
 
