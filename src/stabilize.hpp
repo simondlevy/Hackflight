@@ -85,7 +85,7 @@ private:
     float computePid(float rateP, float softwareTrim, float PTerm, float ITerm, float DTerm, 
             float gyroDegreesPerSecond[3], uint8_t axis);
     float computePitchRollPid(float rcCommand, float softwareTrim, float prop, 
-            float eulerAnglesDegrees[3],  float gyroDegreesPerSecond[3], uint8_t imuAxis);
+            float eulerAnglesRadians[3],  float gyroDegreesPerSecond[3], uint8_t imuAxis);
 
 }; 
 
@@ -146,7 +146,7 @@ float Stabilize::computePitchRollPid(
         float rcCommandF, 
         float softwareTrim,
         float prop, 
-        float eulerAnglesDegrees[3], 
+        float eulerAnglesRadians[3], 
         float gyroDegreesPerSecond[3], 
         uint8_t imuAxis)
 {
@@ -158,7 +158,7 @@ float Stabilize::computePitchRollPid(
     // RC command is in [-500,+500].  We compute error by scaling it up to [-1000,+1000], then treating this value as tenths
     // of a degree and subtracting off corresponding pitch or roll angle obtained from IMU.
     float errorAngle = Filter::constrainAbs(2*rcCommand, (float)(10*imuConfig.maxAngleInclinationDegrees)) - 
-        (float)(10*eulerAnglesDegrees[imuAxis]);
+        (600*eulerAnglesRadians[imuAxis]); // XXX
 
     float PTermAccel = (float)(errorAngle * model->levelP); 
 
@@ -182,20 +182,14 @@ float Stabilize::computePitchRollPid(
 void Stabilize::update(float rcCommandRoll, float rcCommandPitch, float rcCommandYaw, 
             float eulerAnglesRadians[3], float gyroDegreesPerSecond[3])
 {
-    // Convert angles from radians to degrees
-    float eulerAnglesDegrees[3];
-    for (int k=0; k<3; ++k) {
-        eulerAnglesDegrees[k]  = eulerAnglesRadians[k]  * 180.0f / (float)M_PI;
-    }
-
     // Compute proportion of cyclic demand compared to its maximum
     float prop = (std::max)(std::abs(rcCommandRoll), std::abs(rcCommandPitch)) / 0.5f;
 
     // Pitch, roll use leveling based on Euler angles
     pidRoll  = computePitchRollPid(rcCommandRoll,  model->softwareTrimRoll,  prop, 
-            eulerAnglesDegrees, gyroDegreesPerSecond, AXIS_ROLL);
+            eulerAnglesRadians, gyroDegreesPerSecond, AXIS_ROLL);
     pidPitch = computePitchRollPid(rcCommandPitch, model->softwareTrimPitch, prop, 
-            eulerAnglesDegrees, gyroDegreesPerSecond, AXIS_PITCH);
+            eulerAnglesRadians, gyroDegreesPerSecond, AXIS_PITCH);
 
     // For yaw, P term comes directly from RC command, and D term is zero
     float demandYaw   = 1000 * rcCommandYaw; // XXX
