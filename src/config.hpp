@@ -34,7 +34,7 @@ struct StabilizeConfig {
     float angleWindupMax = 10000;
     float gyroWindupMax  = 16;
     float bigGyro        = 40.f; // degrees per second
-    float bigYawDemand   = 100;
+    float bigYawDemand   = 0.1f;
 };
 
 //=========================================================================

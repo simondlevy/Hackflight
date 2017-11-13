@@ -119,14 +119,14 @@ void Stabilize::init(const StabilizeConfig& _config, const ImuConfig& _imuConfig
 
 float Stabilize::computeITermGyro(float rateP, float rateI, float rcCommand, float gyroRadiansPerSecond[3], uint8_t axis)
 {
-    float error = (1000*rcCommand * rateP) - 960*gyroRadiansPerSecond[axis]; // XXX
+    float error = rcCommand*rateP - gyroRadiansPerSecond[axis];
 
     // Avoid integral windup
     errorGyroI[axis] = Filter::constrainAbs(errorGyroI[axis] + error, config.gyroWindupMax);
 
     // Reset integral on quick gyro change or large yaw command
     if ((std::abs(gyroRadiansPerSecond[axis]) > bigGyroRadiansPerSecond) || 
-            ((axis == AXIS_YAW) && (std::abs(1000*rcCommand) > config.bigYawDemand)))
+            ((axis == AXIS_YAW) && (std::abs(rcCommand) > config.bigYawDemand)))
         errorGyroI[axis] = 0;
 
     return (errorGyroI[axis] * rateI);
@@ -143,7 +143,7 @@ float Stabilize::computePid(
 {
     PTerm -= (960*gyroRadiansPerSecond[axis] * rateP); // XXX 
 
-    return (PTerm/1000. + ITerm/1000. - DTerm + softwareTrim); // XXX
+    return (PTerm/1000. + ITerm - DTerm + softwareTrim); // XXX
 }
 
 // Computes leveling PID for pitch or roll
