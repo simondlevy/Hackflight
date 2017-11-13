@@ -157,9 +157,7 @@ float Stabilize::computePitchRollPid(
 {
     float ITermGyro = computeITermGyro(model->ratePitchRollP, model->ratePitchRollI, rcCommand, gyroRadiansPerSecond, imuAxis);
 
-    // RC command is in [-0.5,+0.5].  We compute error by scaling it up to
-    // [-1,+1] and subtracting off corresponding pitch or roll angle obtained from IMU.
-    float errorAngle = Filter::constrainAbsFloat(2*rcCommand, .01*imuConfig.maxAngleInclinationDegrees) - 0.6*eulerAnglesRadians[imuAxis]; // XXX
+    float errorAngle = rcCommand - 0.6*eulerAnglesRadians[imuAxis]; // XXX
 
     float PTermAccel = errorAngle * model->levelP; 
 
