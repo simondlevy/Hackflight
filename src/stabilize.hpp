@@ -156,7 +156,7 @@ float Stabilize::computePitchRollPid(
 {
     float ITermGyro = computeITermGyro(model->ratePitchRollP, model->ratePitchRollI, rcCommand, gyroRadiansPerSecond, imuAxis);
 
-    float PTermAccel = (rcCommand - 0.6*eulerAnglesRadians[imuAxis]) * model->levelP;  // XXX
+    float PTermAccel = (rcCommand - eulerAnglesRadians[imuAxis]) * model->levelP;  
 
     float PTerm = Filter::complementary(rcCommand, PTermAccel, prop); 
 
