@@ -44,7 +44,7 @@ namespace hf {
             {
                 _reversedVerticals = false;
                 _springyThrottle = false;
-                _joyfd = 0;
+                _joyid = 0;
             }
 
             void begin(void)
@@ -84,7 +84,7 @@ namespace hf {
             bool         _springyThrottle;
             float        _throttleDemand;
             uint8_t      _axismap[4];
-            int          _joyfd; // needed for Linux only
+            int          _joyid; // Linux file descriptor or Windows joystick ID
 
             void poll(float * demands)
             {
@@ -142,11 +142,17 @@ static const uint16_t VENDOR_LOGITECH  = 0x046d;
 static const uint16_t VENDOR_MICROSOFT = 0x24c6;
 static const uint16_t PRODUCT_TARANIS  = 0x5710;
 
-
 void hf::Controller::productInit(void)
 {
     JOYCAPS joycaps;
-    if (joyGetDevCaps(JOYSTICKID1, &joycaps, sizeof(joycaps))==JOYERR_NOERROR) {
+
+	// Grab the first available joystick
+	for (_joyid=1; _joyid<16; _joyid++)
+		if (joyGetDevCaps(_joyid, &joycaps, sizeof(joycaps)) == JOYERR_NOERROR)
+			break;
+
+
+    if (_joyid < 16) {
 
         uint16_t vendorId  = joycaps.wMid;
         uint16_t productId = joycaps.wPid;
@@ -199,7 +205,6 @@ void hf::Controller::productInit(void)
             }
 
         }
-
     }
 }
 
@@ -208,7 +213,7 @@ void hf::Controller::productPoll(int32_t axes[6])
     JOYINFOEX joyState;
     joyState.dwSize=sizeof(joyState);
     joyState.dwFlags=JOY_RETURNALL | JOY_RETURNPOVCTS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
-    joyGetPosEx(JOYSTICKID1, &joyState);
+    joyGetPosEx(_joyid, &joyState);
 
     axes[0] = joyState.dwXpos;
     axes[1] = joyState.dwYpos;
@@ -234,13 +239,13 @@ static const char * DEVNAME = "/dev/input/js0";
 
 void hf::Controller::productInit(void)
 {
-    if ((_joyfd=open(DEVNAME, O_RDONLY)) > 0) {
+    if ((_joyid=open(DEVNAME, O_RDONLY)) > 0) {
 
-        fcntl(_joyfd, F_SETFL, O_NONBLOCK);
+        fcntl(_joyid, F_SETFL, O_NONBLOCK);
 
         char prodname[128];
 
-        if (ioctl(_joyfd, JSIOCGNAME(sizeof(prodname)), prodname) < 0) {
+        if (ioctl(_joyid, JSIOCGNAME(sizeof(prodname)), prodname) < 0) {
             return;
         }
 
@@ -284,11 +289,11 @@ void hf::Controller::productInit(void)
 
 void hf::Controller::productPoll(int32_t axes[6])
 {
-    if (_joyfd <= 0) return;
+    if (_joyid <= 0) return;
 
     struct js_event js;
 
-    read(_joyfd, &js, sizeof(struct js_event));
+    read(_joyid, &js, sizeof(struct js_event));
 
     int jstype = js.type & ~JS_EVENT_INIT;
 

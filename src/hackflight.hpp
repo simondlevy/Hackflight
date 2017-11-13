@@ -237,8 +237,6 @@ void Hackflight::updateImu(void)
     // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.
     stab.update(receiver->demandRoll, receiver->demandPitch, receiver->demandYaw, eulerAnglesRadians, gyroRadiansPerSecond);
 
-    //board->dprintf("%+2.2f %+2.2f %+2.2f\n", stab.pidRoll, stab.pidPitch, stab.pidYaw); 
-
     // Update mixer
     mixer.update(receiver->demandThrottle, stab.pidRoll, stab.pidPitch, stab.pidYaw, armed);
 
