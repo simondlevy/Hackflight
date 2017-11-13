@@ -157,18 +157,16 @@ float Stabilize::computePitchRollPid(
 {
     float ITermGyro = computeITermGyro(model->ratePitchRollP, model->ratePitchRollI, rcCommand, gyroRadiansPerSecond, imuAxis);
 
-    // RC command is in [-500,+500].  We compute error by scaling it up to [-1000,+1000], then treating this value as tenths
-    // of a degree and subtracting off corresponding pitch or roll angle obtained from IMU.
-    float errorAngle = Filter::constrainAbs(
-            2000*rcCommand, 
-            (10*imuConfig.maxAngleInclinationDegrees)) - (600*eulerAnglesRadians[imuAxis]); // XXX
+    // RC command is in [-0.5,+0.5].  We compute error by scaling it up to
+    // [-1,+1] and subtracting off corresponding pitch or roll angle obtained from IMU.
+    float errorAngle = Filter::constrainAbs(2*rcCommand, .01*imuConfig.maxAngleInclinationDegrees) - 0.6*eulerAnglesRadians[imuAxis]; // XXX
 
     float PTermAccel = errorAngle * model->levelP; 
 
     // Avoid integral windup
     errorAngleI[imuAxis] = Filter::constrainAbs(errorAngleI[imuAxis] + errorAngle, config.angleWindupMax);
 
-    float PTerm = Filter::complementary(1000*rcCommand, PTermAccel, prop); // XXX
+    float PTerm = Filter::complementary(rcCommand, PTermAccel, prop); 
 
     float ITerm = ITermGyro * prop;
 
@@ -179,7 +177,7 @@ float Stabilize::computePitchRollPid(
     delta1[imuAxis] = delta;
     float DTerm = deltaSum * model->ratePitchRollD; 
 
-    return computePid(model->ratePitchRollP, softwareTrim, PTerm/1000., ITerm, DTerm, gyroRadiansPerSecond, imuAxis); // XXX
+    return computePid(model->ratePitchRollP, softwareTrim, PTerm, ITerm, DTerm, gyroRadiansPerSecond, imuAxis);
 }
 
 void Stabilize::update(float rcCommandRoll, float rcCommandPitch, float rcCommandYaw, 
