@@ -141,9 +141,9 @@ float Stabilize::computePid(
         float gyroRadiansPerSecond[3], 
         uint8_t axis)
 {
-    PTerm -= (960*gyroRadiansPerSecond[axis] * rateP); // XXX 
+    PTerm -= gyroRadiansPerSecond[axis] * rateP; 
 
-    return (PTerm/1000. + ITerm - DTerm + softwareTrim); // XXX
+    return PTerm + ITerm - DTerm + softwareTrim;
 }
 
 // Computes leveling PID for pitch or roll
@@ -168,7 +168,7 @@ float Stabilize::computePitchRollPid(
     // Avoid integral windup
     errorAngleI[imuAxis] = Filter::constrainAbs(errorAngleI[imuAxis] + errorAngle, config.angleWindupMax);
 
-    float PTerm = Filter::complementary(1000*rcCommand, PTermAccel, prop);
+    float PTerm = Filter::complementary(1000*rcCommand, PTermAccel, prop); // XXX
 
     float ITerm = ITermGyro * prop;
 
@@ -179,7 +179,7 @@ float Stabilize::computePitchRollPid(
     delta1[imuAxis] = delta;
     float DTerm = deltaSum * model->ratePitchRollD; 
 
-    return computePid(model->ratePitchRollP, softwareTrim, PTerm, ITerm, DTerm, gyroRadiansPerSecond, imuAxis);
+    return computePid(model->ratePitchRollP, softwareTrim, PTerm/1000., ITerm, DTerm, gyroRadiansPerSecond, imuAxis); // XXX
 }
 
 void Stabilize::update(float rcCommandRoll, float rcCommandPitch, float rcCommandYaw, 
@@ -196,9 +196,7 @@ void Stabilize::update(float rcCommandRoll, float rcCommandPitch, float rcComman
 
     // For yaw, P term comes directly from RC command, and D term is zero
     float ITermGyroYaw = computeITermGyro(model->yawP, model->yawI, rcCommandYaw, gyroRadiansPerSecond, AXIS_YAW);
-
-    float demandYaw   = 1000 * rcCommandYaw; // XXX
-    pidYaw = computePid(model->yawP, model->softwareTrimYaw, demandYaw, ITermGyroYaw, 0, gyroRadiansPerSecond, AXIS_YAW);
+    pidYaw = computePid(model->yawP, model->softwareTrimYaw, rcCommandYaw, ITermGyroYaw, 0, gyroRadiansPerSecond, AXIS_YAW);
 
     // Prevent "yaw jump" during yaw correction
     pidYaw = Filter::constrainAbsFloat(pidYaw, 0.1 + std::abs(rcCommandYaw));
