@@ -120,7 +120,7 @@ void Stabilize::init(const StabilizeConfig& _config, const ImuConfig& _imuConfig
 
 float Stabilize::computeITermGyro(float rateP, float rateI, float rcCommand, float gyroRadiansPerSecond[3], uint8_t axis)
 {
-    float error = (float)(rcCommand * rateP) - 960*gyroRadiansPerSecond[axis]; // XXX
+    float error = (rcCommand * rateP) - 960*gyroRadiansPerSecond[axis]; // XXX
 
     // Avoid integral windup
     errorGyroI[axis] = Filter::constrainAbs(errorGyroI[axis] + error, config.gyroWindupMax);
@@ -130,7 +130,7 @@ float Stabilize::computeITermGyro(float rateP, float rateI, float rcCommand, flo
             ((axis == AXIS_YAW) && (std::abs(rcCommand) > config.bigYawDemand)))
         errorGyroI[axis] = 0;
 
-    return (float)(errorGyroI[axis] * rateI);
+    return (errorGyroI[axis] * rateI);
 }
 
 float Stabilize::computePid(
@@ -162,17 +162,17 @@ float Stabilize::computePitchRollPid(
 
     // RC command is in [-500,+500].  We compute error by scaling it up to [-1000,+1000], then treating this value as tenths
     // of a degree and subtracting off corresponding pitch or roll angle obtained from IMU.
-    float errorAngle = Filter::constrainAbs(2*rcCommand, (float)(10*imuConfig.maxAngleInclinationDegrees)) - 
+    float errorAngle = Filter::constrainAbs(2*rcCommand, (10*imuConfig.maxAngleInclinationDegrees)) - 
         (600*eulerAnglesRadians[imuAxis]); // XXX
 
-    float PTermAccel = (float)(errorAngle * model->levelP); 
+    float PTermAccel = errorAngle * model->levelP; 
 
     // Avoid integral windup
     errorAngleI[imuAxis] = Filter::constrainAbs(errorAngleI[imuAxis] + errorAngle, config.angleWindupMax);
 
-    float PTerm = (float)Filter::complementary((float)rcCommand, (float)PTermAccel, prop);
+    float PTerm = Filter::complementary(rcCommand, PTermAccel, prop);
 
-    float ITerm = (float)(ITermGyro * prop);
+    float ITerm = ITermGyro * prop;
 
     float delta = gyroRadiansPerSecond[imuAxis] - lastGyro[imuAxis];
     lastGyro[imuAxis] = gyroRadiansPerSecond[imuAxis];
