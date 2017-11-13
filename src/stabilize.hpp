@@ -73,7 +73,6 @@ private:
     float delta1[2]; 
     float delta2[2];
     float errorGyroI[3];
-    float errorAngleI[2];
 
     Board * board;
     Model * model;
@@ -157,12 +156,7 @@ float Stabilize::computePitchRollPid(
 {
     float ITermGyro = computeITermGyro(model->ratePitchRollP, model->ratePitchRollI, rcCommand, gyroRadiansPerSecond, imuAxis);
 
-    float errorAngle = rcCommand - 0.6*eulerAnglesRadians[imuAxis]; // XXX
-
-    float PTermAccel = errorAngle * model->levelP; 
-
-    // Avoid integral windup
-    errorAngleI[imuAxis] = Filter::constrainAbsFloat(errorAngleI[imuAxis] + errorAngle, config.angleWindupMax);
+    float PTermAccel = (rcCommand - 0.6*eulerAnglesRadians[imuAxis]) * model->levelP;  // XXX
 
     float PTerm = Filter::complementary(rcCommand, PTermAccel, prop); 
 
@@ -178,8 +172,12 @@ float Stabilize::computePitchRollPid(
     return computePid(model->ratePitchRollP, softwareTrim, PTerm, ITerm, DTerm, gyroRadiansPerSecond, imuAxis);
 }
 
-void Stabilize::update(float rcCommandRoll, float rcCommandPitch, float rcCommandYaw, 
-            float eulerAnglesRadians[3], float gyroRadiansPerSecond[3])
+void Stabilize::update(
+        float rcCommandRoll, 
+        float rcCommandPitch, 
+        float rcCommandYaw, 
+        float eulerAnglesRadians[3], 
+        float gyroRadiansPerSecond[3])
 {
     // Compute proportion of cyclic demand compared to its maximum
     float prop = (std::max)(std::abs(rcCommandRoll), std::abs(rcCommandPitch)) / 0.5f;
@@ -203,8 +201,6 @@ void Stabilize::resetIntegral(void)
     errorGyroI[AXIS_ROLL] = 0;
     errorGyroI[AXIS_PITCH] = 0;
     errorGyroI[AXIS_YAW] = 0;
-    errorAngleI[AXIS_ROLL] = 0;
-    errorAngleI[AXIS_PITCH] = 0;
 }
 
 } // namespace
