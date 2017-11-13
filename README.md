@@ -24,8 +24,10 @@ STM32F103 flight-controller boards (Naze32 and clones like Flip32, MultiRC,
 etc.) the Alienflight F3 board, and a Teensy 3.2-based controller, 
 the hardware focus of the project has shifted to the Arduino-compatible,
 STM32L4-based [Ladybug FC](http://diydrones.com/profiles/blogs/flight-of-the-ladybug).
-The first production run of LadybugFCs is currently undergoing beta testing,
-after which we plan to sell it on <a href="https://www.tindie.com/">Tindie</a>.
+The floating-point support provided by the STM32L4 allows us to write simpler code
+that is easier to understand and modify.  The first production run of
+LadybugFCs is currently undergoing beta testing, after which we plan to sell it
+on <a href="https://www.tindie.com/">Tindie</a>.
 
 Thanks to some help from [Sytelus](https://github.com/sytelus), the core
 Hackflight
