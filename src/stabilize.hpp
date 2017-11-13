@@ -143,7 +143,8 @@ float Stabilize::computePid(
         uint8_t axis)
 {
     PTerm -= (960*gyroRadiansPerSecond[axis] * rateP); // XXX 
-    return (PTerm + ITerm - DTerm + 1000*softwareTrim) / 1000.; // XXX
+
+    return (PTerm/1000. + ITerm/1000. - DTerm + softwareTrim); // XXX
 }
 
 // Computes leveling PID for pitch or roll
@@ -178,7 +179,7 @@ float Stabilize::computePitchRollPid(
     float deltaSum = delta1[imuAxis] + delta2[imuAxis] + delta;
     delta2[imuAxis] = delta1[imuAxis];
     delta1[imuAxis] = delta;
-    float DTerm = (float)(960*deltaSum * model->ratePitchRollD); // XXX
+    float DTerm = deltaSum * model->ratePitchRollD; 
 
     return computePid(model->ratePitchRollP, softwareTrim, PTerm, ITerm, DTerm, gyroRadiansPerSecond, imuAxis);
 }
