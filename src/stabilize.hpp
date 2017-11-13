@@ -122,7 +122,7 @@ float Stabilize::computeITermGyro(float rateP, float rateI, float rcCommand, flo
     float error = rcCommand*rateP - gyroRadiansPerSecond[axis];
 
     // Avoid integral windup
-    errorGyroI[axis] = Filter::constrainAbs(errorGyroI[axis] + error, config.gyroWindupMax);
+    errorGyroI[axis] = Filter::constrainAbsFloat(errorGyroI[axis] + error, config.gyroWindupMax);
 
     // Reset integral on quick gyro change or large yaw command
     if ((std::abs(gyroRadiansPerSecond[axis]) > bigGyroRadiansPerSecond) || 
@@ -159,12 +159,12 @@ float Stabilize::computePitchRollPid(
 
     // RC command is in [-0.5,+0.5].  We compute error by scaling it up to
     // [-1,+1] and subtracting off corresponding pitch or roll angle obtained from IMU.
-    float errorAngle = Filter::constrainAbs(2*rcCommand, .01*imuConfig.maxAngleInclinationDegrees) - 0.6*eulerAnglesRadians[imuAxis]; // XXX
+    float errorAngle = Filter::constrainAbsFloat(2*rcCommand, .01*imuConfig.maxAngleInclinationDegrees) - 0.6*eulerAnglesRadians[imuAxis]; // XXX
 
     float PTermAccel = errorAngle * model->levelP; 
 
     // Avoid integral windup
-    errorAngleI[imuAxis] = Filter::constrainAbs(errorAngleI[imuAxis] + errorAngle, config.angleWindupMax);
+    errorAngleI[imuAxis] = Filter::constrainAbsFloat(errorAngleI[imuAxis] + errorAngle, config.angleWindupMax);
 
     float PTerm = Filter::complementary(rcCommand, PTermAccel, prop); 
 

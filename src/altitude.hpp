@@ -104,7 +104,6 @@ void Altitude::stop(void)
 void Altitude::modifyThrottleDemand(int16_t & throttleDemand)
 {
     if (holdingAltitude) {
-
         throttleDemand = Filter::constrainMinMax(initialThrottleHold + pid, config.throttleMin, config.throttleMax);
     }
 }
