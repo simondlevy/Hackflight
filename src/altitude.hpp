@@ -126,7 +126,9 @@ void Altitude::computePid(bool armed)
     baroAlt = baro.getAltitude();
 
     // Get estimated vertical velocity from accelerometer
-    velocity += accel.getVelocity(dTimeMicros);
+    float accVel = accel.getVelocity(dTimeMicros);
+    Serial.println(accVel);
+    velocity += accVel;
 
     // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
     // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 

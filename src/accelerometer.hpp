@@ -32,15 +32,15 @@ class Accelerometer {
 
     private:
 
-        float     accZ;
-        float     fc;
-        float     lpf[3];
-        uint32_t  previousTimeUsec;
-        int16_t   smooth[3];
-        float     velScale;
-        int32_t   zOffset;
+        float    accZ;
+        float    fc;
+        float    lpf[3];
+        uint32_t previousTimeUsec;
+        float    smooth[3];
+        float    velScale;
+        float    zOffset;
 
-        static float rotate(int16_t ned[3], float * angles);
+        static float rotate(float ned[3], float * angles);
 
         AccelerometerConfig config;
 
@@ -116,7 +116,7 @@ float Accelerometer::getVelocity(uint32_t dTimeMicros)
     return Filter::deadband((int32_t)accZ, config.deadband) * velScale * dTimeMicros;
 }
 
-float Accelerometer::rotate(int16_t ned[3], float * angles)
+float Accelerometer::rotate(float ned[3], float * angles)
 {
     float cosx = cosf(-angles[0]);
     float sinx = sinf(-angles[0]);
