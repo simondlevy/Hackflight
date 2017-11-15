@@ -2,6 +2,8 @@
 
 <img src="hackflight.png" width=500>
 
+test
+
 Hackflight is simple, platform-independent, header-only C++ firmware for quadcopter 
 [flight controllers](http://diydrones.com/profiles/blogs/flight-of-the-ladybug)
 and [simulators](https://github.com/simondlevy/HackflightSim).  It
