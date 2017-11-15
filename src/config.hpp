@@ -129,6 +129,8 @@ struct ReceiverConfig {
     float pitchRollRate = 0.90f;
     float throttleMid   = 0.50f;
     float throttleExpo  = 0.20f;
+
+    static const uint8_t CHANNELS = 8;
 };
 
 //=========================================================================
@@ -169,11 +171,5 @@ enum {
     DEMAND_AUX3,
     DEMAND_AUX4
 };
-
-//=========================================================================
-// static constants, to avoid dynamic memory allocation
-//=========================================================================
-
-static const uint8_t CONFIG_RC_CHANS = 8;
 
 } // namespace
