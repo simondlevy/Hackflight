@@ -41,7 +41,7 @@ class Filter {
 
 int32_t Filter::deadband(int32_t value, int32_t deadband)
 {
-    if (abs(value) < deadband) {
+    if (std::abs(value) < deadband) {
         value = 0;
     } else if (value > 0) {
         value -= deadband;
