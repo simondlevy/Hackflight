@@ -113,7 +113,7 @@ void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
 float Accelerometer::getVelocity(uint32_t dTimeMicros)
 {
     // Integrate vertical acceleration to compute IMU velocity in cm/sec
-    return Filter::deadband((int32_t)accZ, config.deadband) * velScale * dTimeMicros;
+    return Filter::deadband(accZ, config.deadband) * velScale * dTimeMicros;
 }
 
 float Accelerometer::rotate(float ned[3], float * angles)
