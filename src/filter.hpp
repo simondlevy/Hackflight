@@ -28,18 +28,32 @@ class Filter {
 
     public:
         
+        // XXX eventually everything should be float
         static int32_t deadband(int32_t value, int32_t deadband);
         static int32_t constrainAbs(int32_t val, int32_t max);
         static int32_t constrainMinMax(int32_t val, int32_t min, int32_t max);
 
-        static float   complementary(float a, float b, float c);
-        static float   constrainMinMaxFloat(float val, float min, float max);
-        static float   constrainAbsFloat(float val, float max);
+        static float deadbandFloat(float value, float deadband);
+        static float complementary(float a, float b, float c);
+        static float constrainMinMaxFloat(float val, float min, float max);
+        static float constrainAbsFloat(float val, float max);
 };
 
 /********************************************* CPP ********************************************************/
 
 int32_t Filter::deadband(int32_t value, int32_t deadband)
+{
+    if (std::abs(value) < deadband) {
+        value = 0;
+    } else if (value > 0) {
+        value -= deadband;
+    } else if (value < 0) {
+        value += deadband;
+    }
+    return value;
+}
+
+float Filter::deadbandFloat(float value, float deadband)
 {
     if (std::abs(value) < deadband) {
         value = 0;

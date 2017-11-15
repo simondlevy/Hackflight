@@ -76,14 +76,10 @@ struct BarometerConfig {
 
 struct AccelerometerConfig {
 
-    // Raw accelerometer value when board is level
-    uint16_t oneG        = 4096; 
-
     // These probably don't need to be changed
-    float lpfCutoff  = 5.0f;
+    float lpfCutoff  = 5.00f;
     float lpfFactor  = 0.25f;
-    float deadband   = 40.f;
-    float zOffsetDiv = 64.f;
+    float deadband   = 0.02f;
 };
 
 //=========================================================================
