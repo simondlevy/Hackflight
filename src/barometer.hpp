@@ -48,7 +48,7 @@ class Barometer {
         float   lastAlt;
         float   pressureSum;
 
-        static float paToCm(float pa);
+        static float pascalsToMeters(float pa);
 };
 
 /********************************************* CPP ********************************************************/
@@ -75,7 +75,7 @@ void Barometer::calibrate(void)
 {
     groundPressure -= groundPressure / 8;
     groundPressure += pressureSum / (BarometerConfig::HISTORY_SIZE - 1);
-    groundAltitude = paToCm(groundPressure/8);
+    groundAltitude = pascalsToMeters(groundPressure/8);
 }
 
 void Barometer::update()
@@ -91,7 +91,7 @@ void Barometer::update()
 
 float Barometer::getAltitude(void)
 {
-    float alt_tmp = paToCm(pressureSum/(BarometerConfig::HISTORY_SIZE-1)); 
+    float alt_tmp = pascalsToMeters(pressureSum/(BarometerConfig::HISTORY_SIZE-1)); 
     alt_tmp -= groundAltitude;
     alt = lrintf(alt * config.noiseLpf + alt_tmp * (1.0f - config.noiseLpf));
 
@@ -109,9 +109,9 @@ float Barometer::getVelocity(uint32_t dTimeMicros)
 
 
 // Pressure in Pascals to altitude in centimeters
-float Barometer::paToCm(float pa)
+float Barometer::pascalsToMeters(float pa)
 {
-    return (1.0f - powf(pa / 101325.0f, 0.190295f)) * 4433000.0f;
+    return (1.0f - powf(pa / 101325.0f, 0.190295f)) * 44330.0f;
 }
 
 } // namespace hf

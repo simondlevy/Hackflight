@@ -175,7 +175,7 @@ class Ladybug : public Board {
             }
         }
 
-        virtual void  dprintf(const char * fmt, ...) override
+        void  dprintf(const char * fmt, ...)
         { 
             va_list ap;
             va_start(ap, fmt);
