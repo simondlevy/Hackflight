@@ -53,7 +53,6 @@ void Accelerometer::init(const AccelerometerConfig & _config, Board * _board)
     memcpy(&config, &_config, sizeof(AccelerometerConfig));
 
     board = _board;
-
      
     // Calculate RC time constant used in the low-pass filter
     fc = (float)(0.5f / (M_PI * config.lpfCutoff)); 
@@ -110,7 +109,7 @@ void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
 float Accelerometer::getVelocity(uint32_t dTimeMicros)
 {
     // Integrate vertical acceleration to compute IMU velocity in cm/sec
-    return Filter::deadbandFloat(accZ, config.deadband) * 9.80665f / 10000.0f * dTimeMicros;
+    return Filter::deadband(accZ, config.deadband) * 9.80665f / 10000.0f * dTimeMicros;
 }
 
 float Accelerometer::rotate(float ned[3], float * angles)

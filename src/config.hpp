@@ -65,8 +65,8 @@ struct ImuConfig {
 struct BarometerConfig {
 
     float                noiseLpf         = 0.5f;
-    uint16_t             velocityBound    = 300;
-    uint16_t             velocityDeadband = 10;
+    float                velocityBound    = 300.f;
+    float                velocityDeadband = 10.f;
     static const uint8_t HISTORY_SIZE     = 48;
 };
 

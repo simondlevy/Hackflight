@@ -35,11 +35,11 @@ class Altitude {
     public:
 
         void init(const AltitudeConfig & _config, Board * _board, Model * _model);
-        void start(uint16_t throttleDemand);
+        void start(float throttleDemand);
         void stop(void);
         void computePid(bool armed);
         void updateAccelerometer(float eulerAnglesRadians[3], bool armed);
-        void modifyThrottleDemand(int16_t & throttleDemand);
+        void modifyThrottleDemand(float & throttleDemand);
 
     private:
 
@@ -50,18 +50,18 @@ class Altitude {
 
         // Barometer
         Barometer baro;
-        int32_t   baroAlt;               // cm
+        float baroAlt;               // cm
 
         // Accelerometer
         Accelerometer accel;
 
         // Fused
-        int32_t  altHold;
-        int16_t  errorAltitudeI;
-        bool     holdingAltitude;
-        uint16_t initialThrottleHold;  // PWM usec
-        int32_t  pid;
-        float    velocity;             // cm/sec
+        float altHold;
+        float errorAltitudeI;
+        bool  holdingAltitude;
+        float initialThrottleHold;  
+        float pid;
+        float velocity;             // cm/sec
 
         // Microsecond dt for velocity computations
         uint32_t updateTime(void);
@@ -87,7 +87,7 @@ void Altitude::init(const AltitudeConfig & _config, Board * _board, Model * _mod
     velocity = 0;
 }
 
-void Altitude::start(uint16_t throttleDemand)
+void Altitude::start(float throttleDemand)
 {
     holdingAltitude = true;
     initialThrottleHold = throttleDemand;
@@ -101,7 +101,7 @@ void Altitude::stop(void)
     holdingAltitude = false;
 }
 
-void Altitude::modifyThrottleDemand(int16_t & throttleDemand)
+void Altitude::modifyThrottleDemand(float & throttleDemand)
 {
     if (holdingAltitude) {
         throttleDemand = Filter::constrainMinMax(initialThrottleHold + pid, config.throttleMin, config.throttleMax);
@@ -127,7 +127,7 @@ void Altitude::computePid(bool armed)
 
     // Get estimated vertical velocity from accelerometer
     float accVel = accel.getVelocity(dTimeMicros);
-    Serial.println(accVel);
+    //Serial.println(accVel);
     velocity += accVel;
 
     // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
@@ -137,18 +137,18 @@ void Altitude::computePid(bool armed)
     velocity = Filter::complementary(velocity, (float)baroVel, config.cfVel);
 
     // P
-    int32_t error = Filter::constrainAbs(altHold - baroAlt, config.pErrorMax);
+    float error = Filter::constrainAbs(altHold - baroAlt, config.pErrorMax);
     error = Filter::deadband(error, config.pDeadband); 
-    pid = Filter::constrainAbs((int16_t)(model->altP * error), config.pidMax);
+    pid = Filter::constrainAbs(model->altP * error, config.pidMax);
 
     // I
-    errorAltitudeI += (int16_t)(model->altI * error);
+    errorAltitudeI += (model->altI * error);
     errorAltitudeI = Filter::constrainAbs(errorAltitudeI, config.iErrorMax);
-    pid += (int32_t)(errorAltitudeI * (dTimeMicros/1e6));
+    pid += (errorAltitudeI * (dTimeMicros/1e6));
 
     // D
-    int32_t vario = Filter::deadband((int32_t)velocity, config.dDeadband);
-    pid -= Filter::constrainAbs((int16_t)(model->altD * vario), config.pidMax);
+    float vario = Filter::deadband(velocity, config.dDeadband);
+    pid -= Filter::constrainAbs(model->altD * vario, config.pidMax);
 
 } // computePid
 
