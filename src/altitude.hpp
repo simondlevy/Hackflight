@@ -125,8 +125,6 @@ void Altitude::computePid(bool armed)
     // Get estimated altitude from barometer
     baroAlt = baro.getAltitude();
 
-    board->dprintf("BaroAlt: %+2.2f\n", baroAlt);
-
     // Get estimated vertical velocity from accelerometer
     velocity += accel.getVelocity(dTimeMicros);
 

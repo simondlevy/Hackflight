@@ -108,7 +108,7 @@ float Barometer::getVelocity(uint32_t dTimeMicros)
 }
 
 
-// Pressure in Pascals to altitude in centimeters
+// Pressure in Pascals to altitude in meters
 float Barometer::pascalsToMeters(float pa)
 {
     return (1.0f - powf(pa / 101325.0f, 0.190295f)) * 44330.0f;
