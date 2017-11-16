@@ -3,7 +3,8 @@
 <img src="hackflight.png" width=500>
 
 Hackflight is simple, platform-independent, header-only C++ firmware for quadcopter 
-[flight controllers](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) and [simulators](https://github.com/simondlevy/HackflightSim).  It
+[flight controllers](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) 
+and [simulators](https://github.com/simondlevy/HackflightSim).  It
 is geared toward people like me who want to tinker with flight-control
 firmware, and use it to teach students about ideas like inertial measurement
 and PID tuning.  <b>If you are in the 99% percent of users who just want to get
