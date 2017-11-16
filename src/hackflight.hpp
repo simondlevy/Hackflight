@@ -256,8 +256,8 @@ void Hackflight::updateReadyState(void)
     // If angle too steep, flash LED
     uint32_t currentTime = (uint32_t)board->getMicros();
     if (angleCheckTask.ready(currentTime)) {
-        if (fabs(eulerAnglesRadians[AXIS_ROLL])  > maxArmingAngleRadians ||
-            fabs(eulerAnglesRadians[AXIS_PITCH]) > maxArmingAngleRadians) {
+        if (std::abs(eulerAnglesRadians[AXIS_ROLL])  > maxArmingAngleRadians ||
+            std::abs(eulerAnglesRadians[AXIS_PITCH]) > maxArmingAngleRadians) {
             safeToArm = false; 
             blinkLedForTilt();
             angleCheckTask.update(currentTime);

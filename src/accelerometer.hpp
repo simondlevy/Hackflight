@@ -32,15 +32,14 @@ class Accelerometer {
 
     private:
 
-        float     accZ;
-        float     fc;
-        float     lpf[3];
-        uint32_t  previousTimeUsec;
-        int16_t   smooth[3];
-        float     velScale;
-        int32_t   zOffset;
+        float    accZ;
+        float    fc;
+        float    lpf[3];
+        uint32_t previousTimeUsec;
+        float    accelGsSmoothed[3];
+        float    zOffset;
 
-        static float rotate(int16_t ned[3], float * angles);
+        static float rotate(float ned[3], float * angles);
 
         AccelerometerConfig config;
 
@@ -54,14 +53,12 @@ void Accelerometer::init(const AccelerometerConfig & _config, Board * _board)
     memcpy(&config, &_config, sizeof(AccelerometerConfig));
 
     board = _board;
-
-    velScale = (9.80665f / 10000.0f / config.oneG);
-
+     
     // Calculate RC time constant used in the low-pass filter
     fc = (float)(0.5f / (M_PI * config.lpfCutoff)); 
 
     for (int k=0; k<3; ++k) {
-        smooth[k] = 0;
+        accelGsSmoothed[k] = 0;
         lpf[k] = 0;
     }
 
@@ -75,9 +72,9 @@ void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
     // Get current time in microseconds
     uint32_t currentTimeUsec = (uint32_t)board->getMicros();
 
-    // Get raw accelerometer values    
-    int16_t accelRaw[3];
-    board->extrasImuGetAccel(accelRaw);
+    // Get accelerometer G values    
+    float accelGs[3];
+    board->extrasImuGetAccel(accelGs);
 
     // Track delta time
     uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
@@ -86,26 +83,25 @@ void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
     // Smooth the raw values if indicated
     for (uint8_t k=0; k<3; k++) {
         if (config.lpfFactor > 0) {
-            lpf[k] = Filter::complementary(accelRaw[k], lpf[k], config.lpfFactor);
-            smooth[k] = (int16_t)lpf[k];
+            lpf[k] = Filter::complementary(accelGs[k], lpf[k], config.lpfFactor);
+            accelGsSmoothed[k] = lpf[k];
         } else {
-            smooth[k] = accelRaw[k];
+            accelGsSmoothed[k] = accelGs[k];
         }
     }
 
     // Rotate accel values into the earth frame
-    float rotatedZ = Accelerometer::rotate(smooth, eulerAnglesRadians);
+    float rotatedZ = Accelerometer::rotate(accelGsSmoothed, eulerAnglesRadians);
 
     // Compute vertical acceleration offset at rest
     if (!armed) {
-        zOffset -= zOffset / config.zOffsetDiv;
-        zOffset += (int32_t)rotatedZ;
+        zOffset = rotatedZ;
     }
-    rotatedZ -= zOffset / config.zOffsetDiv;
+    rotatedZ -= zOffset;
 
     // Compute smoothed vertical acceleration
     float dT_sec = dT_usec * 1e-6f;
-    accZ = accZ + (dT_sec / (fc + dT_sec)) * (rotatedZ - accZ);
+    accZ += ((dT_sec / (fc + dT_sec)) * (rotatedZ - accZ));
 
 } // update
 
@@ -113,10 +109,10 @@ void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
 float Accelerometer::getVelocity(uint32_t dTimeMicros)
 {
     // Integrate vertical acceleration to compute IMU velocity in cm/sec
-    return Filter::deadband((int32_t)accZ, config.deadband) * velScale * dTimeMicros;
+    return Filter::deadband(accZ, config.deadband) * 9.80665f / 10000.0f * dTimeMicros;
 }
 
-float Accelerometer::rotate(int16_t ned[3], float * angles)
+float Accelerometer::rotate(float ned[3], float * angles)
 {
     float cosx = cosf(-angles[0]);
     float sinx = sinf(-angles[0]);

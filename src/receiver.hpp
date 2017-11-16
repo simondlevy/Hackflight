@@ -54,7 +54,7 @@ private:
 
 public:
 
-    float   rawvals[CONFIG_RC_CHANS];  // raw [-1,+1] from receiver, for MSP
+    float   rawvals[ReceiverConfig::CHANNELS];  // raw [-1,+1] from receiver, for MSP
 
     uint8_t sticks;                    // stick positions for command combos
 

@@ -28,20 +28,17 @@ class Filter {
 
     public:
         
-        static int32_t deadband(int32_t value, int32_t deadband);
-        static int32_t constrainAbs(int32_t val, int32_t max);
-        static int32_t constrainMinMax(int32_t val, int32_t min, int32_t max);
-
-        static float   complementary(float a, float b, float c);
-        static float   constrainMinMaxFloat(float val, float min, float max);
-        static float   constrainAbsFloat(float val, float max);
+        static float deadband(float value, float deadband);
+        static float complementary(float a, float b, float c);
+        static float constrainMinMax(float val, float min, float max);
+        static float constrainAbs(float val, float max);
 };
 
 /********************************************* CPP ********************************************************/
 
-int32_t Filter::deadband(int32_t value, int32_t deadband)
+float Filter::deadband(float value, float deadband)
 {
-    if (abs(value) < deadband) {
+    if (std::abs(value) < deadband) {
         value = 0;
     } else if (value > 0) {
         value -= deadband;
@@ -56,24 +53,14 @@ float Filter::complementary(float a, float b, float c)
     return a * c + b * (1 - c);
 }
 
-int32_t Filter::constrainMinMax(int32_t val, int32_t min, int32_t max)
+float Filter::constrainMinMax(float val, float min, float max)
 {
     return (val<min) ? min : ((val>max) ? max : val);
 }
 
-float Filter::constrainMinMaxFloat(float val, float min, float max)
-{
-    return (val<min) ? min : ((val>max) ? max : val);
-}
-
-int32_t Filter::constrainAbs(int32_t val, int32_t max)
+float Filter::constrainAbs(float val, float max)
 {
     return constrainMinMax(val, -max, +max);
-}
-
-float Filter::constrainAbsFloat(float val, float max)
-{
-    return constrainMinMaxFloat(val, -max, +max);
 }
 
 } // namespace hf

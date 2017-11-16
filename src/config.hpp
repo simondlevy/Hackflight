@@ -65,8 +65,8 @@ struct ImuConfig {
 struct BarometerConfig {
 
     float                noiseLpf         = 0.5f;
-    uint16_t             velocityBound    = 300;
-    uint16_t             velocityDeadband = 10;
+    float                velocityBound    = 300.f;
+    float                velocityDeadband = 10.f;
     static const uint8_t HISTORY_SIZE     = 48;
 };
 
@@ -76,14 +76,10 @@ struct BarometerConfig {
 
 struct AccelerometerConfig {
 
-    // Raw accelerometer value when board is level
-    uint16_t oneG        = 4096; 
-
     // These probably don't need to be changed
-    float    lpfCutoff  = 5.0f;
-    float    lpfFactor  = 0.25f;
-    int32_t  deadband   = 40;
-    uint8_t  zOffsetDiv = 64;
+    float lpfCutoff  = 5.00f;
+    float lpfFactor  = 0.25f;
+    float deadband   = 0.02f;
 };
 
 //=========================================================================
@@ -129,6 +125,8 @@ struct ReceiverConfig {
     float pitchRollRate = 0.90f;
     float throttleMid   = 0.50f;
     float throttleExpo  = 0.20f;
+
+    static const uint8_t CHANNELS = 8;
 };
 
 //=========================================================================
@@ -169,11 +167,5 @@ enum {
     DEMAND_AUX3,
     DEMAND_AUX4
 };
-
-//=========================================================================
-// static constants, to avoid dynamic memory allocation
-//=========================================================================
-
-static const uint8_t CONFIG_RC_CHANS = 8;
 
 } // namespace

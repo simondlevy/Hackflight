@@ -101,7 +101,7 @@ void Mixer::update(float throttle, float pidRoll, float pidPitch, float pidYaw, 
             motors[i] -= maxMotor - 1;
         }
 
-        motors[i] = Filter::constrainMinMaxFloat(motors[i], 0, 1);
+        motors[i] = Filter::constrainMinMax(motors[i], 0, 1);
 
         // Avoid sudden motor jump from right yaw while arming
         if (rc->throttleIsDown()) {

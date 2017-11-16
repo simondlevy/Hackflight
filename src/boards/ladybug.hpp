@@ -43,9 +43,6 @@ class Ladybug : public Board {
 
         virtual void init(Config &config) override
         {
-            // Accelerometer reading at 1G (vehicle resting flat)
-            config.altitude.accel.oneG = 2048; // default is 4096
-
             // Begin serial comms
             Serial.begin(115200);
 
@@ -169,9 +166,13 @@ class Ladybug : public Board {
             return pressure;
         }
 
-        virtual void extrasImuGetAccel(int16_t accelRaw[3]) override
+        virtual void extrasImuGetAccel(float accelGs[3]) override
         {
+            int16_t accelRaw[3];
             _sentral.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
+            for (uint8_t k=0; k<3; ++k) {
+                accelGs[k] = accelRaw[k] / 2048.f;
+            }
         }
 
         virtual void  dprintf(const char * fmt, ...) override

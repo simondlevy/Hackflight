@@ -121,7 +121,7 @@ float Stabilize::computeITermGyro(float rateP, float rateI, float rcCommand, flo
     float error = rcCommand*rateP - gyroRadiansPerSecond[axis];
 
     // Avoid integral windup
-    errorGyroI[axis] = Filter::constrainAbsFloat(errorGyroI[axis] + error, config.gyroWindupMax);
+    errorGyroI[axis] = Filter::constrainAbs(errorGyroI[axis] + error, config.gyroWindupMax);
 
     // Reset integral on quick gyro change or large yaw command
     if ((std::abs(gyroRadiansPerSecond[axis]) > bigGyroRadiansPerSecond) || 
@@ -193,7 +193,7 @@ void Stabilize::update(
     pidYaw = computePid(model->yawP, model->softwareTrimYaw, rcCommandYaw, ITermGyroYaw, 0, gyroRadiansPerSecond, AXIS_YAW);
 
     // Prevent "yaw jump" during yaw correction
-    pidYaw = Filter::constrainAbsFloat(pidYaw, 0.1 + std::abs(rcCommandYaw));
+    pidYaw = Filter::constrainAbs(pidYaw, 0.1 + std::abs(rcCommandYaw));
 }
 
 void Stabilize::resetIntegral(void)
