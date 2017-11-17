@@ -52,9 +52,8 @@ a particular receiver (reading channels values).  The
 [Model](https://github.com/simondlevy/Hackflight/blob/master/src/model.hpp)
 class is where you specify the PID values for your model.
 
-Although Hackflight was designed to be &ldquo;headless&rdquo; (no configurator program),
-it is useful to get some visual feedback on things like vehicle orientation and RC receiver
-channel values.  So we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program.
+Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
+channel values,  we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program.
 that allows you to connect to the board and see what's going on. Windows users
 can run this program directly: just download [this zipfile](http://home.wlu.edu/~levys/hackflight-gcs.zip),
 unzip the file, open the folder, and double-click on <b>hackflight.exe</b>.
