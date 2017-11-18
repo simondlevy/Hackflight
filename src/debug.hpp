@@ -26,7 +26,7 @@ static void dumpstring(char * s) { Serial.print(s); }
 
 // Windows
 #elif defined(_WIN32) 
-static void dumpstring(char * s) { OutputDebugStringA(buf); }
+static void dumpstring(char * s) { OutputDebugStringA(s); }
 
 // Unix
 #else                 
