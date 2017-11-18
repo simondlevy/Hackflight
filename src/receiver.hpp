@@ -25,6 +25,7 @@
 
 #include "config.hpp"
 #include "filter.hpp"
+#include "debug.hpp"
 
 namespace hf {
 

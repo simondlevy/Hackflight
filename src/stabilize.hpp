@@ -27,21 +27,7 @@
 #include "config.hpp"
 #include "filter.hpp"
 #include "model.hpp"
-
-/*
-#include <stdarg.h>
-static void  dprintf(const char * fmt, ...)
-{ 
-    va_list ap;
-    va_start(ap, fmt);
-    char buf[200];
-    vsprintf(buf, fmt, ap);
-    for (char* p=buf; *p; p++) {
-        Serial.print(*p);
-    }
-    va_end(ap);
-}
-*/
+#include "debug.hpp"
 
 namespace hf {
 

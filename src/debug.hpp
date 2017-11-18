@@ -1,5 +1,5 @@
 /*
-   timedtask.hpp : a class for timed tasks
+   debug.hpp : Serial debugging support for Hackflight
 
    This file is part of Hackflight.
 
@@ -18,44 +18,32 @@
 
 #pragma once
 
-#include "debug.hpp"
+#include <stdarg.h>
+
+// ARM Arduino (Ladybug)
+#if defined(__arm__)  
+static void dumpstring(char * s) { Serial.print(s); }
+
+// Windows
+#elif defined(_WIN32) 
+static void dumpstring(char * s) { OutputDebugStringA(buf); }
+
+// Unix
+#else                 
+#include <stdio.h>
+static void dumpstring(char * s) { puts(s); }
+#endif
 
 namespace hf {
 
-class TimedTask {
-
-    private:
-
-        uint32_t usec;
-        uint32_t period;
-
-    public:
-
-        void init(uint32_t _period) {
-
-            period = _period;
-            usec = 0;
-        }
-
-        bool checkAndUpdate(uint32_t currentTime) {
-
-            bool result = ready(currentTime);
-
-            if (result)
-                update(currentTime);
-
-            return result;
-        }
-
-        void update(uint32_t currentTime) {
-
-            usec = currentTime + period;
-        }
-
-        bool ready(uint32_t currentTime) {
-
-            return (int32_t)(currentTime - usec) >= 0;
-        }
-};
-
+static void dprintf(const char * fmt, ...)
+{ 
+    va_list ap;
+    va_start(ap, fmt);
+    char buf[200];
+    vsprintf(buf, fmt, ap);
+    dumpstring(buf);
+    va_end(ap);
 }
+
+} // namespace

@@ -21,6 +21,7 @@
  */
 
 #include "config.hpp"
+#include "debug.hpp"
 
 namespace hf {
  

@@ -21,6 +21,7 @@
 #include "board.hpp"
 #include "receiver.hpp"
 #include "mixer.hpp"
+#include "debug.hpp"
 
 // See http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol
 #define MSP_RC_NORMAL            121    

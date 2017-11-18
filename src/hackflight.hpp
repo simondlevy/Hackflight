@@ -28,6 +28,7 @@
 #include "altitude.hpp"
 #include "timedtask.hpp"
 #include "model.hpp"
+#include "debug.hpp"
 
 // For logical combinations of stick positions (low, center, high)
 #define ROL_LO (1 << (2 * DEMAND_ROLL))

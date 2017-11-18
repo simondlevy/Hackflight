@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "debug.hpp"
+
 namespace hf {
  
 class Filter {

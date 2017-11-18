@@ -20,6 +20,8 @@
    along with EM7180.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "debug.hpp"
+
 namespace hf {
  
 class Accelerometer {

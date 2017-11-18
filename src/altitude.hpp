@@ -27,6 +27,7 @@
 #include "barometer.hpp"
 #include "accelerometer.hpp"
 #include "model.hpp"
+#include "debug.hpp"
 
 namespace hf {
  

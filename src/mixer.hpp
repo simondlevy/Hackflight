@@ -21,6 +21,7 @@
 #include "board.hpp"
 #include "stabilize.hpp"
 #include "filter.hpp"
+#include "debug.hpp"
 
 #include <cstring>
 
