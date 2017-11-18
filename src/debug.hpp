@@ -22,28 +22,33 @@
 
 // ARM Arduino (Ladybug)
 #if defined(__arm__)  
-static void dumpstring(char * s) { Serial.print(s); }
+static void _puts(char * buf) { Serial.print(buf); }
 
-// Windows
 #elif defined(_WIN32) 
-static void dumpstring(char * s) { OutputDebugStringA(s); }
+// Windows
+// Need to include windows.h to declare OutputDebugStringA(), but causes compiler warnings,
+// so we wrap this one include in a no-warnings pragma.
+// See: https://stackoverflow.com/questions/4001736/whats-up-with-the-thousands-of-warnings-in-standard-headers-in-msvc-wall
+#pragma warning(push, 0) 
+#include <windows.h>
+#pragma warning(pop)
+#include <varargs.h>
+static void _puts(char * buf) { OutputDebugStringA(buf); }
 
 // Unix
 #else                 
 #include <stdio.h>
-static void dumpstring(char * s) { puts(s); }
+static void _puts(char * buf) { puts(buf); }
 #endif
 
-namespace hf {
-
 static void dprintf(const char * fmt, ...)
-{ 
+{
     va_list ap;
     va_start(ap, fmt);
     char buf[200];
     vsprintf(buf, fmt, ap);
-    dumpstring(buf);
+    _puts(buf);
     va_end(ap);
 }
 
-} // namespace
+
