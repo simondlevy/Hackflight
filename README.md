@@ -23,9 +23,10 @@ support](https://github.com/simondlevy/hackflight/tree/master/extras/legacy) for
 STM32F103 flight-controller boards (Naze32 and clones like Flip32, MultiRC,
 etc.) the Alienflight F3 board, and a Teensy 3.2-based controller, 
 the hardware focus of the project has shifted to the Arduino-compatible,
-STM32L4-based [Ladybug FC](http://diydrones.com/profiles/blogs/flight-of-the-ladybug).
-The floating-point support provided by the STM32L4 allows us to write simpler code
-that is easier to understand and modify. 
+STM32L4-based [Ladybug FC](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/).
+In addition to offering the full complement of i/o signals (UART, I<sup>2</sup>C,
+SPI, digital, analog), this board has hardware support for floating-point operations, allowing us to
+write simpler code that is easier to understand and modify. 
 
 Thanks to some help from [Sytelus](https://github.com/sytelus), the core
 Hackflight
