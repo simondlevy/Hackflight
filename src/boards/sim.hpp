@@ -36,10 +36,12 @@ namespace hf {
                 // Loop timing overrides
                 config.loop.imuLoopMicro = 8333;    // approx. simulation period
 
-                // Euler angles
-                angles[0] = 0;
-                angles[1] = 0;
-                angles[2] = 0;
+                // State variables
+                for (uint8_t k=0; k<3; ++k) {
+                    angles[k] = 0;
+                    gyro[k] = 0;
+                    accel[k] = 0;
+                }
             }
 
             bool skipArming(void)
@@ -49,13 +51,10 @@ namespace hf {
 
             void getImu(float eulerAnglesRadians[3], float gyroRadiansPerSecond[3])
             {
-                eulerAnglesRadians[0] = angles[0];
-                eulerAnglesRadians[1] = angles[1];
-                eulerAnglesRadians[2] = angles[2];
-
-                gyroRadiansPerSecond[0] =  gyro[0];
-                gyroRadiansPerSecond[1] = -gyro[1];
-                gyroRadiansPerSecond[2] = -gyro[2];
+                for (uint8_t k=0; k<3; ++k) {
+                    eulerAnglesRadians[k] = angles[k];
+                    gyroRadiansPerSecond[k] = -gyro[k];
+                }
             }
 
             uint64_t getMicros()
@@ -79,7 +78,7 @@ namespace hf {
 
             virtual float extrasGetBaroPressure(void)
             {
-                return baroPressurePascals;
+                return baroPressure;
             }
 
             virtual void extrasImuGetAccel(float accelGs[3])
@@ -91,18 +90,14 @@ namespace hf {
 
             // This method is called by your simulator -----------------------------------------------------------------
 
-            void updatePhysics(float rollSpeed, float pitchSpeed, float yawSpeed, float verticalPosition, float deltaSeconds)
+            void updatePhysics(float angularVelocity[3], float altitude, float deltaSeconds)
             {
                 // Track time
                 micros += 1e6 * deltaSeconds;
 
-                // Integrate Euler angle velocities to get Euler angles
-                angles[0] += rollSpeed  * deltaSeconds;
-                angles[1] -= pitchSpeed * deltaSeconds;
-                angles[2] += yawSpeed   * deltaSeconds;
-
-                // Compute pitch, roll, yaw first derivative to simulate gyro
+                // Update state
                 for (int k=0; k<3; ++k) {
+                    angles[k] += angularVelocity[k] * deltaSeconds;
                     gyro[k] = (angles[k] - anglesPrev[k]) / deltaSeconds;
                     anglesPrev[k] = angles[k];
                 }
@@ -110,7 +105,7 @@ namespace hf {
                 // Convert vehicle's Z coordinate in meters to barometric pressure in Pascals (millibars)
                 // At low altitudes above the sea level, the pressure decreases by about 1200 Pa for every 100 meters
                 // (See https://en.wikipedia.org/wiki/Atmospheric_pressure#Altitude_variation)
-                baroPressurePascals = 1000 * (101.325 - 1.2 * verticalPosition / 100);
+                baroPressure = 1000 * (101.325 - 1.2 * altitude / 100);
             }
 
             // Public state variables
@@ -121,9 +116,10 @@ namespace hf {
 
             // Private state variables
             uint64_t micros;
-            float gyro[3];
-            float anglesPrev[3];
-            float baroPressurePascals;
+            float accel[3];      // Gs
+            float gyro[3];       // radians per second
+            float anglesPrev[3]; // radians
+            float baroPressure;  // Pascals (milllibars)
 
     }; // class SimBoard
 
