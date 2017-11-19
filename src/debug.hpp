@@ -1,5 +1,5 @@
 /*
-   debug.hpp : Serial debugging support for Hackflight
+   debug.hpp : Cross-platform serial debugging support for Hackflight
 
    This file is part of Hackflight.
 
@@ -23,6 +23,7 @@
 // ARM Arduino (Ladybug)
 #if defined(__arm__)  
 static void _puts(char * buf) { Serial.print(buf); }
+static void _vsprintf(char * buf, const char * fmt, va_list ap) { vsprintf(buf, fmt, ap); }
 
 #elif defined(_WIN32) 
 // Windows
@@ -34,11 +35,13 @@ static void _puts(char * buf) { Serial.print(buf); }
 #pragma warning(pop)
 #include <varargs.h>
 static void _puts(char * buf) { OutputDebugStringA(buf); }
+static void _vsprintf(char * buf, const char * fmt, va_list ap) { vsprintf_s(buf, _vscprintf(fmt,ap)+ 1, fmt, ap); }
 
 // Unix
 #else                 
 #include <stdio.h>
 static void _puts(char * buf) { puts(buf); }
+static void _vsprintf(char * buf, const char * fmt, va_list ap) { vsprintf(buf, fmt, ap); }
 #endif
 
 static void dprintf(const char * fmt, ...)
@@ -46,7 +49,7 @@ static void dprintf(const char * fmt, ...)
     va_list ap;
     va_start(ap, fmt);
     char buf[200];
-    vsprintf(buf, fmt, ap);
+    _vsprintf(buf, fmt, ap);
     _puts(buf);
     va_end(ap);
 }
