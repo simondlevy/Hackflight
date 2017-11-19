@@ -90,17 +90,30 @@ namespace hf {
 
             // This method is called by your simulator -----------------------------------------------------------------
 
-            void updatePhysics(float angularVelocity[3], float altitude, float deltaSeconds)
+            void updatePhysics(float angularVelocity[3], float altitude, float verticalAcceleration, float deltaSeconds)
             {
                 // Track time
                 micros += 1e6 * deltaSeconds;
 
                 // Update state
                 for (int k=0; k<3; ++k) {
-                    angles[k] += angularVelocity[k] * deltaSeconds;
+                    angles[k] += angularVelocity[k] * deltaSeconds; // XXX Does pitch need to be negated first?
                     gyro[k] = (angles[k] - anglesPrev[k]) / deltaSeconds;
                     anglesPrev[k] = angles[k];
                 }
+
+                // Negate vertical acceleration to get correct direction for G force
+                float accZ = -verticalAcceleration;
+
+                // Estimate G forces on accelerometer using Equations 2, 6-8 in
+                // https://www.nxp.com/docs/en/application-note/AN3461.pdf
+                float phi   = angles[0]; // roll
+                float theta = angles[1]; // pitch
+                accel[0] = accZ * sin(theta);              // accel X   
+                accel[1] = accZ * cos(theta) * sin(phi);   // accel Y   
+                accel[2] = accZ * cos(theta) * cos(phi);   // accel Z   
+
+                dprintf("%+2.2f    %+2.2f    %+2.2f\n", accel[0], accel[1], accel[2]);
 
                 // Convert vehicle's Z coordinate in meters to barometric pressure in Pascals (millibars)
                 // At low altitudes above the sea level, the pressure decreases by about 1200 Pa for every 100 meters
