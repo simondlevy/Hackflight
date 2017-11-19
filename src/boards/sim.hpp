@@ -109,9 +109,9 @@ namespace hf {
                 // https://www.nxp.com/docs/en/application-note/AN3461.pdf
                 float phi   = angles[0]; // roll
                 float theta = angles[1]; // pitch
-                accel[0] = accZ * sin(theta);              // accel X   
-                accel[1] = accZ * cos(theta) * sin(phi);   // accel Y   
-                accel[2] = accZ * cos(theta) * cos(phi);   // accel Z   
+                accel[0] = accZ * -sin(theta);              // accel X   
+                accel[1] = accZ *  cos(theta) * sin(phi);   // accel Y   
+                accel[2] = accZ *  cos(theta) * cos(phi);   // accel Z   
 
                 dprintf("%+2.2f    %+2.2f    %+2.2f\n", accel[0], accel[1], accel[2]);
 
