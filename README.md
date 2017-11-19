@@ -26,7 +26,15 @@ the hardware focus of the project has shifted to the Arduino-compatible,
 STM32L4-based [Ladybug FC](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/).
 In addition to offering the full complement of i/o signals (UART, I<sup>2</sup>C,
 SPI, digital, analog), this board has hardware support for floating-point operations, allowing us to
-write simpler code that is easier to understand and modify. 
+write simpler code based on standard units:
+
+* Euler angles in radians
+* Accelerometer values in Gs
+* Gyrometer values in radians per second
+* Distances in meters
+* Axis demands (roll, pitch, yaw) in the interval [-1,+1]
+* Throttle demand in [0,1]
+* Motor demands in [0,1]
 
 Thanks to some help from [Sytelus](https://github.com/sytelus), the core
 Hackflight
