@@ -37,7 +37,6 @@ namespace hf {
             uint64_t micros;
             float accel[3];      // Gs
             float gyro[3];       // radians per second
-            float anglesPrev[3]; // radians
             float baroPressure;  // Pascals (milllibars)
 
         // public state variables
@@ -57,7 +56,6 @@ namespace hf {
 
                 for (uint8_t k=0; k<3; ++k) {
                     angles[k] = 0;
-                    anglesPrev[k] = 0;
                     gyro[k] = 0;
                     accel[k] = 0;
                 }
@@ -77,9 +75,8 @@ namespace hf {
 
                 // Update state
                 for (int k=0; k<3; ++k) {
-                    angles[k] += angularVelocity[k] * deltaSeconds; // XXX Does pitch need to be negated first?
-                    gyro[k] = (angles[k] - anglesPrev[k]) / deltaSeconds;
-                    anglesPrev[k] = angles[k];
+                    angles[k] += ((k==1) ? -1 : +1) * angularVelocity[k] * deltaSeconds; // negate pitch
+                    gyro[k] = angularVelocity[k];
                 }
 
                 /*
