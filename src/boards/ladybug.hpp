@@ -176,7 +176,7 @@ class Ladybug : public Board {
             int16_t accelRaw[3];
             _sentral.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
             for (uint8_t k=0; k<3; ++k) {
-                accelGs[k] = ACCEL_RES * accelRaw[k] / 2048.f;
+                accelGs[k] = (accelRaw[k]-2048.) / (1<<15) * ACCEL_RES + 1;
             }
         }
 
