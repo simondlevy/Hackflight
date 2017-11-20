@@ -32,6 +32,9 @@ namespace hf {
 
         private:
 
+            // A true constant!
+            const float GRAVITY = 9.80665;
+
             // Scales up thrust to radians per second (substitutes for mass, torque, etc.)
             const float THRUST_SCALE = 5.f;
 
@@ -44,13 +47,13 @@ namespace hf {
 
             // Private state variables
             uint64_t _micros;
-            float _accel[3];        // Gs
-            float _gyro[3];         // radians per second
-            float _angles[3];       // radians
-            float _baroPressure;    // Pascals (milllibars)
-            float _linearSpeeds[3]; // meters per second forward, lateral, vertical
-            float _motors[4];       // arbitrary in [0,1]
-            float _altitude;        // meters
+            float _accel[3];          // Gs
+            float _gyro[3];           // radians per second
+            float _angles[3];         // radians
+            float _baroPressure;      // Pascals (milllibars)
+            float _linearSpeeds[3];   // meters per second forward, lateral, vertical
+            float _motors[4];         // arbitrary in [0,1]
+            float _altitude;          // meters
             bool _flying;
 
         // methods called by simulator
@@ -77,7 +80,7 @@ namespace hf {
                 _micros = 0;
             }
 
-            void getState(float angularSpeeds[3], float linearSpeeds[3], float motors[4])
+            void getState(float angularSpeeds[3], float linearSpeeds[3], float motors[4], bool & flying)
             {
                 for (uint8_t k=0; k<3; ++k) {
                     angularSpeeds[k] = _gyro[k];
@@ -87,6 +90,8 @@ namespace hf {
                 for (uint8_t k=0; k<4; ++k) {
                     motors[k] = _motors[k];
                 }
+
+                flying = _flying;
             }
 
         // methods called by Hackflight
@@ -168,19 +173,19 @@ namespace hf {
                 float r22 = cos(phi)*cos(theta);
 
                 // Overall vertical force = thrust - gravity
-                // We first multiply by the sign of the vertical world coordinate direction, because AddActorLocalOffset()
+                // We first multiply by the sign of the vertical world coordinate direction, because simulator
                 // will upside-down vehicle rise on negative velocity.
-                float verticalAcceleration = (r22 < 0 ? -1 : +1) * (r22*thrust - 9.80665);
+                float lift = (r22 < 0 ? -1 : +1) * (r22*thrust - GRAVITY);
 
-                // Once there's enough thrust, we're flying
-                if (verticalAcceleration > 0) {
+                // Once there's enough lift, we're flying
+                if (lift > 0) {
                     _flying = true;
                 }
 
                 if (_flying) {
 
                     // Integrate vertical force to get vertical speed
-                    _linearSpeeds[2] += (verticalAcceleration * _deltaSeconds);
+                    _linearSpeeds[2] += (lift * _deltaSeconds);
 
                     // To get forward and lateral speeds, integrate thrust along world coordinates
                     _linearSpeeds[0] += thrust * VELOCITY_TRANSLATE_SCALE * r02;
@@ -198,14 +203,17 @@ namespace hf {
                     _angles[k] += ((k==1) ? -1 : +1) * _gyro[k] * _deltaSeconds; // negate pitch
                 }
 
+                // Convert lift to Gs
+                float accelZ = lift / -GRAVITY + 1;
+
                 /*
                 // Estimate G forces on accelerometer using Equations 2, 6-8 in
                 // https://www.nxp.com/docs/en/application-note/AN3461.pdf
                 float phi   = angles[0]; // roll
                 float theta = angles[1]; // pitch
-                accel[0] = accelZ * -sin(theta);              // accel X   
-                accel[1] = accelZ *  cos(theta) * sin(phi);   // accel Y   
-                accel[2] = accelZ *  cos(theta) * cos(phi);   // accel Z   
+                accel[0] = verticalAcceleration * -sin(theta);              // accel X   
+                accel[1] = verticalAcceleration *  cos(theta) * sin(phi);   // accel Y   
+                accel[2] = verticalAcceleration *  cos(theta) * cos(phi);   // accel Z   
                  */
 
                 // Convert vehicle's Z coordinate in meters to barometric pressure in Pascals (millibars)
