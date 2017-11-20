@@ -36,14 +36,14 @@ namespace hf {
             const float GRAVITY = 9.80665;
 
             // Scales up thrust to radians per second (substitutes for mass, torque, etc.)
-            const float THRUST_SCALE = 5.f;
+            const float THRUST_SCALE = 5;
 
             // Approxmiate zero for liftoff
             const float NOISE_FLOOR = 0.2;
 
             // Controls "snappiness" of response
             const float VELOCITY_ROTATE_SCALE    = 1.75;
-            const float VELOCITY_TRANSLATE_SCALE = 0.05f;
+            const float VELOCITY_TRANSLATE_SCALE = 0.05;
 
             // Time constant, set by simulator
             float _deltaSeconds;
@@ -55,6 +55,7 @@ namespace hf {
             float _angles[3];         // radians
             float _baroPressure;      // Pascals (milllibars)
             float _linearSpeeds[3];   // meters per second forward, lateral, vertical
+            float _verticalSpeedPrev; // meters per second
             float _motors[4];         // arbitrary in [0,1]
             float _altitude;          // meters
             bool _flying;
@@ -195,6 +196,7 @@ namespace hf {
                     _linearSpeeds[1] -= thrust * VELOCITY_TRANSLATE_SCALE * r12;
                 }
 
+
                 // Integrate vertical speed to get altitude
                 _altitude += _linearSpeeds[2] * _deltaSeconds;
 
@@ -206,17 +208,20 @@ namespace hf {
                     _angles[k] += ((k==1) ? -1 : +1) * _gyro[k] * _deltaSeconds; // negate pitch
                 }
 
-                // Convert lift to Gs
-                float accelZ = lift / -GRAVITY + 1;
+                // Convert lift to Gs.
+                float g = (_linearSpeeds[2]-_verticalSpeedPrev)/_deltaSeconds / -GRAVITY + 1;
+                _verticalSpeedPrev = _linearSpeeds[2];
+
+                dprintf("%+2.2f\n", g);
 
                 /*
                 // Estimate G forces on accelerometer using Equations 2, 6-8 in
                 // https://www.nxp.com/docs/en/application-note/AN3461.pdf
                 float phi   = angles[0]; // roll
                 float theta = angles[1]; // pitch
-                accel[0] = verticalAcceleration * -sin(theta);              // accel X   
-                accel[1] = verticalAcceleration *  cos(theta) * sin(phi);   // accel Y   
-                accel[2] = verticalAcceleration *  cos(theta) * cos(phi);   // accel Z   
+                accel[0] = g * -sin(theta);              // X   
+                accel[1] = g *  cos(theta) * sin(phi);   // Y   
+                accel[2] = g *  cos(theta) * cos(phi);   // Z   
                  */
 
                 // Convert vehicle's Z coordinate in meters to barometric pressure in Pascals (millibars)
