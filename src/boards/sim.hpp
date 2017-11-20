@@ -38,6 +38,9 @@ namespace hf {
             // Scales up thrust to radians per second (substitutes for mass, torque, etc.)
             const float THRUST_SCALE = 5.f;
 
+            // Approxmiate zero for liftoff
+            const float NOISE_FLOOR = 0.2;
+
             // Controls "snappiness" of response
             const float VELOCITY_ROTATE_SCALE    = 1.75;
             const float VELOCITY_TRANSLATE_SCALE = 0.05f;
@@ -178,7 +181,7 @@ namespace hf {
                 float lift = (r22 < 0 ? -1 : +1) * (r22*thrust - GRAVITY);
 
                 // Once there's enough lift, we're flying
-                if (lift > 0) {
+                if (lift > NOISE_FLOOR) {
                     _flying = true;
                 }
 
