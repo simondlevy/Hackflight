@@ -209,7 +209,7 @@ namespace hf {
                 }
 
                 // Convert lift to Gs.
-                float g = (_linearSpeeds[2]-_verticalSpeedPrev)/_deltaSeconds / -GRAVITY + 1;
+                float g = (_linearSpeeds[2]-_verticalSpeedPrev)/_deltaSeconds/ GRAVITY + 1;
                 _verticalSpeedPrev = _linearSpeeds[2];
 
                 dprintf("%+2.2f\n", g);
