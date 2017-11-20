@@ -208,21 +208,18 @@ namespace hf {
                     _angles[k] += ((k==1) ? -1 : +1) * _gyro[k] * _deltaSeconds; // negate pitch
                 }
 
-                // Convert lift to Gs.
+                // Differentiate vertical speed to get vertical acceleration in meters per second, then convert to Gs.
+                // Resting = 1G; freefall = 0; climbing = >1G
                 float g = (_linearSpeeds[2]-_verticalSpeedPrev)/_deltaSeconds/ GRAVITY + 1;
                 _verticalSpeedPrev = _linearSpeeds[2];
 
-                dprintf("%+2.2f\n", g);
-
-                /*
                 // Estimate G forces on accelerometer using Equations 2, 6-8 in
                 // https://www.nxp.com/docs/en/application-note/AN3461.pdf
-                float phi   = angles[0]; // roll
-                float theta = angles[1]; // pitch
-                accel[0] = g * -sin(theta);              // X   
-                accel[1] = g *  cos(theta) * sin(phi);   // Y   
-                accel[2] = g *  cos(theta) * cos(phi);   // Z   
-                 */
+                _accel[0] = g * -sin(theta);              // X   
+                _accel[1] = g *  cos(theta) * sin(phi);   // Y   
+                _accel[2] = g *  cos(theta) * cos(phi);   // Z   
+
+                dprintf("%+2.2f    %+2.2f    %+2.2f\n", _accel[0], _accel[1], _accel[2]);
 
                 // Convert vehicle's Z coordinate in meters to barometric pressure in Pascals (millibars)
                 // At low altitudes above the sea level, the pressure decreases by about 1200 Pa for every 100 meters
