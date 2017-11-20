@@ -219,8 +219,6 @@ namespace hf {
                 _accel[1] = g *  cos(theta) * sin(phi);   // Y   
                 _accel[2] = g *  cos(theta) * cos(phi);   // Z   
 
-                dprintf("%+2.2f    %+2.2f    %+2.2f\n", _accel[0], _accel[1], _accel[2]);
-
                 // Convert vehicle's Z coordinate in meters to barometric pressure in Pascals (millibars)
                 // At low altitudes above the sea level, the pressure decreases by about 1200 Pa for every 100 meters
                 // (See https://en.wikipedia.org/wiki/Atmospheric_pressure#Altitude_variation)
