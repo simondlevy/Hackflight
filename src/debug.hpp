@@ -44,14 +44,24 @@ static void _puts(char * buf) { printf("%s", buf); }
 static void _vsprintf(char * buf, const char * fmt, va_list ap) { vsprintf(buf, fmt, ap); }
 #endif
 
-static void dprintf(const char * fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-    char buf[200];
-    _vsprintf(buf, fmt, ap);
-    _puts(buf);
-    va_end(ap);
-}
+namespace hf {
+
+    class Debug {
+
+        public:
+
+            static void printf(const char * fmt, ...)
+            {
+                va_list ap;
+                va_start(ap, fmt);
+                char buf[200];
+                _vsprintf(buf, fmt, ap);
+                _puts(buf);
+                va_end(ap);
+            }
+
+    }; // class Debug
+
+} // namespace hf
 
 
