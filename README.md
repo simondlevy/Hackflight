@@ -31,7 +31,7 @@ write simpler code based on standard units:
 * Euler angles in radians
 * Accelerometer values in Gs
 * Gyrometer values in radians per second
-* Distances in meters
+* Distances in meters, velocities in meters per second
 * Axis demands (roll, pitch, yaw) in the interval [-1,+1]
 * Throttle demand in [0,1]
 * Motor demands in [0,1]

@@ -30,7 +30,7 @@ class Accelerometer {
 
         void  init(const AccelerometerConfig & _config, Board * _board);
         void  update(float eulerAnglesRadians[3], bool armed);
-        float getVelocity(uint32_t dTimeMicros);
+        float getVerticalVelocity(uint32_t dTimeMicros);
 
     private:
 
@@ -39,7 +39,7 @@ class Accelerometer {
         float    lpf[3];
         uint32_t previousTimeUsec;
         float    accelGsSmoothed[3];
-        float    zOffset;
+        float    verticalVelocity;
 
         static float rotate(float ned[3], float * angles);
 
@@ -64,8 +64,8 @@ void Accelerometer::init(const AccelerometerConfig & _config, Board * _board)
         lpf[k] = 0;
     }
 
+    verticalVelocity = 0;
     previousTimeUsec = 0;
-    zOffset = 0;
     accZ = 0;
 }
 
@@ -82,7 +82,7 @@ void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
     uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
     previousTimeUsec = currentTimeUsec;
 
-    // Smooth the raw values if indicated
+    // Smoothe the raw values if indicated
     for (uint8_t k=0; k<3; k++) {
         if (config.lpfFactor > 0) {
             lpf[k] = Filter::complementary(accelGs[k], lpf[k], config.lpfFactor);
@@ -92,14 +92,13 @@ void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
         }
     }
 
+    dprintf("s %f\n", accelGsSmoothed[2]); 
+
     // Rotate accel values into the earth frame
     float rotatedZ = Accelerometer::rotate(accelGsSmoothed, eulerAnglesRadians);
 
-    // Compute vertical acceleration offset at rest
-    if (!armed) {
-        zOffset = rotatedZ;
-    }
-    rotatedZ -= zOffset;
+    // Subtract 1G to get 0 acceleration at rest
+    rotatedZ -= 1;
 
     // Compute smoothed vertical acceleration
     float dT_sec = dT_usec * 1e-6f;
@@ -108,10 +107,12 @@ void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
 } // update
 
 
-float Accelerometer::getVelocity(uint32_t dTimeMicros)
+float Accelerometer::getVerticalVelocity(uint32_t dTimeMicros)
 {
-    // Integrate vertical acceleration to compute IMU velocity in cm/sec
-    return Filter::deadband(accZ, config.deadband) * 9.80665f / 10000.0f * dTimeMicros;
+    // Integrate vertical acceleration to compute IMU velocity in meters per second
+    verticalVelocity += Filter::deadband(accZ, config.deadband) * 9.80665f  * dTimeMicros/1e6;
+
+    return verticalVelocity;
 }
 
 float Accelerometer::rotate(float ned[3], float * angles)

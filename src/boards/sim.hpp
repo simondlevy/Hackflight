@@ -60,28 +60,12 @@ namespace hf {
             float _altitude;          // meters
             bool _flying;
 
-        // methods called by simulator
+            // methods called by simulator
         public:
 
             SimBoard(float deltaSeconds)
             {
                 _deltaSeconds = deltaSeconds;
-
-                for (uint8_t k=0; k<3; ++k) {
-                    _angles[k] = 0;
-                    _gyro[k] = 0;
-                    _accel[k] = 0;
-                    _linearSpeeds[k] = 0;
-                }
-
-                for (uint8_t k=0; k<4; ++k) {
-                    _motors[k] = 0;
-                }
-
-                _flying = false;
-                _altitude = 0;
-                _baroPressure = 0;
-                _micros = 0;
             }
 
             void getState(float angularSpeeds[3], float linearSpeeds[3], float motors[4], bool & flying)
@@ -98,13 +82,16 @@ namespace hf {
                 flying = _flying;
             }
 
-        // methods called by Hackflight
+            // methods called by Hackflight
         public:
 
             void init(Config& config)
             {
                 // Loop timing overrides
                 config.loop.imuLoopMicro = 1e6 * _deltaSeconds;
+
+                initPhysics();
+
             }
 
             bool skipArming(void)
@@ -149,13 +136,33 @@ namespace hf {
 
             virtual void extrasImuGetAccel(float accelGs[3])
             {
-                for (uint8_t k = 0; k<3; ++k) {
-                    accelGs[k] = 1.f; // XXX
+                for (uint8_t k=0; k<3; ++k) {
+                    accelGs[k] = _accel[k];
                 }
             }
 
-        // private methods
+            // private methods
         private:
+
+            void initPhysics(void)
+            {
+                for (uint8_t k=0; k<3; ++k) {
+                    _angles[k] = 0;
+                    _gyro[k] = 0;
+                    _accel[k] = 0;
+                    _linearSpeeds[k] = 0;
+                }
+
+                for (uint8_t k=0; k<4; ++k) {
+                    _motors[k] = 0;
+                }
+
+                _flying = false;
+                _altitude = 0;
+                _baroPressure = 0;
+                _micros = 0;
+                _verticalSpeedPrev = 0;
+            }
 
             void updatePhysics(void)
             {
