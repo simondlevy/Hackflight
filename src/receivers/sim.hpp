@@ -83,7 +83,7 @@ namespace hf {
             bool         _reversedVerticals;
             bool         _springyThrottle;
             float        _throttleDemand;
-            uint8_t      _axismap[5];
+            uint8_t      _axismap[5]; // Thr, Ael, Ele, Rud, Aux
             int          _joyid; // Linux file descriptor or Windows joystick ID
 
             void poll(float * demands)
@@ -252,6 +252,7 @@ void hf::Controller::productInit(void)
             _axismap[1] = 1;
             _axismap[2] = 2;
             _axismap[3] = 3;
+            _axismap[4] = 4;
         }
         else if (strstr(prodname, "Horizon Hobby SPEKTRUM")) {
             _axismap[0] = 1;

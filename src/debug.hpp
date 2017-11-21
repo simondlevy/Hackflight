@@ -40,7 +40,7 @@ static void _vsprintf(char * buf, const char * fmt, va_list ap) { vsprintf_s(buf
 // Unix
 #else                 
 #include <stdio.h>
-static void _puts(char * buf) { puts(buf); }
+static void _puts(char * buf) { printf("%s", buf); }
 static void _vsprintf(char * buf, const char * fmt, va_list ap) { vsprintf(buf, fmt, ap); }
 #endif
 
