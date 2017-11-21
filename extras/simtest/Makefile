@@ -17,7 +17,7 @@
 all: simtest
 
 simtest: simtest.cpp ../../src/receivers/sim.hpp
-	g++ -Wall -I../../src/ -o simtest simtest.cpp
+	g++ -std=c++11 -Wall -I../../src/ -o simtest simtest.cpp
 
 run: simtest
 	./simtest
