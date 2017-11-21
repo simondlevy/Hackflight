@@ -94,11 +94,6 @@ namespace hf {
 
             }
 
-            bool skipArming(void)
-            {
-                return true;
-            }
-
             void getImu(float eulerAnglesRadians[3], float gyroRadiansPerSecond[3])
             {
                 for (uint8_t k=0; k<3; ++k) {

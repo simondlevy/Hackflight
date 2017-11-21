@@ -30,20 +30,6 @@
 #include "model.hpp"
 #include "debug.hpp"
 
-// For logical combinations of stick positions (low, center, high)
-#define ROL_LO (1 << (2 * DEMAND_ROLL))
-#define ROL_CE (3 << (2 * DEMAND_ROLL))
-#define ROL_HI (2 << (2 * DEMAND_ROLL))
-#define PIT_LO (1 << (2 * DEMAND_PITCH))
-#define PIT_CE (3 << (2 * DEMAND_PITCH))
-#define PIT_HI (2 << (2 * DEMAND_PITCH))
-#define YAW_LO (1 << (2 * DEMAND_YAW))
-#define YAW_CE (3 << (2 * DEMAND_YAW))
-#define YAW_HI (2 << (2 * DEMAND_YAW))
-#define THR_LO (1 << (2 * DEMAND_THROTTLE))
-#define THR_CE (3 << (2 * DEMAND_THROTTLE))
-#define THR_HI (2 << (2 * DEMAND_THROTTLE))
-
 namespace hf {
 
 class Hackflight {
@@ -119,9 +105,9 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     // Initialize altitude estimator, which will be used if there's a barometer
     alti.init(config.altitude, board, _model);
 
-    // Start in unarmed mode, except for simulator
-    armed = board->skipArming();
-    safeToArm = board->skipArming();
+    // Start unarmed
+    armed = false;
+    safeToArm = false;
 
 } // init
 
@@ -174,9 +160,9 @@ void Hackflight::updateRc(void)
         if (armed) {      
 
             // Disarm on throttle down + yaw
-            if (receiver->sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE) {
+            if (receiver->sticks == Receiver::THR_LO + Receiver::YAW_LO + Receiver::PIT_CE + Receiver::ROL_CE) {
                 if (armed) {
-                    armed = board->skipArming();
+                    armed = false;
                 }
             }
 
@@ -184,9 +170,11 @@ void Hackflight::updateRc(void)
         } else {         
 
             // Arm via throttle-low / yaw-right
-            if (receiver->sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE) {
+            if (receiver->sticks == Receiver::THR_LO + Receiver::YAW_HI + Receiver::PIT_CE + Receiver::ROL_CE) {
+    
                 if (safeToArm) {
                     auxState = receiver->getAuxState();
+
                     if (!auxState) // aux switch must be in zero position
                         if (!armed) {
                             armed = true;

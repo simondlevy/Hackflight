@@ -31,6 +31,22 @@ namespace hf {
 
 class Receiver {
 
+// For logical combinations of stick positions (low, center, high)
+public:
+
+    static const uint8_t ROL_LO = (1 << (2 * DEMAND_ROLL));
+    static const uint8_t ROL_CE = (3 << (2 * DEMAND_ROLL));
+    static const uint8_t ROL_HI = (2 << (2 * DEMAND_ROLL));
+    static const uint8_t PIT_LO = (1 << (2 * DEMAND_PITCH));
+    static const uint8_t PIT_CE = (3 << (2 * DEMAND_PITCH));
+    static const uint8_t PIT_HI = (2 << (2 * DEMAND_PITCH));
+    static const uint8_t YAW_LO = (1 << (2 * DEMAND_YAW));
+    static const uint8_t YAW_CE = (3 << (2 * DEMAND_YAW));
+    static const uint8_t YAW_HI = (2 << (2 * DEMAND_YAW));
+    static const uint8_t THR_LO = (1 << (2 * DEMAND_THROTTLE));
+    static const uint8_t THR_CE = (3 << (2 * DEMAND_THROTTLE));
+    static const uint8_t THR_HI = (2 << (2 * DEMAND_THROTTLE));
+
 protected: 
 
     // These must be overridden for each receiver

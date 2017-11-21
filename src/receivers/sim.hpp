@@ -83,7 +83,7 @@ namespace hf {
             bool         _reversedVerticals;
             bool         _springyThrottle;
             float        _throttleDemand;
-            uint8_t      _axismap[4];
+            uint8_t      _axismap[5];
             int          _joyid; // Linux file descriptor or Windows joystick ID
 
             void poll(float * demands)
@@ -94,7 +94,7 @@ namespace hf {
                 productPoll(axes);
 
                 // normalize the axes to demands in [-1,+1]
-                for (uint8_t k=0; k<4; ++k) {
+                for (uint8_t k=0; k<5; ++k) {
                     demands[k] = (axes[_axismap[k]] - productGetBaseline()) / 32767.f;
                 }
 
@@ -119,9 +119,6 @@ namespace hf {
                 else {
                     _throttleDemand = demands[0];
                 }
-
-                printf("T:%f A:%f E:%f R:%f\n", _throttleDemand, demands[1], demands[2], demands[3]);
-                
             }
 
     }; // class Controller
@@ -171,6 +168,7 @@ void hf::Controller::productInit(void)
                 _axismap[1] =   2;
                 _axismap[2] =   5;
                 _axismap[3] =   0;
+                _axismap[4] =   4;
             }
         }
 

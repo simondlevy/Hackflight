@@ -41,9 +41,6 @@ class Board {
         virtual uint8_t  serialReadByte(void)  { return 0; }
         virtual void     serialWriteByte(uint8_t c) { (void)c; }
 
-    //------------------------------------------ Simulation  ----------------------------------------------------
-        virtual bool     skipArming(void) { return false; }
-
     //------------------------------------------ Extras ---------------------------------------------------------
         virtual bool    extrasHaveBaro(void) { return false; }
         virtual float   extrasGetBaroPressure(void) { return 0; }

@@ -66,6 +66,7 @@ class Altitude {
 
         // Microsecond dt for velocity computations
         uint32_t updateTime(void);
+        uint32_t previousT;
 };
 
 /********************************************* CPP ********************************************************/
@@ -86,6 +87,7 @@ void Altitude::init(const AltitudeConfig & _config, Board * _board, Model * _mod
     holdingAltitude = false;
     errorAltitudeI = 0;
     velocity = 0;
+    previousT = 0;
 }
 
 void Altitude::start(float throttleDemand)
@@ -129,8 +131,6 @@ void Altitude::computePid(bool armed)
     // Get estimated vertical velocity from accelerometer
     velocity = accel.getVerticalVelocity(dTimeMicros);
 
-    //dprintf("%+2.2f ****\n", velocity);
-
     // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
     // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
     // i.e without delay.
@@ -161,7 +161,6 @@ void Altitude::updateAccelerometer(float eulerAnglesRadians[3], bool armed)
 
 uint32_t Altitude::updateTime(void)
 {
-    static uint32_t previousT;
     uint32_t currentT = (uint32_t)board->getMicros();
     uint32_t dTimeMicros = currentT - previousT;
     previousT = currentT;

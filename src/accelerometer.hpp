@@ -40,6 +40,7 @@ class Accelerometer {
         uint32_t previousTimeUsec;
         float    accelGsSmoothed[3];
         float    verticalVelocity;
+        float    zOffset;
 
         static float rotate(float ned[3], float * angles);
 
@@ -67,6 +68,7 @@ void Accelerometer::init(const AccelerometerConfig & _config, Board * _board)
     verticalVelocity = 0;
     previousTimeUsec = 0;
     accZ = 0;
+    zOffset = 0;
 }
 
 void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
@@ -92,13 +94,15 @@ void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
         }
     }
 
-    dprintf("s %f\n", accelGsSmoothed[2]); 
-
     // Rotate accel values into the earth frame
     float rotatedZ = Accelerometer::rotate(accelGsSmoothed, eulerAnglesRadians);
 
-    // Subtract 1G to get 0 acceleration at rest
-    rotatedZ -= 1;
+    if (!armed) {
+        zOffset = rotatedZ;
+    }
+
+    // Subtract rest acceleration to get zero acceleration
+    rotatedZ -= zOffset;
 
     // Compute smoothed vertical acceleration
     float dT_sec = dT_usec * 1e-6f;
