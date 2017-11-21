@@ -31,18 +31,23 @@ class Ladybug : public Board {
 
     private:
 
+        static const uint8_t  ACCEL_RES = 8;    // Gs
+        static const uint16_t GYRO_RES  = 2000; // degrees per second
+        static const uint16_t MAG_RES   = 2000; // Tesla
+
         uint8_t _motorPins[4] = {13, A2, 3, 11};
 
         float _eulerAnglesRadians[3];
 
         EM7180 _sentral;
 
-        static const uint16_t GYRO_RES_DEGREES_PER_SECOND = 2000;
-
     protected:
 
         virtual void init(Config &config) override
         {
+            // Use default configuration
+            (void)config;
+
             // Begin serial comms
             Serial.begin(115200);
 
@@ -56,8 +61,8 @@ class Ladybug : public Board {
             // Hang a bit before starting up the EM7180
             delay(100);
 
-            // Start the EM7180: ranges = accel +/-8G, gyro +/-2000 deg/sec; mag +/-1000 Tesla
-            uint8_t status = _sentral.begin(8, 2000, 1000);
+            // Start the EM7180
+            uint8_t status = _sentral.begin(ACCEL_RES, GYRO_RES, MAG_RES);
             while (status) {
                 Serial.println(EM7180::errorToString(status));
             }
@@ -149,8 +154,8 @@ class Ladybug : public Board {
             gyroRaw[2] = -gyroRaw[2];
 
             for (uint8_t k=0; k<3; ++k) {
-                gyroRadiansPerSecond[k] = (float)GYRO_RES_DEGREES_PER_SECOND * gyroRaw[k] / (1<<15); // raw to degrees
-                gyroRadiansPerSecond[k] = M_PI * gyroRadiansPerSecond[k] / 180.; // degrees to radians
+                gyroRadiansPerSecond[k] = (float)GYRO_RES * gyroRaw[k] / (1<<15); // raw to degrees
+                gyroRadiansPerSecond[k] = M_PI * gyroRadiansPerSecond[k] / 180.;  // degrees to radians
             }
         }
 
@@ -171,7 +176,7 @@ class Ladybug : public Board {
             int16_t accelRaw[3];
             _sentral.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
             for (uint8_t k=0; k<3; ++k) {
-                accelGs[k] = accelRaw[k] / 2048.f;
+                accelGs[k] = (accelRaw[k]-2048.) / (1<<15) * ACCEL_RES + 1;
             }
         }
 
