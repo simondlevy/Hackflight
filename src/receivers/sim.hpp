@@ -144,7 +144,7 @@ void hf::Controller::productInit(void)
     JOYCAPS joycaps;
 
 	// Grab the first available joystick
-	for (_joyid=1; _joyid<16; _joyid++)
+	for (_joyid=0; _joyid<16; _joyid++)
 		if (joyGetDevCaps(_joyid, &joycaps, sizeof(joycaps)) == JOYERR_NOERROR)
 			break;
 
@@ -154,6 +154,9 @@ void hf::Controller::productInit(void)
         uint16_t vendorId  = joycaps.wMid;
         uint16_t productId = joycaps.wPid;
 
+        // axes: 0=Thr 1=Ael 2=Ele 3=Rud 4=Aux
+        // JOYINFOEX: 0=dwXpos 1=dwYpos 2=dwZpos 3=dwRpos 4=dwUpos 5=dwVpos
+
         // R/C transmitter
         if (vendorId == VENDOR_STM) {
 
@@ -161,7 +164,8 @@ void hf::Controller::productInit(void)
                 _axismap[0] =   0;
                 _axismap[1] =   1;
                 _axismap[2] =   2;
-                _axismap[3] =   3;
+                _axismap[3] =   5;
+                _axismap[4] =   3;
             }
             else { // Spektrum
                 _axismap[0] =   1;
