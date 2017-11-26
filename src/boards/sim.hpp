@@ -91,8 +91,9 @@ namespace hf {
                 // Loop timing overrides
                 config.loop.imuLoopMicro = 1e6 * _deltaSeconds;
 
-                initPhysics();
+                _micros = 0;
 
+                initPhysics();
             }
 
             void getImu(float eulerAnglesRadians[3], float gyroRadiansPerSecond[3])
@@ -156,7 +157,6 @@ namespace hf {
                 _flying = false;
                 _altitude = 0;
                 _baroPressure = 0;
-                _micros = 0;
                 _verticalSpeedPrev = 0;
             }
 
@@ -207,7 +207,7 @@ namespace hf {
 
                 // Reset everything if we hit the ground
                 if (_altitude < 0) {
-                    //initPhysics();
+                    initPhysics();
                 }
 
                 // Track time
