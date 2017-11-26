@@ -46,9 +46,6 @@ namespace hf {
             const float VELOCITY_ROTATE_SCALE    = 1.75;
             const float VELOCITY_TRANSLATE_SCALE = 0.05;
 
-            // Time constant, set by simulator --------------------
-            float _deltaSeconds;
-
             // Private state variables ----------------------------
             float _accel[3];          // Gs
             float _gyro[3];           // radians per second
@@ -59,15 +56,11 @@ namespace hf {
             float _motors[4];         // arbitrary in [0,1]
             float _altitude;          // meters
             bool _flying;
+            float _secondsPrev;
 
         public:
 
             // methods called by simulator -------------------------------------------------
-
-            SimBoard(float deltaSeconds)
-            {
-                _deltaSeconds = deltaSeconds;
-            }
 
             void getState(float angularSpeeds[3], float linearSpeeds[3], float motors[4], bool & flying)
             {
@@ -87,6 +80,7 @@ namespace hf {
 
             void init(void)
             {
+                _secondsPrev = 0;
                 initPhysics();
             }
 
@@ -178,6 +172,11 @@ namespace hf {
                 // will upside-down vehicle rise on negative velocity.
                 float lift = (r22 < 0 ? -1 : +1) * (r22*thrust - GRAVITY);
 
+                // Compute delta seconds
+                float secondsCurr = seconds();
+                float deltaSeconds = secondsCurr - _secondsPrev;
+                _secondsPrev = secondsCurr;
+
                 // Once there's enough lift, we're flying
                 if (lift > NOISE_FLOOR) {
                     _flying = true;
@@ -186,7 +185,7 @@ namespace hf {
                 if (_flying) {
 
                     // Integrate vertical force to get vertical speed
-                    _linearSpeeds[2] += (lift * _deltaSeconds);
+                    _linearSpeeds[2] += (lift * deltaSeconds);
 
                     // To get forward and lateral speeds, integrate thrust along world coordinates
                     _linearSpeeds[0] += thrust * VELOCITY_TRANSLATE_SCALE * r02;
@@ -195,7 +194,7 @@ namespace hf {
 
 
                 // Integrate vertical speed to get altitude
-                _altitude += _linearSpeeds[2] * _deltaSeconds;
+                _altitude += _linearSpeeds[2] * deltaSeconds;
 
                 // Reset everything if we hit the ground
                 if (_altitude < 0) {
@@ -204,12 +203,12 @@ namespace hf {
 
                 // Update state
                 for (int k=0; k<3; ++k) {
-                    _angles[k] += ((k==1) ? -1 : +1) * _gyro[k] * _deltaSeconds; // negate pitch
+                    _angles[k] += ((k==1) ? -1 : +1) * _gyro[k] * deltaSeconds; // negate pitch
                 }
 
                 // Differentiate vertical speed to get vertical acceleration in meters per second, then convert to Gs.
                 // Resting = 1G; freefall = 0; climbing = >1G
-                float g = (_linearSpeeds[2]-_verticalSpeedPrev)/_deltaSeconds/ GRAVITY + 1;
+                float g = (_linearSpeeds[2]-_verticalSpeedPrev)/deltaSeconds/ GRAVITY + 1;
                 _verticalSpeedPrev = _linearSpeeds[2];
 
                 // Estimate G forces on accelerometer using Equations 2, 6-8 in

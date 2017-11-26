@@ -24,12 +24,10 @@
 #include <time.h>
 #include <stdio.h>
 
-static const float DELTA_SEC = .01;
-
 int main(int argc, char ** argv)
 {
     hf::Hackflight h;
-    hf::SimBoard  board(DELTA_SEC);
+    hf::SimBoard  board;
     hf::Controller controller;
     hf::ThreeDFly  model;
 
