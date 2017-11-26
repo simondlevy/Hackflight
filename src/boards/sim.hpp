@@ -50,7 +50,6 @@ namespace hf {
             float _deltaSeconds;
 
             // Private state variables ----------------------------
-            uint64_t _micros;
             float _accel[3];          // Gs
             float _gyro[3];           // radians per second
             float _angles[3];         // radians
@@ -88,8 +87,6 @@ namespace hf {
 
             void init(void)
             {
-                _micros = 0;
-
                 initPhysics();
             }
 
@@ -106,7 +103,7 @@ namespace hf {
 
             uint64_t getMicros()
             {
-                return _micros;
+                return micros();
             }
 
             void writeMotor(uint8_t index, float value)
@@ -205,9 +202,6 @@ namespace hf {
                     initPhysics();
                 }
 
-                // Track time
-                _micros += 1e6 * _deltaSeconds;
-
                 // Update state
                 for (int k=0; k<3; ++k) {
                     _angles[k] += ((k==1) ? -1 : +1) * _gyro[k] * _deltaSeconds; // negate pitch
@@ -235,6 +229,18 @@ namespace hf {
             {
                 return VELOCITY_ROTATE_SCALE * ((_motors[a] + _motors[b]) - (_motors[c] + _motors[d]));
             }
+
+            // OS-specific timing routine -------------------------------
+#ifdef _WIN32
+#else
+#include <time.h>
+            uint64_t micros()
+            {
+                struct timespec t;
+                clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t);
+                return 1000000*t.tv_sec + t.tv_nsec/1000;
+            }
+#endif
 
     }; // class SimBoard
 

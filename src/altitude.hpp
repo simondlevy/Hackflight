@@ -115,7 +115,7 @@ void Altitude::computePid(bool armed)
 {  
     // Refresh the timer
     uint32_t dTimeMicros = updateTime();
- 
+
     // Update the baro with the current pressure reading
     baro.update();
 
@@ -128,7 +128,7 @@ void Altitude::computePid(bool armed)
     // Get estimated altitude from barometer
     baroAlt = baro.getAltitude();
 
-    Debug::printf("%f\n", baroAlt);
+    //Debug::printf("%f\n", baroAlt);
 
     // Get estimated vertical velocity from accelerometer
     velocity = accel.getVerticalVelocity(dTimeMicros);
