@@ -196,10 +196,10 @@ void Hackflight::updateRc(void)
         auxState = receiver->getAuxState();
         if (board->extrasHaveBaro()) {
             if (auxState > 0) {
-                //alti.start(receiver->demandThrottle);
+                alti.start(receiver->demandThrottle);
             }
             else {
-                //alti.stop();
+                alti.stop();
             }
         }
     }
@@ -224,8 +224,7 @@ void Hackflight::updateImu(void)
 
     // If barometer avaialble, update accelerometer for altitude fusion, then modify throttle demand
     if (board->extrasHaveBaro()) {
-        alti.updateAccelerometer(eulerAnglesRadians, armed);
-        //alti.modifyThrottleDemand(receiver->demandThrottle);
+        alti.modifyThrottleDemand(eulerAnglesRadians, armed, receiver->demandThrottle);
     }
 
     // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.

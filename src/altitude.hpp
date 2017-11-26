@@ -39,8 +39,7 @@ class Altitude {
         void start(float throttleDemand);
         void stop(void);
         void computePid(bool armed);
-        void updateAccelerometer(float eulerAnglesRadians[3], bool armed);
-        void modifyThrottleDemand(float & throttleDemand);
+        void modifyThrottleDemand(float eulerAnglesRadians[3], bool armed, float & throttleDemand);
 
     private:
 
@@ -92,6 +91,7 @@ void Altitude::init(const AltitudeConfig & _config, Board * _board, Model * _mod
 
 void Altitude::start(float throttleDemand)
 {
+    Debug::printf("start\n");
     holdingAltitude = true;
     initialThrottleHold = throttleDemand;
     altHold = baroAlt;
@@ -101,13 +101,18 @@ void Altitude::start(float throttleDemand)
 
 void Altitude::stop(void)
 {
+    Debug::printf("stop\n");
     holdingAltitude = false;
 }
 
-void Altitude::modifyThrottleDemand(float & throttleDemand)
+void Altitude::modifyThrottleDemand(float eulerAnglesRadians[3], bool armed, float & throttleDemand)
 {
+    // Throttle modification is synched to aquisition of new IMU data
+    accel.update(eulerAnglesRadians, armed);
+
     if (holdingAltitude) {
-        throttleDemand = Filter::constrainMinMax(initialThrottleHold + pid, config.throttleMin, config.throttleMax);
+        throttleDemand = Filter::constrainMinMax(initialThrottleHold + pid, config.throttleMargin, 1-config.throttleMargin);
+        Debug::printf("%+2.2f\n", throttleDemand);
     }
 }
 
@@ -127,8 +132,6 @@ void Altitude::computePid(bool armed)
 
     // Get estimated altitude from barometer
     baroAlt = baro.getAltitude();
-
-    Debug::printf("%f\n", baroAlt);
 
     // Get estimated vertical velocity from accelerometer
     velocity = accel.getVerticalVelocity(dTimeMicros);
@@ -154,12 +157,6 @@ void Altitude::computePid(bool armed)
     pid -= Filter::constrainAbs(model->altD * vario, config.pidMax);
 
 } // computePid
-
-void Altitude::updateAccelerometer(float eulerAnglesRadians[3], bool armed)
-{
-    // Throttle modification is synched to aquisition of new IMU data
-    accel.update(eulerAnglesRadians, armed);
-}
 
 uint32_t Altitude::updateTime(void)
 {

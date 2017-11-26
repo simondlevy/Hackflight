@@ -107,11 +107,8 @@ struct AltitudeConfig {
     float    cfAlt                  = 0.965f;
     float    cfVel                  = 0.985f;
 
-    // Fused
-    uint8_t  maxTiltAngle           = 80;
-    uint8_t  throttleNeutral        = 40;
-    uint16_t throttleMin            = 1150;
-    uint16_t throttleMax            = 1850;
+    // Keeps PID adjustment inside range
+    uint16_t throttleMargin         = 0.15;
 };
 
 //=========================================================================
