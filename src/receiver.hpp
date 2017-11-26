@@ -114,6 +114,7 @@ void Receiver::update()
     if (useSerial()) {
         for (uint8_t chan = 0; chan < 5; chan++) {
             rawvals[chan] = readChannel(chan);
+            //Debug::printf("%d:%f%c", chan, rawvals[chan], chan==4?'\n':'\t');
         }
     }
 
