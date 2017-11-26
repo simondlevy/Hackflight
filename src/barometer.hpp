@@ -94,7 +94,7 @@ float Barometer::getAltitude(void)
 {
     float alt_tmp = pascalsToMeters(pressureSum/(BarometerConfig::HISTORY_SIZE-1)); 
     alt_tmp -= groundAltitude;
-    alt = lrintf(alt * config.noiseLpf + alt_tmp * (1.0f - config.noiseLpf));
+    alt = alt * config.noiseLpf + alt_tmp * (1.0f - config.noiseLpf);
 
     return alt;
 }

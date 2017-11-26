@@ -200,9 +200,6 @@ namespace hf {
                 }
 
 
-                Debug::printf("%f\n", _linearSpeeds[2]);
-
-
                 // Integrate vertical speed to get altitude
                 _altitude += _linearSpeeds[2] * _deltaSeconds;
 
