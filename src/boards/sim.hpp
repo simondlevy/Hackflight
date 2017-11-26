@@ -103,7 +103,7 @@ namespace hf {
 
             uint64_t getMicros()
             {
-                return micros();
+                return (uint64_t)(seconds() * 1000000);
             }
 
             void writeMotor(uint8_t index, float value)
@@ -234,11 +234,11 @@ namespace hf {
 #ifdef _WIN32
 #else
 #include <time.h>
-            uint64_t micros()
+            float seconds()
             {
                 struct timespec t;
                 clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t);
-                return 1000000*t.tv_sec + t.tv_nsec/1000;
+                return t.tv_sec + t.tv_nsec/1.e9;
             }
 #endif
 
