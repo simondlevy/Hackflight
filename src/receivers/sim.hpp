@@ -42,12 +42,10 @@ namespace hf {
 
             Controller(void)
             {
+                _reversedVerticals = false;
                 _springyThrottle = false;
+                _useButtonForAux = false;
                 _joyid = 0;
-
-                for (uint8_t k=0; k<5; ++k) {
-                    _axisdir[k] = +1;
-                }
             }
 
             void begin(void)
@@ -83,10 +81,11 @@ namespace hf {
             void     productPoll(int32_t axes[6]);
             int32_t  productGetBaseline(void);
 
+            bool     _reversedVerticals;
             bool     _springyThrottle;
+            bool     _useButtonForAux;
             float    _throttleDemand;
             uint8_t  _axismap[5];   // Thr, Ael, Ele, Rud, Aux
-            int8_t   _axisdir[5];   
             int      _joyid;        // Linux file descriptor or Windows joystick ID
 
             void poll(float * demands)
@@ -98,7 +97,18 @@ namespace hf {
 
                 // normalize the axes to demands in [-1,+1]
                 for (uint8_t k=0; k<5; ++k) {
-                    demands[k] = _axisdir[k] *(axes[_axismap[k]] - productGetBaseline()) / 32767.f;
+                    demands[k] = (axes[_axismap[k]] - productGetBaseline()) / 32767.f;
+                }
+
+                // invert throttle, pitch if indicated
+                if (_reversedVerticals) {
+                    demands[0] = -demands[0];
+                    demands[2] = -demands[2];
+                }
+
+                // for game controllers, use buttons for aux
+                if (_useButtonForAux) {
+                    demands[4] = -1; // XXX for now, disallow aux switch
                 }
 
                 // game-controller spring-mounted throttle requires special handling
@@ -169,6 +179,8 @@ void hf::Controller::productInit(void)
 
         else {
 
+            _reversedVerticals = true;
+
             switch (vendorId) {
 
                 case VENDOR_SONY:      // PS3
@@ -177,6 +189,7 @@ void hf::Controller::productInit(void)
                     _axismap[2] = 3;
                     _axismap[3] = 0;
                     _springyThrottle = true;
+                    _useButtonForAux = true;
                     break;
 
                 case VENDOR_MICROSOFT: // XBox 360
@@ -185,6 +198,7 @@ void hf::Controller::productInit(void)
                     _axismap[2] = 3;
                     _axismap[3] = 0;
                     _springyThrottle = true;
+                    _useButtonForAux = true;
                     break;
 
                 case VENDOR_LOGITECH:  // Extreme Pro 3D
@@ -192,6 +206,7 @@ void hf::Controller::productInit(void)
                     _axismap[1] = 0;
                     _axismap[2] = 1;
                     _axismap[3] = 3;
+                    _useButtonForAux = true;
                     break;
             }
 
@@ -258,23 +273,26 @@ void hf::Controller::productInit(void)
             _axismap[1] = 0;
             _axismap[2] = 1;
             _axismap[3] = 2;
+            _reversedVerticals = true;
+            _useButtonForAux = true;
         }
         else if (strstr(prodname, "Generic X-Box pad")) {
             _axismap[0] =  1;
             _axismap[1] =  3;
             _axismap[2] =  4;
             _axismap[3] =  0;
-            _axisdir[0] =  -1;
-            _axisdir[2] =  -1;
-            _axisdir[3] =  -1;
+            _reversedVerticals = true;
             _springyThrottle = true;
+            _useButtonForAux = true;
         }
         else { // default to PS3
             _axismap[0] = 1;
             _axismap[1] = 2;
             _axismap[2] = 3;
             _axismap[3] = 0;
+            _reversedVerticals = true;
             _springyThrottle = true;
+            _useButtonForAux = true;
         }
     }
 }

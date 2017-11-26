@@ -152,6 +152,7 @@ void Hackflight::updateRc(void)
     Debug::printf("%+2.2f  %+2.2f  %+2.2f  %+2.2f %d\n",
            receiver->demandThrottle, receiver->demandRoll, receiver->demandPitch, receiver->demandYaw,
           receiver->getAuxState());*/
+    //Debug::printf("%d\n", armed);
 
     // When landed, reset integral component of PID
     if (receiver->throttleIsDown()) {
