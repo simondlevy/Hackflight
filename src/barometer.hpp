@@ -49,7 +49,7 @@ class Barometer {
         float   lastAlt;
         float   pressureSum;
 
-        static float pascalsToMeters(float pa);
+        static float millibarsToMeters(float pa);
 };
 
 /********************************************* CPP ********************************************************/
@@ -76,12 +76,14 @@ void Barometer::calibrate(void)
 {
     groundPressure -= groundPressure / 8;
     groundPressure += pressureSum / (BarometerConfig::HISTORY_SIZE - 1);
-    groundAltitude = pascalsToMeters(groundPressure/8);
+    groundAltitude = millibarsToMeters(groundPressure/8);
 }
 
 void Barometer::update()
 {
     float pressure = board->extrasGetBaroPressure();
+
+    //Debug::printf("%f\n", pressure);
 
     uint8_t indexplus1 = (historyIdx + 1) % BarometerConfig::HISTORY_SIZE;
     history[historyIdx] = pressure;
@@ -92,7 +94,7 @@ void Barometer::update()
 
 float Barometer::getAltitude(void)
 {
-    float alt_tmp = pascalsToMeters(pressureSum/(BarometerConfig::HISTORY_SIZE-1)); 
+    float alt_tmp = millibarsToMeters(pressureSum/(BarometerConfig::HISTORY_SIZE-1)); 
     alt_tmp -= groundAltitude;
     alt = alt * config.noiseLpf + alt_tmp * (1.0f - config.noiseLpf);
 
@@ -109,10 +111,10 @@ float Barometer::getVelocity(uint32_t dTimeMicros)
 }
 
 
-// Pressure in Pascals to altitude in meters
-float Barometer::pascalsToMeters(float pa)
+// Pressure in millibars to altitude in meters
+float Barometer::millibarsToMeters(float pa)
 {
-    return (1.0f - powf(pa / 101325.0f, 0.190295f)) * 44330.0f;
+    return (1.0f - powf(pa / 1013.25f, 0.190295f)) * 44330.0f;
 }
 
 } // namespace hf

@@ -54,7 +54,7 @@ namespace hf {
             float _accel[3];          // Gs
             float _gyro[3];           // radians per second
             float _angles[3];         // radians
-            float _baroPressure;      // Pascals (milllibars)
+            float _baroPressure;      // millibars
             float _linearSpeeds[3];   // meters per second forward, lateral, vertical
             float _verticalSpeedPrev; // meters per second
             float _motors[4];         // arbitrary in [0,1]
@@ -203,6 +203,13 @@ namespace hf {
                 // Integrate vertical speed to get altitude
                 _altitude += _linearSpeeds[2] * _deltaSeconds;
 
+                Debug::printf("%f\n", _altitude);
+
+                // Reset everything if we hit the ground
+                if (_altitude < 0) {
+                    //initPhysics();
+                }
+
                 // Track time
                 _micros += 1e6 * _deltaSeconds;
 
@@ -222,10 +229,11 @@ namespace hf {
                 _accel[1] = g *  cos(theta) * sin(phi);   // Y   
                 _accel[2] = g *  cos(theta) * cos(phi);   // Z   
 
-                // Convert vehicle's Z coordinate in meters to barometric pressure in Pascals (millibars)
-                // At low altitudes above the sea level, the pressure decreases by about 1200 Pa for every 100 meters
-                // (See https://en.wikipedia.org/wiki/Atmospheric_pressure#Altitude_variation)
-                _baroPressure = 1000 * (101.325 - 1.2 * _altitude / 100);
+                // Convert vehicle's Z coordinate in meters to barometric pressure in millibars
+                // At low altitudes above the sea level, the pressure decreases
+                // by about 12 millbars (1.2kPascals) for every 100 meters (See
+                // https://en.wikipedia.org/wiki/Atmospheric_pressure#Altitude_variation)
+                _baroPressure = 1013.25 - 12 * _altitude / 100;
             }
 
             float motorsToAngularVelocity(int a, int b, int c, int d)

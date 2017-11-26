@@ -24,7 +24,7 @@
 #include <time.h>
 #include <stdio.h>
 
-static const float DELTA_SEC = .001;
+static const float DELTA_SEC = .01;
 
 static float getsec(void)
 {

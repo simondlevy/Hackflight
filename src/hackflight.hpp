@@ -148,12 +148,6 @@ void Hackflight::updateRc(void)
     // Update Receiver channels
     receiver->update();
 
-    /*
-    Debug::printf("%+2.2f  %+2.2f  %+2.2f  %+2.2f %d\n",
-           receiver->demandThrottle, receiver->demandRoll, receiver->demandPitch, receiver->demandYaw,
-          receiver->getAuxState());*/
-    //Debug::printf("%d\n", armed);
-
     // When landed, reset integral component of PID
     if (receiver->throttleIsDown()) {
         stab.resetIntegral();
@@ -228,11 +222,6 @@ void Hackflight::updateImu(void)
         alti.updateAccelerometer(eulerAnglesRadians, armed);
         //alti.modifyThrottleDemand(receiver->demandThrottle);
     }
-
-    /*
-    Debug::printf("%f %f %f %f %d\n", 
-            receiver->demandThrottle, receiver->demandRoll, receiver->demandPitch, receiver->demandYaw,
-            receiver->getAuxState());*/
 
     // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.
     stab.update(receiver->demandRoll, receiver->demandPitch, receiver->demandYaw, eulerAnglesRadians, gyroRadiansPerSecond);
