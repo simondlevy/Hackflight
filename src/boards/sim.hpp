@@ -86,11 +86,8 @@ namespace hf {
 
             // methods called by Hackflight -------------------------------------------------
 
-            void init(Config& config)
+            void init(void)
             {
-                // Loop timing overrides
-                config.loop.imuLoopMicro = 1e6 * _deltaSeconds;
-
                 _micros = 0;
 
                 initPhysics();
@@ -202,8 +199,6 @@ namespace hf {
 
                 // Integrate vertical speed to get altitude
                 _altitude += _linearSpeeds[2] * _deltaSeconds;
-
-                Debug::printf("%f\n", _altitude);
 
                 // Reset everything if we hit the ground
                 if (_altitude < 0) {

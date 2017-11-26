@@ -27,7 +27,7 @@ class Board {
     public:
 
     //------------------------------------ Core functionality ----------------------------------------------------
-        virtual void     init(Config& config) = 0;
+        virtual void     init(void) = 0;
         virtual void     delayMilliseconds(uint32_t msec) = 0;
         virtual void     getImu(float eulerAnglesRadians[3], float gyroRadiansPerSecond[3]) = 0;
         virtual uint64_t getMicros() = 0;

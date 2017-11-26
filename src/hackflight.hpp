@@ -77,7 +77,7 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     Config config;
 
     // Do hardware initialization for board
-    board->init(config);
+    board->init();
 
     // Flash the LEDs to indicate startup
     flashLeds(config.init);
@@ -147,6 +147,9 @@ void Hackflight::updateRc(void)
 {
     // Update Receiver channels
     receiver->update();
+
+    //Debug::printf("%f  %f  %f  %f  %d\n",
+    //        receiver->demandThrottle, receiver->demandRoll, receiver->demandPitch, receiver->getAuxState());
 
     // When landed, reset integral component of PID
     if (receiver->throttleIsDown()) {

@@ -43,11 +43,8 @@ class Ladybug : public Board {
 
     protected:
 
-        virtual void init(Config &config) override
+        virtual void init(void) override
         {
-            // Use default configuration
-            (void)config;
-
             // Begin serial comms
             Serial.begin(115200);
 
