@@ -256,7 +256,7 @@ void hf::Controller::productInit(void)
             _axismap[1] = 1;
             _axismap[2] = 2;
             _axismap[3] = 3;
-            _axismap[4] = 4;
+            _axismap[4] = 5; // We have to skip to this channel to support Aux on Windows
         }
         else if (strstr(prodname, "Horizon Hobby SPEKTRUM")) {
             _axismap[0] = 1;

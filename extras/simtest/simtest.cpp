@@ -21,16 +21,38 @@
 #include <receivers/sim.hpp>
 #include <boards/sim.hpp>
 
+#include <time.h>
+#include <stdio.h>
+
+static const float DELTA_SEC = .001;
+
+static float getsec(void)
+{
+    struct timespec t;
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t);
+    return t.tv_sec + t.tv_nsec/1.e9;
+}
+
+static void delay(float dsec)
+{
+    float startsec = getsec();
+    while (getsec()-startsec < dsec)
+        ;
+}
+
 int main(int argc, char ** argv)
 {
     hf::Hackflight h;
-    hf::SimBoard  board(.01); // arbitrary IMU update period
+    hf::SimBoard  board(DELTA_SEC);
     hf::Controller controller;
     hf::ThreeDFly  model;
 
     h.init(&board, &controller, &model);
 
     while (true) {
+
+        delay(DELTA_SEC);
+
         h.update();
     }
 

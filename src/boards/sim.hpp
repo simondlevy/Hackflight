@@ -25,18 +25,19 @@
 #include <board.hpp>
 #include <debug.hpp>
 
-
 namespace hf {
 
     class SimBoard : public Board {
 
         private:
 
+            // Constants ------------------------------------------
+
             // A true constant!
             const float GRAVITY = 9.80665;
 
             // Scales up thrust to radians per second (substitutes for mass, torque, etc.)
-            const float THRUST_SCALE = 5;
+            const float THRUST_SCALE = 5.5;
 
             // Approxmiate zero for liftoff
             const float NOISE_FLOOR = 0.2;
@@ -45,10 +46,10 @@ namespace hf {
             const float VELOCITY_ROTATE_SCALE    = 1.75;
             const float VELOCITY_TRANSLATE_SCALE = 0.05;
 
-            // Time constant, set by simulator
+            // Time constant, set by simulator --------------------
             float _deltaSeconds;
 
-            // Private state variables
+            // Private state variables ----------------------------
             uint64_t _micros;
             float _accel[3];          // Gs
             float _gyro[3];           // radians per second
@@ -60,8 +61,9 @@ namespace hf {
             float _altitude;          // meters
             bool _flying;
 
-            // methods called by simulator
         public:
+
+            // methods called by simulator -------------------------------------------------
 
             SimBoard(float deltaSeconds)
             {
@@ -82,8 +84,7 @@ namespace hf {
                 flying = _flying;
             }
 
-            // methods called by Hackflight
-        public:
+            // methods called by Hackflight -------------------------------------------------
 
             void init(Config& config)
             {
@@ -197,6 +198,9 @@ namespace hf {
                     _linearSpeeds[0] += thrust * VELOCITY_TRANSLATE_SCALE * r02;
                     _linearSpeeds[1] -= thrust * VELOCITY_TRANSLATE_SCALE * r12;
                 }
+
+
+                Debug::printf("%f\n", _linearSpeeds[2]);
 
 
                 // Integrate vertical speed to get altitude
