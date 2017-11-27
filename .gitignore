@@ -1,4 +1,7 @@
 extras/parser/output
+extras/simtest/.vs
+extras/simtest/Debug
+extras/simtest/x64
 ladybug/hackflight/accelerometer.hpp
 ladybug/hackflight/altitude.hpp
 ladybug/hackflight/barometer.hpp

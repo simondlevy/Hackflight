@@ -25,6 +25,17 @@
 #include <board.hpp>
 #include <debug.hpp>
 
+#include <time.h>
+
+// OS-specific timing support -------------------------------
+#ifdef _WIN32
+static const uint8_t CLOCK_PROCESS_CPUTIME_ID = 0;
+static int clock_gettime(int ignore, struct timespec *tv)
+{
+    return timespec_get(tv, TIME_UTC);
+}
+#endif
+ 
 namespace hf {
 
     class SimBoard : public Board {
@@ -229,17 +240,13 @@ namespace hf {
                 return VELOCITY_ROTATE_SCALE * ((_motors[a] + _motors[b]) - (_motors[c] + _motors[d]));
             }
 
-            // OS-specific timing routine -------------------------------
-#ifdef _WIN32
-#else
-#include <time.h>
-            float seconds()
+           float seconds()
             {
                 struct timespec t;
                 clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t);
+                Debug::printf("%d %d\n", t.tv_sec, t.tv_nsec);
                 return t.tv_sec + t.tv_nsec/1.e9;
             }
-#endif
 
     }; // class SimBoard
 

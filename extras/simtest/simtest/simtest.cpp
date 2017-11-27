@@ -16,27 +16,34 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+#include <time.h>
+#include <stdio.h>
+
+#include "stdafx.h"
+
+ // Math support
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #include <hackflight.hpp>
 #include <models/3dfly.hpp> // arbitrary
 #include <receivers/sim.hpp>
 #include <boards/sim.hpp>
 
-#include <time.h>
-#include <stdio.h>
-
 int main(int argc, char ** argv)
 {
-    hf::Hackflight h;
-    hf::SimBoard  board;
-    hf::Controller controller;
-    hf::ThreeDFly  model;
+	hf::Hackflight hackflight;
+	hf::SimBoard  board;
+	hf::Controller controller;
+	hf::ThreeDFly  model;
 
-    h.init(&board, &controller, &model);
+	hackflight.init(&board, &controller, &model);
 
     while (true) {
 
-        h.update();
+        hackflight.update();
     }
-
+	
     return 0;
 }
