@@ -16,8 +16,10 @@
 
 all: simtest
 
-simtest: simtest.cpp ../../src/*.hpp ../../src/boards/sim.hpp ../../src/receivers/sim.hpp
-	g++ -std=c++11 -Wall -I../../src/ -o simtest simtest.cpp
+SRC = ../../../src
+
+simtest: simtest.cpp $(SRC)/*.hpp $(SRC)/boards/sim.hpp $(SRC)/receivers/sim.hpp
+	g++ -std=c++11 -Wall -I$(SRC) -o simtest simtest.cpp
 
 run: simtest
 	./simtest

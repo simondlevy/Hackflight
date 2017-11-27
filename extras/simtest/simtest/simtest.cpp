@@ -1,5 +1,5 @@
 /*
-   simtest.cpp : Simple simulator for Hackflight, to support testing new controllers
+   simtest.cpp : Lightweight (text-only) simulator for Hackflight
 
    This file is part of Hackflight.
 
@@ -20,7 +20,9 @@
 #include <time.h>
 #include <stdio.h>
 
+#ifdef _WIN32
 #include "stdafx.h"
+#endif
 
  // Math support
 #define _USE_MATH_DEFINES
