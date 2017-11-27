@@ -48,8 +48,6 @@ extras/gcs/python/build
 extras/gcs/python/dist/*
 extras/gcs/python/hackflight-gcs
 
-extras/simtest/simtest
-
 src/receivers/controller/test_controller
 src/receivers/controller/*.o
 
