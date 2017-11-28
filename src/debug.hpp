@@ -31,7 +31,7 @@ namespace hf {
                 va_list ap;
                 va_start(ap, fmt);
                 char buf[200];
-                vsprintf(buf, fmt, ap); 
+                vsnprintf(buf, 200, fmt, ap); 
                 Board::outbuf(buf);
                 va_end(ap);
             }

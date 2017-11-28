@@ -5,8 +5,6 @@
 
 #pragma once
 
-#define _CONSOLE
-
 #include "targetver.h"
 
 #include <stdio.h>

@@ -3,6 +3,7 @@ extras/simtest/.vs
 extras/simtest/Debug
 extras/simtest/x64
 extras/simtest/linux/simtest
+extras/simtest/windows/.vs
 ladybug/hackflight/accelerometer.hpp
 ladybug/hackflight/altitude.hpp
 ladybug/hackflight/barometer.hpp

@@ -179,7 +179,7 @@ class Ladybug : public Board {
 
 }; // class
 
-void Board::outbuf(char * buf, const char * fmt, va_list ap)
+void Board::outbuf(char * buf)
 {
     Serial.print(buf);
 }
