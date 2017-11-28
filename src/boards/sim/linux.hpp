@@ -1,8 +1,6 @@
 /*
    linux.hpp: Hackflight SimBoard class implementation for Linux
 
-   Simulates quadcopter physics
-
    Copyright (C) Simon D. Levy 2017
 
    This file is part of Hackflight.
@@ -32,7 +30,5 @@ namespace hf {
         {
             clock_gettime(CLOCK_PROCESS_CPUTIME_ID, tv);
         }
-
-    }; // SimBoardLinux
-
-} // namespace hf
+    }; 
+}

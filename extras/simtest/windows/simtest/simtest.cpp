@@ -29,14 +29,14 @@
 #include <hackflight.hpp>
 #include <models/3dfly.hpp> // arbitrary
 #include <receivers/sim.hpp>
-#include <boards/sim.hpp>
+#include <boards/sim/windows.hpp>
 
 int main(int argc, char ** argv)
 {
-	hf::Hackflight hackflight;
-	hf::SimBoard  board;
-	hf::Controller controller;
-	hf::ThreeDFly  model;
+	hf::Hackflight       hackflight;
+	hf::SimBoardWindows  board;
+	hf::Controller       controller;
+	hf::ThreeDFly        model;
 
 	hackflight.init(&board, &controller, &model);
 
