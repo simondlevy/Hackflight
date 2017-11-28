@@ -22,10 +22,7 @@
 
 #include "sim.hpp"
 
-namespace hf {
-
-    void SimBoard::cputime(struct timespec * tv)
-    {
-        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, tv);
-    }
+void hf::SimBoard::cputime(struct timespec * tv)
+{
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, tv);
 }
