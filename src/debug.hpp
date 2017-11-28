@@ -20,34 +20,6 @@
 
 #include <stdarg.h>
 
-// ARM Arduino (Ladybug)
-#if defined(__arm__)  
-static void _puts(char * buf) { Serial.print(buf); }
-static void _vsprintf(char * buf, const char * fmt, va_list ap) { vsprintf(buf, fmt, ap); }
-
-#elif defined(_WIN32) 
-// Windows
-// Need to include windows.h to declare OutputDebugStringA(), but causes compiler warnings,
-// so we wrap this one include in a no-warnings pragma.
-// See: https://stackoverflow.com/questions/4001736/whats-up-with-the-thousands-of-warnings-in-standard-headers-in-msvc-wall
-#pragma warning(push, 0) 
-#include <windows.h>
-#pragma warning(pop)
-#include <varargs.h>
-#if defined(_CONSOLE)
-static void _puts(char * buf) { printf("%s", buf); }
-#else
-static void _puts(char * buf) { OutputDebugStringA(buf); }
-#endif
-static void _vsprintf(char * buf, const char * fmt, va_list ap) { vsprintf_s(buf, _vscprintf(fmt,ap)+ 1, fmt, ap); }
-
-// Unix
-#else                 
-#include <stdio.h>
-static void _puts(char * buf) { printf("%s", buf); }
-static void _vsprintf(char * buf, const char * fmt, va_list ap) { vsprintf(buf, fmt, ap); }
-#endif
-
 namespace hf {
 
     class Debug {
@@ -59,8 +31,7 @@ namespace hf {
                 va_list ap;
                 va_start(ap, fmt);
                 char buf[200];
-                _vsprintf(buf, fmt, ap);
-                _puts(buf);
+                Board::outbuf(buf, fmt, ap);
                 va_end(ap);
             }
 

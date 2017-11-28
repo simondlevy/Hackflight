@@ -22,7 +22,16 @@
 
 #include "sim.hpp"
 
+#include <stdio.h>
+
 void hf::SimBoard::cputime(struct timespec * tv)
 {
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, tv);
 }
+
+void hf::Board::outbuf(char * buf, const char * fmt, va_list ap)
+{
+    vsprintf(buf, fmt, ap); 
+    printf("%s", buf); 
+}
+

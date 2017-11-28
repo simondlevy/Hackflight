@@ -20,6 +20,8 @@
 
 #include "config.hpp"
 
+#include <stdarg.h>
+
 namespace hf {
 
 class Board {
@@ -32,6 +34,9 @@ class Board {
         virtual void     getImu(float eulerAnglesRadians[3], float gyroRadiansPerSecond[3]) = 0;
         virtual uint64_t getMicros() = 0;
         virtual void     writeMotor(uint8_t index, float value) = 0;
+
+    //--------------------------------------- Debugging ---------------------------------------------------------
+        static void outbuf(char * buf, const char * fmt, va_list ap);
 
     //------------------------------------------ LED ------------------------------------------------------------
         virtual void     ledSet(uint8_t id, bool is_on) { (void)id; (void)is_on; }

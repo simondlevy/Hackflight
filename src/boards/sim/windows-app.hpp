@@ -1,5 +1,7 @@
 /*
-   simtest.cpp : Lightweight (text-only) simulator for Hackflight
+   windows-app.hpp: Debugging support for Windows application programs
+
+   Copyright (C) Simon D. Levy 2017
 
    This file is part of Hackflight.
 
@@ -16,34 +18,21 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 
-#include <time.h>
-#include <stdio.h>
+#include "windows.hpp"
 
-#include "stdafx.h"
+// Windows
+// Need to include windows.h to declare OutputDebugStringA(), but causes compiler warnings,
+// so we wrap this one include in a no-warnings pragma.
+// See: https://stackoverflow.com/questions/4001736/whats-up-with-the-thousands-of-warnings-in-standard-headers-in-msvc-wall
+#pragma warning(push, 0) 
+#include <windows.h>
+#pragma warning(pop)
+#include <varargs.h>
 
- // Math support
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-#include <hackflight.hpp>
-#include <models/3dfly.hpp> // arbitrary
-#include <receivers/sim/windows.hpp>
-#include <boards/sim/windows-console.hpp>
-
-int main(int argc, char ** argv)
+void hf::Board::outbuf(char * buf, const char * fmt, va_list ap)
 {
-	hf::Hackflight hackflight;
-	hf::SimBoard   board;
-	hf::Controller controller;
-	hf::ThreeDFly  model;
-
-	hackflight.init(&board, &controller, &model);
-
-    while (true) {
-
-        hackflight.update();
-    }
-	
-    return 0;
+    vsprintf_s(buf, fmt, ap); 
+    OutputDebugStringA(buf);
 }
