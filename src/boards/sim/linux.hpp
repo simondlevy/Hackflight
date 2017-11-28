@@ -24,11 +24,8 @@
 
 namespace hf {
 
-    class SimBoardLinux  : public SimBoard {
-
-        void cputime(struct timespec * tv) override
-        {
-            clock_gettime(CLOCK_PROCESS_CPUTIME_ID, tv);
-        }
-    }; 
+    void SimBoard::cputime(struct timespec * tv)
+    {
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, tv);
+    }
 }

@@ -32,10 +32,6 @@ namespace hf {
 
     class SimBoard : public Board {
 
-        protected:
-
-            // Gets CPU time in seconds
-            virtual void cputime(struct timespec * tv) = 0;
 
         private:
 
@@ -65,6 +61,9 @@ namespace hf {
             float _altitude;          // meters
             bool _flying;
             float _secondsPrev;
+
+            // Gets CPU time in seconds
+            void cputime(struct timespec * tv);
 
         public:
 

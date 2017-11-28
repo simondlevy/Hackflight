@@ -27,7 +27,7 @@
 int main(int argc, char ** argv)
 {
 	hf::Hackflight hackflight;
-	hf::SimBoardLinux  board;
+	hf::SimBoard   board;
 	hf::Controller controller;
 	hf::ThreeDFly  model;
 
