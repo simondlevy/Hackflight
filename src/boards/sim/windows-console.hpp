@@ -25,8 +25,7 @@
 #include <stdio.h>
 #include <varargs.h>
 
-void hf::Board::outbuf(char * buf, const char * fmt, va_list ap)
+void hf::Board::outbuf(char * buf)
 {
-    vsprintf_s(buf, fmt, ap); 
     printf("%s", buf); 
 }

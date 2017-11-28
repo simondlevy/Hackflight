@@ -33,6 +33,5 @@
 
 void hf::Board::outbuf(char * buf, const char * fmt, va_list ap)
 {
-    vsprintf_s(buf, fmt, ap); 
     OutputDebugStringA(buf);
 }

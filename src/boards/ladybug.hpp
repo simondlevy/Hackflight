@@ -181,7 +181,6 @@ class Ladybug : public Board {
 
 void Board::outbuf(char * buf, const char * fmt, va_list ap)
 {
-    vsprintf(buf, fmt, ap); 
     Serial.print(buf);
 }
 

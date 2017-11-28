@@ -36,7 +36,7 @@ class Board {
         virtual void     writeMotor(uint8_t index, float value) = 0;
 
     //--------------------------------------- Debugging ---------------------------------------------------------
-        static void outbuf(char * buf, const char * fmt, va_list ap);
+        static void      outbuf(char * buf);
 
     //------------------------------------------ LED ------------------------------------------------------------
         virtual void     ledSet(uint8_t id, bool is_on) { (void)id; (void)is_on; }
