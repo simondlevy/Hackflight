@@ -1,5 +1,9 @@
 /*
-   simtest.cpp : Lightweight (text-only) simulator for Hackflight
+   linux.hpp: Hackflight SimBoard class implementation for Linux
+
+   Simulates quadcopter physics
+
+   Copyright (C) Simon D. Levy 2017
 
    This file is part of Hackflight.
 
@@ -16,27 +20,19 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 
-#include <math.h>
+#include "sim.hpp"
 
-#include <hackflight.hpp>
-#include <models/3dfly.hpp> // arbitrary
-#include <receivers/sim.hpp>
-#include <boards/sim/linux.hpp>
+namespace hf {
 
-int main(int argc, char ** argv)
-{
-	hf::Hackflight hackflight;
-	hf::SimBoardLinux  board;
-	hf::Controller controller;
-	hf::ThreeDFly  model;
+    class SimBoardLinux  : public SimBoard {
 
-	hackflight.init(&board, &controller, &model);
+        void cputime(struct timespec * tv) override
+        {
+            clock_gettime(CLOCK_PROCESS_CPUTIME_ID, tv);
+        }
 
-    while (true) {
+    }; // SimBoardLinux
 
-        hackflight.update();
-    }
-	
-    return 0;
-}
+} // namespace hf
