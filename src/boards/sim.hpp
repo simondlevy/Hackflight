@@ -48,7 +48,7 @@ static void cputime(struct timespec *tv)
 
 static void cputime(struct timespec * tv)
 {
-    clock_cputime(CLOCK_PROCESS_CPUTIME_ID, tv);
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, tv);
 }
 
 #endif
