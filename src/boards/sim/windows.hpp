@@ -24,19 +24,16 @@
 
 namespace hf {
 
-    class SimBoardWindows  : public SimBoard {
+    void SimBoard::cputime(struct timespec *tv)
+    {
+        static time_t startsec;
 
-        void cputime(struct timespec *tv) override
-        {
-            static time_t startsec;
+        int retval = timespec_get(tv, TIME_UTC);
 
-            int retval = timespec_get(tv, TIME_UTC);
-
-            if (startsec == 0) {
-                startsec = tv->tv_sec;
-            }
-
-            tv->tv_sec -= startsec;
+        if (startsec == 0) {
+            startsec = tv->tv_sec;
         }
+
+        tv->tv_sec -= startsec;
     }
 }

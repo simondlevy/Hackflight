@@ -21,7 +21,7 @@
 
 #include <hackflight.hpp>
 #include <models/3dfly.hpp> // arbitrary
-#include <receivers/sim/sim.hpp>
+#include <receivers/sim/linux.hpp>
 #include <boards/sim/linux.hpp>
 
 int main(int argc, char ** argv)

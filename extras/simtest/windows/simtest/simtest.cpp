@@ -33,10 +33,10 @@
 
 int main(int argc, char ** argv)
 {
-	hf::Hackflight        hackflight;
-	hf::SimBoardWindows   board;
-	hf::ControllerWindows controller;
-	hf::ThreeDFly         model;
+	hf::Hackflight hackflight;
+	hf::SimBoard   board;
+	hf::Controller controller;
+	hf::ThreeDFly  model;
 
 	hackflight.init(&board, &controller, &model);
 
