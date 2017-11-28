@@ -40,7 +40,7 @@ Thanks to some help from [Sytelus](https://github.com/sytelus), the core
 Hackflight
 [firmware](https://github.com/simondlevy/hackflight/tree/master/src)
 adheres to standard practices for C++, notably, short, simple methods and
-avoidance of compiler macros like <b>#ifdef</b> that can make it difficult to
+minimal use of compiler macros like <b>#ifdef</b> that can make it difficult to
 follow what the code is doing.  As you can see, the code follows the Arduino
 design pattern of a <b>setup()</b> routine that calls the <b>init()</b> method
 of a few objects (<b>IMU</b>, <b>Receiver</b>, <b>Board</b>, etc.) and a
