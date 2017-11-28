@@ -34,7 +34,11 @@ static void _vsprintf(char * buf, const char * fmt, va_list ap) { vsprintf(buf, 
 #include <windows.h>
 #pragma warning(pop)
 #include <varargs.h>
+#if defined(_CONSOLE)
+static void _puts(char * buf) { printf("%s", buf); }
+#else
 static void _puts(char * buf) { OutputDebugStringA(buf); }
+#endif
 static void _vsprintf(char * buf, const char * fmt, va_list ap) { vsprintf_s(buf, _vscprintf(fmt,ap)+ 1, fmt, ap); }
 
 // Unix

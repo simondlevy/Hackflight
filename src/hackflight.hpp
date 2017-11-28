@@ -116,8 +116,6 @@ void Hackflight::update(void)
     // Grab current time for various loops
     uint32_t currentTime = (uint32_t)board->getMicros();
 
-    //Debug::printf("%d\n", currentTime);
-
     // Outer (slow) loop: update Receiver
     if (rcTask.checkAndUpdate(currentTime)) {
         updateRc();
@@ -149,11 +147,10 @@ void Hackflight::updateRc(void)
 {
     // Update Receiver channels
     receiver->update();
-
-    /*
-    Debug::printf("%f  %f  %f  %f  %d\n",
+    
+    Debug::printf("*** %f  %f  %f  %f  %d\n",
             receiver->demandThrottle, receiver->demandRoll, receiver->demandPitch, receiver->demandYaw,
-            receiver->getAuxState());*/
+            receiver->getAuxState());
 
     // When landed, reset integral component of PID
     if (receiver->throttleIsDown()) {

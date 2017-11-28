@@ -91,7 +91,7 @@ void Altitude::init(const AltitudeConfig & _config, Board * _board, Model * _mod
 
 void Altitude::start(float throttleDemand)
 {
-    Debug::printf("start\n");
+    //Debug::printf("start\n");
     holdingAltitude = true;
     initialThrottleHold = throttleDemand;
     altHold = baroAlt;
@@ -101,7 +101,7 @@ void Altitude::start(float throttleDemand)
 
 void Altitude::stop(void)
 {
-    Debug::printf("stop\n");
+    //Debug::printf("stop\n");
     holdingAltitude = false;
 }
 
@@ -112,7 +112,7 @@ void Altitude::modifyThrottleDemand(float eulerAnglesRadians[3], bool armed, flo
 
     if (holdingAltitude) {
         throttleDemand = Filter::constrainMinMax(initialThrottleHold + pid, config.throttleMargin, 1-config.throttleMargin);
-        Debug::printf("%+2.2f\n", throttleDemand);
+        //Debug::printf("%+2.2f\n", throttleDemand);
     }
 }
 

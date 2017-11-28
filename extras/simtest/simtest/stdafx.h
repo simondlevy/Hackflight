@@ -7,6 +7,8 @@
 
 #ifdef _WIN32
 
+#define _CONSOLE
+
 #include "targetver.h"
 
 #include <stdio.h>

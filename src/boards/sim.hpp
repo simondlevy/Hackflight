@@ -26,16 +26,33 @@
 #include <debug.hpp>
 
 #include <time.h>
+#include <stdio.h>
 
-// OS-specific timing support -------------------------------
+// Windows support for POSIX clock_cputime()
 #ifdef _WIN32
-static const uint8_t CLOCK_PROCESS_CPUTIME_ID = 0;
-static int clock_gettime(int ignore, struct timespec *tv)
+
+static void cputime(struct timespec *tv)
 {
-    return timespec_get(tv, TIME_UTC);
+    static time_t startsec;
+
+    int retval = timespec_get(tv, TIME_UTC);
+
+    if (startsec == 0) {
+        startsec = tv->tv_sec;
+    }
+
+    tv->tv_sec -= startsec;
 }
+
+#else
+
+static void cputime(struct timespec * tv)
+{
+    clock_cputime(CLOCK_PROCESS_CPUTIME_ID, tv);
+}
+
 #endif
- 
+
 namespace hf {
 
     class SimBoard : public Board {
@@ -243,8 +260,7 @@ namespace hf {
            float seconds()
             {
                 struct timespec t;
-                clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t);
-                Debug::printf("%d %d\n", t.tv_sec, t.tv_nsec);
+                cputime(&t);
                 return t.tv_sec + t.tv_nsec/1.e9;
             }
 
