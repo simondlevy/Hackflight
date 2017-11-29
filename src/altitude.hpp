@@ -109,7 +109,7 @@ void Altitude::update(float eulerAnglesRadians[3], bool armed, float & throttleD
     accel.update(eulerAnglesRadians, armed);
 
     if (holdingAltitude) {
-        Debug::printf("%fm %f\n", altHold, initialThrottleHold);
+        //Debug::printf("%fm %f %f\n", altHold, initialThrottleHold, pid);
         throttleDemand = Filter::constrainMinMax(initialThrottleHold + pid, config.throttleMargin, 1-config.throttleMargin);
     }
 }
@@ -144,6 +144,7 @@ void Altitude::computePid(bool armed)
     float error = Filter::constrainAbs(altHold - baroAlt, config.pErrorMax);
 
     error = Filter::deadband(error, config.pDeadband); 
+    Debug::printf("%f %f %f\n", altHold, baroAlt, error);
     pid = Filter::constrainAbs(model->altP * error, config.pidMax);
 
     // I

@@ -91,11 +91,11 @@ struct AltitudeConfig {
     // PIDs are in model.hpp
 
     // Bounds
-    uint16_t pidMax    = 150;
-    uint8_t  pDeadband = 10;
-    uint8_t  dDeadband = 5;
-    uint16_t pErrorMax = 300;
-    uint16_t iErrorMax = 30000;
+    float pidMax    = 1.5;
+    float pDeadband = 0.1;
+    float dDeadband = 5;
+    float pErrorMax = 3;
+    float iErrorMax = 300;
 
     // Barometer
     BarometerConfig baro;
@@ -108,7 +108,7 @@ struct AltitudeConfig {
     float    cfVel                  = 0.985f;
 
     // Keeps PID adjustment inside range
-    uint16_t throttleMargin         = 0.15;
+    float throttleMargin            = 0.15;
 };
 
 //=========================================================================
