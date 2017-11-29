@@ -31,7 +31,7 @@
 #pragma warning(pop)
 #include <varargs.h>
 
-void hf::Board::outbuf(char * buf, const char * fmt, va_list ap)
+void hf::Board::outbuf(char * buf)
 {
     OutputDebugStringA(buf);
 }
