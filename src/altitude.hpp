@@ -39,7 +39,7 @@ class Altitude {
         void start(float throttleDemand);
         void stop(void);
         void computePid(bool armed);
-        void modifyThrottleDemand(float eulerAnglesRadians[3], bool armed, float & throttleDemand);
+        void update(float eulerAnglesRadians[3], bool armed, float & throttleDemand);
 
     private:
 
@@ -50,18 +50,18 @@ class Altitude {
 
         // Barometer
         Barometer baro;
-        float baroAlt;               // cm
+        float baroAlt;               // meters
 
         // Accelerometer
         Accelerometer accel;
 
         // Fused
-        float altHold;
+        float altHold;              // desired hold altitude, meters
         float errorAltitudeI;
         bool  holdingAltitude;
-        float initialThrottleHold;  
+        float initialThrottleHold;  // [0,1]  
         float pid;
-        float velocity;             // cm/sec
+        float velocity;             // meters/sec
 
         // Microsecond dt for velocity computations
         uint32_t updateTime(void);
@@ -103,12 +103,13 @@ void Altitude::stop(void)
     holdingAltitude = false;
 }
 
-void Altitude::modifyThrottleDemand(float eulerAnglesRadians[3], bool armed, float & throttleDemand)
+void Altitude::update(float eulerAnglesRadians[3], bool armed, float & throttleDemand)
 {
     // Throttle modification is synched to aquisition of new IMU data
     accel.update(eulerAnglesRadians, armed);
 
     if (holdingAltitude) {
+        Debug::printf("%fm %f\n", altHold, initialThrottleHold);
         throttleDemand = Filter::constrainMinMax(initialThrottleHold + pid, config.throttleMargin, 1-config.throttleMargin);
     }
 }

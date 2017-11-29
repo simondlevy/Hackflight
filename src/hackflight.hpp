@@ -148,9 +148,10 @@ void Hackflight::updateRc(void)
     // Update Receiver channels
     receiver->update();
     
+    /*
     Debug::printf("%f  %f  %f  %f  %d\n",
             receiver->demandThrottle, receiver->demandRoll, receiver->demandPitch, receiver->demandYaw,
-            receiver->getAuxState());
+            receiver->getAuxState());*/
 
     // When landed, reset integral component of PID
     if (receiver->throttleIsDown()) {
@@ -223,7 +224,7 @@ void Hackflight::updateImu(void)
 
     // If barometer avaialble, update accelerometer for altitude fusion, then modify throttle demand
     if (board->extrasHaveBaro()) {
-        alti.modifyThrottleDemand(eulerAnglesRadians, armed, receiver->demandThrottle);
+        alti.update(eulerAnglesRadians, armed, receiver->demandThrottle);
     }
 
     // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.
