@@ -91,10 +91,10 @@ struct AltitudeConfig {
     // PIDs are in model.hpp
 
     // Bounds
-    float pidMax    = 1.5;
+    float pidMax    = 100;
     float pDeadband = 0.1;
     float dDeadband = 5;
-    float pErrorMax = 3;
+    float pErrorMax = 100;
     float iErrorMax = 300;
 
     // Barometer

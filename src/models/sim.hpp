@@ -41,7 +41,12 @@ namespace hf {
                 // Yaw: P must be positive
                 yawP = 0.0001f;// 0.1f;
                 yawI = 0;// 0.05f;
-            }
+
+                // Altitude 
+                altP = 0.1f;
+                altI = 0.02f; 
+                altD = 1.7f;
+             }
     };
 
 } // namespace hf

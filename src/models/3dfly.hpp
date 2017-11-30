@@ -46,9 +46,9 @@ namespace hf {
                 softwareTrimYaw   =   0.f;
 
                 // Altitude 
-                altP = 0.5f;
-                altI = 0.02f; 
-                altD = 1.7f;
+                altP = 0.1f;
+                altI = 0;//0.02f; 
+                altD = 0;//1.7f;
             }
     };
 

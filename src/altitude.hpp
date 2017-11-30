@@ -109,7 +109,6 @@ void Altitude::update(float eulerAnglesRadians[3], bool armed, float & throttleD
     accel.update(eulerAnglesRadians, armed);
 
     if (holdingAltitude) {
-        //Debug::printf("%fm %f %f\n", altHold, initialThrottleHold, pid);
         throttleDemand = Filter::constrainMinMax(initialThrottleHold + pid, config.throttleMargin, 1-config.throttleMargin);
     }
 }
@@ -137,15 +136,16 @@ void Altitude::computePid(bool armed)
     // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
     // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
     // i.e without delay.
-    int32_t baroVel = baro.getVelocity(dTimeMicros);
+    float baroVel = baro.getVelocity(dTimeMicros);
     velocity = Filter::complementary(velocity, (float)baroVel, config.cfVel);
 
     // P
-    float error = Filter::constrainAbs(altHold - baroAlt, config.pErrorMax);
+    float error = Filter::constrainAbs(altHold-baroAlt, config.pErrorMax);
 
-    error = Filter::deadband(error, config.pDeadband); 
-    Debug::printf("%f %f %f\n", altHold, baroAlt, error);
+    //error = Filter::deadband(error, config.pDeadband); 
     pid = Filter::constrainAbs(model->altP * error, config.pidMax);
+
+    if (holdingAltitude) Debug::printf("hold=%+fm baro=%+fm error =%+fm pid=%+f\n", altHold, baroAlt, error, pid);
 
     // I
     errorAltitudeI += (model->altI * error);
