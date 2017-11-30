@@ -27,16 +27,16 @@ class Model {
     public:
 
         // Level (accelerometer)
-        float levelP;
+        float levelP = 0;
 
         // Rate (gyro): P must be positive
-        float ratePitchRollP;
-        float ratePitchRollI;
-        float ratePitchRollD;
+        float ratePitchRollP = 0;
+        float ratePitchRollI = 0;
+        float ratePitchRollD = 0;
 
         // Yaw: P must be positive
-        float yawP;
-        float yawI;
+        float yawP = 0;
+        float yawI = 0;
 
         // Trim for a particular vehicle
         float softwareTrimRoll  = 0;
@@ -44,9 +44,9 @@ class Model {
         float softwareTrimYaw   = 0;
 
         // Altitude 
-        float altP;
-        float altI; 
-        float altD;
+        float altP = 0;
+        float altI = 0; 
+        float altD = 0;
 };
 
 } // namespace hf
