@@ -92,10 +92,10 @@ struct AltitudeConfig {
 
     // Bounds
     float pidMax    = 100;
-    float pDeadband = 0.1;
-    float dDeadband = 5;
-    float pErrorMax = 100;
-    float iErrorMax = 300;
+    float pDeadband = 0.01;
+    float dDeadband = 0.1;
+    float pErrorMax = 1;
+    float iErrorMax = 1;
 
     // Barometer
     BarometerConfig baro;
