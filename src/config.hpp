@@ -31,9 +31,9 @@ struct StabilizeConfig {
     // PIDs are in model.hpp
 
     // Resetting thresholds for PID Integral term
-    float angleWindupMax = 10.f;
-    float gyroWindupMax  = 16.f;
-    float bigGyro        = 40.f; // degrees per second
+    float angleWindupMax = 10.0f;
+    float gyroWindupMax  = 16.0f;
+    float bigGyro        = 40.0f; // degrees per second
     float bigYawDemand   = 0.1f;
 };
 
@@ -65,8 +65,8 @@ struct ImuConfig {
 struct BarometerConfig {
 
     float                noiseLpf         = 0.5f;
-    float                velocityBound    = 300.f;
-    float                velocityDeadband = 10.f;
+    float                velocityBound    = 300.0f;
+    float                velocityDeadband = 10.0f;
     static const uint8_t HISTORY_SIZE     = 48;
 };
 
@@ -91,11 +91,11 @@ struct AltitudeConfig {
     // PIDs are in model.hpp
 
     // Bounds
-    float pidMax    = 100;
+    float pidMax    = 1.0;
     float pDeadband = 0.01;
     float dDeadband = 0.1;
-    float pErrorMax = 1;
-    float iErrorMax = 1;
+    float pErrorMax = 1.0;
+    float iErrorMax = 1.0;
 
     // Barometer
     BarometerConfig baro;
