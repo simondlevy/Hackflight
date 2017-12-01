@@ -91,9 +91,9 @@ struct AltitudeConfig {
     // PIDs are in model.hpp
 
     // Bounds
-    float pidMax    = 1.0;
     float pDeadband = 0.01;
     float dDeadband = 0.1;
+    float pidMax    = 1.0;
     float pErrorMax = 1.0;
     float iErrorMax = 1.0;
 
