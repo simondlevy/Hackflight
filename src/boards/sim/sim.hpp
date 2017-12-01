@@ -40,7 +40,7 @@ namespace hf {
             // A true constant!
             const float GRAVITY = 9.80665;
 
-            // Scales up thrust to radians per second (substitutes for mass, torque, etc.)
+            // Scales up spin rate in [0,1] to thrust in Newtons (substitutes for mass, torque, etc.)
             const float THRUST_SCALE = 5.5;
 
             // Approxmiate zero for liftoff
