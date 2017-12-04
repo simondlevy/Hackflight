@@ -21,14 +21,14 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 MSP_Parser parser;
 
-MSP_Message request = parser.serialize_ATTITUDE_Request();
+MSP_Message request = parser.serialize_ATTITUDE_RADIANS_Request();
 
-class My_ATTITUDE_Handler : public ATTITUDE_Handler {
+class My_ATTITUDE_RADIANS_Handler : public ATTITUDE_RADIANS_Handler {
 
 
     public:
 
-        void handle_ATTITUDE(short angx, short angy, short heading) {
+        void handle_ATTITUDE_RADIANS(short angx, short angy, short heading) {
 
             // Report the attitude
             Serial.print("pitch: " );
@@ -54,7 +54,7 @@ class My_ATTITUDE_Handler : public ATTITUDE_Handler {
         }
 };
 
-My_ATTITUDE_Handler handler;
+My_ATTITUDE_RADIANS_Handler handler;
 
 void setup() {
 
@@ -62,7 +62,7 @@ void setup() {
 
     Serial1.begin(115200); 
 
-    parser.set_ATTITUDE_Handler(&handler);
+    parser.set_ATTITUDE_RADIANS_Handler(&handler);
 
     handler.sendRequest();
 }

@@ -30,9 +30,9 @@ int main(int argc, char ** argv) {
 
     msp_parser_init(&parser);
 
-    msp_message_t message = msp_serialize_ATTITUDE(59, 76, 1);
+    msp_message_t message = msp_serialize_ATTITUDE_RADIANS(59, 76, 1);
 
-    msp_set_ATTITUDE_handler(&parser, handle_attitude);
+    msp_set_ATTITUDE_RADIANS_handler(&parser, handle_attitude);
 
     byte b = msp_message_start(&message); 
     while (msp_message_has_next(&message)) {

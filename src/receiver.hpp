@@ -83,7 +83,7 @@ public:
     void    init(const ReceiverConfig& rcConfig);
     void    update(void);
     bool    changed(void);
-    void    computeExpo(void);
+    void    computeExpo(float yawAngle);
     uint8_t getAuxState(void);
     bool    throttleIsDown(void);
 
@@ -152,7 +152,7 @@ bool Receiver::changed(void)
     return commandDelay == 20;
 }
 
-void Receiver::computeExpo(void)
+void Receiver::computeExpo(float yawAngle)
 {
     // Convert raw [-1,+1] to absolute value
     demandRoll  = makePositiveCommand(DEMAND_ROLL);

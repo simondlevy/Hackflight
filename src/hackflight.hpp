@@ -207,8 +207,8 @@ void Hackflight::updateRc(void)
 
 void Hackflight::updateImu(void)
 {
-    // Compute exponential Receiver commands
-    receiver->computeExpo();
+    // Compute exponential Receiver commands, passing yaw angle for headless mode
+    receiver->computeExpo(eulerAnglesRadians[AXIS_YAW]);
 
     // Get Euler angles and raw gyro from board
     float gyroRadiansPerSecond[3];
