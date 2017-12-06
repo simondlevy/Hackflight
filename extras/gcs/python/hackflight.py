@@ -27,7 +27,8 @@ DISPLAY_HEIGHT = 500
 
 BACKGROUND_COLOR = 'white'
 
-CONNECTION_DELAY_MSEC = 1000
+CONNECTION_DELAY_MSEC  = 1000
+BOARD_REPLY_DELAY_MSEC = 1000
 
 USB_UPDATE_MSEC = 200
 
@@ -44,7 +45,6 @@ from msppg import *
 
 from tkcompat import *
 
-
 from imu import IMU
 from motors import Motors
 from receiver import Receiver
@@ -60,6 +60,7 @@ class GCS:
         # No communications or arming yet
         self.comms = None
         self.armed = False
+        self.gotimu = False
 
         # Do basic Tk initialization
         self.root = Tk()
@@ -101,6 +102,16 @@ class GCS:
         self.frame.pack()
         self.canvas = Canvas(self.root, width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT, background='black')
         self.canvas.pack()
+
+
+        # Set up a text label for reporting errors
+        errmsg = 'No response from board.  Possible reasons:\n\n' + \
+                 '    * You connected to the wrong port.\n\n' + \
+                 '    * Firmware uses serial receiver\n' + \
+                 '      (DSMX, SBUS), but receiver is\n' + \
+                 '      not connected.'
+        self.error_label = Label(self.canvas, text=errmsg, bg='black', fg='red', font=(None,24), justify=LEFT)
+        self.hide(self.error_label)
 
         # Add widgets for motor-testing dialog; hide them immediately
         self.motors = Motors(self)
@@ -213,6 +224,20 @@ class GCS:
 
         self.parser.set_RC_NORMAL_Handler(self._handle_rc)
 
+        self.gotimu = False
+        self.hide(self.error_label)
+        self.scheduleTask(BOARD_REPLY_DELAY_MSEC, self._checkimu)
+
+    def _checkimu(self):
+
+        if not self.gotimu:
+
+            self.imu.stop()
+            self.error_label.place(x=50, y=50)
+            self._disable_button(self.button_imu)
+            self._disable_button(self.button_motors)
+            self._disable_button(self.button_receiver)
+
     # Sends Attitude request to FC
     def _send_attitude_request(self):
 
@@ -301,6 +326,8 @@ class GCS:
             self._disable_buttons()
 
             self.button_connect['text'] = 'Connect'
+
+            self.hide(self.error_label)
 
             self._show_splash()
 
@@ -409,7 +436,6 @@ class GCS:
 
         self.canvas.delete(self.splash)
 
-
     def _show_armed(self, widget):
 
         widget.configure(bg='red')
@@ -438,6 +464,8 @@ class GCS:
     def _handle_attitude(self, x, y, z):
 
         self.roll_pitch_yaw = x, -y, z  
+
+        self.gotimu = True
 
         #self.messages.setCurrentMessage('Roll/Pitch/Yaw: %+3.3f %+3.3f %+3.3f' % self.roll_pitch_yaw)
 
