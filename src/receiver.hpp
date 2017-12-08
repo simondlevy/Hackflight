@@ -22,6 +22,7 @@
 
 #include <cstring>
 #include <algorithm>
+#include <cmath>
 
 #include "config.hpp"
 #include "filter.hpp"
@@ -179,7 +180,7 @@ void Receiver::computeExpo(float yawAngle)
 
 float Receiver::makePositiveCommand(uint8_t channel)
 {
-    return std::abs(rawvals[channel]);
+    return fabs(rawvals[channel]);
 }
 
 float Receiver::applyPitchRollFunction(float command)

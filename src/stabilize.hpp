@@ -22,6 +22,7 @@
 #include <cstring>
 #include <algorithm>
 #include <limits>
+#include <cmath>
 
 #include "receiver.hpp"
 #include "config.hpp"

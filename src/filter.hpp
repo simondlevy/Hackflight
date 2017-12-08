@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <cmath>
+
 #include "debug.hpp"
 
 namespace hf {
@@ -40,7 +42,7 @@ class Filter {
 
 float Filter::deadband(float value, float deadband)
 {
-    if (std::abs(value) < deadband) {
+    if (fabs(value) < deadband) {
         value = 0;
     } else if (value > 0) {
         value -= deadband;
