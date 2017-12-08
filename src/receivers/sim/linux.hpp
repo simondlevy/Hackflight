@@ -50,6 +50,7 @@ void hf::Controller::productInit(void)
             _axismap[1] = 2;
             _axismap[2] = 3;
             _axismap[3] = 0;
+            _axismap[4] = 4;
         }
         else if (strstr(prodname, "Extreme 3D")) {
             _axismap[0] = 3;
