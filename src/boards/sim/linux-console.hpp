@@ -1,5 +1,5 @@
 /*
-   linux.hpp: Hackflight SimBoard class implementation for Linux
+   linux-console.hpp: Hackflight SimBoard class implementation for Linux consoles
 
    Copyright (C) Simon D. Levy 2017
 
@@ -24,7 +24,8 @@
 
 #include <stdio.h>
 
-void hf::SimBoard::cputime(struct timespec * tv)
+void hf::Board::outbuf(char * buf)
 {
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, tv);
+    printf("%s", buf); 
 }
+
