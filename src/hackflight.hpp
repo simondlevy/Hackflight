@@ -107,9 +107,9 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     // Initialize altitude estimator, which will be used if there's a barometer
     alti.init(config.altitude, board, _model);
 
-    // Start unarmed
-    armed = false;
-    safeToArm = false;
+    // Start unarmed (default), or armed (if simulated)
+    armed = board->extrasSimulated();
+    safeToArm = board->extrasSimulated();
 
 } // init
 

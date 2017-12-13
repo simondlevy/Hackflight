@@ -37,8 +37,9 @@ namespace hf {
 
             // Constants ------------------------------------------
 
-            // A true constant!
+            // Some true constants!
             const float GRAVITY = 9.80665;
+            const float SEALEVEL = 1013.25; // millibars
 
             // Scales up spin rate in [0,1] to thrust in Newtons (substitutes for mass, torque, etc.)
             const float THRUST_SCALE = 5.5;
@@ -133,6 +134,11 @@ namespace hf {
                 }
             }
 
+            bool extrasSimulated(void) 
+            {
+                return true;
+            }
+
             // private methods
         private:
 
@@ -151,7 +157,7 @@ namespace hf {
 
                 _flying = false;
                 _altitude = 0;
-                _baroPressure = 0;
+                _baroPressure = SEALEVEL;
                 _verticalSpeedPrev = 0;
             }
 
@@ -228,7 +234,7 @@ namespace hf {
                 // At low altitudes above the sea level, the pressure decreases
                 // by about 12 millbars (1.2kPascals) for every 100 meters (See
                 // https://en.wikipedia.org/wiki/Atmospheric_pressure#Altitude_variation)
-                _baroPressure = 1013.25 - 12 * _altitude / 100;
+                _baroPressure = SEALEVEL - 12 * _altitude / 100;
             }
 
             float motorsToAngularVelocity(int a, int b, int c, int d)

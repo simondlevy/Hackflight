@@ -110,6 +110,7 @@ void Altitude::update(float eulerAnglesRadians[3], bool armed, float & throttleD
 
     if (holdingAltitude) {
         throttleDemand = Filter::constrainMinMax(initialThrottleHold + pid, config.throttleMargin, 1-config.throttleMargin);
+        Debug::printf("%1.1f\n", throttleDemand);
     }
 }
 

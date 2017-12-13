@@ -44,7 +44,6 @@ class Barometer {
         float   alt;
         float   history[BarometerConfig::HISTORY_SIZE];
         uint8_t historyIdx;
-        float   groundPressure;
         float   groundAltitude;
         float   lastAlt;
         float   pressureSum;
@@ -62,7 +61,6 @@ void Barometer::init(const BarometerConfig & _config, Board * _board)
 
     pressureSum = 0;
     historyIdx = 0;
-    groundPressure = 0;
     groundAltitude = 0;
     alt = 0;
     lastAlt = 0;
@@ -74,6 +72,8 @@ void Barometer::init(const BarometerConfig & _config, Board * _board)
 
 void Barometer::calibrate(void)
 {
+    static float   groundPressure;
+
     groundPressure -= groundPressure / 8;
     groundPressure += pressureSum / (BarometerConfig::HISTORY_SIZE - 1);
     groundAltitude = millibarsToMeters(groundPressure/8);
@@ -82,8 +82,6 @@ void Barometer::calibrate(void)
 void Barometer::update()
 {
     float pressure = board->extrasGetBaroPressure();
-
-    //Debug::printf("%f\n", pressure);
 
     uint8_t indexplus1 = (historyIdx + 1) % BarometerConfig::HISTORY_SIZE;
     history[historyIdx] = pressure;

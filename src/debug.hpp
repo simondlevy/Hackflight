@@ -1,5 +1,9 @@
 /*
    debug.hpp : Cross-platform serial debugging support for Hackflight
+   
+   Provides a single method printf() for formatted printing of debug
+   messages.  Your Board implementation should provide and outbuf(char *)
+   method that displays the message in an appropriate way.
 
    This file is part of Hackflight.
 
