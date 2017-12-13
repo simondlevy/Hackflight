@@ -166,8 +166,8 @@ void Hackflight::updateRc(void)
         // actions during armed
         if (armed) {      
 
-            // Disarm on throttle down + yaw
-            if (receiver->sticks == Receiver::THR_LO + Receiver::YAW_LO + Receiver::PIT_CE + Receiver::ROL_CE) {
+            // Disarm
+            if (receiver->disarming()) {
                 if (armed) {
                     armed = false;
                 }
@@ -176,8 +176,8 @@ void Hackflight::updateRc(void)
         // Actions during not armed
         } else {         
 
-            // Arm via throttle-low / yaw-right
-            if (receiver->sticks == Receiver::THR_LO + Receiver::YAW_HI + Receiver::PIT_CE + Receiver::ROL_CE) {
+            // Arming
+            if (receiver->arming()) {
     
                 if (safeToArm) {
                     auxState = receiver->getAuxState();

@@ -32,9 +32,18 @@ namespace hf {
 
 class Receiver {
 
-// For logical combinations of stick positions (low, center, high)
 public:
 
+protected: 
+
+    // These must be overridden for each receiver
+    virtual void  begin(void) = 0;
+    virtual bool  useSerial(void) = 0;
+    virtual float readChannel(uint8_t chan) = 0;
+
+private:
+
+    // For logical combinations of stick positions (low, center, high)
     static const uint8_t ROL_LO = (1 << (2 * DEMAND_ROLL));
     static const uint8_t ROL_CE = (3 << (2 * DEMAND_ROLL));
     static const uint8_t ROL_HI = (2 << (2 * DEMAND_ROLL));
@@ -48,14 +57,7 @@ public:
     static const uint8_t THR_CE = (3 << (2 * DEMAND_THROTTLE));
     static const uint8_t THR_HI = (2 << (2 * DEMAND_THROTTLE));
 
-protected: 
-
-    // These must be overridden for each receiver
-    virtual void  begin(void) = 0;
-    virtual bool  useSerial(void) = 0;
-    virtual float readChannel(uint8_t chan) = 0;
-
-private:
+    uint8_t sticks;                    // stick positions for command combos
 
     float adjustCommand(float command, uint8_t channel);
 
@@ -72,9 +74,10 @@ private:
 
 public:
 
-    float   rawvals[ReceiverConfig::CHANNELS];  // raw [-1,+1] from receiver, for MSP
+    bool    arming(void);
+    bool    disarming(void);
 
-    uint8_t sticks;                    // stick positions for command combos
+    float   rawvals[ReceiverConfig::CHANNELS];  // raw [-1,+1] from receiver, for MSP
 
     float   demandThrottle;
     float   demandRoll;
@@ -94,6 +97,15 @@ public:
 
 
 /********************************************* CPP ********************************************************/
+bool Receiver::arming(void)
+{
+    return sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE;
+}
+
+bool Receiver::disarming(void)
+{
+    return sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE;
+}
 
 void Receiver::init(const ReceiverConfig& rcConfig)
 {
