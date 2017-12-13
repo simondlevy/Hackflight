@@ -97,7 +97,8 @@ void Accelerometer::update(float eulerAnglesRadians[3], bool armed)
     // Rotate accel values into the earth frame
     float rotatedZ = Accelerometer::rotate(accelGsSmoothed, eulerAnglesRadians);
 
-    if (!armed) {
+    // Get vertical acceleration offset at rest
+    if (!armed || board->extrasSimulated()) {
         zOffset = rotatedZ;
     }
 
