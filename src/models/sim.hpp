@@ -43,9 +43,9 @@ namespace hf {
                 yawI = 0;// 0.05f;
 
                 // Altitude 
-                altP = .04f;
-                altI = 0.5f;
-                altD = 6.0f;
+                altP = 0.04f;
+                altI = 0.50f;
+                altD = 6.00f;
              }
     };
 

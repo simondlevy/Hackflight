@@ -134,11 +134,6 @@ namespace hf {
                 }
             }
 
-            bool extrasSimulated(void) 
-            {
-                return true;
-            }
-
             // private methods
         private:
 

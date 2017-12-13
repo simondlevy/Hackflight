@@ -121,7 +121,7 @@ void Altitude::computePid(bool armed)
     // Update the baro with the current pressure reading
     baro.update();
 
-    // Calibrate baro AGL while not armed
+    // Calibrate baro AGL at rest
     if (!armed) {
         baro.calibrate();
         return;
