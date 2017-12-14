@@ -115,8 +115,6 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
 
 void Hackflight::update(void)
 {
-    //Debug::printf("%d\n", armed);
-
     // Grab current time for various loops
     uint32_t currentTime = (uint32_t)board->getMicros();
 
@@ -151,6 +149,8 @@ void Hackflight::updateRc(void)
 {
     // Update Receiver channels
     receiver->update();
+
+    Debug::printf("%d\n", receiver->getAuxState());
     
     /*
     Debug::printf("%f  %f  %f  %f  %d\n",

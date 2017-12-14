@@ -75,9 +75,11 @@ private:
 
 public:
 
-    // These can be overridden to support various styles of arming (sticks, switches, etc.)
-    virtual bool arming(void);
-    virtual bool disarming(void);
+    // These can be overridden to support various styles of arming (sticks, switches, etc.) and
+    // auxiliary-state implementations (switches, buttons, etc.)
+    virtual bool    arming(void);
+    virtual bool    disarming(void);
+    virtual uint8_t getAuxState(void);
 
     float   rawvals[ReceiverConfig::CHANNELS];  // raw [-1,+1] from receiver, for MSP
 
@@ -90,7 +92,6 @@ public:
     void    update(void);
     bool    changed(void);
     void    computeExpo(float yawAngle);
-    uint8_t getAuxState(void);
     bool    throttleIsDown(void);
 
     // Override this if your receiver provides RSSI or other weak-signal detection
@@ -99,6 +100,9 @@ public:
 
 
 /********************************************* CPP ********************************************************/
+
+// arming(), disarming(), getAuxState() can be overridden as needed --------------------
+
 bool Receiver::arming(void)
 {
     return sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE;
@@ -108,6 +112,15 @@ bool Receiver::disarming(void)
 {
     return sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE;
 }
+
+uint8_t Receiver::getAuxState(void) 
+{
+    float aux = rawvals[4];
+
+    return aux < 0 ? 0 : (aux < 0.4 ? 1 : 2);
+}
+
+// --------------------------------------------------------------------------------------
 
 void Receiver::init(const ReceiverConfig& rcConfig)
 {
@@ -223,13 +236,6 @@ float Receiver::throttleFun(float x, float e, float mid)
     float tmp   = x - mid;
     float y = tmp>0 ? 1-mid : (tmp<0 ? mid : 1);
     return mid + tmp*(1-e + e * (tmp*tmp) / (y*y));
-}
-
-uint8_t Receiver::getAuxState(void) 
-{
-    float aux = rawvals[4];
-
-    return aux < 0 ? 0 : (aux < 0.4 ? 1 : 2);
 }
 
 bool Receiver::throttleIsDown(void)

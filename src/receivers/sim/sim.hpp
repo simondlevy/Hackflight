@@ -35,7 +35,7 @@ namespace hf {
 
         public:
 
-            bool arming(void)
+            bool arming(void) override
             {
                 bool retval = _ready ? demandThrottle>0.1 : false;
 
@@ -45,10 +45,16 @@ namespace hf {
             }
 
             // Once armed, sim never disarms
-            bool disarming(void)
+            bool disarming(void) override
             {
                 return false;
             }
+
+            uint8_t getAuxState(void) 
+            {
+                return Receiver::getAuxState();
+            }
+
 
             bool useSerial(void)
             {
