@@ -21,6 +21,7 @@
 #pragma once
 
 #include "sim.hpp"
+#include "linux.hpp"
 
 #include <stdio.h>
 

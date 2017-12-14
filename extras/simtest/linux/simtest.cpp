@@ -22,7 +22,7 @@
 #include <hackflight.hpp>
 #include <models/3dfly.hpp> // arbitrary
 #include <receivers/sim/linux.hpp>
-#include <boards/sim/linux.hpp>
+#include <boards/sim/linux-console.hpp>
 
 int main(int argc, char ** argv)
 {
