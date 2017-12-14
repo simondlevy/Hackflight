@@ -23,6 +23,7 @@
 #pragma once
 
 #include <stdarg.h>
+#include <stdio.h>
 #include "board.hpp"
 
 namespace hf {
