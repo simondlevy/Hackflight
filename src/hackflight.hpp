@@ -150,7 +150,7 @@ void Hackflight::updateRc(void)
     // Update Receiver channels
     receiver->update();
 
-    Debug::printf("%d\n", receiver->getAuxState());
+    //Debug::printf("Aux: %d\n", receiver->getAuxState());
     
     /*
     Debug::printf("%f  %f  %f  %f  %d\n",

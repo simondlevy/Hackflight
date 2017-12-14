@@ -104,7 +104,7 @@ void hf::Controller::productInit(void)
     }
 }
 
-void hf::Controller::productPoll(int32_t axes[6])
+void hf::Controller::productPoll(int32_t axes[6], uint8_t & buttons)
 {
     JOYINFOEX joyState;
     joyState.dwSize=sizeof(joyState);
@@ -117,6 +117,8 @@ void hf::Controller::productPoll(int32_t axes[6])
     axes[3] = joyState.dwRpos;
     axes[4] = joyState.dwUpos;
     axes[5] = joyState.dwVpos;
+
+    buttons = joyState.dwButtons;
 }
 
 int32_t hf::Controller::productGetBaseline(void)

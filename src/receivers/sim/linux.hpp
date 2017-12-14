@@ -81,7 +81,7 @@ void hf::Controller::productInit(void)
     }
 }
 
-void hf::Controller::productPoll(int32_t axes[6])
+void hf::Controller::productPoll(int32_t axes[6], uint8_t & buttons)
 {
     if (_joyid <= 0) return;
 

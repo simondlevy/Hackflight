@@ -37,8 +37,11 @@ namespace hf {
 
             bool arming(void) override
             {
+                // Assume noisy throttle first time around; thereafter, we're arming if the throttle
+                // is positive.
                 bool retval = _ready ? demandThrottle>0.1 : false;
 
+                // We're ready after skipping initial noisy throttle
                 _ready = true;
 
                 return retval;
@@ -49,12 +52,6 @@ namespace hf {
             {
                 return false;
             }
-
-            uint8_t getAuxState(void) 
-            {
-                return Receiver::getAuxState();
-            }
-
 
             bool useSerial(void)
             {
@@ -103,9 +100,10 @@ namespace hf {
 
             // implemented differently for each OS
             void     productInit(void);
-            void     productPoll(int32_t axes[6]);
+            void     productPoll(int32_t axes[6], uint8_t & buttons);
             int32_t  productGetBaseline(void);
 
+            // determined dynamically based on controller
             bool     _reversedVerticals;
             bool     _springyThrottle;
             bool     _useButtonForAux;
@@ -116,9 +114,12 @@ namespace hf {
             void poll(float * demands)
             {
                 static int32_t axes[6];
+                static uint8_t buttons;
 
                 // grab the axis values in an OS-specific way
-                productPoll(axes);
+                productPoll(axes, buttons);
+
+                Debug::printf("Buttons: %d\n", buttons);
 
                 // normalize the axes to demands in [-1,+1]
                 for (uint8_t k=0; k<5; ++k) {
