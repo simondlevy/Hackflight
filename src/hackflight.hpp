@@ -115,6 +115,8 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
 
 void Hackflight::update(void)
 {
+    //Debug::printf("%d\n", armed);
+
     // Grab current time for various loops
     uint32_t currentTime = (uint32_t)board->getMicros();
 
@@ -150,10 +152,10 @@ void Hackflight::updateRc(void)
     // Update Receiver channels
     receiver->update();
     
-
+    /*
     Debug::printf("%f  %f  %f  %f  %d\n",
             receiver->demandThrottle, receiver->demandRoll, receiver->demandPitch, receiver->demandYaw,
-            receiver->getAuxState());
+            receiver->getAuxState());*/
 
     // When landed, reset integral component of PID
     if (receiver->throttleIsDown()) {

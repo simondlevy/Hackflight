@@ -35,6 +35,21 @@ namespace hf {
 
         public:
 
+            bool arming(void)
+            {
+                bool retval = _ready ? demandThrottle>0.1 : false;
+
+                _ready = true;
+
+                return retval;
+            }
+
+            // Once armed, sim never disarms
+            bool disarming(void)
+            {
+                return false;
+            }
+
             bool useSerial(void)
             {
                 return true;
@@ -42,6 +57,7 @@ namespace hf {
 
             Controller(void)
             {
+                _ready = false;
                 _reversedVerticals = false;
                 _springyThrottle = false;
                 _useButtonForAux = false;
@@ -75,6 +91,9 @@ namespace hf {
             }
 
         private:
+
+            // a hack to skip noisy throttle on startup
+            bool     _ready;
 
             // implemented differently for each OS
             void     productInit(void);

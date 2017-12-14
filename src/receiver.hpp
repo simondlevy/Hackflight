@@ -41,8 +41,6 @@ protected:
     virtual bool  useSerial(void) = 0;
     virtual float readChannel(uint8_t chan) = 0;
 
-private:
-
     // For logical combinations of stick positions (low, center, high)
     static const uint8_t ROL_LO = (1 << (2 * DEMAND_ROLL));
     static const uint8_t ROL_CE = (3 << (2 * DEMAND_ROLL));
@@ -57,7 +55,10 @@ private:
     static const uint8_t THR_CE = (3 << (2 * DEMAND_THROTTLE));
     static const uint8_t THR_HI = (2 << (2 * DEMAND_THROTTLE));
 
-    uint8_t sticks;                    // stick positions for command combos
+    // Stick positions for command combos
+    uint8_t sticks;                    
+
+private:
 
     float adjustCommand(float command, uint8_t channel);
 
@@ -74,8 +75,9 @@ private:
 
 public:
 
-    bool    arming(void);
-    bool    disarming(void);
+    // These can be overridden to support various styles of arming (sticks, switches, etc.)
+    virtual bool arming(void);
+    virtual bool disarming(void);
 
     float   rawvals[ReceiverConfig::CHANNELS];  // raw [-1,+1] from receiver, for MSP
 
