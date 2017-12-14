@@ -119,8 +119,6 @@ namespace hf {
                 // grab the axis values in an OS-specific way
                 productPoll(axes, buttons);
 
-                Debug::printf("Buttons: %d\n", buttons);
-
                 // normalize the axes to demands in [-1,+1]
                 for (uint8_t k=0; k<5; ++k) {
                     demands[k] = (axes[_axismap[k]] - productGetBaseline()) / 32767.f;
