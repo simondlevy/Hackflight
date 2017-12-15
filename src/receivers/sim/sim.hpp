@@ -53,6 +53,11 @@ namespace hf {
                 return false;
             }
 
+            uint8_t getAuxState(void) override
+            {
+                return _useButtonForAux ? _auxState : Receiver::getAuxState();
+            }
+
             bool useSerial(void)
             {
                 return true;
@@ -64,6 +69,7 @@ namespace hf {
                 _reversedVerticals = false;
                 _springyThrottle = false;
                 _useButtonForAux = false;
+                _auxState = 0;
                 _joyid = 0;
             }
 
@@ -95,20 +101,22 @@ namespace hf {
 
         private:
 
-            // a hack to skip noisy throttle on startup
+            // A hack to skip noisy throttle on startup
             bool     _ready;
 
-            // implemented differently for each OS
+            // Implemented differently for each OS
             void     productInit(void);
             void     productPoll(int32_t axes[6], uint8_t & buttons);
             int32_t  productGetBaseline(void);
 
-            // determined dynamically based on controller
+            // Determined dynamically based on controller
             bool     _reversedVerticals;
             bool     _springyThrottle;
             bool     _useButtonForAux;
             float    _throttleDemand;
             uint8_t  _axismap[5];   // Thr, Ael, Ele, Rud, Aux
+            uint8_t  _buttonmap[3]; // Aux=0, Aux=1, Aux=2
+            uint8_t  _auxState;     // For buttons
             int      _joyid;        // Linux file descriptor or Windows joystick ID
 
             void poll(float * demands)
@@ -116,26 +124,30 @@ namespace hf {
                 static int32_t axes[6];
                 static uint8_t buttons;
 
-                // grab the axis values in an OS-specific way
+                // Grab the axis values in an OS-specific way
                 productPoll(axes, buttons);
 
-                // normalize the axes to demands in [-1,+1]
+                // Normalize the axes to demands in [-1,+1]
                 for (uint8_t k=0; k<5; ++k) {
                     demands[k] = (axes[_axismap[k]] - productGetBaseline()) / 32767.f;
                 }
 
-                // invert throttle, pitch if indicated
+                // Invert throttle, pitch if indicated
                 if (_reversedVerticals) {
                     demands[0] = -demands[0];
                     demands[2] = -demands[2];
                 }
 
-                // for game controllers, use buttons for aux
+                // For game controllers, use buttons for aux
                 if (_useButtonForAux) {
-                    demands[4] = -1; // XXX for now, disallow aux switch
+                    for (uint8_t k=0; k<3; ++k) {
+                        if (buttons == _buttonmap[k]) {
+                            _auxState = k;
+                        }
+                    }
                 }
 
-                // game-controller spring-mounted throttle requires special handling
+                // Game-controller spring-mounted throttle requires special handling
                 if (_springyThrottle) {
                     demands[0] = Filter::deadband(demands[0], 0.15);
                     _throttleDemand += demands[0] * .01f; // XXX need to make this deltaT computable

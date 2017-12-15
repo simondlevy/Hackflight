@@ -78,6 +78,7 @@ public:
     // These can be overridden to support various styles of arming (sticks, switches, etc.)
     virtual bool    arming(void);
     virtual bool    disarming(void);
+    virtual uint8_t getAuxState(void);
 
     float   rawvals[ReceiverConfig::CHANNELS];  // raw [-1,+1] from receiver, for MSP
 
@@ -90,7 +91,6 @@ public:
     void    update(void);
     bool    changed(void);
     void    computeExpo(float yawAngle);
-    uint8_t getAuxState(void);
     bool    throttleIsDown(void);
 
     // Override this if your receiver provides RSSI or other weak-signal detection
@@ -111,6 +111,15 @@ bool Receiver::disarming(void)
 {
     return sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE;
 }
+
+uint8_t Receiver::getAuxState(void) 
+{
+    // Auxiliary switch is treated as a fifth axis: 
+    // we convert values in interval [-1,+1] to 0, 1, 2
+    float aux = rawvals[4];
+    return aux < 0 ? 0 : (aux < 0.4 ? 1 : 2);
+}
+
 
 // --------------------------------------------------------------------------------------
 
@@ -196,13 +205,6 @@ void Receiver::computeExpo(float yawAngle)
     demandThrottle = throttleFun(tmp, config.throttleExpo, config.throttleMid);
 
 } // computeExpo
-
-uint8_t Receiver::getAuxState(void) 
-{
-    float aux = rawvals[4];
-
-    return aux < 0 ? 0 : (aux < 0.4 ? 1 : 2);
-}
 
 
 float Receiver::makePositiveCommand(uint8_t channel)
