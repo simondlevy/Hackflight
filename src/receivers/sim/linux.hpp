@@ -68,6 +68,9 @@ void hf::Controller::productInit(void)
             _reversedVerticals = true;
             _springyThrottle = true;
             _useButtonForAux = true;
+            _buttonmap[0] = 4;
+            _buttonmap[1] = 2;
+            _buttonmap[2] = 1;
         }
         else { // default to PS3
             _axismap[0] = 1;
@@ -89,11 +92,14 @@ void hf::Controller::productPoll(int32_t axes[6], uint8_t & buttons)
 
     read(_joyid, &js, sizeof(struct js_event));
 
-    int jstype = js.type & ~JS_EVENT_INIT;
+    if (js.type & JS_EVENT_INIT) return;
 
-    if (jstype == JS_EVENT_AXIS)  {
-
-        axes[js.number] = js.value;
+    switch (js.type) {
+        case JS_EVENT_AXIS:
+            axes[js.number] = js.value;
+            break;
+        case JS_EVENT_BUTTON:
+            buttons = js.number + 1; // avoid zero
     }
 }
 
