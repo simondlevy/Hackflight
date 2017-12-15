@@ -59,6 +59,9 @@ void hf::Controller::productInit(void)
             _axismap[3] = 2;
             _reversedVerticals = true;
             _useButtonForAux = true;
+            _buttonmap[0] = 1;
+            _buttonmap[1] = 2;
+            _buttonmap[2] = 3;
         }
         else if (strstr(prodname, "Generic X-Box pad")) {
             _axismap[0] =  1;
