@@ -1,7 +1,7 @@
 /*
    sim.hpp: Hackflight Board class implementation for flight simulators
 
-   Simulates quadcopter physics
+   Simulates quadcopter physics (vehicle state)
 
    Copyright (C) Simon D. Levy 2017
 
@@ -52,7 +52,6 @@ namespace hf {
             const float VELOCITY_TRANSLATE_SCALE = 0.05;
 
             // Private state variables ----------------------------
-            float _accel[3];          // Gs
             float _gyro[3];           // radians per second
             float _angles[3];         // radians
             float _baroPressure;      // millibars
@@ -60,7 +59,8 @@ namespace hf {
             float _verticalSpeedPrev; // meters per second
             float _motors[4];         // arbitrary in [0,1]
             float _altitude;          // meters
-            bool _flying;
+            bool  _flying;
+            float _accel[3];          // Gs
             float _secondsPrev;
 
             // Gets CPU time in seconds
@@ -68,7 +68,7 @@ namespace hf {
 
         public:
 
-            // methods called by simulator -------------------------------------------------
+            // accessor available to simulators -----------------------------------------------
 
             void getState(float angularSpeeds[3], float linearSpeeds[3], float motors[4], bool & flying)
             {
@@ -82,6 +82,44 @@ namespace hf {
                 }
 
                 flying = _flying;
+            }
+
+            void simGetEulerAngles(float angles[3])
+            {
+                for (uint8_t k=0; k<3; ++k) {
+                    angles[k] = _angles[k];
+                }
+            }
+
+            void simGetGyro(float gyro[3])
+            {
+                for (uint8_t k=0; k<3; ++k) {
+                    gyro[k] = _gyro[k];
+                }
+            }
+
+            void simGetLinearSpeeds(float speeds[3])
+            {
+                for (uint8_t k=0; k<3; ++k) {
+                    speeds[k] = _linearSpeeds[k];
+                }
+            }
+
+            void simGetMotors(float motors[3])
+            {
+                for (uint8_t k=0; k<4; ++k) {
+                    motors[k] = _motors[k];
+                }
+            }
+
+            float simGetAltitude(void)
+            {
+                return _altitude;
+            }
+
+            bool simIsFlying(void)
+            {
+                return _flying;
             }
 
             // methods called by Hackflight -------------------------------------------------
