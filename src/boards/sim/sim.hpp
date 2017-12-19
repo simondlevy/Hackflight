@@ -68,21 +68,7 @@ namespace hf {
 
         public:
 
-            // accessor available to simulators -----------------------------------------------
-
-            void getState(float angularSpeeds[3], float linearSpeeds[3], float motors[4], bool & flying)
-            {
-                for (uint8_t k=0; k<3; ++k) {
-                    angularSpeeds[k] = _gyro[k];
-                    linearSpeeds[k] = _linearSpeeds[k];
-                }
-
-                for (uint8_t k=0; k<4; ++k) {
-                    motors[k] = _motors[k];
-                }
-
-                flying = _flying;
-            }
+            // accessors available to simulators -----------------------------------------------
 
             void simGetEulerAngles(float angles[3])
             {
