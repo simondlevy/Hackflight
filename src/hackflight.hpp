@@ -150,10 +150,6 @@ void Hackflight::updateRc(void)
     // Update Receiver channels
     receiver->update();
 
-    Debug::printf("%f  %f  %f  %f  %d\n",
-            receiver->demandThrottle, receiver->demandRoll, receiver->demandPitch, receiver->demandYaw, 
-            receiver->getAuxState());
-
     // When landed, reset integral component of PID
     if (receiver->throttleIsDown()) {
         stab.resetIntegral();

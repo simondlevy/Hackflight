@@ -200,9 +200,9 @@ namespace hf {
                 float r22 = cos(phi)*cos(theta);
 
                 // Overall vertical force = thrust - gravity
-                // We first multiply by the sign of the vertical world coordinate direction, because simulator
-                // will upside-down vehicle rise on negative velocity.
-                float lift = (r22 < 0 ? -1 : +1) * (r22*thrust - GRAVITY);
+                float lift = r22*thrust - GRAVITY;
+
+                Debug::printf("Lift: %f", lift);
 
                 // Compute delta seconds
                 float secondsCurr = seconds();
