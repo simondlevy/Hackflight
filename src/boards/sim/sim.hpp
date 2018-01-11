@@ -190,19 +190,13 @@ namespace hf {
                 // Overall thrust vector, scaled by arbitrary constant for realism
                 float thrust = THRUST_SCALE * (_motors[0] + _motors[1] + _motors[2] + _motors[3]);
 
-                // Compute right column of of R matrix converting body coordinates to world coordinates.
-                // See page 7 of http://repository.upenn.edu/cgi/viewcontent.cgi?article=1705&context=edissertations.
+                // Rename Euler angles to Greek-letter variables from literature
                 float phi   = _angles[0];
                 float theta = _angles[1];
                 float psi   = _angles[2];
-                float r02 = cos(psi)*sin(theta) + cos(theta)*sin(phi)*sin(psi);
-                float r12 = sin(psi)*sin(theta) - cos(psi)*cos(theta)*sin(phi);
-                float r22 = cos(phi)*cos(theta);
 
                 // Overall vertical force = thrust - gravity
-                float lift = r22*thrust - GRAVITY;
-
-                Debug::printf("Lift: %f", lift);
+                float lift = cos(phi)*cos(theta)*thrust - GRAVITY;
 
                 // Compute delta seconds
                 float secondsCurr = seconds();
@@ -220,10 +214,9 @@ namespace hf {
                     _linearSpeeds[2] += (lift * deltaSeconds);
 
                     // To get forward and lateral speeds, integrate thrust along world coordinates
-                    _linearSpeeds[0] += thrust * VELOCITY_TRANSLATE_SCALE * r02;
-                    _linearSpeeds[1] -= thrust * VELOCITY_TRANSLATE_SCALE * r12;
+                    _linearSpeeds[0] += thrust * VELOCITY_TRANSLATE_SCALE * sin(theta);
+                    _linearSpeeds[1] += thrust * VELOCITY_TRANSLATE_SCALE * sin(phi);
                 }
-
 
                 // Integrate vertical speed to get altitude
                 _altitude += _linearSpeeds[2] * deltaSeconds;

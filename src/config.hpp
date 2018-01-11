@@ -123,6 +123,8 @@ struct ReceiverConfig {
     float throttleMid   = 0.50f;
     float throttleExpo  = 0.20f;
 
+    bool  headless      = false;
+
     static const uint8_t CHANNELS = 8;
 };
 

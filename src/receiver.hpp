@@ -143,7 +143,6 @@ void Receiver::update()
     if (useSerial()) {
         for (uint8_t chan = 0; chan < 5; chan++) {
             rawvals[chan] = readChannel(chan);
-            //Debug::printf("%d:%f%c", chan, rawvals[chan], chan==4?'\n':'\t');
         }
     }
 
@@ -196,6 +195,16 @@ void Receiver::computeExpo(float yawAngle)
     demandRoll  = adjustCommand(demandRoll, DEMAND_ROLL);
     demandPitch = adjustCommand(demandPitch, DEMAND_PITCH);
     demandYaw   = adjustCommand(demandYaw, DEMAND_YAW);
+
+    // Support headless mode
+    if (config.headless) {
+        float c = cos(yawAngle);
+        float s = sin(yawAngle);
+        float p = demandPitch;
+        float r = demandRoll;
+        demandPitch = c*p + s*r;
+        demandRoll  = c*r - s*p;
+    }
 
     // Yaw demand needs to be reversed
     demandYaw = -demandYaw;
