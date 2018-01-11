@@ -140,9 +140,8 @@ void Altitude::computePid(bool armed)
     velocity = Filter::complementary(velocity, (float)baroVel, config.cfVel);
 
     // P
-    float olderror = altHold-baroAlt;
-    float error = Filter::constrainAbs(olderror, config.pErrorMax);
-    Debug::printf("%f %f\n", olderror, error);
+    float error = altHold-baroAlt;
+    error = Filter::constrainAbs(error, config.pErrorMax);
     error = Filter::deadband(error, config.pDeadband); 
     pid = Filter::constrainAbs(model->altP * error, config.pidMax);
 

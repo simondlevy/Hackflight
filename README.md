@@ -1,4 +1,4 @@
-# Hackflight: Simple quadcopter flight control firmware for Arduino / C++ hackers
+# Hackflight: Simple C++ quadcopter flight control firmware for Arduino and simulators
 
 <img src="hackflight.png" width=500>
 

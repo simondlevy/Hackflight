@@ -190,7 +190,7 @@ namespace hf {
                 // Overall thrust vector, scaled by arbitrary constant for realism
                 float thrust = THRUST_SCALE * (_motors[0] + _motors[1] + _motors[2] + _motors[3]);
 
-                // Rename Euler angles to Greek-letter variables from literature
+                // Rename Euler angles to familiar Greek-letter variables
                 float phi   = _angles[0];
                 float theta = _angles[1];
                 float psi   = _angles[2];
