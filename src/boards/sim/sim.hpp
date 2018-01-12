@@ -47,9 +47,11 @@ namespace hf {
             // Approxmiate zero for liftoff
             const float NOISE_FLOOR = 0.2;
 
+            // Simulate drift
+            const float DRIFT_SPEED = 0.01;
+
             // Controls "snappiness" of response
             const float VELOCITY_ROTATE_SCALE    = 1.75;
-            const float VELOCITY_TRANSLATE_SCALE = 0.05;
 
             // Private state variables ----------------------------
             float _gyro[3];           // radians per second
@@ -213,9 +215,12 @@ namespace hf {
                     // Integrate vertical force to get vertical speed
                     _linearSpeeds[2] += (lift * deltaSeconds);
 
-                    // To get forward and lateral speeds, integrate thrust along world coordinates
-                    _linearSpeeds[0] += thrust * VELOCITY_TRANSLATE_SCALE * sin(theta);
-                    _linearSpeeds[1] += thrust * VELOCITY_TRANSLATE_SCALE * sin(phi);
+                    // To get forward and lateral speeds, integrate thrust along vehicle coordinates
+                    _linearSpeeds[0] += thrust * deltaSeconds * sin(theta);
+                    _linearSpeeds[1] += thrust * deltaSeconds * sin(phi);
+
+                    // Add some drift
+                    //_linearSpeeds[0] += DRIFT_SPEED;
                 }
 
                 // Integrate vertical speed to get altitude
