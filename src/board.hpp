@@ -50,7 +50,6 @@ class Board {
         virtual bool    extrasHaveBaro(void) { return false; }
         virtual float   extrasGetBaroPressure(void) { return 0; }
         virtual void    extrasImuGetAccel(float accelGs[3]) { (void)accelGs; }
-        virtual void    extrasImuPoll(void) { }
 
 }; // class Board
 

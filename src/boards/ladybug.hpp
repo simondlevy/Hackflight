@@ -118,7 +118,7 @@ class Ladybug : public Board {
             avalPrev[index] = aval;
         }
 
-        virtual void extrasImuPoll(void) override
+        virtual void getImu(float eulerAnglesRadians[3], float gyroRadiansPerSecond[3]) override
         {
             uint8_t errorStatus = _sentral.poll();
 
@@ -127,10 +127,7 @@ class Ladybug : public Board {
                 Serial.println(EM7180::errorToString(errorStatus));
                 return;
             }
-        }
 
-        virtual void getImu(float eulerAnglesRadians[3], float gyroRadiansPerSecond[3]) override
-        {
             static float q[4];
             _sentral.getQuaternions(q);
 
