@@ -141,7 +141,6 @@ void Altitude::computePid(bool armed)
 
     // P
     float error = altHold-baroAlt;
-    Debug::printf("%f", error);
     error = Filter::constrainAbs(error, config.pErrorMax);
     error = Filter::deadband(error, config.pDeadband); 
     pid = Filter::constrainAbs(model->altP * error, config.pidMax);

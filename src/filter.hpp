@@ -32,6 +32,7 @@ class Filter {
 
     public:
         
+        static float max(float a, float b);
         static float deadband(float value, float deadband);
         static float complementary(float a, float b, float c);
         static float constrainMinMax(float val, float min, float max);
@@ -39,6 +40,11 @@ class Filter {
 };
 
 /********************************************* CPP ********************************************************/
+
+float Filter::max(float a, float b)
+{
+    return a > b ? a : b;
+}
 
 float Filter::deadband(float value, float deadband)
 {

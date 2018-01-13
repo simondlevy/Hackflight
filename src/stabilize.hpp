@@ -111,8 +111,8 @@ float Stabilize::computeITermGyro(float rateP, float rateI, float rcCommand, flo
     errorGyroI[axis] = Filter::constrainAbs(errorGyroI[axis] + error, config.gyroWindupMax);
 
     // Reset integral on quick gyro change or large yaw command
-    if ((std::abs(gyroRadiansPerSecond[axis]) > bigGyroRadiansPerSecond) || 
-            ((axis == AXIS_YAW) && (std::abs(rcCommand) > config.bigYawDemand)))
+    if ((fabs(gyroRadiansPerSecond[axis]) > bigGyroRadiansPerSecond) || 
+            ((axis == AXIS_YAW) && (fabs(rcCommand) > config.bigYawDemand)))
         errorGyroI[axis] = 0;
 
     return (errorGyroI[axis] * rateI);
@@ -167,7 +167,7 @@ void Stabilize::update(
         float gyroRadiansPerSecond[3])
 {
     // Compute proportion of cyclic demand compared to its maximum
-    float prop = (std::max)(std::abs(rcCommandRoll), std::abs(rcCommandPitch)) / 0.5f;
+    float prop = Filter::max(fabs(rcCommandRoll), fabs(rcCommandPitch)) / 0.5f;
 
     // Pitch, roll use leveling based on Euler angles
     pidRoll  = computePitchRollPid(rcCommandRoll,  model->softwareTrimRoll,  prop, 
@@ -175,12 +175,14 @@ void Stabilize::update(
     pidPitch = computePitchRollPid(rcCommandPitch, model->softwareTrimPitch, prop, 
             eulerAnglesRadians, gyroRadiansPerSecond, AXIS_PITCH);
 
+    Debug::printf("%f %f", pidRoll, eulerAnglesRadians[0]);
+
     // For yaw, P term comes directly from RC command, and D term is zero
     float ITermGyroYaw = computeITermGyro(model->yawP, model->yawI, rcCommandYaw, gyroRadiansPerSecond, AXIS_YAW);
     pidYaw = computePid(model->yawP, model->softwareTrimYaw, rcCommandYaw, ITermGyroYaw, 0, gyroRadiansPerSecond, AXIS_YAW);
 
     // Prevent "yaw jump" during yaw correction
-    pidYaw = Filter::constrainAbs(pidYaw, 0.1 + std::abs(rcCommandYaw));
+    pidYaw = Filter::constrainAbs(pidYaw, 0.1 + fabs(rcCommandYaw));
 }
 
 void Stabilize::resetIntegral(void)
