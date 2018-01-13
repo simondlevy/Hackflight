@@ -26,17 +26,17 @@ class Model {
 
     public:
 
-        // Level (accelerometer)
+        // Level (Euler angles)
         float levelP = 0;
 
         // Rate (gyro): P must be positive
-        float ratePitchRollP = 0;
-        float ratePitchRollI = 0;
-        float ratePitchRollD = 0;
+        float gyroCyclicP = 0;
+        float gyroCyclicI = 0;
+        float gyroCyclicD = 0;
 
         // Yaw: P must be positive
-        float yawP = 0;
-        float yawI = 0;
+        float gyroYawP = 0;
+        float gyroYawI = 0;
 
         // Trim for a particular vehicle
         float softwareTrimRoll  = 0;

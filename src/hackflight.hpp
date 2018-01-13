@@ -66,7 +66,6 @@ class Hackflight {
         uint8_t  auxState;
         float    eulerAnglesRadians[3];
         bool     safeToArm;
-        float    maxArmingAngleRadians;
 };
 
 /********************************************* CPP ********************************************************/
@@ -83,9 +82,6 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
 
     // Flash the LEDs to indicate startup
     flashLeds(config.init);
-
-    // Convert max arming angle to radians for use later
-    maxArmingAngleRadians = M_PI * config.imu.maxArmingAngleDegrees / 180.;
 
     // Sleep  a bit to allow IMU to catch up
     board->delayMilliseconds(config.init.delayMilli);
@@ -243,8 +239,8 @@ void Hackflight::updateReadyState(void)
     // If angle too steep, flash LED
     uint32_t currentTime = (uint32_t)board->getMicros();
     if (angleCheckTask.ready(currentTime)) {
-        if (fabs(eulerAnglesRadians[AXIS_ROLL])  > maxArmingAngleRadians ||
-            fabs(eulerAnglesRadians[AXIS_PITCH]) > maxArmingAngleRadians) {
+        if (fabs(eulerAnglesRadians[AXIS_ROLL])  > stab.maxArmingAngleRadians ||
+            fabs(eulerAnglesRadians[AXIS_PITCH]) > stab.maxArmingAngleRadians) {
             safeToArm = false; 
             blinkLedForTilt();
             angleCheckTask.update(currentTime);

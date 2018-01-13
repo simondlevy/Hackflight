@@ -28,19 +28,19 @@ namespace hf {
 
             ThreeDFly(void) {
 
-                // Level (accelerometer)
-                levelP         = 0.20f;
+                // Level (Euler angles)
+                levelP = 0.20f;
 
                 // Rate (gyro): P must be positive
-                ratePitchRollP = 0.225f;
-                ratePitchRollI = 0.001875f;
-                ratePitchRollD = 0.375f;
+                gyroCyclicP = 0.225f;
+                gyroCyclicI = 0.001875f;
+                gyroCyclicD = 0.375f;
 
                 // Yaw: P must be positive
-                yawP           = 1.0625f;
-                yawI           = 0.005625f;
+                gyroYawP = 1.0625f;
+                gyroYawI = 0.005625f;
 
-                // Trim for a particular vehicle: roll, pitch, yaw
+                // Trim for a particular vehicle: roll, pitch, gyroYaw
                 softwareTrimRoll  =   0.f;
                 softwareTrimPitch = -.018f;
                 softwareTrimYaw   =   0.f;

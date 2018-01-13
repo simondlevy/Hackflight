@@ -31,10 +31,10 @@ struct StabilizeConfig {
     // PIDs are in model.hpp
 
     // Resetting thresholds for PID Integral term
-    float angleWindupMax = 10.0f;
-    float gyroWindupMax  = 16.0f;
-    float bigGyro        = 40.0f; // degrees per second
-    float bigYawDemand   = 0.1f;
+    float angleWindupMax          = 10.0f;
+    float gyroWindupMax           = 16.0f;
+    float bigGyroDegreesPerSecond = 40.0f; 
+    float bigYawDemand            = 0.1f;
 };
 
 //=========================================================================
