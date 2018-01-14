@@ -64,7 +64,7 @@ class Hackflight {
 
         bool     armed;
         uint8_t  auxState;
-        float    eulerAnglesRadians[3];
+        float    eulerAngles[3];
         bool     safeToArm;
 };
 
@@ -198,15 +198,15 @@ void Hackflight::updateRc(void)
 void Hackflight::updateImu(void)
 {
     // Compute exponential Receiver commands, passing yaw angle for headless mode
-    receiver->computeExpo(eulerAnglesRadians[AXIS_YAW]);
+    receiver->computeExpo(eulerAngles[AXIS_YAW]);
 
     // Get Euler angles and raw gyro from board
     float gyroRadiansPerSecond[3];
-    board->getImu(eulerAnglesRadians, gyroRadiansPerSecond);
+    board->getImu(eulerAngles, gyroRadiansPerSecond);
 
     // Convert heading from [-pi,+pi] to [0,2*pi]
-    if (eulerAnglesRadians[AXIS_YAW] < 0) {
-        eulerAnglesRadians[AXIS_YAW] += 2*M_PI;
+    if (eulerAngles[AXIS_YAW] < 0) {
+        eulerAngles[AXIS_YAW] += 2*M_PI;
     }
 
     // Update status using Euler angles
@@ -214,17 +214,17 @@ void Hackflight::updateImu(void)
 
     // If barometer avaialble, update accelerometer for altitude fusion, then modify throttle demand
     if (board->extrasHaveBaro()) {
-        alti.update(eulerAnglesRadians, armed, receiver->demandThrottle);
+        alti.update(eulerAngles, armed, receiver->demandThrottle);
     }
 
     // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.
-    stab.update(receiver->demandRoll, receiver->demandPitch, receiver->demandYaw, eulerAnglesRadians, gyroRadiansPerSecond);
+    stab.update(receiver->demandRoll, receiver->demandPitch, receiver->demandYaw, eulerAngles, gyroRadiansPerSecond);
 
     // Update mixer
     mixer.update(receiver->demandThrottle, stab.pidRoll, stab.pidPitch, stab.pidYaw, armed);
 
     // Update serial comms
-    msp.update(eulerAnglesRadians, armed);
+    msp.update(eulerAngles, armed);
 } 
 
 void Hackflight::updateReadyState(void)
@@ -239,8 +239,7 @@ void Hackflight::updateReadyState(void)
     // If angle too steep, flash LED
     uint32_t currentTime = (uint32_t)board->getMicros();
     if (angleCheckTask.ready(currentTime)) {
-        if (fabs(eulerAnglesRadians[AXIS_ROLL])  > stab.maxArmingAngleRadians ||
-            fabs(eulerAnglesRadians[AXIS_PITCH]) > stab.maxArmingAngleRadians) {
+        if (fabs(eulerAngles[AXIS_ROLL])  > stab.maxArmingAngle || fabs(eulerAngles[AXIS_PITCH]) > stab.maxArmingAngle) {
             safeToArm = false; 
             blinkLedForTilt();
             angleCheckTask.update(currentTime);

@@ -47,8 +47,7 @@ namespace hf {
             // Approxmiate zero for liftoff
             const float NOISE_FLOOR = 0.2;
 
-            // Simulate drift
-            const float DRIFT_SPEED = 0.01;
+            
 
             // Controls "snappiness" of response
             const float VELOCITY_ROTATE_SCALE    = 1.75;
@@ -64,6 +63,8 @@ namespace hf {
             bool  _flying;
             float _accel[3];          // Gs
             float _secondsPrev;
+
+            bool drifted;
 
             // Gets CPU time in seconds
             void cputime(struct timespec * tv);
@@ -116,6 +117,8 @@ namespace hf {
             {
                 _secondsPrev = 0;
                 initPhysics();
+
+                drifted = false;
             }
 
             void getImu(float eulerAnglesRadians[3], float gyroRadiansPerSecond[3])
@@ -220,7 +223,10 @@ namespace hf {
                     _linearSpeeds[1] += thrust * deltaSeconds * sin(phi);
 
                     // Add some drift
-                    //_linearSpeeds[0] += DRIFT_SPEED;
+                    if (!drifted) {
+                        _linearSpeeds[1] += 0.5;
+                        drifted = true;
+                    }
                 }
 
                 // Integrate vertical speed to get altitude
