@@ -45,8 +45,7 @@ public:
 
     void init(const StabilizeConfig& _config, const ImuConfig& _imuConfig, Model * _model);
 
-    void update(float rcCommandRoll, float rcCommandPitch, float rcCommandYaw, 
-            float eulerAngles[3], float gyroRate[3]);
+    void update(float demands[4], float eulerAngles[3], float gyroRate[3]);
 
     void resetIntegral(void);
 
@@ -177,33 +176,33 @@ float Stabilize::constrainCyclicDemand(float eulerAngle, float demand)
     return fabs(eulerAngle) > maxArmingAngle ? 0 : demand;
 }
 
-void Stabilize::update(float rcCommandRoll, float rcCommandPitch, float rcCommandYaw, float eulerAngles[3], float gyroRate[3])
+void Stabilize::update(float demands[4], float eulerAngles[3], float gyroRate[3])
 {
     // Compute proportion of cyclic demand compared to its maximum
-    float prop = Filter::max(fabs(rcCommandRoll), fabs(rcCommandPitch)) / 0.5f;
+    float prop = Filter::max(fabs(demands[DEMAND_ROLL]), fabs(demands[DEMAND_PITCH])) / 0.5f;
 
     // In level mode, reject pitch, roll demands that increase angle beyond specified maximum
     if (model->levelP > 0) {
-        rcCommandRoll  = constrainCyclicDemand(eulerAngles[0], rcCommandRoll);
-        rcCommandPitch = constrainCyclicDemand(eulerAngles[1], rcCommandPitch);
+        demands[DEMAND_ROLL]  = constrainCyclicDemand(eulerAngles[0], demands[DEMAND_ROLL]);
+        demands[DEMAND_PITCH] = constrainCyclicDemand(eulerAngles[1], demands[DEMAND_PITCH]);
     }
 
     // Pitch, roll use leveling based on Euler angles
 
-    pidRoll = computeCyclicPid(rcCommandRoll,  model->softwareTrimRoll,  prop, 
+    pidRoll = computeCyclicPid(demands[DEMAND_ROLL],  model->softwareTrimRoll,  prop, 
             eulerAngles, gyroRate, AXIS_ROLL);
 
-    pidPitch = computeCyclicPid(rcCommandPitch, model->softwareTrimPitch, prop, 
+    pidPitch = computeCyclicPid(demands[DEMAND_PITCH], model->softwareTrimPitch, prop, 
             eulerAngles, gyroRate, AXIS_PITCH);
 
     Debug::printf("%f %f", pidRoll, eulerAngles[0]);
 
     // For gyroYaw, P term comes directly from RC command, and D term is zero
-    float ITermGyroYaw = computeITermGyro(model->gyroYawP, model->gyroYawI, rcCommandYaw, gyroRate, AXIS_YAW);
-    pidYaw = computePid(model->gyroYawP, model->softwareTrimYaw, rcCommandYaw, ITermGyroYaw, 0, gyroRate, AXIS_YAW);
+    float ITermGyroYaw = computeITermGyro(model->gyroYawP, model->gyroYawI, demands[DEMAND_YAW], gyroRate, AXIS_YAW);
+    pidYaw = computePid(model->gyroYawP, model->softwareTrimYaw, demands[DEMAND_YAW], ITermGyroYaw, 0, gyroRate, AXIS_YAW);
 
     // Prevent "gyroYaw jump" during gyroYaw correction
-    pidYaw = Filter::constrainAbs(pidYaw, 0.1 + fabs(rcCommandYaw));
+    pidYaw = Filter::constrainAbs(pidYaw, 0.1 + fabs(demands[DEMAND_YAW]));
 }
 
 void Stabilize::resetIntegral(void)

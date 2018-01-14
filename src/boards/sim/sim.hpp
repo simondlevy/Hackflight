@@ -224,7 +224,7 @@ namespace hf {
 
                     // Add some drift
                     if (!drifted) {
-                        _linearSpeeds[1] += 0.5;
+                        //_linearSpeeds[1] += 0.5;
                         drifted = true;
                     }
                 }

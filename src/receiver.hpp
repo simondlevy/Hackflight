@@ -82,10 +82,7 @@ public:
 
     float   rawvals[ReceiverConfig::CHANNELS];  // raw [-1,+1] from receiver, for MSP
 
-    float   demandThrottle;
-    float   demandRoll;
-    float   demandPitch;
-    float   demandYaw;
+    float   demands[4]; // TAER (Throttle, Roll, Pitch, Yaw
 
     void    init(const ReceiverConfig& rcConfig);
     void    update(void);
@@ -183,35 +180,35 @@ bool Receiver::changed(void)
 void Receiver::computeExpo(float yawAngle)
 {
     // Convert raw [-1,+1] to absolute value
-    demandRoll  = makePositiveCommand(DEMAND_ROLL);
-    demandPitch = makePositiveCommand(DEMAND_PITCH);
-    demandYaw   = makePositiveCommand(DEMAND_YAW);
+    demands[DEMAND_ROLL]  = makePositiveCommand(DEMAND_ROLL);
+    demands[DEMAND_PITCH] = makePositiveCommand(DEMAND_PITCH);
+    demands[DEMAND_YAW]   = makePositiveCommand(DEMAND_YAW);
 
     // Apply expo nonlinearity to roll, pitch
-    demandRoll  = applyPitchRollFunction(demandRoll);
-    demandPitch = applyPitchRollFunction(demandPitch);
+    demands[DEMAND_ROLL]  = applyPitchRollFunction(demands[DEMAND_ROLL]);
+    demands[DEMAND_PITCH] = applyPitchRollFunction(demands[DEMAND_PITCH]);
 
     // Put sign back on command, yielding [-0.5,+0.5]
-    demandRoll  = adjustCommand(demandRoll, DEMAND_ROLL);
-    demandPitch = adjustCommand(demandPitch, DEMAND_PITCH);
-    demandYaw   = adjustCommand(demandYaw, DEMAND_YAW);
+    demands[DEMAND_ROLL] = adjustCommand(demands[DEMAND_ROLL], DEMAND_ROLL);
+    demands[DEMAND_PITCH] = adjustCommand(demands[DEMAND_PITCH], DEMAND_PITCH);
+    demands[DEMAND_YAW] = adjustCommand(demands[DEMAND_YAW], DEMAND_YAW);
 
     // Support headless mode
     if (config.headless) {
         float c = cos(yawAngle);
         float s = sin(yawAngle);
-        float p = demandPitch;
-        float r = demandRoll;
-        demandPitch = c*p + s*r;
-        demandRoll  = c*r - s*p;
+        float p = demands[DEMAND_PITCH];
+        float r = demands[DEMAND_ROLL];
+        demands[DEMAND_PITCH] = c*p + s*r;
+        demands[DEMAND_ROLL]  = c*r - s*p;
     }
 
     // Yaw demand needs to be reversed
-    demandYaw = -demandYaw;
+    demands[DEMAND_YAW] = -demands[DEMAND_YAW];
 
     // Special handling for throttle
     float tmp = (rawvals[DEMAND_THROTTLE] + 1) / 2; // [-1,+1] -> [0,1]
-    demandThrottle = throttleFun(tmp, config.throttleExpo, config.throttleMid);
+    demands[DEMAND_THROTTLE] = throttleFun(tmp, config.throttleExpo, config.throttleMid);
 
 } // computeExpo
 
