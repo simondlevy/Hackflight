@@ -23,17 +23,6 @@
 namespace hf {
 
 
-//=========================================================================
-// Loop time config
-//=========================================================================
-
-struct LoopConfig {
-
-    uint32_t imuLoopMicro       = 3500;
-    uint32_t angleCheckMilli    = 500;
-    uint32_t rcLoopMilli        = 10;
-    uint32_t altHoldLoopMilli   = 25;
-};
 
 //=========================================================================
 // IMU config
@@ -130,7 +119,6 @@ struct InitConfig {
 //=========================================================================
 
 struct Config {
-    LoopConfig       loop;
     ImuConfig        imu;
     AltitudeConfig   altitude;
     ReceiverConfig   receiver;

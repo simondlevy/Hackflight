@@ -36,6 +36,13 @@ namespace hf {
 
 class Hackflight {
 
+    private: // constants
+
+        const uint32_t imuLoopMicro       = 3500;
+        const uint32_t angleCheckMilli    = 500;
+        const uint32_t rcLoopMilli        = 10;
+        const uint32_t altHoldLoopMilli   = 25;
+
     public:
 
         void init(Board * _board, Receiver *_receiver, Model * _model);
@@ -87,10 +94,10 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     board->delayMilliseconds(config.init.delayMilli);
 
     // Initialize timing tasks
-    imuTask.init(config.loop.imuLoopMicro);
-    rcTask.init(config.loop.rcLoopMilli * 1000);
-    angleCheckTask.init(config.loop.angleCheckMilli * 1000);
-    altitudeTask.init(config.loop.altHoldLoopMilli * 1000);
+    imuTask.init(imuLoopMicro);
+    rcTask.init(rcLoopMilli * 1000);
+    angleCheckTask.init(angleCheckMilli * 1000);
+    altitudeTask.init(altHoldLoopMilli * 1000);
 
     // Initialize the receiver
     receiver->init(config.receiver);
