@@ -32,7 +32,6 @@ namespace hf {
 
     class SimBoard : public Board {
 
-
         private:
 
             // Constants ------------------------------------------
@@ -46,8 +45,6 @@ namespace hf {
 
             // Approxmiate zero for liftoff
             const float NOISE_FLOOR = 0.2;
-
-            
 
             // Controls "snappiness" of response
             const float VELOCITY_ROTATE_SCALE    = 1.75;
