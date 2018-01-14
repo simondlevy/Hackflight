@@ -24,14 +24,7 @@ namespace hf {
 
 
 
-//=========================================================================
-// IMU config
-//=========================================================================
 
-struct ImuConfig {
-
-    float  maxArmingAngleDegrees  = 25;         
-};
 
 //=========================================================================
 // Barometer config
@@ -119,7 +112,6 @@ struct InitConfig {
 //=========================================================================
 
 struct Config {
-    ImuConfig        imu;
     AltitudeConfig   altitude;
     ReceiverConfig   receiver;
     InitConfig       init;

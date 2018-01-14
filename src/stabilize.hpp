@@ -44,13 +44,14 @@ namespace hf {
         private: // constants
 
             // Resetting thresholds for PID Integral term
-            float gyroWindupMax           = 16.0f;
-            float bigGyroDegreesPerSecond = 40.0f; 
-            float bigYawDemand            = 0.1f;
+            const float gyroWindupMax           = 16.0f;
+            const float bigGyroDegreesPerSecond = 40.0f; 
+            const float bigYawDemand            = 0.1f;
+            const float maxArmingAngleDegrees   = 25.0f;         
 
         public:
 
-            void init(const ImuConfig& _imuConfig, Model * _model);
+            void init(Model * _model);
 
             void update(float demands[4], float eulerAngles[3], float gyroRate[3]);
 
@@ -72,8 +73,6 @@ namespace hf {
             Board * board;
             Model * model;
 
-            ImuConfig imuConfig;
-
             float bigGyroRate;
 
             float computeITermGyro(float rateP, float rateI, float rcCommand, float gyroRate[3], uint8_t axis);
@@ -90,10 +89,9 @@ namespace hf {
 
     /********************************************* CPP ********************************************************/
 
-    void Stabilize::init(const ImuConfig& _imuConfig, Model * _model)
+    void Stabilize::init(Model * _model)
     {
         // We'll use PID, IMU config values in update() below
-        memcpy(&imuConfig, &_imuConfig, sizeof(ImuConfig));
         model = _model;
 
         // Zero-out previous values for D term
@@ -105,7 +103,7 @@ namespace hf {
 
         // Convert degree parameters to radians for use later
         bigGyroRate = degreesToRadians(bigGyroDegreesPerSecond);
-        maxArmingAngle = degreesToRadians(imuConfig.maxArmingAngleDegrees);
+        maxArmingAngle = degreesToRadians(maxArmingAngleDegrees);
 
         // Initialize PIDs
         pidRoll = 0;
