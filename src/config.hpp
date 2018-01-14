@@ -22,19 +22,6 @@
 
 namespace hf {
 
-//=========================================================================
-// Stabilization PID config: YOU MUST SET THESE VALUES FOR EACH MODEL
-//=========================================================================
-
-struct StabilizeConfig {
-
-    // PIDs are in model.hpp
-
-    // Resetting thresholds for PID Integral term
-    float gyroWindupMax           = 16.0f;
-    float bigGyroDegreesPerSecond = 40.0f; 
-    float bigYawDemand            = 0.1f;
-};
 
 //=========================================================================
 // Loop time config
@@ -147,7 +134,6 @@ struct Config {
     ImuConfig        imu;
     AltitudeConfig   altitude;
     ReceiverConfig   receiver;
-    StabilizeConfig  stabilize;
     InitConfig       init;
 };
 

@@ -96,7 +96,7 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     receiver->init(config.receiver);
 
     // Initialize our stabilization, mixing, and MSP (serial comms)
-    stab.init(config.stabilize, config.imu, _model);
+    stab.init(config.imu, _model);
     mixer.init(receiver, &stab, board); 
     msp.init(&mixer, receiver, board);
 
