@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include "config.hpp"
-
 #include <stdarg.h>
 
 namespace hf {

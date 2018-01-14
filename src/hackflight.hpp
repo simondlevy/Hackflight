@@ -20,7 +20,6 @@
 
 #include <cmath>
 
-#include "config.hpp"
 #include "board.hpp"
 #include "mixer.hpp"
 #include "model.hpp"
@@ -43,6 +42,10 @@ class Hackflight {
         const uint32_t rcLoopMilli        = 10;
         const uint32_t altHoldLoopMilli   = 25;
 
+        const uint32_t delayMilli         = 100;
+        const uint32_t ledFlashMilli      = 1000;
+        const uint32_t ledFlashCount      = 20;
+
     public:
 
         void init(Board * _board, Receiver *_receiver, Model * _model);
@@ -51,7 +54,7 @@ class Hackflight {
     private:
 
         void blinkLedForTilt(void);
-        void flashLeds(const InitConfig& config);
+        void flashLeds(void);
         void updateRc(void);
         void updateImu(void);
         void updateReadyState(void);
@@ -82,16 +85,14 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     board = _board;
     receiver = _receiver;
 
-    Config config;
-
     // Do hardware initialization for board
     board->init();
 
     // Flash the LEDs to indicate startup
-    flashLeds(config.init);
+    flashLeds();
 
     // Sleep  a bit to allow IMU to catch up
-    board->delayMilliseconds(config.init.delayMilli);
+    board->delayMilliseconds(delayMilli);
 
     // Initialize timing tasks
     imuTask.init(imuLoopMicro);
@@ -100,7 +101,7 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     altitudeTask.init(altHoldLoopMilli * 1000);
 
     // Initialize the receiver
-    receiver->init(config.receiver);
+    receiver->init();
 
     // Initialize our stabilization, mixing, and MSP (serial comms)
     stab.init(_model);
@@ -108,7 +109,7 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     msp.init(&mixer, receiver, board);
 
     // Initialize altitude estimator, which will be used if there's a barometer
-    alti.init(config.altitude, board, _model);
+    alti.init(board, _model);
 
     // Start unarmed
     armed = false;
@@ -193,7 +194,7 @@ void Hackflight::updateRc(void)
         auxState = receiver->getAuxState();
         if (board->extrasHaveBaro()) {
             if (auxState > 0) {
-                alti.start(receiver->demands[DEMAND_THROTTLE]);
+                alti.start(receiver->demands[Receiver::DEMAND_THROTTLE]);
             }
             else {
                 alti.stop();
@@ -221,14 +222,14 @@ void Hackflight::updateImu(void)
 
     // If barometer avaialble, update accelerometer for altitude fusion, then modify throttle demand
     if (board->extrasHaveBaro()) {
-        alti.update(eulerAngles, armed, receiver->demands[DEMAND_THROTTLE]);
+        alti.update(eulerAngles, armed, receiver->demands[Receiver::DEMAND_THROTTLE]);
     }
 
     // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.
     stab.update(receiver->demands, eulerAngles, gyroRadiansPerSecond);
 
     // Update mixer
-    mixer.update(receiver->demands[DEMAND_THROTTLE], stab.pidRoll, stab.pidPitch, stab.pidYaw, armed);
+    mixer.update(receiver->demands[Receiver::DEMAND_THROTTLE], stab.pidRoll, stab.pidPitch, stab.pidYaw, armed);
 
     // Update serial comms
     msp.update(eulerAngles, armed);
@@ -270,12 +271,12 @@ void Hackflight::blinkLedForTilt(void)
     }
 }
 
-void Hackflight::flashLeds(const InitConfig& config)
+void Hackflight::flashLeds(void)
 {
-    uint32_t pauseMilli = config.ledFlashMilli / config.ledFlashCount;
+    uint32_t pauseMilli = ledFlashMilli / ledFlashCount;
     board->ledSet(0, false);
     board->ledSet(1, false);
-    for (uint8_t i = 0; i < config.ledFlashCount; i++) {
+    for (uint8_t i = 0; i < ledFlashCount; i++) {
         board->ledSet(0, true);
         board->ledSet(1, false);
         board->delayMilliseconds(pauseMilli);
