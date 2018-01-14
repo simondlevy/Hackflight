@@ -23,21 +23,6 @@
 namespace hf {
 
 
-
-
-
-//=========================================================================
-// Barometer config
-//=========================================================================
-
-struct BarometerConfig {
-
-    float                noiseLpf         = 0.5f;
-    float                velocityBound    = 300.0f;
-    float                velocityDeadband = 10.0f;
-    static const uint8_t HISTORY_SIZE     = 48;
-};
-
 //=========================================================================
 // Accelerometer config (for atltitude hold)
 //=========================================================================
@@ -64,9 +49,6 @@ struct AltitudeConfig {
     float pidMax    = 4.0;
     float pErrorMax = 1.0;
     float iErrorMax = 8.0;
-
-    // Barometer
-    BarometerConfig baro;
 
     // Acceleromter
     AccelerometerConfig accel;

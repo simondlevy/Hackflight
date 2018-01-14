@@ -77,7 +77,7 @@ void Altitude::init(const AltitudeConfig & _config, Board * _board, Model * _mod
     board = _board;
     model = _model;
 
-    baro.init(config.baro, _board);
+    baro.init(_board);
 
     accel.init(config.accel, _board);
 
