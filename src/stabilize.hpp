@@ -197,8 +197,6 @@ namespace hf {
         pidPitch = computeCyclicPid(demands[Receiver::DEMAND_PITCH], model->softwareTrimPitch, prop, 
                 eulerAngles, gyroRate, AXIS_PITCH);
 
-        Debug::printf("%f %f", pidRoll, eulerAngles[0]);
-
         // For gyroYaw, P term comes directly from RC command, and D term is zero
         float ITermGyroYaw = computeITermGyro(model->gyroYawP, model->gyroYawI, demands[Receiver::DEMAND_YAW], gyroRate, AXIS_YAW);
         pidYaw = computePid(model->gyroYawP, model->softwareTrimYaw, demands[Receiver::DEMAND_YAW], ITermGyroYaw, 0, gyroRate, AXIS_YAW);

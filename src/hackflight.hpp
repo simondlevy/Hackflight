@@ -73,6 +73,7 @@ class Hackflight {
         TimedTask altitudeTask;
 
         bool     armed;
+        float    yawInitial;
         uint8_t  auxState;
         float    eulerAngles[3];
         bool     safeToArm;
@@ -176,10 +177,12 @@ void Hackflight::updateRc(void)
             if (receiver->arming()) {
     
                 if (safeToArm) {
+
                     auxState = receiver->getAuxState();
 
                     if (!auxState) // aux switch must be in zero position
                         if (!armed) {
+                            yawInitial = eulerAngles[AXIS_YAW];
                             armed = true;
                         }
                 }
@@ -206,7 +209,7 @@ void Hackflight::updateRc(void)
 void Hackflight::updateImu(void)
 {
     // Compute exponential Receiver commands, passing yaw angle for headless mode
-    receiver->computeExpo(eulerAngles[AXIS_YAW]);
+    receiver->computeExpo(eulerAngles[AXIS_YAW] - yawInitial);
 
     // Get Euler angles and raw gyro from board
     float gyroRadiansPerSecond[3];
