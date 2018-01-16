@@ -132,16 +132,15 @@ void Hackflight::update(void)
         alti.computePid(armed);
     }
 
+    // Inner (fast) loop: update IMU
+    if (imuTask.checkAndUpdate(currentTime)) {
+        updateImu();
+    }
+
     // Failsafe
     if (receiver->lostSignal()) {
         mixer.cutMotors();
         board->ledSet(0, false);
-        return;
-    }
-
-    // Inner (fast) loop: update IMU
-    if (imuTask.checkAndUpdate(currentTime)) {
-        updateImu();
     }
 
 } // update

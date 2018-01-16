@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "debug.hpp"
 #include "receiver.hpp"
 #include <SpektrumDSM.h>
 
@@ -30,6 +31,7 @@ namespace hf {
         void begin(void)
         {
             rx.begin();
+            timeoutCount = 0;
         }
 
         bool useSerial(void)
@@ -44,9 +46,12 @@ namespace hf {
 
         bool lostSignal(void)
         {
-            // Perhaps we should tolerate a higher fade count?
-            return rx.timedOut() || (rx.getFadeCount() > 0);
+            return rx.timedOut(500000);
         }
+
+        private:
+
+        uint32_t timeoutCount;
 
     }; // class DSMX_Receiver
 
