@@ -51,8 +51,7 @@ namespace hf {
         public:
 
             void init(Board * _board, Model * _model);
-            void start(float throttleDemand);
-            void stop(void);
+            void handleAuxSwitch(uint8_t auxState, float throttleDemand);
             void computePid(bool armed);
             void update(float eulerAnglesRadians[3], bool armed, float & throttleDemand);
 
@@ -100,18 +99,24 @@ namespace hf {
         previousT = 0;
     }
 
-    void Altitude::start(float throttleDemand)
+    void Altitude::handleAuxSwitch(uint8_t auxState, float throttleDemand)
     {
-        holdingAltitude = true;
-        initialThrottleHold = throttleDemand;
-        altHold = baroAlt;
-        pid = 0;
-        errorAltitudeI = 0;
-    }
+        // If board doesn't have baro, don't bother
+        if (!board->extrasHaveBaro()) return;
 
-    void Altitude::stop(void)
-    {
-        holdingAltitude = false;
+        // Start
+        if (auxState > 0) {
+            holdingAltitude = true;
+            initialThrottleHold = throttleDemand;
+            altHold = baroAlt;
+            pid = 0;
+            errorAltitudeI = 0;
+        }
+
+        // Stop
+        else {
+            holdingAltitude = false;
+        }
     }
 
     void Altitude::update(float eulerAnglesRadians[3], bool armed, float & throttleDemand)
@@ -126,6 +131,9 @@ namespace hf {
 
     void Altitude::computePid(bool armed)
     {  
+        // If board doesn't have baro, don't bother
+        if (!board->extrasHaveBaro()) return;
+
         // Refresh the timer
         uint32_t dTimeMicros = updateTime();
 

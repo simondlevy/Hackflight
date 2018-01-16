@@ -128,7 +128,7 @@ void Hackflight::update(void)
     }
 
     // Altithude-PID task (never called in same loop iteration as Receiver update)
-    else if (board->extrasHaveBaro() && altitudeTask.checkAndUpdate(currentTime)) {
+    else if (altitudeTask.checkAndUpdate(currentTime)) {
         alti.computePid(armed);
     }
 
@@ -189,17 +189,10 @@ void Hackflight::updateRc(void)
 
     } // receiver->changed()
 
-    // Detect aux switch changes for altitude-hold
+    // Detect aux switch changes for altitude-hold, loiter, etc.
     if (receiver->getAuxState() != auxState) {
         auxState = receiver->getAuxState();
-        if (board->extrasHaveBaro()) {
-            if (auxState > 0) {
-                alti.start(receiver->demands[Receiver::DEMAND_THROTTLE]);
-            }
-            else {
-                alti.stop();
-            }
-        }
+        alti.handleAuxSwitch(auxState, receiver->demands[Receiver::DEMAND_THROTTLE]);
     }
 }
 
@@ -220,10 +213,8 @@ void Hackflight::updateImu(void)
     // Update status using Euler angles
     updateReadyState();
 
-    // If barometer avaialble, update accelerometer for altitude fusion, then modify throttle demand
-    if (board->extrasHaveBaro()) {
-        alti.update(eulerAngles, armed, receiver->demands[Receiver::DEMAND_THROTTLE]);
-    }
+    // Udate altitude and modify throttle demand
+    alti.update(eulerAngles, armed, receiver->demands[Receiver::DEMAND_THROTTLE]);
 
     // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.
     stab.update(receiver->demands, eulerAngles, gyroRadiansPerSecond);
