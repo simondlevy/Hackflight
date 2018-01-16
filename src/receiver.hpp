@@ -53,7 +53,7 @@ namespace hf {
             const float throttleMid   = 0.50f;
             const float throttleExpo  = 0.20f;
 
-            const bool  headless      = false;
+            const float headless      = true;
 
             static const uint8_t CHANNELS = 8;
 
@@ -216,11 +216,13 @@ namespace hf {
         if (headless) {
             float c = cos(yawAngle);
             float s = sin(yawAngle);
-            float p = demands[DEMAND_PITCH];
-            float r = demands[DEMAND_ROLL];
+            float p = demands[Receiver::DEMAND_PITCH];
+            float r = demands[Receiver::DEMAND_ROLL];
             demands[DEMAND_PITCH] = c*p + s*r;
             demands[DEMAND_ROLL]  = c*r - s*p;
         }
+
+        Debug::printf("%f   %f\n", demands[DEMAND_ROLL], demands[DEMAND_PITCH]);
 
         // Yaw demand needs to be reversed
         demands[DEMAND_YAW] = -demands[DEMAND_YAW];
