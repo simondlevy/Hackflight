@@ -107,7 +107,7 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
 
     // Initialize our stabilization, mixing, and MSP (serial comms)
     stab.init(_model);
-    mixer.init(receiver, &stab, board); 
+    mixer.init(receiver, board); 
     msp.init(&mixer, receiver, board);
 
     // Initialize altitude estimator, which will be used if there's a barometer

@@ -34,14 +34,13 @@ public:
     // This is set by MSP
     float  motorsDisarmed[4];
 
-    void init(Receiver * _rc, Stabilize * _stabilize, Board * _board);
+    void init(Receiver * _rc, Board * _board);
     void update(float throttle, float pidRoll, float pidPitch, float pidYaw, bool armed);
     void cutMotors(void);
 
 private:
 
     Receiver        * rc;
-    Stabilize * stabilize;
 
     Board * board;
 
@@ -59,7 +58,7 @@ private:
 
 /********************************************* CPP ********************************************************/
 
-void Mixer::init(Receiver * _rc, Stabilize * _stabilize, Board * _board)
+void Mixer::init(Receiver * _rc, Board * _board)
 {
 	               //  T   A    E   R
     mixerQuadX[0] = { +1, -1,  +1, +1 };    // right rear
@@ -67,7 +66,6 @@ void Mixer::init(Receiver * _rc, Stabilize * _stabilize, Board * _board)
     mixerQuadX[2] = { +1, +1,  +1, -1 };    // left rear
     mixerQuadX[3] = { +1, +1,  -1, +1 };    // left front
 
-    stabilize = _stabilize;
     rc = _rc;
     board = _board;
 
