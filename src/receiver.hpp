@@ -222,8 +222,6 @@ namespace hf {
             demands[DEMAND_ROLL]  = c*r - s*p;
         }
 
-        Debug::printf("%f   %f\n", demands[DEMAND_ROLL], demands[DEMAND_PITCH]);
-
         // Yaw demand needs to be reversed
         demands[DEMAND_YAW] = -demands[DEMAND_YAW];
 

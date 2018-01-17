@@ -73,6 +73,7 @@ class Hackflight {
         TimedTask altitudeTask;
 
         bool     armed;
+        bool     failsafe;
         float    yawInitial;
         uint8_t  auxState;
         float    eulerAngles[3];
@@ -115,6 +116,7 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     // Start unarmed
     armed = false;
     safeToArm = false;
+    failsafe = false;
 
 } // init
 
@@ -139,8 +141,10 @@ void Hackflight::update(void)
     }
 
     // Failsafe
-    if (receiver->lostSignal()) {
+    if (armed && receiver->lostSignal()) {
         mixer.cutMotors();
+        armed = false;
+        failsafe = true;
         board->ledSet(0, false);
     }
 
@@ -175,7 +179,7 @@ void Hackflight::updateRc(void)
             // Arming
             if (receiver->arming()) {
     
-                if (safeToArm) {
+                if (!failsafe && safeToArm) {
 
                     auxState = receiver->getAuxState();
 
@@ -221,8 +225,10 @@ void Hackflight::updateImu(void)
     // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.
     stab.update(receiver->demands, eulerAngles, gyroRadiansPerSecond);
 
-    // Update mixer
-    mixer.update(receiver->demands[Receiver::DEMAND_THROTTLE], stab.pidRoll, stab.pidPitch, stab.pidYaw, armed);
+    // Update mixer (spin motors) unless failsafe triggered
+    if (!failsafe) {
+        mixer.update(receiver->demands[Receiver::DEMAND_THROTTLE], stab.pidRoll, stab.pidPitch, stab.pidYaw, armed);
+    }
 
     // Update serial comms
     msp.update(eulerAngles, armed);

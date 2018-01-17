@@ -46,7 +46,7 @@ namespace hf {
 
         bool lostSignal(void)
         {
-            return rx.timedOut(250000);
+            return rx.timedOut();
         }
 
         private:

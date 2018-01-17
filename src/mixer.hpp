@@ -54,8 +54,6 @@ private:
     } motorMixer_t;
 
     motorMixer_t mixerQuadX[4];
-
-    bool failsafe;
 };
 
 
@@ -73,8 +71,6 @@ void Mixer::init(Receiver * _rc, Stabilize * _stabilize, Board * _board)
     rc = _rc;
     board = _board;
 
-    failsafe = false;
-
     // set disarmed motor values
     for (uint8_t i = 0; i < 4; i++)
         motorsDisarmed[i] = 0;
@@ -82,9 +78,6 @@ void Mixer::init(Receiver * _rc, Stabilize * _stabilize, Board * _board)
 
 void Mixer::update(float throttle, float pidRoll, float pidPitch, float pidYaw, bool armed)
 {
-    // Stop right now if failsafe was triggered
-    if (failsafe) return;
-
     float motors[4];
 
     for (uint8_t i = 0; i < 4; i++) {
@@ -132,8 +125,6 @@ void Mixer::cutMotors(void)
     for (uint8_t i = 0; i < 4; i++) {
         board->writeMotor(i, 0);
     }
-
-    failsafe = true;
 }
 
 } // namespace
