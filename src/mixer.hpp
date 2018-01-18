@@ -35,8 +35,9 @@ public:
     float  motorsDisarmed[4];
 
     void init(Board * _board);
-    void update(float throttle, float pidRoll, float pidPitch, float pidYaw, bool armed);
+    void runArmed(float throttle, float pidRoll, float pidPitch, float pidYaw);
     void cutMotors(void);
+    void runDisarmed(void);
 
 private:
 
@@ -73,7 +74,7 @@ void Mixer::init(Board * _board)
         motorsDisarmed[i] = 0;
 }
 
-void Mixer::update(float throttle, float pidRoll, float pidPitch, float pidYaw, bool armed)
+void Mixer::runArmed(float throttle, float pidRoll, float pidPitch, float pidYaw)
 {
     float motors[4];
 
@@ -101,15 +102,18 @@ void Mixer::update(float throttle, float pidRoll, float pidPitch, float pidYaw, 
 
         // Keep motor values in interval [0,1]
         motors[i] = Filter::constrainMinMax(motors[i], 0, 1);
-
-        // This is how we can spin the motors from the GCS
-        if (!armed) {
-            motors[i] = motorsDisarmed[i];
-        }
     }
 
     for (uint8_t i = 0; i < 4; i++) {
         board->writeMotor(i, motors[i]);
+    }
+}
+
+// This is how we can spin the motors from the GCS
+void Mixer::runDisarmed(void)
+{
+    for (uint8_t i = 0; i < 4; i++) {
+        board->writeMotor(i, motorsDisarmed[i]);
     }
 }
 

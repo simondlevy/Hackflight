@@ -225,11 +225,17 @@ void Hackflight::updateImu(void)
     // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.
     stab.update(receiver->demands, eulerAngles, gyroRadiansPerSecond);
 
-    // Update mixer (spin motors) unless failsafe triggered or currently arming via down throttle
-    if (!failsafe && !receiver->throttleIsDown()) {
-        mixer.update(receiver->demands[Receiver::DEMAND_THROTTLE], stab.pidRoll, stab.pidPitch, stab.pidYaw, armed);
+    // Support motor testing from GCS
+    if (!armed) {
+        mixer.runDisarmed();
     }
 
+    // Update mixer (spin motors) unless failsafe triggered or currently arming via throttle-down
+    else if (!failsafe && !receiver->throttleIsDown()) {
+        mixer.runArmed(receiver->demands[Receiver::DEMAND_THROTTLE], stab.pidRoll, stab.pidPitch, stab.pidYaw);
+    }
+
+    // Cut motors on failsafe or throttle-down
     else {
         mixer.cutMotors();
     }
