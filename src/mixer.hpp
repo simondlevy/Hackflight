@@ -34,13 +34,13 @@ public:
     // This is set by MSP
     float  motorsDisarmed[4];
 
-    void init(Receiver * _rc, Board * _board);
+    void init(Board * _board);
     void update(float throttle, float pidRoll, float pidPitch, float pidYaw, bool armed);
     void cutMotors(void);
 
 private:
 
-    Receiver        * rc;
+    Receiver * rc;
 
     Board * board;
 
@@ -58,7 +58,7 @@ private:
 
 /********************************************* CPP ********************************************************/
 
-void Mixer::init(Receiver * _rc, Board * _board)
+void Mixer::init(Board * _board)
 {
 	               //  T   A    E   R
     mixerQuadX[0] = { +1, -1,  +1, +1 };    // right rear
@@ -66,7 +66,6 @@ void Mixer::init(Receiver * _rc, Board * _board)
     mixerQuadX[2] = { +1, +1,  +1, -1 };    // left rear
     mixerQuadX[3] = { +1, +1,  -1, +1 };    // left front
 
-    rc = _rc;
     board = _board;
 
     // set disarmed motor values
@@ -100,12 +99,8 @@ void Mixer::update(float throttle, float pidRoll, float pidPitch, float pidYaw, 
             motors[i] -= maxMotor - 1;
         }
 
+        // Keep motor values in interval [0,1]
         motors[i] = Filter::constrainMinMax(motors[i], 0, 1);
-
-        // Avoid sudden motor jump from right yaw while arming
-        if (rc->throttleIsDown()) {
-            motors[i] = 0;
-        } 
 
         // This is how we can spin the motors from the GCS
         if (!armed) {

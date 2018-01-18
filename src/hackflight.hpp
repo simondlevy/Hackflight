@@ -107,7 +107,7 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
 
     // Initialize our stabilization, mixing, and MSP (serial comms)
     stab.init(_model);
-    mixer.init(receiver, board); 
+    mixer.init(board); 
     msp.init(&mixer, receiver, board);
 
     // Initialize altitude estimator, which will be used if there's a barometer
@@ -225,9 +225,13 @@ void Hackflight::updateImu(void)
     // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.
     stab.update(receiver->demands, eulerAngles, gyroRadiansPerSecond);
 
-    // Update mixer (spin motors) unless failsafe triggered
-    if (!failsafe) {
+    // Update mixer (spin motors) unless failsafe triggered or currently arming via down throttle
+    if (!failsafe && !receiver->throttleIsDown()) {
         mixer.update(receiver->demands[Receiver::DEMAND_THROTTLE], stab.pidRoll, stab.pidPitch, stab.pidYaw, armed);
+    }
+
+    else {
+        mixer.cutMotors();
     }
 
     // Update serial comms
