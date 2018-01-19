@@ -31,9 +31,9 @@ class TimedTask {
 
     public:
 
-        void init(uint32_t _period) {
+        void init(uint32_t frequency) {
 
-            period = _period;
+            period = 1000000 / frequency;
             usec = 0;
         }
 

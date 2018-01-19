@@ -38,10 +38,10 @@ class Hackflight {
     private: // constants
 
         // Loop timing
-        const uint32_t imuLoopMicro       = 3500;
-        const uint32_t rcLoopMilli        = 10;
-        const uint32_t altHoldLoopMilli   = 25;
-        const uint32_t angleCheckMilli    = 500;
+        const uint32_t imuLoopFreq        = 285;
+        const uint32_t rcLoopFreq         = 100;
+        const uint32_t altHoldLoopFreq    = 40;
+        const uint32_t angleCheckFreq     = 2;
 
         const uint32_t delayMilli         = 100;
         const uint32_t ledFlashMilli      = 1000;
@@ -97,9 +97,9 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     board->delayMilliseconds(delayMilli);
 
     // Initialize essential timing tasks
-    innerTask.init(imuLoopMicro);
-    outerTask.init(rcLoopMilli * 1000);
-    angleCheckTask.init(angleCheckMilli * 1000);
+    innerTask.init(imuLoopFreq);
+    outerTask.init(rcLoopFreq);
+    angleCheckTask.init(angleCheckFreq);
 
     // Initialize the receiver
     receiver->init();
@@ -110,7 +110,7 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     msp.init(&mixer, receiver, board);
 
     // Initialize altitude estimator, which will be used if there's a barometer
-    altitudeTask.init(altHoldLoopMilli * 1000);
+    altitudeTask.init(altHoldLoopFreq);
     alti.init(board, _model);
 
     // Start unarmed
