@@ -219,10 +219,14 @@ void Hackflight::updateImu(void)
     // Update status using Euler angles
     updateReadyState();
 
-    // Udate altitude and modify throttle demand
-    alti.update(eulerAngles, armed, receiver->demands[Receiver::DEMAND_THROTTLE]);
+    // Udate altitude with accelerometer data
+    // XXX Should be done for us by board!
+    alti.fuseWithImu(eulerAngles, armed);
 
-    // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values.
+    // Modify demands based on extras (currently just altitude-hold)
+    alti.modifyDemand(receiver->demands[Receiver::DEMAND_THROTTLE]);
+
+    // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values. 
     stab.update(receiver->demands, eulerAngles, gyroRadiansPerSecond);
 
     // Support motor testing from GCS

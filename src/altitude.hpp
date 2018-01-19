@@ -53,7 +53,8 @@ namespace hf {
             void init(Board * _board, Model * _model);
             void handleAuxSwitch(uint8_t auxState, float throttleDemand);
             void computePid(bool armed);
-            void update(float eulerAnglesRadians[3], bool armed, float & throttleDemand);
+            void fuseWithImu(float eulerAnglesRadians[3], bool armed);
+            void modifyDemand(float & throttleDemand);
 
         private:
 
@@ -119,13 +120,19 @@ namespace hf {
         }
     }
 
-    void Altitude::update(float eulerAnglesRadians[3], bool armed, float & throttleDemand)
+    void Altitude::fuseWithImu(float eulerAnglesRadians[3], bool armed)
     {
         // If board doesn't have baro, don't bother
         if (!board->extrasHaveBaro()) return;
 
         // Throttle modification is synched to aquisition of new IMU data
         accel.update(eulerAnglesRadians, armed);
+    }
+
+    void Altitude::modifyDemand(float & throttleDemand)
+    {
+        // If board doesn't have baro, don't bother
+        if (!board->extrasHaveBaro()) return;
 
         if (holdingAltitude) {
             throttleDemand = Filter::constrainMinMax(initialThrottleHold + pid, throttleMargin, 1-throttleMargin);
