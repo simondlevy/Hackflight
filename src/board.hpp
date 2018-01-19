@@ -37,7 +37,7 @@ class Board {
         static void      outbuf(char * buf);
 
     //------------------------------------------ LED ------------------------------------------------------------
-        virtual void     ledSet(uint8_t id, bool is_on) { (void)id; (void)is_on; }
+        virtual void     ledSet(bool is_on) { (void)is_on; }
 
     //------------------------------------------ Serial ---------------------------------------------------------
         virtual uint8_t  serialAvailableBytes(void) { return 0; }

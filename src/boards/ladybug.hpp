@@ -81,10 +81,8 @@ class Ladybug : public Board {
             return (uint64_t)micros();
         }
 
-        virtual void ledSet(uint8_t id, bool is_on) override
+        virtual void ledSet(bool is_on) override
         { 
-            (void)id;
-
             digitalWrite(A1, is_on ? HIGH : LOW);
         }
 

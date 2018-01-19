@@ -53,11 +53,10 @@ class Hackflight {
 
     private:
 
-        void blinkLedForTilt(void);
-        void flashLeds(void);
+        void flashLed(void);
         void outer(void);
         void inner(void);
-        void updateReadyState(void);
+        void checkAngle(void);
 
         Mixer      mixer;
         MSP        msp;
@@ -91,7 +90,7 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     board->init();
 
     // Flash the LEDs to indicate startup
-    flashLeds();
+    flashLed();
 
     // Sleep  a bit to allow IMU to catch up
     board->delayMilliseconds(delayMilli);
@@ -140,12 +139,17 @@ void Hackflight::update(void)
         inner();
     }
 
+    // Periodically check pitch, roll angle for arming readiness
+    if (angleCheckTask.ready(currentTime)) {
+        checkAngle();
+    }
+
     // Failsafe
     if (armed && receiver->lostSignal()) {
         mixer.cutMotors();
         armed = false;
         failsafe = true;
-        board->ledSet(0, false);
+        board->ledSet(false);
     }
 
 } // update
@@ -216,11 +220,11 @@ void Hackflight::inner(void)
         eulerAngles[AXIS_YAW] += 2*M_PI;
     }
 
-    // Update status using Euler angles
-    updateReadyState();
+    // Set LED based on arming status
+    board->ledSet(armed);
 
     // Udate altitude with accelerometer data
-    // XXX Should be done for us by board!
+    // XXX Should be done in hardware!
     alti.fuseWithImu(eulerAngles, armed);
 
     // Modify demands based on extras (currently just altitude-hold)
@@ -248,57 +252,22 @@ void Hackflight::inner(void)
     msp.update(eulerAngles, armed);
 } 
 
-void Hackflight::updateReadyState(void)
+void Hackflight::checkAngle(void)
 {
-    if (safeToArm)
-        board->ledSet(0, false);
-    if (armed)
-        board->ledSet(1, true);
-    else
-        board->ledSet(1, false);
-
-    // If angle too steep, flash LED
-    uint32_t currentTime = (uint32_t)board->getMicros();
-    if (angleCheckTask.ready(currentTime)) {
-        if (fabs(eulerAngles[AXIS_ROLL])  > stab.maxArmingAngle || fabs(eulerAngles[AXIS_PITCH]) > stab.maxArmingAngle) {
-            safeToArm = false; 
-            blinkLedForTilt();
-            angleCheckTask.update(currentTime);
-        } else {
-            safeToArm = true;
-        }
-    }
+    safeToArm = fabs(eulerAngles[AXIS_ROLL])  < stab.maxArmingAngle && fabs(eulerAngles[AXIS_PITCH]) < stab.maxArmingAngle;
 }
 
-void Hackflight::blinkLedForTilt(void)
-{
-    static bool on;
-
-    if (on) {
-        board->ledSet(0, false);
-        on = false;
-    }
-    else {
-        board->ledSet(0, true);
-        on = true;
-    }
-}
-
-void Hackflight::flashLeds(void)
+void Hackflight::flashLed(void)
 {
     uint32_t pauseMilli = ledFlashMilli / ledFlashCount;
-    board->ledSet(0, false);
-    board->ledSet(1, false);
+    board->ledSet(false);
     for (uint8_t i = 0; i < ledFlashCount; i++) {
-        board->ledSet(0, true);
-        board->ledSet(1, false);
+        board->ledSet(true);
         board->delayMilliseconds(pauseMilli);
-        board->ledSet(0, false);
-        board->ledSet(1, true);
+        board->ledSet(false);
         board->delayMilliseconds(pauseMilli);
     }
-    board->ledSet(0, false);
-    board->ledSet(1, false);
+    board->ledSet(false);
 }
 
 } // namespace
