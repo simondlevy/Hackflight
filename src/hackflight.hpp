@@ -55,8 +55,8 @@ class Hackflight {
 
         void blinkLedForTilt(void);
         void flashLeds(void);
-        void updateRc(void);
-        void updateImu(void);
+        void outer(void);
+        void inner(void);
         void updateReadyState(void);
 
         Mixer      mixer;
@@ -67,8 +67,8 @@ class Hackflight {
         Board    * board;
         Receiver * receiver;
 
-        TimedTask imuTask;
-        TimedTask rcTask;
+        TimedTask innerTask;
+        TimedTask outerTask;
         TimedTask angleCheckTask;
         TimedTask altitudeTask;
 
@@ -97,8 +97,8 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     board->delayMilliseconds(delayMilli);
 
     // Initialize essential timing tasks
-    imuTask.init(imuLoopMicro);
-    rcTask.init(rcLoopMilli * 1000);
+    innerTask.init(imuLoopMicro);
+    outerTask.init(rcLoopMilli * 1000);
     angleCheckTask.init(angleCheckMilli * 1000);
 
     // Initialize the receiver
@@ -125,9 +125,9 @@ void Hackflight::update(void)
     // Grab current time for various loops
     uint32_t currentTime = (uint32_t)board->getMicros();
 
-    // Outer (slow) loop: update Receiver
-    if (rcTask.checkAndUpdate(currentTime)) {
-        updateRc();
+    // Outer (slow) loop: respond to receiver demands
+    if (outerTask.checkAndUpdate(currentTime)) {
+        outer();
     }
 
     // Altithude-PID task (never called in same loop iteration as Receiver update)
@@ -135,9 +135,9 @@ void Hackflight::update(void)
         alti.computePid(armed);
     }
 
-    // Inner (fast) loop: update IMU
-    if (imuTask.checkAndUpdate(currentTime)) {
-        updateImu();
+    // Inner (fast) loop: stabilize, spin motors
+    if (innerTask.checkAndUpdate(currentTime)) {
+        inner();
     }
 
     // Failsafe
@@ -150,7 +150,7 @@ void Hackflight::update(void)
 
 } // update
 
-void Hackflight::updateRc(void)
+void Hackflight::outer(void)
 {
     // Update Receiver channels
     receiver->update();
@@ -202,7 +202,7 @@ void Hackflight::updateRc(void)
     }
 }
 
-void Hackflight::updateImu(void)
+void Hackflight::inner(void)
 {
     // Compute exponential Receiver commands, passing yaw angle for headless mode
     receiver->computeExpo(eulerAngles[AXIS_YAW] - yawInitial);
