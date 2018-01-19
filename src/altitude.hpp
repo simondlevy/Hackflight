@@ -1,24 +1,24 @@
 /* 
-   altitude.hpp: Altitude estimation and PID via barometer/accelerometer fusion
+    altitude.hpp: Altitude estimation and PID via barometer/accelerometer fusion
 
-   Adapted from
+    Adapted from
 
-   https://github.com/multiwii/baseflight/blob/master/src/imu.c
+    https://github.com/multiwii/baseflight/blob/master/src/imu.c
 
-   This file is part of Hackflight.
+    This file is part of Hackflight.
 
-   Hackflight is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+    Hackflight is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-   Hackflight is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-   You should have received a copy of the GNU General Public License
-   along with EM7180.  If not, see <http://www.gnu.org/licenses/>.
- */
+    Hackflight is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with EM7180.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #pragma once
 
@@ -32,7 +32,7 @@ namespace hf {
 
     class Altitude {
 
-        private: // constants
+        private: 
 
             // Bounds
             const float pDeadband = 0.01f;
@@ -42,21 +42,11 @@ namespace hf {
             const float iErrorMax = 8.0f;
 
             // Complementry filter for accel/baro
-            const float    cfAlt                  = 0.965f;
-            const float    cfVel                  = 0.985f;
+            const float    cfAlt  = 0.965f;
+            const float    cfVel  = 0.985f;
 
             // Keeps PID adjustment inside range
-            const float throttleMargin            = 0.15f;
-
-        public:
-
-            void init(Board * _board, Model * _model);
-            void handleAuxSwitch(uint8_t auxState, float throttleDemand);
-            void computePid(bool armed);
-            void fuseWithImu(float eulerAnglesRadians[3], bool armed);
-            void modifyDemand(float & throttleDemand);
-
-        private:
+            const float throttleMargin = 0.15f;
 
             Board * board;
             Model * model;
@@ -77,120 +67,121 @@ namespace hf {
             float velocity;             // meters/sec
 
             // Microsecond dt for velocity computations
-            uint32_t updateTime(void);
             uint32_t previousT;
-    };
 
-    /********************************************* CPP ********************************************************/
+            uint32_t updateTime(void)
+            {
+                uint32_t currentT = (uint32_t)board->getMicros();
+                uint32_t dTimeMicros = currentT - previousT;
+                previousT = currentT;
+                return dTimeMicros;
+            }
 
-    void Altitude::init(Board * _board, Model * _model)
-    {
-        board = _board;
-        model = _model;
+        public:
 
-        baro.init(_board);
+            void init(Board * _board, Model * _model)
+            {
+                board = _board;
+                model = _model;
 
-        accel.init(_board);
+                baro.init(_board);
 
-        initialThrottleHold = 0;
-        pid = 0;
-        holdingAltitude = false;
-        errorAltitudeI = 0;
-        velocity = 0;
-        previousT = 0;
-    }
+                accel.init(_board);
 
-    void Altitude::handleAuxSwitch(uint8_t auxState, float throttleDemand)
-    {
-        // If board doesn't have baro, don't bother
-        if (!board->extrasHaveBaro()) return;
+                initialThrottleHold = 0;
+                pid = 0;
+                holdingAltitude = false;
+                errorAltitudeI = 0;
+                velocity = 0;
+                previousT = 0;
+            }
 
-        // Start
-        if (auxState > 0) {
-            holdingAltitude = true;
-            initialThrottleHold = throttleDemand;
-            altHold = baroAlt;
-            pid = 0;
-            errorAltitudeI = 0;
-        }
+            void handleAuxSwitch(uint8_t auxState, float throttleDemand)
+            {
+                // If board doesn't have baro, don't bother
+                if (!board->extrasHaveBaro()) return;
 
-        // Stop
-        else {
-            holdingAltitude = false;
-        }
-    }
+                // Start
+                if (auxState > 0) {
+                    holdingAltitude = true;
+                    initialThrottleHold = throttleDemand;
+                    altHold = baroAlt;
+                    pid = 0;
+                    errorAltitudeI = 0;
+                }
 
-    void Altitude::fuseWithImu(float eulerAnglesRadians[3], bool armed)
-    {
-        // If board doesn't have baro, don't bother
-        if (!board->extrasHaveBaro()) return;
+                // Stop
+                else {
+                    holdingAltitude = false;
+                }
+            }
 
-        // Throttle modification is synched to aquisition of new IMU data
-        accel.update(eulerAnglesRadians, armed);
-    }
+            void fuseWithImu(float eulerAnglesRadians[3], bool armed)
+            {
+                // If board doesn't have baro, don't bother
+                if (!board->extrasHaveBaro()) return;
 
-    void Altitude::modifyDemand(float & throttleDemand)
-    {
-        // If board doesn't have baro, don't bother
-        if (!board->extrasHaveBaro()) return;
+                // Throttle modification is synched to aquisition of new IMU data
+                accel.update(eulerAnglesRadians, armed);
+            }
 
-        if (holdingAltitude) {
-            throttleDemand = Filter::constrainMinMax(initialThrottleHold + pid, throttleMargin, 1-throttleMargin);
-        }
-    }
+            void updateDemands(demands_t & demands)
+            {
+                // If board doesn't have baro, don't bother
+                if (!board->extrasHaveBaro()) return;
 
-    void Altitude::computePid(bool armed)
-    {  
-        // If board doesn't have baro, don't bother
-        if (!board->extrasHaveBaro()) return;
+                if (holdingAltitude) {
+                    demands.throttle = Filter::constrainMinMax(initialThrottleHold + pid, throttleMargin, 1-throttleMargin);
+                }
+            }
 
-        // Refresh the timer
-        uint32_t dTimeMicros = updateTime();
+            void computePid(bool armed)
+            {  
+                // If board doesn't have baro, don't bother
+                if (!board->extrasHaveBaro()) return;
 
-        // Update the baro with the current pressure reading
-        baro.update();
+                // Refresh the timer
+                uint32_t dTimeMicros = updateTime();
 
-        // Calibrate baro AGL at rest
-        if (!armed) {
-            baro.calibrate();
-            return;
-        }
+                // Update the baro with the current pressure reading
+                baro.update();
 
-        // Get estimated altitude from barometer
-        baroAlt = baro.getAltitude();
+                // Calibrate baro AGL at rest
+                if (!armed) {
+                    baro.calibrate();
+                    return;
+                }
 
-        // Get estimated vertical velocity from accelerometer
-        velocity = accel.getVerticalVelocity(dTimeMicros);
+                // Get estimated altitude from barometer
+                baroAlt = baro.getAltitude();
 
-        // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
-        // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
-        // i.e without delay.
-        float baroVel = baro.getVelocity(dTimeMicros);
-        velocity = Filter::complementary(velocity, (float)baroVel, cfVel);
+                // Get estimated vertical velocity from accelerometer
+                velocity = accel.getVerticalVelocity(dTimeMicros);
 
-        // P
-        float error = altHold-baroAlt;
-        error = Filter::constrainAbs(error, pErrorMax);
-        error = Filter::deadband(error, pDeadband); 
-        pid = Filter::constrainAbs(model->altP * error, pidMax);
+                // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
+                // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
+                // i.e without delay.
+                float baroVel = baro.getVelocity(dTimeMicros);
+                velocity = Filter::complementary(velocity, (float)baroVel, cfVel);
 
-        // I
-        errorAltitudeI += (model->altI * error);
-        errorAltitudeI = Filter::constrainAbs(errorAltitudeI, iErrorMax);
-        pid += (errorAltitudeI * (dTimeMicros/1e6));
+                // P
+                float error = altHold-baroAlt;
+                error = Filter::constrainAbs(error, pErrorMax);
+                error = Filter::deadband(error, pDeadband); 
+                pid = Filter::constrainAbs(model->altP * error, pidMax);
 
-        // D
-        float vario = Filter::deadband(velocity, dDeadband);
-        pid -= Filter::constrainAbs(model->altD * vario, pidMax);
+                // I
+                errorAltitudeI += (model->altI * error);
+                errorAltitudeI = Filter::constrainAbs(errorAltitudeI, iErrorMax);
+                pid += (errorAltitudeI * (dTimeMicros/1e6));
 
-    } // computePid
+                // D
+                float vario = Filter::deadband(velocity, dDeadband);
+                pid -= Filter::constrainAbs(model->altD * vario, pidMax);
 
-    uint32_t Altitude::updateTime(void)
-    {
-        uint32_t currentT = (uint32_t)board->getMicros();
-        uint32_t dTimeMicros = currentT - previousT;
-        previousT = currentT;
-        return dTimeMicros;
-    }
+            } // computePid
+
+    }; // class Altitude
+
 
 } // namespace hf

@@ -1,5 +1,5 @@
 /* 
-   filter.hpp: Filtering functions
+   filter.hpp: Static filtering methods
 
    Adapted from
 
@@ -27,50 +27,44 @@
 #include "debug.hpp"
 
 namespace hf {
- 
-class Filter {
 
-    public:
-        
-        static float max(float a, float b);
-        static float deadband(float value, float deadband);
-        static float complementary(float a, float b, float c);
-        static float constrainMinMax(float val, float min, float max);
-        static float constrainAbs(float val, float max);
-};
+    class Filter {
 
-/********************************************* CPP ********************************************************/
+        public:
 
-float Filter::max(float a, float b)
-{
-    return a > b ? a : b;
-}
 
-float Filter::deadband(float value, float deadband)
-{
-    if (fabs(value) < deadband) {
-        value = 0;
-    } else if (value > 0) {
-        value -= deadband;
-    } else if (value < 0) {
-        value += deadband;
-    }
-    return value;
-}
+            static float max(float a, float b)
+            {
+                return a > b ? a : b;
+            }
 
-float Filter::complementary(float a, float b, float c)
-{
-    return a * c + b * (1 - c);
-}
+            static float deadband(float value, float deadband)
+            {
+                if (fabs(value) < deadband) {
+                    value = 0;
+                } else if (value > 0) {
+                    value -= deadband;
+                } else if (value < 0) {
+                    value += deadband;
+                }
+                return value;
+            }
 
-float Filter::constrainMinMax(float val, float min, float max)
-{
-    return (val<min) ? min : ((val>max) ? max : val);
-}
+            static float complementary(float a, float b, float c)
+            {
+                return a * c + b * (1 - c);
+            }
 
-float Filter::constrainAbs(float val, float max)
-{
-    return constrainMinMax(val, -max, +max);
-}
+            static float constrainMinMax(float val, float min, float max)
+            {
+                return (val<min) ? min : ((val>max) ? max : val);
+            }
+
+            static float constrainAbs(float val, float max)
+            {
+                return constrainMinMax(val, -max, +max);
+            }
+
+    }; // class Filter
 
 } // namespace hf

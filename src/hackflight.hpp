@@ -33,247 +33,236 @@
 
 namespace hf {
 
-class Hackflight {
+    class Hackflight {
 
-    private: // constants
+        private: // constants
 
-        // Loop timing
-        const uint32_t imuLoopFreq     = 285;
-        const uint32_t rcLoopFreq      = 100;
-        const uint32_t altHoldLoopFreq = 40;
-        const uint32_t angleCheckFreq  = 2;
+            // Loop timing
+            const uint32_t imuLoopFreq     = 285;
+            const uint32_t rcLoopFreq      = 100;
+            const uint32_t altHoldLoopFreq = 40;
+            const uint32_t angleCheckFreq  = 2;
 
-        // Arbitrary
-        const uint32_t startupMilli    = 100;
-        const uint32_t ledFlashMilli   = 1000;
-        const uint32_t ledFlashCount   = 20;
+            // Arbitrary
+            const uint32_t startupMilli    = 100;
+            const uint32_t ledFlashMilli   = 1000;
+            const uint32_t ledFlashCount   = 20;
 
-    public:
+            Mixer      mixer;
+            MSP        msp;
+            Stabilize  stab;
+            Altitude   alti;
 
-        void init(Board * _board, Receiver *_receiver, Model * _model);
-        void update(void);
+            Board    * board;
+            Receiver * receiver;
 
-    private:
+            TimedTask innerTask;
+            TimedTask outerTask;
+            TimedTask angleCheckTask;
+            TimedTask altitudeTask;
 
-        void outerLoop(void);
-        void innerLoop(void);
-        void flashLed(void);
-        void checkAngle(void);
+            // Demands (throttle, roll, pitch yaw) that we will build up to send to the mixer
+            demands_t demands;
 
-        Mixer      mixer;
-        MSP        msp;
-        Stabilize  stab;
-        Altitude   alti;
+            bool     armed;
+            bool     failsafe;
+            float    yawInitial;
+            uint8_t  auxState;
+            float    eulerAngles[3];
+            bool     safeToArm;
 
-        Board    * board;
-        Receiver * receiver;
+            void outerLoop(void)
+            {
+                // Update Receiver channels
+                receiver->update();
 
-        TimedTask innerTask;
-        TimedTask outerTask;
-        TimedTask angleCheckTask;
-        TimedTask altitudeTask;
-
-        // Demands (throttle, roll, pitch yaw) that we will build up to send to the mixer
-        demands_t demands;
-
-        bool     armed;
-        bool     failsafe;
-        float    yawInitial;
-        uint8_t  auxState;
-        float    eulerAngles[3];
-        bool     safeToArm;
-};
-
-/********************************************* CPP ********************************************************/
-
-void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
-{  
-    board = _board;
-    receiver = _receiver;
-
-    // Do hardware initialization for board
-    board->init();
-
-    // Flash the LEDs to indicate startup
-    flashLed();
-
-    // Sleep  a bit to allow IMU to catch up
-    board->delayMilliseconds(startupMilli);
-
-    // Initialize essential timing tasks
-    innerTask.init(imuLoopFreq);
-    outerTask.init(rcLoopFreq);
-    angleCheckTask.init(angleCheckFreq);
-
-    // Initialize the receiver
-    receiver->init();
-
-    // Initialize our stabilization, mixing, and MSP (serial comms)
-    stab.init(_model);
-    mixer.init(board); 
-    msp.init(&mixer, receiver, board);
-
-    // Initialize altitude estimator, which will be used if there's a barometer
-    altitudeTask.init(altHoldLoopFreq);
-    alti.init(board, _model);
-
-    // Start unarmed
-    armed = false;
-    safeToArm = false;
-    failsafe = false;
-
-} // init
-
-void Hackflight::update(void)
-{
-    // Grab current time for various loops
-    uint32_t currentTime = (uint32_t)board->getMicros();
-
-    // Outer (slow) loop: respond to receiver demands
-    if (outerTask.checkAndUpdate(currentTime)) {
-        outerLoop();
-    }
-
-    // Altithude-PID task (never called in same loop iteration as Receiver update)
-    else if (altitudeTask.checkAndUpdate(currentTime)) {
-        alti.computePid(armed);
-    }
-
-    // Inner (fast) loop: stabilize, spin motors
-    if (innerTask.checkAndUpdate(currentTime)) {
-        innerLoop();
-    }
-
-    // Periodically check pitch, roll angle for arming readiness
-    if (angleCheckTask.ready(currentTime)) {
-        checkAngle();
-    }
-
-    // Failsafe
-    if (armed && receiver->lostSignal()) {
-        mixer.cutMotors();
-        armed = false;
-        failsafe = true;
-        board->ledSet(false);
-    }
-
-} // update
-
-void Hackflight::outerLoop(void)
-{
-    // Update Receiver channels
-    receiver->update();
-
-    // When landed, reset integral component of PID
-    if (receiver->throttleIsDown()) {
-        stab.resetIntegral();
-    }
-
-    // Certain actions (arming, disarming) need checking every time
-    if (receiver->changed()) {
-
-        // actions during armed
-        if (armed) {      
-
-            // Disarm
-            if (receiver->disarming()) {
-                if (armed) {
-                    armed = false;
+                // When landed, reset integral component of PID
+                if (receiver->throttleIsDown()) {
+                    stab.resetIntegral();
                 }
-            }
-        } 
-        
-        // Actions during not armed
-        else {         
 
-            // Arming
-            if (receiver->arming()) {
-    
-                if (!failsafe && safeToArm) {
+                // Certain actions (arming, disarming) need checking every time
+                if (receiver->changed()) {
 
-                    auxState = receiver->getAuxState();
+                    // actions during armed
+                    if (armed) {      
 
-                    if (!auxState) // aux switch must be in zero position
-                        if (!armed) {
-                            yawInitial = eulerAngles[AXIS_YAW];
-                            armed = true;
+                        // Disarm
+                        if (receiver->disarming()) {
+                            if (armed) {
+                                armed = false;
+                            }
                         }
+                    } 
+
+                    // Actions during not armed
+                    else {         
+
+                        // Arming
+                        if (receiver->arming()) {
+
+                            if (!failsafe && safeToArm) {
+
+                                auxState = receiver->getAuxState();
+
+                                if (!auxState) // aux switch must be in zero position
+                                    if (!armed) {
+                                        yawInitial = eulerAngles[AXIS_YAW];
+                                        armed = true;
+                                    }
+                            }
+                        }
+
+                    } // not armed
+
+                } // receiver->changed()
+
+                // Detect aux switch changes for altitude-hold, loiter, etc.
+                if (receiver->getAuxState() != auxState) {
+                    auxState = receiver->getAuxState();
+                    alti.handleAuxSwitch(auxState, demands.throttle);
                 }
             }
 
-        } // not armed
+            void innerLoop(void)
+            {
+                // Compute exponential Receiver demands, passing yaw angle for headless mode
+                receiver->updateDemands(eulerAngles[AXIS_YAW] - yawInitial, demands);
 
-    } // receiver->changed()
+                // Get Euler angles and raw gyro from board
+                float gyroRadiansPerSecond[3];
+                board->getImu(eulerAngles, gyroRadiansPerSecond);
 
-    // Detect aux switch changes for altitude-hold, loiter, etc.
-    if (receiver->getAuxState() != auxState) {
-        auxState = receiver->getAuxState();
-        alti.handleAuxSwitch(auxState, demands.throttle);
-    }
-}
+                // Convert heading from [-pi,+pi] to [0,2*pi]
+                if (eulerAngles[AXIS_YAW] < 0) {
+                    eulerAngles[AXIS_YAW] += 2*M_PI;
+                }
 
-void Hackflight::innerLoop(void)
-{
-    // Compute exponential Receiver demands, passing yaw angle for headless mode
-    receiver->computeExpo(eulerAngles[AXIS_YAW] - yawInitial, demands);
+                // Set LED based on arming status
+                board->ledSet(armed);
 
-    // Get Euler angles and raw gyro from board
-    float gyroRadiansPerSecond[3];
-    board->getImu(eulerAngles, gyroRadiansPerSecond);
+                // Udate altitude estimator with accelerometer data
+                // XXX Should be done in hardware!
+                alti.fuseWithImu(eulerAngles, armed);
 
-    // Convert heading from [-pi,+pi] to [0,2*pi]
-    if (eulerAngles[AXIS_YAW] < 0) {
-        eulerAngles[AXIS_YAW] += 2*M_PI;
-    }
+                // Run stabilization to get PIDS
+                stab.updateDemands(eulerAngles, gyroRadiansPerSecond, demands);
 
-    // Set LED based on arming status
-    board->ledSet(armed);
+                // Modify demands based on extras (currently just altitude-hold)
+                alti.updateDemands(demands);
 
-    // Udate altitude estimator with accelerometer data
-    // XXX Should be done in hardware!
-    alti.fuseWithImu(eulerAngles, armed);
+                // Support motor testing from GCS
+                if (!armed) {
+                    mixer.runDisarmed();
+                }
 
-    // Run stabilization to get PIDS
-    stab.update(eulerAngles, gyroRadiansPerSecond, demands);
+                // Update mixer (spin motors) unless failsafe triggered or currently arming via throttle-down
+                else if (!failsafe && !receiver->throttleIsDown()) {
+                    mixer.runArmed(demands);
+                }
 
-    // Modify demands based on extras (currently just altitude-hold)
-    alti.modifyDemand(demands.throttle);
+                // Cut motors on failsafe or throttle-down
+                else {
+                    mixer.cutMotors();
+                }
 
-    // Support motor testing from GCS
-    if (!armed) {
-        mixer.runDisarmed();
-    }
+                // Update serial comms
+                msp.update(eulerAngles, armed);
+            } 
 
-    // Update mixer (spin motors) unless failsafe triggered or currently arming via throttle-down
-    else if (!failsafe && !receiver->throttleIsDown()) {
-        mixer.runArmed(demands);
-    }
+            void checkAngle(void)
+            {
+                safeToArm = fabs(eulerAngles[AXIS_ROLL])  < stab.maxArmingAngle && fabs(eulerAngles[AXIS_PITCH]) < stab.maxArmingAngle;
+            }
 
-    // Cut motors on failsafe or throttle-down
-    else {
-        mixer.cutMotors();
-    }
+            void flashLed(void)
+            {
+                uint32_t pauseMilli = ledFlashMilli / ledFlashCount;
+                board->ledSet(false);
+                for (uint8_t i = 0; i < ledFlashCount; i++) {
+                    board->ledSet(true);
+                    board->delayMilliseconds(pauseMilli);
+                    board->ledSet(false);
+                    board->delayMilliseconds(pauseMilli);
+                }
+                board->ledSet(false);
+            }
 
-    // Update serial comms
-    msp.update(eulerAngles, armed);
-} 
+        public:
 
-void Hackflight::checkAngle(void)
-{
-    safeToArm = fabs(eulerAngles[AXIS_ROLL])  < stab.maxArmingAngle && fabs(eulerAngles[AXIS_PITCH]) < stab.maxArmingAngle;
-}
+            void init(Board * _board, Receiver * _receiver, Model * _model)
+            {  
+                board = _board;
+                receiver = _receiver;
 
-void Hackflight::flashLed(void)
-{
-    uint32_t pauseMilli = ledFlashMilli / ledFlashCount;
-    board->ledSet(false);
-    for (uint8_t i = 0; i < ledFlashCount; i++) {
-        board->ledSet(true);
-        board->delayMilliseconds(pauseMilli);
-        board->ledSet(false);
-        board->delayMilliseconds(pauseMilli);
-    }
-    board->ledSet(false);
-}
+                // Do hardware initialization for board
+                board->init();
+
+                // Flash the LEDs to indicate startup
+                flashLed();
+
+                // Sleep  a bit to allow IMU to catch up
+                board->delayMilliseconds(startupMilli);
+
+                // Initialize essential timing tasks
+                innerTask.init(imuLoopFreq);
+                outerTask.init(rcLoopFreq);
+                angleCheckTask.init(angleCheckFreq);
+
+                // Initialize the receiver
+                receiver->init();
+
+                // Initialize our stabilization, mixing, and MSP (serial comms)
+                stab.init(_model);
+                mixer.init(board); 
+                msp.init(&mixer, receiver, board);
+
+                // Initialize altitude estimator, which will be used if there's a barometer
+                altitudeTask.init(altHoldLoopFreq);
+                alti.init(board, _model);
+
+                // Start unarmed
+                armed = false;
+                safeToArm = false;
+                failsafe = false;
+
+            } // init
+
+            void update(void)
+            {
+                // Grab current time for various loops
+                uint32_t currentTime = (uint32_t)board->getMicros();
+
+                // Outer (slow) loop: respond to receiver demands
+                if (outerTask.checkAndUpdate(currentTime)) {
+                    outerLoop();
+                }
+
+                // Altithude-PID task (never called in same loop iteration as Receiver update)
+                else if (altitudeTask.checkAndUpdate(currentTime)) {
+                    alti.computePid(armed);
+                }
+
+                // Inner (fast) loop: stabilize, spin motors
+                if (innerTask.checkAndUpdate(currentTime)) {
+                    innerLoop();
+                }
+
+                // Periodically check pitch, roll angle for arming readiness
+                if (angleCheckTask.ready(currentTime)) {
+                    checkAngle();
+                }
+
+                // Failsafe
+                if (armed && receiver->lostSignal()) {
+                    mixer.cutMotors();
+                    armed = false;
+                    failsafe = true;
+                    board->ledSet(false);
+                }
+
+            } // update
+
+    }; // class Hackflight
 
 } // namespace

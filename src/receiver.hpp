@@ -32,7 +32,7 @@ namespace hf {
 
     class Receiver {
 
-        private: // constants
+        private: 
 
             const float margin       = 0.1f;
             const float cyclicExpo   = 0.65f;
@@ -43,6 +43,42 @@ namespace hf {
             const float headless     = true;
 
             static const uint8_t CHANNELS = 8;
+
+            uint8_t commandDelay;     // cycles since most recent movement
+            int32_t ppmAverageIndex;  // help with noisy CPPM receivers
+
+            float adjustCommand(float command, uint8_t channel)
+            {
+                command /= 2;
+
+                if (rawvals[channel] < 0) {
+                    command = -command;
+                }
+
+                return command;
+            }
+
+            float applyCyclicFunction(float command)
+            {
+                return rcFun(command, cyclicExpo, cyclicRate);
+            }
+
+            float makePositiveCommand(uint8_t channel)
+            {
+                return fabs(rawvals[channel]);
+            }
+
+            static float rcFun(float x, float e, float r)
+            {
+                return (1 + e*(x*x - 1)) * x * r;
+            }
+
+            static float throttleFun(float x, float e, float mid)
+            {
+                float tmp   = x - mid;
+                float y = tmp>0 ? 1-mid : (tmp<0 ? mid : 1);
+                return mid + tmp*(1-e + e * (tmp*tmp) / (y*y));
+            }
 
         protected: 
 
@@ -80,191 +116,131 @@ namespace hf {
             // Stick positions for command combos
             uint8_t sticks;                    
 
-        private:
-
-            float adjustCommand(float command, uint8_t channel);
-
-            float applyCyclicFunction(float command);
-            float makePositiveCommand(uint8_t channel);
-
-            static float rcFun(float x, float e, float r);
-            static float throttleFun(float x, float e, float m);
-
-            uint8_t commandDelay;     // cycles since most recent movement
-            int32_t ppmAverageIndex;  // help with noisy CPPM receivers
-
         public:
-
-            // These can be overridden to support various styles of arming (sticks, switches, etc.)
-            virtual bool    arming(void);
-            virtual bool    disarming(void);
-            virtual uint8_t getAuxState(void);
 
             float   rawvals[CHANNELS];  // raw [-1,+1] from receiver, for MSP
 
-            void    init(void);
-            void    update(void);
-            bool    changed(void);
-            void    computeExpo(float yawAngle, demands_t & demands);
-            bool    throttleIsDown(void);
+            // These can be overridden to support various styles of arming (sticks, switches, etc.)
 
             // Override this if your receiver provides RSSI or other weak-signal detection
             virtual bool lostSignal(void) { return false; }
-    };
 
-
-    /********************************************* CPP ********************************************************/
-
-    // arming(), disarming() can be overridden as needed ------------------------------------
-
-    bool Receiver::arming(void)
-    {
-        return sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE;
-    }
-
-    bool Receiver::disarming(void)
-    {
-        return sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE;
-    }
-
-    uint8_t Receiver::getAuxState(void) 
-    {
-        // Auxiliary switch is treated as a fifth axis: 
-        // we convert values in interval [-1,+1] to 0, 1, 2
-        float aux = rawvals[4];
-        return aux < 0 ? 0 : (aux < 0.4 ? 1 : 2);
-    }
-
-
-    // --------------------------------------------------------------------------------------
-
-    void Receiver::init(void)
-    {
-        // Do hardware initialization
-        begin();
-
-        commandDelay = 0;
-        sticks = 0;
-        ppmAverageIndex = 0;
-    }
-
-    void Receiver::update()
-    {
-        float averageRaw[5][4];
-
-        // Serial receivers provide clean data and can be read directly
-        if (useSerial()) {
-            for (uint8_t chan = 0; chan < 5; chan++) {
-                rawvals[chan] = readChannel(chan);
+            virtual bool arming(void)
+            {
+                return sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE;
             }
-        }
 
-        // Other kinds of receivers require average of channel values to remove noise
-        else {
-            for (uint8_t chan = 0; chan < 5; chan++) {
-                averageRaw[chan][ppmAverageIndex % 4] = readChannel(chan);
-                rawvals[chan] = 0;
-                for (uint8_t i = 0; i < 4; i++)
-                    rawvals[chan] += averageRaw[chan][i];
-                rawvals[chan] /= 4;
+            virtual bool disarming(void)
+            {
+                return sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE;
             }
-            ppmAverageIndex++;
-        }
 
-        // check stick positions, updating command delay
-        uint8_t stTmp = 0;
-        for (uint8_t i = 0; i < 4; i++) {
-            stTmp >>= 2;
-            if (rawvals[i] > -1 + margin)
-                stTmp |= 0x80;  // check for MIN
-            if (rawvals[i] < +1 - margin)
-                stTmp |= 0x40;  // check for MAX
-        }
-        if (stTmp == sticks) {
-            if (commandDelay < 250)
-                commandDelay++;
-        } else
-            commandDelay = 0;
-        sticks = stTmp;
-    }
-
-    bool Receiver::changed(void)
-    {
-        return commandDelay == 20;
-    }
-
-    void Receiver::computeExpo(float yawAngle, demands_t & demands)
-    {
-        // Convert raw [-1,+1] to absolute value
-        demands.roll  = makePositiveCommand(CHANNEL_ROLL);
-        demands.pitch = makePositiveCommand(CHANNEL_PITCH);
-        demands.yaw   = makePositiveCommand(CHANNEL_YAW);
-
-        // Apply expo nonlinearity to roll, pitch
-        demands.roll  = applyCyclicFunction(demands.roll);
-        demands.pitch = applyCyclicFunction(demands.pitch);
-
-        // Put sign back on command, yielding [-0.5,+0.5]
-        demands.roll  = adjustCommand(demands.roll, CHANNEL_ROLL);
-        demands.pitch = adjustCommand(demands.pitch, CHANNEL_PITCH);
-        demands.yaw   = adjustCommand(demands.yaw, CHANNEL_YAW);
-
-        // Support headless mode
-        if (headless) {
-            float c = cos(yawAngle);
-            float s = sin(yawAngle);
-            float p = demands.pitch;
-            float r = demands.roll;
-            demands.pitch = c*p + s*r;
-            demands.roll  = c*r - s*p;
-        }
-
-        // Yaw demand needs to be reversed
-        demands.yaw = -demands.yaw;
-
-        // Special handling for throttle
-        float tmp = (rawvals[CHANNEL_THROTTLE] + 1) / 2; // [-1,+1] -> [0,1]
-        demands.throttle = throttleFun(tmp, throttleExpo, throttleMid);
-
-    } // computeExpo
+            virtual uint8_t getAuxState(void) 
+            {
+                // Auxiliary switch is treated as a fifth axis: 
+                // we convert values in interval [-1,+1] to 0, 1, 2
+                float aux = rawvals[4];
+                return aux < 0 ? 0 : (aux < 0.4 ? 1 : 2);
+            }
 
 
-    float Receiver::makePositiveCommand(uint8_t channel)
-    {
-        return fabs(rawvals[channel]);
-    }
+            void init(void)
+            {
+                // Do hardware initialization
+                begin();
 
-    float Receiver::applyCyclicFunction(float command)
-    {
-        return rcFun(command, cyclicExpo, cyclicRate);
-    }
+                commandDelay = 0;
+                sticks = 0;
+                ppmAverageIndex = 0;
+            }
 
-    float Receiver::rcFun(float x, float e, float r)
-    {
-        return (1 + e*(x*x - 1)) * x * r;
-    }
+            void update()
+            {
+                float averageRaw[5][4];
 
-    float Receiver::adjustCommand(float command, uint8_t channel)
-    {
-        command /= 2;
+                // Serial receivers provide clean data and can be read directly
+                if (useSerial()) {
+                    for (uint8_t chan = 0; chan < 5; chan++) {
+                        rawvals[chan] = readChannel(chan);
+                    }
+                }
 
-        if (rawvals[channel] < 0) {
-            command = -command;
-        }
+                // Other kinds of receivers require average of channel values to remove noise
+                else {
+                    for (uint8_t chan = 0; chan < 5; chan++) {
+                        averageRaw[chan][ppmAverageIndex % 4] = readChannel(chan);
+                        rawvals[chan] = 0;
+                        for (uint8_t i = 0; i < 4; i++)
+                            rawvals[chan] += averageRaw[chan][i];
+                        rawvals[chan] /= 4;
+                    }
+                    ppmAverageIndex++;
+                }
 
-        return command;
-    }
+                // check stick positions, updating command delay
+                uint8_t stTmp = 0;
+                for (uint8_t i = 0; i < 4; i++) {
+                    stTmp >>= 2;
+                    if (rawvals[i] > -1 + margin)
+                        stTmp |= 0x80;  // check for MIN
+                    if (rawvals[i] < +1 - margin)
+                        stTmp |= 0x40;  // check for MAX
+                }
+                if (stTmp == sticks) {
+                    if (commandDelay < 250)
+                        commandDelay++;
+                } else
+                    commandDelay = 0;
+                sticks = stTmp;
+            }
 
-    float Receiver::throttleFun(float x, float e, float mid)
-    {
-        float tmp   = x - mid;
-        float y = tmp>0 ? 1-mid : (tmp<0 ? mid : 1);
-        return mid + tmp*(1-e + e * (tmp*tmp) / (y*y));
-    }
+            bool changed(void)
+            {
+                return commandDelay == 20;
+            }
 
-    bool Receiver::throttleIsDown(void)
-    {
-        return rawvals[CHANNEL_THROTTLE] < -1 + margin;
-    }
+            void updateDemands(float yawAngle, demands_t & demands)
+            {
+                // Convert raw [-1,+1] to absolute value
+                demands.roll  = makePositiveCommand(CHANNEL_ROLL);
+                demands.pitch = makePositiveCommand(CHANNEL_PITCH);
+                demands.yaw   = makePositiveCommand(CHANNEL_YAW);
+
+                // Apply expo nonlinearity to roll, pitch
+                demands.roll  = applyCyclicFunction(demands.roll);
+                demands.pitch = applyCyclicFunction(demands.pitch);
+
+                // Put sign back on command, yielding [-0.5,+0.5]
+                demands.roll  = adjustCommand(demands.roll, CHANNEL_ROLL);
+                demands.pitch = adjustCommand(demands.pitch, CHANNEL_PITCH);
+                demands.yaw   = adjustCommand(demands.yaw, CHANNEL_YAW);
+
+                // Support headless mode
+                if (headless) {
+                    float c = cos(yawAngle);
+                    float s = sin(yawAngle);
+                    float p = demands.pitch;
+                    float r = demands.roll;
+                    demands.pitch = c*p + s*r;
+                    demands.roll  = c*r - s*p;
+                }
+
+                // Yaw demand needs to be reversed
+                demands.yaw = -demands.yaw;
+
+                // Special handling for throttle
+                float tmp = (rawvals[CHANNEL_THROTTLE] + 1) / 2; // [-1,+1] -> [0,1]
+                demands.throttle = throttleFun(tmp, throttleExpo, throttleMid);
+
+            } // computeExpo
+
+
+            bool throttleIsDown(void)
+            {
+                return rawvals[CHANNEL_THROTTLE] < -1 + margin;
+            }
+
+    }; // class Receiver
+
 
 } // namespace

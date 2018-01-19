@@ -22,33 +22,33 @@
 
 namespace hf {
 
-class Board {
+    class Board {
 
-    public:
+        public:
 
-    //------------------------------------ Core functionality ----------------------------------------------------
-        virtual void     init(void) = 0;
-        virtual void     delayMilliseconds(uint32_t msec) = 0;
-        virtual void     getImu(float eulerAnglesRadians[3], float gyroRadiansPerSecond[3]) = 0;
-        virtual uint64_t getMicros() = 0;
-        virtual void     writeMotor(uint8_t index, float value) = 0;
+            //------------------------------------ Core functionality ----------------------------------------------------
+            virtual void     init(void) = 0;
+            virtual void     delayMilliseconds(uint32_t msec) = 0;
+            virtual void     getImu(float eulerAnglesRadians[3], float gyroRadiansPerSecond[3]) = 0;
+            virtual uint64_t getMicros() = 0;
+            virtual void     writeMotor(uint8_t index, float value) = 0;
 
-    //--------------------------------------- Debugging ---------------------------------------------------------
-        static void      outbuf(char * buf);
+            //--------------------------------------- Debugging ---------------------------------------------------------
+            static void      outbuf(char * buf);
 
-    //------------------------------------------ LED ------------------------------------------------------------
-        virtual void     ledSet(bool is_on) { (void)is_on; }
+            //------------------------------------------ LED ------------------------------------------------------------
+            virtual void     ledSet(bool is_on) { (void)is_on; }
 
-    //------------------------------------------ Serial ---------------------------------------------------------
-        virtual uint8_t  serialAvailableBytes(void) { return 0; }
-        virtual uint8_t  serialReadByte(void)  { return 0; }
-        virtual void     serialWriteByte(uint8_t c) { (void)c; }
+            //------------------------------------------ Serial ---------------------------------------------------------
+            virtual uint8_t  serialAvailableBytes(void) { return 0; }
+            virtual uint8_t  serialReadByte(void)  { return 0; }
+            virtual void     serialWriteByte(uint8_t c) { (void)c; }
 
-    //------------------------------------------ Extras ---------------------------------------------------------
-        virtual bool    extrasHaveBaro(void) { return false; }
-        virtual float   extrasGetBaroPressure(void) { return 0; }
-        virtual void    extrasImuGetAccel(float accelGs[3]) { (void)accelGs; }
+            //------------------------------------------ Extras ---------------------------------------------------------
+            virtual bool    extrasHaveBaro(void) { return false; }
+            virtual float   extrasGetBaroPressure(void) { return 0; }
+            virtual void    extrasImuGetAccel(float accelGs[3]) { (void)accelGs; }
 
-}; // class Board
+    }; // class Board
 
 } // namespace
