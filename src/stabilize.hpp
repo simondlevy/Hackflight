@@ -175,7 +175,7 @@ namespace hf {
 
     float Stabilize::constrainCyclicDemand(float eulerAngle, float demand)
     {
-        return fabs(eulerAngle) > maxArmingAngle ? 0 : demand;
+        return demand * (1 - fabs(eulerAngle)/maxArmingAngle);
     }
 
     void Stabilize::update(float demands[4], float eulerAngles[3], float gyroRate[3])

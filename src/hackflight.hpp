@@ -37,10 +37,11 @@ class Hackflight {
 
     private: // constants
 
+        // Loop timing
         const uint32_t imuLoopMicro       = 3500;
-        const uint32_t angleCheckMilli    = 500;
         const uint32_t rcLoopMilli        = 10;
         const uint32_t altHoldLoopMilli   = 25;
+        const uint32_t angleCheckMilli    = 500;
 
         const uint32_t delayMilli         = 100;
         const uint32_t ledFlashMilli      = 1000;
