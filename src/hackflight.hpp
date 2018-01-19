@@ -96,11 +96,10 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     // Sleep  a bit to allow IMU to catch up
     board->delayMilliseconds(delayMilli);
 
-    // Initialize timing tasks
+    // Initialize essential timing tasks
     imuTask.init(imuLoopMicro);
     rcTask.init(rcLoopMilli * 1000);
     angleCheckTask.init(angleCheckMilli * 1000);
-    altitudeTask.init(altHoldLoopMilli * 1000);
 
     // Initialize the receiver
     receiver->init();
@@ -111,6 +110,7 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     msp.init(&mixer, receiver, board);
 
     // Initialize altitude estimator, which will be used if there's a barometer
+    altitudeTask.init(altHoldLoopMilli * 1000);
     alti.init(board, _model);
 
     // Start unarmed
