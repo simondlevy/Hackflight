@@ -35,7 +35,7 @@ namespace hf {
 
     class Hackflight {
 
-        private: // constants
+        private: 
 
             // Loop timing
             const uint32_t imuLoopFreq     = 285;
@@ -122,7 +122,14 @@ namespace hf {
                     auxState = receiver->getAuxState();
                     alti.handleAuxSwitch(auxState, demands.throttle);
                 }
-            }
+
+                // Set LED based on arming status
+                board->ledSet(armed);
+
+                // Update serial comms
+                msp.update(eulerAngles, armed);
+
+            } // outerLoop
 
             void innerLoop(void)
             {
@@ -138,14 +145,11 @@ namespace hf {
                     eulerAngles[AXIS_YAW] += 2*M_PI;
                 }
 
-                // Set LED based on arming status
-                board->ledSet(armed);
-
                 // Udate altitude estimator with accelerometer data
                 // XXX Should be done in hardware!
                 alti.fuseWithImu(eulerAngles, armed);
 
-                // Run stabilization to get PIDS
+                // Run stabilization to get updated demands
                 stab.updateDemands(eulerAngles, gyroRadiansPerSecond, demands);
 
                 // Modify demands based on extras (currently just altitude-hold)
@@ -156,7 +160,7 @@ namespace hf {
                     mixer.runDisarmed();
                 }
 
-                // Update mixer (spin motors) unless failsafe triggered or currently arming via throttle-down
+                // Run mixer (spin motors) unless failsafe triggered or currently arming via throttle-down
                 else if (!failsafe && !receiver->throttleIsDown()) {
                     mixer.runArmed(demands);
                 }
@@ -166,9 +170,7 @@ namespace hf {
                     mixer.cutMotors();
                 }
 
-                // Update serial comms
-                msp.update(eulerAngles, armed);
-            } 
+            } // innerLoop
 
             void checkAngle(void)
             {
