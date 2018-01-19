@@ -26,38 +26,37 @@
 
 #include "filter.hpp"
 #include "debug.hpp"
+#include "demands.hpp"
 
 namespace hf {
 
     class Receiver {
 
-        public:
-
-            // axis indices
-            enum {
-                DEMAND_THROTTLE, // T
-                DEMAND_ROLL,     // A
-                DEMAND_PITCH,    // E
-                DEMAND_YAW,      // R
-                DEMAND_AUX1,
-                DEMAND_AUX2,
-                DEMAND_AUX3,
-                DEMAND_AUX4
-            };
-
         private: // constants
 
-            const float margin        = 0.1f;
-            const float pitchRollExpo = 0.65f;
-            const float pitchRollRate = 0.90f;
-            const float throttleMid   = 0.50f;
-            const float throttleExpo  = 0.20f;
+            const float margin       = 0.1f;
+            const float cyclicExpo   = 0.65f;
+            const float cyclicRate   = 0.90f;
+            const float throttleMid  = 0.50f;
+            const float throttleExpo = 0.20f;
 
-            const float headless      = true;
+            const float headless     = true;
 
             static const uint8_t CHANNELS = 8;
 
         protected: 
+
+            // channel indices
+            enum {
+                CHANNEL_THROTTLE, // T
+                CHANNEL_ROLL,     // A
+                CHANNEL_PITCH,    // E
+                CHANNEL_YAW,      // R
+                CHANNEL_AUX1,
+                CHANNEL_AUX2,
+                CHANNEL_AUX3,
+                CHANNEL_AUX4
+            };
 
             // These must be overridden for each receiver
             virtual void  begin(void) = 0;
@@ -65,18 +64,18 @@ namespace hf {
             virtual float readChannel(uint8_t chan) = 0;
 
             // For logical combinations of stick positions (low, center, high)
-            static const uint8_t ROL_LO = (1 << (2 * DEMAND_ROLL));
-            static const uint8_t ROL_CE = (3 << (2 * DEMAND_ROLL));
-            static const uint8_t ROL_HI = (2 << (2 * DEMAND_ROLL));
-            static const uint8_t PIT_LO = (1 << (2 * DEMAND_PITCH));
-            static const uint8_t PIT_CE = (3 << (2 * DEMAND_PITCH));
-            static const uint8_t PIT_HI = (2 << (2 * DEMAND_PITCH));
-            static const uint8_t YAW_LO = (1 << (2 * DEMAND_YAW));
-            static const uint8_t YAW_CE = (3 << (2 * DEMAND_YAW));
-            static const uint8_t YAW_HI = (2 << (2 * DEMAND_YAW));
-            static const uint8_t THR_LO = (1 << (2 * DEMAND_THROTTLE));
-            static const uint8_t THR_CE = (3 << (2 * DEMAND_THROTTLE));
-            static const uint8_t THR_HI = (2 << (2 * DEMAND_THROTTLE));
+            static const uint8_t ROL_LO = (1 << (2 * CHANNEL_ROLL));
+            static const uint8_t ROL_CE = (3 << (2 * CHANNEL_ROLL));
+            static const uint8_t ROL_HI = (2 << (2 * CHANNEL_ROLL));
+            static const uint8_t PIT_LO = (1 << (2 * CHANNEL_PITCH));
+            static const uint8_t PIT_CE = (3 << (2 * CHANNEL_PITCH));
+            static const uint8_t PIT_HI = (2 << (2 * CHANNEL_PITCH));
+            static const uint8_t YAW_LO = (1 << (2 * CHANNEL_YAW));
+            static const uint8_t YAW_CE = (3 << (2 * CHANNEL_YAW));
+            static const uint8_t YAW_HI = (2 << (2 * CHANNEL_YAW));
+            static const uint8_t THR_LO = (1 << (2 * CHANNEL_THROTTLE));
+            static const uint8_t THR_CE = (3 << (2 * CHANNEL_THROTTLE));
+            static const uint8_t THR_HI = (2 << (2 * CHANNEL_THROTTLE));
 
             // Stick positions for command combos
             uint8_t sticks;                    
@@ -85,7 +84,7 @@ namespace hf {
 
             float adjustCommand(float command, uint8_t channel);
 
-            float applyPitchRollFunction(float command);
+            float applyCyclicFunction(float command);
             float makePositiveCommand(uint8_t channel);
 
             static float rcFun(float x, float e, float r);
@@ -103,12 +102,10 @@ namespace hf {
 
             float   rawvals[CHANNELS];  // raw [-1,+1] from receiver, for MSP
 
-            float   demands[4]; // TAER (Throttle, Roll, Pitch, Yaw
-
             void    init(void);
             void    update(void);
             bool    changed(void);
-            void    computeExpo(float yawAngle);
+            void    computeExpo(float yawAngle, demands_t & demands);
             bool    throttleIsDown(void);
 
             // Override this if your receiver provides RSSI or other weak-signal detection
@@ -196,38 +193,38 @@ namespace hf {
         return commandDelay == 20;
     }
 
-    void Receiver::computeExpo(float yawAngle)
+    void Receiver::computeExpo(float yawAngle, demands_t & demands)
     {
         // Convert raw [-1,+1] to absolute value
-        demands[DEMAND_ROLL]  = makePositiveCommand(DEMAND_ROLL);
-        demands[DEMAND_PITCH] = makePositiveCommand(DEMAND_PITCH);
-        demands[DEMAND_YAW]   = makePositiveCommand(DEMAND_YAW);
+        demands.roll  = makePositiveCommand(CHANNEL_ROLL);
+        demands.pitch = makePositiveCommand(CHANNEL_PITCH);
+        demands.yaw   = makePositiveCommand(CHANNEL_YAW);
 
         // Apply expo nonlinearity to roll, pitch
-        demands[DEMAND_ROLL]  = applyPitchRollFunction(demands[DEMAND_ROLL]);
-        demands[DEMAND_PITCH] = applyPitchRollFunction(demands[DEMAND_PITCH]);
+        demands.roll  = applyCyclicFunction(demands.roll);
+        demands.pitch = applyCyclicFunction(demands.pitch);
 
         // Put sign back on command, yielding [-0.5,+0.5]
-        demands[DEMAND_ROLL] = adjustCommand(demands[DEMAND_ROLL], DEMAND_ROLL);
-        demands[DEMAND_PITCH] = adjustCommand(demands[DEMAND_PITCH], DEMAND_PITCH);
-        demands[DEMAND_YAW] = adjustCommand(demands[DEMAND_YAW], DEMAND_YAW);
+        demands.roll  = adjustCommand(demands.roll, CHANNEL_ROLL);
+        demands.pitch = adjustCommand(demands.pitch, CHANNEL_PITCH);
+        demands.yaw   = adjustCommand(demands.yaw, CHANNEL_YAW);
 
         // Support headless mode
         if (headless) {
             float c = cos(yawAngle);
             float s = sin(yawAngle);
-            float p = demands[Receiver::DEMAND_PITCH];
-            float r = demands[Receiver::DEMAND_ROLL];
-            demands[DEMAND_PITCH] = c*p + s*r;
-            demands[DEMAND_ROLL]  = c*r - s*p;
+            float p = demands.pitch;
+            float r = demands.roll;
+            demands.pitch = c*p + s*r;
+            demands.roll  = c*r - s*p;
         }
 
         // Yaw demand needs to be reversed
-        demands[DEMAND_YAW] = -demands[DEMAND_YAW];
+        demands.yaw = -demands.yaw;
 
         // Special handling for throttle
-        float tmp = (rawvals[DEMAND_THROTTLE] + 1) / 2; // [-1,+1] -> [0,1]
-        demands[DEMAND_THROTTLE] = throttleFun(tmp, throttleExpo, throttleMid);
+        float tmp = (rawvals[CHANNEL_THROTTLE] + 1) / 2; // [-1,+1] -> [0,1]
+        demands.throttle = throttleFun(tmp, throttleExpo, throttleMid);
 
     } // computeExpo
 
@@ -237,9 +234,9 @@ namespace hf {
         return fabs(rawvals[channel]);
     }
 
-    float Receiver::applyPitchRollFunction(float command)
+    float Receiver::applyCyclicFunction(float command)
     {
-        return rcFun(command, pitchRollExpo, pitchRollRate);
+        return rcFun(command, cyclicExpo, cyclicRate);
     }
 
     float Receiver::rcFun(float x, float e, float r)
@@ -267,7 +264,7 @@ namespace hf {
 
     bool Receiver::throttleIsDown(void)
     {
-        return rawvals[DEMAND_THROTTLE] < -1 + margin;
+        return rawvals[CHANNEL_THROTTLE] < -1 + margin;
     }
 
 } // namespace

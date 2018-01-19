@@ -37,9 +37,8 @@ namespace hf {
 
             bool arming(void) override
             {
-                // Assume noisy throttle first time around; thereafter, we're arming if the throttle
-                // is positive.
-                bool retval = _ready ? demands[DEMAND_THROTTLE]>0.1 : false;
+                // Assume noisy throttle first time around; thereafter, we're arming if the throttle is positive.
+                bool retval = _ready ? rawvals[CHANNEL_THROTTLE] > 0.1 : false;
 
                 // We're ready after skipping initial noisy throttle
                 _ready = true;

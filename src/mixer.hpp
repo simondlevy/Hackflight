@@ -22,6 +22,7 @@
 #include "stabilize.hpp"
 #include "filter.hpp"
 #include "debug.hpp"
+#include "demands.hpp"
 
 #include <cstring>
 
@@ -35,7 +36,7 @@ public:
     float  motorsDisarmed[4];
 
     void init(Board * _board);
-    void runArmed(float throttle, float pidRoll, float pidPitch, float pidYaw);
+    void runArmed(demands_t demands);
     void cutMotors(void);
     void runDisarmed(void);
 
@@ -74,17 +75,17 @@ void Mixer::init(Board * _board)
         motorsDisarmed[i] = 0;
 }
 
-void Mixer::runArmed(float throttle, float pidRoll, float pidPitch, float pidYaw)
+void Mixer::runArmed(demands_t demands)
 {
     float motors[4];
 
     for (uint8_t i = 0; i < 4; i++) {
 
         motors[i] = 
-            (throttle * mixerQuadX[i].throttle + 
-             pidRoll  * mixerQuadX[i].roll +     
-             pidPitch * mixerQuadX[i].pitch +   
-             pidYaw   * mixerQuadX[i].yaw);      
+            (demands.throttle * mixerQuadX[i].throttle + 
+             demands.roll     * mixerQuadX[i].roll +     
+             demands.pitch    * mixerQuadX[i].pitch +   
+             demands.yaw      * mixerQuadX[i].yaw);      
     }
 
     float maxMotor = motors[0];

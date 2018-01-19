@@ -38,14 +38,15 @@ class Hackflight {
     private: // constants
 
         // Loop timing
-        const uint32_t imuLoopFreq        = 285;
-        const uint32_t rcLoopFreq         = 100;
-        const uint32_t altHoldLoopFreq    = 40;
-        const uint32_t angleCheckFreq     = 2;
+        const uint32_t imuLoopFreq     = 285;
+        const uint32_t rcLoopFreq      = 100;
+        const uint32_t altHoldLoopFreq = 40;
+        const uint32_t angleCheckFreq  = 2;
 
-        const uint32_t delayMilli         = 100;
-        const uint32_t ledFlashMilli      = 1000;
-        const uint32_t ledFlashCount      = 20;
+        // Arbitrary
+        const uint32_t startupMilli    = 100;
+        const uint32_t ledFlashMilli   = 1000;
+        const uint32_t ledFlashCount   = 20;
 
     public:
 
@@ -54,9 +55,9 @@ class Hackflight {
 
     private:
 
+        void outerLoop(void);
+        void innerLoop(void);
         void flashLed(void);
-        void outer(void);
-        void inner(void);
         void checkAngle(void);
 
         Mixer      mixer;
@@ -71,6 +72,9 @@ class Hackflight {
         TimedTask outerTask;
         TimedTask angleCheckTask;
         TimedTask altitudeTask;
+
+        // Demands (throttle, roll, pitch yaw) that we will build up to send to the mixer
+        demands_t demands;
 
         bool     armed;
         bool     failsafe;
@@ -94,7 +98,7 @@ void Hackflight::init(Board * _board, Receiver * _receiver, Model * _model)
     flashLed();
 
     // Sleep  a bit to allow IMU to catch up
-    board->delayMilliseconds(delayMilli);
+    board->delayMilliseconds(startupMilli);
 
     // Initialize essential timing tasks
     innerTask.init(imuLoopFreq);
@@ -127,7 +131,7 @@ void Hackflight::update(void)
 
     // Outer (slow) loop: respond to receiver demands
     if (outerTask.checkAndUpdate(currentTime)) {
-        outer();
+        outerLoop();
     }
 
     // Altithude-PID task (never called in same loop iteration as Receiver update)
@@ -137,7 +141,7 @@ void Hackflight::update(void)
 
     // Inner (fast) loop: stabilize, spin motors
     if (innerTask.checkAndUpdate(currentTime)) {
-        inner();
+        innerLoop();
     }
 
     // Periodically check pitch, roll angle for arming readiness
@@ -155,7 +159,7 @@ void Hackflight::update(void)
 
 } // update
 
-void Hackflight::outer(void)
+void Hackflight::outerLoop(void)
 {
     // Update Receiver channels
     receiver->update();
@@ -177,9 +181,10 @@ void Hackflight::outer(void)
                     armed = false;
                 }
             }
-
+        } 
+        
         // Actions during not armed
-        } else {         
+        else {         
 
             // Arming
             if (receiver->arming()) {
@@ -203,14 +208,14 @@ void Hackflight::outer(void)
     // Detect aux switch changes for altitude-hold, loiter, etc.
     if (receiver->getAuxState() != auxState) {
         auxState = receiver->getAuxState();
-        alti.handleAuxSwitch(auxState, receiver->demands[Receiver::DEMAND_THROTTLE]);
+        alti.handleAuxSwitch(auxState, demands.throttle);
     }
 }
 
-void Hackflight::inner(void)
+void Hackflight::innerLoop(void)
 {
-    // Compute exponential Receiver commands, passing yaw angle for headless mode
-    receiver->computeExpo(eulerAngles[AXIS_YAW] - yawInitial);
+    // Compute exponential Receiver demands, passing yaw angle for headless mode
+    receiver->computeExpo(eulerAngles[AXIS_YAW] - yawInitial, demands);
 
     // Get Euler angles and raw gyro from board
     float gyroRadiansPerSecond[3];
@@ -224,15 +229,15 @@ void Hackflight::inner(void)
     // Set LED based on arming status
     board->ledSet(armed);
 
-    // Udate altitude with accelerometer data
+    // Udate altitude estimator with accelerometer data
     // XXX Should be done in hardware!
     alti.fuseWithImu(eulerAngles, armed);
 
-    // Modify demands based on extras (currently just altitude-hold)
-    alti.modifyDemand(receiver->demands[Receiver::DEMAND_THROTTLE]);
+    // Run stabilization to get PIDS
+    stab.update(eulerAngles, gyroRadiansPerSecond, demands);
 
-    // Stabilization is synced to IMU update.  Stabilizer also uses RC demands and raw gyro values. 
-    stab.update(receiver->demands, eulerAngles, gyroRadiansPerSecond);
+    // Modify demands based on extras (currently just altitude-hold)
+    alti.modifyDemand(demands.throttle);
 
     // Support motor testing from GCS
     if (!armed) {
@@ -241,7 +246,7 @@ void Hackflight::inner(void)
 
     // Update mixer (spin motors) unless failsafe triggered or currently arming via throttle-down
     else if (!failsafe && !receiver->throttleIsDown()) {
-        mixer.runArmed(receiver->demands[Receiver::DEMAND_THROTTLE], stab.pidRoll, stab.pidPitch, stab.pidYaw);
+        mixer.runArmed(demands);
     }
 
     // Cut motors on failsafe or throttle-down
