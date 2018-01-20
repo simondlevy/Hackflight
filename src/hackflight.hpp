@@ -61,9 +61,6 @@ namespace hf {
             TimedTask angleCheckTask;
             TimedTask altitudeTask;
 
-            // Demands (throttle, roll, pitch yaw) that we will build up to send to the mixer
-            demands_t demands;
-
             bool     armed;
             bool     failsafe;
             float    yawInitial;
@@ -120,7 +117,7 @@ namespace hf {
                 // Detect aux switch changes for altitude-hold, loiter, etc.
                 if (receiver->getAuxState() != auxState) {
                     auxState = receiver->getAuxState();
-                    alti.handleAuxSwitch(auxState, demands.throttle);
+                    alti.handleAuxSwitch(auxState, receiver->demands.throttle);
                 }
 
                 // Set LED based on arming status
@@ -133,6 +130,8 @@ namespace hf {
 
             void innerLoop(void)
             {
+                // Start with demands from receiver
+                demands_t demands;
                 memcpy(&demands, &receiver->demands, sizeof(demands_t));
 
                 // Get Euler angles and raw gyro from board
