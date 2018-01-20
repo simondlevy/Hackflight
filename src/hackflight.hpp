@@ -73,8 +73,8 @@ namespace hf {
 
             void outerLoop(void)
             {
-                // Update Receiver channels
-                receiver->update();
+                // Update Receiver demands, passing yaw angle for headless mode
+                receiver->update(eulerAngles[AXIS_YAW] - yawInitial);
 
                 // When landed, reset integral component of PID
                 if (receiver->throttleIsDown()) {
@@ -133,8 +133,7 @@ namespace hf {
 
             void innerLoop(void)
             {
-                // Compute exponential Receiver demands, passing yaw angle for headless mode
-                receiver->updateDemands(eulerAngles[AXIS_YAW] - yawInitial, demands);
+                memcpy(&demands, &receiver->demands, sizeof(demands_t));
 
                 // Get Euler angles and raw gyro from board
                 float gyroRadiansPerSecond[3];

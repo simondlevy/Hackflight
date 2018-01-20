@@ -120,6 +120,8 @@ namespace hf {
 
             float   rawvals[CHANNELS];  // raw [-1,+1] from receiver, for MSP
 
+            demands_t demands;
+
             // These can be overridden to support various styles of arming (sticks, switches, etc.)
 
             // Override this if your receiver provides RSSI or other weak-signal detection
@@ -154,7 +156,7 @@ namespace hf {
                 ppmAverageIndex = 0;
             }
 
-            void update()
+            void update(float yawAngle)
             {
                 float averageRaw[5][4];
 
@@ -192,15 +194,7 @@ namespace hf {
                 } else
                     commandDelay = 0;
                 sticks = stTmp;
-            }
-
-            bool changed(void)
-            {
-                return commandDelay == 20;
-            }
-
-            void updateDemands(float yawAngle, demands_t & demands)
-            {
+            
                 // Convert raw [-1,+1] to absolute value
                 demands.roll  = makePositiveCommand(CHANNEL_ROLL);
                 demands.pitch = makePositiveCommand(CHANNEL_PITCH);
@@ -235,7 +229,12 @@ namespace hf {
             } // computeExpo
 
 
-            bool throttleIsDown(void)
+            bool changed(void)
+            {
+                return commandDelay == 20;
+            }
+
+             bool throttleIsDown(void)
             {
                 return rawvals[CHANNEL_THROTTLE] < -1 + margin;
             }
