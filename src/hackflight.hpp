@@ -172,7 +172,12 @@ namespace hf {
 
             void checkAngle(void)
             {
-                safeToArm = fabs(eulerAngles[AXIS_ROLL])  < stab.maxArmingAngle && fabs(eulerAngles[AXIS_PITCH]) < stab.maxArmingAngle;
+                safeToArm = safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH);
+            }
+
+            bool safeAngle(uint8_t axis)
+            {
+                return fabs(eulerAngles[axis]) < stab.maxArmingAngle;
             }
 
             void flashLed(void)
