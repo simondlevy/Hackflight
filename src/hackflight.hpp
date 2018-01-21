@@ -27,7 +27,7 @@
 #include "receiver.hpp"
 #include "stabilize.hpp"
 #include "altitude.hpp"
-#include "timedtask.hpp"
+#include "timer.hpp"
 #include "model.hpp"
 #include "debug.hpp"
 
@@ -38,14 +38,14 @@ namespace hf {
         private: 
 
             // Loop timing
-            const uint32_t imuLoopFreq     = 285;
-            const uint32_t rcLoopFreq      = 100;
-            const uint32_t altHoldLoopFreq = 40;
-            const uint32_t angleCheckFreq  = 2;
+            Timer innerTimer      = Timer(285);
+            Timer outerTimer      = Timer(100);
+            Timer angleCheckTimer = Timer(2);
+            Timer altitudeTimer   = Timer(40);
 
-            // Arbitrary
-            const uint32_t ledFlashMilli   = 1000;
-            const uint32_t ledFlashCount   = 20;
+            // Arbitrary, for flashing LED on startup
+            const uint32_t ledFlashMilli = 1000;
+            const uint32_t ledFlashCount = 20;
 
             Mixer      mixer;
             MSP        msp;
@@ -54,11 +54,6 @@ namespace hf {
 
             Board    * board;
             Receiver * receiver;
-
-            TimedTask innerTask;
-            TimedTask outerTask;
-            TimedTask angleCheckTask;
-            TimedTask altitudeTask;
 
             bool     armed;
             bool     failsafe;
@@ -200,11 +195,6 @@ namespace hf {
                 // Flash the LEDs to indicate startup
                 flashLed();
 
-                // Initialize essential timing tasks
-                innerTask.init(imuLoopFreq);
-                outerTask.init(rcLoopFreq);
-                angleCheckTask.init(angleCheckFreq);
-
                 // Initialize the receiver
                 receiver->init();
 
@@ -214,7 +204,6 @@ namespace hf {
                 msp.init(&mixer, receiver, board);
 
                 // Initialize altitude estimator, which will be used if there's a barometer
-                altitudeTask.init(altHoldLoopFreq);
                 alti.init(board, _model);
 
                 // Start unarmed
@@ -230,22 +219,22 @@ namespace hf {
                 uint32_t currentTime = (uint32_t)board->getMicros();
 
                 // Outer (slow) loop: respond to receiver demands
-                if (outerTask.checkAndUpdate(currentTime)) {
+                if (outerTimer.checkAndUpdate(currentTime)) {
                     outerLoop();
                 }
 
                 // Altithude-PID task (never called in same loop iteration as Receiver update)
-                else if (altitudeTask.checkAndUpdate(currentTime)) {
+                else if (altitudeTimer.checkAndUpdate(currentTime)) {
                     alti.computePid(armed);
                 }
 
                 // Inner (fast) loop: stabilize, spin motors
-                if (innerTask.checkAndUpdate(currentTime)) {
+                if (innerTimer.checkAndUpdate(currentTime)) {
                     innerLoop();
                 }
 
                 // Periodically check pitch, roll angle for arming readiness
-                if (angleCheckTask.ready(currentTime)) {
+                if (angleCheckTimer.ready(currentTime)) {
                     safeToArm = safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH);
                 }
 

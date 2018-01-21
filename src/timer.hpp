@@ -1,5 +1,5 @@
 /*
-   timedtask.hpp : a class for timed tasks
+   timer.hpp : a class for loop timing
 
    This file is part of Hackflight.
 
@@ -18,11 +18,9 @@
 
 #pragma once
 
-#include "debug.hpp"
-
 namespace hf {
 
-class TimedTask {
+class Timer {
 
     private:
 
@@ -31,7 +29,7 @@ class TimedTask {
 
     public:
 
-        void init(uint32_t frequency) {
+        Timer(uint32_t frequency) {
 
             period = 1000000 / frequency;
             usec = 0;
@@ -56,6 +54,7 @@ class TimedTask {
 
             return (int32_t)(currentTime - usec) >= 0;
         }
-};
 
-}
+}; // class Timer
+
+} // namespace hf
