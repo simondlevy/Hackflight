@@ -129,18 +129,14 @@ namespace hf {
                 updatePhysics();
             }
 
-            uint64_t getMicros()
+            uint32_t getMicros()
             {
-                return (uint64_t)(seconds() * 1000000);
+                return seconds() * 1000000;
             }
 
             void writeMotor(uint8_t index, float value)
             {
                 _motors[index] = value;
-            }
-
-            void delayMilliseconds(uint32_t msec)
-            {
             }
 
             virtual bool extrasHaveBaro(void)

@@ -69,6 +69,9 @@ class Ladybug : public Board {
                 analogWriteFrequency(_motorPins[k], 10000);  
                 analogWrite(_motorPins[k], 0);  
             }
+
+            // Hang a bit more
+            delay(100);
         }
 
         virtual void delayMilliseconds(uint32_t msec) override
@@ -76,9 +79,9 @@ class Ladybug : public Board {
             delay(msec);
         }
 
-        virtual uint64_t getMicros() override
+        virtual uint32_t getMicros() override
         {
-            return (uint64_t)micros();
+            return micros();
         }
 
         virtual void ledSet(bool is_on) override

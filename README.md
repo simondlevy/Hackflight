@@ -47,17 +47,18 @@ of a few objects (<b>IMU</b>, <b>Receiver</b>, <b>Board</b>, etc.) and a
 <b>loop()</b> routine that calls the <b>update()</b> method and other methods
 of those objects.  
 
-Because a quadcopter build typically involves choosing a flight-control board, 
-radio receiver, and model (airframe), Hackflight provides a separate C++ class for
-each of these components.  The
+Because a quadcopter build typically involves choosing a flight-control board,
+radio receiver, and model (airframe), Hackflight provides a separate C++ class
+for each of these components.  The
 [Board](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp)
-class specifies a set of abstract (pure virtual) methods that you implement
-for a particular flight controller or simulator: getting values from the IMU,
-sending commands to the motors, etc.  The
+class specifies a set of four abstract (pure virtual) methods that you must
+implement for a particular flight controller or simulator: initializing the
+board, getting the current time in microseconds, getting values from the IMU,
+and sending commands to the motors.  The
 [Receiver](https://github.com/simondlevy/Hackflight/blob/master/src/receiver.hpp)
-class performs basic functions associated with R/C control (tracking stick positions,
-checking switches) and specifies a set of abstract methods that you implement for
-a particular receiver (reading channels values).  The
+class performs basic functions associated with R/C control (tracking stick
+positions, checking switches) and specifies a set of abstract methods that you
+implement for a particular receiver (reading channels values).  The
 [Model](https://github.com/simondlevy/Hackflight/blob/master/src/model.hpp)
 class is where you specify the PID values for your model.
 

@@ -44,7 +44,6 @@ namespace hf {
             const uint32_t angleCheckFreq  = 2;
 
             // Arbitrary
-            const uint32_t startupMilli    = 100;
             const uint32_t ledFlashMilli   = 1000;
             const uint32_t ledFlashCount   = 20;
 
@@ -170,11 +169,6 @@ namespace hf {
 
             } // innerLoop
 
-            void checkAngle(void)
-            {
-                safeToArm = safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH);
-            }
-
             bool safeAngle(uint8_t axis)
             {
                 return fabs(eulerAngles[axis]) < stab.maxArmingAngle;
@@ -205,9 +199,6 @@ namespace hf {
 
                 // Flash the LEDs to indicate startup
                 flashLed();
-
-                // Sleep  a bit to allow IMU to catch up
-                board->delayMilliseconds(startupMilli);
 
                 // Initialize essential timing tasks
                 innerTask.init(imuLoopFreq);
@@ -255,7 +246,7 @@ namespace hf {
 
                 // Periodically check pitch, roll angle for arming readiness
                 if (angleCheckTask.ready(currentTime)) {
-                    checkAngle();
+                    safeToArm = safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH);
                 }
 
                 // Failsafe

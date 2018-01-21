@@ -28,15 +28,15 @@ namespace hf {
 
             //------------------------------------ Core functionality ----------------------------------------------------
             virtual void     init(void) = 0;
-            virtual void     delayMilliseconds(uint32_t msec) = 0;
             virtual void     getImu(float eulerAnglesRadians[3], float gyroRadiansPerSecond[3]) = 0;
-            virtual uint64_t getMicros() = 0;
+            virtual uint32_t getMicros() = 0;
             virtual void     writeMotor(uint8_t index, float value) = 0;
 
             //--------------------------------------- Debugging ---------------------------------------------------------
             static void      outbuf(char * buf);
 
             //------------------------------------------ LED ------------------------------------------------------------
+            virtual void     delayMilliseconds(uint32_t msec) { (void)msec; } 
             virtual void     ledSet(bool is_on) { (void)is_on; }
 
             //------------------------------------------ Serial ---------------------------------------------------------
