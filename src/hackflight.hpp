@@ -43,24 +43,31 @@ namespace hf {
             Timer angleCheckTimer = Timer(2);
             Timer altitudeTimer   = Timer(40);
 
-            // Arbitrary, for flashing LED on startup
-            const uint32_t ledFlashMilli = 1000;
-            const uint32_t ledFlashCount = 20;
-
+            // Essential components
             Mixer      mixer;
-            MSP        msp;
             Stabilize  stab;
-            Altitude   alti;
 
+            // Multiwii Serial Protocol communications
+            MSP        msp;
+
+            // Passed to Hackflight::init() for a particular board and receiver
             Board    * board;
             Receiver * receiver;
 
+            // XXX this should eventually be passed in as an option
+            Altitude   alti;
+
+            // State variables
             bool     armed;
-            bool     failsafe;
-            float    yawInitial;
             uint8_t  auxState;
             float    eulerAngles[3];
+
+            // Safety
+            bool     failsafe;
             bool     safeToArm;
+
+            // Support for headless mode
+            float    yawInitial;
 
             void outerLoop(void)
             {
@@ -171,6 +178,9 @@ namespace hf {
 
             void flashLed(void)
             {
+                const uint32_t ledFlashMilli = 1000;
+                const uint32_t ledFlashCount = 20;
+
                 uint32_t pauseMilli = ledFlashMilli / ledFlashCount;
                 board->ledSet(false);
                 for (uint8_t i = 0; i < ledFlashCount; i++) {
