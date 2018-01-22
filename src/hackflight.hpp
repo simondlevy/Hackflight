@@ -75,7 +75,7 @@ namespace hf {
             void outerLoop(void)
             {
                 // Update Receiver demands, passing yaw angle for headless mode
-                receiver->update(state.angles[AXIS_YAW].value - yawInitial);
+                receiver->update(state.orientation[AXIS_YAW].value - yawInitial);
 
                 // When landed, reset integral component of PID
                 if (receiver->throttleIsDown()) {
@@ -108,7 +108,7 @@ namespace hf {
 
                                 if (!auxState) // aux switch must be in zero position
                                     if (!armed) {
-                                        yawInitial = state.angles[AXIS_YAW].value;
+                                        yawInitial = state.orientation[AXIS_YAW].value;
                                         armed = true;
                                     }
                             }
@@ -142,13 +142,13 @@ namespace hf {
                 board->getState(&state);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (state.angles[AXIS_YAW].value < 0) {
-                    state.angles[AXIS_YAW].value += 2*M_PI;
+                if (state.orientation[AXIS_YAW].value < 0) {
+                    state.orientation[AXIS_YAW].value += 2*M_PI;
                 }
 
                 // Udate altitude estimator with accelerometer data
                 // XXX Should be done in hardware!
-                alti.fuseWithImu(state.angles, armed);
+                alti.fuseWithImu(state.orientation, armed);
 
                 // Run stabilization to get updated demands
                 stab.updateDemands(state, demands);
@@ -175,7 +175,7 @@ namespace hf {
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(state.angles[axis].value) < stab.maxArmingAngle;
+                return fabs(state.orientation[axis].value) < stab.maxArmingAngle;
             }
 
             void flashLed(void)

@@ -36,7 +36,7 @@ typedef struct {
 
 typedef struct {
 
-    stateval_t angles[3]; // roll, pitch, yaw
-    stateval_t altitude;  
+    stateval_t position[3];    // X, Y, Z
+    stateval_t orientation[3]; // roll, pitch, yaw
 
 } vehicle_state_t;

@@ -137,9 +137,9 @@ class Ladybug : public Board {
             float roll  = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
 
             // Also store Euler angles for extrasUpdateAccelZ()
-            state->angles[0].value = _eulerAnglesRadians[0] = roll;
-            state->angles[1].value = _eulerAnglesRadians[1] = -pitch; // compensate for IMU orientation
-            state->angles[2].value = _eulerAnglesRadians[2] = yaw;
+            state->orientation[0].value = _eulerAnglesRadians[0] = roll;
+            state->orientation[1].value = _eulerAnglesRadians[1] = -pitch; // compensate for IMU orientation
+            state->orientation[2].value = _eulerAnglesRadians[2] = yaw;
 
             int16_t gyroRaw[3];
 
@@ -150,7 +150,7 @@ class Ladybug : public Board {
 
             for (uint8_t k=0; k<3; ++k) {
                 float gyroDegrees = (float)GYRO_RES * gyroRaw[k] / (1<<15); // raw to degrees
-                state->angles[k].deriv = M_PI * gyroDegrees / 180.;  // degrees to radians
+                state->orientation[k].deriv = M_PI * gyroDegrees / 180.;  // degrees to radians
             }
         }
 
