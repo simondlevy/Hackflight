@@ -51,7 +51,6 @@ namespace hf {
             const float VELOCITY_ROTATE_SCALE    = 1.75;
 
             // Private state variables ----------------------------
-            float _linearSpeeds[3];   // meters per second forward, lateral, vertical
             float _verticalSpeedPrev; // meters per second
             float _motors[4];         // arbitrary in [0,1]
 
@@ -61,8 +60,6 @@ namespace hf {
             bool  _flying;
             float _accel[3];          // Gs
             float _secondsPrev;
-
-            bool drifted;
 
             // Gets CPU time in seconds
             void cputime(struct timespec * tv);
@@ -88,8 +85,13 @@ namespace hf {
             void simGetLinearSpeeds(float speeds[3])
             {
                 for (uint8_t k=0; k<3; ++k) {
-                    speeds[k] = _linearSpeeds[k];
+                    speeds[k] = _vehicleState.position[k].deriv;
                 }
+            }
+
+            float simGetAltitude(void)
+            {
+                return _vehicleState.position[2].value;
             }
 
             void simGetMotors(float motors[3])
@@ -97,11 +99,6 @@ namespace hf {
                 for (uint8_t k=0; k<4; ++k) {
                     motors[k] = _motors[k];
                 }
-            }
-
-            float simGetAltitude(void)
-            {
-                return _vehicleState.position[2].value;
             }
 
             bool simIsFlying(void)
@@ -115,8 +112,6 @@ namespace hf {
             {
                 _secondsPrev = 0;
                 initPhysics();
-
-                drifted = false;
             }
 
             void getState(vehicle_state_t * vehicleState)
@@ -159,11 +154,10 @@ namespace hf {
 
             void initPhysics(void)
             {
+                memset(&_vehicleState, 0, sizeof(_vehicleState));
+
                 for (uint8_t k=0; k<3; ++k) {
-                    _vehicleState.orientation[k].value = 0;
-                    _vehicleState.orientation[k].deriv = 0;
                     _accel[k] = 0;
-                    _linearSpeeds[k] = 0;
                 }
 
                 for (uint8_t k=0; k<4; ++k) {
@@ -207,21 +201,15 @@ namespace hf {
                 if (_flying) {
 
                     // Integrate vertical force to get vertical speed
-                    _linearSpeeds[2] += (lift * deltaSeconds);
+                    _vehicleState.position[2].deriv += (lift * deltaSeconds);
 
                     // To get forward and lateral speeds, integrate thrust along vehicle coordinates
-                    _linearSpeeds[0] += thrust * deltaSeconds * sin(theta);
-                    _linearSpeeds[1] += thrust * deltaSeconds * sin(phi);
-
-                    // Add some drift
-                    if (!drifted) {
-                        //_linearSpeeds[1] += 0.5;
-                        drifted = true;
-                    }
+                    _vehicleState.position[0].deriv += thrust * deltaSeconds * sin(theta);
+                    _vehicleState.position[1].deriv += thrust * deltaSeconds * sin(phi);
                 }
 
                 // Integrate vertical speed to get altitude
-                _vehicleState.position[2].value += _linearSpeeds[2] * deltaSeconds;
+                _vehicleState.position[2].value += _vehicleState.position[2].deriv * deltaSeconds;
 
                 // Reset everything if we hit the ground
                 if (_vehicleState.position[2].value < 0) {
@@ -235,8 +223,8 @@ namespace hf {
 
                 // Differentiate vertical speed to get vertical acceleration in meters per second, then convert to Gs.
                 // Resting = 1G; freefall = 0; climbing = >1G
-                float g = (_linearSpeeds[2]-_verticalSpeedPrev)/deltaSeconds/ GRAVITY + 1;
-                _verticalSpeedPrev = _linearSpeeds[2];
+                float g = (_vehicleState.position[2].deriv - _verticalSpeedPrev)/deltaSeconds/ GRAVITY + 1;
+                _verticalSpeedPrev = _vehicleState.position[2].deriv;
 
                 // Estimate G forces on accelerometer using Equations 2, 6-8 in
                 // https://www.nxp.com/docs/en/application-note/AN3461.pdf
