@@ -1,5 +1,5 @@
 /*
-    demands.hpp : Datatype for demands (throttle, roll, pitch, yaw)
+    datatypes.hpp : Datatype declarations
 
     This file is part of Hackflight.
 
@@ -26,3 +26,17 @@ typedef struct {
     float yaw;
 
 } demands_t;
+
+typedef struct {
+
+    float value;
+    float deriv; // dValue / dt
+
+} stateval_t;
+
+typedef struct {
+
+    stateval_t angles[3]; // roll, pitch, yaw
+    stateval_t altitude;  
+
+} vehicle_state_t;

@@ -24,6 +24,7 @@
 
 #include <board.hpp>
 #include <debug.hpp>
+#include <datatypes.hpp>
 
 #include <time.h>
 #include <stdio.h>
@@ -50,13 +51,13 @@ namespace hf {
             const float VELOCITY_ROTATE_SCALE    = 1.75;
 
             // Private state variables ----------------------------
-            float _gyro[3];           // radians per second
-            float _angles[3];         // radians
-            float _baroPressure;      // millibars
             float _linearSpeeds[3];   // meters per second forward, lateral, vertical
             float _verticalSpeedPrev; // meters per second
             float _motors[4];         // arbitrary in [0,1]
-            float _altitude;          // meters
+
+            vehicle_state_t _vehicleState;
+
+            float _baroPressure;      // millibars
             bool  _flying;
             float _accel[3];          // Gs
             float _secondsPrev;
@@ -73,14 +74,14 @@ namespace hf {
             void simGetEulerAngles(float angles[3])
             {
                 for (uint8_t k=0; k<3; ++k) {
-                    angles[k] = _angles[k];
+                    angles[k] = _vehicleState.angles[k].value;
                 }
             }
 
             void simGetGyro(float gyro[3])
             {
                 for (uint8_t k=0; k<3; ++k) {
-                    gyro[k] = _gyro[k];
+                    gyro[k] = _vehicleState.angles[k].deriv;
                 }
             }
 
@@ -100,7 +101,7 @@ namespace hf {
 
             float simGetAltitude(void)
             {
-                return _altitude;
+                return _vehicleState.altitude.value;
             }
 
             bool simIsFlying(void)
@@ -118,18 +119,15 @@ namespace hf {
                 drifted = false;
             }
 
-            void getImu(float eulerAnglesRadians[3], float gyroRadiansPerSecond[3])
+            void getState(vehicle_state_t * vehicleState)
             {
-                for (uint8_t k=0; k<3; ++k) {
-                    eulerAnglesRadians[k] = _angles[k];
-                    gyroRadiansPerSecond[k] = -_gyro[k];
-                }
+                memcpy(vehicleState, &_vehicleState, sizeof(vehicle_state_t));
 
                 // Sync physics update to IMU acquisition by Hackflight
                 updatePhysics();
             }
 
-            uint32_t getMicros()
+            uint32_t getMicroseconds()
             {
                 return seconds() * 1000000;
             }
@@ -162,8 +160,8 @@ namespace hf {
             void initPhysics(void)
             {
                 for (uint8_t k=0; k<3; ++k) {
-                    _angles[k] = 0;
-                    _gyro[k] = 0;
+                    _vehicleState.angles[k].value = 0;
+                    _vehicleState.angles[k].deriv = 0;
                     _accel[k] = 0;
                     _linearSpeeds[k] = 0;
                 }
@@ -173,7 +171,7 @@ namespace hf {
                 }
 
                 _flying = false;
-                _altitude = 0;
+                _vehicleState.altitude.value = 0;
                 _baroPressure = SEALEVEL;
                 _verticalSpeedPrev = 0;
             }
@@ -181,17 +179,17 @@ namespace hf {
             void updatePhysics(void)
             {
                 // Compute body-frame roll, pitch, yaw velocities based on differences between motors
-                _gyro[0] = motorsToAngularVelocity(2, 3, 0, 1);
-                _gyro[1] = motorsToAngularVelocity(1, 3, 0, 2); 
-                _gyro[2] = motorsToAngularVelocity(1, 2, 0, 3); 
+                _vehicleState.angles[0].deriv = motorsToAngularVelocity(2, 3, 0, 1);
+                _vehicleState.angles[1].deriv = motorsToAngularVelocity(1, 3, 0, 2); 
+                _vehicleState.angles[2].deriv = motorsToAngularVelocity(1, 2, 0, 3); 
 
                 // Overall thrust vector, scaled by arbitrary constant for realism
                 float thrust = THRUST_SCALE * (_motors[0] + _motors[1] + _motors[2] + _motors[3]);
 
                 // Rename Euler angles to familiar Greek-letter variables
-                float phi   = _angles[0];
-                float theta = _angles[1];
-                float psi   = _angles[2];
+                float phi   = _vehicleState.angles[0].value;
+                float theta = _vehicleState.angles[1].value;
+                float psi   = _vehicleState.angles[2].value;
 
                 // Overall vertical force = thrust - gravity
                 float lift = cos(phi)*cos(theta)*thrust - GRAVITY;
@@ -223,16 +221,16 @@ namespace hf {
                 }
 
                 // Integrate vertical speed to get altitude
-                _altitude += _linearSpeeds[2] * deltaSeconds;
+                _vehicleState.altitude.value += _linearSpeeds[2] * deltaSeconds;
 
                 // Reset everything if we hit the ground
-                if (_altitude < 0) {
+                if (_vehicleState.altitude.value < 0) {
                     initPhysics();
                 }
 
                 // Update state
                 for (int k=0; k<3; ++k) {
-                    _angles[k] += ((k==1) ? -1 : +1) * _gyro[k] * deltaSeconds; // negate pitch
+                    _vehicleState.angles[k].value += ((k==1) ? -1 : +1) * _vehicleState.angles[k].deriv * deltaSeconds; // negate pitch
                 }
 
                 // Differentiate vertical speed to get vertical acceleration in meters per second, then convert to Gs.
@@ -250,7 +248,7 @@ namespace hf {
                 // At low altitudes above the sea level, the pressure decreases
                 // by about 12 millbars (1.2kPascals) for every 100 meters (See
                 // https://en.wikipedia.org/wiki/Atmospheric_pressure#Altitude_variation)
-                _baroPressure = SEALEVEL - 12 * _altitude / 100;
+                _baroPressure = SEALEVEL - 12 * _vehicleState.altitude.value / 100;
             }
 
             float motorsToAngularVelocity(int a, int b, int c, int d)

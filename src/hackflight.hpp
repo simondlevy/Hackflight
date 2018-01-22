@@ -30,6 +30,7 @@
 #include "timer.hpp"
 #include "model.hpp"
 #include "debug.hpp"
+#include "datatypes.hpp"
 
 namespace hf {
 
@@ -57,12 +58,14 @@ namespace hf {
             // XXX this should eventually be passed in as an option
             Altitude   alti;
 
-            // State variables
-            bool     armed;
+            // Vehicle state
+            vehicle_state_t state;
+
+            // Auxiliary switch state
             uint8_t  auxState;
-            float    eulerAngles[3];
 
             // Safety
+            bool     armed;
             bool     failsafe;
             bool     safeToArm;
 
@@ -72,7 +75,7 @@ namespace hf {
             void outerLoop(void)
             {
                 // Update Receiver demands, passing yaw angle for headless mode
-                receiver->update(eulerAngles[AXIS_YAW] - yawInitial);
+                receiver->update(state.angles[AXIS_YAW].value - yawInitial);
 
                 // When landed, reset integral component of PID
                 if (receiver->throttleIsDown()) {
@@ -105,7 +108,7 @@ namespace hf {
 
                                 if (!auxState) // aux switch must be in zero position
                                     if (!armed) {
-                                        yawInitial = eulerAngles[AXIS_YAW];
+                                        yawInitial = state.angles[AXIS_YAW].value;
                                         armed = true;
                                     }
                             }
@@ -125,7 +128,7 @@ namespace hf {
                 board->ledSet(armed);
 
                 // Update serial comms
-                msp.update(eulerAngles, armed);
+                msp.update(state, armed);
 
             } // outerLoop
 
@@ -135,21 +138,20 @@ namespace hf {
                 demands_t demands;
                 memcpy(&demands, &receiver->demands, sizeof(demands_t));
 
-                // Get Euler angles and raw gyro from board
-                float gyroRadiansPerSecond[3];
-                board->getImu(eulerAngles, gyroRadiansPerSecond);
+                // Get vehicle state (minimally, Euler angles and gyro angular velocities) from board
+                board->getState(&state);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (eulerAngles[AXIS_YAW] < 0) {
-                    eulerAngles[AXIS_YAW] += 2*M_PI;
+                if (state.angles[AXIS_YAW].value < 0) {
+                    state.angles[AXIS_YAW].value += 2*M_PI;
                 }
 
                 // Udate altitude estimator with accelerometer data
                 // XXX Should be done in hardware!
-                alti.fuseWithImu(eulerAngles, armed);
+                alti.fuseWithImu(state.angles, armed);
 
                 // Run stabilization to get updated demands
-                stab.updateDemands(eulerAngles, gyroRadiansPerSecond, demands);
+                stab.updateDemands(state, demands);
 
                 // Modify demands based on extras (currently just altitude-hold)
                 alti.updateDemands(demands);
@@ -173,7 +175,7 @@ namespace hf {
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(eulerAngles[axis]) < stab.maxArmingAngle;
+                return fabs(state.angles[axis].value) < stab.maxArmingAngle;
             }
 
             void flashLed(void)
@@ -226,7 +228,7 @@ namespace hf {
             void update(void)
             {
                 // Grab current time for various loops
-                uint32_t currentTime = (uint32_t)board->getMicros();
+                uint32_t currentTime = (uint32_t)board->getMicroseconds();
 
                 // Outer (slow) loop: respond to receiver demands
                 if (outerTimer.checkAndUpdate(currentTime)) {

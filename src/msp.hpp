@@ -22,6 +22,7 @@
 #include "receiver.hpp"
 #include "mixer.hpp"
 #include "debug.hpp"
+#include "datatypes.hpp"
 
 // See http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol
 #define MSP_RC_NORMAL            121    
@@ -157,7 +158,7 @@ namespace hf {
                 memset(&portState, 0, sizeof(portState));
             }
 
-            void update(float eulerAnglesRadians[3], bool armed)
+            void update(vehicle_state_t state, bool armed)
             {
                 while (board->serialAvailableBytes()) {
 
@@ -207,7 +208,13 @@ namespace hf {
                                     break;
 
                                 case MSP_ATTITUDE_RADIANS: 
-                                    serializeFloats(eulerAnglesRadians, 3);
+                                    {
+                                        float eulerAngles[3];
+                                        for (uint8_t k=0; k<3; ++k) {
+                                            eulerAngles[k] = state.angles[k].value;
+                                        }
+                                        serializeFloats(eulerAngles, 3);
+                                    }
                                     break;
 
                                     // don't know how to handle the (valid) message, indicate error MSP $M!

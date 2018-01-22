@@ -22,7 +22,7 @@
 #include "stabilize.hpp"
 #include "filter.hpp"
 #include "debug.hpp"
-#include "demands.hpp"
+#include "datatypes.hpp"
 
 #include <cstring>
 

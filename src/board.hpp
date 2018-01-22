@@ -19,6 +19,7 @@
 #pragma once
 
 #include <stdarg.h>
+#include "datatypes.hpp"
 
 namespace hf {
 
@@ -28,8 +29,8 @@ namespace hf {
 
             //------------------------------------ Core functionality ----------------------------------------------------
             virtual void     init(void) = 0;
-            virtual void     getImu(float eulerAnglesRadians[3], float gyroRadiansPerSecond[3]) = 0;
-            virtual uint32_t getMicros() = 0;
+            virtual void     getState(vehicle_state_t * state) = 0;
+            virtual uint32_t getMicroseconds() = 0;
             virtual void     writeMotor(uint8_t index, float value) = 0;
 
             //--------------------------------------- Debugging ---------------------------------------------------------

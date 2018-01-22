@@ -26,7 +26,7 @@
 
 #include "filter.hpp"
 #include "debug.hpp"
-#include "demands.hpp"
+#include "datatypes.hpp"
 
 namespace hf {
 

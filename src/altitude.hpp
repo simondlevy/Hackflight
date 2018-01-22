@@ -27,6 +27,7 @@
 #include "accelerometer.hpp"
 #include "model.hpp"
 #include "debug.hpp"
+#include "datatypes.hpp"
 
 namespace hf {
 
@@ -71,7 +72,7 @@ namespace hf {
 
             uint32_t updateTime(void)
             {
-                uint32_t currentT = (uint32_t)board->getMicros();
+                uint32_t currentT = (uint32_t)board->getMicroseconds();
                 uint32_t dTimeMicros = currentT - previousT;
                 previousT = currentT;
                 return dTimeMicros;
@@ -116,13 +117,13 @@ namespace hf {
                 }
             }
 
-            void fuseWithImu(float eulerAnglesRadians[3], bool armed)
+            void fuseWithImu(stateval_t angles[3], bool armed)
             {
                 // If board doesn't have baro, don't bother
                 if (!board->extrasHaveBaro()) return;
 
                 // Throttle modification is synched to aquisition of new IMU data
-                accel.update(eulerAnglesRadians, armed);
+                accel.update(angles, armed);
             }
 
             void updateDemands(demands_t & demands)

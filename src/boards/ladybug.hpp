@@ -79,7 +79,7 @@ class Ladybug : public Board {
             delay(msec);
         }
 
-        virtual uint32_t getMicros() override
+        virtual uint32_t getMicroseconds() override
         {
             return micros();
         }
@@ -119,7 +119,7 @@ class Ladybug : public Board {
             avalPrev[index] = aval;
         }
 
-        virtual void getImu(float eulerAnglesRadians[3], float gyroRadiansPerSecond[3]) override
+        virtual void getState(vehicle_state_t * state) override
         {
             uint8_t errorStatus = _sentral.poll();
 
@@ -137,9 +137,9 @@ class Ladybug : public Board {
             float roll  = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
 
             // Also store Euler angles for extrasUpdateAccelZ()
-            _eulerAnglesRadians[0] =  eulerAnglesRadians[0] = roll;
-            _eulerAnglesRadians[1] =  eulerAnglesRadians[1] = -pitch; // compensate for IMU orientation
-            _eulerAnglesRadians[2] =  eulerAnglesRadians[2] = yaw;
+            state->angles[0].value = _eulerAnglesRadians[0] = roll;
+            state->angles[1].value = _eulerAnglesRadians[1] = -pitch; // compensate for IMU orientation
+            state->angles[2].value = _eulerAnglesRadians[2] = yaw;
 
             int16_t gyroRaw[3];
 
@@ -149,8 +149,8 @@ class Ladybug : public Board {
             gyroRaw[2] = -gyroRaw[2];
 
             for (uint8_t k=0; k<3; ++k) {
-                gyroRadiansPerSecond[k] = (float)GYRO_RES * gyroRaw[k] / (1<<15); // raw to degrees
-                gyroRadiansPerSecond[k] = M_PI * gyroRadiansPerSecond[k] / 180.;  // degrees to radians
+                float gyroDegrees = (float)GYRO_RES * gyroRaw[k] / (1<<15); // raw to degrees
+                state->angles[k].deriv = M_PI * gyroDegrees / 180.;  // degrees to radians
             }
         }
 

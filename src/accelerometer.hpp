@@ -21,6 +21,7 @@
 */
 
 #include "debug.hpp"
+#include "datatypes.hpp"
 
 namespace hf {
 
@@ -43,12 +44,12 @@ namespace hf {
 
             Board * board;
 
-            static float rotate(float ned[3], float * angles)
+            static float rotate(float ned[3], stateval_t angles[3])
             {
-                float cosx = cosf(-angles[0]);
-                float sinx = sinf(-angles[0]);
-                float cosy = cosf(-angles[1]);
-                float siny = sinf(-angles[1]);
+                float cosx = cosf(-angles[0].value);
+                float sinx = sinf(-angles[0].value);
+                float cosy = cosf(-angles[1].value);
+                float siny = sinf(-angles[1].value);
 
                 return ned[0] * siny + ned[1] * (-sinx * cosy) + ned[2] * (cosy * cosx);
             }
@@ -73,10 +74,10 @@ namespace hf {
                 zOffset = 0;
             }
 
-            void update(float eulerAnglesRadians[3], bool armed)
+            void update(stateval_t angles[3], bool armed)
             {
                 // Get current time in microseconds
-                uint32_t currentTimeUsec = (uint32_t)board->getMicros();
+                uint32_t currentTimeUsec = (uint32_t)board->getMicroseconds();
 
                 // Get accelerometer G values    
                 float accelGs[3];
@@ -97,7 +98,7 @@ namespace hf {
                 }
 
                 // Rotate accel values into the earth frame
-                float rotatedZ = rotate(accelGsSmoothed, eulerAnglesRadians);
+                float rotatedZ = rotate(accelGsSmoothed, angles);
 
                 // Get vertical acceleration offset at rest
                 if (!armed) {

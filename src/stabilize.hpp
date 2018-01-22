@@ -28,6 +28,7 @@
 #include "filter.hpp"
 #include "model.hpp"
 #include "debug.hpp"
+#include "datatypes.hpp"
 
 namespace hf {
 
@@ -134,15 +135,22 @@ namespace hf {
                 resetIntegral();
             }
 
-            void updateDemands(float eulerAngles[3], float gyroRate[3], demands_t & demands)
+            void updateDemands(vehicle_state_t state, demands_t & demands)
             {
+                float eulerAngles[3];
+                float gyroRate[3];
+                for (uint8_t k=0; k<3; ++k) {
+                    eulerAngles[k] = state.angles[k].value;
+                    gyroRate[k]    = state.angles[k].deriv;
+                }
+
                 // Compute proportion of cyclic demand compared to its maximum
                 float prop = Filter::max(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
 
                 // In level mode, reject pitch, roll demands that increase angle beyond specified maximum
                 if (model->levelP > 0) {
-                    demands.roll  = constrainCyclicDemand(eulerAngles[0], demands.roll);
-                    demands.pitch = constrainCyclicDemand(eulerAngles[1], demands.pitch);
+                    demands.roll  = constrainCyclicDemand(eulerAngles[AXIS_ROLL], demands.roll);
+                    demands.pitch = constrainCyclicDemand(eulerAngles[AXIS_PITCH], demands.pitch);
                 }
 
                 // Pitch, roll use leveling based on Euler angles
