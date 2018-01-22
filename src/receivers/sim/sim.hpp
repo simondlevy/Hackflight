@@ -149,7 +149,7 @@ namespace hf {
                 // Game-controller spring-mounted throttle requires special handling
                 if (_springyThrottle) {
                     demands[0] = Filter::deadband(demands[0], 0.15);
-                    _throttleDemand += demands[0] * .01f; // XXX need to make this deltaT computable
+                    _throttleDemand += demands[0] * 0.1f; // XXX need to make this deltaT computable
                     _throttleDemand = Filter::constrainAbs(_throttleDemand, 1);
                 }
                 else {
