@@ -66,44 +66,15 @@ namespace hf {
 
         public:
 
-            // accessors available to simulators -----------------------------------------------
+            // accessor available to simulators -----------------------------------------------
 
-            void simGetEulerAngles(float angles[3])
+            void simGetVehicleState(vehicle_state_t * vehicleState, float motors[4], bool * flying)
             {
-                for (uint8_t k=0; k<3; ++k) {
-                    angles[k] = _vehicleState.orientation[k].value;
-                }
-            }
+                memcpy(vehicleState, &_vehicleState, sizeof(vehicle_state_t));
 
-            void simGetGyro(float gyro[3])
-            {
-                for (uint8_t k=0; k<3; ++k) {
-                    gyro[k] = _vehicleState.orientation[k].deriv;
-                }
-            }
+                memcpy(motors, _motors, 4*sizeof(float));
 
-            void simGetLinearSpeeds(float speeds[3])
-            {
-                for (uint8_t k=0; k<3; ++k) {
-                    speeds[k] = _vehicleState.position[k].deriv;
-                }
-            }
-
-            float simGetAltitude(void)
-            {
-                return _vehicleState.position[2].value;
-            }
-
-            void simGetMotors(float motors[3])
-            {
-                for (uint8_t k=0; k<4; ++k) {
-                    motors[k] = _motors[k];
-                }
-            }
-
-            bool simIsFlying(void)
-            {
-                return _flying;
+                *flying = _flying;
             }
 
             // methods called by Hackflight -------------------------------------------------
