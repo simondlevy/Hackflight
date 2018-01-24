@@ -239,7 +239,7 @@ namespace hf {
 
                 // Altithude-PID task (never called in same loop iteration as Receiver update)
                 else if (altitudeTimer.checkAndUpdate(currentTime)) {
-                    altEstimator.estimate(state);
+                    altEstimator.estimate(state, currentTime);
                 }
 
                 // Inner (fast) loop: stabilize, spin motors

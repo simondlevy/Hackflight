@@ -26,9 +26,27 @@ namespace hf {
 
     class StateEstimator {
 
+        private:
+
+            uint32_t previousTime;
+
+        protected:
+
+            uint32_t getDeltaTime(uint32_t currentTime)
+            {
+                uint32_t dTime = currentTime - previousTime;
+                previousTime = currentTime;
+                return dTime;
+            }
+
+            void init(void)
+            {
+                previousTime = 0;
+            }
+
         public:
 
-            virtual void estimate(vehicle_state_t & state)  = 0;
+            virtual void estimate(vehicle_state_t & state, uint32_t currentTime)  = 0;
 
     }; // class StateEstimator
 

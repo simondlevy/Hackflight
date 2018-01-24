@@ -39,8 +39,6 @@ namespace hf {
             const float    cfAlt  = 0.965f;
             const float    cfVel  = 0.985f;
 
-            Board * board;
-
             // Barometer
             Barometer baro;
 
@@ -49,11 +47,11 @@ namespace hf {
 
         public:
 
-            void init(Board * _board)
+            void init(Board * board)
             {
-                board = _board;
-                baro.init(_board);
-                accel.init(_board);
+                StateEstimator::init();
+                baro.init(board);
+                accel.init(board);
             }
 
             void fuseWithImu(vehicle_state_t & state)
@@ -62,14 +60,8 @@ namespace hf {
                 accel.update(state.pose.orientation, state.armed);
             }
 
-            void estimate(vehicle_state_t & state)
+            void estimate(vehicle_state_t & state, uint32_t currentTime)
             {  
-                // Refresh the timer
-                static uint32_t previousTime;
-                uint32_t currentTime = board->getMicroseconds();
-                uint32_t dTimeMicros = currentTime - previousTime;
-                previousTime = currentTime;
-
                 // Update the baro with the current pressure reading
                 baro.update();
 
@@ -85,8 +77,9 @@ namespace hf {
                 // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
                 // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
                 // i.e without delay.
-                float accelVel = accel.getVerticalVelocity(dTimeMicros);
-                float baroVel = baro.getVelocity(dTimeMicros);
+                uint32_t dTime = getDeltaTime(currentTime);
+                float accelVel = accel.getVerticalVelocity(dTime);
+                float baroVel = baro.getVelocity(dTime);
                 state.pose.position[2].deriv = Filter::complementary(accelVel, (float)baroVel, cfVel);
             }
 
