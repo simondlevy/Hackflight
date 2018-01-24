@@ -31,8 +31,8 @@
 #include "debug.hpp"
 #include "datatypes.hpp"
 
-#include "extras/althold.hpp"
-#include "extras/altestimator.hpp"
+#include "extras/altitude_hold.hpp"
+#include "extras/altitude_estimator.hpp"
 
 namespace hf {
 
