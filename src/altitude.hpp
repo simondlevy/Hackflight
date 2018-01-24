@@ -102,12 +102,6 @@ namespace hf {
                 }
             }
 
-            void fuseWithImu(stateval_t angles[3], bool armed)
-            {
-                // Throttle modification is synched to aquisition of new IMU data
-                accel.update(angles, armed);
-            }
-
             void updateDemands(demands_t & demands)
             {
                 if (holdingAltitude) {
@@ -139,7 +133,13 @@ namespace hf {
                 }
             }
 
-            void estimate(bool armed)
+            void fuseWithImu(vehicle_state_t * state)
+            {
+                // Throttle modification is synched to aquisition of new IMU data
+                accel.update(state->pose.orientation, state->armed);
+            }
+
+            void estimate(vehicle_state_t * state)
             {  
                 // Refresh the timer
                 static uint32_t previousTime;
@@ -151,7 +151,7 @@ namespace hf {
                 baro.update();
 
                 // Calibrate baro AGL at rest
-                if (!armed) {
+                if (!state->armed) {
                     baro.calibrate();
                     return;
                 }

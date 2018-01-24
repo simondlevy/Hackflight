@@ -147,7 +147,7 @@ namespace hf {
 
                 // Udate altitude estimator with accelerometer data
                 // XXX Should be done in hardware!
-                alti.fuseWithImu(state.pose.orientation, state.armed);
+                alti.fuseWithImu(&state);
 
                 // Run stabilization to get updated demands
                 stab.updateDemands(state, demands);
@@ -236,7 +236,7 @@ namespace hf {
 
                 // Altithude-PID task (never called in same loop iteration as Receiver update)
                 else if (altitudeTimer.checkAndUpdate(currentTime)) {
-                    alti.estimate(state.armed);
+                    alti.estimate(&state);
                 }
 
                 // Inner (fast) loop: stabilize, spin motors
