@@ -120,7 +120,7 @@ namespace hf {
                 // Detect aux switch changes for altitude-hold, loiter, etc.
                 if (receiver->demands.aux != auxState) {
                     auxState = receiver->demands.aux;
-                    alti.handleAuxSwitch(auxState, receiver->demands.throttle);
+                    alti.handleAuxSwitch(&state, receiver->demands);
                 }
 
                 // Set LED based on arming status
@@ -153,7 +153,7 @@ namespace hf {
                 stab.updateDemands(state, demands);
 
                 // Modify demands based on extras (currently just altitude-hold)
-                alti.updateDemands(demands);
+                alti.updateDemands(&state, demands);
 
                 // Support motor testing from GCS
                 if (!state.armed) {

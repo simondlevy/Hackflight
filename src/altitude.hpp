@@ -39,7 +39,7 @@ namespace hf {
             const float pDeadband = 0.01f;
             const float dDeadband = 0.1f;
             const float pidMax    = 4.0f;
-            const float pErrorMax = 4.0f;//1.0f;
+            const float pErrorMax = 4.0f;
             const float iErrorMax = 8.0f;
 
             // Complementry filter for accel/baro
@@ -54,9 +54,6 @@ namespace hf {
 
             // Barometer
             Barometer baro;
-
-            float altitude;               
-            float velocity;             
 
             // Accelerometer
             Accelerometer accel;
@@ -82,16 +79,15 @@ namespace hf {
                 pid = 0;
                 holdingAltitude = false;
                 errorAltitudeI = 0;
-                velocity = 0;
             }
 
-            void handleAuxSwitch(uint8_t auxState, float throttleDemand)
+            void handleAuxSwitch(vehicle_state_t * vehicleState, demands_t & demands)
             {
                 // Start
-                if (auxState > 0) {
+                if (demands.aux > 0) {
                     holdingAltitude = true;
-                    initialThrottleHold = throttleDemand;
-                    altHold = altitude;
+                    initialThrottleHold = demands.throttle;
+                    altHold = vehicleState->pose.position[2].value;
                     pid = 0;
                     errorAltitudeI = 0;
                 }
@@ -102,9 +98,14 @@ namespace hf {
                 }
             }
 
-            void updateDemands(demands_t & demands)
+            void updateDemands(vehicle_state_t * vehicleState, demands_t & demands)
             {
                 if (holdingAltitude) {
+
+                    // Extract altitude, vertical velocity from vehicle state
+                    stateval_t posZ = vehicleState->pose.position[2];
+                    float altitude = posZ.value;
+                    float velocity = posZ.deriv;
 
                     // Refresh the timer
                     static uint32_t previousTime;
@@ -114,7 +115,7 @@ namespace hf {
 
                     // P
                     float error = altHold-altitude;
-                    //if (holdingAltitude) Debug::printf("%f - %f = %f", altHold, altitude, error);
+                    if (holdingAltitude) Debug::printf("%f - %f = %f", altHold, altitude, error);
                     error = Filter::constrainAbs(error, pErrorMax);
                     error = Filter::deadband(error, pDeadband); 
                     pid = Filter::constrainAbs(model->altP * error, pidMax);
@@ -157,16 +158,14 @@ namespace hf {
                 }
 
                 // Get estimated altitude from barometer
-                altitude = baro.getAltitude();
-
-                // Get estimated vertical velocity from accelerometer
-                velocity = accel.getVerticalVelocity(dTimeMicros);
+                state->pose.position[2].value = baro.getAltitude();
 
                 // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
                 // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
                 // i.e without delay.
+                float accelVel = accel.getVerticalVelocity(dTimeMicros);
                 float baroVel = baro.getVelocity(dTimeMicros);
-                velocity = Filter::complementary(velocity, (float)baroVel, cfVel);
+                state->pose.position[2].deriv = Filter::complementary(accelVel, (float)baroVel, cfVel);
 
             }
 
