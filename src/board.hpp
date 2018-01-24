@@ -46,7 +46,6 @@ namespace hf {
             virtual void     serialWriteByte(uint8_t c) { (void)c; }
 
             //------------------------------------------ Extras ---------------------------------------------------------
-            virtual bool    extrasHaveBaro(void) { return false; }
             virtual float   extrasGetBaroPressure(void) { return 0; }
             virtual void    extrasImuGetAccel(float accelGs[3]) { (void)accelGs; }
 

@@ -154,11 +154,6 @@ class Ladybug : public Board {
             }
         }
 
-        virtual bool extrasHaveBaro(void) override
-        { 
-            return true; 
-        }
-
         virtual float extrasGetBaroPressure(void) override 
         {
             float pressure, temperature;
