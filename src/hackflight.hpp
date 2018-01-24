@@ -26,7 +26,8 @@
 #include "msp.hpp"
 #include "receiver.hpp"
 #include "stabilize.hpp"
-#include "altitude.hpp"
+#include "althold.hpp"
+#include "altestimator.hpp"
 #include "timer.hpp"
 #include "model.hpp"
 #include "debug.hpp"
@@ -55,8 +56,8 @@ namespace hf {
             Board    * board;
             Receiver * receiver;
 
-            // XXX this should eventually be passed in as an option
-            Altitude   alti;
+            AltitudeEstimator   altEstimator;
+            AltitudeHold        altHold;
 
             // Vehicle state
             vehicle_state_t state;
@@ -120,7 +121,7 @@ namespace hf {
                 // Detect aux switch changes for altitude-hold, loiter, etc.
                 if (receiver->demands.aux != auxState) {
                     auxState = receiver->demands.aux;
-                    alti.handleAuxSwitch(&state, receiver->demands);
+                    altHold.handleAuxSwitch(&state, receiver->demands);
                 }
 
                 // Set LED based on arming status
@@ -147,13 +148,13 @@ namespace hf {
 
                 // Udate altitude estimator with accelerometer data
                 // XXX Should be done in hardware!
-                alti.fuseWithImu(&state);
+                altEstimator.fuseWithImu(&state);
 
                 // Run stabilization to get updated demands
                 stab.updateDemands(state, demands);
 
                 // Modify demands based on extras (currently just altitude-hold)
-                alti.updateDemands(&state, demands);
+                altHold.updateDemands(&state, demands);
 
                 // Support motor testing from GCS
                 if (!state.armed) {
@@ -214,8 +215,9 @@ namespace hf {
                 mixer.init(board); 
                 msp.init(&mixer, receiver, board);
 
-                // Initialize altitude estimator, which will be used if there's a barometer
-                alti.init(board, _model);
+                // Initialize altitude estimation / hold
+                altEstimator.init(board);
+                altHold.init(board, _model);
 
                 // Start unstate.armed
                 state.armed = false;
@@ -236,7 +238,7 @@ namespace hf {
 
                 // Altithude-PID task (never called in same loop iteration as Receiver update)
                 else if (altitudeTimer.checkAndUpdate(currentTime)) {
-                    alti.estimate(&state);
+                    altEstimator.estimate(&state);
                 }
 
                 // Inner (fast) loop: stabilize, spin motors

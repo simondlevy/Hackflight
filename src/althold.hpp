@@ -1,5 +1,5 @@
 /* 
-    altitude.hpp: Altitude estimation and PID via barometer/accelerometer fusion
+    althold.hpp: Altitude-hold PID controller
 
     Adapted from
 
@@ -23,15 +23,13 @@
 #pragma once
 
 #include "filter.hpp"
-#include "barometer.hpp"
-#include "accelerometer.hpp"
 #include "model.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 
 namespace hf {
 
-    class Altitude {
+    class AltitudeHold {
 
         private: 
 
@@ -42,22 +40,13 @@ namespace hf {
             const float pErrorMax = 4.0f;
             const float iErrorMax = 8.0f;
 
-            // Complementry filter for accel/baro
-            const float    cfAlt  = 0.965f;
-            const float    cfVel  = 0.985f;
-
             // Keeps PID adjustment inside range
             const float throttleMargin = 0.15f;
 
             Board * board;
             Model * model;
 
-            // Barometer
-            Barometer baro;
-
-            // Accelerometer
-            Accelerometer accel;
-
+            // State variables
             float altHold;
             float errorAltitudeI;
             bool  holdingAltitude;
@@ -70,10 +59,6 @@ namespace hf {
             {
                 board = _board;
                 model = _model;
-
-                baro.init(_board);
-
-                accel.init(_board);
 
                 initialThrottleHold = 0;
                 pid = 0;
@@ -134,42 +119,7 @@ namespace hf {
                 }
             }
 
-            void fuseWithImu(vehicle_state_t * state)
-            {
-                // Throttle modification is synched to aquisition of new IMU data
-                accel.update(state->pose.orientation, state->armed);
-            }
-
-            void estimate(vehicle_state_t * state)
-            {  
-                // Refresh the timer
-                static uint32_t previousTime;
-                uint32_t currentTime = board->getMicroseconds();
-                uint32_t dTimeMicros = currentTime - previousTime;
-                previousTime = currentTime;
-
-                // Update the baro with the current pressure reading
-                baro.update();
-
-                // Calibrate baro AGL at rest
-                if (!state->armed) {
-                    baro.calibrate();
-                    return;
-                }
-
-                // Get estimated altitude from barometer
-                state->pose.position[2].value = baro.getAltitude();
-
-                // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
-                // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
-                // i.e without delay.
-                float accelVel = accel.getVerticalVelocity(dTimeMicros);
-                float baroVel = baro.getVelocity(dTimeMicros);
-                state->pose.position[2].deriv = Filter::complementary(accelVel, (float)baroVel, cfVel);
-
-            }
-
-    }; // class Altitude
+    }; // class AltitudeHold
 
 
 } // namespace hf
