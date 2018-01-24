@@ -137,15 +137,6 @@ namespace hf {
                 return sticks == THR_LO + YAW_LO + PIT_CE + ROL_CE;
             }
 
-            virtual uint8_t getAuxState(void) 
-            {
-                // Auxiliary switch is treated as a fifth axis: 
-                // we convert values in interval [-1,+1] to 0, 1, 2
-                float aux = rawvals[4];
-                return aux < 0 ? 0 : (aux < 0.4 ? 1 : 2);
-            }
-
-
             void init(void)
             {
                 // Do hardware initialization
@@ -225,6 +216,10 @@ namespace hf {
                 // Special handling for throttle
                 float tmp = (rawvals[CHANNEL_THROTTLE] + 1) / 2; // [-1,+1] -> [0,1]
                 demands.throttle = throttleFun(tmp, throttleExpo, throttleMid);
+
+                // Store auxiliary switch value
+                float aux = rawvals[4];
+                demands.aux = aux < 0 ? 0 : (aux < 0.4 ? 1 : 2);
 
             } // computeExpo
 

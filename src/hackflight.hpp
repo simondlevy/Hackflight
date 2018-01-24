@@ -61,7 +61,7 @@ namespace hf {
             // Vehicle state
             vehicle_state_t state;
 
-            // Auxiliary switch state
+            // Auxiliary switch state for change detection
             uint8_t  auxState;
 
             // Safety
@@ -103,7 +103,7 @@ namespace hf {
 
                             if (!failsafe && safeToArm) {
 
-                                auxState = receiver->getAuxState();
+                                auxState = receiver->demands.aux;
 
                                 if (!auxState) // aux switch must be in zero position
                                     if (!state.armed) {
@@ -118,8 +118,8 @@ namespace hf {
                 } // receiver->changed()
 
                 // Detect aux switch changes for altitude-hold, loiter, etc.
-                if (receiver->getAuxState() != auxState) {
-                    auxState = receiver->getAuxState();
+                if (receiver->demands.aux != auxState) {
+                    auxState = receiver->demands.aux;
                     alti.handleAuxSwitch(auxState, receiver->demands.throttle);
                 }
 

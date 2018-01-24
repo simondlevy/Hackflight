@@ -114,7 +114,7 @@ namespace hf {
 
                     // P
                     float error = altHold-altitude;
-                    if (holdingAltitude) Debug::printf("%f - %f = %f", altHold, altitude, error);
+                    //if (holdingAltitude) Debug::printf("%f - %f = %f", altHold, altitude, error);
                     error = Filter::constrainAbs(error, pErrorMax);
                     error = Filter::deadband(error, pDeadband); 
                     pid = Filter::constrainAbs(model->altP * error, pidMax);

@@ -28,6 +28,7 @@
 #include <fcntl.h>
 
 #include <board.hpp>
+#include <debug.hpp>
 
 namespace hf {
 
@@ -52,11 +53,6 @@ namespace hf {
                 return false;
             }
 
-            uint8_t getAuxState(void) override
-            {
-                return _useButtonForAux ? _auxState : Receiver::getAuxState();
-            }
-
             bool useSerial(void)
             {
                 return true;
@@ -68,7 +64,6 @@ namespace hf {
                 _reversedVerticals = false;
                 _springyThrottle = false;
                 _useButtonForAux = false;
-                _auxState = 0;
                 _joyid = 0;
             }
 
@@ -115,7 +110,6 @@ namespace hf {
             float    _throttleDemand;
             uint8_t  _axismap[5];   // Thr, Ael, Ele, Rud, Aux
             uint8_t  _buttonmap[3]; // Aux=0, Aux=1, Aux=2
-            uint8_t  _auxState;     // For buttons
             int      _joyid;        // Linux file descriptor or Windows joystick ID
 
             void poll(float * demands)
@@ -137,11 +131,11 @@ namespace hf {
                     demands[2] = -demands[2];
                 }
 
-                // For game controllers, use buttons for aux
+                // For game controllers, use buttons to fake up values in a three-position aux switch
                 if (_useButtonForAux) {
                     for (uint8_t k=0; k<3; ++k) {
                         if (buttons == _buttonmap[k]) {
-                            _auxState = k;
+                            demands[4] = (float)k/3; 
                         }
                     }
                 }

@@ -25,6 +25,8 @@ typedef struct {
     float pitch;
     float yaw;
 
+    uint8_t aux;
+
 } demands_t;
 
 typedef struct {
