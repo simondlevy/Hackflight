@@ -140,8 +140,8 @@ namespace hf {
                 float eulerAngles[3];
                 float gyroRate[3];
                 for (uint8_t k=0; k<3; ++k) {
-                    eulerAngles[k] = state.orientation[k].value;
-                    gyroRate[k]    = state.orientation[k].deriv;
+                    eulerAngles[k] = state.pose.orientation[k].value;
+                    gyroRate[k]    = state.pose.orientation[k].deriv;
                 }
 
                 // Compute proportion of cyclic demand compared to its maximum

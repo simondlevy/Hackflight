@@ -87,7 +87,7 @@ namespace hf {
 
             void getState(vehicle_state_t * vehicleState)
             {
-                memcpy(vehicleState, &_vehicleState, sizeof(vehicle_state_t));
+                memcpy(&vehicleState->pose, &_vehicleState.pose, sizeof(pose_t));
 
                 // Sync physics update to IMU acquisition by Hackflight
                 updatePhysics();
@@ -136,7 +136,7 @@ namespace hf {
                 }
 
                 _flying = false;
-                _vehicleState.position[2].value = 0;
+                _vehicleState.pose.position[2].value = 0;
                 _baroPressure = SEALEVEL;
                 _verticalSpeedPrev = 0;
             }
@@ -144,17 +144,17 @@ namespace hf {
             void updatePhysics(void)
             {
                 // Compute body-frame roll, pitch, yaw velocities based on differences between motors
-                _vehicleState.orientation[0].deriv = motorsToAngularVelocity(2, 3, 0, 1);
-                _vehicleState.orientation[1].deriv = motorsToAngularVelocity(1, 3, 0, 2); 
-                _vehicleState.orientation[2].deriv = motorsToAngularVelocity(1, 2, 0, 3); 
+                _vehicleState.pose.orientation[0].deriv = motorsToAngularVelocity(2, 3, 0, 1);
+                _vehicleState.pose.orientation[1].deriv = motorsToAngularVelocity(1, 3, 0, 2); 
+                _vehicleState.pose.orientation[2].deriv = motorsToAngularVelocity(1, 2, 0, 3); 
 
                 // Overall thrust vector, scaled by arbitrary constant for realism
                 float thrust = THRUST_SCALE * (_motors[0] + _motors[1] + _motors[2] + _motors[3]);
 
                 // Rename Euler angles to familiar Greek-letter variables
-                float phi   = _vehicleState.orientation[0].value;
-                float theta = _vehicleState.orientation[1].value;
-                float psi   = _vehicleState.orientation[2].value;
+                float phi   = _vehicleState.pose.orientation[0].value;
+                float theta = _vehicleState.pose.orientation[1].value;
+                float psi   = _vehicleState.pose.orientation[2].value;
 
                 // Overall vertical force = thrust - gravity
                 float lift = cos(phi)*cos(theta)*thrust - GRAVITY;
@@ -172,30 +172,30 @@ namespace hf {
                 if (_flying) {
 
                     // Integrate vertical force to get vertical speed
-                    _vehicleState.position[2].deriv += (lift * deltaSeconds);
+                    _vehicleState.pose.position[2].deriv += (lift * deltaSeconds);
 
                     // To get forward and lateral speeds, integrate thrust along vehicle coordinates
-                    _vehicleState.position[0].deriv += thrust * deltaSeconds * sin(theta);
-                    _vehicleState.position[1].deriv += thrust * deltaSeconds * sin(phi);
+                    _vehicleState.pose.position[0].deriv += thrust * deltaSeconds * sin(theta);
+                    _vehicleState.pose.position[1].deriv += thrust * deltaSeconds * sin(phi);
                 }
 
                 // Integrate vertical speed to get altitude
-                _vehicleState.position[2].value += _vehicleState.position[2].deriv * deltaSeconds;
+                _vehicleState.pose.position[2].value += _vehicleState.pose.position[2].deriv * deltaSeconds;
 
                 // Reset everything if we hit the ground
-                if (_vehicleState.position[2].value < 0) {
+                if (_vehicleState.pose.position[2].value < 0) {
                     initPhysics();
                 }
 
                 // Update state
                 for (int k=0; k<3; ++k) {
-                    _vehicleState.orientation[k].value += ((k==1) ? -1 : +1) * _vehicleState.orientation[k].deriv * deltaSeconds; // negate pitch
+                    _vehicleState.pose.orientation[k].value += ((k==1) ? -1 : +1) * _vehicleState.pose.orientation[k].deriv * deltaSeconds; // negate pitch
                 }
 
                 // Differentiate vertical speed to get vertical acceleration in meters per second, then convert to Gs.
                 // Resting = 1G; freefall = 0; climbing = >1G
-                float g = (_vehicleState.position[2].deriv - _verticalSpeedPrev)/deltaSeconds/ GRAVITY + 1;
-                _verticalSpeedPrev = _vehicleState.position[2].deriv;
+                float g = (_vehicleState.pose.position[2].deriv - _verticalSpeedPrev)/deltaSeconds/ GRAVITY + 1;
+                _verticalSpeedPrev = _vehicleState.pose.position[2].deriv;
 
                 // Estimate G forces on accelerometer using Equations 2, 6-8 in
                 // https://www.nxp.com/docs/en/application-note/AN3461.pdf
@@ -207,7 +207,7 @@ namespace hf {
                 // At low altitudes above the sea level, the pressure decreases
                 // by about 12 millbars (1.2kPascals) for every 100 meters (See
                 // https://en.wikipedia.org/wiki/Atmospheric_pressure#Altitude_variation)
-                _baroPressure = SEALEVEL - 12 * _vehicleState.position[2].value / 100;
+                _baroPressure = SEALEVEL - 12 * _vehicleState.pose.position[2].value / 100;
             }
 
             float motorsToAngularVelocity(int a, int b, int c, int d)

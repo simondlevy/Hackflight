@@ -38,6 +38,12 @@ typedef struct {
 
     stateval_t position[3];    // X, Y, Z
     stateval_t orientation[3]; // roll, pitch, yaw
+
+} pose_t;
+
+typedef struct {
+
+    pose_t pose;
     bool armed;
 
 } vehicle_state_t;

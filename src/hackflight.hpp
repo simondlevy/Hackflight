@@ -65,7 +65,6 @@ namespace hf {
             uint8_t  auxState;
 
             // Safety
-            bool     armed;
             bool     failsafe;
             bool     safeToArm;
 
@@ -75,7 +74,7 @@ namespace hf {
             void outerLoop(void)
             {
                 // Update Receiver demands, passing yaw angle for headless mode
-                receiver->update(state.orientation[AXIS_YAW].value - yawInitial);
+                receiver->update(state.pose.orientation[AXIS_YAW].value - yawInitial);
 
                 // When landed, reset integral component of PID
                 if (receiver->throttleIsDown()) {
@@ -86,12 +85,12 @@ namespace hf {
                 if (receiver->changed()) {
 
                     // actions during armed
-                    if (armed) {      
+                    if (state.armed) {      
 
                         // Disarm
                         if (receiver->disarming()) {
-                            if (armed) {
-                                armed = false;
+                            if (state.armed) {
+                                state.armed = false;
                             }
                         }
                     } 
@@ -107,9 +106,9 @@ namespace hf {
                                 auxState = receiver->getAuxState();
 
                                 if (!auxState) // aux switch must be in zero position
-                                    if (!armed) {
-                                        yawInitial = state.orientation[AXIS_YAW].value;
-                                        armed = true;
+                                    if (!state.armed) {
+                                        yawInitial = state.pose.orientation[AXIS_YAW].value;
+                                        state.armed = true;
                                     }
                             }
                         }
@@ -125,10 +124,10 @@ namespace hf {
                 }
 
                 // Set LED based on arming status
-                board->ledSet(armed);
+                board->ledSet(state.armed);
 
                 // Update serial comms
-                msp.update(state, armed);
+                msp.update(state, state.armed);
 
             } // outerLoop
 
@@ -142,13 +141,13 @@ namespace hf {
                 board->getState(&state);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (state.orientation[AXIS_YAW].value < 0) {
-                    state.orientation[AXIS_YAW].value += 2*M_PI;
+                if (state.pose.orientation[AXIS_YAW].value < 0) {
+                    state.pose.orientation[AXIS_YAW].value += 2*M_PI;
                 }
 
                 // Udate altitude estimator with accelerometer data
                 // XXX Should be done in hardware!
-                alti.fuseWithImu(state.orientation, armed);
+                alti.fuseWithImu(state.pose.orientation, state.armed);
 
                 // Run stabilization to get updated demands
                 stab.updateDemands(state, demands);
@@ -157,7 +156,7 @@ namespace hf {
                 alti.updateDemands(demands);
 
                 // Support motor testing from GCS
-                if (!armed) {
+                if (!state.armed) {
                     mixer.runDisarmed();
                 }
 
@@ -175,7 +174,7 @@ namespace hf {
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(state.orientation[axis].value) < stab.maxArmingAngle;
+                return fabs(state.pose.orientation[axis].value) < stab.maxArmingAngle;
             }
 
             void flashLed(void)
@@ -218,8 +217,8 @@ namespace hf {
                 // Initialize altitude estimator, which will be used if there's a barometer
                 alti.init(board, _model);
 
-                // Start unarmed
-                armed = false;
+                // Start unstate.armed
+                state.armed = false;
                 safeToArm = false;
                 failsafe = false;
 
@@ -237,7 +236,7 @@ namespace hf {
 
                 // Altithude-PID task (never called in same loop iteration as Receiver update)
                 else if (altitudeTimer.checkAndUpdate(currentTime)) {
-                    alti.estimate(armed);
+                    alti.estimate(state.armed);
                 }
 
                 // Inner (fast) loop: stabilize, spin motors
@@ -251,9 +250,9 @@ namespace hf {
                 }
 
                 // Failsafe
-                if (armed && receiver->lostSignal()) {
+                if (state.armed && receiver->lostSignal()) {
                     mixer.cutMotors();
-                    armed = false;
+                    state.armed = false;
                     failsafe = true;
                     board->ledSet(false);
                 }
