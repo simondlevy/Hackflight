@@ -26,12 +26,13 @@
 #include "msp.hpp"
 #include "receiver.hpp"
 #include "stabilize.hpp"
-#include "althold.hpp"
-#include "altestimator.hpp"
 #include "timer.hpp"
 #include "model.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
+
+#include "extras/althold.hpp"
+#include "extras/altestimator.hpp"
 
 namespace hf {
 

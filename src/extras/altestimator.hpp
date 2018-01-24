@@ -92,5 +92,4 @@ namespace hf {
 
     }; // class AltitudeEstimator
 
-
 } // namespace hf
