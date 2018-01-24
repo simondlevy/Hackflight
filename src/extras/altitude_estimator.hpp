@@ -1,5 +1,5 @@
 /* 
-    altestimator.hpp: Altitude estimation via barometer/accelerometer fusion
+    altitude_estimator.hpp: Altitude estimation via barometer/accelerometer fusion
 
     Adapted from
 
@@ -25,12 +25,13 @@
 #include "filter.hpp"
 #include "barometer.hpp"
 #include "accelerometer.hpp"
+#include "state_estimator.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 
 namespace hf {
 
-    class AltitudeEstimator {
+    class AltitudeEstimator : public StateEstimator {
 
         private: 
 
@@ -55,13 +56,13 @@ namespace hf {
                 accel.init(_board);
             }
 
-            void fuseWithImu(vehicle_state_t * state)
+            void fuseWithImu(vehicle_state_t & state)
             {
                 // Throttle modification is synched to aquisition of new IMU data
-                accel.update(state->pose.orientation, state->armed);
+                accel.update(state.pose.orientation, state.armed);
             }
 
-            void estimate(vehicle_state_t * state)
+            void estimate(vehicle_state_t & state)
             {  
                 // Refresh the timer
                 static uint32_t previousTime;
@@ -73,21 +74,20 @@ namespace hf {
                 baro.update();
 
                 // Calibrate baro AGL at rest
-                if (!state->armed) {
+                if (!state.armed) {
                     baro.calibrate();
                     return;
                 }
 
                 // Get estimated altitude from barometer
-                state->pose.position[2].value = baro.getAltitude();
+                state.pose.position[2].value = baro.getAltitude();
 
                 // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
                 // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
                 // i.e without delay.
                 float accelVel = accel.getVerticalVelocity(dTimeMicros);
                 float baroVel = baro.getVelocity(dTimeMicros);
-                state->pose.position[2].deriv = Filter::complementary(accelVel, (float)baroVel, cfVel);
-
+                state.pose.position[2].deriv = Filter::complementary(accelVel, (float)baroVel, cfVel);
             }
 
     }; // class AltitudeEstimator

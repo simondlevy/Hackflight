@@ -1,5 +1,5 @@
 /* 
-    althold.hpp: Altitude-hold PID controller
+    altitude_hold.hpp: PID controller for altitude hold
 
     Adapted from
 
@@ -66,13 +66,13 @@ namespace hf {
                 errorAltitudeI = 0;
             }
 
-            void handleAuxSwitch(vehicle_state_t * vehicleState, demands_t & demands)
+            void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands)
             {
                 // Start
                 if (demands.aux > 0) {
                     holdingAltitude = true;
                     initialThrottleHold = demands.throttle;
-                    altHold = vehicleState->pose.position[2].value;
+                    altHold = vehicleState.pose.position[2].value;
                     pid = 0;
                     errorAltitudeI = 0;
                 }
@@ -83,12 +83,12 @@ namespace hf {
                 }
             }
 
-            void updateDemands(vehicle_state_t * vehicleState, demands_t & demands)
+            void updateDemands(vehicle_state_t & vehicleState, demands_t & demands)
             {
                 if (holdingAltitude) {
 
                     // Extract altitude, vertical velocity from vehicle state
-                    stateval_t posZ = vehicleState->pose.position[2];
+                    stateval_t posZ = vehicleState.pose.position[2];
                     float altitude = posZ.value;
                     float velocity = posZ.deriv;
 
@@ -100,7 +100,6 @@ namespace hf {
 
                     // P
                     float error = altHold-altitude;
-                    if (holdingAltitude) Debug::printf("%f - %f = %f", altHold, altitude, error);
                     error = Filter::constrainAbs(error, pErrorMax);
                     error = Filter::deadband(error, pDeadband); 
                     pid = Filter::constrainAbs(model->altP * error, pidMax);

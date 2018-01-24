@@ -122,7 +122,7 @@ namespace hf {
                 // Detect aux switch changes for altitude-hold, loiter, etc.
                 if (receiver->demands.aux != auxState) {
                     auxState = receiver->demands.aux;
-                    altHold.handleAuxSwitch(&state, receiver->demands);
+                    altHold.handleAuxSwitch(state, receiver->demands);
                 }
 
                 // Set LED based on arming status
@@ -149,13 +149,13 @@ namespace hf {
 
                 // Udate altitude estimator with accelerometer data
                 // XXX Should be done in hardware!
-                altEstimator.fuseWithImu(&state);
+                altEstimator.fuseWithImu(state);
 
                 // Run stabilization to get updated demands
                 stab.updateDemands(state, demands);
 
                 // Modify demands based on extras (currently just altitude-hold)
-                altHold.updateDemands(&state, demands);
+                altHold.updateDemands(state, demands);
 
                 // Support motor testing from GCS
                 if (!state.armed) {
@@ -239,7 +239,7 @@ namespace hf {
 
                 // Altithude-PID task (never called in same loop iteration as Receiver update)
                 else if (altitudeTimer.checkAndUpdate(currentTime)) {
-                    altEstimator.estimate(&state);
+                    altEstimator.estimate(state);
                 }
 
                 // Inner (fast) loop: stabilize, spin motors
