@@ -48,7 +48,7 @@ namespace hf {
 
         protected:
 
-            virtual void init(void) override
+            void init(void)
             {
                 // Begin serial comms
                 Serial.begin(115200);
@@ -82,37 +82,37 @@ namespace hf {
                 delay(100);
             }
 
-            virtual void delayMilliseconds(uint32_t msec) override
+            void delayMilliseconds(uint32_t msec)
             {
                 delay(msec);
             }
 
-            virtual uint32_t getMicroseconds() override
+            uint32_t getMicroseconds()
             {
                 return micros();
             }
 
-            virtual void ledSet(bool is_on) override
+            void ledSet(bool is_on)
             { 
                 digitalWrite(A1, is_on ? HIGH : LOW);
             }
 
-            virtual uint8_t serialAvailableBytes(void) override
+            uint8_t serialAvailableBytes(void)
             {
                 return Serial.available();
             }
 
-            virtual uint8_t serialReadByte(void) override
+            uint8_t serialReadByte(void)
             {
                 return Serial.read();
             }
 
-            virtual void serialWriteByte(uint8_t c) override
+            void serialWriteByte(uint8_t c)
             {
                 Serial.write(c);
             }
 
-            virtual void writeMotor(uint8_t index, float value) override
+            void writeMotor(uint8_t index, float value)
             {
                 // Scale motor value from [0,1] to [0,255]
                 uint8_t aval = (uint8_t)(value * 255);
@@ -127,7 +127,7 @@ namespace hf {
                 avalPrev[index] = aval;
             }
 
-            virtual void getState(vehicle_state_t & state) override
+            void getState(vehicle_state_t & state)
             {
                 uint8_t errorStatus = _sentral.poll();
 
@@ -172,7 +172,7 @@ namespace hf {
 
             } // getState
 
-            virtual void runEstimators(vehicle_state_t & state, uint32_t currentTime) override
+            void runEstimators(vehicle_state_t & state, uint32_t currentTime)
             {
                 if (altitudeTimer.checkAndUpdate(currentTime)) {
                     float pressure, temperature;
