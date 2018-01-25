@@ -55,7 +55,7 @@ namespace hf {
             Board    * board;
             Receiver * receiver;
 
-            AltitudeHold        altHold;
+            AltitudeHold altitudeHold = AltitudeHold(0.04f, 0.50f, 6.00f);
 
             // Vehicle state
             vehicle_state_t state;
@@ -122,7 +122,7 @@ namespace hf {
                 // Detect aux switch changes for altitude-hold, loiter, etc.
                 if (receiver->demands.aux != auxState) {
                     auxState = receiver->demands.aux;
-                    altHold.handleAuxSwitch(state, receiver->demands);
+                    altitudeHold.handleAuxSwitch(state, receiver->demands);
                 }
 
                 // Set LED based on arming status
@@ -151,7 +151,7 @@ namespace hf {
                 stab.updateDemands(state, demands);
 
                 // Modify demands based on extras (currently just altitude-hold)
-                altHold.updateDemands(state, demands, board->getMicroseconds());
+                altitudeHold.updateDemands(state, demands, board->getMicroseconds());
 
                 // Support motor testing from GCS
                 if (!state.armed) {
@@ -213,7 +213,7 @@ namespace hf {
                 msp.init(&mixer, receiver, board);
 
                 // Initialize altitude estimation / hold
-                altHold.init(_model);
+                altitudeHold.init();
 
                 // Start unstate.armed
                 state.armed = false;

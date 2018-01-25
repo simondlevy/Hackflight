@@ -41,11 +41,6 @@ namespace hf {
                 // Yaw: P must be positive
                 gyroYawP = 0.0001f;// 0.1f;
                 gyroYawI = 0;// 0.05f;
-
-                // Altitude 
-                altP = 0.04f;
-                altI = 0.50f;
-                altD = 6.00f;
              }
     };
 

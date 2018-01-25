@@ -43,7 +43,10 @@ namespace hf {
             // Keeps PID adjustment inside range
             const float throttleMargin = 0.15f;
 
-            Model * model;
+            // PID params
+            float pidP;
+            float pidI;
+            float pidD;
 
             // State variables
             float altHold;
@@ -54,10 +57,15 @@ namespace hf {
 
         public:
 
-            void init(Model * _model)
+            AltitudeHold(float _pidP, float _pidI, float _pidD)
             {
-                model = _model;
+                pidP = _pidP;
+                pidI = _pidI;
+                pidD = _pidD;
+            }
 
+            void init(void)
+            {
                 initialThrottleHold = 0;
                 pid = 0;
                 holdingAltitude = false;
@@ -99,17 +107,17 @@ namespace hf {
                     float error = altHold-altitude;
                     error = Filter::constrainAbs(error, pErrorMax);
                     error = Filter::deadband(error, pDeadband); 
-                    pid = Filter::constrainAbs(model->altP * error, pidMax);
+                    pid = Filter::constrainAbs(pidP * error, pidMax);
 
 
                     // I
-                    errorAltitudeI += (model->altI * error);
+                    errorAltitudeI += (pidI * error);
                     errorAltitudeI = Filter::constrainAbs(errorAltitudeI, iErrorMax);
                     pid += (errorAltitudeI * (dTimeMicros/1e6));
 
                     // D
                     float vario = Filter::deadband(velocity, dDeadband);
-                    pid -= Filter::constrainAbs(model->altD * vario, pidMax);
+                    pid -= Filter::constrainAbs(pidD * vario, pidMax);
 
                     demands.throttle = Filter::constrainMinMax(initialThrottleHold + pid, throttleMargin, 1-throttleMargin);
                 }

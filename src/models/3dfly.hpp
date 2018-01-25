@@ -44,11 +44,6 @@ namespace hf {
                 softwareTrimRoll  =   0.f;
                 softwareTrimPitch = -.018f;
                 softwareTrimYaw   =   0.f;
-
-                // Altitude 
-                altP = 0.1f;
-                altI = 0;//0.02f; 
-                altD = 0;//1.7f;
             }
     };
 

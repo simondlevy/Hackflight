@@ -42,11 +42,6 @@ class Model {
         float softwareTrimRoll  = 0;
         float softwareTrimPitch = 0;
         float softwareTrimYaw   = 0;
-
-        // Altitude 
-        float altP = 0;
-        float altI = 0; 
-        float altD = 0;
 };
 
 } // namespace hf
