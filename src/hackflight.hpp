@@ -32,7 +32,6 @@
 #include "datatypes.hpp"
 
 #include "extras/altitude_hold.hpp"
-#include "extras/altitude_estimator.hpp"
 
 namespace hf {
 
@@ -44,7 +43,6 @@ namespace hf {
             Timer innerTimer      = Timer(285);
             Timer outerTimer      = Timer(100);
             Timer angleCheckTimer = Timer(2);
-            Timer altitudeTimer   = Timer(40);
 
             // Essential components
             Mixer      mixer;
@@ -57,7 +55,6 @@ namespace hf {
             Board    * board;
             Receiver * receiver;
 
-            AltitudeEstimator   altEstimator;
             AltitudeHold        altHold;
 
             // Vehicle state
@@ -72,6 +69,9 @@ namespace hf {
 
             // Support for headless mode
             float    yawInitial;
+
+            // Support a list of state estimators
+            //StateEstimator * stateEstimators = NULL;
 
             void outerLoop(void)
             {
@@ -140,22 +140,18 @@ namespace hf {
                 memcpy(&demands, &receiver->demands, sizeof(demands_t));
 
                 // Get vehicle state (minimally, Euler angles and gyro angular velocities) from board
-                board->getState(&state);
+                board->getState(state);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
                 if (state.pose.orientation[AXIS_YAW].value < 0) {
                     state.pose.orientation[AXIS_YAW].value += 2*M_PI;
                 }
 
-                // Udate altitude estimator with accelerometer data
-                // XXX Should be done in hardware!
-                altEstimator.fuseWithImu(state);
-
                 // Run stabilization to get updated demands
                 stab.updateDemands(state, demands);
 
                 // Modify demands based on extras (currently just altitude-hold)
-                altHold.updateDemands(state, demands);
+                altHold.updateDemands(state, demands, board->getMicroseconds());
 
                 // Support motor testing from GCS
                 if (!state.armed) {
@@ -217,8 +213,7 @@ namespace hf {
                 msp.init(&mixer, receiver, board);
 
                 // Initialize altitude estimation / hold
-                altEstimator.init(board);
-                altHold.init(board, _model);
+                altHold.init(_model);
 
                 // Start unstate.armed
                 state.armed = false;
@@ -237,9 +232,9 @@ namespace hf {
                     outerLoop();
                 }
 
-                // Altithude-PID task (never called in same loop iteration as Receiver update)
-                else if (altitudeTimer.checkAndUpdate(currentTime)) {
-                    altEstimator.estimate(state, currentTime);
+                // Other state estimators (never called in same loop iteration as Receiver update)
+                else {
+                    board->runEstimators(state, currentTime);
                 }
 
                 // Inner (fast) loop: stabilize, spin motors
@@ -262,6 +257,6 @@ namespace hf {
 
             } // update
 
-    }; // class Hackflight
+     }; // class Hackflight
 
 } // namespace

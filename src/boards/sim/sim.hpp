@@ -29,6 +29,8 @@
 #include <time.h>
 #include <stdio.h>
 
+#include <extras/altitude_estimator.hpp>
+
 namespace hf {
 
     class SimBoard : public Board {
@@ -55,6 +57,9 @@ namespace hf {
             float _motors[4];         // arbitrary in [0,1]
 
             vehicle_state_t _vehicleState;
+
+            AltitudeEstimator   altitudeEstimator;
+            Timer altitudeTimer = Timer(40);
 
             float _baroPressure;      // millibars
             bool  _flying;
@@ -83,14 +88,20 @@ namespace hf {
             {
                 _secondsPrev = 0;
                 initPhysics();
+
+                // Initialize the atitude estimator
+                altitudeEstimator.init(this);
             }
 
-            void getState(vehicle_state_t * vehicleState)
+            void getState(vehicle_state_t & vehicleState)
             {
-                memcpy(&vehicleState->pose, &_vehicleState.pose, sizeof(pose_t));
+                memcpy(&vehicleState.pose, &_vehicleState.pose, sizeof(pose_t));
 
                 // Sync physics update to IMU acquisition by Hackflight
                 updatePhysics();
+
+                // Fuse altitude estimator with accelerometer data
+                altitudeEstimator.fuseWithImu(vehicleState, _accel, getMicroseconds());
             }
 
             uint32_t getMicroseconds()
@@ -103,24 +114,13 @@ namespace hf {
                 _motors[index] = value;
             }
 
-            virtual bool extrasHaveBaro(void)
+            void runEstimators(vehicle_state_t & state, uint32_t currentTime)
             {
-                return true;
-            }
-
-            virtual float extrasGetBaroPressure(void)
-            {
-                return _baroPressure;
-            }
-
-            virtual void extrasImuGetAccel(float accelGs[3])
-            {
-                for (uint8_t k=0; k<3; ++k) {
-                    accelGs[k] = _accel[k];
+                if (altitudeTimer.checkAndUpdate(currentTime)) {
+                    altitudeEstimator.estimate(state, currentTime, _baroPressure);
                 }
             }
 
-            // private methods
         private:
 
             void initPhysics(void)

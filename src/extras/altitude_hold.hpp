@@ -43,7 +43,6 @@ namespace hf {
             // Keeps PID adjustment inside range
             const float throttleMargin = 0.15f;
 
-            Board * board;
             Model * model;
 
             // State variables
@@ -55,9 +54,8 @@ namespace hf {
 
         public:
 
-            void init(Board * _board, Model * _model)
+            void init(Model * _model)
             {
-                board = _board;
                 model = _model;
 
                 initialThrottleHold = 0;
@@ -83,7 +81,7 @@ namespace hf {
                 }
             }
 
-            void updateDemands(vehicle_state_t & vehicleState, demands_t & demands)
+            void updateDemands(vehicle_state_t & vehicleState, demands_t & demands, uint32_t currentTime)
             {
                 if (holdingAltitude) {
 
@@ -94,7 +92,6 @@ namespace hf {
 
                     // Refresh the timer
                     static uint32_t previousTime;
-                    uint32_t currentTime = board->getMicroseconds();
                     uint32_t dTimeMicros = currentTime - previousTime;
                     previousTime = currentTime;
 

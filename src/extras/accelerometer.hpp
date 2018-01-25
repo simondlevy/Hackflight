@@ -42,8 +42,6 @@ namespace hf {
             float    verticalVelocity;
             float    zOffset;
 
-            Board * board;
-
             static float rotate(float ned[3], stateval_t angles[3])
             {
                 float cosx = cosf(-angles[0].value);
@@ -56,10 +54,8 @@ namespace hf {
 
         public:
 
-            void init(Board * _board)
+            void init(void)
             {
-                board = _board;
-
                 // Calculate RC time constant used in the low-pass filter
                 fc = (float)(0.5f / (M_PI * lpfCutoff)); 
 
@@ -74,15 +70,8 @@ namespace hf {
                 zOffset = 0;
             }
 
-            void update(stateval_t angles[3], bool armed)
+            void update(stateval_t angles[3], float accelGs[3], uint32_t currentTimeUsec, bool armed)
             {
-                // Get current time in microseconds
-                uint32_t currentTimeUsec = (uint32_t)board->getMicroseconds();
-
-                // Get accelerometer G values    
-                float accelGs[3];
-                board->extrasImuGetAccel(accelGs);
-
                 // Track delta time
                 uint32_t dT_usec = currentTimeUsec - previousTimeUsec;
                 previousTimeUsec = currentTimeUsec;

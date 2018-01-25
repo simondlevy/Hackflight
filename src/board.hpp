@@ -19,6 +19,7 @@
 #pragma once
 
 #include <stdarg.h>
+
 #include "datatypes.hpp"
 
 namespace hf {
@@ -29,7 +30,7 @@ namespace hf {
 
             //------------------------------------ Core functionality ----------------------------------------------------
             virtual void     init(void) = 0;
-            virtual void     getState(vehicle_state_t * state) = 0;
+            virtual void     getState(vehicle_state_t & state) = 0;
             virtual uint32_t getMicroseconds() = 0;
             virtual void     writeMotor(uint8_t index, float value) = 0;
 
@@ -45,9 +46,8 @@ namespace hf {
             virtual uint8_t  serialReadByte(void)  { return 0; }
             virtual void     serialWriteByte(uint8_t c) { (void)c; }
 
-            //------------------------------------------ Extras ---------------------------------------------------------
-            virtual float   extrasGetBaroPressure(void) { return 0; }
-            virtual void    extrasImuGetAccel(float accelGs[3]) { (void)accelGs; }
+            //-------------------------------- Additional state estimation -----------------------------------------------
+            virtual void    runEstimators(vehicle_state_t & state, uint32_t currentTime) { (void)state; (void)currentTime; }
 
     }; // class Board
 

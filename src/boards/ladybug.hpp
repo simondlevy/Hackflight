@@ -24,157 +24,168 @@
 #include <EM7180.h>
 #include <stdarg.h>
 #include "hackflight.hpp"
+#include "extras/altitude_estimator.hpp"
 
 namespace hf {
 
-class Ladybug : public Board {
+    class Ladybug : public Board {
 
-    private:
+        private:
 
-        static const uint8_t  ACCEL_RES = 8;    // Gs
-        static const uint16_t GYRO_RES  = 2000; // degrees per second
-        static const uint16_t MAG_RES   = 2000; // Tesla
+            static const uint8_t  ACCEL_RES = 8;    // Gs
+            static const uint16_t GYRO_RES  = 2000; // degrees per second
+            static const uint16_t MAG_RES   = 2000; // Tesla
 
-        uint8_t _motorPins[4] = {13, A2, 3, 11};
+            uint8_t _motorPins[4] = {13, A2, 3, 11};
 
-        float _eulerAnglesRadians[3];
+            float _eulerAnglesRadians[3];
 
-        EM7180 _sentral;
+            EM7180 _sentral;
 
-    protected:
+            // XXX We should be getting altitude estimation from EM7180
+            AltitudeEstimator   altitudeEstimator;
+            Timer altitudeTimer   = Timer(40);
 
-        virtual void init(void) override
-        {
-            // Begin serial comms
-            Serial.begin(115200);
+        protected:
 
-            // Setup LEDs and turn them off
-            pinMode(A1, OUTPUT);
-            digitalWrite(A1, LOW);
+            virtual void init(void) override
+            {
+                // Begin serial comms
+                Serial.begin(115200);
 
-            // Start I^2C
-            Wire.begin();
+                // Setup LEDs and turn them off
+                pinMode(A1, OUTPUT);
+                digitalWrite(A1, LOW);
 
-            // Hang a bit before starting up the EM7180
-            delay(100);
+                // Start I^2C
+                Wire.begin();
 
-            // Start the EM7180
-            uint8_t status = _sentral.begin(ACCEL_RES, GYRO_RES, MAG_RES);
-            while (status) {
-                Serial.println(EM7180::errorToString(status));
+                // Hang a bit before starting up the EM7180
+                delay(100);
+
+                // Start the EM7180
+                uint8_t status = _sentral.begin(ACCEL_RES, GYRO_RES, MAG_RES);
+                while (status) {
+                    Serial.println(EM7180::errorToString(status));
+                }
+
+                // Initialize the motors
+                for (int k=0; k<4; ++k) {
+                    analogWriteFrequency(_motorPins[k], 10000);  
+                    analogWrite(_motorPins[k], 0);  
+                }
+
+                // Initialize the atitude estimator
+                altitudeEstimator.init(this);
+
+                // Hang a bit more
+                delay(100);
             }
 
-            // Initialize the motors
-            for (int k=0; k<4; ++k) {
-                analogWriteFrequency(_motorPins[k], 10000);  
-                analogWrite(_motorPins[k], 0);  
+            virtual void delayMilliseconds(uint32_t msec) override
+            {
+                delay(msec);
             }
 
-            // Hang a bit more
-            delay(100);
-        }
-
-        virtual void delayMilliseconds(uint32_t msec) override
-        {
-            delay(msec);
-        }
-
-        virtual uint32_t getMicroseconds() override
-        {
-            return micros();
-        }
-
-        virtual void ledSet(bool is_on) override
-        { 
-            digitalWrite(A1, is_on ? HIGH : LOW);
-        }
-
-        virtual uint8_t serialAvailableBytes(void) override
-        {
-            return Serial.available();
-        }
-
-        virtual uint8_t serialReadByte(void) override
-        {
-            return Serial.read();
-        }
-
-        virtual void serialWriteByte(uint8_t c) override
-        {
-            Serial.write(c);
-        }
-
-        virtual void writeMotor(uint8_t index, float value) override
-        {
-            // Scale motor value from [0,1] to [0,255]
-            uint8_t aval = (uint8_t)(value * 255);
-
-            // Avoid sending the motor the same value over and over
-            static uint8_t avalPrev[4];
-
-            if (aval != avalPrev[index]) {
-                analogWrite(_motorPins[index], aval);
+            virtual uint32_t getMicroseconds() override
+            {
+                return micros();
             }
 
-            avalPrev[index] = aval;
-        }
-
-        virtual void getState(vehicle_state_t * state) override
-        {
-            uint8_t errorStatus = _sentral.poll();
-
-            if (errorStatus) {
-                Serial.print("ERROR: ");
-                Serial.println(EM7180::errorToString(errorStatus));
-                return;
+            virtual void ledSet(bool is_on) override
+            { 
+                digitalWrite(A1, is_on ? HIGH : LOW);
             }
 
-            static float q[4];
-            _sentral.getQuaternions(q);
-
-            float yaw   = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
-            float pitch = -asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
-            float roll  = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
-
-            // Also store Euler angles for extrasUpdateAccelZ()
-            state->pose.orientation[0].value = _eulerAnglesRadians[0] = roll;
-            state->pose.orientation[1].value = _eulerAnglesRadians[1] = -pitch; // compensate for IMU orientation
-            state->pose.orientation[2].value = _eulerAnglesRadians[2] = yaw;
-
-            int16_t gyroRaw[3];
-
-            _sentral.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
-
-            gyroRaw[1] = -gyroRaw[1];
-            gyroRaw[2] = -gyroRaw[2];
-
-            for (uint8_t k=0; k<3; ++k) {
-                float gyroDegrees = (float)GYRO_RES * gyroRaw[k] / (1<<15); // raw to degrees
-                state->pose.orientation[k].deriv = M_PI * gyroDegrees / 180.;  // degrees to radians
+            virtual uint8_t serialAvailableBytes(void) override
+            {
+                return Serial.available();
             }
-        }
 
-        virtual float extrasGetBaroPressure(void) override 
-        {
-            float pressure, temperature;
-            _sentral.getBaro(pressure, temperature);
-            return pressure;
-        }
-
-        virtual void extrasImuGetAccel(float accelGs[3]) override
-        {
-            int16_t accelRaw[3];
-            _sentral.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
-            for (uint8_t k=0; k<3; ++k) {
-                accelGs[k] = (accelRaw[k]-2048.) / (1<<15) * ACCEL_RES + 1;
+            virtual uint8_t serialReadByte(void) override
+            {
+                return Serial.read();
             }
-        }
 
-}; // class
+            virtual void serialWriteByte(uint8_t c) override
+            {
+                Serial.write(c);
+            }
 
-void Board::outbuf(char * buf)
-{
-    Serial.print(buf);
-}
+            virtual void writeMotor(uint8_t index, float value) override
+            {
+                // Scale motor value from [0,1] to [0,255]
+                uint8_t aval = (uint8_t)(value * 255);
 
-} // namespace
+                // Avoid sending the motor the same value over and over
+                static uint8_t avalPrev[4];
+
+                if (aval != avalPrev[index]) {
+                    analogWrite(_motorPins[index], aval);
+                }
+
+                avalPrev[index] = aval;
+            }
+
+            virtual void getState(vehicle_state_t & state) override
+            {
+                uint8_t errorStatus = _sentral.poll();
+
+                if (errorStatus) {
+                    Serial.print("ERROR: ");
+                    Serial.println(EM7180::errorToString(errorStatus));
+                    return;
+                }
+
+                static float q[4];
+                _sentral.getQuaternions(q);
+
+                float yaw   = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
+                float pitch = -asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
+                float roll  = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
+
+                // Also store Euler angles for extrasUpdateAccelZ()
+                state.pose.orientation[0].value = _eulerAnglesRadians[0] = roll;
+                state.pose.orientation[1].value = _eulerAnglesRadians[1] = -pitch; // compensate for IMU orientation
+                state.pose.orientation[2].value = _eulerAnglesRadians[2] = yaw;
+
+                int16_t gyroRaw[3];
+
+                _sentral.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
+
+                gyroRaw[1] = -gyroRaw[1];
+                gyroRaw[2] = -gyroRaw[2];
+
+                for (uint8_t k=0; k<3; ++k) {
+                    float gyroDegrees = (float)GYRO_RES * gyroRaw[k] / (1<<15); // raw to degrees
+                    state.pose.orientation[k].deriv = M_PI * gyroDegrees / 180.;  // degrees to radians
+                }
+
+                // Fuse altitude estimator with accelerometer data
+                int16_t accelRaw[3];
+                _sentral.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
+                float accelGs[3];
+                for (uint8_t k=0; k<3; ++k) {
+                    accelGs[k] = (accelRaw[k]-2048.) / (1<<15) * ACCEL_RES + 1;
+                }
+                altitudeEstimator.fuseWithImu(state, accelGs, micros());
+
+            } // getState
+
+            virtual void runEstimators(vehicle_state_t & state, uint32_t currentTime) override
+            {
+                if (altitudeTimer.checkAndUpdate(currentTime)) {
+                    float pressure, temperature;
+                    _sentral.getBaro(pressure, temperature);
+                    altitudeEstimator.estimate(state, currentTime, pressure);
+                }
+            }
+
+    }; // class Ladybug
+
+    void Board::outbuf(char * buf)
+    {
+        Serial.print(buf);
+    }
+
+} // namespace hf

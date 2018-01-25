@@ -35,8 +35,6 @@ namespace hf {
             const float velocityDeadband      = 10.0f;
             static const uint8_t HISTORY_SIZE = 48;
 
-            Board * board;
-
             float   alt;
             float   history[HISTORY_SIZE];
             uint8_t historyIdx;
@@ -52,10 +50,8 @@ namespace hf {
 
         public:
 
-            void init(Board * _board)
+            void init(void)
             {
-                board = _board;
-
                 pressureSum = 0;
                 historyIdx = 0;
                 groundAltitude = 0;
@@ -76,10 +72,8 @@ namespace hf {
                 groundAltitude = millibarsToMeters(groundPressure/8);
             }
 
-            void update()
+            void update(float pressure)
             {
-                float pressure = board->extrasGetBaroPressure();
-
                 uint8_t indexplus1 = (historyIdx + 1) % HISTORY_SIZE;
                 history[historyIdx] = pressure;
                 pressureSum += history[historyIdx];

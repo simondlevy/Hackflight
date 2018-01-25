@@ -25,13 +25,12 @@
 #include "filter.hpp"
 #include "barometer.hpp"
 #include "accelerometer.hpp"
-#include "state_estimator.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 
 namespace hf {
 
-    class AltitudeEstimator : public StateEstimator {
+    class AltitudeEstimator {
 
         private: 
 
@@ -45,25 +44,33 @@ namespace hf {
             // Accelerometer
             Accelerometer accel;
 
+            uint32_t getDeltaTime(uint32_t currentTime)
+            {
+                static int32_t previousTime;
+                uint32_t dTime = currentTime - previousTime;
+                previousTime = currentTime;
+                return dTime;
+            }
+
         public:
 
             void init(Board * board)
             {
-                StateEstimator::init();
-                baro.init(board);
-                accel.init(board);
+                //StateEstimator::init();
+                baro.init();
+                accel.init();
             }
 
-            void fuseWithImu(vehicle_state_t & state)
+            void fuseWithImu(vehicle_state_t & state, float accelGs[3], uint32_t currentTime)
             {
                 // Throttle modification is synched to aquisition of new IMU data
-                accel.update(state.pose.orientation, state.armed);
+                accel.update(state.pose.orientation, accelGs, currentTime, state.armed);
             }
 
-            void estimate(vehicle_state_t & state, uint32_t currentTime)
+            void estimate(vehicle_state_t & state, uint32_t currentTime, float baroPressure)
             {  
                 // Update the baro with the current pressure reading
-                baro.update();
+                baro.update(baroPressure);
 
                 // Calibrate baro AGL at rest
                 if (!state.armed) {

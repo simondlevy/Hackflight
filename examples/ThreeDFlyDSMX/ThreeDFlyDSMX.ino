@@ -23,12 +23,15 @@
 #include "boards/ladybug.hpp"
 #include "models/3dfly.hpp"
 #include "receivers/dsmx.hpp"
+#include "extras/altitude_estimator.hpp"
 
 hf::Hackflight h;
 
 hf::ThreeDFly model;
 
 hf::DSMX_Receiver rc;
+
+hf::AltitudeEstimator altitudeEstimator;
 
 void setup(void)
 {
