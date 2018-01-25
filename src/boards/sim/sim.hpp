@@ -29,8 +29,6 @@
 #include <time.h>
 #include <stdio.h>
 
-#include <extras/altitude_estimator.hpp>
-
 namespace hf {
 
     class SimBoard : public Board {
@@ -41,7 +39,6 @@ namespace hf {
 
             // Some true constants!
             const float GRAVITY = 9.80665;
-            const float SEALEVEL = 1013.25; // millibars
 
             // Scales up spin rate in [0,1] to thrust in Newtons (substitutes for mass, torque, etc.)
             const float THRUST_SCALE = 5.5;
@@ -58,12 +55,11 @@ namespace hf {
 
             vehicle_state_t _vehicleState;
 
-            AltitudeEstimator   altitudeEstimator;
-            Timer altitudeTimer = Timer(40);
+            //AltitudeEstimator   altitudeEstimator;
+            //Timer altitudeTimer = Timer(40);
 
-            float _baroPressure;      // millibars
+            //float _baroPressure;      // millibars
             bool  _flying;
-            float _accel[3];          // Gs
             float _secondsPrev;
 
             // Gets CPU time in seconds
@@ -90,7 +86,7 @@ namespace hf {
                 initPhysics();
 
                 // Initialize the atitude estimator
-                altitudeEstimator.init(this);
+                //altitudeEstimator.init(this);
             }
 
             void getState(vehicle_state_t & vehicleState)
@@ -99,9 +95,6 @@ namespace hf {
 
                 // Sync physics update to IMU acquisition by Hackflight
                 updatePhysics();
-
-                // Fuse altitude estimator with accelerometer data
-                altitudeEstimator.fuseWithImu(vehicleState, _accel, getMicroseconds());
             }
 
             uint32_t getMicroseconds()
@@ -114,22 +107,11 @@ namespace hf {
                 _motors[index] = value;
             }
 
-            void runEstimators(vehicle_state_t & state, uint32_t currentTime)
-            {
-                if (altitudeTimer.checkAndUpdate(currentTime)) {
-                    altitudeEstimator.estimate(state, currentTime, _baroPressure);
-                }
-            }
-
         private:
 
             void initPhysics(void)
             {
                 memset(&_vehicleState, 0, sizeof(_vehicleState));
-
-                for (uint8_t k=0; k<3; ++k) {
-                    _accel[k] = 0;
-                }
 
                 for (uint8_t k=0; k<4; ++k) {
                     _motors[k] = 0;
@@ -137,7 +119,6 @@ namespace hf {
 
                 _flying = false;
                 _vehicleState.pose.position[2].value = 0;
-                _baroPressure = SEALEVEL;
                 _verticalSpeedPrev = 0;
             }
 
@@ -196,18 +177,6 @@ namespace hf {
                 // Resting = 1G; freefall = 0; climbing = >1G
                 float g = (_vehicleState.pose.position[2].deriv - _verticalSpeedPrev)/deltaSeconds/ GRAVITY + 1;
                 _verticalSpeedPrev = _vehicleState.pose.position[2].deriv;
-
-                // Estimate G forces on accelerometer using Equations 2, 6-8 in
-                // https://www.nxp.com/docs/en/application-note/AN3461.pdf
-                _accel[0] = g * -sin(theta);              // X   
-                _accel[1] = g *  cos(theta) * sin(phi);   // Y   
-                _accel[2] = g *  cos(theta) * cos(phi);   // Z   
-
-                // Convert vehicle's Z coordinate in meters to barometric pressure in millibars
-                // At low altitudes above the sea level, the pressure decreases
-                // by about 12 millbars (1.2kPascals) for every 100 meters (See
-                // https://en.wikipedia.org/wiki/Atmospheric_pressure#Altitude_variation)
-                _baroPressure = SEALEVEL - 12 * _vehicleState.pose.position[2].value / 100;
             }
 
             float motorsToAngularVelocity(int a, int b, int c, int d)
