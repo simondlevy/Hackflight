@@ -69,13 +69,11 @@ namespace hf {
 
             // accessor available to simulators -----------------------------------------------
 
-            void simGetVehicleState(vehicle_state_t * vehicleState, float motors[4], bool * flying)
+            void simGetVehicleState(vehicle_state_t * vehicleState, float motors[4])
             {
                 memcpy(vehicleState, &_vehicleState, sizeof(vehicle_state_t));
 
                 memcpy(motors, _motors, 4*sizeof(float));
-
-                *flying = _flying;
             }
 
             // methods called by Hackflight -------------------------------------------------
@@ -168,9 +166,9 @@ namespace hf {
                     initPhysics();
                 }
 
-                // Update state
+                // Update state, negating pitch
                 for (int k=0; k<3; ++k) {
-                    _vehicleState.pose.orientation[k].value += ((k==1) ? -1 : +1) * _vehicleState.pose.orientation[k].deriv * deltaSeconds; // negate pitch
+                    _vehicleState.pose.orientation[k].value += ((k==1) ? -1 : +1) * _vehicleState.pose.orientation[k].deriv * deltaSeconds; 
                 }
 
                 // Differentiate vertical speed to get vertical acceleration in meters per second, then convert to Gs.
