@@ -1,0 +1,66 @@
+/* 
+    pid_controller.hpp: abstract PID controller class for additional functionality
+    (altitude-hold, loiter, etc.)
+
+    This file is part of Hackflight.
+
+    Hackflight is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Hackflight is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with EM7180.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#pragma once
+
+#include "filter.hpp"
+#include "model.hpp"
+#include "debug.hpp"
+#include "datatypes.hpp"
+
+namespace hf {
+
+    class PIDController {
+
+        protected: 
+
+            // PID params
+            float pidP;
+            float pidI;
+            float pidD;
+
+            // PID value
+            float pid;
+
+            // Error integral for I term
+            float errorI;
+
+        public:
+
+            PIDController(float _pidP, float _pidI, float _pidD)
+            {
+                pidP = _pidP;
+                pidI = _pidI;
+                pidD = _pidD;
+            }
+
+            void init(void)
+            {
+                errorI = 0;
+                pid = 0;
+            }
+
+            virtual void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands) = 0;
+
+            virtual void updateDemands(vehicle_state_t & vehicleState, demands_t & demands, uint32_t currentTime) = 0;
+
+    }; // class PIDController
+
+
+} // namespace hf

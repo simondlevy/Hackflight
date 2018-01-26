@@ -26,10 +26,11 @@
 #include "model.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
+#include "pid_controller.hpp"
 
 namespace hf {
 
-    class AltitudeHold {
+    class AltitudeHold : public PIDController {
 
         private: 
 
@@ -43,33 +44,21 @@ namespace hf {
             // Keeps PID adjustment inside range
             const float throttleMargin = 0.15f;
 
-            // PID params
-            float pidP;
-            float pidI;
-            float pidD;
-
             // State variables
             float altHold;
-            float errorAltitudeI;
             bool  holdingAltitude;
             float initialThrottleHold;  // [0,1]  
-            float pid;
 
         public:
 
-            AltitudeHold(float _pidP, float _pidI, float _pidD)
+            AltitudeHold(float _pidP, float _pidI, float _pidD) : PIDController(_pidP, _pidI, _pidD) 
             {
-                pidP = _pidP;
-                pidI = _pidI;
-                pidD = _pidD;
             }
 
             void init(void)
             {
+                PIDController::init();
                 initialThrottleHold = 0;
-                pid = 0;
-                holdingAltitude = false;
-                errorAltitudeI = 0;
             }
 
             void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands)
@@ -80,7 +69,7 @@ namespace hf {
                     initialThrottleHold = demands.throttle;
                     altHold = vehicleState.pose.position[2].value;
                     pid = 0;
-                    errorAltitudeI = 0;
+                    errorI = 0;
                 }
 
                 // Stop
@@ -111,9 +100,9 @@ namespace hf {
 
 
                     // I
-                    errorAltitudeI += (pidI * error);
-                    errorAltitudeI = Filter::constrainAbs(errorAltitudeI, iErrorMax);
-                    pid += (errorAltitudeI * (dTimeMicros/1e6));
+                    errorI += (pidI * error);
+                    errorI = Filter::constrainAbs(errorI, iErrorMax);
+                    pid += (errorI * (dTimeMicros/1e6));
 
                     // D
                     float vario = Filter::deadband(velocity, dDeadband);
