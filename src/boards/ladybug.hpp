@@ -76,7 +76,7 @@ namespace hf {
                 }
 
                 // Initialize the atitude estimator
-                altitudeEstimator.init(this);
+                altitudeEstimator.init();
 
                 // Hang a bit more
                 delay(100);

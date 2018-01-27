@@ -54,7 +54,7 @@ namespace hf {
 
         public:
 
-            void init(Board * board)
+            void init(void)
             {
                 //StateEstimator::init();
                 baro.init();
