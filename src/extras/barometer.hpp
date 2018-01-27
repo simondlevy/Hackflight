@@ -31,8 +31,8 @@ namespace hf {
         private: // constants
 
             const float noiseLpf              = 0.5f;
-            const float velocityBound         = 300.0f;
-            const float velocityDeadband      = 10.0f;
+            const float velocityBound         = 3.0f;
+            const float velocityDeadband      = 0.1f;
             static const uint8_t HISTORY_SIZE = 48;
 
             float   alt;
