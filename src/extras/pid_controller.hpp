@@ -28,6 +28,8 @@ namespace hf {
 
     class PIDController {
 
+        friend class Hackflight;
+
         protected: 
 
             // PID params
@@ -41,13 +43,13 @@ namespace hf {
             // Error integral for I term
             float errorI;
 
-        public:
-
             PIDController(float _pidP, float _pidI, float _pidD)
             {
                 pidP = _pidP;
                 pidI = _pidI;
                 pidD = _pidD;
+
+                next = NULL;
             }
 
             void init(void)
@@ -59,6 +61,11 @@ namespace hf {
             virtual void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands) = 0;
 
             virtual void updateDemands(vehicle_state_t & vehicleState, demands_t & demands, uint32_t currentTime) = 0;
+            
+        private:
+
+            // Simple linked-list support
+            class PIDController * next;
 
     }; // class PIDController
 

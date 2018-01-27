@@ -23,7 +23,6 @@
 #include "boards/ladybug.hpp"
 #include "models/3dfly.hpp"
 #include "receivers/dsmx.hpp"
-#include "extras/altitude_estimator.hpp"
 
 hf::Hackflight h;
 
@@ -31,10 +30,16 @@ hf::ThreeDFly model;
 
 hf::DSMX_Receiver rc;
 
-hf::AltitudeEstimator altitudeEstimator;
+// Additional PID controllers
+//#include <extras/altitude_hold.hpp>
+//hf::AltitudeHold altitudeHold = hf::AltitudeHold(0.1f, 0.02f, 1.7f);
 
 void setup(void)
 {
+    // Add altithude-hold feature to Hackflight firmware
+    //h.addPidController(&altitudeHold);
+
+    // Initialize Hackflight firmware
     h.init(new hf::Ladybug(), &rc, &model);
 }
 

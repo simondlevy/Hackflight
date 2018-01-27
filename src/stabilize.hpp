@@ -137,7 +137,7 @@ namespace hf {
 
             void updateDemands(vehicle_state_t & state, demands_t & demands)
             {
-                // Extra Euler angles, gyro rates from vehicle state
+                // Extract Euler angles, gyro rates from vehicle state
                 float eulerAngles[3];
                 float gyroRate[3];
                 for (uint8_t k=0; k<3; ++k) {

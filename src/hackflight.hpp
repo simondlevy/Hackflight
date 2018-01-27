@@ -31,7 +31,7 @@
 #include "debug.hpp"
 #include "datatypes.hpp"
 
-#include "extras/altitude_hold.hpp"
+#include "extras/pid_controller.hpp"
 
 namespace hf {
 
@@ -55,8 +55,6 @@ namespace hf {
             Board    * board;
             Receiver * receiver;
 
-            AltitudeHold altitudeHold = AltitudeHold(0.04f, 0.50f, 6.00f);
-
             // Vehicle state
             vehicle_state_t state;
 
@@ -70,8 +68,8 @@ namespace hf {
             // Support for headless mode
             float    yawInitial;
 
-            // Support a list of state estimators
-            //StateEstimator * stateEstimators = NULL;
+            // Support for additional PID controllers
+            PIDController * pidControllers = NULL;
 
             void outerLoop(void)
             {
@@ -121,8 +119,13 @@ namespace hf {
 
                 // Detect aux switch changes for altitude-hold, loiter, etc.
                 if (receiver->demands.aux != auxState) {
+
                     auxState = receiver->demands.aux;
-                    altitudeHold.handleAuxSwitch(state, receiver->demands);
+
+                    for (PIDController * p = pidControllers; p; p=p->next) {
+
+                        p->handleAuxSwitch(state, receiver->demands);
+                    }
                 }
 
                 // Set LED based on arming status
@@ -142,6 +145,8 @@ namespace hf {
                 // Get vehicle state (minimally, Euler angles and gyro angular velocities) from board
                 board->getState(state);
 
+                //Debug::printf("%f %f\n", state.pose.position[2].value, state.pose.position[2].deriv);
+
                 // Convert heading from [-pi,+pi] to [0,2*pi]
                 if (state.pose.orientation[AXIS_YAW].value < 0) {
                     state.pose.orientation[AXIS_YAW].value += 2*M_PI;
@@ -150,8 +155,10 @@ namespace hf {
                 // Run stabilization to get updated demands
                 stab.updateDemands(state, demands);
 
-                // Modify demands based on extras (currently just altitude-hold)
-                altitudeHold.updateDemands(state, demands, board->getMicroseconds());
+                // Modify demands based on extra PID controllers
+                for (PIDController * p = pidControllers; p; p=p->next) {
+                    p->updateDemands(state, demands, board->getMicroseconds());
+                }
 
                 // Support motor testing from GCS
                 if (!state.armed) {
@@ -212,8 +219,10 @@ namespace hf {
                 mixer.init(board); 
                 msp.init(&mixer, receiver, board);
 
-                // Initialize altitude estimation / hold
-                altitudeHold.init();
+                // Initialize extra PID controllers
+                for (PIDController * p = pidControllers; p; p=p->next) {
+                    p->init();
+                }
 
                 // Start unstate.armed
                 state.armed = false;
@@ -255,7 +264,27 @@ namespace hf {
                     board->ledSet(false);
                 }
 
+
             } // update
+
+            void addPidController(PIDController * pidController) 
+            {
+                if (pidControllers == NULL) {
+                    pidControllers = pidController;
+                }
+
+                else {
+                    PIDController * p = pidControllers;;
+                    while (true) {
+                        if (p == pidController) 
+                            return; // disallow repetition
+                        if (p->next == NULL)
+                            break;
+                        p = p->next;
+                    } 
+                    p->next = pidController;
+                }
+            }
 
      }; // class Hackflight
 
