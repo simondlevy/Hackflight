@@ -24,7 +24,7 @@
 #include <EM7180.h>
 #include <stdarg.h>
 #include "hackflight.hpp"
-#include "extras/altitude_estimator.hpp"
+#include "estimators/altitude_estimator.hpp"
 
 namespace hf {
 

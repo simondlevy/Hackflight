@@ -31,7 +31,7 @@
 #include "debug.hpp"
 #include "datatypes.hpp"
 
-#include "extras/pid_controller.hpp"
+#include "pid_controllers/pid_controller.hpp"
 
 namespace hf {
 
