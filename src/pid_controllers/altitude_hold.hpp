@@ -59,6 +59,7 @@ namespace hf {
             {
                 PIDController::init();
                 initialThrottleHold = 0;
+                holdingAltitude = false;
             }
 
             void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands)
@@ -68,7 +69,6 @@ namespace hf {
                     holdingAltitude = true;
                     initialThrottleHold = demands.throttle;
                     altHold = vehicleState.pose.position[2].value;
-                    pid = 0;
                     errorI = 0;
                 }
 
@@ -96,7 +96,7 @@ namespace hf {
                     float error = altHold-altitude;
                     error = Filter::constrainAbs(error, pErrorMax);
                     error = Filter::deadband(error, pDeadband); 
-                    pid = Filter::constrainAbs(pidP * error, pidMax);
+                    float pid = Filter::constrainAbs(pidP * error, pidMax);
 
 
                     // I

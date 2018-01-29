@@ -145,8 +145,6 @@ namespace hf {
                 // Get vehicle state (minimally, Euler angles and gyro angular velocities) from board
                 board->getState(state);
 
-                //if (state.armed) Debug::printf("%f %f\n", state.pose.position[2].value, state.pose.position[2].deriv);
-
                 // Convert heading from [-pi,+pi] to [0,2*pi]
                 if (state.pose.orientation[AXIS_YAW].value < 0) {
                     state.pose.orientation[AXIS_YAW].value += 2*M_PI;

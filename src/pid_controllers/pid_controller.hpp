@@ -37,9 +37,6 @@ namespace hf {
             float pidI;
             float pidD;
 
-            // PID value
-            float pid;
-
             // Error integral for I term
             float errorI;
 
@@ -55,7 +52,6 @@ namespace hf {
             void init(void)
             {
                 errorI = 0;
-                pid = 0;
             }
 
             virtual void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands) = 0;

@@ -158,8 +158,10 @@ namespace hf {
                     _vehicleState.pose.position[1].deriv += thrust * deltaSeconds * sin(phi);
                 }
 
-                // Integrate vertical speed to get altitude
-                _vehicleState.pose.position[2].value += _vehicleState.pose.position[2].deriv * deltaSeconds;
+                // Integrate speed to get position XXX ignore heading for now
+                for (int8_t k=0; k<3; ++k) {
+                    _vehicleState.pose.position[k].value += _vehicleState.pose.position[k].deriv * deltaSeconds;
+                }
 
                 // Reset everything if we hit the ground
                 if (_vehicleState.pose.position[2].value < 0) {
