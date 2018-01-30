@@ -47,16 +47,29 @@ namespace hf {
             void init(void) 
             {
                 holding = false;
+                previousTime = 0;
+            }
+
+            uint32_t getDeltaTime(uint32_t currentTime)
+            {
+                uint32_t dtime = currentTime - previousTime;
+                previousTime = currentTime;
+                return dtime;
+
             }
 
             virtual void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands) = 0;
 
             virtual void updateDemands(vehicle_state_t & vehicleState, demands_t & demands, uint32_t currentTime) = 0;
+
+
             
         private:
 
             // Simple linked-list support
-            class PIDController * next;
+            class PIDController * next; 
+
+            uint32_t previousTime;
 
     }; // class PIDController
 

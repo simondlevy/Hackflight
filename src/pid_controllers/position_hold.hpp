@@ -36,7 +36,6 @@ namespace hf {
 
             // State variables
             float posHold[2];
-
             float errorI[2];
 
         public:
@@ -72,17 +71,15 @@ namespace hf {
 
             void updateDemands(vehicle_state_t & vehicleState, demands_t & demands, uint32_t currentTime)
             {
+                // Refresh the timer
+                uint32_t dtime = getDeltaTime(currentTime);
+
                 if (holding) {
 
                     float error[2];
                     float pid[2];
 
                     stateval_t * position = vehicleState.pose.position;
-
-                    // Refresh the timer
-                    static uint32_t previousTime;
-                    uint32_t dTimeMicros = currentTime - previousTime;
-                    previousTime = currentTime;
 
                     for (uint8_t k=0; k<2; ++k) {
 
@@ -93,7 +90,7 @@ namespace hf {
                         // I
                         errorI[k] += (pidI * error[k]);
                         errorI[k] = Filter::constrainAbs(errorI[k], iErrorMax);
-                        pid[k] += (errorI[k] * (dTimeMicros/1e6));
+                        pid[k] += (errorI[k] * (dtime/1e6));
 
                         // D
                         pid[k] -= Filter::constrainAbs(pidD * position[k].deriv, pidMax);

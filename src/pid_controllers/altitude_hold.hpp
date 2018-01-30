@@ -81,6 +81,9 @@ namespace hf {
 
             void updateDemands(vehicle_state_t & vehicleState, demands_t & demands, uint32_t currentTime)
             {
+                // Refresh the timer
+                uint32_t dtime = getDeltaTime(currentTime);
+
                 if (holding) {
 
                     // Extract altitude, vertical velocity from vehicle state
@@ -88,22 +91,16 @@ namespace hf {
                     float altitude = posZ.value;
                     float velocity = posZ.deriv;
 
-                    // Refresh the timer
-                    static uint32_t previousTime;
-                    uint32_t dTimeMicros = currentTime - previousTime;
-                    previousTime = currentTime;
-
                     // P
                     float error = altHold-altitude;
                     error = Filter::constrainAbs(error, pErrorMax);
                     error = Filter::deadband(error, pDeadband); 
                     float pid = Filter::constrainAbs(pidP * error, pidMax);
 
-
                     // I
                     errorI += (pidI * error);
                     errorI = Filter::constrainAbs(errorI, iErrorMax);
-                    pid += (errorI * (dTimeMicros/1e6));
+                    pid += (errorI * (dtime/1e6));
 
                     // D
                     float vario = Filter::deadband(velocity, dDeadband);
