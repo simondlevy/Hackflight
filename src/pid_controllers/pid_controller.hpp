@@ -32,26 +32,21 @@ namespace hf {
 
         protected: 
 
-            // PID params
+
             float pidP;
             float pidI;
             float pidD;
 
-            // Error integral for I term
-            float errorI;
+            bool  holding;
 
-            PIDController(float _pidP, float _pidI, float _pidD)
+            PIDController(float _pidP, float _pidI, float _pidD) : pidP(_pidP), pidI(_pidI), pidD(_pidD)
             {
-                pidP = _pidP;
-                pidI = _pidI;
-                pidD = _pidD;
-
                 next = NULL;
             }
 
-            void init(void)
+            void init(void) 
             {
-                errorI = 0;
+                holding = false;
             }
 
             virtual void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands) = 0;

@@ -46,27 +46,28 @@ namespace hf {
 
             // State variables
             float altHold;
-            bool  holdingAltitude;
             float initialThrottleHold;  // [0,1]  
+
+           float errorI;
 
         public:
 
-            AltitudeHold(float _pidP, float _pidI, float _pidD) : PIDController(_pidP, _pidI, _pidD) 
+            AltitudeHold(float _pidP, float _pidI, float _pidD) : PIDController(_pidP, _pidI, _pidD)
             {
             }
 
             void init(void)
             {
                 PIDController::init();
+                errorI = 0;
                 initialThrottleHold = 0;
-                holdingAltitude = false;
             }
 
             void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands)
             {
                 // Start
                 if (demands.aux > 0) {
-                    holdingAltitude = true;
+                    holding = true;
                     initialThrottleHold = demands.throttle;
                     altHold = vehicleState.pose.position[2].value;
                     errorI = 0;
@@ -74,13 +75,13 @@ namespace hf {
 
                 // Stop
                 else {
-                    holdingAltitude = false;
+                    holding = false;
                 }
             }
 
             void updateDemands(vehicle_state_t & vehicleState, demands_t & demands, uint32_t currentTime)
             {
-                if (holdingAltitude) {
+                if (holding) {
 
                     // Extract altitude, vertical velocity from vehicle state
                     stateval_t posZ = vehicleState.pose.position[2];

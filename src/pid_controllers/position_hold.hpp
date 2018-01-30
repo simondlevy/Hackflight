@@ -30,9 +30,14 @@ namespace hf {
 
         private: 
 
+            // Bounds
+            const float pidMax    = 0.05f;
+            const float iErrorMax = 8.0f;
+
             // State variables
-            bool  holdingPosition;
             float posHold[2];
+
+            float errorI[2];
 
         public:
 
@@ -43,39 +48,60 @@ namespace hf {
             void init(void)
             {
                 PIDController::init();
-                holdingPosition = false;
+                for (uint8_t k=0; k<2; ++k) {
+                    errorI[k] = 0;
+                }
             }
 
             void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands)
             {
                 // Start
                 if (demands.aux > 1) {
-                    holdingPosition = true;
+                    holding = true;
                     for (uint8_t k=0; k<2; ++k) {
                         posHold[k] = vehicleState.pose.position[k].value;
+                        errorI[k] = 0;
                     }
                 }
 
                 // Stop
                 else {
-                    holdingPosition = false;
+                    holding = false;
                 }
             }
 
             void updateDemands(vehicle_state_t & vehicleState, demands_t & demands, uint32_t currentTime)
             {
-                if (holdingPosition) {
+                if (holding) {
 
                     float error[2];
+                    float pid[2];
+
+                    stateval_t * position = vehicleState.pose.position;
+
+                    // Refresh the timer
+                    static uint32_t previousTime;
+                    uint32_t dTimeMicros = currentTime - previousTime;
+                    previousTime = currentTime;
 
                     for (uint8_t k=0; k<2; ++k) {
-                        error[k] = vehicleState.pose.position[k].value - posHold[k];
+
+                        // P
+                        error[k] = posHold[k] - position[k].value;
+                        pid[k] = Filter::constrainAbs(pidP * error[k], pidMax);
+
+                        // I
+                        errorI[k] += (pidI * error[k]);
+                        errorI[k] = Filter::constrainAbs(errorI[k], iErrorMax);
+                        pid[k] += (errorI[k] * (dTimeMicros/1e6));
+
+                        // D
+                        pid[k] -= Filter::constrainAbs(pidD * position[k].deriv, pidMax);
+
                     }
 
-                    Debug::printf("%f %f\n", error[0], error[1]);
-
-                    // D
-                    //demands.roll -= vehicleState.pose.position[1].deriv * pidD;
+                    demands.roll  += pid[1];
+                    demands.pitch += pid[0];
                 }
             }
 
