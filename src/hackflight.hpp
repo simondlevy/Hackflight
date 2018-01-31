@@ -23,7 +23,7 @@
 #include "board.hpp"
 #include "mixer.hpp"
 #include "model.hpp"
-#include "msp.hpp"
+#include "boards/real/msp.hpp"
 #include "receiver.hpp"
 #include "stabilize.hpp"
 #include "timer.hpp"
