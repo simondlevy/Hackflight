@@ -35,11 +35,10 @@ namespace hf {
             virtual void     writeMotor(uint8_t index, float value) = 0;
 
             //--------------------------------------- Debugging ---------------------------------------------------------
-            static void      outbuf(char * buf);
+            virtual void     showArmedStatus(bool armed) { (void)armed; }
 
-            //------------------------------------------ LED ------------------------------------------------------------
-            virtual void     delayMilliseconds(uint32_t msec) { (void)msec; } 
-            virtual void     ledSet(bool is_on) { (void)is_on; }
+            //--------------------------------------- Debugging ---------------------------------------------------------
+            static void      outbuf(char * buf);
 
             //------------------------------------------ Serial ---------------------------------------------------------
             virtual uint8_t  serialAvailableBytes(void) { return 0; }

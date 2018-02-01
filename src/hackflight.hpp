@@ -129,7 +129,7 @@ namespace hf {
                 }
 
                 // Set LED based on arming status
-                board->ledSet(state.armed);
+                board->showArmedStatus(state.armed);
 
                 // Update serial comms
                 msp.update(state, state.armed);
@@ -180,22 +180,6 @@ namespace hf {
                 return fabs(state.pose.orientation[axis].value) < stab.maxArmingAngle;
             }
 
-            void flashLed(void)
-            {
-                const uint32_t ledFlashMilli = 1000;
-                const uint32_t ledFlashCount = 20;
-
-                uint32_t pauseMilli = ledFlashMilli / ledFlashCount;
-                board->ledSet(false);
-                for (uint8_t i = 0; i < ledFlashCount; i++) {
-                    board->ledSet(true);
-                    board->delayMilliseconds(pauseMilli);
-                    board->ledSet(false);
-                    board->delayMilliseconds(pauseMilli);
-                }
-                board->ledSet(false);
-            }
-
         public:
 
             void init(Board * _board, Receiver * _receiver, Model * _model)
@@ -205,9 +189,6 @@ namespace hf {
 
                 // Do hardware initialization for board
                 board->init();
-
-                // Flash the LEDs to indicate startup
-                flashLed();
 
                 // Initialize the receiver
                 receiver->init();
@@ -259,7 +240,7 @@ namespace hf {
                     mixer.cutMotors();
                     state.armed = false;
                     failsafe = true;
-                    board->ledSet(false);
+                    board->showArmedStatus(false);
                 }
 
 
