@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "receiver.hpp"
+#include "receivers/serial.hpp"
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -32,7 +32,7 @@
 
 namespace hf {
 
-    class Controller : public Receiver {
+    class Controller : public SerialReceiver {
 
         public:
 
