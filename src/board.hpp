@@ -29,24 +29,22 @@ namespace hf {
         public:
 
             //------------------------------------ Core functionality ----------------------------------------------------
-            virtual void     init(void) = 0;
+            virtual void     init(vehicle_state_t * state, class Receiver * receiver, class Mixer * mixer) = 0;
             virtual void     getState(vehicle_state_t & state) = 0;
             virtual uint32_t getMicroseconds() = 0;
             virtual void     writeMotor(uint8_t index, float value) = 0;
 
             //----------------------------------------- Safety ----------------------------------------------------------
-            virtual void     showArmedStatus(bool armed) { (void)armed; }
+            virtual void showArmedStatus(bool armed) { (void)armed; }
+
+            //---------------------------------- Serial communications  -------------------------------------------------
+            virtual void doSerialComms(void);
 
             //--------------------------------------- Debugging ---------------------------------------------------------
-            static void      outbuf(char * buf);
-
-            //------------------------------------------ Serial ---------------------------------------------------------
-            virtual uint8_t  serialAvailableBytes(void) { return 0; }
-            virtual uint8_t  serialReadByte(void)  { return 0; }
-            virtual void     serialWriteByte(uint8_t c) { (void)c; }
+            static void  outbuf(char * buf);
 
             //-------------------------------- Additional state estimation -----------------------------------------------
-            virtual void    runEstimators(vehicle_state_t & state, uint32_t currentTime) { (void)state; (void)currentTime; }
+            virtual void runEstimators(vehicle_state_t & state, uint32_t currentTime) { (void)state; (void)currentTime; }
 
     }; // class Board
 

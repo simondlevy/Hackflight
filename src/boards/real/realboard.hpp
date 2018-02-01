@@ -20,6 +20,7 @@
 
 #include "board.hpp"
 #include "msp.hpp"
+#include "datatypes.hpp"
 
 namespace hf {
 
@@ -34,11 +35,13 @@ namespace hf {
 
         protected:
 
-            //------------------------------------------ LED ------------------------------------------------------------
             virtual void     delayMilliseconds(uint32_t msec) { (void)msec; } 
             virtual void     ledSet(bool is_on) { (void)is_on; }
+            virtual uint8_t  serialAvailableBytes(void) { return 0; }
+            virtual uint8_t  serialReadByte(void)  { return 0; }
+            virtual void     serialWriteByte(uint8_t c) { (void)c; }
 
-            void init(void)
+            void init(vehicle_state_t * state, Receiver * receiver, Mixer * mixer) 
             {
                 // Flash LED
                 uint32_t pauseMilli = ledFlashMilli / ledFlashCount;
@@ -50,19 +53,30 @@ namespace hf {
                     delayMilliseconds(pauseMilli);
                 }
                 ledSet(false);
-            }
 
-            void showArmedStatus(bool armed)
-            {
-                ledSet(armed);
+                // Set up MSP
+                msp.init(state, receiver, mixer);
             }
 
         public:
 
-            //------------------------------------------ Serial ---------------------------------------------------------
-            virtual uint8_t  serialAvailableBytes(void) { return 0; }
-            virtual uint8_t  serialReadByte(void)  { return 0; }
-            virtual void     serialWriteByte(uint8_t c) { (void)c; }
+            void showArmedStatus(bool armed)
+            {
+                // Set LED to indicate armed
+                ledSet(armed);
+            }
+
+            void doSerialComms(void)
+            {
+                while (serialAvailableBytes()) {
+                    msp.writeByte(serialReadByte());
+                }
+
+                while (msp.availableBytes() > 0) {
+                    serialWriteByte(msp.readByte());
+                }
+            }
+
 
     }; // class RealBoard
 

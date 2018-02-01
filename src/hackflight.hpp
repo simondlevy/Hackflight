@@ -23,7 +23,6 @@
 #include "board.hpp"
 #include "mixer.hpp"
 #include "model.hpp"
-#include "boards/real/msp.hpp"
 #include "receiver.hpp"
 #include "stabilize.hpp"
 #include "timer.hpp"
@@ -47,9 +46,6 @@ namespace hf {
             // Essential components
             Mixer      mixer;
             Stabilize  stab;
-
-            // Multiwii Serial Protocol communications
-            MSP        msp;
 
             // Passed to Hackflight::init() for a particular board and receiver
             Board    * board;
@@ -131,13 +127,8 @@ namespace hf {
                 // Set LED based on arming status
                 board->showArmedStatus(state.armed);
 
-                // Update serial comms
-                while (board->serialAvailableBytes()) {
-                    msp.writeByte(board->serialReadByte());
-                }
-                while (msp.availableBytes() > 0) {
-                    board->serialWriteByte(msp.readByte());
-                }
+                // Do serial comms
+                board->doSerialComms();
 
             } // outerLoop
 
@@ -193,7 +184,7 @@ namespace hf {
                 receiver = _receiver;
 
                 // Do hardware initialization for board
-                board->init();
+                board->init(&state, receiver, &mixer);
 
                 // Initialize the receiver
                 receiver->init();
@@ -201,7 +192,6 @@ namespace hf {
                 // Initialize our stabilization, mixing, and MSP (serial comms)
                 stab.init(_model);
                 mixer.init(board); 
-                msp.init(&state, receiver, &mixer);
 
                 // Initialize extra PID controllers
                 for (PIDController * p = pidControllers; p; p=p->next) {
