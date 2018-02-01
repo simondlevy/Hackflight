@@ -19,14 +19,14 @@
 #pragma once
 
 #include "debug.hpp"
-#include "receiver.hpp"
+#include "receivers/serial.hpp"
 #include <SpektrumDSM.h>
 
 static SpektrumDSM2048 rx;
 
 namespace hf {
 
-    class DSMX_Receiver : public Receiver {
+    class DSMX_Receiver : public SerialReceiver {
 
         void begin(void)
         {

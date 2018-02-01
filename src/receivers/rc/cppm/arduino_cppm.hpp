@@ -19,14 +19,14 @@
 #pragma once
 
 #include <BreezyCPPM.h>
-#include "receiver.hpp"
+#include "cppm.hpp"
 
 // Interrupt on pin 0, using 5 channels
 static BreezyCPPM rx(0, 5);
 
 namespace hf {
 
-    class CPPM_Receiver : public Receiver {
+    class Arduino_CPPM_Receiver : public CPPM_Receiver {
 
         void begin(void)
         {

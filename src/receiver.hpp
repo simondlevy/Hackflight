@@ -45,7 +45,6 @@ namespace hf {
             static const uint8_t CHANNELS = 8;
 
             uint8_t commandDelay;     // cycles since most recent movement
-            int32_t ppmAverageIndex;  // help with noisy CPPM receivers
 
             float adjustCommand(float command, uint8_t channel)
             {
@@ -96,7 +95,7 @@ namespace hf {
 
             // These must be overridden for each receiver
             virtual void  begin(void) = 0;
-            virtual bool  useSerial(void) = 0;
+            virtual void  readRawvals(void) = 0;
             virtual float readChannel(uint8_t chan) = 0;
 
             // For logical combinations of stick positions (low, center, high)
@@ -144,31 +143,12 @@ namespace hf {
 
                 commandDelay = 0;
                 sticks = 0;
-                ppmAverageIndex = 0;
             }
 
             void update(float yawAngle)
             {
-                float averageRaw[5][4];
-
-                // Serial receivers provide clean data and can be read directly
-                if (useSerial()) {
-                    for (uint8_t chan = 0; chan < 5; chan++) {
-                        rawvals[chan] = readChannel(chan);
-                    }
-                }
-
-                // Other kinds of receivers require average of channel values to remove noise
-                else {
-                    for (uint8_t chan = 0; chan < 5; chan++) {
-                        averageRaw[chan][ppmAverageIndex % 4] = readChannel(chan);
-                        rawvals[chan] = 0;
-                        for (uint8_t i = 0; i < 4; i++)
-                            rawvals[chan] += averageRaw[chan][i];
-                        rawvals[chan] /= 4;
-                    }
-                    ppmAverageIndex++;
-                }
+                // read raw channel values
+                readRawvals();
 
                 // check stick positions, updating command delay
                 uint8_t stTmp = 0;

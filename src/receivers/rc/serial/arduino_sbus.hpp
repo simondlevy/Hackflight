@@ -18,14 +18,14 @@
 
 #pragma once
 
-#include "receiver.hpp"
+#include "receivers/serial.hpp"
 #include <SBUS.h>
 
 static SBUS rx(Serial1);
 
 namespace hf {
 
-    class SBUS_Receiver : public Receiver {
+    class SBUS_Receiver : public SerialReceiver {
 
         void begin(void)
         {

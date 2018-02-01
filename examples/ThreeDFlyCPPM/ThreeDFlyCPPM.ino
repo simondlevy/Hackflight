@@ -23,13 +23,13 @@
 
 #include "boards/real/ladybug.hpp"
 #include "models/3dfly.hpp"
-#include "receivers/rc/arduino_cppm.hpp"
+#include "receivers/rc/cppm/arduino_cppm.hpp"
 
 hf::Hackflight h;
 
 hf::ThreeDFly model;
 
-hf::CPPM_Receiver rc;
+hf::Arduino_CPPM_Receiver rc;
 
 void setup(void)
 {
