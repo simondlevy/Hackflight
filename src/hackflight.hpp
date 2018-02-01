@@ -23,7 +23,6 @@
 #include "board.hpp"
 #include "mixer.hpp"
 #include "model.hpp"
-#include "msp.hpp"
 #include "receiver.hpp"
 #include "stabilize.hpp"
 #include "timer.hpp"
@@ -47,9 +46,6 @@ namespace hf {
             // Essential components
             Mixer      mixer;
             Stabilize  stab;
-
-            // Multiwii Serial Protocol communications
-            MSP        msp;
 
             // Passed to Hackflight::init() for a particular board and receiver
             Board    * board;
@@ -129,10 +125,10 @@ namespace hf {
                 }
 
                 // Set LED based on arming status
-                board->ledSet(state.armed);
+                board->showArmedStatus(state.armed);
 
-                // Update serial comms
-                msp.update(state, state.armed);
+                // Do serial comms
+                board->doSerialComms(&state, receiver, &mixer);
 
             } // outerLoop
 
@@ -180,22 +176,6 @@ namespace hf {
                 return fabs(state.pose.orientation[axis].value) < stab.maxArmingAngle;
             }
 
-            void flashLed(void)
-            {
-                const uint32_t ledFlashMilli = 1000;
-                const uint32_t ledFlashCount = 20;
-
-                uint32_t pauseMilli = ledFlashMilli / ledFlashCount;
-                board->ledSet(false);
-                for (uint8_t i = 0; i < ledFlashCount; i++) {
-                    board->ledSet(true);
-                    board->delayMilliseconds(pauseMilli);
-                    board->ledSet(false);
-                    board->delayMilliseconds(pauseMilli);
-                }
-                board->ledSet(false);
-            }
-
         public:
 
             void init(Board * _board, Receiver * _receiver, Model * _model)
@@ -206,16 +186,12 @@ namespace hf {
                 // Do hardware initialization for board
                 board->init();
 
-                // Flash the LEDs to indicate startup
-                flashLed();
-
                 // Initialize the receiver
                 receiver->init();
 
                 // Initialize our stabilization, mixing, and MSP (serial comms)
                 stab.init(_model);
                 mixer.init(board); 
-                msp.init(&mixer, receiver, board);
 
                 // Initialize extra PID controllers
                 for (PIDController * p = pidControllers; p; p=p->next) {
@@ -259,7 +235,7 @@ namespace hf {
                     mixer.cutMotors();
                     state.armed = false;
                     failsafe = true;
-                    board->ledSet(false);
+                    board->showArmedStatus(false);
                 }
 
 

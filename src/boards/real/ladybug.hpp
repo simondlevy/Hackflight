@@ -24,11 +24,12 @@
 #include <EM7180.h>
 #include <stdarg.h>
 #include "hackflight.hpp"
+#include "realboard.hpp"
 #include "estimators/altitude_estimator.hpp"
 
 namespace hf {
 
-    class Ladybug : public Board {
+    class Ladybug : public RealBoard {
 
         private:
 
@@ -80,6 +81,9 @@ namespace hf {
 
                 // Hang a bit more
                 delay(100);
+
+                // Do general real-board initialization
+                RealBoard::init();
             }
 
             void delayMilliseconds(uint32_t msec)

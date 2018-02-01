@@ -20,9 +20,9 @@
 
 #include "hackflight.hpp"
 
-#include "boards/ladybug.hpp"
+#include "boards/real/ladybug.hpp"
 #include "models/3dfly.hpp"
-#include "receivers/sbus.hpp"
+#include "receivers/rc/serial/sbus.hpp"
 
 hf::Hackflight h;
 
