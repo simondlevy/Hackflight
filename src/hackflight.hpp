@@ -128,7 +128,7 @@ namespace hf {
                 board->showArmedStatus(state.armed);
 
                 // Do serial comms
-                board->doSerialComms();
+                board->doSerialComms(&state, receiver, &mixer);
 
             } // outerLoop
 
@@ -184,7 +184,7 @@ namespace hf {
                 receiver = _receiver;
 
                 // Do hardware initialization for board
-                board->init(&state, receiver, &mixer);
+                board->init();
 
                 // Initialize the receiver
                 receiver->init();

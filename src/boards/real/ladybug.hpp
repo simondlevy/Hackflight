@@ -49,7 +49,7 @@ namespace hf {
 
         protected:
 
-            void init(vehicle_state_t * state, Receiver * receiver, Mixer * mixer) 
+            void init(void)
             {
                 // Begin serial comms
                 Serial.begin(115200);
@@ -83,7 +83,7 @@ namespace hf {
                 delay(100);
 
                 // Do general real-board initialization
-                RealBoard::init(state, receiver, mixer);
+                RealBoard::init();
             }
 
             void delayMilliseconds(uint32_t msec)

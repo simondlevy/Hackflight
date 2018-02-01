@@ -56,10 +56,6 @@ namespace hf {
             uint8_t dataSize;
             serialState_t c_state;
 
-            vehicle_state_t * state;
-            Mixer           * mixer;
-            Receiver        * receiver;
-
             void serialize8(uint8_t a)
             {
                 outBuf[outBufSize++] = a;
@@ -146,12 +142,8 @@ namespace hf {
 
         public:
 
-            void init(vehicle_state_t * _state, Receiver * _receiver, Mixer * _mixer)
+            void init(void)
             {
-                state = _state;
-                receiver = _receiver;
-                mixer = _mixer;
-
                 checksum = 0;
                 outBufIndex = 0;
                 outBufSize = 0;
@@ -161,7 +153,7 @@ namespace hf {
                 c_state = IDLE;
             }
 
-            void writeByte(uint8_t c)
+            void update(uint8_t c, vehicle_state_t * state, Receiver * receiver, Mixer * mixer)
             {
                 if (c_state == IDLE) {
                     c_state = (c == '$') ? HEADER_START : IDLE;

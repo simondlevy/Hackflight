@@ -78,12 +78,8 @@ namespace hf {
 
             // methods called by Hackflight -------------------------------------------------
 
-            void init(vehicle_state_t * state, class Receiver * receiver, class Mixer * mixer)
+            void init(void)
             {
-                (void)state;
-                (void)receiver;
-                (void)mixer;
-
                 _secondsPrev = 0;
                 initPhysics();
 

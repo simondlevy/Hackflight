@@ -29,7 +29,7 @@ namespace hf {
         public:
 
             //------------------------------------ Core functionality ----------------------------------------------------
-            virtual void     init(vehicle_state_t * state, class Receiver * receiver, class Mixer * mixer) = 0;
+            virtual void     init(void) = 0;
             virtual void     getState(vehicle_state_t & state) = 0;
             virtual uint32_t getMicroseconds() = 0;
             virtual void     writeMotor(uint8_t index, float value) = 0;
@@ -38,7 +38,7 @@ namespace hf {
             virtual void showArmedStatus(bool armed) { (void)armed; }
 
             //---------------------------------- Serial communications  -------------------------------------------------
-            virtual void doSerialComms(void) { }
+            virtual void doSerialComms(vehicle_state_t * state, class Receiver * receiver, class Mixer * mixer)  { (void)state; (void)receiver; (void)mixer; }
 
             //--------------------------------------- Debugging ---------------------------------------------------------
             static void  outbuf(char * buf);

@@ -41,7 +41,7 @@ namespace hf {
             virtual uint8_t  serialReadByte(void)  { return 0; }
             virtual void     serialWriteByte(uint8_t c) { (void)c; }
 
-            void init(vehicle_state_t * state, Receiver * receiver, Mixer * mixer) 
+            void init(void)
             {
                 // Flash LED
                 uint32_t pauseMilli = ledFlashMilli / ledFlashCount;
@@ -55,7 +55,7 @@ namespace hf {
                 ledSet(false);
 
                 // Set up MSP
-                msp.init(state, receiver, mixer);
+                msp.init();
             }
 
         public:
@@ -66,10 +66,10 @@ namespace hf {
                 ledSet(armed);
             }
 
-            void doSerialComms(void)
+            void doSerialComms(vehicle_state_t * state, class Receiver * receiver, class Mixer * mixer) 
             {
                 while (serialAvailableBytes()) {
-                    msp.writeByte(serialReadByte());
+                    msp.update(serialReadByte(), state, receiver, mixer);
                 }
 
                 while (msp.availableBytes() > 0) {
