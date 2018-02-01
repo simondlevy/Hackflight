@@ -78,8 +78,12 @@ namespace hf {
 
             // methods called by Hackflight -------------------------------------------------
 
-            void init(void)
+            void init(vehicle_state_t * state, class Receiver * receiver, class Mixer * mixer)
             {
+                (void)state;
+                (void)receiver;
+                (void)mixer;
+
                 _secondsPrev = 0;
                 initPhysics();
 
@@ -133,7 +137,6 @@ namespace hf {
                 // Rename Euler angles to familiar Greek-letter variables
                 float phi   = _vehicleState.pose.orientation[0].value;
                 float theta = _vehicleState.pose.orientation[1].value;
-                float psi   = _vehicleState.pose.orientation[2].value;
 
                 // Overall vertical force = thrust - gravity
                 float lift = cos(phi)*cos(theta)*thrust - GRAVITY;
@@ -175,7 +178,6 @@ namespace hf {
 
                 // Differentiate vertical speed to get vertical acceleration in meters per second, then convert to Gs.
                 // Resting = 1G; freefall = 0; climbing = >1G
-                float g = (_vehicleState.pose.position[2].deriv - _verticalSpeedPrev)/deltaSeconds/ GRAVITY + 1;
                 _verticalSpeedPrev = _vehicleState.pose.position[2].deriv;
             }
 

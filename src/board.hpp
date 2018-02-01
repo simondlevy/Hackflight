@@ -38,7 +38,7 @@ namespace hf {
             virtual void showArmedStatus(bool armed) { (void)armed; }
 
             //---------------------------------- Serial communications  -------------------------------------------------
-            virtual void doSerialComms(void);
+            virtual void doSerialComms(void) { }
 
             //--------------------------------------- Debugging ---------------------------------------------------------
             static void  outbuf(char * buf);
