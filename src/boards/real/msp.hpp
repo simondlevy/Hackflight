@@ -18,6 +18,7 @@
 
 #pragma once
 
+//#include "realboard.hpp"
 #include "board.hpp"
 #include "receiver.hpp"
 #include "mixer.hpp"
@@ -158,7 +159,7 @@ namespace hf {
                 memset(&portState, 0, sizeof(portState));
             }
 
-            void update(vehicle_state_t state, bool armed)
+            void update(vehicle_state_t & state)
             {
                 while (board->serialAvailableBytes()) {
 
@@ -166,7 +167,7 @@ namespace hf {
 
                     if (portState.c_state == IDLE) {
                         portState.c_state = (c == '$') ? HEADER_START : IDLE;
-                        if (portState.c_state == IDLE && !armed) {
+                        if (portState.c_state == IDLE && !state.armed) {
                         }
                     } else if (portState.c_state == HEADER_START) {
                         portState.c_state = (c == 'M') ? HEADER_M : IDLE;

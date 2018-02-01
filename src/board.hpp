@@ -34,7 +34,7 @@ namespace hf {
             virtual uint32_t getMicroseconds() = 0;
             virtual void     writeMotor(uint8_t index, float value) = 0;
 
-            //--------------------------------------- Debugging ---------------------------------------------------------
+            //----------------------------------------- Safety ----------------------------------------------------------
             virtual void     showArmedStatus(bool armed) { (void)armed; }
 
             //--------------------------------------- Debugging ---------------------------------------------------------

@@ -132,7 +132,7 @@ namespace hf {
                 board->showArmedStatus(state.armed);
 
                 // Update serial comms
-                msp.update(state, state.armed);
+                msp.update(state);
 
             } // outerLoop
 

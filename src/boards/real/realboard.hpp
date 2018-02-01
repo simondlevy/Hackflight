@@ -18,6 +18,9 @@
 
 #pragma once
 
+#include "board.hpp"
+#include "msp.hpp"
+
 namespace hf {
 
     class RealBoard : public Board {
@@ -26,6 +29,8 @@ namespace hf {
 
             const uint32_t ledFlashMilli = 1000;
             const uint32_t ledFlashCount = 20;
+
+            MSP msp;
 
         protected:
 
@@ -51,6 +56,13 @@ namespace hf {
             {
                 ledSet(armed);
             }
+
+        public:
+
+            //------------------------------------------ Serial ---------------------------------------------------------
+            virtual uint8_t  serialAvailableBytes(void) { return 0; }
+            virtual uint8_t  serialReadByte(void)  { return 0; }
+            virtual void     serialWriteByte(uint8_t c) { (void)c; }
 
     }; // class RealBoard
 
