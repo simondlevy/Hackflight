@@ -132,7 +132,12 @@ namespace hf {
                 board->showArmedStatus(state.armed);
 
                 // Update serial comms
-                msp.update(state);
+                while (board->serialAvailableBytes()) {
+                    msp.writeByte(board->serialReadByte());
+                }
+                while (msp.availableBytes() > 0) {
+                    board->serialWriteByte(msp.readByte());
+                }
 
             } // outerLoop
 
@@ -196,7 +201,7 @@ namespace hf {
                 // Initialize our stabilization, mixing, and MSP (serial comms)
                 stab.init(_model);
                 mixer.init(board); 
-                msp.init(&mixer, receiver, board);
+                msp.init(&state, receiver, &mixer);
 
                 // Initialize extra PID controllers
                 for (PIDController * p = pidControllers; p; p=p->next) {

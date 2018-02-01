@@ -10,7 +10,7 @@
 
    Hackflight is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MEReceiverHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
@@ -18,11 +18,8 @@
 
 #pragma once
 
-//#include "realboard.hpp"
-#include "board.hpp"
 #include "receiver.hpp"
 #include "mixer.hpp"
-#include "debug.hpp"
 #include "datatypes.hpp"
 
 // See http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol
@@ -36,7 +33,8 @@ namespace hf {
 
         private:
 
-            static const int INBUF_SIZE = 128;
+            static const int INBUF_SIZE  = 128;
+            static const int OUTBUF_SIZE = 128;
 
             typedef enum serialState_t {
                 IDLE,
@@ -47,27 +45,25 @@ namespace hf {
                 HEADER_CMD
             } serialState_t;
 
-            typedef  struct mspPortState_t {
-                uint8_t checksum;
-                uint8_t indRX;
-                uint8_t inBuf[INBUF_SIZE];
-                uint8_t cmdMSP;
-                uint8_t offset;
-                uint8_t dataSize;
-                serialState_t c_state;
-            } mspPortState_t;
+            uint8_t checksum;
+            uint8_t inBuf[INBUF_SIZE];
+            uint8_t inBufIndex;
+            uint8_t outBuf[OUTBUF_SIZE];
+            uint8_t outBufIndex;
+            uint8_t outBufSize;
+            uint8_t cmdMSP;
+            uint8_t offset;
+            uint8_t dataSize;
+            serialState_t c_state;
 
-            Mixer  * mixer;
-            Receiver     * rc;
-            Board  * board;
-
-            mspPortState_t portState;
-
+            vehicle_state_t * state;
+            Mixer           * mixer;
+            Receiver        * receiver;
 
             void serialize8(uint8_t a)
             {
-                board->serialWriteByte(a);
-                portState.checksum ^= a;
+                outBuf[outBufSize++] = a;
+                checksum ^= a;
             }
 
             void serialize16(int16_t a)
@@ -78,7 +74,7 @@ namespace hf {
 
             uint8_t read8(void)
             {
-                return portState.inBuf[portState.indRX++] & 0xff;
+                return inBuf[inBufIndex++] & 0xff;
             }
 
             uint16_t read16(void)
@@ -128,9 +124,9 @@ namespace hf {
                 serialize8('$');
                 serialize8('M');
                 serialize8(err ? '!' : '>');
-                portState.checksum = 0;               // start calculating a new checksum
+                checksum = 0;               // start calculating a new checksum
                 serialize8(s);
-                serialize8(portState.cmdMSP);
+                serialize8(cmdMSP);
             }
 
             void headSerialReply(uint8_t s)
@@ -145,90 +141,110 @@ namespace hf {
 
             void tailSerialReply(void)
             {
-                serialize8(portState.checksum);
+                serialize8(checksum);
             }
 
         public:
 
-            void init(Mixer * _mixer, Receiver * _rc, Board * _board)
+            void init(vehicle_state_t * _state, Receiver * _receiver, Mixer * _mixer)
             {
+                state = _state;
+                receiver = _receiver;
                 mixer = _mixer;
-                rc    = _rc;
-                board = _board;
 
-                memset(&portState, 0, sizeof(portState));
+                checksum = 0;
+                outBufIndex = 0;
+                outBufSize = 0;
+                cmdMSP = 0;
+                offset = 0;
+                dataSize = 0;
+                c_state = IDLE;
             }
 
-            void update(vehicle_state_t & state)
+            void writeByte(uint8_t c)
             {
-                while (board->serialAvailableBytes()) {
-
-                    uint8_t c = board->serialReadByte();
-
-                    if (portState.c_state == IDLE) {
-                        portState.c_state = (c == '$') ? HEADER_START : IDLE;
-                        if (portState.c_state == IDLE && !state.armed) {
-                        }
-                    } else if (portState.c_state == HEADER_START) {
-                        portState.c_state = (c == 'M') ? HEADER_M : IDLE;
-                    } else if (portState.c_state == HEADER_M) {
-                        portState.c_state = (c == '<') ? HEADER_ARROW : IDLE;
-                    } else if (portState.c_state == HEADER_ARROW) {
-                        if (c > INBUF_SIZE) {       // now we are expecting the payload size
-                            portState.c_state = IDLE;
-                            continue;
-                        }
-                        portState.dataSize = c;
-                        portState.offset = 0;
-                        portState.checksum = 0;
-                        portState.indRX = 0;
-                        portState.checksum ^= c;
-                        portState.c_state = HEADER_SIZE;      // the command is to follow
-                    } else if (portState.c_state == HEADER_SIZE) {
-                        portState.cmdMSP = c;
-                        portState.checksum ^= c;
-                        portState.c_state = HEADER_CMD;
-                    } else if (portState.c_state == HEADER_CMD && 
-                            portState.offset < portState.dataSize) {
-                        portState.checksum ^= c;
-                        portState.inBuf[portState.offset++] = c;
-                    } else if (portState.c_state == HEADER_CMD && portState.offset >= portState.dataSize) {
-
-                        if (portState.checksum == c) {        // compare calculated and transferred checksum
-
-                            switch (portState.cmdMSP) {
-
-                                case MSP_SET_MOTOR_NORMAL:
-                                    for (uint8_t i = 0; i < 4; i++)
-                                        mixer->motorsDisarmed[i] = readFloat();
-                                    headSerialReply(0);
-                                    break;
-
-                                case MSP_RC_NORMAL:
-                                    serializeFloats(rc->rawvals, 8);
-                                    break;
-
-                                case MSP_ATTITUDE_RADIANS: 
-                                    {
-                                        float eulerAngles[3];
-                                        for (uint8_t k=0; k<3; ++k) {
-                                            eulerAngles[k] = state.pose.orientation[k].value;
-                                        }
-                                        serializeFloats(eulerAngles, 3);
-                                    }
-                                    break;
-
-                                    // don't know how to handle the (valid) message, indicate error MSP $M!
-                                default:                   
-                                    headSerialError(0);
-                                    break;
-                            }
-                            tailSerialReply();
-                        }
-                        portState.c_state = IDLE;
+                if (c_state == IDLE) {
+                    c_state = (c == '$') ? HEADER_START : IDLE;
+                    if (c_state == IDLE && !state->armed) {
                     }
-                }
+                } else if (c_state == HEADER_START) {
+                    c_state = (c == 'M') ? HEADER_M : IDLE;
+                } else if (c_state == HEADER_M) {
+                    c_state = (c == '<') ? HEADER_ARROW : IDLE;
+                } else if (c_state == HEADER_ARROW) {
+                    if (c > INBUF_SIZE) {       // now we are expecting the payload size
+                        c_state = IDLE;
+                        return;
+                    }
+                    dataSize = c;
+                    offset = 0;
+                    checksum = 0;
+                    inBufIndex = 0;
+                    checksum ^= c;
+                    c_state = HEADER_SIZE;      // the command is to follow
+                } else if (c_state == HEADER_SIZE) {
+                    cmdMSP = c;
+                    checksum ^= c;
+                    c_state = HEADER_CMD;
+                } else if (c_state == HEADER_CMD && 
+                        offset < dataSize) {
+                    checksum ^= c;
+                    inBuf[offset++] = c;
+                } else if (c_state == HEADER_CMD && offset >= dataSize) {
+
+                    if (checksum == c) {        // compare calculated and transferred checksum
+
+                        switch (cmdMSP) {
+
+                            case MSP_SET_MOTOR_NORMAL:
+                                for (uint8_t i = 0; i < 4; i++)
+                                    mixer->motorsDisarmed[i] = readFloat();
+                                headSerialReply(0);
+                                break;
+
+                            case MSP_RC_NORMAL:
+                                outBufSize = 0;
+                                outBufIndex = 0;
+                                serializeFloats(receiver->rawvals, 8);
+                                break;
+
+                            case MSP_ATTITUDE_RADIANS: 
+                                {
+                                    float eulerAngles[3];
+                                    for (uint8_t k=0; k<3; ++k) {
+                                        eulerAngles[k] = state->pose.orientation[k].value;
+                                    }
+                                    outBufSize = 0;
+                                    outBufIndex = 0;
+                                    serializeFloats(eulerAngles, 3);
+                                }
+                                break;
+
+                                // don't know how to handle the (valid) message, indicate error MSP $M!
+                            default:                   
+                                headSerialError(0);
+                                break;
+                        }
+                        tailSerialReply();
+                    }
+
+                    c_state = IDLE;
+
+                } 
+
+            } // writeByte
+
+            uint8_t availableBytes(void)
+            {
+                return outBufSize;
             }
+
+            uint8_t readByte(void)
+            {
+                outBufSize--;
+                return outBuf[outBufIndex++];
+            }
+
 
     }; // class MSP
 
