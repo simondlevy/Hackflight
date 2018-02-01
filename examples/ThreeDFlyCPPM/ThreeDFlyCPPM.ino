@@ -23,7 +23,7 @@
 
 #include "boards/real/ladybug.hpp"
 #include "models/3dfly.hpp"
-#include "receivers/rc/cppm.hpp"
+#include "receivers/rc/arduino_cppm.hpp"
 
 hf::Hackflight h;
 

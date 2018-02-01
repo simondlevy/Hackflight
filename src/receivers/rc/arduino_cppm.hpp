@@ -1,5 +1,5 @@
 /*
-   cppm.hpp : CPPM receiver support for Ladybug Flight Controller
+   arduino_cppm.hpp : CPPM receiver support for Arduino-based flight controllers
 
    This file is part of Hackflight.
 

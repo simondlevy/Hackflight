@@ -22,7 +22,7 @@
 
 #include "boards/real/ladybug.hpp"
 #include "models/3dfly.hpp"
-#include "receivers/rc/serial/sbus.hpp"
+#include "receivers/rc/serial/arduino_sbus.hpp"
 
 hf::Hackflight h;
 

@@ -1,5 +1,5 @@
 /*
-   dsmx.hpp : Spektrum DSMX support for Ladybug Flight Controller
+   arduino_dsmx.hpp : Spektrum DSMX support for Arduino flight controllers
 
    This file is part of Hackflight.
 
