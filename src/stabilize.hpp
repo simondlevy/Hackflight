@@ -54,7 +54,6 @@ namespace hf {
             float delta2[2];
             float errorGyroI[3];
 
-            Board * board;
             Model * model;
 
             float bigGyroRate;
