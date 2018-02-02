@@ -49,7 +49,7 @@ of those objects.
 
 Because a quadcopter build typically involves choosing a flight-control board,
 radio receiver, and model (airframe), Hackflight provides a separate C++ class
-for each of these components.  The
+to support each of these components.  The
 [Board](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp)
 class specifies a set of four abstract (pure virtual) methods that you must
 implement for a particular flight controller or simulator: initializing the
@@ -60,8 +60,8 @@ class performs basic functions associated with R/C control (tracking stick
 positions, checking switches) and specifies a set of abstract methods that you
 implement for a particular receiver (reading channels values).  The
 [Stabilizer](https://github.com/simondlevy/Hackflight/blob/master/src/stabilizer.hpp)
-class provides a constructor where you specify the PID values appropriate to your model to provide
-stable flight.
+class provides a constructor where you specify the stabilization PID values
+appropriate for your model.
 
 Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
 channel values,  we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program.
