@@ -36,11 +36,6 @@ namespace hf {
             rx.begin();
         }
 
-        bool useSerial(void)
-        {
-            return true;
-        }
-
         float readChannel(uint8_t chan)
         {
             // grab all channels on first channel request

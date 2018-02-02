@@ -33,11 +33,6 @@ namespace hf {
             rx.begin();
         }
 
-        bool useSerial(void)
-        {
-            return false;
-        }
-
         float readChannel(uint8_t chan)
         {
             static uint16_t chanvals[5];

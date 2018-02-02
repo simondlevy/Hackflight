@@ -34,11 +34,6 @@ namespace hf {
             timeoutCount = 0;
         }
 
-        bool useSerial(void)
-        {
-            return true;
-        }
-
         float readChannel(uint8_t chan)
         {
             return rx.getChannelValueNormalized(chan);

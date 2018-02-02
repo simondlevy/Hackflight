@@ -53,11 +53,6 @@ namespace hf {
                 return false;
             }
 
-            bool useSerial(void)
-            {
-                return true;
-            }
-
             Controller(void)
             {
                 _ready = false;
