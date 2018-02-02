@@ -42,8 +42,6 @@ namespace hf {
 
             const float headless     = true;
 
-            static const uint8_t CHANNELS = 5;
-
             uint8_t commandDelay;     // cycles since most recent movement
 
             float adjustCommand(float command, uint8_t channel)
@@ -81,6 +79,8 @@ namespace hf {
 
         protected: 
 
+            static const uint8_t CHANNELS = 5;
+
             // channel indices
             enum {
                 CHANNEL_THROTTLE, // T
@@ -96,7 +96,6 @@ namespace hf {
             // These must be overridden for each receiver
             virtual void  begin(void) = 0;
             virtual void  readRawvals(void) = 0;
-            virtual float readChannel(uint8_t chan) = 0;
 
             // For logical combinations of stick positions (low, center, high)
             static const uint8_t ROL_LO = (1 << (2 * CHANNEL_ROLL));

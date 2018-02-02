@@ -19,29 +19,31 @@
 #pragma once
 
 #include "debug.hpp"
-#include "receivers/serial.hpp"
+#include "receiver.hpp"
 #include <SpektrumDSM.h>
 
 static SpektrumDSM2048 rx;
 
 namespace hf {
 
-    class DSMX_Receiver : public SerialReceiver {
+    class DSMX_Receiver : public Receiver {
 
-        void begin(void)
-        {
-            rx.begin();
-        }
+        protected:
 
-        float readChannel(uint8_t chan)
-        {
-            return rx.getChannelValueNormalized(chan);
-        }
+            void begin(void)
+            {
+                rx.begin();
+            }
 
-        bool lostSignal(void)
-        {
-            return rx.timedOut();
-        }
+            void readRawvals(void)
+            {
+                rx.getChannelValuesNormalized(rawvals, CHANNELS);
+            }
+
+            bool lostSignal(void)
+            {
+                return rx.timedOut();
+            }
 
     }; // class DSMX_Receiver
 
