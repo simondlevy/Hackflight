@@ -59,8 +59,9 @@ and sending commands to the motors.  The
 class performs basic functions associated with R/C control (tracking stick
 positions, checking switches) and specifies a set of abstract methods that you
 implement for a particular receiver (reading channels values).  The
-[Model](https://github.com/simondlevy/Hackflight/blob/master/src/model.hpp)
-class is where you specify the PID values for your model.
+[Stabilizer](https://github.com/simondlevy/Hackflight/blob/master/src/stabilizer.hpp)
+class provides a constructor where you specify the PID values appropriate to your model to provide
+stable flight.
 
 Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
 channel values,  we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program.

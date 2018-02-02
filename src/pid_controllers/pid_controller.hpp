@@ -20,7 +20,6 @@
 #pragma once
 
 #include "filter.hpp"
-#include "model.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 
@@ -31,7 +30,6 @@ namespace hf {
         friend class Hackflight;
 
         protected: 
-
 
             float pidP;
             float pidI;

@@ -21,14 +21,20 @@
 #include "hackflight.hpp"
 
 #include "boards/real/ladybug.hpp"
-#include "models/3dfly.hpp"
 #include "receivers/rc/serial/arduino_dsmx.hpp"
+#include "stabilizer.hpp"
 
 hf::Hackflight h;
 
-hf::ThreeDFly model;
-
 hf::DSMX_Receiver rc = hf::DSMX_Receiver(.005f, -.08f, 0.f);
+
+hf::Stabilizer stabilizer = hf::Stabilizer(
+                0.20f,      // Level P
+                0.225f,     // Gyro cyclic P
+                0.001875f,  // Gyro cyclic I
+                0.375f,     // Gyro cyclic D
+                1.0625f,    // Gyro yaw P
+                0.005625f); // Gyro yaw I
 
 // Additional PID controllers
 //#include <extras/altitude_hold.hpp>
@@ -40,7 +46,7 @@ void setup(void)
     //h.addPidController(&altitudeHold);
 
     // Initialize Hackflight firmware
-    h.init(new hf::Ladybug(), &rc, &model);
+    h.init(new hf::Ladybug(), &rc, &stabilizer);
 }
 
 void loop(void)
