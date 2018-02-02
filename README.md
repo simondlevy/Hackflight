@@ -43,7 +43,7 @@ adheres to standard practices for C++, notably, short, simple methods and
 minimal use of compiler macros like <b>#ifdef</b> that can make it difficult to
 follow what the code is doing.  As you can see, the code follows the Arduino
 design pattern of a <b>setup()</b> routine that calls the <b>init()</b> method
-of a few objects (<b>IMU</b>, <b>Receiver</b>, <b>Board</b>, etc.) and a
+of a few objects (<b>Stabilizer</b>, <b>Receiver</b>, <b>Board</b>, etc.) and a
 <b>loop()</b> routine that calls the <b>update()</b> method and other methods
 of those objects.  
 
@@ -53,7 +53,7 @@ for each of these components.  The
 [Board](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp)
 class specifies a set of four abstract (pure virtual) methods that you must
 implement for a particular flight controller or simulator: initializing the
-board, getting the current time in microseconds, getting values from the IMU,
+board, getting the current time in microseconds, getting the vehicle state from the IMU,
 and sending commands to the motors.  The
 [Receiver](https://github.com/simondlevy/Hackflight/blob/master/src/receiver.hpp)
 class performs basic functions associated with R/C control (tracking stick
