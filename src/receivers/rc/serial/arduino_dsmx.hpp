@@ -31,7 +31,6 @@ namespace hf {
         void begin(void)
         {
             rx.begin();
-            timeoutCount = 0;
         }
 
         float readChannel(uint8_t chan)
@@ -43,10 +42,6 @@ namespace hf {
         {
             return rx.timedOut();
         }
-
-        private:
-
-        uint32_t timeoutCount;
 
     }; // class DSMX_Receiver
 
