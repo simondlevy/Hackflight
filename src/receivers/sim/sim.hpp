@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "receivers/serial.hpp"
+#include "receiver.hpp"
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -32,7 +32,7 @@
 
 namespace hf {
 
-    class Controller : public SerialReceiver {
+    class Controller : public Receiver {
 
         public:
 
@@ -71,17 +71,12 @@ namespace hf {
                 _throttleDemand = -1.f;
             }
 
-            float readChannel(uint8_t chan)
+            void readRawvals(void)
             {
-                static float demands[5];
-
-                // Poll on first channel request
-                if (chan == 0) {
-                    poll(demands);
-                }
+                poll(rawvals);
 
                 // Special handling for throttle
-                return (chan == 0) ? _throttleDemand : demands[chan];
+                rawvals[0] = _throttleDemand;
             }
 
             void halt(void)
