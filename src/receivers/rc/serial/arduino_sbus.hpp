@@ -29,10 +29,7 @@ namespace hf {
 
         void begin(void)
         {
-            failsafe = false;
             failsafeCount = 0;
-            lostFrames = 0;
-
             rx.begin();
         }
 
@@ -40,6 +37,9 @@ namespace hf {
         {
             // grab all channels on first channel request
             if (chan == 0) {
+
+                uint8_t failsafe = 0;
+                uint16_t lostFrames = 0;
 
                 rx.readCal(channels, &failsafe, &lostFrames);
 
@@ -66,9 +66,7 @@ namespace hf {
         const uint16_t MAX_FAILSAFE = 10;
 
         float channels[16];
-        uint8_t failsafe;
         uint16_t failsafeCount;
-        uint16_t lostFrames;
 
     }; // class DSMX_Receiver
 
