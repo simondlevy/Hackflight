@@ -114,6 +114,11 @@ namespace hf {
             // Stick positions for command combos
             uint8_t sticks;                    
 
+            // Software trim
+            float _trimRoll;
+            float _trimPitch;
+            float _trimYaw;
+
         public:
 
             float   rawvals[CHANNELS];  // raw [-1,+1] from receiver, for MSP
@@ -124,6 +129,8 @@ namespace hf {
 
             // Override this if your receiver provides RSSI or other weak-signal detection
             virtual bool lostSignal(void) { return false; }
+
+            Receiver(float trimRoll=0, float trimPitch=0, float trimYaw=0) : _trimRoll(trimRoll), _trimPitch(trimPitch), _trimYaw(trimYaw) { }
 
             virtual bool arming(void)
             {
@@ -178,6 +185,11 @@ namespace hf {
                 demands.roll  = adjustCommand(demands.roll, CHANNEL_ROLL);
                 demands.pitch = adjustCommand(demands.pitch, CHANNEL_PITCH);
                 demands.yaw   = adjustCommand(demands.yaw, CHANNEL_YAW);
+
+                // Add in software trim
+                demands.roll  += _trimRoll;
+                demands.pitch += _trimPitch;
+                demands.yaw   += _trimYaw;
 
                 // Support headless mode
                 if (headless) {

@@ -28,24 +28,22 @@ namespace hf {
 
     class Arduino_CPPM_Receiver : public CPPM_Receiver {
 
-        void begin(void)
-        {
-            rx.begin();
-        }
+        public:
 
-        float readChannel(uint8_t chan)
-        {
-            static uint16_t chanvals[5];
+            Arduino_CPPM_Receiver(float trimRoll=0, float trimPitch=0, float trimYaw=0) : CPPM_Receiver(trimRoll, trimPitch, trimYaw) { }
 
-            // Only need to read channels once
-            if (chan == 0) {
-                rx.computeRC(chanvals);
+        protected:
+
+            void begin(void)
+            {
+                rx.begin();
             }
 
-            // TAER
-            return (chanvals[chan] - 1000) / 500.f - 1;
-        }
+            void readPulseVals(uint16_t pulsevals[8])
+            {
+                rx.computeRC(pulsevals);
+            }
 
-    }; // class CPPM_Receiver
+    }; // class Arduino_CPPM_Receiver
 
-} // namespace
+} // namespace hf

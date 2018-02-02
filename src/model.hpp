@@ -37,11 +37,6 @@ class Model {
         // Yaw: P must be positive
         float gyroYawP = 0;
         float gyroYawI = 0;
-
-        // Trim for a particular vehicle
-        float softwareTrimRoll  = 0;
-        float softwareTrimPitch = 0;
-        float softwareTrimYaw   = 0;
 };
 
 } // namespace hf

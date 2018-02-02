@@ -77,15 +77,15 @@ namespace hf {
                 return (errorGyroI[axis] * rateI);
             }
 
-            float computePid( float rateP, float softwareTrim, float PTerm, float ITerm, float DTerm, float gyroRate[3], uint8_t axis)
+            float computePid( float rateP, float PTerm, float ITerm, float DTerm, float gyroRate[3], uint8_t axis)
             {
                 PTerm -= gyroRate[axis] * rateP; 
 
-                return PTerm + ITerm - DTerm + softwareTrim;
+                return PTerm + ITerm - DTerm;
             }
 
             // Computes leveling PID for pitch or roll
-            float computeCyclicPid( float rcCommand, float softwareTrim, float prop, float eulerAngles[3], float gyroRate[3], uint8_t imuAxis)
+            float computeCyclicPid( float rcCommand, float prop, float eulerAngles[3], float gyroRate[3], uint8_t imuAxis)
             {
                 float ITermGyro = computeITermGyro(model->gyroCyclicP, model->gyroCyclicI, rcCommand, gyroRate, imuAxis);
 
@@ -102,7 +102,7 @@ namespace hf {
                 delta1[imuAxis] = delta;
                 float DTerm = deltaSum * model->gyroCyclicD; 
 
-                return computePid(model->gyroCyclicP, softwareTrim, PTerm, ITerm, DTerm, gyroRate, imuAxis);
+                return computePid(model->gyroCyclicP, PTerm, ITerm, DTerm, gyroRate, imuAxis);
             }
 
             float constrainCyclicDemand(float eulerAngle, float demand)
@@ -154,12 +154,12 @@ namespace hf {
                 }
 
                 // Pitch, roll use leveling based on Euler angles
-                demands.roll  = computeCyclicPid(demands.roll,  model->softwareTrimRoll, prop, eulerAngles, gyroRate, AXIS_ROLL);
-                demands.pitch = computeCyclicPid(demands.pitch, model->softwareTrimPitch, prop, eulerAngles, gyroRate, AXIS_PITCH);
+                demands.roll  = computeCyclicPid(demands.roll,  prop, eulerAngles, gyroRate, AXIS_ROLL);
+                demands.pitch = computeCyclicPid(demands.pitch, prop, eulerAngles, gyroRate, AXIS_PITCH);
 
                 // For gyroYaw, P term comes directly from RC command, and D term is zero
                 float ITermGyroYaw = computeITermGyro(model->gyroYawP, model->gyroYawI, demands.yaw, gyroRate, AXIS_YAW);
-                demands.yaw = computePid(model->gyroYawP, model->softwareTrimYaw, demands.yaw, ITermGyroYaw, 0, gyroRate, AXIS_YAW);
+                demands.yaw = computePid(model->gyroYawP, demands.yaw, ITermGyroYaw, 0, gyroRate, AXIS_YAW);
 
                 // Prevent "gyroYaw jump" during gyroYaw correction
                 demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));

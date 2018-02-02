@@ -28,7 +28,7 @@ hf::Hackflight h;
 
 hf::ThreeDFly model;
 
-hf::DSMX_Receiver rc;
+hf::DSMX_Receiver rc = hf::DSMX_Receiver(.005f, -.08f, 0.f);
 
 // Additional PID controllers
 //#include <extras/altitude_hold.hpp>

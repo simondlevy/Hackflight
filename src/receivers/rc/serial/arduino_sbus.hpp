@@ -27,6 +27,10 @@ namespace hf {
 
     class SBUS_Receiver : public Receiver {
 
+        public:
+
+            SBUS_Receiver(float trimRoll=0, float trimPitch=0, float trimYaw=0) : Receiver(trimRoll, trimPitch, trimYaw) { }
+
         protected:
 
             void begin(void)

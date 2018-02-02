@@ -28,8 +28,8 @@ hf::Hackflight h;
 
 hf::ThreeDFly model;
 
-hf::SBUS_Receiver rc;
-
+hf::SBUS_Receiver rc = hf::SBUS_Receiver(.005f, -.08f, 0.f);
+ 
 void setup(void)
 {
     h.init(new hf::Ladybug(), &rc, &model);

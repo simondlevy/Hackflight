@@ -40,11 +40,7 @@ namespace hf {
                 gyroYawP = 1.0625f;
                 gyroYawI = 0.005625f;
 
-                // Trim for a particular vehicle: roll, pitch, gyroYaw
-                softwareTrimRoll  =   0.f;
-                softwareTrimPitch = -.018f;
-                softwareTrimYaw   =   0.f;
-            }
+           }
     };
 
 } // namespace

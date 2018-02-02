@@ -29,7 +29,7 @@ hf::Hackflight h;
 
 hf::ThreeDFly model;
 
-hf::Arduino_CPPM_Receiver rc;
+hf::Arduino_CPPM_Receiver rc = hf::Arduino_CPPM_Receiver(.005f, -.08f, 0.f);
 
 void setup(void)
 {

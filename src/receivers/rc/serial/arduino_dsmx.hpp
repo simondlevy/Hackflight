@@ -28,7 +28,11 @@ namespace hf {
 
     class DSMX_Receiver : public Receiver {
 
-        protected:
+        public:
+
+            DSMX_Receiver(float trimRoll=0, float trimPitch=0, float trimYaw=0) : Receiver(trimRoll, trimPitch, trimYaw) { }
+
+         protected:
 
             void begin(void)
             {
