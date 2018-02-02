@@ -42,7 +42,7 @@ namespace hf {
 
             const float headless     = true;
 
-            static const uint8_t CHANNELS = 8;
+            static const uint8_t CHANNELS = 5;
 
             uint8_t commandDelay;     // cycles since most recent movement
 
