@@ -20,15 +20,14 @@
 
 #pragma once
 
-#include "receiver.hpp"
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
 #include <fcntl.h>
 
-#include <board.hpp>
-#include <debug.hpp>
+#include "receiver.hpp"
+#include "debug.hpp"
 
 namespace hf {
 
