@@ -28,6 +28,12 @@ namespace hf {
 
     class CPPM_Receiver: public Receiver {
 
+        protected:
+
+            CPPM_Receiver(float trimRoll=0, float trimPitch=0, float trimYaw=0) : Receiver(trimRoll, trimPitch, trimYaw) { }
+
+            virtual void readPulseVals(uint16_t chanvals[8]) = 0;
+
         private: 
 
             int32_t ppmAverageIndex;  
@@ -41,10 +47,13 @@ namespace hf {
 
             void readRawvals(void)
             {
+                uint16_t pulsevals[8];
+                readPulseVals(pulsevals);
+
                 float averageRaw[5][4];
 
                 for (uint8_t chan = 0; chan < 5; chan++) {
-                    averageRaw[chan][ppmAverageIndex % 4] = readChannel(chan);
+                    averageRaw[chan][ppmAverageIndex % 4] = (pulsevals[chan] - 1000) / 500.f - 1;
                     rawvals[chan] = 0;
                     for (uint8_t i = 0; i < 4; i++)
                         rawvals[chan] += averageRaw[chan][i];

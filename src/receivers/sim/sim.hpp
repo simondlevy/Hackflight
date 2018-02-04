@@ -20,19 +20,18 @@
 
 #pragma once
 
-#include "receivers/serial.hpp"
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
 #include <fcntl.h>
 
-#include <board.hpp>
-#include <debug.hpp>
+#include "receiver.hpp"
+#include "debug.hpp"
 
 namespace hf {
 
-    class Controller : public SerialReceiver {
+    class Controller : public Receiver {
 
         public:
 
@@ -60,6 +59,8 @@ namespace hf {
                 _springyThrottle = false;
                 _useButtonForAux = false;
                 _joyid = 0;
+
+                _buttonState = 0;
             }
 
             void begin(void)
@@ -71,17 +72,47 @@ namespace hf {
                 _throttleDemand = -1.f;
             }
 
-            float readChannel(uint8_t chan)
+            void readRawvals(void)
             {
-                static float demands[5];
+                static int32_t axes[6];
+                static uint8_t buttons;
 
-                // Poll on first channel request
-                if (chan == 0) {
-                    poll(demands);
+                // Grab the axis values in an OS-specific way
+                productPoll(axes, buttons);
+
+                // Normalize the axes to demands in [-1,+1]
+                for (uint8_t k=0; k<5; ++k) {
+                    rawvals[k] = (axes[_axismap[k]] - productGetBaseline()) / 32767.f;
                 }
 
+                // Invert throttle, pitch if indicated
+                if (_reversedVerticals) {
+                    rawvals[0] = -rawvals[0];
+                    rawvals[2] = -rawvals[2];
+                }
+
+                // For game controllers, use buttons to fake up values in a three-position aux switch
+                if (_useButtonForAux) {
+                    for (uint8_t k=0; k<3; ++k) {
+                        if (buttons == _buttonmap[k]) {
+                            _buttonState = k;
+                        }
+                    }
+                    rawvals[4] = buttonsToAux[_buttonState];
+                }
+
+                // Game-controller spring-mounted throttle requires special handling
+                if (_springyThrottle) {
+                    rawvals[0] = Filter::deadband(rawvals[0], 0.15);
+                    _throttleDemand += rawvals[0] * 0.1f; // XXX need to make this deltaT computable
+                    _throttleDemand = Filter::constrainAbs(_throttleDemand, 1);
+                }
+                else {
+                    _throttleDemand = rawvals[0];
+                }
+ 
                 // Special handling for throttle
-                return (chan == 0) ? _throttleDemand : demands[chan];
+                rawvals[0] = _throttleDemand;
             }
 
             void halt(void)
@@ -107,44 +138,9 @@ namespace hf {
             uint8_t  _buttonmap[3]; // Aux=0, Aux=1, Aux=2
             int      _joyid;        // Linux file descriptor or Windows joystick ID
 
-            void poll(float * demands)
-            {
-                static int32_t axes[6];
-                static uint8_t buttons;
-
-                // Grab the axis values in an OS-specific way
-                productPoll(axes, buttons);
-
-                // Normalize the axes to demands in [-1,+1]
-                for (uint8_t k=0; k<5; ++k) {
-                    demands[k] = (axes[_axismap[k]] - productGetBaseline()) / 32767.f;
-                }
-
-                // Invert throttle, pitch if indicated
-                if (_reversedVerticals) {
-                    demands[0] = -demands[0];
-                    demands[2] = -demands[2];
-                }
-
-                // For game controllers, use buttons to fake up values in a three-position aux switch
-                if (_useButtonForAux) {
-                    for (uint8_t k=0; k<3; ++k) {
-                        if (buttons == _buttonmap[k]) {
-                            demands[4] = (float)k/3; 
-                        }
-                    }
-                }
-
-                // Game-controller spring-mounted throttle requires special handling
-                if (_springyThrottle) {
-                    demands[0] = Filter::deadband(demands[0], 0.15);
-                    _throttleDemand += demands[0] * 0.1f; // XXX need to make this deltaT computable
-                    _throttleDemand = Filter::constrainAbs(_throttleDemand, 1);
-                }
-                else {
-                    _throttleDemand = demands[0];
-                }
-            }
+            // Simulate auxiliary switch via pushbuttons
+            uint8_t _buttonState;
+            const float buttonsToAux[3] = {-.1f, 0.f, .8f};
 
     }; // class Controller
 

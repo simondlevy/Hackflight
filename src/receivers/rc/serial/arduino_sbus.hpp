@@ -18,30 +18,38 @@
 
 #pragma once
 
-#include "receivers/serial.hpp"
+#include "receiver.hpp"
 #include <SBUS.h>
 
 static SBUS rx(Serial1);
 
 namespace hf {
 
-    class SBUS_Receiver : public SerialReceiver {
+    class SBUS_Receiver : public Receiver {
 
-        void begin(void)
-        {
-            failsafeCount = 0;
-            rx.begin();
-        }
+        public:
 
-        float readChannel(uint8_t chan)
-        {
-            // grab all channels on first channel request
-            if (chan == 0) {
+            SBUS_Receiver(float trimRoll=0, float trimPitch=0, float trimYaw=0) : Receiver(trimRoll, trimPitch, trimYaw) { }
+
+        protected:
+
+            void begin(void)
+            {
+                failsafeCount = 0;
+                rx.begin();
+            }
+
+            void readRawvals(void)
+            {
+                for (uint8_t k=0; k<CHANNELS; ++k)
+                    rawvals[k] = 0;
 
                 uint8_t failsafe = 0;
                 uint16_t lostFrames = 0;
 
                 rx.readCal(channels, &failsafe, &lostFrames);
+
+                memcpy(rawvals, channels, CHANNELS*sizeof(float));
 
                 // accumulate consecutive failsafe hits
                 if (failsafe) {
@@ -50,23 +58,21 @@ namespace hf {
                 else { // reset count
                     failsafeCount = 0;
                 }
-
             }
 
-            return channels[chan];
-        }
-
-        bool lostSignal(void)
-        {
-            return failsafeCount > MAX_FAILSAFE;
-        }
+            bool lostSignal(void)
+            {
+                return failsafeCount > MAX_FAILSAFE;
+            }
 
         private:
 
-        const uint16_t MAX_FAILSAFE = 10;
+            // These values must persist between calls to readRawvals()
+            float channels[16];
 
-        float channels[16];
-        uint16_t failsafeCount;
+            const uint16_t MAX_FAILSAFE = 10;
+
+            uint16_t failsafeCount;
 
     }; // class DSMX_Receiver
 

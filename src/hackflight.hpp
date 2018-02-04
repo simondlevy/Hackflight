@@ -22,11 +22,9 @@
 
 #include "board.hpp"
 #include "mixer.hpp"
-#include "model.hpp"
 #include "receiver.hpp"
-#include "stabilize.hpp"
+#include "stabilizer.hpp"
 #include "timer.hpp"
-#include "model.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 
@@ -43,13 +41,13 @@ namespace hf {
             Timer outerTimer      = Timer(100);
             Timer angleCheckTimer = Timer(2);
 
-            // Essential components
-            Mixer      mixer;
-            Stabilize  stab;
-
             // Passed to Hackflight::init() for a particular board and receiver
-            Board    * board;
-            Receiver * receiver;
+            Board      * board;
+            Receiver   * receiver;
+            Stabilizer * stabilizer;
+
+            // Eventually we might want to support mixers for different kinds of configurations (tricopter, etc.)
+            Mixer      mixer;
 
             // Vehicle state
             vehicle_state_t state;
@@ -74,7 +72,7 @@ namespace hf {
 
                 // When landed, reset integral component of PID
                 if (receiver->throttleIsDown()) {
-                    stab.resetIntegral();
+                    stabilizer->resetIntegral();
                 }
 
                 // Certain actions (arming, disarming) need checking every time
@@ -147,7 +145,7 @@ namespace hf {
                 }
 
                 // Run stabilization to get updated demands
-                stab.updateDemands(state, demands);
+                stabilizer->updateDemands(state, demands);
 
                 // Modify demands based on extra PID controllers
                 for (PIDController * p = pidControllers; p; p=p->next) {
@@ -173,15 +171,17 @@ namespace hf {
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(state.pose.orientation[axis].value) < stab.maxArmingAngle;
+                return fabs(state.pose.orientation[axis].value) < stabilizer->maxArmingAngle;
             }
 
         public:
 
-            void init(Board * _board, Receiver * _receiver, Model * _model)
+            void init(Board * _board, Receiver * _receiver, Stabilizer * _stabilizer)
             {  
+                // Store the essentials
                 board = _board;
                 receiver = _receiver;
+                stabilizer = _stabilizer;
 
                 // Do hardware initialization for board
                 board->init();
@@ -190,7 +190,7 @@ namespace hf {
                 receiver->init();
 
                 // Initialize our stabilization, mixing, and MSP (serial comms)
-                stab.init(_model);
+                stabilizer->init();
                 mixer.init(board); 
 
                 // Initialize extra PID controllers

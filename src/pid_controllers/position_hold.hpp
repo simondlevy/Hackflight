@@ -19,7 +19,6 @@
 #pragma once
 
 #include "filter.hpp"
-#include "model.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 #include "pid_controller.hpp"

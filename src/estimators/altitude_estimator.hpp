@@ -87,8 +87,6 @@ namespace hf {
                 uint32_t dTime = getDeltaTime(currentTime);
                 float accelVel = accel.getVerticalVelocity(dTime);
 
-                Debug::printf("%d\n", (int)(100*accelVel));
-
                 float baroVel = baro.getVelocity(dTime);
                 
                 state.pose.position[2].deriv = Filter::complementary(accelVel, (float)baroVel, cfVel);

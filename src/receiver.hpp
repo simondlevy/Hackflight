@@ -42,8 +42,6 @@ namespace hf {
 
             const float headless     = true;
 
-            static const uint8_t CHANNELS = 5;
-
             uint8_t commandDelay;     // cycles since most recent movement
 
             float adjustCommand(float command, uint8_t channel)
@@ -81,6 +79,8 @@ namespace hf {
 
         protected: 
 
+            static const uint8_t CHANNELS = 5;
+
             // channel indices
             enum {
                 CHANNEL_THROTTLE, // T
@@ -96,7 +96,6 @@ namespace hf {
             // These must be overridden for each receiver
             virtual void  begin(void) = 0;
             virtual void  readRawvals(void) = 0;
-            virtual float readChannel(uint8_t chan) = 0;
 
             // For logical combinations of stick positions (low, center, high)
             static const uint8_t ROL_LO = (1 << (2 * CHANNEL_ROLL));
@@ -115,6 +114,11 @@ namespace hf {
             // Stick positions for command combos
             uint8_t sticks;                    
 
+            // Software trim
+            float _trimRoll;
+            float _trimPitch;
+            float _trimYaw;
+
         public:
 
             float   rawvals[CHANNELS];  // raw [-1,+1] from receiver, for MSP
@@ -125,6 +129,8 @@ namespace hf {
 
             // Override this if your receiver provides RSSI or other weak-signal detection
             virtual bool lostSignal(void) { return false; }
+
+            Receiver(float trimRoll=0, float trimPitch=0, float trimYaw=0) : _trimRoll(trimRoll), _trimPitch(trimPitch), _trimYaw(trimYaw) { }
 
             virtual bool arming(void)
             {
@@ -179,6 +185,11 @@ namespace hf {
                 demands.roll  = adjustCommand(demands.roll, CHANNEL_ROLL);
                 demands.pitch = adjustCommand(demands.pitch, CHANNEL_PITCH);
                 demands.yaw   = adjustCommand(demands.yaw, CHANNEL_YAW);
+
+                // Add in software trim
+                demands.roll  += _trimRoll;
+                demands.pitch += _trimPitch;
+                demands.yaw   += _trimYaw;
 
                 // Support headless mode
                 if (headless) {

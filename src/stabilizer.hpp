@@ -1,5 +1,5 @@
 /*
-   stabilize.hpp : PID-based stablization code
+   stabilizer.hpp : PID-based stablization 
 
    This file is part of Hackflight.
 
@@ -26,7 +26,6 @@
 
 #include "receiver.hpp"
 #include "filter.hpp"
-#include "model.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 
@@ -39,9 +38,28 @@ namespace hf {
         AXIS_YAW
     };
 
-    class Stabilize {
+    class Stabilizer {
+
+        public:
+
+            Stabilizer(float levelP, float gyroCyclicP, float gyroCyclicI, float gyroCyclicD, float gyroYawP, float gyroYawI) :
+                _levelP(levelP), 
+                _gyroCyclicP(gyroCyclicP), 
+                _gyroCyclicI(gyroCyclicI), 
+                _gyroCyclicD(gyroCyclicD), 
+                _gyroYawP(gyroYawP), 
+                _gyroYawI(gyroYawI) { }
+
 
         private: 
+
+            // PIDs
+            float _levelP;
+            float _gyroCyclicP;
+            float _gyroCyclicI;
+            float _gyroCyclicD; 
+            float _gyroYawP; 
+            float _gyroYawI;
 
             // Resetting thresholds for PID Integral term
             const float gyroWindupMax           = 16.0f;
@@ -53,9 +71,6 @@ namespace hf {
             float delta1[2]; 
             float delta2[2];
             float errorGyroI[3];
-
-            Board * board;
-            Model * model;
 
             float bigGyroRate;
 
@@ -78,19 +93,19 @@ namespace hf {
                 return (errorGyroI[axis] * rateI);
             }
 
-            float computePid( float rateP, float softwareTrim, float PTerm, float ITerm, float DTerm, float gyroRate[3], uint8_t axis)
+            float computePid( float rateP, float PTerm, float ITerm, float DTerm, float gyroRate[3], uint8_t axis)
             {
                 PTerm -= gyroRate[axis] * rateP; 
 
-                return PTerm + ITerm - DTerm + softwareTrim;
+                return PTerm + ITerm - DTerm;
             }
 
             // Computes leveling PID for pitch or roll
-            float computeCyclicPid( float rcCommand, float softwareTrim, float prop, float eulerAngles[3], float gyroRate[3], uint8_t imuAxis)
+            float computeCyclicPid( float rcCommand, float prop, float eulerAngles[3], float gyroRate[3], uint8_t imuAxis)
             {
-                float ITermGyro = computeITermGyro(model->gyroCyclicP, model->gyroCyclicI, rcCommand, gyroRate, imuAxis);
+                float ITermGyro = computeITermGyro(_gyroCyclicP, _gyroCyclicI, rcCommand, gyroRate, imuAxis);
 
-                float PTermAccel = (rcCommand - eulerAngles[imuAxis]) * model->levelP;  
+                float PTermAccel = (rcCommand - eulerAngles[imuAxis]) * _levelP;  
 
                 float PTerm = Filter::complementary(rcCommand, PTermAccel, prop); 
 
@@ -101,9 +116,9 @@ namespace hf {
                 float deltaSum = delta1[imuAxis] + delta2[imuAxis] + delta;
                 delta2[imuAxis] = delta1[imuAxis];
                 delta1[imuAxis] = delta;
-                float DTerm = deltaSum * model->gyroCyclicD; 
+                float DTerm = deltaSum * _gyroCyclicD; 
 
-                return computePid(model->gyroCyclicP, softwareTrim, PTerm, ITerm, DTerm, gyroRate, imuAxis);
+                return computePid(_gyroCyclicP, PTerm, ITerm, DTerm, gyroRate, imuAxis);
             }
 
             float constrainCyclicDemand(float eulerAngle, float demand)
@@ -115,11 +130,8 @@ namespace hf {
 
             float maxArmingAngle;
 
-            void init(Model * _model)
+            void init(void)
             {
-                // We'll use PID, IMU config values in update() below
-                model = _model;
-
                 // Zero-out previous values for D term
                 for (uint8_t axis=0; axis<2; ++axis) {
                     lastGyro[axis] = 0;
@@ -149,18 +161,18 @@ namespace hf {
                 float prop = Filter::max(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
 
                 // In level mode, reject pitch, roll demands that increase angle beyond specified maximum
-                if (model->levelP > 0) {
+                if (_levelP > 0) {
                     demands.roll  = constrainCyclicDemand(eulerAngles[AXIS_ROLL], demands.roll);
                     demands.pitch = constrainCyclicDemand(eulerAngles[AXIS_PITCH], demands.pitch);
                 }
 
                 // Pitch, roll use leveling based on Euler angles
-                demands.roll  = computeCyclicPid(demands.roll,  model->softwareTrimRoll, prop, eulerAngles, gyroRate, AXIS_ROLL);
-                demands.pitch = computeCyclicPid(demands.pitch, model->softwareTrimPitch, prop, eulerAngles, gyroRate, AXIS_PITCH);
+                demands.roll  = computeCyclicPid(demands.roll,  prop, eulerAngles, gyroRate, AXIS_ROLL);
+                demands.pitch = computeCyclicPid(demands.pitch, prop, eulerAngles, gyroRate, AXIS_PITCH);
 
                 // For gyroYaw, P term comes directly from RC command, and D term is zero
-                float ITermGyroYaw = computeITermGyro(model->gyroYawP, model->gyroYawI, demands.yaw, gyroRate, AXIS_YAW);
-                demands.yaw = computePid(model->gyroYawP, model->softwareTrimYaw, demands.yaw, ITermGyroYaw, 0, gyroRate, AXIS_YAW);
+                float ITermGyroYaw = computeITermGyro(_gyroYawP, _gyroYawI, demands.yaw, gyroRate, AXIS_YAW);
+                demands.yaw = computePid(_gyroYawP, demands.yaw, ITermGyroYaw, 0, gyroRate, AXIS_YAW);
 
                 // Prevent "gyroYaw jump" during gyroYaw correction
                 demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));
