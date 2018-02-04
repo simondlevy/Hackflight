@@ -1,5 +1,5 @@
 /*
-   stabilizer.hpp : PID-based stablization 
+   stabilizer.hpp : PID-based stabilization 
 
    This file is part of Hackflight.
 
