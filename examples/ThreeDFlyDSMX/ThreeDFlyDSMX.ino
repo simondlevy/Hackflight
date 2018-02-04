@@ -26,7 +26,10 @@
 
 hf::Hackflight h;
 
-hf::DSMX_Receiver rc = hf::DSMX_Receiver(.005f, -.08f, 0.f);
+hf::DSMX_Receiver rc = hf::DSMX_Receiver(
+        .005f,  // roll trim
+        .01f,  // pitch trim
+        0.f);   // yaw trim
 
 hf::Stabilizer stabilizer = hf::Stabilizer(
                 0.20f,      // Level P

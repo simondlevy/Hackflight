@@ -43,7 +43,12 @@ namespace hf {
         public:
 
             Stabilizer(float levelP, float gyroCyclicP, float gyroCyclicI, float gyroCyclicD, float gyroYawP, float gyroYawI) :
-                _levelP(levelP), _gyroCyclicP(gyroCyclicP), _gyroCyclicD(gyroCyclicD), _gyroYawP(gyroYawP), _gyroYawI(gyroYawI) { }
+                _levelP(levelP), 
+                _gyroCyclicP(gyroCyclicP), 
+                _gyroCyclicI(gyroCyclicI), 
+                _gyroCyclicD(gyroCyclicD), 
+                _gyroYawP(gyroYawP), 
+                _gyroYawI(gyroYawI) { }
 
 
         private: 
