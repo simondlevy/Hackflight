@@ -64,10 +64,11 @@ namespace hf {
                 // Hang a bit before starting up the EM7180
                 delay(100);
 
-                // Start the EM7180
-                uint8_t status = _sentral.begin(ACCEL_RES, GYRO_RES, MAG_RES);
-                while (status) {
-                    Serial.println(EM7180::errorToString(status));
+                // Start the EM7180 in master mode, no interrupt
+                if (!_sentral.begin(ACCEL_RES, GYRO_RES, MAG_RES)) {
+                    while (true) {
+                        Serial.println(_sentral.getErrorString());
+                    }
                 }
 
                 // Initialize the motors
@@ -133,54 +134,64 @@ namespace hf {
 
             void getState(vehicle_state_t & state)
             {
-                uint8_t errorStatus = _sentral.poll();
+                _sentral.checkEventStatus();
 
-                if (errorStatus) {
-                    Serial.print("ERROR: ");
-                    Serial.println(EM7180::errorToString(errorStatus));
-                    return;
+                if (_sentral.gotError()) {
+                    while (true) {
+                        Serial.print("ERROR: ");
+                        Serial.println(_sentral.getErrorString());
+                    }
                 }
 
-                static float q[4];
-                _sentral.getQuaternions(q);
+                if (_sentral.gotQuaternions()) {
 
-                float yaw   = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
-                float pitch = -asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
-                float roll  = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
+                    static float q[4];
+                    _sentral.readQuaternions(q);
 
-                // Also store Euler angles for extrasUpdateAccelZ()
-                state.pose.orientation[0].value = _eulerAnglesRadians[0] = roll;
-                state.pose.orientation[1].value = _eulerAnglesRadians[1] = -pitch; // compensate for IMU orientation
-                state.pose.orientation[2].value = _eulerAnglesRadians[2] = yaw;
+                    float yaw   = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
+                    float pitch = -asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
+                    float roll  = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
 
-                int16_t gyroRaw[3];
+                    // Also store Euler angles for extrasUpdateAccelZ()
+                    state.pose.orientation[0].value = _eulerAnglesRadians[0] = roll;
+                    state.pose.orientation[1].value = _eulerAnglesRadians[1] = -pitch; // compensate for IMU orientation
+                    state.pose.orientation[2].value = _eulerAnglesRadians[2] = yaw;
+                }
 
-                _sentral.getGyroRaw(gyroRaw[0], gyroRaw[1], gyroRaw[2]);
+                if (_sentral.gotGyrometer()) {
 
-                gyroRaw[1] = -gyroRaw[1];
-                gyroRaw[2] = -gyroRaw[2];
+                    int16_t gyro[3];
 
-                for (uint8_t k=0; k<3; ++k) {
-                    float gyroDegrees = (float)GYRO_RES * gyroRaw[k] / (1<<15); // raw to degrees
-                    state.pose.orientation[k].deriv = M_PI * gyroDegrees / 180.;  // degrees to radians
+                    _sentral.readGyrometer(gyro);
+
+                    gyro[1] = -gyro[1];
+                    gyro[2] = -gyro[2];
+
+                    for (uint8_t k=0; k<3; ++k) {
+                        float gyroDegrees = (float)GYRO_RES * gyro[k] / (1<<15); // raw to degrees
+                        state.pose.orientation[k].deriv = M_PI * gyroDegrees / 180.;  // degrees to radians
+                    }
                 }
 
                 // Fuse altitude estimator with accelerometer data
-                int16_t accelRaw[3];
-                _sentral.getAccelRaw(accelRaw[0], accelRaw[1], accelRaw[2]);
-                float accelGs[3];
-                for (uint8_t k=0; k<3; ++k) {
-                    accelGs[k] = (accelRaw[k]-2048.) / (1<<15) * ACCEL_RES + 1;
-                }
-                altitudeEstimator.fuseWithImu(state, accelGs, micros());
+                if (_sentral.gotAccelerometer()) {
 
-                if (altitudeTimer.checkAndUpdate(micros())) {
-                    float pressure, temperature;
-                    _sentral.getBaro(pressure, temperature);
-                    altitudeEstimator.estimate(state, micros(), pressure);
+                    int16_t accel[3];
+                    _sentral.readAccelerometer(accel);
+                    float accelGs[3];
+                    for (uint8_t k=0; k<3; ++k) {
+                        accelGs[k] = (accel[k]-2048.) / (1<<15) * ACCEL_RES + 1;
+                    }
+                    altitudeEstimator.fuseWithImu(state, accelGs, micros());
+
+                    /*if (altitudeTimer.checkAndUpdate(micros())) {
+                      float pressure, temperature;
+                      _sentral.getBaro(pressure, temperature);
+                      altitudeEstimator.estimate(state, micros(), pressure);
+                      }*/
                 }
 
-             } // getState
+            } // getState
 
     }; // class Ladybug
 
