@@ -165,6 +165,14 @@ namespace hf {
                     mixer.cutMotors();
                 }
 
+                // Failsafe
+                if (state.armed && receiver->lostSignal()) {
+                    mixer.cutMotors();
+                    state.armed = false;
+                    failsafe = true;
+                    board->showArmedStatus(false);
+                }
+
             } // innerLoop
 
             bool safeAngle(uint8_t axis)
@@ -221,15 +229,6 @@ namespace hf {
                 if (innerTimer.checkAndUpdate(currentTime)) {
                     innerLoop();
                 }
-
-                // Failsafe
-                if (state.armed && receiver->lostSignal()) {
-                    mixer.cutMotors();
-                    state.armed = false;
-                    failsafe = true;
-                    board->showArmedStatus(false);
-                }
-
 
             } // update
 
