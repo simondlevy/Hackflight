@@ -21,8 +21,8 @@
 #include "hackflight.hpp"
 
 #include "boards/real/ladybug.hpp"
+
 #include "receivers/rc/serial/arduino_sbus.hpp"
-#include "stabilizer.hpp"
 
 hf::Hackflight h;
 

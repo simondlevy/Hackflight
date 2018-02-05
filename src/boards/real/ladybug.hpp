@@ -174,16 +174,13 @@ namespace hf {
                 }
                 altitudeEstimator.fuseWithImu(state, accelGs, micros());
 
-            } // getState
-
-            void runEstimators(vehicle_state_t & state, uint32_t currentTime)
-            {
-                if (altitudeTimer.checkAndUpdate(currentTime)) {
+                if (altitudeTimer.checkAndUpdate(micros())) {
                     float pressure, temperature;
                     _sentral.getBaro(pressure, temperature);
-                    altitudeEstimator.estimate(state, currentTime, pressure);
+                    altitudeEstimator.estimate(state, micros(), pressure);
                 }
-            }
+
+             } // getState
 
     }; // class Ladybug
 

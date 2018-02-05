@@ -20,7 +20,6 @@
 #include <math.h>
 
 #include <hackflight.hpp>
-#include <models/3dfly.hpp> // arbitrary
 #include <receivers/sim/linux.hpp>
 #include <boards/sim/linux-console.hpp>
 
@@ -28,10 +27,17 @@ int main(int argc, char ** argv)
 {
 	hf::Hackflight hackflight;
 	hf::SimBoard   board;
-	hf::Controller controller;
-	hf::ThreeDFly  model;
+    hf::Controller controller;
 
-	hackflight.init(&board, &controller, &model);
+    hf::Stabilizer stabilizer = hf::Stabilizer(
+            0.20f,      // Level P
+            0.225f,     // Gyro cyclic P
+            0.001875f,  // Gyro cyclic I
+            0.375f,     // Gyro cyclic D
+            1.0625f,    // Gyro yaw P
+            0.005625f); // Gyro yaw I
+
+    hackflight.init(&board, &controller, &stabilizer);
 
     while (true) {
 

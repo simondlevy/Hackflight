@@ -22,8 +22,8 @@
 #include "hackflight.hpp"
 
 #include "boards/real/ladybug.hpp"
+
 #include "receivers/rc/cppm/arduino_cppm.hpp"
-#include "stabilizer.hpp"
 
 hf::Hackflight h;
 

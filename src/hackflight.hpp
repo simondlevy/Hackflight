@@ -37,8 +37,7 @@ namespace hf {
         private: 
 
             // Loop timing
-            Timer innerTimer      = Timer(285);
-            Timer outerTimer      = Timer(100);
+            Timer outerTimer  = Timer(100);
 
             // Passed to Hackflight::init() for a particular board and receiver
             Board      * board;
@@ -220,15 +219,7 @@ namespace hf {
                     outerLoop();
                 }
 
-                // Other state estimators (never called in same loop iteration as Receiver update)
-                else {
-                    board->runEstimators(state, currentTime);
-                }
-
-                // Inner (fast) loop: stabilize, spin motors
-                if (innerTimer.checkAndUpdate(currentTime)) {
-                    innerLoop();
-                }
+                innerLoop();
 
             } // update
 
