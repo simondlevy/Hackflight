@@ -1,5 +1,5 @@
 /*
-   stabilizer.hpp : PID-based stablization 
+   stabilizer.hpp : PID-based stabilization 
 
    This file is part of Hackflight.
 
@@ -105,9 +105,9 @@ namespace hf {
             {
                 float ITermGyro = computeITermGyro(_gyroCyclicP, _gyroCyclicI, rcCommand, gyroRate, imuAxis);
 
-                float PTermAccel = (rcCommand - eulerAngles[imuAxis]) * _levelP;  
+                float PTermEuler = (rcCommand - eulerAngles[imuAxis]) * _levelP;  
 
-                float PTerm = Filter::complementary(rcCommand, PTermAccel, prop); 
+                float PTerm = Filter::complementary(rcCommand, PTermEuler, prop); 
 
                 float ITerm = ITermGyro * prop;
 
@@ -116,6 +116,7 @@ namespace hf {
                 float deltaSum = delta1[imuAxis] + delta2[imuAxis] + delta;
                 delta2[imuAxis] = delta1[imuAxis];
                 delta1[imuAxis] = delta;
+
                 float DTerm = deltaSum * _gyroCyclicD; 
 
                 return computePid(_gyroCyclicP, PTerm, ITerm, DTerm, gyroRate, imuAxis);
@@ -149,22 +150,20 @@ namespace hf {
 
             void updateDemands(vehicle_state_t & state, demands_t & demands)
             {
-                // Extract Euler angles, gyro rates from vehicle state
+                // Extract Euler angles from vehicle state
                 float eulerAngles[3];
-                float gyroRate[3];
                 for (uint8_t k=0; k<3; ++k) {
                     eulerAngles[k] = state.pose.orientation[k].value;
+                }
+
+                // Extract gyro rates from vehicle state
+                float gyroRate[3];
+                for (uint8_t k=0; k<3; ++k) {
                     gyroRate[k]    = state.pose.orientation[k].deriv;
                 }
 
                 // Compute proportion of cyclic demand compared to its maximum
                 float prop = Filter::max(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
-
-                // In level mode, reject pitch, roll demands that increase angle beyond specified maximum
-                if (_levelP > 0) {
-                    demands.roll  = constrainCyclicDemand(eulerAngles[AXIS_ROLL], demands.roll);
-                    demands.pitch = constrainCyclicDemand(eulerAngles[AXIS_PITCH], demands.pitch);
-                }
 
                 // Pitch, roll use leveling based on Euler angles
                 demands.roll  = computeCyclicPid(demands.roll,  prop, eulerAngles, gyroRate, AXIS_ROLL);

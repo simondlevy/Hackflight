@@ -59,8 +59,6 @@ namespace hf {
             virtual void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands) = 0;
 
             virtual void updateDemands(vehicle_state_t & vehicleState, demands_t & demands, uint32_t currentTime) = 0;
-
-
             
         private:
 

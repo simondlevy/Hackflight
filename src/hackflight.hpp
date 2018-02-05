@@ -39,7 +39,6 @@ namespace hf {
             // Loop timing
             Timer innerTimer      = Timer(285);
             Timer outerTimer      = Timer(100);
-            Timer angleCheckTimer = Timer(2);
 
             // Passed to Hackflight::init() for a particular board and receiver
             Board      * board;
@@ -57,7 +56,6 @@ namespace hf {
 
             // Safety
             bool     failsafe;
-            bool     safeToArm;
 
             // Support for headless mode
             float    yawInitial;
@@ -95,7 +93,7 @@ namespace hf {
                         // Arming
                         if (receiver->arming()) {
 
-                            if (!failsafe && safeToArm) {
+                            if (!failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
 
                                 auxState = receiver->demands.aux;
 
@@ -200,7 +198,6 @@ namespace hf {
 
                 // Start unstate.armed
                 state.armed = false;
-                safeToArm = false;
                 failsafe = false;
 
             } // init
@@ -223,11 +220,6 @@ namespace hf {
                 // Inner (fast) loop: stabilize, spin motors
                 if (innerTimer.checkAndUpdate(currentTime)) {
                     innerLoop();
-                }
-
-                // Periodically check pitch, roll angle for arming readiness
-                if (angleCheckTimer.ready(currentTime)) {
-                    safeToArm = safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH);
                 }
 
                 // Failsafe
