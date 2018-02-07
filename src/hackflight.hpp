@@ -37,7 +37,8 @@ namespace hf {
         private: 
 
             // Loop timing
-            Timer outerTimer  = Timer(100);
+            Timer openTimer   = Timer(100);
+            Timer innerTimer  = Timer(285);
 
             // Passed to Hackflight::init() for a particular board and receiver
             Board      * board;
@@ -62,7 +63,7 @@ namespace hf {
             // Support for additional PID controllers
             PIDController * pidControllers = NULL;
 
-            void outerLoop(void)
+            void openLoop(void)
             {
                 // Update Receiver demands, passing yaw angle for headless mode
                 receiver->update(state.pose.orientation[AXIS_YAW].value - yawInitial);
@@ -125,7 +126,7 @@ namespace hf {
                 // Do serial comms
                 board->doSerialComms(&state, receiver, &mixer);
 
-            } // outerLoop
+            } // openLoop
 
             void innerLoop(void)
             {
@@ -214,12 +215,15 @@ namespace hf {
                 // Grab current time for various loops
                 uint32_t currentTime = (uint32_t)board->getMicroseconds();
 
-                // Outer (slow) loop: respond to receiver demands
-                if (outerTimer.checkAndUpdate(currentTime)) {
-                    outerLoop();
+                // Open (slow, "outer") loop: respond to receiver demands
+                if (openTimer.checkAndUpdate(currentTime)) {
+                    openLoop();
                 }
 
-                innerLoop();
+                // Closed (fast, "inner") loop: respond to PID control
+                if (innerTimer.checkAndUpdate(currentTime)) {
+                    innerLoop();
+                }
 
             } // update
 
