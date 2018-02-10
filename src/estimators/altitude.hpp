@@ -46,11 +46,10 @@ namespace hf {
 
         public:
 
-            void init(void)
+            void init(uint16_t imuAccel1G)
             {
-                //StateEstimator::init();
                 baro.init();
-                imu.init();
+                imu.init(imuAccel1G);
             }
 
             void updateAccel(int16_t accel[3], uint32_t currentTime)
@@ -82,13 +81,13 @@ namespace hf {
                 // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
                 // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
                 // i.e without delay.
-                float accelVel = imu.getVerticalVelocity();
+                float imuVel = imu.getVerticalVelocity();
 
-                //Debug::printf("%+2.2f\n", accelVel);
+                //Debug::printf("%+2.2f\n", imuVel);
 
                 float baroVel = baro.getVelocity(currentTime);
                 
-                state.pose.position[2].deriv = Filter::complementary(accelVel, (float)baroVel, cfVel);
+                state.pose.position[2].deriv = Filter::complementary(imuVel, (float)baroVel, cfVel);
             }
 
     }; // class AltitudeEstimator

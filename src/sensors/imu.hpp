@@ -30,7 +30,6 @@ namespace hf {
 
         private:
 
-            const uint16_t   ACCCEL_1G         = 2048;
             const float      ACCEL_LPF_CUTOFF  = 5.0f;
             const float      GYRO_SCALE        = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
             const float      ACCEL_LPF_FACTOR  = 4.f;
@@ -153,9 +152,9 @@ namespace hf {
 
         public:
 
-            void init(void)
+            void init(uint16_t accel1G)
             {
-                accVelScale = 9.80665f / ACCCEL_1G / 10000.0f;
+                accVelScale = 9.80665f / accel1G / 10000.0f;
                 fc_acc = 0.5f / (M_PI * ACCEL_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 
                 reset();

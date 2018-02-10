@@ -77,8 +77,8 @@ namespace hf {
                     analogWrite(_motorPins[k], 0);  
                 }
 
-                // Initialize the atitude estimator
-                altitudeEstimator.init();
+                // Initialize the atitude estimator with the accelerator value for 1G
+                altitudeEstimator.init(2048);
 
                 // Hang a bit more
                 delay(100);
