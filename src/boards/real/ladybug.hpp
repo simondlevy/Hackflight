@@ -25,7 +25,7 @@
 #include <stdarg.h>
 #include "hackflight.hpp"
 #include "realboard.hpp"
-#include "estimators/altitude_estimator.hpp"
+#include "estimators/altitude.hpp"
 
 namespace hf {
 
@@ -43,9 +43,9 @@ namespace hf {
 
             EM7180 _sentral;
 
-            // XXX We should be getting altitude estimation from EM7180
-            AltitudeEstimator   altitudeEstimator;
-            Timer altitudeTimer   = Timer(40);
+            // Altitude-estimation task
+            AltitudeEstimator altitudeEstimator;
+            Timer altitudeTimer = Timer(40);
 
         protected:
 
@@ -164,6 +164,8 @@ namespace hf {
 
                     _sentral.readGyrometer(gyro);
 
+                    altitudeEstimator.updateGyro(gyro, micros());
+
                     gyro[1] = -gyro[1];
                     gyro[2] = -gyro[2];
 
@@ -173,25 +175,25 @@ namespace hf {
                     }
                 }
 
-                // Fuse altitude estimator with accelerometer data
                 if (_sentral.gotAccelerometer()) {
 
                     int16_t accel[3];
                     _sentral.readAccelerometer(accel);
-                    float accelGs[3];
-                    for (uint8_t k=0; k<3; ++k) {
-                        accelGs[k] = (accel[k]-2048.) / (1<<15) * ACCEL_RES + 1;
-                    }
-                    altitudeEstimator.fuseWithImu(state, accelGs, micros());
-
-                    /*if (altitudeTimer.checkAndUpdate(micros())) {
-                      float pressure, temperature;
-                      _sentral.getBaro(pressure, temperature);
-                      altitudeEstimator.estimate(state, micros(), pressure);
-                      }*/
+                    altitudeEstimator.updateAccel(accel, micros());
                 }
 
-            } // getState
+                if (_sentral.gotBarometer()) {
+
+                    float pressure, temperature;
+                    _sentral.readBarometer(pressure, temperature);
+                    altitudeEstimator.updateBaro(pressure);
+                }
+
+                if (altitudeTimer.checkAndUpdate(micros())) {
+                    altitudeEstimator.estimate(state, micros());
+                }
+
+             } // getState
 
     }; // class Ladybug
 

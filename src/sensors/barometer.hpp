@@ -39,7 +39,7 @@ namespace hf {
             float   history[HISTORY_SIZE];
             uint8_t historyIdx;
             float   groundAltitude;
-            float   lastAlt;
+            float   previousAlt;
             float   pressureSum;
 
             // Pressure in millibars to altitude in meters
@@ -56,7 +56,7 @@ namespace hf {
                 historyIdx = 0;
                 groundAltitude = 0;
                 alt = 0;
-                lastAlt = 0;
+                previousAlt = 0;
 
                 for (uint8_t k=0; k<HISTORY_SIZE; ++k) {
                     history[k] = 0;
@@ -90,11 +90,13 @@ namespace hf {
                 return alt;
             }
 
-            float getVelocity(uint32_t dTimeMicros)
+            float getVelocity(uint32_t currentTime)
             {
-                static float lastAlt;
-                float vel = (alt - lastAlt) * 1000000.0f / dTimeMicros;
-                lastAlt = alt;
+                static float previousAlt;
+                static uint32_t previousTime;
+                float vel = (alt - previousAlt) * 1000000.0f / (currentTime-previousTime);
+                previousAlt = alt;
+                previousTime = currentTime;
                 vel = Filter::constrainAbs(vel, velocityBound); 
                 return Filter::deadband(vel, velocityDeadband);
             }

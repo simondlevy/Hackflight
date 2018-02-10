@@ -1,5 +1,5 @@
 /* 
-    altitude_estimator.hpp: Altitude estimation via barometer/accelerometer fusion
+    altitude.hpp: Altitude estimation via barometer/accelerometer fusion
 
     Adapted from
 
@@ -23,8 +23,8 @@
 #pragma once
 
 #include "filter.hpp"
-#include "barometer.hpp"
-#include "accelerometer.hpp"
+#include "sensors/barometer.hpp"
+#include "sensors/imu.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 
@@ -41,16 +41,8 @@ namespace hf {
             // Barometer
             Barometer baro;
 
-            // Accelerometer
-            Accelerometer accel;
-
-            uint32_t getDeltaTime(uint32_t currentTime)
-            {
-                static int32_t previousTime;
-                uint32_t dTime = currentTime - previousTime;
-                previousTime = currentTime;
-                return dTime;
-            }
+            // IMU
+            IMU imu;
 
         public:
 
@@ -58,20 +50,26 @@ namespace hf {
             {
                 //StateEstimator::init();
                 baro.init();
-                accel.init();
+                imu.init();
             }
 
-            void fuseWithImu(vehicle_state_t & state, float accelGs[3], uint32_t currentTime)
+            void updateAccel(int16_t accel[3], uint32_t currentTime)
             {
-                // Throttle modification is synched to aquisition of new IMU data
-                accel.update(state.pose.orientation, accelGs, currentTime, state.armed);
+                imu.updateAccel(accel, currentTime);
             }
 
-            void estimate(vehicle_state_t & state, uint32_t currentTime, float baroPressure)
-            {  
-                // Update the baro with the current pressure reading
-                baro.update(baroPressure);
+            void updateGyro(int16_t gyro[3], uint32_t currentTime)
+            {
+                imu.updateGyro(gyro, currentTime);
+            }
 
+            void updateBaro(float pressure)
+            {
+                baro.update(pressure);
+            }
+
+            void estimate(vehicle_state_t & state, uint32_t currentTime)
+            {  
                 // Calibrate baro AGL at rest
                 if (!state.armed) {
                     baro.calibrate();
@@ -84,10 +82,9 @@ namespace hf {
                 // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
                 // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
                 // i.e without delay.
-                uint32_t dTime = getDeltaTime(currentTime);
-                float accelVel = accel.getVerticalVelocity(dTime);
+                float accelVel = imu.getVerticalVelocity();
 
-                float baroVel = baro.getVelocity(dTime);
+                float baroVel = baro.getVelocity(currentTime);
                 
                 state.pose.position[2].deriv = Filter::complementary(accelVel, (float)baroVel, cfVel);
             }
