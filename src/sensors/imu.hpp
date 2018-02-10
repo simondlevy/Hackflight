@@ -31,7 +31,6 @@ namespace hf {
         private:
 
             const float      ACCEL_LPF_CUTOFF  = 5.0f;
-            const float      GYRO_SCALE        = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
             const float      ACCEL_LPF_FACTOR  = 4.f;
             const float      ACCEL_Z_DEADBAND  = 40.f;
 
@@ -51,6 +50,7 @@ namespace hf {
             int accSumCount;
             int32_t accZoffset;
             float accZsmooth;
+            float gyroRate;
             bool ready;
 
             // Rotate Estimated vector(s) with small angle approximation, according to the gyro data
@@ -94,7 +94,7 @@ namespace hf {
             void update(uint32_t currentTime)
             {
                 uint32_t deltaTime = currentTime - previousTime;
-                float scale = deltaTime * GYRO_SCALE;
+                float scale = deltaTime * gyroRate;
                 previousTime = currentTime;
 
                 // Initialization
@@ -155,7 +155,10 @@ namespace hf {
             void init(uint16_t accel1G)
             {
                 accVelScale = 9.80665f / accel1G / 10000.0f;
+
                 fc_acc = 0.5f / (M_PI * ACCEL_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
+
+                gyroRate = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
 
                 reset();
 
