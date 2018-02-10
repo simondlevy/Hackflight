@@ -84,6 +84,8 @@ namespace hf {
                 // i.e without delay.
                 float accelVel = imu.getVerticalVelocity();
 
+                //Debug::printf("%+2.2f\n", accelVel);
+
                 float baroVel = baro.getVelocity(currentTime);
                 
                 state.pose.position[2].deriv = Filter::complementary(accelVel, (float)baroVel, cfVel);

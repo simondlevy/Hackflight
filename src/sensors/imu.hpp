@@ -30,12 +30,6 @@ namespace hf {
 
         private:
 
-            enum {
-                ROLL = 0,
-                PITCH,
-                YAW
-            };
-
             const uint16_t   ACCCEL_1G         = 2048;
             const float      ACCEL_LPF_CUTOFF  = 5.0f;
             const float      GYRO_SCALE        = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
@@ -58,6 +52,7 @@ namespace hf {
             int accSumCount;
             int32_t accZoffset;
             float accZsmooth;
+            bool ready;
 
             // Rotate Estimated vector(s) with small angle approximation, according to the gyro data
             static void rotateV(float *vout, float *delta)
@@ -70,12 +65,12 @@ namespace hf {
                 float cosx, sinx, cosy, siny, cosz, sinz;
                 float coszcosx, sinzcosx, coszsinx, sinzsinx;
 
-                cosx = cosf(delta[ROLL]);
-                sinx = sinf(delta[ROLL]);
-                cosy = cosf(delta[PITCH]);
-                siny = sinf(delta[PITCH]);
-                cosz = cosf(delta[YAW]);
-                sinz = sinf(delta[YAW]);
+                cosx = cosf(delta[0]);
+                sinx = sinf(delta[0]);
+                cosy = cosf(delta[1]);
+                siny = sinf(delta[1]);
+                cosz = cosf(delta[2]);
+                sinz = sinf(delta[2]);
 
                 coszcosx = cosz * cosx;
                 sinzcosx = sinz * cosx;
@@ -113,18 +108,18 @@ namespace hf {
                 rotateV(EstG, deltaGyroAngle);
 
                 // Attitude of the estimated vector
-                anglerad[ROLL] = atan2f(EstG[1], EstG[2]);
-                anglerad[PITCH] = atan2f(-EstG[0], sqrtf(EstG[1] * EstG[1] + EstG[2] * EstG[2]));
-                angle[ROLL] = lrintf(anglerad[ROLL] * (1800.0f / M_PI));
-                angle[PITCH] = lrintf(anglerad[PITCH] * (1800.0f / M_PI));
+                anglerad[0] = atan2f(EstG[1], EstG[2]);
+                anglerad[1] = atan2f(-EstG[0], sqrtf(EstG[1] * EstG[1] + EstG[2] * EstG[2]));
+                angle[0] = lrintf(anglerad[0] * (1800.0f / M_PI));
+                angle[1] = lrintf(anglerad[1] * (1800.0f / M_PI));
 
                 // deltaTime is measured in us ticks
                 float dT = (float)deltaTime * 1e-6f;
 
                 // the accel values have to be rotated into the earth frame
                 float rpy[3];
-                rpy[0] = -(float)anglerad[ROLL];
-                rpy[1] = -(float)anglerad[PITCH];
+                rpy[0] = -(float)anglerad[0];
+                rpy[1] = -(float)anglerad[1];
                 rpy[2] = -(float)heading * M_PI / 180.0f;;
 
                 float accel_ned[3];
@@ -164,6 +159,8 @@ namespace hf {
                 fc_acc = 0.5f / (M_PI * ACCEL_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 
                 reset();
+
+                ready = false;
             }
 
             float getVerticalVelocity(void)
@@ -171,9 +168,12 @@ namespace hf {
                 // Integrator - velocity, cm/sec
                 float accZ_tmp = (float)accSumZ / (float)accSumCount;
 
-                float vel_acc = accZ_tmp * accVelScale * (float)accTimeSum;
+                // Skip startup transient
+                float vel_acc = ready ? accZ_tmp * accVelScale * (float)accTimeSum : 0;
 
                 reset();
+
+                ready = true;
 
                 return vel_acc;
             }
