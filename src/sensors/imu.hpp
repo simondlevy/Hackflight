@@ -30,15 +30,14 @@ namespace hf {
 
         private:
 
-            const float      ACCEL_LPF_CUTOFF  = 5.0f;
-            const float      ACCEL_LPF_FACTOR  = 4.f;
-            const float      ACCEL_Z_DEADBAND  = 40.f;
+            const float ACCEL_LPF_CUTOFF  = 5.0f;
+            const float ACCEL_LPF_FACTOR  = 4.f;
+            const float ACCEL_Z_DEADBAND  = 40.f;
 
             int16_t accADC[3];
             int16_t gyroADC[3];
 
             float anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
-            int16_t angle[2] = { 0, 0 };     // absolute angle inclination in multiple of 0.1 degree    180 deg = 1800
             int16_t heading;
             float EstG[3];
             float accSmooth[3];
@@ -97,20 +96,19 @@ namespace hf {
                 float scale = deltaTime * gyroRadiansPerMicrosecond;
                 previousTime = currentTime;
 
-                // Initialization
+                // Initialize
                 float deltaGyroAngle[3];
                 for (uint8_t axis = 0; axis < 3; axis++) {
                     deltaGyroAngle[axis] = gyroADC[axis] * scale;
                     accSmooth[axis] = accSmooth[axis] * (1.0f - (1.0f / ACCEL_LPF_FACTOR)) + accADC[axis] * (1.0f / ACCEL_LPF_FACTOR);
                 }
 
+                // Rotate into Earth frame
                 rotateV(EstG, deltaGyroAngle);
 
                 // Attitude of the estimated vector
                 anglerad[0] = atan2f(EstG[1], EstG[2]);
                 anglerad[1] = atan2f(-EstG[0], sqrtf(EstG[1] * EstG[1] + EstG[2] * EstG[2]));
-                angle[0] = lrintf(anglerad[0] * (1800.0f / M_PI));
-                angle[1] = lrintf(anglerad[1] * (1800.0f / M_PI));
 
                 // deltaTime is measured in us ticks
                 float dT = (float)deltaTime * 1e-6f;

@@ -41,6 +41,8 @@ namespace hf {
 
             float _eulerAnglesRadians[3];
 
+            float gyroAdcToRadians = M_PI * (float)GYRO_RES / (1<<15) / 180.;  
+
             EM7180 _sentral;
 
             // Altitude-estimation task
@@ -170,8 +172,7 @@ namespace hf {
                     gyro[2] = -gyro[2];
 
                     for (uint8_t k=0; k<3; ++k) {
-                        float gyroDegrees = (float)GYRO_RES * gyro[k] / (1<<15); // raw to degrees
-                        state.pose.orientation[k].deriv = M_PI * gyroDegrees / 180.;  // degrees to radians
+                        state.pose.orientation[k].deriv = gyro[k] * gyroAdcToRadians;
                     }
                 }
 
