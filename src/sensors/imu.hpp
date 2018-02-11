@@ -50,7 +50,7 @@ namespace hf {
             int accSumCount;
             int32_t accZoffset;
             float accZsmooth;
-            float gyroRate;
+            float gyroRadiansPerMicrosecond;
             bool ready;
 
             // Rotate Estimated vector(s) with small angle approximation, according to the gyro data
@@ -94,7 +94,7 @@ namespace hf {
             void update(uint32_t currentTime)
             {
                 uint32_t deltaTime = currentTime - previousTime;
-                float scale = deltaTime * gyroRate;
+                float scale = deltaTime * gyroRadiansPerMicrosecond;
                 previousTime = currentTime;
 
                 // Initialization
@@ -158,7 +158,7 @@ namespace hf {
 
                 fc_acc = 0.5f / (M_PI * ACCEL_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 
-                gyroRate = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
+                gyroRadiansPerMicrosecond = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
 
                 reset();
 
@@ -182,13 +182,13 @@ namespace hf {
 
             void updateAccel(int16_t _accADC[3], uint32_t currentTime)
             {
-                memcpy(accADC, _accADC, 3*sizeof(float));
+                memcpy(accADC, _accADC, 3*sizeof(int16_t));
                 update(currentTime);
             }
 
             void updateGyro(int16_t _gyroADC[3], uint32_t currentTime)
             {
-                memcpy(gyroADC, _gyroADC, 3*sizeof(float));
+                memcpy(gyroADC, _gyroADC, 3*sizeof(int16_t));
                 update(currentTime);
             }
 

@@ -68,8 +68,8 @@ namespace hf {
             const float maxArmingAngleDegrees   = 25.0f;         
 
             float lastGyro[2];
-            float delta1[2]; 
-            float delta2[2];
+            float gyroDelta1[2]; 
+            float gyroDelta2[2];
             float errorGyroI[3];
 
             float bigGyroRate;
@@ -111,13 +111,13 @@ namespace hf {
 
                 float ITerm = ITermGyro * prop;
 
-                float delta = gyroRate[imuAxis] - lastGyro[imuAxis];
+                float gyroDelta = gyroRate[imuAxis] - lastGyro[imuAxis];
                 lastGyro[imuAxis] = gyroRate[imuAxis];
-                float deltaSum = delta1[imuAxis] + delta2[imuAxis] + delta;
-                delta2[imuAxis] = delta1[imuAxis];
-                delta1[imuAxis] = delta;
+                float gyroDeltaSum = gyroDelta1[imuAxis] + gyroDelta2[imuAxis] + gyroDelta;
+                gyroDelta2[imuAxis] = gyroDelta1[imuAxis];
+                gyroDelta1[imuAxis] = gyroDelta;
 
-                float DTerm = deltaSum * _gyroCyclicD; 
+                float DTerm = gyroDeltaSum * _gyroCyclicD; 
 
                 return computePid(_gyroCyclicP, PTerm, ITerm, DTerm, gyroRate, imuAxis);
             }
@@ -136,8 +136,8 @@ namespace hf {
                 // Zero-out previous values for D term
                 for (uint8_t axis=0; axis<2; ++axis) {
                     lastGyro[axis] = 0;
-                    delta1[axis] = 0;
-                    delta2[axis] = 0;
+                    gyroDelta1[axis] = 0;
+                    gyroDelta2[axis] = 0;
                 }
 
                 // Convert degree parameters to radians for use later
@@ -159,7 +159,7 @@ namespace hf {
                 // Extract gyro rates from vehicle state
                 float gyroRate[3];
                 for (uint8_t k=0; k<3; ++k) {
-                    gyroRate[k]    = state.pose.orientation[k].deriv;
+                    gyroRate[k] = state.pose.orientation[k].deriv;
                 }
 
                 // Compute proportion of cyclic demand compared to its maximum
