@@ -33,21 +33,17 @@ typedef struct {
 
 typedef struct {
 
-    float value;
-    float deriv; // dValue / dt
+    float values[3];
+    float derivs[3];
 
 } stateval_t;
 
 typedef struct {
 
-    stateval_t position[3];    // X, Y, Z
-    stateval_t orientation[3]; // roll, pitch, yaw
+    stateval_t position;    // X, Y, Z
 
-} pose_t;
+    stateval_t orientation; // roll, pitch, yaw
 
-typedef struct {
-
-    pose_t pose;
     bool armed;
 
 } vehicle_state_t;

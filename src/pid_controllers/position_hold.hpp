@@ -57,7 +57,7 @@ namespace hf {
                 if (demands.aux > 1) {
                     holding = true;
                     for (uint8_t k=0; k<2; ++k) {
-                        posHold[k] = vehicleState.pose.position[k].value;
+                        posHold[k] = vehicleState.position.values[k];
                         errorI[k] = 0;
                     }
                 }
@@ -78,12 +78,10 @@ namespace hf {
                     float error[2];
                     float pid[2];
 
-                    stateval_t * position = vehicleState.pose.position;
-
                     for (uint8_t k=0; k<2; ++k) {
 
                         // P
-                        error[k] = posHold[k] - position[k].value;
+                        error[k] = posHold[k] - vehicleState.position.values[k];
                         pid[k] = Filter::constrainAbs(pidP * error[k], pidMax);
 
                         // I

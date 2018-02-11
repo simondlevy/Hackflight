@@ -68,7 +68,7 @@ namespace hf {
                 if (demands.aux > 0) {
                     holding = true;
                     initialThrottleHold = demands.throttle;
-                    altHold = vehicleState.pose.position[2].value;
+                    altHold = vehicleState.position.values[2];
                     errorI = 0;
                 }
 
@@ -86,9 +86,8 @@ namespace hf {
                 if (holding) {
 
                     // Extract altitude, vertical velocity from vehicle state
-                    stateval_t posZ = vehicleState.pose.position[2];
-                    float altitude = posZ.value;
-                    float velocity = posZ.deriv;
+                    float altitude = vehicleState.position.values[2];
+                    float velocity = vehicleState.position.derivs[2];
 
                     // P
                     float error = altHold-altitude;

@@ -204,7 +204,7 @@ namespace hf {
                                 {
                                     float eulerAngles[3];
                                     for (uint8_t k=0; k<3; ++k) {
-                                        eulerAngles[k] = state->pose.orientation[k].value;
+                                        eulerAngles[k] = state->orientation.values[k];
                                     }
                                     outBufSize = 0;
                                     outBufIndex = 0;

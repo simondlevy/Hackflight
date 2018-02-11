@@ -66,7 +66,7 @@ namespace hf {
             void openLoop(void)
             {
                 // Update Receiver demands, passing yaw angle for headless mode
-                receiver->update(state.pose.orientation[AXIS_YAW].value - yawInitial);
+                receiver->update(state.orientation.values[AXIS_YAW] - yawInitial);
 
                 // When landed, reset integral component of PID
                 if (receiver->throttleIsDown()) {
@@ -99,7 +99,7 @@ namespace hf {
 
                                 if (!auxState) // aux switch must be in zero position
                                     if (!state.armed) {
-                                        yawInitial = state.pose.orientation[AXIS_YAW].value;
+                                        yawInitial = state.orientation.values[AXIS_YAW];
                                         state.armed = true;
                                     }
                             }
@@ -138,8 +138,8 @@ namespace hf {
                 board->getState(state);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (state.pose.orientation[AXIS_YAW].value < 0) {
-                    state.pose.orientation[AXIS_YAW].value += 2*M_PI;
+                if (state.orientation.values[AXIS_YAW] < 0) {
+                    state.orientation.values[AXIS_YAW] += 2*M_PI;
                 }
 
                 // Run stabilization to get updated demands
@@ -177,7 +177,7 @@ namespace hf {
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(state.pose.orientation[axis].value) < stabilizer->maxArmingAngle;
+                return fabs(state.orientation.values[axis]) < stabilizer->maxArmingAngle;
             }
 
         public:

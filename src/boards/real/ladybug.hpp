@@ -155,9 +155,9 @@ namespace hf {
                     float roll  = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
 
                     // Also store Euler angles for extrasUpdateAccelZ()
-                    state.pose.orientation[0].value = _eulerAnglesRadians[0] = roll;
-                    state.pose.orientation[1].value = _eulerAnglesRadians[1] = -pitch; // compensate for IMU orientation
-                    state.pose.orientation[2].value = _eulerAnglesRadians[2] = yaw;
+                    state.orientation.values[0] = _eulerAnglesRadians[0] = roll;
+                    state.orientation.values[1] = _eulerAnglesRadians[1] = -pitch; // compensate for IMU orientation
+                    state.orientation.values[2] = _eulerAnglesRadians[2] = yaw;
                 }
 
                 if (_sentral.gotGyrometer()) {
@@ -166,13 +166,14 @@ namespace hf {
 
                     _sentral.readGyrometer(gyro);
 
-                    altitudeEstimator.updateGyro(gyro, micros());
-
+                    // invert pitch, yaw gyro direction to keep other code simpler
                     gyro[1] = -gyro[1];
                     gyro[2] = -gyro[2];
 
+                    altitudeEstimator.updateGyro(gyro, micros());
+
                     for (uint8_t k=0; k<3; ++k) {
-                        state.pose.orientation[k].deriv = gyro[k] * gyroAdcToRadians;
+                        state.orientation.derivs[k] = gyro[k] * gyroAdcToRadians;
                     }
                 }
 

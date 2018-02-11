@@ -89,7 +89,8 @@ namespace hf {
 
             void getState(vehicle_state_t & vehicleState)
             {
-                memcpy(&vehicleState.pose, &_vehicleState.pose, sizeof(pose_t));
+                memcpy(&vehicleState.position, &_vehicleState.position, sizeof(stateval_t));
+                memcpy(&vehicleState.orientation, &_vehicleState.orientation, sizeof(stateval_t));
 
                 // Sync physics update to IMU acquisition by Hackflight
                 updatePhysics();
@@ -116,23 +117,23 @@ namespace hf {
                 }
 
                 _flying = false;
-                _vehicleState.pose.position[2].value = 0;
+                _vehicleState.position.values[2] = 0;
                 _verticalSpeedPrev = 0;
             }
 
             void updatePhysics(void)
             {
                 // Compute body-frame roll, pitch, yaw velocities based on differences between motors
-                _vehicleState.pose.orientation[0].deriv = motorsToAngularVelocity(2, 3, 0, 1);
-                _vehicleState.pose.orientation[1].deriv = motorsToAngularVelocity(1, 3, 0, 2); 
-                _vehicleState.pose.orientation[2].deriv = motorsToAngularVelocity(1, 2, 0, 3); 
+                _vehicleState.orientation.derivs[0] = motorsToAngularVelocity(2, 3, 0, 1);
+                _vehicleState.orientation.derivs[1] = motorsToAngularVelocity(1, 3, 0, 2); 
+                _vehicleState.orientation.derivs[2] = motorsToAngularVelocity(1, 2, 0, 3); 
 
                 // Overall thrust vector, scaled by arbitrary constant for realism
                 float thrust = THRUST_SCALE * (_motors[0] + _motors[1] + _motors[2] + _motors[3]);
 
                 // Rename Euler angles to familiar Greek-letter variables
-                float phi   = _vehicleState.pose.orientation[0].value;
-                float theta = _vehicleState.pose.orientation[1].value;
+                float phi   = _vehicleState.orientation.values[0];
+                float theta = _vehicleState.orientation.values[1];
 
                 // Overall vertical force = thrust - gravity
                 float lift = cos(phi)*cos(theta)*thrust - GRAVITY;
@@ -150,31 +151,31 @@ namespace hf {
                 if (_flying) {
 
                     // Integrate vertical force to get vertical speed
-                    _vehicleState.pose.position[2].deriv += (lift * deltaSeconds);
+                    _vehicleState.position.derivs[2] += (lift * deltaSeconds);
 
                     // To get forward and lateral speeds, integrate thrust along vehicle coordinates
-                    _vehicleState.pose.position[0].deriv += thrust * deltaSeconds * sin(theta);
-                    _vehicleState.pose.position[1].deriv += thrust * deltaSeconds * sin(phi);
+                    _vehicleState.position.derivs[0] += thrust * deltaSeconds * sin(theta);
+                    _vehicleState.position.derivs[1] += thrust * deltaSeconds * sin(phi);
                 }
 
                 // Integrate speed to get position XXX ignore heading for now
                 for (int8_t k=0; k<3; ++k) {
-                    _vehicleState.pose.position[k].value += _vehicleState.pose.position[k].deriv * deltaSeconds;
+                    _vehicleState.position.values[k] += _vehicleState.position.derivs[k] * deltaSeconds;
                 }
 
                 // Reset everything if we hit the ground
-                if (_vehicleState.pose.position[2].value < 0) {
+                if (_vehicleState.position.values[2] < 0) {
                     initPhysics();
                 }
 
                 // Update state, negating pitch
                 for (int k=0; k<3; ++k) {
-                    _vehicleState.pose.orientation[k].value += ((k==1) ? -1 : +1) * _vehicleState.pose.orientation[k].deriv * deltaSeconds; 
+                    _vehicleState.orientation.values[k] += ((k==1) ? -1 : +1) * _vehicleState.orientation.derivs[k] * deltaSeconds; 
                 }
 
                 // Differentiate vertical speed to get vertical acceleration in meters per second, then convert to Gs.
                 // Resting = 1G; freefall = 0; climbing = >1G
-                _verticalSpeedPrev = _vehicleState.pose.position[2].deriv;
+                _verticalSpeedPrev = _vehicleState.position.derivs[2];
             }
 
             float motorsToAngularVelocity(int a, int b, int c, int d)
