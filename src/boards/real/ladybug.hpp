@@ -170,11 +170,11 @@ namespace hf {
                     gyro[1] = -gyro[1];
                     gyro[2] = -gyro[2];
 
-                    altitudeEstimator.updateGyro(gyro, micros());
-
                     for (uint8_t k=0; k<3; ++k) {
                         state.orientation.derivs[k] = gyro[k] * gyroAdcToRadians;
                     }
+
+                    altitudeEstimator.updateGyro(state.orientation.derivs, micros());
                 }
 
                 if (_sentral.gotAccelerometer()) {

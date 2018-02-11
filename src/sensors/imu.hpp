@@ -35,7 +35,7 @@ namespace hf {
             const float ACCEL_Z_DEADBAND  = 40.f;
 
             int16_t accADC[3];
-            int16_t gyroADC[3];
+            float   gyro[3];
 
             float anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
             int16_t heading;
@@ -49,7 +49,6 @@ namespace hf {
             int accSumCount;
             int32_t accZoffset;
             float accZsmooth;
-            float gyroRadiansPerMicrosecond;
             bool ready;
 
             // Rotate Estimated vector(s) with small angle approximation, according to the gyro data
@@ -93,13 +92,13 @@ namespace hf {
             void update(uint32_t currentTime)
             {
                 uint32_t deltaTime = currentTime - previousTime;
-                float scale = deltaTime * gyroRadiansPerMicrosecond;
+                float scale = deltaTime * 1.e-6;
                 previousTime = currentTime;
 
                 // Initialize
                 float deltaGyroAngle[3];
                 for (uint8_t axis = 0; axis < 3; axis++) {
-                    deltaGyroAngle[axis] = gyroADC[axis] * scale;
+                    deltaGyroAngle[axis] = gyro[axis] * scale;
                     accSmooth[axis] = accSmooth[axis] * (1.0f - (1.0f / ACCEL_LPF_FACTOR)) + accADC[axis] * (1.0f / ACCEL_LPF_FACTOR);
                 }
 
@@ -156,8 +155,6 @@ namespace hf {
 
                 fc_acc = 0.5f / (M_PI * ACCEL_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
 
-                gyroRadiansPerMicrosecond = (4.0f / 16.4f) * (M_PI / 180.0f) * 0.000001f;
-
                 reset();
 
                 ready = false;
@@ -184,9 +181,9 @@ namespace hf {
                 update(currentTime);
             }
 
-            void updateGyro(int16_t _gyroADC[3], uint32_t currentTime)
+            void updateGyro(float _gyro[3], uint32_t currentTime)
             {
-                memcpy(gyroADC, _gyroADC, 3*sizeof(int16_t));
+                memcpy(gyro, _gyro, 3*sizeof(float));
                 update(currentTime);
             }
 

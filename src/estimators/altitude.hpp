@@ -57,7 +57,7 @@ namespace hf {
                 imu.updateAccel(accel, currentTime);
             }
 
-            void updateGyro(int16_t gyro[3], uint32_t currentTime)
+            void updateGyro(float gyro[3], uint32_t currentTime)
             {
                 imu.updateGyro(gyro, currentTime);
             }
