@@ -31,7 +31,7 @@ namespace hf {
         private:
 
             const float ACCEL_LPF_CUTOFF  = 5.0f;
-            const float ACCEL_LPF_FACTOR  = 4.f;
+            const float ACCEL_LPF_FACTOR  = 0.25f;
             const float ACCEL_Z_DEADBAND  = 40.f;
 
             int16_t accADC[3];
@@ -99,7 +99,7 @@ namespace hf {
                 float deltaGyroAngle[3];
                 for (uint8_t axis = 0; axis < 3; axis++) {
                     deltaGyroAngle[axis] = gyro[axis] * scale;
-                    accSmooth[axis] = accSmooth[axis] * (1.0f - (1.0f / ACCEL_LPF_FACTOR)) + accADC[axis] * (1.0f / ACCEL_LPF_FACTOR);
+                    accSmooth[axis] = Filter::complementary(accADC[axis], accSmooth[axis], ACCEL_LPF_FACTOR);
                 }
 
                 // Rotate into Earth frame
