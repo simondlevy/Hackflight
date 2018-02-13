@@ -55,6 +55,7 @@ namespace hf {
             IMU imu;
 
             // fused
+            float fusedAlt;
             float fusedVel;
 
         public:
@@ -85,29 +86,35 @@ namespace hf {
                 // Calibrate baro AGL at rest
                 if (!state.armed) {
                     baro.calibrate();
+                    fusedAlt = 0;
                     fusedVel = 0;
                     return;
                 }
 
+                // Track delta time in seconds
+                static uint32_t previousTime;
+                float dt = (currentTime-previousTime) / 1.e6;
+                previousTime = currentTime;
+
                 // Get estimated altitude from barometer
-                state.position.values[2] = baro.getAltitude();
+                float baroAlt = baro.getAltitude();
 
                 // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
                 // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
                 // i.e without delay.
                 float imuVel = imu.getVerticalVelocity();
 
-                fusedVel += imuVel;
+                // Integrator - Altitude in cm
+                fusedAlt += (imuVel * 0.5f) * dt + fusedVel * dt;   
+                fusedAlt = Filter::complementary(fusedAlt, baroAlt, cfAlt);      
 
-                printgauge(fusedVel);
+                //printgauge(fusedAlt);
+
+                fusedVel += imuVel;
 
                 float baroVel = baro.getVelocity(currentTime);
 
                 fusedVel = Filter::complementary(fusedVel, baroVel, cfVel);
-
-                //printgauge(fusedVel);
-                
-                state.position.derivs[2] = fusedVel;
             }
 
     }; // class AltitudeEstimator
