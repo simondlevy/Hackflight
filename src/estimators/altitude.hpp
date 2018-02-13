@@ -28,6 +28,16 @@
 #include "debug.hpp"
 #include "datatypes.hpp"
 
+static void printmeter(float x)
+{
+    char c = x<0 ? '-' : '+';
+    for (uint8_t k=0; k<abs(x); ++k) {
+        printf("%c", c);
+    }
+    printf("\n");
+}
+
+
 namespace hf {
 
     class AltitudeEstimator {
@@ -83,10 +93,10 @@ namespace hf {
                 // i.e without delay.
                 float imuVel = imu.getVerticalVelocity();
 
-                //Debug::printf("%+2.2f\n", imuVel);
-
                 float baroVel = baro.getVelocity(currentTime);
                 
+                Debug::printf("%f\n", baroVel);
+
                 state.position.derivs[2] = Filter::complementary(imuVel, (float)baroVel, cfVel);
             }
 
