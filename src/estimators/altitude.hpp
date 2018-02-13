@@ -88,7 +88,7 @@ namespace hf {
                 // Get estimated altitude from barometer
                 state.position.values[2] = baro.getAltitude();
 
-                //Debug::printf("%f\n", state.position.values[2]);
+                //Debug::printf("%d\n", (int)state.position.values[2]);
 
                 // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
                 // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
@@ -97,8 +97,6 @@ namespace hf {
 
                 float baroVel = baro.getVelocity(currentTime);
                 
-                Debug::printf("%f\n", baroVel);
-
                 state.position.derivs[2] = Filter::complementary(imuVel, (float)baroVel, cfVel);
             }
 

@@ -43,10 +43,11 @@ namespace hf {
             float   previousAlt;
             float   pressureSum;
 
-            // Pressure in millibars to altitude in meters
-            float millibarsToMeters(float pa)
+            // Pressure in millibars to altitude in centimeters
+            float millibarsToCentimeters(float pa)
             {
-                return (1.0f - powf(pa / 1013.25f, 0.190295f)) * 44330.0f;
+                //return (1.0f - powf(pa / 1013.25f, 0.190295f)) * 44330.0f;
+                return (1.0f - powf(pa / 1013.25f, 0.190295f)) * 4433000.0f;
             }
 
         public:
@@ -70,7 +71,7 @@ namespace hf {
 
                 groundPressure -= groundPressure / 8;
                 groundPressure += pressureSum / (HISTORY_SIZE - 1);
-                groundAltitude = millibarsToMeters(groundPressure/8);
+                groundAltitude = millibarsToCentimeters(groundPressure/8);
             }
 
             void update(float pressure)
@@ -84,7 +85,7 @@ namespace hf {
 
             float getAltitude(void)
             {
-                float alt_tmp = millibarsToMeters(pressureSum/(HISTORY_SIZE-1)) - groundAltitude;
+                float alt_tmp = millibarsToCentimeters(pressureSum/(HISTORY_SIZE-1)) - groundAltitude;
                 alt = Filter::complementary(alt, alt_tmp, NOISE_LPF);
 
                 return alt;
