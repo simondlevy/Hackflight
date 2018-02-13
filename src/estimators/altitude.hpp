@@ -28,7 +28,7 @@
 #include "debug.hpp"
 #include "datatypes.hpp"
 
-static void printmeter(float x)
+static void printgauge(float x)
 {
     char c = x<0 ? '-' : '+';
     for (uint8_t k=0; k<abs(x); ++k) {
@@ -53,6 +53,9 @@ namespace hf {
 
             // IMU
             IMU imu;
+
+            // fused
+            float fusedVel;
 
         public:
 
@@ -82,22 +85,29 @@ namespace hf {
                 // Calibrate baro AGL at rest
                 if (!state.armed) {
                     baro.calibrate();
+                    fusedVel = 0;
                     return;
                 }
 
                 // Get estimated altitude from barometer
                 state.position.values[2] = baro.getAltitude();
 
-                //Debug::printf("%d\n", (int)state.position.values[2]);
-
                 // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
                 // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
                 // i.e without delay.
                 float imuVel = imu.getVerticalVelocity();
 
+                fusedVel += imuVel;
+
+                printgauge(fusedVel);
+
                 float baroVel = baro.getVelocity(currentTime);
+
+                fusedVel = Filter::complementary(fusedVel, baroVel, cfVel);
+
+                //printgauge(fusedVel);
                 
-                state.position.derivs[2] = Filter::complementary(imuVel, (float)baroVel, cfVel);
+                state.position.derivs[2] = fusedVel;
             }
 
     }; // class AltitudeEstimator
