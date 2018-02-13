@@ -23,6 +23,7 @@
 #pragma once
 
 #include "debug.hpp"
+#include "filter.hpp"
 
 namespace hf {
 
@@ -30,9 +31,9 @@ namespace hf {
 
         private: // constants
 
-            const float noiseLpf              = 0.5f;
-            const float velocityBound         = 3.0f;
-            const float velocityDeadband      = 0.1f;
+            const float NOISE_LPF             = 0.5f;
+            const float VELOCITY_BOUND        = 3.0f;
+            const float VELOCITY_DEADBAND     = 0.1f;
             static const uint8_t HISTORY_SIZE = 48;
 
             float   alt;
@@ -83,9 +84,8 @@ namespace hf {
 
             float getAltitude(void)
             {
-                float alt_tmp = millibarsToMeters(pressureSum/(HISTORY_SIZE-1)); 
-                alt_tmp -= groundAltitude;
-                alt = alt * noiseLpf + alt_tmp * (1.0f - noiseLpf);
+                float alt_tmp = millibarsToMeters(pressureSum/(HISTORY_SIZE-1)) - groundAltitude;
+                alt = Filter::complementary(alt, alt_tmp, NOISE_LPF);
 
                 return alt;
             }
@@ -97,8 +97,8 @@ namespace hf {
                 float vel = (alt - previousAlt) * 1000000.0f / (currentTime-previousTime);
                 previousAlt = alt;
                 previousTime = currentTime;
-                vel = Filter::constrainAbs(vel, velocityBound); 
-                return Filter::deadband(vel, velocityDeadband);
+                vel = Filter::constrainAbs(vel, VELOCITY_BOUND); 
+                return Filter::deadband(vel, VELOCITY_DEADBAND);
             }
 
 

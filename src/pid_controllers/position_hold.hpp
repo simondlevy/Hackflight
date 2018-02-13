@@ -90,7 +90,7 @@ namespace hf {
                         pid[k] += (errorI[k] * (dtime/1e6));
 
                         // D
-                        pid[k] -= Filter::constrainAbs(pidD * position[k].deriv, pidMax);
+						pid[k] -= Filter::constrainAbs(pidD * vehicleState.position.derivs[k], pidMax);
 
                     }
 
