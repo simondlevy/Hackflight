@@ -89,8 +89,8 @@ namespace hf {
                     // Altitude P-Controller
                     if (!velocityControl) {
                         int32_t error = Filter::constrainAbs(altHold - vehicleState.position.values[2], 500);
+                        error = Filter::deadband(error, 10);       // remove small P parametr to reduce noise near zero position
                         //printgauge(error);
-                        //error = applyDeadband(error, 10);       // remove small P parametr to reduce noise near zero position
                         //setVel = constrain((cfg.P8[PIDALT] * error / 128), -300, +300); // limit velocity to +/- 3 m/s
                     } else {
                         //setVel = setVelocity;
