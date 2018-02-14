@@ -115,6 +115,10 @@ namespace hf {
                 float baroVel = baro.getVelocity(currentTime);
 
                 fusedVel = Filter::complementary(fusedVel, baroVel, cfVel);
+            
+                state.position.values[2] = fusedAlt;
+                state.position.derivs[2] = fusedVel;
+
             }
 
     }; // class AltitudeEstimator

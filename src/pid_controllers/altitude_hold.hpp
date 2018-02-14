@@ -47,13 +47,14 @@ namespace hf {
             float altHold;
             float initialThrottleHold;  // [0,1]  
 
-           float errorI;
+            // No velocity control for now
+            bool velocityControl = false;
+
+            float errorI;
 
         public:
 
-            AltitudeHold(float _pidP, float _pidI, float _pidD) : PIDController(_pidP, _pidI, _pidD)
-            {
-            }
+            AltitudeHold(float _pidP, float _pidI, float _pidD) : PIDController(_pidP, _pidI, _pidD) { }
 
             void init(void)
             {
@@ -85,26 +86,28 @@ namespace hf {
 
                 if (holding) {
 
-                    // Extract altitude, vertical velocity from vehicle state
-                    float altitude = vehicleState.position.values[2];
-                    float velocity = vehicleState.position.derivs[2];
+                    // Altitude P-Controller
+                    if (!velocityControl) {
+                        //Debug::printf("%d %d\n", (int)altHold, (int)vehicleState.position.values[2]);
+                        //int32_t error = Filter::constrain(altHold - fusedAlt, -500, 500);
+                        //error = applyDeadband(error, 10);       // remove small P parametr to reduce noise near zero position
+                        //setVel = constrain((cfg.P8[PIDALT] * error / 128), -300, +300); // limit velocity to +/- 3 m/s
+                    } else {
+                        //setVel = setVelocity;
+                    }
 
+                    // Velocity PID-Controller
                     // P
-                    float error = altHold-altitude;
-                    error = Filter::constrainAbs(error, pErrorMax);
-                    error = Filter::deadband(error, pDeadband); 
-                    float pid = Filter::constrainAbs(pidP * error, pidMax);
+                    //error = setVel - vel_tmp;
+                    //altitudePid = constrain((cfg.P8[PIDVEL] * error / 32), -300, +300);
 
                     // I
-                    errorI += (pidI * error);
-                    errorI = Filter::constrainAbs(errorI, iErrorMax);
-                    pid += (errorI * (dtime/1e6));
+                    //errorVelocityI += (cfg.I8[PIDVEL] * error);
+                    //errorVelocityI = constrain(errorVelocityI, -(8196 * 200), (8196 * 200));
+                    //altitudePid += errorVelocityI / 8196;     // I in the range of +/-200
 
                     // D
-                    float vario = Filter::deadband(velocity, dDeadband);
-                    pid -= Filter::constrainAbs(pidD * vario, pidMax);
-
-                    demands.throttle = Filter::constrainMinMax(initialThrottleHold + pid, throttleMargin, 1-throttleMargin);
+                    //altitudePid -= constrain(cfg.D8[PIDVEL] * (accZ_tmp + accZ_old) / 512, -150, 150);
                 }
             }
 
