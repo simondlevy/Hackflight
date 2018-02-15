@@ -28,8 +28,6 @@
 #include "debug.hpp"
 #include "datatypes.hpp"
 
-#include "pid_controllers/pid_controller.hpp"
-
 namespace hf {
 
     class Hackflight {
@@ -59,9 +57,6 @@ namespace hf {
 
             // Support for headless mode
             float    yawInitial;
-
-            // Support for additional PID controllers
-            PIDController * pidControllers = NULL;
 
             void openLoop(void)
             {
@@ -114,10 +109,7 @@ namespace hf {
 
                     auxState = receiver->demands.aux;
 
-                    for (PIDController * p = pidControllers; p; p=p->next) {
-
-                        p->handleAuxSwitch(state, receiver->demands);
-                    }
+                    board->handleAuxSwitch(state, receiver->demands);
                 }
 
                 // Set LED based on arming status
@@ -146,9 +138,7 @@ namespace hf {
                 stabilizer->updateDemands(state, demands);
 
                 // Modify demands based on extra PID controllers
-                for (PIDController * p = pidControllers; p; p=p->next) {
-                    p->updateDemands(state, demands, board->getMicroseconds());
-                }
+                board->runPidControllers(demands);
 
                 // Support motor testing from GCS
                 if (!state.armed) {
@@ -199,11 +189,6 @@ namespace hf {
                 stabilizer->init();
                 mixer.init(board); 
 
-                // Initialize extra PID controllers
-                for (PIDController * p = pidControllers; p; p=p->next) {
-                    p->init();
-                }
-
                 // Start unstate.armed
                 state.armed = false;
                 failsafe = false;
@@ -226,25 +211,6 @@ namespace hf {
                 }
 
             } // update
-
-            void addPidController(PIDController * pidController) 
-            {
-                if (pidControllers == NULL) {
-                    pidControllers = pidController;
-                }
-
-                else {
-                    PIDController * p = pidControllers;;
-                    while (true) {
-                        if (p == pidController) 
-                            return; // disallow repetition
-                        if (p->next == NULL)
-                            break;
-                        p = p->next;
-                    } 
-                    p->next = pidController;
-                }
-            }
 
      }; // class Hackflight
 

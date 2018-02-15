@@ -46,7 +46,12 @@ namespace hf {
             EM7180 _sentral;
 
             // Altitude-estimation task
-            AltitudeEstimator altitudeEstimator;
+            AltitudeEstimator altitudeEstimator = AltitudeEstimator(
+                    50,  // Alt P
+                    120, // Vel P
+                    45,  // Vel I
+                    1);  // Vel D
+
             Timer altitudeTimer = Timer(40);
 
         protected:
@@ -196,6 +201,16 @@ namespace hf {
                 }
 
              } // getState
+
+            void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands)
+            { 
+                altitudeEstimator.handleAuxSwitch(vehicleState, demands);
+            }
+
+            void runPidControllers(demands_t & demands) 
+            {
+                (void)demands;
+            }
 
     }; // class Ladybug
 

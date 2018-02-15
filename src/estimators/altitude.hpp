@@ -58,12 +58,51 @@ namespace hf {
             float fusedAlt;
             float fusedVel;
 
+            // PIDS: XXX Use uint8_t for now; eventually will be float
+            uint8_t altP;
+            uint8_t velP;
+            uint8_t velI;
+            uint8_t velD;
+
+            // State variables
+            float altHold;
+            bool holding;
+            float initialThrottleHold;  // [0,1]  
+
+            // No velocity control for now
+            bool velocityControl = false;
+
         public:
+
+            AltitudeEstimator(uint8_t _altP, uint8_t _velP, uint8_t _velI, uint8_t _velD) 
+            {
+                altP = _altP;  
+                velP = _velP;  
+                velI = _velI;  
+                velD = _velD; 
+            }
 
             void init(uint16_t imuAccel1G)
             {
                 baro.init();
                 imu.init(imuAccel1G);
+                initialThrottleHold = 0;
+                holding = false;
+            }
+
+            void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands)
+            {
+                // Start
+                if (demands.aux > 0) {
+                    holding = true;
+                    initialThrottleHold = demands.throttle;
+                    altHold = vehicleState.position.values[2];
+                }
+
+                // Stop
+                else {
+                    holding = false;
+                }
             }
 
             void updateAccel(int16_t accel[3], uint32_t currentTime)
@@ -81,10 +120,10 @@ namespace hf {
                 baro.update(pressure);
             }
 
-            void estimate(vehicle_state_t & state, uint32_t currentTime)
+            void estimate(vehicle_state_t & vehicleState, uint32_t currentTime)
             {  
                 // Calibrate baro AGL at rest
-                if (!state.armed) {
+                if (!vehicleState.armed) {
                     baro.calibrate();
                     fusedAlt = 0;
                     fusedVel = 0;
@@ -108,18 +147,45 @@ namespace hf {
                 fusedAlt += (imuVel * 0.5f) * dt + fusedVel * dt;   
                 fusedAlt = Filter::complementary(fusedAlt, baroAlt, cfAlt);      
 
-                //printgauge(fusedAlt);
-
                 fusedVel += imuVel;
 
                 float baroVel = baro.getVelocity(currentTime);
 
                 fusedVel = Filter::complementary(fusedVel, baroVel, cfVel);
-            
-                state.position.values[2] = fusedAlt;
-                state.position.derivs[2] = fusedVel;
 
-            }
+                vehicleState.position.values[2] = fusedAlt;
+                vehicleState.position.derivs[2] = fusedVel;
+
+                if (holding) {
+
+                    int32_t setVel = 0;
+                    int32_t error = 0;
+
+                    // Altitude P-Controller
+                    if (!velocityControl) {
+                        error = Filter::constrainAbs(altHold - vehicleState.position.values[2], 500);
+                        error = Filter::deadband(error, 10);       // remove small P parametr to reduce noise near zero position
+                        setVel = Filter::constrainAbs((altP * error / 128), 300); // limit velocity to +/- 3 m/s
+                    } else {
+                        //setVel = setVelocity;
+                    }
+
+                    // Velocity PID-Controller
+                    // P
+                    error = setVel - fusedVel;
+                    //altitudePid = constrain((cfg.P8[PIDVEL] * error / 32), -300, +300);
+                    //if (vehicleState.armed) printgauge(error);
+
+                    // I
+                    //errorVelocityI += (cfg.I8[PIDVEL] * error);
+                    //errorVelocityI = constrain(errorVelocityI, -(8196 * 200), (8196 * 200));
+                    //altitudePid += errorVelocityI / 8196;     // I in the range of +/-200
+
+                    // D
+                    //altitudePid -= constrain(cfg.D8[PIDVEL] * (accZ_tmp + accZ_old) / 512, -150, 150);
+                }
+
+            } // estimate
 
     }; // class AltitudeEstimator
 

@@ -34,6 +34,11 @@ namespace hf {
             virtual uint32_t getMicroseconds() = 0;
             virtual void     writeMotor(uint8_t index, float value) = 0;
 
+            //----------------------------------- Additional PID controllers --------------------------------------------
+
+            virtual void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands) { (void)vehicleState; (void)demands; }
+            virtual void runPidControllers(demands_t & demands) { (void)demands; }
+
             //----------------------------------------- Safety ----------------------------------------------------------
             virtual void showArmedStatus(bool armed) { (void)armed; }
 

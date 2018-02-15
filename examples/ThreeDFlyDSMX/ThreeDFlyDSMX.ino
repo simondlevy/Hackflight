@@ -39,19 +39,8 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
                 1.0625f,    // Gyro yaw P
                 0.005625f); // Gyro yaw I
 
-// Additional PID controllers
-#include <pid_controllers/altitude_hold.hpp>
-hf::AltitudeHold altitudeHold = hf::AltitudeHold(
-        50,  // Alt P
-        120, // Vel P
-        45,  // Vel I
-        1);  // Vel D
-
 void setup(void)
 {
-    // Add altithude-hold feature to Hackflight firmware
-    h.addPidController(&altitudeHold);
-
     // Initialize Hackflight firmware
     h.init(new hf::Ladybug(), &rc, &stabilizer);
 }
