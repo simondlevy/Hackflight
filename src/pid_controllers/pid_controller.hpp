@@ -31,13 +31,9 @@ namespace hf {
 
         protected: 
 
-            float pidP;
-            float pidI;
-            float pidD;
-
             bool  holding;
 
-            PIDController(float _pidP, float _pidI, float _pidD) : pidP(_pidP), pidI(_pidI), pidD(_pidD)
+            PIDController(void)
             {
                 next = NULL;
             }

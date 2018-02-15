@@ -41,7 +41,11 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
 
 // Additional PID controllers
 #include <pid_controllers/altitude_hold.hpp>
-hf::AltitudeHold altitudeHold = hf::AltitudeHold(0.1f, 0.02f, 1.7f);
+hf::AltitudeHold altitudeHold = hf::AltitudeHold(
+        50,  // Alt P
+        120, // Vel P
+        45,  // Vel I
+        1);  // Vel D
 
 void setup(void)
 {

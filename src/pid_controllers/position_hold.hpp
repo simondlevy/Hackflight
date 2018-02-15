@@ -39,7 +39,7 @@ namespace hf {
 
         public:
 
-            PositionHold(float _pidP, float _pidI, float _pidD) : PIDController(_pidP, _pidI, _pidD) 
+            PositionHold(float _pidP, float _pidI, float _pidD) : PIDController()
             {
             }
 
@@ -70,6 +70,7 @@ namespace hf {
 
             void updateDemands(vehicle_state_t & vehicleState, demands_t & demands, uint32_t currentTime)
             {
+                /*
                 // Refresh the timer
                 uint32_t dtime = getDeltaTime(currentTime);
 
@@ -96,7 +97,7 @@ namespace hf {
 
                     demands.roll  += pid[1];
                     demands.pitch += pid[0];
-                }
+                }*/
             }
 
             private:

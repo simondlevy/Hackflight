@@ -33,15 +33,11 @@ namespace hf {
 
         private: 
 
-            // Bounds
-            const float pDeadband = 0.01f;
-            const float dDeadband = 0.1f;
-            const float pidMax    = 4.0f;
-            const float pErrorMax = 4.0f;
-            const float iErrorMax = 8.0f;
-
-            // Keeps PID adjustment inside range
-            const float throttleMargin = 0.15f;
+            // XXX Use uint8_t for now; eventually will be float
+            uint8_t _altP;
+            uint8_t _velP;
+            uint8_t _velI;
+            uint8_t _velD;
 
             // State variables
             float altHold;
@@ -54,7 +50,13 @@ namespace hf {
 
         public:
 
-            AltitudeHold(float _pidP, float _pidI, float _pidD) : PIDController(_pidP, _pidI, _pidD) { }
+            AltitudeHold(uint8_t altP, uint8_t velP, uint8_t velI, uint8_t velD) : PIDController()
+            {
+                _altP = altP;  
+                _velP = velP;  
+                _velI = velI;  
+                _velD = velD; 
+            }
 
             void init(void)
             {
@@ -86,12 +88,14 @@ namespace hf {
 
                 if (holding) {
 
+                    int32_t setVel = 0;
+
                     // Altitude P-Controller
                     if (!velocityControl) {
                         int32_t error = Filter::constrainAbs(altHold - vehicleState.position.values[2], 500);
                         error = Filter::deadband(error, 10);       // remove small P parametr to reduce noise near zero position
-                        //printgauge(error);
-                        //setVel = constrain((cfg.P8[PIDALT] * error / 128), -300, +300); // limit velocity to +/- 3 m/s
+                        setVel = Filter::constrainAbs((_altP * error / 128), 300); // limit velocity to +/- 3 m/s
+                        //if (vehicleState.armed) printgauge(setVel);
                     } else {
                         //setVel = setVelocity;
                     }
