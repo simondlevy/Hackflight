@@ -53,6 +53,7 @@ namespace hf {
             float _verticalSpeedPrev; // meters per second
             float _eulerAngles[3];
             float _gyroRates[3];
+            float _position[3];
             float _translationRates[3];
             float _motors[4];         // arbitrary in [0,1]
 
@@ -108,6 +109,7 @@ namespace hf {
                 memset(_motors, 0, 4*sizeof(float));
                 memset(_eulerAngles, 0, 3*sizeof(float));
                 memset(_gyroRates, 0, 3*sizeof(float));
+                memset(_position, 0, 3*sizeof(float));
 
                 _flying = false;
                 _verticalSpeedPrev = 0;
@@ -143,11 +145,16 @@ namespace hf {
                 if (_flying) {
 
                     // Integrate vertical force to get vertical speed
-                    _gyroRates[2] += (lift * deltaSeconds);
+                    _translationRates[2] += (lift * deltaSeconds);
 
                     // To get forward and lateral speeds, integrate thrust along vehicle coordinates
-                    _gyroRates[0] += thrust * deltaSeconds * sin(theta);
-                    _gyroRates[1] += thrust * deltaSeconds * sin(phi);
+                    _translationRates[0] += thrust * deltaSeconds * sin(theta);
+                    _translationRates[1] += thrust * deltaSeconds * sin(phi);
+                }
+
+                // Integrate speed to get position 
+                for (int8_t k=0; k<3; ++k) {
+                    _position[k] += _translationRates[k] * deltaSeconds;
                 }
 
                 // Reset everything if we hit the ground
@@ -162,7 +169,7 @@ namespace hf {
 
                 // Differentiate vertical speed to get vertical acceleration in meters per second, then convert to Gs.
                 // Resting = 1G; freefall = 0; climbing = >1G
-                _verticalSpeedPrev = _gyroRates[2];
+                _verticalSpeedPrev = _translationRates[2];
             }
 
             float motorsToAngularVelocity(int a, int b, int c, int d)
