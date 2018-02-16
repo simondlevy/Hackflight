@@ -53,8 +53,8 @@ to support each of these components.  The
 [Board](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp)
 class specifies a set of four abstract (pure virtual) methods that you must
 implement for a particular flight controller or simulator: initializing the
-board, getting the current time in microseconds, getting the vehicle state from the IMU,
-and sending commands to the motors.  The
+board; getting the current time in microseconds; getting Euler angles and
+gyrometer rates from the IMU; and sending commands to the motors.  The
 [Receiver](https://github.com/simondlevy/Hackflight/blob/master/src/receiver.hpp)
 class performs basic functions associated with R/C control (tracking stick
 positions, checking switches) and specifies a set of abstract methods that you
