@@ -28,21 +28,22 @@
 #include "debug.hpp"
 #include "datatypes.hpp"
 
-static void printgauge(float x)
-{
-    char c = x<0 ? '-' : '+';
-    for (uint8_t k=0; k<abs(x); ++k) {
-        printf("%c", c);
-    }
-    printf("\n");
-}
-
 
 namespace hf {
 
     class AltitudeEstimator {
 
         private: 
+
+            // XXX for debugging
+            static void printgauge(float x)
+            {
+                char c = x<0 ? '-' : '+';
+                for (uint8_t k=0; k<abs(x); ++k) {
+                    printf("%c", c);
+                }
+                printf("\n");
+            }
 
             // Complementry filter for accel/baro
             const float    cfAlt  = 0.965f;
@@ -90,13 +91,13 @@ namespace hf {
                 holding = false;
             }
 
-            void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands)
+            void handleAuxSwitch(demands_t & demands)
             {
                 // Start
                 if (demands.aux > 0) {
                     holding = true;
                     initialThrottleHold = demands.throttle;
-                    altHold = vehicleState.position.values[2];
+                    altHold = fusedAlt;
                 }
 
                 // Stop
@@ -120,10 +121,10 @@ namespace hf {
                 baro.update(pressure);
             }
 
-            void estimate(vehicle_state_t & vehicleState, uint32_t currentTime)
+            void estimate(bool armed, uint32_t currentTime)
             {  
                 // Calibrate baro AGL at rest
-                if (!vehicleState.armed) {
+                if (!armed) {
                     baro.calibrate();
                     fusedAlt = 0;
                     fusedVel = 0;
@@ -153,9 +154,6 @@ namespace hf {
 
                 fusedVel = Filter::complementary(fusedVel, baroVel, cfVel);
 
-                vehicleState.position.values[2] = fusedAlt;
-                vehicleState.position.derivs[2] = fusedVel;
-
                 if (holding) {
 
                     int32_t setVel = 0;
@@ -163,7 +161,7 @@ namespace hf {
 
                     // Altitude P-Controller
                     if (!velocityControl) {
-                        error = Filter::constrainAbs(altHold - vehicleState.position.values[2], 500);
+                        error = Filter::constrainAbs(altHold - fusedAlt, 500);
                         error = Filter::deadband(error, 10);       // remove small P parametr to reduce noise near zero position
                         setVel = Filter::constrainAbs((altP * error / 128), 300); // limit velocity to +/- 3 m/s
                     } else {
@@ -174,7 +172,6 @@ namespace hf {
                     // P
                     error = setVel - fusedVel;
                     //altitudePid = constrain((cfg.P8[PIDVEL] * error / 32), -300, +300);
-                    //if (vehicleState.armed) printgauge(error);
 
                     // I
                     //errorVelocityI += (cfg.I8[PIDVEL] * error);

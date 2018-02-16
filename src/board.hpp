@@ -30,21 +30,20 @@ namespace hf {
 
             //------------------------------------ Core functionality ----------------------------------------------------
             virtual void     init(void) = 0;
-            virtual void     getState(vehicle_state_t & state) = 0;
+            virtual void     getImu(float eulerAngles[3], float gyroRates[3]) = 0;
             virtual uint32_t getMicroseconds() = 0;
             virtual void     writeMotor(uint8_t index, float value) = 0;
 
             //----------------------------------- Additional PID controllers --------------------------------------------
-
-            virtual void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands) { (void)vehicleState; (void)demands; }
-            virtual void runPidControllers(demands_t & demands) { (void)demands; }
+            virtual void handleAuxSwitch(demands_t & demands) { (void)demands; }
+            virtual void runPidControllers(bool armed, demands_t & demands) { (void)armed; (void)demands; }
 
             //----------------------------------------- Safety ----------------------------------------------------------
             virtual void showArmedStatus(bool armed) { (void)armed; }
 
             //---------------------------------- Serial communications  -------------------------------------------------
-            virtual void doSerialComms(vehicle_state_t * state, class Receiver * receiver, class Mixer * mixer)  
-            { (void)state; (void)receiver; (void)mixer; }
+            virtual void doSerialComms(float eulerAngles[3], bool armed, class Receiver * receiver, class Mixer * mixer)  
+            { (void)eulerAngles; (void)armed; (void)receiver; (void)mixer; }
 
             //--------------------------------------- Debugging ---------------------------------------------------------
             static void  outbuf(char * buf);

@@ -66,10 +66,10 @@ namespace hf {
                 ledSet(armed);
             }
 
-            void doSerialComms(vehicle_state_t * state, class Receiver * receiver, class Mixer * mixer) 
+            void doSerialComms(float eulerAngles[3], bool armed, class Receiver * receiver, class Mixer * mixer) 
             {
                 while (serialAvailableBytes()) {
-                    msp.update(serialReadByte(), state, receiver, mixer);
+                    msp.update(serialReadByte(), eulerAngles, armed, receiver, mixer);
                 }
 
                 while (msp.availableBytes() > 0) {

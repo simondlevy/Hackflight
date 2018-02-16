@@ -148,18 +148,18 @@ namespace hf {
                 resetIntegral();
             }
 
-            void updateDemands(vehicle_state_t & state, demands_t & demands)
+            void updateDemands(float eulerAngles[3], float gyroRates[3], demands_t & demands)
             {
                 // Compute proportion of cyclic demand compared to its maximum
                 float prop = Filter::max(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
 
                 // Pitch, roll use leveling based on Euler angles
-                demands.roll  = computeCyclicPid(demands.roll,  prop, state.orientation.values, state.orientation.derivs, AXIS_ROLL);
-                demands.pitch = computeCyclicPid(demands.pitch, prop, state.orientation.values, state.orientation.derivs, AXIS_PITCH);
+                demands.roll  = computeCyclicPid(demands.roll,  prop, eulerAngles, gyroRates, AXIS_ROLL);
+                demands.pitch = computeCyclicPid(demands.pitch, prop, eulerAngles, gyroRates, AXIS_PITCH);
 
                 // For gyroYaw, P term comes directly from RC command, and D term is zero
-                float ITermGyroYaw = computeITermGyro(_gyroYawP, _gyroYawI, demands.yaw, state.orientation.derivs, AXIS_YAW);
-                demands.yaw = computePid(_gyroYawP, demands.yaw, ITermGyroYaw, 0, state.orientation.derivs, AXIS_YAW);
+                float ITermGyroYaw = computeITermGyro(_gyroYawP, _gyroYawI, demands.yaw, gyroRates, AXIS_YAW);
+                demands.yaw = computePid(_gyroYawP, demands.yaw, ITermGyroYaw, 0, gyroRates, AXIS_YAW);
 
                 // Prevent "gyroYaw jump" during gyroYaw correction
                 demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));

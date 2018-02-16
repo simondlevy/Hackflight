@@ -47,7 +47,9 @@ namespace hf {
             Mixer      mixer;
 
             // Vehicle state
-            vehicle_state_t state;
+            float eulerAngles[3];
+            float gyroRates[3];
+            bool armed;
 
             // Auxiliary switch state for change detection
             uint8_t  auxState;
@@ -61,7 +63,7 @@ namespace hf {
             void openLoop(void)
             {
                 // Update Receiver demands, passing yaw angle for headless mode
-                receiver->update(state.orientation.values[AXIS_YAW] - yawInitial);
+                receiver->update(eulerAngles[AXIS_YAW] - yawInitial);
 
                 // When landed, reset integral component of PID
                 if (receiver->throttleIsDown()) {
@@ -72,12 +74,12 @@ namespace hf {
                 if (receiver->changed()) {
 
                     // actions during armed
-                    if (state.armed) {      
+                    if (armed) {      
 
                         // Disarm
                         if (receiver->disarming()) {
-                            if (state.armed) {
-                                state.armed = false;
+                            if (armed) {
+                                armed = false;
                             }
                         }
                     } 
@@ -93,9 +95,9 @@ namespace hf {
                                 auxState = receiver->demands.aux;
 
                                 if (!auxState) // aux switch must be in zero position
-                                    if (!state.armed) {
-                                        yawInitial = state.orientation.values[AXIS_YAW];
-                                        state.armed = true;
+                                    if (!armed) {
+                                        yawInitial = eulerAngles[AXIS_YAW];
+                                        armed = true;
                                     }
                             }
                         }
@@ -109,14 +111,14 @@ namespace hf {
 
                     auxState = receiver->demands.aux;
 
-                    board->handleAuxSwitch(state, receiver->demands);
+                    board->handleAuxSwitch(receiver->demands);
                 }
 
                 // Set LED based on arming status
-                board->showArmedStatus(state.armed);
+                board->showArmedStatus(armed);
 
                 // Do serial comms
-                board->doSerialComms(&state, receiver, &mixer);
+                board->doSerialComms(eulerAngles, armed, receiver, &mixer);
 
             } // openLoop
 
@@ -126,22 +128,22 @@ namespace hf {
                 demands_t demands;
                 memcpy(&demands, &receiver->demands, sizeof(demands_t));
 
-                // Get vehicle state (minimally, Euler angles and gyro angular velocities) from board
-                board->getState(state);
+                // Get Euler angles, gyro rates from board
+                board->getImu(eulerAngles, gyroRates);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (state.orientation.values[AXIS_YAW] < 0) {
-                    state.orientation.values[AXIS_YAW] += 2*M_PI;
+                if (eulerAngles[AXIS_YAW] < 0) {
+                    eulerAngles[AXIS_YAW] += 2*M_PI;
                 }
 
                 // Run stabilization to get updated demands
-                stabilizer->updateDemands(state, demands);
+                stabilizer->updateDemands(eulerAngles, gyroRates, demands);
 
                 // Modify demands based on extra PID controllers
-                board->runPidControllers(demands);
+                board->runPidControllers(armed, demands);
 
                 // Support motor testing from GCS
-                if (!state.armed) {
+                if (!armed) {
                     mixer.runDisarmed();
                 }
 
@@ -156,9 +158,9 @@ namespace hf {
                 }
 
                 // Failsafe
-                if (state.armed && receiver->lostSignal()) {
+                if (armed && receiver->lostSignal()) {
                     mixer.cutMotors();
-                    state.armed = false;
+                    armed = false;
                     failsafe = true;
                     board->showArmedStatus(false);
                 }
@@ -167,7 +169,7 @@ namespace hf {
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(state.orientation.values[axis]) < stabilizer->maxArmingAngle;
+                return fabs(eulerAngles[axis]) < stabilizer->maxArmingAngle;
             }
 
         public:
@@ -189,8 +191,8 @@ namespace hf {
                 stabilizer->init();
                 mixer.init(board); 
 
-                // Start unstate.armed
-                state.armed = false;
+                // Start unarmed
+                armed = false;
                 failsafe = false;
 
             } // init

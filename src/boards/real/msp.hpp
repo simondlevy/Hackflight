@@ -153,11 +153,11 @@ namespace hf {
                 c_state = IDLE;
             }
 
-            void update(uint8_t c, vehicle_state_t * state, Receiver * receiver, Mixer * mixer)
+            void update(uint8_t c, float eulerAngles[3], bool armed, Receiver * receiver, Mixer * mixer)
             {
                 if (c_state == IDLE) {
                     c_state = (c == '$') ? HEADER_START : IDLE;
-                    if (c_state == IDLE && !state->armed) {
+                    if (c_state == IDLE && !armed) {
                     }
                 } else if (c_state == HEADER_START) {
                     c_state = (c == 'M') ? HEADER_M : IDLE;
@@ -202,10 +202,6 @@ namespace hf {
 
                             case MSP_ATTITUDE_RADIANS: 
                                 {
-                                    float eulerAngles[3];
-                                    for (uint8_t k=0; k<3; ++k) {
-                                        eulerAngles[k] = state->orientation.values[k];
-                                    }
                                     outBufSize = 0;
                                     outBufIndex = 0;
                                     serializeFloats(eulerAngles, 3);

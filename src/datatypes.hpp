@@ -30,20 +30,3 @@ typedef struct {
     uint8_t aux;
 
 } demands_t;
-
-typedef struct {
-
-    float values[3];
-    float derivs[3];
-
-} stateval_t;
-
-typedef struct {
-
-    stateval_t position;    // X, Y, Z
-
-    stateval_t orientation; // roll, pitch, yaw
-
-    bool armed;
-
-} vehicle_state_t;

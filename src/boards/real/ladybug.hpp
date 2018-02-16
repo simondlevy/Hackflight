@@ -39,7 +39,7 @@ namespace hf {
 
             uint8_t _motorPins[4] = {13, A2, 3, 11};
 
-            float _eulerAnglesRadians[3];
+            float _eulerAngles[3];
 
             float gyroAdcToRadians = M_PI * (float)GYRO_RES / (1<<15) / 180.;  
 
@@ -139,7 +139,7 @@ namespace hf {
                 avalPrev[index] = aval;
             }
 
-            void getState(vehicle_state_t & state)
+            void getImu(float eulerAngles[3], float gyroRates[3])
             {
                 _sentral.checkEventStatus();
 
@@ -160,9 +160,9 @@ namespace hf {
                     float roll  = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
 
                     // Also store Euler angles for extrasUpdateAccelZ()
-                    state.orientation.values[0] = _eulerAnglesRadians[0] = roll;
-                    state.orientation.values[1] = _eulerAnglesRadians[1] = -pitch; // compensate for IMU orientation
-                    state.orientation.values[2] = _eulerAnglesRadians[2] = yaw;
+                    eulerAngles[0] = _eulerAngles[0] = roll;
+                    eulerAngles[1] = _eulerAngles[1] = -pitch; // compensate for IMU orientation
+                    eulerAngles[2] = _eulerAngles[2] = yaw;
                 }
 
                 if (_sentral.gotGyrometer()) {
@@ -176,10 +176,10 @@ namespace hf {
                     gyro[2] = -gyro[2];
 
                     for (uint8_t k=0; k<3; ++k) {
-                        state.orientation.derivs[k] = gyro[k] * gyroAdcToRadians;
+                        gyroRates[k] = gyro[k] * gyroAdcToRadians;
                     }
 
-                    altitudeEstimator.updateGyro(state.orientation.derivs, micros());
+                    altitudeEstimator.updateGyro(gyroRates, micros());
                 }
 
                 if (_sentral.gotAccelerometer()) {
@@ -196,19 +196,19 @@ namespace hf {
                     altitudeEstimator.updateBaro(pressure);
                 }
 
-                if (altitudeTimer.checkAndUpdate(micros())) {
-                    altitudeEstimator.estimate(state, micros());
-                }
-
              } // getState
 
-            void handleAuxSwitch(vehicle_state_t & vehicleState, demands_t & demands)
+            void handleAuxSwitch(demands_t & demands)
             { 
-                altitudeEstimator.handleAuxSwitch(vehicleState, demands);
+                altitudeEstimator.handleAuxSwitch(demands);
             }
 
-            void runPidControllers(demands_t & demands) 
+            void runPidControllers(bool armed, demands_t & demands) 
             {
+                if (altitudeTimer.checkAndUpdate(micros())) {
+                    altitudeEstimator.estimate(armed, micros());
+                }
+
                 (void)demands;
             }
 

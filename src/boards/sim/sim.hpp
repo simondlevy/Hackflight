@@ -51,12 +51,10 @@ namespace hf {
 
             // Private state variables ----------------------------
             float _verticalSpeedPrev; // meters per second
+            float _eulerAngles[3];
+            float _gyroRates[3];
+            float _translationRates[3];
             float _motors[4];         // arbitrary in [0,1]
-
-            vehicle_state_t _vehicleState;
-
-            //AltitudeEstimator   altitudeEstimator;
-            //Timer altitudeTimer = Timer(40);
 
             //float _baroPressure;      // millibars
             bool  _flying;
@@ -69,10 +67,10 @@ namespace hf {
 
             // accessor available to simulators -----------------------------------------------
 
-            void simGetVehicleState(vehicle_state_t * vehicleState, float motors[4])
+            void simGetVehicleState(float gyroRates[3], float translationRates[3], float motors[4])
             {
-                memcpy(vehicleState, &_vehicleState, sizeof(vehicle_state_t));
-
+                memcpy(gyroRates, _gyroRates, 3*sizeof(float));
+                memcpy(translationRates, _translationRates, 3*sizeof(float));
                 memcpy(motors, _motors, 4*sizeof(float));
             }
 
@@ -82,18 +80,15 @@ namespace hf {
             {
                 _secondsPrev = 0;
                 initPhysics();
-
-                // Initialize the atitude estimator
-                //altitudeEstimator.init(this);
             }
 
-            void getState(vehicle_state_t & vehicleState)
+            void getImu(float eulerAngles[3], float gyroRates[3])
             {
-                memcpy(&vehicleState.position, &_vehicleState.position, sizeof(stateval_t));
-                memcpy(&vehicleState.orientation, &_vehicleState.orientation, sizeof(stateval_t));
-
                 // Sync physics update to IMU acquisition by Hackflight
                 updatePhysics();
+
+                memcpy(eulerAngles, _eulerAngles, 3*sizeof(float));
+                memcpy(gyroRates, _gyroRates, 3*sizeof(float));
             }
 
             uint32_t getMicroseconds()
@@ -110,30 +105,27 @@ namespace hf {
 
             void initPhysics(void)
             {
-                memset(&_vehicleState, 0, sizeof(_vehicleState));
-
-                for (uint8_t k=0; k<4; ++k) {
-                    _motors[k] = 0;
-                }
+                memset(_motors, 0, 4*sizeof(float));
+                memset(_eulerAngles, 0, 3*sizeof(float));
+                memset(_gyroRates, 0, 3*sizeof(float));
 
                 _flying = false;
-                _vehicleState.position.values[2] = 0;
                 _verticalSpeedPrev = 0;
             }
 
             void updatePhysics(void)
             {
                 // Compute body-frame roll, pitch, yaw velocities based on differences between motors
-                _vehicleState.orientation.derivs[0] = motorsToAngularVelocity(2, 3, 0, 1);
-                _vehicleState.orientation.derivs[1] = motorsToAngularVelocity(1, 3, 0, 2); 
-                _vehicleState.orientation.derivs[2] = motorsToAngularVelocity(1, 2, 0, 3); 
+                _gyroRates[0] = motorsToAngularVelocity(2, 3, 0, 1);
+                _gyroRates[1] = motorsToAngularVelocity(1, 3, 0, 2); 
+                _gyroRates[2] = motorsToAngularVelocity(1, 2, 0, 3); 
 
                 // Overall thrust vector, scaled by arbitrary constant for realism
                 float thrust = THRUST_SCALE * (_motors[0] + _motors[1] + _motors[2] + _motors[3]);
 
                 // Rename Euler angles to familiar Greek-letter variables
-                float phi   = _vehicleState.orientation.values[0];
-                float theta = _vehicleState.orientation.values[1];
+                float phi   = _eulerAngles[0];
+                float theta = _eulerAngles[1];
 
                 // Overall vertical force = thrust - gravity
                 float lift = cos(phi)*cos(theta)*thrust - GRAVITY;
@@ -151,31 +143,26 @@ namespace hf {
                 if (_flying) {
 
                     // Integrate vertical force to get vertical speed
-                    _vehicleState.position.derivs[2] += (lift * deltaSeconds);
+                    _gyroRates[2] += (lift * deltaSeconds);
 
                     // To get forward and lateral speeds, integrate thrust along vehicle coordinates
-                    _vehicleState.position.derivs[0] += thrust * deltaSeconds * sin(theta);
-                    _vehicleState.position.derivs[1] += thrust * deltaSeconds * sin(phi);
-                }
-
-                // Integrate speed to get position XXX ignore heading for now
-                for (int8_t k=0; k<3; ++k) {
-                    _vehicleState.position.values[k] += _vehicleState.position.derivs[k] * deltaSeconds;
+                    _gyroRates[0] += thrust * deltaSeconds * sin(theta);
+                    _gyroRates[1] += thrust * deltaSeconds * sin(phi);
                 }
 
                 // Reset everything if we hit the ground
-                if (_vehicleState.position.values[2] < 0) {
+                if (_eulerAngles[2] < 0) {
                     initPhysics();
                 }
 
-                // Update state, negating pitch
+                // Integrate gyro to get eulerAngles, negating pitch
                 for (int k=0; k<3; ++k) {
-                    _vehicleState.orientation.values[k] += ((k==1) ? -1 : +1) * _vehicleState.orientation.derivs[k] * deltaSeconds; 
+                    _eulerAngles[k] += ((k==1) ? -1 : +1) * _gyroRates[k] * deltaSeconds; 
                 }
 
                 // Differentiate vertical speed to get vertical acceleration in meters per second, then convert to Gs.
                 // Resting = 1G; freefall = 0; climbing = >1G
-                _verticalSpeedPrev = _vehicleState.position.derivs[2];
+                _verticalSpeedPrev = _gyroRates[2];
             }
 
             float motorsToAngularVelocity(int a, int b, int c, int d)
