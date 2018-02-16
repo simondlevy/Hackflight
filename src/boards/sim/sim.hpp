@@ -109,6 +109,7 @@ namespace hf {
                 memset(_motors, 0, 4*sizeof(float));
                 memset(_eulerAngles, 0, 3*sizeof(float));
                 memset(_gyroRates, 0, 3*sizeof(float));
+                memset(_translationRates, 0, 3*sizeof(float));
                 memset(_position, 0, 3*sizeof(float));
 
                 _flying = false;
