@@ -71,6 +71,7 @@ namespace hf {
             float initialThrottleHold;  // [0,1]  
             float pid;
             float errorVelocityI;
+            float accZ_old;
 
             // No velocity control for now
             bool velocityControl = false;
@@ -93,6 +94,7 @@ namespace hf {
                 holding = false;
                 pid = 0;
                 errorVelocityI = 0;
+                accZ_old = 0;
             }
 
             void handleAuxSwitch(demands_t & demands)
@@ -185,11 +187,13 @@ namespace hf {
                     errorVelocityI = Filter::constrainAbs(errorVelocityI, 8196 * 200);
                     pid += errorVelocityI / 8196;     // I in the range of +/-200
 
-                    //Debug::printf("%+d\n", (int)accZ_tmp);
+                    //Debug::printf("%+d\n", (int)accZ_old);
 
                     // D
                     //altitudePid -= Filter::constrainAbs(velD * (accZ_tmp + accZ_old) / 512, 150);
                 }
+
+                accZ_old = accZ_tmp;
 
             } // estimate
 
