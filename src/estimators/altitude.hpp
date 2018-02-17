@@ -152,9 +152,9 @@ namespace hf {
 
                 float baroVel = baro.getVelocity(currentTime);
 
-                //Debug::printf("%+d\n", (int)baroVel);
-
                 fusedVel = Filter::complementary(fusedVel, baroVel, cfVel);
+
+                //Debug::printf("%+2.2f\n", fusedVel);
 
                 if (holding) {
 
