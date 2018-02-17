@@ -121,8 +121,6 @@ namespace hf {
                 _gyroRates[1] = motorsToAngularVelocity(1, 3, 0, 2); 
                 _gyroRates[2] = motorsToAngularVelocity(1, 2, 0, 3); 
 
-                Debug::printf("%f", _gyroRates[0]);
-
                 // Overall thrust vector, scaled by arbitrary constant for realism
                 float thrust = THRUST_SCALE * (_motors[0] + _motors[1] + _motors[2] + _motors[3]);
 
