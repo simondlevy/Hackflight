@@ -75,46 +75,21 @@ namespace hf {
 
             // methods called by Hackflight -------------------------------------------------
 
+            // Init physics
             void init(void)
             {
                 _secondsPrev = 0;
-                initPhysics();
-            }
-
-            void getImu(float eulerAngles[3], float gyroRates[3])
-            {
-                // Sync physics update to IMU acquisition by Hackflight
-                updatePhysics();
-
-                memcpy(eulerAngles, _eulerAngles, 3*sizeof(float));
-                memcpy(gyroRates, _gyroRates, 3*sizeof(float));
-            }
-
-            uint32_t getMicroseconds()
-            {
-                return seconds() * 1000000;
-            }
-
-            void writeMotor(uint8_t index, float value)
-            {
-                _motors[index] = value;
-            }
-
-        private:
-
-            void initPhysics(void)
-            {
                 memset(_motors, 0, 4*sizeof(float));
                 memset(_eulerAngles, 0, 3*sizeof(float));
                 memset(_gyroRates, 0, 3*sizeof(float));
                 memset(_translationRates, 0, 3*sizeof(float));
                 memset(_position, 0, 3*sizeof(float));
-
                 _flying = false;
                 _verticalSpeedPrev = 0;
             }
 
-            void updatePhysics(void)
+            // Sync physics update to IMU acquisition
+            void getImu(float eulerAngles[3], float gyroRates[3])
             {
                 // Compute body-frame roll, pitch, yaw velocities based on differences between motors
                 _gyroRates[0] = motorsToAngularVelocity(2, 3, 0, 1);
@@ -156,11 +131,6 @@ namespace hf {
                     _position[k] += _translationRates[k] * deltaSeconds;
                 }
 
-                // Reset everything if we hit the ground
-                if (_eulerAngles[2] < 0) {
-                    initPhysics();
-                }
-
                 // Integrate gyro to get eulerAngles, negating pitch
                 for (int k=0; k<3; ++k) {
                     _eulerAngles[k] += ((k==1) ? -1 : +1) * _gyroRates[k] * deltaSeconds; 
@@ -169,7 +139,22 @@ namespace hf {
                 // Differentiate vertical speed to get vertical acceleration in meters per second, then convert to Gs.
                 // Resting = 1G; freefall = 0; climbing = >1G
                 _verticalSpeedPrev = _translationRates[2];
+
+                memcpy(eulerAngles, _eulerAngles, 3*sizeof(float));
+                memcpy(gyroRates, _gyroRates, 3*sizeof(float));
             }
+
+            uint32_t getMicroseconds()
+            {
+                return seconds() * 1000000;
+            }
+
+            void writeMotor(uint8_t index, float value)
+            {
+                _motors[index] = value;
+            }
+
+        private:
 
             float motorsToAngularVelocity(int a, int b, int c, int d)
             {
