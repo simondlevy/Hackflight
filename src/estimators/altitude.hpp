@@ -69,6 +69,7 @@ namespace hf {
             float altHold;
             bool holding;
             float initialThrottleHold;  // [0,1]  
+            float pid;
 
             // No velocity control for now
             bool velocityControl = false;
@@ -89,6 +90,7 @@ namespace hf {
                 imu.init(imuAccel1G);
                 initialThrottleHold = 0;
                 holding = false;
+                pid = 0;
             }
 
             void handleAuxSwitch(demands_t & demands)
@@ -154,8 +156,6 @@ namespace hf {
 
                 fusedVel = Filter::complementary(fusedVel, baroVel, cfVel);
 
-                //Debug::printf("%+2.2f\n", fusedVel);
-
                 if (holding) {
 
                     int32_t setVel = 0;
@@ -173,7 +173,10 @@ namespace hf {
                     // Velocity PID-Controller
                     // P
                     error = setVel - fusedVel;
-                    //altitudePid = constrain((cfg.P8[PIDVEL] * error / 32), -300, +300);
+                    pid = Filter::constrainAbs((velP * error / 32), 300);
+
+                    Debug::printf("%+d\n", (int)pid);
+
 
                     // I
                     //errorVelocityI += (cfg.I8[PIDVEL] * error);
