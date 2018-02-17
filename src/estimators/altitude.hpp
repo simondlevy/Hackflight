@@ -189,6 +189,8 @@ namespace hf {
 
                     // D
                     pid -= Filter::constrainAbs(velD * (accZ_tmp + accZ_old) / 512, 150);
+                    
+                    pid /= 500;
                 }
 
                 accZ_old = accZ_tmp;
