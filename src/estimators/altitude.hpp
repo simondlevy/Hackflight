@@ -181,8 +181,8 @@ namespace hf {
                     // I
                     errorVelocityI += (velI * error);
                     errorVelocityI = Filter::constrainAbs(errorVelocityI, 8196 * 200);
-                    //Debug::printf("%+d\n", (int)errorVelocityI);
-                    //altitudePid += errorVelocityI / 8196;     // I in the range of +/-200
+                    pid += errorVelocityI / 8196;     // I in the range of +/-200
+                    //Debug::printf("%+d\n", (int)pid);
 
                     // D
                     //altitudePid -= constrain(cfg.D8[PIDVEL] * (accZ_tmp + accZ_old) / 512, -150, 150);
