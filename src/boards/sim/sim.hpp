@@ -47,7 +47,7 @@ namespace hf {
             const float NOISE_FLOOR = 0.2;
 
             // Controls "snappiness" of response
-            const float VELOCITY_ROTATE_SCALE    = 1.75;
+            const float MOTOR_EXPONENT = 3;
 
             // Private state variables ----------------------------
             float _verticalSpeedPrev; // meters per second
@@ -121,6 +121,8 @@ namespace hf {
                 _gyroRates[1] = motorsToAngularVelocity(1, 3, 0, 2); 
                 _gyroRates[2] = motorsToAngularVelocity(1, 2, 0, 3); 
 
+                Debug::printf("%f", _gyroRates[0]);
+
                 // Overall thrust vector, scaled by arbitrary constant for realism
                 float thrust = THRUST_SCALE * (_motors[0] + _motors[1] + _motors[2] + _motors[3]);
 
@@ -173,7 +175,9 @@ namespace hf {
 
             float motorsToAngularVelocity(int a, int b, int c, int d)
             {
-                return VELOCITY_ROTATE_SCALE * ((_motors[a] + _motors[b]) - (_motors[c] + _motors[d]));
+                float v = ((_motors[a] + _motors[b]) - (_motors[c] + _motors[d]));
+
+                return (v<0 ? -1 : +1) * pow(fabs(v), MOTOR_EXPONENT);
             }
 
            float seconds()
