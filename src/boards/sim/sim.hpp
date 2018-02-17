@@ -52,12 +52,10 @@ namespace hf {
             // Private state variables ----------------------------
             float _verticalSpeedPrev; // meters per second
             float _eulerAngles[3];
-            float _gyroRates[3];
+            float _gyroRates[3];        
+            float _translationRates[3]; // local (body) frame
             float _position[3];
-            float _translationRates[3];
             float _motors[4];         // arbitrary in [0,1]
-
-            //float _baroPressure;      // millibars
             bool  _flying;
             float _secondsPrev;
 
@@ -131,7 +129,7 @@ namespace hf {
                 float theta = _eulerAngles[1];
 
                 // Overall vertical force = thrust - gravity
-                float lift = cos(phi)*cos(theta)*thrust - GRAVITY;
+                float lift = thrust - GRAVITY;
 
                 // Compute delta seconds
                 float secondsCurr = seconds();
