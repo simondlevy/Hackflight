@@ -187,10 +187,8 @@ namespace hf {
                     errorVelocityI = Filter::constrainAbs(errorVelocityI, 8196 * 200);
                     pid += errorVelocityI / 8196;     // I in the range of +/-200
 
-                    //Debug::printf("%+d\n", (int)accZ_old);
-
                     // D
-                    //altitudePid -= Filter::constrainAbs(velD * (accZ_tmp + accZ_old) / 512, 150);
+                    pid -= Filter::constrainAbs(velD * (accZ_tmp + accZ_old) / 512, 150);
                 }
 
                 accZ_old = accZ_tmp;
