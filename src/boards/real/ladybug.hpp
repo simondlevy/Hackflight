@@ -209,7 +209,7 @@ namespace hf {
                     altitudeEstimator.estimate(armed, micros());
                 }
 
-                (void)demands;
+                altitudeEstimator.modifyDemands(demands);
             }
 
     }; // class Ladybug

@@ -197,6 +197,14 @@ namespace hf {
 
             } // estimate
 
+            void modifyDemands(demands_t & demands)
+            {
+                if (holding) {
+
+                    demands.throttle = initialThrottleHold+pid;
+                }
+            }
+
     }; // class AltitudeEstimator
 
 } // namespace hf
