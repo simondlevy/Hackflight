@@ -70,6 +70,7 @@ namespace hf {
             bool holding;
             float initialThrottleHold;  // [0,1]  
             float pid;
+            float errorVelocityI;
 
             // No velocity control for now
             bool velocityControl = false;
@@ -91,6 +92,7 @@ namespace hf {
                 initialThrottleHold = 0;
                 holding = false;
                 pid = 0;
+                errorVelocityI = 0;
             }
 
             void handleAuxSwitch(demands_t & demands)
@@ -100,6 +102,7 @@ namespace hf {
                     holding = true;
                     initialThrottleHold = demands.throttle;
                     altHold = fusedAlt;
+                    errorVelocityI = 0;
                 }
 
                 // Stop
@@ -175,12 +178,10 @@ namespace hf {
                     error = setVel - fusedVel;
                     pid = Filter::constrainAbs((velP * error / 32), 300);
 
-                    Debug::printf("%+d\n", (int)pid);
-
-
                     // I
-                    //errorVelocityI += (cfg.I8[PIDVEL] * error);
-                    //errorVelocityI = constrain(errorVelocityI, -(8196 * 200), (8196 * 200));
+                    errorVelocityI += (velI * error);
+                    errorVelocityI = Filter::constrainAbs(errorVelocityI, 8196 * 200);
+                    //Debug::printf("%+d\n", (int)errorVelocityI);
                     //altitudePid += errorVelocityI / 8196;     // I in the range of +/-200
 
                     // D
