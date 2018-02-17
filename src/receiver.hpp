@@ -40,8 +40,6 @@ namespace hf {
             const float throttleMid  = 0.50f;
             const float throttleExpo = 0.20f;
 
-            const float headless     = true;
-
             uint8_t commandDelay;     // cycles since most recent movement
 
             float adjustCommand(float command, uint8_t channel)
@@ -120,6 +118,9 @@ namespace hf {
             float _trimYaw;
 
         public:
+
+            // Default to headless mode for novices
+            float headless = true;
 
             float   rawvals[CHANNELS];  // raw [-1,+1] from receiver, for MSP
 
