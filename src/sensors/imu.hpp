@@ -49,6 +49,7 @@ namespace hf {
             int accSumCount;
             int32_t accZoffset;
             float accZsmooth;
+            float accZ_tmp;
             bool ready;
 
             // Rotate Estimated vector(s) with small angle approximation, according to the gyro data
@@ -163,7 +164,7 @@ namespace hf {
             float getVerticalVelocity(void)
             {
                 // Integrator - velocity, cm/sec
-                float accZ_tmp = (float)accSumZ / (float)accSumCount;
+                accZ_tmp = (float)accSumZ / (float)accSumCount;
 
                 // Skip startup transient
                 float vel_acc = ready ? accZ_tmp * accVelScale * (float)accTimeSum : 0;
@@ -173,6 +174,11 @@ namespace hf {
                 ready = true;
 
                 return vel_acc;
+            }
+
+            float getVerticalAcceleration(void)
+            {
+                return accZ_tmp;
             }
 
             void updateAccel(int16_t _accADC[3], uint32_t currentTime)

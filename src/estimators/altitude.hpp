@@ -159,6 +159,8 @@ namespace hf {
 
                 fusedVel = Filter::complementary(fusedVel, baroVel, cfVel);
 
+                float accZ_tmp = imu.getVerticalAcceleration();
+
                 if (holding) {
 
                     int32_t setVel = 0;
@@ -182,10 +184,11 @@ namespace hf {
                     errorVelocityI += (velI * error);
                     errorVelocityI = Filter::constrainAbs(errorVelocityI, 8196 * 200);
                     pid += errorVelocityI / 8196;     // I in the range of +/-200
-                    //Debug::printf("%+d\n", (int)pid);
+
+                    //Debug::printf("%+d\n", (int)accZ_tmp);
 
                     // D
-                    //altitudePid -= constrain(cfg.D8[PIDVEL] * (accZ_tmp + accZ_old) / 512, -150, 150);
+                    //altitudePid -= Filter::constrainAbs(velD * (accZ_tmp + accZ_old) / 512, 150);
                 }
 
             } // estimate
