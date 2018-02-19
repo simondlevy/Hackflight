@@ -46,6 +46,8 @@ namespace hf {
             EM7180 _sentral;
 
             // Altitude-estimation task
+            // NB: Try ALT P 50; VEL PID 50;5;30
+            // based on https://github.com/betaflight/betaflight/issues/1003 (Glowhead comment at bottom)
             AltitudeEstimator altitudeEstimator = AltitudeEstimator(
                     15,  // Alt P
                     15,  // Vel P

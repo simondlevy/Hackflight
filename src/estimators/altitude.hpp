@@ -105,6 +105,7 @@ namespace hf {
                     initialThrottleHold = demands.throttle;
                     altHold = fusedAlt;
                     errorVelocityI = 0;
+                    accZ_old = 0;
                 }
 
                 // Stop
@@ -190,7 +191,7 @@ namespace hf {
                     // D
                     pid -= Filter::constrainAbs(velD * (accZ_tmp + accZ_old) / 512, 150);
                     
-                    pid /= 500;
+                    pid /= 500; // scale down to [-1,+1]
                 }
 
                 accZ_old = accZ_tmp;
