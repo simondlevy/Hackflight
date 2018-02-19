@@ -47,9 +47,9 @@ namespace hf {
 
             // Altitude-estimation task
             AltitudeEstimator altitudeEstimator = AltitudeEstimator(
-                    50,  // Alt P
-                    120, // Vel P
-                    45,  // Vel I
+                    15,  // Alt P
+                    15,  // Vel P
+                    15,  // Vel I
                     1);  // Vel D
 
             Timer altitudeTimer = Timer(40);

@@ -142,6 +142,8 @@ namespace hf {
                 // Modify demands based on extra PID controllers
                 board->runPidControllers(armed, demands);
 
+                //Debug::printf("%2.2f\n", demands.throttle);
+
                 // Support motor testing from GCS
                 if (!armed) {
                     mixer.runDisarmed();
