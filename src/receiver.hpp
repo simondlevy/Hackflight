@@ -119,8 +119,8 @@ namespace hf {
 
         public:
 
-            // Default to headless mode for novices
-            float headless = true;
+            // Default to non-headless mode
+            float headless = false;
 
             float   rawvals[CHANNELS];  // raw [-1,+1] from receiver, for MSP
 
