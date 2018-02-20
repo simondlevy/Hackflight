@@ -127,7 +127,8 @@ namespace hf {
                 demands_t demands;
                 memcpy(&demands, &receiver->demands, sizeof(demands_t));
 
-                // Get Euler angles, gyro rates from board
+                // Get Euler angles, gyro rates from board. Board is responsible for ensuring that gyro
+                // is updated at an appropriate rate (5-10 times faster) with respect to Euler angles.
                 static float gyroRates[3];
                 board->getImu(eulerAngles, gyroRates);
 
