@@ -39,8 +39,6 @@ namespace hf {
 
             uint8_t _motorPins[4] = {13, A2, 3, 11};
 
-            float _eulerAngles[3];
-
             float gyroAdcToRadians = M_PI * (float)GYRO_RES / (1<<15) / 180.;  
 
             EM7180 _sentral;
@@ -157,14 +155,9 @@ namespace hf {
                     static float q[4];
                     _sentral.readQuaternions(q);
 
-                    float yaw   = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
-                    float pitch = -asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
-                    float roll  = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
-
-                    // Also store Euler angles for extrasUpdateAccelZ()
-                    eulerAngles[0] = _eulerAngles[0] = roll;
-                    eulerAngles[1] = _eulerAngles[1] = -pitch; // compensate for IMU orientation
-                    eulerAngles[2] = _eulerAngles[2] = yaw;
+                    eulerAngles[0] = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
+                    eulerAngles[1] = asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
+                    eulerAngles[2] = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
                 }
 
                 if (_sentral.gotGyrometer()) {
