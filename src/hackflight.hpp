@@ -48,6 +48,7 @@ namespace hf {
 
             // Vehicle state
             float eulerAngles[3];
+            float gyroRates[3];
             bool armed;
 
             // Auxiliary switch state for change detection
@@ -127,12 +128,7 @@ namespace hf {
                 demands_t demands;
                 memcpy(&demands, &receiver->demands, sizeof(demands_t));
 
-                // Get Euler angles, gyro rates from board. Board is responsible for ensuring that gyro
-                // is updated at an appropriate rate (5-10 times faster) with respect to Euler angles.
-                static float gyroRates[3];
-                board->getImu(eulerAngles, gyroRates);
-
-                // Convert heading from [-pi,+pi] to [0,2*pi]
+               // Convert heading from [-pi,+pi] to [0,2*pi]
                 if (eulerAngles[AXIS_YAW] < 0) {
                     eulerAngles[AXIS_YAW] += 2*M_PI;
                 }
@@ -202,7 +198,13 @@ namespace hf {
 
             void update(void)
             {
-                // Grab current time for various loops
+                // Get Euler angles, gyro rates from board. Board is responsible for ensuring that gyro
+                // is updated at an appropriate rate (5-10 times faster) with respect to Euler angles.
+                // Board can also use this routine to acquire other sensor data (barometer, accelerometer, etc.)
+                // for additional PID control.
+                board->getImu(eulerAngles, gyroRates);
+
+                 // Grab current time for loops
                 uint32_t currentTime = (uint32_t)board->getMicroseconds();
 
                 // Open (slow, "outer") loop: respond to receiver demands

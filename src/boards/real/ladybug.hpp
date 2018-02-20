@@ -37,9 +37,9 @@ namespace hf {
             static const uint16_t GYRO_RES  = 2000; // degrees per second
             static const uint16_t MAG_RES   = 2000; // Tesla
 
-            uint8_t _motorPins[4] = {13, A2, 3, 11};
+            const uint8_t _motorPins[4] = {13, A2, 3, 11};
 
-            float gyroAdcToRadians = M_PI * (float)GYRO_RES / (1<<15) / 180.;  
+            const float gyroAdcToRadians = M_PI * (float)GYRO_RES / (1<<15) / 180.;  
 
             EM7180 _sentral;
 
