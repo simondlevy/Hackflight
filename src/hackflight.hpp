@@ -48,7 +48,6 @@ namespace hf {
 
             // Vehicle state
             float eulerAngles[3];
-            float gyroRates[3];
             bool armed;
 
             // Auxiliary switch state for change detection
@@ -129,6 +128,7 @@ namespace hf {
                 memcpy(&demands, &receiver->demands, sizeof(demands_t));
 
                 // Get Euler angles, gyro rates from board
+                static float gyroRates[3];
                 board->getImu(eulerAngles, gyroRates);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
