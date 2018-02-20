@@ -52,8 +52,6 @@ namespace hf {
                     15,  // Vel I
                     1);  // Vel D
 
-            Timer altitudeTimer = Timer(40);
-
         protected:
 
             void init(void)
@@ -139,7 +137,7 @@ namespace hf {
                 avalPrev[index] = aval;
             }
 
-            void getImu(float eulerAngles[3], float gyroRates[3])
+            void getImu(bool armed, float eulerAngles[3], float gyroRates[3])
             {
                 _sentral.checkEventStatus();
 
@@ -188,22 +186,18 @@ namespace hf {
 
                     float pressure, temperature;
                     _sentral.readBarometer(pressure, temperature);
-                    altitudeEstimator.updateBaro(pressure);
+                    altitudeEstimator.updateBaro(armed, pressure, micros());
                 }
 
-             } // getState
+             } // getImu
 
             void handleAuxSwitch(demands_t & demands)
             { 
                 altitudeEstimator.handleAuxSwitch(demands);
             }
 
-            void runPidControllers(bool armed, demands_t & demands) 
+            void runPidControllers(demands_t & demands) 
             {
-                if (altitudeTimer.checkAndUpdate(micros())) {
-                    altitudeEstimator.estimate(armed, micros());
-                }
-
                 altitudeEstimator.modifyDemands(demands);
             }
 

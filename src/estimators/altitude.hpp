@@ -124,13 +124,11 @@ namespace hf {
                 imu.updateGyro(gyro, currentTime);
             }
 
-            void updateBaro(float pressure)
-            {
-                baro.update(pressure);
-            }
-
-            void estimate(bool armed, uint32_t currentTime)
+            void updateBaro(bool armed, float pressure, uint32_t currentTime)
             {  
+                // Send pressure to baro for altitude estimation
+                baro.update(pressure);
+
                 // Calibrate baro AGL at rest
                 if (!armed) {
                     baro.calibrate();
