@@ -35,8 +35,8 @@ namespace hf {
         private: 
 
             // Loop timing
-            Timer openTimer   = Timer(100);
-            Timer innerTimer  = Timer(285);
+            Timer openLoopTimer   = Timer(100);
+            Timer closedLoopTimer  = Timer(285);
 
             // Passed to Hackflight::init() for a particular board and receiver
             Board      * board;
@@ -122,7 +122,7 @@ namespace hf {
 
             } // openLoop
 
-            void innerLoop(void)
+            void closedLoop(void)
             {
                 // Start with demands from receiver
                 demands_t demands;
@@ -167,7 +167,7 @@ namespace hf {
                     board->showArmedStatus(false);
                 }
 
-            } // innerLoop
+            } // closedLoop
 
             bool safeAngle(uint8_t axis)
             {
@@ -205,13 +205,13 @@ namespace hf {
                 uint32_t currentTime = (uint32_t)board->getMicroseconds();
 
                 // Open (slow, "outer") loop: respond to receiver demands
-                if (openTimer.checkAndUpdate(currentTime)) {
+                if (openLoopTimer.checkAndUpdate(currentTime)) {
                     openLoop();
                 }
 
-                // Closed (fast, "inner") loop: respond to PID control
-                if (innerTimer.checkAndUpdate(currentTime)) {
-                    innerLoop();
+                // Closed (fast, "closed") loop: collect sensor data and run PID control
+                if (closedLoopTimer.checkAndUpdate(currentTime)) {
+                    closedLoop();
                 }
 
             } // update
