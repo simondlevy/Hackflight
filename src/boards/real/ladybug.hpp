@@ -33,11 +33,9 @@ namespace hf {
 
         private:
 
-            static const uint16_t GYRO_RES  = 2000; // degrees per second
-
             const uint8_t _motorPins[4] = {13, A2, 3, 11};
 
-            const float gyroAdcToRadians = M_PI * (float)GYRO_RES / (1<<15) / 180.;  
+            float gyroAdcToRadians;
 
             EM7180 _sentral;
 
@@ -73,6 +71,11 @@ namespace hf {
                         Serial.println(_sentral.getErrorString());
                     }
                 }
+
+                // Get actual gyro rate for conversion to radians
+                uint8_t accFs; uint16_t gyroFs; uint16_t magFs;
+                _sentral.getFullScaleRanges(accFs, gyroFs, magFs);
+                gyroAdcToRadians = M_PI * (float)gyroFs / (1<<15) / 180.;  
 
                 // Initialize the motors
                 for (int k=0; k<4; ++k) {
