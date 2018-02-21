@@ -65,12 +65,20 @@ namespace hf {
                 // Hang a bit before starting up the EM7180
                 delay(100);
 
+                // Juice up the EM7180 ODRs
+                _sentral.accelRate = 500;
+                _sentral.gyroRate = 500;
+                _sentral.baroRate = 50;
+                _sentral.qRateDivisor = 5;
+
                 // Start the EM7180 in master mode, no interrupt
                 if (!_sentral.begin()) {
                     while (true) {
                         Serial.println(_sentral.getErrorString());
                     }
                 }
+
+
 
                 // Get actual gyro rate for conversion to radians
                 uint8_t accFs; uint16_t gyroFs; uint16_t magFs;
