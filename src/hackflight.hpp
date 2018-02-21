@@ -34,9 +34,9 @@ namespace hf {
 
         private: 
 
-            // Loop timing
+            // Loop timing (Hz)
             Timer openLoopTimer   = Timer(100);
-            Timer closedLoopTimer  = Timer(285);
+            Timer closedLoopTimer = Timer(500);
 
             // Passed to Hackflight::init() for a particular board and receiver
             Board      * board;
@@ -52,13 +52,13 @@ namespace hf {
             bool armed;
 
             // Auxiliary switch state for change detection
-            uint8_t  auxState;
+            uint8_t auxState;
 
             // Safety
-            bool     failsafe;
+            bool failsafe;
 
             // Support for headless mode
-            float    yawInitial;
+            float yawInitial;
 
             void openLoop(void)
             {
