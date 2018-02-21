@@ -65,7 +65,7 @@ namespace hf {
                 // Hang a bit before starting up the EM7180
                 delay(100);
 
-                // Juice up the EM7180 ODRs
+                // Goose up the EM7180 ODRs
                 _sentral.accelRate = 500;
                 _sentral.gyroRate = 500;
                 _sentral.baroRate = 50;
@@ -77,8 +77,6 @@ namespace hf {
                         Serial.println(_sentral.getErrorString());
                     }
                 }
-
-
 
                 // Get actual gyro rate for conversion to radians
                 uint8_t accFs; uint16_t gyroFs; uint16_t magFs;
