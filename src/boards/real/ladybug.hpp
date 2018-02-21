@@ -33,9 +33,7 @@ namespace hf {
 
         private:
 
-            static const uint8_t  ACCEL_RES = 8;    // Gs
             static const uint16_t GYRO_RES  = 2000; // degrees per second
-            static const uint16_t MAG_RES   = 2000; // Tesla
 
             const uint8_t _motorPins[4] = {13, A2, 3, 11};
 
@@ -70,7 +68,7 @@ namespace hf {
                 delay(100);
 
                 // Start the EM7180 in master mode, no interrupt
-                if (!_sentral.begin(ACCEL_RES, GYRO_RES, MAG_RES)) {
+                if (!_sentral.begin()) {
                     while (true) {
                         Serial.println(_sentral.getErrorString());
                     }
