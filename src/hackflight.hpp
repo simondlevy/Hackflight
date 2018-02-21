@@ -139,8 +139,6 @@ namespace hf {
                 // Modify demands based on extra PID controllers
                 board->runPidControllers(demands);
 
-                //Debug::printf("%2.2f\n", demands.throttle);
-
                 // Support motor testing from GCS
                 if (!armed) {
                     mixer.runDisarmed();
@@ -206,14 +204,14 @@ namespace hf {
                 board->getImu(armed, eulerAngles, gyroRates);
 
                  // Grab current time for loops
-                uint32_t currentTime = (uint32_t)board->getMicroseconds();
+                uint32_t currentTime = board->getMicroseconds();
 
                 // Open (slow, "outer") loop: respond to receiver demands
                 if (openLoopTimer.checkAndUpdate(currentTime)) {
                     openLoop();
                 }
 
-                // Closed (fast, "closed") loop: collect sensor data and run PID control
+                // Closed (fast, "inner") loop: collect sensor data and run PID control
                 if (closedLoopTimer.checkAndUpdate(currentTime)) {
                     closedLoop();
                 }

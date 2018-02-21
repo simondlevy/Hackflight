@@ -89,7 +89,7 @@ namespace hf {
             }
 
             // Sync physics update to IMU acquisition
-            void getImu(float eulerAngles[3], float gyroRates[3])
+            void getImu(bool armed, float eulerAngles[3], float gyroRates[3])
             {
                 // Compute body-frame roll, pitch, yaw velocities based on differences between motors
                 _gyroRates[0] = motorsToAngularVelocity(2, 3, 0, 1);
