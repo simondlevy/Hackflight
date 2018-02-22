@@ -65,6 +65,9 @@ namespace hf {
                 // Update Receiver demands, passing yaw angle for headless mode
                 receiver->update(eulerAngles[AXIS_YAW] - yawInitial);
 
+                // Update stabilizer with cyclic demands
+                stabilizer->setCyclicDemand(receiver->demands);
+
                 // When landed, reset integral component of PID
                 if (receiver->throttleIsDown()) {
                     stabilizer->resetIntegral();

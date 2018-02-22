@@ -40,18 +40,13 @@ namespace hf {
 
     class Stabilizer {
 
-        public:
-
-            Stabilizer(float levelP, float gyroCyclicP, float gyroCyclicI, float gyroCyclicD, float gyroYawP, float gyroYawI) :
-                _levelP(levelP), 
-                _gyroCyclicP(gyroCyclicP), 
-                _gyroCyclicI(gyroCyclicI), 
-                _gyroCyclicD(gyroCyclicD), 
-                _gyroYawP(gyroYawP), 
-                _gyroYawI(gyroYawI) { }
-
-
         private: 
+
+            // Resetting thresholds for PID Integral term
+            const float gyroWindupMax           = 16.0f;
+            const float bigGyroDegreesPerSecond = 40.0f; 
+            const float bigYawDemand            = 0.1f;
+            const float maxArmingAngleDegrees   = 25.0f;         
 
             // PIDs
             float _levelP;
@@ -61,16 +56,13 @@ namespace hf {
             float _gyroYawP; 
             float _gyroYawI;
 
-            // Resetting thresholds for PID Integral term
-            const float gyroWindupMax           = 16.0f;
-            const float bigGyroDegreesPerSecond = 40.0f; 
-            const float bigYawDemand            = 0.1f;
-            const float maxArmingAngleDegrees   = 25.0f;         
-
             float lastGyro[2];
             float gyroDelta1[2]; 
             float gyroDelta2[2];
             float errorGyroI[3];
+
+            // proportion of cyclic demand compared to its maximum
+            float proportionalCyclicDemand;
 
             float bigGyroRate;
 
@@ -101,15 +93,15 @@ namespace hf {
             }
 
             // Computes leveling PID for pitch or roll
-            float computeCyclicPid( float rcCommand, float prop, float eulerAngles[3], float gyro[3], uint8_t imuAxis)
+            float computeCyclicPid(float rcCommand, float eulerAngles[3], float gyro[3], uint8_t imuAxis)
             {
                 float ITermGyro = computeITermGyro(_gyroCyclicP, _gyroCyclicI, rcCommand, gyro, imuAxis);
 
                 float PTermEuler = (rcCommand - eulerAngles[imuAxis]) * _levelP;  
 
-                float PTerm = Filter::complementary(rcCommand, PTermEuler, prop); 
+                float PTerm = Filter::complementary(rcCommand, PTermEuler, proportionalCyclicDemand); 
 
-                float ITerm = ITermGyro * prop;
+                float ITerm = ITermGyro * proportionalCyclicDemand;
 
                 float gyroDelta = gyro[imuAxis] - lastGyro[imuAxis];
                 lastGyro[imuAxis] = gyro[imuAxis];
@@ -131,6 +123,15 @@ namespace hf {
 
             float maxArmingAngle;
 
+            Stabilizer(float levelP, float gyroCyclicP, float gyroCyclicI, float gyroCyclicD, float gyroYawP, float gyroYawI) :
+                _levelP(levelP), 
+                _gyroCyclicP(gyroCyclicP), 
+                _gyroCyclicI(gyroCyclicI), 
+                _gyroCyclicD(gyroCyclicD), 
+                _gyroYawP(gyroYawP), 
+                _gyroYawI(gyroYawI) { }
+
+
             void init(void)
             {
                 // Zero-out previous values for D term
@@ -150,12 +151,9 @@ namespace hf {
 
             void updateDemands(float eulerAngles[3], float gyroRates[3], demands_t & demands)
             {
-                // Compute proportion of cyclic demand compared to its maximum
-                float prop = Filter::max(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
-
                 // Pitch, roll use leveling based on Euler angles
-                demands.roll  = computeCyclicPid(demands.roll,  prop, eulerAngles, gyroRates, AXIS_ROLL);
-                demands.pitch = computeCyclicPid(demands.pitch, prop, eulerAngles, gyroRates, AXIS_PITCH);
+                demands.roll  = computeCyclicPid(demands.roll,  eulerAngles, gyroRates, AXIS_ROLL);
+                demands.pitch = computeCyclicPid(demands.pitch, eulerAngles, gyroRates, AXIS_PITCH);
 
                 // For gyroYaw, P term comes directly from RC command, and D term is zero
                 float ITermGyroYaw = computeITermGyro(_gyroYawP, _gyroYawI, demands.yaw, gyroRates, AXIS_YAW);
@@ -163,6 +161,12 @@ namespace hf {
 
                 // Prevent "gyroYaw jump" during gyroYaw correction
                 demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));
+            }
+
+            void setCyclicDemand(demands_t & demands)
+            {
+                // Compute proportion of cyclic demand compared to its maximum
+                proportionalCyclicDemand = Filter::max(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
             }
 
             void resetIntegral(void)
