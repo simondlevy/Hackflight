@@ -51,10 +51,10 @@ Because a quadcopter build typically involves choosing a flight-control board,
 radio receiver, and model (airframe), Hackflight provides a separate C++ class
 to support each of these components.  The
 [Board](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp)
-class specifies a set of four abstract (pure virtual) methods that you must
+class specifies a set of five abstract (pure virtual) methods that you must
 implement for a particular flight controller or simulator: initializing the
-board; getting the current time in microseconds; getting Euler angles and
-gyrometer rates from the IMU; and sending commands to the motors.  The
+board; getting the current time in microseconds; getting Euler angles from the IMU;
+getting gyrometer rates from the IMU; and sending commands to the motors.  The
 [Receiver](https://github.com/simondlevy/Hackflight/blob/master/src/receiver.hpp)
 class performs basic functions associated with R/C control (tracking stick
 positions, checking switches) and specifies a set of abstract methods that you
