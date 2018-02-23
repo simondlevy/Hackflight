@@ -88,8 +88,8 @@ namespace hf {
                 _verticalSpeedPrev = 0;
             }
 
-            // Sync physics update to IMU acquisition
-            void getImu(bool armed, float eulerAngles[3], float gyroRates[3])
+            // Sync physics update to gyro acquisition
+            bool getGyroRates(float gyroRates[3])
             {
                 // Compute body-frame roll, pitch, yaw velocities based on differences between motors
                 _gyroRates[0] = motorsToAngularVelocity(2, 3, 0, 1);
@@ -140,8 +140,16 @@ namespace hf {
                 // Resting = 1G; freefall = 0; climbing = >1G
                 _verticalSpeedPrev = _translationRates[2];
 
-                memcpy(eulerAngles, _eulerAngles, 3*sizeof(float));
                 memcpy(gyroRates, _gyroRates, 3*sizeof(float));
+
+                return true;
+            }
+
+            bool getEulerAngles(float eulerAngles[3]) {
+
+                memcpy(eulerAngles, _eulerAngles, 3*sizeof(float));
+
+                return true;
             }
 
             uint32_t getMicroseconds()
