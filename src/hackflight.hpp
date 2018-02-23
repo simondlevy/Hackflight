@@ -115,6 +115,26 @@ namespace hf {
                     //board->handleAuxSwitch(receiver->demands);
                 }
 
+                // Cut motors on failsafe or throttle-down
+                if (armed) {
+
+                    if (receiver->throttleIsDown()) {
+                        mixer.cutMotors();
+                    }
+
+                    if  (receiver->lostSignal()) {
+                        mixer.cutMotors();
+                        armed = false;
+                        failsafe = true;
+                        board->showArmedStatus(false);
+                    }
+                }
+
+                // Support motor testing from GCS
+                else {
+                    mixer.runDisarmed();
+                }
+
                 // Set LED based on arming status
                 board->showArmedStatus(armed);
 
@@ -179,27 +199,9 @@ namespace hf {
                     // Modify demands based on extra PID controllers
                     //board->runPidControllers(demands);
 
-                    // Support motor testing from GCS
-                    if (!armed) {
-                        mixer.runDisarmed();
-                    }
-
-                    // Run mixer (spin motors) unless failsafe triggered or currently arming via throttle-down
-                    else if (!failsafe && !receiver->throttleIsDown()) {
+                    // Use updated demands to run motors
+                    if (armed && !failsafe && !receiver->throttleIsDown()) {
                         mixer.runArmed(demands);
-                    }
-
-                    // Cut motors on failsafe or throttle-down
-                    else {
-                        mixer.cutMotors();
-                    }
-
-                    // Failsafe
-                    if (armed && receiver->lostSignal()) {
-                        mixer.cutMotors();
-                        armed = false;
-                        failsafe = true;
-                        board->showArmedStatus(false);
                     }
 
                 } //  got new gyro rates
