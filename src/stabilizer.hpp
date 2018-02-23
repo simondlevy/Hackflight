@@ -95,12 +95,15 @@ namespace hf {
             }
 
             // Computes leveling PID for pitch or roll
-            float computeCyclicPid(float rcCommand, float eulerAngles[3], float gyro[3], uint8_t imuAxis)
+            void computeCyclicPTerm(float demand, float eulerAngles[3], uint8_t imuAxis)
             {
-                // P
-                PTerm[imuAxis] = (rcCommand - eulerAngles[imuAxis]) * _levelP;  
-                PTerm[imuAxis] = Filter::complementary(rcCommand, PTerm[imuAxis], proportionalCyclicDemand); 
+                PTerm[imuAxis] = (demand - eulerAngles[imuAxis]) * _levelP;  
+                PTerm[imuAxis] = Filter::complementary(demand, PTerm[imuAxis], proportionalCyclicDemand); 
+            }
 
+            // Computes leveling PID for pitch or roll
+            float computeCyclicPid(float rcCommand, float gyro[3], uint8_t imuAxis)
+            {
                 // I
                 float ITerm = computeITermGyro(_gyroCyclicP, _gyroCyclicI, rcCommand, gyro, imuAxis);
                 ITerm *= proportionalCyclicDemand;
@@ -151,11 +154,17 @@ namespace hf {
                 resetIntegral();
             }
 
-            void updateDemands(float eulerAngles[3], float gyroRates[3], demands_t & demands)
+            void updateEulerAngles(float eulerAngles[3], demands_t & demands)
+            {
+                computeCyclicPTerm(demands.roll,  eulerAngles, 0);
+                computeCyclicPTerm(demands.pitch, eulerAngles, 1);
+            }
+
+            void modifyDemands(float gyroRates[3], demands_t & demands)
             {
                 // Pitch, roll use leveling based on Euler angles
-                demands.roll  = computeCyclicPid(demands.roll,  eulerAngles, gyroRates, AXIS_ROLL);
-                demands.pitch = computeCyclicPid(demands.pitch, eulerAngles, gyroRates, AXIS_PITCH);
+                demands.roll = computeCyclicPid(demands.roll,   gyroRates, AXIS_ROLL);
+                demands.pitch = computeCyclicPid(demands.pitch, gyroRates, AXIS_PITCH);
 
                 // For gyroYaw, P term comes directly from RC command, and D term is zero
                 float ITermGyroYaw = computeITermGyro(_gyroYawP, _gyroYawI, demands.yaw, gyroRates, AXIS_YAW);

@@ -131,13 +131,8 @@ namespace hf {
                 demands_t demands;
                 memcpy(&demands, &receiver->demands, sizeof(demands_t));
 
-               // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (eulerAngles[AXIS_YAW] < 0) {
-                    eulerAngles[AXIS_YAW] += 2*M_PI;
-                }
-
                 // Run stabilization to get updated demands
-                stabilizer->updateDemands(eulerAngles, gyroRates, demands);
+                stabilizer->modifyDemands(gyroRates, demands);
 
                 // Modify demands based on extra PID controllers
                 //board->runPidControllers(demands);
@@ -200,12 +195,19 @@ namespace hf {
             void update(void)
             {
                 if (board->getEulerAngles(eulerAngles)) {
+
+                    // Convert heading from [-pi,+pi] to [0,2*pi]
+                    if (eulerAngles[AXIS_YAW] < 0) {
+                        eulerAngles[AXIS_YAW] += 2*M_PI;
+                    }
+
+                    stabilizer->updateEulerAngles(eulerAngles, receiver->demands);
                 }
 
                 if (board->getGyroRates(gyroRates)) {
                 }
 
-                 // Grab current time for loops
+                // Grab current time for loops
                 uint32_t currentTime = board->getMicroseconds();
 
                 // Open (slow, "outer") loop: respond to receiver demands
@@ -220,6 +222,6 @@ namespace hf {
 
             } // update
 
-     }; // class Hackflight
+    }; // class Hackflight
 
 } // namespace
