@@ -36,7 +36,6 @@ namespace hf {
 
             // Loop timing (Hz)
             Timer openLoopTimer   = Timer(100);
-            Timer closedLoopTimer = Timer(500);
 
             // Passed to Hackflight::init() for a particular board and receiver
             Board      * board;
@@ -48,7 +47,6 @@ namespace hf {
 
             // Vehicle state
             float eulerAngles[3];
-            float gyroRates[3];
             bool armed;
 
             // Auxiliary switch state for change detection
@@ -125,43 +123,6 @@ namespace hf {
 
             } // openLoop
 
-            void closedLoop(void)
-            {
-                // Start with demands from receiver
-                demands_t demands;
-                memcpy(&demands, &receiver->demands, sizeof(demands_t));
-
-                // Run stabilization to get updated demands
-                stabilizer->modifyDemands(gyroRates, demands);
-
-                // Modify demands based on extra PID controllers
-                //board->runPidControllers(demands);
-
-                // Support motor testing from GCS
-                if (!armed) {
-                    mixer.runDisarmed();
-                }
-
-                // Run mixer (spin motors) unless failsafe triggered or currently arming via throttle-down
-                else if (!failsafe && !receiver->throttleIsDown()) {
-                    mixer.runArmed(demands);
-                }
-
-                // Cut motors on failsafe or throttle-down
-                else {
-                    mixer.cutMotors();
-                }
-
-                // Failsafe
-                if (armed && receiver->lostSignal()) {
-                    mixer.cutMotors();
-                    armed = false;
-                    failsafe = true;
-                    board->showArmedStatus(false);
-                }
-
-            } // closedLoop
-
             bool safeAngle(uint8_t axis)
             {
                 return fabs(eulerAngles[axis]) < stabilizer->maxArmingAngle;
@@ -204,8 +165,44 @@ namespace hf {
                     stabilizer->updateEulerAngles(eulerAngles);
                 }
 
+                float gyroRates[3];
+
                 if (board->getGyroRates(gyroRates)) {
-                }
+
+                    // Start with demands from receiver
+                    demands_t demands;
+                    memcpy(&demands, &receiver->demands, sizeof(demands_t));
+
+                    // Run stabilization to get updated demands
+                    stabilizer->modifyDemands(gyroRates, demands);
+
+                    // Modify demands based on extra PID controllers
+                    //board->runPidControllers(demands);
+
+                    // Support motor testing from GCS
+                    if (!armed) {
+                        mixer.runDisarmed();
+                    }
+
+                    // Run mixer (spin motors) unless failsafe triggered or currently arming via throttle-down
+                    else if (!failsafe && !receiver->throttleIsDown()) {
+                        mixer.runArmed(demands);
+                    }
+
+                    // Cut motors on failsafe or throttle-down
+                    else {
+                        mixer.cutMotors();
+                    }
+
+                    // Failsafe
+                    if (armed && receiver->lostSignal()) {
+                        mixer.cutMotors();
+                        armed = false;
+                        failsafe = true;
+                        board->showArmedStatus(false);
+                    }
+
+                } //  got new gyro rates
 
                 // Grab current time for loops
                 uint32_t currentTime = board->getMicroseconds();
@@ -213,11 +210,6 @@ namespace hf {
                 // Open (slow, "outer") loop: respond to receiver demands
                 if (openLoopTimer.checkAndUpdate(currentTime)) {
                     openLoop();
-                }
-
-                // Closed (fast, "inner") loop: collect sensor data and run PID control
-                if (closedLoopTimer.checkAndUpdate(currentTime)) {
-                    closedLoop();
                 }
 
             } // update
