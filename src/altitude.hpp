@@ -23,8 +23,8 @@
 #pragma once
 
 #include "filter.hpp"
-#include "sensors/barometer.hpp"
-#include "sensors/imu.hpp"
+#include "barometer.hpp"
+#include "imu.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 

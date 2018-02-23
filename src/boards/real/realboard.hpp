@@ -75,8 +75,13 @@ namespace hf {
                 while (msp.availableBytes() > 0) {
                     serialWriteByte(msp.readByte());
                 }
-            }
 
+                // Support motor testing from GCS
+                if (!armed) {
+                    mixer->runDisarmed();
+                }
+
+            }
 
     }; // class RealBoard
 

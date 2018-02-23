@@ -25,7 +25,6 @@
 #include <stdarg.h>
 #include "hackflight.hpp"
 #include "realboard.hpp"
-#include "estimators/altitude.hpp"
 
 namespace hf {
 
@@ -38,15 +37,6 @@ namespace hf {
             float gyroAdcToRadians;
 
             EM7180 _sentral;
-
-            // Altitude-estimation task
-            // NB: Try ALT P 50; VEL PID 50;5;30
-            // based on https://github.com/betaflight/betaflight/issues/1003 (Glowhead comment at bottom)
-            AltitudeEstimator altitudeEstimator = AltitudeEstimator(
-                    15,  // Alt P
-                    15,  // Vel P
-                    15,  // Vel I
-                    1);  // Vel D
 
             void checkEventStatus(void)
             {
@@ -101,9 +91,6 @@ namespace hf {
                     analogWrite(_motorPins[k], 0);  
                 }
 
-                // Initialize the atitude estimator with the accelerator value for 1G
-                altitudeEstimator.init(2048);
-
                 // Hang a bit more
                 delay(100);
 
@@ -156,27 +143,9 @@ namespace hf {
                 avalPrev[index] = aval;
             }
 
-            bool getEulerAngles(float eulerAngles[3])
-            {
-                checkEventStatus();
-
-                if (_sentral.gotQuaternions()) {
-
-                    static float q[4];
-                    _sentral.readQuaternions(q);
-
-                    eulerAngles[0] = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
-                    eulerAngles[1] = asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
-                    eulerAngles[2] = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
-
-                    return true;
-                }
-
-                return false;
-            }
-
             bool getGyroRates(float gyroRates[3])
             {
+                // Since gyro is updated most frequently, use it to drive SENtral polling
                 checkEventStatus();
 
                 if (_sentral.gotGyrometer()) {
@@ -199,35 +168,42 @@ namespace hf {
                 return false;
             }
 
-            /*
-             void getImu(bool armed, float eulerAngles[3], float gyroRates[3])
-             {
-                checkEventStatus();
+            bool getEulerAngles(float eulerAngles[3])
+            {
+                if (_sentral.gotQuaternions()) {
 
-                if (_sentral.gotAccelerometer()) {
+                    static float q[4];
+                    _sentral.readQuaternions(q);
 
-                    int16_t accel[3];
-                    _sentral.readAccelerometer(accel);
-                    altitudeEstimator.updateAccel(accel, micros());
+                    eulerAngles[0] = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
+                    eulerAngles[1] = asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
+                    eulerAngles[2] = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
+
+                    return true;
                 }
 
-                if (_sentral.gotBarometer()) {
-
-                    float pressure, temperature;
-                    _sentral.readBarometer(pressure, temperature);
-                    altitudeEstimator.updateBaro(armed, pressure, micros());
-                }
-
-             } // getImu */
-
-            void handleAuxSwitch(demands_t & demands)
-            { 
-                altitudeEstimator.handleAuxSwitch(demands);
+                return false;
             }
 
-            void runPidControllers(demands_t & demands) 
+            bool getAccelerometer(int16_t accelAdc[3])
             {
-                altitudeEstimator.modifyDemands(demands);
+                if (_sentral.gotAccelerometer()) {
+                    _sentral.readAccelerometer(accelAdc);
+                    return true;
+                }
+
+                return false;
+            }
+
+            bool getBarometer(float & pressure)
+            {
+                if (_sentral.gotBarometer()) {
+                    float temperature; // ignored
+                    _sentral.readBarometer(pressure, temperature);
+                    return true;
+                }
+ 
+                return false;
             }
 
     }; // class Ladybug

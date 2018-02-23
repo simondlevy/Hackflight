@@ -27,44 +27,6 @@ namespace hf {
 
     class SBUS_Receiver : public Receiver {
 
-        public:
-
-            SBUS_Receiver(float trimRoll=0, float trimPitch=0, float trimYaw=0) : Receiver(trimRoll, trimPitch, trimYaw) { }
-
-        protected:
-
-            void begin(void)
-            {
-                failsafeCount = 0;
-                rx.begin();
-            }
-
-            void readRawvals(void)
-            {
-                for (uint8_t k=0; k<CHANNELS; ++k)
-                    rawvals[k] = 0;
-
-                uint8_t failsafe = 0;
-                uint16_t lostFrames = 0;
-
-                rx.readCal(channels, &failsafe, &lostFrames);
-
-                memcpy(rawvals, channels, CHANNELS*sizeof(float));
-
-                // accumulate consecutive failsafe hits
-                if (failsafe) {
-                    failsafeCount++;
-                }
-                else { // reset count
-                    failsafeCount = 0;
-                }
-            }
-
-            bool lostSignal(void)
-            {
-                return failsafeCount > MAX_FAILSAFE;
-            }
-
         private:
 
             // These values must persist between calls to readRawvals()
@@ -74,6 +36,50 @@ namespace hf {
 
             uint16_t failsafeCount;
 
-    }; // class DSMX_Receiver
+        protected:
+
+            void begin(void)
+            {
+                failsafeCount = 0;
+                rx.begin();
+            }
+
+            bool gotNewFrame(void)
+            {
+                uint8_t failsafe = 0;
+                uint16_t lostFrames = 0;
+
+                if (rx.readCal(channels, &failsafe, &lostFrames)) {
+
+                    // accumulate consecutive failsafe hits
+                    if (failsafe) {
+                        failsafeCount++;
+                    }
+                    else { // reset count
+                        failsafeCount = 0;
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            void readRawvals(void)
+            {
+                memset(rawvals, 0, CHANNELS*sizeof(float));
+                memcpy(rawvals, channels, CHANNELS*sizeof(float));
+            }
+
+            bool lostSignal(void)
+            {
+                return failsafeCount > MAX_FAILSAFE;
+            }
+
+        public:
+
+            SBUS_Receiver(float trimRoll=0, float trimPitch=0, float trimYaw=0) : Receiver(trimRoll, trimPitch, trimYaw) { }
+
+    }; // class SBUS_Receiver
 
 } // namespace

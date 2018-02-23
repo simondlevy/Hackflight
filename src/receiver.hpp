@@ -40,8 +40,6 @@ namespace hf {
             const float throttleMid  = 0.50f;
             const float throttleExpo = 0.20f;
 
-            uint8_t commandDelay;     // cycles since most recent movement
-
             float adjustCommand(float command, uint8_t channel)
             {
                 command /= 2;
@@ -93,6 +91,7 @@ namespace hf {
 
             // These must be overridden for each receiver
             virtual void  begin(void) = 0;
+            virtual bool  gotNewFrame(void) = 0;
             virtual void  readRawvals(void) = 0;
 
             // For logical combinations of stick positions (low, center, high)
@@ -122,7 +121,7 @@ namespace hf {
             // Default to non-headless mode
             float headless = false;
 
-            float   rawvals[CHANNELS];  // raw [-1,+1] from receiver, for MSP
+            float rawvals[CHANNELS];  // raw [-1,+1] from receiver, for MSP
 
             demands_t demands;
 
@@ -131,7 +130,8 @@ namespace hf {
             // Override this if your receiver provides RSSI or other weak-signal detection
             virtual bool lostSignal(void) { return false; }
 
-            Receiver(float trimRoll=0, float trimPitch=0, float trimYaw=0) : _trimRoll(trimRoll), _trimPitch(trimPitch), _trimYaw(trimYaw) { }
+            Receiver(float trimRoll=0, float trimPitch=0, float trimYaw=0) : 
+                _trimRoll(trimRoll), _trimPitch(trimPitch), _trimYaw(trimYaw) { }
 
             virtual bool arming(void)
             {
@@ -148,16 +148,18 @@ namespace hf {
                 // Do hardware initialization
                 begin();
 
-                commandDelay = 0;
                 sticks = 0;
             }
 
-            void update(float yawAngle)
+            bool getDemands(float yawAngle)
             {
-                // read raw channel values
+                // Wait till there's a new frame
+                if (!gotNewFrame()) return false;
+
+                // Read raw channel values
                 readRawvals();
 
-                // check stick positions, updating command delay
+                // Check stick positions, updating command delay
                 uint8_t stTmp = 0;
                 for (uint8_t i = 0; i < 4; i++) {
                     stTmp >>= 2;
@@ -166,13 +168,9 @@ namespace hf {
                     if (rawvals[i] < +1 - margin)
                         stTmp |= 0x40;  // check for MAX
                 }
-                if (stTmp == sticks) {
-                    if (commandDelay < 250)
-                        commandDelay++;
-                } else
-                    commandDelay = 0;
+
                 sticks = stTmp;
-            
+
                 // Convert raw [-1,+1] to absolute value
                 demands.roll  = makePositiveCommand(CHANNEL_ROLL);
                 demands.pitch = makePositiveCommand(CHANNEL_PITCH);
@@ -213,15 +211,13 @@ namespace hf {
                 float aux = rawvals[4];
                 demands.aux = aux < 0 ? 0 : (aux < 0.4 ? 1 : 2);
 
-            } // computeExpo
+                // Got a new frame
+                return true;
+
+            }  // getDemands
 
 
-            bool changed(void)
-            {
-                return commandDelay == 20;
-            }
-
-             bool throttleIsDown(void)
+            bool throttleIsDown(void)
             {
                 return rawvals[CHANNEL_THROTTLE] < -1 + margin;
             }

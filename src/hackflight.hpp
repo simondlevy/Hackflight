@@ -24,9 +24,9 @@
 #include "mixer.hpp"
 #include "receiver.hpp"
 #include "stabilizer.hpp"
-#include "timer.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
+#include "altitude.hpp"
 
 namespace hf {
 
@@ -34,13 +34,19 @@ namespace hf {
 
         private: 
 
-            // Loop timing (Hz)
-            Timer openLoopTimer   = Timer(100);
-
             // Passed to Hackflight::init() for a particular board and receiver
             Board      * board;
             Receiver   * receiver;
             Stabilizer * stabilizer;
+
+            // Altitude-estimation task
+            // NB: Try ALT P 50; VEL PID 50;5;30
+            // based on https://github.com/betaflight/betaflight/issues/1003 (Glowhead comment at bottom)
+            AltitudeEstimator altitudeEstimator = AltitudeEstimator(
+                    15,  // Alt P
+                    15,  // Vel P
+                    15,  // Vel I
+                    1);  // Vel D 
 
             // Eventually we might want to support mixers for different kinds of configurations (tricopter, etc.)
             Mixer      mixer;
@@ -65,7 +71,6 @@ namespace hf {
 
             void checkEulerAngles(void)
             {
-
                 if (board->getEulerAngles(eulerAngles)) {
 
                     // Convert heading from [-pi,+pi] to [0,2*pi]
@@ -73,13 +78,17 @@ namespace hf {
                         eulerAngles[AXIS_YAW] += 2*M_PI;
                     }
 
+                    // Update stabilizer with new Euler angles
                     stabilizer->updateEulerAngles(eulerAngles);
+
+                    // Do serial comms
+                    board->doSerialComms(eulerAngles, armed, receiver, &mixer);
                 }
             }
 
             void checkGyroRates(void)
             {
-               float gyroRates[3];
+                float gyroRates[3];
 
                 if (board->getGyroRates(gyroRates)) {
 
@@ -90,24 +99,49 @@ namespace hf {
                     // Run stabilization to get updated demands
                     stabilizer->modifyDemands(gyroRates, demands);
 
-                    // Modify demands based on extra PID controllers
-                    //board->runPidControllers(demands);
+                    // Run altitude estimator PIDs
+                    altitudeEstimator.modifyDemands(demands);
+
+                    // Sync failsafe to gyro loop
+                    checkFailsafe();
 
                     // Use updated demands to run motors
                     if (armed && !failsafe && !receiver->throttleIsDown()) {
                         mixer.runArmed(demands);
                     }
-                } 
+                }
             }
+
+            void checkBarometer(void)
+            {
+                float pressure;
+                if (board->getBarometer(pressure)) {
+                    altitudeEstimator.updateBaro(armed, pressure, board->getMicroseconds());
+                }
+            }
+
+            void checkAccelerometer(void)
+            {
+                int16_t accelAdc[3];
+                if (board->getAccelerometer(accelAdc)) {
+                    altitudeEstimator.updateAccel(accelAdc, board->getMicroseconds());
+                }
+            }
+
+            void checkFailsafe(void)
+            {
+                if (armed && receiver->lostSignal()) {
+                    mixer.cutMotors();
+                    armed = false;
+                    failsafe = true;
+                    board->showArmedStatus(false);
+                }
+            } 
 
             void checkReceiver(void)
             {
-                // Grab current time for loops
-                uint32_t currentTime = board->getMicroseconds();
-                if (!openLoopTimer.checkAndUpdate(currentTime)) return;
-
-                // Update Receiver demands, passing yaw angle for headless mode
-                receiver->update(eulerAngles[AXIS_YAW] - yawInitial);
+                // Acquire receiver demands, passing yaw angle for headless mode
+                if (!receiver->getDemands(eulerAngles[AXIS_YAW] - yawInitial)) return;
 
                 // Update stabilizer with cyclic demands
                 stabilizer->updateDemands(receiver->demands);
@@ -117,75 +151,30 @@ namespace hf {
                     stabilizer->resetIntegral();
                 }
 
-                // Certain actions (arming, disarming) need checking every time
-                if (receiver->changed()) {
+                // Disarm
+                if (armed && receiver->disarming()) {
+                    armed = false;
+                } 
 
-                    // actions during armed
-                    if (armed) {      
-
-                        // Disarm
-                        if (receiver->disarming()) {
-                            if (armed) {
-                                armed = false;
-                            }
-                        }
-                    } 
-
-                    // Actions during not armed
-                    else {         
-
-                        // Arming
-                        if (receiver->arming()) {
-
-                            if (!failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
-
-                                auxState = receiver->demands.aux;
-
-                                if (!auxState) // aux switch must be in zero position
-                                    if (!armed) {
-                                        yawInitial = eulerAngles[AXIS_YAW];
-                                        armed = true;
-                                    }
-                            }
-                        }
-
-                    } // not armed
-
-                } // receiver->changed()
+                // Arm (after lots of safety checks!)
+                if (!armed && receiver->arming() && !auxState && !failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
+                    armed = true;
+                    yawInitial = eulerAngles[AXIS_YAW];
+                }
 
                 // Detect aux switch changes for altitude-hold, loiter, etc.
                 if (receiver->demands.aux != auxState) {
-
                     auxState = receiver->demands.aux;
-
-                    //board->handleAuxSwitch(receiver->demands);
+                    altitudeEstimator.handleAuxSwitch(receiver->demands);
                 }
 
-                // Cut motors on failsafe or throttle-down
-                if (armed) {
-
-                    if (receiver->throttleIsDown()) {
-                        mixer.cutMotors();
-                    }
-
-                    if  (receiver->lostSignal()) {
-                        mixer.cutMotors();
-                        armed = false;
-                        failsafe = true;
-                        board->showArmedStatus(false);
-                    }
-                }
-
-                // Support motor testing from GCS
-                else {
-                    mixer.runDisarmed();
+                // Cut motors on throttle-down
+                if (armed && receiver->throttleIsDown()) {
+                    mixer.cutMotors();
                 }
 
                 // Set LED based on arming status
                 board->showArmedStatus(armed);
-
-                // Do serial comms
-                board->doSerialComms(eulerAngles, armed, receiver, &mixer);
 
             } // checkReceiver
 
@@ -208,6 +197,10 @@ namespace hf {
                 stabilizer->init();
                 mixer.init(board); 
 
+                // Initialize the atitude estimator with the accelerator value for 1G
+                // XXX need to make this depend on Board
+                altitudeEstimator.init(2048);
+
                 // Start unarmed
                 armed = false;
                 failsafe = false;
@@ -216,9 +209,11 @@ namespace hf {
 
             void update(void)
             {
-                checkEulerAngles();
                 checkGyroRates();
+                checkEulerAngles();
                 checkReceiver();
+                checkAccelerometer();
+                checkBarometer();
             } 
 
     }; // class Hackflight
