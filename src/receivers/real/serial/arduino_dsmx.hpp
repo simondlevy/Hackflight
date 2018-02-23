@@ -41,7 +41,9 @@ namespace hf {
 
             void readRawvals(void)
             {
-                rx.getChannelValuesNormalized(rawvals, CHANNELS);
+                if (rx.gotNewFrame()) {
+                    rx.getChannelValuesNormalized(rawvals, CHANNELS);
+                }
             }
 
             bool lostSignal(void)

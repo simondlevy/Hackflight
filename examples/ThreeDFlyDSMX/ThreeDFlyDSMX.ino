@@ -22,7 +22,7 @@
 
 #include "boards/real/ladybug.hpp"
 
-#include "receivers/rc/serial/arduino_dsmx.hpp"
+#include "receivers/real/serial/arduino_dsmx.hpp"
 
 hf::Hackflight h;
 
