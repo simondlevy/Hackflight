@@ -72,6 +72,11 @@ namespace hf {
                 _throttleDemand = -1.f;
             }
 
+            bool gotNewFrame(void)
+            {
+                return true;
+            }
+
             void readRawvals(void)
             {
                 static int32_t axes[6];
