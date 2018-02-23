@@ -61,7 +61,10 @@ namespace hf {
             float gyroDelta2[2];
             float errorGyroI[3];
 
+            // For PTerm computation
             float PTerm[2]; // roll, pitch
+            float demandRoll;
+            float demandPitch;
 
             // proportion of cyclic demand compared to its maximum
             float proportionalCyclicDemand;
@@ -154,10 +157,19 @@ namespace hf {
                 resetIntegral();
             }
 
-            void updateEulerAngles(float eulerAngles[3], demands_t & demands)
+            void updateEulerAngles(float eulerAngles[3])
             {
-                computeCyclicPTerm(demands.roll,  eulerAngles, 0);
-                computeCyclicPTerm(demands.pitch, eulerAngles, 1);
+                computeCyclicPTerm(demandRoll,  eulerAngles, 0);
+                computeCyclicPTerm(demandPitch, eulerAngles, 1);
+            }
+
+            void updateDemands(demands_t & demands)
+            {
+                demandRoll  = demands.roll;
+                demandPitch = demands.pitch;
+
+                // Compute proportion of cyclic demand compared to its maximum
+                proportionalCyclicDemand = Filter::max(fabs(demandRoll), fabs(demandPitch)) / 0.5f;
             }
 
             void modifyDemands(float gyroRates[3], demands_t & demands)
@@ -172,12 +184,6 @@ namespace hf {
 
                 // Prevent "gyroYaw jump" during gyroYaw correction
                 demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));
-            }
-
-            void setCyclicDemand(demands_t & demands)
-            {
-                // Compute proportion of cyclic demand compared to its maximum
-                proportionalCyclicDemand = Filter::max(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
             }
 
             void resetIntegral(void)

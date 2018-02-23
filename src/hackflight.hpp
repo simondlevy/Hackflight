@@ -66,7 +66,7 @@ namespace hf {
                 receiver->update(eulerAngles[AXIS_YAW] - yawInitial);
 
                 // Update stabilizer with cyclic demands
-                stabilizer->setCyclicDemand(receiver->demands);
+                stabilizer->updateDemands(receiver->demands);
 
                 // When landed, reset integral component of PID
                 if (receiver->throttleIsDown()) {
@@ -201,7 +201,7 @@ namespace hf {
                         eulerAngles[AXIS_YAW] += 2*M_PI;
                     }
 
-                    stabilizer->updateEulerAngles(eulerAngles, receiver->demands);
+                    stabilizer->updateEulerAngles(eulerAngles);
                 }
 
                 if (board->getGyroRates(gyroRates)) {
