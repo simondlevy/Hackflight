@@ -40,8 +40,6 @@ namespace hf {
             const float throttleMid  = 0.50f;
             const float throttleExpo = 0.20f;
 
-            uint8_t commandDelay;     // cycles since most recent movement
-
             float adjustCommand(float command, uint8_t channel)
             {
                 command /= 2;
@@ -150,7 +148,6 @@ namespace hf {
                 // Do hardware initialization
                 begin();
 
-                commandDelay = 0;
                 sticks = 0;
             }
 
@@ -171,13 +168,9 @@ namespace hf {
                     if (rawvals[i] < +1 - margin)
                         stTmp |= 0x40;  // check for MAX
                 }
-                if (stTmp == sticks) {
-                    if (commandDelay < 250)
-                        commandDelay++;
-                } else
-                    commandDelay = 0;
+
                 sticks = stTmp;
-            
+
                 // Convert raw [-1,+1] to absolute value
                 demands.roll  = makePositiveCommand(CHANNEL_ROLL);
                 demands.pitch = makePositiveCommand(CHANNEL_PITCH);
@@ -224,12 +217,7 @@ namespace hf {
             }  // getDemands
 
 
-            bool changed(void)
-            {
-                return commandDelay == 20;
-            }
-
-             bool throttleIsDown(void)
+            bool throttleIsDown(void)
             {
                 return rawvals[CHANNEL_THROTTLE] < -1 + margin;
             }

@@ -125,43 +125,20 @@ namespace hf {
                     stabilizer->resetIntegral();
                 }
 
-                // Certain actions (arming, disarming) need checking every time
-                if (receiver->changed()) {
+                // Disarm
+                if (armed && receiver->disarming()) {
+                    armed = false;
+                } 
 
-                    // actions during armed
-                    if (armed) {      
-
-                        // Disarm
-                        if (receiver->disarming()) {
-                            armed = false;
-                        }
-                    } 
-
-                    // Actions during not armed
-                    else {         
-
-                        // Arming
-                        if (receiver->arming()) {
-
-                            if (!failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
-
-                                auxState = receiver->demands.aux;
-
-                                if (!auxState) // aux switch must be in zero position
-                                    yawInitial = eulerAngles[AXIS_YAW];
-                                armed = true;
-                            }
-                        }
-
-                    } // not armed
-
-                } // receiver->changed()
+                // Arm (after lots of safety checks!)
+                if (!armed && receiver->arming() && !auxState && !failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
+                    armed = true;
+                    yawInitial = eulerAngles[AXIS_YAW];
+                }
 
                 // Detect aux switch changes for altitude-hold, loiter, etc.
                 if (receiver->demands.aux != auxState) {
-
                     auxState = receiver->demands.aux;
-
                     //board->handleAuxSwitch(receiver->demands);
                 }
 
