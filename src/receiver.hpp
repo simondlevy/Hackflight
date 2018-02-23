@@ -93,6 +93,7 @@ namespace hf {
 
             // These must be overridden for each receiver
             virtual void  begin(void) = 0;
+            virtual bool  gotNewFrame(void) = 0;
             virtual void  readRawvals(void) = 0;
 
             // For logical combinations of stick positions (low, center, high)
@@ -131,7 +132,8 @@ namespace hf {
             // Override this if your receiver provides RSSI or other weak-signal detection
             virtual bool lostSignal(void) { return false; }
 
-            Receiver(float trimRoll=0, float trimPitch=0, float trimYaw=0) : _trimRoll(trimRoll), _trimPitch(trimPitch), _trimYaw(trimYaw) { }
+            Receiver(float trimRoll=0, float trimPitch=0, float trimYaw=0) : 
+                _trimRoll(trimRoll), _trimPitch(trimPitch), _trimYaw(trimYaw) { }
 
             virtual bool arming(void)
             {
@@ -152,12 +154,15 @@ namespace hf {
                 sticks = 0;
             }
 
-            void update(float yawAngle)
+            bool getDemands(float yawAngle)
             {
-                // read raw channel values
+                // Wait till there's a new frame
+                if (!gotNewFrame()) return false;
+
+                // Read raw channel values
                 readRawvals();
 
-                // check stick positions, updating command delay
+                // Check stick positions, updating command delay
                 uint8_t stTmp = 0;
                 for (uint8_t i = 0; i < 4; i++) {
                     stTmp >>= 2;
@@ -213,7 +218,10 @@ namespace hf {
                 float aux = rawvals[4];
                 demands.aux = aux < 0 ? 0 : (aux < 0.4 ? 1 : 2);
 
-            } // computeExpo
+                // Got a new frame
+                return true;
+
+            }  // getDemands
 
 
             bool changed(void)

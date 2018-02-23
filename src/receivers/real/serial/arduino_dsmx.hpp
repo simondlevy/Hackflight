@@ -39,11 +39,14 @@ namespace hf {
                 rx.begin();
             }
 
+            bool gotNewFrame(void)
+            {
+                return rx.gotNewFrame();
+            }
+
             void readRawvals(void)
             {
-                if (rx.gotNewFrame()) {
-                    rx.getChannelValuesNormalized(rawvals, CHANNELS);
-                }
+                rx.getChannelValuesNormalized(rawvals, CHANNELS);
             }
 
             bool lostSignal(void)

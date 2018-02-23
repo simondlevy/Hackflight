@@ -24,7 +24,6 @@
 #include "mixer.hpp"
 #include "receiver.hpp"
 #include "stabilizer.hpp"
-#include "timer.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 
@@ -33,9 +32,6 @@ namespace hf {
     class Hackflight {
 
         private: 
-
-            // Loop timing (Hz)
-            Timer openLoopTimer   = Timer(100);
 
             // Passed to Hackflight::init() for a particular board and receiver
             Board      * board;
@@ -65,7 +61,6 @@ namespace hf {
 
             void checkEulerAngles(void)
             {
-
                 if (board->getEulerAngles(eulerAngles)) {
 
                     // Convert heading from [-pi,+pi] to [0,2*pi]
@@ -73,13 +68,17 @@ namespace hf {
                         eulerAngles[AXIS_YAW] += 2*M_PI;
                     }
 
+                    // Update stabilizer with new Euler angles
                     stabilizer->updateEulerAngles(eulerAngles);
+
+                    // Do serial comms
+                    board->doSerialComms(eulerAngles, armed, receiver, &mixer);
                 }
             }
 
             void checkGyroRates(void)
             {
-               float gyroRates[3];
+                float gyroRates[3];
 
                 if (board->getGyroRates(gyroRates)) {
 
@@ -90,24 +89,33 @@ namespace hf {
                     // Run stabilization to get updated demands
                     stabilizer->modifyDemands(gyroRates, demands);
 
-                    // Modify demands based on extra PID controllers
-                    //board->runPidControllers(demands);
+                    // Sync failsafe to gyro loop
+                    checkFailsafe();
 
                     // Use updated demands to run motors
                     if (armed && !failsafe && !receiver->throttleIsDown()) {
                         mixer.runArmed(demands);
                     }
-                } 
+
+                    // Modify demands based on extra PID controllers
+                    //board->runPidControllers(demands);
+                }
             }
+
+            void checkFailsafe(void)
+            {
+                if (armed && receiver->lostSignal()) {
+                    mixer.cutMotors();
+                    armed = false;
+                    failsafe = true;
+                    board->showArmedStatus(false);
+                }
+            } 
 
             void checkReceiver(void)
             {
-                // Grab current time for loops
-                uint32_t currentTime = board->getMicroseconds();
-                if (!openLoopTimer.checkAndUpdate(currentTime)) return;
-
-                // Update Receiver demands, passing yaw angle for headless mode
-                receiver->update(eulerAngles[AXIS_YAW] - yawInitial);
+                // Acquire receiver demands, passing yaw angle for headless mode
+                if (!receiver->getDemands(eulerAngles[AXIS_YAW] - yawInitial)) return;
 
                 // Update stabilizer with cyclic demands
                 stabilizer->updateDemands(receiver->demands);
@@ -125,9 +133,7 @@ namespace hf {
 
                         // Disarm
                         if (receiver->disarming()) {
-                            if (armed) {
-                                armed = false;
-                            }
+                            armed = false;
                         }
                     } 
 
@@ -142,10 +148,8 @@ namespace hf {
                                 auxState = receiver->demands.aux;
 
                                 if (!auxState) // aux switch must be in zero position
-                                    if (!armed) {
-                                        yawInitial = eulerAngles[AXIS_YAW];
-                                        armed = true;
-                                    }
+                                    yawInitial = eulerAngles[AXIS_YAW];
+                                armed = true;
                             }
                         }
 
@@ -161,31 +165,13 @@ namespace hf {
                     //board->handleAuxSwitch(receiver->demands);
                 }
 
-                // Cut motors on failsafe or throttle-down
-                if (armed) {
-
-                    if (receiver->throttleIsDown()) {
-                        mixer.cutMotors();
-                    }
-
-                    if  (receiver->lostSignal()) {
-                        mixer.cutMotors();
-                        armed = false;
-                        failsafe = true;
-                        board->showArmedStatus(false);
-                    }
-                }
-
-                // Support motor testing from GCS
-                else {
-                    mixer.runDisarmed();
+                // Cut motors on throttle-down
+                if (armed && receiver->throttleIsDown()) {
+                    mixer.cutMotors();
                 }
 
                 // Set LED based on arming status
                 board->showArmedStatus(armed);
-
-                // Do serial comms
-                board->doSerialComms(eulerAngles, armed, receiver, &mixer);
 
             } // checkReceiver
 
