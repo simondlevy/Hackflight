@@ -58,8 +58,54 @@ namespace hf {
             // Support for headless mode
             float yawInitial;
 
-            void openLoop(void)
+            bool safeAngle(uint8_t axis)
             {
+                return fabs(eulerAngles[axis]) < stabilizer->maxArmingAngle;
+            }
+
+            void checkEulerAngles(void)
+            {
+
+                if (board->getEulerAngles(eulerAngles)) {
+
+                    // Convert heading from [-pi,+pi] to [0,2*pi]
+                    if (eulerAngles[AXIS_YAW] < 0) {
+                        eulerAngles[AXIS_YAW] += 2*M_PI;
+                    }
+
+                    stabilizer->updateEulerAngles(eulerAngles);
+                }
+            }
+
+            void checkGyroRates(void)
+            {
+               float gyroRates[3];
+
+                if (board->getGyroRates(gyroRates)) {
+
+                    // Start with demands from receiver
+                    demands_t demands;
+                    memcpy(&demands, &receiver->demands, sizeof(demands_t));
+
+                    // Run stabilization to get updated demands
+                    stabilizer->modifyDemands(gyroRates, demands);
+
+                    // Modify demands based on extra PID controllers
+                    //board->runPidControllers(demands);
+
+                    // Use updated demands to run motors
+                    if (armed && !failsafe && !receiver->throttleIsDown()) {
+                        mixer.runArmed(demands);
+                    }
+                } 
+            }
+
+            void checkReceiver(void)
+            {
+                // Grab current time for loops
+                uint32_t currentTime = board->getMicroseconds();
+                if (!openLoopTimer.checkAndUpdate(currentTime)) return;
+
                 // Update Receiver demands, passing yaw angle for headless mode
                 receiver->update(eulerAngles[AXIS_YAW] - yawInitial);
 
@@ -141,61 +187,7 @@ namespace hf {
                 // Do serial comms
                 board->doSerialComms(eulerAngles, armed, receiver, &mixer);
 
-            } // openLoop
-
-            bool safeAngle(uint8_t axis)
-            {
-                return fabs(eulerAngles[axis]) < stabilizer->maxArmingAngle;
-            }
-
-            void checkEulerAngles(void)
-            {
-
-                if (board->getEulerAngles(eulerAngles)) {
-
-                    // Convert heading from [-pi,+pi] to [0,2*pi]
-                    if (eulerAngles[AXIS_YAW] < 0) {
-                        eulerAngles[AXIS_YAW] += 2*M_PI;
-                    }
-
-                    stabilizer->updateEulerAngles(eulerAngles);
-                }
-            }
-
-            void checkGyroRates(void)
-            {
-               float gyroRates[3];
-
-                if (board->getGyroRates(gyroRates)) {
-
-                    // Start with demands from receiver
-                    demands_t demands;
-                    memcpy(&demands, &receiver->demands, sizeof(demands_t));
-
-                    // Run stabilization to get updated demands
-                    stabilizer->modifyDemands(gyroRates, demands);
-
-                    // Modify demands based on extra PID controllers
-                    //board->runPidControllers(demands);
-
-                    // Use updated demands to run motors
-                    if (armed && !failsafe && !receiver->throttleIsDown()) {
-                        mixer.runArmed(demands);
-                    }
-                } 
-            }
-
-            void checkReceiver(void)
-            {
-                // Grab current time for loops
-                uint32_t currentTime = board->getMicroseconds();
-
-                // Open (slow, "outer") loop: respond to receiver demands
-                if (openLoopTimer.checkAndUpdate(currentTime)) {
-                    openLoop();
-                }
-
-            }
+            } // checkReceiver
 
         public:
 
