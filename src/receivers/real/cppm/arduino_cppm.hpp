@@ -39,6 +39,11 @@ namespace hf {
                 rx.begin();
             }
 
+            bool gotNewFrame(void)
+            {
+                return rx.gotNewFrame();
+            }
+
             void readPulseVals(uint16_t pulsevals[8])
             {
                 rx.computeRC(pulsevals);
