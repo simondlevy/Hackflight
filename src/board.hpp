@@ -30,13 +30,14 @@ namespace hf {
 
             //------------------------------------ Core functionality ----------------------------------------------------
             virtual void     init(void) = 0;
-            virtual void     getImu(bool armed, float eulerAngles[3], float gyroRates[3]) = 0;
+            virtual bool     getEulerAngles(float eulerAngles[3]) = 0;
+            virtual bool     getGyroRates(float gyroRates[3]) = 0;
             virtual uint32_t getMicroseconds() = 0;
             virtual void     writeMotor(uint8_t index, float value) = 0;
 
             //----------------------------------- Additional PID controllers --------------------------------------------
-            virtual void handleAuxSwitch(demands_t & demands) { (void)demands; }
-            virtual void runPidControllers(demands_t & demands) { (void)demands; }
+            virtual bool     getAccelerometer(int16_t accelAdc[3]) { (void)accelAdc; return false; }
+            virtual bool     getBarometerPressure(float & pressure) { (void)pressure; return false; }
 
             //----------------------------------------- Safety ----------------------------------------------------------
             virtual void showArmedStatus(bool armed) { (void)armed; }

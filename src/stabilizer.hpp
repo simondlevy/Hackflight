@@ -48,7 +48,7 @@ namespace hf {
             const float bigYawDemand            = 0.1f;
             const float maxArmingAngleDegrees   = 25.0f;         
 
-            // PIDs
+            // PID constants set in constructor
             float _levelP;
             float _gyroCyclicP;
             float _gyroCyclicI;
@@ -60,6 +60,8 @@ namespace hf {
             float gyroDelta1[2]; 
             float gyroDelta2[2];
             float errorGyroI[3];
+
+            float PTerm[2]; // roll, pitch
 
             // proportion of cyclic demand compared to its maximum
             float proportionalCyclicDemand;
@@ -95,23 +97,23 @@ namespace hf {
             // Computes leveling PID for pitch or roll
             float computeCyclicPid(float rcCommand, float eulerAngles[3], float gyro[3], uint8_t imuAxis)
             {
-                float ITermGyro = computeITermGyro(_gyroCyclicP, _gyroCyclicI, rcCommand, gyro, imuAxis);
+                // P
+                PTerm[imuAxis] = (rcCommand - eulerAngles[imuAxis]) * _levelP;  
+                PTerm[imuAxis] = Filter::complementary(rcCommand, PTerm[imuAxis], proportionalCyclicDemand); 
 
-                float PTermEuler = (rcCommand - eulerAngles[imuAxis]) * _levelP;  
+                // I
+                float ITerm = computeITermGyro(_gyroCyclicP, _gyroCyclicI, rcCommand, gyro, imuAxis);
+                ITerm *= proportionalCyclicDemand;
 
-                float PTerm = Filter::complementary(rcCommand, PTermEuler, proportionalCyclicDemand); 
-
-                float ITerm = ITermGyro * proportionalCyclicDemand;
-
+                // D
                 float gyroDelta = gyro[imuAxis] - lastGyro[imuAxis];
                 lastGyro[imuAxis] = gyro[imuAxis];
                 float gyroDeltaSum = gyroDelta1[imuAxis] + gyroDelta2[imuAxis] + gyroDelta;
                 gyroDelta2[imuAxis] = gyroDelta1[imuAxis];
                 gyroDelta1[imuAxis] = gyroDelta;
-
                 float DTerm = gyroDeltaSum * _gyroCyclicD; 
 
-                return computePid(_gyroCyclicP, PTerm, ITerm, DTerm, gyro, imuAxis);
+                return computePid(_gyroCyclicP, PTerm[imuAxis], ITerm, DTerm, gyro, imuAxis);
             }
 
             float constrainCyclicDemand(float eulerAngle, float demand)

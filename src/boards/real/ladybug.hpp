@@ -144,8 +144,65 @@ namespace hf {
                 avalPrev[index] = aval;
             }
 
-            void getImu(bool armed, float eulerAngles[3], float gyroRates[3])
+            bool getEulerAngles(float eulerAngles[3])
             {
+                _sentral.checkEventStatus();
+
+                if (_sentral.gotError()) {
+                    while (true) {
+                        Serial.print("ERROR: ");
+                        Serial.println(_sentral.getErrorString());
+                    }
+                }
+
+                if (_sentral.gotQuaternions()) {
+
+                    static float q[4];
+                    _sentral.readQuaternions(q);
+
+                    eulerAngles[0] = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
+                    eulerAngles[1] = asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
+                    eulerAngles[2] = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            bool getGyroRates(float gyroRates[3])
+            {
+                _sentral.checkEventStatus();
+
+                if (_sentral.gotError()) {
+                    while (true) {
+                        Serial.print("ERROR: ");
+                        Serial.println(_sentral.getErrorString());
+                    }
+                }
+
+                if (_sentral.gotGyrometer()) {
+
+                    int16_t gyro[3];
+
+                    _sentral.readGyrometer(gyro);
+
+                    // invert pitch, yaw gyro direction to keep other code simpler
+                    gyro[1] = -gyro[1];
+                    gyro[2] = -gyro[2];
+
+                    for (uint8_t k=0; k<3; ++k) {
+                        gyroRates[k] = gyro[k] * gyroAdcToRadians;
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
+
+             void getImu(bool armed, float eulerAngles[3], float gyroRates[3])
+             {
                 _sentral.checkEventStatus();
 
                 if (_sentral.gotError()) {

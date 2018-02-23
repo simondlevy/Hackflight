@@ -114,7 +114,7 @@ namespace hf {
 
                     auxState = receiver->demands.aux;
 
-                    board->handleAuxSwitch(receiver->demands);
+                    //board->handleAuxSwitch(receiver->demands);
                 }
 
                 // Set LED based on arming status
@@ -140,7 +140,7 @@ namespace hf {
                 stabilizer->updateDemands(eulerAngles, gyroRates, demands);
 
                 // Modify demands based on extra PID controllers
-                board->runPidControllers(demands);
+                //board->runPidControllers(demands);
 
                 // Support motor testing from GCS
                 if (!armed) {
@@ -199,12 +199,11 @@ namespace hf {
 
             void update(void)
             {
-                // Get Euler angles, gyro rates from board. Board is responsible for ensuring that gyro
-                // is updated at an appropriate rate (5-10 times faster) with respect to Euler angles.
-                // Board can also use this routine to acquire other sensor data (barometer, accelerometer, etc.)
-                // for additional PID control.  By passing the armed/not-armed status to the board, we enable
-                // the board to perform sensor calibration while the vehicle is resting on the ground.
-                board->getImu(armed, eulerAngles, gyroRates);
+                if (board->getEulerAngles(eulerAngles)) {
+                }
+
+                if (board->getGyroRates(gyroRates)) {
+                }
 
                  // Grab current time for loops
                 uint32_t currentTime = board->getMicroseconds();
