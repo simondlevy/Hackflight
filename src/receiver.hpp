@@ -121,7 +121,7 @@ namespace hf {
             // Default to non-headless mode
             float headless = false;
 
-            float   rawvals[CHANNELS];  // raw [-1,+1] from receiver, for MSP
+            float rawvals[CHANNELS];  // raw [-1,+1] from receiver, for MSP
 
             demands_t demands;
 
