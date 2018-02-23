@@ -26,6 +26,7 @@
 #include "stabilizer.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
+#include "altitude.hpp"
 
 namespace hf {
 
@@ -37,6 +38,15 @@ namespace hf {
             Board      * board;
             Receiver   * receiver;
             Stabilizer * stabilizer;
+
+            // Altitude-estimation task
+            // NB: Try ALT P 50; VEL PID 50;5;30
+            // based on https://github.com/betaflight/betaflight/issues/1003 (Glowhead comment at bottom)
+            AltitudeEstimator altitudeEstimator = AltitudeEstimator(
+                    15,  // Alt P
+                    15,  // Vel P
+                    15,  // Vel I
+                    1);  // Vel D 
 
             // Eventually we might want to support mixers for different kinds of configurations (tricopter, etc.)
             Mixer      mixer;
@@ -89,6 +99,9 @@ namespace hf {
                     // Run stabilization to get updated demands
                     stabilizer->modifyDemands(gyroRates, demands);
 
+                    // Run altitude estimator PIDs
+                    altitudeEstimator.modifyDemands(demands);
+
                     // Sync failsafe to gyro loop
                     checkFailsafe();
 
@@ -96,9 +109,22 @@ namespace hf {
                     if (armed && !failsafe && !receiver->throttleIsDown()) {
                         mixer.runArmed(demands);
                     }
+                }
+            }
 
-                    // Modify demands based on extra PID controllers
-                    //board->runPidControllers(demands);
+            void checkBarometer(void)
+            {
+                float pressure;
+                if (board->getBarometer(pressure)) {
+                    altitudeEstimator.updateBaro(armed, pressure, board->getMicroseconds());
+                }
+            }
+
+            void checkAccelerometer(void)
+            {
+                int16_t accelAdc[3];
+                if (board->getAccelerometer(accelAdc)) {
+                    altitudeEstimator.updateAccel(accelAdc, board->getMicroseconds());
                 }
             }
 
@@ -139,7 +165,7 @@ namespace hf {
                 // Detect aux switch changes for altitude-hold, loiter, etc.
                 if (receiver->demands.aux != auxState) {
                     auxState = receiver->demands.aux;
-                    //board->handleAuxSwitch(receiver->demands);
+                    altitudeEstimator.handleAuxSwitch(receiver->demands);
                 }
 
                 // Cut motors on throttle-down
@@ -171,6 +197,10 @@ namespace hf {
                 stabilizer->init();
                 mixer.init(board); 
 
+                // Initialize the atitude estimator with the accelerator value for 1G
+                // XXX need to make this depend on Board
+                altitudeEstimator.init(2048);
+
                 // Start unarmed
                 armed = false;
                 failsafe = false;
@@ -179,9 +209,11 @@ namespace hf {
 
             void update(void)
             {
-                checkEulerAngles();
                 checkGyroRates();
+                checkEulerAngles();
                 checkReceiver();
+                checkAccelerometer();
+                checkBarometer();
             } 
 
     }; // class Hackflight

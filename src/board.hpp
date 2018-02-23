@@ -37,7 +37,7 @@ namespace hf {
 
             //----------------------------------- Additional PID controllers --------------------------------------------
             virtual bool     getAccelerometer(int16_t accelAdc[3]) { (void)accelAdc; return false; }
-            virtual bool     getBarometerPressure(float & pressure) { (void)pressure; return false; }
+            virtual bool     getBarometer(float & pressure) { (void)pressure; return false; }
 
             //----------------------------------------- Safety ----------------------------------------------------------
             virtual void showArmedStatus(bool armed) { (void)armed; }
