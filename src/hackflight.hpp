@@ -122,9 +122,9 @@ namespace hf {
 
             void checkAccelerometer(void)
             {
-                int16_t accelAdc[3];
-                if (board->getAccelerometer(accelAdc)) {
-                    altitudeEstimator.updateAccel(accelAdc, board->getMicroseconds());
+                float   accelGs[3];
+                if (board->getAccelerometer(accelGs)) {
+                    altitudeEstimator.updateAccel(accelGs, board->getMicroseconds());
                 }
             }
 
@@ -197,9 +197,8 @@ namespace hf {
                 stabilizer->init();
                 mixer.init(board); 
 
-                // Initialize the atitude estimator with the accelerator value for 1G
-                // XXX need to make this depend on Board
-                altitudeEstimator.init(2048);
+                // Initialize the atitude estimator
+                altitudeEstimator.init();
 
                 // Start unarmed
                 armed = false;
