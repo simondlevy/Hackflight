@@ -32,27 +32,29 @@ namespace hf {
 
             const float ACCEL_LPF_CUTOFF  = 5.0f;
             const float ACCEL_LPF_FACTOR  = 0.25f;
-            const float ACCEL_Z_DEADBAND  = 40.f;
+            const float ACCEL_Z_DEADBAND  = 0.02f;
 
-            int16_t accADC[3];
+            float   accel[3];
             float   gyro[3];
 
             float anglerad[2] = { 0.0f, 0.0f };    // absolute angle inclination in radians
             int16_t heading;
             float EstG[3];
-            float accSmooth[3];
             uint32_t previousTime;
-            float accVelScale;
-            float fc_acc;
-            int32_t accSumZ;
-            uint32_t accTimeSum;        // keep track for integration of acc
-            int accSumCount;
-            int32_t accZoffset;
-            float accZsmooth;
-            float accZ_tmp;
+            float fc_accel;
+
             bool ready;
 
-            // Rotate Estimated vector(s) with small angle approximation, according to the gyro data
+            uint32_t accelTimeSum;        // keep track for integration of acc
+            int accelSumCount;
+
+            float accelZ_tmp;
+            float accelZsmooth;
+            float accelSumZ;
+            float accelZoffset;
+            float accelSmooth[3];
+
+             // Rotate Estimated vector(s) with small angle approximation, according to the gyro data
             static void rotateV(float *vout, float *delta)
             {
                 float v_tmp[3];
@@ -100,7 +102,7 @@ namespace hf {
                 float deltaGyroAngle[3];
                 for (uint8_t axis = 0; axis < 3; axis++) {
                     deltaGyroAngle[axis] = gyro[axis] * scale;
-                    accSmooth[axis] = Filter::complementary(accADC[axis], accSmooth[axis], ACCEL_LPF_FACTOR);
+                    accelSmooth[axis] = Filter::complementary(accel[axis], accelSmooth[axis], ACCEL_LPF_FACTOR);
                 }
 
                 // Rotate into Earth frame
@@ -120,41 +122,41 @@ namespace hf {
                 rpy[2] = -(float)heading * M_PI / 180.0f;;
 
                 float accel_ned[3];
-                accel_ned[0] = accSmooth[0];
-                accel_ned[1] = accSmooth[1];
-                accel_ned[2] = accSmooth[2];
+                accel_ned[0] = accelSmooth[0];
+                accel_ned[1] = accelSmooth[1];
+                accel_ned[2] = accelSmooth[2];
 
                 IMU::rotateV(accel_ned, rpy);
 
-                accZoffset -= accZoffset / 64;
-                accZoffset += accel_ned[2];
+                accelZoffset -= accelZoffset / 64;
+                accelZoffset += accel_ned[2];
 
-                accel_ned[2] -= accZoffset / 64;  // compensate for gravitation on z-axis
-                accZsmooth = accZsmooth + (dT / (fc_acc + dT)) * (accel_ned[2] - accZsmooth); // low pass filter
+                accel_ned[2] -= accelZoffset / 64;  // compensate for gravitation on z-axis
+                accelZsmooth = accelZsmooth + (dT / (fc_accel + dT)) * (accel_ned[2] - accelZsmooth); // low pass filter
 
                 // apply Deadband to reduce integration drift and vibration influence and
                 // sum up Values for later integration to get velocity and distance
-                accSumZ += Filter::deadband(lrintf(accZsmooth), ACCEL_Z_DEADBAND);
+                accelSumZ += Filter::deadband(accelZsmooth, ACCEL_Z_DEADBAND);
 
-                accTimeSum += deltaTime;
-                accSumCount++;
+                accelTimeSum += deltaTime;
+                accelSumCount++;
             }
 
 
             void reset(void)
             {
-                accSumZ = 0;
-                accSumCount = 0;
-                accTimeSum = 0;
+                accelSumZ = 0;
+                accelSumCount = 0;
+                accelTimeSum = 0;
             }
 
         public:
 
-            void init(uint16_t accel1G)
+            void init(void)
             {
-                accVelScale = 9.80665f / accel1G / 10000.0f;
+                accelZoffset = 0;
 
-                fc_acc = 0.5f / (M_PI * ACCEL_LPF_CUTOFF); // calculate RC time constant used in the accZ lpf
+                fc_accel = 0.5f / (M_PI * ACCEL_LPF_CUTOFF); // calculate RC time constant used in the accelZ lpf
 
                 reset();
 
@@ -164,10 +166,10 @@ namespace hf {
             float getVerticalVelocity(void)
             {
                 // Integrator - velocity, cm/sec
-                accZ_tmp = (float)accSumZ / (float)accSumCount;
+                accelZ_tmp = accelSumZ / accelSumCount;
 
                 // Skip startup transient
-                float vel_acc = ready ? accZ_tmp * accVelScale * (float)accTimeSum : 0;
+                float vel_acc = ready ? accelZ_tmp * 9.80665e-4 * accelTimeSum : 0;
 
                 reset();
 
@@ -178,12 +180,12 @@ namespace hf {
 
             float getVerticalAcceleration(void)
             {
-                return accZ_tmp;
+                return accelZ_tmp;
             }
 
-            void updateAccel(int16_t _accADC[3], uint32_t currentTime)
+            void updateAccel(float _accel[3], uint32_t currentTime)
             {
-                memcpy(accADC, _accADC, 3*sizeof(int16_t));
+                memcpy(accel, _accel, 3*sizeof(float));
                 update(currentTime);
             }
 

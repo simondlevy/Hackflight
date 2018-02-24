@@ -86,10 +86,10 @@ namespace hf {
                 velD = _velD; 
             }
 
-            void init(uint16_t imuAccel1G)
+            void init(void)
             {
                 baro.init();
-                imu.init(imuAccel1G);
+                imu.init();
                 initialThrottleHold = 0;
                 holding = false;
                 pid = 0;
@@ -114,7 +114,7 @@ namespace hf {
                 }
             }
 
-            void updateAccel(int16_t accel[3], uint32_t currentTime)
+            void updateAccel(float accel[3], uint32_t currentTime)
             {
                 imu.updateAccel(accel, currentTime);
             }

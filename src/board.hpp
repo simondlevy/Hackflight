@@ -36,7 +36,7 @@ namespace hf {
             virtual void     writeMotor(uint8_t index, float value) = 0;
 
             //----------------------------------- Additional PID controllers --------------------------------------------
-            virtual bool     getAccelerometer(int16_t accelAdc[3]) { (void)accelAdc; return false; }
+            virtual bool     getAccelerometer(float accelGs[3]) { (void)accelGs; return false; }
             virtual bool     getBarometer(float & pressure) { (void)pressure; return false; }
 
             //----------------------------------------- Safety ----------------------------------------------------------
