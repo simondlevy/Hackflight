@@ -68,8 +68,8 @@ namespace hf {
                 delay(100);
 
                 // Goose up the EM7180 ODRs
-                _sentral.accelRate = 500;
-                _sentral.gyroRate = 500;
+                _sentral.accelRate = 330;
+                _sentral.gyroRate = 330;
                 _sentral.baroRate = 50;
                 _sentral.qRateDivisor = 5;
 
@@ -177,7 +177,7 @@ namespace hf {
 
                     eulerAngles[0] = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
                     eulerAngles[1] = asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
-                    eulerAngles[2] = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);   
+                    eulerAngles[2] = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]); 
 
                     return true;
                 }
@@ -190,6 +190,7 @@ namespace hf {
                 if (_sentral.gotAccelerometer()) {
                     int16_t accelAdc[3];
                     _sentral.readAccelerometer(accelAdc);
+                    return true;
                     for (uint8_t k=0; k<3; ++k) {
                         accelGs[k] = accelAdc[k] / 2048.f;
                     }

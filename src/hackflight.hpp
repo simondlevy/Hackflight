@@ -159,7 +159,7 @@ namespace hf {
                 // Arm (after lots of safety checks!)
                 if (!armed && receiver->arming() && !auxState && !failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
                     armed = true;
-                    yawInitial = eulerAngles[AXIS_YAW];
+                    yawInitial = eulerAngles[AXIS_YAW]; // grab yaw for headless mode
                 }
 
                 // Detect aux switch changes for altitude-hold, loiter, etc.
