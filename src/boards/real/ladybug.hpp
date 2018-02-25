@@ -190,7 +190,6 @@ namespace hf {
                 if (_sentral.gotAccelerometer()) {
                     int16_t accelAdc[3];
                     _sentral.readAccelerometer(accelAdc);
-                    return true;
                     for (uint8_t k=0; k<3; ++k) {
                         accelGs[k] = accelAdc[k] / 2048.f;
                     }

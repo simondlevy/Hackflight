@@ -35,19 +35,19 @@ namespace hf {
             virtual uint32_t getMicroseconds() = 0;
             virtual void     writeMotor(uint8_t index, float value) = 0;
 
-            //----------------------------------- Additional PID controllers --------------------------------------------
+            //------------------------ Support for additional PID controllers --------------------------------------------
             virtual bool     getAccelerometer(float accelGs[3]) { (void)accelGs; return false; }
             virtual bool     getBarometer(float & pressure) { (void)pressure; return false; }
 
             //----------------------------------------- Safety ----------------------------------------------------------
-            virtual void showArmedStatus(bool armed) { (void)armed; }
+            virtual void     showArmedStatus(bool armed) { (void)armed; }
 
             //---------------------------------- Serial communications  -------------------------------------------------
-            virtual void doSerialComms(float eulerAngles[3], bool armed, class Receiver * receiver, class Mixer * mixer)  
-            { (void)eulerAngles; (void)armed; (void)receiver; (void)mixer; }
+            virtual void     doSerialComms(float eulerAngles[3], bool armed, class Receiver * receiver, class Mixer * mixer)  
+                                { (void)eulerAngles; (void)armed; (void)receiver; (void)mixer; }
 
             //--------------------------------------- Debugging ---------------------------------------------------------
-            static void  outbuf(char * buf);
+            static void      outbuf(char * buf);
 
     }; // class Board
 

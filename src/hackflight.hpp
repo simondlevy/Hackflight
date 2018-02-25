@@ -122,7 +122,7 @@ namespace hf {
 
             void checkAccelerometer(void)
             {
-                float   accelGs[3];
+                float accelGs[3];
                 if (board->getAccelerometer(accelGs)) {
                     altitudeEstimator.updateAccel(accelGs, board->getMicroseconds());
                 }

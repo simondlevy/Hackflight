@@ -35,16 +35,6 @@ namespace hf {
 
         private: 
 
-            // XXX for debugging
-            static void printgauge(float x)
-            {
-                char c = x<0 ? '-' : '+';
-                for (uint8_t k=0; k<abs(x); ++k) {
-                    printf("%c", c);
-                }
-                printf("\n");
-            }
-
             // Complementry filter for accel/baro
             const float    cfAlt  = 0.965f;
             const float    cfVel  = 0.985f;
@@ -164,8 +154,8 @@ namespace hf {
 
                 if (holding) {
 
-                    int32_t setVel = 0;
-                    int32_t error = 0;
+                    float setVel = 0;
+                    float error = 0;
 
                     // Altitude P-Controller
                     if (!velocityControl) {
@@ -194,7 +184,7 @@ namespace hf {
 
                 accZ_old = accZ_tmp;
 
-            } // estimate
+            } // updateBaro
 
             void modifyDemands(demands_t & demands)
             {

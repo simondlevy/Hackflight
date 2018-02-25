@@ -142,7 +142,6 @@ namespace hf {
                 accelSumCount++;
             }
 
-
             void reset(void)
             {
                 accelSumZ = 0;
