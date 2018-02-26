@@ -175,16 +175,16 @@ namespace hf {
             {
                 // Normal situation: flying, so return simulated pressure periodically
                 if (_flying) {
-                    if (_cycle % 6 == 0) {
+                    if (_cycle % 2 == 0) {
                         float h = _position[2];
-                        pressure = 1013.25 * exp (-0.00012 * h); // https://www.math24.net/barometric-formula (but in mbar)
+                        pressure = altitudeToPressure(_position[2]);
                         return true;
                     }
                     return false;
                 }
 
                 // Not flying: return pressure constantly to speed up baro calibration
-                pressure = 1013.25;
+                pressure = altitudeToPressure(0);
                 return true;
             }
 
@@ -199,6 +199,12 @@ namespace hf {
             }
 
         private:
+
+            // https://www.math24.net/barometric-formula (but in mbar)
+            static float altitudeToPressure(float h)
+            {
+                return 1013.25 * exp (-0.00012 * h); 
+            }
 
             float motorsToAngularVelocity(int a, int b, int c, int d)
             {

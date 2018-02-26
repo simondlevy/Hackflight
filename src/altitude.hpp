@@ -135,6 +135,8 @@ namespace hf {
                 // Get estimated altitude from barometer
                 float baroAlt = baro.getAltitude();
 
+                //Debug::printf("%+f\n", baroAlt);
+
                 // Apply complementary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
                 // By using CF it's possible to correct the drift of integrated accelerometer velocity without loosing the phase, 
                 // i.e without delay.

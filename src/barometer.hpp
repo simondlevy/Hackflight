@@ -72,8 +72,6 @@ namespace hf {
                 groundPressure -= groundPressure / 8;
                 groundPressure += pressureSum / (HISTORY_SIZE - 1);
                 groundAltitude = millibarsToCentimeters(groundPressure/8);
-
-                Debug::printf("****** %+f", groundAltitude);
             }
 
             void update(float pressure)
