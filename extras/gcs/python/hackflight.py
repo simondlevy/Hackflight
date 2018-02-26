@@ -430,7 +430,7 @@ class GCS:
 
     def _show_splash(self):
 
-        self.splash = self.canvas.create_image((400,250), image=self.splashimage)
+        self.splash = self.canvas.create_image((400,225), image=self.splashimage)
 
     def _hide_splash(self):
 
