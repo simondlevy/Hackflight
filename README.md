@@ -1,6 +1,8 @@
 # Hackflight: Simple C++ quadcopter flight control firmware for Arduino and simulators
 
-<img src="logo.png" width=500>
+<img src="logo.png" width=400>
+
+<i>Hackflight logo by MC Greenleaf</i>
 
 Hackflight is simple, platform-independent, header-only C++ firmware for quadcopter 
 [flight controllers](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) 
