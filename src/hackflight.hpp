@@ -64,6 +64,8 @@ namespace hf {
             // Support for headless mode
             float yawInitial;
 
+            uint32_t gcount, acount, qcount, bcount, rcount;
+
             bool safeAngle(uint8_t axis)
             {
                 return fabs(eulerAngles[axis]) < stabilizer->maxArmingAngle;
@@ -72,6 +74,8 @@ namespace hf {
             void checkEulerAngles(void)
             {
                 if (board->getEulerAngles(eulerAngles)) {
+
+                    qcount++;
 
                     // Convert heading from [-pi,+pi] to [0,2*pi]
                     if (eulerAngles[AXIS_YAW] < 0) {
@@ -91,6 +95,8 @@ namespace hf {
                 float gyroRates[3];
 
                 if (board->getGyroRates(gyroRates)) {
+
+                    gcount++;
 
                     // Start with demands from receiver
                     demands_t demands;
@@ -116,6 +122,7 @@ namespace hf {
             {
                 float pressure;
                 if (board->getBarometer(pressure)) {
+                    bcount++;
                     altitudeEstimator.updateBaro(armed, pressure, board->getMicroseconds());
                 }
             }
@@ -124,7 +131,9 @@ namespace hf {
             {
                 float accelGs[3];
                 if (board->getAccelerometer(accelGs)) {
+                    acount++;
                     altitudeEstimator.updateAccel(accelGs, board->getMicroseconds());
+                    //Debug::printf("%+3.3f    %+3.3f    %+3.3f\n", accelGs[0], accelGs[1], accelGs[2]);
                 }
             }
 
@@ -142,6 +151,8 @@ namespace hf {
             {
                 // Acquire receiver demands, passing yaw angle for headless mode
                 if (!receiver->getDemands(eulerAngles[AXIS_YAW] - yawInitial)) return;
+
+                rcount++;
 
                 // Update stabilizer with cyclic demands
                 stabilizer->updateDemands(receiver->demands);
@@ -208,6 +219,8 @@ namespace hf {
 
             void update(void)
             {
+                //Debug::printf("G: %d    A: %d    Q: %d    B: %d    R: %d\n", gcount, acount, qcount, bcount, rcount);
+
                 checkGyroRates();
                 checkEulerAngles();
                 checkReceiver();

@@ -50,15 +50,15 @@ namespace hf {
             const float MOTOR_EXPONENT = 3;
 
             // Private state variables ----------------------------
-            float _verticalSpeedPrev; // meters per second
-            float _eulerAngles[3];
-            float _gyroRates[3];        
-            float _translationRates[3]; // local (body) frame
-            float _position[3];
-            float _motors[4];         // arbitrary in [0,1]
-            bool  _flying;
-            float _secondsPrev;
-            uint64_t _cycle;          // helps mock up different output data rates (ODRs)
+            float    _verticalSpeedPrev;   // meters per second
+            float    _eulerAngles[3];
+            float    _gyroRates[3];        
+            float    _translationRates[3]; // local (body) frame
+            float    _position[3];
+            float    _motors[4];           // arbitrary in [0,1]
+            bool     _flying;
+            float    _secondsPrev;
+            uint64_t _cycle;               // helps mock up different output data rates (ODRs)
 
             // Gets CPU time in seconds
             void cputime(struct timespec * tv);
@@ -157,6 +157,35 @@ namespace hf {
                     return true;
                 }
                 return false;
+            }
+
+            bool getAccelerometer(float accelGs[3]) 
+            { 
+                // XXX need to compute actual values based on thrust and Euler angles
+                accelGs[0] = 0;
+                accelGs[1] = 0;
+                accelGs[2] = 1;
+
+
+                // Mock up accelerometer on every cycle (same ODR as gyrometer)
+                return true;
+            }
+
+            bool getBarometer(float & pressure) 
+            {
+                // Normal situation: flying, so return simulated pressure periodically
+                if (_flying) {
+                    if (_cycle % 6 == 0) {
+                        float h = _position[2];
+                        pressure = 1013.25 * exp (-0.00012 * h); // https://www.math24.net/barometric-formula (but in mbar)
+                        return true;
+                    }
+                    return false;
+                }
+
+                // Not flying: return pressure constantly to speed up baro calibration
+                pressure = 1013.25;
+                return true;
             }
 
             uint32_t getMicroseconds()
