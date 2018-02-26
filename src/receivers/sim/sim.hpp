@@ -59,6 +59,7 @@ namespace hf {
                 _springyThrottle = false;
                 _useButtonForAux = false;
                 _joyid = 0;
+                _cycle = 0;
 
                 _buttonState = 0;
             }
@@ -74,7 +75,7 @@ namespace hf {
 
             bool gotNewFrame(void)
             {
-                return true;
+                return (++_cycle % 3) ? false : true;
             }
 
             void readRawvals(void)
@@ -146,6 +147,9 @@ namespace hf {
             // Simulate auxiliary switch via pushbuttons
             uint8_t _buttonState;
             const float buttonsToAux[3] = {-.1f, 0.f, .8f};
+
+            // Helps mock up periodic availability of new data frame (output data rate; ODR)
+            uint64_t _cycle;          
 
     }; // class Controller
 

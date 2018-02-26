@@ -58,6 +58,7 @@ namespace hf {
             float _motors[4];         // arbitrary in [0,1]
             bool  _flying;
             float _secondsPrev;
+            uint64_t _cycle;          // helps mock up different output data rates (ODRs)
 
             // Gets CPU time in seconds
             void cputime(struct timespec * tv);
@@ -86,6 +87,7 @@ namespace hf {
                 memset(_position, 0, 3*sizeof(float));
                 _flying = false;
                 _verticalSpeedPrev = 0;
+                _cycle = 0;
             }
 
             // Sync physics update to gyro acquisition
@@ -142,14 +144,19 @@ namespace hf {
 
                 memcpy(gyroRates, _gyroRates, 3*sizeof(float));
 
+                // Increase cycle counter for ODR mockup
+                _cycle++;
+
                 return true;
             }
 
             bool getEulerAngles(float eulerAngles[3]) {
 
-                memcpy(eulerAngles, _eulerAngles, 3*sizeof(float));
-
-                return true;
+                if (_cycle % 5 == 0) {
+                    memcpy(eulerAngles, _eulerAngles, 3*sizeof(float));
+                    return true;
+                }
+                return false;
             }
 
             uint32_t getMicroseconds()
