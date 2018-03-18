@@ -150,17 +150,17 @@ namespace hf {
 
                 if (_sentral.gotGyrometer()) {
 
-                    int16_t gyro[3];
+                    int16_t gx, gy, gz;
 
-                    _sentral.readGyrometer(gyro);
+                    _sentral.readGyrometer(gx, gy, gz);
 
                     // invert pitch, yaw gyro direction to keep other code simpler
-                    gyro[1] = -gyro[1];
-                    gyro[2] = -gyro[2];
+                    gy = -gy;
+                    gz = -gz;
 
-                    for (uint8_t k=0; k<3; ++k) {
-                        gyroRates[k] = gyro[k] * gyroAdcToRadians;
-                    }
+                    gyroRates[0] = gx * gyroAdcToRadians;
+                    gyroRates[1] = gy * gyroAdcToRadians;
+                    gyroRates[2] = gz * gyroAdcToRadians;
 
                     return true;
                 }
@@ -172,12 +172,12 @@ namespace hf {
             {
                 if (_sentral.gotQuaternions()) {
 
-                    static float q[4];
-                    _sentral.readQuaternions(q);
+                    static float qw, qx, qy, qz;
+                    _sentral.readQuaternions(qw, qx, qy, qz);
 
-                    eulerAngles[0] = atan2(2.0f * (q[3] * q[0] + q[1] * q[2]), q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2]);
-                    eulerAngles[1] = asin(2.0f * (q[0] * q[2] - q[3] * q[1]));
-                    eulerAngles[2] = atan2(2.0f * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]); 
+                    eulerAngles[0] = atan2(2.0f * (qw * qx + qy * qz), qw * qw - qx * qx - qy * qy + qz * qz);
+                    eulerAngles[1] = asin(2.0f * (qx * qz - qw * qy));
+                    eulerAngles[2] = atan2(2.0f * (qx * qy + qw * qz), qw * qw + qx * qx - qy * qy - qz * qz); 
 
                     return true;
                 }
@@ -188,11 +188,11 @@ namespace hf {
             bool getAccelerometer(float accelGs[3])
             {
                 if (_sentral.gotAccelerometer()) {
-                    int16_t accelAdc[3];
-                    _sentral.readAccelerometer(accelAdc);
-                    for (uint8_t k=0; k<3; ++k) {
-                        accelGs[k] = accelAdc[k] / 2048.f;
-                    }
+                    int16_t ax, ay, az;
+                    _sentral.readAccelerometer(ax, ay, az);
+                    accelGs[0] = ax / 2048.f;
+                    accelGs[1] = ay / 2048.f;
+                    accelGs[2] = az / 2048.f;
                     return true;
                 }
 
