@@ -29,7 +29,6 @@ namespace hf {
         public:
 
             //------------------------------------ Core functionality ----------------------------------------------------
-            virtual void     init(void) = 0;
             virtual bool     getEulerAngles(float eulerAngles[3]) = 0;
             virtual bool     getGyroRates(float gyroRates[3]) = 0;
             virtual uint32_t getMicroseconds() = 0;
@@ -42,7 +41,8 @@ namespace hf {
             //----------------------------------------- Safety ----------------------------------------------------------
             virtual void     showArmedStatus(bool armed) { (void)armed; }
 
-            //---------------------------------- Serial communications  -------------------------------------------------
+            //---------------------------------------- Hardware -------------------------------------------------
+            virtual void     init(void) { }
             virtual void     doSerialComms(float eulerAngles[3], bool armed, class Receiver * receiver, class Mixer * mixer)  
                                 { (void)eulerAngles; (void)armed; (void)receiver; (void)mixer; }
 

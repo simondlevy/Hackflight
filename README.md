@@ -41,11 +41,7 @@ Hackflight
 [firmware](https://github.com/simondlevy/hackflight/tree/master/src)
 adheres to standard practices for C++, notably, short, simple methods and
 minimal use of compiler macros like <b>#ifdef</b> that can make it difficult to
-follow what the code is doing.  As you can see, the code follows the Arduino
-design pattern of a <b>setup()</b> routine that calls the <b>init()</b> method
-of a few objects (<b>Stabilizer</b>, <b>Receiver</b>, <b>Board</b>, etc.) and a
-<b>loop()</b> routine that calls the <b>update()</b> method and other methods
-of those objects.  
+follow what the code is doing.  
 
 Because a quadcopter build typically involves choosing a flight-control board,
 radio receiver, and model (airframe), Hackflight provides a separate C++ class
