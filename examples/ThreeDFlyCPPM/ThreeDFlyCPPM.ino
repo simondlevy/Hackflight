@@ -23,7 +23,7 @@
 
 #include "boards/ladybug.hpp"
 
-#include "receivers/real/cppm/arduino_cppm.hpp"
+#include "receivers/cppm/arduino_cppm.hpp"
 
 hf::Hackflight h;
 
