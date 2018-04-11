@@ -29,7 +29,7 @@ namespace hf {
         public:
 
             //------------------------------------ Core functionality ----------------------------------------------------
-            virtual bool     getEulerAngles(float eulerAngles[3]) = 0;
+            virtual bool     getQuaternion(float quat[4]) = 0;
             virtual bool     getGyroRates(float gyroRates[3]) = 0;
             virtual uint32_t getMicroseconds() = 0;
             virtual void     writeMotor(uint8_t index, float value) = 0;

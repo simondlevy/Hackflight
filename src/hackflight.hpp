@@ -71,9 +71,15 @@ namespace hf {
                 return fabs(eulerAngles[axis]) < stabilizer->maxArmingAngle;
             }
 
-            void checkEulerAngles(void)
+            void checkQuaternion(void)
             {
-                if (board->getEulerAngles(eulerAngles)) {
+                float q[4];
+
+                if (board->getQuaternion(q)) {
+
+                    eulerAngles[0] = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
+                    eulerAngles[1] = asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
+                    eulerAngles[2] = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]); 
 
                     qcount++;
 
@@ -222,7 +228,7 @@ namespace hf {
                 //Debug::printf("G: %d    A: %d    Q: %d    B: %d    R: %d\n", gcount, acount, qcount, bcount, rcount);
 
                 checkGyroRates();
-                checkEulerAngles();
+                checkQuaternion();
                 checkReceiver();
                 checkAccelerometer();
                 checkBarometer();
