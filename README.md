@@ -21,16 +21,12 @@ addition to big user communities and loads of great features, these platforms
 have safety mechanisms that Hackflight lacks, which will help avoid injury to
 you and damage to your vehicle.
 
-Hackflight derives from the Baseflight firmware (which in turn derives from
-Multiwii).  Although there is [legacy
-support](https://github.com/simondlevy/hackflight/tree/master/extras/legacy) for
-STM32F103 flight-controller boards (Naze32 and clones like Flip32, MultiRC,
-etc.) the Alienflight F3 board, and a Teensy 3.2-based controller, 
-the hardware focus of the project has shifted to the Arduino-compatible,
-STM32L4-based [Ladybug FC](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/).
-In addition to offering the full complement of i/o signals (UART, I<sup>2</sup>C,
-SPI, digital, analog), this board has hardware support for floating-point operations, allowing us to
-write simpler code based on standard units:
+Although Hackflight is hardware/platform-independent, 
+the hardware focus of the project has shifted to the Arduino-compatible, STM32L4-based 
+[Ladybug FC](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/).  In
+addition to offering the full complement of i/o signals (UART, I<sup>2</sup>C,
+SPI, digital, analog), this board has hardware support for floating-point
+operations, allowing us to write simpler code based on standard units:
 
 * Euler angles in radians
 * Accelerometer values in Gs
