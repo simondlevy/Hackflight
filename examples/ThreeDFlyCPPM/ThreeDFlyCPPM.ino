@@ -21,7 +21,7 @@
 
 #include "hackflight.hpp"
 
-#include "boards/real/ladybug.hpp"
+#include "boards/ladybug.hpp"
 
 #include "receivers/real/cppm/arduino_cppm.hpp"
 

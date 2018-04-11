@@ -20,7 +20,7 @@
 
 #include "hackflight.hpp"
 
-#include "boards/real/ladybug.hpp"
+#include "boards/ladybug.hpp"
 
 #include "receivers/real/serial/arduino_dsmx.hpp"
 
