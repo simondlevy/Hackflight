@@ -170,10 +170,10 @@ namespace hf {
 
             bool getEulerAngles(float eulerAngles[3])
             {
-                if (_sentral.gotQuaternions()) {
+                if (_sentral.gotQuaternion()) {
 
                     static float qw, qx, qy, qz;
-                    _sentral.readQuaternions(qw, qx, qy, qz);
+                    _sentral.readQuaternion(qw, qx, qy, qz);
 
                     eulerAngles[0] = atan2(2.0f * (qw * qx + qy * qz), qw * qw - qx * qx - qy * qy + qz * qz);
                     eulerAngles[1] = asin(2.0f * (qx * qz - qw * qy));
