@@ -102,8 +102,6 @@ namespace hf {
 
         private:
 
-            Receiver * rc;
-
             Board * board;
 
             // Custom mixer data per motor
