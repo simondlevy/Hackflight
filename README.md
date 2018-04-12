@@ -50,7 +50,7 @@ a separate C++ class to support each of these components:
 <li> The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp">Board</a>
 class specifies a set of five abstract (pure virtual) methods that you must
 implement for a particular flight controller or simulator: initializing the
-board; getting the current time in microseconds; getting Euler angles from the IMU;
+board; getting the current time in microseconds; getting the current quaternion from the IMU;
 getting gyrometer rates from the IMU; and sending commands to the motors.  
 <li> The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/receiver.hpp">Receiver</a>
 class performs basic functions associated with R/C control (tracking stick
