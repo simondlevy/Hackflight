@@ -1,4 +1,4 @@
-# Hackflight: Simple C++ quadcopter flight control firmware for Arduino and simulators
+# Hackflight: Simple C++ multirotor flight control firmware for Arduino and simulators
 
 <img src="logo.png" width=400>
 
@@ -6,7 +6,7 @@
 
 <br>
 
-Hackflight is simple, platform-independent, header-only C++ firmware for quadcopter 
+Hackflight is simple, platform-independent, header-only C++ firmware for multirotor
 [flight controllers](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) 
 and [simulators](https://github.com/simondlevy/HackflightSim).  It
 is geared toward people like me who want to tinker with flight-control
@@ -43,21 +43,28 @@ adheres to standard practices for C++, notably, short, simple methods and
 minimal use of compiler macros like <b>#ifdef</b> that can make it difficult to
 follow what the code is doing.  
 
-Because a quadcopter build typically involves choosing a flight-control board,
-radio receiver, and model (airframe), Hackflight provides a separate C++ class
-to support each of these components.  The
-[Board](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp)
+Because a multirotor build typically involves choosing a flight-control board,
+radio receiver, model (airframe), and PID control settings, Hackflight provides
+a separate C++ class to support each of these components:
+<ul>
+<li> The [Board](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp)
 class specifies a set of five abstract (pure virtual) methods that you must
 implement for a particular flight controller or simulator: initializing the
 board; getting the current time in microseconds; getting Euler angles from the IMU;
-getting gyrometer rates from the IMU; and sending commands to the motors.  The
-[Receiver](https://github.com/simondlevy/Hackflight/blob/master/src/receiver.hpp)
+getting gyrometer rates from the IMU; and sending commands to the motors.  
+<li> The [Receiver](https://github.com/simondlevy/Hackflight/blob/master/src/receiver.hpp)
 class performs basic functions associated with R/C control (tracking stick
 positions, checking switches) and specifies a set of abstract methods that you
-implement for a particular receiver (reading channels values).  The
-[Stabilizer](https://github.com/simondlevy/Hackflight/blob/master/src/stabilizer.hpp)
+implement for a particular receiver (reading channels values).  
+<li>The [Mixer](https://github.com/simondlevy/Hackflight/blob/master/src/mixer.hpp)
+is an abstract class that can be subclassed for various motor configurations
+(QuadX, Hexacopter, Tricopter, ...).  The 
+[QuadX](https://github.com/simondlevy/Hackflight/blob/master/src/mixers/quadx.hpp) class
+is already implemented.
+<li>The [Stabilizer](https://github.com/simondlevy/Hackflight/blob/master/src/stabilizer.hpp)
 class provides a constructor where you specify the stabilization PID values
 appropriate for your model.
+</ul>
 
 Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
 channel values,  we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program.
