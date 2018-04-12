@@ -5,8 +5,6 @@
 <br><i>Hackflight logo by MC Greenleaf</i>
 </p>
 
-<br>
-
 Hackflight is simple, platform-independent, header-only C++ firmware for multirotor
 [flight controllers](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) 
 and [simulators](https://github.com/simondlevy/HackflightSim).  It
