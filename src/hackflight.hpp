@@ -37,9 +37,7 @@ namespace hf {
             Board      * board;
             Receiver   * receiver;
             Stabilizer * stabilizer;
-
-            // Eventually we might want to support mixers for different kinds of configurations (tricopter, etc.)
-            Mixer      mixer;
+            Mixer      * mixer;
 
             // Vehicle state
             float eulerAngles[3];
@@ -82,7 +80,7 @@ namespace hf {
                     stabilizer->updateEulerAngles(eulerAngles);
 
                     // Do serial comms
-                    board->doSerialComms(eulerAngles, armed, receiver, &mixer);
+                    board->doSerialComms(eulerAngles, armed, receiver, mixer);
                 }
             }
 
@@ -106,7 +104,7 @@ namespace hf {
 
                     // Use updated demands to run motors
                     if (armed && !failsafe && !receiver->throttleIsDown()) {
-                        mixer.runArmed(demands);
+                        mixer->runArmed(demands);
                     }
                 }
             }
@@ -130,7 +128,7 @@ namespace hf {
             void checkFailsafe(void)
             {
                 if (armed && receiver->lostSignal()) {
-                    mixer.cutMotors();
+                    mixer->cutMotors();
                     armed = false;
                     failsafe = true;
                     board->showArmedStatus(false);
@@ -170,7 +168,7 @@ namespace hf {
 
                 // Cut motors on throttle-down
                 if (armed && receiver->throttleIsDown()) {
-                    mixer.cutMotors();
+                    mixer->cutMotors();
                 }
 
                 // Set LED based on arming status
@@ -180,12 +178,13 @@ namespace hf {
 
         public:
 
-            void init(Board * _board, Receiver * _receiver, Stabilizer * _stabilizer)
+            void init(Board * _board, Receiver * _receiver, Stabilizer * _stabilizer, Mixer * _mixer)
             {  
                 // Store the essentials
                 board = _board;
                 receiver = _receiver;
                 stabilizer = _stabilizer;
+                mixer = _mixer;
 
                 // Do hardware initialization for board
                 board->init();
@@ -195,7 +194,7 @@ namespace hf {
 
                 // Initialize our stabilization, mixing, and MSP (serial comms)
                 stabilizer->init();
-                mixer.init(board); 
+                mixer->init(board); 
 
                 // Start unarmed
                 armed = false;

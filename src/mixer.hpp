@@ -29,77 +29,6 @@ namespace hf {
 
     class Mixer {
 
-        public:
-
-            // This is set by MSP
-            float  motorsDisarmed[4];
-
-            void init(Board * _board)
-            {
-                //  T   A    E   R
-                mixerQuadX[0] = { +1, -1,  +1, +1 };    // right rear
-                mixerQuadX[1] = { +1, -1,  -1, -1 };    // right front
-                mixerQuadX[2] = { +1, +1,  +1, -1 };    // left rear
-                mixerQuadX[3] = { +1, +1,  -1, +1 };    // left front
-
-                board = _board;
-
-                // set disarmed motor values
-                for (uint8_t i = 0; i < 4; i++)
-                    motorsDisarmed[i] = 0;
-            }
-
-            void runArmed(demands_t demands)
-            {
-                float motors[4];
-
-                for (uint8_t i = 0; i < 4; i++) {
-
-                    motors[i] = 
-                        (demands.throttle * mixerQuadX[i].throttle + 
-                         demands.roll     * mixerQuadX[i].roll +     
-                         demands.pitch    * mixerQuadX[i].pitch +   
-                         demands.yaw      * mixerQuadX[i].yaw);      
-                }
-
-                float maxMotor = motors[0];
-
-                for (uint8_t i = 1; i < 4; i++)
-                    if (motors[i] > maxMotor)
-                        maxMotor = motors[i];
-
-                for (uint8_t i = 0; i < 4; i++) {
-
-                    // This is a way to still have good gyro corrections if at least one motor reaches its max
-                    if (maxMotor > 1) {
-                        motors[i] -= maxMotor - 1;
-                    }
-
-                    // Keep motor values in interval [0,1]
-                    motors[i] = Filter::constrainMinMax(motors[i], 0, 1);
-                }
-
-                for (uint8_t i = 0; i < 4; i++) {
-                    board->writeMotor(i, motors[i]);
-                }
-            }
-
-            // This is how we can spin the motors from the GCS
-            void runDisarmed(void)
-            {
-                for (uint8_t i = 0; i < 4; i++) {
-                    board->writeMotor(i, motorsDisarmed[i]);
-                }
-            }
-
-            void cutMotors(void)
-            {
-                for (uint8_t i = 0; i < 4; i++) {
-                    board->writeMotor(i, 0);
-                }
-            }
-
-
         private:
 
             Board * board;
@@ -112,7 +41,84 @@ namespace hf {
                 int8_t yaw;	     // R
             } motorMixer_t;
 
-            motorMixer_t mixerQuadX[4];
+            // Arbitrary
+            static const uint8_t MAXMOTORS = 20;
+
+        protected:
+
+            motorMixer_t motorDirections[MAXMOTORS];
+
+            Mixer(uint8_t _nmotors)
+            {
+                nmotors = _nmotors;
+            }
+
+        public:
+
+            // These are also use by MSP
+            float  motorsDisarmed[MAXMOTORS];
+            uint8_t nmotors;
+
+            void init(Board * _board)
+            {
+                board = _board;
+
+                // set disarmed motor values
+                for (uint8_t i = 0; i < nmotors; i++)
+                    motorsDisarmed[i] = 0;
+            }
+
+            void runArmed(demands_t demands)
+            {
+                float motors[MAXMOTORS];
+
+                for (uint8_t i = 0; i < nmotors; i++) {
+
+                    motors[i] = 
+                        (demands.throttle * motorDirections[i].throttle + 
+                         demands.roll     * motorDirections[i].roll +     
+                         demands.pitch    * motorDirections[i].pitch +   
+                         demands.yaw      * motorDirections[i].yaw);      
+                }
+
+                float maxMotor = motors[0];
+
+                for (uint8_t i = 1; i < nmotors; i++)
+                    if (motors[i] > maxMotor)
+                        maxMotor = motors[i];
+
+                for (uint8_t i = 0; i < nmotors; i++) {
+
+                    // This is a way to still have good gyro corrections if at least one motor reaches its max
+                    if (maxMotor > 1) {
+                        motors[i] -= maxMotor - 1;
+                    }
+
+                    // Keep motor values in interval [0,1]
+                    motors[i] = Filter::constrainMinMax(motors[i], 0, 1);
+                }
+
+                for (uint8_t i = 0; i < nmotors; i++) {
+                    board->writeMotor(i, motors[i]);
+                }
+            }
+
+            // This is how we can spin the motors from the GCS
+            void runDisarmed(void)
+            {
+                for (uint8_t i = 0; i < nmotors; i++) {
+                    board->writeMotor(i, motorsDisarmed[i]);
+                }
+            }
+
+            void cutMotors(void)
+            {
+                for (uint8_t i = 0; i < nmotors; i++) {
+                    board->writeMotor(i, 0);
+                }
+            }
+
+
     };
 
 } // namespace

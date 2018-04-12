@@ -189,7 +189,7 @@ namespace hf {
                         switch (cmdMSP) {
 
                             case MSP_SET_MOTOR_NORMAL:
-                                for (uint8_t i = 0; i < 4; i++)
+                                for (uint8_t i = 0; i < mixer->nmotors; i++)
                                     mixer->motorsDisarmed[i] = readFloat();
                                 headSerialReply(0);
                                 break;

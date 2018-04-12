@@ -20,14 +20,15 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-
 #include "boards/ladybug.hpp"
-
 #include "receivers/cppm/arduino_cppm.hpp"
+#include "mixers/quadx.hpp"
 
 hf::Hackflight h;
 
 hf::Arduino_CPPM_Receiver rc = hf::Arduino_CPPM_Receiver(.005f, -.08f, 0.f);
+
+hf::MixerQuadX mixer;
 
 hf::Stabilizer stabilizer = hf::Stabilizer(
                 0.20f,      // Level P
@@ -39,7 +40,7 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
 
 void setup(void)
 {
-    h.init(new hf::Ladybug(), &rc, &stabilizer);
+    h.init(new hf::Ladybug(), &rc, &stabilizer, &mixer);
 }
 
 void loop(void)
