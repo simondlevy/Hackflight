@@ -82,11 +82,7 @@ namespace hf {
                 CHANNEL_THROTTLE, // T
                 CHANNEL_ROLL,     // A
                 CHANNEL_PITCH,    // E
-                CHANNEL_YAW,      // R
-                CHANNEL_AUX1,
-                CHANNEL_AUX2,
-                CHANNEL_AUX3,
-                CHANNEL_AUX4
+                CHANNEL_YAW       // R
             };
 
             // These must be overridden for each receiver
