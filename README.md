@@ -1,6 +1,6 @@
 # Hackflight: Simple C++ multirotor flight control firmware for Arduino and simulators
 
-<img src="logo.png" width=400>
+<img src="logo.png" width=400 align="middle">
 
 <i>Hackflight logo by MC Greenleaf</i>
 
