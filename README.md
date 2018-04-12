@@ -2,7 +2,7 @@
 
 <p align="center"> 
 <img src="logo.png" width=400>
-<i>Hackflight logo by MC Greenleaf</i>
+<br><i>Hackflight logo by MC Greenleaf</i>
 </p>
 
 <br>
