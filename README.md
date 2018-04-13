@@ -27,7 +27,7 @@ addition to offering the full complement of i/o signals (UART, I<sup>2</sup>C,
 SPI, digital, analog), this board has hardware support for floating-point
 operations, allowing us to write simpler code based on standard units:
 
-* Quaternions in [-1,+1]
+* Quaternions in the interval [-1,+1]
 * Euler angles in radians
 * Accelerometer values in Gs
 * Gyrometer values in radians per second
