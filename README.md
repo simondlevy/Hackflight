@@ -59,7 +59,7 @@ implement for a particular receiver (reading channels values).
 <li>The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/mixer.hpp">Mixer</a> class
 is an abstract class that can be subclassed for various motor configurations
 (QuadX, Hexacopter, Tricopter, etc.).  The 
-<a href="https://github.com/simondlevy/Hackflight/blob/master/src/mixers/quadx.hpp">QuadX</a> class
+<a href="https://github.com/simondlevy/Hackflight/blob/master/src/mixers/quadx.hpp">QuadX</a> subclass
 is already implemented.
 <li>The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/stabilizer.hpp">Stabilizer</a>
 class provides a constructor where you specify the stabilization PID values
