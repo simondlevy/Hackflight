@@ -100,6 +100,7 @@ namespace hf {
 
             bool getGyrometer(float gyroRates[3])
             {
+                Debug::printf("%d\n", imu->readSensor());
                 return false;
             }
 
