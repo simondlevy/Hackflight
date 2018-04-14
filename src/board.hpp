@@ -30,7 +30,7 @@ namespace hf {
 
             //------------------------------------ Core functionality ----------------------------------------------------
             virtual bool     getQuaternion(float quat[4]) = 0;
-            virtual bool     getGyroRates(float gyroRates[3]) = 0;
+            virtual bool     getGyrometer(float gyroRates[3]) = 0;
             virtual void     writeMotor(uint8_t index, float value) = 0;
 
             //------------------------ Support for additional PID controllers --------------------------------------------

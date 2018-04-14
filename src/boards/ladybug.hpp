@@ -138,7 +138,7 @@ namespace hf {
                 avalPrev[index] = aval;
             }
 
-            bool getGyroRates(float gyroRates[3])
+            bool getGyrometer(float gyroRates[3])
             {
                 // Since gyro is updated most frequently, use it to drive SENtral polling
                 checkEventStatus();

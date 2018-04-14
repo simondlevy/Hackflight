@@ -32,7 +32,7 @@ namespace hf {
 
         private:
 
-            MPU9250 * mpu9250;
+            MPU9250 * imu;
             const uint8_t LED = 25;
 
         protected:
@@ -40,10 +40,10 @@ namespace hf {
             void init(void)
             {
                 // Create the MPU9250 object
-                mpu9250 = new MPU9250(Wire, 0x68);
+                imu = new MPU9250(Wire, 0x68);
 
                 // start communication with MPU9250 
-                int status = mpu9250->begin();
+                int status = imu->begin();
                 if (status < 0) {
                     Serial.println("IMU initialization unsuccessful");
                     Serial.println("Check IMU wiring or try cycling power");
@@ -98,7 +98,7 @@ namespace hf {
             {
             }
 
-            bool getGyroRates(float gyroRates[3])
+            bool getGyrometer(float gyroRates[3])
             {
                 return false;
             }

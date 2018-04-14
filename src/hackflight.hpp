@@ -88,7 +88,7 @@ namespace hf {
             {
                 float gyroRates[3];
 
-                if (board->getGyroRates(gyroRates)) {
+                if (board->getGyrometer(gyroRates)) {
 
                     gcount++;
 
