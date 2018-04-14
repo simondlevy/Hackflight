@@ -103,11 +103,6 @@ namespace hf {
                 delay(msec);
             }
 
-            uint32_t getMicroseconds()
-            {
-                return micros();
-            }
-
             void ledSet(bool is_on)
             { 
                 digitalWrite(A1, is_on ? HIGH : LOW);
