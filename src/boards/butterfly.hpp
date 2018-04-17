@@ -96,26 +96,40 @@ namespace hf {
 
             void writeMotor(uint8_t index, float value)
             {
+                (void)index;
+                (void)value;
             }
 
-            bool getGyrometer(float gyroRates[3])
+            bool getGyrometer(float gyro[3])
             {
-                Debug::printf("%d\n", imu->readSensor());
-                return false;
+                // Fake it for now
+                gyro[0] = 0.0f;
+                gyro[1] = 0.0f;
+                gyro[2] = 0.0f;
+
+                return true;
             }
 
             bool getQuaternion(float quat[4])
             {
-                return false;
+                // Fake it for now
+                quat[0] = 0.3f;
+                quat[1] = 0.0f;
+                quat[2] = 0.0f;
+                quat[3] = 1.0f;
+
+                return true;
             }
 
             bool getAccelerometer(float accelGs[3])
             {
+                (void)accelGs;
                 return false;
             }
 
             bool getBarometer(float & pressure)
             {
+                (void)pressure;
                 return false;
             }
 
