@@ -102,10 +102,11 @@ namespace hf {
 
             bool getGyrometer(float gyro[3])
             {
-                // Fake it for now
-                gyro[0] = 0.0f;
-                gyro[1] = 0.0f;
-                gyro[2] = 0.0f;
+                imu->readSensor();
+
+                gyro[0] = imu->getGyroX_rads();
+                gyro[1] = imu->getGyroY_rads();
+                gyro[2] = imu->getGyroZ_rads();
 
                 return true;
             }

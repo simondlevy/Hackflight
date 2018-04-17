@@ -65,8 +65,6 @@ namespace hf {
 
                 if (board->getQuaternion(q)) {
 
-                    Debug::printf("%+2.2f %+2.2f %+2.2f %+2.2f\n", q[0], q[1], q[2], q[3]);
-
                     eulerAngles[0] = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
                     eulerAngles[1] = asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
                     eulerAngles[2] = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]); 
