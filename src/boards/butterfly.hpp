@@ -1,7 +1,6 @@
 /*
-   butterfly.hpp : Ladybug dev board implementation of Hackflight Board routines
-
-   Uses MPU9250
+   butterfly.hpp : Implementation of Hackflight Board routines for Butterfly
+                   dev board + MPU9250 IMU
 
    This file is part of Hackflight.
 
@@ -33,7 +32,7 @@ namespace hf {
         private:
 
             MPU9250 * imu;
-            const uint8_t LED = 25;
+            const uint8_t LED = 13;
 
         protected:
 
@@ -107,6 +106,9 @@ namespace hf {
                 gyro[0] = imu->getGyroX_rads();
                 gyro[1] = imu->getGyroY_rads();
                 gyro[2] = imu->getGyroZ_rads();
+
+                Debug::printf("%+2.2f   %+2.2f   %+2.2f\n",
+                        gyro[0], gyro[1], gyro[2]);
 
                 return true;
             }
