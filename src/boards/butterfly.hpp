@@ -216,21 +216,6 @@ namespace hf {
             {
                 if(sumCount > sumCountMax) {
 
-                    float a12 =   2.0f * (q[1] * q[2] + q[0] * q[3]);
-                    float a22 =   q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3];
-                    float a31 =   2.0f * (q[0] * q[1] + q[2] * q[3]);
-                    float a32 =   2.0f * (q[1] * q[3] - q[0] * q[2]);
-                    float a33 =   q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3];
-
-                    float pitch = -asinf(a32);
-                    float roll  = atan2f(a31, a33);
-                    float yaw   = atan2f(a12, a22);
-
-                    if (yaw < 0) yaw   += 2*M_PI;
-
-                    Debug::printf("q1: %+2.2f    q2: %+2.2f    q3: %+2.2f    q4: %+2.2f\n", q[0], q[1], q[2], q[3]);
-                    Debug::printf("Roll: %+2.2f    Pitch: %+2.2f    Yaw: %+2.2f\n\n", roll, pitch, yaw);
-
                     // Reset accumulators
                     sumCount = 0;
                     sum = 0;    
