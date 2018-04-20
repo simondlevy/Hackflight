@@ -20,8 +20,8 @@
 #pragma once
 
 #include <Wire.h>
-#include <MPU9250.h>
-#include <stdarg.h>
+#include <MPU9250.h> 
+
 #include "hackflight.hpp"
 #include "realboard.hpp"
 
@@ -31,38 +31,56 @@ namespace hf {
 
         private:
 
-            MPU9250 * imu;
-            const uint8_t LED = 13;
+            MPU9250  imu;
+
+            const uint8_t LED_PIN       = 13;
+            const uint8_t INTERRUPT_PIN = 8;
+
+            const uint8_t Ascale     = AFS_2G;
+            const uint8_t Gscale     = GFS_250DPS;
+            const uint8_t Mscale     = MFS_16BITS;
+            const uint8_t Mmode      = M_100Hz;
+            const uint8_t sampleRate = 0x04;         
+
+            float aRes;
+            float gRes;
+            float mRes;
+
+            // XXX we should be loading these values from pre-calibrated data
+            float gyroBias[3]        = {0,0,0};
+            float accelBias[3]       = {0,0,0};
+            float magBias[3]         = {0,0,0};
+            float magScale[3]        = {1,1,1};      
+            float magCalibration[3]  = {1,1,1};      
 
         protected:
 
             void init(void)
             {
-                // Create the MPU9250 object
-                imu = new MPU9250(Wire, 0x68);
-
-                // start communication with MPU9250 
-                int status = imu->begin();
-                if (status < 0) {
-                    Serial.println("IMU initialization unsuccessful");
-                    Serial.println("Check IMU wiring or try cycling power");
-                    Serial.print("Status: ");
-                    Serial.println(status);
-                    while(true) ;
-                }
-
                 // Begin serial comms
                 Serial.begin(115200);
 
-                // Setup LEDs and turn them off
-                pinMode(LED, OUTPUT);
-                digitalWrite(LED, LOW);
+                // Setup LED_PINs and turn them off
+                pinMode(LED_PIN, OUTPUT);
+                digitalWrite(LED_PIN, LOW);
 
                 // Start I^2C
                 Wire.begin();
+                Wire.setClock(400000); // I2C frequency at 400 kHz
+                delay(1000);
 
-                // Hang a bit before starting up the EM7180
-                delay(100);
+                // Reset the MPU9250
+                imu.resetMPU9250(); 
+
+                // get sensor resolutions, only need to do this once
+                aRes = imu.getAres(Ascale);
+                gRes = imu.getGres(Gscale);
+                mRes = imu.getMres(Mscale);
+
+                imu.initMPU9250(Ascale, Gscale, sampleRate); 
+
+                // Get magnetometer calibration from AK8963 ROM
+                imu.initAK8963(Mscale, Mmode, magCalibration);
 
                 // Do general real-board initialization
                 RealBoard::init();
@@ -75,7 +93,7 @@ namespace hf {
 
             void ledSet(bool is_on)
             { 
-                digitalWrite(LED, is_on ? HIGH : LOW);
+                digitalWrite(LED_PIN, is_on ? HIGH : LOW);
             }
 
             uint8_t serialAvailableBytes(void)
@@ -101,16 +119,15 @@ namespace hf {
 
             bool getGyrometer(float gyro[3])
             {
-                imu->readSensor();
 
-                gyro[0] = imu->getGyroX_rads();
-                gyro[1] = imu->getGyroY_rads();
-                gyro[2] = imu->getGyroZ_rads();
+                if(imu.checkNewAccelGyroData()) {
 
-                Debug::printf("%+2.2f   %+2.2f   %+2.2f\n",
-                        gyro[0], gyro[1], gyro[2]);
+                    Debug::printf("%d\n", millis());
 
-                return true;
+                    return true;
+                }
+
+                return false;
             }
 
             bool getQuaternion(float quat[4])
@@ -128,19 +145,19 @@ namespace hf {
             {
                 (void)accelGs;
                 return false;
-            }
-
-            bool getBarometer(float & pressure)
-            {
-                (void)pressure;
-                return false;
-            }
-
-    }; // class Butterfly
-
-    void Board::outbuf(char * buf)
-    {
-        Serial.print(buf);
     }
+
+    bool getBarometer(float & pressure)
+    {
+        (void)pressure;
+        return false;
+    }
+
+}; // class Butterfly
+
+void Board::outbuf(char * buf)
+{
+    Serial.print(buf);
+}
 
 } // namespace hf
