@@ -21,6 +21,7 @@
 
 #include <Wire.h>
 #include <MPU9250.h> 
+#include <QuaternionFilters.h>
 
 #include "hackflight.hpp"
 #include "realboard.hpp"
@@ -53,6 +54,19 @@ namespace hf {
             float ax=0, ay=0, az=0;
             float gx=0, gy=0, gz=0;
             float mx=0, my=0, mz=0;
+
+            // global constants for 9 DoF fusion and AHRS (Attitude and Heading Reference System)
+            const float GyroMeasError = M_PI * (40.0f / 180.0f); // gyroscope measurement error in rads/s (start at 40 deg/s)
+            const float GyroMeasDrift = M_PI * (0.0f  / 180.0f); // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
+            const float beta = sqrtf(3.0f / 4.0f) * GyroMeasError;   // compute beta
+
+            // Quaternion support
+            MadgwickQuaternion quat = MadgwickQuaternion(beta);
+
+            float sum = 0;
+            uint32_t sumCount = 0;                    // used to control display output rate
+            uint32_t timePrev = 0;                    // used to calculate integration interval
+            float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};    // vector to hold quaternion
 
             // XXX we should be loading these values from pre-calibrated data
             float gyroBias[3]        = {0,0,0};
