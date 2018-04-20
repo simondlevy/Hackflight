@@ -34,20 +34,34 @@ namespace hf {
 
             MPU9250  imu;
 
-            const uint8_t LED_PIN       = 13;
-            const uint8_t INTERRUPT_PIN = 8;
+            // Butterfly board follows Arduino standard for LED pin
+            const uint8_t LED_PIN = 13;
 
+            // Paramters to experiment with ------------------------------------------------------------------------
+
+            // Sensor full-scale settings
             const uint8_t Ascale     = AFS_2G;
             const uint8_t Gscale     = GFS_250DPS;
             const uint8_t Mscale     = MFS_16BITS;
             const uint8_t Mmode      = M_100Hz;
+
+            // sampleRate: (1 + sampleRate) is a simple divisor of the fundamental 1000 kHz rate of the gyro and accel, so 
+            // sampleRate = 0x00 means 1 kHz sample rate for both accel and gyro, 0x04 means 200 Hz, etc.
             const uint8_t sampleRate = 0x04;         
 
+            
+            // Quaternion calculation
+            const uint8_t  QuaternionUpdatesPerCycle = 5;    // update quaternion this many times per gyro aquisition
+            const uint16_t QuaternionUpdateRate      = 2;    // Hertz
+
+            // Instance variables -----------------------------------------------------------------------------------
+
+            // For scaling to normal units (accelerometer G's, gyrometer rad/sec, magnetometer mGauss)
             float aRes;
             float gRes;
             float mRes;
 
-            // used to read all 14 bytes at once from the MPU9250 accel/gyro
+            // Used to read all 14 bytes at once from the MPU9250 accel/gyro
             int16_t imuData[7] = {0,0,0,0,0,0,0};
 
             // XXX maybe we can declare these in getGyrometer()
@@ -55,18 +69,18 @@ namespace hf {
             float gx=0, gy=0, gz=0;
             float mx=0, my=0, mz=0;
 
-            // global constants for 9 DoF fusion and AHRS (Attitude and Heading Reference System)
+            // Global constants for 9 DoF fusion and AHRS (Attitude and Heading Reference System)
             const float GyroMeasError = M_PI * (40.0f / 180.0f); // gyroscope measurement error in rads/s (start at 40 deg/s)
             const float GyroMeasDrift = M_PI * (0.0f  / 180.0f); // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
             const float beta = sqrtf(3.0f / 4.0f) * GyroMeasError;   // compute beta
 
             // Quaternion support
             MadgwickQuaternion quaternionCalculator = MadgwickQuaternion(beta);
-
-            float sum = 0;                            // sum for averaging filter update rate
-            uint32_t sumCount = 0;                    // used to control display output rate
-            uint32_t timePrev = 0;                    // used to calculate integration interval
-            float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};    // vector to hold quaternion
+            float sum = 0;                                  // sum for averaging filter update rate
+            uint32_t sumCount = 0;                          // used to control display output rate
+            const uint16_t sumCountMax = 1000 / QuaternionUpdateRate;
+            uint32_t timePrev = 0;                          // used to calculate integration interval
+            float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};          // vector to hold quaternion
 
             // XXX we should be loading these values from pre-calibrated data
             float gyroBias[3]        = {0,0,0};
@@ -173,7 +187,7 @@ namespace hf {
                     }
 
                     // Iterate a fixed number of times per data read cycle, updating the quaternion
-                    for (uint8_t i = 0; i < 5; i++) { 
+                    for (uint8_t i=0; i<QuaternionUpdatesPerCycle; i++) { 
 
                         uint32_t timeCurr = micros();
 
@@ -201,7 +215,7 @@ namespace hf {
 
             bool getQuaternion(float quat[4])
             {
-                if(sumCount > 500) {
+                if(sumCount > sumCountMax) {
 
                     Debug::printf("q1: %+2.2f    q2: %+2.2f    q3: %+2.2f    q4: %+2.2f\n", q[0], q[1], q[2], q[3]);
 
@@ -220,18 +234,7 @@ namespace hf {
                     yaw   *= 180.0f / M_PI; 
                     if (yaw < 0) yaw   += 360.0f; // Ensure yaw stays between 0 and 360
 
-                    Debug::printf("Roll: %+2.2f    Pitch: %+2.2f    Yaw: %+2.2f\n", roll, pitch, yaw);
-
-                    Serial.print("Yaw, Pitch, Roll: ");
-                    Serial.print(yaw, 2);
-                    Serial.print(", ");
-                    Serial.print(pitch, 2);
-                    Serial.print(", ");
-                    Serial.println(roll, 2);
-
-                    Serial.print("rate = ");
-                    Serial.print((float)sumCount/sum, 2);
-                    Serial.println(" Hz\n");
+                    Debug::printf("Roll: %+2.2f    Pitch: %+2.2f    Yaw: %+2.2f\n\n", roll, pitch, yaw);
 
                     sumCount = 0;
                     sum = 0;    
