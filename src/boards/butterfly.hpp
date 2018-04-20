@@ -49,10 +49,9 @@ namespace hf {
             // sampleRate = 0x00 means 1 kHz sample rate for both accel and gyro, 0x04 means 200 Hz, etc.
             const uint8_t sampleRate = 0x04;         
 
-            
             // Quaternion calculation
             const uint8_t  QuaternionUpdatesPerCycle = 5;    // update quaternion this many times per gyro aquisition
-            const uint16_t QuaternionUpdateRate      = 2;    // Hertz
+            const uint16_t QuaternionUpdateRate      = 50;   // Hertz
 
             // Instance variables -----------------------------------------------------------------------------------
 
@@ -217,8 +216,6 @@ namespace hf {
             {
                 if(sumCount > sumCountMax) {
 
-                    Debug::printf("q1: %+2.2f    q2: %+2.2f    q3: %+2.2f    q4: %+2.2f\n", q[0], q[1], q[2], q[3]);
-
                     float a12 =   2.0f * (q[1] * q[2] + q[0] * q[3]);
                     float a22 =   q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3];
                     float a31 =   2.0f * (q[0] * q[1] + q[2] * q[3]);
@@ -229,23 +226,22 @@ namespace hf {
                     float roll  = atan2f(a31, a33);
                     float yaw   = atan2f(a12, a22);
 
-                    pitch *= 180.0f / M_PI;
-                    roll  *= 180.0f / M_PI;
-                    yaw   *= 180.0f / M_PI; 
-                    if (yaw < 0) yaw   += 360.0f; // Ensure yaw stays between 0 and 360
+                    if (yaw < 0) yaw   += 2*M_PI;
 
+                    Debug::printf("q1: %+2.2f    q2: %+2.2f    q3: %+2.2f    q4: %+2.2f\n", q[0], q[1], q[2], q[3]);
                     Debug::printf("Roll: %+2.2f    Pitch: %+2.2f    Yaw: %+2.2f\n\n", roll, pitch, yaw);
 
+                    // Reset accumulators
                     sumCount = 0;
                     sum = 0;    
-                }
-                // Fake it for now
-                quat[0] = 0.3f;
-                quat[1] = 0.0f;
-                quat[2] = 0.0f;
-                quat[3] = 1.0f;
 
-                return true;
+                    // Copy quaternion values back out
+                    memcpy(quat, q, 4*sizeof(float));
+
+                    return true;
+                }
+
+                return false;
             }
 
             bool getAccelerometer(float accelGs[3])
