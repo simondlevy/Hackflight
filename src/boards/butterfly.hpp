@@ -203,50 +203,24 @@ namespace hf {
             {
                 if(sumCount > 500) {
 
-                    Serial.print("ax = ");
-                    Serial.print((int)1000*ax);  
-                    Serial.print(" ay = ");
-                    Serial.print((int)1000*ay); 
-                    Serial.print(" az = ");
-                    Serial.print((int)1000*az);
-                    Serial.println(" mg");
-                    Serial.print("gx = ");
-                    Serial.print( gx, 2); 
-                    Serial.print(" gy = ");
-                    Serial.print( gy, 2); 
-                    Serial.print(" gz = ");
-                    Serial.print( gz, 2);
-                    Serial.println(" deg/s");
-                    Serial.print("mx = ");
-                    Serial.print( (int)mx ); 
-                    Serial.print(" my = ");
-                    Serial.print( (int)my ); 
-                    Serial.print(" mz = ");
-                    Serial.print( (int)mz );
-                    Serial.println(" mG");
-
-                    Serial.print("q0 = ");
-                    Serial.print(q[0]);
-                    Serial.print(" qx = ");
-                    Serial.print(q[1]); 
-                    Serial.print(" qy = ");
-                    Serial.print(q[2]); 
-                    Serial.print(" qz = ");
-                    Serial.println(q[3]); 
+                    Debug::printf("q1: %+2.2f    q2: %+2.2f    q3: %+2.2f    q4: %+2.2f\n", q[0], q[1], q[2], q[3]);
 
                     float a12 =   2.0f * (q[1] * q[2] + q[0] * q[3]);
                     float a22 =   q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3];
                     float a31 =   2.0f * (q[0] * q[1] + q[2] * q[3]);
                     float a32 =   2.0f * (q[1] * q[3] - q[0] * q[2]);
                     float a33 =   q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3];
+
                     float pitch = -asinf(a32);
                     float roll  = atan2f(a31, a33);
                     float yaw   = atan2f(a12, a22);
+
                     pitch *= 180.0f / M_PI;
-                    yaw   *= 180.0f / M_PI; 
-                    yaw   += 13.8f; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
-                    if(yaw < 0) yaw   += 360.0f; // Ensure yaw stays between 0 and 360
                     roll  *= 180.0f / M_PI;
+                    yaw   *= 180.0f / M_PI; 
+                    if (yaw < 0) yaw   += 360.0f; // Ensure yaw stays between 0 and 360
+
+                    Debug::printf("Roll: %+2.2f    Pitch: %+2.2f    Yaw: %+2.2f\n", roll, pitch, yaw);
 
                     Serial.print("Yaw, Pitch, Roll: ");
                     Serial.print(yaw, 2);
