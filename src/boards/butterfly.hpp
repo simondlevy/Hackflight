@@ -40,14 +40,14 @@ namespace hf {
             // Paramters to experiment with ------------------------------------------------------------------------
 
             // Sensor full-scale settings
-            const uint8_t Ascale     = AFS_2G;
-            const uint8_t Gscale     = GFS_250DPS;
+            const uint8_t Ascale     = AFS_8G;
+            const uint8_t Gscale     = GFS_2000DPS;
             const uint8_t Mscale     = MFS_16BITS;
             const uint8_t Mmode      = M_100Hz;
 
             // sampleRate: (1 + sampleRate) is a simple divisor of the fundamental 1000 kHz rate of the gyro and accel, so 
-            // sampleRate = 0x00 means 1 kHz sample rate for both accel and gyro, 0x04 means 200 Hz, etc.
-            const uint8_t sampleRate = 0x04;         
+            // sampleRate = 0 means 1 kHz sample rate for both accel and gyro, 4 means 200 Hz, etc.
+            const uint8_t sampleRate = 0x02;         
 
             // Quaternion calculation
             const uint8_t  QuaternionUpdatesPerCycle = 5;    // update quaternion this many times per gyro aquisition

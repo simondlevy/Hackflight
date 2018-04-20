@@ -81,7 +81,7 @@ namespace hf {
                 }
 
                 // Get actual gyro rate for conversion to radians
-                uint8_t accFs; uint16_t gyroFs; uint16_t magFs;
+                uint8_t accFs=0; uint16_t gyroFs=0; uint16_t magFs=0;
                 _sentral.getFullScaleRanges(accFs, gyroFs, magFs);
                 gyroAdcToRadians = M_PI * (float)gyroFs / (1<<15) / 180.;  
 
