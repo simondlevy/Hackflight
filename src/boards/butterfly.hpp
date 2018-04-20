@@ -46,6 +46,14 @@ namespace hf {
             float gRes;
             float mRes;
 
+            // used to read all 14 bytes at once from the MPU9250 accel/gyro
+            int16_t imuData[7] = {0,0,0,0,0,0,0};
+
+            // XXX maybe we can declare these in getGyrometer()
+            float ax=0, ay=0, az=0;
+            float gx=0, gy=0, gz=0;
+            float mx=0, my=0, mz=0;
+
             // XXX we should be loading these values from pre-calibrated data
             float gyroBias[3]        = {0,0,0};
             float accelBias[3]       = {0,0,0};
@@ -119,10 +127,41 @@ namespace hf {
 
             bool getGyrometer(float gyro[3])
             {
-
                 if(imu.checkNewAccelGyroData()) {
 
-                    Debug::printf("%d\n", millis());
+                    imu.readMPU9250Data(imuData); 
+
+                    // Convert the accleration value into g's
+                    ax = (float)imuData[0]*aRes - accelBias[0];  // get actual g value, this depends on scale being set
+                    ay = (float)imuData[1]*aRes - accelBias[1];   
+                    az = (float)imuData[2]*aRes - accelBias[2];  
+
+                    // Convert the gyro value into degrees per second
+                    gx = (float)imuData[4]*gRes;  // get actual gyro value, this depends on scale being set
+                    gy = (float)imuData[5]*gRes;  
+                    gz = (float)imuData[6]*gRes; 
+
+                    if(imu.checkNewMagData()) { // Wait for magnetometer data ready bit to be set
+
+                        int16_t magCount[3];    // Stores the 16-bit signed magnetometer sensor output
+
+                        imu.readMagData(magCount);  // Read the x/y/z adc values
+
+                        // Calculate the magnetometer values in milliGauss
+                        // Include factory calibration per data sheet and user environmental corrections
+                        // Get actual magnetometer value, this depends on scale being set
+                        mx = (float)magCount[0]*mRes*magCalibration[0] - magBias[0];  
+                        my = (float)magCount[1]*mRes*magCalibration[1] - magBias[1];  
+                        mz = (float)magCount[2]*mRes*magCalibration[2] - magBias[2];  
+                        mx *= magScale[0];
+                        my *= magScale[1];
+                        mz *= magScale[2]; 
+                    }
+
+                    // Copy values back out
+                    gyro[0] = gx;
+                    gyro[1] = gy;
+                    gyro[2] = gz;
 
                     return true;
                 }
@@ -145,19 +184,19 @@ namespace hf {
             {
                 (void)accelGs;
                 return false;
-    }
+            }
 
-    bool getBarometer(float & pressure)
+            bool getBarometer(float & pressure)
+            {
+                (void)pressure;
+                return false;
+            }
+
+    }; // class Butterfly
+
+    void Board::outbuf(char * buf)
     {
-        (void)pressure;
-        return false;
+        Serial.print(buf);
     }
-
-}; // class Butterfly
-
-void Board::outbuf(char * buf)
-{
-    Serial.print(buf);
-}
 
 } // namespace hf
