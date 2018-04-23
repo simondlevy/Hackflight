@@ -107,9 +107,9 @@ namespace hf {
                 // Begin serial comms
                 Serial.begin(115200);
 
-                // Setup LED_PINs and turn them off
+                // Setup LED pin and turn it off
                 pinMode(LED_PIN, OUTPUT);
-                digitalWrite(LED_PIN, LOW);
+                digitalWrite(LED_PIN, HIGH);
 
                 // Connect to the ESCs and send them the baseline values
                 for (uint8_t k=0; k<4; ++k) {
@@ -146,7 +146,7 @@ namespace hf {
 
             void ledSet(bool is_on)
             { 
-                digitalWrite(LED_PIN, is_on ? HIGH : LOW);
+                digitalWrite(LED_PIN, is_on ? LOW : HIGH);
             }
 
             uint8_t serialAvailableBytes(void)
