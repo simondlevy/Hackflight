@@ -23,36 +23,48 @@
 
 static uint8_t MOTOR_PIN = 3;  // Motor 1: right rear
 
-static uint8_t val;
-static uint8_t inc;
+static uint16_t BASELINE = 990;
+static uint16_t MAXVAL   = 1500;
+
+static uint16_t val;
+static int8_t   inc;
 
 Servo esc;
 
 void setup(void)
 {
-    // Initialize the motor
-    //analogWriteFrequency(MOTOR_PIN, 10000);  
-    //analogWrite(MOTOR_PIN, 0);  
+    // Connect to the ESC
+    esc.attach(MOTOR_PIN);
+
+    // Send the baseline value to the ESC
+    esc.writeMicroseconds(BASELINE);
 
     // Start with motor off, increasing
-    val = 0;
+    val = BASELINE;
     inc = +1;
+
+    // Wait a spell
+    delay(1000);
 }
 
 void loop(void)
 {
-    //analogWrite(MOTOR_PIN, val);
+    // Send the current value to the ESC
+    esc.writeMicroseconds(val);
 
+    // Increement or decrement value
     val += inc;
 
-    // stop halfway
-    if (val == 128) {
+    // At max, switch to decrement
+    if (val == MAXVAL) {
         inc = -1;
     }
 
-    if (val == 0) {
+    // At min, switch to increment
+    if (val == BASELINE) {
         inc = +1;
     }
 
+    // Wait a bit between updates
     delay(10);
 }
