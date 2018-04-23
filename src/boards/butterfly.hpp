@@ -2,6 +2,8 @@
    butterfly.hpp : Implementation of Hackflight Board routines for Butterfly
                    dev board + MPU9250 IMU
 
+   Additional library required: https://github.com/simondlevy/MPU9250
+
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify

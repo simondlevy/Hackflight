@@ -3,6 +3,8 @@
 
    Uses EM7180 SENtral Sensor Hub in master mode mode
 
+   Additional library required: https://github.com/simondlevy/EM7180
+
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify

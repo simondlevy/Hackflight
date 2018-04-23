@@ -25,7 +25,7 @@
 
 hf::Hackflight h;
 
-hf::SBUS_Receiver rc = hf::SBUS_Receiver(.005f, -.08f, 0.f);
+hf::SBUS_Receiver rc;
 
 hf::MixerQuadX mixer;
 
