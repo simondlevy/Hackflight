@@ -1,6 +1,6 @@
 /*
    butterfly.hpp : Implementation of Hackflight Board routines for Butterfly
-                   dev board + MPU9250 IMU
+                   dev board + MPU9250 IMU + brushless motors
 
    Additional library required: https://github.com/simondlevy/MPU9250
 
@@ -23,6 +23,7 @@
 
 #include <Wire.h>
 #include <MPU9250.h> 
+#include <Servo.h>
 #include <QuaternionFilters.h>
 
 #include "hackflight.hpp"
@@ -34,7 +35,16 @@ namespace hf {
 
         private:
 
-            MPU9250  imu;
+            MPU9250 imu;
+
+            Servo escs[4];
+
+            // Motor pins
+            const uint8_t MOTOR_PINS[4] = {3, 4, 5, 6};
+
+            // Min, max PWM values
+            const uint16_t PWM_MIN = 990;
+            const uint16_t PWM_MAX = 2000;
 
             // Butterfly board follows Arduino standard for LED pin
             const uint8_t LED_PIN = 13;
@@ -101,6 +111,12 @@ namespace hf {
                 pinMode(LED_PIN, OUTPUT);
                 digitalWrite(LED_PIN, LOW);
 
+                // Connect to the ESCs and send them the baseline values
+                for (uint8_t k=0; k<4; ++k) {
+                    escs[k].attach(MOTOR_PINS[k]);
+                    escs[k].writeMicroseconds(PWM_MIN);
+                }
+
                 // Start I^2C
                 Wire.begin();
                 Wire.setClock(400000); // I2C frequency at 400 kHz
@@ -150,8 +166,7 @@ namespace hf {
 
             void writeMotor(uint8_t index, float value)
             {
-                (void)index;
-                (void)value;
+                escs[index].writeMicroseconds((uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)));
             }
 
             bool getGyrometer(float gyro[3])
