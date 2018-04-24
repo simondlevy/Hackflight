@@ -80,16 +80,7 @@ namespace hf {
             void writeMotor(uint8_t index, float value)
             {
                 // Scale motor value from [0,1] to [0,255]
-                uint8_t aval = (uint8_t)(value * 255);
-
-                // Avoid sending the motor the same value over and over
-                static uint8_t avalPrev[4];
-
-                if (aval != avalPrev[index]) {
-                    analogWrite(_motorPins[index], aval);
-                }
-
-                avalPrev[index] = aval;
+                analogWrite(_motorPins[index], (uint8_t)(value * 255));
             }
 
             bool getGyrometer(float gyroRates[3])

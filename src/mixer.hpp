@@ -44,6 +44,18 @@ namespace hf {
             // Arbitrary
             static const uint8_t MAXMOTORS = 20;
 
+            float motorsPrev[MAXMOTORS];
+
+            void writeMotor(uint8_t index, float value)
+            {
+                // Avoid sending the motor the same value over and over
+                if (motorsPrev[index] != value) {
+                    board->writeMotor(index,value);
+                }
+
+                motorsPrev[index] = value;
+            }
+
         protected:
 
             motorMixer_t motorDirections[MAXMOTORS];
@@ -63,9 +75,12 @@ namespace hf {
             {
                 board = _board;
 
-                // set disarmed motor values
-                for (uint8_t i = 0; i < nmotors; i++)
+                // set disarmed, previous motor values
+                for (uint8_t i = 0; i < nmotors; i++) {
                     motorsDisarmed[i] = 0;
+                    motorsPrev[i] = 0;
+                }
+
             }
 
             void runArmed(demands_t demands)
@@ -99,7 +114,7 @@ namespace hf {
                 }
 
                 for (uint8_t i = 0; i < nmotors; i++) {
-                    board->writeMotor(i, motors[i]);
+                    writeMotor(i, motors[i]);
                 }
             }
 
@@ -107,7 +122,7 @@ namespace hf {
             void runDisarmed(void)
             {
                 for (uint8_t i = 0; i < nmotors; i++) {
-                    board->writeMotor(i, motorsDisarmed[i]);
+                    writeMotor(i, motorsDisarmed[i]);
                 }
             }
 
