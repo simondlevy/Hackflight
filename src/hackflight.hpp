@@ -186,9 +186,6 @@ namespace hf {
                 stabilizer = _stabilizer;
                 mixer = _mixer;
 
-                // Do hardware initialization for board
-                //board->init();
-
                 // Initialize the receiver
                 receiver->init();
 

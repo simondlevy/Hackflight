@@ -102,43 +102,6 @@ namespace hf {
 
         protected:
 
-            void init(void)
-            {
-                // Begin serial comms
-                Serial.begin(115200);
-
-                // Setup LED pin and turn it off
-                pinMode(LED_PIN, OUTPUT);
-                digitalWrite(LED_PIN, HIGH);
-
-                // Connect to the ESCs and send them the baseline values
-                for (uint8_t k=0; k<4; ++k) {
-                    escs[k].attach(MOTOR_PINS[k]);
-                    escs[k].writeMicroseconds(PWM_MIN);
-                }
-
-                // Start I^2C
-                Wire.begin();
-                Wire.setClock(400000); // I2C frequency at 400 kHz
-                delay(1000);
-
-                // Reset the MPU9250
-                imu.resetMPU9250(); 
-
-                // get sensor resolutions, only need to do this once
-                aRes = imu.getAres(Ascale);
-                gRes = imu.getGres(Gscale);
-                mRes = imu.getMres(Mscale);
-
-                imu.initMPU9250(Ascale, Gscale, sampleRate); 
-
-                // Get magnetometer calibration from AK8963 ROM
-                imu.initAK8963(Mscale, Mmode, magCalibration);
-
-                // Do general real-board initialization
-                RealBoard::init();
-            }
-
             void delayMilliseconds(uint32_t msec)
             {
                 delay(msec);
@@ -257,6 +220,46 @@ namespace hf {
                 (void)pressure;
                 return false;
             }
+
+        public:
+
+            Butterfly(void)
+            {
+                // Begin serial comms
+                Serial.begin(115200);
+
+                // Setup LED pin and turn it off
+                pinMode(LED_PIN, OUTPUT);
+                digitalWrite(LED_PIN, HIGH);
+
+                // Connect to the ESCs and send them the baseline values
+                for (uint8_t k=0; k<4; ++k) {
+                    escs[k].attach(MOTOR_PINS[k]);
+                    escs[k].writeMicroseconds(PWM_MIN);
+                }
+
+                // Start I^2C
+                Wire.begin();
+                Wire.setClock(400000); // I2C frequency at 400 kHz
+                delay(1000);
+
+                // Reset the MPU9250
+                imu.resetMPU9250(); 
+
+                // get sensor resolutions, only need to do this once
+                aRes = imu.getAres(Ascale);
+                gRes = imu.getGres(Gscale);
+                mRes = imu.getMres(Mscale);
+
+                imu.initMPU9250(Ascale, Gscale, sampleRate); 
+
+                // Get magnetometer calibration from AK8963 ROM
+                imu.initAK8963(Mscale, Mmode, magCalibration);
+
+                // Do general real-board initialization
+                RealBoard::init();
+            }
+
 
     }; // class Butterfly
 
