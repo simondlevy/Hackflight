@@ -29,9 +29,9 @@ namespace hf {
 
     class Mixer {
 
-        private:
+        friend class Hackflight;
 
-            Board * board;
+        private:
 
             // Custom mixer data per motor
             typedef struct motorMixer_t {
@@ -58,22 +58,13 @@ namespace hf {
 
         protected:
 
+            Board * board;
+
             motorMixer_t motorDirections[MAXMOTORS];
 
             Mixer(uint8_t _nmotors)
             {
                 nmotors = _nmotors;
-            }
-
-        public:
-
-            // These are also use by MSP
-            float  motorsDisarmed[MAXMOTORS];
-            uint8_t nmotors;
-
-            void init(Board * _board)
-            {
-                board = _board;
 
                 // set disarmed, previous motor values
                 for (uint8_t i = 0; i < nmotors; i++) {
@@ -82,6 +73,12 @@ namespace hf {
                 }
 
             }
+
+        public:
+
+            // These are also use by MSP
+            float  motorsDisarmed[MAXMOTORS];
+            uint8_t nmotors;
 
             void runArmed(demands_t demands)
             {
