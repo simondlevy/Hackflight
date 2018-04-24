@@ -187,7 +187,7 @@ namespace hf {
                 mixer = _mixer;
 
                 // Do hardware initialization for board
-                board->init();
+                //board->init();
 
                 // Initialize the receiver
                 receiver->init();

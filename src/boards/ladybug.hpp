@@ -52,54 +52,6 @@ namespace hf {
                 }
             }
 
-        protected:
-
-            void init(void)
-            {
-                // Begin serial comms
-                Serial.begin(115200);
-
-                // Setup LEDs and turn them off
-                pinMode(A1, OUTPUT);
-                digitalWrite(A1, LOW);
-
-                // Start I^2C
-                Wire.begin();
-
-                // Hang a bit before starting up the EM7180
-                delay(100);
-
-                // Goose up the EM7180 ODRs
-                _sentral.accelRate = 330;
-                _sentral.gyroRate = 330;
-                _sentral.baroRate = 50;
-                _sentral.qRateDivisor = 5;
-
-                // Start the EM7180 in master mode, no interrupt
-                if (!_sentral.begin()) {
-                    while (true) {
-                        Serial.println(_sentral.getErrorString());
-                    }
-                }
-
-                // Get actual gyro rate for conversion to radians
-                uint8_t accFs=0; uint16_t gyroFs=0; uint16_t magFs=0;
-                _sentral.getFullScaleRanges(accFs, gyroFs, magFs);
-                gyroAdcToRadians = M_PI * (float)gyroFs / (1<<15) / 180.;  
-
-                // Initialize the motors
-                for (int k=0; k<4; ++k) {
-                    analogWriteFrequency(_motorPins[k], 10000);  
-                    analogWrite(_motorPins[k], 0);  
-                }
-
-                // Hang a bit more
-                delay(100);
-
-                // Do general real-board initialization
-                RealBoard::init();
-            }
-
             void delayMilliseconds(uint32_t msec)
             {
                 delay(msec);
@@ -205,8 +157,56 @@ namespace hf {
                     _sentral.readBarometer(pressure, temperature);
                     return true;
                 }
- 
+
                 return false;
+            }
+
+        public:
+
+            Ladybug(void)
+            {
+                // Begin serial comms
+                Serial.begin(115200);
+
+                // Setup LEDs and turn them off
+                pinMode(A1, OUTPUT);
+                digitalWrite(A1, LOW);
+
+                // Start I^2C
+                Wire.begin();
+
+                // Hang a bit before starting up the EM7180
+                delay(100);
+
+                // Goose up the EM7180 ODRs
+                _sentral.accelRate = 330;
+                _sentral.gyroRate = 330;
+                _sentral.baroRate = 50;
+                _sentral.qRateDivisor = 5;
+
+                // Start the EM7180 in master mode, no interrupt
+                if (!_sentral.begin()) {
+                    while (true) {
+                        Serial.println(_sentral.getErrorString());
+                    }
+                }
+
+                // Get actual gyro rate for conversion to radians
+                uint8_t accFs=0; uint16_t gyroFs=0; uint16_t magFs=0;
+                _sentral.getFullScaleRanges(accFs, gyroFs, magFs);
+                gyroAdcToRadians = M_PI * (float)gyroFs / (1<<15) / 180.;  
+
+                // Initialize the motors
+                for (int k=0; k<4; ++k) {
+                    analogWriteFrequency(_motorPins[k], 10000);  
+                    analogWrite(_motorPins[k], 0);  
+                }
+
+                // Hang a bit more
+                delay(100);
+
+                // Do general real-board initialization
+                RealBoard::init();
             }
 
     }; // class Ladybug
