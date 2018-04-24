@@ -26,26 +26,30 @@ namespace hf {
 
     class Board {
 
-        public:
+        friend class Hackflight;
+        friend class Debug;
+        friend class Mixer;
+
+        protected:
 
             //------------------------------------ Core functionality ----------------------------------------------------
-            virtual bool     getQuaternion(float quat[4]) = 0;
-            virtual bool     getGyrometer(float gyroRates[3]) = 0;
-            virtual void     writeMotor(uint8_t index, float value) = 0;
+            virtual bool getQuaternion(float quat[4]) = 0;
+            virtual bool getGyrometer(float gyroRates[3]) = 0;
+            virtual void writeMotor(uint8_t index, float value) = 0;
 
             //------------------------ Support for additional PID controllers --------------------------------------------
-            virtual bool     getAccelerometer(float accelGs[3]) { (void)accelGs; return false; }
-            virtual bool     getBarometer(float & pressure) { (void)pressure; return false; }
+            virtual bool getAccelerometer(float accelGs[3]) { (void)accelGs; return false; }
+            virtual bool getBarometer(float & pressure) { (void)pressure; return false; }
 
             //----------------------------------------- Safety ----------------------------------------------------------
-            virtual void     showArmedStatus(bool armed) { (void)armed; }
+            virtual void showArmedStatus(bool armed) { (void)armed; }
 
             //---------------------------------------- Hardware -------------------------------------------------
-            virtual void     doSerialComms(float eulerAngles[3], bool armed, class Receiver * receiver, class Mixer * mixer)  
+            virtual void doSerialComms(float eulerAngles[3], bool armed, class Receiver * receiver, class Mixer * mixer)  
                                 { (void)eulerAngles; (void)armed; (void)receiver; (void)mixer; }
 
             //--------------------------------------- Debugging ---------------------------------------------------------
-            static void      outbuf(char * buf);
+            static void  outbuf(char * buf);
 
     }; // class Board
 

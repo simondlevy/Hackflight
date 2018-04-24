@@ -40,6 +40,8 @@ namespace hf {
 
     class Stabilizer {
 
+        friend class Hackflight;
+
         private: 
 
             // Resetting thresholds for PID Integral term
@@ -127,9 +129,11 @@ namespace hf {
                 return demand * (1 - fabs(eulerAngle)/maxArmingAngle);
             }
 
-        public:
+        protected:
 
             float maxArmingAngle;
+
+        public:
 
             Stabilizer(float levelP, float gyroCyclicP, float gyroCyclicI, float gyroCyclicD, float gyroYawP, float gyroYawI) :
                 _levelP(levelP), 

@@ -32,6 +32,10 @@ namespace hf {
 
     class Receiver {
 
+        friend class Hackflight;
+        friend class RealBoard;
+        friend class MSP;
+
         private: 
 
             const float margin       = 0.1f;
@@ -111,8 +115,6 @@ namespace hf {
             float _trimRoll;
             float _trimPitch;
             float _trimYaw;
-
-        public:
 
             // Default to non-headless mode
             float headless = false;

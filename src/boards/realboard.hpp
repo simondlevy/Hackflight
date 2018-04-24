@@ -58,8 +58,6 @@ namespace hf {
                 msp.init();
             }
 
-        public:
-
             void showArmedStatus(bool armed)
             {
                 // Set LED to indicate armed

@@ -31,6 +31,8 @@ namespace hf {
 
     class MSP {
 
+        friend class RealBoard;
+
         private:
 
             static const int INBUF_SIZE  = 128;
@@ -140,7 +142,7 @@ namespace hf {
                 serialize8(checksum);
             }
 
-        public:
+        protected:
 
             void init(void)
             {

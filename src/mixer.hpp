@@ -30,6 +30,8 @@ namespace hf {
     class Mixer {
 
         friend class Hackflight;
+        friend class MSP;
+        friend class RealBoard;
 
         private:
 
@@ -73,8 +75,6 @@ namespace hf {
                 }
 
             }
-
-        public:
 
             // These are also use by MSP
             float  motorsDisarmed[MAXMOTORS];
