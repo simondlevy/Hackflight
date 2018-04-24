@@ -1,5 +1,6 @@
+
 /*
-   ThreeDFlySBUS.ino : Hackflight sketch for Ladybug Flight Controller with 3DFly frame and FrSky XM SBUS receiver
+   LadybugCPPM.ino : Arduino sketech for Hackflight using Ladybug Flight Controller with CPPM recveiver
 
    This file is part of Hackflight.
 
@@ -20,12 +21,12 @@
 
 #include "hackflight.hpp"
 #include "boards/ladybug.hpp"
-#include "receivers/serial/arduino_sbus.hpp"
+#include "receivers/cppm/arduino_cppm.hpp"
 #include "mixers/quadx.hpp"
 
 hf::Hackflight h;
 
-hf::SBUS_Receiver rc = hf::SBUS_Receiver(.005f, -.08f, 0.f);
+hf::Arduino_CPPM_Receiver rc = hf::Arduino_CPPM_Receiver(.005f, -.08f, 0.f);
 
 hf::MixerQuadX mixer;
 

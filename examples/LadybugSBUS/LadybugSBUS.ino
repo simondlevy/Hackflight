@@ -1,5 +1,5 @@
 /*
-   ThreeDFlyDSMX.ino : Hackflight sketch for Ladybug Flight Controller with 3DFly frame and Spektrum DSMX receiver
+   LadybugSBUS.ino : Hackflight sketch for Ladybug Flight Controller with an SBUS receiver
 
    This file is part of Hackflight.
 
@@ -20,15 +20,12 @@
 
 #include "hackflight.hpp"
 #include "boards/ladybug.hpp"
-#include "receivers/serial/arduino_dsmx.hpp"
+#include "receivers/serial/arduino_sbus.hpp"
 #include "mixers/quadx.hpp"
 
 hf::Hackflight h;
 
-hf::DSMX_Receiver rc = hf::DSMX_Receiver(
-        .005f,  // roll trim
-        .01f,  // pitch trim
-        0.f);   // yaw trim
+hf::SBUS_Receiver rc = hf::SBUS_Receiver(.005f, -.08f, 0.f);
 
 hf::MixerQuadX mixer;
 
@@ -42,7 +39,6 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
 
 void setup(void)
 {
-    // Initialize Hackflight firmware
     h.init(new hf::Ladybug(), &rc, &stabilizer, &mixer);
 }
 

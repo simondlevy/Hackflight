@@ -1,6 +1,5 @@
-
 /*
-   ThreeDFlyCPPM.ino : Arduino sketech for Hackflight using Ladybug Flight Controller, 3DFly frame, CPPM receiver
+   LadybugFlyDSMX.ino : Hackflight sketch for Ladybug Flight Controller with Spektrum DSMX receiver
 
    This file is part of Hackflight.
 
@@ -21,12 +20,15 @@
 
 #include "hackflight.hpp"
 #include "boards/ladybug.hpp"
-#include "receivers/cppm/arduino_cppm.hpp"
+#include "receivers/serial/arduino_dsmx.hpp"
 #include "mixers/quadx.hpp"
 
 hf::Hackflight h;
 
-hf::Arduino_CPPM_Receiver rc = hf::Arduino_CPPM_Receiver(.005f, -.08f, 0.f);
+hf::DSMX_Receiver rc = hf::DSMX_Receiver(
+        .005f,  // roll trim
+        .01f,  // pitch trim
+        0.f);   // yaw trim
 
 hf::MixerQuadX mixer;
 
@@ -40,6 +42,7 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
 
 void setup(void)
 {
+    // Initialize Hackflight firmware
     h.init(new hf::Ladybug(), &rc, &stabilizer, &mixer);
 }
 
