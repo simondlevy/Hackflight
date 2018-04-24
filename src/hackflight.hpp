@@ -190,7 +190,6 @@ namespace hf {
                 receiver->init();
 
                 // Initialize our stabilization, mixing, and MSP (serial comms)
-                stabilizer->init();
                 mixer->init(board); 
 
                 // Start unarmed

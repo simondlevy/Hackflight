@@ -137,12 +137,8 @@ namespace hf {
                 _gyroCyclicI(gyroCyclicI), 
                 _gyroCyclicD(gyroCyclicD), 
                 _gyroYawP(gyroYawP), 
-                _gyroYawI(gyroYawI) { }
-
-
-            void init(void)
-            {
-                // Zero-out previous values for D term
+                _gyroYawI(gyroYawI) 
+            {                // Zero-out previous values for D term
                 for (uint8_t axis=0; axis<2; ++axis) {
                     lastGyro[axis] = 0;
                     gyroDelta1[axis] = 0;
