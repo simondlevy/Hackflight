@@ -41,7 +41,6 @@ namespace hf {
             virtual void     showArmedStatus(bool armed) { (void)armed; }
 
             //---------------------------------------- Hardware -------------------------------------------------
-            //virtual void     init(void) { }
             virtual void     doSerialComms(float eulerAngles[3], bool armed, class Receiver * receiver, class Mixer * mixer)  
                                 { (void)eulerAngles; (void)armed; (void)receiver; (void)mixer; }
 
