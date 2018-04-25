@@ -75,11 +75,6 @@ namespace hf {
             // Used to read all 14 bytes at once from the MPU9250 accel/gyro
             int16_t imuData[7] = {0,0,0,0,0,0,0};
 
-            // XXX maybe we can declare these in getGyrometer()
-            float ax=0, ay=0, az=0;
-            float gx=0, gy=0, gz=0;
-            float mx=0, my=0, mz=0;
-
             // Global constants for 9 DoF fusion and AHRS (Attitude and Heading Reference System)
             const float GyroMeasError = M_PI * (40.0f / 180.0f); // gyroscope measurement error in rads/s (start at 40 deg/s)
             const float GyroMeasDrift = M_PI * (0.0f  / 180.0f); // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
@@ -147,14 +142,17 @@ namespace hf {
                     imu.readMPU9250Data(imuData); 
 
                     // Convert the accleration value into g's
-                    ax = imuData[0]*aRes - accelBias[0];  // get actual g value, this depends on scale being set
-                    ay = imuData[1]*aRes - accelBias[1];   
-                    az = imuData[2]*aRes - accelBias[2];  
+                    float ax = imuData[0]*aRes - accelBias[0];  // get actual g value, this depends on scale being set
+                    float ay = imuData[1]*aRes - accelBias[1];   
+                    float az = imuData[2]*aRes - accelBias[2];  
 
                     // Convert the gyro value into degrees per second
-                    gx = adc2rad(imuData[4]);
-                    gy = adc2rad(imuData[5]);
-                    gz = adc2rad(imuData[6]);
+                    float gx = adc2rad(imuData[4]);
+                    float gy = adc2rad(imuData[5]);
+                    float gz = adc2rad(imuData[6]);
+
+                    // Magnetometer values are updated at their own rate
+                    static float mx, my, mz;
 
                     if (imu.checkNewMagData()) { // Wait for magnetometer data ready bit to be set
 

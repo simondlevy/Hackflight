@@ -121,6 +121,7 @@ namespace hf {
             {
                 float accelGs[3];
                 if (board->getAccelerometer(accelGs)) {
+                    Debug::printf("%+2.2f  %+2.2f  %+2.2f\n", accelGs[0], accelGs[1], accelGs[2]);
                     acount++;
                 }
             }
