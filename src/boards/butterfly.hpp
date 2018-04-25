@@ -22,9 +22,11 @@
 #pragma once
 
 #include <Wire.h>
-#include <MPU9250.h> 
 #include <Servo.h>
+
+#include <MPU9250.h> 
 #include <QuaternionFilters.h>
+#include <ArduinoTransfer.h>
 
 #include "hackflight.hpp"
 #include "realboard.hpp"
@@ -35,7 +37,10 @@ namespace hf {
 
         private:
 
-            MPU9250 imu;
+            // Create a byte-transfer object for Arduino I^2C
+            ArduinoWire bt;
+
+            MPU9250 imu = MPU9250(&bt);;
 
             Servo escs[4];
 
