@@ -24,7 +24,7 @@
 #include <Wire.h>
 #include <Servo.h>
 
-#include <KrisWinerMPU9250.h> 
+#include <MPU9250.h> 
 #include <ArduinoTransfer.h>
 
 #include "QuaternionFilters.h"
@@ -174,8 +174,6 @@ namespace hf {
                         mx *= magScale[0];
                         my *= magScale[1];
                         mz *= magScale[2]; 
-
-                        Debug::printf("%+2.2f  %+2.2f  %+2.2f\n", mx, my, mz);
                     }
 
                     // Iterate a fixed number of times per data read cycle, updating the quaternion
