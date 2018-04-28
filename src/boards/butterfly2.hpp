@@ -1,8 +1,8 @@
 /*
-   butterfly.hpp : Implementation of Hackflight Board routines for Butterfly
+   butterfly2.hpp : Implementation of Hackflight Board routines for Butterfly
                    dev board + MPU9250 IMU + brushless motors
 
-   Additional library required: https://github.com/simondlevy/KrisWinerMPU9250
+   Additional library required: https://github.com/simondlevy/MPU9250
 
    This file is part of Hackflight.
 
@@ -24,8 +24,7 @@
 #include <Wire.h>
 #include <Servo.h>
 
-#include <KrisWinerMPU9250.h> 
-#include <ArduinoTransfer.h>
+#include <MPU9250.h> 
 
 #include "QuaternionFilters.h"
 #include "hackflight.hpp"
@@ -33,16 +32,26 @@
 
 namespace hf {
 
+    static bool gotNewData;
+
+    static void interruptHandler(void)
+    {
+        gotNewData = true;    
+    }
+
     class Butterfly : public RealBoard {
 
         private:
 
-            // Create a byte-transfer object for Arduino I^2C
-            ArduinoWire bt;
-
-            MPU9250 imu = MPU9250(&bt);;
+            MPU9250 imu = MPU9250(Wire, 0x68);
 
             Servo escs[4];
+
+            // For convert accelerometer m/sec to Gs
+            const float G = 9.807f;
+
+            // IMU interrupt pin
+            const uint8_t INTERRUPT_PIN = 8;
 
             // Motor pins
             const uint8_t MOTOR_PINS[4] = {3, 4, 5, 6};
@@ -56,15 +65,8 @@ namespace hf {
 
             // Paramters to experiment with ------------------------------------------------------------------------
 
-            // Sensor full-scale settings
-            const uint8_t Ascale     = AFS_8G;
-            const uint8_t Gscale     = GFS_2000DPS;
-            const uint8_t Mscale     = MFS_16BITS;
-            const uint8_t Mmode      = M_100Hz;
-
-            // sampleRate: (1 + sampleRate) is a simple divisor of the fundamental 1000 kHz rate of the gyro and accel, so 
             // sampleRate = 0 means 1 kHz sample rate for both accel and gyro, 4 means 200 Hz, etc.
-            const uint8_t sampleRate = 0x02;         
+            const uint8_t sampleRate = 2;         
 
             // Quaternion calculation
             const uint8_t  QuaternionUpdatesPerCycle = 5;    // update quaternion this many times per gyro aquisition
@@ -142,41 +144,27 @@ namespace hf {
 
             bool getGyrometer(float gyro[3])
             {
-                if (imu.checkNewAccelGyroData()) {
+                if (gotNewData) {
 
-                    imu.readMPU9250Data(imuData); 
+                    gotNewData = false;
 
-                    // Convert the accleration value into g's
-                    float ax = imuData[0]*aRes - accelBias[0];  // get actual g value, this depends on scale being set
-                    float ay = imuData[1]*aRes - accelBias[1];   
-                    float az = imuData[2]*aRes - accelBias[2];  
+                    imu.readSensor();
 
-                    // Convert the gyro value into degrees per second
-                    float gx = adc2rad(imuData[4]);
-                    float gy = adc2rad(imuData[5]);
-                    float gz = adc2rad(imuData[6]);
+                    // Convert accel m/sec to Gs
+                    float ax = imu.getAccelX_mss() / G;
+                    float ay = imu.getAccelY_mss() / G;
+                    float az = imu.getAccelZ_mss() / G;
 
-                    // Magnetometer values are updated at their own rate
-                    static float mx, my, mz;
+                    float gx = imu.getGyroX_rads();
+                    float gy = imu.getGyroY_rads();
+                    float gz = imu.getGyroZ_rads();
 
-                    if (imu.checkNewMagData()) { // Wait for magnetometer data ready bit to be set
-
-                        int16_t magCount[3];    // Stores the 16-bit signed magnetometer sensor output
-
-                        imu.readMagData(magCount);  // Read the x/y/z adc values
-
-                        // Calculate the magnetometer values in milliGauss
-                        // Include factory calibration per data sheet and user environmental corrections
-                        // Get actual magnetometer value, this depends on scale being set
-                        mx = magCount[0]*mRes*magCalibration[0] - magBias[0];  
-                        my = magCount[1]*mRes*magCalibration[1] - magBias[1];  
-                        mz = magCount[2]*mRes*magCalibration[2] - magBias[2];  
-                        mx *= magScale[0];
-                        my *= magScale[1];
-                        mz *= magScale[2]; 
-
-                        Debug::printf("%+2.2f  %+2.2f  %+2.2f\n", mx, my, mz);
-                    }
+                    // Convert uTesla to mGauss
+                    float mx = imu.getMagX_uT() * 10;
+                    float my = imu.getMagY_uT() * 10;
+                    float mz = imu.getMagZ_uT() * 10;
+                    
+                    Debug::printf("%+2.2f  %+2.2f  %+2.2f\n", mx, my, mz);
 
                     // Iterate a fixed number of times per data read cycle, updating the quaternion
                     for (uint8_t i=0; i<QuaternionUpdatesPerCycle; i++) { 
@@ -190,7 +178,7 @@ namespace hf {
                         sum += deltat; 
                         sumCount++;
 
-                        quaternionCalculator.update(-ax, ay, az, gx, -gy, -gz, my, -mx, mz, deltat, q);
+                        quaternionCalculator.update(ay, -ax, -az, -gy, gx, -gz, my, -mx, mz, deltat, q);
                     }
 
                     // Copy gyro values back out
@@ -256,18 +244,33 @@ namespace hf {
                 Wire.setClock(400000); // I2C frequency at 400 kHz
                 delay(1000);
 
-                // Reset the MPU9250
-                imu.resetMPU9250(); 
 
-                // get sensor resolutions, only need to do this once
-                aRes = imu.getAres(Ascale);
-                gRes = imu.getGres(Gscale);
-                mRes = imu.getMres(Mscale);
+                // start communication with IMU 
+                int status = imu.begin();
+                if (status < 0) {
+                    Serial.println("IMU initialization unsuccessful");
+                    Serial.println("Check IMU wiring or try cycling power");
+                    Serial.print("Status: ");
+                    Serial.println(status);
+                    while(1) {}
+                }
 
-                imu.initMPU9250(Ascale, Gscale, sampleRate); 
+                // setting IMU full-scale ranges
+                imu.setAccelRange(MPU9250::ACCEL_RANGE_8G);
+                imu.setGyroRange(MPU9250::GYRO_RANGE_2000DPS);
 
-                // Get magnetometer calibration from AK8963 ROM
-                imu.initAK8963(Mscale, Mmode, magCalibration);
+                // setting DLPF bandwidth to 20 Hz
+                imu.setDlpfBandwidth(MPU9250::DLPF_BANDWIDTH_20HZ);
+
+                // setting SRD 
+                imu.setSrd(sampleRate);
+
+                // enabling the data ready interrupt
+                imu.enableDataReadyInterrupt();
+
+                // attaching the interrupt 
+                pinMode(INTERRUPT_PIN, INPUT);
+                attachInterrupt(INTERRUPT_PIN, interruptHandler, RISING);
 
                 // Do general real-board initialization
                 RealBoard::init();
