@@ -25,6 +25,7 @@
 #include <Servo.h>
 
 #include <MPU9250.h> 
+#include <ArduinoByteTransfer.h>
 
 #include "QuaternionFilters.h"
 #include "hackflight.hpp"
@@ -43,7 +44,9 @@ namespace hf {
 
         private:
 
-            MPU9250 imu = MPU9250(Wire, 0x68);
+            ArduinoI2CTransfer bt = ArduinoI2CTransfer(Wire, 0x68);
+
+            MPU9250 imu = MPU9250(&bt);
 
             Servo escs[4];
 
@@ -239,11 +242,6 @@ namespace hf {
                     escs[k].writeMicroseconds(PWM_MIN);
                 }
 
-                // Start I^2C
-                Wire.begin();
-                Wire.setClock(400000); // I2C frequency at 400 kHz
-                delay(1000);
-
 
                 // start communication with IMU 
                 int status = imu.begin();
@@ -254,6 +252,8 @@ namespace hf {
                     Serial.println(status);
                     while(1) {}
                 }
+
+                delay(1000);
 
                 // setting IMU full-scale ranges
                 imu.setAccelRange(MPU9250::ACCEL_RANGE_8G);
