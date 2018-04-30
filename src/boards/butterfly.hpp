@@ -38,9 +38,10 @@ namespace hf {
         private:
 
             // Create a byte-transfer object for Arduino I^2C
-            ArduinoWire bt;
+            ArduinoI2C bt;
 
-            MPU9250 imu = MPU9250(&bt);;
+            // Use the MPU9250 in pass-through mode
+            MPU9250 imu = MPU9250(&bt, true);;
 
             Servo escs[4];
 
@@ -156,7 +157,7 @@ namespace hf {
                     float gy = adc2rad(imuData[5]);
                     float gz = adc2rad(imuData[6]);
 
-                    // Magnetometer values are updated at their own rate
+                    // We're using pass-through mode, so magnetometer values are updated at their own rate
                     static float mx, my, mz;
 
                     if (imu.checkNewMagData()) { // Wait for magnetometer data ready bit to be set
