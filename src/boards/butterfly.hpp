@@ -27,7 +27,7 @@
 #include <MPU9250.h> 
 #include <ArduinoTransfer.h>
 
-#include "QuaternionFilters.h"
+#include "quaternionFilters.hpp"
 #include "hackflight.hpp"
 #include "realboard.hpp"
 
@@ -41,7 +41,7 @@ namespace hf {
             ArduinoI2C bt;
 
             // Use the MPU9250 in pass-through mode
-            MPU9250 imu = MPU9250(&bt, true);;
+            MPU9250Passthru imu = MPU9250Passthru(&bt);;
 
             Servo escs[4];
 
