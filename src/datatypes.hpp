@@ -30,3 +30,10 @@ typedef struct {
     uint8_t aux;
 
 } demands_t;
+
+typedef struct {
+
+    float eulerAngles[3];
+    bool armed;
+
+} vehicle_state_t;

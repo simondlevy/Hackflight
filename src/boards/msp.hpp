@@ -156,11 +156,11 @@ namespace hf {
             c_state = IDLE;
         }
 
-        void update(uint8_t c, float eulerAngles[3], bool & armed, Receiver * receiver, Mixer * mixer)
+        void update(uint8_t c, vehicle_state_t * state, Receiver * receiver, Mixer * mixer)
         {
             if (c_state == IDLE) {
                 c_state = (c == '$') ? HEADER_START : IDLE;
-                if (c_state == IDLE && !armed) {
+                if (c_state == IDLE && !state->armed) {
                 }
             } else if (c_state == HEADER_START) {
                 c_state = (c == 'M') ? HEADER_M : IDLE;
@@ -198,7 +198,7 @@ namespace hf {
                             break;
 
                         case MSP_SET_ARMED:
-                            armed = (bool)read8();
+                            state->armed = (bool)read8();
                             headSerialReply(0);
                             break;
 
@@ -212,7 +212,7 @@ namespace hf {
                             {
                                 outBufSize = 0;
                                 outBufIndex = 0;
-                                serializeFloats(eulerAngles, 3);
+                                serializeFloats(state->eulerAngles, 3);
                             }
                             break;
 

@@ -64,11 +64,10 @@ namespace hf {
                 ledSet(armed);
             }
 
-            void doSerialComms(float eulerAngles[3], bool & armed, class Receiver * receiver, class Mixer * mixer) 
+            void doSerialComms(vehicle_state_t * state, class Receiver * receiver, class Mixer * mixer) 
             {
                 while (serialAvailableBytes()) {
-                    msp.update(serialReadByte(), eulerAngles, armed, receiver, mixer);
-                    //ledSet(armed);
+                    msp.update(serialReadByte(), state, receiver, mixer);
                 }
 
                 while (msp.availableBytes() > 0) {
@@ -76,7 +75,7 @@ namespace hf {
                 }
 
                 // Support motor testing from GCS
-                if (!armed) {
+                if (!state->armed) {
                     mixer->runDisarmed();
                 }
 
