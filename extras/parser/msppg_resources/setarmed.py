@@ -31,6 +31,8 @@ PERIOD   = 1.0   # switch on / off
 from serial import Serial
 from msppg import serialize_SET_ARMED
 from time import time, sleep
+from sys import stdout
+import struct
 
 if __name__ == "__main__":
 
@@ -50,8 +52,9 @@ if __name__ == "__main__":
             break
 
         if curr_time - prev_time > PERIOD:
-            message = serialize_SET_ARMED(armed)
+            #port.write('\x24\x4d\x3c\x01\xd8\x01\xd8')   # Python 2 
+            message = bytes([ord('$'), ord('M'), ord('<'), 0x01,0xd8,0x01,0xd8]) # Python3
             port.write(message)
             armed = not armed
             prev_time = curr_time
-
+            break
