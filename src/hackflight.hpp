@@ -81,6 +81,7 @@ namespace hf {
 
                     // Do serial comms
                     board->doSerialComms(eulerAngles, armed, receiver, mixer);
+                    //digitalWrite(A1, armed?HIGH:LOW);
                 }
             }
 

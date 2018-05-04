@@ -64,10 +64,11 @@ namespace hf {
                 ledSet(armed);
             }
 
-            void doSerialComms(float eulerAngles[3], bool armed, class Receiver * receiver, class Mixer * mixer) 
+            void doSerialComms(float eulerAngles[3], bool & armed, class Receiver * receiver, class Mixer * mixer) 
             {
                 while (serialAvailableBytes()) {
                     msp.update(serialReadByte(), eulerAngles, armed, receiver, mixer);
+                    //ledSet(armed);
                 }
 
                 while (msp.availableBytes() > 0) {
