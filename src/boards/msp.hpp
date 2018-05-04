@@ -34,6 +34,7 @@ namespace hf {
         static const uint8_t MSP_RC_NORMAL        =    121;
         static const uint8_t MSP_ATTITUDE_RADIANS =    122; 
         static const uint8_t MSP_SET_MOTOR_NORMAL =    215;    
+        static const uint8_t MSP_SET_ARMED        =    216;    
 
         static const int INBUF_SIZE  = 128;
         static const int OUTBUF_SIZE = 128;
@@ -155,7 +156,7 @@ namespace hf {
             c_state = IDLE;
         }
 
-        void update(uint8_t c, float eulerAngles[3], bool armed, Receiver * receiver, Mixer * mixer)
+        void update(uint8_t c, float eulerAngles[3], bool & armed, Receiver * receiver, Mixer * mixer)
         {
             if (c_state == IDLE) {
                 c_state = (c == '$') ? HEADER_START : IDLE;
@@ -193,6 +194,11 @@ namespace hf {
                         case MSP_SET_MOTOR_NORMAL:
                             for (uint8_t i = 0; i < mixer->nmotors; i++)
                                 mixer->motorsDisarmed[i] = readFloat();
+                            headSerialReply(0);
+                            break;
+
+                        case MSP_SET_ARMED:
+                            armed = (bool)read8();
                             headSerialReply(0);
                             break;
 
