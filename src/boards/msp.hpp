@@ -210,7 +210,7 @@ namespace hf {
                             }
                             break;
 
-                            // don't know how to handle the (valid) message, indicate error MSP $M!
+                        // don't know how to handle the (valid) message, indicate error
                         default:                   
                             headSerialError(0);
                             break;

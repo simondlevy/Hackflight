@@ -20,6 +20,9 @@
                        {"m1": "float"},
                        {"m2": "float"},
                        {"m3": "float"},
-                       {"m4": "float"}]
+                       {"m4": "float"}],
 
+  "SET_ARMED": [{"ID": 216},
+                {"comment": "Arm/disarm from MSP"}, 
+                {"flag": "byte"}]
 }
