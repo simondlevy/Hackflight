@@ -8,13 +8,9 @@ def _CRC8(data):
    
     for c in data:
 
-        crc ^= ord(c)
+        crc ^= ord(c) if sys.version[0] == '2' else c
 
     return crc
-
-def _bytes(s):
-
-    return bytes(s) if sys.version[0] == '2' else bytes(s, "utf-8")
 
 class MSP_Parser(object):
 

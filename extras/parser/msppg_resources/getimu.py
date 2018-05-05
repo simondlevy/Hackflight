@@ -20,37 +20,37 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 BAUD = 115200
 
+#PORT = 'COM13'          # Windows
+PORT = '/dev/ttyACM0' # Linux
+
 from msppg import MSP_Parser as Parser, serialize_ATTITUDE_RADIANS_Request
 import serial
 
 from sys import argv
 
-if len(argv) < 2:
-
-    print('Usage: python3 %s PORT' % argv[0])
-    print('Example: python3 %s /dev/ttyUSB0' % argv[0])
-    exit(1)
-
-parser = Parser()
-request = serialize_ATTITUDE_RADIANS_Request()
-port = serial.Serial(argv[1], BAUD)
 
 def handler(pitch, roll, yaw):
 
     print(pitch, roll, yaw)
     port.write(request)
 
-parser.set_ATTITUDE_RADIANS_Handler(handler)
+if __name__ == '__main__':
 
-port.write(request)
+    parser = Parser()
+    request = serialize_ATTITUDE_RADIANS_Request()
+    port = serial.Serial(PORT, BAUD)
 
-while True:
+    parser.set_ATTITUDE_RADIANS_Handler(handler)
 
-    try:
+    port.write(request)
 
-        parser.parse(port.read(1))
+    while True:
 
-    except KeyboardInterrupt:
+        try:
 
-        break
+            parser.parse(port.read(1))
+
+        except KeyboardInterrupt:
+
+            break
 

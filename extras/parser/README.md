@@ -1,5 +1,5 @@
 # MSPPG
-Multiwii Serial Protocol Parser Generator for Python3, Java, and C++, and C.
+Multiwii Serial Protocol Parser Generator for Python, Java, and C++, and C.
 
 <b>Setup</b>
 

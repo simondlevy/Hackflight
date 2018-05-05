@@ -21,7 +21,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-PYTHON_EXAMPLES = ['getimu', 'getrc', 'imudisplay', 'blueimudisplay', 'setrc', 'setarmed']
+PYTHON_EXAMPLES = ['getimu', 'setarmed']
 
 from sys import exit, argv
 import os
@@ -175,7 +175,7 @@ class Python_Emitter(CodeEmitter):
             msgstuff = msgdict[msgtype]
             msgid = msgstuff[0]
 
-            self._write('def serialize_' + msgtype + '(' + ', '.join(self._getargnames(msgstuff)) + '):\n\n')
+            self._write('def serialize_' + msgtype + '(' + ', '.join(self._getargnames(msgstuff)) + '):\n')
             self._write(self.indent + "'''\n")
             self._write(self.indent + 'Serializes the contents of a message of type ' + msgtype + '.\n')
             self._write(self.indent + "'''\n")
@@ -188,9 +188,13 @@ class Python_Emitter(CodeEmitter):
             self._write(')\n\n')
             self._write(self.indent)
 
-            self._write('msg = chr(len(message_buffer)) + chr(%s) + str(message_buffer)\n\n' % msgid)
-            self._write(self.indent + 'return _bytes(\'$M%c\' + msg + chr(_CRC8(msg)))\n\n' %
-                    ('>' if msgid < 200 else '<'))
+            self._write('if sys.version[0] == \'2\':\n')
+            self._write(self.indent*2 + 'msg = chr(len(message_buffer)) + chr(%s) + str(message_buffer)\n' % msgid)
+            self._write(self.indent*2 + 'return \'$M%c\' + msg + chr(_CRC8(msg))\n\n' % ('>' if msgid < 200 else '<'))
+            self._write(self.indent+'else:\n')
+            self._write(self.indent*2 + 'msg = [len(message_buffer), %s] + list(message_buffer)\n' % msgid)
+            self._write(self.indent*2 + 'return bytes([ord(\'$\'), ord(\'M\'), ord(\'<\')] + msg + [_CRC8(msg)])\n\n')
+
 
             if msgid < 200:
 
@@ -198,7 +202,9 @@ class Python_Emitter(CodeEmitter):
                 self._write(self.indent + "'''\n")
                 self._write(self.indent + 'Serializes a request for ' + msgtype + ' data.\n')
                 self._write(self.indent + "'''\n")
-                self._write(self.indent + 'return _bytes(\'$M<\' + chr(0) + chr(%s) + chr(%s))\n\n' % (msgid, msgid))
+                self._write(self.indent+'msg = \'$M<\' + chr(0) + chr(%s) + chr(%s)\n' % (msgid, msgid))
+                self._write(self.indent+'return bytes(msg) if sys.version[0] == \'2\' else bytes(msg, \'utf-8\')\n\n')
+
 
     def _write(self, s):
 

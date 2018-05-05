@@ -516,9 +516,7 @@ class Comms:
 
     def send_message(self, serializer, contents):
 
-        for c in serializer(*contents):
-
-            self.port.write(c)
+        self.port.write(serializer(*contents))
 
     def send_request(self, request):
 

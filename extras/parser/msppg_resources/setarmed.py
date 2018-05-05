@@ -22,39 +22,19 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 BAUD = 115200
 
-PORT = 'COM13'          # Windows
-#PORT = '/dev/ttyACM0' # Linux
-
-DURATION = 8.0   # seconds
-PERIOD   = 1.0   # switch on / off
+#PORT = 'COM13'          # Windows
+PORT = '/dev/ttyACM0' # Linux
 
 from serial import Serial
 from msppg import serialize_SET_ARMED
-from time import time, sleep
-from sys import stdout
-import struct
+from time import sleep
 
 if __name__ == "__main__":
 
     port = Serial(PORT, BAUD)
 
-    armed = False
+    port.write(serialize_SET_ARMED(True))
 
-    start_time = time()
+    sleep(1)
 
-    prev_time = start_time
-
-    while True:
-
-        curr_time = time()
-
-        if curr_time - start_time > DURATION:
-            break
-
-        if curr_time - prev_time > PERIOD:
-            #port.write('\x24\x4d\x3c\x01\xd8\x01\xd8')   # Python 2 
-            message = bytes([ord('$'), ord('M'), ord('<'), 0x01,0xd8,0x01,0xd8]) # Python3
-            port.write(message)
-            armed = not armed
-            prev_time = curr_time
-            break
+    port.write(serialize_SET_ARMED(False))
