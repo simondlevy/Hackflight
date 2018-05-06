@@ -37,11 +37,12 @@ namespace hf {
 
         private:
 
-            // Create a byte-transfer object for Arduino I^2C
-            ArduinoI2C bt;
+            // Create byte-transfer objects for Arduino I^2C 
+            ArduinoI2C mpu = ArduinoI2C(MPU9250::MPU9250_ADDRESS);
+            ArduinoI2C mag = ArduinoI2C(MPU9250::AK8963_ADDRESS);
 
             // Use the MPU9250 in pass-through mode
-            MPU9250Passthru imu = MPU9250Passthru(&bt);;
+            MPU9250Passthru imu = MPU9250Passthru(&mpu, &mag);;
 
             Servo escs[4];
 
