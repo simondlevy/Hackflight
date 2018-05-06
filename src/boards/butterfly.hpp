@@ -152,11 +152,6 @@ namespace hf {
                     float ax = imuData[0]*aRes - accelBias[0];  // get actual g value, this depends on scale being set
                     float ay = imuData[1]*aRes - accelBias[1];
                     float az = imuData[2]*aRes - accelBias[2];
-                    Serial.print(ax);
-                    Serial.print(",");
-                    Serial.print(ay);
-                    Serial.print(",");
-                    Serial.println(az);
 
                     // Convert the gyro value into degrees per second
                     float gx = adc2rad(imuData[4]);
