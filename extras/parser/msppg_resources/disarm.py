@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 '''
-setarmed.py : Test script for MSP arming of board
+disarm.py : Test script for MSP disarming of board
 
-Copyright (C) Simon D. Levy, Josep, Juan 2018
+Copyright (C) Simon D. Levy, Pep Marti, Juan Gallostra Acin 2018
 
 This file is part of Hackflight.
 
@@ -27,14 +27,9 @@ PORT = '/dev/ttyACM0' # Linux
 
 from serial import Serial
 from msppg import serialize_SET_ARMED
-from time import sleep
 
 if __name__ == "__main__":
 
     port = Serial(PORT, BAUD)
-
-    port.write(serialize_SET_ARMED(True))
-
-    sleep(1)
 
     port.write(serialize_SET_ARMED(False))
