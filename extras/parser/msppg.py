@@ -21,8 +21,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-PYTHON_EXAMPLES = ['getimu', 'setarmed']
-
 from sys import exit, argv
 import os
 import json
@@ -114,8 +112,9 @@ class Python_Emitter(CodeEmitter):
 
         CodeEmitter.__init__(self, 'python', 'py')
 
-        for example in PYTHON_EXAMPLES:
-            CodeEmitter._copyfile(self, '%s.py' % example, 'python/' + ('%s.py' % example))
+        for filename in os.listdir('./msppg_resources'):
+            if filename.endswith('.py') and not filename in ['__init__.py', 'setup.py']:
+                CodeEmitter._copyfile(self, '%s' % filename, 'python/' + ('%s' % filename))
 
         mkdir_if_missing('output/python/msppg')
 
