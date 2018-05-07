@@ -19,7 +19,6 @@
 #pragma once
 
 #include "board.hpp"
-#include "msp.hpp"
 #include "datatypes.hpp"
 
 namespace hf {
@@ -31,15 +30,10 @@ namespace hf {
             const uint32_t ledFlashMilli = 1000;
             const uint32_t ledFlashCount = 20;
 
-            MSP msp;
-
         protected:
 
             virtual void     delayMilliseconds(uint32_t msec) { (void)msec; } 
             virtual void     ledSet(bool is_on) { (void)is_on; }
-            virtual uint8_t  serialAvailableBytes(void) { return 0; }
-            virtual uint8_t  serialReadByte(void)  { return 0; }
-            virtual void     serialWriteByte(uint8_t c) { (void)c; }
 
             void init(void)
             {
@@ -53,32 +47,12 @@ namespace hf {
                     delayMilliseconds(pauseMilli);
                 }
                 ledSet(false);
-
-                // Set up MSP
-                msp.init();
             }
 
             void showArmedStatus(bool armed)
             {
                 // Set LED to indicate armed
                 ledSet(armed);
-            }
-
-            void doSerialComms(vehicle_state_t * state, class Receiver * receiver, class Mixer * mixer) 
-            {
-                while (serialAvailableBytes()) {
-                    msp.update(serialReadByte(), state, receiver, mixer);
-                }
-
-                while (msp.availableBytes() > 0) {
-                    serialWriteByte(msp.readByte());
-                }
-
-                // Support motor testing from GCS
-                if (!state->armed) {
-                    mixer->runDisarmed();
-                }
-
             }
 
     }; // class RealBoard

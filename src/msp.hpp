@@ -26,7 +26,7 @@ namespace hf {
 
     class MSP {
 
-        friend class RealBoard;
+        friend class Hackflight;
 
         private:
 
@@ -223,7 +223,7 @@ namespace hf {
                             }
                             break;
 
-                        // don't know how to handle the (valid) message, indicate error
+                            // don't know how to handle the (valid) message, indicate error
                         default:                   
                             headSerialError(0);
                             break;

@@ -41,12 +41,13 @@ namespace hf {
             virtual bool getAccelerometer(float accelGs[3]) { (void)accelGs; return false; }
             virtual bool getBarometer(float & pressure) { (void)pressure; return false; }
 
+            //------------------------------- Serial communications via MSP 00--------------------------------------------
+            virtual uint8_t serialAvailableBytes(void) { return 0; }
+            virtual uint8_t serialReadByte(void)  { return 0; }
+            virtual void    serialWriteByte(uint8_t c) { (void)c; }
+
             //----------------------------------------- Safety ----------------------------------------------------------
             virtual void showArmedStatus(bool armed) { (void)armed; }
-
-            //---------------------------------------- Hardware -------------------------------------------------
-            virtual void doSerialComms(vehicle_state_t * state, class Receiver * receiver, class Mixer * mixer)  
-                                { (void)state; (void)receiver; (void)mixer; }
 
             //--------------------------------------- Debugging ---------------------------------------------------------
             static void  outbuf(char * buf);

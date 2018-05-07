@@ -21,6 +21,7 @@
 #include <cmath>
 
 #include "board.hpp"
+#include "msp.hpp"
 #include "mixer.hpp"
 #include "receiver.hpp"
 #include "stabilizer.hpp"
@@ -38,6 +39,9 @@ namespace hf {
             Receiver   * receiver;
             Stabilizer * stabilizer;
             Mixer      * mixer;
+
+            // MSP (serial comms)
+            MSP msp;
 
             // Vehicle state
             vehicle_state_t state;
@@ -78,8 +82,8 @@ namespace hf {
                     // Update stabilizer with new Euler angles
                     stabilizer->updateEulerAngles(state.eulerAngles);
 
-                    // Do serial comms
-                    board->doSerialComms(&state, receiver, mixer);
+                    // Synch serial comms to quaternion check
+                    doSerialComms();
                 }
             }
 
@@ -175,6 +179,23 @@ namespace hf {
 
             } // checkReceiver
 
+            void doSerialComms(void)
+            {
+                while (board->serialAvailableBytes()) {
+                    msp.update(board->serialReadByte(), &state, receiver, mixer);
+                }
+
+                while (msp.availableBytes() > 0) {
+                    board->serialWriteByte(msp.readByte());
+                }
+
+                // Support motor testing from GCS
+                if (!state.armed) {
+                    mixer->runDisarmed();
+                }
+            }
+
+
         public:
 
             void init(Board * _board, Receiver * _receiver, Stabilizer * _stabilizer, Mixer * _mixer)
@@ -184,6 +205,9 @@ namespace hf {
                 receiver = _receiver;
                 stabilizer = _stabilizer;
                 mixer = _mixer;
+
+                // Initialize MSP (serial comms)
+                msp.init();
 
                 // Initialize the receiver
                 receiver->init();
