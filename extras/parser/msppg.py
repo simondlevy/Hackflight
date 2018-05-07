@@ -109,16 +109,13 @@ class CodeEmitter(object):
 
 class Python_Emitter(CodeEmitter):
 
-    def _copy_example(self, name):
-
-        CodeEmitter._copyfile(self, '%s.py' % name, 'python/' + ('%s.py' % name))
 
     def __init__(self, msgdict):
 
         CodeEmitter.__init__(self, 'python', 'py')
 
         for example in PYTHON_EXAMPLES:
-            self._copy_example(example)
+            CodeEmitter._copyfile(self, '%s.py' % example, 'python/' + ('%s.py' % example))
 
         mkdir_if_missing('output/python/msppg')
 
