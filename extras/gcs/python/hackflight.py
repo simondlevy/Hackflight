@@ -358,7 +358,7 @@ class GCS:
             
             portname = port[0]
 
-            if 'ttyACM' in portname or 'ttyUSB' in portname or 'COM' in portname:
+            if 'usbmodem' in portname or 'ttyACM' in portname or 'ttyUSB' in portname or 'COM' in portname:
                 ports.append(portname)
 
         return ports
