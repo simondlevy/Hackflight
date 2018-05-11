@@ -40,10 +40,9 @@ from serial import Serial
 from serial.tools.list_ports import comports
 from threading import Thread
 import os
+import tkcompat as tk
 
 from msppg import *
-
-from tkcompat import *
 
 from imu import IMU
 from motors import Motors
@@ -63,20 +62,20 @@ class GCS:
         self.gotimu = False
 
         # Do basic Tk initialization
-        self.root = Tk()
+        self.root = tk.Tk()
         self.root.configure(bg=BACKGROUND_COLOR)
         self.root.resizable(False, False)
         self.root.title('Hackflight Ground Control Station')
         left = (self.root.winfo_screenwidth() - DISPLAY_WIDTH) / 2
         top = (self.root.winfo_screenheight() - DISPLAY_HEIGHT) / 2
         self.root.geometry('%dx%d+%d+%d' % (DISPLAY_WIDTH, DISPLAY_HEIGHT, left, top))
-        self.frame = Frame(self.root)
+        self.frame = tk.Frame(self.root)
 
         self.root.wm_iconbitmap(bitmap = "@media/icon.xbm")
 
         # Too much hassle on Windows
         if 'nt' != os.name:
-            self.root.tk.call('wm', 'iconphoto', self.root._w, PhotoImage('icon.xbm'))
+            self.root.tk.call('wm', 'iconphoto', self.root._w, tk.PhotoImage('icon.xbm'))
 
         self.root.protocol('WM_DELETE_WINDOW', self.quit)
 
@@ -93,14 +92,14 @@ class GCS:
         #self.button_maps = self._add_button('Maps', self.pane2, self._maps_button_callback, disabled=False)
 
         # Prepare for adding ports as they are detected by our timer task
-        self.portsvar = StringVar(self.root)
+        self.portsvar = tk.StringVar(self.root)
         self.portsmenu = None
         self.connected = False
         self.ports = []
 
         # Finalize Tk stuff
         self.frame.pack()
-        self.canvas = Canvas(self.root, width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT, background='black')
+        self.canvas = tk.Canvas(self.root, width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT, background='black')
         self.canvas.pack()
 
 
@@ -110,7 +109,7 @@ class GCS:
                  '    * Firmware uses serial receiver\n' + \
                  '      (DSMX, SBUS), but receiver is\n' + \
                  '      not connected.'
-        self.error_label = Label(self.canvas, text=errmsg, bg='black', fg='red', font=(None,24), justify=LEFT)
+        self.error_label = tk.Label(self.canvas, text=errmsg, bg='black', fg='red', font=(None,24), justify=tk.LEFT)
         self.hide(self.error_label)
 
         # Add widgets for motor-testing dialog; hide them immediately
@@ -131,7 +130,7 @@ class GCS:
         #self.maps = Maps(self, yoffset=-30)
 
         # Create a splash image
-        self.splashimage = PhotoImage(file='media/splash.gif')
+        self.splashimage = tk.PhotoImage(file='media/splash.gif')
         self._show_splash()
 
         # Create a message parser 
@@ -191,14 +190,14 @@ class GCS:
 
     def _add_pane(self):
 
-        pane = PanedWindow(self.frame, bg=BACKGROUND_COLOR)
-        pane.pack(fill=BOTH, expand=1)
+        pane = tk.PanedWindow(self.frame, bg=BACKGROUND_COLOR)
+        pane.pack(fill=tk.BOTH, expand=1)
         return pane
 
     def _add_button(self, label, parent, callback, disabled=True):
 
-        button = Button(parent, text=label, command=callback)
-        button.pack(side=LEFT)
+        button = tk.Button(parent, text=label, command=callback)
+        button.pack(side=tk.LEFT)
         button.config(state = 'disabled' if disabled else 'normal')
         return button
 
@@ -261,7 +260,7 @@ class GCS:
 
     def _clear(self):
 
-        self.canvas.delete(ALL)
+        self.canvas.delete(tk.ALL)
 
     # Callback for Receiver button
     def _receiver_button_callback(self):
@@ -372,7 +371,7 @@ class GCS:
 
             if self.portsmenu is None:
 
-                self.portsmenu = OptionMenu(self.pane1, self.portsvar, *ports)
+                self.portsmenu = tk.OptionMenu(self.pane1, self.portsvar, *ports)
 
             else:
 
@@ -380,7 +379,7 @@ class GCS:
 
                     self.portsmenu['menu'].add_command(label=port)
 
-            self.portsmenu.pack(side=LEFT)
+            self.portsmenu.pack(side=tk.LEFT)
 
             if ports == []:
 
@@ -551,4 +550,4 @@ if __name__ == "__main__":
 
     gcs = GCS()
 
-    mainloop()
+    tk.mainloop()
