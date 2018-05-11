@@ -31,7 +31,7 @@ PITCH_ACTIVE = 2
 ROLL_ACTIVE = 3
 
 
-from tkcompat import *
+import tkcompat as tk
 
 from math import sin, cos
 
@@ -144,19 +144,19 @@ class IMU(Dialog):
 
     def _create_window(self, x, widget):
 
-        return self.driver.canvas.create_window(x, 10, anchor=NW, window=widget)
+        return self.driver.canvas.create_window(x, 10, anchor=tk.NW, window=widget)
 
     def _create_button(self, text, x, command):
 
-        button = Button(self.driver.canvas, text=text, height=2, command=command);
+        button = tk.Button(self.driver.canvas, text=text, height=2, command=command);
         button_window = self._create_window(x, button)
 
         return button, button_window
 
     def _create_scale(self, text, x, callback):
         
-        scale = Scale(self.driver.canvas, from_=0, to_=100, label=text, command=callback,
-                orient=HORIZONTAL, length=200, bg='black', fg='white')
+        scale = tk.Scale(self.driver.canvas, from_=0, to_=100, label=text, command=callback,
+                orient=tk.HORIZONTAL, length=200, bg='black', fg='white')
         scale_window = self._create_window(x, scale) 
 
         return scale, scale_window
@@ -251,15 +251,15 @@ class SliderDriver(object):
         self.root = root
         self.canvas = canvas
 
-        frame = Frame(root)
-        pane = PanedWindow(frame)
-        pane.pack(fill=BOTH, expand=1)
+        frame = tk.Frame(root)
+        pane = tk.PanedWindow(frame)
+        pane.pack(fill=tk.BOTH, expand=1)
 
         self.yaw_scale   = self.add_scale(pane, 'Yaw', self.yaw_callback) 
         self.pitch_scale = self.add_scale(pane, 'Pitch', self.pitch_callback) 
         self.roll_scale  = self.add_scale(pane, 'Roll', self.roll_callback) 
 
-        Button(pane, text='Reset', command=self.reset).pack()
+        tk.Button(pane, text='Reset', command=self.reset).pack()
 
         pane.pack()
         frame.pack()
@@ -282,7 +282,7 @@ class SliderDriver(object):
 
     def add_scale(self, pane, label, callback):
 
-        scale =Scale(pane, label=label, from_=-180, to=180, command=callback, orient=HORIZONTAL, length=200)
+        scale = tk.Scale(pane, label=label, from_=-180, to=180, command=callback, orient=tk.HORIZONTAL, length=200)
         scale.pack()
         return scale
 
@@ -314,12 +314,12 @@ if __name__ == "__main__":
     width = 800
     height = 800
 
-    root = Tk()
+    root = tk.Tk()
 
     root.geometry('%dx%d+%d+%d' % (width, height+200, 200, 200))
     root.title('IMU')
 
-    canvas = Canvas(root, width=width, height=height, background='black')
+    canvas = tk.Canvas(root, width=width, height=height, background='black')
 
     driver = SliderDriver(root, canvas)
 
@@ -329,4 +329,4 @@ if __name__ == "__main__":
 
     sim.start()
 
-    mainloop()
+    tk.mainloop()
