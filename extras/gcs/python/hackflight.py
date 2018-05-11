@@ -382,11 +382,15 @@ class GCS:
 
             self.portsmenu.pack(side=tk.LEFT)
 
+            # Disconnected
             if ports == []:
 
+                self.portsmenu['menu'].delete(0, 'end')
+                self.portsvar.set('') 
                 self._disable_button(self.button_connect)
                 self._disable_buttons()
 
+            # Connected
             else:
                 self.portsvar.set(ports[0]) # default value
                 self._enable_button(self.button_connect)
