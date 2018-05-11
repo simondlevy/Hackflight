@@ -42,7 +42,7 @@ from threading import Thread
 import os
 import tkcompat as tk
 
-from msppg import *
+import msppg
 
 from imu import IMU
 from motors import Motors
@@ -134,11 +134,11 @@ class GCS:
         self._show_splash()
 
         # Create a message parser 
-        self.parser = MSP_Parser()
+        self.parser = msppg.MSP_Parser()
 
         # Set up parser's request strings
-        self.attitude_request = serialize_ATTITUDE_RADIANS_Request()
-        self.rc_request = serialize_RC_NORMAL_Request()
+        self.attitude_request = msppg.serialize_ATTITUDE_RADIANS_Request()
+        self.rc_request = msppg.serialize_RC_NORMAL_Request()
 
         # No messages yet
         self.roll_pitch_yaw = 0,0,0
@@ -425,7 +425,7 @@ class GCS:
 
         values = [0]*4
         values[index-1] = percent / 100.
-        self.comms.send_message(serialize_SET_MOTOR_NORMAL, values)
+        self.comms.send_message(msppg.serialize_SET_MOTOR_NORMAL, values)
 
     def _show_splash(self):
 
