@@ -45,9 +45,8 @@ MOTORS_TOP_Y    = 60
 MOTORS_BOTTOM_Y = 220
 MOTORS_RADIUS   = 20
 
-from config import PWM_MIN, PWM_MAX
+import tkcompat as tk
 
-from tkcompat import *
 from math import sqrt
 
 from dialog import Dialog
@@ -66,17 +65,17 @@ class Motors(Dialog):
         (self.image_motors4,self.label_motors4) = self._load_photo(MOTORS4_IMAGE_FILE)
 
         # Add a warning checkbox for motor testing
-        self.checkbox_var = IntVar()
-        self.warning_motors = Checkbutton(self.driver.canvas, \
+        self.checkbox_var = tk.IntVar()
+        self.warning_motors = tk.Checkbutton(self.driver.canvas, \
                 variable=self.checkbox_var, command=self._checkbox_callback, \
                 text=MOTORS_WARNING_TEXT, font=('Heletica', 14),  fg='red', bg='black', highlightthickness=0)
 
         # A a scale for motors
-        self.scale = Scale(self.driver.canvas, from_=100, to_=0, command=self._scale_callback,
-                orient=VERTICAL, length=MOTOR_SCALE_LENGTH, bg='black', fg='white')
+        self.scale = tk.Scale(self.driver.canvas, from_=100, to_=0, command=self._scale_callback,
+                orient=tk.VERTICAL, length=MOTOR_SCALE_LENGTH, bg='black', fg='white')
 
         # A label for the scale
-        self.scale_label = Label(self.driver.canvas, text='%', bg='black', fg='white')
+        self.scale_label = tk.Label(self.driver.canvas, text='%', bg='black', fg='white')
 
         # Index of active motor (0 = none)
         self.active_motor = 0
@@ -148,8 +147,8 @@ class Motors(Dialog):
 
     def _load_photo(self, filename):
 
-        the_image = PhotoImage(file=filename).subsample(MOTORS_IMAGE_SCALEDOWN, MOTORS_IMAGE_SCALEDOWN)
-        the_label = Label(self.driver.canvas, image=the_image, borderwidth=0)
+        the_image = tk.PhotoImage(file=filename).subsample(MOTORS_IMAGE_SCALEDOWN, MOTORS_IMAGE_SCALEDOWN)
+        the_label = tk.Label(self.driver.canvas, image=the_image, borderwidth=0)
         the_label.bind('<Button-1>', self._on_click)
         return the_image, the_label
 

@@ -23,7 +23,7 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 UPDATE_MSEC = 50
 SCROLLBAR_WIDTH = 20
 
-from tkcompat import *
+import tkcompat as tk
 
 from dialog import Dialog
 
@@ -37,11 +37,11 @@ class Messages(Dialog):
         self.current_message = None
         self.previous_message = None
 
-        self.scrollbar = Scrollbar(driver.canvas)
-        self.listbox = Listbox(driver.canvas, bg='black', fg='white')
+        self.scrollbar = tk.Scrollbar(driver.canvas)
+        self.listbox = tk.Listbox(driver.canvas, bg='black', fg='white')
 
-        self.checkbox_var = IntVar()
-        self.checkbox = Checkbutton(self.driver.canvas, 
+        self.checkbox_var = tk.IntVar()
+        self.checkbox = tk.Checkbutton(self.driver.canvas, 
                 text='Autoscroll', selectcolor='black', variable=self.checkbox_var, 
                 bg='black', fg='white', highlightthickness=0)
         self.checkbox.select()
@@ -77,9 +77,9 @@ class Messages(Dialog):
 
 
             if self.current_message != self.previous_message:
-                self.listbox.insert(END, self.current_message)
+                self.listbox.insert(tk.END, self.current_message)
                 if self.checkbox_var.get():
-                    self.listbox.see(END)
+                    self.listbox.see(tk.END)
 
             self.previous_message = self.current_message
 
