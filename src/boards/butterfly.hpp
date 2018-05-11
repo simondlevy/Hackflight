@@ -33,6 +33,13 @@
 
 namespace hf {
 
+    // Interrupt support 
+    static bool gotNewData;
+    static void interruptHandler()
+    {
+        gotNewData = true;
+    }
+
     class Butterfly : public RealBoard {
 
         private:
@@ -55,6 +62,9 @@ namespace hf {
 
             // Butterfly board follows Arduino standard for LED pin
             const uint8_t LED_PIN = 13;
+
+            // MPU9250 add-on board has interrupt on Butterfly pin 8
+            const uint8_t INTERRUPT_PIN = 8;
 
             // Paramters to experiment with ------------------------------------------------------------------------
 
@@ -144,63 +154,69 @@ namespace hf {
 
             bool getGyrometer(float gyro[3])
             {
-                if (imu.checkNewAccelGyroData()) {
+                if (gotNewData) {
 
-                    imu.readMPU9250Data(imuData); 
+                    gotNewData = false;
 
-                    // Convert the accleration value into g's
-                    float ax = imuData[0]*aRes - accelBias[0];  // get actual g value, this depends on scale being set
-                    float ay = imuData[1]*aRes - accelBias[1];   
-                    float az = imuData[2]*aRes - accelBias[2];  
+                    if (imu.checkNewAccelGyroData()) {
 
-                    // Convert the gyro value into degrees per second
-                    float gx = adc2rad(imuData[4]);
-                    float gy = adc2rad(imuData[5]);
-                    float gz = adc2rad(imuData[6]);
+                        imu.readMPU9250Data(imuData); 
 
-                    // We're using pass-through mode, so magnetometer values are updated at their own rate
-                    static float mx, my, mz;
+                        // Convert the accleration value into g's
+                        float ax = imuData[0]*aRes - accelBias[0];  // get actual g value, this depends on scale being set
+                        float ay = imuData[1]*aRes - accelBias[1];   
+                        float az = imuData[2]*aRes - accelBias[2];  
 
-                    if (imu.checkNewMagData()) { // Wait for magnetometer data ready bit to be set
+                        // Convert the gyro value into degrees per second
+                        float gx = adc2rad(imuData[4]);
+                        float gy = adc2rad(imuData[5]);
+                        float gz = adc2rad(imuData[6]);
 
-                        int16_t magCount[3];    // Stores the 16-bit signed magnetometer sensor output
+                        // We're using pass-through mode, so magnetometer values are updated at their own rate
+                        static float mx, my, mz;
 
-                        imu.readMagData(magCount);  // Read the x/y/z adc values
+                        if (imu.checkNewMagData()) { // Wait for magnetometer data ready bit to be set
 
-                        // Calculate the magnetometer values in milliGauss
-                        // Include factory calibration per data sheet and user environmental corrections
-                        // Get actual magnetometer value, this depends on scale being set
-                        mx = magCount[0]*mRes*magCalibration[0] - magBias[0];  
-                        my = magCount[1]*mRes*magCalibration[1] - magBias[1];  
-                        mz = magCount[2]*mRes*magCalibration[2] - magBias[2];  
-                        mx *= magScale[0];
-                        my *= magScale[1];
-                        mz *= magScale[2]; 
-                    }
+                            int16_t magCount[3];    // Stores the 16-bit signed magnetometer sensor output
 
-                    // Iterate a fixed number of times per data read cycle, updating the quaternion
-                    for (uint8_t i=0; i<QuaternionUpdatesPerCycle; i++) { 
+                            imu.readMagData(magCount);  // Read the x/y/z adc values
 
-                        uint32_t timeCurr = micros();
+                            // Calculate the magnetometer values in milliGauss
+                            // Include factory calibration per data sheet and user environmental corrections
+                            // Get actual magnetometer value, this depends on scale being set
+                            mx = magCount[0]*mRes*magCalibration[0] - magBias[0];  
+                            my = magCount[1]*mRes*magCalibration[1] - magBias[1];  
+                            mz = magCount[2]*mRes*magCalibration[2] - magBias[2];  
+                            mx *= magScale[0];
+                            my *= magScale[1];
+                            mz *= magScale[2]; 
+                        }
 
-                        // Set integration time by time elapsed since last filter update
-                        float deltat = ((timeCurr - timePrev)/1000000.0f); 
-                        timePrev = timeCurr;
+                        // Iterate a fixed number of times per data read cycle, updating the quaternion
+                        for (uint8_t i=0; i<QuaternionUpdatesPerCycle; i++) { 
 
-                        sum += deltat; 
-                        sumCount++;
+                            uint32_t timeCurr = micros();
 
-                        quaternionCalculator.update(-ax, ay, az, gx, -gy, -gz, my, -mx, mz, deltat, q);
-                    }
+                            // Set integration time by time elapsed since last filter update
+                            float deltat = ((timeCurr - timePrev)/1000000.0f); 
+                            timePrev = timeCurr;
 
-                    // Copy gyro values back out
-                    gyro[0] = gx;
-                    gyro[1] = gy;
-                    gyro[2] = gz;
+                            sum += deltat; 
+                            sumCount++;
 
-                    return true;
+                            quaternionCalculator.update(-ax, ay, az, gx, -gy, -gz, my, -mx, mz, deltat, q);
+                        }
 
-                } // if (imu.checkNewAccelGyroData())
+                        // Copy gyro values back out
+                        gyro[0] = gx;
+                        gyro[1] = gy;
+                        gyro[2] = gz;
+
+                        return true;
+
+                    } // if (imu.checkNewAccelGyroData())
+
+                } // if gotNewData
 
                 return false;
             }
@@ -244,6 +260,10 @@ namespace hf {
                 // Setup LED pin and turn it off
                 pinMode(LED_PIN, OUTPUT);
                 digitalWrite(LED_PIN, HIGH);
+
+                // Set up the interrupt pin, it's set as active high, push-pull
+                pinMode(INTERRUPT_PIN, INPUT);
+                attachInterrupt(INTERRUPT_PIN, interruptHandler, RISING);  
 
                 // Connect to the ESCs and send them the baseline values
                 for (uint8_t k=0; k<4; ++k) {
