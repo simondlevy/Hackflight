@@ -21,12 +21,9 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 UPDATE_MSEC = 1
 
-
-from tkcompat import *
-
 from dialog import Dialog
 
-from config import PWM_MAX, PWM_MIN
+import tkcompat as tk
 
 class Receiver(Dialog):
 
@@ -109,7 +106,7 @@ class HorizontalGauge(object):
 
     def _create_label(self, x, y, text=''):
 
-        return self.owner.driver.canvas.create_text(x, y, anchor=W, font=('Helvetica', 12), fill='white', text=text)
+        return self.owner.driver.canvas.create_text(x, y, anchor=tk.W, font=('Helvetica', 12), fill='white', text=text)
 
 
 
