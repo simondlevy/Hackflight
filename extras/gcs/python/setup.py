@@ -1,6 +1,9 @@
 '''
 setup.py : script for building Hackflight GCS executable via py2exe
 
+Doesn't yet support Python 3.6:
+https://stackoverflow.com/questions/43304633/using-py2exe-on-python-3-6-to-convert-py-to-exe
+
 Copyright (C) Simon D. Levy 2017
 
 This file is part of Hackflight.
@@ -23,6 +26,11 @@ from distutils.core import setup
 from subprocess import call
 import py2exe
 from os import system
+from sys import version
+
+if version[:3] == '3.6':
+    print('Sorry, Python 3.6 not supported yet!')
+    exit(1)
 
 system('mkdir dist')
 system('mkdir dist\media')
