@@ -19,11 +19,15 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-MOTORS_IMAGE_FILE   = 'media/motors.gif'
-MOTORS1_IMAGE_FILE  = 'media/motors1.gif'
-MOTORS2_IMAGE_FILE  = 'media/motors2.gif'
-MOTORS3_IMAGE_FILE  = 'media/motors3.gif'
-MOTORS4_IMAGE_FILE  = 'media/motors4.gif'
+from resources import resource_path
+
+import os
+
+MOTORS_IMAGE_FILE   = resource_path(os.path.join('media', 'motors.gif'))
+MOTORS1_IMAGE_FILE  = resource_path(os.path.join('media', 'motors1.gif'))
+MOTORS2_IMAGE_FILE  = resource_path(os.path.join('media', 'motors2.gif'))
+MOTORS3_IMAGE_FILE  = resource_path(os.path.join('media', 'motors3.gif'))
+MOTORS4_IMAGE_FILE  = resource_path(os.path.join('media', 'motors4.gif'))
 
 MOTORS_IMAGE_SCALEDOWN = 3
 
