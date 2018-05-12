@@ -18,12 +18,13 @@
 # You should have received a copy of the GNU Lesser General Public License 
 # along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
-block_cipher = None
 
+block_cipher = None
 
 a = Analysis(['hackflight.py'],
              pathex=['C:\\Users\\levys\\Documents\\Arduino\\libraries\\Hackflight\\extras\\gcs\\python'],
              binaries=[],
+             datas=[('media/'+name, 'media') for name in ['hackflight.ico', 'splash.gif', 'motors.gif', 'motors1.gif', 'motors2.gif', 'motors3.gif', 'motors4.gif']],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -31,19 +32,20 @@ a = Analysis(['hackflight.py'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher)
-
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
-
 exe = EXE(pyz,
-          Tree('media', prefix='media'),
           a.scripts,
-          a.binaries,
-          a.zipfiles,
-          a.datas,
+          exclude_binaries=True,
           name='hackflight',
           debug=False,
           strip=False,
           upx=True,
-          runtime_tmpdir=None,
           console=False )
+coll = COLLECT(exe,
+               a.binaries,
+               a.zipfiles,
+               a.datas,
+               strip=False,
+               upx=True,
+               name='hackflight')

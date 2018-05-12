@@ -1,8 +1,6 @@
 '''
 resources.py : Resource access to support pytinstall
 
-See: https://irwinkwan.com/2013/04/29/python-executables-pyinstaller-and-a-48-hour-game-design-compo
-
 Copyright (C) Simon D. Levy 2018
 
 This file is part of Hackflight.
@@ -23,6 +21,6 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 import os
 import sys
 
-def resource_path(relative):
+def resource_path(filename):
 
-    return os.path.join(sys._MEIPASS, relative) if hasattr(sys, "_MEIPASS") else os.path.join(relative)
+    return os.path.join('media', filename)

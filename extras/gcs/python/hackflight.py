@@ -70,8 +70,6 @@ class GCS:
         self.root.geometry('%dx%d+%d+%d' % (DISPLAY_WIDTH, DISPLAY_HEIGHT, left, top))
         self.frame = tk.Frame(self.root)
 
-        #self.root.wm_iconbitmap(bitmap = "@media/icon.xbm")
-
         # Too much hassle on Windows
         if 'nt' != os.name:
             self.root.tk.call('wm', 'iconphoto', self.root._w, tk.PhotoImage('icon.xbm'))
@@ -129,8 +127,7 @@ class GCS:
         #self.maps = Maps(self, yoffset=-30)
 
         # Create a splash image
-        #self.splashimage = tk.PhotoImage(file='media/splash.gif')
-        self.splashimage = tk.PhotoImage(file=resource_path(os.path.join('media', 'splash.gif')))
+        self.splashimage = tk.PhotoImage(file=resource_path('splash.gif'))
         self._show_splash()
 
         # Create a message parser 
