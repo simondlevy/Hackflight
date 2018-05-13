@@ -27,7 +27,7 @@ boards from [Tlera Corp](https://www.tindie.com/stores/TleraCorp/): the
 brushed-motor board and the (currently in development) brushless-motor 
 [ButterflyFC](https://github.com/simondlevy/Hackflight/wiki/B.01-Bill-of-Materials).
 In addition to offering the full complement of i/o signals (UART, I<sup>2</sup>C,
-SPI, digital, analog), this board has hardware support for floating-point
+SPI, digital, analog), these boards have hardware support for floating-point
 operations, allowing us to write simpler code based on standard units:
 
 * Quaternions in the interval [-1,+1]
