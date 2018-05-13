@@ -22,8 +22,11 @@ you and damage to your vehicle.
 
 Although Hackflight is hardware/platform-independent, 
 the hardware focus of the project has shifted to the Arduino-compatible, STM32L4-based 
-[Ladybug FC](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/).  In
-addition to offering the full complement of i/o signals (UART, I<sup>2</sup>C,
+boards from [Tlera Corp](https://www.tindie.com/stores/TleraCorp/): the
+[Ladybug FC](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/)
+brushed-motor board and the (currently in development) brushless-motor 
+[ButterflyFC](https://github.com/simondlevy/Hackflight/wiki/B.01-Bill-of-Materials).
+In addition to offering the full complement of i/o signals (UART, I<sup>2</sup>C,
 SPI, digital, analog), this board has hardware support for floating-point
 operations, allowing us to write simpler code based on standard units:
 
