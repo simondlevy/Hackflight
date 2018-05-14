@@ -20,12 +20,12 @@
 
 #include "hackflight.hpp"
 #include "boards/butterfly.hpp"
-#include "receivers/serial/arduino_sbus.hpp"
+#include "receivers/serial/arduino_dsmx.hpp"
 #include "mixers/quadx.hpp"
 
 hf::Hackflight h;
 
-hf::SBUS_Receiver rc;
+hf::DSMX_Receiver rc;
 
 hf::MixerQuadX mixer;
 
