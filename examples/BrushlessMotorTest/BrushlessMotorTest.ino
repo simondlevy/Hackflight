@@ -21,7 +21,7 @@
 
 #include <Servo.h>
 
-static uint8_t MOTOR_PIN = 6;  
+static uint8_t MOTOR_PIN = 3;  
 
 static uint16_t BASELINE = 990;
 static uint16_t MAXVAL   = 1500;
