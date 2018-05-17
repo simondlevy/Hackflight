@@ -110,9 +110,9 @@ namespace hf {
             float accelBias[3]       = {0,0,0};
 
             // These should be computed by running MPU9250/examples/PassthruTest
-            float magBias[3]         = {0,0,0};
-            float magScale[3]        = {1,1,1};      
-            float magCalibration[3]  = {1,1,1};      
+            float magBias[3]         = {-57.91, 125.28, 36.65};
+            float magScale[3]        = {0.99, 1.02, 0.99};
+            float magCalibration[3]  = {1.21, 1.21, 1.16};      
 
             // Helpers -----------------------------------------------------------------------------------
 
