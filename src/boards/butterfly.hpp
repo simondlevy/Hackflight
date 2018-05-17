@@ -51,6 +51,7 @@ namespace hf {
             // Use the MPU9250 in pass-through mode
             MPU9250Passthru imu = MPU9250Passthru(&mpu, &mag);;
 
+            // Run motor ESCs using standard Servo library
             Servo escs[4];
 
             // Motor pins
