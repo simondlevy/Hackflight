@@ -105,9 +105,11 @@ namespace hf {
             uint32_t timePrev = 0;                          // used to calculate integration interval
             float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};          // vector to hold quaternion
 
-            // XXX we should be loading these values from pre-calibrated data
+            // We compute these at startup
             float gyroBias[3]        = {0,0,0};
             float accelBias[3]       = {0,0,0};
+
+            // These should be computed by running MPU9250/examples/PassthruTest
             float magBias[3]         = {0,0,0};
             float magScale[3]        = {1,1,1};      
             float magCalibration[3]  = {1,1,1};      
@@ -115,9 +117,9 @@ namespace hf {
             // Helpers -----------------------------------------------------------------------------------
 
             // Raw analog-to-digital values converted to radians per second
-            float adc2rad(int16_t adc) 
+            float adc2rad(int16_t adc, float bias) 
             {
-                return adc * gRes * M_PI / 180;
+                return (adc * gRes - bias) * M_PI / 180;
             }
 
         protected:
@@ -168,9 +170,9 @@ namespace hf {
                         float az = imuData[2]*aRes - accelBias[2];  
 
                         // Convert the gyro value into degrees per second
-                        float gx = adc2rad(imuData[4]);
-                        float gy = adc2rad(imuData[5]);
-                        float gz = adc2rad(imuData[6]);
+                        float gx = adc2rad(imuData[4], gyroBias[0]);
+                        float gy = adc2rad(imuData[5], gyroBias[1]);
+                        float gz = adc2rad(imuData[6], gyroBias[2]);
 
                         // We're using pass-through mode, so magnetometer values are updated at their own rate
                         static float mx, my, mz;
@@ -184,12 +186,9 @@ namespace hf {
                             // Calculate the magnetometer values in milliGauss
                             // Include factory calibration per data sheet and user environmental corrections
                             // Get actual magnetometer value, this depends on scale being set
-                            mx = magCount[0]*mRes*magCalibration[0] - magBias[0];  
-                            my = magCount[1]*mRes*magCalibration[1] - magBias[1];  
-                            mz = magCount[2]*mRes*magCalibration[2] - magBias[2];  
-                            mx *= magScale[0];
-                            my *= magScale[1];
-                            mz *= magScale[2]; 
+                            mx = (magCount[0]*mRes*magCalibration[0] - magBias[0]) * magScale[0];  
+                            my = (magCount[1]*mRes*magCalibration[1] - magBias[1]) * magScale[1];  
+                            mz = (magCount[2]*mRes*magCalibration[2] - magBias[2]) * magScale[2];  
                         }
 
                         // Iterate a fixed number of times per data read cycle, updating the quaternion
@@ -283,6 +282,9 @@ namespace hf {
                 aRes = imu.getAres(Ascale);
                 gRes = imu.getGres(Gscale);
                 mRes = imu.getMres(Mscale);
+
+                // Calibrate gyro and accelerometers, load biases in bias registers
+                imu.calibrateMPU9250(gyroBias, accelBias); 
 
                 imu.initMPU9250(Ascale, Gscale, sampleRate); 
 
