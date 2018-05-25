@@ -52,16 +52,16 @@ namespace hf {
         Receiver * _receiver;
         Mixer * _mixer;
 
-        uint8_t checksum;
-        uint8_t inBuf[INBUF_SIZE];
-        uint8_t inBufIndex;
-        uint8_t outBuf[OUTBUF_SIZE];
-        uint8_t outBufIndex;
-        uint8_t outBufSize;
-        uint8_t cmdMSP;
-        uint8_t offset;
-        uint8_t dataSize;
-        serialState_t _parser_state;
+        uint8_t         checksum;
+        uint8_t         inBuf[INBUF_SIZE];
+        uint8_t         inBufIndex;
+        uint8_t         outBuf[OUTBUF_SIZE];
+        uint8_t         outBufIndex;
+        uint8_t         outBufSize;
+        uint8_t         cmdMSP;
+        uint8_t         offset;
+        uint8_t         dataSize;
+        serialState_t   _parser_state;
 
         void serialize8(uint8_t a)
         {
@@ -209,37 +209,45 @@ namespace hf {
 
         void update(uint8_t c)
         {
-            if (_parser_state == IDLE) {
-                _parser_state = (c == '$') ? HEADER_START : IDLE;
-            } else if (_parser_state == HEADER_START) {
-                _parser_state = (c == 'M') ? HEADER_M : IDLE;
-            } else if (_parser_state == HEADER_M) {
-                _parser_state = (c == '<') ? HEADER_ARROW : IDLE;
-            } else if (_parser_state == HEADER_ARROW) {
-                if (c > INBUF_SIZE) {       // now we are expecting the payload size
-                    _parser_state = IDLE;
-                    return;
-                }
-                dataSize = c;
-                offset = 0;
-                checksum = 0;
-                inBufIndex = 0;
-                checksum ^= c;
-                _parser_state = HEADER_SIZE;      // the command is to follow
-            } else if (_parser_state == HEADER_SIZE) {
-                cmdMSP = c;
-                checksum ^= c;
-                _parser_state = HEADER_CMD;
-            } else if (_parser_state == HEADER_CMD && offset < dataSize) {
-                checksum ^= c;
-                inBuf[offset++] = c;
-            } else if (_parser_state == HEADER_CMD && offset >= dataSize) {
-                if (checksum == c) {        // compare calculated and transferred checksum
-                    dispatchCommand();
-                    tailSerialReply();
-                }
-                _parser_state = IDLE;
-            } 
+            switch (_parser_state) {
+                case IDLE:
+                    _parser_state = (c == '$') ? HEADER_START : IDLE;
+                    break;
+                case HEADER_START:
+                    _parser_state = (c == 'M') ? HEADER_M : IDLE;
+                    break;
+                case HEADER_M:
+                    _parser_state = (c == '<') ? HEADER_ARROW : IDLE;
+                    break;
+                case HEADER_ARROW:
+                    if (c > INBUF_SIZE) {       // now we are expecting the payload size
+                        _parser_state = IDLE;
+                        return;
+                    }
+                    dataSize = c;
+                    offset = 0;
+                    checksum = 0;
+                    inBufIndex = 0;
+                    checksum ^= c;
+                    _parser_state = HEADER_SIZE;      // the command is to follow
+                    break;
+                case HEADER_SIZE:
+                    cmdMSP = c;
+                    checksum ^= c;
+                    _parser_state = HEADER_CMD;
+                    break;
+                case HEADER_CMD:
+                    if (offset < dataSize) {
+                        checksum ^= c;
+                        inBuf[offset++] = c;
+                    } else  {
+                        if (checksum == c) {        // compare calculated and transferred checksum
+                            dispatchCommand();
+                            tailSerialReply();
+                        }
+                        _parser_state = IDLE;
+                    }
+            } // switch (_parser_state)
 
         } // update
 
