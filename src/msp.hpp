@@ -247,6 +247,7 @@ namespace hf {
                         }
                         _parser_state = IDLE;
                     }
+
             } // switch (_parser_state)
 
         } // update
