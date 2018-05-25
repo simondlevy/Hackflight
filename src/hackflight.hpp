@@ -228,8 +228,6 @@ namespace hf {
                 checkReceiver();
                 checkAccelerometer();
                 checkBarometer();
-
-                Debug::printf("%s\n", state.armed ? "ARMED" : "DISARMED");
             } 
 
     }; // class Hackflight
