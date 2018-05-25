@@ -181,8 +181,8 @@ namespace hf {
 
             void doSerialComms(void)
             {
-                while (board->serialAvailableBytes()) {
-                    msp.update(board->serialReadByte(), &state, receiver, mixer);
+                while (board->serialAvailableBytes() > 0) {
+                    msp.update(board->serialReadByte());
                 }
 
                 while (msp.availableBytes() > 0) {
@@ -207,7 +207,7 @@ namespace hf {
                 mixer = _mixer;
 
                 // Initialize MSP (serial comms)
-                msp.init();
+                msp.init(&state, receiver, mixer);
 
                 // Initialize the receiver
                 receiver->init();

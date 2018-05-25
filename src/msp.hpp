@@ -48,6 +48,10 @@ namespace hf {
             HEADER_CMD
         } serialState_t;
 
+        vehicle_state_t * _vehicle_state;
+        Receiver * _receiver;
+        Mixer * _mixer;
+
         uint8_t checksum;
         uint8_t inBuf[INBUF_SIZE];
         uint8_t inBufIndex;
@@ -57,7 +61,7 @@ namespace hf {
         uint8_t cmdMSP;
         uint8_t offset;
         uint8_t dataSize;
-        serialState_t c_state;
+        serialState_t _parser_state;
 
         void serialize8(uint8_t a)
         {
@@ -143,32 +147,77 @@ namespace hf {
             serialize8(checksum);
         }
 
+        void dispatchCommand(void)
+        {
+            switch (cmdMSP) {
+
+                case MSP_SET_MOTOR_NORMAL:
+                    for (uint8_t i = 0; i < _mixer->nmotors; i++)
+                        _mixer->motorsDisarmed[i] = readFloat();
+                    headSerialReply(0);
+                    break;
+
+                case MSP_SET_ARMED:
+                    if (read8()) {  // got arming command: arm only if throttle is down
+                        if (_receiver->throttleIsDown()) {
+                            _vehicle_state->armed = true;
+                        }
+                    }
+                    else {          // got disarming command: always disarm
+                        _vehicle_state->armed = false;
+                    }
+                    headSerialReply(0);
+                    break;
+
+                case MSP_RC_NORMAL:
+                    outBufSize = 0;
+                    outBufIndex = 0;
+                    serializeFloats(_receiver->rawvals, 8);
+                    break;
+
+                case MSP_ATTITUDE_RADIANS: 
+                    {
+                        outBufSize = 0;
+                        outBufIndex = 0;
+                        serializeFloats(_vehicle_state->eulerAngles, 3);
+                    }
+                    break;
+
+                    // don't know how to handle the (valid) message, indicate error
+                default:                   
+                    headSerialError(0);
+                    break;
+            }
+        }
+
         protected:
 
-        void init(void)
+        void init(vehicle_state_t * vehicle_state, Receiver * receiver, Mixer * mixer)
         {
+            _vehicle_state = vehicle_state;
+            _receiver = receiver;
+            _mixer = mixer;
+
             checksum = 0;
             outBufIndex = 0;
             outBufSize = 0;
             cmdMSP = 0;
             offset = 0;
             dataSize = 0;
-            c_state = IDLE;
+            _parser_state = IDLE;
         }
 
-        void update(uint8_t c, vehicle_state_t * state, Receiver * receiver, Mixer * mixer)
+        void update(uint8_t c)
         {
-            if (c_state == IDLE) {
-                c_state = (c == '$') ? HEADER_START : IDLE;
-                if (c_state == IDLE && !state->armed) {
-                }
-            } else if (c_state == HEADER_START) {
-                c_state = (c == 'M') ? HEADER_M : IDLE;
-            } else if (c_state == HEADER_M) {
-                c_state = (c == '<') ? HEADER_ARROW : IDLE;
-            } else if (c_state == HEADER_ARROW) {
+            if (_parser_state == IDLE) {
+                _parser_state = (c == '$') ? HEADER_START : IDLE;
+            } else if (_parser_state == HEADER_START) {
+                _parser_state = (c == 'M') ? HEADER_M : IDLE;
+            } else if (_parser_state == HEADER_M) {
+                _parser_state = (c == '<') ? HEADER_ARROW : IDLE;
+            } else if (_parser_state == HEADER_ARROW) {
                 if (c > INBUF_SIZE) {       // now we are expecting the payload size
-                    c_state = IDLE;
+                    _parser_state = IDLE;
                     return;
                 }
                 dataSize = c;
@@ -176,66 +225,23 @@ namespace hf {
                 checksum = 0;
                 inBufIndex = 0;
                 checksum ^= c;
-                c_state = HEADER_SIZE;      // the command is to follow
-            } else if (c_state == HEADER_SIZE) {
+                _parser_state = HEADER_SIZE;      // the command is to follow
+            } else if (_parser_state == HEADER_SIZE) {
                 cmdMSP = c;
                 checksum ^= c;
-                c_state = HEADER_CMD;
-            } else if (c_state == HEADER_CMD && 
-                    offset < dataSize) {
+                _parser_state = HEADER_CMD;
+            } else if (_parser_state == HEADER_CMD && offset < dataSize) {
                 checksum ^= c;
                 inBuf[offset++] = c;
-            } else if (c_state == HEADER_CMD && offset >= dataSize) {
-
+            } else if (_parser_state == HEADER_CMD && offset >= dataSize) {
                 if (checksum == c) {        // compare calculated and transferred checksum
-
-                    switch (cmdMSP) {
-
-                        case MSP_SET_MOTOR_NORMAL:
-                            for (uint8_t i = 0; i < mixer->nmotors; i++)
-                                mixer->motorsDisarmed[i] = readFloat();
-                            headSerialReply(0);
-                            break;
-
-                        case MSP_SET_ARMED:
-                            if (read8()) {  // got arming command: arm only if throttle is down
-                                if (receiver->throttleIsDown()) {
-                                    state->armed = true;
-                                }
-                            }
-                            else {          // got disarming command: always disarm
-                                state->armed = false;
-                            }
-                            headSerialReply(0);
-                            break;
-
-                        case MSP_RC_NORMAL:
-                            outBufSize = 0;
-                            outBufIndex = 0;
-                            serializeFloats(receiver->rawvals, 8);
-                            break;
-
-                        case MSP_ATTITUDE_RADIANS: 
-                            {
-                                outBufSize = 0;
-                                outBufIndex = 0;
-                                serializeFloats(state->eulerAngles, 3);
-                            }
-                            break;
-
-                            // don't know how to handle the (valid) message, indicate error
-                        default:                   
-                            headSerialError(0);
-                            break;
-                    }
+                    dispatchCommand();
                     tailSerialReply();
                 }
-
-                c_state = IDLE;
-
+                _parser_state = IDLE;
             } 
 
-        } // writeByte
+        } // update
 
         uint8_t availableBytes(void)
         {
