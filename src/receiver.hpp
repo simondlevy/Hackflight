@@ -38,11 +38,11 @@ namespace hf {
 
         private: 
 
-            const float margin       = 0.1f;
-            const float cyclicExpo   = 0.65f;
-            const float cyclicRate   = 0.90f;
-            const float throttleMid  = 0.50f;
-            const float throttleExpo = 0.20f;
+            const float MARGIN        = 0.1f;
+            const float CYCLIC_EXPO   = 0.65f;
+            const float CYCLIC_RATE   = 0.90f;
+            const float THROTTLE_MID  = 0.50f;
+            const float THROTTLE_EXPO = 0.20f;
 
             float adjustCommand(float command, uint8_t channel)
             {
@@ -57,7 +57,7 @@ namespace hf {
 
             float applyCyclicFunction(float command)
             {
-                return rcFun(command, cyclicExpo, cyclicRate);
+                return rcFun(command, CYCLIC_EXPO, CYCLIC_RATE);
             }
 
             float makePositiveCommand(uint8_t channel)
@@ -161,9 +161,9 @@ namespace hf {
                 uint8_t stTmp = 0;
                 for (uint8_t i = 0; i < 4; i++) {
                     stTmp >>= 2;
-                    if (rawvals[i] > -1 + margin)
+                    if (rawvals[i] > -1 + MARGIN)
                         stTmp |= 0x80;  // check for MIN
-                    if (rawvals[i] < +1 - margin)
+                    if (rawvals[i] < +1 - MARGIN)
                         stTmp |= 0x40;  // check for MAX
                 }
 
@@ -203,7 +203,7 @@ namespace hf {
 
                 // Special handling for throttle
                 float tmp = (rawvals[CHANNEL_THROTTLE] + 1) / 2; // [-1,+1] -> [0,1]
-                demands.throttle = throttleFun(tmp, throttleExpo, throttleMid);
+                demands.throttle = throttleFun(tmp, THROTTLE_EXPO, THROTTLE_MID);
 
                 // Store auxiliary switch value
                 float aux = rawvals[4];
@@ -217,10 +217,9 @@ namespace hf {
 
             bool throttleIsDown(void)
             {
-                return rawvals[CHANNEL_THROTTLE] < -1 + margin;
+                return rawvals[CHANNEL_THROTTLE] < -1 + MARGIN;
             }
 
     }; // class Receiver
-
 
 } // namespace

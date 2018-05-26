@@ -35,52 +35,48 @@ namespace hf {
         private: 
 
             // Passed to Hackflight::init() for a particular board and receiver
-            Board      * board;
-            Receiver   * receiver;
-            Stabilizer * stabilizer;
-            Mixer      * mixer;
+            Board      * _board;
+            Receiver   * _receiver;
+            Stabilizer * _stabilizer;
+            Mixer      * _mixer;
 
             // MSP (serial comms)
-            MSP msp;
+            MSP _msp;
 
             // Vehicle state
-            vehicle_state_t state;
+            vehicleState_t _state;
 
             // Auxiliary switch state for change detection
-            uint8_t auxState;
+            uint8_t _auxState;
 
             // Safety
-            bool failsafe;
+            bool _failsafe;
 
             // Support for headless mode
-            float yawInitial;
-
-            uint32_t gcount, acount, qcount, bcount, rcount;
+            float _yawInitial;
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(state.eulerAngles[axis]) < stabilizer->maxArmingAngle;
+                return fabs(_state.eulerAngles[axis]) < _stabilizer->maxArmingAngle;
             }
 
             void checkQuaternion(void)
             {
                 float q[4];
 
-                if (board->getQuaternion(q)) {
+                if (_board->getQuaternion(q)) {
 
-                    state.eulerAngles[0] = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
-                    state.eulerAngles[1] = asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
-                    state.eulerAngles[2] = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]); 
-
-                    qcount++;
+                    _state.eulerAngles[0] = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
+                    _state.eulerAngles[1] = asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
+                    _state.eulerAngles[2] = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]); 
 
                     // Convert heading from [-pi,+pi] to [0,2*pi]
-                    if (state.eulerAngles[AXIS_YAW] < 0) {
-                        state.eulerAngles[AXIS_YAW] += 2*M_PI;
+                    if (_state.eulerAngles[AXIS_YAW] < 0) {
+                        _state.eulerAngles[AXIS_YAW] += 2*M_PI;
                     }
 
                     // Update stabilizer with new Euler angles
-                    stabilizer->updateEulerAngles(state.eulerAngles);
+                    _stabilizer->updateEulerAngles(_state.eulerAngles);
 
                     // Synch serial comms to quaternion check
                     doSerialComms();
@@ -91,23 +87,21 @@ namespace hf {
             {
                 float gyroRates[3];
 
-                if (board->getGyrometer(gyroRates)) {
-
-                    gcount++;
+                if (_board->getGyrometer(gyroRates)) {
 
                     // Start with demands from receiver
                     demands_t demands;
-                    memcpy(&demands, &receiver->demands, sizeof(demands_t));
+                    memcpy(&demands, &_receiver->demands, sizeof(demands_t));
 
                     // Run stabilization to get updated demands
-                    stabilizer->modifyDemands(gyroRates, demands);
+                    _stabilizer->modifyDemands(gyroRates, demands);
 
                     // Sync failsafe to gyro loop
                     checkFailsafe();
 
                     // Use updated demands to run motors
-                    if (state.armed && !failsafe && !receiver->throttleIsDown()) {
-                        mixer->runArmed(demands);
+                    if (_state.armed && !_failsafe && !_receiver->throttleIsDown()) {
+                        _mixer->runArmed(demands);
                     }
                 }
             }
@@ -115,109 +109,105 @@ namespace hf {
             void checkBarometer(void)
             {
                 float pressure;
-                if (board->getBarometer(pressure)) {
-                    bcount++;
+                if (_board->getBarometer(pressure)) {
                 }
             }
 
             void checkAccelerometer(void)
             {
                 float accelGs[3];
-                if (board->getAccelerometer(accelGs)) {
-                    acount++;
+                if (_board->getAccelerometer(accelGs)) {
                 }
             }
 
             void checkFailsafe(void)
             {
-                if (state.armed && receiver->lostSignal()) {
-                    mixer->cutMotors();
-                    state.armed = false;
-                    failsafe = true;
-                    board->showArmedStatus(false);
+                if (_state.armed && _receiver->lostSignal()) {
+                    _mixer->cutMotors();
+                    _state.armed = false;
+                    _failsafe = true;
+                    _board->showArmedStatus(false);
                 }
             } 
 
             void checkReceiver(void)
             {
                 // Acquire receiver demands, passing yaw angle for headless mode
-                if (!receiver->getDemands(state.eulerAngles[AXIS_YAW] - yawInitial)) return;
-
-                rcount++;
+                if (!_receiver->getDemands(_state.eulerAngles[AXIS_YAW] - _yawInitial)) return;
 
                 // Update stabilizer with cyclic demands
-                stabilizer->updateDemands(receiver->demands);
+                _stabilizer->updateDemands(_receiver->demands);
 
                 // When landed, reset integral component of PID
-                if (receiver->throttleIsDown()) {
-                    stabilizer->resetIntegral();
+                if (_receiver->throttleIsDown()) {
+                    _stabilizer->resetIntegral();
                 }
 
                 // Disarm
-                if (state.armed && receiver->disarming()) {
-                    state.armed = false;
+                if (_state.armed && _receiver->disarming()) {
+                    _state.armed = false;
                 } 
 
                 // Arm (after lots of safety checks!)
-                if (!state.armed && receiver->arming() && !auxState && !failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
-                    state.armed = true;
-                    yawInitial = state.eulerAngles[AXIS_YAW]; // grab yaw for headless mode
+                if (!_state.armed && _receiver->arming() && !_auxState && !_failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
+                    _state.armed = true;
+                    _yawInitial = _state.eulerAngles[AXIS_YAW]; // grab yaw for headless mode
                 }
 
                 // Detect aux switch changes for altitude-hold, loiter, etc.
-                if (receiver->demands.aux != auxState) {
-                    auxState = receiver->demands.aux;
+                if (_receiver->demands.aux != _auxState) {
+                    _auxState = _receiver->demands.aux;
                 }
 
                 // Cut motors on throttle-down
-                if (state.armed && receiver->throttleIsDown()) {
-                    mixer->cutMotors();
+                if (_state.armed && _receiver->throttleIsDown()) {
+                    _mixer->cutMotors();
                 }
 
                 // Set LED based on arming status
-                board->showArmedStatus(state.armed);
+                _board->showArmedStatus(_state.armed);
 
             } // checkReceiver
 
             void doSerialComms(void)
             {
-                while (board->serialAvailableBytes() > 0) {
-                    msp.update(board->serialReadByte());
+                while (_board->serialAvailableBytes() > 0) {
+                    _msp.update(_board->serialReadByte());
                 }
 
-                while (msp.availableBytes() > 0) {
-                    board->serialWriteByte(msp.readByte());
+                while (_msp.availableBytes() > 0) {
+                    _board->serialWriteByte(_msp.readByte());
                 }
 
                 // Support motor testing from GCS
-                if (!state.armed) {
-                    mixer->runDisarmed();
+                if (!_state.armed) {
+                    _mixer->runDisarmed();
                 }
             }
 
 
         public:
 
-            void init(Board * _board, Receiver * _receiver, Stabilizer * _stabilizer, Mixer * _mixer)
+            void init(Board * board, Receiver * receiver, Stabilizer * stabilizer, Mixer * mixer)
             {  
                 // Store the essentials
-                board = _board;
-                receiver = _receiver;
-                stabilizer = _stabilizer;
-                mixer = _mixer;
+                _board      = board;
+                _receiver   = receiver;
+                _stabilizer = stabilizer;
+                _mixer      = mixer;
 
                 // Initialize MSP (serial comms)
-                msp.init(&state, receiver, mixer);
+                _msp.init(&_state, receiver, mixer);
 
                 // Initialize the receiver
-                receiver->init();
+                _receiver->init();
 
                 // Tell the mixer which board to use
-                mixer->board = board; 
+                _mixer->board = board; 
 
                 // Start unarmed
-                state.armed = false;
-                failsafe = false;
+                _state.armed = false;
+                _failsafe = false;
 
             } // init
 

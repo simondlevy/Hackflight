@@ -46,16 +46,16 @@ namespace hf {
             // Arbitrary
             static const uint8_t MAXMOTORS = 20;
 
-            float motorsPrev[MAXMOTORS];
+            float _motorsPrev[MAXMOTORS];
 
             void writeMotor(uint8_t index, float value)
             {
                 // Avoid sending the motor the same value over and over
-                if (motorsPrev[index] != value) {
+                if (_motorsPrev[index] != value) {
                     board->writeMotor(index,value);
                 }
 
-                motorsPrev[index] = value;
+                _motorsPrev[index] = value;
             }
 
         protected:
@@ -71,7 +71,7 @@ namespace hf {
                 // set disarmed, previous motor values
                 for (uint8_t i = 0; i < nmotors; i++) {
                     motorsDisarmed[i] = 0;
-                    motorsPrev[i] = 0;
+                    _motorsPrev[i] = 0;
                 }
 
             }

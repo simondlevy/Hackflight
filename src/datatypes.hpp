@@ -36,4 +36,4 @@ typedef struct {
     float eulerAngles[3];
     bool armed;
 
-} vehicle_state_t;
+} vehicleState_t;

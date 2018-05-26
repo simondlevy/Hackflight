@@ -48,25 +48,26 @@ namespace hf {
             HEADER_CMD
         } serialState_t;
 
-        vehicle_state_t * _vehicle_state;
+        vehicleState_t * _vehicleState;
         Receiver * _receiver;
         Mixer * _mixer;
 
-        uint8_t         checksum;
-        uint8_t         inBuf[INBUF_SIZE];
-        uint8_t         inBufIndex;
-        uint8_t         outBuf[OUTBUF_SIZE];
-        uint8_t         outBufIndex;
-        uint8_t         outBufSize;
-        uint8_t         cmdMSP;
-        uint8_t         offset;
-        uint8_t         dataSize;
-        serialState_t   _parser_state;
+        uint8_t _checksum;
+        uint8_t _inBuf[INBUF_SIZE];
+        uint8_t _inBufIndex;
+        uint8_t _outBuf[OUTBUF_SIZE];
+        uint8_t _outBufIndex;
+        uint8_t _outBufSize;
+        uint8_t _cmdMSP;
+        uint8_t _offset;
+        uint8_t _dataSize;
+
+        serialState_t   _parserState;
 
         void serialize8(uint8_t a)
         {
-            outBuf[outBufSize++] = a;
-            checksum ^= a;
+            _outBuf[_outBufSize++] = a;
+            _checksum ^= a;
         }
 
         void serialize16(int16_t a)
@@ -77,7 +78,7 @@ namespace hf {
 
         uint8_t read8(void)
         {
-            return inBuf[inBufIndex++] & 0xff;
+            return _inBuf[_inBufIndex++] & 0xff;
         }
 
         uint16_t read16(void)
@@ -127,9 +128,9 @@ namespace hf {
             serialize8('$');
             serialize8('M');
             serialize8(err ? '!' : '>');
-            checksum = 0;               // start calculating a new checksum
+            _checksum = 0;               // start calculating a new _checksum
             serialize8(s);
-            serialize8(cmdMSP);
+            serialize8(_cmdMSP);
         }
 
         void headSerialReply(uint8_t s)
@@ -144,12 +145,12 @@ namespace hf {
 
         void tailSerialReply(void)
         {
-            serialize8(checksum);
+            serialize8(_checksum);
         }
 
         void dispatchCommand(void)
         {
-            switch (cmdMSP) {
+            switch (_cmdMSP) {
 
                 case MSP_SET_MOTOR_NORMAL:
                     for (uint8_t i = 0; i < _mixer->nmotors; i++)
@@ -160,26 +161,26 @@ namespace hf {
                 case MSP_SET_ARMED:
                     if (read8()) {  // got arming command: arm only if throttle is down
                         if (_receiver->throttleIsDown()) {
-                            _vehicle_state->armed = true;
+                            _vehicleState->armed = true;
                         }
                     }
                     else {          // got disarming command: always disarm
-                        _vehicle_state->armed = false;
+                        _vehicleState->armed = false;
                     }
                     headSerialReply(0);
                     break;
 
                 case MSP_RC_NORMAL:
-                    outBufSize = 0;
-                    outBufIndex = 0;
+                    _outBufSize = 0;
+                    _outBufIndex = 0;
                     serializeFloats(_receiver->rawvals, 8);
                     break;
 
                 case MSP_ATTITUDE_RADIANS: 
                     {
-                        outBufSize = 0;
-                        outBufIndex = 0;
-                        serializeFloats(_vehicle_state->eulerAngles, 3);
+                        _outBufSize = 0;
+                        _outBufIndex = 0;
+                        serializeFloats(_vehicleState->eulerAngles, 3);
                     }
                     break;
 
@@ -192,75 +193,75 @@ namespace hf {
 
         protected:
 
-        void init(vehicle_state_t * vehicle_state, Receiver * receiver, Mixer * mixer)
+        void init(vehicleState_t * vehicleState, Receiver * receiver, Mixer * mixer)
         {
-            _vehicle_state = vehicle_state;
+            _vehicleState = vehicleState;
             _receiver = receiver;
             _mixer = mixer;
 
-            checksum = 0;
-            outBufIndex = 0;
-            outBufSize = 0;
-            cmdMSP = 0;
-            offset = 0;
-            dataSize = 0;
-            _parser_state = IDLE;
+            _checksum = 0;
+            _outBufIndex = 0;
+            _outBufSize = 0;
+            _cmdMSP = 0;
+            _offset = 0;
+            _dataSize = 0;
+            _parserState = IDLE;
         }
 
         void update(uint8_t c)
         {
-            switch (_parser_state) {
+            switch (_parserState) {
                 case IDLE:
-                    _parser_state = (c == '$') ? HEADER_START : IDLE;
+                    _parserState = (c == '$') ? HEADER_START : IDLE;
                     break;
                 case HEADER_START:
-                    _parser_state = (c == 'M') ? HEADER_M : IDLE;
+                    _parserState = (c == 'M') ? HEADER_M : IDLE;
                     break;
                 case HEADER_M:
-                    _parser_state = (c == '<') ? HEADER_ARROW : IDLE;
+                    _parserState = (c == '<') ? HEADER_ARROW : IDLE;
                     break;
                 case HEADER_ARROW:
                     if (c > INBUF_SIZE) {       // now we are expecting the payload size
-                        _parser_state = IDLE;
+                        _parserState = IDLE;
                         return;
                     }
-                    dataSize = c;
-                    offset = 0;
-                    checksum = 0;
-                    inBufIndex = 0;
-                    checksum ^= c;
-                    _parser_state = HEADER_SIZE;      // the command is to follow
+                    _dataSize = c;
+                    _offset = 0;
+                    _checksum = 0;
+                    _inBufIndex = 0;
+                    _checksum ^= c;
+                    _parserState = HEADER_SIZE;      // the command is to follow
                     break;
                 case HEADER_SIZE:
-                    cmdMSP = c;
-                    checksum ^= c;
-                    _parser_state = HEADER_CMD;
+                    _cmdMSP = c;
+                    _checksum ^= c;
+                    _parserState = HEADER_CMD;
                     break;
                 case HEADER_CMD:
-                    if (offset < dataSize) {
-                        checksum ^= c;
-                        inBuf[offset++] = c;
+                    if (_offset < _dataSize) {
+                        _checksum ^= c;
+                        _inBuf[_offset++] = c;
                     } else  {
-                        if (checksum == c) {        // compare calculated and transferred checksum
+                        if (_checksum == c) {        // compare calculated and transferred _checksum
                             dispatchCommand();
                             tailSerialReply();
                         }
-                        _parser_state = IDLE;
+                        _parserState = IDLE;
                     }
 
-            } // switch (_parser_state)
+            } // switch (_parserState)
 
         } // update
 
         uint8_t availableBytes(void)
         {
-            return outBufSize;
+            return _outBufSize;
         }
 
         uint8_t readByte(void)
         {
-            outBufSize--;
-            return outBuf[outBufIndex++];
+            _outBufSize--;
+            return _outBuf[_outBufIndex++];
         }
 
 
