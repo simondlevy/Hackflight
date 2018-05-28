@@ -44,16 +44,6 @@ namespace hf {
 
         private:
 
-            // Create byte-transfer objects for Arduino I^2C 
-            ArduinoI2C mpu = ArduinoI2C(MPU9250::MPU9250_ADDRESS);
-            ArduinoI2C mag = ArduinoI2C(MPU9250::AK8963_ADDRESS);
-
-            // Use the MPU9250 in pass-through mode
-            MPU9250Passthru imu = MPU9250Passthru(&mpu, &mag);;
-
-            // Run motor ESCs using standard Servo library
-            Servo escs[4];
-
             // Motor pins
             const uint8_t MOTOR_PINS[4] = {3, 4, 5, 6};
 
@@ -67,60 +57,70 @@ namespace hf {
             // MPU9250 add-on board has interrupt on Butterfly pin 8
             const uint8_t INTERRUPT_PIN = 8;
 
+            // Create byte-transfer objects for Arduino I^2C 
+            ArduinoI2C mpu = ArduinoI2C(MPU9250::MPU9250_ADDRESS);
+            ArduinoI2C mag = ArduinoI2C(MPU9250::AK8963_ADDRESS);
+
+            // Use the MPU9250 in pass-through mode
+            MPU9250Passthru _imu = MPU9250Passthru(&mpu, &mag);;
+
+            // Run motor ESCs using standard Servo library
+            Servo _escs[4];
+
             // Paramters to experiment with ------------------------------------------------------------------------
 
             // Sensor full-scale settings
-            const uint8_t Ascale     = AFS_8G;
-            const uint8_t Gscale     = GFS_2000DPS;
-            const uint8_t Mscale     = MFS_16BITS;
-            const uint8_t Mmode      = M_100Hz;
+            const uint8_t ASCALE     = AFS_8G;
+            const uint8_t GSCALE     = GFS_2000DPS;
+            const uint8_t MSCALE     = MFS_16BITS;
+            const uint8_t MMODE      = M_100Hz;
 
-            // sampleRate: (1 + sampleRate) is a simple divisor of the fundamental 1000 kHz rate of the gyro and accel, so 
-            // sampleRate = 0 means 1 kHz sample rate for both accel and gyro, 4 means 200 Hz, etc.
-            const uint8_t sampleRate = 0x02;         
+            // SAMPLE_RATE: (1 + SAMPLE_RATE) is a simple divisor of the fundamental 1000 kHz rate of the gyro and accel, so 
+            // SAMPLE_RATE = 0 means 1 kHz sample rate for both accel and gyro, 4 means 200 Hz, etc.
+            const uint8_t SAMPLE_RATE = 0x02;         
 
             // Quaternion calculation
-            const uint8_t  QuaternionUpdatesPerCycle = 5;    // update quaternion this many times per gyro aquisition
-            const uint16_t QuaternionUpdateRate      = 50;   // Hertz
+            const uint8_t  QUATERNION_UPDATES_PER_CYCLE = 5;    // update quaternion this many times per gyro aquisition
+            const uint16_t QUATERNION_UPDATE_RATE      = 50;   // Hertz
 
             // Global constants for 9 DoF fusion and AHRS (Attitude and Heading Reference System)
-            const float GyroMeasError = M_PI * (40.0f / 180.0f); // gyroscope measurement error in rads/s (start at 40 deg/s)
-            const float GyroMeasDrift = M_PI * (0.0f  / 180.0f); // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
-            const float beta = sqrtf(3.0f / 4.0f) * GyroMeasError;   // compute beta
+            const float GYRO_MEAS_ERROR = M_PI * (40.0f / 180.0f); // gyroscope measurement error in rads/s (start at 40 deg/s)
+            const float GYRO_MES_DRIFT = M_PI * (0.0f  / 180.0f); // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
+            const float BETA = sqrtf(3.0f / 4.0f) * GYRO_MEAS_ERROR;   // compute BETA
 
             // These should be computed by running MPU9250/examples/PassthruTest
-            float magBias[3]         = {172.f, 395.f, 382.f};
-            float magScale[3]        = {0.84, 0.94, 1.33};
-            float magCalibration[3]  = {1.21f, 1.21f, 1.17f};      
+            float MAG_BIAS[3]         = {172.f, 395.f, 382.f};
+            float MAG_SCALE[3]        = {0.84, 0.94, 1.33};
+            float MAG_CALIBRATION[3]  = {1.21f, 1.21f, 1.17f};      
 
             // Instance variables -----------------------------------------------------------------------------------
 
             // For scaling to normal units (accelerometer G's, gyrometer rad/sec, magnetometer mGauss)
-            float aRes;
-            float gRes;
-            float mRes;
+            float _aRes;
+            float _gRes;
+            float _mRes;
 
             // Used to read all 14 bytes at once from the MPU9250 accel/gyro
-            int16_t imuData[7] = {0,0,0,0,0,0,0};
+            int16_t _imuData[7] = {0,0,0,0,0,0,0};
 
             // Quaternion support
-            MadgwickQuaternion quaternionCalculator = MadgwickQuaternion(beta);
-            float sum = 0;                                  // sum for averaging filter update rate
-            uint32_t sumCount = 0;                          // used to control display output rate
-            const uint16_t sumCountMax = 1000 / QuaternionUpdateRate;
-            uint32_t timePrev = 0;                          // used to calculate integration interval
-            float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};          // vector to hold quaternion
+            MadgwickQuaternion _quaternionCalculator = MadgwickQuaternion(BETA);
+            float _sum = 0;                                  // sum for averaging filter update rate
+            uint32_t _sumCount = 0;                          // used to control display output rate
+            const uint16_t SUM_COUNT_MAX = 1000 / QUATERNION_UPDATE_RATE;
+            uint32_t _timePrev = 0;                          // used to calculate integration interval
+            float _q[4] = {1.0f, 0.0f, 0.0f, 0.0f};          // vector to hold quaternion
 
             // We compute these at startup
-            float gyroBias[3]        = {0,0,0};
-            float accelBias[3]       = {0,0,0};
+            float _gyroBias[3]        = {0,0,0};
+            float _accelBias[3]       = {0,0,0};
 
             // Helpers -----------------------------------------------------------------------------------
 
             // Raw analog-to-digital values converted to radians per second
             float adc2rad(int16_t adc, float bias) 
             {
-                return (adc * gRes - bias) * M_PI / 180;
+                return (adc * _gRes - bias) * M_PI / 180;
             }
 
         protected:
@@ -152,7 +152,7 @@ namespace hf {
 
             void writeMotor(uint8_t index, float value)
             {
-                escs[index].writeMicroseconds((uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)));
+                _escs[index].writeMicroseconds((uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)));
             }
 
             bool getGyrometer(float gyro[3])
@@ -161,50 +161,50 @@ namespace hf {
 
                     gotNewData = false;
 
-                    if (imu.checkNewAccelGyroData()) {
+                    if (_imu.checkNewAccelGyroData()) {
 
-                        imu.readMPU9250Data(imuData); 
+                        _imu.readMPU9250Data(_imuData); 
 
                         // Convert the accleration value into g's
-                        float ax = imuData[0]*aRes - accelBias[0];  // get actual g value, this depends on scale being set
-                        float ay = imuData[1]*aRes - accelBias[1];   
-                        float az = imuData[2]*aRes - accelBias[2];  
+                        float ax = _imuData[0]*_aRes - _accelBias[0];  // get actual g value, this depends on scale being set
+                        float ay = _imuData[1]*_aRes - _accelBias[1];   
+                        float az = _imuData[2]*_aRes - _accelBias[2];  
 
                         // Convert the gyro value into degrees per second
-                        float gx = adc2rad(imuData[4], gyroBias[0]);
-                        float gy = adc2rad(imuData[5], gyroBias[1]);
-                        float gz = adc2rad(imuData[6], gyroBias[2]);
+                        float gx = adc2rad(_imuData[4], _gyroBias[0]);
+                        float gy = adc2rad(_imuData[5], _gyroBias[1]);
+                        float gz = adc2rad(_imuData[6], _gyroBias[2]);
 
                         // We're using pass-through mode, so magnetometer values are updated at their own rate
                         static float mx, my, mz;
 
-                        if (imu.checkNewMagData()) { // Wait for magnetometer data ready bit to be set
+                        if (_imu.checkNewMagData()) { // Wait for magnetometer data ready bit to be set
 
                             int16_t magCount[3];    // Stores the 16-bit signed magnetometer sensor output
 
-                            imu.readMagData(magCount);  // Read the x/y/z adc values
+                            _imu.readMagData(magCount);  // Read the x/y/z adc values
 
                             // Calculate the magnetometer values in milliGauss
                             // Include factory calibration per data sheet and user environmental corrections
                             // Get actual magnetometer value, this depends on scale being set
-                            mx = (magCount[0]*mRes*magCalibration[0] - magBias[0]) * magScale[0];  
-                            my = (magCount[1]*mRes*magCalibration[1] - magBias[1]) * magScale[1];  
-                            mz = (magCount[2]*mRes*magCalibration[2] - magBias[2]) * magScale[2];  
+                            mx = (magCount[0]*_mRes*MAG_CALIBRATION[0] - MAG_BIAS[0]) * MAG_SCALE[0];  
+                            my = (magCount[1]*_mRes*MAG_CALIBRATION[1] - MAG_BIAS[1]) * MAG_SCALE[1];  
+                            mz = (magCount[2]*_mRes*MAG_CALIBRATION[2] - MAG_BIAS[2]) * MAG_SCALE[2];  
                         }
 
                         // Iterate a fixed number of times per data read cycle, updating the quaternion
-                        for (uint8_t i=0; i<QuaternionUpdatesPerCycle; i++) { 
+                        for (uint8_t i=0; i<QUATERNION_UPDATES_PER_CYCLE; i++) { 
 
                             uint32_t timeCurr = micros();
 
                             // Set integration time by time elapsed since last filter update
-                            float deltat = ((timeCurr - timePrev)/1000000.0f); 
-                            timePrev = timeCurr;
+                            float deltat = ((timeCurr - _timePrev)/1000000.0f); 
+                            _timePrev = timeCurr;
 
-                            sum += deltat; 
-                            sumCount++;
+                            _sum += deltat; 
+                            _sumCount++;
 
-                            quaternionCalculator.update(-ax, ay, az, gx, -gy, -gz, my, -mx, mz, deltat, q);
+                            _quaternionCalculator.update(-ax, ay, az, gx, -gy, -gz, my, -mx, mz, deltat, _q);
                         }
 
                         // Copy gyro values back out
@@ -214,7 +214,7 @@ namespace hf {
 
                         return true;
 
-                    } // if (imu.checkNewAccelGyroData())
+                    } // if (_imu.checkNewAccelGyroData())
 
                 } // if gotNewData
 
@@ -223,14 +223,14 @@ namespace hf {
 
             bool getQuaternion(float quat[4])
             {
-                if(sumCount > sumCountMax) {
+                if(_sumCount > SUM_COUNT_MAX) {
 
                     // Reset accumulators
-                    sumCount = 0;
-                    sum = 0;    
+                    _sumCount = 0;
+                    _sum = 0;    
 
                     // Copy quaternion values back out
-                    memcpy(quat, q, 4*sizeof(float));
+                    memcpy(quat, _q, 4*sizeof(float));
 
                     return true;
                 }
@@ -267,8 +267,8 @@ namespace hf {
 
                 // Connect to the ESCs and send them the baseline values
                 for (uint8_t k=0; k<4; ++k) {
-                    escs[k].attach(MOTOR_PINS[k]);
-                    escs[k].writeMicroseconds(PWM_MIN);
+                    _escs[k].attach(MOTOR_PINS[k]);
+                    _escs[k].writeMicroseconds(PWM_MIN);
                 }
 
                 // Start I^2C
@@ -277,20 +277,20 @@ namespace hf {
                 delay(1000);
 
                 // Reset the MPU9250
-                imu.resetMPU9250(); 
+                _imu.resetMPU9250(); 
 
                 // get sensor resolutions, only need to do this once
-                aRes = imu.getAres(Ascale);
-                gRes = imu.getGres(Gscale);
-                mRes = imu.getMres(Mscale);
+                _aRes = _imu.getAres(ASCALE);
+                _gRes = _imu.getGres(GSCALE);
+                _mRes = _imu.getMres(MSCALE);
 
                 // Calibrate gyro and accelerometers, load biases in bias registers
-                imu.calibrateMPU9250(gyroBias, accelBias); 
+                _imu.calibrateMPU9250(_gyroBias, _accelBias); 
 
-                imu.initMPU9250(Ascale, Gscale, sampleRate); 
+                _imu.initMPU9250(ASCALE, GSCALE, SAMPLE_RATE); 
 
                 // Get magnetometer calibration from AK8963 ROM
-                imu.initAK8963(Mscale, Mmode, magCalibration);
+                _imu.initAK8963(MSCALE, MMODE, MAG_CALIBRATION);
 
                 // Do general real-board initialization
                 RealBoard::init();
