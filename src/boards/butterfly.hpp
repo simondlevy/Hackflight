@@ -89,11 +89,13 @@ namespace hf {
             const float BETA = sqrtf(3.0f / 4.0f) * GYRO_MEAS_ERROR;   // compute BETA
 
             // These should be computed by running MPU9250/examples/PassthruTest
-            float MAG_BIAS[3]         = {172.f, 395.f, 382.f};
-            float MAG_SCALE[3]        = {0.84, 0.94, 1.33};
-            float MAG_CALIBRATION[3]  = {1.21f, 1.21f, 1.17f};      
+            const float MAG_BIAS[3]         = {172.f, 395.f, 382.f};
+            const float MAG_SCALE[3]        = {0.84, 0.94, 1.33};
 
             // Instance variables -----------------------------------------------------------------------------------
+
+            // This will be read from the AK8963 ROM on startup
+            float _magCalibration[3]  = {0.f, 0.f, 0.f};
 
             // For scaling to normal units (accelerometer G's, gyrometer rad/sec, magnetometer mGauss)
             float _aRes;
@@ -187,9 +189,9 @@ namespace hf {
                             // Calculate the magnetometer values in milliGauss
                             // Include factory calibration per data sheet and user environmental corrections
                             // Get actual magnetometer value, this depends on scale being set
-                            mx = (magCount[0]*_mRes*MAG_CALIBRATION[0] - MAG_BIAS[0]) * MAG_SCALE[0];  
-                            my = (magCount[1]*_mRes*MAG_CALIBRATION[1] - MAG_BIAS[1]) * MAG_SCALE[1];  
-                            mz = (magCount[2]*_mRes*MAG_CALIBRATION[2] - MAG_BIAS[2]) * MAG_SCALE[2];  
+                            mx = (magCount[0]*_mRes*_magCalibration[0] - MAG_BIAS[0]) * MAG_SCALE[0];  
+                            my = (magCount[1]*_mRes*_magCalibration[1] - MAG_BIAS[1]) * MAG_SCALE[1];  
+                            mz = (magCount[2]*_mRes*_magCalibration[2] - MAG_BIAS[2]) * MAG_SCALE[2];  
                         }
 
                         // Iterate a fixed number of times per data read cycle, updating the quaternion
@@ -287,10 +289,11 @@ namespace hf {
                 // Calibrate gyro and accelerometers, load biases in bias registers
                 _imu.calibrateMPU9250(_gyroBias, _accelBias); 
 
+                // Initialize the MPU9250
                 _imu.initMPU9250(ASCALE, GSCALE, SAMPLE_RATE); 
 
                 // Get magnetometer calibration from AK8963 ROM
-                _imu.initAK8963(MSCALE, MMODE, MAG_CALIBRATION);
+                _imu.initAK8963(MSCALE, MMODE, _magCalibration);
 
                 // Do general real-board initialization
                 RealBoard::init();
