@@ -83,6 +83,16 @@ namespace hf {
             const uint8_t  QuaternionUpdatesPerCycle = 5;    // update quaternion this many times per gyro aquisition
             const uint16_t QuaternionUpdateRate      = 50;   // Hertz
 
+            // Global constants for 9 DoF fusion and AHRS (Attitude and Heading Reference System)
+            const float GyroMeasError = M_PI * (40.0f / 180.0f); // gyroscope measurement error in rads/s (start at 40 deg/s)
+            const float GyroMeasDrift = M_PI * (0.0f  / 180.0f); // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
+            const float beta = sqrtf(3.0f / 4.0f) * GyroMeasError;   // compute beta
+
+            // These should be computed by running MPU9250/examples/PassthruTest
+            float magBias[3]         = {312.f, 357.f, 352.f};
+            float magScale[3]        = {0.71f, 1.16f, 0.99f};
+            float magCalibration[3]  = {1.21f, 1.21f, 1.17f};      
+
             // Instance variables -----------------------------------------------------------------------------------
 
             // For scaling to normal units (accelerometer G's, gyrometer rad/sec, magnetometer mGauss)
@@ -92,11 +102,6 @@ namespace hf {
 
             // Used to read all 14 bytes at once from the MPU9250 accel/gyro
             int16_t imuData[7] = {0,0,0,0,0,0,0};
-
-            // Global constants for 9 DoF fusion and AHRS (Attitude and Heading Reference System)
-            const float GyroMeasError = M_PI * (40.0f / 180.0f); // gyroscope measurement error in rads/s (start at 40 deg/s)
-            const float GyroMeasDrift = M_PI * (0.0f  / 180.0f); // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
-            const float beta = sqrtf(3.0f / 4.0f) * GyroMeasError;   // compute beta
 
             // Quaternion support
             MadgwickQuaternion quaternionCalculator = MadgwickQuaternion(beta);
@@ -109,11 +114,6 @@ namespace hf {
             // We compute these at startup
             float gyroBias[3]        = {0,0,0};
             float accelBias[3]       = {0,0,0};
-
-            // These should be computed by running MPU9250/examples/PassthruTest
-            float magBias[3]         = {-57.91, 125.28, 36.65};
-            float magScale[3]        = {0.99, 1.02, 0.99};
-            float magCalibration[3]  = {1.21, 1.21, 1.16};      
 
             // Helpers -----------------------------------------------------------------------------------
 
