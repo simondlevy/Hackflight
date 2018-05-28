@@ -30,12 +30,12 @@ hf::SBUS_Receiver rc;
 hf::MixerQuadX mixer;
 
 hf::Stabilizer stabilizer = hf::Stabilizer(
-                0,//0.20f,      // Level P
-                0,//0.225f,     // Gyro cyclic P
-                0,//0.001875f,  // Gyro cyclic I
-                0,//0.375f,     // Gyro cyclic D
+                0.20f,      // Level P
+                0.225,     // Gyro cyclic P
+                0.001875f,  // Gyro cyclic I
+                0.375f,     // Gyro cyclic D
                 0,//1.0625f,    // Gyro yaw P
-                0);//0.005625f); // Gyro yaw I
+                0.005625f); // Gyro yaw I
 
 void setup(void)
 {
