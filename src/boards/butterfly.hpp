@@ -89,8 +89,8 @@ namespace hf {
             const float beta = sqrtf(3.0f / 4.0f) * GyroMeasError;   // compute beta
 
             // These should be computed by running MPU9250/examples/PassthruTest
-            float magBias[3]         = {312.f, 357.f, 352.f};
-            float magScale[3]        = {0.71f, 1.16f, 0.99f};
+            float magBias[3]         = {172.f, 395.f, 382.f};
+            float magScale[3]        = {0.84, 0.94, 1.33};
             float magCalibration[3]  = {1.21f, 1.21f, 1.17f};      
 
             // Instance variables -----------------------------------------------------------------------------------
