@@ -34,9 +34,9 @@ namespace hf {
 
         private:
 
-            const uint8_t _motorPins[4] = {13, A2, 3, 11};
+            const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
 
-            float gyroAdcToRadians;
+            float _gyroAdcToRadians;
 
             EM7180 _sentral;
 
@@ -80,7 +80,7 @@ namespace hf {
             void writeMotor(uint8_t index, float value)
             {
                 // Scale motor value from [0,1] to [0,255]
-                analogWrite(_motorPins[index], (uint8_t)(value * 255));
+                analogWrite(MOTOR_PINS[index], (uint8_t)(value * 255));
             }
 
             bool getGyrometer(float gyroRates[3])
@@ -98,9 +98,9 @@ namespace hf {
                     gy = -gy;
                     gz = -gz;
 
-                    gyroRates[0] = gx * gyroAdcToRadians;
-                    gyroRates[1] = gy * gyroAdcToRadians;
-                    gyroRates[2] = gz * gyroAdcToRadians;
+                    gyroRates[0] = gx * _gyroAdcToRadians;
+                    gyroRates[1] = gy * _gyroAdcToRadians;
+                    gyroRates[2] = gz * _gyroAdcToRadians;
 
                     return true;
                 }
@@ -185,12 +185,12 @@ namespace hf {
                 // Get actual gyro rate for conversion to radians
                 uint8_t accFs=0; uint16_t gyroFs=0; uint16_t magFs=0;
                 _sentral.getFullScaleRanges(accFs, gyroFs, magFs);
-                gyroAdcToRadians = M_PI * (float)gyroFs / (1<<15) / 180.;  
+                _gyroAdcToRadians = M_PI * (float)gyroFs / (1<<15) / 180.;  
 
                 // Initialize the motors
                 for (int k=0; k<4; ++k) {
-                    analogWriteFrequency(_motorPins[k], 10000);  
-                    analogWrite(_motorPins[k], 0);  
+                    analogWriteFrequency(MOTOR_PINS[k], 10000);  
+                    analogWrite(MOTOR_PINS[k], 0);  
                 }
 
                 // Hang a bit more
