@@ -70,10 +70,10 @@ namespace hf {
             // Paramters to experiment with ------------------------------------------------------------------------
 
             // Sensor full-scale settings
-            const uint8_t ASCALE     = AFS_8G;
-            const uint8_t GSCALE     = GFS_2000DPS;
-            const uint8_t MSCALE     = MFS_16BITS;
-            const uint8_t MMODE      = M_100Hz;
+            const Ascale_t ASCALE = AFS_8G;
+            const Gscale_t GSCALE = GFS_2000DPS;
+            const Mscale_t MSCALE = MFS_16BITS;
+            const Mmode_t  MMODE  = M_100Hz;
 
             // SAMPLE_RATE: (1 + SAMPLE_RATE) is a simple divisor of the fundamental 1000 kHz rate of the gyro and accel, so 
             // SAMPLE_RATE = 0 means 1 kHz sample rate for both accel and gyro, 4 means 200 Hz, etc.

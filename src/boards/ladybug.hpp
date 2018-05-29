@@ -28,17 +28,28 @@
 #include "hackflight.hpp"
 #include "realboard.hpp"
 
+
 namespace hf {
 
     class Ladybug : public RealBoard {
 
         private:
 
+            // Tunable EM7180 parameters
+            static const uint8_t  ARES           = 8;    // Gs
+            static const uint16_t GRES           = 2000; // radians per second
+            static const uint16_t MRES           = 1000; // microTeslas
+            static const uint8_t  MAG_RATE       = 100;  // Hz
+            static const uint16_t ACCEL_RATE     = 330;  // Hz
+            static const uint16_t GYRO_RATE      = 330;  // Hz
+            static const uint8_t  BARO_RATE      = 50;   // Hz
+            static const uint8_t  Q_RATE_DIVISOR = 5;    // 1/5 gyro rate
+
             const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
 
             float _gyroAdcToRadians;
 
-            EM7180 _sentral;
+            EM7180 _sentral = EM7180(ARES, GRES, MRES, MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
 
             void checkEventStatus(void)
             {
@@ -168,12 +179,6 @@ namespace hf {
 
                 // Hang a bit before starting up the EM7180
                 delay(100);
-
-                // Goose up the EM7180 ODRs
-                _sentral.accelRate = 330;
-                _sentral.gyroRate = 330;
-                _sentral.baroRate = 50;
-                _sentral.qRateDivisor = 5;
 
                 // Start the EM7180 in master mode, no interrupt
                 if (!_sentral.begin()) {
