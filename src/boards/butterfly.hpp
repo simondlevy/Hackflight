@@ -75,9 +75,9 @@ namespace hf {
             const Mscale_t MSCALE = MFS_16BITS;
             const Mmode_t  MMODE  = M_100Hz;
 
-            // SAMPLE_RATE: (1 + SAMPLE_RATE) is a simple divisor of the fundamental 1000 kHz rate of the gyro and accel, so 
-            // SAMPLE_RATE = 0 means 1 kHz sample rate for both accel and gyro, 4 means 200 Hz, etc.
-            const uint8_t SAMPLE_RATE = 0x02;         
+            // SAMPLE_RATE_DIVISOR: (1 + SAMPLE_RATE_DIVISOR) is a simple divisor of the fundamental 1000 kHz rate of the gyro and accel, so 
+            // SAMPLE_RATE_DIVISOR = 0 means 1 kHz sample rate for both accel and gyro, 4 means 200 Hz, etc.
+            const uint8_t SAMPLE_RATE_DIVISOR = 0;         
 
             // Quaternion calculation
             const uint8_t  QUATERNION_UPDATES_PER_CYCLE = 5;    // update quaternion this many times per gyro aquisition
@@ -89,8 +89,8 @@ namespace hf {
             const float BETA = sqrtf(3.0f / 4.0f) * GYRO_MEAS_ERROR;   // compute BETA
 
             // These should be computed by running MPU9250/examples/PassthruTest
-            const float MAG_BIAS[3]         = {172.f, 395.f, 382.f};
-            const float MAG_SCALE[3]        = {0.84, 0.94, 1.33};
+            const float MAG_BIAS[3]  = {133.f, 399.f, 336.f};
+            const float MAG_SCALE[3] = {0.90, 1.02f, 1.11f};
 
             // Instance variables -----------------------------------------------------------------------------------
 
@@ -290,7 +290,7 @@ namespace hf {
                 _imu.calibrateMPU9250(_gyroBias, _accelBias); 
 
                 // Initialize the MPU9250
-                _imu.initMPU9250(ASCALE, GSCALE, SAMPLE_RATE); 
+                _imu.initMPU9250(ASCALE, GSCALE, SAMPLE_RATE_DIVISOR); 
 
                 // Get magnetometer calibration from AK8963 ROM
                 _imu.initAK8963(MSCALE, MMODE, _magCalibration);

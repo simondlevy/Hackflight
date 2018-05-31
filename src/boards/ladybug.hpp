@@ -37,7 +37,7 @@ namespace hf {
 
             // Tunable EM7180 parameters
             static const uint8_t  ARES           = 8;    // Gs
-            static const uint16_t GRES           = 2000; // radians per second
+            static const uint16_t GRES           = 2000; // degrees per second
             static const uint16_t MRES           = 1000; // microTeslas
             static const uint8_t  MAG_RATE       = 100;  // Hz
             static const uint16_t ACCEL_RATE     = 330;  // Hz
