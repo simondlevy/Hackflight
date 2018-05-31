@@ -8,5 +8,3 @@ All three examples use the PID parameters that we've tuned for the popular
 should also work well for similarly-sized vehicles.  Our
 [wiki](https://github.com/simondlevy/Hackflight/wiki) 
 will take you through the steps of setting up this board and using it on a quadcopter.
-
-The <b>motortest</b> directory contains a little Arduino sketch you can run to test the motors.
