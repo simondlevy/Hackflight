@@ -80,8 +80,8 @@ namespace hf {
             const uint8_t SAMPLE_RATE_DIVISOR = 0;         
 
             // Quaternion calculation
-            const uint8_t  QUATERNION_UPDATES_PER_CYCLE = 5;    // update quaternion this many times per gyro aquisition
-            const uint16_t QUATERNION_UPDATE_RATE      = 50;   // Hertz
+            const uint8_t  QUATERNION_UPDATES_PER_CYCLE = 10;  // update quaternion this many times per gyro aquisition
+            const uint16_t QUATERNION_UPDATE_RATE       = 50;   // Hertz
 
             // Global constants for 9 DoF fusion and AHRS (Attitude and Heading Reference System)
             const float GYRO_MEAS_ERROR = M_PI * (40.0f / 180.0f); // gyroscope measurement error in rads/s (start at 40 deg/s)
@@ -107,7 +107,6 @@ namespace hf {
 
             // Quaternion support
             MadgwickQuaternion _quaternionCalculator = MadgwickQuaternion(BETA);
-            float _sum = 0;                                  // sum for averaging filter update rate
             uint32_t _sumCount = 0;                          // used to control display output rate
             const uint16_t SUM_COUNT_MAX = 1000 / QUATERNION_UPDATE_RATE;
             uint32_t _timePrev = 0;                          // used to calculate integration interval
@@ -203,7 +202,6 @@ namespace hf {
                             float deltat = ((timeCurr - _timePrev)/1000000.0f); 
                             _timePrev = timeCurr;
 
-                            _sum += deltat; 
                             _sumCount++;
 
                             _quaternionCalculator.update(-ax, ay, az, gx, -gy, -gz, my, -mx, mz, deltat, _q);
@@ -229,7 +227,6 @@ namespace hf {
 
                     // Reset accumulators
                     _sumCount = 0;
-                    _sum = 0;    
 
                     // Copy quaternion values back out
                     memcpy(quat, _q, 4*sizeof(float));
