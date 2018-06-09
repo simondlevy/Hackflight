@@ -1,8 +1,8 @@
 {
-  "ALTITUDE": 
-  [{"ID": 109},
-   {"estalt"  : "int"}, 
-   {"vario"   : "short"}],
+  "ALTITUDE_METERS": 
+  [{"ID": 121},
+   {"estalt"  : "float"}, 
+   {"vario"   : "float"}],
 
   "RC_NORMAL": 
   [{"ID": 121},
