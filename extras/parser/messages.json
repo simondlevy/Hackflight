@@ -1,4 +1,9 @@
 {
+  "ALTITUDE": 
+  [{"ID": 109},
+   {"estalt"  : "int"}, 
+   {"vario"   : "short"}],
+
   "RC_NORMAL": 
   [{"ID": 121},
    {"comment": "16 channels in http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol"}, 
