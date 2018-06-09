@@ -1,9 +1,4 @@
 {
-  "ALTITUDE_METERS": 
-  [{"ID": 121},
-   {"estalt"  : "float"}, 
-   {"vario"   : "float"}],
-
   "RC_NORMAL": 
   [{"ID": 121},
    {"comment": "16 channels in http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol"}, 
@@ -21,6 +16,11 @@
    {"roll"    : "float"}, 
    {"pitch"   : "float"},
    {"yaw"     : "float"}],
+  
+  "ALTITUDE_METERS": 
+  [{"ID": 123},
+   {"estalt"  : "float"}, 
+   {"vario"   : "float"}],  
 
   "SET_MOTOR_NORMAL": 
   [{"ID": 215},
