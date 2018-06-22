@@ -120,10 +120,10 @@ namespace hf {
                 }
             }
 
-            void checkFailsafe(void)
-            {
-                if (_state.armed && _receiver->lostSignal()) {
-                    _mixer->cutMotors();
+	    void checkFailsafe(void)
+	    {
+		    if (_state.armed && _receiver->lostSignal()) {
+			    _mixer->cutMotors();
                     _state.armed = false;
                     _failsafe = true;
                     _board->showArmedStatus(false);

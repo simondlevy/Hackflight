@@ -70,14 +70,15 @@ namespace hf {
                 return (1 + e*(x*x - 1)) * x * r;
             }
 
-            static float throttleFun(float x, float e, float mid)
-            {
-                float tmp   = x - mid;
-                float y = tmp>0 ? 1-mid : (tmp<0 ? mid : 1);
-                return mid + tmp*(1-e + e * (tmp*tmp) / (y*y));
-            }
-
         protected: 
+
+	    // overridable for simulation
+            virtual float throttleFun(float x)
+            {
+                float tmp   = x - THROTTLE_MID;
+                float y = tmp>0 ? 1-THROTTLE_MID : (tmp<0 ? THROTTLE_MID : 1);
+                return THROTTLE_MID + tmp*(1-THROTTLE_EXPO + THROTTLE_EXPO * (tmp*tmp) / (y*y));
+            }
 
             static const uint8_t CHANNELS = 5;
 
@@ -201,9 +202,11 @@ namespace hf {
                 // Yaw demand needs to be reversed
                 demands.yaw = -demands.yaw;
 
-                // Special handling for throttle
-                float tmp = (rawvals[CHANNEL_THROTTLE] + 1) / 2; // [-1,+1] -> [0,1]
-                demands.throttle = throttleFun(tmp, THROTTLE_EXPO, THROTTLE_MID);
+                // Convert throttle from [-1,+1] to [0,1]
+                float tmp = (rawvals[CHANNEL_THROTTLE] + 1) / 2; 
+
+		// Apply throttle expo function
+                demands.throttle = throttleFun(tmp);
 
                 // Store auxiliary switch value
                 float aux = rawvals[4];
