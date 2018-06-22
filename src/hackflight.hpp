@@ -40,11 +40,11 @@ namespace hf {
             Stabilizer * _stabilizer;
             Mixer      * _mixer;
 
-            // MSP (serial comms)
-            MSP _msp;
-
             // Vehicle state
             vehicleState_t _state;
+
+            // MSP (serial comms)
+            MSP _msp;
 
             // Auxiliary switch state for change detection
             uint8_t _auxState;
@@ -185,6 +185,10 @@ namespace hf {
                 }
             }
 
+	    void getGroundTruth(void)
+	    {
+	        _board->getGroundTruth(_state);
+	    }
 
         public:
 
@@ -218,6 +222,7 @@ namespace hf {
                 checkReceiver();
                 checkAccelerometer();
                 checkBarometer();
+		getGroundTruth();
             } 
 
     }; // class Hackflight

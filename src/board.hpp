@@ -49,6 +49,9 @@ namespace hf {
             //----------------------------------------- Safety -----------------------------------------------------------
             virtual void showArmedStatus(bool armed) { (void)armed; }
 
+            //----------------------------------------- Simulation -------------------------------------------------------
+            virtual void getGroundTruth(vehicleState_t & state) { (void)state; }
+
             //--------------------------------------- Debugging ----------------------------------------------------------
             static void  outbuf(char * buf);
 
