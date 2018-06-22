@@ -70,15 +70,14 @@ namespace hf {
                 return (1 + e*(x*x - 1)) * x * r;
             }
 
-        protected: 
-
-	    // overridable for simulation
-            virtual float throttleFun(float x)
+            float throttleFun(float x)
             {
                 float tmp   = x - THROTTLE_MID;
                 float y = tmp>0 ? 1-THROTTLE_MID : (tmp<0 ? THROTTLE_MID : 1);
                 return THROTTLE_MID + tmp*(1-THROTTLE_EXPO + THROTTLE_EXPO * (tmp*tmp) / (y*y));
             }
+
+        protected: 
 
             static const uint8_t CHANNELS = 5;
 
