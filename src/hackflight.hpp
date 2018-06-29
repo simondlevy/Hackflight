@@ -84,6 +84,9 @@ namespace hf {
 
                 if (_board->getGyrometer(gyroRates)) {
 
+                    // Update state with gyro rates
+                    _state.updateGyrometer(gyroRates);
+
                     // Start with demands from receiver
                     demands_t demands;
                     memcpy(&demands, &_receiver->demands, sizeof(demands_t));
@@ -105,6 +108,7 @@ namespace hf {
             {
                 float pressure;
                 if (_board->getBarometer(pressure)) {
+                    _state.updateBarometer(pressure);
                 }
             }
 
@@ -112,13 +116,14 @@ namespace hf {
             {
                 float accelGs[3];
                 if (_board->getAccelerometer(accelGs)) {
+                    _state.updateAccelerometer(accelGs);
                 }
             }
 
-	    void checkFailsafe(void)
-	    {
-		    if (_state.armed && _receiver->lostSignal()) {
-			    _mixer->cutMotors();
+            void checkFailsafe(void)
+            {
+                if (_state.armed && _receiver->lostSignal()) {
+                    _mixer->cutMotors();
                     _state.armed = false;
                     _failsafe = true;
                     _board->showArmedStatus(false);

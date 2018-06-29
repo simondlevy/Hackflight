@@ -30,6 +30,18 @@ namespace hf {
             bool armed;
             float altitude;
 
+            void updateGyrometer(float gyroRate[3])
+            {
+            }
+
+            void updateAccelerometer(float accelGs[3])
+            {
+            }
+
+            void updateBarometer(float pressure)
+            {
+            }
+
             void updateQuaternion(float q[4])
             {
                 eulerAngles[0] = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
