@@ -67,14 +67,8 @@ namespace hf {
 
                 if (_board->getQuaternion(q)) {
 
-                    _state.eulerAngles[0] = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
-                    _state.eulerAngles[1] = asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
-                    _state.eulerAngles[2] = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]); 
-
-                    // Convert heading from [-pi,+pi] to [0,2*pi]
-                    if (_state.eulerAngles[AXIS_YAW] < 0) {
-                        _state.eulerAngles[AXIS_YAW] += 2*M_PI;
-                    }
+                    // Update state with new quaternion to yield Euler angles
+                    _state.updateQuaternion(q);
 
                     // Update stabilizer with new Euler angles
                     _stabilizer->updateEulerAngles(_state.eulerAngles);
