@@ -180,11 +180,6 @@ namespace hf {
                 }
             }
 
-	    void getGroundTruth(void)
-	    {
-	        _board->getGroundTruth(_state);
-	    }
-
         public:
 
             void init(Board * board, Receiver * receiver, Stabilizer * stabilizer, Mixer * mixer)
@@ -217,7 +212,6 @@ namespace hf {
                 checkReceiver();
                 checkAccelerometer();
                 checkBarometer();
-		getGroundTruth();
             } 
 
     }; // class Hackflight
