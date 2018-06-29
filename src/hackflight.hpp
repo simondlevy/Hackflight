@@ -27,6 +27,7 @@
 #include "stabilizer.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
+#include "state.hpp"
 
 namespace hf {
 
@@ -41,7 +42,7 @@ namespace hf {
             Mixer      * _mixer;
 
             // Vehicle state
-            vehicleState_t _state;
+            State _state;
 
             // MSP (serial comms)
             MSP _msp;

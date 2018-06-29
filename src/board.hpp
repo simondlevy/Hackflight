@@ -20,7 +20,7 @@
 
 #include <stdarg.h>
 
-#include "datatypes.hpp"
+#include "state.hpp"
 
 namespace hf {
 
@@ -50,7 +50,7 @@ namespace hf {
             virtual void showArmedStatus(bool armed) { (void)armed; }
 
             //----------------------------------------- Simulation -------------------------------------------------------
-            virtual void getGroundTruth(vehicleState_t & state) { (void)state; }
+            virtual void getGroundTruth(State & state) { (void)state; }
 
             //--------------------------------------- Debugging ----------------------------------------------------------
             static void  outbuf(char * buf);

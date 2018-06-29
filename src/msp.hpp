@@ -20,7 +20,7 @@
 
 #include "receiver.hpp"
 #include "mixer.hpp"
-#include "datatypes.hpp"
+#include "state.hpp"
 
 namespace hf {
 
@@ -48,9 +48,9 @@ namespace hf {
             HEADER_CMD
         } serialState_t;
 
-        vehicleState_t * _vehicleState;
+        State *    _vehicleState;
         Receiver * _receiver;
-        Mixer * _mixer;
+        Mixer *    _mixer;
 
         uint8_t _checksum;
         uint8_t _inBuf[INBUF_SIZE];
@@ -193,7 +193,7 @@ namespace hf {
 
         protected:
 
-        void init(vehicleState_t * vehicleState, Receiver * receiver, Mixer * mixer)
+        void init(State * vehicleState, Receiver * receiver, Mixer * mixer)
         {
             _vehicleState = vehicleState;
             _receiver = receiver;
