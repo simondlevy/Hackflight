@@ -20,8 +20,6 @@
 
 #include <stdarg.h>
 
-#include "state.hpp"
-
 namespace hf {
 
     class Board {
