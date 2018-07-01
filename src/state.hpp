@@ -26,11 +26,22 @@ namespace hf {
 
     class State {
 
+        private:
+
+            float _altitudePrev; // simulate variometer for now
+
         public:
 
             float eulerAngles[3];
             bool armed;
             float altitude;
+            float variometer;
+
+            void init(void)
+            {
+                armed = false;
+                _altitudePrev = 0;
+            }
 
             void updateGyrometer(float gyroRate[3])
             {
@@ -44,6 +55,9 @@ namespace hf {
             {
                 //https://www.researchgate.net/file.PostFileLoader.html?id=5409cac4d5a3f2e81f8b4568&assetKey=AS%3A273593643012096%401442241215893
                 altitude = 44331.5 - 4946.62 * pow(pressure, 0.190263);
+
+                variometer = altitude - _altitudePrev;
+                _altitudePrev = altitude;
 
                 //Debug::printf("Altitude = *** %3.3fm", altitude);
             }

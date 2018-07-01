@@ -20,6 +20,7 @@
 
 #include "debug.hpp"
 #include "datatypes.hpp"
+#include "state.hpp"
 
 namespace hf {
 
@@ -27,6 +28,24 @@ namespace hf {
     class Hover {
 
         friend class Hackflight;
+
+        public:
+
+        Hover(float Pterm)
+        {
+            _Pterm = Pterm;
+        }
+
+        protected:
+
+        void modifyDemands(State & state, demands_t & demands) 
+        {
+            Debug::printf("vario: %+2.2f    throttle: %+2.2f\n", state.variometer, demands.throttle);
+        }
+
+        private:
+
+        float _Pterm;
 
     };  // class Hover
 

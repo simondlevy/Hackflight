@@ -90,8 +90,13 @@ namespace hf {
                     demands_t demands;
                     memcpy(&demands, &_receiver->demands, sizeof(demands_t));
 
-                    // Run stabilization to get updated demands
+                    // Run stabilization PID controller to get updated demands
                     _stabilizer->modifyDemands(gyroRates, demands);
+
+                    // Run hover PID controller if specified
+                    if (_hover && _receiver->inHoverMode()) {
+                        _hover->modifyDemands(_state, demands);
+                    }
 
                     // Sync failsafe to gyro loop
                     checkFailsafe();
@@ -195,6 +200,9 @@ namespace hf {
                 _mixer      = mixer;
                 _hover      = hover;
 
+                // Initialize state
+                _state.init();
+
                 // Initialize MSP (serial comms)
                 _msp.init(&_state, receiver, mixer);
 
@@ -204,8 +212,7 @@ namespace hf {
                 // Tell the mixer which board to use
                 _mixer->board = board; 
 
-                // Start unarmed
-                _state.armed = false;
+                // No failsafe yet
                 _failsafe = false;
 
             } // init
