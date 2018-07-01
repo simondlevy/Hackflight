@@ -39,7 +39,7 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
 
 void setup(void)
 {
-    h.init(new hf::Butterfly(), &rc, &stabilizer, &mixer);
+    h.init(new hf::Butterfly(), &rc, &mixer, &stabilizer);
 }
 
 void loop(void)

@@ -25,6 +25,7 @@
 #include "mixer.hpp"
 #include "receiver.hpp"
 #include "stabilizer.hpp"
+#include "hover.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 #include "state.hpp"
@@ -39,6 +40,7 @@ namespace hf {
             Board      * _board;
             Receiver   * _receiver;
             Stabilizer * _stabilizer;
+            Hover      * _hover;
             Mixer      * _mixer;
 
             // Vehicle state
@@ -179,13 +181,19 @@ namespace hf {
 
         public:
 
-            void init(Board * board, Receiver * receiver, Stabilizer * stabilizer, Mixer * mixer)
+            void init(Board * board, Receiver * receiver, Mixer * mixer, Stabilizer * stabilizer)
+            {
+                init(board, receiver, mixer, stabilizer, NULL);
+            }
+
+            void init(Board * board, Receiver * receiver, Mixer * mixer, Stabilizer * stabilizer, Hover * hover)
             {  
                 // Store the essentials
                 _board      = board;
                 _receiver   = receiver;
                 _stabilizer = stabilizer;
                 _mixer      = mixer;
+                _hover      = hover;
 
                 // Initialize MSP (serial comms)
                 _msp.init(&_state, receiver, mixer);
