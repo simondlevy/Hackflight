@@ -47,9 +47,6 @@ namespace hf {
             // MSP (serial comms)
             MSP _msp;
 
-            // Auxiliary switch state for change detection
-            uint8_t _auxState;
-
             // Safety
             bool _failsafe;
 
@@ -149,14 +146,9 @@ namespace hf {
                 } 
 
                 // Arm (after lots of safety checks!)
-                if (!_state.armed && _receiver->arming() && !_auxState && !_failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
+                if (!_state.armed && _receiver->arming() && !_failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
                     _state.armed = true;
                     _yawInitial = _state.eulerAngles[AXIS_YAW]; // grab yaw for headless mode
-                }
-
-                // Detect aux switch changes for altitude-hold, loiter, etc.
-                if (_receiver->demands.aux != _auxState) {
-                    _auxState = _receiver->demands.aux;
                 }
 
                 // Cut motors on throttle-down
