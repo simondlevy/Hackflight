@@ -222,6 +222,11 @@ namespace hf {
             return rawvals[CHANNEL_THROTTLE] < -1 + MARGIN;
         }
 
+        bool inHoverMode(void)
+        {
+            return false;
+        }
+
     }; // class Receiver
 
 } // namespace
