@@ -44,8 +44,6 @@ namespace hf {
         const float THROTTLE_MID  = 0.50f;
         const float THROTTLE_EXPO = 0.20f;
 
-        bool  _inHoverMode;
-
         float adjustCommand(float command, uint8_t channel)
         {
             command /= 2;
@@ -82,6 +80,8 @@ namespace hf {
         protected: 
 
         static const uint8_t CHANNELS = 5;
+
+        bool  _inHoverMode;
 
         // channel indices
         enum {
@@ -223,9 +223,9 @@ namespace hf {
             return rawvals[CHANNEL_THROTTLE] < -1 + MARGIN;
         }
 
-        bool inHoverMode(void)
+        virtual bool inHoverMode(void)
         {
-            return _inHoverMode;
+            return false; //_inHoverMode; XXX disallow for now
         }
 
     }; // class Receiver
