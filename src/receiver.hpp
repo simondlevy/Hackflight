@@ -44,6 +44,8 @@ namespace hf {
         const float THROTTLE_MID  = 0.50f;
         const float THROTTLE_EXPO = 0.20f;
 
+        bool  _inHoverMode;
+
         float adjustCommand(float command, uint8_t channel)
         {
             command /= 2;
@@ -207,9 +209,8 @@ namespace hf {
             // Apply throttle expo function
             demands.throttle = throttleFun(tmp);
 
-            // Store auxiliary switch value
-            float aux = rawvals[4];
-            demands.aux = aux < 0 ? 0 : (aux < 0.4 ? 1 : 2);
+            // Store auxiliary switch state for hover mode
+            _inHoverMode = rawvals[4] >= 0.0;
 
             // Got a new frame
             return true;
@@ -224,7 +225,7 @@ namespace hf {
 
         bool inHoverMode(void)
         {
-            return false;
+            return _inHoverMode;
         }
 
     }; // class Receiver
