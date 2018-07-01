@@ -204,11 +204,11 @@ namespace hf {
             demands.yaw = -demands.yaw;
 
             // Special handling for throttle demand
-            demands.throttle = rawvals[CHANNEL_THROTTLE];
+            demands.throttleIn = rawvals[CHANNEL_THROTTLE];
             
             // If not in hover mode, convert throttle from [-1,+1] to [0,1] and apply expo function
             if (!inHoverMode()) {
-                demands.throttle = throttleFun((demands.throttle + 1) / 2);
+                demands.throttleIn = throttleFun((demands.throttleIn + 1) / 2);
             }
 
             // Store auxiliary switch state for hover mode

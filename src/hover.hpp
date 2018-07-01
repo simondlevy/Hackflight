@@ -40,7 +40,8 @@ namespace hf {
 
         void modifyDemands(State & state, demands_t & demands) 
         {
-            Debug::printf("vario: %+2.2f    throttle: %+2.2f\n", state.variometer, demands.throttle);
+            //Debug::printf("vario: %+2.2f    throttle: %+2.2f\n", state.variometer, demands.throttle);
+            //demands.throttle = _Pterm * (demands.throttle - state.variometer);
         }
 
         private:

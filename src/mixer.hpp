@@ -87,10 +87,10 @@ namespace hf {
                 for (uint8_t i = 0; i < nmotors; i++) {
 
                     motors[i] = 
-                        (demands.throttle * motorDirections[i].throttle + 
-                         demands.roll     * motorDirections[i].roll +     
-                         demands.pitch    * motorDirections[i].pitch +   
-                         demands.yaw      * motorDirections[i].yaw);      
+                        (demands.throttleOut * motorDirections[i].throttle + 
+                         demands.roll        * motorDirections[i].roll +     
+                         demands.pitch       * motorDirections[i].pitch +   
+                         demands.yaw         * motorDirections[i].yaw);      
                 }
 
                 float maxMotor = motors[0];

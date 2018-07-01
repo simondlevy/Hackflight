@@ -22,7 +22,10 @@
 
 typedef struct {
 
-    float throttle;
+    // Support hover
+    float throttleIn;
+    float throttleOut;
+
     float roll;
     float pitch;
     float yaw;
