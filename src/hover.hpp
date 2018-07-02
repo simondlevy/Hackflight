@@ -42,13 +42,13 @@ namespace hf {
         void modifyDemands(State & state, demands_t & demands) 
         {
             // Move up or down outside throttle deadband
-            if (abs(demands.throttleIn) > Receiver::THROTTLE_DEADBAND) {
-                demands.throttleOut = 0.5 + _throttleScale*demands.throttleIn;
+            if (abs(demands.throttle) > Receiver::THROTTLE_DEADBAND) {
+                demands.throttle = 0.5 + _throttleScale*demands.throttle;
             }
             
             // Hold in center w/deadband
             else {
-                demands.throttleOut = 0.5 - state.variometer;
+                demands.throttle = 0.5 - state.variometer;
             }
         }
 

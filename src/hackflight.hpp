@@ -98,12 +98,7 @@ namespace hf {
                         _hover->modifyDemands(_state, demands);
                     }
 
-                    // Otherwise, get throttle directly from controller
-                    else {
-                        demands.throttleOut = demands.throttleIn;
-                    }
-
-                    //Debug::printf("THROTTLE: %+2.2f\n", demands.throttleOut);
+                    Debug::printf("THROTTLE: %+2.2f\n", demands.throttle);
 
                     // Sync failsafe to gyro loop
                     checkFailsafe();

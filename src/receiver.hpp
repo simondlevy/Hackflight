@@ -45,7 +45,7 @@ namespace hf {
         const float MARGIN            = 0.1f;
         const float CYCLIC_EXPO       = 0.65f;
         const float CYCLIC_RATE       = 0.90f;
-        const float THROTTLE_MID      = 0.50f;
+        const float THROTTLE_MID      = 0.00f;
         const float THROTTLE_EXPO     = 0.20f;
 
         float adjustCommand(float command, uint8_t channel)
@@ -74,11 +74,13 @@ namespace hf {
             return (1 + e*(x*x - 1)) * x * r;
         }
 
+        // [-1,+1] -> [0,1] -> [-1,+1] XXX can we simplify?
         float throttleFun(float x)
         {
-            float tmp   = x - THROTTLE_MID;
-            float y = tmp>0 ? 1-THROTTLE_MID : (tmp<0 ? THROTTLE_MID : 1);
-            return THROTTLE_MID + tmp*(1-THROTTLE_EXPO + THROTTLE_EXPO * (tmp*tmp) / (y*y));
+            float mid = THROTTLE_MID + 0.5;
+            float tmp = (x + 1) / 2 - mid;
+            float y = tmp>0 ? 1-mid : (tmp<0 ? mid : 1);
+            return (mid + tmp*(1-THROTTLE_EXPO + THROTTLE_EXPO * (tmp*tmp) / (y*y))) * 2 - 1;
         }
 
         protected: 
@@ -207,12 +209,12 @@ namespace hf {
             // Yaw demand needs to be reversed
             demands.yaw = -demands.yaw;
 
-            // Special handling for throttle demand
-            demands.throttleIn = rawvals[CHANNEL_THROTTLE];
+            // Pass throttle demand through exponential function
+            demands.throttle = throttleFun(rawvals[CHANNEL_THROTTLE]);
             
             // If not in hover mode, convert throttle from [-1,+1] to [0,1] and apply expo function
             if (!inHoverMode()) {
-                demands.throttleIn = throttleFun((demands.throttleIn + 1) / 2);
+                demands.throttle = (demands.throttle + 1) / 2;
             }
 
             // Store auxiliary switch state for hover mode
