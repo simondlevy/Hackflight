@@ -38,7 +38,7 @@ namespace hf {
 
         public:
 
-        static constexpr float THROTTLE_DEADBAND = 0.10f;
+        static constexpr float THROTTLE_DEADBAND = 0.15f;
 
         private: 
 
