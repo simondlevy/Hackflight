@@ -98,8 +98,6 @@ namespace hf {
                         _hover->modifyDemands(_state, demands);
                     }
 
-                    Debug::printf("THROTTLE: %+2.2f\n", demands.throttle);
-
                     // Sync failsafe to gyro loop
                     checkFailsafe();
 
