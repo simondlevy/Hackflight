@@ -36,13 +36,17 @@ namespace hf {
         friend class RealBoard;
         friend class MSP;
 
+        public:
+
+        static constexpr float THROTTLE_DEADBAND = 0.10f;
+
         private: 
 
-        const float MARGIN        = 0.1f;
-        const float CYCLIC_EXPO   = 0.65f;
-        const float CYCLIC_RATE   = 0.90f;
-        const float THROTTLE_MID  = 0.50f;
-        const float THROTTLE_EXPO = 0.20f;
+        const float MARGIN            = 0.1f;
+        const float CYCLIC_EXPO       = 0.65f;
+        const float CYCLIC_RATE       = 0.90f;
+        const float THROTTLE_MID      = 0.50f;
+        const float THROTTLE_EXPO     = 0.20f;
 
         float adjustCommand(float command, uint8_t channel)
         {

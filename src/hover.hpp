@@ -21,6 +21,7 @@
 #include "debug.hpp"
 #include "datatypes.hpp"
 #include "state.hpp"
+#include "receiver.hpp"
 
 namespace hf {
 
@@ -31,27 +32,29 @@ namespace hf {
 
         public:
 
-        Hover(float Pterm)
+        Hover(float throttleScale)
         {
-            _Pterm = Pterm;
+            _throttleScale = throttleScale;
         }
 
         protected:
 
         void modifyDemands(State & state, demands_t & demands) 
         {
-            // Hold in center w/deadband
-            if (abs(demands.throttleIn) < 0.15) {
-                demands.throttleOut = 0.5 - state.variometer;
+            // Move up or down outside throttle deadband
+            if (abs(demands.throttleIn) > Receiver::THROTTLE_DEADBAND) {
+                demands.throttleOut = 0.5 + _throttleScale*demands.throttleIn;
             }
+            
+            // Hold in center w/deadband
             else {
-                demands.throttleOut = 0.5 + 0.1*demands.throttleIn;
+                demands.throttleOut = 0.5 - state.variometer;
             }
         }
 
         private:
 
-        float _Pterm;
+        float _throttleScale;
 
     };  // class Hover
 
