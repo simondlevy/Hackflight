@@ -36,8 +36,8 @@ namespace hf {
             bool armed;
             float altitude;
             float variometer;
-            float velocityX;
-            float velocityY;
+            float velocityX;  // fore/aft 
+            float velocityY;  // right/left
 
             void init(void)
             {
