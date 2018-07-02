@@ -28,7 +28,7 @@ namespace hf {
 
         private:
 
-            float _altitudePrev; // simulate variometer for now
+            float _altitudePrev; // XXX simulate variometer for now
 
         public:
 
@@ -36,10 +36,17 @@ namespace hf {
             bool armed;
             float altitude;
             float variometer;
+            float velocityX;
+            float velocityY;
 
             void init(void)
             {
                 armed = false;
+                altitude = 0;
+                variometer = 0;
+                velocityX = 0;
+                velocityY = 0;
+
                 _altitudePrev = 0;
             }
 
@@ -72,6 +79,12 @@ namespace hf {
                 if (eulerAngles[2] < 0) {
                     eulerAngles[2] += 2*M_PI;
                 }
+            }
+
+            void updateOpticalFlow(float x, float y)
+            {
+                velocityX = x;
+                velocityY = y;
             }
 
     };  // class State

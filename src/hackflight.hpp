@@ -126,6 +126,14 @@ namespace hf {
                 }
             }
 
+            void checkOpticalFlow(void)
+            {
+                float x, y;
+                if (_board->getOpticalFlow(x, y)) {
+                    _state.updateOpticalFlow(x, y);
+                }
+            }
+
             void checkFailsafe(void)
             {
                 if (_state.armed && _receiver->lostSignal()) {
@@ -226,6 +234,7 @@ namespace hf {
                 checkReceiver();
                 checkAccelerometer();
                 checkBarometer();
+                checkOpticalFlow();
             } 
 
     }; // class Hackflight

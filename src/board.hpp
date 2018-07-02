@@ -38,6 +38,7 @@ namespace hf {
             //------------------------ Support for additional PID controllers --------------------------------------------
             virtual bool getAccelerometer(float accelGs[3]) { (void)accelGs; return false; }
             virtual bool getBarometer(float & pressure) { (void)pressure; return false; }
+            virtual bool getOpticalFlow(float & x, float & y) { (void)x; (void)y; return false; }
 
             //------------------------------- Serial communications via MSP ----------------------------------------------
             virtual uint8_t serialAvailableBytes(void) { return 0; }
