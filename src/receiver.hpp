@@ -212,11 +212,6 @@ namespace hf {
             // Pass throttle demand through exponential function
             demands.throttle = throttleFun(rawvals[CHANNEL_THROTTLE]);
             
-            // If not in hover mode, convert throttle from [-1,+1] to [0,1] and apply expo function
-            if (!inHoverMode()) {
-                demands.throttle = (demands.throttle + 1) / 2;
-            }
-
             // Store auxiliary switch state for hover mode
             _inHoverMode = rawvals[4] >= 0.0;
 

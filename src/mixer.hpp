@@ -82,6 +82,9 @@ namespace hf {
 
             void runArmed(demands_t demands)
             {
+                // Map throttle demand from [-1,+1] to [0,1]
+                demands.throttle = (demands.throttle + 1) / 2;
+
                 float motors[MAXMOTORS];
 
                 for (uint8_t i = 0; i < nmotors; i++) {

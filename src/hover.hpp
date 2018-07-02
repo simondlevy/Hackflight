@@ -42,7 +42,7 @@ namespace hf {
         void modifyDemands(State & state, demands_t & demands) 
         {
             // Throttle
-            demands.throttle = 0.5 + 
+            demands.throttle = 
                 ((abs(demands.throttle) > Receiver::THROTTLE_DEADBAND) ?  // Outside throttle deaband,
                  _throttleScale*demands.throttle :                        // allow throttle to raise/lower vehicle.
                  -state.variometer);                                      // Inside deadband, move to oppose variometer.
