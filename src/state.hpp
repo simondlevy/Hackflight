@@ -36,16 +36,16 @@ namespace hf {
             bool armed;
             float altitude;
             float variometer;
-            float velocityX;  // fore/aft 
-            float velocityY;  // right/left
+            float velocityForward;  
+            float velocityRightward; 
 
             void init(void)
             {
                 armed = false;
                 altitude = 0;
                 variometer = 0;
-                velocityX = 0;
-                velocityY = 0;
+                velocityForward = 0;
+                velocityRightward = 0;
 
                 _altitudePrev = 0;
             }
@@ -65,8 +65,6 @@ namespace hf {
 
                 variometer = altitude - _altitudePrev;
                 _altitudePrev = altitude;
-
-                //Debug::printf("Altitude = *** %3.3fm", altitude);
             }
 
             void updateQuaternion(float q[4])
@@ -81,10 +79,10 @@ namespace hf {
                 }
             }
 
-            void updateOpticalFlow(float x, float y)
+            void updateOpticalFlow(float velFore, float velRight)
             {
-                velocityX = x;
-                velocityY = y;
+                velocityForward  = velFore;
+                velocityRightward = velRight;
             }
 
     };  // class State
