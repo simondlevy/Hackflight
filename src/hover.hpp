@@ -48,9 +48,9 @@ namespace hf {
                  -state.variometer);                                      // Inside deadband, move to oppose variometer.
 
             // Pitch/roll
-            Debug::printf("forward: %+2.2f    rightward: %+2.2f\n", state.velocityForward, state.velocityRightward);
-            //demands.pitch -= state.velocityForeward;
-            //demands.roll  -= state.velocityRightward;
+            //Debug::printf("forward: %+2.2f    rightward: %+2.2f\n", state.velocityForward, state.velocityRightward);
+            demands.pitch -= state.velocityForward;
+            demands.roll  -= state.velocityRightward;
         }
 
         private:
