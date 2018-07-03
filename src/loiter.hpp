@@ -43,7 +43,7 @@ namespace hf {
 
         void modifyDemands(State & state, demands_t & demands) 
         {
-            // Throttle: inside stick deadband, adjust by variometer; inside deadband, respond weakly to stick demand
+            // Throttle: inside stick deadband, adjust by variometer; outside deadband, respond weakly to stick demand
             demands.throttle = adjust(demands.throttle, _throttleScale*demands.throttle, 0, _varioP, state.variometer);     
 
             // Pitch/roll
