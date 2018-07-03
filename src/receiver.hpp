@@ -36,10 +36,6 @@ namespace hf {
         friend class RealBoard;
         friend class MSP;
 
-        public:
-
-        static constexpr float THROTTLE_DEADBAND = 0.15f;
-
         private: 
 
         const float MARGIN            = 0.1f;
@@ -230,6 +226,10 @@ namespace hf {
         {
             return false; //_inHoverMode; XXX disallow for now
         }
+
+        public:
+
+        static constexpr float STICK_DEADBAND = 0.15f;
 
     }; // class Receiver
 

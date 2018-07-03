@@ -32,8 +32,10 @@ namespace hf {
 
         public:
 
-        Hover(float throttleScale)
+        Hover(float varioP, float cyclicP, float throttleScale=0.10)
         {
+            _varioP        = varioP;
+            _cyclicP       = cyclicP;
             _throttleScale = throttleScale;
         }
 
@@ -43,18 +45,19 @@ namespace hf {
         {
             // Throttle
             demands.throttle = 
-                ((abs(demands.throttle) > Receiver::THROTTLE_DEADBAND) ?  // Outside throttle deaband,
-                 _throttleScale*demands.throttle :                        // allow throttle to raise/lower vehicle.
-                 -state.variometer);                                      // Inside deadband, move to oppose variometer.
+                ((abs(demands.throttle) > Receiver::STICK_DEADBAND) ?  // Outside throttle deaband,
+                 _throttleScale*demands.throttle :           // allow throttle to raise/lower vehicle.
+                 -_varioP*state.variometer);                         // Inside deadband, move to oppose variometer.
 
             // Pitch/roll
-            //Debug::printf("forward: %+2.2f    rightward: %+2.2f\n", state.velocityForward, state.velocityRightward);
-            demands.pitch -= state.velocityForward;
-            demands.roll  -= state.velocityRightward;
+            demands.pitch -= (abs(demands.roll)  > Receiver::STICK_DEADBAND ? 0 : .1*state.velocityForward);
+            demands.roll  -= (abs(demands.pitch) > Receiver::STICK_DEADBAND ? 0 : .1*state.velocityRightward);
         }
 
         private:
 
+        float _varioP;
+        float _cyclicP;
         float _throttleScale;
 
     };  // class Hover
