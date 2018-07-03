@@ -83,7 +83,7 @@ namespace hf {
 
         static const uint8_t CHANNELS = 5;
 
-        bool  _inHoverMode;
+        bool  _inLoiterMode;
 
         // channel indices
         enum {
@@ -208,8 +208,8 @@ namespace hf {
             // Pass throttle demand through exponential function
             demands.throttle = throttleFun(rawvals[CHANNEL_THROTTLE]);
             
-            // Store auxiliary switch state for hover mode
-            _inHoverMode = rawvals[4] >= 0.0;
+            // Store auxiliary switch state for loiter mode
+            _inLoiterMode = rawvals[4] >= 0.0;
 
             // Got a new frame
             return true;
@@ -222,9 +222,9 @@ namespace hf {
             return rawvals[CHANNEL_THROTTLE] < -1 + MARGIN;
         }
 
-        virtual bool inHoverMode(void)
+        virtual bool inLoiterMode(void)
         {
-            return false; //_inHoverMode; XXX disallow for now
+            return false; //_inLoiterMode; XXX disallow for now
         }
 
         public:

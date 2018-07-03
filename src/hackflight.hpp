@@ -25,7 +25,7 @@
 #include "mixer.hpp"
 #include "receiver.hpp"
 #include "stabilizer.hpp"
-#include "hover.hpp"
+#include "loiter.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 #include "state.hpp"
@@ -40,7 +40,7 @@ namespace hf {
             Board      * _board;
             Receiver   * _receiver;
             Stabilizer * _stabilizer;
-            Hover      * _hover;
+            Loiter      * _loiter;
             Mixer      * _mixer;
 
             // Vehicle state
@@ -93,9 +93,9 @@ namespace hf {
                     // Run stabilization PID controller to get updated demands
                     _stabilizer->modifyDemands(gyroRates, demands);
 
-                    // Run hover PID controller if specified
-                    if (_hover && _receiver->inHoverMode()) {
-                        _hover->modifyDemands(_state, demands);
+                    // Run loiter PID controller if specified
+                    if (_loiter && _receiver->inLoiterMode()) {
+                        _loiter->modifyDemands(_state, demands);
                     }
 
                     // Sync failsafe to gyro loop
@@ -199,14 +199,14 @@ namespace hf {
                 init(board, receiver, mixer, stabilizer, NULL);
             }
 
-            void init(Board * board, Receiver * receiver, Mixer * mixer, Stabilizer * stabilizer, Hover * hover)
+            void init(Board * board, Receiver * receiver, Mixer * mixer, Stabilizer * stabilizer, Loiter * loiter)
             {  
                 // Store the essentials
                 _board      = board;
                 _receiver   = receiver;
                 _stabilizer = stabilizer;
                 _mixer      = mixer;
-                _hover      = hover;
+                _loiter     = loiter;
 
                 // Initialize state
                 _state.init();

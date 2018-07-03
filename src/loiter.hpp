@@ -1,5 +1,5 @@
 /*
-   hover.hpp : PID-based hover
+   loiter.hpp : PID-based loiter
 
    This file is part of Hackflight.
 
@@ -26,13 +26,13 @@
 namespace hf {
 
 
-    class Hover {
+    class Loiter {
 
         friend class Hackflight;
 
         public:
 
-        Hover(float varioP, float cyclicP, float throttleScale=0.10)
+        Loiter(float varioP, float cyclicP, float throttleScale=0.10)
         {
             _varioP        = varioP;
             _cyclicP       = cyclicP;
@@ -68,6 +68,6 @@ namespace hf {
         float _cyclicP;
         float _throttleScale;
 
-    };  // class Hover
+    };  // class Loiter
 
 } // namespace
