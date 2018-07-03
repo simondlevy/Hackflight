@@ -43,23 +43,25 @@ namespace hf {
 
         void modifyDemands(State & state, demands_t & demands) 
         {
-            // Throttle
-            demands.throttle = 
-                ((abs(demands.throttle) > Receiver::STICK_DEADBAND) ?  // Outside throttle deaband,
-                 _throttleScale*demands.throttle :           // allow throttle to raise/lower vehicle.
-                 -_varioP*state.variometer);                         // Inside deadband, move to oppose variometer.
+            // Throttle: inside stick deadband, adjust by variometer; inside deadband, respond weakly to stick demand
+            demands.throttle = adjust(demands.throttle, _throttleScale*demands.throttle, 0, _varioP, state.variometer);     
 
             // Pitch/roll
-            demands.pitch = cyclicPID(demands.pitch, state.velocityForward);
-            demands.roll  = cyclicPID(demands.roll,  state.velocityRightward);
+            demands.pitch = adjustCyclic(demands.pitch, state.velocityForward);
+            demands.roll  = adjustCyclic(demands.roll,  state.velocityRightward);
         }
 
         private:
 
-        float cyclicPID(float demand, float velocity)
+        float adjustCyclic(float demand, float velocity)
         {
-            // Inside stick deadband, adjust pitch/roll demand by velocity; inside deadband, leave it as-is
-            return demand - (abs(demand) > Receiver::STICK_DEADBAND ? 0 : _cyclicP*velocity);
+            // Inside stick deadband, adjust pitch/roll demand by velocity; outside deadband, leave it as-is
+            return adjust(demand, demand, demand, _cyclicP, velocity);
+        }
+
+        static float adjust(float demand, float outBandValue, float baseValue, float P, float velocity)
+        {
+            return abs(demand) > Receiver::STICK_DEADBAND ? outBandValue : baseValue-P*velocity;
         }
 
         float _varioP;
