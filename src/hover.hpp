@@ -50,11 +50,17 @@ namespace hf {
                  -_varioP*state.variometer);                         // Inside deadband, move to oppose variometer.
 
             // Pitch/roll
-            demands.pitch -= (abs(demands.roll)  > Receiver::STICK_DEADBAND ? 0 : .1*state.velocityForward);
-            demands.roll  -= (abs(demands.pitch) > Receiver::STICK_DEADBAND ? 0 : .1*state.velocityRightward);
+            demands.pitch = cyclicPID(demands.pitch, state.velocityForward);
+            demands.roll  = cyclicPID(demands.roll,  state.velocityRightward);
         }
 
         private:
+
+        float cyclicPID(float demand, float velocity)
+        {
+            // Inside stick deadband, adjust pitch/roll demand by velocity; inside deadband, leave it as-is
+            return demand - (abs(demand) > Receiver::STICK_DEADBAND ? 0 : _cyclicP*velocity);
+        }
 
         float _varioP;
         float _cyclicP;
