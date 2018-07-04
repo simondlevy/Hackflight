@@ -59,9 +59,7 @@ namespace hf {
 
 
             // Throttle: inside stick deadband, adjust by variometer; outside deadband, respond weakly to stick demand
-            demands.throttle = inBandCurr ?
-                -_varioP*state.variometer - _varioI*_varioIntegral: 
-                _throttleScale*demands.throttle;
+            demands.throttle = inBandCurr ?  -_varioP*state.variometer - _varioI*_varioIntegral: _throttleScale*demands.throttle;
 
             // Pitch/roll
             demands.pitch = adjustCyclic(demands.pitch, state.velocityForward);
