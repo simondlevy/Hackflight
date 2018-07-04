@@ -32,19 +32,31 @@ namespace hf {
 
         public:
 
-        Loiter(float varioP, float cyclicP, float throttleScale=0.10)
+        Loiter(float varioP, float varioI, float cyclicP, float throttleScale=0.10)
         {
             _varioP        = varioP;
+            _varioI        = varioI;
             _cyclicP       = cyclicP;
             _throttleScale = throttleScale;
+
+            _varioIntegral = 0;
+            _inBandPrev = false;
         }
 
         protected:
 
         void modifyDemands(State & state, demands_t & demands) 
         {
-            Debug::printf("alt: %+4.4f  var: %+4.4f  for: %+4.4f   rgt: %+4.4f\n", 
-                    state.altitude, state.variometer, state.velocityForward, state.velocityRightward);
+            Debug::printf("var: %+6.6f  varint: %+6.6f  for: %+4.4f   rgt: %+4.4f\n", 
+                    state.variometer, _varioIntegral, state.velocityForward, state.velocityRightward);
+
+            // Reset integral if moved into stick deadband
+            bool inBandCurr = inBand(demands.throttle);
+            if (inBandCurr && !_inBandPrev) {
+                _varioIntegral = 0;
+            }
+            _inBandPrev = inBandCurr;
+
 
             // Throttle: inside stick deadband, adjust by variometer; outside deadband, respond weakly to stick demand
             demands.throttle = inBand(demands.throttle) ? -_varioP*state.variometer : _throttleScale*demands.throttle;
@@ -52,6 +64,9 @@ namespace hf {
             // Pitch/roll
             demands.pitch = adjustCyclic(demands.pitch, state.velocityForward);
             demands.roll  = adjustCyclic(demands.roll,  state.velocityRightward);
+
+            // Accumulate integrals
+            _varioIntegral += state.variometer;
         }
 
         private:
@@ -67,9 +82,13 @@ namespace hf {
             return abs(demand) < Receiver::STICK_DEADBAND; 
         }
 
+        float _varioI;
         float _varioP;
         float _cyclicP;
         float _throttleScale;
+
+        float _varioIntegral;
+        bool  _inBandPrev;
 
     };  // class Loiter
 
