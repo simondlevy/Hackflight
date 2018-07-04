@@ -56,6 +56,7 @@ namespace hf {
 
             void updateAccelerometer(float accelGs[3])
             {
+                //Debug::printf("X: %+2.2f  Y: %+2.2f  Z: %+2.2f\n", accelGs[0], accelGs[1], accelGs[2]);
             }
 
             void updateBarometer(float pressure)
