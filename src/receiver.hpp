@@ -83,14 +83,16 @@ namespace hf {
 
         static const uint8_t CHANNELS = 5;
 
-        bool  _inLoiterMode;
+        flightmode_t _mode;
 
         // channel indices
         enum {
             CHANNEL_THROTTLE, // T
             CHANNEL_ROLL,     // A
             CHANNEL_PITCH,    // E
-            CHANNEL_YAW       // R
+            CHANNEL_YAW,      // R
+            CHANNEL_AUX
+
         };
 
         // These must be overridden for each receiver
@@ -198,7 +200,7 @@ namespace hf {
                 float s = sin(yawAngle);
                 float p = demands.pitch;
                 float r = demands.roll;
-                demands.pitch = c*p + s*r;
+                
                 demands.roll  = c*r - s*p;
             }
 
@@ -208,8 +210,8 @@ namespace hf {
             // Pass throttle demand through exponential function
             demands.throttle = throttleFun(rawvals[CHANNEL_THROTTLE]);
             
-            // Store auxiliary switch state for loiter mode
-            _inLoiterMode = rawvals[4] >= 0.0;
+            // Store auxiliary switch state for flight mode (rate, level, loiter)
+            _mode = rawvals[CHANNEL_AUX] >= 0.0 ? (rawvals[CHANNEL_AUX] > .4 ? MODE_LOITER : MODE_LEVEL) : MODE_RATE;
 
             // Got a new frame
             return true;
@@ -222,9 +224,9 @@ namespace hf {
             return rawvals[CHANNEL_THROTTLE] < -1 + MARGIN;
         }
 
-        virtual bool inLoiterMode(void)
+        virtual flightmode_t flightMode(void)
         {
-            return false; //_inLoiterMode; XXX disallow for now
+            return MODE_LEVEL; // XXX _mode XXX disallow rate, loiter mode for now
         }
 
         public:

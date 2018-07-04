@@ -70,7 +70,7 @@ namespace hf {
                     _state.updateQuaternion(q);
 
                     // Update stabilizer with new Euler angles
-                    _stabilizer->updateEulerAngles(_state.eulerAngles);
+                    _stabilizer->updateEulerAngles(_state.eulerAngles, _receiver->flightMode());
 
                     // Synch serial comms to quaternion check
                     doSerialComms();
@@ -94,7 +94,7 @@ namespace hf {
                     _stabilizer->modifyDemands(gyroRates, demands);
 
                     // Run loiter PID controller if specified
-                    if (_loiter && _receiver->inLoiterMode()) {
+                    if (_loiter && _receiver->flightMode() == MODE_LOITER) {
                         _loiter->modifyDemands(_state, demands);
                     }
 

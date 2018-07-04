@@ -100,10 +100,17 @@ namespace hf {
             }
 
             // Computes leveling PID for pitch or roll
-            void computeCyclicPTerm(float demand, float eulerAngles[3], uint8_t imuAxis)
+            void computeCyclicPTerm(float demand, float eulerAngles[3], uint8_t imuAxis, flightmode_t flightmode)
             {
-                _PTerm[imuAxis] = (demand - eulerAngles[imuAxis]) * _levelP;  
-                _PTerm[imuAxis] = Filter::complementary(demand, _PTerm[imuAxis], _proportionalCyclicDemand); 
+                if (flightmode == MODE_RATE) {
+                    _PTerm[imuAxis] = demand; 
+                }
+
+                else {
+
+                    _PTerm[imuAxis] = (demand - eulerAngles[imuAxis]) * _levelP;  
+                    _PTerm[imuAxis] = Filter::complementary(demand, _PTerm[imuAxis], _proportionalCyclicDemand); 
+                }
             }
 
             // Computes leveling PID for pitch or roll
@@ -157,10 +164,10 @@ namespace hf {
                 resetIntegral();
             }
 
-            void updateEulerAngles(float eulerAngles[3])
+            void updateEulerAngles(float eulerAngles[3], flightmode_t flightmode)
             {
-                computeCyclicPTerm(_demandRoll,  eulerAngles, 0);
-                computeCyclicPTerm(_demandPitch, eulerAngles, 1);
+                computeCyclicPTerm(_demandRoll,  eulerAngles, 0, flightmode);
+                computeCyclicPTerm(_demandPitch, eulerAngles, 1, flightmode);
             }
 
             void updateDemands(demands_t & demands)
@@ -175,7 +182,7 @@ namespace hf {
             void modifyDemands(float gyroRates[3], demands_t & demands)
             {
                 // Pitch, roll use leveling based on Euler angles
-                demands.roll = computeCyclicPid(demands.roll,   gyroRates, AXIS_ROLL);
+                demands.roll  = computeCyclicPid(demands.roll,  gyroRates, AXIS_ROLL);
                 demands.pitch = computeCyclicPid(demands.pitch, gyroRates, AXIS_PITCH);
 
                 // For gyroYaw, P term comes directly from RC command, and D term is zero
