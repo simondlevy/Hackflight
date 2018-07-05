@@ -1,8 +1,9 @@
 /*
    butterfly.hpp : Implementation of Hackflight Board routines for Butterfly
-                   dev board + MPU9250 IMU + brushless motors
+                   dev board + MPU9250 IMU + MS5637 barometer + brushless motors
 
-   Additional library required: https://github.com/simondlevy/KrisWinerMPU9250
+   Additional libraries required: https://github.com/simondlevy/MPU9250
+                                  https://github.com/simondlevy/MS5637
 
    This file is part of Hackflight.
 
@@ -25,6 +26,7 @@
 #include <Servo.h>
 
 #include <MPU9250.h> 
+#include <MS5637.h>
 #include <ArduinoTransfer.h>
 
 #include "quaternionFilters.hpp"
@@ -63,6 +65,9 @@ namespace hf {
 
             // Use the MPU9250 in pass-through mode
             MPU9250Passthru _imu = MPU9250Passthru(&mpu, &mag);;
+
+            // Use the MS5637 barometer
+            MS5637 _baro = MS5637();
 
             // Run motor ESCs using standard Servo library
             Servo _escs[4];
@@ -245,7 +250,11 @@ namespace hf {
 
             bool getBarometer(float & pressure)
             {
-                (void)pressure;
+                if (_baro.getPressure(&pressure)) {
+                    pressure *= 100; // millibars to Pascals
+                    return true;
+                }
+
                 return false;
             }
 
@@ -274,6 +283,9 @@ namespace hf {
                 Wire.begin();
                 Wire.setClock(400000); // I2C frequency at 400 kHz
                 delay(1000);
+
+                // Start the MS5637 barometer
+                _baro.begin();
 
                 // Reset the MPU9250
                 _imu.resetMPU9250(); 

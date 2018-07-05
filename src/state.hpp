@@ -52,17 +52,22 @@ namespace hf {
 
             void updateGyrometer(float gyroRate[3])
             {
+                (void)gyroRate;
             }
 
             void updateAccelerometer(float accelGs[3])
             {
+                (void)accelGs;
                 //Debug::printf("X: %+2.2f  Y: %+2.2f  Z: %+2.2f\n", accelGs[0], accelGs[1], accelGs[2]);
             }
 
             void updateBarometer(float pressure)
             {
-                //https://www.researchgate.net/file.PostFileLoader.html?id=5409cac4d5a3f2e81f8b4568&assetKey=AS%3A273593643012096%401442241215893
+                // Pascals to meters: see
+                //  https://www.researchgate.net/file.PostFileLoader.html?id=5409cac4d5a3f2e81f8b4568&assetKey=AS%3A273593643012096%401442241215893
                 altitude = 44331.5 - 4946.62 * pow(pressure, 0.190263);
+
+                //Debug::printf("Altitude: %4.2f meters\n", altitude);
 
                 variometer = altitude - _altitudePrev;
                 _altitudePrev = altitude;
