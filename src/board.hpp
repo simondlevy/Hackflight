@@ -41,6 +41,9 @@ namespace hf {
             virtual bool getOpticalFlow(float & forward, float & rightward) { (void)forward; (void)rightward; return false; }
             virtual bool getSonar(float & distance) { (void)distance;  return false; }
 
+            //----------------------------------------- Timing -----------------------------------------------------------
+            virtual uint32_t getMicroseconds(void) { return 0; }
+
             //------------------------------- Serial communications via MSP ----------------------------------------------
             virtual uint8_t serialAvailableBytes(void) { return 0; }
             virtual uint8_t serialReadByte(void)  { return 0; }

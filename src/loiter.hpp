@@ -47,8 +47,8 @@ namespace hf {
 
         void modifyDemands(State & state, demands_t & demands) 
         {
-            Debug::printf("var: %+6.6f  varint: %+6.6f  for: %+4.4f   rgt: %+4.4f\n", 
-                    state.variometer, _varioIntegral, state.velocityForward, state.velocityRightward);
+            //Debug::printf("var: %+6.6f  varint: %+6.6f  for: %+4.4f   rgt: %+4.4f\n", 
+            //        state.variometer, _varioIntegral, state.velocityForward, state.velocityRightward);
 
             // Reset integral if moved into stick deadband
             bool inBandCurr = inBand(demands.throttle);

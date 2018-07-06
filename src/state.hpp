@@ -29,6 +29,7 @@ namespace hf {
         private:
 
             float _altitudePrev; // XXX simulate variometer for now
+            uint32_t _microsecondsPrev;
 
         public:
 
@@ -48,6 +49,7 @@ namespace hf {
                 velocityRightward = 0;
 
                 _altitudePrev = 0;
+                _microsecondsPrev = 0;
             }
 
             void updateGyrometer(float gyroRate[3])
@@ -65,12 +67,10 @@ namespace hf {
             {
                 // Pascals to meters: see
                 //  https://www.researchgate.net/file.PostFileLoader.html?id=5409cac4d5a3f2e81f8b4568&assetKey=AS%3A273593643012096%401442241215893
-                altitude = 44331.5 - 4946.62 * pow(pressure, 0.190263);
+               // altitude = 44331.5 - 4946.62 * pow(pressure, 0.190263);
 
-                //Debug::printf("Altitude: %4.2f meters\n", altitude);
-
-                variometer = altitude - _altitudePrev;
-                _altitudePrev = altitude;
+                //variometer = altitude - _altitudePrev;
+                //_altitudePrev = altitude;
             }
 
             void updateQuaternion(float q[4])
@@ -91,9 +91,13 @@ namespace hf {
                 velocityRightward = velRight;
             }
 
-            void updateSonar(float distance)
+            void updateSonar(float distance, uint32_t microseconds)
             {
-                (void)distance;
+                altitude = distance;
+                variometer = (altitude - _altitudePrev) / ((microseconds-_microsecondsPrev) / 1.e6);
+                Debug::printf("Vario: %+3.3f", variometer);
+                _altitudePrev = altitude;
+                _microsecondsPrev = microseconds;
             }
 
     };  // class State

@@ -136,7 +136,7 @@ namespace hf {
             {
                 float distance;
                 if (_board->getSonar(distance)) {
-                    _state.updateSonar(distance);
+                    _state.updateSonar(distance, _board->getMicroseconds());
                 }
             }
 
