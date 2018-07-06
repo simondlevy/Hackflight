@@ -132,6 +132,14 @@ namespace hf {
                 }
             }
 
+            void checkSonar(void)
+            {
+                float distance;
+                if (_board->getSonar(distance)) {
+                    _state.updateSonar(distance);
+                }
+            }
+
             void checkFailsafe(void)
             {
                 if (_state.armed && _receiver->lostSignal()) {
@@ -233,6 +241,7 @@ namespace hf {
                 checkAccelerometer();
                 checkBarometer();
                 checkOpticalFlow();
+                checkSonar();
             } 
 
     }; // class Hackflight

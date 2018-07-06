@@ -39,6 +39,7 @@ namespace hf {
             virtual bool getAccelerometer(float accelGs[3]) { (void)accelGs; return false; }
             virtual bool getBarometer(float & pressure) { (void)pressure; return false; }
             virtual bool getOpticalFlow(float & forward, float & rightward) { (void)forward; (void)rightward; return false; }
+            virtual bool getSonar(float & distance) { (void)distance;  }
 
             //------------------------------- Serial communications via MSP ----------------------------------------------
             virtual uint8_t serialAvailableBytes(void) { return 0; }

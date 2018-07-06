@@ -91,6 +91,11 @@ namespace hf {
                 velocityRightward = velRight;
             }
 
+            void updateSonar(float distance)
+            {
+                (void)distance;
+            }
+
     };  // class State
 
 } // namespace
