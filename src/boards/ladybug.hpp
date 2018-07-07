@@ -70,7 +70,7 @@ namespace hf {
 
             void ledSet(bool is_on)
             { 
-                digitalWrite(A1, is_on ? HIGH : LOW);
+                digitalWrite(A4, is_on ? HIGH : LOW);
             }
 
             uint8_t serialAvailableBytes(void)
@@ -171,8 +171,8 @@ namespace hf {
                 Serial.begin(115200);
 
                 // Setup LEDs and turn them off
-                pinMode(A1, OUTPUT);
-                digitalWrite(A1, LOW);
+                pinMode(A4, OUTPUT);
+                digitalWrite(A4, LOW);
 
                 // Start I^2C
                 Wire.begin();
