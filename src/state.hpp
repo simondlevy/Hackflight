@@ -28,13 +28,13 @@ namespace hf {
 
         private:
 
-            float _altitudePrev; // XXX simulate variometer for now
+            float    _altitudePrev; 
             uint32_t _microsecondsPrev;
 
         public:
 
             float eulerAngles[3];
-            bool armed;
+            bool  armed;
             float altitude;
             float variometer;
             float velocityForward;  
@@ -93,9 +93,12 @@ namespace hf {
 
             void updateSonar(float distance, uint32_t microseconds)
             {
-                altitude = distance;
+                // Compensate for effect of pitch, roll on sonar reading
+                altitude = distance * cos(eulerAngles[0]) * cos(eulerAngles[1]);
+
+                Debug::printf("%+3.3f\n", altitude);
+
                 variometer = (altitude - _altitudePrev) / ((microseconds-_microsecondsPrev) / 1.e6);
-                Debug::printf("Vario: %+3.3f", variometer);
                 _altitudePrev = altitude;
                 _microsecondsPrev = microseconds;
             }
