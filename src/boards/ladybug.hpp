@@ -35,6 +35,8 @@ namespace hf {
 
         private:
 
+            static const uint8_t LED = A4; // A1 for prototype board
+
             // Tunable EM7180 parameters
             static const uint8_t  ARES           = 8;    // Gs
             static const uint16_t GRES           = 2000; // degrees per second
@@ -49,7 +51,7 @@ namespace hf {
 
             float _gyroAdcToRadians;
 
-            EM7180 _sentral = EM7180(ARES, GRES, MRES, MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
+            EM7180_Master _sentral = EM7180_Master(ARES, GRES, MRES, MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
 
             void checkEventStatus(void)
             {
@@ -70,7 +72,7 @@ namespace hf {
 
             void ledSet(bool is_on)
             { 
-                digitalWrite(A4, is_on ? HIGH : LOW);
+                digitalWrite(LED, is_on ? HIGH : LOW);
             }
 
             uint8_t serialAvailableBytes(void)
@@ -171,8 +173,8 @@ namespace hf {
                 Serial.begin(115200);
 
                 // Setup LEDs and turn them off
-                pinMode(A4, OUTPUT);
-                digitalWrite(A4, LOW);
+                pinMode(LED, OUTPUT);
+                digitalWrite(LED, LOW);
 
                 // Start I^2C
                 Wire.begin();
