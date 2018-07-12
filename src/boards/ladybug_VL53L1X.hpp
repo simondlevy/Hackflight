@@ -61,6 +61,8 @@ namespace hf {
 
             EM7180_Master _sentral = EM7180_Master(ARES, GRES, MRES, MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
 
+            VL53L1X distanceSensor;
+
             void checkEventStatus(void)
             {
                 _sentral.checkEventStatus();
@@ -123,6 +125,16 @@ namespace hf {
                     gyroRates[1] = gy * _gyroAdcToRadians;
                     gyroRates[2] = gz * _gyroAdcToRadians;
 
+                    return true;
+                }
+
+                return false;
+            }
+
+            bool getSonar(float & distance)
+            {
+                if (distanceSensor.newDataReady()) {
+                    distance = distanceSensor.getDistance() / 1000.; // millimeters => meters
                     return true;
                 }
 
@@ -207,6 +219,12 @@ namespace hf {
                     analogWriteFrequency(MOTOR_PINS[k], 10000);  
                     analogWrite(MOTOR_PINS[k], 0);  
                 }
+
+                // Hang a bit more
+                delay(100);
+
+                // Initialize the VL53L1X 
+                distanceSensor.begin();
 
                 // Hang a bit more
                 delay(100);
