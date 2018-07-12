@@ -35,11 +35,11 @@ namespace hf {
             virtual bool getGyrometer(float gyroRates[3]) = 0;
             virtual void writeMotor(uint8_t index, float value) = 0;
 
-            //------------------------ Support for additional PID controllers --------------------------------------------
+            //----------------------------- Support for additional sensors -----------------------------------------------
             virtual bool getAccelerometer(float accelGs[3]) { (void)accelGs; return false; }
             virtual bool getBarometer(float & pressure) { (void)pressure; return false; }
             virtual bool getOpticalFlow(float & forward, float & rightward) { (void)forward; (void)rightward; return false; }
-            virtual bool getSonar(float & distance) { (void)distance;  return false; }
+            virtual bool getRangefinder(float & distance) { (void)distance;  return false; }
 
             //----------------------------------------- Timing -----------------------------------------------------------
             virtual uint32_t getMicroseconds(void) { return 0; }

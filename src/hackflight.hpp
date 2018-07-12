@@ -132,11 +132,11 @@ namespace hf {
                 }
             }
 
-            void checkSonar(void)
+            void checkRangefinder(void)
             {
                 float distance;
-                if (_board->getSonar(distance)) {
-                    _state.updateSonar(distance, _board->getMicroseconds());
+                if (_board->getRangefinder(distance)) {
+                    _state.updateRangefinder(distance, _board->getMicroseconds());
                 }
             }
 
@@ -241,7 +241,7 @@ namespace hf {
                 checkAccelerometer();
                 checkBarometer();
                 checkOpticalFlow();
-                checkSonar();
+                checkRangefinder();
             } 
 
     }; // class Hackflight

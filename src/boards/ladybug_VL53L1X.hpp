@@ -131,7 +131,7 @@ namespace hf {
                 return false;
             }
 
-            bool getSonar(float & distance)
+            bool getRangefinder(float & distance)
             {
                 if (distanceSensor.newDataReady()) {
                     distance = distanceSensor.getDistance() / 1000.; // millimeters => meters

@@ -92,12 +92,10 @@ namespace hf {
                 velocityRightward = velRight;
             }
 
-            void updateSonar(float distance, uint32_t microseconds)
+            void updateRangefinder(float distance, uint32_t microseconds)
             {
                 // Compensate for effect of pitch, roll on sonar reading
                 altitude = distance * cos(eulerAngles[0]) * cos(eulerAngles[1]);
-
-                Debug::printf("%3.3fm\n", altitude);
 
                 variometer = (altitude - _altitudePrev) / ((microseconds-_microsecondsPrev) / 1.e6);
                 _altitudePrev = altitude;
