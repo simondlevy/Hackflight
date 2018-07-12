@@ -41,7 +41,9 @@ namespace hf {
 
         private:
 
-            static const uint8_t LED = A4; // A1 for prototype board
+            // Current version of LadybugFC uses A4 for LED; but prototype had A1,
+            //  and we happen to be using a prototype LadybugFC for this build
+            static const uint8_t LED = A1; 
 
             // Tunable EM7180 parameters
             static const uint8_t  ARES           = 8;    // Gs
