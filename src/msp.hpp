@@ -105,6 +105,9 @@ namespace hf {
 
         void serializeFloats(float f[], uint8_t n)
         {
+            _outBufSize = 0;
+            _outBufIndex = 0;
+
             headSerialReply(4*n);
 
             for (uint8_t k=0; k<n; ++k) {
@@ -171,17 +174,11 @@ namespace hf {
                     break;
 
                 case MSP_RC_NORMAL:
-                    _outBufSize = 0;
-                    _outBufIndex = 0;
                     serializeFloats(_receiver->rawvals, 8);
                     break;
 
                 case MSP_ATTITUDE_RADIANS: 
-                    {
-                        _outBufSize = 0;
-                        _outBufIndex = 0;
-                        serializeFloats(_vehicleState->eulerAngles, 3);
-                    }
+                    serializeFloats(_vehicleState->eulerAngles, 3);
                     break;
 
                     // don't know how to handle the (valid) message, indicate error

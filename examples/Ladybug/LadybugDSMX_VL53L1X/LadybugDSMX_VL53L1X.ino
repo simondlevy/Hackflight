@@ -27,9 +27,9 @@
 hf::Hackflight h;
 
 hf::DSMX_Receiver rc = hf::DSMX_Receiver(
-        .005f,  // roll trim
-        .01f,  // pitch trim
-        0.f);   // yaw trim
+         0.f,  // roll trim
+       -.06f,  // pitch trim
+         0.f); // yaw trim
 
 hf::MixerQuadX mixer;
 
