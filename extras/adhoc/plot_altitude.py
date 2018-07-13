@@ -60,9 +60,12 @@ def _update(port, plotter):
     while True:
 
 
-        vals = [float(s) for s in port.readline().decode()[:-2].split()]
+        dist,roll,pitch,usec = [float(s) for s in port.readline().decode()[:-2].split()]
 
-        plotter.vals = vals[0], 0
+        alti = dist * np.cos(roll) * np.cos(pitch);
+
+
+        plotter.vals = alti, 0
 
         plotter.tick += 1
 
