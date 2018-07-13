@@ -33,6 +33,7 @@ namespace hf {
         // See http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol
         static const uint8_t MSP_RC_NORMAL        =    121;
         static const uint8_t MSP_ATTITUDE_RADIANS =    122; 
+        static const uint8_t MSP_ALTITUDE_METERS  =    123; 
         static const uint8_t MSP_SET_MOTOR_NORMAL =    215;    
         static const uint8_t MSP_SET_ARMED        =    216;    
 
@@ -179,6 +180,10 @@ namespace hf {
 
                 case MSP_ATTITUDE_RADIANS: 
                     serializeFloats(_vehicleState->eulerAngles, 3);
+                    break;
+
+                case MSP_ALTITUDE_METERS: 
+                    serializeFloats(&_vehicleState->altitude, 2);
                     break;
 
                     // don't know how to handle the (valid) message, indicate error

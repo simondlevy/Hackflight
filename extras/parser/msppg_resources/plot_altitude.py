@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 '''
-getimu.py Uses MSPPG to request and handle ATTITUDE_RADIANS messages from flight controller IMU
+plot_altitude.py Uses MSPPG to request and handle ALTITUDE_METERS messages from flight controller IMU
 
-Copyright (C) Rob Jones, Alec Singer, Chris Lavin, Blake Liebling, Simon D. Levy 2015
+Copyright (C) Simon D. Levy 2018
 
 This file is part of Hackflight.
 
@@ -25,24 +25,25 @@ BAUD = 115200
 #PORT = 'COM13'          # Windows
 PORT = '/dev/ttyACM0' # Linux
 
-from msppg import MSP_Parser as Parser, serialize_ATTITUDE_RADIANS_Request
+from msppg import MSP_Parser as Parser, serialize_ALTITUDE_METERS_Request
 import serial
 
-from sys import argv
+from sys import stdout
 
 
-def handler(pitch, roll, yaw):
+def handler(altitude, variometer):
 
-    print(pitch, roll, yaw)
+    print(altitude, variometer)
+    stdout.flush()
     port.write(request)
 
 if __name__ == '__main__':
 
     parser = Parser()
-    request = serialize_ATTITUDE_RADIANS_Request()
+    request = serialize_ALTITUDE_METERS_Request()
     port = serial.Serial(PORT, BAUD)
 
-    parser.set_ATTITUDE_RADIANS_Handler(handler)
+    parser.set_ALTITUDE_METERS_Handler(handler)
 
     port.write(request)
 
