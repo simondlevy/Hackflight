@@ -60,7 +60,9 @@ def _update(port, plotter):
     while True:
 
 
-        plotter.vals = [float(s) for s in port.readline().decode()[:-2].split()]
+        vals = [float(s) for s in port.readline().decode()[:-2].split()]
+
+        plotter.vals = vals[0], 0
 
         plotter.tick += 1
 
