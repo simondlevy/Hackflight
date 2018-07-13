@@ -22,8 +22,8 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 BAUD = 115200
 
-#PORT = 'COM13'          # Windows
-PORT = '/dev/ttyACM0' # Linux
+PORT = 'COM38'          # Windows
+#PORT = '/dev/ttyACM0' # Linux
 
 from msppg import MSP_Parser as Parser, serialize_ALTITUDE_METERS_Request
 import serial
@@ -33,7 +33,7 @@ from sys import stdout
 
 def handler(altitude, variometer):
 
-    print(altitude, variometer)
+    print('%3.3f %+3.3f' % (altitude, variometer))
     stdout.flush()
     port.write(request)
 
