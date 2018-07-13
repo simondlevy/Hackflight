@@ -57,7 +57,7 @@ namespace hf {
 
             const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
 
-            static constexpr float RANGEFINDER_UPDATE_HZ = 20; // XXX should be using interrupt!
+            static constexpr float RANGEFINDER_UPDATE_HZ = 50; // XXX should be using interrupt!
 
             const uint32_t RANGEFINDER_UPDATE_MICROS = 1e6 / RANGEFINDER_UPDATE_HZ;
 

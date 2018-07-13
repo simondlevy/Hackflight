@@ -97,6 +97,8 @@ namespace hf {
 
                 variometer = (altitude - _altitudePrev) / ((microseconds-_microsecondsPrev) / 1.e6);
 
+                Debug::printf("%f %f\n", altitude, variometer);
+
                 _altitudePrev = altitude;
                 _microsecondsPrev = microseconds;
             }
