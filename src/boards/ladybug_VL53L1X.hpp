@@ -57,6 +57,12 @@ namespace hf {
 
             const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
 
+            static constexpr float RANGEFINDER_UPDATE_HZ = 20; // XXX should be using interrupt!
+
+            const uint32_t RANGEFINDER_UPDATE_MICROS = 1e6 / RANGEFINDER_UPDATE_HZ;
+
+            uint32_t _rangefinderMicrosPrev;
+
             float _gyroAdcToRadians;
 
             EM7180_Master _sentral = EM7180_Master(ARES, GRES, MRES, MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
@@ -78,6 +84,11 @@ namespace hf {
             void delayMilliseconds(uint32_t msec)
             {
                 delay(msec);
+            }
+
+            uint32_t getMicroseconds(void) 
+            {
+                return micros();
             }
 
             void ledSet(bool is_on)
@@ -134,8 +145,12 @@ namespace hf {
             bool getRangefinder(float & distance)
             {
                 if (distanceSensor.newDataReady()) {
-                    distance = distanceSensor.getDistance() / 1000.; // millimeters => meters
-                    return true;
+                    uint32_t msec = micros();
+                    if (msec-_rangefinderMicrosPrev > RANGEFINDER_UPDATE_MICROS) {
+                        distance = distanceSensor.getDistance() / 1000.; // millimeters => meters
+                        _rangefinderMicrosPrev = msec; 
+                        return true;
+                    }
                 }
 
                 return false;
@@ -225,6 +240,8 @@ namespace hf {
 
                 // Initialize the VL53L1X 
                 distanceSensor.begin();
+                _rangefinderMicrosPrev = 0;
+
 
                 // Hang a bit more
                 delay(100);

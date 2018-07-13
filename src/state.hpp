@@ -96,6 +96,7 @@ namespace hf {
                 altitude = distance * cos(eulerAngles[0]) * cos(eulerAngles[1]);
 
                 variometer = (altitude - _altitudePrev) / ((microseconds-_microsecondsPrev) / 1.e6);
+
                 _altitudePrev = altitude;
                 _microsecondsPrev = microseconds;
             }
