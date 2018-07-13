@@ -24,21 +24,21 @@ import serial
 from realtime_plot import RealtimePlotter
 import numpy as np
 from threading import Thread
-from sys import argv
+from sys import argv, stdout
 
 # Change these to suit your needs
 PORT = 'COM38'
 BAUD = 115200
 
-ALTITUDE_RANGE     = 5
-VARIOMETER_RANGE   = 1
+ALTITUDE_RANGE     = 0,2
+VARIOMETER_RANGE   = -5,+5
 NTICKS             = 10
 
 class SerialPlotter(RealtimePlotter):
 
     def __init__(self):
 
-        ranges = [(-lim,+lim) for lim in [ALTITUDE_RANGE, VARIOMETER_RANGE]]
+        ranges = [rng for rng in [ALTITUDE_RANGE, VARIOMETER_RANGE]]
 
         RealtimePlotter.__init__(self, 
                 ranges, 
@@ -51,6 +51,9 @@ class SerialPlotter(RealtimePlotter):
         self.tick = 0
         self.vals = None
 
+        self.usec_prev = 0
+        self.alti_prev = 0
+
     def getValues(self):
 
          return self.vals
@@ -59,15 +62,22 @@ def _update(port, plotter):
 
     while True:
 
-
         dist,roll,pitch,usec = [float(s) for s in port.readline().decode()[:-2].split()]
 
         alti = dist * np.cos(roll) * np.cos(pitch);
 
+        if plotter.usec_prev > 0:
 
-        plotter.vals = alti, 0
+            dsec = (usec-plotter.usec_prev) / 1e6
 
-        plotter.tick += 1
+            vari = (alti - plotter.alti_prev) / dsec
+
+            plotter.vals = alti, vari
+
+            plotter.tick += 1
+
+        plotter.usec_prev = usec
+        plotter.alti_prev = alti
 
 if __name__ == '__main__':
 
