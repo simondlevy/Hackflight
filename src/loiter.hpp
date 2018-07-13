@@ -45,7 +45,7 @@ namespace hf {
 
         protected:
 
-        void modifyDemands(State & state, demands_t & demands) 
+        virtual void modifyDemands(State & state, demands_t & demands) 
         {
             //Debug::printf("var: %+6.6f  varint: %+6.6f  for: %+4.4f   rgt: %+4.4f\n", 
             //        state.variometer, _varioIntegral, state.velocityForward, state.velocityRightward);
@@ -69,7 +69,10 @@ namespace hf {
             _varioIntegral += state.variometer;
         }
 
-        private:
+        bool inBand(float demand)
+        {
+            return abs(demand) < Receiver::STICK_DEADBAND; 
+        }
 
         float adjustCyclic(float demand, float velocity)
         {
@@ -77,18 +80,12 @@ namespace hf {
             return inBand(demand) ? demand - _cyclicP*velocity: demand; 
         }
 
-        bool inBand(float demand)
-        {
-            return abs(demand) < Receiver::STICK_DEADBAND; 
-        }
-
         float _varioI;
         float _varioP;
         float _cyclicP;
         float _throttleScale;
-
-        float _varioIntegral;
         bool  _inBandPrev;
+        float _varioIntegral;
 
     };  // class Loiter
 
