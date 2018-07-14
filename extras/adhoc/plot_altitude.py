@@ -30,6 +30,7 @@ from sys import argv, stdout
 PORT = 'COM38'
 BAUD = 115200
 
+ACCEL_CAL_SECONDS  = 2.0
 ALTITUDE_RANGE     = -0.1,1.9
 VARIOMETER_RANGE   = -10,+10
 NTICKS             = 10
@@ -51,6 +52,8 @@ class SerialPlotter(RealtimePlotter):
         self.tick = 0
         self.vals = None
 
+        self.usec = 0
+        self.usec_start = 0
         self.usec_prev = 0
         self.alti_prev = 0
 
@@ -60,15 +63,25 @@ class SerialPlotter(RealtimePlotter):
 
 def _update(port, plotter):
 
+    accelz_sum = 0
+    accelz_count = 0
+
     while True:
 
-        dist,roll,pitch,accelx,accely,accelz,usec = [float(s) for s in port.readline().decode()[:-2].split()]
+        dist,roll,pitch,accelx,accely,accelz,usec = [float(s) for s in port.readline().decode()[:-1].split()]
 
         alti = dist * np.cos(roll) * np.cos(pitch);
 
-        if plotter.usec_prev > 0:
+        if plotter.usec_start == 0:
+            plotter.usec_start = usec
 
-            print(accelz)
+        plotter.usec = usec - plotter.usec_start
+
+        if plotter.usec > ACCEL_CAL_SECONDS*1e6:
+
+            accelz_mean = accelz_sum / accelz_count
+
+            print(accelz_mean)
             stdout.flush()
 
             dsec = (usec-plotter.usec_prev) / 1e6
@@ -78,6 +91,11 @@ def _update(port, plotter):
             plotter.vals = alti, vari
 
             plotter.tick += 1
+
+        else:
+
+            accelz_sum += accelz
+            accelz_count += 1
 
         plotter.usec_prev = usec
         plotter.alti_prev = alti
