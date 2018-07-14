@@ -30,6 +30,7 @@ namespace hf {
 
             float    _altitudePrev; 
             uint32_t _microsecondsPrev;
+            float    _rangefinderDistance;
 
         public:
 
@@ -57,10 +58,14 @@ namespace hf {
                 (void)gyroRate;
             }
 
-            void updateAccelerometer(float accelGs[3])
+            void updateAccelerometer(float accelGs[3], uint32_t microseconds)
             {
                 (void)accelGs;
-                //Debug::printf("X: %+2.2f  Y: %+2.2f  Z: %+2.2f\n", accelGs[0], accelGs[1], accelGs[2]);
+                Debug::printf("%f %f %f %f %f %f %d\n", 
+                        _rangefinderDistance, 
+                        eulerAngles[0], eulerAngles[1], 
+                        accelGs[0], accelGs[1], accelGs[2],
+                        microseconds);
             }
 
             void updateBarometer(float pressure)
@@ -92,12 +97,12 @@ namespace hf {
 
             void updateRangefinder(float distance, uint32_t microseconds)
             {
+                _rangefinderDistance = distance;
+
                 // Compensate for effect of pitch, roll on sonar reading
                 altitude = distance * cos(eulerAngles[0]) * cos(eulerAngles[1]);
 
                 variometer = (altitude - _altitudePrev) / ((microseconds-_microsecondsPrev) / 1.e6);
-
-                Debug::printf("%f %f %f %d\n", distance, eulerAngles[0], eulerAngles[1], microseconds);
 
                 _altitudePrev = altitude;
                 _microsecondsPrev = microseconds;

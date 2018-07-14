@@ -120,7 +120,7 @@ namespace hf {
             {
                 float accelGs[3];
                 if (_board->getAccelerometer(accelGs)) {
-                    _state.updateAccelerometer(accelGs);
+                    _state.updateAccelerometer(accelGs, _board->getMicroseconds());
                 }
             }
 

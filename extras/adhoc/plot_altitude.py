@@ -30,8 +30,8 @@ from sys import argv, stdout
 PORT = 'COM38'
 BAUD = 115200
 
-ALTITUDE_RANGE     = 0,2
-VARIOMETER_RANGE   = -5,+5
+ALTITUDE_RANGE     = -0.1,1.9
+VARIOMETER_RANGE   = -10,+10
 NTICKS             = 10
 
 class SerialPlotter(RealtimePlotter):
@@ -62,11 +62,14 @@ def _update(port, plotter):
 
     while True:
 
-        dist,roll,pitch,usec = [float(s) for s in port.readline().decode()[:-2].split()]
+        dist,roll,pitch,accelx,accely,accelz,usec = [float(s) for s in port.readline().decode()[:-2].split()]
 
         alti = dist * np.cos(roll) * np.cos(pitch);
 
         if plotter.usec_prev > 0:
+
+            print(accelz)
+            stdout.flush()
 
             dsec = (usec-plotter.usec_prev) / 1e6
 
