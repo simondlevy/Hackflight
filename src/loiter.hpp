@@ -47,10 +47,8 @@ namespace hf {
 
         virtual void modifyDemands(State & state, demands_t & demands) 
         {
-            //Debug::printf("var: %+6.6f  varint: %+6.6f  for: %+4.4f   rgt: %+4.4f\n", 
-            //        state.variometer, _varioIntegral, state.velocityForward, state.velocityRightward);
-
             // Reset integral if moved into stick deadband
+            // XXX should we just use altitude as target?
             bool inBandCurr = inBand(demands.throttle);
             if (inBandCurr && !_inBandPrev) {
                 _varioIntegral = 0;
