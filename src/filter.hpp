@@ -38,18 +38,6 @@ namespace hf {
                 return a > b ? a : b;
             }
 
-            static float deadband(float value, float deadband)
-            {
-                if (fabs(value) < deadband) {
-                    value = 0;
-                } else if (value > 0) {
-                    value -= deadband;
-                } else if (value < 0) {
-                    value += deadband;
-                }
-                return value;
-            }
-
             static float complementary(float a, float b, float c)
             {
                 return a * c + b * (1 - c);
