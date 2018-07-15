@@ -84,7 +84,7 @@ namespace hf {
                 if (_board->getGyrometer(gyroRates)) {
 
                     // Update state with gyro rates
-                    _state.updateGyrometer(gyroRates);
+                    _state.updateGyrometer(gyroRates, _board->getMicroseconds());
 
                     // Start with demands from receiver
                     demands_t demands;

@@ -28,9 +28,7 @@ namespace hf {
 
         private:
 
-            float    _altitudePrev; 
-            uint32_t _microsecondsPrev;
-            float    _rangefinderDistance;
+            LowPassFilter _rangefinderLpf = LowPassFilter(20);
 
         public:
 
@@ -49,39 +47,31 @@ namespace hf {
                 velocityForward = 0;
                 velocityRightward = 0;
 
-                _altitudePrev = 0;
-                _microsecondsPrev = 0;
+                _rangefinderLpf.init();
             }
 
-            void updateGyrometer(float gyroRate[3])
+            void updateGyrometer(float gyroRates[3], uint32_t microseconds)
             {
-                (void)gyroRate;
+                (void)gyroRates;
+                (void)microseconds;
             }
 
             void updateAccelerometer(float accelGs[3], uint32_t microseconds)
             {
                 (void)accelGs;
-                Debug::printf("%f %f %f %f %f %f %d\n", 
-                        _rangefinderDistance, 
-                        eulerAngles[0], eulerAngles[1], 
-                        accelGs[0], accelGs[1], accelGs[2],
-                        microseconds);
+                (void)microseconds;
             }
 
             void updateBarometer(float pressure)
             {
                 (void)pressure;
-                // Pascals to meters
-                // altitude = 44331.5 - 4946.62 * pow(pressure, 0.190263);
-                //variometer = altitude - _altitudePrev;
-                //_altitudePrev = altitude;
             }
 
             void updateQuaternion(float q[4])
             {
-                eulerAngles[0] = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
-                eulerAngles[1] = asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
-                eulerAngles[2] = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]); 
+                eulerAngles[0] = atan2(2.0f*(q[0]*q[1]+q[2]*q[3]),q[0]*q[0]-q[1]*q[1]-q[2]*q[2]+q[3]*q[3]);
+                eulerAngles[1] =  asin(2.0f*(q[1]*q[3]-q[0]*q[2]));
+                eulerAngles[2] = atan2(2.0f*(q[1]*q[2]+q[0]*q[3]),q[0]*q[0]+q[1]*q[1]-q[2]*q[2]-q[3]*q[3]);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
                 if (eulerAngles[2] < 0) {
@@ -97,15 +87,18 @@ namespace hf {
 
             void updateRangefinder(float distance, uint32_t microseconds)
             {
-                _rangefinderDistance = distance;
+                float seconds = microseconds / 1.e6;
+                static float _seconds;
+                static float _altitude;
 
-                // Compensate for effect of pitch, roll on sonar reading
-                altitude = distance * cos(eulerAngles[0]) * cos(eulerAngles[1]);
+                // Compensate for effect of pitch, roll on rangefinder reading
+                altitude =  distance * cos(eulerAngles[0]) * cos(eulerAngles[1]);
 
-                variometer = (altitude - _altitudePrev) / ((microseconds-_microsecondsPrev) / 1.e6);
+                // Use first-differenced, low-pass-filtered altitude as variometer
+                variometer = _rangefinderLpf.update((altitude-_altitude) / (seconds-_seconds));
 
-                _altitudePrev = altitude;
-                _microsecondsPrev = microseconds;
+                _seconds = seconds;
+                _altitude = altitude;
             }
 
     };  // class State

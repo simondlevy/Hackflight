@@ -20,7 +20,7 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/ladybug_vl53l1x.hpp"
+#include "boards/ladybug_VL53L1X.hpp"
 #include "receivers/serial/arduino_dsmx.hpp"
 #include "mixers/quadx.hpp"
 

@@ -27,35 +27,26 @@ from threading import Thread
 from sys import argv, stdout
 
 # Change these to suit your needs
-PORT = 'COM38'
+PORT = '/dev/ttyACM0'
 BAUD = 115200
 
-ACCEL_CAL_SECONDS  = 2.0
-ALTITUDE_RANGE     = -0.1,1.9
-VARIOMETER_RANGE   = -10,+10
-NTICKS             = 10
+NTICKS = 10
 
 class SerialPlotter(RealtimePlotter):
 
     def __init__(self):
 
-        ranges = [rng for rng in [ALTITUDE_RANGE, VARIOMETER_RANGE]]
+        ranges = [(-1,5), (-5,+5), (-5,+5)]
 
         RealtimePlotter.__init__(self, 
                 ranges, 
                 show_yvals=True,
-                ylabels=['Altitude', 'Variometer'],
-                yticks=[np.linspace(rng[0], rng[1], NTICKS-1) for rng in ranges],
+                ylabels=['Altitude', 'Variometer', 'FirstDiff'],
                 window_name='Altitude Estimation',
-                styles=['b', 'r'])
+                styles=['b', 'r', 'g'])
 
         self.tick = 0
         self.vals = None
-
-        self.usec = 0
-        self.usec_start = 0
-        self.usec_prev = 0
-        self.alti_prev = 0
 
     def getValues(self):
 
@@ -63,42 +54,11 @@ class SerialPlotter(RealtimePlotter):
 
 def _update(port, plotter):
 
-    accelz_sum = 0
-    accelz_count = 0
-
     while True:
 
-        dist,roll,pitch,accelx,accely,accelz,usec = [float(s) for s in port.readline().decode()[:-1].split()]
+        plotter.vals = [float(s) for s in port.readline().decode()[:-1].split()]
 
-        alti = dist * np.cos(roll) * np.cos(pitch);
-
-        if plotter.usec_start == 0:
-            plotter.usec_start = usec
-
-        plotter.usec = usec - plotter.usec_start
-
-        if plotter.usec > ACCEL_CAL_SECONDS*1e6:
-
-            accelz_mean = accelz_sum / accelz_count
-
-            print(accelz_mean)
-            stdout.flush()
-
-            dsec = (usec-plotter.usec_prev) / 1e6
-
-            vari = (alti - plotter.alti_prev) / dsec
-
-            plotter.vals = alti, vari
-
-            plotter.tick += 1
-
-        else:
-
-            accelz_sum += accelz
-            accelz_count += 1
-
-        plotter.usec_prev = usec
-        plotter.alti_prev = alti
+        plotter.tick += 1
 
 if __name__ == '__main__':
 

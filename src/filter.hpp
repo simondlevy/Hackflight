@@ -67,4 +67,41 @@ namespace hf {
 
     }; // class Filter
 
+    class LowPassFilter {
+
+        private:
+
+            float _history[256];
+            uint8_t _historySize;
+            uint8_t _historyIdx;
+            float _sum;
+
+        public:
+
+            LowPassFilter(uint16_t historySize)
+            {
+                _historySize = historySize;
+            }
+
+            void init(void)
+            {
+                for (uint8_t k=0; k<_historySize; ++k) {
+                    _history[k] = 0;
+                }
+                _historyIdx = 0;
+                _sum = 0;
+            }
+
+            float update(float value)
+            {
+                uint8_t indexplus1 = (_historyIdx + 1) % _historySize;
+                _history[_historyIdx] = value;
+                _sum += _history[_historyIdx];
+                _sum -= _history[indexplus1];
+                _historyIdx = indexplus1;
+                return _sum / _historySize;
+            }
+
+    }; // class LowPassFilter
+
 } // namespace hf
