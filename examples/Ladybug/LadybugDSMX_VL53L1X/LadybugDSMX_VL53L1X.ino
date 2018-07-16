@@ -27,24 +27,29 @@
 hf::Hackflight h;
 
 hf::DSMX_Receiver rc = hf::DSMX_Receiver(
-         0.f,  // roll trim
-       -.06f,  // pitch trim
-         0.f); // yaw trim
+        0.f,  // roll trim
+        -.06f,  // pitch trim
+        0.f); // yaw trim
 
 hf::MixerQuadX mixer;
 
 hf::Stabilizer stabilizer = hf::Stabilizer(
-                0.20f,      // Level P
-                0.225f,     // Gyro cyclic P
-                0.001875f,  // Gyro cyclic I
-                0.375f,     // Gyro cyclic D
-                1.0625f,    // Gyro yaw P
-                0.005625f); // Gyro yaw I
+        0.20f,      // Level P
+        0.225f,     // Gyro cyclic P
+        0.001875f,  // Gyro cyclic I
+        0.375f,     // Gyro cyclic D
+        1.0625f,    // Gyro yaw P
+        0.005625f); // Gyro yaw I
+
+hf::Loiter loiter = hf::Loiter(
+	0.25f,  // Altitude P
+	0.50f,  // Altitude D
+	0.f);  // Cyclic P
 
 void setup(void)
 {
     // Initialize Hackflight firmware
-    h.init(new hf::Ladybug(), &rc, &mixer, &stabilizer);
+    h.init(new hf::Ladybug(), &rc, &mixer, &stabilizer, &loiter);
 }
 
 void loop(void)

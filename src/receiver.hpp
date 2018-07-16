@@ -226,7 +226,7 @@ namespace hf {
 
         virtual flightmode_t flightMode(void)
         {
-            return MODE_LEVEL; // XXX _mode XXX disallow rate, loiter mode for now
+            return _mode;
         }
 
         public:

@@ -53,12 +53,11 @@ namespace hf {
             }
             _inBandPrev = inBandCurr;
 
-
             // Throttle: inside stick deadband, adjust by variometer; outside deadband, respond weakly to stick demand
             demands.throttle = inBandCurr ?  
                 _altitudeP * (_altitudeTarget-state.altitude) - _altitudeD * state.variometer: 
                 _throttleScale*demands.throttle;
-
+            
             // Pitch/roll
             demands.pitch = adjustCyclic(demands.pitch, state.velocityForward);
             demands.roll  = adjustCyclic(demands.roll,  state.velocityRightward);
@@ -66,7 +65,7 @@ namespace hf {
 
         bool inBand(float demand)
         {
-            return abs(demand) < Receiver::STICK_DEADBAND; 
+            return fabs(demand) < Receiver::STICK_DEADBAND; 
         }
 
         float adjustCyclic(float demand, float velocity)
