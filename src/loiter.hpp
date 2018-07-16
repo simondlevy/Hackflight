@@ -32,14 +32,13 @@ namespace hf {
 
         public:
 
-        Loiter(float varioP, float varioI, float cyclicP, float throttleScale=0.10)
+        Loiter(float altitudeP, float altitudeD, float cyclicP, float throttleScale=0.10)
         {
-            _varioP        = varioP;
-            _varioI        = varioI;
+            _altitudeP     = altitudeP;
+            _altitudeD     = altitudeD;
             _cyclicP       = cyclicP;
             _throttleScale = throttleScale;
 
-            _varioIntegral = 0;
             _inBandPrev = false;
         }
 
@@ -48,23 +47,21 @@ namespace hf {
         virtual void modifyDemands(State & state, demands_t & demands) 
         {
             // Reset integral if moved into stick deadband
-            // XXX should we just use altitude as target?
             bool inBandCurr = inBand(demands.throttle);
             if (inBandCurr && !_inBandPrev) {
-                _varioIntegral = 0;
+                _altitudeTarget = state.altitude;
             }
             _inBandPrev = inBandCurr;
 
 
             // Throttle: inside stick deadband, adjust by variometer; outside deadband, respond weakly to stick demand
-            demands.throttle = inBandCurr ?  -_varioP*state.variometer - _varioI*_varioIntegral: _throttleScale*demands.throttle;
+            demands.throttle = inBandCurr ?  
+                _altitudeP * (_altitudeTarget-state.altitude) - _altitudeD * state.variometer: 
+                _throttleScale*demands.throttle;
 
             // Pitch/roll
             demands.pitch = adjustCyclic(demands.pitch, state.velocityForward);
             demands.roll  = adjustCyclic(demands.roll,  state.velocityRightward);
-
-            // Accumulate integrals
-            _varioIntegral += state.variometer;
         }
 
         bool inBand(float demand)
@@ -74,16 +71,16 @@ namespace hf {
 
         float adjustCyclic(float demand, float velocity)
         {
-            // Inside stick deadband, adjust pitch/roll demand by velocity; outside deadband, leave it as-is
+            // Inside throttle deadband, adjust pitch/roll demand by PD controller; outside deadband, leave it as-is
             return inBand(demand) ? demand - _cyclicP*velocity: demand; 
         }
 
-        float _varioI;
-        float _varioP;
+        float _altitudeTarget;
+        float _altitudeP;
+        float _altitudeD;
         float _cyclicP;
         float _throttleScale;
         bool  _inBandPrev;
-        float _varioIntegral;
 
     };  // class Loiter
 

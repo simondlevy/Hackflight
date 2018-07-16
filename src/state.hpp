@@ -21,6 +21,7 @@
 #include <cmath>
 
 #include "debug.hpp"
+#include "filter.hpp"
 
 namespace hf {
 
@@ -79,10 +80,10 @@ namespace hf {
                 }
             }
 
-            void updateOpticalFlow(float velFore, float velRight)
+            void updateOpticalFlow(float flow[2])
             {
-                velocityForward  = velFore;
-                velocityRightward = velRight;
+                velocityForward   = flow[0];
+                velocityRightward = flow[1];
             }
 
             void updateRangefinder(float distance, uint32_t microseconds)

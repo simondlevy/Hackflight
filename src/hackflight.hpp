@@ -126,9 +126,9 @@ namespace hf {
 
             void checkOpticalFlow(void)
             {
-                float x, y;
-                if (_board->getOpticalFlow(x, y)) {
-                    _state.updateOpticalFlow(x, y);
+                float flow[2];
+                if (_board->getOpticalFlow(flow)) {
+                    _state.updateOpticalFlow(flow);
                 }
             }
 
