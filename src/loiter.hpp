@@ -44,7 +44,7 @@ namespace hf {
 
         protected:
 
-        virtual void modifyDemands(State & state, demands_t & demands) 
+        virtual bool modifyDemands(State & state, demands_t & demands) 
         {
             // Reset integral if moved into stick deadband
             bool inBandCurr = inBand(demands.throttle);
@@ -61,6 +61,8 @@ namespace hf {
             // Pitch/roll
             demands.pitch = adjustCyclic(demands.pitch, state.velocityForward);
             demands.roll  = adjustCyclic(demands.roll,  state.velocityRightward);
+
+            return inBandCurr;
         }
 
         bool inBand(float demand)

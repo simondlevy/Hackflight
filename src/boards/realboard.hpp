@@ -27,32 +27,58 @@ namespace hf {
 
         private:
 
-            const uint32_t ledFlashMilli = 1000;
-            const uint32_t ledFlashCount = 20;
+            const uint32_t LED_STARTUP_FLASH_MILLI = 1000;
+            const uint32_t LED_STARTUP_FLASH_COUNT = 20;
+            const uint32_t LED_LOITERING_MICROS   = 250000;
+
+            bool _loitering;
 
         protected:
 
-            virtual void     delayMilliseconds(uint32_t msec) { (void)msec; } 
-            virtual void     ledSet(bool is_on) { (void)is_on; }
+            virtual void delayMilliseconds(uint32_t msec) { (void)msec; } 
+            virtual void ledSet(bool is_on) { (void)is_on; }
 
             void init(void)
             {
                 // Flash LED
-                uint32_t pauseMilli = ledFlashMilli / ledFlashCount;
+                uint32_t pauseMilli = LED_STARTUP_FLASH_MILLI / LED_STARTUP_FLASH_COUNT;
                 ledSet(false);
-                for (uint8_t i = 0; i < ledFlashCount; i++) {
+                for (uint8_t i = 0; i < LED_STARTUP_FLASH_COUNT; i++) {
                     ledSet(true);
                     delayMilliseconds(pauseMilli);
                     ledSet(false);
                     delayMilliseconds(pauseMilli);
                 }
                 ledSet(false);
+
+                _loitering = false;
             }
 
             void showArmedStatus(bool armed)
             {
                 // Set LED to indicate armed
-                ledSet(armed);
+                if (!_loitering) {
+                    ledSet(armed);
+                }
+            }
+
+            void showLoiterStatus(bool loitering)
+            {
+                if (loitering) {
+
+                    static uint32_t _usec;
+                    static bool state;
+
+                    uint32_t usec = getMicroseconds();
+
+                    if (usec-_usec > LED_LOITERING_MICROS) {
+                        state = !state;
+                        ledSet(state);
+                        _usec = usec;
+                    }
+                }
+
+                _loitering = loitering;
             }
 
     }; // class RealBoard

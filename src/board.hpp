@@ -51,6 +51,7 @@ namespace hf {
 
             //----------------------------------------- Safety -----------------------------------------------------------
             virtual void showArmedStatus(bool armed) { (void)armed; }
+            virtual void showLoiterStatus(bool loitering) { (void)loitering; }
 
             //--------------------------------------- Debugging ----------------------------------------------------------
             static void  outbuf(char * buf);

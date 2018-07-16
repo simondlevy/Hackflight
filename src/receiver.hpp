@@ -231,7 +231,7 @@ namespace hf {
 
         public:
 
-        static constexpr float STICK_DEADBAND = 0.15f;
+        static constexpr float STICK_DEADBAND = 0.20;
 
     }; // class Receiver
 
