@@ -32,7 +32,7 @@ namespace hf {
 
         public:
 
-        Loiter(float altitudeP, float altitudeD, float cyclicP, float throttleScale=0.10)
+        Loiter(float altitudeP, float altitudeD, float cyclicP, float throttleScale=1.f)
         {
             _altitudeP     = altitudeP;
             _altitudeD     = altitudeD;
@@ -57,7 +57,7 @@ namespace hf {
             demands.throttle = inBandCurr ?  
                 _altitudeP * (_altitudeTarget-state.altitude) - _altitudeD * state.variometer: 
                 _throttleScale*demands.throttle;
-            
+
             // Pitch/roll
             demands.pitch = adjustCyclic(demands.pitch, state.velocityForward);
             demands.roll  = adjustCyclic(demands.roll,  state.velocityRightward);
