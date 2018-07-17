@@ -28,6 +28,7 @@
 #include "filter.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
+#include "pidcontroller.hpp"
 
 namespace hf {
 
@@ -38,7 +39,7 @@ namespace hf {
         AXIS_YAW
     };
 
-    class Stabilizer {
+    class Stabilizer : public PID_Controller {
 
         friend class Hackflight;
 
@@ -170,7 +171,7 @@ namespace hf {
                 computeCyclicPTerm(_demandPitch, eulerAngles, 1, flightmode);
             }
 
-            void updateDemands(demands_t & demands)
+            void updateReceiver(demands_t & demands)
             {
                 _demandRoll  = demands.roll;
                 _demandPitch = demands.pitch;
@@ -179,15 +180,15 @@ namespace hf {
                 _proportionalCyclicDemand = Filter::max(fabs(_demandRoll), fabs(_demandPitch)) / 0.5f;
             }
 
-            void modifyDemands(float gyroRates[3], demands_t & demands)
+            void modifyDemands(State & state, demands_t & demands)
             {
                 // Pitch, roll use leveling based on Euler angles
-                demands.roll  = computeCyclicPid(demands.roll,  gyroRates, AXIS_ROLL);
-                demands.pitch = computeCyclicPid(demands.pitch, gyroRates, AXIS_PITCH);
+                demands.roll  = computeCyclicPid(demands.roll,  state.angularVelocities, AXIS_ROLL);
+                demands.pitch = computeCyclicPid(demands.pitch, state.angularVelocities, AXIS_PITCH);
 
                 // For gyroYaw, P term comes directly from RC command, and D term is zero
-                float ITermGyroYaw = computeITermGyro(_gyroYawP, _gyroYawI, demands.yaw, gyroRates, AXIS_YAW);
-                demands.yaw = computePid(_gyroYawP, demands.yaw, ITermGyroYaw, 0, gyroRates, AXIS_YAW);
+                float ITermGyroYaw = computeITermGyro(_gyroYawP, _gyroYawI, demands.yaw, state.angularVelocities, AXIS_YAW);
+                demands.yaw = computePid(_gyroYawP, demands.yaw, ITermGyroYaw, 0, state.angularVelocities, AXIS_YAW);
 
                 // Prevent "gyroYaw jump" during gyroYaw correction
                 demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));

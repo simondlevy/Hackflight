@@ -34,6 +34,7 @@ namespace hf {
         public:
 
             float eulerAngles[3];
+            float angularVelocities[3];
             bool  armed;
             float altitude;
             float variometer;
@@ -53,8 +54,9 @@ namespace hf {
 
             void updateGyrometer(float gyroRates[3], uint32_t microseconds)
             {
-                (void)gyroRates;
                 (void)microseconds;
+
+                memcpy(angularVelocities, gyroRates, 3*sizeof(float));
             }
 
             void updateAccelerometer(float accelGs[3], uint32_t microseconds)

@@ -29,6 +29,7 @@
 #include "debug.hpp"
 #include "datatypes.hpp"
 #include "state.hpp"
+#include "pidcontroller.hpp"
 
 namespace hf {
 
@@ -39,9 +40,10 @@ namespace hf {
             // Passed to Hackflight::init() for a particular board and receiver
             Board      * _board;
             Receiver   * _receiver;
-            Stabilizer * _stabilizer;
-            Loiter      * _loiter;
             Mixer      * _mixer;
+
+            Stabilizer * _stabilizer;
+            Loiter     * _loiter;
 
             // Vehicle state
             State _state;
@@ -91,7 +93,7 @@ namespace hf {
                     memcpy(&demands, &_receiver->demands, sizeof(demands_t));
 
                     // Run stabilization PID controller to get updated demands
-                    _stabilizer->modifyDemands(gyroRates, demands);
+                    _stabilizer->modifyDemands(_state, demands);
 
                     // Run loiter PID controller if specified
                     if (_loiter && _receiver->flightMode() == MODE_LOITER) {
@@ -157,7 +159,7 @@ namespace hf {
                 if (!_receiver->getDemands(_state.eulerAngles[AXIS_YAW] - _yawInitial)) return;
 
                 // Update stabilizer with cyclic demands
-                _stabilizer->updateDemands(_receiver->demands);
+                _stabilizer->updateReceiver(_receiver->demands);
 
                 // When landed, reset integral component of PID
                 if (_receiver->throttleIsDown()) {
@@ -213,8 +215,9 @@ namespace hf {
                 // Store the essentials
                 _board      = board;
                 _receiver   = receiver;
-                _stabilizer = stabilizer;
                 _mixer      = mixer;
+
+                _stabilizer = stabilizer;
                 _loiter     = loiter;
 
                 // Initialize state
@@ -233,6 +236,10 @@ namespace hf {
                 _failsafe = false;
 
             } // init
+
+            void addPidController(PID_Controller & pidController) 
+            {
+            }
 
             void update(void)
             {
