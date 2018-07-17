@@ -32,12 +32,14 @@ namespace hf {
 
         public:
 
-        Loiter(float altitudeP, float altitudeD, float cyclicP, float throttleScale=1.f)
+        Loiter(float altitudeP, float altitudeD, float cyclicP, 
+                float throttleScale=1.f, float minAltitude=1.0)
         {
             _altitudeP     = altitudeP;
             _altitudeD     = altitudeD;
             _cyclicP       = cyclicP;
             _throttleScale = throttleScale;
+            _minAltitude   = minAltitude;
 
             _inBandPrev = false;
         }
@@ -46,6 +48,9 @@ namespace hf {
 
         virtual bool modifyDemands(State & state, demands_t & demands) 
         {
+            // Don't do anything till we've reached sufficient altitude
+            if (state.altitude < _minAltitude) return false;
+
             // Reset altitude target if moved into stick deadband
             bool inBandCurr = inBand(demands.throttle);
             if (inBandCurr && !_inBandPrev) {
@@ -76,11 +81,15 @@ namespace hf {
             return inBand(demand) ? demand - _cyclicP*velocity: demand; 
         }
 
-        float _altitudeTarget;
+        // set by constructor
         float _altitudeP;
         float _altitudeD;
         float _cyclicP;
         float _throttleScale;
+        float _minAltitude;
+
+        // modified in-flight
+        float _altitudeTarget;
         bool  _inBandPrev;
 
     };  // class Loiter
