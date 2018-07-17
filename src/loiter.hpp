@@ -46,14 +46,14 @@ namespace hf {
 
         virtual bool modifyDemands(State & state, demands_t & demands) 
         {
-            // Reset integral if moved into stick deadband
+            // Reset altitude target if moved into stick deadband
             bool inBandCurr = inBand(demands.throttle);
             if (inBandCurr && !_inBandPrev) {
                 _altitudeTarget = state.altitude;
             }
             _inBandPrev = inBandCurr;
 
-            // Throttle: inside stick deadband, adjust by variometer; outside deadband, respond weakly to stick demand
+            // Throttle: inside stick deadband, adjust by PID; outside deadband, respond to stick demand
             demands.throttle = inBandCurr ?  
                 _altitudeP * (_altitudeTarget-state.altitude) - _altitudeD * state.variometer: 
                 _throttleScale*demands.throttle;
