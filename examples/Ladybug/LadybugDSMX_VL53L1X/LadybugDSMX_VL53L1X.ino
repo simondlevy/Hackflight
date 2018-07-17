@@ -42,8 +42,8 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
         0.005625f); // Gyro yaw I
 
 hf::Loiter loiter = hf::Loiter(
-	0.35f,  // Altitude P
-	0.1f,  // Altitude D
+	0.40f,  // Altitude P
+	0.2f,  // Altitude D
 	0.f);  // Cyclic P
 
 void setup(void)
