@@ -43,8 +43,10 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
 
 hf::Loiter loiter = hf::Loiter(
 	0.40f,  // Altitude P
-	0.2f,  // Altitude D
-	0.f);  // Cyclic P
+	0.2f,   // Altitude D
+	0.f,    // Cyclic P
+    1.0f,   // throttleScale
+    0.04f); // minAltitude
 
 void setup(void)
 {
