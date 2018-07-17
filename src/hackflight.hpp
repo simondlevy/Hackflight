@@ -96,7 +96,7 @@ namespace hf {
                     // Run loiter PID controller if specified
                     if (_loiter && _receiver->flightMode() == MODE_LOITER) {
                         bool loitering = _loiter->modifyDemands(_state, demands);
-                        _board->showLoiterStatus(loitering);
+                        _board->showLoiterStatus(loitering, _state.armed);
                     }
 
                     // Sync failsafe to gyro loop

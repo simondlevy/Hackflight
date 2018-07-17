@@ -62,9 +62,9 @@ namespace hf {
                 }
             }
 
-            void showLoiterStatus(bool loitering)
+            void showLoiterStatus(bool loitering, bool armed)
             {
-                if (loitering) {
+                if (loitering && armed) {
 
                     static uint32_t _usec;
                     static bool state;
