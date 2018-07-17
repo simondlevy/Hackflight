@@ -25,7 +25,7 @@ namespace hf {
 
     class PID_Controller {
 
-        virtual void modifyDemands(State & state, demands_t & demands) = 0;
+        virtual bool modifyDemands(State & state, demands_t & demands) = 0;
 
 
     };  // class PID_Controller

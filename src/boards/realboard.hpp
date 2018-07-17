@@ -29,9 +29,9 @@ namespace hf {
 
             const uint32_t LED_STARTUP_FLASH_MILLI = 1000;
             const uint32_t LED_STARTUP_FLASH_COUNT = 20;
-            const uint32_t LED_LOITERING_MICROS   = 250000;
+            const uint32_t LED_SLOWFLASH_MICROS    = 250000;
 
-            bool _loitering;
+            bool _shouldflash;
 
         protected:
 
@@ -51,34 +51,34 @@ namespace hf {
                 }
                 ledSet(false);
 
-                _loitering = false;
+                _shouldflash = false;
             }
 
             void showArmedStatus(bool armed)
             {
                 // Set LED to indicate armed
-                if (!_loitering) {
+                if (!_shouldflash) {
                     ledSet(armed);
                 }
             }
 
-            void showLoiterStatus(bool loitering, bool armed)
+            void flashLed(bool shouldflash)
             {
-                if (loitering && armed) {
+                if (shouldflash) {
 
                     static uint32_t _usec;
                     static bool state;
 
                     uint32_t usec = getMicroseconds();
 
-                    if (usec-_usec > LED_LOITERING_MICROS) {
+                    if (usec-_usec > LED_SLOWFLASH_MICROS) {
                         state = !state;
                         ledSet(state);
                         _usec = usec;
                     }
                 }
 
-                _loitering = loitering;
+                _shouldflash = shouldflash;
             }
 
     }; // class RealBoard

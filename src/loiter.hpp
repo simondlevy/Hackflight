@@ -33,7 +33,7 @@ namespace hf {
         public:
 
         Loiter(float altitudeP, float altitudeD, float cyclicP, 
-                float throttleScale=1.f, float minAltitude=1.0)
+                float throttleScale=1.f, float minAltitude=0.5)
         {
             _altitudeP     = altitudeP;
             _altitudeD     = altitudeD;

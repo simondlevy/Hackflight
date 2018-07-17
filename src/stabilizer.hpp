@@ -180,7 +180,7 @@ namespace hf {
                 _proportionalCyclicDemand = Filter::max(fabs(_demandRoll), fabs(_demandPitch)) / 0.5f;
             }
 
-            void modifyDemands(State & state, demands_t & demands)
+            bool modifyDemands(State & state, demands_t & demands)
             {
                 // Pitch, roll use leveling based on Euler angles
                 demands.roll  = computeCyclicPid(demands.roll,  state.angularVelocities, AXIS_ROLL);
@@ -192,6 +192,9 @@ namespace hf {
 
                 // Prevent "gyroYaw jump" during gyroYaw correction
                 demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));
+
+                // We've always gotta do this!
+                return true;
             }
 
             void resetIntegral(void)
