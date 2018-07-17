@@ -137,6 +137,13 @@ namespace hf {
                 return demand * (1 - fabs(eulerAngle)/maxArmingAngle);
             }
 
+            void resetIntegral(void)
+            {
+                _errorGyroI[AXIS_ROLL] = 0;
+                _errorGyroI[AXIS_PITCH] = 0;
+                _errorGyroI[AXIS_YAW] = 0;
+            }
+
         protected:
 
             float maxArmingAngle;
@@ -171,13 +178,19 @@ namespace hf {
                 computeCyclicPTerm(_demandPitch, eulerAngles, 1, flightmode);
             }
 
-            void updateReceiver(demands_t & demands)
+            void updateReceiver(demands_t & demands, bool throttleIsDown)
             {
                 _demandRoll  = demands.roll;
                 _demandPitch = demands.pitch;
 
                 // Compute proportion of cyclic demand compared to its maximum
                 _proportionalCyclicDemand = Filter::max(fabs(_demandRoll), fabs(_demandPitch)) / 0.5f;
+                
+                // When landed, reset integral component of PID
+                if (throttleIsDown) {
+                    resetIntegral();
+                }
+
             }
 
             bool modifyDemands(State & state, demands_t & demands)
@@ -195,13 +208,6 @@ namespace hf {
 
                 // We've always gotta do this!
                 return true;
-            }
-
-            void resetIntegral(void)
-            {
-                _errorGyroI[AXIS_ROLL] = 0;
-                _errorGyroI[AXIS_PITCH] = 0;
-                _errorGyroI[AXIS_YAW] = 0;
             }
 
     };  // class Stabilize

@@ -159,12 +159,7 @@ namespace hf {
                 if (!_receiver->getDemands(_state.eulerAngles[AXIS_YAW] - _yawInitial)) return;
 
                 // Update stabilizer with cyclic demands
-                _stabilizer->updateReceiver(_receiver->demands);
-
-                // When landed, reset integral component of PID
-                if (_receiver->throttleIsDown()) {
-                    _stabilizer->resetIntegral();
-                }
+                _stabilizer->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
 
                 // Disarm
                 if (_state.armed && _receiver->disarming()) {
