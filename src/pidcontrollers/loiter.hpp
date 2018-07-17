@@ -22,6 +22,7 @@
 #include "datatypes.hpp"
 #include "state.hpp"
 #include "receiver.hpp"
+#include "pidcontroller.hpp"
 
 namespace hf {
 

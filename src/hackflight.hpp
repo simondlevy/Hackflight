@@ -24,12 +24,12 @@
 #include "msp.hpp"
 #include "mixer.hpp"
 #include "receiver.hpp"
-#include "stabilizer.hpp"
-#include "loiter.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 #include "state.hpp"
 #include "pidcontroller.hpp"
+#include "pidcontrollers/stabilizer.hpp"
+#include "pidcontrollers/loiter.hpp"
 
 namespace hf {
 
