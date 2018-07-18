@@ -98,7 +98,7 @@ namespace hf {
                 if (_board->getGyrometer(gyroRates)) {
 
                     // Update state with gyro rates
-                    _state.updateGyrometer(gyroRates, _board->getMicroseconds());
+                    _state.updateGyrometer(gyroRates, _board->getTime());
 
                     // Start with demands from receiver
                     memcpy(&_demands, &_receiver->demands, sizeof(demands_t));
@@ -154,7 +154,7 @@ namespace hf {
             {
                 float distance;
                 if (_board->getRangefinder(distance)) {
-                    _state.updateRangefinder(distance, _board->getMicroseconds());
+                    _state.updateRangefinder(distance, _board->getTime());
                 }
             }
 
@@ -213,6 +213,22 @@ namespace hf {
                 }
             }
 
+            void checkSensors(void)
+            {
+                // XXX these need to be subclasses of Sensor
+                checkOpticalFlow();
+                checkRangefinder();
+
+                for (uint8_t k=0; k<_sensor_count; ++k) {
+
+                    Sensor * sensor = _sensors[k];
+
+                    if (sensor->ready()) {
+                        sensor->modifyState(_state, _board->getTime());
+                    }
+                }
+            }
+
         public:
 
             void init(Board * board, Receiver * receiver, Mixer * mixer, Stabilizer * stabilizer)
@@ -266,8 +282,7 @@ namespace hf {
                 checkGyrometer();
                 checkQuaternion();
 
-                checkOpticalFlow();
-                checkRangefinder();
+                checkSensors();
             } 
 
     }; // class Hackflight

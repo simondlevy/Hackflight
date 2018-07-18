@@ -27,31 +27,37 @@ namespace hf {
 
         private:
 
-            const uint32_t LED_STARTUP_FLASH_MILLI = 1000;
-            const uint32_t LED_STARTUP_FLASH_COUNT = 20;
-            const uint32_t LED_SLOWFLASH_MICROS    = 250000;
+            static constexpr float   LED_STARTUP_FLASH_SECONDS = 1.0;
+            static constexpr uint8_t LED_STARTUP_FLASH_COUNT   = 20;
+            static constexpr float   LED_SLOWFLASH_SECONDS     = 0.25;
 
             bool _shouldflash;
 
         protected:
 
-            virtual void delayMilliseconds(uint32_t msec) { (void)msec; } 
-            virtual void ledSet(bool is_on) { (void)is_on; }
+            virtual uint32_t getMicroseconds(void) = 0;
+            virtual void     delaySeconds(float time) = 0;
+            virtual void     ledSet(bool is_on) = 0;
 
             void init(void)
             {
                 // Flash LED
-                uint32_t pauseMilli = LED_STARTUP_FLASH_MILLI / LED_STARTUP_FLASH_COUNT;
+                float pauseSeconds = LED_STARTUP_FLASH_SECONDS / LED_STARTUP_FLASH_COUNT;
                 ledSet(false);
                 for (uint8_t i = 0; i < LED_STARTUP_FLASH_COUNT; i++) {
                     ledSet(true);
-                    delayMilliseconds(pauseMilli);
+                    delaySeconds(pauseSeconds);
                     ledSet(false);
-                    delayMilliseconds(pauseMilli);
+                    delaySeconds(pauseSeconds);
                 }
                 ledSet(false);
 
                 _shouldflash = false;
+            }
+
+            float getTime(void)
+            {
+                return getMicroseconds() / 1.e6f;
             }
 
             void showArmedStatus(bool armed)
@@ -66,15 +72,15 @@ namespace hf {
             {
                 if (shouldflash) {
 
-                    static uint32_t _usec;
+                    static float _time;
                     static bool state;
 
-                    uint32_t usec = getMicroseconds();
+                    float time = getTime();
 
-                    if (usec-_usec > LED_SLOWFLASH_MICROS) {
+                    if (time-_time > LED_SLOWFLASH_SECONDS) {
                         state = !state;
                         ledSet(state);
-                        _usec = usec;
+                        _time = time;
                     }
                 }
 

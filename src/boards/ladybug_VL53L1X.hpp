@@ -81,9 +81,9 @@ namespace hf {
                 }
             }
 
-            void delayMilliseconds(uint32_t msec)
+            void delaySeconds(float sec)
             {
-                delay(msec);
+                delay((uint32_t)(1000*sec));
             }
 
             uint32_t getMicroseconds(void) 

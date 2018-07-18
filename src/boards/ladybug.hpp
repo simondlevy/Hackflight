@@ -65,9 +65,9 @@ namespace hf {
                 }
             }
 
-            void delayMilliseconds(uint32_t msec)
+            void delaySeconds(float sec)
             {
-                delay(msec);
+                delay((uint32_t)(1000*sec));
             }
 
             void ledSet(bool is_on)
@@ -88,6 +88,11 @@ namespace hf {
             void serialWriteByte(uint8_t c)
             {
                 Serial.write(c);
+            }
+
+            virtual uint32_t getMicroseconds(void) override
+            {
+                return micros();
             }
 
             void writeMotor(uint8_t index, float value)

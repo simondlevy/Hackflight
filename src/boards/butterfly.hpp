@@ -161,6 +161,16 @@ namespace hf {
                 _escs[index].writeMicroseconds((uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)));
             }
 
+            virtual uint32_t getMicroseconds(void) override
+            {
+                return micros();
+            }
+
+            void delaySeconds(float sec)
+            {
+                delay((uint32_t)(1000*sec));
+            }
+
             bool getGyrometer(float gyro[3])
             {
                 if (gotNewData) {

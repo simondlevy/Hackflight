@@ -52,24 +52,6 @@ namespace hf {
                 _rangefinderLpf.init();
             }
 
-            void updateGyrometer(float gyroRates[3], uint32_t microseconds)
-            {
-                (void)microseconds;
-
-                memcpy(angularVelocities, gyroRates, 3*sizeof(float));
-            }
-
-            void updateAccelerometer(float accelGs[3], uint32_t microseconds)
-            {
-                (void)accelGs;
-                (void)microseconds;
-            }
-
-            void updateBarometer(float pressure)
-            {
-                (void)pressure;
-            }
-
             void updateQuaternion(float q[4])
             {
                 eulerAngles[0] = atan2(2.0f*(q[0]*q[1]+q[2]*q[3]),q[0]*q[0]-q[1]*q[1]-q[2]*q[2]+q[3]*q[3]);
@@ -82,15 +64,21 @@ namespace hf {
                 }
             }
 
+            void updateGyrometer(float gyroRates[3], float seconds)
+            {
+                (void)seconds;
+
+                memcpy(angularVelocities, gyroRates, 3*sizeof(float));
+            }
+
             void updateOpticalFlow(float flow[2])
             {
                 velocityForward   = flow[0];
                 velocityRightward = flow[1];
             }
 
-            void updateRangefinder(float distance, uint32_t microseconds)
+            void updateRangefinder(float distance, float seconds)
             {
-                float seconds = microseconds / 1.e6;
                 static float _seconds;
                 static float _altitude;
 

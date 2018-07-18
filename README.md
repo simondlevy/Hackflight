@@ -52,10 +52,10 @@ radio receiver, model (airframe), and PID control settings, Hackflight provides
 a separate C++ class to support each of these components:
 <ul>
 <li> The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp">Board</a>
-class specifies a set of three abstract (pure virtual) methods that you must
+class specifies a set of four abstract (pure virtual) methods that you must
 implement for a particular flight controller or simulator: getting the current
 quaternion from the IMU; getting gyrometer rates from the IMU; and sending
-commands to the motors.  <li> The <a
+commands to the motorsa; and getting the current time.  <li> The <a
 href="https://github.com/simondlevy/Hackflight/blob/master/src/receiver.hpp">Receiver</a>
 class performs basic functions associated with R/C control (tracking stick
 positions, checking switches) and specifies a set of abstract methods that you

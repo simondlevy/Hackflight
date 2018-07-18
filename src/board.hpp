@@ -31,18 +31,16 @@ namespace hf {
         protected:
 
             //------------------------------------ Core functionality ----------------------------------------------------
-            virtual bool getQuaternion(float quat[4]) = 0;
-            virtual bool getGyrometer(float gyroRates[3]) = 0;
-            virtual void writeMotor(uint8_t index, float value) = 0;
+            virtual bool  getQuaternion(float quat[4]) = 0;
+            virtual bool  getGyrometer(float gyroRates[3]) = 0;
+            virtual void  writeMotor(uint8_t index, float value) = 0;
+            virtual float getTime(void) = 0;
 
             //----------------------------- Support for additional sensors -----------------------------------------------
             virtual bool getAccelerometer(float accelGs[3]) { (void)accelGs; return false; }
             virtual bool getBarometer(float & pressure) { (void)pressure; return false; }
             virtual bool getOpticalFlow(float flow[2]) { (void)flow; return false; }
             virtual bool getRangefinder(float & distance) { (void)distance;  return false; }
-
-            //----------------------------------------- Timing -----------------------------------------------------------
-            virtual uint32_t getMicroseconds(void) { return 0; }
 
             //------------------------------- Serial communications via MSP ----------------------------------------------
             virtual uint8_t serialAvailableBytes(void) { return 0; }
