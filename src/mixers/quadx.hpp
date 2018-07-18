@@ -19,7 +19,6 @@
 #pragma once
 
 #include "board.hpp"
-#include "filter.hpp"
 #include "debug.hpp"
 #include "mixer.hpp"
 #include "datatypes.hpp"

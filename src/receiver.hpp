@@ -24,7 +24,6 @@
 #include <algorithm>
 #include <cmath>
 
-#include "filter.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 

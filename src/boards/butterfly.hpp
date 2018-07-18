@@ -29,7 +29,7 @@
 #include <MS5637.h>
 #include <ArduinoTransfer.h>
 
-#include "quaternionFilters.hpp"
+#include "filters.hpp"
 #include "hackflight.hpp"
 #include "realboard.hpp"
 
@@ -111,7 +111,7 @@ namespace hf {
             int16_t _imuData[7] = {0,0,0,0,0,0,0};
 
             // Quaternion support
-            MadgwickQuaternion _quaternionCalculator = MadgwickQuaternion(BETA);
+            MadgwickQuaternionFilter _quaternionFilter = MadgwickQuaternionFilter(BETA);
             uint32_t _sumCount = 0;                          // used to control display output rate
             const uint16_t SUM_COUNT_MAX = 1000 / QUATERNION_UPDATE_RATE;
             uint32_t _timePrev = 0;                          // used to calculate integration interval
@@ -209,7 +209,7 @@ namespace hf {
 
                             _sumCount++;
 
-                            _quaternionCalculator.update(-ax, ay, az, gx, -gy, -gz, my, -mx, mz, deltat, _q);
+                            _quaternionFilter.update(-ax, ay, az, gx, -gy, -gz, my, -mx, mz, deltat, _q);
                         }
 
                         // Copy gyro values back out

@@ -21,7 +21,7 @@
 #include <cmath>
 
 #include "debug.hpp"
-#include "filter.hpp"
+#include "filters.hpp"
 
 namespace hf {
 

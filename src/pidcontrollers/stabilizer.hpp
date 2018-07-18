@@ -25,7 +25,7 @@
 #include <cmath>
 
 #include "receiver.hpp"
-#include "filter.hpp"
+#include "filters.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"

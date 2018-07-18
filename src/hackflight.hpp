@@ -265,9 +265,11 @@ namespace hf {
 
             void update(void)
             {
+                // Essentials
                 checkGyrometer();
                 checkQuaternion();
                 checkReceiver();
+
                 checkAccelerometer();
                 checkBarometer();
                 checkOpticalFlow();
