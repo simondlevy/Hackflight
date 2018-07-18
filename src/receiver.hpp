@@ -83,7 +83,7 @@ namespace hf {
 
         static const uint8_t CHANNELS = 5;
 
-        flightmode_t _mode;
+        uint8_t _auxState;
 
         // channel indices
         enum {
@@ -210,8 +210,8 @@ namespace hf {
             // Pass throttle demand through exponential function
             demands.throttle = throttleFun(rawvals[CHANNEL_THROTTLE]);
             
-            // Store auxiliary switch state for flight mode (rate, level, loiter)
-            _mode = rawvals[CHANNEL_AUX] >= 0.0 ? (rawvals[CHANNEL_AUX] > .4 ? MODE_LOITER : MODE_LEVEL) : MODE_RATE;
+            // Store auxiliary switch state 
+            _auxState = rawvals[CHANNEL_AUX] >= 0.0 ? (rawvals[CHANNEL_AUX] > .4 ? 2 : 1) : 0;
 
             // Got a new frame
             return true;
@@ -224,10 +224,11 @@ namespace hf {
             return rawvals[CHANNEL_THROTTLE] < -1 + MARGIN;
         }
 
-        virtual flightmode_t flightMode(void)
+        virtual uint8_t getAuxState(void)
         {
-            return _mode;
+            return _auxState;
         }
+
 
         public:
 

@@ -101,9 +101,9 @@ namespace hf {
             }
 
             // Computes leveling PID for pitch or roll
-            void computeCyclicPTerm(float demand, float eulerAngles[3], uint8_t imuAxis, flightmode_t flightmode)
+            void computeCyclicPTerm(float demand, float eulerAngles[3], uint8_t imuAxis, uint8_t auxState)
             {
-                if (flightmode == MODE_RATE) {
+                if (auxState == 0) {
                     _PTerm[imuAxis] = demand; 
                 }
 
@@ -172,10 +172,10 @@ namespace hf {
                 resetIntegral();
             }
 
-            void updateEulerAngles(float eulerAngles[3], flightmode_t flightmode)
+            void updateEulerAngles(float eulerAngles[3], uint8_t auxState)
             {
-                computeCyclicPTerm(_demandRoll,  eulerAngles, 0, flightmode);
-                computeCyclicPTerm(_demandPitch, eulerAngles, 1, flightmode);
+                computeCyclicPTerm(_demandRoll,  eulerAngles, 0, auxState);
+                computeCyclicPTerm(_demandPitch, eulerAngles, 1, auxState);
             }
 
             void updateReceiver(demands_t & demands, bool throttleIsDown)

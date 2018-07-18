@@ -27,7 +27,7 @@
 namespace hf {
 
 
-    class Loiter {
+    class Loiter : public PID_Controller {
 
         friend class Hackflight;
 
@@ -69,6 +69,11 @@ namespace hf {
             demands.roll  = adjustCyclic(demands.roll,  state.velocityRightward);
 
             return inBandCurr;
+        }
+
+        virtual bool shouldFlashLed(void) override 
+        {
+            return true;
         }
 
         bool inBand(float demand)

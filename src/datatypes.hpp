@@ -28,11 +28,3 @@ typedef struct {
     float yaw;
 
 } demands_t;
-
-typedef enum {
-
-    MODE_RATE,
-    MODE_LEVEL,
-    MODE_LOITER
-
-} flightmode_t;

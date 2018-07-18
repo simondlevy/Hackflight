@@ -43,7 +43,10 @@ namespace hf {
             Mixer      * _mixer;
 
             Stabilizer * _stabilizer;
-            Loiter     * _loiter;
+
+            // PID controllers
+            PID_Controller * _pid_controllers[256];
+            uint8_t _pid_controller_count;
 
             // Vehicle state
             State _state;
@@ -72,7 +75,7 @@ namespace hf {
                     _state.updateQuaternion(q);
 
                     // Update stabilizer with new Euler angles
-                    _stabilizer->updateEulerAngles(_state.eulerAngles, _receiver->flightMode());
+                    _stabilizer->updateEulerAngles(_state.eulerAngles, _receiver->getAuxState());
 
                     // Synch serial comms to quaternion check
                     doSerialComms();
@@ -92,14 +95,23 @@ namespace hf {
                     demands_t demands;
                     memcpy(&demands, &_receiver->demands, sizeof(demands_t));
 
-                    // Run stabilization PID controller to get updated demands
-                    _stabilizer->modifyDemands(_state, demands);
+                    // Run PID controllers
+                    uint8_t auxState = _receiver->getAuxState();
+                    bool shouldFlash = false;
+                    for (uint8_t k=0; k<_pid_controller_count; ++k) {
+                        PID_Controller * pidController = _pid_controllers[k];
+                        // XXX we should allow associating PID controllers with particular aux states
+                        if (pidController->auxState <= auxState) {  
 
-                    // Run loiter PID controller if specified
-                    if (_loiter && _receiver->flightMode() == MODE_LOITER) {
-                        bool loitering = _loiter->modifyDemands(_state, demands);
-                        _board->flashLed(loitering);
+                            bool modified = pidController->modifyDemands(_state, demands);
+                            if (modified && pidController->shouldFlashLed()) {
+                                shouldFlash = true;
+                            }
+                        }
                     }
+
+                    // Flash LED for certain PID controllers
+                    _board->flashLed(shouldFlash);
 
                     // Sync failsafe to gyro loop
                     checkFailsafe();
@@ -201,19 +213,15 @@ namespace hf {
         public:
 
             void init(Board * board, Receiver * receiver, Mixer * mixer, Stabilizer * stabilizer)
-            {
-                init(board, receiver, mixer, stabilizer, NULL);
-            }
-
-            void init(Board * board, Receiver * receiver, Mixer * mixer, Stabilizer * stabilizer, Loiter * loiter)
             {  
                 // Store the essentials
                 _board      = board;
                 _receiver   = receiver;
                 _mixer      = mixer;
-
                 _stabilizer = stabilizer;
-                _loiter     = loiter;
+
+                // First PID controller is always stabilizer, aux state = 0
+                addPidController(stabilizer, 0);
 
                 // Initialize state
                 _state.init();
@@ -232,8 +240,11 @@ namespace hf {
 
             } // init
 
-            void addPidController(PID_Controller & pidController) 
+            void addPidController(PID_Controller * pidController, uint8_t auxState) 
             {
+                pidController->auxState = auxState;
+
+                _pid_controllers[_pid_controller_count++] = pidController;
             }
 
             void update(void)

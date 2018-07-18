@@ -25,8 +25,15 @@ namespace hf {
 
     class PID_Controller {
 
+        friend class Hackflight;
+
+        protected:
+
         virtual bool modifyDemands(State & state, demands_t & demands) = 0;
 
+        virtual bool shouldFlashLed(void) { return false; }
+
+        uint8_t auxState;
 
     };  // class PID_Controller
 

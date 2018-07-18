@@ -51,7 +51,10 @@ hf::Loiter loiter = hf::Loiter(
 void setup(void)
 {
     // Initialize Hackflight firmware
-    h.init(new hf::Ladybug(), &rc, &mixer, &stabilizer, &loiter);
+    h.init(new hf::Ladybug(), &rc, &mixer, &stabilizer);
+
+    // Add Loiter PID controller for aux switch position 2
+    h.addPidController(&loiter, 2);
 }
 
 void loop(void)
