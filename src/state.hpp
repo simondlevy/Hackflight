@@ -71,12 +71,6 @@ namespace hf {
                 memcpy(angularVelocities, gyroRates, 3*sizeof(float));
             }
 
-            void updateOpticalFlow(float flow[2])
-            {
-                velocityForward   = flow[0];
-                velocityRightward = flow[1];
-            }
-
             void updateRangefinder(float distance, float seconds)
             {
                 static float _seconds;

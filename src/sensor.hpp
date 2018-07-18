@@ -29,7 +29,7 @@ namespace hf {
 
         protected:
 
-        virtual bool modifyState(State & state, uint32_t microsec) = 0;
+        virtual bool modifyState(State & state, float time) = 0;
 
         virtual bool ready(void) = 0;
 

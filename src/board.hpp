@@ -37,9 +37,6 @@ namespace hf {
             virtual float getTime(void) = 0;
 
             //----------------------------- Support for additional sensors -----------------------------------------------
-            virtual bool getAccelerometer(float accelGs[3]) { (void)accelGs; return false; }
-            virtual bool getBarometer(float & pressure) { (void)pressure; return false; }
-            virtual bool getOpticalFlow(float flow[2]) { (void)flow; return false; }
             virtual bool getRangefinder(float & distance) { (void)distance;  return false; }
 
             //------------------------------- Serial communications via MSP ----------------------------------------------

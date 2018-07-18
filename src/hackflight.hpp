@@ -142,14 +142,6 @@ namespace hf {
             }
 
 
-            void checkOpticalFlow(void)
-            {
-                float flow[2];
-                if (_board->getOpticalFlow(flow)) {
-                    _state.updateOpticalFlow(flow);
-                }
-            }
-
             void checkRangefinder(void)
             {
                 float distance;
@@ -216,7 +208,6 @@ namespace hf {
             void checkSensors(void)
             {
                 // XXX these need to be subclasses of Sensor
-                checkOpticalFlow();
                 checkRangefinder();
 
                 for (uint8_t k=0; k<_sensor_count; ++k) {
