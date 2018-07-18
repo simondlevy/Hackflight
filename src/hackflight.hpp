@@ -42,15 +42,19 @@ namespace hf {
             Receiver   * _receiver;
             Mixer      * _mixer;
 
-            Stabilizer * _stabilizer;
-
             // PID controllers
             PID_Controller * _pid_controllers[256];
             uint8_t _pid_controller_count;
 
+            // Stabilizer is mandatory and is always the first PID controller
+            Stabilizer * _stabilizer;
+
             // Vehicle state
             State _state;
 
+            // Demands sent to mixer
+            demands_t _demands;
+            
             // MSP (serial comms)
             MSP _msp;
 
@@ -82,7 +86,7 @@ namespace hf {
                 }
             }
 
-            void checkGyroRates(void)
+            void checkGyrometer(void)
             {
                 float gyroRates[3];
 
@@ -92,36 +96,46 @@ namespace hf {
                     _state.updateGyrometer(gyroRates, _board->getMicroseconds());
 
                     // Start with demands from receiver
-                    demands_t demands;
-                    memcpy(&demands, &_receiver->demands, sizeof(demands_t));
+                    memcpy(&_demands, &_receiver->demands, sizeof(demands_t));
 
-                    // Run PID controllers
-                    uint8_t auxState = _receiver->getAuxState();
-                    bool shouldFlash = false;
-                    for (uint8_t k=0; k<_pid_controller_count; ++k) {
-                        PID_Controller * pidController = _pid_controllers[k];
-                        // XXX we should allow associating PID controllers with particular aux states
-                        if (pidController->auxState <= auxState) {  
-
-                            bool modified = pidController->modifyDemands(_state, demands);
-                            if (modified && pidController->shouldFlashLed()) {
-                                shouldFlash = true;
-                            }
-                        }
-                    }
-
-                    // Flash LED for certain PID controllers
-                    _board->flashLed(shouldFlash);
+                    // Synch PID controllers to gyro update
+                    runPidControllers();
 
                     // Sync failsafe to gyro loop
                     checkFailsafe();
 
                     // Use updated demands to run motors
                     if (_state.armed && !_failsafe && !_receiver->throttleIsDown()) {
-                        _mixer->runArmed(demands);
+                        _mixer->runArmed(_demands);
                     }
                 }
             }
+
+            void runPidControllers(void)
+            {
+                // Each PID controllers is associated with at least one auxiliary switch state
+                uint8_t auxState = _receiver->getAuxState();
+
+                // Some PID controllers should cause LED to flash when they're active
+                bool shouldFlash = false;
+
+                for (uint8_t k=0; k<_pid_controller_count; ++k) {
+
+                    PID_Controller * pidController = _pid_controllers[k];
+
+                    // XXX we should allow associating PID controllers with particular aux states
+                    if (pidController->auxState <= auxState) {  
+
+                        if (pidController->modifyDemands(_state, _demands) && pidController->shouldFlashLed()) {
+                            shouldFlash = true;
+                        }
+                    }
+                }
+
+                // Flash LED for certain PID controllers
+                _board->flashLed(shouldFlash);
+            }
+
 
             void checkBarometer(void)
             {
@@ -220,6 +234,8 @@ namespace hf {
                 _mixer      = mixer;
                 _stabilizer = stabilizer;
 
+                _pid_controller_count = 0;
+
                 // First PID controller is always stabilizer, aux state = 0
                 addPidController(stabilizer, 0);
 
@@ -249,7 +265,7 @@ namespace hf {
 
             void update(void)
             {
-                checkGyroRates();
+                checkGyrometer();
                 checkQuaternion();
                 checkReceiver();
                 checkAccelerometer();
