@@ -20,6 +20,7 @@
 
 #include <cmath>
 
+#include "sensor.hpp"
 #include "board.hpp"
 #include "msp.hpp"
 #include "mixer.hpp"
@@ -45,6 +46,10 @@ namespace hf {
             // PID controllers
             PID_Controller * _pid_controllers[256];
             uint8_t _pid_controller_count;
+
+            // Sensors 
+            Sensor * _sensors[256];
+            uint8_t _sensor_count;
 
             // Stabilizer is mandatory and is always the first PID controller
             Stabilizer * _stabilizer;
@@ -137,22 +142,6 @@ namespace hf {
             }
 
 
-            void checkBarometer(void)
-            {
-                float pressure;
-                if (_board->getBarometer(pressure)) {
-                    _state.updateBarometer(pressure);
-                }
-            }
-
-            void checkAccelerometer(void)
-            {
-                float accelGs[3];
-                if (_board->getAccelerometer(accelGs)) {
-                    _state.updateAccelerometer(accelGs, _board->getMicroseconds());
-                }
-            }
-
             void checkOpticalFlow(void)
             {
                 float flow[2];
@@ -234,6 +223,8 @@ namespace hf {
                 _mixer      = mixer;
                 _stabilizer = stabilizer;
 
+                // Support adding new sensors and PID controllers
+                _sensor_count = 0;
                 _pid_controller_count = 0;
 
                 // First PID controller is always stabilizer, aux state = 0
@@ -256,6 +247,11 @@ namespace hf {
 
             } // init
 
+            void addSensor(Sensor * sensor) 
+            {
+                _sensors[_sensor_count++] = sensor;
+            }
+
             void addPidController(PID_Controller * pidController, uint8_t auxState) 
             {
                 pidController->auxState = auxState;
@@ -265,13 +261,11 @@ namespace hf {
 
             void update(void)
             {
-                // Essentials
-                checkGyrometer();
-                checkQuaternion();
                 checkReceiver();
 
-                checkAccelerometer();
-                checkBarometer();
+                checkGyrometer();
+                checkQuaternion();
+
                 checkOpticalFlow();
                 checkRangefinder();
             } 
