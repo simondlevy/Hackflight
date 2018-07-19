@@ -38,8 +38,6 @@ namespace hf {
             {
                 (void)time; // XXX ignore time for now
 
-                Debug::printf("%+3.3f %+3.3f\n", _flow[0], _flow[1]);
-
                 state.velocityForward   = _flow[0];
                 state.velocityRightward = _flow[1];
 
