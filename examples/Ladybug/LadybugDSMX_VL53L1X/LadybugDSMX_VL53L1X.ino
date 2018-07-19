@@ -24,6 +24,7 @@
 #include "boards/ladybug.hpp"
 #include "receivers/serial/arduino_dsmx.hpp"
 #include "sensors/rangefinder.hpp"
+#include "pidcontrollers/loiter.hpp"
 #include "mixers/quadx.hpp"
 
 hf::Hackflight h;

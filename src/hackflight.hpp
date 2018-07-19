@@ -30,7 +30,6 @@
 #include "state.hpp"
 #include "pidcontroller.hpp"
 #include "pidcontrollers/stabilizer.hpp"
-#include "pidcontrollers/loiter.hpp"
 
 namespace hf {
 
