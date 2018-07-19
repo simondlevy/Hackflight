@@ -3,7 +3,7 @@
 
    Uses moving average of channel values to remove noise
 
-   Adapted from https://github.com/multiwii/baseflight/blob/master/src/mw.h
+   Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
 

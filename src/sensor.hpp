@@ -1,6 +1,8 @@
 /*
    sensor.hpp : Abstract class for sensors
 
+   Copyright (c) 2018 Simon D. Levy
+
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify

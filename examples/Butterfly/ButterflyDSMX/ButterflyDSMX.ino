@@ -1,6 +1,8 @@
 /*
    ButterflySBUS.ino : Hackflight sketch for Butterfly dev-board SBUS receiver
 
+   Copyright (c) 2018 Simon D. Levy
+
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify

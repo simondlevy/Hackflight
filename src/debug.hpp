@@ -5,6 +5,8 @@
     messages.  Your Board implementation should provide and outbuf(char *)
     method that displays the message in an appropriate way.
 
+    Copyright (c) 2018 Simon D. Levy
+
     This file is part of Hackflight.
 
     Hackflight is free software: you can redistribute it and/or modify

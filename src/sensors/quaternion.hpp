@@ -6,6 +6,8 @@
    UE4, where quaternion is provided by physics engine. For other IMUs 
    and simulators, you can use quaternion-filter classes in filters.hpp.
 
+   Copyright (c) 2018 Simon D. Levy
+
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify

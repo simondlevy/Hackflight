@@ -2,6 +2,8 @@
 /*
    LadybugCPPM.ino : Arduino sketech for Hackflight using Ladybug Flight Controller with CPPM recveiver
 
+   Copyright (c) 2018 Simon D. Levy
+
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify

@@ -5,6 +5,8 @@
    Additional libraries required: https://github.com/simondlevy/MPU9250
                                   https://github.com/simondlevy/MS5637
 
+   Copyright (c) 2018 Simon D. Levy
+
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify
