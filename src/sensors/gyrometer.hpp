@@ -1,5 +1,5 @@
 /*
-   gyrometer.hpp : Support for gyrometer (a.k.a. gyroscoe) 
+   gyrometer.hpp : Support for gyrometer (a.k.a. gyroscope) 
 
    This file is part of Hackflight.
 
@@ -29,31 +29,41 @@ namespace hf {
 
     class Gyrometer : public Sensor {
 
-        public:
-
-            Gyrometer(Board * board) 
-            {
-                _board = board;
-            }
+        friend class Hackflight;
 
         protected:
 
+            void init(Board * board) 
+            {
+                _board = board;
+
+                memset(_rates, 0, 3*sizeof(float));
+            }
+
             virtual void modifyState(State & state, float time) override
             {
-                (void)state;
                 (void)time;
+
+                memcpy(&state.angularVelocities, _rates, 3*sizeof(float));
             }
 
             virtual bool ready(float time) override
             {
                 (void)time;
 
+                if (_board->getGyrometer(_rates)) {
+                    return true;
+                }
+
                 return false;
             }
 
         private:
 
+            // Gyro is a surface-mount sensor
             Board * _board;
+
+            float _rates[3];
 
     };  // class Gyrometer
 

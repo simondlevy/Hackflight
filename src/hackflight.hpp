@@ -38,21 +38,22 @@ namespace hf {
 
         private: 
 
-            // Passed to Hackflight::init() for a particular board and receiver
+            // Passed to Hackflight::init() for a particular build
             Board      * _board;
             Receiver   * _receiver;
+            Stabilizer * _stabilizer;
             Mixer      * _mixer;
 
             // PID controllers
             PID_Controller * _pid_controllers[256];
             uint8_t _pid_controller_count;
 
-            // Sensors 
+            // Mandatory sensors on the board
+            Gyrometer _gyrometer;
+
+            // Additional sensors 
             Sensor * _sensors[256];
             uint8_t _sensor_count;
-
-            // Stabilizer is mandatory and is always the first PID controller
-            Stabilizer * _stabilizer;
 
             // Vehicle state
             State _state;
@@ -93,14 +94,16 @@ namespace hf {
 
             void checkGyrometer(void)
             {
-                float gyroRates[3];
+                // Some gyrometers may need to know the current time
+                float time = _board->getTime();
 
-                if (_board->getGyrometer(gyroRates)) {
+                // If gyrometer data ready
+                if (_gyrometer.ready(time)) {
 
                     // Update state with gyro rates
-                    _state.updateGyrometer(gyroRates, _board->getTime());
+                    _gyrometer.modifyState(_state, time);
 
-                    // Start with demands from receiver
+                    // For PID control, start with demands from receiver
                     memcpy(&_demands, &_receiver->demands, sizeof(demands_t));
 
                     // Synch PID controllers to gyro update
@@ -222,6 +225,9 @@ namespace hf {
                 _mixer      = mixer;
                 _stabilizer = stabilizer;
 
+                // Support for mandatory sensors
+                _gyrometer.init(board);
+
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
                 _pid_controller_count = 0;
@@ -260,11 +266,14 @@ namespace hf {
 
             void update(void)
             {
+                // Grab control signal if available
                 checkReceiver();
 
+                // Check mandatory sensors
                 checkGyrometer();
                 checkQuaternion();
 
+                // Check optional sensors
                 checkSensors();
             } 
 

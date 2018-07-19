@@ -25,6 +25,7 @@ namespace hf {
     class Board {
 
         friend class Hackflight;
+        friend class Gyrometer;
         friend class Debug;
         friend class Mixer;
 
@@ -36,7 +37,7 @@ namespace hf {
             virtual void  writeMotor(uint8_t index, float value) = 0;
             virtual float getTime(void) = 0;
 
-            //----------------------------- Support for additional sensors -----------------------------------------------
+            //------------------------- Support for additional surface-mount sensors -------------------------------------
             virtual bool  getAccelerometer(float accelGs[3]) { (void)accelGs;  return false; }
             virtual bool  getBarometer(float & pressure) { (void)pressure;  return false; }
 
