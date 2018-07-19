@@ -1,5 +1,5 @@
 /*
-   sensor.hpp : Abstract class for sensors
+   gyrometer.hpp : Support for gyrometer (a.k.a. gyroscoe) 
 
    This file is part of Hackflight.
 
@@ -18,21 +18,43 @@
 
 #pragma once
 
-#include "state.hpp"
-#include "datatypes.hpp"
+#include <cmath>
+#include <math.h>
+
+#include "debug.hpp"
+#include "sensor.hpp"
+#include "board.hpp"
 
 namespace hf {
 
-    class Sensor {
+    class Gyrometer : public Sensor {
 
-        friend class Hackflight;
+        public:
+
+            Gyrometer(Board * board) 
+            {
+                _board = board;
+            }
 
         protected:
 
-        virtual void modifyState(State & state, float time) = 0;
+            virtual void modifyState(State & state, float time) override
+            {
+                (void)state;
+                (void)time;
+            }
 
-        virtual bool ready(float time) = 0;
+            virtual bool ready(float time) override
+            {
+                (void)time;
 
-    };  // class Sensor
+                return false;
+            }
 
-} // namespace hf
+        private:
+
+            Board * _board;
+
+    };  // class Gyrometer
+
+} // namespace

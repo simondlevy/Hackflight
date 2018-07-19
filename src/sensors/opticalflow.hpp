@@ -34,14 +34,12 @@ namespace hf {
 
         protected:
 
-            virtual bool modifyState(State & state, float time) override
+            virtual void modifyState(State & state, float time) override
             {
                 (void)time; // XXX ignore time for now
 
                 state.velocityForward   = _flow[0];
                 state.velocityRightward = _flow[1];
-
-				return true;
             }
 
             virtual bool ready(float time) override
