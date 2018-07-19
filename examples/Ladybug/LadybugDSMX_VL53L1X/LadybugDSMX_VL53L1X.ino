@@ -18,10 +18,12 @@
  */
 
 #include <Arduino.h>
+#include <SparkFun_VL53L1X_Arduino_Library.h>
 
 #include "hackflight.hpp"
-#include "boards/ladybug_VL53L1X.hpp"
+#include "boards/ladybug.hpp"
 #include "receivers/serial/arduino_dsmx.hpp"
+#include "sensors/rangefinder.hpp"
 #include "mixers/quadx.hpp"
 
 hf::Hackflight h;
@@ -43,15 +45,49 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
 
 hf::Loiter loiter = hf::Loiter(
 	0.40f,  // Altitude P
-	0.2f,   // Altitude D
-	0.f,    // Cyclic P
+    0.2f,   // Altitude D
+    0.f,    // Cyclic P
     1.0f,   // throttleScale
     0.04f); // minAltitude
+
+
+class VL53L1X_Rangefinder : public hf::Rangefinder {
+
+    private:
+
+        VL53L1X _distanceSensor;
+
+    protected:
+
+        virtual bool distanceAvailable(float & distance) override
+        {
+            if (_distanceSensor.newDataReady()) {
+                distance = _distanceSensor.getDistance() / 1000.f; // mm => m
+                return true;
+            }
+            return false;
+        }
+
+    public:
+
+        void begin(void)
+        {
+            _distanceSensor.begin();
+        }
+
+};
+
+VL53L1X_Rangefinder rangefinder;
 
 void setup(void)
 {
     // Initialize Hackflight firmware
-    h.init(new hf::Ladybug(), &rc, &mixer, &stabilizer);
+    // We're using an older ladybug with LED on pin A1
+    h.init(new hf::Ladybug(A1), &rc, &mixer, &stabilizer);
+
+    // Add rangefinder sensor
+    rangefinder.begin();
+    h.addSensor(&rangefinder);
 
     // Add Loiter PID controller for aux switch position 2
     h.addPidController(&loiter, 2);

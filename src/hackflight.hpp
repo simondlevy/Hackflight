@@ -142,14 +142,6 @@ namespace hf {
             }
 
 
-            void checkRangefinder(void)
-            {
-                float distance;
-                if (_board->getRangefinder(distance)) {
-                    _state.updateRangefinder(distance, _board->getTime());
-                }
-            }
-
             void checkFailsafe(void)
             {
                 if (_state.armed && _receiver->lostSignal()) {
@@ -207,15 +199,15 @@ namespace hf {
 
             void checkSensors(void)
             {
-                // XXX these need to be subclasses of Sensor
-                checkRangefinder();
-
                 for (uint8_t k=0; k<_sensor_count; ++k) {
 
                     Sensor * sensor = _sensors[k];
 
-                    if (sensor->ready()) {
-                        sensor->modifyState(_state, _board->getTime());
+                    float time = _board->getTime();
+
+                    if (sensor->ready(time)) {
+
+                        sensor->modifyState(_state, time);
                     }
                 }
             }

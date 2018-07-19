@@ -29,7 +29,6 @@ namespace hf {
 
         private:
 
-            LowPassFilter _rangefinderLpf = LowPassFilter(20);
 
         public:
 
@@ -48,8 +47,6 @@ namespace hf {
                 variometer = 0;
                 velocityForward = 0;
                 velocityRightward = 0;
-
-                _rangefinderLpf.init();
             }
 
             void updateQuaternion(float q[4])
@@ -69,21 +66,6 @@ namespace hf {
                 (void)seconds;
 
                 memcpy(angularVelocities, gyroRates, 3*sizeof(float));
-            }
-
-            void updateRangefinder(float distance, float seconds)
-            {
-                static float _seconds;
-                static float _altitude;
-
-                // Compensate for effect of pitch, roll on rangefinder reading
-                altitude =  distance * cos(eulerAngles[0]) * cos(eulerAngles[1]);
-
-                // Use first-differenced, low-pass-filtered altitude as variometer
-                variometer = _rangefinderLpf.update((altitude-_altitude) / (seconds-_seconds));
-
-                _seconds = seconds;
-                _altitude = altitude;
             }
 
     };  // class State

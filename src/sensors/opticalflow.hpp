@@ -46,8 +46,10 @@ namespace hf {
 				return true;
             }
 
-            virtual bool ready(void) override
+            virtual bool ready(float time) override
             {
+                (void)time;
+
                 getFlow(_flow);
 
                 return true; // XXX ignore readiness for now

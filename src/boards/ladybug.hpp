@@ -35,8 +35,6 @@ namespace hf {
 
         private:
 
-            static const uint8_t LED = A4; // A1 for prototype board
-
             // Tunable EM7180 parameters
             static const uint8_t  ARES           = 8;    // Gs
             static const uint16_t GRES           = 2000; // degrees per second
@@ -46,6 +44,9 @@ namespace hf {
             static const uint16_t GYRO_RATE      = 330;  // Hz
             static const uint8_t  BARO_RATE      = 50;   // Hz
             static const uint8_t  Q_RATE_DIVISOR = 5;    // 1/5 gyro rate
+
+            // Tindie version has LED on pin A4, but we support older version with LED on pin A1
+            uint8_t _led_pin;
 
             const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
 
@@ -72,7 +73,7 @@ namespace hf {
 
             void ledSet(bool is_on)
             { 
-                digitalWrite(LED, is_on ? HIGH : LOW);
+                digitalWrite(_led_pin, is_on ? HIGH : LOW);
             }
 
             uint8_t serialAvailableBytes(void)
@@ -172,14 +173,17 @@ namespace hf {
 
         public:
 
-            Ladybug(void)
+            // Support prototype version where LED is on pin A1
+            Ladybug(uint8_t ledPin = A4) 
             {
+                _led_pin = ledPin;
+
                 // Begin serial comms
                 Serial.begin(115200);
 
                 // Setup LEDs and turn them off
-                pinMode(LED, OUTPUT);
-                digitalWrite(LED, LOW);
+                pinMode(_led_pin, OUTPUT);
+                digitalWrite(_led_pin, LOW);
 
                 // Start I^2C
                 Wire.begin();
