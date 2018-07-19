@@ -1,5 +1,3 @@
-# Hackflight: Simple C++ multirotor flight control firmware for Arduino and simulators
-
 <p align="center"> 
 <img src="logo.png" width=400>
 <br><i>Hackflight logo by MC Greenleaf</i>
@@ -81,5 +79,13 @@ Others can run the <b>hackflight.py</b> Python script in the
 need to install [MSPPG](https://github.com/simondlevy/hackflight/tree/master/extras/parser), a
 parser generator for the Multiwii Serial Protocol (MSP) messages used by the
 firmware. Follow the directions in that repository to install MSPPG for Python.
+
+To support working with new new sensors and PID control algorithms, the <b>Hackflight</b> C++ class provides
+two methods: <tt>addSensor</tt> and <tt>addPidController</tt>.   For an example of how to use these
+methods, take a look at 
+this
+[sketch] (https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/LadybugDSMX_VL53L1X/LadybugDSMX_VL53L1X.ino),
+which uses the [VL53L1X long-range proximity sensor](https://www.tindie.com/products/onehorse/vl53l1-long-range-proximity-sensor/)
+to provide altitude hold.
 
 For more information, check out the Hackflight [wiki](https://github.com/simondlevy/Hackflight/wiki).
