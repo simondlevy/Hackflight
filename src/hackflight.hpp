@@ -30,6 +30,7 @@
 #include "state.hpp"
 #include "pidcontroller.hpp"
 #include "pidcontrollers/stabilizer.hpp"
+#include "sensors/gyrometer.hpp"
 
 namespace hf {
 

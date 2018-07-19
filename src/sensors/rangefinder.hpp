@@ -38,7 +38,7 @@ namespace hf {
 
         protected:
 
-            virtual bool modifyState(State & state, float time) override
+            virtual void modifyState(State & state, float time) override
             {
                 // Previous values to support first-differencing
                 static float _time;
@@ -53,8 +53,6 @@ namespace hf {
                 // Update first-difference values
                 _time = time;
                 _altitude = state.altitude;
-
-				return true;
             }
 
             virtual bool ready(float time) override

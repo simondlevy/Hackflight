@@ -29,7 +29,7 @@ namespace hf {
 
         protected:
 
-        virtual bool modifyState(State & state, float time) = 0;
+        virtual void modifyState(State & state, float time) = 0;
 
         virtual bool ready(float time) = 0;
 

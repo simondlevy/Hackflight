@@ -38,7 +38,7 @@ namespace hf {
 
         protected:
 
-            virtual bool modifyState(State & state, float time) override
+            virtual void modifyState(State & state, float time) override
             {
                 (void)state;
                 (void)time;
