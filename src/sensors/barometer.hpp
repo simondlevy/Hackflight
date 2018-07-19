@@ -40,7 +40,7 @@ namespace hf {
             {
                 SurfaceMountSensor::init(board);
 
-                memset(_gs, 0, 3*sizeof(float));
+                _pressure = 0;
             }
 
             virtual void modifyState(State & state, float time) override

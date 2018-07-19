@@ -29,6 +29,8 @@ namespace hf {
         friend class Hackflight;
         friend class Gyrometer;
         friend class Quaternion;
+        friend class Accelerometer;
+        friend class Barometer;
         friend class Debug;
         friend class Mixer;
 
