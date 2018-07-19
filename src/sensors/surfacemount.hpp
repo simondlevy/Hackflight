@@ -1,8 +1,8 @@
 /*
-   gyrometer.hpp : Support for gyrometer (a.k.a. gyroscope) 
+   surfacemount.hpp : Abstract class for surface-mounted sensors (IMU, barometer)
 
    Copyright (c) 2018 Simon D. Levy
-
+   
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify
@@ -20,51 +20,22 @@
 
 #pragma once
 
-#include <cmath>
-#include <math.h>
-
-#include "debug.hpp"
 #include "sensor.hpp"
-#include "surfacemount.hpp"
 #include "board.hpp"
 
 namespace hf {
 
-    class Gyrometer : public SurfaceMountSensor {
-
-        friend class Hackflight;
+    class SurfaceMountSensor : public Sensor {
 
         protected:
 
             void init(Board * board) 
             {
-                SurfaceMountSensor::init(board);
-
-                memset(_rates, 0, 3*sizeof(float));
+                _board = board;
             }
 
-            virtual void modifyState(State & state, float time) override
-            {
-                (void)time;
+            Board * _board;
 
-                memcpy(&state.angularVelocities, _rates, 3*sizeof(float));
-            }
-
-            virtual bool ready(float time) override
-            {
-                (void)time;
-
-                if (_board->getGyrometer(_rates)) {
-                    return true;
-                }
-
-                return false;
-            }
-
-        private:
-
-            float _rates[3];
-
-    };  // class Gyrometer
+    };  // class SurfaceMountSensor
 
 } // namespace

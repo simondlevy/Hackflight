@@ -30,11 +30,12 @@
 
 #include "debug.hpp"
 #include "sensor.hpp"
+#include "surfacemount.hpp"
 #include "board.hpp"
 
 namespace hf {
 
-    class Quaternion : public Sensor {
+    class Quaternion : public SurfaceMountSensor {
 
         friend class Hackflight;
 
@@ -42,7 +43,7 @@ namespace hf {
 
             void init(Board * board) 
             {
-                _board = board;
+                SurfaceMountSensor::init(board);
 
                 memset(_quat, 0, 4*sizeof(float));
             }
@@ -75,9 +76,6 @@ namespace hf {
             }
 
         private:
-
-            // Gyro is a surface-mount sensor
-            Board * _board;
 
             float _quat[4];
 
