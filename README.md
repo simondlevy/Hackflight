@@ -84,7 +84,7 @@ To support working with new new sensors and PID control algorithms, the <b>Hackf
 two methods: <tt>addSensor</tt> and <tt>addPidController</tt>.   For an example of how to use these
 methods, take a look at 
 this
-[sketch] (https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/LadybugDSMX_VL53L1X/LadybugDSMX_VL53L1X.ino),
+[sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/LadybugDSMX_VL53L1X/LadybugDSMX_VL53L1X.ino),
 which uses the [VL53L1X long-range proximity sensor](https://www.tindie.com/products/onehorse/vl53l1-long-range-proximity-sensor/)
 to provide altitude hold.
 
