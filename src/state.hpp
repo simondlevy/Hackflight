@@ -49,25 +49,6 @@ namespace hf {
                 velocityRightward = 0;
             }
 
-            void updateQuaternion(float q[4])
-            {
-                eulerAngles[0] = atan2(2.0f*(q[0]*q[1]+q[2]*q[3]),q[0]*q[0]-q[1]*q[1]-q[2]*q[2]+q[3]*q[3]);
-                eulerAngles[1] =  asin(2.0f*(q[1]*q[3]-q[0]*q[2]));
-                eulerAngles[2] = atan2(2.0f*(q[1]*q[2]+q[0]*q[3]),q[0]*q[0]+q[1]*q[1]-q[2]*q[2]-q[3]*q[3]);
-
-                // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (eulerAngles[2] < 0) {
-                    eulerAngles[2] += 2*M_PI;
-                }
-            }
-
-            void updateGyrometer(float gyroRates[3], float seconds)
-            {
-                (void)seconds;
-
-                memcpy(angularVelocities, gyroRates, 3*sizeof(float));
-            }
-
     };  // class State
 
 } // namespace

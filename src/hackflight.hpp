@@ -31,6 +31,7 @@
 #include "pidcontroller.hpp"
 #include "pidcontrollers/stabilizer.hpp"
 #include "sensors/gyrometer.hpp"
+#include "sensors/quaternion.hpp"
 
 namespace hf {
 
@@ -50,6 +51,7 @@ namespace hf {
 
             // Mandatory sensors on the board
             Gyrometer _gyrometer;
+            Quaternion _quaternion; // not really a sensor, but we treat it like one!
 
             // Additional sensors 
             Sensor * _sensors[256];
@@ -77,12 +79,14 @@ namespace hf {
 
             void checkQuaternion(void)
             {
-                float q[4];
+                // Some quaternion filters may need to know the current time
+                float time = _board->getTime();
 
-                if (_board->getQuaternion(q)) {
+                // If quaternion data ready
+                if (_quaternion.ready(time)) {
 
                     // Update state with new quaternion to yield Euler angles
-                    _state.updateQuaternion(q);
+                    _quaternion.modifyState(_state, time);
 
                     // Update stabilizer with new Euler angles
                     _stabilizer->updateEulerAngles(_state.eulerAngles, _receiver->getAuxState());
@@ -227,6 +231,7 @@ namespace hf {
 
                 // Support for mandatory sensors
                 _gyrometer.init(board);
+                _quaternion.init(board);
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
