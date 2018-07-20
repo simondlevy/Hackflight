@@ -48,7 +48,7 @@ namespace hf {
                 memset(_quat, 0, 4*sizeof(float));
             }
 
-            virtual void modifyState(State & state, float time) override
+            virtual void modifyState(state_t & state, float time) override
             {
                 (void)time;
 

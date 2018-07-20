@@ -195,7 +195,7 @@ namespace hf {
 
             }
 
-            bool modifyDemands(State & state, demands_t & demands)
+            bool modifyDemands(state_t & state, demands_t & demands)
             {
                 // Pitch, roll use leveling based on Euler angles
                 demands.roll  = computeCyclicPid(demands.roll,  state.angularVelocities, AXIS_ROLL);

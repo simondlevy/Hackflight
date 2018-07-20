@@ -30,3 +30,16 @@ typedef struct {
     float yaw;
 
 } demands_t;
+
+typedef struct {
+
+    float eulerAngles[3];
+    float angularVelocities[3];
+    bool  armed;
+    float altitude;
+    float variometer;
+    float velocityForward;  
+    float velocityRightward; 
+
+} state_t;
+

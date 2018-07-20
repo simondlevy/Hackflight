@@ -36,7 +36,7 @@ namespace hf {
 
         protected:
 
-            virtual void modifyState(State & state, float time) override
+            virtual void modifyState(state_t & state, float time) override
             {
                 (void)time; // XXX ignore time for now
 

@@ -29,7 +29,6 @@
 #include "receiver.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
-#include "state.hpp"
 #include "pidcontroller.hpp"
 #include "pidcontrollers/stabilizer.hpp"
 #include "sensors/gyrometer.hpp"
@@ -60,7 +59,7 @@ namespace hf {
             uint8_t _sensor_count;
 
             // Vehicle state
-            State _state;
+            state_t _state;
 
             // Demands sent to mixer
             demands_t _demands;
@@ -243,7 +242,7 @@ namespace hf {
                 addPidController(stabilizer, 0);
 
                 // Initialize state
-                _state.init();
+                memset(&_state, 0, sizeof(state_t));
 
                 // Initialize MSP (serial comms)
                 _msp.init(&_state, receiver, mixer);

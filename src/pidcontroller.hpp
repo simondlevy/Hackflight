@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include "state.hpp"
 #include "datatypes.hpp"
 
 namespace hf {
@@ -31,7 +30,7 @@ namespace hf {
 
         protected:
 
-        virtual bool modifyDemands(State & state, demands_t & demands) = 0;
+        virtual bool modifyDemands(state_t & state, demands_t & demands) = 0;
 
         virtual bool shouldFlashLed(void) { return false; }
 

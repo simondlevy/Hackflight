@@ -40,7 +40,7 @@ namespace hf {
 
         protected:
 
-            virtual void modifyState(State & state, float time) override
+            virtual void modifyState(state_t & state, float time) override
             {
                 // Previous values to support first-differencing
                 static float _time;

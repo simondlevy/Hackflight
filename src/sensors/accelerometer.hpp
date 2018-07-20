@@ -47,7 +47,7 @@ namespace hf {
                 memset(_gs, 0, 3*sizeof(float));
             }
 
-            virtual void modifyState(State & state, float time) override
+            virtual void modifyState(state_t & state, float time) override
             {
                 // Here is where you'd do sensor fusion
                 (void)state;

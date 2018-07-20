@@ -43,7 +43,7 @@ namespace hf {
                 memset(_rates, 0, 3*sizeof(float));
             }
 
-            virtual void modifyState(State & state, float time) override
+            virtual void modifyState(state_t & state, float time) override
             {
                 (void)time;
 
