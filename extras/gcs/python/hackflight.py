@@ -138,8 +138,8 @@ class GCS:
         self.rc_request = msppg.serialize_RC_NORMAL_Request()
 
         # No messages yet
-        self.roll_pitch_yaw = 0,0,0
-        self.rxchannels = 0,0,0,0,0,0,0,0
+        self.roll_pitch_yaw = [0]*3
+        self.rxchannels = [0]*8
 
         # A hack to support display in IMU dialog
         self.active_axis = 0
@@ -477,7 +477,7 @@ class GCS:
     def _handle_rc(self, c1, c2, c3, c4, c5, c6, c7, c8):
 
         # Display throttle as [0,1], other channels as [-1,+1]
-        self.rxchannels = c1/2.+.5, c2, c3, c4, c5
+        self.rxchannels = c1/2.+.5, c2, c3, c4, c5, c6, c7, c8
 
         # As soon as we handle the callback from one request, send another request, if receiver dialog is running
         if self.receiver.running:

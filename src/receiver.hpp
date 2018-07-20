@@ -80,18 +80,19 @@ namespace hf {
 
         protected: 
 
-        static const uint8_t CHANNELS = 5;
+        static const uint8_t CHANNELS = 7;
 
         uint8_t _auxState;
 
         // channel indices
         enum {
-            CHANNEL_THROTTLE, // T
-            CHANNEL_ROLL,     // A
-            CHANNEL_PITCH,    // E
-            CHANNEL_YAW,      // R
+            CHANNEL_THROTTLE, 
+            CHANNEL_ROLL,    
+            CHANNEL_PITCH,  
+            CHANNEL_YAW,   
+            CHANNEL_ARM,
+            CHANNEL_SKIP,
             CHANNEL_AUX
-
         };
 
         // These must be overridden for each receiver
