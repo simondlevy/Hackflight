@@ -28,15 +28,13 @@ In addition to offering the full complement of i/o signals (UART, I<sup>2</sup>C
 SPI, digital, analog), these boards have hardware support for floating-point
 operations, allowing us to write simpler code based on standard units:
 
+* Distances in meters
 * Time in seconds
 * Quaternions in the interval [-1,+1]
 * Euler angles in radians
 * Accelerometer values in Gs
-* Gyrometer values in radians per second
-* Distances in meters, velocities in meters per second
 * Barometric pressure in Pascals
-* Axis demands (roll, pitch, yaw) in the interval [-1,+1]
-* Throttle demand in [0,1]
+* Stick demands in the interval [-1,+1]
 * Motor demands in [0,1]
 
 Thanks to some help from [Sytelus](https://github.com/sytelus), the core
