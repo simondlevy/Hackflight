@@ -54,11 +54,7 @@ namespace hf {
             {
                 (void)time;
 
-                if (board->getBarometer(_pressure)) {
-                    return true;
-                }
-
-                return false;
+                return board->getBarometer(_pressure);
             }
 
         private:

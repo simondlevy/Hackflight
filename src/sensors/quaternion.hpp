@@ -66,11 +66,7 @@ namespace hf {
             {
                 (void)time;
 
-                if (board->getQuaternion(_quat)) {
-                    return true;
-                }
-
-                return false;
+                return board->getQuaternion(_quat);
             }
 
         private:

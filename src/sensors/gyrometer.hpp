@@ -54,12 +54,7 @@ namespace hf {
             {
                 (void)time;
 
-                if (board->getGyrometer(_rates)) {
-                    return true;
-
-                }
-
-                return false;
+                return board->getGyrometer(_rates);
             }
 
         private:

@@ -58,11 +58,7 @@ namespace hf {
             {
                 (void)time;
 
-                if (board->getAccelerometer(_gs)) {
-                    return true;
-                }
-
-                return false;
+                return board->getAccelerometer(_gs);
             }
 
         private:
