@@ -47,6 +47,8 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
 
 hf::Accelerometer  accel;
 
+hf::Barometer baro;
+
 void setup(void)
 {
     // Create a Ladybug board object
@@ -57,9 +59,11 @@ void setup(void)
 
     // Set up the Accelerometer object to access the IMU on this board
     accel.init(board);
+    baro.init(board);
 
     // Add the Accelerometer object to the sensors that will be acquired
     h.addSensor(&accel);
+    h.addSensor(&baro);
 }
 
 void loop(void)

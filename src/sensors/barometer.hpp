@@ -34,7 +34,7 @@ namespace hf {
 
         friend class Hackflight;
 
-        protected:
+        public:
 
             void init(Board * board) 
             {
@@ -42,6 +42,8 @@ namespace hf {
 
                 _pressure = 0;
             }
+
+        protected:
 
             virtual void modifyState(state_t & state, float time) override
             {
