@@ -45,10 +45,21 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
                 1.0625f,    // Gyro yaw P
                 0.005625f); // Gyro yaw I
 
+hf::Accelerometer  accel;
+
 void setup(void)
 {
+    // Create a Ladybug board object
+    hf::Ladybug * board = new hf::Ladybug();
+
     // Initialize Hackflight firmware
-    h.init(new hf::Ladybug(), &rc, &mixer, &stabilizer);
+    h.init(board, &rc, &mixer, &stabilizer);
+
+    // Set up the Accelerometer object to access the IMU on this board
+    accel.init(board);
+
+    // Add the Accelerometer object to the sensors that will be acquired
+    h.addSensor(&accel);
 }
 
 void loop(void)

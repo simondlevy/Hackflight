@@ -38,7 +38,7 @@ namespace hf {
 
         friend class Hackflight;
 
-        protected:
+        public:
 
             void init(Board * board) 
             {
@@ -46,6 +46,8 @@ namespace hf {
 
                 memset(_gs, 0, 3*sizeof(float));
             }
+
+        protected:
 
             virtual void modifyState(state_t & state, float time) override
             {
