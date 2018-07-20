@@ -1,5 +1,5 @@
 /*
-   surfacemount.hpp : Abstract class for surface-mounted sensors (IMU, barometer)
+   peripheral.hpp : Abstract class for peripheral sensors (rangefinder, optical flow)
 
    Copyright (c) 2018 Simon D. Levy
    
@@ -25,14 +25,8 @@
 
 namespace hf {
 
-    class SurfaceMountSensor : public Sensor {
+    class PeripheralSensor : public Sensor {
 
-        friend class Hackflight;
-
-        protected:
-
-            Board * board;
-
-    };  // class SurfaceMountSensor
+    };  // class PeripheralSensor
 
 } // namespace

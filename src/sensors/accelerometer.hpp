@@ -40,10 +40,8 @@ namespace hf {
 
         public:
 
-            void init(Board * board) 
+            Accelerometer(void)
             {
-                SurfaceMountSensor::init(board);
-
                 memset(_gs, 0, 3*sizeof(float));
             }
 
@@ -60,7 +58,7 @@ namespace hf {
             {
                 (void)time;
 
-                if (_board->getAccelerometer(_gs)) {
+                if (board->getAccelerometer(_gs)) {
                     return true;
                 }
 

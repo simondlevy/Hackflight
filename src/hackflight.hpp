@@ -31,6 +31,7 @@
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
 #include "pidcontrollers/stabilizer.hpp"
+#include "sensors/peripheral.hpp"
 #include "sensors/gyrometer.hpp"
 #include "sensors/quaternion.hpp"
 
@@ -220,6 +221,11 @@ namespace hf {
                 }
             }
 
+            void add_sensor(Sensor * sensor)
+            {
+                _sensors[_sensor_count++] = sensor;
+            }
+
         public:
 
             void init(Board * board, Receiver * receiver, Mixer * mixer, Stabilizer * stabilizer)
@@ -231,8 +237,8 @@ namespace hf {
                 _stabilizer = stabilizer;
 
                 // Support for mandatory sensors
-                _gyrometer.init(board);
-                _quaternion.init(board);
+                addSensor(&_quaternion, board);
+                addSensor(&_gyrometer, board);
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
@@ -258,9 +264,16 @@ namespace hf {
 
             } // init
 
-            void addSensor(Sensor * sensor) 
+            void addSensor(PeripheralSensor * sensor) 
             {
-                _sensors[_sensor_count++] = sensor;
+                add_sensor(sensor);
+            }
+
+            void addSensor(SurfaceMountSensor * sensor, Board * board) 
+            {
+                add_sensor(sensor);
+
+                sensor->board = board;
             }
 
             void addPidController(PID_Controller * pidController, uint8_t auxState) 

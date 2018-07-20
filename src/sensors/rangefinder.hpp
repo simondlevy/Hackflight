@@ -24,12 +24,12 @@
 #include <math.h>
 
 #include "debug.hpp"
-#include "sensor.hpp"
+#include "peripheral.hpp"
 #include "filters.hpp"
 
 namespace hf {
 
-    class Rangefinder : public Sensor {
+    class Rangefinder : public PeripheralSensor {
 
         public:
 

@@ -41,10 +41,8 @@ namespace hf {
 
         protected:
 
-            void init(Board * board) 
+            Quaternion(void)
             {
-                SurfaceMountSensor::init(board);
-
                 memset(_quat, 0, 4*sizeof(float));
             }
 
@@ -68,7 +66,7 @@ namespace hf {
             {
                 (void)time;
 
-                if (_board->getQuaternion(_quat)) {
+                if (board->getQuaternion(_quat)) {
                     return true;
                 }
 

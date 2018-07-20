@@ -24,11 +24,11 @@
 #include <math.h>
 
 #include "debug.hpp"
-#include "sensor.hpp"
+#include "perhipheral.hpp"
 
 namespace hf {
 
-    class OpticalFlow : public Sensor {
+    class OpticalFlow : public PerhipheralSensor {
 
         private:
 

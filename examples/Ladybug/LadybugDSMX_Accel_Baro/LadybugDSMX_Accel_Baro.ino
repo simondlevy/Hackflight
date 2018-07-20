@@ -45,7 +45,7 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
                 1.0625f,    // Gyro yaw P
                 0.005625f); // Gyro yaw I
 
-hf::Accelerometer  accel;
+hf::Accelerometer accel;
 
 hf::Barometer baro;
 
@@ -57,13 +57,9 @@ void setup(void)
     // Initialize Hackflight firmware
     h.init(board, &rc, &mixer, &stabilizer);
 
-    // Set up the Accelerometer object to access the IMU on this board
-    accel.init(board);
-    baro.init(board);
-
-    // Add the Accelerometer object to the sensors that will be acquired
-    h.addSensor(&accel);
-    h.addSensor(&baro);
+    // Add the accelerometer and barometer to the sensors that will be acquired from this board
+    h.addSensor(&accel, board);
+    h.addSensor(&baro, board);
 }
 
 void loop(void)

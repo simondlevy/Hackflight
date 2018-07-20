@@ -34,14 +34,14 @@ namespace hf {
 
         friend class Hackflight;
 
-        protected:
+        public:
 
-            void init(Board * board) 
+            Gyrometer(void)
             {
-                SurfaceMountSensor::init(board);
-
                 memset(_rates, 0, 3*sizeof(float));
             }
+
+        protected:
 
             virtual void modifyState(state_t & state, float time) override
             {
@@ -54,8 +54,9 @@ namespace hf {
             {
                 (void)time;
 
-                if (_board->getGyrometer(_rates)) {
+                if (board->getGyrometer(_rates)) {
                     return true;
+
                 }
 
                 return false;

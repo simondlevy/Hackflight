@@ -36,10 +36,8 @@ namespace hf {
 
         public:
 
-            void init(Board * board) 
+            Barometer(void)
             {
-                SurfaceMountSensor::init(board);
-
                 _pressure = 0;
             }
 
@@ -56,7 +54,7 @@ namespace hf {
             {
                 (void)time;
 
-                if (_board->getBarometer(_pressure)) {
+                if (board->getBarometer(_pressure)) {
                     return true;
                 }
 
