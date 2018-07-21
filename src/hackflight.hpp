@@ -69,6 +69,7 @@ namespace hf {
             MSP _msp;
 
             // Safety
+            bool _safeToArm;
             bool _failsafe;
 
             // Support for headless mode
@@ -174,8 +175,14 @@ namespace hf {
                     _state.armed = false;
                 } 
 
+                // Avoid arming if aux2 switch down on startup
+                if (!_safeToArm) {
+                    _safeToArm = !_receiver->getAux2State();
+                }
+
                 // Arm (after lots of safety checks!)
-                if (!_state.armed && 
+                if (    _safeToArm &&
+                        !_state.armed && 
                         _receiver->throttleIsDown() &&
                         _receiver->getAux2State() && 
                         !_failsafe && 
@@ -264,8 +271,9 @@ namespace hf {
                 // Tell the mixer which board to use
                 _mixer->board = board; 
 
-                // No failsafe yet
+                // Setup safety checks
                 _failsafe = false;
+                _safeToArm = false;
 
             } // init
 
