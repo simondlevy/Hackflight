@@ -132,6 +132,11 @@ namespace hf {
 
         demands_t demands;
 
+        float getRawval(uint8_t chan)
+        {
+            return rawvals[_channelMap[chan]];
+        }
+
         // These can be overridden to support various styles of arming (sticks, switches, etc.)
 
         // Override this if your receiver provides RSSI or other weak-signal detection
@@ -237,11 +242,6 @@ namespace hf {
         virtual uint8_t getAuxState(void)
         {
             return _auxState;
-        }
-
-        float getRawval(uint8_t chan)
-        {
-            return rawvals[_channelMap[chan]];
         }
 
         public:

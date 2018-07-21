@@ -23,7 +23,9 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 BAUD = 115200
 
 DISPLAY_WIDTH  = 800
-DISPLAY_HEIGHT = 500
+DISPLAY_HEIGHT = 600
+
+SPLASH_LOCATION = 430,260
 
 BACKGROUND_COLOR = 'white'
 
@@ -31,10 +33,6 @@ CONNECTION_DELAY_MSEC  = 1000
 BOARD_REPLY_DELAY_MSEC = 1000
 
 USB_UPDATE_MSEC = 200
-
-# These should agree with the values in firmware Config.PwmConfg
-PWM_MIN = 1000
-PWM_MAX = 2000
 
 from serial import Serial
 from serial.tools.list_ports import comports
@@ -139,7 +137,7 @@ class GCS:
 
         # No messages yet
         self.roll_pitch_yaw = [0]*3
-        self.rxchannels = [0]*8
+        self.rxchannels = [0]*6
 
         # A hack to support display in IMU dialog
         self.active_axis = 0
@@ -431,7 +429,7 @@ class GCS:
 
     def _show_splash(self):
 
-        self.splash = self.canvas.create_image((400,225), image=self.splashimage)
+        self.splash = self.canvas.create_image(SPLASH_LOCATION, image=self.splashimage)
 
     def _hide_splash(self):
 
@@ -474,10 +472,10 @@ class GCS:
         if self.imu.running:
             self._send_attitude_request()
 
-    def _handle_rc(self, c1, c2, c3, c4, c5, c6, c7, c8):
+    def _handle_rc(self, c1, c2, c3, c4, c5, c6):
 
         # Display throttle as [0,1], other channels as [-1,+1]
-        self.rxchannels = c1/2.+.5, c2, c3, c4, c5, c6, c7, c8
+        self.rxchannels = c1/2.+.5, c2, c3, c4, c5, c6
 
         # As soon as we handle the callback from one request, send another request, if receiver dialog is running
         if self.receiver.running:

@@ -7,9 +7,7 @@
    {"c3": "float"}, 
    {"c4": "float"}, 
    {"c5": "float"}, 
-   {"c6": "float"}, 
-   {"c7": "float"}, 
-   {"c8": "float"}],
+   {"c6": "float"}],
 
   "ATTITUDE_RADIANS": 
   [{"ID": 122},

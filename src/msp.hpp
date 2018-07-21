@@ -177,7 +177,13 @@ namespace hf {
                     break;
 
                 case MSP_RC_NORMAL:
-                    serializeFloats(_receiver->rawvals, 8);
+                    {
+                        float rawvals[6];
+                        for (uint8_t k=0; k<6; ++k) {
+                            rawvals[k] = _receiver->getRawval(k);
+                        }
+                        serializeFloats(rawvals, 6);
+                    }
                     break;
 
                 case MSP_ATTITUDE_RADIANS: 
