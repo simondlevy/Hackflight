@@ -25,9 +25,11 @@
 #include "receivers/serial/arduino_sbus.hpp"
 #include "mixers/quadx.hpp"
 
+static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
+
 hf::Hackflight h;
 
-hf::SBUS_Receiver rc = hf::SBUS_Receiver(.005f, -.08f, 0.f);
+hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, .005f, -.08f, 0.f);
 
 hf::MixerQuadX mixer;
 
@@ -41,7 +43,8 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
 
 void setup(void)
 {
-    h.init(new hf::Ladybug(), &rc, &mixer, &stabilizer);
+    // Use A1 for a prototype LadybugFC
+    h.init(new hf::Ladybug(A1), &rc, &mixer, &stabilizer);
 }
 
 void loop(void)

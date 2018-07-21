@@ -25,9 +25,12 @@
 #include "receivers/serial/arduino_dsmx.hpp"
 #include "mixers/quadx.hpp"
 
+constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+
 hf::Hackflight h;
 
 hf::DSMX_Receiver rc = hf::DSMX_Receiver(
+        CHANNEL_MAP,
         .005f,  // roll trim
         .01f,  // pitch trim
         0.f);   // yaw trim
