@@ -240,7 +240,7 @@ namespace hf {
 
         public:
 
-            void init(Board * board, Receiver * receiver, Mixer * mixer, Stabilizer * stabilizer)
+            void init(Board * board, Receiver * receiver, Mixer * mixer, Stabilizer * stabilizer, bool armed=false)
             {  
                 // Store the essentials
                 _board      = board;
@@ -262,6 +262,9 @@ namespace hf {
                 // Initialize state
                 memset(&_state, 0, sizeof(state_t));
 
+                // Support safety override by simulator
+                _state.armed = armed;
+
                 // Initialize MSP (serial comms)
                 _msp.init(&_state, receiver, mixer);
 
@@ -271,9 +274,8 @@ namespace hf {
                 // Tell the mixer which board to use
                 _mixer->board = board; 
 
-                // Setup safety checks
+                // Setup failsafe
                 _failsafe = false;
-                _safeToArm = false;
 
             } // init
 
