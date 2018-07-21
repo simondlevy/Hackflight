@@ -170,12 +170,17 @@ namespace hf {
                 _stabilizer->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
 
                 // Disarm
-                if (_state.armed && _receiver->disarming()) {
+                if (_state.armed && !_receiver->getAux2State()) {
                     _state.armed = false;
                 } 
 
                 // Arm (after lots of safety checks!)
-                if (!_state.armed && _receiver->arming() && !_failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
+                if (!_state.armed && 
+                        _receiver->throttleIsDown() &&
+                        _receiver->getAux2State() && 
+                        !_failsafe && 
+                        safeAngle(AXIS_ROLL) && 
+                        safeAngle(AXIS_PITCH)) {
                     _state.armed = true;
                     _yawInitial = _state.eulerAngles[AXIS_YAW]; // grab yaw for headless mode
                 }
