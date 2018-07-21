@@ -29,7 +29,7 @@
 #include "pidcontrollers/loiter.hpp"
 #include "mixers/quadx.hpp"
 
-uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 hf::Hackflight h;
 
