@@ -121,8 +121,6 @@ namespace hf {
             return rawvals[_channelMap[chan]];
         }
 
-        // These can be overridden to support various styles of arming (sticks, switches, etc.)
-
         // Override this if your receiver provides RSSI or other weak-signal detection
         virtual bool lostSignal(void) { return false; }
 
