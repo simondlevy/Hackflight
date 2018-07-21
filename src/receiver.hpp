@@ -90,10 +90,11 @@ namespace hf {
             CHANNEL_ROLL,    
             CHANNEL_PITCH,  
             CHANNEL_YAW,   
-            CHANNEL_ARM,
-            CHANNEL_SKIP,
-            CHANNEL_AUX
+            CHANNEL_AUX1,
+            CHANNEL_AUX2
         };
+
+        uint8_t _channelMap[6];
 
         // These must be overridden for each receiver
         virtual void  begin(void) = 0;
@@ -134,8 +135,12 @@ namespace hf {
         // Override this if your receiver provides RSSI or other weak-signal detection
         virtual bool lostSignal(void) { return false; }
 
-        Receiver(float trimRoll=0, float trimPitch=0, float trimYaw=0) : 
-            _trimRoll(trimRoll), _trimPitch(trimPitch), _trimYaw(trimYaw) { }
+        Receiver(uint8_t channelMap[6], // throttle, roll, pitch, yaw, aux, arm
+                float trimRoll=0, float trimPitch=0, float trimYaw=0) : 
+                _trimRoll(trimRoll), _trimPitch(trimPitch), _trimYaw(trimYaw) 
+        { 
+            memcpy(_channelMap, channelMap, 6);
+        }
 
         virtual bool arming(void)
         {
@@ -211,17 +216,16 @@ namespace hf {
             demands.throttle = throttleFun(rawvals[CHANNEL_THROTTLE]);
             
             // Store auxiliary switch state 
-            _auxState = rawvals[CHANNEL_AUX] >= 0.0 ? (rawvals[CHANNEL_AUX] > .4 ? 2 : 1) : 0;
+            _auxState = getRawval(CHANNEL_AUX1) >= 0.0 ? (getRawval(CHANNEL_AUX1) > .4 ? 2 : 1) : 0;
 
             // Got a new frame
             return true;
 
         }  // getDemands
 
-
         bool throttleIsDown(void)
         {
-            return rawvals[CHANNEL_THROTTLE] < -1 + MARGIN;
+            return getRawval(CHANNEL_THROTTLE) < -1 + MARGIN;
         }
 
         virtual uint8_t getAuxState(void)
@@ -229,6 +233,10 @@ namespace hf {
             return _auxState;
         }
 
+        float getRawval(uint8_t chan)
+        {
+            return rawvals[_channelMap[chan]];
+        }
 
         public:
 
