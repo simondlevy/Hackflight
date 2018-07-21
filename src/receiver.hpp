@@ -84,7 +84,8 @@ namespace hf {
 
         static const uint8_t CHANNELS = 7;
 
-        uint8_t _auxState;
+        uint8_t _aux1State;
+        uint8_t _aux2State;
 
         // channel indices
         enum {
@@ -226,8 +227,9 @@ namespace hf {
             // Pass throttle demand through exponential function
             demands.throttle = throttleFun(rawvals[CHANNEL_THROTTLE]);
             
-            // Store auxiliary switch state 
-            _auxState = getRawval(CHANNEL_AUX1) >= 0.0 ? (getRawval(CHANNEL_AUX1) > .4 ? 2 : 1) : 0;
+            // Store auxiliary switch state
+            _aux1State = getRawval(CHANNEL_AUX1) >= 0.0 ? (getRawval(CHANNEL_AUX1) > .4 ? 2 : 1) : 0;
+            _aux2State = getRawval(CHANNEL_AUX2) >= 0.4 ? 1 : 0;
 
             // Got a new frame
             return true;
@@ -239,9 +241,14 @@ namespace hf {
             return getRawval(CHANNEL_THROTTLE) < -1 + MARGIN;
         }
 
-        virtual uint8_t getAuxState(void)
+        virtual uint8_t getAux1State(void)
         {
-            return _auxState;
+            return _aux1State;
+        }
+
+        virtual uint8_t getAux2State(void)
+        {
+            return _aux2State;
         }
 
         public:

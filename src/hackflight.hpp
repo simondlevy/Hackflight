@@ -91,7 +91,7 @@ namespace hf {
                     _quaternion.modifyState(_state, time);
 
                     // Update stabilizer with new Euler angles
-                    _stabilizer->updateEulerAngles(_state.eulerAngles, _receiver->getAuxState());
+                    _stabilizer->updateEulerAngles(_state.eulerAngles, _receiver->getAux1State());
 
                     // Synch serial comms to quaternion check
                     doSerialComms();
@@ -128,7 +128,7 @@ namespace hf {
             void runPidControllers(void)
             {
                 // Each PID controllers is associated with at least one auxiliary switch state
-                uint8_t auxState = _receiver->getAuxState();
+                uint8_t auxState = _receiver->getAux1State();
 
                 // Some PID controllers should cause LED to flash when they're active
                 bool shouldFlash = false;
