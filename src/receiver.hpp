@@ -37,6 +37,8 @@ namespace hf {
 
         private: 
 
+        static constexpr uint8_t DEFAULT_CHANNEL_MAP[6] = {0, 1, 2, 3, 4, 5};
+
         const float MARGIN            = 0.1f;
         const float CYCLIC_EXPO       = 0.65f;
         const float CYCLIC_RATE       = 0.90f;
@@ -142,7 +144,11 @@ namespace hf {
             memcpy(_channelMap, channelMap, 6);
         }
 
-        virtual bool arming(void)
+        Receiver(void) : Receiver(DEFAULT_CHANNEL_MAP)
+        {
+        }
+
+         virtual bool arming(void)
         {
             return sticks == THR_LO + YAW_HI + PIT_CE + ROL_CE;
         }
