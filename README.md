@@ -86,4 +86,7 @@ this
 which uses the [VL53L1X long-range proximity sensor](https://www.tindie.com/products/onehorse/vl53l1-long-range-proximity-sensor/)
 to provide altitude hold.
 
-For more information, check out the Hackflight [wiki](https://github.com/simondlevy/Hackflight/wiki).
+To get started with Hackflight, take a look at the [build wiki](https://github.com/simondlevy/Hackflight/wiki).
+To understand the principles behind the software, contniue reading.
+
+## Design Principles
