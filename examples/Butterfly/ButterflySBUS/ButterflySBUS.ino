@@ -25,9 +25,11 @@
 #include "receivers/serial/arduino_sbus.hpp"
 #include "mixers/quadx.hpp"
 
+static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
+
 hf::Hackflight h;
 
-hf::SBUS_Receiver rc;
+hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP);
 
 hf::MixerQuadX mixer;
 
