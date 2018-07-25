@@ -29,7 +29,7 @@
 
 #include <MPU9250.h> 
 #include <MS5637.h>
-#include <ArduinoTransfer.h>
+#include <CrossPlatformI2C.h>
 
 #include "filters.hpp"
 #include "hackflight.hpp"
@@ -61,15 +61,8 @@ namespace hf {
             // MPU9250 add-on board has interrupt on Butterfly pin 8
             const uint8_t INTERRUPT_PIN = 8;
 
-            // Create byte-transfer objects for Arduino I^2C 
-            ArduinoI2C mpu = ArduinoI2C(MPU9250::MPU9250_ADDRESS);
-            ArduinoI2C mag = ArduinoI2C(MPU9250::AK8963_ADDRESS);
-
             // Use the MPU9250 in pass-through mode
-            MPU9250Passthru _imu = MPU9250Passthru(&mpu, &mag);;
-
-            // Use the MS5637 barometer
-            MS5637 _baro = MS5637();
+            MPU9250_Passthru _imu;
 
             // Run motor ESCs using standard Servo library
             Servo _escs[4];
@@ -262,11 +255,6 @@ namespace hf {
 
             bool getBarometer(float & pressure)
             {
-                if (_baro.getPressure(&pressure)) {
-                    pressure *= 100; // millibars to Pascals
-                    return true;
-                }
-
                 return false;
             }
 
@@ -296,8 +284,8 @@ namespace hf {
                 Wire.setClock(400000); // I2C frequency at 400 kHz
                 delay(1000);
 
-                // Start the MS5637 barometer
-                _baro.begin();
+                // Start the MPU9250
+                _imu.begin();
 
                 // Reset the MPU9250
                 _imu.resetMPU9250(); 
