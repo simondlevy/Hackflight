@@ -93,8 +93,8 @@ To understand the principles behind the software, contniue reading.
 
 There are two basic data types in Hackflight: 
 [state](https://github.com/simondlevy/Hackflight/blob/master/src/datatypes.hpp#L34-L44) and 
-[demands](https://github.com/simondlevy/Hackflight/blob/master/src/datatypes.hpp#L25-L32).  For those
-familiar with [Kalman filtering](http://home.wlu.edu/~levys/kalman_tutorial/), the state will be familiar:
+[demands](https://github.com/simondlevy/Hackflight/blob/master/src/datatypes.hpp#L25-L32).  For anyone
+who's studied [Kalman filtering](http://home.wlu.edu/~levys/kalman_tutorial/), the state will be familiar:
 it is the set of values that define the state of the vehicle at a given time
 (altitude, orientation, angular velocity, ...), which gets modified by a set of
 sensors (gyrometer, accelerometer, barometer, rangefinder, ...).  Once the
@@ -107,7 +107,10 @@ values to be sent to each motor.
 
 As discussed above, Hackflight requires a bare minimum of 
 [two sensor readings](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp#L40-L41)
-&emdash; quaternion and gyrometer &emdash; and one PID controller, the Stabilizer.  (Technically, the
-quaternion is more properly part of the vehicle state, but because of the availablity of 
-&ldquo;hardware quaternion&rdquo; data from modern IMUs like the 
-[EM7180 SENtral Sensor Fusion Solution](https://www.tindie.com/products/onehorse/ultimate-sensor-fusion-solution-mpu9250/), we find it advantageous to treat the quaternion as a sensor reading.)
+&emdash; quaternion and gyrometer &emdash; and one PID controller, the 
+[Stabilizer](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/stabilizer.hpp).
+(Technically, the quaternion is more properly part of the vehicle state, but
+because of the availablity of &ldquo;hardware quaternion&rdquo; data from
+modern IMUs like the [EM7180 SENtral Sensor Fusion
+Solution](https://www.tindie.com/products/onehorse/ultimate-sensor-fusion-solution-mpu9250/),
+we find it convenient to treat the quaternion as a sensor reading.)
