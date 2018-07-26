@@ -145,4 +145,4 @@ in an
 [example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/LadybugDSMX_VL53L1X/LadybugDSMX_VL53L1X.ino#L60-L84).  
 
 
-<img src="extras/media/sensors.png" width=600 align=center>
+<img src="extras/media/sensors.png" width=700 align=center>
