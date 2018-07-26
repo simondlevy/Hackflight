@@ -163,7 +163,7 @@ Like sensors, PID controllers in Hackflight are subclasses of an abstract
 whose <tt>modifyDemands()</tt> method takes the current state and demands, and modifies the demands based on the
 state.  (This class also provides an optional <tt>shouldFlashLed()</tt> method, to help you see when the PID
 controller is active.)  As with sensors, you can sub-class the <tt>PID_Controller</tt> class and call
-[Hackflight:addPidController()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L293-L299)
+[Hackflight::addPidController()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L293-L299)
 to ensure that your PID controller is called in the
 [Hackflight::runPidControllers()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L129-L152) method.
 The <tt>addPidController()</tt> method requires you to to specify the auxiliary-switch state in which the specified PID controller will be active.
