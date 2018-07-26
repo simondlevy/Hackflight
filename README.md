@@ -107,6 +107,8 @@ values to be sent to each motor:
 
 <img src="extras/media/dataflow2.png" width=800>
 
+### Sensors
+
 As discussed above, Hackflight requires a bare minimum of 
 [two sensor readings](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp#L40-L41)
 &ndash; quaternion and gyrometer &ndash; and one PID controller, the 
@@ -153,6 +155,8 @@ code will be called by the [checkSensors](https://github.com/simondlevy/Hackflig
 <p align="center"> 
 <img src="extras/media/sensors5.png" width=700>
 </p>
+
+### PID Controllers
 
 Like sensors, PID controllers in Hackflight are subclasses of an abstract
 [PID Controller](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp#L27-L39) class, 
