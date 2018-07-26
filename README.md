@@ -139,18 +139,23 @@ The Sensor class is an abstract (virtual) class (a.k.a. interface) specifying tw
 must implement: (1) reporting whether the sensor is ready to deliver new data;
 (2) modifying the vehicle state.  By requiring each sensor to report its
 readiness, we can avoid the need to write a separate timing loop for each
-sensor in the main [loop code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L301-L312). To
-implement additional sensors, you can directly sub-class the Sensor class, as we've done with the 
+sensor in the main [loop code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L301-L312). 
+
+To implement additional sensors, you can directly sub-class the Sensor class, as we've done with the 
 [Rangefinder](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/rangefinder.hpp) 
 class that we use to support the
 [VL53L1](https://www.tindie.com/products/onehorse/vl53l1-long-range-proximity-sensor/) time-of-flight rangefinder 
 in an 
 [example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/LadybugDSMX_VL53L1X/LadybugDSMX_VL53L1X.ino#L60-L84).  
-
+Once you've implemented the sub-class(es) for a new sensor, you can call  <tt>Hackflight::addSensor()</tt> to ensure that the sensor
+code will be called by the [checkSensors](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L220-L234) method.
 
 <p align="center"> 
 <img src="extras/media/sensors5.png" width=700>
 </p>
 
-Like sensors, PID controllers in Hackflight are subclasses of an abstrct
-[PIDController]() class
+Like sensors, PID controllers in Hackflight are subclasses of an abstract
+[PID Controller](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp#L27-L39) class, 
+whose <tt>modifyDemands()</tt> method takes the current state and demands, and modifies the demands based on the
+state.  (This class also provides an optional <tt>shouldFlashLed()</tt> method, to help you see when the PID
+controller is active.)
