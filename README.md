@@ -111,6 +111,6 @@ As discussed above, Hackflight requires a bare minimum of
 [Stabilizer](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/stabilizer.hpp).
 (Technically, the quaternion is more properly part of the vehicle state, but
 because of the availablity of &ldquo;hardware quaternion&rdquo; data from
-modern IMUs like the [EM7180 SENtral Sensor Fusion
+modern sensors like the [EM7180 SENtral Sensor Fusion
 Solution](https://www.tindie.com/products/onehorse/ultimate-sensor-fusion-solution-mpu9250/),
 we find it convenient to treat the quaternion as a sensor reading.)
