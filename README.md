@@ -141,4 +141,8 @@ implement additional sensors, you can directly sub-class the Sensor class, as we
 [Rangefinder](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/rangefinder.hpp) 
 class that we use to support the
 [VL53L1](https://www.tindie.com/products/onehorse/vl53l1-long-range-proximity-sensor/) time-of-flight rangefinder 
-in an [example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/LadybugDSMX_VL53L1X/LadybugDSMX_VL53L1X.ino#L60-L84).
+in an 
+[example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/LadybugDSMX_VL53L1X/LadybugDSMX_VL53L1X.ino#L60-L84).  
+
+
+<img src="extras/media/sensors.png" width=800>
