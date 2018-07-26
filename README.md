@@ -90,3 +90,12 @@ To get started with Hackflight, take a look at the [build wiki](https://github.c
 To understand the principles behind the software, contniue reading.
 
 ## Design Principles
+
+There are two basic data types in Hackflight: 
+[state](https://github.com/simondlevy/Hackflight/blob/master/src/datatypes.hpp#L34-L44) and 
+[demands](https://github.com/simondlevy/Hackflight/blob/master/src/datatypes.hpp#L25-L32).  For those
+familiar with [Kalman filtering](http://home.wlu.edu/~levys/kalman_tutorial/), the state will be familiar:
+it is the set of values that define the state of the vehicle at a given time, which gets modified by a 
+set of sensors (gyrometer, accelerometer, barometer, rangefinder, ...).  Once the state has been determined,
+it is used by a set of [PID controllers](https://en.wikipedia.org/wiki/PID_controller) to modify the 
+demands received by the R/C receiver or other control device. 
