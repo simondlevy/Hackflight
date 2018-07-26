@@ -173,5 +173,5 @@ PID controller will be active in switch state 2, as we've
 example sketch. 
 
 <p align="center"> 
-<img src="extras/media/pidcontrollers.png" width=700>
+<img src="extras/media/pidcontrollers.png" width=400>
 </p>
