@@ -95,7 +95,19 @@ There are two basic data types in Hackflight:
 [state](https://github.com/simondlevy/Hackflight/blob/master/src/datatypes.hpp#L34-L44) and 
 [demands](https://github.com/simondlevy/Hackflight/blob/master/src/datatypes.hpp#L25-L32).  For those
 familiar with [Kalman filtering](http://home.wlu.edu/~levys/kalman_tutorial/), the state will be familiar:
-it is the set of values that define the state of the vehicle at a given time, which gets modified by a 
-set of sensors (gyrometer, accelerometer, barometer, rangefinder, ...).  Once the state has been determined,
-it is used by a set of [PID controllers](https://en.wikipedia.org/wiki/PID_controller) to modify the 
-demands received by the R/C receiver or other control device. 
+it is the set of values that define the state of the vehicle at a given time
+(altitude, orientation, angular velocity, ...), which gets modified by a set of
+sensors (gyrometer, accelerometer, barometer, rangefinder, ...).  Once the
+state has been determined, it is used by a set of [PID
+controllers](https://en.wikipedia.org/wiki/PID_controller) to modify the
+demands (throttle, roll, pitch, yaw) received by the R/C receiver or other
+control device. Then the demands are
+sent to the [mixer](https://github.com/simondlevy/Hackflight/blob/master/src/mixer.hpp), which determines the
+values to be sent to each motor.  
+
+As discussed above, Hackflight requires a bare minimum of 
+[two sensor readings](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp#L40-L41)
+&emdash; quaternion and gyrometer &emdash; and one PID controller, the Stabilizer.  (Technically, the
+quaternion is more properly part of the vehicle state, but because of the availablity of 
+&ldquo;hardware quaternion&rdquo; data from modern IMUs like the 
+[EM7180 SENtral Sensor Fusion Solution](https://www.tindie.com/products/onehorse/ultimate-sensor-fusion-solution-mpu9250/), we find it advantageous to treat the quaternion as a sensor reading.)
