@@ -109,8 +109,14 @@ As discussed above, Hackflight requires a bare minimum of
 [two sensor readings](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp#L40-L41)
 &ndash; quaternion and gyrometer &ndash; and one PID controller, the 
 [Stabilizer](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/stabilizer.hpp).
-(Technically, the quaternion is more properly part of the vehicle state, but
+Technically, the quaternion is more properly part of the vehicle state, but
 because of the availablity of &ldquo;hardware quaternion&rdquo; data from
 modern sensors like the [EM7180 SENtral Sensor Fusion
 Solution](https://www.tindie.com/products/onehorse/ultimate-sensor-fusion-solution-mpu9250/),
-we find it convenient to treat the quaternion as a sensor reading.)
+we find it convenient to treat the quaternion as a sensor reading.  For intertial measurement units
+(IMUs) like the MPU9250 that do not deliver a hardware quaternion, Hackflight provides a 
+pair of classes &ndash; 
+[MadgwickQuaternionFilter](https://github.com/simondlevy/Hackflight/blob/master/src/filters.hpp#L94-L95)
+and 
+[MahonyQuaternionFilter](https://github.com/simondlevy/Hackflight/blob/master/src/filters.hpp#L201-L202)
+ &ndash; that can be used to compute the quaternion on your microcontroller.
