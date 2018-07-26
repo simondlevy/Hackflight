@@ -131,6 +131,7 @@ of the [SurfaceMountSensor](https://github.com/simondlevy/Hackflight/blob/master
 class, which is in turn a sub-class of the 
 [Sensor](https://github.com/simondlevy/Hackflight/blob/master/src/sensor.hpp#L27-L37)
 class.  The Sensor class is an abstract (virtual) class (a.k.a. interface) specifying two methods that any sensor
-must implement: (1) reporting whether the sensor is ready to deliver new data; (2) modifying the vehicle state.  
-By requiring each sensor to report its readiness, we can avoid the need to write a separate timing loop for each
+must implement: (1) reporting whether the sensor is ready to deliver new data;
+(2) modifying the vehicle state.  By requiring each sensor to report its
+readiness, we can avoid the need to write a separate timing loop for each
 sensor in the main [loop code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L301-L312).
