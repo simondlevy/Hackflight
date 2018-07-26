@@ -1,5 +1,5 @@
 <p align="center"> 
-<img src="extras/media/logo.png" width=400>
+<img src="extras/media/logo.png" width=800>
 <br><i>Hackflight logo by MC Greenleaf</i>
 </p>
 
