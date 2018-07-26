@@ -149,7 +149,7 @@ in an
 
 
 <p align="center"> 
-<img src="extras/media/sensors4.png" width=700>
+<img src="extras/media/sensors5.png" width=700>
 </p>
 
 Like sensors, PID controllers in Hackflight are subclasses of an abstrct
