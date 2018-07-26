@@ -105,7 +105,7 @@ control device. Then the demands are
 sent to the [mixer](https://github.com/simondlevy/Hackflight/blob/master/src/mixer.hpp), which determines the
 values to be sent to each motor:
 
-<img src="extras/media/dataflow.png">
+<img src="extras/media/dataflow.png" width=400>
 
 As discussed above, Hackflight requires a bare minimum of 
 [two sensor readings](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp#L40-L41)
