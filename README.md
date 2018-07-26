@@ -134,4 +134,9 @@ class.  The Sensor class is an abstract (virtual) class (a.k.a. interface) speci
 must implement: (1) reporting whether the sensor is ready to deliver new data;
 (2) modifying the vehicle state.  By requiring each sensor to report its
 readiness, we can avoid the need to write a separate timing loop for each
-sensor in the main [loop code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L301-L312).
+sensor in the main [loop code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L301-L312). To
+implement additional sensors, you can directly sub-class the Sensor class, as we've done with the 
+[Rangefinder](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/rangefinder.hpp) 
+class that we use to support the
+[VL53L1](https://www.tindie.com/products/onehorse/vl53l1-long-range-proximity-sensor/) time-of-flight rangefinder 
+in an [example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/LadybugDSMX_VL53L1X/LadybugDSMX_VL53L1X.ino#L60-L84).
