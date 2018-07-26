@@ -120,3 +120,12 @@ pair of classes &ndash;
 and 
 [MahonyQuaternionFilter](https://github.com/simondlevy/Hackflight/blob/master/src/filters.hpp#L201-L202)
  &ndash; that can be used to compute the quaternion on your microcontroller.
+
+To provide access to other popular surface-mount sensors that you may wish to read, Hackflight also has classes to support
+[accelerometers](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/accelerometer.hpp), 
+[magnetometers](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/magnetometer.hpp), and 
+[barometers](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/barometer.hpp).  Together with the
+[quaternion](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/quaternion.hpp) and 
+[gyrometer](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/gyrometer.hpp), these are all sub-classes 
+of the [surface-mount sensor](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/surfacemount.hpp)
+class.
