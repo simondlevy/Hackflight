@@ -101,7 +101,7 @@ sensors (gyrometer, accelerometer, barometer, rangefinder, ...).  Once the
 state has been determined, it is used by a set of [PID
 controllers](https://en.wikipedia.org/wiki/PID_controller) to modify the
 demands (throttle, roll, pitch, yaw) received by the R/C receiver or other
-control device. Then the demands are
+control device. Then the demands are then
 sent to the [mixer](https://github.com/simondlevy/Hackflight/blob/master/src/mixer.hpp), which determines the
 values to be sent to each motor:
 
