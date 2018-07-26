@@ -132,7 +132,7 @@ To provide access to other popular surface-mount sensors that you may wish to re
 of the [SurfaceMountSensor](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/surfacemount.hpp)
 class, which is in turn a sub-class of the 
 [Sensor](https://github.com/simondlevy/Hackflight/blob/master/src/sensor.hpp#L27-L37)
-class.  Each surface-mount sensors accesses the appropriate virtual method of the 
+class.  Each surface-mount sensor accesses the appropriate virtual method of the 
 [Board](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp) class 
 (<tt>getQuaternion()</tt>, <tt>getGyrometer()</tt>, ...).
 The Sensor class is an abstract (virtual) class (a.k.a. interface) specifying two methods that any sensor
