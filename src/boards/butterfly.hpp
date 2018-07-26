@@ -255,6 +255,7 @@ namespace hf {
 
             bool getBarometer(float & pressure)
             {
+                (void)pressure;
                 return false;
             }
 
