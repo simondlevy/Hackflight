@@ -103,7 +103,9 @@ controllers](https://en.wikipedia.org/wiki/PID_controller) to modify the
 demands (throttle, roll, pitch, yaw) received by the R/C receiver or other
 control device. Then the demands are
 sent to the [mixer](https://github.com/simondlevy/Hackflight/blob/master/src/mixer.hpp), which determines the
-values to be sent to each motor.  
+values to be sent to each motor:
+
+<img src="extras/media/dataflow.png">
 
 As discussed above, Hackflight requires a bare minimum of 
 [two sensor readings](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp#L40-L41)
