@@ -128,7 +128,8 @@ To provide access to other popular surface-mount sensors that you may wish to re
 [quaternion](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/quaternion.hpp) and 
 [gyrometer](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/gyrometer.hpp), these are all sub-classes 
 of the [SurfaceMountSensor](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/surfacemount.hpp)
-class, which is in turn a sub-class of the [Sensor](https://github.com/simondlevy/Hackflight/blob/master/src/sensor.hpp)
+class, which is in turn a sub-class of the 
+[Sensor](https://github.com/simondlevy/Hackflight/blob/master/src/sensor.hpp#L27-L37)
 class.  The Sensor class is an abstract (virtual) class (a.k.a. interface) specifying two methods that any sensor
 must implement: (1) reporting whether the sensor is ready to deliver new data; (2) modifying the vehicle state.  
 By requiring each sensor to report its readiness, we can avoid the need to write a separate timing loop for each
