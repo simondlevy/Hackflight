@@ -143,7 +143,7 @@ must implement: (1) reporting whether the sensor is ready to deliver new data;
 readiness, we can avoid the need to write a separate timing loop for each
 sensor in the main [loop code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L301-L312). 
 
-If you're mathematically-minded, you can think of a sensor as a function from states to state:
+If you're mathematically-minded, you can think of a sensor as a function from states to states:
 <i>Sensor</i>: <i>State</i> &rarr; <i>State</i>
 
 To implement additional sensors, you can directly sub-class the Sensor class, as we've done with the 
@@ -178,3 +178,7 @@ example sketch.
 <p align="center"> 
 <img src="extras/media/pidcontrollers.png" width=400>
 </p>
+
+If you're mathematically-minded, you can think of a PID Controller as a function from a (<i>State</i>, <i>Demands</i>) pair to <i>Demands</i>:
+<i>PID Controller</i>: <i>State</i> &times; <i>Demands</i> &rarr; <i>Demands</i>
+
