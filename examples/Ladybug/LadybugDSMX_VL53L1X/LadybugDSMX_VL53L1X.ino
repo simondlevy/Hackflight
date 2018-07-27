@@ -20,7 +20,7 @@
  */
 
 #include <Arduino.h>
-#include <SparkFun_VL53L1X_Arduino_Library.h>
+#include <VL53L1X.h>
 
 #include "hackflight.hpp"
 #include "boards/ladybug.hpp"
