@@ -143,6 +143,9 @@ must implement: (1) reporting whether the sensor is ready to deliver new data;
 readiness, we can avoid the need to write a separate timing loop for each
 sensor in the main [loop code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L301-L312). 
 
+If you're mathematically-minded, you can think of a sensor as a function from states to state:
+<i>Sensor</i>: <i>State</i> &rarr; <i>State</i>
+
 To implement additional sensors, you can directly sub-class the Sensor class, as we've done with the 
 [Rangefinder](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/rangefinder.hpp) 
 class that we use to support the
