@@ -105,7 +105,7 @@ control device. Then the demands are then
 sent to the [mixer](https://github.com/simondlevy/Hackflight/blob/master/src/mixer.hpp), which determines the
 values to be sent to each motor:
 
-<img src="extras/media/dataflow2.png" width=800>
+<img src="extras/media/dataflow3.png" width=800>
 
 ### Sensors
 
