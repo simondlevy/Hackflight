@@ -47,25 +47,25 @@ follow what the code is doing.
 Because a multirotor build typically involves choosing a flight-control board,
 radio receiver, model (airframe), and PID control settings, Hackflight provides
 a separate C++ class to support each of these components:
-<ul>
-<li> The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp">Board</a>
+
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp">Board</a>
 class specifies a set of four abstract (pure virtual) methods that you must
 implement for a particular flight controller or simulator: getting the current
 quaternion from the IMU; getting gyrometer rates from the IMU; sending
-commands to the motors; and getting the current time.  <li> The <a
-href="https://github.com/simondlevy/Hackflight/blob/master/src/receiver.hpp">Receiver</a>
+commands to the motors; and getting the current time.  
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/receiver.hpp">Receiver</a>
 class performs basic functions associated with R/C control (tracking stick
 positions, checking switches) and specifies a set of abstract methods that you
-implement for a particular receiver (reading channels values).  <li>The <a
-href="https://github.com/simondlevy/Hackflight/blob/master/src/mixer.hpp">Mixer</a>
+implement for a particular receiver (reading channels values).  
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/mixer.hpp">Mixer</a>
 class is an abstract class that can be subclassed for various motor
 configurations (QuadX, Hexacopter, Tricopter, etc.).  The <a
 href="https://github.com/simondlevy/Hackflight/blob/master/src/mixers/quadx.hpp">QuadX</a>
 subclass is already implemented.  
-<li>The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/stabilizer.hpp">Stabilizer</a>
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/stabilizer.hpp">Stabilizer</a>
 class provides a constructor where you specify the stabilization PID values
 appropriate for your model.  
-</ul>
+
 
 Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
 channel values,  we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program.
