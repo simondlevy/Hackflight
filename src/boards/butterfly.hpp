@@ -28,8 +28,6 @@
 #include <Servo.h>
 
 #include <MPU9250.h> 
-#include <MS5637.h>
-#include <CrossPlatformI2C.h>
 
 #include "filters.hpp"
 #include "hackflight.hpp"
