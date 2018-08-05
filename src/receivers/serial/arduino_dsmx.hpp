@@ -24,6 +24,21 @@
 
 static SpektrumDSM2048 rx;
 
+void serialEvent1(void)
+{
+    rx.handleSerialEvent(micros());
+}
+
+int serialAvailable(void)
+{
+    return Serial1.available();
+}
+
+uint8_t serialRead(void)
+{
+    return Serial1.read();
+}
+
 namespace hf {
 
     class DSMX_Receiver : public Receiver {
@@ -37,7 +52,7 @@ namespace hf {
 
             void begin(void)
             {
-                rx.begin();
+                Serial1.begin(115200);
             }
 
             bool gotNewFrame(void)
