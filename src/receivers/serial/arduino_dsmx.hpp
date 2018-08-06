@@ -67,7 +67,7 @@ namespace hf {
 
             bool lostSignal(void)
             {
-                return rx.timedOut();
+                return rx.timedOut(micros());
             }
 
     }; // class DSMX_Receiver
