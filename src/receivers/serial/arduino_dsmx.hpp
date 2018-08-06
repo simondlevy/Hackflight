@@ -29,12 +29,12 @@ void serialEvent1(void)
     rx.handleSerialEvent(micros());
 }
 
-int serialAvailable(void)
+uint8_t dsmSerialAvailable(void)
 {
     return Serial1.available();
 }
 
-uint8_t serialRead(void)
+uint8_t dsmSerialRead(void)
 {
     return Serial1.read();
 }
