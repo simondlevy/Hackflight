@@ -34,6 +34,9 @@ extern "C" {
 #include "exti.h"
 #include "bus_spi.h"
 
+extern void setup(void);
+extern void loop(void);
+
 // Board-specific
 GPIO_TypeDef * gpio_type_from_pin(uint8_t pin);
 uint16_t gpio_pin_from_pin(uint8_t pin);

@@ -2852,6 +2852,7 @@ void HRTIM_ADCTriggerConfig(HRTIM_TypeDef * HRTIMx,
       /* Set the ADC trigger 3 source */
       HRTIMx->HRTIM_COMMON.ADC3R = pADCTriggerCfg->Trigger;
     }
+    break;
     case HRTIM_ADCTRIGGER_4:
     {
       HRTIM_cr1 &= ~(HRTIM_CR1_ADC4USRC);

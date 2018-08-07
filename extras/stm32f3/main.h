@@ -27,12 +27,6 @@ extern "C" {
 #include <stdarg.h>
 #include <stdio.h>
 
-#define HIGH 0x1
-#define LOW  0x0
-
-#define INPUT 0x0
-#define OUTPUT 0x1
-
 void ledInit(void);
 void ledSet(bool value);
 
