@@ -75,19 +75,8 @@ uint32_t millis(void)
 
 void systemInit(void)
 {
-#ifdef CC3D
-    /* Accounts for OP Bootloader, set the Vector Table base address as specified in .ld file */
-    extern void *isr_vector_table_base;
-
-    NVIC_SetVectorTable((uint32_t)&isr_vector_table_base, 0x0);
-#endif
     // Configure NVIC preempt/priority groups
     NVIC_PriorityGroupConfig(NVIC_PRIORITY_GROUPING);
-
-#ifdef STM32F10X
-    // Turn on clocks for stuff we use
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-#endif
 
     // cache RCC->CSR value to use it in isMPUSoftreset() and others
     cachedRccCsrValue = RCC->CSR;
@@ -97,12 +86,6 @@ void systemInit(void)
 
     usartInitAllIOSignals();
 
-#ifdef STM32F10X
-    // Turn off JTAG port 'cause we're using the GPIO for leds
-#define AFIO_MAPR_SWJ_CFG_NO_JTAG_SW            (0x2 << 24)
-    AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_NO_JTAG_SW;
-#endif
-
     // Init cycle counter
     cycleCounterInit();
 
@@ -110,39 +93,11 @@ void systemInit(void)
     SysTick_Config(SystemCoreClock / 1000);
 }
 
-#if 1
 void delayMicroseconds(uint32_t us)
 {
     uint32_t now = micros();
     while (micros() - now < us);
 }
-#else
-void delayMicroseconds(uint32_t us)
-{
-    uint32_t elapsed = 0;
-    uint32_t lastCount = SysTick->VAL;
-
-    for (;;) {
-        register uint32_t current_count = SysTick->VAL;
-        uint32_t elapsed_us;
-
-        // measure the time elapsed since the last time we checked
-        elapsed += current_count - lastCount;
-        lastCount = current_count;
-
-        // convert to microseconds
-        elapsed_us = elapsed / usTicks;
-        if (elapsed_us >= us)
-            break;
-
-        // reduce the delay by the elapsed time
-        us -= elapsed_us;
-
-        // keep fractional microseconds for the next iteration
-        elapsed %= usTicks;
-    }
-}
-#endif
 
 void delay(uint32_t ms)
 {
