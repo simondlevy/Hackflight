@@ -75,16 +75,6 @@ void ledSet(bool value)
     }
 }
 
-void reset(void)
-{
-    systemReset();
-}
-
-void resetToBootloader(void)
-{
-    systemResetToBootloader();
-}
-
 int main(void) 
 {
     // start fpu

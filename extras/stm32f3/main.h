@@ -33,9 +33,6 @@ unsigned long micros(void);
 unsigned long millis(void);
 void delay(unsigned long);
 
-void reset(void);
-void resetToBootloader(void);
-
 void setup(void);
 void loop(void);
 
