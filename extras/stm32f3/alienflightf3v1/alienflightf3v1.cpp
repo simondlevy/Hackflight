@@ -19,6 +19,15 @@
 */
 
 #include <main.h>
+#include "../f3board.h"
+
+namespace hf {
+
+class AlienflightF3V1Board : public F3Board {
+
+}; // class AlienflightF3V1Board
+
+} // namespace hf
 
 void setup() {                
 

@@ -271,7 +271,7 @@ $(OBJECT_DIR)/$(PROJECT)/HardwareSerial.o: $(F3_DIR)/HardwareSerial.cpp $(F3_DIR
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/HardwareSerial.o $(CFLAGS) $(F3_DIR)/HardwareSerial.cpp
 
 $(OBJECT_DIR)/$(PROJECT).o: ./$(PROJECT).cpp
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT).o $(CFLAGS) ./$(PROJECT).cpp
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT).o -I$(HACKFLIGHT_DIR) $(CFLAGS) ./$(PROJECT).cpp
 
 clean:
 	rm -rf obj ../*.i ../*.o ../*.d ../*.s
