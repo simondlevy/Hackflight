@@ -26,6 +26,12 @@ namespace hf {
 
 class AlienflightF3V1Board : public F3Board {
 
+    void writeMotor(uint8_t index, float value)
+    {
+        (void)index; // XXX
+        (void)value;
+    }
+
 }; // class AlienflightF3V1Board
 
 } // namespace hf

@@ -41,7 +41,7 @@ namespace hf {
 
             virtual uint32_t getMicroseconds(void) override;
 
-            void writeMotor(uint8_t index, float value);
+            virtual void writeMotor(uint8_t index, float value) = 0;
 
             bool getGyrometer(float gyroRates[3]);
 

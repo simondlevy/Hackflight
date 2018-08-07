@@ -64,17 +64,17 @@ namespace hf {
 
     uint8_t F3Board::serialAvailableBytes(void)
     {
-        return 0;
+        return 0; // XXX
     }
 
     uint8_t F3Board::serialReadByte(void)
     {
-        return 0;
+        return 0; // XXX
     }
 
     void F3Board::serialWriteByte(uint8_t c)
     {
-        (void)c;
+        (void)c; // XXX
     }
 
     uint32_t F3Board::getMicroseconds(void)
@@ -82,21 +82,15 @@ namespace hf {
         return micros();
     }
 
-    void F3Board::writeMotor(uint8_t index, float value)
-    {
-        (void)index;
-        (void)value;
-    }
-
     bool F3Board::getGyrometer(float gyroRates[3])
     {
-        (void)gyroRates;
+        (void)gyroRates; // XXX
         return false;
     }
 
     bool F3Board::getQuaternion(float quat[4])
     {
-        (void)quat;
+        (void)quat; // XXX
         return false;
     }
 
