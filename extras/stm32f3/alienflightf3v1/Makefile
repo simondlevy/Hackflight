@@ -26,7 +26,6 @@ PROJECT = Blink
 
 F3_DIR = ..
 SUPPORT_DIR = $(F3_DIR)/support
-ALIENFLIGHTF3_DIR = .
 
 # Debugger optons, must be empty or GDB
 DEBUG ?=
@@ -39,12 +38,12 @@ FLASH_SIZE ?= 256
 
 # Working directories
 ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
-SRC_DIR		 = $(ALIENFLIGHTF3_DIR)
+SRC_DIR		 = .
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 #CMSIS_DIR	 = $(ROOT)/lib/CMSIS
 CMSIS_DIR	 = $(SUPPORT_DIR)/lib/CMSIS
-INCLUDE_DIRS = $(SUPPORT_DIR) $(F3_DIR) $(SUPPORT_DIR) $(ALIENFLIGHTF3_DIR) $(SRC_DIR) $(SRC_DIR)/target
+INCLUDE_DIRS = $(SUPPORT_DIR) $(F3_DIR) $(SUPPORT_DIR) $(SRC_DIR) $(SRC_DIR)/target
 LINKER_DIR	 = $(SUPPORT_DIR)
 
 # Search path for sources
