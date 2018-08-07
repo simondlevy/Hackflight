@@ -24,9 +24,9 @@ PROJECT = Blink
 
 ###############################################################################
 
-F3_DIR = ../../..
+F3_DIR = ..
 SUPPORT_DIR = $(F3_DIR)/support
-ALIENFLIGHTF3_DIR = ../..
+ALIENFLIGHTF3_DIR = .
 
 # Debugger optons, must be empty or GDB
 DEBUG ?=
