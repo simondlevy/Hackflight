@@ -211,6 +211,7 @@ hex:    $(TARGET_HEX)
 
 $(TARGET_HEX): $(TARGET_ELF)
 	$(OBJCOPY) -O ihex --set-start 0x8000000 $< $@
+	rm -f ../*.i ../*.d ../*.o ../*.s
 
 $(TARGET_ELF):  $(TARGET_OBJS)
 	$(CC) -o $@ $^ $(LDFLAGS)

@@ -236,6 +236,7 @@ $(TARGET_HEX): $(TARGET_ELF)
 
 $(TARGET_BIN): $(TARGET_ELF)
 	$(OBJCOPY) -O binary $< $@
+	rm -f ../*.i ../*.d ../*.o ../*.s
 
 $(TARGET_ELF):  $(TARGET_OBJS)
 	$(C++) -o $@ $^ $(LDFLAGS)
