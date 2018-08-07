@@ -20,6 +20,8 @@
 
 #include "../f3board.h"
 
+#include <stdio.h>
+
 namespace hf {
 
 class AlienflightF3V1Board : public F3Board {
@@ -42,4 +44,8 @@ void loop() {
     board->delaySeconds(1);  
     board->ledSet(false);
     board->delaySeconds(1);  
+
+    char tmp[20];
+    sprintf(tmp, "%d\n", board->getMicroseconds());
+    hf::Board::outbuf(tmp);
 }

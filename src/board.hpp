@@ -35,7 +35,8 @@ namespace hf {
         friend class Debug;
         friend class Mixer;
 
-        protected:
+        //protected:
+        public:
 
             //------------------------------------ Core functionality ----------------------------------------------------
             virtual bool  getQuaternion(float quat[4]) = 0;

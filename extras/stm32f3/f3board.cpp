@@ -79,7 +79,7 @@ namespace hf {
 
     uint32_t F3Board::getMicroseconds(void)
     {
-        return 0;
+        return micros();
     }
 
     void F3Board::writeMotor(uint8_t index, float value)
