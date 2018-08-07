@@ -20,7 +20,7 @@
 ARDUINO_DIR = $(HOME)/Documents/Arduino/libraries
 
 # Change this to whatever project name you want
-PROJECT = Blink
+PROJECT = alienflightf3v1
 
 ###############################################################################
 
