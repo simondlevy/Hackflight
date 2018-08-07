@@ -33,8 +33,8 @@ extern "C" {
 #define INPUT 0x0
 #define OUTPUT 0x1
 
-void pinMode(uint8_t pin, uint8_t mode);
-void digitalWrite(uint8_t pin, uint8_t level);
+void ledInit(void);
+void ledSet(bool value);
 
 unsigned long micros(void);
 unsigned long millis(void);

@@ -47,39 +47,32 @@ void SetSysClock(void);
 
 static serialPort_t * serial0;
 
-void pinMode(uint8_t pin, uint8_t mode)
+static const uint8_t LED_PIN = 16;
+
+void ledInit(void)
 {
-    // XXX currently support output mode only
-    if (mode != OUTPUT) return;
-
-    pin = 1<<pin;
-
-    GPIO_TypeDef * gpio = gpio_type_from_pin(pin);
+    GPIO_TypeDef * gpio = gpio_type_from_pin(LED_PIN);
 
     gpio_config_t cfg;
 
-    cfg.pin = gpio_pin_from_pin(pin);
+    cfg.pin = gpio_pin_from_pin(LED_PIN);
     cfg.mode = Mode_Out_PP;
     cfg.speed = Speed_2MHz;
 
     gpioInit(gpio, &cfg);
 }
 
-void digitalWrite(uint8_t pin, uint8_t level)
+void ledSet(bool value)
 {
-    pin = 1<<pin;
+    uint16_t gpio_pin = gpio_pin_from_pin(LED_PIN);
 
-    GPIO_TypeDef * gpio = gpio_type_from_pin(pin);
+    GPIO_TypeDef * gpio = gpio_type_from_pin(LED_PIN);
 
-    uint16_t gpio_pin = gpio_pin_from_pin(pin);
-
-    switch (level) {
-        case HIGH:
-            digitalLo(gpio, gpio_pin);
-            break;
-        case LOW:
-            digitalHi(gpio, gpio_pin);
-            break;
+    if (value) {
+        digitalLo(gpio, gpio_pin);
+    }
+    else {
+        digitalHi(gpio, gpio_pin);
     }
 }
 
