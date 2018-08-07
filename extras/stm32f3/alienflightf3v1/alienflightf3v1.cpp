@@ -36,8 +36,6 @@ void Board::outbuf(char * buf)
 
 static hf::AlienflightF3V1Board  * board;
 
-extern void delay(uint32_t);
-
 void setup() {                
 
     board = new hf::AlienflightF3V1Board();
