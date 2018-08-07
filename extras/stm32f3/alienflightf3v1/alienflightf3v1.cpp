@@ -26,12 +26,6 @@ class AlienflightF3V1Board : public F3Board {
 
 }; // class AlienflightF3V1Board
 
-void Board::outbuf(char * buf)
-{
-    (void)buf;
-    //Serial.print(buf);
-}
-
 } // namespace hf
 
 static hf::AlienflightF3V1Board  * board;

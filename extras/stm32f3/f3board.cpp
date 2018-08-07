@@ -35,10 +35,11 @@ extern "C" { // So we can talk to C support code
 #include "serial_uart.h"
 #include "exti.h"
 
+static const uint8_t LED_PIN = 16;
+
 GPIO_TypeDef * gpio_type_from_pin(uint8_t pin);
 uint16_t gpio_pin_from_pin(uint8_t pin);
-
-static const uint8_t LED_PIN = 16;
+serialPort_t * serial0;
 
 namespace hf {
 
@@ -106,14 +107,13 @@ namespace hf {
         RealBoard::init();
     }
 
+    void Board::outbuf(char * buf)
+    {
+        for (char *p=buf; *p; p++)
+            serialWrite(serial0, *p);
+    }
+
 } // namespace hf
-
-// Board-specific
-serialPort_t * serial0_open(void);
-
-void SetSysClock(void);
-
-serialPort_t * serial0;
 
 static void ledInit(void)
 {
@@ -127,6 +127,10 @@ static void ledInit(void)
 
     gpioInit(gpio, &cfg);
 }
+
+serialPort_t * serial0_open(void);
+
+void SetSysClock(void);
 
 int main(void) 
 {
