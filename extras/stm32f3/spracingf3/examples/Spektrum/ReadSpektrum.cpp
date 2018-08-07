@@ -23,12 +23,12 @@ SpektrumDSM2048 * rx;
 
 static uint8_t avail;
 
-int serialAvailable(void)
+uint8_t dsmSerialAvailable(void)
 {
     return avail;
 }
 
-uint8_t serialRead(void)
+uint8_t dsmSerialRead(void)
 {
     avail--;
 
