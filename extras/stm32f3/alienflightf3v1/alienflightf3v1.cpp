@@ -76,6 +76,9 @@ hf::MixerQuadX mixer;
 
 void setup() {                
 
+    // Note that we have to allocate Stabilizer and Receiver dynamically to
+    // ensure that their constructors are called
+
     hf::Stabilizer * stabilizer = new hf::Stabilizer(
         0.20f,      // Level P
         0.225f,     // Gyro cyclic P
@@ -98,7 +101,4 @@ void setup() {
 void loop() {
 
     h.update();
-
-    static int count;
-    hf::Debug::printf("%d\n", count++);
 }

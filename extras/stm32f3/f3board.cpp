@@ -137,6 +137,20 @@ static void ledInit(void)
     gpioInit(gpio, &cfg);
 }
 
+static void checkReboot(void)
+{
+    // support reboot from host computer
+    static uint32_t dbg_start_msec;
+    if (millis()-dbg_start_msec > 100) {
+        dbg_start_msec = millis();
+        while (serialRxBytesWaiting(serial0)) {
+            uint8_t c = serialRead(serial0);
+            if (c == 'R') 
+                systemResetToBootloader();
+        }
+    }
+}
+
 serialPort_t * serial0_open(void);
 
 void SetSysClock(void);
@@ -162,16 +176,7 @@ int main(void)
 
     while (true) {
 
-        // support reboot from host computer
-        static uint32_t dbg_start_msec;
-        if (millis()-dbg_start_msec > 100) {
-            dbg_start_msec = millis();
-            while (serialRxBytesWaiting(serial0)) {
-                uint8_t c = serialRead(serial0);
-                if (c == 'R') 
-                    systemResetToBootloader();
-            }
-        }
+        checkReboot();
 
         loop();
     }
