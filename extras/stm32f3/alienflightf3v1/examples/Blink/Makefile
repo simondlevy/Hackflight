@@ -25,7 +25,7 @@ PROJECT = Blink
 ###############################################################################
 
 F3_DIR = ../../..
-ALIENFLIGHTF3_DIR = $(F3_DIR)/alienflightf3
+ALIENFLIGHTF3_DIR = ../..
 
 # Debugger optons, must be empty or GDB
 DEBUG ?=
@@ -264,7 +264,7 @@ $(OBJECT_DIR)/$(PROJECT).o: ./$(PROJECT).cpp
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT).o $(CFLAGS) ./$(PROJECT).cpp
 
 clean:
-	rm -rf obj
+	rm -rf obj ../*.i ../*.o ../*.d ../*.s
 
 flash_$(PROJECT): $(TARGET_BIN)
 	echo -n 'R' >$(SERIAL_DEVICE)
