@@ -27,7 +27,6 @@ extern "C" {
 #include <stdarg.h>
 #include <stdio.h>
 
-void ledInit(void);
 void ledSet(bool value);
 
 unsigned long micros(void);

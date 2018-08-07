@@ -262,7 +262,7 @@ $(OBJECT_DIR)/$(PROJECT)/%.o: %.S
 	@$(CC) -c -o $@ $(ASFLAGS) $<
 
 $(OBJECT_DIR)/$(PROJECT)/main.o: $(F3_DIR)/main.cpp $(F3_DIR)/main.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/main.o $(CFLAGS) $(F3_DIR)/main.cpp
+	@$(C++) -c -o $(OBJECT_DIR)/$(PROJECT)/main.o $(CFLAGS) $(F3_DIR)/main.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/f3board.o: $(F3_DIR)/f3board.cpp $(F3_DIR)/f3board.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3board.o -I$(HACKFLIGHT_DIR) $(CFLAGS) $(F3_DIR)/f3board.cpp

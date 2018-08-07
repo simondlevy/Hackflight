@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-extern "C" {
+extern "C" { // So we can talk to C support code
 
 #include <main.h>
 
@@ -48,7 +48,7 @@ serialPort_t * serial0;
 
 static const uint8_t LED_PIN = 16;
 
-void ledInit(void)
+static void ledInit(void)
 {
     GPIO_TypeDef * gpio = gpio_type_from_pin(LED_PIN);
 
@@ -99,6 +99,8 @@ int main(void)
     serial0 = serial0_open();
 
     dmaInit();
+
+    ledInit();
 
     setup();
 
