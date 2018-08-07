@@ -25,7 +25,7 @@ void serialEvent3(void) __attribute__((weak));
 
 extern "C" {
 
-#include <Arduino.h>
+#include <main.h>
 
 #include "platform.h"
 

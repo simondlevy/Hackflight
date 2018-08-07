@@ -1,5 +1,8 @@
 extras/parser/output
 parser/output
+*.d
+*.i
+*.s
 *.o
 *.swp
 *~
