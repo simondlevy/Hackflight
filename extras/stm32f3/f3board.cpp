@@ -64,17 +64,18 @@ namespace hf {
 
     uint8_t F3Board::serialAvailableBytes(void)
     {
-        return 0; // XXX
+        return serialRxBytesWaiting(serial0);
     }
 
     uint8_t F3Board::serialReadByte(void)
     {
-        return 0; // XXX
+        return serialRead(serial0);
     }
 
     void F3Board::serialWriteByte(uint8_t c)
     {
-        (void)c; // XXX
+        serialWrite(serial0, c);
+        while (!isSerialTransmitBufferEmpty(serial0));
     }
 
     uint32_t F3Board::getMicroseconds(void)
@@ -85,14 +86,28 @@ namespace hf {
     bool F3Board::getGyrometer(float gyroRates[3])
     {
         (void)gyroRates; // XXX
+
+        static uint32_t _time;
+        uint32_t time = micros();
+        if (time-_time > 5000) {
+            _time = time;
+            return true;
+        }
         return false;
     }
 
     bool F3Board::getQuaternion(float quat[4])
     {
         (void)quat; // XXX
+
+        static uint32_t _time;
+        uint32_t time = micros();
+        if (time-_time > 10000) {
+            _time = time;
+            return true;
+        }
         return false;
-    }
+     }
 
     // Support prototype version where LED is on pin A1
     F3Board::F3Board(void)
@@ -147,9 +162,8 @@ int main(void)
 
     while (true) {
 
-#ifndef EXTERNAL_DEBUG
-        static uint32_t dbg_start_msec;
         // support reboot from host computer
+        static uint32_t dbg_start_msec;
         if (millis()-dbg_start_msec > 100) {
             dbg_start_msec = millis();
             while (serialRxBytesWaiting(serial0)) {
@@ -158,7 +172,7 @@ int main(void)
                     systemResetToBootloader();
             }
         }
-#endif
+
         loop();
     }
 

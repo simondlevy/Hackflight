@@ -20,11 +20,15 @@
 
 #include "../f3board.h"
 
-#include <stdio.h>
+#include <receiver.hpp>
+#include <hackflight.hpp>
+#include <mixers/quadx.hpp>
+
+constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 namespace hf {
 
-class AlienflightF3V1Board : public F3Board {
+class AlienflightF3V1 : public F3Board {
 
     void writeMotor(uint8_t index, float value)
     {
@@ -32,26 +36,69 @@ class AlienflightF3V1Board : public F3Board {
         (void)value;
     }
 
-}; // class AlienflightF3V1Board
+}; // class AlienflightF3V1
+
+class PhonyReceiver : public Receiver {
+
+    public:
+
+        PhonyReceiver(const uint8_t channelMap[6], float trimRoll=.01, float trimPitch=0, float trimYaw=0) : 
+            Receiver(channelMap, trimRoll, trimPitch, trimYaw) { }
+
+    protected:
+
+        virtual void begin(void) override 
+        {
+        }
+
+        virtual bool gotNewFrame(void) override 
+        {
+            return true;
+        }
+
+        virtual void readRawvals(void)override 
+        {
+            rawvals[0] = 0.1;
+            rawvals[1] = 0.2;
+            rawvals[2] = 0.3;
+            rawvals[3] = 0.4;
+            rawvals[4] = 0.5;
+            rawvals[5] = 0.6;
+            rawvals[6] = 0.7;
+        }
+};
 
 } // namespace hf
 
-static hf::AlienflightF3V1Board  * board;
+static hf::Hackflight h;
+
+hf::MixerQuadX mixer;
 
 void setup() {                
 
-    board = new hf::AlienflightF3V1Board();
+    hf::Stabilizer * stabilizer = new hf::Stabilizer(
+        0.20f,      // Level P
+        0.225f,     // Gyro cyclic P
+        0.001875f,  // Gyro cyclic I
+        0.375f,     // Gyro cyclic D
+        1.0625f,    // Gyro yaw P
+        0.005625f); // Gyro yaw I
+
+    hf::PhonyReceiver * rc = new hf::PhonyReceiver(
+        CHANNEL_MAP,
+        .005f,  // roll trim
+        .01f,  // pitch trim
+        0.f);   // yaw trim
+
+    // Initialize Hackflight firmware
+    h.init(new hf::AlienflightF3V1(), rc, &mixer, stabilizer);
 }
 
 // the loop routine runs over and over again forever:
 void loop() {
 
-    board->ledSet(true);  
-    board->delaySeconds(1);  
-    board->ledSet(false);
-    board->delaySeconds(1);  
+    h.update();
 
-    char tmp[20];
-    sprintf(tmp, "%d\n", board->getMicroseconds());
-    hf::Board::outbuf(tmp);
+    static int count;
+    hf::Debug::printf("%d\n", count++);
 }

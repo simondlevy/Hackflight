@@ -100,9 +100,9 @@ namespace hf {
         uint8_t _channelMap[6];
 
         // These must be overridden for each receiver
-        virtual void  begin(void) = 0;
-        virtual bool  gotNewFrame(void) = 0;
-        virtual void  readRawvals(void) = 0;
+        virtual void begin(void) = 0;
+        virtual bool gotNewFrame(void) = 0;
+        virtual void readRawvals(void) = 0;
 
         // Software trim
         float _trimRoll;
@@ -143,6 +143,7 @@ namespace hf {
 
         bool getDemands(float yawAngle)
         {
+            // Acquire receiver demands, passing yaw angle for headless mode
             // Wait till there's a new frame
             if (!gotNewFrame()) return false;
 

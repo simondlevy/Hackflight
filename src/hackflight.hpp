@@ -164,7 +164,6 @@ namespace hf {
 
             void checkReceiver(void)
             {
-                // Acquire receiver demands, passing yaw angle for headless mode
                 if (!_receiver->getDemands(_state.eulerAngles[AXIS_YAW] - _yawInitial)) return;
 
                 // Update stabilizer with cyclic demands
@@ -302,6 +301,8 @@ namespace hf {
             {
                 // Grab control signal if available
                 checkReceiver();
+
+                return;
 
                 // Check mandatory sensors
                 checkGyrometer();

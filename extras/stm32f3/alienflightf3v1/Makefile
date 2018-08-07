@@ -33,6 +33,7 @@ DEBUG ?=
 
 # Serial port/Device for flashing
 SERIAL_DEVICE	?= /dev/ttyACM0
+BAUD            ?= 115200
 
 # Flash size (KB).  Some low-end chips actually have more flash than advertised, use this to override.
 FLASH_SIZE ?= 256
@@ -266,7 +267,7 @@ $(OBJECT_DIR)/$(PROJECT)/f3board.o: $(F3_DIR)/f3board.cpp $(F3_DIR)/f3board.h
 $(OBJECT_DIR)/$(PROJECT)/HardwareSerial.o: $(F3_DIR)/HardwareSerial.cpp $(F3_DIR)/HardwareSerial.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/HardwareSerial.o $(CFLAGS) $(F3_DIR)/HardwareSerial.cpp
 
-$(OBJECT_DIR)/$(PROJECT).o: ./$(PROJECT).cpp
+$(OBJECT_DIR)/$(PROJECT).o: ./$(PROJECT).cpp $(HACKFLIGHT_DIR)/*.hpp
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT).o -I$(HACKFLIGHT_DIR) $(CFLAGS) ./$(PROJECT).cpp
 
 clean:
@@ -294,4 +295,4 @@ commit:
 	git push
 
 listen:
-	miniterm.py $(SERIAL_DEVICE)
+	miniterm.py $(SERIAL_DEVICE) $(BAUD)
