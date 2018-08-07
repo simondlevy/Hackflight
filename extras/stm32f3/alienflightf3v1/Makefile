@@ -210,7 +210,6 @@ TARGET_BIN	 = obj/$(PROJECT).bin
 TARGET_HEX	 = $(BIN_DIR)/$(PROJECT).hex
 TARGET_ELF	 = $(OBJECT_DIR)/$(PROJECT).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $($(PROJECT)_CSRC)))) \
-			   $(OBJECT_DIR)/$(PROJECT)/main.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3board.o \
 			   $(OBJECT_DIR)/$(PROJECT)/HardwareSerial.o \
 			   $(OBJECT_DIR)/$(PROJECT).o
@@ -260,9 +259,6 @@ $(OBJECT_DIR)/$(PROJECT)/%.o: %.S
 	@mkdir -p $(dir $@)
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(ASFLAGS) $<
-
-$(OBJECT_DIR)/$(PROJECT)/main.o: $(F3_DIR)/main.cpp $(F3_DIR)/main.h
-	@$(C++) -c -o $(OBJECT_DIR)/$(PROJECT)/main.o $(CFLAGS) $(F3_DIR)/main.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/f3board.o: $(F3_DIR)/f3board.cpp $(F3_DIR)/f3board.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3board.o -I$(HACKFLIGHT_DIR) $(CFLAGS) $(F3_DIR)/f3board.cpp

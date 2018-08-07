@@ -18,7 +18,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <main.h>
 #include "../f3board.h"
 
 namespace hf {
@@ -35,15 +34,20 @@ void Board::outbuf(char * buf)
 
 } // namespace hf
 
+static hf::AlienflightF3V1Board  * board;
+
+extern void delay(uint32_t);
+
 void setup() {                
 
+    board = new hf::AlienflightF3V1Board();
 }
 
 // the loop routine runs over and over again forever:
 void loop() {
 
-    ledSet(true);  
-    delay(1000);  
-    ledSet(false);
-    delay(1000); 
+    board->ledSet(true);  
+    board->delaySeconds(1);  
+    board->ledSet(false);
+    board->delaySeconds(1);  
 }

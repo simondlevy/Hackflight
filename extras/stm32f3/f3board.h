@@ -26,7 +26,8 @@ namespace hf {
 
     class F3Board : public RealBoard {
 
-        protected:
+        //protected:
+        public:
 
             void delaySeconds(float sec);
 
@@ -45,10 +46,6 @@ namespace hf {
             bool getGyrometer(float gyroRates[3]);
 
             bool getQuaternion(float quat[4]);
-
-            bool getAccelerometer(float accelGs[3]);
-
-            bool getBarometer(float & pressure);
 
         public:
 
