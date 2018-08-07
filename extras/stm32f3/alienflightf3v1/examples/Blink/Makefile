@@ -25,6 +25,7 @@ PROJECT = Blink
 ###############################################################################
 
 F3_DIR = ../../..
+SUPPORT_DIR = $(F3_DIR)/support
 ALIENFLIGHTF3_DIR = ../..
 
 # Debugger optons, must be empty or GDB
@@ -42,18 +43,18 @@ SRC_DIR		 = $(ALIENFLIGHTF3_DIR)
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 #CMSIS_DIR	 = $(ROOT)/lib/CMSIS
-CMSIS_DIR	 = $(F3_DIR)/lib/CMSIS
-INCLUDE_DIRS = $(F3_DIR) $(F3_DIR) $(ALIENFLIGHTF3_DIR) $(SRC_DIR) $(SRC_DIR)/target
-LINKER_DIR	 = $(F3_DIR)
+CMSIS_DIR	 = $(SUPPORT_DIR)/lib/CMSIS
+INCLUDE_DIRS = $(SUPPORT_DIR) $(F3_DIR) $(SUPPORT_DIR) $(ALIENFLIGHTF3_DIR) $(SRC_DIR) $(SRC_DIR)/target
+LINKER_DIR	 = $(SUPPORT_DIR)
 
 # Search path for sources
 VPATH		:= $(SRC_DIR):$(SRC_DIR)/startup
-USBFS_DIR	= $(F3_DIR)/lib/STM32_USB-FS-Device_Driver
+USBFS_DIR	= $(SUPPORT_DIR)/lib/STM32_USB-FS-Device_Driver
 USBPERIPH_SRC = $(notdir $(wildcard $(USBFS_DIR)/src/*.c))
 
 CSOURCES        := $(shell find $(SRC_DIR) -name '*.c')
 
-STDPERIPH_DIR	= $(F3_DIR)/lib/STM32F30x_StdPeriph_Driver
+STDPERIPH_DIR	= $(SUPPORT_DIR)/lib/STM32F30x_StdPeriph_Driver
 
 STDPERIPH_SRC = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
 
@@ -75,7 +76,7 @@ INCLUDE_DIRS := $(INCLUDE_DIRS) \
 
 # VCP support
 
-VCP_DIR = $(F3_DIR)/vcp
+VCP_DIR = $(SUPPORT_DIR)/vcp
 
 INCLUDE_DIRS := $(INCLUDE_DIRS) \
 		$(USBFS_DIR)/inc \
@@ -96,16 +97,16 @@ DEVICE_FLAGS := $(DEVICE_FLAGS) -DFLASH_SIZE=$(FLASH_SIZE)
 endif
 
 SYSTEM_SRC = \
-		   $(F3_DIR)/dma.c \
-		   $(F3_DIR)/serial.c \
-		   $(F3_DIR)/system.c \
+		   $(SUPPORT_DIR)/dma.c \
+		   $(SUPPORT_DIR)/serial.c \
+		   $(SUPPORT_DIR)/system.c \
 		   $(TARGET_SRC) \
 		   $(CMSIS_SRC) \
 		   $(DEVICE_STDPERIPH_SRC)
 
 FC_COMMON_SRC = \
-   	       $(F3_DIR)/exti.c \
-		   $(F3_DIR)/io.c \
+   	       $(SUPPORT_DIR)/exti.c \
+		   $(SUPPORT_DIR)/io.c \
 
 VCP_SRC = \
 		   $(VCP_DIR)/hw_config.c \
@@ -115,20 +116,20 @@ VCP_SRC = \
 		   $(VCP_DIR)/usb_istr.c \
 		   $(VCP_DIR)/usb_prop.c \
 		   $(VCP_DIR)/usb_pwr.c \
-		   $(F3_DIR)/serial_usb_vcp.c \
-		   $(F3_DIR)/usb_io.c
+		   $(SUPPORT_DIR)/serial_usb_vcp.c \
+		   $(SUPPORT_DIR)/usb_io.c
 
 STM32F30x_COMMON_SRC = \
-		   $(F3_DIR)/startup_stm32f30x_md_gcc.S \
-		   $(F3_DIR)/system_stm32f30x_extras.c \
-		   $(F3_DIR)/gpio_stm32f30x.c \
-		   $(F3_DIR)/serial_uart.c \
-		   $(F3_DIR)/serial_uart_stm32f30x.c \
-		   $(F3_DIR)/system_stm32f30x.c
+		   $(SUPPORT_DIR)/startup_stm32f30x_md_gcc.S \
+		   $(SUPPORT_DIR)/system_stm32f30x_extras.c \
+		   $(SUPPORT_DIR)/gpio_stm32f30x.c \
+		   $(SUPPORT_DIR)/serial_uart.c \
+		   $(SUPPORT_DIR)/serial_uart_stm32f30x.c \
+		   $(SUPPORT_DIR)/system_stm32f30x.c
 
 $(PROJECT)_CSRC = \
 		   timer.c \
-		   $(F3_DIR)/timer_stm32f30x.c \
+		   $(SUPPORT_DIR)/timer_stm32f30x.c \
 		   $(STM32F30x_COMMON_SRC) \
 		   $(FC_COMMON_SRC) \
 		   $(SYSTEM_SRC) \
