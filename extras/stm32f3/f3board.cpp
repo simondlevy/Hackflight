@@ -27,8 +27,6 @@ extern "C" {
 
 #include <f3board.h>
 
-static const uint8_t LED_PIN = 16;
-
 // Board-specific
 serialPort_t * serial0_open(void);
 
