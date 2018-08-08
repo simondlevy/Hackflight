@@ -302,8 +302,6 @@ namespace hf {
                 // Grab control signal if available
                 checkReceiver();
 
-                return;
-
                 // Check mandatory sensors
                 checkGyrometer();
                 checkQuaternion();
