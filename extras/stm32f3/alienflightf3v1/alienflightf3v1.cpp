@@ -16,7 +16,7 @@
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 #include <f3board.h>
 #include <SpektrumDSM.h>
@@ -30,7 +30,6 @@
 #include "serial.h"
 #include "exti.h"
 #include "timer.h"
-
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
@@ -52,19 +51,6 @@ uint8_t dsmSerialRead(void)
     return dsmValue;
 }
 
-extern "C" {
-
-#include "system.h"
-
-static void serial_event_2(uint16_t value)
-{
-    dsmValue = (uint8_t)value;
-    dsmAvailable = 1;
-
-    rx->handleSerialEvent(micros());
-}
-
-}
 
 class DSMX_Receiver : public hf::Receiver {
 
@@ -103,40 +89,48 @@ hf::MixerQuadX mixer;
 extern "C" {
 
 #include "serial_uart.h"
-
-void setup() {
-
-    // Open connection to UART2
-    serial2 = uartOpen(USART2, serial_event_2, 115200, MODE_RX, SERIAL_NOT_INVERTED);
-
-    // Create an object for talking to the DSMX receiver.
-    // We have to allocate such objects dynamicall to ensure that their constructor are called.
-    rx = new SpektrumDSM2048();
-
-    hf::Stabilizer * stabilizer = new hf::Stabilizer(
-            0.20f,      // Level P
-            0.225f,     // Gyro cyclic P
-            0.001875f,  // Gyro cyclic I
-            0.375f,     // Gyro cyclic D
-            1.0625f,    // Gyro yaw P
-            0.005625f); // Gyro yaw I
-
-    DSMX_Receiver * rc = new DSMX_Receiver(
-            CHANNEL_MAP,
-            .005f,  // roll trim
-            .01f,  // pitch trim
-            0.f);   // yaw trim
-
-    // Initialize Hackflight firmware
-    h.init(new AlienflightF3V1(), rc, &mixer, stabilizer);
-}
-
-void loop() {
-
-    h.update();
-}
-
+#include "system.h"
 #include "serial_usb_vcp.h"
+
+    static void serial_event_2(uint16_t value)
+    {
+        dsmValue = (uint8_t)value;
+        dsmAvailable = 1;
+
+        rx->handleSerialEvent(micros());
+    }
+    void setup() {
+
+        // Open connection to UART2
+        serial2 = uartOpen(USART2, serial_event_2, 115200, MODE_RX, SERIAL_NOT_INVERTED);
+
+        // Create an object for talking to the DSMX receiver.
+        // We have to allocate such objects dynamicall to ensure that their constructor are called.
+        rx = new SpektrumDSM2048();
+
+        hf::Stabilizer * stabilizer = new hf::Stabilizer(
+                0.20f,      // Level P
+                0.225f,     // Gyro cyclic P
+                0.001875f,  // Gyro cyclic I
+                0.375f,     // Gyro cyclic D
+                1.0625f,    // Gyro yaw P
+                0.005625f); // Gyro yaw I
+
+        DSMX_Receiver * rc = new DSMX_Receiver(
+                CHANNEL_MAP,
+                .005f,  // roll trim
+                .01f,  // pitch trim
+                0.f);   // yaw trim
+
+        // Initialize Hackflight firmware
+        h.init(new AlienflightF3V1(), rc, &mixer, stabilizer);
+    }
+
+    void loop() {
+
+        h.update();
+    }
+
 
     serialPort_t * serial0_open(void)
     {
