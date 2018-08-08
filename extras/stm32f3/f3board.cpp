@@ -71,21 +71,6 @@ static void ledInit(void)
     gpioInit(gpio, &cfg);
 }
 
-static void ledSet(bool is_on)
-{ 
-    uint16_t gpio_pin = LED0_PIN;
-
-    GPIO_TypeDef * gpio = LED0_GPIO;
-
-    if (is_on) {
-        digitalLo(gpio, gpio_pin);
-    }
-    else {
-        digitalHi(gpio, gpio_pin);
-    }
-}
-
-
 int main(void) {
 
     // start fpu
@@ -102,8 +87,6 @@ int main(void) {
     dmaInit();
 
     ledInit();
-
-    ledSet(true);
 
     setup();
 
