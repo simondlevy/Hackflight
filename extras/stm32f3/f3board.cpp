@@ -95,10 +95,12 @@ int main(void) {
     }
 } // main
 
+/*
 void HardFault_Handler(void)
 {
     while (true);
 }
+*/
 
 void F3Board::delaySeconds(float sec)
 {
