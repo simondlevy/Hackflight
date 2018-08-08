@@ -47,42 +47,6 @@ void SetSysClock(void);
 
 static serialPort_t * serial0;
 
-void pinMode(uint8_t pin, uint8_t mode)
-{
-    // XXX currently support output mode only
-    if (mode != OUTPUT) return;
-
-    pin = 1<<pin;
-
-    GPIO_TypeDef * gpio = gpio_type_from_pin(pin);
-
-    gpio_config_t cfg;
-
-    cfg.pin = gpio_pin_from_pin(pin);
-    cfg.mode = Mode_Out_PP;
-    cfg.speed = Speed_2MHz;
-
-    gpioInit(gpio, &cfg);
-}
-
-void digitalWrite(uint8_t pin, uint8_t level)
-{
-    pin = 1<<pin;
-
-    GPIO_TypeDef * gpio = gpio_type_from_pin(pin);
-
-    uint16_t gpio_pin = gpio_pin_from_pin(pin);
-
-    switch (level) {
-        case HIGH:
-            digitalLo(gpio, gpio_pin);
-            break;
-        case LOW:
-            digitalHi(gpio, gpio_pin);
-            break;
-    }
-}
-
 void reset(void)
 {
     systemReset();
@@ -93,9 +57,21 @@ void resetToBootloader(void)
     systemResetToBootloader();
 }
 
-int main(void) {
+static void checkReboot(void)
+{
+    static uint32_t dbg_start_msec;
+    // support reboot from host computer
+    if (millis()-dbg_start_msec > 100) {
+        dbg_start_msec = millis();
+        while (serialRxBytesWaiting(serial0)) {
+            uint8_t c = serialRead(serial0);
+            if (c == 'R') 
+                systemResetToBootloader();
+        }
+    }
+}
 
-    //spiInit(SPIDEV_1);
+int main(void) {
 
     // start fpu
     SCB->CPACR = (0x3 << (10*2)) | (0x3 << (11*2));
@@ -114,18 +90,8 @@ int main(void) {
 
     while (true) {
 
-#ifndef EXTERNAL_DEBUG
-        static uint32_t dbg_start_msec;
-        // support reboot from host computer
-        if (millis()-dbg_start_msec > 100) {
-            dbg_start_msec = millis();
-            while (serialRxBytesWaiting(serial0)) {
-                uint8_t c = serialRead(serial0);
-                if (c == 'R') 
-                    systemResetToBootloader();
-            }
-        }
-#endif
+        checkReboot();
+
         loop();
     }
 } // main

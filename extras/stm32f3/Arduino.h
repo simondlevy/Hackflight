@@ -27,21 +27,10 @@ extern "C" {
 #include <stdarg.h>
 #include <stdio.h>
 
-#define HIGH 0x1
-#define LOW  0x0
-
-#define INPUT 0x0
-#define OUTPUT 0x1
-
-void pinMode(uint8_t pin, uint8_t mode);
-void digitalWrite(uint8_t pin, uint8_t level);
-
 unsigned long micros(void);
 unsigned long millis(void);
 void delay(unsigned long);
 
-void reset(void);
-void resetToBootloader(void);
 
 void setup(void);
 void loop(void);

@@ -196,7 +196,6 @@ TARGET_HEX	 = $(BIN_DIR)/$(PROJECT).hex
 TARGET_ELF	 = $(OBJECT_DIR)/$(PROJECT).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $($(PROJECT)_CSRC)))) \
 			   $(OBJECT_DIR)/$(PROJECT)/Arduino.o \
-			   $(OBJECT_DIR)/$(PROJECT)/HardwareWire.o \
 			   $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o \
 			   $(OBJECT_DIR)/$(PROJECT).o
 TARGET_MAP	 = $(OBJECT_DIR)/$(PROJECT).map
@@ -248,8 +247,8 @@ $(OBJECT_DIR)/$(PROJECT)/%.o: %.S
 $(OBJECT_DIR)/$(PROJECT)/Arduino.o: ../Arduino.cpp ../Arduino.h
 	@$(C++) -c -o $(OBJECT_DIR)/$(PROJECT)/Arduino.o $(CFLAGS) ../Arduino.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/HardwareWire.o: ../HardwareWire.cpp ../Wire.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/HardwareWire.o $(CFLAGS) ../HardwareWire.cpp
+$(OBJECT_DIR)/$(PROJECT)/HardwareSerial.o: ../HardwareSerial.cpp ../HardwareSerial.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/HardwareSerial.o $(CFLAGS) ../HardwareSerial.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o $(CFLAGS) $(SPEKTRUM_DIR)/SpektrumDSM.cpp
