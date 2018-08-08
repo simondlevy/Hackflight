@@ -30,17 +30,6 @@ serialPort_t * serial0_open(void);
 
 void SetSysClock(void);
 
-
-void reset(void)
-{
-    systemReset();
-}
-
-void resetToBootloader(void)
-{
-    systemResetToBootloader();
-}
-
 static void checkReboot(void)
 {
     static uint32_t dbg_start_msec;
@@ -94,13 +83,6 @@ int main(void) {
         loop();
     }
 } // main
-
-/*
-void HardFault_Handler(void)
-{
-    while (true);
-}
-*/
 
 void F3Board::delaySeconds(float sec)
 {
