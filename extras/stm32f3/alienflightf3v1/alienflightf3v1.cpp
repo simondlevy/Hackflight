@@ -61,21 +61,14 @@ class DSMX_Receiver : public hf::Receiver {
 
     protected:
 
-        virtual void begin(void) override 
-        {
-        }
-
         virtual bool gotNewFrame(void) override 
         {
-            return true;
+            return rx->gotNewFrame();
         }
 
         virtual void readRawvals(void)override 
         {
-            if (rx->gotNewFrame()) {
-
-                rx->getChannelValuesNormalized(rawvals, CHANNELS);
-            }
+            rx->getChannelValuesNormalized(rawvals, CHANNELS);
         }
 };
 

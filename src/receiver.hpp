@@ -100,9 +100,11 @@ namespace hf {
         uint8_t _channelMap[6];
 
         // These must be overridden for each receiver
-        virtual void begin(void) = 0;
         virtual bool gotNewFrame(void) = 0;
         virtual void readRawvals(void) = 0;
+
+        // This can be overridden optionally
+        virtual void begin(void) { }
 
         // Software trim
         float _trimRoll;
