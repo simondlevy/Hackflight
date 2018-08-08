@@ -23,13 +23,13 @@ extern "C" {
 
 #include "f3board.h"
 
+static serialPort_t * serial0;
+
 // Board-specific
 serialPort_t * serial0_open(void);
 
 void SetSysClock(void);
 
-// Shared with HardwareSerial.cpp
-serialPort_t * serial0;
 
 void reset(void)
 {
