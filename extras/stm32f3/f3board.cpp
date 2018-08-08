@@ -179,5 +179,4 @@ void hf::Board::outbuf(char * buf)
         serialWrite(serial0, *p);
 }
 
-
 } // extern "C"

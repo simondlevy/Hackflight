@@ -58,18 +58,6 @@ extern "C" {
         while (!isSerialTransmitBufferEmpty(port));
     }
 
-    void HardwareSerial0::begin(uint32_t baud)
-    {
-        (void)baud;
-        this->_uart = serial0;
-    }
-
-    uint8_t HardwareSerial0::read(void)
-    {
-        serialPort_t * port = (serialPort_t *)this->_uart;
-        return serialRead(port);
-    }
-
 #define SERIAL_RX_BUFSIZE 256
 
     static uint8_t serial1_rx_buffer[SERIAL_RX_BUFSIZE];
@@ -146,7 +134,6 @@ extern "C" {
 
 } // extern "C"
 
-HardwareSerial0 Serial;
 HardwareSerial1 Serial1;
 HardwareSerial2 Serial2;
 HardwareSerial3 Serial3;

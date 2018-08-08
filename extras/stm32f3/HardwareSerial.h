@@ -56,16 +56,6 @@ extern "C" {
             }
     };
 
-    class HardwareSerial0 : public HardwareSerial {
-
-        public:
-
-            void begin(uint32_t baud);
-
-            uint8_t read(void);
-    };
-    extern HardwareSerial0 Serial;
-
     class HardwareSerial1 : public HardwareSerial {
 
         public:
