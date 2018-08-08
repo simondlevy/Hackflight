@@ -30,8 +30,6 @@ extern "C" {
 static const uint8_t LED_PIN = 16;
 
 // Board-specific
-GPIO_TypeDef * gpio_type_from_pin(uint8_t pin);
-uint16_t gpio_pin_from_pin(uint8_t pin);
 serialPort_t * serial0_open(void);
 
 void SetSysClock(void);
@@ -64,15 +62,29 @@ static void checkReboot(void)
 
 static void ledInit(void)
 {
-    GPIO_TypeDef * gpio = gpio_type_from_pin(LED_PIN);
+    GPIO_TypeDef * gpio = LED0_GPIO;
 
     gpio_config_t cfg;
 
-    cfg.pin = gpio_pin_from_pin(LED_PIN);
+    cfg.pin = LED0_PIN;
     cfg.mode = Mode_Out_PP;
     cfg.speed = Speed_2MHz;
 
     gpioInit(gpio, &cfg);
+}
+
+static void ledSet(bool is_on)
+{ 
+    uint16_t gpio_pin = LED0_PIN;
+
+    GPIO_TypeDef * gpio = LED0_GPIO;
+
+    if (is_on) {
+        digitalLo(gpio, gpio_pin);
+    }
+    else {
+        digitalHi(gpio, gpio_pin);
+    }
 }
 
 
@@ -92,6 +104,8 @@ int main(void) {
     dmaInit();
 
     ledInit();
+
+    ledSet(true);
 
     setup();
 
@@ -220,9 +234,9 @@ void F3Board::delaySeconds(float sec)
 
 void F3Board::ledSet(bool is_on)
 { 
-    uint16_t gpio_pin = gpio_pin_from_pin(LED_PIN);
+    uint16_t gpio_pin = LED0_PIN;
 
-    GPIO_TypeDef * gpio = gpio_type_from_pin(LED_PIN);
+    GPIO_TypeDef * gpio = LED0_GPIO;
 
     if (is_on) {
         digitalLo(gpio, gpio_pin);

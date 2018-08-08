@@ -22,7 +22,6 @@
 #include <stdbool.h>
 
 #include "platform.h"
-
 #include "system.h"
 #include "dma.h"
 #include "gpio.h"
@@ -31,16 +30,6 @@
 #include "serial_uart.h"
 #include "exti.h"
 #include "serial_usb_vcp.h"
-
-GPIO_TypeDef * gpio_type_from_pin(uint8_t pin)
-{
-    return  pin == 8 ? LED0_GPIO : LED1_GPIO;
-}
-
-uint16_t gpio_pin_from_pin(uint8_t pin)
-{
-    return pin == 8 ? LED0_PIN  : LED1_PIN;
-}
 
 serialPort_t * serial0_open(void)
 {
