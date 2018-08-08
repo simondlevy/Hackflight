@@ -104,7 +104,7 @@ namespace hf {
             int16_t _imuData[7] = {0,0,0,0,0,0,0};
 
             // Quaternion support
-            MadgwickQuaternionFilter _quaternionFilter = MadgwickQuaternionFilter(BETA);
+            MadgwickQuaternionFilter9DOF _quaternionFilter = MadgwickQuaternionFilter9DOF(BETA);
             uint32_t _sumCount = 0;                          // used to control display output rate
             const uint16_t SUM_COUNT_MAX = 1000 / QUATERNION_UPDATE_RATE;
             uint32_t _timePrev = 0;                          // used to calculate integration interval
