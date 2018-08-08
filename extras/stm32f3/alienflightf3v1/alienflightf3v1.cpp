@@ -28,8 +28,6 @@
 #include "dma.h"
 #include "gpio.h"
 #include "serial.h"
-#include "exti.h"
-#include "timer.h"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
