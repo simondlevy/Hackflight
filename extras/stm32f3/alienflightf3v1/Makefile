@@ -7,6 +7,8 @@ PROJECT = alienflightf3
 
 ###############################################################################
 
+HACKFLIGHT_DIR = ../../../src
+
 F3_DIR = ../support
 
 ALIENFLIGHTF3_DIR = .
@@ -65,7 +67,8 @@ VCP_DIR := ../support/vcp
 INCLUDE_DIRS := $(INCLUDE_DIRS) \
 		   $(USBFS_DIR)/inc \
 		   $(VCP_DIR) \
-           $(SPEKTRUM_DIR)
+           $(SPEKTRUM_DIR) \
+		   $(HACKFLIGHT_DIR)
 
 VPATH := $(VPATH):$(USBFS_DIR)/src
 

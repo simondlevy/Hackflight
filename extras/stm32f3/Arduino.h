@@ -104,5 +104,35 @@ class HardwareSerial3 : public HardwareSerial {
 };
 extern HardwareSerial3 Serial3;
 
+#include <boards/realboard.hpp>
+
+class F3Board : public hf::RealBoard {
+
+    //protected:
+    public:
+
+        void delaySeconds(float sec);
+
+        void ledSet(bool is_on);
+
+        uint8_t serialAvailableBytes(void);
+
+        uint8_t serialReadByte(void);
+
+        void serialWriteByte(uint8_t c);
+
+        virtual uint32_t getMicroseconds(void) override;
+
+        virtual void writeMotor(uint8_t index, float value) = 0;
+
+        bool getGyrometer(float gyroRates[3]);
+
+        bool getQuaternion(float quat[4]);
+
+    public:
+
+        F3Board(void);
+
+}; // class F3Board
 
 } // extern "C"
