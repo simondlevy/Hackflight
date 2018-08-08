@@ -3,7 +3,8 @@
 ARDUINO_DIR = $(HOME)/Documents/Arduino/libraries
 
 # Change this to whatever project name you want
-PROJECT = alienflightf3v1
+#PROJECT = alienflightf3v1
+PROJECT = sniff
 
 ###############################################################################
 
@@ -198,6 +199,7 @@ TARGET_HEX	 = $(BIN_DIR)/$(PROJECT).hex
 TARGET_ELF	 = $(OBJECT_DIR)/$(PROJECT).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $($(PROJECT)_CSRC)))) \
 			   $(OBJECT_DIR)/$(PROJECT)/f3board.o \
+			   $(OBJECT_DIR)/$(PROJECT)/Wire.o \
 			   $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o \
 			   $(OBJECT_DIR)/$(PROJECT).o
 TARGET_MAP	 = $(OBJECT_DIR)/$(PROJECT).map
@@ -248,6 +250,9 @@ $(OBJECT_DIR)/$(PROJECT)/%.o: %.S
 
 $(OBJECT_DIR)/$(PROJECT)/f3board.o: ../f3board.cpp ../f3board.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3board.o $(CFLAGS) ../f3board.cpp
+
+$(OBJECT_DIR)/$(PROJECT)/Wire.o: ../Wire.cpp ../Wire.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/Wire.o $(CFLAGS) ../Wire.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o $(CFLAGS) $(SPEKTRUM_DIR)/SpektrumDSM.cpp
