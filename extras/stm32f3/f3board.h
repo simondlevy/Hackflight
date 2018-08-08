@@ -23,34 +23,12 @@
 
 extern "C" {
 
-#include <stdint.h>
-#include <stdarg.h>
-#include <stdio.h>
-
-#include "platform.h"
-#include "system.h"
-#include "dma.h"
-#include "gpio.h"
-#include "timer.h"
-#include "serial.h"
-#include "serial_uart.h"
-#include "exti.h"
-#include "bus_spi.h"
-
 #include <board.hpp>
 #include <boards/realboard.hpp>
 
-    unsigned long micros(void);
-    unsigned long millis(void);
-    void delay(unsigned long);
-
-    void setup(void);
-    void loop(void);
-
     class F3Board : public hf::RealBoard {
 
-        //protected:
-        public:
+        protected:
 
             void delaySeconds(float sec);
 

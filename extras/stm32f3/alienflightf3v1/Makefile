@@ -203,6 +203,7 @@ TARGET_BIN	 = obj/$(PROJECT).bin
 TARGET_HEX	 = $(BIN_DIR)/$(PROJECT).hex
 TARGET_ELF	 = $(OBJECT_DIR)/$(PROJECT).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $($(PROJECT)_CSRC)))) \
+			   $(OBJECT_DIR)/$(PROJECT)/main.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3board.o \
 			   $(OBJECT_DIR)/$(PROJECT)/Wire.o \
 			   $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o \
@@ -254,6 +255,9 @@ $(OBJECT_DIR)/$(PROJECT)/%.o: %.S
 	@mkdir -p $(dir $@)
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(ASFLAGS) $<
+
+$(OBJECT_DIR)/$(PROJECT)/main.o: ../main.cpp 
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/main.o $(CFLAGS) ../main.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/f3board.o: ../f3board.cpp ../f3board.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3board.o $(CFLAGS) ../f3board.cpp

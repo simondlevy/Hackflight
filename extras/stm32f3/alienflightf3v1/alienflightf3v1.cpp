@@ -24,6 +24,14 @@
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
 
+#include "platform.h"
+#include "dma.h"
+#include "gpio.h"
+#include "serial.h"
+#include "exti.h"
+#include "timer.h"
+
+
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 SpektrumDSM2048 * rx;
@@ -44,12 +52,18 @@ uint8_t dsmSerialRead(void)
     return dsmValue;
 }
 
+extern "C" {
+
+#include "system.h"
+
 static void serial_event_2(uint16_t value)
 {
     dsmValue = (uint8_t)value;
     dsmAvailable = 1;
 
     rx->handleSerialEvent(micros());
+}
+
 }
 
 class DSMX_Receiver : public hf::Receiver {
@@ -86,6 +100,10 @@ static hf::Hackflight h;
 
 hf::MixerQuadX mixer;
 
+extern "C" {
+
+#include "serial_uart.h"
+
 void setup() {
 
     // Open connection to UART2
@@ -116,11 +134,7 @@ void setup() {
 void loop() {
 
     h.update();
-
-    hf::Debug::printf("%d\n", millis());
 }
-
-extern "C" {
 
 #include "serial_usb_vcp.h"
 

@@ -23,66 +23,17 @@ extern "C" {
 
 #include "f3board.h"
 
-static serialPort_t * serial0;
+#include "platform.h"
+#include "system.h"
+#include "dma.h"
+#include "gpio.h"
+#include "timer.h"
+#include "serial.h"
+#include "serial_uart.h"
+#include "exti.h"
+#include "bus_spi.h"
 
-// Board-specific
-serialPort_t * serial0_open(void);
-
-void SetSysClock(void);
-
-static void checkReboot(void)
-{
-    static uint32_t dbg_start_msec;
-    // support reboot from host computer
-    if (millis()-dbg_start_msec > 100) {
-        dbg_start_msec = millis();
-        while (serialRxBytesWaiting(serial0)) {
-            uint8_t c = serialRead(serial0);
-            if (c == 'R') 
-                systemResetToBootloader();
-        }
-    }
-}
-
-static void ledInit(void)
-{
-    GPIO_TypeDef * gpio = LED0_GPIO;
-
-    gpio_config_t cfg;
-
-    cfg.pin = LED0_PIN;
-    cfg.mode = Mode_Out_PP;
-    cfg.speed = Speed_2MHz;
-
-    gpioInit(gpio, &cfg);
-}
-
-int main(void) {
-
-    // start fpu
-    SCB->CPACR = (0x3 << (10*2)) | (0x3 << (11*2));
-
-    SetSysClock();
-
-    systemInit();
-
-    timerInit();  // timer must be initialized before any channel is allocated
-
-    serial0 = serial0_open();
-
-    dmaInit();
-
-    ledInit();
-
-    setup();
-
-    while (true) {
-
-        checkReboot();
-
-        loop();
-    }
-} // main
+extern serialPort_t * serial0;
 
 void F3Board::delaySeconds(float sec)
 {
