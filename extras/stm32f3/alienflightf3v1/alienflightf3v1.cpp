@@ -20,7 +20,6 @@
 
 #include <f3board.h>
 #include <SpektrumDSM.h>
-#include "serial_usb_vcp.h"
 
 SpektrumDSM2048 * rx;
 
@@ -70,4 +69,16 @@ void loop() {
 
     // Allow some time between readings
     delay(10);  
+
+}
+
+extern "C" {
+
+#include "serial_usb_vcp.h"
+
+serialPort_t * serial0_open(void)
+{
+    return usbVcpOpen();
+}
+
 }

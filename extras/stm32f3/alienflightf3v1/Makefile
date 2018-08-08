@@ -121,8 +121,7 @@ $(PROJECT)_CSRC = \
 		   $(STM32F30x_COMMON_SRC) \
 		   $(FC_COMMON_SRC) \
 		   $(SYSTEM_SRC) \
-		   $(VCP_SRC) \
-		   target.c
+		   $(VCP_SRC)
 
 VPATH		:= $(VPATH):$(STDPERIPH_DIR)/src
 
