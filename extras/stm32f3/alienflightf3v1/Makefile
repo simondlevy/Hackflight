@@ -1,61 +1,46 @@
-# Makefile for BreezySTM32F3 examples
-#
-# Copyright (C) 2016 Simon D. Levy
-#
-# This file is part of BreezySTM32.
-#
-# BreezySTM32 is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as 
-# published by the Free Software Foundation, either version 3 of the 
-# License, or (at your option) any later version.
-# 
-# This code is distributed in the hope that it will be useful,     
-# but WITHOUT ANY WARRANTY without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU Lesser General Public License 
-# along with this code.  If not, see <http://www.gnu.org/licenses/>.
-
+# Change this to wherever you put BreezySTM32
+# Change this to where you put your Arduino libraries
 ARDUINO_DIR = $(HOME)/Documents/Arduino/libraries
 
 # Change this to whatever project name you want
-PROJECT = alienflightf3v1
+PROJECT = alienflightf3
 
 ###############################################################################
 
-HACKFLIGHT_DIR = ../../../src
-F3_DIR = ..
-SUPPORT_DIR = $(F3_DIR)/support
+F3_DIR = ../support
+
+ALIENFLIGHTF3_DIR = .
+
+SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM/src
 
 # Debugger optons, must be empty or GDB
 DEBUG ?=
 
 # Serial port/Device for flashing
 SERIAL_DEVICE	?= /dev/ttyACM0
-BAUD            ?= 115200
 
 # Flash size (KB).  Some low-end chips actually have more flash than advertised, use this to override.
 FLASH_SIZE ?= 256
 
 # Working directories
 ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
-SRC_DIR		 = .
+SRC_DIR		 = $(ALIENFLIGHTF3_DIR)
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
-#CMSIS_DIR	 = $(ROOT)/lib/CMSIS
-CMSIS_DIR	 = $(SUPPORT_DIR)/lib/CMSIS
-INCLUDE_DIRS = $(SUPPORT_DIR) $(F3_DIR) $(SUPPORT_DIR) $(SRC_DIR) $(SRC_DIR)/target
-LINKER_DIR	 = $(SUPPORT_DIR)
+CMSIS_DIR	 = ../support/lib/CMSIS
+INCLUDE_DIRS = .. $(F3_DIR) $(ALIENFLIGHTF3_DIR) $(SRC_DIR) $(SRC_DIR)/target
+LINKER_DIR	 = $(F3_DIR)
 
 # Search path for sources
 VPATH		:= $(SRC_DIR):$(SRC_DIR)/startup
-USBFS_DIR	= $(SUPPORT_DIR)/lib/STM32_USB-FS-Device_Driver
+USBFS_DIR	= ../support/lib/STM32_USB-FS-Device_Driver
 USBPERIPH_SRC = $(notdir $(wildcard $(USBFS_DIR)/src/*.c))
 
 CSOURCES        := $(shell find $(SRC_DIR) -name '*.c')
 
-STDPERIPH_DIR	= $(SUPPORT_DIR)/lib/STM32F30x_StdPeriph_Driver
+# F3 TARGETS
+
+STDPERIPH_DIR	= ../support/lib/STM32F30x_StdPeriph_Driver
 
 STDPERIPH_SRC = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
 
@@ -76,12 +61,11 @@ INCLUDE_DIRS := $(INCLUDE_DIRS) \
 		   $(CMSIS_DIR)/CM1/DeviceSupport/ST/STM32F30x
 
 # VCP support
-
-VCP_DIR = $(SUPPORT_DIR)/vcp
-
+VCP_DIR := ../support/vcp
 INCLUDE_DIRS := $(INCLUDE_DIRS) \
-		$(USBFS_DIR)/inc \
-		$(VCP_DIR) 
+		   $(USBFS_DIR)/inc \
+		   $(VCP_DIR) \
+           $(SPEKTRUM_DIR)
 
 VPATH := $(VPATH):$(USBFS_DIR)/src
 
@@ -98,16 +82,16 @@ DEVICE_FLAGS := $(DEVICE_FLAGS) -DFLASH_SIZE=$(FLASH_SIZE)
 endif
 
 SYSTEM_SRC = \
-		   $(SUPPORT_DIR)/dma.c \
-		   $(SUPPORT_DIR)/serial.c \
-		   $(SUPPORT_DIR)/system.c \
+		   $(F3_DIR)/dma.c \
+		   $(F3_DIR)/serial.c \
+		   $(F3_DIR)/system.c \
 		   $(TARGET_SRC) \
 		   $(CMSIS_SRC) \
 		   $(DEVICE_STDPERIPH_SRC)
 
 FC_COMMON_SRC = \
-   	       $(SUPPORT_DIR)/exti.c \
-		   $(SUPPORT_DIR)/io.c \
+   	       $(F3_DIR)/exti.c \
+		   $(F3_DIR)/io.c \
 
 VCP_SRC = \
 		   $(VCP_DIR)/hw_config.c \
@@ -117,20 +101,20 @@ VCP_SRC = \
 		   $(VCP_DIR)/usb_istr.c \
 		   $(VCP_DIR)/usb_prop.c \
 		   $(VCP_DIR)/usb_pwr.c \
-		   $(SUPPORT_DIR)/serial_usb_vcp.c \
-		   $(SUPPORT_DIR)/usb_io.c
+		   $(F3_DIR)/serial_usb_vcp.c \
+		   $(F3_DIR)/usb_io.c
 
 STM32F30x_COMMON_SRC = \
-		   $(SUPPORT_DIR)/startup_stm32f30x_md_gcc.S \
-		   $(SUPPORT_DIR)/system_stm32f30x_extras.c \
-		   $(SUPPORT_DIR)/gpio_stm32f30x.c \
-		   $(SUPPORT_DIR)/serial_uart.c \
-		   $(SUPPORT_DIR)/serial_uart_stm32f30x.c \
-		   $(SUPPORT_DIR)/system_stm32f30x.c
+		   $(F3_DIR)/startup_stm32f30x_md_gcc.S \
+		   $(F3_DIR)/system_stm32f30x_extras.c \
+		   $(F3_DIR)/gpio_stm32f30x.c \
+		   $(F3_DIR)/serial_uart.c \
+		   $(F3_DIR)/serial_uart_stm32f30x.c \
+		   $(F3_DIR)/system_stm32f30x.c
 
 $(PROJECT)_CSRC = \
 		   timer.c \
-		   $(SUPPORT_DIR)/timer_stm32f30x.c \
+		   $(F3_DIR)/timer_stm32f30x.c \
 		   $(STM32F30x_COMMON_SRC) \
 		   $(FC_COMMON_SRC) \
 		   $(SYSTEM_SRC) \
@@ -211,8 +195,9 @@ TARGET_BIN	 = obj/$(PROJECT).bin
 TARGET_HEX	 = $(BIN_DIR)/$(PROJECT).hex
 TARGET_ELF	 = $(OBJECT_DIR)/$(PROJECT).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $($(PROJECT)_CSRC)))) \
-			   $(OBJECT_DIR)/$(PROJECT)/f3board.o \
-			   $(OBJECT_DIR)/$(PROJECT)/HardwareSerial.o \
+			   $(OBJECT_DIR)/$(PROJECT)/Arduino.o \
+			   $(OBJECT_DIR)/$(PROJECT)/HardwareWire.o \
+			   $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o \
 			   $(OBJECT_DIR)/$(PROJECT).o
 TARGET_MAP	 = $(OBJECT_DIR)/$(PROJECT).map
 
@@ -239,7 +224,6 @@ $(TARGET_HEX): $(TARGET_ELF)
 
 $(TARGET_BIN): $(TARGET_ELF)
 	$(OBJCOPY) -O binary $< $@
-	rm -f ../*.i ../*.d ../*.o ../*.s
 
 $(TARGET_ELF):  $(TARGET_OBJS)
 	$(C++) -o $@ $^ $(LDFLAGS)
@@ -261,21 +245,24 @@ $(OBJECT_DIR)/$(PROJECT)/%.o: %.S
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(ASFLAGS) $<
 
-$(OBJECT_DIR)/$(PROJECT)/f3board.o: $(F3_DIR)/f3board.cpp $(F3_DIR)/f3board.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3board.o -I$(HACKFLIGHT_DIR) $(CFLAGS) $(F3_DIR)/f3board.cpp
+$(OBJECT_DIR)/$(PROJECT)/Arduino.o: ../Arduino.cpp ../Arduino.h
+	@$(C++) -c -o $(OBJECT_DIR)/$(PROJECT)/Arduino.o $(CFLAGS) ../Arduino.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/HardwareSerial.o: $(F3_DIR)/HardwareSerial.cpp $(F3_DIR)/HardwareSerial.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/HardwareSerial.o $(CFLAGS) $(F3_DIR)/HardwareSerial.cpp
+$(OBJECT_DIR)/$(PROJECT)/HardwareWire.o: ../HardwareWire.cpp ../Wire.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/HardwareWire.o $(CFLAGS) ../HardwareWire.cpp
 
-$(OBJECT_DIR)/$(PROJECT).o: ./$(PROJECT).cpp $(HACKFLIGHT_DIR)/*.hpp
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT).o -I$(HACKFLIGHT_DIR) $(CFLAGS) ./$(PROJECT).cpp
+$(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o $(CFLAGS) $(SPEKTRUM_DIR)/SpektrumDSM.cpp
+
+$(OBJECT_DIR)/$(PROJECT).o: ./$(PROJECT).cpp
+	@$(C++) -c -o $(OBJECT_DIR)/$(PROJECT).o $(CFLAGS) ./$(PROJECT).cpp
 
 clean:
-	rm -rf obj ../*.i ../*.o ../*.d ../*.s
+	rm -rf obj
 
 flash_$(PROJECT): $(TARGET_BIN)
 	echo -n 'R' >$(SERIAL_DEVICE)
-	sleep 1
+	sleep 2
 	dfu-util -a 0 -s 0x08000000:leave -D $(TARGET_BIN)
 
 ## flash       : flash firmware (.hex) onto flight controller
@@ -295,4 +282,4 @@ commit:
 	git push
 
 listen:
-	miniterm.py $(SERIAL_DEVICE) $(BAUD)
+	miniterm.py $(SERIAL_DEVICE)

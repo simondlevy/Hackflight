@@ -22,6 +22,16 @@
 
 #include <boards/realboard.hpp>
 
+#include "platform.h"
+#include "system.h"
+#include "dma.h"
+#include "gpio.h"
+#include "timer.h"
+#include "serial.h"
+#include "serial_uart.h"
+#include "exti.h"
+
+
 namespace hf {
 
     class F3Board : public RealBoard {

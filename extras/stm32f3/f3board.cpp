@@ -25,16 +25,6 @@ extern "C" { // So we can talk to C support code
 
 #include "f3board.h"
 
-#include "platform.h"
-
-#include "system.h"
-#include "dma.h"
-#include "gpio.h"
-#include "timer.h"
-#include "serial.h"
-#include "serial_uart.h"
-#include "exti.h"
-
 static const uint8_t LED_PIN = 16;
 
 GPIO_TypeDef * gpio_type_from_pin(uint8_t pin);
