@@ -37,9 +37,6 @@ extern "C" {
 
 #include "HardwareSerial.h"
 
-    // Defined in f3board.cpp
-    extern serialPort_t * serial0;
-
     void HardwareSerial::write(uint8_t byte)
     {
         serialPort_t * port = (serialPort_t *)this->_uart;
