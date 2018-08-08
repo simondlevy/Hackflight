@@ -248,7 +248,7 @@ $(OBJECT_DIR)/$(PROJECT)/%.o: %.S
 	@$(CC) -c -o $@ $(ASFLAGS) $<
 
 $(OBJECT_DIR)/$(PROJECT)/f3board.o: ../f3board.cpp ../f3board.h
-	@$(CC -c -o $(OBJECT_DIR)/$(PROJECT)/f3board.o $(CFLAGS) ../f3board.cpp
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3board.o $(CFLAGS) ../f3board.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/HardwareSerial.o: ../HardwareSerial.cpp ../HardwareSerial.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/HardwareSerial.o $(CFLAGS) ../HardwareSerial.cpp
