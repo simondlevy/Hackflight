@@ -1,23 +1,23 @@
 /*
-Arduino.h : Arduino API header for BreezySTM32 library
+   f3board.h : Support for STM32F3 boards
 
-Copyright (C) 2017 Simon D. Levy 
+   Copyright (C) 2018 Simon D. Levy 
 
-This file is part of BreezySTM32.
+   This file is part of Hackflight.
 
-BreezySTM32 is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+   Hackflight is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-BreezySTM32 is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with BreezySTM32.  If not, see <http://www.gnu.org/licenses/>.
-*/
+   You should have received a copy of the GNU General Public License
+   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #pragma once
 
@@ -27,113 +27,112 @@ extern "C" {
 #include <stdarg.h>
 #include <stdio.h>
 
-unsigned long micros(void);
-unsigned long millis(void);
-void delay(unsigned long);
+    unsigned long micros(void);
+    unsigned long millis(void);
+    void delay(unsigned long);
 
+    void setup(void);
+    void loop(void);
 
-void setup(void);
-void loop(void);
+    class HardwareSerial {
 
-class HardwareSerial {
+        protected:
 
-    protected:
+            void *  _uart;
 
-        void *  _uart;
+        public:
 
-    public:
+            uint8_t available(void);
 
-        uint8_t available(void);
+            uint8_t read(void);
 
-        uint8_t read(void);
+            void write(uint8_t byte);
 
-        void write(uint8_t byte);
+            void flush(void);
 
-        void flush(void);
+            void printf(const char * fmt, ...)
+            {
+                va_list ap;       
+                va_start(ap, fmt);     
+                char buf[1000];
+                vsprintf(buf, fmt, ap);
+                for (char *p=buf; *p; p++)
+                    this->write(*p);
+                va_end(ap);  
+                this->flush();
+            }
+    };
 
-        void printf(const char * fmt, ...)
-        {
-            va_list ap;       
-            va_start(ap, fmt);     
-            char buf[1000];
-            vsprintf(buf, fmt, ap);
-            for (char *p=buf; *p; p++)
-               this->write(*p);
-            va_end(ap);  
-            this->flush();
-        }
-};
+    class HardwareSerial0 : public HardwareSerial {
 
-class HardwareSerial0 : public HardwareSerial {
+        public:
 
-    public:
+            void begin(uint32_t baud);
 
-        void begin(uint32_t baud);
+            uint8_t read(void);
+    };
+    extern HardwareSerial0 Serial;
 
-        uint8_t read(void);
-};
-extern HardwareSerial0 Serial;
+    class HardwareSerial1 : public HardwareSerial {
 
-class HardwareSerial1 : public HardwareSerial {
+        public:
 
-    public:
+            void begin(uint32_t baud);
 
-        void begin(uint32_t baud);
+            uint8_t read(void);
+    };
+    extern HardwareSerial1 Serial1;
 
-        uint8_t read(void);
-};
-extern HardwareSerial1 Serial1;
+    class HardwareSerial2 : public HardwareSerial {
 
-class HardwareSerial2 : public HardwareSerial {
+        public:
 
-    public:
+            void begin(uint32_t baud);
 
-        void begin(uint32_t baud);
+            uint8_t read(void);
+    };
+    extern HardwareSerial2 Serial2;
 
-        uint8_t read(void);
-};
-extern HardwareSerial2 Serial2;
+    class HardwareSerial3 : public HardwareSerial {
 
-class HardwareSerial3 : public HardwareSerial {
+        public:
 
-    public:
+            void begin(uint32_t baud);
 
-        void begin(uint32_t baud);
-
-        uint8_t read(void);
-};
-extern HardwareSerial3 Serial3;
+            uint8_t read(void);
+    };
+    extern HardwareSerial3 Serial3;
 
 #include <board.hpp>
 #include <boards/realboard.hpp>
 
-class F3Board : public hf::RealBoard {
+    class F3Board : public hf::RealBoard {
 
-    //protected:
-    public:
+        //protected:
+        public:
 
-        void delaySeconds(float sec);
+            void delaySeconds(float sec);
 
-        void ledSet(bool is_on);
+            void ledSet(bool is_on);
 
-        uint8_t serialAvailableBytes(void);
+            uint8_t serialAvailableBytes(void);
 
-        uint8_t serialReadByte(void);
+            uint8_t serialReadByte(void);
 
-        void serialWriteByte(uint8_t c);
+            void serialWriteByte(uint8_t c);
 
-        virtual uint32_t getMicroseconds(void) override;
+            virtual uint32_t getMicroseconds(void) override;
 
-        virtual void writeMotor(uint8_t index, float value) = 0;
+            virtual void writeMotor(uint8_t index, float value) = 0;
 
-        bool getGyrometer(float gyroRates[3]);
+            bool getGyrometer(float gyroRates[3]);
 
-        bool getQuaternion(float quat[4]);
+            bool getQuaternion(float quat[4]);
 
-    public:
+        public:
 
-        F3Board(void);
+            F3Board(void);
 
-}; // class F3Board
+    }; // class F3Board
 
 } // extern "C"
