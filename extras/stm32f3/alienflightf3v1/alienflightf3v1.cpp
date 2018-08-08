@@ -69,6 +69,18 @@ class PhonyReceiver : public hf::Receiver {
 
         virtual void readRawvals(void)override 
         {
+            if (rx->gotNewFrame()) {
+
+                uint16_t values[8];
+
+                rx->getChannelValues(values);
+
+                for (int k=0; k<8; ++k) {
+                    Serial.printf("%d ", values[k]);
+                }
+                Serial.printf("\n");
+            }
+
             rawvals[0] = 0.1;
             rawvals[1] = 0.2;
             rawvals[2] = 0.3;
@@ -78,7 +90,6 @@ class PhonyReceiver : public hf::Receiver {
             rawvals[6] = 0.7;
         }
 };
-
 
 class AlienflightF3V1 : public F3Board {
 
@@ -95,29 +106,29 @@ static hf::Hackflight h;
 hf::MixerQuadX mixer;
 
 void setup() {
-  
-  Serial.begin(115200);
 
-  Serial2.begin(115200);
+    Serial.begin(115200);
 
-  rx = new SpektrumDSM2048();
+    Serial2.begin(115200);
 
-  // Note that we have to allocate Stabilizer and Receiver dynamically to
-  // ensure that their constructors are called
+    rx = new SpektrumDSM2048();
 
-  hf::Stabilizer * stabilizer = new hf::Stabilizer(
-          0.20f,      // Level P
-          0.225f,     // Gyro cyclic P
-          0.001875f,  // Gyro cyclic I
-          0.375f,     // Gyro cyclic D
-          1.0625f,    // Gyro yaw P
-          0.005625f); // Gyro yaw I
+    // Note that we have to allocate Stabilizer and Receiver dynamically to
+    // ensure that their constructors are called
 
-  PhonyReceiver * rc = new PhonyReceiver(
-          CHANNEL_MAP,
-          .005f,  // roll trim
-          .01f,  // pitch trim
-          0.f);   // yaw trim
+    hf::Stabilizer * stabilizer = new hf::Stabilizer(
+            0.20f,      // Level P
+            0.225f,     // Gyro cyclic P
+            0.001875f,  // Gyro cyclic I
+            0.375f,     // Gyro cyclic D
+            1.0625f,    // Gyro yaw P
+            0.005625f); // Gyro yaw I
+
+    PhonyReceiver * rc = new PhonyReceiver(
+            CHANNEL_MAP,
+            .005f,  // roll trim
+            .01f,  // pitch trim
+            0.f);   // yaw trim
 
     // Initialize Hackflight firmware
     h.init(new AlienflightF3V1(), rc, &mixer, stabilizer);
@@ -125,21 +136,7 @@ void setup() {
 
 void loop() {
 
-    if (rx->gotNewFrame()) {
-
-        uint16_t values[8];
-
-        rx->getChannelValues(values);
-
-        for (int k=0; k<8; ++k) {
-            Serial.printf("%d ", values[k]);
-        }
-        Serial.printf("\n");
-    }
-
-    // Allow some time between readings
-    delay(10);  
-
+    h.update();
 }
 
 extern "C" {
