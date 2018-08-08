@@ -623,10 +623,6 @@ void timerInit(void)
 {
     memset(timerConfig, 0, sizeof (timerConfig));
 
-#ifdef CC3D
-    GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3, ENABLE);
-#endif
-
 #ifdef TIMER_APB1_PERIPHERALS
     RCC_APB1PeriphClockCmd(TIMER_APB1_PERIPHERALS, ENABLE);
 #endif
@@ -639,12 +635,10 @@ void timerInit(void)
     RCC_AHBPeriphClockCmd(TIMER_AHB_PERIPHERALS, ENABLE);
 #endif
 
-#ifdef STM32F303xC
     for (uint8_t timerIndex = 0; timerIndex < USABLE_TIMER_CHANNEL_COUNT; timerIndex++) {
         const timerHardware_t *timerHardwarePtr = &timerHardware[timerIndex];
         GPIO_PinAFConfig(timerHardwarePtr->gpio, (uint16_t)timerHardwarePtr->gpioPinSource, timerHardwarePtr->alternateFunction);
     }
-#endif
 
 // initialize timer channel structures
     for(int i = 0; i < USABLE_TIMER_CHANNEL_COUNT; i++) {

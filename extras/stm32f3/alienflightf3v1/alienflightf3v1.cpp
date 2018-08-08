@@ -20,6 +20,11 @@
 
 #include <f3board.h>
 #include <SpektrumDSM.h>
+#include <receiver.hpp>
+#include <hackflight.hpp>
+#include <mixers/quadx.hpp>
+
+constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 SpektrumDSM2048 * rx;
 
@@ -44,6 +49,51 @@ void serialEvent2()
     rx->handleSerialEvent(micros());
 }
 
+class PhonyReceiver : public hf::Receiver {
+
+    public:
+
+        PhonyReceiver(const uint8_t channelMap[6], float trimRoll=.01, float trimPitch=0, float trimYaw=0) : 
+            Receiver(channelMap, trimRoll, trimPitch, trimYaw) { }
+
+    protected:
+
+        virtual void begin(void) override 
+        {
+        }
+
+        virtual bool gotNewFrame(void) override 
+        {
+            return true;
+        }
+
+        virtual void readRawvals(void)override 
+        {
+            rawvals[0] = 0.1;
+            rawvals[1] = 0.2;
+            rawvals[2] = 0.3;
+            rawvals[3] = 0.4;
+            rawvals[4] = 0.5;
+            rawvals[5] = 0.6;
+            rawvals[6] = 0.7;
+        }
+};
+
+
+class AlienflightF3V1 : public F3Board {
+
+    void writeMotor(uint8_t index, float value)
+    {
+        (void)index; // XXX
+        (void)value;
+    }
+
+}; // class AlienflightF3V1
+
+static hf::Hackflight h;
+
+hf::MixerQuadX mixer;
+
 void setup() {
   
   Serial.begin(115200);
@@ -51,6 +101,26 @@ void setup() {
   Serial2.begin(115200);
 
   rx = new SpektrumDSM2048();
+
+  // Note that we have to allocate Stabilizer and Receiver dynamically to
+  // ensure that their constructors are called
+
+  hf::Stabilizer * stabilizer = new hf::Stabilizer(
+          0.20f,      // Level P
+          0.225f,     // Gyro cyclic P
+          0.001875f,  // Gyro cyclic I
+          0.375f,     // Gyro cyclic D
+          1.0625f,    // Gyro yaw P
+          0.005625f); // Gyro yaw I
+
+  PhonyReceiver * rc = new PhonyReceiver(
+          CHANNEL_MAP,
+          .005f,  // roll trim
+          .01f,  // pitch trim
+          0.f);   // yaw trim
+
+    // Initialize Hackflight firmware
+    h.init(new AlienflightF3V1(), rc, &mixer, stabilizer);
 }
 
 void loop() {
@@ -76,9 +146,9 @@ extern "C" {
 
 #include "serial_usb_vcp.h"
 
-serialPort_t * serial0_open(void)
-{
-    return usbVcpOpen();
-}
+    serialPort_t * serial0_open(void)
+    {
+        return usbVcpOpen();
+    }
 
 }
