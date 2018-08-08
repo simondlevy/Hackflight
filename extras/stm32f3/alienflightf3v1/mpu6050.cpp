@@ -5,6 +5,9 @@
 
 MPU6050 * imu;
 
+static const Gscale_t GSCALE = GFS_250DPS;
+static const Ascale_t ASCALE = AFS_2G;
+
 void setup() {
 
     Wire.begin(2); 
@@ -12,13 +15,17 @@ void setup() {
     imu = new MPU6050();
 
     imu->begin();
+
+    imu->initMPU6050(ASCALE, GSCALE); 
 }
 
 void loop() {
 
-    uint8_t c = imu->getMPU6050ID();
-    hf::Debug::printf("%x\n", c);
-    delay(500);
+    if (imu->checkNewData()) {  
+        int16_t accelCount[3];           
+        imu->readAccelData(accelCount);  
+        hf::Debug::printf("%d %d %d\n", accelCount[0], accelCount[1], accelCount[2]);
+    }
 }
 
 extern "C" {
