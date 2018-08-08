@@ -20,6 +20,7 @@
 
 #include <f3board.h>
 #include <SpektrumDSM.h>
+#include "serial_usb_vcp.h"
 
 SpektrumDSM2048 * rx;
 

@@ -27,17 +27,6 @@ extern "C" {
 
 #include <f3board.h>
 
-#include "platform.h"
-
-#include "system.h"
-#include "dma.h"
-#include "gpio.h"
-#include "timer.h"
-#include "serial.h"
-#include "serial_uart.h"
-#include "exti.h"
-#include "bus_spi.h"
-
 static const uint8_t LED_PIN = 16;
 
 // Board-specific
