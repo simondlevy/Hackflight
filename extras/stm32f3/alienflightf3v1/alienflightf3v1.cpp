@@ -72,15 +72,6 @@ class DSMX_Receiver : public hf::Receiver {
             if (rx->gotNewFrame()) {
 
                 rx->getChannelValuesNormalized(rawvals, CHANNELS);
-                /*
-                uint16_t values[8];
-
-                rx->getChannelValues(values);
-
-                for (int k=0; k<8; ++k) {
-                    Serial.printf("%d ", values[k]);
-                }
-                Serial.printf("\n");*/
             }
         }
 };
