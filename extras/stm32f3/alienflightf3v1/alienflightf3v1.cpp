@@ -24,29 +24,30 @@
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
 
-#include "HardwareSerial.h"
-
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 SpektrumDSM2048 * rx;
 
-static uint8_t avail;
+// Support for reading DSMX signals over UART2
+static serialPort_t * serial2;
+static uint8_t dsmAvailable;
+static uint8_t dsmValue;
 
 uint8_t dsmSerialAvailable(void)
 {
-    return avail;
+    return dsmAvailable;
 }
 
 uint8_t dsmSerialRead(void)
 {
-    avail--;
-
-    return Serial2.read();
+    dsmAvailable--;
+    return dsmValue;
 }
 
-void serialEvent2()
+static void serial_event_2(uint16_t value)
 {
-    avail = 1;
+    dsmValue = (uint8_t)value;
+    dsmAvailable = 1;
 
     rx->handleSerialEvent(micros());
 }
@@ -94,12 +95,12 @@ hf::MixerQuadX mixer;
 
 void setup() {
 
-    Serial2.begin(115200);
+    // Open connection to UART2
+    serial2 = uartOpen(USART2, serial_event_2, 115200, MODE_RX, SERIAL_NOT_INVERTED);
 
+    // Create an object for talking to the DSMX receiver.
+    // We have to allocate such objects dynamicall to ensure that their constructor are called.
     rx = new SpektrumDSM2048();
-
-    // Note that we have to allocate Stabilizer and Receiver dynamically to
-    // ensure that their constructors are called
 
     hf::Stabilizer * stabilizer = new hf::Stabilizer(
             0.20f,      // Level P
