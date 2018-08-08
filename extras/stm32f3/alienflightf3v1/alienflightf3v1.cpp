@@ -49,11 +49,11 @@ void serialEvent2()
     rx->handleSerialEvent(micros());
 }
 
-class PhonyReceiver : public hf::Receiver {
+class DSMX_Receiver : public hf::Receiver {
 
     public:
 
-        PhonyReceiver(const uint8_t channelMap[6], float trimRoll=.01, float trimPitch=0, float trimYaw=0) : 
+        DSMX_Receiver(const uint8_t channelMap[6], float trimRoll=.01, float trimPitch=0, float trimYaw=0) : 
             Receiver(channelMap, trimRoll, trimPitch, trimYaw) { }
 
     protected:
@@ -71,6 +71,8 @@ class PhonyReceiver : public hf::Receiver {
         {
             if (rx->gotNewFrame()) {
 
+                rx->getChannelValuesNormalized(rawvals, CHANNELS);
+                /*
                 uint16_t values[8];
 
                 rx->getChannelValues(values);
@@ -78,16 +80,8 @@ class PhonyReceiver : public hf::Receiver {
                 for (int k=0; k<8; ++k) {
                     Serial.printf("%d ", values[k]);
                 }
-                Serial.printf("\n");
+                Serial.printf("\n");*/
             }
-
-            rawvals[0] = 0.1;
-            rawvals[1] = 0.2;
-            rawvals[2] = 0.3;
-            rawvals[3] = 0.4;
-            rawvals[4] = 0.5;
-            rawvals[5] = 0.6;
-            rawvals[6] = 0.7;
         }
 };
 
@@ -124,7 +118,7 @@ void setup() {
             1.0625f,    // Gyro yaw P
             0.005625f); // Gyro yaw I
 
-    PhonyReceiver * rc = new PhonyReceiver(
+    DSMX_Receiver * rc = new DSMX_Receiver(
             CHANNEL_MAP,
             .005f,  // roll trim
             .01f,  // pitch trim
