@@ -38,6 +38,8 @@ extern "C" {
 #include "exti.h"
 #include "bus_spi.h"
 
+static const uint8_t LED_PIN = 16;
+
 // Board-specific
 GPIO_TypeDef * gpio_type_from_pin(uint8_t pin);
 uint16_t gpio_pin_from_pin(uint8_t pin);
@@ -71,6 +73,20 @@ static void checkReboot(void)
     }
 }
 
+static void ledInit(void)
+{
+    GPIO_TypeDef * gpio = gpio_type_from_pin(LED_PIN);
+
+    gpio_config_t cfg;
+
+    cfg.pin = gpio_pin_from_pin(LED_PIN);
+    cfg.mode = Mode_Out_PP;
+    cfg.speed = Speed_2MHz;
+
+    gpioInit(gpio, &cfg);
+}
+
+
 int main(void) {
 
     // start fpu
@@ -85,6 +101,8 @@ int main(void) {
     serial0 = serial0_open();
 
     dmaInit();
+
+    ledInit();
 
     setup();
 
@@ -205,6 +223,86 @@ void HardFault_Handler(void)
 {
     while (true);
 }
+
+void F3Board::delaySeconds(float sec)
+{
+    delay(sec*1000);
+}
+
+void F3Board::ledSet(bool is_on)
+{ 
+    uint16_t gpio_pin = gpio_pin_from_pin(LED_PIN);
+
+    GPIO_TypeDef * gpio = gpio_type_from_pin(LED_PIN);
+
+    if (is_on) {
+        digitalLo(gpio, gpio_pin);
+    }
+    else {
+        digitalHi(gpio, gpio_pin);
+    }
+}
+
+uint8_t F3Board::serialAvailableBytes(void)
+{
+    return serialRxBytesWaiting(serial0);
+}
+
+uint8_t F3Board::serialReadByte(void)
+{
+    return serialRead(serial0);
+}
+
+void F3Board::serialWriteByte(uint8_t c)
+{
+    serialWrite(serial0, c);
+    while (!isSerialTransmitBufferEmpty(serial0));
+}
+
+uint32_t F3Board::getMicroseconds(void)
+{
+    return micros();
+}
+
+bool F3Board::getGyrometer(float gyroRates[3])
+{
+    (void)gyroRates; // XXX
+
+    static uint32_t _time;
+    uint32_t time = micros();
+    if (time-_time > 5000) {
+        _time = time;
+        return true;
+    }
+    return false;
+}
+
+bool F3Board::getQuaternion(float quat[4])
+{
+    (void)quat; // XXX
+
+    static uint32_t _time;
+    uint32_t time = micros();
+    if (time-_time > 10000) {
+        _time = time;
+        return true;
+    }
+    return false;
+}
+
+// Support prototype version where LED is on pin A1
+F3Board::F3Board(void)
+{
+    // Do general real-board initialization
+    RealBoard::init();
+}
+
+void hf::Board::outbuf(char * buf)
+{
+    for (char *p=buf; *p; p++)
+        serialWrite(serial0, *p);
+}
+
 
 } // extern "C"
 

@@ -104,6 +104,7 @@ class HardwareSerial3 : public HardwareSerial {
 };
 extern HardwareSerial3 Serial3;
 
+#include <board.hpp>
 #include <boards/realboard.hpp>
 
 class F3Board : public hf::RealBoard {
