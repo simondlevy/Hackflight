@@ -37,84 +37,15 @@ extern "C" {
 #include "exti.h"
 #include "bus_spi.h"
 
+#include <board.hpp>
+#include <boards/realboard.hpp>
+
     unsigned long micros(void);
     unsigned long millis(void);
     void delay(unsigned long);
 
     void setup(void);
     void loop(void);
-
-    class HardwareSerial {
-
-        protected:
-
-            void *  _uart;
-
-        public:
-
-            uint8_t available(void);
-
-            uint8_t read(void);
-
-            void write(uint8_t byte);
-
-            void flush(void);
-
-            void printf(const char * fmt, ...)
-            {
-                va_list ap;       
-                va_start(ap, fmt);     
-                char buf[1000];
-                vsprintf(buf, fmt, ap);
-                for (char *p=buf; *p; p++)
-                    this->write(*p);
-                va_end(ap);  
-                this->flush();
-            }
-    };
-
-    class HardwareSerial0 : public HardwareSerial {
-
-        public:
-
-            void begin(uint32_t baud);
-
-            uint8_t read(void);
-    };
-    extern HardwareSerial0 Serial;
-
-    class HardwareSerial1 : public HardwareSerial {
-
-        public:
-
-            void begin(uint32_t baud);
-
-            uint8_t read(void);
-    };
-    extern HardwareSerial1 Serial1;
-
-    class HardwareSerial2 : public HardwareSerial {
-
-        public:
-
-            void begin(uint32_t baud);
-
-            uint8_t read(void);
-    };
-    extern HardwareSerial2 Serial2;
-
-    class HardwareSerial3 : public HardwareSerial {
-
-        public:
-
-            void begin(uint32_t baud);
-
-            uint8_t read(void);
-    };
-    extern HardwareSerial3 Serial3;
-
-#include <board.hpp>
-#include <boards/realboard.hpp>
 
     class F3Board : public hf::RealBoard {
 

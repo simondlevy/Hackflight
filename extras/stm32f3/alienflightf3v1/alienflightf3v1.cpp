@@ -24,6 +24,8 @@
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
 
+#include "HardwareSerial.h"
+
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 SpektrumDSM2048 * rx;

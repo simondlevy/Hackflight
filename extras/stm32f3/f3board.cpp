@@ -19,20 +19,17 @@ You should have received a copy of the GNU General Public License
 along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-void serialEvent1(void) __attribute__((weak));
-void serialEvent2(void) __attribute__((weak));
-void serialEvent3(void) __attribute__((weak));
-
 extern "C" {
 
-#include <f3board.h>
+#include "f3board.h"
 
 // Board-specific
 serialPort_t * serial0_open(void);
 
 void SetSysClock(void);
 
-static serialPort_t * serial0;
+// Shared with HardwareSerial.cpp
+serialPort_t * serial0;
 
 void reset(void)
 {
@@ -97,111 +94,6 @@ int main(void) {
         loop();
     }
 } // main
-
-void HardwareSerial::write(uint8_t byte)
-{
-    serialPort_t * port = (serialPort_t *)this->_uart;
-    serialWrite(port, byte);
-}
-
-uint8_t HardwareSerial::available(void)
-{
-    serialPort_t * port = (serialPort_t *)this->_uart;
-    return serialRxBytesWaiting(port);
-}
-
-void HardwareSerial::flush(void)
-{
-    serialPort_t * port = (serialPort_t *)this->_uart;
-    while (!isSerialTransmitBufferEmpty(port));
-}
-
-void HardwareSerial0::begin(uint32_t baud)
-{
-    (void)baud;
-    this->_uart = serial0;
-}
-
-uint8_t HardwareSerial0::read(void)
-{
-    serialPort_t * port = (serialPort_t *)this->_uart;
-    return serialRead(port);
-}
-
-#define SERIAL_RX_BUFSIZE 256
-
-static uint8_t serial1_rx_buffer[SERIAL_RX_BUFSIZE];
-static uint8_t serial1_rx_index;
-
-static void serial_event_1(uint16_t value)
-{
-    serial1_rx_buffer[serial1_rx_index] = (uint8_t)value;
-
-    serialEvent1();
-
-    serial1_rx_index = (serial1_rx_index + 1) % SERIAL_RX_BUFSIZE;
-}
-
-void HardwareSerial1::begin(uint32_t baud)
-{
-    this->_uart = uartOpen(USART1, serial_event_1, baud, MODE_RX, SERIAL_NOT_INVERTED);
-
-    serial1_rx_index = 0;
-}
-
-uint8_t HardwareSerial1::read(void)
-{
-    return serial1_rx_buffer[serial1_rx_index];
-}
-
-static uint8_t serial2_rx_buffer[SERIAL_RX_BUFSIZE];
-static uint8_t serial2_rx_index;
-
-static void serial_event_2(uint16_t value)
-{
-    serial2_rx_buffer[serial2_rx_index] = (uint8_t)value;
-
-    serialEvent2();
-
-    serial2_rx_index = (serial2_rx_index + 1) % SERIAL_RX_BUFSIZE;
-}
-
-void HardwareSerial2::begin(uint32_t baud)
-{
-    this->_uart = uartOpen(USART2, serial_event_2, baud, MODE_RX, SERIAL_NOT_INVERTED);
-
-    serial2_rx_index = 0;
-}
-
-uint8_t HardwareSerial2::read(void)
-{
-    return serial2_rx_buffer[serial2_rx_index];
-}
-
-static uint8_t serial3_rx_buffer[SERIAL_RX_BUFSIZE];
-static uint8_t serial3_rx_index;
-
-static void serial_event_3(uint16_t value)
-{
-    serial3_rx_buffer[serial3_rx_index] = (uint8_t)value;
-
-    serialEvent3();
-
-    serial3_rx_index = (serial3_rx_index + 1) % SERIAL_RX_BUFSIZE;
-}
-
-void HardwareSerial3::begin(uint32_t baud)
-{
-    this->_uart = uartOpen(USART3, serial_event_3, baud, MODE_RX, SERIAL_NOT_INVERTED);
-
-    serial3_rx_index = 0;
-}
-
-uint8_t HardwareSerial3::read(void)
-{
-    return serial3_rx_buffer[serial3_rx_index];
-}
-
 
 void HardFault_Handler(void)
 {
@@ -289,8 +181,3 @@ void hf::Board::outbuf(char * buf)
 
 
 } // extern "C"
-
-HardwareSerial0 Serial;
-HardwareSerial1 Serial1;
-HardwareSerial2 Serial2;
-HardwareSerial3 Serial3;
