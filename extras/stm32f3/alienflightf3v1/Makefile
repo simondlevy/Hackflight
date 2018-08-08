@@ -1,5 +1,5 @@
 # Change this to wherever you put BreezySTM32
-# Change this to where you put your Arduino libraries
+# Change this to where you put your f3board libraries
 ARDUINO_DIR = $(HOME)/Documents/Arduino/libraries
 
 # Change this to whatever project name you want
@@ -198,7 +198,7 @@ TARGET_BIN	 = obj/$(PROJECT).bin
 TARGET_HEX	 = $(BIN_DIR)/$(PROJECT).hex
 TARGET_ELF	 = $(OBJECT_DIR)/$(PROJECT).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $($(PROJECT)_CSRC)))) \
-			   $(OBJECT_DIR)/$(PROJECT)/Arduino.o \
+			   $(OBJECT_DIR)/$(PROJECT)/f3board.o \
 			   $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o \
 			   $(OBJECT_DIR)/$(PROJECT).o
 TARGET_MAP	 = $(OBJECT_DIR)/$(PROJECT).map
@@ -247,8 +247,8 @@ $(OBJECT_DIR)/$(PROJECT)/%.o: %.S
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(ASFLAGS) $<
 
-$(OBJECT_DIR)/$(PROJECT)/Arduino.o: ../Arduino.cpp ../Arduino.h
-	@$(C++) -c -o $(OBJECT_DIR)/$(PROJECT)/Arduino.o $(CFLAGS) ../Arduino.cpp
+$(OBJECT_DIR)/$(PROJECT)/f3board.o: ../f3board.cpp ../f3board.h
+	@$(C++) -c -o $(OBJECT_DIR)/$(PROJECT)/f3board.o $(CFLAGS) ../f3board.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/HardwareSerial.o: ../HardwareSerial.cpp ../HardwareSerial.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/HardwareSerial.o $(CFLAGS) ../HardwareSerial.cpp

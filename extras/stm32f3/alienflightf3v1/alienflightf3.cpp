@@ -1,4 +1,4 @@
-#include <Arduino.h>
+#include <f3board.h>
 #include <SpektrumDSM.h>
 
 SpektrumDSM2048 * rx;
