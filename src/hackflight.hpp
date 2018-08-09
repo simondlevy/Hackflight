@@ -95,7 +95,7 @@ namespace hf {
                     _stabilizer->updateEulerAngles(_state.eulerAngles, _receiver->getAux1State());
 
                     // Synch serial comms to quaternion check
-                    doSerialComms();
+                    //doSerialComms();
                 }
             }
 
@@ -304,6 +304,7 @@ namespace hf {
 
                 // Check mandatory sensors
                 checkGyrometer();
+
                 checkQuaternion();
 
                 // Check optional sensors

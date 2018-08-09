@@ -25,17 +25,11 @@
 #include <mixers/quadx.hpp>
 #include <MPU6050.h>
 
-#include "platform.h"
-#include "dma.h"
-#include "gpio.h"
-#include "serial.h"
-
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 SpektrumDSM2048 * rx;
 
 // Support for reading DSMX signals over UART2
-static serialPort_t * serial2;
 static uint8_t dsmAvailable;
 static uint8_t dsmValue;
 
@@ -50,13 +44,35 @@ uint8_t dsmSerialRead(void)
     return dsmValue;
 }
 
+extern "C" {
+
+#include "platform.h"
+#include "dma.h"
+#include "gpio.h"
+#include "serial.h"
+#include "system.h"
+#include "serial_uart.h"
+
+static serialPort_t * serial2;
+
+static void serial_event_2(uint16_t value)
+{
+    dsmValue = (uint8_t)value;
+    dsmAvailable = 1;
+
+    rx->handleSerialEvent(micros());
+}
 
 class DSMX_Receiver : public hf::Receiver {
 
     public:
 
         DSMX_Receiver(const uint8_t channelMap[6], float trimRoll=.01, float trimPitch=0, float trimYaw=0) : 
-            Receiver(channelMap, trimRoll, trimPitch, trimYaw) { }
+            Receiver(channelMap, trimRoll, trimPitch, trimYaw) 
+        {         
+            // Open connection to UART2
+            serial2 = uartOpen(USART2, serial_event_2, 115200, MODE_RX, SERIAL_NOT_INVERTED);
+        }
 
     protected:
 
@@ -69,65 +85,55 @@ class DSMX_Receiver : public hf::Receiver {
         {
             rx->getChannelValuesNormalized(rawvals, CHANNELS);
         }
-};
 
-extern "C" {
+}; // DSMX_Receiver
+
 
 #include "serial_uart.h"
 #include "system.h"
 #include "serial_usb_vcp.h"
 
-class AlienflightF3V1 : public F3Board {
+    class AlienflightF3V1 : public F3Board {
 
-    bool getGyrometer(float gyroRates[3])
-    {
-        (void)gyroRates; // XXX
+        bool getGyrometer(float gyroRates[3])
+        {
+            (void)gyroRates; // XXX
 
-        static uint32_t _time;
-        uint32_t time = micros();
-        if (time-_time > 5000) {
-            _time = time;
-            return true;
+            static uint32_t _time;
+            uint32_t time = micros();
+            if (time-_time > 5000) {
+                _time = time;
+                return true;
+            }
+            return false;
         }
-        return false;
-    }
 
-    bool getQuaternion(float quat[4])
-    {
-        (void)quat; // XXX
+        bool getQuaternion(float quat[4])
+        {
+            (void)quat; // XXX
 
-        static uint32_t _time;
-        uint32_t time = micros();
-        if (time-_time > 10000) {
-            _time = time;
-            return true;
+            static uint32_t _time;
+            uint32_t time = micros();
+            if (time-_time > 10000) {
+                _time = time;
+                return true;
+            }
+            return false;
         }
-        return false;
-    }
 
-    void writeMotor(uint8_t index, float value)
-    {
-        (void)index; // XXX
-        (void)value;
-    }
+        void writeMotor(uint8_t index, float value)
+        {
+            (void)index; // XXX
+            (void)value;
+        }
 
-}; // class AlienflightF3V1
+    }; // class AlienflightF3V1
 
-static hf::Hackflight h;
+    static hf::Hackflight h;
 
-hf::MixerQuadX mixer;
+    hf::MixerQuadX mixer;
 
-    static void serial_event_2(uint16_t value)
-    {
-        dsmValue = (uint8_t)value;
-        dsmAvailable = 1;
-
-        rx->handleSerialEvent(micros());
-    }
     void setup() {
-
-        // Open connection to UART2
-        serial2 = uartOpen(USART2, serial_event_2, 115200, MODE_RX, SERIAL_NOT_INVERTED);
 
         // Create an object for talking to the DSMX receiver.
         // We have to allocate such objects dynamicall to ensure that their constructor are called.
@@ -162,4 +168,4 @@ hf::MixerQuadX mixer;
         return usbVcpOpen();
     }
 
-}
+} // extern "C"

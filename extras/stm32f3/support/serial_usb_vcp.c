@@ -33,6 +33,15 @@
 #include "serial.h"
 #include "serial_usb_vcp.h"
 
+typedef struct {
+    serialPort_t port;
+
+    // Buffer used during bulk writes.
+    uint8_t txBuf[20];
+    uint8_t txAt;
+    // Set if the port is in bulk write mode and can buffer.
+    bool buffering;
+} vcpPort_t;
 
 #define USB_TIMEOUT  50
 
@@ -60,14 +69,14 @@ static bool isUsbVcpTransmitBufferEmpty(const serialPort_t *instance)
     return true;
 }
 
-static uint32_t usbVcpAvailable(const serialPort_t *instance)
+uint32_t usbVcpAvailable(const serialPort_t *instance)
 {
     UNUSED(instance);
 
     return receiveLength;
 }
 
-static uint8_t usbVcpRead(serialPort_t *instance)
+uint8_t usbVcpRead(serialPort_t *instance)
 {
     UNUSED(instance);
 
@@ -130,7 +139,7 @@ static bool usbVcpFlush(vcpPort_t *port)
     return count == 0;
 }
 
-static void usbVcpWrite(serialPort_t *instance, uint8_t c)
+void usbVcpWrite(serialPort_t *instance, uint8_t c)
 {
     vcpPort_t *port = container_of(instance, vcpPort_t, port);
 
