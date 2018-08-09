@@ -30,6 +30,8 @@ class AlienflightF3 : public F3Board {
 
     protected:
 
+        void init(void);
+
         bool getGyrometer(float gyroRates[3]) override;
 
         bool getQuaternion(float quat[4]) override;
@@ -41,4 +43,8 @@ class AlienflightF3 : public F3Board {
         uint8_t serialReadByte(void);
 
         void serialWriteByte(uint8_t c);
+
+    private:
+
+        void * _imu;
 };

@@ -35,6 +35,8 @@ extern "C" {
     AlienflightF3::AlienflightF3(void)
     {
         serial0 = usbVcpOpen();
+
+        init();
     }
 
     uint8_t AlienflightF3::serialAvailableBytes(void)

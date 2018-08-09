@@ -1,5 +1,5 @@
 /*
-   alienflightf3v1.cpp 
+   alienflightf3v1.cpp Support MPU6050 IMU on AlienflightF3 V1 board
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -19,10 +19,38 @@
  */
 
 #include "alienflightf3.h"
+#include <MPU6050.h>
+#include <Wire.h>
+#include <debug.hpp>
+
+static const Gscale_t GSCALE = GFS_250DPS;
+static const Ascale_t ASCALE = AFS_2G;
+
+void AlienflightF3::init(void)
+{
+    Wire.begin(2);
+
+    MPU6050 * imu = new MPU6050();
+
+    imu->begin();
+
+    imu->initMPU6050(ASCALE, GSCALE); 
+
+    _imu = imu;
+}
 
 bool AlienflightF3::getGyrometer(float gyroRates[3])
 {
-    (void)gyroRates; // XXX
+    (void)gyroRates;
+
+    MPU6050 * imu = (MPU6050 *)_imu;
+
+    if (imu->checkNewData()) {  
+        int16_t accelCount[3];           
+        imu->readAccelData(accelCount);  
+        hf::Debug::printf("%d %d %d\n", accelCount[0], accelCount[1], accelCount[2]);
+        return true;
+    }
 
     return false;
 }
