@@ -1,5 +1,5 @@
 /*
-   alienflightf3_dsmx.cpp Support for Spektrum DSMX receive on AlienflightF3 board
+   dsmx_receiver.cpp Support for Spektrum DSMX receive on F3 boards
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -18,7 +18,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "alienflightf3_dsmx.h"
+#include "dsmx_receiver.h"
 #include <SpektrumDSM.h>
 
 SpektrumDSM2048 * rx;
@@ -47,9 +47,9 @@ extern "C" {
 #include "serial_uart.h"
 #include "system.h"
 
-static serialPort_t * serial2;
+static serialPort_t * serialPort;
 
-static void serial_event_2(uint16_t value)
+static void serial_event(uint16_t value)
 {
     dsmValue = (uint8_t)value;
     dsmAvailable = 1;
@@ -57,10 +57,10 @@ static void serial_event_2(uint16_t value)
     rx->handleSerialEvent(micros());
 }
 
-static void serial2Open(void)
+static void serialPortOpen(void)
 {
     // Open connection to UART2
-    serial2 = uartOpen(USART2, serial_event_2, 115200, MODE_RX, SERIAL_NOT_INVERTED);
+    serialPort = uartOpen(USART2, serial_event, 115200, MODE_RX, SERIAL_NOT_INVERTED);
 }
 
 } // extern "C"
@@ -70,7 +70,7 @@ DSMX_Receiver::DSMX_Receiver(const uint8_t channelMap[6], float trimRoll, float 
 {         
 
     // Open connection to UART2
-    serial2Open();
+    serialPortOpen();
 
     // Create a SpektrumDSM2048 object to handle serial interrupts
     rx = new SpektrumDSM2048();

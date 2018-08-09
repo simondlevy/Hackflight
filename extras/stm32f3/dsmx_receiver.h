@@ -1,5 +1,5 @@
 /*
-   alienflightf3_dsmx.h Support for Spektrum DSMX receive on AlienflightF3 board
+   dsmx_receiver.h Support for Spektrum DSMX receive on F3 boards
 
    Copyright (c) 2018 Simon D. Levy
 
