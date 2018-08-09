@@ -164,7 +164,7 @@ void loop()
         _time = time;
 
         // Use Madgwick to computer quaternion, converting gyro into radians / sec
-        madgwick.update(ax, ay, az, gx*PI/180.0f, gy*PI/180.0f, gz*PI/180.0f, deltaT, q);
+        madgwick.update(ax, ay, az, radians(gx), radians(gy), radians(gz), deltaT, q);
 
         // Convert quaternion to euler angles
         float euler[3];
@@ -172,13 +172,13 @@ void loop()
 
         // Report Euler angles in degrees
         Serial.print("Roll: ");
-        Serial.print(euler[0] * 180.f / PI, 2);
+        Serial.print(degrees(euler[0]), 2);
         Serial.print(" deg  ");
         Serial.print("Pitch: ");
-        Serial.print(euler[1] * 180.f / PI, 2);
+        Serial.print(degrees(euler[1]), 2);
         Serial.print(" deg  ");
         Serial.print("Yaw: ");
-        Serial.print(euler[2] * 180.f / PI, 2);
+        Serial.print(degrees(euler[2]), 2);
         Serial.println(" deg");
     }  
 }
