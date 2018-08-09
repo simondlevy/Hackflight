@@ -215,21 +215,9 @@ void timerConfigure(const timerHardware_t *timerHardwarePtr, uint16_t period, ui
     timerNVICConfigure(timerHardwarePtr->irq);
     // HACK - enable second IRQ on timers that need it
     switch(timerHardwarePtr->irq) {
-#if defined(STM32F10X)
-    case TIM1_CC_IRQn:
-        timerNVICConfigure(TIM1_UP_IRQn);
-        break;
-#endif
-#ifdef STM32F303xC
     case TIM1_CC_IRQn:
         timerNVICConfigure(TIM1_UP_TIM16_IRQn);
         break;
-#endif
-#if defined(STM32F10X_XL)
-    case TIM8_CC_IRQn:
-        timerNVICConfigure(TIM8_UP_IRQn);
-        break;
-#endif
     }
 }
 
@@ -581,9 +569,6 @@ static void timCCxHandler(TIM_TypeDef *tim, timerConfig_t *timerConfig)
 
 #if USED_TIMERS & TIM_N(1)
 _TIM_IRQ_HANDLER(TIM1_CC_IRQHandler, 1);
-# if defined(STM32F10X)
-_TIM_IRQ_HANDLER(TIM1_UP_IRQHandler, 1);       // timer can't be shared
-# endif
 # ifdef STM32F303xC
 #  if USED_TIMERS & TIM_N(16)
 _TIM_IRQ_HANDLER2(TIM1_UP_TIM16_IRQHandler, 1, 16);  // both timers are in use
@@ -603,11 +588,7 @@ _TIM_IRQ_HANDLER(TIM4_IRQHandler, 4);
 #endif
 #if USED_TIMERS & TIM_N(8)
 _TIM_IRQ_HANDLER(TIM8_CC_IRQHandler, 8);
-# if defined(STM32F10X_XL)
-_TIM_IRQ_HANDLER(TIM8_UP_TIM13_IRQHandler, 8);
-# else  // f10x_hd, f30x
 _TIM_IRQ_HANDLER(TIM8_UP_IRQHandler, 8);
-# endif
 #endif
 #if USED_TIMERS & TIM_N(15)
 _TIM_IRQ_HANDLER(TIM1_BRK_TIM15_IRQHandler, 15);
