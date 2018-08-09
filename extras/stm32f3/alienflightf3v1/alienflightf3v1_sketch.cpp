@@ -23,7 +23,7 @@
 #include <mixers/quadx.hpp>
 #include <MPU6050.h>
 #include "dsmx_receiver.h"
-#include "alienflightf3v1_board.h"
+#include "alienflightf3v1.h"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 

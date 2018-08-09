@@ -1,5 +1,5 @@
 /*
-   alienflightf3v1_board.h 
+   alienflightf3v1.h 
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -18,7 +18,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "alienflightf3v1_board.h"
+#include "alienflightf3v1.h"
 
 extern "C" {
 

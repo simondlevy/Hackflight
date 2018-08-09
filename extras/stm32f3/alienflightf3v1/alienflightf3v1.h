@@ -1,5 +1,5 @@
 /*
-   alienflightf3v1_board.h 
+   alienflightf3v1.h 
 
    Copyright (c) 2018 Simon D. Levy
 
