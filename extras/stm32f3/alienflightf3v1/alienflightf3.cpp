@@ -68,21 +68,6 @@ extern "C" {
 
 #include <f3board.h>
 #include <hackflight.hpp>
-#include <mixers/quadx.hpp>
-#include <MPU6050.h>
-
-bool AlienflightF3::getGyrometer(float gyroRates[3])
-{
-    (void)gyroRates; // XXX
-
-    static uint32_t _time;
-    uint32_t time = micros();
-    if (time-_time > 5000) {
-        _time = time;
-        return true;
-    }
-    return false;
-}
 
 bool AlienflightF3::getQuaternion(float quat[4])
 {

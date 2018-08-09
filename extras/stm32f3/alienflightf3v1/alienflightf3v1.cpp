@@ -1,5 +1,5 @@
 /*
-   alienflightf3.h 
+   alienflightf3v1.cpp 
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -18,27 +18,11 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "alienflightf3.h"
 
-#include <f3board.h>
+bool AlienflightF3::getGyrometer(float gyroRates[3])
+{
+    (void)gyroRates; // XXX
 
-class AlienflightF3 : public F3Board {
-
-    public:
-
-        AlienflightF3(void);
-
-    protected:
-
-        bool getGyrometer(float gyroRates[3]) override;
-
-        bool getQuaternion(float quat[4]) override;
-
-        void writeMotor(uint8_t index, float value) override;
-
-        uint8_t serialAvailableBytes(void);
-
-        uint8_t serialReadByte(void);
-
-        void serialWriteByte(uint8_t c);
-};
+    return false;
+}
