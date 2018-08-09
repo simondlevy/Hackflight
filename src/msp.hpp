@@ -219,10 +219,11 @@ namespace hf {
             _parserState = IDLE;
         }
 
-        void update(uint8_t c)
+        bool update(uint8_t c)
         {
             switch (_parserState) {
                 case IDLE:
+                    if (c == 'R') return true; // got reboot command
                     _parserState = (c == '$') ? HEADER_START : IDLE;
                     break;
                 case HEADER_START:
@@ -234,7 +235,7 @@ namespace hf {
                 case HEADER_ARROW:
                     if (c > INBUF_SIZE) {       // now we are expecting the payload size
                         _parserState = IDLE;
-                        return;
+                        return false;
                     }
                     _dataSize = c;
                     _offset = 0;
@@ -261,6 +262,8 @@ namespace hf {
                     }
 
             } // switch (_parserState)
+
+            return false; // no reboot
 
         } // update
 

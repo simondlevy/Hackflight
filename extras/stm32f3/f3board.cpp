@@ -58,6 +58,12 @@ extern "C" {
         RealBoard::init();
     }
 
+    void F3Board::reboot(void)
+    {
+        systemResetToBootloader();
+    }
+
+
     void hf::Board::outbuf(char * buf)
     {
         for (char *p=buf; *p; p++)

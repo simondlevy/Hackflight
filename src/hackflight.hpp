@@ -95,7 +95,7 @@ namespace hf {
                     _stabilizer->updateEulerAngles(_state.eulerAngles, _receiver->getAux1State());
 
                     // Synch serial comms to quaternion check
-                    //doSerialComms();
+                    doSerialComms();
                 }
             }
 
@@ -204,7 +204,9 @@ namespace hf {
             void doSerialComms(void)
             {
                 while (_board->serialAvailableBytes() > 0) {
-                    _msp.update(_board->serialReadByte());
+                    if (_msp.update(_board->serialReadByte())) {
+                        _board->reboot(); // support "make flash" from STM32F boards
+                    }
                 }
 
                 while (_msp.availableBytes() > 0) {

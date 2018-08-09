@@ -34,20 +34,6 @@ extern "C" {
 // Shared with F3Board
 serialPort_t * serial0;
 
-static void checkReboot(void)
-{
-    static uint32_t dbg_start_msec;
-    // support reboot from host computer
-    if (millis()-dbg_start_msec > 100) {
-        dbg_start_msec = millis();
-        while (serialRxBytesWaiting(serial0)) {
-            uint8_t c = serialRead(serial0);
-            if (c == 'R') 
-                systemResetToBootloader();
-        }
-    }
-}
-
 static void ledInit(void)
 {
     GPIO_TypeDef * gpio = LED0_GPIO;
@@ -90,8 +76,6 @@ int main(void) {
     setup();
 
     while (true) {
-
-        checkReboot();
 
         loop();
     }

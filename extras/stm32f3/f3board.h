@@ -36,6 +36,8 @@ extern "C" {
 
             virtual uint32_t getMicroseconds(void) override;
 
+            virtual void reboot(void) override;
+
         public:
 
             F3Board(void);

@@ -54,6 +54,9 @@ namespace hf {
             virtual uint8_t serialReadByte(void)  { return 0; }
             virtual void    serialWriteByte(uint8_t c) { (void)c; }
 
+            //------------------------------- Reboot for non-Arduino boards ---------------------------------------------
+            virtual void reboot(void) { }
+
             //----------------------------------------- Safety -----------------------------------------------------------
             virtual void showArmedStatus(bool armed) { (void)armed; }
             virtual void flashLed(bool shouldflash) { (void)shouldflash; }
