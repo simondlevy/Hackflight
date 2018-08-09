@@ -1,5 +1,5 @@
 /*
-   alienflightf3.h 
+   alienflightf3.cpp Board class implementation for AlienflightF3
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -19,6 +19,8 @@
  */
 
 #include "alienflightf3.h"
+
+// This code has to talk to the C code supporing USB Virtual COM Port ------------------------------------------
 
 extern "C" {
 
@@ -67,9 +69,25 @@ extern "C" {
 
 } // extern "C"
 
+// This code is ordinary C++ -----------------------------------------------------------------------------------
 
 #include <f3board.h>
 #include <hackflight.hpp>
+
+bool AlienflightF3::getGyrometer(float gyroRates[3])
+{
+    (void)gyroRates;
+
+    int16_t gyroCount[3];
+    int16_t accelCount[3];
+
+    if (getImu(gyroCount, accelCount)) {
+
+        return true;
+    }
+
+    return false;
+}
 
 bool AlienflightF3::getQuaternion(float quat[4])
 {

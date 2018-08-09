@@ -39,18 +39,13 @@ void AlienflightF3::init(void)
     _imu = imu;
 }
 
-bool AlienflightF3::getGyrometer(float gyroRates[3])
+bool AlienflightF3::getImu(int16_t accelCount[3], int16_t gyroCount[3])
 {
-    (void)gyroRates;
-
     MPU6050 * imu = (MPU6050 *)_imu;
 
     if (imu->checkNewData()) {  
-        int16_t gyroCount[3];           
         imu->readGyroData(gyroCount);  
-        int16_t accelCount[3];           
         imu->readAccelData(accelCount);  
-        hf::Debug::printf("%d %d %d\n", gyroCount[0], gyroCount[1], gyroCount[2]);
         return true;
     }
 
