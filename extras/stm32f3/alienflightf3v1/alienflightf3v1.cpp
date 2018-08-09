@@ -46,9 +46,11 @@ bool AlienflightF3::getGyrometer(float gyroRates[3])
     MPU6050 * imu = (MPU6050 *)_imu;
 
     if (imu->checkNewData()) {  
+        int16_t gyroCount[3];           
+        imu->readGyroData(gyroCount);  
         int16_t accelCount[3];           
         imu->readAccelData(accelCount);  
-        hf::Debug::printf("%d %d %d\n", accelCount[0], accelCount[1], accelCount[2]);
+        hf::Debug::printf("%d %d %d\n", gyroCount[0], gyroCount[1], gyroCount[2]);
         return true;
     }
 
