@@ -72,32 +72,6 @@ extern "C" {
         return micros();
     }
 
-    bool F3Board::getGyrometer(float gyroRates[3])
-    {
-        (void)gyroRates; // XXX
-
-        static uint32_t _time;
-        uint32_t time = micros();
-        if (time-_time > 5000) {
-            _time = time;
-            return true;
-        }
-        return false;
-    }
-
-    bool F3Board::getQuaternion(float quat[4])
-    {
-        (void)quat; // XXX
-
-        static uint32_t _time;
-        uint32_t time = micros();
-        if (time-_time > 10000) {
-            _time = time;
-            return true;
-        }
-        return false;
-    }
-
     // Support prototype version where LED is on pin A1
     F3Board::F3Board(void)
     {

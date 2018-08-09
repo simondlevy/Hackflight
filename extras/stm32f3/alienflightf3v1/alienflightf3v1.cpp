@@ -23,6 +23,7 @@
 #include <receiver.hpp>
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
+#include <MPU6050.h>
 
 #include "platform.h"
 #include "dma.h"
@@ -70,7 +71,39 @@ class DSMX_Receiver : public hf::Receiver {
         }
 };
 
+extern "C" {
+
+#include "serial_uart.h"
+#include "system.h"
+#include "serial_usb_vcp.h"
+
 class AlienflightF3V1 : public F3Board {
+
+    bool getGyrometer(float gyroRates[3])
+    {
+        (void)gyroRates; // XXX
+
+        static uint32_t _time;
+        uint32_t time = micros();
+        if (time-_time > 5000) {
+            _time = time;
+            return true;
+        }
+        return false;
+    }
+
+    bool getQuaternion(float quat[4])
+    {
+        (void)quat; // XXX
+
+        static uint32_t _time;
+        uint32_t time = micros();
+        if (time-_time > 10000) {
+            _time = time;
+            return true;
+        }
+        return false;
+    }
 
     void writeMotor(uint8_t index, float value)
     {
@@ -83,12 +116,6 @@ class AlienflightF3V1 : public F3Board {
 static hf::Hackflight h;
 
 hf::MixerQuadX mixer;
-
-extern "C" {
-
-#include "serial_uart.h"
-#include "system.h"
-#include "serial_usb_vcp.h"
 
     static void serial_event_2(uint16_t value)
     {

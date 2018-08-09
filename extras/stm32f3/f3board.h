@@ -42,12 +42,6 @@ extern "C" {
 
             virtual uint32_t getMicroseconds(void) override;
 
-            virtual void writeMotor(uint8_t index, float value) = 0;
-
-            bool getGyrometer(float gyroRates[3]);
-
-            bool getQuaternion(float quat[4]);
-
         public:
 
             F3Board(void);
