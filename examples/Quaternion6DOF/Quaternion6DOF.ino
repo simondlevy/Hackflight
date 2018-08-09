@@ -24,7 +24,9 @@
  */
 
 #include <MPU6050.h>
+
 #include <filters.hpp>
+#include <sensors/quaternion.hpp>
 
 #ifdef __MK20DX256__
 #include <i2c_t3.h>
@@ -164,18 +166,19 @@ void loop()
         // Use Madgwick to computer quaternion, converting gyro into radians / sec
         madgwick.update(ax, ay, az, gx*PI/180.0f, gy*PI/180.0f, gz*PI/180.0f, deltaT, q);
 
-        float yaw   = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);   
-        float pitch = -asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
-        float roll  = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
-        pitch *= 180.0f / PI;
-        yaw   *= 180.0f / PI; 
-        roll  *= 180.0f / PI;
+        // Convert quaternion to euler angles
+        float euler[3];
+        hf::Quaternion::computeEulerAngles(q, euler);
 
-        //    Serial.print("Yaw, Pitch, Roll: ");
-        Serial.print(yaw, 2);
-        Serial.print(", ");
-        Serial.print(pitch, 2);
-        Serial.print(", ");
-        Serial.println(roll, 2);
+        // Report Euler angles in degrees
+        Serial.print("Roll: ");
+        Serial.print(euler[0] * 180.f / PI, 2);
+        Serial.print(" deg  ");
+        Serial.print("Pitch: ");
+        Serial.print(euler[1] * 180.f / PI, 2);
+        Serial.print(" deg  ");
+        Serial.print("Yaw: ");
+        Serial.print(euler[2] * 180.f / PI, 2);
+        Serial.println(" deg");
     }  
 }
