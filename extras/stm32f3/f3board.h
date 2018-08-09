@@ -34,12 +34,6 @@ extern "C" {
 
             void ledSet(bool is_on);
 
-            uint8_t serialAvailableBytes(void);
-
-            uint8_t serialReadByte(void);
-
-            void serialWriteByte(uint8_t c);
-
             virtual uint32_t getMicroseconds(void) override;
 
         public:

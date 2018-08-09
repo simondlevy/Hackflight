@@ -27,4 +27,10 @@ class AlienflightF3V1 : public F3Board {
     bool getQuaternion(float quat[4]) override;
 
     void writeMotor(uint8_t index, float value) override;
+
+    uint8_t serialAvailableBytes(void);
+
+    uint8_t serialReadByte(void);
+
+    void serialWriteByte(uint8_t c);
 };

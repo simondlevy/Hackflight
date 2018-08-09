@@ -18,6 +18,8 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "alienflightf3v1_board.h"
+
 extern "C" {
 
 #include "platform.h"
@@ -26,12 +28,31 @@ extern "C" {
 #include "serial.h"
 #include "system.h"
 #include "serial_uart.h"
-#include "system.h"
 #include "serial_usb_vcp.h"
+
+    static serialPort_t * serial0;
 
     serialPort_t * serial0_open(void)
     {
-        return usbVcpOpen();
+        serial0 = usbVcpOpen();
+
+        return serial0;
+    }
+
+    uint8_t AlienflightF3V1::serialAvailableBytes(void)
+    {
+        return serialRxBytesWaiting(serial0);
+    }
+
+    uint8_t AlienflightF3V1::serialReadByte(void)
+    {
+        return serialRead(serial0);
+    }
+
+    void AlienflightF3V1::serialWriteByte(uint8_t c)
+    {
+        serialWrite(serial0, c);
+        while (!isSerialTransmitBufferEmpty(serial0));
     }
 
 } // extern "C"
@@ -40,7 +61,6 @@ extern "C" {
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
 #include <MPU6050.h>
-#include "alienflightf3v1_board.h"
 
 bool AlienflightF3V1::getGyrometer(float gyroRates[3])
 {

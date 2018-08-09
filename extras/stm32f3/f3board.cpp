@@ -46,22 +46,6 @@ extern "C" {
         }
     }
 
-    uint8_t F3Board::serialAvailableBytes(void)
-    {
-        return serialRxBytesWaiting(serial0);
-    }
-
-    uint8_t F3Board::serialReadByte(void)
-    {
-        return serialRead(serial0);
-    }
-
-    void F3Board::serialWriteByte(uint8_t c)
-    {
-        serialWrite(serial0, c);
-        while (!isSerialTransmitBufferEmpty(serial0));
-    }
-
     uint32_t F3Board::getMicroseconds(void)
     {
         return micros();
