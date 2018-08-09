@@ -39,6 +39,16 @@ namespace hf {
 
         friend class Hackflight;
 
+        public:
+
+            // We make this public so we can use it in different sketches
+            static void quaternionToEuler(float q[4], float euler[3])
+            {
+                euler[0] = atan2(2.0f*(q[0]*q[1]+q[2]*q[3]),q[0]*q[0]-q[1]*q[1]-q[2]*q[2]+q[3]*q[3]);
+                euler[1] =  asin(2.0f*(q[1]*q[3]-q[0]*q[2]));
+                euler[2] = atan2(2.0f*(q[1]*q[2]+q[0]*q[3]),q[0]*q[0]+q[1]*q[1]-q[2]*q[2]-q[3]*q[3]);
+            }
+
         protected:
 
             Quaternion(void)
@@ -50,11 +60,7 @@ namespace hf {
             {
                 (void)time;
 
-                float * q = _quat; // abbreviate
-
-                state.eulerAngles[0] = atan2(2.0f*(q[0]*q[1]+q[2]*q[3]),q[0]*q[0]-q[1]*q[1]-q[2]*q[2]+q[3]*q[3]);
-                state.eulerAngles[1] =  asin(2.0f*(q[1]*q[3]-q[0]*q[2]));
-                state.eulerAngles[2] = atan2(2.0f*(q[1]*q[2]+q[0]*q[3]),q[0]*q[0]+q[1]*q[1]-q[2]*q[2]-q[3]*q[3]);
+                quaternionToEuler(_quat, state.eulerAngles);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
                 if (state.eulerAngles[2] < 0) {
