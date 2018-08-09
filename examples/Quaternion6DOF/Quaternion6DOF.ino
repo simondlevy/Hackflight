@@ -4,6 +4,8 @@
    Dependencies: https://github.com/simondlevy/MPU6050
                  https://github.com/simondlevy/CrossPlatformI2C
 
+   Adapted from https://github.com/kriswiner/MPU6050/blob/master/MPU6050IMU.ino
+
    Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
@@ -22,6 +24,7 @@
  */
 
 #include <MPU6050.h>
+#include <filters.hpp>
 
 #ifdef __MK20DX256__
 #include <i2c_t3.h>
@@ -31,14 +34,31 @@
 #define NOSTOP false
 #endif
 
+// IMU full-scale settings
 static const Gscale_t GSCALE = GFS_250DPS;
 static const Ascale_t ASCALE = AFS_2G;
+
+// gyroscope measurement error in rads/s (start at 60 deg/s), then reduce after ~10 s to 3
+static const float GyroMeasError = PI * (40.0f / 180.0f);     
+
+// first parameter for Madgwick
+static const float Beta = sqrt(3.0f / 4.0f) * GyroMeasError;  
+
+// gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
+static const float GyroMeasDrift = PI * (2.0f / 180.0f);      
+
+// second parameter for Madgwick, usually set to a small or zero value
+static const float Zeta = sqrt(3.0f / 4.0f) * GyroMeasDrift;  
 
 static float gyroBias[3], accelBias[3]; // Bias corrections for gyro and accelerometer
 
 static float aRes, gRes;
 
 static MPU6050 mpu;
+
+static float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};            // vector to hold quaternion
+
+static hf::MadgwickQuaternionFilter6DOF madgwick(Beta, Zeta);
 
 void setup()
 {
@@ -110,18 +130,11 @@ void setup()
             Serial.println(c, HEX);
             while (true) ; // Loop forever if communication doesn't happen
         }
-
     }
 }
 
 void loop()
 {  
-    static float temperature;
-    static uint32_t count;
-    static float ax, ay, az;
-    static float gx, gy, gz;
-
-    // If data ready bit set, all data registers have new data
     if (mpu.checkNewData()) {  // check if data ready interrupt
 
         int16_t accelCount[3];           // Stores the 16-bit signed accelerometer sensor output
@@ -129,55 +142,40 @@ void loop()
         mpu.readAccelData(accelCount);  // Read the x/y/z adc values
 
         // Now we'll calculate the accleration value into actual g's
-        ax = (float)accelCount[0]*aRes - accelBias[0];  // get actual g value, this depends on scale being set
-        ay = (float)accelCount[1]*aRes - accelBias[1];   
-        az = (float)accelCount[2]*aRes - accelBias[2];  
+        float ax = (float)accelCount[0]*aRes - accelBias[0];  // get actual g value, this depends on scale being set
+        float ay = (float)accelCount[1]*aRes - accelBias[1];   
+        float az = (float)accelCount[2]*aRes - accelBias[2];  
 
         int16_t gyroCount[3];            // Stores the 16-bit signed gyro sensor output
 
         mpu.readGyroData(gyroCount);  // Read the x/y/z adc values
 
         // Calculate the gyro value into actual degrees per second
-        gx = (float)gyroCount[0]*gRes - gyroBias[0];  // get actual gyro value, this depends on scale being set
-        gy = (float)gyroCount[1]*gRes - gyroBias[1];  
-        gz = (float)gyroCount[2]*gRes - gyroBias[2];   
+        float gx = (float)gyroCount[0]*gRes - gyroBias[0];  // get actual gyro value, this depends on scale being set
+        float gy = (float)gyroCount[1]*gRes - gyroBias[1];  
+        float gz = (float)gyroCount[2]*gRes - gyroBias[2];   
 
-        int16_t tempCount = mpu.readTempData();  // Read the x/y/z adc values
-        temperature = ((float) tempCount) / 340. + 36.53; // Temperature in degrees Centigrade
+        // Compute deltaT for Madgwick
+        uint32_t time = micros();
+        static uint32_t _time;
+        float deltaT = (time-_time) / 1000000.f;
+        _time = time;
+
+        // Use Madgwick to computer quaternion, converting gyro into radians / sec
+        madgwick.update(ax, ay, az, gx*PI/180.0f, gy*PI/180.0f, gz*PI/180.0f, deltaT, q);
+
+        float yaw   = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);   
+        float pitch = -asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
+        float roll  = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
+        pitch *= 180.0f / PI;
+        yaw   *= 180.0f / PI; 
+        roll  *= 180.0f / PI;
+
+        //    Serial.print("Yaw, Pitch, Roll: ");
+        Serial.print(yaw, 2);
+        Serial.print(", ");
+        Serial.print(pitch, 2);
+        Serial.print(", ");
+        Serial.println(roll, 2);
     }  
-
-    uint32_t deltat = millis() - count;
-    if (deltat > 500) {
-
-        // Print acceleration values in milligs!
-        Serial.print("X-acceleration: ");
-        Serial.print(1000*ax);
-        Serial.print(" mg "); 
-        Serial.print("Y-acceleration: ");
-        Serial.print(1000*ay);
-        Serial.print(" mg "); 
-        Serial.print("Z-acceleration: ");
-        Serial.print(1000*az);
-        Serial.println(" mg"); 
-
-        // Print gyro values in degree/sec
-        Serial.print("X-gyro rate: ");
-        Serial.print(gx, 1);
-        Serial.print(" degrees/sec "); 
-        Serial.print("Y-gyro rate: ");
-        Serial.print(gy, 1);
-        Serial.print(" degrees/sec "); 
-        Serial.print("Z-gyro rate: ");
-        Serial.print(gz, 1);
-        Serial.println(" degrees/sec"); 
-
-        // Print temperature in degrees Centigrade      
-        Serial.print("Temperature is ");  
-        Serial.print(temperature, 2);  
-        Serial.println(" degrees C"); // Print T values to tenths of s degree C
-        Serial.println("");
-
-        count = millis();
-    }
-
 }

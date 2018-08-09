@@ -220,12 +220,7 @@ namespace hf {
             void update(float ax, float ay, float az, float gx, float gy, float gz, float deltat, float q[4])
             {
                 float q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];         // short name local variable for readability
-                float norm;                                               // vector norm
-                float f1, f2, f3;                                         // objetive funcyion elements
-                float J_11or24, J_12or23, J_13or22, J_14or21, J_32, J_33; // objective function Jacobian elements
-                float qDot1, qDot2, qDot3, qDot4;
-                float hatDot1, hatDot2, hatDot3, hatDot4;
-                float gerrx, gerry, gerrz, gbiasx, gbiasy, gbiasz;        // gyro bias error
+                static float gbiasx, gbiasy, gbiasz;        // gyro bias error
 
                 // Auxiliary variables to avoid repeated arithmetic
                 float _halfq1 = 0.5f * q1;
@@ -240,7 +235,7 @@ namespace hf {
                 //float _2q3q4 = 2.0f * q3 * q4;
 
                 // Normalise accelerometer measurement
-                norm = sqrt(ax * ax + ay * ay + az * az);
+                float norm = sqrt(ax * ax + ay * ay + az * az);
                 if (norm == 0.0f) return; // handle NaN
                 norm = 1.0f/norm;
                 ax *= norm;
@@ -248,21 +243,21 @@ namespace hf {
                 az *= norm;
 
                 // Compute the objective function and Jacobian
-                f1 = _2q2 * q4 - _2q1 * q3 - ax;
-                f2 = _2q1 * q2 + _2q3 * q4 - ay;
-                f3 = 1.0f - _2q2 * q2 - _2q3 * q3 - az;
-                J_11or24 = _2q3;
-                J_12or23 = _2q4;
-                J_13or22 = _2q1;
-                J_14or21 = _2q2;
-                J_32 = 2.0f * J_14or21;
-                J_33 = 2.0f * J_11or24;
+                float f1 = _2q2 * q4 - _2q1 * q3 - ax;
+                float f2 = _2q1 * q2 + _2q3 * q4 - ay;
+                float f3 = 1.0f - _2q2 * q2 - _2q3 * q3 - az;
+                float J_11or24 = _2q3;
+                float J_12or23 = _2q4;
+                float J_13or22 = _2q1;
+                float J_14or21 = _2q2;
+                float J_32 = 2.0f * J_14or21;
+                float J_33 = 2.0f * J_11or24;
 
                 // Compute the gradient (matrix multiplication)
-                hatDot1 = J_14or21 * f2 - J_11or24 * f1;
-                hatDot2 = J_12or23 * f1 + J_13or22 * f2 - J_32 * f3;
-                hatDot3 = J_12or23 * f2 - J_33 *f3 - J_13or22 * f1;
-                hatDot4 = J_14or21 * f1 + J_11or24 * f2;
+                float hatDot1 = J_14or21 * f2 - J_11or24 * f1;
+                float hatDot2 = J_12or23 * f1 + J_13or22 * f2 - J_32 * f3;
+                float hatDot3 = J_12or23 * f2 - J_33 *f3 - J_13or22 * f1;
+                float hatDot4 = J_14or21 * f1 + J_11or24 * f2;
 
                 // Normalize the gradient
                 norm = sqrt(hatDot1 * hatDot1 + hatDot2 * hatDot2 + hatDot3 * hatDot3 + hatDot4 * hatDot4);
@@ -272,9 +267,9 @@ namespace hf {
                 hatDot4 /= norm;
 
                 // Compute estimated gyroscope biases
-                gerrx = _2q1 * hatDot2 - _2q2 * hatDot1 - _2q3 * hatDot4 + _2q4 * hatDot3;
-                gerry = _2q1 * hatDot3 + _2q2 * hatDot4 - _2q3 * hatDot1 - _2q4 * hatDot2;
-                gerrz = _2q1 * hatDot4 - _2q2 * hatDot3 + _2q3 * hatDot2 - _2q4 * hatDot1;
+                float gerrx = _2q1 * hatDot2 - _2q2 * hatDot1 - _2q3 * hatDot4 + _2q4 * hatDot3;
+                float gerry = _2q1 * hatDot3 + _2q2 * hatDot4 - _2q3 * hatDot1 - _2q4 * hatDot2;
+                float gerrz = _2q1 * hatDot4 - _2q2 * hatDot3 + _2q3 * hatDot2 - _2q4 * hatDot1;
 
                 // Compute and remove gyroscope biases
                 gbiasx += gerrx * deltat * _zeta;
@@ -285,10 +280,10 @@ namespace hf {
                 gz -= gbiasz;
 
                 // Compute the quaternion derivative
-                qDot1 = -_halfq2 * gx - _halfq3 * gy - _halfq4 * gz;
-                qDot2 =  _halfq1 * gx + _halfq3 * gz - _halfq4 * gy;
-                qDot3 =  _halfq1 * gy - _halfq2 * gz + _halfq4 * gx;
-                qDot4 =  _halfq1 * gz + _halfq2 * gy - _halfq3 * gx;
+                float qDot1 = -_halfq2 * gx - _halfq3 * gy - _halfq4 * gz;
+                float qDot2 =  _halfq1 * gx + _halfq3 * gz - _halfq4 * gy;
+                float qDot3 =  _halfq1 * gy - _halfq2 * gz + _halfq4 * gx;
+                float qDot4 =  _halfq1 * gz + _halfq2 * gy - _halfq3 * gx;
 
                 // Compute then integrate estimated quaternion derivative
                 q1 += (qDot1 -(_beta * hatDot1)) * deltat;
