@@ -3,7 +3,7 @@
 ARDUINO_DIR = $(HOME)/Documents/Arduino/libraries
 
 # Change this to whatever project name you want
-PROJECT = alienflightf3v1
+PROJECT = alienflightf3v1_sketch
 
 ###############################################################################
 
@@ -208,6 +208,7 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $
 			   $(OBJECT_DIR)/$(PROJECT)/Wire.o \
 			   $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o \
 			   $(OBJECT_DIR)/$(PROJECT)/alienflightf3_dsmx.o \
+			   $(OBJECT_DIR)/$(PROJECT)/alienflightf3v1_board.o \
 			   $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o \
 			   $(OBJECT_DIR)/$(PROJECT)/MPU6050.o \
 			   $(OBJECT_DIR)/$(PROJECT).o
@@ -271,6 +272,9 @@ $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTR
 
 $(OBJECT_DIR)/$(PROJECT)/alienflightf3_dsmx.o: alienflightf3_dsmx.cpp 
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/alienflightf3_dsmx.o $(CFLAGS) alienflightf3_dsmx.cpp
+
+$(OBJECT_DIR)/$(PROJECT)/alienflightf3v1_board.o: alienflightf3v1_board.cpp alienflightf3v1_board.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/alienflightf3v1_board.o $(CFLAGS) alienflightf3v1_board.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o: $(CPI2C_DIR)/ArduinoI2C.cpp $(CPI2C_DIR)/CrossPlatformI2C.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o $(CFLAGS) $(CPI2C_DIR)/ArduinoI2C.cpp
