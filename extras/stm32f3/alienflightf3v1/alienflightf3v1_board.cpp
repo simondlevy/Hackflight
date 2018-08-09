@@ -41,17 +41,17 @@ extern "C" {
 
     uint8_t AlienflightF3V1::serialAvailableBytes(void)
     {
-        return serialRxBytesWaiting(serial0);
+        return usbVcpAvailable(serial0);
     }
 
     uint8_t AlienflightF3V1::serialReadByte(void)
     {
-        return serialRead(serial0);
+        return usbVcpRead(serial0);
     }
 
     void AlienflightF3V1::serialWriteByte(uint8_t c)
     {
-        serialWrite(serial0, c);
+        usbVcpWrite(serial0, c);
         while (!isSerialTransmitBufferEmpty(serial0));
     }
 
