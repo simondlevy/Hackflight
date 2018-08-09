@@ -19,30 +19,12 @@
  */
 
 #include <f3board.h>
-#include <SpektrumDSM.h>
-#include <receiver.hpp>
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
 #include <MPU6050.h>
+#include "alienflightf3_dsmx.h"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
-
-SpektrumDSM2048 * rx;
-
-// Support for reading DSMX signals over UART2
-static uint8_t dsmAvailable;
-static uint8_t dsmValue;
-
-uint8_t dsmSerialAvailable(void)
-{
-    return dsmAvailable;
-}
-
-uint8_t dsmSerialRead(void)
-{
-    dsmAvailable--;
-    return dsmValue;
-}
 
 extern "C" {
 
@@ -51,44 +33,6 @@ extern "C" {
 #include "gpio.h"
 #include "serial.h"
 #include "system.h"
-#include "serial_uart.h"
-
-static serialPort_t * serial2;
-
-static void serial_event_2(uint16_t value)
-{
-    dsmValue = (uint8_t)value;
-    dsmAvailable = 1;
-
-    rx->handleSerialEvent(micros());
-}
-
-class DSMX_Receiver : public hf::Receiver {
-
-    public:
-
-        DSMX_Receiver(const uint8_t channelMap[6], float trimRoll=.01, float trimPitch=0, float trimYaw=0) : 
-            Receiver(channelMap, trimRoll, trimPitch, trimYaw) 
-        {         
-            // Open connection to UART2
-            serial2 = uartOpen(USART2, serial_event_2, 115200, MODE_RX, SERIAL_NOT_INVERTED);
-        }
-
-    protected:
-
-        virtual bool gotNewFrame(void) override 
-        {
-            return rx->gotNewFrame();
-        }
-
-        virtual void readRawvals(void)override 
-        {
-            rx->getChannelValuesNormalized(rawvals, CHANNELS);
-        }
-
-}; // DSMX_Receiver
-
-
 #include "serial_uart.h"
 #include "system.h"
 #include "serial_usb_vcp.h"
@@ -134,10 +78,6 @@ class DSMX_Receiver : public hf::Receiver {
     hf::MixerQuadX mixer;
 
     void setup() {
-
-        // Create an object for talking to the DSMX receiver.
-        // We have to allocate such objects dynamicall to ensure that their constructor are called.
-        rx = new SpektrumDSM2048();
 
         hf::Stabilizer * stabilizer = new hf::Stabilizer(
                 0.20f,      // Level P
