@@ -208,7 +208,7 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $
 			   $(OBJECT_DIR)/$(PROJECT)/Wire.o \
 			   $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o \
 			   $(OBJECT_DIR)/$(PROJECT)/dsmx_receiver.o \
-			   $(OBJECT_DIR)/$(PROJECT)/alienflightf3v1.o \
+			   $(OBJECT_DIR)/$(PROJECT)/alienflightf3.o \
 			   $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o \
 			   $(OBJECT_DIR)/$(PROJECT)/MPU6050.o \
 			   $(OBJECT_DIR)/$(PROJECT).o
@@ -273,8 +273,8 @@ $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTR
 $(OBJECT_DIR)/$(PROJECT)/dsmx_receiver.o: ../dsmx_receiver.cpp 
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/dsmx_receiver.o $(CFLAGS) ../dsmx_receiver.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/alienflightf3v1.o: alienflightf3v1.cpp alienflightf3v1.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/alienflightf3v1.o $(CFLAGS) alienflightf3v1.cpp
+$(OBJECT_DIR)/$(PROJECT)/alienflightf3.o: alienflightf3.cpp alienflightf3.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/alienflightf3.o $(CFLAGS) alienflightf3.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o: $(CPI2C_DIR)/ArduinoI2C.cpp $(CPI2C_DIR)/CrossPlatformI2C.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o $(CFLAGS) $(CPI2C_DIR)/ArduinoI2C.cpp

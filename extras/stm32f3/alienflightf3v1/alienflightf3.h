@@ -1,5 +1,5 @@
 /*
-   alienflightf3v1.h 
+   alienflightf3.h 
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -20,11 +20,11 @@
 
 #include <f3board.h>
 
-class AlienflightF3V1 : public F3Board {
+class AlienflightF3 : public F3Board {
 
     public:
 
-        AlienflightF3V1(void);
+        AlienflightF3(void);
 
     protected:
 

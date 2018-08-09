@@ -1,5 +1,5 @@
 /*
-   alienflightf3v1_sketch.cpp setup(), loop() implementation for AlienflightF3V1 board
+   alienflightf3v1_dsmx.cpp Sketch for AlienflightF3V1 board with Spektrum DSMX receiver
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -23,7 +23,7 @@
 #include <mixers/quadx.hpp>
 #include <MPU6050.h>
 #include "dsmx_receiver.h"
-#include "alienflightf3v1.h"
+#include "alienflightf3.h"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
@@ -50,7 +50,7 @@ void setup() {
             0.f);   // yaw trim
 
     // Initialize Hackflight firmware
-    h.init(new AlienflightF3V1(), rc, &mixer, stabilizer);
+    h.init(new AlienflightF3(), rc, &mixer, stabilizer);
 }
 
 void loop() {

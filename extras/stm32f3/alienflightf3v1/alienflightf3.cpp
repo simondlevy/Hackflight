@@ -1,5 +1,5 @@
 /*
-   alienflightf3v1.h 
+   alienflightf3.h 
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -18,7 +18,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "alienflightf3v1.h"
+#include "alienflightf3.h"
 
 extern "C" {
 
@@ -32,22 +32,22 @@ extern "C" {
 
     static serialPort_t * serial0;
 
-    AlienflightF3V1::AlienflightF3V1(void)
+    AlienflightF3::AlienflightF3(void)
     {
         serial0 = usbVcpOpen();
     }
 
-    uint8_t AlienflightF3V1::serialAvailableBytes(void)
+    uint8_t AlienflightF3::serialAvailableBytes(void)
     {
         return usbVcpAvailable(serial0);
     }
 
-    uint8_t AlienflightF3V1::serialReadByte(void)
+    uint8_t AlienflightF3::serialReadByte(void)
     {
         return usbVcpRead(serial0);
     }
 
-    void AlienflightF3V1::serialWriteByte(uint8_t c)
+    void AlienflightF3::serialWriteByte(uint8_t c)
     {
         usbVcpWrite(serial0, c);
         while (!isSerialTransmitBufferEmpty(serial0));
@@ -71,7 +71,7 @@ extern "C" {
 #include <mixers/quadx.hpp>
 #include <MPU6050.h>
 
-bool AlienflightF3V1::getGyrometer(float gyroRates[3])
+bool AlienflightF3::getGyrometer(float gyroRates[3])
 {
     (void)gyroRates; // XXX
 
@@ -84,7 +84,7 @@ bool AlienflightF3V1::getGyrometer(float gyroRates[3])
     return false;
 }
 
-bool AlienflightF3V1::getQuaternion(float quat[4])
+bool AlienflightF3::getQuaternion(float quat[4])
 {
     (void)quat; // XXX
 
@@ -97,7 +97,7 @@ bool AlienflightF3V1::getQuaternion(float quat[4])
     return false;
 }
 
-void AlienflightF3V1::writeMotor(uint8_t index, float value)
+void AlienflightF3::writeMotor(uint8_t index, float value)
 {
     (void)index; // XXX
     (void)value;
