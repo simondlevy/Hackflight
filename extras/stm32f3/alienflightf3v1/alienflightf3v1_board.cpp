@@ -32,11 +32,9 @@ extern "C" {
 
     static serialPort_t * serial0;
 
-    serialPort_t * serial0_open(void)
+    AlienflightF3V1::AlienflightF3V1(void)
     {
         serial0 = usbVcpOpen();
-
-        return serial0;
     }
 
     uint8_t AlienflightF3V1::serialAvailableBytes(void)
@@ -53,6 +51,11 @@ extern "C" {
     {
         usbVcpWrite(serial0, c);
         while (!isSerialTransmitBufferEmpty(serial0));
+    }
+
+    void F3Board::outchar(char c)
+    {
+        usbVcpWrite(serial0, c);
     }
 
 } // extern "C"

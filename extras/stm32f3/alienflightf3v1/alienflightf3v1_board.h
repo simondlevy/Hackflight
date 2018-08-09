@@ -22,15 +22,21 @@
 
 class AlienflightF3V1 : public F3Board {
 
-    bool getGyrometer(float gyroRates[3]) override;
+    public:
 
-    bool getQuaternion(float quat[4]) override;
+        AlienflightF3V1(void);
 
-    void writeMotor(uint8_t index, float value) override;
+    protected:
 
-    uint8_t serialAvailableBytes(void);
+        bool getGyrometer(float gyroRates[3]) override;
 
-    uint8_t serialReadByte(void);
+        bool getQuaternion(float quat[4]) override;
 
-    void serialWriteByte(uint8_t c);
+        void writeMotor(uint8_t index, float value) override;
+
+        uint8_t serialAvailableBytes(void);
+
+        uint8_t serialReadByte(void);
+
+        void serialWriteByte(uint8_t c);
 };

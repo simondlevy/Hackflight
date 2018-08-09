@@ -21,27 +21,26 @@
 
 #pragma once
 
-extern "C" {
-
-#include <board.hpp>
 #include <boards/realboard.hpp>
 
-    class F3Board : public hf::RealBoard {
+class F3Board : public hf::RealBoard {
 
-        protected:
+    friend class hf::Board;
 
-            void delaySeconds(float sec);
+    protected:
 
-            void ledSet(bool is_on);
+        void delaySeconds(float sec);
 
-            virtual uint32_t getMicroseconds(void) override;
+        void ledSet(bool is_on);
 
-            virtual void reboot(void) override;
+        virtual uint32_t getMicroseconds(void) override;
 
-        public:
+        virtual void reboot(void) override;
 
-            F3Board(void);
+        static void outchar(char c);
 
-    }; // class F3Board
+    public:
 
-} // extern "C"
+        F3Board(void);
+
+}; // class F3Board

@@ -31,9 +31,6 @@ extern "C" {
 #include "exti.h"
 
 #
-// Shared with F3Board
-serialPort_t * serial0;
-
 static void ledInit(void)
 {
     GPIO_TypeDef * gpio = LED0_GPIO;
@@ -55,9 +52,6 @@ int main(void) {
 
     void SetSysClock(void);
 
-    // Board-specific
-    serialPort_t * serial0_open(void);
-
     // start fpu
     SCB->CPACR = (0x3 << (10*2)) | (0x3 << (11*2));
 
@@ -66,8 +60,6 @@ int main(void) {
     systemInit();
 
     timerInit();  // timer must be initialized before any channel is allocated
-
-    serial0 = serial0_open();
 
     dmaInit();
 

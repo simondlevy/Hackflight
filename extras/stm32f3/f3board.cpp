@@ -24,9 +24,6 @@ extern "C" {
 #include "gpio.h"
 #include "serial.h"
 
-    // Provided by main.cpp
-    extern serialPort_t * serial0;
-
     void F3Board::delaySeconds(float sec)
     {
         delay(sec*1000);
@@ -51,10 +48,8 @@ extern "C" {
         return micros();
     }
 
-    // Support prototype version where LED is on pin A1
     F3Board::F3Board(void)
     {
-        // Do general real-board initialization
         RealBoard::init();
     }
 
@@ -63,11 +58,10 @@ extern "C" {
         systemResetToBootloader();
     }
 
-
     void hf::Board::outbuf(char * buf)
     {
         for (char *p=buf; *p; p++)
-            serialWrite(serial0, *p);
+            F3Board::outchar(*p);
     }
 
 } // extern "C"
