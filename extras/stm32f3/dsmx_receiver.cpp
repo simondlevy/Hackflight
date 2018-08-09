@@ -59,8 +59,10 @@ static void serial_event(uint16_t value)
 
 static void serialPortOpen(void)
 {
+    USART_TypeDef * getDsmUart();
+
     // Open connection to UART2
-    serialPort = uartOpen(USART2, serial_event, 115200, MODE_RX, SERIAL_NOT_INVERTED);
+    serialPort = uartOpen(getDsmUart(), serial_event, 115200, MODE_RX, SERIAL_NOT_INVERTED);
 }
 
 } // extern "C"

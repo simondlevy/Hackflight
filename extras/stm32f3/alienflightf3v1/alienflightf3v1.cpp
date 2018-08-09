@@ -58,6 +58,11 @@ extern "C" {
         usbVcpWrite(serial0, c);
     }
 
+    USART_TypeDef * getDsmUart()
+    {
+        return USART2;
+    }
+
 } // extern "C"
 
 #include <f3board.h>
