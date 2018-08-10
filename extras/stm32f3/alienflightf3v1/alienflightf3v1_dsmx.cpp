@@ -23,7 +23,7 @@
 #include <mixers/quadx.hpp>
 #include <MPU6050.h>
 #include "dsmx_receiver.h"
-#include "alienflightf3.h"
+#include "f3board.h"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
@@ -50,7 +50,7 @@ void setup() {
             0.f);   // yaw trim
 
     // Initialize Hackflight firmware
-    h.init(new AlienflightF3(), rc, &mixer, stabilizer);
+    h.init(new F3Board(), rc, &mixer, stabilizer);
 }
 
 void loop() {

@@ -27,20 +27,42 @@ class F3Board : public hf::RealBoard {
 
     friend class hf::Board;
 
+    private:
+
+    void imuInit(void);
+
+    void usbInit(void);
+
+    bool getImu(int16_t accelCount[3], int16_t gyroCount[3]);
+
+    void * _imu;
+
     protected:
 
-        void delaySeconds(float sec);
+    virtual bool  getQuaternion(float quat[4]) override;
 
-        void ledSet(bool is_on);
+    virtual bool  getGyrometer(float gyroRates[3]) override;
 
-        virtual uint32_t getMicroseconds(void) override;
+    virtual void  writeMotor(uint8_t index, float value) override;
 
-        virtual void reboot(void) override;
+    virtual void delaySeconds(float sec) override;
 
-        static void outchar(char c);
+    virtual void ledSet(bool is_on) override;
+
+    virtual uint32_t getMicroseconds(void) override;
+
+    virtual void reboot(void) override;
+
+    static void outchar(char c);
+
+    virtual uint8_t serialAvailableBytes(void) override;
+
+    virtual uint8_t serialReadByte(void) override;
+
+    virtual void    serialWriteByte(uint8_t c) override;
 
     public:
 
-        F3Board(void);
+    F3Board(void);
 
 }; // class F3Board

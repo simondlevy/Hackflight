@@ -1,5 +1,5 @@
 /*
-   alienflightf3v1.cpp Support MPU6050 IMU on AlienflightF3 V1 board
+   alienflightf3v1.cpp Support MPU6050 IMU on F3Board V1 board
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -18,7 +18,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "alienflightf3.h"
+#include "f3board.h"
 #include <MPU6050.h>
 #include <Wire.h>
 #include <debug.hpp>
@@ -26,7 +26,7 @@
 static const Gscale_t GSCALE = GFS_250DPS;
 static const Ascale_t ASCALE = AFS_2G;
 
-void AlienflightF3::init(void)
+void F3Board::imuInit(void)
 {
     Wire.begin(2);
 
@@ -39,7 +39,7 @@ void AlienflightF3::init(void)
     _imu = imu;
 }
 
-bool AlienflightF3::getImu(int16_t accelCount[3], int16_t gyroCount[3])
+bool F3Board::getImu(int16_t accelCount[3], int16_t gyroCount[3])
 {
     MPU6050 * imu = (MPU6050 *)_imu;
 

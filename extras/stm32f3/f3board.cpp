@@ -24,6 +24,15 @@ extern "C" {
 #include "gpio.h"
 #include "serial.h"
 
+    F3Board::F3Board(void)
+    {
+        usbInit();
+
+        imuInit();
+
+        RealBoard::init();
+    }
+
     void F3Board::delaySeconds(float sec)
     {
         delay(sec*1000);
@@ -46,11 +55,6 @@ extern "C" {
     uint32_t F3Board::getMicroseconds(void)
     {
         return micros();
-    }
-
-    F3Board::F3Board(void)
-    {
-        RealBoard::init();
     }
 
     void F3Board::reboot(void)

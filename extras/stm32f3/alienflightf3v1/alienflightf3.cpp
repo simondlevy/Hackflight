@@ -1,5 +1,5 @@
 /*
-   alienflightf3.cpp Board class implementation for AlienflightF3
+   alienflightf3.cpp Board class implementation for F3Board
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -18,7 +18,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "alienflightf3.h"
+#include "f3board.h"
 
 // This code has to talk to the C code supporing USB Virtual COM Port ------------------------------------------
 
@@ -34,24 +34,22 @@ extern "C" {
 
     static serialPort_t * serial0;
 
-    AlienflightF3::AlienflightF3(void)
+    void F3Board::usbInit(void)
     {
         serial0 = usbVcpOpen();
-
-        init();
     }
 
-    uint8_t AlienflightF3::serialAvailableBytes(void)
+    uint8_t F3Board::serialAvailableBytes(void)
     {
         return usbVcpAvailable(serial0);
     }
 
-    uint8_t AlienflightF3::serialReadByte(void)
+    uint8_t F3Board::serialReadByte(void)
     {
         return usbVcpRead(serial0);
     }
 
-    void AlienflightF3::serialWriteByte(uint8_t c)
+    void F3Board::serialWriteByte(uint8_t c)
     {
         usbVcpWrite(serial0, c);
         while (!isSerialTransmitBufferEmpty(serial0));
@@ -74,7 +72,7 @@ extern "C" {
 #include <f3board.h>
 #include <hackflight.hpp>
 
-bool AlienflightF3::getGyrometer(float gyroRates[3])
+bool F3Board::getGyrometer(float gyroRates[3])
 {
     (void)gyroRates;
 
@@ -89,7 +87,7 @@ bool AlienflightF3::getGyrometer(float gyroRates[3])
     return false;
 }
 
-bool AlienflightF3::getQuaternion(float quat[4])
+bool F3Board::getQuaternion(float quat[4])
 {
     (void)quat; // XXX
 
@@ -102,7 +100,7 @@ bool AlienflightF3::getQuaternion(float quat[4])
     return false;
 }
 
-void AlienflightF3::writeMotor(uint8_t index, float value)
+void F3Board::writeMotor(uint8_t index, float value)
 {
     (void)index; // XXX
     (void)value;
