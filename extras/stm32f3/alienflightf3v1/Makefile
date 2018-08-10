@@ -204,12 +204,13 @@ TARGET_HEX	 = $(BIN_DIR)/$(PROJECT).hex
 TARGET_ELF	 = $(OBJECT_DIR)/$(PROJECT).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $($(PROJECT)_CSRC)))) \
 			   $(OBJECT_DIR)/$(PROJECT)/main.o \
-			   $(OBJECT_DIR)/$(PROJECT)/f3board.o \
 			   $(OBJECT_DIR)/$(PROJECT)/Wire.o \
 			   $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o \
 			   $(OBJECT_DIR)/$(PROJECT)/dsmx_receiver.o \
+			   $(OBJECT_DIR)/$(PROJECT)/f3board.o \
 			   $(OBJECT_DIR)/$(PROJECT)/alienflightf3.o \
-			   $(OBJECT_DIR)/$(PROJECT)/alienflightf3v1.o \
+			   $(OBJECT_DIR)/$(PROJECT)/f3imu_mpu6050.o \
+			   $(OBJECT_DIR)/$(PROJECT)/f3usb_vcp.o \
 			   $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o \
 			   $(OBJECT_DIR)/$(PROJECT)/MPU6050.o \
 			   $(OBJECT_DIR)/$(PROJECT).o
@@ -277,8 +278,11 @@ $(OBJECT_DIR)/$(PROJECT)/dsmx_receiver.o: ../dsmx_receiver.cpp
 $(OBJECT_DIR)/$(PROJECT)/alienflightf3.o: alienflightf3.cpp ../f3board.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/alienflightf3.o $(CFLAGS) alienflightf3.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/alienflightf3v1.o: alienflightf3v1.cpp ../f3board.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/alienflightf3v1.o $(CFLAGS) alienflightf3v1.cpp
+$(OBJECT_DIR)/$(PROJECT)/f3imu_mpu6050.o: ../f3imu_mpu6050.cpp ../f3board.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3imu_mpu6050.o $(CFLAGS) ../f3imu_mpu6050.cpp
+
+$(OBJECT_DIR)/$(PROJECT)/f3usb_vcp.o: ../f3usb_vcp.cpp ../f3board.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3usb_vcp.o $(CFLAGS) ../f3usb_vcp.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o: $(CPI2C_DIR)/ArduinoI2C.cpp $(CPI2C_DIR)/CrossPlatformI2C.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o $(CFLAGS) $(CPI2C_DIR)/ArduinoI2C.cpp

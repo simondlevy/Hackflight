@@ -62,10 +62,39 @@ extern "C" {
         systemResetToBootloader();
     }
 
+    bool F3Board::getGyrometer(float gyroRates[3])
+    {
+        (void)gyroRates;
+
+        int16_t gyroCount[3];
+        int16_t accelCount[3];
+
+        if (getImu(gyroCount, accelCount)) {
+
+            return true;
+        }
+
+        return false;
+    }
+
+    bool F3Board::getQuaternion(float quat[4])
+    {
+        (void)quat; // XXX
+
+        static uint32_t _time;
+        uint32_t time = micros();
+        if (time-_time > 10000) {
+            _time = time;
+            return true;
+        }
+        return false;
+    }
+
     void hf::Board::outbuf(char * buf)
     {
         for (char *p=buf; *p; p++)
             F3Board::outchar(*p);
     }
+
 
 } // extern "C"

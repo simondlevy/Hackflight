@@ -1,5 +1,5 @@
 /*
-   alienflightf3v1.cpp Support MPU6050 IMU on F3Board V1 board
+   f3imu_mpu6050.cpp Support MPU6050 IMU on F3 boards
 
    Copyright (c) 2018 Simon D. Levy
 
