@@ -1,5 +1,5 @@
 /*
-   dsmx_receiver.cpp Support for Spektrum DSMX receive on F3 boards
+   f3_receiver_dsmx.cpp Support for Spektrum DSMX receive on F3 boards
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -18,7 +18,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "dsmx_receiver.h"
+#include "f3_receiver_dsmx.h"
 #include <SpektrumDSM.h>
 
 SpektrumDSM2048 * rx;

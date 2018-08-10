@@ -1,5 +1,5 @@
 /*
-   f3board.h : Support for STM32F3 boards
+   f3_board.h : Support for STM32F3 boards
 
    Copyright (C) 2018 Simon D. Levy 
 

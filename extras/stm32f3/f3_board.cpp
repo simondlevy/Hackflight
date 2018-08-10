@@ -1,5 +1,5 @@
 /*
-   f3board.cpp : Support for STM32F3 boards
+   f3_board.cpp : Support for STM32F3 boards
    Copyright (C) 2018 Simon D. Levy 
    This file is part of Hackflight.
    Hackflight is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 
 extern "C" {
 
-#include "f3board.h"
+#include "f3_board.h"
 
 #include "platform.h"
 #include "system.h"

@@ -18,7 +18,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "f3board.h"
+#include "f3_board.h"
 
 // This code has to talk to the C code supporing USB Virtual COM Port ------------------------------------------
 

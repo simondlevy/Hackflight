@@ -1,5 +1,5 @@
 /*
-   f3imu_mpu6050.cpp Support MPU6050 IMU on F3 boards
+   f3_receiver_dsmx.h Support for Spektrum DSMX receive on F3 boards
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -18,36 +18,20 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "f3board.h"
-#include <MPU6050.h>
-#include <Wire.h>
-#include <debug.hpp>
+#include <f3_board.h>
+#include <receiver.hpp>
+#include <hackflight.hpp>
 
-static const Gscale_t GSCALE = GFS_250DPS;
-static const Ascale_t ASCALE = AFS_2G;
+class DSMX_Receiver : public hf::Receiver {
 
-void F3Board::imuInit(void)
-{
-    Wire.begin(2);
+    public:
 
-    MPU6050 * imu = new MPU6050();
+        DSMX_Receiver(const uint8_t channelMap[6], float trimRoll=.01, float trimPitch=0, float trimYaw=0);
 
-    imu->begin();
+    protected:
 
-    imu->initMPU6050(ASCALE, GSCALE); 
+        virtual bool gotNewFrame(void) override;
 
-    _imu = imu;
-}
+        virtual void readRawvals(void) override;
 
-bool F3Board::getImu(int16_t accelCount[3], int16_t gyroCount[3])
-{
-    MPU6050 * imu = (MPU6050 *)_imu;
-
-    if (imu->checkNewData()) {  
-        imu->readGyroData(gyroCount);  
-        imu->readAccelData(accelCount);  
-        return true;
-    }
-
-    return false;
-}
+}; // DSMX_Receiver

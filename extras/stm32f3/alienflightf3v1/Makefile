@@ -1,5 +1,5 @@
 # Change this to wherever you put BreezySTM32
-# Change this to where you put your f3board libraries
+# Change this to where you put your f3_board libraries
 ARDUINO_DIR = $(HOME)/Documents/Arduino/libraries
 
 # Change this to whatever project name you want
@@ -206,11 +206,11 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $
 			   $(OBJECT_DIR)/$(PROJECT)/main.o \
 			   $(OBJECT_DIR)/$(PROJECT)/Wire.o \
 			   $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o \
-			   $(OBJECT_DIR)/$(PROJECT)/dsmx_receiver.o \
-			   $(OBJECT_DIR)/$(PROJECT)/f3board.o \
+			   $(OBJECT_DIR)/$(PROJECT)/f3_receiver_dsmx.o \
+			   $(OBJECT_DIR)/$(PROJECT)/f3_board.o \
 			   $(OBJECT_DIR)/$(PROJECT)/alienflightf3.o \
-			   $(OBJECT_DIR)/$(PROJECT)/f3imu_mpu6050.o \
-			   $(OBJECT_DIR)/$(PROJECT)/f3usb_vcp.o \
+			   $(OBJECT_DIR)/$(PROJECT)/f3_imu_mpu6050.o \
+			   $(OBJECT_DIR)/$(PROJECT)/f3_usb_vcp.o \
 			   $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o \
 			   $(OBJECT_DIR)/$(PROJECT)/MPU6050.o \
 			   $(OBJECT_DIR)/$(PROJECT).o
@@ -263,8 +263,8 @@ $(OBJECT_DIR)/$(PROJECT)/%.o: %.S
 $(OBJECT_DIR)/$(PROJECT)/main.o: ../main.cpp 
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/main.o $(CFLAGS) ../main.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/f3board.o: ../f3board.cpp ../f3board.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3board.o $(CFLAGS) ../f3board.cpp
+$(OBJECT_DIR)/$(PROJECT)/f3_board.o: ../f3_board.cpp ../f3_board.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_board.o $(CFLAGS) ../f3_board.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/Wire.o: ../Wire.cpp ../Wire.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/Wire.o $(CFLAGS) ../Wire.cpp
@@ -272,17 +272,17 @@ $(OBJECT_DIR)/$(PROJECT)/Wire.o: ../Wire.cpp ../Wire.h
 $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o $(CFLAGS) $(SPEKTRUM_DIR)/SpektrumDSM.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/dsmx_receiver.o: ../dsmx_receiver.cpp 
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/dsmx_receiver.o $(CFLAGS) ../dsmx_receiver.cpp
+$(OBJECT_DIR)/$(PROJECT)/f3_receiver_dsmx.o: ../f3_receiver_dsmx.cpp 
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_receiver_dsmx.o $(CFLAGS) ../f3_receiver_dsmx.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/alienflightf3.o: alienflightf3.cpp ../f3board.h
+$(OBJECT_DIR)/$(PROJECT)/alienflightf3.o: alienflightf3.cpp ../f3_board.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/alienflightf3.o $(CFLAGS) alienflightf3.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/f3imu_mpu6050.o: ../f3imu_mpu6050.cpp ../f3board.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3imu_mpu6050.o $(CFLAGS) ../f3imu_mpu6050.cpp
+$(OBJECT_DIR)/$(PROJECT)/f3_imu_mpu6050.o: ../f3_imu_mpu6050.cpp ../f3_board.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_imu_mpu6050.o $(CFLAGS) ../f3_imu_mpu6050.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/f3usb_vcp.o: ../f3usb_vcp.cpp ../f3board.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3usb_vcp.o $(CFLAGS) ../f3usb_vcp.cpp
+$(OBJECT_DIR)/$(PROJECT)/f3_usb_vcp.o: ../f3_usb_vcp.cpp ../f3_board.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_usb_vcp.o $(CFLAGS) ../f3_usb_vcp.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o: $(CPI2C_DIR)/ArduinoI2C.cpp $(CPI2C_DIR)/CrossPlatformI2C.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o $(CFLAGS) $(CPI2C_DIR)/ArduinoI2C.cpp
