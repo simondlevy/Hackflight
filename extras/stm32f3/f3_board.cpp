@@ -24,6 +24,8 @@ extern "C" {
 #include "gpio.h"
 #include "serial.h"
 
+#include <filters.hpp>
+
     F3Board::F3Board(void)
     {
         usbInit();

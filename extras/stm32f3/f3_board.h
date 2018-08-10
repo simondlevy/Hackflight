@@ -35,8 +35,6 @@ class F3Board : public hf::RealBoard {
 
     bool getImu(int16_t accelCount[3], int16_t gyroCount[3]);
 
-    void * _imu;
-
     protected:
 
     virtual bool  getQuaternion(float quat[4]) override;

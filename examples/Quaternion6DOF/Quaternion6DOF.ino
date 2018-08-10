@@ -56,7 +56,7 @@ static float gyroBias[3], accelBias[3]; // Bias corrections for gyro and acceler
 
 static float aRes, gRes;
 
-static MPU6050 mpu;
+static MPU6050 imu;
 
 static float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};            // vector to hold quaternion
 
@@ -71,7 +71,7 @@ void setup()
     Wire.begin();
 #endif
 
-    mpu.begin();
+    imu.begin();
 
     Serial.begin(115200);
 
@@ -81,7 +81,7 @@ void setup()
     Serial.println("60 ug LSB");
 
     // Read the WHO_AM_I register, this is a good test of communication
-    uint8_t c = mpu.getMPU6050ID();
+    uint8_t c = imu.getMPU6050ID();
     Serial.print("I AM ");
     Serial.print(c, HEX);  
     Serial.print(" I Should Be ");
@@ -92,7 +92,7 @@ void setup()
         Serial.println("MPU6050 is online...");
 
         float SelfTest[6];               // Gyro and accelerometer self-test sensor output
-        mpu.MPU6050SelfTest(SelfTest); // Start by performing self test and reporting values
+        imu.MPU6050SelfTest(SelfTest); // Start by performing self test and reporting values
         Serial.print("x-axis self test: acceleration trim within : ");
         Serial.print(SelfTest[0],1);
         Serial.println("% of factory value");
@@ -119,12 +119,12 @@ void setup()
 
             Serial.println("Pass Selftest!");  
 
-            mpu.calibrateMPU6050(gyroBias, accelBias); // Calibrate gyro and accelerometers, load biases in bias registers  
-            mpu.initMPU6050(ASCALE, GSCALE);
+            imu.calibrateMPU6050(gyroBias, accelBias); // Calibrate gyro and accelerometers, load biases in bias registers  
+            imu.initMPU6050(ASCALE, GSCALE);
             Serial.println("MPU6050 initialized for active data mode...."); 
 
-            aRes = mpu.getAres(ASCALE);
-            gRes=mpu.getGres(GSCALE);
+            aRes = imu.getAres(ASCALE);
+            gRes=imu.getGres(GSCALE);
         }
         else
         {
@@ -137,11 +137,11 @@ void setup()
 
 void loop()
 {  
-    if (mpu.checkNewData()) {  // check if data ready interrupt
+    if (imu.checkNewData()) {  // check if data ready interrupt
 
         int16_t accelCount[3];           // Stores the 16-bit signed accelerometer sensor output
 
-        mpu.readAccelData(accelCount);  // Read the x/y/z adc values
+        imu.readAccelData(accelCount);  // Read the x/y/z adc values
 
         // Now we'll calculate the accleration value into actual g's
         float ax = (float)accelCount[0]*aRes - accelBias[0];  // get actual g value, this depends on scale being set
@@ -150,7 +150,7 @@ void loop()
 
         int16_t gyroCount[3];            // Stores the 16-bit signed gyro sensor output
 
-        mpu.readGyroData(gyroCount);  // Read the x/y/z adc values
+        imu.readGyroData(gyroCount);  // Read the x/y/z adc values
 
         // Calculate the gyro value into actual degrees per second
         float gx = (float)gyroCount[0]*gRes - gyroBias[0];  // get actual gyro value, this depends on scale being set

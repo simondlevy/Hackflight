@@ -19,30 +19,59 @@
  */
 
 #include "f3_board.h"
+
+#include <hackflight.hpp>
 #include <MPU6050.h>
 #include <Wire.h>
 #include <debug.hpp>
+#include <math.h>
+#include <string.h>
+#include <sensors/quaternion.hpp>
 
-static const Gscale_t GSCALE = GFS_250DPS;
-static const Ascale_t ASCALE = AFS_2G;
+// IMU full-scale settings
+static const Gscale_t GSCALE = GFS_2000DPS;
+static const Ascale_t ASCALE = AFS_8G;
+
+// gyroscope measurement error in rads/s (start at 60 deg/s), then reduce after ~10 s to 3
+static const float GyroMeasError = M_PI * (40.0f / 180.0f);     
+
+// first parameter for Madgwick
+static const float Beta = sqrt(3.0f / 4.0f) * GyroMeasError;  
+
+// gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
+static const float GyroMeasDrift = M_PI * (2.0f / 180.0f);      
+
+// second parameter for Madgwick, usually set to a small or zero value
+static const float Zeta = sqrt(3.0f / 4.0f) * GyroMeasDrift;  
+
+static float gyroBias[3], accelBias[3]; // Bias corrections for gyro and accelerometer
+
+static float aRes, gRes;
+
+static MPU6050 * imu;
+
+static hf::MadgwickQuaternionFilter6DOF * madgwick;
 
 void F3Board::imuInit(void)
 {
     Wire.begin(2);
 
-    MPU6050 * imu = new MPU6050();
+    imu = new MPU6050();
+
+    madgwick = new hf::MadgwickQuaternionFilter6DOF(Beta, Zeta);
 
     imu->begin();
 
-    imu->initMPU6050(ASCALE, GSCALE); 
+    imu->calibrateMPU6050(gyroBias, accelBias); // Calibrate gyro and accelerometers, load biases in bias registers  
 
-    _imu = imu;
+    imu->initMPU6050(ASCALE, GSCALE);
+
+    aRes = imu->getAres(ASCALE);
+    gRes=imu->getGres(GSCALE);
 }
 
 bool F3Board::getImu(int16_t accelCount[3], int16_t gyroCount[3])
 {
-    MPU6050 * imu = (MPU6050 *)_imu;
-
     if (imu->checkNewData()) {  
         imu->readGyroData(gyroCount);  
         imu->readAccelData(accelCount);  
