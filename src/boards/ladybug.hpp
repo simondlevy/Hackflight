@@ -197,10 +197,8 @@ namespace hf {
                     }
                 }
 
-                // Get actual gyro rate for conversion to radians
-                uint8_t accFs=0; uint16_t gyroFs=0; uint16_t magFs=0;
-                _sentral.getFullScaleRanges(accFs, gyroFs, magFs);
-                _gyroAdcToRadians = M_PI * (float)gyroFs / (1<<15) / 180.;  
+                // Get gyro rate for conversion to radians
+                _gyroAdcToRadians = M_PI * 2000.f / (1<<15) / 180.;  
 
                 // Initialize the motors
                 for (int k=0; k<4; ++k) {
