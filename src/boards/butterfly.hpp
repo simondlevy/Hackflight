@@ -91,7 +91,6 @@ namespace hf {
             // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
             // using a 6DOF fiter (accel, gyro)
             MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(BETA, ZETA);
-            float _q[4] = {1.0f, 0.0f, 0.0f, 0.0f};          // vector to hold quaternion
             uint8_t _gyroCycleCount;
             float _ax=0,_ay=0,_az=0,_gx=0,_gy=0,_gz=0;
 
@@ -193,10 +192,14 @@ namespace hf {
                     _timePrev = timeCurr;
 
                     // Run the quaternion on the IMU values acquired in getGyrometer()
-                    _quaternionFilter.update(-_ax, _ay, _az, _gx, -_gy, -_gz, deltat, _q);
+                    _quaternionFilter.update(-_ax, _ay, _az, _gx, -_gy, -_gz, deltat);
 
                     // Copy the quaternion back out
-                    memcpy(quat, _q, 4*sizeof(float));
+                    quat[0] = _quaternionFilter.q1;
+                    quat[1] = _quaternionFilter.q2;
+                    quat[2] = _quaternionFilter.q3;
+                    quat[3] = _quaternionFilter.q4;
+
                     return true;
                 }
 

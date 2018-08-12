@@ -94,24 +94,23 @@ namespace hf {
 
         public:
 
-            float q0;
             float q1;
             float q2;
             float q3;
+            float q4;
 
         protected:
 
             QuaternionFilter(void)
             {
-                q0 = 0;
-                q1 = 0;
+                q1 = 1;
                 q2 = 0;
                 q3 = 0;
+                q4 = 0;
             }
-
     };
 
-    class MadgwickQuaternionFilter : protected QuaternionFilter {
+    class MadgwickQuaternionFilter : public QuaternionFilter {
 
         protected:
 
@@ -121,7 +120,6 @@ namespace hf {
             {
                 this->_beta = beta;
             }
-
     };
 
     class MadgwickQuaternionFilter9DOF : public MadgwickQuaternionFilter {
@@ -131,9 +129,8 @@ namespace hf {
             MadgwickQuaternionFilter9DOF(float beta) : MadgwickQuaternionFilter(beta) { }
 
             // Adapted from https://github.com/kriswiner/MPU9250/blob/master/quaternionFilters.ino
-            void update(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float deltat, float q[4])
+            void update(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float deltat)
             {
-                float q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];   // short name local variable for readability
                 float norm;
                 float hx, hy, _2bx, _2bz;
                 float s1, s2, s3, s4;
@@ -236,10 +233,6 @@ namespace hf {
                 q4 += qDot4 * deltat;
                 norm = sqrtf(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);    // normalise quaternion
                 norm = 1.0f/norm;
-                q[0] = q1 * norm;
-                q[1] = q2 * norm;
-                q[2] = q3 * norm;
-                q[3] = q4 * norm;
             }
     }; // class MadgwickQuaternionFilter9DOF 
 
@@ -257,9 +250,8 @@ namespace hf {
             }
 
             // Adapted from https://github.com/kriswiner/MPU6050/blob/master/quaternionFilter.ino
-            void update(float ax, float ay, float az, float gx, float gy, float gz, float deltat, float q[4])
+            void update(float ax, float ay, float az, float gx, float gy, float gz, float deltat)
             {
-                float q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];         // short name local variable for readability
                 static float gbiasx, gbiasy, gbiasz;        // gyro bias error
 
                 // Auxiliary variables to avoid repeated arithmetic
@@ -334,10 +326,10 @@ namespace hf {
                 // Normalize the quaternion
                 norm = sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);    // normalise quaternion
                 norm = 1.0f/norm;
-                q[0] = q1 * norm;
-                q[1] = q2 * norm;
-                q[2] = q3 * norm;
-                q[3] = q4 * norm;
+                q1 *= norm;
+                q2 *= norm;
+                q3 *= norm;
+                q4 *= norm;
             }
 
     }; // class MadgwickQuaternionFilter6DOF
@@ -362,9 +354,8 @@ namespace hf {
             }
 
             // Adapted from https://github.com/kriswiner/MPU9250/blob/master/quaternionFilters.ino
-            void update(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float deltat, float q[4])
+            void update(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float deltat)
             {
-                float q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];   // short name local variable for readability
                 float norm;
                 float hx, hy, bx, bz;
                 float vx, vy, vz, wx, wy, wz;
@@ -447,10 +438,10 @@ namespace hf {
                 // Normalise quaternion
                 norm = sqrtf(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);
                 norm = 1.0f / norm;
-                q[0] = q1 * norm;
-                q[1] = q2 * norm;
-                q[2] = q3 * norm;
-                q[3] = q4 * norm;
+                q1 *= norm;
+                q2 *= norm;
+                q3 *= norm;
+                q4 *= norm;
             }
 
     }; // class MahonyQuaternionFilter
