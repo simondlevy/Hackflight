@@ -67,59 +67,13 @@ extern "C" {
     bool F3Board::getGyrometer(float gyroRates[3])
     {
         (void)gyroRates;
-        /*
-        if (_imu.checkNewAccelGyroData()) {
 
-            // Read IMU
-            _imu.readAccelerometer(_ax, _ay, _az);
-            _imu.readGyrometer(_gx, _gy, _gz);
-
-            // Convert gyrometer values from degrees/sec to radians/sec
-            _gx = radians(_gx);
-            _gy = radians(_gy);
-            _gz = radians(_gz);
-
-            // Copy gyro values back out
-            gyro[0] = _gx;
-            gyro[1] = _gy;
-            gyro[2] = _gz;
-
-            // Increment count for quaternion check
-            _gyroCycleCount++;
-
-            return true;
-
-        } // if (_imu.checkNewAccelGyroData())
-
-    } // if gotNewData
-    */
-
-    return false;
-}
+        return false;
+    }
 
 bool F3Board::getQuaternion(float quat[4])
 {
     (void)quat;
-    /*
-    // Update quaternion after some number of IMU readings
-    if (_gyroCycleCount == QUATERNION_DIVISOR) {
-
-        _gyroCycleCount = 0;
-
-        // Set integration time by time elapsed since last filter update
-        uint32_t timeCurr = micros();
-        static uint32_t _timePrev;
-        float deltat = ((timeCurr - _timePrev)/1000000.0f); 
-        _timePrev = timeCurr;
-
-        // Run the quaternion on the IMU values acquired in getGyrometer()
-        _quaternionFilter.update(-_ax, _ay, _az, _gx, -_gy, -_gz, deltat, _q);
-
-        // Copy the quaternion back out
-        memcpy(quat, _q, 4*sizeof(float));
-        return true;
-    }
-    */
     return false;
 }
 
