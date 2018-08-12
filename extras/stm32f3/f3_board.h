@@ -58,6 +58,8 @@ class F3Board : public hf::SoftwareQuaternionBoard  {
 
     virtual void    serialWriteByte(uint8_t c) override;
 
+    float radians(float degrees);
+
     public:
 
     F3Board(void);

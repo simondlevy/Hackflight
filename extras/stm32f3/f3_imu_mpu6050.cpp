@@ -52,7 +52,7 @@ void F3Board::imuInit(void)
     _imu = imu;
 }
 
-bool F3Board::getGyrometer(float gyroRates[3]) 
+bool F3Board::getGyrometer(float gyro[3]) 
 {
     MPU6050 * imu = (MPU6050 *)_imu;
 
@@ -62,7 +62,18 @@ bool F3Board::getGyrometer(float gyroRates[3])
 
         imu->readGyrometer(_gx, _gy, _gz);
 
-        hf::Debug::printf("gotGyro!\n");
+        // Convert gyrometer values from degrees/sec to radians/sec
+        _gx = radians(_gx);
+        _gy = radians(_gy);
+        _gz = radians(_gz);
+
+        // Copy gyro values back out
+        gyro[0] = _gx;
+        gyro[1] = _gy;
+        gyro[2] = _gz;
+
+        return true;
+
     }  
 
     return false;

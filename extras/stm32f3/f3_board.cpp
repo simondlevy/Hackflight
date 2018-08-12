@@ -64,6 +64,11 @@ extern "C" {
         systemResetToBootloader();
     }
 
+    float F3Board::radians(float degrees)
+    {
+        return M_PI * degrees / 180;
+    }
+
     void hf::Board::outbuf(char * buf)
     {
         for (char *p=buf; *p; p++)
