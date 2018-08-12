@@ -61,7 +61,7 @@ namespace hf {
 
             // Paramters to experiment with ------------------------------------------------------------------------
 
-            // Sensor full-scale settings
+            // MPU9250 full-scale settings
             static const Ascale_t ASCALE = AFS_8G;
             static const Gscale_t GSCALE = GFS_2000DPS;
             static const Mscale_t MSCALE = MFS_16BITS;
