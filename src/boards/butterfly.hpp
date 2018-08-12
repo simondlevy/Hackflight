@@ -90,8 +90,9 @@ namespace hf {
             // Run motor ESCs using standard Servo library
             Servo _escs[4];
 
-            // Quaternion support
-            MadgwickQuaternionFilter9DOF _quaternionFilter = MadgwickQuaternionFilter9DOF(BETA);
+            // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
+            // using a 6DOF fiter (accel, gyro)
+            MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(BETA, ZETA);
             uint32_t _sumCount = 0;                          // used to control display output rate
             const uint16_t SUM_COUNT_MAX = 1000 / QUATERNION_UPDATE_RATE;
             uint32_t _timePrev = 0;                          // used to calculate integration interval
@@ -184,7 +185,7 @@ namespace hf {
 
                             _sumCount++;
 
-                            _quaternionFilter.update(-ax, ay, az, gx, -gy, -gz, my, -mx, mz, deltat, _q);
+                            _quaternionFilter.update(-ax, ay, az, gx, -gy, -gz, deltat, _q);
 
                             Debug::printf("%+3.3f %+3.3f %+3.3f %+3.3f\n", _q[0], _q[1], _q[2], _q[3]);
                         }
