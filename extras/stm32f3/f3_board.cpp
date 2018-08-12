@@ -66,6 +66,8 @@ extern "C" {
 
     bool F3Board::getGyrometer(float gyroRates[3])
     {
+        (void)gyroRates;
+        /*
         if (_imu.checkNewAccelGyroData()) {
 
             // Read IMU
@@ -90,12 +92,15 @@ extern "C" {
         } // if (_imu.checkNewAccelGyroData())
 
     } // if gotNewData
+    */
 
     return false;
 }
 
 bool F3Board::getQuaternion(float quat[4])
 {
+    (void)quat;
+    /*
     // Update quaternion after some number of IMU readings
     if (_gyroCycleCount == QUATERNION_DIVISOR) {
 
@@ -114,7 +119,7 @@ bool F3Board::getQuaternion(float quat[4])
         memcpy(quat, _q, 4*sizeof(float));
         return true;
     }
-
+    */
     return false;
 }
 

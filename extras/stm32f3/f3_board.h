@@ -22,12 +22,31 @@
 #pragma once
 
 #include <boards/realboard.hpp>
+#include <filters.hpp>
 
 class F3Board : public hf::RealBoard {
 
     friend class hf::Board;
 
     private:
+
+    // Global constants for 6 DoF quaternion filter
+    const float GYRO_MEAS_ERROR = M_PI * (40.0f / 180.0f); // gyroscope measurement error in rads/s (start at 40 deg/s)
+    const float GYRO_MEAS_DRIFT = M_PI * (0.0f  / 180.0f); // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
+    const float BETA = sqrtf(3.0f / 4.0f) * GYRO_MEAS_ERROR;   // compute BETA
+    const float ZETA = sqrt(3.0f / 4.0f) * GYRO_MEAS_DRIFT;  
+
+    // Update quaternion after this number of gyro updates
+    const uint8_t QUATERNION_DIVISOR = 5;
+
+    // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
+    // using a 6DOF fiter (accel, gyro)
+    hf::MadgwickQuaternionFilter6DOF * _quaternionFilter;
+    float _q[4] = {1.0f, 0.0f, 0.0f, 0.0f};          // vector to hold quaternion
+    uint8_t _gyroCycleCount;
+    float _ax=0,_ay=0,_az=0,_gx=0,_gy=0,_gz=0;
+
+    void error(const char * errmsg);
 
     void imuInit(void);
 
