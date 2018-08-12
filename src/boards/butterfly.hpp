@@ -81,6 +81,7 @@ namespace hf {
             const float BETA = sqrtf(3.0f / 4.0f) * GYRO_MEAS_ERROR;   // compute BETA
             const float ZETA = sqrt(3.0f / 4.0f) * GYRO_MEAS_DRIFT;  
 
+            const uint8_t QUATERNION_DIVISOR = 5;
 
             // Instance variables -----------------------------------------------------------------------------------
 
@@ -97,6 +98,11 @@ namespace hf {
             const uint16_t SUM_COUNT_MAX = 1000 / QUATERNION_UPDATE_RATE;
             uint32_t _timePrev = 0;                          // used to calculate integration interval
             float _q[4] = {1.0f, 0.0f, 0.0f, 0.0f};          // vector to hold quaternion
+
+            uint8_t _gyroCycleCount;
+
+            float ax=0,ay=0,az=0,gx=0,gy=0,gz=0;
+
 
             // Helpers -----------------------------------------------------------------------------------------------
 
@@ -156,10 +162,8 @@ namespace hf {
 
                     if (_imu.checkNewAccelGyroData()) {
 
-                        float ax=0, ay=0, az=0;
                         _imu.readAccelerometer(ax, ay, az);
 
-                        float gx=0, gy=0, gz=0;
                         _imu.readGyrometer(gx, gy, gz);
 
                         gx = radians(gx);
@@ -193,6 +197,8 @@ namespace hf {
                         gyro[1] = gy;
                         gyro[2] = gz;
 
+                        _gyroCycleCount++;
+
                         return true;
 
                     } // if (_imu.checkNewAccelGyroData())
@@ -204,6 +210,23 @@ namespace hf {
 
             bool getQuaternion(float quat[4])
             {
+                if (_gyroCycleCount == QUATERNION_DIVISOR) {
+                    _gyroCycleCount = 0;
+                    uint32_t timeCurr = micros();
+
+                    // Set integration time by time elapsed since last filter update
+                    float deltat = ((timeCurr - _timePrev)/1000000.0f); 
+                    _timePrev = timeCurr;
+
+                    _sumCount++;
+
+                    _quaternionFilter.update(-ax, ay, az, gx, -gy, -gz, deltat, _q);
+                    memcpy(quat, _q, 4*sizeof(float));
+                    return true;
+                }
+
+                return false;
+
                 if(_sumCount > SUM_COUNT_MAX) {
 
                     // Reset accumulators
@@ -271,6 +294,7 @@ namespace hf {
                         Serial.println("MPU6050 online!\n");
                 }
 
+                _gyroCycleCount = 0;
 
                 // Do general real-board initialization
                 RealBoard::init();
