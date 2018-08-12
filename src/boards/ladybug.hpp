@@ -38,9 +38,6 @@ namespace hf {
         private:
 
             // Tunable EM7180 parameters
-            static const uint8_t  ARES           = 8;    // Gs
-            static const uint16_t GRES           = 2000; // degrees per second
-            static const uint16_t MRES           = 1000; // microTeslas
             static const uint8_t  MAG_RATE       = 100;  // Hz
             static const uint16_t ACCEL_RATE     = 330;  // Hz
             static const uint16_t GYRO_RATE      = 330;  // Hz
@@ -54,7 +51,7 @@ namespace hf {
 
             float _gyroAdcToRadians;
 
-            EM7180_Master _sentral = EM7180_Master(ARES, GRES, MRES, MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
+            EM7180_Master _sentral = EM7180_Master(MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
 
             void checkEventStatus(void)
             {
