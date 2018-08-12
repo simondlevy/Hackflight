@@ -206,18 +206,6 @@ namespace hf {
                 return false;
             }
 
-            bool getAccelerometer(float accelGs[3])
-            {
-                (void)accelGs;
-                return false;
-            }
-
-            bool getBarometer(float & pressure)
-            {
-                (void)pressure;
-                return false;
-            }
-
         public:
 
             Butterfly(void)
