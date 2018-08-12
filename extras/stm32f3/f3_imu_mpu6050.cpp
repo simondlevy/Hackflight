@@ -55,6 +55,15 @@ void F3Board::imuInit(void)
 bool F3Board::getGyrometer(float gyroRates[3]) 
 {
     MPU6050 * imu = (MPU6050 *)_imu;
-    
+
+    if (imu->checkNewData()) {  
+
+        imu->readAccelerometer(_ax, _ay, _az);
+
+        imu->readGyrometer(_gx, _gy, _gz);
+
+        hf::Debug::printf("gotGyro!\n");
+    }  
+
     return false;
 }
