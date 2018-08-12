@@ -92,12 +92,22 @@ namespace hf {
 
     class QuaternionFilter {
 
+        public:
+
+            float q0;
+            float q1;
+            float q2;
+            float q3;
+
         protected:
 
-            float _q0;
-            float _q1;
-            float _q2;
-            float _q3;
+            QuaternionFilter(void)
+            {
+                q0 = 0;
+                q1 = 0;
+                q2 = 0;
+                q3 = 0;
+            }
 
     };
 
@@ -107,7 +117,7 @@ namespace hf {
 
             float _beta;
 
-            MadgwickQuaternionFilter(float beta)
+            MadgwickQuaternionFilter(float beta) : QuaternionFilter()
             {
                 this->_beta = beta;
             }
@@ -332,7 +342,7 @@ namespace hf {
 
     }; // class MadgwickQuaternionFilter6DOF
 
-    class MahonyQuaternionFilter : public QuaternionFilter {
+    class MahonyQuaternionFilter9DOF : public QuaternionFilter {
 
         private:
 
@@ -344,7 +354,7 @@ namespace hf {
 
         public:
 
-            MahonyQuaternionFilter(void)
+            MahonyQuaternionFilter9DOF(void) : QuaternionFilter()
             {
                 _eInt[0] = 0;
                 _eInt[1] = 0;
