@@ -71,10 +71,6 @@ namespace hf {
             // SAMPLE_RATE_DIVISOR = 0 means 1 kHz sample rate for both accel and gyro, 4 means 200 Hz, etc.
             static const uint8_t SAMPLE_RATE_DIVISOR = 0;         
 
-            // Quaternion calculation
-            static const uint8_t  QUATERNION_UPDATES_PER_CYCLE = 10;  // update quaternion this many times per gyro aquisition
-            static const uint16_t QUATERNION_UPDATE_RATE       = 50;   // Hertz
-
             // Global constants for 6 DoF quaternion filter
             const float GYRO_MEAS_ERROR = M_PI * (40.0f / 180.0f); // gyroscope measurement error in rads/s (start at 40 deg/s)
             const float GYRO_MEAS_DRIFT = M_PI * (0.0f  / 180.0f); // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
