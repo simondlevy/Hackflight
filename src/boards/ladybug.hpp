@@ -198,7 +198,7 @@ namespace hf {
                 }
 
                 // Get gyro rate for conversion to radians
-                _gyroAdcToRadians = M_PI * 2000.f / (1<<15) / 180.;  
+                _gyroAdcToRadians = radians(2000.f / (1<<15));
 
                 // Initialize the motors
                 for (int k=0; k<4; ++k) {
