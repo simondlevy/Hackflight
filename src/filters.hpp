@@ -90,8 +90,18 @@ namespace hf {
 
     }; // class LowPassFilter
 
-    // Adapted from https://github.com/kriswiner/MPU9250/blob/master/quaternionFilters.ino
-    class MadgwickQuaternionFilter {
+    class QuaternionFilter {
+
+        protected:
+
+            float _q0;
+            float _q1;
+            float _q2;
+            float _q3;
+
+    };
+
+    class MadgwickQuaternionFilter : protected QuaternionFilter {
 
         protected:
 
@@ -110,6 +120,7 @@ namespace hf {
 
             MadgwickQuaternionFilter9DOF(float beta) : MadgwickQuaternionFilter(beta) { }
 
+            // Adapted from https://github.com/kriswiner/MPU9250/blob/master/quaternionFilters.ino
             void update(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float deltat, float q[4])
             {
                 float q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];   // short name local variable for readability
@@ -321,8 +332,7 @@ namespace hf {
 
     }; // class MadgwickQuaternionFilter6DOF
 
-    // Adapted from https://github.com/kriswiner/MPU9250/blob/master/quaternionFilters.ino
-    class MahonyQuaternionFilter {
+    class MahonyQuaternionFilter : public QuaternionFilter {
 
         private:
 
@@ -341,6 +351,7 @@ namespace hf {
                 _eInt[2] = 0;
             }
 
+            // Adapted from https://github.com/kriswiner/MPU9250/blob/master/quaternionFilters.ino
             void update(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float deltat, float q[4])
             {
                 float q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];   // short name local variable for readability
