@@ -75,12 +75,13 @@ namespace hf {
             static const uint8_t  QUATERNION_UPDATES_PER_CYCLE = 10;  // update quaternion this many times per gyro aquisition
             static const uint16_t QUATERNION_UPDATE_RATE       = 50;   // Hertz
 
-            // Global constants for 9 DoF fusion and AHRS (Attitude and Heading Reference System)
+            // Global constants for 6 DoF quaternion filter
             const float GYRO_MEAS_ERROR = M_PI * (40.0f / 180.0f); // gyroscope measurement error in rads/s (start at 40 deg/s)
             const float GYRO_MEAS_DRIFT = M_PI * (0.0f  / 180.0f); // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
             const float BETA = sqrtf(3.0f / 4.0f) * GYRO_MEAS_ERROR;   // compute BETA
             const float ZETA = sqrt(3.0f / 4.0f) * GYRO_MEAS_DRIFT;  
 
+            // Update quaternion after this number of gyro updates
             const uint8_t QUATERNION_DIVISOR = 5;
 
             // Instance variables -----------------------------------------------------------------------------------
@@ -94,15 +95,9 @@ namespace hf {
             // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
             // using a 6DOF fiter (accel, gyro)
             MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(BETA, ZETA);
-            uint32_t _sumCount = 0;                          // used to control display output rate
-            const uint16_t SUM_COUNT_MAX = 1000 / QUATERNION_UPDATE_RATE;
-            uint32_t _timePrev = 0;                          // used to calculate integration interval
             float _q[4] = {1.0f, 0.0f, 0.0f, 0.0f};          // vector to hold quaternion
-
             uint8_t _gyroCycleCount;
-
-            float ax=0,ay=0,az=0,gx=0,gy=0,gz=0;
-
+            float _ax=0,_ay=0,_az=0,_gx=0,_gy=0,_gz=0;
 
             // Helpers -----------------------------------------------------------------------------------------------
 
@@ -162,41 +157,21 @@ namespace hf {
 
                     if (_imu.checkNewAccelGyroData()) {
 
-                        _imu.readAccelerometer(ax, ay, az);
+                        // Read IMU
+                        _imu.readAccelerometer(_ax, _ay, _az);
+                        _imu.readGyrometer(_gx, _gy, _gz);
 
-                        _imu.readGyrometer(gx, gy, gz);
-
-                        gx = radians(gx);
-                        gy = radians(gy);
-                        gz = radians(gz);
-
-                        // We're using pass-through mode, so magnetometer values are updated at their own rate
-                        static float mx, my, mz;
-
-                        if (_imu.checkNewMagData()) { // Wait for magnetometer data ready bit to be set
-
-                            _imu.readMagnetometer(mx, my, mz);
-                        }
-
-                        // Iterate a fixed number of times per data read cycle, updating the quaternion
-                        for (uint8_t i=0; i<QUATERNION_UPDATES_PER_CYCLE; i++) { 
-
-                            uint32_t timeCurr = micros();
-
-                            // Set integration time by time elapsed since last filter update
-                            float deltat = ((timeCurr - _timePrev)/1000000.0f); 
-                            _timePrev = timeCurr;
-
-                            _sumCount++;
-
-                            _quaternionFilter.update(-ax, ay, az, gx, -gy, -gz, deltat, _q);
-                        }
+                        // Convert gyrometer values from degrees/sec to radians/sec
+                        _gx = radians(_gx);
+                        _gy = radians(_gy);
+                        _gz = radians(_gz);
 
                         // Copy gyro values back out
-                        gyro[0] = gx;
-                        gyro[1] = gy;
-                        gyro[2] = gz;
+                        gyro[0] = _gx;
+                        gyro[1] = _gy;
+                        gyro[2] = _gz;
 
+                        // Increment count for quaternion check
                         _gyroCycleCount++;
 
                         return true;
@@ -210,31 +185,22 @@ namespace hf {
 
             bool getQuaternion(float quat[4])
             {
+                // Update quaternion after some number of IMU readings
                 if (_gyroCycleCount == QUATERNION_DIVISOR) {
+
                     _gyroCycleCount = 0;
-                    uint32_t timeCurr = micros();
 
                     // Set integration time by time elapsed since last filter update
+                    uint32_t timeCurr = micros();
+                    static uint32_t _timePrev;
                     float deltat = ((timeCurr - _timePrev)/1000000.0f); 
                     _timePrev = timeCurr;
 
-                    _sumCount++;
+                    // Run the quaternion on the IMU values acquired in getGyrometer()
+                    _quaternionFilter.update(-_ax, _ay, _az, _gx, -_gy, -_gz, deltat, _q);
 
-                    _quaternionFilter.update(-ax, ay, az, gx, -gy, -gz, deltat, _q);
+                    // Copy the quaternion back out
                     memcpy(quat, _q, 4*sizeof(float));
-                    return true;
-                }
-
-                return false;
-
-                if(_sumCount > SUM_COUNT_MAX) {
-
-                    // Reset accumulators
-                    _sumCount = 0;
-
-                    // Copy quaternion values back out
-                    memcpy(quat, _q, 4*sizeof(float));
-
                     return true;
                 }
 
@@ -277,8 +243,8 @@ namespace hf {
                 // Start I^2C
                 Wire.begin();
                 Wire.setClock(400000); // I2C frequency at 400 kHz
-                delay(1000);
 
+                // Wait a bit
                 delay(100);
 
                 // Start the MPU9250
@@ -291,9 +257,10 @@ namespace hf {
                     case MPU_ERROR_SELFTEST:
                         error("Failed self-test");
                     default:
-                        Serial.println("MPU6050 online!\n");
+                        break;
                 }
 
+                // Initialize the quaternion-update counter
                 _gyroCycleCount = 0;
 
                 // Do general real-board initialization
