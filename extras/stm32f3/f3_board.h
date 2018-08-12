@@ -22,9 +22,10 @@
 #pragma once
 
 #include <boards/software_quaternion.hpp>
+#include <boards/realboard.hpp>
 #include <filters.hpp>
 
-class F3Board : public hf::SoftwareQuaternionBoard {
+class F3Board : public hf::SoftwareQuaternionBoard  {
 
     friend class hf::Board;
 
@@ -55,9 +56,9 @@ class F3Board : public hf::SoftwareQuaternionBoard {
 
     protected:
 
-    virtual bool  getQuaternion(float quat[4]) override;
-
     virtual bool  getGyrometer(float gyroRates[3]) override;
+
+    virtual bool getQuaternion(float quat[4]) override;
 
     virtual void  writeMotor(uint8_t index, float value) override;
 
