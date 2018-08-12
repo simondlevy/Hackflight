@@ -21,10 +21,10 @@
 
 #pragma once
 
-#include <boards/realboard.hpp>
+#include <boards/software_quaternion.hpp>
 #include <filters.hpp>
 
-class F3Board : public hf::RealBoard {
+class F3Board : public hf::SoftwareQuaternionBoard {
 
     friend class hf::Board;
 

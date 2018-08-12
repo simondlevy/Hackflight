@@ -46,7 +46,6 @@ namespace hf {
             MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(BETA, ZETA);
             uint8_t _quatCycleCount = 0;
 
-
         protected:
 
             float _ax = 0;
@@ -64,10 +63,10 @@ namespace hf {
                 if (_quatCycleCount == 0) {
 
                     // Set integration time by time elapsed since last filter update
-                    uint32_t timeCurr = micros();
-                    static uint32_t _timePrev;
-                    float deltat = ((timeCurr - _timePrev)/1000000.0f); 
-                    _timePrev = timeCurr;
+                    static float _time;
+                    float time = getTime();
+                    float deltat = time - _time;
+                    _time = time;
 
                     // Run the quaternion on the IMU values acquired in getGyrometer()
                     _quaternionFilter.update(-_ax, _ay, _az, _gx, -_gy, -_gz, deltat);
