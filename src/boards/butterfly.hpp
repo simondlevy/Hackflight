@@ -91,7 +91,7 @@ namespace hf {
             // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
             // using a 6DOF fiter (accel, gyro)
             MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(BETA, ZETA);
-            uint8_t _gyroCycleCount;
+            uint8_t _quatCycleCount;
             float _ax=0,_ay=0,_az=0,_gx=0,_gy=0,_gz=0;
 
             // Helpers -----------------------------------------------------------------------------------------------
@@ -166,9 +166,6 @@ namespace hf {
                         gyro[1] = _gy;
                         gyro[2] = _gz;
 
-                        // Increment count for quaternion check
-                        _gyroCycleCount++;
-
                         return true;
 
                     } // if (_imu.checkNewAccelGyroData())
@@ -181,9 +178,9 @@ namespace hf {
             bool getQuaternion(float quat[4])
             {
                 // Update quaternion after some number of IMU readings
-                if (_gyroCycleCount == QUATERNION_DIVISOR) {
+                _quatCycleCount = (_quatCycleCount + 1) % QUATERNION_DIVISOR;
 
-                    _gyroCycleCount = 0;
+                if (_quatCycleCount == 0) {
 
                     // Set integration time by time elapsed since last filter update
                     uint32_t timeCurr = micros();
@@ -248,7 +245,7 @@ namespace hf {
                 }
 
                 // Initialize the quaternion-update counter
-                _gyroCycleCount = 0;
+                _quatCycleCount = 0;
 
                 // Do general real-board initialization
                 RealBoard::init();
