@@ -32,11 +32,3 @@ void F3Board::imuInit(void)
 {
     Wire.begin(2);
 }
-
-bool F3Board::getImu(int16_t accelCount[3], int16_t gyroCount[3])
-{
-    (void)accelCount;
-    (void)gyroCount;
-
-    return false;
-}
