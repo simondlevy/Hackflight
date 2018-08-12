@@ -31,7 +31,7 @@
 
 #include "filters.hpp"
 #include "hackflight.hpp"
-#include "realboard.hpp"
+#include "software_quaternion.hpp"
 
 namespace hf {
 
@@ -42,7 +42,7 @@ namespace hf {
         gotNewData = true;
     }
 
-    class Butterfly : public RealBoard {
+    class Butterfly : public SoftwareQuaternionBoard {
 
         private:
 
@@ -71,15 +71,6 @@ namespace hf {
             // SAMPLE_RATE_DIVISOR = 0 means 1 kHz sample rate for both accel and gyro, 4 means 200 Hz, etc.
             static const uint8_t SAMPLE_RATE_DIVISOR = 0;         
 
-            // Global constants for 6 DoF quaternion filter
-            const float GYRO_MEAS_ERROR = M_PI * (40.0f / 180.0f); // gyroscope measurement error in rads/s (start at 40 deg/s)
-            const float GYRO_MEAS_DRIFT = M_PI * (0.0f  / 180.0f); // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
-            const float BETA = sqrtf(3.0f / 4.0f) * GYRO_MEAS_ERROR;   // compute BETA
-            const float ZETA = sqrt(3.0f / 4.0f) * GYRO_MEAS_DRIFT;  
-
-            // Update quaternion after this number of gyro updates
-            const uint8_t QUATERNION_DIVISOR = 5;
-
             // Instance variables -----------------------------------------------------------------------------------
 
             // Use the MPU9250 in pass-through mode
@@ -87,12 +78,6 @@ namespace hf {
 
             // Run motor ESCs using standard Servo library
             Servo _escs[4];
-
-            // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
-            // using a 6DOF fiter (accel, gyro)
-            MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(BETA, ZETA);
-            uint8_t _quatCycleCount;
-            float _ax=0,_ay=0,_az=0,_gx=0,_gy=0,_gz=0;
 
             // Helpers -----------------------------------------------------------------------------------------------
 
@@ -175,34 +160,6 @@ namespace hf {
                 return false;
             }
 
-            bool getQuaternion(float quat[4])
-            {
-                // Update quaternion after some number of IMU readings
-                _quatCycleCount = (_quatCycleCount + 1) % QUATERNION_DIVISOR;
-
-                if (_quatCycleCount == 0) {
-
-                    // Set integration time by time elapsed since last filter update
-                    uint32_t timeCurr = micros();
-                    static uint32_t _timePrev;
-                    float deltat = ((timeCurr - _timePrev)/1000000.0f); 
-                    _timePrev = timeCurr;
-
-                    // Run the quaternion on the IMU values acquired in getGyrometer()
-                    _quaternionFilter.update(-_ax, _ay, _az, _gx, -_gy, -_gz, deltat);
-
-                    // Copy the quaternion back out
-                    quat[0] = _quaternionFilter.q1;
-                    quat[1] = _quaternionFilter.q2;
-                    quat[2] = _quaternionFilter.q3;
-                    quat[3] = _quaternionFilter.q4;
-
-                    return true;
-                }
-
-                return false;
-            }
-
         public:
 
             Butterfly(void)
@@ -243,9 +200,6 @@ namespace hf {
                     default:
                         break;
                 }
-
-                // Initialize the quaternion-update counter
-                _quatCycleCount = 0;
 
                 // Do general real-board initialization
                 RealBoard::init();
