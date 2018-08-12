@@ -49,8 +49,6 @@ namespace hf {
 
             const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
 
-            float _gyroAdcToRadians;
-
             EM7180_Master _sentral = EM7180_Master(MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
 
             void checkEventStatus(void)
@@ -108,17 +106,19 @@ namespace hf {
 
                 if (_sentral.gotGyrometer()) {
 
-                    int16_t gx, gy, gz;
+                    float gx, gy, gz;
 
+                    // Returns degrees / sec
                     _sentral.readGyrometer(gx, gy, gz);
 
                     // invert pitch, yaw gyro direction to keep other code simpler
                     gy = -gy;
                     gz = -gz;
 
-                    gyroRates[0] = gx * _gyroAdcToRadians;
-                    gyroRates[1] = gy * _gyroAdcToRadians;
-                    gyroRates[2] = gz * _gyroAdcToRadians;
+                    // Convert degrees / sec to radians / sec
+                    gyroRates[0] = radians(gx);
+                    gyroRates[1] = radians(gy);
+                    gyroRates[2] = radians(gz);
 
                     return true;
                 }
@@ -148,11 +148,11 @@ namespace hf {
             bool getAccelerometer(float accelGs[3])
             {
                 if (_sentral.gotAccelerometer()) {
-                    int16_t ax, ay, az;
+                    float ax, ay, az;
                     _sentral.readAccelerometer(ax, ay, az);
-                    accelGs[0] = ax / 2048.f;
-                    accelGs[1] = ay / 2048.f;
-                    accelGs[2] = az / 2048.f;
+                    accelGs[0] = ax;
+                    accelGs[1] = ay;
+                    accelGs[2] = az;
                     return true;
                 }
 
@@ -196,9 +196,6 @@ namespace hf {
                         Serial.println(_sentral.getErrorString());
                     }
                 }
-
-                // Get gyro rate for conversion to radians
-                _gyroAdcToRadians = radians(2000.f / (1<<15));
 
                 // Initialize the motors
                 for (int k=0; k<4; ++k) {
