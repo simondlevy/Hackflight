@@ -64,13 +64,6 @@ extern "C" {
         systemResetToBootloader();
     }
 
-    bool F3Board::getGyrometer(float gyroRates[3])
-    {
-        (void)gyroRates;
-
-        return false;
-    }
-
     void hf::Board::outbuf(char * buf)
     {
         for (char *p=buf; *p; p++)

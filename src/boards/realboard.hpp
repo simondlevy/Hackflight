@@ -21,6 +21,7 @@
 #pragma once
 
 #include "board.hpp"
+#include "debug.hpp"
 #include "datatypes.hpp"
 
 namespace hf {
@@ -89,6 +90,13 @@ namespace hf {
                 _shouldflash = shouldflash;
             }
 
+            void error(const char * errmsg) 
+            {
+                Debug::printf("%s\n", errmsg);
+                while (true) ;
+            }
+
+ 
     }; // class RealBoard
 
 } // namespace hf

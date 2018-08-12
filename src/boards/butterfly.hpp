@@ -79,15 +79,7 @@ namespace hf {
             // Run motor ESCs using standard Servo library
             Servo _escs[4];
 
-            // Helpers -----------------------------------------------------------------------------------------------
-
-            void error(const char * errmsg) 
-            {
-                Serial.println(errmsg);
-                while (true);
-            }
-
-        protected:
+       protected:
 
             void delayMilliseconds(uint32_t msec)
             {

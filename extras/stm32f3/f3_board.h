@@ -30,11 +30,11 @@ class F3Board : public hf::SoftwareQuaternionBoard  {
 
     private:
 
-    void error(const char * errmsg);
-
     void imuInit(void);
 
     void usbInit(void);
+
+    void * _imu;
 
     protected:
 

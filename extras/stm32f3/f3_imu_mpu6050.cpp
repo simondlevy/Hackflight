@@ -28,7 +28,33 @@
 #include <string.h>
 #include <sensors/quaternion.hpp>
 
+static const Ascale_t ASCALE = AFS_2G;
+static const Gscale_t GSCALE = GFS_250DPS;
+
 void F3Board::imuInit(void)
 {
     Wire.begin(2);
+
+    MPU6050 * imu = new MPU6050(ASCALE, GSCALE);
+
+    switch (imu->begin()) {
+
+        case MPU_ERROR_ID:
+            error("Bad device ID");
+            break;
+        case MPU_ERROR_SELFTEST:
+            error("Failed self-test");
+            break;
+        default:
+            break;
+    }
+ 
+    _imu = imu;
+}
+
+bool F3Board::getGyrometer(float gyroRates[3]) 
+{
+    MPU6050 * imu = (MPU6050 *)_imu;
+    
+    return false;
 }
