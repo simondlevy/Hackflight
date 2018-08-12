@@ -186,8 +186,6 @@ namespace hf {
                             _sumCount++;
 
                             _quaternionFilter.update(-ax, ay, az, gx, -gy, -gz, deltat, _q);
-
-                            Debug::printf("%+3.3f %+3.3f %+3.3f %+3.3f\n", _q[0], _q[1], _q[2], _q[3]);
                         }
 
                         // Copy gyro values back out
