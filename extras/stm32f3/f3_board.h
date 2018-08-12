@@ -42,8 +42,7 @@ class F3Board : public hf::RealBoard {
     // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
     // using a 6DOF fiter (accel, gyro)
     hf::MadgwickQuaternionFilter6DOF * _quaternionFilter;
-    float _q[4] = {1.0f, 0.0f, 0.0f, 0.0f};          // vector to hold quaternion
-    uint8_t _gyroCycleCount;
+    uint8_t _quatCycleCount;
     float _ax=0,_ay=0,_az=0,_gx=0,_gy=0,_gz=0;
 
     void error(const char * errmsg);

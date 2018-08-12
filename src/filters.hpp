@@ -118,7 +118,7 @@ namespace hf {
 
             MadgwickQuaternionFilter(float beta) : QuaternionFilter()
             {
-                this->_beta = beta;
+                _beta = beta;
             }
     };
 

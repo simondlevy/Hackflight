@@ -71,17 +71,39 @@ extern "C" {
         return false;
     }
 
-bool F3Board::getQuaternion(float quat[4])
-{
-    (void)quat;
-    return false;
-}
+    bool F3Board::getQuaternion(float quat[4])
+    {
+        // Update quaternion after some number of IMU readings
+        _quatCycleCount = (_quatCycleCount + 1) % QUATERNION_DIVISOR;
 
-void hf::Board::outbuf(char * buf)
-{
-    for (char *p=buf; *p; p++)
-        F3Board::outchar(*p);
-}
+        if (_quatCycleCount == 0) {
+
+            // Set integration time by time elapsed since last filter update
+            uint32_t timeCurr = micros();
+            static uint32_t _timePrev;
+            float deltat = ((timeCurr - _timePrev)/1000000.0f); 
+            _timePrev = timeCurr;
+
+            // Run the quaternion on the IMU values acquired in getGyrometer()
+            _quaternionFilter.update(-_ax, _ay, _az, _gx, -_gy, -_gz, deltat);
+
+            // Copy the quaternion back out
+            quat[0] = _quaternionFilter.q1;
+            quat[1] = _quaternionFilter.q2;
+            quat[2] = _quaternionFilter.q3;
+            quat[3] = _quaternionFilter.q4;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    void hf::Board::outbuf(char * buf)
+    {
+        for (char *p=buf; *p; p++)
+            F3Board::outchar(*p);
+    }
 
 
 } // extern "C"
