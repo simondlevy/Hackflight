@@ -43,6 +43,7 @@ namespace hf {
             // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
             // using a 6DOF fiter (accel, gyro)
             MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(BETA, ZETA);
+
             uint8_t _quatCycleCount = 0;
 
         protected:
@@ -67,9 +68,12 @@ namespace hf {
                     float deltat = time - _time;
                     _time = time;
 
+                    // Adjust the IMU readings for board-particular rotation
+                    float a1=0, a2=0, g1=0, g2=0;
+                    adjustImu(a1, a2, g1, g2);
+
                     // Run the quaternion on the IMU values acquired in getGyrometer()
-                    _quaternionFilter.update(-_ax, _ay, _az, _gx, -_gy, -_gz, deltat); // Butterfly
-                    //_quaternionFilter.update(_ay, _ax,  _az, -_gy, -_gx, -_gz, deltat);  // AlienflightF3
+                    _quaternionFilter.update(a1, a2, _az, g1, g2, -_gz, deltat); 
 
                     // Copy the quaternion back out
                     quat[0] = _quaternionFilter.q1;
@@ -82,6 +86,8 @@ namespace hf {
 
                 return false;
             }
+
+            virtual void adjustImu(float & a1, float & a2, float & g1, float & g2) = 0;
 
     }; // class SoftwareQuaternionBoard
 

@@ -29,4 +29,12 @@ void F3Board::writeMotor(uint8_t index, float value)
     (void)value;
 }
 
+void F3Board::adjustImu(float & a1, float & a2, float & g1, float & g2)
+{
+    a1 =  _ay;
+    a2 =  _ax,
+    g1 = -_gy;
+    g2 = -_gx;
+}
+
 

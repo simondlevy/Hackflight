@@ -152,6 +152,14 @@ namespace hf {
                 return false;
             }
 
+            virtual void adjustImu(float & a1, float & a2, float & g1, float & g2) override
+            {
+                a1 = -_ax;
+                a2 =  _ay;
+                g1 =  _gx;
+                g2 = -_gy;
+            }
+
         public:
 
             Butterfly(void)
