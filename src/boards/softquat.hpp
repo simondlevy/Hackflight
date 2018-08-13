@@ -1,5 +1,5 @@
 /*
-   software_quaternionn.hpp : Abstract class for boards that need to compute the quaternion on the MCU
+   sofquat.hpp : Abstract class for boards that need to compute the quaternion on the MCU
 
    Copyright (c) 2018 Simon D. Levy
 

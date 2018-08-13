@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <boards/software_quaternion.hpp>
+#include <boards/softquat.hpp>
 #include <filters.hpp>
 
 class F3Board : public hf::SoftwareQuaternionBoard  {

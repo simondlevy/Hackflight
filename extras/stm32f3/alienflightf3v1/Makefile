@@ -1,3 +1,4 @@
+##############################################################################
 #   Makefile for AlienflightF3V1 board
 #
 #   Copyright (c) 2018 Simon D. Levy
@@ -15,6 +16,7 @@
 #   GNU General Public License for more details.
 #   You should have received a copy of the GNU General Public License
 #   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+##############################################################################
 
  # Change this to where you put your f3_board libraries
 ARDUINO_DIR = $(HOME)/Documents/Arduino/libraries
@@ -280,7 +282,7 @@ $(OBJECT_DIR)/$(PROJECT)/%.o: %.S
 $(OBJECT_DIR)/$(PROJECT)/main.o: ../main.cpp 
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/main.o $(CFLAGS) ../main.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/f3_board.o: ../f3_board.cpp ../f3_board.h $(HACKFLIGHT_DIR)/board.hpp $(HACKFLIGHT_DIR)/boards/software_quaternion.hpp
+$(OBJECT_DIR)/$(PROJECT)/f3_board.o: ../f3_board.cpp ../f3_board.h $(HACKFLIGHT_DIR)/board.hpp $(HACKFLIGHT_DIR)/boards/softquat.hpp
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_board.o $(CFLAGS) ../f3_board.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/f3_wire.o: ../f3_wire.cpp ../Wire.h

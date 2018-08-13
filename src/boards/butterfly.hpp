@@ -31,7 +31,7 @@
 
 #include "filters.hpp"
 #include "hackflight.hpp"
-#include "software_quaternion.hpp"
+#include "softquat.hpp"
 
 namespace hf {
 
