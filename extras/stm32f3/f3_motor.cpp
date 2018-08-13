@@ -81,26 +81,13 @@ static void pwmGPIOConfig(GPIO_TypeDef *gpio, uint32_t pin, GPIO_Mode mode)
     gpioInit(gpio, &cfg);
 }
 
-void Servo::writeMicroseconds(uint16_t uS)
-{
-    pwmOutputPort_t * _servo = (pwmOutputPort_t *)this->motor;
-    *_servo->ccr = uS;
-}
-
-
 void BrushedMotor::writeMicroseconds(uint16_t uS)
 {
     pwmOutputPort_t * _motor = (pwmOutputPort_t *)this->motor;
     *_motor->ccr = (uS<1000) ? 0 : (uS - 1000) * _motor->period / 1000;
 }
 
-void BrushlessMotor::writeMicroseconds(uint16_t uS)
-{
-    pwmOutputPort_t * _motor = (pwmOutputPort_t *)this->motor;
-    *_motor->ccr = uS;
-}
-
-void Motor::attach(uint8_t pin, uint32_t motorPwmRate, uint16_t idlePulseUsec)
+Motor::Motor(uint8_t pin, uint32_t motorPwmRate, uint16_t idlePulseUsec)
 {
     static pwmOutputPort_t pwmPorts[16];
 

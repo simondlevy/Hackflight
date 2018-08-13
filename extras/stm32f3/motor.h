@@ -29,34 +29,16 @@ class Motor {
 
         void * motor;
 
+        Motor(uint8_t pin, uint32_t motorPwmRate, uint16_t idlePulseUsec);
+
         void attach(uint8_t pin, uint32_t motorPwmRate, uint16_t idlePulseUsec);
-};
-
-class Servo : public Motor {
-
-    public:
-
-        void attach(uint8_t pin) { Motor::attach(pin, 50, 1500); }
-
-        // 1000 - 2000
-        void writeMicroseconds(uint16_t uS);
-
-};
-
-class BrushlessMotor : public Motor {
-
-    public:
-
-        void attach(uint8_t pin) { Motor::attach(pin, 50 /*400*/, 1000); };
-
-        // 1000 - 2000
-        void writeMicroseconds(uint16_t uS);
-
 };
 
 class BrushedMotor : public Motor {
 
     public:
+
+        BrushedMotor(uint8_t pin) : Motor(pin, 32000, 0) { }
 
         void attach(uint8_t pin) { Motor::attach(pin, 32000, 0); }
 

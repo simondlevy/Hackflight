@@ -33,12 +33,10 @@ extern "C" {
 
 void setup() {                
 
-    motor = new BrushedMotor();
+    // Valid pins for ALIENFLIGHTF3 are 0, 8, 14, 15
+    motor = new BrushedMotor(14);
 
     board = new F3Board();
-
-    // Valid pins for ALIENFLIGHTF3 are 0, 8, 14, 15
-    motor->attach(14);
 
     board->delaySeconds(0.1);
 
