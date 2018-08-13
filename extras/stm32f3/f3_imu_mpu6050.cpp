@@ -62,6 +62,8 @@ bool F3Board::getGyrometer(float gyro[3])
 
         imu->readGyrometer(_gx, _gy, _gz);
 
+        if (fabs(_gx) > 100) hf::Debug::printf("%d\n", (int)(100*_gx));
+
         // Convert gyrometer values from degrees/sec to radians/sec
         _gx = radians(_gx);
         _gy = radians(_gy);

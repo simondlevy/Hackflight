@@ -32,7 +32,7 @@ namespace hf {
             // Global constants for 6 DoF quaternion filter
             const float GYRO_MEAS_ERROR = M_PI * (40.0f / 180.0f); // gyroscope measurement error in rads/s (start at 40 deg/s)
             const float GYRO_MEAS_DRIFT = M_PI * (0.0f  / 180.0f); // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
-            const float BETA = sqrtf(3.0f / 4.0f) * GYRO_MEAS_ERROR;   // compute BETA
+            const float BETA = sqrtf(3.0f / 4.0f) * GYRO_MEAS_ERROR; 
             const float ZETA = sqrt(3.0f / 4.0f) * GYRO_MEAS_DRIFT;  
 
             // Update quaternion after this number of gyro updates
@@ -68,7 +68,8 @@ namespace hf {
                     _time = time;
 
                     // Run the quaternion on the IMU values acquired in getGyrometer()
-                    _quaternionFilter.update(-_ax, _ay, _az, _gx, -_gy, -_gz, deltat);
+                    //_quaternionFilter.update(-_ax, _ay, _az, _gx, -_gy, -_gz, deltat); // Butterfly
+                    _quaternionFilter.update(_ay, _ax,  _az, -_gy, -_gx, -_gz, deltat);  // AlienflightF3
 
                     // Copy the quaternion back out
                     quat[0] = _quaternionFilter.q1;

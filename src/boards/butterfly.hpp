@@ -185,10 +185,13 @@ namespace hf {
 
                     case MPU_ERROR_IMU_ID:
                         error("Bad IMU device ID");
+                        break;
                     case MPU_ERROR_MAG_ID:
                         error("Bad magnetometer device ID");
+                        break;
                     case MPU_ERROR_SELFTEST:
-                        error("Failed self-test");
+                        //error("Failed self-test");
+                        break;
                     default:
                         break;
                 }

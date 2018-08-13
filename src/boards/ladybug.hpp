@@ -145,31 +145,6 @@ namespace hf {
                 return false;
             }
 
-            bool getAccelerometer(float accelGs[3])
-            {
-                if (_sentral.gotAccelerometer()) {
-                    float ax, ay, az;
-                    _sentral.readAccelerometer(ax, ay, az);
-                    accelGs[0] = ax;
-                    accelGs[1] = ay;
-                    accelGs[2] = az;
-                    return true;
-                }
-
-                return false;
-            }
-
-            bool getBarometer(float & pressure)
-            {
-                if (_sentral.gotBarometer()) {
-                    float temperature; // ignored
-                    _sentral.readBarometer(pressure, temperature);
-                    return true;
-                }
-
-                return false;
-            }
-
         public:
 
             // Support prototype version where LED is on pin A1

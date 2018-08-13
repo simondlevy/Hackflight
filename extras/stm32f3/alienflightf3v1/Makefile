@@ -263,7 +263,7 @@ $(OBJECT_DIR)/$(PROJECT)/%.o: %.S
 $(OBJECT_DIR)/$(PROJECT)/main.o: ../main.cpp 
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/main.o $(CFLAGS) ../main.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/f3_board.o: ../f3_board.cpp ../f3_board.h
+$(OBJECT_DIR)/$(PROJECT)/f3_board.o: ../f3_board.cpp ../f3_board.h $(HACKFLIGHT_DIR)/board.hpp $(HACKFLIGHT_DIR)/boards/software_quaternion.hpp
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_board.o $(CFLAGS) ../f3_board.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/Wire.o: ../Wire.cpp ../Wire.h
