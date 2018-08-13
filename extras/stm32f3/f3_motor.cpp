@@ -25,7 +25,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "Motor.h"
+#include "motor.h"
 
 #include <platform.h>
 

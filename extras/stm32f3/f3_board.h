@@ -34,6 +34,8 @@ class F3Board : public hf::SoftwareQuaternionBoard  {
 
     void usbInit(void);
 
+    void motorInit(void);
+
     void * _imu;
 
     protected:

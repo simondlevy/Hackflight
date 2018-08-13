@@ -224,7 +224,7 @@ TARGET_ELF	 = $(OBJECT_DIR)/$(PROJECT).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $($(PROJECT)_CSRC)))) \
 			   $(OBJECT_DIR)/$(PROJECT)/main.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3_wire.o \
-			   $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o \
+			   $(OBJECT_DIR)/$(PROJECT)/f3_motor.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3_receiver_dsmx.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3_board.o \
 			   $(OBJECT_DIR)/$(PROJECT)/alienflightf3.o \
@@ -232,6 +232,7 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $
 			   $(OBJECT_DIR)/$(PROJECT)/f3_usb_vcp.o \
 			   $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o \
 			   $(OBJECT_DIR)/$(PROJECT)/MPU6050.o \
+			   $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o \
 			   $(OBJECT_DIR)/$(PROJECT).o
 TARGET_MAP	 = $(OBJECT_DIR)/$(PROJECT).map
 
@@ -287,6 +288,9 @@ $(OBJECT_DIR)/$(PROJECT)/f3_board.o: ../f3_board.cpp ../f3_board.h $(HACKFLIGHT_
 
 $(OBJECT_DIR)/$(PROJECT)/f3_wire.o: ../f3_wire.cpp ../Wire.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_wire.o $(CFLAGS) ../f3_wire.cpp
+
+$(OBJECT_DIR)/$(PROJECT)/f3_motor.o: ../f3_motor.cpp ../motor.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_motor.o $(CFLAGS) ../f3_motor.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o $(CFLAGS) $(SPEKTRUM_DIR)/SpektrumDSM.cpp

@@ -32,6 +32,8 @@ extern "C" {
 
         imuInit();
 
+        motorInit();
+
         RealBoard::init();
     }
 
