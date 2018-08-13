@@ -81,3 +81,15 @@ void F3Board::motorInit(void)
     motors[2] = new BrushedMotor(8);
     motors[3] = new BrushedMotor(0);
 }
+
+extern "C" {
+
+#include "platform.h"
+#include "serial.h"
+
+    USART_TypeDef * getDsmUart()
+    {
+        return USART2;
+    }
+
+} // extern "C"
