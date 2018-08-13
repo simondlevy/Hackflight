@@ -42,7 +42,9 @@ static void ledInit(void)
     cfg.speed = Speed_2MHz;
 
     gpioInit(gpio, &cfg);
-}
+
+    digitalHi(gpio, cfg.pin);
+ }
 
 int main(void) {
 
