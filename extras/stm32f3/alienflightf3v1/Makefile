@@ -1,5 +1,22 @@
-# Change this to wherever you put BreezySTM32
-# Change this to where you put your f3_board libraries
+#   Makefile for AlienflightF3V1 board
+#
+#   Copyright (c) 2018 Simon D. Levy
+#
+#   This file is part of Hackflight.
+#
+#   Hackflight is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   Hackflight is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#   You should have received a copy of the GNU General Public License
+#   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+
+ # Change this to where you put your f3_board libraries
 ARDUINO_DIR = $(HOME)/Documents/Arduino/libraries
 
 # Change this to whatever project name you want
@@ -204,7 +221,7 @@ TARGET_HEX	 = $(BIN_DIR)/$(PROJECT).hex
 TARGET_ELF	 = $(OBJECT_DIR)/$(PROJECT).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $($(PROJECT)_CSRC)))) \
 			   $(OBJECT_DIR)/$(PROJECT)/main.o \
-			   $(OBJECT_DIR)/$(PROJECT)/Wire.o \
+			   $(OBJECT_DIR)/$(PROJECT)/f3_wire.o \
 			   $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3_receiver_dsmx.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3_board.o \
@@ -266,8 +283,8 @@ $(OBJECT_DIR)/$(PROJECT)/main.o: ../main.cpp
 $(OBJECT_DIR)/$(PROJECT)/f3_board.o: ../f3_board.cpp ../f3_board.h $(HACKFLIGHT_DIR)/board.hpp $(HACKFLIGHT_DIR)/boards/software_quaternion.hpp
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_board.o $(CFLAGS) ../f3_board.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/Wire.o: ../Wire.cpp ../Wire.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/Wire.o $(CFLAGS) ../Wire.cpp
+$(OBJECT_DIR)/$(PROJECT)/f3_wire.o: ../f3_wire.cpp ../Wire.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_wire.o $(CFLAGS) ../f3_wire.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTRUM_DIR)/SpektrumDSM.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o $(CFLAGS) $(SPEKTRUM_DIR)/SpektrumDSM.cpp

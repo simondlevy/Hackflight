@@ -1,5 +1,5 @@
 /*
-Wire.h : Arduino-style API for SMT32F boards
+Wire.h : Arduino-style I^2C API for SMT32F* boards
 
 Copyright (C) 2018 Simon D. Levy 
 

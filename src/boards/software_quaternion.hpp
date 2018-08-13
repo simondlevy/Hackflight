@@ -68,8 +68,8 @@ namespace hf {
                     _time = time;
 
                     // Run the quaternion on the IMU values acquired in getGyrometer()
-                    //_quaternionFilter.update(-_ax, _ay, _az, _gx, -_gy, -_gz, deltat); // Butterfly
-                    _quaternionFilter.update(_ay, _ax,  _az, -_gy, -_gx, -_gz, deltat);  // AlienflightF3
+                    _quaternionFilter.update(-_ax, _ay, _az, _gx, -_gy, -_gz, deltat); // Butterfly
+                    //_quaternionFilter.update(_ay, _ax,  _az, -_gy, -_gx, -_gz, deltat);  // AlienflightF3
 
                     // Copy the quaternion back out
                     quat[0] = _quaternionFilter.q1;
