@@ -18,10 +18,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "f3_board.h"
-
 #include <f3_board.h>
-#include <hackflight.hpp>
 
 void F3Board::writeMotor(uint8_t index, float value)
 {
