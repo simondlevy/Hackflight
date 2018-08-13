@@ -48,7 +48,7 @@ namespace hf {
             uint8_t _quatCycleCount = 0;
 
             // Built into Arduino, but not other platforms 
-            static float radians(float degrees) 
+            static float deg2rad(float degrees) 
             {
                 return M_PI * degrees / 180;
             }
@@ -67,12 +67,12 @@ namespace hf {
                 // Read acceleromter Gs, gyrometer degrees/sec
                 if (imuRead()) {
 
-                    Debug::printf("%d\n", (int)_gz);
+                    Debug::printf("%d\n", (int)_gy);
 
         	    // Convert gyrometer values from degrees/sec to radians/sec
-        	    _gx = radians(_gx);
-        	    _gy = radians(_gy);
-        	    _gz = radians(_gz);
+        	    _gx = deg2rad(_gx);
+        	    _gy = deg2rad(_gy);
+        	    _gz = deg2rad(_gz);
 
                     // Store output
                     gyro[0] = _gx;

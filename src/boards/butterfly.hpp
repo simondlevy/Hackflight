@@ -121,7 +121,8 @@ namespace hf {
                 delay((uint32_t)(1000*sec));
             }
 
-            bool getGyrometer(float gyro[3])
+
+            bool imuRead(void)
             {
                 if (gotNewData) {
 
@@ -129,38 +130,15 @@ namespace hf {
 
                     if (_imu.checkNewAccelGyroData()) {
 
-                        // Read IMU
                         _imu.readAccelerometer(_ax, _ay, _az);
                         _imu.readGyrometer(_gx, _gy, _gz);
 
-                        _gy = -_gy;
-                        _gz = -_gz;
-
-                        // Convert gyrometer values from degrees/sec to radians/sec
-                        _gx = radians(_gx);
-                        _gy = radians(_gy);
-                        _gz = radians(_gz);
-
-                        // Copy gyro values back out
-                        gyro[0] = _gx;
-                        gyro[1] = _gy;
-                        gyro[2] = _gz;
-
                         return true;
 
-                    } // if (_imu.checkNewAccelGyroData())
-
-                } // if gotNewData
+                    } 
+                } 
 
                 return false;
-            }
-
-            virtual void adjustImu(float & a1, float & a2, float & g1, float & g2) override
-            {
-                a1 = -_ax;
-                a2 =  _ay;
-                g1 =  _gx;
-                g2 =  _gy;
             }
 
         public:
