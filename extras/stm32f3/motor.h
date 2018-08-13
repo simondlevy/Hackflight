@@ -1,5 +1,5 @@
 /*
-   motor.h : Support for servos and brushed and brushless motors on STM32F* boards
+   motor.h : Support for servos and brushed and brushless motors on STM32F boards
 
    This file is part of Hackflight.
 

@@ -38,7 +38,8 @@ class F3Board : public hf::SoftwareQuaternionBoard  {
 
     void * _imu;
 
-    protected:
+    //protected:
+    public:
 
     virtual void adjustImu(float & a1, float & a2, float & g1, float & g2) override;
 

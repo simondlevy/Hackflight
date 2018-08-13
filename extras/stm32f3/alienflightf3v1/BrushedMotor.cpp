@@ -1,7 +1,7 @@
 /*
-   alienflightf3.cpp Board class implementation for F3Board
+  BrushedMotor
 
-   Copyright (c) 2018 Simon D. Levy
+  Runs a brushed motor for one second.
 
    This file is part of Hackflight.
 
@@ -14,30 +14,49 @@
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
+
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
-#include <f3_board.h>
 #include <motor.h>
+#include <f3_board.h>
 
+BrushedMotor motor;
 
-void F3Board::writeMotor(uint8_t index, float value)
-{
-    (void)index;
-    (void)value;
+static uint16_t value;
+static int16_t  direction;
+
+static F3Board * board;
+
+extern "C" {
+
+void setup() {                
+
+    board = new F3Board();
+
+    // Valid pins for ALIENFLIGHTF3 are 0, 8, 14, 15
+    motor.attach(14);
+
+    board->delaySeconds(0.1);
+
+    value = 1100;
+    direction = +1;
 }
 
-void F3Board::motorInit(void)
-{
+void loop() {
+
+    motor.writeMicroseconds(value);
+
+    value += direction;
+
+    if (value == 1200)
+        direction = -1;
+
+    if (value == 1100)
+        direction = +1;
+
+    board->delaySeconds(.01);
 }
 
-void F3Board::adjustImu(float & a1, float & a2, float & g1, float & g2)
-{
-    a1 =  _ay;
-    a2 =  _ax,
-    g1 = -_gy;
-    g2 = -_gx;
 }
-
-
