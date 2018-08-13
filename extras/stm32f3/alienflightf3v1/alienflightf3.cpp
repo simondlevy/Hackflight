@@ -21,6 +21,48 @@
 #include <f3_board.h>
 #include <motor.h>
 #include <debug.hpp>
+#include <MPU6050.h>
+#include <Wire.h>
+
+void F3Board::imuInit(void)
+{
+    Wire.begin(2);
+
+    MPU6050 * imu = new MPU6050(AFS_2G, GFS_250DPS);
+
+    switch (imu->begin()) {
+
+        case MPU_ERROR_ID:
+            error("Bad device ID");
+            break;
+        case MPU_ERROR_SELFTEST:
+            error("Failed self-test");
+            break;
+        default:
+            break;
+    }
+ 
+    _imu = imu;
+}
+
+bool F3Board::imuRead(void)
+{
+    MPU6050 * imu = (MPU6050 *)_imu;
+
+    if (imu->checkNewData()) {  
+
+        imu->readAccelerometer(_ay, _ax, _az);
+
+        imu->readGyrometer(_gy, _gx, _gz);
+
+        _gx = -_gx;
+
+        return true;
+
+    }  
+
+    return false;
+}
 
 static BrushedMotor * motors[4];
 
@@ -36,12 +78,4 @@ void F3Board::motorInit(void)
     motors[1] = new BrushedMotor(14);
     motors[2] = new BrushedMotor(8);
     motors[3] = new BrushedMotor(0);
-}
-
-void F3Board::adjustImu(float & a1, float & a2, float & g1, float & g2)
-{
-    a1 =  _ay;
-    a2 =  _ax,
-    g1 =  _gy;
-    g2 = -_gx;
 }

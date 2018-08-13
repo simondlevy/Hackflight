@@ -41,9 +41,7 @@ class F3Board : public hf::SoftwareQuaternionBoard  {
     //protected:
     public:
 
-    virtual void adjustImu(float & a1, float & a2, float & g1, float & g2) override;
-
-    virtual bool  getGyrometer(float gyroRates[3]) override;
+    virtual bool imuRead(void);
 
     virtual void  writeMotor(uint8_t index, float value) override;
 
@@ -62,8 +60,6 @@ class F3Board : public hf::SoftwareQuaternionBoard  {
     virtual uint8_t serialReadByte(void) override;
 
     virtual void    serialWriteByte(uint8_t c) override;
-
-    float radians(float degrees);
 
     public:
 
