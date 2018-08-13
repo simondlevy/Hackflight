@@ -67,8 +67,6 @@ namespace hf {
                 // Read acceleromter Gs, gyrometer degrees/sec
                 if (imuRead()) {
 
-                    Debug::printf("%d\n", (int)_gy);
-
         	    // Convert gyrometer values from degrees/sec to radians/sec
         	    _gx = deg2rad(_gx);
         	    _gy = deg2rad(_gy);
@@ -93,18 +91,14 @@ namespace hf {
                 if (_quatCycleCount == 0) {
 
                     // Set integration time by time elapsed since last filter update
-                    //static float _time;
-                    //float time = getTime();
-                    //float deltat = time - _time;
-                    //_time = time;
-
-                    // Adjust the IMU readings for board-particular rotation
-                    //float a1=0, a2=0, g1=0, g2=0;
-                    //adjustImu(a1, a2, g1, g2);
+                    static float _time;
+                    float time = getTime();
+                    float deltat = time - _time;
+                    _time = time;
 
                     // Run the quaternion on the IMU values acquired in getGyrometer()
-                    //_quaternionFilter.update(a1, a2, _az, g1, g2, _gz, deltat); 
-
+                    _quaternionFilter.update(-_ax, _ay, _az, _gx, -_gy, -_gz, deltat);
+ 
                     // Copy the quaternion back out
                     quat[0] = _quaternionFilter.q1;
                     quat[1] = _quaternionFilter.q2;
