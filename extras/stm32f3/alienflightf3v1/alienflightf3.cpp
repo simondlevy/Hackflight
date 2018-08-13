@@ -29,8 +29,6 @@ void F3Board::writeMotor(uint8_t index, float value)
     (void)index;
 
     motor->writeMicroseconds((uint16_t)(1000*(value+1)));
-
-    hf::Debug::printf("%d\n", (int)(100*value));
 }
 
 void F3Board::motorInit(void)
