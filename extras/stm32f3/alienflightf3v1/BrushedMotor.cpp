@@ -22,7 +22,7 @@
 #include <motor.h>
 #include <f3_board.h>
 
-BrushedMotor motor;
+BrushedMotor * motor;
 
 static uint16_t value;
 static int16_t  direction;
@@ -33,10 +33,12 @@ extern "C" {
 
 void setup() {                
 
+    motor = new BrushedMotor();
+
     board = new F3Board();
 
     // Valid pins for ALIENFLIGHTF3 are 0, 8, 14, 15
-    motor.attach(14);
+    motor->attach(14);
 
     board->delaySeconds(0.1);
 
@@ -46,7 +48,7 @@ void setup() {
 
 void loop() {
 
-    motor.writeMicroseconds(value);
+    motor->writeMicroseconds(value);
 
     value += direction;
 
