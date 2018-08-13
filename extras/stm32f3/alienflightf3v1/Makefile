@@ -22,8 +22,8 @@
 ARDUINO_DIR = $(HOME)/Documents/Arduino/libraries
 
 # Change this to whatever project name you want
-#PROJECT = alienflightf3v1_dsmx
-PROJECT = BrushedMotor
+PROJECT = alienflightf3v1_dsmx
+#PROJECT = BrushedMotor
 
 ###############################################################################
 

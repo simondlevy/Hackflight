@@ -115,9 +115,13 @@ namespace hf {
                     motors[i] = Filter::constrainMinMax(motors[i], 0, 1);
                 }
 
+                Debug::printf("%d\n", nmotors);
+
                 for (uint8_t i = 0; i < nmotors; i++) {
+                    Debug::printf("%d %d\t", i, (int)(100*motors[i]));
                     writeMotor(i, motors[i]);
                 }
+
             }
 
             // This is how we can spin the motors from the GCS

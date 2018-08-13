@@ -29,8 +29,6 @@ constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 static hf::Hackflight h;
 
-hf::MixerQuadX mixer;
-
 extern "C" {
 
 void setup() {
@@ -50,7 +48,7 @@ void setup() {
             0.f);   // yaw trim
 
     // Initialize Hackflight firmware
-    h.init(new F3Board(), rc, &mixer, stabilizer);
+    h.init(new F3Board(), rc, new hf::MixerQuadX(), stabilizer);
 }
 
 void loop() {
