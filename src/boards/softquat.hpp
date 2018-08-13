@@ -30,8 +30,8 @@ namespace hf {
         private:
 
             // Global constants for 6 DoF quaternion filter
-            const float GYRO_MEAS_ERROR = M_PI * (40.0f / 180.0f); // gyroscope measurement error in rads/s (start at 40 deg/s)
-            const float GYRO_MEAS_DRIFT = M_PI * (0.0f  / 180.0f); // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
+            const float GYRO_MEAS_ERROR = M_PI * (40.0f / 180.0f);
+            const float GYRO_MEAS_DRIFT = M_PI * (0.0f  / 180.0f);
             const float BETA = sqrtf(3.0f / 4.0f) * GYRO_MEAS_ERROR; 
             const float ZETA = sqrt(3.0f / 4.0f) * GYRO_MEAS_DRIFT;  
 
