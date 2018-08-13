@@ -22,19 +22,20 @@
 #include <motor.h>
 #include <debug.hpp>
 
-BrushedMotor * motor;
+static BrushedMotor * motors[4];
 
 void F3Board::writeMotor(uint8_t index, float value)
 {
-    (void)index;
-
-    motor->writeMicroseconds((uint16_t)(1000*(value+1)));
+    motors[index]->writeMicroseconds((uint16_t)(1000*(value+1)));
 }
 
 void F3Board::motorInit(void)
 {
     // Valid pins for ALIENFLIGHTF3 are 0, 8, 14, 15
-    motor = new BrushedMotor(14);
+    motors[0] = new BrushedMotor(15);
+    motors[1] = new BrushedMotor(14);
+    motors[2] = new BrushedMotor(8);
+    motors[3] = new BrushedMotor(0);
 }
 
 void F3Board::adjustImu(float & a1, float & a2, float & g1, float & g2)
@@ -44,5 +45,3 @@ void F3Board::adjustImu(float & a1, float & a2, float & g1, float & g2)
     g1 = -_gy;
     g2 = -_gx;
 }
-
-
