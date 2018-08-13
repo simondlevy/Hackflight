@@ -133,6 +133,9 @@ namespace hf {
                         _imu.readAccelerometer(_ax, _ay, _az);
                         _imu.readGyrometer(_gx, _gy, _gz);
 
+                        _gy = -_gy;
+                        _gz = -_gz;
+
                         // Convert gyrometer values from degrees/sec to radians/sec
                         _gx = radians(_gx);
                         _gy = radians(_gy);
@@ -157,7 +160,7 @@ namespace hf {
                 a1 = -_ax;
                 a2 =  _ay;
                 g1 =  _gx;
-                g2 = -_gy;
+                g2 =  _gy;
             }
 
         public:

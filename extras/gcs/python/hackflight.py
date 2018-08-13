@@ -20,8 +20,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-BAUD = 115200
-
 DISPLAY_WIDTH  = 800
 DISPLAY_HEIGHT = 600
 
@@ -34,7 +32,7 @@ BOARD_REPLY_DELAY_MSEC = 1000
 
 USB_UPDATE_MSEC = 200
 
-from serial import Serial
+from comms import Comms
 from serial.tools.list_ports import comports
 from threading import Thread
 import os
@@ -493,56 +491,6 @@ class GCS:
 
         return
         #self.messages.setCurrentMessage('BatteryStatus: %3.3f volts, %3.3f amps' % (volts, amps))
-
-# Comms class for communiating with flight controller ====================================================
-
-class Comms:
-
-    def __init__(self, gcs):
-
-        self.gcs = gcs
-
-        portname = gcs.portsvar.get()
-
-        baud = BAUD
-
-        self.port = Serial(portname, baud)
-
-        self.thread = Thread(target=self.run)
-        self.thread.setDaemon(True)
-
-        self.running = False
-
-    def send_message(self, serializer, contents):
-
-        self.port.write(serializer(*contents))
-
-    def send_request(self, request):
-
-        self.port.write(request)
-
-    def run(self):
-
-        while self.running:
-            try:
-                byte = self.port.read(1)
-                self.gcs.parser.parse(byte)
-            except:
-                None
-
-    def start(self):
-
-        self.running = True
-
-        self.thread.start()
-
-        self.gcs.newconnect = True
-
-    def stop(self):
-
-        self.running = False
-
-        self.port.close()
 
 # Main ==============================================================================================================
 

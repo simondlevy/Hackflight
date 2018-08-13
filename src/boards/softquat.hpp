@@ -73,7 +73,7 @@ namespace hf {
                     adjustImu(a1, a2, g1, g2);
 
                     // Run the quaternion on the IMU values acquired in getGyrometer()
-                    _quaternionFilter.update(a1, a2, _az, g1, g2, -_gz, deltat); 
+                    _quaternionFilter.update(a1, a2, _az, g1, g2, _gz, deltat); 
 
                     // Copy the quaternion back out
                     quat[0] = _quaternionFilter.q1;
