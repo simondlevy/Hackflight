@@ -28,7 +28,7 @@ extern "C" {
 
     F3Board::F3Board(void)
     {
-        //usbInit();
+        usbInit();
 
         imuInit();
 

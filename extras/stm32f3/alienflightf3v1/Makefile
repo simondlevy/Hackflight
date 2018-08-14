@@ -222,7 +222,7 @@ TARGET_BIN	 = obj/$(PROJECT).bin
 TARGET_HEX	 = $(BIN_DIR)/$(PROJECT).hex
 TARGET_ELF	 = $(OBJECT_DIR)/$(PROJECT).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $($(PROJECT)_CSRC)))) \
-			   $(OBJECT_DIR)/$(PROJECT)/main.o \
+			   $(OBJECT_DIR)/$(PROJECT)/f3_main.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3_wire.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3_motor.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3_receiver_dsmx.o \
@@ -280,8 +280,8 @@ $(OBJECT_DIR)/$(PROJECT)/%.o: %.S
 	@echo %% $(notdir $<)
 	@$(CC) -c -o $@ $(ASFLAGS) $<
 
-$(OBJECT_DIR)/$(PROJECT)/main.o: ../main.cpp 
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/main.o $(CFLAGS) ../main.cpp
+$(OBJECT_DIR)/$(PROJECT)/f3_main.o: ../f3_main.cpp 
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_main.o $(CFLAGS) ../f3_main.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/f3_board.o: ../f3_board.cpp ../f3_board.h \
 	    $(HACKFLIGHT_DIR)/board.hpp $(HACKFLIGHT_DIR)/boards/softquat.hpp $(HACKFLIGHT_DIR)/sensors/*.hpp

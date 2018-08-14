@@ -1,5 +1,5 @@
 /*
-main.cpp : Entry point for STM32F3 boards
+f3_main.cpp : Entry point for STM32F3 boards
 
 Copyright (C) 2018 Simon D. Levy 
 
@@ -64,8 +64,6 @@ int main(void) {
     systemInit();
 
     timerInit();  // timer must be initialized before any channel is allocated
-
-    usbInit();
 
     dmaInit();
 

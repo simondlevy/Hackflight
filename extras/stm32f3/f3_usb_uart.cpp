@@ -34,7 +34,7 @@ extern "C" {
 
     static serialPort_t * serial0;
 
-    void /*F3Board::*/usbInit(void)
+    void F3Board::usbInit(void)
     {
         serial0 = (serialPort_t *)uartOpen(USART1, NULL, 115200, MODE_RXTX, SERIAL_NOT_INVERTED);;
     }
