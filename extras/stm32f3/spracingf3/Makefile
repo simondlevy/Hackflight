@@ -22,7 +22,7 @@
 ARDUINO_DIR = $(HOME)/Documents/Arduino/libraries
 
 # Change this to whatever project name you want
-PROJECT = alienflightf3v1_dsmx
+PROJECT = spracingf3_dsmx
 
 ###############################################################################
 
@@ -42,7 +42,7 @@ CPI2C_DIR = $(ARDUINO_DIR)/CrossPlatformI2C/src
 DEBUG ?=
 
 # Serial port/Device for flashing
-SERIAL_DEVICE	?= /dev/ttyACM0
+SERIAL_DEVICE	?= /dev/ttyUSB0
 
 # Flash size (KB).  Some low-end chips actually have more flash than advertised, use this to override.
 FLASH_SIZE ?= 256
@@ -129,7 +129,6 @@ VCP_SRC = \
 		   $(VCP_DIR)/usb_istr.c \
 		   $(VCP_DIR)/usb_prop.c \
 		   $(VCP_DIR)/usb_pwr.c \
-		   $(F3_DIR)/serial_usb_vcp.c \
 		   $(F3_DIR)/usb_io.c
 
 STM32F30x_COMMON_SRC = \
@@ -227,8 +226,8 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $
 			   $(OBJECT_DIR)/$(PROJECT)/f3_motor.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3_receiver_dsmx.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3_board.o \
-			   $(OBJECT_DIR)/$(PROJECT)/alienflightf3.o \
-			   $(OBJECT_DIR)/$(PROJECT)/f3_usb_vcp.o \
+			   $(OBJECT_DIR)/$(PROJECT)/spracingf3.o \
+			   $(OBJECT_DIR)/$(PROJECT)/f3_usb_uart.o \
 			   $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o \
 			   $(OBJECT_DIR)/$(PROJECT)/MPU6050.o \
 			   $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o \
@@ -298,11 +297,11 @@ $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTR
 $(OBJECT_DIR)/$(PROJECT)/f3_receiver_dsmx.o: ../f3_receiver_dsmx.cpp 
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_receiver_dsmx.o $(CFLAGS) ../f3_receiver_dsmx.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/alienflightf3.o: alienflightf3.cpp ../f3_board.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/alienflightf3.o $(CFLAGS) alienflightf3.cpp
+$(OBJECT_DIR)/$(PROJECT)/spracingf3.o: spracingf3.cpp ../f3_board.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/spracingf3.o $(CFLAGS) spracingf3.cpp
 
-$(OBJECT_DIR)/$(PROJECT)/f3_usb_vcp.o: ../f3_usb_vcp.cpp ../f3_board.h
-	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_usb_vcp.o $(CFLAGS) ../f3_usb_vcp.cpp
+$(OBJECT_DIR)/$(PROJECT)/f3_usb_uart.o: ../f3_usb_uart.cpp ../f3_board.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_usb_uart.o $(CFLAGS) ../f3_usb_uart.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o: $(CPI2C_DIR)/ArduinoI2C.cpp $(CPI2C_DIR)/CrossPlatformI2C.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o $(CFLAGS) $(CPI2C_DIR)/ArduinoI2C.cpp
@@ -316,16 +315,19 @@ $(OBJECT_DIR)/$(PROJECT).o: ./$(PROJECT).cpp $(HACKFLIGHT_DIR)/*.hpp
 clean:
 	rm -rf obj
 
-flash_$(PROJECT): $(TARGET_BIN)
+flash_$(PROJECT): $(TARGET_HEX)
+	stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
 	echo -n 'R' >$(SERIAL_DEVICE)
 	sleep 2
-	dfu-util -a 0 -s 0x08000000:leave -D $(TARGET_BIN)
+	stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
 
 ## flash       : flash firmware (.hex) onto flight controller
 flash: flash_$(PROJECT)
 
-unbrick_$(PROJECT): $(TARGET_BIN)
-	dfu-util -a 0 -s 0x08000000:leave -D $(TARGET_BIN)
+unbrick_$(PROJECT): $(TARGET_HEX)
+	stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
+	stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
+
 
 ## unbrick     : unbrick flight controller
 unbrick: unbrick_$(PROJECT)
