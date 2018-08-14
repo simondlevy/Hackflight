@@ -3,30 +3,29 @@
 <br><i>Hackflight logo by MC Greenleaf</i>
 </p>
 
-Hackflight is simple, platform-independent, header-only C++ firmware for multirotor
-[flight controllers](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) 
-and [simulators](https://github.com/simondlevy/HackflightSim).  It
-is geared toward people like me who want to tinker with flight-control
-firmware, and use it to teach students about ideas like inertial measurement
-and PID tuning.  <b>If you are in the 99% percent of users who just want to get
-your vehicle flying without getting into firmware hacking, I recommend
+Hackflight is simple, platform-independent, header-only C++ firmware for
+multirotor flight controllers and simulators.  It is geared toward people like
+me who want to tinker with flight-control firmware, and use it to teach
+students about ideas like inertial measurement and PID tuning.  <b>If you are
+in the 99% percent of users who just want to get your vehicle flying without
+getting into firmware hacking, I recommend
 [Cleanflight](http://cleanflight.com/)</b> (great for getting started when
-you're on a budget) <b>or the
-[Ardupilot](http://copter.ardupilot.org) system</b> (for
-sophisticated mission planning with waypoint navigation and the like).  In
-addition to big user communities and loads of great features, these platforms
-have safety mechanisms that Hackflight lacks, which will help avoid injury to
-you and damage to your vehicle.
+you're on a budget) <b>or the [Ardupilot](http://copter.ardupilot.org)
+system</b> (for sophisticated mission planning with waypoint navigation and the
+like).  In addition to big user communities and loads of great features, these
+platforms have safety mechanisms that Hackflight lacks, which will help avoid
+injury to you and damage to your vehicle.
 
-Although Hackflight is hardware/platform-independent, 
-the hardware focus of the project has shifted to the Arduino-compatible, STM32L4-based 
-boards from [Tlera Corp](https://www.tindie.com/stores/TleraCorp/): the
-[Ladybug FC](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/)
-brushed-motor board and the (currently in development) brushless-motor 
-[ButterflyFC](https://github.com/simondlevy/Hackflight/wiki/B.01-Bill-of-Materials).
-In addition to offering the full complement of i/o signals (UART, I<sup>2</sup>C,
-SPI, digital, analog), these boards have hardware support for floating-point
-operations, allowing us to write simpler code based on standard units:
+Hackflight is current working on the following platforms:
+
+* [Ladybug Flight Controller](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/)from Tlera Corp.
+
+* [Alienflight F3 Brushed](http://www.readytoflyquads.com/alien-f3-brushed-flight-controller) 
+controller from ReadyToFlyQuads
+
+* [HackflightSim](https://github.com/simondlevy/HackflightSim) flight simulator based on UnrealEngine4
+
+By supporting floating-point operations, these platforms allow us to write simpler code based on standard units:
 
 * Distances in meters
 * Time in seconds
