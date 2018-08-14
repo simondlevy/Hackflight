@@ -30,13 +30,12 @@ extern "C" {
 #include "serial.h"
 #include "system.h"
 #include "serial_uart.h"
-#include "serial_usb_vcp.h"
 
     static serialPort_t * serial0;
 
     void F3Board::usbInit(void)
     {
-        serial0 = (serialPort_t *)uartOpen(USART1, NULL, 115200, MODE_RXTX, SERIAL_NOT_INVERTED);;
+        serial0 = uartOpen(USART1, NULL, 115200, MODE_RXTX, SERIAL_NOT_INVERTED);
     }
 
     uint8_t F3Board::serialAvailableBytes(void)
@@ -52,7 +51,6 @@ extern "C" {
     void F3Board::serialWriteByte(uint8_t c)
     {
         serialWrite(serial0, c);
-        while (!isSerialTransmitBufferEmpty(serial0));
     }
 
     void F3Board::outchar(char c)

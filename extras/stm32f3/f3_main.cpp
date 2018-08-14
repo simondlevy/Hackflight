@@ -52,8 +52,6 @@ int main(void) {
     void setup(void);
     void loop(void);
 
-    void usbInit(void);
-
     void SetSysClock(void);
 
     // start fpu
