@@ -43,6 +43,7 @@ DEBUG ?=
 
 # Serial port/Device for flashing
 SERIAL_DEVICE	?= /dev/ttyUSB0
+BAUD            ?= 115200
 
 # Flash size (KB).  Some low-end chips actually have more flash than advertised, use this to override.
 FLASH_SIZE ?= 256
@@ -336,4 +337,4 @@ unbrick: unbrick_$(PROJECT)
 $(TARGET_OBJS) : Makefile
 
 listen:
-	miniterm.py $(SERIAL_DEVICE)
+	miniterm.py $(SERIAL_DEVICE) $(BAUD)

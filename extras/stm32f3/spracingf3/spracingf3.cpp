@@ -51,8 +51,13 @@ bool F3Board::imuRead(void)
 
     if (imu->checkNewData()) {  
 
-        imu->readAccelerometer(_ax, _ay, _az);
-        imu->readGyrometer(_gx, _gy, _gz);
+	// Note reversed X/Y order because of IMU rotation
+        imu->readAccelerometer(_ay, _ax, _az);
+        imu->readGyrometer(_gy, _gx, _gz);
+
+        // Negate for same reason
+        _ax = -_ax;
+        _gx = -_gx;
 
         return true;
 

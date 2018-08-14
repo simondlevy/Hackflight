@@ -67,6 +67,8 @@ namespace hf {
                 // Read acceleromter Gs, gyrometer degrees/sec
                 if (imuRead()) {
 
+                    Debug::printf("%d\n", (int)_gz);
+
         	    // Convert gyrometer values from degrees/sec to radians/sec
         	    _gx = deg2rad(_gx);
         	    _gy = deg2rad(_gy);
