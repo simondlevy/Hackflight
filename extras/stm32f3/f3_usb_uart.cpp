@@ -52,7 +52,7 @@ extern "C" {
     void F3Board::serialWriteByte(uint8_t c)
     {
         serialWrite(serial0, c);
-        //while (!isSerialTransmitBufferEmpty(serial0));
+        while (!isSerialTransmitBufferEmpty(serial0));
     }
 
     void F3Board::outchar(char c)
