@@ -78,7 +78,7 @@ extern "C" {
 
     USART_TypeDef * getDsmUart()
     {
-        return USART2;
+        return USART3;
     }
 
 } // extern "C"
