@@ -226,6 +226,7 @@ TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(PROJECT)/,$(basename $
 			   $(OBJECT_DIR)/$(PROJECT)/f3_wire.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3_motor.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3_receiver_dsmx.o \
+			   $(OBJECT_DIR)/$(PROJECT)/f3_imu_mpu6050.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3_board.o \
 			   $(OBJECT_DIR)/$(PROJECT)/spracingf3.o \
 			   $(OBJECT_DIR)/$(PROJECT)/f3_usb_uart.o \
@@ -297,6 +298,9 @@ $(OBJECT_DIR)/$(PROJECT)/SpektrumDSM.o: $(SPEKTRUM_DIR)/SpektrumDSM.cpp $(SPEKTR
 
 $(OBJECT_DIR)/$(PROJECT)/f3_receiver_dsmx.o: ../f3_receiver_dsmx.cpp 
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_receiver_dsmx.o $(CFLAGS) ../f3_receiver_dsmx.cpp
+
+$(OBJECT_DIR)/$(PROJECT)/f3_imu_mpu6050.o: ../f3_imu_mpu6050.cpp ../f3_board.h
+	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_imu_mpu6050.o $(CFLAGS) ../f3_imu_mpu6050.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/spracingf3.o: spracingf3.cpp ../f3_board.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/spracingf3.o $(CFLAGS) spracingf3.cpp

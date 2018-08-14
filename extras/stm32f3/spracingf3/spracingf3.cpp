@@ -21,49 +21,10 @@
 #include <f3_board.h>
 #include <motor.h>
 #include <debug.hpp>
-#include <MPU6050.h>
-#include <Wire.h>
 
-void F3Board::imuInit(void)
+uint8_t F3Board::getI2cBus(void)
 {
-    Wire.begin(1);
-
-    MPU6050 * imu = new MPU6050(AFS_2G, GFS_250DPS);
-
-    switch (imu->begin()) {
-
-        case MPU_ERROR_ID:
-            error("Bad device ID");
-            break;
-        case MPU_ERROR_SELFTEST:
-            error("Failed self-test");
-            break;
-        default:
-            break;
-    }
- 
-    _imu = imu;
-}
-
-bool F3Board::imuRead(void)
-{
-    MPU6050 * imu = (MPU6050 *)_imu;
-
-    if (imu->checkNewData()) {  
-
-	// Note reversed X/Y order because of IMU rotation
-        imu->readAccelerometer(_ay, _ax, _az);
-        imu->readGyrometer(_gy, _gx, _gz);
-
-        // Negate for same reason
-        _ax = -_ax;
-        _gx = -_gx;
-
-        return true;
-
-    }  
-
-    return false;
+    return 1;
 }
 
 void F3Board::writeMotor(uint8_t index, float value)

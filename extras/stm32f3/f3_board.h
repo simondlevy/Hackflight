@@ -32,14 +32,15 @@ class F3Board : public hf::SoftwareQuaternionBoard  {
 
     void imuInit(void);
 
+    uint8_t getI2cBus(void);
+
     void usbInit(void);
 
     void motorInit(void);
 
     void * _imu;
 
-    //protected:
-    public:
+    protected:
 
     virtual bool imuRead(void);
 
