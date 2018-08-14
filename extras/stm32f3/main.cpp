@@ -30,7 +30,7 @@ extern "C" {
 #include "serial_uart.h"
 #include "exti.h"
 
-#
+
 static void ledInit(void)
 {
     GPIO_TypeDef * gpio = LED0_GPIO;
@@ -49,8 +49,10 @@ static void ledInit(void)
 int main(void) {
 
     // Defined in each sketch
-    void setup();
-    void loop();
+    void setup(void);
+    void loop(void);
+
+    void usbInit(void);
 
     void SetSysClock(void);
 
@@ -62,6 +64,8 @@ int main(void) {
     systemInit();
 
     timerInit();  // timer must be initialized before any channel is allocated
+
+    usbInit();
 
     dmaInit();
 
