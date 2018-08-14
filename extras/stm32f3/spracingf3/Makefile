@@ -122,16 +122,6 @@ FC_COMMON_SRC = \
    	       $(F3_DIR)/exti.c \
 		   $(F3_DIR)/io.c \
 
-VCP_SRC = \
-		   $(VCP_DIR)/hw_config.c \
-		   $(VCP_DIR)/stm32_it.c \
-		   $(VCP_DIR)/usb_desc.c \
-		   $(VCP_DIR)/usb_endp.c \
-		   $(VCP_DIR)/usb_istr.c \
-		   $(VCP_DIR)/usb_prop.c \
-		   $(VCP_DIR)/usb_pwr.c \
-		   $(F3_DIR)/usb_io.c
-
 STM32F30x_COMMON_SRC = \
 		   $(F3_DIR)/startup_stm32f30x_md_gcc.S \
 		   $(F3_DIR)/system_stm32f30x_extras.c \
@@ -145,8 +135,7 @@ $(PROJECT)_CSRC = \
 		   $(F3_DIR)/timer_stm32f30x.c \
 		   $(STM32F30x_COMMON_SRC) \
 		   $(FC_COMMON_SRC) \
-		   $(SYSTEM_SRC) \
-		   $(VCP_SRC)
+		   $(SYSTEM_SRC)
 
 VPATH		:= $(VPATH):$(STDPERIPH_DIR)/src
 
