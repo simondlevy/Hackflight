@@ -1,5 +1,5 @@
 ##############################################################################
-#   Makefile for AlienflightF3V1 board
+#   Makefile for SPRacingF3 board
 #
 #   Copyright (c) 2018 Simon D. Levy
 #
