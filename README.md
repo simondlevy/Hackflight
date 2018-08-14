@@ -18,7 +18,7 @@ injury to you and damage to your vehicle.
 
 Hackflight is current working on the following platforms:
 
-* [Ladybug Flight Controller](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/)from Tlera Corp.
+* [Ladybug Flight Controller](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) from Tlera Corp.
 
 * [Alienflight F3 Brushed](http://www.readytoflyquads.com/alien-f3-brushed-flight-controller) 
 controller from ReadyToFlyQuads
