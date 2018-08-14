@@ -26,10 +26,11 @@
 
 void F3Board::imuInit(void)
 {
-    return;
+    MPU6050 * imu = new MPU6050(AFS_2G, GFS_250DPS);
+
     Wire.begin(getI2cBus());
 
-    MPU6050 * imu = new MPU6050(AFS_2G, GFS_250DPS);
+    delaySeconds(.01);
 
     switch (imu->begin()) {
 
@@ -48,7 +49,6 @@ void F3Board::imuInit(void)
 
 bool F3Board::imuRead(void)
 {
-    return false;
     MPU6050 * imu = (MPU6050 *)_imu;
 
     if (imu->checkNewData()) {  
