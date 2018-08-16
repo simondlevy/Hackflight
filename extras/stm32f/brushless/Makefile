@@ -50,8 +50,8 @@ FORKNAME      = cleanflight
 
 # Working directories
 ROOT            := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
-SRC_DIR         := $(ROOT)/src
-OBJECT_DIR      := $(ROOT)/obj
+SRC_DIR         := $(CF_DIR)/src/main
+OBJECT_DIR      := $(ROOT)/obj/main
 BIN_DIR         := $(ROOT)/obj
 LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
@@ -428,7 +428,7 @@ VPATH           := $(VPATH):$(TARGET_DIR)
 
 COMMON_SRC = \
             $(TARGET_DIR_SRC) \
-            main.c \
+            ./main.c \
             drivers/io.c \
             drivers/system.c \
             drivers/timer_common.c \
