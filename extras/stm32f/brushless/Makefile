@@ -56,17 +56,17 @@ BIN_DIR         := $(ROOT)/obj
 LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
 INCLUDE_DIRS    := $(SRC_DIR) \
-                   $(ROOT)/src/target
-LINKER_DIR      := $(ROOT)/src/target/link
+                   $(SRC_DIR)/target
+LINKER_DIR      := $(SRC_DIR)/target/link
 
 # configure some variables dependent upon what type of system this is
 
 OSFAMILY := linux
 LINUX := 1
 
-# configure some directories that are relative to wherever ROOT_DIR is located
+# configure some directories that are relative to wherever CF_DIR is located
 ifndef TOOLS_DIR
-TOOLS_DIR := $(ROOT)/tools
+TOOLS_DIR := $(CF_DIR)/tools
 endif
 BUILD_DIR := $(ROOT)/build
 DL_DIR    := $(ROOT)/downloads
@@ -82,13 +82,13 @@ HSE_VALUE       ?= 8000000
 FEATURES        =
 
 OFFICIAL_TARGETS  = ALIENFLIGHTF3 ALIENFLIGHTF4 ANYFCF7 BETAFLIGHTF3 BLUEJAYF4 FURYF4 REVO SIRINFPV SPARKY SPRACINGF3 SPRACINGF3EVO SPRACINGF3NEO SPRACINGF3MINI SPRACINGF4EVO SPRACINGF7DUAL STM32F3DISCOVERY
-ALT_TARGETS       = $(sort $(filter-out target, $(basename $(notdir $(wildcard $(ROOT)/src/target/*/*.mk)))))
-NOBUILD_TARGETS   = $(sort $(filter-out target, $(basename $(notdir $(wildcard $(ROOT)/src/target/*/*.nomk)))))
+ALT_TARGETS       = $(sort $(filter-out target, $(basename $(notdir $(wildcard $(SRC_DIR)/target/*/*.mk)))))
+NOBUILD_TARGETS   = $(sort $(filter-out target, $(basename $(notdir $(wildcard $(SRC_DIR)/target/*/*.nomk)))))
 OPBL_TARGETS      = $(filter %_OPBL, $(ALT_TARGETS))
 OSD_SLAVE_TARGETS = SPRACINGF3OSD
 
 ifeq ($(filter $(TARGET),$(NOBUILD_TARGETS)), $(TARGET))
-ALTERNATES    := $(sort $(filter-out target, $(basename $(notdir $(wildcard $(ROOT)/src/target/$(TARGET)/*.mk)))))
+ALTERNATES    := $(sort $(filter-out target, $(basename $(notdir $(wildcard $(SRC_DIR)/target/$(TARGET)/*.mk)))))
 $(error The target specified, $(TARGET), cannot be built. Use one of the ALT targets: $(ALTERNATES))
 endif
 
@@ -220,8 +220,8 @@ GROUP_4_TARGETS := \
 GROUP_OTHER_TARGETS := $(filter-out $(GROUP_1_TARGETS) $(GROUP_2_TARGETS) $(GROUP_3_TARGETS) $(GROUP_4_TARGETS), $(SUPPORTED_TARGETS))
 
 ifeq ($(filter $(TARGET),$(ALT_TARGETS)), $(TARGET))
-BASE_TARGET    := $(firstword $(subst /,, $(subst ./src/target/,, $(dir $(wildcard $(ROOT)/src/target/*/$(TARGET).mk)))))
-include $(ROOT)/src/target/$(BASE_TARGET)/$(TARGET).mk
+BASE_TARGET    := $(firstword $(subst /,, $(subst ./src/target/,, $(dir $(wildcard $(SRC_DIR)/target/*/$(TARGET).mk)))))
+include $(SRC_DIR)/target/$(BASE_TARGET)/$(TARGET).mk
 else
 BASE_TARGET    := $(TARGET)
 endif
@@ -271,9 +271,9 @@ TARGET_FLAGS  	:= $(TARGET_FLAGS) -D$(TARGET_MCU)
 
 REVISION := $(shell git log -1 --format="%h")
 
-FC_VER_MAJOR := $(shell grep " FC_VERSION_MAJOR" src/build/version.h | awk '{print $$3}' )
-FC_VER_MINOR := $(shell grep " FC_VERSION_MINOR" src/build/version.h | awk '{print $$3}' )
-FC_VER_PATCH := $(shell grep " FC_VERSION_PATCH" src/build/version.h | awk '{print $$3}' )
+FC_VER_MAJOR := $(shell grep " FC_VERSION_MAJOR" $(SRC_DIR)/build/version.h | awk '{print $$3}' )
+FC_VER_MINOR := $(shell grep " FC_VERSION_MINOR" $(SRC_DIR)/build/version.h | awk '{print $$3}' )
+FC_VER_PATCH := $(shell grep " FC_VERSION_PATCH" $(SRC_DIR)/build/version.h | awk '{print $$3}' )
 
 FC_VER := $(FC_VER_MAJOR).$(FC_VER_MINOR).$(FC_VER_PATCH)
 
@@ -308,8 +308,8 @@ OPTIMISE_SIZE         := -Os
 LTO_FLAGS             := $(OPTIMISATION_BASE) $(OPTIMISE_SPEED)
 endif
 
-VPATH 			:= $(VPATH):$(ROOT)/make/mcu
-VPATH 			:= $(VPATH):$(ROOT)/make
+VPATH 			:= $(VPATH):$(CF_DIR)/make/mcu
+VPATH 			:= $(VPATH):$(CF_DIR)/make
 
 # start specific includes
 ifeq ($(OPBL),yes)
@@ -345,7 +345,7 @@ INCLUDE_DIRS    := $(INCLUDE_DIRS) \
 ifneq ($(filter VCP, $(FEATURES)),)
 INCLUDE_DIRS    := $(INCLUDE_DIRS) \
                    $(USBFS_DIR)/inc \
-                   $(ROOT)/src/vcp
+                   $(SRC_DIR)/vcp
 
 VPATH           := $(VPATH):$(USBFS_DIR)/src
 
@@ -408,7 +408,7 @@ ifneq ($(HSE_VALUE),)
 DEVICE_FLAGS  := $(DEVICE_FLAGS) -DHSE_VALUE=$(HSE_VALUE)
 endif
 
-TARGET_DIR     = $(ROOT)/src/target/$(BASE_TARGET)
+TARGET_DIR     = $(SRC_DIR)/target/$(BASE_TARGET)
 TARGET_DIR_SRC = $(notdir $(wildcard $(TARGET_DIR)/*.c))
 
 ifeq ($(OPBL),yes)
