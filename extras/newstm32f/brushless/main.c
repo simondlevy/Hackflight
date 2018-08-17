@@ -7,9 +7,6 @@
 #include "drivers/system.h"
 #include "drivers/timer.h"
 #include "drivers/time.h"
-
-// ======================================================
-
 #include "drivers/pwm_output.h"
 
 #define BRUSHED_MOTORS_PWM_RATE 16000
