@@ -89,7 +89,8 @@ INCLUDE_DIRS := $(INCLUDE_DIRS) \
 		   $(CMSIS_DIR)/CM1/DeviceSupport/ST/STM32F30x
 
 # VCP support
-VCP_DIR := ../support/vcp
+#VCP_DIR := ../support/vcp
+VCP_DIR := $(CF_DIR)/src/main/vcp
 INCLUDE_DIRS := $(INCLUDE_DIRS) \
 		   $(USBFS_DIR)/inc \
 		   $(VCP_DIR) \

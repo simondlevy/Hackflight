@@ -32,7 +32,7 @@ F3_DIR = ../support
 
 CF_DIR = $(HOME)/Desktop/cleanflight
 
-SPRACINGF3_DIR = .
+ROOT_DIR = .
 
 SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM/src
 
@@ -52,12 +52,12 @@ FLASH_SIZE ?= 256
 
 # Working directories
 ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
-SRC_DIR		 = $(SPRACINGF3_DIR)
+SRC_DIR		 = $(ROOT_DIR)
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR	 = ../support/lib/CMSIS
-INCLUDE_DIRS = .. $(F3_DIR) $(SPRACINGF3_DIR) $(SRC_DIR) $(SRC_DIR)/target
+INCLUDE_DIRS = .. $(F3_DIR) $(ROOT_DIR) $(SRC_DIR) $(SRC_DIR)/target
 LINKER_DIR	 = $(F3_DIR)
 
 # Search path for sources
