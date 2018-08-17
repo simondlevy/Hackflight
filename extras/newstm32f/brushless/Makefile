@@ -104,120 +104,6 @@ UNSUPPORTED_TARGETS := \
 
 SUPPORTED_TARGETS := $(filter-out $(UNSUPPORTED_TARGETS), $(VALID_TARGETS))
 
-GROUP_1_TARGETS := \
-	AIORACERF3 \
-	AIR32 \
-	AIRBOTF4 \
-	AIRBOTF4SD \
-	AIRHEROF3 \
-	ALIENFLIGHTF3 \
-	ALIENFLIGHTF4 \
-	ALIENFLIGHTNGF7 \
-	ALIENWHOOPF4 \
-	ALIENWHOOPF7 \
-	ANYFCF7 \
-	BEEBRAIN_V2D \
-	BEEBRAIN_V2F \
-	BEEROTORF4 \
-	BETAFLIGHTF3 \
-	BETAFLIGHTF4 \
-	BLUEJAYF4 \
-	CHEBUZZF3 \
-	CLRACINGF4 \
-	COLIBRI \
-	COLIBRI_OPBL \
-	COLIBRI_RACE \
-
-GROUP_2_TARGETS := \
-	DOGE \
-	DYSF4PRO \
-	EACHIF3 \
-	ELLE0 \
-	F4BY \
-	FISHDRONEF4 \
-	FLIP32F3OSD \
-	FF_ACROWHOOPSP \
-	FF_FORTINIF4 \
-	FF_KOMBINI \
-	FF_PIKOBLX \
-	FF_PIKOF4 \
-	FF_RADIANCE \
-	FPVM_BETAFLIGHTF7 \
-	FRSKYF3 \
-	FRSKYF4 \
-	FURYF3 \
-	KAKUTEF4 \
-	KISSCC \
-	KIWIF4 \
-	LUX_RACE \
-	LUXV2_RACE \
-	FURYF3OSD \
-	FURYF4 \
-	FURYF4OSD \
-	FURYF7 \
-	IMPULSERCF3 \
-	IRCFUSIONF3 \
-	ISHAPEDF3 \
-	KAKUTEF4 \
-	KAKUTEF7 \
-	KISSCC \
-	KISSFC \
-	KIWIF4 \
-	KIWIF4V2 \
-	KROOZX
-
-GROUP_3_TARGETS := \
-	LUX_RACE \
-	LUXV2_RACE \
-	LUXF4OSD \
-	MLTEMPF4 \
-	MLTYPHF4 \
-	MOTOLAB \
-	MULTIFLITEPICO \
-	NERO \
-	NUCLEOF7 \
-	OMNIBUS \
-	OMNIBUSF4 \
-	OMNIBUSF4SD \
-	OMNIBUSF7 \
-	OMNIBUSF7V2 \
-	OMNINXT4 \
-	OMNINXT7 \
-	PLUMF4 \
-	PODIUMF4 \
-	RACEBASE \
-	RCEXPLORERF3 \
-	RG_SSD_F3 \
-	REVO \
-	REVO_OPBL \
-	REVOLT \
-	REVONANO \
-	RMDO
-
-GROUP_4_TARGETS := \
-	SINGULARITY \
-	SIRINFPV \
-	SOULF4 \
-	SPARKY \
-	SPARKY2 \
-	SPRACINGF3 \
-	SPRACINGF3EVO \
-	SPRACINGF3MINI \
-	SPRACINGF3MQ \
-	SPRACINGF3NEO \
-	SPRACINGF3OSD \
-	SPRACINGF4EVO \
-	SPRACINGF4NEO \
-	SPRACINGF7DUAL \
-	STM32F3DISCOVERY \
-	TINYBEEF3 \
-	TINYFISH \
-	VRRACE \
-	XRACERF4 \
-	X_RACERSPI \
-	ZCOREF3
-
-GROUP_OTHER_TARGETS := $(filter-out $(GROUP_1_TARGETS) $(GROUP_2_TARGETS) $(GROUP_3_TARGETS) $(GROUP_4_TARGETS), $(SUPPORTED_TARGETS))
 
 ifeq ($(filter $(TARGET),$(ALT_TARGETS)), $(TARGET))
 BASE_TARGET    := $(firstword $(subst /,, $(subst ./src/target/,, $(dir $(wildcard $(SRC_DIR)/target/*/$(TARGET).mk)))))
@@ -588,11 +474,8 @@ $(TARGET_BIN): $(TARGET_ELF)
 	$(V1) $(OBJCOPY) -O binary $< $@
 
 $(TARGET_ELF):  $(TARGET_OBJS)
-	@echo "Linking $(TARGET)" "$(STDOUT)"
-ifeq ($(TARGET_MCU),STM32F1)
-	@echo "Notice: STM32F1 based targets will be unsupported soon."
-endif
-	$(V1) $(CROSS_CC) -o $@ $^ $(LD_FLAGS)
+	@echo "Linking: $(TARGET)" "$(STDOUT)"
+	$(V1) $(CROSS_CXX) -o $@ $^ $(LD_FLAGS)
 	$(V1) $(SIZE) $(TARGET_ELF)
 
 # Compile
@@ -639,19 +522,6 @@ unsupported: $(UNSUPPORTED_TARGETS)
 official: $(OFFICIAL_TARGETS)
 
 ## targets-group-1   : build some targets
-targets-group-1: $(GROUP_1_TARGETS)
-
-## targets-group-2   : build some targets
-targets-group-2: $(GROUP_2_TARGETS)
-
-## targets-group-3   : build some targets
-targets-group-3: $(GROUP_3_TARGETS)
-
-## targets-group-3   : build some targets
-targets-group-4: $(GROUP_4_TARGETS)
-
-## targets-group-rest: build the rest of the targets (not listed in group 1, 2 or 3)
-targets-group-rest: $(GROUP_OTHER_TARGETS)
 
 $(VALID_TARGETS):
 	$(V0) @echo "Building $@" && \
@@ -752,25 +622,6 @@ help: Makefile make/tools.mk
 	@echo "Valid TARGET values are: $(VALID_TARGETS)"
 	@echo ""
 	@sed -n 's/^## //p' $?
-
-## targets           : print a list of all valid target platforms (for consumption by scripts)
-targets:
-	@echo "Valid targets:       $(VALID_TARGETS)"
-	@echo "Variant targets:     $(VARIANT_TARGETS)"
-	@echo "Supported targets:   $(SUPPORTED_TARGETS)"
-	@echo "Unsupported targets: $(UNSUPPORTED_TARGETS)"
-	@echo "Target:              $(TARGET)"
-	@echo "Base target:         $(BASE_TARGET)"
-	@echo "targets-group-1:     $(GROUP_1_TARGETS)"
-	@echo "targets-group-2:     $(GROUP_2_TARGETS)"
-	@echo "targets-group-3:     $(GROUP_3_TARGETS)"
-	@echo "targets-group-4:     $(GROUP_4_TARGETS)"
-	@echo "targets-group-rest:  $(GROUP_OTHER_TARGETS)"
-
-## test              : run the cleanflight test suite
-## junittest         : run the cleanflight test suite, producing Junit XML result files.
-test junittest:
-	$(V0) cd src/test && $(MAKE) $@
 
 
 check-target-independence:
