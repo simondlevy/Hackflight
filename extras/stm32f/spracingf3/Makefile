@@ -28,9 +28,9 @@ PROJECT = spracingf3_dsmx
 
 HF_DIR = ../../../src
 
-SUPPORT_DIR = ../support
-
 CF_DIR = $(HOME)/Desktop/cleanflight
+
+SUPPORT_DIR = ../support
 
 ROOT_DIR = .
 
@@ -56,7 +56,7 @@ SRC_DIR		 = $(ROOT_DIR)
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
 LIB_DIR         := $(CF_DIR)/lib/main
-CMSIS_DIR	 = ../support/lib/CMSIS
+CMSIS_DIR	 = $(SUPPORT_DIR)/lib/CMSIS
 INCLUDE_DIRS = .. $(SUPPORT_DIR) $(ROOT_DIR) $(SRC_DIR) $(SRC_DIR)/target
 LINKER_DIR	 = $(SUPPORT_DIR)
 
@@ -90,7 +90,7 @@ INCLUDE_DIRS := $(INCLUDE_DIRS) \
 		   $(CMSIS_DIR)/CM1/DeviceSupport/ST/STM32F30x
 
 # VCP support
-VCP_DIR := ../support/vcp
+VCP_DIR := $(SUPPORT_DIR)/vcp
 INCLUDE_DIRS := $(INCLUDE_DIRS) \
 		   $(USBFS_DIR)/inc \
 		   $(VCP_DIR) \
