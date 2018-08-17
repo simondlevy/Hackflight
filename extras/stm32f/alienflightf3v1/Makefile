@@ -30,6 +30,8 @@ HF_DIR = ../../../src
 
 F3_DIR = ../support
 
+CF_DIR = $(HOME)/Desktop/cleanflight
+
 ALIENFLIGHTF3_DIR = .
 
 SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM/src
@@ -65,7 +67,8 @@ CSOURCES        := $(shell find $(SRC_DIR) -name '*.c')
 
 # F3 TARGETS
 
-STDPERIPH_DIR	= ../support/lib/STM32F30x_StdPeriph_Driver
+#STDPERIPH_DIR	= ../support/lib/STM32F30x_StdPeriph_Driver
+STDPERIPH_DIR	= $(CF_DIR)//lib/main/STM32F3/Drivers/STM32F30x_StdPeriph_Driver
 
 STDPERIPH_SRC = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
 
