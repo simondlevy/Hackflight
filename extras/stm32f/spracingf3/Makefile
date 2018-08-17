@@ -55,6 +55,7 @@ ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
 SRC_DIR		 = $(SPRACINGF3_DIR)
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
+LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR	 = ../support/lib/CMSIS
 INCLUDE_DIRS = .. $(F3_DIR) $(SPRACINGF3_DIR) $(SRC_DIR) $(SRC_DIR)/target
 LINKER_DIR	 = $(F3_DIR)
@@ -68,7 +69,7 @@ CSOURCES        := $(shell find $(SRC_DIR) -name '*.c')
 
 # F3 TARGETS
 
-STDPERIPH_DIR	= $(CF_DIR)//lib/main/STM32F3/Drivers/STM32F30x_StdPeriph_Driver
+STDPERIPH_DIR	= $(LIB_DIR)/STM32F3/Drivers/STM32F30x_StdPeriph_Driver
 
 STDPERIPH_SRC = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
 
