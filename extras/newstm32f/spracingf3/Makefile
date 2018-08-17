@@ -23,6 +23,7 @@
 # The target to build
 TARGET    ?= SPRACINGF3
 
+# Where you put Cleanflight
 CF_DIR = $(HOME)/Desktop/cleanflight
 
 # Compile-time options
@@ -61,8 +62,8 @@ OBJECT_DIR      := $(ROOT)/obj/main
 BIN_DIR         := $(ROOT)/obj
 LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
-INCLUDE_DIRS    := $(SRC_DIR) \
-                   $(SRC_DIR)/target
+HF_DIR          := $(HOME)/Documents/Arduino/libraries/Hackflight/src
+INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR)
 LINKER_DIR      := $(SRC_DIR)/target/link
 
 # configure some variables dependent upon what type of system this is
