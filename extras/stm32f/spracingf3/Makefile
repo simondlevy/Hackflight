@@ -27,17 +27,11 @@ PROJECT = spracingf3_dsmx
 ###############################################################################
 
 HF_DIR = ../../../src
-
 CF_DIR = $(HOME)/Desktop/cleanflight
-
 SUPPORT_DIR = ../support
-
 ROOT_DIR = .
-
 SPEKTRUM_DIR = $(ARDUINO_DIR)/SpektrumDSM/src
-
 MPU6050_DIR = $(ARDUINO_DIR)/MPU6050/src
-
 CPI2C_DIR = $(ARDUINO_DIR)/CrossPlatformI2C/src
 
 # Debugger optons, must be empty or GDB
@@ -55,7 +49,7 @@ ROOT		 = $(dir $(lastword $(MAKEFILE_LIST)))
 SRC_DIR		 = $(ROOT_DIR)
 OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/obj
-LIB_DIR         := $(CF_DIR)/lib/main
+LIB_DIR      = $(CF_DIR)/lib/main
 CMSIS_DIR	 = $(SUPPORT_DIR)/lib/CMSIS
 INCLUDE_DIRS = .. $(SUPPORT_DIR) $(ROOT_DIR) $(SRC_DIR) $(SRC_DIR)/target
 LINKER_DIR	 = $(SUPPORT_DIR)
