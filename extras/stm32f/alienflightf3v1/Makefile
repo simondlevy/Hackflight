@@ -26,7 +26,7 @@ PROJECT = alienflightf3v1_dsmx
 
 ###############################################################################
 
-HACKFLIGHT_DIR = ../../../src
+HF_DIR = ../../../src
 
 F3_DIR = ../support
 
@@ -93,7 +93,7 @@ INCLUDE_DIRS := $(INCLUDE_DIRS) \
            $(MPU6050_DIR) \
            $(SPEKTRUM_DIR) \
            $(CPI2C_DIR) \
-		   $(HACKFLIGHT_DIR)
+		   $(HF_DIR)
 
 VPATH := $(VPATH):$(USBFS_DIR)/src
 
@@ -284,7 +284,7 @@ $(OBJECT_DIR)/$(PROJECT)/f3_main.o: ../f3_main.cpp
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_main.o $(CFLAGS) ../f3_main.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/f3_board.o: ../f3_board.cpp ../f3_board.h \
-	    $(HACKFLIGHT_DIR)/board.hpp $(HACKFLIGHT_DIR)/boards/softquat.hpp $(HACKFLIGHT_DIR)/sensors/*.hpp
+	    $(HF_DIR)/board.hpp $(HF_DIR)/boards/softquat.hpp $(HF_DIR)/sensors/*.hpp
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_board.o $(CFLAGS) ../f3_board.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/f3_wire.o: ../f3_wire.cpp ../Wire.h
@@ -314,7 +314,7 @@ $(OBJECT_DIR)/$(PROJECT)/ArduinoI2C.o: $(CPI2C_DIR)/ArduinoI2C.cpp $(CPI2C_DIR)/
 $(OBJECT_DIR)/$(PROJECT)/MPU6050.o: $(MPU6050_DIR)/MPU6050.cpp $(MPU6050_DIR)/MPU6050.h
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/MPU6050.o $(CFLAGS) $(MPU6050_DIR)/MPU6050.cpp
 
-$(OBJECT_DIR)/$(PROJECT).o: ./$(PROJECT).cpp $(HACKFLIGHT_DIR)/*.hpp
+$(OBJECT_DIR)/$(PROJECT).o: ./$(PROJECT).cpp $(HF_DIR)/*.hpp
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT).o $(CFLAGS) ./$(PROJECT).cpp
 
 clean:
@@ -339,3 +339,7 @@ $(TARGET_OBJS) : Makefile
 
 listen:
 	miniterm.py $(SERIAL_DEVICE)
+
+commit:
+	git commit -a -m="Cleanup"
+	git push
