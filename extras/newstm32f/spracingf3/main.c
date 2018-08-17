@@ -7,9 +7,6 @@
 #include "drivers/system.h"
 #include "drivers/timer.h"
 #include "drivers/time.h"
-
-// ======================================================
-
 #include "drivers/pwm_output.h"
 
 #define BRUSHED_MOTORS_PWM_RATE 16000
@@ -23,10 +20,11 @@ typedef enum {
 
 uint8_t hardwareMotorType = MOTOR_BRUSHLESS;
 
-static float motorval;
-
-void setup(void)
+int main(void)
 {
+    void setup(void);
+    void loop(void);
+
     systemInit();
 
     IOInitGlobal();
@@ -51,20 +49,6 @@ void setup(void)
     motorDevInit(&dev, idlePulse, 4);
 
     pwmEnableMotors();
-
-    motorval = .01;
-}
-
-void loop(void)
-{
-    pwmWriteMotor(0, motorval);
-    motorval += .01;
-    delay(10);
-}
-
-int main(void)
-{
-    void delay(unsigned long);
 
     setup();
 
