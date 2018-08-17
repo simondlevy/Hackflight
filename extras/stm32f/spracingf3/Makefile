@@ -62,7 +62,7 @@ LINKER_DIR	 = $(F3_DIR)
 
 # Search path for sources
 VPATH		:= $(SRC_DIR):$(SRC_DIR)/startup
-USBFS_DIR	= ../support/lib/STM32_USB-FS-Device_Driver
+USBFS_DIR	= $(LIB_DIR)/STM32_USB-FS-Device_Driver
 USBPERIPH_SRC = $(notdir $(wildcard $(USBFS_DIR)/src/*.c))
 
 CSOURCES        := $(shell find $(SRC_DIR) -name '*.c')
