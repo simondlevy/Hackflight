@@ -62,8 +62,6 @@ extern "C" {
         motorval = 0;
         motordir = +1;
 
-        board->writeMotor(0, motorval);
-
         board->delaySeconds(1.0);
     }
 
