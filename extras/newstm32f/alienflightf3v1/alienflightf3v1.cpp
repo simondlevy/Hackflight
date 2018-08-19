@@ -109,7 +109,7 @@ extern "C" {
 
     void AlienflightF3V1::writeMotor(uint8_t index, float value)
     {
-        pwmWriteMotor(index, MOTOR_MIN + value*(MOTOR_MAX-MOTOR_MIN));
+        //pwmWriteMotor(index, MOTOR_MIN + value*(MOTOR_MAX-MOTOR_MIN));
     }
 
     void AlienflightF3V1::delaySeconds(float sec)
