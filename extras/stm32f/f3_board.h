@@ -48,7 +48,7 @@ class F3Board : public hf::SoftwareQuaternionBoard  {
 
     virtual void delaySeconds(float sec) override;
 
-    virtual void ledSet(bool is_on) override;
+    virtual void setLed(bool is_on) override;
 
     virtual uint32_t getMicroseconds(void) override;
 

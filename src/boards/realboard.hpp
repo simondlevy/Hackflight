@@ -40,20 +40,20 @@ namespace hf {
 
             virtual uint32_t getMicroseconds(void) = 0;
             virtual void     delaySeconds(float time) = 0;
-            virtual void     ledSet(bool is_on) = 0;
+            virtual void     setLed(bool is_on) = 0;
 
             void init(void)
             {
                 // Flash LED
                 float pauseSeconds = LED_STARTUP_FLASH_SECONDS / LED_STARTUP_FLASH_COUNT;
-                ledSet(false);
+                setLed(false);
                 for (uint8_t i = 0; i < LED_STARTUP_FLASH_COUNT; i++) {
-                    ledSet(true);
+                    setLed(true);
                     delaySeconds(pauseSeconds);
-                    ledSet(false);
+                    setLed(false);
                     delaySeconds(pauseSeconds);
                 }
-                ledSet(false);
+                setLed(false);
 
                 _shouldflash = false;
             }
@@ -67,7 +67,7 @@ namespace hf {
             {
                 // Set LED to indicate armed
                 if (!_shouldflash) {
-                    ledSet(armed);
+                    setLed(armed);
                 }
             }
 
@@ -82,7 +82,7 @@ namespace hf {
 
                     if (time-_time > LED_SLOWFLASH_SECONDS) {
                         state = !state;
-                        ledSet(state);
+                        setLed(state);
                         _time = time;
                     }
                 }

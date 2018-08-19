@@ -42,7 +42,7 @@ extern "C" {
         delay(sec*1000);
     }
 
-    void F3Board::ledSet(bool is_on)
+    void F3Board::setLed(bool is_on)
     { 
         uint16_t gpio_pin = LED0_PIN;
 

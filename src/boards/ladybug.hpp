@@ -68,7 +68,7 @@ namespace hf {
                 delay((uint32_t)(1000*sec));
             }
 
-            void ledSet(bool is_on)
+            void setLed(bool is_on)
             { 
                 digitalWrite(_led_pin, is_on ? HIGH : LOW);
             }
