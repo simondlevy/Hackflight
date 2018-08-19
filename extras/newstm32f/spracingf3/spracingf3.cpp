@@ -102,6 +102,8 @@ extern "C" {
         motorDevInit(&dev, idlePulse, 4);
 
         pwmEnableMotors();
+
+        pwmWriteMotor(0, .01);
     }
 
     void SPRacingF3::writeMotor(uint8_t index, float value)
