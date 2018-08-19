@@ -38,11 +38,13 @@ void setup(void)
     uint16_t idlePulse = 1000; // 0 for brushed motor
 
     motorDevConfig_t dev;
+
     dev.motorPwmRate = BRUSHLESS_MOTORS_PWM_RATE;
     dev.motorPwmProtocol = PWM_TYPE_STANDARD;
     dev.motorPwmInversion = false;
     dev.useUnsyncedPwm = true;
     dev.useBurstDshot = false;
+
     dev.ioTags[0] = timerioTagGetByUsage(TIM_USE_MOTOR, 0);
     dev.ioTags[1] = timerioTagGetByUsage(TIM_USE_MOTOR, 1);
     dev.ioTags[2] = timerioTagGetByUsage(TIM_USE_MOTOR, 2);

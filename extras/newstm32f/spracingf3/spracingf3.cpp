@@ -31,6 +31,10 @@ typedef enum {
     MOTOR_BRUSHLESS
 } HardwareMotorTypes_e;
 
+
+static const float MOTOR_MIN = 3;
+static const float MOTOR_MAX = 18;
+
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
@@ -102,8 +106,6 @@ extern "C" {
         motorDevInit(&dev, idlePulse, 4);
 
         pwmEnableMotors();
-
-        pwmWriteMotor(0, .01);
     }
 
     void SPRacingF3::writeMotor(uint8_t index, float value)
