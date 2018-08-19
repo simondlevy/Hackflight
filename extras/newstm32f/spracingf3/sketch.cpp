@@ -62,7 +62,7 @@ extern "C" {
         motorval = 0;
         motordir = +1;
 
-        board->delaySeconds(1.0);
+        //board->delaySeconds(1.0);
     }
 
     void loop(void)
