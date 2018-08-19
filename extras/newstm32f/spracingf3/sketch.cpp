@@ -35,9 +35,6 @@ extern "C" {
     static SPRacingF3 * board;
     static DSMX_Receiver * rc;
 
-    static float motorval;
-    static int8_t motordir;
-
     void setup(void)
     {
         board = new SPRacingF3();
@@ -58,32 +55,11 @@ extern "C" {
 
         // Initialize Hackflight firmware
         h.init(board, rc, new hf::MixerQuadX(), stabilizer);
-
-        motorval = 0;
-        motordir = +1;
     }
 
     void loop(void)
     {
         h.update();
-
-        /*
-        hf::Debug::printfloat(motorval);
-        hf::Debug::printf("\n");
-
-        board->writeMotor(0, motorval);
-
-        motorval += .01 * motordir;
-
-        if (motorval >= 1.0) {
-            motordir = -1;
-        }
-
-        if (motorval <= 0.0) {
-            motordir = +1;
-        }
-
-        board->delaySeconds(.1);*/
     }
 
 } // extern "C"
