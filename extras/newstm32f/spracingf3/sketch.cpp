@@ -61,14 +61,13 @@ extern "C" {
 
         motorval = 0;
         motordir = +1;
-
-        //board->delaySeconds(1.0);
     }
 
     void loop(void)
     {
-        //h.update();
+        h.update();
 
+        /*
         hf::Debug::printfloat(motorval);
         hf::Debug::printf("\n");
 
@@ -84,7 +83,7 @@ extern "C" {
             motordir = +1;
         }
 
-        board->delaySeconds(.1);
+        board->delaySeconds(.1);*/
     }
 
 } // extern "C"
