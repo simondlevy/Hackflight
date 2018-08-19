@@ -23,9 +23,7 @@
 
 
 static const uint16_t BRUSHED_PWM_RATE     = 16000;
-static const uint16_t BRUSHLESS_PWM_RATE   = 480;
 static const uint16_t BRUSHED_IDLE_PULSE   = 0; 
-static const uint16_t BRUSHLESS_IDLE_PULSE = 1000; 
 
 static const float    MOTOR_MIN = 4;
 static const float    MOTOR_MAX = 18;
@@ -93,18 +91,18 @@ extern "C" {
         dev.useBurstDshot = false;
 
         dev.ioTags[0] = timerioTagGetByUsage(TIM_USE_MOTOR, 0);
-        dev.ioTags[1] = timerioTagGetByUsage(TIM_USE_MOTOR, 1);
-        dev.ioTags[2] = timerioTagGetByUsage(TIM_USE_MOTOR, 2);
-        dev.ioTags[3] = timerioTagGetByUsage(TIM_USE_MOTOR, 3);
+        //dev.ioTags[1] = timerioTagGetByUsage(TIM_USE_MOTOR, 1);
+        //dev.ioTags[2] = timerioTagGetByUsage(TIM_USE_MOTOR, 2);
+        //dev.ioTags[3] = timerioTagGetByUsage(TIM_USE_MOTOR, 3);
 
         motorDevInit(&dev, BRUSHED_IDLE_PULSE, 4);
 
         pwmEnableMotors();
 
         writeMotor(0, 0);
-        writeMotor(1, 0);
-        writeMotor(2, 0);
-        writeMotor(3, 0);
+        //writeMotor(1, 0);
+        //writeMotor(2, 0);
+        //writeMotor(3, 0);
     }
 
     void AlienflightF3V1::writeMotor(uint8_t index, float value)

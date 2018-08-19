@@ -34,8 +34,7 @@ class SPRacingF3 : public hf::SoftwareQuaternionBoard  {
         void initUsb(void);
         void initImu(void);
 
-    //protected: 
-    public:// XXX testing
+    protected: 
 
         // Board class overrides
         virtual void     writeMotor(uint8_t index, float value) override;
