@@ -26,6 +26,8 @@
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
+static hf::Hackflight h;
+
 // Called by main.c, so must be treated as C
 extern "C" {
 
@@ -51,16 +53,19 @@ extern "C" {
                 .01f,  // pitch trim
                 0.f);   // yaw trim
 
+        // Initialize Hackflight firmware
+        h.init(board, rc, new hf::MixerQuadX(), stabilizer);
     }
 
     void loop(void)
     {
         //board->imuRead();
-        if (rc->gotNewFrame()) {
-            rc->readRawvals();
-        }
-
+        //if (rc->gotNewFrame()) {
+        //    rc->readRawvals();
+        //}
         board->delaySeconds(.01);
+
+        h.update();
     }
 
 } // extern "C"
