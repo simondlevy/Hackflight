@@ -24,6 +24,8 @@
 
 static const uint16_t BRUSHED_MOTORS_PWM_RATE   = 16000;
 static const uint16_t BRUSHLESS_MOTORS_PWM_RATE = 480;
+static const float    MOTOR_MIN                 = 4;
+static const float    MOTOR_MAX                 = 18;
 
 typedef enum {
     MOTOR_UNKNOWN = 0,
@@ -31,9 +33,6 @@ typedef enum {
     MOTOR_BRUSHLESS
 } HardwareMotorTypes_e;
 
-
-static const float MOTOR_MIN = 3;
-static const float MOTOR_MAX = 18;
 
 // Here we put code that interacts with Cleanflight
 extern "C" {
@@ -110,7 +109,7 @@ extern "C" {
 
     void SPRacingF3::writeMotor(uint8_t index, float value)
     {
-        pwmWriteMotor(index, value+4);
+        pwmWriteMotor(index, value+MOTOR_MIN);
     }
 
     void SPRacingF3::delaySeconds(float sec)
