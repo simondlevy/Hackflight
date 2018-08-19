@@ -59,12 +59,6 @@ extern "C" {
 
     void loop(void)
     {
-        //board->imuRead();
-        //if (rc->gotNewFrame()) {
-        //    rc->readRawvals();
-        //}
-        //board->delaySeconds(.01);
-
         h.update();
     }
 
