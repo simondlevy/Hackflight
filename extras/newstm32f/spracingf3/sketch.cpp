@@ -58,10 +58,11 @@ extern "C" {
         // Initialize Hackflight firmware
         h.init(board, rc, new hf::MixerQuadX(), stabilizer);
 
-        board->writeMotor(0, 0);
-        board->delaySeconds(1.0);
+        motorval = 4.0;
 
-        motorval = 0.01;
+        board->writeMotor(0, motorval);
+
+        board->delaySeconds(1.0);
     }
 
     void loop(void)
