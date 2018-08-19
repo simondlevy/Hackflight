@@ -1,5 +1,22 @@
-#include <stdbool.h>
-#include <stdint.h>
+/*
+   main routine for SP Racing F3 board
+
+   Copyright (c) 2018 Simon D. Levy
+
+   This file is part of Hackflight.
+
+   Hackflight is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   Hackflight is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   You should have received a copy of the GNU General Public License
+   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "platform.h"
 
@@ -7,21 +24,13 @@
 #include "drivers/system.h"
 #include "drivers/timer.h"
 #include "drivers/time.h"
-#include "drivers/pwm_output.h"
+#include "drivers/light_led.h"
 
-#define BRUSHED_MOTORS_PWM_RATE 16000
-#define BRUSHLESS_MOTORS_PWM_RATE 480
-
-typedef enum {
-    MOTOR_UNKNOWN = 0,
-    MOTOR_BRUSHED,
-    MOTOR_BRUSHLESS
-} HardwareMotorTypes_e;
-
-uint8_t hardwareMotorType = MOTOR_BRUSHLESS;
+#include "pg/pg.h"
 
 int main(void)
 {
+    // implemented in sketch.cpp
     void setup(void);
     void loop(void);
 
@@ -33,22 +42,9 @@ int main(void)
 
     timerInit();  
 
-    uint16_t idlePulse = 1000; // 0 for brushed motor
+    pgResetAll();
 
-    motorDevConfig_t dev;
-    dev.motorPwmRate = BRUSHLESS_MOTORS_PWM_RATE;
-    dev.motorPwmProtocol = PWM_TYPE_STANDARD;
-    dev.motorPwmInversion = false;
-    dev.useUnsyncedPwm = true;
-    dev.useBurstDshot = false;
-    dev.ioTags[0] = timerioTagGetByUsage(TIM_USE_MOTOR, 0);
-    dev.ioTags[1] = timerioTagGetByUsage(TIM_USE_MOTOR, 1);
-    dev.ioTags[2] = timerioTagGetByUsage(TIM_USE_MOTOR, 2);
-    dev.ioTags[3] = timerioTagGetByUsage(TIM_USE_MOTOR, 3);
-
-    motorDevInit(&dev, idlePulse, 4);
-
-    pwmEnableMotors();
+    ledInit(statusLedConfig());
 
     setup();
 
