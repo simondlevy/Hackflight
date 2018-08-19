@@ -71,7 +71,7 @@ DSMX_Receiver::DSMX_Receiver(const uint8_t channelMap[6], float trimRoll, float 
     Receiver(channelMap, trimRoll, trimPitch, trimYaw) 
 {         
 
-    // Open connection to UART2
+    // Open connection to UART
     serialPortOpen();
 
     // Create a SpektrumDSM2048 object to handle serial interrupts
