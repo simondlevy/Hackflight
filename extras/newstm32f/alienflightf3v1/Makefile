@@ -46,7 +46,7 @@ DEBUG     ?=
 DEBUG_HARDFAULTS ?=
 
 # Serial port/Device for flashing
-SERIAL_DEVICE   ?= /dev/ttyUSB0
+SERIAL_DEVICE   ?= /dev/ttyACM0
 
 # Flash size (KB).  Some low-end chips actually have more flash than advertised, use this to override.
 FLASH_SIZE ?=
@@ -649,9 +649,8 @@ binary:
 hex:
 	$(V0) $(MAKE) -j $(TARGET_HEX)
 
-unbrick_$(TARGET): $(TARGET_HEX)
-	$(V0) stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
-	$(V0) stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
+unbrick_$(TARGET): $(TARGET_BIN)
+	dfu-util -a 0 -s 0x08000000:leave -D $(TARGET_BIN)
 
 ## unbrick           : unbrick flight controller
 unbrick: unbrick_$(TARGET)
