@@ -54,12 +54,12 @@ extern "C" {
                 0.f);   // yaw trim
 
         // Initialize Hackflight firmware
-        h.init(board, rc, new hf::MixerQuadX(), stabilizer);
+        //h.init(board, rc, new hf::MixerQuadX(), stabilizer);
     }
 
     void loop(void)
     {
-        h.update();
+        //h.update();
     }
 
 } // extern "C"

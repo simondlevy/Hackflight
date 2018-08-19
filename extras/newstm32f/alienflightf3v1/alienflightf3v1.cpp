@@ -99,7 +99,7 @@ extern "C" {
 
         pwmEnableMotors();
 
-        writeMotor(0, 0);
+        //writeMotor(0, 0);
         //writeMotor(1, 0);
         //writeMotor(2, 0);
         //writeMotor(3, 0);
@@ -132,19 +132,16 @@ extern "C" {
 
     uint8_t AlienflightF3V1::serialAvailableBytes(void)
     {
-        //return usbVcpAvailable(_serial0);
         return serialRxBytesWaiting(_serial0);
     }
 
     uint8_t AlienflightF3V1::serialReadByte(void)
     {
-        //return usbVcpRead(_serial0);
         return serialRead(_serial0);
     }
 
     void AlienflightF3V1::serialWriteByte(uint8_t c)
     {
-        //usbVcpWrite(_serial0, c);
         serialWrite(_serial0, c);
     }
 

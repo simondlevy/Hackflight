@@ -22,20 +22,11 @@
 #include "spracingf3.h"
 
 
-static const uint16_t BRUSHED_PWM_RATE     = 16000;
 static const uint16_t BRUSHLESS_PWM_RATE   = 480;
-static const uint16_t BRUSHED_IDLE_PULSE   = 0; 
 static const uint16_t BRUSHLESS_IDLE_PULSE = 1000; 
 
 static const float    MOTOR_MIN = 4;
 static const float    MOTOR_MAX = 18;
-
-typedef enum {
-    MOTOR_UNKNOWN = 0,
-    MOTOR_BRUSHED,
-    MOTOR_BRUSHLESS
-} HardwareMotorTypes_e;
-
 
 // Here we put code that interacts with Cleanflight
 extern "C" {
