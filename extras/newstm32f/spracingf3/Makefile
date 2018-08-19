@@ -603,6 +603,7 @@ clean_all: $(CLEAN_TARGETS)
 ## all_clean         : clean all valid targets (alias for above)
 all_clean: $(TARGETS_CLEAN)
 
+flash: flash_$(TARGET)
 
 flash_$(TARGET): $(TARGET_HEX)
 	$(V0) stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
