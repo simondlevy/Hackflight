@@ -68,9 +68,7 @@ extern "C" {
     {
         //h.update();
 
-        uint16_t mul = 1000;
-        hf::Debug::printf("%d.", (uint16_t)(motorval*mul) / mul);
-        hf::Debug::printf("%d",  (uint16_t)(motorval*mul) % mul);
+        hf::Debug::printfloat(motorval);
         hf::Debug::printf("\n");
 
         board->writeMotor(0, motorval);
