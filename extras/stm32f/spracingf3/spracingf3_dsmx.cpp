@@ -31,13 +31,6 @@ static hf::Hackflight h;
 
 extern "C" {
 
-#include "platform.h"
-#include "dma.h"
-#include "gpio.h"
-#include "serial.h"
-#include "system.h"
-#include "serial_uart.h"
-
 void setup() {
 
     hf::Stabilizer * stabilizer = new hf::Stabilizer(

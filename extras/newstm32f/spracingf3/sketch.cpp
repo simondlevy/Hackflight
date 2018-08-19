@@ -37,7 +37,6 @@ extern "C" {
     {
         board = new SPRacingF3();
 
-        /*
            hf::Stabilizer * stabilizer = new hf::Stabilizer(
            0.10f,      // Level P
            0.125f,     // Gyro cyclic P
@@ -45,7 +44,7 @@ extern "C" {
            0.175f,     // Gyro cyclic D
            0.625f,    // Gyro yaw P
            0.005625f); // Gyro yaw I
-         */
+         
         rc = new DSMX_Receiver(
                 CHANNEL_MAP,
                 .005f,  // roll trim
