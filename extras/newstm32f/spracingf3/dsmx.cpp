@@ -80,8 +80,9 @@ DSMX_Receiver::DSMX_Receiver(const uint8_t channelMap[6], float trimRoll, float 
 
 bool DSMX_Receiver::gotNewFrame(void) 
 {
-    hf::Debug::printf("%d\n", foo);
-    return rx->gotNewFrame();
+    bool result = rx->gotNewFrame();
+    hf::Debug::printf("%d\n", result);
+    return result;
 }
 
 void DSMX_Receiver::readRawvals(void)

@@ -58,6 +58,8 @@ extern "C" {
     {
         //board->imuRead();
         rc->gotNewFrame();
+
+        board->delaySeconds(.01);
     }
 
 } // extern "C"
