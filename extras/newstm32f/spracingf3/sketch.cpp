@@ -63,7 +63,7 @@ extern "C" {
         //if (rc->gotNewFrame()) {
         //    rc->readRawvals();
         //}
-        board->delaySeconds(.01);
+        //board->delaySeconds(.01);
 
         h.update();
     }
