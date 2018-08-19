@@ -31,8 +31,8 @@ static hf::Hackflight h;
 // Called by main.c, so must be treated as C
 extern "C" {
 
+    // NB: these must be declared here for sketch to work!
     static SPRacingF3 * board;
-
     static DSMX_Receiver * rc;
 
     void setup(void)
