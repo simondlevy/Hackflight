@@ -36,12 +36,12 @@ extern "C" {
 
 static bool _writeRegister(uint8_t address, uint8_t subAddress, uint8_t data)
 {
-    return i2cWrite(I2CDEV_1, address, subAddress, data);
+    return i2cWrite(I2CDEV_2, address, subAddress, data);
 }
 
 static void _readRegisters(uint8_t address, uint8_t subAddress, uint8_t count, uint8_t * dest)
 {  
-    i2cRead(I2CDEV_1, address, subAddress, count, dest);
+    i2cRead(I2CDEV_2, address, subAddress, count, dest);
 }
 
 } // extern "C"
