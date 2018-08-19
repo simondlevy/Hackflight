@@ -62,7 +62,7 @@ static void serial_event(uint16_t value, void * data)
 
 static void serialPortOpen(void)
 {
-    _serialPort = uartOpen(UARTDEV_3, serial_event, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
+    _serialPort = uartOpen(UARTDEV_2, serial_event, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
 }
 
 } // extern "C"

@@ -625,7 +625,7 @@ all_clean: $(TARGETS_CLEAN)
 
 flash: flash_$(TARGET)
 
-flash_$(TARGET): $(TARGET_HEX)
+flash_$(TARGET): $(TARGET_BIN)
 	$(V0) echo -n 'R' >$(SERIAL_DEVICE)
 	sleep 2
 	dfu-util -a 0 -s 0x08000000:leave -D $(TARGET_BIN)
