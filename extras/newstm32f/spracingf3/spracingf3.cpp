@@ -22,10 +22,13 @@
 #include "spracingf3.h"
 
 
-static const uint16_t BRUSHED_MOTORS_PWM_RATE   = 16000;
-static const uint16_t BRUSHLESS_MOTORS_PWM_RATE = 480;
-static const float    MOTOR_MIN                 = 4;
-static const float    MOTOR_MAX                 = 18;
+static const uint16_t BRUSHED_PWM_RATE     = 16000;
+static const uint16_t BRUSHLESS_PWM_RATE   = 480;
+static const uint16_t BRUSHED_IDLE_PULSE   = 0; 
+static const uint16_t BRUSHLESS_IDLE_PULSE = 1000; 
+
+static const float    MOTOR_MIN = 4;
+static const float    MOTOR_MAX = 18;
 
 typedef enum {
     MOTOR_UNKNOWN = 0,
@@ -87,11 +90,9 @@ extern "C" {
     void SPRacingF3::initMotors(void)
     {
 
-        uint16_t idlePulse = 1000; // 0 for brushed motor
-
         motorDevConfig_t dev;
 
-        dev.motorPwmRate = BRUSHLESS_MOTORS_PWM_RATE;
+        dev.motorPwmRate = BRUSHLESS_PWM_RATE;
         dev.motorPwmProtocol = PWM_TYPE_STANDARD;
         dev.motorPwmInversion = false;
         dev.useUnsyncedPwm = true;
@@ -102,7 +103,7 @@ extern "C" {
         dev.ioTags[2] = timerioTagGetByUsage(TIM_USE_MOTOR, 2);
         dev.ioTags[3] = timerioTagGetByUsage(TIM_USE_MOTOR, 3);
 
-        motorDevInit(&dev, idlePulse, 4);
+        motorDevInit(&dev, BRUSHLESS_IDLE_PULSE, 4);
 
         pwmEnableMotors();
 
