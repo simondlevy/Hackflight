@@ -66,8 +66,8 @@ extern "C" {
 
     void AlienflightF3V1::initImu(void)
     {
-        i2cHardwareConfigure(i2cConfig(0));
-        i2cInit(I2CDEV_1);
+        i2cHardwareConfigure(i2cConfig(2));
+        i2cInit(I2CDEV_2);
 
         _imu = new MPU6050(AFS_8G, GFS_2000DPS);
 

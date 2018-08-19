@@ -626,10 +626,9 @@ all_clean: $(TARGETS_CLEAN)
 flash: flash_$(TARGET)
 
 flash_$(TARGET): $(TARGET_HEX)
-	$(V0) stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
 	$(V0) echo -n 'R' >$(SERIAL_DEVICE)
 	sleep 2
-	$(V0) stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
+	dfu-util -a 0 -s 0x08000000:leave -D $(TARGET_BIN)
 
 ## flash             : flash firmware (.hex) onto flight controller
 st-flash_$(TARGET): $(TARGET_BIN)
