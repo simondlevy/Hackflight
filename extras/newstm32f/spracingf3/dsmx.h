@@ -27,7 +27,7 @@ class DSMX_Receiver : public hf::Receiver {
 
         DSMX_Receiver(const uint8_t channelMap[6], float trimRoll=.01, float trimPitch=0, float trimYaw=0);
 
-    //protected:
+    protected:
 
         virtual bool gotNewFrame(void) override;
 
