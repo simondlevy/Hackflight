@@ -110,7 +110,7 @@ extern "C" {
 
     void SPRacingF3::writeMotor(uint8_t index, float value)
     {
-        pwmWriteMotor(index, value);
+        pwmWriteMotor(index, value+4);
     }
 
     void SPRacingF3::delaySeconds(float sec)

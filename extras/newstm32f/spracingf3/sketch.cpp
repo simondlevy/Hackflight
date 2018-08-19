@@ -58,7 +58,7 @@ extern "C" {
         // Initialize Hackflight firmware
         h.init(board, rc, new hf::MixerQuadX(), stabilizer);
 
-        motorval = 4.0;
+        motorval = 0;
 
         board->writeMotor(0, motorval);
 
