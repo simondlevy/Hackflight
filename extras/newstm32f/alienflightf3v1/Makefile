@@ -725,4 +725,4 @@ listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
 
 commit:
-	git commit -a -m="More SPRacingF3 Board implementation"; git push
+	git commit -a -m="More AlienflightF3 Board implementation"; git push
