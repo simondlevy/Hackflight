@@ -67,6 +67,8 @@ extern "C" {
 
         i2cInit(I2CDEV_1);
 
+        delaySeconds(0.1);
+
         _imu = new MPU6050(AFS_8G, GFS_2000DPS);
 
         _imu->begin();

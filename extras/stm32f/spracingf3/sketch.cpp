@@ -20,7 +20,7 @@
 
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
-#include "dsmx.h"
+#include "../dsmx.h"
 
 #include "spracingf3.h"
 
@@ -31,30 +31,24 @@ static hf::Hackflight h;
 // Called by main.c, so must be treated as C
 extern "C" {
 
-    // NB: these must be declared here for sketch to work!
-    static SPRacingF3 * board;
-    static DSMX_Receiver * rc;
-
     void setup(void)
     {
-        board = new SPRacingF3();
+        hf::Stabilizer * stabilizer = new hf::Stabilizer(
+                0.10f,      // Level P
+                0.125f,     // Gyro cyclic P
+                0.001875f,  // Gyro cyclic I
+                0.175f,     // Gyro cyclic D
+                0.625f,     // Gyro yaw P
+                0.005625f); // Gyro yaw I
 
-           hf::Stabilizer * stabilizer = new hf::Stabilizer(
-           0.10f,      // Level P
-           0.125f,     // Gyro cyclic P
-           0.001875f,  // Gyro cyclic I
-           0.175f,     // Gyro cyclic D
-           0.625f,    // Gyro yaw P
-           0.005625f); // Gyro yaw I
-         
-        rc = new DSMX_Receiver(
+        DSMX_Receiver * rc = new DSMX_Receiver(
                 CHANNEL_MAP,
-                .005f,  // roll trim
-                .01f,  // pitch trim
-                0.f);   // yaw trim
+                0.005f,  // roll trim
+                0.01f,   // pitch trim
+                0.f);    // yaw trim
 
         // Initialize Hackflight firmware
-        h.init(board, rc, new hf::MixerQuadX(), stabilizer);
+        h.init(new SPRacingF3(), rc, new hf::MixerQuadX(), stabilizer);
     }
 
     void loop(void)

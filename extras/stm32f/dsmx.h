@@ -21,11 +21,17 @@
 #include <receiver.hpp>
 #include <hackflight.hpp>
 
+extern "C" {
+
+#include "io/serial.h"
+#include "drivers/serial_uart.h"
+
 class DSMX_Receiver : public hf::Receiver {
 
     public:
 
-        DSMX_Receiver(const uint8_t channelMap[6], float trimRoll=.01, float trimPitch=0, float trimYaw=0);
+        DSMX_Receiver(UARTDevice_e uartDevice,
+                const uint8_t channelMap[6], float trimRoll=.01, float trimPitch=0, float trimYaw=0);
 
         virtual void begin(void) override;
 
@@ -35,4 +41,10 @@ class DSMX_Receiver : public hf::Receiver {
 
         virtual void readRawvals(void) override;
 
+    private:
+
+        UARTDevice_e _uartDevice;
+
 }; // DSMX_Receiver
+
+} // extern "C"

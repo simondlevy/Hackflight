@@ -86,8 +86,6 @@ extern "C" {
 
     void AlienflightF3V1::initUsb(void)
     {
-        uartPinConfigure(serialPinConfig());
-
         _serial0 = usbVcpOpen();
     }
 

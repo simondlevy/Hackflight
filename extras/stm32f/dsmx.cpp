@@ -24,7 +24,7 @@
 
 static SpektrumDSM2048 * _rx;
 
-// Support for reading DSMX signals over UART2
+// Support for reading DSMX signals over UART
 static uint8_t _dsmAvailable;
 static uint8_t _dsmValue;
 
@@ -53,18 +53,22 @@ static void serial_event(uint16_t value, void * data)
     _dsmAvailable = 1;
 
     _rx->handleSerialEvent(micros());
-
 }
 
-DSMX_Receiver::DSMX_Receiver(const uint8_t channelMap[6], float trimRoll, float trimPitch, float trimYaw) : 
+DSMX_Receiver::DSMX_Receiver(UARTDevice_e uartDevice,
+        const uint8_t channelMap[6], float trimRoll, float trimPitch, float trimYaw) : 
     Receiver(channelMap, trimRoll, trimPitch, trimYaw) 
-{         
+{       
+    _uartDevice = uartDevice;  
 }
 
-void DSMX_Receiver::begin(void)
+void DSMX_Receiver::begin(void) 
 {
+    // Set up UART
+    uartPinConfigure(serialPinConfig());
+
     // Open serial connection to receiver
-    uartOpen(UARTDEV_2, serial_event, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
+    uartOpen(_uartDevice, serial_event, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
 
     // Create a SpektrumDSM2048 object to handle serial interrupts
     _rx = new SpektrumDSM2048();
