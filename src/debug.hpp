@@ -51,7 +51,13 @@ namespace hf {
                 for (uint8_t k=0; k<prec; ++k) {
                     mul *= 10;
                 }
-                Debug::printf("%d.%d", (uint16_t)(val*mul)/mul, (uint16_t)(val*mul) % mul);
+                char sgn = '+';
+                if (val < 0) {
+                    val = -val;
+                    sgn = '-';
+                }
+                uint32_t bigval = (uint32_t)(val*mul);
+                Debug::printf("%c%d.%d", sgn, bigval/mul, bigval % mul);
             }
 
     }; // class Debug

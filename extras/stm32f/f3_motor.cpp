@@ -32,6 +32,8 @@ extern "C" {
 #include "gpio.h"
 #include "timer.h"
 
+#include <debug.hpp>
+
 typedef struct {
     volatile timCCR_t *ccr;
     TIM_TypeDef *tim;
@@ -81,10 +83,14 @@ static void pwmGPIOConfig(GPIO_TypeDef *gpio, uint32_t pin, GPIO_Mode mode)
     gpioInit(gpio, &cfg);
 }
 
+uint32_t motorval;
+
 void BrushedMotor::writeMicroseconds(uint16_t uS)
 {
     pwmOutputPort_t * _motor = (pwmOutputPort_t *)this->motor;
-    *_motor->ccr = (uS<1000) ? 0 : (uS - 1000) * _motor->period / 1000;
+    motorval = (uS<1000) ? 0 : (uS - 1000) * _motor->period / 1000;
+    //*_motor->ccr = motorval;
+
 }
 
 Motor::Motor(uint8_t pin, uint32_t motorPwmRate, uint16_t idlePulseUsec)

@@ -20,6 +20,7 @@
 
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
+
 #include "dsmx.h"
 
 #include "alienflightf3v1.h"
@@ -31,9 +32,13 @@ static hf::Hackflight h;
 // Called by main.c, so must be treated as C
 extern "C" {
 
+#include <debug.hpp>
+
     // NB: these must be declared here for sketch to work!
     static AlienflightF3V1 * board;
     static DSMX_Receiver * rc;
+
+    //extern uint32_t motorval;
 
     void setup(void)
     {
