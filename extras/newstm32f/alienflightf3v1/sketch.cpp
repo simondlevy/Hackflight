@@ -35,9 +35,6 @@ extern "C" {
     static AlienflightF3V1 * board;
     static DSMX_Receiver * rc;
 
-    //static float motorval;
-    //static float motordir;
-
     void setup(void)
     {
         board = new AlienflightF3V1();
@@ -58,22 +55,11 @@ extern "C" {
 
         // Initialize Hackflight firmware
         h.init(board, rc, new hf::MixerQuadX(), stabilizer);
-
-        //motorval = 0;
-        //motordir = +1;
     }
 
     void loop(void)
     {
         h.update();
-
-	/*
-        board->writeMotor(0, motorval);
-        motorval += motordir*.01;
-        if (motorval >= 1) motordir = -1;
-        if (motorval <= 0) motordir = +1;
-        board->delaySeconds(.1);
-        */
     }
 
 } // extern "C"

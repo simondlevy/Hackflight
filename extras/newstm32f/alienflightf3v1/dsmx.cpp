@@ -86,9 +86,4 @@ bool DSMX_Receiver::gotNewFrame(void)
 void DSMX_Receiver::readRawvals(void)
 {
     rx->getChannelValuesNormalized(rawvals, CHANNELS);
-
-    for (uint8_t k=0; k<4; ++k) {
-        hf::Debug::printf("%d\t", (int16_t)(rawvals[k]*100));
-    }
-    hf::Debug::printf("\n");
 }

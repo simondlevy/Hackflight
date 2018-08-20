@@ -22,11 +22,11 @@
 #include "alienflightf3v1.h"
 
 
-static const uint16_t BRUSHED_PWM_RATE     = 16000;
+static const uint16_t BRUSHED_PWM_RATE     = 32000;
 static const uint16_t BRUSHED_IDLE_PULSE   = 0; 
 
 static const float    MOTOR_MIN = 0;
-static const float    MOTOR_MAX = 20;
+static const float    MOTOR_MAX = 40;
 
 // Here we put code that interacts with Cleanflight
 extern "C" {
@@ -67,7 +67,7 @@ extern "C" {
         i2cHardwareConfigure(i2cConfig(0));
         i2cInit(I2CDEV_2);
 
-        _imu = new MPU6050(AFS_8G, GFS_2000DPS);
+        _imu = new MPU6050(AFS_2G, GFS_250DPS);
 
         _imu->begin();
     }
@@ -98,17 +98,12 @@ extern "C" {
         motorDevInit(&dev, BRUSHED_IDLE_PULSE, 4);
 
         pwmEnableMotors();
-
-        //writeMotor(0, 0);
-        //writeMotor(1, 0);
-        //writeMotor(2, 0);
-        //writeMotor(3, 0);
     }
 
     void AlienflightF3V1::writeMotor(uint8_t index, float value)
     {
         float motorval = MOTOR_MIN + value*(MOTOR_MAX-MOTOR_MIN);
-        //hf::Debug::printfloat(motorval); hf::Debug::printf("\n");
+        //hf::Debug::printfloat(value); hf::Debug::printf("\n");
         pwmWriteMotor(index, motorval);
     }
 
