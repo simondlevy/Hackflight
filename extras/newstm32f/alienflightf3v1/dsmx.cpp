@@ -45,18 +45,14 @@ extern "C" {
 #include "io/serial.h"
 #include "drivers/serial_uart.h"
 
-static bool foo;
-
 static void serial_event(uint16_t value, void * data)
 {
     (void)data;
 
-    foo = true;
-
     _dsmValue = (uint8_t)value;
     _dsmAvailable = 1;
 
-    //_rx->handleSerialEvent(micros());
+    _rx->handleSerialEvent(micros());
 
 }
 
@@ -67,9 +63,7 @@ DSMX_Receiver::DSMX_Receiver(const uint8_t channelMap[6], float trimRoll, float 
 
 void DSMX_Receiver::begin(void)
 {
-    // Open connection to UART2
-    //serialPortOpen();
-
+    // Open serial connection to receiver
     uartOpen(UARTDEV_2, serial_event, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
 
     // Create a SpektrumDSM2048 object to handle serial interrupts
@@ -78,13 +72,12 @@ void DSMX_Receiver::begin(void)
 
 bool DSMX_Receiver::gotNewFrame(void) 
 {
-    hf::Debug::printf("%d\n", foo);
     return _rx->gotNewFrame();
 }
 
 void DSMX_Receiver::readRawvals(void)
 {
-    //_rx->getChannelValuesNormalized(rawvals, CHANNELS);
+    _rx->getChannelValuesNormalized(rawvals, CHANNELS);
 }
 
 } // extern "C"
