@@ -20,7 +20,7 @@
 
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
-#include "dsmx.h"
+#include "../dsmx.h"
 #include "alienflightf3v1.h"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
