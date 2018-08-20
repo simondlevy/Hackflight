@@ -18,10 +18,8 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <f3_board.h>
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
-#include <MPU6050.h>
 #include "f3_receiver_dsmx.h"
 #include "f3_board.h"
 

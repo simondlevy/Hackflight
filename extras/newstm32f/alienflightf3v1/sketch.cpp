@@ -20,30 +20,17 @@
 
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
-
 #include "dsmx.h"
-
 #include "alienflightf3v1.h"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 static hf::Hackflight h;
 
-// Called by main.c, so must be treated as C
 extern "C" {
-
-#include <debug.hpp>
-
-    // NB: these must be declared here for sketch to work!
-    static AlienflightF3V1 * board;
-    static DSMX_Receiver * rc;
-
-    //extern uint32_t motorval;
 
     void setup(void)
     {
-        board = new AlienflightF3V1();
-
            hf::Stabilizer * stabilizer = new hf::Stabilizer(
            0.10f,      // Level P
            0.125f,     // Gyro cyclic P
@@ -52,14 +39,14 @@ extern "C" {
            0.625f,    // Gyro yaw P
            0.005625f); // Gyro yaw I
          
-        rc = new DSMX_Receiver(
+        DSMX_Receiver * rc = new DSMX_Receiver(
                 CHANNEL_MAP,
                 .005f,  // roll trim
                 .01f,  // pitch trim
                 0.f);   // yaw trim
 
         // Initialize Hackflight firmware
-        h.init(board, rc, new hf::MixerQuadX(), stabilizer);
+        h.init(new AlienflightF3V1(), rc, new hf::MixerQuadX(), stabilizer);
     }
 
     void loop(void)

@@ -20,22 +20,23 @@
 
 #include "dsmx.h"
 #include <SpektrumDSM.h>
+#include <debug.hpp>
 
-SpektrumDSM2048 * rx;
+static SpektrumDSM2048 * _rx;
 
 // Support for reading DSMX signals over UART2
-static uint8_t dsmAvailable;
-static uint8_t dsmValue;
+static uint8_t _dsmAvailable;
+static uint8_t _dsmValue;
 
 uint8_t dsmSerialAvailable(void)
 {
-    return dsmAvailable;
+    return _dsmAvailable;
 }
 
 uint8_t dsmSerialRead(void)
 {
-    dsmAvailable--;
-    return dsmValue;
+    _dsmAvailable--;
+    return _dsmValue;
 }
 
 extern "C" {
@@ -44,46 +45,46 @@ extern "C" {
 #include "io/serial.h"
 #include "drivers/serial_uart.h"
 
-static serialPort_t * _serialPort;
-
 static bool foo;
 
 static void serial_event(uint16_t value, void * data)
 {
     (void)data;
 
-    dsmValue = (uint8_t)value;
-    dsmAvailable = 1;
-
-    rx->handleSerialEvent(micros());
-
     foo = true;
-}
 
-static void serialPortOpen(void)
-{
-    _serialPort = uartOpen(UARTDEV_2, serial_event, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
-}
+    _dsmValue = (uint8_t)value;
+    _dsmAvailable = 1;
 
-} // extern "C"
+    //_rx->handleSerialEvent(micros());
+
+}
 
 DSMX_Receiver::DSMX_Receiver(const uint8_t channelMap[6], float trimRoll, float trimPitch, float trimYaw) : 
     Receiver(channelMap, trimRoll, trimPitch, trimYaw) 
 {         
+}
 
+void DSMX_Receiver::begin(void)
+{
     // Open connection to UART2
-    serialPortOpen();
+    //serialPortOpen();
+
+    uartOpen(UARTDEV_2, serial_event, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
 
     // Create a SpektrumDSM2048 object to handle serial interrupts
-    rx = new SpektrumDSM2048();
+    _rx = new SpektrumDSM2048();
 }
 
 bool DSMX_Receiver::gotNewFrame(void) 
 {
-    return rx->gotNewFrame();
+    hf::Debug::printf("%d\n", foo);
+    return _rx->gotNewFrame();
 }
 
 void DSMX_Receiver::readRawvals(void)
 {
-    rx->getChannelValuesNormalized(rawvals, CHANNELS);
+    //_rx->getChannelValuesNormalized(rawvals, CHANNELS);
 }
+
+} // extern "C"

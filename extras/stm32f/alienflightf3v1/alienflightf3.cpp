@@ -35,7 +35,7 @@ void F3Board::writeMotor(uint8_t index, float value)
 
     if (index == 0) {
         extern uint32_t motorval;
-        hf::Debug::printf("%d\n", motorval);
+        //hf::Debug::printf("%d\n", motorval);
     }
 }
 

@@ -89,7 +89,7 @@ void BrushedMotor::writeMicroseconds(uint16_t uS)
 {
     pwmOutputPort_t * _motor = (pwmOutputPort_t *)this->motor;
     motorval = (uS<1000) ? 0 : (uS - 1000) * _motor->period / 1000;
-    //*_motor->ccr = motorval;
+    *_motor->ccr = motorval;
 
 }
 

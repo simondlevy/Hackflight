@@ -25,8 +25,8 @@
 static const uint16_t BRUSHED_PWM_RATE     = 32000;
 static const uint16_t BRUSHED_IDLE_PULSE   = 0; 
 
-static const float    MOTOR_MIN = 0;
-static const float    MOTOR_MAX = 111;
+static const float    MOTOR_MIN = 1000;
+static const float    MOTOR_MAX = 2000;
 
 // Here we put code that interacts with Cleanflight
 extern "C" {
@@ -105,11 +105,15 @@ extern "C" {
         pwmWriteMotor(index, MOTOR_MIN + value*(MOTOR_MAX-MOTOR_MIN));
 
         if (index == 0) {
-            extern uint32_t motorval;
+            /*extern uint32_t motorval;
             extern float pulseScale, pulseOffset;
+            
+            hf::Debug::printfloat(value);
+            hf::Debug::printf(" * ");
+            hf::Debug::printfloat(pulseScale);
+            hf::Debug::printf(" + ");
             hf::Debug::printfloat(pulseOffset);
-            hf::Debug::printf("    %d\n", (int)(100*pulseOffset));
-            //hf::Debug::printf(" = %d\n", motorval);
+            hf::Debug::printf(" = %d\n", motorval);*/
         }
     }
 

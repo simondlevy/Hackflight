@@ -61,7 +61,6 @@ static void serialPortOpen(void)
 {
     USART_TypeDef * getDsmUart();
 
-    // Open connection to UART2
     serialPort = uartOpen(getDsmUart(), serial_event, 115200, MODE_RX, SERIAL_NOT_INVERTED);
 }
 
