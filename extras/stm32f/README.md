@@ -5,5 +5,5 @@ After installing the toolchain, download
 [Cleanflight](https://github.com/cleanflight/cleanflight).  Put the Cleanflight
 download on your desktop, or edit the line in the
 [Makefile](https://github.com/simondlevy/Hackflight/blob/master/extras/stm32f/alienflightf3v1/Makefile#L26-L28)
-to reflect where you put it.
+to reflect where you put it. Then cd to the folder for your board and type <tt>make</tt>.
 
