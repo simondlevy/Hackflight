@@ -92,8 +92,10 @@ namespace hf {
 
             void error(const char * errmsg) 
             {
-                Debug::printf("%s\n", errmsg);
-                while (true) ;
+                while (true) {
+                    Debug::printf("%s\n", errmsg);
+                    delaySeconds(0.1);
+                }
             }
 
  

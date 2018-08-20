@@ -282,7 +282,8 @@ $(OBJECT_DIR)/$(PROJECT)/f3_main.o: ../f3_main.cpp
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_main.o $(CFLAGS) ../f3_main.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/f3_board.o: ../f3_board.cpp ../f3_board.h \
-	    $(HF_DIR)/board.hpp $(HF_DIR)/boards/softquat.hpp $(HF_DIR)/sensors/*.hpp
+	    $(HF_DIR)/board.hpp $(HF_DIR)/boards/softquat.hpp $(HF_DIR)/sensors/*.hpp \
+		     $(HF_DIR)/boards/realboard.hpp $(HF_DIR)/boards/softquat.hpp
 	@$(CC) -c -o $(OBJECT_DIR)/$(PROJECT)/f3_board.o $(CFLAGS) ../f3_board.cpp
 
 $(OBJECT_DIR)/$(PROJECT)/f3_wire.o: ../f3_wire.cpp ../Wire.h

@@ -67,9 +67,21 @@ extern "C" {
         i2cHardwareConfigure(i2cConfig(0));
         i2cInit(I2CDEV_2);
 
+        delaySeconds(.01);
+
         _imu = new MPU6050(AFS_2G, GFS_250DPS);
 
-        _imu->begin();
+        switch (_imu->begin()) {
+
+            case MPU_ERROR_ID:
+                error("Bad device ID");
+                break;
+            case MPU_ERROR_SELFTEST:
+                error("Failed self-test");
+                break;
+            default:
+                break;
+        }
     }
 
     void AlienflightF3V1::initUsb(void)
@@ -103,18 +115,6 @@ extern "C" {
     void AlienflightF3V1::writeMotor(uint8_t index, float value)
     {
         pwmWriteMotor(index, MOTOR_MIN + value*(MOTOR_MAX-MOTOR_MIN));
-
-        if (index == 0) {
-            /*extern uint32_t motorval;
-            extern float pulseScale, pulseOffset;
-            
-            hf::Debug::printfloat(value);
-            hf::Debug::printf(" * ");
-            hf::Debug::printfloat(pulseScale);
-            hf::Debug::printf(" + ");
-            hf::Debug::printfloat(pulseOffset);
-            hf::Debug::printf(" = %d\n", motorval);*/
-        }
     }
 
     void AlienflightF3V1::delaySeconds(float sec)

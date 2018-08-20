@@ -32,11 +32,6 @@ static BrushedMotor * motors[4];
 void F3Board::writeMotor(uint8_t index, float value)
 {
     motors[index]->writeMicroseconds((uint16_t)(1000*(value+1)));
-
-    if (index == 0) {
-        extern uint32_t motorval;
-        //hf::Debug::printf("%d\n", motorval);
-    }
 }
 
 void F3Board::motorInit(void)
