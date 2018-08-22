@@ -18,10 +18,13 @@ injury to you and damage to your vehicle.
 
 Hackflight is current working on the following platforms:
 
-* [Ladybug Flight Controller](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) from Tlera Corp.
+* [Ladybug](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) brushed flight controller
+from Tlera Corp.
 
-* [Alienflight F3 Brushed](http://www.readytoflyquads.com/alien-f3-brushed-flight-controller) 
+* [Alienflight F3](http://www.readytoflyquads.com/alien-f3-brushed-flight-controller) brushed flight controller
 controller from ReadyToFlyQuads
+
+* [SP Racing F3](http://seriouslypro.com/spracingf3) brushless flight controller
 
 * [HackflightSim](https://github.com/simondlevy/HackflightSim) flight simulator based on UnrealEngine4
 

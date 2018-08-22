@@ -23,6 +23,14 @@
 # The target to build
 TARGET    ?= SPRACINGF3
 
+# For Ubunto on Windows
+HOME = /mnt/c/Users/levys
+
+# Serial port/Device for flashing
+#SERIAL_DEVICE   ?= /dev/ttyUSB0
+SERIAL_DEVICE   ?= /dev/ttyS6
+
+
 # Where you put Cleanflight
 CF_DIR := $(HOME)/Desktop/cleanflight
 
@@ -44,9 +52,6 @@ DEBUG     ?=
 # Insert the debugging hardfault debugger
 # releases should not be built with this flag as it does not disable pwm output
 DEBUG_HARDFAULTS ?=
-
-# Serial port/Device for flashing
-SERIAL_DEVICE   ?= /dev/ttyUSB0
 
 # Flash size (KB).  Some low-end chips actually have more flash than advertised, use this to override.
 FLASH_SIZE ?=
