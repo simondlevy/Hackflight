@@ -144,14 +144,14 @@ OPTIMISE_SIZE         := -Os
 LTO_FLAGS             := $(OPTIMISATION_BASE) $(OPTIMISE_SPEED)
 endif
 
-VPATH 			:= $(VPATH):$(ROOT)/make/mcu
-VPATH 			:= $(VPATH):$(ROOT)/make
+VPATH 			:= $(VPATH):$(MAKE_DIR)/mcu
+VPATH 			:= $(VPATH):$(MAKE_DIR)
 
 # start specific includes
 include $(ROOT)/make/mcu/$(TARGET_MCU).mk
 
 # openocd specific includes
-include $(ROOT)/make/openocd.mk
+include $(MAKE_DIR)/openocd.mk
 
 # Configure default flash sizes for the targets (largest size specified gets hit first) if flash not specified already.
 ifeq ($(FLASH_SIZE),)
