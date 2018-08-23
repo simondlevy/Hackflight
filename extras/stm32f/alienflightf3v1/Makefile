@@ -92,8 +92,6 @@ I2C_DIR         := $(ARDUINO_DIR)/CrossPlatformI2C/src
 INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(I2C_DIR) $(RX_DIR)
 LINKER_DIR      := $(SRC_DIR)/target/link
 
-SUPPORT_DIR     := ../../stm32f3/support
-
 # configure some variables dependent upon what type of system this is
 
 OSFAMILY := linux
