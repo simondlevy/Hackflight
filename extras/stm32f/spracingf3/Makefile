@@ -23,13 +23,12 @@
 # The target to build
 TARGET    ?= SPRACINGF3
 
-# For Ubunto on Windows
-HOME = /mnt/c/Users/levys
-
 # Serial port/Device for flashing
-#SERIAL_DEVICE   ?= /dev/ttyUSB0
-SERIAL_DEVICE   ?= /dev/ttyS6
+SERIAL_DEVICE   ?= /dev/ttyUSB0
 
+# For Ubuntu on Windows
+#HOME = /mnt/c/Users/levys
+#SERIAL_DEVICE   ?= /dev/ttyS6
 
 # Where you put Cleanflight
 CF_DIR := $(HOME)/Desktop/cleanflight
@@ -310,24 +309,22 @@ MCU_COMMON_SRC = \
             drivers/adc_stm32f30x.c \
             drivers/bus_spi_stdperiph.c \
             drivers/dma.c \
-            drivers/light_ws2811strip_stdperiph.c \
-            drivers/transponder_ir_io_stdperiph.c \
             drivers/pwm_output_dshot.c \
             drivers/system_stm32f30x.c \
             drivers/timer_stm32f30x.c \
             drivers/light_led.c \
             drivers/serial_uart_stm32f30x.c \
-			drivers/serial_uart_pinconfig.c \
-			drivers/serial_pinconfig.c \
-			drivers/serial_uart_init.c \
-			drivers/serial_uart.c \
-			drivers/serial.c \
-			drivers/bus_i2c_busdev.c \
-			drivers/bus_i2c_config.c \
+	    drivers/serial_uart_pinconfig.c \
+	    drivers/serial_pinconfig.c \
+	    drivers/serial_uart_init.c \
+	    drivers/serial_uart.c \
+	    drivers/serial.c \
+	    drivers/bus_i2c_busdev.c \
+	    drivers/bus_i2c_config.c \
             drivers/bus_i2c_stm32f30x.c \
-			io/serial.c \
-			pg/pg.c \
-			pg/bus_i2c.c
+	    io/serial.c \
+	    pg/pg.c \
+	    pg/bus_i2c.c
 
 DEVICE_FLAGS += -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING -D__FPU_PRESENT=1 -DUNALIGNED_SUPPORT_DISABLE -DARM_MATH_CM4
 
