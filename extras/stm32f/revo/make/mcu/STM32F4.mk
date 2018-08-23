@@ -119,7 +119,7 @@ INCLUDE_DIRS    := $(INCLUDE_DIRS) \
                    $(USBCDC_DIR)/Inc \
                    $(CMSIS_DIR)/Include \
                    $(CMSIS_DIR)/Device/ST/STM32F4xx/Include \
-                   $(ROOT)/src/main/vcp_hal
+                   $(SRC_DIR)/vcp_hal
 else
 CMSIS_SRC       := $(notdir $(wildcard $(CMSIS_DIR)/CoreSupport/*.c \
                    $(LIB_DIR)/STM32F4/Drivers/CMSIS/Device/ST/STM32F4xx/*.c))
@@ -134,7 +134,7 @@ INCLUDE_DIRS    := $(INCLUDE_DIRS) \
                    $(USBFS_DIR)/inc \
                    $(CMSIS_DIR)/Core/Include \
                    $(LIB_DIR)/STM32F4/Drivers/CMSIS/Device/ST/STM32F4xx \
-                   $(ROOT)/src/main/vcpf4
+                   $(SRC_DIR)/vcpf4
 endif
 
 ifneq ($(filter SDCARD,$(FEATURES)),)
