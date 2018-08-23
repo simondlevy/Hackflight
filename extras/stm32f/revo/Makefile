@@ -23,6 +23,12 @@
 # The target to build, see VALID_TARGETS below
 TARGET    ?= REVO
 
+# Where you put Cleanflight
+CF_DIR := $(HOME)/Desktop/cleanflight
+
+# Where you put Arduino libraries
+ARDUINO_DIR     := $(HOME)/Documents/Arduino/libraries
+
 # Compile-time options
 OPTIONS   ?=
 
@@ -57,7 +63,8 @@ ROOT            := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 SRC_DIR         := $(ROOT)/src/main
 OBJECT_DIR      := $(ROOT)/obj/main
 BIN_DIR         := $(ROOT)/obj
-CMSIS_DIR       := $(ROOT)/lib/main/CMSIS
+LIB_DIR         := $(CF_DIR)/lib/main
+CMSIS_DIR       := $(LIB_DIR)/CMSIS
 INCLUDE_DIRS    := $(SRC_DIR) \
                    $(ROOT)/src/main/target
 LINKER_DIR      := $(ROOT)/src/main/target/link
@@ -107,9 +114,9 @@ FC_VER := $(FC_VER_MAJOR).$(FC_VER_MINOR).$(FC_VER_PATCH)
 
 # Search path for sources
 VPATH           := $(SRC_DIR):$(SRC_DIR)/startup
-USBFS_DIR       = $(ROOT)/lib/main/STM32_USB-FS-Device_Driver
+USBFS_DIR       = $(LIB_DIR)/STM32_USB-FS-Device_Driver
 USBPERIPH_SRC   = $(notdir $(wildcard $(USBFS_DIR)/src/*.c))
-FATFS_DIR       = $(ROOT)/lib/main/FatFS
+FATFS_DIR       = $(LIB_DIR)/FatFS
 FATFS_SRC       = $(notdir $(wildcard $(FATFS_DIR)/*.c))
 
 CSOURCES        := $(shell find $(SRC_DIR) -name '*.c')
@@ -171,7 +178,7 @@ else
 endif
 
 INCLUDE_DIRS    := $(INCLUDE_DIRS) \
-                   $(ROOT)/lib/main/MAVLink
+                   $(LIB_DIR)/MAVLink
 
 INCLUDE_DIRS    := $(INCLUDE_DIRS) \
                    $(TARGET_DIR)
