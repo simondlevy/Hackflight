@@ -65,6 +65,7 @@ OBJECT_DIR      := $(ROOT)/obj/main
 BIN_DIR         := $(ROOT)/obj
 LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
+MAKE_DIR        := $(CF_DIR)/make
 INCLUDE_DIRS    := $(SRC_DIR) \
                    $(ROOT)/src/main/target
 LINKER_DIR      := $(ROOT)/src/main/target/link
@@ -72,14 +73,14 @@ LINKER_DIR      := $(ROOT)/src/main/target/link
 ## V                 : Set verbosity level based on the V= parameter
 ##                     V=0 Low
 ##                     V=1 High
-include $(ROOT)/make/build_verbosity.mk
+include $(MAKE_DIR)/build_verbosity.mk
 
 # Build tools, so we all share the same versions
 # import macros common to all supported build systems
-include $(ROOT)/make/system-id.mk
+include $(MAKE_DIR)/system-id.mk
 
 # developer preferences, edit these at will, they'll be gitignored
--include $(ROOT)/make/local.mk
+-include $(MAKE_DIR)/local.mk
 
 # configure some directories that are relative to wherever ROOT_DIR is located
 ifndef TOOLS_DIR
@@ -91,10 +92,10 @@ DL_DIR    := $(ROOT)/downloads
 export RM := rm
 
 # import macros that are OS specific
-include $(ROOT)/make/$(OSFAMILY).mk
+include $(MAKE_DIR)/$(OSFAMILY).mk
 
 # include the tools makefile
-include $(ROOT)/make/tools.mk
+include $(MAKE_DIR)/tools.mk
 
 # default xtal value for F4 targets
 HSE_VALUE       ?= 8000000
@@ -102,7 +103,7 @@ HSE_VALUE       ?= 8000000
 # used for turning on features like VCP and SDCARD
 FEATURES        =
 
-include $(ROOT)/make/targets.mk
+include $(MAKE_DIR)/targets.mk
 
 REVISION := $(shell git log -1 --format="%h")
 
