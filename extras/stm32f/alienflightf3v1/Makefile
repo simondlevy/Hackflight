@@ -236,13 +236,6 @@ LD_SCRIPT = $(LINKER_DIR)/stm32_flash_f303_$(FLASH_SIZE)k_opbl.ld
 endif
 
 TARGET_FLASH   := 256
-# note that there is no hardfault debugging startup file assembly handler for other platforms
-ifeq ($(DEBUG_HARDFAULTS),F3)
-CFLAGS               += -DDEBUG_HARDFAULTS
-MCU_COMMON_SRC  = startup_stm32f3_debug_hardfault_handler.S
-else
-MCU_COMMON_SRC  = startup_stm32f30x_md_gcc.S
-endif
 
 STDPERIPH_DIR   = $(LIB_DIR)/STM32F3/Drivers/STM32F30x_StdPeriph_Driver
 STDPERIPH_SRC   = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
@@ -297,15 +290,15 @@ VCP_SRC = \
 
 
 MCU_COMMON_SRC = \
-            target/system_stm32f30x.c \
-            drivers/adc_stm32f30x.c \
-            drivers/bus_spi_stdperiph.c \
-            drivers/dma.c \
-            drivers/pwm_output_dshot.c \
-            drivers/system_stm32f30x.c \
-            drivers/timer_stm32f30x.c \
-            drivers/light_led.c \
-            drivers/serial_uart_stm32f30x.c \
+        target/system_stm32f30x.c \
+        drivers/adc_stm32f30x.c \
+        drivers/bus_spi_stdperiph.c \
+        drivers/dma.c \
+        drivers/pwm_output_dshot.c \
+        drivers/system_stm32f30x.c \
+        drivers/timer_stm32f30x.c \
+        drivers/light_led.c \
+        drivers/serial_uart_stm32f30x.c \
 	    drivers/serial_uart_pinconfig.c \
 	    drivers/serial_pinconfig.c \
 	    drivers/serial_uart_init.c \
