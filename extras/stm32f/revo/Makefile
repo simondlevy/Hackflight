@@ -186,7 +186,7 @@ INCLUDE_DIRS    := $(INCLUDE_DIRS) \
 
 VPATH           := $(VPATH):$(TARGET_DIR)
 
-include $(ROOT)/make/source.mk
+include $(MAKE_DIR)/source.mk
 
 ###############################################################################
 # Things that might need changing to use different tools
