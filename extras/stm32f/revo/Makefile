@@ -94,9 +94,6 @@ endif
 OSFAMILY := linux
 LINUX := 1
 
-# developer preferences, edit these at will, they'll be gitignored
--include $(MAKE_DIR)/local.mk
-
 # configure some directories that are relative to wherever ROOT_DIR is located
 ifndef TOOLS_DIR
 TOOLS_DIR := $(ROOT)/tools
@@ -105,9 +102,6 @@ BUILD_DIR := $(ROOT)/build
 DL_DIR    := $(ROOT)/downloads
 
 export RM := rm
-
-# import macros that are OS specific
-include $(MAKE_DIR)/$(OSFAMILY).mk
 
 # include the tools makefile
 include $(MAKE_DIR)/tools.mk
