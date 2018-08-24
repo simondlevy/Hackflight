@@ -108,13 +108,24 @@ HSE_VALUE       ?= 8000000
 # used for turning on features like VCP and SDCARD
 FEATURES        =
 
-include $(MAKE_DIR)/targets.mk
+GROUP_3_TARGETS := REVO 
+
+BASE_TARGET    := $(TARGET)
+
+-include $(ROOT)/src/main/target/$(BASE_TARGET)/target.mk
+
+F4_TARGETS      := $(F405_TARGETS) $(F411_TARGETS) $(F446_TARGETS)
+
+TARGET_MCU := STM32F4
+
+ifneq ($(BASE_TARGET), $(TARGET))
+TARGET_FLAGS  	:= $(TARGET_FLAGS) -D$(BASE_TARGET)
+endif
+
+TARGET_FLAGS  	:= $(TARGET_FLAGS) -D$(TARGET_MCU)
+
 
 REVISION := $(shell git log -1 --format="%h")
-
-FC_VER_MAJOR := $(shell grep " FC_VERSION_MAJOR" src/main/build/version.h | awk '{print $$3}' )
-FC_VER_MINOR := $(shell grep " FC_VERSION_MINOR" src/main/build/version.h | awk '{print $$3}' )
-FC_VER_PATCH := $(shell grep " FC_VERSION_PATCH" src/main/build/version.h | awk '{print $$3}' )
 
 FC_VER := $(FC_VER_MAJOR).$(FC_VER_MINOR).$(FC_VER_PATCH)
 
@@ -300,21 +311,10 @@ endif
 #Flags
 ARCH_FLAGS      = -mthumb -mcpu=cortex-m4 -march=armv7e-m -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fsingle-precision-constant -Wdouble-promotion
 
-ifeq ($(TARGET),$(filter $(TARGET),$(F411_TARGETS)))
-DEVICE_FLAGS    = -DSTM32F411xE
-LD_SCRIPT       = $(LINKER_DIR)/stm32_flash_f411.ld
-STARTUP_SRC     = startup_stm32f411xe.s
-else ifeq ($(TARGET),$(filter $(TARGET),$(F405_TARGETS)))
 DEVICE_FLAGS    = -DSTM32F40_41xxx -DSTM32F405xx
 LD_SCRIPT       = $(LINKER_DIR)/stm32_flash_f405.ld
 STARTUP_SRC     = startup_stm32f40xx.s
-else ifeq ($(TARGET),$(filter $(TARGET),$(F446_TARGETS)))
-DEVICE_FLAGS    = -DSTM32F446xx
-LD_SCRIPT       = $(LINKER_DIR)/stm32_flash_f446.ld
-STARTUP_SRC     = startup_stm32f446xx.s
-else
-$(error Unknown MCU for F4 target)
-endif
+
 DEVICE_FLAGS    += -DHSE_VALUE=$(HSE_VALUE)
 
 MCU_COMMON_SRC = \
@@ -1074,50 +1074,13 @@ $(BUILD_DIR):
 version:
 	@echo $(FC_VER)
 
-## targets           : print a list of all valid target platforms (for consumption by scripts)
-targets:
-	@echo "Valid targets:       $(VALID_TARGETS)"
-	@echo "Variant targets:     $(VARIANT_TARGETS)"
-	@echo "Supported targets:   $(SUPPORTED_TARGETS)"
-	@echo "Unsupported targets: $(UNSUPPORTED_TARGETS)"
-	@echo "Target:              $(TARGET)"
-	@echo "Base target:         $(BASE_TARGET)"
-	@echo "targets-group-1:     $(GROUP_1_TARGETS)"
-	@echo "targets-group-2:     $(GROUP_2_TARGETS)"
-	@echo "targets-group-3:     $(GROUP_3_TARGETS)"
-	@echo "targets-group-4:     $(GROUP_4_TARGETS)"
-	@echo "targets-group-rest:  $(GROUP_OTHER_TARGETS)"
-
 ## test              : run the cleanflight test suite
 ## junittest         : run the cleanflight test suite, producing Junit XML result files.
 test junittest:
 	$(V0) cd src/test && $(MAKE) $@
 
 
-check-target-independence:
-	$(V1) for test_target in $(VALID_TARGETS); do \
-		FOUND=$$(grep -rE "\W$${test_target}\W?" src/main | grep -vE "(//)|(/\*).*\W$${test_target}\W?" | grep -vE "^src/main/target"); \
-		if [ "$${FOUND}" != "" ]; then \
-			echo "Target dependencies found:"; \
-			echo "$${FOUND}"; \
-			exit 1; \
-		fi; \
-	done
 
-check-fastram-usage-correctness:
-	$(V1) NON_TRIVIALLY_INITIALIZED=$$(grep -Ern "\W?FAST_RAM_ZERO_INIT\W.*=.*" src/main/ | grep -Ev "=\s*(false|NULL|0(\.0*f?)?)\s*[,;]"); \
-	if [ "$${NON_TRIVIALLY_INITIALIZED}" != "" ]; then \
-		echo "Non-trivially initialized FAST_RAM_ZERO_INIT variables found, use FAST_RAM instead:"; \
-		echo "$${NON_TRIVIALLY_INITIALIZED}"; \
-		exit 1; \
-	fi; \
-	TRIVIALLY_INITIALIZED=$$(grep -Ern "\W?FAST_RAM\W.*;" src/main/ | grep -v "="); \
-	EXPLICITLY_TRIVIALLY_INITIALIZED=$$(grep -Ern "\W?FAST_RAM\W.*;" src/main/ | grep -E "=\s*(false|NULL|0(\.0*f?)?)\s*[,;]"); \
-	if [ "$${TRIVIALLY_INITIALIZED}$${EXPLICITLY_TRIVIALLY_INITIALIZED}" != "" ]; then \
-		echo "Trivially initialized FAST_RAM variables found, use FAST_RAM_ZERO_INIT instead to save FLASH:"; \
-		echo "$${TRIVIALLY_INITIALIZED}\n$${EXPLICITLY_TRIVIALLY_INITIALIZED}"; \
-		exit 1; \
-	fi;
 
 # rebuild everything when makefile changes
 $(TARGET_OBJS) : Makefile
