@@ -31,7 +31,8 @@ class Revo : public hf::SoftwareQuaternionBoard  {
         void initUsb(void);
         void initImu(void);
 
-    protected: 
+    //protected: 
+    public: 
 
         // Board class overrides
         virtual void     writeMotor(uint8_t index, float value) override;

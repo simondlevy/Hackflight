@@ -1108,6 +1108,9 @@ $(TARGET_OBJS) : Makefile
 # include auto-generated dependencies
 -include $(TARGET_DEPS)
 
+listen:
+	miniterm.py $(SERIAL_DEVICE) 115200
+
 commit:
 	git commit -a -m="More Revo progress"
 	git push

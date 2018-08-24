@@ -26,15 +26,17 @@ static hf::Hackflight h;
 
 extern "C" {
 
-    static Revo * revo;
+    static Revo * board;
 
     void setup(void)
     {
-        revo = new Revo();
+        board = new Revo();
     }
 
     void loop(void)
     {
+        hf::Debug::printf("Hello\n");
+        board->delaySeconds(.1);
     }
 
 } // extern "C"
