@@ -92,7 +92,7 @@ endif
 
 # Build tools, so we all share the same versions
 # import macros common to all supported build systems
-include $(MAKE_DIR)/system-id.mk
+#include $(MAKE_DIR)/system-id.mk
 
 # developer preferences, edit these at will, they'll be gitignored
 -include $(MAKE_DIR)/local.mk
@@ -107,7 +107,7 @@ DL_DIR    := $(ROOT)/downloads
 export RM := rm
 
 # import macros that are OS specific
-include $(MAKE_DIR)/$(OSFAMILY).mk
+#include $(MAKE_DIR)/$(OSFAMILY).mk
 
 # include the tools makefile
 include $(MAKE_DIR)/tools.mk
