@@ -45,8 +45,11 @@ extern "C" {
 
     void loop(void)
     {
-        hf::Debug::printf("%d\n", (int)(rx->gotNewFrame()));
-        board->delaySeconds(.01);
+        if (rx->gotNewFrame()) {
+            rx->readRawvals();
+            hf::Debug::printfloat(rx->rawvals[CHANNEL_MAP[0]]);
+            hf::Debug::printf("\n");
+        }
     }
 
 } // extern "C"
