@@ -90,13 +90,6 @@ export V1    :=
 export STDOUT   :=
 endif
 
-# Build tools, so we all share the same versions
-# import macros common to all supported build systems
-#include $(MAKE_DIR)/system-id.mk
-
-# developer preferences, edit these at will, they'll be gitignored
--include $(MAKE_DIR)/local.mk
-
 # configure some directories that are relative to wherever ROOT_DIR is located
 ifndef TOOLS_DIR
 TOOLS_DIR := $(ROOT)/tools
@@ -105,9 +98,6 @@ BUILD_DIR := $(ROOT)/build
 DL_DIR    := $(ROOT)/downloads
 
 export RM := rm
-
-# import macros that are OS specific
-#include $(MAKE_DIR)/$(OSFAMILY).mk
 
 # include the tools makefile
 include $(MAKE_DIR)/tools.mk
@@ -178,13 +168,13 @@ endif
 
 #CMSIS
 ifeq ($(PERIPH_DRIVER), HAL)
-CMSIS_DIR      := $(ROOT)/lib/main/STM32F4/Drivers/CMSIS
-STDPERIPH_DIR   = $(ROOT)/lib/main/STM32F4/Drivers/STM32F4xx_HAL_Driver
+CMSIS_DIR      := $(LIB_DIR)/STM32F4/Drivers/CMSIS
+STDPERIPH_DIR   = $(LIB_DIR)/STM32F4/Drivers/STM32F4xx_HAL_Driver
 STDPERIPH_SRC   = $(notdir $(wildcard $(STDPERIPH_DIR)/Src/*.c))
 EXCLUDES        =
 else
-CMSIS_DIR      := $(ROOT)/lib/main/CMSIS
-STDPERIPH_DIR   = $(ROOT)/lib/main/STM32F4/Drivers/STM32F4xx_StdPeriph_Driver
+CMSIS_DIR      := $(LIB_DIR)/CMSIS
+STDPERIPH_DIR   = $(LIB_DIR)/STM32F4/Drivers/STM32F4xx_StdPeriph_Driver
 STDPERIPH_SRC   = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
 EXCLUDES        = stm32f4xx_crc.c \
                   stm32f4xx_can.c \
@@ -222,12 +212,12 @@ STDPERIPH_SRC   := $(filter-out ${EXCLUDES}, $(STDPERIPH_SRC))
 
 ifeq ($(PERIPH_DRIVER), HAL)
 #USB
-USBCORE_DIR = $(ROOT)/lib/main/STM32F4/Middlewares/ST/STM32_USB_Device_Library/Core
+USBCORE_DIR = $(LIB_DIR)/STM32F4/Middlewares/ST/STM32_USB_Device_Library/Core
 USBCORE_SRC = $(notdir $(wildcard $(USBCORE_DIR)/Src/*.c))
 EXCLUDES    = usbd_conf_template.c
 USBCORE_SRC := $(filter-out ${EXCLUDES}, $(USBCORE_SRC))
 
-USBCDC_DIR = $(ROOT)/lib/main/STM32F4/Middlewares/ST/STM32_USB_Device_Library/Class/CDC
+USBCDC_DIR = $(LIB_DIR)/STM32F4/Middlewares/ST/STM32_USB_Device_Library/Class/CDC
 USBCDC_SRC = $(notdir $(wildcard $(USBCDC_DIR)/Src/*.c))
 EXCLUDES   = usbd_cdc_if_template.c
 USBCDC_SRC := $(filter-out ${EXCLUDES}, $(USBCDC_SRC))
@@ -238,9 +228,9 @@ DEVICE_STDPERIPH_SRC := $(STDPERIPH_SRC) \
                         $(USBCORE_SRC) \
                         $(USBCDC_SRC)
 else
-USBCORE_DIR = $(ROOT)/lib/main/STM32_USB_Device_Library/Core
+USBCORE_DIR = $(LIB_DIR)/STM32_USB_Device_Library/Core
 USBCORE_SRC = $(notdir $(wildcard $(USBCORE_DIR)/src/*.c))
-USBOTG_DIR  = $(ROOT)/lib/main/STM32_USB_OTG_Driver
+USBOTG_DIR  = $(LIB_DIR)/STM32_USB_OTG_Driver
 USBOTG_SRC  = $(notdir $(wildcard $(USBOTG_DIR)/src/*.c))
 EXCLUDES    = usb_bsp_template.c \
               usb_conf_template.c \
@@ -249,17 +239,17 @@ EXCLUDES    = usb_bsp_template.c \
               usb_otg.c
 
 USBOTG_SRC  := $(filter-out ${EXCLUDES}, $(USBOTG_SRC))
-USBCDC_DIR  = $(ROOT)/lib/main/STM32_USB_Device_Library/Class/cdc
+USBCDC_DIR  = $(LIB_DIR)/STM32_USB_Device_Library/Class/cdc
 USBCDC_SRC  = $(notdir $(wildcard $(USBCDC_DIR)/src/*.c))
 EXCLUDES    = usbd_cdc_if_template.c
 USBCDC_SRC  := $(filter-out ${EXCLUDES}, $(USBCDC_SRC))
-USBMSC_DIR  = $(ROOT)/lib/main/STM32_USB_Device_Library/Class/msc
+USBMSC_DIR  = $(LIB_DIR)/STM32_USB_Device_Library/Class/msc
 USBMSC_SRC  = $(notdir $(wildcard $(USBMSC_DIR)/src/*.c))
 EXCLUDES    = usbd_storage_template.c
 USBMSC_SRC  := $(filter-out ${EXCLUDES}, $(USBMSC_SRC))
-USBHID_DIR  = $(ROOT)/lib/main/STM32_USB_Device_Library/Class/hid
+USBHID_DIR  = $(LIB_DIR)/STM32_USB_Device_Library/Class/hid
 USBHID_SRC  = $(notdir $(wildcard $(USBHID_DIR)/src/*.c))
-USBWRAPPER_DIR  = $(ROOT)/lib/main/STM32_USB_Device_Library/Class/hid_cdc_wrapper
+USBWRAPPER_DIR  = $(LIB_DIR)/STM32_USB_Device_Library/Class/hid_cdc_wrapper
 USBWRAPPER_SRC  = $(notdir $(wildcard $(USBWRAPPER_DIR)/src/*.c))
 VPATH       := $(VPATH):$(USBOTG_DIR)/src:$(USBCORE_DIR)/src:$(USBCDC_DIR)/src:$(USBMSC_DIR)/src:$(USBHID_DIR)/src:$(USBWRAPPER_DIR)/src
 
@@ -273,7 +263,7 @@ DEVICE_STDPERIPH_SRC := $(STDPERIPH_SRC) \
 endif
 
 #CMSIS
-VPATH           := $(VPATH):$(CMSIS_DIR)/Core/Include:$(ROOT)/lib/main/STM32F4/Drivers/CMSIS/Device/ST/STM32F4xx
+VPATH           := $(VPATH):$(CMSIS_DIR)/Core/Include:$(LIB_DIR)/STM32F4/Drivers/CMSIS/Device/ST/STM32F4xx
 
 ifeq ($(PERIPH_DRIVER), HAL)
 CMSIS_SRC       :=
@@ -286,7 +276,7 @@ INCLUDE_DIRS    := $(INCLUDE_DIRS) \
                    $(ROOT)/src/main/vcp_hal
 else
 CMSIS_SRC       := $(notdir $(wildcard $(CMSIS_DIR)/CoreSupport/*.c \
-                   $(ROOT)/lib/main/STM32F4/Drivers/CMSIS/Device/ST/STM32F4xx/*.c))
+                   $(LIB_DIR)/STM32F4/Drivers/CMSIS/Device/ST/STM32F4xx/*.c))
 INCLUDE_DIRS    := $(INCLUDE_DIRS) \
                    $(STDPERIPH_DIR)/inc \
                    $(USBOTG_DIR)/inc \
@@ -297,7 +287,7 @@ INCLUDE_DIRS    := $(INCLUDE_DIRS) \
                    $(USBMSC_DIR)/inc \
                    $(USBFS_DIR)/inc \
                    $(CMSIS_DIR)/Core/Include \
-                   $(ROOT)/lib/main/STM32F4/Drivers/CMSIS/Device/ST/STM32F4xx \
+                   $(LIB_DIR)/STM32F4/Drivers/CMSIS/Device/ST/STM32F4xx \
                    $(ROOT)/src/main/vcpf4
 endif
 
@@ -385,7 +375,7 @@ MSC_SRC += \
             msc/emfat_file.c
 endif
 
-DSP_LIB := $(ROOT)/lib/main/CMSIS/DSP
+DSP_LIB := $(LIB_DIR)/CMSIS/DSP
 DEVICE_FLAGS += -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING -D__FPU_PRESENT=1 -DUNALIGNED_SUPPORT_DISABLE -DARM_MATH_CM4
 
 ifeq ($(FLASH_SIZE),)
