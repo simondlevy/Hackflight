@@ -1,33 +1,22 @@
-##############################################################################
-#   Makefile for OpenPilot CC3D Revolution board
+###############################################################################
+# "THE BEER-WARE LICENSE" (Revision 42):
+# <msmith@FreeBSD.ORG> wrote this file. As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return
+###############################################################################
 #
-#   Copyright (c) 2018 Simon D. Levy
+# Makefile for building the cleanflight firmware.
 #
-#   This file is part of Hackflight.
+# Invoke this with 'make help' to see the list of supported targets.
 #
-#   Hackflight is free software: you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation, either version 3 of the License, or
-#   (at your option) any later version.
-#
-#   Hackflight is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
-#   You should have received a copy of the GNU General Public License
-#   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
-##############################################################################
+###############################################################################
+
 
 # Things that the user might override on the commandline
+#
 
 # The target to build, see VALID_TARGETS below
 TARGET    ?= REVO
-
-# Where you put Cleanflight
-CF_DIR := $(HOME)/Desktop/cleanflight
-
-# Where you put Arduino libraries
-ARDUINO_DIR     := $(HOME)/Documents/Arduino/libraries
 
 # Compile-time options
 OPTIONS   ?=
@@ -46,7 +35,7 @@ DEBUG     ?=
 DEBUG_HARDFAULTS ?=
 
 # Serial port/Device for flashing
-SERIAL_DEVICE   ?= /dev/ttyACM0
+SERIAL_DEVICE   ?= $(firstword $(wildcard /dev/ttyUSB*) no-port-found)
 
 # Flash size (KB).  Some low-end chips actually have more flash than advertised, use this to override.
 FLASH_SIZE ?=
@@ -56,16 +45,14 @@ FLASH_SIZE ?=
 # Things that need to be maintained as the source changes
 #
 
-FORKNAME      = hackflight
+FORKNAME      = cleanflight
 
 # Working directories
 ROOT            := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 SRC_DIR         := $(ROOT)/src/main
 OBJECT_DIR      := $(ROOT)/obj/main
 BIN_DIR         := $(ROOT)/obj
-LIB_DIR         := $(CF_DIR)/lib/main
-CMSIS_DIR       := $(LIB_DIR)/CMSIS
-MAKE_DIR        := $(CF_DIR)/make
+CMSIS_DIR       := $(ROOT)/lib/main/CMSIS
 INCLUDE_DIRS    := $(SRC_DIR) \
                    $(ROOT)/src/main/target
 LINKER_DIR      := $(ROOT)/src/main/target/link
@@ -73,26 +60,14 @@ LINKER_DIR      := $(ROOT)/src/main/target/link
 ## V                 : Set verbosity level based on the V= parameter
 ##                     V=0 Low
 ##                     V=1 High
-export AT := @
+include $(ROOT)/make/build_verbosity.mk
 
-ifndef V
-export V0    :=
-export V1    := $(AT)
-export STDOUT   :=
-else ifeq ($(V), 0)
-export V0    := $(AT)
-export V1    := $(AT)
-export STDOUT:= "> /dev/null"
-export MAKE  := $(MAKE) --no-print-directory
-else ifeq ($(V), 1)
-export V0    :=
-export V1    :=
-export STDOUT   :=
-endif
+# Build tools, so we all share the same versions
+# import macros common to all supported build systems
+include $(ROOT)/make/system-id.mk
 
-
-OSFAMILY := linux
-LINUX := 1
+# developer preferences, edit these at will, they'll be gitignored
+-include $(ROOT)/make/local.mk
 
 # configure some directories that are relative to wherever ROOT_DIR is located
 ifndef TOOLS_DIR
@@ -103,8 +78,11 @@ DL_DIR    := $(ROOT)/downloads
 
 export RM := rm
 
+# import macros that are OS specific
+include $(ROOT)/make/$(OSFAMILY).mk
+
 # include the tools makefile
-include $(MAKE_DIR)/tools.mk
+include $(ROOT)/make/tools.mk
 
 # default xtal value for F4 targets
 HSE_VALUE       ?= 8000000
@@ -112,7 +90,7 @@ HSE_VALUE       ?= 8000000
 # used for turning on features like VCP and SDCARD
 FEATURES        =
 
-include $(MAKE_DIR)/targets.mk
+include $(ROOT)/make/targets.mk
 
 REVISION := $(shell git log -1 --format="%h")
 
@@ -124,9 +102,9 @@ FC_VER := $(FC_VER_MAJOR).$(FC_VER_MINOR).$(FC_VER_PATCH)
 
 # Search path for sources
 VPATH           := $(SRC_DIR):$(SRC_DIR)/startup
-USBFS_DIR       = $(LIB_DIR)/STM32_USB-FS-Device_Driver
+USBFS_DIR       = $(ROOT)/lib/main/STM32_USB-FS-Device_Driver
 USBPERIPH_SRC   = $(notdir $(wildcard $(USBFS_DIR)/src/*.c))
-FATFS_DIR       = $(LIB_DIR)/FatFS
+FATFS_DIR       = $(ROOT)/lib/main/FatFS
 FATFS_SRC       = $(notdir $(wildcard $(FATFS_DIR)/*.c))
 
 CSOURCES        := $(shell find $(SRC_DIR) -name '*.c')
@@ -153,11 +131,14 @@ OPTIMISE_SIZE         := -Os
 LTO_FLAGS             := $(OPTIMISATION_BASE) $(OPTIMISE_SPEED)
 endif
 
-VPATH 			:= $(VPATH):$(MAKE_DIR)/mcu
-VPATH 			:= $(VPATH):$(MAKE_DIR)
+VPATH 			:= $(VPATH):$(ROOT)/make/mcu
+VPATH 			:= $(VPATH):$(ROOT)/make
 
 # start specific includes
 include $(ROOT)/make/mcu/$(TARGET_MCU).mk
+
+# openocd specific includes
+include $(ROOT)/make/openocd.mk
 
 # Configure default flash sizes for the targets (largest size specified gets hit first) if flash not specified already.
 ifeq ($(FLASH_SIZE),)
@@ -185,409 +166,14 @@ else
 endif
 
 INCLUDE_DIRS    := $(INCLUDE_DIRS) \
-                   $(LIB_DIR)/MAVLink
+                   $(ROOT)/lib/main/MAVLink
 
 INCLUDE_DIRS    := $(INCLUDE_DIRS) \
                    $(TARGET_DIR)
 
 VPATH           := $(VPATH):$(TARGET_DIR)
 
-COMMON_SRC = \
-            build/build_config.c \
-            build/debug.c \
-            build/version.c \
-            $(TARGET_DIR_SRC) \
-            main.c \
-            $(addprefix pg/,$(notdir $(wildcard $(SRC_DIR)/pg/*.c))) \
-            $(addprefix common/,$(notdir $(wildcard $(SRC_DIR)/common/*.c))) \
-            $(addprefix config/,$(notdir $(wildcard $(SRC_DIR)/config/*.c))) \
-            drivers/adc.c \
-            drivers/buf_writer.c \
-            drivers/bus.c \
-            drivers/bus_i2c_config.c \
-            drivers/bus_i2c_busdev.c \
-            drivers/bus_i2c_soft.c \
-            drivers/bus_spi.c \
-            drivers/bus_spi_config.c \
-            drivers/bus_spi_pinconfig.c \
-            drivers/buttons.c \
-            drivers/display.c \
-            drivers/exti.c \
-            drivers/io.c \
-            drivers/light_led.c \
-            drivers/pinio.c \
-            drivers/resource.c \
-            drivers/rcc.c \
-            drivers/serial.c \
-            drivers/serial_pinconfig.c \
-            drivers/serial_uart.c \
-            drivers/serial_uart_pinconfig.c \
-            drivers/sound_beeper.c \
-            drivers/stack_check.c \
-            drivers/system.c \
-            drivers/timer_common.c \
-            drivers/timer.c \
-            drivers/transponder_ir_arcitimer.c \
-            drivers/transponder_ir_ilap.c \
-            drivers/transponder_ir_erlt.c \
-            fc/board_info.c \
-            fc/config.c \
-            fc/fc_dispatch.c \
-            fc/fc_hardfaults.c \
-            fc/fc_tasks.c \
-            fc/runtime_config.c \
-            interface/msp.c \
-            interface/msp_box.c \
-            interface/tramp_protocol.c \
-            interface/smartaudio_protocol.c \
-            io/beeper.c \
-            io/piniobox.c \
-            io/serial.c \
-            io/statusindicator.c \
-            io/transponder_ir.c \
-            io/usb_cdc_hid.c \
-            msp/msp_serial.c \
-            scheduler/scheduler.c \
-            sensors/adcinternal.c \
-            sensors/battery.c \
-            sensors/current.c \
-            sensors/voltage.c \
-            target/config_helper.c
-
-OSD_SLAVE_SRC = \
-            io/displayport_max7456.c \
-            osd_slave/osd_slave_init.c \
-            io/osd_slave.c
-
-FC_SRC = \
-            fc/fc_init.c \
-            fc/controlrate_profile.c \
-            drivers/camera_control.c \
-            drivers/accgyro/gyro_sync.c \
-            drivers/pwm_esc_detect.c \
-            drivers/pwm_output.c \
-            drivers/rx/rx_spi.c \
-            drivers/rx/rx_xn297.c \
-            drivers/rx/rx_pwm.c \
-            drivers/serial_softserial.c \
-            fc/fc_core.c \
-            fc/fc_rc.c \
-            fc/rc_adjustments.c \
-            fc/rc_controls.c \
-            fc/rc_modes.c \
-            flight/position.c \
-            flight/failsafe.c \
-            flight/gps_rescue.c \
-            flight/imu.c \
-            flight/mixer.c \
-            flight/mixer_tricopter.c \
-            flight/pid.c \
-            flight/servos.c \
-            flight/servos_tricopter.c \
-            interface/cli.c \
-            interface/settings.c \
-            io/serial_4way.c \
-            io/serial_4way_avrootloader.c \
-            io/serial_4way_stk500v2.c \
-            rx/ibus.c \
-            rx/jetiexbus.c \
-            rx/msp.c \
-            rx/pwm.c \
-            rx/rx.c \
-            rx/rx_spi.c \
-            rx/crsf.c \
-            rx/sbus.c \
-            rx/sbus_channels.c \
-            rx/spektrum.c \
-            io/spektrum_vtx_control.c \
-            io/spektrum_rssi.c \
-            rx/sumd.c \
-            rx/sumh.c \
-            rx/xbus.c \
-            rx/fport.c \
-            sensors/acceleration.c \
-            sensors/boardalignment.c \
-            sensors/compass.c \
-            sensors/gyro.c \
-            sensors/gyroanalyse.c \
-            sensors/initialisation.c \
-            blackbox/blackbox.c \
-            blackbox/blackbox_encoding.c \
-            blackbox/blackbox_io.c \
-            cms/cms.c \
-            cms/cms_menu_blackbox.c \
-            cms/cms_menu_builtin.c \
-            cms/cms_menu_imu.c \
-            cms/cms_menu_ledstrip.c \
-            cms/cms_menu_misc.c \
-            cms/cms_menu_osd.c \
-            cms/cms_menu_power.c \
-            cms/cms_menu_vtx_rtc6705.c \
-            cms/cms_menu_vtx_smartaudio.c \
-            cms/cms_menu_vtx_tramp.c \
-            drivers/display_ug2864hsweg01.c \
-            drivers/light_ws2811strip.c \
-            drivers/rangefinder/rangefinder_hcsr04.c \
-            drivers/rangefinder/rangefinder_lidartf.c \
-            drivers/serial_escserial.c \
-            drivers/vtx_common.c \
-            io/dashboard.c \
-            io/displayport_max7456.c \
-            io/displayport_msp.c \
-            io/displayport_oled.c \
-            io/displayport_srxl.c \
-            io/displayport_crsf.c \
-            io/rcdevice_cam.c \
-            io/rcdevice.c \
-            io/gps.c \
-            io/ledstrip.c \
-            io/osd.c \
-            io/pidaudio.c \
-            sensors/barometer.c \
-            sensors/rangefinder.c \
-            telemetry/telemetry.c \
-            telemetry/crsf.c \
-            telemetry/srxl.c \
-            telemetry/frsky_hub.c \
-            telemetry/hott.c \
-            telemetry/jetiexbus.c \
-            telemetry/smartport.c \
-            telemetry/ltm.c \
-            telemetry/mavlink.c \
-            telemetry/msp_shared.c \
-            telemetry/ibus.c \
-            telemetry/ibus_shared.c \
-            sensors/esc_sensor.c \
-            io/vtx_string.c \
-            io/vtx.c \
-            io/vtx_rtc6705.c \
-            io/vtx_smartaudio.c \
-            io/vtx_tramp.c \
-            io/vtx_control.c
-
-COMMON_DEVICE_SRC = \
-            $(CMSIS_SRC) \
-            $(DEVICE_STDPERIPH_SRC)
-
-ifeq ($(OSD_SLAVE),yes)
-TARGET_FLAGS := -DUSE_OSD_SLAVE $(TARGET_FLAGS)
-COMMON_SRC := $(COMMON_SRC) $(OSD_SLAVE_SRC) $(COMMON_DEVICE_SRC)
-else
-COMMON_SRC := $(COMMON_SRC) $(FC_SRC) $(COMMON_DEVICE_SRC)
-endif
-
-ifeq ($(SIMULATOR_BUILD),yes)
-TARGET_FLAGS := -DSIMULATOR_BUILD $(TARGET_FLAGS)
-endif
-
-SPEED_OPTIMISED_SRC := ""
-SIZE_OPTIMISED_SRC  := ""
-
-ifneq ($(TARGET),$(filter $(TARGET),$(F1_TARGETS)))
-SPEED_OPTIMISED_SRC := $(SPEED_OPTIMISED_SRC) \
-            common/encoding.c \
-            common/filter.c \
-            common/maths.c \
-            common/typeconversion.c \
-            drivers/accgyro/accgyro_fake.c \
-            drivers/accgyro/accgyro_mpu.c \
-            drivers/accgyro/accgyro_mpu3050.c \
-            drivers/accgyro/accgyro_mpu6050.c \
-            drivers/accgyro/accgyro_mpu6500.c \
-            drivers/accgyro/accgyro_spi_bmi160.c \
-            drivers/accgyro/accgyro_spi_icm20689.c \
-            drivers/accgyro/accgyro_spi_mpu6000.c \
-            drivers/accgyro/accgyro_spi_mpu6500.c \
-            drivers/accgyro/accgyro_spi_mpu9250.c \
-            drivers/accgyro_legacy/accgyro_adxl345.c \
-            drivers/accgyro_legacy/accgyro_bma280.c \
-            drivers/accgyro_legacy/accgyro_l3g4200d.c \
-            drivers/accgyro_legacy/accgyro_l3gd20.c \
-            drivers/accgyro_legacy/accgyro_lsm303dlhc.c \
-            drivers/accgyro_legacy/accgyro_mma845x.c \
-            drivers/adc.c \
-            drivers/buf_writer.c \
-            drivers/bus.c \
-            drivers/bus_spi.c \
-            drivers/exti.c \
-            drivers/io.c \
-            drivers/pwm_output.c \
-            drivers/rcc.c \
-            drivers/serial.c \
-            drivers/serial_uart.c \
-            drivers/system.c \
-            drivers/timer.c \
-            fc/fc_core.c \
-            fc/fc_tasks.c \
-            fc/fc_rc.c \
-            fc/rc_controls.c \
-            fc/runtime_config.c \
-            flight/imu.c \
-            flight/mixer.c \
-            flight/pid.c \
-            rx/ibus.c \
-            rx/rx.c \
-            rx/rx_spi.c \
-            rx/crsf.c \
-            rx/sbus.c \
-            rx/sbus_channels.c \
-            rx/spektrum.c \
-            rx/sumd.c \
-            rx/xbus.c \
-            rx/fport.c \
-            scheduler/scheduler.c \
-            sensors/acceleration.c \
-            sensors/boardalignment.c \
-            sensors/gyro.c \
-            sensors/gyroanalyse.c \
-            $(CMSIS_SRC) \
-            $(DEVICE_STDPERIPH_SRC) \
-
-SIZE_OPTIMISED_SRC := $(SIZE_OPTIMISED_SRC) \
-            bus_bst_stm32f30x.c \
-            drivers/barometer/barometer_bmp085.c \
-            drivers/barometer/barometer_bmp280.c \
-            drivers/barometer/barometer_fake.c \
-            drivers/barometer/barometer_ms5611.c \
-            drivers/barometer/barometer_lps.c \
-            drivers/barometer/barometer_qmp6988.c \
-            drivers/bus_i2c_config.c \
-            drivers/bus_spi_config.c \
-            drivers/bus_spi_pinconfig.c \
-            drivers/compass/compass_ak8963.c \
-            drivers/compass/compass_ak8975.c \
-            drivers/compass/compass_fake.c \
-            drivers/compass/compass_hmc5883l.c \
-            drivers/compass/compass_qmc5883l.c \
-            drivers/display_ug2864hsweg01.c \
-            drivers/inverter.c \
-            drivers/light_ws2811strip.c \
-            drivers/light_ws2811strip_hal.c \
-            drivers/light_ws2811strip_stdperiph.c \
-            drivers/serial_escserial.c \
-            drivers/serial_pinconfig.c \
-            drivers/serial_tcp.c \
-            drivers/serial_uart_init.c \
-            drivers/serial_uart_pinconfig.c \
-            drivers/serial_usb_vcp.c \
-            drivers/transponder_ir_io_hal.c \
-            drivers/transponder_ir_io_stdperiph.c \
-            drivers/vtx_rtc6705_soft_spi.c \
-            drivers/vtx_rtc6705.c \
-            drivers/vtx_common.c \
-            fc/fc_init.c \
-            fc/board_info.c \
-            config/config_eeprom.c \
-            config/feature.c \
-            config/config_streamer.c \
-            i2c_bst.c \
-            interface/cli.c \
-            interface/settings.c \
-            io/dashboard.c \
-            io/osd.c \
-            io/serial.c \
-            io/serial_4way.c \
-            io/serial_4way_avrootloader.c \
-            io/serial_4way_stk500v2.c \
-            io/transponder_ir.c \
-            io/usb_cdc_hid.c \
-            msp/msp_serial.c \
-            cms/cms.c \
-            cms/cms_menu_blackbox.c \
-            cms/cms_menu_builtin.c \
-            cms/cms_menu_imu.c \
-            cms/cms_menu_ledstrip.c \
-            cms/cms_menu_misc.c \
-            cms/cms_menu_osd.c \
-            cms/cms_menu_power.c \
-            cms/cms_menu_vtx_rtc6705.c \
-            cms/cms_menu_vtx_smartaudio.c \
-            cms/cms_menu_vtx_tramp.c \
-            io/vtx_string.c \
-            io/vtx.c \
-            io/vtx_rtc6705.c \
-            io/vtx_smartaudio.c \
-            io/vtx_tramp.c \
-            io/vtx_control.c \
-            io/spektrum_vtx_control.c \
-            pg/pg.h
-
-# F4 and F7 optimizations
-ifneq ($(TARGET),$(filter $(TARGET),$(F3_TARGETS)))
-SPEED_OPTIMISED_SRC := $(SPEED_OPTIMISED_SRC) \
-            drivers/bus_i2c_hal.c \
-            drivers/bus_spi_ll.c \
-            drivers/max7456.c \
-            drivers/pwm_output_dshot.c \
-            drivers/pwm_output_dshot_hal.c
-endif #!F3
-endif #!F1
-
-# check if target.mk supplied
-SRC := $(STARTUP_SRC) $(MCU_COMMON_SRC) $(TARGET_SRC) $(VARIANT_SRC)
-
-ifneq ($(DSP_LIB),)
-
-INCLUDE_DIRS += $(DSP_LIB)/Include
-
-SRC += $(DSP_LIB)/Source/BasicMathFunctions/arm_mult_f32.c
-SRC += $(DSP_LIB)/Source/TransformFunctions/arm_rfft_fast_f32.c
-SRC += $(DSP_LIB)/Source/TransformFunctions/arm_cfft_f32.c
-SRC += $(DSP_LIB)/Source/TransformFunctions/arm_rfft_fast_init_f32.c
-SRC += $(DSP_LIB)/Source/TransformFunctions/arm_cfft_radix8_f32.c
-SRC += $(DSP_LIB)/Source/CommonTables/arm_common_tables.c
-
-SRC += $(DSP_LIB)/Source/ComplexMathFunctions/arm_cmplx_mag_f32.c
-SRC += $(DSP_LIB)/Source/StatisticsFunctions/arm_max_f32.c
-
-SRC += $(wildcard $(DSP_LIB)/Source/*/*.S)
-endif
-
-ifneq ($(filter ONBOARDFLASH,$(FEATURES)),)
-SRC += \
-            drivers/flash.c \
-            drivers/flash_m25p16.c \
-            drivers/flash_w25m.c \
-            io/flashfs.c \
-            pg/flash.c \
-            $(MSC_SRC)
-endif
-
-SRC += $(COMMON_SRC)
-
-#excludes
-SRC   := $(filter-out $(MCU_EXCLUDES), $(SRC))
-
-ifneq ($(filter SDCARD,$(FEATURES)),)
-SRC += \
-            drivers/sdcard.c \
-            drivers/sdcard_standard.c \
-            io/asyncfatfs/asyncfatfs.c \
-            io/asyncfatfs/fat_standard.c \
-            $(MSC_SRC)
-endif
-
-ifneq ($(filter SDIO,$(FEATURES)),)
-SRC += \
-            drivers/sdcard_sdio_baremetal.c \
-            drivers/sdcard_standard.c \
-            io/asyncfatfs/asyncfatfs.c \
-            io/asyncfatfs/fat_standard.c \
-            pg/sdio.c \
-            $(MSC_SRC)
-endif
-
-ifneq ($(filter VCP,$(FEATURES)),)
-SRC += $(VCP_SRC)
-endif
-
-ifneq ($(filter MSC,$(FEATURES)),)
-SRC += $(MSC_SRC)
-endif
-# end target specific make file checks
-
-# Search path and source files for the ST stdperiph library
-VPATH        := $(VPATH):$(STDPERIPH_DIR)/src
+include $(ROOT)/make/source.mk
 
 ###############################################################################
 # Things that might need changing to use different tools
@@ -802,10 +388,11 @@ clean_all: $(CLEAN_TARGETS)
 ## all_clean         : clean all valid targets (alias for above)
 all_clean: $(TARGETS_CLEAN)
 
-flash_$(TARGET): $(TARGET_BIN)
+
+flash_$(TARGET): $(TARGET_HEX)
+	$(V0) stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
 	$(V0) echo -n 'R' >$(SERIAL_DEVICE)
-	sleep 2
-	dfu-util -a 0 -s 0x08000000:leave -D $(TARGET_BIN)
+	$(V0) stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
 
 ## flash             : flash firmware (.hex) onto flight controller
 flash: flash_$(TARGET)
@@ -827,8 +414,9 @@ binary:
 hex:
 	$(V0) $(MAKE) -j $(TARGET_HEX)
 
-unbrick_$(TARGET): $(TARGET_BIN)
-	dfu-util -a 0 -s 0x08000000:leave -D $(TARGET_BIN)
+unbrick_$(TARGET): $(TARGET_HEX)
+	$(V0) stty -F $(SERIAL_DEVICE) raw speed 115200 -crtscts cs8 -parenb -cstopb -ixon
+	$(V0) stm32flash -w $(TARGET_HEX) -v -g 0x0 -b 115200 $(SERIAL_DEVICE)
 
 ## unbrick           : unbrick flight controller
 unbrick: unbrick_$(TARGET)
@@ -853,6 +441,20 @@ $(BUILD_DIR):
 ## version           : print firmware version
 version:
 	@echo $(FC_VER)
+
+## help              : print this help message and exit
+help: Makefile make/tools.mk
+	@echo ""
+	@echo "Makefile for the $(FORKNAME) firmware"
+	@echo ""
+	@echo "Usage:"
+	@echo "        make [V=<verbosity>] [TARGET=<target>] [OPTIONS=\"<options>\"]"
+	@echo "Or:"
+	@echo "        make <target> [V=<verbosity>] [OPTIONS=\"<options>\"]"
+	@echo ""
+	@echo "Valid TARGET values are: $(VALID_TARGETS)"
+	@echo ""
+	@sed -n 's/^## //p' $?
 
 ## targets           : print a list of all valid target platforms (for consumption by scripts)
 targets:
@@ -905,8 +507,3 @@ $(TARGET_OBJS) : Makefile
 # include auto-generated dependencies
 -include $(TARGET_DEPS)
 
-listen:
-	miniterm.py $(SERIAL_DEVICE) 115200
-
-commit:
-	git commit -a -m="More Revo Board implementation"; git push
