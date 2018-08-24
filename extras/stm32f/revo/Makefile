@@ -66,8 +66,8 @@ BIN_DIR         := $(ROOT)/obj
 LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
 INCLUDE_DIRS    := $(SRC_DIR) \
-                   $(ROOT)/src/main/target
-LINKER_DIR      := $(ROOT)/src/main/target/link
+                   $(SRC_DIR)/target
+LINKER_DIR      := $(SRC_DIR)/target/link
 MAKE_DIR        := $(CF_DIR)/make
 
 ## V                 : Set verbosity level based on the V= parameter
@@ -273,7 +273,7 @@ INCLUDE_DIRS    := $(INCLUDE_DIRS) \
                    $(USBCDC_DIR)/Inc \
                    $(CMSIS_DIR)/Include \
                    $(CMSIS_DIR)/Device/ST/STM32F4xx/Include \
-                   $(ROOT)/src/main/vcp_hal
+                   $(SRC_DIR)/vcp_hal
 else
 CMSIS_SRC       := $(notdir $(wildcard $(CMSIS_DIR)/CoreSupport/*.c \
                    $(LIB_DIR)/STM32F4/Drivers/CMSIS/Device/ST/STM32F4xx/*.c))
@@ -288,7 +288,7 @@ INCLUDE_DIRS    := $(INCLUDE_DIRS) \
                    $(USBFS_DIR)/inc \
                    $(CMSIS_DIR)/Core/Include \
                    $(LIB_DIR)/STM32F4/Drivers/CMSIS/Device/ST/STM32F4xx \
-                   $(ROOT)/src/main/vcpf4
+                   $(SRC_DIR)/vcpf4
 endif
 
 ifneq ($(filter SDCARD,$(FEATURES)),)
@@ -392,7 +392,7 @@ ifneq ($(HSE_VALUE),)
 DEVICE_FLAGS  := $(DEVICE_FLAGS) -DHSE_VALUE=$(HSE_VALUE)
 endif
 
-TARGET_DIR     = $(ROOT)/src/main/target/$(BASE_TARGET)
+TARGET_DIR     = $(SRC_DIR)/target/$(BASE_TARGET)
 TARGET_DIR_SRC = $(notdir $(wildcard $(TARGET_DIR)/*.c))
 
 ifeq ($(OPBL),yes)
