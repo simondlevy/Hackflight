@@ -69,7 +69,8 @@ BIN_DIR         := $(ROOT)/obj
 LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
 HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
-INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR)
+RX_DIR          := $(ARDUINO_DIR)/SpektrumDSM/src
+INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(RX_DIR)
 LINKER_DIR      := $(SRC_DIR)/target/link
 MAKE_DIR        := $(CF_DIR)/make
 
@@ -879,8 +880,9 @@ LD_FLAGS     = -lm \
               -T$(LD_SCRIPT)
 endif
 
-HF_SRC := ../main.c sketch.cpp revo.cpp
-SRC += $(HF_SRC) 
+RX_SRC := $(RX_DIR)/SpektrumDSM.cpp
+HF_SRC := ../main.c sketch.cpp revo.cpp ../dsmx.cpp
+SRC += $(HF_SRC)  $(RX_SRC)
 
 ###############################################################################
 # No user-serviceable parts below

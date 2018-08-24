@@ -1,5 +1,5 @@
 /*
-   dsmx.cpp Support for Spektrum DSMX receive on F3 boards
+   dsmx.cpp Support for Spektrum DSMX receive on STM32Fx boards
 
    Copyright (c) 2018 Simon D. Levy
 

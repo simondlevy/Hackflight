@@ -1,5 +1,5 @@
 /*
-   dsmx.h Support for Spektrum DSMX receive on F3 boards
+   dsmx.h Support for Spektrum DSMX receive on STM32Fx boards
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -35,7 +35,8 @@ class DSMX_Receiver : public hf::Receiver {
 
         virtual void begin(void) override;
 
-    protected:
+    //protected:
+    public:
 
         virtual bool gotNewFrame(void) override;
 

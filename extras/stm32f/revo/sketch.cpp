@@ -22,21 +22,31 @@
 #include <mixers/quadx.hpp>
 #include "revo.h"
 
+constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+
 static hf::Hackflight h;
 
 extern "C" {
 
+#include "../dsmx.h"
+
     static Revo * board;
+
+    static DSMX_Receiver * rx;
 
     void setup(void)
     {
+        rx = new DSMX_Receiver(UARTDEV_1, CHANNEL_MAP);
+
+        rx->begin();
+
         board = new Revo();
     }
 
     void loop(void)
     {
-        hf::Debug::printf("Hello\n");
-        board->delaySeconds(.1);
+        hf::Debug::printf("%d\n", (int)(rx->gotNewFrame()));
+        board->delaySeconds(.01);
     }
 
 } // extern "C"
