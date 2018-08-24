@@ -112,7 +112,7 @@ GROUP_3_TARGETS := REVO
 
 BASE_TARGET    := $(TARGET)
 
--include $(ROOT)/src/main/target/$(BASE_TARGET)/target.mk
+-include $(SRC_DIR)/target/REVO/target.mk
 
 F4_TARGETS      := $(F405_TARGETS) $(F411_TARGETS) $(F446_TARGETS)
 
