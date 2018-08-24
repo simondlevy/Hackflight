@@ -68,6 +68,7 @@ CMSIS_DIR       := $(LIB_DIR)/CMSIS
 INCLUDE_DIRS    := $(SRC_DIR) \
                    $(ROOT)/src/main/target
 LINKER_DIR      := $(ROOT)/src/main/target/link
+MAKE_DIR        := $(CF_DIR)/make
 
 ## V                 : Set verbosity level based on the V= parameter
 ##                     V=0 Low
@@ -91,10 +92,10 @@ endif
 
 # Build tools, so we all share the same versions
 # import macros common to all supported build systems
-include $(CF_DIR)/make/system-id.mk
+include $(MAKE_DIR)/system-id.mk
 
 # developer preferences, edit these at will, they'll be gitignored
--include $(CF_DIR)/make/local.mk
+-include $(MAKE_DIR)/local.mk
 
 # configure some directories that are relative to wherever ROOT_DIR is located
 ifndef TOOLS_DIR
@@ -106,10 +107,10 @@ DL_DIR    := $(ROOT)/downloads
 export RM := rm
 
 # import macros that are OS specific
-include $(CF_DIR)/make/$(OSFAMILY).mk
+include $(MAKE_DIR)/$(OSFAMILY).mk
 
 # include the tools makefile
-include $(CF_DIR)/make/tools.mk
+include $(MAKE_DIR)/tools.mk
 
 # default xtal value for F4 targets
 HSE_VALUE       ?= 8000000
@@ -117,7 +118,7 @@ HSE_VALUE       ?= 8000000
 # used for turning on features like VCP and SDCARD
 FEATURES        =
 
-include $(CF_DIR)/make/targets.mk
+include $(MAKE_DIR)/targets.mk
 
 REVISION := $(shell git log -1 --format="%h")
 
@@ -419,7 +420,7 @@ INCLUDE_DIRS    := $(INCLUDE_DIRS) \
 
 VPATH           := $(VPATH):$(TARGET_DIR)
 
-include $(CF_DIR)/make/source.mk
+include $(MAKE_DIR)/source.mk
 
 ###############################################################################
 # Things that might need changing to use different tools
