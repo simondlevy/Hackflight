@@ -879,7 +879,7 @@ LD_FLAGS     = -lm \
               -T$(LD_SCRIPT)
 endif
 
-HF_SRC := main.c sketch.cpp revo.cpp
+HF_SRC := ../main.c sketch.cpp revo.cpp
 SRC += $(HF_SRC) 
 
 ###############################################################################

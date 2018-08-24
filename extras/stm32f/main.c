@@ -1,5 +1,5 @@
 /*
-   main routine for SP Racing F3 board
+   main routine for STM32Fx boards
 
    Copyright (c) 2018 Simon D. Levy
 
