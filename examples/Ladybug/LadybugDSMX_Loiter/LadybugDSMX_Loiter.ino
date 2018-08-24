@@ -21,6 +21,7 @@
 
 #include <Arduino.h>
 #include <VL53L1X.h>
+#include <Bitcraze_PMW3901.h>
 
 #include "hackflight.hpp"
 #include "boards/ladybug.hpp"
@@ -85,6 +86,9 @@ class VL53L1X_Rangefinder : public hf::Rangefinder {
 
 VL53L1X_Rangefinder rangefinder;
 
+// Using digital pin 10 for chip select
+Bitcraze_PMW3901 flow(10);
+
 void setup(void)
 {
     // Initialize Hackflight firmware
@@ -95,6 +99,13 @@ void setup(void)
     rangefinder.begin();
     h.addSensor(&rangefinder);
 
+    if (!flow.begin()) {
+        while (true) {
+            Serial.println("Initialization of the flow sensor failed");
+            delay(500);
+        }
+    }
+
     // Add Loiter PID controller for aux switch position 2
     h.addPidController(&loiter, 2);
 }
@@ -102,4 +113,13 @@ void setup(void)
 void loop(void)
 {
     h.update();
+
+    // Get motion count since last call
+    int16_t deltaX=0, deltaY=0;
+    flow.readMotionCount(&deltaX, &deltaY);
+    Serial.print("X: ");
+    Serial.print(deltaX);
+    Serial.print(", Y: ");
+    Serial.print(deltaY);
+    Serial.print("\n");
 }
