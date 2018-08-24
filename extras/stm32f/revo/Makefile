@@ -72,7 +72,22 @@ LINKER_DIR      := $(ROOT)/src/main/target/link
 ## V                 : Set verbosity level based on the V= parameter
 ##                     V=0 Low
 ##                     V=1 High
-include $(ROOT)/make/build_verbosity.mk
+export AT := @
+
+ifndef V
+export V0    :=
+export V1    := $(AT)
+export STDOUT   :=
+else ifeq ($(V), 0)
+export V0    := $(AT)
+export V1    := $(AT)
+export STDOUT:= "> /dev/null"
+export MAKE  := $(MAKE) --no-print-directory
+else ifeq ($(V), 1)
+export V0    :=
+export V1    :=
+export STDOUT   :=
+endif
 
 # Build tools, so we all share the same versions
 # import macros common to all supported build systems
@@ -149,10 +164,6 @@ VPATH 			:= $(VPATH):$(ROOT)/make
 # start specific includes
 include $(ROOT)/make/mcu/$(TARGET_MCU).mk
 
-# openocd specific includes
-include $(ROOT)/make/openocd.mk
-
-# Configure default flash sizes for the targets (largest size specified gets hit first) if flash not specified already.
 ifeq ($(FLASH_SIZE),)
 ifneq ($(TARGET_FLASH),)
 FLASH_SIZE := $(TARGET_FLASH)
@@ -453,20 +464,6 @@ $(BUILD_DIR):
 ## version           : print firmware version
 version:
 	@echo $(FC_VER)
-
-## help              : print this help message and exit
-help: Makefile make/tools.mk
-	@echo ""
-	@echo "Makefile for the $(FORKNAME) firmware"
-	@echo ""
-	@echo "Usage:"
-	@echo "        make [V=<verbosity>] [TARGET=<target>] [OPTIONS=\"<options>\"]"
-	@echo "Or:"
-	@echo "        make <target> [V=<verbosity>] [OPTIONS=\"<options>\"]"
-	@echo ""
-	@echo "Valid TARGET values are: $(VALID_TARGETS)"
-	@echo ""
-	@sed -n 's/^## //p' $?
 
 ## targets           : print a list of all valid target platforms (for consumption by scripts)
 targets:
