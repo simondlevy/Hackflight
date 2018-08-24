@@ -1,15 +1,23 @@
-###############################################################################
-# "THE BEER-WARE LICENSE" (Revision 42):
-# <msmith@FreeBSD.ORG> wrote this file. As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
-# this stuff is worth it, you can buy me a beer in return
-###############################################################################
+##############################################################################
+#   Makefile for OpenPilot CC3D Revolution board
 #
-# Makefile for building the cleanflight firmware.
+#   Copyright (c) 2018 Simon D. Levy
 #
-# Invoke this with 'make help' to see the list of supported targets.
+#   This file is part of Hackflight.
 #
-###############################################################################
+#   Hackflight is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   Hackflight is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#   You should have received a copy of the GNU General Public License
+#   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+##############################################################################
+
 
 
 # Things that the user might override on the commandline
@@ -45,7 +53,7 @@ FLASH_SIZE ?=
 # Things that need to be maintained as the source changes
 #
 
-FORKNAME      = cleanflight
+FORKNAME      = hackflight
 
 # Working directories
 ROOT            := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
@@ -507,3 +515,6 @@ $(TARGET_OBJS) : Makefile
 # include auto-generated dependencies
 -include $(TARGET_DEPS)
 
+commit:
+	git commit -a -m="More Revo progress"
+	git push
