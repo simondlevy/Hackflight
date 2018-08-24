@@ -29,6 +29,9 @@ TARGET    ?= REVO
 # Where you put Cleanflight
 CF_DIR := $(HOME)/Desktop/cleanflight
 
+# Where you put Arduino libraries
+ARDUINO_DIR     := $(HOME)/Documents/Arduino/libraries
+
 # Compile-time options
 OPTIONS   ?=
 
@@ -65,8 +68,8 @@ OBJECT_DIR      := $(ROOT)/obj/main
 BIN_DIR         := $(ROOT)/obj
 LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
-INCLUDE_DIRS    := $(SRC_DIR) \
-                   $(SRC_DIR)/target
+HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
+INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR)
 LINKER_DIR      := $(SRC_DIR)/target/link
 MAKE_DIR        := $(CF_DIR)/make
 
@@ -415,7 +418,6 @@ COMMON_SRC = \
             build/debug.c \
             build/version.c \
             $(TARGET_DIR_SRC) \
-            main.c \
             $(addprefix pg/,$(notdir $(wildcard $(SRC_DIR)/pg/*.c))) \
             $(addprefix common/,$(notdir $(wildcard $(SRC_DIR)/common/*.c))) \
             $(addprefix config/,$(notdir $(wildcard $(SRC_DIR)/config/*.c))) \
@@ -838,7 +840,6 @@ CFLAGS     += $(ARCH_FLAGS) \
               $(addprefix -D,$(OPTIONS)) \
               $(addprefix -I,$(INCLUDE_DIRS)) \
               $(DEBUG_FLAGS) \
-              -std=gnu99 \
               -Wall -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion \
               -ffunction-sections \
               -fdata-sections \
@@ -877,6 +878,9 @@ LD_FLAGS     = -lm \
               -Wl,--print-memory-usage \
               -T$(LD_SCRIPT)
 endif
+
+HF_SRC := main.c sketch.cpp revo.cpp
+SRC += $(HF_SRC) 
 
 ###############################################################################
 # No user-serviceable parts below
@@ -923,13 +927,10 @@ $(TARGET_BIN): $(TARGET_ELF)
 
 $(TARGET_ELF):  $(TARGET_OBJS)
 	@echo "Linking $(TARGET)" "$(STDOUT)"
-ifeq ($(TARGET_MCU),STM32F1)
-	@echo "Notice: STM32F1 based targets will be unsupported soon."
-endif
-	$(V1) $(CROSS_CC) -o $@ $^ $(LD_FLAGS)
+	$(V1) $(CROSS_CXX) -o $@ $^ $(LD_FLAGS)
 	$(V1) $(SIZE) $(TARGET_ELF)
 
-# Compile
+# Compile .c
 ifeq ($(DEBUG),GDB)
 $(OBJECT_DIR)/$(TARGET)/%.o: %.c
 	$(V1) mkdir -p $(dir $@)
@@ -947,6 +948,26 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.c
 	echo "%% $<" "$(STDOUT)" && \
 	$(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<))
 endif
+
+# Compile .cpp
+ifeq ($(DEBUG),GDB)
+$(OBJECT_DIR)/$(TARGET)/%.o: %.cpp
+	$(V1) mkdir -p $(dir $@)
+	$(V1) echo "%% (debug) $<" "$(STDOUT)" && \
+	$(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEBUG_OPTIMISATION) $<
+else
+$(OBJECT_DIR)/$(TARGET)/%.o: %.cpp
+	$(V1) mkdir -p $(dir $@)
+	$(V1) $(if $(findstring $(subst ./src/,,$<),$(SPEED_OPTIMISED_SRC)), \
+	echo "%% (speed optimised) $<" "$(STDOUT)" && \
+	$(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_SPEED_OPTIMISATION) $<, \
+	$(if $(findstring $(subst ./src/,,$<),$(SIZE_OPTIMISED_SRC)), \
+	echo "%% (size optimised) $<" "$(STDOUT)" && \
+	$(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_SIZE_OPTIMISATION) $<, \
+	echo "%% $<" "$(STDOUT)" && \
+	$(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<))
+endif
+
 
 # Assemble
 $(OBJECT_DIR)/$(TARGET)/%.o: %.s
