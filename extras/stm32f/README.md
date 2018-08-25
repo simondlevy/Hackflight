@@ -10,3 +10,12 @@ download on your desktop, or edit the line in the
 to reflect where you put it. Then cd to the folder for your board and type
 <tt>make</tt>.
 
+The following flight controllers are currently supported:
+
+* [Alienflight F3](http://www.readytoflyquads.com/alien-f3-brushed-flight-controller) brushed flight controller
+controller from ReadyToFlyQuads
+
+* [SP Racing F3](http://seriouslypro.com/spracingf3) brushless flight controller
+
+
+
