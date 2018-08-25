@@ -76,9 +76,7 @@ extern "C" {
 
         spiBusSetInstance(&bus, MPU6000_SPI_INSTANCE);
 
-        bus.busdev_u.spi.csnPin = bus.busdev_u.spi.csnPin == IO_NONE ? 
-                                  IOGetByTag(IO_TAG(MPU6000_CS_PIN)) : 
-                                  bus.busdev_u.spi.csnPin;
+        bus.busdev_u.spi.csnPin = IOGetByTag(IO_TAG(MPU6000_CS_PIN));
 
         tmp = mpu6000SpiDetect(&bus);
 
