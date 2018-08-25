@@ -195,6 +195,18 @@ extern "C" {
 
     bool Nuke::imuRead(void)
     {
+        if (_imu->checkNewData()) {  
+
+            // Note reversed X/Y order because of IMU rotation
+            _imu->readAccelerometer(_ax, _ay, _az);
+            _imu->readGyrometer(_gx, _gy, _gz);
+
+            _az = -_az;
+
+            return true;
+
+        }  
+
         return false;
     }
 
