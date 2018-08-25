@@ -90,6 +90,12 @@ extern "C" {
 
         delaySeconds(.01);
 
+        IOInit(_bus.busdev_u.spi.csnPin, OWNER_MPU_CS, 0);
+        IOConfigGPIO(_bus.busdev_u.spi.csnPin, SPI_IO_CS_CFG);
+        IOHi(_bus.busdev_u.spi.csnPin);
+
+        spiSetDivisor(_bus.busdev_u.spi.instance, SPI_CLOCK_INITIALIZATON);
+
         _imu = new MPU6000(AFS_2G, GFS_250DPS);
 
         switch (_imu->begin()) {
