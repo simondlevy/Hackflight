@@ -70,7 +70,22 @@ extern "C" {
     {
         spiPinConfigure(spiPinConfig(0));
         spiPreInit();
-        spiInitDevice(SPIDEV_2);
+
+        SPIDevice spiDevice = SPIINVALID;
+
+        if (MPU6000_SPI_INSTANCE == SPI1) {
+            spiDevice = SPIDEV_1;
+        }
+
+        else if (MPU6000_SPI_INSTANCE == SPI2) {
+            spiDevice = SPIDEV_2;
+        }
+
+        else if (MPU6000_SPI_INSTANCE == SPI3) {
+            spiDevice = SPIDEV_3;
+        }
+
+        spiInit(spiDevice);
 
         busDevice_t bus;
 
