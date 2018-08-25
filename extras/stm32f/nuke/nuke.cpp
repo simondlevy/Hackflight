@@ -27,8 +27,6 @@ static const uint16_t BRUSHED_IDLE_PULSE   = 0;
 static const float    MOTOR_MIN = 1000;
 static const float    MOTOR_MAX = 2000;
 
-uint8_t tmp;
-
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
@@ -53,6 +51,8 @@ extern "C" {
 #include "stm32f30x.h"
 
     static serialPort_t * _serial0;
+
+    static busDevice_t _bus;
 
     Nuke::Nuke(void)
     {
@@ -84,14 +84,42 @@ extern "C" {
 
         spiInit(spiDevice);
 
-        busDevice_t bus;
+        spiBusSetInstance(&_bus, MPU6000_SPI_INSTANCE);
 
-        spiBusSetInstance(&bus, MPU6000_SPI_INSTANCE);
-
-        bus.busdev_u.spi.csnPin = IOGetByTag(IO_TAG(MPU6000_CS_PIN));
+        _bus.busdev_u.spi.csnPin = IOGetByTag(IO_TAG(MPU6000_CS_PIN));
 
         delaySeconds(.01);
+
+        _imu = new MPU6000(AFS_2G, GFS_250DPS);
+
+        switch (_imu->begin()) {
+
+            case MPU_ERROR_ID:
+                error("Bad device ID");
+                break;
+            case MPU_ERROR_SELFTEST:
+                error("Failed self-test");
+                break;
+            default:
+                break;
+        }
     }
+
+    static void _writeRegister(uint8_t subAddress, uint8_t data)
+    {
+        spiBusWriteRegister(&_bus, subAddress, data);
+    }
+
+    static void _readRegisters(uint8_t subAddress, uint8_t count, uint8_t * dest)
+    {  
+        spiBusReadRegisterBuffer(&_bus, subAddress, dest, count);
+    }
+
+    void spi_init(void)
+    {
+        spiSetDivisor(_bus.busdev_u.spi.instance, SPI_CLOCK_INITIALIZATON);
+    }
+
 
     void Nuke::initUsb(void)
     {
@@ -171,3 +199,16 @@ extern "C" {
     }
 
 } // extern "C"
+
+#include <CrossPlatformSPI.h>
+
+void cpspi_writeRegister(uint8_t subAddress, uint8_t data)
+{
+    _writeRegister(subAddress, data);
+}
+
+void cpspi_readRegisters(uint8_t subAddress, uint8_t count, uint8_t * dest)
+{  
+    _readRegisters(subAddress, count, dest);
+}
+

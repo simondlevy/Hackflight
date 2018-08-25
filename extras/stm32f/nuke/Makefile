@@ -468,7 +468,7 @@ endif
 IMU_SRC := $(IMU_DIR)/MPU60x0.cpp $(IMU_DIR)/MPU6000.cpp
 RX_SRC := $(RX_DIR)/SpektrumDSM.cpp
 HF_SRC := ../main.c sketch.cpp nuke.cpp ../dsmx.cpp
-SRC += $(HF_SRC) $(RX_SRC)
+SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC)
 
 ###############################################################################
 # No user-serviceable parts below

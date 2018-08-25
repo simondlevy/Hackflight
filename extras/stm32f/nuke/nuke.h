@@ -28,6 +28,8 @@ class Nuke : public hf::SoftwareQuaternionBoard  {
 
     private:
 
+        MPU6000 * _imu;
+
         void initMotors(void);
         void initUsb(void);
         void initImu(void);
