@@ -22,7 +22,7 @@
 #pragma once
 
 #include <boards/softquat.hpp>
-#include <MPU6000.h>
+#include <MPU60x0.h>
 
 class Nuke : public hf::SoftwareQuaternionBoard  {
 

@@ -86,9 +86,10 @@ BIN_DIR         := $(ROOT)/obj
 LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
 HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
+IMU_DIR         := $(ARDUINO_DIR)/MPU60x0/src
 RX_DIR          := $(ARDUINO_DIR)/SpektrumDSM/src
 SPI_DIR         := $(ARDUINO_DIR)/CrossPlatformSPI/src
-INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(SPI_DIR) $(RX_DIR)
+INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR)
 LINKER_DIR      := $(SRC_DIR)/target/link
 
 # configure some variables dependent upon what type of system this is
@@ -464,6 +465,7 @@ LD_FLAGS     = -lm \
 endif
 
 # Hackflight support
+IMU_SRC := $(IMU_DIR)/MPU60x0.cpp $(IMU_DIR)/MPU6000.cpp
 RX_SRC := $(RX_DIR)/SpektrumDSM.cpp
 HF_SRC := ../main.c sketch.cpp nuke.cpp ../dsmx.cpp
 SRC += $(HF_SRC) $(RX_SRC)
