@@ -37,6 +37,11 @@ namespace hf {
 
         protected:
 
+            // NB: gyrometer, accelerometer should return values as follows:
+            // X: nose-up -, nose-down +
+            // Y: roll-left -, roll-right +
+            // Z: rightside-up +, upside-down -
+
             //------------------------------------ Core functionality ----------------------------------------------------
             virtual bool  getQuaternion(float quat[4]) = 0;
             virtual bool  getGyrometer(float gyroRates[3]) = 0;
