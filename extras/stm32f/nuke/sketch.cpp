@@ -49,6 +49,9 @@ extern "C" {
     void loop(void)
     {
         h.update();
+
+        extern uint8_t tmp;
+        hf::Debug::printf("%d\n", tmp);
     }
 
 } // extern "C"

@@ -27,6 +27,8 @@ static const uint16_t BRUSHED_IDLE_PULSE   = 0;
 static const float    MOTOR_MIN = 1000;
 static const float    MOTOR_MAX = 2000;
 
+uint8_t tmp;
+
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
@@ -50,6 +52,9 @@ extern "C" {
 
 #include "stm32f30x.h"
 
+#include "drivers/accgyro/accgyro.h"
+#include "drivers/accgyro/accgyro_spi_mpu6000.h"
+
     static serialPort_t * _serial0;
 
     Nuke::Nuke(void)
@@ -64,7 +69,20 @@ extern "C" {
     void Nuke::initImu(void)
     {
         spiPinConfigure(spiPinConfig(0));
-        spiInitDevice(SPIDEV_1);
+        spiPreInit();
+        spiInitDevice(SPIDEV_2);
+
+        busDevice_t bus;
+
+        spiBusSetInstance(&bus, MPU6000_SPI_INSTANCE);
+
+        bus.busdev_u.spi.csnPin = bus.busdev_u.spi.csnPin == IO_NONE ? 
+                                  IOGetByTag(IO_TAG(MPU6000_CS_PIN)) : 
+                                  bus.busdev_u.spi.csnPin;
+
+        tmp = mpu6000SpiDetect(&bus);
+
+        delaySeconds(.01);
     }
 
     void Nuke::initUsb(void)
