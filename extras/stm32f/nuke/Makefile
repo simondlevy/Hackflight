@@ -304,8 +304,11 @@ MCU_COMMON_SRC = \
 	    drivers/serial_uart_init.c \
 	    drivers/serial_uart.c \
 	    drivers/serial.c \
+		drivers/bus_spi.c \
+		drivers/bus_spi_pinconfig.c \
 	    io/serial.c \
-	    pg/pg.c
+	    pg/pg.c \
+	    pg/bus_spi.c
 
 DEVICE_FLAGS += -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING -D__FPU_PRESENT=1 -DUNALIGNED_SUPPORT_DISABLE -DARM_MATH_CM4
 
@@ -710,4 +713,4 @@ listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
 
 commit:
-	git commit -a -m="More AlienflightF3 Board implementation"; git push
+	git commit -a -m="More Furious FPV Nuke Board implementation"; git push

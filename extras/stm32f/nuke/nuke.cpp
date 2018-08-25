@@ -40,7 +40,9 @@ extern "C" {
 #include "drivers/serial.h"
 #include "drivers/serial_uart.h"
 #include "drivers/serial_usb_vcp.h"
-#include "drivers/bus_i2c.h"
+#include "drivers/bus_spi.h"
+#include "drivers/bus_spi_impl.h"
+#include "pg/bus_spi.h"
 
 #include "io/serial.h"
 
@@ -61,6 +63,8 @@ extern "C" {
 
     void Nuke::initImu(void)
     {
+        spiPinConfigure(spiPinConfig(0));
+        spiInitDevice(SPIDEV_1);
     }
 
     void Nuke::initUsb(void)
