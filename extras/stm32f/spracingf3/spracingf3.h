@@ -22,7 +22,7 @@
 #pragma once
 
 #include <boards/softquat.hpp>
-#include <MPU6050.h>
+#include <MPU60x0.h>
 
 class SPRacingF3 : public hf::SoftwareQuaternionBoard  {
 
