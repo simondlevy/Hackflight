@@ -52,9 +52,6 @@ extern "C" {
 
 #include "stm32f30x.h"
 
-#include "drivers/accgyro/accgyro.h"
-#include "drivers/accgyro/accgyro_spi_mpu6000.h"
-
     static serialPort_t * _serial0;
 
     Nuke::Nuke(void)
@@ -92,8 +89,6 @@ extern "C" {
         spiBusSetInstance(&bus, MPU6000_SPI_INSTANCE);
 
         bus.busdev_u.spi.csnPin = IOGetByTag(IO_TAG(MPU6000_CS_PIN));
-
-        tmp = mpu6000SpiDetect(&bus);
 
         delaySeconds(.01);
     }

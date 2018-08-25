@@ -86,7 +86,7 @@ BIN_DIR         := $(ROOT)/obj
 LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
 HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
-IMU_DIR         := $(ARDUINO_DIR)/MPU6050/src
+IMU_DIR         := $(ARDUINO_DIR)/MPU60x0/src
 RX_DIR          := $(ARDUINO_DIR)/SpektrumDSM/src
 I2C_DIR         := $(ARDUINO_DIR)/CrossPlatformI2C/src
 INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(I2C_DIR) $(RX_DIR)
@@ -463,7 +463,7 @@ LD_FLAGS     = -lm \
 endif
 
 # Hackflight support
-IMU_SRC := $(IMU_DIR)/MPU6050.cpp
+IMU_SRC := $(IMU_DIR)/MPU60x0.cpp $(IMU_DIR)/MPU6050.cpp
 RX_SRC := $(RX_DIR)/SpektrumDSM.cpp
 HF_SRC := ../main.c sketch.cpp alienflightf3v1.cpp i2c.cpp ../dsmx.cpp
 SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC)
