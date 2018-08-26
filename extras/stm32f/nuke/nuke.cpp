@@ -169,18 +169,18 @@ extern "C" {
 
         // Accel Sample Rate 1kHz
         // Gyroscope Output Rate =  1kHz when the DLPF is enabled
-        //spiBusWriteRegister(&_bus, MPU_RA_SMPLRT_DIV, gyro->mpuDividerDrops);
-        //delayMicroseconds(15);
+        spiBusWriteRegister(&_bus, MPU_RA_SMPLRT_DIV, 0);
+        delayMicroseconds(15);
 
         // Gyro +/- 1000 DPS Full Scale
-        spiBusWriteRegister(&_bus, MPU_RA_GYRO_CONFIG, INV_FSR_2000DPS << 3);
+        spiBusWriteRegister(&_bus, MPU_RA_GYRO_CONFIG, INV_FSR_250DPS << 3);
         delayMicroseconds(15);
 
         // Accel +/- 16 G Full Scale
-        spiBusWriteRegister(&_bus, MPU_RA_ACCEL_CONFIG, INV_FSR_16G << 3);
+        spiBusWriteRegister(&_bus, MPU_RA_ACCEL_CONFIG, INV_FSR_2G << 3);
         delayMicroseconds(15);
 
-        //spiBusWriteRegister(&_bus, MPU_RA_INT_PIN_CFG, 0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR
+        spiBusWriteRegister(&_bus, MPU_RA_INT_PIN_CFG, 0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR
         delayMicroseconds(15);
 
         spiBusWriteRegister(&_bus, MPU_RA_INT_ENABLE, MPU_RF_DATA_RDY_EN);
@@ -268,17 +268,19 @@ extern "C" {
         if (_imu->checkNewData()) {  
 
             // Note reversed X/Y order because of IMU rotation
-            _imu->readAccelerometer(_ax, _ay, _az);
+            _imu->readAccelerometer(_ay, _ax, _az);
+            _imu->readGyrometer(_gy, _gx, _gz);
 
-
-            hf::Debug::printf("%d\n", (int16_t)(1000*_ay));
-
-            _imu->readGyrometer(_gx, _gy, _gz);
-
+            // Negate for same reason	    
+            _ay = -_ay;
+            _gy = -_gy;
             _az = -_az;
+            _gz = -_gz;
+
+            hf::Debug::printfloat(_gz);
+            hf::Debug::printf("\n");
 
             return true;
-
         }  
 
         return false;

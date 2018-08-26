@@ -38,8 +38,11 @@ namespace hf {
         protected:
 
             // NB: gyrometer, accelerometer should return values as follows:
+            //
             // GX: pitch forward -, pitch back +
             // GY: roll left -, roll right +
+            // GZ: yaw left +, yaw right -
+            //
             // AZ: rightside-up +, upside-down -
 
             //------------------------------------ Core functionality ----------------------------------------------------
