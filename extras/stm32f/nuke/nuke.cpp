@@ -133,6 +133,7 @@ extern "C" {
 
         delaySeconds(.01);
 
+        /*
         _imu = new MPU6000(AFS_2G, GFS_250DPS);
 
         switch (_imu->begin()) {
@@ -148,6 +149,7 @@ extern "C" {
         }
 
         delaySeconds(.01);
+        */
 
         // Device Reset
         spiBusWriteRegister(&_bus, MPU_RA_PWR_MGMT_1, BIT_H_RESET);
@@ -265,6 +267,11 @@ extern "C" {
 
     bool Nuke::imuRead(void)
     {
+        uint8_t data=0;
+        _readRegisters(0x3A, 1, &data);
+        hf::Debug::printf("%d\n", data & 0x01);
+
+        /*
         if (_imu->checkNewData()) {  
 
             // Note reversed X/Y order because of IMU rotation
@@ -277,7 +284,7 @@ extern "C" {
             _az = -_az;
 
             return true;
-        }  
+        }*/
 
         return false;
     }
