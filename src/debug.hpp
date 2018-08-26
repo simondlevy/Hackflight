@@ -60,7 +60,13 @@ namespace hf {
                 Debug::printf("%c%d.%d", sgn, bigval/mul, bigval % mul);
             }
 
-    }; // class Debug
+            static void printlnfloat(float val, uint8_t prec=3)
+            {
+                printfloat(val, prec);
+                printf("\n");
+            }
+
+     }; // class Debug
 
 } // namespace hf
 

@@ -275,10 +275,6 @@ extern "C" {
             _ay = -_ay;
             _gy = -_gy;
             _az = -_az;
-            _gz = -_gz;
-
-            hf::Debug::printfloat(_gz);
-            hf::Debug::printf("\n");
 
             return true;
         }  
