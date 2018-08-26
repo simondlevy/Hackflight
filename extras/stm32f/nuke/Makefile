@@ -304,6 +304,7 @@ MCU_COMMON_SRC = \
 	    drivers/serial_uart_init.c \
 	    drivers/serial_uart.c \
 	    drivers/serial.c \
+		drivers/bus.c \
 		drivers/bus_spi.c \
 		drivers/bus_spi_config.c \
 		drivers/bus_spi_pinconfig.c \

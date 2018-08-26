@@ -98,6 +98,39 @@ extern "C" {
         RealBoard::init();
     }
 
+    static bool _mpuGyroRead(int16_t & gx, int16_t & gy, int16_t & gz)
+    {
+        uint8_t data[6];
+
+        const bool ack = busReadRegisterBuffer(&_bus, MPU_RA_GYRO_XOUT_H, data, 6);
+        if (!ack) {
+            return false;
+        }
+
+        gx = (int16_t)((data[0] << 8) | data[1]);
+        gy = (int16_t)((data[2] << 8) | data[3]);
+        gz = (int16_t)((data[4] << 8) | data[5]);
+
+        return true;
+    }
+
+
+    static bool _mpuAccRead(int16_t & ax, int16_t & ay, int16_t & az)
+    {
+        uint8_t data[6];
+
+        const bool ack = busReadRegisterBuffer(&_bus, MPU_RA_ACCEL_XOUT_H, data, 6);
+        if (!ack) {
+            return false;
+        }
+
+        ax = (int16_t)((data[0] << 8) | data[1]);
+        ay = (int16_t)((data[2] << 8) | data[3]);
+        az = (int16_t)((data[4] << 8) | data[5]);
+
+        return true;
+    }
+
     void Nuke::initImu(void)
     {
         spiPinConfigure(spiPinConfig(0));
@@ -134,22 +167,22 @@ extern "C" {
         delaySeconds(.01);
 
         /*
-        _imu = new MPU6000(AFS_2G, GFS_250DPS);
+           _imu = new MPU6000(AFS_2G, GFS_250DPS);
 
-        switch (_imu->begin()) {
+           switch (_imu->begin()) {
 
-            case MPU_ERROR_ID:
-                error("Bad device ID");
-                break;
-            case MPU_ERROR_SELFTEST:
-                error("Failed self-test");
-                break;
-            default:
-                break;
-        }
+           case MPU_ERROR_ID:
+           error("Bad device ID");
+           break;
+           case MPU_ERROR_SELFTEST:
+           error("Failed self-test");
+           break;
+           default:
+           break;
+           }
 
-        delaySeconds(.01);
-        */
+           delaySeconds(.01);
+         */
 
         // Device Reset
         spiBusWriteRegister(&_bus, MPU_RA_PWR_MGMT_1, BIT_H_RESET);
@@ -269,21 +302,27 @@ extern "C" {
     {
         uint8_t data=0;
         _readRegisters(0x3A, 1, &data);
-        hf::Debug::printf("%d\n", data & 0x01);
+         if (data & 0x01) {
+             int16_t gx=0, gy=0, gz=0;
+             int16_t ax=0, ay=0, az=0;
+             if (_mpuAccRead(ax, ay, az) && _mpuGyroRead(gx, gy, gz)) {
+                hf::Debug::printf("%d %d %d\n", ax, ay, az);
+             }
+         }
 
         /*
-        if (_imu->checkNewData()) {  
+           if (_imu->checkNewData()) {  
 
-            // Note reversed X/Y order because of IMU rotation
-            _imu->readAccelerometer(_ay, _ax, _az);
-            _imu->readGyrometer(_gy, _gx, _gz);
+        // Note reversed X/Y order because of IMU rotation
+        _imu->readAccelerometer(_ay, _ax, _az);
+        _imu->readGyrometer(_gy, _gx, _gz);
 
-            // Negate for same reason	    
-            _ay = -_ay;
-            _gy = -_gy;
-            _az = -_az;
+        // Negate for same reason	    
+        _ay = -_ay;
+        _gy = -_gy;
+        _az = -_az;
 
-            return true;
+        return true;
         }*/
 
         return false;
