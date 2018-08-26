@@ -21,39 +21,6 @@
 
 #include "nuke.h"
 
-// Bits
-#define BIT_SLEEP                   0x40
-#define BIT_H_RESET                 0x80
-#define BITS_CLKSEL                 0x07
-#define MPU_CLK_SEL_PLLGYROX        0x01
-#define MPU_CLK_SEL_PLLGYROZ        0x03
-#define MPU_EXT_SYNC_GYROX          0x02
-#define BITS_FS_250DPS              0x00
-#define BITS_FS_500DPS              0x08
-#define BITS_FS_1000DPS             0x10
-#define BITS_FS_2000DPS             0x18
-#define BITS_FS_2G                  0x00
-#define BITS_FS_4G                  0x08
-#define BITS_FS_8G                  0x10
-#define BITS_FS_16G                 0x18
-#define BITS_FS_MASK                0x18
-#define BITS_DLPF_CFG_256HZ         0x00
-#define BITS_DLPF_CFG_188HZ         0x01
-#define BITS_DLPF_CFG_98HZ          0x02
-#define BITS_DLPF_CFG_42HZ          0x03
-#define BITS_DLPF_CFG_20HZ          0x04
-#define BITS_DLPF_CFG_10HZ          0x05
-#define BITS_DLPF_CFG_5HZ           0x06
-#define BITS_DLPF_CFG_2100HZ_NOLPF  0x07
-#define BITS_DLPF_CFG_MASK          0x07
-#define BIT_INT_ANYRD_2CLEAR        0x10
-#define BIT_RAW_RDY_EN              0x01
-#define BIT_I2C_IF_DIS              0x10
-#define BIT_INT_STATUS_DATA         0x01
-#define BIT_GYRO                    3
-#define BIT_ACC                     2
-#define BIT_TEMP                    1
-
 static const uint16_t BRUSHED_PWM_RATE     = 32000;
 static const uint16_t BRUSHED_IDLE_PULSE   = 0; 
 
@@ -83,11 +50,13 @@ extern "C" {
 
 #include "stm32f30x.h"
 
+#include "drivers/accgyro/accgyro.h"
 #include "drivers/accgyro/accgyro_mpu.h"
+#include "drivers/accgyro/accgyro_spi_mpu6000.h"
 
     static serialPort_t * _serial0;
 
-    static busDevice_t _bus;
+    static gyroDev_t _gyro;
 
     Nuke::Nuke(void)
     {
@@ -96,39 +65,6 @@ extern "C" {
         initImu();
 
         RealBoard::init();
-    }
-
-    static bool _mpuGyroRead(int16_t & gx, int16_t & gy, int16_t & gz)
-    {
-        uint8_t data[6];
-
-        const bool ack = busReadRegisterBuffer(&_bus, MPU_RA_GYRO_XOUT_H, data, 6);
-        if (!ack) {
-            return false;
-        }
-
-        gx = (int16_t)((data[0] << 8) | data[1]);
-        gy = (int16_t)((data[2] << 8) | data[3]);
-        gz = (int16_t)((data[4] << 8) | data[5]);
-
-        return true;
-    }
-
-
-    static bool _mpuAccRead(int16_t & ax, int16_t & ay, int16_t & az)
-    {
-        uint8_t data[6];
-
-        const bool ack = busReadRegisterBuffer(&_bus, MPU_RA_ACCEL_XOUT_H, data, 6);
-        if (!ack) {
-            return false;
-        }
-
-        ax = (int16_t)((data[0] << 8) | data[1]);
-        ay = (int16_t)((data[2] << 8) | data[3]);
-        az = (int16_t)((data[4] << 8) | data[5]);
-
-        return true;
     }
 
     void Nuke::initImu(void)
@@ -152,85 +88,19 @@ extern "C" {
 
         spiInit(spiDevice);
 
-        spiBusSetInstance(&_bus, MPU6000_SPI_INSTANCE);
+        spiBusSetInstance(&_gyro.bus, MPU6000_SPI_INSTANCE);
 
-        _bus.busdev_u.spi.csnPin = IOGetByTag(IO_TAG(MPU6000_CS_PIN));
+        _gyro.bus.busdev_u.spi.csnPin = IOGetByTag(IO_TAG(MPU6000_CS_PIN));
 
-        delaySeconds(.01);
+        delay(100);
 
-        IOInit(_bus.busdev_u.spi.csnPin, OWNER_MPU_CS, 0);
-        IOConfigGPIO(_bus.busdev_u.spi.csnPin, SPI_IO_CS_CFG);
-        IOHi(_bus.busdev_u.spi.csnPin);
+        mpu6000SpiDetect(&_gyro.bus);
 
-        spiSetDivisor(_bus.busdev_u.spi.instance, SPI_CLOCK_INITIALIZATON);
+        delay(100);
 
-        delaySeconds(.01);
+        extern void mpu6000SpiGyroInit(gyroDev_t *gyro);
 
-        /*
-           _imu = new MPU6000(AFS_2G, GFS_250DPS);
-
-           switch (_imu->begin()) {
-
-           case MPU_ERROR_ID:
-           error("Bad device ID");
-           break;
-           case MPU_ERROR_SELFTEST:
-           error("Failed self-test");
-           break;
-           default:
-           break;
-           }
-
-           delaySeconds(.01);
-         */
-
-        // Device Reset
-        spiBusWriteRegister(&_bus, MPU_RA_PWR_MGMT_1, BIT_H_RESET);
-        delay(150);
-
-        spiBusWriteRegister(&_bus, MPU_RA_SIGNAL_PATH_RESET, BIT_GYRO | BIT_ACC | BIT_TEMP);
-        delay(150);
-
-        // Clock Source PPL with Z axis gyro reference
-        spiBusWriteRegister(&_bus, MPU_RA_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
-        delayMicroseconds(15);
-
-        // Disable Primary I2C Interface
-        spiBusWriteRegister(&_bus, MPU_RA_USER_CTRL, BIT_I2C_IF_DIS);
-        delayMicroseconds(15);
-
-        spiBusWriteRegister(&_bus, MPU_RA_PWR_MGMT_2, 0x00);
-        delayMicroseconds(15);
-
-        // Accel Sample Rate 1kHz
-        // Gyroscope Output Rate =  1kHz when the DLPF is enabled
-        spiBusWriteRegister(&_bus, MPU_RA_SMPLRT_DIV, 0);
-        delayMicroseconds(15);
-
-        // Gyro +/- 1000 DPS Full Scale
-        spiBusWriteRegister(&_bus, MPU_RA_GYRO_CONFIG, INV_FSR_250DPS << 3);
-        delayMicroseconds(15);
-
-        // Accel +/- 16 G Full Scale
-        spiBusWriteRegister(&_bus, MPU_RA_ACCEL_CONFIG, INV_FSR_2G << 3);
-        delayMicroseconds(15);
-
-        spiBusWriteRegister(&_bus, MPU_RA_INT_PIN_CFG, 0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR
-        delayMicroseconds(15);
-
-        spiBusWriteRegister(&_bus, MPU_RA_INT_ENABLE, MPU_RF_DATA_RDY_EN);
-
-        spiSetDivisor(_bus.busdev_u.spi.instance, SPI_CLOCK_FAST);
-    }
-
-    static void _writeRegister(uint8_t subAddress, uint8_t data)
-    {
-        spiBusWriteRegister(&_bus, subAddress, data);
-    }
-
-    static void _readRegisters(uint8_t subAddress, uint8_t count, uint8_t * dest)
-    {  
-        spiBusReadRegisterBuffer(&_bus, subAddress | 0x80, dest, count);
+        mpu6000SpiGyroInit(&_gyro);
     }
 
     void Nuke::initUsb(void)
@@ -262,6 +132,8 @@ extern "C" {
     {
         pwmWriteMotor(index, MOTOR_MIN + value*(MOTOR_MAX-MOTOR_MIN));
     }
+
+    void systemBeep(bool ignore) { (void)ignore; } // XXX to satisfy EXTI
 
     void Nuke::delaySeconds(float sec)
     {
@@ -300,30 +172,12 @@ extern "C" {
 
     bool Nuke::imuRead(void)
     {
-        uint8_t data=0;
-        _readRegisters(0x3A, 1, &data);
-         if (data & 0x01) {
-             int16_t gx=0, gy=0, gz=0;
-             int16_t ax=0, ay=0, az=0;
-             if (_mpuAccRead(ax, ay, az) && _mpuGyroRead(gx, gy, gz)) {
-                hf::Debug::printf("%d %d %d\n", ax, ay, az);
-             }
-         }
+        if (mpuGyroReadSPI(&_gyro)) {
 
-        /*
-           if (_imu->checkNewData()) {  
+            hf::Debug::printf("%d\n", _gyro.gyroADCRaw[0]);
 
-        // Note reversed X/Y order because of IMU rotation
-        _imu->readAccelerometer(_ay, _ax, _az);
-        _imu->readGyrometer(_gy, _gx, _gz);
-
-        // Negate for same reason	    
-        _ay = -_ay;
-        _gy = -_gy;
-        _az = -_az;
-
-        return true;
-        }*/
+            return true;
+        }
 
         return false;
     }
@@ -335,16 +189,3 @@ extern "C" {
     }
 
 } // extern "C"
-
-#include <CrossPlatformSPI.h>
-
-void cpspi_writeRegister(uint8_t subAddress, uint8_t data)
-{
-    _writeRegister(subAddress, data);
-}
-
-void cpspi_readRegisters(uint8_t subAddress, uint8_t count, uint8_t * dest)
-{  
-    _readRegisters(subAddress, count, dest);
-}
-
