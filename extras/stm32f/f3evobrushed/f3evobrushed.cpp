@@ -176,11 +176,15 @@ extern "C" {
 
             uint8_t ack = spiBusReadRegisterBuffer(&_gyro.bus, MPU_RA_ACCEL_XOUT_H | 0x80, data, 6);
 
-            int16_t ax = (int16_t)((data[0] << 8) | data[1]);
-            int16_t ay = (int16_t)((data[2] << 8) | data[3]);
+            int16_t ax = (int16_t)((data[0] << 8) | data[3]);
+            int16_t ay = (int16_t)((data[2] << 8) | data[1]);
             int16_t az = (int16_t)((data[4] << 8) | data[5]);
 
-            hf::Debug::printf("%d\n", ax);
+            int16_t gx = _gyro.gyroADCRaw[1];
+            int16_t gy = _gyro.gyroADCRaw[0];
+            int16_t gz = _gyro.gyroADCRaw[2];
+
+            hf::Debug::printf("%d\n", gz);
 
             return true;
         }
