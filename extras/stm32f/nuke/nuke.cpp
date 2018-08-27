@@ -57,6 +57,7 @@ extern "C" {
     static serialPort_t * _serial0;
 
     static gyroDev_t _gyro;
+    static accDev_t _acc;
 
     Nuke::Nuke(void)
     {
@@ -174,7 +175,7 @@ extern "C" {
     {
         if (mpuGyroReadSPI(&_gyro)) {
 
-            hf::Debug::printf("%d\n", _gyro.gyroADCRaw[0]);
+            hf::Debug::printf("%d\n", _gyro.gyroADCRaw[2]);
 
             return true;
         }

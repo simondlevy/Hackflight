@@ -82,14 +82,45 @@ class VL53L1X_Rangefinder : public hf::Rangefinder {
         {
             _distanceSensor.begin();
         }
+}; // class VL53L1X_Rangefinder 
 
-};
 
+class PMW3901_OpticalFlow : public hf::OpticalFlow {
+
+    private:
+
+        // Using digital pin 10 for chip select
+        Bitcraze_PMW3901 _flowSensor = Bitcraze_PMW3901(10);
+
+
+    protected:
+
+        virtual void getFlow(float flow[2]) override
+        {
+            int16_t deltaX=0, deltaY=0;
+            _flowSensor.readMotionCount(&deltaX, &deltaY);
+            flow[0] = (float)deltaX;
+            flow[1] = (float)deltaY;
+        }
+
+    public:
+
+        void begin(void)
+        {
+            if (!_flowSensor.begin()) {
+                while (true) {
+                    Serial.println("Initialization of the flow sensor failed");
+                    delay(500);
+                }
+            }
+
+        }
+
+};  // class PMW3901_OpticalFlow 
 
 VL53L1X_Rangefinder rangefinder;
 
-// Using digital pin 10 for chip select
-Bitcraze_PMW3901 flow(10);
+PMW3901_OpticalFlow opticalFlow;
 
 void setup(void)
 {
@@ -101,12 +132,9 @@ void setup(void)
     rangefinder.begin();
     h.addSensor(&rangefinder);
 
-    if (!flow.begin()) {
-        while (true) {
-            Serial.println("Initialization of the flow sensor failed");
-            delay(500);
-        }
-    }
+    // Add opticalf-low sensor
+    opticalFlow.begin();
+    h.addSensor(&opticalFlow);
 
     // Add Loiter PID controller for aux switch position 2
     h.addPidController(&loiter, 2);
@@ -116,13 +144,4 @@ void loop(void)
 {
     h.update();
 
-    // Get motion count since last call
-    /*
-    int16_t deltaX=0, deltaY=0;
-    flow.readMotionCount(&deltaX, &deltaY);
-    Serial.print("X: ");
-    Serial.print(deltaX);
-    Serial.print(", Y: ");
-    Serial.print(deltaY);
-    Serial.print("\n");*/
 }

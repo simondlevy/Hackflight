@@ -232,6 +232,9 @@ namespace hf {
                         sensor->modifyState(_state, time);
                     }
                 }
+
+                //Debug::printf("forward: %+2.2f    rightward: %+2.2f\n", 
+                //        _state.velocityForward, _state.velocityRightward);
             }
 
             void add_sensor(Sensor * sensor)
