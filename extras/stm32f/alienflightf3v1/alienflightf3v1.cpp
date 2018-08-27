@@ -73,7 +73,7 @@ extern "C" {
 
         switch (_imu->begin()) {
 
-            case MPU_ERROR_ID:
+            case MPU_ERROR_IMU_ID:
                 error("Bad device ID");
                 break;
             case MPU_ERROR_SELFTEST:

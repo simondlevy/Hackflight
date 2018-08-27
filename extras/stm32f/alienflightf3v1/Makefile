@@ -463,7 +463,7 @@ LD_FLAGS     = -lm \
 endif
 
 # Hackflight support
-IMU_SRC := $(IMU_DIR)/MPU60x0.cpp $(IMU_DIR)/MPU6050.cpp
+IMU_SRC := $(IMU_DIR)/MPU6050.cpp
 RX_SRC := $(RX_DIR)/SpektrumDSM.cpp
 HF_SRC := ../main.c sketch.cpp alienflightf3v1.cpp i2c.cpp ../dsmx.cpp
 SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC)
