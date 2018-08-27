@@ -110,7 +110,7 @@ extern "C" {
         delay(100);
         busWriteRegister(&_gyro.bus, MPU_RA_PWR_MGMT_1, INV_CLK_PLL);
         delay(15);
-        busWriteRegister(&_gyro.bus, MPU_RA_GYRO_CONFIG, INV_FSR_2000DPS << 3 | mpuGyroFCHOICE(&_gyro));
+        busWriteRegister(&_gyro.bus, MPU_RA_GYRO_CONFIG, INV_FSR_2000DPS << 3);
         delay(15);
         busWriteRegister(&_gyro.bus, MPU_RA_ACCEL_CONFIG, INV_FSR_16G << 3);
         delay(15);
@@ -192,23 +192,6 @@ extern "C" {
     void F3EvoBrushed::serialWriteByte(uint8_t c)
     {
         serialWrite(_serial0, c);
-    }
-
-    static bool _mpuGyroReadSPI(gyroDev_t *gyro)
-    {
-        static const uint8_t dataToSend[7] = {MPU_RA_GYRO_XOUT_H | 0x80, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-        uint8_t data[7];
-
-        const bool ack = spiBusTransfer(&gyro->bus, dataToSend, data, 7);
-        if (!ack) {
-            return false;
-        }
-
-        gyro->gyroADCRaw[X] = (int16_t)((data[1] << 8) | data[2]);
-        gyro->gyroADCRaw[Y] = (int16_t)((data[3] << 8) | data[4]);
-        gyro->gyroADCRaw[Z] = (int16_t)((data[5] << 8) | data[6]);
-
-        return true;
     }
 
     bool F3EvoBrushed::imuRead(void)
