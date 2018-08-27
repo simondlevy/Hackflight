@@ -50,10 +50,43 @@ extern "C" {
 
 #include "stm32f30x.h"
 
-#include "drivers/accgyro/accgyro.h"
-#include "drivers/accgyro/accgyro_mpu.h"
-#include "drivers/accgyro/accgyro_mpu6500.h"
-#include "drivers/accgyro/accgyro_spi_mpu6500.h"
+enum clock_sel_e {
+    INV_CLK_INTERNAL = 0,
+    INV_CLK_PLL,
+    NUM_CLK
+};
+
+enum gyro_fsr_e {
+    INV_FSR_250DPS = 0,
+    INV_FSR_500DPS,
+    INV_FSR_1000DPS,
+    INV_FSR_2000DPS,
+    NUM_GYRO_FSR
+};
+
+enum accel_fsr_e {
+    INV_FSR_2G = 0,
+    INV_FSR_4G,
+    INV_FSR_8G,
+    INV_FSR_16G,
+    NUM_ACCEL_FSR
+};
+
+
+#define MPU_RA_ACCEL_XOUT_H     0x3B
+#define MPU_RA_GYRO_XOUT_H      0x43
+#define MPU_RA_PWR_MGMT_1       0x6B
+#define MPU_RA_SIGNAL_PATH_RESET    0x68
+#define MPU_RA_GYRO_CONFIG      0x1B
+#define MPU_RA_ACCEL_CONFIG     0x1C
+#define MPU_RA_CONFIG           0x1A
+#define MPU_RA_SMPLRT_DIV       0x19
+#define MPU_RA_INT_PIN_CFG      0x37
+#define MPU_RA_INT_ENABLE       0x38
+
+#define MPU6500_BIT_RESET                   (0x80)
+#define MPU6500_BIT_INT_ANYRD_2CLEAR        (1 << 4)
+#define MPU6500_BIT_RAW_RDY_EN              (1 << 0)
 
     static serialPort_t * _serial0;
 
