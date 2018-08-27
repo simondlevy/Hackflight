@@ -102,7 +102,6 @@ extern "C" {
 
         delay(100);
 
-        //mpu6500SpiGyroInit(&_gyro);
         busWriteRegister(&_gyro.bus, MPU_RA_PWR_MGMT_1, MPU6500_BIT_RESET);
         delay(100);
         busWriteRegister(&_gyro.bus, MPU_RA_SIGNAL_PATH_RESET, 0x07);
@@ -195,9 +194,26 @@ extern "C" {
         serialWrite(_serial0, c);
     }
 
+    static bool _mpuGyroReadSPI(gyroDev_t *gyro)
+    {
+        static const uint8_t dataToSend[7] = {MPU_RA_GYRO_XOUT_H | 0x80, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+        uint8_t data[7];
+
+        const bool ack = spiBusTransfer(&gyro->bus, dataToSend, data, 7);
+        if (!ack) {
+            return false;
+        }
+
+        gyro->gyroADCRaw[X] = (int16_t)((data[1] << 8) | data[2]);
+        gyro->gyroADCRaw[Y] = (int16_t)((data[3] << 8) | data[4]);
+        gyro->gyroADCRaw[Z] = (int16_t)((data[5] << 8) | data[6]);
+
+        return true;
+    }
+
     bool F3EvoBrushed::imuRead(void)
     {
-        if (mpuGyroReadSPI(&_gyro)) {
+        if (_mpuGyroReadSPI(&_gyro)) {
 
             uint8_t data[6];
 
