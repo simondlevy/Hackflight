@@ -73,16 +73,16 @@ enum accel_fsr_e {
 };
 
 
-#define MPU_RA_ACCEL_XOUT_H     0x3B
-#define MPU_RA_GYRO_XOUT_H      0x43
-#define MPU_RA_PWR_MGMT_1       0x6B
+#define MPU_RA_SMPLRT_DIV           0x19
+#define MPU_RA_CONFIG               0x1A
+#define MPU_RA_GYRO_CONFIG          0x1B
+#define MPU_RA_ACCEL_CONFIG         0x1C
+#define MPU_RA_INT_PIN_CFG          0x37
+#define MPU_RA_INT_ENABLE           0x38
+#define MPU_RA_ACCEL_XOUT_H         0x3B
+#define MPU_RA_GYRO_XOUT_H          0x43
+#define MPU_RA_PWR_MGMT_1           0x6B
 #define MPU_RA_SIGNAL_PATH_RESET    0x68
-#define MPU_RA_GYRO_CONFIG      0x1B
-#define MPU_RA_ACCEL_CONFIG     0x1C
-#define MPU_RA_CONFIG           0x1A
-#define MPU_RA_SMPLRT_DIV       0x19
-#define MPU_RA_INT_PIN_CFG      0x37
-#define MPU_RA_INT_ENABLE       0x38
 
 #define MPU6500_BIT_RESET                   (0x80)
 #define MPU6500_BIT_INT_ANYRD_2CLEAR        (1 << 4)
