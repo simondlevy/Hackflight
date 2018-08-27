@@ -213,26 +213,28 @@ extern "C" {
 
     bool F3EvoBrushed::imuRead(void)
     {
-        if (_mpuGyroReadSPI(&_gyro)) {
+        static const uint8_t dataToSend[7] = {MPU_RA_GYRO_XOUT_H | 0x80, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
-            uint8_t data[6];
+        uint8_t data[7];
 
-            spiBusReadRegisterBuffer(&_gyro.bus, MPU_RA_ACCEL_XOUT_H | 0x80, data, 6);
-
-            // Note reversed X/Y order because of IMU rotation
-            int16_t ax = (int16_t)((data[0] << 8) | data[3]);
-            int16_t ay = (int16_t)((data[2] << 8) | data[1]);
-            int16_t az = (int16_t)((data[4] << 8) | data[5]);
-            int16_t gx = _gyro.gyroADCRaw[1];
-            int16_t gy = _gyro.gyroADCRaw[0];
-            int16_t gz = _gyro.gyroADCRaw[2];
-
-            hf::Debug::printf("%d %d %d %d %d %d\n", ax, ay, az, gx, gy, gz);
-
-            return true;
+        if (!spiBusTransfer(&_gyro.bus, dataToSend, data, 7)) {
+            return false;
         }
 
-        return false;
+        int gy = (int16_t)((data[1] << 8) | data[2]);
+        int gx = (int16_t)((data[3] << 8) | data[4]);
+        int gz = (int16_t)((data[5] << 8) | data[6]);
+
+        spiBusReadRegisterBuffer(&_gyro.bus, MPU_RA_ACCEL_XOUT_H | 0x80, data, 6);
+
+        // Note reversed X/Y order because of IMU rotation
+        int16_t ax = (int16_t)((data[0] << 8) | data[3]);
+        int16_t ay = (int16_t)((data[2] << 8) | data[1]);
+        int16_t az = (int16_t)((data[4] << 8) | data[5]);
+
+        hf::Debug::printf("%d %d %d %d %d %d\n", ax, ay, az, gx, gy, gz);
+
+        return true;
     }
 
     void hf::Board::outbuf(char * buf)
