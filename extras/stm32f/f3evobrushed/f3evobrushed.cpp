@@ -57,7 +57,6 @@ extern "C" {
     static serialPort_t * _serial0;
 
     static gyroDev_t _gyro;
-    static accDev_t _acc;
 
     F3EvoBrushed::F3EvoBrushed(void)
     {
@@ -173,7 +172,12 @@ extern "C" {
     {
         if (mpuGyroReadSPI(&_gyro)) {
 
-            hf::Debug::printf("%d\n", _gyro.gyroADCRaw[2]);
+            uint8_t accData[6];
+
+            uint8_t ack = spiBusReadRegisterBuffer(&_gyro.bus, MPU_RA_ACCEL_XOUT_H | 0x80, accData, 6);
+
+            //hf::Debug::printf("%d\n", _gyro.gyroADCRaw[2]);
+            hf::Debug::printf("%d\n", ack);
 
             return true;
         }
