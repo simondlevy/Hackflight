@@ -94,7 +94,10 @@ extern "C" {
 
         delay(100);
 
-        mpu6500SpiDetect(&_gyro.bus);
+        IOInit(_gyro.bus.busdev_u.spi.csnPin, OWNER_MPU_CS, 0);
+        IOConfigGPIO(_gyro.bus.busdev_u.spi.csnPin, SPI_IO_CS_CFG);
+        IOHi(_gyro.bus.busdev_u.spi.csnPin);
+        spiSetDivisor(_gyro.bus.busdev_u.spi.instance, SPI_CLOCK_FAST);
 
         delay(100);
 
