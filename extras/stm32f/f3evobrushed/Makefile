@@ -307,9 +307,6 @@ MCU_COMMON_SRC = \
 		drivers/bus_spi.c \
 		drivers/bus_spi_config.c \
 		drivers/bus_spi_pinconfig.c \
-		drivers/accgyro/accgyro_spi_mpu6500.c \
-		drivers/accgyro/accgyro_mpu6500.c \
-		drivers/accgyro/accgyro_mpu.c \
 	    drivers/bus_i2c_busdev.c \
 	    drivers/bus_i2c_config.c \
         drivers/bus_i2c_stm32f30x.c \
