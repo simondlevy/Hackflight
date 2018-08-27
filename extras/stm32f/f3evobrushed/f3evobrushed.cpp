@@ -174,7 +174,7 @@ extern "C" {
 
             uint8_t data[6];
 
-            uint8_t ack = spiBusReadRegisterBuffer(&_gyro.bus, MPU_RA_ACCEL_XOUT_H | 0x80, data, 6);
+            spiBusReadRegisterBuffer(&_gyro.bus, MPU_RA_ACCEL_XOUT_H | 0x80, data, 6);
 
             // Note reversed X/Y order because of IMU rotation
             int16_t ax = (int16_t)((data[0] << 8) | data[3]);
@@ -184,7 +184,7 @@ extern "C" {
             int16_t gy = _gyro.gyroADCRaw[0];
             int16_t gz = _gyro.gyroADCRaw[2];
 
-            hf::Debug::printf("%d\n", az);
+            hf::Debug::printf("%d %d %d %d %d %d\n", ax, ay, az, gx, gy, gz);
 
             return true;
         }
