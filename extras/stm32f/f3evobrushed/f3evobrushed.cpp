@@ -114,7 +114,7 @@ extern "C" {
         delay(15);
         busWriteRegister(&_gyro.bus, MPU_RA_ACCEL_CONFIG, INV_FSR_16G << 3);
         delay(15);
-        busWriteRegister(&_gyro.bus, MPU_RA_CONFIG, mpuGyroDLPF(&_gyro));
+        busWriteRegister(&_gyro.bus, MPU_RA_CONFIG, 0); // no DLPF bits
         delay(15);
         busWriteRegister(&_gyro.bus, MPU_RA_SMPLRT_DIV, _gyro.mpuDividerDrops); // Get Divider Drops
         delay(100);
