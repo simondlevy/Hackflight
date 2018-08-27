@@ -73,16 +73,16 @@ enum accel_fsr_e {
 };
 
 
-#define MPU_RA_SMPLRT_DIV           0x19
-#define MPU_RA_CONFIG               0x1A
-#define MPU_RA_GYRO_CONFIG          0x1B
-#define MPU_RA_ACCEL_CONFIG         0x1C
-#define MPU_RA_INT_PIN_CFG          0x37
-#define MPU_RA_INT_ENABLE           0x38
-#define MPU_RA_ACCEL_XOUT_H         0x3B
-#define MPU_RA_GYRO_XOUT_H          0x43
-#define MPU_RA_PWR_MGMT_1           0x6B
-#define MPU_RA_SIGNAL_PATH_RESET    0x68
+#define SMPLRT_DIV           0x19
+#define CONFIG               0x1A
+#define GYRO_CONFIG          0x1B
+#define ACCEL_CONFIG         0x1C
+#define INT_PIN_CFG          0x37
+#define INT_ENABLE           0x38
+#define ACCEL_XOUT_H         0x3B
+#define GYRO_XOUT_H          0x43
+#define PWR_MGMT_1           0x6B
+#define SIGNAL_PATH_RESET    0x68
 
 #define MPU6500_BIT_RESET                   (0x80)
 #define MPU6500_BIT_INT_ANYRD_2CLEAR        (1 << 4)
@@ -135,28 +135,28 @@ enum accel_fsr_e {
 
         delay(100);
 
-        busWriteRegister(&_bus, MPU_RA_PWR_MGMT_1, MPU6500_BIT_RESET);
+        busWriteRegister(&_bus, PWR_MGMT_1, MPU6500_BIT_RESET);
         delay(100);
-        busWriteRegister(&_bus, MPU_RA_SIGNAL_PATH_RESET, 0x07);
+        busWriteRegister(&_bus, SIGNAL_PATH_RESET, 0x07);
         delay(100);
-        busWriteRegister(&_bus, MPU_RA_PWR_MGMT_1, 0);
+        busWriteRegister(&_bus, PWR_MGMT_1, 0);
         delay(100);
-        busWriteRegister(&_bus, MPU_RA_PWR_MGMT_1, INV_CLK_PLL);
+        busWriteRegister(&_bus, PWR_MGMT_1, INV_CLK_PLL);
         delay(15);
-        busWriteRegister(&_bus, MPU_RA_GYRO_CONFIG, INV_FSR_2000DPS << 3);
+        busWriteRegister(&_bus, GYRO_CONFIG, INV_FSR_2000DPS << 3);
         delay(15);
-        busWriteRegister(&_bus, MPU_RA_ACCEL_CONFIG, INV_FSR_16G << 3);
+        busWriteRegister(&_bus, ACCEL_CONFIG, INV_FSR_16G << 3);
         delay(15);
-        busWriteRegister(&_bus, MPU_RA_CONFIG, 0); // no DLPF bits
+        busWriteRegister(&_bus, CONFIG, 0); // no DLPF bits
         delay(15);
-        busWriteRegister(&_bus, MPU_RA_SMPLRT_DIV, 0); 
+        busWriteRegister(&_bus, SMPLRT_DIV, 0); 
         delay(100);
 
         // Data ready interrupt configuration
-        busWriteRegister(&_bus, MPU_RA_INT_PIN_CFG, MPU6500_BIT_INT_ANYRD_2CLEAR);  // INT_ANYRD_2CLEAR
+        busWriteRegister(&_bus, INT_PIN_CFG, MPU6500_BIT_INT_ANYRD_2CLEAR);  // INT_ANYRD_2CLEAR
         delay(15);
 
-        busWriteRegister(&_bus, MPU_RA_INT_ENABLE, MPU6500_BIT_RAW_RDY_EN); // RAW_RDY_EN interrupt enable
+        busWriteRegister(&_bus, INT_ENABLE, MPU6500_BIT_RAW_RDY_EN); // RAW_RDY_EN interrupt enable
         delay(15);
     }
 
@@ -229,7 +229,7 @@ enum accel_fsr_e {
 
     bool F3EvoBrushed::imuRead(void)
     {
-        static const uint8_t dataToSend[7] = {MPU_RA_GYRO_XOUT_H | 0x80, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+        static const uint8_t dataToSend[7] = {GYRO_XOUT_H | 0x80, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
         uint8_t data[7];
 
@@ -241,7 +241,7 @@ enum accel_fsr_e {
         int gx = (int16_t)((data[3] << 8) | data[4]);
         int gz = (int16_t)((data[5] << 8) | data[6]);
 
-        spiBusReadRegisterBuffer(&_bus, MPU_RA_ACCEL_XOUT_H | 0x80, data, 6);
+        spiBusReadRegisterBuffer(&_bus, ACCEL_XOUT_H | 0x80, data, 6);
 
         // Note reversed X/Y order because of IMU rotation
         int16_t ax = (int16_t)((data[0] << 8) | data[3]);
