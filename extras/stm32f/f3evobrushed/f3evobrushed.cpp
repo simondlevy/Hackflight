@@ -52,6 +52,7 @@ extern "C" {
 
 #include "drivers/accgyro/accgyro.h"
 #include "drivers/accgyro/accgyro_mpu.h"
+#include "drivers/accgyro/accgyro_mpu6500.h"
 #include "drivers/accgyro/accgyro_spi_mpu6500.h"
 
     static serialPort_t * _serial0;
@@ -101,7 +102,30 @@ extern "C" {
 
         delay(100);
 
-        mpu6500SpiGyroInit(&_gyro);
+        //mpu6500SpiGyroInit(&_gyro);
+        busWriteRegister(&_gyro.bus, MPU_RA_PWR_MGMT_1, MPU6500_BIT_RESET);
+        delay(100);
+        busWriteRegister(&_gyro.bus, MPU_RA_SIGNAL_PATH_RESET, 0x07);
+        delay(100);
+        busWriteRegister(&_gyro.bus, MPU_RA_PWR_MGMT_1, 0);
+        delay(100);
+        busWriteRegister(&_gyro.bus, MPU_RA_PWR_MGMT_1, INV_CLK_PLL);
+        delay(15);
+        busWriteRegister(&_gyro.bus, MPU_RA_GYRO_CONFIG, INV_FSR_2000DPS << 3 | mpuGyroFCHOICE(&_gyro));
+        delay(15);
+        busWriteRegister(&_gyro.bus, MPU_RA_ACCEL_CONFIG, INV_FSR_16G << 3);
+        delay(15);
+        busWriteRegister(&_gyro.bus, MPU_RA_CONFIG, mpuGyroDLPF(&_gyro));
+        delay(15);
+        busWriteRegister(&_gyro.bus, MPU_RA_SMPLRT_DIV, _gyro.mpuDividerDrops); // Get Divider Drops
+        delay(100);
+
+        // Data ready interrupt configuration
+        busWriteRegister(&_gyro.bus, MPU_RA_INT_PIN_CFG, MPU6500_BIT_INT_ANYRD_2CLEAR);  // INT_ANYRD_2CLEAR
+        delay(15);
+
+        busWriteRegister(&_gyro.bus, MPU_RA_INT_ENABLE, MPU6500_BIT_RAW_RDY_EN); // RAW_RDY_EN interrupt enable
+        delay(15);
     }
 
     void F3EvoBrushed::initUsb(void)
