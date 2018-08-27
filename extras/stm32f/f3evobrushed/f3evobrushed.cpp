@@ -116,7 +116,7 @@ extern "C" {
         delay(15);
         busWriteRegister(&_gyro.bus, MPU_RA_CONFIG, 0); // no DLPF bits
         delay(15);
-        busWriteRegister(&_gyro.bus, MPU_RA_SMPLRT_DIV, _gyro.mpuDividerDrops); // Get Divider Drops
+        busWriteRegister(&_gyro.bus, MPU_RA_SMPLRT_DIV, 0); 
         delay(100);
 
         // Data ready interrupt configuration
