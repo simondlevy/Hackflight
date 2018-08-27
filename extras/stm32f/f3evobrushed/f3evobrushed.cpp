@@ -57,7 +57,7 @@ extern "C" {
 
     static serialPort_t * _serial0;
 
-    static gyroDev_t _gyro;
+    static busDevice_t _bus;
 
     F3EvoBrushed::F3EvoBrushed(void)
     {
@@ -89,41 +89,41 @@ extern "C" {
 
         spiInit(spiDevice);
 
-        spiBusSetInstance(&_gyro.bus, MPU6500_SPI_INSTANCE);
+        spiBusSetInstance(&_bus, MPU6500_SPI_INSTANCE);
 
-        _gyro.bus.busdev_u.spi.csnPin = IOGetByTag(IO_TAG(MPU6500_CS_PIN));
-
-        delay(100);
-
-        IOInit(_gyro.bus.busdev_u.spi.csnPin, OWNER_MPU_CS, 0);
-        IOConfigGPIO(_gyro.bus.busdev_u.spi.csnPin, SPI_IO_CS_CFG);
-        IOHi(_gyro.bus.busdev_u.spi.csnPin);
-        spiSetDivisor(_gyro.bus.busdev_u.spi.instance, SPI_CLOCK_FAST);
+        _bus.busdev_u.spi.csnPin = IOGetByTag(IO_TAG(MPU6500_CS_PIN));
 
         delay(100);
 
-        busWriteRegister(&_gyro.bus, MPU_RA_PWR_MGMT_1, MPU6500_BIT_RESET);
+        IOInit(_bus.busdev_u.spi.csnPin, OWNER_MPU_CS, 0);
+        IOConfigGPIO(_bus.busdev_u.spi.csnPin, SPI_IO_CS_CFG);
+        IOHi(_bus.busdev_u.spi.csnPin);
+        spiSetDivisor(_bus.busdev_u.spi.instance, SPI_CLOCK_FAST);
+
         delay(100);
-        busWriteRegister(&_gyro.bus, MPU_RA_SIGNAL_PATH_RESET, 0x07);
+
+        busWriteRegister(&_bus, MPU_RA_PWR_MGMT_1, MPU6500_BIT_RESET);
         delay(100);
-        busWriteRegister(&_gyro.bus, MPU_RA_PWR_MGMT_1, 0);
+        busWriteRegister(&_bus, MPU_RA_SIGNAL_PATH_RESET, 0x07);
         delay(100);
-        busWriteRegister(&_gyro.bus, MPU_RA_PWR_MGMT_1, INV_CLK_PLL);
+        busWriteRegister(&_bus, MPU_RA_PWR_MGMT_1, 0);
+        delay(100);
+        busWriteRegister(&_bus, MPU_RA_PWR_MGMT_1, INV_CLK_PLL);
         delay(15);
-        busWriteRegister(&_gyro.bus, MPU_RA_GYRO_CONFIG, INV_FSR_2000DPS << 3);
+        busWriteRegister(&_bus, MPU_RA_GYRO_CONFIG, INV_FSR_2000DPS << 3);
         delay(15);
-        busWriteRegister(&_gyro.bus, MPU_RA_ACCEL_CONFIG, INV_FSR_16G << 3);
+        busWriteRegister(&_bus, MPU_RA_ACCEL_CONFIG, INV_FSR_16G << 3);
         delay(15);
-        busWriteRegister(&_gyro.bus, MPU_RA_CONFIG, 0); // no DLPF bits
+        busWriteRegister(&_bus, MPU_RA_CONFIG, 0); // no DLPF bits
         delay(15);
-        busWriteRegister(&_gyro.bus, MPU_RA_SMPLRT_DIV, 0); 
+        busWriteRegister(&_bus, MPU_RA_SMPLRT_DIV, 0); 
         delay(100);
 
         // Data ready interrupt configuration
-        busWriteRegister(&_gyro.bus, MPU_RA_INT_PIN_CFG, MPU6500_BIT_INT_ANYRD_2CLEAR);  // INT_ANYRD_2CLEAR
+        busWriteRegister(&_bus, MPU_RA_INT_PIN_CFG, MPU6500_BIT_INT_ANYRD_2CLEAR);  // INT_ANYRD_2CLEAR
         delay(15);
 
-        busWriteRegister(&_gyro.bus, MPU_RA_INT_ENABLE, MPU6500_BIT_RAW_RDY_EN); // RAW_RDY_EN interrupt enable
+        busWriteRegister(&_bus, MPU_RA_INT_ENABLE, MPU6500_BIT_RAW_RDY_EN); // RAW_RDY_EN interrupt enable
         delay(15);
     }
 
@@ -200,7 +200,7 @@ extern "C" {
 
         uint8_t data[7];
 
-        if (!spiBusTransfer(&_gyro.bus, dataToSend, data, 7)) {
+        if (!spiBusTransfer(&_bus, dataToSend, data, 7)) {
             return false;
         }
 
@@ -208,7 +208,7 @@ extern "C" {
         int gx = (int16_t)((data[3] << 8) | data[4]);
         int gz = (int16_t)((data[5] << 8) | data[6]);
 
-        spiBusReadRegisterBuffer(&_gyro.bus, MPU_RA_ACCEL_XOUT_H | 0x80, data, 6);
+        spiBusReadRegisterBuffer(&_bus, MPU_RA_ACCEL_XOUT_H | 0x80, data, 6);
 
         // Note reversed X/Y order because of IMU rotation
         int16_t ax = (int16_t)((data[0] << 8) | data[3]);
