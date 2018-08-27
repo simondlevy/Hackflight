@@ -27,6 +27,7 @@
 #include "boards/ladybug.hpp"
 #include "receivers/serial/arduino_dsmx.hpp"
 #include "sensors/rangefinder.hpp"
+#include "sensors/opticalflow.hpp"
 #include "pidcontrollers/loiter.hpp"
 #include "mixers/quadx.hpp"
 
@@ -36,7 +37,7 @@ hf::Hackflight h;
 
 hf::DSMX_Receiver rc = hf::DSMX_Receiver(
         CHANNEL_MAP,
-        0.1f,  // roll trim
+        0.f,  // roll trim
         0.f,  // pitch trim
         0.f); // yaw trim
 
@@ -84,6 +85,7 @@ class VL53L1X_Rangefinder : public hf::Rangefinder {
 
 };
 
+
 VL53L1X_Rangefinder rangefinder;
 
 // Using digital pin 10 for chip select
@@ -115,11 +117,12 @@ void loop(void)
     h.update();
 
     // Get motion count since last call
+    /*
     int16_t deltaX=0, deltaY=0;
     flow.readMotionCount(&deltaX, &deltaY);
     Serial.print("X: ");
     Serial.print(deltaX);
     Serial.print(", Y: ");
     Serial.print(deltaY);
-    Serial.print("\n");
+    Serial.print("\n");*/
 }
