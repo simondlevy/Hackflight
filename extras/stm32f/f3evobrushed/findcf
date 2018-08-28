@@ -1,1 +1,0 @@
-grep -R $1 ~/Desktop/cleanflight/src/main
