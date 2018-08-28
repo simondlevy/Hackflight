@@ -1,5 +1,5 @@
 /*
-   spracingf3.cpp : Board implementation for Spracing F3 
+   omnibusf3.cpp : Board implementation for Omnibus F3
 
    Copyright (C) 2018 Simon D. Levy 
 
@@ -19,7 +19,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "spracingf3.h"
+#include "omnibusf3.h"
 
 
 static const uint16_t BRUSHLESS_PWM_RATE   = 480;
@@ -40,9 +40,10 @@ extern "C" {
 #include "drivers/light_led.h"
 #include "drivers/serial.h"
 #include "drivers/serial_uart.h"
-#include "drivers/bus_i2c.h"
-
-#include "pg/bus_i2c.h"
+#include "drivers/serial_usb_vcp.h"
+#include "drivers/bus_spi.h"
+#include "drivers/bus_spi_impl.h"
+#include "pg/bus_spi.h"
 
 #include "io/serial.h"
 
@@ -52,7 +53,9 @@ extern "C" {
 
     static serialPort_t * _serial0;
 
-    SPRacingF3::SPRacingF3(void)
+    static busDevice_t _bus;
+
+    OmnibusF3::OmnibusF3(void)
     {
         initMotors();
         initUsb();
@@ -61,33 +64,65 @@ extern "C" {
         RealBoard::init();
     }
 
-    void SPRacingF3::initImu(void)
+    void OmnibusF3::initImu(void)
     {
-        i2cHardwareConfigure(i2cConfig(0));
+        spiPinConfigure(spiPinConfig(0));
+        spiPreInit();
 
-        i2cInit(I2CDEV_1);
+        SPIDevice spiDevice = SPIINVALID;
 
-        delaySeconds(0.1);
+        if (MPU6000_SPI_INSTANCE == SPI1) {
+            spiDevice = SPIDEV_1;
+        }
 
-        _imu = new MPU6050(AFS_8G, GFS_2000DPS);
+        else if (MPU6000_SPI_INSTANCE == SPI2) {
+            spiDevice = SPIDEV_2;
+        }
 
-        _imu->begin();
+        else if (MPU6000_SPI_INSTANCE == SPI3) {
+            spiDevice = SPIDEV_3;
+        }
+
+        spiInit(spiDevice);
+
+        spiBusSetInstance(&_bus, MPU6000_SPI_INSTANCE);
+
+        _bus.busdev_u.spi.csnPin = IOGetByTag(IO_TAG(MPU6000_CS_PIN));
+
+        delay(100);
+
+        IOInit(_bus.busdev_u.spi.csnPin, OWNER_MPU_CS, 0);
+        IOConfigGPIO(_bus.busdev_u.spi.csnPin, SPI_IO_CS_CFG);
+        IOHi(_bus.busdev_u.spi.csnPin);
+        spiSetDivisor(_bus.busdev_u.spi.instance, SPI_CLOCK_FAST);
+
+        _imu = new MPU6000(AFS_2G, GFS_250DPS);
+
+        switch (_imu->begin()) {
+
+            case MPU_ERROR_IMU_ID:
+                error("Bad device ID");
+                break;
+            case MPU_ERROR_SELFTEST:
+                error("Failed self-test");
+                break;
+            default:
+                break;
+        }
     }
 
-    void SPRacingF3::initUsb(void)
+    void OmnibusF3::initUsb(void)
     {
-        uartPinConfigure(serialPinConfig());
-
-        _serial0 = uartOpen(UARTDEV_1,  NULL, NULL,  115200, MODE_RXTX, SERIAL_NOT_INVERTED);
+        _serial0 = usbVcpOpen();
     }
 
-    void SPRacingF3::initMotors(void)
+    void OmnibusF3::initMotors(void)
     {
 
         motorDevConfig_t dev;
 
         dev.motorPwmRate = BRUSHLESS_PWM_RATE;
-        dev.motorPwmProtocol = PWM_TYPE_BRUSHLESS;
+        dev.motorPwmProtocol = PWM_TYPE_STANDARD;
         dev.motorPwmInversion = false;
         dev.useUnsyncedPwm = true;
         dev.useBurstDshot = false;
@@ -107,47 +142,47 @@ extern "C" {
         writeMotor(3, 0);
     }
 
-    void SPRacingF3::writeMotor(uint8_t index, float value)
+    void OmnibusF3::writeMotor(uint8_t index, float value)
     {
         pwmWriteMotor(index, MOTOR_MIN + value*(MOTOR_MAX-MOTOR_MIN));
     }
 
-    void SPRacingF3::delaySeconds(float sec)
+    void OmnibusF3::delaySeconds(float sec)
     {
         delay((uint16_t)(sec*1000));
     }
 
-    void SPRacingF3::setLed(bool is_on)
+    void OmnibusF3::setLed(bool is_on)
     {
         ledSet(0, is_on);
     }
 
-    uint32_t SPRacingF3::getMicroseconds(void)
+    uint32_t OmnibusF3::getMicroseconds(void)
     {
         return micros();
     }
 
-    void SPRacingF3::reboot(void)
+    void OmnibusF3::reboot(void)
     {
         systemResetToBootloader();
     }
 
-    uint8_t SPRacingF3::serialAvailableBytes(void)
+    uint8_t OmnibusF3::serialAvailableBytes(void)
     {
         return serialRxBytesWaiting(_serial0);
     }
 
-    uint8_t SPRacingF3::serialReadByte(void)
+    uint8_t OmnibusF3::serialReadByte(void)
     {
         return serialRead(_serial0);
     }
 
-    void SPRacingF3::serialWriteByte(uint8_t c)
+    void OmnibusF3::serialWriteByte(uint8_t c)
     {
         serialWrite(_serial0, c);
     }
 
-    bool SPRacingF3::imuRead(void)
+    bool OmnibusF3::imuRead(void)
     {
         if (_imu->checkNewData()) {  
 
@@ -160,7 +195,6 @@ extern "C" {
             _gx = -_gx;
 
             return true;
-
         }  
 
         return false;
@@ -172,4 +206,26 @@ extern "C" {
             serialWrite(_serial0, *p);
     }
 
+    static void _busWriteRegister(uint8_t subAddress, uint8_t data)
+    {
+        spiBusWriteRegister(&_bus, subAddress, data);
+    }
+
+    static void _spiBusReadRegisterBuffer(uint8_t subAddress, uint8_t count, uint8_t * dest)
+    {
+        spiBusReadRegisterBuffer(&_bus, subAddress, dest, count);
+    }
+
 } // extern "C"
+
+void  cpspi_writeRegister(uint8_t subAddress, uint8_t data)
+{
+    _busWriteRegister(subAddress, data);
+}
+
+void  cpspi_readRegisters(uint8_t subAddress, uint8_t count, uint8_t * dest)
+{
+    _spiBusReadRegisterBuffer(subAddress, count, dest);
+}
+
+

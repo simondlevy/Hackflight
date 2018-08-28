@@ -1,5 +1,5 @@
 /*
-   alienflightf3v1.h : Board class for Alienflight F3 V1
+   omnibusf3.cpp : Board class for Omnibus F3
 
    Copyright (C) 2018 Simon D. Levy 
 
@@ -22,13 +22,13 @@
 #pragma once
 
 #include <boards/softquat.hpp>
-#include <MPU6050.h>
+#include <MPU6000.h>
 
-class AlienflightF3V1 : public hf::SoftwareQuaternionBoard  {
+class OmnibusF3 : public hf::SoftwareQuaternionBoard  {
 
     private:
 
-        MPU6050 * _imu;
+        MPU6000 * _imu;
 
         void initMotors(void);
         void initUsb(void);
@@ -52,6 +52,6 @@ class AlienflightF3V1 : public hf::SoftwareQuaternionBoard  {
 
     public:
 
-        AlienflightF3V1(void);
+        OmnibusF3(void);
 
-}; // class AlienflightF3V1
+}; // class OmnibusF3
