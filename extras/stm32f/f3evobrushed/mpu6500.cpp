@@ -90,18 +90,6 @@ enum accel_fsr_e {
 
     bool MPU6500::read(int16_t & ax, int16_t & ay, int16_t & az, int16_t & gx, int16_t & gy, int16_t & gz)
     {
-        /*
-        static const uint8_t dataToSend[7] = {GYRO_XOUT_H | 0x80, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-        uint8_t data[7];
-        if (!spiBusTransfer(_bus, dataToSend, data, 7)) {
-            return false;
-        }
-
-        gy = (int16_t)((data[1] << 8) | data[2]);
-        gx = (int16_t)((data[3] << 8) | data[4]);
-        gz = (int16_t)((data[5] << 8) | data[6]);
-        */
-
         uint8_t data[6];
         
         if (!spiBusReadRegisterBuffer(_bus, GYRO_XOUT_H | 0x80, data, 6)) {
