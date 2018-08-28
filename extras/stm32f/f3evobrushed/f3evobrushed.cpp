@@ -140,8 +140,6 @@ extern "C" {
         pwmWriteMotor(index, MOTOR_MIN + value*(MOTOR_MAX-MOTOR_MIN));
     }
 
-    void systemBeep(bool ignore) { (void)ignore; } // XXX to satisfy EXTI
-
     void F3EvoBrushed::delaySeconds(float sec)
     {
         delay((uint16_t)(sec*1000));
