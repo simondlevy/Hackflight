@@ -54,6 +54,7 @@ enum accel_fsr_e {
 #define ACCEL_CONFIG         0x1C
 #define INT_PIN_CFG          0x37
 #define INT_ENABLE           0x38
+#define INT_STATUS           0x3A
 #define ACCEL_XOUT_H         0x3B
 #define GYRO_XOUT_H          0x43
 #define PWR_MGMT_1           0x6B
@@ -88,25 +89,33 @@ enum accel_fsr_e {
         delay(15);
     }
 
-    bool MPU6500::read(int16_t & ax, int16_t & ay, int16_t & az, int16_t & gx, int16_t & gy, int16_t & gz)
+    bool MPU6500::ready(void)
+    {
+        uint8_t data;
+        spiBusReadRegisterBuffer(_bus, INT_STATUS | 0x80, &data, 1);
+        return (bool)(data & 0x01);
+    }
+
+    void MPU6500::readAccel(int16_t & ax, int16_t & ay, int16_t & az)
     {
         uint8_t data[6];
         
-        if (!spiBusReadRegisterBuffer(_bus, GYRO_XOUT_H | 0x80, data, 6)) {
-            return false;
-        }
-
-        gx = (int16_t)((data[0] << 8) | data[1]);
-        gy = (int16_t)((data[2] << 8) | data[3]);
-        gz = (int16_t)((data[4] << 8) | data[5]);
-
         spiBusReadRegisterBuffer(_bus, ACCEL_XOUT_H | 0x80, data, 6);
 
         ax = (int16_t)((data[0] << 8) | data[1]);
         ay = (int16_t)((data[2] << 8) | data[3]);
         az = (int16_t)((data[4] << 8) | data[5]);
+    }
 
-        return true;
+    void MPU6500::readGyro(int16_t & gx, int16_t & gy, int16_t & gz)
+    {
+        uint8_t data[6];
+        
+        spiBusReadRegisterBuffer(_bus, GYRO_XOUT_H | 0x80, data, 6);
+
+        gx = (int16_t)((data[0] << 8) | data[1]);
+        gy = (int16_t)((data[2] << 8) | data[3]);
+        gz = (int16_t)((data[4] << 8) | data[5]);
     }
 
 } // extern "C"

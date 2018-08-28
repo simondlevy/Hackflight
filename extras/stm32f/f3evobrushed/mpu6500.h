@@ -47,18 +47,22 @@ extern "C" {
 #include "stm32f30x.h"
 
 
-class MPU6500 {
+    class MPU6500 {
 
-    private:
+        private:
 
-        busDevice_t * _bus;
+            busDevice_t * _bus;
 
-    public:
+        public:
 
-    MPU6500(busDevice_t * bus);
+            MPU6500(busDevice_t * bus);
 
-    bool read(int16_t & ax, int16_t & ay, int16_t & az, int16_t & gx, int16_t & gy, int16_t & gz);
-};
+            bool ready(void);
+
+            void readAccel(int16_t & ax, int16_t & ay, int16_t & az);
+
+            void readGyro(int16_t & gx, int16_t & gy, int16_t & gz);
+    };
 
 }
 

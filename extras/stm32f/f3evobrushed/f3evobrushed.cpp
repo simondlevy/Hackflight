@@ -167,9 +167,13 @@ extern "C" {
 
     bool F3EvoBrushed::imuRead(void)
     {
-        int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
+        if (_imu->ready()) {
 
-        if (_imu->read(ax, ay, az, gx, gy, gz)) {
+            int16_t ax=0, ay=0, az=0;
+            _imu->readAccel(ax, ay, az);
+
+            int16_t gx=0, gy=0, gz=0;
+            _imu->readGyro(gx, gy, gz);
 
             hf::Debug::printf("%d %d %d %d %d %d\n", ax, ay, az, gx, gy, gz);
 
