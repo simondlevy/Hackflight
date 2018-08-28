@@ -23,6 +23,8 @@
 
 #include <boards/softquat.hpp>
 
+#include "mpu6500.h"
+
 class F3EvoBrushed : public hf::SoftwareQuaternionBoard  {
 
     private:
@@ -30,6 +32,8 @@ class F3EvoBrushed : public hf::SoftwareQuaternionBoard  {
         void initMotors(void);
         void initUsb(void);
         void initImu(void);
+
+        MPU6500 * _imu;
 
     protected: 
 

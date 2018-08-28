@@ -50,44 +50,6 @@ extern "C" {
 
 #include "stm32f30x.h"
 
-enum clock_sel_e {
-    INV_CLK_INTERNAL = 0,
-    INV_CLK_PLL,
-    NUM_CLK
-};
-
-enum gyro_fsr_e {
-    INV_FSR_250DPS = 0,
-    INV_FSR_500DPS,
-    INV_FSR_1000DPS,
-    INV_FSR_2000DPS,
-    NUM_GYRO_FSR
-};
-
-enum accel_fsr_e {
-    INV_FSR_2G = 0,
-    INV_FSR_4G,
-    INV_FSR_8G,
-    INV_FSR_16G,
-    NUM_ACCEL_FSR
-};
-
-
-#define SMPLRT_DIV           0x19
-#define CONFIG               0x1A
-#define GYRO_CONFIG          0x1B
-#define ACCEL_CONFIG         0x1C
-#define INT_PIN_CFG          0x37
-#define INT_ENABLE           0x38
-#define ACCEL_XOUT_H         0x3B
-#define GYRO_XOUT_H          0x43
-#define PWR_MGMT_1           0x6B
-#define SIGNAL_PATH_RESET    0x68
-
-#define MPU6500_BIT_RESET                   (0x80)
-#define MPU6500_BIT_INT_ANYRD_2CLEAR        (1 << 4)
-#define MPU6500_BIT_RAW_RDY_EN              (1 << 0)
-
     static serialPort_t * _serial0;
 
     static busDevice_t _bus;
@@ -133,31 +95,7 @@ enum accel_fsr_e {
         IOHi(_bus.busdev_u.spi.csnPin);
         spiSetDivisor(_bus.busdev_u.spi.instance, SPI_CLOCK_FAST);
 
-        delay(100);
-
-        busWriteRegister(&_bus, PWR_MGMT_1, MPU6500_BIT_RESET);
-        delay(100);
-        busWriteRegister(&_bus, SIGNAL_PATH_RESET, 0x07);
-        delay(100);
-        busWriteRegister(&_bus, PWR_MGMT_1, 0);
-        delay(100);
-        busWriteRegister(&_bus, PWR_MGMT_1, INV_CLK_PLL);
-        delay(15);
-        busWriteRegister(&_bus, GYRO_CONFIG, INV_FSR_2000DPS << 3);
-        delay(15);
-        busWriteRegister(&_bus, ACCEL_CONFIG, INV_FSR_16G << 3);
-        delay(15);
-        busWriteRegister(&_bus, CONFIG, 0); // no DLPF bits
-        delay(15);
-        busWriteRegister(&_bus, SMPLRT_DIV, 0); 
-        delay(100);
-
-        // Data ready interrupt configuration
-        busWriteRegister(&_bus, INT_PIN_CFG, MPU6500_BIT_INT_ANYRD_2CLEAR);  // INT_ANYRD_2CLEAR
-        delay(15);
-
-        busWriteRegister(&_bus, INT_ENABLE, MPU6500_BIT_RAW_RDY_EN); // RAW_RDY_EN interrupt enable
-        delay(15);
+        _imu = new MPU6500(&_bus);
     }
 
     void F3EvoBrushed::initUsb(void)
@@ -229,28 +167,16 @@ enum accel_fsr_e {
 
     bool F3EvoBrushed::imuRead(void)
     {
-        static const uint8_t dataToSend[7] = {GYRO_XOUT_H | 0x80, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+        int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
 
-        uint8_t data[7];
+        if (_imu->read(ax, ay, az, gx, gy, gz)) {
 
-        if (!spiBusTransfer(&_bus, dataToSend, data, 7)) {
-            return false;
+            hf::Debug::printf("%d %d %d %d %d %d\n", ax, ay, az, gx, gy, gz);
+
+            return true;
         }
 
-        int gy = (int16_t)((data[1] << 8) | data[2]);
-        int gx = (int16_t)((data[3] << 8) | data[4]);
-        int gz = (int16_t)((data[5] << 8) | data[6]);
-
-        spiBusReadRegisterBuffer(&_bus, ACCEL_XOUT_H | 0x80, data, 6);
-
-        // Note reversed X/Y order because of IMU rotation
-        int16_t ax = (int16_t)((data[0] << 8) | data[3]);
-        int16_t ay = (int16_t)((data[2] << 8) | data[1]);
-        int16_t az = (int16_t)((data[4] << 8) | data[5]);
-
-        hf::Debug::printf("%d %d %d %d %d %d\n", ax, ay, az, gx, gy, gz);
-
-        return true;
+        return false;
     }
 
     void hf::Board::outbuf(char * buf)

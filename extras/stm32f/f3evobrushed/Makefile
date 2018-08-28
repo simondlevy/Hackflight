@@ -468,7 +468,7 @@ endif
 
 # Hackflight support
 RX_SRC := $(RX_DIR)/SpektrumDSM.cpp
-HF_SRC := ../main.c sketch.cpp f3evobrushed.cpp ../dsmx.cpp
+HF_SRC := ../main.c sketch.cpp f3evobrushed.cpp mpu6500.cpp ../dsmx.cpp
 SRC += $(HF_SRC) $(RX_SRC)
 
 ###############################################################################
