@@ -23,7 +23,7 @@
 
 #include <boards/softquat.hpp>
 
-#include "mpu6500.h"
+#include <MPU6500.h>
 
 class F3EvoBrushed : public hf::SoftwareQuaternionBoard  {
 

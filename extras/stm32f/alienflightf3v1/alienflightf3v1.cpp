@@ -163,7 +163,6 @@ extern "C" {
             _gx = -_gx;
 
             return true;
-
         }  
 
         return false;

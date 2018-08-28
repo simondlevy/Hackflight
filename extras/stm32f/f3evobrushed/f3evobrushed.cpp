@@ -95,7 +95,19 @@ extern "C" {
         IOHi(_bus.busdev_u.spi.csnPin);
         spiSetDivisor(_bus.busdev_u.spi.instance, SPI_CLOCK_FAST);
 
-        _imu = new MPU6500(&_bus);
+        _imu = new MPU6500(AFS_2G, GFS_250DPS);
+
+        switch (_imu->begin()) {
+
+            case MPU_ERROR_IMU_ID:
+                error("Bad device ID");
+                break;
+            case MPU_ERROR_SELFTEST:
+                error("Failed self-test");
+                break;
+            default:
+                break;
+        }
     }
 
     void F3EvoBrushed::initUsb(void)
@@ -167,18 +179,19 @@ extern "C" {
 
     bool F3EvoBrushed::imuRead(void)
     {
-        if (_imu->ready()) {
+        if (_imu->checkNewData()) {  
 
-            int16_t ax=0, ay=0, az=0;
-            _imu->readAccel(ax, ay, az);
+            // Note reversed X/Y order because of IMU rotation
+            _imu->readAccelerometer(_ay, _ax, _az);
+            _imu->readGyrometer(_gy, _gx, _gz);
 
-            int16_t gx=0, gy=0, gz=0;
-            _imu->readGyro(gx, gy, gz);
-
-            hf::Debug::printf("%d %d %d %d %d %d\n", ax, ay, az, gx, gy, gz);
+            // Negate for same reason
+            _ax = -_ax;
+            _gx = -_gx;
 
             return true;
-        }
+        }  
+
 
         return false;
     }
@@ -189,4 +202,28 @@ extern "C" {
             serialWrite(_serial0, *p);
     }
 
+    static void _busWriteRegister(uint8_t subAddress, uint8_t data)
+    {
+        busWriteRegister(&_bus, subAddress, data);
+    }
+
+    static void _spiBusReadRegisterBuffer(uint8_t subAddress, uint8_t count, uint8_t * dest)
+    {
+        spiBusReadRegisterBuffer(&_bus, subAddress, dest, count);
+    }
+
 } // extern "C"
+
+#include <CrossPlatformSPI.h>
+
+void  cpspi_writeRegister(uint8_t subAddress, uint8_t data)
+{
+    _busWriteRegister(subAddress, data);
+}
+
+void  cpspi_readRegisters(uint8_t subAddress, uint8_t count, uint8_t * dest)
+{
+    _spiBusReadRegisterBuffer(subAddress, count, dest);
+}
+
+
