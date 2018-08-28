@@ -202,7 +202,7 @@ extern "C" {
 
     static void _busWriteRegister(uint8_t subAddress, uint8_t data)
     {
-        busWriteRegister(&_bus, subAddress, data);
+        spiBusWriteRegister(&_bus, subAddress, data);
     }
 
     static void _spiBusReadRegisterBuffer(uint8_t subAddress, uint8_t count, uint8_t * dest)
