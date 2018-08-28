@@ -59,17 +59,13 @@ enum accel_fsr_e {
 #define PWR_MGMT_1           0x6B
 #define SIGNAL_PATH_RESET    0x68
 
-#define MPU6500_BIT_RESET                   (0x80)
-#define MPU6500_BIT_INT_ANYRD_2CLEAR        (1 << 4)
-#define MPU6500_BIT_RAW_RDY_EN              (1 << 0)
-
     MPU6500::MPU6500(busDevice_t * bus)
     {
         _bus = bus;
 
-        busWriteRegister(_bus, PWR_MGMT_1, MPU6500_BIT_RESET);
+        busWriteRegister(_bus, PWR_MGMT_1, 0x80);
         delay(100);
-        busWriteRegister(_bus, SIGNAL_PATH_RESET, 0x07);
+        busWriteRegister(_bus, SIGNAL_PATH_RESET, 0x80);
         delay(100);
         busWriteRegister(_bus, PWR_MGMT_1, 0);
         delay(100);
@@ -85,10 +81,10 @@ enum accel_fsr_e {
         delay(100);
 
         // Data ready interrupt configuration
-        busWriteRegister(_bus, INT_PIN_CFG, MPU6500_BIT_INT_ANYRD_2CLEAR);  // INT_ANYRD_2CLEAR
+        busWriteRegister(_bus, INT_PIN_CFG, 0x10);  
         delay(15);
 
-        busWriteRegister(_bus, INT_ENABLE, MPU6500_BIT_RAW_RDY_EN); // RAW_RDY_EN interrupt enable
+        busWriteRegister(_bus, INT_ENABLE, 0x01); 
         delay(15);
     }
 
