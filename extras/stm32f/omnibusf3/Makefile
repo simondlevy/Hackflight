@@ -88,7 +88,7 @@ CMSIS_DIR       := $(LIB_DIR)/CMSIS
 HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
 IMU_DIR         := $(ARDUINO_DIR)/MPU/src
 RX_DIR          := $(ARDUINO_DIR)/SpektrumDSM/src
-SPI_DIR         := $(ARDUINO_DIR)/CrossPlatformSPI/src
+SPI_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
 INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR)
 LINKER_DIR      := $(SRC_DIR)/target/link
 
