@@ -59,7 +59,7 @@ extern "C" {
 
     OmnibusF3::OmnibusF3(void)
     {
-        // Set up the LED
+        // Set up the LED (uses the beeper for some reason)
         beeperInit(beeperDevConfig());
 
         // Turn it off
@@ -194,15 +194,10 @@ extern "C" {
     {
         if (_imu->checkNewData()) {  
 
-            // Note reversed X/Y order because of IMU rotation
-            _imu->readAccelerometer(_ay, _ax, _az);
             _imu->readGyrometer(_gy, _gx, _gz);
+            _imu->readAccelerometer(_ay, _ax, _az);
 
-            //hf::Debug::printlnfloat(_gx);
-
-            // Negate for same reason
-            _ax = -_ax;
-            _gx = -_gx;
+            hf::Debug::printlnfloat(_gx);
 
             return true;
         }  
