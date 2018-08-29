@@ -147,7 +147,7 @@ extern "C" {
 
     void F3EvoBrushed::setLed(bool isOn)
     {
-        //ledSet(0, isOn);
+        ledSet(0, isOn);
     }
 
     uint32_t F3EvoBrushed::getMicroseconds(void)
