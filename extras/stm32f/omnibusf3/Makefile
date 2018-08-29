@@ -309,6 +309,8 @@ MCU_COMMON_SRC = \
 		drivers/bus_spi.c \
 		drivers/bus_spi_config.c \
 		drivers/bus_spi_pinconfig.c \
+		drivers/sound_beeper.c \
+		pg/beeper_dev.c \
 		io/serial.c \
 	    pg/pg.c \
 	    pg/bus_spi.c

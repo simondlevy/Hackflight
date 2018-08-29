@@ -21,7 +21,6 @@
 
 #include "omnibusf3.h"
 
-
 static const uint16_t BRUSHLESS_PWM_RATE   = 480;
 static const uint16_t BRUSHLESS_IDLE_PULSE = 1000; 
 
@@ -51,12 +50,20 @@ extern "C" {
 
 #include "stm32f30x.h"
 
+#include "drivers/sound_beeper.h"
+#include "pg/beeper.h"
+#include "pg/beeper_dev.h"
+#include "io/beeper.h"
+
     static serialPort_t * _serial0;
 
     static busDevice_t _bus;
 
     OmnibusF3::OmnibusF3(void)
     {
+        beeperInit(beeperDevConfig());
+        BEEP_ON;
+
         initMotors();
         initUsb();
         initImu();
@@ -154,7 +161,13 @@ extern "C" {
 
     void OmnibusF3::setLed(bool is_on)
     {
-        ledSet(0, is_on);
+        if (is_on) {
+            BEEP_OFF;
+        }
+        else { 
+            BEEP_ON;
+        }
+        //ledSet(2, is_on);
     }
 
     uint32_t OmnibusF3::getMicroseconds(void)
@@ -189,6 +202,8 @@ extern "C" {
             // Note reversed X/Y order because of IMU rotation
             _imu->readAccelerometer(_ay, _ax, _az);
             _imu->readGyrometer(_gy, _gx, _gz);
+
+            //hf::Debug::printlnfloat(_gx);
 
             // Negate for same reason
             _ax = -_ax;
