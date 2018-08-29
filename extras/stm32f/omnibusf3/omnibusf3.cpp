@@ -194,10 +194,13 @@ extern "C" {
     {
         if (_imu->checkNewData()) {  
 
-            _imu->readGyrometer(_gy, _gx, _gz);
+            // Note reversed X/Y order because of IMU rotation            
             _imu->readAccelerometer(_ay, _ax, _az);
+            _imu->readGyrometer(_gy, _gx, _gz);
 
-            hf::Debug::printlnfloat(_gx);
+            // Negate for same reason
+            _gy = -_gy;
+            _ay = -_ay;
 
             return true;
         }  
