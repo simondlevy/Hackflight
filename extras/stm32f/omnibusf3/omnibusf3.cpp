@@ -51,9 +51,7 @@ extern "C" {
 #include "stm32f30x.h"
 
 #include "drivers/sound_beeper.h"
-#include "pg/beeper.h"
 #include "pg/beeper_dev.h"
-#include "io/beeper.h"
 
     static serialPort_t * _serial0;
 
