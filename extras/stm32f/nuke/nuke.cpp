@@ -141,9 +141,9 @@ extern "C" {
         delay((uint16_t)(sec*1000));
     }
 
-    void Nuke::setLed(bool is_on)
+    void Nuke::setLed(bool isOn)
     {
-        ledSet(0, is_on);
+        ledSet(0, isOn);
     }
 
     uint32_t Nuke::getMicroseconds(void)

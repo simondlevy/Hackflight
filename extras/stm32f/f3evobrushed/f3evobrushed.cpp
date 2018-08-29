@@ -145,9 +145,9 @@ extern "C" {
         delay((uint16_t)(sec*1000));
     }
 
-    void F3EvoBrushed::setLed(bool is_on)
+    void F3EvoBrushed::setLed(bool isOn)
     {
-        //ledSet(0, is_on);
+        //ledSet(0, isOn);
     }
 
     uint32_t F3EvoBrushed::getMicroseconds(void)

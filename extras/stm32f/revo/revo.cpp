@@ -76,9 +76,9 @@ extern "C" {
         delay((uint16_t)(sec*1000));
     }
 
-    void Revo::setLed(bool is_on)
+    void Revo::setLed(bool isOn)
     {
-        ledSet(0, is_on);
+        ledSet(0, isOn);
     }
 
     uint32_t Revo::getMicroseconds(void)

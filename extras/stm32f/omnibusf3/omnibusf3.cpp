@@ -61,8 +61,11 @@ extern "C" {
 
     OmnibusF3::OmnibusF3(void)
     {
+        // Set up the LED
         beeperInit(beeperDevConfig());
-        BEEP_ON;
+
+        // Turn it off
+        systemBeep(true);
 
         initMotors();
         initUsb();
@@ -159,15 +162,9 @@ extern "C" {
         delay((uint16_t)(sec*1000));
     }
 
-    void OmnibusF3::setLed(bool is_on)
+    void OmnibusF3::setLed(bool isOn)
     {
-        if (is_on) {
-            BEEP_OFF;
-        }
-        else { 
-            BEEP_ON;
-        }
-        //ledSet(2, is_on);
+        systemBeep(!isOn);
     }
 
     uint32_t OmnibusF3::getMicroseconds(void)

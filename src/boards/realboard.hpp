@@ -40,7 +40,7 @@ namespace hf {
 
             virtual uint32_t getMicroseconds(void) = 0;
             virtual void     delaySeconds(float time) = 0;
-            virtual void     setLed(bool is_on) = 0;
+            virtual void     setLed(bool isOn) = 0;
 
             void init(void)
             {

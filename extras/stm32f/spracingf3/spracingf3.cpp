@@ -117,9 +117,9 @@ extern "C" {
         delay((uint16_t)(sec*1000));
     }
 
-    void SPRacingF3::setLed(bool is_on)
+    void SPRacingF3::setLed(bool isOn)
     {
-        ledSet(0, is_on);
+        ledSet(0, isOn);
     }
 
     uint32_t SPRacingF3::getMicroseconds(void)

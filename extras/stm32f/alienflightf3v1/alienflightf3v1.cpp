@@ -120,9 +120,9 @@ extern "C" {
         delay((uint16_t)(sec*1000));
     }
 
-    void AlienflightF3V1::setLed(bool is_on)
+    void AlienflightF3V1::setLed(bool isOn)
     {
-        ledSet(0, is_on);
+        ledSet(0, isOn);
     }
 
     uint32_t AlienflightF3V1::getMicroseconds(void)

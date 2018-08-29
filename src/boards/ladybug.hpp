@@ -68,9 +68,9 @@ namespace hf {
                 delay((uint32_t)(1000*sec));
             }
 
-            void setLed(bool is_on)
+            void setLed(bool isOn)
             { 
-                digitalWrite(_led_pin, is_on ? HIGH : LOW);
+                digitalWrite(_led_pin, isOn ? HIGH : LOW);
             }
 
             uint8_t serialAvailableBytes(void)
