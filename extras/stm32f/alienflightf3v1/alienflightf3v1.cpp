@@ -63,10 +63,7 @@ extern "C" {
 
     void AlienflightF3V1::initImu(void)
     {
-        i2c_set_device(I2CDEV_2);
-
-        i2cHardwareConfigure(i2cConfig(0));
-        i2cInit(I2CDEV_2);
+        i2c_init(I2CDEV_2);
 
         delaySeconds(.01);
 

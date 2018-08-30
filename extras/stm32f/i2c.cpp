@@ -45,13 +45,15 @@ static void _readRegisters(uint8_t address, uint8_t subAddress, uint8_t count, u
     i2cRead(_i2cdev, address, subAddress, count, dest);
 }
 
-void i2c_set_device(I2CDevice i2cdev)
+void i2c_init(I2CDevice i2cdev)
 {
     _i2cdev = i2cdev;
+    i2cHardwareConfigure(i2cConfig(0));
+    i2cInit(_i2cdev);
 }
 
 } // extern "C"
- 
+
 #include <CrossPlatformI2C_Core.h>
 
 uint8_t cpi2c_open(uint8_t address, uint8_t bus)

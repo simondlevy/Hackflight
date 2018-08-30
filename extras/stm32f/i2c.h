@@ -20,6 +20,6 @@
 
 extern "C" {
 
-void i2c_set_device(I2CDevice i2cdev);
+void i2c_init(I2CDevice i2cdev);
 
 }

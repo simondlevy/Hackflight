@@ -31,8 +31,8 @@ static const float    MOTOR_MAX = 2000;
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
+    // Cleanflight includes
 #include "platform.h"
-
 #include "drivers/system.h"
 #include "drivers/timer.h"
 #include "drivers/time.h"
@@ -41,14 +41,13 @@ extern "C" {
 #include "drivers/serial.h"
 #include "drivers/serial_uart.h"
 #include "drivers/bus_i2c.h"
-
 #include "pg/bus_i2c.h"
-
 #include "io/serial.h"
-
 #include "target.h"
-
 #include "stm32f30x.h"
+
+    // Hackflight include
+#include "../i2c.h"
 
     static serialPort_t * _serial0;
 
@@ -63,15 +62,23 @@ extern "C" {
 
     void SPRacingF3::initImu(void)
     {
-        i2cHardwareConfigure(i2cConfig(0));
-
-        i2cInit(I2CDEV_1);
+        i2c_init(I2CDEV_1);
 
         delaySeconds(0.1);
 
         _imu = new MPU6050(AFS_8G, GFS_2000DPS);
 
-        _imu->begin();
+        switch (_imu->begin()) {
+
+        case MPU_ERROR_IMU_ID:
+                error("Bad device ID");
+                break;
+            case MPU_ERROR_SELFTEST:
+                error("Failed self-test");
+                break;
+            default:
+                break;
+        }
     }
 
     void SPRacingF3::initUsb(void)
