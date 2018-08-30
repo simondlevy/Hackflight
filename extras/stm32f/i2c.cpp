@@ -33,14 +33,21 @@ extern "C" {
 
 #include "stm32f30x.h"
 
+static I2CDevice _i2cdev;
+
 static bool _writeRegister(uint8_t address, uint8_t subAddress, uint8_t data)
 {
-    return i2cWrite(I2CDEV_2, address, subAddress, data);
+    return i2cWrite(_i2cdev, address, subAddress, data);
 }
 
 static void _readRegisters(uint8_t address, uint8_t subAddress, uint8_t count, uint8_t * dest)
 {  
-    i2cRead(I2CDEV_2, address, subAddress, count, dest);
+    i2cRead(_i2cdev, address, subAddress, count, dest);
+}
+
+void i2c_set_device(I2CDevice i2cdev)
+{
+    _i2cdev = i2cdev;
 }
 
 } // extern "C"
