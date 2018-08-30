@@ -87,7 +87,7 @@ extern "C" {
         motorDevConfig_t dev;
 
         dev.motorPwmRate = BRUSHLESS_PWM_RATE;
-        dev.motorPwmProtocol = PWM_TYPE_BRUSHLESS;
+        dev.motorPwmProtocol = PWM_TYPE_STANDARD;
         dev.motorPwmInversion = false;
         dev.useUnsyncedPwm = true;
         dev.useBurstDshot = false;
