@@ -26,11 +26,8 @@ extern "C" {
 #include "drivers/timer.h"
 #include "drivers/time.h"
 #include "drivers/bus_i2c.h"
-
 #include "pg/bus_i2c.h"
-
 #include "target.h"
-
 #include "stm32f30x.h"
 
 static I2CDevice _i2cdev;

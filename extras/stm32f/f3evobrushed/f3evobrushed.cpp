@@ -30,8 +30,8 @@ static const float    MOTOR_MAX = 2000;
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
+    // Cleanflight includes
 #include "platform.h"
-
 #include "drivers/system.h"
 #include "drivers/timer.h"
 #include "drivers/time.h"
@@ -43,16 +43,14 @@ extern "C" {
 #include "drivers/bus_spi.h"
 #include "drivers/bus_spi_impl.h"
 #include "pg/bus_spi.h"
-
 #include "io/serial.h"
-
 #include "target.h"
-
 #include "stm32f30x.h"
 
-    static serialPort_t * _serial0;
+    // Hackflight includes
+#include "../spi.h"
 
-    static busDevice_t _bus;
+    static serialPort_t * _serial0;
 
     F3EvoBrushed::F3EvoBrushed(void)
     {
@@ -65,35 +63,7 @@ extern "C" {
 
     void F3EvoBrushed::initImu(void)
     {
-        spiPinConfigure(spiPinConfig(0));
-        spiPreInit();
-
-        SPIDevice spiDevice = SPIINVALID;
-
-        if (MPU6500_SPI_INSTANCE == SPI1) {
-            spiDevice = SPIDEV_1;
-        }
-
-        else if (MPU6500_SPI_INSTANCE == SPI2) {
-            spiDevice = SPIDEV_2;
-        }
-
-        else if (MPU6500_SPI_INSTANCE == SPI3) {
-            spiDevice = SPIDEV_3;
-        }
-
-        spiInit(spiDevice);
-
-        spiBusSetInstance(&_bus, MPU6500_SPI_INSTANCE);
-
-        _bus.busdev_u.spi.csnPin = IOGetByTag(IO_TAG(MPU6500_CS_PIN));
-
-        delay(100);
-
-        IOInit(_bus.busdev_u.spi.csnPin, OWNER_MPU_CS, 0);
-        IOConfigGPIO(_bus.busdev_u.spi.csnPin, SPI_IO_CS_CFG);
-        IOHi(_bus.busdev_u.spi.csnPin);
-        spiSetDivisor(_bus.busdev_u.spi.instance, SPI_CLOCK_FAST);
+        spi_init(MPU6500_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6500_CS_PIN)));
 
         _imu = new MPU6500(AFS_2G, GFS_250DPS);
 
@@ -202,28 +172,5 @@ extern "C" {
             serialWrite(_serial0, *p);
     }
 
-    static void _busWriteRegister(uint8_t subAddress, uint8_t data)
-    {
-        spiBusWriteRegister(&_bus, subAddress, data);
-    }
-
-    static void _spiBusReadRegisterBuffer(uint8_t subAddress, uint8_t count, uint8_t * dest)
-    {
-        spiBusReadRegisterBuffer(&_bus, subAddress, dest, count);
-    }
 
 } // extern "C"
-
-#include <CrossPlatformSPI.h>
-
-void  cpspi_writeRegister(uint8_t subAddress, uint8_t data)
-{
-    _busWriteRegister(subAddress, data);
-}
-
-void  cpspi_readRegisters(uint8_t subAddress, uint8_t count, uint8_t * dest)
-{
-    _spiBusReadRegisterBuffer(subAddress, count, dest);
-}
-
-
