@@ -22,10 +22,13 @@
 #pragma once
 
 #include <boards/softquat.hpp>
+#include <MPU6000.h>
 
 class Revo : public hf::SoftwareQuaternionBoard  {
 
     private:
+
+        MPU6000 * _imu;
 
         void initMotors(void);
         void initUsb(void);

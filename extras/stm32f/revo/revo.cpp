@@ -26,6 +26,7 @@ extern "C" {
 
 #include "platform.h"
 
+    // Cleanflight includes
 #include "drivers/system.h"
 #include "drivers/timer.h"
 #include "drivers/time.h"
@@ -33,12 +34,12 @@ extern "C" {
 #include "drivers/serial.h"
 #include "drivers/serial_uart.h"
 #include "drivers/serial_usb_vcp.h"
-
 #include "io/serial.h"
-
 #include "target.h"
-
 #include "stm32f4xx.h"
+
+    // Hackflight includes
+#include "../spi.h"
 
     static serialPort_t * _serial0;
 
@@ -53,6 +54,20 @@ extern "C" {
 
     void Revo::initImu(void)
     {
+        spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
+        _imu = new MPU6000(AFS_2G, GFS_250DPS);
+
+        switch (_imu->begin()) {
+
+            case MPU_ERROR_IMU_ID:
+                error("Bad device ID");
+                break;
+            case MPU_ERROR_SELFTEST:
+                error("Failed self-test");
+                break;
+            default:
+                break;
+        }
     }
 
     void Revo::initUsb(void)

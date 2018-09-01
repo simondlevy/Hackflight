@@ -22,9 +22,6 @@
 #include <mixers/quadx.hpp>
 #include "revo.h"
 
-#include <drivers/accgyro/accgyro.h>
-#include <drivers/accgyro/accgyro_spi_mpu6000.h>
-
 static hf::Hackflight h;
 
 extern "C" {
