@@ -90,6 +90,7 @@ CMSIS_DIR       := $(LIB_DIR)/CMSIS
 HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
 IMU_DIR         := $(ARDUINO_DIR)/MPU/src
 RX_DIR          := $(ARDUINO_DIR)/SpektrumDSM/src
+SPI_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
 INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR)
 LINKER_DIR      := $(SRC_DIR)/target/link
 MAKE_DIR        := $(CF_DIR)/make
@@ -612,22 +613,7 @@ SPEED_OPTIMISED_SRC := $(SPEED_OPTIMISED_SRC) \
             common/maths.c \
             common/typeconversion.c \
             drivers/accgyro/accgyro_fake.c \
-            drivers/accgyro/accgyro_mpu.c \
-            drivers/accgyro/accgyro_mpu3050.c \
-            drivers/accgyro/accgyro_mpu6050.c \
-            drivers/accgyro/accgyro_mpu6500.c \
-            drivers/accgyro/accgyro_spi_bmi160.c \
-            drivers/accgyro/accgyro_spi_icm20689.c \
-            drivers/accgyro/accgyro_spi_mpu6000.c \
-            drivers/accgyro/accgyro_spi_mpu6500.c \
-            drivers/accgyro/accgyro_spi_mpu9250.c \
-            drivers/accgyro_legacy/accgyro_adxl345.c \
-            drivers/accgyro_legacy/accgyro_bma280.c \
-            drivers/accgyro_legacy/accgyro_l3g4200d.c \
-            drivers/accgyro_legacy/accgyro_l3gd20.c \
-            drivers/accgyro_legacy/accgyro_lsm303dlhc.c \
-            drivers/accgyro_legacy/accgyro_mma845x.c \
-            drivers/adc.c \
+           drivers/adc.c \
             drivers/buf_writer.c \
             drivers/bus.c \
             drivers/bus_spi.c \

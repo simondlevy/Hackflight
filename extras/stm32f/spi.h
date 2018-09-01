@@ -33,7 +33,6 @@ extern "C" {
 #include "pg/bus_spi.h"
 #include "io/serial.h"
 #include "target.h"
-#include "stm32f30x.h"
 
     void spi_init(SPI_TypeDef * instance, IO_t pin);
 } 
