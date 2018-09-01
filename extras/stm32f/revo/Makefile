@@ -18,8 +18,6 @@
 #   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-
-
 # Things that the user might override on the commandline
 #
 
@@ -56,24 +54,6 @@ FLASH_SIZE ?=
 
 
 ###############################################################################
-# Things that need to be maintained as the source changes
-#
-
-FORKNAME      = hackflight
-
-# Working directories
-ROOT            := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
-SRC_DIR         := $(CF_DIR)/src/main
-OBJECT_DIR      := $(ROOT)/obj/main
-BIN_DIR         := $(ROOT)/obj
-LIB_DIR         := $(CF_DIR)/lib/main
-CMSIS_DIR       := $(LIB_DIR)/CMSIS
-HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
-RX_DIR          := $(ARDUINO_DIR)/SpektrumDSM/src
-INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(RX_DIR)
-LINKER_DIR      := $(SRC_DIR)/target/link
-MAKE_DIR        := $(CF_DIR)/make
-
 ## V                 : Set verbosity level based on the V= parameter
 ##                     V=0 Low
 ##                     V=1 High
@@ -93,6 +73,27 @@ export V0    :=
 export V1    :=
 export STDOUT   :=
 endif
+
+###############################################################################
+# Things that need to be maintained as the source changes
+#
+
+FORKNAME      = hackflight
+
+# Working directories
+ROOT            := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+SRC_DIR         := $(CF_DIR)/src/main
+OBJECT_DIR      := $(ROOT)/obj/main
+BIN_DIR         := $(ROOT)/obj
+LIB_DIR         := $(CF_DIR)/lib/main
+CMSIS_DIR       := $(LIB_DIR)/CMSIS
+HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
+IMU_DIR         := $(ARDUINO_DIR)/MPU/src
+RX_DIR          := $(ARDUINO_DIR)/SpektrumDSM/src
+INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR)
+LINKER_DIR      := $(SRC_DIR)/target/link
+MAKE_DIR        := $(CF_DIR)/make
+
 
 # configure some directories that are relative to wherever ROOT_DIR is located
 ifndef TOOLS_DIR
@@ -880,9 +881,12 @@ LD_FLAGS     = -lm \
               -T$(LD_SCRIPT)
 endif
 
+# Hackflight support
+IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6000.cpp
 RX_SRC := $(RX_DIR)/SpektrumDSM.cpp
-HF_SRC := ../main.c sketch.cpp revo.cpp ../dsmx.cpp
-SRC += $(HF_SRC)  $(RX_SRC)
+HF_SRC := ../main.c sketch.cpp revo.cpp ../dsmx.cpp ../spi.cpp
+SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC)
+
 
 ###############################################################################
 # No user-serviceable parts below
