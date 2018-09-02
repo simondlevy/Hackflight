@@ -1,5 +1,5 @@
 /*
-   I2C scanner sketch for STM32F3 boards
+   I^2C scanner sketch for STM32F3 boards
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -53,6 +53,15 @@ extern "C" {
     void loop(void)
     {
 
+        // Scan for and report I^2C devices
+        for (uint8_t addr=0; addr<128; ++addr) {
+            //Wire.beginTransmission(addr);
+            if (addr==0x33 /*!Wire.endTransmission()*/) {
+                hf::Debug::printf("Found device at address 0X%02X\n", addr);
+            }
+        }
+        hf::Debug::printf("--------------------------\n");
+
         // support reboot from host computer
         static uint32_t dbg_start_msec;
         if (millis()-dbg_start_msec > 100) {
@@ -64,6 +73,15 @@ extern "C" {
 
             }
         }
+
+        // Wait a bit between reports
+        delay(500);
+    }
+
+   void hf::Board::outbuf(char * buf)
+    {
+        for (char *p=buf; *p; p++)
+            serialWrite(_serial0, *p);
     }
 
 } // extern "C"
