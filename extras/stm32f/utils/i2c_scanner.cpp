@@ -38,7 +38,8 @@ extern "C" {
 #include "target.h"
 #include "stm32f30x.h"
 
-    // Hackflight include
+    // Other includes
+#include <CrossPlatformI2C.h>
 #include "../common/i2c.h"
 
     static I2CDevice _i2cdev = I2CDEV_2;
