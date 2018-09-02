@@ -41,11 +41,13 @@ extern "C" {
     // Hackflight include
 #include "../common/i2c.h"
 
+    static I2CDevice _i2cdev = I2CDEV_2;
+
     static serialPort_t * _serial0;
 
     void setup(void)
     {
-        i2c_init(I2CDEV_2);
+        i2c_init(_i2cdev);
 
         _serial0 = usbVcpOpen();
     }
@@ -53,32 +55,32 @@ extern "C" {
     void loop(void)
     {
 
-        // Scan for and report I^2C devices
+        // Scan for and report I^2C devices.
         for (uint8_t addr=0; addr<128; ++addr) {
-            //Wire.beginTransmission(addr);
-            if (addr==0x33 /*!Wire.endTransmission()*/) {
+
+            // A successful scan is detected as the ability to write to a given address.
+            if (i2cWrite(_i2cdev, addr,  0, 0)) { 
                 hf::Debug::printf("Found device at address 0X%02X\n", addr);
             }
-        }
-        hf::Debug::printf("--------------------------\n");
 
-        // support reboot from host computer
-        static uint32_t dbg_start_msec;
-        if (millis()-dbg_start_msec > 100) {
-            dbg_start_msec = millis();
-            while (serialRxBytesWaiting(_serial0)) {
-                uint8_t c = serialRead(_serial0);
-                if (c == 'R') 
-                    systemResetToBootloader();
+            // support reboot from host computer
+            static uint32_t dbg_start_msec;
+            if (millis()-dbg_start_msec > 100) {
+                dbg_start_msec = millis();
+                while (serialRxBytesWaiting(_serial0)) {
+                    uint8_t c = serialRead(_serial0);
+                    if (c == 'R') 
+                        systemResetToBootloader();
 
+                }
             }
+
         }
 
-        // Wait a bit between reports
-        delay(500);
+        hf::Debug::printf("--------------------------\n");
     }
 
-   void hf::Board::outbuf(char * buf)
+    void hf::Board::outbuf(char * buf)
     {
         for (char *p=buf; *p; p++)
             serialWrite(_serial0, *p);
