@@ -17,5 +17,8 @@ controller from ReadyToFlyQuads
 
 * [SP Racing F3](http://seriouslypro.com/spracingf3) brushless flight controller
 
+What these boards have in common is the ability to short the boot-loader pads easily, either through a jumper
+or boot button.  
+
 
 
