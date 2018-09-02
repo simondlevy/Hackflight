@@ -1,5 +1,5 @@
 ##############################################################################
-#   Makefile for AlienflightF3V1 board
+#   Makefile for Furious FPV Nuke board
 #
 #   Copyright (c) 2018 Simon D. Levy
 #
@@ -21,7 +21,7 @@
 # Things that the user might override on the commandline
 
 # The target to build
-TARGET    ?= ALIENFLIGHTF3
+TARGET    ?= FF_PIKOBLX
 
 # Where you put Cleanflight
 CF_DIR := $(HOME)/Desktop/cleanflight
@@ -86,10 +86,8 @@ BIN_DIR         := $(ROOT)/obj
 LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
 HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
-IMU_DIR         := $(ARDUINO_DIR)/MPU/src
 RX_DIR          := $(ARDUINO_DIR)/SpektrumDSM/src
-I2C_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
-INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(I2C_DIR) $(RX_DIR)
+INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(RX_DIR)
 LINKER_DIR      := $(SRC_DIR)/target/link
 
 # configure some variables dependent upon what type of system this is
@@ -304,12 +302,16 @@ MCU_COMMON_SRC = \
 	    drivers/serial_uart_init.c \
 	    drivers/serial_uart.c \
 	    drivers/serial.c \
-	    drivers/bus_i2c_busdev.c \
-	    drivers/bus_i2c_config.c \
-        drivers/bus_i2c_stm32f30x.c \
+		drivers/exti.c \
+		drivers/bus.c \
+		drivers/bus_spi.c \
+		drivers/bus_spi_config.c \
+		drivers/bus_spi_pinconfig.c \
+		drivers/accgyro/accgyro_spi_mpu6000.c \
+		drivers/accgyro/accgyro_mpu.c \
 	    io/serial.c \
 	    pg/pg.c \
-	    pg/bus_i2c.c
+	    pg/bus_spi.c
 
 DEVICE_FLAGS += -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING -D__FPU_PRESENT=1 -DUNALIGNED_SUPPORT_DISABLE -DARM_MATH_CM4
 
@@ -463,10 +465,9 @@ LD_FLAGS     = -lm \
 endif
 
 # Hackflight support
-IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6050.cpp
 RX_SRC := $(RX_DIR)/SpektrumDSM.cpp
-HF_SRC := ../main.c sketch.cpp alienflightf3v1.cpp ../i2c.cpp ../dsmx.cpp
-SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC)
+HF_SRC := ../../common/main.c sketch.cpp nuke.cpp ../../common/dsmx.cpp
+SRC += $(HF_SRC) $(RX_SRC)
 
 ###############################################################################
 # No user-serviceable parts below
@@ -714,4 +715,4 @@ listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
 
 commit:
-	git commit -a -m="More AlienflightF3 Board implementation"; git push
+	git commit -a -m="More Furious FPV Nuke Board implementation"; git push

@@ -20,7 +20,7 @@
 
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
-#include "omnibusf3.h"
+#include "alienflightf3v1.h"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
@@ -28,9 +28,7 @@ static hf::Hackflight h;
 
 extern "C" {
 
-#include "time.h"
-
-#include "../dsmx.h"
+#include "../../common/dsmx.h"
 
     void setup(void)
     {
@@ -42,10 +40,10 @@ extern "C" {
            0.625f,    // Gyro yaw P
            0.005625f); // Gyro yaw I
          
-        DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_3, CHANNEL_MAP);
+        DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_2, CHANNEL_MAP);
 
         // Initialize Hackflight firmware
-        h.init(new OmnibusF3(), rc, new hf::MixerQuadX(), stabilizer);
+        h.init(new AlienflightF3V1(), rc, new hf::MixerQuadX(), stabilizer);
     }
 
     void loop(void)

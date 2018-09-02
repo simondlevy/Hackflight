@@ -39,7 +39,7 @@ extern "C" {
 #include "stm32f4xx.h"
 
     // Hackflight includes
-#include "../spi.h"
+#include "../../common/spi.h"
 
     static serialPort_t * _serial0;
 

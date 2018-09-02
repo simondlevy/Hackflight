@@ -870,7 +870,7 @@ endif
 # Hackflight support
 IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6000.cpp
 RX_SRC := $(RX_DIR)/SpektrumDSM.cpp
-HF_SRC := ../main.c sketch.cpp revo.cpp ../dsmx.cpp ../spi.cpp
+HF_SRC := ../../common/main.c sketch.cpp revo.cpp ../../common/dsmx.cpp ../../common/spi.cpp
 SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC)
 
 

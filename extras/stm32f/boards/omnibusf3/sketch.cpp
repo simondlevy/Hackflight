@@ -1,5 +1,5 @@
 /*
-   Sketch for Furious F3 Evo brushed board with Spektrum DSMX receiver
+   Sketch for SP Racing F3 board with Spektrum DSMX receiver
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -20,7 +20,7 @@
 
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
-#include "f3evobrushed.h"
+#include "omnibusf3.h"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
@@ -28,7 +28,9 @@ static hf::Hackflight h;
 
 extern "C" {
 
-#include "../dsmx.h"
+#include "time.h"
+
+#include "../../common/dsmx.h"
 
     void setup(void)
     {
@@ -43,7 +45,7 @@ extern "C" {
         DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_3, CHANNEL_MAP);
 
         // Initialize Hackflight firmware
-        h.init(new F3EvoBrushed(), rc, new hf::MixerQuadX(), stabilizer);
+        h.init(new OmnibusF3(), rc, new hf::MixerQuadX(), stabilizer);
     }
 
     void loop(void)

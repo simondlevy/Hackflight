@@ -1,5 +1,5 @@
 /*
-   f3evobrushed.h : Board implmentation for Hyperion F3 Evo Brushed board
+   omnibusf3.cpp : Board implementation for Omnibus F3
 
    Copyright (C) 2018 Simon D. Levy 
 
@@ -19,10 +19,10 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "f3evobrushed.h"
+#include "omnibusf3.h"
 
-static const uint16_t BRUSHED_PWM_RATE     = 32000;
-static const uint16_t BRUSHED_IDLE_PULSE   = 0; 
+static const uint16_t BRUSHLESS_PWM_RATE   = 480;
+static const uint16_t BRUSHLESS_IDLE_PULSE = 1000; 
 
 static const float    MOTOR_MIN = 1000;
 static const float    MOTOR_MAX = 2000;
@@ -36,21 +36,28 @@ extern "C" {
 #include "drivers/timer.h"
 #include "drivers/time.h"
 #include "drivers/pwm_output.h"
-#include "drivers/light_led.h"
 #include "drivers/serial.h"
 #include "drivers/serial_uart.h"
 #include "drivers/serial_usb_vcp.h"
 #include "io/serial.h"
 #include "target.h"
 #include "stm32f30x.h"
+#include "drivers/sound_beeper.h"
+#include "pg/beeper_dev.h"
 
     // Hackflight includes
-#include "../spi.h"
+#include "../../common/spi.h"
 
     static serialPort_t * _serial0;
 
-    F3EvoBrushed::F3EvoBrushed(void)
+    OmnibusF3::OmnibusF3(void)
     {
+        // Set up the LED (uses the beeper for some reason)
+        beeperInit(beeperDevConfig());
+
+        // Turn it off
+        systemBeep(true);
+
         initMotors();
         initUsb();
         initImu();
@@ -58,11 +65,10 @@ extern "C" {
         RealBoard::init();
     }
 
-    void F3EvoBrushed::initImu(void)
+    void OmnibusF3::initImu(void)
     {
-        spi_init(MPU6500_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6500_CS_PIN)));
-
-        _imu = new MPU6500(AFS_2G, GFS_250DPS);
+        spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
+        _imu = new MPU6000(AFS_2G, GFS_250DPS);
 
         switch (_imu->begin()) {
 
@@ -77,17 +83,18 @@ extern "C" {
         }
     }
 
-    void F3EvoBrushed::initUsb(void)
+    void OmnibusF3::initUsb(void)
     {
         _serial0 = usbVcpOpen();
     }
 
-    void F3EvoBrushed::initMotors(void)
+    void OmnibusF3::initMotors(void)
     {
+
         motorDevConfig_t dev;
 
-        dev.motorPwmRate = BRUSHED_PWM_RATE;
-        dev.motorPwmProtocol = PWM_TYPE_BRUSHED;
+        dev.motorPwmRate = BRUSHLESS_PWM_RATE;
+        dev.motorPwmProtocol = PWM_TYPE_STANDARD;
         dev.motorPwmInversion = false;
         dev.useUnsyncedPwm = true;
         dev.useBurstDshot = false;
@@ -97,65 +104,67 @@ extern "C" {
         dev.ioTags[2] = timerioTagGetByUsage(TIM_USE_MOTOR, 2);
         dev.ioTags[3] = timerioTagGetByUsage(TIM_USE_MOTOR, 3);
 
-        motorDevInit(&dev, BRUSHED_IDLE_PULSE, 4);
+        motorDevInit(&dev, BRUSHLESS_IDLE_PULSE, 4);
 
         pwmEnableMotors();
+
+        writeMotor(0, 0);
+        writeMotor(1, 0);
+        writeMotor(2, 0);
+        writeMotor(3, 0);
     }
 
-    void F3EvoBrushed::writeMotor(uint8_t index, float value)
+    void OmnibusF3::writeMotor(uint8_t index, float value)
     {
         pwmWriteMotor(index, MOTOR_MIN + value*(MOTOR_MAX-MOTOR_MIN));
     }
 
-    void F3EvoBrushed::delaySeconds(float sec)
+    void OmnibusF3::delaySeconds(float sec)
     {
         delay((uint16_t)(sec*1000));
     }
 
-    void F3EvoBrushed::setLed(bool isOn)
+    void OmnibusF3::setLed(bool isOn)
     {
-        ledSet(0, isOn);
+        systemBeep(!isOn);
     }
 
-    uint32_t F3EvoBrushed::getMicroseconds(void)
+    uint32_t OmnibusF3::getMicroseconds(void)
     {
         return micros();
     }
 
-    void F3EvoBrushed::reboot(void)
+    void OmnibusF3::reboot(void)
     {
         systemResetToBootloader();
     }
 
-    uint8_t F3EvoBrushed::serialAvailableBytes(void)
+    uint8_t OmnibusF3::serialAvailableBytes(void)
     {
         return serialRxBytesWaiting(_serial0);
     }
 
-    uint8_t F3EvoBrushed::serialReadByte(void)
+    uint8_t OmnibusF3::serialReadByte(void)
     {
         return serialRead(_serial0);
     }
 
-    void F3EvoBrushed::serialWriteByte(uint8_t c)
+    void OmnibusF3::serialWriteByte(uint8_t c)
     {
         serialWrite(_serial0, c);
     }
 
-    bool F3EvoBrushed::imuRead(void)
+    bool OmnibusF3::imuRead(void)
     {
         if (_imu->checkNewData()) {  
 
-            _imu->readAccelerometer(_ax, _ay, _az);
-            _imu->readGyrometer(_gx, _gy, _gz);
+            // Note reversed X/Y order because of IMU rotation            
+            _imu->readAccelerometer(_ay, _ax, _az);
+            _imu->readGyrometer(_gy, _gx, _gz);
 
-            // Negate for IMU orientation
-            _ax = -_ax;
-            _ay = -_ay;
-            _gx = -_gx;
+            // Negate for same reason
             _gy = -_gy;
-
-            //hf::Debug::printf("%d\n", micros());
+            _ay = -_ay;
 
             return true;
         }  
@@ -168,6 +177,5 @@ extern "C" {
         for (char *p=buf; *p; p++)
             serialWrite(_serial0, *p);
     }
-
 
 } // extern "C"

@@ -28,7 +28,7 @@ static hf::Hackflight h;
 
 extern "C" {
 
-#include "../dsmx.h"
+#include "../../common/dsmx.h"
 
     void setup(void)
     {

@@ -1,5 +1,5 @@
 ##############################################################################
-#   Makefile for Omnibus F3 board
+#   Makefile for AlienflightF3V1 board
 #
 #   Copyright (c) 2018 Simon D. Levy
 #
@@ -21,7 +21,7 @@
 # Things that the user might override on the commandline
 
 # The target to build
-TARGET    ?= OMNIBUS
+TARGET    ?= ALIENFLIGHTF3
 
 # Where you put Cleanflight
 CF_DIR := $(HOME)/Desktop/cleanflight
@@ -88,8 +88,8 @@ CMSIS_DIR       := $(LIB_DIR)/CMSIS
 HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
 IMU_DIR         := $(ARDUINO_DIR)/MPU/src
 RX_DIR          := $(ARDUINO_DIR)/SpektrumDSM/src
-SPI_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
-INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR)
+I2C_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
+INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(I2C_DIR) $(RX_DIR)
 LINKER_DIR      := $(SRC_DIR)/target/link
 
 # configure some variables dependent upon what type of system this is
@@ -304,17 +304,12 @@ MCU_COMMON_SRC = \
 	    drivers/serial_uart_init.c \
 	    drivers/serial_uart.c \
 	    drivers/serial.c \
-		drivers/exti.c \
-		drivers/bus.c \
-		drivers/bus_spi.c \
-		drivers/bus_spi_config.c \
-		drivers/bus_spi_pinconfig.c \
-		drivers/sound_beeper.c \
-		pg/beeper_dev.c \
-		io/serial.c \
+	    drivers/bus_i2c_busdev.c \
+	    drivers/bus_i2c_config.c \
+        drivers/bus_i2c_stm32f30x.c \
+	    io/serial.c \
 	    pg/pg.c \
-	    pg/bus_spi.c
-
+	    pg/bus_i2c.c
 
 DEVICE_FLAGS += -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING -D__FPU_PRESENT=1 -DUNALIGNED_SUPPORT_DISABLE -DARM_MATH_CM4
 
@@ -468,9 +463,9 @@ LD_FLAGS     = -lm \
 endif
 
 # Hackflight support
-IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6000.cpp
+IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6050.cpp
 RX_SRC := $(RX_DIR)/SpektrumDSM.cpp
-HF_SRC := ../main.c sketch.cpp omnibusf3.cpp ../dsmx.cpp ../spi.cpp
+HF_SRC := ../../common/main.c ../../common/i2c.cpp ../../common/dsmx.cpp sketch.cpp alienflightf3v1.cpp  
 SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC)
 
 ###############################################################################

@@ -48,7 +48,7 @@ extern "C" {
 #include "stm32f30x.h"
 
     // Hackflight include
-#include "../i2c.h"
+#include "../../common/i2c.h"
 
     static serialPort_t * _serial0;
 
