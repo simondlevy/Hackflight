@@ -21,7 +21,7 @@
 # Things that the user might override on the commandline
 
 # The target to build
-TARGET    ?= ALIENFLIGHTF3
+TARGET    ?= OMNIBUS
 
 # Where you put Cleanflight
 CF_DIR := $(HOME)/Desktop/cleanflight

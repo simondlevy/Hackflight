@@ -42,7 +42,7 @@ extern "C" {
 #include <CrossPlatformI2C.h>
 #include "../common/i2c.h"
 
-    static I2CDevice _i2cdev = I2CDEV_2;
+    static I2CDevice _i2cdev = I2CDEV_1;
 
     static serialPort_t * _serial0;
 
