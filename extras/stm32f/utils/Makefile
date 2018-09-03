@@ -87,8 +87,9 @@ LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
 HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
 IMU_DIR         := $(ARDUINO_DIR)/MPU/src
+VL3_DIR         := $(ARDUINO_DIR)/VL53L1X/src
 I2C_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
-INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(I2C_DIR) 
+INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(I2C_DIR) $(VL3_DIR)
 LINKER_DIR      := $(SRC_DIR)/target/link
 
 # configure some variables dependent upon what type of system this is
@@ -463,8 +464,9 @@ endif
 
 # Hackflight support
 IMU_SRC := $(IMU_DIR)/MPU.cpp  # XXX not sure why we need this to link!
+VL3_SRC := $(VL3_DIR)/VL53L1X.cpp  # XXX not sure why we need this to link!
 HF_SRC := ../common/main.c ../common/i2c.cpp i2c_scanner.cpp 
-SRC += $(HF_SRC) $(IMU_SRC)
+SRC += $(HF_SRC) $(IMU_SRC) $(VL3_SRC)
 
 ###############################################################################
 # No user-serviceable parts below

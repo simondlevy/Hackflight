@@ -27,8 +27,6 @@ extern "C" {
 #include "drivers/system.h"
 #include "drivers/timer.h"
 #include "drivers/time.h"
-#include "drivers/pwm_output.h"
-#include "drivers/light_led.h"
 #include "drivers/serial.h"
 #include "drivers/serial_uart.h"
 #include "drivers/serial_usb_vcp.h"
@@ -49,6 +47,8 @@ extern "C" {
     void setup(void)
     {
         i2c_init(_i2cdev);
+
+        delay(100);
 
         _serial0 = usbVcpOpen();
     }
