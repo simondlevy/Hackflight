@@ -464,7 +464,7 @@ endif
 
 # Hackflight support
 IMU_SRC := $(IMU_DIR)/MPU.cpp  # XXX not sure why we need this to link!
-VL3_SRC := $(VL3_DIR)/VL53L1X.cpp  # XXX not sure why we need this to link!
+#VL3_SRC := $(VL3_DIR)/VL53L1X.cpp  
 HF_SRC := ../common/main.c ../common/i2c.cpp i2c_scanner.cpp 
 SRC += $(HF_SRC) $(IMU_SRC) $(VL3_SRC)
 

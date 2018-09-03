@@ -27,7 +27,7 @@
 #include <Wire.h>
 #include <Servo.h>
 
-#include <MPU9250.h> 
+#include <MPU9250_Passthru.h> 
 
 #include "filters.hpp"
 #include "hackflight.hpp"

@@ -19,6 +19,7 @@
  */
 
 #include <debug.hpp>
+#include <VL53L1X.h>
 
 extern "C" {
 
@@ -44,18 +45,29 @@ extern "C" {
 
     static serialPort_t * _serial0;
 
+    //static VL53L1X * distanceSensor;
+
     void setup(void)
     {
         i2c_init(_i2cdev);
 
         delay(100);
 
+        //distanceSensor = new VL53L1X();
+
         _serial0 = usbVcpOpen();
+
+        /*
+        if (!distanceSensor->begin()) {
+            while (true) {
+                hf::Debug::printf("Sensor offline!\n");
+                delay(200);
+            }
+        }*/
     }
 
     void loop(void)
     {
-
         // Scan for and report I^2C devices.
         for (uint8_t addr=0; addr<128; ++addr) {
 
