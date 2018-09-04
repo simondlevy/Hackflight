@@ -66,14 +66,14 @@ extern "C" {
 
         delaySeconds(0.1);
 
-        _imu = new MPU6050(AFS_8G, GFS_2000DPS);
+        _imu = new MPU6050(MPUIMU::AFS_8G, MPUIMU::GFS_2000DPS);
 
         switch (_imu->begin()) {
 
-        case MPU_ERROR_IMU_ID:
+        case MPUIMU::ERROR_IMU_ID:
                 error("Bad device ID");
                 break;
-            case MPU_ERROR_SELFTEST:
+            case MPUIMU::ERROR_SELFTEST:
                 error("Failed self-test");
                 break;
             default:

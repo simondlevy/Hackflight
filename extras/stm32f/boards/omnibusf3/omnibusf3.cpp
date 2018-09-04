@@ -50,6 +50,19 @@ extern "C" {
 
     static serialPort_t * _serial0;
 
+    /*
+    static serialPort_t * _serial_extra;
+
+    static char tmp = 'a';
+
+    static void serial_event(uint16_t value, void * data)
+    {
+        tmp = (char)value;
+
+        (void)data;
+    }
+    */
+
     OmnibusF3::OmnibusF3(void)
     {
         // Set up the LED (uses the beeper for some reason)
@@ -62,20 +75,22 @@ extern "C" {
         initUsb();
         initImu();
 
+        //_serial_extra = uartOpen(UARTDEV_2,  serial_event, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
+
         RealBoard::init();
     }
 
     void OmnibusF3::initImu(void)
     {
         spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
-        _imu = new MPU6000(AFS_2G, GFS_250DPS);
+        _imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
         switch (_imu->begin()) {
 
-            case MPU_ERROR_IMU_ID:
+            case MPUIMU::ERROR_IMU_ID:
                 error("Bad device ID");
                 break;
-            case MPU_ERROR_SELFTEST:
+            case MPUIMU::ERROR_SELFTEST:
                 error("Failed self-test");
                 break;
             default:
@@ -165,6 +180,8 @@ extern "C" {
             // Negate for same reason
             _gy = -_gy;
             _ay = -_ay;
+
+            //hf::Debug::printf("%c\n", tmp);
 
             return true;
         }  

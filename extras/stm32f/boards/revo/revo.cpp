@@ -55,14 +55,14 @@ extern "C" {
     void Revo::initImu(void)
     {
         spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
-        _imu = new MPU6000(AFS_2G, GFS_250DPS);
+        _imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
         switch (_imu->begin()) {
 
-            case MPU_ERROR_IMU_ID:
+            case MPUIMU::ERROR_IMU_ID:
                 error("Bad device ID");
                 break;
-            case MPU_ERROR_SELFTEST:
+            case MPUIMU::ERROR_SELFTEST:
                 error("Failed self-test");
                 break;
             default:
