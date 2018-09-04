@@ -25,7 +25,7 @@
 #pragma once
 
 #include <Wire.h>
-#include <EM7180.h>
+#include <EM7180_Master.h>
 #include <stdarg.h>
 #include "hackflight.hpp"
 #include "realboard.hpp"
