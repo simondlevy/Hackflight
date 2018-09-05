@@ -183,6 +183,12 @@ extern "C" {
                     // -  -  -  + 
                     // -  -  -  - 
 
+    void BetaFPVF3::updateQuaternion(float deltat) 
+    {                   
+        _quaternionFilter.update(_ay, _ax, -_az, _gy, _gx, -_gz, deltat); 
+    }
+
+
     void hf::Board::outbuf(char * buf)
     {
         for (char *p=buf; *p; p++)
