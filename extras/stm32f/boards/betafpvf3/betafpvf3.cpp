@@ -43,8 +43,6 @@ extern "C" {
 #include "io/serial.h"
 #include "target.h"
 #include "stm32f30x.h"
-#include "drivers/sound_beeper.h"
-#include "pg/beeper_dev.h"
 
     // Hackflight includes
 #include "../../common/spi.h"

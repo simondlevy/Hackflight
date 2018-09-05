@@ -42,11 +42,10 @@ extern "C" {
 #include "io/serial.h"
 #include "target.h"
 #include "stm32f30x.h"
-#include "drivers/sound_beeper.h"
-#include "pg/beeper_dev.h"
 
     // Hackflight includes
 #include "../../common/spi.h"
+#include "../../common/beeperled.h"
 
     static serialPort_t * _serial0;
 
@@ -66,10 +65,7 @@ extern "C" {
     OmnibusF3::OmnibusF3(void)
     {
         // Set up the LED (uses the beeper for some reason)
-        beeperInit(beeperDevConfig());
-
-        // Turn it off
-        systemBeep(true);
+        beeperLedInit();
 
         initMotors();
         initUsb();
@@ -141,7 +137,7 @@ extern "C" {
 
     void OmnibusF3::setLed(bool isOn)
     {
-        systemBeep(!isOn);
+        beeperLedSet(isOn);
     }
 
     uint32_t OmnibusF3::getMicroseconds(void)
