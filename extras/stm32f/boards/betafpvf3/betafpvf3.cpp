@@ -150,16 +150,14 @@ extern "C" {
     {
         if (_imu->checkNewData()) {  
 
-            _imu->readAccelerometer(_ax, _ay, _az);
-            _imu->readGyrometer(_gx, _gy, _gz);
+            _imu->readAccelerometer(_ay, _ax, _az);
+            _imu->readGyrometer(_gy, _gx, _gz);
 
-            // Negate for IMU orientation
-            _ax = -_ax;
-            _ay = -_ay;
             _gx = -_gx;
             _gy = -_gy;
+            _gz = -_gz;
 
-            //hf::Debug::printf("%d\n", micros());
+            hf::Debug::printlnfloat(_gx);
 
             return true;
         }  
