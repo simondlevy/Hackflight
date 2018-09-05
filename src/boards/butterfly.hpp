@@ -143,6 +143,11 @@ namespace hf {
                 return false;
             }
 
+            void updateQuaternion(float deltat) 
+            {                   
+                _quaternionFilter.update(-_ay, _ax, _az, _gy, _gx, -_gz, deltat); 
+            }
+
         public:
 
             Butterfly(void)

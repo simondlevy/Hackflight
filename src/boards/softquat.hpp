@@ -40,10 +40,6 @@ namespace hf {
             // Update quaternion after this number of gyro updates
             const uint8_t QUATERNION_DIVISOR = 5;
 
-            // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
-            // using a 6DOF fiter (accel, gyro)
-            MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(BETA, ZETA);
-
             // Supports computing quaternion after a certain number of IMU readings
             uint8_t _quatCycleCount = 0;
 
@@ -61,6 +57,10 @@ namespace hf {
             float _gx = 0;
             float _gy = 0;
             float _gz = 0;
+
+            // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
+            // using a 6DOF fiter (accel, gyro)
+            MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(BETA, ZETA);
 
             bool getGyrometer(float gyro[3])
             {
@@ -97,24 +97,7 @@ namespace hf {
                     _time = time;
 
                     // Run the quaternion on the IMU values acquired in getGyrometer()
-                    // ay ax gy gx
-                    // +  +  +  + 
-                    // +  +  +  - 
-                    // +  +  -  + 
-                    // +  +  -  - 
-                    // +  -  +  + 
-                    // +  -  +  - 
-                    // +  -  -  + 
-                    // +  -  -  - 
-                    // -  +  +  + 
-                    // -  +  +  - 
-                    // -  +  -  + 
-                    // -  +  -  - 
-                    // -  -  +  + 
-                    // -  -  +  - 
-                    // -  -  -  + 
-                    // -  -  -  -                    
-                    _quaternionFilter.update(-_ay, _ax, _az, _gy, _gx, -_gz, deltat); // ButterflyFC
+                    updateQuaternion(deltat);
 
                     // Copy the quaternion back out
                     quat[0] = _quaternionFilter.q1;
@@ -129,6 +112,8 @@ namespace hf {
             }
 
             virtual bool imuRead(void) = 0;
+
+            virtual void updateQuaternion(float deltat) = 0;
 
     }; // class SoftwareQuaternionBoard
 

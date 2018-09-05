@@ -157,13 +157,31 @@ extern "C" {
             _gy = -_gy;
             _gz = -_gz;
 
-            hf::Debug::printlnfloat(_gx);
+            hf::Debug::printlnfloat(_gz);
 
             return true;
         }  
 
         return false;
     }
+
+                    // ay ax gy gx
+                    // +  +  +  + 
+                    // +  +  +  - 
+                    // +  +  -  + 
+                    // +  +  -  - 
+                    // +  -  +  + 
+                    // +  -  +  - 
+                    // +  -  -  + 
+                    // +  -  -  - 
+                    // -  +  +  + 
+                    // -  +  +  - 
+                    // -  +  -  + 
+                    // -  +  -  - 
+                    // -  -  +  + 
+                    // -  -  +  - 
+                    // -  -  -  + 
+                    // -  -  -  - 
 
     void hf::Board::outbuf(char * buf)
     {
