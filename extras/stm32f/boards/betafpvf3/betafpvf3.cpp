@@ -165,24 +165,6 @@ extern "C" {
         return false;
     }
 
-                    // ay ax gy gx
-                    // +  +  +  + 
-                    // +  +  +  - 
-                    // +  +  -  + 
-                    // +  +  -  - 
-                    // +  -  +  + 
-                    // +  -  +  - 
-                    // +  -  -  + 
-                    // +  -  -  - 
-                    // -  +  +  + 
-                    // -  +  +  - 
-                    // -  +  -  + 
-                    // -  +  -  - 
-                    // -  -  +  + 
-                    // -  -  +  - 
-                    // -  -  -  + 
-                    // -  -  -  - 
-
     void BetaFPVF3::updateQuaternion(float deltat) 
     {                   
         _quaternionFilter.update(_ay, _ax, -_az, _gy, _gx, -_gz, deltat); 

@@ -175,15 +175,36 @@ extern "C" {
 
             // Negate for same reason
             _gy = -_gy;
-            _ay = -_ay;
-
-            //hf::Debug::printf("%c\n", tmp);
 
             return true;
         }  
 
         return false;
     }
+
+    // ay ax gy gx
+    // +  +  +  + 
+    // +  +  +  - 
+    // +  +  -  + 
+    // +  +  -  - 
+    // +  -  +  + 
+    // +  -  +  - 
+    // +  -  -  + 
+    // +  -  -  - 
+    // -  +  +  + 
+    // -  +  +  - 
+    // -  +  -  + 
+    // -  +  -  - 
+    // -  -  +  + 
+    // -  -  +  - 
+    // -  -  -  + 
+    // -  -  -  - 
+
+    void OmnibusF3::updateQuaternion(float deltat) 
+    {                   
+        _quaternionFilter.update(_ay, -_ax, _az, _gy, _gx, -_gz, deltat); 
+    }
+
 
     void hf::Board::outbuf(char * buf)
     {
