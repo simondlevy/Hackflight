@@ -43,6 +43,8 @@ extern "C" {
 #include "io/serial.h"
 #include "target.h"
 #include "stm32f30x.h"
+#include "drivers/sound_beeper.h"
+#include "pg/beeper_dev.h"
 
     // Hackflight includes
 #include "../../common/spi.h"
@@ -51,6 +53,12 @@ extern "C" {
 
     BetaFPVF3::BetaFPVF3(void)
     {
+        // Set up the LED (uses the beeper for some reason)
+        beeperInit(beeperDevConfig());
+
+        // Turn it off
+        systemBeep(true);
+
         initMotors();
         initUsb();
         initImu();
@@ -114,7 +122,8 @@ extern "C" {
 
     void BetaFPVF3::setLed(bool isOn)
     {
-        ledSet(0, isOn);
+        //ledSet(0, isOn);
+        systemBeep(!isOn);
     }
 
     uint32_t BetaFPVF3::getMicroseconds(void)

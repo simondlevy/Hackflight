@@ -310,7 +310,10 @@ MCU_COMMON_SRC = \
 		drivers/bus_spi_config.c \
 		drivers/bus_spi_pinconfig.c \
 		io/serial.c \
-	    pg/pg.c \
+		drivers/bus_spi_pinconfig.c \
+		drivers/sound_beeper.c \
+		pg/beeper_dev.c \
+		pg/pg.c \
 	    pg/bus_spi.c 
 
 DEVICE_FLAGS += -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING -D__FPU_PRESENT=1 -DUNALIGNED_SUPPORT_DISABLE -DARM_MATH_CM4
