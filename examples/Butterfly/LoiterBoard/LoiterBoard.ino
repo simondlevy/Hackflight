@@ -2,6 +2,12 @@
    LoiterBoard.ino : Sketch allowing Butterfly breakout board to provide
    optical flow and above-ground-level messages to a flight controller
 
+   Additional libraries required:
+
+      https://github.com/simondlevy/CrossPlatformDataBus
+      https://github.com/simondlevy/VL53L1X
+      https://github.com/bitcraze/Bitcraze_PMW3901
+
    Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
@@ -19,14 +25,32 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <Arduino.h>
+#include <Wire.h>
+
+#include <VL53L1X.h>
+#include <Bitcraze_PMW3901.h>
 
 #include "hackflight.hpp"
 
+static VL53L1X _distanceSensor;
+
 void setup(void)
 {
+    Serial.begin(115200);
+
+    Wire.begin();
+
+    delay(100);
+
+    _distanceSensor.begin();
 }
 
 void loop(void)
 {
+    if (_distanceSensor.newDataReady()) {
+
+        float distance = _distanceSensor.getDistance() / 1000.f; // mm => m
+
+        Serial.println(distance);
+    }
 }
