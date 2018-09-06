@@ -35,12 +35,24 @@
 static const uint8_t VCC_PIN = 8;
 static const uint8_t GND_PIN = 9;
 
+static const uint8_t CS_PIN  = 10;
+
 static VL53L1X _distanceSensor;
+
+static Bitcraze_PMW3901 _flowSensor(CS_PIN);
 
 static void powerPin(uint8_t pin, uint8_t value)
 {
     pinMode(pin, OUTPUT);
     digitalWrite(pin, value);
+}
+
+static void error(const char * sensorName)
+{
+    while (true) {
+        Serial.print(sensorName);
+        Serial.println(" offline!");
+    }
 }
 
 void setup(void)
@@ -55,7 +67,13 @@ void setup(void)
 
     delay(100);
 
-    _distanceSensor.begin();
+    if (!_distanceSensor.begin()) {
+        error("VL53L1X");
+    }
+
+    if (!_flowSensor.begin()) {
+        error("PMW3901");
+    }
 }
 
 void loop(void)
@@ -64,6 +82,14 @@ void loop(void)
 
         float distance = _distanceSensor.getDistance() / 1000.f; // mm => m
 
-        Serial.println(distance);
+        int16_t fx = 0, fy = 0;
+        _flowSensor.readMotionCount(&fx, &fy);
+
+        Serial.print("Distance: ");
+        Serial.print(distance);
+        Serial.print("m  Flow:  ");
+        Serial.print(fx);
+        Serial.print(" ");
+        Serial.println(fy);
     }
 }
