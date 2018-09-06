@@ -152,42 +152,20 @@ extern "C" {
     {
         if (_imu->checkNewData()) {  
 
-            // Note reversed X/Y order because of IMU rotation
-            _imu->readAccelerometer(_ax, _ay, _az);
-            _imu->readGyrometer(_gx, _gy, _gz);
+            // Note reversed X/Y order because of IMU orientation
+            _imu->readAccelerometer(_ay, _ax, _az);
+            _imu->readGyrometer(_gy, _gx, _gz);
 
             // Negate for same reason
             _gx = -_gx;
             _gy = -_gy;
+            _gz = -_gz;
 
             return true;
         }  
 
         return false;
     }
-
-    void AlienflightF3V1::updateQuaternion(float deltat) 
-    {                   
-        // ay ax gy gx
-        // +  +  +  +  *
-        // +  +  +  - 
-        // +  +  -  + 
-        // +  +  -  - 
-        // +  -  +  + 
-        // +  -  +  - 
-        // +  -  -  + 
-        // +  -  -  - 
-        // -  +  +  + 
-        // -  +  +  - 
-        // -  +  -  + 
-        // -  +  -  - 
-        // -  -  +  + 
-        // -  -  +  - 
-        // -  -  -  + 
-        // -  -  -  - 
-        _quaternionFilter.update(_ay, _ax, _az, _gy, _gx, -_gz, deltat); 
-    }
-
 
     void hf::Board::outbuf(char * buf)
     {

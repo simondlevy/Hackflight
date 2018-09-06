@@ -130,10 +130,13 @@ namespace hf {
 
                     if (_imu.checkNewAccelGyroData()) {
 
-                        _imu.readAccelerometer(_ay, _ax, _az);
-                        _imu.readGyrometer(_gy, _gx, _gz);
+                        _imu.readAccelerometer(_ax, _ay, _az);
+                        _imu.readGyrometer(_gx, _gy, _gz);
 
-                        _gx = -_gx;
+                        // Negate to support board orientation
+                        _ax = -_ax;
+                        _gy = -_gy;
+                        _gz = -_gz;
 
                         return true;
 
@@ -141,11 +144,6 @@ namespace hf {
                 } 
 
                 return false;
-            }
-
-            void updateQuaternion(float deltat) 
-            {                   
-                _quaternionFilter.update(-_ay, _ax, _az, _gy, _gx, -_gz, deltat); 
             }
 
         public:

@@ -96,9 +96,9 @@ namespace hf {
                     float deltat = time - _time;
                     _time = time;
 
-                    // Run the quaternion on the IMU values acquired in getGyrometer()
-                    updateQuaternion(deltat);
-
+                    // Run the quaternion on the IMU values acquired in imuRead()                   
+                    _quaternionFilter.update(_ax, _ay, _az, _gx, _gy, _gz, deltat); 
+   
                     // Copy the quaternion back out
                     quat[0] = _quaternionFilter.q1;
                     quat[1] = _quaternionFilter.q2;
@@ -112,8 +112,6 @@ namespace hf {
             }
 
             virtual bool imuRead(void) = 0;
-
-            virtual void updateQuaternion(float deltat) = 0;
 
     }; // class SoftwareQuaternionBoard
 

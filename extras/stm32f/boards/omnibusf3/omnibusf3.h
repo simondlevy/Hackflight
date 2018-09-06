@@ -49,7 +49,7 @@ class OmnibusF3 : public hf::SoftwareQuaternionBoard  {
 
         // SoftwareQuaternionBoard class overrides
         virtual bool     imuRead(void) override;
-        virtual void     updateQuaternion(float deltat); 
+
     public:
 
         OmnibusF3(void);

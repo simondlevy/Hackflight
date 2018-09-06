@@ -37,13 +37,17 @@ namespace hf {
 
         protected:
 
-            // NB: gyrometer, accelerometer should return values as follows:
+            // NB: gyrometer, accelerometer should return values as follows,
+            // based on the Ladybug Flight Controller:
             //
-            // GX: pitch forward -, pitch back +
-            // GY: roll left -, roll right +
-            // GZ: yaw left +, yaw right -
+            // AX: pitch forward +, back -
+            // AY: roll right +,    left -
+            // AZ: rightside-up +,  upside-down -
             //
-            // AZ: rightside-up +, upside-down -
+            // GX: roll right +,    left -
+            // GY: pitch forward -, back +
+            // GZ: yaw left -,      right +
+
 
             //------------------------------------ Core functionality ----------------------------------------------------
             virtual bool  getQuaternion(float quat[4]) = 0;

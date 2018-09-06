@@ -150,12 +150,9 @@ extern "C" {
             _imu->readGyrometer(_gx, _gy, _gz);
 
             // Negate for IMU orientation
-            _ax = -_ax;
             _ay = -_ay;
             _gx = -_gx;
-            _gy = -_gy;
-
-            //hf::Debug::printf("%d\n", micros());
+            _gz = -_gz;
 
             return true;
         }  

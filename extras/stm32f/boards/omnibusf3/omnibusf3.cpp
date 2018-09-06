@@ -169,26 +169,19 @@ extern "C" {
     {
         if (_imu->checkNewData()) {  
 
-            // Note reversed X/Y order because of IMU rotation            
-            _imu->readAccelerometer(_ay, _ax, _az);
-            _imu->readGyrometer(_gy, _gx, _gz);
+            _imu->readAccelerometer(_ax, _ay, _az);
+            _imu->readGyrometer(_gx, _gy, _gz);
 
-            // Negate for same reason
-            _gy = -_gy;
+            // Negate to support board orientation
+            _ay = -_ay;
+            _gx = -_gx;
+            _gz = -_gz;
 
             return true;
         }  
 
         return false;
     }
-
-
-
-    void OmnibusF3::updateQuaternion(float deltat) 
-    {                   
-        _quaternionFilter.update(_ay, -_ax, _az, _gy, _gx, -_gz, deltat); 
-    }
-
 
     void hf::Board::outbuf(char * buf)
     {

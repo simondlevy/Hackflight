@@ -158,16 +158,16 @@ extern "C" {
     {
         if (_imu->checkNewData()) {  
 
-            // Note reversed X/Y order because of IMU rotation
+             // Note reversed X/Y order to support board orientation
             _imu->readAccelerometer(_ay, _ax, _az);
             _imu->readGyrometer(_gy, _gx, _gz);
 
             // Negate for same reason
-            _ax = -_ax;
             _gx = -_gx;
+            _gy = -_gy;
+            _gz = -_gz;
 
             return true;
-
         }  
 
         return false;
