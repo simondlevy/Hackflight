@@ -1,5 +1,5 @@
 /*
-   ButterflySBUS.ino : Hackflight sketch for Butterfly dev-board SBUS receiver
+   SBUS.ino : Hackflight sketch for Butterfly dev-board SBUS receiver
 
    Copyright (c) 2018 Simon D. Levy
 

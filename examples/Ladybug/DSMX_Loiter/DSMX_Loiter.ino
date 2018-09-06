@@ -1,6 +1,6 @@
 /*
-   LadybugFlyDSMX_Loiter.ino : Hackflight sketch for Ladybug Flight Controller with Spektrum DSMX receiver,
-                               VL53L1X distance sensor, and PMW3901 optical-flow sensor
+   DSMX_Loiter.ino : Hackflight sketch for Ladybug Flight Controller with Spektrum DSMX receiver,
+                     VL53L1X distance sensor, and PMW3901 optical-flow sensor
 
    Copyright (c) 2018 Simon D. Levy
 

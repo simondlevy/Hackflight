@@ -1,5 +1,5 @@
 /*
-   Teensy32DSMX.ino : Hackflight sketch for Teensy 3.2 dev-board with Spektrum DSMX receiver
+   DSMX.ino : Hackflight sketch for Ladybug Flight Controller with Spektrum DSMX receiver
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -16,12 +16,12 @@
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/teensy32.hpp"
+#include "boards/ladybug.hpp"
 #include "receivers/serial/arduino_dsmx.hpp"
 #include "mixers/quadx.hpp"
 
@@ -29,21 +29,26 @@ constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 hf::Hackflight h;
 
-hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);
+hf::DSMX_Receiver rc = hf::DSMX_Receiver(
+        CHANNEL_MAP,
+        .005f,  // roll trim
+        .01f,  // pitch trim
+        0.f);   // yaw trim
 
 hf::MixerQuadX mixer;
 
 hf::Stabilizer stabilizer = hf::Stabilizer(
-                0,//0.20f,      // Level P
-                0,//0.225f,     // Gyro cyclic P
-                0,//0.001875f,  // Gyro cyclic I
-                0,//0.375f,     // Gyro cyclic D
-                0,//1.0625f,    // Gyro yaw P
-                0);//0.005625f); // Gyro yaw I
+                0.20f,      // Level P
+                0.225f,     // Gyro cyclic P
+                0.001875f,  // Gyro cyclic I
+                0.375f,     // Gyro cyclic D
+                1.0625f,    // Gyro yaw P
+                0.005625f); // Gyro yaw I
 
 void setup(void)
 {
-    h.init(new hf::Teensy32(), &rc, &mixer, &stabilizer);
+    // Initialize Hackflight firmware
+    h.init(new hf::Ladybug(), &rc, &mixer, &stabilizer);
 }
 
 void loop(void)

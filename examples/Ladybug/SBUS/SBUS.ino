@@ -1,5 +1,5 @@
 /*
-   LadybugSBUS.ino : Hackflight sketch for Ladybug Flight Controller with an SBUS receiver
+   SBUS.ino : Hackflight sketch for Ladybug Flight Controller with an SBUS receiver
 
    Copyright (c) 2018 Simon D. Levy
 

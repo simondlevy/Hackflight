@@ -1,6 +1,6 @@
 /*
-   LadybugFlyDSMX_VL53L1X.ino : Hackflight sketch for Ladybug Flight Controller with Spektrum DSMX receiver and
-                                VL53L1X distance sensor
+   DSMX_VL53L1X.ino : Hackflight sketch for Ladybug Flight Controller with Spektrum DSMX receiver and
+                      VL53L1X distance sensor
 
    Copyright (c) 2018 Simon D. Levy
 

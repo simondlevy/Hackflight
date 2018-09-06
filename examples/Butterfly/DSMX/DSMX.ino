@@ -1,5 +1,5 @@
 /*
-   ButterflySBUS.ino : Hackflight sketch for Butterfly dev-board with Spektrum DSMX receiver
+   DSMX.ino : Hackflight sketch for Butterfly dev-board with Spektrum DSMX receiver
 
    Copyright (c) 2018 Simon D. Levy
 
