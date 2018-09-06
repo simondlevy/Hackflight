@@ -49,7 +49,20 @@ extern "C" {
     // Hackflight include
 #include "../../common/i2c.h"
 
-    static serialPort_t * _serial0;
+    static serialPort_t * _serial1;
+
+    static serialPort_t * _serial2;
+    static uint8_t _c;
+    static bool _avail;
+
+    static void serial_event2(uint16_t value, void * data)
+    {
+        (void)data;
+
+        _c = (uint8_t)(value & 0xFF);
+
+        _avail = true;
+    }
 
     SPRacingF3::SPRacingF3(void)
     {
@@ -70,7 +83,7 @@ extern "C" {
 
         switch (_imu->begin()) {
 
-        case MPUIMU::ERROR_IMU_ID:
+            case MPUIMU::ERROR_IMU_ID:
                 error("Bad device ID");
                 break;
             case MPUIMU::ERROR_SELFTEST:
@@ -85,7 +98,9 @@ extern "C" {
     {
         uartPinConfigure(serialPinConfig());
 
-        _serial0 = uartOpen(UARTDEV_1,  NULL, NULL,  115200, MODE_RXTX, SERIAL_NOT_INVERTED);
+        _serial1 = uartOpen(UARTDEV_1,  NULL, NULL,  115200, MODE_RXTX, SERIAL_NOT_INVERTED);
+
+        _serial2 = uartOpen(UARTDEV_2,  serial_event2, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
     }
 
     void SPRacingF3::initMotors(void)
@@ -141,17 +156,17 @@ extern "C" {
 
     uint8_t SPRacingF3::serialAvailableBytes(void)
     {
-        return serialRxBytesWaiting(_serial0);
+        return serialRxBytesWaiting(_serial1);
     }
 
     uint8_t SPRacingF3::serialReadByte(void)
     {
-        return serialRead(_serial0);
+        return serialRead(_serial1);
     }
 
     void SPRacingF3::serialWriteByte(uint8_t c)
     {
-        serialWrite(_serial0, c);
+        serialWrite(_serial1, c);
     }
 
     bool SPRacingF3::imuRead(void)
@@ -170,13 +185,20 @@ extern "C" {
             return true;
         }  
 
+        else {
+            if (_avail) {
+                hf::Debug::printf("%d\n", _c);
+                _avail = false;
+            }
+        }
+
         return false;
     }
 
     void hf::Board::outbuf(char * buf)
     {
         for (char *p=buf; *p; p++)
-            serialWrite(_serial0, *p);
+            serialWrite(_serial1, *p);
     }
 
 } // extern "C"
