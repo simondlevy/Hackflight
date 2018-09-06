@@ -80,14 +80,14 @@ void loop(void)
 {
     if (_distanceSensor.newDataReady()) {
 
-        float distance = _distanceSensor.getDistance() / 1000.f; // mm => m
+        uint8_t distanceMm = _distanceSensor.getDistance();
 
         int16_t fx = 0, fy = 0;
         _flowSensor.readMotionCount(&fx, &fy);
 
         Serial.print("Distance: ");
-        Serial.print(distance);
-        Serial.print("m  Flow:  ");
+        Serial.print(distanceMm);
+        Serial.print(" mm;  Flow:  ");
         Serial.print(fx);
         Serial.print(" ");
         Serial.println(fy);
