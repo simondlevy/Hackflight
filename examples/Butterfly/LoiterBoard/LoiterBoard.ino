@@ -32,10 +32,23 @@
 
 #include "hackflight.hpp"
 
+static const uint8_t VCC_PIN = 8;
+static const uint8_t GND_PIN = 9;
+
 static VL53L1X _distanceSensor;
+
+static void powerPin(uint8_t pin, uint8_t value)
+{
+    pinMode(pin, OUTPUT);
+    digitalWrite(pin, value);
+}
 
 void setup(void)
 {
+    // Use digital pins for VL53L1 power, ground
+    powerPin(GND_PIN, LOW);
+    powerPin(VCC_PIN, HIGH);
+
     Serial.begin(115200);
 
     Wire.begin();
