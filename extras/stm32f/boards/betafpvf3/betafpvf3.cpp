@@ -157,8 +157,6 @@ extern "C" {
             _gy = -_gy;
             _gz = -_gz;
 
-            hf::Debug::printlnfloat(_gz);
-
             return true;
         }  
 

@@ -182,23 +182,7 @@ extern "C" {
         return false;
     }
 
-    // ay ax gy gx
-    // +  +  +  + 
-    // +  +  +  - 
-    // +  +  -  + 
-    // +  +  -  - 
-    // +  -  +  + 
-    // +  -  +  - 
-    // +  -  -  + 
-    // +  -  -  - 
-    // -  +  +  + 
-    // -  +  +  - 
-    // -  +  -  + 
-    // -  +  -  - 
-    // -  -  +  + 
-    // -  -  +  - 
-    // -  -  -  + 
-    // -  -  -  - 
+
 
     void OmnibusF3::updateQuaternion(float deltat) 
     {                   
