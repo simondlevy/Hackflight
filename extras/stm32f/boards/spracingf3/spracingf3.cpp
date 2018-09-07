@@ -55,7 +55,7 @@ extern "C" {
     static uint8_t _c;
     static bool _avail;
 
-    static void serial_event2(uint16_t value, void * data)
+    static void serial_event(uint16_t value, void * data)
     {
         (void)data;
 
@@ -69,6 +69,8 @@ extern "C" {
         initMotors();
         initUsb();
         initImu();
+
+        _serial2 = uartOpen(UARTDEV_2,  serial_event, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
 
         RealBoard::init();
     }
@@ -99,8 +101,6 @@ extern "C" {
         uartPinConfigure(serialPinConfig());
 
         _serial1 = uartOpen(UARTDEV_1,  NULL, NULL,  115200, MODE_RXTX, SERIAL_NOT_INVERTED);
-
-        _serial2 = uartOpen(UARTDEV_2,  serial_event2, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
     }
 
     void SPRacingF3::initMotors(void)

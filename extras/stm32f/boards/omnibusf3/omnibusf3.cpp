@@ -49,18 +49,17 @@ extern "C" {
 
     static serialPort_t * _serial0;
 
-    /*
-    static serialPort_t * _serial_extra;
-
-    static char tmp = 'a';
+    static uint8_t _c;
+    static bool _avail;
 
     static void serial_event(uint16_t value, void * data)
     {
-        tmp = (char)value;
-
         (void)data;
+
+        _c = (uint8_t)(value & 0xFF);
+
+        _avail = true;
     }
-    */
 
     OmnibusF3::OmnibusF3(void)
     {
@@ -71,7 +70,9 @@ extern "C" {
         initUsb();
         initImu();
 
-        //_serial_extra = uartOpen(UARTDEV_2,  serial_event, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
+        // Set up UART for incoming MSP sensor messages
+        uartPinConfigure(serialPinConfig());
+        uartOpen(UARTDEV_2,  serial_event, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
 
         RealBoard::init();
     }
@@ -179,6 +180,14 @@ extern "C" {
 
             return true;
         }  
+
+        else {
+
+            if (_avail) {
+                hf::Debug::printf("%d\n", _c);
+                _avail = false;
+            }
+        }
 
         return false;
     }

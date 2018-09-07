@@ -95,5 +95,9 @@ void loop(void)
         Serial.print(fx);
         Serial.print(" ");
         Serial.println(fy);
+
+        static uint8_t c;
+        Serial1.write(c);
+        c = (c+1) % 0xFF;
     }
 }
