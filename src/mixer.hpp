@@ -32,7 +32,7 @@ namespace hf {
     class Mixer {
 
         friend class Hackflight;
-        friend class MSP;
+        friend class Parser;
         friend class RealBoard;
 
         private:

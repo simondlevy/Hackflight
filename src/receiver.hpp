@@ -33,7 +33,7 @@ namespace hf {
 
         friend class Hackflight;
         friend class RealBoard;
-        friend class MSP;
+        friend class Parser;
 
         private: 
 

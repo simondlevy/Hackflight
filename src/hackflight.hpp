@@ -24,7 +24,7 @@
 
 #include "sensor.hpp"
 #include "board.hpp"
-#include "msp.hpp"
+#include "parser.hpp"
 #include "mixer.hpp"
 #include "receiver.hpp"
 #include "debug.hpp"
@@ -65,8 +65,8 @@ namespace hf {
             // Demands sent to mixer
             demands_t _demands;
             
-            // MSP (serial comms)
-            MSP _msp;
+            // Parser for serial messages
+            Parser _parser;
 
             // Safety
             bool _safeToArm;
@@ -206,13 +206,13 @@ namespace hf {
             void doSerialComms(void)
             {
                 while (_board->serialAvailableBytes() > 0) {
-                    if (_msp.update(_board->serialReadByte())) {
+                    if (_parser.update(_board->serialReadByte())) {
                         _board->reboot(); // support "make flash" from STM32F boards
                     }
                 }
 
-                while (_msp.availableBytes() > 0) {
-                    _board->serialWriteByte(_msp.readByte());
+                while (_parser.availableBytes() > 0) {
+                    _board->serialWriteByte(_parser.readByte());
                 }
 
                 // Support motor testing from GCS
@@ -267,8 +267,8 @@ namespace hf {
                 // Support safety override by simulator
                 _state.armed = armed;
 
-                // Initialize MSP (serial comms)
-                _msp.init(&_state, receiver, mixer);
+                // Initialize parser for serial comms
+                _parser.init(&_state, receiver, mixer);
 
                 // Initialize the receiver
                 _receiver->init();

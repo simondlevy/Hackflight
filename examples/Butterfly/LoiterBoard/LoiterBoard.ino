@@ -61,11 +61,15 @@ void setup(void)
     powerPin(GND_PIN, LOW);
     powerPin(VCC_PIN, HIGH);
 
+    // Debugging
     Serial.begin(115200);
 
     Wire.begin();
 
     delay(100);
+
+    // Output to flight controller
+    Serial1.begin(115200);
 
     if (!_distanceSensor.begin()) {
         error("VL53L1X");
