@@ -47,7 +47,10 @@ namespace hf {
             {
                 (void)time;
 
-                memcpy(&state.angularVelocities, _rates, 3*sizeof(float));
+                // NB: We negate gyro X, Y to simplify PID controller
+                state.angularVelocities[0] =  _rates[0];
+                state.angularVelocities[1] = -_rates[1];
+                state.angularVelocities[2] = -_rates[2];
             }
 
             virtual bool ready(float time) override

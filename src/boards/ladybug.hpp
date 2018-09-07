@@ -99,7 +99,7 @@ namespace hf {
                 analogWrite(MOTOR_PINS[index], (uint8_t)(value * 255));
             }
 
-            bool getGyrometer(float gyroRates[3])
+            bool getGyrometer(float gyro[3])
             {
                 // Since gyro is updated most frequently, use it to drive SENtral polling
                 checkEventStatus();
@@ -111,14 +111,10 @@ namespace hf {
                     // Returns degrees / sec
                     _sentral.readGyrometer(gx, gy, gz);
 
-                    // invert pitch, yaw gyro direction to keep other code simpler
-                    gy = -gy;
-                    gz = -gz;
-
                     // Convert degrees / sec to radians / sec
-                    gyroRates[0] = radians(gx);
-                    gyroRates[1] = radians(gy);
-                    gyroRates[2] = radians(gz);
+                    gyro[0] = radians(gx);
+                    gyro[1] = radians(gy);
+                    gyro[2] = radians(gz);
 
                     return true;
                 }

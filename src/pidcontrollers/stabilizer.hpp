@@ -192,7 +192,6 @@ namespace hf {
                 if (throttleIsDown) {
                     resetIntegral();
                 }
-
             }
 
             bool modifyDemands(state_t & state, demands_t & demands)

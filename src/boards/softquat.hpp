@@ -67,10 +67,10 @@ namespace hf {
                 // Read acceleromter Gs, gyrometer degrees/sec
                 if (imuRead()) {
 
-        	    // Convert gyrometer values from degrees/sec to radians/sec
-        	    _gx = deg2rad(_gx);
-        	    _gy = deg2rad(_gy);
-        	    _gz = deg2rad(_gz);
+                    // Convert gyrometer values from degrees/sec to radians/sec
+                    _gx = deg2rad(_gx);
+                    _gy = deg2rad(_gy);
+                    _gz = deg2rad(_gz);
 
                     // Store output
                     gyro[0] = _gx;
@@ -98,7 +98,7 @@ namespace hf {
 
                     // Run the quaternion on the IMU values acquired in imuRead()                   
                     _quaternionFilter.update(_ax, _ay, _az, _gx, _gy, _gz, deltat); 
-   
+
                     // Copy the quaternion back out
                     quat[0] = _quaternionFilter.q1;
                     quat[1] = _quaternionFilter.q2;
