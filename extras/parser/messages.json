@@ -1,5 +1,5 @@
 {
-  "RC_NORMAL": 
+  "GET_RC_NORMAL": 
   [{"ID": 121},
    {"comment": "16 channels in http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol"}, 
    {"c1": "float"}, 
@@ -9,13 +9,13 @@
    {"c5": "float"}, 
    {"c6": "float"}],
 
-  "ATTITUDE_RADIANS": 
+  "GET_ATTITUDE_RADIANS": 
   [{"ID": 122},
    {"roll"    : "float"}, 
    {"pitch"   : "float"},
    {"yaw"     : "float"}],
   
-  "ALTITUDE_METERS": 
+  "GET_ALTITUDE_METERS": 
   [{"ID": 123},
    {"estalt"  : "float"}, 
    {"vario"   : "float"}],  
