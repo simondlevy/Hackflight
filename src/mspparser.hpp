@@ -1,5 +1,5 @@
 /*
-   parser.hpp : parser for MSP (Multiwii Serial Protocol) messages
+   mspparser.hpp : parser for MSP (Multiwii Serial Protocol) messages
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -26,7 +26,7 @@
 
 namespace hf {
 
-    class Parser {
+    class MspParser {
 
         friend class Hackflight;
 
