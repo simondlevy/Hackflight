@@ -24,8 +24,6 @@
 #include <algorithm>
 #include <cmath>
 
-#include "debug.hpp"
-#include "datatypes.hpp"
 #include "mspdispatcher.hpp"
 
 namespace hf {

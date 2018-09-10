@@ -22,7 +22,6 @@
 
 #include "receiver.hpp"
 #include "mixer.hpp"
-#include "datatypes.hpp"
 
 namespace hf {
 

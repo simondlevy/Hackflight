@@ -23,8 +23,6 @@
 #include <cmath>
 #include <math.h>
 
-#include "debug.hpp"
-
 namespace hf {
 
     class Filter {
