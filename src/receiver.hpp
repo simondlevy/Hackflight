@@ -26,10 +26,11 @@
 
 #include "debug.hpp"
 #include "datatypes.hpp"
+#include "mspdispatcher.hpp"
 
 namespace hf {
 
-    class Receiver {
+    class Receiver : public MspDispatcher {
 
         friend class Hackflight;
         friend class RealBoard;
@@ -210,6 +211,10 @@ namespace hf {
         virtual uint8_t getAux2State(void)
         {
             return _aux2State;
+        }
+
+        virtual void dispatchMspCommand(void) override
+        {
         }
 
         public:
