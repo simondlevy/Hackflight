@@ -161,7 +161,10 @@ namespace hf {
 
             void checkReceiver(void)
             {
-                if (!_receiver->getDemands(_state.eulerAngles[AXIS_YAW] - _yawInitial)) return;
+                // Check whether receiver data is available
+                if (!_receiver->getDemands(_state.eulerAngles[AXIS_YAW] - _yawInitial)) {
+                    return;
+                }
 
                 // Update stabilizer with cyclic demands
                 _stabilizer->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
@@ -201,7 +204,7 @@ namespace hf {
             void doSerialComms(void)
             {
                 while (_board->serialAvailableBytes() > 0) {
-                    if (MspParser::update(_board->serialReadByte()) == MspParser::MSP_REBOOT) {
+                    if (MspParser::update(_board->serialReadByte())) { // true return value from update means reboot
                         _board->reboot(); // support "make flash" from STM32F boards
                     }
                 }

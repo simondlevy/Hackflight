@@ -49,14 +49,14 @@ extern "C" {
 
     static serialPort_t * _serial0;
 
-    static uint8_t _c;
+    static uint8_t _value;
     static bool _avail;
 
     static void serial_event(uint16_t value, void * data)
     {
         (void)data;
 
-        _c = (uint8_t)(value & 0xFF);
+        _value = (uint8_t)(value & 0xFF);
 
         _avail = true;
     }
@@ -184,7 +184,7 @@ extern "C" {
         else {
 
             if (_avail) {
-                hf::Debug::printf("%d\n", _c);
+                hf::Debug::printf("%d\n", _value);
                 _avail = false;
             }
         }

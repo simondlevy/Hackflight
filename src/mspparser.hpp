@@ -50,7 +50,7 @@ namespace hf {
         uint8_t _offset;
         uint8_t _dataSize;
 
-        serialState_t   _parserState;
+        serialState_t  _parserState;
 
         void serialize8(uint8_t a)
         {
@@ -63,7 +63,6 @@ namespace hf {
             serialize8(a & 0xFF);
             serialize8((a >> 8) & 0xFF);
         }
-
 
         uint8_t read8(void)
         {
@@ -92,7 +91,6 @@ namespace hf {
             serialize8((a >> 24) & 0xFF);
         }
 
-
         void headSerialResponse(uint8_t err, uint8_t s)
         {
             serialize8('$');
@@ -102,7 +100,6 @@ namespace hf {
             serialize8(s);
             serialize8(_cmdMsp);
         }
-
 
         void headSerialReply(uint8_t s)
         {
@@ -153,9 +150,6 @@ namespace hf {
             headSerialResponse(1, 0);
         }
 
-        static const uint8_t MSP_NONE   = 0;
-        static const uint8_t MSP_REBOOT = 1;
-
         // See http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol
         static const uint8_t MSP_GET_RC_NORMAL        = 121;
         static const uint8_t MSP_GET_ATTITUDE_RADIANS = 122; 
@@ -174,15 +168,14 @@ namespace hf {
             _parserState = IDLE;
         }
 
-        uint8_t update(uint8_t c)
+        // returns true if reboot request, false otherwise
+        bool update(uint8_t c)
         {
-            uint8_t retval = MSP_NONE;            
-
             switch (_parserState) {
 
                 case IDLE:
                     if (c == 'R') {
-                        return MSP_REBOOT; // got reboot command
+                        return true; // got reboot command
                     }
                     _parserState = (c == '$') ? HEADER_START : IDLE;
                     break;
@@ -216,7 +209,6 @@ namespace hf {
                     } else  {
                         if (_checksum == c) {        // compare calculated and transferred _checksum
                             dispatchCommand(_cmdMsp);
-                            retval = _cmdMsp;
                             serialize8(_checksum);                            
                         }
                         _parserState = IDLE;
@@ -224,7 +216,7 @@ namespace hf {
 
             } // switch (_parserState)
 
-            return retval; 
+            return false; // no reboot 
 
         } // update
 
