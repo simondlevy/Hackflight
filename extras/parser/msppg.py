@@ -664,11 +664,12 @@ class Header_Emitter(object):
 
     def __init__(self, msgdict):
 
+        output = _openw('../../src/mspcommands.hpp')
+
         for msgtype in msgdict.keys():
 
-            print(msgtype, msgdict[msgtype][0])
-
-
+            output.write('static const uint8_t CMD_%s' % msgtype)
+            output.write('\t\t= %d;\n' % msgdict[msgtype][0])
 
 # main ===============================================================================================
 
