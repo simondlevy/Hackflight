@@ -666,10 +666,11 @@ class Header_Emitter(object):
 
         output = _openw('../../src/mspcommands.hpp')
 
+        output.write('// AUTO-GENERATED CODE: DO NOT EDIT\n\n')
+
         for msgtype in msgdict.keys():
 
-            output.write('static const uint8_t CMD_%s' % msgtype)
-            output.write('\t\t= %d;\n' % msgdict[msgtype][0])
+            output.write('static const uint8_t CMD_%s = %d;\n' % (msgtype.ljust(30), msgdict[msgtype][0]))
 
 # main ===============================================================================================
 
