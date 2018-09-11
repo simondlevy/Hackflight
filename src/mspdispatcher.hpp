@@ -1,5 +1,5 @@
 /*
-   mspdispatcher.hpp : Abstract class for classes (Receiver, Mixer) that dispatch MSP messages
+   mspdispatcher.hpp : abstract class for classes than dispatch MSP messages
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -16,12 +16,33 @@
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
- */
+   */
 
-class MspDispatcher {
+#pragma once
 
-    protected:
+namespace hf {
 
-        virtual void dispatchMspCommand(void) = 0;
+    class MspDispatcher {
 
-};
+        friend class Hackflight;
+        friend class MspParser;
+
+        protected:
+
+        // See http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol
+        typedef enum {
+
+            CMD_NONE                 =   0,
+            CMD_GET_RC_NORMAL        = 121,
+            CMD_GET_ATTITUDE_RADIANS = 122, 
+            CMD_GET_ALTITUDE_METERS  = 123, 
+            CMD_SET_MOTOR_NORMAL     = 215,    
+            CMD_SET_ARMED            = 216
+
+        } Command_t;
+
+        virtual void dispatchMspCommand(Command_t command) = 0;
+
+    }; // class MspDispatcher
+
+} // namespace hf

@@ -25,6 +25,7 @@
 #include "sensor.hpp"
 #include "board.hpp"
 #include "mspparser.hpp"
+#include "mspdispatcher.hpp"
 #include "mixer.hpp"
 #include "receiver.hpp"
 #include "debug.hpp"
@@ -37,7 +38,7 @@
 
 namespace hf {
 
-    class Hackflight {
+    class Hackflight : public MspDispatcher {
 
         private: 
 
@@ -313,6 +314,11 @@ namespace hf {
                 // Check optional sensors
                 checkSensors();
             } 
+
+        virtual void dispatchMspCommand(Command_t command) override
+        {
+            (void)command;
+        }
 
     }; // class Hackflight
 

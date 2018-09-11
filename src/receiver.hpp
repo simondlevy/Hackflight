@@ -23,12 +23,13 @@
 #include <cstring>
 #include <algorithm>
 #include <cmath>
+#include <stdint.h>
 
-#include "mspdispatcher.hpp"
+#include "datatypes.hpp"
 
 namespace hf {
 
-    class Receiver : public MspDispatcher {
+    class Receiver {
 
         friend class Hackflight;
         friend class RealBoard;
@@ -209,10 +210,6 @@ namespace hf {
         virtual uint8_t getAux2State(void)
         {
             return _aux2State;
-        }
-
-        virtual void dispatchMspCommand(void) override
-        {
         }
 
         public:
