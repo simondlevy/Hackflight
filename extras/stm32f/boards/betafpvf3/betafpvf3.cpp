@@ -47,6 +47,7 @@ extern "C" {
     // Hackflight includes
 #include "../../common/spi.h"
 #include "../../common/beeperled.h"
+#include "../../common/motors.h"
 
     static serialPort_t * _serial0;
 
@@ -55,7 +56,8 @@ extern "C" {
         // Set up the LED (uses the beeper for some reason)
         beeperLedInit();
 
-        initMotors();
+        brushed_motors_init(2, 3, 0, 1);
+
         initUsb();
         initImu();
 
@@ -84,26 +86,6 @@ extern "C" {
     void BetaFPVF3::initUsb(void)
     {
         _serial0 = usbVcpOpen();
-    }
-
-    void BetaFPVF3::initMotors(void)
-    {
-        motorDevConfig_t dev;
-
-        dev.motorPwmRate = BRUSHED_PWM_RATE;
-        dev.motorPwmProtocol = PWM_TYPE_BRUSHED;
-        dev.motorPwmInversion = false;
-        dev.useUnsyncedPwm = true;
-        dev.useBurstDshot = false;
-
-        dev.ioTags[0] = timerioTagGetByUsage(TIM_USE_MOTOR, 2);
-        dev.ioTags[1] = timerioTagGetByUsage(TIM_USE_MOTOR, 3);
-        dev.ioTags[2] = timerioTagGetByUsage(TIM_USE_MOTOR, 0);
-        dev.ioTags[3] = timerioTagGetByUsage(TIM_USE_MOTOR, 1);
-
-        motorDevInit(&dev, BRUSHED_IDLE_PULSE, 4);
-
-        pwmEnableMotors();
     }
 
     void BetaFPVF3::writeMotor(uint8_t index, float value)

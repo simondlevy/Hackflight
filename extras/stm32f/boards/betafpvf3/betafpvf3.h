@@ -29,7 +29,6 @@ class BetaFPVF3 : public hf::SoftwareQuaternionBoard  {
 
     private:
 
-        void initMotors(void);
         void initUsb(void);
         void initImu(void);
 
