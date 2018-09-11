@@ -29,17 +29,12 @@ extern "C" {
     // Cleanflight includes
 #include "platform.h"
 #include "drivers/system.h"
-#include "drivers/timer.h"
-#include "drivers/time.h"
 #include "drivers/pwm_output.h"
-#include "drivers/light_led.h"
-#include "drivers/serial.h"
-#include "drivers/serial_uart.h"
-#include "drivers/serial_usb_vcp.h"
-#include "io/serial.h"
 #include "target.h"
 #include "stm32f30x.h"
 
     void brushed_motors_init(uint8_t m1, uint8_t m2, uint8_t m3, uint8_t m4);
+
+    void motor_write(uint8_t index, float value);
 
 } // extern "C"

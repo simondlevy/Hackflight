@@ -21,12 +21,6 @@
 
 #include "betafpvf3.h"
 
-static const uint16_t BRUSHED_PWM_RATE     = 32000;
-static const uint16_t BRUSHED_IDLE_PULSE   = 0; 
-
-static const float    MOTOR_MIN = 1000;
-static const float    MOTOR_MAX = 2000;
-
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
@@ -35,7 +29,6 @@ extern "C" {
 #include "drivers/system.h"
 #include "drivers/timer.h"
 #include "drivers/time.h"
-#include "drivers/pwm_output.h"
 #include "drivers/light_led.h"
 #include "drivers/serial.h"
 #include "drivers/serial_uart.h"
@@ -90,7 +83,7 @@ extern "C" {
 
     void BetaFPVF3::writeMotor(uint8_t index, float value)
     {
-        pwmWriteMotor(index, MOTOR_MIN + value*(MOTOR_MAX-MOTOR_MIN));
+        motor_write(index, value);
     }
 
     void BetaFPVF3::delaySeconds(float sec)

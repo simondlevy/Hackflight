@@ -22,9 +22,6 @@
 #include "alienflightf3v1.h"
 
 
-static const float    MOTOR_MIN = 1000;
-static const float    MOTOR_MAX = 2000;
-
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
@@ -33,7 +30,6 @@ extern "C" {
 #include "drivers/system.h"
 #include "drivers/timer.h"
 #include "drivers/time.h"
-#include "drivers/pwm_output.h"
 #include "drivers/light_led.h"
 #include "drivers/serial.h"
 #include "drivers/serial_uart.h"
@@ -88,7 +84,7 @@ extern "C" {
 
     void AlienflightF3V1::writeMotor(uint8_t index, float value)
     {
-        pwmWriteMotor(index, MOTOR_MIN + value*(MOTOR_MAX-MOTOR_MIN));
+        motor_write(index, value);
     }
 
     void AlienflightF3V1::delaySeconds(float sec)

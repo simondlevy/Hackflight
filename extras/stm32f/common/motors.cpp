@@ -26,6 +26,9 @@ extern "C" {
 static const uint16_t BRUSHED_PWM_RATE     = 32000;
 static const uint16_t BRUSHED_IDLE_PULSE   = 0; 
 
+static const float    MOTOR_MIN = 1000;
+static const float    MOTOR_MAX = 2000;
+
    void brushed_motors_init(uint8_t m1, uint8_t m2, uint8_t m3, uint8_t m4)
     {
         motorDevConfig_t dev;
@@ -44,6 +47,11 @@ static const uint16_t BRUSHED_IDLE_PULSE   = 0;
         motorDevInit(&dev, BRUSHED_IDLE_PULSE, 4);
 
         pwmEnableMotors();
+    }
+
+    void motor_write(uint8_t index, float value)
+    {
+        pwmWriteMotor(index, MOTOR_MIN + value*(MOTOR_MAX-MOTOR_MIN));
     }
 
 } // extern "C"
