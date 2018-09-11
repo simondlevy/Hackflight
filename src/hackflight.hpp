@@ -25,7 +25,6 @@
 #include "sensor.hpp"
 #include "board.hpp"
 #include "mspparser.hpp"
-#include "mspdispatcher.hpp"
 #include "mixer.hpp"
 #include "receiver.hpp"
 #include "debug.hpp"
@@ -38,7 +37,7 @@
 
 namespace hf {
 
-    class Hackflight : public MspDispatcher {
+    class Hackflight : public MspParser {
 
         private: 
 
@@ -65,9 +64,6 @@ namespace hf {
 
             // Demands sent to mixer
             demands_t _demands;
-            
-            // Parser for serial messages
-            MspParser _mspParser;
 
             // Safety
             bool _safeToArm;
@@ -180,8 +176,6 @@ namespace hf {
                     _safeToArm = !_receiver->getAux2State();
                 }
 
-                //Debug::printf("%d\n", _receiver->throttleIsDown());
-
                 // Arm (after lots of safety checks!)
                 if (    _safeToArm &&
                         !_state.armed && 
@@ -207,13 +201,13 @@ namespace hf {
             void doSerialComms(void)
             {
                 while (_board->serialAvailableBytes() > 0) {
-                    if (_mspParser.update(_board->serialReadByte())) {
+                    if (mspUpdate(_board->serialReadByte()) == MspParser::MSP_REBOOT) {
                         _board->reboot(); // support "make flash" from STM32F boards
                     }
                 }
 
-                while (_mspParser.availableBytes() > 0) {
-                    _board->serialWriteByte(_mspParser.readByte());
+                while (mspAvailableBytes() > 0) {
+                    _board->serialWriteByte(mspReadByte());
                 }
 
                 // Support motor testing from GCS
@@ -231,15 +225,62 @@ namespace hf {
                         sensor->modifyState(_state, time);
                     }
                 }
-
-                //Debug::printf("forward: %+2.2f    rightward: %+2.2f\n", 
-                //        _state.velocityForward, _state.velocityRightward);
             }
 
             void add_sensor(Sensor * sensor)
             {
                 _sensors[_sensor_count++] = sensor;
             }
+
+        protected:
+
+        virtual void dispatchCommand(uint8_t cmd) override
+        {
+            switch (cmd) {
+
+                case MSP_SET_MOTOR_NORMAL:
+                    for (uint8_t i = 0; i < _mixer->nmotors; i++) {
+                        _mixer->motorsDisarmed[i] = readFloat();
+                    }
+                    headSerialReply(0);
+                    break;
+
+                case MSP_SET_ARMED:
+                    if (read8()) {  // got arming command: arm only if throttle is down
+                        if (_receiver->throttleIsDown()) {
+                            _state.armed = true;
+                        }
+                    }
+                    else {          // got disarming command: always disarm
+                        _state.armed = false;
+                    }
+                    headSerialReply(0);
+                    break;
+
+                case MSP_GET_RC_NORMAL:
+                    {
+                        float rawvals[6];
+                        for (uint8_t k=0; k<6; ++k) {
+                            rawvals[k] = _receiver->getRawval(k);
+                        }
+                        serializeFloats(rawvals, 6);
+                    }
+                    break;
+
+                case MSP_GET_ATTITUDE_RADIANS: 
+                    serializeFloats(_state.eulerAngles, 3);
+                    break;
+
+                case MSP_GET_ALTITUDE_METERS: 
+                    serializeFloats(&_state.altitude, 2);
+                    break;
+
+                    // don't know how to handle the (valid) message, indicate error
+                default:                   
+                    headSerialError(0);
+                    break;
+            }
+        }
 
         public:
 
@@ -269,7 +310,7 @@ namespace hf {
                 _state.armed = armed;
 
                 // Initialize MPS parser for serial comms
-                _mspParser.init(this, &_state, receiver, mixer);
+                mspInit();
 
                 // Initialize the receiver
                 _receiver->init();
@@ -314,11 +355,6 @@ namespace hf {
                 // Check optional sensors
                 checkSensors();
             } 
-
-        virtual void dispatchMspCommand(Command_t command) override
-        {
-            (void)command;
-        }
 
     }; // class Hackflight
 

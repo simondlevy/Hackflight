@@ -198,7 +198,6 @@ namespace hf {
 
         bool throttleIsDown(void)
         {
-            //Debug::printlnfloat(getRawval(CHANNEL_THROTTLE));
             return getRawval(CHANNEL_THROTTLE) < -1 + MARGIN;
         }
 
