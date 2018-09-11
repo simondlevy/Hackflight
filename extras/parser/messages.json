@@ -20,7 +20,7 @@
    {"estalt"  : "float"}, 
    {"vario"   : "float"}],  
 
-  "GET_LOITER_VALUES": 
+  "GET_LOITER_RAW": 
   [{"ID": 126},
    {"agl"   : "byte"}, 
    {"flowx" : "byte"},

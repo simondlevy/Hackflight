@@ -658,6 +658,18 @@ class Java_Emitter(CodeEmitter):
 
         self.output.write(s)
 
+# Firmware header emitter ===============================================================================
+
+class Header_Emitter(object):
+
+    def __init__(self, msgdict):
+
+        for msgtype in msgdict.keys():
+
+            print(msgtype, msgdict[msgtype][0])
+
+
+
 # main ===============================================================================================
 
 if __name__ == '__main__':
@@ -711,3 +723,6 @@ if __name__ == '__main__':
 
     # Emite Java
     Java_Emitter(msgdict)
+
+    # Emit firmware header
+    Header_Emitter(msgdict)
