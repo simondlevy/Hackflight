@@ -22,9 +22,6 @@
 #include "alienflightf3v1.h"
 
 
-static const uint16_t BRUSHED_PWM_RATE     = 32000;
-static const uint16_t BRUSHED_IDLE_PULSE   = 0; 
-
 static const float    MOTOR_MIN = 1000;
 static const float    MOTOR_MAX = 2000;
 
@@ -49,12 +46,14 @@ extern "C" {
 
     // Hackflight include
 #include "../../common/i2c.h"
+#include "../../common/motors.h"
 
     static serialPort_t * _serial0;
 
     AlienflightF3V1::AlienflightF3V1(void)
     {
-        initMotors();
+        brushed_motors_init(0, 1, 2, 3);
+        
         initUsb();
         initImu();
 
@@ -85,27 +84,6 @@ extern "C" {
     void AlienflightF3V1::initUsb(void)
     {
         _serial0 = usbVcpOpen();
-    }
-
-    void AlienflightF3V1::initMotors(void)
-    {
-
-        motorDevConfig_t dev;
-
-        dev.motorPwmRate = BRUSHED_PWM_RATE;
-        dev.motorPwmProtocol = PWM_TYPE_BRUSHED;
-        dev.motorPwmInversion = false;
-        dev.useUnsyncedPwm = true;
-        dev.useBurstDshot = false;
-
-        dev.ioTags[0] = timerioTagGetByUsage(TIM_USE_MOTOR, 0);
-        dev.ioTags[1] = timerioTagGetByUsage(TIM_USE_MOTOR, 1);
-        dev.ioTags[2] = timerioTagGetByUsage(TIM_USE_MOTOR, 2);
-        dev.ioTags[3] = timerioTagGetByUsage(TIM_USE_MOTOR, 3);
-
-        motorDevInit(&dev, BRUSHED_IDLE_PULSE, 4);
-
-        pwmEnableMotors();
     }
 
     void AlienflightF3V1::writeMotor(uint8_t index, float value)

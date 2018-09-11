@@ -30,7 +30,6 @@ class AlienflightF3V1 : public hf::SoftwareQuaternionBoard  {
 
         MPU6050 * _imu;
 
-        void initMotors(void);
         void initUsb(void);
         void initImu(void);
 
