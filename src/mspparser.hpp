@@ -64,6 +64,12 @@ namespace hf {
             serialize8((a >> 8) & 0xFF);
         }
 
+
+        uint8_t read8(void)
+        {
+            return _inBuf[_inBufIndex++] & 0xff;
+        }
+
         uint16_t read16(void)
         {
             uint16_t t = read8();
@@ -77,8 +83,6 @@ namespace hf {
             t += (uint32_t)read16() << 16;
             return t;
         }
-
-
 
         void serialize32(uint32_t a)
         {
@@ -100,25 +104,40 @@ namespace hf {
         }
 
 
+        void headSerialReply(uint8_t s)
+        {
+            headSerialResponse(0, s);
+        }
+
         protected:
 
-        void serializeFloats(float f[], uint8_t n)
+        void sendFloats(float * src, uint8_t count)
         {
             _outBufSize = 0;
             _outBufIndex = 0;
 
-            headSerialReply(4*n);
+            headSerialReply(4*count);
 
-            for (uint8_t k=0; k<n; ++k) {
+            for (uint8_t k=0; k<count; ++k) {
                 uint32_t a;
-                memcpy(&a, &f[k], 4);
+                memcpy(&a, &src[k], 4);
                 serialize32(a);
             }
         }
 
-        uint8_t read8(void)
+        void receiveFloats(float * dst, uint8_t count)
         {
-            return _inBuf[_inBufIndex++] & 0xff;
+            for (uint8_t k=0; k<count; ++k) {
+                dst[k] = readFloat();
+            }
+            headSerialReply(0);
+        }
+
+        bool readBool(void)
+        {
+            bool retval = (bool)read8();
+            headSerialReply(0);
+            return retval;
         }
 
         float readFloat(void)
@@ -129,15 +148,11 @@ namespace hf {
             return f;
         }
 
-        void headSerialReply(uint8_t s)
+        void error(void)
         {
-            headSerialResponse(0, s);
+            headSerialResponse(1, 0);
         }
 
-        void headSerialError(uint8_t s)
-        {
-            headSerialResponse(1, s);
-        }
         static const uint8_t MSP_NONE   = 0;
         static const uint8_t MSP_REBOOT = 1;
 
@@ -148,7 +163,7 @@ namespace hf {
         static const uint8_t MSP_SET_MOTOR_NORMAL     = 215;    
         static const uint8_t MSP_SET_ARMED            = 216;    
 
-        void mspInit(void)
+        void init(void)
         {
             _checksum = 0;
             _outBufIndex = 0;
@@ -159,7 +174,7 @@ namespace hf {
             _parserState = IDLE;
         }
 
-        uint8_t mspUpdate(uint8_t c)
+        uint8_t update(uint8_t c)
         {
             uint8_t retval = MSP_NONE;            
 
@@ -213,12 +228,12 @@ namespace hf {
 
         } // update
 
-        uint8_t mspAvailableBytes(void)
+        uint8_t availableBytes(void)
         {
             return _outBufSize;
         }
 
-        uint8_t mspReadByte(void)
+        uint8_t readByte(void)
         {
             _outBufSize--;
             return _outBuf[_outBufIndex++];

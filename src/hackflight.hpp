@@ -201,13 +201,13 @@ namespace hf {
             void doSerialComms(void)
             {
                 while (_board->serialAvailableBytes() > 0) {
-                    if (mspUpdate(_board->serialReadByte()) == MspParser::MSP_REBOOT) {
+                    if (MspParser::update(_board->serialReadByte()) == MspParser::MSP_REBOOT) {
                         _board->reboot(); // support "make flash" from STM32F boards
                     }
                 }
 
-                while (mspAvailableBytes() > 0) {
-                    _board->serialWriteByte(mspReadByte());
+                while (MspParser::availableBytes() > 0) {
+                    _board->serialWriteByte(MspParser::readByte());
                 }
 
                 // Support motor testing from GCS
@@ -239,14 +239,11 @@ namespace hf {
             switch (cmd) {
 
                 case MSP_SET_MOTOR_NORMAL:
-                    for (uint8_t i = 0; i < _mixer->nmotors; i++) {
-                        _mixer->motorsDisarmed[i] = readFloat();
-                    }
-                    headSerialReply(0);
+                    MspParser::receiveFloats(_mixer->motorsDisarmed, _mixer->nmotors);
                     break;
 
                 case MSP_SET_ARMED:
-                    if (read8()) {  // got arming command: arm only if throttle is down
+                    if (MspParser::readBool()) {  // got arming command: arm only if throttle is down
                         if (_receiver->throttleIsDown()) {
                             _state.armed = true;
                         }
@@ -254,7 +251,6 @@ namespace hf {
                     else {          // got disarming command: always disarm
                         _state.armed = false;
                     }
-                    headSerialReply(0);
                     break;
 
                 case MSP_GET_RC_NORMAL:
@@ -263,21 +259,21 @@ namespace hf {
                         for (uint8_t k=0; k<6; ++k) {
                             rawvals[k] = _receiver->getRawval(k);
                         }
-                        serializeFloats(rawvals, 6);
+                        MspParser::sendFloats(rawvals, 6);
                     }
                     break;
 
                 case MSP_GET_ATTITUDE_RADIANS: 
-                    serializeFloats(_state.eulerAngles, 3);
+                    MspParser::sendFloats(_state.eulerAngles, 3);
                     break;
 
                 case MSP_GET_ALTITUDE_METERS: 
-                    serializeFloats(&_state.altitude, 2);
+                    MspParser::sendFloats(&_state.altitude, 2);
                     break;
 
                     // don't know how to handle the (valid) message, indicate error
-                default:                   
-                    headSerialError(0);
+                default:           
+                    MspParser::error();        
                     break;
             }
         }
@@ -310,7 +306,7 @@ namespace hf {
                 _state.armed = armed;
 
                 // Initialize MPS parser for serial comms
-                mspInit();
+                MspParser::init();
 
                 // Initialize the receiver
                 _receiver->init();
