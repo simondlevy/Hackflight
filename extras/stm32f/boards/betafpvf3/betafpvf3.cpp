@@ -96,10 +96,10 @@ extern "C" {
         dev.useUnsyncedPwm = true;
         dev.useBurstDshot = false;
 
-        dev.ioTags[0] = timerioTagGetByUsage(TIM_USE_MOTOR, 0);
-        dev.ioTags[1] = timerioTagGetByUsage(TIM_USE_MOTOR, 1);
-        dev.ioTags[2] = timerioTagGetByUsage(TIM_USE_MOTOR, 2);
-        dev.ioTags[3] = timerioTagGetByUsage(TIM_USE_MOTOR, 3);
+        dev.ioTags[0] = timerioTagGetByUsage(TIM_USE_MOTOR, 2);
+        dev.ioTags[1] = timerioTagGetByUsage(TIM_USE_MOTOR, 3);
+        dev.ioTags[2] = timerioTagGetByUsage(TIM_USE_MOTOR, 0);
+        dev.ioTags[3] = timerioTagGetByUsage(TIM_USE_MOTOR, 1);
 
         motorDevInit(&dev, BRUSHED_IDLE_PULSE, 4);
 
