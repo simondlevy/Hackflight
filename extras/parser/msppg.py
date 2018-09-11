@@ -667,6 +667,7 @@ class Header_Emitter(object):
         output = _openw('../../src/mspcommands.hpp')
 
         output.write('// AUTO-GENERATED CODE: DO NOT EDIT\n\n')
+        output.write('# pragma once\n\n')
 
         for msgtype in msgdict.keys():
 
