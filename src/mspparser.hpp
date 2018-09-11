@@ -22,6 +22,7 @@
 
 #include "receiver.hpp"
 #include "mixer.hpp"
+#include "mspdispatcher.hpp"
 
 namespace hf {
 
@@ -50,6 +51,7 @@ namespace hf {
             HEADER_CMD
         } serialState_t;
 
+        MspDispatcher * _dispatcher;
         state_t *  _vehicleState;
         Receiver * _receiver;
         Mixer *    _mixer;
@@ -203,8 +205,9 @@ namespace hf {
 
         protected:
 
-        void init(state_t * vehicleState, Receiver * receiver, Mixer * mixer)
+        void init(MspDispatcher * dispatcher, state_t * vehicleState, Receiver * receiver, Mixer * mixer)
         {
+            _dispatcher = dispatcher;
             _vehicleState = vehicleState;
             _receiver = receiver;
             _mixer = mixer;
@@ -221,8 +224,11 @@ namespace hf {
         bool update(uint8_t c)
         {
             switch (_parserState) {
+
                 case IDLE:
-                    if (c == 'R') return true; // got reboot command
+                    if (c == 'R') {
+                        return true; // got reboot command
+                    }
                     _parserState = (c == '$') ? HEADER_START : IDLE;
                     break;
                 case HEADER_START:

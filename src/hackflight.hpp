@@ -269,7 +269,7 @@ namespace hf {
                 _state.armed = armed;
 
                 // Initialize MPS parser for serial comms
-                _mspParser.init(&_state, receiver, mixer);
+                _mspParser.init(this, &_state, receiver, mixer);
 
                 // Initialize the receiver
                 _receiver->init();
