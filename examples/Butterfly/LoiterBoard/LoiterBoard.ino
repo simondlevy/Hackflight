@@ -28,7 +28,7 @@
 #include <Wire.h>
 
 #include <VL53L1X.h>
-//#include <Bitcraze_PMW3901.h>
+#include <Bitcraze_PMW3901.h>
 
 //#include "hackflight.hpp"
 
@@ -39,7 +39,7 @@ static const uint8_t CS_PIN  = 10;
 
 static VL53L1X _distanceSensor;
 
-//static Bitcraze_PMW3901 _flowSensor(CS_PIN);
+static Bitcraze_PMW3901 _flowSensor(CS_PIN);
 
 static void powerPin(uint8_t pin, uint8_t value)
 {
@@ -75,39 +75,33 @@ void setup(void)
         error("VL53L1X");
     }
 
-    //if (!_flowSensor.begin()) {
-    //    error("PMW3901");
-    //}
+    if (!_flowSensor.begin()) {
+        error("PMW3901");
+    }
 }
 
 void loop(void)
 {
     //Poll for completion of measurement. Takes 40-50ms.
-    while (_distanceSensor.newDataReady() == false)
+    while (!_distanceSensor.newDataReady()) {
         delay(5);
+    }
 
-    int distance = _distanceSensor.getDistance(); //Get the result of the measurement from the sensor
+    uint16_t distance = _distanceSensor.getDistance(); //Get the result of the measurement from the sensor
 
-    Serial.print("Distance(mm): ");
+    Serial.print("Distance: ");
     Serial.println(distance);
+    Serial.print(" mm;  Flow:  ");
 
-    /*
-    if (_distanceSensor.newDataReady()) {
+    int16_t fx = 0, fy = 0;
+    _flowSensor.readMotionCount(&fx, &fy);
+    Serial.print(fx);
+    Serial.print(" ");
+    Serial.println(fy);
 
-        uint8_t distanceMm = _distanceSensor.getDistance();
+    delay(50);
 
-        int16_t fx = 0, fy = 0;
-        _flowSensor.readMotionCount(&fx, &fy);
-
-        Serial.print("Distance: ");
-        Serial.print(distanceMm);
-        Serial.print(" mm;  Flow:  ");
-        Serial.print(fx);
-        Serial.print(" ");
-        Serial.println(fy);
-
-        //static uint8_t c;
-        //Serial1.write(c);
-        //c = (c+1) % 0xFF;
-    }*/
+    //static uint8_t c;
+    //Serial1.write(c);
+    //c = (c+1) % 0xFF;
 }
