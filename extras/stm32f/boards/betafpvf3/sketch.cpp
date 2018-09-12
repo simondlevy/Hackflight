@@ -22,7 +22,11 @@
 #include <mixers/quadx.hpp>
 #include "betafpvf3.h"
 
-constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+
+static constexpr float TRIM_ROLL  =  0.0f;
+static constexpr float TRIM_PITCH = +0.15;
+static constexpr float TRIM_YAW   =  0.0f;
 
 static hf::Hackflight h;
 
@@ -40,7 +44,8 @@ extern "C" {
            0.625f,    // Gyro yaw P
            0.005625f); // Gyro yaw I
          
-        DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_2, CHANNEL_MAP);
+        DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_2, CHANNEL_MAP, 
+                TRIM_ROLL, TRIM_PITCH, TRIM_YAW);
 
         // Initialize Hackflight firmware
         h.init(new BetaFPVF3(), rc, new hf::MixerQuadX(), stabilizer);
