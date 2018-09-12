@@ -28,18 +28,18 @@
 #include <Wire.h>
 
 #include <VL53L1X.h>
-#include <Bitcraze_PMW3901.h>
+//#include <Bitcraze_PMW3901.h>
 
-#include "hackflight.hpp"
+//#include "hackflight.hpp"
 
-static const uint8_t VCC_PIN = 8;
-static const uint8_t GND_PIN = 9;
+static const uint8_t VCC_PIN = A0;
+static const uint8_t GND_PIN = A1;
 
 static const uint8_t CS_PIN  = 10;
 
 static VL53L1X _distanceSensor;
 
-static Bitcraze_PMW3901 _flowSensor(CS_PIN);
+//static Bitcraze_PMW3901 _flowSensor(CS_PIN);
 
 static void powerPin(uint8_t pin, uint8_t value)
 {
@@ -64,24 +64,34 @@ void setup(void)
     // Debugging
     Serial.begin(115200);
 
-    Wire.begin();
+    delay(200);
 
-    delay(100);
+    Wire.begin(TWI_PINS_6_7);
 
     // Output to flight controller
-    Serial1.begin(115200);
+    //Serial1.begin(115200);
 
     if (!_distanceSensor.begin()) {
         error("VL53L1X");
     }
 
-    if (!_flowSensor.begin()) {
-        error("PMW3901");
-    }
+    //if (!_flowSensor.begin()) {
+    //    error("PMW3901");
+    //}
 }
 
 void loop(void)
 {
+    //Poll for completion of measurement. Takes 40-50ms.
+    while (_distanceSensor.newDataReady() == false)
+        delay(5);
+
+    int distance = _distanceSensor.getDistance(); //Get the result of the measurement from the sensor
+
+    Serial.print("Distance(mm): ");
+    Serial.println(distance);
+
+    /*
     if (_distanceSensor.newDataReady()) {
 
         uint8_t distanceMm = _distanceSensor.getDistance();
@@ -96,8 +106,8 @@ void loop(void)
         Serial.print(" ");
         Serial.println(fy);
 
-        static uint8_t c;
-        Serial1.write(c);
-        c = (c+1) % 0xFF;
-    }
+        //static uint8_t c;
+        //Serial1.write(c);
+        //c = (c+1) % 0xFF;
+    }*/
 }
