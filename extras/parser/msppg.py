@@ -26,6 +26,8 @@ import os
 import json
 from pkg_resources import resource_string
 
+# Helper functions ===========================================================================
+
 def clean(string):
     cleaned_string = string[1: len(string) - 1]
     return cleaned_string
@@ -42,6 +44,8 @@ def _openw(fname):
 
     print('Creating file ' + fname)
     return open(fname, 'w')
+
+# Code-emitter classes=======================================================================
 
 class CodeEmitter(object):
 
