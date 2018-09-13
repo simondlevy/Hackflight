@@ -219,28 +219,6 @@ MSP_Message MSP_Parser::serialize_GET_ALTITUDE_METERS(float estalt, float vario)
     return msg;
 }
 
-MSP_Message MSP_Parser::serialize_SET_MOTOR_NORMAL(float m1, float m2, float m3, float m4) {
-
-    MSP_Message msg;
-
-    msg.bytes[0] = 36;
-    msg.bytes[1] = 77;
-    msg.bytes[2] = 62;
-    msg.bytes[3] = 16;
-    msg.bytes[4] = 215;
-
-    memcpy(&msg.bytes[5], &m1, sizeof(float));
-    memcpy(&msg.bytes[9], &m2, sizeof(float));
-    memcpy(&msg.bytes[13], &m3, sizeof(float));
-    memcpy(&msg.bytes[17], &m4, sizeof(float));
-
-    msg.bytes[21] = CRC8(&msg.bytes[3], 18);
-
-    msg.len = 22;
-
-    return msg;
-}
-
 void MSP_Parser::set_GET_ATTITUDE_RADIANS_Handler(class GET_ATTITUDE_RADIANS_Handler * handler) {
 
     this->handlerForGET_ATTITUDE_RADIANS = handler;
@@ -279,6 +257,25 @@ MSP_Message MSP_Parser::serialize_GET_ATTITUDE_RADIANS(float roll, float pitch, 
     msg.bytes[17] = CRC8(&msg.bytes[3], 14);
 
     msg.len = 18;
+
+    return msg;
+}
+
+MSP_Message MSP_Parser::serialize_SET_ARMED(byte flag) {
+
+    MSP_Message msg;
+
+    msg.bytes[0] = 36;
+    msg.bytes[1] = 77;
+    msg.bytes[2] = 62;
+    msg.bytes[3] = 1;
+    msg.bytes[4] = 216;
+
+    memcpy(&msg.bytes[5], &flag, sizeof(byte));
+
+    msg.bytes[6] = CRC8(&msg.bytes[3], 3);
+
+    msg.len = 7;
 
     return msg;
 }
@@ -325,21 +322,24 @@ MSP_Message MSP_Parser::serialize_GET_LOITER_RAW(byte agl, byte flowx, byte flow
     return msg;
 }
 
-MSP_Message MSP_Parser::serialize_SET_ARMED(byte flag) {
+MSP_Message MSP_Parser::serialize_SET_MOTOR_NORMAL(float m1, float m2, float m3, float m4) {
 
     MSP_Message msg;
 
     msg.bytes[0] = 36;
     msg.bytes[1] = 77;
     msg.bytes[2] = 62;
-    msg.bytes[3] = 1;
-    msg.bytes[4] = 216;
+    msg.bytes[3] = 16;
+    msg.bytes[4] = 215;
 
-    memcpy(&msg.bytes[5], &flag, sizeof(byte));
+    memcpy(&msg.bytes[5], &m1, sizeof(float));
+    memcpy(&msg.bytes[9], &m2, sizeof(float));
+    memcpy(&msg.bytes[13], &m3, sizeof(float));
+    memcpy(&msg.bytes[17], &m4, sizeof(float));
 
-    msg.bytes[6] = CRC8(&msg.bytes[3], 3);
+    msg.bytes[21] = CRC8(&msg.bytes[3], 18);
 
-    msg.len = 7;
+    msg.len = 22;
 
     return msg;
 }

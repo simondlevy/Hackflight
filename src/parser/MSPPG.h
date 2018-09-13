@@ -48,13 +48,13 @@ class MSP_Parser {
 
         void set_GET_ALTITUDE_METERS_Handler(class GET_ALTITUDE_METERS_Handler * handler);
 
-        static MSP_Message serialize_SET_MOTOR_NORMAL(float m1, float m2, float m3, float m4);
-
         static MSP_Message serialize_GET_ATTITUDE_RADIANS(float roll, float pitch, float yaw);
 
         static MSP_Message serialize_GET_ATTITUDE_RADIANS_Request();
 
         void set_GET_ATTITUDE_RADIANS_Handler(class GET_ATTITUDE_RADIANS_Handler * handler);
+
+        static MSP_Message serialize_SET_ARMED(byte flag);
 
         static MSP_Message serialize_GET_LOITER_RAW(byte agl, byte flowx, byte flowy);
 
@@ -62,7 +62,7 @@ class MSP_Parser {
 
         void set_GET_LOITER_RAW_Handler(class GET_LOITER_RAW_Handler * handler);
 
-        static MSP_Message serialize_SET_ARMED(byte flag);
+        static MSP_Message serialize_SET_MOTOR_NORMAL(float m1, float m2, float m3, float m4);
 
         static MSP_Message serialize_GET_RC_NORMAL(float c1, float c2, float c3, float c4, float c5, float c6);
 
