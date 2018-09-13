@@ -82,17 +82,18 @@ void setup(void)
 
 void loop(void)
 {
-    //Poll for completion of measurement. Takes 40-50ms.
-    while (!_distanceSensor.newDataReady()) {
-        delay(5);
+    // Declare measurement variables static so they'll persist between calls to loop()
+    static uint16_t distance;
+
+    if (_distanceSensor.newDataReady()) {
+        distance = _distanceSensor.getDistance(); //Get the result of the measurement from the sensor
     }
 
-    uint16_t distance = _distanceSensor.getDistance(); //Get the result of the measurement from the sensor
-
     Serial.print("Distance: ");
-    Serial.println(distance);
-    Serial.print(" mm;  Flow:  ");
+    Serial.print(distance);
+    Serial.println(" mm");
 
+    /*
     int16_t fx = 0, fy = 0;
     _flowSensor.readMotionCount(&fx, &fy);
     Serial.print(fx);
@@ -101,7 +102,8 @@ void loop(void)
 
     delay(50);
 
-    //static uint8_t c;
-    //Serial1.write(c);
-    //c = (c+1) % 0xFF;
+    static uint8_t c;
+    Serial1.write(c);
+    c = (c+1) % 0xFF;
+    */
 }
