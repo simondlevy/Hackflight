@@ -48,7 +48,6 @@ class CodeEmitter(object):
     def __init__(self, folder, ext):
 
         mkdir_if_missing('output/%s' % folder)
-        self._copyfile('%s.makefile' % folder, '%s/Makefile' % folder)
 
         self.indent = '    '
 
@@ -102,6 +101,14 @@ class CodeEmitter(object):
         return [(argname,argtype) for (argname,argtype) in 
                 zip(message[1], message[2]) if argname.lower()!='comment']
 
+
+class CompileableCodeEmitter(CodeEmitter):
+
+    def __init__(self, folder, ext):
+
+        CodeEmitter.__init__(self, folder, ext)
+
+        self._copyfile('%s.makefile' % folder, '%s/Makefile' % folder)
 
 # Python emitter ============================================================================
 
@@ -208,11 +215,11 @@ class Python_Emitter(CodeEmitter):
 
 # C++ / Arduino emitter ============================================================================
 
-class CPP_Emitter(CodeEmitter):
+class CPP_Emitter(CompileableCodeEmitter):
 
     def __init__(self, msgdict):
 
-        CodeEmitter.__init__(self, 'cpp', 'cpp')
+        CompileableCodeEmitter.__init__(self, 'cpp', 'cpp')
         mkdir_if_missing('output/cpp/msppg')
 
         # Create C++ example
@@ -376,11 +383,11 @@ class CPP_Emitter(CodeEmitter):
 
 # C emitter ===============================================================================
 
-class C_Emitter(CodeEmitter):
+class C_Emitter(CompileableCodeEmitter):
 
     def __init__(self, msgdict):
 
-        CodeEmitter.__init__(self, 'c', 'c')
+        CompileableCodeEmitter.__init__(self, 'c', 'c')
         mkdir_if_missing('output/c/msppg')
         self._copyfile('example.c', 'c/example.c')
 
@@ -521,11 +528,11 @@ class C_Emitter(CodeEmitter):
 
 # Java emitter =======================================================================================
 
-class Java_Emitter(CodeEmitter):
+class Java_Emitter(CompileableCodeEmitter):
 
     def __init__(self, msgdict):
 
-        CodeEmitter.__init__(self, 'java', 'java')
+        CompileableCodeEmitter.__init__(self, 'java', 'java')
 
         self._copyfile('example.java', 'java/example.java')
 
