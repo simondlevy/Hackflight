@@ -312,7 +312,8 @@ class CPP_Emitter(CodeEmitter):
                 self._hwrite(2*self.indent + 'virtual void handle_%s' % msgtype)
                 self._write_params(self.houtput, argtypes, argnames)
                 self._write_params(self.ahoutput, argtypes, argnames)
-                self._hwrite('{ }\n\n')
+                #self._hwrite('{ }\n\n')
+                self._hwrite('= 0;\n\n')
                 self._hwrite('};\n\n')
                 
                 # Write handler method
