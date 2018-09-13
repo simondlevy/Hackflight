@@ -87,7 +87,7 @@ class CodeEmitter(object):
 
     def _getsrc(self, filename):
 
-        return resource_string('msppg_resources', filename).decode('utf-8')
+        return resource_string('resources', filename).decode('utf-8')
  
     def _getargnames(self, message):
 
@@ -112,7 +112,7 @@ class Python_Emitter(CodeEmitter):
 
         CodeEmitter.__init__(self, 'python', 'py')
 
-        for filename in os.listdir('./msppg_resources'):
+        for filename in os.listdir('./resources'):
             if filename.endswith('.py') and not filename in ['__init__.py', 'setup.py']:
                 CodeEmitter._copyfile(self, '%s' % filename, 'python/' + ('%s' % filename))
 

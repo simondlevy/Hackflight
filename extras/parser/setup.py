@@ -19,9 +19,9 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 from distutils.core import setup
 
 setup (name = 'msppg',
-       packages = ['msppg_resources'],
+       packages = ['resources'],
        scripts = ['msppg.py'],
-       package_data={'msppg_resources' : ['*']},
+       package_data={'resources' : ['*']},
        version = '0.1',
        description = 'Multiwii Serial Protocol Parser Generator',
        author='Rob Jones, Chris Lavin, Blake Liebling, Alec Singer, Simon D. Levy',
