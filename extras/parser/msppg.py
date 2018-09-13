@@ -233,8 +233,6 @@ class CPP_Emitter(CompileableCodeEmitter):
         mkdir_if_missing('output/arduino')
         mkdir_if_missing('output/arduino/MSPPG')
         mkdir_if_missing('output/arduino/MSPPG/examples')
-        mkdir_if_missing('output/arduino/MSPPG/examples/imuexample')
-        self._copyfile('imuexample.ino', 'arduino/MSPPG/examples/imuexample/imuexample.ino')
 
         self.type2decl = {'byte': 'byte', 'short' : 'short', 'float' : 'float', 'int' : 'int'}
 
