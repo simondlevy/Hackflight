@@ -229,18 +229,12 @@ class CPP_Emitter(CompileableCodeEmitter):
         # Create C++ example
         self._copyfile('example.cpp', 'cpp/example.cpp')
 
-        # Create Arduino stuff
-        mkdir_if_missing('output/arduino')
-        mkdir_if_missing('output/arduino/MSPPG')
-        mkdir_if_missing('output/arduino/MSPPG/examples')
-
         self.type2decl = {'byte': 'byte', 'short' : 'short', 'float' : 'float', 'int' : 'int'}
 
-        self.coutput = _openw('output/cpp/msppg/MSPPG.cpp')
-        self.houtput = _openw('output/cpp/msppg/MSPPG.h')
-
-        self.acoutput = _openw('output/arduino/MSPPG/MSPPG.cpp')
-        self.ahoutput = _openw('output/arduino/MSPPG/MSPPG.h')
+        # Create firwmare stuff
+        mkdir_if_missing('../../src/parser/')
+        self.coutput = _openw('../../src/parser/MSPPG.cpp')
+        self.houtput = _openw('../../src/parser/MSPPG.h')
 
         self._cwrite(self.warning('//'))
 
@@ -258,7 +252,6 @@ class CPP_Emitter(CompileableCodeEmitter):
 
             self._hwrite(self.indent*2 + 'static MSP_Message serialize_%s' % msgtype)
             self._write_params(self.houtput, argtypes, argnames)
-            self._write_params(self.ahoutput, argtypes, argnames)
             self._hwrite(';\n\n')
 
             # Write handler code for incoming messages
@@ -320,7 +313,6 @@ class CPP_Emitter(CompileableCodeEmitter):
                 self._hwrite(2*self.indent + '%s_Handler() {}\n\n' % msgtype)
                 self._hwrite(2*self.indent + 'virtual void handle_%s' % msgtype)
                 self._write_params(self.houtput, argtypes, argnames)
-                self._write_params(self.ahoutput, argtypes, argnames)
                 #self._hwrite('{ }\n\n')
                 self._hwrite('= 0;\n\n')
                 self._hwrite('};\n\n')
@@ -348,7 +340,6 @@ class CPP_Emitter(CompileableCodeEmitter):
             # Add parser method for serializing message
             self._cwrite('MSP_Message MSP_Parser::serialize_%s' % msgtype)
             self._write_params(self.coutput, argtypes, argnames)
-            self._write_params(self.acoutput, argtypes, argnames)
             self._cwrite(' {\n\n')
             self._cwrite(self.indent + 'MSP_Message msg;\n\n')
             msgsize = self._msgsize(argtypes)
@@ -376,12 +367,10 @@ class CPP_Emitter(CompileableCodeEmitter):
     def _cwrite(self, s):
 
         self.coutput.write(s)
-        self.acoutput.write(s)
 
     def _hwrite(self, s):
 
         self.houtput.write(s)
-        self.ahoutput.write(s)
 
 # C emitter ===============================================================================
 
