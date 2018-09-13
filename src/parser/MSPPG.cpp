@@ -117,29 +117,6 @@ void MSP_Parser::parse(byte b) {
                         this->handlerForGET_ALTITUDE_METERS->handle_GET_ALTITUDE_METERS(estalt, vario);
                         } break;
 
-                    case 121: {
-
-                        float c1;
-                        memcpy(&c1,  &this->message_buffer[0], sizeof(float));
-
-                        float c2;
-                        memcpy(&c2,  &this->message_buffer[4], sizeof(float));
-
-                        float c3;
-                        memcpy(&c3,  &this->message_buffer[8], sizeof(float));
-
-                        float c4;
-                        memcpy(&c4,  &this->message_buffer[12], sizeof(float));
-
-                        float c5;
-                        memcpy(&c5,  &this->message_buffer[16], sizeof(float));
-
-                        float c6;
-                        memcpy(&c6,  &this->message_buffer[20], sizeof(float));
-
-                        this->handlerForGET_RC_NORMAL->handle_GET_RC_NORMAL(c1, c2, c3, c4, c5, c6);
-                        } break;
-
                     case 122: {
 
                         float roll;
@@ -166,6 +143,29 @@ void MSP_Parser::parse(byte b) {
                         memcpy(&flowy,  &this->message_buffer[2], sizeof(byte));
 
                         this->handlerForGET_LOITER_RAW->handle_GET_LOITER_RAW(agl, flowx, flowy);
+                        } break;
+
+                    case 121: {
+
+                        float c1;
+                        memcpy(&c1,  &this->message_buffer[0], sizeof(float));
+
+                        float c2;
+                        memcpy(&c2,  &this->message_buffer[4], sizeof(float));
+
+                        float c3;
+                        memcpy(&c3,  &this->message_buffer[8], sizeof(float));
+
+                        float c4;
+                        memcpy(&c4,  &this->message_buffer[12], sizeof(float));
+
+                        float c5;
+                        memcpy(&c5,  &this->message_buffer[16], sizeof(float));
+
+                        float c6;
+                        memcpy(&c6,  &this->message_buffer[20], sizeof(float));
+
+                        this->handlerForGET_RC_NORMAL->handle_GET_RC_NORMAL(c1, c2, c3, c4, c5, c6);
                         } break;
 
                 }
@@ -237,70 +237,6 @@ MSP_Message MSP_Parser::serialize_SET_MOTOR_NORMAL(float m1, float m2, float m3,
     msg.bytes[21] = CRC8(&msg.bytes[3], 18);
 
     msg.len = 22;
-
-    return msg;
-}
-
-MSP_Message MSP_Parser::serialize_SET_ARMED(byte flag) {
-
-    MSP_Message msg;
-
-    msg.bytes[0] = 36;
-    msg.bytes[1] = 77;
-    msg.bytes[2] = 62;
-    msg.bytes[3] = 1;
-    msg.bytes[4] = 216;
-
-    memcpy(&msg.bytes[5], &flag, sizeof(byte));
-
-    msg.bytes[6] = CRC8(&msg.bytes[3], 3);
-
-    msg.len = 7;
-
-    return msg;
-}
-
-void MSP_Parser::set_GET_RC_NORMAL_Handler(class GET_RC_NORMAL_Handler * handler) {
-
-    this->handlerForGET_RC_NORMAL = handler;
-}
-
-MSP_Message MSP_Parser::serialize_GET_RC_NORMAL_Request() {
-
-    MSP_Message msg;
-
-    msg.bytes[0] = 36;
-    msg.bytes[1] = 77;
-    msg.bytes[2] = 60;
-    msg.bytes[3] = 0;
-    msg.bytes[4] = 121;
-    msg.bytes[5] = 121;
-
-    msg.len = 6;
-
-    return msg;
-}
-
-MSP_Message MSP_Parser::serialize_GET_RC_NORMAL(float c1, float c2, float c3, float c4, float c5, float c6) {
-
-    MSP_Message msg;
-
-    msg.bytes[0] = 36;
-    msg.bytes[1] = 77;
-    msg.bytes[2] = 62;
-    msg.bytes[3] = 24;
-    msg.bytes[4] = 121;
-
-    memcpy(&msg.bytes[5], &c1, sizeof(float));
-    memcpy(&msg.bytes[9], &c2, sizeof(float));
-    memcpy(&msg.bytes[13], &c3, sizeof(float));
-    memcpy(&msg.bytes[17], &c4, sizeof(float));
-    memcpy(&msg.bytes[21], &c5, sizeof(float));
-    memcpy(&msg.bytes[25], &c6, sizeof(float));
-
-    msg.bytes[29] = CRC8(&msg.bytes[3], 26);
-
-    msg.len = 30;
 
     return msg;
 }
@@ -385,6 +321,70 @@ MSP_Message MSP_Parser::serialize_GET_LOITER_RAW(byte agl, byte flowx, byte flow
     msg.bytes[8] = CRC8(&msg.bytes[3], 5);
 
     msg.len = 9;
+
+    return msg;
+}
+
+MSP_Message MSP_Parser::serialize_SET_ARMED(byte flag) {
+
+    MSP_Message msg;
+
+    msg.bytes[0] = 36;
+    msg.bytes[1] = 77;
+    msg.bytes[2] = 62;
+    msg.bytes[3] = 1;
+    msg.bytes[4] = 216;
+
+    memcpy(&msg.bytes[5], &flag, sizeof(byte));
+
+    msg.bytes[6] = CRC8(&msg.bytes[3], 3);
+
+    msg.len = 7;
+
+    return msg;
+}
+
+void MSP_Parser::set_GET_RC_NORMAL_Handler(class GET_RC_NORMAL_Handler * handler) {
+
+    this->handlerForGET_RC_NORMAL = handler;
+}
+
+MSP_Message MSP_Parser::serialize_GET_RC_NORMAL_Request() {
+
+    MSP_Message msg;
+
+    msg.bytes[0] = 36;
+    msg.bytes[1] = 77;
+    msg.bytes[2] = 60;
+    msg.bytes[3] = 0;
+    msg.bytes[4] = 121;
+    msg.bytes[5] = 121;
+
+    msg.len = 6;
+
+    return msg;
+}
+
+MSP_Message MSP_Parser::serialize_GET_RC_NORMAL(float c1, float c2, float c3, float c4, float c5, float c6) {
+
+    MSP_Message msg;
+
+    msg.bytes[0] = 36;
+    msg.bytes[1] = 77;
+    msg.bytes[2] = 62;
+    msg.bytes[3] = 24;
+    msg.bytes[4] = 121;
+
+    memcpy(&msg.bytes[5], &c1, sizeof(float));
+    memcpy(&msg.bytes[9], &c2, sizeof(float));
+    memcpy(&msg.bytes[13], &c3, sizeof(float));
+    memcpy(&msg.bytes[17], &c4, sizeof(float));
+    memcpy(&msg.bytes[21], &c5, sizeof(float));
+    memcpy(&msg.bytes[25], &c6, sizeof(float));
+
+    msg.bytes[29] = CRC8(&msg.bytes[3], 26);
+
+    msg.len = 30;
 
     return msg;
 }

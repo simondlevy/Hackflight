@@ -224,7 +224,6 @@ class CPP_Emitter(CompileableCodeEmitter):
     def __init__(self, msgdict):
 
         CompileableCodeEmitter.__init__(self, 'cpp', 'cpp')
-        mkdir_if_missing('output/cpp/msppg')
 
         # Create C++ example
         self._copyfile('example.cpp', 'cpp/example.cpp')
