@@ -231,9 +231,8 @@ class CPP_Emitter(CompileableCodeEmitter):
         self.type2decl = {'byte': 'byte', 'short' : 'short', 'float' : 'float', 'int' : 'int'}
 
         # Create firwmare stuff
-        mkdir_if_missing('../../src/parser/')
-        self.coutput = _openw('../../src/parser/MSPPG.cpp')
-        self.houtput = _openw('../../src/parser/MSPPG.h')
+        self.coutput = _openw('output/cpp/MSPPG.cpp')
+        self.houtput = _openw('output/cpp/MSPPG.h')
 
         self._cwrite(self.warning('//'))
 

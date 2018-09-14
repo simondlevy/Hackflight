@@ -22,8 +22,6 @@ INSTALL_ROOT = /usr/local
 ALL = libmsppg.so example
 CFLAGS = -Wall -fPIC -static
 
-SRCDIR = ../../../../src/parser
-
 OS = $(shell uname -s)
 ifeq ($(OS), Linux)
 	EXT = so
@@ -32,7 +30,7 @@ else
 endif
 
 libmsppg.$(EXT): 
-	g++ $(CFLAGS) -c $(SRCDIR)/MSPPG.cpp
+	g++ $(CFLAGS) -c MSPPG.cpp
 	g++ *.o -o libmsppg.$(EXT) -lpthread -shared
 
 install: libmsppg.so
@@ -45,11 +43,11 @@ test: example
 example: example.o msppg.o
 	g++ -o example example.o msppg.o
   
-example.o: example.cpp $(SRCDIR)/MSPPG.h
+example.o: example.cpp MSPPG.h
 	g++ -Wall -c example.cpp
   
-msppg.o: $(SRCDIR)/MSPPG.cpp $(SRCDIR)/MSPPG.h
-	g++ -std=c++11 -Wall -c $(SRCDIR)/MSPPG.cpp
+msppg.o: MSPPG.cpp MSPPG.h
+	g++ -std=c++11 -Wall -c MSPPG.cpp
 
 clean:
 	rm -f *.so *.o *~

@@ -1,150 +1,111 @@
 // AUTO-GENERATED CODE: DO NOT EDIT!!!
 
 
-#include "MSPPG.h"
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-static byte CRC8(byte * data, int n) {
-
-    byte crc = 0x00;
-
-    for (int k=0; k<n; ++k) {
-
-        crc ^= data[k];
-    }
-
-    return crc;
-}
-
-byte MSP_Message::start() {
-
-    this->pos = 0;
-    return this->getNext();
-}
-
-bool MSP_Message::hasNext() {
-
-    return this->pos <= this->len;
-}
-
-
-byte MSP_Message::getNext() {
-
-    return this->bytes[this->pos++];
-}
-
-MSP_Parser::MSP_Parser() {
-
-    this->state = 0;
-}
-
-void MSP_Parser::parse(byte b) {
-
-    switch (this->state) {
-
-        case 0:               // sync char 1
-            if (b == 36) { // $
-                this->state++;
-            }
-            break;        
-
-        case 1:               // sync char 2
-            if (b == 77) { // M
-                this->state++;
-            }
-            else {            // restart and try again
-                this->state = 0;
-            }
-            break;
-
-        case 2:               // direction (should be >)
-            if (b == 62) { // >
-                this->message_direction = 1;
-            }
-            else {            // <
-                this->message_direction = 0;
-            }
-            this->state++;
-            break;
-
-        case 3:
-            this->message_length_expected = b;
-            this->message_checksum = b;
-            // setup arraybuffer
-            this->message_length_received = 0;
-            this->state++;
-            break;
-
-        case 4:
-            this->message_id = b;
-            this->message_checksum ^= b;
-            if (this->message_length_expected > 0) {
-                // process payload
-                this->state++;
-            }
-            else {
-                // no payload
-                this->state += 2;
-            }
-            break;
-
-        case 5: // payload
-            this->message_buffer[this->message_length_received] = b;
-            this->message_checksum ^= b;
-            this->message_length_received++;
-            if (this->message_length_received >= this->message_length_expected) {
-                this->state++;
-            }
-            break;
-
-        case 6:
-            this->state = 0;
-            if (this->message_checksum == b) {
-                // message received, process
-                switch (this->message_id) {
-                
-                    case 123: {
-
-                        float estalt;
-                        memcpy(&estalt,  &this->message_buffer[0], sizeof(float));
-
-                        float vario;
-                        memcpy(&vario,  &this->message_buffer[4], sizeof(float));
-
-                        this->handlerForGET_ALTITUDE_METERS->handle_GET_ALTITUDE_METERS(estalt, vario);
-                        } break;
-
-                    case 122: {
-
-                        float roll;
-                        memcpy(&roll,  &this->message_buffer[0], sizeof(float));
-
-                        float pitch;
-                        memcpy(&pitch,  &this->message_buffer[4], sizeof(float));
-
-                        float yaw;
-                        memcpy(&yaw,  &this->message_buffer[8], sizeof(float));
-
-                        this->handlerForGET_ATTITUDE_RADIANS->handle_GET_ATTITUDE_RADIANS(roll, pitch, yaw);
-                        } break;
-
-                    case 126: {
-
-                        byte agl;
-                        memcpy(&agl,  &this->message_buffer[0], sizeof(byte));
-
-                        byte flowx;
-                        memcpy(&flowx,  &this->message_buffer[1], sizeof(byte));
-
-                        byte flowy;
-                        memcpy(&flowy,  &this->message_buffer[2], sizeof(byte));
-
-                        this->handlerForGET_LOITER_RAW->handle_GET_LOITER_RAW(agl, flowx, flowy);
-                        } break;
-
+#include "MSPPG.h"
+
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+static byte CRC8(byte * data, int n) {
+
+    byte crc = 0x00;
+
+    for (int k=0; k<n; ++k) {
+
+        crc ^= data[k];
+    }
+
+    return crc;
+}
+
+byte MSP_Message::start() {
+
+    this->pos = 0;
+    return this->getNext();
+}
+
+bool MSP_Message::hasNext() {
+
+    return this->pos <= this->len;
+}
+
+
+byte MSP_Message::getNext() {
+
+    return this->bytes[this->pos++];
+}
+
+MSP_Parser::MSP_Parser() {
+
+    this->state = 0;
+}
+
+void MSP_Parser::parse(byte b) {
+
+    switch (this->state) {
+
+        case 0:               // sync char 1
+            if (b == 36) { // $
+                this->state++;
+            }
+            break;        
+
+        case 1:               // sync char 2
+            if (b == 77) { // M
+                this->state++;
+            }
+            else {            // restart and try again
+                this->state = 0;
+            }
+            break;
+
+        case 2:               // direction (should be >)
+            if (b == 62) { // >
+                this->message_direction = 1;
+            }
+            else {            // <
+                this->message_direction = 0;
+            }
+            this->state++;
+            break;
+
+        case 3:
+            this->message_length_expected = b;
+            this->message_checksum = b;
+            // setup arraybuffer
+            this->message_length_received = 0;
+            this->state++;
+            break;
+
+        case 4:
+            this->message_id = b;
+            this->message_checksum ^= b;
+            if (this->message_length_expected > 0) {
+                // process payload
+                this->state++;
+            }
+            else {
+                // no payload
+                this->state += 2;
+            }
+            break;
+
+        case 5: // payload
+            this->message_buffer[this->message_length_received] = b;
+            this->message_checksum ^= b;
+            this->message_length_received++;
+            if (this->message_length_received >= this->message_length_expected) {
+                this->state++;
+            }
+            break;
+
+        case 6:
+            this->state = 0;
+            if (this->message_checksum == b) {
+                // message received, process
+                switch (this->message_id) {
+                
                     case 121: {
 
                         float c1;
@@ -168,22 +129,61 @@ void MSP_Parser::parse(byte b) {
                         this->handlerForGET_RC_NORMAL->handle_GET_RC_NORMAL(c1, c2, c3, c4, c5, c6);
                         } break;
 
-                }
-            }
+                    case 122: {
 
-            break;
+                        float roll;
+                        memcpy(&roll,  &this->message_buffer[0], sizeof(float));
 
-        default:
-            break;
-    }
+                        float pitch;
+                        memcpy(&pitch,  &this->message_buffer[4], sizeof(float));
+
+                        float yaw;
+                        memcpy(&yaw,  &this->message_buffer[8], sizeof(float));
+
+                        this->handlerForGET_ATTITUDE_RADIANS->handle_GET_ATTITUDE_RADIANS(roll, pitch, yaw);
+                        } break;
+
+                    case 123: {
+
+                        float estalt;
+                        memcpy(&estalt,  &this->message_buffer[0], sizeof(float));
+
+                        float vario;
+                        memcpy(&vario,  &this->message_buffer[4], sizeof(float));
+
+                        this->handlerForGET_ALTITUDE_METERS->handle_GET_ALTITUDE_METERS(estalt, vario);
+                        } break;
+
+                    case 126: {
+
+                        byte agl;
+                        memcpy(&agl,  &this->message_buffer[0], sizeof(byte));
+
+                        byte flowx;
+                        memcpy(&flowx,  &this->message_buffer[1], sizeof(byte));
+
+                        byte flowy;
+                        memcpy(&flowy,  &this->message_buffer[2], sizeof(byte));
+
+                        this->handlerForGET_LOITER_RAW->handle_GET_LOITER_RAW(agl, flowx, flowy);
+                        } break;
+
+                }
+            }
+
+            break;
+
+        default:
+            break;
+    }
+}
+
+void MSP_Parser::set_GET_RC_NORMAL_Handler(class GET_RC_NORMAL_Handler * handler) {
+
+    this->handlerForGET_RC_NORMAL = handler;
 }
 
-void MSP_Parser::set_GET_ALTITUDE_METERS_Handler(class GET_ALTITUDE_METERS_Handler * handler) {
-
-    this->handlerForGET_ALTITUDE_METERS = handler;
-}
-
-MSP_Message MSP_Parser::serialize_GET_ALTITUDE_METERS_Request() {
+MSP_Message MSP_Parser::serialize_GET_RC_NORMAL_Request() {
 
     MSP_Message msg;
 
@@ -191,30 +191,34 @@ MSP_Message MSP_Parser::serialize_GET_ALTITUDE_METERS_Request() {
     msg.bytes[1] = 77;
     msg.bytes[2] = 60;
     msg.bytes[3] = 0;
-    msg.bytes[4] = 123;
-    msg.bytes[5] = 123;
+    msg.bytes[4] = 121;
+    msg.bytes[5] = 121;
 
     msg.len = 6;
 
     return msg;
 }
 
-MSP_Message MSP_Parser::serialize_GET_ALTITUDE_METERS(float estalt, float vario) {
+MSP_Message MSP_Parser::serialize_GET_RC_NORMAL(float c1, float c2, float c3, float c4, float c5, float c6) {
 
     MSP_Message msg;
 
     msg.bytes[0] = 36;
     msg.bytes[1] = 77;
     msg.bytes[2] = 62;
-    msg.bytes[3] = 8;
-    msg.bytes[4] = 123;
+    msg.bytes[3] = 24;
+    msg.bytes[4] = 121;
 
-    memcpy(&msg.bytes[5], &estalt, sizeof(float));
-    memcpy(&msg.bytes[9], &vario, sizeof(float));
+    memcpy(&msg.bytes[5], &c1, sizeof(float));
+    memcpy(&msg.bytes[9], &c2, sizeof(float));
+    memcpy(&msg.bytes[13], &c3, sizeof(float));
+    memcpy(&msg.bytes[17], &c4, sizeof(float));
+    memcpy(&msg.bytes[21], &c5, sizeof(float));
+    memcpy(&msg.bytes[25], &c6, sizeof(float));
 
-    msg.bytes[13] = CRC8(&msg.bytes[3], 10);
+    msg.bytes[29] = CRC8(&msg.bytes[3], 26);
 
-    msg.len = 14;
+    msg.len = 30;
 
     return msg;
 }
@@ -261,21 +265,43 @@ MSP_Message MSP_Parser::serialize_GET_ATTITUDE_RADIANS(float roll, float pitch, 
     return msg;
 }
 
-MSP_Message MSP_Parser::serialize_SET_ARMED(byte flag) {
+void MSP_Parser::set_GET_ALTITUDE_METERS_Handler(class GET_ALTITUDE_METERS_Handler * handler) {
+
+    this->handlerForGET_ALTITUDE_METERS = handler;
+}
+
+MSP_Message MSP_Parser::serialize_GET_ALTITUDE_METERS_Request() {
+
+    MSP_Message msg;
+
+    msg.bytes[0] = 36;
+    msg.bytes[1] = 77;
+    msg.bytes[2] = 60;
+    msg.bytes[3] = 0;
+    msg.bytes[4] = 123;
+    msg.bytes[5] = 123;
+
+    msg.len = 6;
+
+    return msg;
+}
+
+MSP_Message MSP_Parser::serialize_GET_ALTITUDE_METERS(float estalt, float vario) {
 
     MSP_Message msg;
 
     msg.bytes[0] = 36;
     msg.bytes[1] = 77;
     msg.bytes[2] = 62;
-    msg.bytes[3] = 1;
-    msg.bytes[4] = 216;
+    msg.bytes[3] = 8;
+    msg.bytes[4] = 123;
 
-    memcpy(&msg.bytes[5], &flag, sizeof(byte));
+    memcpy(&msg.bytes[5], &estalt, sizeof(float));
+    memcpy(&msg.bytes[9], &vario, sizeof(float));
 
-    msg.bytes[6] = CRC8(&msg.bytes[3], 3);
+    msg.bytes[13] = CRC8(&msg.bytes[3], 10);
 
-    msg.len = 7;
+    msg.len = 14;
 
     return msg;
 }
@@ -344,47 +370,21 @@ MSP_Message MSP_Parser::serialize_SET_MOTOR_NORMAL(float m1, float m2, float m3,
     return msg;
 }
 
-void MSP_Parser::set_GET_RC_NORMAL_Handler(class GET_RC_NORMAL_Handler * handler) {
-
-    this->handlerForGET_RC_NORMAL = handler;
-}
-
-MSP_Message MSP_Parser::serialize_GET_RC_NORMAL_Request() {
-
-    MSP_Message msg;
-
-    msg.bytes[0] = 36;
-    msg.bytes[1] = 77;
-    msg.bytes[2] = 60;
-    msg.bytes[3] = 0;
-    msg.bytes[4] = 121;
-    msg.bytes[5] = 121;
-
-    msg.len = 6;
-
-    return msg;
-}
-
-MSP_Message MSP_Parser::serialize_GET_RC_NORMAL(float c1, float c2, float c3, float c4, float c5, float c6) {
+MSP_Message MSP_Parser::serialize_SET_ARMED(byte flag) {
 
     MSP_Message msg;
 
     msg.bytes[0] = 36;
     msg.bytes[1] = 77;
     msg.bytes[2] = 62;
-    msg.bytes[3] = 24;
-    msg.bytes[4] = 121;
+    msg.bytes[3] = 1;
+    msg.bytes[4] = 216;
 
-    memcpy(&msg.bytes[5], &c1, sizeof(float));
-    memcpy(&msg.bytes[9], &c2, sizeof(float));
-    memcpy(&msg.bytes[13], &c3, sizeof(float));
-    memcpy(&msg.bytes[17], &c4, sizeof(float));
-    memcpy(&msg.bytes[21], &c5, sizeof(float));
-    memcpy(&msg.bytes[25], &c6, sizeof(float));
+    memcpy(&msg.bytes[5], &flag, sizeof(byte));
 
-    msg.bytes[29] = CRC8(&msg.bytes[3], 26);
+    msg.bytes[6] = CRC8(&msg.bytes[3], 3);
 
-    msg.len = 30;
+    msg.len = 7;
 
     return msg;
 }
