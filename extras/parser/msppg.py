@@ -387,10 +387,12 @@ class HPP_Emitter(CodeEmitter):
 
         output.write('// AUTO-GENERATED CODE: DO NOT EDIT\n\n')
         output.write('# pragma once\n\n')
+        output.write('class MspParser2 {\n\n')
+        output.write(self.indent + 'public:\n\n')
 
         for msgtype in msgdict.keys():
 
-            output.write('static const uint8_t CMD_%s = %d;\n' % (msgtype.ljust(30), msgdict[msgtype][0]))
+            output.write(2*self.indent + 'static const uint8_t CMD_%s = %d;\n' % (msgtype.ljust(30), msgdict[msgtype][0]))
 
         output.write('/*')
 
@@ -515,6 +517,7 @@ class HPP_Emitter(CodeEmitter):
             output.write('}\n\n')
 
         output.write('*/')
+        output.write('};')
  
 # C emitter ===============================================================================
 

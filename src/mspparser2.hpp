@@ -2,12 +2,16 @@
 
 # pragma once
 
-static const uint8_t CMD_GET_RC_NORMAL                  = 121;
-static const uint8_t CMD_GET_ATTITUDE_RADIANS           = 122;
-static const uint8_t CMD_GET_ALTITUDE_METERS            = 123;
-static const uint8_t CMD_GET_LOITER_RAW                 = 126;
-static const uint8_t CMD_SET_MOTOR_NORMAL               = 215;
-static const uint8_t CMD_SET_ARMED                      = 216;
+class MspParser2 {
+
+    public:
+
+        static const uint8_t CMD_GET_RC_NORMAL                  = 121;
+        static const uint8_t CMD_GET_ATTITUDE_RADIANS           = 122;
+        static const uint8_t CMD_GET_ALTITUDE_METERS            = 123;
+        static const uint8_t CMD_GET_LOITER_RAW                 = 126;
+        static const uint8_t CMD_SET_MOTOR_NORMAL               = 215;
+        static const uint8_t CMD_SET_ARMED                      = 216;
 /*        static MSP_Message serialize_GET_RC_NORMAL(float c1, float c2, float c3, float c4, float c5, float c6);
 
                     case 121: {
@@ -368,4 +372,4 @@ MSP_Message MSP_Parser::serialize_SET_ARMED(byte flag) {
     return msg;
 }
 
-*/
+*/};
