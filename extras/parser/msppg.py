@@ -655,9 +655,9 @@ class Java_Emitter(CompileableCodeEmitter):
 
         self.output.write(s)
 
-# Firmware header emitter ===============================================================================
+# Firmware header-only code emitter ===================================================================
 
-class Header_Emitter(object):
+class HPP_Emitter(object):
 
     def __init__(self, msgdict):
 
@@ -725,4 +725,4 @@ if __name__ == '__main__':
     Java_Emitter(msgdict)
 
     # Emit firmware header
-    Header_Emitter(msgdict)
+    HPP_Emitter(msgdict)
