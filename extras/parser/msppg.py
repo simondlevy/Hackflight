@@ -377,7 +377,7 @@ class CPP_Emitter(CompileableCodeEmitter):
 
 class HPP_Emitter(LocalCodeEmitter):
 
-    type2decl = {'byte': 'byte', 'short' : 'short', 'float' : 'float', 'int' : 'int'}
+    type2decl = {'byte': 'uint8_t', 'short' : 'uint16_t', 'float' : 'float', 'int' : 'int32_t'}
 
     def __init__(self, msgdict):
 
@@ -441,7 +441,7 @@ class HPP_Emitter(LocalCodeEmitter):
                 self.output.write(2*self.indent + 'virtual void handle_%s(' % msgtype)
 
                 for k in range(nargs):
-                    self.output.write(argnames[k])
+                    self.output.write(argtypes[k] +  ' ' + argnames[k])
                     if k < nargs-1:
                         self.output.write(', ')
 
