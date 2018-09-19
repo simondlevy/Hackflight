@@ -438,7 +438,7 @@ class HPP_Emitter(LocalCodeEmitter):
 
                 self.output.write(2*self.indent + 'virtual void handle_%s(' % msgtype)
 
-                self.output.write('\n\n')
+                self.output.write(') = 0;\n\n')
 
         self.output.write('};')
  
