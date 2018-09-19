@@ -25,7 +25,6 @@
 #include "sensor.hpp"
 #include "board.hpp"
 #include "mspparser.hpp"
-#include "mspparser2.hpp"
 #include "mixer.hpp"
 #include "receiver.hpp"
 #include "debug.hpp"
@@ -242,11 +241,11 @@ namespace hf {
         {
             switch (cmd) {
 
-                case MspParser2::CMD_SET_MOTOR_NORMAL:
+                case MspParser::CMD_SET_MOTOR_NORMAL:
                     MspParser::receiveFloats(_mixer->motorsDisarmed, _mixer->nmotors);
                     break;
 
-                case MspParser2::CMD_SET_ARMED:
+                case MspParser::CMD_SET_ARMED:
                     if (MspParser::readBool()) {  // got arming command: arm only if throttle is down
                         if (_receiver->throttleIsDown()) {
                             _state.armed = true;
@@ -257,7 +256,7 @@ namespace hf {
                     }
                     break;
 
-                case MspParser2::CMD_GET_RC_NORMAL:
+                case MspParser::CMD_GET_RC_NORMAL:
                     {
                         float rawvals[6];
                         for (uint8_t k=0; k<6; ++k) {
@@ -267,11 +266,11 @@ namespace hf {
                     }
                     break;
 
-                case MspParser2::CMD_GET_ATTITUDE_RADIANS: 
+                case MspParser::CMD_GET_ATTITUDE_RADIANS: 
                     MspParser::sendFloats(_state.eulerAngles, 3);
                     break;
 
-                case MspParser2::CMD_GET_ALTITUDE_METERS: 
+                case MspParser::CMD_GET_ALTITUDE_METERS: 
                     MspParser::sendFloats(&_state.altitude, 2);
                     break;
 
