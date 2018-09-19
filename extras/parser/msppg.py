@@ -413,7 +413,7 @@ class HPP_Emitter(LocalCodeEmitter):
                             'memcpy(&%s,  &_message_buffer[%d], sizeof(%s));\n\n' % 
                             (argname, offset, decl))
                     offset += self.type2size[argtype]
-                self.output.write(6*self.indent + '_handlerFor_%s->handle_%s(' % (msgtype, msgtype))
+                self.output.write(6*self.indent + 'handle_%s(' % msgtype)
                 for k in range(nargs):
                     self.output.write(argnames[k])
                     if k < nargs-1:
@@ -422,23 +422,6 @@ class HPP_Emitter(LocalCodeEmitter):
                 self.output.write(6*self.indent + '} break;\n\n')
 
         self.output.write(self._getsrc('bottom-cpp'))
- 
-        for msgtype in msgdict.keys():
-
-            msgstuff = msgdict[msgtype]
-            msgid = msgstuff[0]
-
-            argnames = self._getargnames(msgstuff)
-            argtypes = self._getargtypes(msgstuff)
-
-            # Incoming messages
-            if msgid < 200:
-
-                # Write handler method
-                self.output.write('void MSP_Parser::set_%s_Handler(class %s_Handler * handler) {\n\n' %
-                        (msgtype, msgtype))
-                self.output.write(self.indent + '_handlerFor_%s = handler;\n' % msgtype)
-                self.output.write('}\n\n')
  
 # C emitter ===============================================================================
 

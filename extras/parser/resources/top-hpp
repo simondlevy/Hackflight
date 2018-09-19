@@ -19,8 +19,8 @@ class MSP_Parser {
 
     public:
 
-        MSP_Parser(void) {
-
+        MSP_Parser(void) 
+        {
             _state = 0;
         }
 
