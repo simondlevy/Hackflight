@@ -446,7 +446,12 @@ class HPP_Emitter(LocalCodeEmitter):
                         self.output.write(', ')
 
                 self.output.write(')\n')
+
                 self.output.write(2*self.indent + '{\n')
+
+                for k in range(nargs):
+                    self.output.write(3*self.indent + '(void)' + argnames[k] + ';\n')
+
                 self.output.write(2*self.indent + '}\n\n')
 
 
