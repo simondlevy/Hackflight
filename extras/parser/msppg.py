@@ -385,11 +385,11 @@ class HPP_Emitter(LocalCodeEmitter):
 
         self.type2decl = CPP_Emitter.type2decl
 
-        # Create firwmare stuff
         self.output = _openw('output/hpp/mspparser.hpp')
 
         self.output.write('\n' + self._getsrc('top-hpp'))
 
+        # Write message-handler switch
         for msgtype in msgdict.keys():
 
             msgstuff = msgdict[msgtype]
@@ -423,6 +423,22 @@ class HPP_Emitter(LocalCodeEmitter):
                 self.output.write(8*self.indent + 'break;\n\n')
 
         self.output.write(self._getsrc('middle-hpp'))
+
+        # Write message-handler virtual declarations
+        for msgtype in msgdict.keys():
+
+            msgstuff = msgdict[msgtype]
+            msgid = msgstuff[0]
+
+            argnames = self._getargnames(msgstuff)
+            argtypes = self._getargtypes(msgstuff)
+
+            # Write handler code for incoming messages
+            if msgid < 200:
+
+                self.output.write(2*self.indent + 'virtual void handle_%s(' % msgtype)
+
+                self.output.write('\n\n')
 
         self.output.write('};')
  
