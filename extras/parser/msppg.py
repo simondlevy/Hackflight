@@ -399,28 +399,27 @@ class HPP_Emitter(LocalCodeEmitter):
             argtypes = self._getargtypes(msgstuff)
 
             # Write handler code for incoming messages
-            if msgid < 200:
 
-                self.output.write(7*self.indent + ('case %s: {\n\n' % msgdict[msgtype][0]))
-                nargs = len(argnames)
-                offset = 0
-                for k in range(nargs):
-                    argname = argnames[k]
-                    argtype = argtypes[k]
-                    decl = self.type2decl[argtype]
-                    self.output.write(8*self.indent + decl  + ' ' + argname + ';\n')
-                    self.output.write(8*self.indent + 
-                            'memcpy(&%s,  &_message_buffer[%d], sizeof(%s));\n\n' % 
-                            (argname, offset, decl))
-                    offset += self.type2size[argtype]
-                self.output.write(8*self.indent + 'handle_%s(' % msgtype)
-                for k in range(nargs):
-                    self.output.write(argnames[k])
-                    if k < nargs-1:
-                        self.output.write(', ')
-                self.output.write(');\n')
-                self.output.write(8*self.indent + '}\n')
-                self.output.write(8*self.indent + 'break;\n\n')
+            self.output.write(7*self.indent + ('case %s: {\n\n' % msgdict[msgtype][0]))
+            nargs = len(argnames)
+            offset = 0
+            for k in range(nargs):
+                argname = argnames[k]
+                argtype = argtypes[k]
+                decl = self.type2decl[argtype]
+                self.output.write(8*self.indent + decl  + ' ' + argname + ';\n')
+                self.output.write(8*self.indent + 
+                        'memcpy(&%s,  &_message_buffer[%d], sizeof(%s));\n\n' % 
+                        (argname, offset, decl))
+                offset += self.type2size[argtype]
+            self.output.write(8*self.indent + 'handle_%s(' % msgtype)
+            for k in range(nargs):
+                self.output.write(argnames[k])
+                if k < nargs-1:
+                    self.output.write(', ')
+            self.output.write(');\n')
+            self.output.write(8*self.indent + '}\n')
+            self.output.write(8*self.indent + 'break;\n\n')
 
         self.output.write(self._getsrc('middle-hpp'))
 
@@ -435,24 +434,23 @@ class HPP_Emitter(LocalCodeEmitter):
 
             nargs = len(argnames)
 
-            # Write handler code for incoming messages
-            if msgid < 200:
+            # Write handler code declarations
 
-                self.output.write(2*self.indent + 'virtual void handle_%s(' % msgtype)
+            self.output.write(2*self.indent + 'virtual void handle_%s(' % msgtype)
 
-                for k in range(nargs):
-                    self.output.write(argtypes[k] +  ' ' + argnames[k])
-                    if k < nargs-1:
-                        self.output.write(', ')
+            for k in range(nargs):
+                self.output.write(argtypes[k] +  ' ' + argnames[k])
+                if k < nargs-1:
+                    self.output.write(', ')
 
-                self.output.write(')\n')
+            self.output.write(')\n')
 
-                self.output.write(2*self.indent + '{\n')
+            self.output.write(2*self.indent + '{\n')
 
-                for k in range(nargs):
-                    self.output.write(3*self.indent + '(void)' + argnames[k] + ';\n')
+            for k in range(nargs):
+                self.output.write(3*self.indent + '(void)' + argnames[k] + ';\n')
 
-                self.output.write(2*self.indent + '}\n\n')
+            self.output.write(2*self.indent + '}\n\n')
 
 
         self.output.write('};')
