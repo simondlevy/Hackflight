@@ -387,12 +387,9 @@ class HPP_Emitter(LocalCodeEmitter):
 
         # Create firwmare stuff
         self.coutput = _openw('output/hpp/MSPPG.cpp')
-        self.houtput = _openw('output/hpp/MSPPG.h')
 
         self._cwrite(self.warning('//'))
 
-        self._hwrite(self._getsrc('top-hpp'))
- 
         self._cwrite('\n' + self._getsrc('top-cpp'))
 
         for msgtype in msgdict.keys():
@@ -402,10 +399,6 @@ class HPP_Emitter(LocalCodeEmitter):
 
             argnames = self._getargnames(msgstuff)
             argtypes = self._getargtypes(msgstuff)
-
-            self._hwrite(self.indent*2 + 'static MSP_Message serialize_%s' % msgtype)
-            self._write_params(self.houtput, argtypes, argnames)
-            self._hwrite(';\n\n')
 
             # Write handler code for incoming messages
             if msgid < 200:
@@ -429,23 +422,6 @@ class HPP_Emitter(LocalCodeEmitter):
                         self._cwrite(', ')
                 self._cwrite(');\n')
                 self._cwrite(6*self.indent + '} break;\n\n')
-                
-                self._hwrite(self.indent*2 + 'static MSP_Message serialize_%s_Request();\n\n' % msgtype)
-                self._hwrite(self.indent*2 + 
-                        'void set_%s_Handler(class %s_Handler * handler);\n\n' % (msgtype, msgtype))
-
-        self._hwrite(self.indent + 'private:\n\n')
-
-        for msgtype in msgdict.keys():
-
-            msgstuff = msgdict[msgtype]
-            msgid = msgstuff[0]
-            
-            if msgid < 200:
-                self._hwrite(2*self.indent + 
-                        'class %s_Handler * handlerFor%s;\n\n' % (msgtype, msgtype));
-
-        self._hwrite('};\n');
 
         self._cwrite(self._getsrc('bottom-cpp'))
  
@@ -460,16 +436,6 @@ class HPP_Emitter(LocalCodeEmitter):
             # Incoming messages
             if msgid < 200:
 
-                # Declare handler class
-                self._hwrite('\n\n' + 'class %s_Handler {\n' % msgtype)
-                self._hwrite('\n' + self.indent + 'public:\n\n')
-                self._hwrite(2*self.indent + '%s_Handler() {}\n\n' % msgtype)
-                self._hwrite(2*self.indent + 'virtual void handle_%s' % msgtype)
-                self._write_params(self.houtput, argtypes, argnames)
-                #self._hwrite('{ }\n\n')
-                self._hwrite('= 0;\n\n')
-                self._hwrite('};\n\n')
-                
                 # Write handler method
                 self._cwrite('void MSP_Parser::set_%s_Handler(class %s_Handler * handler) {\n\n' %
                         (msgtype, msgtype))
@@ -520,10 +486,6 @@ class HPP_Emitter(LocalCodeEmitter):
     def _cwrite(self, s):
 
         self.coutput.write(s)
-
-    def _hwrite(self, s):
-
-        self.houtput.write(s)
 
  
 # C emitter ===============================================================================
