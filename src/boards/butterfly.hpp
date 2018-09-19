@@ -2,9 +2,6 @@
    butterfly.hpp : Implementation of Hackflight Board routines for Butterfly
                    dev board + MPU9250 IMU + MS5637 barometer + brushless motors
 
-   Additional libraries required: https://github.com/simondlevy/MPU9250
-                                  https://github.com/simondlevy/MS5637
-
    Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
