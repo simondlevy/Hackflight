@@ -24,8 +24,8 @@ class MSP_Parser {
             _state = 0;
         }
 
-        void parse(byte b) {
-
+        void parse(byte b) 
+        {
             switch (this->state) {
 
                 case 0:               // sync char 1
