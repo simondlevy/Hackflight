@@ -422,7 +422,9 @@ class HPP_Emitter(LocalCodeEmitter):
                 self.output.write(8*self.indent + '}\n')
                 self.output.write(8*self.indent + 'break;\n\n')
 
-        self.output.write(self._getsrc('bottom-hpp'))
+        self.output.write(self._getsrc('middle-hpp'))
+
+        self.output.write('};')
  
 # C emitter ===============================================================================
 
