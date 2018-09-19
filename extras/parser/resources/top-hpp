@@ -8,18 +8,21 @@ class MSP_Parser {
 
         static const int MAXBUF = 256;
 
-        uint_t  state;
+        uint_t  _state;
 
-        uint8_t message_direction;
-        uint8_t message_id;
-        uint8_t message_length_expected;
-        uint8_t message_length_received;
-        uint8_t message_buffer[MAXBUF];
-        uint8_t message_checksum;
+        uint8_t _message_direction;
+        uint8_t _message_id;
+        uint8_t _message_length_expected;
+        uint8_t _message_length_received;
+        uint8_t _message_buffer[MAXBUF];
+        uint8_t _message_checksum;
 
     public:
 
-        MSP_Parser();
+        MSP_Parser(void) {
+
+            _state = 0;
+        }
 
         void parse(uint8_t b);
 
