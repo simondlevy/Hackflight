@@ -433,10 +433,17 @@ class HPP_Emitter(LocalCodeEmitter):
             argnames = self._getargnames(msgstuff)
             argtypes = self._getargtypes(msgstuff)
 
+            nargs = len(argnames)
+
             # Write handler code for incoming messages
             if msgid < 200:
 
                 self.output.write(2*self.indent + 'virtual void handle_%s(' % msgtype)
+
+                for k in range(nargs):
+                    self.output.write(argnames[k])
+                    if k < nargs-1:
+                        self.output.write(', ')
 
                 self.output.write(') = 0;\n\n')
 
