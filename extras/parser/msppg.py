@@ -445,7 +445,10 @@ class HPP_Emitter(LocalCodeEmitter):
                     if k < nargs-1:
                         self.output.write(', ')
 
-                self.output.write(') = 0;\n\n')
+                self.output.write(')\n')
+                self.output.write(2*self.indent + '{\n')
+                self.output.write(2*self.indent + '}\n\n')
+
 
         self.output.write('};')
  
