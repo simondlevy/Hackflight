@@ -1,5 +1,7 @@
 // AUTO-GENERATED CODE: DO NOT EDIT!!!\n\n'
 
+#pragma once
+
 #include <stdint.h>
 
 class MSP_Parser {
