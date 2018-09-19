@@ -89,6 +89,10 @@ class CodeEmitter(object):
 
         return cmt + ' AUTO-GENERATED CODE: DO NOT EDIT!!!\n\n'
 
+    def _getsrc(self, filename):
+
+        return resource_string('resources', filename).decode('utf-8')
+ 
 class LocalCodeEmitter(CodeEmitter):
 
     def __init__(self, folder, ext):
@@ -103,10 +107,6 @@ class LocalCodeEmitter(CodeEmitter):
         outfile.write(self._getsrc(src))
         outfile.close()
 
-    def _getsrc(self, filename):
-
-        return resource_string('resources', filename).decode('utf-8')
- 
 class CompileableCodeEmitter(LocalCodeEmitter):
 
     def __init__(self, folder, ext):
@@ -375,17 +375,17 @@ class CPP_Emitter(CompileableCodeEmitter):
 
 # Firmware header-only code emitter ===================================================================
 
-class HPP_Emitter(LocalCodeEmitter):
+class HPP_Emitter(CodeEmitter):
 
     type2decl = {'byte': 'uint8_t', 'short' : 'uint16_t', 'float' : 'float', 'int' : 'int32_t'}
 
     def __init__(self, msgdict):
 
-        LocalCodeEmitter.__init__(self, 'hpp', 'hpp')
+        CodeEmitter.__init__(self)
 
         self.type2decl = CPP_Emitter.type2decl
 
-        self.output = _openw('output/hpp/mspparser.hpp')
+        self.output = _openw('../../src/mspparser2.hpp')
 
         self.output.write('\n' + self._getsrc('top-hpp'))
 
