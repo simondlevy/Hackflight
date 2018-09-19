@@ -85,10 +85,6 @@ class CodeEmitter(object):
                 outfile.write(', ')
         outfile.write(')')
 
-    def warning(self, cmt):
-
-        return cmt + ' AUTO-GENERATED CODE: DO NOT EDIT!!!\n\n'
-
     def _getsrc(self, filename):
 
         return resource_string('resources', filename).decode('utf-8')
@@ -133,8 +129,6 @@ class Python_Emitter(LocalCodeEmitter):
         self._copyfile('setup.py', 'python/setup.py')
 
         self.output = _openw('output/python/msppg/__init__.py')
-
-        self._write(self.warning('#'))
 
         self.type2pack = {'byte' : 'B', 'short' : 'h', 'float' : 'f', 'int' : 'i'}
 
@@ -236,8 +230,6 @@ class CPP_Emitter(CompileableCodeEmitter):
         # Create firwmare stuff
         self.coutput = _openw('output/cpp/MSPPG.cpp')
         self.houtput = _openw('output/cpp/MSPPG.h')
-
-        self._cwrite(self.warning('//'))
 
         self._hwrite(self._getsrc('top-hpp'))
  
@@ -385,7 +377,7 @@ class HPP_Emitter(CodeEmitter):
 
         self.type2decl = CPP_Emitter.type2decl
 
-        self.output = _openw('../../src/mspparser2.hpp')
+        self.output = _openw('../../src/msp.hpp')
 
         self.output.write('\n' + self._getsrc('top-hpp'))
 
@@ -469,8 +461,6 @@ class C_Emitter(CompileableCodeEmitter):
 
         self.coutput = _openw('output/c/msppg/msppg.c')
         self.houtput = _openw('output/c/msppg/msppg.h')
-
-        self._cwrite(self.warning('//'))
 
         self._hwrite(self._getsrc('top-h'))
 
@@ -620,7 +610,7 @@ class Java_Emitter(CompileableCodeEmitter):
 
         self.output = _openw('output/java/edu/wlu/cs/msppg/Parser.java')
 
-        self._write(self.warning('//'))
+        self._write('/*\nParser.java: Java implementation of MSPPG parser\n')
 
         self._write(self._getsrc('top-java'))
 
@@ -727,8 +717,10 @@ class Java_Emitter(CompileableCodeEmitter):
                 argnames = self._getargnames(msgstuff)
                 argtypes = self._getargtypes(msgstuff)
 
-                self.output = _openw('output/java/edu/wlu/cs/msppg/%s_Handler.java' % msgtype)
-                self.output.write(self.warning('//'))
+                classname = '%s_Handler.java' % msgtype
+                self.output = _openw('output/java/edu/wlu/cs/msppg/' + classname)
+                self.output.write('/*\n%s: handler class for %s message in MSPPG\n' % (classname, msgtype))
+                self._write(self._getsrc('top-java'))
                 self.output.write('package edu.wlu.cs.msppg;\n\n')
                 self.output.write('public interface %s_Handler {\n\n' % msgtype)
                 self.output.write(self.indent + 'public void handle_%s' % msgtype)
