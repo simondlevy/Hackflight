@@ -375,26 +375,25 @@ class CPP_Emitter(CompileableCodeEmitter):
 
 # Firmware header-only code emitter ===================================================================
 
-class HPP_Emitter(CodeEmitter):
+class HPP_Emitter(LocalCodeEmitter):
+
+    type2decl = {'byte': 'byte', 'short' : 'short', 'float' : 'float', 'int' : 'int'}
 
     def __init__(self, msgdict):
 
-        CodeEmitter.__init__(self)
+        LocalCodeEmitter.__init__(self, 'hpp', 'hpp')
 
         self.type2decl = CPP_Emitter.type2decl
 
-        output = _openw('../../src/mspparser2.hpp')
+        # Create firwmare stuff
+        self.coutput = _openw('output/hpp/MSPPG.cpp')
+        self.houtput = _openw('output/hpp/MSPPG.h')
 
-        output.write('// AUTO-GENERATED CODE: DO NOT EDIT\n\n')
-        output.write('# pragma once\n\n')
-        output.write('class MspParser2 {\n\n')
-        output.write(self.indent + 'public:\n\n')
+        self._cwrite(self.warning('//'))
 
-        for msgtype in msgdict.keys():
-
-            output.write(2*self.indent + 'static const uint8_t CMD_%s = %d;\n' % (msgtype.ljust(30), msgdict[msgtype][0]))
-
-        output.write('/*')
+        self._hwrite(self._getsrc('top-hpp'))
+ 
+        self._cwrite('\n' + self._getsrc('top-cpp'))
 
         for msgtype in msgdict.keys():
 
@@ -404,38 +403,38 @@ class HPP_Emitter(CodeEmitter):
             argnames = self._getargnames(msgstuff)
             argtypes = self._getargtypes(msgstuff)
 
-            output.write(self.indent*2 + 'static MSP_Message serialize_%s' % msgtype)
-            self._write_params(output, argtypes, argnames)
-            output.write(';\n\n')
+            self._hwrite(self.indent*2 + 'static MSP_Message serialize_%s' % msgtype)
+            self._write_params(self.houtput, argtypes, argnames)
+            self._hwrite(';\n\n')
 
             # Write handler code for incoming messages
             if msgid < 200:
 
-                output.write(5*self.indent + ('case %s: {\n\n' % msgdict[msgtype][0]))
+                self._cwrite(5*self.indent + ('case %s: {\n\n' % msgdict[msgtype][0]))
                 nargs = len(argnames)
                 offset = 0
                 for k in range(nargs):
                     argname = argnames[k]
                     argtype = argtypes[k]
                     decl = self.type2decl[argtype]
-                    output.write(6*self.indent + decl  + ' ' + argname + ';\n')
-                    output.write(6*self.indent + 
+                    self._cwrite(6*self.indent + decl  + ' ' + argname + ';\n')
+                    self._cwrite(6*self.indent + 
                             'memcpy(&%s,  &this->message_buffer[%d], sizeof(%s));\n\n' % 
                             (argname, offset, decl))
                     offset += self.type2size[argtype]
-                output.write(6*self.indent + 'this->handlerFor%s->handle_%s(' % (msgtype, msgtype))
+                self._cwrite(6*self.indent + 'this->handlerFor%s->handle_%s(' % (msgtype, msgtype))
                 for k in range(nargs):
-                    output.write(argnames[k])
+                    self._cwrite(argnames[k])
                     if k < nargs-1:
-                        output.write(', ')
-                output.write(');\n')
-                output.write(6*self.indent + '} break;\n\n')
+                        self._cwrite(', ')
+                self._cwrite(');\n')
+                self._cwrite(6*self.indent + '} break;\n\n')
                 
-                output.write(self.indent*2 + 'static MSP_Message serialize_%s_Request();\n\n' % msgtype)
-                output.write(self.indent*2 + 
+                self._hwrite(self.indent*2 + 'static MSP_Message serialize_%s_Request();\n\n' % msgtype)
+                self._hwrite(self.indent*2 + 
                         'void set_%s_Handler(class %s_Handler * handler);\n\n' % (msgtype, msgtype))
 
-        output.write(self.indent + 'private:\n\n')
+        self._hwrite(self.indent + 'private:\n\n')
 
         for msgtype in msgdict.keys():
 
@@ -443,11 +442,13 @@ class HPP_Emitter(CodeEmitter):
             msgid = msgstuff[0]
             
             if msgid < 200:
-                output.write(2*self.indent + 
+                self._hwrite(2*self.indent + 
                         'class %s_Handler * handlerFor%s;\n\n' % (msgtype, msgtype));
 
-        output.write('};\n');
+        self._hwrite('};\n');
 
+        self._cwrite(self._getsrc('bottom-cpp'))
+ 
         for msgtype in msgdict.keys():
 
             msgstuff = msgdict[msgtype]
@@ -460,64 +461,70 @@ class HPP_Emitter(CodeEmitter):
             if msgid < 200:
 
                 # Declare handler class
-                output.write('\n\n' + 'class %s_Handler {\n' % msgtype)
-                output.write('\n' + self.indent + 'public:\n\n')
-                output.write(2*self.indent + '%s_Handler() {}\n\n' % msgtype)
-                output.write(2*self.indent + 'virtual void handle_%s' % msgtype)
-                self._write_params(output, argtypes, argnames)
-                #output.write('{ }\n\n')
-                output.write('= 0;\n\n')
-                output.write('};\n\n')
+                self._hwrite('\n\n' + 'class %s_Handler {\n' % msgtype)
+                self._hwrite('\n' + self.indent + 'public:\n\n')
+                self._hwrite(2*self.indent + '%s_Handler() {}\n\n' % msgtype)
+                self._hwrite(2*self.indent + 'virtual void handle_%s' % msgtype)
+                self._write_params(self.houtput, argtypes, argnames)
+                #self._hwrite('{ }\n\n')
+                self._hwrite('= 0;\n\n')
+                self._hwrite('};\n\n')
                 
                 # Write handler method
-                output.write('void MSP_Parser::set_%s_Handler(class %s_Handler * handler) {\n\n' %
+                self._cwrite('void MSP_Parser::set_%s_Handler(class %s_Handler * handler) {\n\n' %
                         (msgtype, msgtype))
-                output.write(self.indent + 'this->handlerFor%s = handler;\n' % msgtype)
-                output.write('}\n\n')
+                self._cwrite(self.indent + 'this->handlerFor%s = handler;\n' % msgtype)
+                self._cwrite('}\n\n')
 
                 # Write request method
-                output.write('MSP_Message MSP_Parser::serialize_%s_Request() {\n\n' % msgtype)
-                output.write(self.indent + 'MSP_Message msg;\n\n')
-                output.write(self.indent + 'msg.bytes[0] = 36;\n')
-                output.write(self.indent + 'msg.bytes[1] = 77;\n')
-                output.write(self.indent + 'msg.bytes[2] = %d;\n' % 60 if msgid < 200 else 62)
-                output.write(self.indent + 'msg.bytes[3] = 0;\n')
-                output.write(self.indent + 'msg.bytes[4] = %d;\n' % msgid)
-                output.write(self.indent + 'msg.bytes[5] = %d;\n\n' % msgid)
-                output.write(self.indent + 'msg.len = 6;\n\n')
-                output.write(self.indent + 'return msg;\n')
-                output.write('}\n\n')
+                self._cwrite('MSP_Message MSP_Parser::serialize_%s_Request() {\n\n' % msgtype)
+                self._cwrite(self.indent + 'MSP_Message msg;\n\n')
+                self._cwrite(self.indent + 'msg.bytes[0] = 36;\n')
+                self._cwrite(self.indent + 'msg.bytes[1] = 77;\n')
+                self._cwrite(self.indent + 'msg.bytes[2] = %d;\n' % 60 if msgid < 200 else 62)
+                self._cwrite(self.indent + 'msg.bytes[3] = 0;\n')
+                self._cwrite(self.indent + 'msg.bytes[4] = %d;\n' % msgid)
+                self._cwrite(self.indent + 'msg.bytes[5] = %d;\n\n' % msgid)
+                self._cwrite(self.indent + 'msg.len = 6;\n\n')
+                self._cwrite(self.indent + 'return msg;\n')
+                self._cwrite('}\n\n')
 
 
             # Add parser method for serializing message
-            output.write('MSP_Message MSP_Parser::serialize_%s' % msgtype)
-            self._write_params(output, argtypes, argnames)
-            output.write(' {\n\n')
-            output.write(self.indent + 'MSP_Message msg;\n\n')
+            self._cwrite('MSP_Message MSP_Parser::serialize_%s' % msgtype)
+            self._write_params(self.coutput, argtypes, argnames)
+            self._cwrite(' {\n\n')
+            self._cwrite(self.indent + 'MSP_Message msg;\n\n')
             msgsize = self._msgsize(argtypes)
-            output.write(self.indent + 'msg.bytes[0] = 36;\n')
-            output.write(self.indent + 'msg.bytes[1] = 77;\n')
-            output.write(self.indent + 'msg.bytes[2] = 62;\n')
-            output.write(self.indent + 'msg.bytes[3] = %d;\n' % msgsize)
-            output.write(self.indent + 'msg.bytes[4] = %d;\n\n' % msgid)
+            self._cwrite(self.indent + 'msg.bytes[0] = 36;\n')
+            self._cwrite(self.indent + 'msg.bytes[1] = 77;\n')
+            self._cwrite(self.indent + 'msg.bytes[2] = 62;\n')
+            self._cwrite(self.indent + 'msg.bytes[3] = %d;\n' % msgsize)
+            self._cwrite(self.indent + 'msg.bytes[4] = %d;\n\n' % msgid)
             nargs = len(argnames)
             offset = 5
             for k in range(nargs):
                 argname = argnames[k]
                 argtype = argtypes[k]
                 decl = self.type2decl[argtype]
-                output.write(self.indent + 
+                self._cwrite(self.indent + 
                         'memcpy(&msg.bytes[%d], &%s, sizeof(%s));\n' %  (offset, argname, decl))
                 offset += self.type2size[argtype]
-            output.write('\n')
-            output.write(self.indent + 
+            self._cwrite('\n')
+            self._cwrite(self.indent + 
                     'msg.bytes[%d] = CRC8(&msg.bytes[3], %d);\n\n' % (msgsize+5, msgsize+2))
-            output.write(self.indent + 'msg.len = %d;\n\n' % (msgsize+6))
-            output.write(self.indent + 'return msg;\n')
-            output.write('}\n\n')
+            self._cwrite(self.indent + 'msg.len = %d;\n\n' % (msgsize+6))
+            self._cwrite(self.indent + 'return msg;\n')
+            self._cwrite('}\n\n')
+ 
+    def _cwrite(self, s):
 
-        output.write('*/')
-        output.write('};')
+        self.coutput.write(s)
+
+    def _hwrite(self, s):
+
+        self.houtput.write(s)
+
  
 # C emitter ===============================================================================
 
