@@ -118,7 +118,6 @@ namespace hf {
                 delay((uint32_t)(1000*sec));
             }
 
-
             bool imuRead(void)
             {
                 if (gotNewAccelGyroData) {
@@ -127,12 +126,10 @@ namespace hf {
 
                     _lsm6dsm.readData(_ax, _ay, _az, _gx, _gy, _gz);
 
-                    Serial.println(_gx);
-
                     // Negate to support board orientation
-                    //_ax = -_ax;
-                    //_gy = -_gy;
-                    //_gz = -_gz;
+                    _ax = -_ax;
+                    _gy = -_gy;
+                    _gz = -_gz;
 
                     return true;
 
@@ -175,7 +172,7 @@ namespace hf {
                         break;
 
                     case LSM6DSM::ERROR_SELFTEST:
-                        i2cerror("failed self-test");
+                        //i2cerror("failed self-test");
                         break;
 
                     case LSM6DSM::ERROR_NONE:
@@ -183,7 +180,7 @@ namespace hf {
 
                 }
 
-                delay(1000);
+                delay(100);
 
                 attachInterrupt(LSM6DSM_INTERRUPT_PIN, lsm6dsmInterruptHandler, RISING);  
 
