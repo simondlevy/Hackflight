@@ -22,15 +22,15 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 #include <iostream>
 using namespace std;
 
-#include "msppg/msppg.h"
+#include "MSPPG.h"
 
-class My_ATTITUDE_RADIANS_Handler : public ATTITUDE_RADIANS_Handler {
+class My_GET_ATTITUDE_RADIANS_Handler : public GET_ATTITUDE_RADIANS_Handler {
 
     public:
 
-        void handle_ATTITUDE_RADIANS(short angx, short angy, short heading) {
+        void handle_GET_ATTITUDE_RADIANS(float angx, float angy, float heading) {
 
-            printf("%+3d %+3d %+3d\n", angx, angy, heading);
+            printf("%+3.3f %+3.3f %+3.3f\n", angx, angy, heading);
         }
 
 };
@@ -39,13 +39,13 @@ int main(int argc, char ** argv) {
 
     MSP_Parser parser;
 
-    MSP_Message message = parser.serialize_ATTITUDE_RADIANS(59, 76, 1);
+    MSP_Message message = parser.serialize_GET_ATTITUDE_RADIANS(59, 76, 1);
 
-    My_ATTITUDE_RADIANS_Handler handler;
+    My_GET_ATTITUDE_RADIANS_Handler handler;
 
-    parser.set_ATTITUDE_RADIANS_Handler(&handler);
+    parser.set_GET_ATTITUDE_RADIANS_Handler(&handler);
 
-    for (byte b=message.start(); message.hasNext(); b=message.getNext()) {
+    for (uint8_t b=message.start(); message.hasNext(); b=message.getNext()) {
 
         parser.parse(b);
     }

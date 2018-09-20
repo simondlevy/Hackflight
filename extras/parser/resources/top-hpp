@@ -48,7 +48,7 @@ class MSP_Parser {
             _state = 0;
         }
 
-        void parse(byte b) 
+        void parse(uint8_t b) 
         {
             switch (_state) {
 

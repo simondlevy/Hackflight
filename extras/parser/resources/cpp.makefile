@@ -34,19 +34,19 @@ libmsppg.$(EXT):
 	g++ *.o -o libmsppg.$(EXT) -lpthread -shared
 
 install: libmsppg.so
-	cp msppg/MSPPG.h $(INSTALL_ROOT)/include
+	cp MSPPG.h $(INSTALL_ROOT)/include
 	cp libmsppg.so $(INSTALL_ROOT)/lib
 
 test: example
 	./example
   
-example: example.o msppg.o
+example: example.o MSPPG.o
 	g++ -o example example.o msppg.o
   
 example.o: example.cpp MSPPG.h
 	g++ -Wall -c example.cpp
   
-msppg.o: MSPPG.cpp MSPPG.h
+MSPPG.o: MSPPG.cpp MSPPG.h
 	g++ -std=c++11 -Wall -c MSPPG.cpp
 
 clean:
