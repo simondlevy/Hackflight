@@ -454,13 +454,13 @@ class C_Emitter(CompileableCodeEmitter):
     def __init__(self, msgdict):
 
         CompileableCodeEmitter.__init__(self, 'c', 'c')
-        mkdir_if_missing('output/c/msppg')
+        mkdir_if_missing('output/c')
         self._copyfile('example.c', 'c/example.c')
 
         self.type2decl = {'byte': 'char', 'short' : 'short', 'float' : 'float', 'int' : 'int'}
 
-        self.coutput = _openw('output/c/msppg/msppg.c')
-        self.houtput = _openw('output/c/msppg/msppg.h')
+        self.coutput = _openw('output/c/msppg.c')
+        self.houtput = _openw('output/c/msppg.h')
 
         self._hwrite(self._getsrc('top-h'))
 

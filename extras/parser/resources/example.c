@@ -17,11 +17,11 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
-#include "msppg/msppg.h"
+#include "msppg.h"
 
-void handle_attitude(short angx, short angy, short heading) {
+void handle_attitude(float angx, float angy, float heading) {
 
-    printf("%+3d %+3d %+3d\n", angx, angy, heading);
+    printf("%+3.3f %+3.3f %+3.3f\n", angx, angy, heading);
 }
 
 int main(int argc, char ** argv) {
@@ -30,9 +30,9 @@ int main(int argc, char ** argv) {
 
     msp_parser_init(&parser);
 
-    msp_message_t message = msp_serialize_ATTITUDE_RADIANS(59, 76, 1);
+    msp_message_t message = msp_serialize_GET_ATTITUDE_RADIANS(59, 76, 1);
 
-    msp_set_ATTITUDE_RADIANS_handler(&parser, handle_attitude);
+    msp_set_GET_ATTITUDE_RADIANS_handler(&parser, handle_attitude);
 
     byte b = msp_message_start(&message); 
     while (msp_message_has_next(&message)) {

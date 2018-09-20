@@ -1,5 +1,5 @@
 #
-# Example Makefile for MSPPG C output
+# Example Makefile for msppg C output
 #
 # Copyright (C) Simon D. Levy 2015
 #
@@ -17,14 +17,27 @@
 # along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 # Change this to match your desired install directory
-INSTALLDIR = /home/levys/Software/MSPPG/c
+INSTALL_ROOT = /usr/local
 
-ALL = example
+ALL = libmsppg.so example
+CFLAGS = -Wall -fPIC -static
+
+OS = $(shell uname -s)
+ifeq ($(OS), Linux)
+	EXT = so
+else
+	EXT = dylib
+endif
 
 all: $(ALL)
 
-install: 
-	cp -r msppg $(INSTALLDIR)
+libmsppg.$(EXT): 
+	gcc $(CFLAGS) -c msppg.c
+	gcc *.o -o libmsppg.$(EXT) -lpthread -shared
+
+install: libmsppg.so
+	cp msppg.h $(INSTALL_ROOT)/include
+	cp libmsppg.so $(INSTALL_ROOT)/lib
 
 test: example
 	./example
@@ -32,8 +45,11 @@ test: example
 example: example.o msppg.o
 	gcc -o example example.o msppg.o
   
-example.o: example.c msppg/msppg.h
+example.o: example.c msppg.h
 	gcc -Wall -c example.c
   
-msppg.o: msppg/msppg.c msppg/msppg.h
-	gcc -Wall -c msppg/msppg.c
+msppg.o: msppg.c msppg.h
+	gcc -Wall -c msppg.c
+
+clean:
+	rm -f *.so *.o *~
