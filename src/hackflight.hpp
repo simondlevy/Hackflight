@@ -24,8 +24,7 @@
 
 #include "sensor.hpp"
 #include "board.hpp"
-#include "mspparser.hpp"
-//#include "msp.hpp"
+#include "mspdispatcher.hpp"
 #include "mixer.hpp"
 #include "receiver.hpp"
 #include "debug.hpp"
@@ -38,7 +37,7 @@
 
 namespace hf {
 
-    class Hackflight : public MspParser {
+    class Hackflight : public MspDispatcher {
 
         private: 
 
