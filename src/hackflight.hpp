@@ -237,49 +237,41 @@ namespace hf {
 
         protected:
 
-        virtual void dispatchCommand(uint8_t cmd) override
-        {
-            switch (cmd) {
-
-                case MspParser::CMD_SET_MOTOR_NORMAL:
-                    MspParser::receiveFloats(_mixer->motorsDisarmed, _mixer->nmotors);
-                    break;
-
-                case MspParser::CMD_SET_ARMED:
-                    if (MspParser::readBool()) {  // got arming command: arm only if throttle is down
-                        if (_receiver->throttleIsDown()) {
-                            _state.armed = true;
-                        }
-                    }
-                    else {          // got disarming command: always disarm
-                        _state.armed = false;
-                    }
-                    break;
-
-                case MspParser::CMD_GET_RC_NORMAL:
-                    {
-                        float rawvals[6];
-                        for (uint8_t k=0; k<6; ++k) {
-                            rawvals[k] = _receiver->getRawval(k);
-                        }
-                        MspParser::sendFloats(rawvals, 6);
-                    }
-                    break;
-
-                case MspParser::CMD_GET_ATTITUDE_RADIANS: 
-                    MspParser::sendFloats(_state.eulerAngles, 3);
-                    break;
-
-                case MspParser::CMD_GET_ALTITUDE_METERS: 
-                    MspParser::sendFloats(&_state.altitude, 2);
-                    break;
-
-                    // don't know how to handle the (valid) message, indicate error
-                default:           
-                    MspParser::error();        
-                    break;
+            virtual void dispatch_SET_MOTOR_NORMAL() override
+            {
+                MspParser::receiveFloats(_mixer->motorsDisarmed, _mixer->nmotors);
             }
-        }
+
+            virtual void dispatch_SET_ARMED() override
+            {
+                if (MspParser::readBool()) {  // got arming command: arm only if throttle is down
+                    if (_receiver->throttleIsDown()) {
+                        _state.armed = true;
+                    }
+                }
+                else {          // got disarming command: always disarm
+                    _state.armed = false;
+                }
+            }
+
+            virtual void dispatch_GET_RC_NORMAL() override
+            {
+                float rawvals[6];
+                for (uint8_t k=0; k<6; ++k) {
+                    rawvals[k] = _receiver->getRawval(k);
+                }
+                MspParser::sendFloats(rawvals, 6);
+            }
+
+            virtual void dispatch_GET_ATTITUDE_RADIANS() override
+            {
+                MspParser::sendFloats(_state.eulerAngles, 3);
+            }
+
+            virtual void dispatch_GET_ALTITUDE_METERS() override
+            {
+                MspParser::sendFloats(&_state.altitude, 2);
+            }
 
         public:
 
