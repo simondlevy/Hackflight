@@ -21,7 +21,7 @@
 #include "receiver.hpp"
 #include <SBUS.h>
 
-static SBUS rx(Serial1);
+//static SBUS rx(Serial1);
 
 namespace hf {
 
@@ -35,6 +35,8 @@ namespace hf {
             const uint16_t MAX_FAILSAFE = 10;
 
             uint16_t failsafeCount;
+
+            SBUS rx = SBUS(Serial1);
 
         protected:
 
