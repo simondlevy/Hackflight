@@ -30,8 +30,7 @@ class DSMX_Receiver : public hf::Receiver {
 
     public:
 
-        DSMX_Receiver(UARTDevice_e uartDevice,
-                const uint8_t channelMap[6], float trimRoll=.01, float trimPitch=0, float trimYaw=0);
+        DSMX_Receiver(UARTDevice_e uartDevice, const uint8_t channelMap[6]);
 
         virtual void begin(void) override;
 

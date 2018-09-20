@@ -78,8 +78,9 @@ namespace hf {
 
         public:
 
-            SBUS_Receiver(const uint8_t channelMap[6], float trimRoll=0, float trimPitch=0, float trimYaw=0) : 
-                Receiver(channelMap, trimRoll, trimPitch, trimYaw) { }
+            SBUS_Receiver(const uint8_t channelMap[6]) :  Receiver(channelMap) 
+            { 
+            }
 
     }; // class SBUS_Receiver
 

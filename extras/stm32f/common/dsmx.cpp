@@ -55,9 +55,7 @@ static void serial_event(uint16_t value, void * data)
     _rx->handleSerialEvent(micros());
 }
 
-DSMX_Receiver::DSMX_Receiver(UARTDevice_e uartDevice,
-        const uint8_t channelMap[6], float trimRoll, float trimPitch, float trimYaw) : 
-    Receiver(channelMap, trimRoll, trimPitch, trimYaw) 
+DSMX_Receiver::DSMX_Receiver(UARTDevice_e uartDevice, const uint8_t channelMap[6]) : Receiver(channelMap) 
 {       
     _uartDevice = uartDevice;  
 }

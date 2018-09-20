@@ -39,7 +39,7 @@ static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 
 hf::Hackflight h;
 
-hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, .005f, -.08f, 0.f);
+hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP);
 
 hf::MixerQuadX mixer;
 
