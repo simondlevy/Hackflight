@@ -217,6 +217,22 @@ namespace hf {
 
         static constexpr float STICK_DEADBAND = 0.20;
 
+        void setTrimRoll(float trim)
+        {
+            _trimRoll = trim;
+        }
+
+         void setTrimPitch(float trim)
+        {
+            _trimPitch = trim;
+        }
+
+        void setTrimYaw(float trim)
+        {
+            _trimYaw = trim;
+        }
+
+
     }; // class Receiver
 
 } // namespace

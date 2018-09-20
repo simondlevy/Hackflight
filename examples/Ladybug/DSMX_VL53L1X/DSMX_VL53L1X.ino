@@ -83,6 +83,9 @@ VL53L1X_Rangefinder rangefinder;
 
 void setup(void)
 {
+    // Add some "software trim" to the receiver
+    rc.setTrimPitch(-.1);
+
     // Initialize Hackflight firmware
     // We're using an older ladybug with LED on pin A1
     h.init(new hf::Ladybug(A1), &rc, &mixer, &stabilizer);
