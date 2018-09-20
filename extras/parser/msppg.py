@@ -609,9 +609,7 @@ class Java_Emitter(CompileableCodeEmitter):
 
         self.output = _openw('output/java/edu/wlu/cs/msppg/Parser.java')
 
-        self._write('/*\nParser.java: Java implementation of MSPPG parser\n')
-
-        self._write(self._getsrc('top-java'))
+        self._write(self._getsrc('parser-top-java'))
 
         # Write handler cases for incoming messages
         for msgtype in msgdict.keys():
@@ -719,7 +717,7 @@ class Java_Emitter(CompileableCodeEmitter):
                 classname = '%s_Handler.java' % msgtype
                 self.output = _openw('output/java/edu/wlu/cs/msppg/' + classname)
                 self.output.write('/*\n%s: handler class for %s message in MSPPG\n' % (classname, msgtype))
-                self._write(self._getsrc('top-java'))
+                self._write(self._getsrc('class-top-java'))
                 self.output.write('package edu.wlu.cs.msppg;\n\n')
                 self.output.write('public interface %s_Handler {\n\n' % msgtype)
                 self.output.write(self.indent + 'public void handle_%s' % msgtype)

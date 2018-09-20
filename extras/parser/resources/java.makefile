@@ -16,9 +16,6 @@
 #  You should have received a copy of the GNU Lesser General Public License 
 #  along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
-# Change this to match your desired install directory
-INSTALLDIR = /home/levys/DolphinQuad/gcs/android/DolphinGCS/app/src/main/java/edu/wlu/cs/
-
 ALL = example.class msppg.jar
 
 all: $(ALL)

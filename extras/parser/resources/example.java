@@ -18,22 +18,22 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 import edu.wlu.cs.msppg.*;
 
-public class example implements ATTITUDE_RADIANS_Handler {
+public class example implements GET_ATTITUDE_RADIANS_Handler {
 
-    public void handle_ATTITUDE_RADIANS(short angx, short angy, short heading) {
+    public void handle_GET_ATTITUDE_RADIANS(float angx, float angy, float heading) {
 
-         System.out.printf("%+3d %+3d %+3d\n", angx, angy, heading);
+         System.out.printf("%+3.3f %+3.3f %+3.3f\n", angx, angy, heading);
     }
 
     public static void main(String [] argv) {
 
         Parser parser = new Parser();
 
-        byte [] buf = parser.serialize_ATTITUDE_RADIANS((short)59, (short)76, (short)1);
+        byte [] buf = parser.serialize_GET_ATTITUDE_RADIANS((float)59, (float)76, (float)1);
 
         example handler = new example();
 
-        parser.set_ATTITUDE_RADIANS_Handler(handler);
+        parser.set_GET_ATTITUDE_RADIANS_Handler(handler);
 
           for (byte b : buf) {
 
