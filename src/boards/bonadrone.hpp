@@ -47,6 +47,12 @@ namespace hf {
             // LSM6DSM data-ready interrupt pin
             const uint8_t LSM6DSM_INTERRUPT_PIN = 2;
 
+            const uint8_t MOTOR_PINS[4] = {3, 4, 5, 6};
+            
+            // Min, max PWM values
+            const uint16_t PWM_MIN = 1000;
+            const uint16_t PWM_MAX = 2000;
+            
             // Paramters to experiment with ------------------------------------------------------------------------
 
             // LSM6DSM full-scale settings
@@ -103,9 +109,7 @@ namespace hf {
 
             void writeMotor(uint8_t index, float value)
             {
-                // XXX
-                (void)index;
-                (void)value;
+                analogWrite(MOTOR_PINS[index], (uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)) >> 3);
             }
 
             virtual uint32_t getMicroseconds(void) override
@@ -153,7 +157,10 @@ namespace hf {
                 pinMode(LSM6DSM_INTERRUPT_PIN, INPUT);
 
                 // Connect to the ESCs and send them the baseline values
-                // XXX
+                for (uint8_t k=0; k<4; ++k) {
+                  pinMode(MOTOR_PINS[k], OUTPUT);
+                  analogWrite(MOTOR_PINS[k], PWM_MIN>>3);
+                }
 
                 // Start I^2C
                 Wire.begin(TWI_PINS_20_21);
