@@ -21,8 +21,6 @@
 #include "receiver.hpp"
 #include <SBUS.h>
 
-//static SBUS rx(Serial1);
-
 namespace hf {
 
     class SBUS_Receiver : public Receiver {
@@ -36,14 +34,14 @@ namespace hf {
 
             uint16_t failsafeCount;
 
-            SBUS rx = SBUS(Serial1);
+            SBUS * rx; 
 
         protected:
 
             void begin(void)
             {
                 failsafeCount = 0;
-                rx.begin();
+                rx->begin();
             }
 
             bool gotNewFrame(void)
@@ -51,7 +49,7 @@ namespace hf {
                 uint8_t failsafe = 0;
                 uint16_t lostFrames = 0;
 
-                if (rx.readCal(channels, &failsafe, &lostFrames)) {
+                if (rx->readCal(channels, &failsafe, &lostFrames)) {
 
                     // accumulate consecutive failsafe hits
                     if (failsafe) {
@@ -80,8 +78,9 @@ namespace hf {
 
         public:
 
-            SBUS_Receiver(const uint8_t channelMap[6]) :  Receiver(channelMap) 
+            SBUS_Receiver(const uint8_t channelMap[6], HardwareSerial & hardwareSerial=Serial1) :  Receiver(channelMap) 
             { 
+                rx = new SBUS(hardwareSerial);
             }
 
     }; // class SBUS_Receiver
