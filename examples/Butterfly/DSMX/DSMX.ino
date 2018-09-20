@@ -1,5 +1,16 @@
 /*
-   DSMX.ino : Hackflight sketch for Butterfly dev-board with Spektrum DSMX receiver
+   DSMX.ino : Hackflight sketch for Butterfly dev-board with MPU9250 add-on shield and
+   Spektrum DSMX receiver
+
+   Additional libraries needed:
+
+       https://github.com/simondlevy/MPU
+       https://github.com/simondlevy/CrossPlatformDataBus
+       https://github.com/simondlevy/SpektrumDSM 
+
+   Hardware support for Butterfly board:
+
+       https://github.com/simondlevy/grumpyoldpizza
 
    Copyright (c) 2018 Simon D. Levy
 

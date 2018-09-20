@@ -1,7 +1,17 @@
 /*
    DSMX.ino : Hackflight sketch for Ladybug Flight Controller with Spektrum DSMX receiver
 
-   Copyright (c) 2018 Simon D. Levy
+   Additional libraries needed:
+
+       https://github.com/simondlevy/EM7180
+       https://github.com/simondlevy/CrossPlatformDataBus
+       https://github.com/simondlevy/SpektrumDSM 
+
+   Hardware support for Ladybug flight controller:
+
+       https://github.com/simondlevy/grumpyoldpizza
+
+Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
 

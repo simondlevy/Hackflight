@@ -1,6 +1,16 @@
 /*
    SBUS.ino : Hackflight sketch for Bonadrone flight controller with SBUS receiver
 
+   Additional libraries needed:
+
+       https://github.com/simondlevy/LSM6DSM
+       https://github.com/simondlevy/CrossPlatformDataBus
+       https://github.com/simondlevy/SBUS 
+
+   Hardware support for Bonadrone flight controller:
+
+       https://github.com/simondlevy/grumpyoldpizza
+
    Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
