@@ -20,11 +20,11 @@
 
 #pragma once
 
-#include <BreezyCPPM.h>
+#include <CPPM.h>
 #include "cppm.hpp"
 
 // Interrupt on pin 0, using 5 channels
-static BreezyCPPM rx(0, 5);
+static CPPM rx(0, 5);
 
 namespace hf {
 
