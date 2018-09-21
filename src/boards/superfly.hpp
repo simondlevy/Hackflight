@@ -28,7 +28,6 @@
 #include "hackflight.hpp"
 #include "realboard.hpp"
 
-
 namespace hf {
 
     class SuperFly : public RealBoard {
@@ -44,7 +43,7 @@ namespace hf {
 
             static const uint8_t LED_PIN = 15;
 
-            const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
+            //const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
 
             EM7180_Master _sentral = EM7180_Master(MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
 
@@ -92,8 +91,10 @@ namespace hf {
 
             void writeMotor(uint8_t index, float value)
             {
+                (void)index;
+                (void)value;
                 // Scale motor value from [0,1] to [0,255]
-                analogWrite(MOTOR_PINS[index], (uint8_t)(value * 255));
+                //analogWrite(MOTOR_PINS[index], (uint8_t)(value * 255));
             }
 
             bool getGyrometer(float gyro[3])
@@ -164,8 +165,8 @@ namespace hf {
 
                 // Initialize the motors
                 for (int k=0; k<4; ++k) {
-                    analogWriteFrequency(MOTOR_PINS[k], 10000);  
-                    analogWrite(MOTOR_PINS[k], 0);  
+                    //analogWriteFrequency(MOTOR_PINS[k], 10000);  
+                    //analogWrite(MOTOR_PINS[k], 0);  
                 }
 
                 // Hang a bit more
