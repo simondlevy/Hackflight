@@ -1,11 +1,10 @@
 /*
-   CPPM.ino : Hackflight sketch for SuperFly ESP8266 Hackable Flight Controller with a CPPM receiver
+   DummyRX.ino : Hackflight sketch for SuperFly ESP8266 Hackable Flight Controller with a "dummy" receiver
  
    Additional libraries needed:
 
        https://github.com/simondlevy/EM7180
        https://github.com/simondlevy/CrossPlatformDataBus
-       https://github.com/simondlevy/CPPM
 
    Hardware support for SuperFly ESP8266 Hackable flight controller:
 
@@ -33,13 +32,13 @@
 #include "hackflight.hpp"
 #include "boards/superfly.hpp"
 #include "mixers/quadx.hpp"
-#include "receivers/cppm/arduino_cppm.hpp"
+#include "receivers/dummy.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 
 hf::Hackflight h;
 
-//hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP);
+hf::Dummy_Receiver rc = hf::Dummy_Receiver(CHANNEL_MAP);
 
 hf::MixerQuadX mixer;
 
@@ -54,10 +53,10 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
 void setup(void)
 {
     // Use A1 for a prototype LadybugFC
-    //h.init(new hf::Ladybug(A1), &rc, &mixer, &stabilizer);
+    h.init(new hf::SuperFly(), &rc, &mixer, &stabilizer);
 }
 
 void loop(void)
 {
-    //h.update();
+    h.update();
 }

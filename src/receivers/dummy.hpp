@@ -1,7 +1,5 @@
 /*
-   arduino_cppm.hpp : CPPM receiver support for Arduino-based flight controllers
-
-   Copyright (c) 2018 Simon D. Levy
+   dummy.hpp : "Dummy" receiver subclass for prototyping
 
    This file is part of Hackflight.
 
@@ -20,37 +18,38 @@
 
 #pragma once
 
-#include <CPPM.h>
-#include "cppm.hpp"
-
-// Interrupt on pin 0, using 5 channels
-static CPPM rx(0, 5);
+#include "receiver.hpp"
 
 namespace hf {
 
-    class Arduino_CPPM_Receiver : public CPPM_Receiver {
-
-        public:
-
-            Arduino_CPPM_Receiver() : CPPM_Receiver() { }
+    class Dummy_Receiver : public Receiver {
 
         protected:
 
             void begin(void)
             {
-                rx.begin();
             }
 
             bool gotNewFrame(void)
             {
-                return rx.gotNewFrame();
+                return false;
             }
 
-            void readPulseVals(uint16_t pulsevals[8])
+            void readRawvals(void)
             {
-                rx.computeRC(pulsevals);
             }
 
-    }; // class Arduino_CPPM_Receiver
+            bool lostSignal(void)
+            {
+                return false;
+            }
+
+        public:
+
+            Dummy_Receiver(const uint8_t channelMap[6]) :  Receiver(channelMap) 
+            { 
+            }
+
+    }; // class Dummy_Receiver
 
 } // namespace hf
