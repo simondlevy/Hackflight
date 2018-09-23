@@ -37,20 +37,10 @@ In output/java you can do
 
 to build the msppg.jar file, which can then be used as a library for Android projects and other Java-based work.
 
-<b>Arduino example</b>
-
-The Arduino example allows you to control the pitch of a buzzer using the pitch from the IMU. You should use an Arduino Mega or other Arduino that has TX1/RX1 pins, and make the following connections:
-
-(1) Naze - to Arduino ground.
-(2) Naze + to Arduino 5v.
-(3) Naze TX to Arduino RX1.
-(4) Naze RX to Arduino TX1.
-(5) Buzzer + to Arduino digitial 8.
-(6) Buzzer - to Arduino ground.
-
-Then copy the output/arduino/MSPPG folder into your Arduino libaries folder, launch the Arduino IDE, and find the MSPPG submenu under the File/Examples menu.
-
 <b>Extending</b>
 
-The msp-example.json file currently contains just a few message specifications, but you can easily add to it by specifying additional messages from the MSP: http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol. 
-MSPPG currently supports types byte, short, and float, but we will likely add int as the need arises.
+The msp-example.json file currently contains just a few message specifications,
+but you can easily add to it by specifying additional messages from the the MSP
+[standard](http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol),
+or add some of your own new message types.  MSPPG currently supports types
+byte, short, and float, but we will likely add int as the need arises.
