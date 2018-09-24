@@ -377,10 +377,10 @@ class HPP_Emitter(CodeEmitter):
         self.type2decl = HPP_Emitter.type2decl
 
         # Create C++ header file
-        self._copyfile('mspparser.hpp', 'mspparser2.hpp', '../../src')
+        self._copyfile('mspparser.hpp', 'mspparser.hpp', '../../src')
 
         # Open file for appending
-        self.output = open('../../src/mspparser2.hpp', 'a')
+        self.output = open('../../src/mspparser.hpp', 'a')
 
         # Add dispatchMessage() method
         self.output.write(self.indent + 'void dispatchMessage(void)\n')
@@ -413,6 +413,10 @@ class HPP_Emitter(CodeEmitter):
                 if k < nargs-1:
                     self.output.write(', ')
             self.output.write(');\n')
+            if msgid < 200:
+                self.output.write(4*self.indent + ('prepareToSendFloats(%d);\n' % nargs))
+                for argname in argnames:
+                    self.output.write(4*self.indent + ('sendFloat(%s);\n' % argname))
             self.output.write(4*self.indent + '} break;\n\n')
 
         self.output.write(2*self.indent + '}\n')
@@ -493,7 +497,8 @@ class HPP_Emitter(CodeEmitter):
             self.output.write(3*self.indent + 'return msg;\n')
             self.output.write(2*self.indent + '}\n\n')
  
-        self.output.write('};\n\n')
+        self.output.write('};\n')
+        self.output.write('}\n')
         self.output.close()
 
  

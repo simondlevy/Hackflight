@@ -26,6 +26,8 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 #include <stdint.h>
 
+namespace hf {
+
 class MspMessage {
 
     friend class MspParser;
@@ -153,18 +155,18 @@ class MspParser {
         headSerialResponse(0, s);
     }
 
-    void sendFloats(float * src, uint8_t count)
+    void prepareToSendFloats(uint8_t count)
     {
         _outBufSize = 0;
         _outBufIndex = 0;
+        headSerialReply(count*4);
+    }
 
-        headSerialReply(4*count);
-
-        for (uint8_t k=0; k<count; ++k) {
-            uint32_t a;
-            memcpy(&a, &src[k], 4);
-            serialize32(a);
-        }
+    void sendFloat(float src)
+    {
+        uint32_t a;
+        memcpy(&a, &src, 4);
+        serialize32(a);
     }
 
     protected:
