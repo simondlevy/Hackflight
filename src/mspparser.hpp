@@ -153,18 +153,18 @@ class MspParser {
         headSerialResponse(0, s);
     }
 
-    void sendFloats(float * src, uint8_t count)
+    void prepareToSendFloats(uint8_t count)
     {
         _outBufSize = 0;
         _outBufIndex = 0;
+        headSerialReply(count*4);
+    }
 
-        headSerialReply(4*count);
-
-        for (uint8_t k=0; k<count; ++k) {
-            uint32_t a;
-            memcpy(&a, &src[k], 4);
-            serialize32(a);
-        }
+    void sendFloat(float src)
+    {
+        uint32_t a;
+        memcpy(&a, &src, 4);
+        serialize32(a);
     }
 
     protected:
@@ -252,55 +252,60 @@ class MspParser {
     {
         switch (_command) {
 
-            case 123: 
-                {
-
-                float vals[2]; 
-                handle_GET_ALTITUDE_METERS(vals[0], vals[1]);
-                sendFloats(vals, 2);
-                } break;
-
-            case 216: 
-                {
-
-                uint8_t flag = 0;
-                memcpy(&flag,  &_inBuf[0], sizeof(uint8_t));
-
-                handle_SET_ARMED(flag);
-                } break;
 
             case 121: 
                 {
-
-                float vals[6]; 
-                handle_GET_RC_NORMAL(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5]);
-                sendFloats(vals, 6);
-                } break;
+                    float c1=0;
+                    float c2=0;
+                    float c3=0;
+                    float c4=0;
+                    float c5=0;
+                    float c6=0;
+                    handle_GET_RC_NORMAL(c1, c2, c3, c4, c5, c6);
+                    prepareToSendFloats(6);
+                    sendFloat(c1);
+                    sendFloat(c2);
+                    sendFloat(c3);
+                    sendFloat(c4);
+                    sendFloat(c5);
+                    sendFloat(c6);
+                 } break;
 
             case 122: 
                 {
-
-                float vals[3];
-                handle_GET_ATTITUDE_RADIANS(vals[0], vals[1], vals[2]);
-                sendFloats(vals, 3);
+                    float roll=0;
+                    float pitch=0;
+                    float yaw=0;
+                    handle_GET_ATTITUDE_RADIANS(roll, pitch, yaw);
+                    prepareToSendFloats(3);
+                    sendFloat(roll);
+                    sendFloat(pitch);
+                    sendFloat(yaw);
                 } break;
 
             case 215: 
                 {
 
-                float m1 = 0;
-                memcpy(&m1,  &_inBuf[0], sizeof(float));
+                    float m1 = 0;
+                    memcpy(&m1,  &_inBuf[0], sizeof(float));
 
-                float m2 = 0;
-                memcpy(&m2,  &_inBuf[4], sizeof(float));
+                    float m2 = 0;
+                    memcpy(&m2,  &_inBuf[4], sizeof(float));
 
-                float m3 = 0;
-                memcpy(&m3,  &_inBuf[8], sizeof(float));
+                    float m3 = 0;
+                    memcpy(&m3,  &_inBuf[8], sizeof(float));
 
-                float m4 = 0;
-                memcpy(&m4,  &_inBuf[12], sizeof(float));
+                    float m4 = 0;
+                    memcpy(&m4,  &_inBuf[12], sizeof(float));
 
-                handle_SET_MOTOR_NORMAL(m1, m2, m3, m4);
+                    handle_SET_MOTOR_NORMAL(m1, m2, m3, m4);
+                } break;
+
+            case 216: 
+                {
+                    uint8_t flag = 0;
+                    memcpy(&flag,  &_inBuf[0], sizeof(uint8_t));
+                    handle_SET_ARMED(flag);
                 } break;
 
         }
@@ -308,241 +313,241 @@ class MspParser {
 
     protected:
 
-        virtual void handle_GET_ALTITUDE_METERS(float & estalt, float & vario)
-        {
-            (void)estalt;
-            (void)vario;
-        }
+    virtual void handle_GET_ALTITUDE_METERS(float & estalt, float & vario)
+    {
+        (void)estalt;
+        (void)vario;
+    }
 
-        virtual void handle_SET_ARMED(uint8_t  flag)
-        {
-            (void)flag;
-        }
+    virtual void handle_SET_ARMED(uint8_t  flag)
+    {
+        (void)flag;
+    }
 
-        virtual void handle_GET_RC_NORMAL(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
-        {
-            (void)c1;
-            (void)c2;
-            (void)c3;
-            (void)c4;
-            (void)c5;
-            (void)c6;
-        }
+    virtual void handle_GET_RC_NORMAL(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
+    {
+        (void)c1;
+        (void)c2;
+        (void)c3;
+        (void)c4;
+        (void)c5;
+        (void)c6;
+    }
 
-        virtual void handle_GET_ATTITUDE_RADIANS(float & roll, float & pitch, float & yaw)
-        {
-            (void)roll;
-            (void)pitch;
-            (void)yaw;
-        }
+    virtual void handle_GET_ATTITUDE_RADIANS(float & roll, float & pitch, float & yaw)
+    {
+        (void)roll;
+        (void)pitch;
+        (void)yaw;
+    }
 
-        virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4)
-        {
-            (void)m1;
-            (void)m2;
-            (void)m3;
-            (void)m4;
-        }
+    virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4)
+    {
+        (void)m1;
+        (void)m2;
+        (void)m3;
+        (void)m4;
+    }
 
-        virtual void handle_GET_LOITER_RAW(uint8_t & agl, uint8_t & flowx, uint8_t & flowy)
-        {
-            (void)agl;
-            (void)flowx;
-            (void)flowy;
-        }
+    virtual void handle_GET_LOITER_RAW(uint8_t & agl, uint8_t & flowx, uint8_t & flowy)
+    {
+        (void)agl;
+        (void)flowx;
+        (void)flowy;
+    }
 
     public:
 
-        MspMessage serialize_GET_ALTITUDE_METERS_Request()
-        {
-            MspMessage msg;
+    MspMessage serialize_GET_ALTITUDE_METERS_Request()
+    {
+        MspMessage msg;
 
-            msg._bytes[0] = 36;
-            msg._bytes[1] = 77;
-            msg._bytes[2] = 60;
-            msg._bytes[3] = 0;
-            msg._bytes[4] = 123;
-            msg._bytes[5] = 123;
+        msg._bytes[0] = 36;
+        msg._bytes[1] = 77;
+        msg._bytes[2] = 60;
+        msg._bytes[3] = 0;
+        msg._bytes[4] = 123;
+        msg._bytes[5] = 123;
 
-            msg._len = 6;
+        msg._len = 6;
 
-            return msg;
-        }
+        return msg;
+    }
 
-        MspMessage serialize_GET_ALTITUDE_METERS(float  estalt, float  vario)
-        {
-            MspMessage msg;
+    MspMessage serialize_GET_ALTITUDE_METERS(float  estalt, float  vario)
+    {
+        MspMessage msg;
 
-            msg._bytes[0] = 36;
-            msg._bytes[1] = 77;
-            msg._bytes[2] = 62;
-            msg._bytes[3] = 8;
-            msg._bytes[4] = 123;
+        msg._bytes[0] = 36;
+        msg._bytes[1] = 77;
+        msg._bytes[2] = 62;
+        msg._bytes[3] = 8;
+        msg._bytes[4] = 123;
 
-            memcpy(&msg._bytes[5], &estalt, sizeof(float));
-            memcpy(&msg._bytes[9], &vario, sizeof(float));
+        memcpy(&msg._bytes[5], &estalt, sizeof(float));
+        memcpy(&msg._bytes[9], &vario, sizeof(float));
 
-            msg._bytes[13] = CRC8(&msg._bytes[3], 10);
+        msg._bytes[13] = CRC8(&msg._bytes[3], 10);
 
-            msg._len = 14;
+        msg._len = 14;
 
-            return msg;
-        }
+        return msg;
+    }
 
-        MspMessage serialize_SET_ARMED(uint8_t  flag)
-        {
-            MspMessage msg;
+    MspMessage serialize_SET_ARMED(uint8_t  flag)
+    {
+        MspMessage msg;
 
-            msg._bytes[0] = 36;
-            msg._bytes[1] = 77;
-            msg._bytes[2] = 62;
-            msg._bytes[3] = 1;
-            msg._bytes[4] = 216;
+        msg._bytes[0] = 36;
+        msg._bytes[1] = 77;
+        msg._bytes[2] = 62;
+        msg._bytes[3] = 1;
+        msg._bytes[4] = 216;
 
-            memcpy(&msg._bytes[5], &flag, sizeof(uint8_t));
+        memcpy(&msg._bytes[5], &flag, sizeof(uint8_t));
 
-            msg._bytes[6] = CRC8(&msg._bytes[3], 3);
+        msg._bytes[6] = CRC8(&msg._bytes[3], 3);
 
-            msg._len = 7;
+        msg._len = 7;
 
-            return msg;
-        }
+        return msg;
+    }
 
-        MspMessage serialize_GET_RC_NORMAL_Request()
-        {
-            MspMessage msg;
+    MspMessage serialize_GET_RC_NORMAL_Request()
+    {
+        MspMessage msg;
 
-            msg._bytes[0] = 36;
-            msg._bytes[1] = 77;
-            msg._bytes[2] = 60;
-            msg._bytes[3] = 0;
-            msg._bytes[4] = 121;
-            msg._bytes[5] = 121;
+        msg._bytes[0] = 36;
+        msg._bytes[1] = 77;
+        msg._bytes[2] = 60;
+        msg._bytes[3] = 0;
+        msg._bytes[4] = 121;
+        msg._bytes[5] = 121;
 
-            msg._len = 6;
+        msg._len = 6;
 
-            return msg;
-        }
+        return msg;
+    }
 
-        MspMessage serialize_GET_RC_NORMAL(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
-        {
-            MspMessage msg;
+    MspMessage serialize_GET_RC_NORMAL(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
+    {
+        MspMessage msg;
 
-            msg._bytes[0] = 36;
-            msg._bytes[1] = 77;
-            msg._bytes[2] = 62;
-            msg._bytes[3] = 24;
-            msg._bytes[4] = 121;
+        msg._bytes[0] = 36;
+        msg._bytes[1] = 77;
+        msg._bytes[2] = 62;
+        msg._bytes[3] = 24;
+        msg._bytes[4] = 121;
 
-            memcpy(&msg._bytes[5], &c1, sizeof(float));
-            memcpy(&msg._bytes[9], &c2, sizeof(float));
-            memcpy(&msg._bytes[13], &c3, sizeof(float));
-            memcpy(&msg._bytes[17], &c4, sizeof(float));
-            memcpy(&msg._bytes[21], &c5, sizeof(float));
-            memcpy(&msg._bytes[25], &c6, sizeof(float));
+        memcpy(&msg._bytes[5], &c1, sizeof(float));
+        memcpy(&msg._bytes[9], &c2, sizeof(float));
+        memcpy(&msg._bytes[13], &c3, sizeof(float));
+        memcpy(&msg._bytes[17], &c4, sizeof(float));
+        memcpy(&msg._bytes[21], &c5, sizeof(float));
+        memcpy(&msg._bytes[25], &c6, sizeof(float));
 
-            msg._bytes[29] = CRC8(&msg._bytes[3], 26);
+        msg._bytes[29] = CRC8(&msg._bytes[3], 26);
 
-            msg._len = 30;
+        msg._len = 30;
 
-            return msg;
-        }
+        return msg;
+    }
 
-        MspMessage serialize_GET_ATTITUDE_RADIANS_Request()
-        {
-            MspMessage msg;
+    MspMessage serialize_GET_ATTITUDE_RADIANS_Request()
+    {
+        MspMessage msg;
 
-            msg._bytes[0] = 36;
-            msg._bytes[1] = 77;
-            msg._bytes[2] = 60;
-            msg._bytes[3] = 0;
-            msg._bytes[4] = 122;
-            msg._bytes[5] = 122;
+        msg._bytes[0] = 36;
+        msg._bytes[1] = 77;
+        msg._bytes[2] = 60;
+        msg._bytes[3] = 0;
+        msg._bytes[4] = 122;
+        msg._bytes[5] = 122;
 
-            msg._len = 6;
+        msg._len = 6;
 
-            return msg;
-        }
+        return msg;
+    }
 
-        MspMessage serialize_GET_ATTITUDE_RADIANS(float  roll, float  pitch, float  yaw)
-        {
-            MspMessage msg;
+    MspMessage serialize_GET_ATTITUDE_RADIANS(float  roll, float  pitch, float  yaw)
+    {
+        MspMessage msg;
 
-            msg._bytes[0] = 36;
-            msg._bytes[1] = 77;
-            msg._bytes[2] = 62;
-            msg._bytes[3] = 12;
-            msg._bytes[4] = 122;
+        msg._bytes[0] = 36;
+        msg._bytes[1] = 77;
+        msg._bytes[2] = 62;
+        msg._bytes[3] = 12;
+        msg._bytes[4] = 122;
 
-            memcpy(&msg._bytes[5], &roll, sizeof(float));
-            memcpy(&msg._bytes[9], &pitch, sizeof(float));
-            memcpy(&msg._bytes[13], &yaw, sizeof(float));
+        memcpy(&msg._bytes[5], &roll, sizeof(float));
+        memcpy(&msg._bytes[9], &pitch, sizeof(float));
+        memcpy(&msg._bytes[13], &yaw, sizeof(float));
 
-            msg._bytes[17] = CRC8(&msg._bytes[3], 14);
+        msg._bytes[17] = CRC8(&msg._bytes[3], 14);
 
-            msg._len = 18;
+        msg._len = 18;
 
-            return msg;
-        }
+        return msg;
+    }
 
-        MspMessage serialize_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4)
-        {
-            MspMessage msg;
+    MspMessage serialize_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4)
+    {
+        MspMessage msg;
 
-            msg._bytes[0] = 36;
-            msg._bytes[1] = 77;
-            msg._bytes[2] = 62;
-            msg._bytes[3] = 16;
-            msg._bytes[4] = 215;
+        msg._bytes[0] = 36;
+        msg._bytes[1] = 77;
+        msg._bytes[2] = 62;
+        msg._bytes[3] = 16;
+        msg._bytes[4] = 215;
 
-            memcpy(&msg._bytes[5], &m1, sizeof(float));
-            memcpy(&msg._bytes[9], &m2, sizeof(float));
-            memcpy(&msg._bytes[13], &m3, sizeof(float));
-            memcpy(&msg._bytes[17], &m4, sizeof(float));
+        memcpy(&msg._bytes[5], &m1, sizeof(float));
+        memcpy(&msg._bytes[9], &m2, sizeof(float));
+        memcpy(&msg._bytes[13], &m3, sizeof(float));
+        memcpy(&msg._bytes[17], &m4, sizeof(float));
 
-            msg._bytes[21] = CRC8(&msg._bytes[3], 18);
+        msg._bytes[21] = CRC8(&msg._bytes[3], 18);
 
-            msg._len = 22;
+        msg._len = 22;
 
-            return msg;
-        }
+        return msg;
+    }
 
-        MspMessage serialize_GET_LOITER_RAW_Request()
-        {
-            MspMessage msg;
+    MspMessage serialize_GET_LOITER_RAW_Request()
+    {
+        MspMessage msg;
 
-            msg._bytes[0] = 36;
-            msg._bytes[1] = 77;
-            msg._bytes[2] = 60;
-            msg._bytes[3] = 0;
-            msg._bytes[4] = 126;
-            msg._bytes[5] = 126;
+        msg._bytes[0] = 36;
+        msg._bytes[1] = 77;
+        msg._bytes[2] = 60;
+        msg._bytes[3] = 0;
+        msg._bytes[4] = 126;
+        msg._bytes[5] = 126;
 
-            msg._len = 6;
+        msg._len = 6;
 
-            return msg;
-        }
+        return msg;
+    }
 
-        MspMessage serialize_GET_LOITER_RAW(uint8_t  agl, uint8_t  flowx, uint8_t  flowy)
-        {
-            MspMessage msg;
+    MspMessage serialize_GET_LOITER_RAW(uint8_t  agl, uint8_t  flowx, uint8_t  flowy)
+    {
+        MspMessage msg;
 
-            msg._bytes[0] = 36;
-            msg._bytes[1] = 77;
-            msg._bytes[2] = 62;
-            msg._bytes[3] = 3;
-            msg._bytes[4] = 126;
+        msg._bytes[0] = 36;
+        msg._bytes[1] = 77;
+        msg._bytes[2] = 62;
+        msg._bytes[3] = 3;
+        msg._bytes[4] = 126;
 
-            memcpy(&msg._bytes[5], &agl, sizeof(uint8_t));
-            memcpy(&msg._bytes[6], &flowx, sizeof(uint8_t));
-            memcpy(&msg._bytes[7], &flowy, sizeof(uint8_t));
+        memcpy(&msg._bytes[5], &agl, sizeof(uint8_t));
+        memcpy(&msg._bytes[6], &flowx, sizeof(uint8_t));
+        memcpy(&msg._bytes[7], &flowy, sizeof(uint8_t));
 
-            msg._bytes[8] = CRC8(&msg._bytes[3], 5);
+        msg._bytes[8] = CRC8(&msg._bytes[3], 5);
 
-            msg._len = 9;
+        msg._len = 9;
 
-            return msg;
-        }
+        return msg;
+    }
 
 };
 

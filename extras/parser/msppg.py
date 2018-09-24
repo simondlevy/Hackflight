@@ -395,7 +395,8 @@ class HPP_Emitter(CodeEmitter):
             argnames = self._getargnames(msgstuff)
             argtypes = self._getargtypes(msgstuff)
 
-            self.output.write(3*self.indent + ('case %s: {\n\n' % msgdict[msgtype][0]))
+            self.output.write(3*self.indent + ('case %s:\n' % msgdict[msgtype][0]))
+            self.output.write(3*self.indent + '{\n')
             nargs = len(argnames)
             offset = 0
             for k in range(nargs):

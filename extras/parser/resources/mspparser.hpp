@@ -153,8 +153,6 @@ class MspParser {
         headSerialResponse(0, s);
     }
 
-    protected:
-
     void sendFloats(float * src, uint8_t count)
     {
         _outBufSize = 0;
@@ -169,33 +167,7 @@ class MspParser {
         }
     }
 
-    void receiveFloats(float * dst, uint8_t count)
-    {
-        for (uint8_t k=0; k<count; ++k) {
-            dst[k] = readFloat();
-        }
-        headSerialReply(0);
-    }
-
-    bool readBool(void)
-    {
-        bool retval = (bool)read8();
-        headSerialReply(0);
-        return retval;
-    }
-
-    float readFloat(void)
-    {
-        float f = 0;
-        uint32_t t = read32();
-        memcpy(&f, &t, 4);
-        return f;
-    }
-
-    void error(void)
-    {
-        headSerialResponse(1, 0);
-    }
+    protected:
 
     void init(void)
     {
