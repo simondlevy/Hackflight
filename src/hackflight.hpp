@@ -24,7 +24,7 @@
 
 #include "sensor.hpp"
 #include "board.hpp"
-#include "mspdispatcher.hpp"
+#include "mspparser.hpp"
 #include "mixer.hpp"
 #include "receiver.hpp"
 #include "debug.hpp"
@@ -37,7 +37,7 @@
 
 namespace hf {
 
-    class Hackflight : public MspDispatcher {
+    class Hackflight : public MspParser {
 
         private: 
 
@@ -237,14 +237,9 @@ namespace hf {
 
         protected:
 
-            virtual void dispatch_SET_MOTOR_NORMAL() override
+            virtual void handle_SET_ARMED(uint8_t  flag)
             {
-                MspParser::receiveFloats(_mixer->motorsDisarmed, _mixer->nmotors);
-            }
-
-            virtual void dispatch_SET_ARMED() override
-            {
-                if (MspParser::readBool()) {  // got arming command: arm only if throttle is down
+                if (flag) {  // got arming command: arm only if throttle is down
                     if (_receiver->throttleIsDown()) {
                         _state.armed = true;
                     }
@@ -254,23 +249,29 @@ namespace hf {
                 }
             }
 
-            virtual void dispatch_GET_RC_NORMAL() override
+            virtual void handle_GET_RC_NORMAL(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
             {
-                float rawvals[6];
-                for (uint8_t k=0; k<6; ++k) {
-                    rawvals[k] = _receiver->getRawval(k);
-                }
-                MspParser::sendFloats(rawvals, 6);
+                c1 = _receiver->getRawval(0);
+                c2 = _receiver->getRawval(1);
+                c3 = _receiver->getRawval(2);
+                c4 = _receiver->getRawval(3);
+                c5 = _receiver->getRawval(4);
+                c6 = _receiver->getRawval(5);
             }
 
-            virtual void dispatch_GET_ATTITUDE_RADIANS() override
+            virtual void handle_GET_ATTITUDE_RADIANS(float & roll, float & pitch, float & yaw) override
             {
-                MspParser::sendFloats(_state.eulerAngles, 3);
+                roll  = _state.eulerAngles[0];
+                pitch = _state.eulerAngles[1];
+                yaw   = _state.eulerAngles[2];
             }
 
-            virtual void dispatch_GET_ALTITUDE_METERS() override
+            virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
             {
-                MspParser::sendFloats(&_state.altitude, 2);
+                _mixer->motorsDisarmed[0] = m1;
+                _mixer->motorsDisarmed[1] = m2;
+                _mixer->motorsDisarmed[2] = m3;
+                _mixer->motorsDisarmed[3] = m4;
             }
 
         public:
