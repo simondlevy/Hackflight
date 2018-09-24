@@ -441,6 +441,11 @@ class HPP_Emitter(CodeEmitter):
                 self.output.write(4*self.indent + '(void)%s;\n' % argname)
             self.output.write(3*self.indent + '}\n\n')
 
+        self.output.write(self.indent + '}; // class MspParser\n\n')
+        self.output.write('} // namespace hf\n')
+        self.output.close()
+
+        '''
         # Add message-serialization declarations to header
 
         self.output.write(2*self.indent + 'public:\n\n')
@@ -496,11 +501,8 @@ class HPP_Emitter(CodeEmitter):
             self.output.write(4*self.indent + 'msg._len = %d;\n\n' % (msgsize+6))
             self.output.write(4*self.indent + 'return msg;\n')
             self.output.write(3*self.indent + '}\n\n')
+        '''
  
-        self.output.write(self.indent + '}; // class MspParser\n\n')
-        self.output.write('} // namespace hf\n')
-        self.output.close()
-
  
 # C emitter ===============================================================================
 

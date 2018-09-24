@@ -28,39 +28,6 @@
 
 namespace hf {
 
-    class MspMessage {
-
-        friend class MspParser;
-
-        protected:
-
-        static const int MAXBUF = 256;
-
-        uint8_t _bytes[MAXBUF];
-        int _pos;
-        int _len;
-
-        public:
-
-        uint8_t start(void) 
-        {
-            _pos = 0;
-            return getNext();
-        }
-
-        bool hasNext(void) 
-        {
-            return _pos <= _len;
-        }
-
-
-        uint8_t getNext(void) 
-        {
-            return _bytes[_pos++];
-        }
-
-    };
-
     class MspParser {
 
         private:
