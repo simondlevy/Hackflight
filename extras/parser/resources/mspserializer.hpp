@@ -61,4 +61,5 @@ namespace hf {
 
     };
 
+    class MspSerializer {
 

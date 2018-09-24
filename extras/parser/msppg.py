@@ -445,7 +445,12 @@ class HPP_Emitter(CodeEmitter):
         self.output.write('} // namespace hf\n')
         self.output.close()
 
-        '''
+        # Create C++ header file for MspSerializer
+        self._copyfile('mspserializer.hpp', 'mspserializer.hpp', '../../src')
+
+        # Open file for appending
+        self.output = open('../../src/mspserializer.hpp', 'a')
+
         # Add message-serialization declarations to header
 
         self.output.write(2*self.indent + 'public:\n\n')
@@ -501,8 +506,11 @@ class HPP_Emitter(CodeEmitter):
             self.output.write(4*self.indent + 'msg._len = %d;\n\n' % (msgsize+6))
             self.output.write(4*self.indent + 'return msg;\n')
             self.output.write(3*self.indent + '}\n\n')
-        '''
  
+        self.output.write(self.indent + '}; // class MspSerializer\n\n')
+        self.output.write('} // namespace hf\n')
+        self.output.close()
+
  
 # C emitter ===============================================================================
 
