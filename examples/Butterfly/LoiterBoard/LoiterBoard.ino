@@ -39,6 +39,8 @@ static const uint8_t GND_PIN = A1;
 
 static const uint8_t CS_PIN  = 10;
 
+static const uint8_t LED_PIN = 13;
+
 static VL53L1X distanceSensor;
 
 static PMW3901 flowSensor(CS_PIN);
@@ -65,20 +67,22 @@ void setup(void)
     powerPin(GND_PIN, LOW);
     powerPin(VCC_PIN, HIGH);
 
-    // Debugging
+    // Start I^2C bus
+    Wire.begin(TWI_PINS_6_7);
+    delay(100); // Wait a bit for bus to start
+
+    // Start serial comms for debugging
     Serial.begin(115200);
 
-    delay(200);
+    // Start output to flight controller
+    Serial1.begin(115200);
 
-    Wire.begin(TWI_PINS_6_7);
-
-    // Output to flight controller
-    //Serial1.begin(115200);
-
+    // Start VL53L1X distance sensor
     if (!distanceSensor.begin()) {
         error("VL53L1X");
     }
 
+    // Start PMW3901 optical-flow sensor
     if (!flowSensor.begin()) {
         error("PMW3901");
     }
@@ -103,16 +107,12 @@ void loop(void)
         _time = time;
     }
 
-    Serial.print("Distance: ");
-    Serial.print(distance);
-    Serial.print(" mm; Flow: ");
-    Serial.print(flowx);
-    Serial.print(" ");
-    Serial.println(flowy);
+    // Serialize a message to send to flight controller
+    uint8_t msgbytes[hf::MspSerializer::MAXLEN];
+    uint8_t msglen = hf::MspSerializer::serialize_GET_LOITER(msgbytes, (float)distance, (float)flowx, (float)flowy);
 
-    /*
-    static uint8_t c;
-    Serial1.write(c);
-    c = (c+1) % 0xFF;
-    */
+    // Send the message
+    for (uint8_t k=0; k<msglen; ++k) {
+        Serial1.write(msgbytes[k]);
+    }
 }
