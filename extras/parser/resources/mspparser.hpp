@@ -56,18 +56,6 @@ namespace hf {
 
             serialState_t  _state;
 
-            static uint8_t CRC8(uint8_t * data, int n) 
-            {
-                uint8_t crc = 0x00;
-
-                for (int k=0; k<n; ++k) {
-
-                    crc ^= data[k];
-                }
-
-                return crc;
-            }
-
             void serialize8(uint8_t a)
             {
                 _outBuf[_outBufSize++] = a;

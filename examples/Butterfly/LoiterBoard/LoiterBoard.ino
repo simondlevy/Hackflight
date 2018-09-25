@@ -1,6 +1,6 @@
 /*
    LoiterBoard.ino : Sketch allowing Butterfly breakout board to provide
-   optical flow and above-ground-level messages to a flight controller
+   optical flow and Above-Ground-Level messages to a flight controller
 
    Additional libraries required:
 
@@ -29,6 +29,8 @@
 
 #include <VL53L1X.h>
 #include <PMW3901.h>
+
+#include <mspserializer.hpp>
 
 static uint16_t FLOW_UPDATE_HZ = 20;
 
