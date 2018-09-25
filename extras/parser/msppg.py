@@ -479,7 +479,6 @@ class HPP_Emitter(CodeEmitter):
             self.output.write(3*self.indent + 'static uint8_t serialize_%s' % msgtype)
             self._write_params(self.output, argtypes, argnames, '(uint8_t bytes[], ')
             self.output.write('\n' + 3*self.indent + '{\n')
-            self.output.write(4*self.indent + 'MspMessage msg;\n\n')
             msgsize = self._msgsize(argtypes)
             self.output.write(4*self.indent + 'bytes[0] = 36;\n')
             self.output.write(4*self.indent + 'bytes[1] = 77;\n')

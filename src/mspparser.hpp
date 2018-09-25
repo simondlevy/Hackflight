@@ -210,12 +210,14 @@ namespace hf {
             {
                 switch (_command) {
 
-                    case 216:
+                    case 123:
                     {
-                        uint8_t flag = 0;
-                        memcpy(&flag,  &_inBuf[0], sizeof(uint8_t));
-
-                        handle_SET_ARMED(flag);
+                        float estalt = 0;
+                        float vario = 0;
+                        handle_GET_ALTITUDE_METERS(estalt, vario);
+                        prepareToSendFloats(2);
+                        sendFloat(estalt);
+                        sendFloat(vario);
                         } break;
 
                     case 126:
@@ -228,6 +230,43 @@ namespace hf {
                         sendFloat(agl);
                         sendFloat(flowx);
                         sendFloat(flowy);
+                        } break;
+
+                    case 215:
+                    {
+                        float m1 = 0;
+                        memcpy(&m1,  &_inBuf[0], sizeof(float));
+
+                        float m2 = 0;
+                        memcpy(&m2,  &_inBuf[4], sizeof(float));
+
+                        float m3 = 0;
+                        memcpy(&m3,  &_inBuf[8], sizeof(float));
+
+                        float m4 = 0;
+                        memcpy(&m4,  &_inBuf[12], sizeof(float));
+
+                        handle_SET_MOTOR_NORMAL(m1, m2, m3, m4);
+                        } break;
+
+                    case 216:
+                    {
+                        uint8_t flag = 0;
+                        memcpy(&flag,  &_inBuf[0], sizeof(uint8_t));
+
+                        handle_SET_ARMED(flag);
+                        } break;
+
+                    case 122:
+                    {
+                        float roll = 0;
+                        float pitch = 0;
+                        float yaw = 0;
+                        handle_GET_ATTITUDE_RADIANS(roll, pitch, yaw);
+                        prepareToSendFloats(3);
+                        sendFloat(roll);
+                        sendFloat(pitch);
+                        sendFloat(yaw);
                         } break;
 
                     case 121:
@@ -248,53 +287,15 @@ namespace hf {
                         sendFloat(c6);
                         } break;
 
-                    case 215:
-                    {
-                        float m1 = 0;
-                        memcpy(&m1,  &_inBuf[0], sizeof(float));
-
-                        float m2 = 0;
-                        memcpy(&m2,  &_inBuf[4], sizeof(float));
-
-                        float m3 = 0;
-                        memcpy(&m3,  &_inBuf[8], sizeof(float));
-
-                        float m4 = 0;
-                        memcpy(&m4,  &_inBuf[12], sizeof(float));
-
-                        handle_SET_MOTOR_NORMAL(m1, m2, m3, m4);
-                        } break;
-
-                    case 123:
-                    {
-                        float estalt = 0;
-                        float vario = 0;
-                        handle_GET_ALTITUDE_METERS(estalt, vario);
-                        prepareToSendFloats(2);
-                        sendFloat(estalt);
-                        sendFloat(vario);
-                        } break;
-
-                    case 122:
-                    {
-                        float roll = 0;
-                        float pitch = 0;
-                        float yaw = 0;
-                        handle_GET_ATTITUDE_RADIANS(roll, pitch, yaw);
-                        prepareToSendFloats(3);
-                        sendFloat(roll);
-                        sendFloat(pitch);
-                        sendFloat(yaw);
-                        } break;
-
                 }
             }
 
         protected:
 
-            virtual void handle_SET_ARMED(uint8_t  flag)
+            virtual void handle_GET_ALTITUDE_METERS(float & estalt, float & vario)
             {
-                (void)flag;
+                (void)estalt;
+                (void)vario;
             }
 
             virtual void handle_GET_LOITER(float & agl, float & flowx, float & flowy)
@@ -302,16 +303,6 @@ namespace hf {
                 (void)agl;
                 (void)flowx;
                 (void)flowy;
-            }
-
-            virtual void handle_GET_RC_NORMAL(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
-            {
-                (void)c1;
-                (void)c2;
-                (void)c3;
-                (void)c4;
-                (void)c5;
-                (void)c6;
             }
 
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4)
@@ -322,10 +313,9 @@ namespace hf {
                 (void)m4;
             }
 
-            virtual void handle_GET_ALTITUDE_METERS(float & estalt, float & vario)
+            virtual void handle_SET_ARMED(uint8_t  flag)
             {
-                (void)estalt;
-                (void)vario;
+                (void)flag;
             }
 
             virtual void handle_GET_ATTITUDE_RADIANS(float & roll, float & pitch, float & yaw)
@@ -333,6 +323,16 @@ namespace hf {
                 (void)roll;
                 (void)pitch;
                 (void)yaw;
+            }
+
+            virtual void handle_GET_RC_NORMAL(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
+            {
+                (void)c1;
+                (void)c2;
+                (void)c3;
+                (void)c4;
+                (void)c5;
+                (void)c6;
             }
 
     }; // class MspParser

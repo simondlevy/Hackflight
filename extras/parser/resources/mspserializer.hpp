@@ -46,5 +46,5 @@ namespace hf {
 
         public:
 
-            static const uint8_t MAXLEN = 256;
+            static const uint8_t MAXLEN = 255;
 
