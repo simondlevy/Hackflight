@@ -30,7 +30,7 @@
 #include <VL53L1X.h>
 #include <PMW3901.h>
 
-#include "LoiterBoardSerializer.hpp"
+#include "mspserializer.hpp"
 
 static uint16_t FLOW_UPDATE_HZ = 20;
 

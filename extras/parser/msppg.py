@@ -75,9 +75,8 @@ class CodeEmitter(object):
         return [(argname,argtype) for (argname,argtype) in 
                 zip(message[1], message[2]) if argname.lower()!='comment']
 
-    def _write_params(self, outfile, argtypes, argnames, prefix = '', ampersand=''):
+    def _write_params(self, outfile, argtypes, argnames, prefix = '(', ampersand=''):
 
-        outfile.write('(')
         outfile.write(prefix)
         for argtype,argname in zip(argtypes, argnames):
             outfile.write(self.type2decl[argtype] + ' ' +  ampersand + ' ' + argname)
@@ -453,8 +452,6 @@ class HPP_Emitter(CodeEmitter):
 
         # Add message-serialization declarations to header
 
-        self.output.write(2*self.indent + 'public:\n\n')
-        
         for msgtype in msgdict.keys():
 
             msgstuff = msgdict[msgtype]
@@ -467,30 +464,28 @@ class HPP_Emitter(CodeEmitter):
             if msgid < 200:
 
                 # Write request method
-                self.output.write(3*self.indent + 'MspMessage serialize_%s_Request()\n' % msgtype)
+                self.output.write(3*self.indent + 'static uint8_t serialize_%s_Request(uint8_t bytes[])\n' % msgtype)
                 self.output.write(3*self.indent + '{\n')
-                self.output.write(4*self.indent + 'MspMessage msg;\n\n')
-                self.output.write(4*self.indent + 'msg._bytes[0] = 36;\n')
-                self.output.write(4*self.indent + 'msg._bytes[1] = 77;\n')
-                self.output.write(4*self.indent + 'msg._bytes[2] = %d;\n' % 60 if msgid < 200 else 62)
-                self.output.write(4*self.indent + 'msg._bytes[3] = 0;\n')
-                self.output.write(4*self.indent + 'msg._bytes[4] = %d;\n' % msgid)
-                self.output.write(4*self.indent + 'msg._bytes[5] = %d;\n\n' % msgid)
-                self.output.write(4*self.indent + 'msg._len = 6;\n\n')
-                self.output.write(4*self.indent + 'return msg;\n')
+                self.output.write(4*self.indent + 'bytes[0] = 36;\n')
+                self.output.write(4*self.indent + 'bytes[1] = 77;\n')
+                self.output.write(4*self.indent + 'bytes[2] = %d;\n' % 60 if msgid < 200 else 62)
+                self.output.write(4*self.indent + 'bytes[3] = 0;\n')
+                self.output.write(4*self.indent + 'bytes[4] = %d;\n' % msgid)
+                self.output.write(4*self.indent + 'bytes[5] = %d;\n\n' % msgid)
+                self.output.write(4*self.indent + 'return 6;\n')
                 self.output.write(3*self.indent + '}\n\n')
 
             # Add parser method for serializing message
-            self.output.write(3*self.indent + 'MspMessage serialize_%s' % msgtype)
-            self._write_params(self.output, argtypes, argnames)
+            self.output.write(3*self.indent + 'static uint8_t serialize_%s' % msgtype)
+            self._write_params(self.output, argtypes, argnames, '(uint8_t bytes[], ')
             self.output.write('\n' + 3*self.indent + '{\n')
             self.output.write(4*self.indent + 'MspMessage msg;\n\n')
             msgsize = self._msgsize(argtypes)
-            self.output.write(4*self.indent + 'msg._bytes[0] = 36;\n')
-            self.output.write(4*self.indent + 'msg._bytes[1] = 77;\n')
-            self.output.write(4*self.indent + 'msg._bytes[2] = 62;\n')
-            self.output.write(4*self.indent + 'msg._bytes[3] = %d;\n' % msgsize)
-            self.output.write(4*self.indent + 'msg._bytes[4] = %d;\n\n' % msgid)
+            self.output.write(4*self.indent + 'bytes[0] = 36;\n')
+            self.output.write(4*self.indent + 'bytes[1] = 77;\n')
+            self.output.write(4*self.indent + 'bytes[2] = 62;\n')
+            self.output.write(4*self.indent + 'bytes[3] = %d;\n' % msgsize)
+            self.output.write(4*self.indent + 'bytes[4] = %d;\n\n' % msgid)
             nargs = len(argnames)
             offset = 5
             for k in range(nargs):
@@ -498,13 +493,12 @@ class HPP_Emitter(CodeEmitter):
                 argtype = argtypes[k]
                 decl = self.type2decl[argtype]
                 self.output.write(4*self.indent + 
-                        'memcpy(&msg._bytes[%d], &%s, sizeof(%s));\n' %  (offset, argname, decl))
+                        'memcpy(&bytes[%d], &%s, sizeof(%s));\n' %  (offset, argname, decl))
                 offset += self.type2size[argtype]
             self.output.write('\n')
             self.output.write(4*self.indent + 
-                    'msg._bytes[%d] = CRC8(&msg._bytes[3], %d);\n\n' % (msgsize+5, msgsize+2))
-            self.output.write(4*self.indent + 'msg._len = %d;\n\n' % (msgsize+6))
-            self.output.write(4*self.indent + 'return msg;\n')
+                    'bytes[%d] = CRC8(&bytes[3], %d);\n\n' % (msgsize+5, msgsize+2))
+            self.output.write(4*self.indent + 'return %d;\n'% (msgsize+6))
             self.output.write(3*self.indent + '}\n\n')
  
         self.output.write(self.indent + '}; // class MspSerializer\n\n')

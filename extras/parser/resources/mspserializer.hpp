@@ -28,39 +28,6 @@
 
 namespace hf {
 
-    class MspMessage {
-
-        friend class MspSerializer;
-
-        protected:
-
-        static const int MAXBUF = 256;
-
-        uint8_t _bytes[MAXBUF];
-        int _pos;
-        int _len;
-
-        public:
-
-        uint8_t start(void) 
-        {
-            _pos = 0;
-            return getNext();
-        }
-
-        bool hasNext(void) 
-        {
-            return _pos <= _len;
-        }
-
-
-        uint8_t getNext(void) 
-        {
-            return _bytes[_pos++];
-        }
-
-    };
-
     class MspSerializer {
 
         private:
@@ -77,4 +44,7 @@ namespace hf {
                 return crc;
             }
 
+        public:
+
+            static const uint8_t MAXLEN = 256;
 

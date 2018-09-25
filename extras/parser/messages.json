@@ -20,11 +20,11 @@
    {"estalt"  : "float"}, 
    {"vario"   : "float"}],  
 
-  "GET_LOITER_RAW": 
+  "GET_LOITER": 
   [{"ID": 126},
-   {"agl"   : "byte"}, 
-   {"flowx" : "byte"},
-   {"flowy" : "byte"}],  
+   {"agl"   : "float"}, 
+   {"flowx" : "float"},
+   {"flowy" : "float"}],  
 
   "SET_MOTOR_NORMAL": 
   [{"ID": 215},
