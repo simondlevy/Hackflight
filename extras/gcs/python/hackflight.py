@@ -130,8 +130,8 @@ class GCS:
         self.parser = msppg.MSP_Parser()
 
         # Set up parser's request strings
-        self.attitude_request = msppg.serialize_GET_ATTITUDE_RADIANS_Request()
-        self.rc_request = msppg.serialize_GET_RC_NORMAL_Request()
+        self.attitude_request = msppg.serialize_ATTITUDE_RADIANS_Request()
+        self.rc_request = msppg.serialize_RC_NORMAL_Request()
 
         # No messages yet
         self.roll_pitch_yaw = [0]*3
@@ -204,17 +204,17 @@ class GCS:
         #self.messages.stop()
         #self.maps.stop()
 
-        self.parser.set_GET_ATTITUDE_RADIANS_Handler(self._handle_attitude)
+        self.parser.set_ATTITUDE_RADIANS_Handler(self._handle_attitude)
         self._send_attitude_request()
         self.imu.start()
 
     def _start(self):
 
-        self.parser.set_GET_ATTITUDE_RADIANS_Handler(self._handle_attitude)
+        self.parser.set_ATTITUDE_RADIANS_Handler(self._handle_attitude)
         self._send_attitude_request()
         self.imu.start()
 
-        self.parser.set_GET_RC_NORMAL_Handler(self._handle_rc)
+        self.parser.set_RC_NORMAL_Handler(self._handle_rc)
 
         self.gotimu = False
         self.hide(self.error_label)

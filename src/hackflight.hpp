@@ -249,7 +249,7 @@ namespace hf {
                 }
             }
 
-            virtual void handle_GET_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
+            virtual void handle_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
             {
                 c1 = _receiver->getRawval(0);
                 c2 = _receiver->getRawval(1);
@@ -259,7 +259,7 @@ namespace hf {
                 c6 = _receiver->getRawval(5);
             }
 
-            virtual void handle_GET_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
+            virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
             {
                 roll  = _state.eulerAngles[0];
                 pitch = _state.eulerAngles[1];

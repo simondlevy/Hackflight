@@ -61,6 +61,43 @@ static void error(const char * sensorName)
     }
 }
 
+class LoiterRequestParser : public hf::MspParser {
+
+    private:
+        
+        float _agl;
+        float _flowx;
+        float _flowy;
+
+    public:
+
+        void init(void) 
+        {
+            hf::MspParser::init();
+        }
+
+        void update(uint8_t c)
+        {
+            hf::MspParser::update(c);
+        }
+
+        void set(float agl, float flowx, float flowy)
+        {
+            _agl = agl;
+            _flowx = flowx;
+            _flowy = flowy;
+        }
+
+        virtual void handle_LOITER_Request(float & agl, float & flowx, float & flowy) override
+        {
+            agl = _agl;
+            flowx = _flowx;
+            flowy = _flowy;
+        }
+ };
+
+static LoiterRequestParser parser;
+
 void setup(void)
 {
     // Use digital pins for VL53L1 power, ground
@@ -86,17 +123,20 @@ void setup(void)
     if (!flowSensor.begin()) {
         error("PMW3901");
     }
+
+    // Start MSP parser to listen for loiter data requests
+    parser.init();
 }
 
 void loop(void)
 {
     // Declare measurement variables static so they'll persist between calls to loop()
-    static uint16_t distance;
+    static uint16_t agl;
     static int16_t flowx, flowy;
 
     // Read distance sensor when its data is available
     if (distanceSensor.newDataReady()) {
-        distance = distanceSensor.getDistance(); //Get the result of the measurement from the sensor
+        agl = distanceSensor.getDistance(); //Get the result of the measurement from the sensor
     }
 
     // Read flow sensor periodically
@@ -107,12 +147,6 @@ void loop(void)
         _time = time;
     }
 
-    // Serialize a message to send to flight controller
-    uint8_t msgbytes[hf::MspParser::MAXMSG];
-    uint8_t msglen = hf::MspParser::serialize_GET_LOITER(msgbytes, (float)distance, (float)flowx, (float)flowy);
-
-    // Send the message
-    for (uint8_t k=0; k<msglen; ++k) {
-        Serial1.write(msgbytes[k]);
-    }
+    // Set current AGL, flow in parser
+    parser.set(agl, flowx, flowy);
 }
