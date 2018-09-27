@@ -1,5 +1,5 @@
 # MSPPG
-Multiwii Serial Protocol Parser Generator for Python, Java, and C++, and C.
+Multiwii Serial Protocol Parser Generator for Python, Java, and C++
 
 <b>Setup</b>
 
@@ -15,7 +15,7 @@ in Unix (Linux, OS X).
 
 <b>Testing</b>
 
-Once the package is installed, you can put your example.json file anywhere and run the following:
+Once the package is installed, you can put your messages.json file anywhere and run the following:
 
 % msppg.py
 
@@ -39,7 +39,7 @@ to build the msppg.jar file, which can then be used as a library for Android pro
 
 <b>Extending</b>
 
-The msp-example.json file currently contains just a few message specifications,
+The messages.json file currently contains just a few message specifications,
 but you can easily add to it by specifying additional messages from the the MSP
 [standard](http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol),
 or add some of your own new message types.  MSPPG currently supports types

@@ -211,158 +211,6 @@ class Python_Emitter(LocalCodeEmitter):
 
         self.output.write(s)
 
-# C++ emitter ============================================================================
-
-class CPP_Emitter(CompileableCodeEmitter):
-
-    type2decl = {'byte': 'uint8_t', 'short' : 'int16_t', 'float' : 'float', 'int' : 'int32_t'}
-
-    def __init__(self, msgdict):
-
-        CompileableCodeEmitter.__init__(self, 'cpp', 'cpp')
-
-        self.type2decl = CPP_Emitter.type2decl
-
-        # Create C++ example
-        self._copyfile('example.cpp', 'cpp/example.cpp')
-
-        self.coutput = _openw('output/cpp/MSPPG.cpp')
-        self.houtput = _openw('output/cpp/MSPPG.h')
-
-        self._hwrite(self._getsrc('top-cpp-h'))
- 
-        self._cwrite('\n' + self._getsrc('top-cpp'))
-
-        for msgtype in msgdict.keys():
-
-            msgstuff = msgdict[msgtype]
-            msgid = msgstuff[0]
-
-            argnames = self._getargnames(msgstuff)
-            argtypes = self._getargtypes(msgstuff)
-
-            self._hwrite(self.indent*2 + 'static MSP_Message serialize_%s' % msgtype)
-            self._write_params(self.houtput, argtypes, argnames)
-            self._hwrite(';\n\n')
-
-            # Write handler code for incoming messages
-            if msgid < 200:
-
-                self._cwrite(5*self.indent + ('case %s: {\n\n' % msgdict[msgtype][0]))
-                nargs = len(argnames)
-                offset = 0
-                for k in range(nargs):
-                    argname = argnames[k]
-                    argtype = argtypes[k]
-                    decl = self.type2decl[argtype]
-                    self._cwrite(6*self.indent + decl  + ' ' + argname + ';\n')
-                    self._cwrite(6*self.indent + 
-                            'memcpy(&%s,  &_message_buffer[%d], sizeof(%s));\n\n' % 
-                            (argname, offset, decl))
-                    offset += self.type2size[argtype]
-                self._cwrite(6*self.indent + 'handlerFor_%s->handle_%s(' % (msgtype, msgtype))
-                for k in range(nargs):
-                    self._cwrite(argnames[k])
-                    if k < nargs-1:
-                        self._cwrite(', ')
-                self._cwrite(');\n')
-                self._cwrite(6*self.indent + '} break;\n\n')
-                
-                self._hwrite(self.indent*2 + 'static MSP_Message serialize_%s_Request();\n\n' % msgtype)
-                self._hwrite(self.indent*2 + 
-                        'void set_%s_Handler(class %s_Handler * handler);\n\n' % (msgtype, msgtype))
-
-        self._hwrite(self.indent + 'private:\n\n')
-
-        for msgtype in msgdict.keys():
-
-            msgstuff = msgdict[msgtype]
-            msgid = msgstuff[0]
-            
-            if msgid < 200:
-                self._hwrite(2*self.indent + 
-                        'class %s_Handler * handlerFor_%s;\n\n' % (msgtype, msgtype));
-
-        self._hwrite('};\n');
-
-        self._cwrite(self._getsrc('bottom-cpp'))
- 
-        for msgtype in msgdict.keys():
-
-            msgstuff = msgdict[msgtype]
-            msgid = msgstuff[0]
-
-            argnames = self._getargnames(msgstuff)
-            argtypes = self._getargtypes(msgstuff)
-
-            # Incoming messages
-            if msgid < 200:
-
-                # Declare handler class
-                self._hwrite('\n\n' + 'class %s_Handler {\n' % msgtype)
-                self._hwrite('\n' + self.indent + 'public:\n\n')
-                self._hwrite(2*self.indent + '%s_Handler() {}\n\n' % msgtype)
-                self._hwrite(2*self.indent + 'virtual void handle_%s' % msgtype)
-                self._write_params(self.houtput, argtypes, argnames)
-                #self._hwrite('{ }\n\n')
-                self._hwrite('= 0;\n\n')
-                self._hwrite('};\n\n')
-                
-                # Write handler method
-                self._cwrite('void MSP_Parser::set_%s_Handler(class %s_Handler * handler) {\n\n' %
-                        (msgtype, msgtype))
-                self._cwrite(self.indent + 'handlerFor_%s = handler;\n' % msgtype)
-                self._cwrite('}\n\n')
-
-                # Write request method
-                self._cwrite('MSP_Message MSP_Parser::serialize_%s_Request() {\n\n' % msgtype)
-                self._cwrite(self.indent + 'MSP_Message msg;\n\n')
-                self._cwrite(self.indent + 'msg._bytes[0] = 36;\n')
-                self._cwrite(self.indent + 'msg._bytes[1] = 77;\n')
-                self._cwrite(self.indent + 'msg._bytes[2] = %d;\n' % 60 if msgid < 200 else 62)
-                self._cwrite(self.indent + 'msg._bytes[3] = 0;\n')
-                self._cwrite(self.indent + 'msg._bytes[4] = %d;\n' % msgid)
-                self._cwrite(self.indent + 'msg._bytes[5] = %d;\n\n' % msgid)
-                self._cwrite(self.indent + 'msg._len = 6;\n\n')
-                self._cwrite(self.indent + 'return msg;\n')
-                self._cwrite('}\n\n')
-
-
-            # Add parser method for serializing message
-            self._cwrite('MSP_Message MSP_Parser::serialize_%s' % msgtype)
-            self._write_params(self.coutput, argtypes, argnames)
-            self._cwrite(' {\n\n')
-            self._cwrite(self.indent + 'MSP_Message msg;\n\n')
-            msgsize = self._msgsize(argtypes)
-            self._cwrite(self.indent + 'msg._bytes[0] = 36;\n')
-            self._cwrite(self.indent + 'msg._bytes[1] = 77;\n')
-            self._cwrite(self.indent + 'msg._bytes[2] = 62;\n')
-            self._cwrite(self.indent + 'msg._bytes[3] = %d;\n' % msgsize)
-            self._cwrite(self.indent + 'msg._bytes[4] = %d;\n\n' % msgid)
-            nargs = len(argnames)
-            offset = 5
-            for k in range(nargs):
-                argname = argnames[k]
-                argtype = argtypes[k]
-                decl = self.type2decl[argtype]
-                self._cwrite(self.indent + 
-                        'memcpy(&msg._bytes[%d], &%s, sizeof(%s));\n' %  (offset, argname, decl))
-                offset += self.type2size[argtype]
-            self._cwrite('\n')
-            self._cwrite(self.indent + 
-                    'msg._bytes[%d] = CRC8(&msg._bytes[3], %d);\n\n' % (msgsize+5, msgsize+2))
-            self._cwrite(self.indent + 'msg._len = %d;\n\n' % (msgsize+6))
-            self._cwrite(self.indent + 'return msg;\n')
-            self._cwrite('}\n\n')
- 
-    def _cwrite(self, s):
-
-        self.coutput.write(s)
-
-    def _hwrite(self, s):
-
-        self.houtput.write(s)
-
 # Firmware header-only code emitter ===================================================================
 
 class HPP_Emitter(CodeEmitter):
@@ -433,32 +281,31 @@ class HPP_Emitter(CodeEmitter):
             msgstuff = msgdict[msgtype]
             msgid = msgstuff[0]
 
-            argnames = self._getargnames(msgstuff)
-            argtypes = self._getargtypes(msgstuff)
-
-            self.output.write(5*self.indent + ('case %s:\n' % msgdict[msgtype][0]))
-            self.output.write(5*self.indent + '{\n')
-            nargs = len(argnames)
-            offset = 0
-            for k in range(nargs):
-                argname = argnames[k]
-                argtype = argtypes[k]
-                decl = self.type2decl[argtype]
-                self.output.write(6*self.indent + decl  + ' ' + argname + ' = 0;\n')
-                if msgid >= 200:
-                    self.output.write(6*self.indent + 'memcpy(&%s,  &_inBuf[%d], sizeof(%s));\n\n' % (argname, offset, decl))
-                offset += self.type2size[argtype]
-            self.output.write(6*self.indent + 'handle_%s_Data(' %  msgtype)
-            for k in range(nargs):
-                self.output.write(argnames[k])
-                if k < nargs-1:
-                    self.output.write(', ')
-            self.output.write(');\n')
             if msgid < 200:
+
+                argnames = self._getargnames(msgstuff)
+                argtypes = self._getargtypes(msgstuff)
+
+                self.output.write(5*self.indent + ('case %s:\n' % msgdict[msgtype][0]))
+                self.output.write(5*self.indent + '{\n')
+                nargs = len(argnames)
+                offset = 0
+                for k in range(nargs):
+                    argname = argnames[k]
+                    argtype = argtypes[k]
+                    decl = self.type2decl[argtype]
+                    self.output.write(6*self.indent + decl  + ' ' + argname + ' = 0;\n')
+                    offset += self.type2size[argtype]
+                self.output.write(6*self.indent + 'handle_%s_Data(' %  msgtype)
+                for k in range(nargs):
+                    self.output.write(argnames[k])
+                    if k < nargs-1:
+                        self.output.write(', ')
+                self.output.write(');\n')
                 self.output.write(6*self.indent + ('prepareToSendFloats(%d);\n' % nargs))
                 for argname in argnames:
                     self.output.write(6*self.indent + ('sendFloat(%s);\n' % argname))
-            self.output.write(6*self.indent + '} break;\n\n')
+                self.output.write(6*self.indent + '} break;\n\n')
 
         self.output.write(4*self.indent + '}\n')
         self.output.write(3*self.indent + '}\n\n')
@@ -543,150 +390,6 @@ class HPP_Emitter(CodeEmitter):
         self.output.write(self.indent + '}; // class MspParser\n\n')
         self.output.write('} // namespace hf\n')
         self.output.close()
-
- 
-# C emitter ===============================================================================
-
-class C_Emitter(CompileableCodeEmitter):
-
-    def __init__(self, msgdict):
-
-        CompileableCodeEmitter.__init__(self, 'c', 'c')
-        mkdir_if_missing('output/c')
-        self._copyfile('example.c', 'c/example.c')
-
-        self.type2decl = {'byte': 'char', 'short' : 'short', 'float' : 'float', 'int' : 'int'}
-
-        self.coutput = _openw('output/c/msppg.c')
-        self.houtput = _openw('output/c/msppg.h')
-
-        self._hwrite(self._getsrc('top-c-h'))
-
-        for msgtype in msgdict.keys():
-
-            msgstuff = msgdict[msgtype]
-            msgid = msgstuff[0]
-
-            if msgid < 200:
-
-                argnames = self._getargnames(msgstuff)
-                argtypes = self._getargtypes(msgstuff)
-
-                self._hwrite(self.indent + 'void (*handler_for_%s)' % msgtype)
-                self._write_params(self.houtput, argtypes, argnames)
-                self._hwrite(';\n')
-
-        self._hwrite(self._getsrc('bottom-h'))
- 
-        self._cwrite('\n' + self._getsrc('top-c'))
-
-        for msgtype in msgdict.keys():
-
-            msgstuff = msgdict[msgtype]
-            msgid = msgstuff[0]
-
-            argnames = self._getargnames(msgstuff)
-            argtypes = self._getargtypes(msgstuff)
-
-            self._hwrite('msp_message_t msp_serialize_%s' % msgtype)
-            self._write_params(self.houtput, argtypes, argnames)
-            self._hwrite(';\n\n')
-
-            # Write handler code for incoming messages
-            if msgid < 200:
-
-                self._cwrite(5*self.indent + ('case %s: {\n\n' % msgdict[msgtype][0]))
-                nargs = len(argnames)
-                offset = 0
-                for k in range(nargs):
-                    argname = argnames[k]
-                    argtype = argtypes[k]
-                    decl = self.type2decl[argtype]
-                    self._cwrite(6*self.indent + decl  + ' ' + argname + ';\n')
-                    self._cwrite(6*self.indent + 
-                            'memcpy(&%s,  &parser->message_buffer[%d], sizeof(%s));\n\n' % 
-                            (argname, offset, decl))
-                    offset += self.type2size[argtype]
-                self._cwrite(6*self.indent + 'parser->handler_for_%s(' % msgtype)
-                for k in range(nargs):
-                    self._cwrite(argnames[k])
-                    if k < nargs-1:
-                        self._cwrite(', ')
-                self._cwrite(');\n')
-                self._cwrite(6*self.indent + '} break;\n\n')
-                
-                self._hwrite('msp_message_t msp_serialize_%s_request();\n\n' % msgtype)
-                self._hwrite('void msp_set_%s_handler(msp_parser_t * parser, void (*handler)' % msgtype)
-                self._write_params(self.houtput, argtypes, argnames)
-                self._hwrite(');\n\n')
-
-        self._cwrite(self._getsrc('bottom-cpp'))
- 
-        for msgtype in msgdict.keys():
-
-            msgstuff = msgdict[msgtype]
-            msgid = msgstuff[0]
-
-            argnames = self._getargnames(msgstuff)
-            argtypes = self._getargtypes(msgstuff)
-
-            # Incoming messages
-            if msgid < 200:
-
-                # Write handler method
-                self._cwrite('void msp_set_%s_handler(msp_parser_t * parser, void (*handler)' % msgtype)
-                self._write_params(self.coutput, argtypes, argnames)
-                self._cwrite(') {\n\n')
-                self._cwrite(self.indent + 'parser->handler_for_%s = handler;\n' % msgtype)
-                self._cwrite('}\n\n')
-
-                # Write request method
-                self._cwrite('msp_message_t serialize_%s_Request() {\n\n' % msgtype)
-                self._cwrite(self.indent + 'msp_message_t msg;\n\n')
-                self._cwrite(self.indent + 'msg.bytes[0] = 36;\n')
-                self._cwrite(self.indent + 'msg.bytes[1] = 77;\n')
-                self._cwrite(self.indent + 'msg.bytes[2] = %d;\n' % 60 if msgid < 200 else 62)
-                self._cwrite(self.indent + 'msg.bytes[3] = 0;\n')
-                self._cwrite(self.indent + 'msg.bytes[4] = %d;\n' % msgid)
-                self._cwrite(self.indent + 'msg.bytes[5] = %d;\n\n' % msgid)
-                self._cwrite(self.indent + 'msg.len = 6;\n\n')
-                self._cwrite(self.indent + 'return msg;\n')
-                self._cwrite('}\n\n')
-
-            # Add parser method for serializing message
-            self._cwrite('msp_message_t msp_serialize_%s' % msgtype)
-            self._write_params(self.coutput, argtypes, argnames)
-            self._cwrite(' {\n\n')
-            self._cwrite(self.indent + 'msp_message_t msg;\n\n')
-            msgsize = self._msgsize(argtypes)
-            self._cwrite(self.indent + 'msg.bytes[0] = 36;\n')
-            self._cwrite(self.indent + 'msg.bytes[1] = 77;\n')
-            self._cwrite(self.indent + 'msg.bytes[2] = 62;\n')
-            self._cwrite(self.indent + 'msg.bytes[3] = %d;\n' % msgsize)
-            self._cwrite(self.indent + 'msg.bytes[4] = %d;\n\n' % msgid)
-            nargs = len(argnames)
-            offset = 5
-            for k in range(nargs):
-                argname = argnames[k]
-                argtype = argtypes[k]
-                decl = self.type2decl[argtype]
-                self._cwrite(self.indent + 
-                        'memcpy(&msg.bytes[%d], &%s, sizeof(%s));\n' %  (offset, argname, decl))
-                offset += self.type2size[argtype]
-            self._cwrite('\n')
-            self._cwrite(self.indent + 
-                    'msg.bytes[%d] = CRC8(&msg.bytes[3], %d);\n\n' % (msgsize+5, msgsize+2))
-            self._cwrite(self.indent + 'msg.len = %d;\n\n' % (msgsize+6))
-            self._cwrite(self.indent + 'return msg;\n')
-            self._cwrite('}\n\n')
- 
-    def _cwrite(self, s):
-
-        self.coutput.write(s)
-
-    def _hwrite(self, s):
-
-        self.houtput.write(s)
 
 # Java emitter =======================================================================================
 
@@ -872,12 +575,6 @@ if __name__ == '__main__':
 
     # Emit Python
     Python_Emitter(msgdict)
-
-    # Emit C++
-    CPP_Emitter(msgdict)
-
-    # Emit C
-    C_Emitter(msgdict)
 
     # Emite Java
     Java_Emitter(msgdict)
