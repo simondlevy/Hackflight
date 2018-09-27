@@ -19,7 +19,7 @@
 #pragma once
 
 #include "receiver.hpp"
-#include <SBUS.h>
+#include <SBUSRX.h>
 
 namespace hf {
 
@@ -34,7 +34,7 @@ namespace hf {
 
             uint16_t failsafeCount;
 
-            SBUS * rx; 
+            SBUSRX * rx; 
 
         protected:
 
@@ -80,7 +80,7 @@ namespace hf {
 
             SBUS_Receiver(const uint8_t channelMap[6], HardwareSerial & hardwareSerial=Serial1) :  Receiver(channelMap) 
             { 
-                rx = new SBUS(hardwareSerial);
+                rx = new SBUSRX(hardwareSerial);
             }
 
     }; // class SBUS_Receiver

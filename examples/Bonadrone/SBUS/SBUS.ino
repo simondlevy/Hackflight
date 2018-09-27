@@ -5,7 +5,7 @@
 
        https://github.com/simondlevy/LSM6DSM
        https://github.com/simondlevy/CrossPlatformDataBus
-       https://github.com/simondlevy/SBUS 
+       https://github.com/simondlevy/SBUSRX
 
    Hardware support for Bonadrone flight controller:
 

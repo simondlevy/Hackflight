@@ -5,7 +5,7 @@
 
        https://github.com/simondlevy/EM7180
        https://github.com/simondlevy/CrossPlatformDataBus
-       https://github.com/simondlevy/SBUS 
+       https://github.com/simondlevy/SBUSRX
 
    Hardware support for Ladybug flight controller:
 
