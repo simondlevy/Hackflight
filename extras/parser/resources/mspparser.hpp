@@ -31,6 +31,10 @@ namespace hf {
 
     class MspParser {
 
+        public:
+
+            static const uint8_t MAXMSG = 255;
+
         private:
 
             static const int INBUF_SIZE  = 128;

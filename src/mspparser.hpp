@@ -31,6 +31,10 @@ namespace hf {
 
     class MspParser {
 
+        public:
+
+            static const uint8_t MAXMSG = 255;
+
         private:
 
             static const int INBUF_SIZE  = 128;
@@ -226,16 +230,6 @@ namespace hf {
             {
                 switch (_command) {
 
-                    case 123:
-                    {
-                        float estalt = 0;
-                        float vario = 0;
-                        handle_GET_ALTITUDE_METERS_Request(estalt, vario);
-                        prepareToSendFloats(2);
-                        sendFloat(estalt);
-                        sendFloat(vario);
-                        } break;
-
                     case 122:
                     {
                         float roll = 0;
@@ -273,6 +267,28 @@ namespace hf {
                         handle_SET_ARMED_Request(flag);
                         } break;
 
+                    case 126:
+                    {
+                        float agl = 0;
+                        float flowx = 0;
+                        float flowy = 0;
+                        handle_GET_LOITER_Request(agl, flowx, flowy);
+                        prepareToSendFloats(3);
+                        sendFloat(agl);
+                        sendFloat(flowx);
+                        sendFloat(flowy);
+                        } break;
+
+                    case 123:
+                    {
+                        float estalt = 0;
+                        float vario = 0;
+                        handle_GET_ALTITUDE_METERS_Request(estalt, vario);
+                        prepareToSendFloats(2);
+                        sendFloat(estalt);
+                        sendFloat(vario);
+                        } break;
+
                     case 121:
                     {
                         float c1 = 0;
@@ -291,18 +307,6 @@ namespace hf {
                         sendFloat(c6);
                         } break;
 
-                    case 126:
-                    {
-                        float agl = 0;
-                        float flowx = 0;
-                        float flowy = 0;
-                        handle_GET_LOITER_Request(agl, flowx, flowy);
-                        prepareToSendFloats(3);
-                        sendFloat(agl);
-                        sendFloat(flowx);
-                        sendFloat(flowy);
-                        } break;
-
                 }
             }
 
@@ -310,19 +314,27 @@ namespace hf {
             {
                 switch (_command) {
 
-                    case 123:
-                    {
-                        float estalt = getArgument(0);
-                        float vario = getArgument(1);
-                        handle_GET_ALTITUDE_METERS_Data(estalt, vario);
-                        } break;
-
                     case 122:
                     {
                         float roll = getArgument(0);
                         float pitch = getArgument(1);
                         float yaw = getArgument(2);
                         handle_GET_ATTITUDE_RADIANS_Data(roll, pitch, yaw);
+                        } break;
+
+                    case 126:
+                    {
+                        float agl = getArgument(0);
+                        float flowx = getArgument(1);
+                        float flowy = getArgument(2);
+                        handle_GET_LOITER_Data(agl, flowx, flowy);
+                        } break;
+
+                    case 123:
+                    {
+                        float estalt = getArgument(0);
+                        float vario = getArgument(1);
+                        handle_GET_ALTITUDE_METERS_Data(estalt, vario);
                         } break;
 
                     case 121:
@@ -336,30 +348,10 @@ namespace hf {
                         handle_GET_RC_NORMAL_Data(c1, c2, c3, c4, c5, c6);
                         } break;
 
-                    case 126:
-                    {
-                        float agl = getArgument(0);
-                        float flowx = getArgument(1);
-                        float flowy = getArgument(2);
-                        handle_GET_LOITER_Data(agl, flowx, flowy);
-                        } break;
-
                 }
             }
 
         protected:
-
-            virtual void handle_GET_ALTITUDE_METERS_Request(float & estalt, float & vario)
-            {
-                (void)estalt;
-                (void)vario;
-            }
-
-            virtual void handle_GET_ALTITUDE_METERS_Data(float & estalt, float & vario)
-            {
-                (void)estalt;
-                (void)vario;
-            }
 
             virtual void handle_GET_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw)
             {
@@ -401,6 +393,32 @@ namespace hf {
                 (void)flag;
             }
 
+            virtual void handle_GET_LOITER_Request(float & agl, float & flowx, float & flowy)
+            {
+                (void)agl;
+                (void)flowx;
+                (void)flowy;
+            }
+
+            virtual void handle_GET_LOITER_Data(float & agl, float & flowx, float & flowy)
+            {
+                (void)agl;
+                (void)flowx;
+                (void)flowy;
+            }
+
+            virtual void handle_GET_ALTITUDE_METERS_Request(float & estalt, float & vario)
+            {
+                (void)estalt;
+                (void)vario;
+            }
+
+            virtual void handle_GET_ALTITUDE_METERS_Data(float & estalt, float & vario)
+            {
+                (void)estalt;
+                (void)vario;
+            }
+
             virtual void handle_GET_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
             {
                 (void)c1;
@@ -421,47 +439,7 @@ namespace hf {
                 (void)c6;
             }
 
-            virtual void handle_GET_LOITER_Request(float & agl, float & flowx, float & flowy)
-            {
-                (void)agl;
-                (void)flowx;
-                (void)flowy;
-            }
-
-            virtual void handle_GET_LOITER_Data(float & agl, float & flowx, float & flowy)
-            {
-                (void)agl;
-                (void)flowx;
-                (void)flowy;
-            }
-
-            static uint8_t serialize_GET_ALTITUDE_METERS_Request(uint8_t bytes[])
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 123;
-                bytes[5] = 123;
-
-                return 6;
-            }
-
-            static uint8_t serialize_GET_ALTITUDE_METERS(uint8_t bytes[], float  estalt, float  vario)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 8;
-                bytes[4] = 123;
-
-                memcpy(&bytes[5], &estalt, sizeof(float));
-                memcpy(&bytes[9], &vario, sizeof(float));
-
-                bytes[13] = CRC8(&bytes[3], 10);
-
-                return 14;
-            }
+        public:
 
             static uint8_t serialize_GET_ATTITUDE_RADIANS_Request(uint8_t bytes[])
             {
@@ -525,6 +503,63 @@ namespace hf {
                 return 7;
             }
 
+            static uint8_t serialize_GET_LOITER_Request(uint8_t bytes[])
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 60;
+                bytes[3] = 0;
+                bytes[4] = 126;
+                bytes[5] = 126;
+
+                return 6;
+            }
+
+            static uint8_t serialize_GET_LOITER(uint8_t bytes[], float  agl, float  flowx, float  flowy)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 12;
+                bytes[4] = 126;
+
+                memcpy(&bytes[5], &agl, sizeof(float));
+                memcpy(&bytes[9], &flowx, sizeof(float));
+                memcpy(&bytes[13], &flowy, sizeof(float));
+
+                bytes[17] = CRC8(&bytes[3], 14);
+
+                return 18;
+            }
+
+            static uint8_t serialize_GET_ALTITUDE_METERS_Request(uint8_t bytes[])
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 60;
+                bytes[3] = 0;
+                bytes[4] = 123;
+                bytes[5] = 123;
+
+                return 6;
+            }
+
+            static uint8_t serialize_GET_ALTITUDE_METERS(uint8_t bytes[], float  estalt, float  vario)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 8;
+                bytes[4] = 123;
+
+                memcpy(&bytes[5], &estalt, sizeof(float));
+                memcpy(&bytes[9], &vario, sizeof(float));
+
+                bytes[13] = CRC8(&bytes[3], 10);
+
+                return 14;
+            }
+
             static uint8_t serialize_GET_RC_NORMAL_Request(uint8_t bytes[])
             {
                 bytes[0] = 36;
@@ -555,35 +590,6 @@ namespace hf {
                 bytes[29] = CRC8(&bytes[3], 26);
 
                 return 30;
-            }
-
-            static uint8_t serialize_GET_LOITER_Request(uint8_t bytes[])
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 126;
-                bytes[5] = 126;
-
-                return 6;
-            }
-
-            static uint8_t serialize_GET_LOITER(uint8_t bytes[], float  agl, float  flowx, float  flowy)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 12;
-                bytes[4] = 126;
-
-                memcpy(&bytes[5], &agl, sizeof(float));
-                memcpy(&bytes[9], &flowx, sizeof(float));
-                memcpy(&bytes[13], &flowy, sizeof(float));
-
-                bytes[17] = CRC8(&bytes[3], 14);
-
-                return 18;
             }
 
     }; // class MspParser

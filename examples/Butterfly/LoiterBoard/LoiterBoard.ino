@@ -30,7 +30,7 @@
 #include <VL53L1X.h>
 #include <PMW3901.h>
 
-#include "mspserializer.hpp"
+#include "mspparser.hpp"
 
 static uint16_t FLOW_UPDATE_HZ = 20;
 
@@ -108,8 +108,8 @@ void loop(void)
     }
 
     // Serialize a message to send to flight controller
-    uint8_t msgbytes[hf::MspSerializer::MAXLEN];
-    uint8_t msglen = hf::MspSerializer::serialize_GET_LOITER(msgbytes, (float)distance, (float)flowx, (float)flowy);
+    uint8_t msgbytes[hf::MspParser::MAXMSG];
+    uint8_t msglen = hf::MspParser::serialize_GET_LOITER(msgbytes, (float)distance, (float)flowx, (float)flowy);
 
     // Send the message
     for (uint8_t k=0; k<msglen; ++k) {

@@ -336,6 +336,8 @@ class HPP_Emitter(CodeEmitter):
 
         # Add message-serialization declarations to header
 
+        self.output.write(self.indent*2 + 'public:\n\n')
+
         for msgtype in msgdict.keys():
 
             msgstuff = msgdict[msgtype]
