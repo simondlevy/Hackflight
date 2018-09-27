@@ -381,8 +381,8 @@ class HPP_Emitter(CodeEmitter):
         # Open file for appending
         self.output = open('../../src/mspparser.hpp', 'a')
 
-        # Add dispatchMessage() method
-        self.output.write(3*self.indent + 'void dispatchMessage(void)\n')
+        # Add dispatchRequestMessage() method
+        self.output.write(3*self.indent + 'void dispatchRequestMessage(void)\n')
         self.output.write(3*self.indent + '{\n')
         self.output.write(4*self.indent + 'switch (_command) {\n\n')
 

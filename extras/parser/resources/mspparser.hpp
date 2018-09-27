@@ -208,7 +208,7 @@ namespace hf {
                             _inBuf[_offset++] = c;
                         } else  {
                             if (_checksum == c) {        // compare calculated and transferred _checksum
-                                dispatchMessage();
+                                dispatchRequestMessage();
                                 serialize8(_checksum);                            
                             }
                             _state = IDLE;
