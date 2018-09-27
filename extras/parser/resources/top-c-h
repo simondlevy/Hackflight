@@ -37,7 +37,6 @@ typedef struct {
 typedef struct {
 
     int state;
-    byte message_direction;
     byte message_id;
     byte message_length_expected;
     byte message_length_received;
