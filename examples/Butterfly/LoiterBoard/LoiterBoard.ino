@@ -101,7 +101,7 @@ static LoiterRequestParser parser;
 void setup(void)
 {
     // Set up LED
-    //pinMode(LED_PIN, OUTPUT);
+    pinMode(LED_PIN, OUTPUT);
 
     powerPin(GND_PIN, LOW);
     powerPin(VCC_PIN, HIGH);
@@ -164,7 +164,7 @@ void loop(void)
     Serial.println(flowy);
 
     // Set current AGL, flow in parser
-    //parser.set(agl, flowx, flowy);
+    parser.set(agl, flowx, flowy);
 
     // Grab bytes from requester and send them to parser
     // XXX Serial1 eventually
