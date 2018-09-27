@@ -124,6 +124,19 @@ namespace hf {
                 serialize32(a);
             }
 
+            static uint8_t CRC8(uint8_t * data, int n) 
+            {
+                uint8_t crc = 0x00;
+
+                for (int k=0; k<n; ++k) {
+
+                    crc ^= data[k];
+                }
+
+                return crc;
+            }
+
+
         protected:
 
             void init(void)
