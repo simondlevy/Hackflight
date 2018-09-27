@@ -70,25 +70,6 @@ namespace hf {
                 serialize8((a >> 8) & 0xFF);
             }
 
-            uint8_t read8(void)
-            {
-                return _inBuf[_inBufIndex++] & 0xff;
-            }
-
-            uint16_t read16(void)
-            {
-                uint16_t t = read8();
-                t += (uint16_t)read8() << 8;
-                return t;
-            }
-
-            uint32_t read32(void)
-            {
-                uint32_t t = read16();
-                t += (uint32_t)read16() << 16;
-                return t;
-            }
-
             void serialize32(uint32_t a)
             {
                 serialize8(a & 0xFF);
@@ -241,54 +222,6 @@ namespace hf {
             {
                 switch (_command) {
 
-                    case 121:
-                    {
-                        float c1 = 0;
-                        float c2 = 0;
-                        float c3 = 0;
-                        float c4 = 0;
-                        float c5 = 0;
-                        float c6 = 0;
-                        handle_GET_RC_NORMAL_Request(c1, c2, c3, c4, c5, c6);
-                        prepareToSendFloats(6);
-                        sendFloat(c1);
-                        sendFloat(c2);
-                        sendFloat(c3);
-                        sendFloat(c4);
-                        sendFloat(c5);
-                        sendFloat(c6);
-                        } break;
-
-                    case 123:
-                    {
-                        float estalt = 0;
-                        float vario = 0;
-                        handle_GET_ALTITUDE_METERS_Request(estalt, vario);
-                        prepareToSendFloats(2);
-                        sendFloat(estalt);
-                        sendFloat(vario);
-                        } break;
-
-                    case 216:
-                    {
-                        uint8_t flag = 0;
-                        memcpy(&flag,  &_inBuf[0], sizeof(uint8_t));
-
-                        handle_SET_ARMED_Request(flag);
-                        } break;
-
-                    case 126:
-                    {
-                        float agl = 0;
-                        float flowx = 0;
-                        float flowy = 0;
-                        handle_GET_LOITER_Request(agl, flowx, flowy);
-                        prepareToSendFloats(3);
-                        sendFloat(agl);
-                        sendFloat(flowx);
-                        sendFloat(flowy);
-                        } break;
-
                     case 215:
                     {
                         float m1 = 0;
@@ -318,12 +251,76 @@ namespace hf {
                         sendFloat(yaw);
                         } break;
 
+                    case 126:
+                    {
+                        float agl = 0;
+                        float flowx = 0;
+                        float flowy = 0;
+                        handle_GET_LOITER_Request(agl, flowx, flowy);
+                        prepareToSendFloats(3);
+                        sendFloat(agl);
+                        sendFloat(flowx);
+                        sendFloat(flowy);
+                        } break;
+
+                    case 121:
+                    {
+                        float c1 = 0;
+                        float c2 = 0;
+                        float c3 = 0;
+                        float c4 = 0;
+                        float c5 = 0;
+                        float c6 = 0;
+                        handle_GET_RC_NORMAL_Request(c1, c2, c3, c4, c5, c6);
+                        prepareToSendFloats(6);
+                        sendFloat(c1);
+                        sendFloat(c2);
+                        sendFloat(c3);
+                        sendFloat(c4);
+                        sendFloat(c5);
+                        sendFloat(c6);
+                        } break;
+
+                    case 216:
+                    {
+                        uint8_t flag = 0;
+                        memcpy(&flag,  &_inBuf[0], sizeof(uint8_t));
+
+                        handle_SET_ARMED_Request(flag);
+                        } break;
+
+                    case 123:
+                    {
+                        float estalt = 0;
+                        float vario = 0;
+                        handle_GET_ALTITUDE_METERS_Request(estalt, vario);
+                        prepareToSendFloats(2);
+                        sendFloat(estalt);
+                        sendFloat(vario);
+                        } break;
+
                 }
             }
 
             void dispatchDataMessage(void)
             {
                 switch (_command) {
+
+                    case 122:
+                    {
+                        float roll = 0;
+                        float pitch = 0;
+                        float yaw = 0;
+                        handle_GET_ATTITUDE_RADIANS_Data(roll, pitch, yaw);
+                        } break;
+
+                    case 126:
+                    {
+                        float agl = 0;
+                        float flowx = 0;
+                        float flowy = 0;
+                        handle_GET_LOITER_Data(agl, flowx, flowy);
+                        } break;
 
                     case 121:
                     {
@@ -343,82 +340,10 @@ namespace hf {
                         handle_GET_ALTITUDE_METERS_Data(estalt, vario);
                         } break;
 
-                    case 126:
-                    {
-                        float agl = 0;
-                        float flowx = 0;
-                        float flowy = 0;
-                        handle_GET_LOITER_Data(agl, flowx, flowy);
-                        } break;
-
-                    case 122:
-                    {
-                        float roll = 0;
-                        float pitch = 0;
-                        float yaw = 0;
-                        handle_GET_ATTITUDE_RADIANS_Data(roll, pitch, yaw);
-                        } break;
-
                 }
             }
 
         protected:
-
-            virtual void handle_GET_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
-            {
-                (void)c1;
-                (void)c2;
-                (void)c3;
-                (void)c4;
-                (void)c5;
-                (void)c6;
-            }
-
-            virtual void handle_GET_RC_NORMAL_Data(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
-            {
-                (void)c1;
-                (void)c2;
-                (void)c3;
-                (void)c4;
-                (void)c5;
-                (void)c6;
-            }
-
-            virtual void handle_GET_ALTITUDE_METERS_Request(float & estalt, float & vario)
-            {
-                (void)estalt;
-                (void)vario;
-            }
-
-            virtual void handle_GET_ALTITUDE_METERS_Data(float & estalt, float & vario)
-            {
-                (void)estalt;
-                (void)vario;
-            }
-
-            virtual void handle_SET_ARMED_Request(uint8_t  flag)
-            {
-                (void)flag;
-            }
-
-            virtual void handle_SET_ARMED_Data(uint8_t  flag)
-            {
-                (void)flag;
-            }
-
-            virtual void handle_GET_LOITER_Request(float & agl, float & flowx, float & flowy)
-            {
-                (void)agl;
-                (void)flowx;
-                (void)flowy;
-            }
-
-            virtual void handle_GET_LOITER_Data(float & agl, float & flowx, float & flowy)
-            {
-                (void)agl;
-                (void)flowx;
-                (void)flowy;
-            }
 
             virtual void handle_SET_MOTOR_NORMAL_Request(float  m1, float  m2, float  m3, float  m4)
             {
@@ -450,108 +375,60 @@ namespace hf {
                 (void)yaw;
             }
 
-            static uint8_t serialize_GET_RC_NORMAL_Request(uint8_t bytes[])
+            virtual void handle_GET_LOITER_Request(float & agl, float & flowx, float & flowy)
             {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 121;
-                bytes[5] = 121;
-
-                return 6;
+                (void)agl;
+                (void)flowx;
+                (void)flowy;
             }
 
-            static uint8_t serialize_GET_RC_NORMAL(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
+            virtual void handle_GET_LOITER_Data(float & agl, float & flowx, float & flowy)
             {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 24;
-                bytes[4] = 121;
-
-                memcpy(&bytes[5], &c1, sizeof(float));
-                memcpy(&bytes[9], &c2, sizeof(float));
-                memcpy(&bytes[13], &c3, sizeof(float));
-                memcpy(&bytes[17], &c4, sizeof(float));
-                memcpy(&bytes[21], &c5, sizeof(float));
-                memcpy(&bytes[25], &c6, sizeof(float));
-
-                bytes[29] = CRC8(&bytes[3], 26);
-
-                return 30;
+                (void)agl;
+                (void)flowx;
+                (void)flowy;
             }
 
-            static uint8_t serialize_GET_ALTITUDE_METERS_Request(uint8_t bytes[])
+            virtual void handle_GET_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
             {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 123;
-                bytes[5] = 123;
-
-                return 6;
+                (void)c1;
+                (void)c2;
+                (void)c3;
+                (void)c4;
+                (void)c5;
+                (void)c6;
             }
 
-            static uint8_t serialize_GET_ALTITUDE_METERS(uint8_t bytes[], float  estalt, float  vario)
+            virtual void handle_GET_RC_NORMAL_Data(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
             {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 8;
-                bytes[4] = 123;
-
-                memcpy(&bytes[5], &estalt, sizeof(float));
-                memcpy(&bytes[9], &vario, sizeof(float));
-
-                bytes[13] = CRC8(&bytes[3], 10);
-
-                return 14;
+                (void)c1;
+                (void)c2;
+                (void)c3;
+                (void)c4;
+                (void)c5;
+                (void)c6;
             }
 
-            static uint8_t serialize_SET_ARMED(uint8_t bytes[], uint8_t  flag)
+            virtual void handle_SET_ARMED_Request(uint8_t  flag)
             {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 1;
-                bytes[4] = 216;
-
-                memcpy(&bytes[5], &flag, sizeof(uint8_t));
-
-                bytes[6] = CRC8(&bytes[3], 3);
-
-                return 7;
+                (void)flag;
             }
 
-            static uint8_t serialize_GET_LOITER_Request(uint8_t bytes[])
+            virtual void handle_SET_ARMED_Data(uint8_t  flag)
             {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 126;
-                bytes[5] = 126;
-
-                return 6;
+                (void)flag;
             }
 
-            static uint8_t serialize_GET_LOITER(uint8_t bytes[], float  agl, float  flowx, float  flowy)
+            virtual void handle_GET_ALTITUDE_METERS_Request(float & estalt, float & vario)
             {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 12;
-                bytes[4] = 126;
+                (void)estalt;
+                (void)vario;
+            }
 
-                memcpy(&bytes[5], &agl, sizeof(float));
-                memcpy(&bytes[9], &flowx, sizeof(float));
-                memcpy(&bytes[13], &flowy, sizeof(float));
-
-                bytes[17] = CRC8(&bytes[3], 14);
-
-                return 18;
+            virtual void handle_GET_ALTITUDE_METERS_Data(float & estalt, float & vario)
+            {
+                (void)estalt;
+                (void)vario;
             }
 
             static uint8_t serialize_SET_MOTOR_NORMAL(uint8_t bytes[], float  m1, float  m2, float  m3, float  m4)
@@ -599,6 +476,110 @@ namespace hf {
                 bytes[17] = CRC8(&bytes[3], 14);
 
                 return 18;
+            }
+
+            static uint8_t serialize_GET_LOITER_Request(uint8_t bytes[])
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 60;
+                bytes[3] = 0;
+                bytes[4] = 126;
+                bytes[5] = 126;
+
+                return 6;
+            }
+
+            static uint8_t serialize_GET_LOITER(uint8_t bytes[], float  agl, float  flowx, float  flowy)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 12;
+                bytes[4] = 126;
+
+                memcpy(&bytes[5], &agl, sizeof(float));
+                memcpy(&bytes[9], &flowx, sizeof(float));
+                memcpy(&bytes[13], &flowy, sizeof(float));
+
+                bytes[17] = CRC8(&bytes[3], 14);
+
+                return 18;
+            }
+
+            static uint8_t serialize_GET_RC_NORMAL_Request(uint8_t bytes[])
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 60;
+                bytes[3] = 0;
+                bytes[4] = 121;
+                bytes[5] = 121;
+
+                return 6;
+            }
+
+            static uint8_t serialize_GET_RC_NORMAL(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 24;
+                bytes[4] = 121;
+
+                memcpy(&bytes[5], &c1, sizeof(float));
+                memcpy(&bytes[9], &c2, sizeof(float));
+                memcpy(&bytes[13], &c3, sizeof(float));
+                memcpy(&bytes[17], &c4, sizeof(float));
+                memcpy(&bytes[21], &c5, sizeof(float));
+                memcpy(&bytes[25], &c6, sizeof(float));
+
+                bytes[29] = CRC8(&bytes[3], 26);
+
+                return 30;
+            }
+
+            static uint8_t serialize_SET_ARMED(uint8_t bytes[], uint8_t  flag)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 1;
+                bytes[4] = 216;
+
+                memcpy(&bytes[5], &flag, sizeof(uint8_t));
+
+                bytes[6] = CRC8(&bytes[3], 3);
+
+                return 7;
+            }
+
+            static uint8_t serialize_GET_ALTITUDE_METERS_Request(uint8_t bytes[])
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 60;
+                bytes[3] = 0;
+                bytes[4] = 123;
+                bytes[5] = 123;
+
+                return 6;
+            }
+
+            static uint8_t serialize_GET_ALTITUDE_METERS(uint8_t bytes[], float  estalt, float  vario)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 8;
+                bytes[4] = 123;
+
+                memcpy(&bytes[5], &estalt, sizeof(float));
+                memcpy(&bytes[9], &vario, sizeof(float));
+
+                bytes[13] = CRC8(&bytes[3], 10);
+
+                return 14;
             }
 
     }; // class MspParser
