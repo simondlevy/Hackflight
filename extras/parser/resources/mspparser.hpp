@@ -212,6 +212,9 @@ namespace hf {
                                     dispatchRequestMessage();
                                     serialize8(_checksum);                            
                                 }
+                                else {
+                                    dispatchDataMessage();
+                                }
                             }
                             _state = IDLE;
                         }

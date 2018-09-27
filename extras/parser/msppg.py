@@ -421,6 +421,47 @@ class HPP_Emitter(CodeEmitter):
         self.output.write(4*self.indent + '}\n')
         self.output.write(3*self.indent + '}\n\n')
 
+        # Add dispatchDataMessage() method
+        self.output.write(3*self.indent + 'void dispatchDataMessage(void)\n')
+        self.output.write(3*self.indent + '{\n')
+        self.output.write(4*self.indent + 'switch (_command) {\n\n')
+
+        for msgtype in msgdict.keys():
+
+            msgstuff = msgdict[msgtype]
+            msgid = msgstuff[0]
+
+            argnames = self._getargnames(msgstuff)
+            argtypes = self._getargtypes(msgstuff)
+
+            self.output.write(5*self.indent + ('case %s:\n' % msgdict[msgtype][0]))
+            self.output.write(5*self.indent + '{\n')
+            nargs = len(argnames)
+            offset = 0
+            for k in range(nargs):
+                argname = argnames[k]
+                argtype = argtypes[k]
+                decl = self.type2decl[argtype]
+                self.output.write(6*self.indent + decl  + ' ' + argname + ' = 0;\n')
+                if msgid >= 200:
+                    self.output.write(6*self.indent + 'memcpy(&%s,  &_inBuf[%d], sizeof(%s));\n\n' % (argname, offset, decl))
+                offset += self.type2size[argtype]
+            self.output.write(6*self.indent + 'handle_%s_Request(' %  msgtype)
+            for k in range(nargs):
+                self.output.write(argnames[k])
+                if k < nargs-1:
+                    self.output.write(', ')
+            self.output.write(');\n')
+            if msgid < 200:
+                self.output.write(6*self.indent + ('prepareToSendFloats(%d);\n' % nargs))
+                for argname in argnames:
+                    self.output.write(6*self.indent + ('sendFloat(%s);\n' % argname))
+            self.output.write(6*self.indent + '} break;\n\n')
+
+        self.output.write(4*self.indent + '}\n')
+        self.output.write(3*self.indent + '}\n\n')
+
+
         # Add virtual declarations for handler methods
 
         self.output.write(2*self.indent + 'protected:\n\n')
