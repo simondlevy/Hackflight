@@ -441,7 +441,7 @@ class Java_Emitter(CompileableCodeEmitter):
                 self._write(7*self.indent + '}\n')
                 self._write(7*self.indent + 'break;\n\n')
 
-        self._write(self._getsrc('bottom-java'))
+        self._write(5*self.indent + '}\n' + 4*self.indent + '}\n' + 2*self.indent + '}\n' + self.indent + '}\n\n')
 
         for msgtype in msgdict.keys():
 
