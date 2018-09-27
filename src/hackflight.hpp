@@ -237,7 +237,7 @@ namespace hf {
 
         protected:
 
-            virtual void handle_SET_ARMED(uint8_t  flag)
+            virtual void handle_SET_ARMED_Request(uint8_t  flag)
             {
                 if (flag) {  // got arming command: arm only if throttle is down
                     if (_receiver->throttleIsDown()) {
@@ -249,7 +249,7 @@ namespace hf {
                 }
             }
 
-            virtual void handle_GET_RC_NORMAL(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
+            virtual void handle_GET_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
             {
                 c1 = _receiver->getRawval(0);
                 c2 = _receiver->getRawval(1);
@@ -259,14 +259,14 @@ namespace hf {
                 c6 = _receiver->getRawval(5);
             }
 
-            virtual void handle_GET_ATTITUDE_RADIANS(float & roll, float & pitch, float & yaw) override
+            virtual void handle_GET_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
             {
                 roll  = _state.eulerAngles[0];
                 pitch = _state.eulerAngles[1];
                 yaw   = _state.eulerAngles[2];
             }
 
-            virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
+            virtual void handle_SET_MOTOR_NORMAL_Request(float  m1, float  m2, float  m3, float  m4) override
             {
                 _mixer->motorsDisarmed[0] = m1;
                 _mixer->motorsDisarmed[1] = m2;
