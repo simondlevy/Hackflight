@@ -119,6 +119,10 @@ namespace hf {
                 return crc;
             }
 
+            float getArgument(uint8_t k)
+            {
+                return (float)k; // XXX for testing only
+            }
 
         protected:
 

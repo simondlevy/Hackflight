@@ -294,7 +294,7 @@ class HPP_Emitter(CodeEmitter):
                     argname = argnames[k]
                     argtype = argtypes[k]
                     decl = self.type2decl[argtype]
-                    self.output.write(6*self.indent + decl  + ' ' + argname + ' = 0;\n')
+                    self.output.write(6*self.indent + decl  + ' ' + argname + ' = getArgument(%d);\n' % k)
                     offset += self.type2size[argtype]
                 self.output.write(6*self.indent + 'handle_%s_Data(' %  msgtype)
                 for k in range(nargs):
