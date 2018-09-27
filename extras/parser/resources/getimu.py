@@ -28,9 +28,6 @@ PORT = '/dev/ttyACM0' # Linux
 from msppg import MSP_Parser as Parser, serialize_ATTITUDE_RADIANS_Request
 import serial
 
-from sys import argv
-
-
 def handler(pitch, roll, yaw):
 
     print(pitch, roll, yaw)
