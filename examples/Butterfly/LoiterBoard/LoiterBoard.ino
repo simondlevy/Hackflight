@@ -100,7 +100,9 @@ static LoiterRequestParser parser;
 
 void setup(void)
 {
-    // Use digital pins for VL53L1 power, ground
+    // Set up LED
+    //pinMode(LED_PIN, OUTPUT);
+
     powerPin(GND_PIN, LOW);
     powerPin(VCC_PIN, HIGH);
 
@@ -114,6 +116,7 @@ void setup(void)
     // Start output to flight controller
     Serial1.begin(115200);
 
+    // Use digital pins for VL53L1 power, ground
     // Start VL53L1X distance sensor
     if (!distanceSensor.begin()) {
         error("VL53L1X");
@@ -130,6 +133,13 @@ void setup(void)
 
 void loop(void)
 {
+    /*
+    digitalWrite(LED_PIN, LOW);
+    delay(500);
+    digitalWrite(LED_PIN, HIGH);
+    delay(500);
+    */
+
     // Declare measurement variables static so they'll persist between calls to loop()
     static uint16_t agl;
     static int16_t flowx, flowy;
@@ -147,6 +157,18 @@ void loop(void)
         _time = time;
     }
 
+    Serial.print(agl);
+    Serial.print(" ");
+    Serial.print(flowx);
+    Serial.print(" ");
+    Serial.println(flowy);
+
     // Set current AGL, flow in parser
-    parser.set(agl, flowx, flowy);
+    //parser.set(agl, flowx, flowy);
+
+    // Grab bytes from requester and send them to parser
+    // XXX Serial1 eventually
+    //while (Serial.available()) {
+    //    parser.update(Serial.read());
+    //}
 }
