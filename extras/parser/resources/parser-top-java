@@ -31,7 +31,6 @@ import java.io.ByteArrayOutputStream;
 public class Parser {
 
     private int state;
-    private byte message_direction;
     private byte message_id;
     private byte message_length_expected;
     private byte message_length_received;
@@ -84,12 +83,6 @@ public class Parser {
                 break;
 
             case 2:               // direction (should be >)
-                if (b == 62) { // >
-                    this.message_direction = 1;
-                }
-                else {            // <
-                    this.message_direction = 0;
-                }
                 this.state++;
                 break;
 
