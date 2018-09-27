@@ -25,6 +25,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <string.h>
 
 namespace hf {
 
@@ -53,6 +54,7 @@ namespace hf {
             uint8_t _command;
             uint8_t _offset;
             uint8_t _dataSize;
+            uint8_t _direction;
 
             serialState_t  _state;
 
@@ -167,7 +169,18 @@ namespace hf {
                         break;
 
                     case HEADER_M:
-                        _state = (c == '<') ? HEADER_ARROW : IDLE;
+                        switch (c) {
+                           case '>':
+                                _direction = 1;
+                                _state = HEADER_ARROW;
+                                break;
+                            case '<':
+                                _direction = 0;
+                                _state = HEADER_ARROW;
+                                break;
+                             default:
+                                _state = IDLE;
+                        }
                         break;
 
                     case HEADER_ARROW:

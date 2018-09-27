@@ -30,7 +30,7 @@ namespace hf {
             {
             }
 
-            bool gotNewFrame(void)
+            virtual bool gotNewFrame(void) override
             {
                 return false;
             }
@@ -46,7 +46,7 @@ namespace hf {
 
         public:
 
-            Dummy_Receiver(const uint8_t channelMap[6]) :  Receiver(channelMap) 
+            Dummy_Receiver(void) : Receiver(NULL)
             { 
             }
 

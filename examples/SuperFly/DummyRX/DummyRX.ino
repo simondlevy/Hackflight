@@ -34,11 +34,9 @@
 #include "mixers/quadx.hpp"
 #include "receivers/dummy.hpp"
 
-static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
-
 hf::Hackflight h;
 
-hf::Dummy_Receiver rc = hf::Dummy_Receiver(CHANNEL_MAP);
+hf::Dummy_Receiver rc;
 
 hf::MixerQuadX mixer;
 
@@ -52,7 +50,6 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
 
 void setup(void)
 {
-    // Use A1 for a prototype LadybugFC
     h.init(new hf::SuperFly(), &rc, &mixer, &stabilizer);
 }
 
