@@ -89,12 +89,12 @@ namespace hf {
 
         // channel indices
         enum {
-            CHANNEL_THROTTLE, 
             CHANNEL_ROLL,    
             CHANNEL_PITCH,  
+            CHANNEL_THROTTLE, 
             CHANNEL_YAW,   
-            CHANNEL_AUX1,
-            CHANNEL_AUX2
+            CHANNEL_AUX2,
+            CHANNEL_AUX1
         };
 
         uint8_t _channelMap[6];

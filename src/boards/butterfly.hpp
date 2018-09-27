@@ -2,6 +2,9 @@
    butterfly.hpp : Implementation of Hackflight Board routines for Butterfly
                    dev board + MPU9250 IMU + MS5637 barometer + brushless motors
 
+   Additional libraries required: https://github.com/simondlevy/MPU9250
+                                  https://github.com/simondlevy/MS5637
+
    Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
@@ -47,7 +50,7 @@ namespace hf {
             const uint8_t MOTOR_PINS[4] = {3, 4, 5, 6};
 
             // Min, max PWM values
-            const uint16_t PWM_MIN = 990;
+            const uint16_t PWM_MIN = 1000;
             const uint16_t PWM_MAX = 2000;
 
             // Butterfly board follows Arduino standard for LED pin
@@ -72,9 +75,6 @@ namespace hf {
 
             // Use the MPU9250 in pass-through mode
             MPU9250_Passthru _imu = MPU9250_Passthru(ASCALE, GSCALE, MSCALE, MMODE, SAMPLE_RATE_DIVISOR);
-
-            // Run motor ESCs using standard Servo library
-            Servo _escs[4];
 
        protected:
 
@@ -105,7 +105,7 @@ namespace hf {
 
             void writeMotor(uint8_t index, float value)
             {
-                _escs[index].writeMicroseconds((uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)));
+                analogWrite(MOTOR_PINS[index], (uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)) >> 3);
             }
 
             virtual uint32_t getMicroseconds(void) override
@@ -160,8 +160,8 @@ namespace hf {
 
                 // Connect to the ESCs and send them the baseline values
                 for (uint8_t k=0; k<4; ++k) {
-                    _escs[k].attach(MOTOR_PINS[k]);
-                    _escs[k].writeMicroseconds(PWM_MIN);
+                  pinMode(MOTOR_PINS[k], OUTPUT);
+                  analogWrite(MOTOR_PINS[k], PWM_MIN>>3);
                 }
 
                 // Start I^2C
