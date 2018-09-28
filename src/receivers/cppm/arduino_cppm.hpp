@@ -16,41 +16,48 @@
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
- */
+   */
 
 #pragma once
 
+#include "receiver.hpp"
 #include <CPPM.h>
-#include "cppm.hpp"
-
-// Interrupt on pin 0, using 5 channels
-static CPPM rx(0, 5);
 
 namespace hf {
 
-    class Arduino_CPPM_Receiver : public CPPM_Receiver {
+    class CPPM_Receiver : public Receiver {
 
-        public:
+        private:
 
-            Arduino_CPPM_Receiver() : CPPM_Receiver() { }
+            CPPM * rx;
 
         protected:
 
             void begin(void)
             {
-                rx.begin();
             }
 
             bool gotNewFrame(void)
             {
-                return rx.gotNewFrame();
+                return false;
             }
 
-            void readPulseVals(uint16_t pulsevals[8])
+            void readRawvals(void)
             {
-                rx.computeRC(pulsevals);
             }
 
-    }; // class Arduino_CPPM_Receiver
+            bool lostSignal(void)
+            {
+                return false;
+            }
+
+        public:
+
+            CPPM_Receiver(uint8_t pin, const uint8_t channelMap[6]) : Receiver(channelMap) 
+            { 
+                rx = new CPPM(pin, 6);
+            }
+
+    }; // class CPPM_Receiver
 
 } // namespace hf

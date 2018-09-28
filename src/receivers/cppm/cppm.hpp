@@ -30,7 +30,9 @@ namespace hf {
 
         protected:
 
-            CPPM_Receiver(float trimRoll=0, float trimPitch=0, float trimYaw=0) : Receiver(trimRoll, trimPitch, trimYaw) { }
+            CPPM_Receiver(const uint8_t channelMap[6]) :  Receiver(channelMap) 
+            {
+            }
 
             virtual void readPulseVals(uint16_t chanvals[8]) = 0;
 
