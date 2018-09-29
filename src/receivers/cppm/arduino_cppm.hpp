@@ -31,16 +31,10 @@ namespace hf {
 
             CPPM * rx;
 
-            uint32_t ppmAverageIndex;  
-
-            // Window size for moving average to reduce noise
-            static const uint8_t WINDOW = 4;
-
         protected:
 
             void begin(void)
             {
-                ppmAverageIndex = 0;
                 rx->begin();
             }
 
@@ -55,29 +49,9 @@ namespace hf {
 
                 rx->computeRC(rcData);
 
-                Serial.print(rcData[0]);
-                Serial.print(" ");
-                Serial.print(rcData[1]);
-                Serial.print(" ");
-                Serial.print(rcData[2]);
-                Serial.print(" ");
-                Serial.print(rcData[3]);
-                Serial.print(" ");
-                Serial.print(rcData[4]);
-                Serial.print(" ");
-                Serial.println(rcData[5]);
-
-                float averageRaw[6][WINDOW];
-
-                for (uint8_t chan = 0; chan < 6; chan++) {
-                    averageRaw[chan][ppmAverageIndex % WINDOW] = (rcData[chan] - 1000) / 500.f - 1;
-                    rawvals[chan] = 0;
-                    for (uint8_t k=0; k<WINDOW; ++k) {
-                        rawvals[chan] += averageRaw[chan][k];
-                    }
-                    rawvals[chan] /= WINDOW;
+                for (uint8_t k=0; k<6; k++) {
+                    rawvals[k] = 2 * (rcData[k] - 990.f) / (2020 - 990) - 1;
                 }
-                ppmAverageIndex++;
             }
 
             bool lostSignal(void)
