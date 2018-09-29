@@ -42,8 +42,9 @@ static const uint8_t RX_PIN = 12;
 
 hf::Hackflight h;
 
-//hf::CPPM_Receiver rc = hf::CPPM_Receiver(RX_PIN, CHANNEL_MAP);
 hf::Dummy_Receiver rc;
+
+hf::CPPM_Receiver rc2 = hf::CPPM_Receiver(12, CHANNEL_MAP);
 
 hf::MixerQuadX mixer;
 
