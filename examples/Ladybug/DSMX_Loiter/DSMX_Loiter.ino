@@ -21,11 +21,11 @@
 
 #include <Arduino.h>
 #include <VL53L1X.h>
-#include <Bitcraze_PMW3901.h>
+#include <PMW3901.h>
 
 #include "hackflight.hpp"
 #include "boards/ladybug.hpp"
-#include "receivers/serial/arduino_dsmx.hpp"
+#include "receivers/dsmx.hpp"
 #include "sensors/rangefinder.hpp"
 #include "sensors/opticalflow.hpp"
 #include "pidcontrollers/loiter.hpp"
@@ -86,7 +86,7 @@ class PMW3901_OpticalFlow : public hf::OpticalFlow {
     private:
 
         // Using digital pin 10 for chip select
-        Bitcraze_PMW3901 _flowSensor = Bitcraze_PMW3901(10);
+        PMW3901 _flowSensor = PMW3901(10);
 
 
     protected:

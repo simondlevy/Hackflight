@@ -33,8 +33,7 @@
 #include "hackflight.hpp"
 #include "boards/superfly.hpp"
 #include "mixers/quadx.hpp"
-#include "receivers/cppm/arduino_cppm.hpp"
-#include "receivers/dummy.hpp"
+#include "receivers/cppm.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 

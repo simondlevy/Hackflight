@@ -32,7 +32,7 @@
 
 #include "hackflight.hpp"
 #include "boards/bonadrone.hpp"
-#include "receivers/serial/arduino_sbus.hpp"
+#include "receivers/sbus.hpp"
 #include "mixers/quadx.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};

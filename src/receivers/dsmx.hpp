@@ -1,5 +1,5 @@
 /*
-   arduino_dsmx.hpp : Spektrum DSMX support for Arduino flight controllers
+   dsmx.hpp : Spektrum DSMX support for Arduino flight controllers
 
    This file is part of Hackflight.
 

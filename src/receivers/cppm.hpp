@@ -1,5 +1,5 @@
 /*
-   arduino_cppm.hpp : CPPM receiver support for Arduino-based flight controllers
+   cppm.hpp : CPPM receiver support for Arduino-based flight controllers
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -29,6 +29,9 @@ namespace hf {
 
         private:
 
+            static const uint16_t PPM_MIN = 990;
+            static const uint16_t PPM_MAX = 2020;
+
             CPPM * rx;
 
         protected:
@@ -50,7 +53,8 @@ namespace hf {
                 rx->computeRC(rcData);
 
                 for (uint8_t k=0; k<6; k++) {
-                    rawvals[k] = 2 * (rcData[k] - 990.f) / (2020 - 990) - 1;
+
+                    rawvals[k] = 2.f * (rcData[k] - PPM_MIN) / (PPM_MAX - PPM_MIN) - 1;
                 }
             }
 
