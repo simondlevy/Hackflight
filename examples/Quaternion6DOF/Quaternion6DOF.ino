@@ -1,7 +1,7 @@
 /*
    Quaternion6DOF.ino : Arduino sketch to test quaternion with MPU6050
 
-   Dependencies: https://github.com/simondlevy/MPU6050
+   Dependencies: https://github.com/simondlevy/MPU
                  https://github.com/simondlevy/CrossPlatformI2C
 
    Adapted from https://github.com/kriswiner/MPU6050/blob/master/MPU6050IMU.ino
