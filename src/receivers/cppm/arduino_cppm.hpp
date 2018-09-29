@@ -42,7 +42,9 @@ namespace hf {
 
             bool gotNewFrame(void)
             {
-                return rx->gotNewFrame();
+                bool retval = rx->gotNewFrame();
+                Serial.println(retval);
+                return retval;
             }
 
             void readRawvals(void)
@@ -59,6 +61,7 @@ namespace hf {
                     for (uint8_t i = 0; i < 4; i++)
                         rawvals[chan] += averageRaw[chan][i];
                     rawvals[chan] /= 4;
+
                 }
                 ppmAverageIndex++;
             }
