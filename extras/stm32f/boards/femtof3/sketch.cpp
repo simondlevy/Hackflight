@@ -30,25 +30,38 @@ static hf::Hackflight h;
 
 extern "C" {
 
+#include "io/serial.h"
+#include "drivers/serial_uart.h"
+
+    static serialPort_t * sbusSerialPort;
+
     void setup(void)
     {
-           hf::Stabilizer * stabilizer = new hf::Stabilizer(
-           0.10f,      // Level P
-           0.125f,     // Gyro cyclic P
-           0.001875f,  // Gyro cyclic I
-           0.175f,     // Gyro cyclic D
-           0.625f,    // Gyro yaw P
-           0.005625f); // Gyro yaw I
-         
-           hf::Dummy_Receiver * rc = new hf::Dummy_Receiver();
+        hf::Stabilizer * stabilizer = new hf::Stabilizer(
+                0.10f,      // Level P
+                0.125f,     // Gyro cyclic P
+                0.001875f,  // Gyro cyclic I
+                0.175f,     // Gyro cyclic D
+                0.625f,    // Gyro yaw P
+                0.005625f); // Gyro yaw I
+
+        hf::Dummy_Receiver * rc = new hf::Dummy_Receiver();
 
         // Initialize Hackflight firmware
         h.init(new FemtoF3(), rc, new hf::MixerQuadX(), stabilizer);
+
+        // Set up UART
+        uartPinConfigure(serialPinConfig());
+
+        // Open serial connection to receiver
+        sbusSerialPort = uartOpen(UARTDEV_3, NULL, NULL,  115200, MODE_RX, SERIAL_INVERTED);
     }
 
     void loop(void)
     {
         h.update();
+
+        hf::Debug::printf("%d\n", serialRxBytesWaiting(sbusSerialPort));
     }
 
 } // extern "C"
