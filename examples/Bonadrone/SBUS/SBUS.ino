@@ -35,11 +35,14 @@
 #include "receivers/sbus.hpp"
 #include "mixers/quadx.hpp"
 
+// Change this as needed
+#define SBUS_SERIAL Serial3
+
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 
 hf::Hackflight h;
 
-hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, Serial3);
+hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP);
 
 hf::MixerQuadX mixer;
 
@@ -51,8 +54,23 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
                 0,//1.0625f,    // Gyro yaw P
                 0.005625f); // Gyro yaw I
 
+
+uint8_t sbusSerialAvailable(void)
+{
+    return SBUS_SERIAL.available();
+}
+
+uint8_t sbusSerialRead(void)
+{
+    return SBUS_SERIAL.read();
+}
+
+
 void setup(void)
 {
+    // begin the serial port for SBUS
+    SBUS_SERIAL.begin(100000, SERIAL_SBUS);
+
     h.init(new hf::Bonadrone(), &rc, &mixer, &stabilizer);
 }
 
