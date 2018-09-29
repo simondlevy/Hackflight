@@ -34,12 +34,16 @@
 #include "boards/superfly.hpp"
 #include "mixers/quadx.hpp"
 #include "receivers/cppm/arduino_cppm.hpp"
+#include "receivers/dummy.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 
+static const uint8_t RX_PIN = 12;
+
 hf::Hackflight h;
 
-hf::CPPM_Receiver rc = hf::CPPM_Receiver(CHANNEL_MAP);
+//hf::CPPM_Receiver rc = hf::CPPM_Receiver(RX_PIN, CHANNEL_MAP);
+hf::Dummy_Receiver rc;
 
 hf::MixerQuadX mixer;
 

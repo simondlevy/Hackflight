@@ -37,8 +37,6 @@ namespace hf {
 
         private: 
 
-        static constexpr uint8_t DEFAULT_CHANNEL_MAP[6] = {0, 1, 2, 3, 4, 5};
-
         const float MARGIN            = 0.1f;
         const float CYCLIC_EXPO       = 0.65f;
         const float CYCLIC_RATE       = 0.90f;
@@ -133,10 +131,6 @@ namespace hf {
             _trimRoll  = 0;
             _trimPitch = 0;
             _trimYaw   = 0;
-        }
-
-        Receiver(void) : Receiver(DEFAULT_CHANNEL_MAP)
-        {
         }
 
         void init(void)

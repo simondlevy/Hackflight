@@ -20,6 +20,8 @@
 
 #include "receiver.hpp"
 
+static constexpr uint8_t DEFAULT_MAP[6] = {0,1,2,3,4,5};
+
 namespace hf {
 
     class Dummy_Receiver : public Receiver {
@@ -46,7 +48,7 @@ namespace hf {
 
         public:
 
-            Dummy_Receiver(void) : Receiver(NULL)
+            Dummy_Receiver(void) : Receiver(DEFAULT_MAP)
             { 
             }
 
