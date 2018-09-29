@@ -37,7 +37,7 @@ namespace hf {
 
         private: 
 
-        const float MARGIN            = 0.1f;
+        const float THROTTLE_MARGIN   = 0.1f;
         const float CYCLIC_EXPO       = 0.65f;
         const float CYCLIC_RATE       = 0.90f;
         const float THROTTLE_MID      = 0.00f;
@@ -87,12 +87,12 @@ namespace hf {
 
         // channel indices
         enum {
+            CHANNEL_THROTTLE, 
             CHANNEL_ROLL,    
             CHANNEL_PITCH,  
-            CHANNEL_THROTTLE, 
             CHANNEL_YAW,   
+            CHANNEL_AUX1,
             CHANNEL_AUX2,
-            CHANNEL_AUX1
         };
 
         uint8_t _channelMap[6];
@@ -194,7 +194,7 @@ namespace hf {
 
         bool throttleIsDown(void)
         {
-            return getRawval(CHANNEL_THROTTLE) < -1 + MARGIN;
+            return getRawval(CHANNEL_THROTTLE) < -1 + THROTTLE_MARGIN;
         }
 
         virtual uint8_t getAux1State(void)
