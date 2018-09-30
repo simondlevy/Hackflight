@@ -2,6 +2,7 @@
    hackflight.hpp : general header, plus init and update methods
 
    Copyright (c) 2018 Simon D. Levy
+   Contributed to by Alec Singer
 
    This file is part of Hackflight.
 
