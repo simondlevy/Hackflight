@@ -39,12 +39,6 @@ namespace hf {
 
         protected:
 
-            void begin(void)
-            {
-                failsafeCount = 0;
-                rx.begin();
-            }
-
             bool gotNewFrame(void)
             {
                 uint8_t failsafe = 0;
@@ -82,6 +76,13 @@ namespace hf {
             SBUS_Receiver(const uint8_t channelMap[6]) :  Receiver(channelMap) 
             { 
             }
+
+            void begin(void)
+            {
+                failsafeCount = 0;
+                rx.begin();
+            }
+
 
     }; // class SBUS_Receiver
 

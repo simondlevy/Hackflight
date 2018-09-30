@@ -20,12 +20,11 @@
 
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
-#include <receivers/dummy.hpp>
 #include <receivers/sbus.hpp>
 
 #include "femtof3.h"
 
-constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 4, 5};
 
 static hf::Hackflight h;
 
@@ -35,6 +34,16 @@ extern "C" {
 #include "drivers/serial_uart.h"
 
     static serialPort_t * sbusSerialPort;
+
+    static uint8_t _sbusSerialAvailable(void)
+    {
+        return serialRxBytesWaiting(sbusSerialPort);
+    }
+
+    static uint8_t _sbusSerialRead(void)
+    {
+        return serialRead(sbusSerialPort);
+    }
 
     void setup(void)
     {
@@ -46,7 +55,7 @@ extern "C" {
                 0.625f,    // Gyro yaw P
                 0.005625f); // Gyro yaw I
 
-        hf::Dummy_Receiver * rc = new hf::Dummy_Receiver();
+        hf::SBUS_Receiver * rc = new hf::SBUS_Receiver(CHANNEL_MAP);
 
         // Initialize Hackflight firmware
         h.init(new FemtoF3(), rc, new hf::MixerQuadX(), stabilizer);
@@ -55,14 +64,28 @@ extern "C" {
         uartPinConfigure(serialPinConfig());
 
         // Open serial connection to receiver
-        sbusSerialPort = uartOpen(UARTDEV_3, NULL, NULL,  115200, MODE_RX, SERIAL_INVERTED);
+        sbusSerialPort = uartOpen(UARTDEV_3, NULL, NULL, 100000, MODE_RX, 
+                (portOptions_e)((uint8_t)SERIAL_STOPBITS_2|(uint8_t)SERIAL_PARITY_EVEN|(uint8_t)SERIAL_INVERTED));
+
+        // Start the receiving
+        rc->begin();
     }
 
     void loop(void)
     {
         h.update();
-
-        hf::Debug::printf("%d\n", serialRxBytesWaiting(sbusSerialPort));
     }
 
 } // extern "C"
+
+uint8_t sbusSerialAvailable(void)
+{
+    return _sbusSerialAvailable();
+}
+
+uint8_t sbusSerialRead(void)
+{
+    return _sbusSerialRead();
+}
+
+
