@@ -87,7 +87,7 @@ LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
 HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
 IMU_DIR         := $(ARDUINO_DIR)/MPU/src
-RX_DIR          := $(ARDUINO_DIR)/SpektrumDSM/src
+RX_DIR          := $(ARDUINO_DIR)/SBUSRX/src
 SPI_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
 INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR)
 LINKER_DIR      := $(SRC_DIR)/target/link
@@ -466,8 +466,8 @@ endif
 
 # Hackflight support
 IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6500.cpp
-RX_SRC := $(RX_DIR)/SpektrumDSM.cpp
-HF_SRC := ../../common/main.c sketch.cpp femtof3.cpp ../../common/dsmx.cpp ../../common/spi.cpp
+RX_SRC := $(RX_DIR)/SBUSRX.cpp
+HF_SRC := ../../common/main.c sketch.cpp femtof3.cpp ../../common/spi.cpp
 SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC)
 
 ###############################################################################

@@ -21,6 +21,7 @@
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
 #include <receivers/dummy.hpp>
+#include <receivers/sbus.hpp>
 
 #include "femtof3.h"
 
