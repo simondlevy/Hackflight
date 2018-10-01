@@ -1,5 +1,5 @@
 /*
-   Sketch for Furious F3 Evo brushed board with Spektrum DSMX receiver
+   Sketch for FemtoF3 Evo brushless board with SBUS receiver
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -21,6 +21,7 @@
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
 #include <receivers/sbus.hpp>
+#include <receivers/dummy.hpp>
 
 #include "femtof3.h"
 
@@ -32,6 +33,15 @@ extern "C" {
 
 #include "io/serial.h"
 #include "drivers/serial_uart.h"
+
+    static uint8_t byte;
+
+    static void sbusDataReceive(uint16_t c, void *data)
+    {
+        (void)data;
+
+        byte = (uint8_t)c;
+    }
 
     static serialPort_t * sbusSerialPort;
 
@@ -55,7 +65,9 @@ extern "C" {
                 0.625f,    // Gyro yaw P
                 0.005625f); // Gyro yaw I
 
-        hf::SBUS_Receiver * rc = new hf::SBUS_Receiver(CHANNEL_MAP);
+        //hf::SBUS_Receiver * rc = new hf::SBUS_Receiver(CHANNEL_MAP);
+
+        hf::Dummy_Receiver * rc = new hf::Dummy_Receiver();
 
         // Initialize Hackflight firmware
         h.init(new FemtoF3(), rc, new hf::MixerQuadX(), stabilizer);
@@ -64,29 +76,35 @@ extern "C" {
         uartPinConfigure(serialPinConfig());
 
         // Open serial connection to receiver
-        sbusSerialPort = uartOpen(UARTDEV_3, NULL, NULL, 100000, MODE_RX, 
-                //(portOptions_e)((uint8_t)SERIAL_STOPBITS_2|(uint8_t)SERIAL_PARITY_EVEN|(uint8_t)SERIAL_INVERTED));
-                (portOptions_e)((uint8_t)SERIAL_STOPBITS_2|(uint8_t)SERIAL_PARITY_EVEN));
+        sbusSerialPort = uartOpen(UARTDEV_3, sbusDataReceive, NULL, 100000, MODE_RX, 
+                (portOptions_e)((uint8_t)SERIAL_STOPBITS_2|(uint8_t)SERIAL_PARITY_EVEN|(uint8_t)SERIAL_INVERTED));
 
-        // Start the receiving
-        rc->begin();
+        // Start the receiver
+        //rc->begin();
     }
 
     void loop(void)
     {
         h.update();
+
+        uint32_t time = micros();
+        static uint32_t _time;
+        if (time - _time > 1000) { 
+            hf::Debug::printf("%02X\n", byte);
+            _time = time;
+        }
     }
 
 } // extern "C"
 
 uint8_t sbusSerialAvailable(void)
 {
-    return _sbusSerialAvailable();
+    return 0;//_sbusSerialAvailable();
 }
 
 uint8_t sbusSerialRead(void)
 {
-    return _sbusSerialRead();
+    return 0;//_sbusSerialRead();
 }
 
 
