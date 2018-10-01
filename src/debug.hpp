@@ -27,6 +27,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include "board.hpp"
+
 namespace hf {
 
     class Debug {

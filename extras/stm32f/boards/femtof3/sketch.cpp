@@ -65,7 +65,8 @@ extern "C" {
 
         // Open serial connection to receiver
         sbusSerialPort = uartOpen(UARTDEV_3, NULL, NULL, 100000, MODE_RX, 
-                (portOptions_e)((uint8_t)SERIAL_STOPBITS_2|(uint8_t)SERIAL_PARITY_EVEN|(uint8_t)SERIAL_INVERTED));
+                //(portOptions_e)((uint8_t)SERIAL_STOPBITS_2|(uint8_t)SERIAL_PARITY_EVEN|(uint8_t)SERIAL_INVERTED));
+                (portOptions_e)((uint8_t)SERIAL_STOPBITS_2|(uint8_t)SERIAL_PARITY_EVEN));
 
         // Start the receiving
         rc->begin();
