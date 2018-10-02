@@ -42,6 +42,8 @@ extern "C" {
          
         DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_2, CHANNEL_MAP);
 
+        rc->begin();
+
         // Initialize Hackflight firmware
         h.init(new AlienflightF3V1(), rc, new hf::MixerQuadX(), stabilizer);
     }
