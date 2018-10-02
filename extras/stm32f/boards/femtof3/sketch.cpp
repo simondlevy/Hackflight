@@ -42,6 +42,7 @@ extern "C" {
 
         SBUS_Receiver * rc = new SBUS_Receiver(UARTDEV_3, CHANNEL_MAP);
 
+        // XXX for some reason this has to be called both here and int Hackflight::init()
         rc->begin();
 
         // Initialize Hackflight firmware
