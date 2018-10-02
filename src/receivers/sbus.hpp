@@ -41,10 +41,12 @@ namespace hf {
 
             bool gotNewFrame(void)
             {
-                uint8_t failsafe = 0;
-                uint16_t lostFrames = 0;
+                if (rx.gotNewFrame()) {
 
-                if (rx.getChannelValuesNormalized(channels, &failsafe, &lostFrames)) {
+                    uint8_t failsafe = 0;
+                    uint16_t lostFrames = 0;
+
+                    rx.getChannelValuesNormalized(channels, &failsafe, &lostFrames);
 
                     // accumulate consecutive failsafe hits
                     if (failsafe) {
@@ -74,9 +76,9 @@ namespace hf {
         public:
 
             SBUS_Receiver(const uint8_t channelMap[6]) :  Receiver(channelMap) 
-            { 
-                failsafeCount = 0;
-            }
+        { 
+            failsafeCount = 0;
+        }
 
     }; // class SBUS_Receiver
 
