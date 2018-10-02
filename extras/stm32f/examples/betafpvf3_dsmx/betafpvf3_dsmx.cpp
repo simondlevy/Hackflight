@@ -44,8 +44,7 @@ extern "C" {
            0.625f,    // Gyro yaw P
            0.005625f); // Gyro yaw I
          
-        DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_2, CHANNEL_MAP, 
-                TRIM_ROLL, TRIM_PITCH, TRIM_YAW);
+        DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_2, CHANNEL_MAP);
 
         // Initialize Hackflight firmware
         h.init(new BetaFPVF3(), rc, new hf::MixerQuadX(), stabilizer);

@@ -468,11 +468,16 @@ LD_FLAGS     = -lm \
 endif
 
 # Hackflight support
+BOARD := betafpvf3
+BOARD_DIR := ../../boards/$(BOARD)
+INCLUDE_DIRS += $(BOARD_DIR)
 IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6000.cpp
 RX_SRC := $(RX_DIR)/SpektrumDSM.cpp
-HF_SRC := ../../common/main.c sketch.cpp betafpvf3.cpp ../../common/dsmx.cpp ../../common/spi.cpp \
+HF_SRC := ../../common/main.c ../../common/dsmx.cpp ../../common/spi.cpp \
 	../../common/beeperled.cpp ../../common/motors.cpp
-SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC)
+BOARD_SRC := $(BOARD_DIR)/$(BOARD).cpp  
+SKETCH_SRC := ./betafpvf3_dsmx.cpp
+SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(BOARD_SRC) $(SKETCH_SRC)
 
 ###############################################################################
 # No user-serviceable parts below
