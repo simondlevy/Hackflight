@@ -1,5 +1,5 @@
 /*
-   cppm.hpp : CPPM receiver support for Arduino-based flight controllers
+   cppm.hpp : CPPMRX receiver support for Arduino-based flight controllers
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -21,7 +21,7 @@
 #pragma once
 
 #include "receiver.hpp"
-#include <CPPM.h>
+#include <CPPMRX.h>
 
 namespace hf {
 
@@ -32,7 +32,7 @@ namespace hf {
             static const uint16_t PPM_MIN = 990;
             static const uint16_t PPM_MAX = 2020;
 
-            CPPM * rx;
+            CPPMRX * rx;
 
         protected:
 
@@ -67,7 +67,7 @@ namespace hf {
 
             CPPM_Receiver(uint8_t pin, const uint8_t channelMap[6]) : Receiver(channelMap) 
             { 
-                rx = new CPPM(pin, 6);
+                rx = new CPPMRX(pin, 6);
             }
 
     }; // class CPPM_Receiver

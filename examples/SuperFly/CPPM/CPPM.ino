@@ -5,7 +5,7 @@
 
        https://github.com/simondlevy/EM7180
        https://github.com/simondlevy/CrossPlatformDataBus
-       https://github.com/simondlevy/CPPM
+       https://github.com/simondlevy/CPPMRX
 
    Hardware support for SuperFly ESP8266 Hackable flight controller:
 
