@@ -465,10 +465,15 @@ LD_FLAGS     = -lm \
 endif
 
 # Hackflight support
+BOARD := femtof3
+BOARD_DIR := ../../boards/$(BOARD)
+INCLUDE_DIRS += $(BOARD_DIR)
 IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6500.cpp
 RX_SRC := $(RX_DIR)/SBUSRX.cpp
-HF_SRC := ../../common/main.c  ../../common/spi.cpp ../../common/sbusrx.cpp sketch.cpp femtof3.cpp
-SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC)
+HF_SRC := ../../common/main.c  ../../common/spi.cpp ../../common/sbusrx.cpp 
+BOARD_SRC := $(BOARD_DIR)/$(BOARD).cpp  
+SKETCH_SRC := ./femtof3_sbus.cpp
+SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(BOARD_SRC) $(SKETCH_SRC)
 
 ###############################################################################
 # No user-serviceable parts below
