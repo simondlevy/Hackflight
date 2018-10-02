@@ -133,12 +133,6 @@ namespace hf {
             _trimYaw   = 0;
         }
 
-        void init(void)
-        {
-            // Do hardware initialization
-            begin();
-        }
-
         bool getDemands(float yawAngle)
         {
             // Acquire receiver demands, passing yaw angle for headless mode
