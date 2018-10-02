@@ -19,10 +19,10 @@
  */
 
 #include "dsmx.h"
-#include <SpektrumDSM.h>
+#include <DSMRX.h>
 #include <debug.hpp>
 
-static SpektrumDSM2048 * _rx;
+static DSM2048 * _rx;
 
 // Support for reading DSMX signals over UART
 static uint8_t _dsmAvailable;
@@ -68,8 +68,8 @@ void DSMX_Receiver::begin(void)
     // Open serial connection to receiver
     uartOpen(_uartDevice, serial_event, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
 
-    // Create a SpektrumDSM2048 object to handle serial interrupts
-    _rx = new SpektrumDSM2048();
+    // Create a DSM2048 object to handle serial interrupts
+    _rx = new DSM2048();
 }
 
 bool DSMX_Receiver::gotNewFrame(void) 

@@ -20,9 +20,9 @@
 
 #include "debug.hpp"
 #include "receiver.hpp"
-#include <SpektrumDSM.h>
+#include <DSMRX.h>
 
-static SpektrumDSM2048 rx;
+static DSM2048 rx;
 
 void serialEvent1(void)
 {
