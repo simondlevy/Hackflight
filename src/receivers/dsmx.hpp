@@ -24,34 +24,45 @@
 
 static DSM2048 rx;
 
+// Support different UARTs
+
+static HardwareSerial * _hardwareSerial;
+
 void serialEvent1(void)
+{
+    rx.handleSerialEvent(micros());
+}
+
+void serialEvent2(void)
+{
+    rx.handleSerialEvent(micros());
+}
+
+void serialEvent3(void)
 {
     rx.handleSerialEvent(micros());
 }
 
 uint8_t dsmSerialAvailable(void)
 {
-    return Serial1.available();
+    return _hardwareSerial->available();
 }
 
 uint8_t dsmSerialRead(void)
 {
-    return Serial1.read();
+    return _hardwareSerial->read();
 }
+
 
 namespace hf {
 
     class DSMX_Receiver : public Receiver {
 
-        public:
-
-            DSMX_Receiver(const uint8_t channelMap[6]) :  Receiver(channelMap) { }
-
          protected:
 
             void begin(void)
             {
-                Serial1.begin(115200);
+                _hardwareSerial->begin(115200);
             }
 
             bool gotNewFrame(void)
@@ -67,6 +78,14 @@ namespace hf {
             bool lostSignal(void)
             {
                 return rx.timedOut(micros());
+            }
+
+        public:
+
+            DSMX_Receiver(const uint8_t channelMap[6], HardwareSerial * hardwareSerial=&Serial1) 
+                :  Receiver(channelMap) 
+            { 
+                _hardwareSerial = hardwareSerial;
             }
 
     }; // class DSMX_Receiver
