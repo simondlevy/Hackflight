@@ -23,6 +23,21 @@
 
 static SBUSRX rx;
 
+void serialEvent1(void)
+{
+    rx.handleSerialEvent(micros());
+}
+
+uint8_t sbusSerialAvailable(void)
+{
+    return Serial1.available();
+}
+
+uint8_t sbusSerialRead(void)
+{
+    return Serial1.read();
+}
+
 
 namespace hf {
 

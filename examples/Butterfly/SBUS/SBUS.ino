@@ -51,16 +51,6 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
                 0,//1.0625f,    // Gyro yaw P
                 0.005625f); // Gyro yaw I
 
-uint8_t sbusSerialAvailable(void)
-{
-    return Serial1.available();
-}
-
-uint8_t sbusSerialRead(void)
-{
-    return Serial1.read();
-}
-
 void setup(void)
 {
     // begin the serial port for SBUS
