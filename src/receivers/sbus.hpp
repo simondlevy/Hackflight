@@ -23,21 +23,34 @@
 
 static SBUSRX rx;
 
+// Support different UARTs
+
+static HardwareSerial * _hardwareSerial;
+
 void serialEvent1(void)
+{
+    rx.handleSerialEvent(micros());
+}
+
+void serialEvent2(void)
+{
+    rx.handleSerialEvent(micros());
+}
+
+void serialEvent3(void)
 {
     rx.handleSerialEvent(micros());
 }
 
 uint8_t sbusSerialAvailable(void)
 {
-    return Serial1.available();
+    return _hardwareSerial->available();
 }
 
 uint8_t sbusSerialRead(void)
 {
-    return Serial1.read();
+    return _hardwareSerial->read();
 }
-
 
 namespace hf {
 
@@ -45,12 +58,11 @@ namespace hf {
 
         private:
 
-            // These values must persist between calls to readRawvals()
-            float channels[16];
-
             const uint16_t MAX_FAILSAFE = 10;
 
-            uint16_t failsafeCount;
+            // These values must persist between calls to readRawvals()
+            float    _channels[16];
+            uint16_t _failsafeCount;
 
         protected:
 
@@ -61,14 +73,14 @@ namespace hf {
                     uint8_t failsafe = 0;
                     uint16_t lostFrames = 0;
 
-                    rx.getChannelValuesNormalized(channels, &failsafe, &lostFrames);
+                    rx.getChannelValuesNormalized(_channels, &failsafe, &lostFrames);
 
                     // accumulate consecutive failsafe hits
                     if (failsafe) {
-                        failsafeCount++;
+                        _failsafeCount++;
                     }
                     else { // reset count
-                        failsafeCount = 0;
+                        _failsafeCount = 0;
                     }
 
                     return true;
@@ -80,20 +92,22 @@ namespace hf {
             void readRawvals(void)
             {
                 memset(rawvals, 0, CHANNELS*sizeof(float));
-                memcpy(rawvals, channels, CHANNELS*sizeof(float));
+                memcpy(rawvals, _channels, CHANNELS*sizeof(float));
             }
 
             bool lostSignal(void)
             {
-                return failsafeCount > MAX_FAILSAFE;
+                return _failsafeCount > MAX_FAILSAFE;
             }
 
         public:
 
-            SBUS_Receiver(const uint8_t channelMap[6]) :  Receiver(channelMap) 
-        { 
-            failsafeCount = 0;
-        }
+            SBUS_Receiver(const uint8_t channelMap[6], HardwareSerial * hardwareSerial=&Serial1) 
+                :  Receiver(channelMap) 
+            { 
+                _hardwareSerial = hardwareSerial;
+                _failsafeCount = 0;
+            }
 
     }; // class SBUS_Receiver
 
