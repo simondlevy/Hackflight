@@ -1,5 +1,5 @@
 /*
-   Sketch for SP Racing F3 board with Spektrum DSMX receiver
+   Sketch for AlienflightF3V1 board with Spektrum DSMX receiver
 
    Copyright (c) 2018 Simon D. Levy
 

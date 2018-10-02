@@ -467,7 +467,7 @@ endif
 # Hackflight support
 IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6500.cpp
 RX_SRC := $(RX_DIR)/SBUSRX.cpp
-HF_SRC := ../../common/main.c sketch.cpp femtof3.cpp ../../common/spi.cpp
+HF_SRC := ../../common/main.c  ../../common/spi.cpp ../../common/sbusrx.cpp sketch.cpp femtof3.cpp
 SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC)
 
 ###############################################################################
