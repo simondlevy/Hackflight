@@ -42,7 +42,7 @@ static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 
 hf::Hackflight h;
 
-hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, &SBUS_SERIAL);
+hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, SERIAL_SBUS, &SBUS_SERIAL);
 
 hf::MixerQuadX mixer;
 
@@ -56,9 +56,6 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
 
 void setup(void)
 {
-    // begin the serial port for SBUS
-    SBUS_SERIAL.begin(100000, SERIAL_SBUS);
-
     h.init(new hf::Bonadrone(), &rc, &mixer, &stabilizer);
 }
 

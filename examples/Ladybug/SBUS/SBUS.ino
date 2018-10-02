@@ -39,7 +39,7 @@ static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 
 hf::Hackflight h;
 
-hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP);
+hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, SERIAL_SBUS);
 
 hf::MixerQuadX mixer;
 
@@ -53,9 +53,6 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
 
 void setup(void)
 {
-    // begin the serial port for SBUS
-    Serial1.begin(100000, SERIAL_SBUS);
-
     // Use A1 for a prototype LadybugFC
     h.init(new hf::Ladybug(A1), &rc, &mixer, &stabilizer);
 }

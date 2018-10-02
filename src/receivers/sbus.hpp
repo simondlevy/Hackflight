@@ -60,11 +60,19 @@ namespace hf {
 
             const uint16_t MAX_FAILSAFE = 10;
 
+            // Support different Arduino hardware
+            uint16_t _serialConfig;
+
             // These values must persist between calls to readRawvals()
             float    _channels[16];
             uint16_t _failsafeCount;
 
         protected:
+
+            void begin(void)
+            {
+                _hardwareSerial->begin(100000, _serialConfig);
+            }
 
             bool gotNewFrame(void)
             {
@@ -102,9 +110,13 @@ namespace hf {
 
         public:
 
-            SBUS_Receiver(const uint8_t channelMap[6], HardwareSerial * hardwareSerial=&Serial1) 
+            SBUS_Receiver(
+                    const uint8_t channelMap[6], 
+                    uint16_t serialConfig,
+                    HardwareSerial * hardwareSerial=&Serial1) 
                 :  Receiver(channelMap) 
             { 
+                _serialConfig = serialConfig;
                 _hardwareSerial = hardwareSerial;
                 _failsafeCount = 0;
             }
