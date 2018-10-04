@@ -128,21 +128,8 @@ namespace hf {
                 return (float)k; // XXX for testing only
             }
 
-        protected:
-
-            void init(void)
-            {
-                _checksum = 0;
-                _outBufIndex = 0;
-                _outBufSize = 0;
-                _command = 0;
-                _offset = 0;
-                _dataSize = 0;
-                _state = IDLE;
-            }
-
             // returns true if reboot request, false otherwise
-            bool update(uint8_t c)
+            bool parse(uint8_t c)
             {
                 switch (_state) {
 
@@ -225,7 +212,43 @@ namespace hf {
                 return _outBuf[_outBufIndex++];
             }
 
+        protected:
 
+            void init(void)
+            {
+                _checksum = 0;
+                _outBufIndex = 0;
+                _outBufSize = 0;
+                _command = 0;
+                _offset = 0;
+                _dataSize = 0;
+                _state = IDLE;
+            }
+
+            bool update(void)
+            {
+                // True return value from update means reboot
+                bool reboot = false;
+
+                while (mspSerialAvailable() > 0) {
+
+                    if (parse(mspSerialRead())) { 
+                        reboot = true;
+                    }
+                }
+
+                while (availableBytes() > 0) {
+                    mspSerialWrite(readByte());
+                }
+
+                return reboot;
+            }
+
+            virtual uint8_t mspSerialAvailable(void) = 0;
+
+            virtual uint8_t mspSerialRead(void) = 0;
+
+            virtual void    mspSerialWrite(uint8_t b) = 0;
             void dispatchRequestMessage(void)
             {
                 switch (_command) {
@@ -248,18 +271,6 @@ namespace hf {
                         sendFloat(c6);
                         } break;
 
-                    case 122:
-                    {
-                        float roll = 0;
-                        float pitch = 0;
-                        float yaw = 0;
-                        handle_ATTITUDE_RADIANS_Request(roll, pitch, yaw);
-                        prepareToSendFloats(3);
-                        sendFloat(roll);
-                        sendFloat(pitch);
-                        sendFloat(yaw);
-                        } break;
-
                     case 123:
                     {
                         float estalt = 0;
@@ -268,26 +279,6 @@ namespace hf {
                         prepareToSendFloats(2);
                         sendFloat(estalt);
                         sendFloat(vario);
-                        } break;
-
-                    case 126:
-                    {
-                        float agl = 0;
-                        float flowx = 0;
-                        float flowy = 0;
-                        handle_LOITER_Request(agl, flowx, flowy);
-                        prepareToSendFloats(3);
-                        sendFloat(agl);
-                        sendFloat(flowx);
-                        sendFloat(flowy);
-                        } break;
-
-                    case 216:
-                    {
-                        uint8_t flag = 0;
-                        memcpy(&flag,  &_inBuf[0], sizeof(uint8_t));
-
-                        handle_SET_ARMED_Request(flag);
                         } break;
 
                     case 215:
@@ -305,6 +296,38 @@ namespace hf {
                         memcpy(&m4,  &_inBuf[12], sizeof(float));
 
                         handle_SET_MOTOR_NORMAL_Request(m1, m2, m3, m4);
+                        } break;
+
+                    case 216:
+                    {
+                        uint8_t flag = 0;
+                        memcpy(&flag,  &_inBuf[0], sizeof(uint8_t));
+
+                        handle_SET_ARMED_Request(flag);
+                        } break;
+
+                    case 126:
+                    {
+                        float agl = 0;
+                        float flowx = 0;
+                        float flowy = 0;
+                        handle_LOITER_Request(agl, flowx, flowy);
+                        prepareToSendFloats(3);
+                        sendFloat(agl);
+                        sendFloat(flowx);
+                        sendFloat(flowy);
+                        } break;
+
+                    case 122:
+                    {
+                        float roll = 0;
+                        float pitch = 0;
+                        float yaw = 0;
+                        handle_ATTITUDE_RADIANS_Request(roll, pitch, yaw);
+                        prepareToSendFloats(3);
+                        sendFloat(roll);
+                        sendFloat(pitch);
+                        sendFloat(yaw);
                         } break;
 
                 }
@@ -325,14 +348,6 @@ namespace hf {
                         handle_RC_NORMAL_Data(c1, c2, c3, c4, c5, c6);
                         } break;
 
-                    case 122:
-                    {
-                        float roll = getArgument(0);
-                        float pitch = getArgument(1);
-                        float yaw = getArgument(2);
-                        handle_ATTITUDE_RADIANS_Data(roll, pitch, yaw);
-                        } break;
-
                     case 123:
                     {
                         float estalt = getArgument(0);
@@ -346,6 +361,14 @@ namespace hf {
                         float flowx = getArgument(1);
                         float flowy = getArgument(2);
                         handle_LOITER_Data(agl, flowx, flowy);
+                        } break;
+
+                    case 122:
+                    {
+                        float roll = getArgument(0);
+                        float pitch = getArgument(1);
+                        float yaw = getArgument(2);
+                        handle_ATTITUDE_RADIANS_Data(roll, pitch, yaw);
                         } break;
 
                 }
@@ -373,20 +396,6 @@ namespace hf {
                 (void)c6;
             }
 
-            virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw)
-            {
-                (void)roll;
-                (void)pitch;
-                (void)yaw;
-            }
-
-            virtual void handle_ATTITUDE_RADIANS_Data(float & roll, float & pitch, float & yaw)
-            {
-                (void)roll;
-                (void)pitch;
-                (void)yaw;
-            }
-
             virtual void handle_ALTITUDE_METERS_Request(float & estalt, float & vario)
             {
                 (void)estalt;
@@ -397,30 +406,6 @@ namespace hf {
             {
                 (void)estalt;
                 (void)vario;
-            }
-
-            virtual void handle_LOITER_Request(float & agl, float & flowx, float & flowy)
-            {
-                (void)agl;
-                (void)flowx;
-                (void)flowy;
-            }
-
-            virtual void handle_LOITER_Data(float & agl, float & flowx, float & flowy)
-            {
-                (void)agl;
-                (void)flowx;
-                (void)flowy;
-            }
-
-            virtual void handle_SET_ARMED_Request(uint8_t  flag)
-            {
-                (void)flag;
-            }
-
-            virtual void handle_SET_ARMED_Data(uint8_t  flag)
-            {
-                (void)flag;
             }
 
             virtual void handle_SET_MOTOR_NORMAL_Request(float  m1, float  m2, float  m3, float  m4)
@@ -437,6 +422,44 @@ namespace hf {
                 (void)m2;
                 (void)m3;
                 (void)m4;
+            }
+
+            virtual void handle_SET_ARMED_Request(uint8_t  flag)
+            {
+                (void)flag;
+            }
+
+            virtual void handle_SET_ARMED_Data(uint8_t  flag)
+            {
+                (void)flag;
+            }
+
+            virtual void handle_LOITER_Request(float & agl, float & flowx, float & flowy)
+            {
+                (void)agl;
+                (void)flowx;
+                (void)flowy;
+            }
+
+            virtual void handle_LOITER_Data(float & agl, float & flowx, float & flowy)
+            {
+                (void)agl;
+                (void)flowx;
+                (void)flowy;
+            }
+
+            virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw)
+            {
+                (void)roll;
+                (void)pitch;
+                (void)yaw;
+            }
+
+            virtual void handle_ATTITUDE_RADIANS_Data(float & roll, float & pitch, float & yaw)
+            {
+                (void)roll;
+                (void)pitch;
+                (void)yaw;
             }
 
         public:
@@ -473,35 +496,6 @@ namespace hf {
                 return 30;
             }
 
-            static uint8_t serialize_ATTITUDE_RADIANS_Request(uint8_t bytes[])
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 122;
-                bytes[5] = 122;
-
-                return 6;
-            }
-
-            static uint8_t serialize_ATTITUDE_RADIANS(uint8_t bytes[], float  roll, float  pitch, float  yaw)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 12;
-                bytes[4] = 122;
-
-                memcpy(&bytes[5], &roll, sizeof(float));
-                memcpy(&bytes[9], &pitch, sizeof(float));
-                memcpy(&bytes[13], &yaw, sizeof(float));
-
-                bytes[17] = CRC8(&bytes[3], 14);
-
-                return 18;
-            }
-
             static uint8_t serialize_ALTITUDE_METERS_Request(uint8_t bytes[])
             {
                 bytes[0] = 36;
@@ -528,6 +522,39 @@ namespace hf {
                 bytes[13] = CRC8(&bytes[3], 10);
 
                 return 14;
+            }
+
+            static uint8_t serialize_SET_MOTOR_NORMAL(uint8_t bytes[], float  m1, float  m2, float  m3, float  m4)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 16;
+                bytes[4] = 215;
+
+                memcpy(&bytes[5], &m1, sizeof(float));
+                memcpy(&bytes[9], &m2, sizeof(float));
+                memcpy(&bytes[13], &m3, sizeof(float));
+                memcpy(&bytes[17], &m4, sizeof(float));
+
+                bytes[21] = CRC8(&bytes[3], 18);
+
+                return 22;
+            }
+
+            static uint8_t serialize_SET_ARMED(uint8_t bytes[], uint8_t  flag)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 1;
+                bytes[4] = 216;
+
+                memcpy(&bytes[5], &flag, sizeof(uint8_t));
+
+                bytes[6] = CRC8(&bytes[3], 3);
+
+                return 7;
             }
 
             static uint8_t serialize_LOITER_Request(uint8_t bytes[])
@@ -559,37 +586,33 @@ namespace hf {
                 return 18;
             }
 
-            static uint8_t serialize_SET_ARMED(uint8_t bytes[], uint8_t  flag)
+            static uint8_t serialize_ATTITUDE_RADIANS_Request(uint8_t bytes[])
             {
                 bytes[0] = 36;
                 bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 1;
-                bytes[4] = 216;
+                bytes[2] = 60;
+                bytes[3] = 0;
+                bytes[4] = 122;
+                bytes[5] = 122;
 
-                memcpy(&bytes[5], &flag, sizeof(uint8_t));
-
-                bytes[6] = CRC8(&bytes[3], 3);
-
-                return 7;
+                return 6;
             }
 
-            static uint8_t serialize_SET_MOTOR_NORMAL(uint8_t bytes[], float  m1, float  m2, float  m3, float  m4)
+            static uint8_t serialize_ATTITUDE_RADIANS(uint8_t bytes[], float  roll, float  pitch, float  yaw)
             {
                 bytes[0] = 36;
                 bytes[1] = 77;
                 bytes[2] = 62;
-                bytes[3] = 16;
-                bytes[4] = 215;
+                bytes[3] = 12;
+                bytes[4] = 122;
 
-                memcpy(&bytes[5], &m1, sizeof(float));
-                memcpy(&bytes[9], &m2, sizeof(float));
-                memcpy(&bytes[13], &m3, sizeof(float));
-                memcpy(&bytes[17], &m4, sizeof(float));
+                memcpy(&bytes[5], &roll, sizeof(float));
+                memcpy(&bytes[9], &pitch, sizeof(float));
+                memcpy(&bytes[13], &yaw, sizeof(float));
 
-                bytes[21] = CRC8(&bytes[3], 18);
+                bytes[17] = CRC8(&bytes[3], 14);
 
-                return 22;
+                return 18;
             }
 
     }; // class MspParser

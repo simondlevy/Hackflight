@@ -204,14 +204,9 @@ namespace hf {
 
             void doSerialComms(void)
             {
-                while (_board->serialAvailableBytes() > 0) {
-                    if (MspParser::update(_board->serialReadByte())) { // true return value from update means reboot
-                        _board->reboot(); // support "make flash" from STM32F boards
-                    }
-                }
-
-                while (MspParser::availableBytes() > 0) {
-                    _board->serialWriteByte(MspParser::readByte());
+                // runMspComms() return true if reboot requested, else false
+                if (MspParser::update()) {
+                    _board->reboot();
                 }
 
                 // Support motor testing from GCS
@@ -237,6 +232,21 @@ namespace hf {
             }
 
         protected:
+
+            virtual uint8_t mspSerialAvailable(void) 
+            {
+                return _board->serialAvailableBytes();
+            }
+
+            virtual uint8_t mspSerialRead(void) 
+            {
+                return _board->serialReadByte();
+            }
+
+            virtual void mspSerialWrite(uint8_t b) 
+            {
+                _board->serialWriteByte(b);
+            }
 
             virtual void handle_SET_ARMED_Request(uint8_t  flag)
             {

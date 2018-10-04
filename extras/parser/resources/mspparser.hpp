@@ -128,21 +128,8 @@ namespace hf {
                 return (float)k; // XXX for testing only
             }
 
-        protected:
-
-            void init(void)
-            {
-                _checksum = 0;
-                _outBufIndex = 0;
-                _outBufSize = 0;
-                _command = 0;
-                _offset = 0;
-                _dataSize = 0;
-                _state = IDLE;
-            }
-
             // returns true if reboot request, false otherwise
-            bool update(uint8_t c)
+            bool parse(uint8_t c)
             {
                 switch (_state) {
 
@@ -225,4 +212,40 @@ namespace hf {
                 return _outBuf[_outBufIndex++];
             }
 
+        protected:
 
+            void init(void)
+            {
+                _checksum = 0;
+                _outBufIndex = 0;
+                _outBufSize = 0;
+                _command = 0;
+                _offset = 0;
+                _dataSize = 0;
+                _state = IDLE;
+            }
+
+            bool update(void)
+            {
+                // True return value from update means reboot
+                bool reboot = false;
+
+                while (mspSerialAvailable() > 0) {
+
+                    if (parse(mspSerialRead())) { 
+                        reboot = true;
+                    }
+                }
+
+                while (availableBytes() > 0) {
+                    mspSerialWrite(readByte());
+                }
+
+                return reboot;
+            }
+
+            virtual uint8_t mspSerialAvailable(void) = 0;
+
+            virtual uint8_t mspSerialRead(void) = 0;
+
+            virtual void    mspSerialWrite(uint8_t b) = 0;

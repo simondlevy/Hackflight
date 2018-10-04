@@ -78,20 +78,13 @@ class LoiterRequestParser : public hf::MspParser {
 
         void set(float agl, float flowx, float flowy)
         {
+            // Set the values that the parser will send out
             _agl = agl;
             _flowx = flowx;
             _flowy = flowy;
 
-
-            // Get incoming requests
-            while (hardwareSerial->available() > 0) {
-                MspParser::update(hardwareSerial->read());
-            }
-
-            // Send data back out
-            while (MspParser::availableBytes() > 0) {
-                hardwareSerial->write(MspParser::readByte());
-            }
+            // Update the parser
+            MspParser::update();
         }
 
         virtual void handle_LOITER_Request(float & agl, float & flowx, float & flowy) override
@@ -100,6 +93,22 @@ class LoiterRequestParser : public hf::MspParser {
             flowx = _flowx;
             flowy = _flowy;
         }
+
+        virtual uint8_t mspSerialAvailable(void) 
+        {
+            return hardwareSerial->available();
+        }
+
+        virtual uint8_t mspSerialRead(void) 
+        {
+            return hardwareSerial->read();
+        }
+
+        virtual void mspSerialWrite(uint8_t b) 
+        {
+            hardwareSerial->write(b);
+        }
+
 };
 
 static LoiterRequestParser parser;
