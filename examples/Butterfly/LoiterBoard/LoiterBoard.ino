@@ -39,8 +39,6 @@ static const uint8_t GND_PIN = A1;
 
 static const uint8_t CS_PIN  = 10;
 
-static const uint8_t LED_PIN = 13;
-
 static VL53L1X distanceSensor;
 
 static PMW3901 flowSensor(CS_PIN);
@@ -101,7 +99,6 @@ class LoiterRequestParser : public hf::MspParser {
 
         virtual void handle_LOITER_Request(float & agl, float & flowx, float & flowy) override
         {
-            digitalWrite(LED_PIN, LOW);
             agl = _agl;
             flowx = _flowx;
             flowy = _flowy;
@@ -112,31 +109,26 @@ static LoiterRequestParser parser;
 
 void setup(void)
 {
-    // Set up LED
-    pinMode(LED_PIN, OUTPUT);
-    digitalWrite(LED_PIN, HIGH);
-
-    // Set up power for VL53L1X
-    //powerPin(GND_PIN, LOW);
-    //powerPin(VCC_PIN, HIGH);
+    // Use digital pins to power VL53L1X
+    powerPin(GND_PIN, LOW);
+    powerPin(VCC_PIN, HIGH);
 
     // Start I^2C bus
-    //Wire.begin(TWI_PINS_6_7);
-    //delay(100); // Wait a bit for bus to start
+    Wire.begin(TWI_PINS_6_7);
+    delay(100); // Wait a bit for bus to start
 
     // Start serial comms 
     Serial.begin(115200);
 
-    // Use digital pins for VL53L1 power, ground
     // Start VL53L1X distance sensor
-    //if (!distanceSensor.begin()) {
-    //    error("VL53L1X");
-    //}
+    if (!distanceSensor.begin()) {
+        error("VL53L1X");
+    }
 
     // Start PMW3901 optical-flow sensor
-    //if (!flowSensor.begin()) {
-    //    error("PMW3901");
-    //}
+    if (!flowSensor.begin()) {
+        error("PMW3901");
+    }
 
     // Start MSP parser to listen for loiter data requests
     parser.init();
@@ -149,17 +141,17 @@ void loop(void)
     static int16_t flowx, flowy;
 
     // Read distance sensor when its data is available
-    //if (distanceSensor.newDataReady()) {
-    //    agl = distanceSensor.getDistance(); //Get the result of the measurement from the sensor
-    //}
+    if (distanceSensor.newDataReady()) {
+        agl = distanceSensor.getDistance(); //Get the result of the measurement from the sensor
+    }
 
     // Read flow sensor periodically
-    //static uint32_t _time;
-    //uint32_t time = micros();
-    //if (time-_time > _flowUpdateMicros) {
-    //    flowSensor.readMotionCount(&flowx, &flowy);
-    //    _time = time;
-    //}
+    static uint32_t _time;
+    uint32_t time = micros();
+    if (time-_time > _flowUpdateMicros) {
+        flowSensor.readMotionCount(&flowx, &flowy);
+        _time = time;
+    }
 
     // Set current AGL, flow in parser
     parser.set(agl, flowx, flowy);
