@@ -47,7 +47,7 @@ namespace hf {
         {
             command /= 2;
 
-            if (rawvals[channel] < 0) {
+            if (rawvals[_channelMap[channel]] < 0) {
                 command = -command;
             }
 
@@ -61,7 +61,7 @@ namespace hf {
 
         float makePositiveCommand(uint8_t channel)
         {
-            return fabs(rawvals[channel]);
+            return fabs(rawvals[_channelMap[channel]]);
         }
 
         static float rcFun(float x, float e, float r)
@@ -143,18 +143,18 @@ namespace hf {
             readRawvals();
 
             // Convert raw [-1,+1] to absolute value
-            demands.roll  = makePositiveCommand(_channelMap[CHANNEL_ROLL]);
-            demands.pitch = makePositiveCommand(_channelMap[CHANNEL_PITCH]);
-            demands.yaw   = makePositiveCommand(_channelMap[CHANNEL_YAW]);
+            demands.roll  = makePositiveCommand(CHANNEL_ROLL);
+            demands.pitch = makePositiveCommand(CHANNEL_PITCH);
+            demands.yaw   = makePositiveCommand(CHANNEL_YAW);
 
             // Apply expo nonlinearity to roll, pitch
             demands.roll  = applyCyclicFunction(demands.roll);
             demands.pitch = applyCyclicFunction(demands.pitch);
 
             // Put sign back on command, yielding [-0.5,+0.5]
-            demands.roll  = adjustCommand(demands.roll, _channelMap[CHANNEL_ROLL]);
-            demands.pitch = adjustCommand(demands.pitch, _channelMap[CHANNEL_PITCH]);
-            demands.yaw   = adjustCommand(demands.yaw, _channelMap[CHANNEL_YAW]);
+            demands.roll  = adjustCommand(demands.roll, CHANNEL_ROLL);
+            demands.pitch = adjustCommand(demands.pitch,CHANNEL_PITCH);
+            demands.yaw   = adjustCommand(demands.yaw, CHANNEL_YAW);
 
             // Add in software trim
             demands.roll  += _trimRoll;
