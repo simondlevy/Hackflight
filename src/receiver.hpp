@@ -47,7 +47,7 @@ namespace hf {
         {
             command /= 2;
 
-            if (rawvals[channel] < 0) {
+            if (rawvals[_channelMap[channel]] < 0) {
                 command = -command;
             }
 
@@ -61,7 +61,7 @@ namespace hf {
 
         float makePositiveCommand(uint8_t channel)
         {
-            return fabs(rawvals[channel]);
+            return fabs(rawvals[_channelMap[channel]]);
         }
 
         static float rcFun(float x, float e, float r)
@@ -153,7 +153,7 @@ namespace hf {
 
             // Put sign back on command, yielding [-0.5,+0.5]
             demands.roll  = adjustCommand(demands.roll, CHANNEL_ROLL);
-            demands.pitch = adjustCommand(demands.pitch, CHANNEL_PITCH);
+            demands.pitch = adjustCommand(demands.pitch,CHANNEL_PITCH);
             demands.yaw   = adjustCommand(demands.yaw, CHANNEL_YAW);
 
             // Add in software trim
@@ -175,7 +175,7 @@ namespace hf {
             demands.yaw = -demands.yaw;
 
             // Pass throttle demand through exponential function
-            demands.throttle = throttleFun(rawvals[CHANNEL_THROTTLE]);
+            demands.throttle = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
             
             // Store auxiliary switch state
             _aux1State = getRawval(CHANNEL_AUX1) >= 0.0 ? (getRawval(CHANNEL_AUX1) > .4 ? 2 : 1) : 0;
