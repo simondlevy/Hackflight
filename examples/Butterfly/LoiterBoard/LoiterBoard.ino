@@ -76,11 +76,6 @@ class LoiterRequestParser : public hf::MspParser {
             hf::MspParser::init();
         }
 
-        void update(uint8_t c)
-        {
-            hf::MspParser::update(c);
-        }
-
         void set(float agl, float flowx, float flowy)
         {
             _agl = agl;
