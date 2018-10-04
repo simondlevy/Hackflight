@@ -45,6 +45,8 @@ static PMW3901 flowSensor(CS_PIN);
 
 static uint32_t _flowUpdateMicros = 1000000 / FLOW_UPDATE_HZ;
 
+static HardwareSerial * hardwareSerial = &Serial;
+
 static void powerPin(uint8_t pin, uint8_t value)
 {
     pinMode(pin, OUTPUT);
@@ -87,13 +89,13 @@ class LoiterRequestParser : public hf::MspParser {
 
 
             // Get incoming requests
-            while (Serial.available() > 0) {
-                MspParser::update(Serial.read());
+            while (hardwareSerial->available() > 0) {
+                MspParser::update(hardwareSerial->read());
             }
 
             // Send data back out
             while (MspParser::availableBytes() > 0) {
-                Serial.write(MspParser::readByte());
+                hardwareSerial->write(MspParser::readByte());
             }
         }
 
@@ -118,7 +120,7 @@ void setup(void)
     delay(100); // Wait a bit for bus to start
 
     // Start serial comms 
-    Serial.begin(115200);
+    hardwareSerial->begin(115200);
 
     // Start VL53L1X distance sensor
     if (!distanceSensor.begin()) {
