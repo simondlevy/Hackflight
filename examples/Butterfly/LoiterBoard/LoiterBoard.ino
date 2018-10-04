@@ -86,15 +86,27 @@ class LoiterRequestParser : public hf::MspParser {
             _agl = agl;
             _flowx = flowx;
             _flowy = flowy;
+
+
+            // Get incoming requests
+            while (Serial.available() > 0) {
+                MspParser::update(Serial.read());
+            }
+
+            // Send data back out
+            while (MspParser::availableBytes() > 0) {
+                Serial.write(MspParser::readByte());
+            }
         }
 
         virtual void handle_LOITER_Request(float & agl, float & flowx, float & flowy) override
         {
+            digitalWrite(LED_PIN, LOW);
             agl = _agl;
             flowx = _flowx;
             flowy = _flowy;
         }
- };
+};
 
 static LoiterRequestParser parser;
 
@@ -102,30 +114,29 @@ void setup(void)
 {
     // Set up LED
     pinMode(LED_PIN, OUTPUT);
+    digitalWrite(LED_PIN, HIGH);
 
-    powerPin(GND_PIN, LOW);
-    powerPin(VCC_PIN, HIGH);
+    // Set up power for VL53L1X
+    //powerPin(GND_PIN, LOW);
+    //powerPin(VCC_PIN, HIGH);
 
     // Start I^2C bus
-    Wire.begin(TWI_PINS_6_7);
-    delay(100); // Wait a bit for bus to start
+    //Wire.begin(TWI_PINS_6_7);
+    //delay(100); // Wait a bit for bus to start
 
-    // Start serial comms for debugging
+    // Start serial comms 
     Serial.begin(115200);
-
-    // Start output to flight controller
-    Serial1.begin(115200);
 
     // Use digital pins for VL53L1 power, ground
     // Start VL53L1X distance sensor
-    if (!distanceSensor.begin()) {
-        error("VL53L1X");
-    }
+    //if (!distanceSensor.begin()) {
+    //    error("VL53L1X");
+    //}
 
     // Start PMW3901 optical-flow sensor
-    if (!flowSensor.begin()) {
-        error("PMW3901");
-    }
+    //if (!flowSensor.begin()) {
+    //    error("PMW3901");
+    //}
 
     // Start MSP parser to listen for loiter data requests
     parser.init();
@@ -133,42 +144,23 @@ void setup(void)
 
 void loop(void)
 {
-    /*
-    digitalWrite(LED_PIN, LOW);
-    delay(500);
-    digitalWrite(LED_PIN, HIGH);
-    delay(500);
-    */
-
     // Declare measurement variables static so they'll persist between calls to loop()
     static uint16_t agl;
     static int16_t flowx, flowy;
 
     // Read distance sensor when its data is available
-    if (distanceSensor.newDataReady()) {
-        agl = distanceSensor.getDistance(); //Get the result of the measurement from the sensor
-    }
+    //if (distanceSensor.newDataReady()) {
+    //    agl = distanceSensor.getDistance(); //Get the result of the measurement from the sensor
+    //}
 
     // Read flow sensor periodically
-    static uint32_t _time;
-    uint32_t time = micros();
-    if (time-_time > _flowUpdateMicros) {
-        flowSensor.readMotionCount(&flowx, &flowy);
-        _time = time;
-    }
-
-    Serial.print(agl);
-    Serial.print(" ");
-    Serial.print(flowx);
-    Serial.print(" ");
-    Serial.println(flowy);
+    //static uint32_t _time;
+    //uint32_t time = micros();
+    //if (time-_time > _flowUpdateMicros) {
+    //    flowSensor.readMotionCount(&flowx, &flowy);
+    //    _time = time;
+    //}
 
     // Set current AGL, flow in parser
     parser.set(agl, flowx, flowy);
-
-    // Grab bytes from requester and send them to parser
-    // XXX Serial1 eventually
-    //while (Serial.available()) {
-    //    parser.update(Serial.read());
-    //}
 }
