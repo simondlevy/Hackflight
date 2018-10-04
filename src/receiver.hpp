@@ -175,7 +175,7 @@ namespace hf {
             demands.yaw = -demands.yaw;
 
             // Pass throttle demand through exponential function
-            demands.throttle = throttleFun(rawvals[CHANNEL_THROTTLE]);
+            demands.throttle = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
             
             // Store auxiliary switch state
             _aux1State = getRawval(CHANNEL_AUX1) >= 0.0 ? (getRawval(CHANNEL_AUX1) > .4 ? 2 : 1) : 0;
