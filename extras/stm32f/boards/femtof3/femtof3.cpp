@@ -21,8 +21,8 @@
 
 #include "femtof3.h"
 
-static const uint16_t BRUSHED_PWM_RATE     = 32000;
-static const uint16_t BRUSHED_IDLE_PULSE   = 0; 
+static const uint16_t BRUSHLESS_PWM_RATE   = 480;
+static const uint16_t BRUSHLESS_IDLE_PULSE = 1000; 
 
 static const float    MOTOR_MIN = 1000;
 static const float    MOTOR_MAX = 2000;
@@ -86,8 +86,8 @@ extern "C" {
     {
         motorDevConfig_t dev;
 
-        dev.motorPwmRate = BRUSHED_PWM_RATE;
-        dev.motorPwmProtocol = PWM_TYPE_BRUSHED;
+        dev.motorPwmRate = BRUSHLESS_PWM_RATE;
+        dev.motorPwmProtocol = PWM_TYPE_STANDARD;
         dev.motorPwmInversion = false;
         dev.useUnsyncedPwm = true;
         dev.useBurstDshot = false;
@@ -97,10 +97,15 @@ extern "C" {
         dev.ioTags[2] = timerioTagGetByUsage(TIM_USE_MOTOR, 2);
         dev.ioTags[3] = timerioTagGetByUsage(TIM_USE_MOTOR, 3);
 
-        motorDevInit(&dev, BRUSHED_IDLE_PULSE, 4);
+        motorDevInit(&dev, BRUSHLESS_IDLE_PULSE, 4);
 
         pwmEnableMotors();
-    }
+
+        writeMotor(0, 0);
+        writeMotor(1, 0);
+        writeMotor(2, 0);
+        writeMotor(3, 0);
+     }
 
     void FemtoF3::writeMotor(uint8_t index, float value)
     {
