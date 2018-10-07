@@ -37,7 +37,7 @@ extern "C" {
                 0.225f,     // Gyro cyclic P
                 0.001875f,  // Gyro cyclic I
                 0.375f,     // Gyro cyclic D
-                0,//0.625f,    // Gyro yaw P
+                0.625f,    // Gyro yaw P
                 0.005625f); // Gyro yaw I
 
         SBUS_Receiver * rc = new SBUS_Receiver(UARTDEV_3, CHANNEL_MAP);
