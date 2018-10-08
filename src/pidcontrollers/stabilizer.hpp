@@ -97,7 +97,7 @@ namespace hf {
             {
                 PTerm = PTerm * rateP -gyro[axis];
 
-                return PTerm + ITerm - DTerm;
+                return PTerm + ITerm + DTerm;
             }
 
             // Computes leveling PID for pitch or roll
