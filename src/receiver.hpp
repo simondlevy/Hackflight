@@ -37,6 +37,8 @@ namespace hf {
 
         private: 
 
+        static constexpr uint8_t DEFAULT_CHANNEL_MAP[6] = {0, 1, 2, 3, 4, 5};
+
         const float THROTTLE_MARGIN   = 0.1f;
         const float CYCLIC_EXPO       = 0.65f;
         const float CYCLIC_RATE       = 0.90f;
@@ -133,7 +135,12 @@ namespace hf {
             _trimYaw   = 0;
         }
 
-        bool getDemands(float yawAngle)
+        // Default constructor
+        Receiver(void) : Receiver(DEFAULT_CHANNEL_MAP)
+        {
+        }
+
+         bool getDemands(float yawAngle)
         {
             // Acquire receiver demands, passing yaw angle for headless mode
             // Wait till there's a new frame
