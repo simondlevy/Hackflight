@@ -21,8 +21,7 @@
 
 #include "femtof3.h"
 
-static const uint16_t BRUSHLESS_PWM_RATE   = 480;
-static const uint16_t BRUSHLESS_IDLE_PULSE = 1000; 
+static const uint16_t IDLE_PULSE = 1000;
 
 static const float    MOTOR_MIN = 1000;
 static const float    MOTOR_MAX = 2000;
@@ -86,10 +85,10 @@ extern "C" {
     {
         motorDevConfig_t dev;
 
-        dev.motorPwmRate = BRUSHLESS_PWM_RATE;
-        dev.motorPwmProtocol = PWM_TYPE_STANDARD;
+        dev.motorPwmRate = 0;
+        dev.motorPwmProtocol = PWM_TYPE_ONESHOT125;
         dev.motorPwmInversion = false;
-        dev.useUnsyncedPwm = true;
+        dev.useUnsyncedPwm = false;
         dev.useBurstDshot = false;
 
         dev.ioTags[0] = timerioTagGetByUsage(TIM_USE_MOTOR, 0);
@@ -97,7 +96,7 @@ extern "C" {
         dev.ioTags[2] = timerioTagGetByUsage(TIM_USE_MOTOR, 2);
         dev.ioTags[3] = timerioTagGetByUsage(TIM_USE_MOTOR, 3);
 
-        motorDevInit(&dev, BRUSHLESS_IDLE_PULSE, 4);
+        motorDevInit(&dev, IDLE_PULSE, 4);
 
         pwmEnableMotors();
 
