@@ -97,7 +97,7 @@ namespace hf {
 
             float computePid(float rateP, float PTerm, float ITerm, float DTerm, float gyro[3], uint8_t axis)
             {
-                PTerm -= gyro[axis] * rateP; 
+                PTerm = PTerm * rateP -gyro[axis];
 
                 return PTerm + ITerm - DTerm;
             }
