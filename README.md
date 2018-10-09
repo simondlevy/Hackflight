@@ -184,7 +184,7 @@ If you're mathematically-minded, you can think of a PID Controller as a function
 ### Control Flow Diagram
 
 <p align="center"> 
-<img src="extras/media/controlflow.png" width=400>
+<img src="extras/media/controlflow.png" width=600>
 <br><i>Courtesy of Juan Gallostra Ac&iacute;n</i>
 </p>
 
