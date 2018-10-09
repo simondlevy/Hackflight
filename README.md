@@ -181,3 +181,11 @@ example sketch.
 If you're mathematically-minded, you can think of a PID Controller as a function from a (<i>State</i>, <i>Demands</i>) pair to <i>Demands</i>:
 <br><i>PID Controller</i>: <i>State</i> &times; <i>Demands</i> &rarr; <i>Demands</i>
 
+### Control Flow Diagram
+
+<p align="center"> 
+<img src="extras/media/controlflow.png" width=400>
+<br><i>Courtesy of Juan Gallostra Ac&iacute;n</i>
+</p>
+
+
