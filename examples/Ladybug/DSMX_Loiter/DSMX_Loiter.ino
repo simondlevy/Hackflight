@@ -121,7 +121,8 @@ PMW3901_OpticalFlow opticalFlow;
 void setup(void)
 {
     // Add some "software trim" to the receiver
-    rc.setTrimRoll(+.15);
+    rc.setTrimRoll(+.1);
+    rc.setTrimPitch(+.1);
 
     // Initialize Hackflight firmware
     // We're using an older ladybug with LED on pin A1
