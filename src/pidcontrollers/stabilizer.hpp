@@ -51,9 +51,10 @@ namespace hf {
             const float GYRO_WINDUP_MAX             = 16.0f;
             const float BIG_GYRO_DEGREES_PER_SECOND = 40.0f; 
             const float BIG_YAW_DEMAND              = 0.1f;
-            const float MAX_ARMING_ANGLE_DEGREES    = 25.0f;         
+            const float MAX_ARMING_ANGLE_DEGREES    = 25.0f;
 
             // PID constants set in constructor
+            float _demandsToRate;
             float _levelP;
             float _gyroCyclicP;
             float _gyroCyclicI;
@@ -61,9 +62,9 @@ namespace hf {
             float _gyroYawP; 
             float _gyroYawI;
 
-            float _lastGyro[2];
-            float _gyroDelta1[2]; 
-            float _gyroDelta2[2];
+            float _lastError[2];
+            float _gyroDeltaError1[2]; 
+            float _gyroDeltaError2[2];
             float _errorGyroI[3];
 
             // For PTerm computation
@@ -81,10 +82,8 @@ namespace hf {
                 return M_PI * deg / 180.;
             }
 
-            float computeITermGyro(float rateP, float rateI, float rcCommand, float gyro[3], uint8_t axis)
+            float computeITermGyro(float error, float rateI, float rcCommand, float gyro[3], uint8_t axis)
             {
-                float error = rcCommand*rateP - gyro[axis];
-
                 // Avoid integral windup
                 _errorGyroI[axis] = Filter::constrainAbs(_errorGyroI[axis] + error, GYRO_WINDUP_MAX);
 
@@ -97,9 +96,9 @@ namespace hf {
 
             float computePid(float rateP, float PTerm, float ITerm, float DTerm, float gyro[3], uint8_t axis)
             {
-                PTerm -= gyro[axis] * rateP; 
+                PTerm = (PTerm * _demandsToRate -gyro[axis]) * rateP;
 
-                return PTerm + ITerm - DTerm;
+                return PTerm + ITerm + DTerm;
             }
 
             // Computes leveling PID for pitch or roll
@@ -119,17 +118,18 @@ namespace hf {
             // Computes leveling PID for pitch or roll
             float computeCyclicPid(float rcCommand, float gyro[3], uint8_t imuAxis)
             {
+                float error = rcCommand * _demandsToRate - gyro[imuAxis];
                 // I
-                float ITerm = computeITermGyro(_gyroCyclicP, _gyroCyclicI, rcCommand, gyro, imuAxis);
+                float ITerm = computeITermGyro(error, _gyroCyclicI, rcCommand, gyro, imuAxis);
                 ITerm *= _proportionalCyclicDemand;
 
                 // D
-                float _gyroDelta = gyro[imuAxis] - _lastGyro[imuAxis];
-                _lastGyro[imuAxis] = gyro[imuAxis];
-                float _gyroDeltaSum = _gyroDelta1[imuAxis] + _gyroDelta2[imuAxis] + _gyroDelta;
-                _gyroDelta2[imuAxis] = _gyroDelta1[imuAxis];
-                _gyroDelta1[imuAxis] = _gyroDelta;
-                float DTerm = _gyroDeltaSum * _gyroCyclicD; 
+                float _gyroDeltaError = error - _lastError[imuAxis];
+                _lastError[imuAxis] = error;
+                float _gyroDeltaErrorSum = _gyroDeltaError1[imuAxis] + _gyroDeltaError2[imuAxis] + _gyroDeltaError;
+                _gyroDeltaError2[imuAxis] = _gyroDeltaError1[imuAxis];
+                _gyroDeltaError1[imuAxis] = _gyroDeltaError;
+                float DTerm = _gyroDeltaErrorSum * _gyroCyclicD; 
 
                 return computePid(_gyroCyclicP, _PTerm[imuAxis], ITerm, DTerm, gyro, imuAxis);
             }
@@ -152,7 +152,8 @@ namespace hf {
 
         public:
 
-            Stabilizer(float levelP, float gyroCyclicP, float gyroCyclicI, float gyroCyclicD, float gyroYawP, float gyroYawI) :
+            Stabilizer(float levelP, float gyroCyclicP, float gyroCyclicI, float gyroCyclicD, float gyroYawP, float gyroYawI, float demandsToRate = 1.0f) :
+                _demandsToRate(demandsToRate),
                 _levelP(levelP), 
                 _gyroCyclicP(gyroCyclicP), 
                 _gyroCyclicI(gyroCyclicI), 
@@ -161,9 +162,9 @@ namespace hf {
                 _gyroYawI(gyroYawI) 
             {                // Zero-out previous values for D term
                 for (uint8_t axis=0; axis<2; ++axis) {
-                    _lastGyro[axis] = 0;
-                    _gyroDelta1[axis] = 0;
-                    _gyroDelta2[axis] = 0;
+                    _lastError[axis] = 0;
+                    _gyroDeltaError1[axis] = 0;
+                    _gyroDeltaError2[axis] = 0;
                 }
 
                 // Convert degree parameters to radians for use later
@@ -201,7 +202,8 @@ namespace hf {
                 demands.pitch = computeCyclicPid(demands.pitch, state.angularVelocities, AXIS_PITCH);
 
                 // For gyroYaw, P term comes directly from RC command, and D term is zero
-                float ITermGyroYaw = computeITermGyro(_gyroYawP, _gyroYawI, demands.yaw, state.angularVelocities, AXIS_YAW);
+                float yawError = demands.yaw * _demandsToRate - state.angularVelocities[AXIS_YAW];
+                float ITermGyroYaw = computeITermGyro(yawError, _gyroYawI, demands.yaw, state.angularVelocities, AXIS_YAW);
                 demands.yaw = computePid(_gyroYawP, demands.yaw, ITermGyroYaw, 0, state.angularVelocities, AXIS_YAW);
 
                 // Prevent "gyroYaw jump" during gyroYaw correction
