@@ -120,6 +120,9 @@ PMW3901_OpticalFlow opticalFlow;
 
 void setup(void)
 {
+    // Add some "software trim" to the receiver
+    rc.setTrimRoll(+.15);
+
     // Initialize Hackflight firmware
     // We're using an older ladybug with LED on pin A1
     h.init(new hf::Ladybug(), &rc, &mixer, &stabilizer);
@@ -128,7 +131,7 @@ void setup(void)
     rangefinder.begin();
     h.addSensor(&rangefinder);
 
-    // Add opticalf-low sensor
+    // Add optical-flow sensor
     opticalFlow.begin();
     h.addSensor(&opticalFlow);
 
