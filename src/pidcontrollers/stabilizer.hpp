@@ -134,11 +134,6 @@ namespace hf {
                 return computePid(_gyroCyclicP, _PTerm[imuAxis], ITerm, DTerm, gyro, imuAxis);
             }
 
-            float constrainCyclicDemand(float eulerAngle, float demand)
-            {
-                return demand * (1 - fabs(eulerAngle)/maxArmingAngle);
-            }
-
             void resetIntegral(void)
             {
                 _errorGyroI[AXIS_ROLL] = 0;
