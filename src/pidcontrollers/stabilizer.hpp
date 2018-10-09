@@ -51,9 +51,10 @@ namespace hf {
             const float GYRO_WINDUP_MAX             = 16.0f;
             const float BIG_GYRO_DEGREES_PER_SECOND = 40.0f; 
             const float BIG_YAW_DEMAND              = 0.1f;
-            const float MAX_ARMING_ANGLE_DEGREES    = 25.0f;         
+            const float MAX_ARMING_ANGLE_DEGREES    = 25.0f;
 
             // PID constants set in constructor
+            float _demandsToRate;
             float _levelP;
             float _gyroCyclicP;
             float _gyroCyclicI;
@@ -95,7 +96,7 @@ namespace hf {
 
             float computePid(float rateP, float PTerm, float ITerm, float DTerm, float gyro[3], uint8_t axis)
             {
-                PTerm = PTerm * rateP -gyro[axis];
+                PTerm = (PTerm * _demandsToRate -gyro[axis]) * rateP;
 
                 return PTerm + ITerm + DTerm;
             }
@@ -117,7 +118,7 @@ namespace hf {
             // Computes leveling PID for pitch or roll
             float computeCyclicPid(float rcCommand, float gyro[3], uint8_t imuAxis)
             {
-                float error = rcCommand * _gyroCyclicP - gyro[imuAxis];
+                float error = rcCommand * _demandsToRate - gyro[imuAxis];
                 // I
                 float ITerm = computeITermGyro(error, _gyroCyclicI, rcCommand, gyro, imuAxis);
                 ITerm *= _proportionalCyclicDemand;
@@ -151,7 +152,8 @@ namespace hf {
 
         public:
 
-            Stabilizer(float levelP, float gyroCyclicP, float gyroCyclicI, float gyroCyclicD, float gyroYawP, float gyroYawI) :
+            Stabilizer(float levelP, float gyroCyclicP, float gyroCyclicI, float gyroCyclicD, float gyroYawP, float gyroYawI, float demandsToRate = 1.0f) :
+                _demandsToRate(demandsToRate),
                 _levelP(levelP), 
                 _gyroCyclicP(gyroCyclicP), 
                 _gyroCyclicI(gyroCyclicI), 
@@ -200,7 +202,7 @@ namespace hf {
                 demands.pitch = computeCyclicPid(demands.pitch, state.angularVelocities, AXIS_PITCH);
 
                 // For gyroYaw, P term comes directly from RC command, and D term is zero
-                float yawError = demands.yaw * _gyroYawP - state.angularVelocities[AXIS_YAW];
+                float yawError = demands.yaw * _demandsToRate - state.angularVelocities[AXIS_YAW];
                 float ITermGyroYaw = computeITermGyro(yawError, _gyroYawI, demands.yaw, state.angularVelocities, AXIS_YAW);
                 demands.yaw = computePid(_gyroYawP, demands.yaw, ITermGyroYaw, 0, state.angularVelocities, AXIS_YAW);
 
