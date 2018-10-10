@@ -215,7 +215,7 @@ namespace hf {
                 }
             }
 
-            void checkSensors(void)
+            void checkOptionalSensors(void)
             {
                 for (uint8_t k=0; k<_sensor_count; ++k) {
                     Sensor * sensor = _sensors[k];
@@ -352,11 +352,10 @@ namespace hf {
 
                 // Check mandatory sensors
                 checkGyrometer();
-
                 checkQuaternion();
 
                 // Check optional sensors
-                checkSensors();
+                checkOptionalSensors();
             } 
 
     }; // class Hackflight
