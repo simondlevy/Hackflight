@@ -61,9 +61,9 @@ namespace hf {
             static const LSM6DSM::Rate_t   AODR   = LSM6DSM::ODR_833Hz;
             static const LSM6DSM::Rate_t   GODR   = LSM6DSM::ODR_833Hz;
 
-            // Biases computed by Kris
-            float ACCEL_BIAS[3] = {-0.01308, -0.00493, 0.03083};
-            float GYRO_BIAS[3]  = {0.71, -2.69, 0.78}; 
+            // Biases computed by Simon using Juan & Pep's LSM6DSM/Examples/Calibrate sketch
+            float ACCEL_BIAS[3] = {-0.020306,0.008926,0.029526};
+            float GYRO_BIAS[3]  = {0.301350,-0.818594,-0.701652};
 
 
             // Instance variables -----------------------------------------------------------------------------------

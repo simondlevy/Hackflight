@@ -48,8 +48,8 @@ hf::Stabilizer stabilizer = hf::Stabilizer(
         0.005625f); // Gyro yaw I
 
 hf::Loiter loiter = hf::Loiter(
-	0.40f,  // Altitude P
-    0.2f,   // Altitude D
+	0.60f,  // Altitude P
+    0.3f,   // Altitude D
     0.f,    // Cyclic P
     1.0f,   // throttleScale
     0.04f); // minAltitude
