@@ -1,5 +1,5 @@
 /*
-   ESCCalibration.ino : Hackflight sketch for calibrating Electronic Speed Controllers
+   ESCCalibration.ino : Calibrate Electronic Speed Controllers on Bonadrone Flight Controller
 
    Hardware support:
 
