@@ -48,19 +48,26 @@ namespace hf {
         private: 
 
             // Arbitrary constants
-            const float GYRO_WINDUP_MAX             = 16.0f;
+            const float GYRO_WINDUP_MAX             = 6.0f;
             const float BIG_GYRO_DEGREES_PER_SECOND = 40.0f; 
             const float BIG_YAW_DEMAND              = 0.1f;
             const float MAX_ARMING_ANGLE_DEGREES    = 25.0f;
 
             // PID constants set in constructor
             float _demandsToRate;
-            float _levelP;
-            float _gyroCyclicP;
-            float _gyroCyclicI;
-            float _gyroCyclicD; 
+            float _gyroRollP;
+            float _gyroRollI;
+            float _gyroRollD; 
+            float _gyroPitchP;
+            float _gyroPitchI;
+            float _gyroPitchD; 
             float _gyroYawP; 
             float _gyroYawI;
+            // Arrays of constants
+            float _PConstants[2];
+            float _IConstants[2];
+            float _DConstants[2];
+
 
             float _lastError[2];
             float _gyroDeltaError1[2]; 
@@ -69,8 +76,6 @@ namespace hf {
 
             // For PTerm computation
             float _PTerm[2]; // roll, pitch
-            float _demandRoll;
-            float _demandPitch;
 
             // proportion of cyclic demand compared to its maximum
             float _proportionalCyclicDemand;
@@ -102,25 +107,11 @@ namespace hf {
             }
 
             // Computes leveling PID for pitch or roll
-            void computeCyclicPTerm(float demand, float eulerAngles[3], uint8_t imuAxis, uint8_t auxState)
-            {
-                if (auxState == 0) {
-                    _PTerm[imuAxis] = demand; 
-                }
-
-                else {
-
-                    _PTerm[imuAxis] = (demand - eulerAngles[imuAxis]) * _levelP;  
-                    _PTerm[imuAxis] = Filter::complementary(demand, _PTerm[imuAxis], _proportionalCyclicDemand); 
-                }
-            }
-
-            // Computes leveling PID for pitch or roll
             float computeCyclicPid(float rcCommand, float gyro[3], uint8_t imuAxis)
             {
                 float error = rcCommand * _demandsToRate - gyro[imuAxis];
                 // I
-                float ITerm = computeITermGyro(error, _gyroCyclicI, rcCommand, gyro, imuAxis);
+                float ITerm = computeITermGyro(error, _IConstants[imuAxis], rcCommand, gyro, imuAxis);
                 ITerm *= _proportionalCyclicDemand;
 
                 // D
@@ -129,9 +120,9 @@ namespace hf {
                 float _gyroDeltaErrorSum = _gyroDeltaError1[imuAxis] + _gyroDeltaError2[imuAxis] + _gyroDeltaError;
                 _gyroDeltaError2[imuAxis] = _gyroDeltaError1[imuAxis];
                 _gyroDeltaError1[imuAxis] = _gyroDeltaError;
-                float DTerm = _gyroDeltaErrorSum * _gyroCyclicD; 
+                float DTerm = _gyroDeltaErrorSum * _DConstants[imuAxis]; 
 
-                return computePid(_gyroCyclicP, _PTerm[imuAxis], ITerm, DTerm, gyro, imuAxis);
+                return computePid(_PConstants[imuAxis], _PTerm[imuAxis], ITerm, DTerm, gyro, imuAxis);
             }
 
             void resetIntegral(void)
@@ -147,12 +138,16 @@ namespace hf {
 
         public:
 
-            Stabilizer(float levelP, float gyroCyclicP, float gyroCyclicI, float gyroCyclicD, float gyroYawP, float gyroYawI, float demandsToRate = 1.0f) :
+            Stabilizer(float gyroRollP, float gyroRollI, float gyroRollD,
+                       float gyroPitchP, float gyroPitchI, float gyroPitchD,
+                       float gyroYawP, float gyroYawI, float demandsToRate = 1.0f) :
                 _demandsToRate(demandsToRate),
-                _levelP(levelP), 
-                _gyroCyclicP(gyroCyclicP), 
-                _gyroCyclicI(gyroCyclicI), 
-                _gyroCyclicD(gyroCyclicD), 
+                _gyroRollP(gyroRollP), 
+                _gyroRollI(gyroRollI), 
+                _gyroRollD(gyroRollD),
+                _gyroPitchP(gyroPitchP),
+                _gyroPitchI(gyroPitchI),
+                _gyroPitchD(gyroPitchD), 
                 _gyroYawP(gyroYawP), 
                 _gyroYawI(gyroYawI) 
             {                // Zero-out previous values for D term
@@ -168,21 +163,20 @@ namespace hf {
 
                 // Initialize gyro error integral
                 resetIntegral();
-            }
-
-            void updateEulerAngles(float eulerAngles[3], uint8_t auxState)
-            {
-                computeCyclicPTerm(_demandRoll,  eulerAngles, 0, auxState);
-                computeCyclicPTerm(_demandPitch, eulerAngles, 1, auxState);
+                
+                // Constants arrays
+                _PConstants[0] = _gyroRollP;
+                _PConstants[1] = _gyroPitchP;
+                _IConstants[0] = _gyroRollI;
+                _IConstants[1] = _gyroPitchI;
+                _DConstants[0] = _gyroRollD;
+                _DConstants[1] = _gyroPitchD;
             }
 
             void updateReceiver(demands_t & demands, bool throttleIsDown)
             {
-                _demandRoll  = demands.roll;
-                _demandPitch = demands.pitch;
-
                 // Compute proportion of cyclic demand compared to its maximum
-                _proportionalCyclicDemand = Filter::max(fabs(_demandRoll), fabs(_demandPitch)) / 0.5f;
+                _proportionalCyclicDemand = Filter::max(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
                 
                 // When landed, reset integral component of PID
                 if (throttleIsDown) {
@@ -192,6 +186,9 @@ namespace hf {
 
             bool modifyDemands(state_t & state, demands_t & demands)
             {
+                _PTerm[0] = demands.roll;
+                _PTerm[1] = demands.pitch;
+
                 // Pitch, roll use leveling based on Euler angles
                 demands.roll  = computeCyclicPid(demands.roll,  state.angularVelocities, AXIS_ROLL);
                 demands.pitch = computeCyclicPid(demands.pitch, state.angularVelocities, AXIS_PITCH);
