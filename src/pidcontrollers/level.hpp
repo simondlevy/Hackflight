@@ -27,8 +27,6 @@
 #include <limits>
 #include <cmath>
 
-#include "receiver.hpp"
-#include "filters.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
@@ -41,7 +39,7 @@ namespace hf {
 
         private:
           
-            const float FF = 0.5;
+            const float FEED_FORWARD = 0.5;
             
             float PTerms[2];
             
@@ -53,6 +51,11 @@ namespace hf {
             {
                 PTerms[0] = rollLevelP;
                 PTerms[1] = pitchLevelP;
+                // roll and pitch demands go between [-0.5, 0.5] so, for a
+                // given max angle, the following relation must hold true:
+                // 0.5 * _demandsToAngle = maxAngle
+                // Since we work in radians:
+                // _demandsToAngle = (maxAngle*PI/180) * 2
                 _demandsToAngle = maxAngle * 2 * M_PI / 180.0f;
             }
 
@@ -62,7 +65,7 @@ namespace hf {
                 for (int axis=0; axis<2; ++axis)
                 {
                   float error = _demands[axis] * _demandsToAngle - state.eulerAngles[axis];
-                  _demands[axis] = error * PTerms[axis] + FF * _demands[axis];
+                  _demands[axis] = error * PTerms[axis] + FEED_FORWARD * _demands[axis];
                 }
                 
                 demands.roll = _demands[0];
