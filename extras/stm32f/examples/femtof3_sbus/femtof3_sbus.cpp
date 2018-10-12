@@ -33,12 +33,13 @@ extern "C" {
     void setup(void)
     {
         hf::Stabilizer * stabilizer = new hf::Stabilizer(
-                0.20f,      // Level P
-                0.225f,     // Gyro cyclic P
-                0.001875f,  // Gyro cyclic I
-                0.375f,     // Gyro cyclic D
-                0.625f,    // Gyro yaw P
-                0.005625f); // Gyro yaw I
+                1.00f, // Level P
+                0.05f, // Gyro cyclic P
+                0.00f, // Gyro cyclic I
+                0.00f, // Gyro cyclic D
+                0.10f, // Gyro yaw P
+                0.01f, // Gyro yaw I
+                8.58); // Demands to rate
 
         SBUS_Receiver * rc = new SBUS_Receiver(UARTDEV_3, CHANNEL_MAP);
 
