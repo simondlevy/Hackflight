@@ -55,15 +55,9 @@ namespace hf {
 
             // PID constants set in constructor
             float _demandsToRate;
-            float _gyroRollP;
-            float _gyroRollI;
-            float _gyroRollD; 
-            float _gyroPitchP;
-            float _gyroPitchI;
-            float _gyroPitchD; 
             float _gyroYawP; 
             float _gyroYawI;
-            // Arrays of constants
+            // Arrays of PID constants for pitch and roll
             float _PConstants[2];
             float _IConstants[2];
             float _DConstants[2];
@@ -81,6 +75,24 @@ namespace hf {
             float _proportionalCyclicDemand;
 
             float _bigGyroRate;
+            
+            void init(void)
+            {
+              // Zero-out previous values for D term
+              for (uint8_t axis=0; axis<2; ++axis) {
+                  _lastError[axis] = 0;
+                  _gyroDeltaError1[axis] = 0;
+                  _gyroDeltaError2[axis] = 0;
+              }
+
+              // Convert degree parameters to radians for use later
+              _bigGyroRate = degreesToRadians(BIG_GYRO_DEGREES_PER_SECOND);
+              maxArmingAngle = degreesToRadians(MAX_ARMING_ANGLE_DEGREES);
+
+              // Initialize gyro error integral
+              resetIntegral();
+
+            }
 
             float degreesToRadians(float deg)
             {
@@ -142,35 +154,33 @@ namespace hf {
                        float gyroPitchP, float gyroPitchI, float gyroPitchD,
                        float gyroYawP, float gyroYawI, float demandsToRate = 1.0f) :
                 _demandsToRate(demandsToRate),
-                _gyroRollP(gyroRollP), 
-                _gyroRollI(gyroRollI), 
-                _gyroRollD(gyroRollD),
-                _gyroPitchP(gyroPitchP),
-                _gyroPitchI(gyroPitchI),
-                _gyroPitchD(gyroPitchD), 
                 _gyroYawP(gyroYawP), 
                 _gyroYawI(gyroYawI) 
-            {                // Zero-out previous values for D term
-                for (uint8_t axis=0; axis<2; ++axis) {
-                    _lastError[axis] = 0;
-                    _gyroDeltaError1[axis] = 0;
-                    _gyroDeltaError2[axis] = 0;
-                }
-
-                // Convert degree parameters to radians for use later
-                _bigGyroRate = degreesToRadians(BIG_GYRO_DEGREES_PER_SECOND);
-                maxArmingAngle = degreesToRadians(MAX_ARMING_ANGLE_DEGREES);
-
-                // Initialize gyro error integral
-                resetIntegral();
-                
+            {
+                init();
                 // Constants arrays
-                _PConstants[0] = _gyroRollP;
-                _PConstants[1] = _gyroPitchP;
-                _IConstants[0] = _gyroRollI;
-                _IConstants[1] = _gyroPitchI;
-                _DConstants[0] = _gyroRollD;
-                _DConstants[1] = _gyroPitchD;
+                _PConstants[0] = gyroRollP;
+                _PConstants[1] = gyroPitchP;
+                _IConstants[0] = gyroRollI;
+                _IConstants[1] = gyroPitchI;
+                _DConstants[0] = gyroRollD;
+                _DConstants[1] = gyroPitchD;
+            }
+            
+            Stabilizer(float gyroRollPitchP, float gyroRollPitchI, float gyroRollPitchD,
+                       float gyroYawP, float gyroYawI, float demandsToRate = 1.0f) :
+                _demandsToRate(demandsToRate),
+                _gyroYawP(gyroYawP), 
+                _gyroYawI(gyroYawI) 
+            {
+                init();
+                // Constants arrays
+                _PConstants[0] = gyroRollPitchP;
+                _PConstants[1] = gyroRollPitchP;
+                _IConstants[0] = gyroRollPitchI;
+                _IConstants[1] = gyroRollPitchI;
+                _DConstants[0] = gyroRollPitchD;
+                _DConstants[1] = gyroRollPitchD;
             }
 
             void updateReceiver(demands_t & demands, bool throttleIsDown)
