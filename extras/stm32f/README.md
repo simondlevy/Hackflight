@@ -17,7 +17,7 @@ controller
 
 * [BetaFPV F3](https://betafpv.com/products/betafpv-f3-evo-whoop-brushed-flight-controller-no-receiver-version) brushed flight controller
 
-* [Femto F3] (http://www.readytoflyquads.com/f3-femto-flight-controller) brushless flight controller
+* [Femto F3](http://www.readytoflyquads.com/f3-femto-flight-controller) brushless flight controller
 
 What these boards have in common is the ability to short the boot-loader pads easily, either through a jumper
 or boot button.  
