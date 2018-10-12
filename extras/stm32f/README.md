@@ -13,9 +13,11 @@ to reflect where you put it. Then cd to the folder for your board and type
 The following flight controllers are currently supported and have been tested:
 
 * [Alienflight F3](http://www.readytoflyquads.com/alien-f3-brushed-flight-controller) brushed flight controller
-controller from ReadyToFlyQuads
+controller
 
-* [BetaFPV F3 brushed flight controller](https://betafpv.com/products/betafpv-f3-evo-whoop-brushed-flight-controller-no-receiver-version)
+* [BetaFPV F3](https://betafpv.com/products/betafpv-f3-evo-whoop-brushed-flight-controller-no-receiver-version) brushed flight controller
+
+* [Femto F3] (http://www.readytoflyquads.com/f3-femto-flight-controller) brushless flight controller
 
 What these boards have in common is the ability to short the boot-loader pads easily, either through a jumper
 or boot button.  
