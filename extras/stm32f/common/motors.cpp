@@ -17,28 +17,37 @@
 
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
- */
+   */
 
 extern "C" {
 
 #include "motors.h"
 
-static const uint16_t BRUSHED_PWM_RATE     = 32000;
-static const uint16_t BRUSHED_IDLE_PULSE   = 0; 
+    static const uint16_t BRUSHED_PWM_RATE     = 32000;
+    static const uint16_t BRUSHED_IDLE_PULSE   = 0; 
 
-static const uint16_t BRUSHLESS_IDLE_PULSE = 1000;
+    static const uint16_t BRUSHLESS_PWM_RATE   = 0;
+    static const uint16_t BRUSHLESS_IDLE_PULSE = 1000;
 
-static const float    MOTOR_MIN = 1000;
-static const float    MOTOR_MAX = 2000;
+    static const float    MOTOR_MIN = 1000;
+    static const float    MOTOR_MAX = 2000;
 
-   void brushed_motors_init(uint8_t m1, uint8_t m2, uint8_t m3, uint8_t m4)
+    static void motors_init(
+            uint16_t pwm_rate, 
+            uint16_t idle_pulse, 
+            motorPwmProtocolTypes_e protocol, 
+            bool unsynced,
+            uint8_t m1, 
+            uint8_t m2, 
+            uint8_t m3, 
+            uint8_t m4)
     {
         motorDevConfig_t dev;
 
-        dev.motorPwmRate = BRUSHED_PWM_RATE;
-        dev.motorPwmProtocol = PWM_TYPE_BRUSHED;
+        dev.motorPwmRate = pwm_rate;
+        dev.motorPwmProtocol = protocol;
         dev.motorPwmInversion = false;
-        dev.useUnsyncedPwm = true;
+        dev.useUnsyncedPwm = unsynced;
         dev.useBurstDshot = false;
 
         dev.ioTags[0] = timerioTagGetByUsage(TIM_USE_MOTOR, m1);
@@ -46,35 +55,27 @@ static const float    MOTOR_MAX = 2000;
         dev.ioTags[2] = timerioTagGetByUsage(TIM_USE_MOTOR, m3);
         dev.ioTags[3] = timerioTagGetByUsage(TIM_USE_MOTOR, m4);
 
-        motorDevInit(&dev, BRUSHED_IDLE_PULSE, 4);
+        motorDevInit(&dev, idle_pulse, 4);
 
         pwmEnableMotors();
     }
 
+    void brushed_motors_init(uint8_t m1, uint8_t m2, uint8_t m3, uint8_t m4)
+    {
+        motors_init(BRUSHED_PWM_RATE, BRUSHED_IDLE_PULSE, PWM_TYPE_BRUSHED, true, m1, m2, m3, m4);
+    }
+
     void brushless_motors_init(uint8_t m1, uint8_t m2, uint8_t m3, uint8_t m4)
     {
-        motorDevConfig_t dev;
+        // XXX should probably support more than just Oneshot protocol
+        motors_init(BRUSHLESS_PWM_RATE, BRUSHLESS_IDLE_PULSE, PWM_TYPE_ONESHOT125, false, m1, m2, m3, m4);
 
-        dev.motorPwmRate = 0;
-        dev.motorPwmProtocol = PWM_TYPE_ONESHOT125; // XXX shoud be a parameter
-        dev.motorPwmInversion = false;
-        dev.useUnsyncedPwm = false;
-        dev.useBurstDshot = false;
-
-        dev.ioTags[0] = timerioTagGetByUsage(TIM_USE_MOTOR, m1);
-        dev.ioTags[1] = timerioTagGetByUsage(TIM_USE_MOTOR, m2);
-        dev.ioTags[2] = timerioTagGetByUsage(TIM_USE_MOTOR, m3);
-        dev.ioTags[3] = timerioTagGetByUsage(TIM_USE_MOTOR, m4);
-
-        motorDevInit(&dev, BRUSHLESS_IDLE_PULSE, 4);
-
-        pwmEnableMotors();
-
+        // Send baseline pulse to initialize
         motor_write(0, 0);
         motor_write(1, 0);
         motor_write(2, 0);
         motor_write(3, 0);
-     }
+    }
 
 
     void motor_write(uint8_t index, float value)
