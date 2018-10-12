@@ -108,9 +108,6 @@ namespace hf {
                     // For PID control, start with demands from receiver
                     memcpy(&_demands, &_receiver->demands, sizeof(demands_t));
 
-                    // Update stabilizer with new Euler angles
-                    //_stabilizer->updateEulerAngles(_demands, _state.eulerAngles, _receiver->getAux1State());
-
                     // Synch PID controllers to gyro update
                     runPidControllers();
 
@@ -301,7 +298,6 @@ namespace hf {
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
-                //_pid_controller_count = 0;
 
                 // Last PID controller is always stabilizer (rate), aux state = 0
                 addPidController(stabilizer, 0);
