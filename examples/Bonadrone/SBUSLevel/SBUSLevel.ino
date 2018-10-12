@@ -73,6 +73,8 @@ void setup(void)
     rc.setTrimPitch(-0.0058769f);
     rc.setTrimYaw(-0.0192190f);
 
+    // 0 means the controller will always be active, but by changing
+    // that number it can be linked to a different aux state
     h.addPidController(&level, 0);
 
     h.init(new hf::Bonadrone(), &rc, &mixer, &stabilizer);
