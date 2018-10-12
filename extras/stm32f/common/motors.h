@@ -35,6 +35,8 @@ extern "C" {
 
     void brushed_motors_init(uint8_t m1, uint8_t m2, uint8_t m3, uint8_t m4);
 
+    void brushless_motors_init(uint8_t m1, uint8_t m2, uint8_t m3, uint8_t m4);
+
     void motor_write(uint8_t index, float value);
 
 } // extern "C"

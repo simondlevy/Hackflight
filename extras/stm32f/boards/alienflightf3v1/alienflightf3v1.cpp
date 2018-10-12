@@ -25,7 +25,7 @@
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
-    // Cleanflight includes
+// Cleanflight includes
 #include "platform.h"
 #include "drivers/system.h"
 #include "drivers/timer.h"
@@ -40,7 +40,7 @@ extern "C" {
 #include "target.h"
 #include "stm32f30x.h"
 
-    // Hackflight include
+// Hackflight include
 #include "../../common/i2c.h"
 #include "../../common/motors.h"
 

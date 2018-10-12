@@ -21,15 +21,10 @@
 
 #include "femtof3.h"
 
-static const uint16_t IDLE_PULSE = 1000;
-
-static const float    MOTOR_MIN = 1000;
-static const float    MOTOR_MAX = 2000;
-
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
-    // Cleanflight includes
+// Cleanflight includes
 #include "platform.h"
 #include "drivers/system.h"
 #include "drivers/timer.h"
@@ -43,8 +38,9 @@ extern "C" {
 #include "target.h"
 #include "stm32f30x.h"
 
-    // Hackflight includes
+// Hackflight includes
 #include "../../common/spi.h"
+#include "../../common/motors.h"
 
     static serialPort_t * _serial0;
 
@@ -83,32 +79,12 @@ extern "C" {
 
     void FemtoF3::initMotors(void)
     {
-        motorDevConfig_t dev;
-
-        dev.motorPwmRate = 0;
-        dev.motorPwmProtocol = PWM_TYPE_ONESHOT125;
-        dev.motorPwmInversion = false;
-        dev.useUnsyncedPwm = false;
-        dev.useBurstDshot = false;
-
-        dev.ioTags[0] = timerioTagGetByUsage(TIM_USE_MOTOR, 0);
-        dev.ioTags[1] = timerioTagGetByUsage(TIM_USE_MOTOR, 1);
-        dev.ioTags[2] = timerioTagGetByUsage(TIM_USE_MOTOR, 2);
-        dev.ioTags[3] = timerioTagGetByUsage(TIM_USE_MOTOR, 3);
-
-        motorDevInit(&dev, IDLE_PULSE, 4);
-
-        pwmEnableMotors();
-
-        writeMotor(0, 0);
-        writeMotor(1, 0);
-        writeMotor(2, 0);
-        writeMotor(3, 0);
-     }
+        brushless_motors_init(0, 1, 2, 3);
+    }
 
     void FemtoF3::writeMotor(uint8_t index, float value)
     {
-        pwmWriteMotor(index, MOTOR_MIN + value*(MOTOR_MAX-MOTOR_MIN));
+        motor_write(index, value);
     }
 
     void FemtoF3::delaySeconds(float sec)
