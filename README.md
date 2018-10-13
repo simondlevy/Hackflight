@@ -171,9 +171,10 @@ As with sensors, you can sub-class the <tt>PID_Controller</tt> class and call
 to ensure that your PID controller is called in the
 [Hackflight::runPidControllers()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L124-L147) method.
 The <tt>addPidController()</tt> method requires you to to specify the auxiliary-switch state in which the specified PID controller will be active.
-For example, you can specify that a [Loiter](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/loiter.hpp)
+For example, you can specify that a Level PID controller will be active in switch state 1 (or higher) and a 
+[Loiter](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/loiter.hpp)
 PID controller will be active in switch state 2, as we've
-[done](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_VL53L1X/DSMX_VL53L1X.ino#L98-L99) in the previously-cited
+[done](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_VL53L1X/DSMX_VL53L1X.ino#L99-L103) in the previously-cited
 example sketch. 
 
 <p align="center"> 
