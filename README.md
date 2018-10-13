@@ -61,9 +61,9 @@ class is an abstract class that can be subclassed for various motor
 configurations (QuadX, Hexacopter, Tricopter, etc.).  The <a
 href="https://github.com/simondlevy/Hackflight/blob/master/src/mixers/quadx.hpp">QuadX</a>
 subclass is already implemented.  
-* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/stabilizer.hpp">Stabilizer</a>
-class provides a constructor where you specify the stabilization PID values
-appropriate for your model.  
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp">PID_Controller</a>
+class provides a constructor where you specify the PID values appropriate for your model (see
+<b>PID Controllers</b> discussion below).
 
 
 Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
