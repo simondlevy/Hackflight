@@ -81,7 +81,7 @@ To support working with new new sensors and PID control algorithms, the <b>Hackf
 two methods: <tt>addSensor</tt> and <tt>addPidController</tt>.   For an example of how to use these
 methods, take a look at 
 this
-[sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/LadybugDSMX_VL53L1X/LadybugDSMX_VL53L1X.ino),
+[sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_VL53L1X/DSMX_VL53L1X.ino),
 which uses the [VL53L1X long-range proximity sensor](https://www.tindie.com/products/onehorse/vl53l1-long-range-proximity-sensor/)
 to provide altitude hold.
 
@@ -150,7 +150,7 @@ To implement additional sensors, you can directly sub-class the Sensor class, as
 class that we use to support the
 [VL53L1](https://www.tindie.com/products/onehorse/vl53l1-long-range-proximity-sensor/) time-of-flight rangefinder 
 in an 
-[example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/LadybugDSMX_VL53L1X/LadybugDSMX_VL53L1X.ino#L60-L84).  Once 
+[example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_VL53L1X/DSMX_VL53L1X.ino#L60-L84).  Once 
 you've implemented the sub-class(es) for a new sensor, you can call  <tt>Hackflight::addSensor()</tt> to ensure that the sensor
 code will be called by the [checkSensors](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L220-L234) method.
 
@@ -177,7 +177,7 @@ to ensure that your PID controller is called in the
 The <tt>addPidController()</tt> method requires you to to specify the auxiliary-switch state in which the specified PID controller will be active.
 For example, you can specify that a [Loiter](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/loiter.hpp)
 PID controller will be active in switch state 2, as we've
-[done](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/LadybugDSMX_VL53L1X/LadybugDSMX_VL53L1X.ino#L98-L99) in the previously-cited
+[done](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_VL53L1X/DSMX_VL53L1X.ino#L98-L99) in the previously-cited
 example sketch. 
 
 <p align="center"> 
