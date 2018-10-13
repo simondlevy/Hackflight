@@ -117,11 +117,8 @@ Fusion
 Solution](https://www.tindie.com/products/onehorse/ultimate-sensor-fusion-solution-mpu9250/),
 we find it convenient to treat the quaternion as a sensor reading.  For
 inertial measurement units (IMUs) like the MPU9250 that do not deliver a
-hardware quaternion, Hackflight provides a pair of classes &ndash;
-[MadgwickQuaternionFilter](https://github.com/simondlevy/Hackflight/blob/master/src/filters.hpp#L94-L95)
-and
-[MahonyQuaternionFilter](https://github.com/simondlevy/Hackflight/blob/master/src/filters.hpp#L201-L202)
-&ndash; that can be used to compute the quaternion on your microcontroller.
+hardware quaternion, Hackflight provides a [QuaternionFilter](https://github.com/simondlevy/Hackflight/blob/master/src/filters.hpp#L92)
+class that can be used to compute the quaternion on your microcontroller.
 
 To provide access to other popular surface-mount sensors that you may wish to read, Hackflight also has classes to support
 [accelerometers](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/accelerometer.hpp), 
