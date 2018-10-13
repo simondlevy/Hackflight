@@ -164,7 +164,13 @@ Like sensors, PID controllers in Hackflight are subclasses of an abstract
 [PID Controller](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp#L27-L39) class, 
 whose <tt>modifyDemands()</tt> method takes the current state and demands, and modifies the demands based on the
 state.  (This class also provides an optional <tt>shouldFlashLed()</tt> method, to help you see when the PID
-controller is active.)  As with sensors, you can sub-class the <tt>PID_Controller</tt> class and call
+controller is active.)  The Hackflight class [init](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L287)
+requires you to provide a [Rate](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/rate.hpp) PID controller, 
+and (especially for beginners), it is advisable to add a [Level](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/level.hpp) 
+PID controller as well, as shown in this example.  (For an introduction to Rate (a.k.a. Acro and Level modes, read this
+[blog post](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).)
+
+As with sensors, you can sub-class the <tt>PID_Controller</tt> class and call
 [Hackflight::addPidController()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L293-L299)
 to ensure that your PID controller is called in the
 [Hackflight::runPidControllers()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L129-L152) method.
