@@ -31,7 +31,7 @@
 #include "debug.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
-#include "pidcontrollers/stabilizer.hpp"
+#include "pidcontrollers/rate.hpp"
 #include "sensors/peripheral.hpp"
 #include "sensors/gyrometer.hpp"
 #include "sensors/quaternion.hpp"
@@ -45,7 +45,7 @@ namespace hf {
             // Passed to Hackflight::init() for a particular build
             Board      * _board;
             Receiver   * _receiver;
-            Stabilizer * _stabilizer;
+            Rate * _ratePid;
             Mixer      * _mixer;
 
             // PID controllers
@@ -75,7 +75,7 @@ namespace hf {
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(_state.eulerAngles[axis]) < _stabilizer->maxArmingAngle;
+                return fabs(_state.eulerAngles[axis]) < _ratePid->maxArmingAngle;
             }
 
             void checkQuaternion(void)
@@ -164,8 +164,8 @@ namespace hf {
                     return;
                 }
 
-                // Update stabilizer with cyclic demands
-                _stabilizer->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
+                // Update ratePid with cyclic demands
+                _ratePid->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
 
                 // Disarm
                 if (_state.armed && !_receiver->getAux2State()) {
@@ -284,13 +284,13 @@ namespace hf {
 
         public:
 
-            void init(Board * board, Receiver * receiver, Mixer * mixer, Stabilizer * stabilizer, bool armed=false)
+            void init(Board * board, Receiver * receiver, Mixer * mixer, Rate * ratePid, bool armed=false)
             {  
                 // Store the essentials
-                _board      = board;
-                _receiver   = receiver;
-                _mixer      = mixer;
-                _stabilizer = stabilizer;
+                _board    = board;
+                _receiver = receiver;
+                _mixer    = mixer;
+                _ratePid  = ratePid;
 
                 // Support for mandatory sensors
                 addSensor(&_quaternion, board);
@@ -299,8 +299,8 @@ namespace hf {
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
 
-                // Last PID controller is always stabilizer (rate), aux state = 0
-                addPidController(stabilizer, 0);
+                // Last PID controller is always ratePid (rate), aux state = 0
+                addPidController(ratePid, 0);
 
                 // Initialize state
                 memset(&_state, 0, sizeof(state_t));

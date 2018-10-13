@@ -48,20 +48,20 @@ hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, SERIAL_SBUS, &SBUS_SERIAL)
 
 hf::MixerQuadX mixer;
 
-hf::Stabilizer stabilizer = hf::Stabilizer(
-                0.10f,   // Gyro Roll P
-                0.01f,   // Gyro Roll I
-                0.05f,   // Gyro Roll D
-                0.20f,   // Gyro Pitch P
-                0.01f,   // Gyro Pitch I
-                0.05f,   // Gyro Pitch D
-                0.10f,   // Gyro yaw P
-                0.01f,   // Gyro yaw I
-                8.58f); // Demands to rate
+hf::Rate ratePid = hf::Rate(
+        0.10f,  // Gyro Roll P
+        0.01f,  // Gyro Roll I
+        0.05f,  // Gyro Roll D
+        0.20f,  // Gyro Pitch P
+        0.01f,  // Gyro Pitch I
+        0.05f,  // Gyro Pitch D
+        0.10f,  // Gyro yaw P
+        0.01f,  // Gyro yaw I
+        8.58f); // Demands to rate
 
 hf::Level level = hf::Level(
-                0.25f,   // Roll Level P
-                0.25f);  // Pitch Level P
+        0.25f,   // Roll Level P
+        0.25f);  // Pitch Level P
 
 void setup(void)
 {
@@ -77,7 +77,7 @@ void setup(void)
     // that number it can be linked to a different aux state
     h.addPidController(&level, 0);
 
-    h.init(new hf::Bonadrone(), &rc, &mixer, &stabilizer);
+    h.init(new hf::Bonadrone(), &rc, &mixer, &ratePid);
 }
 
 void loop(void)
