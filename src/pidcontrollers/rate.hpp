@@ -1,7 +1,7 @@
 /*
    rate.hpp : rate PID controller
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2018 Juan Gallostra and Simon D. Levy
 
    This file is part of Hackflight.
 

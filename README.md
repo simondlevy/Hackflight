@@ -189,7 +189,7 @@ If you're mathematically-minded, you can think of a PID Controller as a function
 
 ### Control Flow Diagrams
 
-<br><i>Courtesy of Juan Gallostra Ac&iacute;n</i>
+<br><i>Courtesy of Juan Gallostra</i>
 
 #### Rate PID
 

@@ -1,7 +1,8 @@
 /*
-   stabilizer.hpp : PID-based stabilization 
+   level.hpp : PID controller for Level mode
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2018 Juan Gallostra and Simon D. Levy
+
    Author: Juan Gallostra
 
    This file is part of Hackflight.
