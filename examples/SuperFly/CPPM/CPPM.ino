@@ -33,6 +33,7 @@
 #include "hackflight.hpp"
 #include "boards/superfly.hpp"
 #include "mixers/quadx.hpp"
+#include "pidcontrollers/level.hpp"
 #include "receivers/cppm.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
@@ -45,17 +46,23 @@ hf::CPPM_Receiver rc = hf::CPPM_Receiver(12, CHANNEL_MAP);
 
 hf::MixerQuadX mixer;
 
-hf::Stabilizer stabilizer = hf::Stabilizer(
-                0.20f,      // Level P
-                0.225f,     // Gyro cyclic P
-                0.001875f,  // Gyro cyclic I
-                0.375f,     // Gyro cyclic D
-                1.0625f,    // Gyro yaw P
-                0.005625f); // Gyro yaw I
+hf::Rate ratePid = hf::Rate(
+        0.225f,     // Gyro pitch/roll P
+        0.001875f,  // Gyro pitch/roll I
+        0.375f,     // Gyro pitch/roll D
+        1.0625f,    // Gyro yaw P
+        0.005625f); // Gyro yaw I
+
+hf::Level level = hf::Level(0.20f);
+
 
 void setup(void)
 {
-    h.init(new hf::SuperFly(), &rc, &mixer, &stabilizer);
+    // Add Level PID for aux switch position 1
+    h.addPidController(&level, 1);
+
+     // Initialize Hackflight firmware
+     h.init(new hf::SuperFly(), &rc, &mixer, &ratePid);
 }
 
 void loop(void)
