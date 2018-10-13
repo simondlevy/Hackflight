@@ -152,7 +152,7 @@ class that we use to support the
 in an 
 [example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_VL53L1X/DSMX_VL53L1X.ino#L60-L84).  Once 
 you've implemented the sub-class(es) for a new sensor, you can call  <tt>Hackflight::addSensor()</tt> to ensure that the sensor
-code will be called by the [checkSensors](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L220-L234) method.
+code will be called by the [checkOptionalSensors](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L215-L223) method.
 
 <p align="center"> 
 <img src="extras/media/sensors5.png" width=700>
