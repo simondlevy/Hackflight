@@ -44,10 +44,22 @@ hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);
 
 hf::MixerQuadX mixer;
 
+hf::Rate ratePid = hf::Rate(
+        0.225f,     // Gyro pitch/roll P
+        0.001875f,  // Gyro pitch/roll I
+        0.375f,     // Gyro pitch/roll D
+        1.0625f,    // Gyro yaw P
+        0.005625f); // Gyro yaw I
+
+hf::Level level = hf::Level(0.20f);
+
 void setup(void)
 {
+    // Add Level PID for aux switch position 1
+    h.addPidController(&level, 1);
+
     // Initialize Hackflight firmware
-    h.init(new hf::Ladybug(), &rc, &mixer, &stabilizer);
+    h.init(new hf::Ladybug(), &rc, &mixer, &ratePid);
 }
 
 void loop(void)

@@ -26,6 +26,7 @@
 #include "boards/ladybug.hpp"
 #include "receivers/dsmx.hpp"
 #include "sensors/rangefinder.hpp"
+#include "pidcontrollers/level.hpp"
 #include "pidcontrollers/loiter.hpp"
 #include "mixers/quadx.hpp"
 
@@ -37,13 +38,14 @@ hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);
 
 hf::MixerQuadX mixer;
 
-hf::Stabilizer stabilizer = hf::Stabilizer(
-        0.20f,      // Level P
-        0.225f,     // Gyro cyclic P
-        0.001875f,  // Gyro cyclic I
-        0.375f,     // Gyro cyclic D
+hf::Rate ratePid = hf::Rate(
+        0.225f,     // Gyro pitch/roll P
+        0.001875f,  // Gyro pitch/roll I
+        0.375f,     // Gyro pitch/roll D
         1.0625f,    // Gyro yaw P
         0.005625f); // Gyro yaw I
+
+hf::Level level = hf::Level(0.20f);
 
 hf::Loiter loiter = hf::Loiter(
 	0.40f,  // Altitude P
@@ -88,11 +90,14 @@ void setup(void)
 
     // Initialize Hackflight firmware
     // We're using an older ladybug with LED on pin A1
-    h.init(new hf::Ladybug(A1), &rc, &mixer, &stabilizer);
+    h.init(new hf::Ladybug(A1), &rc, &mixer, &ratePid);
 
     // Add rangefinder sensor
     rangefinder.begin();
     h.addSensor(&rangefinder);
+
+    // Add Level PID for aux switch position 1
+    h.addPidController(&level, 1);
 
     // Add Loiter PID controller for aux switch position 2
     h.addPidController(&loiter, 2);
