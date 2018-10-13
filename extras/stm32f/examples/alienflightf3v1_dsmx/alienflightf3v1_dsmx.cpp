@@ -20,6 +20,7 @@
 
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
+#include "pidcontrollers/level.hpp"
 #include "alienflightf3v1.h"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
@@ -32,18 +33,23 @@ extern "C" {
 
     void setup(void)
     {
-           hf::Stabilizer * stabilizer = new hf::Stabilizer(
-           0.10f,      // Level P
-           0.125f,     // Gyro cyclic P
-           0.001875f,  // Gyro cyclic I
-           0.175f,     // Gyro cyclic D
-           0.625f,    // Gyro yaw P
-           0.005625f); // Gyro yaw I
          
+        hf::Rate * ratePid = new hf::Rate(
+                0.125,      // Gyro pitch/roll P
+                0.001875f,  // Gyro pitch/roll I
+                0.175f,     // Gyro pitch/roll D
+                0.625f,     // Gyro yaw P
+                0.005625f); // Gyro yaw I
+
+        hf::Level * level = new hf::Level(0.10f);
+
         DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_2, CHANNEL_MAP);
 
+        // Add Level PID for aux switch position 1
+        h.addPidController(level, 1);
+
         // Initialize Hackflight firmware
-        h.init(new AlienflightF3V1(), rc, new hf::MixerQuadX(), stabilizer);
+        h.init(new AlienflightF3V1(), rc, new hf::MixerQuadX(), ratePid);
     }
 
     void loop(void)
