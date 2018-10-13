@@ -109,7 +109,7 @@ values to be sent to each motor:
 ### Sensors
 
 As discussed above, Hackflight requires a bare minimum of 
-[two sensor readings](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp#L40-L41)
+[two sensor readings](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp#L53-L54)
 &ndash; quaternion and gyrometer &ndash; and one PID controller, the 
 [Stabilizer](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/stabilizer.hpp).
 Technically, the quaternion is more properly part of the vehicle state, but
