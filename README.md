@@ -75,7 +75,7 @@ Others can run the <b>hackflight.py</b> Python script in the
 <b>extras/gcs/python</b> folder.  To run the Python script you'll
 need to install [MSPPG](https://github.com/simondlevy/hackflight/tree/master/extras/parser), a
 parser generator for the Multiwii Serial Protocol (MSP) messages used by the
-firmware. Follow the directions in that repository to install MSPPG for Python.
+firmware. Follow the directions in that folder to install MSPPG for Python.
 
 To support working with new new sensors and PID control algorithms, the <b>Hackflight</b> C++ class provides
 two methods: <tt>addSensor</tt> and <tt>addPidController</tt>.   For an example of how to use these
