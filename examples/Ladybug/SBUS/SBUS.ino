@@ -34,6 +34,7 @@
 #include "boards/ladybug.hpp"
 #include "receivers/sbus.hpp"
 #include "mixers/quadx.hpp"
+#include "pidcontrollers/level.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 
@@ -44,16 +45,23 @@ hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, SERIAL_SBUS);
 hf::MixerQuadX mixer;
 
 hf::Stabilizer stabilizer = hf::Stabilizer(
-                0.20f,      // Level P
                 0.225f,     // Gyro cyclic P
                 0.001875f,  // Gyro cyclic I
                 0.375f,     // Gyro cyclic D
                 1.0625f,    // Gyro yaw P
                 0.005625f); // Gyro yaw I
 
+hf::Level level = hf::Level(
+                0.20f,      // Roll level P
+                0.20f);     // Pitch level I
+                
+
 void setup(void)
 {
-    // Use A1 for a prototype LadybugFC
+
+    h.addPidController(&level, 1);
+
+    // Use pin A1 for LED on original LadybugFc (newer uses A4)
     h.init(new hf::Ladybug(A1), &rc, &mixer, &stabilizer);
 }
 
