@@ -108,9 +108,9 @@ values to be sent to each motor:
 
 ### Sensors
 
-As discussed above, Hackflight requires a bare minimum of 
-[two sensor readings](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp#L53-L54),
-quaternion and gyrometer.  Technically, the quaternion is more properly part of
+As discussed above, Hackflight requires a bare minimum of two sensor readings:
+[quaternion and gyrometer](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp#L53-L54).
+Technically, the quaternion is more properly part of
 the vehicle state, but because of the availability of &ldquo;hardware
 quaternion&rdquo; data from modern sensors like the [EM7180 SENtral Sensor
 Fusion
