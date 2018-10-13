@@ -34,6 +34,7 @@ Copyright (c) 2018 Simon D. Levy
 #include "boards/ladybug.hpp"
 #include "receivers/dsmx.hpp"
 #include "mixers/quadx.hpp"
+#include "pidcontrollers/level.hpp"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
@@ -42,14 +43,6 @@ hf::Hackflight h;
 hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);  
 
 hf::MixerQuadX mixer;
-
-hf::Stabilizer stabilizer = hf::Stabilizer(
-                0.20f,      // Level P
-                0.225f,     // Gyro cyclic P
-                0.001875f,  // Gyro cyclic I
-                0.375f,     // Gyro cyclic D
-                1.0625f,    // Gyro yaw P
-                0.005625f); // Gyro yaw I
 
 void setup(void)
 {

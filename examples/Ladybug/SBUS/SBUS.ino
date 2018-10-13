@@ -45,16 +45,13 @@ hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, SERIAL_SBUS);
 hf::MixerQuadX mixer;
 
 hf::Stabilizer stabilizer = hf::Stabilizer(
-                0.225f,     // Gyro cyclic P
-                0.001875f,  // Gyro cyclic I
-                0.375f,     // Gyro cyclic D
+                0.225f,     // Gyro pitch/roll P
+                0.001875f,  // Gyro pitch/roll I
+                0.375f,     // Gyro pitch/roll D
                 1.0625f,    // Gyro yaw P
                 0.005625f); // Gyro yaw I
 
-hf::Level level = hf::Level(
-                0.20f,      // Roll level P
-                0.20f);     // Pitch level I
-                
+hf::Level level = hf::Level(0.20f);
 
 void setup(void)
 {

@@ -59,6 +59,10 @@ namespace hf {
                 _demandsToAngle = maxAngle * 2 * M_PI / 180.0f;
             }
 
+            Level(float rollPitchLevelP) : Level(rollPitchLevelP, rollPitchLevelP)
+            {
+            }
+
             bool modifyDemands(state_t & state, demands_t & demands)
             {
                 float _demands[2] = {demands.roll, demands.pitch};
