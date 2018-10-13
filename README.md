@@ -165,8 +165,8 @@ Like sensors, PID controllers in Hackflight are subclasses of an abstract
 whose <tt>modifyDemands()</tt> method takes the current state and demands, and modifies the demands based on the
 state.  (This class also provides an optional <tt>shouldFlashLed()</tt> method, to help you see when the PID
 controller is active.)  The Hackflight class [init](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L287) method
-requires you to provide a [Rate](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/rate.hpp) PID controller; however,
-and (especially for beginners), it is advisable to add a [Level](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/level.hpp) 
+requires you to provide a [Rate](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/rate.hpp) PID controller; however
+(especially for beginners), it is advisable to add a [Level](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/level.hpp) 
 PID controller as well, as shown in this [example](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX/DSMX.ino#L47-L62).
 (For an introduction to Rate (a.k.a. Acro and Level modes, read this [blog post](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).)
 
