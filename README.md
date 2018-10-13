@@ -136,7 +136,7 @@ The Sensor class is an abstract (virtual) class (a.k.a. interface) specifying tw
 must implement: (1) reporting whether the sensor is ready to deliver new data;
 (2) modifying the vehicle state.  By requiring each sensor to report its
 readiness, we can avoid the need to write a separate timing loop for each
-sensor in the main [loop code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L301-L312). 
+sensor in the main [loop code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L344-L355). 
 
 If you're mathematically-minded, you can think of a sensor as a function from states to states:
 <i>Sensor</i>: <i>State</i> &rarr; <i>State</i>
