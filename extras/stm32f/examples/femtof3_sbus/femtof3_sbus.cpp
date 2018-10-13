@@ -20,6 +20,7 @@
 
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
+#include "pidcontrollers/level.hpp"
 #include "femtof3.h"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 4, 5};
@@ -32,8 +33,7 @@ extern "C" {
 
     void setup(void)
     {
-        hf::Stabilizer * stabilizer = new hf::Stabilizer(
-                1.00f, // Level P
+        hf::Rate * ratePid = new hf::Rate(
                 0.05f, // Gyro cyclic P
                 0.00f, // Gyro cyclic I
                 0.00f, // Gyro cyclic D
@@ -41,13 +41,18 @@ extern "C" {
                 0.01f, // Gyro yaw I
                 8.58); // Demands to rate
 
+        hf::Level * level = new hf::Level(1.00f);
+
         SBUS_Receiver * rc = new SBUS_Receiver(UARTDEV_3, CHANNEL_MAP);
 
         // XXX for some reason this has to be called both here and int Hackflight::init()
         rc->begin();
 
+        // Add Level PID for aux switch position 1
+        h.addPidController(level, 1);
+
         // Initialize Hackflight firmware
-        h.init(new FemtoF3(), rc, new hf::MixerQuadX(), stabilizer);
+        h.init(new FemtoF3(), rc, new hf::MixerQuadX(), ratePid);
     }
 
     void loop(void)
