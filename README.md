@@ -181,17 +181,17 @@ example sketch.
 If you're mathematically-minded, you can think of a PID Controller as a function from a (<i>State</i>, <i>Demands</i>) pair to <i>Demands</i>:
 <br><i>PID Controller</i>: <i>State</i> &times; <i>Demands</i> &rarr; <i>Demands</i>
 
-### Control Flow Diagram
+### Control Flow Diagrams
 
 <br><i>Courtesy of Juan Gallostra Ac&iacute;n</i>
 
-### Rate PID
+#### Rate PID
 
 <p align="center"> 
 <img src="extras/media/ratepid.png" width=800>
 </p>
 
-### Level PID
+#### Level PID
 
 <p align="center"> 
 <img src="extras/media/levelpid.png" width=800>
