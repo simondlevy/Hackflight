@@ -146,7 +146,7 @@ To implement additional sensors, you can directly sub-class the Sensor class, as
 class that we use to support the
 [VL53L1](https://www.tindie.com/products/onehorse/vl53l1-long-range-proximity-sensor/) time-of-flight rangefinder 
 in an 
-[example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_VL53L1X/DSMX_VL53L1X.ino#L60-L84).  Once 
+[example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_VL53L1X/DSMX_VL53L1X.ino).  Once 
 you've implemented the sub-class(es) for a new sensor, you can call  <tt>Hackflight::addSensor()</tt> to ensure that the sensor
 code will be called by the [checkOptionalSensors](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L215-L223) method.
 
