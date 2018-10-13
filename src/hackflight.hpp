@@ -50,7 +50,7 @@ namespace hf {
 
             // PID controllers
             PID_Controller * _pid_controllers[256];
-            uint8_t _pid_controller_count;
+            uint8_t _pid_controller_count = 0;
 
             // Mandatory sensors on the board
             Gyrometer _gyrometer;
@@ -88,9 +88,6 @@ namespace hf {
 
                     // Update state with new quaternion to yield Euler angles
                     _quaternion.modifyState(_state, time);
-
-                    // Update stabilizer with new Euler angles
-                    _stabilizer->updateEulerAngles(_state.eulerAngles, _receiver->getAux1State());
 
                     // Synch serial comms to quaternion check
                     doSerialComms();
@@ -301,9 +298,8 @@ namespace hf {
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
-                _pid_controller_count = 0;
 
-                // First PID controller is always stabilizer, aux state = 0
+                // Last PID controller is always stabilizer (rate), aux state = 0
                 addPidController(stabilizer, 0);
 
                 // Initialize state
