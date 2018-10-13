@@ -168,7 +168,7 @@ controller is active.)  The Hackflight class [init](https://github.com/simondlev
 requires you to provide a [Rate](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/rate.hpp) PID controller; however
 (especially for beginners), it is advisable to add a [Level](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/level.hpp) 
 PID controller as well, as shown in this [example](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX/DSMX.ino#L47-L62).
-(For an introduction to Rate (a.k.a. Acro and Level modes, read this [blog post](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).)
+For an introduction to Rate (a.k.a. Acro) and Level modes, read this [blog post](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).
 
 As with sensors, you can sub-class the <tt>PID_Controller</tt> class and call
 [Hackflight::addPidController()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L293-L299)
