@@ -188,7 +188,7 @@ namespace hf {
 
     }; // class Bonadrone
 
-    class BonadroneOneShot : public Bonadrone {
+    class BonadroneStandard : public Bonadrone {
 
         private:
 
@@ -200,13 +200,13 @@ namespace hf {
 
             virtual void writeMotor(uint8_t index, float value) override
             {
-                Debug::printf("writeMotorOneShot: %d %d\n", PWM_MIN, PWM_MAX);
+                Debug::printf("writeMotorStandard: %d %d\n", PWM_MIN, PWM_MAX);
                 analogWrite(MOTOR_PINS[index], (uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)) >> 3);
             }
 
         public:
 
-            BonadroneOneShot(void) : Bonadrone()
+            BonadroneStandard(void) : Bonadrone()
             {
                 for (uint8_t k=0; k<4; ++k) {
                     pinMode(MOTOR_PINS[k], OUTPUT);
@@ -214,7 +214,7 @@ namespace hf {
                 }
             }
 
-    }; // class BonadroneOneShot
+    }; // class BonadroneStandard
 
     class BonadroneMultiShot : public Bonadrone {
 
@@ -246,12 +246,6 @@ namespace hf {
     }; // class BonadroneMultiShot
 
     class BonadroneBrushed : public Bonadrone {
-
-        private:
-
-            // Min, max PWM values
-            const uint16_t PWM_MIN = 100;
-            const uint16_t PWM_MAX = 500;
 
         protected:
 
