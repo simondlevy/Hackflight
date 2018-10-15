@@ -1,7 +1,7 @@
 /*
    bonadrone.hpp : Implementation of Hackflight Board routines for Bonadrone Flight Controller
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2018 Juan Gallostra Acin, Simon D. Levy, Pep Martí Saumell
 
    This file is part of Hackflight.
 
@@ -47,11 +47,6 @@ namespace hf {
             // LSM6DSM data-ready interrupt pin
             const uint8_t LSM6DSM_INTERRUPT_PIN = 2;
 
-            const uint8_t MOTOR_PINS[4] = {3, 4, 5, 6};
-            
-            // Min, max PWM values
-            const uint16_t PWM_MIN = 1000;
-            const uint16_t PWM_MAX = 2000;
             
             // Paramters to experiment with ------------------------------------------------------------------------
 
@@ -82,6 +77,10 @@ namespace hf {
 
         protected:
 
+            const uint8_t MOTOR_PINS[4] = {3, 4, 5, 6};
+
+            virtual void writeMotor(uint8_t index, float value) = 0;
+
             void delayMilliseconds(uint32_t msec)
             {
                 delay(msec);
@@ -105,11 +104,6 @@ namespace hf {
             void serialWriteByte(uint8_t c)
             {
                 Serial.write(c);
-            }
-
-            void writeMotor(uint8_t index, float value)
-            {
-                analogWrite(MOTOR_PINS[index], (uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)) >> 3);
             }
 
             virtual uint32_t getMicroseconds(void) override
@@ -156,12 +150,6 @@ namespace hf {
                 // Configure interrupt
                 pinMode(LSM6DSM_INTERRUPT_PIN, INPUT);
 
-                // Connect to the ESCs and send them the baseline values
-                for (uint8_t k=0; k<4; ++k) {
-                  pinMode(MOTOR_PINS[k], OUTPUT);
-                  analogWrite(MOTOR_PINS[k], PWM_MIN>>3);
-                }
-
                 // Start I^2C
                 Wire.begin(TWI_PINS_20_21);
                 Wire.setClock(400000); // I2C frequency at 400 kHz  
@@ -198,8 +186,92 @@ namespace hf {
                 RealBoard::init();
             }
 
-
     }; // class Bonadrone
+
+    class BonadroneOneShot : public Bonadrone {
+
+        private:
+
+            // Min, max PWM values
+            const uint16_t PWM_MIN = 1000;
+            const uint16_t PWM_MAX = 2000;
+
+        protected:
+
+            virtual void writeMotor(uint8_t index, float value) override
+            {
+                Debug::printf("writeMotorOneShot: %d %d\n", PWM_MIN, PWM_MAX);
+                analogWrite(MOTOR_PINS[index], (uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)) >> 3);
+            }
+
+        public:
+
+            BonadroneOneShot(void) : Bonadrone()
+            {
+                for (uint8_t k=0; k<4; ++k) {
+                    pinMode(MOTOR_PINS[k], OUTPUT);
+                    analogWrite(MOTOR_PINS[k], PWM_MIN>>3);
+                }
+            }
+
+    }; // class BonadroneOneShot
+
+    class BonadroneMultiShot : public Bonadrone {
+
+        private:
+
+            // Min, max PWM values
+            const uint16_t PWM_MIN = 100;
+            const uint16_t PWM_MAX = 500;
+
+        protected:
+
+            virtual void writeMotor(uint8_t index, float value) override
+            {
+                analogWrite(MOTOR_PINS[index], (uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)));
+            }
+
+
+        public:
+
+            BonadroneMultiShot(void) : Bonadrone()
+            {
+                for (uint8_t k=0; k<4; ++k) {
+                    analogWriteFrequency(MOTOR_PINS[k], 2000);
+                    analogWriteRange(MOTOR_PINS[k], 10000);
+                    analogWrite(MOTOR_PINS[k], PWM_MIN);
+                }
+            }
+
+    }; // class BonadroneMultiShot
+
+    class BonadroneBrushed : public Bonadrone {
+
+        private:
+
+            // Min, max PWM values
+            const uint16_t PWM_MIN = 100;
+            const uint16_t PWM_MAX = 500;
+
+        protected:
+
+            virtual void writeMotor(uint8_t index, float value) override
+            {
+                analogWrite(MOTOR_PINS[index], (uint8_t)(value * 255));
+            }
+
+
+        public:
+
+            BonadroneBrushed(void) : Bonadrone()
+        {
+            for (int k=0; k<4; ++k) {
+                analogWriteFrequency(MOTOR_PINS[k], 10000);  
+                analogWrite(MOTOR_PINS[k], 0);  
+            }
+        }
+
+    }; // class BonadroneBrushed
 
     void Board::outbuf(char * buf)
     {

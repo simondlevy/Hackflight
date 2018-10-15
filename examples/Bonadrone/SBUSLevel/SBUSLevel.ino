@@ -77,7 +77,7 @@ void setup(void)
     // that number it can be linked to a different aux state
     h.addPidController(&level, 0);
 
-    h.init(new hf::Bonadrone(), &rc, &mixer, &ratePid);
+    h.init(new hf::BonadroneMultiShot(), &rc, &mixer, &ratePid);
 }
 
 void loop(void)
