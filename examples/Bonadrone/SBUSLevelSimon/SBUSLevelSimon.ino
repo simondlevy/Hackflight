@@ -66,11 +66,6 @@ hf::Level level = hf::Level(
 
 void setup(void)
 {
-    Serial.begin(115200);
-
-    // begin the serial port for the ESP32
-    Serial4.begin(115200);
-
     // Trim receiver via software
     //rc.setTrimRoll(-0.0012494f);
     //rc.setTrimPitch(-0.0058769f);
