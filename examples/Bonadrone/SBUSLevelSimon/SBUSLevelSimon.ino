@@ -66,19 +66,8 @@ hf::Level level = hf::Level(
 
 void setup(void)
 {
-    Serial.begin(115200);
-
-    // begin the serial port for the ESP32
-    Serial4.begin(115200);
-
-    // Trim receiver via software
-    //rc.setTrimRoll(-0.0012494f);
-    //rc.setTrimPitch(-0.0058769f);
-    //rc.setTrimYaw(-0.0192190f);
-
-    // 0 means the controller will always be active, but by changing
-    // that number it can be linked to a different aux state
-    h.addPidController(&level, 0);
+    // Aux switch 1 for Level mode
+    h.addPidController(&level, 1);
 
     h.init(new hf::BonadroneMultiShot(), &rc, &mixer, &ratePid);
 }

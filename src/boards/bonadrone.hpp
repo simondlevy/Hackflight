@@ -200,7 +200,6 @@ namespace hf {
 
             virtual void writeMotor(uint8_t index, float value) override
             {
-                Debug::printf("writeMotorStandard: %d %d\n", PWM_MIN, PWM_MAX);
                 analogWrite(MOTOR_PINS[index], (uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)) >> 3);
             }
 

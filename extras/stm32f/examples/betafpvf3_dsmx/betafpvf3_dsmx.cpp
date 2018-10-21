@@ -44,7 +44,7 @@ extern "C" {
                 0.625f,    // Gyro yaw P
                 0.005625f); // Gyro yaw I
 
-        hf::Level * level = new hf::Level(0.10f);
+        hf::Level * level = new hf::Level(0.20f);
 
         // Add Level PID for aux switch position 1
         h.addPidController(level, 1);

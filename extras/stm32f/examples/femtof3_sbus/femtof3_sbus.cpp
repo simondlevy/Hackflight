@@ -41,7 +41,7 @@ extern "C" {
                 0.01f, // Gyro yaw I
                 8.58); // Demands to rate
 
-        hf::Level * level = new hf::Level(1.00f);
+        hf::Level * level = new hf::Level(0.2f);
 
         SBUS_Receiver * rc = new SBUS_Receiver(UARTDEV_3, CHANNEL_MAP);
 

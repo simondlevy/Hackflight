@@ -41,7 +41,7 @@ extern "C" {
                 0.625f,     // Gyro yaw P
                 0.005625f); // Gyro yaw I
 
-        hf::Level * level = new hf::Level(0.10f);
+        hf::Level * level = new hf::Level(0.20f);
 
         DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_2, CHANNEL_MAP);
 
