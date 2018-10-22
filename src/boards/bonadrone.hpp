@@ -30,14 +30,6 @@
 
 namespace hf {
 
-    // Interrupt support 
-
-    static bool gotNewAccelGyroData;
-    static void lsm6dsmInterruptHandler()
-    {
-        gotNewAccelGyroData = true;
-    }
-
     class Bonadrone : public SoftwareQuaternionBoard {
 
         private:
@@ -118,9 +110,7 @@ namespace hf {
 
             bool imuRead(void)
             {
-                if (gotNewAccelGyroData) {
-
-                    gotNewAccelGyroData = false;
+                if (_lsm6dsm.checkNewData()) {
 
                     _lsm6dsm.readData(_ax, _ay, _az, _gx, _gy, _gz);
 
@@ -176,8 +166,6 @@ namespace hf {
                 }
 
                 delay(100);
-
-                attachInterrupt(LSM6DSM_INTERRUPT_PIN, lsm6dsmInterruptHandler, RISING);  
 
                 // Clear the interrupt
                 _lsm6dsm.clearInterrupt();
