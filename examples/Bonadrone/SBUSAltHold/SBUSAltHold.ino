@@ -94,11 +94,10 @@ hf::Level level = hf::Level(
         0.25f);  // Pitch Level P
 
 hf::AltitudeHold althold = hf::AltitudeHold(
-        0.30f,   // Altitude Hold P
-        0.20f,   // Altitude Hold Velocity P
-        0.00f,   // Altitude Hold Velocity I
-        1.00f);  // Altitude Hold Velocity D
-
+        1.00f,   // Altitude Hold P
+        0.15f,   // Altitude Hold Velocity P
+        0.01f,   // Altitude Hold Velocity I
+        0.05f);  // Altitude Hold Velocity D
 
 void setup(void)
 {
