@@ -40,32 +40,63 @@ namespace hf {
 
         private: 
 
-            // Arbitrary constants
-            const float WINDUP_MAX             = 0.40f;
-            const float HOVER_THROTTLE         = 0.05f;
-            const float MIN_ALTITUDE           = 0.10f;
+              // Arbitrary constants
+              const float WINDUP_MAX             = 0.40f;
+              const float HOVER_THROTTLE         = 0.05f;
+              const float MIN_ALTITUDE           = 0.10f;
 
-            // PID constants set in constructor
-            float _altHoldP;
-            float _altHoldVelP;
-            float _altHoldVelI;
-            float _altHoldVelD;
+              // PID constants set in constructor
+              float _altHoldP;
+              float _altHoldVelP;
+              float _altHoldVelI;
+              float _altHoldVelD;
             
-            // Required constants
-            float _lastError;
-            float _deltaError;
-            float _integralError;
-            float _velocityTarget;
-            float _altitudeTarget;
-            uint32_t _previousTime;
+              // Required constants
+              float _lastError;
+              float _deltaError;
+              float _integralError;
+              float _velocityTarget;
+              float _altitudeTarget;
+              uint32_t _previousTime;
             
 
-            void resetErrors(void)
-            {
-                _lastError = 0;
-                _deltaError = 0;
-                _integralError = 0;
-            }
+              void resetErrors(void)
+              {
+                  _lastError = 0;
+                  _deltaError = 0;
+                  _integralError = 0;
+              }
+
+
+          protected:
+            
+              bool modifyDemands(state_t & state, demands_t & demands)
+              {
+                uint32_t _currentTime = micros();
+                float dt = (_currentTime - _previousTime) / 1000000.0f;
+                _previousTime = _currentTime;
+                _altitudeTarget = 0.20f;
+                // Compute vertical velocity setpoint and error
+                _velocityTarget = (_altitudeTarget - state.altitude) * _altHoldP;
+                float velocityError = _velocityTarget - state.variometer;
+                // Update error integral and error derivative
+                _integralError = Filter::constrainAbs(_integralError + velocityError * dt, WINDUP_MAX);
+                _deltaError = (velocityError - _lastError) / dt;
+                _lastError = velocityError;
+                float throttleCorrection = _altHoldVelP * velocityError +
+                                           _altHoldVelD * _deltaError +
+                                           _altHoldVelI * _integralError;
+
+                demands.throttle = HOVER_THROTTLE + throttleCorrection;
+
+                return true;
+              }
+              
+              virtual bool shouldFlashLed(void) override 
+              {
+                  return true;
+              }
+
 
         public:
 
@@ -78,34 +109,6 @@ namespace hf {
               // Initialize errors
               resetErrors();
               _previousTime = micros();
-            }
-
-            bool modifyDemands(state_t & state, demands_t & demands)
-            {
-              uint32_t _currentTime = micros();
-              float dt = (_currentTime - _previousTime) / 1000000.0f;
-              _previousTime = _currentTime;
-              _altitudeTarget = 0.20f;
-              // Compute velocity setpoint
-              _velocityTarget = (_altitudeTarget - state.altitude)*_altHoldP;
-              // Compute errors
-
-              float velocityError = _velocityTarget - state.variometer;
-              // Update error integral and error derivative
-              _integralError = Filter::constrainAbs(_integralError + velocityError * dt, WINDUP_MAX);
-              _deltaError = (velocityError - _lastError) / dt;
-              _lastError = velocityError;
-              float throttleCorrection = _altHoldVelP * velocityError +
-                                         _altHoldVelD * _deltaError +
-                                         _altHoldVelI * _integralError;
-              demands.throttle = HOVER_THROTTLE + throttleCorrection;
-
-              return true;
-            }
-            
-            virtual bool shouldFlashLed(void) override 
-            {
-                return true;
             }
 
     };  // class AltitudeHold
