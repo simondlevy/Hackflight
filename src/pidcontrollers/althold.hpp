@@ -43,7 +43,6 @@ namespace hf {
               // Arbitrary constants
               const float WINDUP_MAX             = 0.40f;
               const float HOVER_THROTTLE         = 0.05f;
-              const float MIN_ALTITUDE           = 0.10f;
 
               // PID constants set in constructor
               float _altHoldP;
@@ -59,7 +58,9 @@ namespace hf {
               float _altitudeTarget;
               uint32_t _previousTime;
             
-
+              bool _inBandPrev;
+              float _minAltitude;
+              
               void resetErrors(void)
               {
                   _lastError = 0;
@@ -67,15 +68,25 @@ namespace hf {
                   _integralError = 0;
               }
 
-
           protected:
             
               bool modifyDemands(state_t & state, demands_t & demands)
               {
+                // Don't do anything till we've reached sufficient altitude
+                if (state.altitude < _minAltitude) return false;
+
+                // Reset altitude target if moved into stick deadband
+                bool inBandCurr = inBand(demands.throttle);
+                if (inBandCurr && !_inBandPrev) {
+                    _altitudeTarget = state.altitude;
+                    resetErrors();
+                }
+                _inBandPrev = inBandCurr;
+                
+                // Altitude Hold P(PID) control action computation
                 uint32_t _currentTime = micros();
                 float dt = (_currentTime - _previousTime) / 1000000.0f;
                 _previousTime = _currentTime;
-                _altitudeTarget = 0.20f;
                 // Compute vertical velocity setpoint and error
                 _velocityTarget = (_altitudeTarget - state.altitude) * _altHoldP;
                 float velocityError = _velocityTarget - state.variometer;
@@ -83,13 +94,16 @@ namespace hf {
                 _integralError = Filter::constrainAbs(_integralError + velocityError * dt, WINDUP_MAX);
                 _deltaError = (velocityError - _lastError) / dt;
                 _lastError = velocityError;
+                // Compute control action
                 float throttleCorrection = _altHoldVelP * velocityError +
                                            _altHoldVelD * _deltaError +
-                                           _altHoldVelI * _integralError;
-
-                demands.throttle = HOVER_THROTTLE + throttleCorrection;
-
-                return true;
+                                           _altHoldVelI * _integralError;                       
+                // Throttle: inside stick deadband, adjust by P(PID);
+                // outside deadband, respond to stick demand
+                demands.throttle = inBandCurr ? 
+                    HOVER_THROTTLE + throttleCorrection:
+                    demands.throttle;
+                return inBandCurr;
               }
               
               virtual bool shouldFlashLed(void) override 
@@ -97,18 +111,25 @@ namespace hf {
                   return true;
               }
 
+              bool inBand(float demand)
+              {
+                  return fabs(demand) < Receiver::STICK_DEADBAND; 
+              }
 
         public:
 
-            AltitudeHold(float altHoldP, float altHoldVelP, float altHoldVelI, float altHoldVelD) :
+            AltitudeHold(float altHoldP, float altHoldVelP, float altHoldVelI, float altHoldVelD,
+                         float minAltitude=0.1) :
                 _altHoldP(altHoldP), 
                 _altHoldVelP(altHoldVelP), 
                 _altHoldVelI(altHoldVelI),
-                _altHoldVelD(altHoldVelD) 
+                _altHoldVelD(altHoldVelD),
+                _minAltitude(minAltitude)
             {
               // Initialize errors
               resetErrors();
               _previousTime = micros();
+              _inBandPrev = false;
             }
 
     };  // class AltitudeHold
