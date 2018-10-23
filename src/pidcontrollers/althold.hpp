@@ -72,38 +72,38 @@ namespace hf {
             
               bool modifyDemands(state_t & state, demands_t & demands)
               {
-                // Don't do anything till we've reached sufficient altitude
-                if (state.altitude < _minAltitude) return false;
+                  // Don't do anything till we've reached sufficient altitude
+                  if (state.altitude < _minAltitude) return false;
 
-                // Reset altitude target if moved into stick deadband
-                bool inBandCurr = inBand(demands.throttle);
-                if (inBandCurr && !_inBandPrev) {
-                    _altitudeTarget = state.altitude;
-                    resetErrors();
-                }
-                _inBandPrev = inBandCurr;
+                  // Reset altitude target if moved into stick deadband
+                  bool inBandCurr = inBand(demands.throttle);
+                  if (inBandCurr && !_inBandPrev) {
+                      _altitudeTarget = state.altitude;
+                      resetErrors();
+                  }
+                  _inBandPrev = inBandCurr;
                 
-                // Altitude Hold P(PID) control action computation
-                uint32_t _currentTime = micros();
-                float dt = (_currentTime - _previousTime) / 1000000.0f;
-                _previousTime = _currentTime;
-                // Compute vertical velocity setpoint and error
-                _velocityTarget = (_altitudeTarget - state.altitude) * _altHoldP;
-                float velocityError = _velocityTarget - state.variometer;
-                // Update error integral and error derivative
-                _integralError = Filter::constrainAbs(_integralError + velocityError * dt, WINDUP_MAX);
-                _deltaError = (velocityError - _lastError) / dt;
-                _lastError = velocityError;
-                // Compute control action
-                float throttleCorrection = _altHoldVelP * velocityError +
-                                           _altHoldVelD * _deltaError +
-                                           _altHoldVelI * _integralError;                       
-                // Throttle: inside stick deadband, adjust by P(PID);
-                // outside deadband, respond to stick demand
-                demands.throttle = inBandCurr ? 
-                    HOVER_THROTTLE + throttleCorrection:
-                    demands.throttle;
-                return inBandCurr;
+                  // Altitude Hold P(PID) control action computation
+                  uint32_t _currentTime = micros();
+                  float dt = (_currentTime - _previousTime) / 1000000.0f;
+                  _previousTime = _currentTime;
+                  // Compute vertical velocity setpoint and error
+                  _velocityTarget = (_altitudeTarget - state.altitude) * _altHoldP;
+                  float velocityError = _velocityTarget - state.variometer;
+                  // Update error integral and error derivative
+                  _integralError = Filter::constrainAbs(_integralError + velocityError * dt, WINDUP_MAX);
+                  _deltaError = (velocityError - _lastError) / dt;
+                  _lastError = velocityError;
+                  // Compute control action
+                  float throttleCorrection = _altHoldVelP * velocityError +
+                                             _altHoldVelD * _deltaError +
+                                             _altHoldVelI * _integralError;                       
+                  // Throttle: inside stick deadband, adjust by P(PID);
+                  // outside deadband, respond to stick demand
+                  demands.throttle = inBandCurr ? 
+                      HOVER_THROTTLE + throttleCorrection:
+                      demands.throttle;
+                  return inBandCurr;
               }
               
               virtual bool shouldFlashLed(void) override 
@@ -126,10 +126,10 @@ namespace hf {
                 _altHoldVelD(altHoldVelD),
                 _minAltitude(minAltitude)
             {
-              // Initialize errors
-              resetErrors();
-              _previousTime = micros();
-              _inBandPrev = false;
+                // Initialize errors
+                resetErrors();
+                _previousTime = micros();
+                _inBandPrev = false;
             }
 
     };  // class AltitudeHold
