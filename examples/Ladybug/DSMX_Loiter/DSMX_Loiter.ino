@@ -29,7 +29,7 @@
 #include "sensors/rangefinder.hpp"
 #include "sensors/opticalflow.hpp"
 #include "pidcontrollers/level.hpp"
-#include "pidcontrollers/loiter.hpp"
+#include "pidcontrollers/althold.hpp"
 #include "mixers/quadx.hpp"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
@@ -49,12 +49,11 @@ hf::Rate ratePid = hf::Rate(
 
 hf::Level level = hf::Level(0.20f);
 
-hf::Loiter loiter = hf::Loiter(
-	0.40f,  // Altitude P
-    0.2f,   // Altitude D
-    0.f,    // Cyclic P
-    1.0f,   // throttleScale
-    0.04f); // minAltitude
+hf::AltitudeHold althold = hf::AltitudeHold(
+        1.00f,   // Altitude Hold P
+        0.15f,   // Altitude Hold Velocity P
+        0.01f,   // Altitude Hold Velocity I
+        0.05f);  // Altitude Hold Velocity D
 
 
 class VL53L1X_Rangefinder : public hf::Rangefinder {
@@ -120,6 +119,7 @@ VL53L1X_Rangefinder rangefinder;
 
 PMW3901_OpticalFlow opticalFlow;
 
+
 void setup(void)
 {
     // Add some "software trim" to the receiver
@@ -142,7 +142,7 @@ void setup(void)
     h.addPidController(&level, 1);
 
     // Add Loiter PID controller for aux switch position 2
-    h.addPidController(&loiter, 2);
+    h.addPidController(&althold, 2);
 }
 
 void loop(void)
