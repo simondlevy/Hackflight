@@ -178,7 +178,7 @@ PID controller will be active in switch state 2, as we've
 example sketch. 
 
 <p align="center"> 
-<img src="extras/media/pidcontrollers.png" width=400>
+<img src="extras/media/pidcontrollers2.png" width=400>
 </p>
 
 If you're mathematically-minded, you can think of a PID Controller as a function from a (<i>State</i>, <i>Demands</i>) pair to <i>Demands</i>:
