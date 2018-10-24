@@ -119,7 +119,6 @@ VL53L1X_Rangefinder rangefinder;
 
 PMW3901_OpticalFlow opticalFlow;
 
-
 void setup(void)
 {
     // Add some "software trim" to the receiver
