@@ -44,9 +44,9 @@ namespace hf {
 
             // LSM6DSM full-scale settings
             static const LSM6DSM::Ascale_t Ascale = LSM6DSM::AFS_2G;
-            static const LSM6DSM::Gscale_t Gscale = LSM6DSM::GFS_245DPS;
-            static const LSM6DSM::Rate_t   AODR   = LSM6DSM::ODR_833Hz;
-            static const LSM6DSM::Rate_t   GODR   = LSM6DSM::ODR_833Hz;
+            static const LSM6DSM::Gscale_t Gscale = LSM6DSM::GFS_2000DPS;
+            static const LSM6DSM::Rate_t   AODR   = LSM6DSM::ODR_1660Hz;
+            static const LSM6DSM::Rate_t   GODR   = LSM6DSM::ODR_1660Hz;
 
             // Biases computed by Simon using Juan & Pep's LSM6DSM/Examples/Calibrate sketch
             float ACCEL_BIAS[3] = {-0.020306,0.008926,0.029526};
