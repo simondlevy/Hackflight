@@ -200,7 +200,7 @@ If you're mathematically-minded, you can think of a PID Controller as a function
 <img src="extras/media/levelpid.png" width=800>
 </p>
 
-#### Altithude-hold PID
+#### Altitude-hold PID
 
 This PID controller was adapted from the
 [algorithm](https://github.com/iNavFlight/inav/wiki/Developer-info#user-content-pid-reg)
