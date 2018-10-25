@@ -56,7 +56,7 @@ namespace hf {
               float _integralError;
               float _velocityTarget;
               float _altitudeTarget;
-              uint32_t _previousTime;
+              float _previousTime;
             
               bool _inBandPrev;
               float _minAltitude;
@@ -70,10 +70,15 @@ namespace hf {
 
           protected:
             
-              bool modifyDemands(state_t & state, demands_t & demands)
+              bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
               {
                   // Don't do anything till we've reached sufficient altitude
                   if (state.altitude < _minAltitude) return false;
+
+                  // Don't do anything until we have a positive dt
+                  float dt = currentTime - _previousTime;
+                  _previousTime = currentTime;
+                  if (dt == currentTime) return false;
 
                   // Reset altitude target if moved into stick deadband
                   bool inBandCurr = inBand(demands.throttle);
@@ -83,17 +88,15 @@ namespace hf {
                   }
                   _inBandPrev = inBandCurr;
                 
-                  // Altitude Hold P(PID) control action computation
-                  uint32_t _currentTime = micros();
-                  float dt = (_currentTime - _previousTime) / 1000000.0f;
-                  _previousTime = _currentTime;
                   // Compute vertical velocity setpoint and error
                   _velocityTarget = (_altitudeTarget - state.altitude) * _altHoldP;
                   float velocityError = _velocityTarget - state.variometer;
+
                   // Update error integral and error derivative
                   _integralError = Filter::constrainAbs(_integralError + velocityError * dt, WINDUP_MAX);
                   _deltaError = (velocityError - _lastError) / dt;
                   _lastError = velocityError;
+
                   // Compute control action
                   float throttleCorrection = _altHoldVelP * velocityError +
                                              _altHoldVelD * _deltaError +
@@ -128,7 +131,7 @@ namespace hf {
             {
                 // Initialize errors
                 resetErrors();
-                _previousTime = micros();
+                _previousTime = 0;
                 _inBandPrev = false;
             }
 

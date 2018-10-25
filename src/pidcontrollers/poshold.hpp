@@ -44,7 +44,7 @@ namespace hf {
 
         protected:
 
-        virtual bool modifyDemands(state_t & state, demands_t & demands) 
+        virtual bool modifyDemands(state_t & state, demands_t & demands, float currentTime) 
         {
             return false;
         }

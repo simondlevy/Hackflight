@@ -194,8 +194,10 @@ namespace hf {
                 }
             }
 
-            bool modifyDemands(state_t & state, demands_t & demands)
+            bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
             {
+                (void)currentTime;
+
                 _PTerm[0] = demands.roll;
                 _PTerm[1] = demands.pitch;
 

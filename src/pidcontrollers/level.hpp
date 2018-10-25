@@ -64,8 +64,10 @@ namespace hf {
             {
             }
 
-            bool modifyDemands(state_t & state, demands_t & demands)
+            bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
             {
+                (void)currentTime;
+
                 float _demands[2] = {demands.roll, demands.pitch};
                 for (int axis=0; axis<2; ++axis)
                 {
