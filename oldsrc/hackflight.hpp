@@ -2,6 +2,7 @@
    hackflight.hpp : general header, plus init and update methods
 
    Copyright (c) 2018 Simon D. Levy
+   Contributed to by Alec Singer
 
    This file is part of Hackflight.
 
@@ -30,7 +31,7 @@
 #include "debug.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
-#include "pidcontrollers/stabilizer.hpp"
+#include "pidcontrollers/rate.hpp"
 #include "sensors/peripheral.hpp"
 #include "sensors/gyrometer.hpp"
 #include "sensors/quaternion.hpp"
@@ -44,12 +45,12 @@ namespace hf {
             // Passed to Hackflight::init() for a particular build
             Board      * _board;
             Receiver   * _receiver;
-            Stabilizer * _stabilizer;
+            Rate       * _ratePid;
             Mixer      * _mixer;
 
             // PID controllers
             PID_Controller * _pid_controllers[256];
-            uint8_t _pid_controller_count;
+            uint8_t _pid_controller_count = 0;
 
             // Mandatory sensors on the board
             Gyrometer _gyrometer;
@@ -74,7 +75,7 @@ namespace hf {
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(_state.eulerAngles[axis]) < _stabilizer->maxArmingAngle;
+                return fabs(_state.eulerAngles[axis]) < _ratePid->maxArmingAngle;
             }
 
             void checkQuaternion(void)
@@ -88,8 +89,8 @@ namespace hf {
                     // Update state with new quaternion to yield Euler angles
                     _quaternion.modifyState(_state, time);
 
-                    // Update stabilizer with new Euler angles
-                    _stabilizer->updateEulerAngles(_state.eulerAngles, _receiver->getAux1State());
+                    // Update ratePid with new Euler angles
+                    _ratePid->updateEulerAngles(_state.eulerAngles, _receiver->getAux1State());
 
                     // Synch serial comms to quaternion check
                     doSerialComms();
@@ -166,8 +167,8 @@ namespace hf {
                 // Acquire receiver demands, passing yaw angle for headless mode
                 if (!_receiver->getDemands(_state.eulerAngles[AXIS_YAW] - _yawInitial)) return;
 
-                // Update stabilizer with cyclic demands
-                _stabilizer->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
+                // Update ratePid with cyclic demands
+                _ratePid->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
 
                 // Disarm
                 if (_state.armed && !_receiver->getAux2State()) {
@@ -215,7 +216,7 @@ namespace hf {
                 }
             }
 
-            void checkSensors(void)
+            void checkOptionalSensors(void)
             {
                 for (uint8_t k=0; k<_sensor_count; ++k) {
 
@@ -291,13 +292,13 @@ namespace hf {
 
         public:
 
-            void init(Board * board, Receiver * receiver, Mixer * mixer, Stabilizer * stabilizer, bool armed=false)
+            void init(Board * board, Receiver * receiver, Mixer * mixer, Rate * ratePid, bool armed=false)
             {  
                 // Store the essentials
                 _board      = board;
                 _receiver   = receiver;
                 _mixer      = mixer;
-                _stabilizer = stabilizer;
+                _ratePid = ratePid;
 
                 // Support for mandatory sensors
                 addSensor(&_quaternion, board);
@@ -305,10 +306,9 @@ namespace hf {
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
-                _pid_controller_count = 0;
 
-                // First PID controller is always stabilizer, aux state = 0
-                addPidController(stabilizer, 0);
+                // First PID controller is always ratePid, aux state = 0
+                addPidController(ratePid, 0);
 
                 // Initialize state
                 memset(&_state, 0, sizeof(state_t));
@@ -359,7 +359,7 @@ namespace hf {
                 checkQuaternion();
 
                 // Check optional sensors
-                checkSensors();
+                checkOptionalSensors();
             } 
 
     }; // class Hackflight
