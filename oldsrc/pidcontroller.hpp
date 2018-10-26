@@ -30,7 +30,7 @@ namespace hf {
 
         protected:
 
-        virtual bool modifyDemands(state_t & state, demands_t & demands) = 0;
+        virtual bool modifyDemands(state_t & state, demands_t & demands, float currentTime) = 0;
 
         virtual bool shouldFlashLed(void) { return false; }
 

@@ -48,8 +48,10 @@ namespace hf {
 
         protected:
 
-        virtual bool modifyDemands(state_t & state, demands_t & demands) 
+        virtual bool modifyDemands(state_t & state, demands_t & demands, float currentTime) 
         {
+            (void)currentTime;
+
             // Don't do anything till we've reached sufficient altitude
             if (state.altitude < _minAltitude) return false;
 

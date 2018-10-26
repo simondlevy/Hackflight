@@ -135,10 +135,12 @@ namespace hf {
 
                     PID_Controller * pidController = _pid_controllers[k];
 
+                    float currentTime = _board->getTime();
+
                     // XXX we should allow associating PID controllers with particular aux states
                     if (pidController->auxState <= auxState) {  
 
-                        if (pidController->modifyDemands(_state, _demands) && pidController->shouldFlashLed()) {
+                        if (pidController->modifyDemands(_state, _demands, currentTime) && pidController->shouldFlashLed()) {
                             shouldFlash = true;
                         }
                     }
