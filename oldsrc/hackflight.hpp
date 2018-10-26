@@ -320,7 +320,7 @@ namespace hf {
                 MspParser::init();
 
                 // Initialize the receiver
-                _receiver->init();
+                _receiver->begin();
 
                 // Tell the mixer which board to use
                 _mixer->board = board; 
