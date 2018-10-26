@@ -160,7 +160,7 @@ namespace hf {
 
             // Put sign back on command, yielding [-0.5,+0.5]
             demands.roll  = adjustCommand(demands.roll, CHANNEL_ROLL);
-            demands.pitch = adjustCommand(demands.pitch,CHANNEL_PITCH);
+            demands.pitch = adjustCommand(demands.pitch, CHANNEL_PITCH);
             demands.yaw   = adjustCommand(demands.yaw, CHANNEL_YAW);
 
             // Add in software trim
