@@ -94,7 +94,7 @@ namespace hf {
             CHANNEL_PITCH,  
             CHANNEL_YAW,   
             CHANNEL_AUX1,
-            CHANNEL_AUX2,
+            CHANNEL_AUX2
         };
 
         uint8_t _channelMap[6];
@@ -217,7 +217,7 @@ namespace hf {
             _trimRoll = trim;
         }
 
-         void setTrimPitch(float trim)
+        void setTrimPitch(float trim)
         {
             _trimPitch = trim;
         }

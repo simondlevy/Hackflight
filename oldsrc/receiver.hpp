@@ -23,8 +23,8 @@
 #include <cstring>
 #include <algorithm>
 #include <cmath>
+#include <stdint.h>
 
-#include "debug.hpp"
 #include "datatypes.hpp"
 
 namespace hf {
@@ -33,13 +33,13 @@ namespace hf {
 
         friend class Hackflight;
         friend class RealBoard;
-        friend class MSP;
+        friend class MspParser;
 
         private: 
 
         static constexpr uint8_t DEFAULT_CHANNEL_MAP[6] = {0, 1, 2, 3, 4, 5};
 
-        const float MARGIN            = 0.1f;
+        const float THROTTLE_MARGIN   = 0.1f;
         const float CYCLIC_EXPO       = 0.65f;
         const float CYCLIC_RATE       = 0.90f;
         const float THROTTLE_MID      = 0.00f;
@@ -124,11 +124,13 @@ namespace hf {
         // Override this if your receiver provides RSSI or other weak-signal detection
         virtual bool lostSignal(void) { return false; }
 
-        Receiver(const uint8_t channelMap[6], // throttle, roll, pitch, yaw, aux, arm
-                float trimRoll=0, float trimPitch=0, float trimYaw=0) : 
-                _trimRoll(trimRoll), _trimPitch(trimPitch), _trimYaw(trimYaw) 
+        Receiver(const uint8_t channelMap[6]) // throttle, roll, pitch, yaw, aux, arm
         { 
             memcpy(_channelMap, channelMap, 6);
+
+            _trimRoll  = 0;
+            _trimPitch = 0;
+            _trimYaw   = 0;
         }
 
         Receiver(void) : Receiver(DEFAULT_CHANNEL_MAP)
@@ -195,7 +197,7 @@ namespace hf {
 
         bool throttleIsDown(void)
         {
-            return getRawval(CHANNEL_THROTTLE) < -1 + MARGIN;
+            return getRawval(CHANNEL_THROTTLE) < -1 + THROTTLE_MARGIN;
         }
 
         virtual uint8_t getAux1State(void)
@@ -211,6 +213,21 @@ namespace hf {
         public:
 
         static constexpr float STICK_DEADBAND = 0.20;
+
+        void setTrimRoll(float trim)
+        {
+            _trimRoll = trim;
+        }
+
+        void setTrimPitch(float trim)
+        {
+            _trimPitch = trim;
+        }
+
+        void setTrimYaw(float trim)
+        {
+            _trimYaw = trim;
+        }
 
     }; // class Receiver
 
