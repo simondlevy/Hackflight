@@ -140,9 +140,8 @@ namespace hf {
         {
         }
 
-         bool getDemands(float yawAngle)
+        bool getDemands(float yawAngle)
         {
-            // Acquire receiver demands, passing yaw angle for headless mode
             // Wait till there's a new frame
             if (!gotNewFrame()) return false;
 
