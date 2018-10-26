@@ -21,6 +21,7 @@
 #pragma once
 
 #include <stdarg.h>
+#include <stdint.h>
 
 namespace hf {
 
@@ -36,6 +37,18 @@ namespace hf {
 
         protected:
 
+            // NB: gyrometer, accelerometer should return values as follows,
+            // based on the Ladybug Flight Controller:
+            //
+            // AX: pitch forward +, back -
+            // AY: roll right +,    left -
+            // AZ: rightside-up +,  upside-down -
+            //
+            // GX: roll right +,    left -
+            // GY: pitch forward -, back +
+            // GZ: yaw left -,      right +
+
+
             //------------------------------------ Core functionality ----------------------------------------------------
             virtual bool  getQuaternion(float quat[4]) = 0;
             virtual bool  getGyrometer(float gyroRates[3]) = 0;
@@ -44,12 +57,16 @@ namespace hf {
 
             //------------------------- Support for additional surface-mount sensors -------------------------------------
             virtual bool  getAccelerometer(float accelGs[3]) { (void)accelGs;  return false; }
+            virtual bool  getMagnetometer(float uTs[3]) { (void)uTs;  return false; }
             virtual bool  getBarometer(float & pressure) { (void)pressure;  return false; }
 
             //------------------------------- Serial communications via MSP ----------------------------------------------
             virtual uint8_t serialAvailableBytes(void) { return 0; }
             virtual uint8_t serialReadByte(void)  { return 0; }
             virtual void    serialWriteByte(uint8_t c) { (void)c; }
+
+            //------------------------------- Reboot for non-Arduino boards ---------------------------------------------
+            virtual void reboot(void) { }
 
             //----------------------------------------- Safety -----------------------------------------------------------
             virtual void showArmedStatus(bool armed) { (void)armed; }
