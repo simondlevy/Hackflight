@@ -22,15 +22,13 @@
 
 #include <cmath>
 #include <math.h>
-
-#include "debug.hpp"
+#include <stdint.h>
 
 namespace hf {
 
     class Filter {
 
         public:
-
 
             static float max(float a, float b)
             {
@@ -91,23 +89,47 @@ namespace hf {
 
     }; // class LowPassFilter
 
-    // Adapted from https://github.com/kriswiner/MPU9250/blob/master/quaternionFilters.ino
-    class MadgwickQuaternionFilter {
-
-        private:
-
-            float _beta;
+    class QuaternionFilter {
 
         public:
 
-            MadgwickQuaternionFilter(float beta)
-            {
-                this->_beta = beta;
-            }
+            float q1;
+            float q2;
+            float q3;
+            float q4;
 
-            void update(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float deltat, float q[4])
+        protected:
+
+            QuaternionFilter(void)
             {
-                float q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];   // short name local variable for readability
+                q1 = 1;
+                q2 = 0;
+                q3 = 0;
+                q4 = 0;
+            }
+    };
+
+    class MadgwickQuaternionFilter : public QuaternionFilter {
+
+        protected:
+
+            float _beta;
+
+            MadgwickQuaternionFilter(float beta) : QuaternionFilter()
+            {
+                _beta = beta;
+            }
+    };
+
+    class MadgwickQuaternionFilter9DOF : public MadgwickQuaternionFilter {
+
+        public:
+
+            MadgwickQuaternionFilter9DOF(float beta) : MadgwickQuaternionFilter(beta) { }
+
+            // Adapted from https://github.com/kriswiner/MPU9250/blob/master/quaternionFilters.ino
+            void update(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float deltat)
+            {
                 float norm;
                 float hx, hy, _2bx, _2bz;
                 float s1, s2, s3, s4;
@@ -166,11 +188,31 @@ namespace hf {
                 _4bz = 2.0f * _2bz;
 
                 // Gradient decent algorithm corrective step
-                s1 = -_2q3 * (2.0f * q2q4 - _2q1q3 - ax) + _2q2 * (2.0f * q1q2 + _2q3q4 - ay) - _2bz * q3 * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (-_2bx * q4 + _2bz * q2) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + _2bx * q3 * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
-                s2 = _2q4 * (2.0f * q2q4 - _2q1q3 - ax) + _2q1 * (2.0f * q1q2 + _2q3q4 - ay) - 4.0f * q2 * (1.0f - 2.0f * q2q2 - 2.0f * q3q3 - az) + _2bz * q4 * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (_2bx * q3 + _2bz * q1) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + (_2bx * q4 - _4bz * q2) * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
-                s3 = -_2q1 * (2.0f * q2q4 - _2q1q3 - ax) + _2q4 * (2.0f * q1q2 + _2q3q4 - ay) - 4.0f * q3 * (1.0f - 2.0f * q2q2 - 2.0f * q3q3 - az) + (-_4bx * q3 - _2bz * q1) * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (_2bx * q2 + _2bz * q4) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + (_2bx * q1 - _4bz * q3) * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
-                s4 = _2q2 * (2.0f * q2q4 - _2q1q3 - ax) + _2q3 * (2.0f * q1q2 + _2q3q4 - ay) + (-_4bx * q4 + _2bz * q2) * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (-_2bx * q1 + _2bz * q3) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + _2bx * q2 * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
-                norm = sqrtf(s1 * s1 + s2 * s2 + s3 * s3 + s4 * s4);    // normalise step magnitude
+                s1 = -_2q3 * (2.0f * q2q4 - _2q1q3 - ax) + 
+                    _2q2 * (2.0f * q1q2 + _2q3q4 - ay) - 
+                    _2bz * q3 * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + 
+                    (-_2bx * q4 + _2bz * q2) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + 
+                    _2bx * q3 * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
+                s2 = _2q4 * (2.0f * q2q4 - _2q1q3 - ax) + 
+                    _2q1 * (2.0f * q1q2 + _2q3q4 - ay) - 
+                    4.0f * q2 * (1.0f - 2.0f * q2q2 - 2.0f * q3q3 - az) + 
+                    _2bz * q4 * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + 
+                    (_2bx * q3 + _2bz * q1) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + 
+                    (_2bx * q4 - _4bz * q2) * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
+                s3 = -_2q1 * (2.0f * q2q4 - _2q1q3 - ax) + 
+                    _2q4 * (2.0f * q1q2 + _2q3q4 - ay) - 
+                    4.0f * q3 * (1.0f - 2.0f * q2q2 - 2.0f * q3q3 - az) + 
+                    (-_4bx * q3 - _2bz * q1) * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + 
+                    (_2bx * q2 + _2bz * q4) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + 
+                    (_2bx * q1 - _4bz * q3) * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
+                s4 = _2q2 * (2.0f * q2q4 - _2q1q3 - ax) + 
+                    _2q3 * (2.0f * q1q2 + _2q3q4 - ay) + 
+                    (-_4bx * q4 + _2bz * q2) * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + 
+                    (-_2bx * q1 + _2bz * q3) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + 
+                    _2bx * q2 * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
+
+                // Normalize step magnitude
+                norm = sqrtf(s1 * s1 + s2 * s2 + s3 * s3 + s4 * s4);    
                 norm = 1.0f/norm;
                 s1 *= norm;
                 s2 *= norm;
@@ -190,16 +232,108 @@ namespace hf {
                 q4 += qDot4 * deltat;
                 norm = sqrtf(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);    // normalise quaternion
                 norm = 1.0f/norm;
-                q[0] = q1 * norm;
-                q[1] = q2 * norm;
-                q[2] = q3 * norm;
-                q[3] = q4 * norm;
+            }
+    }; // class MadgwickQuaternionFilter9DOF 
+
+    class MadgwickQuaternionFilter6DOF : public MadgwickQuaternionFilter {
+
+        private:
+
+            float _zeta;
+
+        public:
+
+            MadgwickQuaternionFilter6DOF(float beta, float zeta) : MadgwickQuaternionFilter(beta) 
+            { 
+                _zeta = zeta;
             }
 
-    }; // class MadgwickQuaternionFilter
+            // Adapted from https://github.com/kriswiner/MPU6050/blob/master/quaternionFilter.ino
+            void update(float ax, float ay, float az, float gx, float gy, float gz, float deltat)
+            {
+                static float gbiasx, gbiasy, gbiasz;        // gyro bias error
 
-    // Adapted from https://github.com/kriswiner/MPU9250/blob/master/quaternionFilters.ino
-    class MahonyQuaternionFilter {
+                // Auxiliary variables to avoid repeated arithmetic
+                float _halfq1 = 0.5f * q1;
+                float _halfq2 = 0.5f * q2;
+                float _halfq3 = 0.5f * q3;
+                float _halfq4 = 0.5f * q4;
+                float _2q1 = 2.0f * q1;
+                float _2q2 = 2.0f * q2;
+                float _2q3 = 2.0f * q3;
+                float _2q4 = 2.0f * q4;
+                //float _2q1q3 = 2.0f * q1 * q3;
+                //float _2q3q4 = 2.0f * q3 * q4;
+
+                // Normalise accelerometer measurement
+                float norm = sqrt(ax * ax + ay * ay + az * az);
+                if (norm == 0.0f) return; // handle NaN
+                norm = 1.0f/norm;
+                ax *= norm;
+                ay *= norm;
+                az *= norm;
+
+                // Compute the objective function and Jacobian
+                float f1 = _2q2 * q4 - _2q1 * q3 - ax;
+                float f2 = _2q1 * q2 + _2q3 * q4 - ay;
+                float f3 = 1.0f - _2q2 * q2 - _2q3 * q3 - az;
+                float J_11or24 = _2q3;
+                float J_12or23 = _2q4;
+                float J_13or22 = _2q1;
+                float J_14or21 = _2q2;
+                float J_32 = 2.0f * J_14or21;
+                float J_33 = 2.0f * J_11or24;
+
+                // Compute the gradient (matrix multiplication)
+                float hatDot1 = J_14or21 * f2 - J_11or24 * f1;
+                float hatDot2 = J_12or23 * f1 + J_13or22 * f2 - J_32 * f3;
+                float hatDot3 = J_12or23 * f2 - J_33 *f3 - J_13or22 * f1;
+                float hatDot4 = J_14or21 * f1 + J_11or24 * f2;
+
+                // Normalize the gradient
+                norm = sqrt(hatDot1 * hatDot1 + hatDot2 * hatDot2 + hatDot3 * hatDot3 + hatDot4 * hatDot4);
+                hatDot1 /= norm;
+                hatDot2 /= norm;
+                hatDot3 /= norm;
+                hatDot4 /= norm;
+
+                // Compute estimated gyroscope biases
+                float gerrx = _2q1 * hatDot2 - _2q2 * hatDot1 - _2q3 * hatDot4 + _2q4 * hatDot3;
+                float gerry = _2q1 * hatDot3 + _2q2 * hatDot4 - _2q3 * hatDot1 - _2q4 * hatDot2;
+                float gerrz = _2q1 * hatDot4 - _2q2 * hatDot3 + _2q3 * hatDot2 - _2q4 * hatDot1;
+
+                // Compute and remove gyroscope biases
+                gbiasx += gerrx * deltat * _zeta;
+                gbiasy += gerry * deltat * _zeta;
+                gbiasz += gerrz * deltat * _zeta;
+                gx -= gbiasx;
+                gy -= gbiasy;
+                gz -= gbiasz;
+
+                // Compute the quaternion derivative
+                float qDot1 = -_halfq2 * gx - _halfq3 * gy - _halfq4 * gz;
+                float qDot2 =  _halfq1 * gx + _halfq3 * gz - _halfq4 * gy;
+                float qDot3 =  _halfq1 * gy - _halfq2 * gz + _halfq4 * gx;
+                float qDot4 =  _halfq1 * gz + _halfq2 * gy - _halfq3 * gx;
+
+                // Compute then integrate estimated quaternion derivative
+                q1 += (qDot1 -(_beta * hatDot1)) * deltat;
+                q2 += (qDot2 -(_beta * hatDot2)) * deltat;
+                q3 += (qDot3 -(_beta * hatDot3)) * deltat;
+                q4 += (qDot4 -(_beta * hatDot4)) * deltat;
+
+                // Normalize the quaternion
+                norm = sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);    // normalise quaternion
+                norm = 1.0f/norm;
+                q1 *= norm;
+                q2 *= norm;
+                q3 *= norm;
+                q4 *= norm;
+            }
+
+    }; // class MadgwickQuaternionFilter6DOF
+
+    class MahonyQuaternionFilter9DOF : public QuaternionFilter {
 
         private:
 
@@ -211,16 +345,16 @@ namespace hf {
 
         public:
 
-            MahonyQuaternionFilter(void)
+            MahonyQuaternionFilter9DOF(void) : QuaternionFilter()
             {
                 _eInt[0] = 0;
                 _eInt[1] = 0;
                 _eInt[2] = 0;
             }
 
-            void update(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float deltat, float q[4])
+            // Adapted from https://github.com/kriswiner/MPU9250/blob/master/quaternionFilters.ino
+            void update(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float deltat)
             {
-                float q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];   // short name local variable for readability
                 float norm;
                 float hx, hy, bx, bz;
                 float vx, vy, vz, wx, wy, wz;
@@ -303,10 +437,10 @@ namespace hf {
                 // Normalise quaternion
                 norm = sqrtf(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);
                 norm = 1.0f / norm;
-                q[0] = q1 * norm;
-                q[1] = q2 * norm;
-                q[2] = q3 * norm;
-                q[3] = q4 * norm;
+                q1 *= norm;
+                q2 *= norm;
+                q3 *= norm;
+                q4 *= norm;
             }
 
     }; // class MahonyQuaternionFilter

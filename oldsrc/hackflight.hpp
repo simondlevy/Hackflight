@@ -24,7 +24,7 @@
 
 #include "sensor.hpp"
 #include "board.hpp"
-#include "msp.hpp"
+#include "mspparser.hpp"
 #include "mixer.hpp"
 #include "receiver.hpp"
 #include "debug.hpp"
@@ -37,7 +37,7 @@
 
 namespace hf {
 
-    class Hackflight {
+    class Hackflight : public MspParser {
 
         private: 
 
@@ -65,9 +65,6 @@ namespace hf {
             // Demands sent to mixer
             demands_t _demands;
             
-            // MSP (serial comms)
-            MSP _msp;
-
             // Safety
             bool _safeToArm;
             bool _failsafe;
@@ -202,14 +199,12 @@ namespace hf {
 
             } // checkReceiver
 
+
             void doSerialComms(void)
             {
-                while (_board->serialAvailableBytes() > 0) {
-                    _msp.update(_board->serialReadByte());
-                }
-
-                while (_msp.availableBytes() > 0) {
-                    _board->serialWriteByte(_msp.readByte());
+                // runMspComms() return true if reboot requested, else false
+                if (MspParser::update()) {
+                    _board->reboot();
                 }
 
                 // Support motor testing from GCS
@@ -236,6 +231,60 @@ namespace hf {
             void add_sensor(Sensor * sensor)
             {
                 _sensors[_sensor_count++] = sensor;
+            }
+
+        protected:
+
+            virtual uint8_t mspSerialAvailable(void) 
+            {
+                return _board->serialAvailableBytes();
+            }
+
+            virtual uint8_t mspSerialRead(void) 
+            {
+                return _board->serialReadByte();
+            }
+
+            virtual void mspSerialWrite(uint8_t b) 
+            {
+                _board->serialWriteByte(b);
+            }
+
+            virtual void handle_SET_ARMED_Request(uint8_t  flag)
+            {
+                if (flag) {  // got arming command: arm only if throttle is down
+                    if (_receiver->throttleIsDown()) {
+                        _state.armed = true;
+                    }
+                }
+                else {          // got disarming command: always disarm
+                    _state.armed = false;
+                }
+            }
+
+            virtual void handle_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
+            {
+                c1 = _receiver->getRawval(0);
+                c2 = _receiver->getRawval(1);
+                c3 = _receiver->getRawval(2);
+                c4 = _receiver->getRawval(3);
+                c5 = _receiver->getRawval(4);
+                c6 = _receiver->getRawval(5);
+            }
+
+            virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
+            {
+                roll  = _state.eulerAngles[0];
+                pitch = _state.eulerAngles[1];
+                yaw   = _state.eulerAngles[2];
+            }
+
+            virtual void handle_SET_MOTOR_NORMAL_Request(float  m1, float  m2, float  m3, float  m4) override
+            {
+                _mixer->motorsDisarmed[0] = m1;
+                _mixer->motorsDisarmed[1] = m2;
+                _mixer->motorsDisarmed[2] = m3;
+                _mixer->motorsDisarmed[3] = m4;
             }
 
         public:
@@ -265,8 +314,8 @@ namespace hf {
                 // Support safety override by simulator
                 _state.armed = armed;
 
-                // Initialize MSP (serial comms)
-                _msp.init(&_state, receiver, mixer);
+                // Initialize MPS parser for serial comms
+                MspParser::init();
 
                 // Initialize the receiver
                 _receiver->init();

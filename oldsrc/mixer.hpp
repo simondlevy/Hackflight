@@ -20,10 +20,7 @@
 
 #pragma once
 
-#include "board.hpp"
 #include "filters.hpp"
-#include "debug.hpp"
-#include "datatypes.hpp"
 
 #include <cstring>
 
@@ -32,7 +29,7 @@ namespace hf {
     class Mixer {
 
         friend class Hackflight;
-        friend class MSP;
+        friend class MspParser;
         friend class RealBoard;
 
         private:
@@ -118,6 +115,7 @@ namespace hf {
                 for (uint8_t i = 0; i < nmotors; i++) {
                     writeMotor(i, motors[i]);
                 }
+
             }
 
             // This is how we can spin the motors from the GCS
