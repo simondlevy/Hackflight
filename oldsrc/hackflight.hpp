@@ -65,7 +65,7 @@ namespace hf {
 
             // Demands sent to mixer
             demands_t _demands;
-            
+
             // Safety
             bool _safeToArm;
             bool _failsafe;
@@ -164,7 +164,7 @@ namespace hf {
 
             void checkReceiver(void)
             {
-                // Acquire receiver demands, passing yaw angle for headless mode
+                // Check whether receiver data is available
                 if (!_receiver->getDemands(_state.eulerAngles[AXIS_YAW] - _yawInitial)) return;
 
                 // Update ratePid with cyclic demands
@@ -202,7 +202,6 @@ namespace hf {
 
             } // checkReceiver
 
-
             void doSerialComms(void)
             {
                 // runMspComms() return true if reboot requested, else false
@@ -219,13 +218,9 @@ namespace hf {
             void checkOptionalSensors(void)
             {
                 for (uint8_t k=0; k<_sensor_count; ++k) {
-
                     Sensor * sensor = _sensors[k];
-
                     float time = _board->getTime();
-
                     if (sensor->ready(time)) {
-
                         sensor->modifyState(_state, time);
                     }
                 }
@@ -307,7 +302,7 @@ namespace hf {
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
 
-                // First PID controller is always ratePid, aux state = 0
+                // Last PID controller is always ratePid (rate), aux state = 0
                 addPidController(ratePid, 0);
 
                 // Initialize state
