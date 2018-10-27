@@ -89,8 +89,8 @@ namespace hf {
                     // Update state with new quaternion to yield Euler angles
                     _quaternion.modifyState(_state, time);
 
-                    // Update ratePid with new Euler angles
-                    _ratePid->updateEulerAngles(_state.eulerAngles, _receiver->getAux1State());
+                    // Update ratePid for simulator (XXX should not be necessary)
+                    _ratePid->simUpdate(_state.eulerAngles, _receiver->getAux1State());
 
                     // Synch serial comms to quaternion check
                     doSerialComms();
@@ -295,10 +295,10 @@ namespace hf {
             void init(Board * board, Receiver * receiver, Mixer * mixer, Rate * ratePid, bool armed=false)
             {  
                 // Store the essentials
-                _board      = board;
-                _receiver   = receiver;
-                _mixer      = mixer;
-                _ratePid = ratePid;
+                _board    = board;
+                _receiver = receiver;
+                _mixer    = mixer;
+                _ratePid  = ratePid;
 
                 // Support for mandatory sensors
                 addSensor(&_quaternion, board);

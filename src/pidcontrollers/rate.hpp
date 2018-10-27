@@ -217,6 +217,12 @@ namespace hf {
                 return true;
             }
 
-    };  // class Stabilize
+            void simUpdate(float eulerAngles[3], uint8_t auxState)
+            {
+                (void)eulerAngles;
+                (void)auxState;
+            }
+
+    };  // class Rate
 
 } // namespace

@@ -45,7 +45,7 @@ namespace hf {
             // Passed to Hackflight::init() for a particular build
             Board      * _board;
             Receiver   * _receiver;
-            Rate * _ratePid;
+            Rate       * _ratePid;
             Mixer      * _mixer;
 
             // PID controllers
@@ -88,6 +88,9 @@ namespace hf {
 
                     // Update state with new quaternion to yield Euler angles
                     _quaternion.modifyState(_state, time);
+
+                    // Update ratePid for simulator (XXX should not be necessary)
+                    _ratePid->simUpdate(_state.eulerAngles, _receiver->getAux1State());
 
                     // Synch serial comms to quaternion check
                     doSerialComms();
@@ -162,9 +165,7 @@ namespace hf {
             void checkReceiver(void)
             {
                 // Check whether receiver data is available
-                if (!_receiver->getDemands(_state.eulerAngles[AXIS_YAW] - _yawInitial)) {
-                    return;
-                }
+                if (!_receiver->getDemands(_state.eulerAngles[AXIS_YAW] - _yawInitial)) return;
 
                 // Update ratePid with cyclic demands
                 _ratePid->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
