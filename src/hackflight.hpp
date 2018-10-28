@@ -93,9 +93,6 @@ namespace hf {
                     // Update state with new quaternion to yield Euler angles
                     _quaternion.modifyState(_state, time);
 
-                    // Update ratePid for simulator (XXX should not be necessary)
-                    _ratePid->simUpdate(_state.eulerAngles, _receiver->getAux1State());
-
                     // Synch serial comms to quaternion check
                     doSerialComms();
                 }
