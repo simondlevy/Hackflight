@@ -124,7 +124,7 @@ namespace hf {
             }
 
             
-            virtual float computePid(float rateP, float PTerm, float ITerm, float DTerm, float gyro[3], uint8_t axis)
+            float computePid(float rateP, float PTerm, float ITerm, float DTerm, float gyro[3], uint8_t axis)
             {
                 PTerm = (PTerm * _demandsToRate - gyro[axis]) * rateP;
 

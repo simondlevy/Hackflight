@@ -31,11 +31,7 @@
 #include "debug.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
-#ifdef _SIM // XXX
-#include "pidcontrollers/simrate.hpp"
-#else
 #include "pidcontrollers/rate.hpp"
-#endif
 #include "sensors/peripheral.hpp"
 #include "sensors/gyrometer.hpp"
 #include "sensors/quaternion.hpp"
