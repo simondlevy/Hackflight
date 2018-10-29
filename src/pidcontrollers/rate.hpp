@@ -58,12 +58,6 @@ namespace hf {
             const float BIG_YAW_DEMAND              = 0.1f;
             const float MAX_ARMING_ANGLE_DEGREES    = 25.0f;
 
-            // For PTerm computation
-            float _PTerm[2]; // roll, pitch
-
-            // proportion of cyclic demand compared to its maximum
-            float _proportionalCyclicDemand;
-
             float _bigGyroRate;
 
             float computeITermGyro(float error, float rateI, float rcCommand, float gyro[3], uint8_t axis)
@@ -79,15 +73,8 @@ namespace hf {
             }
 
              // PID constants set in constructor
-            float _demandsToRate;
             float _gyroYawP; 
             float _gyroYawI;
-
-        protected:
-
-            float maxArmingAngle;
-
-        private:
 
             void init(void)
             {
@@ -110,6 +97,51 @@ namespace hf {
             float _gyroDeltaError1[2]; 
             float _gyroDeltaError2[2];
             float _errorGyroI[3];
+
+            // Arrays of PID constants for pitch and roll
+            float _PConstants[2];
+            float _IConstants[2];
+            float _DConstants[2];
+
+            // Computes PID for pitch or roll
+            float computeCyclicPid(float rcCommand, float gyro[3], uint8_t imuAxis)
+            {
+                float error = rcCommand * _demandsToRate - gyro[imuAxis];
+
+                // I
+                float ITerm = computeITermGyro(error, _IConstants[imuAxis], rcCommand, gyro, imuAxis);
+                ITerm *= _proportionalCyclicDemand;
+
+                // D
+                float gyroDeltaError = error - _lastError[imuAxis];
+                _lastError[imuAxis] = error;
+                float gyroDeltaErrorSum = _gyroDeltaError1[imuAxis] + _gyroDeltaError2[imuAxis] + gyroDeltaError;
+                _gyroDeltaError2[imuAxis] = _gyroDeltaError1[imuAxis];
+                _gyroDeltaError1[imuAxis] = gyroDeltaError;
+                float DTerm = gyroDeltaErrorSum * _DConstants[imuAxis]; 
+
+                return computePid(_PConstants[imuAxis], _PTerm[imuAxis], ITerm, DTerm, gyro, imuAxis);
+            }
+
+            
+            virtual float computePid(float rateP, float PTerm, float ITerm, float DTerm, float gyro[3], uint8_t axis)
+            {
+                PTerm = (PTerm * _demandsToRate - gyro[axis]) * rateP;
+
+                return PTerm + ITerm + DTerm;
+            }
+
+        protected:
+
+            // For PTerm computation
+            float _PTerm[2]; // roll, pitch
+
+            float maxArmingAngle;
+
+            float _demandsToRate;
+
+            // proportion of cyclic demand compared to its maximum
+            float _proportionalCyclicDemand;
 
             void resetIntegral(void)
             {
@@ -176,46 +208,7 @@ namespace hf {
                 return true;
             }
 
-        private:
-
-            // Arrays of PID constants for pitch and roll
-            float _PConstants[2];
-            float _IConstants[2];
-            float _DConstants[2];
-
-            // Computes PID for pitch or roll
-            float computeCyclicPid(float rcCommand, float gyro[3], uint8_t imuAxis)
-            {
-                float error = rcCommand * _demandsToRate - gyro[imuAxis];
-
-                // I
-                float ITerm = computeITermGyro(error, _IConstants[imuAxis], rcCommand, gyro, imuAxis);
-                ITerm *= _proportionalCyclicDemand;
-
-                // D
-                float gyroDeltaError = error - _lastError[imuAxis];
-                _lastError[imuAxis] = error;
-                float gyroDeltaErrorSum = _gyroDeltaError1[imuAxis] + _gyroDeltaError2[imuAxis] + gyroDeltaError;
-                _gyroDeltaError2[imuAxis] = _gyroDeltaError1[imuAxis];
-                _gyroDeltaError1[imuAxis] = gyroDeltaError;
-                float DTerm = gyroDeltaErrorSum * _DConstants[imuAxis]; 
-
-                return computePid(_PConstants[imuAxis], _PTerm[imuAxis], ITerm, DTerm, gyro, imuAxis);
-            }
-
-            // ===================================================
-
-            
-            float computePid(float rateP, float PTerm, float ITerm, float DTerm, float gyro[3], uint8_t axis)
-            {
-                PTerm = (PTerm * _demandsToRate - gyro[axis]) * rateP;
-
-                return PTerm + ITerm + DTerm;
-            }
-
-        public:
-
-            void updateReceiver(demands_t & demands, bool throttleIsDown)
+            virtual void updateReceiver(demands_t & demands, bool throttleIsDown)
             {
                 // Compute proportion of cyclic demand compared to its maximum
                 _proportionalCyclicDemand = Filter::max(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
@@ -228,4 +221,4 @@ namespace hf {
 
     };  // class Rate
 
-} // namespace
+} // namespace hf
