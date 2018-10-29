@@ -41,16 +41,18 @@ namespace hf {
         private: 
 
               // Arbitrary constants
-              const float WINDUP_MAX             = 0.40f;
-              const float HOVER_THROTTLE         = 0.05f;
+              const float WINDUP_MAX      = 0.40f;
+              const float HOVER_THROTTLE  = 0.05f;
 
-              // PID constants set in constructor
+              // PID and other constants set in constructor
               float _altHoldP;
               float _altHoldVelP;
               float _altHoldVelI;
               float _altHoldVelD;
-            
-              // Required constants
+              bool _inBandPrev;
+              float _minAltitude;
+
+              // Values modified in-flight
               float _lastError;
               float _deltaError;
               float _integralError;
@@ -58,15 +60,35 @@ namespace hf {
               float _altitudeTarget;
               float _previousTime;
             
-              bool _inBandPrev;
-              float _minAltitude;
-              
+              bool inBand(float demand)
+              {
+                  return fabs(demand) < Receiver::STICK_DEADBAND; 
+              }
+
               void resetErrors(void)
               {
                   _lastError = 0;
                   _deltaError = 0;
                   _integralError = 0;
               }
+
+              virtual float correctedThrottle(state_t & state, float dt)
+              {
+                  // Compute vertical velocity setpoint and error
+                  _velocityTarget = (_altitudeTarget - state.altitude) * _altHoldP;
+                  float velocityError = _velocityTarget - state.variometer;
+
+                  // Update error integral and error derivative
+                  _integralError = Filter::constrainAbs(_integralError + velocityError * dt, WINDUP_MAX);
+                  _deltaError = (velocityError - _lastError) / dt;
+                  _lastError = velocityError;
+
+                  // Compute control action
+                  float throttleCorrection = _altHoldVelP * velocityError +
+                                             _altHoldVelD * _deltaError +
+                                             _altHoldVelI * _integralError;                       
+                 return HOVER_THROTTLE + throttleCorrection;
+               }
 
           protected:
             
@@ -88,35 +110,16 @@ namespace hf {
                   }
                   _inBandPrev = inBandCurr;
                 
-                  // Compute vertical velocity setpoint and error
-                  _velocityTarget = (_altitudeTarget - state.altitude) * _altHoldP;
-                  float velocityError = _velocityTarget - state.variometer;
-
-                  // Update error integral and error derivative
-                  _integralError = Filter::constrainAbs(_integralError + velocityError * dt, WINDUP_MAX);
-                  _deltaError = (velocityError - _lastError) / dt;
-                  _lastError = velocityError;
-
-                  // Compute control action
-                  float throttleCorrection = _altHoldVelP * velocityError +
-                                             _altHoldVelD * _deltaError +
-                                             _altHoldVelI * _integralError;                       
                   // Throttle: inside stick deadband, adjust by P(PID);
                   // outside deadband, respond to stick demand
-                  demands.throttle = inBandCurr ? 
-                      HOVER_THROTTLE + throttleCorrection:
-                      demands.throttle;
+                  demands.throttle = inBandCurr ? correctedThrottle(state, dt) : demands.throttle;
+
                   return inBandCurr;
               }
-              
+
               virtual bool shouldFlashLed(void) override 
               {
                   return true;
-              }
-
-              bool inBand(float demand)
-              {
-                  return fabs(demand) < Receiver::STICK_DEADBAND; 
               }
 
         public:
