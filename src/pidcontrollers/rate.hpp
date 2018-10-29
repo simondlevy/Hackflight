@@ -208,7 +208,7 @@ namespace hf {
                 return true;
             }
 
-            virtual void updateReceiver(demands_t & demands, bool throttleIsDown)
+            void updateReceiver(demands_t & demands, bool throttleIsDown)
             {
                 // Compute proportion of cyclic demand compared to its maximum
                 _proportionalCyclicDemand = Filter::max(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
