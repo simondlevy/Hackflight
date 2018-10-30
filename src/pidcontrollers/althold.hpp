@@ -56,7 +56,6 @@ namespace hf {
               float _lastError;
               float _deltaError;
               float _integralError;
-              float _velocityTarget;
               float _altitudeTarget;
               float _previousTime;
             
@@ -72,11 +71,11 @@ namespace hf {
                   _integralError = 0;
               }
 
-              virtual float correctedThrottle(state_t & state, float dt)
+              float correctedThrottle(state_t & state, float dt)
               {
                   // Compute vertical velocity setpoint and error
-                  _velocityTarget = (_altitudeTarget - state.altitude) * _altHoldP;
-                  float velocityError = _velocityTarget - state.variometer;
+                  float velocityTarget = (_altitudeTarget - state.altitude) * _altHoldP;
+                  float velocityError = velocityTarget - state.variometer;
 
                   // Update error integral and error derivative
                   _integralError = Filter::constrainAbs(_integralError + velocityError * dt, WINDUP_MAX);
