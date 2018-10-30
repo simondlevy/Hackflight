@@ -34,21 +34,46 @@ namespace hf {
 
         friend class Hackflight;
 
-        public:
+        private:
 
-        PositionHold(float posP, float posrP, float posrI, float posrD=0.0f)
+        // PID constants set by constructor
+        float _posP;
+        float _posrP;
+        float _posrI;
+        float _posrD;
+
+        // Values modified in-flight
+        float _positionSetpointX;
+        float _positionSetpointY;
+        bool  _inBandPrev;
+
+        bool inBand(float demand)
         {
-            _posP = posP;
-            _posrP = posrP;
-            _posrI = posrI;
-            _posrD = posrD;
+            return fabs(demand) < Receiver::STICK_DEADBAND; 
+        }
 
-            resetErrors();
+        float adjustDemand(float positionSetpoint, float demand, float position, float velocity)
+        {
+            // Inside throttle deadband, adjust pitch/roll demand by PD controller; outside deadband, leave it as-is
+            return demand - (inBand(demand) ? angleCorrection(positionSetpoint, position, velocity) : 0); 
+        }
 
-            _positionSetpointX = 0;
-            _positionSetpointY = 0;
+        // https://raw.githubusercontent.com/wiki/iNavFlight/inav/images/nav_poshold_pids_diagram.jpg
+        float angleCorrection(float positionSetpoint, float actualPosition, float actualVelocity)
+        {
+            float positionError = positionSetpoint - actualPosition;
+            float velocitySetpoint = _posP * positionError;
+            float velocityError = actualVelocity - velocitySetpoint;
+            float accelerationSetpoint = velocityError * _posrP;
 
-            _inBandPrev = false;
+            return accelerationSetpoint;
+         }
+
+        void resetErrors(void)
+        {
+            //_lastError = 0;
+            //_deltaError = 0;
+            //_integralError = 0;
         }
 
         protected:
@@ -77,47 +102,21 @@ namespace hf {
             return true;
         }
 
-        private:
+        public:
 
-        // PID constants set by constructor
-        float _posP;
-        float _posrP;
-        float _posrI;
-        float _posrD;
-
-        // Values modified in-flight
-        float _positionSetpointX;
-        float _positionSetpointY;
-        bool  _inBandPrev;
-
-        bool inBand(float demand)
+        PositionHold(float posP, float posrP, float posrI, float posrD=0.0f)
         {
-            return fabs(demand) < Receiver::STICK_DEADBAND; 
-        }
+            _posP = posP;
+            _posrP = posrP;
+            _posrI = posrI;
+            _posrD = posrD;
 
-        float adjustDemand(float positionSetpoint, float demand, float position, float velocity)
-        {
-            // Inside throttle deadband, adjust pitch/roll demand by PD controller; outside deadband, leave it as-is
-            return demand - (inBand(demand) ? angleCorrection(positionSetpoint, position, velocity) : 0); 
-        }
+            resetErrors();
 
-        float angleCorrection(float positionSetpoint, float actualPosition, float actualVelocity)
-        {
-            //return _posrP*actualVelocity;
-            
-            float positionError = positionSetpoint - actualPosition;
-            float velocitySetpoint = _posP * positionError;
-            float velocityError = actualVelocity - velocitySetpoint;
-            float accelerationSetpoint = velocityError * _posrP;
+            _positionSetpointX = 0;
+            _positionSetpointY = 0;
 
-            return accelerationSetpoint;
-         }
-
-        void resetErrors(void)
-        {
-            //_lastError = 0;
-            //_deltaError = 0;
-            //_integralError = 0;
+            _inBandPrev = false;
         }
 
     };  // class PositionHold

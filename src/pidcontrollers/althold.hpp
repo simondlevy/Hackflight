@@ -139,4 +139,4 @@ namespace hf {
 
     };  // class AltitudeHold
 
-} // namespace
+} // namespace hf
