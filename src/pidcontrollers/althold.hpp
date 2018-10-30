@@ -20,12 +20,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <cstring>
-#include <algorithm>
-#include <limits>
-#include <cmath>
-
 #include "receiver.hpp"
 #include "filters.hpp"
 #include "debug.hpp"
@@ -44,15 +38,17 @@ namespace hf {
               const float WINDUP_MAX      = 0.40f;
               const float HOVER_THROTTLE  = 0.05f;
 
-              // PID and other constants set in constructor
+              // PID constants set by constructor
               float _altHoldP;
               float _altHoldVelP;
               float _altHoldVelI;
               float _altHoldVelD;
-              bool _inBandPrev;
+
+              // Minimum altitude, set by constructor
               float _minAltitude;
 
               // Values modified in-flight
+              bool _inBandPrev;
               float _lastError;
               float _deltaError;
               float _integralError;
@@ -111,7 +107,9 @@ namespace hf {
                 
                   // Throttle: inside stick deadband, adjust by P(PID);
                   // outside deadband, respond to stick demand
-                  demands.throttle = inBandCurr ? correctedThrottle(state, dt) : demands.throttle;
+                  if (inBandCurr) {
+                    demands.throttle = correctedThrottle(state, dt);
+                  }
 
                   return inBandCurr;
               }

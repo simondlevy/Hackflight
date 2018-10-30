@@ -1,8 +1,6 @@
 /*
    poshold.hpp : PID-based position hold
 
-   Based on https://raw.githubusercontent.com/wiki/iNavFlight/inav/images/nav_poshold_pids_diagram.jpg
-
    Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
@@ -22,9 +20,9 @@
 
 #pragma once
 
+#include "receiver.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
-#include "receiver.hpp"
 #include "pidcontroller.hpp"
 
 namespace hf {
@@ -52,10 +50,11 @@ namespace hf {
             return fabs(demand) < Receiver::STICK_DEADBAND; 
         }
 
-        float adjustDemand(float positionSetpoint, float demand, float position, float velocity)
+        void resetErrors(void)
         {
-            // Inside throttle deadband, adjust pitch/roll demand by PD controller; outside deadband, leave it as-is
-            return demand - (inBand(demand) ? angleCorrection(positionSetpoint, position, velocity) : 0); 
+            //_lastError = 0;
+            //_deltaError = 0;
+            //_integralError = 0;
         }
 
         // https://raw.githubusercontent.com/wiki/iNavFlight/inav/images/nav_poshold_pids_diagram.jpg
@@ -68,13 +67,6 @@ namespace hf {
 
             return accelerationSetpoint;
          }
-
-        void resetErrors(void)
-        {
-            //_lastError = 0;
-            //_deltaError = 0;
-            //_integralError = 0;
-        }
 
         protected:
 
@@ -91,10 +83,12 @@ namespace hf {
             }
             _inBandPrev = inBandCurr;
 
-            demands.pitch = adjustDemand(_positionSetpointX, demands.pitch, state.positionX, state.velocityForward);
-            demands.roll  = adjustDemand(_positionSetpointY, demands.roll,  state.positionY, state.velocityRightward);
+            if (inBandCurr) {
+                demands.pitch -= angleCorrection(_positionSetpointX, state.positionX, state.velocityForward);
+                demands.roll  -= angleCorrection(_positionSetpointY, state.positionY, state.velocityRightward);
+            }
 
-            return true;
+            return inBandCurr;
         }
 
         virtual bool shouldFlashLed(void) override 
