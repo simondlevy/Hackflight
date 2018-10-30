@@ -98,12 +98,12 @@ namespace hf {
         float adjustDemand(float positionSetpoint, float demand, float position, float velocity)
         {
             // Inside throttle deadband, adjust pitch/roll demand by PD controller; outside deadband, leave it as-is
-            return demand - (inBand(demand) ? angleCorrection(velocity) : 0); 
+            return demand - (inBand(demand) ? angleCorrection(positionSetpoint, position, velocity) : 0); 
         }
 
-        float angleCorrection(float velocity)
+        float angleCorrection(float positionSetpoint, float actualPosition, float actualVelocity)
         {
-            return _posrP*velocity;
+            return _posrP*actualVelocity;
         }
 
         void resetErrors(void)
