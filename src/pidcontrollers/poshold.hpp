@@ -103,8 +103,15 @@ namespace hf {
 
         float angleCorrection(float positionSetpoint, float actualPosition, float actualVelocity)
         {
-            return _posrP*actualVelocity;
-        }
+            //return _posrP*actualVelocity;
+            
+            float positionError = positionSetpoint - actualPosition;
+            float velocitySetpoint = _posP * positionError;
+            float velocityError = actualVelocity - velocitySetpoint;
+            float accelerationSetpoint = velocityError * _posrP;
+
+            return accelerationSetpoint;
+         }
 
         void resetErrors(void)
         {
