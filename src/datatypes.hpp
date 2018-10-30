@@ -38,6 +38,8 @@ typedef struct {
     bool  armed;
     float altitude;
     float variometer;
+    float positionX;
+    float positionY;
     float velocityForward;  
     float velocityRightward; 
 

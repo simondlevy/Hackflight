@@ -42,6 +42,13 @@ namespace hf {
             _posrP = posrP;
             _posrI = posrI;
             _posrD = posrD;
+
+            resetErrors();
+
+            _positionSetpointX = 0;
+            _positionSetpointY = 0;
+
+            _inBandPrev = false;
         }
 
         protected:
@@ -49,6 +56,15 @@ namespace hf {
         virtual bool modifyDemands(state_t & state, demands_t & demands, float currentTime) 
         {
             (void)currentTime;
+
+            // Reset position setpoint if moved into stick deadband
+            bool inBandCurr = inBand(demands.pitch) && inBand(demands.roll);
+            if (inBandCurr && !_inBandPrev) {
+                _positionSetpointX = state.positionX;
+                _positionSetpointY = state.positionY;
+                resetErrors();
+            }
+            _inBandPrev = inBandCurr;
 
             demands.pitch = adjustCyclic(demands.pitch, state.velocityForward);
             demands.roll  = adjustCyclic(demands.roll,  state.velocityRightward);
@@ -63,11 +79,16 @@ namespace hf {
 
         private:
 
-        // set by constructor
+        // PID constants set by constructor
         float _posP;
         float _posrP;
         float _posrI;
         float _posrD;
+
+        // Values modified in-flight
+        float _positionSetpointX;
+        float _positionSetpointY;
+        bool  _inBandPrev;
 
         bool inBand(float demand)
         {
@@ -78,6 +99,13 @@ namespace hf {
         {
             // Inside throttle deadband, adjust pitch/roll demand by PD controller; outside deadband, leave it as-is
             return inBand(demand) ? demand - _posrP*velocity: demand; 
+        }
+
+        void resetErrors(void)
+        {
+            //_lastError = 0;
+            //_deltaError = 0;
+            //_integralError = 0;
         }
 
     };  // class PositionHold
