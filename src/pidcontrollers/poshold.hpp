@@ -66,8 +66,8 @@ namespace hf {
             }
             _inBandPrev = inBandCurr;
 
-            demands.pitch = adjustCyclic(demands.pitch, state.velocityForward);
-            demands.roll  = adjustCyclic(demands.roll,  state.velocityRightward);
+            demands.pitch = adjustDemand(_positionSetpointX, demands.pitch, state.positionX, state.velocityForward);
+            demands.roll  = adjustDemand(_positionSetpointY, demands.roll,  state.positionY, state.velocityRightward);
 
             return true;
         }
@@ -95,7 +95,7 @@ namespace hf {
             return fabs(demand) < Receiver::STICK_DEADBAND; 
         }
 
-        float adjustCyclic(float demand, float velocity)
+        float adjustDemand(float positionSetpoint, float demand, float position, float velocity)
         {
             // Inside throttle deadband, adjust pitch/roll demand by PD controller; outside deadband, leave it as-is
             return inBand(demand) ? demand - _posrP*velocity: demand; 
