@@ -50,7 +50,6 @@ namespace hf {
               // Values modified in-flight
               bool _inBandPrev;
               float _lastError;
-              float _deltaError;
               float _integralError;
               float _altitudeTarget;
               float _previousTime;
@@ -63,7 +62,6 @@ namespace hf {
               void resetErrors(void)
               {
                   _lastError = 0;
-                  _deltaError = 0;
                   _integralError = 0;
               }
 
@@ -75,12 +73,12 @@ namespace hf {
 
                   // Update error integral and error derivative
                   _integralError = Filter::constrainAbs(_integralError + velocityError * dt, WINDUP_MAX);
-                  _deltaError = (velocityError - _lastError) / dt;
+                  float deltaError = (velocityError - _lastError) / dt;
                   _lastError = velocityError;
 
                   // Compute control action
                   float throttleCorrection = _altHoldVelP * velocityError +
-                                             _altHoldVelD * _deltaError +
+                                             _altHoldVelD * deltaError +
                                              _altHoldVelI * _integralError;                       
                  return HOVER_THROTTLE + throttleCorrection;
                }

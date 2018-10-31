@@ -155,9 +155,9 @@ namespace hf {
             Rate(float gyroRollP, float gyroRollI, float gyroRollD,
                        float gyroPitchP, float gyroPitchI, float gyroPitchD,
                        float gyroYawP, float gyroYawI, float demandsToRate = 1.0f) :
-                _demandsToRate(demandsToRate),
                 _gyroYawP(gyroYawP), 
-                _gyroYawI(gyroYawI) 
+                _gyroYawI(gyroYawI),
+                _demandsToRate(demandsToRate)
             {
                 init();
                 // Constants arrays
@@ -171,9 +171,9 @@ namespace hf {
             
             Rate(float gyroRollPitchP, float gyroRollPitchI, float gyroRollPitchD,
                        float gyroYawP, float gyroYawI, float demandsToRate = 1.0f) :
-                _demandsToRate(demandsToRate),
                 _gyroYawP(gyroYawP), 
-                _gyroYawI(gyroYawI) 
+                _gyroYawI(gyroYawI), 
+                _demandsToRate(demandsToRate)
             {
                 init();
                 // Constants arrays
