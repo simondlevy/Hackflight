@@ -25,6 +25,7 @@
 #include "debug.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
+#include "pidcontrollers/setpoint.hpp"
 
 namespace hf {
 
