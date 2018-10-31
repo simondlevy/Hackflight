@@ -21,7 +21,6 @@
 #pragma once
 
 #include "receiver.hpp"
-#include "filters.hpp"
 #include "debug.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
@@ -39,50 +38,11 @@ namespace hf {
               const float WINDUP_MAX      = 0.40f;
               const float HOVER_THROTTLE  = 0.05f;
 
-              // PID constants set by constructor
-              float _altHoldP;
-              float _altHoldVelP;
-              float _altHoldVelI;
-              float _altHoldVelD;
+              // Setpoint class for PID control
+              Setpoint setpoint;
 
               // Minimum altitude, set by constructor
               float _minAltitude;
-
-              // Values modified in-flight
-              bool _inBandPrev;
-              float _lastError;
-              float _integralError;
-              float _altitudeTarget;
-              float _previousTime;
-            
-              bool inBand(float demand)
-              {
-                  return fabs(demand) < Receiver::STICK_DEADBAND; 
-              }
-
-              void resetErrors(void)
-              {
-                  _lastError = 0;
-                  _integralError = 0;
-              }
-
-              float correctedThrottle(state_t & state, float dt)
-              {
-                  // Compute vertical velocity setpoint and error
-                  float velocityTarget = (_altitudeTarget - state.altitude) * _altHoldP;
-                  float velocityError = velocityTarget - state.variometer;
-
-                  // Update error integral and error derivative
-                  _integralError = Filter::constrainAbs(_integralError + velocityError * dt, WINDUP_MAX);
-                  float deltaError = (velocityError - _lastError) / dt;
-                  _lastError = velocityError;
-
-                  // Compute control action
-                  float throttleCorrection = _altHoldVelP * velocityError +
-                                             _altHoldVelD * deltaError +
-                                             _altHoldVelI * _integralError;                       
-                 return HOVER_THROTTLE + throttleCorrection;
-               }
 
           protected:
             
@@ -91,26 +51,14 @@ namespace hf {
                   // Don't do anything till we've reached sufficient altitude
                   if (state.altitude < _minAltitude) return false;
 
-                  // Don't do anything until we have a positive dt
-                  float dt = currentTime - _previousTime;
-                  _previousTime = currentTime;
-                  if (dt == currentTime) return false;
-
-                  // Reset altitude target if moved into stick deadband
-                  bool inBandCurr = inBand(demands.throttle);
-                  if (inBandCurr && !_inBandPrev) {
-                      _altitudeTarget = state.altitude;
-                      resetErrors();
-                  }
-                  _inBandPrev = inBandCurr;
-                
-                  // Throttle: inside stick deadband, adjust by P(PID);
-                  // outside deadband, respond to stick demand
-                  if (inBandCurr) {
-                    demands.throttle = correctedThrottle(state, dt);
+                  float correction = 0;
+                  if (setpoint.gotCorrection(demands.throttle, state.altitude, state.variometer, currentTime, correction)) {
+                      demands.throttle = correction + HOVER_THROTTLE;
+                      return true;
                   }
 
-                  return inBandCurr;
+                  return false;
+
               }
 
               virtual bool shouldFlashLed(void) override 
@@ -120,18 +68,10 @@ namespace hf {
 
         public:
 
-            AltitudeHold(float altHoldP, float altHoldVelP, float altHoldVelI, float altHoldVelD,
-                         float minAltitude=0.1) :
-                _altHoldP(altHoldP), 
-                _altHoldVelP(altHoldVelP), 
-                _altHoldVelI(altHoldVelI),
-                _altHoldVelD(altHoldVelD),
-                _minAltitude(minAltitude)
+            AltitudeHold(float altHoldP, float altHoldVelP, float altHoldVelI, float altHoldVelD, float minAltitude=0.1) : _minAltitude(minAltitude)
             {
-                // Initialize errors
-                resetErrors();
-                _previousTime = 0;
-                _inBandPrev = false;
+                // Initialize PID controller
+                setpoint.init(altHoldP, altHoldVelP, altHoldVelI, altHoldVelD, WINDUP_MAX);
             }
 
     };  // class AltitudeHold

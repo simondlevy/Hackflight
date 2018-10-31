@@ -34,60 +34,31 @@ namespace hf {
 
         private:
 
-        // PID constants set by constructor
-        float _posP;
-        float _posrP;
-        float _posrI;
-        float _posrD;
+        // Arbitrary constants
+        const float WINDUP_MAX = 0.40f;
 
-        // Values modified in-flight
-        float _positionSetpointX;
-        float _positionSetpointY;
-        bool  _inBandPrev;
+        // Setpoints for PID control
+        Setpoint setpointX;
+        Setpoint setpointY;
 
-        bool inBand(float demand)
+        bool gotCorrection(Setpoint & setpoint, float & demand, float position, float velocity, float currentTime) 
         {
-            return fabs(demand) < Receiver::STICK_DEADBAND; 
+            float correction = 0;
+            if (setpoint.gotCorrection(demand, position, velocity, currentTime, correction)) {
+                demand += correction;
+                return true;
+            }
+
+            return false;
         }
-
-        void resetErrors(void)
-        {
-            //_lastError = 0;
-            //_integralError = 0;
-        }
-
-        // https://raw.githubusercontent.com/wiki/iNavFlight/inav/images/nav_poshold_pids_diagram.jpg
-        float angleCorrection(float positionSetpoint, float actualPosition, float actualVelocity)
-        {
-            float positionError = positionSetpoint - actualPosition;
-            float velocitySetpoint = _posP * positionError;
-            float velocityError = actualVelocity - velocitySetpoint;
-            float accelerationSetpoint = velocityError * _posrP;
-
-            return accelerationSetpoint;
-         }
 
         protected:
 
         virtual bool modifyDemands(state_t & state, demands_t & demands, float currentTime) 
         {
-            (void)currentTime;
-
-            // Reset position setpoint if moved into stick deadband
-            bool inBandCurr = inBand(demands.pitch) && inBand(demands.roll);
-            if (inBandCurr && !_inBandPrev) {
-                _positionSetpointX = state.positionX;
-                _positionSetpointY = state.positionY;
-                resetErrors();
-            }
-            _inBandPrev = inBandCurr;
-
-            if (inBandCurr) {
-                demands.pitch -= angleCorrection(_positionSetpointX, state.positionX, state.velocityForward);
-                demands.roll  -= angleCorrection(_positionSetpointY, state.positionY, state.velocityRightward);
-            }
-
-            return inBandCurr;
+            bool correctedPitch = gotCorrection(setpointY, demands.pitch, state.positionX, state.velocityForward,   currentTime);
+            bool correctedRoll  = gotCorrection(setpointX, demands.roll,  state.positionY, state.velocityRightward, currentTime);
+            return correctedPitch || correctedRoll;
         }
 
         virtual bool shouldFlashLed(void) override 
@@ -99,17 +70,8 @@ namespace hf {
 
         PositionHold(float posP, float posrP, float posrI, float posrD=0.0f)
         {
-            _posP = posP;
-            _posrP = posrP;
-            _posrI = posrI;
-            _posrD = posrD;
-
-            resetErrors();
-
-            _positionSetpointX = 0;
-            _positionSetpointY = 0;
-
-            _inBandPrev = false;
+            setpointX.init(posP, posrP, posrI, posrD, WINDUP_MAX);
+            setpointY.init(posP, posrP, posrI, posrD, WINDUP_MAX);
         }
 
     };  // class PositionHold
