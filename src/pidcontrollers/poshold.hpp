@@ -53,7 +53,6 @@ namespace hf {
         void resetErrors(void)
         {
             //_lastError = 0;
-            //_deltaError = 0;
             //_integralError = 0;
         }
 
