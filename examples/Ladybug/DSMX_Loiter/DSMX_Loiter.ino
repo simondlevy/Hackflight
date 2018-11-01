@@ -20,13 +20,11 @@
  */
 
 #include <Arduino.h>
-#include <VL53L1X.h>
-#include <PMW3901.h>
 
 #include "hackflight.hpp"
 #include "boards/ladybug.hpp"
 #include "receivers/dsmx.hpp"
-#include "sensors/rangefinder.hpp"
+#include "sensors/rangefinders/vl53l1x.hpp"
 #include "sensors/opticalflow.hpp"
 #include "pidcontrollers/level.hpp"
 #include "pidcontrollers/althold.hpp"
@@ -57,68 +55,9 @@ hf::AltitudeHold althold = hf::AltitudeHold(
         0.05f);  // Altitude Hold Velocity D
 
 
-class VL53L1X_Rangefinder : public hf::Rangefinder {
+hf::VL53L1X_Rangefinder rangefinder;
 
-    private:
-
-        VL53L1X _distanceSensor;
-
-    protected:
-
-        virtual bool distanceAvailable(float & distance) override
-        {
-            if (_distanceSensor.newDataReady()) {
-                distance = _distanceSensor.getDistance() / 1000.f; // mm => m
-                return true;
-            }
-            return false;
-        }
-
-    public:
-
-        void begin(void)
-        {
-            _distanceSensor.begin();
-        }
-}; // class VL53L1X_Rangefinder 
-
-
-class PMW3901_OpticalFlow : public hf::OpticalFlow {
-
-    private:
-
-        // Using digital pin 10 for chip select
-        PMW3901 _flowSensor = PMW3901(10);
-
-
-    protected:
-
-        virtual void getFlow(float flow[2]) override
-        {
-            int16_t deltaX=0, deltaY=0;
-            _flowSensor.readMotionCount(&deltaX, &deltaY);
-            flow[0] = (float)deltaX;
-            flow[1] = (float)deltaY;
-        }
-
-    public:
-
-        void begin(void)
-        {
-            if (!_flowSensor.begin()) {
-                while (true) {
-                    Serial.println("Initialization of the flow sensor failed");
-                    delay(500);
-                }
-            }
-
-        }
-
-};  // class PMW3901_OpticalFlow 
-
-VL53L1X_Rangefinder rangefinder;
-
-PMW3901_OpticalFlow opticalFlow;
+hf::OpticalFlow opticalFlow;
 
 void setup(void)
 {

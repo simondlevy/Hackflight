@@ -1,5 +1,5 @@
 /*
-   opticalflow.hpp : Support for optical-flow sensors
+   opticalflow.hpp : Support for PMW3901 optical-flow sensor
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -23,6 +23,8 @@
 #include <cmath>
 #include <math.h>
 
+#include <PMW3901.h>
+
 #include "debug.hpp"
 #include "peripheral.hpp"
 
@@ -32,6 +34,9 @@ namespace hf {
 
         private:
 
+            // Using digital pin 10 for chip select
+            PMW3901 _flowSensor = PMW3901(10);
+
             float _flow[2];
 
         protected:
@@ -40,21 +45,33 @@ namespace hf {
             {
                 (void)time; // XXX ignore time for now
 
-                state.velocityForward   = _flow[0];
-                state.velocityRightward = _flow[1];
+                int16_t deltaX=0, deltaY=0;
+                _flowSensor.readMotionCount(&deltaX, &deltaY);
+
+                state.velocityForward   = (float)deltaX;
+                state.velocityRightward = (float)deltaY;
             }
 
             virtual bool ready(float time) override
             {
                 (void)time;
 
-                getFlow(_flow);
-
                 return true; // XXX ignore readiness for now
             }
 
-            virtual void getFlow(float flow[2]) = 0;
+        public:
 
-    };  // class OpticalFlow
+            void begin(void)
+            {
+                if (!_flowSensor.begin()) {
+                    while (true) {
+                        Serial.println("Initialization of the flow sensor failed");
+                        delay(500);
+                    }
+                }
 
-} // namespace
+            }
+
+    };  // class OpticalFlow 
+
+} // namespace hf
