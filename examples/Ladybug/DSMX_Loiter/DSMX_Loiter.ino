@@ -54,6 +54,10 @@ hf::AltitudeHold althold = hf::AltitudeHold(
         0.01f,   // Altitude Hold Velocity I
         0.05f);  // Altitude Hold Velocity D
 
+hf::PositionHold poshold = hf::PositionHold(
+	0.0f,	// posP
+	0.2f,	// posrP
+	0.0f);	// posrI
 
 hf::VL53L1X_Rangefinder rangefinder;
 
@@ -80,8 +84,9 @@ void setup(void)
     // Add Level PID for aux switch position 1
     h.addPidController(&level, 1);
 
-    // Add Loiter PID controller for aux switch position 2
+    // Add altitude-hold and position-hold PID controllers for aux switch position 2
     h.addPidController(&althold, 2);
+    h.addPidController(&poshold, 2);
 }
 
 void loop(void)

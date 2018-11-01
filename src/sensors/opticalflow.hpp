@@ -34,29 +34,37 @@ namespace hf {
 
         private:
 
-            // Using digital pin 10 for chip select
+            static constexpr float UPDATE_PERIOD = .01f;
+
+            // Use digital pin 10 for chip select
             PMW3901 _flowSensor = PMW3901(10);
 
-            float _flow[2];
+            // Track elapsed time for periodic readiness
+            bool _previousTime = 0;
+
 
         protected:
 
             virtual void modifyState(state_t & state, float time) override
             {
-                (void)time; // XXX ignore time for now
+                (void)time; 
 
                 int16_t deltaX=0, deltaY=0;
                 _flowSensor.readMotionCount(&deltaX, &deltaY);
 
-                state.velocityForward   = (float)deltaX;
-                state.velocityRightward = (float)deltaY;
+                state.velocityForward   =  (float)deltaY;
+                state.velocityRightward = -(float)deltaX;
             }
 
             virtual bool ready(float time) override
             {
-                (void)time;
+                _previousTime = time;
 
-                return true; // XXX ignore readiness for now
+                bool result = (time - _previousTime > UPDATE_PERIOD);
+
+                _previousTime = time;
+
+                return result;
             }
 
         public:
