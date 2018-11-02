@@ -20,6 +20,7 @@
 
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
+#include "pidcontrollers/level.hpp"
 #include "omnibusf3.h"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
@@ -34,18 +35,24 @@ extern "C" {
 
     void setup(void)
     {
-           hf::Stabilizer * stabilizer = new hf::Stabilizer(
-           0.10f,      // Level P
-           0.125f,     // Gyro cyclic P
-           0.001875f,  // Gyro cyclic I
-           0.175f,     // Gyro cyclic D
-           0.625f,    // Gyro yaw P
-           0.005625f); // Gyro yaw I
          
+        hf::Rate * ratePid = new hf::Rate(
+                0.05f, // Gyro cyclic P
+                0.00f, // Gyro cyclic I
+                0.00f, // Gyro cyclic D
+                0.10f, // Gyro yaw P
+                0.01f, // Gyro yaw I
+                8.58); // Demands to rate
+
+        hf::Level * level = new hf::Level(0.2f);
+
         DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_3, CHANNEL_MAP);
 
+        // Add Level PID for aux switch position 1
+        h.addPidController(level, 1);
+
         // Initialize Hackflight firmware
-        h.init(new OmnibusF3(), rc, new hf::MixerQuadX(), stabilizer);
+        h.init(new OmnibusF3(), rc, new hf::MixerQuadX(), ratePid);
     }
 
     void loop(void)
