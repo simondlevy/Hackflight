@@ -49,7 +49,6 @@ namespace hf {
                     if (_client.connected()) {
 
                         while (_client.available()) {
-                            //Serial.println(_client.readStringUntil('\r'));
                             Serial.println(_client.read(), HEX);
                         }
                     }

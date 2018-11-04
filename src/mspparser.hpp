@@ -249,6 +249,7 @@ namespace hf {
             virtual uint8_t mspSerialRead(void) = 0;
 
             virtual void    mspSerialWrite(uint8_t b) = 0;
+
             void dispatchRequestMessage(void)
             {
                 switch (_command) {
