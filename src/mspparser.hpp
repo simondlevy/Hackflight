@@ -199,7 +199,7 @@ namespace hf {
 
                 return false; // no reboot 
 
-            } // update
+            } // parse
 
             uint8_t availableBytes(void)
             {
