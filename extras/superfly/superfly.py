@@ -28,8 +28,12 @@ from time import sleep
 sock = socket()
 sock.connect((SUPERFLY_ADDR, SUPERFLY_PORT))
 
+count = 0
+
 while True:
 
-    sock.send('Hello\r'.encode('UTF-8'))
+    sock.send(('%d\r' % count).encode('UTF-8'))
+
+    count += 1
 
     sleep(0.5)
