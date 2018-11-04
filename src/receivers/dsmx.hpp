@@ -90,4 +90,4 @@ namespace hf {
 
     }; // class DSMX_Receiver
 
-} // namespace
+} // namespace hf

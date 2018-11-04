@@ -123,4 +123,4 @@ namespace hf {
 
     }; // class SBUS_Receiver
 
-} // namespace
+} // namespace hf

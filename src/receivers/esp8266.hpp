@@ -22,14 +22,52 @@ namespace hf {
 
     class ESP8266_Receiver : public Receiver {
 
-         protected:
+        private:
+
+            static constexpr char * SSID     = "Esp8266TestNet";
+            static constexpr char * PASSWORD = "Esp8266Test"; // has to be longer than 7 chars
+
+            WiFiServer _server = WiFiServer(80);
+            WiFiClient _client;
+            bool _haveClient;
+
+        protected:
 
             void begin(void)
             {
+                WiFi.mode(WIFI_AP);
+                //WiFi.softAP(SSID, PASSWORD, 1, 1); // password required
+                WiFi.softAP(SSID); // no password
+                _server.begin();
+                _haveClient = false;
             }
 
             bool gotNewFrame(void)
             {
+                if (_haveClient) {
+
+                    if (_client.connected()) {
+
+                        if (_client.available()) {
+                            Serial.println(_client.readStringUntil('\r'));
+                        }
+                    }
+
+                    else {
+                        _haveClient = false;
+                    }
+                }
+
+                else {
+                    _client = _server.available();
+                    if (_client) {
+                        _haveClient = true;
+                    } 
+                    else {
+                        Serial.println("Waiting for client ...");
+                    }
+                }
+
                 return false; //rx.gotNewFrame();
             }
 
@@ -45,68 +83,10 @@ namespace hf {
 
         public:
 
-            ESP8266_Receiver(const uint8_t channelMap[6]) : Receiver(channelMap) 
-            { 
-            }
+        ESP8266_Receiver(const uint8_t channelMap[6]) : Receiver(channelMap) 
+        { 
+        }
 
     }; // class ESP8266_Receiver
 
-} // namespace
-
-/*
-
-// WiFi Definitions
-static const char* ssid = "Esp8266TestNet";
-const static char* password = "Esp8266Test"; // has to be longer than 7 chars
-
-WiFiServer server(80);
-
-void setup() {
-
-    Serial.begin(115200);
-    delay(10);
-
-    WiFi.mode(WIFI_AP);
-    //WiFi.softAP(ssid, password, 1, 1);
-    WiFi.softAP(ssid);
-
-    server.begin();
-}
-
-void loop() {
-
-    static WiFiClient client;
-    static bool haveClient;
-
-    if (haveClient) {
-
-        if (client.connected()) {
-
-            if (client.available()) {
-                Serial.println(client.readStringUntil('\r'));
-            }
-        }
-
-        else {
-            haveClient = false;
-        }
-    }
-
-    else {
-        client = server.available();
-        if (client) {
-            haveClient = true;
-        } 
-        else {
-            Serial.println("Waiting for client ...");
-        }
-    }
-
-    delay(500);
-
-    //String request = client.readStringUntil('\r');
-    //Serial.println(request);
-    //client.flush();
-}
-
-*/
+} // namespace hf
