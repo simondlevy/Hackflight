@@ -20,3 +20,16 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
 SUPERFLY_ADDR = '192.168.4.1'
+SUPERFLY_PORT = 80
+
+from socket import socket
+from time import sleep
+
+sock = socket()
+sock.connect((SUPERFLY_ADDR, SUPERFLY_PORT))
+
+while True:
+
+    sock.send('Hello\r'.encode('UTF-8'))
+
+    sleep(0.5)
