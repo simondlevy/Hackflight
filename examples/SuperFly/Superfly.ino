@@ -1,11 +1,10 @@
 /*
-   CPPM.ino : Hackflight sketch for SuperFly ESP8266 Hackable Flight Controller with a CPPM receiver
+   Superfly.ino : Hackflight sketch for SuperFly ESP8266 Hackable Flight Controller
  
    Additional libraries needed:
 
        https://github.com/simondlevy/EM7180
        https://github.com/simondlevy/CrossPlatformDataBus
-       https://github.com/simondlevy/CPPMRX
 
    Hardware support for SuperFly ESP8266 Hackable flight controller:
 
@@ -34,15 +33,13 @@
 #include "boards/superfly.hpp"
 #include "mixers/quadx.hpp"
 #include "pidcontrollers/level.hpp"
-#include "receivers/cppm.hpp"
+#include "receivers/esp8266.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 
-static const uint8_t RX_PIN = 12;
-
 hf::Hackflight h;
 
-hf::CPPM_Receiver rc = hf::CPPM_Receiver(12, CHANNEL_MAP);
+hf::ESP8266_Receiver rc = hf::ESP8266_Receiver(CHANNEL_MAP);
 
 hf::MixerQuadX mixer;
 
@@ -54,7 +51,6 @@ hf::Rate ratePid = hf::Rate(
         0.005625f); // Gyro yaw I
 
 hf::Level level = hf::Level(0.20f);
-
 
 void setup(void)
 {
