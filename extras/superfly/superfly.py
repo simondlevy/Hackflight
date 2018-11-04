@@ -25,15 +25,12 @@ SUPERFLY_PORT = 80
 from socket import socket
 from time import sleep
 
+from msppg import serialize_RC_NORMAL
+
 sock = socket()
 sock.connect((SUPERFLY_ADDR, SUPERFLY_PORT))
 
-count = 0
-
 while True:
 
-    sock.send(('%d\r' % count).encode('UTF-8'))
+    sock.send(serialize_RC_NORMAL(0, 0, 0, 0, 0, 0))
 
-    count += 1
-
-    sleep(0.5)
