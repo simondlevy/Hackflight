@@ -51,8 +51,8 @@ namespace hf {
                     if (_client.connected()) {
 
                         while (_client.available()) {
-                            MspParser::parse(_client.read());
-                            //Serial.println(_client.read(), HEX);
+                            //MspParser::parse(_client.read());
+                            _client.read();
                         }
                     }
 
@@ -64,6 +64,7 @@ namespace hf {
                 else {
                     _client = _server.available();
                     if (_client) {
+                        Serial.println("Connected!");
                         _haveClient = true;
                     } 
                     else {
@@ -84,7 +85,7 @@ namespace hf {
                 return false; //rx.timedOut(micros());
             }
 
-            virtual void handle_RC_NORMAL_Data(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
+            virtual void handle_SET_RC_NORMAL_Request(float c1, float c2, float c3, float c4, float c5, float c6) override
             {
                 Debug::printf("%+2.2f %+2.2f %+2.2f %+2.2f %+2.2f %+2.2f\n",
                         c1, c2, c3, c4, c5, c6);

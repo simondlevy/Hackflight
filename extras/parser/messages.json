@@ -37,5 +37,16 @@
   "SET_ARMED": 
   [{"ID": 216},
    {"comment": "Arm/disarm from MSP"}, 
-   {"flag": "byte"}]
+   {"flag": "byte"}],
+
+  "SET_RC_NORMAL": 
+  [{"ID": 221},
+   {"comment": "16 channels in http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol"}, 
+   {"c1": "float"}, 
+   {"c2": "float"}, 
+   {"c3": "float"}, 
+   {"c4": "float"}, 
+   {"c5": "float"}, 
+   {"c6": "float"}]
+
 }

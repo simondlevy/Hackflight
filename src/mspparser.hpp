@@ -307,6 +307,29 @@ namespace hf {
                         handle_SET_ARMED_Request(flag);
                         } break;
 
+                    case 221:
+                    {
+                        float c1 = 0;
+                        memcpy(&c1,  &_inBuf[0], sizeof(float));
+
+                        float c2 = 0;
+                        memcpy(&c2,  &_inBuf[4], sizeof(float));
+
+                        float c3 = 0;
+                        memcpy(&c3,  &_inBuf[8], sizeof(float));
+
+                        float c4 = 0;
+                        memcpy(&c4,  &_inBuf[12], sizeof(float));
+
+                        float c5 = 0;
+                        memcpy(&c5,  &_inBuf[16], sizeof(float));
+
+                        float c6 = 0;
+                        memcpy(&c6,  &_inBuf[20], sizeof(float));
+
+                        handle_SET_RC_NORMAL_Request(c1, c2, c3, c4, c5, c6);
+                        } break;
+
                 }
             }
 
@@ -437,6 +460,26 @@ namespace hf {
             virtual void handle_SET_ARMED_Data(uint8_t  flag)
             {
                 (void)flag;
+            }
+
+            virtual void handle_SET_RC_NORMAL_Request(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
+            {
+                (void)c1;
+                (void)c2;
+                (void)c3;
+                (void)c4;
+                (void)c5;
+                (void)c6;
+            }
+
+            virtual void handle_SET_RC_NORMAL_Data(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
+            {
+                (void)c1;
+                (void)c2;
+                (void)c3;
+                (void)c4;
+                (void)c5;
+                (void)c6;
             }
 
         public:
@@ -590,6 +633,26 @@ namespace hf {
                 bytes[6] = CRC8(&bytes[3], 3);
 
                 return 7;
+            }
+
+            static uint8_t serialize_SET_RC_NORMAL(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 24;
+                bytes[4] = 221;
+
+                memcpy(&bytes[5], &c1, sizeof(float));
+                memcpy(&bytes[9], &c2, sizeof(float));
+                memcpy(&bytes[13], &c3, sizeof(float));
+                memcpy(&bytes[17], &c4, sizeof(float));
+                memcpy(&bytes[21], &c5, sizeof(float));
+                memcpy(&bytes[25], &c6, sizeof(float));
+
+                bytes[29] = CRC8(&bytes[3], 26);
+
+                return 30;
             }
 
     }; // class MspParser
