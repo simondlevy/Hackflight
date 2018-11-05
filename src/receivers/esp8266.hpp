@@ -54,7 +54,9 @@ namespace hf {
                     if (_client.connected()) {
 
                         while (_client.available()) {
-                            Serial.println(parser.parse(_client.read()));
+                            if (parser.parse(_client.read()) == MspParser2::RESULT_DONE) {
+                                Serial.println("Got message");
+                            }
                         }
                     }
 
