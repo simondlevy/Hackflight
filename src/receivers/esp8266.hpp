@@ -20,7 +20,7 @@
 
 namespace hf {
 
-    class ESP8266_Receiver : public Receiver {
+    class ESP8266_Receiver : public Receiver, public MspParser {
 
         private:
 
@@ -40,6 +40,8 @@ namespace hf {
                 WiFi.softAP(SSID); // no password
                 _server.begin();
                 _haveClient = false;
+
+                MspParser::init();
             }
 
             bool gotNewFrame(void)
@@ -49,7 +51,8 @@ namespace hf {
                     if (_client.connected()) {
 
                         while (_client.available()) {
-                            Serial.println(_client.read(), HEX);
+                            MspParser::parse(_client.read());
+                            //Serial.println(_client.read(), HEX);
                         }
                     }
 
@@ -79,6 +82,12 @@ namespace hf {
             bool lostSignal(void)
             {
                 return false; //rx.timedOut(micros());
+            }
+
+            virtual void handle_RC_NORMAL_Data(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
+            {
+                Debug::printf("%+2.2f %+2.2f %+2.2f %+2.2f %+2.2f %+2.2f\n",
+                        c1, c2, c3, c4, c5, c6);
             }
 
         public:

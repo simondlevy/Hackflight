@@ -231,7 +231,6 @@ class HPP_Emitter(CodeEmitter):
 
         # Add dispatchRequestMessage() method
 
-        self.output.write('\n')
         self.output.write(3*self.indent + 'void dispatchRequestMessage(void)\n')
         self.output.write(3*self.indent + '{\n')
         self.output.write(4*self.indent + 'switch (_command) {\n\n')

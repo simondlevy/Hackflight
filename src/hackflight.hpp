@@ -201,9 +201,15 @@ namespace hf {
 
             void doSerialComms(void)
             {
-                // runMspComms() return true if reboot requested, else false
-                if (MspParser::update()) {
-                    _board->reboot();
+                while (_board->serialAvailableBytes() > 0) {
+
+                    if (MspParser::parse(_board->serialReadByte())) {
+                        _board->reboot();
+                    }
+                }
+
+                while (MspParser::availableBytes() > 0) {
+                    _board->serialWriteByte(MspParser::readByte());
                 }
 
                 // Support motor testing from GCS
@@ -230,20 +236,7 @@ namespace hf {
 
         protected:
 
-            virtual uint8_t mspSerialAvailable(void) 
-            {
-                return _board->serialAvailableBytes();
-            }
 
-            virtual uint8_t mspSerialRead(void) 
-            {
-                return _board->serialReadByte();
-            }
-
-            virtual void mspSerialWrite(uint8_t b) 
-            {
-                _board->serialWriteByte(b);
-            }
 
             virtual void handle_SET_ARMED_Request(uint8_t  flag)
             {
