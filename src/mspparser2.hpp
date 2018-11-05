@@ -227,7 +227,7 @@ namespace hf {
 
             } // parse
 
-            void get_SET_RC_NORMAL_Data(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) 
+            void get_SET_RC_NORMAL(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) 
             {
                 c1 = 0;
                 c2 = 1;
