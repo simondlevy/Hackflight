@@ -55,10 +55,9 @@ namespace hf {
 
                         while (_client.available()) {
                             if (parser.parse(_client.read()) == MspParser2::RESULT_DONE) {
-                                float c1=0, c2=0, c3=0, c4=0, c5=0, c6=0;
-
-                                parser.get_SET_RC_NORMAL(&c1, &c2, &c3, &c4, &c5, &c6);
-                                Debug::printf("%+2.2f\n", c1);
+                                uint8_t c1=0, c2=0, c3=0, c4=0, c5=0, c6=0;
+                                parser.get_SET_RC_BYTES(&c1, &c2, &c3, &c4, &c5, &c6);
+                                Debug::printf("%d %d %d %d %d %d\n", c1, c2, c3, c4, c5, c6);
                             }
                         }
                     }

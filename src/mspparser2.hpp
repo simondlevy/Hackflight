@@ -227,17 +227,15 @@ namespace hf {
 
             } // parse
 
-            void get_SET_RC_NORMAL(float * c1, float * c2, float * c3, float * c4, float * c5, float * c6) 
+            void get_SET_RC_BYTES(uint8_t * c1, uint8_t * c2, uint8_t * c3, uint8_t * c4, uint8_t * c5, uint8_t * c6) 
             {
-                Serial.println(_inBuf[3]);
-                *c1 = (float)_inBuf[3] / 4;
+                *c1 = _inBuf[0];
+                *c2 = _inBuf[1];
+                *c3 = _inBuf[2];
+                *c4 = _inBuf[3];
+                *c5 = _inBuf[4];
+                *c6 = _inBuf[5];
 
-                c1 = 0;
-                c2 = 0;
-                c3 = 0;
-                c4 = 0;
-                c5 = 0;
-                c6 = 0;
             }
 
     }; // class MspParser2

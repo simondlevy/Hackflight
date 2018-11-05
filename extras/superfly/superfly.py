@@ -25,16 +25,14 @@ SUPERFLY_PORT = 80
 from socket import socket
 from time import sleep
 
-from msppg import serialize_SET_RC_NORMAL
-
-import numpy as np
+from msppg import serialize_SET_RC_BYTES
 
 sock = socket()
 sock.connect((SUPERFLY_ADDR, SUPERFLY_PORT))
 
 while True:
 
-    sock.send(serialize_SET_RC_NORMAL(np.random.random(), 2, 3, 4, 5, 6))
+    sock.send(serialize_SET_RC_BYTES(1, 2, 3, 4, 5, 6))
 
     sleep(.01)
 
