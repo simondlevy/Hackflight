@@ -227,6 +227,16 @@ namespace hf {
 
             } // parse
 
+            void get_SET_RC_NORMAL_Data(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) 
+            {
+                c1 = 0;
+                c2 = 1;
+                c3 = 0;
+                c4 = 1;
+                c5 = 0;
+                c6 = 1;
+            }
+
     }; // class MspParser2
 
 } // namespace hf
