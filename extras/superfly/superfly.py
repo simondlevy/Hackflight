@@ -2,6 +2,8 @@
 '''
 Python script to fly the SuperFly flight controller over wifi
 
+Requires: pygame
+
 Copyright (C) Simon D. Levy 2016
 
 This file is part of Hackflight.
@@ -44,7 +46,9 @@ while True:
 
     pygame.event.pump()
 
-    print('okay')
+    for k in range(controller.get_numaxes()):
+        stdout.write('%+2.2f ' % controller.get_axis(k))
+    stdout.write('\n')
 
     stdout.flush()
 
