@@ -32,9 +32,11 @@ import pygame
 
 from msppg import serialize_SET_RC_BYTES
 
+# Set up socket connection to SuperFly
 sock = socket()
 sock.connect((SUPERFLY_ADDR, SUPERFLY_PORT))
 
+# Initialize pygame for joystick support
 pygame.display.init()
 pygame.joystick.init()
 controller = pygame.joystick.Joystick(0)
@@ -42,15 +44,13 @@ controller.init()
 
 while True:
 
-    sock.send(serialize_SET_RC_BYTES(1, 2, 3, 4, 5, 6))
-
+    # Get next pygame event
     pygame.event.pump()
 
     for k in range(controller.get_numaxes()):
         stdout.write('%+2.2f ' % controller.get_axis(k))
     stdout.write('\n')
 
-    stdout.flush()
-
-    sleep(.01)
+    # Send stick commands to SuperFly
+    sock.send(serialize_SET_RC_BYTES(1, 2, 3, 4, 5, 6))
 
