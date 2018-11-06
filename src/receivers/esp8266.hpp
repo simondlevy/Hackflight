@@ -91,7 +91,12 @@ namespace hf {
                 return false; //rx.timedOut(micros());
             }
 
-        public:
+            virtual void handle_SET_RC_BYTES_Request(uint8_t  c1, uint8_t  c2, uint8_t  c3, uint8_t  c4, uint8_t  c5, uint8_t  c6) override
+            {
+                Debug::printf("***: %d %d %d %d %d %d\n", c1, c2, c3, c4, c5, c6);
+            }
+
+         public:
 
         ESP8266_Receiver(const uint8_t channelMap[6]) : Receiver(channelMap) 
         { 
