@@ -17,11 +17,11 @@
  */
 
 #include<ESP8266WiFi.h>
-#include "mspparser2.hpp"
+#include "mspparser.hpp"
 
 namespace hf {
 
-    class ESP8266_Receiver : public Receiver {
+    class ESP8266_Receiver : public Receiver, public MspParser {
 
         private:
 
@@ -31,8 +31,6 @@ namespace hf {
             WiFiServer _server = WiFiServer(80);
             WiFiClient _client;
             bool _haveClient;
-
-            MspParser2 parser;
 
         protected:
 
@@ -44,7 +42,7 @@ namespace hf {
                 _server.begin();
                 _haveClient = false;
 
-                parser.init();
+                MspParser::init();
             }
 
             bool gotNewFrame(void)
@@ -54,11 +52,13 @@ namespace hf {
                     if (_client.connected()) {
 
                         while (_client.available()) {
+                            MspParser::parse(_client.read());
+                            /*
                             if (parser.parse(_client.read()) == MspParser2::RESULT_DONE) {
                                 uint8_t c1=0, c2=0, c3=0, c4=0, c5=0, c6=0;
                                 parser.get_SET_RC_BYTES(&c1, &c2, &c3, &c4, &c5, &c6);
                                 Debug::printf("%d %d %d %d %d %d\n", c1, c2, c3, c4, c5, c6);
-                            }
+                            }*/
                         }
                     }
 
