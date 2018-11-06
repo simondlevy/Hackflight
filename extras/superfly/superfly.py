@@ -24,15 +24,29 @@ SUPERFLY_PORT = 80
 
 from socket import socket
 from time import sleep
+from sys import stdout
+
+import pygame
 
 from msppg import serialize_SET_RC_BYTES
 
 sock = socket()
 sock.connect((SUPERFLY_ADDR, SUPERFLY_PORT))
 
+pygame.display.init()
+pygame.joystick.init()
+controller = pygame.joystick.Joystick(0)
+controller.init()
+
 while True:
 
     sock.send(serialize_SET_RC_BYTES(1, 2, 3, 4, 5, 6))
+
+    pygame.event.pump()
+
+    print('okay')
+
+    stdout.flush()
 
     sleep(.01)
 
