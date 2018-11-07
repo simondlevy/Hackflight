@@ -1,5 +1,5 @@
 /*
-   SparkfunEsp8266ThingDev.ino : Hackflight sketch for SparkfunESP8266 ThingDev
+   ThingDev.ino : Hackflight sketch for SparkfunESP8266 ThingDev
 
    Solely for receiver prototyping
  
@@ -27,7 +27,7 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/sparkfunesp8266thingdev.hpp"
+#include "boards/thingdev.hpp"
 #include "mixers/quadx.hpp"
 #include "pidcontrollers/level.hpp"
 #include "receivers/esp8266.hpp"

@@ -1,5 +1,5 @@
 /*
-   sparkfunEsp8266thingdev.hpp : Board subclass for prototyping
+   thingdev.hpp : Board subclass for prototyping on Sparkfun ESP8266 ThingDev board
 
    Copyright (c) 2018 Simon D. Levy
 
