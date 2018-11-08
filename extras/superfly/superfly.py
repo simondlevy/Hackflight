@@ -49,38 +49,39 @@ class Controller(object):
         val = self.joystick.get_axis(abs(j))
         if abs(val) < STICK_DEADBAND:
             val = 0
-        return (-1 if j<0 else +1) * val        
+        return (-1 if j<0 else +1) * val
 
-class Xbox360(Controller):
+class GameController(Controller):
 
-    def __init__(self, joystick):
+    def __init__(self, joystick, axis_map, button_id):
 
-        Controller.__init__(self, joystick, (-1,  4, -3, 0))    
-
-class PS3(Controller):
-
-    def __init__(self, joystick):
-
-        Controller.__init__(self, joystick, (-1,  2, -3, 0))
-
+        Controller.__init__(self, joystick, axis_map)
+        self.button_id = button_id
         self.button_is_down = False
         self.switch_value = 0
-
+        
     def getAux(self):
 
-        if self.joystick.get_button(9):
-
+        if self.joystick.get_button(self.button_id):
             if not self.button_is_down:
-
                 self.switch_value = 255 - self.switch_value
-
             self.button_is_down = True
-
         else:
-
             self.button_is_down = False
-
         return self.switch_value
+
+        
+class Xbox360(GameController):
+
+    def __init__(self, joystick):
+
+        GameController.__init__(self, joystick, (-1,  4, -3, 0), 7)    
+
+class PS3(GameController):
+
+    def __init__(self, joystick):
+
+        GameController.__init__(self, joystick, (-1,  2, -3, 0), 9)
 
 class ExtremePro3D(Controller):
 
