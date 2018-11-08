@@ -63,6 +63,25 @@ class PS3(Controller):
 
         Controller.__init__(self, joystick, (-1,  2, -3, 0))
 
+        self.button_is_down = False
+        self.switch_value = 0
+
+    def getAux(self):
+
+        if self.joystick.get_button(9):
+
+            if not self.button_is_down:
+
+                self.switch_value = 255 - self.switch_value
+
+            self.button_is_down = True
+
+        else:
+
+            self.button_is_down = False
+
+        return self.switch_value
+
 class ExtremePro3D(Controller):
 
     def __init__(self, joystick):
@@ -118,15 +137,15 @@ if __name__ == '__main__':
 
         axis_vals = [0]*6
 
+        controller.getAux()
+
         # Get first four axis values
         for k in range(4):
             axis_vals[k] = controller.getAxis(k)
         for k in range(4):
             stdout.write('%+2.2f ' % axis_vals[k])
-        stdout.write(' | ')
+        stdout.write(' | %d' % controller.getAux())
         stdout.write('\n')
-        #for k in range(controller.get_numbuttons())
-        #stdout.write(': %s \n' % controller.get_name())
 
         # Send stick commands to SuperFly
         #sock.send(serialize_SET_RC_BYTES(1, 2, 3, 4, 5, 6))
