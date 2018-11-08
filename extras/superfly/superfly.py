@@ -92,13 +92,17 @@ class Taranis(Controller):
 
     def __init__(self, joystick):
 
-        Controller.__init__(self, joystick, ( 0,  1,  2, 5))
+        Controller.__init__(self, joystick, (0,  1,  2, 5))
+
+    def getAux(self):
+
+        return 255 if self.joystick.get_axis(3) > 0 else 0
 
 class Spektrum(Controller):
 
     def __init__(self, joystick):
 
-        Controller.__init__(self, joystick, ( 1,  2,  5, 0))
+        Controller.__init__(self, joystick, (1,  2,  5, 0))
 
 if __name__ == '__main__':
         
@@ -113,7 +117,7 @@ if __name__ == '__main__':
         'Controller (Rock Candy Gamepad for Xbox 360)' : Xbox360(joystick), 
         '2In1 USB Joystick'                            : PS3(joystick),
         'Logitech Extreme 3D'                          : ExtremePro3D(joystick),
-        'Frsky Taranis Joystick'                       : Taranis(joystick),
+        'FrSky Taranis Joystick'                       : Taranis(joystick),
         'SPEKTRUM RECEIVER'                            : Spektrum(joystick)
         }
 
