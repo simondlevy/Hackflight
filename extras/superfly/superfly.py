@@ -35,7 +35,6 @@ from msppg import serialize_SET_RC_BYTES
 
 from sys import stdout
 
-
 class Controller(object):
 
     def __init__(self, joystick, axis_map):
@@ -83,11 +82,11 @@ class PS3(GameController):
 
         GameController.__init__(self, joystick, (-1,  2, -3, 0), 9)
 
-class ExtremePro3D(Controller):
+class ExtremePro3D(GameController):
 
     def __init__(self, joystick):
 
-        Controller.__init__(self, joystick, (-2,  0,  1, 3))
+        GameController.__init__(self, joystick, (-2,  0,  1, 3), 0)
 
 class Taranis(Controller):
 
@@ -100,7 +99,6 @@ class Spektrum(Controller):
     def __init__(self, joystick):
 
         Controller.__init__(self, joystick, ( 1,  2,  5, 0))
-
 
 if __name__ == '__main__':
         
