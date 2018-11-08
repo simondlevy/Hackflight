@@ -37,9 +37,9 @@ from sys import stdout
 
 class Controller(object):
 
-    def __init__(self, joystick, axis_map):
+    def __init__(self, axis_map):
 
-        self.joystick = joystick
+        self.joystick = None
         self.axis_map = axis_map
 
     def getAxis(self, k):
@@ -52,9 +52,9 @@ class Controller(object):
 
 class GameController(Controller):
 
-    def __init__(self, joystick, axis_map, button_id):
+    def __init__(self, axis_map, button_id):
 
-        Controller.__init__(self, joystick, axis_map)
+        Controller.__init__(self, axis_map)
         self.button_id = button_id
         self.button_is_down = False
         self.switch_value = 0
@@ -71,9 +71,9 @@ class GameController(Controller):
 
 class RcTransmitter(Controller):
 
-    def __init__(self, joystick, axis_map, aux_id):
+    def __init__(self, axis_map, aux_id):
 
-        Controller.__init__(self, joystick, axis_map)
+        Controller.__init__(self, axis_map)
         self.aux_id = aux_id
         
     def getAux(self):
@@ -82,33 +82,42 @@ class RcTransmitter(Controller):
         
 class Xbox360(GameController):
 
-    def __init__(self, joystick):
+    def __init__(self):
 
-        GameController.__init__(self, joystick, (-1,  4, -3, 0), 7)    
+        GameController.__init__(self, (-1,  4, -3, 0), 7)    
 
 class PS3(GameController):
 
-    def __init__(self, joystick):
+    def __init__(self):
 
-        GameController.__init__(self, joystick, (-1,  2, -3, 0), 9)
+        GameController.__init__(self, (-1,  2, -3, 0), 9)
 
 class ExtremePro3D(GameController):
 
-    def __init__(self, joystick):
+    def __init__(self):
 
-        GameController.__init__(self, joystick, (-2,  0,  1, 3), 0)
+        GameController.__init__(self, (-2,  0,  1, 3), 0)
 
 class Taranis(RcTransmitter):
 
-    def __init__(self, joystick):
+    def __init__(self):
 
-        RcTransmitter.__init__(self, joystick, (0,  1,  2, 5), 3)
+        RcTransmitter.__init__(self, (0,  1,  2, 5), 3)
 
 class Spektrum(RcTransmitter):
 
-    def __init__(self, joystick):
+    def __init__(self):
 
-        RcTransmitter.__init__(self, joystick, (1,  2,  5, 0), 4)
+        RcTransmitter.__init__(self, (1,  2,  5, 0), 4)
+
+# Make a dictionary of controllers
+controllers = {
+    'Controller (Rock Candy Gamepad for Xbox 360)' : Xbox360(), 
+    '2In1 USB Joystick'                            : PS3(),
+    'Logitech Extreme 3D'                          : ExtremePro3D(),
+    'FrSky Taranis Joystick'                       : Taranis(),
+    'SPEKTRUM RECEIVER'                            : Spektrum()
+    }
 
 if __name__ == '__main__':
         
@@ -118,21 +127,13 @@ if __name__ == '__main__':
     joystick = pygame.joystick.Joystick(0)
     joystick.init()
 
-    # Make a dictionary of controllers
-    controllers = {
-        'Controller (Rock Candy Gamepad for Xbox 360)' : Xbox360(joystick), 
-        '2In1 USB Joystick'                            : PS3(joystick),
-        'Logitech Extreme 3D'                          : ExtremePro3D(joystick),
-        'FrSky Taranis Joystick'                       : Taranis(joystick),
-        'SPEKTRUM RECEIVER'                            : Spektrum(joystick)
-        }
-
     # Find your controller
     controller_name = joystick.get_name()
     if not controller_name in controllers.keys():
         print('Unrecognized controller: %s' % controller_name)
         exit(1)
     controller = controllers[controller_name]
+    controller.joystick = joystick
 
     # Set up socket connection to SuperFly
     #sock = socket()
