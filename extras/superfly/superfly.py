@@ -25,6 +25,8 @@ SUPERFLY_ADDR        = '192.168.4.1'
 SUPERFLY_PORT        = 80
 SUPERFLY_TIMEOUT_SEC = 4
 
+STICK_DEADBAND       = .05
+
 from socket import socket
 
 import pygame
@@ -68,7 +70,10 @@ while True:
 
     for k in range(4):
         j = axis_map[k]
-        stdout.write('%d: %+2.2f ' % (k, (-1 if j<0 else +1) * controller.get_axis(abs(j))))
+        val = controller.get_axis(abs(j))
+        if abs(val) < STICK_DEADBAND:
+            val = 0
+        stdout.write('%d: %+2.2f ' % (k, (-1 if j<0 else +1) * val))
     stdout.write(' | ')
     stdout.write('\n')
     #for k in range(controller.get_numbuttons())
