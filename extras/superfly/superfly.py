@@ -35,50 +35,99 @@ from msppg import serialize_SET_RC_BYTES
 
 from sys import stdout
 
-# A dictionary to support auto-detection of joystick axes: T A E R Aux order, - means inverted
-axis_maps = {
-        'Controller (Rock Candy Gamepad for Xbox 360)' : (-1,  4, -3, 0), 
-        '2In1 USB Joystick'                            : (-1,  2, -3, 0),
-        'Logitech Extreme 3D'                          : (-2,  0,  1, 3),
-        'Frsky Taranis Joystick'                       : ( 0,  1,  2, 5),
-        'SPEKTRUM RECEIVER'                            : ( 1,  2,  5, 0)
-        }
 
-# Initialize pygame for joystick support
-pygame.display.init()
-pygame.joystick.init()
-controller = pygame.joystick.Joystick(0)
-controller.init()
+class Controller(object):
 
-# Get axis map for controller
-controller_name = controller.get_name()
-if not controller_name in axis_maps.keys():
-    print('Unrecognized controller: %s' % controller_name)
-    exit(1)
-axis_map = axis_maps[controller_name]
+    def __init__(self, joystick, axis_map):
 
+        self.joystick = joystick
+        self.axis_map = axis_map
 
-# Set up socket connection to SuperFly
-#sock = socket()
-#sock.settimeout(SUPERFLY_TIMEOUT_SEC)
-#sock.connect((SUPERFLY_ADDR, SUPERFLY_PORT))
+    def getAxis(self, k):
 
-while True:
-
-    # Get next pygame event
-    pygame.event.pump()
-
-    for k in range(4):
-        j = axis_map[k]
-        val = controller.get_axis(abs(j))
+        j = self.axis_map[k]
+        val = self.joystick.get_axis(abs(j))
         if abs(val) < STICK_DEADBAND:
             val = 0
-        stdout.write('%d: %+2.2f ' % (k, (-1 if j<0 else +1) * val))
-    stdout.write(' | ')
-    stdout.write('\n')
-    #for k in range(controller.get_numbuttons())
-    #stdout.write(': %s \n' % controller.get_name())
+        return (-1 if j<0 else +1) * val        
 
-    # Send stick commands to SuperFly
-    #sock.send(serialize_SET_RC_BYTES(1, 2, 3, 4, 5, 6))
+class Xbox360(Controller):
+
+    def __init__(self, joystick):
+
+        Controller.__init__(self, joystick, (-1,  4, -3, 0))    
+
+class PS3(Controller):
+
+    def __init__(self, joystick):
+
+        Controller.__init__(self, joystick, (-1,  2, -3, 0))
+
+class ExtremePro3D(Controller):
+
+    def __init__(self, joystick):
+
+        Controller.__init__(self, joystick, (-2,  0,  1, 3))
+
+class Taranis(Controller):
+
+    def __init__(self, joystick):
+
+        Controller.__init__(self, joystick, ( 0,  1,  2, 5))
+
+class Spektrum(Controller):
+
+    def __init__(self, joystick):
+
+        Controller.__init__(self, joystick, ( 1,  2,  5, 0))
+
+
+if __name__ == '__main__':
+        
+    # Initialize pygame for joystick support
+    pygame.display.init()
+    pygame.joystick.init()
+    joystick = pygame.joystick.Joystick(0)
+    joystick.init()
+
+    # Make a dictionary of controllers
+    controllers = {
+        'Controller (Rock Candy Gamepad for Xbox 360)' : Xbox360(joystick), 
+        '2In1 USB Joystick'                            : PS3(joystick),
+        'Logitech Extreme 3D'                          : ExtremePro3D(joystick),
+        'Frsky Taranis Joystick'                       : Taranis(joystick),
+        'SPEKTRUM RECEIVER'                            : Spektrum(joystick)
+        }
+
+    # Find your controller
+    controller_name = joystick.get_name()
+    if not controller_name in controllers.keys():
+        print('Unrecognized controller: %s' % controller_name)
+        exit(1)
+    controller = controllers[controller_name]
+
+    # Set up socket connection to SuperFly
+    #sock = socket()
+    #sock.settimeout(SUPERFLY_TIMEOUT_SEC)
+    #sock.connect((SUPERFLY_ADDR, SUPERFLY_PORT))
+
+    while True:
+
+        # Get next pygame event
+        pygame.event.pump()
+
+        axis_vals = [0]*6
+
+        # Get first four axis values
+        for k in range(4):
+            axis_vals[k] = controller.getAxis(k)
+        for k in range(4):
+            stdout.write('%+2.2f ' % axis_vals[k])
+        stdout.write(' | ')
+        stdout.write('\n')
+        #for k in range(controller.get_numbuttons())
+        #stdout.write(': %s \n' % controller.get_name())
+
+        # Send stick commands to SuperFly
+        #sock.send(serialize_SET_RC_BYTES(1, 2, 3, 4, 5, 6))
 
