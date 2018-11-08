@@ -25,8 +25,8 @@ namespace hf {
 
         private:
 
-            static constexpr char * SSID     = "Esp8266TestNet";
-            static constexpr char * PASSWORD = "Esp8266Test"; // has to be longer than 7 chars
+            const char * SSID     = "Esp8266TestNet";
+            const char * PASSWORD = "Esp8266Test"; // has to be longer than 7 chars
 
             WiFiServer _server = WiFiServer(80);
             WiFiClient _client;
