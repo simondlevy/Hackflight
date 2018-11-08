@@ -69,6 +69,16 @@ class GameController(Controller):
             self.button_is_down = False
         return self.switch_value
 
+class RcTransmitter(Controller):
+
+    def __init__(self, joystick, axis_map, aux_id):
+
+        Controller.__init__(self, joystick, axis_map)
+        self.aux_id = aux_id
+        
+    def getAux(self):
+
+        return 255 if self.joystick.get_axis(self.aux_id) > 0 else 0
         
 class Xbox360(GameController):
 
@@ -88,21 +98,17 @@ class ExtremePro3D(GameController):
 
         GameController.__init__(self, joystick, (-2,  0,  1, 3), 0)
 
-class Taranis(Controller):
+class Taranis(RcTransmitter):
 
     def __init__(self, joystick):
 
-        Controller.__init__(self, joystick, (0,  1,  2, 5))
+        RcTransmitter.__init__(self, joystick, (0,  1,  2, 5), 3)
 
-    def getAux(self):
-
-        return 255 if self.joystick.get_axis(3) > 0 else 0
-
-class Spektrum(Controller):
+class Spektrum(RcTransmitter):
 
     def __init__(self, joystick):
 
-        Controller.__init__(self, joystick, (1,  2,  5, 0))
+        RcTransmitter.__init__(self, joystick, (1,  2,  5, 0), 4)
 
 if __name__ == '__main__':
         
