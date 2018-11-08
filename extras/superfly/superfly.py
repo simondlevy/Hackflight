@@ -31,8 +31,10 @@ import pygame
 
 from msppg import serialize_SET_RC_BYTES
 
+from sys import stdout
+
 # A dictionary to support auto-detection of joystick axes: T A E R Aux order, - means inverted
-axismaps = {
+axis_maps = {
         'Controller (Rock Candy Gamepad for Xbox 360)' : (-1,  4, -3, 0), 
         '2In1 USB Joystick'                            : (-1,  2, -3, 0),
         'Logitech Extreme 3D'                          : (-2,  0,  1, 3),
@@ -41,7 +43,6 @@ axismaps = {
         }
 
 # Initialize pygame for joystick support
-'''
 pygame.display.init()
 pygame.joystick.init()
 controller = pygame.joystick.Joystick(0)
@@ -49,27 +50,30 @@ controller.init()
 
 # Get axis map for controller
 controller_name = controller.get_name()
-if not controller_name in axismaps.keys():
+if not controller_name in axis_maps.keys():
     print('Unrecognized controller: %s' % controller_name)
     exit(1)
-'''
+axis_map = axis_maps[controller_name]
+
 
 # Set up socket connection to SuperFly
-sock = socket()
-sock.settimeout(SUPERFLY_TIMEOUT_SEC)
-sock.connect((SUPERFLY_ADDR, SUPERFLY_PORT))
+#sock = socket()
+#sock.settimeout(SUPERFLY_TIMEOUT_SEC)
+#sock.connect((SUPERFLY_ADDR, SUPERFLY_PORT))
 
 while True:
 
     # Get next pygame event
-    #pygame.event.pump()
+    pygame.event.pump()
 
-    #for k in range(controller.get_numaxes()):
-    #    stdout.write('%d: %+2.2f ' % (k controller.get_axis(k)))
-    #stdout.write(' | ')
+    for k in range(4):
+        j = axis_map[k]
+        stdout.write('%d: %+2.2f ' % (k, (-1 if j<0 else +1) * controller.get_axis(abs(j))))
+    stdout.write(' | ')
+    stdout.write('\n')
     #for k in range(controller.get_numbuttons())
     #stdout.write(': %s \n' % controller.get_name())
 
     # Send stick commands to SuperFly
-    sock.send(serialize_SET_RC_BYTES(1, 2, 3, 4, 5, 6))
+    #sock.send(serialize_SET_RC_BYTES(1, 2, 3, 4, 5, 6))
 
