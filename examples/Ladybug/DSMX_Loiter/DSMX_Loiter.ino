@@ -70,7 +70,6 @@ void setup(void)
     rc.setTrimPitch(+.1);
 
     // Initialize Hackflight firmware
-    // We're using an older ladybug with LED on pin A1
     h.init(new hf::Ladybug(), &rc, &mixer, &ratePid);
 
     // Add rangefinder sensor
