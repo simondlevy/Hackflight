@@ -41,7 +41,9 @@ if __name__ == '__main__':
 
         controller.update()
 
-        for k in range(4):
-            stdout.write('%+2.2f ' % controller.getAxis(k))
+        cmds = [controller.getAxis(k) for k in range(4)] + [controller.getAux()]
 
-        stdout.write(' | %d\n' % controller.getAux())
+        cmds = [int(127*(cmd+1)) for cmd in cmds]
+
+        print(cmds)
+
