@@ -21,8 +21,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-STICK_DEADBAND       = .05
-
 import pygame
 
 from sys import stdout
@@ -33,6 +31,7 @@ class Controller(object):
 
         self.joystick = None
         self.axis_map = axis_map
+        self.STICK_DEADBAND = .05
 
     def update(self):
 
@@ -42,7 +41,7 @@ class Controller(object):
 
         j = self.axis_map[k]
         val = self.joystick.get_axis(abs(j))
-        if abs(val) < STICK_DEADBAND:
+        if abs(val) < self.STICK_DEADBAND:
             val = 0
         return (-1 if j<0 else +1) * val
 
@@ -53,13 +52,13 @@ class GameController(Controller):
         Controller.__init__(self, axis_map)
         self.button_id = button_id
         self.button_is_down = False
-        self.switch_value = 0
+        self.switch_value = -1
         
     def getAux(self):
 
         if self.joystick.get_button(self.button_id):
             if not self.button_is_down:
-                self.switch_value = 255 - self.switch_value
+                self.switch_value = -self.switch_value
             self.button_is_down = True
         else:
             self.button_is_down = False
@@ -74,7 +73,7 @@ class RcTransmitter(Controller):
         
     def getAux(self):
 
-        return 255 if self.joystick.get_axis(self.aux_id) > 0 else 0
+        return +1 if self.joystick.get_axis(self.aux_id) > 0 else -1
         
 class Xbox360(GameController):
 
