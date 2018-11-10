@@ -265,6 +265,7 @@ class HPP_Emitter(CodeEmitter):
                 self.output.write(6*self.indent + ('prepareToSendFloats(%d);\n' % nargs))
                 for argname in argnames:
                     self.output.write(6*self.indent + ('sendFloat(%s);\n' % argname))
+                self.output.write(6*self.indent + "serialize8(_checksum);\n")
             self.output.write(6*self.indent + '} break;\n\n')
 
         self.output.write(4*self.indent + '}\n')

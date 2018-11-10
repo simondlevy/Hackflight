@@ -70,7 +70,7 @@ namespace hf {
                 else {
                     _client = _server.available();
                     if (_client) {
-                        Serial.println("Connected!");
+                        //Serial.println("Connected!");
                         _haveClient = true;
                     } 
                     else {
