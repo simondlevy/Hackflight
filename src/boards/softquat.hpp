@@ -21,13 +21,12 @@
 #pragma once
 
 #include "filters.hpp"
-#include "realboard.hpp"
 
 #include <math.h>
 
 namespace hf {
 
-    class SoftwareQuaternionBoard : public RealBoard {
+    class SoftwareQuaternionBoard {
 
         private:
 
@@ -62,6 +61,8 @@ namespace hf {
             // using a 6DOF fiter (accel, gyro)
             MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(BETA, ZETA);
 
+        public:
+
             bool getGyrometer(float gyro[3])
             {
                 // Read acceleromter Gs, gyrometer degrees/sec
@@ -83,7 +84,7 @@ namespace hf {
                 return false;
             }
 
-            bool getQuaternion(float quat[4])
+            bool getQuaternion(float quat[4], float time)
             {
                 // Update quaternion after some number of IMU readings
                 _quatCycleCount = (_quatCycleCount + 1) % QUATERNION_DIVISOR;
@@ -92,7 +93,6 @@ namespace hf {
 
                     // Set integration time by time elapsed since last filter update
                     static float _time;
-                    float time = getTime();
                     float deltat = time - _time;
                     _time = time;
 

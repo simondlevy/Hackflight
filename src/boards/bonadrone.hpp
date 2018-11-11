@@ -27,14 +27,13 @@
 #include "filters.hpp"
 #include "hackflight.hpp"
 #include "softquat.hpp"
+#include "arduino.hpp"
 
 namespace hf {
 
-    class Bonadrone : public SoftwareQuaternionBoard {
+    class Bonadrone : public ArduinoBoard, public SoftwareQuaternionBoard {
 
         private:
-
-            const uint8_t LED_PIN = 38;
 
             // LSM6DSM data-ready interrupt pin
             const uint8_t LSM6DSM_INTERRUPT_PIN = 2;
@@ -73,39 +72,14 @@ namespace hf {
 
             virtual void writeMotor(uint8_t index, float value) = 0;
 
-            void delayMilliseconds(uint32_t msec)
+            virtual bool  getQuaternion(float quat[4]) override 
             {
-                delay(msec);
+                return SoftwareQuaternionBoard::getQuaternion(quat, getTime());
             }
 
-            void setLed(bool isOn)
-            { 
-                digitalWrite(LED_PIN, isOn ? LOW : HIGH);
-            }
-
-            uint8_t serialAvailableBytes(void)
+            virtual bool  getGyrometer(float gyroRates[3]) override
             {
-                return Serial.available();
-            }
-
-            uint8_t serialReadByte(void)
-            {
-                return Serial.read();
-            }
-
-            void serialWriteByte(uint8_t c)
-            {
-                Serial.write(c);
-            }
-
-            virtual uint32_t getMicroseconds(void) override
-            {
-                return micros();
-            }
-
-            void delaySeconds(float sec)
-            {
-                delay((uint32_t)(1000*sec));
+                return SoftwareQuaternionBoard::getGyrometer(gyroRates);
             }
 
             bool imuRead(void)
@@ -128,15 +102,8 @@ namespace hf {
 
         public:
 
-            Bonadrone(void)
+            Bonadrone(void) : ArduinoBoard(38, true) // inverted LED signal
             {
-                // Begin serial comms
-                Serial.begin(115200);
-
-                // Setup LED pin and turn it off
-                pinMode(LED_PIN, OUTPUT);
-                digitalWrite(LED_PIN, HIGH);
-
                 // Configure interrupt
                 pinMode(LSM6DSM_INTERRUPT_PIN, INPUT);
 
@@ -169,9 +136,6 @@ namespace hf {
 
                 // Clear the interrupt
                 _lsm6dsm.clearInterrupt();
-
-                // Do general real-board initialization
-                RealBoard::init();
             }
 
     }; // class Bonadrone
