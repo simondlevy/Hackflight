@@ -25,12 +25,14 @@ import pygame
 
 class Controller(object):
 
-    def __init__(self, axis_map):
+    STICK_DEADBAND = .05
+
+    def __init__(self, axis_map, springy_throttle=False):
 
         self.joystick = None
         self.axis_map = axis_map
-        self.STICK_DEADBAND = .05
-
+        self.springy_throttle = springy_throttle
+        
     def update(self):
 
         pygame.event.pump()
@@ -55,15 +57,15 @@ class Controller(object):
 
         j = self.axis_map[k]
         val = self.joystick.get_axis(abs(j))
-        if abs(val) < self.STICK_DEADBAND:
+        if abs(val) < Controller.STICK_DEADBAND:
             val = 0
         return (-1 if j<0 else +1) * val
 
 class GameController(Controller):
 
-    def __init__(self, axis_map, button_id):
+    def __init__(self, axis_map, button_id, springy_throttle=True):
 
-        Controller.__init__(self, axis_map)
+        Controller.__init__(self, axis_map, springy_throttle)
         self.button_id = button_id
         self.button_is_down = False
         self.switch_value = -1
@@ -114,7 +116,7 @@ class ExtremePro3D(GameController):
 
     def __init__(self):
 
-        GameController.__init__(self, (-2,  0,  1, 3), 0)
+        GameController.__init__(self, (-2,  0,  1, 3), 0, False) # no springy throttle
 
 class Taranis(RcTransmitter):
 
