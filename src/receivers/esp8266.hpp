@@ -25,8 +25,8 @@ namespace hf {
 
         private:
 
-            const char * SSID     = "Esp8266TestNet";
-            const char * PASSWORD = "Esp8266Test"; // has to be longer than 7 chars
+            char _ssid[100];
+            char _passwd[100];
 
             WiFiServer _server = WiFiServer(80);
             WiFiClient _client;
@@ -37,8 +37,12 @@ namespace hf {
             void begin(void)
             {
                 WiFi.mode(WIFI_AP);
-                //WiFi.softAP(SSID, PASSWORD, 1, 1); // password required
-                WiFi.softAP(SSID); // no password
+                if (strlen(_passwd) > 0) {
+                    WiFi.softAP(_ssid, _passwd, 1, 1);
+                }
+                else {
+                    WiFi.softAP(_ssid); // no password
+                }
                 _server.begin();
                 _haveClient = false;
 
@@ -53,12 +57,6 @@ namespace hf {
 
                         while (_client.available()) {
                             MspParser::parse(_client.read());
-                            /*
-                            if (parser.parse(_client.read()) == MspParser2::RESULT_DONE) {
-                                uint8_t c1=0, c2=0, c3=0, c4=0, c5=0, c6=0;
-                                parser.get_SET_RC_BYTES(&c1, &c2, &c3, &c4, &c5, &c6);
-                                Debug::printf("%d %d %d %d %d %d\n", c1, c2, c3, c4, c5, c6);
-                            }*/
                         }
                     }
 
@@ -98,8 +96,10 @@ namespace hf {
 
          public:
 
-        ESP8266_Receiver(const uint8_t channelMap[6]) : Receiver(channelMap) 
+        ESP8266_Receiver(const uint8_t channelMap[6], const char * ssid, const char * passwd="") : Receiver(channelMap) 
         { 
+            strcpy(_ssid, ssid);
+            strcpy(_passwd, passwd);
         }
 
     }; // class ESP8266_Receiver

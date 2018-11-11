@@ -36,7 +36,7 @@ static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 
 hf::Hackflight h;
 
-hf::ESP8266_Receiver rc = hf::ESP8266_Receiver(CHANNEL_MAP);
+hf::ESP8266_Receiver rc = hf::ESP8266_Receiver(CHANNEL_MAP, "ThingDev");
 
 hf::MixerQuadX mixer;
 

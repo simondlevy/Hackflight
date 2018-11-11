@@ -40,7 +40,7 @@ namespace hf {
 
             void setLed(bool isOn)
             { 
-                digitalWrite(LED_PIN, isOn ? HIGH : LOW);
+                digitalWrite(LED_PIN, isOn ? LOW : HIGH);
             }
 
             uint8_t serialAvailableBytes(void)
@@ -85,6 +85,7 @@ namespace hf {
 
             SparkfunEsp8266ThingDev(void)
             {
+                pinMode(LED_PIN, OUTPUT);
                 Serial.begin(115200);
             }
 
