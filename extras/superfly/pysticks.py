@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 '''
-pysticks.py: Python classes for joysticks, R/C controllers
+pysticks.py: Python classes for flying with joysticks, R/C controllers
 
 Requires: pygame
 
@@ -62,16 +62,12 @@ class Controller(object):
 
 class GameController(Controller):
 
-    THROTTLE_SCALE = .01
-
-    def __init__(self, axis_map, button_id, springy_throttle=True):
+    def __init__(self, axis_map, button_id):
 
         Controller.__init__(self, axis_map)
         self.button_id = button_id
         self.button_is_down = False
         self.switch_value = -1
-        self.springy_throttle = springy_throttle
-        self.throttleval = 0
 
     def _getAuxValue(self):
 
@@ -87,17 +83,21 @@ class GameController(Controller):
             self.button_is_down = False
         return self.switch_value
 
+class SpringyThrottleController(GameController):
+
+    THROTTLE_SCALE = .01
+    
+    def __init__(self, axis_map, button_id):
+
+        GameController.__init__(self, axis_map, button_id)
+        
+        self.throttleval = 0
+
     def getThrottle(self):
 
-        axisval = self._getAxis(0)
+        self.throttleval = min(max(self.throttleval+self._getAxis(0)*SpringyThrottleController.THROTTLE_SCALE, -1), +1)
 
-        if self.springy_throttle:
-
-            self.throttleval = min(max(self.throttleval+axisval*GameController.THROTTLE_SCALE, -1), +1)
-
-            return self.throttleval
-
-        return axisval
+        return self.throttleval
 
 class RcTransmitter(Controller):
 
@@ -110,28 +110,28 @@ class RcTransmitter(Controller):
 
         return +1 if self.joystick.get_axis(self.aux_id) > 0 else -1
         
-class Xbox360(GameController):
+class Xbox360(SpringyThrottleController):
 
     def __init__(self):
 
-        GameController.__init__(self, (-1,  4, -3, 0), None)
+        SpringyThrottleController.__init__(self, (-1,  4, -3, 0), None)
 
     def _getAuxValue(self):
 
         return self.joystick.get_axis(2) < -.5
         
 
-class Playstation(GameController):
+class Playstation(SpringyThrottleController):
 
     def __init__(self):
 
-        GameController.__init__(self, (-1,  2, -3, 0), 7)
+        SpringyThrottleController.__init__(self, (-1,  2, -3, 0), 7)
 
 class ExtremePro3D(GameController):
 
     def __init__(self):
 
-        GameController.__init__(self, (-2,  0,  1, 3), 0, False) # no springy throttle
+        GameController.__init__(self, (-2,  0,  1, 3), 0) # no springy throttle
 
 class Taranis(RcTransmitter):
 
