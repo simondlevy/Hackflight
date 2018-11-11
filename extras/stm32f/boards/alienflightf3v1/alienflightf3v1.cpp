@@ -122,6 +122,16 @@ extern "C" {
         serialWrite(_serial0, c);
     }
 
+    bool AlienflightF3V1::getQuaternion(float quat[4])
+    {
+        return SoftwareQuaternionBoard::getQuaternion(quat, getTime());
+    }
+
+    bool AlienflightF3V1::getGyrometer(float gyroRates[3])
+    {
+        return SoftwareQuaternionBoard::getGyrometer(gyroRates);
+    }
+
     bool AlienflightF3V1::imuRead(void)
     {
         if (_imu->checkNewData()) {  

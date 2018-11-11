@@ -146,7 +146,17 @@ extern "C" {
         serialWrite(_serial0, c);
     }
 
-    bool OmnibusF3::imuRead(void)
+    bool OmnibusF3::getQuaternion(float quat[4])
+    {
+        return SoftwareQuaternionBoard::getQuaternion(quat, getTime());
+    }
+
+    bool OmnibusF3::getGyrometer(float gyroRates[3])
+    {
+        return SoftwareQuaternionBoard::getGyrometer(gyroRates);
+    }
+
+     bool OmnibusF3::imuRead(void)
     {
         if (_imu->checkNewData()) {  
 

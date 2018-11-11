@@ -122,6 +122,16 @@ extern "C" {
         serialWrite(_serial0, c);
     }
 
+    bool FemtoF3::getQuaternion(float quat[4])
+    {
+        return SoftwareQuaternionBoard::getQuaternion(quat, getTime());
+    }
+
+    bool FemtoF3::getGyrometer(float gyroRates[3])
+    {
+        return SoftwareQuaternionBoard::getGyrometer(gyroRates);
+    }
+
     bool FemtoF3::imuRead(void)
     {
         if (_imu->checkNewData()) {  

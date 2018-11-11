@@ -121,6 +121,16 @@ extern "C" {
         serialWrite(_serial0, c);
     }
 
+    bool Revo::getQuaternion(float quat[4])
+    {
+        return SoftwareQuaternionBoard::getQuaternion(quat, getTime());
+    }
+
+    bool Revo::getGyrometer(float gyroRates[3])
+    {
+        return SoftwareQuaternionBoard::getGyrometer(gyroRates);
+    }
+
     bool Revo::imuRead(void)
     {
         return false;

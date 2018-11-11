@@ -121,6 +121,16 @@ extern "C" {
         serialWrite(_serial0, c);
     }
 
+    bool BetaFPVF3::getQuaternion(float quat[4])
+    {
+        return SoftwareQuaternionBoard::getQuaternion(quat, getTime());
+    }
+
+    bool BetaFPVF3::getGyrometer(float gyroRates[3])
+    {
+        return SoftwareQuaternionBoard::getGyrometer(gyroRates);
+    }
+
     bool BetaFPVF3::imuRead(void)
     {
         if (_imu->checkNewData()) {  

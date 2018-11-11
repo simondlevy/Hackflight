@@ -169,6 +169,16 @@ extern "C" {
         serialWrite(_serial1, c);
     }
 
+    bool SPRacingF3::getQuaternion(float quat[4])
+    {
+        return SoftwareQuaternionBoard::getQuaternion(quat, getTime());
+    }
+
+    bool SPRacingF3::getGyrometer(float gyroRates[3])
+    {
+        return SoftwareQuaternionBoard::getGyrometer(gyroRates);
+    }
+
     bool SPRacingF3::imuRead(void)
     {
         if (_imu->checkNewData()) {  

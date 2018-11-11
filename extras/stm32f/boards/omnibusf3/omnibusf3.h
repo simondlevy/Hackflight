@@ -21,10 +21,11 @@
 
 #pragma once
 
+#include <boards/realboard.hpp>
 #include <boards/softquat.hpp>
 #include <MPU6000.h>
 
-class OmnibusF3 : public hf::SoftwareQuaternionBoard  {
+class OmnibusF3 : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
 
     private:
 
@@ -46,6 +47,8 @@ class OmnibusF3 : public hf::SoftwareQuaternionBoard  {
         virtual uint8_t  serialAvailableBytes(void) override;
         virtual uint8_t  serialReadByte(void) override;
         virtual void     serialWriteByte(uint8_t c) override;
+        virtual bool     getQuaternion(float quat[4]) override;
+        virtual bool     getGyrometer(float gyroRates[3]) override;
 
         // SoftwareQuaternionBoard class overrides
         virtual bool     imuRead(void) override;
