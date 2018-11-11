@@ -20,48 +20,13 @@
 
 #pragma once
 
-#include "hackflight.hpp"
-#include "realboard.hpp"
+#include "arduino.hpp"
 
 namespace hf {
 
-    class SparkfunEsp8266ThingDev : public RealBoard {
-
-        private:
-
-            static const uint8_t LED_PIN = 5;
+    class SparkfunEsp8266ThingDev : public ArduinoBoard {
 
         protected:
-
-            void delaySeconds(float sec)
-            {
-                delay((uint32_t)(1000*sec));
-            }
-
-            void setLed(bool isOn)
-            { 
-                digitalWrite(LED_PIN, isOn ? LOW : HIGH);
-            }
-
-            uint8_t serialAvailableBytes(void)
-            {
-                return Serial.available();
-            }
-
-            uint8_t serialReadByte(void)
-            {
-                return Serial.read();
-            }
-
-            void serialWriteByte(uint8_t c)
-            {
-                Serial.write(c);
-            }
-
-            virtual uint32_t getMicroseconds(void) override
-            {
-                return micros();
-            }
 
             virtual bool getQuaternion(float quat[4]) override
             {
@@ -83,17 +48,10 @@ namespace hf {
 
         public:
 
-            SparkfunEsp8266ThingDev(void)
+            SparkfunEsp8266ThingDev(void) : ArduinoBoard(5)
             {
-                pinMode(LED_PIN, OUTPUT);
-                Serial.begin(115200);
             }
 
     }; // class SparkfunEsp8266ThingDev
-
-    void Board::outbuf(char * buf)
-    {
-        Serial.print(buf);
-    }
 
 } // namespace hf

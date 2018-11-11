@@ -26,12 +26,12 @@
 #include <EM7180_Master.h>
 #include <stdarg.h>
 #include "hackflight.hpp"
-#include "realboard.hpp"
+#include "arduino.hpp"
 
 
 namespace hf {
 
-    class Ladybug : public RealBoard {
+    class Ladybug : public ArduinoBoard {
 
         private:
 
@@ -41,9 +41,6 @@ namespace hf {
             static const uint16_t GYRO_RATE      = 330;  // Hz
             static const uint8_t  BARO_RATE      = 50;   // Hz
             static const uint8_t  Q_RATE_DIVISOR = 5;    // 1/5 gyro rate
-
-            // Tindie version has LED on pin A4, but we support older version with LED on pin A1
-            uint8_t _led_pin;
 
             const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
 
@@ -59,36 +56,6 @@ namespace hf {
                         Serial.println(_sentral.getErrorString());
                     }
                 }
-            }
-
-            void delaySeconds(float sec)
-            {
-                delay((uint32_t)(1000*sec));
-            }
-
-            void setLed(bool isOn)
-            { 
-                digitalWrite(_led_pin, isOn ? HIGH : LOW);
-            }
-
-            uint8_t serialAvailableBytes(void)
-            {
-                return Serial.available();
-            }
-
-            uint8_t serialReadByte(void)
-            {
-                return Serial.read();
-            }
-
-            void serialWriteByte(uint8_t c)
-            {
-                Serial.write(c);
-            }
-
-            virtual uint32_t getMicroseconds(void) override
-            {
-                return micros();
             }
 
             void writeMotor(uint8_t index, float value)
@@ -142,17 +109,8 @@ namespace hf {
         public:
 
             // Support prototype version where LED is on pin A1
-            Ladybug(uint8_t ledPin = A4) 
+            Ladybug(uint8_t ledPin = A4) : ArduinoBoard(ledPin)
             {
-                _led_pin = ledPin;
-
-                // Begin serial comms
-                Serial.begin(115200);
-
-                // Setup LEDs and turn them off
-                pinMode(_led_pin, OUTPUT);
-                digitalWrite(_led_pin, LOW);
-
                 // Start I^2C
                 Wire.begin();
 
@@ -174,16 +132,8 @@ namespace hf {
 
                 // Hang a bit more
                 delay(100);
-
-                // Do general real-board initialization
-                RealBoard::init();
             }
 
     }; // class Ladybug
-
-    void Board::outbuf(char * buf)
-    {
-        Serial.print(buf);
-    }
 
 } // namespace hf

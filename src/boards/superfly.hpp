@@ -26,11 +26,11 @@
 #include <EM7180_Master.h>
 #include <stdarg.h>
 #include "hackflight.hpp"
-#include "realboard.hpp"
+#include "arduino.hpp"
 
 namespace hf {
 
-    class SuperFly : public RealBoard {
+    class SuperFly : public ArduinoBoard {
 
         private:
 
@@ -40,8 +40,6 @@ namespace hf {
             static const uint16_t GYRO_RATE      = 330;  // Hz
             static const uint8_t  BARO_RATE      = 50;   // Hz
             static const uint8_t  Q_RATE_DIVISOR = 5;    // 1/5 gyro rate
-
-            static const uint8_t LED_PIN = 15;
 
             const uint8_t MOTOR_PINS[4] = {4, 5, 12, 14};
 
@@ -57,36 +55,6 @@ namespace hf {
                         Serial.println(_sentral.getErrorString());
                     }
                 }
-            }
-
-            void delaySeconds(float sec)
-            {
-                delay((uint32_t)(1000*sec));
-            }
-
-            void setLed(bool isOn)
-            { 
-                digitalWrite(LED_PIN, isOn ? HIGH : LOW);
-            }
-
-            uint8_t serialAvailableBytes(void)
-            {
-                return Serial.available();
-            }
-
-            uint8_t serialReadByte(void)
-            {
-                return Serial.read();
-            }
-
-            void serialWriteByte(uint8_t c)
-            {
-                Serial.write(c);
-            }
-
-            virtual uint32_t getMicroseconds(void) override
-            {
-                return micros();
             }
 
             void writeMotor(uint8_t index, float value)
@@ -139,15 +107,8 @@ namespace hf {
 
         public:
 
-            SuperFly(void)
+            SuperFly(void) : ArduinoBoard(15)
             {
-                // Begin serial comms
-                Serial.begin(115200);
-
-                // Setup LEDs and turn them off
-                pinMode(LED_PIN, OUTPUT);
-                digitalWrite(LED_PIN, LOW);
-
                 // Start I^2C
                 Wire.begin(0,2); // SDA (0), SCL (2) on ESP8266
 
