@@ -27,11 +27,10 @@ class Controller(object):
 
     STICK_DEADBAND = .05
 
-    def __init__(self, axis_map, springy_throttle=False):
+    def __init__(self, axis_map):
 
         self.joystick = None
         self.axis_map = axis_map
-        self.springy_throttle = springy_throttle
         
     def update(self):
 
@@ -63,26 +62,42 @@ class Controller(object):
 
 class GameController(Controller):
 
+    THROTTLE_SCALE = .01
+
     def __init__(self, axis_map, button_id, springy_throttle=True):
 
-        Controller.__init__(self, axis_map, springy_throttle)
+        Controller.__init__(self, axis_map)
         self.button_id = button_id
         self.button_is_down = False
         self.switch_value = -1
+        self.springy_throttle = springy_throttle
+        self.throttleval = 0
 
-    def getAuxValue(self):
+    def _getAuxValue(self):
 
         return self.joystick.get_button(self.button_id)
         
     def getAux(self):
 
-        if self.getAuxValue():
+        if self._getAuxValue():
             if not self.button_is_down:
                 self.switch_value = -self.switch_value
             self.button_is_down = True
         else:
             self.button_is_down = False
         return self.switch_value
+
+    def getThrottle(self):
+
+        axisval = self._getAxis(0)
+
+        if self.springy_throttle:
+
+            self.throttleval = min(max(self.throttleval+axisval*GameController.THROTTLE_SCALE, -1), +1)
+
+            return self.throttleval
+
+        return axisval
 
 class RcTransmitter(Controller):
 
@@ -101,7 +116,7 @@ class Xbox360(GameController):
 
         GameController.__init__(self, (-1,  4, -3, 0), None)
 
-    def getAuxValue(self):
+    def _getAuxValue(self):
 
         return self.joystick.get_axis(2) < -.5
         
