@@ -53,10 +53,14 @@ class GameController(Controller):
         self.button_id = button_id
         self.button_is_down = False
         self.switch_value = -1
+
+    def getAuxValue(self):
+
+        return self.joystick.get_button(self.button_id)
         
     def getAux(self):
 
-        if self.joystick.get_button(self.button_id):
+        if self.getAuxValue():
             if not self.button_is_down:
                 self.switch_value = -self.switch_value
             self.button_is_down = True
@@ -79,13 +83,18 @@ class Xbox360(GameController):
 
     def __init__(self):
 
-        GameController.__init__(self, (-1,  4, -3, 0), 7)    
+        GameController.__init__(self, (-1,  4, -3, 0), None)
 
-class PS3(GameController):
+    def getAuxValue(self):
+
+        return self.joystick.get_axis(2) < -.5
+        
+
+class Playstation(GameController):
 
     def __init__(self):
 
-        GameController.__init__(self, (-1,  2, -3, 0), 9)
+        GameController.__init__(self, (-1,  2, -3, 0), 7)
 
 class ExtremePro3D(GameController):
 
@@ -108,7 +117,8 @@ class Spektrum(RcTransmitter):
 # Make a dictionary of controllers
 controllers = {
     'Controller (Rock Candy Gamepad for Xbox 360)' : Xbox360(), 
-    '2In1 USB Joystick'                            : PS3(),
+    '2In1 USB Joystick'                            : Playstation(),
+    'Wireless Controller'                          : Playstation(),    
     'Logitech Extreme 3D'                          : ExtremePro3D(),
     'FrSky Taranis Joystick'                       : Taranis(),
     'SPEKTRUM RECEIVER'                            : Spektrum()
