@@ -210,7 +210,6 @@ namespace hf {
                             if (_checksum == c) {        // compare calculated and transferred _checksum
                                 if (_direction == 0) {
                                     dispatchRequestMessage();
-                                    serialize8(_checksum);                            
                                 }
                                 else {
                                     dispatchDataMessage();
