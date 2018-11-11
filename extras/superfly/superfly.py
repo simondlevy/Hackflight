@@ -27,7 +27,7 @@ TIMEOUT_SEC   = 4
 
 from socket import socket
 from pysticks import get_controller
-from msppg import serialize_SET_RC_BYTES
+from msppg import serialize_SET_RC_NORMAL
 
 # Start the controller
 controller = get_controller()
@@ -42,14 +42,11 @@ while True:
     # Make the controller acquire the next event
     controller.update()
 
-    # Put stick demands and aux switch value into a single array
-    cmds = [controller.getAxis(k) for k in range(4)] + [controller.getAux()]
-
-    # Conver the array from [-1,+1] to [0,255], and append a 0 for channel 6 for now
-    cmds = [int(127*(cmd+1)) for cmd in cmds] + [0]
+    # Put stick demands and aux switch value into a single array and append a 0 sixth channel
+    cmds = [controller.getAxis(k) for k in range(4)] + [controller.getAux()] + [0]
 
     print(cmds)
 
     # Send the array of commands to SuperFly
-    sock.send(serialize_SET_RC_BYTES(*cmds))
+    sock.send(serialize_SET_RC_NORMAL(*cmds))
 
