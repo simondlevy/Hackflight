@@ -30,7 +30,7 @@ from pysticks import get_controller
 from msppg import serialize_SET_RC_NORMAL
 
 # Start the controller
-controller = get_controller()
+con = get_controller()
 
 # Set up socket connection to SuperFly
 sock = socket()
@@ -40,10 +40,10 @@ sock.connect((SUPERFLY_ADDR, SUPERFLY_PORT))
 while True:
 
     # Make the controller acquire the next event
-    controller.update()
+    con.update()
 
     # Put stick demands and aux switch value into a single array and append a 0 sixth channel
-    cmds = [controller.getAxis(k) for k in range(4)] + [controller.getAux()] + [0]
+    cmds = (con.getThrottle(), con.getRoll(), con.getPitch(), con.getYaw(), con.getAux(), 0)
 
     print(cmds)
 

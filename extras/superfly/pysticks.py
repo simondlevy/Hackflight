@@ -23,8 +23,6 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 import pygame
 
-from sys import stdout
-
 class Controller(object):
 
     def __init__(self, axis_map):
@@ -37,7 +35,23 @@ class Controller(object):
 
         pygame.event.pump()
 
-    def getAxis(self, k):
+    def getThrottle(self):
+
+        return self._getAxis(0)
+
+    def getRoll(self):
+
+        return self._getAxis(1)
+
+    def getPitch(self):
+
+        return self._getAxis(2)
+
+    def getYaw(self):
+
+        return self._getAxis(3)
+
+    def _getAxis(self, k):
 
         j = self.axis_map[k]
         val = self.joystick.get_axis(abs(j))
@@ -149,14 +163,11 @@ if __name__ == '__main__':
     Tester? I hardly know 'er!
     '''
 
-    controller = get_controller()
+    con = get_controller()
         
     while True:
 
-        controller.update()
+        con.update()
 
-        for k in range(4):
-            stdout.write('%+2.2f ' % controller.getAxis(k))
-
-        stdout.write(' | %d\n' % controller.getAux())
-
+        print('%+2.2f %+2.2f %+2.2f %+2.2f %+2.2f' %
+             (con.getThrottle(), con.getRoll(), con.getPitch(), con.getYaw(), con.getAux()))
