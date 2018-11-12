@@ -26,19 +26,43 @@ namespace hf {
 
     class DummyBoard : public ArduinoBoard {
 
+        private:
+
+            float _time;
+
+            // level and motionless
+            float _quat[4] = {1.f, 0.f, 0.f, 0.f};
+            float _gyro[3] = {0.f, 0.f, 0.f};
+
         protected:
 
             virtual bool getQuaternion(float quat[4]) override
             {
-                (void)quat;
+                memcpy(quat, _quat, 4*sizeof(float));
+
+                float time = getTime();
+
+                if (time-_time > .01) {
+                    _time = time;
+                    return true;
+                }
+
                 return false;
             }
 
             virtual bool getGyrometer(float gyroRates[3]) override
             {
-                (void)gyroRates;
+                memcpy(gyroRates, _gyro, 3*sizeof(float));
+
+                float time = getTime();
+
+                if (time-_time > .01) {
+                    _time = time;
+                    return true;
+                }
+
                 return false;
-            }
+             }
 
             virtual void writeMotor(uint8_t index, float value) override
             {
@@ -48,6 +72,7 @@ namespace hf {
 
             DummyBoard(uint8_t ledPin, bool ledInverted=false) : ArduinoBoard(ledPin, ledInverted)
             {
+                _time = 0;
             }
 
     }; // class DummyBoard

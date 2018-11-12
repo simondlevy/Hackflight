@@ -166,10 +166,9 @@ namespace hf {
                         _safeToArm,
                         _receiver->throttleIsDown(),
                         _receiver->getAux2State(), 
-                        !_failsafe, 
+                        _failsafe, 
                         safeAngle(AXIS_ROLL), 
-                        safeAngle(AXIS_PITCH));
-                        */
+                        safeAngle(AXIS_PITCH));*/
 
                 // Check whether receiver data is available
                 if (!_receiver->getDemands(_state.eulerAngles[AXIS_YAW] - _yawInitial)) return;

@@ -30,7 +30,9 @@ namespace hf {
 
             WiFiServer _server = WiFiServer(80);
             WiFiClient _client;
+
             bool _haveClient;
+            bool _hadClient;
             bool _gotMessage;
             float _sixvals[6];
 
@@ -47,6 +49,7 @@ namespace hf {
                 }
                 _server.begin();
                 _haveClient = false;
+                _hadClient = false;
                 _gotMessage = false;
                 memset(_sixvals, 0, 6*sizeof(float));
 
@@ -81,6 +84,7 @@ namespace hf {
                     _client = _server.available();
                     if (_client) {
                         _haveClient = true;
+                        _hadClient = true;
                     } 
                     else {
                     }
@@ -97,7 +101,7 @@ namespace hf {
 
             bool lostSignal(void)
             {
-                return !_haveClient;
+                return _hadClient && !_haveClient;
             }
 
             virtual void handle_SET_RC_NORMAL_Request(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6) override
