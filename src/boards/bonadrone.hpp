@@ -218,9 +218,4 @@ namespace hf {
 
     }; // class BonadroneBrushed
 
-    void Board::outbuf(char * buf)
-    {
-        Serial.print(buf);
-    }
-
 } // namespace hf

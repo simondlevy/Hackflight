@@ -83,4 +83,9 @@ namespace hf {
 
     }; // class ArduinoBoard
 
+    void Board::outbuf(char * buf)
+    {
+        Serial.print(buf);
+    }
+
 } // namespace hf
