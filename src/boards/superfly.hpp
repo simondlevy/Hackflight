@@ -72,9 +72,6 @@ namespace hf {
 
                 // Hang a bit more
                 delay(100);
-
-                // Do general real-board initialization
-                RealBoard::init();
             }
 
     }; // class SuperFly
