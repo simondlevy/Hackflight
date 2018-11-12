@@ -64,6 +64,4 @@ void setup(void)
 void loop(void)
 {
     h.update();
-
-    delay(10);
 }
