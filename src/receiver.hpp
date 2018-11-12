@@ -82,7 +82,8 @@ namespace hf {
 
         protected: 
 
-        static const uint8_t CHANNELS = 7;
+        // maximum number of channels that any receiver will send (of which we'll use six)
+        static const uint8_t MAXCHAN = 7;
 
         uint8_t _aux1State;
         uint8_t _aux2State;
@@ -114,7 +115,8 @@ namespace hf {
         // Default to non-headless mode
         float headless = false;
 
-        float rawvals[CHANNELS];  // raw [-1,+1] from receiver, for MSP
+        // Raw receiver values in [-1,+1]
+        float rawvals[MAXCHAN];  
 
         demands_t demands;
 

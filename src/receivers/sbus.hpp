@@ -99,8 +99,8 @@ namespace hf {
 
             void readRawvals(void)
             {
-                memset(rawvals, 0, CHANNELS*sizeof(float));
-                memcpy(rawvals, _channels, CHANNELS*sizeof(float));
+                memset(rawvals, 0, MAXCHAN*sizeof(float));
+                memcpy(rawvals, _channels, MAXCHAN*sizeof(float));
             }
 
             bool lostSignal(void)

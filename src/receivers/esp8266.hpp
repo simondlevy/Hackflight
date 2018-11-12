@@ -81,7 +81,7 @@ namespace hf {
 
             void readRawvals(void)
             {
-                //rx.getChannelValuesNormalized(rawvals, CHANNELS);
+                //rx.getChannelValuesNormalized(rawvals, MAXCHAN);
             }
 
             bool lostSignal(void)
