@@ -71,7 +71,7 @@ namespace hf {
             return (1 + e*(x*x - 1)) * x * r;
         }
 
-        // [-1,+1] -> [0,1] -> [-1,+1] XXX can we simplify?
+        // [-1,+1] -> [0,1] -> [-1,+1]
         float throttleFun(float x)
         {
             float mid = THROTTLE_MID + 0.5;
@@ -83,7 +83,7 @@ namespace hf {
         protected: 
 
         // maximum number of channels that any receiver will send (of which we'll use six)
-        static const uint8_t MAXCHAN = 7;
+        static const uint8_t MAXCHAN = 8;
 
         uint8_t _aux1State;
         uint8_t _aux2State;
