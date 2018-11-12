@@ -23,9 +23,6 @@
 #pragma once
 
 #include <Wire.h>
-#include <EM7180_Master.h>
-#include <stdarg.h>
-#include "hackflight.hpp"
 #include "arduino.hpp"
 #include "sentral.hpp"
 
