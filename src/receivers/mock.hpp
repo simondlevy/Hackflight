@@ -1,5 +1,5 @@
 /*
-   dummy.hpp : "Dummy" receiver subclass for prototyping
+   mock.hpp : "Mock" receiver subclass for prototyping
 
    This file is part of Hackflight.
 
@@ -24,7 +24,7 @@ static constexpr uint8_t DEFAULT_MAP[6] = {0,1,2,3,4,5};
 
 namespace hf {
 
-    class Dummy_Receiver : public Receiver {
+    class Mock_Receiver : public Receiver {
 
         protected:
 
@@ -48,10 +48,10 @@ namespace hf {
 
         public:
 
-            Dummy_Receiver(void) : Receiver(DEFAULT_MAP)
+            Mock_Receiver(void) : Receiver(DEFAULT_MAP)
             { 
             }
 
-    }; // class Dummy_Receiver
+    }; // class Mock_Receiver
 
 } // namespace hf

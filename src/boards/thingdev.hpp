@@ -20,15 +20,15 @@
 
 #pragma once
 
-#include "dummy.hpp"
+#include "mock.hpp"
 
 namespace hf {
 
-    class SparkfunEsp8266ThingDev : public DummyBoard {
+    class SparkfunEsp8266ThingDev : public MockBoard {
 
         public:
 
-            SparkfunEsp8266ThingDev(void) : DummyBoard(5, true)
+            SparkfunEsp8266ThingDev(void) : MockBoard(5, true)
             {
             }
 

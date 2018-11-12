@@ -1,5 +1,5 @@
 /*
-   dummy.hpp : Board subclass for Arduino prototyping without IMU or motors
+   mock.hpp : Board subclass for Arduino prototyping without IMU or motors
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -24,7 +24,7 @@
 
 namespace hf {
 
-    class DummyBoard : public ArduinoBoard {
+    class MockBoard : public ArduinoBoard {
 
         private:
 
@@ -70,11 +70,11 @@ namespace hf {
                 (void)value;
             }
 
-            DummyBoard(uint8_t ledPin, bool ledInverted=false) : ArduinoBoard(ledPin, ledInverted)
+            MockBoard(uint8_t ledPin, bool ledInverted=false) : ArduinoBoard(ledPin, ledInverted)
             {
                 _time = 0;
             }
 
-    }; // class DummyBoard
+    }; // class MockBoard
 
 } // namespace hf
