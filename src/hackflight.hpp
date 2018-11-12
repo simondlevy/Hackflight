@@ -161,15 +161,6 @@ namespace hf {
 
             void checkReceiver(void)
             {
-                /*
-                Debug::printf("safeToArm: %d throtDown: %d aux2: %d failsafe: %d safeRoll: %d safePitch: %d\n",
-                        _safeToArm,
-                        _receiver->throttleIsDown(),
-                        _receiver->getAux2State(), 
-                        _failsafe, 
-                        safeAngle(AXIS_ROLL), 
-                        safeAngle(AXIS_PITCH));*/
-
                 // Check whether receiver data is available
                 if (!_receiver->getDemands(_state.eulerAngles[AXIS_YAW] - _yawInitial)) return;
 
