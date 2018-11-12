@@ -31,6 +31,8 @@ namespace hf {
             WiFiServer _server = WiFiServer(80);
             WiFiClient _client;
             bool _haveClient;
+            bool _gotMessage;
+            float _sixvals[6];
 
         protected:
 
@@ -45,6 +47,8 @@ namespace hf {
                 }
                 _server.begin();
                 _haveClient = false;
+                _gotMessage = false;
+                memset(_sixvals, 0, 6*sizeof(float));
 
                 MspParser::init();
             }
@@ -55,9 +59,17 @@ namespace hf {
 
                     if (_client.connected()) {
 
+                        bool retval = false;
+
                         while (_client.available()) {
+                            _gotMessage = false;
                             MspParser::parse(_client.read());
+                            if (_gotMessage) {
+                                retval = true;
+                            }
                         }
+
+                        return retval;
                     }
 
                     else {
@@ -68,30 +80,36 @@ namespace hf {
                 else {
                     _client = _server.available();
                     if (_client) {
-                        //Serial.println("Connected!");
                         _haveClient = true;
                     } 
                     else {
-                        //Serial.println("Waiting for client ...");
                     }
                 }
 
-                return false; //rx.gotNewFrame();
+                return false; 
             }
 
             void readRawvals(void)
             {
-                //rx.getChannelValuesNormalized(rawvals, MAXCHAN);
+                memset(rawvals, 0, MAXCHAN*sizeof(float));
+                memcpy(rawvals, _sixvals, 6*sizeof(float));
+                for (uint8_t k=0; k<MAXCHAN; ++k) Debug::printf("%+2.2f ", rawvals[k]); Debug::printf("\n");
             }
 
             bool lostSignal(void)
             {
-                return false; //rx.timedOut(micros());
+                return !_haveClient;
             }
 
             virtual void handle_SET_RC_NORMAL_Request(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6) override
             {
-                Debug::printf("%+2.2f %+2.2f %+2.2f %+2.2f %+2.2f %+2.2f\n", c1, c2, c3, c4, c5, c6);
+                _gotMessage = true;
+                _sixvals[0] = c1;
+                _sixvals[1] = c2;
+                _sixvals[2] = c3;
+                _sixvals[3] = c4;
+                _sixvals[4] = c5;
+                _sixvals[5] = c6;
             }
 
          public:
