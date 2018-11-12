@@ -27,36 +27,17 @@
 #include <stdarg.h>
 #include "hackflight.hpp"
 #include "arduino.hpp"
-
+#include "sentral.hpp"
 
 namespace hf {
 
-    class Ladybug : public ArduinoBoard {
+    class Ladybug : public ArduinoBoard, public SentralBoard {
 
         private:
 
-            // Tunable EM7180 parameters
-            static const uint8_t  MAG_RATE       = 100;  // Hz
-            static const uint16_t ACCEL_RATE     = 330;  // Hz
-            static const uint16_t GYRO_RATE      = 330;  // Hz
-            static const uint8_t  BARO_RATE      = 50;   // Hz
-            static const uint8_t  Q_RATE_DIVISOR = 5;    // 1/5 gyro rate
-
             const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
 
-            EM7180_Master _sentral = EM7180_Master(MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
-
-            void checkEventStatus(void)
-            {
-                _sentral.checkEventStatus();
-
-                if (_sentral.gotError()) {
-                    while (true) {
-                        Serial.print("ERROR: ");
-                        Serial.println(_sentral.getErrorString());
-                    }
-                }
-            }
+        protected:
 
             void writeMotor(uint8_t index, float value)
             {
@@ -66,44 +47,12 @@ namespace hf {
 
             bool getGyrometer(float gyro[3])
             {
-                // Since gyro is updated most frequently, use it to drive SENtral polling
-                checkEventStatus();
-
-                if (_sentral.gotGyrometer()) {
-
-                    float gx, gy, gz;
-
-                    // Returns degrees / sec
-                    _sentral.readGyrometer(gx, gy, gz);
-
-                    // Convert degrees / sec to radians / sec
-                    gyro[0] = radians(gx);
-                    gyro[1] = radians(gy);
-                    gyro[2] = radians(gz);
-
-                    return true;
-                }
-
-                return false;
+                return SentralBoard::getGyrometer(gyro);
             }
 
             bool getQuaternion(float quat[4])
             {
-                if (_sentral.gotQuaternion()) {
-
-                    static float qw, qx, qy, qz;
-
-                    _sentral.readQuaternion(qw, qx, qy, qz);
-
-                    quat[0] = qw;
-                    quat[1] = qx;
-                    quat[2] = qy;
-                    quat[3] = qz;
-
-                    return true;
-                }
-
-                return false;
+                return SentralBoard::getQuaternion(quat);
             }
 
         public:
@@ -117,12 +66,7 @@ namespace hf {
                 // Hang a bit before starting up the EM7180
                 delay(100);
 
-                // Start the EM7180 in master mode, no interrupt
-                if (!_sentral.begin()) {
-                    while (true) {
-                        Serial.println(_sentral.getErrorString());
-                    }
-                }
+                SentralBoard::begin();
 
                 // Initialize the motors
                 for (int k=0; k<4; ++k) {
