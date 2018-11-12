@@ -38,7 +38,7 @@ namespace hf {
 
             void writeMotor(uint8_t index, float value)
             {
-                // Scale motor value from [0,1] to [0,255]
+                // Scale motor value from [0,1] to [0,1023]
                 analogWrite(MOTOR_PINS[index], (uint16_t)(value * 1023));
             }
 
