@@ -42,8 +42,9 @@ while True:
     # Make the controller acquire the next event
     con.update()
 
-    # Put stick demands and aux switch value into a single array and append a 0 sixth channel
-    cmds = (con.getThrottle(), con.getRoll(), con.getPitch(), con.getYaw(), con.getAux(), 0)
+    # Put stick demands and aux switch value into a single array,
+    # with zero for Aux1 and aux switch for Aux2
+    cmds = (con.getThrottle(), con.getRoll(), con.getPitch(), con.getYaw(), 0, con.getAux())
 
     print(cmds)
 

@@ -1,5 +1,5 @@
 /*
-   thingdev.hpp : Board subclass for prototyping on Sparkfun ESP8266 ThingDev board
+   dummy.hpp : Board subclass for Arduino prototyping without IMU or motors
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -20,18 +20,36 @@
 
 #pragma once
 
-#include "dummy.hpp"
+#include "arduino.hpp"
 
 namespace hf {
 
-    class SparkfunEsp8266ThingDev : public DummyBoard {
+    class DummyBoard : public ArduinoBoard {
 
-        public:
+        protected:
 
-            SparkfunEsp8266ThingDev(void) : DummyBoard(5, true)
+            virtual bool getQuaternion(float quat[4]) override
+            {
+                (void)quat;
+                return false;
+            }
+
+            virtual bool getGyrometer(float gyroRates[3]) override
+            {
+                (void)gyroRates;
+                return false;
+            }
+
+            virtual void writeMotor(uint8_t index, float value) override
+            {
+                (void)index;
+                (void)value;
+            }
+
+            DummyBoard(uint8_t ledPin, bool ledInverted=false) : ArduinoBoard(ledPin, ledInverted)
             {
             }
 
-    }; // class SparkfunEsp8266ThingDev
+    }; // class DummyBoard
 
 } // namespace hf

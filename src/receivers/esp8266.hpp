@@ -93,7 +93,6 @@ namespace hf {
             {
                 memset(rawvals, 0, MAXCHAN*sizeof(float));
                 memcpy(rawvals, _sixvals, 6*sizeof(float));
-                for (uint8_t k=0; k<MAXCHAN; ++k) Debug::printf("%+2.2f ", rawvals[k]); Debug::printf("\n");
             }
 
             bool lostSignal(void)

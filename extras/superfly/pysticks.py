@@ -91,7 +91,7 @@ class SpringyThrottleController(GameController):
 
         GameController.__init__(self, axis_map, button_id)
         
-        self.throttleval = 0
+        self.throttleval = -1
 
     def getThrottle(self):
 
@@ -177,7 +177,7 @@ def get_controller():
 if __name__ == '__main__':
 
     '''
-    Tester? I hardly know 'er!
+    Test
     '''
 
     con = get_controller()
