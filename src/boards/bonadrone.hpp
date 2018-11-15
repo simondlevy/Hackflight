@@ -104,6 +104,7 @@ namespace hf {
 
             Bonadrone(void) : ArduinoBoard(38, true) // inverted LED signal
             {
+                setLed(true);
                 // Configure interrupt
                 pinMode(LSM6DSM_INTERRUPT_PIN, INPUT);
 
@@ -138,6 +139,7 @@ namespace hf {
                 _lsm6dsm.calibrate(GYRO_BIAS, ACCEL_BIAS);
                 // Clear the interrupt
                 _lsm6dsm.clearInterrupt();
+                setLed(false);
             }
 
     }; // class Bonadrone
