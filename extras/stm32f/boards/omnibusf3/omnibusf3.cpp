@@ -156,7 +156,7 @@ extern "C" {
         return SoftwareQuaternionBoard::getGyrometer(gyroRates);
     }
 
-     bool OmnibusF3::imuRead(void)
+    bool OmnibusF3::imuRead(void)
     {
         if (_imu->checkNewData()) {  
 

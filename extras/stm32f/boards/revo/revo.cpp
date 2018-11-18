@@ -54,8 +54,8 @@ extern "C" {
 
     void Revo::initImu(void)
     {
-        /*
         spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
+
         _imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
         switch (_imu->begin()) {
@@ -69,7 +69,6 @@ extern "C" {
             default:
                 break;
         }
-        */
     }
 
     void Revo::initUsb(void)
@@ -135,6 +134,27 @@ extern "C" {
 
     bool Revo::imuRead(void)
     {
+        if (_imu->checkNewData()) {  
+
+            _imu->readAccelerometer(_ax, _ay, _az);
+            _imu->readGyrometer(_gx, _gy, _gz);
+
+            // Negate to support board orientation
+            _ay = -_ay;
+            _gx = -_gx;
+            _gz = -_gz;
+
+            return true;
+        }  
+
+        else {
+
+            //if (_avail) {
+            //    hf::Debug::printf("%d\n", _value);
+            //    _avail = false;
+            //}
+        }
+
         return false;
     }
 
