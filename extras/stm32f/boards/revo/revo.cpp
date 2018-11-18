@@ -147,14 +147,6 @@ extern "C" {
             return true;
         }  
 
-        else {
-
-            //if (_avail) {
-            //    hf::Debug::printf("%d\n", _value);
-            //    _avail = false;
-            //}
-        }
-
         return false;
     }
 
