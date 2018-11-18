@@ -54,6 +54,7 @@ extern "C" {
 
     void Revo::initImu(void)
     {
+        /*
         spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
         _imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
@@ -68,6 +69,7 @@ extern "C" {
             default:
                 break;
         }
+        */
     }
 
     void Revo::initUsb(void)

@@ -79,7 +79,7 @@ bool DSMX_Receiver::gotNewFrame(void)
 
 void DSMX_Receiver::readRawvals(void)
 {
-    _rx->getChannelValuesNormalized(rawvals, CHANNELS);
+    _rx->getChannelValuesNormalized(rawvals, MAXCHAN);
 }
 
 } // extern "C"
