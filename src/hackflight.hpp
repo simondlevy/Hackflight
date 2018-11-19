@@ -151,7 +151,7 @@ namespace hf {
 
             void checkFailsafe(void)
             {
-                if (_state.armed && _receiver->lostSignal()) {
+                if (_state.armed && (_receiver->lostSignal() || _board->isBatteryLow())) {
                     _mixer->cutMotors();
                     _state.armed = false;
                     _failsafe = true;
