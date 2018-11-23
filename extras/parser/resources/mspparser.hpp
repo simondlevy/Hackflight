@@ -97,11 +97,50 @@ namespace hf {
                 headSerialResponse(0, s);
             }
 
-            void prepareToSendFloats(uint8_t count)
+            void prepareToSend(uint8_t count, uint8_t size)
             {
                 _outBufSize = 0;
                 _outBufIndex = 0;
-                headSerialReply(count*4);
+                headSerialReply(count*size);
+            }
+
+            void prepareToSendBytes(uint8_t count)
+            {
+                prepareToSend(count, 1);
+            }
+
+            void sendByte(uint8_t src)
+            {
+                serialize8(src);
+            }
+
+            void prepareToSendShorts(uint8_t count)
+            {
+                prepareToSend(count, 2);
+            }
+
+            void sendShort(short src)
+            {
+                int16_t a;
+                memcpy(&a, &src, 2);
+                serialize16(a);
+            }
+
+            void prepareToSendInts(uint8_t count)
+            {
+                prepareToSend(count, 4);
+            }
+
+            void sendInt(int32_t src)
+            {
+                int32_t a;
+                memcpy(&a, &src, 4);
+                serialize32(a);
+            }
+
+            void prepareToSendFloats(uint8_t count)
+            {
+                prepareToSend(count, 4);
             }
 
             void sendFloat(float src)

@@ -97,11 +97,50 @@ namespace hf {
                 headSerialResponse(0, s);
             }
 
-            void prepareToSendFloats(uint8_t count)
+            void prepareToSend(uint8_t count, uint8_t size)
             {
                 _outBufSize = 0;
                 _outBufIndex = 0;
-                headSerialReply(count*4);
+                headSerialReply(count*size);
+            }
+
+            void prepareToSendBytes(uint8_t count)
+            {
+                prepareToSend(count, 1);
+            }
+
+            void sendByte(uint8_t src)
+            {
+                serialize8(src);
+            }
+
+            void prepareToSendShorts(uint8_t count)
+            {
+                prepareToSend(count, 2);
+            }
+
+            void sendShort(short src)
+            {
+                int16_t a;
+                memcpy(&a, &src, 2);
+                serialize16(a);
+            }
+
+            void prepareToSendInts(uint8_t count)
+            {
+                prepareToSend(count, 4);
+            }
+
+            void sendInt(int32_t src)
+            {
+                int32_t a;
+                memcpy(&a, &src, 4);
+                serialize32(a);
+            }
+
+            void prepareToSendFloats(uint8_t count)
+            {
+                prepareToSend(count, 4);
             }
 
             void sendFloat(float src)
@@ -229,6 +268,31 @@ namespace hf {
             {
                 switch (_command) {
 
+                    case 102:
+                    {
+                        int16_t accx = 0;
+                        int16_t accy = 0;
+                        int16_t accz = 0;
+                        int16_t gyrx = 0;
+                        int16_t gyry = 0;
+                        int16_t gyrz = 0;
+                        int16_t magx = 0;
+                        int16_t magy = 0;
+                        int16_t magz = 0;
+                        handle_RAW_IMU_Request(accx, accy, accz, gyrx, gyry, gyrz, magx, magy, magz);
+                        prepareToSendShorts(9);
+                        sendShort(accx);
+                        sendShort(accy);
+                        sendShort(accz);
+                        sendShort(gyrx);
+                        sendShort(gyry);
+                        sendShort(gyrz);
+                        sendShort(magx);
+                        sendShort(magy);
+                        sendShort(magz);
+                        serialize8(_checksum);
+                        } break;
+
                     case 121:
                     {
                         float c1 = 0;
@@ -282,6 +346,17 @@ namespace hf {
                         sendFloat(agl);
                         sendFloat(flowx);
                         sendFloat(flowy);
+                        serialize8(_checksum);
+                        } break;
+
+                    case 199:
+                    {
+                        int32_t value1 = 0;
+                        int32_t value2 = 0;
+                        handle_FAKE_INT_Request(value1, value2);
+                        prepareToSendInts(2);
+                        sendInt(value1);
+                        sendInt(value2);
                         serialize8(_checksum);
                         } break;
 
@@ -340,6 +415,20 @@ namespace hf {
             {
                 switch (_command) {
 
+                    case 102:
+                    {
+                        int16_t accx = getArgument(0);
+                        int16_t accy = getArgument(1);
+                        int16_t accz = getArgument(2);
+                        int16_t gyrx = getArgument(3);
+                        int16_t gyry = getArgument(4);
+                        int16_t gyrz = getArgument(5);
+                        int16_t magx = getArgument(6);
+                        int16_t magy = getArgument(7);
+                        int16_t magz = getArgument(8);
+                        handle_RAW_IMU_Data(accx, accy, accz, gyrx, gyry, gyrz, magx, magy, magz);
+                        } break;
+
                     case 121:
                     {
                         float c1 = getArgument(0);
@@ -374,10 +463,43 @@ namespace hf {
                         handle_LOITER_Data(agl, flowx, flowy);
                         } break;
 
+                    case 199:
+                    {
+                        int32_t value1 = getArgument(0);
+                        int32_t value2 = getArgument(1);
+                        handle_FAKE_INT_Data(value1, value2);
+                        } break;
+
                 }
             }
 
         protected:
+
+            virtual void handle_RAW_IMU_Request(int16_t & accx, int16_t & accy, int16_t & accz, int16_t & gyrx, int16_t & gyry, int16_t & gyrz, int16_t & magx, int16_t & magy, int16_t & magz)
+            {
+                (void)accx;
+                (void)accy;
+                (void)accz;
+                (void)gyrx;
+                (void)gyry;
+                (void)gyrz;
+                (void)magx;
+                (void)magy;
+                (void)magz;
+            }
+
+            virtual void handle_RAW_IMU_Data(int16_t & accx, int16_t & accy, int16_t & accz, int16_t & gyrx, int16_t & gyry, int16_t & gyrz, int16_t & magx, int16_t & magy, int16_t & magz)
+            {
+                (void)accx;
+                (void)accy;
+                (void)accz;
+                (void)gyrx;
+                (void)gyry;
+                (void)gyrz;
+                (void)magx;
+                (void)magy;
+                (void)magz;
+            }
 
             virtual void handle_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
             {
@@ -439,6 +561,18 @@ namespace hf {
                 (void)flowy;
             }
 
+            virtual void handle_FAKE_INT_Request(int32_t & value1, int32_t & value2)
+            {
+                (void)value1;
+                (void)value2;
+            }
+
+            virtual void handle_FAKE_INT_Data(int32_t & value1, int32_t & value2)
+            {
+                (void)value1;
+                (void)value2;
+            }
+
             virtual void handle_SET_MOTOR_NORMAL_Request(float  m1, float  m2, float  m3, float  m4)
             {
                 (void)m1;
@@ -486,6 +620,41 @@ namespace hf {
             }
 
         public:
+
+            static uint8_t serialize_RAW_IMU_Request(uint8_t bytes[])
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 60;
+                bytes[3] = 0;
+                bytes[4] = 102;
+                bytes[5] = 102;
+
+                return 6;
+            }
+
+            static uint8_t serialize_RAW_IMU(uint8_t bytes[], int16_t  accx, int16_t  accy, int16_t  accz, int16_t  gyrx, int16_t  gyry, int16_t  gyrz, int16_t  magx, int16_t  magy, int16_t  magz)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 18;
+                bytes[4] = 102;
+
+                memcpy(&bytes[5], &accx, sizeof(int16_t));
+                memcpy(&bytes[7], &accy, sizeof(int16_t));
+                memcpy(&bytes[9], &accz, sizeof(int16_t));
+                memcpy(&bytes[11], &gyrx, sizeof(int16_t));
+                memcpy(&bytes[13], &gyry, sizeof(int16_t));
+                memcpy(&bytes[15], &gyrz, sizeof(int16_t));
+                memcpy(&bytes[17], &magx, sizeof(int16_t));
+                memcpy(&bytes[19], &magy, sizeof(int16_t));
+                memcpy(&bytes[21], &magz, sizeof(int16_t));
+
+                bytes[23] = CRC8(&bytes[3], 20);
+
+                return 24;
+            }
 
             static uint8_t serialize_RC_NORMAL_Request(uint8_t bytes[])
             {
@@ -603,6 +772,34 @@ namespace hf {
                 bytes[17] = CRC8(&bytes[3], 14);
 
                 return 18;
+            }
+
+            static uint8_t serialize_FAKE_INT_Request(uint8_t bytes[])
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 60;
+                bytes[3] = 0;
+                bytes[4] = 199;
+                bytes[5] = 199;
+
+                return 6;
+            }
+
+            static uint8_t serialize_FAKE_INT(uint8_t bytes[], int32_t  value1, int32_t  value2)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 8;
+                bytes[4] = 199;
+
+                memcpy(&bytes[5], &value1, sizeof(int32_t));
+                memcpy(&bytes[9], &value2, sizeof(int32_t));
+
+                bytes[13] = CRC8(&bytes[3], 10);
+
+                return 14;
             }
 
             static uint8_t serialize_SET_MOTOR_NORMAL(uint8_t bytes[], float  m1, float  m2, float  m3, float  m4)
