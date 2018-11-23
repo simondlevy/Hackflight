@@ -62,6 +62,12 @@ namespace hf {
 
             serialState_t  _state;
 
+            void clearOutBuff(void)
+            {
+                _outBufSize = 0;
+                _outBufIndex = 0;
+            }
+
             void serialize8(uint8_t a)
             {
                 _outBuf[_outBufSize++] = a;
@@ -99,12 +105,48 @@ namespace hf {
 
             void prepareToSendFloats(uint8_t count)
             {
-                _outBufSize = 0;
-                _outBufIndex = 0;
+                clearOutBuff();
                 headSerialReply(count*4);
             }
 
             void sendFloat(float src)
+            {
+                uint32_t a;
+                memcpy(&a, &src, 4);
+                serialize32(a);
+            }
+
+            void prepareToSendBytes(uint8_t count)
+            {
+                clearOutBuff();
+                headSerialReply(count);
+            }
+
+            void sendByte(uint8_t src)
+            {
+                serialize8(src);
+            }
+
+            void prepareToSendShorts(uint8_t count)
+            {
+                clearOutBuff();
+                headSerialReply(2*count);
+            }
+
+            void sendShort(uint16_t src)
+            {
+                uint32_t a;
+                memcpy(&a, &src, 2);
+                serialize16(a);
+            }
+
+            void prepareToSendInts(uint8_t count)
+            {
+                clearOutBuff();
+                headSerialReply(4*count);
+            }
+
+            void sendInt(uint32_t src)
             {
                 uint32_t a;
                 memcpy(&a, &src, 4);

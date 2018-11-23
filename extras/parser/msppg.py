@@ -215,13 +215,15 @@ class Python_Emitter(LocalCodeEmitter):
 
 class HPP_Emitter(CodeEmitter):
 
-    type2decl = {'byte': 'uint8_t', 'short' : 'int16_t', 'float' : 'float', 'int' : 'int32_t'}
+    type2decl    = {'byte': 'uint8_t', 'short' : 'int16_t', 'float' : 'float', 'int' : 'int32_t'}
+    type2keyword = {'byte': 'Byte', 'short' : 'Short', 'float' : 'Float', 'int' : 'Int'}
 
     def __init__(self, msgdict):
 
         CodeEmitter.__init__(self)
 
         self.type2decl = HPP_Emitter.type2decl
+        self.type2keyword = HPP_Emitter.type2keyword
 
         # Create C++ header file
         self._copyfile('mspparser.hpp', 'mspparser.hpp', '../../src')
@@ -262,9 +264,9 @@ class HPP_Emitter(CodeEmitter):
                     self.output.write(', ')
             self.output.write(');\n')
             if msgid < 200:
-                self.output.write(6*self.indent + ('prepareToSendFloats(%d);\n' % nargs))
+                self.output.write(6*self.indent + ('prepareToSend%ss(%d);\n' % (self.type2keyword[argtype], nargs)))
                 for argname in argnames:
-                    self.output.write(6*self.indent + ('sendFloat(%s);\n' % argname))
+                    self.output.write(6*self.indent + ('send%s(%s);\n' % (self.type2keyword[argtype], argname)))
                 self.output.write(6*self.indent + "serialize8(_checksum);\n")
             self.output.write(6*self.indent + '} break;\n\n')
 
