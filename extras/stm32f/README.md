@@ -19,6 +19,8 @@ controller
 
 * [Femto F3](http://www.readytoflyquads.com/f3-femto-flight-controller) brushless flight controller
 
+* [Omnibus F3](https://www.readytoflyquads.com/flip-32-f3-omnibus) brushless flight controller
+
 What these boards have in common is the ability to short the boot-loader pads easily, either through a jumper
 or boot button.  
 
