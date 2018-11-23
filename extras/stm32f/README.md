@@ -1,4 +1,4 @@
-This folder contains experimental code to support running Hackflight on the popular STM32F-based flight controllers,
+This folder contains code to support running Hackflight on the popular STM32F-based flight controllers,
 by linking to the low-level device drivers (UART, I<sup>2</sup>C, SPI, PWM) in
 the Cleanflight repository. It is easiest to compile this code on Linux, using
 the [GNU Arm Embedded
