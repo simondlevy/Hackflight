@@ -85,7 +85,7 @@ class GameController(Controller):
 
 class SpringyThrottleController(GameController):
 
-    THROTTLE_SCALE = .01
+    THROTTLE_SCALE = .0001
     
     def __init__(self, axis_map, button_id):
 
@@ -184,7 +184,13 @@ if __name__ == '__main__':
         
     while True:
 
-        con.update()
+        try:
 
-        print('%+2.2f %+2.2f %+2.2f %+2.2f %+2.2f' %
-             (con.getThrottle(), con.getRoll(), con.getPitch(), con.getYaw(), con.getAux()))
+            con.update()
+
+            print('%+2.2f %+2.2f %+2.2f %+2.2f %+2.2f' %
+                 (con.getThrottle(), con.getRoll(), con.getPitch(), con.getYaw(), con.getAux()))
+
+        except KeyboardInterrupt:
+
+            break
