@@ -113,53 +113,26 @@ class RcTransmitter(Controller):
         
 class Xbox360(SpringyThrottleController):
 
-    def __init__(self):
+    def __init__(self, axes, aux):
 
-        SpringyThrottleController.__init__(self, (-1,  4, -3, 0), None)
+        SpringyThrottleController.__init__(self, axes, None)
+
+        self.aux = aux
 
     def _getAuxValue(self):
 
-        return self.joystick.get_axis(2) < -.5
-        
+        return self.joystick.get_axis(self.aux) < -.5
 
-class Playstation(SpringyThrottleController):
-
-    def __init__(self):
-
-        SpringyThrottleController.__init__(self, (-1,  2, -5 if platform.system() == 'Linux' else -3, 0), 7)
-
-class ExtremePro3D(GameController):
-
-    def __init__(self):
-
-        GameController.__init__(self, (-2,  0,  1, 3), 0) # no springy throttle
-
-class Taranis(RcTransmitter):
-
-    def __init__(self):
-
-        RcTransmitter.__init__(self, (0,  1,  2, 5), 3)
-
-class Spektrum(RcTransmitter):
-
-    def __init__(self):
-
-        RcTransmitter.__init__(self, (1,  2,  5, 0), 4)
-
-# Make a dictionary of controllers for each OS
-
-controllers_windows = {
-    'Controller (Rock Candy Gamepad for Xbox 360)' : Xbox360(), 
-    '2In1 USB Joystick'                            : Playstation(),
-    'Wireless Controller'                          : Playstation(),    
-    'Logitech Extreme 3D'                          : ExtremePro3D(),
-    'FrSky Taranis Joystick'                       : Taranis(),
-    'SPEKTRUM RECEIVER'                            : Spektrum()
-    }
-
-controllers_linux = {
-    
-    'Sony Interactive Entertainment Wireless Controller' : Playstation(), 
+controllers = {
+    'Controller (Rock Candy Gamepad for Xbox 360)'       : Xbox360((-1,4,-3,0), 2), 
+    'Generic X-Box pad'                                  : Xbox360((-1,3,-4,0), 5), 
+    '2In1 USB Joystick'                                  : SpringyThrottleController((-1,2,-3,0), 7),
+    'MY-POWER CO.,LTD. 2In1 USB Joystick'                : SpringyThrottleController((-1,2,-3,0), 7),
+    'Sony Interactive Entertainment Wireless Controller' : SpringyThrottleController((-1,2,-5,0), 7),
+    'Logitech Extreme 3D'                                : GameController((-2,0,1,3), 0),
+    'Logitech Logitech Extreme 3D'                       : GameController((-3,0,-1,2), 0),
+    'FrSky Taranis Joystick'                             : RcTransmitter((0,1,2,5), 3),
+    'SPEKTRUM RECEIVER'                                  : RcTransmitter((1,2,5,0), 4)
     }
 
 def get_controller():
@@ -172,7 +145,6 @@ def get_controller():
 
     # Find your controller
     controller_name = joystick.get_name()
-    controllers = controllers_linux if platform.system() == 'Linux' else controllers_windows
     if not controller_name in controllers.keys():
         print('Unrecognized controller: %s' % controller_name)
         exit(1)
