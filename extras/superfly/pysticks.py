@@ -22,6 +22,7 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
 import pygame
+import platform
 
 class Controller(object):
 
@@ -125,7 +126,7 @@ class Playstation(SpringyThrottleController):
 
     def __init__(self):
 
-        SpringyThrottleController.__init__(self, (-1,  2, -3, 0), 7)
+        SpringyThrottleController.__init__(self, (-1,  2, -5 if platform.system() == 'Linux' else -3, 0), 7)
 
 class ExtremePro3D(GameController):
 
@@ -145,14 +146,20 @@ class Spektrum(RcTransmitter):
 
         RcTransmitter.__init__(self, (1,  2,  5, 0), 4)
 
-# Make a dictionary of controllers
-controllers = {
+# Make a dictionary of controllers for each OS
+
+controllers_windows = {
     'Controller (Rock Candy Gamepad for Xbox 360)' : Xbox360(), 
     '2In1 USB Joystick'                            : Playstation(),
     'Wireless Controller'                          : Playstation(),    
     'Logitech Extreme 3D'                          : ExtremePro3D(),
     'FrSky Taranis Joystick'                       : Taranis(),
     'SPEKTRUM RECEIVER'                            : Spektrum()
+    }
+
+controllers_linux = {
+    
+    'Sony Interactive Entertainment Wireless Controller' : Playstation(), 
     }
 
 def get_controller():
@@ -165,6 +172,7 @@ def get_controller():
 
     # Find your controller
     controller_name = joystick.get_name()
+    controllers = controllers_linux if platform.system() == 'Linux' else controllers_windows
     if not controller_name in controllers.keys():
         print('Unrecognized controller: %s' % controller_name)
         exit(1)
@@ -184,7 +192,13 @@ if __name__ == '__main__':
         
     while True:
 
-        con.update()
+        try:
 
-        print('%+2.2f %+2.2f %+2.2f %+2.2f %+2.2f' %
-             (con.getThrottle(), con.getRoll(), con.getPitch(), con.getYaw(), con.getAux()))
+            con.update()
+
+            print('%+2.2f %+2.2f %+2.2f %+2.2f %+2.2f' %
+                 (con.getThrottle(), con.getRoll(), con.getPitch(), con.getYaw(), con.getAux()))
+
+        except KeyboardInterrupt:
+
+            break

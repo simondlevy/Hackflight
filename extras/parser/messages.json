@@ -1,4 +1,16 @@
 {
+  "RAW_IMU": 
+  [{"ID": 102},
+   {"accx": "short"}, 
+   {"accy": "short"}, 
+   {"accz": "short"}, 
+   {"gyrx": "short"}, 
+   {"gyry": "short"}, 
+   {"gyrz": "short"}, 
+   {"magx": "short"}, 
+   {"magy": "short"}, 
+   {"magz": "short"}],
+
   "RC_NORMAL": 
   [{"ID": 121},
    {"comment": "16 channels in http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol"}, 
@@ -25,6 +37,12 @@
    {"agl"   : "float"}, 
    {"flowx" : "float"},
    {"flowy" : "float"}],  
+
+  "FAKE_INT": 
+  [{"ID": 199},
+   {"comment": "Fake int message for testing"}, 
+   {"value1" : "int"},
+   {"value2" : "int"}],  
 
   "SET_MOTOR_NORMAL": 
   [{"ID": 215},

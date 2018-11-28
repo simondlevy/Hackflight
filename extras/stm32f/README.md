@@ -1,4 +1,4 @@
-This folder contains experimental code to support running Hackflight on the popular STM32F-based flight controllers,
+This folder contains code to support running Hackflight on the popular STM32F-based flight controllers,
 by linking to the low-level device drivers (UART, I<sup>2</sup>C, SPI, PWM) in
 the Cleanflight repository. It is easiest to compile this code on Linux, using
 the [GNU Arm Embedded
@@ -18,6 +18,8 @@ controller
 * [BetaFPV F3](https://betafpv.com/products/betafpv-f3-evo-whoop-brushed-flight-controller-no-receiver-version) brushed flight controller
 
 * [Femto F3](http://www.readytoflyquads.com/f3-femto-flight-controller) brushless flight controller
+
+* [Omnibus F3](https://www.readytoflyquads.com/flip-32-f3-omnibus) brushless flight controller
 
 What these boards have in common is the ability to short the boot-loader pads easily, either through a jumper
 or boot button.  

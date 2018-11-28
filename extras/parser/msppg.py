@@ -262,9 +262,10 @@ class HPP_Emitter(CodeEmitter):
                     self.output.write(', ')
             self.output.write(');\n')
             if msgid < 200:
-                self.output.write(6*self.indent + ('prepareToSendFloats(%d);\n' % nargs))
+                argtype = argtypes[0].capitalize() # XXX enforce uniform type for now
+                self.output.write(6*self.indent + ('prepareToSend%ss(%d);\n' % (argtype, nargs)))
                 for argname in argnames:
-                    self.output.write(6*self.indent + ('sendFloat(%s);\n' % argname))
+                    self.output.write(6*self.indent + ('send%s(%s);\n' % (argtype, argname)))
                 self.output.write(6*self.indent + "serialize8(_checksum);\n")
             self.output.write(6*self.indent + '} break;\n\n')
 
