@@ -126,7 +126,7 @@ class Playstation(SpringyThrottleController):
 
     def __init__(self):
 
-        SpringyThrottleController.__init__(self, (-1,  2, -3, 0), 7)
+        SpringyThrottleController.__init__(self, (-1,  2, -5 if platform.system() == 'Linux' else -3, 0), 7)
 
 class ExtremePro3D(GameController):
 
