@@ -123,12 +123,13 @@ class Xbox360(SpringyThrottleController):
 
         return self.joystick.get_axis(self.aux) < -.5
 
+# This dictionary works with Windows 10 and Ubuntu 18.04
 controllers = {
     'Controller (Rock Candy Gamepad for Xbox 360)'       : Xbox360((-1,4,-3,0), 2), 
     'Generic X-Box pad'                                  : Xbox360((-1,3,-4,0), 5), 
     '2In1 USB Joystick'                                  : SpringyThrottleController((-1,2,-3,0), 7),
     'MY-POWER CO.,LTD. 2In1 USB Joystick'                : SpringyThrottleController((-1,2,-3,0), 7),
-    'Sony Interactive Entertainment Wireless Controller' : SpringyThrottleController((-1,2,-5,0), 7),
+    'Sony Interactive Entertainment Wireless Controller' : SpringyThrottleController((-1,3,-4,0), 7),
     'Logitech Extreme 3D'                                : GameController((-2,0,1,3), 0),
     'Logitech Logitech Extreme 3D'                       : GameController((-3,0,-1,2), 0),
     'FrSky Taranis Joystick'                             : RcTransmitter((0,1,2,5), 3),
