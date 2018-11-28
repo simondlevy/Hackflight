@@ -1,0 +1,8 @@
+ [Desktop Entry]
+ Name=Hackflight
+ Comment=Hackflight GCS
+ Exec=/home/levys/Documents/Arduino/libraries/Hackflight/extras/gcs/python/hackflight.sh
+ Icon=/home/levys/.local/share/icons/hackflight.png
+ Terminal=false
+ Type=Application
+ Categories=Utility;Application;Development;
