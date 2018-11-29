@@ -21,8 +21,8 @@ Hackflight is current working on the following platforms:
 * [Ladybug](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) brushed flight controller
 from Tlera Corp.
 
-* [SuperFly Hackable ESP8266 Flight Controller](https://www.tindie.com/products/onehorse/superfly-hackable-esp8266-flight-controller/) 
-from Pesky Products
+* [SuperFly](https://www.tindie.com/products/onehorse/superfly-hackable-esp8266-flight-controller/) 
+Hackable ESP8266 Flight Controlle rfrom Pesky Products
 
 * Certain [STM32F-based](https://github.com/simondlevy/Hackflight/tree/master/extras/stm32f) flight controllers
 
