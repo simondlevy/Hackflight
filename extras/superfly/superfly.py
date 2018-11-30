@@ -47,7 +47,8 @@ while True:
     # with zero for Aux1 and aux switch for Aux2
     cmds = (con.getThrottle(), con.getRoll(), con.getPitch(), con.getYaw(), 0, con.getAux())
 
-    print(cmds)
+    # Report commands for debugging
+    print('Throttle:%+2.2f Roll:%+2.2f Pitch:%+2.2f Yaw:%+2.2f Aux1:%+2.2f Aux2:%+2.2f' % cmds)
 
     # Send the array of commands to SuperFly
     sock.send(serialize_SET_RC_NORMAL(*cmds))
