@@ -1,7 +1,7 @@
 # MSPPG
 Multiwii Serial Protocol Parser Generator
 
-Steps:
+## Instructions
 
 1. Run <b>msppg.py</b>
 
@@ -17,7 +17,7 @@ Steps:
 
 6. Java users, Windows: use your favorite Java IDE (Netbeans, Eclipse) to build <b>msppg.jar</b>
 
-<b>Extending</b>
+## Extending
 
 The messages.json file currently contains just a few message specifications,
 but you can easily add to it by specifying additional messages from the the MSP
