@@ -9,13 +9,13 @@ Steps:
 
 3. Python users, Linux: <tt>sudo python3 setup.py install</tt>
 
- Python users, Windows: <tt>python3 setup.py install</tt>
+4. Python users, Windows: <tt>python3 setup.py install</tt>
 
-4. Java users, Linux: run <tt>make jar</tt> to build <b>msppg.jar</b>, which
+5. Java users, Linux: run <tt>make jar</tt> to build <b>msppg.jar</b>, which
    can then be used as a library for Android projects and other Java-based
    work.
 
-5. Java users, Windows: use your favorite Java IDE (Netbeans, Eclipse) to build <b>msppg.jar</b>
+6. Java users, Windows: use your favorite Java IDE (Netbeans, Eclipse) to build <b>msppg.jar</b>
 
 <b>Extending</b>
 
