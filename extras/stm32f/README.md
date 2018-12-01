@@ -8,7 +8,7 @@ the Cleanflight repository. It is easiest to compile this code on Linux, doing t
 
 3. cd to Cleanflight directory and do <tt>make arm\_sdk\_install</tt>
 
-4. In your <b>.bashr</b> file, add the line <tt>export PATH=$PATH:$HOME/Desktop/cleanflight/tools/gcc-arm-none-eabi-7-2017-q4-major/bin</tt>  (assuming you put Cleanflight in your Desktop directory).
+4. In your <b>~/.bashrc</b> file, add the line <tt>export PATH=$PATH:$HOME/Desktop/cleanflight/tools/gcc-arm-none-eabi-7-2017-q4-major/bin</tt>  (assuming you put Cleanflight in your Desktop directory).
 
 5. Edit the line in your [Makefile](https://github.com/simondlevy/Hackflight/blob/master/extras/stm32f/examples/alienflightf3v1_dsmx/Makefile#L26-L28)
 to reflect where you put Cleanflight. Then cd to the folder for your board and type
