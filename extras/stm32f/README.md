@@ -14,7 +14,7 @@ the Cleanflight repository. It is easiest to compile this code on Linux, doing t
 [Makefile](https://github.com/simondlevy/Hackflight/blob/master/extras/stm32f/examples/alienflightf3v1_dsmx/Makefile#L26-L28)
 to reflect where you put Cleanflight .
 
-6.cd to the folder for your board and type <tt>make</tt>.
+  6.cd to the folder for your board and type <tt>make</tt>.
 
 The following flight controllers are currently supported and have been tested:
 
