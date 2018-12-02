@@ -5,7 +5,7 @@ superfly.py : Python script to fly the SuperFly flight controller over wifi
 Requires: pygame
           https://github.com/simondlevy/pysticks
 
-Copyright (C) Simon D. Levy 2016
+Copyright (C) Simon D. Levy 2018
 
 This file is part of Hackflight.
 
