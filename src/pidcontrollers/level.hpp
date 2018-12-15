@@ -31,6 +31,7 @@
 #include "debug.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
+#include "filters.hpp"
 
 namespace hf {
 
@@ -56,8 +57,8 @@ namespace hf {
                 // given max angle, the following relation must hold true:
                 // 0.5 * _demandsToAngle = maxAngle
                 // Since we work in radians:
-                // _demandsToAngle = (maxAngle*PI/180) * 2
-                _demandsToAngle = maxAngle * 2 * M_PI / 180.0f;
+                // _demandsToAngle = deg2rad(maxAngle) * 2
+                _demandsToAngle = 2* Filter::deg2rad(maxAngle);
             }
 
             Level(float rollPitchLevelP) : Level(rollPitchLevelP, rollPitchLevelP)

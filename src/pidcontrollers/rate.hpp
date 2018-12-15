@@ -47,11 +47,6 @@ namespace hf {
 
         private: 
 
-            float degreesToRadians(float deg)
-            {
-                return M_PI * deg / 180.;
-            }
-
             // Arbitrary constants
             const float GYRO_WINDUP_MAX             = 6.0f;
             const float BIG_GYRO_DEGREES_PER_SECOND = 40.0f; 
@@ -86,8 +81,8 @@ namespace hf {
               }
 
               // Convert degree parameters to radians for use later
-              _bigGyroRate = degreesToRadians(BIG_GYRO_DEGREES_PER_SECOND);
-              maxArmingAngle = degreesToRadians(MAX_ARMING_ANGLE_DEGREES);
+              _bigGyroRate   = Filter::deg2rad(BIG_GYRO_DEGREES_PER_SECOND);
+              maxArmingAngle = Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
 
               // Initialize gyro error integral
               resetIntegral();
