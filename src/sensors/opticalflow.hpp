@@ -40,29 +40,32 @@ namespace hf {
             PMW3901 _flowSensor = PMW3901(10);
 
             // Track elapsed time for periodic readiness
-            bool _previousTime = 0;
+            float _previousTime;
 
+            // While tracking elapsed time, store delta time
+            float _deltaTime;
 
         protected:
 
             virtual void modifyState(state_t & state, float time) override
             {
-                (void)time; 
-
                 int16_t deltaX=0, deltaY=0;
                 _flowSensor.readMotionCount(&deltaX, &deltaY);
 
-                state.velocityForward   =  (float)deltaY;
-                state.velocityRightward = -(float)deltaX;
+                state.velocityForward   = 0;
+                state.velocityRightward = 0;
             }
 
             virtual bool ready(float time) override
             {
-                _previousTime = time;
+                _deltaTime = time - _previousTime; 
 
-                bool result = (time - _previousTime > UPDATE_PERIOD);
+                bool result = _deltaTime > UPDATE_PERIOD;
 
-                _previousTime = time;
+                if (result) {
+
+                    _previousTime = time;
+                }
 
                 return result;
             }
@@ -78,6 +81,7 @@ namespace hf {
                     }
                 }
 
+                _previousTime = 0;
             }
 
     };  // class OpticalFlow 
