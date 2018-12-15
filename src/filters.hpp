@@ -30,6 +30,8 @@ namespace hf {
 
         public:
 
+            // Simple static functions
+
             static float max(float a, float b)
             {
                 return a > b ? a : b;
@@ -48,6 +50,11 @@ namespace hf {
             static float constrainAbs(float val, float max)
             {
                 return constrainMinMax(val, -max, +max);
+            }
+
+            static float deg2rad(float degrees)
+            {
+                return degrees * M_PI / 180;
             }
 
     }; // class Filter

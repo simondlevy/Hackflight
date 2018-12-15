@@ -31,10 +31,8 @@ namespace hf {
         private:
 
             // Global constants for 6 DoF quaternion filter
-            const float GYRO_MEAS_ERROR = M_PI * (40.0f / 180.0f);
-            const float GYRO_MEAS_DRIFT = M_PI * (0.0f  / 180.0f);
-            const float BETA = sqrtf(3.0f / 4.0f) * GYRO_MEAS_ERROR; 
-            const float ZETA = sqrt(3.0f / 4.0f) * GYRO_MEAS_DRIFT;  
+            const float GYRO_MEAS_ERROR_DEG = 40.f;
+            const float GYRO_MEAS_DRIFT_DEG =  0.f;
 
             // Update quaternion after this number of gyro updates
             const uint8_t QUATERNION_DIVISOR = 5;
@@ -42,11 +40,9 @@ namespace hf {
             // Supports computing quaternion after a certain number of IMU readings
             uint8_t _quatCycleCount = 0;
 
-            // Built into Arduino, but not other platforms 
-            static float deg2rad(float degrees) 
-            {
-                return M_PI * degrees / 180;
-            }
+            // Params passed to Madgwick quaternion constructor
+            const float _beta = sqrtf(3.0f / 4.0f) * Filter::deg2rad(GYRO_MEAS_ERROR_DEG);
+            const float _zeta = sqrtf(3.0f / 4.0f) * Filter::deg2rad(GYRO_MEAS_DRIFT_DEG);  
 
         protected:
 
@@ -59,7 +55,7 @@ namespace hf {
 
             // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
             // using a 6DOF fiter (accel, gyro)
-            MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(BETA, ZETA);
+            MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(_beta, _zeta);
 
         public:
 
@@ -69,9 +65,9 @@ namespace hf {
                 if (imuRead()) {
 
                     // Convert gyrometer values from degrees/sec to radians/sec
-                    _gx = deg2rad(_gx);
-                    _gy = deg2rad(_gy);
-                    _gz = deg2rad(_gz);
+                    _gx = Filter::deg2rad(_gx);
+                    _gy = Filter::deg2rad(_gy);
+                    _gz = Filter::deg2rad(_gz);
 
                     // Store output
                     gyro[0] = _gx;
