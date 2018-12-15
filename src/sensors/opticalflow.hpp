@@ -1,6 +1,10 @@
 /*
    opticalflow.hpp : Support for PMW3901 optical-flow sensor
 
+   State estimation adapted from:
+
+       https://github.com/bitcraze/crazyflie-firmware/blob/master/src/modules/src/estimator_kalman.c
+
    Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
@@ -45,12 +49,44 @@ namespace hf {
             // While tracking elapsed time, store delta time
             float _deltaTime;
 
+            float _omegax_b;
+            float _omegay_b;
+            float _dx_g;
+            float _dy_g;
+            float _z_g;
+            float _predictedNX;
+            float _predictedNY;
+            float _measuredNX;
+            float _measuredNY;
+
         protected:
 
             virtual void modifyState(state_t & state, float time) override
             {
                 int16_t deltaX=0, deltaY=0;
                 _flowSensor.readMotionCount(&deltaX, &deltaY);
+
+                // ~~~ Camera constants ~~~
+                // The angle of aperture is guessed from the raw data register and thankfully look to be symmetric
+                float Npix = 30.0;                      // [pixels] (same in x and y)
+                //float thetapix = DEG_TO_RAD * 4.2f;
+                //~~~ Body rates ~~~
+                // TODO check if this is feasible or if some filtering has to be done
+                //_omegax_b = sensors->gyro.x * DEG_TO_RAD;
+                //_omegay_b = sensors->gyro.y * DEG_TO_RAD;
+
+                // ~~~ Moves the body velocity into the global coordinate system ~~~
+                // [bar{x},bar{y},bar{z}]_G = R*[bar{x},bar{y},bar{z}]_B
+                //
+                // \dot{x}_G = (R^T*[dot{x}_B,dot{y}_B,dot{z}_B])\dot \hat{x}_G
+                // \dot{x}_G = (R^T*[dot{x}_B,dot{y}_B,dot{z}_B])\dot \hat{x}_G
+                //
+                // where \hat{} denotes a basis vector, \dot{} denotes a derivative and
+                // _G and _B refer to the global/body coordinate systems.
+
+                // Modification 1
+                //dx_g = R[0][0] * S[STATE_PX] + R[0][1] * S[STATE_PY] + R[0][2] * S[STATE_PZ];
+                //dy_g = R[1][0] * S[STATE_PX] + R[1][1] * S[STATE_PY] + R[1][2] * S[STATE_PZ];
 
                 state.velocityForward   = 0;
                 state.velocityRightward = 0;
