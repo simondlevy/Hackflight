@@ -31,6 +31,7 @@
 
 #include "debug.hpp"
 #include "peripheral.hpp"
+#include "filters.hpp"
 
 namespace hf {
 
@@ -49,44 +50,92 @@ namespace hf {
             // While tracking elapsed time, store delta time
             float _deltaTime;
 
-            float _omegax_b;
-            float _omegay_b;
-            float _dx_g;
-            float _dy_g;
-            float _z_g;
-            float _predictedNX;
-            float _predictedNY;
-            float _measuredNX;
-            float _measuredNY;
+            // The quad's attitude as a rotation matrix (used by the prediction, updated by the finalization)
+            static constexpr float R[3][3] = {{1,0,0},{0,1,0},{0,0,1}};
+           
+            // The quad's state, stored as a column vector
+            typedef enum
+            {
+                STATE_X,  // Position
+                STATE_Y, 
+                STATE_Z, 
+                STATE_PX, // Velocity
+                STATE_PY, 
+                STATE_PZ, 
+                STATE_D0, // Attitude error
+                STATE_D1, 
+                STATE_D2, 
+                STATE_DIM
+            } stateIdx_t;
+
+
+            float S[STATE_DIM] = {0.f};
+
+            float _omegax_b = 0;
+            float _omegay_b = 0;
+            float _dx_g = 0;
+            float _dy_g = 0;
+            float _z_g = 0;
+            float _predictedNX = 0;
+            float _predictedNY = 0;
+            float _measuredNX = 0;
+            float _measuredNY = 0;
+
+            static constexpr float STDDEV = 0.25f;
+
+            // ~~~ Camera constants ~~~
+            // The angle of aperture is guessed from the raw data register and thankfully look to be symmetric
+            float Npix = 30.0;                      // [pixels] (same in x and y)
+            float thetapix = Filter::deg2rad(4.2f);
 
         protected:
 
             virtual void modifyState(state_t & state, float time) override
             {
-                int16_t deltaX=0, deltaY=0;
-                _flowSensor.readMotionCount(&deltaX, &deltaY);
+                S[STATE_Z] = state.altitude;
+                S[STATE_PZ] = state.variometer;
 
-                // ~~~ Camera constants ~~~
-                // The angle of aperture is guessed from the raw data register and thankfully look to be symmetric
-                float Npix = 30.0;                      // [pixels] (same in x and y)
-                //float thetapix = DEG_TO_RAD * 4.2f;
+                int16_t dpixelx=0, dpixely=0;
+                _flowSensor.readMotionCount(&dpixelx, &dpixely);
+
                 //~~~ Body rates ~~~
                 // TODO check if this is feasible or if some filtering has to be done
-                //_omegax_b = sensors->gyro.x * DEG_TO_RAD;
-                //_omegay_b = sensors->gyro.y * DEG_TO_RAD;
+                _omegax_b = state.angularVelocities[0];
+                _omegay_b = state.angularVelocities[1];
 
-                // ~~~ Moves the body velocity into the global coordinate system ~~~
-                // [bar{x},bar{y},bar{z}]_G = R*[bar{x},bar{y},bar{z}]_B
-                //
-                // \dot{x}_G = (R^T*[dot{x}_B,dot{y}_B,dot{z}_B])\dot \hat{x}_G
-                // \dot{x}_G = (R^T*[dot{x}_B,dot{y}_B,dot{z}_B])\dot \hat{x}_G
-                //
-                // where \hat{} denotes a basis vector, \dot{} denotes a derivative and
-                // _G and _B refer to the global/body coordinate systems.
+                _dx_g = S[STATE_PX];
+                _dy_g = S[STATE_PY];
 
-                // Modification 1
-                //dx_g = R[0][0] * S[STATE_PX] + R[0][1] * S[STATE_PY] + R[0][2] * S[STATE_PZ];
-                //dy_g = R[1][0] * S[STATE_PX] + R[1][1] * S[STATE_PY] + R[1][2] * S[STATE_PZ];
+                // Saturate elevation in prediction and correction to avoid singularities
+                _z_g = S[STATE_Z] < 0.1f ?  0.1f : S[STATE_Z];
+
+                // ~~~ X velocity prediction and update ~~~
+                // predicts the number of accumulated pixels in the x-direction
+                float omegaFactor = 1.25f;
+                float hx[STATE_DIM] = {0};
+                //arm_matrix_instance_f32 Hx = {1, STATE_DIM, hx};
+                _predictedNX = (_deltaTime * Npix / thetapix ) * ((_dx_g * R[2][2] / _z_g) - omegaFactor * _omegay_b);
+                _measuredNX = (float)dpixelx;
+
+                // derive measurement equation with respect to dx (and z?)
+                hx[STATE_Z] = (Npix * _deltaTime / thetapix) * ((R[2][2] * _dx_g) / (-_z_g * _z_g));
+                hx[STATE_PX] = (Npix * _deltaTime / thetapix) * (R[2][2] / _z_g);
+
+                //First update
+                //stateEstimatorScalarUpdate(&Hx, measuredNX-predictedNX, STDDEV);
+
+                // ~~~ Y velocity prediction and update ~~~
+                float hy[STATE_DIM] = {0};
+                //arm_matrix_instance_f32 Hy = {1, STATE_DIM, hy};
+                _predictedNY = (_deltaTime * Npix / thetapix ) * ((_dy_g * R[2][2] / _z_g) + omegaFactor * _omegax_b);
+                _measuredNY = (float)dpixely;
+
+                // derive measurement equation with respect to dy (and z?)
+                hy[STATE_Z] = (Npix * _deltaTime / thetapix) * ((R[2][2] * _dy_g) / (-_z_g * _z_g));
+                hy[STATE_PY] = (Npix * _deltaTime / thetapix) * (R[2][2] / _z_g);
+
+                // Second update
+                //stateEstimatorScalarUpdate(&Hy, measuredNY-predictedNY, STDDEV);
 
                 state.velocityForward   = 0;
                 state.velocityRightward = 0;
@@ -118,6 +167,7 @@ namespace hf {
                 }
 
                 _previousTime = 0;
+
             }
 
     };  // class OpticalFlow 

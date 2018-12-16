@@ -33,9 +33,10 @@ typedef struct {
 
 typedef struct {
 
+    bool  armed;
+
     float eulerAngles[3];
     float angularVelocities[3];
-    bool  armed;
     float altitude;
     float variometer;
     float positionX;
