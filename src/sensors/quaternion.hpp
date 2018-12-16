@@ -80,4 +80,4 @@ namespace hf {
 
     };  // class Quaternion
 
-} // namespace
+} // namespace hf
