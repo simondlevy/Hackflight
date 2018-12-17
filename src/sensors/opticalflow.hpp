@@ -108,27 +108,29 @@ namespace hf {
                 Matrix::mult(Pm, HTm, PHTm); // PH'
                 float R = stdMeasNoise*stdMeasNoise;
                 float HPHR = R; // HPH' + R
-                /*
+                
                 for (int i=0; i<STATE_DIM; i++) { // Add the element of HPH' to the above
-                    HPHR += Hm.pData(i)*PHTd[i]; // this obviously only works if the update is scalar (as in this function)
+                    HPHR += Hm.get(i,0)*PHTm.get(i,0); // this obviously only works if the update is scalar (as in this function)
                 }
                 //configASSERT(!isnan(HPHR));
-
 
                 // ====== MEASUREMENT UPDATE ======
                 // Calculate the Kalman gain and perform the state update
                 for (int i=0; i<STATE_DIM; i++) {
-                    K[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-                    S[i] = S[i] + K[i] * error; // state update
+                    Km.set(i,0, PHTm.get(i,0)/HPHR); // kalman gain = (PH' (HPH' + R )^-1)
+                    S[i] += Km.get(i,0) * error; // state update
                 }
                 //stateEstimatorAssertNotNaN();
 
                 // ====== COVARIANCE UPDATE ======
                 Matrix::mult(Km, Hm, tmpNN1m); // KH
-                for (int i=0; i<STATE_DIM; i++) { tmpNN1d[STATE_DIM*i+i] -= 1; } // KH - I
+                for (int i=0; i<STATE_DIM; i++) { 
+                    tmpNN1m.set(i,i, tmpNN1m.get(i,i)-1);// KH - I
+                }
                 Matrix::trans(tmpNN1m, tmpNN2m); // (KH - I)'
                 Matrix::mult(tmpNN1m, Pm, tmpNN3m); // (KH - I)*P
                 Matrix::mult(tmpNN3m, tmpNN2m, Pm); // (KH - I)*P*(KH - I)'
+                /*
                 //stateEstimatorAssertNotNaN();
                 // add the measurement variance and ensure boundedness and symmetry
                 // TODO: Why would it hit these bounds? Needs to be investigated.

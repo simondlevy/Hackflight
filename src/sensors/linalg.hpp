@@ -46,9 +46,14 @@ namespace hf {
                 memset(_vals, 0, rows*cols*sizeof(float));
             }
 
-            float pData(uint8_t i)
+            float get(uint8_t j, uint8_t k)
             {
-                return _vals[0][i];
+                return _vals[j][k];
+            }
+
+            float set(uint8_t j, uint8_t k, float val)
+            {
+                _vals[j][k] = val;
             }
 
             void dump(void)
