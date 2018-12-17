@@ -84,6 +84,7 @@ namespace hf {
 
                         float dot = 0;
 
+                        c._vals[j][k] = dot;
 
                     }
                 }

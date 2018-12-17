@@ -31,15 +31,21 @@ int main(int argc, char ** argv)
 {
     float v[9] = {1,2,3,4,5,6,7,8,9};
 
-    hf::Matrix a = hf::Matrix(3,3,v);
+    hf::Matrix a = hf::Matrix(2,3,v);
 
     a.dump();
 
     printf("\n");
 
-    hf::Matrix at(3,3);
+    hf::Matrix b(3,2,v);
 
-    hf::Matrix::trans(a, at);
+    b.dump();
 
-    at.dump();
+    printf("\n");
+
+    hf::Matrix c = hf::Matrix(2,2);
+
+    hf::Matrix::mult(a, b, c);
+
+    c.dump();
 }
