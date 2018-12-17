@@ -81,6 +81,9 @@ namespace hf {
             float _measuredNX = 0;
             float _measuredNY = 0;
 
+            float P[STATE_DIM*STATE_DIM];
+            Matrix Pm = Matrix(STATE_DIM, STATE_DIM, P);
+
             static constexpr float STDDEV = 0.25f;
 
             // ~~~ Camera constants ~~~
@@ -88,39 +91,35 @@ namespace hf {
             float Npix = 30.0;                      // [pixels] (same in x and y)
             float thetapix = Filter::deg2rad(4.2f);
 
-            void stateEstimatorScalarUpdate(float *Hm, float error, float stdMeasNoise)
+            void stateEstimatorScalarUpdate(Matrix & Hm, float error, float stdMeasNoise)
             {
                 // The Kalman gain as a column vector
                 static float K[STATE_DIM];
-                //static arm_matrix_instance_f32 Km = {STATE_DIM, 1, (float *)K};
+                static Matrix Km(STATE_DIM, 1, K);
 
                 // Temporary matrices for the covariance updates
                 static float tmpNN1d[STATE_DIM * STATE_DIM];
-                //static arm_matrix_instance_f32 tmpNN1m = {STATE_DIM, STATE_DIM, tmpNN1d};
+                static Matrix tmpNN1m(STATE_DIM, STATE_DIM, tmpNN1d);
 
                 static float tmpNN2d[STATE_DIM * STATE_DIM];
-                //static arm_matrix_instance_f32 tmpNN2m = {STATE_DIM, STATE_DIM, tmpNN2d};
+                static Matrix tmpNN2m(STATE_DIM, STATE_DIM, tmpNN2d);
 
                 static float tmpNN3d[STATE_DIM * STATE_DIM];
-                //static arm_matrix_instance_f32 tmpNN3m = {STATE_DIM, STATE_DIM, tmpNN3d};
+                static Matrix tmpNN3m(STATE_DIM, STATE_DIM, tmpNN3d);
 
                 static float HTd[STATE_DIM * 1];
-                //static arm_matrix_instance_f32 HTm = {STATE_DIM, 1, HTd};
+                static Matrix HTm(STATE_DIM, 1, HTd);
 
                 static float PHTd[STATE_DIM * 1];
-                //static arm_matrix_instance_f32 PHTm = {STATE_DIM, 1, PHTd};
-
-                //configASSERT(Hm->numRows == 1);
-                //configASSERT(Hm->numCols == STATE_DIM);
-
-                /*
+                static Matrix PHTm(STATE_DIM, 1, PHTd);
 
                 // ====== INNOVATION COVARIANCE ======
 
-                mat_trans(Hm, &HTm);
-                mat_mult(&Pm, &HTm, &PHTm); // PH'
+                Matrix::trans(Hm, HTm);
+                Matrix::mult(Pm, HTm, PHTm); // PH'
                 float R = stdMeasNoise*stdMeasNoise;
                 float HPHR = R; // HPH' + R
+                /*
                 for (int i=0; i<STATE_DIM; i++) { // Add the element of HPH' to the above
                     HPHR += Hm->pData[i]*PHTd[i]; // this obviously only works if the update is scalar (as in this function)
                 }
@@ -135,11 +134,11 @@ namespace hf {
                 stateEstimatorAssertNotNaN();
 
                 // ====== COVARIANCE UPDATE ======
-                mat_mult(&Km, Hm, &tmpNN1m); // KH
+                Matrix::mult(&Km, Hm, &tmpNN1m); // KH
                 for (int i=0; i<STATE_DIM; i++) { tmpNN1d[STATE_DIM*i+i] -= 1; } // KH - I
-                mat_trans(&tmpNN1m, &tmpNN2m); // (KH - I)'
-                mat_mult(&tmpNN1m, &Pm, &tmpNN3m); // (KH - I)*P
-                mat_mult(&tmpNN3m, &tmpNN2m, &Pm); // (KH - I)*P*(KH - I)'
+                Matrix::trans(&tmpNN1m, &tmpNN2m); // (KH - I)'
+                Matrix::mult(&tmpNN1m, &Pm, &tmpNN3m); // (KH - I)*P
+                Matrix::mult(&tmpNN3m, &tmpNN2m, &Pm); // (KH - I)*P*(KH - I)'
                 stateEstimatorAssertNotNaN();
                 // add the measurement variance and ensure boundedness and symmetry
                 // TODO: Why would it hit these bounds? Needs to be investigated.
@@ -188,7 +187,6 @@ namespace hf {
                 float omegaFactor = 1.25f;
                 float hx[STATE_DIM] = {0};
                 Matrix Hx(1, STATE_DIM, hx);
-                //arm_matrix_instance_f32 Hx = {1, STATE_DIM, hx};
                 _predictedNX = (_deltaTime * Npix / thetapix ) * ((_dx_g * R[2][2] / _z_g) - omegaFactor * _omegay_b);
                 _measuredNX = (float)dpixelx;
 
@@ -201,7 +199,7 @@ namespace hf {
 
                 // ~~~ Y velocity prediction and update ~~~
                 float hy[STATE_DIM] = {0};
-                //arm_matrix_instance_f32 Hy = {1, STATE_DIM, hy};
+                Matrix Hy(1, STATE_DIM, hy);
                 _predictedNY = (_deltaTime * Npix / thetapix ) * ((_dy_g * R[2][2] / _z_g) + omegaFactor * _omegax_b);
                 _measuredNY = (float)dpixely;
 

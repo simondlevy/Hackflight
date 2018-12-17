@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <string.h>
+
 namespace hf {
 
     class Matrix {
@@ -41,6 +43,14 @@ namespace hf {
                 _rows = rows;
                 _cols = cols;
                 memcpy(_vals, vals, rows*cols*sizeof(float));
+            }
+
+            static void trans(Matrix & a, Matrix & at)
+            {
+            }
+
+            static void mult(Matrix & a, Matrix & b, Matrix & c)
+            {
             }
 
     };  // class Matrix
