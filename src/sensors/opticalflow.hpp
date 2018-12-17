@@ -42,6 +42,10 @@ namespace hf {
 
             static constexpr float UPDATE_PERIOD = .01f;
 
+            // The bounds on the covariance, these shouldn't be hit, but sometimes are... why?
+            static constexpr float MAX_COVARIANCE = 100.f;
+            static constexpr float MIN_COVARIANCE = 1e-6f;
+
             // Use digital pin 10 for chip select
             PMW3901 _flowSensor = PMW3901(10);
 
@@ -53,7 +57,7 @@ namespace hf {
 
             // The quad's attitude as a rotation matrix (used by the prediction, updated by the finalization)
             static constexpr float R[3][3] = {{1,0,0},{0,1,0},{0,0,1}};
-           
+
             // The quad's state, stored as a column vector
             typedef enum
             {
@@ -108,11 +112,11 @@ namespace hf {
                 Matrix::mult(Pm, HTm, PHTm); // PH'
                 float R = stdMeasNoise*stdMeasNoise;
                 float HPHR = R; // HPH' + R
-                
+
                 for (int i=0; i<STATE_DIM; i++) { // Add the element of HPH' to the above
                     HPHR += Hm.get(i,0)*PHTm.get(i,0); // this obviously only works if the update is scalar (as in this function)
                 }
-                //configASSERT(!isnan(HPHR));
+                //configASSERT(!std::isnan(HPHR));
 
                 // ====== MEASUREMENT UPDATE ======
                 // Calculate the Kalman gain and perform the state update
@@ -130,26 +134,28 @@ namespace hf {
                 Matrix::trans(tmpNN1m, tmpNN2m); // (KH - I)'
                 Matrix::mult(tmpNN1m, Pm, tmpNN3m); // (KH - I)*P
                 Matrix::mult(tmpNN3m, tmpNN2m, Pm); // (KH - I)*P*(KH - I)'
-                /*
+
                 //stateEstimatorAssertNotNaN();
                 // add the measurement variance and ensure boundedness and symmetry
                 // TODO: Why would it hit these bounds? Needs to be investigated.
                 for (int i=0; i<STATE_DIM; i++) {
                     for (int j=i; j<STATE_DIM; j++) {
-                        float v = K[i] * R * K[j];
-                        float p = 0.5f*P[i*STATE_DIM+j] + 0.5f*P[j*STATE_DIM+i] + v; // add measurement noise
-                        if (isnan(p) || p > MAX_COVARIANCE) {
-                            P[i][j] = P[j][i] = MAX_COVARIANCE;
+                        float v = Km.get(i,0) * R * Km.get(j,0);
+                        float p = 0.5f*Pm.get(i,j) + 0.5f*Pm.get(j,i) + v; // add measurement noise
+                        if (std::isnan(p) || p > MAX_COVARIANCE) {
+                            Pm.set(i,j, MAX_COVARIANCE);
+                            Pm.set(j,i, MAX_COVARIANCE);
                         } else if ( i==j && p < MIN_COVARIANCE ) {
-                            P[i][j] = P[j][i] = MIN_COVARIANCE;
+                            Pm.set(i,j, MIN_COVARIANCE);
+                            Pm.set(j,i, MIN_COVARIANCE);
                         } else {
-                            P[i][j] = P[j][i] = p;
+                            Pm.set(i,j, p);
+                            Pm.set(j,i, p);
                         }
                     }
                 }
 
                 //stateEstimatorAssertNotNaN();
-                */
             }
 
 
@@ -179,9 +185,9 @@ namespace hf {
                 float omegaFactor = 1.25f;
                 float hx[STATE_DIM] = {0};
                 /*
-                Matrix Hx(1, STATE_DIM, hx);
-                _predictedNX = (_deltaTime * Npix / thetapix ) * ((_dx_g * R[2][2] / _z_g) - omegaFactor * _omegay_b);
-                _measuredNX = (float)dpixelx;
+                   Matrix Hx(1, STATE_DIM, hx);
+                   _predictedNX = (_deltaTime * Npix / thetapix ) * ((_dx_g * R[2][2] / _z_g) - omegaFactor * _omegay_b);
+                   _measuredNX = (float)dpixelx;
 
                 // derive measurement equation with respect to dx (and z?)
                 hx[STATE_Z] = (Npix * _deltaTime / thetapix) * ((R[2][2] * _dx_g) / (-_z_g * _z_g));
