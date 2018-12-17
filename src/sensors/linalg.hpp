@@ -46,6 +46,13 @@ namespace hf {
                 memcpy(_vals, vals, rows*cols*sizeof(float));
             }
 
+             Matrix(uint8_t rows, uint8_t cols) 
+            {
+                _rows = rows;
+                _cols = cols;
+                memset(_vals, 0, rows*cols*sizeof(float));
+            }
+
             void dump(void)
             {
                 for (uint8_t j=0; j<_rows; ++j) {

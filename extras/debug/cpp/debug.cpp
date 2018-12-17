@@ -33,5 +33,9 @@ int main(int argc, char ** argv)
 
     hf::Matrix a = hf::Matrix(3,3,v);
 
-    a.dump();
+    hf::Matrix at(3,3);
+
+    hf::Matrix::trans(a, at);
+
+    at.dump();
 }
