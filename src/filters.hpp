@@ -57,6 +57,12 @@ namespace hf {
                 return degrees * M_PI / 180;
             }
 
+
+            static float round2(float val)
+            {
+                return int(val*100)/100.f;
+            }
+
     }; // class Filter
 
     class LowPassFilter {

@@ -69,10 +69,10 @@ namespace hf {
                     _gy = Filter::deg2rad(_gy);
                     _gz = Filter::deg2rad(_gz);
 
-                    // Store output
-                    gyro[0] = int(_gx*100)/100.0;
-                    gyro[1] = int(_gy*100)/100.0;
-                    gyro[2] = int(_gz*100)/100.0;
+                    // Round to two decimal places
+                    gyro[0] = Filter::round2(_gx);
+                    gyro[1] = Filter::round2(_gy);
+                    gyro[2] = Filter::round2(_gz);
 
 
                     return true;

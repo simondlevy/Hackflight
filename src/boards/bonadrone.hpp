@@ -183,7 +183,7 @@ namespace hf {
 
             virtual void writeMotor(uint8_t index, float value) override
             {
-                value = int(value*100)/100.0;
+                value = Filter::round2(value); // round to two decimal places
                 analogWrite(MOTOR_PINS[index], (uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)));
             }
 
