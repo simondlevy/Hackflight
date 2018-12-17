@@ -177,6 +177,8 @@ namespace hf {
                 _dx_g = S[STATE_PX];
                 _dy_g = S[STATE_PY];
 
+                Debug::printf("%+3.3f %+3.3f\n", _dx_g, _dy_g);
+
                 // Saturate elevation in prediction and correction to avoid singularities
                 _z_g = S[STATE_Z] < 0.1f ?  0.1f : S[STATE_Z];
 
