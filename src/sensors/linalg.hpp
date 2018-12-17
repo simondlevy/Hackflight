@@ -78,17 +78,15 @@ namespace hf {
 
             static void mult(Matrix & a, Matrix & b, Matrix & c)
             {
-                for (uint8_t j=0; j<c._rows; ++j) {
-
-                    for (uint8_t k=0; k<c._cols; ++k) {
-
-                        float dot = 0;
-
-                        c._vals[j][k] = dot;
-
+                for(uint8_t i=0; i<a._rows; ++i) {
+                    for(uint8_t j=0; j<b._cols; ++j) {
+                        c._vals[i][j] = 0;
+                        for(uint8_t k=0; k<a._cols; ++k) {
+                            c._vals[i][j] += a._vals[i][k] *b._vals[k][j];
+                        }
                     }
                 }
-             }
+            }
 
     };  // class Matrix
 
