@@ -29,4 +29,4 @@ extras/gcs/python/build
 extras/gcs/python/dist/*
 extras/gcs/python/hackflight-gcs
 extras/parser/build
-extras/debug/linalg/debug
+extras/debug/cpp/debug

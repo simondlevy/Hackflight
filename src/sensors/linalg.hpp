@@ -21,6 +21,7 @@
 #pragma once
 
 #include <string.h>
+#include <debug.hpp>
 
 namespace hf {
 
@@ -43,6 +44,16 @@ namespace hf {
                 _rows = rows;
                 _cols = cols;
                 memcpy(_vals, vals, rows*cols*sizeof(float));
+            }
+
+            void dump(void)
+            {
+                for (uint8_t j=0; j<_rows; ++j) {
+                    for (uint8_t k=0; k<_cols; ++k) {
+                        Debug::printf("%+2.2f ", _vals[j*_cols+k]);
+                    }
+                    Debug::printf("\n");
+                }
             }
 
             static void trans(Matrix & a, Matrix & at)
