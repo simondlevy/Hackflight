@@ -39,22 +39,16 @@ namespace hf {
 
         public:
 
-            Matrix(uint8_t rows, uint8_t cols, float * vals) 
-            {
-                _rows = rows;
-                _cols = cols;
-                for (uint8_t j=0; j<rows; ++j) {
-                    for (uint8_t k=0; k<cols; ++k) {
-                        _vals[j][k] = vals[j*cols+k];
-                    }
-                }
-            }
-
-             Matrix(uint8_t rows, uint8_t cols) 
+            Matrix(uint8_t rows, uint8_t cols) 
             {
                 _rows = rows;
                 _cols = cols;
                 memset(_vals, 0, rows*cols*sizeof(float));
+            }
+
+            float pData(uint8_t i)
+            {
+                return _vals[0][i];
             }
 
             void dump(void)

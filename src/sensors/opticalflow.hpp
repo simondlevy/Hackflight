@@ -81,8 +81,7 @@ namespace hf {
             float _measuredNX = 0;
             float _measuredNY = 0;
 
-            float P[STATE_DIM*STATE_DIM];
-            Matrix Pm = Matrix(STATE_DIM, STATE_DIM, P);
+            Matrix Pm = Matrix(STATE_DIM, STATE_DIM);
 
             static constexpr float STDDEV = 0.25f;
 
@@ -94,24 +93,14 @@ namespace hf {
             void stateEstimatorScalarUpdate(Matrix & Hm, float error, float stdMeasNoise)
             {
                 // The Kalman gain as a column vector
-                static float K[STATE_DIM];
-                static Matrix Km(STATE_DIM, 1, K);
+                static Matrix Km(STATE_DIM, 1);
 
                 // Temporary matrices for the covariance updates
-                static float tmpNN1d[STATE_DIM * STATE_DIM];
-                static Matrix tmpNN1m(STATE_DIM, STATE_DIM, tmpNN1d);
-
-                static float tmpNN2d[STATE_DIM * STATE_DIM];
-                static Matrix tmpNN2m(STATE_DIM, STATE_DIM, tmpNN2d);
-
-                static float tmpNN3d[STATE_DIM * STATE_DIM];
-                static Matrix tmpNN3m(STATE_DIM, STATE_DIM, tmpNN3d);
-
-                static float HTd[STATE_DIM * 1];
-                static Matrix HTm(STATE_DIM, 1, HTd);
-
-                static float PHTd[STATE_DIM * 1];
-                static Matrix PHTm(STATE_DIM, 1, PHTd);
+                static Matrix tmpNN1m(STATE_DIM, STATE_DIM);
+                static Matrix tmpNN2m(STATE_DIM, STATE_DIM);
+                static Matrix tmpNN3m(STATE_DIM, STATE_DIM);
+                static Matrix HTm(STATE_DIM, 1);
+                static Matrix PHTm(STATE_DIM, 1);
 
                 // ====== INNOVATION COVARIANCE ======
 
@@ -121,9 +110,10 @@ namespace hf {
                 float HPHR = R; // HPH' + R
                 /*
                 for (int i=0; i<STATE_DIM; i++) { // Add the element of HPH' to the above
-                    HPHR += Hm->pData[i]*PHTd[i]; // this obviously only works if the update is scalar (as in this function)
+                    HPHR += Hm.pData(i)*PHTd[i]; // this obviously only works if the update is scalar (as in this function)
                 }
-                configASSERT(!isnan(HPHR));
+                //configASSERT(!isnan(HPHR));
+
 
                 // ====== MEASUREMENT UPDATE ======
                 // Calculate the Kalman gain and perform the state update
@@ -131,21 +121,21 @@ namespace hf {
                     K[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
                     S[i] = S[i] + K[i] * error; // state update
                 }
-                stateEstimatorAssertNotNaN();
+                //stateEstimatorAssertNotNaN();
 
                 // ====== COVARIANCE UPDATE ======
-                Matrix::mult(&Km, Hm, &tmpNN1m); // KH
+                Matrix::mult(Km, Hm, tmpNN1m); // KH
                 for (int i=0; i<STATE_DIM; i++) { tmpNN1d[STATE_DIM*i+i] -= 1; } // KH - I
-                Matrix::trans(&tmpNN1m, &tmpNN2m); // (KH - I)'
-                Matrix::mult(&tmpNN1m, &Pm, &tmpNN3m); // (KH - I)*P
-                Matrix::mult(&tmpNN3m, &tmpNN2m, &Pm); // (KH - I)*P*(KH - I)'
-                stateEstimatorAssertNotNaN();
+                Matrix::trans(tmpNN1m, tmpNN2m); // (KH - I)'
+                Matrix::mult(tmpNN1m, Pm, tmpNN3m); // (KH - I)*P
+                Matrix::mult(tmpNN3m, tmpNN2m, Pm); // (KH - I)*P*(KH - I)'
+                //stateEstimatorAssertNotNaN();
                 // add the measurement variance and ensure boundedness and symmetry
                 // TODO: Why would it hit these bounds? Needs to be investigated.
                 for (int i=0; i<STATE_DIM; i++) {
                     for (int j=i; j<STATE_DIM; j++) {
                         float v = K[i] * R * K[j];
-                        float p = 0.5f*P[i][j] + 0.5f*P[j][i] + v; // add measurement noise
+                        float p = 0.5f*P[i*STATE_DIM+j] + 0.5f*P[j*STATE_DIM+i] + v; // add measurement noise
                         if (isnan(p) || p > MAX_COVARIANCE) {
                             P[i][j] = P[j][i] = MAX_COVARIANCE;
                         } else if ( i==j && p < MIN_COVARIANCE ) {
@@ -156,7 +146,7 @@ namespace hf {
                     }
                 }
 
-                stateEstimatorAssertNotNaN();
+                //stateEstimatorAssertNotNaN();
                 */
             }
 
@@ -186,6 +176,7 @@ namespace hf {
                 // predicts the number of accumulated pixels in the x-direction
                 float omegaFactor = 1.25f;
                 float hx[STATE_DIM] = {0};
+                /*
                 Matrix Hx(1, STATE_DIM, hx);
                 _predictedNX = (_deltaTime * Npix / thetapix ) * ((_dx_g * R[2][2] / _z_g) - omegaFactor * _omegay_b);
                 _measuredNX = (float)dpixelx;
@@ -209,7 +200,7 @@ namespace hf {
 
                 // Second update
                 //stateEstimatorScalarUpdate(&Hy, measuredNY-predictedNY, STDDEV);
-
+                */
                 state.velocityForward   = 0;
                 state.velocityRightward = 0;
             }
