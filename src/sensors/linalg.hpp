@@ -58,6 +58,11 @@ namespace hf {
 
             static void trans(Matrix & a, Matrix & at)
             {
+                for (uint8_t j=0; j<a._rows; ++j) {
+                    for (uint8_t k=0; k<a._cols; ++k) {
+                        at._vals[k*a._rows+j] = a._vals[j*a._cols+k];
+                    }
+                }
             }
 
             static void mult(Matrix & a, Matrix & b, Matrix & c)

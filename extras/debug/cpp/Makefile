@@ -19,7 +19,6 @@
 INC  = $(HOME)/Documents/Arduino/libraries/Hackflight/src/
 
 all: debug
-	./debug
 
 run: debug
 	./debug
