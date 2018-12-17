@@ -35,7 +35,7 @@ namespace hf {
             uint8_t _rows;
             uint8_t _cols;
 
-            float _vals[MAXSIZE*MAXSIZE];
+            float _vals[MAXSIZE][MAXSIZE];
 
         public:
 
@@ -43,7 +43,11 @@ namespace hf {
             {
                 _rows = rows;
                 _cols = cols;
-                memcpy(_vals, vals, rows*cols*sizeof(float));
+                for (uint8_t j=0; j<rows; ++j) {
+                    for (uint8_t k=0; k<cols; ++k) {
+                        _vals[j][k] = vals[j*cols+k];
+                    }
+                }
             }
 
              Matrix(uint8_t rows, uint8_t cols) 
@@ -57,7 +61,7 @@ namespace hf {
             {
                 for (uint8_t j=0; j<_rows; ++j) {
                     for (uint8_t k=0; k<_cols; ++k) {
-                        Debug::printf("%+2.2f ", _vals[j*_cols+k]);
+                        Debug::printf("%+2.2f ", _vals[j][k]);
                     }
                     Debug::printf("\n");
                 }
@@ -67,14 +71,23 @@ namespace hf {
             {
                 for (uint8_t j=0; j<a._rows; ++j) {
                     for (uint8_t k=0; k<a._cols; ++k) {
-                        at._vals[k*a._rows+j] = a._vals[j*a._cols+k];
+                        at._vals[k][j] = a._vals[j][k];
                     }
                 }
             }
 
             static void mult(Matrix & a, Matrix & b, Matrix & c)
             {
-            }
+                for (uint8_t j=0; j<c._rows; ++j) {
+
+                    for (uint8_t k=0; k<c._cols; ++k) {
+
+                        float dot = 0;
+
+
+                    }
+                }
+             }
 
     };  // class Matrix
 
