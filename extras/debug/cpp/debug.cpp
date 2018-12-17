@@ -20,6 +20,18 @@
 
 #include <sensors/linalg.hpp>
 
+#include <stdio.h>
+
+void hf::Board::outbuf(char * buf)
+{
+    printf("%s", buf);
+}
+
 int main(int argc, char ** argv)
 {
+    float v[9] = {1,2,3,4,5,6,7,8,9};
+
+    hf::Matrix a = hf::Matrix(3,3,v);
+
+    a.dump();
 }
