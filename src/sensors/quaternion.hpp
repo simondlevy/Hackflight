@@ -46,6 +46,10 @@ namespace hf {
                 euler[0] = atan2(2.0f*(q[0]*q[1]+q[2]*q[3]),q[0]*q[0]-q[1]*q[1]-q[2]*q[2]+q[3]*q[3]);
                 euler[1] =  asin(2.0f*(q[1]*q[3]-q[0]*q[2]));
                 euler[2] = atan2(2.0f*(q[1]*q[2]+q[0]*q[3]),q[0]*q[0]+q[1]*q[1]-q[2]*q[2]-q[3]*q[3]);
+
+                euler[0] = int(euler[0]*1000)/1000.0;
+                euler[1] = int(euler[1]*1000)/1000.0;
+                euler[2] = int(euler[2]*1000)/1000.0;
             }
 
         protected:

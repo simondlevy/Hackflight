@@ -42,7 +42,7 @@ namespace hf {
             // Paramters to experiment with ------------------------------------------------------------------------
 
             // LSM6DSM full-scale settings
-            static const LSM6DSM::Ascale_t Ascale = LSM6DSM::AFS_2G;
+            static const LSM6DSM::Ascale_t Ascale = LSM6DSM::AFS_8G;
             static const LSM6DSM::Gscale_t Gscale = LSM6DSM::GFS_2000DPS;
             static const LSM6DSM::Rate_t   AODR   = LSM6DSM::ODR_1660Hz;
             static const LSM6DSM::Rate_t   GODR   = LSM6DSM::ODR_1660Hz;
@@ -183,6 +183,7 @@ namespace hf {
 
             virtual void writeMotor(uint8_t index, float value) override
             {
+                value = int(value*100)/100.0;
                 analogWrite(MOTOR_PINS[index], (uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)));
             }
 

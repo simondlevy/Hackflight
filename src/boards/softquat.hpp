@@ -70,9 +70,10 @@ namespace hf {
                     _gz = Filter::deg2rad(_gz);
 
                     // Store output
-                    gyro[0] = _gx;
-                    gyro[1] = _gy;
-                    gyro[2] = _gz;
+                    gyro[0] = int(_gx*100)/100.0;
+                    gyro[1] = int(_gy*100)/100.0;
+                    gyro[2] = int(_gz*100)/100.0;
+
 
                     return true;
                 }
