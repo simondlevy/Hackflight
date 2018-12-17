@@ -183,32 +183,29 @@ namespace hf {
                 // ~~~ X velocity prediction and update ~~~
                 // predicts the number of accumulated pixels in the x-direction
                 float omegaFactor = 1.25f;
-                float hx[STATE_DIM] = {0};
-                /*
-                   Matrix Hx(1, STATE_DIM, hx);
-                   _predictedNX = (_deltaTime * Npix / thetapix ) * ((_dx_g * R[2][2] / _z_g) - omegaFactor * _omegay_b);
-                   _measuredNX = (float)dpixelx;
+                Matrix Hx(1, STATE_DIM);
+                _predictedNX = (_deltaTime * Npix / thetapix ) * ((_dx_g * R[2][2] / _z_g) - omegaFactor * _omegay_b);
+                _measuredNX = (float)dpixelx;
 
                 // derive measurement equation with respect to dx (and z?)
-                hx[STATE_Z] = (Npix * _deltaTime / thetapix) * ((R[2][2] * _dx_g) / (-_z_g * _z_g));
-                hx[STATE_PX] = (Npix * _deltaTime / thetapix) * (R[2][2] / _z_g);
+                Hx.set(0, STATE_Z,  (Npix * _deltaTime / thetapix) * ((R[2][2] * _dx_g) / (-_z_g * _z_g)));
+                Hx.set(0, STATE_PX, (Npix * _deltaTime / thetapix) * (R[2][2] / _z_g));
 
                 //First update
-                //stateEstimatorScalarUpdate(&Hx, measuredNX-predictedNX, STDDEV);
+                stateEstimatorScalarUpdate(Hx, _measuredNX-_predictedNX, STDDEV);
 
                 // ~~~ Y velocity prediction and update ~~~
-                float hy[STATE_DIM] = {0};
-                Matrix Hy(1, STATE_DIM, hy);
+                Matrix Hy(1, STATE_DIM);
                 _predictedNY = (_deltaTime * Npix / thetapix ) * ((_dy_g * R[2][2] / _z_g) + omegaFactor * _omegax_b);
                 _measuredNY = (float)dpixely;
 
                 // derive measurement equation with respect to dy (and z?)
-                hy[STATE_Z] = (Npix * _deltaTime / thetapix) * ((R[2][2] * _dy_g) / (-_z_g * _z_g));
-                hy[STATE_PY] = (Npix * _deltaTime / thetapix) * (R[2][2] / _z_g);
+                Hy.set(0, STATE_Z,  (Npix * _deltaTime / thetapix) * ((R[2][2] * _dy_g) / (-_z_g * _z_g)));
+                Hy.set(0, STATE_PY, (Npix * _deltaTime / thetapix) * (R[2][2] / _z_g));
 
                 // Second update
-                //stateEstimatorScalarUpdate(&Hy, measuredNY-predictedNY, STDDEV);
-                */
+                stateEstimatorScalarUpdate(Hy, _measuredNY-_predictedNY, STDDEV);
+                
                 state.velocityForward   = 0;
                 state.velocityRightward = 0;
             }
