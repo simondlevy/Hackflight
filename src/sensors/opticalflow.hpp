@@ -94,6 +94,41 @@ namespace hf {
             float Npix = 30.0;                      // [pixels] (same in x and y)
             float thetapix = Filter::deg2rad(4.2f);
 
+            static void checkNan(float x, const char * name)
+            {
+                if (std::isnan(x)) {
+                    while (true) {
+                        Debug::printf("%s is NaN\n", name);
+                    }
+                }
+            }
+
+            void stateEstimatorAssertNotNaN() {
+
+                for(int i=0; i<STATE_DIM; i++) {
+                    if (std::isnan(S[i])) {
+                        reset();
+                        return;
+                    }
+                    for(int j=0; j<STATE_DIM; j++) {
+                        if (std::isnan(Pm.get(i,j))) {
+                            reset();
+                            return;
+                        }
+                    }
+                }
+            }
+
+            void reset(void)
+            {
+                for (uint8_t j=0; j<STATE_DIM; ++j) {
+                    S[j] = 0;
+                    for (uint8_t k=0; k<STATE_DIM; ++k) {
+                        Pm.set(j,k,0);
+                    }
+                }
+            }
+
             void stateEstimatorScalarUpdate(Matrix & Hm, float error, float stdMeasNoise)
             {
                 // The Kalman gain as a column vector
@@ -116,7 +151,7 @@ namespace hf {
                 for (int i=0; i<STATE_DIM; i++) { // Add the element of HPH' to the above
                     HPHR += Hm.get(i,0)*PHTm.get(i,0); // this obviously only works if the update is scalar (as in this function)
                 }
-                //configASSERT(!std::isnan(HPHR));
+                checkNan(HPHR, "HPHR");
 
                 // ====== MEASUREMENT UPDATE ======
                 // Calculate the Kalman gain and perform the state update
@@ -124,7 +159,7 @@ namespace hf {
                     Km.set(i,0, PHTm.get(i,0)/HPHR); // kalman gain = (PH' (HPH' + R )^-1)
                     S[i] += Km.get(i,0) * error; // state update
                 }
-                //stateEstimatorAssertNotNaN();
+                stateEstimatorAssertNotNaN();
 
                 // ====== COVARIANCE UPDATE ======
                 Matrix::mult(Km, Hm, tmpNN1m); // KH
@@ -155,7 +190,7 @@ namespace hf {
                     }
                 }
 
-                //stateEstimatorAssertNotNaN();
+                stateEstimatorAssertNotNaN();
             }
 
 
