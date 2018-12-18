@@ -94,11 +94,13 @@ namespace hf {
             float Npix = 30.0;                      // [pixels] (same in x and y)
             float thetapix = Filter::deg2rad(4.2f);
 
-            static void checkNan(float x, const char * name)
+            uint32_t count = 0;
+
+            static void checkNan(float x, const char * name, uint32_t count)
             {
                 if (std::isnan(x)) {
                     while (true) {
-                        Debug::printf("%s is NaN\n", name);
+                        Debug::printf("%s is NaN after %d steps\n", name, count);
                     }
                 }
             }
@@ -144,6 +146,7 @@ namespace hf {
                 // ====== INNOVATION COVARIANCE ======
 
                 Matrix::trans(Hm, HTm);
+
                 Matrix::mult(Pm, HTm, PHTm); // PH'
                 float R = stdMeasNoise*stdMeasNoise;
                 float HPHR = R; // HPH' + R
@@ -151,7 +154,7 @@ namespace hf {
                 for (int i=0; i<STATE_DIM; i++) { // Add the element of HPH' to the above
                     HPHR += Hm.get(i,0)*PHTm.get(i,0); // this obviously only works if the update is scalar (as in this function)
                 }
-                checkNan(HPHR, "HPHR");
+                checkNan(HPHR, "HPHR", count++);
 
                 // ====== MEASUREMENT UPDATE ======
                 // Calculate the Kalman gain and perform the state update
@@ -198,21 +201,23 @@ namespace hf {
 
             virtual void modifyState(state_t & state, float time) override
             {
+                // Avoid time blips
+                if (_deltaTime > 0.02) return;
+
                 S[STATE_Z] = state.altitude;
                 S[STATE_PZ] = state.variometer;
 
                 int16_t dpixelx=0, dpixely=0;
-                _flowSensor.readMotionCount(&dpixelx, &dpixely);
+                //_flowSensor.readMotionCount(&dpixelx, &dpixely);
+
 
                 //~~~ Body rates ~~~
                 // TODO check if this is feasible or if some filtering has to be done
-                _omegax_b = state.angularVelocities[0];
-                _omegay_b = state.angularVelocities[1];
+                _omegax_b = 0;//state.angularVelocities[0];
+                _omegay_b = 0;//state.angularVelocities[1];
 
                 _dx_g = S[STATE_PX];
                 _dy_g = S[STATE_PY];
-
-                Debug::printf("%+3.3f %+3.3f\n", _dx_g, _dy_g);
 
                 // Saturate elevation in prediction and correction to avoid singularities
                 _z_g = S[STATE_Z] < 0.1f ?  0.1f : S[STATE_Z];
