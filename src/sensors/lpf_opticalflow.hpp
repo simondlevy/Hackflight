@@ -1,5 +1,5 @@
 /*
-   opticalflow.hpp : Support for PMW3901 optical-flow sensor
+   lpf_opticalflow.hpp : Support for PMW3901 optical-flow sensor with low-pass filter
 
 
    Copyright (c) 2018 Simon D. Levy
@@ -36,15 +36,18 @@ namespace hf {
 
         private:
 
-            static constexpr float UPDATE_PERIOD = .01f;
+            static constexpr float   UPDATE_PERIOD = .01f;
+            static const     uint8_t LPF_SIZE      = 64;
 
             // Use digital pin 10 for chip select
             PMW3901 _flowSensor = PMW3901(10);
 
+            // Use low-pass filters for smoothing
+            LowPassFilter _lpf_x = LowPassFilter(LPF_SIZE);
+            LowPassFilter _lpf_y = LowPassFilter(LPF_SIZE);
+
             // Track elapsed time for periodic readiness
             float _previousTime;
-
-            // While tracking elapsed time, store delta time
             float _deltaTime;
 
         protected:
@@ -54,13 +57,13 @@ namespace hf {
                 // Avoid time blips
                 if (_deltaTime > 0.02) return;
 
+                // Read sensor
                 int16_t dpixelx=0, dpixely=0;
                 _flowSensor.readMotionCount(&dpixelx, &dpixely);
 
-                state.velocityForward   =  dpixely * state.altitude;
-                state.velocityRightward = -dpixelx * state.altitude;
-
-                Debug::printf("%+3.3f\n", state.velocityForward);
+                // Scale readings by altitude, then low-pass filter them to get state
+                state.velocityForward   =  _lpf_y.update(dpixely * state.altitude);
+                state.velocityRightward =  _lpf_x.update(-dpixelx * state.altitude);
             }
 
             virtual bool ready(float time) override
@@ -87,6 +90,9 @@ namespace hf {
                         delay(500);
                     }
                 }
+
+                _lpf_x.init();
+                _lpf_y.init();
 
                 _previousTime = 0;
 

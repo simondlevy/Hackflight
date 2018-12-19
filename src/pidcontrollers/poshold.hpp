@@ -38,8 +38,8 @@ namespace hf {
         const float WINDUP_MAX = 0.40f;
 
         // Setpoints for PID control
-        Setpoint setpointX;
-        Setpoint setpointY;
+        Setpoint _setpointX;
+        Setpoint _setpointY;
 
         bool gotCorrection(Setpoint & setpoint, float & demand, float position, float velocity, float currentTime) 
         {
@@ -56,12 +56,10 @@ namespace hf {
 
         virtual bool modifyDemands(state_t & state, demands_t & demands, float currentTime) 
         {
-            bool correctedPitch = gotCorrection(setpointY, demands.pitch, state.positionX, state.velocityForward,   
-                    currentTime);
-            bool correctedRoll  = gotCorrection(setpointX, demands.roll,  state.positionY, state.velocityRightward, 
-                    currentTime);
+            bool didCorrectPitch = gotCorrection(_setpointY, demands.pitch, state.positionX, state.velocityForward,   currentTime);
+            bool didCorrectRoll  = gotCorrection(_setpointX, demands.roll,  state.positionY, state.velocityRightward, currentTime);
 
-            return correctedPitch || correctedRoll;
+            return didCorrectPitch || didCorrectRoll;
         }
 
         virtual bool shouldFlashLed(void) override 
@@ -73,8 +71,8 @@ namespace hf {
 
         PositionHold(float posP, float posrP, float posrI, float posrD=0.0f)
         {
-            setpointX.init(posP, posrP, posrI, posrD, WINDUP_MAX);
-            setpointY.init(posP, posrP, posrI, posrD, WINDUP_MAX);
+            _setpointX.init(posP, posrP, posrI, posrD, WINDUP_MAX);
+            _setpointY.init(posP, posrP, posrI, posrD, WINDUP_MAX);
         }
 
     };  // class PositionHold
