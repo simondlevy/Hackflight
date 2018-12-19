@@ -41,6 +41,7 @@ namespace hf {
         private:
 
             static constexpr float UPDATE_PERIOD = .01f;
+            static constexpr float FLOW_SCALE    = 100.f;
 
             // The bounds on the covariance, these shouldn't be hit, but sometimes are... why?
             static constexpr float MAX_COVARIANCE = 100.f;
@@ -334,6 +335,7 @@ namespace hf {
                 S[STATE_Z] = state.altitude;
                 S[STATE_PZ] = state.variometer;
 
+                // Read the flow sensor
                 int16_t dpixelx=0, dpixely=0;
                 _flowSensor.readMotionCount(&dpixelx, &dpixely);
 
@@ -353,7 +355,7 @@ namespace hf {
                 float omegaFactor = 1.25f;
                 Matrix Hx(1, STATE_DIM);
                 _predictedNX = (_deltaTime * Npix / thetapix ) * ((_dx_g * R[2][2] / _z_g) - omegaFactor * _omegay_b);
-                _measuredNX = (float)dpixelx;
+                _measuredNX = (float)dpixelx * FLOW_SCALE;
 
                 // derive measurement equation with respect to dx (and z?)
                 Hx.set(0, STATE_Z,  (Npix * _deltaTime / thetapix) * ((R[2][2] * _dx_g) / (-_z_g * _z_g)));
@@ -365,7 +367,7 @@ namespace hf {
                 // ~~~ Y velocity prediction and update ~~~
                 Matrix Hy(1, STATE_DIM);
                 _predictedNY = (_deltaTime * Npix / thetapix ) * ((_dy_g * R[2][2] / _z_g) + omegaFactor * _omegax_b);
-                _measuredNY = (float)dpixely;
+                _measuredNY = (float)dpixely * FLOW_SCALE;
 
                 // derive measurement equation with respect to dy (and z?)
                 Hy.set(0, STATE_Z,  (Npix * _deltaTime / thetapix) * ((R[2][2] * _dy_g) / (-_z_g * _z_g)));
@@ -375,6 +377,8 @@ namespace hf {
                 stateEstimatorScalarUpdate(Hy, _measuredNY-_predictedNY, STDDEV, "Y");
 
                 stateEstimatorFinalize();
+
+                Debug::printf("%+3.3f\n", S[STATE_PX]);
 
                 state.velocityForward   = 0;
                 state.velocityRightward = 0;
