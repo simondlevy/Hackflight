@@ -28,27 +28,29 @@ from time import time
 PORT = '/dev/ttyACM0'
 BAUD = 115200
 RANGE = (-1,+1)
-DELAY = 5
+DELAY = 3
 
 class SerialPlotter(RealtimePlotter):
 
     def __init__(self):
 
-        RealtimePlotter.__init__(self, [RANGE], 
-                window_name='Serial input',
-                yticks = [RANGE],
-                styles = ['b-'])
+        RealtimePlotter.__init__(self, [(-1,+1), (-1,+1)], 
+                phaselims=((-1,+1), (-1,+1)),
+                window_name='Position',
+                yticks = [(-1,0,+1),(-1,0,+1)],
+                styles = ['r--', 'b-'], 
+                ylabels=['X', 'Y'])
 
-        self.xcurr = 0
-        self.ycurr = 0
         
+        self.xcurr = 0
         self.start_time = time()
         self.start_pos = None
+        self.pos = (0,0)
 
 
     def getValues(self):
 
-         return (self.ycurr,)
+         return self.pos[0], self.pos[1], self.pos[0], self.pos[1]
 
 def _update(port, plotter):
 
@@ -75,9 +77,10 @@ def _update(port, plotter):
                     plotter.start_pos = pos
             else:
 
-                plotter.ycurr = pos[0] - plotter.start_pos[0]
+                plotter.pos = pos[0]-plotter.start_pos[0], pos[1]-plotter.start_pos[1]
             
-                print(plotter.ycurr)
+                #print('%+3.3f %+3.3f' % (plotter.pos[0], plotter.pos[1]))
+                print('%+3.3f %+3.3f' % (pos[0], pos[1]))
             
             msg = ''
             
