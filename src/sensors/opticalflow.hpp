@@ -329,22 +329,19 @@ namespace hf {
 
             virtual void modifyState(state_t & state, float time) override
             {
-                _deltaTime = 0.01f;
-
                 // Avoid time blips
                 if (_deltaTime > 0.02) return;
 
-                S[STATE_Z] = 0.1;//state.altitude;
-                S[STATE_PZ] = 0.0;//state.variometer;
+                S[STATE_Z] = state.altitude;
+                S[STATE_PZ] = state.variometer;
 
                 int16_t dpixelx=0, dpixely=0;
-                //_flowSensor.readMotionCount(&dpixelx, &dpixely);
-
+                _flowSensor.readMotionCount(&dpixelx, &dpixely);
 
                 //~~~ Body rates ~~~
                 // TODO check if this is feasible or if some filtering has to be done
-                _omegax_b = 0;//state.angularVelocities[0];
-                _omegay_b = 0;//state.angularVelocities[1];
+                _omegax_b = state.angularVelocities[0];
+                _omegay_b = state.angularVelocities[1];
 
                 _dx_g = S[STATE_PX];
                 _dy_g = S[STATE_PY];
@@ -384,7 +381,8 @@ namespace hf {
                 for (uint8_t k=0; k<STATE_DIM; ++k) {
                     Debug::printf("%d: %f\n", k, S[k]);
                 }
-                Debug::printf("\n");*/
+                Debug::printf("\n");
+                */
 
                 state.velocityForward   = 0;
                 state.velocityRightward = 0;
