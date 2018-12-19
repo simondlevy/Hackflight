@@ -61,8 +61,6 @@ namespace hf {
                 int16_t dpixelx=0, dpixely=0;
                 _flowSensor.readMotionCount(&dpixelx, &dpixely);
 
-                const float SCALE = 1000.f;
-
                 // Scale readings by altitude, then low-pass filter them to get velocity
                 state.velocityForward   =  _lpf_y.update(dpixely  * state.altitude * _deltaTime);
                 state.velocityRightward =  _lpf_x.update(-dpixelx * state.altitude * _deltaTime);
