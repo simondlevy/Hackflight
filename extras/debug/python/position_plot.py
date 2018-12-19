@@ -43,7 +43,8 @@ class SerialPlotter(RealtimePlotter):
         self.ycurr = 0
         
         self.start_time = time()
-        self.start_value = 0
+        self.start_pos = None
+
 
     def getValues(self):
 
@@ -58,26 +59,30 @@ def _update(port, plotter):
         c = port.read().decode()
 
         if c == '\n':
+            
             try:
 
-                value = float(msg)
-                
-                if plotter.start_value == 0:
-
-                    if (time() - plotter.start_time) > DELAY:
-
-                        plotter.start_value = value
-
-                else:
-
-                    plotter.ycurr = value - plotter.start_value;
-                
-                print(time() - plotter.start_time)
+                pos = tuple((float(v) for v in msg.split(',')))
                 
             except:
+                
                 pass
+
+            if plotter.start_pos is None:
+
+                if (time() - plotter.start_time) > DELAY:
+
+                    plotter.start_pos = pos
+            else:
+
+                plotter.ycurr = pos[0] - plotter.start_pos[0]
+            
+                print(plotter.ycurr)
+            
             msg = ''
+            
         else:
+            
             msg += c
 
         plotter.xcurr += 1

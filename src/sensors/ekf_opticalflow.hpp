@@ -378,7 +378,7 @@ namespace hf {
 
                 stateEstimatorFinalize();
 
-                Debug::printf("%+3.3f\n", S[STATE_PX]);
+                Debug::printf("%+3.3f,%+3.3f\n", S[STATE_PX], S[STATE_PY]);
 
                 state.velocityForward   = 0;
                 state.velocityRightward = 0;
