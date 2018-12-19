@@ -61,9 +61,17 @@ namespace hf {
                 int16_t dpixelx=0, dpixely=0;
                 _flowSensor.readMotionCount(&dpixelx, &dpixely);
 
-                // Scale readings by altitude, then low-pass filter them to get state
+                // Scale readings by altitude, then low-pass filter them to get velocity
                 state.velocityForward   =  _lpf_y.update(dpixely * state.altitude);
                 state.velocityRightward =  _lpf_x.update(-dpixelx * state.altitude);
+
+                const float SCALE = 100.f;
+
+                // Integrate velocity to get position
+                state.positionX += state.velocityRightward / SCALE;
+                state.positionY += state.velocityForward / SCALE;
+
+                Debug::printf("%+3.3f %+3.3f\n", state.positionX, state.positionY);
             }
 
             virtual bool ready(float time) override

@@ -64,7 +64,7 @@ def _update(port, plotter):
             
             try:
 
-                pos = tuple((float(v) for v in msg.split(',')))
+                pos = tuple((float(v) for v in msg.split()))
                 
             except:
                 

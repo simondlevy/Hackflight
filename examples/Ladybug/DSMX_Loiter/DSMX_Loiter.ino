@@ -25,7 +25,7 @@
 #include "boards/ladybug.hpp"
 #include "receivers/dsmx.hpp"
 #include "sensors/rangefinders/vl53l1x.hpp"
-#include "sensors/ekf_opticalflow.hpp"
+#include "sensors/lpf_opticalflow.hpp"
 #include "pidcontrollers/level.hpp"
 #include "pidcontrollers/althold.hpp"
 #include "pidcontrollers/poshold.hpp"
