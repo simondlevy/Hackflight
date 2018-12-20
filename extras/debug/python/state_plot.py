@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-'''
-Dependencies: numpy, matplotlib, https://github.com/simondlevy/RealtimePlotter
 
-Copyright (C) 2018 Simon D. Levy
+'''
+getimu.py Uses MSPPG to request and handle ATTITUDE_RADIANS messages from flight controller IMU
+
+Copyright (C) Rob Jones, Alec Singer, Chris Lavin, Blake Liebling, Simon D. Levy 2015
 
 This file is part of Hackflight.
 
@@ -19,90 +20,36 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-import serial
-from realtime_plot import RealtimePlotter
-from threading import Thread
-from time import time
-
-# Change these to suit your needs
-#PORT = '/dev/ttyACM0'
-PORT = 'COM67'
 BAUD = 115200
-RANGE = (-1,+1)
-DELAY = 3
 
-class SerialPlotter(RealtimePlotter):
+PORT = 'COM60'          # Windows
+#PORT = '/dev/ttyACM0' # Linux
 
-    def __init__(self):
+from msppg import MSP_Parser as Parser, serialize_STATE_Request
+import serial
 
-        RealtimePlotter.__init__(self, [(-1,+1), (-1,+1)], 
-                phaselims=((-1,+1), (-1,+1)),
-                window_name='Position',
-                yticks = [(-1,0,+1),(-1,0,+1)],
-                styles = ['r--', 'b-'], 
-                ylabels=['X', 'Y'])
+def handler(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
 
-        
-        self.xcurr = 0
-        self.start_time = time()
-        self.start_pos = None
-        self.pos = (0,0)
-
-
-    def getValues(self):
-
-         return self.pos[0], self.pos[1], self.pos[0], self.pos[1]
-
-def _update(port, plotter):
-
-    msg = ''
-
-    while True:
-
-        c = port.read().decode()
-
-        if c == '\n':
-            
-            try:
-
-                pos = tuple((float(v) for v in msg.split()))
-                
-            except:
-                
-                pass
-
-            if plotter.start_pos is None:
-
-                if (time() - plotter.start_time) > DELAY:
-
-                    plotter.start_pos = pos
-            else:
-
-                plotter.pos = pos[0]-plotter.start_pos[0], pos[1]-plotter.start_pos[1]
-            
-                #print('%+3.3f %+3.3f' % (plotter.pos[0], plotter.pos[1]))
-                print('%+3.3f %+3.3f' % (pos[0], pos[1]))
-            
-            msg = ''
-            
-        else:
-            
-            msg += c
-
-        plotter.xcurr += 1
+    print(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward)
+    port.write(request)
 
 if __name__ == '__main__':
 
-    try:
-        port = serial.Serial(PORT, BAUD)
-    except serial.SerialException:
-        print('Unable to access device on port %s' % PORT)
-        exit(1)
+    parser = Parser()
+    request = serialize_STATE_Request()
+    port = serial.Serial(PORT, BAUD)
 
-    plotter = SerialPlotter()
+    parser.set_STATE_Handler(handler)
 
-    thread = Thread(target=_update, args = (port, plotter))
-    thread.daemon = True
-    thread.start()
+    port.write(request)
 
-    plotter.start()
+    while True:
+
+        try:
+
+            parser.parse(port.read(1))
+
+        except KeyboardInterrupt:
+
+            break
+

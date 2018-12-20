@@ -237,7 +237,19 @@ namespace hf {
         protected:
 
 
-
+            virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 
+                    float & heading, float & velocityForward, float & velocityRightward) 
+            {
+                // XXX mock values for now
+                altitude = 1;
+                variometer = 2;
+                positionX = 3;
+                positionY = 4;
+                heading = 5;
+                velocityForward = 6;
+                velocityRightward = 7;
+            }
+ 
             virtual void handle_SET_ARMED_Request(uint8_t  flag)
             {
                 if (flag) {  // got arming command: arm only if throttle is down
