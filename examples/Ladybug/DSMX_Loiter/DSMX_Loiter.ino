@@ -55,8 +55,8 @@ hf::AltitudeHold althold = hf::AltitudeHold(
         0.05f);  // Altitude Hold Velocity D
 
 hf::PositionHold poshold = hf::PositionHold(
-	0.1f,	// posP
-	0.1f,	// posrP
+	0.01f,	// posP
+	0.01f,	// posrP
 	0.02f);	// posrI
 
 hf::VL53L1X_Rangefinder rangefinder;
@@ -67,7 +67,7 @@ void setup(void)
 {
     // Add some "software trim" to the receiver
     rc.setTrimRoll(+.2);
-    rc.setTrimPitch(+.1);
+    rc.setTrimPitch(+.3);
 
     // Initialize Hackflight firmware
     h.init(new hf::Ladybug(), &rc, &mixer, &ratePid);

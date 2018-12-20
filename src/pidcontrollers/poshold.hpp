@@ -41,12 +41,11 @@ namespace hf {
         Setpoint _setpointX;
         Setpoint _setpointY;
 
-        bool gotCorrection(Setpoint & setpoint, float & demand, float position, float velocity, float currentTime, const char * label) 
+        bool gotCorrection(Setpoint & setpoint, float & demand, float position, float velocity, float currentTime) 
         {
             float correction = 0;
             if (setpoint.gotCorrection(demand, position, velocity, currentTime, correction)) {
-                //Debug::printf("%+3.3f  %s  ", correction, label);
-                demand += correction;
+                demand -= correction;
                 return true;
             }
 
@@ -57,8 +56,8 @@ namespace hf {
 
         virtual bool modifyDemands(state_t & state, demands_t & demands, float currentTime) 
         {
-            bool didCorrectPitch = gotCorrection(_setpointY, demands.pitch, state.positionX, state.velocityForward,   currentTime, "Y");
-            bool didCorrectRoll  = gotCorrection(_setpointX, demands.roll,  state.positionY, state.velocityRightward, currentTime, "X\n");
+            bool didCorrectRoll  = gotCorrection(_setpointX, demands.roll,  state.positionY, state.velocityRightward, currentTime);
+            bool didCorrectPitch = gotCorrection(_setpointY, demands.pitch, state.positionX, state.velocityForward,   currentTime);
 
             return didCorrectPitch || didCorrectRoll;
         }

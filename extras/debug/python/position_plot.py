@@ -25,8 +25,8 @@ from threading import Thread
 from time import time
 
 # Change these to suit your needs
-#PORT = '/dev/ttyACM0'
-PORT = 'COM67'
+PORT = '/dev/ttyACM0'
+#PORT = 'COM67'
 BAUD = 115200
 RANGE = (-1,+1)
 DELAY = 3
