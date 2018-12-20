@@ -31,7 +31,7 @@ namespace hf {
 
         private: 
 
-            // PID ants set by ructor
+            // PID constants set by constructor
             float _posP;
             float _velP;
             float _velI;
