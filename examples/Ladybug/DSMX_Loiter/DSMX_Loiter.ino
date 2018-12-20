@@ -55,8 +55,8 @@ hf::AltitudeHold althold = hf::AltitudeHold(
         0.05f);  // Altitude Hold Velocity D
 
 hf::PositionHold poshold = hf::PositionHold(
-	0.0f,	// posP
-	0.02f,	// posrP
+	0.1f,	// posP
+	0.1f,	// posrP
 	0.02f);	// posrI
 
 hf::VL53L1X_Rangefinder rangefinder;
