@@ -70,6 +70,8 @@ namespace hf {
                 (void)value;
             }
 
+        public:
+
             MockBoard(uint8_t ledPin, bool ledInverted=false) : ArduinoBoard(ledPin, ledInverted)
             {
                 _time = 0;

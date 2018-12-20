@@ -49,7 +49,7 @@ extern "C" {
 
         //DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_3, CHANNEL_MAP);
         DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_1, CHANNEL_MAP);
-        //hf::Mock_Receiver * rc = new hf::Mock_Receiver();
+        //hf::MockReceiver * rc = new hf::MockReceiver();
 
         // Add Level PID for aux switch position 1
         h.addPidController(level, 1);

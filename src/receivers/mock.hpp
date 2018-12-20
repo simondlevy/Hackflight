@@ -24,7 +24,7 @@ static constexpr uint8_t DEFAULT_MAP[6] = {0,1,2,3,4,5};
 
 namespace hf {
 
-    class Mock_Receiver : public Receiver {
+    class MockReceiver : public Receiver {
 
         protected:
 
@@ -48,10 +48,10 @@ namespace hf {
 
         public:
 
-            Mock_Receiver(void) : Receiver(DEFAULT_MAP)
+            MockReceiver(void) : Receiver(DEFAULT_MAP)
             { 
             }
 
-    }; // class Mock_Receiver
+    }; // class MockReceiver
 
 } // namespace hf
