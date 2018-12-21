@@ -25,6 +25,7 @@ BD_PORT = 1
 
 from msppg import MSP_Parser as Parser, serialize_STATE_Request
 import bluetooth
+from time import time, sleep
 
 parser = Parser()
 request = serialize_STATE_Request()
@@ -47,7 +48,6 @@ while True:
 
         try:
 
-            sock.send(request)
             parser.parse(sock.recv(1))
 
         except KeyboardInterrupt:
