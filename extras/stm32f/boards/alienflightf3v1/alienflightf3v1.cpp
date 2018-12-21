@@ -107,17 +107,17 @@ extern "C" {
         systemResetToBootloader();
     }
 
-    uint8_t AlienflightF3V1::serialAvailableBytes(void)
+    uint8_t AlienflightF3V1::serialNormalAvailable(void)
     {
         return serialRxBytesWaiting(_serial0);
     }
 
-    uint8_t AlienflightF3V1::serialReadByte(void)
+    uint8_t AlienflightF3V1::serialNormalRead(void)
     {
         return serialRead(_serial0);
     }
 
-    void AlienflightF3V1::serialWriteByte(uint8_t c)
+    void AlienflightF3V1::serialNormalWrite(uint8_t c)
     {
         serialWrite(_serial0, c);
     }

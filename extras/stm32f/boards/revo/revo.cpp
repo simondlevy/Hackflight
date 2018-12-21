@@ -107,17 +107,17 @@ extern "C" {
         systemResetToBootloader();
     }
 
-    uint8_t Revo::serialAvailableBytes(void)
+    uint8_t Revo::serialNormalAvailable(void)
     {
         return serialRxBytesWaiting(_serial0);
     }
 
-    uint8_t Revo::serialReadByte(void)
+    uint8_t Revo::serialNormalRead(void)
     {
         return serialRead(_serial0);
     }
 
-    void Revo::serialWriteByte(uint8_t c)
+    void Revo::serialNormalWrite(uint8_t c)
     {
         serialWrite(_serial0, c);
     }

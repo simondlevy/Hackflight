@@ -127,17 +127,17 @@ extern "C" {
         systemResetToBootloader();
     }
 
-    uint8_t F3EvoBrushed::serialAvailableBytes(void)
+    uint8_t F3EvoBrushed::serialNormalAvailable(void)
     {
         return serialRxBytesWaiting(_serial0);
     }
 
-    uint8_t F3EvoBrushed::serialReadByte(void)
+    uint8_t F3EvoBrushed::serialNormalRead(void)
     {
         return serialRead(_serial0);
     }
 
-    void F3EvoBrushed::serialWriteByte(uint8_t c)
+    void F3EvoBrushed::serialNormalWrite(uint8_t c)
     {
         serialWrite(_serial0, c);
     }

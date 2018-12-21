@@ -43,9 +43,9 @@ class SPRacingF3 : public hf::SoftwareQuaternionBoard  {
         virtual uint32_t getMicroseconds(void) override;
         virtual void     reboot(void) override;
         static void      outchar(char c);
-        virtual uint8_t  serialAvailableBytes(void) override;
-        virtual uint8_t  serialReadByte(void) override;
-        virtual void     serialWriteByte(uint8_t c) override;
+        virtual uint8_t  serialNormalAvailable(void) override;
+        virtual uint8_t  serialNormalRead(void) override;
+        virtual void     serialNormalWrite(uint8_t c) override;
 
         // SoftwareQuaternionBoard class overrides
         virtual bool     imuRead(void) override;

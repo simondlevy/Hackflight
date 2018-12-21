@@ -154,17 +154,17 @@ extern "C" {
         systemResetToBootloader();
     }
 
-    uint8_t SPRacingF3::serialAvailableBytes(void)
+    uint8_t SPRacingF3::serialNormalAvailable(void)
     {
         return serialRxBytesWaiting(_serial1);
     }
 
-    uint8_t SPRacingF3::serialReadByte(void)
+    uint8_t SPRacingF3::serialNormalRead(void)
     {
         return serialRead(_serial1);
     }
 
-    void SPRacingF3::serialWriteByte(uint8_t c)
+    void SPRacingF3::serialNormalWrite(uint8_t c)
     {
         serialWrite(_serial1, c);
     }
