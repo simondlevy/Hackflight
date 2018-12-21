@@ -131,17 +131,17 @@ extern "C" {
         systemResetToBootloader();
     }
 
-    uint8_t OmnibusF3::serialAvailableBytes(void)
+    uint8_t OmnibusF3::serialNormalAvailable(void)
     {
         return serialRxBytesWaiting(_serial0);
     }
 
-    uint8_t OmnibusF3::serialReadByte(void)
+    uint8_t OmnibusF3::serialNormalRead(void)
     {
         return serialRead(_serial0);
     }
 
-    void OmnibusF3::serialWriteByte(uint8_t c)
+    void OmnibusF3::serialNormalWrite(uint8_t c)
     {
         serialWrite(_serial0, c);
     }

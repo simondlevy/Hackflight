@@ -137,6 +137,7 @@ namespace hf {
 
                 // Calibrate IMU on startup
                 _lsm6dsm.calibrate(GYRO_BIAS, ACCEL_BIAS);
+
                 // Clear the interrupt
                 _lsm6dsm.clearInterrupt();
                 setLed(false);
