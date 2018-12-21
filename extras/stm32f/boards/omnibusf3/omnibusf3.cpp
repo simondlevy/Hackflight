@@ -190,9 +190,9 @@ extern "C" {
 
         else {
 
-            if (_avail1) {
-                hf::Debug::printf("%d\n", _value1);
-                _avail1 = false;
+            if (_avail2) {
+                hf::Debug::printf("%c\n", (char)_value2);
+                _avail2 = false;
             }
         }
 
