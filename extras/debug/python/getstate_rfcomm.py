@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 '''
-getstate_rfcomm.py Uses MSPPG to request and handle STATE messages from flight controller IMU
+getstate_rfcomm.py Uses MSPPG to request and handle STATE messages from flight controller over Bluetooth
 
 Copyright (C) Simon D. Levy 2018
 
