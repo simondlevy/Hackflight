@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 '''
-getimu.py Uses MSPPG to request and handle ATTITUDE_RADIANS messages from flight controller IMU
+getstate_rfcomm.py Uses MSPPG to request and handle STATE messages from flight controller IMU
 
-Copyright (C) Rob Jones, Alec Singer, Chris Lavin, Blake Liebling, Simon D. Levy 2015
+Copyright (C) Simon D. Levy 2018
 
 This file is part of Hackflight.
 
