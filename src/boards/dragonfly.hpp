@@ -1,8 +1,6 @@
 /*
-   Mock.ino : Hackflight sketch for Tlera Dragonfly with mock board and receiver
+   dragonfly.hpp : Board subclass for Arduino prototyping without IMU or motors
 
-   Solely for receiver prototyping
- 
    Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
@@ -18,37 +16,39 @@
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
- */
+   */
 
-#include <Arduino.h>
+#pragma once
 
-#include "hackflight.hpp"
-#include "boards/dragonfly.hpp"
-#include "mixers/quadx.hpp"
-#include "receivers/mock.hpp"
+#include "mock.hpp"
 
-static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
+namespace hf {
 
-hf::Hackflight h;
+    class DragonflyBoard : public MockBoard {
 
-hf::MockReceiver rc;
+        protected:
 
-hf::MixerQuadX mixer;
+            uint8_t serialTelemetryAvailable(void) override
+            {
+                return Serial1.available();
+            }
 
-hf::Rate ratePid = hf::Rate(0, 0, 0, 0, 0);
+            uint8_t serialTelemetryRead(void) override
+            {
+                return Serial1.read();
+            }
 
-void setup(void)
-{
-     // Initialize Hackflight firmware (LED 25, inverted)
-     h.init(new hf::DragonflyBoard(), &rc, &mixer, &ratePid);
+            void serialTelemetryWrite(uint8_t c) override
+            {
+                Serial1.write(c);
+            }
 
-     // Set up to receive telemetry over Serial1
-     Serial1.begin(115200);
-}
+        public:
 
-void loop(void)
-{
-    h.update();
+            DragonflyBoard(void) : MockBoard(25, false)
+            {
+            }
 
-    delay(10);
-}
+    }; // class DragonflyBoard
+
+} // namespace hf
