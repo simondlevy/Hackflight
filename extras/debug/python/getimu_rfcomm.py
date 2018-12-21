@@ -20,36 +20,38 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-BAUD = 115200
-
-PORT = 'COM60'          # Windows
-#PORT = '/dev/ttyACM0' # Linux
+BD_ADDR = '00:06:66:73:E3:E8'
+BD_PORT = 1
 
 from msppg import MSP_Parser as Parser, serialize_STATE_Request
-import serial
+import bluetooth
+
+parser = Parser()
+request = serialize_STATE_Request()
+
+sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+sock.connect((BD_ADDR, BD_PORT))
+
+print('connected to ' + BD_ADDR)
 
 def handler(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
 
     print(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward)
-    port.write(request)
+    sock.send(request)
 
-if __name__ == '__main__':
+parser.set_STATE_Handler(handler)
 
-    parser = Parser()
-    request = serialize_STATE_Request()
-    port = serial.Serial(PORT, BAUD)
+sock.send(request)
 
-    parser.set_STATE_Handler(handler)
-
-    port.write(request)
-
-    while True:
+while True:
 
         try:
 
-            parser.parse(port.read(1))
+            sock.send(request)
+            parser.parse(sock.recv(1))
 
         except KeyboardInterrupt:
 
+            sock.close()
             break
 
