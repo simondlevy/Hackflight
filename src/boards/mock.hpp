@@ -30,8 +30,8 @@ namespace hf {
 
             float _time;
 
-            // level and motionless
-            float _quat[4] = {1.f, 0.f, 0.f, 0.f};
+            // motionless and sligthly off-level
+            float _quat[4] = {.9f, 0.05f, 0.05f, 0.f};
             float _gyro[3] = {0.f, 0.f, 0.f};
 
         protected:
