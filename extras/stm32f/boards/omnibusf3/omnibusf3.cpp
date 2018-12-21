@@ -48,18 +48,33 @@ extern "C" {
 #include "../../common/beeperled.h"
 #include "../../common/motors.h"
 
+    // This is static so Board::outbuf() can access it
     static serialPort_t * _serial0;
 
-    static uint8_t _value;
-    static bool _avail;
+    // These are static so serial_event can access them
+    static uint8_t _value1;
+    static bool _avail1;
 
-    static void serial_event(uint16_t value, void * data)
+    static void serial_event1(uint16_t value, void * data)
     {
         (void)data;
 
-        _value = (uint8_t)(value & 0xFF);
+        _value1 = (uint8_t)(value & 0xFF);
 
-        _avail = true;
+        _avail1 = true;
+    }
+
+    // These are static so serial_event can access them
+    static uint8_t _value2;
+    static bool _avail2;
+
+    static void serial_event2(uint16_t value, void * data)
+    {
+        (void)data;
+
+        _value2 = (uint8_t)(value & 0xFF);
+
+        _avail2 = true;
     }
 
     OmnibusF3::OmnibusF3(void)
@@ -67,13 +82,15 @@ extern "C" {
         // Set up the LED (uses the beeper for some reason)
         beeperLedInit();
 
+        // Run standard initializations
         initMotors();
         initUsb();
         initImu();
 
-        // Set up UART for incoming MSP sensor messages
+        // Set up UARTs for sensors, telemetry
         uartPinConfigure(serialPinConfig());
-        uartOpen(UARTDEV_2,  serial_event, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
+        uartOpen(UARTDEV_1,  serial_event1, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
+        uartOpen(UARTDEV_2,  serial_event2, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
 
         RealBoard::init();
     }
@@ -173,9 +190,9 @@ extern "C" {
 
         else {
 
-            if (_avail) {
-                hf::Debug::printf("%d\n", _value);
-                _avail = false;
+            if (_avail1) {
+                hf::Debug::printf("%d\n", _value1);
+                _avail1 = false;
             }
         }
 
