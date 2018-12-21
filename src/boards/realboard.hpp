@@ -36,6 +36,7 @@ namespace hf {
 
             bool _shouldFlash = false;
 
+            // Supports MSP over wireless protcols like Bluetooth
             bool _useSerialTelemetry = false;
 
         protected:
@@ -67,14 +68,16 @@ namespace hf {
 
             uint8_t serialAvailableBytes(void)
             {
-                if (serialNormalAvailable() > 0) {
-                    _useSerialTelemetry = false;
-                    return serialNormalAvailable();
-                }
-
+                // Attempt to use telemetry first
                 if (serialTelemetryAvailable()) {
                     _useSerialTelemetry = true;
                     return serialTelemetryAvailable();
+                }
+
+                // Default to USB
+                if (serialNormalAvailable() > 0) {
+                    _useSerialTelemetry = false;
+                    return serialNormalAvailable();
                 }
 
                 return 0;
