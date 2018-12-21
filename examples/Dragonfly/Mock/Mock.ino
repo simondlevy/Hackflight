@@ -41,6 +41,9 @@ void setup(void)
 {
      // Initialize Hackflight firmware (LED 25, inverted)
      h.init(new hf::MockBoard(25, true), &rc, &mixer, &ratePid);
+
+     // Set up to receive telemetry over Serial1
+     Serial1.begin(115200);
 }
 
 void loop(void)

@@ -61,6 +61,21 @@ namespace hf {
                 Serial.write(c);
             }
 
+            uint8_t serialTelemetryAvailable(void) override
+            {
+                return Serial1.available();
+            }
+
+            uint8_t serialTelemetryRead(void) override
+            {
+                return Serial1.read();
+            }
+
+            void serialTelemetryWrite(uint8_t c) override
+            {
+                Serial1.write(c);
+            }
+
             virtual uint32_t getMicroseconds(void) override
             {
                 return micros();
