@@ -46,17 +46,17 @@ namespace hf {
                         (_led_inverted?HIGH:LOW));
             }
 
-            uint8_t serialAvailableBytes(void)
+            uint8_t serialNormalAvailable(void)
             {
                 return Serial.available();
             }
 
-            uint8_t serialReadByte(void)
+            uint8_t serialNormalRead(void)
             {
                 return Serial.read();
             }
 
-            void serialWriteByte(uint8_t c)
+            void serialNormalWrite(uint8_t c)
             {
                 Serial.write(c);
             }

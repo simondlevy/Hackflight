@@ -34,7 +34,9 @@ namespace hf {
             static constexpr uint8_t LED_STARTUP_FLASH_COUNT   = 20;
             static constexpr float   LED_SLOWFLASH_SECONDS     = 0.25;
 
-            bool _shouldflash;
+            bool _shouldFlash = false;
+
+            bool _useSerialTelemetry = false;
 
         protected:
 
@@ -55,7 +57,7 @@ namespace hf {
                 }
                 setLed(false);
 
-                _shouldflash = false;
+                _shouldFlash = false;
             }
 
             float getTime(void)
@@ -63,10 +65,61 @@ namespace hf {
                 return getMicroseconds() / 1.e6f;
             }
 
+            uint8_t serialAvailableBytes(void)
+            {
+                if (serialNormalAvailable() > 0) {
+                    _useSerialTelemetry = false;
+                    return serialNormalAvailable();
+                }
+
+                if (serialTelemetryAvailable()) {
+                    _useSerialTelemetry = true;
+                    return serialTelemetryAvailable();
+                }
+
+                return 0;
+            }
+
+            uint8_t serialReadByte(void)
+            {
+                return _useSerialTelemetry? serialTelemetryRead() : serialNormalRead();
+            }
+
+            void serialWriteByte(uint8_t c)
+            {
+                if (_useSerialTelemetry) {
+                    serialTelemetryWrite(c);
+                }
+                else {
+                    serialNormalWrite(c);
+                }
+            }
+
+            virtual uint8_t serialNormalAvailable(void) = 0;
+
+            virtual uint8_t serialNormalRead(void) = 0;
+
+            virtual void    serialNormalWrite(uint8_t c) = 0;
+
+            virtual uint8_t serialTelemetryAvailable(void)
+            {
+                return 0;
+            }
+
+            virtual uint8_t serialTelemetryRead(void)
+            {
+                return 0;
+            }
+
+            virtual void serialTelemetryWrite(uint8_t c)
+            {
+                (void)c;
+            }
+
             void showArmedStatus(bool armed)
             {
                 // Set LED to indicate armed
-                if (!_shouldflash) {
+                if (!_shouldFlash) {
                     setLed(armed);
                 }
             }
@@ -87,7 +140,7 @@ namespace hf {
                     }
                 }
 
-                _shouldflash = shouldflash;
+                _shouldFlash = shouldflash;
             }
 
             void error(const char * errmsg) 

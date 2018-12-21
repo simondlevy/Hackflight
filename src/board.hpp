@@ -62,7 +62,7 @@ namespace hf {
 
             //------------------------------- Serial communications via MSP ----------------------------------------------
             virtual uint8_t serialAvailableBytes(void) { return 0; }
-            virtual uint8_t serialReadByte(void)  { return 0; }
+            virtual uint8_t serialReadByte(void)  { return 1; }
             virtual void    serialWriteByte(uint8_t c) { (void)c; }
 
             //------------------------------- Reboot for non-Arduino boards ---------------------------------------------
