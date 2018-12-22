@@ -30,7 +30,7 @@ static const float    MOTOR_MAX = 2000;
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
-// Cleanflight includes
+    // Cleanflight includes
 #include "platform.h"
 #include "drivers/system.h"
 #include "drivers/timer.h"
@@ -43,13 +43,17 @@ extern "C" {
 #include "target.h"
 #include "stm32f30x.h"
 
-// Hackflight includes
+    // Hackflight includes
 #include "../../common/spi.h"
 #include "../../common/beeperled.h"
 #include "../../common/motors.h"
 
+    // --------------------------------------------------
+
     // This is static so Board::outbuf() can access it
     static serialPort_t * _serial0;
+
+    // --------------------------------------------------
 
     // These are static so serial_event can access them
     static uint8_t _value1;
@@ -64,6 +68,10 @@ extern "C" {
         _avail1 = true;
     }
 
+    // --------------------------------------------------
+
+    static serialPort_t * _serial2;
+
     // These are static so serial_event can access them
     static uint8_t _value2;
     static bool _avail2;
@@ -76,6 +84,8 @@ extern "C" {
 
         _avail2 = true;
     }
+
+    // --------------------------------------------------
 
     OmnibusF3::OmnibusF3(void)
     {
@@ -90,7 +100,8 @@ extern "C" {
         // Set up UARTs for sensors, telemetry
         uartPinConfigure(serialPinConfig());
         uartOpen(UARTDEV_1,  serial_event1, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
-        uartOpen(UARTDEV_2,  serial_event2, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
+        //uartOpen(UARTDEV_2,  serial_event2, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
+        _serial2 = uartOpen(UARTDEV_2,  NULL, NULL,  115200, MODE_RXTX, SERIAL_NOT_INVERTED);
 
         RealBoard::init();
     }
@@ -161,6 +172,21 @@ extern "C" {
     void OmnibusF3::serialNormalWrite(uint8_t c)
     {
         serialWrite(_serial0, c);
+    }
+
+    uint8_t OmnibusF3::serialTelemetryAvailable(void)
+    {
+        return serialRxBytesWaiting(_serial2);
+    }
+
+    uint8_t OmnibusF3::serialTelemetryRead(void)
+    {
+        return serialRead(_serial2);
+    }
+
+    void OmnibusF3::serialTelemetryWrite(uint8_t c)
+    {
+        serialWrite(_serial2, c);
     }
 
     bool OmnibusF3::getQuaternion(float quat[4])

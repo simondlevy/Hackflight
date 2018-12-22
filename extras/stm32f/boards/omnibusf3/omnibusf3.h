@@ -47,9 +47,9 @@ class OmnibusF3 : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
         virtual uint8_t  serialNormalAvailable(void) override;
         virtual uint8_t  serialNormalRead(void) override;
         virtual void     serialNormalWrite(uint8_t c) override;
-        //virtual uint8_t  serialTelemetryAvailable(void) override;
-        //virtual uint8_t  serialTelemetryRead(void) override;
-        //virtual void     serialTelemetryWrite(uint8_t c) override;
+        virtual uint8_t  serialTelemetryAvailable(void) override;
+        virtual uint8_t  serialTelemetryRead(void) override;
+        virtual void     serialTelemetryWrite(uint8_t c) override;
         virtual bool     getQuaternion(float quat[4]) override;
         virtual bool     getGyrometer(float gyroRates[3]) override;
 
