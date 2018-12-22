@@ -25,11 +25,30 @@
 #include <boards/softquat.hpp>
 #include <MPU6000.h>
 
+// Cleanflight includes
+extern "C" {
+
+#include "platform.h"
+#include "drivers/system.h"
+#include "drivers/timer.h"
+#include "drivers/time.h"
+#include "drivers/pwm_output.h"
+#include "drivers/serial.h"
+#include "drivers/serial_uart.h"
+#include "drivers/serial_usb_vcp.h"
+#include "io/serial.h"
+#include "target.h"
+#include "stm32f30x.h"
+
+} // extern "C"
+
 class OmnibusF3 : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
 
     private:
 
         MPU6000 * _imu;
+
+        serialPort_t * _serial2;
 
         void initMotors(void);
         void initUsb(void);

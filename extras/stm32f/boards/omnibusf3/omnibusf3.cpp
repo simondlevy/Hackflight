@@ -30,19 +30,6 @@ static const float    MOTOR_MAX = 2000;
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
-    // Cleanflight includes
-#include "platform.h"
-#include "drivers/system.h"
-#include "drivers/timer.h"
-#include "drivers/time.h"
-#include "drivers/pwm_output.h"
-#include "drivers/serial.h"
-#include "drivers/serial_uart.h"
-#include "drivers/serial_usb_vcp.h"
-#include "io/serial.h"
-#include "target.h"
-#include "stm32f30x.h"
-
     // Hackflight includes
 #include "../../common/spi.h"
 #include "../../common/beeperled.h"
@@ -55,7 +42,7 @@ extern "C" {
 
     // --------------------------------------------------
 
-    // These are static so serial_event can access them
+    // These are static so serial_event1 can access them
     static uint8_t _value1;
     static bool _avail1;
 
@@ -66,23 +53,6 @@ extern "C" {
         _value1 = (uint8_t)(value & 0xFF);
 
         _avail1 = true;
-    }
-
-    // --------------------------------------------------
-
-    static serialPort_t * _serial2;
-
-    // These are static so serial_event can access them
-    static uint8_t _value2;
-    static bool _avail2;
-
-    static void serial_event2(uint16_t value, void * data)
-    {
-        (void)data;
-
-        _value2 = (uint8_t)(value & 0xFF);
-
-        _avail2 = true;
     }
 
     // --------------------------------------------------
@@ -100,7 +70,6 @@ extern "C" {
         // Set up UARTs for sensors, telemetry
         uartPinConfigure(serialPinConfig());
         uartOpen(UARTDEV_1,  serial_event1, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
-        //uartOpen(UARTDEV_2,  serial_event2, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
         _serial2 = uartOpen(UARTDEV_2,  NULL, NULL,  115200, MODE_RXTX, SERIAL_NOT_INVERTED);
 
         RealBoard::init();
@@ -213,14 +182,6 @@ extern "C" {
 
             return true;
         }  
-
-        else {
-
-            if (_avail2) {
-                hf::Debug::printf("%c\n", (char)_value2);
-                _avail2 = false;
-            }
-        }
 
         return false;
     }
