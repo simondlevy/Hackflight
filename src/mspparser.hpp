@@ -359,25 +359,14 @@ namespace hf {
 
                     case 126:
                     {
-                        float agl = 0;
-                        float flowx = 0;
-                        float flowy = 0;
-                        handle_LOITER_Request(agl, flowx, flowy);
-                        prepareToSendFloats(3);
-                        sendFloat(agl);
-                        sendFloat(flowx);
-                        sendFloat(flowy);
-                        serialize8(_checksum);
-                        } break;
-
-                    case 199:
-                    {
-                        int32_t value1 = 0;
-                        int32_t value2 = 0;
-                        handle_FAKE_INT_Request(value1, value2);
-                        prepareToSendInts(2);
-                        sendInt(value1);
-                        sendInt(value2);
+                        int16_t range = 0;
+                        int16_t flowx = 0;
+                        int16_t flowy = 0;
+                        handle_RANGE_AND_FLOW_Request(range, flowx, flowy);
+                        prepareToSendShorts(3);
+                        sendShort(range);
+                        sendShort(flowx);
+                        sendShort(flowy);
                         serialize8(_checksum);
                         } break;
 
@@ -427,6 +416,20 @@ namespace hf {
                         memcpy(&c6,  &_inBuf[20], sizeof(float));
 
                         handle_SET_RC_NORMAL_Request(c1, c2, c3, c4, c5, c6);
+                        } break;
+
+                    case 226:
+                    {
+                        int16_t range = 0;
+                        memcpy(&range,  &_inBuf[0], sizeof(int16_t));
+
+                        int16_t flowx = 0;
+                        memcpy(&flowx,  &_inBuf[2], sizeof(int16_t));
+
+                        int16_t flowy = 0;
+                        memcpy(&flowy,  &_inBuf[4], sizeof(int16_t));
+
+                        handle_SET_RANGE_AND_FLOW_Request(range, flowx, flowy);
                         } break;
 
                 }
@@ -490,17 +493,10 @@ namespace hf {
 
                     case 126:
                     {
-                        float agl = getArgument(0);
-                        float flowx = getArgument(1);
-                        float flowy = getArgument(2);
-                        handle_LOITER_Data(agl, flowx, flowy);
-                        } break;
-
-                    case 199:
-                    {
-                        int32_t value1 = getArgument(0);
-                        int32_t value2 = getArgument(1);
-                        handle_FAKE_INT_Data(value1, value2);
+                        int16_t range = getArgument(0);
+                        int16_t flowx = getArgument(1);
+                        int16_t flowy = getArgument(2);
+                        handle_RANGE_AND_FLOW_Data(range, flowx, flowy);
                         } break;
 
                 }
@@ -602,30 +598,18 @@ namespace hf {
                 (void)vario;
             }
 
-            virtual void handle_LOITER_Request(float & agl, float & flowx, float & flowy)
+            virtual void handle_RANGE_AND_FLOW_Request(int16_t & range, int16_t & flowx, int16_t & flowy)
             {
-                (void)agl;
+                (void)range;
                 (void)flowx;
                 (void)flowy;
             }
 
-            virtual void handle_LOITER_Data(float & agl, float & flowx, float & flowy)
+            virtual void handle_RANGE_AND_FLOW_Data(int16_t & range, int16_t & flowx, int16_t & flowy)
             {
-                (void)agl;
+                (void)range;
                 (void)flowx;
                 (void)flowy;
-            }
-
-            virtual void handle_FAKE_INT_Request(int32_t & value1, int32_t & value2)
-            {
-                (void)value1;
-                (void)value2;
-            }
-
-            virtual void handle_FAKE_INT_Data(int32_t & value1, int32_t & value2)
-            {
-                (void)value1;
-                (void)value2;
             }
 
             virtual void handle_SET_MOTOR_NORMAL_Request(float  m1, float  m2, float  m3, float  m4)
@@ -672,6 +656,20 @@ namespace hf {
                 (void)c4;
                 (void)c5;
                 (void)c6;
+            }
+
+            virtual void handle_SET_RANGE_AND_FLOW_Request(int16_t  range, int16_t  flowx, int16_t  flowy)
+            {
+                (void)range;
+                (void)flowx;
+                (void)flowy;
+            }
+
+            virtual void handle_SET_RANGE_AND_FLOW_Data(int16_t  range, int16_t  flowx, int16_t  flowy)
+            {
+                (void)range;
+                (void)flowx;
+                (void)flowy;
             }
 
         public:
@@ -833,7 +831,7 @@ namespace hf {
                 return 14;
             }
 
-            static uint8_t serialize_LOITER_Request(uint8_t bytes[])
+            static uint8_t serialize_RANGE_AND_FLOW_Request(uint8_t bytes[])
             {
                 bytes[0] = 36;
                 bytes[1] = 77;
@@ -845,49 +843,21 @@ namespace hf {
                 return 6;
             }
 
-            static uint8_t serialize_LOITER(uint8_t bytes[], float  agl, float  flowx, float  flowy)
+            static uint8_t serialize_RANGE_AND_FLOW(uint8_t bytes[], int16_t  range, int16_t  flowx, int16_t  flowy)
             {
                 bytes[0] = 36;
                 bytes[1] = 77;
                 bytes[2] = 62;
-                bytes[3] = 12;
+                bytes[3] = 6;
                 bytes[4] = 126;
 
-                memcpy(&bytes[5], &agl, sizeof(float));
-                memcpy(&bytes[9], &flowx, sizeof(float));
-                memcpy(&bytes[13], &flowy, sizeof(float));
+                memcpy(&bytes[5], &range, sizeof(int16_t));
+                memcpy(&bytes[7], &flowx, sizeof(int16_t));
+                memcpy(&bytes[9], &flowy, sizeof(int16_t));
 
-                bytes[17] = CRC8(&bytes[3], 14);
+                bytes[11] = CRC8(&bytes[3], 8);
 
-                return 18;
-            }
-
-            static uint8_t serialize_FAKE_INT_Request(uint8_t bytes[])
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 199;
-                bytes[5] = 199;
-
-                return 6;
-            }
-
-            static uint8_t serialize_FAKE_INT(uint8_t bytes[], int32_t  value1, int32_t  value2)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 8;
-                bytes[4] = 199;
-
-                memcpy(&bytes[5], &value1, sizeof(int32_t));
-                memcpy(&bytes[9], &value2, sizeof(int32_t));
-
-                bytes[13] = CRC8(&bytes[3], 10);
-
-                return 14;
+                return 12;
             }
 
             static uint8_t serialize_SET_MOTOR_NORMAL(uint8_t bytes[], float  m1, float  m2, float  m3, float  m4)
@@ -941,6 +911,23 @@ namespace hf {
                 bytes[29] = CRC8(&bytes[3], 26);
 
                 return 30;
+            }
+
+            static uint8_t serialize_SET_RANGE_AND_FLOW(uint8_t bytes[], int16_t  range, int16_t  flowx, int16_t  flowy)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 6;
+                bytes[4] = 226;
+
+                memcpy(&bytes[5], &range, sizeof(int16_t));
+                memcpy(&bytes[7], &flowx, sizeof(int16_t));
+                memcpy(&bytes[9], &flowy, sizeof(int16_t));
+
+                bytes[11] = CRC8(&bytes[3], 8);
+
+                return 12;
             }
 
     }; // class MspParser

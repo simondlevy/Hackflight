@@ -42,17 +42,11 @@
    {"estalt"  : "float"}, 
    {"vario"   : "float"}],  
 
-  "LOITER": 
+  "RANGE_AND_FLOW": 
   [{"ID": 126},
-   {"agl"   : "float"}, 
-   {"flowx" : "float"},
-   {"flowy" : "float"}],  
-
-  "FAKE_INT": 
-  [{"ID": 199},
-   {"comment": "Fake int message for testing"}, 
-   {"value1" : "int"},
-   {"value2" : "int"}],  
+   {"range": "short"},
+   {"flowx": "short"},
+   {"flowy": "short"}],
 
   "SET_MOTOR_NORMAL": 
   [{"ID": 215},
@@ -74,6 +68,11 @@
    {"c3": "float"}, 
    {"c4": "float"}, 
    {"c5": "float"}, 
-   {"c6": "float"}]
+   {"c6": "float"}],
 
+  "SET_RANGE_AND_FLOW": 
+  [{"ID": 226},
+   {"range": "short"},
+   {"flowx": "short"},
+   {"flowy": "short"}]
 }

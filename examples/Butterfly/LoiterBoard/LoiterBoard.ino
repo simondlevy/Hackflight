@@ -32,6 +32,9 @@
 
 #include "mspparser.hpp"
 
+// Set this to Serial for USB debugging, or Serial1 for depolyment
+static HardwareSerial * UART = &Serial;
+
 static uint16_t FLOW_UPDATE_HZ = 20;
 
 static const uint8_t VCC_PIN = A0;
@@ -44,8 +47,6 @@ static VL53L1X distanceSensor;
 static PMW3901 flowSensor(CS_PIN);
 
 static uint32_t _flowUpdateMicros = 1000000 / FLOW_UPDATE_HZ;
-
-static HardwareSerial * hardwareSerial = &Serial;
 
 static void powerPin(uint8_t pin, uint8_t value)
 {
@@ -61,58 +62,6 @@ static void error(const char * sensorName)
     }
 }
 
-class LoiterRequestParser : public hf::MspParser {
-
-    private:
-        
-        float _agl;
-        float _flowx;
-        float _flowy;
-
-    public:
-
-        void init(void) 
-        {
-            hf::MspParser::init();
-        }
-
-        void set(float agl, float flowx, float flowy)
-        {
-            // Set the values that the parser will send out
-            _agl = agl;
-            _flowx = flowx;
-            _flowy = flowy;
-
-            // Update the parser
-            MspParser::update();
-        }
-
-        virtual void handle_LOITER_Request(float & agl, float & flowx, float & flowy) override
-        {
-            agl = _agl;
-            flowx = _flowx;
-            flowy = _flowy;
-        }
-
-        virtual uint8_t mspSerialAvailable(void) 
-        {
-            return hardwareSerial->available();
-        }
-
-        virtual uint8_t mspSerialRead(void) 
-        {
-            return hardwareSerial->read();
-        }
-
-        virtual void mspSerialWrite(uint8_t b) 
-        {
-            hardwareSerial->write(b);
-        }
-
-};
-
-static LoiterRequestParser parser;
-
 void setup(void)
 {
     // Use digital pins to power VL53L1X
@@ -123,8 +72,8 @@ void setup(void)
     Wire.begin(TWI_PINS_6_7);
     delay(100); // Wait a bit for bus to start
 
-    // Start serial comms 
-    hardwareSerial->begin(115200);
+    // Start serial comms
+    UART->begin(115200);
 
     // Start VL53L1X distance sensor
     if (!distanceSensor.begin()) {
@@ -135,20 +84,16 @@ void setup(void)
     if (!flowSensor.begin()) {
         error("PMW3901");
     }
-
-    // Start MSP parser to listen for loiter data requests
-    parser.init();
 }
 
 void loop(void)
 {
     // Declare measurement variables static so they'll persist between calls to loop()
-    static uint16_t agl;
-    static int16_t flowx, flowy;
+    static int16_t range, flowx, flowy;
 
     // Read distance sensor when its data is available
     if (distanceSensor.newDataReady()) {
-        agl = distanceSensor.getDistance(); //Get the result of the measurement from the sensor
+        range = distanceSensor.getDistance(); //Get the result of the measurement from the sensor
     }
 
     // Read flow sensor periodically
@@ -157,8 +102,10 @@ void loop(void)
     if (time-_time > _flowUpdateMicros) {
         flowSensor.readMotionCount(&flowx, &flowy);
         _time = time;
+        uint8_t msg[hf::MspParser::MAXMSG];
+        uint8_t len = hf::MspParser::serialize_RANGE_AND_FLOW(msg, range, flowx, flowy);
+        for (uint8_t k=0; k<len; ++k) {
+            UART->write(msg[k]);
+        }
     }
-
-    // Set current AGL, flow in parser
-    parser.set(agl, flowx, flowy);
 }
