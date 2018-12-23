@@ -30,13 +30,13 @@ along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 #include <PMW3901.h>
 
 #include "debug.hpp"
-#include "peripheral.hpp"
+#include "sensor.hpp"
 #include "filters.hpp"
 #include "linalg.hpp"
 
 namespace hf {
 
-    class OpticalFlow : public PeripheralSensor {
+    class OpticalFlow : public Sensor {
 
         private:
 

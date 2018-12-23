@@ -48,6 +48,7 @@ class OmnibusF3 : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
 
         MPU6000 * _imu;
 
+        // For incoming sensor messages
         serialPort_t * _serial2;
 
         void initMotors(void);

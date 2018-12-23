@@ -32,7 +32,6 @@
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
 #include "pidcontrollers/rate.hpp"
-#include "sensors/peripheral.hpp"
 #include "sensors/gyrometer.hpp"
 #include "sensors/quaternion.hpp"
 
@@ -327,7 +326,7 @@ namespace hf {
 
             } // init
 
-            void addSensor(PeripheralSensor * sensor) 
+            void addSensor(Sensor * sensor) 
             {
                 add_sensor(sensor);
             }
