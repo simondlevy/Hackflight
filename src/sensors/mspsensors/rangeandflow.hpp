@@ -1,5 +1,5 @@
 /*
-   rangenflow.hpp : MSP-based sensor using rangefinder and optial flow
+   rangelndflow.hpp : MSP-based sensor using rangefinder and optial flow
 
    Copyright (c) 2018 Simon D. Levy
    

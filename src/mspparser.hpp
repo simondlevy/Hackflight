@@ -293,7 +293,7 @@ namespace hf {
                         serialize8(_checksum);
                         } break;
 
-                    case 107:
+                    case 112:
                     {
                         float altitude = 0;
                         float variometer = 0;
@@ -450,7 +450,7 @@ namespace hf {
                         handle_RAW_IMU_Data(accx, accy, accz, gyrx, gyry, gyrz, magx, magy, magz);
                         } break;
 
-                    case 107:
+                    case 112:
                     {
                         float altitude = getArgument(0);
                         float variometer = getArgument(1);
@@ -717,8 +717,8 @@ namespace hf {
                 bytes[1] = 77;
                 bytes[2] = 60;
                 bytes[3] = 0;
-                bytes[4] = 107;
-                bytes[5] = 107;
+                bytes[4] = 112;
+                bytes[5] = 112;
 
                 return 6;
             }
@@ -729,7 +729,7 @@ namespace hf {
                 bytes[1] = 77;
                 bytes[2] = 62;
                 bytes[3] = 28;
-                bytes[4] = 107;
+                bytes[4] = 112;
 
                 memcpy(&bytes[5], &altitude, sizeof(float));
                 memcpy(&bytes[9], &variometer, sizeof(float));

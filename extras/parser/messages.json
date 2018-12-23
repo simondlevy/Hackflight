@@ -12,7 +12,7 @@
    {"magz": "short"}],
 
   "STATE": 
-  [{"ID": 107},
+  [{"ID": 112},
    {"altitude":          "float"}, 
    {"variometer":        "float"}, 
    {"positionX":         "float"}, 
