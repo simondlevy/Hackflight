@@ -32,7 +32,7 @@ def _CRC8(data):
 
     return crc
 
-class MSP_Parser(object):
+class Parser(object):
 
     def __init__(self):
 

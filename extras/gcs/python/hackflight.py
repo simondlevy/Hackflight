@@ -127,7 +127,7 @@ class GCS:
         self._show_splash()
 
         # Create a message parser 
-        self.parser = msppg.MSP_Parser()
+        self.parser = msppg.Parser()
 
         # Set up parser's request strings
         self.attitude_request = msppg.serialize_ATTITUDE_RADIANS_Request()
