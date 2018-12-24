@@ -1,8 +1,6 @@
 /*
    LoiterListener.ino : Test-listener for LoiterBoard
 
-   Additional libraries required:
-
    Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
@@ -25,7 +23,6 @@
 void setup(void)
 {
     Serial.begin(115200);
-
     Serial1.begin(115200);
 }
 
@@ -35,13 +32,4 @@ void loop(void)
         uint8_t c = Serial1.read();
         Serial.println(c, HEX);
     }
-
-    /*
-    Serial.print("Distance: ");
-    Serial.print(distance);
-    Serial.print(" mm; Flow: ");
-    Serial.print(flowx);
-    Serial.print(" ");
-    Serial.println(flowy);
-    */
 }

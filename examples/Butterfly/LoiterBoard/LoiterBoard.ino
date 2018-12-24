@@ -33,7 +33,7 @@
 #include "mspparser.hpp"
 
 // Set this to Serial for USB debugging, or Serial1 for depolyment
-static HardwareSerial * UART = &Serial;
+static HardwareSerial * UART = &Serial1;
 
 static uint16_t FLOW_UPDATE_HZ = 20;
 
