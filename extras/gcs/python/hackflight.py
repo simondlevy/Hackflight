@@ -34,7 +34,6 @@ USB_UPDATE_MSEC = 200
 
 from comms import Comms
 from serial.tools.list_ports import comports
-from threading import Thread
 import os
 import tkcompat as tk
 
@@ -185,7 +184,14 @@ class GCS(msppg.Parser):
 
     def handle_RC_NORMAL(self, c1, c2, c3, c4, c5, c6):
 
-        return
+        # Display throttle as [0,1], other channels as [-1,+1]
+        self.rxchannels = c1/2.+.5, c2, c3, c4, c5, c6
+
+        # As soon as we handle the callback from one request, send another request, if receiver dialog is running
+        if self.receiver.running:
+            self._send_rc_request()
+
+        #self.messages.setCurrentMessage('Receiver: %04d %04d %04d %04d %04d' % (c1, c2, c3, c4, c5))
 
     def handle_ATTITUDE_RADIANS(self, x, y, z):
 
@@ -471,17 +477,6 @@ class GCS(msppg.Parser):
             self.imu.setParams(pitchroll_kp_percent, yaw_kp_percent)
 
         self.newconnect = False
-
-    def _handle_rc(self, c1, c2, c3, c4, c5, c6):
-
-        # Display throttle as [0,1], other channels as [-1,+1]
-        self.rxchannels = c1/2.+.5, c2, c3, c4, c5, c6
-
-        # As soon as we handle the callback from one request, send another request, if receiver dialog is running
-        if self.receiver.running:
-            self._send_rc_request()
-
-        #self.messages.setCurrentMessage('Receiver: %04d %04d %04d %04d %04d' % (c1, c2, c3, c4, c5))
 
     def _handle_arm_status(self, armed):
 
