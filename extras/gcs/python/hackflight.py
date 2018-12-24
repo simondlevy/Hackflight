@@ -183,6 +183,10 @@ class GCS(msppg.Parser):
 
         self.root.after(delay_msec, task)
 
+    def handle_RC_NORMAL(self, c1, c2, c3, c4, c5, c6):
+
+        return
+
     def handle_ATTITUDE_RADIANS(self, x, y, z):
 
         self.roll_pitch_yaw = x, -y, z  
@@ -467,18 +471,6 @@ class GCS(msppg.Parser):
             self.imu.setParams(pitchroll_kp_percent, yaw_kp_percent)
 
         self.newconnect = False
-
-    def _handle_attitude(self, x, y, z):
-
-        self.roll_pitch_yaw = x, -y, z  
-
-        self.gotimu = True
-
-        #self.messages.setCurrentMessage('Roll/Pitch/Yaw: %+3.3f %+3.3f %+3.3f' % self.roll_pitch_yaw)
-
-        # As soon as we handle the callback from one request, send another request, if IMU dialog is running
-        if self.imu.running:
-            self._send_attitude_request()
 
     def _handle_rc(self, c1, c2, c3, c4, c5, c6):
 

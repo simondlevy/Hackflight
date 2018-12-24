@@ -109,15 +109,11 @@ class Parser(object):
 
                     if self.message_direction == 0:
 
-                        if hasattr(self, 'RC_NORMAL_Request_Handler'):
-
-                            self.RC_NORMAL_Request_Handler()
+                        self.handle_RC_NORMAL_Request()
 
                     else:
 
-                        if hasattr(self, 'RC_NORMAL_Handler'):
-
-                            self.RC_NORMAL_Handler(*struct.unpack('=ffffff', self.message_buffer))
+                        self.handle_RC_NORMAL(*struct.unpack('=ffffff', self.message_buffer))
 
                 if self.message_id == 122:
 
@@ -149,27 +145,21 @@ class Parser(object):
         '''
         self.STATE_Handler = handler
 
-    def set_RC_NORMAL_Handler(self, handler):
+    def handle_RC_NORMAL_Request(self):
 
-        '''
-        Sets the handler method for when a RC_NORMAL message is successfully parsed.
-        You should declare this message with the following parameter(s):
-            c1,c2,c3,c4,c5,c6
-        '''
-        self.RC_NORMAL_Handler = handler
+        return
+
+    def handle_RC_NORMAL(self, c1, c2, c3, c4, c5, c6):
+
+        return
+
+    def handle_ATTITUDE_RADIANS_Request(self):
+
+        return
 
     def handle_ATTITUDE_RADIANS(self, x, y, z):
 
         return
-
-    def set_ATTITUDE_RADIANS_Handler(self, handler):
-
-        '''
-        Sets the handler method for when a ATTITUDE_RADIANS message is successfully parsed.
-        You should declare this message with the following parameter(s):
-            roll,pitch,yaw
-        '''
-        self.ATTITUDE_RADIANS_Handler = handler
 
 def serialize_STATE(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
     '''
