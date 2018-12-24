@@ -55,7 +55,7 @@ class Comms:
         while self.running:
             try:
                 byte = self.port.read(1)
-                self.gcs.parser.parse(byte)
+                self.gcs.parse(byte)
             except:
                 None
 

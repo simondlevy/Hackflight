@@ -47,9 +47,11 @@ from resources import resource_path
 
 # GCS class runs the show =========================================================================================
 
-class GCS:
+class GCS(msppg.Parser):
 
     def __init__(self):
+
+        msppg.Parser.__init__(self)
 
         # No communications or arming yet
         self.comms = None
@@ -127,7 +129,7 @@ class GCS:
         self._show_splash()
 
         # Create a message parser 
-        self.parser = msppg.Parser()
+        #self.parser = msppg.Parser()
 
         # Set up parser's request strings
         self.attitude_request = msppg.serialize_ATTITUDE_RADIANS_Request()
@@ -204,17 +206,20 @@ class GCS:
         #self.messages.stop()
         #self.maps.stop()
 
-        self.parser.set_ATTITUDE_RADIANS_Handler(self._handle_attitude)
+        #self.parser.set_ATTITUDE_RADIANS_Handler(self._handle_attitude)
+        self.set_ATTITUDE_RADIANS_Handler(self._handle_attitude)
         self._send_attitude_request()
         self.imu.start()
 
     def _start(self):
 
-        self.parser.set_ATTITUDE_RADIANS_Handler(self._handle_attitude)
+        #self.parser.set_ATTITUDE_RADIANS_Handler(self._handle_attitude)
+        self.set_ATTITUDE_RADIANS_Handler(self._handle_attitude)
         self._send_attitude_request()
         self.imu.start()
 
-        self.parser.set_RC_NORMAL_Handler(self._handle_rc)
+        #self.parser.set_RC_NORMAL_Handler(self._handle_rc)
+        self.set_RC_NORMAL_Handler(self._handle_rc)
 
         self.gotimu = False
         self.hide(self.error_label)
