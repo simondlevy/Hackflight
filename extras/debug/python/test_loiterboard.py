@@ -33,7 +33,6 @@ port = serial.Serial(PORT, 115200)
 parser = MSP_Parser()
 parser.set_RANGE_AND_FLOW_Handler(handler)
 
-
 while True:
 
         c = None

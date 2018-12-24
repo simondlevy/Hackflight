@@ -268,31 +268,6 @@ namespace hf {
             {
                 switch (_command) {
 
-                    case 102:
-                    {
-                        int16_t accx = 0;
-                        int16_t accy = 0;
-                        int16_t accz = 0;
-                        int16_t gyrx = 0;
-                        int16_t gyry = 0;
-                        int16_t gyrz = 0;
-                        int16_t magx = 0;
-                        int16_t magy = 0;
-                        int16_t magz = 0;
-                        handle_RAW_IMU_Request(accx, accy, accz, gyrx, gyry, gyrz, magx, magy, magz);
-                        prepareToSendShorts(9);
-                        sendShort(accx);
-                        sendShort(accy);
-                        sendShort(accz);
-                        sendShort(gyrx);
-                        sendShort(gyry);
-                        sendShort(gyrz);
-                        sendShort(magx);
-                        sendShort(magy);
-                        sendShort(magz);
-                        serialize8(_checksum);
-                        } break;
-
                     case 112:
                     {
                         float altitude = 0;
@@ -343,17 +318,6 @@ namespace hf {
                         sendFloat(roll);
                         sendFloat(pitch);
                         sendFloat(yaw);
-                        serialize8(_checksum);
-                        } break;
-
-                    case 123:
-                    {
-                        float estalt = 0;
-                        float vario = 0;
-                        handle_ALTITUDE_METERS_Request(estalt, vario);
-                        prepareToSendFloats(2);
-                        sendFloat(estalt);
-                        sendFloat(vario);
                         serialize8(_checksum);
                         } break;
 
@@ -439,20 +403,6 @@ namespace hf {
             {
                 switch (_command) {
 
-                    case 102:
-                    {
-                        int16_t accx = getArgument(0);
-                        int16_t accy = getArgument(1);
-                        int16_t accz = getArgument(2);
-                        int16_t gyrx = getArgument(3);
-                        int16_t gyry = getArgument(4);
-                        int16_t gyrz = getArgument(5);
-                        int16_t magx = getArgument(6);
-                        int16_t magy = getArgument(7);
-                        int16_t magz = getArgument(8);
-                        handle_RAW_IMU_Data(accx, accy, accz, gyrx, gyry, gyrz, magx, magy, magz);
-                        } break;
-
                     case 112:
                     {
                         float altitude = getArgument(0);
@@ -484,13 +434,6 @@ namespace hf {
                         handle_ATTITUDE_RADIANS_Data(roll, pitch, yaw);
                         } break;
 
-                    case 123:
-                    {
-                        float estalt = getArgument(0);
-                        float vario = getArgument(1);
-                        handle_ALTITUDE_METERS_Data(estalt, vario);
-                        } break;
-
                     case 126:
                     {
                         int16_t range = getArgument(0);
@@ -503,32 +446,6 @@ namespace hf {
             }
 
         protected:
-
-            virtual void handle_RAW_IMU_Request(int16_t & accx, int16_t & accy, int16_t & accz, int16_t & gyrx, int16_t & gyry, int16_t & gyrz, int16_t & magx, int16_t & magy, int16_t & magz)
-            {
-                (void)accx;
-                (void)accy;
-                (void)accz;
-                (void)gyrx;
-                (void)gyry;
-                (void)gyrz;
-                (void)magx;
-                (void)magy;
-                (void)magz;
-            }
-
-            virtual void handle_RAW_IMU_Data(int16_t & accx, int16_t & accy, int16_t & accz, int16_t & gyrx, int16_t & gyry, int16_t & gyrz, int16_t & magx, int16_t & magy, int16_t & magz)
-            {
-                (void)accx;
-                (void)accy;
-                (void)accz;
-                (void)gyrx;
-                (void)gyry;
-                (void)gyrz;
-                (void)magx;
-                (void)magy;
-                (void)magz;
-            }
 
             virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, float & heading, float & velocityForward, float & velocityRightward)
             {
@@ -584,18 +501,6 @@ namespace hf {
                 (void)roll;
                 (void)pitch;
                 (void)yaw;
-            }
-
-            virtual void handle_ALTITUDE_METERS_Request(float & estalt, float & vario)
-            {
-                (void)estalt;
-                (void)vario;
-            }
-
-            virtual void handle_ALTITUDE_METERS_Data(float & estalt, float & vario)
-            {
-                (void)estalt;
-                (void)vario;
             }
 
             virtual void handle_RANGE_AND_FLOW_Request(int16_t & range, int16_t & flowx, int16_t & flowy)
@@ -673,41 +578,6 @@ namespace hf {
             }
 
         public:
-
-            static uint8_t serialize_RAW_IMU_Request(uint8_t bytes[])
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 102;
-                bytes[5] = 102;
-
-                return 6;
-            }
-
-            static uint8_t serialize_RAW_IMU(uint8_t bytes[], int16_t  accx, int16_t  accy, int16_t  accz, int16_t  gyrx, int16_t  gyry, int16_t  gyrz, int16_t  magx, int16_t  magy, int16_t  magz)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 18;
-                bytes[4] = 102;
-
-                memcpy(&bytes[5], &accx, sizeof(int16_t));
-                memcpy(&bytes[7], &accy, sizeof(int16_t));
-                memcpy(&bytes[9], &accz, sizeof(int16_t));
-                memcpy(&bytes[11], &gyrx, sizeof(int16_t));
-                memcpy(&bytes[13], &gyry, sizeof(int16_t));
-                memcpy(&bytes[15], &gyrz, sizeof(int16_t));
-                memcpy(&bytes[17], &magx, sizeof(int16_t));
-                memcpy(&bytes[19], &magy, sizeof(int16_t));
-                memcpy(&bytes[21], &magz, sizeof(int16_t));
-
-                bytes[23] = CRC8(&bytes[3], 20);
-
-                return 24;
-            }
 
             static uint8_t serialize_STATE_Request(uint8_t bytes[])
             {
@@ -801,34 +671,6 @@ namespace hf {
                 bytes[17] = CRC8(&bytes[3], 14);
 
                 return 18;
-            }
-
-            static uint8_t serialize_ALTITUDE_METERS_Request(uint8_t bytes[])
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 123;
-                bytes[5] = 123;
-
-                return 6;
-            }
-
-            static uint8_t serialize_ALTITUDE_METERS(uint8_t bytes[], float  estalt, float  vario)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 8;
-                bytes[4] = 123;
-
-                memcpy(&bytes[5], &estalt, sizeof(float));
-                memcpy(&bytes[9], &vario, sizeof(float));
-
-                bytes[13] = CRC8(&bytes[3], 10);
-
-                return 14;
             }
 
             static uint8_t serialize_RANGE_AND_FLOW_Request(uint8_t bytes[])
