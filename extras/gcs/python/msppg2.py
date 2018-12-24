@@ -123,15 +123,23 @@ class Parser(object):
 
                     if self.message_direction == 0:
 
+                        self.handle_ATTITUDE_RADIANS_Request()
+
+                        '''
                         if hasattr(self, 'ATTITUDE_RADIANS_Request_Handler'):
 
                             self.ATTITUDE_RADIANS_Request_Handler()
+                        '''
 
                     else:
 
+                        self.handle_ATTITUDE_RADIANS(*struct.unpack('=fff', self.message_buffer))
+
+                        '''
                         if hasattr(self, 'ATTITUDE_RADIANS_Handler'):
 
                             self.ATTITUDE_RADIANS_Handler(*struct.unpack('=fff', self.message_buffer))
+                        '''
 
             else:
                 print('code: ' + str(self.message_id) + ' - crc failed')
@@ -161,6 +169,10 @@ class Parser(object):
             c1,c2,c3,c4,c5,c6
         '''
         self.RC_NORMAL_Handler = handler
+
+    def handle_ATTITUDE_RADIANS(self, x, y, z):
+
+        return
 
     def set_ATTITUDE_RADIANS_Handler(self, handler):
 
