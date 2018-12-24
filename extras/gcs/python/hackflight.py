@@ -226,8 +226,6 @@ class GCS(msppg.Parser):
         self._send_attitude_request()
         self.imu.start()
 
-        self.set_RC_NORMAL_Handler(self._handle_rc)
-
         self.gotimu = False
         self.hide(self.error_label)
         self.scheduleTask(BOARD_REPLY_DELAY_MSEC, self._checkimu)
