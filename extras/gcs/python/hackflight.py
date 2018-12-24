@@ -218,19 +218,14 @@ class GCS(msppg.Parser):
         #self.messages.stop()
         #self.maps.stop()
 
-        #self.parser.set_ATTITUDE_RADIANS_Handler(self._handle_attitude)
-        self.set_ATTITUDE_RADIANS_Handler(self._handle_attitude)
         self._send_attitude_request()
         self.imu.start()
 
     def _start(self):
 
-        #self.parser.set_ATTITUDE_RADIANS_Handler(self._handle_attitude)
-        self.set_ATTITUDE_RADIANS_Handler(self._handle_attitude)
         self._send_attitude_request()
         self.imu.start()
 
-        #self.parser.set_RC_NORMAL_Handler(self._handle_rc)
         self.set_RC_NORMAL_Handler(self._handle_rc)
 
         self.gotimu = False
