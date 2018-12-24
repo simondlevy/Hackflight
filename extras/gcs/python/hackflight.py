@@ -38,7 +38,7 @@ from threading import Thread
 import os
 import tkcompat as tk
 
-import msppg
+import msppg2 as msppg
 
 from imu import IMU
 from motors import Motors

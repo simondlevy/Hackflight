@@ -321,19 +321,6 @@ namespace hf {
                         serialize8(_checksum);
                         } break;
 
-                    case 126:
-                    {
-                        int16_t range = 0;
-                        int16_t flowx = 0;
-                        int16_t flowy = 0;
-                        handle_RANGE_AND_FLOW_Request(range, flowx, flowy);
-                        prepareToSendShorts(3);
-                        sendShort(range);
-                        sendShort(flowx);
-                        sendShort(flowy);
-                        serialize8(_checksum);
-                        } break;
-
                     case 215:
                     {
                         float m1 = 0;
@@ -434,14 +421,6 @@ namespace hf {
                         handle_ATTITUDE_RADIANS_Data(roll, pitch, yaw);
                         } break;
 
-                    case 126:
-                    {
-                        int16_t range = getArgument(0);
-                        int16_t flowx = getArgument(1);
-                        int16_t flowy = getArgument(2);
-                        handle_RANGE_AND_FLOW_Data(range, flowx, flowy);
-                        } break;
-
                 }
             }
 
@@ -501,20 +480,6 @@ namespace hf {
                 (void)roll;
                 (void)pitch;
                 (void)yaw;
-            }
-
-            virtual void handle_RANGE_AND_FLOW_Request(int16_t & range, int16_t & flowx, int16_t & flowy)
-            {
-                (void)range;
-                (void)flowx;
-                (void)flowy;
-            }
-
-            virtual void handle_RANGE_AND_FLOW_Data(int16_t & range, int16_t & flowx, int16_t & flowy)
-            {
-                (void)range;
-                (void)flowx;
-                (void)flowy;
             }
 
             virtual void handle_SET_MOTOR_NORMAL_Request(float  m1, float  m2, float  m3, float  m4)
@@ -671,35 +636,6 @@ namespace hf {
                 bytes[17] = CRC8(&bytes[3], 14);
 
                 return 18;
-            }
-
-            static uint8_t serialize_RANGE_AND_FLOW_Request(uint8_t bytes[])
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 126;
-                bytes[5] = 126;
-
-                return 6;
-            }
-
-            static uint8_t serialize_RANGE_AND_FLOW(uint8_t bytes[], int16_t  range, int16_t  flowx, int16_t  flowy)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 6;
-                bytes[4] = 126;
-
-                memcpy(&bytes[5], &range, sizeof(int16_t));
-                memcpy(&bytes[7], &flowx, sizeof(int16_t));
-                memcpy(&bytes[9], &flowy, sizeof(int16_t));
-
-                bytes[11] = CRC8(&bytes[3], 8);
-
-                return 12;
             }
 
             static uint8_t serialize_SET_MOTOR_NORMAL(uint8_t bytes[], float  m1, float  m2, float  m3, float  m4)
