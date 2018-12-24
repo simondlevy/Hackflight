@@ -139,11 +139,9 @@ class Python_Emitter(LocalCodeEmitter):
             if msgid < 200:
                 self._write(4*self.indent + ('if self.message_id == %d:\n\n' % msgstuff[0]))
                 self._write(5*self.indent + ('if self.message_direction == 0:\n\n'))
-                self._write(6*self.indent + 'if hasattr(self, \'' +  msgtype + '_Request_Handler\'):\n\n')
-                self._write(7*self.indent + 'self.%s_Request_Handler()\n\n' % msgtype)
+                self._write(6*self.indent + 'self.handle_%s_Request()\n\n' % msgtype)
                 self._write(5*self.indent + 'else:\n\n')
-                self._write(6*self.indent + 'if hasattr(self, \'' +  msgtype + '_Handler\'):\n\n')
-                self._write(7*self.indent + 'self.%s_Handler(*struct.unpack(\'=' % msgtype)
+                self._write(6*self.indent + 'self.handle_%s(*struct.unpack(\'=' % msgtype)
                 for argtype in self._getargtypes(msgstuff):
                     self._write('%s' % self.type2pack[argtype])
                 self._write("\'" + ', self.message_buffer))\n\n')
@@ -158,17 +156,14 @@ class Python_Emitter(LocalCodeEmitter):
 
             if msgid < 200:
 
-                self._write(self.indent + 'def set_%s_Handler(self, handler):\n\n' % msgtype) 
+                self._write(self.indent + 'def handle_%s(self' % msgtype) 
+                for argname in self._getargnames(msgstuff):
+                    self._write(', ' + argname)
+                self._write('):\n')
                 self._write(2*self.indent + "'''\n")
-                self._write(2*self.indent + 'Sets the handler method for when a %s message is successfully parsed.\n' %
-                        msgtype)
-                self._write(2*self.indent + 'You should declare this message with the following parameter(s):\n')
-                self._write(3*self.indent + ','.join(self._getargnames(msgstuff)))
-                self._write('\n' + 2*self.indent + "'''\n")
-                self._write(2*self.indent + 'self.%s_Handler = handler\n\n' % msgtype)
-
-                #self._write(self.indent + 'def set_%s_Request_Handler(self, handler):\n\n' % msgtype) 
-                #self._write(2*self.indent + 'self.%s_Request_Handler = handler\n\n' % msgtype)
+                self._write(2*self.indent + 'Overridable handler method for when a %s message is successfully parsed.\n' % msgtype)
+                self._write(2*self.indent + "'''\n")
+                self._write(2*self.indent + 'return\n\n')
 
         # Emit serializer functions for module
         for msgtype in msgdict.keys():

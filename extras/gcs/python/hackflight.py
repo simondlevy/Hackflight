@@ -37,7 +37,8 @@ from serial.tools.list_ports import comports
 import os
 import tkcompat as tk
 
-import msppg2 as msppg
+#import msppg2 as msppg
+import msppg
 
 from imu import IMU
 from motors import Motors
