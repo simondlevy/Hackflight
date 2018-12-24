@@ -1,16 +1,3 @@
-{
-  "RAW_IMU": 
-  [{"ID": 102},
-   {"accx": "short"}, 
-   {"accy": "short"}, 
-   {"accz": "short"}, 
-   {"gyrx": "short"}, 
-   {"gyry": "short"}, 
-   {"gyrz": "short"}, 
-   {"magx": "short"}, 
-   {"magy": "short"}, 
-   {"magz": "short"}],
-
   "STATE": 
   [{"ID": 112},
    {"altitude":          "float"}, 
@@ -37,11 +24,6 @@
    {"pitch"   : "float"},
    {"yaw"     : "float"}],
   
-  "ALTITUDE_METERS": 
-  [{"ID": 123},
-   {"estalt"  : "float"}, 
-   {"vario"   : "float"}],  
-
   "RANGE_AND_FLOW": 
   [{"ID": 126},
    {"range": "short"},
