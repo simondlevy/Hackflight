@@ -20,11 +20,29 @@
 
 #pragma once
 
-#include "mspsensor.hpp"
+#include "sensors/mspsensor.hpp"
+#include "debug.hpp"
 
 namespace hf {
 
     class RangeAndFlow : public MspSensor {
+
+        virtual bool ready(float time) override
+        {
+            (void)time;
+            return false;
+        }
+
+        virtual void modifyState(state_t & state, float time)  override
+        {
+            (void)state;
+            (void)time;
+        }
+
+        virtual void handle_SET_RANGE_AND_FLOW(int16_t  range, int16_t  flowx, int16_t  flowy) override
+        {
+            hf::Debug::printf("%04d %+3d %+3d\n", range, flowx, flowy); 
+        }
 
     };  // class RangeAndFlow
 

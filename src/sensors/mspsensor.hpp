@@ -2,7 +2,7 @@
    mspsensor.hpp : Abstract class for sensors using MSP
 
    Copyright (c) 2018 Simon D. Levy
-   
+
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify
@@ -28,6 +28,18 @@ namespace hf {
     class MspSensor : public Sensor, MspParser {
 
         friend class Hackflight;
+
+        public:
+
+        void init(void) 
+        {
+            MspParser::init();
+        }
+
+        void parse(uint8_t c)
+        {
+            MspParser::parse(c);
+        }
 
     };  // class MspSensor
 

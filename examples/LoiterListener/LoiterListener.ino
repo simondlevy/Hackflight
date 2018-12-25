@@ -19,6 +19,8 @@
 */
 
 #include "mspparser.hpp"
+#include "sensors/mspsensor.hpp"
+#include "sensors/mspsensors/rangeandflow.hpp"
 #include "debug.hpp"
 
 void hf::Board::outbuf(char * buf)
@@ -26,28 +28,20 @@ void hf::Board::outbuf(char * buf)
     Serial.print(buf);
 }
 
-class LoiterParser : public hf::MspParser {
-
-    virtual void handle_SET_RANGE_AND_FLOW(int16_t  range, int16_t  flowx, int16_t  flowy) override
-    {
-        hf::Debug::printf("%04d %+3d %+3d\n", range, flowx, flowy); 
-    }
-}; 
-
-LoiterParser parser;
+hf::RangeAndFlow rangeAndFlow;
 
 void setup(void)
 {
     Serial.begin(115200);
     Serial1.begin(115200);
 
-    parser.init();
+    rangeAndFlow.init();
 }
 
 void loop(void)
 {
     while (Serial1.available()) {
         uint8_t c = Serial1.read();
-        parser.parse(c);
+        rangeAndFlow.parse(c);
     }
 }
