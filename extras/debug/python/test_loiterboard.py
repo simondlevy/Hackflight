@@ -46,12 +46,12 @@ while True:
 
             c = port.read()
 
-            parser.parse(c)
 
         except KeyboardInterrupt:
 
             port.close()
             break
-
+ 
+        parser.parse(c)
     
 
