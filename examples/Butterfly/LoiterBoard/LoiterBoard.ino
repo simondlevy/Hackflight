@@ -103,7 +103,7 @@ void loop(void)
         flowSensor.readMotionCount(&flowx, &flowy);
         _time = time;
         uint8_t msg[hf::MspParser::MAXMSG];
-        uint8_t len = hf::MspParser::serialize_RANGE_AND_FLOW(msg, range, flowx, flowy);
+        uint8_t len = hf::MspParser::serialize_SET_RANGE_AND_FLOW(msg, range, flowx, flowy);
         for (uint8_t k=0; k<len; ++k) {
             UART->write(msg[k]);
         }
