@@ -281,7 +281,7 @@ namespace hf {
                                 }
                                 else {
                                     _inBufIndex = 0;
-                                    dispatchDataMessage();
+                                    //dispatchDataMessage();
                                 }
                             }
                             _state = IDLE;

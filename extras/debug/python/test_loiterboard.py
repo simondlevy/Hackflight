@@ -20,18 +20,22 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-PORT = '/dev/ttyACM0'
+#PORT = '/dev/ttyACM0'
+PORT = 'COM61'
 
 import serial
-from msppg import MSP_Parser
+from msppg import Parser
+import sys
 
-def handler(agl, flowx, flowy):
-    print(agl, flowx, flowy)
+#class RangeAndFlowParser(Parzser):
+#
+#    def handle_SET_RANGE_AND_FLOW(self, agl, flowx, flowy):
+#
+#        print(agl, flowx, flowy)
 
 port = serial.Serial(PORT, 115200)
 
-parser = MSP_Parser()
-parser.set_RANGE_AND_FLOW_Handler(handler)
+#parser = RangeAndFlowParser()
 
 while True:
 
@@ -41,10 +45,13 @@ while True:
 
             c = port.read()
 
+            print('x%02x' % ord(c))
+            sys.stdout.flush()
+
         except KeyboardInterrupt:
 
             port.close()
             break
 
-        parser.parse(c)
+    
 
