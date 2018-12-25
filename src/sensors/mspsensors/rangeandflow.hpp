@@ -30,7 +30,20 @@ namespace hf {
         virtual bool ready(float time) override
         {
             (void)time;
-            return false;
+
+            bool retval = false;
+
+            if (_ready) {
+                hf::Debug::printf("%04d %+3d %+3d\n", _range, _flowx, _flowy); 
+                retval = true;
+                _ready = false;
+            }
+
+            else {
+                Debug::printf("not ready\n");
+            }
+
+            return retval;
         }
 
         virtual void modifyState(state_t & state, float time)  override
@@ -41,8 +54,18 @@ namespace hf {
 
         virtual void handle_SET_RANGE_AND_FLOW(int16_t  range, int16_t  flowx, int16_t  flowy) override
         {
-            hf::Debug::printf("%04d %+3d %+3d\n", range, flowx, flowy); 
+            _range = range;
+            _flowx = flowx;
+            _flowy = flowy;
         }
+
+        private:
+
+        bool _ready = false;
+
+        int16_t  _range = 0;
+        int16_t  _flowx = 0;
+        int16_t  _flowy = 0;
 
     };  // class RangeAndFlow
 
