@@ -28,9 +28,9 @@ void hf::Board::outbuf(char * buf)
 
 class LoiterParser : public hf::MspParser {
 
-    virtual void handle_SET_RANGE_AND_FLOW_Data(int16_t  range, int16_t  flowx, int16_t  flowy) override
+    virtual void handle_SET_RANGE_AND_FLOW(int16_t  range, int16_t  flowx, int16_t  flowy) override
     {
-        //hf::Debug::printf("%d %d %d\n", range, flowx, flowy); 
+        hf::Debug::printf("%d %d %d\n", range, flowx, flowy); 
     }
 }; 
 
