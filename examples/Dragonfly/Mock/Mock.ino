@@ -26,6 +26,7 @@
 #include "boards/dragonfly.hpp"
 #include "mixers/quadx.hpp"
 #include "receivers/mock.hpp"
+#include "sensors/mspsensors/rangeandflow.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 
@@ -36,6 +37,8 @@ hf::MockReceiver rc;
 hf::MixerQuadX mixer;
 
 hf::Rate ratePid = hf::Rate(0, 0, 0, 0, 0);
+
+hf::RangeAndFlow rangeAndFlow;
 
 void setup(void)
 {

@@ -45,7 +45,7 @@ namespace hf {
 
         public:
 
-            DragonflyBoard(void) : MockBoard(25, false)
+            DragonflyBoard(void) : MockBoard(25, true)
             {
             }
 
