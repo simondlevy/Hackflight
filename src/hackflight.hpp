@@ -32,8 +32,8 @@
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
 #include "pidcontrollers/rate.hpp"
-#include "sensors/gyrometer.hpp"
-#include "sensors/quaternion.hpp"
+#include "sensors/surfacemount/gyrometer.hpp"
+#include "sensors/surfacemount/quaternion.hpp"
 
 namespace hf {
 

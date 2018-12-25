@@ -28,9 +28,7 @@
 #include <cmath>
 #include <math.h>
 
-#include "sensor.hpp"
-#include "surfacemount.hpp"
-#include "board.hpp"
+#include "sensors/surfacemount.hpp"
 
 namespace hf {
 
