@@ -233,6 +233,13 @@ namespace hf {
                 _sensors[_sensor_count++] = sensor;
             }
 
+            void addSensor(SurfaceMountSensor * sensor, Board * board) 
+            {
+                add_sensor(sensor);
+
+                sensor->board = board;
+            }
+
         protected:
 
 
@@ -329,13 +336,6 @@ namespace hf {
             void addSensor(Sensor * sensor) 
             {
                 add_sensor(sensor);
-            }
-
-            void addSensor(SurfaceMountSensor * sensor, Board * board) 
-            {
-                add_sensor(sensor);
-
-                sensor->board = board;
             }
 
             void addPidController(PID_Controller * pidController, uint8_t auxState) 
