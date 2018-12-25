@@ -25,7 +25,7 @@
 
 #include "sensor.hpp"
 #include "board.hpp"
-#include "mspparser2.hpp"
+#include "mspparser.hpp"
 #include "mixer.hpp"
 #include "receiver.hpp"
 #include "debug.hpp"
