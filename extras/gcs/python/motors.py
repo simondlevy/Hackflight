@@ -21,8 +21,6 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 from resources import resource_path
 
-import os
-
 MOTORS_IMAGE_FILE   = resource_path('motors.gif')
 MOTORS1_IMAGE_FILE  = resource_path('motors1.gif')
 MOTORS2_IMAGE_FILE  = resource_path('motors2.gif')
