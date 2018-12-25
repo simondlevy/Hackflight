@@ -27,15 +27,16 @@ import serial
 from msppg import Parser
 import sys
 
-#class RangeAndFlowParser(Parzser):
-#
-#    def handle_SET_RANGE_AND_FLOW(self, agl, flowx, flowy):
-#
-#        print(agl, flowx, flowy)
+class RangeAndFlowParser(Parser):
+
+    def handle_SET_RANGE_AND_FLOW(self, agl, flowx, flowy):
+
+        print(agl, flowx, flowy)
+        sys.stdout.flush()
 
 port = serial.Serial(PORT, 115200)
 
-#parser = RangeAndFlowParser()
+parser = RangeAndFlowParser()
 
 while True:
 
@@ -45,8 +46,7 @@ while True:
 
             c = port.read()
 
-            print('x%02x' % ord(c))
-            sys.stdout.flush()
+            parser.parse(c)
 
         except KeyboardInterrupt:
 
