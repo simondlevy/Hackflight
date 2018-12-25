@@ -35,7 +35,18 @@ namespace hf {
 
             static const uint8_t MAXMSG = 255;
 
-        private:
+            void init(void)
+            {
+                _checksum = 0;
+                _outBufIndex = 0;
+                _outBufSize = 0;
+                _command = 0;
+                _offset = 0;
+                _dataSize = 0;
+                _state = IDLE;
+            }
+            
+         private:
 
             static const int INBUF_SIZE  = 128;
             static const int OUTBUF_SIZE = 128;
@@ -169,18 +180,7 @@ namespace hf {
 
         protected:
 
-            void init(void)
-            {
-                _checksum = 0;
-                _outBufIndex = 0;
-                _outBufSize = 0;
-                _command = 0;
-                _offset = 0;
-                _dataSize = 0;
-                _state = IDLE;
-            }
-            
-            uint8_t availableBytes(void)
+           uint8_t availableBytes(void)
             {
                 return _outBufSize;
             }
@@ -190,6 +190,8 @@ namespace hf {
                 _outBufSize--;
                 return _outBuf[_outBufIndex++];
             }
+
+        public:
 
             // returns true if reboot request, false otherwise
             bool parse(uint8_t c)

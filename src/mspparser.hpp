@@ -35,7 +35,18 @@ namespace hf {
 
             static const uint8_t MAXMSG = 255;
 
-        private:
+            void init(void)
+            {
+                _checksum = 0;
+                _outBufIndex = 0;
+                _outBufSize = 0;
+                _command = 0;
+                _offset = 0;
+                _dataSize = 0;
+                _state = IDLE;
+            }
+            
+         private:
 
             static const int INBUF_SIZE  = 128;
             static const int OUTBUF_SIZE = 128;
@@ -169,18 +180,7 @@ namespace hf {
 
         protected:
 
-            void init(void)
-            {
-                _checksum = 0;
-                _outBufIndex = 0;
-                _outBufSize = 0;
-                _command = 0;
-                _offset = 0;
-                _dataSize = 0;
-                _state = IDLE;
-            }
-            
-            uint8_t availableBytes(void)
+           uint8_t availableBytes(void)
             {
                 return _outBufSize;
             }
@@ -190,6 +190,8 @@ namespace hf {
                 _outBufSize--;
                 return _outBuf[_outBufIndex++];
             }
+
+        public:
 
             // returns true if reboot request, false otherwise
             bool parse(uint8_t c)
@@ -264,6 +266,8 @@ namespace hf {
             } // parse
 
 
+        private:
+
             void dispatchRequestMessage(void)
             {
                 switch (_command) {
@@ -277,7 +281,7 @@ namespace hf {
                         float heading = 0;
                         float velocityForward = 0;
                         float velocityRightward = 0;
-                        handle_STATE_Request(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward);
+                        handle_STATE(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward);
                         prepareToSendFloats(7);
                         sendFloat(altitude);
                         sendFloat(variometer);
@@ -297,7 +301,7 @@ namespace hf {
                         float c4 = 0;
                         float c5 = 0;
                         float c6 = 0;
-                        handle_RC_NORMAL_Request(c1, c2, c3, c4, c5, c6);
+                        handle_RC_NORMAL(c1, c2, c3, c4, c5, c6);
                         prepareToSendFloats(6);
                         sendFloat(c1);
                         sendFloat(c2);
@@ -313,74 +317,12 @@ namespace hf {
                         float roll = 0;
                         float pitch = 0;
                         float yaw = 0;
-                        handle_ATTITUDE_RADIANS_Request(roll, pitch, yaw);
+                        handle_ATTITUDE_RADIANS(roll, pitch, yaw);
                         prepareToSendFloats(3);
                         sendFloat(roll);
                         sendFloat(pitch);
                         sendFloat(yaw);
                         serialize8(_checksum);
-                        } break;
-
-                    case 215:
-                    {
-                        float m1 = 0;
-                        memcpy(&m1,  &_inBuf[0], sizeof(float));
-
-                        float m2 = 0;
-                        memcpy(&m2,  &_inBuf[4], sizeof(float));
-
-                        float m3 = 0;
-                        memcpy(&m3,  &_inBuf[8], sizeof(float));
-
-                        float m4 = 0;
-                        memcpy(&m4,  &_inBuf[12], sizeof(float));
-
-                        handle_SET_MOTOR_NORMAL_Request(m1, m2, m3, m4);
-                        } break;
-
-                    case 216:
-                    {
-                        uint8_t flag = 0;
-                        memcpy(&flag,  &_inBuf[0], sizeof(uint8_t));
-
-                        handle_SET_ARMED_Request(flag);
-                        } break;
-
-                    case 222:
-                    {
-                        float c1 = 0;
-                        memcpy(&c1,  &_inBuf[0], sizeof(float));
-
-                        float c2 = 0;
-                        memcpy(&c2,  &_inBuf[4], sizeof(float));
-
-                        float c3 = 0;
-                        memcpy(&c3,  &_inBuf[8], sizeof(float));
-
-                        float c4 = 0;
-                        memcpy(&c4,  &_inBuf[12], sizeof(float));
-
-                        float c5 = 0;
-                        memcpy(&c5,  &_inBuf[16], sizeof(float));
-
-                        float c6 = 0;
-                        memcpy(&c6,  &_inBuf[20], sizeof(float));
-
-                        handle_SET_RC_NORMAL_Request(c1, c2, c3, c4, c5, c6);
-                        } break;
-
-                    case 226:
-                    {
-                        int16_t range = 0;
-                        memcpy(&range,  &_inBuf[0], sizeof(int16_t));
-
-                        int16_t flowx = 0;
-                        memcpy(&flowx,  &_inBuf[2], sizeof(int16_t));
-
-                        int16_t flowy = 0;
-                        memcpy(&flowy,  &_inBuf[4], sizeof(int16_t));
-
-                        handle_SET_RANGE_AND_FLOW_Request(range, flowx, flowy);
                         } break;
 
                 }
@@ -390,19 +332,22 @@ namespace hf {
             {
                 switch (_command) {
 
-                    case 112:
+                    case 215:
                     {
-                        float altitude = getArgument(0);
-                        float variometer = getArgument(1);
-                        float positionX = getArgument(2);
-                        float positionY = getArgument(3);
-                        float heading = getArgument(4);
-                        float velocityForward = getArgument(5);
-                        float velocityRightward = getArgument(6);
-                        handle_STATE_Data(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward);
+                        float m1 = getArgument(0);
+                        float m2 = getArgument(1);
+                        float m3 = getArgument(2);
+                        float m4 = getArgument(3);
+                        handle_SET_MOTOR_NORMAL(m1, m2, m3, m4);
                         } break;
 
-                    case 121:
+                    case 216:
+                    {
+                        uint8_t flag = getArgument(0);
+                        handle_SET_ARMED(flag);
+                        } break;
+
+                    case 222:
                     {
                         float c1 = getArgument(0);
                         float c2 = getArgument(1);
@@ -410,15 +355,15 @@ namespace hf {
                         float c4 = getArgument(3);
                         float c5 = getArgument(4);
                         float c6 = getArgument(5);
-                        handle_RC_NORMAL_Data(c1, c2, c3, c4, c5, c6);
+                        handle_SET_RC_NORMAL(c1, c2, c3, c4, c5, c6);
                         } break;
 
-                    case 122:
+                    case 226:
                     {
-                        float roll = getArgument(0);
-                        float pitch = getArgument(1);
-                        float yaw = getArgument(2);
-                        handle_ATTITUDE_RADIANS_Data(roll, pitch, yaw);
+                        int16_t range = getArgument(0);
+                        int16_t flowx = getArgument(1);
+                        int16_t flowy = getArgument(2);
+                        handle_SET_RANGE_AND_FLOW(range, flowx, flowy);
                         } break;
 
                 }
@@ -426,7 +371,7 @@ namespace hf {
 
         protected:
 
-            virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, float & heading, float & velocityForward, float & velocityRightward)
+            virtual void handle_STATE(float & altitude, float & variometer, float & positionX, float & positionY, float & heading, float & velocityForward, float & velocityRightward)
             {
                 (void)altitude;
                 (void)variometer;
@@ -437,18 +382,7 @@ namespace hf {
                 (void)velocityRightward;
             }
 
-            virtual void handle_STATE_Data(float & altitude, float & variometer, float & positionX, float & positionY, float & heading, float & velocityForward, float & velocityRightward)
-            {
-                (void)altitude;
-                (void)variometer;
-                (void)positionX;
-                (void)positionY;
-                (void)heading;
-                (void)velocityForward;
-                (void)velocityRightward;
-            }
-
-            virtual void handle_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
+            virtual void handle_RC_NORMAL(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
             {
                 (void)c1;
                 (void)c2;
@@ -458,31 +392,14 @@ namespace hf {
                 (void)c6;
             }
 
-            virtual void handle_RC_NORMAL_Data(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
-            {
-                (void)c1;
-                (void)c2;
-                (void)c3;
-                (void)c4;
-                (void)c5;
-                (void)c6;
-            }
-
-            virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw)
+            virtual void handle_ATTITUDE_RADIANS(float & roll, float & pitch, float & yaw)
             {
                 (void)roll;
                 (void)pitch;
                 (void)yaw;
             }
 
-            virtual void handle_ATTITUDE_RADIANS_Data(float & roll, float & pitch, float & yaw)
-            {
-                (void)roll;
-                (void)pitch;
-                (void)yaw;
-            }
-
-            virtual void handle_SET_MOTOR_NORMAL_Request(float  m1, float  m2, float  m3, float  m4)
+            virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4)
             {
                 (void)m1;
                 (void)m2;
@@ -490,25 +407,12 @@ namespace hf {
                 (void)m4;
             }
 
-            virtual void handle_SET_MOTOR_NORMAL_Data(float  m1, float  m2, float  m3, float  m4)
-            {
-                (void)m1;
-                (void)m2;
-                (void)m3;
-                (void)m4;
-            }
-
-            virtual void handle_SET_ARMED_Request(uint8_t  flag)
+            virtual void handle_SET_ARMED(uint8_t  flag)
             {
                 (void)flag;
             }
 
-            virtual void handle_SET_ARMED_Data(uint8_t  flag)
-            {
-                (void)flag;
-            }
-
-            virtual void handle_SET_RC_NORMAL_Request(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
+            virtual void handle_SET_RC_NORMAL(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
             {
                 (void)c1;
                 (void)c2;
@@ -518,24 +422,7 @@ namespace hf {
                 (void)c6;
             }
 
-            virtual void handle_SET_RC_NORMAL_Data(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
-            {
-                (void)c1;
-                (void)c2;
-                (void)c3;
-                (void)c4;
-                (void)c5;
-                (void)c6;
-            }
-
-            virtual void handle_SET_RANGE_AND_FLOW_Request(int16_t  range, int16_t  flowx, int16_t  flowy)
-            {
-                (void)range;
-                (void)flowx;
-                (void)flowy;
-            }
-
-            virtual void handle_SET_RANGE_AND_FLOW_Data(int16_t  range, int16_t  flowx, int16_t  flowy)
+            virtual void handle_SET_RANGE_AND_FLOW(int16_t  range, int16_t  flowx, int16_t  flowy)
             {
                 (void)range;
                 (void)flowx;
@@ -544,7 +431,7 @@ namespace hf {
 
         public:
 
-            static uint8_t serialize_STATE_Request(uint8_t bytes[])
+            static uint8_t serialize_STATE(uint8_t bytes[])
             {
                 bytes[0] = 36;
                 bytes[1] = 77;
@@ -577,7 +464,7 @@ namespace hf {
                 return 34;
             }
 
-            static uint8_t serialize_RC_NORMAL_Request(uint8_t bytes[])
+            static uint8_t serialize_RC_NORMAL(uint8_t bytes[])
             {
                 bytes[0] = 36;
                 bytes[1] = 77;
@@ -609,7 +496,7 @@ namespace hf {
                 return 30;
             }
 
-            static uint8_t serialize_ATTITUDE_RADIANS_Request(uint8_t bytes[])
+            static uint8_t serialize_ATTITUDE_RADIANS(uint8_t bytes[])
             {
                 bytes[0] = 36;
                 bytes[1] = 77;

@@ -226,50 +226,8 @@ class HPP_Emitter(CodeEmitter):
 
         # Add dispatchRequestMessage() method
 
+        self.output.write(2*self.indent + 'private:\n\n')
         self.output.write(3*self.indent + 'void dispatchRequestMessage(void)\n')
-        self.output.write(3*self.indent + '{\n')
-        self.output.write(4*self.indent + 'switch (_command) {\n\n')
-
-        for msgtype in msgdict.keys():
-
-            msgstuff = msgdict[msgtype]
-            msgid = msgstuff[0]
-
-            argnames = self._getargnames(msgstuff)
-            argtypes = self._getargtypes(msgstuff)
-
-            self.output.write(5*self.indent + ('case %s:\n' % msgdict[msgtype][0]))
-            self.output.write(5*self.indent + '{\n')
-            nargs = len(argnames)
-            offset = 0
-            for k in range(nargs):
-                argname = argnames[k]
-                argtype = argtypes[k]
-                decl = self.type2decl[argtype]
-                self.output.write(6*self.indent + decl  + ' ' + argname + ' = 0;\n')
-                if msgid >= 200:
-                    self.output.write(6*self.indent + 'memcpy(&%s,  &_inBuf[%d], sizeof(%s));\n\n' % (argname, offset, decl))
-                offset += self.type2size[argtype]
-            self.output.write(6*self.indent + 'handle_%s_Request(' %  msgtype)
-            for k in range(nargs):
-                self.output.write(argnames[k])
-                if k < nargs-1:
-                    self.output.write(', ')
-            self.output.write(');\n')
-            if msgid < 200:
-                argtype = argtypes[0].capitalize() # XXX enforce uniform type for now
-                self.output.write(6*self.indent + ('prepareToSend%ss(%d);\n' % (argtype, nargs)))
-                for argname in argnames:
-                    self.output.write(6*self.indent + ('send%s(%s);\n' % (argtype, argname)))
-                self.output.write(6*self.indent + "serialize8(_checksum);\n")
-            self.output.write(6*self.indent + '} break;\n\n')
-
-        self.output.write(4*self.indent + '}\n')
-        self.output.write(3*self.indent + '}\n\n')
-
-        # Add dispatchDataMessage() method
-
-        self.output.write(3*self.indent + 'void dispatchDataMessage(void)\n')
         self.output.write(3*self.indent + '{\n')
         self.output.write(4*self.indent + 'switch (_command) {\n\n')
 
@@ -291,9 +249,54 @@ class HPP_Emitter(CodeEmitter):
                     argname = argnames[k]
                     argtype = argtypes[k]
                     decl = self.type2decl[argtype]
+                    self.output.write(6*self.indent + decl  + ' ' + argname + ' = 0;\n')
+                    if msgid >= 200:
+                        self.output.write(6*self.indent + 'memcpy(&%s,  &_inBuf[%d], sizeof(%s));\n\n' % (argname, offset, decl))
+                    offset += self.type2size[argtype]
+                self.output.write(6*self.indent + 'handle_%s(' %  msgtype)
+                for k in range(nargs):
+                    self.output.write(argnames[k])
+                    if k < nargs-1:
+                        self.output.write(', ')
+                self.output.write(');\n')
+                if msgid < 200:
+                    argtype = argtypes[0].capitalize() # XXX enforce uniform type for now
+                    self.output.write(6*self.indent + ('prepareToSend%ss(%d);\n' % (argtype, nargs)))
+                    for argname in argnames:
+                        self.output.write(6*self.indent + ('send%s(%s);\n' % (argtype, argname)))
+                    self.output.write(6*self.indent + "serialize8(_checksum);\n")
+                self.output.write(6*self.indent + '} break;\n\n')
+
+        self.output.write(4*self.indent + '}\n')
+        self.output.write(3*self.indent + '}\n\n')
+
+        # Add dispatchDataMessage() method
+
+        self.output.write(3*self.indent + 'void dispatchDataMessage(void)\n')
+        self.output.write(3*self.indent + '{\n')
+        self.output.write(4*self.indent + 'switch (_command) {\n\n')
+
+        for msgtype in msgdict.keys():
+
+            msgstuff = msgdict[msgtype]
+            msgid = msgstuff[0]
+
+            if msgid >= 200:
+
+                argnames = self._getargnames(msgstuff)
+                argtypes = self._getargtypes(msgstuff)
+
+                self.output.write(5*self.indent + ('case %s:\n' % msgdict[msgtype][0]))
+                self.output.write(5*self.indent + '{\n')
+                nargs = len(argnames)
+                offset = 0
+                for k in range(nargs):
+                    argname = argnames[k]
+                    argtype = argtypes[k]
+                    decl = self.type2decl[argtype]
                     self.output.write(6*self.indent + decl  + ' ' + argname + ' = getArgument(%d);\n' % k)
                     offset += self.type2size[argtype]
-                self.output.write(6*self.indent + 'handle_%s_Data(' %  msgtype)
+                self.output.write(6*self.indent + 'handle_%s(' %  msgtype)
                 for k in range(nargs):
                     self.output.write(argnames[k])
                     if k < nargs-1:
@@ -317,14 +320,7 @@ class HPP_Emitter(CodeEmitter):
             argnames = self._getargnames(msgstuff)
             argtypes = self._getargtypes(msgstuff)
 
-            self.output.write(3*self.indent + 'virtual void handle_%s_Request' % msgtype)
-            self._write_params(self.output, argtypes, argnames, ampersand = '&' if msgid<200 else '')
-            self.output.write('\n' + 3*self.indent + '{\n')
-            for argname in argnames:
-                self.output.write(4*self.indent + '(void)%s;\n' % argname)
-            self.output.write(3*self.indent + '}\n\n')
-
-            self.output.write(3*self.indent + 'virtual void handle_%s_Data' % msgtype)
+            self.output.write(3*self.indent + 'virtual void handle_%s' % msgtype)
             self._write_params(self.output, argtypes, argnames, ampersand = '&' if msgid<200 else '')
             self.output.write('\n' + 3*self.indent + '{\n')
             for argname in argnames:
@@ -347,7 +343,7 @@ class HPP_Emitter(CodeEmitter):
             if msgid < 200:
 
                 # Write request method
-                self.output.write(3*self.indent + 'static uint8_t serialize_%s_Request(uint8_t bytes[])\n' % msgtype)
+                self.output.write(3*self.indent + 'static uint8_t serialize_%s(uint8_t bytes[])\n' % msgtype)
                 self.output.write(3*self.indent + '{\n')
                 self.output.write(4*self.indent + 'bytes[0] = 36;\n')
                 self.output.write(4*self.indent + 'bytes[1] = 77;\n')
