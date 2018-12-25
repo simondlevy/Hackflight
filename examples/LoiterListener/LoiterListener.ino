@@ -42,6 +42,7 @@ void loop(void)
 {
     while (Serial1.available()) {
         uint8_t c = Serial1.read();
+        hf::Debug::printf("%02x\n", c);
         rangeAndFlow.parse(c);
     }
 }

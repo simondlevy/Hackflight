@@ -33,6 +33,7 @@ namespace hf {
 
             bool retval = false;
 
+            /*
             if (_ready) {
                 hf::Debug::printf("%04d %+3d %+3d\n", _range, _flowx, _flowy); 
                 retval = true;
@@ -42,7 +43,7 @@ namespace hf {
             else {
                 Debug::printf("not ready\n");
             }
-
+            */
             return retval;
         }
 
@@ -51,7 +52,7 @@ namespace hf {
             (void)state;
             (void)time;
         }
-
+/*
         virtual void handle_SET_RANGE_AND_FLOW(int16_t  range, int16_t  flowx, int16_t  flowy) override
         {
             _range = range;
@@ -66,6 +67,7 @@ namespace hf {
         int16_t  _range = 0;
         int16_t  _flowx = 0;
         int16_t  _flowy = 0;
+        */
 
     };  // class RangeAndFlow
 
