@@ -347,17 +347,6 @@ namespace hf {
                         handle_SET_ARMED(flag);
                         } break;
 
-                    case 222:
-                    {
-                        float c1 = getArgument(0);
-                        float c2 = getArgument(1);
-                        float c3 = getArgument(2);
-                        float c4 = getArgument(3);
-                        float c5 = getArgument(4);
-                        float c6 = getArgument(5);
-                        handle_SET_RC_NORMAL(c1, c2, c3, c4, c5, c6);
-                        } break;
-
                     case 226:
                     {
                         int16_t range = getArgument(0);
@@ -410,16 +399,6 @@ namespace hf {
             virtual void handle_SET_ARMED(uint8_t  flag)
             {
                 (void)flag;
-            }
-
-            virtual void handle_SET_RC_NORMAL(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
-            {
-                (void)c1;
-                (void)c2;
-                (void)c3;
-                (void)c4;
-                (void)c5;
-                (void)c6;
             }
 
             virtual void handle_SET_RANGE_AND_FLOW(int16_t  range, int16_t  flowx, int16_t  flowy)
@@ -556,26 +535,6 @@ namespace hf {
                 bytes[6] = CRC8(&bytes[3], 3);
 
                 return 7;
-            }
-
-            static uint8_t serialize_SET_RC_NORMAL(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 24;
-                bytes[4] = 222;
-
-                memcpy(&bytes[5], &c1, sizeof(float));
-                memcpy(&bytes[9], &c2, sizeof(float));
-                memcpy(&bytes[13], &c3, sizeof(float));
-                memcpy(&bytes[17], &c4, sizeof(float));
-                memcpy(&bytes[21], &c5, sizeof(float));
-                memcpy(&bytes[25], &c6, sizeof(float));
-
-                bytes[29] = CRC8(&bytes[3], 26);
-
-                return 30;
             }
 
             static uint8_t serialize_SET_RANGE_AND_FLOW(uint8_t bytes[], int16_t  range, int16_t  flowx, int16_t  flowy)

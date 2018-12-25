@@ -38,15 +38,6 @@
    {"comment": "Arm/disarm from MSP"}, 
    {"flag": "byte"}],
 
-  "SET_RC_NORMAL": 
-  [{"ID": 222},
-   {"c1": "float"}, 
-   {"c2": "float"}, 
-   {"c3": "float"}, 
-   {"c4": "float"}, 
-   {"c5": "float"}, 
-   {"c6": "float"}],
-
   "SET_RANGE_AND_FLOW": 
   [{"ID": 226},
    {"range": "short"},
