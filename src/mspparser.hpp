@@ -173,9 +173,36 @@ namespace hf {
                 return crc;
             }
 
-            float getArgument(uint8_t k)
+            uint8_t getByteArgument(void)
             {
-                return (float)k; // XXX for testing only
+                uint8_t arg = 0;
+                memcpy(&arg, &_inBuf[_inBufIndex], 1);
+                _inBufIndex++;
+                return arg;
+            }
+
+            int16_t getShortArgument(void)
+            {
+                int16_t arg = 0;
+                memcpy(&arg, &_inBuf[_inBufIndex], 2);
+                _inBufIndex += 2;
+                return arg;
+            }
+
+            int32_t getIntArgument(void)
+            {
+                int32_t arg = 0;
+                memcpy(&arg, &_inBuf[_inBufIndex], 4);
+                _inBufIndex += 4;
+                return arg;
+            }
+
+            float getFloatArgument(void)
+            {
+                float arg = 0;
+                memcpy(&arg, &_inBuf[_inBufIndex], 4);
+                _inBufIndex += 4;
+                return arg;
             }
 
         protected:
@@ -253,6 +280,7 @@ namespace hf {
                                     dispatchRequestMessage();
                                 }
                                 else {
+                                    _inBufIndex = 0;
                                     dispatchDataMessage();
                                 }
                             }
@@ -334,24 +362,24 @@ namespace hf {
 
                     case 215:
                     {
-                        float m1 = getArgument(0);
-                        float m2 = getArgument(1);
-                        float m3 = getArgument(2);
-                        float m4 = getArgument(3);
+                        float m1 = getFloatArgument();
+                        float m2 = getFloatArgument();
+                        float m3 = getFloatArgument();
+                        float m4 = getFloatArgument();
                         handle_SET_MOTOR_NORMAL(m1, m2, m3, m4);
                         } break;
 
                     case 216:
                     {
-                        uint8_t flag = getArgument(0);
+                        uint8_t flag = getByteArgument();
                         handle_SET_ARMED(flag);
                         } break;
 
                     case 226:
                     {
-                        int16_t range = getArgument(0);
-                        int16_t flowx = getArgument(1);
-                        int16_t flowy = getArgument(2);
+                        int16_t range = getShortArgument();
+                        int16_t flowx = getShortArgument();
+                        int16_t flowy = getShortArgument();
                         handle_SET_RANGE_AND_FLOW(range, flowx, flowy);
                         } break;
 

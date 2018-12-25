@@ -30,7 +30,7 @@ class LoiterParser : public hf::MspParser {
 
     virtual void handle_SET_RANGE_AND_FLOW(int16_t  range, int16_t  flowx, int16_t  flowy) override
     {
-        hf::Debug::printf("%d %d %d\n", range, flowx, flowy); 
+        hf::Debug::printf("%04d %+3d %+3d\n", range, flowx, flowy); 
     }
 }; 
 
