@@ -34,7 +34,7 @@ namespace hf {
             (void)time;
         }
 
-        virtual void handle_SET_RANGE_AND_FLOW_Request(int16_t  range, int16_t  flowx, int16_t  flowy) override
+        virtual void handle_SET_RANGE_AND_FLOW(int16_t  range, int16_t  flowx, int16_t  flowy) override
         {
             Debug::printf("%d %d %d\n", range, flowx, flowy);
             _range = range;

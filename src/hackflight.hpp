@@ -287,7 +287,7 @@ namespace hf {
                 yaw   = _state.eulerAngles[2];
             }
 
-            virtual void handle_SET_MOTOR_NORMAL_Request(float  m1, float  m2, float  m3, float  m4) override
+            virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
             {
                 _mixer->motorsDisarmed[0] = m1;
                 _mixer->motorsDisarmed[1] = m2;
