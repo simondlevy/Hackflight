@@ -233,7 +233,7 @@ namespace hf {
                 _sensors[_sensor_count++] = sensor;
             }
 
-            void addSensor(SurfaceMountSensor * sensor, Board * board) 
+            void add_sensor(SurfaceMountSensor * sensor, Board * board) 
             {
                 add_sensor(sensor);
 
@@ -304,8 +304,8 @@ namespace hf {
                 _ratePid  = ratePid;
 
                 // Support for mandatory sensors
-                addSensor(&_quaternion, board);
-                addSensor(&_gyrometer, board);
+                add_sensor(&_quaternion, board);
+                add_sensor(&_gyrometer, board);
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
