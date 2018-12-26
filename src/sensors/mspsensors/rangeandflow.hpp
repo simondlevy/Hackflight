@@ -27,25 +27,6 @@ namespace hf {
 
     class RangeAndFlow : public MspSensor {
 
-        virtual bool ready(float time) override
-        {
-            (void)time;
-
-            bool retval = false;
-
-            /*
-            if (_ready) {
-                hf::Debug::printf("%04d %+3d %+3d\n", _range, _flowx, _flowy); 
-                retval = true;
-                _ready = false;
-            }
-
-            else {
-                Debug::printf("not ready\n");
-            }
-            */
-            return retval;
-        }
 
         virtual void modifyState(state_t & state, float time)  override
         {

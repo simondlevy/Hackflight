@@ -2,7 +2,7 @@
    Mock.ino : Hackflight sketch for Tlera Dragonfly with mock board and receiver
 
    Solely for receiver prototyping
- 
+
    Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
@@ -42,11 +42,17 @@ hf::RangeAndFlow rangeAndFlow;
 
 void setup(void)
 {
-     // Initialize Hackflight firmware (LED 25, inverted)
-     h.init(new hf::DragonflyBoard(), &rc, &mixer, &ratePid);
+    // Create the Board object
+    hf::DragonflyBoard * board = new hf::DragonflyBoard();
 
-     // Set up to receive telemetry over Serial1
-     Serial1.begin(115200);
+    // Initialize Hackflight firmware
+    h.init(board, &rc, &mixer, &ratePid);
+
+    // Add MSP-based range-and-flow sensor
+    h.addSensor(&rangeAndFlow, board);
+
+    // Set up to receive telemetry over Serial1
+    Serial1.begin(115200);
 }
 
 void loop(void)

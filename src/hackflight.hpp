@@ -34,6 +34,7 @@
 #include "pidcontrollers/rate.hpp"
 #include "sensors/surfacemount/gyrometer.hpp"
 #include "sensors/surfacemount/quaternion.hpp"
+#include "sensors/mspsensor.hpp"
 
 namespace hf {
 
@@ -233,6 +234,7 @@ namespace hf {
                 _sensors[_sensor_count++] = sensor;
             }
 
+            // Called by Hackflight::init() to associate sensor with board
             void add_sensor(SurfaceMountSensor * sensor, Board * board) 
             {
                 add_sensor(sensor);
@@ -335,6 +337,13 @@ namespace hf {
 
             void addSensor(Sensor * sensor) 
             {
+                add_sensor(sensor);
+            }
+
+            void addSensor(MspSensor * sensor, RealBoard * board)
+            {
+                sensor->_board = board;
+
                 add_sensor(sensor);
             }
 

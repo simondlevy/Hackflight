@@ -22,6 +22,7 @@
 
 #include "sensor.hpp"
 #include "mspparser.hpp"
+#include "boards/realboard.hpp"
 
 namespace hf {
 
@@ -29,16 +30,29 @@ namespace hf {
 
         friend class Hackflight;
 
+        protected:
+
+        // Sensor must be able to access boards' UART
+        RealBoard * _board;
+
+        virtual bool ready(float time) override
+        {
+            (void)time;
+
+            bool retval = false;
+
+            while (_board->serialTelemetryAvailable()) {
+                Debug::printf("x%02X\n", _board->serialTelemetryRead());
+            }
+
+            return retval;
+        }
+
         public:
 
         void init(void) 
         {
             MspParser::init();
-        }
-
-        void parse(uint8_t c)
-        {
-            MspParser::parse(c);
         }
 
     };  // class MspSensor

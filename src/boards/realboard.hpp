@@ -28,6 +28,8 @@ namespace hf {
 
     class RealBoard : public Board {
 
+        friend class MspSensor;
+
         private:
 
             static constexpr float   LED_STARTUP_FLASH_SECONDS = 1.0;
