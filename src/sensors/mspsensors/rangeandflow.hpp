@@ -33,8 +33,8 @@ namespace hf {
             (void)state;
             (void)time;
         }
-/*
-        virtual void handle_SET_RANGE_AND_FLOW(int16_t  range, int16_t  flowx, int16_t  flowy) override
+
+        virtual void handle_SET_RANGE_AND_FLOW_Data(int16_t  range, int16_t  flowx, int16_t  flowy) override
         {
             _range = range;
             _flowx = flowx;
@@ -43,12 +43,9 @@ namespace hf {
 
         private:
 
-        bool _ready = false;
-
         int16_t  _range = 0;
         int16_t  _flowx = 0;
         int16_t  _flowy = 0;
-        */
 
     };  // class RangeAndFlow
 

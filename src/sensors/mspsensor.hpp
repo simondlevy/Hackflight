@@ -42,7 +42,7 @@ namespace hf {
             bool retval = false;
 
             while (_board->serialTelemetryAvailable()) {
-                Debug::printf("x%02X\n", _board->serialTelemetryRead());
+                MspParser::parse(_board->serialTelemetryRead());
             }
 
             return retval;
