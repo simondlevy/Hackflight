@@ -221,9 +221,9 @@ class HPP_Emitter(CodeEmitter):
         # Open file for appending
         self.output = open('../../src/mspparser.hpp', 'a')
 
-        # Add dispatchRequestMessage() method
+        # Add dispatchMessage() method
 
-        self.output.write(3*self.indent + 'void dispatchRequestMessage(void)\n')
+        self.output.write(3*self.indent + 'void dispatchMessage(void)\n')
         self.output.write(3*self.indent + '{\n')
         self.output.write(4*self.indent + 'switch (_command) {\n\n')
 
@@ -277,13 +277,6 @@ class HPP_Emitter(CodeEmitter):
             argtypes = self._getargtypes(msgstuff)
 
             self.output.write(3*self.indent + 'virtual void handle_%s_Request' % msgtype)
-            self._write_params(self.output, argtypes, argnames, ampersand = '&' if msgid<200 else '')
-            self.output.write('\n' + 3*self.indent + '{\n')
-            for argname in argnames:
-                self.output.write(4*self.indent + '(void)%s;\n' % argname)
-            self.output.write(3*self.indent + '}\n\n')
-
-            self.output.write(3*self.indent + 'virtual void handle_%s_Data' % msgtype)
             self._write_params(self.output, argtypes, argnames, ampersand = '&' if msgid<200 else '')
             self.output.write('\n' + 3*self.indent + '{\n')
             for argname in argnames:

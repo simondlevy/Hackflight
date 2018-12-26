@@ -278,13 +278,7 @@ namespace hf {
                             _inBuf[_offset++] = c;
                         } else  {
                             if (_checksum == c) {        // compare calculated and transferred _checksum
-                                if (_direction == 0) {
-                                    dispatchRequestMessage();
-                                }
-                                else {
-                                    _inBufIndex = 0;
-                                    //dispatchDataMessage();
-                                }
+                                dispatchMessage();
                             }
                             _state = IDLE;
                         }
