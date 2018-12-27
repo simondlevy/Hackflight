@@ -175,38 +175,6 @@ namespace hf {
                 return crc;
             }
 
-            uint8_t getByteArgument(void)
-            {
-                uint8_t arg = 0;
-                memcpy(&arg, &_inBuf[_inBufIndex], 1);
-                _inBufIndex++;
-                return arg;
-            }
-
-            int16_t getShortArgument(void)
-            {
-                int16_t arg = 0;
-                memcpy(&arg, &_inBuf[_inBufIndex], 2);
-                _inBufIndex += 2;
-                return arg;
-            }
-
-            int32_t getIntArgument(void)
-            {
-                int32_t arg = 0;
-                memcpy(&arg, &_inBuf[_inBufIndex], 4);
-                _inBufIndex += 4;
-                return arg;
-            }
-
-            float getFloatArgument(void)
-            {
-                float arg = 0;
-                memcpy(&arg, &_inBuf[_inBufIndex], 4);
-                _inBufIndex += 4;
-                return arg;
-            }
-
         protected:
 
            uint8_t availableBytes(void)
