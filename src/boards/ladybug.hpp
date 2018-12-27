@@ -23,12 +23,11 @@
 #pragma once
 
 #include <Wire.h>
-#include "arduino.hpp"
-#include "sentral.hpp"
+#include "arduinosentral.hpp"
 
 namespace hf {
 
-    class Ladybug : public ArduinoBoard, public SentralBoard {
+    class Ladybug : public ArduinoSentralBoard {
 
         private:
 
@@ -42,20 +41,10 @@ namespace hf {
                 analogWrite(MOTOR_PINS[index], (uint8_t)(value * 255));
             }
 
-            bool getGyrometer(float gyro[3])
-            {
-                return SentralBoard::getGyrometer(gyro);
-            }
-
-            bool getQuaternion(float quat[4])
-            {
-                return SentralBoard::getQuaternion(quat);
-            }
-
         public:
 
             // Support prototype version where LED is on pin A1
-            Ladybug(uint8_t ledPin = A4) : ArduinoBoard(ledPin)
+            Ladybug(uint8_t ledPin = A4) : ArduinoSentralBoard(ledPin)
             {
                 // Start I^2C
                 Wire.begin();

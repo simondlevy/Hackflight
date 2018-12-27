@@ -23,12 +23,11 @@
 #pragma once
 
 #include <Wire.h>
-#include "arduino.hpp"
-#include "sentral.hpp"
+#include "arduinosentral.hpp"
 
 namespace hf {
 
-    class SuperFly : public ArduinoBoard, public SentralBoard {
+    class SuperFly : public ArduinoSentralBoard {
 
         private:
 
@@ -42,19 +41,9 @@ namespace hf {
                 analogWrite(MOTOR_PINS[index], (uint16_t)(value * 1023));
             }
 
-            bool getGyrometer(float gyro[3])
-            {
-                return SentralBoard::getGyrometer(gyro);
-            }
-
-            bool getQuaternion(float quat[4])
-            {
-                return SentralBoard::getQuaternion(quat);
-            }
-
         public:
 
-            SuperFly(void) : ArduinoBoard(15)
+            SuperFly(void) : ArduinoSentralBoard(15)
             {
                 // Start I^2C
                 Wire.begin(0,2); // SDA (0), SCL (2) on ESP8266

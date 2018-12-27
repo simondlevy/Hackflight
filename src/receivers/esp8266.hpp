@@ -104,7 +104,7 @@ namespace hf {
                 return _hadClient && !_haveClient;
             }
 
-            virtual void handle_SET_RC_NORMAL_Request(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6) override
+            virtual void handle_SET_RC_NORMAL(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6) override
             {
                 _gotMessage = true;
                 _sixvals[0] = c1;
