@@ -266,8 +266,6 @@ class HPP_Emitter(CodeEmitter):
 
         # Add virtual declarations for handler methods
 
-        self.output.write(2*self.indent + 'protected:\n\n')
-
         for msgtype in msgdict.keys():
 
             msgstuff = msgdict[msgtype]
