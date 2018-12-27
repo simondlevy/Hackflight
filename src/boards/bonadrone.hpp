@@ -31,14 +31,14 @@
 
 namespace hf {
 
-    class Bonadrone : public ArduinoBoard, public SoftwareQuaternionBoard {
+    class BonadroneBoard : public ArduinoBoard, public SoftwareQuaternionBoard {
 
         private:
 
             // LSM6DSM data-ready interrupt pin
             const uint8_t LSM6DSM_INTERRUPT_PIN = 2;
 
-            
+
             // Paramters to experiment with ------------------------------------------------------------------------
 
             // LSM6DSM full-scale settings
@@ -102,50 +102,50 @@ namespace hf {
 
         public:
 
-            Bonadrone(void) : ArduinoBoard(38, true) // inverted LED signal
-            {
-                setLed(true);
-                // Configure interrupt
-                pinMode(LSM6DSM_INTERRUPT_PIN, INPUT);
+            BonadroneBoard(void) : ArduinoBoard(38, true) // inverted LED signal
+        {
+            setLed(true);
+            // Configure interrupt
+            pinMode(LSM6DSM_INTERRUPT_PIN, INPUT);
 
-                // Start I^2C
-                Wire.begin(TWI_PINS_20_21);
-                Wire.setClock(400000); // I2C frequency at 400 kHz  
-                delay(100);
+            // Start I^2C
+            Wire.begin(TWI_PINS_20_21);
+            Wire.setClock(400000); // I2C frequency at 400 kHz  
+            delay(100);
 
-                // Start the LSM6DSM
-                switch (_lsm6dsm.begin()) {
+            // Start the LSM6DSM
+            switch (_lsm6dsm.begin()) {
 
-                    case LSM6DSM::ERROR_CONNECT:
-                        i2cerror("no connection");
-                        break;
+                case LSM6DSM::ERROR_CONNECT:
+                    i2cerror("no connection");
+                    break;
 
-                    case LSM6DSM::ERROR_ID:
-                        i2cerror("bad ID");
-                        break;
+                case LSM6DSM::ERROR_ID:
+                    i2cerror("bad ID");
+                    break;
 
-                    case LSM6DSM::ERROR_SELFTEST:
-                        //i2cerror("failed self-test");
-                        break;
+                case LSM6DSM::ERROR_SELFTEST:
+                    //i2cerror("failed self-test");
+                    break;
 
-                    case LSM6DSM::ERROR_NONE:
-                        break;
+                case LSM6DSM::ERROR_NONE:
+                    break;
 
-                }
-
-                delay(100);
-
-                // Calibrate IMU on startup
-                _lsm6dsm.calibrate(GYRO_BIAS, ACCEL_BIAS);
-
-                // Clear the interrupt
-                _lsm6dsm.clearInterrupt();
-                setLed(false);
             }
 
-    }; // class Bonadrone
+            delay(100);
 
-    class BonadroneStandard : public Bonadrone {
+            // Calibrate IMU on startup
+            _lsm6dsm.calibrate(GYRO_BIAS, ACCEL_BIAS);
+
+            // Clear the interrupt
+            _lsm6dsm.clearInterrupt();
+            setLed(false);
+        }
+
+    }; // class BonadroneBoard
+
+    class BonadroneStandard : public BonadroneBoard {
 
         private:
 
@@ -162,17 +162,17 @@ namespace hf {
 
         public:
 
-            BonadroneStandard(void) : Bonadrone()
-            {
-                for (uint8_t k=0; k<4; ++k) {
-                    pinMode(MOTOR_PINS[k], OUTPUT);
-                    analogWrite(MOTOR_PINS[k], PWM_MIN>>3);
-                }
+            BonadroneStandard(void) : BonadroneBoard()
+        {
+            for (uint8_t k=0; k<4; ++k) {
+                pinMode(MOTOR_PINS[k], OUTPUT);
+                analogWrite(MOTOR_PINS[k], PWM_MIN>>3);
             }
+        }
 
     }; // class BonadroneStandard
 
-    class BonadroneMultiShot : public Bonadrone {
+    class BonadroneMultiShot : public BonadroneBoard {
 
         private:
 
@@ -191,18 +191,18 @@ namespace hf {
 
         public:
 
-            BonadroneMultiShot(void) : Bonadrone()
-            {
-                for (uint8_t k=0; k<4; ++k) {
-                    analogWriteFrequency(MOTOR_PINS[k], 2000);
-                    analogWriteRange(MOTOR_PINS[k], 10000);
-                    analogWrite(MOTOR_PINS[k], PWM_MIN);
-                }
+            BonadroneMultiShot(void) : BonadroneBoard()
+        {
+            for (uint8_t k=0; k<4; ++k) {
+                analogWriteFrequency(MOTOR_PINS[k], 2000);
+                analogWriteRange(MOTOR_PINS[k], 10000);
+                analogWrite(MOTOR_PINS[k], PWM_MIN);
             }
+        }
 
     }; // class BonadroneMultiShot
 
-    class BonadroneBrushed : public Bonadrone {
+    class BonadroneBrushed : public BonadroneBoard {
 
         protected:
 
@@ -214,7 +214,7 @@ namespace hf {
 
         public:
 
-            BonadroneBrushed(void) : Bonadrone()
+            BonadroneBrushed(void) : BonadroneBoard()
         {
             for (int k=0; k<4; ++k) {
                 analogWriteFrequency(MOTOR_PINS[k], 10000);  
