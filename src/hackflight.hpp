@@ -340,13 +340,6 @@ namespace hf {
                 add_sensor(sensor);
             }
 
-            void addSensor(MspSensor * sensor, RealBoard * board)
-            {
-                sensor->_board = board;
-
-                add_sensor(sensor);
-            }
-
             void addPidController(PID_Controller * pidController, uint8_t auxState) 
             {
                 pidController->auxState = auxState;

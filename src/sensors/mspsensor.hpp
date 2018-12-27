@@ -30,10 +30,17 @@ namespace hf {
 
         friend class Hackflight;
 
-        protected:
+        private:
 
         // Sensor must be able to access boards' UART
         RealBoard * _board;
+
+        protected:
+
+        MspSensor(RealBoard * board)
+        {
+            _board = board;
+        }
 
         virtual bool ready(float time) override
         {

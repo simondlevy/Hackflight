@@ -28,6 +28,14 @@ namespace hf {
     class RangeAndFlow : public MspSensor {
 
 
+        private:
+
+        int16_t  _range = 0;
+        int16_t  _flowx = 0;
+        int16_t  _flowy = 0;
+
+        protected:
+
         virtual void modifyState(state_t & state, float time)  override
         {
             (void)state;
@@ -42,11 +50,11 @@ namespace hf {
             _flowy = flowy;
         }
 
-        private:
+        public:
 
-        int16_t  _range = 0;
-        int16_t  _flowx = 0;
-        int16_t  _flowy = 0;
+        RangeAndFlow(RealBoard * board) : MspSensor(board)
+        {
+        }
 
     };  // class RangeAndFlow
 

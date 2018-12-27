@@ -38,8 +38,6 @@ hf::MixerQuadX mixer;
 
 hf::Rate ratePid = hf::Rate(0, 0, 0, 0, 0);
 
-hf::RangeAndFlow rangeAndFlow;
-
 void setup(void)
 {
     // Create the Board object
@@ -48,8 +46,11 @@ void setup(void)
     // Initialize Hackflight firmware
     h.init(board, &rc, &mixer, &ratePid);
 
-    // Add MSP-based range-and-flow sensor
-    h.addSensor(&rangeAndFlow, board);
+    // Create new MSP RangeAndFlow sensor using board
+    hf::RangeAndFlow * rangeAndFlow = new hf::RangeAndFlow(board);
+
+    // Add RangeAndFlow sensor to sensor list
+    h.addSensor(rangeAndFlow);
 
     // Set up to receive telemetry over Serial1
     Serial1.begin(115200);

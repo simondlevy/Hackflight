@@ -20,7 +20,8 @@
 
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
-#include "pidcontrollers/level.hpp"
+#include <pidcontrollers/level.hpp>
+#include <sensors/mspsensors/rangeandflow.hpp>
 #include "omnibusf3.h"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
@@ -44,15 +45,23 @@ extern "C" {
                 0.01f, // Gyro yaw I
                 8.58); // Demands to rate
 
+        // Create a Level PID controller object
         hf::Level * level = new hf::Level(0.2f);
 
+        // Create a DSMX Receiver object
         DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_3, CHANNEL_MAP);
+
+        // Create an OmnibusF3 Board object
+        OmnibusF3 * board = new OmnibusF3();
 
         // Add Level PID for aux switch position 1
         h.addPidController(level, 1);
 
         // Initialize Hackflight firmware
-        h.init(new OmnibusF3(), rc, new hf::MixerQuadX(), ratePid);
+        h.init(board, rc, new hf::MixerQuadX(), ratePid);
+
+        // Add an MSP-based sensor for AGL and optical flow
+        h.addSensor(new hf::RangeAndFlow(board));
     }
 
     void loop(void)
