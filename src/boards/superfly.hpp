@@ -23,11 +23,11 @@
 #pragma once
 
 #include <Wire.h>
-#include "arduinosentral.hpp"
+#include "sentral.hpp"
 
 namespace hf {
 
-    class SuperFly : public ArduinoSentralBoard {
+    class SuperFly : public SentralBoard {
 
         private:
 
@@ -43,7 +43,7 @@ namespace hf {
 
         public:
 
-            SuperFly(void) : ArduinoSentralBoard(15)
+            SuperFly(void) : SentralBoard(15)
             {
                 // Start I^2C
                 Wire.begin(0,2); // SDA (0), SCL (2) on ESP8266

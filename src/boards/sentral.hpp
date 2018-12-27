@@ -22,10 +22,11 @@
 
 #include <Wire.h>
 #include <EM7180_Master.h>
+#include "arduino.hpp"
 
 namespace hf {
 
-    class SentralBoard {
+    class SentralBoard : public ArduinoBoard {
 
         private:
 
@@ -39,6 +40,10 @@ namespace hf {
             EM7180_Master _sentral = EM7180_Master(MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
 
         protected:
+
+            SentralBoard(uint8_t ledPin, bool ledInverted=false) : ArduinoBoard(ledPin, ledInverted)
+            {
+            }
 
             void checkEventStatus(void)
             {

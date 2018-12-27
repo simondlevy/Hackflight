@@ -23,11 +23,11 @@
 #pragma once
 
 #include <Wire.h>
-#include "arduinosentral.hpp"
+#include "sentral.hpp"
 
 namespace hf {
 
-    class Ladybug : public ArduinoSentralBoard {
+    class Ladybug : public SentralBoard {
 
         private:
 
@@ -44,7 +44,7 @@ namespace hf {
         public:
 
             // Support prototype version where LED is on pin A1
-            Ladybug(uint8_t ledPin = A4) : ArduinoSentralBoard(ledPin)
+            Ladybug(uint8_t ledPin = A4) : SentralBoard(ledPin)
             {
                 // Start I^2C
                 Wire.begin();
