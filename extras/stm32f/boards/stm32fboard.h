@@ -1,5 +1,5 @@
 /*
-   omnibusf3.cpp : Board class for Omnibus F3
+   stm32fboard.h : Board class for STM4F boards
 
    Copyright (C) 2018 Simon D. Levy 
 
@@ -23,62 +23,30 @@
 
 #include <boards/realboard.hpp>
 #include <boards/softquat.hpp>
-#include <MPU6000.h>
-#include "stm32fboard.h"
 
-// Cleanflight includes
-extern "C" {
-
-#include "platform.h"
-#include "drivers/system.h"
-#include "drivers/timer.h"
-#include "drivers/time.h"
-#include "drivers/pwm_output.h"
-#include "drivers/serial.h"
-#include "drivers/serial_uart.h"
-#include "drivers/serial_usb_vcp.h"
-#include "io/serial.h"
-#include "target.h"
-#include "stm32f30x.h"
-
-} // extern "C"
-
-class OmnibusF3 : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
+class Stm32FBoard : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
 
     private:
 
-        MPU6000 * _imu;
-
-        // For incoming sensor messages
-        serialPort_t * _serial2;
-
-        void initMotors(void);
-        void initUsb(void);
-        void initImu(void);
+        virtual void initUsb(void) = 0;
+        virtual void initImu(void) = 0;
 
     protected: 
 
         // Board class overrides
         virtual void     writeMotor(uint8_t index, float value) override;
         virtual void     delaySeconds(float sec) override;
-        virtual void     setLed(bool is_on) override;
+        virtual void     setLed(bool isOn) override;
         virtual uint32_t getMicroseconds(void) override;
         virtual void     reboot(void) override;
         static void      outchar(char c);
         virtual uint8_t  serialNormalAvailable(void) override;
         virtual uint8_t  serialNormalRead(void) override;
         virtual void     serialNormalWrite(uint8_t c) override;
-        virtual uint8_t  serialTelemetryAvailable(void) override;
-        virtual uint8_t  serialTelemetryRead(void) override;
-        virtual void     serialTelemetryWrite(uint8_t c) override;
         virtual bool     getQuaternion(float quat[4]) override;
         virtual bool     getGyrometer(float gyroRates[3]) override;
 
         // SoftwareQuaternionBoard class overrides
         virtual bool     imuRead(void) override;
 
-    public:
-
-        OmnibusF3(void);
-
-}; // class OmnibusF3
+}; // class Stm32FBoard
