@@ -190,7 +190,7 @@ If you're mathematically-minded, you can think of a PID Controller as a function
 ### Board classes
 
 <p align="center"> 
-<img src="extras/media/boards.png" width=400>
+<img src="extras/media/boards.png" width=800>
 </p>
 
 ### Control Flow Diagrams
