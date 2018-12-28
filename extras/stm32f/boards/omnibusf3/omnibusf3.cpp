@@ -103,29 +103,9 @@ extern "C" {
         brushless_motors_init(0, 1, 2, 3);
     }
 
-    void Stm32FBoard::writeMotor(uint8_t index, float value)
-    {
-        motor_write(index, value);
-    }
-
-    void Stm32FBoard::delaySeconds(float sec)
-    {
-        delay((uint16_t)(sec*1000));
-    }
-
     void Stm32FBoard::setLed(bool isOn)
     {
         beeperLedSet(isOn);
-    }
-
-    uint32_t Stm32FBoard::getMicroseconds(void)
-    {
-        return micros();
-    }
-
-    void Stm32FBoard::reboot(void)
-    {
-        systemResetToBootloader();
     }
 
     uint8_t Stm32FBoard::serialNormalAvailable(void)
@@ -156,16 +136,6 @@ extern "C" {
     void OmnibusF3::serialTelemetryWrite(uint8_t c)
     {
         serialWrite(_serial2, c);
-    }
-
-    bool Stm32FBoard::getQuaternion(float quat[4])
-    {
-        return SoftwareQuaternionBoard::getQuaternion(quat, getTime());
-    }
-
-    bool Stm32FBoard::getGyrometer(float gyroRates[3])
-    {
-        return SoftwareQuaternionBoard::getGyrometer(gyroRates);
     }
 
     bool OmnibusF3::imuRead(void)
