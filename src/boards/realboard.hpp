@@ -48,8 +48,6 @@ namespace hf {
 
         protected:
 
-            //virtual uint32_t micros(void) = 0;
-            //virtual void     delay(uint32_t msec) = 0;
             virtual void     setLed(bool isOn) = 0;
 
             void init(void)

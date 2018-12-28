@@ -35,9 +35,7 @@ class Stm32FBoard : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
 
         // Board class overrides
         virtual void     writeMotor(uint8_t index, float value) override;
-        //virtual void     delaySeconds(float sec) override;
         virtual void     setLed(bool isOn) override;
-        //virtual uint32_t getMicroseconds(void) override;
         virtual void     reboot(void) override;
         static void      outchar(char c);
         virtual uint8_t  serialNormalAvailable(void) override;

@@ -34,18 +34,6 @@ extern "C" {
         motor_write(index, value);
     }
 
-    /*
-    void Stm32FBoard::delaySeconds(float sec)
-    {
-        delay((uint16_t)(sec*1000));
-    }
-
-    uint32_t Stm32FBoard::getMicroseconds(void)
-    {
-        return micros();
-    }
-    */
-
     void Stm32FBoard::reboot(void)
     {
         systemResetToBootloader();
