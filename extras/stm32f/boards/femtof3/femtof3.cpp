@@ -82,52 +82,52 @@ extern "C" {
         brushless_motors_init(0, 1, 2, 3);
     }
 
-    void FemtoF3::writeMotor(uint8_t index, float value)
+    void Stm32FBoard::writeMotor(uint8_t index, float value)
     {
         motor_write(index, value);
     }
 
-    void FemtoF3::delaySeconds(float sec)
+    void Stm32FBoard::delaySeconds(float sec)
     {
         delay((uint16_t)(sec*1000));
     }
 
-    void FemtoF3::setLed(bool isOn)
+    void Stm32FBoard::setLed(bool isOn)
     {
         ledSet(0, isOn);
     }
 
-    uint32_t FemtoF3::getMicroseconds(void)
+    uint32_t Stm32FBoard::getMicroseconds(void)
     {
         return micros();
     }
 
-    void FemtoF3::reboot(void)
+    void Stm32FBoard::reboot(void)
     {
         systemResetToBootloader();
     }
 
-    uint8_t FemtoF3::serialNormalAvailable(void)
+    uint8_t Stm32FBoard::serialNormalAvailable(void)
     {
         return serialRxBytesWaiting(_serial0);
     }
 
-    uint8_t FemtoF3::serialNormalRead(void)
+    uint8_t Stm32FBoard::serialNormalRead(void)
     {
         return serialRead(_serial0);
     }
 
-    void FemtoF3::serialNormalWrite(uint8_t c)
+    void Stm32FBoard::serialNormalWrite(uint8_t c)
     {
         serialWrite(_serial0, c);
     }
 
-    bool FemtoF3::getQuaternion(float quat[4])
+    bool Stm32FBoard::getQuaternion(float quat[4])
     {
         return SoftwareQuaternionBoard::getQuaternion(quat, getTime());
     }
 
-    bool FemtoF3::getGyrometer(float gyroRates[3])
+    bool Stm32FBoard::getGyrometer(float gyroRates[3])
     {
         return SoftwareQuaternionBoard::getGyrometer(gyroRates);
     }

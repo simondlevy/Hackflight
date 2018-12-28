@@ -41,7 +41,6 @@ extern "C" {
 
 } // extern "C"
 
-//class OmnibusF3 : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
 class OmnibusF3 : public Stm32FBoard {
 
     private:
