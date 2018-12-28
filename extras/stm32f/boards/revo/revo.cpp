@@ -41,12 +41,8 @@ extern "C" {
     // Hackflight includes
 #include "../../common/spi.h"
 
-    static serialPort_t * _serial0;
-
-    Revo::Revo(void)
+    Revo::Revo(void) : Stm32FBoard(usbVcpOpen())
     {
-        initMotors();
-        initUsb();
         initImu();
 
         RealBoard::init();
@@ -71,65 +67,9 @@ extern "C" {
         }
     }
 
-    void Revo::initUsb(void)
-    {
-        _serial0 = usbVcpOpen();
-    }
-
-    void Revo::initMotors(void)
-    {
-
-    }
-
-    void Stm32FBoard::writeMotor(uint8_t index, float value)
-    {
-        (void)index;
-        (void)value;
-    }
-
-    void Stm32FBoard::delaySeconds(float sec)
-    {
-        delay((uint16_t)(sec*1000));
-    }
-
     void Stm32FBoard::setLed(bool isOn)
     {
         ledSet(0, isOn);
-    }
-
-    uint32_t Stm32FBoard::getMicroseconds(void)
-    {
-        return micros();
-    }
-
-    void Stm32FBoard::reboot(void)
-    {
-        systemResetToBootloader();
-    }
-
-    uint8_t Stm32FBoard::serialNormalAvailable(void)
-    {
-        return serialRxBytesWaiting(_serial0);
-    }
-
-    uint8_t Stm32FBoard::serialNormalRead(void)
-    {
-        return serialRead(_serial0);
-    }
-
-    void Stm32FBoard::serialNormalWrite(uint8_t c)
-    {
-        serialWrite(_serial0, c);
-    }
-
-    bool Stm32FBoard::getQuaternion(float quat[4])
-    {
-        return SoftwareQuaternionBoard::getQuaternion(quat, getTime());
-    }
-
-    bool Stm32FBoard::getGyrometer(float gyroRates[3])
-    {
-        return SoftwareQuaternionBoard::getGyrometer(gyroRates);
     }
 
     bool Revo::imuRead(void)
@@ -148,12 +88,6 @@ extern "C" {
         }  
 
         return false;
-    }
-
-    void hf::Board::outbuf(char * buf)
-    {
-        for (char *p=buf; *p; p++)
-            serialWrite(_serial0, *p);
     }
 
 } // extern "C"

@@ -31,7 +31,6 @@ extern "C" {
 #include "drivers/system.h"
 #include "drivers/pwm_output.h"
 #include "target.h"
-#include "stm32f30x.h"
 
     void brushed_motors_init(uint8_t m1, uint8_t m2, uint8_t m3, uint8_t m4);
 
