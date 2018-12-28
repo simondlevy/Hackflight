@@ -90,4 +90,11 @@ extern "C" {
         return false;
     }
 
+    // stubbed for now
+    void motor_write(uint8_t index, float value)
+    {
+        (void)index;
+        (void)value;
+    }
+
 } // extern "C"
