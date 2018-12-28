@@ -42,12 +42,10 @@ extern "C" {
 #include "../../common/spi.h"
 #include "../../common/motors.h"
 
-    static serialPort_t * _serial0;
-
-    FemtoF3::FemtoF3(void)
+    FemtoF3::FemtoF3(void) : Stm32FBoard(usbVcpOpen())
     {
-        initMotors();
-        initUsb();
+        brushless_motors_init(0, 1, 2, 3);
+
         initImu();
 
         RealBoard::init();
@@ -72,64 +70,9 @@ extern "C" {
         }
     }
 
-    void FemtoF3::initUsb(void)
-    {
-        _serial0 = usbVcpOpen();
-    }
-
-    void FemtoF3::initMotors(void)
-    {
-        brushless_motors_init(0, 1, 2, 3);
-    }
-
-    void Stm32FBoard::writeMotor(uint8_t index, float value)
-    {
-        motor_write(index, value);
-    }
-
-    void Stm32FBoard::delaySeconds(float sec)
-    {
-        delay((uint16_t)(sec*1000));
-    }
-
     void Stm32FBoard::setLed(bool isOn)
     {
         ledSet(0, isOn);
-    }
-
-    uint32_t Stm32FBoard::getMicroseconds(void)
-    {
-        return micros();
-    }
-
-    void Stm32FBoard::reboot(void)
-    {
-        systemResetToBootloader();
-    }
-
-    uint8_t Stm32FBoard::serialNormalAvailable(void)
-    {
-        return serialRxBytesWaiting(_serial0);
-    }
-
-    uint8_t Stm32FBoard::serialNormalRead(void)
-    {
-        return serialRead(_serial0);
-    }
-
-    void Stm32FBoard::serialNormalWrite(uint8_t c)
-    {
-        serialWrite(_serial0, c);
-    }
-
-    bool Stm32FBoard::getQuaternion(float quat[4])
-    {
-        return SoftwareQuaternionBoard::getQuaternion(quat, getTime());
-    }
-
-    bool Stm32FBoard::getGyrometer(float gyroRates[3])
-    {
-        return SoftwareQuaternionBoard::getGyrometer(gyroRates);
     }
 
     bool FemtoF3::imuRead(void)
@@ -149,12 +92,5 @@ extern "C" {
 
         return false;
     }
-
-    void hf::Board::outbuf(char * buf)
-    {
-        for (char *p=buf; *p; p++)
-            serialWrite(_serial0, *p);
-    }
-
 
 } // extern "C"

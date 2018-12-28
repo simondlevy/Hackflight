@@ -37,7 +37,7 @@ class FemtoF3 : public Stm32FBoard {
     protected: 
 
         // SoftwareQuaternionBoard class overrides
-        virtual bool     imuRead(void) override;
+        virtual bool imuRead(void) override;
 
     public:
 
