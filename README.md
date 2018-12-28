@@ -201,7 +201,16 @@ description of each member of the Board class hiearchy:
 
 * <b><i>SimulatedBoard</i></b>: Anything other than a real board; for example, the Board
 [subclass](https://github.com/simondlevy/HackflightSim/blob/master/Source/HackflightSim/HackflightSimPawn.h) used in
-[HackflightSim](https://github.com/simondlevy/HackflightSim).
+[HackflightSim](https://github.com/simondlevy/HackflightSim)
+
+* <b>ArduinoBoard</b>: Ancestor class for any board using the Arduino API
+
+* <b>SoftwareQuaternionBoard</b>: Ancestor class for any board not providing a direct (hardware-based) quaternion reading; i.e.,
+most boards
+
+* <b>SentralBoard</b>: Ancestor class for Arduino boards using the the
+[EM7180 SENtral Sensor Fusion Solution](https://www.tindie.com/products/onehorse/ultimate-sensor-fusion-solution-mpu9250/)
+to provide the quaternion
 
 <p align="center"> 
 <img src="extras/media/boards3.png" width=800>
