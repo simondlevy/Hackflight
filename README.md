@@ -197,9 +197,9 @@ description of each member of the Board class hiearchy:
 
 * <b>Board</b>: Ancestor class for all boards, real and simulated
 
-* RealBoard: Ancestor class for real (physical) boards
+* <b>RealBoard</b>: Ancestor class for real (physical) boards
 
-* SimulatedBoard
+* <b><i>SimulatedBoard</i></b>
 
 <p align="center"> 
 <img src="extras/media/boards3.png" width=800>
