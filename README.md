@@ -212,7 +212,7 @@ most boards
 [EM7180 SENtral Sensor Fusion Solution](https://www.tindie.com/products/onehorse/ultimate-sensor-fusion-solution-mpu9250/)
 to provide the quaternion directly
 
-* <b>MockBoard</b>: Parent class for Arduino development boards; enables algorithm and sensor prototyping
+* <b>MockBoard</b>: Parent class for Arduino development boards; enables algorithm, sensor, and receiver prototyping
 
 * <b>BonadroneBoard</b>: Parent class for the forthcoming brushless/brushed Arduino-compatible flight controller from 
 [Bonadrone.com](https://www.bonadrone.com/en)
