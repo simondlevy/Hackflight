@@ -21,37 +21,23 @@
 
 #pragma once
 
-#include <boards/realboard.hpp>
-#include <boards/softquat.hpp>
-
 #include <MPU6000.h>
+#include "stm32fboard.h"
 
-class BetaFPVF3 : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
+class BetaFPVF3 : public Stm32FBoard {
 
     private:
 
+        MPU6000 * _imu;
+
+        void initMotors(void);
         void initUsb(void);
         void initImu(void);
 
-        MPU6000 * _imu;
-
     protected: 
 
-        // Board class overrides
-        virtual void     writeMotor(uint8_t index, float value) override;
-        virtual void     delaySeconds(float sec) override;
-        virtual void     setLed(bool isOn) override;
-        virtual uint32_t getMicroseconds(void) override;
-        virtual void     reboot(void) override;
-        static void      outchar(char c);
-        virtual uint8_t  serialNormalAvailable(void) override;
-        virtual uint8_t  serialNormalRead(void) override;
-        virtual void     serialNormalWrite(uint8_t c) override;
-        virtual bool     getQuaternion(float quat[4]) override;
-        virtual bool     getGyrometer(float gyroRates[3]) override;
-
         // SoftwareQuaternionBoard class overrides
-        virtual bool     imuRead(void) override;
+        virtual bool imuRead(void) override;
 
     public:
 

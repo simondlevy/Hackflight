@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <boards/realboard.hpp>
-#include <boards/softquat.hpp>
 #include <MPU6000.h>
 #include "stm32fboard.h"
 
