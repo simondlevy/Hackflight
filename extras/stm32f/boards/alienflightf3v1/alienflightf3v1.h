@@ -21,33 +21,20 @@
 
 #pragma once
 
-#include <boards/realboard.hpp>
-#include <boards/softquat.hpp>
 #include <MPU6050.h>
+#include "stm32fboard.h"
 
-class AlienflightF3V1 : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
+class AlienflightF3V1 : public Stm32FBoard {
 
     private:
 
         MPU6050 * _imu;
 
+        void initMotors(void);
         void initUsb(void);
         void initImu(void);
 
     protected: 
-
-        // Board class overrides
-        virtual void     writeMotor(uint8_t index, float value) override;
-        virtual void     delaySeconds(float sec) override;
-        virtual void     setLed(bool isOn) override;
-        virtual uint32_t getMicroseconds(void) override;
-        virtual void     reboot(void) override;
-        static void      outchar(char c);
-        virtual uint8_t  serialNormalAvailable(void) override;
-        virtual uint8_t  serialNormalRead(void) override;
-        virtual void     serialNormalWrite(uint8_t c) override;
-        virtual bool     getQuaternion(float quat[4]) override;
-        virtual bool     getGyrometer(float gyroRates[3]) override;
 
         // SoftwareQuaternionBoard class overrides
         virtual bool     imuRead(void) override;
