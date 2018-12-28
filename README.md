@@ -212,6 +212,14 @@ most boards
 [EM7180 SENtral Sensor Fusion Solution](https://www.tindie.com/products/onehorse/ultimate-sensor-fusion-solution-mpu9250/)
 to provide the quaternion
 
+* <b>MockBoard</b>: Parent class for Arduino development boards; enables algorithm and sensor prototyping
+
+* <b>BonadroneBoard</b>: Parent class for the forthcoming brushless/brushed Arduino-compatible flight controller from 
+[Bonadrone.com](https://www.bonadrone.com/en)
+
+* <b>STM32FBoard</b>: Parent class for the popular line of Cleanflight-compatible controllers based on the STM32F architecture (more info
+[here](https://github.com/simondlevy/Hackflight/tree/master/extras/stm32f))
+
 <p align="center"> 
 <img src="extras/media/boards3.png" width=800>
 </p>
