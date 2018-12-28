@@ -191,9 +191,9 @@ If you're mathematically-minded, you can think of a PID Controller as a function
 
 As described above, the <a href="https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp">Board</a>
 class specifies a set of abstract  methods that you must implement for a particular flight controller or simulator.
-The figure below shows the class hiearchy for currently implemented and tested boards.  As the figure shows, Hackflight
+The figure below shows the class hierarchy for currently implemented and tested boards.  As the figure shows, Hackflight
 makes extensive use of C++ inheritance to minimize the amount of redundant code among these classes.  Here is a brief
-description of each member of the Board class hiearchy:
+description of each member of the Board class hierarchy:
 
 * <b>Board</b>: Ancestor class for all boards, real and simulated
 
