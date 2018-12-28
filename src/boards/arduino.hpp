@@ -34,11 +34,6 @@ namespace hf {
 
         protected:
 
-            void delaySeconds(float sec)
-            {
-                delay((uint32_t)(1000*sec));
-            }
-
             void setLed(bool isOn)
             { 
                 digitalWrite(_led_pin, isOn ? 
@@ -59,11 +54,6 @@ namespace hf {
             void serialNormalWrite(uint8_t c)
             {
                 Serial.write(c);
-            }
-
-            virtual uint32_t getMicroseconds(void) override
-            {
-                return micros();
             }
 
         public:

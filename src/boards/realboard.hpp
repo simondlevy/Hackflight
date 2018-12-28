@@ -24,6 +24,11 @@
 #include "debug.hpp"
 #include "datatypes.hpp"
 
+extern "C" {
+extern uint32_t micros(void);
+extern void     delay(uint32_t msec);
+}
+
 namespace hf {
 
     class RealBoard : public Board {
@@ -43,8 +48,8 @@ namespace hf {
 
         protected:
 
-            virtual uint32_t getMicroseconds(void) = 0;
-            virtual void     delaySeconds(float time) = 0;
+            //virtual uint32_t micros(void) = 0;
+            //virtual void     delay(uint32_t msec) = 0;
             virtual void     setLed(bool isOn) = 0;
 
             void init(void)
@@ -65,7 +70,12 @@ namespace hf {
 
             float getTime(void)
             {
-                return getMicroseconds() / 1.e6f;
+                return micros() / 1.e6f;
+            }
+
+            void delaySeconds(float sec)
+            {
+                delay((uint32_t)(1000*sec));
             }
 
             uint8_t serialAvailableBytes(void)
