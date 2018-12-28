@@ -29,6 +29,14 @@ extern "C" {
 #include "../../common/beeperled.h"
 #include "../../common/motors.h"
 
+    // We put this outside the class to make it available to static Board::outbuf() below
+    static serialPort_t * _serial0;
+
+    Stm32FBoard::Stm32FBoard(serialPort_t * serial0)
+    {
+        _serial0 = serial0;
+    }
+
     void Stm32FBoard::writeMotor(uint8_t index, float value)
     {
         motor_write(index, value);
@@ -52,7 +60,23 @@ extern "C" {
     void hf::Board::outbuf(char * buf)
     {
         for (char *p=buf; *p; p++)
-            serialWrite(getSerial0(), *p);
+            serialWrite(_serial0, *p);
     }
+
+    uint8_t Stm32FBoard::serialNormalAvailable(void)
+    {
+        return serialRxBytesWaiting(_serial0);
+    }
+
+    uint8_t Stm32FBoard::serialNormalRead(void)
+    {
+        return serialRead(_serial0);
+    }
+
+    void Stm32FBoard::serialNormalWrite(uint8_t c)
+    {
+        serialWrite(_serial0, c);
+    }
+
 
 } // extern "C"

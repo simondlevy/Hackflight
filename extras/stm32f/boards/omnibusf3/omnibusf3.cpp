@@ -21,12 +21,6 @@
 
 #include "omnibusf3.h"
 
-static const uint16_t BRUSHLESS_PWM_RATE   = 480;
-static const uint16_t BRUSHLESS_IDLE_PULSE = 1000; 
-
-static const float    MOTOR_MIN = 1000;
-static const float    MOTOR_MAX = 2000;
-
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
@@ -34,13 +28,6 @@ extern "C" {
 #include "../../common/spi.h"
 #include "../../common/beeperled.h"
 #include "../../common/motors.h"
-
-    // --------------------------------------------------
-
-    // This is static so Board::outbuf() can access it
-    static serialPort_t * _serial0;
-
-    // --------------------------------------------------
 
     // These are static so serial_event1 can access them
     static uint8_t _value1;
@@ -57,14 +44,13 @@ extern "C" {
 
     // --------------------------------------------------
 
-    OmnibusF3::OmnibusF3(void)
+    OmnibusF3::OmnibusF3(void) : Stm32FBoard(usbVcpOpen())
     {
         // Set up the LED (uses the beeper for some reason)
         beeperLedInit();
 
         // Run standard initializations
         initMotors();
-        initUsb();
         initImu();
 
         // Set up UARTs for sensors, telemetry
@@ -93,11 +79,6 @@ extern "C" {
         }
     }
 
-    void OmnibusF3::initUsb(void)
-    {
-        _serial0 = usbVcpOpen();
-    }
-
     void OmnibusF3::initMotors(void)
     {
         brushless_motors_init(0, 1, 2, 3);
@@ -106,21 +87,6 @@ extern "C" {
     void Stm32FBoard::setLed(bool isOn)
     {
         beeperLedSet(isOn);
-    }
-
-    uint8_t Stm32FBoard::serialNormalAvailable(void)
-    {
-        return serialRxBytesWaiting(_serial0);
-    }
-
-    uint8_t Stm32FBoard::serialNormalRead(void)
-    {
-        return serialRead(_serial0);
-    }
-
-    void Stm32FBoard::serialNormalWrite(uint8_t c)
-    {
-        serialWrite(_serial0, c);
     }
 
     uint8_t OmnibusF3::serialTelemetryAvailable(void)
@@ -154,11 +120,6 @@ extern "C" {
         }  
 
         return false;
-    }
-
-    serialPort_t * getSerial0(void) 
-    {
-        return _serial0;
     }
 
 } // extern "C"

@@ -39,9 +39,6 @@ extern "C" {
 #include "target.h"
 #include "stm32f30x.h"
 
-// Serial support
-serialPort_t * getSerial0(void);
-
 } // extern "C"
 
 
@@ -49,10 +46,11 @@ class Stm32FBoard : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
 
     private:
 
-        virtual void initUsb(void) = 0;
         virtual void initImu(void) = 0;
 
     protected: 
+
+        Stm32FBoard(serialPort_t * serial0);
 
         // Board class overrides
         virtual void     writeMotor(uint8_t index, float value) override;
