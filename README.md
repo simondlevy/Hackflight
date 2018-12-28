@@ -203,7 +203,7 @@ description of each member of the Board class hiearchy:
 [subclass](https://github.com/simondlevy/HackflightSim/blob/master/Source/HackflightSim/HackflightSimPawn.h) used in
 [HackflightSim](https://github.com/simondlevy/HackflightSim)
 
-* <b>ArduinoBoard</b>: Ancestor class for any board using the Arduino API
+* <b>ArduinoBoard</b>: Ancestor class for Arduino-compatible boards
 
 * <b>SoftwareQuaternionBoard</b>: Ancestor class for any board not providing a direct (hardware-based) quaternion reading; i.e.,
 most boards
