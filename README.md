@@ -195,7 +195,7 @@ The figure below shows the class hiearchy for currently implemented and tested b
 makes extensive use of C++ inheritance to minimize the amount of redundant code among these classes.  Here is a brief
 description of each member of the Board class hiearchy:
 
-* Board: Ancestor class for all boards, real and simulated
+* <b>Board</b>: Ancestor class for all boards, real and simulated
 
 * RealBoard: Ancestor class for real (physical) boards
 
