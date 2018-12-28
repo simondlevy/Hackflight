@@ -24,6 +24,27 @@
 #include <boards/realboard.hpp>
 #include <boards/softquat.hpp>
 
+// Cleanflight includes
+extern "C" {
+
+#include "platform.h"
+#include "drivers/system.h"
+#include "drivers/timer.h"
+#include "drivers/time.h"
+#include "drivers/pwm_output.h"
+#include "drivers/serial.h"
+#include "drivers/serial_uart.h"
+#include "drivers/serial_usb_vcp.h"
+#include "io/serial.h"
+#include "target.h"
+#include "stm32f30x.h"
+
+// Serial support
+serialPort_t * getSerial0(void);
+
+} // extern "C"
+
+
 class Stm32FBoard : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
 
     private:
@@ -37,7 +58,6 @@ class Stm32FBoard : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
         virtual void     writeMotor(uint8_t index, float value) override;
         virtual void     setLed(bool isOn) override;
         virtual void     reboot(void) override;
-        static void      outchar(char c);
         virtual uint8_t  serialNormalAvailable(void) override;
         virtual uint8_t  serialNormalRead(void) override;
         virtual void     serialNormalWrite(uint8_t c) override;
@@ -45,3 +65,5 @@ class Stm32FBoard : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
         virtual bool     getGyrometer(float gyroRates[3]) override;
 
 }; // class Stm32FBoard
+
+

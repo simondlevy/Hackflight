@@ -156,10 +156,9 @@ extern "C" {
         return false;
     }
 
-    void hf::Board::outbuf(char * buf)
+    serialPort_t * getSerial0(void) 
     {
-        for (char *p=buf; *p; p++)
-            serialWrite(_serial0, *p);
+        return _serial0;
     }
 
 } // extern "C"

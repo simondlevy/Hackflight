@@ -49,4 +49,10 @@ extern "C" {
         return SoftwareQuaternionBoard::getGyrometer(gyroRates);
     }
 
+    void hf::Board::outbuf(char * buf)
+    {
+        for (char *p=buf; *p; p++)
+            serialWrite(getSerial0(), *p);
+    }
+
 } // extern "C"
