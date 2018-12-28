@@ -37,7 +37,6 @@ extern "C" {
 #include "drivers/serial_usb_vcp.h"
 #include "io/serial.h"
 #include "target.h"
-#include "stm32f30x.h"
 
 } // extern "C"
 
