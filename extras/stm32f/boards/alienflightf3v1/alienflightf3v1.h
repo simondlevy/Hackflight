@@ -30,14 +30,12 @@ class AlienflightF3V1 : public Stm32FBoard {
 
         MPU6050 * _imu;
 
-        void initMotors(void);
-        void initUsb(void);
         void initImu(void);
 
     protected: 
 
         // SoftwareQuaternionBoard class overrides
-        virtual bool     imuRead(void) override;
+        virtual bool imuRead(void) override;
 
     public:
 

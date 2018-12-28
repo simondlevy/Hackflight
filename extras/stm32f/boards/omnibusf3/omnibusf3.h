@@ -33,14 +33,12 @@ class OmnibusF3 : public Stm32FBoard {
         // For incoming sensor messages
         serialPort_t * _serial2;
 
-        void initMotors(void);
-        void initUsb(void);
         void initImu(void);
 
     protected:
 
         // SoftwareQuaternionBoard class overrides
-        virtual bool     imuRead(void) override;
+        virtual bool imuRead(void) override;
 
         // RealBoard class overrides
         virtual uint8_t  serialTelemetryAvailable(void) override;

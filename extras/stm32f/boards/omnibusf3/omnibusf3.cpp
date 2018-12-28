@@ -50,7 +50,7 @@ extern "C" {
         beeperLedInit();
 
         // Run standard initializations
-        initMotors();
+        brushless_motors_init(0, 1, 2, 3);
         initImu();
 
         // Set up UARTs for sensors, telemetry
@@ -77,11 +77,6 @@ extern "C" {
             default:
                 break;
         }
-    }
-
-    void OmnibusF3::initMotors(void)
-    {
-        brushless_motors_init(0, 1, 2, 3);
     }
 
     void Stm32FBoard::setLed(bool isOn)
