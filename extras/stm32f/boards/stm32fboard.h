@@ -46,7 +46,4 @@ class Stm32FBoard : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
         virtual bool     getQuaternion(float quat[4]) override;
         virtual bool     getGyrometer(float gyroRates[3]) override;
 
-        // SoftwareQuaternionBoard class overrides
-        virtual bool     imuRead(void) override;
-
 }; // class Stm32FBoard
