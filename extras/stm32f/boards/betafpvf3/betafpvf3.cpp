@@ -31,33 +31,17 @@ extern "C" {
 
     BetaFPVF3::BetaFPVF3(void) : Stm32FBoard(usbVcpOpen())
     {
+        spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
         // Set up the LED (uses the beeper for some reason)
         beeperLedInit();
 
         brushed_motors_init(2, 3, 0, 1);
 
-        initImu();
-
-        RealBoard::init();
-    }
-
-    void BetaFPVF3::initImu(void)
-    {
-        spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
-
         _imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
-        switch (_imu->begin()) {
+        checkImuError(_imu->begin());
 
-            case MPUIMU::ERROR_IMU_ID:
-                error("Bad device ID");
-                break;
-            case MPUIMU::ERROR_SELFTEST:
-                error("Failed self-test");
-                break;
-            default:
-                break;
-        }
+        RealBoard::init();
     }
 
     void Stm32FBoard::setLed(bool isOn)

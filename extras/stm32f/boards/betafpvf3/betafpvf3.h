@@ -30,8 +30,6 @@ class BetaFPVF3 : public Stm32FBoard {
 
         MPU6000 * _imu;
 
-        void initImu(void);
-
     protected: 
 
         // SoftwareQuaternionBoard class overrides
