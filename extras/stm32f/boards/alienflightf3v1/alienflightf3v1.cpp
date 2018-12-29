@@ -36,32 +36,16 @@ extern "C" {
 
     AlienflightF3V1::AlienflightF3V1(void) : Stm32FBoard(usbVcpOpen())
     {
-        brushed_motors_init(0, 1, 2, 3);
-        
-        initImu();
-
-        RealBoard::init();
-    }
-
-    void AlienflightF3V1::initImu(void)
-    {
         i2c_init(I2CDEV_2);
-
         delaySeconds(.01);
 
+        brushed_motors_init(0, 1, 2, 3);
+        
         _imu = new MPU6050(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
-        switch (_imu->begin()) {
+        checkImuError(_imu->begin());
 
-            case MPUIMU::ERROR_IMU_ID:
-                error("Bad device ID");
-                break;
-            case MPUIMU::ERROR_SELFTEST:
-                error("Failed self-test");
-                break;
-            default:
-                break;
-        }
+        RealBoard::init();
     }
 
     void Stm32FBoard::setLed(bool isOn)

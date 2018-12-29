@@ -39,7 +39,8 @@ extern "C" {
                 0.001875f,  // Gyro pitch/roll I
                 0.175f,     // Gyro pitch/roll D
                 0.625f,     // Gyro yaw P
-                0.005625f); // Gyro yaw I
+                0.005625f,  // Gyro yaw I
+                4.0f);      // Demands to rate
 
         hf::Level * level = new hf::Level(0.20f);
 
