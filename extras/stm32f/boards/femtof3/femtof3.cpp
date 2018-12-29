@@ -33,16 +33,9 @@ extern "C" {
 
     FemtoF3::FemtoF3(void) : Stm32FBoard(usbVcpOpen())
     {
-        brushless_motors_init(0, 1, 2, 3);
-
-        initImu();
-
-        RealBoard::init();
-    }
-
-    void FemtoF3::initImu(void)
-    {
         spi_init(MPU6500_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6500_CS_PIN)));
+
+        brushless_motors_init(0, 1, 2, 3);
 
         _imu = new MPU6500(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
@@ -57,6 +50,8 @@ extern "C" {
             default:
                 break;
         }
+
+        RealBoard::init();
     }
 
     void Stm32FBoard::setLed(bool isOn)
