@@ -148,8 +148,13 @@ Many popular STM32F-based flight-control boards come with extra UARTs (serial po
 signals like I<sup>2</sup>C or SPI.  For this reason, , Hackflight also
 provides an abstract
 [class](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/mspsensor.hpp)
-to support communicating with an external Arduino-compatible microprocessor
-(like Teensy board) connected to such sensors.  
+to support communicating with an external Arduino-compatible development board
+(like Teensy board) connected to such sensors.  For example, 
+[this image](https://github.com/simondlevy/Hackflight/blob/master/extras/media/loiterboard.jpg) shows a 
+[Butterfly Board](https://www.tindie.com/products/TleraCorp/butterfly-stm32l433-development-board/) from Tlera Corp., 
+with a [VL53L1X](https://www.tindie.com/products/onehorse/vl53l1-long-range-proximity-sensor/)
+long-range proximity sensor and [PMW3901](https://www.tindie.com/products/onehorse/pmw3901-optical-flow-sensor/)
+optical-flow sensor (both from Pesky Products).
 
 To implement additional sensors, you can directly sub-class the Sensor class, as we've done with the 
 [Rangefinder](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/rangefinder.hpp) 
