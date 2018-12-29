@@ -24,20 +24,7 @@
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
-    // Cleanflight includes
-#include "platform.h"
-#include "drivers/system.h"
-#include "drivers/timer.h"
-#include "drivers/time.h"
-#include "drivers/light_led.h"
-#include "drivers/serial.h"
-#include "drivers/serial_uart.h"
-#include "drivers/serial_usb_vcp.h"
-#include "io/serial.h"
-#include "target.h"
-#include "stm32f30x.h"
-
-    // Hackflight includes
+// Hackflight includes
 #include "../../common/spi.h"
 #include "../../common/beeperled.h"
 #include "../../common/motors.h"
