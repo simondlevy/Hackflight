@@ -37,6 +37,21 @@ extern "C" {
         _serial0 = serial0;
     }
 
+    void Stm32FBoard::checkImu(MPUIMU::Error_t errid)
+    {
+        switch (errid) {
+
+            case MPUIMU::ERROR_IMU_ID:
+                error("Bad device ID");
+                break;
+            case MPUIMU::ERROR_SELFTEST:
+                error("Failed self-test");
+                break;
+            default:
+                break;
+        }
+    }
+
     void Stm32FBoard::writeMotor(uint8_t index, float value)
     {
         motor_write(index, value);

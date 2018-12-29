@@ -54,31 +54,17 @@ extern "C" {
 
         // Run standard initializations
         brushless_motors_init(0, 1, 2, 3);
-        initImu();
 
+        // Start the IMU
+        _imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
+
+        checkImu(_imu->begin());
         // Set up UARTs for sensors, telemetry
         uartPinConfigure(serialPinConfig());
         uartOpen(UARTDEV_1,  serial_event1, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
         _serial2 = uartOpen(UARTDEV_2,  NULL, NULL,  115200, MODE_RXTX, SERIAL_NOT_INVERTED);
 
         RealBoard::init();
-    }
-
-    void OmnibusF3::initImu(void)
-    {
-        _imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
-
-        switch (_imu->begin()) {
-
-            case MPUIMU::ERROR_IMU_ID:
-                error("Bad device ID");
-                break;
-            case MPUIMU::ERROR_SELFTEST:
-                error("Failed self-test");
-                break;
-            default:
-                break;
-        }
     }
 
     void Stm32FBoard::setLed(bool isOn)
