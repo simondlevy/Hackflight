@@ -48,7 +48,7 @@ namespace hf {
 
         protected:
 
-            virtual void     setLed(bool isOn) = 0;
+            virtual void setLed(bool isOn) = 0;
 
             void init(void)
             {

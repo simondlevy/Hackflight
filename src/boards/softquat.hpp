@@ -108,6 +108,7 @@ namespace hf {
                 return false;
             }
 
+            // Should set values of _ax,_ay,_az,_gx,_gy,_gz
             virtual bool imuRead(void) = 0;
 
     }; // class SoftwareQuaternionBoard
