@@ -123,6 +123,9 @@ inertial measurement units (IMUs) like the MPU9250 that do not deliver a
 hardware quaternion, Hackflight provides a [QuaternionFilter](https://github.com/simondlevy/Hackflight/blob/master/src/filters.hpp#L92)
 class that can be used to compute the quaternion on your microcontroller.
 
+If you're mathematically-minded, you can think of a sensor as a function from states to states:
+<i>Sensor</i>: <i>State</i> &rarr; <i>State</i>
+
 To provide access to other popular surface-mount sensors that you may wish to read, Hackflight also has classes to support
 [accelerometers](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/accelerometer.hpp), 
 [magnetometers](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/magnetometer.hpp), and 
@@ -141,8 +144,12 @@ must implement: (1) reporting whether the sensor is ready to deliver new data;
 readiness, we can avoid the need to write a separate timing loop for each
 sensor in the main [loop code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L344-L355). 
 
-If you're mathematically-minded, you can think of a sensor as a function from states to states:
-<i>Sensor</i>: <i>State</i> &rarr; <i>State</i>
+Many popular STM32F-based flight-control boards come with extra UARTs (serial ports) but lack ports for sensor
+signals like I<sup>2</sup>C or SPI.  For this reason, , Hackflight also
+provides an abstract
+[class](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/mspsensor.hpp)
+to support communicating with an external Arduino-compatible microprocessor
+(like Teensy board) connected to such sensors.  
 
 To implement additional sensors, you can directly sub-class the Sensor class, as we've done with the 
 [Rangefinder](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/rangefinder.hpp) 
