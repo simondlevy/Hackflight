@@ -58,7 +58,9 @@ extern "C" {
         // Start the IMU
         _imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
-        checkImu(_imu->begin());
+        // Check IMU ready status
+        checkImuError(_imu->begin());
+
         // Set up UARTs for sensors, telemetry
         uartPinConfigure(serialPinConfig());
         uartOpen(UARTDEV_1,  serial_event1, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
@@ -89,10 +91,7 @@ extern "C" {
 
     bool OmnibusF3::imuRead(void)
     {
-        if (_imu->checkNewData()) {  
-
-            _imu->readAccelerometer(_ax, _ay, _az);
-            _imu->readGyrometer(_gx, _gy, _gz);
+        if (imuReady(_imu)) {
 
             // Negate to support board orientation
             _ay = -_ay;

@@ -37,7 +37,7 @@ extern "C" {
         _serial0 = serial0;
     }
 
-    void Stm32FBoard::checkImu(MPUIMU::Error_t errid)
+    void Stm32FBoard::checkImuError(MPUIMU::Error_t errid)
     {
         switch (errid) {
 
@@ -93,5 +93,17 @@ extern "C" {
         serialWrite(_serial0, c);
     }
 
+    bool Stm32FBoard::imuReady(MPU6xx0 * imu)
+    {
+        if (imu->checkNewData()) {  
+
+            imu->readAccelerometer(_ax, _ay, _az);
+            imu->readGyrometer(_gx, _gy, _gz);
+
+            return true;
+        }  
+
+        return false;
+    }
 
 } // extern "C"
