@@ -93,17 +93,4 @@ extern "C" {
         serialWrite(_serial0, c);
     }
 
-    bool Stm32FBoard::imuReady(MPU6xx0 * imu)
-    {
-        if (imu->checkNewData()) {  
-
-            imu->readAccelerometer(_ax, _ay, _az);
-            imu->readGyrometer(_gx, _gy, _gz);
-
-            return true;
-        }  
-
-        return false;
-    }
-
 } // extern "C"

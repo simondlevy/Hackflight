@@ -54,8 +54,6 @@ class Stm32FBoard : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
 
         void checkImuError(MPUIMU::Error_t errid);
 
-        bool imuReady(MPU6xx0 * imu);
-
         // Board class overrides
         virtual void     writeMotor(uint8_t index, float value) override;
         virtual void     setLed(bool isOn) override;

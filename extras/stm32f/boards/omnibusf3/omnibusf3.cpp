@@ -91,9 +91,12 @@ extern "C" {
 
     bool OmnibusF3::imuRead(void)
     {
-        if (imuReady(_imu)) {
+        if (_imu->checkNewData()) {  
 
-            // Negate to support board orientation
+            _imu->readAccelerometer(_ax, _ay, _az);
+            _imu->readGyrometer(_gx, _gy, _gz);
+
+            // Negate for IMU orientation
             _ay = -_ay;
             _gx = -_gx;
             _gz = -_gz;
