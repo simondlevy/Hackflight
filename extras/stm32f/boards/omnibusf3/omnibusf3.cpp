@@ -89,22 +89,20 @@ extern "C" {
         serialWrite(_serial2, c);
     }
 
-    bool OmnibusF3::imuRead(void)
+    bool OmnibusF3::imuReady(void)
     {
-        if (_imu->checkNewData()) {  
+        return _imu->checkNewData();
+    }
 
-            _imu->readAccelerometer(_ax, _ay, _az);
-            _imu->readGyrometer(_gx, _gy, _gz);
+    void OmnibusF3::imuReadAccelGyro(void)
+    {
+        _imu->readAccelerometer(_ax, _ay, _az);
+        _imu->readGyrometer(_gx, _gy, _gz);
 
-            // Negate for IMU orientation
-            _ay = -_ay;
-            _gx = -_gx;
-            _gz = -_gz;
-
-            return true;
-        }  
-
-        return false;
+        // Negate for IMU orientation
+        _ay = -_ay;
+        _gx = -_gx;
+        _gz = -_gz;
     }
 
 } // extern "C"

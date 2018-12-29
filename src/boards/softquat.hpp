@@ -56,13 +56,18 @@ namespace hf {
             // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
             // using a 6DOF fiter (accel, gyro)
             MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(_beta, _zeta);
+            virtual bool imuReady(void) = 0;
+
+            virtual void imuReadAccelGyro(void) = 0;
 
         public:
 
             bool getGyrometer(float gyro[3])
             {
                 // Read acceleromter Gs, gyrometer degrees/sec
-                if (imuRead()) {
+                if (imuReady()) {
+
+                    imuReadAccelGyro();
 
                     // Convert gyrometer values from degrees/sec to radians/sec
                     _gx = Filter::deg2rad(_gx);
@@ -93,7 +98,7 @@ namespace hf {
                     float deltat = time - _time;
                     _time = time;
 
-                    // Run the quaternion on the IMU values acquired in imuRead()                   
+                    // Run the quaternion on the IMU values acquired in imuReadAccelGyro()                   
                     _quaternionFilter.update(_ax, _ay, _az, _gx, _gy, _gz, deltat); 
 
                     // Copy the quaternion back out
@@ -107,9 +112,6 @@ namespace hf {
 
                 return false;
             }
-
-            // Should set values of _ax,_ay,_az,_gx,_gy,_gz
-            virtual bool imuRead(void) = 0;
 
     }; // class SoftwareQuaternionBoard
 

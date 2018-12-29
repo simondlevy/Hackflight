@@ -36,7 +36,8 @@ class OmnibusF3 : public Stm32FBoard {
     protected:
 
         // SoftwareQuaternionBoard class overrides
-        virtual bool imuRead(void) override;
+        virtual bool imuReady(void) override;
+        virtual void imuReadAccelGyro(void) override;
 
         // RealBoard class overrides
         virtual uint8_t  serialTelemetryAvailable(void) override;
