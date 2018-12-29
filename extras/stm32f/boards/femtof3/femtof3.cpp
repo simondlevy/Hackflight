@@ -39,17 +39,7 @@ extern "C" {
 
         _imu = new MPU6500(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
-        switch (_imu->begin()) {
-
-            case MPUIMU::ERROR_IMU_ID:
-                error("Bad device ID");
-                break;
-            case MPUIMU::ERROR_SELFTEST:
-                error("Failed self-test");
-                break;
-            default:
-                break;
-        }
+        checkImuError(_imu->begin());
 
         RealBoard::init();
     }
