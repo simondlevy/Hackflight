@@ -24,6 +24,8 @@
 #include <boards/realboard.hpp>
 #include <boards/softquat.hpp>
 
+#include <MPU6xx0.h>
+
 // Cleanflight includes
 extern "C" {
 
@@ -40,10 +42,11 @@ extern "C" {
 
 } // extern "C"
 
-
 class Stm32FBoard : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
 
     private:
+
+        MPU6xx0 * _mpu;
 
         virtual void initImu(void) = 0;
 
@@ -62,5 +65,3 @@ class Stm32FBoard : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
         virtual bool     getGyrometer(float gyroRates[3]) override;
 
 }; // class Stm32FBoard
-
-

@@ -46,6 +46,9 @@ extern "C" {
 
     OmnibusF3::OmnibusF3(void) : Stm32FBoard(usbVcpOpen())
     {
+        // Start SPI bus for MPU6000
+        spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
+
         // Set up the LED (uses the beeper for some reason)
         beeperLedInit();
 
@@ -63,7 +66,6 @@ extern "C" {
 
     void OmnibusF3::initImu(void)
     {
-        spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
         _imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
         switch (_imu->begin()) {
