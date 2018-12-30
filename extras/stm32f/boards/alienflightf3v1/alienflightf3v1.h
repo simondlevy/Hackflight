@@ -33,7 +33,8 @@ class AlienflightF3V1 : public Stm32FBoard {
     protected: 
 
         // SoftwareQuaternionBoard class overrides
-        virtual bool imuRead(void) override;
+        virtual bool imuReady(void) override;
+        virtual void imuReadAccelGyro(void) override;
 
     public:
 

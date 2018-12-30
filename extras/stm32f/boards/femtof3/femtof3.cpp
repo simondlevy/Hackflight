@@ -49,22 +49,20 @@ extern "C" {
         ledSet(0, isOn);
     }
 
-    bool FemtoF3::imuRead(void)
+    bool FemtoF3::imuReady(void)
     {
-        if (_imu->checkNewData()) {  
+        return _imu->checkNewData();
+    }
 
-            _imu->readAccelerometer(_ax, _ay, _az);
-            _imu->readGyrometer(_gx, _gy, _gz);
+    void FemtoF3::imuReadAccelGyro(void)
+    {
+        _imu->readAccelerometer(_ax, _ay, _az);
+        _imu->readGyrometer(_gx, _gy, _gz);
 
-            // Negate for IMU orientation
-            _ay = -_ay;
-            _gx = -_gx;
-            _gz = -_gz;
-
-            return true;
-        }  
-
-        return false;
+        // Negate for IMU orientation
+        _ay = -_ay;
+        _gx = -_gx;
+        _gz = -_gz;
     }
 
 } // extern "C"

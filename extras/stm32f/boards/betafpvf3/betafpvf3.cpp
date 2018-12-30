@@ -49,22 +49,20 @@ extern "C" {
         beeperLedSet(isOn);
     }
 
-    bool BetaFPVF3::imuRead(void)
+    bool BetaFPVF3::imuReady(void)
     {
-        if (_imu->checkNewData()) {  
+        return _imu->checkNewData();
+    }
 
-            _imu->readAccelerometer(_ax, _ay, _az);
-            _imu->readGyrometer(_gx, _gy, _gz);
+    void BetaFPVF3::imuReadAccelGyro(void)
+    {
+        _imu->readAccelerometer(_ax, _ay, _az);
+        _imu->readGyrometer(_gx, _gy, _gz);
 
-             // Negate values based on board orientation
-            _az = -_az;
-            _gx = -_gx;
-            _gy = -_gy;
-
-            return true;
-        }  
-
-        return false;
+        // Negate values based on board orientation
+        _az = -_az;
+        _gx = -_gx;
+        _gy = -_gy;
     }
 
 } // extern "C"

@@ -53,23 +53,21 @@ extern "C" {
         ledSet(0, isOn);
     }
 
-    bool AlienflightF3V1::imuRead(void)
+    bool AlienflightF3V1::imuReady(void)
     {
-        if (_imu->checkNewData()) {  
+        return _imu->checkNewData();
+    }
 
-            // Note reversed X/Y order because of IMU orientation
-            _imu->readAccelerometer(_ay, _ax, _az);
-            _imu->readGyrometer(_gy, _gx, _gz);
+    void AlienflightF3V1::imuReadAccelGyro(void)
+    {
+        // Note reversed X/Y order because of IMU orientation
+        _imu->readAccelerometer(_ay, _ax, _az);
+        _imu->readGyrometer(_gy, _gx, _gz);
 
-            // Negate for same reason
-            _gx = -_gx;
-            _gy = -_gy;
-            _gz = -_gz;
-
-            return true;
-        }  
-
-        return false;
+        // Negate for same reason
+        _gx = -_gx;
+        _gy = -_gy;
+        _gz = -_gz;
     }
 
 } // extern "C"
