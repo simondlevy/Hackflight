@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 '''
-test_loisterboard.py Simple test to check SET_RANGE_AND_FLOW messages sent from Butterfly loiter-board
+rfcomm_test.py Simple test to send characters to flight controller over Bluetooth
 
 Copyright (C) Simon D. Levy 2018
 
@@ -20,38 +20,31 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-#PORT = '/dev/ttyACM0'
-PORT = 'COM61'
+BD_ADDR = '00:06:66:73:E3:E8'
+BD_PORT = 1
 
-import serial
-from msppg import Parser
-import sys
+import bluetooth
+from time import sleep
 
-class RangeAndFlowParser(Parser):
+sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+sock.connect((BD_ADDR, BD_PORT))
 
-    def handle_SET_RANGE_AND_FLOW(self, agl, flowx, flowy):
+print('connected to ' + BD_ADDR)
 
-        print(agl, flowx, flowy)
-        sys.stdout.flush()
-
-port = serial.Serial(PORT, 115200)
-
-parser = RangeAndFlowParser()
+k = 0
 
 while True:
 
-        c = None
-
         try:
 
-            c = port.read()
+            sock.send(chr(k+97).encode())
 
+            k = (k+1) % 26
+
+            sleep(.01)
 
         except KeyboardInterrupt:
 
-            port.close()
+            sock.close()
             break
- 
-        parser.parse(c)
-    
 
