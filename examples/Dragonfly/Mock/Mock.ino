@@ -26,7 +26,7 @@
 #include "boards/dragonfly.hpp"
 #include "mixers/quadx.hpp"
 #include "receivers/mock.hpp"
-#include "sensors/mspsensors/rangeandflow.hpp"
+//#include "sensors/mspsensors/rangeandflow.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 
@@ -47,13 +47,13 @@ void setup(void)
     h.init(board, &rc, &mixer, &ratePid);
 
     // Create new MSP RangeAndFlow sensor using board
-    hf::RangeAndFlow * rangeAndFlow = new hf::RangeAndFlow(board);
+    //hf::RangeAndFlow * rangeAndFlow = new hf::RangeAndFlow(board);
 
     // Add RangeAndFlow sensor to sensor list
-    h.addSensor(rangeAndFlow);
+    //h.addSensor(rangeAndFlow);
 
     // Set up to receive telemetry over Serial1
-    Serial1.begin(115200);
+    //Serial1.begin(115200);
 }
 
 void loop(void)
