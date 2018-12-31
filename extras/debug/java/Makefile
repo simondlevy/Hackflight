@@ -21,7 +21,10 @@ ALL = example.class
 all: $(ALL)
 
 test: example.class
-	java example
+	java -classpath msppg.jar:. example
   
 example.class: example.java
 	javac -classpath msppg.jar example.java
+
+clean:
+	rm -rf $(ALL)

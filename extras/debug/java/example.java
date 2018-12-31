@@ -27,6 +27,9 @@ public class example implements ATTITUDE_RADIANS_Handler {
 
     public static void main(String [] argv) {
 
+        System.out.println("Hello world!");
+
+        /*
         Parser parser = new Parser();
 
         byte [] buf = parser.serialize_ATTITUDE_RADIANS((float)59, (float)76, (float)1);
@@ -39,7 +42,7 @@ public class example implements ATTITUDE_RADIANS_Handler {
 
             parser.parse(b);
 
-        }
+        }*/
     }
 
 }
