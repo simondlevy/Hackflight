@@ -31,3 +31,6 @@ jar: msppg.jar
 msppg.jar:
 	cd edu/wlu/cs/msppg; javac *.java
 	jar cvf msppg.jar edu/wlu/cs/msppg/*.class
+
+copy: msppg.jar
+	cp msppg.jar ../../../debug/java/
