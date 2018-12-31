@@ -47,9 +47,7 @@ while True:
 
         try:
 
-            c = sock.recv(1)
-            print('%02x' % ord(c)) 
-            parser.parse(c)
+            parser.parse(sock.recv(1))
 
         except KeyboardInterrupt:
 

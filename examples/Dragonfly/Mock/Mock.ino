@@ -53,7 +53,7 @@ void setup(void)
     //h.addSensor(rangeAndFlow);
 
     // Set up to receive telemetry over Serial1
-    //Serial1.begin(115200);
+    Serial1.begin(115200);
 }
 
 void loop(void)
