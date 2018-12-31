@@ -1,5 +1,7 @@
 extras/parser/output
 parser/output
+*.class
+*.jar
 *.d
 *.i
 *.s

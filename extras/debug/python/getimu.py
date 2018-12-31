@@ -25,31 +25,30 @@ BAUD = 115200
 #PORT = 'COM13'          # Windows
 PORT = '/dev/ttyACM0' # Linux
 
-from msppg import MSP_Parser as Parser, serialize_ATTITUDE_RADIANS_Request
+from msppg import Parser as Parser, serialize_ATTITUDE_RADIANS_Request
 import serial
 
-def handler(pitch, roll, yaw):
+request = serialize_ATTITUDE_RADIANS_Request()
 
-    print(pitch, roll, yaw)
-    port.write(request)
+class ImuParser(Parser):
 
-if __name__ == '__main__':
+    def hande_ATTITUDE_RADIANS(sef, pitch, roll, yaw):
+        print(pitch, roll, yaw)
+        port.write(request)
 
-    parser = Parser()
-    request = serialize_ATTITUDE_RADIANS_Request()
-    port = serial.Serial(PORT, BAUD)
+parser = ImuParser()
 
-    parser.set_ATTITUDE_RADIANS_Handler(handler)
+port = serial.Serial(PORT, BAUD)
 
-    port.write(request)
+port.write(request)
 
-    while True:
+while True:
 
-        try:
+    try:
 
-            parser.parse(port.read(1))
+        parser.parse(port.read(1))
 
-        except KeyboardInterrupt:
+    except KeyboardInterrupt:
 
-            break
+        break
 

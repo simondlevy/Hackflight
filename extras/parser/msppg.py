@@ -119,10 +119,6 @@ class Python_Emitter(LocalCodeEmitter):
 
         LocalCodeEmitter.__init__(self, 'python', 'py')
 
-        for filename in os.listdir('./resources'):
-            if filename.endswith('.py') and not filename in ['__init__.py', 'setup.py']:
-                LocalCodeEmitter._copyfile(self, '%s' % filename, 'python/' + ('%s' % filename))
-
         mkdir_if_missing('output/python/msppg')
 
         self._copyfile('setup.py', 'python/setup.py')
@@ -345,8 +341,6 @@ class Java_Emitter(CompileableCodeEmitter):
     def __init__(self, msgdict):
 
         CompileableCodeEmitter.__init__(self, 'java', 'java')
-
-        self._copyfile('example.java', 'java/example.java')
 
         mkdir_if_missing('output/java/edu')
         mkdir_if_missing('output/java/edu/wlu')
