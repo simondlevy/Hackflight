@@ -23,10 +23,9 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/dragonfly.hpp"
+#include "boards/mock.hpp"
 #include "mixers/quadx.hpp"
 #include "receivers/mock.hpp"
-//#include "sensors/mspsensors/rangeandflow.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 
@@ -40,20 +39,11 @@ hf::Rate ratePid = hf::Rate(0, 0, 0, 0, 0);
 
 void setup(void)
 {
-    // Create the Board object
-    hf::DragonflyBoard * board = new hf::DragonflyBoard();
+    // Create the Board object: LED on pin 25, active low
+    hf::MockBoard * board = new hf::MockBoard(25, true);
 
     // Initialize Hackflight firmware
     h.init(board, &rc, &mixer, &ratePid);
-
-    // Create new MSP RangeAndFlow sensor using board
-    //hf::RangeAndFlow * rangeAndFlow = new hf::RangeAndFlow(board);
-
-    // Add RangeAndFlow sensor to sensor list
-    //h.addSensor(rangeAndFlow);
-
-    // Set up to receive telemetry over Serial1
-    Serial1.begin(115200);
 }
 
 void loop(void)
