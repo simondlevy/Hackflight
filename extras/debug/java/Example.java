@@ -1,6 +1,9 @@
 /*
    Example for parsing MSPPG messages with Java
 
+   Mocks up an ATTITUDE_RADIANS message response from the flight controller
+   and uses the Parser object to parse the response bytes
+
    Copyright (C) Simon D. Levy 2018
 
    This code is free software: you can redistribute it and/or modify
@@ -29,7 +32,7 @@ public class Example implements ATTITUDE_RADIANS_Handler {
 
         Parser parser = new Parser();
 
-        byte [] buf = parser.serialize_ATTITUDE_RADIANS_Request();
+        byte [] buf = parser.serialize_ATTITUDE_RADIANS(1,2,3);
 
         /*
            Example handler = new Example();
