@@ -18,7 +18,7 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 import edu.wlu.cs.msppg.*;
 
-public class example implements ATTITUDE_RADIANS_Handler {
+public class Example implements ATTITUDE_RADIANS_Handler {
 
     public void handle_ATTITUDE_RADIANS(float angx, float angy, float heading) {
 
@@ -27,14 +27,11 @@ public class example implements ATTITUDE_RADIANS_Handler {
 
     public static void main(String [] argv) {
 
-        System.out.println("Hello world!");
-
-        /*
         Parser parser = new Parser();
 
         byte [] buf = parser.serialize_ATTITUDE_RADIANS((float)59, (float)76, (float)1);
 
-        example handler = new example();
+        Example handler = new Example();
 
         parser.set_ATTITUDE_RADIANS_Handler(handler);
 
@@ -42,7 +39,7 @@ public class example implements ATTITUDE_RADIANS_Handler {
 
             parser.parse(b);
 
-        }*/
+        }
     }
 
 }

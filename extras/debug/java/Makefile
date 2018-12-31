@@ -16,15 +16,15 @@
 #  You should have received a copy of the GNU Lesser General Public License 
 #  along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
-ALL = example.class
+ALL = Example.class
 
 all: $(ALL)
 
-test: example.class
-	java -classpath msppg.jar:. example
+test: Example.class
+	java -classpath msppg.jar:. Example
   
-example.class: example.java
-	javac -classpath msppg.jar example.java
+Example.class: Example.java
+	javac -classpath msppg.jar Example.java
 
 clean:
 	rm -rf $(ALL)
