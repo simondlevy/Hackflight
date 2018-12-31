@@ -16,7 +16,7 @@
 #  You should have received a copy of the GNU Lesser General Public License 
 #  along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
-ALL = example.class msppg.jar
+ALL = msppg.jar
 
 all: $(ALL)
 
@@ -31,6 +31,9 @@ jar: msppg.jar
 msppg.jar:
 	cd edu/wlu/cs/msppg; javac *.java
 	jar cvf msppg.jar edu/wlu/cs/msppg/*.class
+
+clean:
+	rm -f msppg.jar
 
 copy: msppg.jar
 	cp msppg.jar ../../../debug/java/

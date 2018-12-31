@@ -1,7 +1,11 @@
 /*
    Example for testing Python output of MSPPG
 
-   Copyright (C) Rob Jones, Alec Singer, Chris Lavin, Blake Liebling, Simon D. Levy 2015
+   Requires comm.jar:
+
+   https://www.oracle.com/technetwork/java/javasebusiness/downloads/java-archive-downloads-misc-419423.html
+
+   Copyright (C) Simon D. Levy 2018
 
    This code is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as 
@@ -17,6 +21,9 @@
  */
 
 import edu.wlu.cs.msppg.*;
+import java.io.IOException;
+import javax.comm.*;
+
 
 public class Example implements ATTITUDE_RADIANS_Handler {
 
@@ -29,19 +36,37 @@ public class Example implements ATTITUDE_RADIANS_Handler {
 
         Parser parser = new Parser();
 
-        byte [] buf = parser.serialize_ATTITUDE_RADIANS((float)59, (float)76, (float)1);
+        byte [] buf = parser.serialize_ATTITUDE_RADIANS_Request();
 
-        Example handler = new Example();
+        try {
 
-        parser.set_ATTITUDE_RADIANS_Handler(handler);
-
-        for (byte b : buf) {
-
-            System.out.printf("x%02X\n", b);
-
-            parser.parse(b);
-
+            System.out.write(buf);
         }
+
+        catch (IOException e) {
+        }
+
+
+        while (true) {
+
+            try {
+                int inChar = System.in.read();
+                System.out.println(inChar);
+            }
+            catch (IOException e){
+                break;
+            }
+        }
+        /*
+           Example handler = new Example();
+
+           parser.set_ATTITUDE_RADIANS_Handler(handler);
+
+           for (byte b : buf) {
+
+           parser.parse(b);
+
+           }*/
     }
 
 }
