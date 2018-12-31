@@ -245,7 +245,7 @@ namespace hf {
         protected:
 
 
-            virtual void handle_STATE(float & altitude, float & variometer, float & positionX, float & positionY, 
+            virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 
                     float & heading, float & velocityForward, float & velocityRightward) 
             {
                 // XXX mock values for now

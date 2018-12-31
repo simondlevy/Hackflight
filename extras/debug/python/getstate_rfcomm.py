@@ -30,11 +30,11 @@ request = serialize_STATE_Request()
 
 class StateParser(Parser):
 
-    def handle_STATE(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
+    def handle_STATE(self, altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
         print(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward)
         sock.send(request)
 
-parser = Parser()
+parser = StateParser()
 
 sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 sock.connect((BD_ADDR, BD_PORT))
