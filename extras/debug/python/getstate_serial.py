@@ -28,12 +28,10 @@ from sys import stdout
 
 request = serialize_STATE_Request()
 
-
 class StateParser(Parser):
 
     def handle_STATE(self, altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
         print(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward)
-        stdout.flush()
         port.write(request)
 
 parser = StateParser()
