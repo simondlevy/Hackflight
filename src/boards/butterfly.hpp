@@ -32,18 +32,23 @@ namespace hf {
 
         private:
 
+            const uint8_t MOTOR_PINS[4] = {5, 8, 9, 11};
+
             static void powerPin(uint8_t id, uint8_t value)
             {
                 pinMode(id, OUTPUT);
                 digitalWrite(id, value);
             }
 
-        protected:
+            // Min, max PWM values
+            const uint16_t PWM_MIN = 1000;
+            const uint16_t PWM_MAX = 2000;
 
-            void writeMotor(uint8_t index, float value)
+         protected:
+
+            virtual void writeMotor(uint8_t index, float value) override
             {
-                (void)index;
-                (void)value;
+                analogWrite(MOTOR_PINS[index], (uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)) >> 3);
             }
 
         public:
