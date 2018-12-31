@@ -40,30 +40,28 @@ namespace hf {
                 digitalWrite(id, value);
             }
 
-            // Min, max PWM values
-            const uint16_t PWM_MIN = 1000;
-            const uint16_t PWM_MAX = 2000;
 
          protected:
 
             virtual void writeMotor(uint8_t index, float value) override
             {
-                analogWrite(MOTOR_PINS[index], (uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)) >> 3);
+                (void)index;
+                (void)value;
             }
 
         public:
 
             Butterfly(void) : SentralBoard(13, true) // red LED, active low
             {
-                // User D4 for power, D3 for ground
-                powerPin(4, HIGH);
-                powerPin(3, LOW);
+                // User D30 for power, D31 for ground
+                powerPin(30, HIGH);
+                powerPin(31, LOW);
 
                 // Hang a bit 
                 delay(100);
 
                 // Start I^2C
-                Wire.begin(TWI_PINS_6_7);
+                Wire.begin(TWI_PINS_20_21);
 
                 // Hang a bit
                 delay(100);
