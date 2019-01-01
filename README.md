@@ -1,5 +1,5 @@
 <p align="center"> 
-<img src="extras/media/logo2.png" width=400>
+<img src="extras/media/logo2.png" width=500>
 </p>
 
 Hackflight is simple, platform-independent, header-only C++ firmware for
