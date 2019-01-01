@@ -1,7 +1,7 @@
 /*
    Example for parsing MSPPG messages with Java
 
-   Mocks up an ATTITUDE_RADIANS message response from the flight controller
+   Mocks up an STATE message response from the flight controller
    and uses the Parser object to parse the response bytes
 
    Copyright (C) Simon D. Levy 2018
@@ -21,29 +21,40 @@
 
 import edu.wlu.cs.msppg.*;
 
-public class Example implements ATTITUDE_RADIANS_Handler {
+public class Example implements STATE_Handler {
 
-    public void handle_ATTITUDE_RADIANS(float angx, float angy, float heading) {
+    public void handle_STATE(float  altitude,float variometer, float positionX, float positionY, 
+            float heading, float velocityForward, float velocityRightward) {
 
-        System.out.printf("%+3.3f %+3.3f %+3.3f\n", angx, angy, heading);
+
+        System.out.printf("%+3.3f %+3.3f %+3.3f %+3.3f %+3.3f %+3.3f %+3.3f\n", 
+                altitude,variometer, positionX, positionY, 
+                heading, velocityForward, velocityRightward);
+
     }
 
     public static void main(String [] argv) {
 
         Parser parser = new Parser();
 
-        byte [] buf = parser.serialize_ATTITUDE_RADIANS(1,2,3);
+        // Fake response from flight controller
+        byte [] buf = {(byte)0x24, (byte)0x4d, (byte)0x3e, (byte)0x1c,
+            (byte)0x70, (byte)0x00, (byte)0x00, (byte)0x80, (byte)0x3f,
+            (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x40, (byte)0x00,
+            (byte)0x00, (byte)0x40, (byte)0x40, (byte)0x00, (byte)0x00,
+            (byte)0x80, (byte)0x40, (byte)0x00, (byte)0x00, (byte)0xa0,
+            (byte)0x40, (byte)0x00, (byte)0x00, (byte)0xc0, (byte)0x40,
+            (byte)0x00, (byte)0x00, (byte)0xe0, (byte)0x40, (byte)0x93};
 
-        /*
-           Example handler = new Example();
+        Example handler = new Example();
 
-           parser.set_ATTITUDE_RADIANS_Handler(handler);
+        parser.set_STATE_Handler(handler);
 
-           for (byte b : buf) {
+        for (byte b : buf) {
 
-           parser.parse(b);
+            parser.parse(b);
 
-           }*/
+        }
     }
 
 }
