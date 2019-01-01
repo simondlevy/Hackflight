@@ -1,6 +1,5 @@
 <p align="center"> 
-<img src="extras/media/logo.png" width=400>
-<br><i>Hackflight logo by MC Greenleaf</i>
+<img src="extras/media/logo2.png" width=400>
 </p>
 
 Hackflight is simple, platform-independent, header-only C++ firmware for
