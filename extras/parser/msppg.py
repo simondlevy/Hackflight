@@ -417,31 +417,6 @@ class Java_Emitter(CompileableCodeEmitter):
                 self._write(2*self.indent + 'return message;\n')
                 self._write(self.indent + '}\n\n')
 
-            # Write serializer method for messages from FC
-            self._write(self.indent + 'public byte [] serialize_%s' % msgtype)
-            self._write_params(self.output, argtypes, argnames)
-            self._write(' {\n\n')
-            paysize = self._paysize(argtypes)
-            msgsize = self._msgsize(argtypes)
-            self._write(2*self.indent + 'ByteBuffer bb = newByteBuffer(%d);\n\n' % paysize)
-            for (argname,argtype) in zip(argnames,argtypes):
-                self._write(2*self.indent + 'bb.put%s(%s);\n' % (self.type2bb[argtype], argname))
-            self._write('\n' + 2*self.indent + 'byte [] message = new byte[%d];\n' % (msgsize+6))
-            self._write(2*self.indent + 'message[0] = 36;\n')
-            self._write(2*self.indent + 'message[1] = 77;\n')
-            self._write(2*self.indent + 'message[2] = %d;\n' % (62 if msgid < 200 else 60))
-            self._write(2*self.indent + 'message[3] = %d;\n' % msgsize)
-            self._write(2*self.indent + 'message[4] = (byte)%d;\n' %msgdict[msgtype][0]) 
-            self._write(2*self.indent + 'byte [] data = bb.array();\n')
-            self._write(2*self.indent + 'int k;\n')
-            self._write(2*self.indent + 'for (k=0; k<data.length; ++k) {\n')
-            self._write(3*self.indent + 'message[k+5] = data[k];\n')
-            self._write(2*self.indent + '}\n\n')
-            self._write(2*self.indent + 'message[%d] = CRC8(message, 3, %d);\n\n' % 
-                    (msgsize+5, msgsize+4))
-            self._write(2*self.indent + 'return message;\n')
-            self._write(self.indent + '}\n\n')
-
         self._write('}')
 
         self.output.close()
