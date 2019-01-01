@@ -409,7 +409,7 @@ class Java_Emitter(CompileableCodeEmitter):
                 self._write(self.indent + '}\n\n')
 
                 # Write handler for replies from flight controller
-                self._write(self.indent + 'public void handle_%s' % msgtype)
+                self._write(self.indent + 'protected void handle_%s' % msgtype)
                 self._write_params(self.output, argtypes, argnames)
                 self._write(' { \n')
                 self._write(self.indent + '}\n\n')

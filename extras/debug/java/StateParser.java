@@ -24,7 +24,7 @@ import edu.wlu.cs.msppg.Parser;
 public class StateParser extends Parser {
 
     @Override
-    public void handle_STATE(float  altitude,float variometer, float positionX, float positionY, 
+    protected void handle_STATE(float  altitude,float variometer, float positionX, float positionY, 
             float heading, float velocityForward, float velocityRightward) {
 
         System.out.printf("%+3.3f %+3.3f %+3.3f %+3.3f %+3.3f %+3.3f %+3.3f\n", 
