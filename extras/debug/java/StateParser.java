@@ -1,5 +1,5 @@
 /*
-   Example for parsing MSPPG messages with Java
+   Example of parsing MSPPG messages with Java
 
    Mocks up an STATE message response from the flight controller
    and uses the Parser object to parse the response bytes
@@ -19,13 +19,13 @@
    along with this code.  If not, see <http:#www.gnu.org/licenses/>.
  */
 
-import edu.wlu.cs.msppg.*;
+import edu.wlu.cs.msppg.Parser;
 
-public class Example implements STATE_Handler {
+public class StateParser extends Parser {
 
+    @Override
     public void handle_STATE(float  altitude,float variometer, float positionX, float positionY, 
             float heading, float velocityForward, float velocityRightward) {
-
 
         System.out.printf("%+3.3f %+3.3f %+3.3f %+3.3f %+3.3f %+3.3f %+3.3f\n", 
                 altitude,variometer, positionX, positionY, 
@@ -34,8 +34,6 @@ public class Example implements STATE_Handler {
     }
 
     public static void main(String [] argv) {
-
-        Parser parser = new Parser();
 
         // Fake response from flight controller
         byte [] buf = {(byte)0x24, (byte)0x4d, (byte)0x3e, (byte)0x1c,
@@ -46,9 +44,7 @@ public class Example implements STATE_Handler {
             (byte)0x40, (byte)0x00, (byte)0x00, (byte)0xc0, (byte)0x40,
             (byte)0x00, (byte)0x00, (byte)0xe0, (byte)0x40, (byte)0x93};
 
-        Example handler = new Example();
-
-        parser.set_STATE_Handler(handler);
+        StateParser parser = new StateParser();
 
         for (byte b : buf) {
 

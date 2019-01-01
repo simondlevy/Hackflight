@@ -363,8 +363,7 @@ class Java_Emitter(CompileableCodeEmitter):
             if msgid < 200:
 
                 self._write(6*self.indent + 'case (byte)%d:\n' % msgid)
-                self._write(7*self.indent + 'if (this.%s_handler != null) {\n' % msgtype)
-                self._write(8*self.indent + 'this.%s_handler.handle_%s(\n' % (msgtype, msgtype));
+                self._write(8*self.indent + 'this.handle_%s(\n' % msgtype)
 
                 argnames = self._getargnames(msgstuff)
                 argtypes = self._getargtypes(msgstuff)
@@ -380,7 +379,6 @@ class Java_Emitter(CompileableCodeEmitter):
                         self._write(',\n')
                 self._write(');\n')
 
-                self._write(7*self.indent + '}\n')
                 self._write(7*self.indent + 'break;\n\n')
 
         self._write(5*self.indent + '}\n' + 4*self.indent + '}\n' + 2*self.indent + '}\n' + self.indent + '}\n\n')
@@ -396,13 +394,6 @@ class Java_Emitter(CompileableCodeEmitter):
             # For messages from FC
             if msgid < 200:
 
-                # Declare handler
-                self._write(self.indent + 'private %s_Handler %s_handler;\n\n' % (msgtype, msgtype))
-                self._write(self.indent + 
-                        'public void set_%s_Handler(%s_Handler handler) {\n\n' % (msgtype, msgtype))
-                self._write(2*self.indent + 'this.%s_handler = handler;\n' % msgtype)
-                self._write(self.indent + '}\n\n')
-
                 # Write serializer for requests
                 self._write(self.indent + 'public byte [] serialize_%s_Request() {\n\n' % msgtype)
                 paysize = self._paysize(argtypes)
@@ -417,31 +408,13 @@ class Java_Emitter(CompileableCodeEmitter):
                 self._write(2*self.indent + 'return message;\n')
                 self._write(self.indent + '}\n\n')
 
-        self._write('}')
-
-        self.output.close()
-
-        # Write handler classes for each type of incoming message
-        for msgtype in msgdict.keys():
-
-            msgstuff = msgdict[msgtype]
-            msgid = msgstuff[0]
-
-            if msgid < 200:
-
-                argnames = self._getargnames(msgstuff)
-                argtypes = self._getargtypes(msgstuff)
-
-                classname = '%s_Handler.java' % msgtype
-                self.output = _openw('output/java/edu/wlu/cs/msppg/' + classname)
-                self.output.write('/*\n%s: handler class for %s message in MSPPG\n' % (classname, msgtype))
-                self._write(self._getsrc('class-top-java'))
-                self.output.write('package edu.wlu.cs.msppg;\n\n')
-                self.output.write('public interface %s_Handler {\n\n' % msgtype)
-                self.output.write(self.indent + 'public void handle_%s' % msgtype)
+                # Write handler for replies from flight controller
+                self._write(self.indent + 'public void handle_%s' % msgtype)
                 self._write_params(self.output, argtypes, argnames)
-                self.output.write(';\n')
-                self.output.write('}\n')
+                self._write(' { \n')
+                self._write(self.indent + '}\n\n')
+
+        self._write('}\n')
 
     def _write(self, s):
 

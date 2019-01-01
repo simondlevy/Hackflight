@@ -1,5 +1,5 @@
 #
-# Example Makefile for MSPPG Java output
+# Makefile for MSPPG Java example
 #
 # Copyright (C) Simon D. Levy 2015
 #
@@ -16,15 +16,15 @@
 #  You should have received a copy of the GNU Lesser General Public License 
 #  along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
-ALL = Example.class
+ALL = StateParser.class
 
 all: $(ALL)
 
-test: Example.class
-	java -classpath msppg.jar:. Example
+test: StateParser.class
+	java -classpath msppg.jar:. StateParser
   
-Example.class: Example.java
-	javac -classpath msppg.jar Example.java
+StateParser.class: StateParser.java
+	javac -classpath msppg.jar StateParser.java
 
 clean:
 	rm -rf $(ALL)
