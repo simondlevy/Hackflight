@@ -24,6 +24,7 @@
 
 #include <Wire.h>
 #include "sentral.hpp"
+#include "motors/brushed.hpp"
 
 namespace hf {
 
@@ -31,14 +32,13 @@ namespace hf {
 
         private:
 
-            const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
+            BrushedMotor motors[4] = { BrushedMotor(13), BrushedMotor(A2), BrushedMotor(3), BrushedMotor(11) };
 
         protected:
 
             void writeMotor(uint8_t index, float value)
             {
-                // Scale motor value from [0,1] to [0,255]
-                analogWrite(MOTOR_PINS[index], (uint8_t)(value * 255));
+                motors[index].write(value);
             }
 
         public:
@@ -56,8 +56,7 @@ namespace hf {
 
                 // Initialize the motors
                 for (int k=0; k<4; ++k) {
-                    analogWriteFrequency(MOTOR_PINS[k], 10000);  
-                    analogWrite(MOTOR_PINS[k], 0);  
+                    motors[k].init();
                 }
 
                 // Hang a bit more
