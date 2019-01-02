@@ -35,9 +35,9 @@ if __name__ == '__main__':
 
     parser = MyArgumentParser(description='Visualize incoming vehicle-state messages.')
 
-    parser.add_argument('-f', '--file', help='read state data from file')
+    parser.add_argument('-f', '--file',      help='read state data from file')
     parser.add_argument('-b', '--bluetooth', help='read state data from Bluetooth device')
-    parser.add_argument('-s', '--serial', help='read state data from serial port')
+    parser.add_argument('-s', '--serial',    help='read state data from serial port')
 
     if len(sys.argv)==1:
         parser.print_help(sys.stderr)
@@ -45,5 +45,12 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    print(args)
+    if not args.file is None:
+        print(args.file)
+
+    if not args.bluetooth is None:
+        print(args.bluetooth)
+    
+    if not args.serial is None:
+        print(args.serial)
 
