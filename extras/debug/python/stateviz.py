@@ -41,29 +41,31 @@ request = msppg.serialize_STATE_Request()
 
 class StateParser(msppg.Parser):
 
-    def __init__(self, port):
+    def __init__(self, readfun, writefun, closefun):
 
         msppg.Parser.__init__(self)
 
-        self.port = port
+        self.readfun = readfun
+        self.writefun = writefun
+        self.closefun = closefun
 
     def handle_STATE(self, altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
         print(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward)
-        self.port.write(request)
+        self.writefun(request)
 
     def begin(self):
 
-        self.port.write(request)
+        self.writefun(request)
 
         while True:
 
                 try:
 
-                    self.parse(self.port.read(1))
+                    self.parse(self.readfun(1))
 
                 except KeyboardInterrupt:
 
-                    self.port.close()
+                    self.closefun()
                     break
 
 def handle_file(filename):
@@ -93,7 +95,7 @@ def handle_serial(portname):
 
     print('conntcted to ' + portname)
 
-    parser = StateParser(port)
+    parser = StateParser(port.read, port.write, port.close)
 
     parser.begin()
 
