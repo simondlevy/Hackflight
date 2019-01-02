@@ -31,6 +31,18 @@ class MyArgumentParser(argparse.ArgumentParser):
         self.print_help()
         sys.exit(1)
 
+def handle_file(filename):
+
+    print('Read from file ' + filename)
+
+def handle_bluetooth(devicename):
+
+    print('Read from bluetooth device ' + devicename)
+
+def handle_serial(portname):
+
+    print('Read from serial port ' + portname)
+
 if __name__ == '__main__':
 
     parser = MyArgumentParser(description='Visualize incoming vehicle-state messages.')
@@ -46,11 +58,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if not args.file is None:
-        print(args.file)
+        handle_file(args.file)
 
     if not args.bluetooth is None:
-        print(args.bluetooth)
+        handle_bluetooth(args.bluetooth)
     
     if not args.serial is None:
-        print(args.serial)
+        handle_serial(args.serial)
 
