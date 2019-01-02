@@ -47,6 +47,10 @@ def handle_bluetooth(devicename):
 
     print('Read from bluetooth device ' + devicename)
 
+    devices = bluetooth.discover_devices(lookup_names = True)
+
+    print(devices)
+
 def handle_serial(portname):
 
     try:
