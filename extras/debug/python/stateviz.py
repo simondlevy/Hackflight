@@ -22,11 +22,24 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
 import argparse
+import sys
+
+# https://stackoverflow.com/questions/4042452/display-help-message-with-python-argparse-when-script-is-called-without-any-argu
+class MyArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        sys.stderr.write('error: %s\n' % message)
+        self.print_help()
+        sys.exit(1)
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Visualize incoming vehicle-state messages.')
-    parser.add_argument('-v', '--verbosity', help='increase output verbosity')
+    parser = MyArgumentParser(description='Visualize incoming vehicle-state messages.')
+    parser.add_argument('-f', '--file', help='read state data from file')
     args = parser.parse_args()
+
+    if len(sys.argv)==1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+
     print(args)
 
