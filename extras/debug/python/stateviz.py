@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 '''
+stateviz.py: State visualizer 
+
 Dependencies: numpy, matplotlib, https://github.com/simondlevy/RealtimePlotter
 
 Copyright (C) 2018 Simon D. Levy
@@ -19,11 +21,13 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
+from optparse import OptionParser
 import serial
 from realtime_plot import RealtimePlotter
 from threading import Thread
 from time import time
 
+'''
 # Change these to suit your needs
 #PORT = '/dev/ttyACM0'
 PORT = 'COM67'
@@ -90,9 +94,16 @@ def _update(port, plotter):
             msg += c
 
         plotter.xcurr += 1
+'''
 
 if __name__ == '__main__':
 
+    parser = OptionParser()
+    parser.add_option("-f", "--file", dest="filename",
+                      help="read data from FILE", metavar="FILE")
+    (options, args) = parser.parse_args()
+
+    '''
     try:
         port = serial.Serial(PORT, BAUD)
     except serial.SerialException:
@@ -106,3 +117,4 @@ if __name__ == '__main__':
     thread.start()
 
     plotter.start()
+    '''
