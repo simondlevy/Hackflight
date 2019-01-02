@@ -21,6 +21,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
+import msppg
 import argparse
 import sys
 
@@ -57,7 +58,9 @@ def handle_serial(portname):
     except:
         errmsg('import serial failed; make sure pyserial is installed')
 
-    print('Read from serial port ' + portname)
+    port = serial.Serial(portname, 115200)
+
+    print('conntcted to ' + portname)
 
 if __name__ == '__main__':
 
