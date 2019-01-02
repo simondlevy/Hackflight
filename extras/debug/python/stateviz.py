@@ -21,100 +21,17 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-from optparse import OptionParser
-import serial
-from realtime_plot import RealtimePlotter
-from threading import Thread
-from time import time
-
-'''
-# Change these to suit your needs
-#PORT = '/dev/ttyACM0'
-PORT = 'COM67'
-BAUD = 115200
-RANGE = (-1,+1)
-DELAY = 3
-
-class SerialPlotter(RealtimePlotter):
-
-    def __init__(self):
-
-        RealtimePlotter.__init__(self, [(-1,+1), (-1,+1)], 
-                phaselims=((-1,+1), (-1,+1)),
-                window_name='Position',
-                yticks = [(-1,0,+1),(-1,0,+1)],
-                styles = ['r--', 'b-'], 
-                ylabels=['X', 'Y'])
-
-        
-        self.xcurr = 0
-        self.start_time = time()
-        self.start_pos = None
-        self.pos = (0,0)
-
-
-    def getValues(self):
-
-         return self.pos[0], self.pos[1], self.pos[0], self.pos[1]
-
-def _update(port, plotter):
-
-    msg = ''
-
-    while True:
-
-        c = port.read().decode()
-
-        if c == '\n':
-            
-            try:
-
-                pos = tuple((float(v) for v in msg.split()))
-                
-            except:
-                
-                pass
-
-            if plotter.start_pos is None:
-
-                if (time() - plotter.start_time) > DELAY:
-
-                    plotter.start_pos = pos
-            else:
-
-                plotter.pos = pos[0]-plotter.start_pos[0], pos[1]-plotter.start_pos[1]
-            
-                #print('%+3.3f %+3.3f' % (plotter.pos[0], plotter.pos[1]))
-                print('%+3.3f %+3.3f' % (pos[0], pos[1]))
-            
-            msg = ''
-            
-        else:
-            
-            msg += c
-
-        plotter.xcurr += 1
-'''
+import argparse
 
 if __name__ == '__main__':
 
-    parser = OptionParser()
-    parser.add_option("-f", "--file", dest="filename",
-                      help="read data from FILE", metavar="FILE")
-    (options, args) = parser.parse_args()
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('integers', metavar='N', type=int, nargs='+',
+                    help='an integer for the accumulator')
+    parser.add_argument('--sum', dest='accumulate', action='store_const',
+                    const=sum, default=max,
+                    help='sum the integers (default: find the max)')
 
-    '''
-    try:
-        port = serial.Serial(PORT, BAUD)
-    except serial.SerialException:
-        print('Unable to access device on port %s' % PORT)
-        exit(1)
+    args = parser.parse_args()
+    print(args.accumulate(args.integers))
 
-    plotter = SerialPlotter()
-
-    thread = Thread(target=_update, args = (port, plotter))
-    thread.daemon = True
-    thread.start()
-
-    plotter.start()
-    '''
