@@ -84,6 +84,10 @@ def handle_bluetooth(device_address):
 
     print('connected to ' + device_address)
 
+    parser = StateParser(sock.recv, sock.send, sock.close)
+
+    parser.begin()
+
 def handle_serial(portname):
 
     try:
