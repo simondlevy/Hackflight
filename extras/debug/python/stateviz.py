@@ -24,7 +24,10 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 import argparse
 import sys
 
-# https://stackoverflow.com/questions/4042452/display-help-message-with-python-argparse-when-script-is-called-without-any-argu
+def errmsg(message):
+    sys.stderr.write(message + '\n')
+    sys.exit(1)
+
 class MyArgumentParser(argparse.ArgumentParser):
     def error(self, message):
         sys.stderr.write('error: %s\n' % message)
@@ -37,9 +40,19 @@ def handle_file(filename):
 
 def handle_bluetooth(devicename):
 
+    try:
+        import bluetooth
+    except:
+        errmsg('import bluetooth failed; make sure pybluez is installed')
+
     print('Read from bluetooth device ' + devicename)
 
 def handle_serial(portname):
+
+    try:
+        import serial
+    except:
+        errmsg('import serial failed; make sure pyserial is installed')
 
     print('Read from serial port ' + portname)
 
