@@ -35,6 +35,7 @@ class MyArgumentParser(argparse.ArgumentParser):
         self.print_help()
         sys.exit(1)
 
+
 def handle_file(filename):
 
     print('Read from file ' + filename)
@@ -61,6 +62,29 @@ def handle_serial(portname):
     port = serial.Serial(portname, 115200)
 
     print('conntcted to ' + portname)
+
+    request = msppg.serialize_STATE_Request()
+
+    class StateParser(msppg.Parser):
+
+        def handle_STATE(self, altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
+            print(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward)
+            port.write(request)
+
+    parser = StateParser()
+
+    port.write(request)
+
+    while True:
+
+            try:
+
+                parser.parse(port.read(1))
+
+            except KeyboardInterrupt:
+
+                port.close()
+                break
 
 if __name__ == '__main__':
 
