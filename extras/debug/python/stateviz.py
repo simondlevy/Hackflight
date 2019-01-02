@@ -38,18 +38,17 @@ def handle_file(filename):
 
     print('Read from file ' + filename)
 
-def handle_bluetooth(devicename):
+def handle_bluetooth(device_address):
 
     try:
         import bluetooth
     except:
         errmsg('import bluetooth failed; make sure pybluez is installed')
 
-    print('Read from bluetooth device ' + devicename)
+    sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+    sock.connect((device_address, 1))
 
-    devices = bluetooth.discover_devices(lookup_names = True)
-
-    print(devices)
+    print('connected to ' + device_address)
 
 def handle_serial(portname):
 
