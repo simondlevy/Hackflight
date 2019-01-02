@@ -16,7 +16,7 @@
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
- */
+   */
 
 #pragma once
 
@@ -28,6 +28,9 @@
 #include "hackflight.hpp"
 #include "softquat.hpp"
 #include "arduino.hpp"
+#include "motors/brushed.hpp"
+#include "motors/standard.hpp"
+#include "motors/multishot.hpp"
 
 namespace hf {
 
@@ -68,7 +71,11 @@ namespace hf {
 
         protected:
 
-            const uint8_t MOTOR_PINS[4] = {3, 4, 5, 6};
+
+            const uint8_t MOTOR_PIN_1 = 3;
+            const uint8_t MOTOR_PIN_2 = 4;
+            const uint8_t MOTOR_PIN_3 = 5;
+            const uint8_t MOTOR_PIN_4 = 6;
 
             virtual void writeMotor(uint8_t index, float value) = 0;
 
@@ -146,15 +153,19 @@ namespace hf {
 
         private:
 
-            // Min, max PWM values
-            const uint16_t PWM_MIN = 1000;
-            const uint16_t PWM_MAX = 2000;
+            StandardMotor motors[4] = { 
+                StandardMotor(MOTOR_PIN_1), 
+                StandardMotor(MOTOR_PIN_2), 
+                StandardMotor(MOTOR_PIN_3), 
+                StandardMotor(MOTOR_PIN_4) 
+            };
+
 
         protected:
 
             virtual void writeMotor(uint8_t index, float value) override
             {
-                analogWrite(MOTOR_PINS[index], (uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)) >> 3);
+                motors[index].write(value);
             }
 
         public:
@@ -162,8 +173,7 @@ namespace hf {
             BonadroneStandard(void) : BonadroneBoard()
         {
             for (uint8_t k=0; k<4; ++k) {
-                pinMode(MOTOR_PINS[k], OUTPUT);
-                analogWrite(MOTOR_PINS[k], PWM_MIN>>3);
+                motors[k].init();
             }
         }
 
@@ -173,16 +183,18 @@ namespace hf {
 
         private:
 
-            // Min, max PWM values
-            const uint16_t PWM_MIN = 100;
-            const uint16_t PWM_MAX = 500;
+            MultiShotMotor motors[4] = { 
+                MultiShotMotor(MOTOR_PIN_1), 
+                MultiShotMotor(MOTOR_PIN_2), 
+                MultiShotMotor(MOTOR_PIN_3), 
+                MultiShotMotor(MOTOR_PIN_4) 
+            };
 
         protected:
 
             virtual void writeMotor(uint8_t index, float value) override
             {
-                value = Filter::round2(value); // round to two decimal places
-                analogWrite(MOTOR_PINS[index], (uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)));
+                motors[index].write(value);
             }
 
 
@@ -191,9 +203,7 @@ namespace hf {
             BonadroneMultiShot(void) : BonadroneBoard()
         {
             for (uint8_t k=0; k<4; ++k) {
-                analogWriteFrequency(MOTOR_PINS[k], 2000);
-                analogWriteRange(MOTOR_PINS[k], 10000);
-                analogWrite(MOTOR_PINS[k], PWM_MIN);
+                motors[k].init();
             }
         }
 
@@ -201,11 +211,20 @@ namespace hf {
 
     class BonadroneBrushed : public BonadroneBoard {
 
+        private:
+
+            BrushedMotor motors[4] = { 
+                BrushedMotor(MOTOR_PIN_1), 
+                BrushedMotor(MOTOR_PIN_2), 
+                BrushedMotor(MOTOR_PIN_3), 
+                BrushedMotor(MOTOR_PIN_4) 
+            };
+
         protected:
 
             virtual void writeMotor(uint8_t index, float value) override
             {
-                analogWrite(MOTOR_PINS[index], (uint8_t)(value * 255));
+                motors[index].write(value);
             }
 
 
@@ -214,8 +233,7 @@ namespace hf {
             BonadroneBrushed(void) : BonadroneBoard()
         {
             for (int k=0; k<4; ++k) {
-                analogWriteFrequency(MOTOR_PINS[k], 10000);  
-                analogWrite(MOTOR_PINS[k], 0);  
+                motors[k].init();
             }
         }
 
