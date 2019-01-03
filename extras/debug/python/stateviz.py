@@ -162,6 +162,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--file',      help='read state data from file')
     parser.add_argument('-b', '--bluetooth', help='read state data from Bluetooth device')
     parser.add_argument('-s', '--serial',    help='read state data from serial port')
+    parser.add_argument('-r', '--random',    help='use random-walk simulation')
 
     if len(sys.argv)==1:
         parser.print_help(sys.stderr)
