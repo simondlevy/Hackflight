@@ -90,7 +90,9 @@ def handle_file(filename):
 
         state = (float(s) for s in line.split())
 
-        print(list(state))
+        viz.setPose(*state)
+
+        viz.refresh()
 
         time.sleep(DT_SEC)
 
