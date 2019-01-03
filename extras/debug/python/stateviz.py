@@ -23,8 +23,10 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 import msppg
 import argparse
+import realtime_plot
 import sys
 import time
+import threading
 
 def errmsg(message):
     sys.stderr.write(message + '\n')
@@ -43,6 +45,38 @@ def plotstate(altitude, variometer, positionX, positionY, heading, velocityForwa
     print(altitude, variometer)
 
     return
+
+def update(plotter):
+
+    while True:
+
+        print(time.time())
+
+        plotter.xcurr += 1
+
+        time.sleep(.01)
+
+class StatePlotter(realtime_plot.RealtimePlotter):
+
+    def __init__(self):
+
+        realtime_plot.RealtimePlotter.__init__(self, [(-1,+1), (-1,+1)], 
+                phaselims=((-1,+1), (-1,+1)),
+                window_name='Position',
+                yticks = [(-1,0,+1),(-1,0,+1)],
+                styles = ['r--', 'b-'], 
+                ylabels=['X', 'Y'])
+
+        
+        self.xcurr = 0
+        self.start_time = time.time()
+        self.start_pos = None
+        self.pos = (0,0)
+
+
+    def getValues(self):
+
+         return self.pos[0], self.pos[1], self.pos[0], self.pos[1]
 
 class StateParser(msppg.Parser):
 
@@ -130,6 +164,12 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    plotter = StatePlotter()
+
+    thread = threading.Thread(target=update, args = (plotter,))
+    thread.daemon = True
+    thread.start()
+
     if not args.file is None:
         handle_file(args.file)
 
@@ -138,4 +178,5 @@ if __name__ == '__main__':
     
     if not args.serial is None:
         handle_serial(args.serial)
+
 
