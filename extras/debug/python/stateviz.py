@@ -23,7 +23,6 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 import msppg
 import argparse
-import realtime_plot
 import sys
 import time
 import threading
