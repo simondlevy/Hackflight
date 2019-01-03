@@ -24,6 +24,7 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 import msppg
 import argparse
 import sys
+import time
 
 def errmsg(message):
     sys.stderr.write(message + '\n')
@@ -81,6 +82,8 @@ def handle_file(filename):
         state = (float(s) for s in line.split())
 
         plotstate(*state)
+
+        time.sleep(.1)
 
 def handle_bluetooth(device_address):
 
