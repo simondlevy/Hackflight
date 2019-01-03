@@ -142,13 +142,12 @@ def handle_serial(portname, plotter):
 
 def handle_random(seed, plotter):
 
-    seeded = False
     if seed >= 0:
         npr.seed(seed)
-        seeded = True
 
     while True:
-        print(seeded)
+
+        plotter.pos = npr.random(2) - 0.5
 
 def threadfunc(args, plotter):
 
