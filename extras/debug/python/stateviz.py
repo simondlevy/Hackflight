@@ -46,16 +46,6 @@ def plotstate(altitude, variometer, positionX, positionY, heading, velocityForwa
 
     return
 
-def update(plotter):
-
-    while True:
-
-        print(time.time())
-
-        plotter.xcurr += 1
-
-        time.sleep(.01)
-
 class StatePlotter(realtime_plot.RealtimePlotter):
 
     def __init__(self):
@@ -77,6 +67,16 @@ class StatePlotter(realtime_plot.RealtimePlotter):
     def getValues(self):
 
          return self.pos[0], self.pos[1], self.pos[0], self.pos[1]
+
+    def update(self):
+
+        while True:
+
+            print(time.time())
+
+            plotter.xcurr += 1
+
+            time.sleep(.01)
 
 class StateParser(msppg.Parser):
 
@@ -166,7 +166,7 @@ if __name__ == '__main__':
 
     plotter = StatePlotter()
 
-    thread = threading.Thread(target=update, args = (plotter,))
+    thread = threading.Thread(target=plotter.update) #, args = (plotter,))
     thread.daemon = True
     thread.start()
 
