@@ -35,9 +35,13 @@ class MyArgumentParser(argparse.ArgumentParser):
         self.print_help()
         sys.exit(1)
 
-
-
 request = msppg.serialize_STATE_Request()
+
+def plotstate(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
+
+    print(altitude, variometer)
+
+    return
 
 class StateParser(msppg.Parser):
 
@@ -50,7 +54,7 @@ class StateParser(msppg.Parser):
         self.closefun = closefun
 
     def handle_STATE(self, altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
-        print(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward)
+        plotstate(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward)
         self.writefun(request)
 
     def begin(self):
@@ -74,7 +78,9 @@ def handle_file(filename):
 
     for line in open(filename):
 
-        print(line)
+        state = (float(s) for s in line.split())
+
+        plotstate(*state)
 
 def handle_bluetooth(device_address):
 
