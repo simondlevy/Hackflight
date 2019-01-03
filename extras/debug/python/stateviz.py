@@ -27,7 +27,7 @@ import realtime_plot
 import sys
 import time
 import threading
-import numpy.random as npr
+import numpy as np
 
 def errmsg(message):
     sys.stderr.write(message + '\n')
@@ -142,12 +142,16 @@ def handle_serial(portname, plotter):
 
 def handle_random(seed, plotter):
 
+    MAG = .0001
+
     if seed >= 0:
-        npr.seed(seed)
+        np.random.seed(seed)
+
+    plotter.pos = np.zeros(2)
 
     while True:
 
-        plotter.pos = npr.random(2) - 0.5
+        plotter.pos += 2*MAG * np.random.random(2) - MAG
 
 def threadfunc(args, plotter):
 
