@@ -171,11 +171,6 @@ if __name__ == '__main__':
     thread.daemon = True
     thread.start()
 
-    while True:
-        print('start plot')
-        sys.stdout.flush()
-        time.sleep(.01)
-
     plotter.start()
 
 
