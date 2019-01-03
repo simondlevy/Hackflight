@@ -169,13 +169,16 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--file',      help='read state data from file')
     parser.add_argument('-b', '--bluetooth', help='read state data from Bluetooth device')
     parser.add_argument('-s', '--serial',    help='read state data from serial port')
-    parser.add_argument('-r', '--random',    help='use random-walk simulation with specified random seed')
+    parser.add_argument('-r', '--random',    nargs='?', const=-1, type=int, help='use random-walk simulation with optional random seed')
 
     if len(sys.argv)==1:
         parser.print_help(sys.stderr)
         sys.exit(1)
 
     cmdargs = parser.parse_args()
+
+    print(cmdargs)
+    exit(0)
 
     plotter = StatePlotter()
 
