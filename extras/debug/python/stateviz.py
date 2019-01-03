@@ -72,6 +72,10 @@ def handle_file(filename):
 
     print('Read from file ' + filename)
 
+    for line in open(filename):
+
+        print(line)
+
 def handle_bluetooth(device_address):
 
     try:
