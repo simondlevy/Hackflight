@@ -142,7 +142,7 @@ def handle_serial(portname, plotter):
 
 def handle_random(seed, plotter):
 
-    MAG = .0001
+    MAG = .001
 
     if seed >= 0:
         np.random.seed(seed)
