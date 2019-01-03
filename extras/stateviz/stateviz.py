@@ -2,7 +2,7 @@
 '''
 stateviz.py: State visualizer 
 
-Dependencies: numpy, matplotlib, https://github.com/simondlevy/RealtimePlotter
+Dependencies: numpy, matplotlib, pyserial, pybluez, https://github.com/simondlevy/PyRoboViz
 
 Copyright (C) 2018 Simon D. Levy
 
@@ -25,8 +25,10 @@ import msppg
 import argparse
 import sys
 import time
-import threading
-import numpy as np
+from roboviz import Visualizer
+
+MAP_SIZE_PIXELS = 800
+MAP_SIZE_METERS = 32
 
 def errmsg(message):
     sys.stderr.write(message + '\n')
@@ -45,26 +47,6 @@ def plotstate(altitude, variometer, positionX, positionY, heading, velocityForwa
     print(altitude, variometer)
 
     return
-
-class StatePlotter(realtime_plot.RealtimePlotter):
-
-    def __init__(self):
-
-        realtime_plot.RealtimePlotter.__init__(self, [(-1,+1), (-1,+1)], 
-                phaselims=((-1,+1), (-1,+1)),
-                window_name='Position',
-                yticks = [(-1,0,+1),(-1,0,+1)],
-                styles = ['r--', 'b-'], 
-                ylabels=['X', 'Y'])
-        
-        self.xcurr = 0
-        self.start_time = time.time()
-        self.start_pos = None
-        self.pos = (0,0)
-
-    def getValues(self):
-
-         return self.pos[0], self.pos[1], self.pos[0], self.pos[1]
 
 class StateParser(msppg.Parser):
 
@@ -95,19 +77,24 @@ class StateParser(msppg.Parser):
                     self.closefun()
                     break
 
-def handle_file(filename, plotter):
+def handle_file(filename):
+
+    DT_SEC    = .01
 
     print('Read from file ' + filename)
+
+    # Create a Visualizer object
+    viz = Visualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'From File', True)
 
     for line in open(filename):
 
         state = (float(s) for s in line.split())
 
-        plotstate(*state)
+        print(list(state))
 
-        time.sleep(.1)
+        time.sleep(DT_SEC)
 
-def handle_bluetooth(device_address, plotter):
+def handle_bluetooth(device_address):
 
     try:
         import bluetooth
@@ -123,7 +110,7 @@ def handle_bluetooth(device_address, plotter):
 
     parser.begin()
 
-def handle_serial(portname, plotter):
+def handle_serial(portname):
 
     try:
         import serial
@@ -138,39 +125,24 @@ def handle_serial(portname, plotter):
 
     parser.begin()
 
-def handle_random(seed, plotter):
-
-    MAG = .0005
-
-    if seed >= 0:
-        np.random.seed(seed)
-
-    while True:
-
-        plotter.pos += 2*MAG * np.random.random(2) - MAG
-
-def threadfunc(args, plotter):
+def threadfunc(args):
 
     if not args.file is None:
-        handle_file(args.file, plotter)
+        handle_file(args.file)
 
     if not args.bluetooth is None:
-        handle_bluetooth(args.bluetooth, plotter)
+        handle_bluetooth(args.bluetooth)
     
     if not args.serial is None:
-        handle_serial(args.serial, plotter)
-
-    if not args.random is None:
-        handle_random(args.random, plotter)
+        handle_serial(args.serial)
 
 if __name__ == '__main__':
 
-    parser = MyArgumentParser(description='Visualize incoming vehicle-state messages. Defaults to random-walk data.')
+    parser = MyArgumentParser(description='Visualize incoming vehicle-state messages.')
 
     parser.add_argument('-f', '--file',      help='read state data from file')
     parser.add_argument('-b', '--bluetooth', help='read state data from Bluetooth device')
     parser.add_argument('-s', '--serial',    help='read state data from serial port')
-    parser.add_argument('-r', '--random',    nargs='?', const=-1, type=int, help='use random-walk simulation with optional non-negative random seed')
 
     if len(sys.argv)==1:
         parser.print_help(sys.stderr)
@@ -178,12 +150,11 @@ if __name__ == '__main__':
 
     cmdargs = parser.parse_args()
 
-    plotter = StatePlotter()
+    if not cmdargs.file is None:
+        handle_file(cmdargs.file)
 
-    thread = threading.Thread(target=threadfunc, args=(cmdargs, plotter))
-    thread.daemon = True
-    thread.start()
-
-    plotter.start()
-
-
+    if not cmdargs.bluetooth is None:
+        handle_bluetooth(cmdargs.bluetooth)
+    
+    if not cmdargs.serial is None:
+        handle_serial(cmdargs.serial)
