@@ -63,7 +63,6 @@ class StatePlotter(realtime_plot.RealtimePlotter):
         self.start_pos = None
         self.pos = (0,0)
 
-
     def getValues(self):
 
          return self.pos[0], self.pos[1], self.pos[0], self.pos[1]
@@ -146,8 +145,6 @@ def handle_random(seed, plotter):
 
     if seed >= 0:
         np.random.seed(seed)
-
-    plotter.pos = np.zeros(2)
 
     while True:
 
