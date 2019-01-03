@@ -139,6 +139,10 @@ def handle_serial(portname, plotter):
 
     parser.begin()
 
+def handle_random(seed, plotter):
+
+    print(seed)
+
 def threadfunc(args, plotter):
 
     while True:
@@ -155,22 +159,27 @@ def threadfunc(args, plotter):
     if not args.serial is None:
         handle_serial(args.serial, plotter)
 
+    if not args.random is None:
+        handle_random(args.random, plotter)
+
 if __name__ == '__main__':
 
-    parser = MyArgumentParser(description='Visualize incoming vehicle-state messages.')
+    parser = MyArgumentParser(description='Visualize incoming vehicle-state messages. Defaults to random-walk data.')
 
     parser.add_argument('-f', '--file',      help='read state data from file')
     parser.add_argument('-b', '--bluetooth', help='read state data from Bluetooth device')
     parser.add_argument('-s', '--serial',    help='read state data from serial port')
-    parser.add_argument('-r', '--random',    help='use random-walk simulation')
+    parser.add_argument('-r', '--random',    help='use random-walk simulation with specified random seed')
 
     if len(sys.argv)==1:
         parser.print_help(sys.stderr)
         sys.exit(1)
 
+    cmdargs = parser.parse_args()
+
     plotter = StatePlotter()
 
-    thread = threading.Thread(target=threadfunc, args=(parser.parse_args(), plotter))
+    thread = threading.Thread(target=threadfunc, args=(cmdargs, plotter))
     thread.daemon = True
     thread.start()
 
