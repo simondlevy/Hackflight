@@ -167,7 +167,9 @@ if __name__ == '__main__':
         parser.print_help(sys.stderr)
         sys.exit(1)
 
-    thread = threading.Thread(target=threadfunc, args=(parser.parse_args(), StatePlotter()))
+    plotter = StatePlotter()
+
+    thread = threading.Thread(target=threadfunc, args=(parser.parse_args(), plotter))
     thread.daemon = True
     thread.start()
 
