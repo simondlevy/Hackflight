@@ -56,7 +56,6 @@ class StatePlotter(realtime_plot.RealtimePlotter):
                 yticks = [(-1,0,+1),(-1,0,+1)],
                 styles = ['r--', 'b-'], 
                 ylabels=['X', 'Y'])
-
         
         self.xcurr = 0
         self.start_time = time.time()
@@ -67,16 +66,6 @@ class StatePlotter(realtime_plot.RealtimePlotter):
     def getValues(self):
 
          return self.pos[0], self.pos[1], self.pos[0], self.pos[1]
-
-    def update(self):
-
-        while True:
-
-            print(time.time())
-
-            plotter.xcurr += 1
-
-            time.sleep(.01)
 
 class StateParser(msppg.Parser):
 
@@ -107,7 +96,7 @@ class StateParser(msppg.Parser):
                     self.closefun()
                     break
 
-def handle_file(filename):
+def handle_file(filename, plotter):
 
     print('Read from file ' + filename)
 
@@ -119,7 +108,7 @@ def handle_file(filename):
 
         time.sleep(.1)
 
-def handle_bluetooth(device_address):
+def handle_bluetooth(device_address, plotter):
 
     try:
         import bluetooth
@@ -135,7 +124,7 @@ def handle_bluetooth(device_address):
 
     parser.begin()
 
-def handle_serial(portname):
+def handle_serial(portname, plotter):
 
     try:
         import serial
@@ -150,6 +139,22 @@ def handle_serial(portname):
 
     parser.begin()
 
+def threadfunc(args, plotter):
+
+    while True:
+
+        print('Threadfunc')
+        time.sleep(.1)
+
+    if not args.file is None:
+        handle_file(args.file, plotter)
+
+    if not args.bluetooth is None:
+        handle_bluetooth(args.bluetooth, plotter)
+    
+    if not args.serial is None:
+        handle_serial(args.serial, plotter)
+
 if __name__ == '__main__':
 
     parser = MyArgumentParser(description='Visualize incoming vehicle-state messages.')
@@ -162,21 +167,15 @@ if __name__ == '__main__':
         parser.print_help(sys.stderr)
         sys.exit(1)
 
-    args = parser.parse_args()
-
-    plotter = StatePlotter()
-
-    thread = threading.Thread(target=plotter.update) #, args = (plotter,))
+    thread = threading.Thread(target=threadfunc, args=(parser.parse_args(), StatePlotter()))
     thread.daemon = True
     thread.start()
 
-    if not args.file is None:
-        handle_file(args.file)
+    while True:
+        print('start plot')
+        sys.stdout.flush()
+        time.sleep(.01)
 
-    if not args.bluetooth is None:
-        handle_bluetooth(args.bluetooth)
-    
-    if not args.serial is None:
-        handle_serial(args.serial)
+    plotter.start()
 
 
