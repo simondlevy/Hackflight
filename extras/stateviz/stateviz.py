@@ -83,8 +83,8 @@ def handle_file(filename):
 
     print('Read from file ' + filename)
 
-    # Create a Visualizer object
-    viz = Visualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'From File', True)
+    # Create a Visualizer object with trajectory, centered at origin
+    viz = Visualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'From File', True, True)
 
     for line in open(filename):
 
