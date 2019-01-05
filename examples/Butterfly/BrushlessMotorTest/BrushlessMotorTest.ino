@@ -23,7 +23,7 @@
 
 #include <Arduino.h>
 
-static uint8_t MOTOR_PIN = 5;
+static uint8_t MOTOR_PIN = 11;
 
 static uint16_t val;
 static uint16_t inc;

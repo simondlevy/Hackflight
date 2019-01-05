@@ -24,6 +24,7 @@
 
 #include <Wire.h>
 #include "sentral.hpp"
+#include "motors/standard.hpp"
 
 namespace hf {
 
@@ -33,6 +34,13 @@ namespace hf {
         private:
 
             const uint8_t MOTOR_PINS[4] = {5, 8, 9, 11};
+
+            StandardMotor motors[4] = { 
+                StandardMotor(5), 
+                StandardMotor(8), 
+                StandardMotor(9), 
+                StandardMotor(11) 
+            };
 
             static void powerPin(uint8_t id, uint8_t value)
             {
@@ -45,8 +53,7 @@ namespace hf {
 
             virtual void writeMotor(uint8_t index, float value) override
             {
-                (void)index;
-                (void)value;
+                motors[index].write(value);
             }
 
         public:
@@ -54,14 +61,14 @@ namespace hf {
             Butterfly(void) : SentralBoard(13, true) // red LED, active low
             {
                 // User D30 for power, D31 for ground
-                powerPin(30, HIGH);
-                powerPin(31, LOW);
+                powerPin(4, HIGH);
+                powerPin(3, LOW);
 
                 // Hang a bit 
                 delay(100);
 
                 // Start I^2C
-                Wire.begin(TWI_PINS_20_21);
+                Wire.begin(TWI_PINS_6_7);
 
                 // Hang a bit
                 delay(100);
@@ -69,6 +76,9 @@ namespace hf {
                 SentralBoard::begin();
 
                 // Initialize the motors
+                for (uint8_t k=0; k<4; ++k) {
+                    motors[k].init();
+                }
 
                 // Hang a bit more
                 delay(100);
