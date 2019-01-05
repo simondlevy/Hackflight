@@ -35,6 +35,9 @@ const uint16_t PWM_MAX = 2000;
 
 void setup(void)
 {
+    // Start serial debugging
+    Serial.begin(115200);
+
     // Initialize the motor
     pinMode(MOTOR_PIN, OUTPUT);
     analogWrite(MOTOR_PIN, PWM_MIN>>3);
@@ -48,6 +51,9 @@ void setup(void)
 
 void loop(void)
 {
+    return;
+    //Serial.println(val);
+
     analogWrite(MOTOR_PIN, val >> 3);
 
     val += inc;

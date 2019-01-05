@@ -45,11 +45,12 @@ hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);
 hf::MixerQuadX mixer;
 
 hf::Rate ratePid = hf::Rate(
-        0.225f,     // Gyro pitch/roll P
-        0.001875f,  // Gyro pitch/roll I
-        0.375f,     // Gyro pitch/roll D
-        1.0625f,    // Gyro yaw P
-        0.005625f); // Gyro yaw I
+        0.05f, // Gyro cyclic P
+        0.00f, // Gyro cyclic I
+        0.00f, // Gyro cyclic D
+        0.10f, // Gyro yaw P
+        0.01f, // Gyro yaw I
+        8.58); // Demands to rate
 
 hf::Level level = hf::Level(0.20f);
 
