@@ -23,6 +23,9 @@ from Tlera Corp.
 * [SuperFly](https://www.tindie.com/products/onehorse/superfly-hackable-esp8266-flight-controller/) 
 Hackable ESP8266 Flight Controller from Pesky Products
 
+* [Butterfly DIY](https://diydrones.com/profiles/blogs/hackhawk-ii-an-arduino-compatible-brushless-flight-controller)
+brushless flight controller (components from from Tlera Corp. and Pesky Products)
+
 * Certain [STM32F-based](https://github.com/simondlevy/Hackflight/tree/master/extras/stm32f) flight controllers
 
 * [HackflightSim](https://github.com/simondlevy/HackflightSim) flight simulator based on UnrealEngine4
