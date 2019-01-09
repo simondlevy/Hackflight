@@ -253,7 +253,7 @@ namespace hf {
                 variometer = 2;
                 positionX = 3;
                 positionY = 4;
-                heading = 5;
+                heading = _state.eulerAngles[2];
                 velocityForward = 6;
                 velocityRightward = 7;
             }
