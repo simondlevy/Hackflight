@@ -44,7 +44,7 @@ request = msppg.serialize_STATE_Request()
 
 def plotstate(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
 
-    print(altitude, variometer)
+    print(heading)
 
     return
 
@@ -84,7 +84,7 @@ def handle_file(filename):
     print('Read from file ' + filename)
 
     # Create a Visualizer object with trajectory
-    viz = Visualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'From File', True)
+    viz = Visualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'From file: ' + filename, True)
 
     for line in open(filename):
 
