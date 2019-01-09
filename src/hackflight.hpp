@@ -248,7 +248,7 @@ namespace hf {
             virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 
                     float & heading, float & velocityForward, float & velocityRightward) 
             {
-                // XXX mock values for now
+                // XXX mock up some values for now
                 altitude = 1;
                 variometer = 2;
                 positionX = 3;
