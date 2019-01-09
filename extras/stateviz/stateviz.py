@@ -25,6 +25,7 @@ import msppg
 import argparse
 import sys
 import time
+from math import degrees
 from roboviz import Visualizer
 
 MAP_SIZE_PIXELS = 800
@@ -42,15 +43,9 @@ class MyArgumentParser(argparse.ArgumentParser):
 
 request = msppg.serialize_STATE_Request()
 
-def plotstate(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
-
-    print(heading)
-
-    return
-
 class StateParser(msppg.Parser):
 
-    def __init__(self, readfun, writefun, closefun):
+    def __init__(self, readfun, writefun, closefun, label):
 
         msppg.Parser.__init__(self)
 
@@ -58,8 +53,15 @@ class StateParser(msppg.Parser):
         self.writefun = writefun
         self.closefun = closefun
 
+        # Create a Visualizer object with trajectory
+        self.viz = Visualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, label, True)
+
     def handle_STATE(self, altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
-        plotstate(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward)
+
+        self.viz.setPose(0, 0, degrees(heading))
+
+        self.viz.refresh()
+
         self.writefun(request)
 
     def begin(self):
@@ -108,7 +110,7 @@ def handle_bluetooth(device_address):
 
     print('connected to ' + device_address)
 
-    parser = StateParser(sock.recv, sock.send, sock.close)
+    parser = StateParser(sock.recv, sock.send, sock.close, 'From Bluetooth: ' + device_address)
 
     parser.begin()
 
@@ -123,7 +125,7 @@ def handle_serial(portname):
 
     print('conntcted to ' + portname)
 
-    parser = StateParser(port.read, port.write, port.close)
+    parser = StateParser(port.read, port.write, port.close, 'From serial: ' + portname)
 
     parser.begin()
 
