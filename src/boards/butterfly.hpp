@@ -56,10 +56,28 @@ namespace hf {
                 motors[index].write(value);
             }
 
+            virtual uint8_t serialTelemetryAvailable(void) override
+            {
+                return Serial2.available();
+            }
+
+            virtual uint8_t serialTelemetryRead(void) override
+            {
+                return Serial2.read();
+            }
+
+            virtual void serialTelemetryWrite(uint8_t c) override
+            {
+                Serial2.write(c);
+            }
+
         public:
 
             Butterfly(void) : SentralBoard(13, true) // red LED, active low
             {
+                // Start telemetry on Serial2
+                Serial2.begin(115200);
+
                 // User D30 for power, D31 for ground
                 powerPin(4, HIGH);
                 powerPin(3, LOW);
@@ -73,6 +91,7 @@ namespace hf {
                 // Hang a bit
                 delay(100);
 
+                // Start the USFS
                 SentralBoard::begin();
 
                 // Initialize the motors
