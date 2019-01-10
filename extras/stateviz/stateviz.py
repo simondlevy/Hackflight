@@ -25,25 +25,25 @@ import msppg
 import argparse
 import sys
 import time
-from math import degrees
+import math
 from roboviz import Visualizer
 
 MAP_SIZE_PIXELS = 800
 MAP_SIZE_METERS = 32
 
-def errmsg(message):
+def _errmsg(message):
     sys.stderr.write(message + '\n')
     sys.exit(1)
 
-class MyArgumentParser(argparse.ArgumentParser):
+class _MyArgumentParser(argparse.ArgumentParser):
     def error(self, message):
         sys.stderr.write('error: %s\n' % message)
         self.print_help()
         sys.exit(1)
 
-request = msppg.serialize_STATE_Request()
+_request = msppg.serialize_STATE_Request()
 
-class StateParser(msppg.Parser):
+class _StateParser(msppg.Parser):
 
     def __init__(self, readfun, writefun, closefun, label):
 
@@ -58,15 +58,15 @@ class StateParser(msppg.Parser):
 
     def handle_STATE(self, altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
 
-        self.viz.setPose(0, 0, degrees(heading))
+        self.viz.setPose(0, 0, math.degrees(heading))
 
         self.viz.refresh()
 
-        self.writefun(request)
+        self.writefun(_request)
 
     def begin(self):
 
-        self.writefun(request)
+        self.writefun(_request)
 
         while True:
 
@@ -79,16 +79,14 @@ class StateParser(msppg.Parser):
                     self.closefun()
                     break
 
-def handle_file(filename):
+def _handle_file(cmdargs):
 
     DT_SEC    = .01
 
-    print('Read from file ' + filename)
-
     # Create a Visualizer object with trajectory
-    viz = Visualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'From file: ' + filename, True)
+    viz = Visualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'From file: ' + cmdargs.filename, True)
 
-    for line in open(filename):
+    for line in open(cmdargs.filename):
 
         state = (float(s) for s in line.split())
 
@@ -98,55 +96,52 @@ def handle_file(filename):
 
         time.sleep(DT_SEC)
 
-def handle_bluetooth(device_address):
+def _handle_bluetooth(cmdargs):
 
     try:
         import bluetooth
     except:
-        errmsg('import bluetooth failed; make sure pybluez is installed')
+        _errmsg('import bluetooth failed; make sure pybluez is installed')
 
     sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-    sock.connect((device_address, 1))
+    sock.connect((cmdargs.device_address, 1))
 
-    print('connected to ' + device_address)
-
-    parser = StateParser(sock.recv, sock.send, sock.close, 'From Bluetooth: ' + device_address)
+    parser = _StateParser(sock.recv, sock.send, sock.close, 'From Bluetooth: ' + cmdargs.device_address)
 
     parser.begin()
 
-def handle_serial(portname):
+def _handle_serial(cmdargs):
 
     try:
         import serial
     except:
-        errmsg('import serial failed; make sure pyserial is installed')
+        _errmsg('import serial failed; make sure pyserial is installed')
 
-    port = serial.Serial(portname, 115200)
+    port = serial.Serial(cmdargs.portname, 115200)
 
-    print('conntcted to ' + portname)
-
-    parser = StateParser(port.read, port.write, port.close, 'From serial: ' + portname)
+    parser = _StateParser(port.read, port.write, port.close, 'From serial: ' + cmdargs.portname)
 
     parser.begin()
 
 def threadfunc(args):
 
     if not args.file is None:
-        handle_file(args.file)
+        _handle_file(args.file)
 
     if not args.bluetooth is None:
-        handle_bluetooth(args.bluetooth)
+        _handle_bluetooth(args.bluetooth)
     
     if not args.serial is None:
-        handle_serial(args.serial)
+        _handle_serial(args.serial)
 
 if __name__ == '__main__':
 
-    parser = MyArgumentParser(description='Visualize incoming vehicle-state messages.')
+    parser = _MyArgumentParser(description='Visualize incoming vehicle-state messages.')
 
-    parser.add_argument('-f', '--file',      help='read state data from file')
-    parser.add_argument('-b', '--bluetooth', help='read state data from Bluetooth device')
-    parser.add_argument('-s', '--serial',    help='read state data from serial port')
+    parser.add_argument('-f', '--filename',    help='read state data from file')
+    parser.add_argument('-b', '--bluetooth',   help='read state data from Bluetooth device')
+    parser.add_argument('-s', '--serial',      help='read state data from serial port')
+    parser.add_argument('-z', '--zero_angle',  help='starting angle in degrees')
 
     if len(sys.argv)==1:
         parser.print_help(sys.stderr)
@@ -154,11 +149,11 @@ if __name__ == '__main__':
 
     cmdargs = parser.parse_args()
 
-    if not cmdargs.file is None:
-        handle_file(cmdargs.file)
+    if not cmdargs.filename is None:
+        _handle_file(cmdargs)
 
     if not cmdargs.bluetooth is None:
-        handle_bluetooth(cmdargs.bluetooth)
+        _handle_bluetooth(cmdargs)
     
     if not cmdargs.serial is None:
-        handle_serial(cmdargs.serial)
+        _handle_serial(cmdargs)
