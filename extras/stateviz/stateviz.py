@@ -51,7 +51,7 @@ class _MyVisualizer(Visualizer):
 
 class _StateParser(msppg.Parser):
 
-    def __init__(self, readfun, writefun, closefun, visualizer):
+    def __init__(self, readfun, writefun, closefun, label, visualizer):
 
         msppg.Parser.__init__(self)
 
@@ -110,11 +110,11 @@ def _handle_bluetooth(cmdargs):
         _errmsg('import bluetooth failed; make sure pybluez is installed')
 
     sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-    sock.connect((cmdargs.device_address, 1))
+    sock.connect((cmdargs.bluetooth, 1))
 
-    viz = _MyVisualizer(cmdargs, 'From bluetooth: ' + cmdargs.device_address)
+    viz = _MyVisualizer(cmdargs, 'From bluetooth: ' + cmdargs.bluetooth)
 
-    parser = _StateParser(sock.recv, sock.send, sock.close, 'From Bluetooth: ' + cmdargs.device_address, viz)
+    parser = _StateParser(sock.recv, sock.send, sock.close, 'From Bluetooth: ' + cmdargs.bluetooth, viz)
 
     parser.begin()
 
