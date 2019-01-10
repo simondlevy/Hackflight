@@ -51,7 +51,7 @@ class _MyVisualizer(Visualizer):
 
 class _StateParser(msppg.Parser):
 
-    def __init__(self, readfun, writefun, closefun, label, visualizer):
+    def __init__(self, readfun, writefun, closefun, visualizer):
 
         msppg.Parser.__init__(self)
 
@@ -114,7 +114,7 @@ def _handle_bluetooth(cmdargs):
 
     viz = _MyVisualizer(cmdargs, 'From bluetooth: ' + cmdargs.bluetooth)
 
-    parser = _StateParser(sock.recv, sock.send, sock.close, 'From Bluetooth: ' + cmdargs.bluetooth, viz)
+    parser = _StateParser(sock.recv, sock.send, sock.close, viz)
 
     parser.begin()
 
@@ -125,9 +125,11 @@ def _handle_serial(cmdargs):
     except:
         _errmsg('import serial failed; make sure pyserial is installed')
 
-    port = serial.Serial(cmdargs.portname, 115200)
+    port = serial.Serial(cmdargs.serial, 115200)
 
-    parser = _StateParser(port.read, port.write, port.close, 'From serial: ' + cmdargs.portname)
+    viz = _MyVisualizer(cmdargs, 'From serial: ' + cmdargs.serial)
+
+    parser = _StateParser(port.read, port.write, port.close, viz)
 
     parser.begin()
 
