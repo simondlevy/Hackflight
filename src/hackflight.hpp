@@ -253,7 +253,7 @@ namespace hf {
                 variometer = 2;
                 positionX = 3;
                 positionY = 4;
-                heading = _state.eulerAngles[2];
+                heading = _state.eulerAngles[AXIS_YAW];
                 velocityForward = 6;
                 velocityRightward = 7;
             }
@@ -282,9 +282,9 @@ namespace hf {
 
             virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
             {
-                roll  = _state.eulerAngles[0];
-                pitch = _state.eulerAngles[1];
-                yaw   = _state.eulerAngles[2];
+                roll  = _state.eulerAngles[AXIS_ROLL];
+                pitch = _state.eulerAngles[AXIS_PITCH];
+                yaw   = _state.eulerAngles[AXIS_YAW];
             }
 
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
