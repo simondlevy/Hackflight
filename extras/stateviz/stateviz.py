@@ -49,6 +49,18 @@ class _MyVisualizer(Visualizer):
 
         Visualizer.__init__(self, MAP_SIZE_PIXELS, MAP_SIZE_METERS, label, True)
 
+        self.zero_angle = float(cmdargs.zero_angle) if not cmdargs.zero_angle is None else None
+        self.start_angle = None
+
+    def setPose(self, x_m, y_m, theta_deg):
+
+        if not self.zero_angle is None:
+            if self.start_angle is None:
+                self.start_angle = theta_deg
+            theta_deg = theta_deg - self.start_angle + self.zero_angle
+
+        Visualizer.setPose(self, x_m, y_m, theta_deg)
+
 class _StateParser(msppg.Parser):
 
     def __init__(self, readfun, writefun, closefun, visualizer):
