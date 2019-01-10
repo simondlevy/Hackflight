@@ -43,6 +43,12 @@ class _MyArgumentParser(argparse.ArgumentParser):
 
 _request = msppg.serialize_STATE_Request()
 
+class _MyVisualizer(Visualizer):
+
+    def __init__(self, cmdargs, label):
+
+        Visualizer.__init__(self, MAP_SIZE_PIXELS, MAP_SIZE_METERS, label, True)
+
 class _StateParser(msppg.Parser):
 
     def __init__(self, readfun, writefun, closefun, label):
@@ -54,7 +60,7 @@ class _StateParser(msppg.Parser):
         self.closefun = closefun
 
         # Create a Visualizer object with trajectory
-        self.viz = Visualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, label, True)
+        self.viz = _MyVisualizer(None, label)
 
     def handle_STATE(self, altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
 
@@ -84,7 +90,7 @@ def _handle_file(cmdargs):
     DT_SEC    = .01
 
     # Create a Visualizer object with trajectory
-    viz = Visualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'From file: ' + cmdargs.filename, True)
+    viz = _MyVisualizer(None, 'From file: ' + cmdargs.filename)
 
     for line in open(cmdargs.filename):
 
