@@ -51,7 +51,7 @@ class _MyVisualizer(Visualizer):
 
 class _StateParser(msppg.Parser):
 
-    def __init__(self, readfun, writefun, closefun, label):
+    def __init__(self, readfun, writefun, closefun, visualizer):
 
         msppg.Parser.__init__(self)
 
@@ -60,7 +60,7 @@ class _StateParser(msppg.Parser):
         self.closefun = closefun
 
         # Create a Visualizer object with trajectory
-        self.viz = _MyVisualizer(None, label)
+        self.viz = visualizer
 
     def handle_STATE(self, altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
 
@@ -90,7 +90,7 @@ def _handle_file(cmdargs):
     DT_SEC    = .01
 
     # Create a Visualizer object with trajectory
-    viz = _MyVisualizer(None, 'From file: ' + cmdargs.filename)
+    viz = _MyVisualizer(cmdargs, 'From file: ' + cmdargs.filename)
 
     for line in open(cmdargs.filename):
 
@@ -112,7 +112,9 @@ def _handle_bluetooth(cmdargs):
     sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
     sock.connect((cmdargs.device_address, 1))
 
-    parser = _StateParser(sock.recv, sock.send, sock.close, 'From Bluetooth: ' + cmdargs.device_address)
+    viz = _MyVisualizer(cmdargs, 'From bluetooth: ' + cmdargs.device_address)
+
+    parser = _StateParser(sock.recv, sock.send, sock.close, 'From Bluetooth: ' + cmdargs.device_address, viz)
 
     parser.begin()
 
