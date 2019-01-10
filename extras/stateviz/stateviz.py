@@ -123,17 +123,6 @@ def _handle_serial(cmdargs):
 
     parser.begin()
 
-def threadfunc(args):
-
-    if not args.file is None:
-        _handle_file(args.file)
-
-    if not args.bluetooth is None:
-        _handle_bluetooth(args.bluetooth)
-    
-    if not args.serial is None:
-        _handle_serial(args.serial)
-
 if __name__ == '__main__':
 
     parser = _MyArgumentParser(description='Visualize incoming vehicle-state messages.')
