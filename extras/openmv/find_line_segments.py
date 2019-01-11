@@ -5,6 +5,8 @@
 
 # find_line_segments() finds finite length lines (but is slow).
 # Use find_line_segments() to find non-infinite lines (and is fast).
+#
+# Adapted from https://github.com/openmv/openmv/blob/master/scripts/examples/09-Feature-Detection/find_line_segments.py
 
 enable_lens_corr = False # turn on for straighter lines...
 
@@ -35,7 +37,6 @@ while(True):
 
     for l in img.find_line_segments(merge_distance = 0, max_theta_diff = 5):
         img.draw_line(l.line(), color = (255, 0, 0))
-        print(l)
-    print('')
+        msg = serialize_SET_LINE_SEGMENT(l.x1(), l.y1(), l.x2(), l.y2(), l.length(), l.magnitude(), l.theta(), l.rho())
 
     print("FPS %f" % clock.fps())
