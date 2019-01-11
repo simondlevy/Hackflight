@@ -47,9 +47,14 @@
    {"c5": "float"}, 
    {"c6": "float"}],
 
-  "SET_RANGE_AND_FLOW": 
-  [{"ID": 226},
-   {"range": "short"},
-   {"flowx": "short"},
-   {"flowy": "short"}]
+  "SET_LINE_SEGMENT": 
+  [{"ID":        226},
+   {"x1":        "short"}, 
+   {"y1":        "short"}, 
+   {"x2":        "short"}, 
+   {"y2":        "short"}, 
+   {"length":    "short"}, 
+   {"magnitude": "short"}, 
+   {"theta":     "short"}, 
+   {"rho":       "short"}]
 }

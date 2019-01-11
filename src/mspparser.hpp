@@ -363,16 +363,31 @@ namespace hf {
 
                     case 226:
                     {
-                        int16_t range = 0;
-                        memcpy(&range,  &_inBuf[0], sizeof(int16_t));
+                        int16_t x1 = 0;
+                        memcpy(&x1,  &_inBuf[0], sizeof(int16_t));
 
-                        int16_t flowx = 0;
-                        memcpy(&flowx,  &_inBuf[2], sizeof(int16_t));
+                        int16_t y1 = 0;
+                        memcpy(&y1,  &_inBuf[2], sizeof(int16_t));
 
-                        int16_t flowy = 0;
-                        memcpy(&flowy,  &_inBuf[4], sizeof(int16_t));
+                        int16_t x2 = 0;
+                        memcpy(&x2,  &_inBuf[4], sizeof(int16_t));
 
-                        handle_SET_RANGE_AND_FLOW(range, flowx, flowy);
+                        int16_t y2 = 0;
+                        memcpy(&y2,  &_inBuf[6], sizeof(int16_t));
+
+                        int16_t length = 0;
+                        memcpy(&length,  &_inBuf[8], sizeof(int16_t));
+
+                        int16_t magnitude = 0;
+                        memcpy(&magnitude,  &_inBuf[10], sizeof(int16_t));
+
+                        int16_t theta = 0;
+                        memcpy(&theta,  &_inBuf[12], sizeof(int16_t));
+
+                        int16_t rho = 0;
+                        memcpy(&rho,  &_inBuf[14], sizeof(int16_t));
+
+                        handle_SET_LINE_SEGMENT(x1, y1, x2, y2, length, magnitude, theta, rho);
                         } break;
 
                 }
@@ -429,11 +444,16 @@ namespace hf {
                 (void)c6;
             }
 
-            virtual void handle_SET_RANGE_AND_FLOW(int16_t  range, int16_t  flowx, int16_t  flowy)
+            virtual void handle_SET_LINE_SEGMENT(int16_t  x1, int16_t  y1, int16_t  x2, int16_t  y2, int16_t  length, int16_t  magnitude, int16_t  theta, int16_t  rho)
             {
-                (void)range;
-                (void)flowx;
-                (void)flowy;
+                (void)x1;
+                (void)y1;
+                (void)x2;
+                (void)y2;
+                (void)length;
+                (void)magnitude;
+                (void)theta;
+                (void)rho;
             }
 
         public:
@@ -585,21 +605,26 @@ namespace hf {
                 return 30;
             }
 
-            static uint8_t serialize_SET_RANGE_AND_FLOW(uint8_t bytes[], int16_t  range, int16_t  flowx, int16_t  flowy)
+            static uint8_t serialize_SET_LINE_SEGMENT(uint8_t bytes[], int16_t  x1, int16_t  y1, int16_t  x2, int16_t  y2, int16_t  length, int16_t  magnitude, int16_t  theta, int16_t  rho)
             {
                 bytes[0] = 36;
                 bytes[1] = 77;
                 bytes[2] = 62;
-                bytes[3] = 6;
+                bytes[3] = 16;
                 bytes[4] = 226;
 
-                memcpy(&bytes[5], &range, sizeof(int16_t));
-                memcpy(&bytes[7], &flowx, sizeof(int16_t));
-                memcpy(&bytes[9], &flowy, sizeof(int16_t));
+                memcpy(&bytes[5], &x1, sizeof(int16_t));
+                memcpy(&bytes[7], &y1, sizeof(int16_t));
+                memcpy(&bytes[9], &x2, sizeof(int16_t));
+                memcpy(&bytes[11], &y2, sizeof(int16_t));
+                memcpy(&bytes[13], &length, sizeof(int16_t));
+                memcpy(&bytes[15], &magnitude, sizeof(int16_t));
+                memcpy(&bytes[17], &theta, sizeof(int16_t));
+                memcpy(&bytes[19], &rho, sizeof(int16_t));
 
-                bytes[11] = CRC8(&bytes[3], 8);
+                bytes[21] = CRC8(&bytes[3], 18);
 
-                return 12;
+                return 22;
             }
 
     }; // class MspParser
