@@ -47,7 +47,9 @@ class _MyVisualizer(Visualizer):
 
     def __init__(self, cmdargs, label):
 
-        Visualizer.__init__(self, MAP_SIZE_PIXELS, MAP_SIZE_METERS, label, True)
+        zero_angle = float(cmdargs.zero_angle) if not cmdargs.zero_angle is None else 0
+
+        Visualizer.__init__(self, MAP_SIZE_PIXELS, MAP_SIZE_METERS, label, True, zero_angle)
 
 class _StateParser(msppg.Parser):
 
