@@ -253,7 +253,7 @@ namespace hf {
                 variometer = 2;
                 positionX = 3;
                 positionY = 4;
-                heading = _state.eulerAngles[AXIS_YAW];
+                heading = -_state.eulerAngles[AXIS_YAW]; // NB: Angle negated for remote visualization
                 velocityForward = 6;
                 velocityRightward = 7;
             }
