@@ -8,7 +8,7 @@ https://github.com/ros-visualization/visualization_tutorials/blob/indigo-devel/i
 import rospy
 import copy
 
-from interactive_markers.interactive_marker_server import InteractiveMarkerServer, InteractiveMarker
+from interactive_markers.interactive_marker_server import InteractiveMarkerServer, InteractiveMarker, InteractiveMarkerFeedback
 from interactive_markers.menu_handler import MenuHandler
 from visualization_msgs.msg import Marker, InteractiveMarkerControl
 from geometry_msgs.msg import Point
