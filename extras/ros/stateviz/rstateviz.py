@@ -10,7 +10,7 @@ import copy
 
 from interactive_markers.interactive_marker_server import *
 from interactive_markers.menu_handler import *
-from visualization_msgs.msg import *
+from visualization_msgs.msg import Marker, InteractiveMarkerControl
 from geometry_msgs.msg import Point
 from tf.broadcaster import TransformBroadcaster
 
