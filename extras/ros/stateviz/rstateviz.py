@@ -14,7 +14,6 @@ from visualization_msgs.msg import *
 from geometry_msgs.msg import Point
 from tf.broadcaster import TransformBroadcaster
 
-from random import random
 from math import sin
 
 server = None
@@ -45,19 +44,6 @@ def processFeedback( feedback ):
         rospy.loginfo( s + ": menu item " + str(feedback.menu_entry_id) + " clicked" + mp + "." )
     elif feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE:
         rospy.loginfo( s + ": pose changed")
-# TODO
-#          << "\nposition = "
-#          << feedback.pose.position.x
-#          << ", " << feedback.pose.position.y
-#          << ", " << feedback.pose.position.z
-#          << "\norientation = "
-#          << feedback.pose.orientation.w
-#          << ", " << feedback.pose.orientation.x
-#          << ", " << feedback.pose.orientation.y
-#          << ", " << feedback.pose.orientation.z
-#          << "\nframe: " << feedback.header.frame_id
-#          << " time: " << feedback.header.stamp.sec << "sec, "
-#          << feedback.header.stamp.nsec << " nsec" )
     elif feedback.event_type == InteractiveMarkerFeedback.MOUSE_DOWN:
         rospy.loginfo( s + ": mouse down" + mp + "." )
     elif feedback.event_type == InteractiveMarkerFeedback.MOUSE_UP:
@@ -75,9 +61,6 @@ def alignMarker( feedback ):
 
     server.setPose( feedback.marker_name, pose )
     server.applyChanges()
-
-def rand( min_, max_ ):
-    return min_ + random()*(max_-min_)
 
 def makeBox( msg ):
     marker = Marker()
@@ -114,32 +97,6 @@ def normalizeQuaternion( quaternion_msg ):
     quaternion_msg.y *= s
     quaternion_msg.z *= s
     quaternion_msg.w *= s
-
-def makeRandomDofMarker( position ):
-    int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
-    int_marker.pose.position = position
-    int_marker.scale = 1
-
-    int_marker.name = "6dof_random_axes"
-    int_marker.description = "6-DOF\n(Arbitrary Axes)"
-
-    makeBoxControl(int_marker)
-
-    control = InteractiveMarkerControl()
-
-    for i in range(3):
-        control.orientation.w = rand(-1,1)
-        control.orientation.x = rand(-1,1)
-        control.orientation.y = rand(-1,1)
-        control.orientation.z = rand(-1,1)
-        normalizeQuaternion(control.orientation)
-        control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
-        int_marker.controls.append(copy.deepcopy(control))
-        control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
-        int_marker.controls.append(copy.deepcopy(control))
-
-    server.insert(int_marker, processFeedback)
 
 def makeQuadrocopterMarker(position):
     int_marker = InteractiveMarker()
