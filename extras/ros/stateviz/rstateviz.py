@@ -93,7 +93,6 @@ def makeQuadcopterMarker(position):
     marker.scale = 1
 
     marker.name = "quadcopter"
-    marker.description = "Quadcopter"
 
     makeBoxControl(marker)
 
