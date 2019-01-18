@@ -24,7 +24,12 @@ counter = 0
 def frameCallback( msg ):
     global counter, br
     time = rospy.Time.now()
-    br.sendTransform( (0, 0, sin(counter/140.0)*2.0), (0, 0, 0, 1.0), time, "base_link", "moving_frame" )
+    br.sendTransform( 
+            (0, 0, sin(counter/140.0)*2.0), # translation
+            (0, 0, 0, 1.0),                 # rotation
+            time,   
+            "map",                          # child (sender)
+            "moving_frame" )                # parent (recipient)
     counter += 1
 
 def processFeedback( feedback ):
