@@ -88,6 +88,7 @@ def saveMarker( int_marker ):
 
 
 def normalizeQuaternion( quaternion_msg ):
+
     norm = quaternion_msg.x**2 + quaternion_msg.y**2 + quaternion_msg.z**2 + quaternion_msg.w**2
     s = norm**(-0.5)
     quaternion_msg.x *= s
@@ -96,12 +97,13 @@ def normalizeQuaternion( quaternion_msg ):
     quaternion_msg.w *= s
 
 def makeQuadcopterMarker(position):
+
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
+    int_marker.header.frame_id = "moving_frame"
     int_marker.pose.position = position
     int_marker.scale = 1
 
-    int_marker.name = "quadrocopter"
+    int_marker.name = "quadcopter"
     int_marker.description = "Quadcopter"
 
     makeBoxControl(int_marker)
@@ -114,36 +116,11 @@ def makeQuadcopterMarker(position):
     normalizeQuaternion(control.orientation)
     control.interaction_mode = InteractiveMarkerControl.MOVE_ROTATE
     int_marker.controls.append(copy.deepcopy(control))
+
     control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
     int_marker.controls.append(control)
 
     server.insert(int_marker, processFeedback)
-
-def makeMovingMarker(position):
-    int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "moving_frame"
-    int_marker.pose.position = position
-    int_marker.scale = 1
-
-    int_marker.name = "moving"
-    int_marker.description = "Marker Attached to a\nMoving Frame"
-
-    control = InteractiveMarkerControl()
-    control.orientation.w = 1
-    control.orientation.x = 1
-    control.orientation.y = 0
-    control.orientation.z = 0
-    normalizeQuaternion(control.orientation)
-    control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
-    int_marker.controls.append(copy.deepcopy(control))
-
-    control.interaction_mode = InteractiveMarkerControl.MOVE_PLANE
-    control.always_visible = True
-    control.markers.append( makeBox(int_marker) )
-    int_marker.controls.append(control)
-
-    server.insert(int_marker, processFeedback)
-
 
 if __name__=="__main__":
 
@@ -164,9 +141,6 @@ if __name__=="__main__":
   
     position = Point( 0, -3, 0)
     makeQuadcopterMarker( position )
-
-    position = Point( 0, -6, 0)
-    makeMovingMarker( position )
 
     server.applyChanges()
 
