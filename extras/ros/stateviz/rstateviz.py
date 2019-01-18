@@ -87,9 +87,6 @@ def saveMarker( int_marker ):
   server.insert(int_marker, processFeedback)
 
 
-#####################################################################
-# Marker Creation
-
 def normalizeQuaternion( quaternion_msg ):
     norm = quaternion_msg.x**2 + quaternion_msg.y**2 + quaternion_msg.z**2 + quaternion_msg.w**2
     s = norm**(-0.5)
@@ -98,14 +95,14 @@ def normalizeQuaternion( quaternion_msg ):
     quaternion_msg.z *= s
     quaternion_msg.w *= s
 
-def makeQuadrocopterMarker(position):
+def makeQuadcopterMarker(position):
     int_marker = InteractiveMarker()
     int_marker.header.frame_id = "base_link"
     int_marker.pose.position = position
     int_marker.scale = 1
 
     int_marker.name = "quadrocopter"
-    int_marker.description = "Quadrocopter"
+    int_marker.description = "Quadcopter"
 
     makeBoxControl(int_marker)
 
@@ -166,7 +163,7 @@ if __name__=="__main__":
     menu_handler.insert( "Second Entry", parent=sub_menu_handle, callback=processFeedback )
   
     position = Point( 0, -3, 0)
-    makeQuadrocopterMarker( position )
+    makeQuadcopterMarker( position )
 
     position = Point( 0, -6, 0)
     makeMovingMarker( position )
