@@ -40,6 +40,7 @@ br = None
 counter = 0
 
 def frameCallback(msg):
+
     global counter, br
     time = rospy.Time.now()
     br.sendTransform(
@@ -51,9 +52,11 @@ def frameCallback(msg):
     counter += 1
 
 def processFeedback(feedback):
+
     server.applyChanges()
 
 def makeBox(msg):
+
     marker = Marker()
 
     marker.type = Marker.CUBE
@@ -101,10 +104,7 @@ def makeQuadcopterMarker(position):
     control.orientation.y = 1
     control.orientation.z = 0
     normalizeQuaternion(control.orientation)
-    control.interaction_mode = InteractiveMarkerControl.MOVE_ROTATE
     marker.controls.append(copy.deepcopy(control))
-
-    control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
     marker.controls.append(control)
 
     server.insert(marker, processFeedback)
