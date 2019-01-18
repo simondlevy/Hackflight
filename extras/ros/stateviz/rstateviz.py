@@ -73,18 +73,6 @@ def processFeedback( feedback ):
         rospy.loginfo( s + ": mouse up" + mp + "." )
     server.applyChanges()
 
-def alignMarker( feedback ):
-    pose = feedback.pose
-
-    pose.position.x = round(pose.position.x-0.5)+0.5
-    pose.position.y = round(pose.position.y-0.5)+0.5
-
-    rospy.loginfo( feedback.marker_name + ": aligning position = " + str(feedback.pose.position.x) + "," + str(feedback.pose.position.y) + "," + str(feedback.pose.position.z) + " to " +
-                                                                     str(pose.position.x) + "," + str(pose.position.y) + "," + str(pose.position.z) )
-
-    server.setPose( feedback.marker_name, pose )
-    server.applyChanges()
-
 def makeBox( msg ):
     marker = Marker()
 
@@ -105,10 +93,6 @@ def makeBoxControl( msg ):
     control.markers.append( makeBox(msg) )
     msg.controls.append( control )
     return control
-
-def saveMarker( int_marker ):
-  server.insert(int_marker, processFeedback)
-
 
 def normalizeQuaternion( quaternion_msg ):
 
@@ -156,12 +140,6 @@ if __name__=="__main__":
 
     server = InteractiveMarkerServer("basic_controls")
 
-    menu_handler.insert( "First Entry", callback=processFeedback )
-    menu_handler.insert( "Second Entry", callback=processFeedback )
-    sub_menu_handle = menu_handler.insert( "Submenu" )
-    menu_handler.insert( "First Entry", parent=sub_menu_handle, callback=processFeedback )
-    menu_handler.insert( "Second Entry", parent=sub_menu_handle, callback=processFeedback )
-  
     position = Point( 0, -3, 0)
     makeQuadcopterMarker( position )
 
