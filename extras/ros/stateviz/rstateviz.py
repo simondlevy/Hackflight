@@ -27,7 +27,6 @@ import rospy
 import copy
 
 from interactive_markers.interactive_marker_server import InteractiveMarkerServer, InteractiveMarker
-from interactive_markers.menu_handler import MenuHandler
 from visualization_msgs.msg import Marker, InteractiveMarkerControl
 from geometry_msgs.msg import Point
 from tf.broadcaster import TransformBroadcaster
@@ -35,7 +34,6 @@ from tf.broadcaster import TransformBroadcaster
 from math import sin
 
 server = None
-menu_handler = MenuHandler()
 br = None
 counter = 0
 
@@ -71,6 +69,7 @@ def makeBox(msg):
     return marker
 
 def makeBoxControl(msg):
+
     control =  InteractiveMarkerControl()
     control.always_visible = True
     control.markers.append(makeBox(msg))
