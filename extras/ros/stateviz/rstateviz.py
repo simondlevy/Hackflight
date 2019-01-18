@@ -39,41 +39,21 @@ menu_handler = MenuHandler()
 br = None
 counter = 0
 
-def frameCallback( msg ):
+def frameCallback(msg):
     global counter, br
     time = rospy.Time.now()
-    br.sendTransform( 
+    br.sendTransform(
             (0, 0, sin(counter/140.0)*2.0), # translation
             (0, 0, 0, 1.0),                 # rotation
             time,   
             "map",                          # child (sender)
-            "moving_frame" )                # parent (recipient)
+            "moving_frame")                 # parent (recipient)
     counter += 1
 
-def processFeedback( feedback ):
-    s = "Feedback from marker '" + feedback.marker_name
-    s += "' / control '" + feedback.control_name + "'"
-
-    mp = ""
-    if feedback.mouse_point_valid:
-        mp = " at " + str(feedback.mouse_point.x)
-        mp += ", " + str(feedback.mouse_point.y)
-        mp += ", " + str(feedback.mouse_point.z)
-        mp += " in frame " + feedback.header.frame_id
-
-    if feedback.event_type == InteractiveMarkerFeedback.BUTTON_CLICK:
-        rospy.loginfo( s + ": button click" + mp + "." )
-    elif feedback.event_type == InteractiveMarkerFeedback.MENU_SELECT:
-        rospy.loginfo( s + ": menu item " + str(feedback.menu_entry_id) + " clicked" + mp + "." )
-    elif feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE:
-        rospy.loginfo( s + ": pose changed")
-    elif feedback.event_type == InteractiveMarkerFeedback.MOUSE_DOWN:
-        rospy.loginfo( s + ": mouse down" + mp + "." )
-    elif feedback.event_type == InteractiveMarkerFeedback.MOUSE_UP:
-        rospy.loginfo( s + ": mouse up" + mp + "." )
+def processFeedback(feedback):
     server.applyChanges()
 
-def makeBox( msg ):
+def makeBox(msg):
     marker = Marker()
 
     marker.type = Marker.CUBE
@@ -87,14 +67,14 @@ def makeBox( msg ):
 
     return marker
 
-def makeBoxControl( msg ):
+def makeBoxControl(msg):
     control =  InteractiveMarkerControl()
     control.always_visible = True
-    control.markers.append( makeBox(msg) )
-    msg.controls.append( control )
+    control.markers.append(makeBox(msg))
+    msg.controls.append(control)
     return control
 
-def normalizeQuaternion( quaternion_msg ):
+def normalizeQuaternion(quaternion_msg):
 
     norm = quaternion_msg.x**2 + quaternion_msg.y**2 + quaternion_msg.z**2 + quaternion_msg.w**2
     s = norm**(-0.5)
@@ -105,15 +85,15 @@ def normalizeQuaternion( quaternion_msg ):
 
 def makeQuadcopterMarker(position):
 
-    int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "moving_frame"
-    int_marker.pose.position = position
-    int_marker.scale = 1
+    marker = InteractiveMarker()
+    marker.header.frame_id = "moving_frame"
+    marker.pose.position = position
+    marker.scale = 1
 
-    int_marker.name = "quadcopter"
-    int_marker.description = "Quadcopter"
+    marker.name = "quadcopter"
+    marker.description = "Quadcopter"
 
-    makeBoxControl(int_marker)
+    makeBoxControl(marker)
 
     control = InteractiveMarkerControl()
     control.orientation.w = 1
@@ -122,12 +102,12 @@ def makeQuadcopterMarker(position):
     control.orientation.z = 0
     normalizeQuaternion(control.orientation)
     control.interaction_mode = InteractiveMarkerControl.MOVE_ROTATE
-    int_marker.controls.append(copy.deepcopy(control))
+    marker.controls.append(copy.deepcopy(control))
 
     control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
-    int_marker.controls.append(control)
+    marker.controls.append(control)
 
-    server.insert(int_marker, processFeedback)
+    server.insert(marker, processFeedback)
 
 if __name__=="__main__":
 
@@ -140,8 +120,8 @@ if __name__=="__main__":
 
     server = InteractiveMarkerServer("basic_controls")
 
-    position = Point( 0, -3, 0)
-    makeQuadcopterMarker( position )
+    position = Point(0, -3, 0)
+    makeQuadcopterMarker(position)
 
     server.applyChanges()
 
