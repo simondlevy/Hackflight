@@ -61,9 +61,9 @@ def makeBox(msg):
     marker.scale.x = msg.scale * 0.45
     marker.scale.y = msg.scale * 0.45
     marker.scale.z = msg.scale * 0.45
-    marker.color.r = 0.5
-    marker.color.g = 0.5
-    marker.color.b = 0.5
+    marker.color.r = 1.0
+    marker.color.g = 0.0
+    marker.color.b = 0.0
     marker.color.a = 1.0
 
     return marker
