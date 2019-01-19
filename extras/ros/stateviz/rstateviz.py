@@ -107,7 +107,6 @@ def makeVehicleMarker(position):
 
     normalizeQuaternion(control.orientation)
 
-    marker.controls.append(copy.deepcopy(control))
     marker.controls.append(control)
 
     server.insert(marker, processFeedback)
