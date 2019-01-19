@@ -23,6 +23,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
+MARKER_COLOR    = 1.0, 0.0, 0.0
 MARKER_RESOURCE = 'package://stateviz/arrowhead.stl'
 MARKER_SCALE    = .02
 
@@ -95,11 +96,8 @@ def makeVehicleMarker(position):
     meshMarker.scale.x = marker.scale * MARKER_SCALE
     meshMarker.scale.y = marker.scale * MARKER_SCALE
     meshMarker.scale.z = marker.scale * MARKER_SCALE
-    meshMarker.color.r = 1.0
-    meshMarker.color.g = 0.0
-    meshMarker.color.b = 0.0
+    meshMarker.color.r, meshMarker.color.g, meshMarker.color.b = MARKER_COLOR
     meshMarker.color.a = 1.0
-
 
     control.markers.append(meshMarker)
     marker.controls.append(control)
