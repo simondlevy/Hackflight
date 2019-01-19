@@ -24,7 +24,7 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
 MARKER_RESOURCE = "package://stateviz/arrowhead.stl"
-MARKER_SCALE    = .01
+MARKER_SCALE    = .02
 
 import rospy
 import copy
@@ -33,6 +33,7 @@ from interactive_markers.interactive_marker_server import InteractiveMarkerServe
 from visualization_msgs.msg import Marker, InteractiveMarkerControl
 from geometry_msgs.msg import Point
 from tf.broadcaster import TransformBroadcaster
+from tf.transformations import quaternion_from_euler
 
 from math import sin
 
@@ -44,9 +45,15 @@ def frameCallback(msg):
 
     global counter, br
     time = rospy.Time.now()
+
+    roll,pitch,yaw = 0,0,0
+    rotation_quaternion = quaternion_from_euler(roll, pitch, yaw)
+   
+    translation = (0, 0, sin(counter/140.0)*2.0)
+
     br.sendTransform(
-            (0, 0, sin(counter/140.0)*2.0), # translation
-            (0, 0, 0, 1.0),                 # rotation
+            translation,
+            rotation_quaternion,            
             time,   
             "map",                          # child (sender)
             "moving_frame")                 # parent (recipient)
