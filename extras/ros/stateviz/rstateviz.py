@@ -68,16 +68,16 @@ def processFeedback(feedback):
 
     server.applyChanges()
 
-def normalizeQuaternion(quaternion_msg):
+def normalizeQuaternion(orientation):
 
-    norm = quaternion_msg.x**2 + quaternion_msg.y**2 + quaternion_msg.z**2 + quaternion_msg.w**2
+    norm = orientation.x**2 + orientation.y**2 + orientation.z**2 + orientation.w**2
     s = norm**(-0.5)
-    quaternion_msg.x *= s
-    quaternion_msg.y *= s
-    quaternion_msg.z *= s
-    quaternion_msg.w *= s
+    orientation.x *= s
+    orientation.y *= s
+    orientation.z *= s
+    orientation.w *= s
 
-def makeQuadcopterMarker(position):
+def makeVehicleMarker(position):
 
     marker = InteractiveMarker()
     marker.header.frame_id = 'moving_frame'
@@ -109,7 +109,9 @@ def makeQuadcopterMarker(position):
     control.orientation.x = 0
     control.orientation.y = 1
     control.orientation.z = 0
+
     normalizeQuaternion(control.orientation)
+
     marker.controls.append(copy.deepcopy(control))
     marker.controls.append(control)
 
@@ -127,7 +129,7 @@ if __name__=='__main__':
     server = InteractiveMarkerServer('basic_controls')
 
     position = Point(0, 0, 0)
-    makeQuadcopterMarker(position)
+    makeVehicleMarker(position)
 
     server.applyChanges()
 
