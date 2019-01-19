@@ -50,8 +50,6 @@ def frameCallback(msg):
 
     cycle = sin(counter/140.0)
 
-    rospy.loginfo('%+3.3f' % cycle)
-
     roll = 0
     pitch = 0
     yaw = cycle * pi
@@ -101,10 +99,11 @@ def makeVehicleMarker(position):
     marker.controls.append(control)
  
     control = InteractiveMarkerControl()
-    control.orientation.w = 1
-    control.orientation.x = 0
-    control.orientation.y = 1
-    control.orientation.z = 0
+    q = quaternion_from_euler(0, 0, 0)
+    control.orientation.x = q[0]
+    control.orientation.y = q[1]
+    control.orientation.z = q[2] 
+    control.orientation.w = q[3]
 
     normalizeQuaternion(control.orientation)
 
