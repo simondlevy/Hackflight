@@ -78,8 +78,18 @@ def normalizeQuaternion(orientation):
     orientation.z *= s
     orientation.w *= s
 
-def makeVehicleMarker(position):
+if __name__=='__main__':
 
+    rospy.init_node(NODE_NAME)
+
+    br = TransformBroadcaster()
+    
+    # create a timer to update the published transforms
+    rospy.Timer(rospy.Duration(0.01), frameCallback)
+
+    server = InteractiveMarkerServer(NODE_NAME)
+
+    position = Point(0, 0, 0)
     marker = InteractiveMarker()
     marker.header.frame_id = 'moving_frame'
     marker.pose.position = position
@@ -113,19 +123,6 @@ def makeVehicleMarker(position):
 
     server.insert(marker, processFeedback)
 
-if __name__=='__main__':
-
-    rospy.init_node(NODE_NAME)
-
-    br = TransformBroadcaster()
-    
-    # create a timer to update the published transforms
-    rospy.Timer(rospy.Duration(0.01), frameCallback)
-
-    server = InteractiveMarkerServer(NODE_NAME)
-
-    position = Point(0, 0, 0)
-    makeVehicleMarker(position)
 
     server.applyChanges()
 
