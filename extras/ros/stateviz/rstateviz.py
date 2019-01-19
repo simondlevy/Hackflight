@@ -93,9 +93,7 @@ def makeVehicleMarker(position):
     meshMarker = Marker()
     meshMarker.type = Marker.MESH_RESOURCE
     meshMarker.mesh_resource = MARKER_RESOURCE
-    meshMarker.scale.x = marker.scale * MARKER_SCALE
-    meshMarker.scale.y = marker.scale * MARKER_SCALE
-    meshMarker.scale.z = marker.scale * MARKER_SCALE
+    meshMarker.scale.x, meshMarker.scale.y, meshMarker.scale.z = (tuple([marker.scale*MARKER_SCALE]))*3
     meshMarker.color.r, meshMarker.color.g, meshMarker.color.b = MARKER_COLOR
     meshMarker.color.a = 1.0
 
