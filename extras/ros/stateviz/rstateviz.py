@@ -81,33 +81,28 @@ def normalizeQuaternion(orientation):
 if __name__=='__main__':
 
     rospy.init_node(NODE_NAME)
-
     br = TransformBroadcaster()
-    
     rospy.Timer(rospy.Duration(0.01), frameCallback)
-
     server = InteractiveMarkerServer(NODE_NAME)
 
     position = Point(0, 0, 0)
-    marker = InteractiveMarker()
-    marker.header.frame_id = 'moving_frame'
-    marker.pose.position = position
-    marker.scale = 1
-
-    marker.name = 'quadcopter'
-
-    control =  InteractiveMarkerControl()
-    control.always_visible = True
+    vehicleMarker = InteractiveMarker()
+    vehicleMarker.header.frame_id = 'moving_frame'
+    vehicleMarker.pose.position = position
+    vehicleMarker.scale = 1
+    vehicleMarker.name = 'quadcopter'
 
     meshMarker = Marker()
     meshMarker.type = Marker.MESH_RESOURCE
     meshMarker.mesh_resource = MARKER_RESOURCE
-    meshMarker.scale.x, meshMarker.scale.y, meshMarker.scale.z = (tuple([marker.scale*MARKER_SCALE]))*3
+    meshMarker.scale.x, meshMarker.scale.y, meshMarker.scale.z = (tuple([vehicleMarker.scale*MARKER_SCALE]))*3
     meshMarker.color.r, meshMarker.color.g, meshMarker.color.b = MARKER_COLOR
     meshMarker.color.a = 1.0
 
+    control =  InteractiveMarkerControl()
+    control.always_visible = True
     control.markers.append(meshMarker)
-    marker.controls.append(control)
+    vehicleMarker.controls.append(control)
  
     control = InteractiveMarkerControl()
     q = quaternion_from_euler(0, 0, 0)
@@ -118,10 +113,9 @@ if __name__=='__main__':
 
     normalizeQuaternion(control.orientation)
 
-    marker.controls.append(control)
+    vehicleMarker.controls.append(control)
 
-    server.insert(marker, processFeedback)
-
+    server.insert(vehicleMarker, processFeedback)
 
     server.applyChanges()
 
