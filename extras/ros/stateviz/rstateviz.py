@@ -91,26 +91,25 @@ if __name__=='__main__':
     vehicleMarker.scale = 1
     vehicleMarker.name = 'quadcopter'
 
-    meshMarker = Marker()
-    meshMarker.type = Marker.MESH_RESOURCE
-    meshMarker.mesh_resource = MARKER_RESOURCE
-    meshMarker.scale.x, meshMarker.scale.y, meshMarker.scale.z = (tuple([vehicleMarker.scale*MARKER_SCALE]))*3
-    meshMarker.color.r, meshMarker.color.g, meshMarker.color.b = MARKER_COLOR
-    meshMarker.color.a = 1.0
+    vehicleMesh = Marker()
+    vehicleMesh.type = Marker.MESH_RESOURCE
+    vehicleMesh.mesh_resource = MARKER_RESOURCE
+    vehicleMesh.scale.x, vehicleMesh.scale.y, vehicleMesh.scale.z = (tuple([vehicleMarker.scale*MARKER_SCALE]))*3
+    vehicleMesh.color.r, vehicleMesh.color.g, vehicleMesh.color.b = MARKER_COLOR
+    vehicleMesh.color.a = 1.0
 
-    control =  InteractiveMarkerControl()
-    control.always_visible = True
-    control.markers.append(meshMarker)
-    vehicleMarker.controls.append(control)
- 
-    control = InteractiveMarkerControl()
     q = quaternion_from_euler(0, 0, 0)
-    control.orientation.x = q[0]
-    control.orientation.y = q[1]
-    control.orientation.z = q[2] 
-    control.orientation.w = q[3]
 
-    normalizeQuaternion(control.orientation)
+    vehicleControl =  InteractiveMarkerControl()
+    vehicleControl.always_visible = True
+    vehicleControl.markers.append(vehicleMesh)
+    vehicleMarker.controls.append(vehicleControl)
+    vehicleControl.orientation.x = q[0]
+    vehicleControl.orientation.y = q[1]
+    vehicleControl.orientation.z = q[2] 
+    vehicleControl.orientation.w = q[3]
+
+    normalizeQuaternion(vehicleControl.orientation)
 
     server.insert(vehicleMarker, processFeedback)
 
