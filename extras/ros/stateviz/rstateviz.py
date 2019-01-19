@@ -43,11 +43,12 @@ from math import sin, pi
 server = None
 br = None
 counter = 0
-marker = None
+vehicleMarker = None
+vehicleControl = None
 
 def frameCallback(msg):
 
-    global counter, br, marker
+    global counter, br, vehicleMarker, vehicleControl
     time = rospy.Time.now()
 
     cycle = sin(counter/140.0)
@@ -59,11 +60,15 @@ def frameCallback(msg):
    
     x = 0
     y = 0
-    z = 0 #cycle*2.0
+    z = cycle*2.0
     translation = (x, y, z)
 
-    br.sendTransform( translation, rotation_quaternion, time, 'map', 'moving_frame')                
+    vehicleMarker.pose.position.z = z
+
+    br.sendTransform(translation, rotation_quaternion, time, 'map', 'vehicle_frame')                
     counter += 1
+    
+    rospy.loginfo(str(vehicleMarker.pose.position) + '\n')
 
 def processFeedback(feedback):
 
@@ -86,10 +91,16 @@ if __name__=='__main__':
     server = InteractiveMarkerServer(NODE_NAME)
 
     vehicleMarker = InteractiveMarker()
-    vehicleMarker.header.frame_id = 'moving_frame'
-    vehicleMarker.pose.position = Point(0,0,0)
+    vehicleMarker.header.frame_id = 'vehicle_frame'
+    vehicleMarker.pose.position = Point(0,-3,0)
     vehicleMarker.scale = 1
     vehicleMarker.name = 'quadcopter'
+    q = quaternion_from_euler(0, 0, 0)
+    vehicleMarker.pose.orientation.x = q[0]
+    vehicleMarker.pose.orientation.y = q[1]
+    vehicleMarker.pose.orientation.z = q[2] 
+    vehicleMarker.pose.orientation.w = q[3]
+    normalizeQuaternion(vehicleMarker.pose.orientation)
 
     vehicleMesh = Marker()
     vehicleMesh.type = Marker.MESH_RESOURCE
@@ -98,18 +109,11 @@ if __name__=='__main__':
     vehicleMesh.color.r, vehicleMesh.color.g, vehicleMesh.color.b = MARKER_COLOR
     vehicleMesh.color.a = 1.0
 
-    q = quaternion_from_euler(0, 0, 0)
-
     vehicleControl =  InteractiveMarkerControl()
     vehicleControl.always_visible = True
     vehicleControl.markers.append(vehicleMesh)
-    vehicleMarker.controls.append(vehicleControl)
-    vehicleControl.orientation.x = q[0]
-    vehicleControl.orientation.y = q[1]
-    vehicleControl.orientation.z = q[2] 
-    vehicleControl.orientation.w = q[3]
 
-    normalizeQuaternion(vehicleControl.orientation)
+    vehicleMarker.controls.append(vehicleControl)
 
     server.insert(vehicleMarker, processFeedback)
 
