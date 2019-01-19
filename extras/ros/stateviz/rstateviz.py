@@ -85,10 +85,9 @@ if __name__=='__main__':
     rospy.Timer(rospy.Duration(0.01), frameCallback)
     server = InteractiveMarkerServer(NODE_NAME)
 
-    position = Point(0, 0, 0)
     vehicleMarker = InteractiveMarker()
     vehicleMarker.header.frame_id = 'moving_frame'
-    vehicleMarker.pose.position = position
+    vehicleMarker.pose.position = Point(0,0,0)
     vehicleMarker.scale = 1
     vehicleMarker.name = 'quadcopter'
 
