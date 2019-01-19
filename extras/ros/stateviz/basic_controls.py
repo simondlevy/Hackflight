@@ -201,61 +201,6 @@ def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
     server.insert(int_marker, processFeedback)
     menu_handler.apply( server, int_marker.name )
 
-def makeViewFacingMarker(position):
-    int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
-    int_marker.pose.position = position
-    int_marker.scale = 1
-
-    int_marker.name = "view_facing"
-    int_marker.description = "View Facing 6-DOF"
-
-    # make a control that rotates around the view axis
-    control = InteractiveMarkerControl()
-    control.orientation_mode = InteractiveMarkerControl.VIEW_FACING
-    control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
-    control.orientation.w = 1
-    control.name = "rotate"
-    int_marker.controls.append(control)
-
-    # create a box in the center which should not be view facing,
-    # but move in the camera plane.
-    control = InteractiveMarkerControl()
-    control.orientation_mode = InteractiveMarkerControl.VIEW_FACING
-    control.interaction_mode = InteractiveMarkerControl.MOVE_PLANE
-    control.independent_marker_orientation = True
-    control.name = "move"
-    control.markers.append( makeBox(int_marker) )
-    control.always_visible = True
-    int_marker.controls.append(control)
-
-    server.insert(int_marker, processFeedback)
-
-def makeMenuMarker(position):
-    int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
-    int_marker.pose.position = position
-    int_marker.scale = 1
-
-    int_marker.name = "context_menu"
-    int_marker.description = "Context Menu\n(Right Click)"
-
-    # make one control using default visuals
-    control = InteractiveMarkerControl()
-    control.interaction_mode = InteractiveMarkerControl.MENU
-    control.description="Options"
-    control.name = "menu_only_control"
-    int_marker.controls.append(copy.deepcopy(control))
-
-    # make one control showing a box
-    marker = makeBox( int_marker )
-    control.markers.append( marker )
-    control.always_visible = True
-    int_marker.controls.append(control)
-
-    server.insert(int_marker, processFeedback)
-    menu_handler.apply( server, int_marker.name )
-
 def makeMovingMarker(position):
     int_marker = InteractiveMarker()
     int_marker.header.frame_id = "moving_frame"
@@ -298,30 +243,12 @@ if __name__=="__main__":
     menu_handler.insert( "First Entry", parent=sub_menu_handle, callback=processFeedback )
     menu_handler.insert( "Second Entry", parent=sub_menu_handle, callback=processFeedback )
     
-    position = Point(-3, 3, 0)
-    make6DofMarker( False, InteractiveMarkerControl.NONE, position, True)
-
     position = Point( 0, 3, 0)
     make6DofMarker( True, InteractiveMarkerControl.NONE, position, True)
-
-    position = Point(-3, 0, 0)
-    make6DofMarker( False, InteractiveMarkerControl.ROTATE_3D, position, False)
-
-    position = Point( 0, 0, 0)
-    make6DofMarker( False, InteractiveMarkerControl.MOVE_ROTATE_3D, position, True )
-
-    position = Point( 3, 0, 0)
-    make6DofMarker( False, InteractiveMarkerControl.MOVE_3D, position, False)
-
-    position = Point(-3, -3, 0)
-    makeViewFacingMarker( position )
 
     position = Point( 0, -6, 0)
     makeMovingMarker( position )
 
-    position = Point( 3, -6, 0)
-    makeMenuMarker( position )
-    
     server.applyChanges()
 
     rospy.spin()
