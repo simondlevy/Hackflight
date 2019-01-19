@@ -23,7 +23,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-MARKER_RESOURCE = "package://stateviz/arrowhead.stl"
+MARKER_RESOURCE = 'package://stateviz/arrowhead.stl'
 MARKER_SCALE    = .02
 
 import rospy
@@ -35,28 +35,33 @@ from geometry_msgs.msg import Point
 from tf.broadcaster import TransformBroadcaster
 from tf.transformations import quaternion_from_euler
 
-from math import sin
+from math import sin, pi
 
 server = None
 br = None
 counter = 0
+marker = None
 
 def frameCallback(msg):
 
-    global counter, br
+    global counter, br, marker
     time = rospy.Time.now()
+
+    cycle = sin(counter/140.0)
+
+    rospy.loginfo('%+3.3f' % cycle)
 
     roll,pitch,yaw = 0,0,0
     rotation_quaternion = quaternion_from_euler(roll, pitch, yaw)
    
-    translation = (0, 0, sin(counter/140.0)*2.0)
+    translation = (0, 0, cycle*2.0)
 
     br.sendTransform(
             translation,
             rotation_quaternion,            
             time,   
-            "map",                          # child (sender)
-            "moving_frame")                 # parent (recipient)
+            'map',                          # child (sender)
+            'moving_frame')                 # parent (recipient)
     counter += 1
 
 def processFeedback(feedback):
@@ -100,11 +105,11 @@ def normalizeQuaternion(quaternion_msg):
 def makeQuadcopterMarker(position):
 
     marker = InteractiveMarker()
-    marker.header.frame_id = "moving_frame"
+    marker.header.frame_id = 'moving_frame'
     marker.pose.position = position
     marker.scale = 1
 
-    marker.name = "quadcopter"
+    marker.name = 'quadcopter'
 
     makeBoxControl(marker)
 
@@ -119,16 +124,16 @@ def makeQuadcopterMarker(position):
 
     server.insert(marker, processFeedback)
 
-if __name__=="__main__":
+if __name__=='__main__':
 
-    rospy.init_node("basic_controls")
+    rospy.init_node('basic_controls')
 
     br = TransformBroadcaster()
     
     # create a timer to update the published transforms
     rospy.Timer(rospy.Duration(0.01), frameCallback)
 
-    server = InteractiveMarkerServer("basic_controls")
+    server = InteractiveMarkerServer('basic_controls')
 
     position = Point(0, -3, 0)
     makeQuadcopterMarker(position)
