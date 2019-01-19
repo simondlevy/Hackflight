@@ -51,47 +51,22 @@ def frameCallback(msg):
 
     rospy.loginfo('%+3.3f' % cycle)
 
-    roll,pitch,yaw = 0,0,0
+    roll = 0
+    pitch = 0
+    yaw = cycle * pi
     rotation_quaternion = quaternion_from_euler(roll, pitch, yaw)
    
-    translation = (0, 0, cycle*2.0)
+    x = 0
+    y = 0
+    z = 0 #cycle*2.0
+    translation = (x, y, z)
 
-    br.sendTransform(
-            translation,
-            rotation_quaternion,            
-            time,   
-            'map',                          # child (sender)
-            'moving_frame')                 # parent (recipient)
+    br.sendTransform( translation, rotation_quaternion, time, 'map', 'moving_frame')                
     counter += 1
 
 def processFeedback(feedback):
 
     server.applyChanges()
-
-def makeBox(msg):
-
-    marker = Marker()
-
-    #marker.type = Marker.CUBE
-    marker.type = Marker.MESH_RESOURCE
-    marker.mesh_resource = MARKER_RESOURCE
-    marker.scale.x = msg.scale * MARKER_SCALE
-    marker.scale.y = msg.scale * MARKER_SCALE
-    marker.scale.z = msg.scale * MARKER_SCALE
-    marker.color.r = 1.0
-    marker.color.g = 0.0
-    marker.color.b = 0.0
-    marker.color.a = 1.0
-
-    return marker
-
-def makeBoxControl(msg):
-
-    control =  InteractiveMarkerControl()
-    control.always_visible = True
-    control.markers.append(makeBox(msg))
-    msg.controls.append(control)
-    return control
 
 def normalizeQuaternion(quaternion_msg):
 
@@ -111,8 +86,24 @@ def makeQuadcopterMarker(position):
 
     marker.name = 'quadcopter'
 
-    makeBoxControl(marker)
+    control =  InteractiveMarkerControl()
+    control.always_visible = True
 
+    meshMarker = Marker()
+    meshMarker.type = Marker.MESH_RESOURCE
+    meshMarker.mesh_resource = MARKER_RESOURCE
+    meshMarker.scale.x = marker.scale * MARKER_SCALE
+    meshMarker.scale.y = marker.scale * MARKER_SCALE
+    meshMarker.scale.z = marker.scale * MARKER_SCALE
+    meshMarker.color.r = 1.0
+    meshMarker.color.g = 0.0
+    meshMarker.color.b = 0.0
+    meshMarker.color.a = 1.0
+
+
+    control.markers.append(meshMarker)
+    marker.controls.append(control)
+ 
     control = InteractiveMarkerControl()
     control.orientation.w = 1
     control.orientation.x = 0
@@ -135,7 +126,7 @@ if __name__=='__main__':
 
     server = InteractiveMarkerServer('basic_controls')
 
-    position = Point(0, -3, 0)
+    position = Point(0, 0, 0)
     makeQuadcopterMarker(position)
 
     server.applyChanges()
