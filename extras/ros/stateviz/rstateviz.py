@@ -112,8 +112,6 @@ if __name__=='__main__':
 
     normalizeQuaternion(control.orientation)
 
-    vehicleMarker.controls.append(control)
-
     server.insert(vehicleMarker, processFeedback)
 
     server.applyChanges()
