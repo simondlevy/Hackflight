@@ -201,32 +201,6 @@ def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
     server.insert(int_marker, processFeedback)
     menu_handler.apply( server, int_marker.name )
 
-def makeRandomDofMarker( position ):
-    int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
-    int_marker.pose.position = position
-    int_marker.scale = 1
-
-    int_marker.name = "6dof_random_axes"
-    int_marker.description = "6-DOF\n(Arbitrary Axes)"
-
-    makeBoxControl(int_marker)
-
-    control = InteractiveMarkerControl()
-
-    for i in range(3):
-        control.orientation.w = rand(-1,1)
-        control.orientation.x = rand(-1,1)
-        control.orientation.y = rand(-1,1)
-        control.orientation.z = rand(-1,1)
-        normalizeQuaternion(control.orientation)
-        control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
-        int_marker.controls.append(copy.deepcopy(control))
-        control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
-        int_marker.controls.append(copy.deepcopy(control))
-
-    server.insert(int_marker, processFeedback)
-
 def makeViewFacingMarker(position):
     int_marker = InteractiveMarker()
     int_marker.header.frame_id = "base_link"
@@ -253,92 +227,6 @@ def makeViewFacingMarker(position):
     control.name = "move"
     control.markers.append( makeBox(int_marker) )
     control.always_visible = True
-    int_marker.controls.append(control)
-
-    server.insert(int_marker, processFeedback)
-
-def makeQuadrocopterMarker(position):
-    int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
-    int_marker.pose.position = position
-    int_marker.scale = 1
-
-    int_marker.name = "quadrocopter"
-    int_marker.description = "Quadrocopter"
-
-    makeBoxControl(int_marker)
-
-    control = InteractiveMarkerControl()
-    control.orientation.w = 1
-    control.orientation.x = 0
-    control.orientation.y = 1
-    control.orientation.z = 0
-    normalizeQuaternion(control.orientation)
-    control.interaction_mode = InteractiveMarkerControl.MOVE_ROTATE
-    int_marker.controls.append(copy.deepcopy(control))
-    control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
-    int_marker.controls.append(control)
-
-    server.insert(int_marker, processFeedback)
-
-def makeChessPieceMarker(position):
-    int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
-    int_marker.pose.position = position
-    int_marker.scale = 1
-
-    int_marker.name = "chess_piece"
-    int_marker.description = "Chess Piece\n(2D Move + Alignment)"
-
-    control = InteractiveMarkerControl()
-    control.orientation.w = 1
-    control.orientation.x = 0
-    control.orientation.y = 1
-    control.orientation.z = 0
-    normalizeQuaternion(control.orientation)
-    control.interaction_mode = InteractiveMarkerControl.MOVE_PLANE
-    int_marker.controls.append(copy.deepcopy(control))
-
-    # make a box which also moves in the plane
-    control.markers.append( makeBox(int_marker) )
-    control.always_visible = True
-    int_marker.controls.append(control)
-
-    # we want to use our special callback function
-    server.insert(int_marker, processFeedback)
-
-    # set different callback for POSE_UPDATE feedback
-    server.setCallback(int_marker.name, alignMarker, InteractiveMarkerFeedback.POSE_UPDATE )
-
-def makePanTiltMarker(position):
-    int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
-    int_marker.pose.position = position
-    int_marker.scale = 1
-
-    int_marker.name = "pan_tilt"
-    int_marker.description = "Pan / Tilt"
-
-    makeBoxControl(int_marker)
-
-    control = InteractiveMarkerControl()
-    control.orientation.w = 1
-    control.orientation.x = 0
-    control.orientation.y = 1
-    control.orientation.z = 0
-    normalizeQuaternion(control.orientation)
-    control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
-    control.orientation_mode = InteractiveMarkerControl.FIXED
-    int_marker.controls.append(control)
-
-    control = InteractiveMarkerControl()
-    control.orientation.w = 1
-    control.orientation.x = 0
-    control.orientation.y = 0
-    control.orientation.z = 1
-    normalizeQuaternion(control.orientation)
-    control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
-    control.orientation_mode = InteractiveMarkerControl.INHERIT
     int_marker.controls.append(control)
 
     server.insert(int_marker, processFeedback)
@@ -395,10 +283,11 @@ def makeMovingMarker(position):
 
 
 if __name__=="__main__":
+
     rospy.init_node("basic_controls")
+
     br = TransformBroadcaster()
     
-    # create a timer to update the published transforms
     rospy.Timer(rospy.Duration(0.01), frameCallback)
 
     server = InteractiveMarkerServer("basic_controls")
@@ -408,34 +297,31 @@ if __name__=="__main__":
     sub_menu_handle = menu_handler.insert( "Submenu" )
     menu_handler.insert( "First Entry", parent=sub_menu_handle, callback=processFeedback )
     menu_handler.insert( "Second Entry", parent=sub_menu_handle, callback=processFeedback )
-  
     
     position = Point(-3, 3, 0)
     make6DofMarker( False, InteractiveMarkerControl.NONE, position, True)
+
     position = Point( 0, 3, 0)
     make6DofMarker( True, InteractiveMarkerControl.NONE, position, True)
-    position = Point( 3, 3, 0)
-    makeRandomDofMarker( position )
+
     position = Point(-3, 0, 0)
     make6DofMarker( False, InteractiveMarkerControl.ROTATE_3D, position, False)
+
     position = Point( 0, 0, 0)
     make6DofMarker( False, InteractiveMarkerControl.MOVE_ROTATE_3D, position, True )
+
     position = Point( 3, 0, 0)
     make6DofMarker( False, InteractiveMarkerControl.MOVE_3D, position, False)
+
     position = Point(-3, -3, 0)
     makeViewFacingMarker( position )
-    position = Point( 0, -3, 0)
-    makeQuadrocopterMarker( position )
-    position = Point( 3, -3, 0)
-    makeChessPieceMarker( position )
-    position = Point(-3, -6, 0)
-    makePanTiltMarker( position )
+
     position = Point( 0, -6, 0)
     makeMovingMarker( position )
+
     position = Point( 3, -6, 0)
     makeMenuMarker( position )
     
-
     server.applyChanges()
 
     rospy.spin()
