@@ -27,6 +27,7 @@ NODE_NAME = 'stateviz'
 
 MARKER_COLOR    = 1.0, 0.0, 0.0
 MARKER_RESOURCE = 'package://stateviz/arrowhead.stl'
+MARKER_START    = 0.08, 0.08, 0.
 MARKER_SCALE    = .02
 
 import rospy
@@ -51,16 +52,16 @@ def frameCallback(msg):
     global counter, br, vehicleMarker, vehicleControl
     time = rospy.Time.now()
 
-    cycle = sin(counter/140.0)
+    inc = counter/140.0
 
     roll = 0
     pitch = 0
-    yaw = cycle * pi
+    yaw = inc
     rotation_quaternion = quaternion_from_euler(roll, pitch, yaw)
    
-    x = 0
+    x = 0 #sin(inc) * 2.0
     y = 0
-    z = cycle*2.0
+    z = 0 
     translation = (x, y, z)
 
     vehicleMarker.pose.position.z = z
@@ -92,7 +93,7 @@ if __name__=='__main__':
 
     vehicleMarker = InteractiveMarker()
     vehicleMarker.header.frame_id = 'vehicle_frame'
-    vehicleMarker.pose.position = Point(0,-3,0)
+    vehicleMarker.pose.position = Point(*MARKER_START)
     vehicleMarker.scale = 1
     vehicleMarker.name = 'quadcopter'
     q = quaternion_from_euler(0, 0, 0)
