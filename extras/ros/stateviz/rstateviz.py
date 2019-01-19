@@ -23,7 +23,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-MARKER_SCALE = .01
+MARKER_RESOURCE = "package://stateviz/arrowhead.stl"
+MARKER_SCALE    = .01
 
 import rospy
 import copy
@@ -61,7 +62,7 @@ def makeBox(msg):
 
     #marker.type = Marker.CUBE
     marker.type = Marker.MESH_RESOURCE
-    marker.mesh_resource = "package://stateviz/arrowhead.stl"
+    marker.mesh_resource = MARKER_RESOURCE
     marker.scale.x = msg.scale * MARKER_SCALE
     marker.scale.y = msg.scale * MARKER_SCALE
     marker.scale.z = msg.scale * MARKER_SCALE
