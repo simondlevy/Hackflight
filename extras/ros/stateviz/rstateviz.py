@@ -84,7 +84,6 @@ if __name__=='__main__':
 
     br = TransformBroadcaster()
     
-    # create a timer to update the published transforms
     rospy.Timer(rospy.Duration(0.01), frameCallback)
 
     server = InteractiveMarkerServer(NODE_NAME)
