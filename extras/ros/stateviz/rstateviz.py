@@ -23,6 +23,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
+NODE_NAME = 'stateviz'
+
 MARKER_COLOR    = 1.0, 0.0, 0.0
 MARKER_RESOURCE = 'package://stateviz/arrowhead.stl'
 MARKER_SCALE    = .02
@@ -113,14 +115,14 @@ def makeVehicleMarker(position):
 
 if __name__=='__main__':
 
-    rospy.init_node('basic_controls')
+    rospy.init_node(NODE_NAME)
 
     br = TransformBroadcaster()
     
     # create a timer to update the published transforms
     rospy.Timer(rospy.Duration(0.01), frameCallback)
 
-    server = InteractiveMarkerServer('basic_controls')
+    server = InteractiveMarkerServer(NODE_NAME)
 
     position = Point(0, 0, 0)
     makeVehicleMarker(position)

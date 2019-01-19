@@ -57,7 +57,7 @@ Visualization Manager:
       Show Axes: false
       Show Descriptions: true
       Show Visual Aids: false
-      Update Topic: /basic_controls/update
+      Update Topic: /stateviz/update
       Value: true
   Enabled: true
   Global Options:
