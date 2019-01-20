@@ -44,11 +44,8 @@ from threading import Thread
 
 import msppg
 
-iserver = None
 br = None
 counter = 0
-vehicleMarker = None
-vehicleControl = None
 
 def _errmsg(message):
     sys.stderr.write(message + '\n')
@@ -71,7 +68,7 @@ def normalizeQuaternion(orientation):
 
 def frameCallback(msg):
 
-    global counter, br, vehicleMarker, vehicleControl
+    global counter, br
     time = rospy.Time.now()
 
     inc = counter/140.0
@@ -107,6 +104,10 @@ def threadFunc(cmdargs):
 
     if not cmdargs.randseed is None:
         np.random.seed(int(cmdargs.randseed))
+
+    while True:
+
+        rospy.loginfo('hello')
 
 if __name__=='__main__':
 
