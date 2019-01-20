@@ -44,7 +44,6 @@ from threading import Thread
 from time import sleep
 
 br = None
-counter = 0
 euler = None
 translat = None
 
@@ -93,7 +92,6 @@ def threadFunc(cmdargs):
 
     if not cmdargs.randseed is None:
         np.random.seed(int(cmdargs.randseed))
-
 
     counter = 0
 
