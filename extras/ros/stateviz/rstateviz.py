@@ -41,11 +41,12 @@ import numpy as np
 import sys
 import argparse
 from threading import Thread
-
-import msppg
+from time import sleep
 
 br = None
 counter = 0
+euler = None
+translat = None
 
 def _errmsg(message):
     sys.stderr.write(message + '\n')
@@ -68,24 +69,12 @@ def normalizeQuaternion(orientation):
 
 def frameCallback(msg):
 
-    global counter, br
+    global br, euler, translat
     time = rospy.Time.now()
 
-    inc = counter/140.0
+    rotation = quaternion_from_euler(*euler)
 
-    roll = 0
-    pitch = 0
-    yaw = inc
-    rotation = quaternion_from_euler(roll, pitch, yaw)
-
-    x = np.sin(inc) * 2.0
-    y = 0 
-    z = 0 
-    translation = (x, y, z)
-
-    br.sendTransform(translation, rotation, time, 'vehicle_frame', 'map')                
-
-    counter += 1
+    br.sendTransform(translat, rotation, time, 'vehicle_frame', 'map')                
     
 def processFeedback(feedback):
 
@@ -105,10 +94,30 @@ def threadFunc(cmdargs):
     if not cmdargs.randseed is None:
         np.random.seed(int(cmdargs.randseed))
 
+
+    counter = 0
+
+    global euler, translat
+
     while True:
 
-        rospy.loginfo('hello')
+        inc = counter/140.0
 
+        roll = 0
+        pitch = 0
+        yaw = inc
+
+        euler = (roll, pitch, yaw)
+
+        x = np.sin(inc) * 2.0
+        y = 0 
+        z = 0 
+        translat = (x, y, z)
+
+        counter += 1
+
+        sleep(.01)
+     
 if __name__=='__main__':
 
     parser = _MyArgumentParser(description='Visualize incoming vehicle-state messages.' +
