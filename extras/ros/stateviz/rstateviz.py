@@ -30,6 +30,10 @@ MARKER_RESOURCE = 'package://stateviz/arrowhead.stl'
 MARKER_START    = 0.08, 0.08, 0.
 MARKER_SCALE    = .02
 
+TRANS_X = 0
+TRANS_Y = 0
+ROT_YAW = 0
+
 import rospy
 import copy
 
@@ -47,6 +51,15 @@ counter = 0
 vehicleMarker = None
 vehicleControl = None
 
+def normalizeQuaternion(orientation):
+
+    norm = orientation.x**2 + orientation.y**2 + orientation.z**2 + orientation.w**2
+    s = norm**(-0.5)
+    orientation.x *= s
+    orientation.y *= s
+    orientation.z *= s
+    orientation.w *= s
+
 def frameCallback(msg):
 
     global counter, br, vehicleMarker, vehicleControl
@@ -57,32 +70,20 @@ def frameCallback(msg):
     roll = 0
     pitch = 0
     yaw = inc
-    rotation_quaternion = quaternion_from_euler(roll, pitch, yaw)
-   
-    x = 0 #sin(inc) * 2.0
-    y = 0
+    rotation = quaternion_from_euler(roll, pitch, yaw)
+
+    x = sin(inc) * 2.0
+    y = 0 
     z = 0 
     translation = (x, y, z)
 
-    vehicleMarker.pose.position.z = z
+    br.sendTransform(translation, rotation, time, 'vehicle_frame', 'map')                
 
-    br.sendTransform(translation, rotation_quaternion, time, 'map', 'vehicle_frame')                
     counter += 1
     
-    rospy.loginfo(str(vehicleMarker.pose.position) + '\n')
-
 def processFeedback(feedback):
 
     server.applyChanges()
-
-def normalizeQuaternion(orientation):
-
-    norm = orientation.x**2 + orientation.y**2 + orientation.z**2 + orientation.w**2
-    s = norm**(-0.5)
-    orientation.x *= s
-    orientation.y *= s
-    orientation.z *= s
-    orientation.w *= s
 
 if __name__=='__main__':
 
