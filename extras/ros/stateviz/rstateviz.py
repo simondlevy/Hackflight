@@ -30,10 +30,6 @@ MARKER_RESOURCE = 'package://stateviz/arrowhead.stl'
 MARKER_START    = 0.08, 0.08, 0.
 MARKER_SCALE    = .02
 
-TRANS_X = 0
-TRANS_Y = 0
-ROT_YAW = 0
-
 import rospy
 import copy
 
