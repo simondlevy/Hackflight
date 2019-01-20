@@ -39,9 +39,10 @@ from tf.transformations import quaternion_from_euler
 
 import numpy as np
 import sys
+import argparse
+from threading import Thread
 
 import msppg
-import argparse
 
 iserver = None
 br = None
@@ -93,17 +94,7 @@ def processFeedback(feedback):
 
     server.applyChanges()
 
-if __name__=='__main__':
-
-    parser = _MyArgumentParser(description='Visualize incoming vehicle-state messages.' +
-            'If no options provided, do a random walk.')
-
-    parser.add_argument('-f', '--filename',    help='read state data from file')
-    parser.add_argument('-b', '--bluetooth',   help='read state data from Bluetooth device')
-    parser.add_argument('-s', '--serial',      help='read state data from serial port')
-    parser.add_argument('-r', '--randseed',    help='seed the random number generator')
-
-    cmdargs = parser.parse_args()
+def threadFunc(cmdargs):
 
     if not cmdargs.filename is None:
         pass
@@ -116,6 +107,22 @@ if __name__=='__main__':
 
     if not cmdargs.randseed is None:
         np.random.seed(int(cmdargs.randseed))
+
+if __name__=='__main__':
+
+    parser = _MyArgumentParser(description='Visualize incoming vehicle-state messages.' +
+            'If no options provided, do a random walk.')
+
+    parser.add_argument('-f', '--filename',    help='read state data from file')
+    parser.add_argument('-b', '--bluetooth',   help='read state data from Bluetooth device')
+    parser.add_argument('-s', '--serial',      help='read state data from serial port')
+    parser.add_argument('-r', '--randseed',    help='seed the random number generator')
+
+    cmdargs = parser.parse_args()
+
+    thread = Thread(target=threadFunc, args = (cmdargs,))
+    thread.daemon = True
+    thread.start()
 
     rospy.init_node(NODE_NAME)
     br = TransformBroadcaster()
