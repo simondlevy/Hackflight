@@ -31,21 +31,33 @@ MARKER_START    = 0.08, 0.08, 0.
 MARKER_SCALE    = .02
 
 import rospy
-import copy
-
 from interactive_markers.interactive_marker_server import InteractiveMarkerServer, InteractiveMarker
 from visualization_msgs.msg import Marker, InteractiveMarkerControl
 from geometry_msgs.msg import Point
 from tf.broadcaster import TransformBroadcaster
 from tf.transformations import quaternion_from_euler
 
-from math import sin, pi
+import numpy as np
+import sys
 
-server = None
+import msppg
+import argparse
+
+iserver = None
 br = None
 counter = 0
 vehicleMarker = None
 vehicleControl = None
+
+def _errmsg(message):
+    sys.stderr.write(message + '\n')
+    sys.exit(1)
+
+class _MyArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        sys.stderr.write('error: %s\n' % message)
+        self.print_help()
+        sys.exit(1)
 
 def normalizeQuaternion(orientation):
 
@@ -68,7 +80,7 @@ def frameCallback(msg):
     yaw = inc
     rotation = quaternion_from_euler(roll, pitch, yaw)
 
-    x = sin(inc) * 2.0
+    x = np.sin(inc) * 2.0
     y = 0 
     z = 0 
     translation = (x, y, z)
@@ -82,6 +94,28 @@ def processFeedback(feedback):
     server.applyChanges()
 
 if __name__=='__main__':
+
+    parser = _MyArgumentParser(description='Visualize incoming vehicle-state messages.' +
+            'If no options provided, do a random walk.')
+
+    parser.add_argument('-f', '--filename',    help='read state data from file')
+    parser.add_argument('-b', '--bluetooth',   help='read state data from Bluetooth device')
+    parser.add_argument('-s', '--serial',      help='read state data from serial port')
+    parser.add_argument('-r', '--randseed',    help='seed the random number generator')
+
+    cmdargs = parser.parse_args()
+
+    if not cmdargs.filename is None:
+        pass
+
+    elif not cmdargs.bluetooth is None:
+        pass
+    
+    elif not cmdargs.serial is None:
+        pass
+
+    if not cmdargs.randseed is None:
+        np.random.seed(int(cmdargs.randseed))
 
     rospy.init_node(NODE_NAME)
     br = TransformBroadcaster()
