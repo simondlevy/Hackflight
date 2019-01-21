@@ -92,13 +92,14 @@ def handleRandomWalk(cmdargs):
 
     global euler, translat
 
+    DELAY = .01
+    FORWARD_SPEED = .5
+    YAW_FACTOR = .04
+
     x,y,z = 0,0,0
     yaw = 0
 
-    DELAY = .01
-    SPEED = .5
-
-    s = SPEED * DELAY
+    s = FORWARD_SPEED * DELAY
 
     while True:
 
@@ -109,7 +110,7 @@ def handleRandomWalk(cmdargs):
         z = 0 
         translat = (x, y, z)
 
-        yaw += .01 * np.random.randn()
+        yaw += YAW_FACTOR * np.random.randn()
 
         # Yield to main thread
         sleep(DELAY)
