@@ -79,19 +79,16 @@ def processFeedback(feedback):
 
     server.applyChanges()
 
-def threadFunc(cmdargs):
+def handleFile(cmdargs):
+    return
 
-    if not cmdargs.filename is None:
-        pass
+def handleBluetooth(cmdargs):
+    return
 
-    elif not cmdargs.bluetooth is None:
-        pass
-    
-    elif not cmdargs.serial is None:
-        pass
+def handleSerial(cmdargs):
+    return
 
-    if not cmdargs.randseed is None:
-        np.random.seed(int(cmdargs.randseed))
+def handleRandomWalk(cmdargs):
 
     counter = 0
 
@@ -115,7 +112,23 @@ def threadFunc(cmdargs):
         counter += 1
 
         sleep(.01)
-     
+ 
+def threadFunc(cmdargs):
+
+    if not cmdargs.filename is None:
+        handleFile(cmdargs)
+
+    elif not cmdargs.bluetooth is None:
+        handleBluetooth(cmdargs) 
+
+    elif not cmdargs.serial is None:
+        handleSerial(cmdargs)
+
+    elif not cmdargs.randseed is None:
+        np.random.seed(int(cmdargs.randseed))
+
+    handleRandomWalk(cmdargs) 
+    
 if __name__=='__main__':
 
     parser = _MyArgumentParser(description='Visualize incoming vehicle-state messages.' +
