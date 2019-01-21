@@ -90,28 +90,29 @@ def handleSerial(cmdargs):
 
 def handleRandomWalk(cmdargs):
 
-    counter = 0
-
     global euler, translat
+
+    x,y,z = 0,0,0
+    yaw = 0
+
+    DELAY = .01
+    SPEED = .5
+
+    s = SPEED * DELAY
 
     while True:
 
-        inc = counter/140.0
+        euler = (0, 0, yaw)
 
-        roll = 0
-        pitch = 0
-        yaw = inc
-
-        euler = (roll, pitch, yaw)
-
-        x = np.sin(inc) * 2.0
-        y = 0 
+        x += s * np.cos(yaw)
+        y += s * np.sin(yaw) 
         z = 0 
         translat = (x, y, z)
 
-        counter += 1
+        yaw += .01 * np.random.randn()
 
-        sleep(.01)
+        # Yield to main thread
+        sleep(DELAY)
  
 def threadFunc(cmdargs):
 
