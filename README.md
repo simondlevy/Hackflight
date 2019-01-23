@@ -28,7 +28,7 @@ brushless flight controller (components from from Tlera Corp. and Pesky Products
 
 * Certain [STM32F-based](https://github.com/simondlevy/Hackflight/tree/master/extras/stm32f) flight controllers
 
-* [HackflightSim](https://github.com/simondlevy/HackflightSim) flight simulator based on UnrealEngine4
+* [MulticopterSim](https://github.com/simondlevy/MulticopterSim) flight simulator based on UnrealEngine4
 
 By supporting floating-point operations, these platforms allow us to write simpler code based on standard units:
 
