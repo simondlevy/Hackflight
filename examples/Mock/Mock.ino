@@ -27,8 +27,6 @@
 #include "mixers/quadx.hpp"
 #include "receivers/mock.hpp"
 
-static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
-
 hf::Hackflight h;
 
 hf::MockReceiver rc;

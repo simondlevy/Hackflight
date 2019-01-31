@@ -102,6 +102,8 @@ def handleRandomWalk(cmdargs):
 
     s = LINEAR_SPEED * DELAY
 
+    first = True
+
     while True:
 
         euler = (0, 0, yaw)
@@ -114,7 +116,9 @@ def handleRandomWalk(cmdargs):
         yaw += YAW_FACTOR * np.random.randn()
 
         # Yield to main thread
-        sleep(DELAY)
+        sleep(20 if first else DELAY)
+
+        first = False
  
 def threadFunc(cmdargs):
 
