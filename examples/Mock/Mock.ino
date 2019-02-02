@@ -32,12 +32,14 @@ class RandomWalkHackflight : public hf::Hackflight {
     private:
 
 
-        static constexpr float   SPEED_MPS = 0.2f;        
+        static constexpr float   SPEED_MPS    = 0.2f;        
         static constexpr uint8_t TURN_MAX_DEG = 20;
+        static constexpr float   CLIMB_MAX_M  = 1.0f;
 
         float _prevtime = 0;
         float _x = 0;
         float _y = 0;
+        float _z = 0;
         float _theta = 0;
 
     protected:
@@ -45,15 +47,13 @@ class RandomWalkHackflight : public hf::Hackflight {
         virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 
                 float & heading, float & velocityForward, float & velocityRightward)  override
         {
-            altitude = 0;
+            altitude = _z;
             variometer = 0;
             positionX = _x;
             positionY = _y;
             heading = _theta;
             velocityForward = 0;
             velocityRightward = 0;
-
-            hf::Debug::printf("%+3.3f %+3.3f\n", _x, _y);
 
             // Rotate randomly and move forward
             float currtime = millis() / 1000.f;
@@ -62,6 +62,7 @@ class RandomWalkHackflight : public hf::Hackflight {
                 _prevtime = currtime;
                 _x += s * cos(_theta);
                 _y += s * sin(_theta);
+                _z += random(-1000, +1000) / 1000.f * CLIMB_MAX_M;
                 _theta += radians(random(-TURN_MAX_DEG, +TURN_MAX_DEG));
             }
             _prevtime = currtime;
