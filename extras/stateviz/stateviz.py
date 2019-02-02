@@ -1,8 +1,5 @@
-#!/usr/bin/env python3
 '''
 stateviz.py: State visualizer 
-
-Dependencies: numpy, matplotlib, pyserial, pybluez, https://github.com/simondlevy/PyRoboViz
 
 Copyright (C) 2018 Simon D. Levy
 
@@ -26,10 +23,6 @@ import argparse
 import sys
 import time
 import math
-from roboviz import Visualizer
-
-MAP_SIZE_PIXELS = 800
-MAP_SIZE_METERS = 32
 
 def _errmsg(message):
     sys.stderr.write(message + '\n')
@@ -42,26 +35,6 @@ class _MyArgumentParser(argparse.ArgumentParser):
         sys.exit(1)
 
 _request = msppg.serialize_STATE_Request()
-
-class _MyVisualizer(Visualizer):
-
-    def __init__(self, cmdargs, label, outfile=None):
-
-        zero_angle = float(cmdargs.zero_angle) if not cmdargs.zero_angle is None else 0
-
-        Visualizer.__init__(self, MAP_SIZE_PIXELS, MAP_SIZE_METERS, label, True, zero_angle)
-
-        self.outfile = outfile
-
-    def display(self, x_m, y_m, theta_deg):
-
-        if not self.outfile is None:
-
-            self.outfile.write('%+3.3f %+3.3f %3.3f\n' % (x_m, y_m, theta_deg))
-            self.outfile.flush()
-
-        return Visualizer.display(self, x_m, y_m, theta_deg)
-
 
 class _StateParser(msppg.Parser):
 
@@ -101,12 +74,12 @@ def _open_outfile(cmdargs):
 
     return None if cmdargs.filename is None else open(cmdargs.filename, 'w')
 
-def _handle_infile(cmdargs):
+def _handle_infile(visualizer, cmdargs):
 
     DT_SEC    = .01
 
     # Create a Visualizer object with trajectory
-    viz = _MyVisualizer(cmdargs, 'From file: ' + cmdargs.filename)
+    viz = visualizer(cmdargs, 'From file: ' + cmdargs.filename)
 
     for line in open(cmdargs.filename):
 
@@ -117,7 +90,7 @@ def _handle_infile(cmdargs):
 
         time.sleep(DT_SEC)
 
-def _handle_bluetooth(cmdargs):
+def _handle_bluetooth(visualizer, cmdargs):
 
     try:
         import bluetooth
@@ -127,13 +100,13 @@ def _handle_bluetooth(cmdargs):
     sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
     sock.connect((cmdargs.bluetooth, 1))
 
-    viz = _MyVisualizer(cmdargs, 'From bluetooth: ' + cmdargs.bluetooth, _open_outfile(cmdargs))
+    viz = visualizer(cmdargs, 'From bluetooth: ' + cmdargs.bluetooth, _open_outfile(cmdargs))
 
     parser = _StateParser(sock.recv, sock.send, sock.close, viz)
 
     parser.begin()
 
-def _handle_serial(cmdargs):
+def _handle_serial(visualizer, cmdargs):
 
     try:
         import serial
@@ -142,13 +115,13 @@ def _handle_serial(cmdargs):
 
     port = serial.Serial(cmdargs.serial, 115200)
 
-    viz = _MyVisualizer(cmdargs, 'From serial: ' + cmdargs.serial, _open_outfile(cmdargs))
+    viz = visualizer(cmdargs, 'From serial: ' + cmdargs.serial, _open_outfile(cmdargs))
 
     parser = _StateParser(port.read, port.write, port.close, viz)
 
     parser.begin()
 
-if __name__ == '__main__':
+def main(visualizer):
 
     parser = _MyArgumentParser(description='Visualize incoming vehicle-state messages.')
 
@@ -165,12 +138,12 @@ if __name__ == '__main__':
 
     # Filename only; read it
     if cmdargs.serial is None and cmdargs.bluetooth is None and not cmdargs.filename is None:
-        _handle_infile(cmdargs)
+        _handle_infile(visualizer, cmdargs)
 
     # Bluetooth
     if not cmdargs.bluetooth is None:
-        _handle_bluetooth(cmdargs)
+        _handle_bluetooth(visualizer, cmdargs)
     
     # Serial
     if not cmdargs.serial is None:
-        _handle_serial(cmdargs)
+        _handle_serial(visualizer, cmdargs)

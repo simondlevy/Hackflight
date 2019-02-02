@@ -1,1 +1,1 @@
-rosrun stateviz rstateviz.py -s 0 & rosrun rviz rviz -d quadstate.rviz
+rosrun stateviz rstateviz.py & rosrun rviz rviz -d quadstate.rviz

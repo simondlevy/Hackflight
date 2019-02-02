@@ -79,7 +79,8 @@ def processFeedback(feedback):
 
     server.applyChanges()
 
-def handleFile(cmdargs):
+
+def handleInfile(cmdargs):
     return
 
 def handleBluetooth(cmdargs):
@@ -88,54 +89,20 @@ def handleBluetooth(cmdargs):
 def handleSerial(cmdargs):
     return
 
-def handleRandomWalk(cmdargs):
-
-    global euler, translat
-
-    DELAY = .01
-    LINEAR_SPEED = .5
-    YAW_FACTOR = .06
-    CLIMB_FACTOR = .005
-
-    x,y,z = 0,0,0
-    yaw = 0
-
-    s = LINEAR_SPEED * DELAY
-
-    first = True
-
-    while True:
-
-        euler = (0, 0, yaw)
-
-        x += s * np.cos(yaw)
-        y += s * np.sin(yaw) 
-        z += CLIMB_FACTOR * np.random.randn()
-        translat = (x, y, z)
-
-        yaw += YAW_FACTOR * np.random.randn()
-
-        # Yield to main thread
-        sleep(20 if first else DELAY)
-
-        first = False
- 
 def threadFunc(cmdargs):
 
-    if not cmdargs.filename is None:
-        handleFile(cmdargs)
+    # Filename only; read it
+    if cmdargs.serial is None and cmdargs.bluetooth is None and not cmdargs.filename is None:
+        handleInfile(cmdargs)
 
-    elif not cmdargs.bluetooth is None:
-        handleBluetooth(cmdargs) 
-
-    elif not cmdargs.serial is None:
-        handleSerial(cmdargs)
-
-    elif not cmdargs.randseed is None:
-        np.random.seed(int(cmdargs.randseed))
-
-    handleRandomWalk(cmdargs) 
+    # Bluetooth
+    if not cmdargs.bluetooth is None:
+        handleBluetooth(cmdargs)
     
+    # Serial
+    if not cmdargs.serial is None:
+        handleSerial(cmdargs)    if not cmdargs.filename is None:
+
 if __name__=='__main__':
 
     parser = _MyArgumentParser(description='Visualize incoming vehicle-state messages.' +
@@ -144,7 +111,6 @@ if __name__=='__main__':
     parser.add_argument('-f', '--filename',    help='read state data from file')
     parser.add_argument('-b', '--bluetooth',   help='read state data from Bluetooth device')
     parser.add_argument('-s', '--serial',      help='read state data from serial port')
-    parser.add_argument('-r', '--randseed',    help='seed the random number generator')
 
     cmdargs = parser.parse_args()
 
