@@ -58,6 +58,7 @@ class RandomWalkHackflight : public hf::Hackflight {
             // Rotate randomly and move forward
             float currtime = millis() / 1000.f;
             if (_prevtime > 0) {
+
                 float s = SPEED_MPS * (currtime - _prevtime);
                 _prevtime = currtime;
                 _x += s * cos(_theta);
