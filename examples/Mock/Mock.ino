@@ -32,7 +32,8 @@ class RandomWalkHackflight : public hf::Hackflight {
     private:
 
 
-        static constexpr float SPEED_MPS = 0.1f;        
+        static constexpr float   SPEED_MPS = 0.2f;        
+        static constexpr uint8_t TURN_MAX_DEG = 20;
 
         float _prevtime = 0;
         float _x = 0;
@@ -56,11 +57,13 @@ class RandomWalkHackflight : public hf::Hackflight {
 
             // Rotate randomly and move forward
             float currtime = millis() / 1000.f;
-            float s = SPEED_MPS * (currtime - _prevtime);
-            _prevtime = currtime;
-            _x += s * cos(_theta);
-            _y += s * sin(_theta);
-            _theta += radians(random(-10, +10));
+            if (_prevtime > 0) {
+                float s = SPEED_MPS * (currtime - _prevtime);
+                _prevtime = currtime;
+                _x += s * cos(_theta);
+                _y += s * sin(_theta);
+                _theta += radians(random(-TURN_MAX_DEG, +TURN_MAX_DEG));
+            }
             _prevtime = currtime;
         }
 };
