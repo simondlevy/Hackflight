@@ -21,13 +21,13 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 '''
 
-from roboviz import Visualizer
-from stateviz import main
+from  roboviz import Visualizer
+import stateviz
 
 MAP_SIZE_PIXELS = 800
 MAP_SIZE_METERS = 32
 
-class _MyVisualizer(Visualizer):
+class TwoDVisualizer(Visualizer):
 
     def __init__(self, cmdargs, label, outfile=None):
 
@@ -37,7 +37,7 @@ class _MyVisualizer(Visualizer):
 
         self.outfile = outfile
 
-    def display(self, x_m, y_m, theta_deg):
+    def display(self, x_m, y_m, z_m, theta_deg):
 
         if not self.outfile is None:
 
@@ -46,4 +46,4 @@ class _MyVisualizer(Visualizer):
 
         return Visualizer.display(self, x_m, y_m, theta_deg)
 
-main(_MyVisualizer)
+stateviz.run(TwoDVisualizer)

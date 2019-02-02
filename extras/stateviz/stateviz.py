@@ -46,7 +46,7 @@ class _StateParser(msppg.Parser):
         self.writefun = writefun
         self.closefun = closefun
 
-        # Create a Visualizer object with trajectory
+        # Visualizer object should provide a display() method
         self.viz = visualizer
 
     def handle_STATE(self, altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
@@ -121,7 +121,7 @@ def _handle_serial(visualizer, cmdargs):
 
     parser.begin()
 
-def main(visualizer):
+def run(visualizer):
 
     parser = _MyArgumentParser(description='Visualize incoming vehicle-state messages.')
 
