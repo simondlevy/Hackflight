@@ -27,7 +27,22 @@
 #include "mixers/quadx.hpp"
 #include "receivers/mock.hpp"
 
-hf::Hackflight h;
+class RandomWalkHackflight : public hf::Hackflight {
+
+    virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 
+            float & heading, float & velocityForward, float & velocityRightward)  override
+    {
+        altitude = 0;
+        variometer = 0;
+        positionX = 0;
+        positionY = 0;
+        heading = 0;
+        velocityForward = 0;
+        velocityRightward = 0;
+    }
+};
+
+RandomWalkHackflight h;
 
 hf::MockReceiver rc;
 

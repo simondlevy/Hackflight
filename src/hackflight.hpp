@@ -248,14 +248,14 @@ namespace hf {
             virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 
                     float & heading, float & velocityForward, float & velocityRightward) 
             {
-                // XXX mock up some values for now
-                altitude = 1;
-                variometer = 2;
-                positionX = 3;
-                positionY = 4;
+                // XXX Use only heading for now
+                altitude = 0;
+                variometer = 0;
+                positionX = 0;
+                positionY = 0;
                 heading = -_state.eulerAngles[AXIS_YAW]; // NB: Angle negated for remote visualization
-                velocityForward = 6;
-                velocityRightward = 7;
+                velocityForward = 0;
+                velocityRightward = 0;
             }
  
             virtual void handle_SET_ARMED(uint8_t  flag)
