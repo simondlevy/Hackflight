@@ -60,7 +60,7 @@ class RandomWalkHackflight : public hf::Hackflight {
             _prevtime = currtime;
             _x += s * cos(_theta);
             _y += s * sin(_theta);
-            //pose[2] += 10 * np.random.randn();
+            _theta += radians(random(-10, +10));
             _prevtime = currtime;
         }
 };
