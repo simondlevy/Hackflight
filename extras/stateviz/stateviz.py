@@ -66,7 +66,7 @@ class _StateParser(msppg.Parser):
 
     def handle_STATE(self, altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward):
 
-        self.viz.display(0, 0, math.degrees(heading))
+        self.viz.display(positionX, positionY, math.degrees(heading))
 
         self.writefun(_request)
 

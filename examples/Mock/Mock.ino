@@ -29,17 +29,40 @@
 
 class RandomWalkHackflight : public hf::Hackflight {
 
-    virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 
-            float & heading, float & velocityForward, float & velocityRightward)  override
-    {
-        altitude = 0;
-        variometer = 0;
-        positionX = 0;
-        positionY = 0;
-        heading = 0;
-        velocityForward = 0;
-        velocityRightward = 0;
-    }
+    private:
+
+
+        static constexpr float SPEED_MPS = 0.1f;        
+
+        float _prevtime = 0;
+        float _x = 0;
+        float _y = 0;
+        float _theta = 0;
+
+    protected:
+
+        virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 
+                float & heading, float & velocityForward, float & velocityRightward)  override
+        {
+            altitude = 0;
+            variometer = 0;
+            positionX = _x;
+            positionY = _y;
+            heading = _theta;
+            velocityForward = 0;
+            velocityRightward = 0;
+
+            hf::Debug::printf("%+3.3f %+3.3f\n", _x, _y);
+
+            // Rotate randomly and move forward
+            float currtime = millis() / 1000.f;
+            float s = SPEED_MPS * (currtime - _prevtime);
+            _prevtime = currtime;
+            _x += s * cos(_theta);
+            _y += s * sin(_theta);
+            //pose[2] += 10 * np.random.randn();
+            _prevtime = currtime;
+        }
 };
 
 RandomWalkHackflight h;
