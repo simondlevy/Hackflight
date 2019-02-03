@@ -98,14 +98,16 @@ class ThreeDVisualizer(object):
 
         global euler, translat
 
-        euler = (0,0,theta_deg)
+        euler = (0, 0, np.radians(theta_deg))
 
-        translat = (x_m, y_m, z_m)
+        translat = tuple(v/10. for v in (x_m,y_m,z_m))
 
         if not self.outfile is None:
 
             self.outfile.write('%+3.3f %+3.3f %3.3f\n' % (x_m, y_m, theta_deg))
             self.outfile.flush()
+
+        return True
 
 def threadFunc():
 
