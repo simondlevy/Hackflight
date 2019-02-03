@@ -70,9 +70,11 @@ def normalizeQuaternion(orientation):
 
 def frameCallback(msg):
 
-    return
-
     global br, euler, translat
+
+    if euler is None or translat is None:
+        return
+
     time = rospy.Time.now()
 
     rotation = quaternion_from_euler(*euler)
@@ -94,13 +96,16 @@ class ThreeDVisualizer(object):
 
     def display(self, x_m, y_m, z_m, theta_deg):
 
-        print(x_m, y_m, z_m, theta_deg)
+        global euler, translat
+
+        euler = (0,0,theta_deg)
+
+        translat = (x_m, y_m, z_m)
 
         if not self.outfile is None:
 
             self.outfile.write('%+3.3f %+3.3f %3.3f\n' % (x_m, y_m, theta_deg))
             self.outfile.flush()
-
 
 def threadFunc():
 
