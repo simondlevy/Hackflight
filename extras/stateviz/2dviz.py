@@ -41,9 +41,11 @@ class TwoDVisualizer(Visualizer):
 
         if not self.outfile is None:
 
-            self.outfile.write('%+3.3f %+3.3f %3.3f\n' % (x_m, y_m, theta_deg))
+            self.outfile.write('%+3.3f %+3.3f %+3.3f %3.3f\n' % (altitude, x_m, y_m, theta_deg))
             self.outfile.flush()
 
+        # Ignore altitude for 2D display
         return Visualizer.display(self, x_m, y_m, theta_deg)
 
+# We pass the class, rather than an instance, because Stateviz.run() will create the instance for us
 stateviz.run(TwoDVisualizer)

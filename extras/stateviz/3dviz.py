@@ -70,6 +70,8 @@ def normalizeQuaternion(orientation):
 
 def frameCallback(msg):
 
+    return
+
     global br, euler, translat
     time = rospy.Time.now()
 
@@ -81,18 +83,29 @@ def processFeedback(feedback):
 
     server.applyChanges()
 
+class ThreeDVisualizer(object):
+    '''
+    Methods are called automatically by Stateviz.run()
+    '''
+
+    def __init__(self, cmdargs, label, outfile=None):
+
+        self.outfile = outfile
+
+    def display(self, x_m, y_m, z_m, theta_deg):
+
+        print(x_m, y_m, z_m, theta_deg)
+
+        if not self.outfile is None:
+
+            self.outfile.write('%+3.3f %+3.3f %3.3f\n' % (x_m, y_m, theta_deg))
+            self.outfile.flush()
+
+
 def threadFunc():
 
-    global euler, translat
-
-    euler = [0,0,0]
-    translat = [0,0,0]
-
-    while True:
-
-        euler[2] += .01
-
-        sleep(.01)
+    # We pass the class, rather than an instance, because Stateviz.run() will create the instance for us
+    stateviz.run(ThreeDVisualizer)
 
 if __name__=='__main__':
 
