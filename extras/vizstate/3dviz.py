@@ -105,7 +105,10 @@ class ThreeDVisualizer(object):
 
         euler = (0, 0, np.radians(theta_deg))
 
-        translat = tuple(v/10. for v in (x_m,y_m,z_m))
+        #translat = tuple(v/10. for v in (x_m,y_m,z_m))
+        translat = tuple(v for v in (x_m,y_m,z_m))
+ 
+        print(translat)
 
         if not self.outfile is None:
 
