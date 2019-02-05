@@ -55,19 +55,23 @@ class RandomWalkHackflight : public hf::Hackflight {
             velocityForward = 0;
             velocityRightward = 0;
 
-            // Rotate randomly and move forward
             float currtime = millis() / 1000.f;
-            hf::Debug::printf("%f\n", currtime);
             float dt = currtime - _prevtime;
-            if (dt > .01) {
-                float s = SPEED_MPS * dt;
-                _prevtime = currtime;
-                _x += s * cos(_theta);
-                _y += s * sin(_theta);
-                _z += random(-1000, +1000) / 1000.f * CLIMB_MAX_M;
-                _theta += radians(random(-TURN_MAX_DEG, +TURN_MAX_DEG));
-                _prevtime = currtime;
+
+            if (dt > 1.0) {
+                _x = 0;
+                _y = 0;
+                _theta = 0;
             }
+
+            float s = SPEED_MPS * dt;
+            _prevtime = currtime;
+            _x += s * cos(_theta);
+            _y += s * sin(_theta);
+            _z += random(-1000, +1000) / 1000.f * CLIMB_MAX_M;
+            _theta += radians(random(-TURN_MAX_DEG, +TURN_MAX_DEG));
+
+            _prevtime = currtime;
         }
 };
 

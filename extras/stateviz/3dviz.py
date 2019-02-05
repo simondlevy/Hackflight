@@ -1,5 +1,11 @@
+#!/usr/bin/env python
 '''
 3dviz.py: ROS rviz script for visualizing quadcopter state in 3D space
+
+You should run this with a shell script:
+
+    % ./fileviz.sh
+    % ./blueviz.sh
 
 Copyright (C) 2018 Simon D. Levy
 
