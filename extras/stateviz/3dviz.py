@@ -44,12 +44,11 @@ from tf.transformations import quaternion_from_euler
 
 import numpy as np
 import sys
-import argparse
 from threading import Thread
-from time import sleep
 
 import stateviz
 
+# Globals
 br = None
 euler = None
 translat = None
@@ -57,12 +56,6 @@ translat = None
 def _errmsg(message):
     sys.stderr.write(message + '\n')
     sys.exit(1)
-
-class _MyArgumentParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write('error: %s\n' % message)
-        self.print_help()
-        sys.exit(1)
 
 def normalizeQuaternion(orientation):
 
@@ -80,12 +73,8 @@ def frameCallback(msg):
     if euler is None or translat is None:
         return
 
-    time = rospy.Time.now()
+    br.sendTransform(translat, quaternion_from_euler(*euler), rospy.Time.now(), 'vehicle_frame', 'map')                
 
-    rotation = quaternion_from_euler(*euler)
-
-    br.sendTransform(translat, rotation, time, 'vehicle_frame', 'map')                
-    
 def processFeedback(feedback):
 
     server.applyChanges()
@@ -105,11 +94,8 @@ class ThreeDVisualizer(object):
 
         euler = (0, 0, np.radians(theta_deg))
 
-        #translat = tuple(v/10. for v in (x_m,y_m,z_m))
-        translat = tuple(v for v in (x_m,y_m,z_m))
+        translat = tuple(v/10. for v in (x_m,y_m,z_m))
  
-        print(translat)
-
         if not self.outfile is None:
 
             self.outfile.write('%+3.3f %+3.3f %3.3f\n' % (x_m, y_m, theta_deg))
@@ -123,6 +109,8 @@ def threadFunc():
     stateviz.run(ThreeDVisualizer)
 
 if __name__=='__main__':
+
+    global callbackTime
 
     thread = Thread(target=threadFunc)
     thread.daemon = True
@@ -162,4 +150,8 @@ if __name__=='__main__':
 
     server.applyChanges()
 
-    rospy.spin()
+    #rospy.spin()
+
+    while not rospy.core.is_shutdown():
+        print('*********************')
+        rospy.rostime.wallsleep(0.5)
