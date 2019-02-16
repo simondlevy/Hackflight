@@ -41,7 +41,6 @@ namespace hf {
             float _windupMax;
 
             // Values modified in-flight
-            float deltaT;
             float _posTarget;
             bool  _inBandPrev;
             float _lastError;
