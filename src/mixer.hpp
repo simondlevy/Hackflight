@@ -22,8 +22,6 @@
 
 #include "filters.hpp"
 
-#include <cstring>
-
 namespace hf {
 
     class Mixer {

@@ -20,9 +20,6 @@
 
 #pragma once
 
-#include <cstring>
-#include <algorithm>
-#include <cmath>
 #include <stdint.h>
 
 #include "datatypes.hpp"
@@ -130,7 +127,9 @@ namespace hf {
 
         Receiver(const uint8_t channelMap[6]) // throttle, roll, pitch, yaw, aux, arm
         { 
-            memcpy(_channelMap, channelMap, 6);
+            for (uint8_t k=0; k<6; ++k) {
+                _channelMap[k] = channelMap[k];
+            }
 
             _trimRoll  = 0;
             _trimPitch = 0;

@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 typedef struct {
 
     float throttle;
