@@ -20,9 +20,6 @@
 
 #pragma once
 
-#include <cstring>
-#include <algorithm>
-#include <cmath>
 #include <stdint.h>
 
 #include "datatypes.hpp"

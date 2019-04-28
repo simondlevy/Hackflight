@@ -20,12 +20,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <cstring>
-#include <algorithm>
-#include <limits>
-#include <cmath>
-
 #include "receiver.hpp"
 #include "filters.hpp"
 #include "debug.hpp"
@@ -206,7 +200,7 @@ namespace hf {
             void updateReceiver(demands_t & demands, bool throttleIsDown)
             {
                 // Compute proportion of cyclic demand compared to its maximum
-                _proportionalCyclicDemand = Filter::max(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
+                _proportionalCyclicDemand = max(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
                 
                 // When landed, reset integral component of PID
                 if (throttleIsDown) {

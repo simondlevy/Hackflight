@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <cmath>
 #include <math.h>
 #include <stdint.h>
 
@@ -31,11 +30,6 @@ namespace hf {
         public:
 
             // Simple static functions
-
-            static float max(float a, float b)
-            {
-                return a > b ? a : b;
-            }
 
             static float complementary(float a, float b, float c)
             {

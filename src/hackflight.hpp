@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <cmath>
-
 #include "sensor.hpp"
 #include "board.hpp"
 #include "mspparser.hpp"

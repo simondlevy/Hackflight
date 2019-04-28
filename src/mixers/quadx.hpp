@@ -25,8 +25,6 @@
 #include "mixer.hpp"
 #include "datatypes.hpp"
 
-#include <cstring>
-
 namespace hf {
 
     class MixerQuadX : public Mixer {
