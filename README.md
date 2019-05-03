@@ -200,9 +200,8 @@ to ensure that your PID controller is called in the
 The <tt>addPidController()</tt> method requires you to to specify the auxiliary-switch state in which the specified PID controller will be active.
 For example, you can specify that a Level PID controller will be active in switch state 1 (or higher) and an
 [AltitudeHold](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/althold.hpp)
-PID controller will be active in switch state 2, as we've
-[done](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_AltHold/DSMX_AltHold.ino#L99-L103) in the previously-cited
-example sketch. 
+PID controller will be active in switch state 2, as we've done in the previously-cited
+[example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_AltHold/DSMX_AltHold.ino#L99-L103).
 
 <p align="center"> 
 <img src="extras/media/pidcontrollers2.png" width=400>
