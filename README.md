@@ -222,9 +222,9 @@ description of each member of the Board class hierarchy:
 
 * <b>RealBoard</b>: Ancestor class for real (physical) boards
 
-* <b><i>SimulatedBoard</i></b>: Anything other than a real board; for example, the Board
-[subclass](https://github.com/simondlevy/HackflightSim/blob/master/Source/HackflightSim/HackflightSimPawn.h) used in
-[HackflightSim](https://github.com/simondlevy/HackflightSim)
+* <b><i>SimulatedBoard</i></b>: Anything other than a real board; for example, the 
+[SimBoard](https://github.com/simondlevy/MulticopterSim/blob/hackflight/Source/MulticopterSim/hackflight/SimBoard.h) 
+class used in [MulticopterSim](https://github.com/simondlevy/MulticopterSim/tree/hackflight)
 
 * <b>ArduinoBoard</b>: Ancestor class for Arduino-compatible boards
 
