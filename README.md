@@ -149,7 +149,7 @@ that any sensor must implement: (1) reporting whether the sensor is ready to
 deliver new data; (2) modifying the vehicle state.  By requiring each sensor to
 report its readiness, we can avoid the need to write a separate timing loop for
 each sensor in the main [loop
-code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L344-L355). 
+code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L348-L359). 
 
 Many popular STM32F-based flight-control boards come with extra UARTs (serial
 ports) but lack ports for sensor
@@ -174,7 +174,7 @@ To implement additional sensors, you can directly sub-class the Sensor class, as
 class that we use to support the
 [VL53L1](https://www.tindie.com/products/onehorse/vl53l1-long-range-proximity-sensor/) time-of-flight rangefinder 
 in an 
-[example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_VL53L1X/DSMX_VL53L1X.ino).  Once 
+[example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_AltHold/DSMX_AltHold.ino).  Once 
 you've implemented the sub-class(es) for a new sensor, you can call  <tt>Hackflight::addSensor()</tt> to ensure that the sensor
 code will be called by the [checkOptionalSensors](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L215-L223) method.
 
@@ -202,7 +202,7 @@ The <tt>addPidController()</tt> method requires you to to specify the auxiliary-
 For example, you can specify that a Level PID controller will be active in switch state 1 (or higher) and an
 [AltitudeHold](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/althold.hpp)
 PID controller will be active in switch state 2, as we've
-[done](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_VL53L1X/DSMX_VL53L1X.ino#L99-L103) in the previously-cited
+[done](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_AltHold/DSMX_AltHold.ino#L99-L103) in the previously-cited
 example sketch. 
 
 <p align="center"> 
