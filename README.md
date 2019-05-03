@@ -165,7 +165,6 @@ long-range proximity sensor and [PMW3901](https://www.tindie.com/products/onehor
 optical-flow sensor (both from Pesky Products). Flashing this Arduino
 [sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Butterfly/LoiterBoard/LoiterBoard.ino)
 onto the Butterfly board will cause the board to output 
-[SET\_RANGE\_AND\_FLOW](https://github.com/simondlevy/Hackflight/blob/master/extras/parser/messages.json#L50-L54)
 messages to your flight controller's UART on the green wire (with the red and black wires providing power to the
 Butterfly from your flight controller).
 
@@ -185,7 +184,7 @@ code will be called by the [checkOptionalSensors](https://github.com/simondlevy/
 ### PID Controllers
 
 Like sensors, PID controllers in Hackflight are subclasses of an abstract
-[PID Controller](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp#L27-L39) class, 
+[class](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp#L27-L39), 
 whose <tt>modifyDemands()</tt> method takes the current state and demands, and modifies the demands based on the
 state.  (This class also provides an optional <tt>shouldFlashLed()</tt> method, to help you see when the PID
 controller is active.)  The Hackflight class [init](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L287) method
