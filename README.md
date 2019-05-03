@@ -124,30 +124,35 @@ we find it convenient to treat the quaternion as a sensor reading.  For
 inertial measurement units (IMUs) like the MPU9250 that do not deliver a
 hardware quaternion, Hackflight provides a
 [QuaternionFilter](https://github.com/simondlevy/Hackflight/blob/master/src/filters.hpp#L105-L123)
-class that can be used to compute the quaternion on your microcontroller.
+class that can be used to compute the quaternion using your microcontroller.
 
 If you're mathematically-minded, you can think of a sensor as a function from states to states:
 <i>Sensor</i>: <i>State</i> &rarr; <i>State</i>
 
 To provide access to other popular surface-mount sensors that you may wish to read, Hackflight also has classes to support
-[accelerometers](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/accelerometer.hpp), 
-[magnetometers](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/magnetometer.hpp), and 
-[barometers](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/barometer.hpp).  Together with the
-[quaternion](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/quaternion.hpp) and 
-[gyrometer](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/gyrometer.hpp), these are all sub-classes 
-of the [SurfaceMountSensor](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/surfacemount.hpp)
-class, which is in turn a sub-class of the 
+[accelerometers](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/surfacemount/accelerometer.hpp), 
+[magnetometers](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/surfacemount/magnetometer.hpp), and 
+[barometers](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/surfacemount/barometer.hpp).
+Together with the
+[quaternion](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/surfacemount/quaternion.hpp)
+and
+[gyrometer](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/surfacemount/gyrometer.hpp),
+these are all sub-classes of the
+[SurfaceMountSensor](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/surfacemount.hpp)
+class, which is in turn a sub-class of the
 [Sensor](https://github.com/simondlevy/Hackflight/blob/master/src/sensor.hpp#L27-L37)
-class.  Each surface-mount sensor accesses the appropriate virtual method of the 
-[Board](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp) class 
-(<tt>getQuaternion()</tt>, <tt>getGyrometer()</tt>, ...).
-The Sensor class is an abstract (virtual) class (a.k.a. interface) specifying two methods that any sensor
-must implement: (1) reporting whether the sensor is ready to deliver new data;
-(2) modifying the vehicle state.  By requiring each sensor to report its
-readiness, we can avoid the need to write a separate timing loop for each
-sensor in the main [loop code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L344-L355). 
+class.  Each surface-mount sensor accesses the appropriate virtual method of
+the [Board](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp)
+class (<tt>getQuaternion()</tt>, <tt>getGyrometer()</tt>, ...).  The Sensor
+class is an abstract (virtual) class (a.k.a. interface) specifying two methods
+that any sensor must implement: (1) reporting whether the sensor is ready to
+deliver new data; (2) modifying the vehicle state.  By requiring each sensor to
+report its readiness, we can avoid the need to write a separate timing loop for
+each sensor in the main [loop
+code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L344-L355). 
 
-Many popular STM32F-based flight-control boards come with extra UARTs (serial ports) but lack ports for sensor
+Many popular STM32F-based flight-control boards come with extra UARTs (serial
+ports) but lack ports for sensor
 signals like I<sup>2</sup>C or SPI.  For this reason, , Hackflight also
 provides an abstract
 [class](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/mspsensor.hpp)
