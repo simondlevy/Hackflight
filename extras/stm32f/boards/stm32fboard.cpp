@@ -62,9 +62,9 @@ extern "C" {
         systemResetToBootloader();
     }
 
-    bool Stm32FBoard::getQuaternion(float quat[4])
+    bool Stm32FBoard::getQuaternion(float & qw, float & qx, float & qy, float & qz)
     {
-        return SoftwareQuaternionBoard::getQuaternion(quat, getTime());
+        return SoftwareQuaternionBoard::getQuaternion(qw, qx, qy, qz, getTime());
     }
 
     bool Stm32FBoard::getGyrometer(float gyroRates[3])

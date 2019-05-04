@@ -87,7 +87,7 @@ namespace hf {
                 return false;
             }
 
-            bool getQuaternion(float quat[4], float time)
+            bool getQuaternion(float & qw, float & qx, float & qy, float & qz, float time)
             {
                 // Update quaternion after some number of IMU readings
                 _quatCycleCount = (_quatCycleCount + 1) % QUATERNION_DIVISOR;
@@ -103,10 +103,10 @@ namespace hf {
                     _quaternionFilter.update(_ax, _ay, _az, _gx, _gy, _gz, deltat); 
 
                     // Copy the quaternion back out
-                    quat[0] = _quaternionFilter.q1;
-                    quat[1] = _quaternionFilter.q2;
-                    quat[2] = _quaternionFilter.q3;
-                    quat[3] = _quaternionFilter.q4;
+                    qw = _quaternionFilter.q1;
+                    qx = _quaternionFilter.q2;
+                    qy = _quaternionFilter.q3;
+                    qz = _quaternionFilter.q4;
 
                     return true;
                 }

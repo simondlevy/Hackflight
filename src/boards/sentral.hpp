@@ -80,18 +80,11 @@ namespace hf {
                 return false;
             }
 
-            bool getQuaternion(float quat[4])
+            bool getQuaternion(float & qw, float & qx, float & qy, float & qz)
             {
                 if (_sentral.gotQuaternion()) {
 
-                    static float qw, qx, qy, qz;
-
                     _sentral.readQuaternion(qw, qx, qy, qz);
-
-                    quat[0] = qw;
-                    quat[1] = qx;
-                    quat[2] = qy;
-                    quat[3] = qz;
 
                     return true;
                 }
