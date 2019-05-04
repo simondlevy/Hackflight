@@ -1,7 +1,7 @@
 ##############################################################################
-#   Makefile for OpenPilot CC3D Revolution board
+#   Makefile for FuryF4 board
 #
-#   Copyright (c) 2018 Simon D. Levy
+#   Copyright (c) 2019 Simon D. Levy
 #
 #   This file is part of Hackflight.
 #
@@ -22,7 +22,7 @@
 #
 
 # The target to build, see VALID_TARGETS below
-TARGET    ?= REVO
+TARGET    ?= FURYF4
 
 # Where you put Cleanflight
 CF_DIR := $(HOME)/Desktop/cleanflight
@@ -89,7 +89,6 @@ LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
 HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
 IMU_DIR         := $(ARDUINO_DIR)/MPU/src
-RX_DIR          := $(ARDUINO_DIR)/DSMRX/src
 SPI_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
 INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR) ../../boards
 LINKER_DIR      := $(SRC_DIR)/target/link
@@ -868,14 +867,13 @@ LD_FLAGS     = -lm \
 endif
 
 # Hackflight support
-BOARD := revo
+BOARD := furyf4
 BOARD_DIR := ../../boards/$(BOARD)
 INCLUDE_DIRS += $(BOARD_DIR)
 IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6000.cpp
-RX_SRC := $(RX_DIR)/DSMRX.cpp
-HF_SRC := ../../common/main.c ../../common/dsmx.cpp ../../common/spi.cpp ../../boards/stm32fboard.cpp
+HF_SRC := ../../common/main.c ../../common/spi.cpp ../../boards/stm32fboard.cpp
 BOARD_SRC := $(BOARD_DIR)/$(BOARD).cpp  
-SKETCH_SRC := ./revo_dsmx.cpp
+SKETCH_SRC := ./furyf4_mock.cpp
 SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(BOARD_SRC) $(SKETCH_SRC)
 
 
@@ -1107,7 +1105,3 @@ $(TARGET_OBJS) : Makefile
 
 listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
-
-commit:
-	git commit -a -m="More Revo progress"
-	git push

@@ -1,7 +1,7 @@
 /*
-   Sketch for OpenPilot Revolution board with Spektrum DSMX receiver
+   Sketch for FURYF4 board with mock receiver
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2019 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -21,10 +21,7 @@
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
 #include <receivers/mock.hpp>
-#include "pidcontrollers/level.hpp"
-#include "revo.h"
-
-constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+#include "furyf4.h"
 
 static hf::Hackflight h;
 
@@ -32,11 +29,8 @@ extern "C" {
 
 #include "time.h"
 
-#include "../../common/dsmx.h"
-
     void setup(void)
     {
-         
         hf::Rate * ratePid = new hf::Rate(
                 0.05f, // Gyro cyclic P
                 0.00f, // Gyro cyclic I
@@ -45,17 +39,9 @@ extern "C" {
                 0.01f, // Gyro yaw I
                 8.58); // Demands to rate
 
-        hf::Level * level = new hf::Level(0.2f);
-
-        //DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_3, CHANNEL_MAP);
-        DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_1, CHANNEL_MAP);
-        //hf::MockReceiver * rc = new hf::MockReceiver();
-
-        // Add Level PID for aux switch position 1
         h.addPidController(level, 1);
 
-        // Initialize Hackflight firmware
-        h.init(new Revo(), rc, new hf::MixerQuadX(), ratePid);
+        h.init(new FuryF4(), new hf::MockReceiver(), new hf::MixerQuadX(), ratePid);
     }
 
     void loop(void)
