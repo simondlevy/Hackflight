@@ -67,9 +67,9 @@ extern "C" {
         return SoftwareQuaternionBoard::getQuaternion(qw, qx, qy, qz, getTime());
     }
 
-    bool Stm32FBoard::getGyrometer(float gyroRates[3])
+    bool Stm32FBoard::getGyrometer(float & gx, float & gy, float & gz)
     {
-        return SoftwareQuaternionBoard::getGyrometer(gyroRates);
+        return SoftwareQuaternionBoard::getGyrometer(gx, gy, gz);
     }
 
     void hf::Board::outbuf(char * buf)

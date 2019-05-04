@@ -58,9 +58,11 @@ namespace hf {
                 return false;
             }
 
-            virtual bool getGyrometer(float gyroRates[3]) override
+            virtual bool getGyrometer(float & gx, float & gy, float & gz) override
             {
-                memcpy(gyroRates, _gyro, 3*sizeof(float));
+                gx = _gx;
+                gy = _gy;
+                gz = _gz;
 
                 float time = getTime();
 

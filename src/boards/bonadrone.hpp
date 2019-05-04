@@ -84,9 +84,9 @@ namespace hf {
                 return SoftwareQuaternionBoard::getQuaternion(qw, qx, qy, qz, getTime());
             }
 
-            virtual bool  getGyrometer(float gyroRates[3]) override
+            virtual bool  getGyrometer(float & gx, float & gy, float & gz) override
             {
-                return SoftwareQuaternionBoard::getGyrometer(gyroRates);
+                return SoftwareQuaternionBoard::getGyrometer(gx, gy, gz);
             }
 
             virtual bool imuReady(void) override

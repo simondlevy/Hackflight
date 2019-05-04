@@ -64,7 +64,7 @@ namespace hf {
 
         public:
 
-            bool getGyrometer(float gyro[3])
+            bool getGyrometer(float & gx, float & gy, float & gz)
             {
                 // Read acceleromter Gs, gyrometer degrees/sec
                 if (imuReady()) {
@@ -77,9 +77,9 @@ namespace hf {
                     _gz = Filter::deg2rad(_gz);
 
                     // Round to two decimal places
-                    gyro[0] = Filter::round2(_gx);
-                    gyro[1] = Filter::round2(_gy);
-                    gyro[2] = Filter::round2(_gz);
+                    gx = Filter::round2(_gx);
+                    gy = Filter::round2(_gy);
+                    gz = Filter::round2(_gz);
 
                     return true;
                 }

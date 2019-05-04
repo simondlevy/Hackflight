@@ -36,7 +36,9 @@ namespace hf {
 
             Gyrometer(void)
             {
-                memset(_rates, 0, 3*sizeof(float));
+                _gx = 0;
+                _gy = 0;
+                _gz = 0;
             }
 
         protected:
@@ -46,23 +48,25 @@ namespace hf {
                 (void)time;
 
                 // NB: We negate gyro X, Y to simplify PID controller
-                state.angularVelocities[0] =  _rates[0];
-                state.angularVelocities[1] = -_rates[1];
-                state.angularVelocities[2] = -_rates[2];
+                state.angularVelocities[0] =  _gx;
+                state.angularVelocities[1] = -_gy;
+                state.angularVelocities[2] = -_gz;
             }
 
             virtual bool ready(float time) override
             {
                 (void)time;
 
-                bool result = board->getGyrometer(_rates);
+                bool result = board->getGyrometer(_gx, _gy, _gz);
 
                 return result;
             }
 
         private:
 
-            float _rates[3];
+            float _gx;
+            float _gy;
+            float _gz;
 
     };  // class Gyrometer
 

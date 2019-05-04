@@ -62,7 +62,7 @@ class Stm32FBoard : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
         virtual uint8_t  serialNormalRead(void) override;
         virtual void     serialNormalWrite(uint8_t c) override;
         virtual bool     getQuaternion(float & qw, float & qx, float & qy, float & qz) override;
-        virtual bool     getGyrometer(float gyroRates[3]) override;
+        virtual bool     getGyrometer(float & gx, float & gy, float & gz) override;
         virtual void     getRawImu(float & ax, float & ay, float & az, float & gx, float & gy, float & gz) override; 
 
 }; // class Stm32FBoard
