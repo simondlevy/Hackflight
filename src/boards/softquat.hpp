@@ -79,7 +79,6 @@ namespace hf {
                     gyro[1] = Filter::round2(_gy);
                     gyro[2] = Filter::round2(_gz);
 
-
                     return true;
                 }
 
