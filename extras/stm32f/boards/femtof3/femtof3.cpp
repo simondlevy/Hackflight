@@ -1,5 +1,5 @@
 /*
-   femtof3.h : Board implmentation for Hyperion F3 Evo Brushed board
+   femtof3.cpp : Board implmentation for FemtoF3
 
    Copyright (C) 2018 Simon D. Levy 
 

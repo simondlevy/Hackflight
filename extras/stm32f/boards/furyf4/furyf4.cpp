@@ -1,7 +1,7 @@
 /*
-   furyf4.cpp : Board implementation for FuryF4
+   furyf4.cpp : Board implmentation for FuryF4
 
-   Copyright (C) 2018 Simon D. Levy 
+   Copyright (C) 2019 Simon D. Levy 
 
    This file is part of Hackflight.
 
@@ -24,38 +24,24 @@
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
-#include "platform.h"
-
-    // Cleanflight includes
+// Cleanflight includes
 #include "drivers/light_led.h"
 
-    // Hackflight includes
+// Hackflight includes
 #include "../../common/spi.h"
+#include "../../common/motors.h"
 
     FuryF4::FuryF4(void) : Stm32FBoard(usbVcpOpen())
     {
-        initImu();
-
-        RealBoard::init();
-    }
-
-    void FuryF4::initImu(void)
-    {
         spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
+
+        brushless_motors_init(0, 1, 2, 3);
 
         _imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
-        switch (_imu->begin()) {
+        checkImuError(_imu->begin());
 
-            case MPUIMU::ERROR_IMU_ID:
-                error("Bad device ID");
-                break;
-            case MPUIMU::ERROR_SELFTEST:
-                error("Failed self-test");
-                break;
-            default:
-                break;
-        }
+        RealBoard::init();
     }
 
     void Stm32FBoard::setLed(bool isOn)
@@ -63,29 +49,20 @@ extern "C" {
         ledSet(0, isOn);
     }
 
-    bool FuryF4::imuRead(void)
+    bool FuryF4::imuReady(void)
     {
-        if (_imu->checkNewData()) {  
-
-            _imu->readAccelerometer(_ax, _ay, _az);
-            _imu->readGyrometer(_gx, _gy, _gz);
-
-            // Negate to support board orientation
-            _ay = -_ay;
-            _gx = -_gx;
-            _gz = -_gz;
-
-            return true;
-        }  
-
-        return false;
+        return _imu->checkNewData();
     }
 
-    // stubbed for now
-    void motor_write(uint8_t index, float value)
+    void FuryF4::imuReadAccelGyro(void)
     {
-        (void)index;
-        (void)value;
+        _imu->readAccelerometer(_ax, _ay, _az);
+        _imu->readGyrometer(_gx, _gy, _gz);
+
+        // Negate for IMU orientation
+        _ay = -_ay;
+        _gx = -_gx;
+        _gz = -_gz;
     }
 
 } // extern "C"

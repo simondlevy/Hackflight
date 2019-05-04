@@ -1,5 +1,5 @@
 /*
-   omnibusf3.cpp : Board class for Omnibus F3
+   omnibusf3.h : Board class for Omnibus F3
 
    Copyright (C) 2018 Simon D. Levy 
 

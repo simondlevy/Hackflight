@@ -39,8 +39,6 @@ extern "C" {
                 0.01f, // Gyro yaw I
                 8.58); // Demands to rate
 
-        h.addPidController(level, 1);
-
         h.init(new FuryF4(), new hf::MockReceiver(), new hf::MixerQuadX(), ratePid);
     }
 
