@@ -286,12 +286,7 @@ namespace hf {
 
             virtual void handle_IMU_SI_Request(float & ax, float & ay, float & az, float & gx, float & gy, float & gz) override
             {
-                ax = 1;
-                ay = 2;
-                az = 3;
-                gx = 4;
-                gy = 5;
-                gz = 6;
+                _board->getRawImu(ax, ay, az, gx, gy, gz);
             }
 
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override

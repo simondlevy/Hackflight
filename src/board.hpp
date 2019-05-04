@@ -48,7 +48,6 @@ namespace hf {
             // GY: pitch forward -, back +
             // GZ: yaw left -,      right +
 
-
             //------------------------------------ Core functionality ----------------------------------------------------
             virtual bool  getQuaternion(float quat[4]) = 0;
             virtual bool  getGyrometer(float gyroRates[3]) = 0;
@@ -74,7 +73,9 @@ namespace hf {
             virtual bool isBatteryLow(void) { return false; }
 
             //--------------------------------------- Debugging ----------------------------------------------------------
-            static void  outbuf(char * buf);
+            virtual void getRawImu(float & ax, float & ay, float & az, float & gx, float & gy, float & gz) 
+                {(void)ax; (void)ay; (void)az; (void)gx; (void)gy; (void)gz; }
+            static  void outbuf(char * buf);
 
     }; // class Board
 

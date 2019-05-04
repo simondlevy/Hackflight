@@ -21,6 +21,7 @@
 #pragma once
 
 #include "filters.hpp"
+#include "realboard.hpp"
 
 #include <math.h>
 
@@ -112,6 +113,16 @@ namespace hf {
 
                 return false;
             }
+
+            virtual void getRawImu(float & ax, float & ay, float & az, float & gx, float & gy, float & gz) 
+            {
+                ax = _ax;
+                ay = _ay;
+                az = _az;
+                gx = _gx;
+                gy = _gy;
+                gz = _gz;
+             }
 
     }; // class SoftwareQuaternionBoard
 

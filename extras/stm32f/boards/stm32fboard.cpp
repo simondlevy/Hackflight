@@ -93,4 +93,9 @@ extern "C" {
         serialWrite(_serial0, c);
     }
 
+    void Stm32FBoard::getRawImu(float & ax, float & ay, float & az, float & gx, float & gy, float & gz)
+    {
+        hf::SoftwareQuaternionBoard::getRawImu(ax, ay, az, gx, gy, gz);
+    } 
+
 } // extern "C"

@@ -166,7 +166,6 @@ namespace hf {
                     delaySeconds(0.1);
                 }
             }
-
  
     }; // class RealBoard
 
