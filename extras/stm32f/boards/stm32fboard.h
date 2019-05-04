@@ -65,5 +65,4 @@ class Stm32FBoard : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
         virtual bool     getGyrometer(float gyroRates[3]) override;
         virtual void     getRawImu(float & ax, float & ay, float & az, float & gx, float & gy, float & gz) override; 
 
-
 }; // class Stm32FBoard
