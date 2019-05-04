@@ -55,8 +55,8 @@ namespace hf {
             virtual float getTime(void) = 0;
 
             //------------------------- Support for additional surface-mount sensors -------------------------------------
-            virtual bool  getAccelerometer(float accelGs[3]) { (void)accelGs;  return false; }
-            virtual bool  getMagnetometer(float uTs[3]) { (void)uTs;  return false; }
+            virtual bool  getAccelerometer(float & ax, float & ay, float & az) { (void)ax; (void)ay; (void)az; return false; }
+            virtual bool  getMagnetometer(float & mx, float & my, float & mz) { (void)mx; (void)my; (void)mz; return false; }
             virtual bool  getBarometer(float & pressure) { (void)pressure;  return false; }
 
             //------------------------------- Serial communications via MSP ----------------------------------------------

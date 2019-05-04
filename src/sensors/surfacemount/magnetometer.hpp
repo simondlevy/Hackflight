@@ -42,7 +42,9 @@ namespace hf {
 
             Magnetometer(void)
             {
-                memset(_uTs, 0, 3*sizeof(float));
+                _mx = 0;
+                _my = 0;
+                _mz = 0;
             }
 
         protected:
@@ -63,7 +65,9 @@ namespace hf {
 
         private:
 
-            float _uTs[3];
+            float _mx;
+            float _my;
+            float _mz;
 
     };  // class Magnetometer
 
