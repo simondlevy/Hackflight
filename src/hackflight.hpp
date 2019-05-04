@@ -242,7 +242,6 @@ namespace hf {
 
         protected:
 
-
             virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 
                     float & heading, float & velocityForward, float & velocityRightward) 
             {
@@ -283,6 +282,16 @@ namespace hf {
                 roll  = _state.eulerAngles[AXIS_ROLL];
                 pitch = _state.eulerAngles[AXIS_PITCH];
                 yaw   = _state.eulerAngles[AXIS_YAW];
+            }
+
+            virtual void handle_IMU_SI_Request(float & ax, float & ay, float & az, float & gx, float & gy, float & gz) override
+            {
+                ax = 1;
+                ay = 2;
+                az = 3;
+                gx = 4;
+                gy = 5;
+                gz = 6;
             }
 
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 '''
-getloiter.py Uses MSPPG to request and handle LOITER messages from flight controller IMU
+getimu.py Uses MSPPG to request and handle IMU_SI messages from flight controller
 
-Copyright (C) Simon D. Levy 2018
+Copyright (C) Simon D. Levy 2019
 
 This file is part of Hackflight.
 
@@ -25,21 +25,21 @@ BAUD = 115200
 #PORT = 'COM13'          # Windows
 PORT = '/dev/ttyACM0' # Linux
 
-from msppg import MSP_Parser as Parser, serialize_LOITER_Request
+from msppg import Parser, serialize_IMU_SI_Request
 import serial
 
-def handler(agl, flowx, flowy):
+class ImuParser(Parser):
 
-    print(agl, flowx, flowy)
-    port.write(request)
+    def handle_IMU_SI(self, ax, ay, az, gx, gy, gz):
+
+        print('ax: %+3.3f  ay: %+3.3f  az: %+3.3f | gx: %+3.3f  gy: %+3.3f  gz: %+3.3f ' % (ax, ay, az, gx, gy, gz))
+        port.write(request)
 
 if __name__ == '__main__':
 
-    parser = Parser()
-    request = serialize_LOITER_Request()
+    parser = ImuParser()
+    request = serialize_IMU_SI_Request()
     port = serial.Serial(PORT, BAUD)
-
-    parser.set_LOITER_Handler(handler)
 
     port.write(request)
 

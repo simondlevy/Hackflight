@@ -313,6 +313,25 @@ namespace hf {
                         serialize8(_checksum);
                         } break;
 
+                    case 123:
+                    {
+                        float ax = 0;
+                        float ay = 0;
+                        float az = 0;
+                        float gx = 0;
+                        float gy = 0;
+                        float gz = 0;
+                        handle_IMU_SI_Request(ax, ay, az, gx, gy, gz);
+                        prepareToSendFloats(6);
+                        sendFloat(ax);
+                        sendFloat(ay);
+                        sendFloat(az);
+                        sendFloat(gx);
+                        sendFloat(gy);
+                        sendFloat(gz);
+                        serialize8(_checksum);
+                        } break;
+
                     case 215:
                     {
                         float m1 = 0;
@@ -390,6 +409,16 @@ namespace hf {
                 (void)roll;
                 (void)pitch;
                 (void)yaw;
+            }
+
+            virtual void handle_IMU_SI_Request(float & ax, float & ay, float & az, float & gx, float & gy, float & gz)
+            {
+                (void)ax;
+                (void)ay;
+                (void)az;
+                (void)gx;
+                (void)gy;
+                (void)gz;
             }
 
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4)
@@ -509,6 +538,38 @@ namespace hf {
                 bytes[17] = CRC8(&bytes[3], 14);
 
                 return 18;
+            }
+
+            static uint8_t serialize_IMU_SI_Request(uint8_t bytes[])
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 60;
+                bytes[3] = 0;
+                bytes[4] = 123;
+                bytes[5] = 123;
+
+                return 6;
+            }
+
+            static uint8_t serialize_IMU_SI(uint8_t bytes[], float  ax, float  ay, float  az, float  gx, float  gy, float  gz)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 24;
+                bytes[4] = 123;
+
+                memcpy(&bytes[5], &ax, sizeof(float));
+                memcpy(&bytes[9], &ay, sizeof(float));
+                memcpy(&bytes[13], &az, sizeof(float));
+                memcpy(&bytes[17], &gx, sizeof(float));
+                memcpy(&bytes[21], &gy, sizeof(float));
+                memcpy(&bytes[25], &gz, sizeof(float));
+
+                bytes[29] = CRC8(&bytes[3], 26);
+
+                return 30;
             }
 
             static uint8_t serialize_SET_MOTOR_NORMAL(uint8_t bytes[], float  m1, float  m2, float  m3, float  m4)

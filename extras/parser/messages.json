@@ -25,7 +25,17 @@
    {"pitch"   : "float"},
    {"yaw"     : "float"}],
   
-  "SET_MOTOR_NORMAL": 
+  "IMU_SI": 
+  [{"ID": 123},
+   {"comment": "IMU in Systeme Internationale units (gyro rad/sec; accel m/s/s)"}, 
+   {"ax" : "float"}, 
+   {"ay" : "float"},
+   {"az" : "float"},
+   {"gx" : "float"}, 
+   {"gy" : "float"},
+   {"gz" : "float"}],
+
+   "SET_MOTOR_NORMAL": 
   [{"ID": 215},
    {"comment": "We send floating-point values in [0,1], rather than PWM"}, 
    {"m1": "float"},
