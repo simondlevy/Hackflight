@@ -37,9 +37,10 @@ extern "C" {
 
         brushless_motors_init(0, 1, 2, 3);
 
-        _imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
+        //_imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
+        _imu = new MPU6000();
 
-        checkImuError(_imu->begin());
+        //checkImuError(_imu->begin());
 
         RealBoard::init();
     }
@@ -56,13 +57,13 @@ extern "C" {
 
     void FuryF4::imuReadAccelGyro(void)
     {
-        _imu->readAccelerometer(_ax, _ay, _az);
-        _imu->readGyrometer(_gx, _gy, _gz);
+        //_imu->readAccelerometer(_ax, _ay, _az);
+        //_imu->readGyrometer(_gx, _gy, _gz);
 
         // Negate for IMU orientation
-        _ay = -_ay;
-        _gx = -_gx;
-        _gz = -_gz;
+        //_ay = -_ay;
+        //_gx = -_gx;
+        //_gz = -_gz;
     }
 
 } // extern "C"
