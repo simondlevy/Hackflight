@@ -120,6 +120,11 @@ namespace hf {
                 return PTerm + ITerm + DTerm;
             }
 
+            float maxval(float a, float b)
+            {
+                return a > b ? a : b;
+            }
+
         protected:
 
             // For PTerm computation
@@ -200,7 +205,7 @@ namespace hf {
             void updateReceiver(demands_t & demands, bool throttleIsDown)
             {
                 // Compute proportion of cyclic demand compared to its maximum
-                _proportionalCyclicDemand = max(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
+                _proportionalCyclicDemand = maxval(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
                 
                 // When landed, reset integral component of PID
                 if (throttleIsDown) {
