@@ -1042,7 +1042,6 @@ flash_$(TARGET): $(TARGET_BIN)
 	sleep 2
 	dfu-util -a 0 -s 0x08000000:leave -D $(TARGET_BIN)
 
-
 ## flash             : flash firmware (.hex) onto flight controller
 flash: flash_$(TARGET)
 
@@ -1094,9 +1093,6 @@ version:
 ## junittest         : run the cleanflight test suite, producing Junit XML result files.
 test junittest:
 	$(V0) cd src/test && $(MAKE) $@
-
-
-
 
 # rebuild everything when makefile changes
 $(TARGET_OBJS) : Makefile
