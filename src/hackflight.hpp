@@ -284,9 +284,12 @@ namespace hf {
                 yaw   = _state.eulerAngles[AXIS_YAW];
             }
 
-            virtual void handle_IMU_SI_Request(float & ax, float & ay, float & az, float & gx, float & gy, float & gz) override
+            virtual void handle_RAW_IMU_Request(
+                    int16_t & ax, int16_t & ay, int16_t & az, 
+                    int16_t & gx, int16_t & gy, int16_t & gz,
+                    int16_t & mx, int16_t & my, int16_t & mz) override
             {
-                _board->getRawImu(ax, ay, az, gx, gy, gz);
+                _board->getRawImu(ax, ay, az, gx, gy, gz, mx, my, mz); 
             }
 
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override

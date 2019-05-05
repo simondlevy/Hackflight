@@ -73,8 +73,11 @@ namespace hf {
             virtual bool isBatteryLow(void) { return false; }
 
             //--------------------------------------- Debugging ----------------------------------------------------------
-            virtual void getRawImu(float & ax, float & ay, float & az, float & gx, float & gy, float & gz) 
-                {(void)ax; (void)ay; (void)az; (void)gx; (void)gy; (void)gz; }
+            virtual void getRawImu(
+                    int16_t & ax, int16_t & ay, int16_t & az, 
+                    int16_t & gx, int16_t & gy, int16_t & gz,
+                    int16_t & mx, int16_t & my, int16_t & mz) 
+                {(void)ax; (void)ay; (void)az; (void)gx; (void)gy; (void)gz; (void)mx; (void)my; (void)mz; }
             static  void outbuf(char * buf);
 
     }; // class Board

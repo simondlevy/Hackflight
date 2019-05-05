@@ -54,6 +54,17 @@ namespace hf {
             float _gy = 0;
             float _gz = 0;
 
+            // For debugging
+            int16_t _axRaw = 0;
+            int16_t _ayRaw = 0;
+            int16_t _azRaw = 0;
+            int16_t _gxRaw = 0;
+            int16_t _gyRaw = 0;
+            int16_t _gzRaw = 0;
+            int16_t _mxRaw = 0;
+            int16_t _myRaw = 0;
+            int16_t _mzRaw = 0;
+
             // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
             // using a 6DOF fiter (accel, gyro)
             MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(_beta, _zeta);
@@ -114,15 +125,21 @@ namespace hf {
                 return false;
             }
 
-            virtual void getRawImu(float & ax, float & ay, float & az, float & gx, float & gy, float & gz) 
+            virtual void getRawImu(
+                    int16_t & ax, int16_t & ay, int16_t & az, 
+                    int16_t & gx, int16_t & gy, int16_t & gz,
+                    int16_t & mx, int16_t & my, int16_t & mz)
             {
-                ax = _ax;
-                ay = _ay;
-                az = _az;
-                gx = _gx;
-                gy = _gy;
-                gz = _gz;
-             }
+                ax = _axRaw;
+                ay = _ayRaw;
+                az = _azRaw;
+                gx = _gxRaw;
+                gy = _gyRaw;
+                gz = _gzRaw;
+                mx = _mxRaw;
+                my = _myRaw;
+                mz = _mzRaw;
+            }
 
     }; // class SoftwareQuaternionBoard
 

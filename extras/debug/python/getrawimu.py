@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 '''
-getimu.py Uses MSPPG to request and handle IMU_SI messages from flight controller
+getrawsimu.py Uses MSPPG to request and handle raw (integer) IMU messages from flight controller
 
 Copyright (C) Simon D. Levy 2019
 
@@ -25,20 +25,20 @@ BAUD = 115200
 #PORT = 'COM13'          # Windows
 PORT = '/dev/ttyACM0' # Linux
 
-from msppg import Parser, serialize_IMU_SI_Request
+from msppg import Parser, serialize_RAW_IMU_Request
 import serial
 
-class ImuParser(Parser):
+class RawImuParser(Parser):
 
-    def handle_IMU_SI(self, ax, ay, az, gx, gy, gz):
+    def handle_RAW_IMU(self, ax, ay, az, gx, gy, gz, mx, my, mz):
 
-        print('ax: %+3.3f  ay: %+3.3f  az: %+3.3f | gx: %+3.3f  gy: %+3.3f  gz: %+3.3f ' % (ax, ay, az, gx, gy, gz))
+        print('ax: %+d  ay: %+d  az: %+d | gx: %+d  gy: %+d  gz: %+d ' % (ax, ay, az, gx, gy, gz))
         port.write(request)
 
 if __name__ == '__main__':
 
-    parser = ImuParser()
-    request = serialize_IMU_SI_Request()
+    parser = RawImuParser()
+    request = serialize_RAW_IMU_Request()
     port = serial.Serial(PORT, BAUD)
 
     port.write(request)

@@ -1,4 +1,16 @@
 {
+  "RAW_IMU": 
+  [{"ID": 102},
+   {"ax" : "short"}, 
+   {"ay" : "short"},
+   {"az" : "short"},
+   {"gx" : "short"}, 
+   {"gy" : "short"},
+   {"gz" : "short"},
+   {"mx" : "short"}, 
+   {"my" : "short"},
+   {"mz" : "short"}],
+
   "STATE": 
   [{"ID": 112},
    {"altitude":          "float"}, 
@@ -25,16 +37,6 @@
    {"pitch"   : "float"},
    {"yaw"     : "float"}],
   
-  "IMU_SI": 
-  [{"ID": 123},
-   {"comment": "IMU in Systeme Internationale units (gyro rad/sec; accel m/s/s)"}, 
-   {"ax" : "float"}, 
-   {"ay" : "float"},
-   {"az" : "float"},
-   {"gx" : "float"}, 
-   {"gy" : "float"},
-   {"gz" : "float"}],
-
    "SET_MOTOR_NORMAL": 
   [{"ID": 215},
    {"comment": "We send floating-point values in [0,1], rather than PWM"}, 
