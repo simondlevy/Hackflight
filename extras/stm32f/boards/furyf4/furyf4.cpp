@@ -57,6 +57,15 @@ extern "C" {
 
     void FuryF4::imuReadAccelGyro(void)
     {
+        _imu->read();
+
+        _axRaw = _imu->sensors.sensors_signed.accX;
+        _ayRaw = _imu->sensors.sensors_signed.accY;
+        _azRaw = _imu->sensors.sensors_signed.accZ;
+        _gxRaw = _imu->sensors.sensors_signed.gyrX;
+        _gyRaw = _imu->sensors.sensors_signed.gyrY;
+        _gzRaw = _imu->sensors.sensors_signed.gyrZ;
+
         //_imu->readAccelerometer(_ax, _ay, _az);
         //_imu->readGyrometer(_gx, _gy, _gz);
 
