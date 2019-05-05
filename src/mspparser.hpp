@@ -260,6 +260,73 @@ namespace hf {
             {
                 switch (_command) {
 
+                    case 121:
+                    {
+                        float c1 = 0;
+                        float c2 = 0;
+                        float c3 = 0;
+                        float c4 = 0;
+                        float c5 = 0;
+                        float c6 = 0;
+                        handle_RC_NORMAL_Request(c1, c2, c3, c4, c5, c6);
+                        prepareToSendFloats(6);
+                        sendFloat(c1);
+                        sendFloat(c2);
+                        sendFloat(c3);
+                        sendFloat(c4);
+                        sendFloat(c5);
+                        sendFloat(c6);
+                        serialize8(_checksum);
+                        } break;
+
+                    case 221:
+                    {
+                        float c1 = 0;
+                        memcpy(&c1,  &_inBuf[0], sizeof(float));
+
+                        float c2 = 0;
+                        memcpy(&c2,  &_inBuf[4], sizeof(float));
+
+                        float c3 = 0;
+                        memcpy(&c3,  &_inBuf[8], sizeof(float));
+
+                        float c4 = 0;
+                        memcpy(&c4,  &_inBuf[12], sizeof(float));
+
+                        float c5 = 0;
+                        memcpy(&c5,  &_inBuf[16], sizeof(float));
+
+                        float c6 = 0;
+                        memcpy(&c6,  &_inBuf[20], sizeof(float));
+
+                        handle_SET_RC_NORMAL(c1, c2, c3, c4, c5, c6);
+                        } break;
+
+                    case 102:
+                    {
+                        int16_t ax = 0;
+                        int16_t ay = 0;
+                        int16_t az = 0;
+                        int16_t gx = 0;
+                        int16_t gy = 0;
+                        int16_t gz = 0;
+                        int16_t mx = 0;
+                        int16_t my = 0;
+                        int16_t mz = 0;
+                        handle_RAW_IMU_Request(ax, ay, az, gx, gy, gz, mx, my, mz);
+                        prepareToSendShorts(9);
+                        sendShort(ax);
+                        sendShort(ay);
+                        sendShort(az);
+                        sendShort(gx);
+                        sendShort(gy);
+                        sendShort(gz);
+                        sendShort(mx);
+                        sendShort(my);
+                        sendShort(mz);
+                        serialize8(_checksum);
+                        } break;
+
                     case 112:
                     {
                         float altitude = 0;
@@ -278,25 +345,6 @@ namespace hf {
                         sendFloat(heading);
                         sendFloat(velocityForward);
                         sendFloat(velocityRightward);
-                        serialize8(_checksum);
-                        } break;
-
-                    case 121:
-                    {
-                        float c1 = 0;
-                        float c2 = 0;
-                        float c3 = 0;
-                        float c4 = 0;
-                        float c5 = 0;
-                        float c6 = 0;
-                        handle_RC_NORMAL_Request(c1, c2, c3, c4, c5, c6);
-                        prepareToSendFloats(6);
-                        sendFloat(c1);
-                        sendFloat(c2);
-                        sendFloat(c3);
-                        sendFloat(c4);
-                        sendFloat(c5);
-                        sendFloat(c6);
                         serialize8(_checksum);
                         } break;
 
@@ -338,59 +386,40 @@ namespace hf {
                         handle_SET_ARMED(flag);
                         } break;
 
-                    case 221:
-                    {
-                        float c1 = 0;
-                        memcpy(&c1,  &_inBuf[0], sizeof(float));
-
-                        float c2 = 0;
-                        memcpy(&c2,  &_inBuf[4], sizeof(float));
-
-                        float c3 = 0;
-                        memcpy(&c3,  &_inBuf[8], sizeof(float));
-
-                        float c4 = 0;
-                        memcpy(&c4,  &_inBuf[12], sizeof(float));
-
-                        float c5 = 0;
-                        memcpy(&c5,  &_inBuf[16], sizeof(float));
-
-                        float c6 = 0;
-                        memcpy(&c6,  &_inBuf[20], sizeof(float));
-
-                        handle_SET_RC_NORMAL(c1, c2, c3, c4, c5, c6);
-                        } break;
-
-                    case 226:
-                    {
-                        int16_t x1 = 0;
-                        memcpy(&x1,  &_inBuf[0], sizeof(int16_t));
-
-                        int16_t y1 = 0;
-                        memcpy(&y1,  &_inBuf[2], sizeof(int16_t));
-
-                        int16_t x2 = 0;
-                        memcpy(&x2,  &_inBuf[4], sizeof(int16_t));
-
-                        int16_t y2 = 0;
-                        memcpy(&y2,  &_inBuf[6], sizeof(int16_t));
-
-                        int16_t length = 0;
-                        memcpy(&length,  &_inBuf[8], sizeof(int16_t));
-
-                        int16_t magnitude = 0;
-                        memcpy(&magnitude,  &_inBuf[10], sizeof(int16_t));
-
-                        int16_t theta = 0;
-                        memcpy(&theta,  &_inBuf[12], sizeof(int16_t));
-
-                        int16_t rho = 0;
-                        memcpy(&rho,  &_inBuf[14], sizeof(int16_t));
-
-                        handle_SET_LINE_SEGMENT(x1, y1, x2, y2, length, magnitude, theta, rho);
-                        } break;
-
                 }
+            }
+
+            virtual void handle_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
+            {
+                (void)c1;
+                (void)c2;
+                (void)c3;
+                (void)c4;
+                (void)c5;
+                (void)c6;
+            }
+
+            virtual void handle_SET_RC_NORMAL(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
+            {
+                (void)c1;
+                (void)c2;
+                (void)c3;
+                (void)c4;
+                (void)c5;
+                (void)c6;
+            }
+
+            virtual void handle_RAW_IMU_Request(int16_t & ax, int16_t & ay, int16_t & az, int16_t & gx, int16_t & gy, int16_t & gz, int16_t & mx, int16_t & my, int16_t & mz)
+            {
+                (void)ax;
+                (void)ay;
+                (void)az;
+                (void)gx;
+                (void)gy;
+                (void)gz;
+                (void)mx;
+                (void)my;
+                (void)mz;
             }
 
             virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, float & heading, float & velocityForward, float & velocityRightward)
@@ -402,16 +431,6 @@ namespace hf {
                 (void)heading;
                 (void)velocityForward;
                 (void)velocityRightward;
-            }
-
-            virtual void handle_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
-            {
-                (void)c1;
-                (void)c2;
-                (void)c3;
-                (void)c4;
-                (void)c5;
-                (void)c6;
             }
 
             virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw)
@@ -434,29 +453,94 @@ namespace hf {
                 (void)flag;
             }
 
-            virtual void handle_SET_RC_NORMAL(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
-            {
-                (void)c1;
-                (void)c2;
-                (void)c3;
-                (void)c4;
-                (void)c5;
-                (void)c6;
-            }
-
-            virtual void handle_SET_LINE_SEGMENT(int16_t  x1, int16_t  y1, int16_t  x2, int16_t  y2, int16_t  length, int16_t  magnitude, int16_t  theta, int16_t  rho)
-            {
-                (void)x1;
-                (void)y1;
-                (void)x2;
-                (void)y2;
-                (void)length;
-                (void)magnitude;
-                (void)theta;
-                (void)rho;
-            }
-
         public:
+
+            static uint8_t serialize_RC_NORMAL_Request(uint8_t bytes[])
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 60;
+                bytes[3] = 0;
+                bytes[4] = 121;
+                bytes[5] = 121;
+
+                return 6;
+            }
+
+            static uint8_t serialize_RC_NORMAL(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 24;
+                bytes[4] = 121;
+
+                memcpy(&bytes[5], &c1, sizeof(float));
+                memcpy(&bytes[9], &c2, sizeof(float));
+                memcpy(&bytes[13], &c3, sizeof(float));
+                memcpy(&bytes[17], &c4, sizeof(float));
+                memcpy(&bytes[21], &c5, sizeof(float));
+                memcpy(&bytes[25], &c6, sizeof(float));
+
+                bytes[29] = CRC8(&bytes[3], 26);
+
+                return 30;
+            }
+
+            static uint8_t serialize_SET_RC_NORMAL(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 24;
+                bytes[4] = 221;
+
+                memcpy(&bytes[5], &c1, sizeof(float));
+                memcpy(&bytes[9], &c2, sizeof(float));
+                memcpy(&bytes[13], &c3, sizeof(float));
+                memcpy(&bytes[17], &c4, sizeof(float));
+                memcpy(&bytes[21], &c5, sizeof(float));
+                memcpy(&bytes[25], &c6, sizeof(float));
+
+                bytes[29] = CRC8(&bytes[3], 26);
+
+                return 30;
+            }
+
+            static uint8_t serialize_RAW_IMU_Request(uint8_t bytes[])
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 60;
+                bytes[3] = 0;
+                bytes[4] = 102;
+                bytes[5] = 102;
+
+                return 6;
+            }
+
+            static uint8_t serialize_RAW_IMU(uint8_t bytes[], int16_t  ax, int16_t  ay, int16_t  az, int16_t  gx, int16_t  gy, int16_t  gz, int16_t  mx, int16_t  my, int16_t  mz)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 18;
+                bytes[4] = 102;
+
+                memcpy(&bytes[5], &ax, sizeof(int16_t));
+                memcpy(&bytes[7], &ay, sizeof(int16_t));
+                memcpy(&bytes[9], &az, sizeof(int16_t));
+                memcpy(&bytes[11], &gx, sizeof(int16_t));
+                memcpy(&bytes[13], &gy, sizeof(int16_t));
+                memcpy(&bytes[15], &gz, sizeof(int16_t));
+                memcpy(&bytes[17], &mx, sizeof(int16_t));
+                memcpy(&bytes[19], &my, sizeof(int16_t));
+                memcpy(&bytes[21], &mz, sizeof(int16_t));
+
+                bytes[23] = CRC8(&bytes[3], 20);
+
+                return 24;
+            }
 
             static uint8_t serialize_STATE_Request(uint8_t bytes[])
             {
@@ -489,38 +573,6 @@ namespace hf {
                 bytes[33] = CRC8(&bytes[3], 30);
 
                 return 34;
-            }
-
-            static uint8_t serialize_RC_NORMAL_Request(uint8_t bytes[])
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 121;
-                bytes[5] = 121;
-
-                return 6;
-            }
-
-            static uint8_t serialize_RC_NORMAL(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 24;
-                bytes[4] = 121;
-
-                memcpy(&bytes[5], &c1, sizeof(float));
-                memcpy(&bytes[9], &c2, sizeof(float));
-                memcpy(&bytes[13], &c3, sizeof(float));
-                memcpy(&bytes[17], &c4, sizeof(float));
-                memcpy(&bytes[21], &c5, sizeof(float));
-                memcpy(&bytes[25], &c6, sizeof(float));
-
-                bytes[29] = CRC8(&bytes[3], 26);
-
-                return 30;
             }
 
             static uint8_t serialize_ATTITUDE_RADIANS_Request(uint8_t bytes[])
@@ -583,48 +635,6 @@ namespace hf {
                 bytes[6] = CRC8(&bytes[3], 3);
 
                 return 7;
-            }
-
-            static uint8_t serialize_SET_RC_NORMAL(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 24;
-                bytes[4] = 221;
-
-                memcpy(&bytes[5], &c1, sizeof(float));
-                memcpy(&bytes[9], &c2, sizeof(float));
-                memcpy(&bytes[13], &c3, sizeof(float));
-                memcpy(&bytes[17], &c4, sizeof(float));
-                memcpy(&bytes[21], &c5, sizeof(float));
-                memcpy(&bytes[25], &c6, sizeof(float));
-
-                bytes[29] = CRC8(&bytes[3], 26);
-
-                return 30;
-            }
-
-            static uint8_t serialize_SET_LINE_SEGMENT(uint8_t bytes[], int16_t  x1, int16_t  y1, int16_t  x2, int16_t  y2, int16_t  length, int16_t  magnitude, int16_t  theta, int16_t  rho)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 16;
-                bytes[4] = 226;
-
-                memcpy(&bytes[5], &x1, sizeof(int16_t));
-                memcpy(&bytes[7], &y1, sizeof(int16_t));
-                memcpy(&bytes[9], &x2, sizeof(int16_t));
-                memcpy(&bytes[11], &y2, sizeof(int16_t));
-                memcpy(&bytes[13], &length, sizeof(int16_t));
-                memcpy(&bytes[15], &magnitude, sizeof(int16_t));
-                memcpy(&bytes[17], &theta, sizeof(int16_t));
-                memcpy(&bytes[19], &rho, sizeof(int16_t));
-
-                bytes[21] = CRC8(&bytes[3], 18);
-
-                return 22;
             }
 
     }; // class MspParser

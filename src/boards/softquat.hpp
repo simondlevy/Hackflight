@@ -21,6 +21,7 @@
 #pragma once
 
 #include "filters.hpp"
+#include "realboard.hpp"
 
 #include <math.h>
 
@@ -53,16 +54,28 @@ namespace hf {
             float _gy = 0;
             float _gz = 0;
 
+            // For debugging
+            int16_t _axRaw = 0;
+            int16_t _ayRaw = 0;
+            int16_t _azRaw = 0;
+            int16_t _gxRaw = 0;
+            int16_t _gyRaw = 0;
+            int16_t _gzRaw = 0;
+            int16_t _mxRaw = 0;
+            int16_t _myRaw = 0;
+            int16_t _mzRaw = 0;
+
             // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
             // using a 6DOF fiter (accel, gyro)
             MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(_beta, _zeta);
+
             virtual bool imuReady(void) = 0;
 
             virtual void imuReadAccelGyro(void) = 0;
 
         public:
 
-            bool getGyrometer(float gyro[3])
+            bool getGyrometer(float & gx, float & gy, float & gz)
             {
                 // Read acceleromter Gs, gyrometer degrees/sec
                 if (imuReady()) {
@@ -75,10 +88,9 @@ namespace hf {
                     _gz = Filter::deg2rad(_gz);
 
                     // Round to two decimal places
-                    gyro[0] = Filter::round2(_gx);
-                    gyro[1] = Filter::round2(_gy);
-                    gyro[2] = Filter::round2(_gz);
-
+                    gx = Filter::round2(_gx);
+                    gy = Filter::round2(_gy);
+                    gz = Filter::round2(_gz);
 
                     return true;
                 }
@@ -86,7 +98,7 @@ namespace hf {
                 return false;
             }
 
-            bool getQuaternion(float quat[4], float time)
+            bool getQuaternion(float & qw, float & qx, float & qy, float & qz, float time)
             {
                 // Update quaternion after some number of IMU readings
                 _quatCycleCount = (_quatCycleCount + 1) % QUATERNION_DIVISOR;
@@ -102,15 +114,31 @@ namespace hf {
                     _quaternionFilter.update(_ax, _ay, _az, _gx, _gy, _gz, deltat); 
 
                     // Copy the quaternion back out
-                    quat[0] = _quaternionFilter.q1;
-                    quat[1] = _quaternionFilter.q2;
-                    quat[2] = _quaternionFilter.q3;
-                    quat[3] = _quaternionFilter.q4;
+                    qw = _quaternionFilter.q1;
+                    qx = _quaternionFilter.q2;
+                    qy = _quaternionFilter.q3;
+                    qz = _quaternionFilter.q4;
 
                     return true;
                 }
 
                 return false;
+            }
+
+            virtual void getRawImu(
+                    int16_t & ax, int16_t & ay, int16_t & az, 
+                    int16_t & gx, int16_t & gy, int16_t & gz,
+                    int16_t & mx, int16_t & my, int16_t & mz)
+            {
+                ax = _axRaw;
+                ay = _ayRaw;
+                az = _azRaw;
+                gx = _gxRaw;
+                gy = _gyRaw;
+                gz = _gzRaw;
+                mx = _mxRaw;
+                my = _myRaw;
+                mz = _mzRaw;
             }
 
     }; // class SoftwareQuaternionBoard

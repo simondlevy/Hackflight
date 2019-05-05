@@ -79,14 +79,14 @@ namespace hf {
 
             virtual void writeMotor(uint8_t index, float value) = 0;
 
-            virtual bool  getQuaternion(float quat[4]) override 
+            virtual bool  getQuaternion(float & qw, float & qx, float & qy, float & qz) override 
             {
-                return SoftwareQuaternionBoard::getQuaternion(quat, getTime());
+                return SoftwareQuaternionBoard::getQuaternion(qw, qx, qy, qz, getTime());
             }
 
-            virtual bool  getGyrometer(float gyroRates[3]) override
+            virtual bool  getGyrometer(float & gx, float & gy, float & gz) override
             {
-                return SoftwareQuaternionBoard::getGyrometer(gyroRates);
+                return SoftwareQuaternionBoard::getGyrometer(gx, gy, gz);
             }
 
             virtual bool imuReady(void) override

@@ -1,7 +1,7 @@
 /*
-   alienflightf3v1.cpp : Board class for OpenPilot CC3D Revolution
+   furyf4.h : Board class for FuryF4
 
-   Copyright (C) 2018 Simon D. Levy 
+   Copyright (C) 2019 Simon D. Levy 
 
    This file is part of Hackflight.
 
@@ -24,23 +24,20 @@
 #include <MPU6000.h>
 #include "stm32fboard.h"
 
-class Revo : public Stm32FBoard {
+class FuryF4 : public Stm32FBoard {
 
     private:
 
         MPU6000 * _imu;
 
-        void initMotors(void);
-        void initUsb(void);
-        void initImu(void);
-
     protected: 
 
         // SoftwareQuaternionBoard class overrides
-        virtual bool imuRead(void) override;
+        virtual bool imuReady(void) override;
+        virtual void imuReadAccelGyro(void) override;
 
     public:
 
-        Revo(void);
+        FuryF4(void);
 
-}; // class Revo
+}; // class FuryF4

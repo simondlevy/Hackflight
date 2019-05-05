@@ -1,4 +1,16 @@
 {
+  "RAW_IMU": 
+  [{"ID": 102},
+   {"ax" : "short"}, 
+   {"ay" : "short"},
+   {"az" : "short"},
+   {"gx" : "short"}, 
+   {"gy" : "short"},
+   {"gz" : "short"},
+   {"mx" : "short"}, 
+   {"my" : "short"},
+   {"mz" : "short"}],
+
   "STATE": 
   [{"ID": 112},
    {"altitude":          "float"}, 
@@ -25,7 +37,7 @@
    {"pitch"   : "float"},
    {"yaw"     : "float"}],
   
-  "SET_MOTOR_NORMAL": 
+   "SET_MOTOR_NORMAL": 
   [{"ID": 215},
    {"comment": "We send floating-point values in [0,1], rather than PWM"}, 
    {"m1": "float"},
@@ -45,16 +57,5 @@
    {"c3": "float"}, 
    {"c4": "float"}, 
    {"c5": "float"}, 
-   {"c6": "float"}],
-
-  "SET_LINE_SEGMENT": 
-  [{"ID":        226},
-   {"x1":        "short"}, 
-   {"y1":        "short"}, 
-   {"x2":        "short"}, 
-   {"y2":        "short"}, 
-   {"length":    "short"}, 
-   {"magnitude": "short"}, 
-   {"theta":     "short"}, 
-   {"rho":       "short"}]
+   {"c6": "float"}]
 }

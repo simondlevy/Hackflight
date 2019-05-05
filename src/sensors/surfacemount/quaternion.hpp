@@ -38,11 +38,11 @@ namespace hf {
         public:
 
             // We make this public so we can use it in different sketches
-            static void computeEulerAngles(float q[4], float euler[3])
+            static void computeEulerAngles(float qw, float qx, float qy, float qz, float euler[3])
             {
-                euler[0] = atan2(2.0f*(q[0]*q[1]+q[2]*q[3]),q[0]*q[0]-q[1]*q[1]-q[2]*q[2]+q[3]*q[3]);
-                euler[1] =  asin(2.0f*(q[1]*q[3]-q[0]*q[2]));
-                euler[2] = atan2(2.0f*(q[1]*q[2]+q[0]*q[3]),q[0]*q[0]+q[1]*q[1]-q[2]*q[2]-q[3]*q[3]);
+                euler[0] = atan2(2.0f*(qw*qx+qy*qz),qw*qw-qx*qx-qy*qy+qz*qz);
+                euler[1] =  asin(2.0f*(qx*qz-qw*qy));
+                euler[2] = atan2(2.0f*(qx*qy+qw*qz),qw*qw+qx*qx-qy*qy-qz*qz);
 
                 euler[0] = int(euler[0]*1000)/1000.0;
                 euler[1] = int(euler[1]*1000)/1000.0;
@@ -53,14 +53,17 @@ namespace hf {
 
             Quaternion(void)
             {
-                memset(_quat, 0, 4*sizeof(float));
+                _qw = 0;
+                _qx = 0;
+                _qy = 0;
+                _qz = 0;
             }
 
             virtual void modifyState(state_t & state, float time) override
             {
                 (void)time;
 
-                computeEulerAngles(_quat, state.eulerAngles);
+                computeEulerAngles(_qw, _qx, _qy, _qz, state.eulerAngles);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
                 if (state.eulerAngles[2] < 0) {
@@ -72,12 +75,15 @@ namespace hf {
             {
                 (void)time;
 
-                return board->getQuaternion(_quat);
+                return board->getQuaternion(_qw, _qx, _qy, _qz);
             }
 
         private:
 
-            float _quat[4];
+            float _qw;
+            float _qx;
+            float _qy;
+            float _qz;
 
     };  // class Quaternion
 

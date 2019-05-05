@@ -57,22 +57,20 @@ namespace hf {
                 }
             }
 
-            bool getGyrometer(float gyro[3])
+            bool getGyrometer(float & gx, float & gy, float & gz)
             {
                 // Since gyro is updated most frequently, use it to drive SENtral polling
                 checkEventStatus();
 
                 if (_sentral.gotGyrometer()) {
 
-                    float gx, gy, gz;
-
                     // Returns degrees / sec
                     _sentral.readGyrometer(gx, gy, gz);
 
                     // Convert degrees / sec to radians / sec
-                    gyro[0] = radians(gx);
-                    gyro[1] = radians(gy);
-                    gyro[2] = radians(gz);
+                    gx = radians(gx);
+                    gy = radians(gy);
+                    gz = radians(gz);
 
                     return true;
                 }
@@ -80,18 +78,11 @@ namespace hf {
                 return false;
             }
 
-            bool getQuaternion(float quat[4])
+            bool getQuaternion(float & qw, float & qx, float & qy, float & qz)
             {
                 if (_sentral.gotQuaternion()) {
 
-                    static float qw, qx, qy, qz;
-
                     _sentral.readQuaternion(qw, qx, qy, qz);
-
-                    quat[0] = qw;
-                    quat[1] = qx;
-                    quat[2] = qy;
-                    quat[3] = qz;
 
                     return true;
                 }

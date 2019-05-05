@@ -48,16 +48,15 @@ namespace hf {
             // GY: pitch forward -, back +
             // GZ: yaw left -,      right +
 
-
             //------------------------------------ Core functionality ----------------------------------------------------
-            virtual bool  getQuaternion(float quat[4]) = 0;
-            virtual bool  getGyrometer(float gyroRates[3]) = 0;
+            virtual bool  getQuaternion(float & qw, float & qx, float & qy, float & qz) = 0;
+            virtual bool  getGyrometer(float & gx, float & gy, float & gz) = 0;
             virtual void  writeMotor(uint8_t index, float value) = 0;
             virtual float getTime(void) = 0;
 
             //------------------------- Support for additional surface-mount sensors -------------------------------------
-            virtual bool  getAccelerometer(float accelGs[3]) { (void)accelGs;  return false; }
-            virtual bool  getMagnetometer(float uTs[3]) { (void)uTs;  return false; }
+            virtual bool  getAccelerometer(float & ax, float & ay, float & az) { (void)ax; (void)ay; (void)az; return false; }
+            virtual bool  getMagnetometer(float & mx, float & my, float & mz) { (void)mx; (void)my; (void)mz; return false; }
             virtual bool  getBarometer(float & pressure) { (void)pressure;  return false; }
 
             //------------------------------- Serial communications via MSP ----------------------------------------------
@@ -74,7 +73,12 @@ namespace hf {
             virtual bool isBatteryLow(void) { return false; }
 
             //--------------------------------------- Debugging ----------------------------------------------------------
-            static void  outbuf(char * buf);
+            virtual void getRawImu(
+                    int16_t & ax, int16_t & ay, int16_t & az, 
+                    int16_t & gx, int16_t & gy, int16_t & gz,
+                    int16_t & mx, int16_t & my, int16_t & mz) 
+                {(void)ax; (void)ay; (void)az; (void)gx; (void)gy; (void)gz; (void)mx; (void)my; (void)mz; }
+            static  void outbuf(char * buf);
 
     }; // class Board
 

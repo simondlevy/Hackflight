@@ -31,14 +31,22 @@ namespace hf {
             float _time;
 
             // motionless and sligthly off-level
-            float _quat[4] = {.9f, 0.05f, 0.05f, 0.f};
-            float _gyro[3] = {0.f, 0.f, 0.f};
+            float _qw = 0.90f;
+            float _qx = 0.05f;
+            float _qy = 0.05f;
+            float _qz = 0.00f;
+            float _gx = 0.00f;
+            float _gy = 0.00f;
+            float _gz = 0.00f;
 
         protected:
 
-            virtual bool getQuaternion(float quat[4]) override
+            virtual bool  getQuaternion(float & qw, float & qx, float & qy, float & qz) override 
             {
-                memcpy(quat, _quat, 4*sizeof(float));
+                qw = _qw;
+                qx = _qx;
+                qy = _qy;
+                qz = _qz;
 
                 float time = getTime();
 
@@ -50,9 +58,11 @@ namespace hf {
                 return false;
             }
 
-            virtual bool getGyrometer(float gyroRates[3]) override
+            virtual bool getGyrometer(float & gx, float & gy, float & gz) override
             {
-                memcpy(gyroRates, _gyro, 3*sizeof(float));
+                gx = _gx;
+                gy = _gy;
+                gz = _gz;
 
                 float time = getTime();
 

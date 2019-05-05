@@ -21,7 +21,6 @@
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
 #include <pidcontrollers/level.hpp>
-#include <sensors/mspsensors/rangeandflow.hpp>
 #include "omnibusf3.h"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
@@ -59,9 +58,6 @@ extern "C" {
 
         // Initialize Hackflight firmware
         h.init(board, rc, new hf::MixerQuadX(), ratePid);
-
-        // Add an MSP-based sensor for AGL and optical flow
-        h.addSensor(new hf::RangeAndFlow(board));
     }
 
     void loop(void)

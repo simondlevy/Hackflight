@@ -1,5 +1,5 @@
 /*
-   f3evobrushed.h : Board class for Hyperion F3 Evo Brushed board
+   femtof3.h : Board class for FemtoF3
 
    Copyright (C) 2018 Simon D. Levy 
 

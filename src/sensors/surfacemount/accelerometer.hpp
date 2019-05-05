@@ -42,7 +42,9 @@ namespace hf {
 
             Accelerometer(void)
             {
-                memset(_gs, 0, 3*sizeof(float));
+                _ax = 0;
+                _ay = 0;
+                _az = 0;
             }
 
         protected:
@@ -58,12 +60,14 @@ namespace hf {
             {
                 (void)time;
 
-                return board->getAccelerometer(_gs);
+                return board->getAccelerometer(_ax, _ay, _az);
             }
 
         private:
 
-            float _gs[3];
+            float _ax;
+            float _ay;
+            float _az;
 
     };  // class Accelerometer
 

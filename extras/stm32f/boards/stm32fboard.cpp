@@ -62,14 +62,14 @@ extern "C" {
         systemResetToBootloader();
     }
 
-    bool Stm32FBoard::getQuaternion(float quat[4])
+    bool Stm32FBoard::getQuaternion(float & qw, float & qx, float & qy, float & qz)
     {
-        return SoftwareQuaternionBoard::getQuaternion(quat, getTime());
+        return SoftwareQuaternionBoard::getQuaternion(qw, qx, qy, qz, getTime());
     }
 
-    bool Stm32FBoard::getGyrometer(float gyroRates[3])
+    bool Stm32FBoard::getGyrometer(float & gx, float & gy, float & gz)
     {
-        return SoftwareQuaternionBoard::getGyrometer(gyroRates);
+        return SoftwareQuaternionBoard::getGyrometer(gx, gy, gz);
     }
 
     void hf::Board::outbuf(char * buf)
@@ -92,5 +92,13 @@ extern "C" {
     {
         serialWrite(_serial0, c);
     }
+
+    void Stm32FBoard::getRawImu(
+            int16_t & ax, int16_t & ay, int16_t & az, 
+            int16_t & gx, int16_t & gy, int16_t & gz,
+            int16_t & mx, int16_t & my, int16_t & mz)
+    {
+        hf::SoftwareQuaternionBoard::getRawImu(ax, ay, az, gx, gy, gz, mx, my, mz);
+    } 
 
 } // extern "C"

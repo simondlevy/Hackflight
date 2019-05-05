@@ -1,7 +1,7 @@
 /*
-   femtof3.cpp : Board implmentation for FemtoF3
+   furyf4.cpp : Board implmentation for FuryF4
 
-   Copyright (C) 2018 Simon D. Levy 
+   Copyright (C) 2019 Simon D. Levy 
 
    This file is part of Hackflight.
 
@@ -19,7 +19,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "femtof3.h"
+#include "furyf4.h"
 
 // Here we put code that interacts with Cleanflight
 extern "C" {
@@ -31,15 +31,16 @@ extern "C" {
 #include "../../common/spi.h"
 #include "../../common/motors.h"
 
-    FemtoF3::FemtoF3(void) : Stm32FBoard(usbVcpOpen())
+    FuryF4::FuryF4(void) : Stm32FBoard(usbVcpOpen())
     {
-        spi_init(MPU6500_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6500_CS_PIN)));
+        spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
 
         brushless_motors_init(0, 1, 2, 3);
 
-        _imu = new MPU6500(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
+        //_imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
+        _imu = new MPU6000();
 
-        checkImuError(_imu->begin());
+        //checkImuError(_imu->begin());
 
         RealBoard::init();
     }
@@ -49,20 +50,29 @@ extern "C" {
         ledSet(0, isOn);
     }
 
-    bool FemtoF3::imuReady(void)
+    bool FuryF4::imuReady(void)
     {
         return _imu->checkNewData();
     }
 
-    void FemtoF3::imuReadAccelGyro(void)
+    void FuryF4::imuReadAccelGyro(void)
     {
-        _imu->readAccelerometer(_ax, _ay, _az);
-        _imu->readGyrometer(_gx, _gy, _gz);
+        _imu->read();
+
+        _axRaw = _imu->sensors.sensors_signed.accX;
+        _ayRaw = _imu->sensors.sensors_signed.accY;
+        _azRaw = _imu->sensors.sensors_signed.accZ;
+        _gxRaw = _imu->sensors.sensors_signed.gyrX;
+        _gyRaw = _imu->sensors.sensors_signed.gyrY;
+        _gzRaw = _imu->sensors.sensors_signed.gyrZ;
+
+        //_imu->readAccelerometer(_ax, _ay, _az);
+        //_imu->readGyrometer(_gx, _gy, _gz);
 
         // Negate for IMU orientation
-        _ay = -_ay;
-        _gx = -_gx;
-        _gz = -_gz;
+        //_ay = -_ay;
+        //_gx = -_gx;
+        //_gz = -_gz;
     }
 
 } // extern "C"

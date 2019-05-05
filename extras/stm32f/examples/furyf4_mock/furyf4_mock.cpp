@@ -1,7 +1,7 @@
 /*
-   Sketch for SP Racing F3 board with Spektrum DSMX receiver
+   Sketch for FURYF4 board with mock receiver
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2019 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -20,31 +20,26 @@
 
 #include <hackflight.hpp>
 #include <mixers/quadx.hpp>
-#include "../../common/dsmx.h"
-
-#include "spracingf3.h"
-
-constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+#include <receivers/mock.hpp>
+#include "furyf4.h"
 
 static hf::Hackflight h;
 
-// Called by main.c, so must be treated as C
 extern "C" {
+
+#include "time.h"
 
     void setup(void)
     {
-        hf::Stabilizer * stabilizer = new hf::Stabilizer(
-                0.10f,      // Level P
-                0.125f,     // Gyro cyclic P
-                0.001875f,  // Gyro cyclic I
-                0.175f,     // Gyro cyclic D
-                0.625f,     // Gyro yaw P
-                0.005625f); // Gyro yaw I
+        hf::Rate * ratePid = new hf::Rate(
+                0.05f, // Gyro cyclic P
+                0.00f, // Gyro cyclic I
+                0.00f, // Gyro cyclic D
+                0.10f, // Gyro yaw P
+                0.01f, // Gyro yaw I
+                8.58); // Demands to rate
 
-        DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_3, CHANNEL_MAP);
-
-        // Initialize Hackflight firmware
-        h.init(new SPRacingF3(), rc, new hf::MixerQuadX(), stabilizer);
+        h.init(new FuryF4(), new hf::MockReceiver(), new hf::MixerQuadX(), ratePid);
     }
 
     void loop(void)
