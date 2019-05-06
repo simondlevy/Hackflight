@@ -31,8 +31,18 @@ extern "C" {
 #include "../../common/spi.h"
 #include "../../common/motors.h"
 
-    FuryF4::FuryF4(void) : Stm32FBoard(usbVcpOpen())
+// Hackflight includes
+#include "../../common/spi.h"
+#include "../../common/beeperled.h"
+#include "../../common/motors.h"
+
+    // We put this outside the class to make it available to static Board::outbuf() below
+    static serialPort_t * _serial0;
+
+    FuryF4::FuryF4(void)
     {
+        _serial0 = usbVcpOpen();
+
         spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
 
         brushless_motors_init(0, 1, 2, 3);
@@ -40,12 +50,12 @@ extern "C" {
         //_imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
         _imu = new MPU6000();
 
-        //checkImuError(_imu->begin());
+        checkImuError(_imu->begin());
 
         RealBoard::init();
     }
 
-    void Stm32FBoard::setLed(bool isOn)
+    void FuryF4::setLed(bool isOn)
     {
         ledSet(0, isOn);
     }
@@ -74,5 +84,69 @@ extern "C" {
         //_gx = -_gx;
         //_gz = -_gz;
     }
+    
+    void FuryF4::checkImuError(MPUIMU::Error_t errid)
+    {
+        switch (errid) {
+
+            case MPUIMU::ERROR_IMU_ID:
+                error("Bad device ID");
+                break;
+            case MPUIMU::ERROR_SELFTEST:
+                error("Failed self-test");
+                break;
+            default:
+                break;
+        }
+    }
+
+    void FuryF4::writeMotor(uint8_t index, float value)
+    {
+        motor_write(index, value);
+    }
+
+    void FuryF4::reboot(void)
+    {
+        systemResetToBootloader();
+    }
+
+    bool FuryF4::getQuaternion(float & qw, float & qx, float & qy, float & qz)
+    {
+        return SoftwareQuaternionBoard::getQuaternion(qw, qx, qy, qz, getTime());
+    }
+
+    bool FuryF4::getGyrometer(float & gx, float & gy, float & gz)
+    {
+        return SoftwareQuaternionBoard::getGyrometer(gx, gy, gz);
+    }
+
+    void hf::Board::outbuf(char * buf)
+    {
+        for (char *p=buf; *p; p++)
+            serialWrite(_serial0, *p);
+    }
+
+    uint8_t FuryF4::serialNormalAvailable(void)
+    {
+        return serialRxBytesWaiting(_serial0);
+    }
+
+    uint8_t FuryF4::serialNormalRead(void)
+    {
+        return serialRead(_serial0);
+    }
+
+    void FuryF4::serialNormalWrite(uint8_t c)
+    {
+        serialWrite(_serial0, c);
+    }
+
+    void FuryF4::getRawImu(
+            int16_t & ax, int16_t & ay, int16_t & az, 
+            int16_t & gx, int16_t & gy, int16_t & gz,
+            int16_t & mx, int16_t & my, int16_t & mz)
+    {
+        hf::SoftwareQuaternionBoard::getRawImu(ax, ay, az, gx, gy, gz, mx, my, mz);
+    } 
 
 } // extern "C"

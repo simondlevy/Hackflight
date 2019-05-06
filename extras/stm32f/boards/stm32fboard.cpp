@@ -24,7 +24,7 @@
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
-    // Hackflight includes
+// Hackflight includes
 #include "../../common/spi.h"
 #include "../../common/beeperled.h"
 #include "../../common/motors.h"

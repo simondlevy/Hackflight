@@ -21,16 +21,53 @@
 
 #pragma once
 
-#include <MPU6000.h>
-#include "stm32fboard.h"
+#include <boards/realboard.hpp>
+#include <boards/softquat.hpp>
 
-class FuryF4 : public Stm32FBoard {
+// Cleanflight includes
+extern "C" {
+
+#include "platform.h"
+#include "drivers/system.h"
+#include "drivers/timer.h"
+#include "drivers/time.h"
+#include "drivers/pwm_output.h"
+#include "drivers/serial.h"
+#include "drivers/serial_uart.h"
+#include "drivers/serial_usb_vcp.h"
+#include "io/serial.h"
+#include "target.h"
+
+} // extern "C"
+
+
+#include <MPU6000.h>
+
+class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
     private:
 
         MPU6000 * _imu;
 
     protected: 
+
+        FuryF4(serialPort_t * serial0);
+
+        void checkImuError(MPUIMU::Error_t errid);
+
+        // Board class overrides
+        virtual void     writeMotor(uint8_t index, float value) override;
+        virtual void     setLed(bool isOn) override;
+        virtual void     reboot(void) override;
+        virtual uint8_t  serialNormalAvailable(void) override;
+        virtual uint8_t  serialNormalRead(void) override;
+        virtual void     serialNormalWrite(uint8_t c) override;
+        virtual bool     getQuaternion(float & qw, float & qx, float & qy, float & qz) override;
+        virtual bool     getGyrometer(float & gx, float & gy, float & gz) override;
+        virtual void     getRawImu(
+                int16_t & ax, int16_t & ay, int16_t & az, 
+                int16_t & gx, int16_t & gy, int16_t & gz,
+                int16_t & mx, int16_t & my, int16_t & mz) override; 
 
         // SoftwareQuaternionBoard class overrides
         virtual bool imuReady(void) override;
