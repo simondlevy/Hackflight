@@ -68,7 +68,7 @@ namespace hf {
                 _previousTime = currentTime;
                 if (deltaT == currentTime) return false;
 
-                // Reset altitude target if moved into stick deadband
+                // Reset target if moved into stick deadband
                 bool inBandCurr = inBand(demand);
                 if (inBandCurr && !_inBandPrev) {
                     _posTarget = posActual;
