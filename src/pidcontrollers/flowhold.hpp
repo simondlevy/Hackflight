@@ -57,7 +57,8 @@ namespace hf {
             _previousTime = currentTime;
             if (deltaT == currentTime) return false;
 
-            float correction = 0;
+            demands.roll  -= _P * state.velocityRightward;
+            demands.pitch -= _P * state.velocityForward;
 
             return false;
 
