@@ -32,7 +32,7 @@ class RawImuParser(Parser):
 
     def handle_RAW_IMU(self, ax, ay, az, gx, gy, gz, mx, my, mz):
 
-        print('ax: %+d  ay: %+d  az: %+d | gx: %+d  gy: %+d  gz: %+d ' % (ax, ay, az, gx, gy, gz))
+        print('ax: %+06d  ay: %+06d  az: %+06d | gx: %+06d  gy: %+06d  gz: %+06d ' % (ax, ay, az, gx, gy, gz))
         port.write(request)
 
 if __name__ == '__main__':
