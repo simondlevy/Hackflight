@@ -56,7 +56,7 @@ extern "C" {
 
     void FuryF4::setLed(bool isOn)
     {
-        ledSet(0, isOn);
+        ledSet(1, isOn);
     }
 
     bool FuryF4::imuReady(void)
