@@ -23,6 +23,10 @@
 #include <math.h>
 #include <stdint.h>
 
+#ifndef M_PI
+static const float M_PI = 3.141593;
+#endif
+
 namespace hf {
 
     class Filter {
