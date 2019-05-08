@@ -53,7 +53,7 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
         FuryF4(serialPort_t * serial0);
 
-        void checkImuError(MPUIMU::Error_t errid);
+        void checkImuError(MPU6000::Error_t errid);
 
         // Board class overrides
         virtual void     writeMotor(uint8_t index, float value) override;

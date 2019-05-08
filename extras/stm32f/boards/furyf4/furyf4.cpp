@@ -47,8 +47,7 @@ extern "C" {
 
         brushless_motors_init(0, 1, 2, 3);
 
-        //_imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
-        _imu = new MPU6000();
+        _imu = new MPU6000(MPU6000::AFS_2G, MPU6000::GFS_250DPS);
 
         checkImuError(_imu->begin());
 
@@ -67,15 +66,15 @@ extern "C" {
 
     void FuryF4::imuReadAccelGyro(void)
     {
-        _imu->read();
+        //_imu->read();
 
-        _axRaw = _imu->sensors.sensors_signed.accX;
-        _ayRaw = _imu->sensors.sensors_signed.accY;
-        _azRaw = _imu->sensors.sensors_signed.accZ;
-        _gxRaw = _imu->sensors.sensors_signed.gyrX;
-        _gyRaw = _imu->sensors.sensors_signed.gyrY;
-        _gzRaw = _imu->sensors.sensors_signed.gyrZ;
-
+        _axRaw = 1;
+        _ayRaw = 2;
+        _azRaw = 3;
+        _gxRaw = 4;
+        _gyRaw = 5;
+        _gzRaw = 6;
+        
         //_imu->readAccelerometer(_ax, _ay, _az);
         //_imu->readGyrometer(_gx, _gy, _gz);
 
@@ -85,14 +84,14 @@ extern "C" {
         //_gz = -_gz;
     }
     
-    void FuryF4::checkImuError(MPUIMU::Error_t errid)
+    void FuryF4::checkImuError(MPU6000::Error_t errid)
     {
         switch (errid) {
 
-            case MPUIMU::ERROR_IMU_ID:
+            case MPU6000::ERROR_IMU_ID:
                 error("Bad device ID");
                 break;
-            case MPUIMU::ERROR_SELFTEST:
+            case MPU6000::ERROR_SELFTEST:
                 error("Failed self-test");
                 break;
             default:
