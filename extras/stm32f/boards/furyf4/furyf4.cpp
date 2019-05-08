@@ -66,22 +66,7 @@ extern "C" {
 
     void FuryF4::imuReadAccelGyro(void)
     {
-        //_imu->read();
-
-        _axRaw = 1;
-        _ayRaw = 2;
-        _azRaw = 3;
-        _gxRaw = 4;
-        _gyRaw = 5;
-        _gzRaw = 6;
-        
-        //_imu->readAccelerometer(_ax, _ay, _az);
-        //_imu->readGyrometer(_gx, _gy, _gz);
-
-        // Negate for IMU orientation
-        //_ay = -_ay;
-        //_gx = -_gx;
-        //_gz = -_gz;
+        _imu->readRaw(_axRaw, _ayRaw, _azRaw, _gxRaw, _gyRaw, _gzRaw);
     }
     
     void FuryF4::checkImuError(MPU6000::Error_t errid)
