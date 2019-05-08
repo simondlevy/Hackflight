@@ -47,7 +47,7 @@ extern "C" {
 
         brushless_motors_init(0, 1, 2, 3);
 
-        _imu = new MPU6000(MPU6000::AFS_2G, MPU6000::GFS_250DPS);
+        _imu = new MPU6000();
 
         checkImuError(_imu->begin());
 
