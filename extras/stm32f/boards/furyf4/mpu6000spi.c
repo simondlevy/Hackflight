@@ -163,7 +163,19 @@ static void _mpuIntExtiHandler(extiCallbackRec_t *cb)
     gyro->dataReady = true;
 }
 
-/*
+static void _mpuGyroRead(gyroDev_t *gyro)
+{
+    uint8_t data[6];
+
+    const bool ack = busReadRegisterBuffer(&gyro->bus, MPU_RA_GYRO_XOUT_H, data, 6);
+    if (!ack) {
+        return;
+    }
+
+    gyro->gyroADCRaw[X] = (int16_t)((data[0] << 8) | data[1]);
+    gyro->gyroADCRaw[Y] = (int16_t)((data[2] << 8) | data[3]);
+    gyro->gyroADCRaw[Z] = (int16_t)((data[4] << 8) | data[5]);
+}/*
 
 static _bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
 {
@@ -179,19 +191,7 @@ static _bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
     return true;
 }
 
-static void _mpuGyroRead(gyroDev_t *gyro)
-{
-    uint8_t data[6];
 
-    const bool ack = busReadRegisterBuffer(&gyro->bus, MPU_RA_GYRO_XOUT_H, data, 6);
-    if (!ack) {
-        return;
-    }
-
-    gyro->gyroADCRaw[X] = (int16_t)((data[0] << 8) | data[1]);
-    gyro->gyroADCRaw[Y] = (int16_t)((data[2] << 8) | data[3]);
-    gyro->gyroADCRaw[Z] = (int16_t)((data[4] << 8) | data[5]);
-}
 
 static bool _mpuGyroReadSPI(gyroDev_t *gyro)
 {
