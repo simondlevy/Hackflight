@@ -156,14 +156,14 @@ static uint8_t _mpu6000SpiDetect(const busDevice_t *bus)
     return MPU_NONE;
 }
 
-
-/*
 // Gyro interrupt service routine
 static void _mpuIntExtiHandler(extiCallbackRec_t *cb)
 {
     gyroDev_t *gyro = container_of(cb, gyroDev_t, exti);
     gyro->dataReady = true;
 }
+
+/*
 
 static void _mpuIntExtiInit(gyroDev_t *gyro)
 {
