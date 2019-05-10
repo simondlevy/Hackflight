@@ -186,7 +186,7 @@ static bool _detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
 
     spiBusSetInstance(&gyro->bus, MPU6000_SPI_INSTANCE);
     gyro->bus.busdev_u.spi.csnPin = gyro->bus.busdev_u.spi.csnPin == IO_NONE ? IOGetByTag(IO_TAG(MPU6000_CS_PIN)) : gyro->bus.busdev_u.spi.csnPin;
-    sensor = mpu6000SpiDetect(&gyro->bus);
+    sensor = _mpu6000SpiDetect(&gyro->bus);
     gyro->mpuDetectionResult.sensor = sensor;
     return true;
 }
@@ -259,7 +259,7 @@ static void _mpuDetect(gyroDev_t *gyro)
     delay(35);
 
     gyro->bus.bustype = BUSTYPE_SPI;
-    detectSPISensorsAndUpdateDetectionResult(gyro);
+    _detectSPISensorsAndUpdateDetectionResult(gyro);
 }
 
 
@@ -286,6 +286,23 @@ static uint32_t _gyroSetSampleRate(gyroDev_t *gyro, uint8_t lpf, uint8_t gyroSyn
     const uint32_t targetLooptime = (uint32_t)(gyroSyncDenominator * gyroSamplePeriod);
     return targetLooptime;
 }
+
+static void _mpuIntExtiInit(gyroDev_t *gyro)
+{
+    if (gyro->mpuIntExtiTag == IO_TAG_NONE) {
+        return;
+    }
+
+    const IO_t mpuIntIO = IOGetByTag(gyro->mpuIntExtiTag);
+
+    IOInit(mpuIntIO, OWNER_MPU_EXTI, 0);
+    IOConfigGPIO(mpuIntIO, IOCFG_IN_FLOATING);   // TODO - maybe pullup / pulldown ?
+
+    EXTIHandlerInit(&gyro->exti, _mpuIntExtiHandler);
+    EXTIConfig(mpuIntIO, &gyro->exti, NVIC_PRIO_MPU_INT_EXTI, EXTI_Trigger_Rising);
+    EXTIEnable(mpuIntIO, true);
+}
+
 
 static void _mpu6000SpiGyroInit(gyroDev_t *gyro)
 {
@@ -376,14 +393,13 @@ static bool _mpu6000SpiGyroDetect(gyroDev_t *gyro)
 
 void mpu6000_spi_init(gyroDev_t * gyro, accDev_t * acc, uint8_t lpf, uint8_t gyroSyncDenominator, bool gyro_use_32khz)
 {
-    (void)gyro;
     (void)acc;
     (void)lpf;
     (void)gyroSyncDenominator;
     (void)gyro_use_32khz;
 
-    //_mpuDetect(gyro);
-    //_mpu6000SpiGyroDetect(gyro);
+    _mpuDetect(gyro);
+    _mpu6000SpiGyroDetect(gyro);
     //_gyroSetSampleRate(gyro, lpf, gyroSyncDenominator, gyro_use_32khz);
     //_mpu6000SpiAccDetect(acc);
 
