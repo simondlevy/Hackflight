@@ -400,7 +400,7 @@ void mpu6000_spi_init(gyroDev_t * gyro, accDev_t * acc, uint8_t lpf, uint8_t gyr
 
     _mpuDetect(gyro);
     _mpu6000SpiGyroDetect(gyro);
-    //_gyroSetSampleRate(gyro, lpf, gyroSyncDenominator, gyro_use_32khz);
+    _gyroSetSampleRate(gyro, lpf, gyroSyncDenominator, gyro_use_32khz);
     //_mpu6000SpiAccDetect(acc);
 
 }
