@@ -287,9 +287,6 @@ static uint32_t _gyroSetSampleRate(gyroDev_t *gyro, uint8_t lpf, uint8_t gyroSyn
     return targetLooptime;
 }
 
-
-/*
-
 static void _mpu6000SpiGyroInit(gyroDev_t *gyro)
 {
     _mpuIntExtiInit(gyro);
@@ -345,17 +342,20 @@ static void _mpu6000SpiGyroInit(gyroDev_t *gyro)
     spiSetDivisor(gyro->bus.busdev_u.spi.instance, SPI_CLOCK_INITIALIZATON);
 
     // Accel and Gyro DLPF Setting
-    spiBusWriteRegister(&gyro->bus, MPU6000_CONFIG, mpuGyroDLPF(gyro));
+    spiBusWriteRegister(&gyro->bus, MPU6000_CONFIG, _mpuGyroDLPF(gyro));
     delayMicroseconds(1);
 
     spiSetDivisor(gyro->bus.busdev_u.spi.instance, SPI_CLOCK_FAST);  // 18 MHz SPI clock
 
-    mpuGyroRead(gyro);
+    _mpuGyroRead(gyro);
 
     if (((int8_t)gyro->gyroADCRaw[1]) == -1 && ((int8_t)gyro->gyroADCRaw[0]) == -1) {
         failureMode(FAILURE_GYRO_INIT_FAILED);
     }
 }
+
+
+/*
 
 static bool _mpu6000SpiAccDetect(accDev_t *acc)
 {
