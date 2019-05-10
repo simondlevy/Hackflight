@@ -482,7 +482,6 @@ FC_SRC = \
             fc/fc_init.c \
             fc/controlrate_profile.c \
             drivers/camera_control.c \
-            drivers/accgyro/gyro_sync.c \
             drivers/pwm_esc_detect.c \
             drivers/pwm_output.c \
             drivers/rx/rx_spi.c \
