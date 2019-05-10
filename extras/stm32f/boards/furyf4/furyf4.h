@@ -41,19 +41,11 @@ extern "C" {
 } // extern "C"
 
 
-#include <MPU6000.h>
-
 class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
-
-    private:
-
-        MPU6000 * _imu;
 
     protected: 
 
         FuryF4(serialPort_t * serial0);
-
-        void checkImuError(MPU6000::Error_t errid);
 
         // Board class overrides
         virtual void     writeMotor(uint8_t index, float value) override;

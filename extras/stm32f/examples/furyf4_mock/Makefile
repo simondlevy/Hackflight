@@ -88,9 +88,7 @@ BIN_DIR         := $(ROOT)/obj
 LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
 HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
-IMU_DIR         := $(ARDUINO_DIR)/MPU6000/src
-SPI_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
-INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR) ../../boards
+INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(RX_DIR) ../../boards
 LINKER_DIR      := $(SRC_DIR)/target/link
 MAKE_DIR        := $(CF_DIR)/make
 
@@ -104,6 +102,8 @@ DL_DIR    := $(ROOT)/downloads
 
 export RM := rm
 
+ARM_SDK_PREFIX := arm-none-eabi-
+
 # include the tools makefile
 include $(MAKE_DIR)/tools.mk
 
@@ -112,8 +112,6 @@ HSE_VALUE       ?= 8000000
 
 # used for turning on features like VCP and SDCARD
 FEATURES        =
-
-GROUP_3_TARGETS := REVO 
 
 BASE_TARGET    := $(TARGET)
 
@@ -870,11 +868,10 @@ endif
 BOARD := furyf4
 BOARD_DIR := ../../boards/$(BOARD)
 INCLUDE_DIRS += $(BOARD_DIR)
-IMU_SRC := $(IMU_DIR)/MPU6000.cpp
-HF_SRC := ../../common/main.c ../../common/spi.cpp ../../common/motors.cpp 
+HF_SRC := ../../common/main.c ../../common/motors.cpp 
 BOARD_SRC := $(BOARD_DIR)/$(BOARD).cpp  
 SKETCH_SRC := ./furyf4_mock.cpp
-SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(BOARD_SRC) $(SKETCH_SRC)
+SRC += $(HF_SRC) $(RX_SRC) $(BOARD_SRC) $(SKETCH_SRC)
 
 
 ###############################################################################
@@ -993,9 +990,6 @@ targets-group-1: $(GROUP_1_TARGETS)
 
 ## targets-group-2   : build some targets
 targets-group-2: $(GROUP_2_TARGETS)
-
-## targets-group-3   : build some targets
-targets-group-3: $(GROUP_3_TARGETS)
 
 ## targets-group-3   : build some targets
 targets-group-4: $(GROUP_4_TARGETS)

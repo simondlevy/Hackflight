@@ -43,13 +43,7 @@ extern "C" {
     {
         _serial0 = usbVcpOpen();
 
-        spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
-
-        brushless_motors_init(0, 1, 2, 3);
-
-        _imu = new MPU6000();
-
-        checkImuError(_imu->begin());
+        //spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
 
         RealBoard::init();
     }
@@ -61,32 +55,17 @@ extern "C" {
 
     bool FuryF4::imuReady(void)
     {
-        return _imu->checkNewData();
+        return false;
     }
 
     void FuryF4::imuReadAccelGyro(void)
     {
-        _imu->readRaw(_axRaw, _ayRaw, _azRaw, _gxRaw, _gyRaw, _gzRaw);
     }
     
-    void FuryF4::checkImuError(MPU6000::Error_t errid)
-    {
-        switch (errid) {
-
-            case MPU6000::ERROR_IMU_ID:
-                error("Bad device ID");
-                break;
-            case MPU6000::ERROR_SELFTEST:
-                error("Failed self-test");
-                break;
-            default:
-                break;
-        }
-    }
-
     void FuryF4::writeMotor(uint8_t index, float value)
     {
-        motor_write(index, value);
+        (void)index;
+        (void)value;
     }
 
     void FuryF4::reboot(void)
