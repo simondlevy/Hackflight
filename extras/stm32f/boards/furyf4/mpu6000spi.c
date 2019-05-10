@@ -180,6 +180,7 @@ static uint8_t _mpu6000SpiDetect(const busDevice_t *bus)
     return MPU_NONE;
 }
 
+*/
 
 static _bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
 {
@@ -195,6 +196,7 @@ static _bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
     return true;
 }
 
+/*
 static void _mpuGyroRead(gyroDev_t *gyro)
 {
     uint8_t data[6];
