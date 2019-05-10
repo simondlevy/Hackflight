@@ -163,8 +163,6 @@ static void _mpuIntExtiHandler(extiCallbackRec_t *cb)
     gyro->dataReady = true;
 }
 
-/*
-
 static void _mpuIntExtiInit(gyroDev_t *gyro)
 {
     if (gyro->mpuIntExtiTag == IO_TAG_NONE) {
@@ -180,6 +178,8 @@ static void _mpuIntExtiInit(gyroDev_t *gyro)
     EXTIConfig(mpuIntIO, &gyro->exti, NVIC_PRIO_MPU_INT_EXTI, EXTI_Trigger_Rising);
     EXTIEnable(mpuIntIO, true);
 }
+
+/*
 
 static _bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
 {
