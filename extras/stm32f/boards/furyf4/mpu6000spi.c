@@ -179,8 +179,6 @@ static void _mpuIntExtiInit(gyroDev_t *gyro)
     EXTIEnable(mpuIntIO, true);
 }
 
-/*
-
 static _bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
 {
     UNUSED(gyro); // since there are FCs which have gyro on I2C but other devices on SPI
@@ -194,6 +192,8 @@ static _bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
     gyro->mpuDetectionResult.sensor = sensor;
     return true;
 }
+
+/*
 
 static void _mpuGyroRead(gyroDev_t *gyro)
 {
