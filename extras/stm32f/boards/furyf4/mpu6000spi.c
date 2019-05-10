@@ -253,6 +253,15 @@ static void _mpu6000SpiAccInit(accDev_t *acc)
     acc->acc_1G = 512 * 4;
 }
 
+static void _mpuDetect(gyroDev_t *gyro)
+{
+    // MPU datasheet specifies 30ms.
+    delay(35);
+
+    gyro->bus.bustype = BUSTYPE_SPI;
+    detectSPISensorsAndUpdateDetectionResult(gyro);
+}
+
 /*
 
 static void _mpu6000SpiGyroInit(gyroDev_t *gyro)
@@ -340,14 +349,6 @@ static bool _mpu6000SpiGyroDetect(gyroDev_t *gyro)
     return true;
 }
 
-static void _mpuDetect(gyroDev_t *gyro)
-{
-    // MPU datasheet specifies 30ms.
-    delay(35);
-
-    gyro->bus.bustype = BUSTYPE_SPI;
-    detectSPISensorsAndUpdateDetectionResult(gyro);
-}
 
 static uint32_t _gyroSetSampleRate(gyroDev_t *gyro, uint8_t lpf, uint8_t gyroSyncDenominator, bool gyro_use_32khz)
 {
