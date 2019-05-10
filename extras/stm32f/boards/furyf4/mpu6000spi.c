@@ -163,21 +163,7 @@ static void _mpuIntExtiHandler(extiCallbackRec_t *cb)
     gyro->dataReady = true;
 }
 
-static void _mpuIntExtiInit(gyroDev_t *gyro)
-{
-    if (gyro->mpuIntExtiTag == IO_TAG_NONE) {
-        return;
-    }
-
-    const IO_t mpuIntIO = IOGetByTag(gyro->mpuIntExtiTag);
-
-    IOInit(mpuIntIO, OWNER_MPU_EXTI, 0);
-    IOConfigGPIO(mpuIntIO, IOCFG_IN_FLOATING);   // TODO - maybe pullup / pulldown ?
-
-    EXTIHandlerInit(&gyro->exti, _mpuIntExtiHandler);
-    EXTIConfig(mpuIntIO, &gyro->exti, NVIC_PRIO_MPU_INT_EXTI, EXTI_Trigger_Rising);
-    EXTIEnable(mpuIntIO, true);
-}
+/*
 
 static _bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
 {
@@ -192,8 +178,6 @@ static _bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
     gyro->mpuDetectionResult.sensor = sensor;
     return true;
 }
-
-/*
 
 static void _mpuGyroRead(gyroDev_t *gyro)
 {
