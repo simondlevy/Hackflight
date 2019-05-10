@@ -43,7 +43,7 @@ extern "C" {
     {
         _serial0 = usbVcpOpen();
 
-        //spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
+        spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
 
         RealBoard::init();
     }
