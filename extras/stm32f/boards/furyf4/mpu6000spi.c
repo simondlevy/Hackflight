@@ -175,9 +175,9 @@ static void _mpuGyroRead(gyroDev_t *gyro)
     gyro->gyroADCRaw[X] = (int16_t)((data[0] << 8) | data[1]);
     gyro->gyroADCRaw[Y] = (int16_t)((data[2] << 8) | data[3]);
     gyro->gyroADCRaw[Z] = (int16_t)((data[4] << 8) | data[5]);
-}/*
+}
 
-static _bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
+static bool _detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
 {
     UNUSED(gyro); // since there are FCs which have gyro on I2C but other devices on SPI
 
@@ -190,6 +190,8 @@ static _bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
     gyro->mpuDetectionResult.sensor = sensor;
     return true;
 }
+/*
+
 
 
 
