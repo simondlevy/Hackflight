@@ -354,28 +354,23 @@ static void _mpu6000SpiGyroInit(gyroDev_t *gyro)
     }
 }
 
-
-/*
-
 static bool _mpu6000SpiAccDetect(accDev_t *acc)
 {
-    acc->initFn = mpu6000SpiAccInit;
-    acc->readFn = mpuAccRead;
+    acc->initFn = _mpu6000SpiAccInit;
+    acc->readFn = _mpuAccRead;
 
     return true;
 }
 
 static bool _mpu6000SpiGyroDetect(gyroDev_t *gyro)
 {
-    gyro->initFn = mpu6000SpiGyroInit;
-    gyro->readFn = mpuGyroReadSPI;
+    gyro->initFn = _mpu6000SpiGyroInit;
+    gyro->readFn = _mpuGyroReadSPI;
     // 16.4 dps/lsb scalefactor
     gyro->scale = 1.0f / 16.4f;
 
     return true;
 }
-
-*/
 
 // Public:  ======================================================================================
 
