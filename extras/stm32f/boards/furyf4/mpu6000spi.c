@@ -262,6 +262,32 @@ static void _mpuDetect(gyroDev_t *gyro)
     detectSPISensorsAndUpdateDetectionResult(gyro);
 }
 
+
+static uint32_t _gyroSetSampleRate(gyroDev_t *gyro, uint8_t lpf, uint8_t gyroSyncDenominator, bool gyro_use_32khz)
+{
+    float gyroSamplePeriod;
+
+    if (lpf == GYRO_HARDWARE_LPF_NORMAL || lpf == GYRO_HARDWARE_LPF_EXPERIMENTAL) {
+        if (gyro_use_32khz) {
+            gyro->gyroRateKHz = GYRO_RATE_32_kHz;
+            gyroSamplePeriod = 31.5f;
+        } else {
+            gyro->gyroRateKHz = GYRO_RATE_8_kHz;
+            gyroSamplePeriod = 125.0f;
+        }
+    } else {
+        gyro->gyroRateKHz = GYRO_RATE_1_kHz;
+        gyroSamplePeriod = 1000.0f;
+        gyroSyncDenominator = 1; // Always full Sampling 1khz
+    }
+
+    // calculate gyro divider and targetLooptime (expected cycleTime)
+    gyro->mpuDividerDrops  = gyroSyncDenominator - 1;
+    const uint32_t targetLooptime = (uint32_t)(gyroSyncDenominator * gyroSamplePeriod);
+    return targetLooptime;
+}
+
+
 /*
 
 static void _mpu6000SpiGyroInit(gyroDev_t *gyro)
@@ -349,30 +375,6 @@ static bool _mpu6000SpiGyroDetect(gyroDev_t *gyro)
     return true;
 }
 
-
-static uint32_t _gyroSetSampleRate(gyroDev_t *gyro, uint8_t lpf, uint8_t gyroSyncDenominator, bool gyro_use_32khz)
-{
-    float gyroSamplePeriod;
-
-    if (lpf == GYRO_HARDWARE_LPF_NORMAL || lpf == GYRO_HARDWARE_LPF_EXPERIMENTAL) {
-        if (gyro_use_32khz) {
-            gyro->gyroRateKHz = GYRO_RATE_32_kHz;
-            gyroSamplePeriod = 31.5f;
-        } else {
-            gyro->gyroRateKHz = GYRO_RATE_8_kHz;
-            gyroSamplePeriod = 125.0f;
-        }
-    } else {
-        gyro->gyroRateKHz = GYRO_RATE_1_kHz;
-        gyroSamplePeriod = 1000.0f;
-        gyroSyncDenominator = 1; // Always full Sampling 1khz
-    }
-
-    // calculate gyro divider and targetLooptime (expected cycleTime)
-    gyro->mpuDividerDrops  = gyroSyncDenominator - 1;
-    const uint32_t targetLooptime = (uint32_t)(gyroSyncDenominator * gyroSamplePeriod);
-    return targetLooptime;
-}
 */
 
 // Public:  ======================================================================================
