@@ -190,10 +190,6 @@ static bool _detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
     gyro->mpuDetectionResult.sensor = sensor;
     return true;
 }
-/*
-
-
-
 
 static bool _mpuGyroReadSPI(gyroDev_t *gyro)
 {
@@ -227,6 +223,8 @@ static bool _mpuAccRead(accDev_t *acc)
 
     return true;
 }
+
+/*
 
 static uint8_t _mpuGyroDLPF(gyroDev_t *gyro)
 {
