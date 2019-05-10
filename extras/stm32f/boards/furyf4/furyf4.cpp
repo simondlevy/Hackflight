@@ -45,6 +45,10 @@ extern "C" {
 
         spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
 
+        delay(10);
+
+        mpu6000_spi_init(&_gyro, &_acc, 0, 1, false);
+
         RealBoard::init();
     }
 

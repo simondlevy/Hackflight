@@ -38,7 +38,7 @@ extern "C" {
 #include "io/serial.h"
 #include "target.h"
 
-#include "accgyro_spi_mpu6000.h"
+#include "mpu6000spi.h"
 
 } // extern "C"
 
@@ -47,8 +47,8 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
     private:
 
-        gyroDev_t gyro;
-        accDev_t  acc;
+        gyroDev_t _gyro;
+        accDev_t  _acc;
 
     protected: 
 

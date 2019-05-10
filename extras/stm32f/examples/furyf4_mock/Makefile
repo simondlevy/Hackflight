@@ -610,7 +610,7 @@ SPEED_OPTIMISED_SRC := $(SPEED_OPTIMISED_SRC) \
             common/maths.c \
             common/typeconversion.c \
             drivers/accgyro/accgyro_fake.c \
-           drivers/adc.c \
+            drivers/adc.c \
             drivers/buf_writer.c \
             drivers/bus.c \
             drivers/bus_spi.c \
@@ -868,7 +868,7 @@ endif
 BOARD := furyf4
 BOARD_DIR := ../../boards/$(BOARD)
 INCLUDE_DIRS += $(BOARD_DIR)
-HF_SRC := ../../common/main.c ../../boards/furyf4/spi.cpp
+HF_SRC := ../../common/main.c ../../boards/furyf4/spi.cpp $(BOARD_DIR)/mpu6000spi.c
 BOARD_SRC := $(BOARD_DIR)/$(BOARD).cpp  
 SKETCH_SRC := ./furyf4_mock.cpp
 SRC += $(HF_SRC) $(RX_SRC) $(BOARD_SRC) $(SKETCH_SRC)
