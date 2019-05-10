@@ -248,12 +248,12 @@ static uint8_t _mpuGyroDLPF(gyroDev_t *gyro)
     return ret;
 }
 
-/*
-
 static void _mpu6000SpiAccInit(accDev_t *acc)
 {
     acc->acc_1G = 512 * 4;
 }
+
+/*
 
 static void _mpu6000SpiGyroInit(gyroDev_t *gyro)
 {
