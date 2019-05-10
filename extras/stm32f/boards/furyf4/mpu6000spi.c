@@ -111,30 +111,6 @@ mpuResetFnPtr mpuResetFn;
 
 // Private: ======================================================================================
 
-/*
-// Gyro interrupt service routine
-static void _mpuIntExtiHandler(extiCallbackRec_t *cb)
-{
-    gyroDev_t *gyro = container_of(cb, gyroDev_t, exti);
-    gyro->dataReady = true;
-}
-
-static void _mpuIntExtiInit(gyroDev_t *gyro)
-{
-    if (gyro->mpuIntExtiTag == IO_TAG_NONE) {
-        return;
-    }
-
-    const IO_t mpuIntIO = IOGetByTag(gyro->mpuIntExtiTag);
-
-    IOInit(mpuIntIO, OWNER_MPU_EXTI, 0);
-    IOConfigGPIO(mpuIntIO, IOCFG_IN_FLOATING);   // TODO - maybe pullup / pulldown ?
-
-    EXTIHandlerInit(&gyro->exti, _mpuIntExtiHandler);
-    EXTIConfig(mpuIntIO, &gyro->exti, NVIC_PRIO_MPU_INT_EXTI, EXTI_Trigger_Rising);
-    EXTIEnable(mpuIntIO, true);
-}
-
 static uint8_t _mpu6000SpiDetect(const busDevice_t *bus)
 {
     IOInit(bus->busdev_u.spi.csnPin, OWNER_MPU_CS, 0);
@@ -180,7 +156,30 @@ static uint8_t _mpu6000SpiDetect(const busDevice_t *bus)
     return MPU_NONE;
 }
 
-*/
+
+/*
+// Gyro interrupt service routine
+static void _mpuIntExtiHandler(extiCallbackRec_t *cb)
+{
+    gyroDev_t *gyro = container_of(cb, gyroDev_t, exti);
+    gyro->dataReady = true;
+}
+
+static void _mpuIntExtiInit(gyroDev_t *gyro)
+{
+    if (gyro->mpuIntExtiTag == IO_TAG_NONE) {
+        return;
+    }
+
+    const IO_t mpuIntIO = IOGetByTag(gyro->mpuIntExtiTag);
+
+    IOInit(mpuIntIO, OWNER_MPU_EXTI, 0);
+    IOConfigGPIO(mpuIntIO, IOCFG_IN_FLOATING);   // TODO - maybe pullup / pulldown ?
+
+    EXTIHandlerInit(&gyro->exti, _mpuIntExtiHandler);
+    EXTIConfig(mpuIntIO, &gyro->exti, NVIC_PRIO_MPU_INT_EXTI, EXTI_Trigger_Rising);
+    EXTIEnable(mpuIntIO, true);
+}
 
 static _bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
 {
@@ -196,7 +195,6 @@ static _bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro)
     return true;
 }
 
-/*
 static void _mpuGyroRead(gyroDev_t *gyro)
 {
     uint8_t data[6];
