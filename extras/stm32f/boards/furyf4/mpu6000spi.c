@@ -224,8 +224,6 @@ static bool _mpuAccRead(accDev_t *acc)
     return true;
 }
 
-/*
-
 static uint8_t _mpuGyroDLPF(gyroDev_t *gyro)
 {
     uint8_t ret;
@@ -249,6 +247,8 @@ static uint8_t _mpuGyroDLPF(gyroDev_t *gyro)
     }
     return ret;
 }
+
+/*
 
 static void _mpu6000SpiAccInit(accDev_t *acc)
 {
