@@ -24,6 +24,8 @@
 #include <boards/realboard.hpp>
 #include <boards/softquat2.hpp>
 
+#include "mpu6000spi.h"
+
 // Cleanflight includes
 extern "C" {
 
@@ -42,6 +44,10 @@ extern "C" {
 
 
 class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard2 {
+
+    private:
+
+        MPU6000SPI * _imu;
 
     protected: 
 

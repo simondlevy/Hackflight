@@ -21,3 +21,21 @@
 
 #include "mpu6000spi.h"
 
+MPU6000SPI::MPU6000SPI(Ascale_t ascale, Gscale_t gscale, uint8_t sampleRateDivisor)
+{
+    (void)ascale;
+    (void)gscale;
+    (void)sampleRateDivisor;
+}
+
+bool MPU6000SPI::accelReady(void)
+{
+    return false;
+}
+
+bool MPU6000SPI::gyroReady(void)
+{
+    return false;
+}
+
+

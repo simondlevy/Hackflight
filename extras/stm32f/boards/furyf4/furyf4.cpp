@@ -20,7 +20,6 @@
  */
 
 #include "furyf4.h"
-#include "mpu6000spi.h"
 
 // Here we put code that interacts with Cleanflight
 extern "C" {
