@@ -24,7 +24,7 @@
 
 #include "hackflight.hpp"
 #include "boards/mock.hpp"
-#include "mixers/quadx.hpp"
+#include "mixers/quadxcf.hpp"
 #include "receivers/mock.hpp"
 
 class RandomWalkHackflight : public hf::Hackflight {
@@ -79,7 +79,7 @@ RandomWalkHackflight h;
 
 hf::MockReceiver rc;
 
-hf::MixerQuadX mixer;
+hf::MixerQuadXCF mixer;
 
 hf::Rate ratePid = hf::Rate(0, 0, 0, 0, 0);
 

@@ -64,8 +64,8 @@ implement for a particular receiver (reading channels values).
 * The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/mixer.hpp">Mixer</a>
 class is an abstract class that can be subclassed for various motor
 configurations (QuadX, Hexacopter, Tricopter, etc.).  The <a
-href="https://github.com/simondlevy/Hackflight/blob/master/src/mixers/quadx.hpp">QuadX</a>
-subclass is already implemented.  
+href="https://github.com/simondlevy/Hackflight/blob/master/src/mixers/quadxcf.hpp">QuadXCF</a>
+(quad-X using Cleanflight number conventions) subclass is already implemented.  
 * The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp">PID_Controller</a>
 class provides a constructor where you specify the PID values appropriate for your model (see
 <b>PID Controllers</b> discussion below).

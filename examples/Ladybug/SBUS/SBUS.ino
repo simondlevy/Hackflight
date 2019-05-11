@@ -33,7 +33,7 @@
 #include "hackflight.hpp"
 #include "boards/ladybug.hpp"
 #include "receivers/sbus.hpp"
-#include "mixers/quadx.hpp"
+#include "mixers/quadxcf.hpp"
 #include "pidcontrollers/level.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
@@ -42,7 +42,7 @@ hf::Hackflight h;
 
 hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, SERIAL_SBUS);
 
-hf::MixerQuadX mixer;
+hf::MixerQuadXCF mixer;
 
 hf::Rate ratePid = hf::Rate(
         0.225f,     // Gyro pitch/roll P

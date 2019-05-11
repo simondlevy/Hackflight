@@ -31,7 +31,7 @@
 
 #include "hackflight.hpp"
 #include "boards/superfly.hpp"
-#include "mixers/quadx.hpp"
+#include "mixers/quadxcf.hpp"
 #include "pidcontrollers/level.hpp"
 #include "receivers/esp8266.hpp"
 
@@ -41,7 +41,7 @@ hf::Hackflight h;
 
 hf::ESP8266_Receiver rc = hf::ESP8266_Receiver(CHANNEL_MAP, "SuperFly" /*, "Password"*/);
 
-hf::MixerQuadX mixer;
+hf::MixerQuadXCF mixer;
 
 hf::Rate ratePid = hf::Rate(
         0.225f,     // Gyro pitch/roll P

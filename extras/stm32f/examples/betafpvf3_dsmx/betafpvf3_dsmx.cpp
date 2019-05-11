@@ -19,7 +19,7 @@
  */
 
 #include <hackflight.hpp>
-#include <mixers/quadx.hpp>
+#include <mixers/quadxcf.hpp>
 #include "pidcontrollers/level.hpp"
 #include "betafpvf3.h"
 
@@ -54,7 +54,7 @@ extern "C" {
         DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_2, CHANNEL_MAP);
 
         // Initialize Hackflight firmware
-        h.init(new BetaFPVF3(), rc, new hf::MixerQuadX(), ratePid);
+        h.init(new BetaFPVF3(), rc, new hf::MixerQuadXCF(), ratePid);
     }
 
     void loop(void)

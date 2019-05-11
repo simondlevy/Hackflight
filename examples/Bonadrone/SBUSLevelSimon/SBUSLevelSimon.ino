@@ -34,7 +34,7 @@
 #include "hackflight.hpp"
 #include "boards/bonadrone.hpp"
 #include "receivers/sbus.hpp"
-#include "mixers/quadx.hpp"
+#include "mixers/quadxcf.hpp"
 
 #include "pidcontrollers/level.hpp"
 
@@ -47,7 +47,7 @@ hf::Hackflight h;
 
 hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, SERIAL_SBUS, &SBUS_SERIAL);
 
-hf::MixerQuadX mixer;
+hf::MixerQuadXCF mixer;
 
 hf::Rate ratePid = hf::Rate(
         0.10f,  // PitchRoll P

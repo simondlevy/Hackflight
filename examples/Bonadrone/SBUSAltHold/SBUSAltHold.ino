@@ -36,7 +36,7 @@
 #include "hackflight.hpp"
 #include "boards/bonadrone.hpp"
 #include "receivers/sbus.hpp"
-#include "mixers/quadx.hpp"
+#include "mixers/quadxcf.hpp"
 
 #include "sensors/rangefinder.hpp"
 
@@ -77,7 +77,7 @@ hf::Hackflight h;
 
 hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, SERIAL_SBUS, &SBUS_SERIAL);
 
-hf::MixerQuadX mixer;
+hf::MixerQuadXCF mixer;
 
 VL53L1X_Rangefinder rangefinder;
 

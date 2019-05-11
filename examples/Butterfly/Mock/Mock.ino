@@ -24,7 +24,7 @@
 
 #include "hackflight.hpp"
 #include "boards/mock.hpp"
-#include "mixers/quadx.hpp"
+#include "mixers/quadxcf.hpp"
 #include "receivers/mock.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
@@ -33,7 +33,7 @@ hf::Hackflight h;
 
 hf::MockReceiver rc;
 
-hf::MixerQuadX mixer;
+hf::MixerQuadXCF mixer;
 
 hf::Rate ratePid = hf::Rate(0, 0, 0, 0, 0);
 

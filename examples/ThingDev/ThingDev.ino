@@ -28,7 +28,7 @@
 
 #include "hackflight.hpp"
 #include "boards/thingdev.hpp"
-#include "mixers/quadx.hpp"
+#include "mixers/quadxcf.hpp"
 #include "pidcontrollers/level.hpp"
 #include "receivers/esp8266.hpp"
 
@@ -38,7 +38,7 @@ hf::Hackflight h;
 
 hf::ESP8266_Receiver rc = hf::ESP8266_Receiver(CHANNEL_MAP, "ThingDev");
 
-hf::MixerQuadX mixer;
+hf::MixerQuadXCF mixer;
 
 hf::Rate ratePid = hf::Rate(0, 0, 0, 0, 0);
 

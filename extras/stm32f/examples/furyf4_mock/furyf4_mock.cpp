@@ -19,7 +19,7 @@
  */
 
 #include <hackflight.hpp>
-#include <mixers/quadx.hpp>
+#include <mixers/quadxcf.hpp>
 #include <receivers/mock.hpp>
 #include "furyf4.h"
 
@@ -39,7 +39,7 @@ extern "C" {
                 0.01f, // Gyro yaw I
                 8.58); // Demands to rate
 
-        h.init(new FuryF4(), new hf::MockReceiver(), new hf::MixerQuadX(), ratePid);
+        h.init(new FuryF4(), new hf::MockReceiver(), new hf::MixerQuadXCF(), ratePid);
     }
 
     void loop(void)
