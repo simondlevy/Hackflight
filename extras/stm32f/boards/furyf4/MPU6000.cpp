@@ -78,19 +78,32 @@ MPU6000::Error_t MPU6000::begin(void)
 
 }
 
-bool MPU6000::readAccel(int16_t & ax, int16_t & ay, int16_t & az)
+bool MPU6000::readAccel(int16_t & x, int16_t & y, int16_t & z)
 {
     uint8_t data[6];
 
     if (!spi_read_registers(ACCEL_XOUT_H, 6, data)) return false;
 
-    ax = (int16_t)((data[0] << 8) | data[1]);
-    ay = (int16_t)((data[2] << 8) | data[3]);
-    az = (int16_t)((data[4] << 8) | data[5]);
+    x = (int16_t)((data[0] << 8) | data[1]);
+    y = (int16_t)((data[2] << 8) | data[3]);
+    z = (int16_t)((data[4] << 8) | data[5]);
 
     return true;
 }
 
+bool MPU6000::readGyro(int16_t & x, int16_t & y, int16_t & z)
+{
+    static const uint8_t send[7] = {GYRO_XOUT_H | 0x80, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+    uint8_t recv[7];
+
+    if (!spi_transfer(send, recv, 7)) return false;
+
+    x = (int16_t)((recv[1] << 8) | recv[2]);
+    y = (int16_t)((recv[3] << 8) | recv[4]);
+    z = (int16_t)((recv[5] << 8) | recv[6]);
+
+    return true;
+}
 
 uint8_t MPU6000::getId()
 {

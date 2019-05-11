@@ -60,6 +60,10 @@ extern "C" {
         _accx = 0;
         _accy = 0;
         _accz = 0;
+
+        _gyrox = 0;
+        _gyroy = 0;
+        _gyroz = 0;
     }
 
     void FuryF4::setLed(bool isOn)
@@ -70,7 +74,34 @@ extern "C" {
 
     bool FuryF4::imuReady(void)
     {
-        return _imu->readAccel(_accx, _accy, _accz);
+        int16_t gx=0, gy=0, gz=0;
+        int16_t ax=0, ay=0, az=0;
+
+        static bool accel;
+
+        if (accel) {
+
+            if (_imu->readAccel(ax, ay, az)) {
+                _accx = ax;
+                _accy = ay;
+                _accz = az;
+            }
+
+            accel = false;
+        }
+
+        else {
+
+            if (_imu->readGyro(gx, gy, gz)) {
+                _gyrox = gx;
+                _gyroy = gy;
+                _gyroz = gz;
+            }
+
+            accel  = true;
+        }
+
+        return false;
     }
 
 
@@ -137,7 +168,8 @@ extern "C" {
 
     void FuryF4::adHocDebug(void)
     {
-        hf::Debugger::printf("%+05d %+05d %+05d\n", _accx, _accy, _accz);
+        hf::Debugger::printf("ax: %+05d ay: %+05d az: %+05d | gx: %+05d gy: %+05d gz: %+05d\n", 
+           _accx, _accy, _accz, _gyrox, _gyroy, _gyroz);
     }
 
 } // extern "C"

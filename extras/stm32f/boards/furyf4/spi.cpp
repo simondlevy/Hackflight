@@ -69,4 +69,9 @@ extern "C" {
         return spiBusReadRegisterBuffer(&_bus, subAddress, dest, count);
     }
 
+    bool spi_transfer(const uint8_t * send, uint8_t * recv, uint8_t count)
+    {
+        return spiBusTransfer(&_bus, send, recv, count);
+    }
+
 } // extern "C"

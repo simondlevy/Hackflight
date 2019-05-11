@@ -53,6 +53,7 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard2 {
 
         // debugging
         int16_t _accx, _accy, _accz;
+        int16_t _gyrox, _gyroy, _gyroz;
 
     protected: 
 

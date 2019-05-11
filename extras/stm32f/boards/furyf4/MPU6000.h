@@ -196,13 +196,15 @@ class MPU6000 {
 
     public:
 
-        MPU6000(Ascale_t ascale, Gscale_t gscale, uint8_t sampleRateDivisor=1);
+        MPU6000(Ascale_t ascale, Gscale_t gscale, uint8_t sampleRateDivisor=0);
 
         MPU6000::Error_t begin(void);
 
         uint8_t getId();
 
-	bool readAccel(int16_t & ax, int16_t & ay, int16_t & az);
+	bool readAccel(int16_t & x, int16_t & y, int16_t & z);
+
+        bool readGyro(int16_t & x, int16_t & y, int16_t & z);
 
 
 }; // class MPU6000 SPI

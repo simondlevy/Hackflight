@@ -39,4 +39,6 @@ extern "C" {
     void spi_write_register(uint8_t subAddress, uint8_t data);
 
     bool spi_read_registers(uint8_t subAddress, uint8_t count, uint8_t * dest);
+
+    bool spi_transfer(const uint8_t * send, uint8_t * recv, uint8_t count);
 } 
