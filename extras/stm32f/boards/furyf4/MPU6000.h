@@ -187,6 +187,12 @@ class MPU6000 {
         float   _gRes;
         float _accelBias[3];
         float _gyroBias[3];
+ 
+        uint8_t readRegister(uint8_t subAddress);
+
+        void readRegisters(uint8_t subAddress, uint8_t count, uint8_t * dest);
+
+        void writeRegister(uint8_t subAddress, uint8_t data);
 
     public:
 
@@ -195,15 +201,8 @@ class MPU6000 {
         MPU6000::Error_t begin(void);
 
         uint8_t getId();
-        
-        bool accelReady(void);
 
-        bool gyroReady(void);
+	bool readAccel(int16_t & ax, int16_t & ay, int16_t & az);
 
-        uint8_t readRegister(uint8_t subAddress);
-
-        void readRegisters(uint8_t subAddress, uint8_t count, uint8_t * dest);
-
-        void writeRegister(uint8_t subAddress, uint8_t data);
 
 }; // class MPU6000 SPI

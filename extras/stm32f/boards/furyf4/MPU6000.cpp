@@ -78,15 +78,15 @@ MPU6000::Error_t MPU6000::begin(void)
 
 }
 
-bool MPU6000::accelReady(void)
+bool MPU6000::readAccel(int16_t & ax, int16_t & ay, int16_t & az)
 {
-    return false;
+    ax = 1;
+    ay = 2;
+    az = 3;
+
+    return true;
 }
 
-bool MPU6000::gyroReady(void)
-{
-    return false;
-}
 
 uint8_t MPU6000::getId()
 {
