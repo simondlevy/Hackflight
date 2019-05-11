@@ -38,5 +38,5 @@ extern "C" {
 
     void spi_write_register(uint8_t subAddress, uint8_t data);
 
-    void spi_read_registers(uint8_t subAddress, uint8_t count, uint8_t * dest);
+    bool spi_read_registers(uint8_t subAddress, uint8_t count, uint8_t * dest);
 } 

@@ -80,9 +80,13 @@ MPU6000::Error_t MPU6000::begin(void)
 
 bool MPU6000::readAccel(int16_t & ax, int16_t & ay, int16_t & az)
 {
-    ax = 1;
-    ay = 2;
-    az = 3;
+    uint8_t data[6];
+
+    if (!spi_read_registers(ACCEL_XOUT_H, 6, data)) return false;
+
+    ax = (int16_t)((data[0] << 8) | data[1]);
+    ay = (int16_t)((data[2] << 8) | data[3]);
+    az = (int16_t)((data[4] << 8) | data[5]);
 
     return true;
 }

@@ -64,9 +64,9 @@ extern "C" {
         spiBusWriteRegister(&_bus, subAddress, data);
     }
 
-    void spi_read_registers(uint8_t subAddress, uint8_t count, uint8_t * dest)
+    bool spi_read_registers(uint8_t subAddress, uint8_t count, uint8_t * dest)
     {
-        spiBusReadRegisterBuffer(&_bus, subAddress, dest, count);
+        return spiBusReadRegisterBuffer(&_bus, subAddress, dest, count);
     }
 
 } // extern "C"
