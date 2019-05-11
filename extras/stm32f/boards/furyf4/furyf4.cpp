@@ -70,6 +70,10 @@ extern "C" {
 
     bool FuryF4::imuReady(void)
     {
+        _accx = 7;
+        _accy = 8;
+        _accz = 9;
+
         return false;
     }
 
