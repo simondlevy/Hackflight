@@ -35,4 +35,8 @@ extern "C" {
 #include "target.h"
 
     void spi_init(SPI_TypeDef * instance, IO_t pin);
+
+    void spi_write_register(uint8_t subAddress, uint8_t data);
+
+    void spi_read_registers(uint8_t subAddress, uint8_t count, uint8_t * dest);
 } 

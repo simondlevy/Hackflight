@@ -1,5 +1,5 @@
 /*
-   mpu6000spi.cpp : Experimental class for Invensense MPU6000 IMU using SPI bus
+   MPU6000.cpp : Experimental class for Invensense MPU6000 IMU using SPI bus
 
    Copyright (C) 2019 Simon D. Levy 
 
@@ -19,16 +19,17 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "mpu6000spi.h"
+#include "MPU6000.h"
+#include "spi.h"
 
-MPU6000SPI::MPU6000SPI(Ascale_t ascale, Gscale_t gscale, uint8_t sampleRateDivisor)
+MPU6000::MPU6000(Ascale_t ascale, Gscale_t gscale, uint8_t sampleRateDivisor)
 {
-    (void)ascale;
-    (void)gscale;
-    (void)sampleRateDivisor;
+    _aScale =  ascale;
+    _gScale = gscale;
+    _sampleRateDivisor = sampleRateDivisor;
 }
 
-MPU6000SPI::Error_t MPU6000SPI::begin(void)
+MPU6000::Error_t MPU6000::begin(void)
 {
     if (getId() != MPU_ADDRESS) {
         return ERROR_IMU_ID;
@@ -77,37 +78,34 @@ MPU6000SPI::Error_t MPU6000SPI::begin(void)
 
 }
 
-bool MPU6000SPI::accelReady(void)
+bool MPU6000::accelReady(void)
 {
     return false;
 }
 
-bool MPU6000SPI::gyroReady(void)
+bool MPU6000::gyroReady(void)
 {
     return false;
 }
 
-uint8_t MPU6000SPI::getId()
+uint8_t MPU6000::getId()
 {
     return readRegister(WHO_AM_I);  
 }
 
-uint8_t MPU6000SPI::readRegister(uint8_t subAddress)
+uint8_t MPU6000::readRegister(uint8_t subAddress)
 {
     uint8_t data;
     readRegisters(subAddress, 1, &data);
     return data;
 }
 
-void MPU6000SPI::readRegisters(uint8_t subAddress, uint8_t count, uint8_t * dest)
+void MPU6000::readRegisters(uint8_t subAddress, uint8_t count, uint8_t * dest)
 {
-    (void)subAddress;
-    (void)count;
-    (void)dest;
+    spi_read_registers(subAddress, count, dest);
 }
 
-void MPU6000SPI::writeRegister(uint8_t subAddress, uint8_t data)
+void MPU6000::writeRegister(uint8_t subAddress, uint8_t data)
 {
-    (void)subAddress;
-    (void)data;
+    spi_write_register(subAddress, data);
 }

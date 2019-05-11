@@ -59,12 +59,12 @@ extern "C" {
         spiSetDivisor(_bus.busdev_u.spi.instance, SPI_CLOCK_FAST);
     }
 
-    static void _busWriteRegister(uint8_t subAddress, uint8_t data)
+    void spi_write_register(uint8_t subAddress, uint8_t data)
     {
         spiBusWriteRegister(&_bus, subAddress, data);
     }
 
-    static void _spiBusReadRegisterBuffer(uint8_t subAddress, uint8_t count, uint8_t * dest)
+    void spi_read_registers(uint8_t subAddress, uint8_t count, uint8_t * dest)
     {
         spiBusReadRegisterBuffer(&_bus, subAddress, dest, count);
     }

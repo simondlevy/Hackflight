@@ -49,6 +49,12 @@ extern "C" {
 
         spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
 
+        // Start the IMU
+        _imu = new MPU6000(MPU6000::AFS_2G, MPU6000::GFS_250DPS);
+
+        // Check IMU ready status
+       _status = _imu->begin();
+
         RealBoard::init();
     }
 
@@ -117,7 +123,7 @@ extern "C" {
 
     void FuryF4::adHocDebug(void)
     {
-        hf::Debugger::printf("%d %d %d\n", accx, accy, accz);
+        hf::Debugger::printf("status: %d\n", _status);
     }
 
 } // extern "C"

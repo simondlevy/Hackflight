@@ -1,5 +1,5 @@
 /*
-   mpu6000spi.h : Experimental class for Invensense MPU6000 IMU using SPI bus
+   MPU6000.h : Experimental class for Invensense MPU6000 IMU using SPI bus
 
    Copyright (C) 2019 Simon D. Levy 
 
@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 
-class MPU6000SPI {
+class MPU6000 {
 
     public:
 
@@ -190,9 +190,9 @@ class MPU6000SPI {
 
     public:
 
-        MPU6000SPI(Ascale_t ascale, Gscale_t gscale, uint8_t sampleRateDivisor);
+        MPU6000(Ascale_t ascale, Gscale_t gscale, uint8_t sampleRateDivisor=1);
 
-        MPU6000SPI::Error_t begin(void);
+        MPU6000::Error_t begin(void);
 
         uint8_t getId();
         
