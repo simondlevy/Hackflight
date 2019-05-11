@@ -66,7 +66,7 @@ class is an abstract class that can be subclassed for various motor
 configurations (QuadX, Hexacopter, Tricopter, etc.).  The 
 <a href="https://github.com/simondlevy/Hackflight/blob/master/src/mixers/quadxcf.hpp">QuadXCF</a>
 (quad-X using Cleanflight numbering conventions)  and
-<a href="https://github.com/simondlevy/Hackflight/blob/master/src/mixers/quadxcf.hpp">QuadXAP</a>
+<a href="https://github.com/simondlevy/Hackflight/blob/master/src/mixers/quadxap.hpp">QuadXAP</a>
 (quad-X using ArduPilot numbering conventions) subclasses are already implemented.  
 * The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp">PID_Controller</a>
 class provides a constructor where you specify the PID values appropriate for your model (see
