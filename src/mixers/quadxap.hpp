@@ -6,7 +6,7 @@
      X
    2   4
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2019 Simon D. Levy
 
    This file is part of Hackflight.
 
