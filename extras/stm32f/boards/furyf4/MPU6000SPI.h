@@ -19,6 +19,8 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdint.h>
+
 class MPU6000SPI {
 
     public:
@@ -58,9 +60,9 @@ class MPU6000SPI {
 
         } Error_t;
 
-        void readAccelerometer(float & ax, float & ay, float & az);
 
-    protected:
+
+    private:
 
         const uint8_t MPU_ADDRESS               = 0x68;
 
@@ -186,10 +188,22 @@ class MPU6000SPI {
         float _accelBias[3];
         float _gyroBias[3];
 
+    public:
+
         MPU6000SPI(Ascale_t ascale, Gscale_t gscale, uint8_t sampleRateDivisor);
 
+        MPU6000SPI::Error_t begin(void);
+
+        uint8_t getId();
+        
         bool accelReady(void);
 
         bool gyroReady(void);
+
+        uint8_t readRegister(uint8_t subAddress);
+
+        void readRegisters(uint8_t subAddress, uint8_t count, uint8_t * dest);
+
+        void writeRegister(uint8_t subAddress, uint8_t data);
 
 }; // class MPU6000 SPI

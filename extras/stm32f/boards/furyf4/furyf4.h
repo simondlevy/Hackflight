@@ -24,7 +24,7 @@
 #include <boards/realboard.hpp>
 #include <boards/softquat2.hpp>
 
-#include "mpu6000spi.h"
+#include "MPU6000SPI.h"
 
 // Cleanflight includes
 extern "C" {
