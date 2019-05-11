@@ -81,12 +81,12 @@ extern "C" {
 
     bool FuryF4::getQuaternion(float & qw, float & qx, float & qy, float & qz)
     {
-        return SoftwareQuaternionBoard::getQuaternion(qw, qx, qy, qz, getTime());
+        return SoftwareQuaternionBoard2::getQuaternion(qw, qx, qy, qz, getTime());
     }
 
     bool FuryF4::getGyrometer(float & gx, float & gy, float & gz)
     {
-        return SoftwareQuaternionBoard::getGyrometer(gx, gy, gz);
+        return SoftwareQuaternionBoard2::getGyrometer(gx, gy, gz);
     }
 
     void hf::Board::outbuf(char * buf)

@@ -22,7 +22,7 @@
 #pragma once
 
 #include <boards/realboard.hpp>
-#include <boards/softquat.hpp>
+#include <boards/softquat2.hpp>
 
 // Cleanflight includes
 extern "C" {
@@ -41,7 +41,7 @@ extern "C" {
 } // extern "C"
 
 
-class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
+class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard2 {
 
     protected: 
 
