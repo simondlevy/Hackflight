@@ -21,7 +21,7 @@
 #pragma once
 
 #include <string.h>
-#include <debug.hpp>
+#include <debugger.hpp>
 
 namespace hf {
 
@@ -60,9 +60,9 @@ namespace hf {
             {
                 for (uint8_t j=0; j<_rows; ++j) {
                     for (uint8_t k=0; k<_cols; ++k) {
-                        Debug::printf("%+2.2f ", _vals[j][k]);
+                        Debugger::printf("%+2.2f ", _vals[j][k]);
                     }
-                    Debug::printf("\n");
+                    Debugger::printf("\n");
                 }
             }
 

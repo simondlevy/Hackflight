@@ -22,7 +22,6 @@
 
 #include "receiver.hpp"
 #include "filters.hpp"
-#include "debug.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
 

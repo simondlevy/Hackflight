@@ -1,16 +1,4 @@
 {
-  "RAW_IMU": 
-  [{"ID": 102},
-   {"ax" : "short"}, 
-   {"ay" : "short"},
-   {"az" : "short"},
-   {"gx" : "short"}, 
-   {"gy" : "short"},
-   {"gz" : "short"},
-   {"mx" : "short"}, 
-   {"my" : "short"},
-   {"mz" : "short"}],
-
   "STATE": 
   [{"ID": 112},
    {"altitude":          "float"}, 

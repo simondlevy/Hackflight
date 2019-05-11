@@ -36,6 +36,9 @@ extern "C" {
 #include "../../common/beeperled.h"
 #include "../../common/motors.h"
 
+    // Required by system_stm32f4xx.c
+    void * mpuResetFn = NULL;
+
     // We put this outside the class to make it available to static Board::outbuf() below
     static serialPort_t * _serial0;
 
@@ -44,10 +47,6 @@ extern "C" {
         _serial0 = usbVcpOpen();
 
         spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
-
-        delay(10);
-
-        mpu6000_spi_init(&_gyro, &_acc, 0, 1, false);
 
         RealBoard::init();
     }
@@ -62,8 +61,11 @@ extern "C" {
         return false;
     }
 
+    int16_t accx;
+
     void FuryF4::imuReadAccelGyro(void)
     {
+        accx = 99;
     }
     
     void FuryF4::writeMotor(uint8_t index, float value)
@@ -108,12 +110,8 @@ extern "C" {
         serialWrite(_serial0, c);
     }
 
-    void FuryF4::getRawImu(
-            int16_t & ax, int16_t & ay, int16_t & az, 
-            int16_t & gx, int16_t & gy, int16_t & gz,
-            int16_t & mx, int16_t & my, int16_t & mz)
+    void FuryF4::adHocDebug(void)
     {
-        hf::SoftwareQuaternionBoard::getRawImu(ax, ay, az, gx, gy, gz, mx, my, mz);
-    } 
+    }
 
 } // extern "C"

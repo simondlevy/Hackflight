@@ -26,7 +26,6 @@
 #include "mspparser.hpp"
 #include "mixer.hpp"
 #include "receiver.hpp"
-#include "debug.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
 #include "pidcontrollers/rate.hpp"
@@ -45,6 +44,9 @@ namespace hf {
             Receiver   * _receiver;
             Rate       * _ratePid;
             Mixer      * _mixer;
+
+            // Supports periodic ad-hoc debugging
+            Debugger _debugger;
 
             // PID controllers
             PID_Controller * _pid_controllers[256];
@@ -240,6 +242,11 @@ namespace hf {
                 sensor->board = board;
             }
 
+            void debug(void)
+            {
+                _debugger.adHoc();
+            }
+
         protected:
 
             virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 
@@ -284,14 +291,6 @@ namespace hf {
                 yaw   = _state.eulerAngles[AXIS_YAW];
             }
 
-            virtual void handle_RAW_IMU_Request(
-                    int16_t & ax, int16_t & ay, int16_t & az, 
-                    int16_t & gx, int16_t & gy, int16_t & gz,
-                    int16_t & mx, int16_t & my, int16_t & mz) override
-            {
-                _board->getRawImu(ax, ay, az, gx, gy, gz, mx, my, mz); 
-            }
-
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
             {
                 _mixer->motorsDisarmed[0] = m1;
@@ -309,6 +308,9 @@ namespace hf {
                 _receiver = receiver;
                 _mixer    = mixer;
                 _ratePid  = ratePid;
+
+                // Ad-hoc debugging support
+                _debugger.init(board);
 
                 // Support for mandatory sensors
                 add_sensor(&_quaternion, board);
@@ -363,6 +365,9 @@ namespace hf {
 
                 // Check optional sensors
                 checkOptionalSensors();
+
+                // Run periodic ad-hoc debugger
+                debug();
             } 
 
     }; // class Hackflight

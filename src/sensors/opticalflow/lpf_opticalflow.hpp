@@ -26,7 +26,6 @@
 
 #include <PMW3901.h>
 
-#include "debug.hpp"
 #include "sensor.hpp"
 #include "filters.hpp"
 
@@ -68,8 +67,6 @@ namespace hf {
                 // Integrate velocity to get position
                 state.positionX += state.velocityRightward;
                 state.positionY += state.velocityForward;
-
-                //Debug::printf("%+3.3f %+3.3f\n", state.positionX, state.positionY);
             }
 
             virtual bool ready(float time) override

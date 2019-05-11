@@ -29,7 +29,7 @@ along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <PMW3901.h>
 
-#include "debug.hpp"
+#include "debugger.hpp"
 #include "sensor.hpp"
 #include "filters.hpp"
 #include "linalg.hpp"
@@ -104,7 +104,7 @@ namespace hf {
             static void checkNan(float x, const char * name, uint32_t count)
             {
                 if (std::isnan(x)) {
-                    Debug::printf("%s is NaN after %d steps\n", name, count);
+                    Debugger::printf("%s is NaN after %d steps\n", name, count);
                     while (true) {
                     }
                 }
@@ -378,7 +378,7 @@ namespace hf {
 
                 stateEstimatorFinalize();
 
-                Debug::printf("%+3.3f,%+3.3f\n", S[STATE_PX], S[STATE_PY]);
+                Debugger::printf("%+3.3f,%+3.3f\n", S[STATE_PX], S[STATE_PY]);
 
                 state.velocityForward   = 0;
                 state.velocityRightward = 0;

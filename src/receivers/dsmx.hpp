@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "debug.hpp"
 #include "receiver.hpp"
 #include <DSMRX.h>
 

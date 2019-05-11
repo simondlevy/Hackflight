@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include "debug.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
 

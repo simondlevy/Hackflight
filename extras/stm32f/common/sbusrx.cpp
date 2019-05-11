@@ -21,7 +21,6 @@
 
 #include "sbusrx.h"
 #include <SBUSRX.h>
-#include <debug.hpp>
 
 static SBUSRX * _rx;
 

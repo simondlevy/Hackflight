@@ -38,17 +38,10 @@ extern "C" {
 #include "io/serial.h"
 #include "target.h"
 
-#include "mpu6000spi.h"
-
 } // extern "C"
 
 
 class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
-
-    private:
-
-        gyroDev_t _gyro;
-        accDev_t  _acc;
 
     protected: 
 
@@ -63,10 +56,8 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
         virtual void     serialNormalWrite(uint8_t c) override;
         virtual bool     getQuaternion(float & qw, float & qx, float & qy, float & qz) override;
         virtual bool     getGyrometer(float & gx, float & gy, float & gz) override;
-        virtual void     getRawImu(
-                int16_t & ax, int16_t & ay, int16_t & az, 
-                int16_t & gx, int16_t & gy, int16_t & gz,
-                int16_t & mx, int16_t & my, int16_t & mz) override; 
+
+        virtual void     adHocDebug(void) override;
 
         // SoftwareQuaternionBoard class overrides
         virtual bool imuReady(void) override;

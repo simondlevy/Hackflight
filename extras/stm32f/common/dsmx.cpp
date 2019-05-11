@@ -20,7 +20,6 @@
 
 #include "dsmx.h"
 #include <DSMRX.h>
-#include <debug.hpp>
 
 static DSM2048 * _rx;
 

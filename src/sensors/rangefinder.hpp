@@ -23,7 +23,6 @@
 #include <cmath>
 #include <math.h>
 
-#include "debug.hpp"
 #include "sensor.hpp"
 #include "filters.hpp"
 

@@ -21,7 +21,7 @@
 #pragma once
 
 #include "board.hpp"
-#include "debug.hpp"
+#include "debugger.hpp"
 #include "datatypes.hpp"
 
 // Support delay(), micros() on non-Arduino boards
@@ -162,7 +162,7 @@ namespace hf {
             void error(const char * errmsg) 
             {
                 while (true) {
-                    Debug::printf("%s\n", errmsg);
+                    Debugger::printf("%s\n", errmsg);
                     delaySeconds(0.1);
                 }
             }

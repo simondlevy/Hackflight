@@ -21,7 +21,6 @@
 #pragma once
 
 #include "sensors/mspsensor.hpp"
-#include "debug.hpp"
 
 namespace hf {
 
@@ -44,7 +43,6 @@ namespace hf {
 
         virtual void handle_SET_RANGE_AND_FLOW(int16_t  range, int16_t  flowx, int16_t  flowy) override
         {
-            Debug::printf("%d %d %d\n", range, flowx, flowy);
             _range = range;
             _flowx = flowx;
             _flowy = flowy;
