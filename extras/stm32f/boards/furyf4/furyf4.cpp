@@ -35,6 +35,7 @@ extern "C" {
 #include "../../common/spi.h"
 #include "../../common/beeperled.h"
 #include "../../common/motors.h"
+#include <debugger.hpp>
 
     // Required by system_stm32f4xx.c
     void * mpuResetFn = NULL;
@@ -56,16 +57,20 @@ extern "C" {
         ledSet(1, isOn);
     }
 
+    int16_t accx, accy, accz;
+
     bool FuryF4::imuReady(void)
     {
+        accx = 7;
+        accy = 8;
+        accz = 9;
+
         return false;
     }
 
-    int16_t accx;
 
     void FuryF4::imuReadAccelGyro(void)
     {
-        accx = 99;
     }
     
     void FuryF4::writeMotor(uint8_t index, float value)
@@ -112,6 +117,7 @@ extern "C" {
 
     void FuryF4::adHocDebug(void)
     {
+        hf::Debugger::printf("%d %d %d\n", accx, accy, accz);
     }
 
 } // extern "C"
