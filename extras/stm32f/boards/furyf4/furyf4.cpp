@@ -53,9 +53,13 @@ extern "C" {
         _imu = new MPU6000(MPU6000::AFS_2G, MPU6000::GFS_250DPS);
 
         // Check IMU ready status
-       _status = _imu->begin();
+        checkImuError(_imu->begin());
 
         RealBoard::init();
+
+        _accx = 0;
+        _accy = 0;
+        _accz = 0;
     }
 
     void FuryF4::setLed(bool isOn)
@@ -63,14 +67,9 @@ extern "C" {
         ledSet(1, isOn);
     }
 
-    int16_t accx, accy, accz;
 
     bool FuryF4::imuReady(void)
     {
-        accx = 7;
-        accy = 8;
-        accz = 9;
-
         return false;
     }
 
@@ -100,6 +99,21 @@ extern "C" {
         return SoftwareQuaternionBoard2::getGyrometer(gx, gy, gz);
     }
 
+    void FuryF4::checkImuError(MPU6000::Error_t errid)
+    {
+        switch (errid) {
+
+            case MPU6000::ERROR_IMU_ID:
+                error("Bad device ID");
+                break;
+            case MPU6000::ERROR_SELFTEST:
+                error("Failed self-test");
+                break;
+            default:
+                break;
+        }
+    }
+
     void hf::Board::outbuf(char * buf)
     {
         for (char *p=buf; *p; p++)
@@ -123,7 +137,7 @@ extern "C" {
 
     void FuryF4::adHocDebug(void)
     {
-        hf::Debugger::printf("status: %d\n", _status);
+        hf::Debugger::printf("%+05d %+05d %+05d\n", _accx, _accy, _accz);
     }
 
 } // extern "C"

@@ -49,7 +49,10 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard2 {
 
         MPU6000 * _imu;
 
-        MPU6000::Error_t _status;
+    	void checkImuError(MPU6000::Error_t errid);
+
+        // debugging
+        int16_t _accx, _accy, _accz;
 
     protected: 
 
