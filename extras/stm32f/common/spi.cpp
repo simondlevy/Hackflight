@@ -59,26 +59,36 @@ extern "C" {
         spiSetDivisor(_bus.busdev_u.spi.instance, SPI_CLOCK_FAST);
     }
 
-    static void _busWriteRegister(uint8_t subAddress, uint8_t data)
+    static bool _busWriteRegister(uint8_t subAddress, uint8_t data)
     {
-        spiBusWriteRegister(&_bus, subAddress, data);
+        return spiBusWriteRegister(&_bus, subAddress, data);
     }
 
-    static void _spiBusReadRegisterBuffer(uint8_t subAddress, uint8_t count, uint8_t * dest)
+    static bool _spiBusReadRegisterBuffer(uint8_t subAddress, uint8_t count, uint8_t * dest)
     {
-        spiBusReadRegisterBuffer(&_bus, subAddress, dest, count);
+        return spiBusReadRegisterBuffer(&_bus, subAddress, dest, count);
+    }
+
+    static bool _spiBusTransfer(const uint8_t * send, uint8_t * recv, uint8_t count)
+    {
+        return spiBusTransfer(&_bus, send, recv, count);
     }
 
 } // extern "C"
 
 #include <CrossPlatformSPI.h>
 
-void  cpspi_writeRegister(uint8_t subAddress, uint8_t data)
+bool  cpspi_writeRegister(uint8_t subAddress, uint8_t data)
 {
-    _busWriteRegister(subAddress, data);
+    return _busWriteRegister(subAddress, data);
 }
 
-void  cpspi_readRegisters(uint8_t subAddress, uint8_t count, uint8_t * dest)
+bool  cpspi_readRegisters(uint8_t subAddress, uint8_t count, uint8_t * dest)
 {
-    _spiBusReadRegisterBuffer(subAddress, count, dest);
+    return _spiBusReadRegisterBuffer(subAddress, count, dest);
+}
+
+bool cpspi_transfer(const uint8_t * send, uint8_t * recv, uint8_t count)
+{
+    return _spiBusTransfer(send, recv, count);
 }
