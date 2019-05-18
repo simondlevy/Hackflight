@@ -88,7 +88,8 @@ BIN_DIR         := $(ROOT)/obj
 LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
 HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
-INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(RX_DIR) ../../boards
+IMU_DIR         := $(ARDUINO_DIR)/MPU/src
+INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(RX_DIR) ../../boards
 LINKER_DIR      := $(SRC_DIR)/target/link
 MAKE_DIR        := $(CF_DIR)/make
 
@@ -865,10 +866,11 @@ endif
 BOARD := furyf4
 BOARD_DIR := ../../boards/$(BOARD)
 INCLUDE_DIRS += $(BOARD_DIR)
-HF_SRC := ../../common/main.c ../../boards/furyf4/spi.cpp ../../boards/furyf4/MPU6000f4.cpp
+HF_SRC := ../../common/main.c ../../boards/furyf4/spi.cpp
+IMU_SRC := $(IMU_DIR)/MPU6000f4.cpp 
 BOARD_SRC := $(BOARD_DIR)/$(BOARD).cpp  
 SKETCH_SRC := ./furyf4_mock.cpp
-SRC += $(HF_SRC) $(RX_SRC) $(BOARD_SRC) $(SKETCH_SRC)
+SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(BOARD_SRC) $(SKETCH_SRC)
 
 
 ###############################################################################
