@@ -33,7 +33,7 @@
 
 #include "hackflight.hpp"
 #include "boards/arduino/bonadrone.hpp"
-#include "receivers/sbus.hpp"
+#include "receivers/arduino/sbus.hpp"
 #include "mixers/quadxcf.hpp"
 
 #include "pidcontrollers/level.hpp"

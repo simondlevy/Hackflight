@@ -30,7 +30,7 @@
 #include "boards/arduino/thingdev.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/level.hpp"
-#include "receivers/esp8266.hpp"
+#include "receivers/arduino/esp8266.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 

@@ -23,7 +23,7 @@
 
 #include "hackflight.hpp"
 #include "boards/arduino/ladybug.hpp"
-#include "receivers/dsmx.hpp"
+#include "receivers/arduino/dsmx.hpp"
 #include "sensors/rangefinders/vl53l1x.hpp"
 #include "sensors/opticalflow/lpf_opticalflow.hpp"
 #include "pidcontrollers/level.hpp"
