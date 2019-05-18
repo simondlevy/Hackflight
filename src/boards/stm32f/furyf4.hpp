@@ -1,5 +1,5 @@
 /*
-   furyf4.hpp : Board class for FuryF4
+   Board class for FuryF4
 
    Copyright (C) 2019 Simon D. Levy 
 
@@ -21,16 +21,17 @@
 
 #pragma once
 
+#include <MPU6000f4.h>
+
 #include <boards/realboard.hpp>
 #include <boards/softquat2.hpp>
-#include "beeperled.hpp"
-#include "motors.hpp"
+#include "support/beeperled.hpp"
+#include "support/spi.h"
+#include <debugger.hpp>
 
-#include "MPU6000f4.h"
 
-// Cleanflight includes
+// Cleanflight drivers
 extern "C" {
-
 #include "platform.h"
 #include "drivers/system.h"
 #include "drivers/timer.h"
@@ -43,9 +44,6 @@ extern "C" {
 #include "target.h"
 #include "drivers/light_led.h"
 } // extern "C"
-
-#include "spi.h"
-#include <debugger.hpp>
 
 // Required by system_stm32f4xx.c
 void * mpuResetFn = NULL;

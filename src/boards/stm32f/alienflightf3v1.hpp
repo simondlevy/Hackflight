@@ -24,9 +24,9 @@
 #include <MPU6050.h>
 
 #include "stm32fboard.hpp"
-#include "motors.hpp"
-#include "i2c.hpp"
+#include "support/i2c.hpp"
 
+// Cleanflight drivers
 extern "C" {
 #include "drivers/light_led.h"
 #include "drivers/bus_i2c.h"

@@ -22,7 +22,7 @@
 // Here we put code that interacts with Cleanflight
 extern "C" {
 
-#include "spi.h"
+#include "support/spi.h"
 
     static busDevice_t _bus;
 

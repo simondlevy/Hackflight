@@ -23,12 +23,8 @@
 
 #include <MPU6000.h>
 #include "stm32fboard.hpp"
-#include "motors.hpp"
-#include "beeperled.hpp"
-
-extern "C" {
-#include "spi.h"
-}
+#include "support/beeperled.hpp"
+#include "support/spi.h"
 
 class BetaFPVF3 : public Stm32FBoard {
 

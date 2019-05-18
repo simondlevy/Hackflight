@@ -23,11 +23,11 @@
 
 #include <MPU6500.h>
 #include "stm32fboard.hpp"
+#include "support/spi.h"
 
+// Cleanflight drivers
 extern "C" {
 #include "drivers/light_led.h"
-#include "spi.h"
-#include "motors.hpp"
 }
 
 class FemtoF3 : public Stm32FBoard {

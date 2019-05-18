@@ -22,13 +22,11 @@
 #pragma once
 
 #include <MPU6000.h>
-#include "stm32fboard.hpp"
-#include "beeperled.hpp"
-#include "motors.hpp"
 
-extern "C" {
-#include "spi.h"
-}
+#include "stm32fboard.hpp"
+
+#include "support/beeperled.hpp"
+#include "support/spi.h"
 
 // These are static so serial_event1 can access them
 static uint8_t _value1;

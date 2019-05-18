@@ -25,9 +25,10 @@
 #include <boards/softquat.hpp>
 
 #include <MPU6xx0.h>
+#include "support/motors.hpp"
 
+// Cleanflight drivers
 extern "C" {
-
 #include "platform.h"
 #include "drivers/system.h"
 #include "drivers/timer.h"
@@ -39,7 +40,6 @@ extern "C" {
 #include "io/serial.h"
 #include "target.h"
 
-#include "motors.hpp"
 
     // We put this outside the class to make it available to static Board::outbuf() below
     static serialPort_t * _serial0;
