@@ -26,7 +26,7 @@
 #include "stm32fboard.hpp"
 
 #include "support/beeperled.hpp"
-#include "support/spi.h"
+#include "support/spi.hpp"
 
 // These are static so serial_event1 can access them
 static uint8_t _value1;

@@ -24,7 +24,7 @@
 #include <MPU6000.h>
 #include "stm32fboard.hpp"
 #include "support/beeperled.hpp"
-#include "support/spi.h"
+#include "support/spi.hpp"
 
 class BetaFPVF3 : public Stm32FBoard {
 

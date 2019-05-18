@@ -26,7 +26,7 @@
 #include <boards/realboard.hpp>
 #include <boards/softquat2.hpp>
 #include "support/beeperled.hpp"
-#include "support/spi.h"
+#include "support/spi.hpp"
 #include <debugger.hpp>
 
 

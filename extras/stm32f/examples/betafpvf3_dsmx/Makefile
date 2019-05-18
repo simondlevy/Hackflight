@@ -471,7 +471,7 @@ endif
 BOARD := betafpvf3
 IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6000.cpp
 RX_SRC := $(RX_DIR)/DSMRX.cpp
-HF_SRC := ../../common/main.c ../../common/dsmx.cpp ../../common/spi.cpp
+HF_SRC := ../../common/main.c ../../common/dsmx.cpp
 SKETCH_SRC := ./betafpvf3_dsmx.cpp
 SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(SKETCH_SRC)
 
