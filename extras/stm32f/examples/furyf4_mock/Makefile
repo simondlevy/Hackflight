@@ -501,8 +501,6 @@ FC_SRC = \
             flight/mixer.c \
             flight/mixer_tricopter.c \
             flight/pid.c \
-            flight/servos.c \
-            flight/servos_tricopter.c \
             interface/cli.c \
             interface/settings.c \
             io/serial_4way.c \
@@ -867,7 +865,7 @@ BOARD := furyf4
 BOARD_DIR := ../../boards/$(BOARD)
 INCLUDE_DIRS += $(BOARD_DIR)
 HF_SRC := ../../common/main.c ../../boards/furyf4/spi.cpp
-IMU_SRC := $(IMU_DIR)/MPU6000f4.cpp 
+IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6000f4.cpp 
 BOARD_SRC := $(BOARD_DIR)/$(BOARD).cpp  
 SKETCH_SRC := ./furyf4_mock.cpp
 SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(BOARD_SRC) $(SKETCH_SRC)
