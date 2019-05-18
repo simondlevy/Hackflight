@@ -464,8 +464,6 @@ endif
 
 # Hackflight support
 BOARD := alienflightf3v1
-BOARD_DIR := ../../boards/$(BOARD)
-INCLUDE_DIRS += $(BOARD_DIR)
 IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6050.cpp
 RX_SRC := $(RX_DIR)/DSMRX.cpp
 HF_SRC := ../../common/main.c ../../common/dsmx.cpp  ../../common/i2c.cpp

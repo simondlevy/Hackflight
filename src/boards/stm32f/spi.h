@@ -1,5 +1,5 @@
 /*
-   betafpvf3.h : Board class for BetaFPV F3 Brushed board
+   SPI support for STM32F3 boards
 
    Copyright (C) 2018 Simon D. Levy 
 
@@ -21,23 +21,18 @@
 
 #pragma once
 
-#include <MPU6000.h>
-#include "stm32fboard.h"
+// Here we put code that interacts with Cleanflight
+extern "C" {
 
-class BetaFPVF3 : public Stm32FBoard {
+#include "platform.h"
+#include "drivers/system.h"
+#include "drivers/timer.h"
+#include "drivers/time.h"
+#include "drivers/bus_spi.h"
+#include "drivers/bus_spi_impl.h"
+#include "pg/bus_spi.h"
+#include "io/serial.h"
+#include "target.h"
 
-    private:
-
-        MPU6000 * _imu;
-
-    protected: 
-
-        // SoftwareQuaternionBoard class overrides
-        virtual bool imuReady(void) override;
-        virtual void imuReadAccelGyro(void) override;
-
-    public:
-
-        BetaFPVF3(void);
-
-}; // class BetaFPVF3
+    void spi_init(SPI_TypeDef * instance, IO_t pin);
+} 

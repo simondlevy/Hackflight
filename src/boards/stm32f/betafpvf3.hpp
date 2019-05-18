@@ -1,7 +1,7 @@
 /*
-   betafpvf3.h : Board implmentation for BetaFPV F3 Brushed board
+   Board class for BetaFPV F3 Brushed board
 
-   Copyright (C) 2018 Simon D. Levy 
+   Copyright (C) 2019 Simon D. Levy 
 
    This file is part of Hackflight.
 
@@ -19,17 +19,47 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "betafpvf3.h"
+#pragma once
 
-// Here we put code that interacts with Cleanflight
+#include <MPU6000.h>
+#include "stm32fboard.hpp"
+
 extern "C" {
 
-// Hackflight includes
-#include "../../common/spi.h"
-#include "../../common/beeperled.h"
-#include "../../common/motors.h"
+#include "spi.h"
+#include "beeperled.h"
+#include "motors.hpp"
 
-    BetaFPVF3::BetaFPVF3(void) : Stm32FBoard(usbVcpOpen())
+}
+
+class BetaFPVF3 : public Stm32FBoard {
+
+    private:
+
+        MPU6000 * _imu;
+
+    protected: 
+
+        // SoftwareQuaternionBoard class overrides
+        bool imuReady(void)
+        {
+            return _imu->checkNewData();
+        }
+
+        void imuReadAccelGyro(void)
+        {
+            _imu->readAccelerometer(_ax, _ay, _az);
+            _imu->readGyrometer(_gx, _gy, _gz);
+
+            // Negate values based on board orientation
+            _az = -_az;
+            _gx = -_gx;
+            _gy = -_gy;
+        }
+
+    public:
+
+        BetaFPVF3(void) : Stm32FBoard(usbVcpOpen())
     {
         spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
         // Set up the LED (uses the beeper for some reason)
@@ -44,25 +74,12 @@ extern "C" {
         RealBoard::init();
     }
 
-    void Stm32FBoard::setLed(bool isOn)
-    {
-        beeperLedSet(isOn);
-    }
 
-    bool BetaFPVF3::imuReady(void)
-    {
-        return _imu->checkNewData();
-    }
+}; // class BetaFPVF3
 
-    void BetaFPVF3::imuReadAccelGyro(void)
-    {
-        _imu->readAccelerometer(_ax, _ay, _az);
-        _imu->readGyrometer(_gx, _gy, _gz);
+void Stm32FBoard::setLed(bool isOn)
+{
+    beeperLedSet(isOn);
+}
 
-        // Negate values based on board orientation
-        _az = -_az;
-        _gx = -_gx;
-        _gy = -_gy;
-    }
 
-} // extern "C"

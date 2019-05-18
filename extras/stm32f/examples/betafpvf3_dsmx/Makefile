@@ -89,7 +89,7 @@ HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
 IMU_DIR         := $(ARDUINO_DIR)/MPU/src
 RX_DIR          := $(ARDUINO_DIR)/DSMRX/src
 SPI_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
-INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR) ../../boards
+INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR) $(HF_DIR)/boards/stm32f
 LINKER_DIR      := $(SRC_DIR)/target/link
 
 # configure some variables dependent upon what type of system this is
@@ -469,15 +469,12 @@ endif
 
 # Hackflight support
 BOARD := betafpvf3
-BOARD_DIR := ../../boards/$(BOARD)
-INCLUDE_DIRS += $(BOARD_DIR)
 IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6000.cpp
 RX_SRC := $(RX_DIR)/DSMRX.cpp
 HF_SRC := ../../common/main.c ../../common/dsmx.cpp ../../common/spi.cpp \
-	../../common/beeperled.cpp ../../common/motors.cpp ../../boards/stm32fboard.cpp
-BOARD_SRC := $(BOARD_DIR)/$(BOARD).cpp  
+	../../common/beeperled.cpp
 SKETCH_SRC := ./betafpvf3_dsmx.cpp
-SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(BOARD_SRC) $(SKETCH_SRC)
+SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(SKETCH_SRC)
 
 ###############################################################################
 # No user-serviceable parts below
