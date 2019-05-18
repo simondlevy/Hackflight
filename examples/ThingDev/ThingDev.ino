@@ -5,7 +5,7 @@
  
    Hardware support for SparkfunESP8266 ThingDev:
 
-       https://github.com/esp8266/Arduino#installing-with-boards-manager
+       https://github.com/esp8266/Arduino#installing-with-boards/arduino-manager
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -27,7 +27,7 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/thingdev.hpp"
+#include "boards/arduino/thingdev.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/level.hpp"
 #include "receivers/esp8266.hpp"

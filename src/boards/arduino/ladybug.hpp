@@ -23,7 +23,7 @@
 #pragma once
 
 #include <Wire.h>
-#include "sentral.hpp"
+#include "boards/arduino/sentral.hpp"
 #include "motors/brushed.hpp"
 
 namespace hf {

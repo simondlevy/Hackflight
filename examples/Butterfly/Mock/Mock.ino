@@ -23,7 +23,7 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/mock.hpp"
+#include "boards/arduino/mock.hpp"
 #include "mixers/quadxcf.hpp"
 #include "receivers/mock.hpp"
 

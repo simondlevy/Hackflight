@@ -26,8 +26,8 @@
 
 #include "filters.hpp"
 #include "hackflight.hpp"
-#include "softquat.hpp"
-#include "arduino.hpp"
+#include "boards/softquat.hpp"
+#include "boards/arduino/arduino.hpp"
 #include "motors/brushed.hpp"
 #include "motors/standard.hpp"
 #include "motors/multishot.hpp"

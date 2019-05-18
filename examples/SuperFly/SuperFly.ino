@@ -30,7 +30,7 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/superfly.hpp"
+#include "boards/arduino/superfly.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/level.hpp"
 #include "receivers/esp8266.hpp"

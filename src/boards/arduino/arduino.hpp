@@ -21,7 +21,7 @@
 #pragma once
 
 #include "hackflight.hpp"
-#include "realboard.hpp"
+#include "boards/realboard.hpp"
 
 namespace hf {
 

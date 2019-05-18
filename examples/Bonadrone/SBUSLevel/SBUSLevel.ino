@@ -31,7 +31,7 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/bonadrone.hpp"
+#include "boards/arduino/bonadrone.hpp"
 #include "receivers/sbus.hpp"
 #include "mixers/quadxcf.hpp"
 

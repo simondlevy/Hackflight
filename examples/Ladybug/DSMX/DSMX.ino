@@ -31,7 +31,7 @@ Copyright (c) 2018 Simon D. Levy
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/ladybug.hpp"
+#include "boards/arduino/ladybug.hpp"
 #include "receivers/dsmx.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/level.hpp"

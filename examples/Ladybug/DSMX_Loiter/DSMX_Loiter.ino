@@ -22,7 +22,7 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/ladybug.hpp"
+#include "boards/arduino/ladybug.hpp"
 #include "receivers/dsmx.hpp"
 #include "sensors/rangefinders/vl53l1x.hpp"
 #include "sensors/opticalflow/lpf_opticalflow.hpp"

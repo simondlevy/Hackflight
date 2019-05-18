@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "mock.hpp"
+#include "boards/arduino/mock.hpp"
 
 namespace hf {
 

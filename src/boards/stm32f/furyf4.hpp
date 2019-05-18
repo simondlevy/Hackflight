@@ -39,18 +39,14 @@ extern "C" {
 #include "drivers/serial_usb_vcp.h"
 #include "io/serial.h"
 #include "target.h"
-
-    // Cleanflight includes
 #include "drivers/light_led.h"
 
-    // Hackflight includes
 #include "../common/spi.h"
 #include "../common/motors.h"
-
-    // Hackflight includes
 #include "../common/spi.h"
 #include "../common/beeperled.h"
 #include "../common/motors.h"
+
 #include <debugger.hpp>
 
     // Required by system_stm32f4xx.c
