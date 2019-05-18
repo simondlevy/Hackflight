@@ -22,18 +22,15 @@
 #pragma once
 
 #include <MPU6050.h>
+
 #include "stm32fboard.hpp"
+#include "motors.hpp"
+#include "i2c.hpp"
 
 extern "C" {
-
 #include "drivers/light_led.h"
 #include "drivers/bus_i2c.h"
 #include "pg/bus_i2c.h"
-
-#include "i2c.h"
-
-#include "motors.hpp"
-
 } // extern "C"
 
 class AlienflightF3V1 : public Stm32FBoard {
