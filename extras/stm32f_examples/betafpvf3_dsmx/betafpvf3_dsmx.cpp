@@ -20,8 +20,9 @@
 
 #include <hackflight.hpp>
 #include <mixers/quadxcf.hpp>
-#include "pidcontrollers/level.hpp"
-#include "betafpvf3.hpp"
+#include <pidcontrollers/level.hpp>
+#include <boards/stm32f/betafpvf3.hpp>
+#include <receivers/stm32f/dsmx.hpp>
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
@@ -32,8 +33,6 @@ static constexpr float TRIM_YAW   =  0.0f;
 static hf::Hackflight h;
 
 extern "C" {
-
-#include "../support/dsmx.h"
 
     void setup(void)
     {
