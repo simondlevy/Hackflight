@@ -39,9 +39,7 @@ extern "C" {
 #include "io/serial.h"
 #include "target.h"
 
-#include "../../common/spi.h"
-#include "../../common/beeperled.h"
-#include "../../common/motors.h"
+#include "motors.hpp"
 
     // We put this outside the class to make it available to static Board::outbuf() below
     static serialPort_t * _serial0;

@@ -30,8 +30,9 @@ extern "C" {
 #include "drivers/bus_i2c.h"
 #include "pg/bus_i2c.h"
 
-#include "../../common/i2c.h"
-#include "../../common/motors.h"
+#include "i2c.h"
+
+#include "motors.hpp"
 
 } // extern "C"
 
