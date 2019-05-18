@@ -89,7 +89,7 @@ HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
 IMU_DIR         := $(ARDUINO_DIR)/MPU/src
 RX_DIR          := $(ARDUINO_DIR)/SBUSRX/src
 SPI_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
-INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR) $(HF_DIR)/boards/stm32f
+INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR)
 LINKER_DIR      := $(SRC_DIR)/target/link
 
 # configure some variables dependent upon what type of system this is
@@ -468,7 +468,7 @@ endif
 BOARD := femtof3
 IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6500.cpp
 RX_SRC := $(RX_DIR)/SBUSRX.cpp
-HF_SRC := ../support/main.c  ../support/sbusrx.cpp 
+HF_SRC := ../support/main.c
 SKETCH_SRC := ./femtof3_sbus.cpp
 SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(SKETCH_SRC)
 

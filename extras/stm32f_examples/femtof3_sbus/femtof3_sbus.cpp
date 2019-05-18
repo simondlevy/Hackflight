@@ -20,16 +20,15 @@
 
 #include <hackflight.hpp>
 #include <mixers/quadxcf.hpp>
-#include "pidcontrollers/level.hpp"
-#include "femtof3.hpp"
+#include <pidcontrollers/level.hpp>
+#include <boards/stm32f/femtof3.hpp>
+#include <receivers/stm32f/sbus.hpp>
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 4, 5};
 
 static hf::Hackflight h;
 
 extern "C" {
-
-#include "../support/sbusrx.h"
 
     void setup(void)
     {

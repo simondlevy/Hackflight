@@ -1,5 +1,5 @@
 /*
-   sbusrx.h Support for Futaba SBUS receivers on STM32Fx boards
+   dsmx.h Support for Spektrum DSMX receivers on STM32Fx boards
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -26,11 +26,11 @@ extern "C" {
 #include "io/serial.h"
 #include "drivers/serial_uart.h"
 
-class SBUS_Receiver : public hf::Receiver {
+class DSMX_Receiver : public hf::Receiver {
 
     public:
 
-        SBUS_Receiver(UARTDevice_e uartDevice, const uint8_t channelMap[6]);
+        DSMX_Receiver(UARTDevice_e uartDevice, const uint8_t channelMap[6]);
 
         virtual void begin(void) override;
 
@@ -45,6 +45,6 @@ class SBUS_Receiver : public hf::Receiver {
 
         UARTDevice_e _uartDevice;
 
-}; // SBUS_Receiver
+}; // DSMX_Receiver
 
 } // extern "C"
