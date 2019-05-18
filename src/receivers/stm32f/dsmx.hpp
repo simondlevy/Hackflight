@@ -1,7 +1,7 @@
 /*
-   dsmx.h Support for Spektrum DSMX receivers on STM32Fx boards
+   Support for Spektrum DSMX receivers on STM32Fx boards
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2019 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -20,31 +20,80 @@
 
 #include <receiver.hpp>
 #include <hackflight.hpp>
+#include <DSMRX.h>
 
+// Cleanflight drivers
 extern "C" {
-
+#include "drivers/time.h"
 #include "io/serial.h"
 #include "drivers/serial_uart.h"
+}
+
+static DSM2048 * _rx;
+
+// Support for reading DSMX signals over UART
+static uint8_t _dsmAvailable;
+static uint8_t _dsmValue;
+
+uint8_t dsmSerialAvailable(void)
+{
+    return _dsmAvailable;
+}
+
+uint8_t dsmSerialRead(void)
+{
+    _dsmAvailable--;
+    return _dsmValue;
+}
+
+static void serial_event(uint16_t value, void * data)
+{
+    (void)data;
+
+    _dsmValue = (uint8_t)value;
+    _dsmAvailable = 1;
+
+    _rx->handleSerialEvent(micros());
+}
 
 class DSMX_Receiver : public hf::Receiver {
 
     public:
 
-        DSMX_Receiver(UARTDevice_e uartDevice, const uint8_t channelMap[6]);
+        DSMX_Receiver(UARTDevice_e uartDevice, const uint8_t channelMap[6]) : Receiver(channelMap) 
+        {       
+            _uartDevice = uartDevice;  
+        }
 
-        virtual void begin(void) override;
 
-    //protected:
+        virtual void begin(void) override
+        {
+            // Set up UART
+            uartPinConfigure(serialPinConfig());
+
+            // Open serial connection to receiver
+            uartOpen(_uartDevice, serial_event, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
+
+            // Create a DSM2048 object to handle serial interrupts
+            _rx = new DSM2048();
+        }
+
+
+        //protected:
     public:
 
-        virtual bool gotNewFrame(void) override;
+        virtual bool gotNewFrame(void) override
+        {
+            return _rx->gotNewFrame();
+        }
 
-        virtual void readRawvals(void) override;
+        void virtual readRawvals(void) override
+        {
+            _rx->getChannelValuesNormalized(rawvals, MAXCHAN);
+        } 
 
     private:
 
         UARTDevice_e _uartDevice;
 
 }; // DSMX_Receiver
-
-} // extern "C"
