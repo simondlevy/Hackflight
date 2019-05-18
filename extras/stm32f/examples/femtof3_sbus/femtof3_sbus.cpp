@@ -21,7 +21,7 @@
 #include <hackflight.hpp>
 #include <mixers/quadxcf.hpp>
 #include "pidcontrollers/level.hpp"
-#include "femtof3.h"
+#include "femtof3.hpp"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 4, 5};
 

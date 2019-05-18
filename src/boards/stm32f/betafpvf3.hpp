@@ -29,7 +29,6 @@ extern "C" {
 #include "spi.h"
 #include "beeperled.h"
 #include "motors.hpp"
-
 }
 
 class BetaFPVF3 : public Stm32FBoard {

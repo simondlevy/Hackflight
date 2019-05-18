@@ -1,7 +1,7 @@
 /*
-   femtof3.cpp : Board implmentation for FemtoF3
+   Board class for FemtoF3
 
-   Copyright (C) 2018 Simon D. Levy 
+   Copyright (C) 2019 Simon D. Levy 
 
    This file is part of Hackflight.
 
@@ -19,19 +19,47 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "femtof3.h"
+#pragma once
 
-// Here we put code that interacts with Cleanflight
+#include <MPU6500.h>
+#include "stm32fboard.hpp"
+
 extern "C" {
-
-// Cleanflight includes
 #include "drivers/light_led.h"
+#include "spi.h"
+#include "motors.hpp"
+}
 
-// Hackflight includes
-#include "../../common/spi.h"
-#include "../../common/motors.h"
+class FemtoF3 : public Stm32FBoard {
 
-    FemtoF3::FemtoF3(void) : Stm32FBoard(usbVcpOpen())
+    private:
+
+        MPU6500 * _imu;
+
+    protected: 
+
+        // SoftwareQuaternionBoard class overrides
+
+        virtual bool imuReady(void) override
+        {
+            return _imu->checkNewData();
+        }
+
+        virtual void imuReadAccelGyro(void) override
+        {
+            _imu->readAccelerometer(_ax, _ay, _az);
+            _imu->readGyrometer(_gx, _gy, _gz);
+
+            // Negate for IMU orientation
+            _ay = -_ay;
+            _gx = -_gx;
+            _gz = -_gz;
+        }
+
+
+    public:
+
+        FemtoF3(void) : Stm32FBoard(usbVcpOpen())
     {
         spi_init(MPU6500_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6500_CS_PIN)));
 
@@ -44,25 +72,11 @@ extern "C" {
         RealBoard::init();
     }
 
-    void Stm32FBoard::setLed(bool isOn)
-    {
-        ledSet(0, isOn);
-    }
+}; // class FemtoF3
 
-    bool FemtoF3::imuReady(void)
-    {
-        return _imu->checkNewData();
-    }
+void Stm32FBoard::setLed(bool isOn)
+{
+    ledSet(0, isOn);
+}
 
-    void FemtoF3::imuReadAccelGyro(void)
-    {
-        _imu->readAccelerometer(_ax, _ay, _az);
-        _imu->readGyrometer(_gx, _gy, _gz);
 
-        // Negate for IMU orientation
-        _ay = -_ay;
-        _gx = -_gx;
-        _gz = -_gz;
-    }
-
-} // extern "C"
