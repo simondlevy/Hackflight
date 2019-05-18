@@ -21,7 +21,7 @@
 #include <hackflight.hpp>
 #include <mixers/quadxcf.hpp>
 #include <receivers/mock.hpp>
-#include "furyf4.h"
+#include "furyf4.hpp"
 
 static hf::Hackflight h;
 

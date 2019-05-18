@@ -863,11 +863,10 @@ endif
 
 # Hackflight support
 BOARD := furyf4
-BOARD_DIR := ../../boards/$(BOARD)
+BOARD_DIR := ../../boards
 INCLUDE_DIRS += $(BOARD_DIR)
 IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6000f4.cpp
 HF_SRC := ../../common/main.c ../../common/spi.cpp 
-BOARD_SRC := $(BOARD_DIR)/$(BOARD).cpp  
 SKETCH_SRC := ./furyf4_mock.cpp
 SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(BOARD_SRC) $(SKETCH_SRC)
 
