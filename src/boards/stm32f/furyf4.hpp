@@ -168,7 +168,6 @@ extern "C" {
                 return false;
             }
 
-
             virtual void imuReadAccelGyro(void) override
             {
             }

@@ -1,7 +1,7 @@
 /*
-   alienflightf3v1.cpp : Board implementation for Alienflight F3 V1
+   Board class for Alienflight F3 V1
 
-   Copyright (C) 2018 Simon D. Levy 
+   Copyright (C) 2019 Simon D. Levy 
 
    This file is part of Hackflight.
 
@@ -19,28 +19,56 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "alienflightf3v1.h"
+#pragma once
 
+#include <MPU6050.h>
+#include "stm32fboard.hpp"
 
-// Here we put code that interacts with Cleanflight
 extern "C" {
 
-// Cleanflight includes
 #include "drivers/light_led.h"
 #include "drivers/bus_i2c.h"
 #include "pg/bus_i2c.h"
 
-// Hackflight include
 #include "../../common/i2c.h"
 #include "../../common/motors.h"
 
-    AlienflightF3V1::AlienflightF3V1(void) : Stm32FBoard(usbVcpOpen())
+} // extern "C"
+
+class AlienflightF3V1 : public Stm32FBoard {
+
+    private:
+
+        MPU6050 * _imu;
+
+    protected: 
+
+        bool imuReady(void)
+        {
+            return _imu->checkNewData();
+        }
+
+        void imuReadAccelGyro(void)
+        {
+            // Note reversed X/Y order because of IMU orientation
+            _imu->readAccelerometer(_ay, _ax, _az);
+            _imu->readGyrometer(_gy, _gx, _gz);
+
+            // Negate for same reason
+            _gx = -_gx;
+            _gy = -_gy;
+            _gz = -_gz;
+        }
+
+    public:
+
+        AlienflightF3V1(void) : Stm32FBoard(usbVcpOpen())
     {
         i2c_init(I2CDEV_2);
         delaySeconds(.01);
 
         brushed_motors_init(0, 1, 2, 3);
-        
+
         _imu = new MPU6050(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
         checkImuError(_imu->begin());
@@ -48,26 +76,9 @@ extern "C" {
         RealBoard::init();
     }
 
-    void Stm32FBoard::setLed(bool isOn)
-    {
-        ledSet(0, isOn);
-    }
+}; // class AlienflightF3V1
 
-    bool AlienflightF3V1::imuReady(void)
-    {
-        return _imu->checkNewData();
-    }
-
-    void AlienflightF3V1::imuReadAccelGyro(void)
-    {
-        // Note reversed X/Y order because of IMU orientation
-        _imu->readAccelerometer(_ay, _ax, _az);
-        _imu->readGyrometer(_gy, _gx, _gz);
-
-        // Negate for same reason
-        _gx = -_gx;
-        _gy = -_gy;
-        _gz = -_gz;
-    }
-
-} // extern "C"
+void Stm32FBoard::setLed(bool isOn)
+{
+    ledSet(0, isOn);
+}

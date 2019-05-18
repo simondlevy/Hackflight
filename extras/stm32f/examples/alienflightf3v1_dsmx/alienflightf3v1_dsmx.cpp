@@ -21,7 +21,7 @@
 #include <hackflight.hpp>
 #include <mixers/quadxcf.hpp>
 #include "pidcontrollers/level.hpp"
-#include "alienflightf3v1.h"
+#include "alienflightf3v1.hpp"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
