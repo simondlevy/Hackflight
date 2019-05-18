@@ -1,5 +1,5 @@
 ##############################################################################
-#   Makefile for Omnibus F3 board
+#   Makefile for BetaFPV F3 brushed board
 #
 #   Copyright (c) 2018 Simon D. Levy
 #
@@ -21,7 +21,7 @@
 # Things that the user might override on the commandline
 
 # The target to build
-TARGET    ?= OMNIBUS
+TARGET    ?= BETAFLIGHTF3
 
 # Where you put Cleanflight
 CF_DIR := $(HOME)/Desktop/cleanflight
@@ -309,12 +309,12 @@ MCU_COMMON_SRC = \
 		drivers/bus_spi.c \
 		drivers/bus_spi_config.c \
 		drivers/bus_spi_pinconfig.c \
+		io/serial.c \
+		drivers/bus_spi_pinconfig.c \
 		drivers/sound_beeper.c \
 		pg/beeper_dev.c \
-		io/serial.c \
-	    pg/pg.c \
-	    pg/bus_spi.c
-
+		pg/pg.c \
+	    pg/bus_spi.c 
 
 DEVICE_FLAGS += -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING -D__FPU_PRESENT=1 -DUNALIGNED_SUPPORT_DISABLE -DARM_MATH_CM4
 
@@ -343,7 +343,11 @@ else
 .DEFAULT_GOAL := hex
 endif
 
-INCLUDE_DIRS    := $(INCLUDE_DIRS) $(TARGET_DIR)
+INCLUDE_DIRS    := $(INCLUDE_DIRS) \
+                   $(LIB_DIR)/MAVLink
+
+INCLUDE_DIRS    := $(INCLUDE_DIRS) \
+                   $(TARGET_DIR)
 
 VPATH           := $(VPATH):$(TARGET_DIR)
 
@@ -464,12 +468,11 @@ LD_FLAGS     = -lm \
 endif
 
 # Hackflight support
-BOARD := omnibusf3
-BOARD_DIR := ../../boards/$(BOARD)
+BOARD := betafpvf3
 IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6000.cpp
 RX_SRC := $(RX_DIR)/DSMRX.cpp
-HF_SRC := ../../common/main.c ../../common/dsmx.cpp
-SKETCH_SRC := ./omnibusf3_dsmx.cpp
+HF_SRC := ../support/main.c ../support/dsmx.cpp
+SKETCH_SRC := ./betafpvf3_dsmx.cpp
 SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(SKETCH_SRC)
 
 ###############################################################################
@@ -718,4 +721,4 @@ listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
 
 commit:
-	git commit -a -m="More AlienflightF3 Board implementation"; git push
+	git commit -a -m="More Hyperion F3 Evo Brushed Board implementation"; git push

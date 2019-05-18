@@ -29,7 +29,7 @@ static hf::Hackflight h;
 
 extern "C" {
 
-#include "../../common/sbusrx.h"
+#include "../support/sbusrx.h"
 
     void setup(void)
     {

@@ -1,5 +1,5 @@
 /*
-   Sketch for Furious BetaFPV F3 brushed board with Spektrum DSMX receiver
+   Sketch for AlienflightF3V1 board with Spektrum DSMX receiver
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -21,40 +21,36 @@
 #include <hackflight.hpp>
 #include <mixers/quadxcf.hpp>
 #include "pidcontrollers/level.hpp"
-#include "betafpvf3.hpp"
+#include "alienflightf3v1.hpp"
 
-static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
-
-static constexpr float TRIM_ROLL  =  0.0f;
-static constexpr float TRIM_PITCH = +0.15;
-static constexpr float TRIM_YAW   =  0.0f;
+constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 static hf::Hackflight h;
 
 extern "C" {
 
-#include "../../common/dsmx.h"
+#include "../support/dsmx.h"
 
     void setup(void)
     {
+         
         hf::Rate * ratePid = new hf::Rate(
-                0.125f,    // Gyro cyclic P
-                0.001875f, // Gyro cyclic I
-                0.175f,    // Gyro cyclic D
-                0.625f,    // Gyro yaw P
-                0.005625f, // Gyro yaw I
-                4.0f);     // Demands to rate
+                0.125,      // Gyro pitch/roll P
+                0.001875f,  // Gyro pitch/roll I
+                0.175f,     // Gyro pitch/roll D
+                0.625f,     // Gyro yaw P
+                0.005625f,  // Gyro yaw I
+                4.0f);      // Demands to rate
 
         hf::Level * level = new hf::Level(0.20f);
+
+        DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_2, CHANNEL_MAP);
 
         // Add Level PID for aux switch position 1
         h.addPidController(level, 1);
 
-        // Create DSMX Receiver object
-        DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_2, CHANNEL_MAP);
-
         // Initialize Hackflight firmware
-        h.init(new BetaFPVF3(), rc, new hf::MixerQuadXCF(), ratePid);
+        h.init(new AlienflightF3V1(), rc, new hf::MixerQuadXCF(), ratePid);
     }
 
     void loop(void)

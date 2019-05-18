@@ -22,8 +22,9 @@
 #pragma once
 
 #include <MPU6500.h>
+
 #include "stm32fboard.hpp"
-#include "support/spi.h"
+#include "support/spi.hpp"
 
 // Cleanflight drivers
 extern "C" {

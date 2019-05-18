@@ -1,5 +1,5 @@
 ##############################################################################
-#   Makefile for Hyperion F3 Evo brushed board
+#   Makefile for Omnibus F3 board
 #
 #   Copyright (c) 2018 Simon D. Levy
 #
@@ -21,7 +21,7 @@
 # Things that the user might override on the commandline
 
 # The target to build
-TARGET    ?= SPRACINGF3EVO
+TARGET    ?= OMNIBUS
 
 # Where you put Cleanflight
 CF_DIR := $(HOME)/Desktop/cleanflight
@@ -87,7 +87,7 @@ LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
 HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
 IMU_DIR         := $(ARDUINO_DIR)/MPU/src
-RX_DIR          := $(ARDUINO_DIR)/SBUSRX/src
+RX_DIR          := $(ARDUINO_DIR)/DSMRX/src
 SPI_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
 INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR) $(HF_DIR)/boards/stm32f
 LINKER_DIR      := $(SRC_DIR)/target/link
@@ -309,9 +309,12 @@ MCU_COMMON_SRC = \
 		drivers/bus_spi.c \
 		drivers/bus_spi_config.c \
 		drivers/bus_spi_pinconfig.c \
+		drivers/sound_beeper.c \
+		pg/beeper_dev.c \
 		io/serial.c \
 	    pg/pg.c \
-	    pg/bus_spi.c 
+	    pg/bus_spi.c
+
 
 DEVICE_FLAGS += -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING -D__FPU_PRESENT=1 -DUNALIGNED_SUPPORT_DISABLE -DARM_MATH_CM4
 
@@ -340,11 +343,7 @@ else
 .DEFAULT_GOAL := hex
 endif
 
-INCLUDE_DIRS    := $(INCLUDE_DIRS) \
-                   $(LIB_DIR)/MAVLink
-
-INCLUDE_DIRS    := $(INCLUDE_DIRS) \
-                   $(TARGET_DIR)
+INCLUDE_DIRS    := $(INCLUDE_DIRS) $(TARGET_DIR)
 
 VPATH           := $(VPATH):$(TARGET_DIR)
 
@@ -465,11 +464,12 @@ LD_FLAGS     = -lm \
 endif
 
 # Hackflight support
-BOARD := femtof3
-IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6500.cpp
-RX_SRC := $(RX_DIR)/SBUSRX.cpp
-HF_SRC := ../../common/main.c  ../../common/spi.cpp ../../common/sbusrx.cpp 
-SKETCH_SRC := ./femtof3_sbus.cpp
+BOARD := omnibusf3
+BOARD_DIR := ../../boards/$(BOARD)
+IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6000.cpp
+RX_SRC := $(RX_DIR)/DSMRX.cpp
+HF_SRC := ../support/main.c ../support/dsmx.cpp
+SKETCH_SRC := ./omnibusf3_dsmx.cpp
 SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(SKETCH_SRC)
 
 ###############################################################################
@@ -718,4 +718,4 @@ listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
 
 commit:
-	git commit -a -m="More Hyperion F3 Evo Brushed Board implementation"; git push
+	git commit -a -m="More AlienflightF3 Board implementation"; git push

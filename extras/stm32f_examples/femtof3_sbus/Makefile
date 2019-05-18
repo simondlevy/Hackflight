@@ -1,5 +1,5 @@
 ##############################################################################
-#   Makefile for AlienflightF3V1 board
+#   Makefile for Hyperion F3 Evo brushed board
 #
 #   Copyright (c) 2018 Simon D. Levy
 #
@@ -21,7 +21,7 @@
 # Things that the user might override on the commandline
 
 # The target to build
-TARGET    ?= ALIENFLIGHTF3
+TARGET    ?= SPRACINGF3EVO
 
 # Where you put Cleanflight
 CF_DIR := $(HOME)/Desktop/cleanflight
@@ -87,9 +87,9 @@ LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
 HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
 IMU_DIR         := $(ARDUINO_DIR)/MPU/src
-RX_DIR          := $(ARDUINO_DIR)/DSMRX/src
-I2C_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
-INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(I2C_DIR) $(RX_DIR) $(HF_DIR)/boards/stm32f
+RX_DIR          := $(ARDUINO_DIR)/SBUSRX/src
+SPI_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
+INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR) $(HF_DIR)/boards/stm32f
 LINKER_DIR      := $(SRC_DIR)/target/link
 
 # configure some variables dependent upon what type of system this is
@@ -304,12 +304,14 @@ MCU_COMMON_SRC = \
 	    drivers/serial_uart_init.c \
 	    drivers/serial_uart.c \
 	    drivers/serial.c \
-	    drivers/bus_i2c_busdev.c \
-	    drivers/bus_i2c_config.c \
-        drivers/bus_i2c_stm32f30x.c \
-	    io/serial.c \
+		drivers/exti.c \
+		drivers/bus.c \
+		drivers/bus_spi.c \
+		drivers/bus_spi_config.c \
+		drivers/bus_spi_pinconfig.c \
+		io/serial.c \
 	    pg/pg.c \
-	    pg/bus_i2c.c
+	    pg/bus_spi.c 
 
 DEVICE_FLAGS += -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING -D__FPU_PRESENT=1 -DUNALIGNED_SUPPORT_DISABLE -DARM_MATH_CM4
 
@@ -463,11 +465,11 @@ LD_FLAGS     = -lm \
 endif
 
 # Hackflight support
-BOARD := alienflightf3v1
-IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6050.cpp
-RX_SRC := $(RX_DIR)/DSMRX.cpp
-HF_SRC := ../../common/main.c ../../common/dsmx.cpp
-SKETCH_SRC := ./alienflightf3v1_dsmx.cpp
+BOARD := femtof3
+IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6500.cpp
+RX_SRC := $(RX_DIR)/SBUSRX.cpp
+HF_SRC := ../support/main.c  ../support/sbusrx.cpp 
+SKETCH_SRC := ./femtof3_sbus.cpp
 SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(SKETCH_SRC)
 
 ###############################################################################
@@ -716,4 +718,4 @@ listen:
 	miniterm.py $(SERIAL_DEVICE) 115200
 
 commit:
-	git commit -a -m="More AlienflightF3 Board implementation"; git push
+	git commit -a -m="More Hyperion F3 Evo Brushed Board implementation"; git push
