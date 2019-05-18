@@ -1,5 +1,5 @@
 /*
-   MPU6000.cpp : Experimental class for Invensense MPU6000 IMU using SPI bus
+   Experimental class for Invensense MPU6000 IMU on STM32F4 
 
    Copyright (C) 2019 Simon D. Levy 
 
@@ -19,7 +19,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "MPU6000.h"
+#include "MPU6000f4.h"
 #include "spi.h"
 
 MPU6000::MPU6000(Ascale_t ascale, Gscale_t gscale, uint8_t sampleRateDivisor)

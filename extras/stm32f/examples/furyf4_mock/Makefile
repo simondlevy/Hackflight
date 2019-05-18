@@ -865,7 +865,7 @@ endif
 BOARD := furyf4
 BOARD_DIR := ../../boards/$(BOARD)
 INCLUDE_DIRS += $(BOARD_DIR)
-HF_SRC := ../../common/main.c ../../boards/furyf4/spi.cpp ../../boards/furyf4/MPU6000.cpp
+HF_SRC := ../../common/main.c ../../boards/furyf4/spi.cpp ../../boards/furyf4/MPU6000f4.cpp
 BOARD_SRC := $(BOARD_DIR)/$(BOARD).cpp  
 SKETCH_SRC := ./furyf4_mock.cpp
 SRC += $(HF_SRC) $(RX_SRC) $(BOARD_SRC) $(SKETCH_SRC)

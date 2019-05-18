@@ -1,5 +1,5 @@
 /*
-   MPU6000.h : Experimental class for Invensense MPU6000 IMU using SPI bus
+   Experimental class for Invensense MPU6000 IMU on STM32F4 
 
    Copyright (C) 2019 Simon D. Levy 
 
@@ -187,7 +187,7 @@ class MPU6000 {
         float   _gRes;
         float _accelBias[3];
         float _gyroBias[3];
- 
+
         uint8_t readRegister(uint8_t subAddress);
 
         void readRegisters(uint8_t subAddress, uint8_t count, uint8_t * dest);
@@ -202,9 +202,9 @@ class MPU6000 {
 
         uint8_t getId();
 
-	bool readAccel(int16_t & x, int16_t & y, int16_t & z);
+        bool readAccel(int16_t & x, int16_t & y, int16_t & z);
 
         bool readGyro(int16_t & x, int16_t & y, int16_t & z);
 
 
-}; // class MPU6000 SPI
+}; // class MPU6000
