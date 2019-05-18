@@ -1,7 +1,7 @@
 /*
-   beeperled.cpp : code for boards that use beeper signals to control LED
+   Method declarations for STM32F boards that use beeper signals to control LED
 
-   Copyright (C) 2018 Simon D. Levy 
+   Copyright (C) 2019 Simon D. Levy 
 
    This file is part of Hackflight.
 
@@ -19,25 +19,24 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "beeperled.h"
+#pragma once
 
-// Here we put code that interacts with Cleanflight
+// Cleanflight drivers
 extern "C" {
-
 #include "drivers/sound_beeper.h"
 #include "pg/beeper_dev.h"
+}
 
-    void beeperLedInit(void)
-    {
-        // Set up the LED (uses the beeper for some reason)
-        beeperInit(beeperDevConfig());
+void beeperLedInit(void)
+{
+    // Set up the LED (uses the beeper for some reason)
+    beeperInit(beeperDevConfig());
 
-        // Turn it off
-        systemBeep(true);
-    }
+    // Turn it off
+    systemBeep(true);
+}
 
-    void beeperLedSet(bool isOn)
-    {
-        systemBeep(!isOn);
-    }
+void beeperLedSet(bool isOn)
+{
+    systemBeep(!isOn);
 }

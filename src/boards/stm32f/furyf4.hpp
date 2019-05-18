@@ -23,6 +23,8 @@
 
 #include <boards/realboard.hpp>
 #include <boards/softquat2.hpp>
+#include "beeperled.hpp"
+#include "motors.hpp"
 
 #include "MPU6000f4.h"
 
@@ -40,172 +42,167 @@ extern "C" {
 #include "io/serial.h"
 #include "target.h"
 #include "drivers/light_led.h"
+} // extern "C"
 
-#include "../common/spi.h"
-#include "../common/motors.h"
-#include "../common/spi.h"
-#include "../common/beeperled.h"
-#include "../common/motors.h"
-
+#include "spi.h"
 #include <debugger.hpp>
 
-    // Required by system_stm32f4xx.c
-    void * mpuResetFn = NULL;
+// Required by system_stm32f4xx.c
+void * mpuResetFn = NULL;
 
-    // We put this outside the class to make it available to static Board::outbuf() below
-    static serialPort_t * _serial0;
+// We put this outside the class to make it available to static Board::outbuf() below
+static serialPort_t * _serial0;
 
-    class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard2 {
+class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard2 {
 
-        private:
+    private:
 
-            MPU6000 * _imu;
+        MPU6000 * _imu;
 
-            // debugging
-            int16_t _accx, _accy, _accz;
-            int16_t _gyrox, _gyroy, _gyroz;
+        // debugging
+        int16_t _accx, _accy, _accz;
+        int16_t _gyrox, _gyroy, _gyroz;
 
-            void checkImuError(MPU6000::Error_t errid)
-            {
-                switch (errid) {
+        void checkImuError(MPU6000::Error_t errid)
+        {
+            switch (errid) {
 
-                    case MPU6000::ERROR_IMU_ID:
-                        error("Bad device ID");
-                        break;
-                    case MPU6000::ERROR_SELFTEST:
-                        error("Failed self-test");
-                        break;
-                    default:
-                        break;
-                }
+                case MPU6000::ERROR_IMU_ID:
+                    error("Bad device ID");
+                    break;
+                case MPU6000::ERROR_SELFTEST:
+                    error("Failed self-test");
+                    break;
+                default:
+                    break;
             }
+        }
 
-        protected: 
+    protected: 
 
-            FuryF4(serialPort_t * serial0);
+        FuryF4(serialPort_t * serial0);
 
-            // Board class overrides
+        // Board class overrides
 
-            virtual void setLed(bool isOn) override
-            {
-                ledSet(1, isOn);
-            }
+        virtual void setLed(bool isOn) override
+        {
+            ledSet(1, isOn);
+        }
 
 
-            virtual void writeMotor(uint8_t index, float value) override
-            {
-                (void)index;
-                (void)value;
-            }
+        virtual void writeMotor(uint8_t index, float value) override
+        {
+            (void)index;
+            (void)value;
+        }
 
-            virtual void reboot(void) override
-            {
-                systemResetToBootloader();
-            }
+        virtual void reboot(void) override
+        {
+            systemResetToBootloader();
+        }
 
-            virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz) override
-            {
-                return SoftwareQuaternionBoard2::getQuaternion(qw, qx, qy, qz, getTime());
-            }
+        virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz) override
+        {
+            return SoftwareQuaternionBoard2::getQuaternion(qw, qx, qy, qz, getTime());
+        }
 
-            virtual bool getGyrometer(float & gx, float & gy, float & gz) override
-            {
-                return SoftwareQuaternionBoard2::getGyrometer(gx, gy, gz);
-            }
+        virtual bool getGyrometer(float & gx, float & gy, float & gz) override
+        {
+            return SoftwareQuaternionBoard2::getGyrometer(gx, gy, gz);
+        }
 
-            virtual uint8_t serialNormalAvailable(void) override
-            {
-                return serialRxBytesWaiting(_serial0);
-            }
+        virtual uint8_t serialNormalAvailable(void) override
+        {
+            return serialRxBytesWaiting(_serial0);
+        }
 
-            virtual uint8_t serialNormalRead(void) override
-            {
-                return serialRead(_serial0);
-            }
+        virtual uint8_t serialNormalRead(void) override
+        {
+            return serialRead(_serial0);
+        }
 
-            virtual void serialNormalWrite(uint8_t c) override
-            {
-                serialWrite(_serial0, c);
-            }
+        virtual void serialNormalWrite(uint8_t c) override
+        {
+            serialWrite(_serial0, c);
+        }
 
-            virtual void adHocDebug(void) override
-            {
-                hf::Debugger::printf("ax: %+05d ay: %+05d az: %+05d | gx: %+05d gy: %+05d gz: %+05d\n", 
-                        _accx, _accy, _accz, _gyrox, _gyroy, _gyroz);
-            }
+        virtual void adHocDebug(void) override
+        {
+            hf::Debugger::printf("ax: %+05d ay: %+05d az: %+05d | gx: %+05d gy: %+05d gz: %+05d\n", 
+                    _accx, _accy, _accz, _gyrox, _gyroy, _gyroz);
+        }
 
-            // SoftwareQuaternionBoard class overrides
+        // SoftwareQuaternionBoard class overrides
 
-            virtual bool imuReady(void) override
-            {
-                int16_t gx=0, gy=0, gz=0;
-                int16_t ax=0, ay=0, az=0;
+        virtual bool imuReady(void) override
+        {
+            int16_t gx=0, gy=0, gz=0;
+            int16_t ax=0, ay=0, az=0;
 
-                static bool accel;
+            static bool accel;
 
-                if (accel) {
+            if (accel) {
 
-                    if (_imu->readAccel(ax, ay, az)) {
-                        _accx = ax;
-                        _accy = ay;
-                        _accz = az;
-                    }
-
-                    accel = false;
+                if (_imu->readAccel(ax, ay, az)) {
+                    _accx = ax;
+                    _accy = ay;
+                    _accz = az;
                 }
 
-                else {
+                accel = false;
+            }
 
-                    if (_imu->readGyro(gx, gy, gz)) {
-                        _gyrox = gx;
-                        _gyroy = gy;
-                        _gyroz = gz;
-                    }
+            else {
 
-                    accel  = true;
+                if (_imu->readGyro(gx, gy, gz)) {
+                    _gyrox = gx;
+                    _gyroy = gy;
+                    _gyroz = gz;
                 }
 
-                return false;
+                accel  = true;
             }
 
-            virtual void imuReadAccelGyro(void) override
-            {
-            }
+            return false;
+        }
 
-            // IMU methods
+        virtual void imuReadAccelGyro(void) override
+        {
+        }
 
-         public:
+        // IMU methods
 
-            FuryF4(void)
-            {
-                _serial0 = usbVcpOpen();
+    public:
 
-                spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
+        FuryF4(void)
+        {
+            _serial0 = usbVcpOpen();
 
-                // Start the IMU
-                _imu = new MPU6000(MPU6000::AFS_2G, MPU6000::GFS_250DPS);
+            spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
 
-                // Check IMU ready status
-                checkImuError(_imu->begin());
+            // Start the IMU
+            _imu = new MPU6000(MPU6000::AFS_2G, MPU6000::GFS_250DPS);
 
-                RealBoard::init();
+            // Check IMU ready status
+            checkImuError(_imu->begin());
 
-                _accx = 0;
-                _accy = 0;
-                _accz = 0;
+            RealBoard::init();
 
-                _gyrox = 0;
-                _gyroy = 0;
-                _gyroz = 0;
-            }
+            _accx = 0;
+            _accy = 0;
+            _accz = 0;
+
+            _gyrox = 0;
+            _gyroy = 0;
+            _gyroz = 0;
+        }
 
 
-    }; // class FuryF4
+}; // class FuryF4
 
-    void hf::Board::outbuf(char * buf)
-    {
-        for (char *p=buf; *p; p++)
-            serialWrite(_serial0, *p);
-    }
+void hf::Board::outbuf(char * buf)
+{
+    for (char *p=buf; *p; p++)
+        serialWrite(_serial0, *p);
+}
 
-} // extern "C"

@@ -23,11 +23,11 @@
 
 #include <MPU6000.h>
 #include "stm32fboard.hpp"
+#include "beeperled.hpp"
+#include "motors.hpp"
 
 extern "C" {
 #include "spi.h"
-#include "beeperled.h"
-#include "motors.hpp"
 }
 
 // These are static so serial_event1 can access them
