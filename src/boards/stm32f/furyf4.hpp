@@ -140,7 +140,7 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
                 int16_t ax=0, ay=0, az=0;
 
-                if (_imu->readAccel(ax, ay, az)) {
+                if (_imu->readAccelRaw(ax, ay, az)) {
                     _accx = ax;
                     _accy = ay;
                     _accz = az;
@@ -155,7 +155,7 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
                 int16_t gx=0, gy=0, gz=0;
 
-                if (_imu->readGyro(gx, gy, gz)) {
+                if (_imu->readGyroRaw(gx, gy, gz)) {
                     _gyrx = gx;
                     _gyry = gy;
                     _gyrz = gz;
