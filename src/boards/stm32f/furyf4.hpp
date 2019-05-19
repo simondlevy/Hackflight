@@ -59,9 +59,8 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
         bool _accelReady;
 
-        // debugging
         int16_t _accx, _accy, _accz;
-        int16_t _gyrox, _gyroy, _gyroz;
+        int16_t _gyrx, _gyry, _gyrz;
 
         void checkImuError(MPU6000::Error_t errid)
         {
@@ -88,7 +87,6 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
         {
             ledSet(1, isOn);
         }
-
 
         virtual void writeMotor(uint8_t index, float value) override
         {
@@ -129,17 +127,18 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
         virtual void adHocDebug(void) override
         {
             hf::Debugger::printf("ax: %+05d ay: %+05d az: %+05d | gx: %+05d gy: %+05d gz: %+05d\n", 
-                    _accx, _accy, _accz, _gyrox, _gyroy, _gyroz);
+                    _accx, _accy, _accz, _gyrx, _gyry, _gyrz);
         }
 
         // SoftwareQuaternionBoard class overrides
 
         virtual bool imuReady(void) override
         {
-            int16_t gx=0, gy=0, gz=0;
-            int16_t ax=0, ay=0, az=0;
+            bool ready = false;
 
             if (_accelReady) {
+
+                int16_t ax=0, ay=0, az=0;
 
                 if (_imu->readAccel(ax, ay, az)) {
                     _accx = ax;
@@ -148,20 +147,24 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
                 }
 
                 _accelReady = false;
+
+                ready = true;
             }
 
             else {
 
+                int16_t gx=0, gy=0, gz=0;
+
                 if (_imu->readGyro(gx, gy, gz)) {
-                    _gyrox = gx;
-                    _gyroy = gy;
-                    _gyroz = gz;
+                    _gyrx = gx;
+                    _gyry = gy;
+                    _gyrz = gz;
                 }
 
                 _accelReady  = true;
             }
 
-            return false;
+            return ready;
         }
 
         virtual void imuReadAccelGyro(void) override
@@ -192,9 +195,9 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
             _accy = 0;
             _accz = 0;
 
-            _gyrox = 0;
-            _gyroy = 0;
-            _gyroz = 0;
+            _gyrx = 0;
+            _gyry = 0;
+            _gyrz = 0;
         }
 
 
