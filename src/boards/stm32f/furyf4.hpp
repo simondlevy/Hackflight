@@ -129,7 +129,9 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
         virtual void adHocDebug(void) override
         {
             hf::Debugger::printf("ax: ");
-            hf::Debugger::printfloat(_ax, 3);
+            hf::Debugger::printfloat(_ax);
+            hf::Debugger::printf("\tay: ");
+            hf::Debugger::printfloat(_ay);
             hf::Debugger::printf("\n");
         }
 
