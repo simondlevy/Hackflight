@@ -1032,7 +1032,7 @@ all_clean: $(TARGETS_CLEAN)
 flash_$(TARGET): $(TARGET_BIN)
 	$(V0) echo -n 'R' >$(SERIAL_DEVICE)
 	sleep 2
-	dfu-util -a 0 -s 0x08000000:leave -D $(TARGET_BIN)
+	sudo dfu-util -a 0 -s 0x08000000:leave -D $(TARGET_BIN)
 
 ## flash             : flash firmware (.hex) onto flight controller
 flash: flash_$(TARGET)
