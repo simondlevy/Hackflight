@@ -57,6 +57,8 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
         MPU6000 * _imu;
 
+        bool _accelReady;
+
         // debugging
         int16_t _accx, _accy, _accz;
         int16_t _gyrox, _gyroy, _gyroz;
@@ -137,9 +139,7 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
             int16_t gx=0, gy=0, gz=0;
             int16_t ax=0, ay=0, az=0;
 
-            static bool accel;
-
-            if (accel) {
+            if (_accelReady) {
 
                 if (_imu->readAccel(ax, ay, az)) {
                     _accx = ax;
@@ -147,7 +147,7 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
                     _accz = az;
                 }
 
-                accel = false;
+                _accelReady = false;
             }
 
             else {
@@ -158,7 +158,7 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
                     _gyroz = gz;
                 }
 
-                accel  = true;
+                _accelReady  = true;
             }
 
             return false;
@@ -185,6 +185,8 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
             checkImuError(_imu->begin());
 
             RealBoard::init();
+
+            _accelReady = false;
 
             _accx = 0;
             _accy = 0;
