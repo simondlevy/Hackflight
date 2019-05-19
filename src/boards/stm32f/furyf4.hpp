@@ -1,6 +1,8 @@
 /*
    Board class for FuryF4
 
+   Reads raw IMU gyro and accel alternately from MPU6000
+
    Copyright (C) 2019 Simon D. Levy 
 
    This file is part of Hackflight.
@@ -21,7 +23,7 @@
 
 #pragma once
 
-#include <MPU6000f4.h>
+#include <MPU6000.h>
 
 #include <boards/realboard.hpp>
 #include <boards/softquat.hpp>
@@ -60,7 +62,7 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
         bool _accelReady;
 
         int16_t _accx, _accy, _accz;
-        int16_t _gyrx, _gyry, _gyrz;
+        int16_t _gyrox, _gyroy, _gyroz;
 
         void checkImuError(MPU6000::Error_t errid)
         {
@@ -126,8 +128,9 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
         virtual void adHocDebug(void) override
         {
-            hf::Debugger::printf("ax: %+05d ay: %+05d az: %+05d | gx: %+05d gy: %+05d gz: %+05d\n", 
-                    _accx, _accy, _accz, _gyrx, _gyry, _gyrz);
+            hf::Debugger::printf("ax: ");
+            hf::Debugger::printfloat(_ax, 3);
+            hf::Debugger::printf("\n");
         }
 
         // SoftwareQuaternionBoard class overrides
@@ -156,9 +159,9 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
                 int16_t gx=0, gy=0, gz=0;
 
                 if (_imu->readGyroRaw(gx, gy, gz)) {
-                    _gyrx = gx;
-                    _gyry = gy;
-                    _gyrz = gz;
+                    _gyrox = gx;
+                    _gyroy = gy;
+                    _gyroz = gz;
                 }
 
                 _accelReady  = true;
@@ -169,6 +172,9 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
         virtual void imuReadAccelGyro(void) override
         {
+            _imu->scaleRawAccel(_accx, _accy, _accz, _ax, _ay, _az);
+            _imu->scaleRawGyro(_gyrox, _gyroy, _gyroz, _gx, _gy, _gz);
+
         }
 
         // IMU methods
@@ -195,11 +201,10 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
             _accy = 0;
             _accz = 0;
 
-            _gyrx = 0;
-            _gyry = 0;
-            _gyrz = 0;
+            _gyrox = 0;
+            _gyroy = 0;
+            _gyroz = 0;
         }
-
 
 }; // class FuryF4
 
