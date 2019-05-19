@@ -24,7 +24,7 @@
 #include <MPU6000f4.h>
 
 #include <boards/realboard.hpp>
-#include <boards/softquat2.hpp>
+#include <boards/softquat.hpp>
 #include "support/beeperled.hpp"
 #include "support/spi.hpp"
 #include <debugger.hpp>
@@ -51,7 +51,7 @@ void * mpuResetFn = NULL;
 // We put this outside the class to make it available to static Board::outbuf() below
 static serialPort_t * _serial0;
 
-class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard2 {
+class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
     private:
 
@@ -101,12 +101,12 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard2 {
 
         virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz) override
         {
-            return SoftwareQuaternionBoard2::getQuaternion(qw, qx, qy, qz, getTime());
+            return SoftwareQuaternionBoard::getQuaternion(qw, qx, qy, qz, getTime());
         }
 
         virtual bool getGyrometer(float & gx, float & gy, float & gz) override
         {
-            return SoftwareQuaternionBoard2::getGyrometer(gx, gy, gz);
+            return SoftwareQuaternionBoard::getGyrometer(gx, gy, gz);
         }
 
         virtual uint8_t serialNormalAvailable(void) override
