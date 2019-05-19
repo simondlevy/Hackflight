@@ -128,6 +128,7 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
         virtual void adHocDebug(void) override
         {
+            /*
             hf::Debugger::printf("ax: ");
             hf::Debugger::printfloat(_ax);
             hf::Debugger::printf("\tay: ");
@@ -141,6 +142,7 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
             hf::Debugger::printf("\tgz: ");
             hf::Debugger::printfloat(_gz);
             hf::Debugger::printf("\n");
+            */
         }
 
         // SoftwareQuaternionBoard class overrides
@@ -182,9 +184,13 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
         virtual void imuReadAccelGyro(void) override
         {
-            _imu->scaleRawAccel(_accx, _accy, _accz, _ax, _ay, _az);
+            _imu->scaleRawAccel(_accx, _accy,  _accz,  _ax, _ay, _az);
             _imu->scaleRawGyro(_gyrox, _gyroy, _gyroz, _gx, _gy, _gz);
 
+            // Negate for IMU orientation
+            _ay = -_ay;
+            _gx = -_gx;
+            _gz = -_gz;
         }
 
         // IMU methods
