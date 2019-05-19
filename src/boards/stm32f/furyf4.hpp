@@ -132,6 +132,14 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
             hf::Debugger::printfloat(_ax);
             hf::Debugger::printf("\tay: ");
             hf::Debugger::printfloat(_ay);
+            hf::Debugger::printf("\taz: ");
+            hf::Debugger::printfloat(_az);
+            hf::Debugger::printf("\tgx: ");
+            hf::Debugger::printfloat(_gx);
+            hf::Debugger::printf("\tgy: ");
+            hf::Debugger::printfloat(_gy);
+            hf::Debugger::printf("\tgz: ");
+            hf::Debugger::printfloat(_gz);
             hf::Debugger::printf("\n");
         }
 
