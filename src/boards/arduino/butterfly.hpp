@@ -48,7 +48,6 @@ namespace hf {
                 digitalWrite(id, value);
             }
 
-
          protected:
 
             virtual void writeMotor(uint8_t index, float value) override

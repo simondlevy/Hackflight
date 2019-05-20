@@ -37,7 +37,7 @@ class AlienflightF3V1 : public Stm32FBoard {
 
     private:
 
-        MPU6050 * _imu;
+        MPU6050 * _imu = NULL;
 
     protected: 
 

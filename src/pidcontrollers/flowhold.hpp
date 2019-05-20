@@ -32,10 +32,9 @@ namespace hf {
         private: 
 
         // PID constants set by constructor
-        float _P;
-        float _minAltitude;
-        float _previousTime;
-
+        float _P = 0;
+        float _minAltitude = 0;
+        float _previousTime = 0;
 
         bool gotCorrection(float demand, float velocity, float currentTime, float & correction)
         {

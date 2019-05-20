@@ -37,14 +37,11 @@ namespace hf {
 
         friend class Hackflight;
 
-        public:
+        private:
 
-            Magnetometer(void)
-            {
-                _mx = 0;
-                _my = 0;
-                _mz = 0;
-            }
+            float _mx = 0;
+            float _my = 0;
+            float _mz = 0;
 
         protected:
 
@@ -62,11 +59,14 @@ namespace hf {
                 return board->getMagnetometer(_uTs);
             }
 
-        private:
+        public:
 
-            float _mx;
-            float _my;
-            float _mz;
+            Magnetometer(void)
+            {
+                _mx = 0;
+                _my = 0;
+                _mz = 0;
+            }
 
     };  // class Magnetometer
 

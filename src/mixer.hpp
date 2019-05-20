@@ -43,7 +43,7 @@ namespace hf {
             // Arbitrary
             static const uint8_t MAXMOTORS = 20;
 
-            float _motorsPrev[MAXMOTORS];
+            float _motorsPrev[MAXMOTORS] = {0};
 
             void writeMotor(uint8_t index, float value)
             {

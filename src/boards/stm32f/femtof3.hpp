@@ -35,7 +35,7 @@ class FemtoF3 : public Stm32FBoard {
 
     private:
 
-        MPU6500 * _imu;
+        MPU6500 * _imu = NULL;
 
     protected: 
 

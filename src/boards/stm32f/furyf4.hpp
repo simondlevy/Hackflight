@@ -57,7 +57,7 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
     private:
 
-        MPU6000 * _imu;
+        MPU6000 * _imu = NULL;
 
         bool _accelReady;
 

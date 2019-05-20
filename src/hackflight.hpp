@@ -40,16 +40,16 @@ namespace hf {
         private: 
 
             // Passed to Hackflight::init() for a particular build
-            Board      * _board;
-            Receiver   * _receiver;
-            Rate       * _ratePid;
-            Mixer      * _mixer;
+            Board      * _board = NULL;
+            Receiver   * _receiver = NULL;
+            Rate       * _ratePid = NULL;
+            Mixer      * _mixer = NULL;
 
             // Supports periodic ad-hoc debugging
             Debugger _debugger;
 
             // PID controllers
-            PID_Controller * _pid_controllers[256];
+            PID_Controller * _pid_controllers[256] = {NULL};
             uint8_t _pid_controller_count = 0;
 
             // Mandatory sensors on the board
@@ -57,8 +57,8 @@ namespace hf {
             Quaternion _quaternion; // not really a sensor, but we treat it like one!
 
             // Additional sensors 
-            Sensor * _sensors[256];
-            uint8_t _sensor_count;
+            Sensor * _sensors[256] = {NULL};
+            uint8_t _sensor_count = 0;
 
             // Vehicle state
             state_t _state;
@@ -67,11 +67,11 @@ namespace hf {
             demands_t _demands;
 
             // Safety
-            bool _safeToArm;
-            bool _failsafe;
+            bool _safeToArm = false;
+            bool _failsafe = false;
 
             // Support for headless mode
-            float _yawInitial;
+            float _yawInitial = 0;
 
             bool safeAngle(uint8_t axis)
             {

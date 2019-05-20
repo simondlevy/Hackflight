@@ -67,10 +67,10 @@ namespace hf {
 
         private:
 
-            float _history[256];
-            uint8_t _historySize;
-            uint8_t _historyIdx;
-            float _sum;
+            float _history[256] = {0};
+            uint8_t _historySize = {0};
+            uint8_t _historyIdx = {0};
+            float _sum = {0};
 
         public:
 
@@ -124,7 +124,7 @@ namespace hf {
 
         protected:
 
-            float _beta;
+            float _beta = 0;
 
             MadgwickQuaternionFilter(float beta) : QuaternionFilter()
             {
@@ -250,7 +250,7 @@ namespace hf {
 
         private:
 
-            float _zeta;
+            float _zeta = 0;
 
         public:
 
@@ -352,7 +352,7 @@ namespace hf {
             const float Kp  = 2.0f * 5.0f; 
             const float Ki = 0.0f;
 
-            float _eInt[3];
+            float _eInt[3] = {0};
 
         public:
 

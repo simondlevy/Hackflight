@@ -32,7 +32,7 @@ namespace hf {
             static const uint16_t PPM_MIN = 990;
             static const uint16_t PPM_MAX = 2020;
 
-            CPPMRX * rx;
+            CPPMRX * rx = NULL;
 
         protected:
 

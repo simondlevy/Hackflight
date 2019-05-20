@@ -83,8 +83,8 @@ namespace hf {
         // maximum number of channels that any receiver will send (of which we'll use six)
         static const uint8_t MAXCHAN = 8;
 
-        uint8_t _aux1State;
-        uint8_t _aux2State;
+        uint8_t _aux1State = 0;
+        uint8_t _aux2State = 0;
 
         // channel indices
         enum {
@@ -96,7 +96,7 @@ namespace hf {
             CHANNEL_AUX2
         };
 
-        uint8_t _channelMap[6];
+        uint8_t _channelMap[6] = {0};
 
         // These must be overridden for each receiver
         virtual bool gotNewFrame(void) = 0;
@@ -106,15 +106,15 @@ namespace hf {
         virtual void begin(void) { }
 
         // Software trim
-        float _trimRoll;
-        float _trimPitch;
-        float _trimYaw;
+        float _trimRoll = 0;
+        float _trimPitch = 0;
+        float _trimYaw = 0;
 
         // Default to non-headless mode
         float headless = false;
 
         // Raw receiver values in [-1,+1]
-        float rawvals[MAXCHAN];  
+        float rawvals[MAXCHAN] = {0};  
 
         demands_t demands;
 

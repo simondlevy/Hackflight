@@ -36,9 +36,9 @@ namespace hf {
           
             const float FEED_FORWARD = 0.5;
             
-            float PTerms[2];
+            float PTerms[2] = {0};
             
-            float _demandsToAngle;
+            float _demandsToAngle = 0;
 
         public:
 

@@ -37,14 +37,11 @@ namespace hf {
 
         friend class Hackflight;
 
-        public:
+        private:
 
-            Accelerometer(void)
-            {
-                _ax = 0;
-                _ay = 0;
-                _az = 0;
-            }
+            float _ax = 0;
+            float _ay = 0;
+            float _az = 0;
 
         protected:
 
@@ -62,11 +59,14 @@ namespace hf {
                 return board->getAccelerometer(_ax, _ay, _az);
             }
 
-        private:
+        public:
 
-            float _ax;
-            float _ay;
-            float _az;
+            Accelerometer(void)
+            {
+                _ax = 0;
+                _ay = 0;
+                _az = 0;
+            }
 
     };  // class Accelerometer
 

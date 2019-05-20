@@ -30,12 +30,15 @@ namespace hf {
 
     class Rangefinder : public Sensor {
 
-        public:
+        private:
 
-            Rangefinder(void) 
-            {
-                _lpf.init();
-            }
+            static constexpr float UPDATE_HZ = 25; // XXX should be using interrupt!
+
+            static constexpr float UPDATE_PERIOD = 1/UPDATE_HZ;
+
+            float _distance = 0;
+
+            LowPassFilter _lpf = LowPassFilter(20);
 
         protected:
 
@@ -80,15 +83,12 @@ namespace hf {
 
             virtual bool distanceAvailable(float & distance) = 0;
 
-        private:
+        public:
 
-            static constexpr float UPDATE_HZ = 25; // XXX should be using interrupt!
-
-            static constexpr float UPDATE_PERIOD = 1/UPDATE_HZ;
-
-            float _distance;
-
-            LowPassFilter _lpf = LowPassFilter(20);
+            Rangefinder(void) 
+            {
+                _lpf.init();
+            }
 
     };  // class Rangefinder
 

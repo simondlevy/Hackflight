@@ -46,8 +46,8 @@ namespace hf {
             LowPassFilter _lpf_y = LowPassFilter(LPF_SIZE);
 
             // Track elapsed time for periodic readiness
-            float _previousTime;
-            float _deltaTime;
+            float _previousTime = 0;
+            float _deltaTime = 0;
 
         protected:
 

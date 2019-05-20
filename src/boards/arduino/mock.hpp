@@ -28,7 +28,7 @@ namespace hf {
 
         private:
 
-            float _time;
+            float _time = 0;
 
             // motionless and sligthly off-level
             float _qw = 0.90f;

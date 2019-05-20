@@ -30,7 +30,7 @@ class BetaFPVF3 : public Stm32FBoard {
 
     private:
 
-        MPU6000 * _imu;
+        MPU6000 * _imu = NULL;
 
     protected: 
 

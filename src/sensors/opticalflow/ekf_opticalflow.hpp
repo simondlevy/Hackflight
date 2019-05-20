@@ -53,10 +53,10 @@ namespace hf {
             PMW3901 _flowSensor = PMW3901(10);
 
             // Track elapsed time for periodic readiness
-            float _previousTime;
+            float _previousTime = 0;
 
             // While tracking elapsed time, store delta time
-            float _deltaTime;
+            float _deltaTime = 0;
 
             // The quad's attitude as a rotation matrix (used by the prediction, updated by the finalization)
             float R[3][3] = {{1,0,0},{0,1,0},{0,0,1}};

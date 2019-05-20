@@ -25,16 +25,16 @@ namespace hf {
 
         private:
 
-            char _ssid[100];
-            char _passwd[100];
+            char _ssid[100] = {0};
+            char _passwd[100] = {0};
 
             WiFiServer _server = WiFiServer(80);
             WiFiClient _client;
 
-            bool _haveClient;
-            bool _hadClient;
-            bool _gotMessage;
-            float _sixvals[6];
+            bool _haveClient = false;
+            bool _hadClient = false;
+            bool _gotMessage = false;
+            float _sixvals[6] = {0};
 
         protected:
 

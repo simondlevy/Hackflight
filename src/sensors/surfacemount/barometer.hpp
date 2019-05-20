@@ -33,12 +33,10 @@ namespace hf {
 
         friend class Hackflight;
 
-        public:
+        private:
 
-            Barometer(void)
-            {
-                _pressure = 0;
-            }
+            // pascals
+            float _pressure = 0;
 
         protected:
 
@@ -56,10 +54,12 @@ namespace hf {
                 return board->getBarometer(_pressure);
             }
 
-        private:
+        public:
 
-            // pascals
-            float _pressure;
+            Barometer(void)
+            {
+                _pressure = 0;
+            }
 
     };  // class Barometer
 

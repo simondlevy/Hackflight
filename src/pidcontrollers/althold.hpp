@@ -90,8 +90,6 @@ namespace hf {
             float velTarget = (_posTarget - posActual) * _posP;
             float velError = velTarget - velActual;
 
-            Debugger::printf("_integralError: %+3.3f", _integralError);
-
             // Update error integral and error derivative
             _integralError = Filter::constrainAbs(_integralError + velError * deltaT, _windupMax);
             float deltaError = (velError - _lastError) / deltaT;

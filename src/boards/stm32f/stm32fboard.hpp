@@ -50,7 +50,7 @@ class Stm32FBoard : public hf::RealBoard, public hf::SoftwareQuaternionBoard  {
 
     private:
 
-        MPU6xx0 * _mpu;
+        MPU6xx0 * _mpu = NULL;
 
     protected: 
 

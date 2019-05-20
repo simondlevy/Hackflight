@@ -31,7 +31,7 @@ namespace hf {
 
         protected:
 
-            Board * board;
+            Board * board = NULL;
 
     };  // class SurfaceMountSensor
 

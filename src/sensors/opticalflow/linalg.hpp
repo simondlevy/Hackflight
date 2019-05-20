@@ -32,8 +32,8 @@ namespace hf {
             // avoid dynamic memory allocation
             static const uint8_t MAXSIZE = 10;
 
-            uint8_t _rows;
-            uint8_t _cols;
+            uint8_t _rows = 0;
+            uint8_t _cols0;
 
             float _vals[MAXSIZE][MAXSIZE];
 

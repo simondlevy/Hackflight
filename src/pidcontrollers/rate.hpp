@@ -46,7 +46,12 @@ namespace hf {
             const float BIG_YAW_DEMAND              = 0.1f;
             const float MAX_ARMING_ANGLE_DEGREES    = 25.0f;
 
-            float _bigGyroRate;
+            // Converted to radians from degrees in init() method for efficiency
+            float _bigGyroRate = 0;
+
+            // PID constants set in constructor
+            float _gyroYawP = 0; 
+            float _gyroYawI = 0;
 
             float computeITermGyro(float error, float rateI, float rcCommand, float gyro[3], uint8_t axis)
             {
@@ -59,10 +64,6 @@ namespace hf {
 
                 return (_errorGyroI[axis] * rateI);
             }
-
-             // PID constants set in constructor
-            float _gyroYawP; 
-            float _gyroYawI;
 
             void init(void)
             {

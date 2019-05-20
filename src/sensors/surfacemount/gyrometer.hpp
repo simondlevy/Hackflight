@@ -31,14 +31,11 @@ namespace hf {
 
         friend class Hackflight;
 
-        public:
+        private:
 
-            Gyrometer(void)
-            {
-                _gx = 0;
-                _gy = 0;
-                _gz = 0;
-            }
+            float _gx = 0;
+            float _gy = 0;
+            float _gz = 0;
 
         protected:
 
@@ -61,11 +58,14 @@ namespace hf {
                 return result;
             }
 
-        private:
+        public:
 
-            float _gx;
-            float _gy;
-            float _gz;
+            Gyrometer(void)
+            {
+                _gx = 0;
+                _gy = 0;
+                _gz = 0;
+            }
 
     };  // class Gyrometer
 

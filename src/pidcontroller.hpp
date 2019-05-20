@@ -34,7 +34,7 @@ namespace hf {
 
         virtual bool shouldFlashLed(void) { return false; }
 
-        uint8_t auxState;
+        uint8_t auxState = 0;
 
     };  // class PID_Controller
 

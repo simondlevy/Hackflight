@@ -29,8 +29,8 @@ namespace hf {
 
         private:
 
-            uint8_t _led_pin;
-            bool    _led_inverted;
+            uint8_t _led_pin = 0;
+            bool    _led_inverted = false;
 
         protected:
 

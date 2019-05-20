@@ -26,7 +26,7 @@ namespace hf {
 
         protected:
 
-            uint8_t _pin;
+            uint8_t _pin = 0;
 
             Motor(uint8_t pin)
             {

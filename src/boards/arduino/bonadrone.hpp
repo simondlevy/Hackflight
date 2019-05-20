@@ -41,7 +41,6 @@ namespace hf {
             // LSM6DSM data-ready interrupt pin
             const uint8_t LSM6DSM_INTERRUPT_PIN = 2;
 
-
             // Paramters to experiment with ------------------------------------------------------------------------
 
             // LSM6DSM full-scale settings

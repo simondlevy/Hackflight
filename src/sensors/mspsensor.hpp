@@ -33,7 +33,7 @@ namespace hf {
         private:
 
         // Sensor must be able to access boards' UART
-        RealBoard * _board;
+        RealBoard * _board = NULL;
 
         protected:
 

@@ -35,19 +35,12 @@ namespace hf {
 
         friend class Hackflight;
 
-        public:
+        private:
 
-            // We make this public so we can use it in different sketches
-            static void computeEulerAngles(float qw, float qx, float qy, float qz, float euler[3])
-            {
-                euler[0] = atan2(2.0f*(qw*qx+qy*qz),qw*qw-qx*qx-qy*qy+qz*qz);
-                euler[1] =  asin(2.0f*(qx*qz-qw*qy));
-                euler[2] = atan2(2.0f*(qx*qy+qw*qz),qw*qw+qx*qx-qy*qy-qz*qz);
-
-                euler[0] = int(euler[0]*1000)/1000.0;
-                euler[1] = int(euler[1]*1000)/1000.0;
-                euler[2] = int(euler[2]*1000)/1000.0;
-            }
+            float _qw = 0;
+            float _qx = 0;
+            float _qy = 0;
+            float _qz = 0;
 
         protected:
 
@@ -78,12 +71,19 @@ namespace hf {
                 return board->getQuaternion(_qw, _qx, _qy, _qz);
             }
 
-        private:
+        public:
 
-            float _qw;
-            float _qx;
-            float _qy;
-            float _qz;
+            // We make this public so we can use it in different sketches
+            static void computeEulerAngles(float qw, float qx, float qy, float qz, float euler[3])
+            {
+                euler[0] = atan2(2.0f*(qw*qx+qy*qz),qw*qw-qx*qx-qy*qy+qz*qz);
+                euler[1] =  asin(2.0f*(qx*qz-qw*qy));
+                euler[2] = atan2(2.0f*(qx*qy+qw*qz),qw*qw+qx*qx-qy*qy-qz*qz);
+
+                euler[0] = int(euler[0]*1000)/1000.0;
+                euler[1] = int(euler[1]*1000)/1000.0;
+                euler[2] = int(euler[2]*1000)/1000.0;
+            }
 
     };  // class Quaternion
 
