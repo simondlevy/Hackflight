@@ -38,24 +38,24 @@ namespace hf {
         const float HOVER_THROTTLE  = 0.05f;
 
         // Minimum altitude, set by constructor
-        float _minAltitude;
+        float _minAltitude = 0;
 
         // PID constants set by constructor
-        float _posP;
-        float _velP;
-        float _velI;
-        float _velD;
+        float _posP = 0;
+        float _velP = 0;
+        float _velI = 0;
+        float _velD = 0;
 
         // Parameter to avoid integral windup
-        float _windupMax;
+        float _windupMax = 0;
 
         // Values modified in-flight
-        float _posTarget;
-        bool  _inBandPrev;
-        float _lastError;
-        float _integralError;
-        float _altitudeTarget;
-        float _previousTime;
+        float _posTarget = 0;
+        bool  _inBandPrev = false;
+        float _lastError = 0;
+        float _integralError = 0;
+        float _altitudeTarget = 0;
+        float _previousTime = 0;
 
         bool inBand(float demand)
         {
@@ -72,6 +72,7 @@ namespace hf {
         {
             // Don't do anything until we have a positive deltaT
             float deltaT = currentTime - _previousTime;
+
             _previousTime = currentTime;
             if (deltaT == currentTime) return false;
 
@@ -88,6 +89,8 @@ namespace hf {
             // compute velocity setpoint and error
             float velTarget = (_posTarget - posActual) * _posP;
             float velError = velTarget - velActual;
+
+            Debugger::printf("_integralError: %+3.3f", _integralError);
 
             // Update error integral and error derivative
             _integralError = Filter::constrainAbs(_integralError + velError * deltaT, _windupMax);
