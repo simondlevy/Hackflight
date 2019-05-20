@@ -79,11 +79,11 @@ class FHackflightManager : public FFlightManager {
         hf::MixerQuadXAP _mixer;
 
         // "Sensors" (get values from dynamics)
-        SimSensors * _sensors;
+        SimSensors * _sensors = NULL;
 
         // Gimbal axes
-        float _gimbalRoll;
-        float _gimbalPitch;
+        float _gimbalRoll = 0;
+        float _gimbalPitch = 0;
 
     public:
 
