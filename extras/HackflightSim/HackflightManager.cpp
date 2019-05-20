@@ -19,10 +19,8 @@
    */
 
 #include "FlightManager.h"
-#include "VehiclePawn.h"
 #include "SimBoard.hpp"
 #include "SimSensors.hpp"
-#include "dynamics/MultirotorDynamics.h"
 
 // Math support
 #define _USE_MATH_DEFINES

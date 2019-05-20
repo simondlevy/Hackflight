@@ -21,10 +21,11 @@
 
 #pragma once
 
-#include "dynamics/MultirotorDynamics.h"
+#include "dynamics/MultirotorDynamics.hpp"
 
 #include <sensor.hpp>
 #include <datatypes.hpp>
+#include <debugger.hpp>
 
 class SimSensors : public hf::Sensor {
 
