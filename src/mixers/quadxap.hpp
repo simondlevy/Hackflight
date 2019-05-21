@@ -2,10 +2,12 @@
    quadxap.hpp : Mixer subclass for X-configuration quadcopters following the
    ArduPilot numbering convention:
 
-   3   1
-     X
-   2   4
-
+    3cw   1ccw
+       \ /
+        X
+       / \
+    2ccw  4cw
+ 
    Copyright (c) 2019 Simon D. Levy
 
    This file is part of Hackflight.
