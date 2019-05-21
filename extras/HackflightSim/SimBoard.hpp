@@ -49,7 +49,7 @@ class SimBoard : public hf::Board {
         {
             gx = _gyro[0];
             gy = _gyro[1];
-            gz = 0; // XXX ignore Z for now
+            gz = _gyro[2];
 
             return true;
         }

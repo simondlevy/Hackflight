@@ -51,7 +51,7 @@ class FHackflightManager : public FFlightManager {
                 0.01,	// Roll/Pitch P
                 0.01,	// Roll/Pitch I
                 0.01,	// Roll/Pitch D
-                0.5,	// Yaw P
+                0.01,	// Yaw P
                 0.0,	// Yaw I
                 8.f);	// Demands to rate
 
