@@ -1,5 +1,5 @@
 /*
-   Sketch for FURYF4 board with mock receiver
+   Sketch for FURYF4 board with DSMX receiver
 
    Copyright (c) 2019 Simon D. Levy
 
@@ -21,7 +21,7 @@
 #include <hackflight.hpp>
 #include <mixers/quadxcf.hpp>
 #include <receivers/mock.hpp>
-#include "furyf4.hpp"
+#include <boards/stm32f/furyf4.hpp>
 
 static hf::Hackflight h;
 
