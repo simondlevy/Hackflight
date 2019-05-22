@@ -89,6 +89,7 @@ LIB_DIR         := $(CF_DIR)/lib/main
 CMSIS_DIR       := $(LIB_DIR)/CMSIS
 HF_DIR          := $(ARDUINO_DIR)/Hackflight/src
 IMU_DIR         := $(ARDUINO_DIR)/MPU/src
+RX_DIR          := $(ARDUINO_DIR)/DSMRX/src
 SPI_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
 INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR) $(HF_DIR)/boards/stm32f ../../boards 
 LINKER_DIR      := $(SRC_DIR)/target/link
@@ -868,7 +869,7 @@ INCLUDE_DIRS += $(BOARD_DIR)
 IMU_SRC := $(IMU_DIR)/MPU.cpp $(IMU_DIR)/MPU6xx0.cpp $(IMU_DIR)/MPU6x00.cpp $(IMU_DIR)/MPU6000.cpp
 HF_SRC := ../support/main.c
 SKETCH_SRC := ./furyf4_dsmx.cpp
-SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(BOARD_SRC) $(SKETCH_SRC)
+SRC += $(HF_SRC) $(IMU_SRC) $(RX_SRC) $(SKETCH_SRC)
 
 
 ###############################################################################
