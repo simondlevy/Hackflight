@@ -18,7 +18,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
    */
 
-#include "FlightManager.h"
+#include "FlightManager.hpp"
 #include "SimBoard.hpp"
 #include "SimSensors.hpp"
 

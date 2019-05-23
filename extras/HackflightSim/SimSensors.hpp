@@ -60,10 +60,11 @@ class SimSensors : public hf::Sensor {
 
             // Get vehicle state from dynamics
             double angularVelocity[3] = {0};
+            double earthFrameAcceleration[3] = {0};
             double eulerAngles[3] = {0};
             double velocityXYZ[3] = {0};
             double positionXYZ[3] = {0};
-            _dynamics->getState(angularVelocity, eulerAngles, velocityXYZ, positionXYZ);
+            _dynamics->getState(angularVelocity, earthFrameAcceleration, eulerAngles, velocityXYZ, positionXYZ);
 
             // Use vehicle state to modify Hackflight state values
             state.altitude   = -positionXYZ[2]; // Negate for NED => ENU conversion
