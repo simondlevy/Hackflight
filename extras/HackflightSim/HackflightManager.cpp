@@ -37,10 +37,6 @@
 // Mixer
 #include <mixers/quadxap.hpp>
 
-// Debugging
-#include "debug.h"
-#include "osd.h"
-
 class FHackflightManager : public FFlightManager {
 
     private:
