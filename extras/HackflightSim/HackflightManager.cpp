@@ -35,7 +35,8 @@
 #include <pidcontrollers/flowhold.hpp>
 
 // Mixer
-#include <mixers/quadxap.hpp>
+//#include <mixers/quadxap.hpp>
+#include <mixers/quadplusap.hpp>
 
 class FHackflightManager : public FFlightManager {
 
@@ -72,7 +73,7 @@ class FHackflightManager : public FFlightManager {
         SimReceiver _receiver;
 
         // Mixer
-        hf::MixerQuadXAP _mixer;
+        hf::MixerQuadPlusAP _mixer;
 
         // "Sensors" (get values from dynamics)
         SimSensors * _sensors = NULL;
