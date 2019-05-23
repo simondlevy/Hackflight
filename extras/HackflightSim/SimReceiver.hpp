@@ -66,18 +66,20 @@ class SimReceiver : public hf::Receiver {
         }
     }
 
-    void update(void)
+    Joystick::error_t update(void)
     {
-        _joystick->poll(rawvals, _buttonState);
+        // Joystick::poll() returns zero (okay) or a postive value (error)
+        Joystick::error_t pollResult = _joystick->poll(rawvals, _buttonState);
 
         // In gimbal mode, grab pan,tilt from cyclic stick, then lock roll and pitch at zero
-        if (_joystick->inGimbalMode()) {
+        if (!pollResult && _joystick->inGimbalMode()) {
             _gimbalRoll  = rawvals[1];
             _gimbalPitch = rawvals[2];
             rawvals[1] = 0;
             rawvals[2] = 0;
         }
 
+        return pollResult;
     }
 
     bool inGimbalMode(void)
