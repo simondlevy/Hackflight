@@ -81,8 +81,6 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
     protected: 
 
-        FuryF4(serialPort_t * serial0);
-
         // Board class overrides
 
         virtual void setLed(bool isOn) override
