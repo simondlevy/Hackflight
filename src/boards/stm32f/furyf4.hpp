@@ -24,13 +24,12 @@
 #pragma once
 
 #include <MPU6000.h>
+#include "support/motors.hpp"
 
 #include <boards/realboard.hpp>
 #include <boards/softquat.hpp>
 #include "support/beeperled.hpp"
 #include "support/spi.hpp"
-#include <debugger.hpp>
-
 
 // Cleanflight drivers
 extern "C" {
@@ -163,6 +162,7 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
         virtual void imuReadAccelGyro(void) override
         {
+            // Scale the raw accel & gyro values read by imuReady()
             _imu->scaleRawAccel(_accx, _accy,  _accz,  _ax, _ay, _az);
             _imu->scaleRawGyro(_gyrox, _gyroy, _gyroz, _gx, _gy, _gz);
 
@@ -182,6 +182,9 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
             spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
 
+            // Set up the motors
+            //brushless_motors_init(0, 1, 2, 3);
+
             // Start the IMU
             _imu = new MPU6000(MPU6000::AFS_2G, MPU6000::GFS_250DPS);
 
@@ -190,12 +193,11 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
             RealBoard::init();
 
+            // Set up for gyro/accel alternation hack
             _accelReady = false;
-
             _accx = 0;
             _accy = 0;
             _accz = 0;
-
             _gyrox = 0;
             _gyroy = 0;
             _gyroz = 0;
