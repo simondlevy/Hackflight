@@ -89,8 +89,7 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
 
         virtual void writeMotor(uint8_t index, float value) override
         {
-            (void)index;
-            (void)value;
+            motor_write(index, value);
         }
 
         virtual void reboot(void) override
@@ -183,7 +182,7 @@ class FuryF4 : public hf::RealBoard, public hf::SoftwareQuaternionBoard {
             spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
 
             // Set up the motors
-            //brushless_motors_init(0, 1, 2, 3);
+            brushless_motors_init(0, 1, 2, 3);
 
             // Start the IMU
             _imu = new MPU6000(MPU6000::AFS_2G, MPU6000::GFS_250DPS);
