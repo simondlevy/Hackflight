@@ -1,6 +1,6 @@
 /*
    datatypes.hpp : Datatype declarations
- 
+
    Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
@@ -16,29 +16,32 @@
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
-*/
+   */
 
 #pragma once
 
-typedef struct {
+namespace hf {
 
-    float throttle;
-    float roll;
-    float pitch;
-    float yaw;
+    typedef struct {
 
-} demands_t;
+        float throttle;
+        float roll;
+        float pitch;
+        float yaw;
 
-typedef struct {
+    } demands_t;
 
-    bool  armed;
+    typedef struct {
 
-    float location[3];
-    float rotation[3]; 
-    float angularVel[3]; 
-    float bodyAccel[3]; 
-    float bodyVel[3]; 
-    float inertialVel[3]; 
+        bool  armed;
 
-} state_t;
+        float location[3];
+        float rotation[3]; 
+        float angularVel[3]; 
+        float bodyAccel[3]; 
+        float bodyVel[3]; 
+        float inertialVel[3]; 
 
+    } state_t;
+
+}; // namespace hf
