@@ -37,6 +37,7 @@ typedef struct {
     float rotation[3]; 
     float angularVel[3]; 
     float bodyAccel[3]; 
+    float bodyVel[3]; 
     float inertialVel[3]; 
 
 } state_t;
