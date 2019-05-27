@@ -48,7 +48,7 @@ namespace hf {
         bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
         {
             // Don't do anything till we've reached sufficient altitude
-            if (state.pose.location[2] < _minAltitude) return false;
+            if (state.location[2] < _minAltitude) return false;
 
             // Don't do anything until we have a positive deltaT
             float deltaT = currentTime - _previousTime;

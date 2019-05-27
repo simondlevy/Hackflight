@@ -30,18 +30,14 @@ typedef struct {
 } demands_t;
 
 typedef struct {
-    float location[3];
-    float rotation[3]; 
-} pose_t;
-
-typedef struct {
 
     bool  armed;
 
+    float location[3];
+    float rotation[3]; 
     float angularVel[3]; 
     float bodyAccel[3]; 
     float inertialVel[3]; 
-    pose_t pose;
 
 } state_t;
 

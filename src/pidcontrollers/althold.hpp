@@ -107,10 +107,10 @@ namespace hf {
         bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
         {
             // Don't do anything till we've reached sufficient altitude
-            if (state.pose.location[2] < _minAltitude) return false;
+            if (state.location[2] < _minAltitude) return false;
 
             float correction = 0;
-            if (gotCorrection(demands.throttle, state.pose.location[2], state.inertialVel[2], currentTime, correction)) {
+            if (gotCorrection(demands.throttle, state.location[2], state.inertialVel[2], currentTime, correction)) {
                 demands.throttle = correction + HOVER_THROTTLE;
                 return true;
             }

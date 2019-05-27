@@ -332,7 +332,7 @@ namespace hf {
                 // Avoid time blips
                 if (_deltaTime > 0.02) return;
 
-                S[STATE_Z] = state.pose.location[2];
+                S[STATE_Z] = state.location[2];
                 S[STATE_PZ] = state.inertialVel[2];
 
                 // Read the flow sensor
