@@ -38,9 +38,6 @@ typedef struct {
 
     bool  armed;
 
-    float velocityForward;  
-    float velocityRightward; 
-
     float angularVel[3]; 
     float bodyAccel[3]; 
     float inertialVel[3]; 

@@ -380,8 +380,8 @@ namespace hf {
 
                 Debugger::printf("%+3.3f,%+3.3f\n", S[STATE_PX], S[STATE_PY]);
 
-                state.velocityForward   = 0;
-                state.velocityRightward = 0;
+                state.inertialVel[0] = 0;
+                state.inertialVel[1] = 0;
             }
 
             virtual bool ready(float time) override

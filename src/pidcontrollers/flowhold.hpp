@@ -55,8 +55,8 @@ namespace hf {
             _previousTime = currentTime;
             if (deltaT == currentTime) return false;
 
-            demands.roll  -= _P * state.velocityRightward;
-            demands.pitch -= _P * state.velocityForward;
+            demands.roll  -= _P * state.inertialVel[1];
+            demands.pitch -= _P * state.inertialVel[0];
 
             return false;
 
