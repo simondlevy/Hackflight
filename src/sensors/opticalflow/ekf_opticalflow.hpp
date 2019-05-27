@@ -332,8 +332,8 @@ namespace hf {
                 // Avoid time blips
                 if (_deltaTime > 0.02) return;
 
-                S[STATE_Z] = state.altitude;
-                S[STATE_PZ] = state.variometer;
+                S[STATE_Z] = state.pose.location[2];
+                S[STATE_PZ] = state.inertialVel[2];
 
                 // Read the flow sensor
                 int16_t dpixelx=0, dpixely=0;
@@ -341,8 +341,8 @@ namespace hf {
 
                 //~~~ Body rates ~~~
                 // TODO check if this is feasible or if some filtering has to be done
-                _omegax_b = state.angularVelocities[0];
-                _omegay_b = state.angularVelocities[1];
+                _omegax_b = state.angularVel[0];
+                _omegay_b = state.angularVel[1];
 
                 _dx_g = S[STATE_PX];
                 _dy_g = S[STATE_PY];

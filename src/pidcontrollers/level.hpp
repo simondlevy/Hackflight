@@ -65,7 +65,7 @@ namespace hf {
                 float _demands[2] = {demands.roll, demands.pitch};
                 for (int axis=0; axis<2; ++axis)
                 {
-                  float error = _demands[axis] * _demandsToAngle - state.eulerAngles[axis];
+                  float error = _demands[axis] * _demandsToAngle - state.pose.rotation[axis];
                   _demands[axis] = error * PTerms[axis] + FEED_FORWARD * _demands[axis];
                 }
                 

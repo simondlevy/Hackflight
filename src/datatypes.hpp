@@ -30,17 +30,21 @@ typedef struct {
 } demands_t;
 
 typedef struct {
+    float location[3];
+    float rotation[3]; 
+} pose_t;
+
+typedef struct {
 
     bool  armed;
 
-    float eulerAngles[3];
-    float angularVelocities[3];
-    float altitude;
-    float variometer;
-    float positionX;
-    float positionY;
     float velocityForward;  
     float velocityRightward; 
+
+    float angularVel[3]; 
+    float bodyAccel[3]; 
+    float inertialVel[3]; 
+    pose_t pose;
 
 } state_t;
 

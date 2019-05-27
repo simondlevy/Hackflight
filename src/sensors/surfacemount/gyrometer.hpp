@@ -44,9 +44,9 @@ namespace hf {
                 (void)time;
 
                 // NB: We negate gyro X, Y to simplify PID controller
-                state.angularVelocities[0] =  _gx;
-                state.angularVelocities[1] = -_gy;
-                state.angularVelocities[2] = -_gz;
+                state.angularVel[0] =  _gx;
+                state.angularVel[1] = -_gy;
+                state.angularVel[2] = -_gz;
             }
 
             virtual bool ready(float time) override
