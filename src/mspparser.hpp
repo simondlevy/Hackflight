@@ -258,6 +258,19 @@ namespace hf {
             {
                 switch (_command) {
 
+                    case 122:
+                    {
+                        float roll = 0;
+                        float pitch = 0;
+                        float yaw = 0;
+                        handle_ATTITUDE_RADIANS_Request(roll, pitch, yaw);
+                        prepareToSendFloats(3);
+                        sendFloat(roll);
+                        sendFloat(pitch);
+                        sendFloat(yaw);
+                        serialize8(_checksum);
+                        } break;
+
                     case 112:
                     {
                         float altitude = 0;
@@ -279,17 +292,12 @@ namespace hf {
                         serialize8(_checksum);
                         } break;
 
-                    case 122:
+                    case 216:
                     {
-                        float roll = 0;
-                        float pitch = 0;
-                        float yaw = 0;
-                        handle_ATTITUDE_RADIANS_Request(roll, pitch, yaw);
-                        prepareToSendFloats(3);
-                        sendFloat(roll);
-                        sendFloat(pitch);
-                        sendFloat(yaw);
-                        serialize8(_checksum);
+                        uint8_t flag = 0;
+                        memcpy(&flag,  &_inBuf[0], sizeof(uint8_t));
+
+                        handle_SET_ARMED(flag);
                         } break;
 
                     case 121:
@@ -311,6 +319,23 @@ namespace hf {
                         serialize8(_checksum);
                         } break;
 
+                    case 213:
+                    {
+                        float vx = 0;
+                        memcpy(&vx,  &_inBuf[0], sizeof(float));
+
+                        float vy = 0;
+                        memcpy(&vy,  &_inBuf[4], sizeof(float));
+
+                        float vz = 0;
+                        memcpy(&vz,  &_inBuf[8], sizeof(float));
+
+                        float yaw_rate = 0;
+                        memcpy(&yaw_rate,  &_inBuf[12], sizeof(float));
+
+                        handle_SET_VELOCITY_SETPOINTS(vx, vy, vz, yaw_rate);
+                        } break;
+
                     case 215:
                     {
                         float m1 = 0;
@@ -328,38 +353,14 @@ namespace hf {
                         handle_SET_MOTOR_NORMAL(m1, m2, m3, m4);
                         } break;
 
-                    case 216:
-                    {
-                        uint8_t flag = 0;
-                        memcpy(&flag,  &_inBuf[0], sizeof(uint8_t));
-
-                        handle_SET_ARMED(flag);
-                        } break;
-
-                    case 221:
-                    {
-                        float c1 = 0;
-                        memcpy(&c1,  &_inBuf[0], sizeof(float));
-
-                        float c2 = 0;
-                        memcpy(&c2,  &_inBuf[4], sizeof(float));
-
-                        float c3 = 0;
-                        memcpy(&c3,  &_inBuf[8], sizeof(float));
-
-                        float c4 = 0;
-                        memcpy(&c4,  &_inBuf[12], sizeof(float));
-
-                        float c5 = 0;
-                        memcpy(&c5,  &_inBuf[16], sizeof(float));
-
-                        float c6 = 0;
-                        memcpy(&c6,  &_inBuf[20], sizeof(float));
-
-                        handle_SET_RC_NORMAL(c1, c2, c3, c4, c5, c6);
-                        } break;
-
                 }
+            }
+
+            virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw)
+            {
+                (void)roll;
+                (void)pitch;
+                (void)yaw;
             }
 
             virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, float & heading, float & velocityForward, float & velocityRightward)
@@ -373,11 +374,9 @@ namespace hf {
                 (void)velocityRightward;
             }
 
-            virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw)
+            virtual void handle_SET_ARMED(uint8_t  flag)
             {
-                (void)roll;
-                (void)pitch;
-                (void)yaw;
+                (void)flag;
             }
 
             virtual void handle_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
@@ -390,6 +389,14 @@ namespace hf {
                 (void)c6;
             }
 
+            virtual void handle_SET_VELOCITY_SETPOINTS(float  vx, float  vy, float  vz, float  yaw_rate)
+            {
+                (void)vx;
+                (void)vy;
+                (void)vz;
+                (void)yaw_rate;
+            }
+
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4)
             {
                 (void)m1;
@@ -398,22 +405,36 @@ namespace hf {
                 (void)m4;
             }
 
-            virtual void handle_SET_ARMED(uint8_t  flag)
-            {
-                (void)flag;
-            }
-
-            virtual void handle_SET_RC_NORMAL(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
-            {
-                (void)c1;
-                (void)c2;
-                (void)c3;
-                (void)c4;
-                (void)c5;
-                (void)c6;
-            }
-
         public:
+
+            static uint8_t serialize_ATTITUDE_RADIANS_Request(uint8_t bytes[])
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 60;
+                bytes[3] = 0;
+                bytes[4] = 122;
+                bytes[5] = 122;
+
+                return 6;
+            }
+
+            static uint8_t serialize_ATTITUDE_RADIANS(uint8_t bytes[], float  roll, float  pitch, float  yaw)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 12;
+                bytes[4] = 122;
+
+                memcpy(&bytes[5], &roll, sizeof(float));
+                memcpy(&bytes[9], &pitch, sizeof(float));
+                memcpy(&bytes[13], &yaw, sizeof(float));
+
+                bytes[17] = CRC8(&bytes[3], 14);
+
+                return 18;
+            }
 
             static uint8_t serialize_STATE_Request(uint8_t bytes[])
             {
@@ -448,33 +469,19 @@ namespace hf {
                 return 34;
             }
 
-            static uint8_t serialize_ATTITUDE_RADIANS_Request(uint8_t bytes[])
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 122;
-                bytes[5] = 122;
-
-                return 6;
-            }
-
-            static uint8_t serialize_ATTITUDE_RADIANS(uint8_t bytes[], float  roll, float  pitch, float  yaw)
+            static uint8_t serialize_SET_ARMED(uint8_t bytes[], uint8_t  flag)
             {
                 bytes[0] = 36;
                 bytes[1] = 77;
                 bytes[2] = 62;
-                bytes[3] = 12;
-                bytes[4] = 122;
+                bytes[3] = 1;
+                bytes[4] = 216;
 
-                memcpy(&bytes[5], &roll, sizeof(float));
-                memcpy(&bytes[9], &pitch, sizeof(float));
-                memcpy(&bytes[13], &yaw, sizeof(float));
+                memcpy(&bytes[5], &flag, sizeof(uint8_t));
 
-                bytes[17] = CRC8(&bytes[3], 14);
+                bytes[6] = CRC8(&bytes[3], 3);
 
-                return 18;
+                return 7;
             }
 
             static uint8_t serialize_RC_NORMAL_Request(uint8_t bytes[])
@@ -509,6 +516,24 @@ namespace hf {
                 return 30;
             }
 
+            static uint8_t serialize_SET_VELOCITY_SETPOINTS(uint8_t bytes[], float  vx, float  vy, float  vz, float  yaw_rate)
+            {
+                bytes[0] = 36;
+                bytes[1] = 77;
+                bytes[2] = 62;
+                bytes[3] = 16;
+                bytes[4] = 213;
+
+                memcpy(&bytes[5], &vx, sizeof(float));
+                memcpy(&bytes[9], &vy, sizeof(float));
+                memcpy(&bytes[13], &vz, sizeof(float));
+                memcpy(&bytes[17], &yaw_rate, sizeof(float));
+
+                bytes[21] = CRC8(&bytes[3], 18);
+
+                return 22;
+            }
+
             static uint8_t serialize_SET_MOTOR_NORMAL(uint8_t bytes[], float  m1, float  m2, float  m3, float  m4)
             {
                 bytes[0] = 36;
@@ -525,41 +550,6 @@ namespace hf {
                 bytes[21] = CRC8(&bytes[3], 18);
 
                 return 22;
-            }
-
-            static uint8_t serialize_SET_ARMED(uint8_t bytes[], uint8_t  flag)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 1;
-                bytes[4] = 216;
-
-                memcpy(&bytes[5], &flag, sizeof(uint8_t));
-
-                bytes[6] = CRC8(&bytes[3], 3);
-
-                return 7;
-            }
-
-            static uint8_t serialize_SET_RC_NORMAL(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 24;
-                bytes[4] = 221;
-
-                memcpy(&bytes[5], &c1, sizeof(float));
-                memcpy(&bytes[9], &c2, sizeof(float));
-                memcpy(&bytes[13], &c3, sizeof(float));
-                memcpy(&bytes[17], &c4, sizeof(float));
-                memcpy(&bytes[21], &c5, sizeof(float));
-                memcpy(&bytes[25], &c6, sizeof(float));
-
-                bytes[29] = CRC8(&bytes[3], 26);
-
-                return 30;
             }
 
     }; // class MspParser
