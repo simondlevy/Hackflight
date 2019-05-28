@@ -49,14 +49,14 @@ namespace hf {
                 static float _altitude;
 
                 // Compensate for effect of pitch, roll on rangefinder reading
-                state.altitude =  _distance * cos(state.eulerAngles[0]) * cos(state.eulerAngles[1]);
+                state.location[2] =  _distance * cos(state.rotation[0]) * cos(state.rotation[1]);
 
                 // Use first-differenced, low-pass-filtered altitude as variometer
-                state.variometer = _lpf.update((state.altitude-_altitude) / (time-_time));
+                state.inertialVel[2] = _lpf.update((state.location[2]-_altitude) / (time-_time));
 
                 // Update first-difference values
                 _time = time;
-                _altitude = state.altitude;
+                _altitude = state.location[2];
             }
 
             virtual bool ready(float time) override

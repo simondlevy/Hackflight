@@ -56,11 +56,11 @@ namespace hf {
             {
                 (void)time;
 
-                computeEulerAngles(_qw, _qx, _qy, _qz, state.eulerAngles);
+                computeEulerAngles(_qw, _qx, _qy, _qz, state.rotation);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (state.eulerAngles[2] < 0) {
-                    state.eulerAngles[2] += 2*M_PI;
+                if (state.rotation[2] < 0) {
+                    state.rotation[2] += 2*M_PI;
                 }
             }
 

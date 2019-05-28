@@ -48,15 +48,15 @@ namespace hf {
         bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
         {
             // Don't do anything till we've reached sufficient altitude
-            if (state.altitude < _minAltitude) return false;
+            if (state.location[2] < _minAltitude) return false;
 
             // Don't do anything until we have a positive deltaT
             float deltaT = currentTime - _previousTime;
             _previousTime = currentTime;
             if (deltaT == currentTime) return false;
 
-            demands.roll  -= _P * state.velocityRightward;
-            demands.pitch -= _P * state.velocityForward;
+            demands.roll  -= _P * state.bodyVel[1];
+            demands.pitch -= _P * state.bodyVel[0];
 
             return false;
 

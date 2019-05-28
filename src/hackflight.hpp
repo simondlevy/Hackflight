@@ -75,7 +75,7 @@ namespace hf {
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(_state.eulerAngles[axis]) < _ratePid->maxArmingAngle;
+                return fabs(_state.rotation[axis]) < _ratePid->maxArmingAngle;
             }
 
             void checkQuaternion(void)
@@ -162,7 +162,7 @@ namespace hf {
             void checkReceiver(void)
             {
                 // Check whether receiver data is available
-                if (!_receiver->getDemands(_state.eulerAngles[AXIS_YAW] - _yawInitial)) return;
+                if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
 
                 // Update ratePid with cyclic demands
                 _ratePid->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
@@ -186,7 +186,7 @@ namespace hf {
                         safeAngle(AXIS_ROLL) && 
                         safeAngle(AXIS_PITCH)) {
                     _state.armed = true;
-                    _yawInitial = _state.eulerAngles[AXIS_YAW]; // grab yaw for headless mode
+                    _yawInitial = _state.rotation[AXIS_YAW]; // grab yaw for headless mode
                 }
 
                 // Cut motors on throttle-down
@@ -257,7 +257,7 @@ namespace hf {
                 variometer = 0;
                 positionX = 0;
                 positionY = 0;
-                heading = -_state.eulerAngles[AXIS_YAW]; // NB: Angle negated for remote visualization
+                heading = -_state.rotation[AXIS_YAW]; // NB: Angle negated for remote visualization
                 velocityForward = 0;
                 velocityRightward = 0;
             }
@@ -286,9 +286,9 @@ namespace hf {
 
             virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
             {
-                roll  = _state.eulerAngles[AXIS_ROLL];
-                pitch = _state.eulerAngles[AXIS_PITCH];
-                yaw   = _state.eulerAngles[AXIS_YAW];
+                roll  = _state.rotation[AXIS_ROLL];
+                pitch = _state.rotation[AXIS_PITCH];
+                yaw   = _state.rotation[AXIS_YAW];
             }
 
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override

@@ -61,12 +61,12 @@ namespace hf {
                 _flowSensor.readMotionCount(&dpixelx, &dpixely);
 
                 // Scale readings by altitude, then low-pass filter them to get velocity
-                state.velocityForward   =  _lpf_y.update(dpixely  * state.altitude * _deltaTime);
-                state.velocityRightward =  _lpf_x.update(-dpixelx * state.altitude * _deltaTime);
+                state.inertialVel[0] = _lpf_y.update(dpixely  * state.location[2] * _deltaTime);
+                state.inertialVel[1] = _lpf_x.update(-dpixelx * state.location[2] * _deltaTime);
 
                 // Integrate velocity to get position
-                state.positionX += state.velocityRightward;
-                state.positionY += state.velocityForward;
+                state.location[0] += state.inertialVel[0];
+                state.location[1] += state.inertialVel[1];
             }
 
             virtual bool ready(float time) override
