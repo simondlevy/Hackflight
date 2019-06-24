@@ -42,7 +42,6 @@ namespace hf {
         const float CYCLIC_RATE       = 0.90f;
         const float THROTTLE_MID      = 0.00f;
         const float THROTTLE_EXPO     = 0.20f;
-        const float AUX_THRESHOLD     = 0.4f;
 
         float adjustCommand(float command, uint8_t channel)
         {
@@ -80,6 +79,9 @@ namespace hf {
         }
 
         protected: 
+
+        // position that auxiliary switches must cross to be considered nonzero
+        const float AUX_THRESHOLD = 0.4f;
 
         // maximum number of channels that any receiver will send (of which we'll use six)
         static const uint8_t MAXCHAN = 8;

@@ -25,6 +25,8 @@
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
 
+#include "debugger.hpp"
+
 namespace hf {
 
     class AltitudeHold : public PID_Controller {
