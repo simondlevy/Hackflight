@@ -42,6 +42,7 @@ namespace hf {
         const float CYCLIC_RATE       = 0.90f;
         const float THROTTLE_MID      = 0.00f;
         const float THROTTLE_EXPO     = 0.20f;
+        const float AUX_THRESHOLD     = 0.4f;
 
         float adjustCommand(float command, uint8_t channel)
         {
@@ -186,8 +187,8 @@ namespace hf {
             demands.throttle = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
 
             // Store auxiliary switch state
-            _aux1State = getRawval(CHANNEL_AUX1) >= 0.0 ? (getRawval(CHANNEL_AUX1) > .4 ? 2 : 1) : 0;
-            _aux2State = getRawval(CHANNEL_AUX2) >= 0.4 ? 1 : 0;
+            _aux1State = getRawval(CHANNEL_AUX1) >= 0.0 ? (getRawval(CHANNEL_AUX1) > AUX_THRESHOLD ? 2 : 1) : 0;
+            _aux2State = getRawval(CHANNEL_AUX2) >= AUX_THRESHOLD ? 1 : 0;
 
             // Got a new frame
             return true;
