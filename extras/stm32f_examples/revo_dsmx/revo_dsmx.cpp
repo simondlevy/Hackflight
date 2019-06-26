@@ -43,7 +43,7 @@ extern "C" {
                 8.58); // Demands to rate
 
         // Create a DSMX Receiver object
-        DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_3, CHANNEL_MAP);
+        DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_1, CHANNEL_MAP);
 
         // Create an OmnibusF3 Board object
         Revo * board = new Revo();
