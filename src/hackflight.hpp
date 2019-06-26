@@ -126,7 +126,7 @@ namespace hf {
                 // Each PID controllers is associated with at least one auxiliary switch state
                 uint8_t auxState = _receiver->getAux1State();
 
-                //fprintf(stderr, "%d\n", auxState);
+                fprintf(stderr, "%d\n", auxState);
 
                 // Some PID controllers should cause LED to flash when they're active
                 bool shouldFlash = false;

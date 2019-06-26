@@ -44,4 +44,4 @@ namespace hf {
 
     } state_t;
 
-}; // namespace hf
+} // namespace hf
