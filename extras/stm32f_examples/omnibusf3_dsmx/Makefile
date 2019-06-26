@@ -91,6 +91,7 @@ RX_DIR          := $(ARDUINO_DIR)/DSMRX/src
 SPI_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
 INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR)
 LINKER_DIR      := $(SRC_DIR)/target/link
+SDK_DIR         := $(CF_DIR)/tools/gcc-arm-none-eabi-7-2017-q4-major/bin
 
 # configure some variables dependent upon what type of system this is
 
@@ -106,7 +107,7 @@ DL_DIR    := $(ROOT)/downloads
 
 export RM := rm
 
-ARM_SDK_PREFIX := arm-none-eabi-
+ARM_SDK_PREFIX := $(SDK_DIR)/arm-none-eabi-
 
 # default xtal value for F4 targets
 HSE_VALUE       ?= 8000000
@@ -448,7 +449,7 @@ ASFLAGS     = $(ARCH_FLAGS) \
 ifeq ($(LD_FLAGS),)
 LD_FLAGS     = -lm \
               -nostartfiles \
-              --specs=nano.specs \
+              --specs=nosys.specs \
               -lc \
               -lnosys \
               $(ARCH_FLAGS) \

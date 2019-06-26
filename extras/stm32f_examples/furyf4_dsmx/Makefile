@@ -94,7 +94,7 @@ SPI_DIR         := $(ARDUINO_DIR)/CrossPlatformDataBus/src
 INCLUDE_DIRS    := $(SRC_DIR) $(SRC_DIR)/target $(HF_DIR) $(IMU_DIR) $(SPI_DIR) $(RX_DIR) $(HF_DIR)/boards/stm32f ../../boards 
 LINKER_DIR      := $(SRC_DIR)/target/link
 MAKE_DIR        := $(CF_DIR)/make
-
+SDK_DIR         := $(CF_DIR)/tools/gcc-arm-none-eabi-7-2017-q4-major/bin
 
 # configure some directories that are relative to wherever ROOT_DIR is located
 ifndef TOOLS_DIR
@@ -105,10 +105,7 @@ DL_DIR    := $(ROOT)/downloads
 
 export RM := rm
 
-ARM_SDK_PREFIX := arm-none-eabi-
-
-# include the tools makefile
-include $(MAKE_DIR)/tools.mk
+ARM_SDK_PREFIX := $(SDK_DIR)/arm-none-eabi-
 
 # default xtal value for F4 targets
 HSE_VALUE       ?= 8000000
@@ -847,7 +844,7 @@ ASFLAGS     = $(ARCH_FLAGS) \
 ifeq ($(LD_FLAGS),)
 LD_FLAGS     = -lm \
               -nostartfiles \
-              --specs=nano.specs \
+              --specs=nosys.specs \
               -lc \
               -lnosys \
               $(ARCH_FLAGS) \
