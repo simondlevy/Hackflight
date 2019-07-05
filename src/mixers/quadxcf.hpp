@@ -4,7 +4,7 @@
 
     4cw   2ccw
        \ /
-        X
+        ^
        / \
     3ccw  1cw
  
@@ -39,7 +39,7 @@ namespace hf {
 
             MixerQuadXCF(void) : Mixer(4)
             {
-                //                      T   A   E   R
+                //                     Th  RR  PF  YR
                 motorDirections[0] = { +1, -1, +1, +1 };    // 1 right rear
                 motorDirections[1] = { +1, -1, -1, -1 };    // 2 right front
                 motorDirections[2] = { +1, +1, +1, -1 };    // 3 left rear
