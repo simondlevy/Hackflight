@@ -113,7 +113,6 @@ namespace hf {
                 for (uint8_t i = 0; i < nmotors; i++) {
                     writeMotor(i, motors[i]);
                 }
-
             }
 
             // This is how we can spin the motors from the GCS

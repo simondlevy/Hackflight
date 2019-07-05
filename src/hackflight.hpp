@@ -108,7 +108,7 @@ namespace hf {
                     // For PID control, start with demands from receiver
                     memcpy(&_demands, &_receiver->demands, sizeof(demands_t));
 
-                    // Synch PID controllers to gyro update
+                    // Sync PID controllers to gyro update
                     runPidControllers();
 
                     // Sync failsafe to gyro loop
@@ -125,8 +125,6 @@ namespace hf {
             {
                 // Each PID controllers is associated with at least one auxiliary switch state
                 uint8_t auxState = _receiver->getAux1State();
-
-                fprintf(stderr, "%d\n", auxState);
 
                 // Some PID controllers should cause LED to flash when they're active
                 bool shouldFlash = false;
