@@ -1,13 +1,7 @@
 /*
-   ThingDev.ino : Hackflight sketch for SparkfunESP8266 ThingDev
+   ESP32.ino : Hackflight sketch for ESP32
 
-   Solely for receiver prototyping
- 
-   Hardware support for SparkfunESP8266 ThingDev:
-
-       https://github.com/esp8266/Arduino#installing-with-boards/arduino-manager
-
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2019 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -27,16 +21,13 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/arduino/thingdev.hpp"
+#include "boards/arduino/esp32.hpp"
+#include "receivers/mock.hpp"
 #include "mixers/quadxcf.hpp"
-#include "pidcontrollers/level.hpp"
-#include "receivers/arduino/esp8266.hpp"
-
-static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 
 hf::Hackflight h;
 
-hf::ESP8266_Receiver rc = hf::ESP8266_Receiver(CHANNEL_MAP, "ThingDev");
+hf::MockReceiver rc;
 
 hf::MixerQuadXCF mixer;
 
@@ -45,7 +36,7 @@ hf::Rate ratePid = hf::Rate(0, 0, 0, 0, 0);
 void setup(void)
 {
      // Initialize Hackflight firmware
-     h.init(new hf::SparkfunEsp8266ThingDev(), &rc, &mixer, &ratePid);
+     h.init(new hf::ESP32Board(), &rc, &mixer, &ratePid);
 }
 
 void loop(void)

@@ -24,11 +24,11 @@
 
 namespace hf {
 
-    class ESP32 : public MockBoard {
+    class ESP32Board : public MockBoard {
 
         public:
 
-            ESP32(void) : MockBoard(2, true)
+            ESP32Board(void) : MockBoard(2)
             {
             }
 
