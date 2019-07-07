@@ -130,7 +130,6 @@ namespace hf {
                 }
             }
 
-
-    };
+    }; // class Mixer
 
 } // namespace

@@ -1,6 +1,5 @@
 /*
-   octoxap.hpp : Mixer subclass for X-configuration octocopters following the
-   ArduPilot numbering convention:
+   Mixer subclass for X-configuration octocopters following the ArduPilot numbering convention:
 
         5CCW   1CW
                   
