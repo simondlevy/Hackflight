@@ -37,7 +37,8 @@ namespace hf {
 
         public:
 
-            MixerQuadXAP(void) : Mixer(4)
+            MixerQuadXAP(void) 
+                : Mixer(4)
             {
                 //                     Th  RR  PF  YR
                 motorDirections[0] = { +1, -1, -1, -1 };    // 1 right front

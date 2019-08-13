@@ -126,7 +126,8 @@ namespace hf {
 
             float _beta = 0;
 
-            MadgwickQuaternionFilter(float beta) : QuaternionFilter()
+            MadgwickQuaternionFilter(float beta) 
+                : QuaternionFilter()
             {
                 _beta = beta;
             }
@@ -136,7 +137,8 @@ namespace hf {
 
         public:
 
-            MadgwickQuaternionFilter9DOF(float beta) : MadgwickQuaternionFilter(beta) { }
+            MadgwickQuaternionFilter9DOF(float beta) 
+                : MadgwickQuaternionFilter(beta) { }
 
             // Adapted from https://github.com/kriswiner/MPU9250/blob/master/quaternionFilters.ino
             void update(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float deltat)
@@ -254,7 +256,8 @@ namespace hf {
 
         public:
 
-            MadgwickQuaternionFilter6DOF(float beta, float zeta) : MadgwickQuaternionFilter(beta) 
+            MadgwickQuaternionFilter6DOF(float beta, float zeta) 
+                : MadgwickQuaternionFilter(beta) 
             { 
                 _zeta = zeta;
             }
@@ -356,7 +359,8 @@ namespace hf {
 
         public:
 
-            MahonyQuaternionFilter9DOF(void) : QuaternionFilter()
+            MahonyQuaternionFilter9DOF(void) 
+                : QuaternionFilter()
             {
                 _eInt[0] = 0;
                 _eInt[1] = 0;

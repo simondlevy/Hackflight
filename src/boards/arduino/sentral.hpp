@@ -41,7 +41,8 @@ namespace hf {
 
         protected:
 
-            SentralBoard(uint8_t ledPin, bool ledInverted=false) : ArduinoBoard(ledPin, ledInverted)
+            SentralBoard(uint8_t ledPin, bool ledInverted=false) 
+                : ArduinoBoard(ledPin, ledInverted)
             {
             }
 

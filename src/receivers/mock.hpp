@@ -48,7 +48,8 @@ namespace hf {
 
         public:
 
-            MockReceiver(void) : Receiver(DEFAULT_MAP)
+            MockReceiver(void) 
+                : Receiver(DEFAULT_MAP)
             { 
             }
 

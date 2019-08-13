@@ -60,19 +60,20 @@ class AlienflightF3V1 : public Stm32FBoard {
 
     public:
 
-        AlienflightF3V1(void) : Stm32FBoard(usbVcpOpen())
-    {
-        i2c_init(I2CDEV_2);
-        delaySeconds(.01);
+        AlienflightF3V1(void) 
+            : Stm32FBoard(usbVcpOpen())
+        {
+            i2c_init(I2CDEV_2);
+            delaySeconds(.01);
 
-        brushed_motors_init(0, 1, 2, 3);
+            brushed_motors_init(0, 1, 2, 3);
 
-        _imu = new MPU6050(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
+            _imu = new MPU6050(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
-        checkImuError(_imu->begin());
+            checkImuError(_imu->begin());
 
-        RealBoard::init();
-    }
+            RealBoard::init();
+        }
 
 }; // class AlienflightF3V1
 

@@ -79,7 +79,8 @@ class SBUS_Receiver : public hf::Receiver {
 
     public:
 
-        SBUS_Receiver(UARTDevice_e uartDevice, const uint8_t channelMap[6]) : Receiver(channelMap) 
+        SBUS_Receiver(UARTDevice_e uartDevice, const uint8_t channelMap[6]) 
+            : Receiver(channelMap) 
         {       
             _uartDevice = uartDevice;  
         }

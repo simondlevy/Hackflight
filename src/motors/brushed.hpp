@@ -28,7 +28,8 @@ namespace hf {
 
         public:
 
-            BrushedMotor(uint8_t pin) : Motor(pin)
+            BrushedMotor(uint8_t pin) 
+                : Motor(pin)
             {
             }
 

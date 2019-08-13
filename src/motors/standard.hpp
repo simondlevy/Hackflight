@@ -35,7 +35,8 @@ namespace hf {
 
         public:
 
-            StandardMotor(uint8_t pin) : Motor(pin)
+            StandardMotor(uint8_t pin) 
+                : Motor(pin)
             {
             }
 

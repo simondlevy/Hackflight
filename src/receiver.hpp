@@ -141,7 +141,8 @@ namespace hf {
         }
 
         // Default constructor
-        Receiver(void) : Receiver(DEFAULT_CHANNEL_MAP)
+        Receiver(void) 
+            : Receiver(DEFAULT_CHANNEL_MAP)
         {
         }
 

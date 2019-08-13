@@ -54,7 +54,8 @@ namespace hf {
                 _demandsToAngle = 2* Filter::deg2rad(maxAngle);
             }
 
-            Level(float rollPitchLevelP) : Level(rollPitchLevelP, rollPitchLevelP)
+            Level(float rollPitchLevelP) 
+                : Level(rollPitchLevelP, rollPitchLevelP)
             {
             }
 

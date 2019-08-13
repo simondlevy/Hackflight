@@ -20,15 +20,35 @@
 
 #pragma once
 
-#include "boards/arduino/mock.hpp"
+#include <Wire.h>
+#include "sentral.hpp"
 
 namespace hf {
 
-    class ESP32FeatherBoard : public MockBoard {
+    class ESP32FeatherBoard : public SentralBoard {
 
         public:
 
-            ESP32FeatherBoard(void) : MockBoard(13)
+            ESP32FeatherBoard(void) 
+                : SentralBoard(13)
+            {
+
+                // Start I^2C
+                Wire.begin();
+
+                // Hang a bit
+                delay(100);
+
+                // Start the USFS
+                SentralBoard::begin();
+
+                // Hang a bit more
+                delay(100);
+            }
+
+        protected:
+
+            virtual void writeMotor(uint8_t index, float value) override
             {
             }
 

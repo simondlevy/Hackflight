@@ -69,7 +69,8 @@ namespace hf {
 
         public:
 
-        FlowHold(float P, float minAltitude=0.1) : _P(P), _minAltitude(minAltitude)
+        FlowHold(float P, float minAltitude=0.1) 
+            : _P(P), _minAltitude(minAltitude)
         {
             _previousTime = 0;
         }

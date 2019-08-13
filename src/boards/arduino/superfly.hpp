@@ -43,7 +43,8 @@ namespace hf {
 
         public:
 
-            SuperFly(void) : SentralBoard(15)
+            SuperFly(void) 
+                : SentralBoard(15)
             {
                 // Start I^2C
                 Wire.begin(0,2); // SDA (0), SCL (2) on ESP8266

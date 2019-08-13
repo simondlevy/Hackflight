@@ -28,7 +28,8 @@ namespace hf {
 
         public:
 
-            SparkfunEsp8266ThingDev(void) : MockBoard(5, true)
+            SparkfunEsp8266ThingDev(void) 
+                : MockBoard(5, true)
             {
             }
 

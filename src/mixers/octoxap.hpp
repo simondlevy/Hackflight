@@ -40,7 +40,8 @@ namespace hf {
 
         public:
 
-            MixerOctoXAP(void) : Mixer(8)
+            MixerOctoXAP(void) 
+                : Mixer(8)
             {
                 //                     Th  RR  PF  YR
                 motorDirections[0] = { +1, -1, -1, +1 }; // 1

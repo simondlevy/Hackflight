@@ -97,7 +97,8 @@ namespace hf {
 
         public:
 
-            MockBoard(uint8_t ledPin, bool ledInverted=false) : ArduinoBoard(ledPin, ledInverted)
+            MockBoard(uint8_t ledPin, bool ledInverted=false) 
+                : ArduinoBoard(ledPin, ledInverted)
             {
 
                 // Set up to receive telemetry over Serial1

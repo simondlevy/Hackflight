@@ -117,7 +117,8 @@ namespace hf {
 
          public:
 
-        ESP8266_Receiver(const uint8_t channelMap[6], const char * ssid, const char * passwd="") : Receiver(channelMap) 
+        ESP8266_Receiver(const uint8_t channelMap[6], const char * ssid, const char * passwd="") 
+            : Receiver(channelMap) 
         { 
             strcpy(_ssid, ssid);
             strcpy(_passwd, passwd);

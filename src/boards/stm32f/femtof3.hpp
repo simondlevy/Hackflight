@@ -60,18 +60,19 @@ class FemtoF3 : public Stm32FBoard {
 
     public:
 
-        FemtoF3(void) : Stm32FBoard(usbVcpOpen())
-    {
-        spi_init(MPU6500_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6500_CS_PIN)));
+        FemtoF3(void) 
+            : Stm32FBoard(usbVcpOpen())
+        {
+            spi_init(MPU6500_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6500_CS_PIN)));
 
-        brushless_motors_init(0, 1, 2, 3);
+            brushless_motors_init(0, 1, 2, 3);
 
-        _imu = new MPU6500(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
+            _imu = new MPU6500(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
-        checkImuError(_imu->begin());
+            checkImuError(_imu->begin());
 
-        RealBoard::init();
-    }
+            RealBoard::init();
+        }
 
 }; // class FemtoF3
 

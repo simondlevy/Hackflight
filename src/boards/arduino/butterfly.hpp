@@ -70,9 +70,10 @@ namespace hf {
                 Serial2.write(c);
             }
 
-        public:
+         public:
 
-            Butterfly(void) : SentralBoard(13, true) // red LED, active low
+            Butterfly(void) 
+                : SentralBoard(13, true) // red LED, active low
             {
                 // Start telemetry on Serial2
                 Serial2.begin(115200);

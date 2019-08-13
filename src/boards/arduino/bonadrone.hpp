@@ -105,46 +105,47 @@ namespace hf {
 
         public:
 
-            BonadroneBoard(void) : ArduinoBoard(38, true) // inverted LED signal
-        {
-            setLed(true);
-            // Configure interrupt
-            pinMode(LSM6DSM_INTERRUPT_PIN, INPUT);
+            BonadroneBoard(void) 
+                : ArduinoBoard(38, true) // inverted LED signal
+            {
+                setLed(true);
+                // Configure interrupt
+                pinMode(LSM6DSM_INTERRUPT_PIN, INPUT);
 
-            // Start I^2C
-            Wire.begin(TWI_PINS_20_21);
-            Wire.setClock(400000); // I2C frequency at 400 kHz  
-            delay(100);
+                // Start I^2C
+                Wire.begin(TWI_PINS_20_21);
+                Wire.setClock(400000); // I2C frequency at 400 kHz  
+                delay(100);
 
-            // Start the LSM6DSM
-            switch (_lsm6dsm.begin()) {
+                // Start the LSM6DSM
+                switch (_lsm6dsm.begin()) {
 
-                case LSM6DSM::ERROR_CONNECT:
-                    i2cerror("no connection");
-                    break;
+                    case LSM6DSM::ERROR_CONNECT:
+                        i2cerror("no connection");
+                        break;
 
-                case LSM6DSM::ERROR_ID:
-                    i2cerror("bad ID");
-                    break;
+                    case LSM6DSM::ERROR_ID:
+                        i2cerror("bad ID");
+                        break;
 
-                case LSM6DSM::ERROR_SELFTEST:
-                    //i2cerror("failed self-test");
-                    break;
+                    case LSM6DSM::ERROR_SELFTEST:
+                        //i2cerror("failed self-test");
+                        break;
 
-                case LSM6DSM::ERROR_NONE:
-                    break;
+                    case LSM6DSM::ERROR_NONE:
+                        break;
 
+                }
+
+                delay(100);
+
+                // Calibrate IMU on startup
+                _lsm6dsm.calibrate(GYRO_BIAS, ACCEL_BIAS);
+
+                // Clear the interrupt
+                _lsm6dsm.clearInterrupt();
+                setLed(false);
             }
-
-            delay(100);
-
-            // Calibrate IMU on startup
-            _lsm6dsm.calibrate(GYRO_BIAS, ACCEL_BIAS);
-
-            // Clear the interrupt
-            _lsm6dsm.clearInterrupt();
-            setLed(false);
-        }
 
     }; // class BonadroneBoard
 
@@ -169,12 +170,13 @@ namespace hf {
 
         public:
 
-            BonadroneStandard(void) : BonadroneBoard()
-        {
-            for (uint8_t k=0; k<4; ++k) {
-                motors[k].init();
+            BonadroneStandard(void) 
+                : BonadroneBoard()
+            {
+                for (uint8_t k=0; k<4; ++k) {
+                    motors[k].init();
+                }
             }
-        }
 
     }; // class BonadroneStandard
 

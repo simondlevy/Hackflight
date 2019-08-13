@@ -89,30 +89,31 @@ class OmnibusF3 : public Stm32FBoard {
 
     public:
 
-        OmnibusF3(void) : Stm32FBoard(usbVcpOpen())
-    {
-        // Start SPI bus for MPU6000
-        spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
+        OmnibusF3(void) 
+            : Stm32FBoard(usbVcpOpen())
+        {
+            // Start SPI bus for MPU6000
+            spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
 
-        // Set up the LED (uses the beeper for some reason)
-        beeperLedInit();
+            // Set up the LED (uses the beeper for some reason)
+            beeperLedInit();
 
-        // Run standard initializations
-        brushless_motors_init(0, 1, 2, 3);
+            // Run standard initializations
+            brushless_motors_init(0, 1, 2, 3);
 
-        // Start the IMU
-        _imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
+            // Start the IMU
+            _imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
-        // Check IMU ready status
-        checkImuError(_imu->begin());
+            // Check IMU ready status
+            checkImuError(_imu->begin());
 
-        // Set up UARTs for sensors, telemetry
-        uartPinConfigure(serialPinConfig());
-        uartOpen(UARTDEV_1,  serial_event1, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
-        _serial2 = uartOpen(UARTDEV_2,  NULL, NULL,  115200, MODE_RXTX, SERIAL_NOT_INVERTED);
+            // Set up UARTs for sensors, telemetry
+            uartPinConfigure(serialPinConfig());
+            uartOpen(UARTDEV_1,  serial_event1, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
+            _serial2 = uartOpen(UARTDEV_2,  NULL, NULL,  115200, MODE_RXTX, SERIAL_NOT_INVERTED);
 
-        RealBoard::init();
-    }
+            RealBoard::init();
+        }
 
 }; // class OmnibusF3
 

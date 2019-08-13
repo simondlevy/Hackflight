@@ -53,20 +53,21 @@ class BetaFPVF3 : public Stm32FBoard {
 
     public:
 
-        BetaFPVF3(void) : Stm32FBoard(usbVcpOpen())
-    {
-        spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
-        // Set up the LED (uses the beeper for some reason)
-        beeperLedInit();
+        BetaFPVF3(void) 
+            : Stm32FBoard(usbVcpOpen())
+        {
+            spi_init(MPU6000_SPI_INSTANCE, IOGetByTag(IO_TAG(MPU6000_CS_PIN)));
+            // Set up the LED (uses the beeper for some reason)
+            beeperLedInit();
 
-        brushed_motors_init(2, 3, 0, 1);
+            brushed_motors_init(2, 3, 0, 1);
 
-        _imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
+            _imu = new MPU6000(MPUIMU::AFS_2G, MPUIMU::GFS_250DPS);
 
-        checkImuError(_imu->begin());
+            checkImuError(_imu->begin());
 
-        RealBoard::init();
-    }
+            RealBoard::init();
+        }
 
 
 }; // class BetaFPVF3

@@ -50,7 +50,8 @@ namespace hf {
 
         public:
 
-        RangeAndFlow(RealBoard * board) : MspSensor(board)
+        RangeAndFlow(RealBoard * board) 
+            : MspSensor(board)
         {
         }
 

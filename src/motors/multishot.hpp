@@ -35,7 +35,8 @@ namespace hf {
 
         public:
 
-            MultiShotMotor(uint8_t pin) : Motor(pin)
+            MultiShotMotor(uint8_t pin) 
+                : Motor(pin)
             {
             }
 
