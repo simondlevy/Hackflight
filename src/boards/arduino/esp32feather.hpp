@@ -1,5 +1,5 @@
 /*
-   ESP32.ino : Hackflight sketch for ESP32
+   esp32.hpp : Board subclass for ESP32 Feather
 
    Copyright (c) 2019 Simon D. Levy
 
@@ -16,32 +16,22 @@
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
- */
+   */
 
-#include <Arduino.h>
+#pragma once
 
-#include "hackflight.hpp"
-#include "boards/arduino/esp32.hpp"
-#include "receivers/mock.hpp"
-#include "mixers/quadxcf.hpp"
+#include "boards/arduino/mock.hpp"
 
-hf::Hackflight h;
+namespace hf {
 
-hf::MockReceiver rc;
+    class ESP32FeatherBoard : public MockBoard {
 
-hf::MixerQuadXCF mixer;
+        public:
 
-hf::Rate ratePid = hf::Rate(0, 0, 0, 0, 0);
+            ESP32FeatherBoard(void) : MockBoard(13)
+            {
+            }
 
-void setup(void)
-{
-     // Initialize Hackflight firmware
-     h.init(new hf::ESP32Board(), &rc, &mixer, &ratePid);
-}
+    }; // class ESP32Feather
 
-void loop(void)
-{
-    h.update();
-
-    delay(10);
-}
+} // namespace hf
