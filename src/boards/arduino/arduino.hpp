@@ -56,6 +56,12 @@ namespace hf {
                 Serial.write(c);
             }
 
+            static void powerPin(uint8_t id, uint8_t value)
+            {
+                pinMode(id, OUTPUT);
+                digitalWrite(id, value);
+            }
+
         public:
 
             ArduinoBoard(uint8_t ledPin, bool ledInverted=false)
