@@ -28,7 +28,7 @@
 
 namespace hf {
 
-    class Teensy40 : public SentralBoard {
+    class Teensy40 : public UpsideDownSentralBoard {
 
 
         private:
@@ -50,7 +50,7 @@ namespace hf {
          public:
 
             Teensy40(void) 
-                : SentralBoard(13)
+                : UpsideDownSentralBoard(13)
             {
                 // Start telemetry on Serial2
                 Serial2.begin(115200);
@@ -69,7 +69,7 @@ namespace hf {
                 delay(100);
 
                 // Start the USFS
-                SentralBoard::begin();
+                UpsideDownSentralBoard::begin();
 
                 // Initialize the motors
                 for (uint8_t k=0; k<4; ++k) {
