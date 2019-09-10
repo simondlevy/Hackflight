@@ -37,26 +37,26 @@ namespace hf {
 
         private:
 
-            float _qw = 0;
-            float _qx = 0;
-            float _qy = 0;
-            float _qz = 0;
+            float _w = 0;
+            float _x = 0;
+            float _y = 0;
+            float _z = 0;
 
         protected:
 
             Quaternion(void)
             {
-                _qw = 0;
-                _qx = 0;
-                _qy = 0;
-                _qz = 0;
+                _w = 0;
+                _x = 0;
+                _y = 0;
+                _z = 0;
             }
 
             virtual void modifyState(state_t & state, float time) override
             {
                 (void)time;
 
-                computeEulerAngles(_qw, _qx, _qy, _qz, state.rotation);
+                computeEulerAngles(_w, _x, _y, _z, state.rotation);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
                 if (state.rotation[2] < 0) {
@@ -68,7 +68,7 @@ namespace hf {
             {
                 (void)time;
 
-                return board->getQuaternion(_qw, _qx, _qy, _qz);
+                return board->getQuaternion(_w, _x, _y, _z);
             }
 
         public:

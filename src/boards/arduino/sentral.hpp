@@ -68,10 +68,6 @@ namespace hf {
                     // Returns degrees / sec
                     _sentral.readGyrometer(gx, gy, gz);
 
-                    invertGyrometer(gx, gy, gz);
-
-                    //Debugger::printf("gx=%+3.2f  gy=%+3.2f  gz=%+3.2f\n", gx, gy, gz);
-
                     // Convert degrees / sec to radians / sec
                     gx = radians(gx);
                     gy = radians(gy);
@@ -88,8 +84,6 @@ namespace hf {
                 if (_sentral.gotQuaternion()) {
 
                     _sentral.readQuaternion(qw, qx, qy, qz);
-
-                    invertQuaternion(qw, qx, qy, qz);
 
                     //Debugger::printf("qw=%+3.2f  qx=%+3.2f  qy=%+3.2f  qz=%+3.2f\n", qw, qx, qy, qz);
                     
@@ -114,38 +108,5 @@ namespace hf {
             virtual void invertGyrometer(float & gx, float & gy, float & gz) { }
 
     }; // class SentralBoard
-
-    class UpsideDownSentralBoard : public SentralBoard {
-
-        public:
-
-            UpsideDownSentralBoard(uint8_t ledPin, bool ledInverted=false) 
-                : SentralBoard(ledPin, ledInverted) { }
-
-        protected:
-
-            virtual void invertQuaternion(float & qw, float & qx, float & qy, float & qz) override
-            { 
-                swapn(qw, qx);
-                swapn(qy, qz);
-            }
-
-            virtual void invertGyrometer(float & gx, float & gy, float & gz) override 
-            { 
-                gx = -gx;
-                gz = -gz;
-            }
-
-        private:
-
-            void swapn(float & a, float & b)
-            {
-                float tmp = a;
-                a = -b;
-                b = -tmp;
-
-            }
-
-    }; // class UpsideDownSentralBoard
 
 } // namespace hf

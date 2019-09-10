@@ -86,6 +86,9 @@ namespace hf {
                 // If quaternion data ready
                 if (_quaternion.ready(time)) {
 
+                    // Adjust quaternion values based on IMU orientation
+                    _board->adjustQuaternion(_quaternion._w, _quaternion._x, _quaternion._y, _quaternion._z);
+
                     // Update state with new quaternion to yield Euler angles
                     _quaternion.modifyState(_state, time);
 
@@ -101,6 +104,9 @@ namespace hf {
 
                 // If gyrometer data ready
                 if (_gyrometer.ready(time)) {
+
+                    // Adjust gyrometer values based on IMU orientation
+                    _board->adjustGyrometer(_gyrometer._x, _gyrometer._y, _gyrometer._z);
 
                     // Update state with gyro rates
                     _gyrometer.modifyState(_state, time);

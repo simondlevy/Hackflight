@@ -28,7 +28,7 @@
 
 namespace hf {
 
-    class Teensy40 : public UpsideDownSentralBoard {
+    class Teensy40 : public SentralBoard {
 
 
         private:
@@ -40,6 +40,13 @@ namespace hf {
                 StandardMotor(5) 
             };
 
+            void swap(float & a, float & b)
+            {
+                float tmp = a;
+                a = b;
+                b = tmp;
+            }
+
          protected:
 
             virtual void writeMotor(uint8_t index, float value) override
@@ -47,10 +54,25 @@ namespace hf {
                 //motors[index].write(value);
             }
 
+            virtual void adjustGyrometer(float & gx, float & gy, float & gz) override
+            { 
+                gy = -gy;
+                gz = -gz;
+            }
+
+            virtual void adjustQuaternion(float & qw, float & qx, float & qy, float & qz) override
+            { 
+                swap(qw, qx);
+                swap(qy, qz);
+
+                qx = -qx;
+                qy = -qy;
+            }
+
          public:
 
             Teensy40(void) 
-                : UpsideDownSentralBoard(13)
+                : SentralBoard(13)
             {
                 // Start telemetry on Serial2
                 Serial2.begin(115200);
@@ -69,7 +91,7 @@ namespace hf {
                 delay(100);
 
                 // Start the USFS
-                UpsideDownSentralBoard::begin();
+                SentralBoard::begin();
 
                 // Initialize the motors
                 for (uint8_t k=0; k<4; ++k) {
