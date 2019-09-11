@@ -1,10 +1,10 @@
 
 /*
-   BrushlessMotorTest.ino : Arduino sketch to test motors on Butterfly flight Controller
+   BrushlessMotorTest.ino : Arduino sketch to test motors on Teensy4.0 flight Controller
 
    DID YOU REMEMOVE THE PROPELLERS FIRST?
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2019 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -23,7 +23,7 @@
 
 #include <Arduino.h>
 
-static uint8_t MOTOR_PIN = 11;
+static uint8_t MOTOR_PIN = 14;
 
 static uint16_t val;
 static uint16_t inc;
@@ -46,7 +46,7 @@ void setup(void)
     val = PWM_MIN;
     inc = +1;
 
-    delay(1000);
+    delay(2000);
 }
 
 void loop(void)

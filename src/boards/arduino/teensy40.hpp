@@ -34,10 +34,10 @@ namespace hf {
         private:
 
             StandardMotor motors[4] = { 
-                StandardMotor(2), 
-                StandardMotor(3), 
-                StandardMotor(4), 
-                StandardMotor(5) 
+                StandardMotor(14), 
+                StandardMotor(15), 
+                StandardMotor(22), 
+                StandardMotor(23) 
             };
 
             void swap(float & a, float & b)
@@ -51,7 +51,7 @@ namespace hf {
 
             virtual void writeMotor(uint8_t index, float value) override
             {
-                //motors[index].write(value);
+                if (index==0) motors[index].write(value);
             }
 
             virtual void adjustGyrometer(float & gx, float & gy, float & gz) override
