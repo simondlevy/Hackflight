@@ -1,70 +1,65 @@
-
-/*
-   BrushlessMotorTest.ino : Arduino sketch to test motors on Teensy4.0 flight Controller
-
-   DID YOU REMEMOVE THE PROPELLERS FIRST?
-
-   Copyright (c) 2019 Simon D. Levy
-
-   This file is part of Hackflight.
-
-   Hackflight is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   Hackflight is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-   You should have received a copy of the GNU General Public License
-   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include <Arduino.h>
+#include <Servo.h>
 
-static uint8_t MOTOR_PIN = 14;
+class Motor {
 
-static uint16_t val;
-static uint16_t inc;
+    private:
 
-// Min, max PWM values
-const uint16_t PWM_MIN = 1000;
-const uint16_t PWM_MAX = 2000;
+        Servo _servo;
 
+    public:
+
+        Motor(uint8_t pin) 
+        {
+            _servo.attach(pin);
+        }
+
+        void begin(void)
+        {
+            _servo.write(180);
+            delay(250);
+            _servo.write(30);
+        }
+
+        void set(uint8_t val)
+        {
+            _servo.write(val);
+        }
+};
+
+static Motor motor1(14);
+static Motor motor2(15);
+static Motor motor3(9);
+static Motor motor4(2);
 
 void setup(void)
 {
-    // Start serial debugging
+    motor1.begin();
+    motor2.begin();
+    motor3.begin();
+    motor4.begin();
+
     Serial.begin(115200);
 
-    // Initialize the motor
-    pinMode(MOTOR_PIN, OUTPUT);
-    analogWrite(MOTOR_PIN, PWM_MIN>>3);
-
-    // Start with motor off, increasing
-    val = PWM_MIN;
-    inc = +1;
-
-    delay(2000);
+    delay(1000);
 }
 
 void loop(void)
 {
+    static int val = 30;
+    static int dir = +1;
+
+    motor1.set(val);
+    motor2.set(val);
+    motor3.set(val);
+    motor4.set(val);
+
     Serial.println(val);
 
-    analogWrite(MOTOR_PIN, val >> 3);
+    val += dir;
 
-    val += inc;
+    if (val == 50) dir = +1;
+    if (val == 140) dir = -1;
 
-    // stop halfway
-    if (val >= (PWM_MIN+PWM_MAX)/2) {
-        inc = -1;
-    }
-
-    if (val <= PWM_MIN) {
-        inc = +1;
-    }
-
-    delay(10);
+    delay(100);
 }

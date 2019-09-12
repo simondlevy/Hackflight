@@ -26,7 +26,7 @@
 static uint8_t MOTOR_PIN = 11;
 
 static uint16_t val;
-static uint16_t inc;
+static int16_t inc;
 
 // Min, max PWM values
 const uint16_t PWM_MIN = 1000;

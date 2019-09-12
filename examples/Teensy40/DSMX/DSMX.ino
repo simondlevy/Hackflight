@@ -28,7 +28,7 @@
 
 #include "hackflight.hpp"
 #include "boards/arduino/teensy40.hpp"
-#include "receivers/arduino/dsmx.hpp"
+#include "receivers/mock.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/level.hpp"
 
@@ -36,7 +36,8 @@ constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 hf::Hackflight h;
 
-hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);
+//hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);
+hf::MockReceiver rc;
 
 hf::MixerQuadXCF mixer;
 

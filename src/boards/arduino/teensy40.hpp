@@ -36,8 +36,8 @@ namespace hf {
             StandardMotor motors[4] = { 
                 StandardMotor(14), 
                 StandardMotor(15), 
-                StandardMotor(22), 
-                StandardMotor(23) 
+                StandardMotor(2), 
+                StandardMotor(3) 
             };
 
             void swap(float & a, float & b)
@@ -51,7 +51,7 @@ namespace hf {
 
             virtual void writeMotor(uint8_t index, float value) override
             {
-                if (index==0) motors[index].write(value);
+                //motors[index].write(value);
             }
 
             virtual void adjustGyrometer(float & gx, float & gy, float & gz) override
@@ -74,10 +74,7 @@ namespace hf {
             Teensy40(void) 
                 : SentralBoard(13)
             {
-                // Start telemetry on Serial2
-                Serial2.begin(115200);
-
-                // User D21 for power, D22 for ground
+                // User D21 for 3.3V, D22 for ground to power SENTRAL
                 powerPin(21, HIGH);
                 powerPin(22, LOW);
 
@@ -99,7 +96,7 @@ namespace hf {
                 }
 
                 // Hang a bit more
-                delay(100);
+                delay(2000);
             }
 
     }; // class Teensy40
