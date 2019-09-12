@@ -1,12 +1,13 @@
 #include <Arduino.h>
 #include <Servo.h>
 
-static const int MINVAL = 50;
-static const int MAXVAL = 150;
 
 class Motor {
 
     private:
+
+        static const int MINVAL = 50;
+        static const int MAXVAL = 150;
 
         Servo _servo;
 
@@ -24,9 +25,10 @@ class Motor {
             _servo.write(MINVAL);
         }
 
-        void set(int val)
+        void set(float val)
         {
-            _servo.write(val);
+            int intval = (int)(MINVAL + val * (MAXVAL-MINVAL));
+            _servo.write(intval);
         }
 };
 
@@ -52,14 +54,10 @@ void loop(void)
     static float val;
     static int dir = +1;
 
-    int intval = (int)(MINVAL + val * (MAXVAL-MINVAL));
-
-    motor1.set(intval);
-    motor2.set(intval);
-    motor3.set(intval);
-    motor4.set(intval);
-
-    Serial.printf("%f %d\n", val, intval);
+    motor1.set(val);
+    motor2.set(val);
+    motor3.set(val);
+    motor4.set(val);
 
     if (val <= 0) dir = +1;
     if (val >= 1) dir = -1;
