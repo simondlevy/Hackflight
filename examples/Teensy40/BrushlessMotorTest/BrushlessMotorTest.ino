@@ -55,12 +55,12 @@ void loop(void)
     static float newval;
     static int newdir = +1;
 
-    motor1.set(val);
-    motor2.set(val);
-    motor3.set(val);
-    motor4.set(val);
-
     int newint = (int)(MINVAL + newval * (MAXVAL-MINVAL));
+
+    motor1.set(newint);
+    motor2.set(newint);
+    motor3.set(newint);
+    motor4.set(newint);
 
     Serial.printf("%d %f %d\n", val, newval, newint);
 
