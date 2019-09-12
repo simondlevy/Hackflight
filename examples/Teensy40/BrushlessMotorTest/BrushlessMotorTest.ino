@@ -49,29 +49,21 @@ void setup(void)
 
 void loop(void)
 {
-    static int val = MINVAL;
+    static float val;
     static int dir = +1;
 
-    static float newval;
-    static int newdir = +1;
+    int intval = (int)(MINVAL + val * (MAXVAL-MINVAL));
 
-    int newint = (int)(MINVAL + newval * (MAXVAL-MINVAL));
+    motor1.set(intval);
+    motor2.set(intval);
+    motor3.set(intval);
+    motor4.set(intval);
 
-    motor1.set(newint);
-    motor2.set(newint);
-    motor3.set(newint);
-    motor4.set(newint);
+    Serial.printf("%f %d\n", val, intval);
 
-    Serial.printf("%d %f %d\n", val, newval, newint);
-
-    val += dir;
-    if (val == MINVAL) dir = +1;
-    if (val == MAXVAL) dir = -1;
-
-    if (newval <= 0) newdir = +1;
-    if (newval >= 1) newdir = -1;
-    newval += newdir * .01;
-
+    if (val <= 0) dir = +1;
+    if (val >= 1) dir = -1;
+    val += dir * .01;
 
     delay(100);
 }
