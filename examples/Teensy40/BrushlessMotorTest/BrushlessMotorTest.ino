@@ -1,9 +1,6 @@
 #include <Arduino.h>
 #include <Servo.h>
 
-static const int MINVAL = 50;
-static const int MAXVAL = 140;
-
 class Motor {
 
     private:
@@ -19,9 +16,9 @@ class Motor {
 
         void begin(void)
         {
-            _servo.write(MAXVAL);
+            _servo.write(180);
             delay(250);
-            _servo.write(MINVAL);
+            _servo.write(30);
         }
 
         void set(uint8_t val)
@@ -49,7 +46,7 @@ void setup(void)
 
 void loop(void)
 {
-    static int val = MINVAL;
+    static int val = 30;
     static int dir = +1;
 
     motor1.set(val);
@@ -61,8 +58,8 @@ void loop(void)
 
     val += dir;
 
-    if (val == MINVAL) dir = +1;
-    if (val == MAXVAL) dir = -1;
+    if (val == 50) dir = +1;
+    if (val == 140) dir = -1;
 
     delay(100);
 }
