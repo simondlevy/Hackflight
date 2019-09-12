@@ -24,7 +24,7 @@ class Motor {
             _servo.write(MINVAL);
         }
 
-        void set(uint8_t val)
+        void set(int val)
         {
             _servo.write(val);
         }
@@ -52,17 +52,26 @@ void loop(void)
     static int val = MINVAL;
     static int dir = +1;
 
+    static float newval;
+    static int newdir = +1;
+
     motor1.set(val);
     motor2.set(val);
     motor3.set(val);
     motor4.set(val);
 
-    Serial.println(val);
+    int newint = (int)(MINVAL + newval * (MAXVAL-MINVAL));
+
+    Serial.printf("%d %f %d\n", val, newval, newint);
 
     val += dir;
-
     if (val == MINVAL) dir = +1;
     if (val == MAXVAL) dir = -1;
+
+    if (newval <= 0) newdir = +1;
+    if (newval >= 1) newdir = -1;
+    newval += newdir * .01;
+
 
     delay(100);
 }
