@@ -16,9 +16,9 @@ class Motor {
 
         void begin(void)
         {
-            _servo.write(180);
+            _servo.write(150);
             delay(250);
-            _servo.write(30);
+            _servo.write(50);
         }
 
         void set(uint8_t val)
@@ -46,7 +46,7 @@ void setup(void)
 
 void loop(void)
 {
-    static int val = 30;
+    static int val = 50;
     static int dir = +1;
 
     motor1.set(val);
@@ -59,7 +59,7 @@ void loop(void)
     val += dir;
 
     if (val == 50) dir = +1;
-    if (val == 140) dir = -1;
+    if (val == 150) dir = -1;
 
     delay(100);
 }
