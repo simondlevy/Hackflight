@@ -24,7 +24,7 @@
 
 #include <Wire.h>
 #include "sentral.hpp"
-#include "motors/standard.hpp"
+#include "motors/standard2.hpp"
 
 namespace hf {
 
@@ -36,8 +36,8 @@ namespace hf {
             StandardMotor motors[4] = { 
                 StandardMotor(14), 
                 StandardMotor(15), 
-                StandardMotor(2), 
-                StandardMotor(3) 
+                StandardMotor(9), 
+                StandardMotor(2) 
             };
 
             void swap(float & a, float & b)
@@ -51,7 +51,7 @@ namespace hf {
 
             virtual void writeMotor(uint8_t index, float value) override
             {
-                //motors[index].write(value);
+                motors[index].set(value);
             }
 
             virtual void adjustGyrometer(float & gx, float & gy, float & gz) override
@@ -92,11 +92,11 @@ namespace hf {
 
                 // Initialize the motors
                 for (uint8_t k=0; k<4; ++k) {
-                    //motors[k].init();
+                    motors[k].begin();
                 }
 
                 // Hang a bit more
-                delay(2000);
+                delay(1000);
             }
 
     }; // class Teensy40

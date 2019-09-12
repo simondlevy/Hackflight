@@ -1,7 +1,6 @@
 /*
-   BrushlessMotorTest.ino : Arduino sketch to test motors on Teensy4.0 flight Controller
-
-   DID YOU REMEMOVE THE PROPELLERS FIRST?
+   standard2.hpp : Arduino code for brushless motor running on
+   standard ESC.  Alternate version using Servo
 
    Copyright (c) 2019 Simon D. Levy
 
@@ -19,6 +18,8 @@
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#pragma once
 
 #include <Servo.h>
 
@@ -51,36 +52,3 @@ class StandardMotor {
             _servo.write(intval);
         }
 };
-static StandardMotor motor1(14);
-static StandardMotor motor2(15);
-static StandardMotor motor3(9);
-static StandardMotor motor4(2);
-
-void setup(void)
-{
-    motor1.begin();
-    motor2.begin();
-    motor3.begin();
-    motor4.begin();
-
-    Serial.begin(115200);
-
-    delay(1000);
-}
-
-void loop(void)
-{
-    static float val;
-    static int dir = +1;
-
-    motor1.set(val);
-    motor2.set(val);
-    motor3.set(val);
-    motor4.set(val);
-
-    if (val <= 0) dir = +1;
-    if (val >= 1) dir = -1;
-    val += dir * .01;
-
-    delay(100);
-}

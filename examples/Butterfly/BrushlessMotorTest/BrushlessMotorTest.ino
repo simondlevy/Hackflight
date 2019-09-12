@@ -1,4 +1,3 @@
-
 /*
    BrushlessMotorTest.ino : Arduino sketch to test motors on Butterfly flight Controller
 
