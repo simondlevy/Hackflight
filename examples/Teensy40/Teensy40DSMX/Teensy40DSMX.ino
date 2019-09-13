@@ -1,9 +1,13 @@
 /*
-   Mock.ino : Hackflight sketch for Tlera Butterfly with mock board and receiver
+   Hackflight sketch for Teensy4.0 Flight Controller with Spektrum DSMX receiver
 
-   Solely for receiver prototyping
+   Additional libraries needed:
 
-   Copyright (c) 2018 Simon D. Levy
+       https://github.com/simondlevy/EM7180
+       https://github.com/simondlevy/CrossPlatformDataBus
+       https://github.com/simondlevy/SpektrumDSM 
+
+   Copyright (c) 2019 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -20,30 +24,31 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
-
 #include "hackflight.hpp"
-#include "boards/arduino/mock.hpp"
+#include "boards/arduino/teensy40.hpp"
+#include "receivers/arduino/dsmx.hpp"
 #include "mixers/quadxcf.hpp"
-#include "receivers/mock.hpp"
+#include "pidcontrollers/level.hpp"
 
-static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
+constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 hf::Hackflight h;
 
-hf::MockReceiver rc;
+hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);
 
 hf::MixerQuadXCF mixer;
 
-hf::Rate ratePid = hf::Rate(0, 0, 0, 0, 0);
+hf::Rate ratePid = hf::Rate(0.01f, 0.00f, 0.00f, 0.10f, 0.01f, 8.58); 
+
+hf::Level level = hf::Level(0.40f);
 
 void setup(void)
 {
-    // Create the Board object: LED on pin 13, active low
-    hf::MockBoard * board = new hf::MockBoard(13, true);
+    // Add Level PID for aux switch position 1
+    h.addPidController(&level, 1);
 
     // Initialize Hackflight firmware
-    h.init(board, &rc, &mixer, &ratePid);
+    h.init(new hf::Teensy40(), &rc, &mixer, &ratePid);
 }
 
 void loop(void)

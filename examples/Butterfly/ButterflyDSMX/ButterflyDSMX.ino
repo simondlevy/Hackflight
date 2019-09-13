@@ -1,5 +1,5 @@
 /*
-   DSMX.ino : Hackflight sketch for Butterfly Flight Controller with Spektrum DSMX receiver
+   Hackflight sketch for Butterfly Flight Controller with Spektrum DSMX receiver
 
    Additional libraries needed:
 

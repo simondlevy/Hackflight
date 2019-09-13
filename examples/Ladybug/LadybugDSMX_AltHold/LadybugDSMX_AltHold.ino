@@ -1,6 +1,5 @@
 /*
-   DSMX_AltHold.ino : Hackflight sketch for Ladybug Flight Controller with Spektrum DSMX receiver and
-                      VL53L1X distance sensor, providing altitude-hold
+   Hackflight sketch for Ladybug Flight Controller with Spektrum DSMX receiver and VL53L1X distance sensor, providing altitude-hold
 
    Copyright (c) 2019 Simon D. Levy
 

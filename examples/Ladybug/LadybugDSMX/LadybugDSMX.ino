@@ -1,18 +1,17 @@
 /*
-   SBUSLevelSimon.ino : Hackflight sketch for Bonadrone flight controller with SBUS receiver and
-   Simon's TAER channel map and RX connection
+   Hackflight sketch for Ladybug Flight Controller with Spektrum DSMX receiver
 
    Additional libraries needed:
 
-       https://github.com/simondlevy/LSM6DSM
+       https://github.com/simondlevy/EM7180
        https://github.com/simondlevy/CrossPlatformDataBus
-       https://github.com/simondlevy/SBUSRX
+       https://github.com/simondlevy/SpektrumDSM 
 
-   Hardware support for Bonadrone flight controller:
+   Hardware support for Ladybug flight controller:
 
        https://github.com/simondlevy/grumpyoldpizza
 
-   Copyright (c) 2018 Simon D. Levy
+Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -32,40 +31,35 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/arduino/bonadrone.hpp"
-#include "receivers/arduino/sbus.hpp"
+#include "boards/arduino/ladybug.hpp"
+#include "receivers/arduino/dsmx.hpp"
 #include "mixers/quadxcf.hpp"
-
 #include "pidcontrollers/level.hpp"
 
-// Change this as needed
-#define SBUS_SERIAL Serial3
-
-static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
+constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 hf::Hackflight h;
 
-hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, SERIAL_SBUS, &SBUS_SERIAL);
+hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);  
 
 hf::MixerQuadXCF mixer;
 
 hf::Rate ratePid = hf::Rate(
-        0.10f,  // PitchRoll P
-        0.01f,  // PitchRoll I
-        0.05f,  // PitchRoll D
-        0.10,   // Yaw P
-        0.01f,  // Yaw I
-        8.58f); // Demands to rate
+        0.225f,     // Gyro pitch/roll P
+        0.001875f,  // Gyro pitch/roll I
+        0.375f,     // Gyro pitch/roll D
+        1.0625f,    // Gyro yaw P
+        0.005625f); // Gyro yaw I
 
-hf::Level level = hf::Level(0.25f);
+hf::Level level = hf::Level(0.20f);
 
 void setup(void)
 {
-
-    // Aux switch 1 for Level mode
+    // Add Level PID for aux switch position 1
     h.addPidController(&level, 1);
 
-    h.init(new hf::BonadroneMultiShot(), &rc, &mixer, &ratePid);
+    // Initialize Hackflight firmware
+    h.init(new hf::Ladybug(), &rc, &mixer, &ratePid);
 }
 
 void loop(void)

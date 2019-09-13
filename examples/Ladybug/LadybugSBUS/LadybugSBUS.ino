@@ -1,17 +1,17 @@
 /*
-   DSMX.ino : Hackflight sketch for Ladybug Flight Controller with Spektrum DSMX receiver
-
+   Hackflight sketch for Ladybug Flight Controller with an SBUS receiver
+ 
    Additional libraries needed:
 
        https://github.com/simondlevy/EM7180
        https://github.com/simondlevy/CrossPlatformDataBus
-       https://github.com/simondlevy/SpektrumDSM 
+       https://github.com/simondlevy/SBUSRX
 
    Hardware support for Ladybug flight controller:
 
        https://github.com/simondlevy/grumpyoldpizza
 
-Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -32,15 +32,15 @@ Copyright (c) 2018 Simon D. Levy
 
 #include "hackflight.hpp"
 #include "boards/arduino/ladybug.hpp"
-#include "receivers/arduino/dsmx.hpp"
+#include "receivers/arduino/sbus.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/level.hpp"
 
-constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 
 hf::Hackflight h;
 
-hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);  
+hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, SERIAL_SBUS);
 
 hf::MixerQuadXCF mixer;
 
@@ -55,11 +55,12 @@ hf::Level level = hf::Level(0.20f);
 
 void setup(void)
 {
+
     // Add Level PID for aux switch position 1
     h.addPidController(&level, 1);
 
-    // Initialize Hackflight firmware
-    h.init(new hf::Ladybug(), &rc, &mixer, &ratePid);
+    // Use pin A1 for LED on original LadybugFc (newer uses A4)
+    h.init(new hf::Ladybug(A1), &rc, &mixer, &ratePid);
 }
 
 void loop(void)
