@@ -39,10 +39,11 @@ namespace hf {
 
         private: 
 
+            static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
+
             // Passed to Hackflight::init() for a particular build
             Board      * _board = NULL;
             Receiver   * _receiver = NULL;
-            Rate       * _ratePid = NULL;
             Mixer      * _mixer = NULL;
 
             // Supports periodic ad-hoc debugging
@@ -75,7 +76,7 @@ namespace hf {
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(_state.rotation[axis]) < _ratePid->maxArmingAngle;
+                return fabs(_state.rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
             void checkQuaternion(void)
@@ -156,7 +157,6 @@ namespace hf {
                 _board->flashLed(shouldFlash);
             }
 
-
             void checkFailsafe(void)
             {
                 if (_state.armed && (_receiver->lostSignal() || _board->isBatteryLow())) {
@@ -172,8 +172,10 @@ namespace hf {
                 // Check whether receiver data is available
                 if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
 
-                // Update ratePid with cyclic demands
-                _ratePid->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
+                // Update PID controllers with receiver demands
+                for (uint8_t k=0; k<_pid_controller_count; ++k) {
+                    _pid_controllers[k]->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
+                }
 
                 // Disarm
                 if (_state.armed && !_receiver->getAux2State()) {
@@ -315,7 +317,6 @@ namespace hf {
                 _board    = board;
                 _receiver = receiver;
                 _mixer    = mixer;
-                _ratePid  = ratePid;
 
                 // Ad-hoc debugging support
                 _debugger.init(board);

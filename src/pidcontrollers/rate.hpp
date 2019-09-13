@@ -44,7 +44,6 @@ namespace hf {
             const float GYRO_WINDUP_MAX             = 6.0f;
             const float BIG_GYRO_DEGREES_PER_SECOND = 40.0f; 
             const float BIG_YAW_DEMAND              = 0.1f;
-            const float MAX_ARMING_ANGLE_DEGREES    = 25.0f;
 
             // Converted to radians from degrees in init() method for efficiency
             float _bigGyroRate = 0;
@@ -76,7 +75,6 @@ namespace hf {
 
               // Convert degree parameters to radians for use later
               _bigGyroRate   = Filter::deg2rad(BIG_GYRO_DEGREES_PER_SECOND);
-              maxArmingAngle = Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
 
               // Initialize gyro error integral
               resetIntegral();
@@ -129,8 +127,6 @@ namespace hf {
 
             // For PTerm computation
             float _PTerm[2]; // roll, pitch
-
-            float maxArmingAngle;
 
             float _demandsToRate;
 
@@ -202,7 +198,7 @@ namespace hf {
                 return true;
             }
 
-            void updateReceiver(demands_t & demands, bool throttleIsDown)
+            virtual void updateReceiver(demands_t & demands, bool throttleIsDown) override
             {
                 // Compute proportion of cyclic demand compared to its maximum
                 _proportionalCyclicDemand = maxval(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;

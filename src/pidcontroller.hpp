@@ -34,6 +34,8 @@ namespace hf {
 
         virtual bool shouldFlashLed(void) { return false; }
 
+        virtual void updateReceiver(demands_t & demands, bool throttleIsDown) { (void)demands; (void)throttleIsDown; }
+
         uint8_t auxState = 0;
 
     };  // class PID_Controller
