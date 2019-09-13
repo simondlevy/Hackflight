@@ -142,31 +142,15 @@ namespace hf {
 
         public:
 
-            Rate(float gyroRollP, float gyroRollI, float gyroRollD,
-                       float gyroPitchP, float gyroPitchI, float gyroPitchD,
-                       float gyroYawP, float gyroYawI, float demandsToRate = 1.0f) :
-                _gyroYawP(gyroYawP), 
-                _gyroYawI(gyroYawI),
-                _demandsToRate(demandsToRate)
-            {
-                init();
-                // Constants arrays
-                _PConstants[0] = gyroRollP;
-                _PConstants[1] = gyroPitchP;
-                _IConstants[0] = gyroRollI;
-                _IConstants[1] = gyroPitchI;
-                _DConstants[0] = gyroRollD;
-                _DConstants[1] = gyroPitchD;
-            }
-            
             Rate(float gyroRollPitchP, float gyroRollPitchI, float gyroRollPitchD,
                        float gyroYawP, float gyroYawI, float demandsToRate = 1.0f) :
+
                 _gyroYawP(gyroYawP), 
                 _gyroYawI(gyroYawI), 
                 _demandsToRate(demandsToRate)
             {
                 init();
-                // Constants arrays
+            
                 _PConstants[0] = gyroRollPitchP;
                 _PConstants[1] = gyroRollPitchP;
                 _IConstants[0] = gyroRollPitchI;

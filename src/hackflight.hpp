@@ -188,13 +188,8 @@ namespace hf {
                 }
 
                 // Arm (after lots of safety checks!)
-                if (    _safeToArm &&
-                        !_state.armed && 
-                        _receiver->throttleIsDown() &&
-                        _receiver->getAux2State() && 
-                        !_failsafe && 
-                        safeAngle(AXIS_ROLL) && 
-                        safeAngle(AXIS_PITCH)) {
+                if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux2State() && 
+                        !_failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
                     _state.armed = true;
                     _yawInitial = _state.rotation[AXIS_YAW]; // grab yaw for headless mode
                 }
@@ -311,7 +306,7 @@ namespace hf {
 
         public:
 
-            void init(Board * board, Receiver * receiver, Mixer * mixer, Rate * ratePid, bool armed=false)
+            void init(Board * board, Receiver * receiver, Mixer * mixer, bool armed=false)
             {  
                 // Store the essentials
                 _board    = board;
@@ -327,9 +322,6 @@ namespace hf {
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
-
-                // Last PID controller is always ratePid (rate), aux state = 0
-                addPidController(ratePid, 0);
 
                 // Initialize state
                 memset(&_state, 0, sizeof(state_t));
