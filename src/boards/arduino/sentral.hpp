@@ -85,8 +85,6 @@ namespace hf {
 
                     _sentral.readQuaternion(qw, qx, qy, qz);
 
-                    //Debugger::printf("qw=%+3.2f  qx=%+3.2f  qy=%+3.2f  qz=%+3.2f\n", qw, qx, qy, qz);
-                    
                     return true;
                 }
 

@@ -1,6 +1,5 @@
 /*
-   LoiterBoard.ino : Sketch allowing Butterfly breakout board to provide
-   optical flow and Above-Ground-Level messages to a flight controller
+   Sketch allowing Butterfly breakout board to provide optical flow and Above-Ground-Level messages to a flight controller
 
    Additional libraries required:
 

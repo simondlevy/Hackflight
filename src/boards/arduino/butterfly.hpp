@@ -70,7 +70,7 @@ namespace hf {
                 // Start telemetry on Serial2
                 Serial2.begin(115200);
 
-                // User D30 for power, D31 for ground
+                // User D4 for power, D3 for ground
                 powerPin(4, HIGH);
                 powerPin(3, LOW);
 
