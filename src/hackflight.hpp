@@ -111,6 +111,8 @@ namespace hf {
                     // Update state with gyro rates
                     _gyrometer.modifyState(_state, time);
 
+                    //debugline("%+3.3f\n", _receiver->demands.throttle);
+
                     // For PID control, start with demands from receiver
                     memcpy(&_demands, &_receiver->demands, sizeof(demands_t));
 
