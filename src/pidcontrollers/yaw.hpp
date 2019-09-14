@@ -34,62 +34,50 @@ namespace hf {
         private: 
 
             // Arbitrary constants
-            const float GYRO_WINDUP_MAX             = 6.0f;
-            const float BIG_GYRO_DEGREES_PER_SECOND = 40.0f; 
-            const float BIG_YAW_DEMAND              = 0.1f;
+            const float BIG_YAW_DEMAND = 0.1f;
 
-            // Converted to radians from degrees in init() method for efficiency
-            float _bigGyroRate = 0;
+            // Arbitrary constants
+            const float WINDUP_MAX             = 6.0f;
+            const float BIG_DEGREES_PER_SECOND = 40.0f; 
+
+            // Converted to radians from degrees in constructor for efficiency
+            float _bigAngularVel = 0;
 
             // PID constants set in constructor
             float _P = 0; 
             float _I = 0;
 
-            float computeITermGyro(float error, float rateI, float rcCommand, float gyro[3])
+            // Accumulated values
+            float _lastError = 0;
+            float _errorI    = 0;
+
+            float computeITerm(float error, float rcCommand, float angularVel)
             {
                 // Avoid integral windup
-                _errorGyroI = Filter::constrainAbs(_errorGyroI + error, GYRO_WINDUP_MAX);
+                _errorI = Filter::constrainAbs(_errorI + error, WINDUP_MAX);
 
                 // Reset integral on quick gyro change or large gyroYawPid command
-                if ((fabs(gyro[2]) > _bigGyroRate) || (fabs(rcCommand) > BIG_YAW_DEMAND)) {
-                    _errorGyroI = 0;
+                if (fabs(angularVel) > _bigAngularVel) {
+                    _errorI = 0;
                 }
 
-                return _errorGyroI * rateI;
+                return _errorI * _I;
             }
 
-            void init(void)
+            float computePid(float PTerm, float ITerm, float DTerm, float angularVel)
             {
-              // Zero-out previous value for D term
-              _lastError = 0;
-
-              // Convert degree parameters to radians for use later
-              _bigGyroRate   = Filter::deg2rad(BIG_GYRO_DEGREES_PER_SECOND);
-
-              // Initialize gyro error integral
-              resetIntegral();
-            }
-
-            float _lastError = 0;
-            float _errorGyroI = 0;
-
-            float computePid(float rateP, float PTerm, float ITerm, float DTerm, float angularVel)
-            {
-                PTerm = (PTerm * _demandsToRate - angularVel) * rateP;
+                PTerm = (PTerm * _demandsToRate - angularVel) * _P;
 
                 return PTerm + ITerm + DTerm;
             }
 
         protected:
 
-            float _demandsToRate;
-
-            // proportion of cyclic demand compared to its maximum
-            float _proportionalCyclicDemand;
+            float _demandsToRate = 0;
 
             void resetIntegral(void)
             {
-                _errorGyroI = 0;
+                _errorI = 0;
             }
 
         public:
@@ -97,7 +85,14 @@ namespace hf {
             YawPid(float P, float I, float demandsToRate = 1.0f) 
                 : _P(P), _I(I), _demandsToRate(demandsToRate)
             {
-                init();
+                // Zero-out previous value for D term
+                _lastError = 0;
+
+                // Convert degree parameters to radians for use later
+                _bigAngularVel = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
+
+                // Initialize gyro error integral
+                resetIntegral();
             }
 
             bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
@@ -105,9 +100,16 @@ namespace hf {
                 (void)currentTime;
 
                 // P term comes directly from RC command, and D term is zero
-                float error = demands.yaw * _demandsToRate - state.angularVel[AXIS_YAW];
-                float ITermGyro = computeITermGyro(error, _I, demands.yaw, state.angularVel);
-                demands.yaw = computePid(_P, demands.yaw, ITermGyro, 0, state.angularVel[2]);
+                float error = demands.yaw * _demandsToRate - state.angularVel[2];
+                float ITermGyro = computeITerm(error, demands.yaw, state.angularVel[2]);
+
+                // Reset integral on large yaw command
+                if (fabs(demands.yaw) > BIG_YAW_DEMAND) {
+                    ITermGyro = 0;
+                    _errorI = 0;
+                }
+
+                demands.yaw = computePid(demands.yaw, ITermGyro, 0, state.angularVel[2]);
 
                 // Prevent "yaw jump" during gyroYawPid correction
                 demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));

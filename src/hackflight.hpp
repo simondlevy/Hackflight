@@ -28,7 +28,6 @@
 #include "receiver.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
-#include "pidcontrollers/rate.hpp"
 #include "sensors/surfacemount/gyrometer.hpp"
 #include "sensors/surfacemount/quaternion.hpp"
 #include "sensors/mspsensor.hpp"

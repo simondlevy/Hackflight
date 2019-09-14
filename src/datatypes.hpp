@@ -22,6 +22,12 @@
 
 namespace hf {
 
+    enum {
+        AXIS_ROLL = 0,
+        AXIS_PITCH, 
+        AXIS_YAW
+    };
+
     typedef struct {
 
         float throttle;
