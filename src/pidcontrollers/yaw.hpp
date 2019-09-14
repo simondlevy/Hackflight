@@ -27,7 +27,7 @@
 
 namespace hf {
 
-    class Yaw : public PID_Controller {
+    class YawPid : public PidController {
 
         friend class Hackflight;
 
@@ -50,7 +50,7 @@ namespace hf {
                 // Avoid integral windup
                 _errorGyroI = Filter::constrainAbs(_errorGyroI + error, GYRO_WINDUP_MAX);
 
-                // Reset integral on quick gyro change or large gyroYaw command
+                // Reset integral on quick gyro change or large gyroYawPid command
                 if ((fabs(gyro[2]) > _bigGyroRate) || (fabs(rcCommand) > BIG_YAW_DEMAND)) {
                     _errorGyroI = 0;
                 }
@@ -94,7 +94,7 @@ namespace hf {
 
         public:
 
-            Yaw(float P, float I, float demandsToRate = 1.0f) 
+            YawPid(float P, float I, float demandsToRate = 1.0f) 
                 : _P(P), _I(I), _demandsToRate(demandsToRate)
             {
                 init();
@@ -109,7 +109,7 @@ namespace hf {
                 float ITermGyro = computeITermGyro(error, _I, demands.yaw, state.angularVel);
                 demands.yaw = computePid(_P, demands.yaw, ITermGyro, 0, state.angularVel[2]);
 
-                // Prevent "yaw jump" during gyroYaw correction
+                // Prevent "yaw jump" during gyroYawPid correction
                 demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));
 
                 // We've always gotta do this!
@@ -124,6 +124,6 @@ namespace hf {
                 }
             }
 
-    };  // class Yaw
+    };  // class YawPid
 
 } // namespace hf

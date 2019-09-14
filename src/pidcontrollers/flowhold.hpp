@@ -25,7 +25,7 @@
 
 namespace hf {
 
-    class FlowHold : public PID_Controller {
+    class FlowHoldPid : public PidController {
 
         friend class Hackflight;
 
@@ -69,12 +69,12 @@ namespace hf {
 
         public:
 
-        FlowHold(float P, float minAltitude=0.1) 
+        FlowHoldPid(float P, float minAltitude=0.1) 
             : _P(P), _minAltitude(minAltitude)
         {
             _previousTime = 0;
         }
 
-    };  // class FlowHold
+    };  // class FlowHoldPid
 
 } // namespace hf

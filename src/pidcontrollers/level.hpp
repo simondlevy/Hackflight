@@ -1,5 +1,5 @@
 /*
-   level.hpp : PID controller for Level mode
+   level.hpp : PID controller for LevelPid mode
 
    Copyright (c) 2018 Juan Gallostra and Simon D. Levy
 
@@ -28,7 +28,7 @@
 
 namespace hf {
 
-    class Level : public PID_Controller {
+    class LevelPid : public PidController {
 
         friend class Hackflight;
 
@@ -42,10 +42,10 @@ namespace hf {
 
         public:
 
-            Level(float rollLevelP, float pitchLevelP, float maxAngle = 10)
+            LevelPid(float rollLevelPidP, float pitchLevelPidP, float maxAngle = 10)
             {
-                PTerms[0] = rollLevelP;
-                PTerms[1] = pitchLevelP;
+                PTerms[0] = rollLevelPidP;
+                PTerms[1] = pitchLevelPidP;
                 // roll and pitch demands go between [-0.5, 0.5] so, for a
                 // given max angle, the following relation must hold true:
                 // 0.5 * _demandsToAngle = maxAngle
@@ -54,8 +54,8 @@ namespace hf {
                 _demandsToAngle = 2* Filter::deg2rad(maxAngle);
             }
 
-            Level(float rollPitchLevelP) 
-                : Level(rollPitchLevelP, rollPitchLevelP)
+            LevelPid(float rollPitchLevelPidP) 
+                : LevelPid(rollPitchLevelPidP, rollPitchLevelPidP)
             {
             }
 
@@ -77,6 +77,6 @@ namespace hf {
                 return true;
             }
 
-    };  // class Level
+    };  // class LevelPid
 
 } // namespace

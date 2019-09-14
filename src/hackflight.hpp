@@ -50,7 +50,7 @@ namespace hf {
             Debugger _debugger;
 
             // PID controllers
-            PID_Controller * _pid_controllers[256] = {NULL};
+            PidController * _pid_controllers[256] = {NULL};
             uint8_t _pid_controller_count = 0;
 
             // Mandatory sensors on the board
@@ -138,7 +138,7 @@ namespace hf {
 
                 for (uint8_t k=0; k<_pid_controller_count; ++k) {
 
-                    PID_Controller * pidController = _pid_controllers[k];
+                    PidController * pidController = _pid_controllers[k];
 
                     float currentTime = _board->getTime();
 
@@ -346,7 +346,7 @@ namespace hf {
                 add_sensor(sensor);
             }
 
-            void addPidController(PID_Controller * pidController, uint8_t auxState) 
+            void addPidController(PidController * pidController, uint8_t auxState) 
             {
                 pidController->auxState = auxState;
 

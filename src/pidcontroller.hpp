@@ -24,7 +24,7 @@
 
 namespace hf {
 
-    class PID_Controller {
+    class PidController {
 
         friend class Hackflight;
 
@@ -38,6 +38,6 @@ namespace hf {
 
         uint8_t auxState = 0;
 
-    };  // class PID_Controller
+    };  // class PidController
 
 } // namespace hf
