@@ -49,7 +49,9 @@ namespace hf {
         // Accumulated values
         float _lastError   = 0;
         float _errorI      = 0;
-
+        float _deltaError1 = 0;
+        float _deltaError2 = 0;
+ 
         // Scale factor for stick demand
         float _demandScale = 0;
 
@@ -94,13 +96,13 @@ namespace hf {
 
             // Compute D term
             float dterm = 0;
-            if (_D > 0) { // optimization (XXX should be done at compile time)
+            if (_D > 0) { // optimization
                 float deltaError = error - _lastError;
+                float deltaErrorSum = _deltaError1 + _deltaError2 + deltaError;
+                _deltaError2 = _deltaError1;
+                _deltaError1 = deltaError;
+                dterm = deltaErrorSum * _D; 
                 _lastError = error;
-                //float deltaErrorSum = _deltaError1 + _deltaError2 + deltaError;
-                //_deltaError2 = _deltaError1;
-                //_deltaError1 = deltaError;
-                //dterm = deltaErrorSum * _DConstants; 
             }
 
             return pterm + iterm + dterm;
