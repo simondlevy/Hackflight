@@ -34,7 +34,9 @@ Copyright (c) 2018 Simon D. Levy
 #include "boards/arduino/ladybug.hpp"
 #include "receivers/arduino/dsmx.hpp"
 #include "mixers/quadxcf.hpp"
+#include "pidcontrollers/acro.hpp"
 #include "pidcontrollers/level.hpp"
+#include "pidcontrollers/yaw.hpp"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
@@ -44,22 +46,20 @@ hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);
 
 hf::MixerQuadXCF mixer;
 
-hf::Rate ratePid = hf::Rate(
-        0.225f,     // Gyro pitch/roll P
-        0.001875f,  // Gyro pitch/roll I
-        0.375f,     // Gyro pitch/roll D
-        1.0625f,    // Gyro yaw P
-        0.005625f); // Gyro yaw I
+hf::AcroPid acroPid = hf::AcroPid(0.225, 0.001875, 0.375); 
 
-hf::Level level = hf::Level(0.20f);
+hf::LevelPid levelPid = hf::LevelPid(0.20);
+
+hf::YawPid yawPid = hf::YawPid(1.0625, 0.005625f);
 
 void setup(void)
 {
-    // Add Level PID for aux switch position 1
-    h.addPidController(&level, 1);
-
     // Initialize Hackflight firmware
-    h.init(new hf::Ladybug(), &rc, &mixer, &ratePid);
+    h.init(new hf::Ladybug(), &rc, &mixer);
+
+    // Add Level, Yaw PIDs for aux switch position 0
+    h.addPidController(&yawPid, 0);
+    h.addPidController(&levelPid, 0);
 }
 
 void loop(void)

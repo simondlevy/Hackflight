@@ -41,10 +41,10 @@ namespace hf {
 
         public:
 
-        YawPid(const float P, const float I, const float demandScale = 1.0f, const float D=0.0f) 
+        YawPid(const float Kp, const float Ki, const float demandScale = 1.0f, const float Kd=0.0f) 
         {
             // PI controller
-            _ratePid.init(P, I, D, demandScale);
+            _ratePid.init(Kp, Ki, Kd, demandScale);
         }
 
         bool modifyDemands(state_t & state, demands_t & demands, float currentTime)

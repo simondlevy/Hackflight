@@ -38,15 +38,15 @@ namespace hf {
             const float FEED_FORWARD = 0.5;
             
             // Simple P controller (no I or D)
-            float _P = 0;
+            float _Kp = 0;
 
             float _demandToAngle = 0;
 
         protected:
 
-            void init(const float P, const float maxAngleDegrees)
+            void init(const float Kp, const float maxAngleDegrees)
             {
-                _P = P;
+                _Kp = Kp;
 
                 // Roll and pitch demands go between [-0.5, 0.5] so, for a
                 // given max angle, the following relation must hold true: 
@@ -57,7 +57,7 @@ namespace hf {
             float compute(float demand, float angle)
             {
                 float error = demand * _demandToAngle - angle;
-                return error * _P + FEED_FORWARD * demand;
+                return error * _Kp + FEED_FORWARD * demand;
             }
 
     }; // class _AnglePid
@@ -82,8 +82,8 @@ namespace hf {
                 _pitchPid.init(pitchP, maxPitchDegrees);
             }
 
-            LevelPid(const float P, const float maxAngleDegrees = MAX_ANGLE_DEGREES) 
-                : LevelPid(P, P, maxAngleDegrees, maxAngleDegrees)
+            LevelPid(const float Kp, const float maxAngleDegrees = MAX_ANGLE_DEGREES) 
+                : LevelPid(Kp, Kp, maxAngleDegrees, maxAngleDegrees)
             {
             }
 

@@ -42,9 +42,9 @@ namespace hf {
         float _bigAngularVelocity = 0;
 
         // PID constants set in init() method
-        float _P = 0;
-        float _I = 0;
-        float _D = 0;
+        float _Kp = 0;
+        float _Ki = 0;
+        float _Kd = 0;
 
         // Accumulated values
         float _lastError   = 0;
@@ -57,12 +57,12 @@ namespace hf {
 
         public:
 
-        void init(const float P, const float I, const float D, const float demandScale) 
+        void init(const float Kp, const float Ki, const float Kd, const float demandScale) 
         {
             // Set constants
-            _P = P;
-            _I = I;
-            _D = D;
+            _Kp = Kp;
+            _Ki = Ki;
+            _Kd = Kd;
             _demandScale = demandScale;
 
             // Zero-out previous values for D term
@@ -78,7 +78,7 @@ namespace hf {
         float compute(float demand, float angularVelocity, float itermFactor)
         {
             // Compute P term
-            float pterm = (demand * _demandScale - angularVelocity) * _P;
+            float pterm = (demand * _demandScale - angularVelocity) * _Kp;
 
             // Compute error as scaled demand minus angular velocity
             float error = demand * _demandScale - angularVelocity;
@@ -92,16 +92,16 @@ namespace hf {
             }
 
             // Compute I term
-            float iterm =  _errorI * _I;
+            float iterm =  _errorI * _Ki;
 
             // Compute D term
             float dterm = 0;
-            if (_D > 0) { // optimization
+            if (_Kd > 0) { // optimization
                 float deltaError = error - _lastError;
                 float deltaErrorSum = _deltaError1 + _deltaError2 + deltaError;
                 _deltaError2 = _deltaError1;
                 _deltaError1 = deltaError;
-                dterm = deltaErrorSum * _D; 
+                dterm = deltaErrorSum * _Kd; 
                 _lastError = error;
             }
 
