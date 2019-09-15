@@ -1,5 +1,5 @@
 /*
-   althold.hpp : Altitude hold PID controller
+   Altitude hold PID controller
 
    Copyright (c) 2018 Juan Gallostra and Simon D. Levy
 

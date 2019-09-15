@@ -1,5 +1,5 @@
 /*
-   flowhold.hpp : Positon-hold PID controller using optical flow (body-frame velocity)
+   Positon-hold PID controller using optical flow (body-frame velocity)
 
    Copyright (c) 2018 Juan Gallostra and Simon D. Levy
 
