@@ -34,86 +34,32 @@ namespace hf {
 
         private: 
 
-        // Arbitrary constants
+        // Arbitrary
         const float BIG_YAW_DEMAND = 0.1f;
 
         AnglePid _anglePid;
 
-        // Arbitrary constants
-        const float WINDUP_MAX             = 6.0f;
-        const float BIG_DEGREES_PER_SECOND = 40.0f; 
-
-        // Converted to radians from degrees in constructor for efficiency
-        float _bigAngularVel = 0;
-
-        // PID constants set in constructor
-        float _P = 0; 
-        float _I = 0;
-
-        // Accumulated values
-        float _lastError = 0;
-        float _errorI    = 0;
-
-        float computeITerm(float error, float rcCommand, float angularVel)
-        {
-            // Avoid integral windup
-            _errorI = Filter::constrainAbs(_errorI + error, WINDUP_MAX);
-
-            // Reset integral on quick gyro change or large gyroYawPid command
-            if (fabs(angularVel) > _bigAngularVel) {
-                _errorI = 0;
-            }
-
-            return _errorI * _I;
-        }
-
-        float computePid(float PTerm, float ITerm, float DTerm, float angularVel)
-        {
-            PTerm = (PTerm * _demandScale - angularVel) * _P;
-
-            return PTerm + ITerm + DTerm;
-        }
-
-        protected:
-
-        float _demandScale = 0;
-
-        void resetIntegral(void)
-        {
-            _errorI = 0;
-        }
-
         public:
 
         YawPid(float P, float I, float demandScale = 1.0f) 
-            : _P(P), _I(I), _demandScale(demandScale)
         {
-            // Zero-out previous value for D term
-            _lastError = 0;
-
-            // Convert degree parameters to radians for use later
-            _bigAngularVel = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
-
-            // Initialize gyro error integral
-            resetIntegral();
+            // PI controller
+            _anglePid.init(P, I, 0, demandScale);
         }
 
         bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
         {
             (void)currentTime;
 
-            float error = demands.yaw * _demandScale - state.angularVel[2];
-
-            // I
-            float ITerm = computeITerm(error, demands.yaw, state.angularVel[2]);
+            float itermFactor = 1.0;
 
             // Reset integral on large yaw command
             if (fabs(demands.yaw) > BIG_YAW_DEMAND) {
-                ITerm = 0;
-                _errorI = 0;
+                itermFactor = 0.0;
+                _anglePid.resetIntegral();
             }
 
-            demands.yaw = computePid(demands.yaw, ITerm, 0, state.angularVel[2]);
+            demands.yaw = _anglePid.compute(demands.yaw, state.angularVel[2], itermFactor);
 
             // Prevent "yaw jump" during gyroYawPid correction
             demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));
@@ -124,10 +70,7 @@ namespace hf {
 
         virtual void updateReceiver(demands_t & demands, bool throttleIsDown) override
         {
-            // When landed, reset integral component of PID
-            if (throttleIsDown) {
-                resetIntegral();
-            }
+            _anglePid.updateReceiver(demands, throttleIsDown);
         }
 
     };  // class YawPid

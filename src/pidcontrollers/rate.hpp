@@ -34,33 +34,6 @@ namespace hf {
 
         private: 
 
-        // Arbitrary constants
-        static constexpr float WINDUP_MAX             = 6.0f;
-        static constexpr float BIG_DEGREES_PER_SECOND = 40.0f; 
-
-        // Converted to radians from degrees in constructor for efficiency
-        float _bigAngularVel = 0;
-
-        // PID constants set in constructor
-        float _P = 0;
-        float _I = 0;
-
-        // Accumulated values
-        float _lastError   = 0;
-        float _errorI      = 0;
-
-        float computeITerm(float error, float rcCommand, float angularVel)
-        {
-            // Avoid integral windup
-            _errorI = Filter::constrainAbs(_errorI + error, WINDUP_MAX);
-
-            // Reset integral on quick gyro change
-            if (fabs(angularVel) > _bigAngularVel) {
-                _errorI = 0;
-            }
-
-            return _errorI * _I;
-        }
 
         float computePid(float PTerm, float ITerm, float DTerm, float rate)
         {

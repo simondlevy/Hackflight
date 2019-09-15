@@ -39,11 +39,12 @@ namespace hf {
         static constexpr float BIG_DEGREES_PER_SECOND = 40.0f; 
 
         // Converted to radians from degrees in constructor for efficiency
-        float _bigAngularVel = 0;
+        float _bigAngularVelocity = 0;
 
-        // PID constants set in constructor
+        // PID constants set in init() method
         float _P = 0;
         float _I = 0;
+        float _D = 0;
 
         // Accumulated values
         float _lastError   = 0;
@@ -52,43 +53,57 @@ namespace hf {
         // Scale factor for stick demand
         float _demandScale = 0;
 
-        float computeITerm(float error, float rcCommand, float angularVel)
-        {
-            // Avoid integral windup
-            _errorI = Filter::constrainAbs(_errorI + error, WINDUP_MAX);
-
-            // Reset integral on quick gyro change
-            if (fabs(angularVel) > _bigAngularVel) {
-                _errorI = 0;
-            }
-
-            return _errorI * _I;
-        }
-
         public:
 
-        void init (float P, float I, float demandScale) 
+        void init(float P, float I, float D, float demandScale) 
         {
             // Set constants
             _P = P;
             _I = I;
+            _D = D;
             _demandScale = demandScale;
 
             // Zero-out previous values for D term
-            _lastError   = 0;
+            _lastError = 0;
 
             // Convert degree parameters to radians for use later
-            _bigAngularVel = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
+            _bigAngularVelocity = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
 
-            // Initialize gyro error integral
+            // Initialize error integral
             resetIntegral();
         }
 
-        float computePid(float PTerm, float ITerm, float DTerm, float rate)
+        float compute(float demand, float angularVelocity, float itermFactor)
         {
-            PTerm = (PTerm * _demandScale - rate) * _P;
+            // Compute P term
+            float pterm = (demand * _demandScale - angularVelocity) * _P;
 
-            return PTerm + ITerm + DTerm;
+            // Compute error as scaled demand minus angular velocity
+            float error = demand * _demandScale - angularVelocity;
+
+            // Avoid integral windup
+            _errorI = Filter::constrainAbs(_errorI + error, WINDUP_MAX);
+
+            // Reset integral on quick angular velocity change
+            if (fabs(angularVelocity) > _bigAngularVelocity) {
+                _errorI = 0;
+            }
+
+            // Compute I term
+            float iterm =  _errorI * _I;
+
+            // Compute D term
+            float dterm = 0;
+            if (_D > 0) { // optimization (XXX should be done at compile time)
+                float deltaError = error - _lastError;
+                _lastError = error;
+                //float deltaErrorSum = _deltaError1 + _deltaError2 + deltaError;
+                //_deltaError2 = _deltaError1;
+                //_deltaError1 = deltaError;
+                //dterm = deltaErrorSum * _DConstants; 
+            }
+
+            return pterm + iterm + dterm;
         }
 
         void resetIntegral(void)
