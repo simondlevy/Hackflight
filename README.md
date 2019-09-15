@@ -239,9 +239,6 @@ to provide the quaternion directly
 
 * <b>MockBoard</b>: Parent class for Arduino development boards; enables algorithm, sensor, and receiver prototyping
 
-* <b>BonadroneBoard</b>: Parent class for the forthcoming brushless/brushed Arduino-compatible flight controller from 
-[Bonadrone.com](https://www.bonadrone.com/en)
-
 * <b>STM32FBoard</b>: Parent class for the popular line of Cleanflight-compatible controllers based on the STM32F architecture (more info
 [here](https://github.com/simondlevy/Hackflight/tree/master/extras/stm32f_examples))
 
