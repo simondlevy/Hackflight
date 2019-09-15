@@ -46,7 +46,7 @@ namespace hf {
         protected:
 
         // proportion of cyclic demand compared to its maximum
-        float _proportionalCyclicDemand;
+        float _proportionalDemand;
 
         public:
 
@@ -61,26 +61,20 @@ namespace hf {
         {
             (void)currentTime;
 
-            _PTerm[0] = demands.roll;
-            _PTerm[1] = demands.pitch;
+            demands.roll  = _rollPid.compute(demands.roll,  state.angularVel, _proportionalDemand);
+            demands.pitch = _pitchPid.compute(demands.pitch, state.angularVel, _proportionalDemand);
 
-            // Pitch, roll use Euler angles
-            demands.roll  = computeCyclicPid(demands.roll,  state.angularVel, AXIS_ROLL);
-            demands.pitch = computeCyclicPid(demands.pitch, state.angularVel, AXIS_PITCH);
-
-            // We've always gotta do this!
             return true;
         }
 
         virtual void updateReceiver(demands_t & demands, bool throttleIsDown) override
         {
             // Compute proportion of cyclic demand compared to its maximum
-            _proportionalCyclicDemand = maxval(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
+            _proportionalDemand = maxval(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
 
-            // When landed, reset integral component of PID
-            if (throttleIsDown) {
-                resetIntegral();
-            }
+            // Check throttle-down for integral reset
+            _rollPid.updateReceiver(demands, throttleIsDown);
+            _ptichPid.updateReceiver(demands, throttleIsDown);
         }
 
     };  // class AcroPid

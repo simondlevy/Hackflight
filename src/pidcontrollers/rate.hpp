@@ -72,7 +72,7 @@ namespace hf {
             _bigAngularVelocity = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
 
             // Initialize error integral
-            resetIntegral();
+            _errorI = 0;
         }
 
         float compute(float demand, float angularVelocity, float itermFactor)
@@ -108,17 +108,17 @@ namespace hf {
             return pterm + iterm + dterm;
         }
 
-        void resetIntegral(void)
-        {
-            _errorI = 0;
-        }
-
         void updateReceiver(demands_t & demands, bool throttleIsDown)
         {
             // When landed, reset integral component of PID
             if (throttleIsDown) {
-                resetIntegral();
+                _errorI = 0; 
             }
+        }
+
+        void resetIntegral(void)
+        {
+            _errorI = 0;
         }
 
     };  // class RatePid
