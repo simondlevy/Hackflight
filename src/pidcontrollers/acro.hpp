@@ -50,8 +50,7 @@ namespace hf {
 
         public:
 
-        AcroPid(const float P, const float I, const float D,float demandsScale=1.0f) 
-            : _demandsScale(demandsScale)
+        AcroPid(const float P, const float I, const float D,float demandScale=1.0f) 
         {
             _rollPid.init(P, I, D, demandScale);
             _pitchPid.init(P, I, D, demandScale);
@@ -61,8 +60,8 @@ namespace hf {
         {
             (void)currentTime;
 
-            demands.roll  = _rollPid.compute(demands.roll,  state.angularVel, _proportionalDemand);
-            demands.pitch = _pitchPid.compute(demands.pitch, state.angularVel, _proportionalDemand);
+            demands.roll  = _rollPid.compute(demands.roll,  state.angularVel[0], _proportionalDemand);
+            demands.pitch = _pitchPid.compute(demands.pitch, state.angularVel[1], _proportionalDemand);
 
             return true;
         }
@@ -74,7 +73,7 @@ namespace hf {
 
             // Check throttle-down for integral reset
             _rollPid.updateReceiver(demands, throttleIsDown);
-            _ptichPid.updateReceiver(demands, throttleIsDown);
+            _pitchPid.updateReceiver(demands, throttleIsDown);
         }
 
     };  // class AcroPid
