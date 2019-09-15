@@ -1,5 +1,5 @@
 /*
-   acro.hpp : acro-mode PID controller 
+   Acro-mode PID controller 
 
    Copyright (c) 2018 Juan Gallostra and Simon D. Levy
 
@@ -23,6 +23,7 @@
 #include "receiver.hpp"
 #include "filters.hpp"
 #include "datatypes.hpp"
+#include "rate.hpp"
 #include "pidcontroller.hpp"
 
 namespace hf {
@@ -33,121 +34,54 @@ namespace hf {
 
         private: 
 
-            // Arbitrary constants
-            static constexpr float WINDUP_MAX             = 6.0f;
-            static constexpr float BIG_DEGREES_PER_SECOND = 40.0f; 
+        // Acro mode uses a rate controller for roll, pitch
+        RatePid _rollPid;
+        RatePid _pitchPid;
 
-            float _lastError[2];
-            float _deltaError1[2]; 
-            float _deltaError2[2];
-            float _errorI[2];
-
-            // Arrays of PID constants for pitch and roll
-            float _PConstants[2];
-            float _IConstants[2];
-            float _DConstants[2];
-
-            // Converted to radians from degrees in init() method for efficiency
-            float _bigRate = 0;
-
-            float computeITerm(float error, float rateI, float rcCommand, float rate[3], uint8_t axis)
-            {
-                // Avoid integral windup
-                _errorI[axis] = Filter::constrainAbs(_errorI[axis] + error, WINDUP_MAX);
-
-                // Reset integral on quick gyro change
-                if (fabs(rate[axis]) > _bigRate)
-                    _errorI[axis] = 0;
-
-                return (_errorI[axis] * rateI);
-            }
-
-            void init(void)
-            {
-              // Zero-out previous values for D term
-              for (uint8_t axis=0; axis<2; ++axis) {
-                  _lastError[axis] = 0;
-                  _deltaError1[axis] = 0;
-                  _deltaError2[axis] = 0;
-              }
-
-              // Convert degree parameters to radians for use later
-              _bigRate = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
-
-              // Initialize gyro error integral
-              resetIntegral();
-            }
-
-            // Computes PID for pitch or roll
-            float computeCyclicPid(float rcCommand, float rate[3], uint8_t imuAxis)
-            {
-                float error = rcCommand * _demandsScale - rate[imuAxis];
-
-                // I
-                float ITerm = computeITerm(error, _IConstants[imuAxis], rcCommand, gyro, imuAxis);
-                ITerm *= _proportionalCyclicDemand;
-
-                // D
-                float deltaError = error - _lastError[imuAxis];
-                _lastError[imuAxis] = error;
-                float deltaErrorSum = _deltaError1[imuAxis] + _deltaError2[imuAxis] + deltaError;
-                _deltaError2[imuAxis] = _deltaError1[imuAxis];
-                _deltaError1[imuAxis] = deltaError;
-                float DTerm = deltaErrorSum * _DConstants[imuAxis]; 
-
-                return computePid(_PConstants[imuAxis], _PTerm[imuAxis], ITerm, DTerm, gyro, imuAxis);
-            }
-
-            
-
-            float maxval(float a, float b)
-            {
-                return a > b ? a : b;
-            }
+        float maxval(float a, float b)
+        {
+            return a > b ? a : b;
+        }
 
         protected:
 
-            // For PTerm computation
-            float _PTerm[2]; // roll, pitch
-
-            float _demandsScale;
-
-            // proportion of cyclic demand compared to its maximum
-            float _proportionalCyclicDemand;
+        // proportion of cyclic demand compared to its maximum
+        float _proportionalCyclicDemand;
 
         public:
 
-            AcroPid(float P, float I, float D,float demandsScale=1.0f) 
-                : _demandsScale(demandsScale)
-            {
-                init();
+        AcroPid(const float P, const float I, const float D,float demandsScale=1.0f) 
+            : _demandsScale(demandsScale)
+        {
+            _rollPid.init(P, I, D, demandScale);
+            _pitchPid.init(P, I, D, demandScale);
+        }
+
+        bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
+        {
+            (void)currentTime;
+
+            _PTerm[0] = demands.roll;
+            _PTerm[1] = demands.pitch;
+
+            // Pitch, roll use Euler angles
+            demands.roll  = computeCyclicPid(demands.roll,  state.angularVel, AXIS_ROLL);
+            demands.pitch = computeCyclicPid(demands.pitch, state.angularVel, AXIS_PITCH);
+
+            // We've always gotta do this!
+            return true;
+        }
+
+        virtual void updateReceiver(demands_t & demands, bool throttleIsDown) override
+        {
+            // Compute proportion of cyclic demand compared to its maximum
+            _proportionalCyclicDemand = maxval(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
+
+            // When landed, reset integral component of PID
+            if (throttleIsDown) {
+                resetIntegral();
             }
-
-            bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
-            {
-                (void)currentTime;
-
-                _PTerm[0] = demands.roll;
-                _PTerm[1] = demands.pitch;
-
-                // Pitch, roll use Euler angles
-                demands.roll  = computeCyclicPid(demands.roll,  state.angularVel, AXIS_ROLL);
-                demands.pitch = computeCyclicPid(demands.pitch, state.angularVel, AXIS_PITCH);
-
-                // We've always gotta do this!
-                return true;
-            }
-
-            virtual void updateReceiver(demands_t & demands, bool throttleIsDown) override
-            {
-                // Compute proportion of cyclic demand compared to its maximum
-                _proportionalCyclicDemand = maxval(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
-                
-                // When landed, reset integral component of PID
-                if (throttleIsDown) {
-                    resetIntegral();
-                }
-            }
+        }
 
     };  // class AcroPid
 

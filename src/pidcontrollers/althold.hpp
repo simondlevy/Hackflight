@@ -128,12 +128,13 @@ namespace hf {
 
         public:
 
-        AltitudeHoldPid(float altHoldP, float altHoldVelP, float altHoldVelI, float altHoldVelD, float minAltitude=0.1) : _minAltitude(minAltitude)
+        AltitudeHoldPid(const float posP, const float velP, const float velI, const float velD, const float minAltitude=0.1) 
+            : _minAltitude(minAltitude)
         {
-            _posP = altHoldP; 
-            _velP = altHoldVelP; 
-            _velI = altHoldVelI; 
-            _velD = altHoldVelD; 
+            _posP = posP; 
+            _velP = velP; 
+            _velI = velI; 
+            _velD = velD; 
             resetErrors();
             _posTarget = 0;
             _previousTime = 0;

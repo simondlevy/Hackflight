@@ -57,7 +57,7 @@ namespace hf {
 
         public:
 
-        void init(float P, float I, float D, float demandScale) 
+        void init(const float P, const float I, const float D, const float demandScale) 
         {
             // Set constants
             _P = P;

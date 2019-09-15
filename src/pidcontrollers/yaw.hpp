@@ -41,7 +41,7 @@ namespace hf {
 
         public:
 
-        YawPid(float P, float I, float demandScale = 1.0f, float D=0.0f) 
+        YawPid(const float P, const float I, const float demandScale = 1.0f, const float D=0.0f) 
         {
             // PI controller
             _ratePid.init(P, I, D, demandScale);

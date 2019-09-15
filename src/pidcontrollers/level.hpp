@@ -42,10 +42,10 @@ namespace hf {
 
         public:
 
-            LevelPid(float rollLevelPidP, float pitchLevelPidP, float maxAngle = 10)
+            LevelPid(const float rollP, float const pitchP, float maxAngle = 10)
             {
-                PTerms[0] = rollLevelPidP;
-                PTerms[1] = pitchLevelPidP;
+                PTerms[0] = rollP;
+                PTerms[1] = pitchP;
                 // roll and pitch demands go between [-0.5, 0.5] so, for a
                 // given max angle, the following relation must hold true:
                 // 0.5 * _demandsToAngle = maxAngle

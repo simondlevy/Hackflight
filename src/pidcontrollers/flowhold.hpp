@@ -69,7 +69,7 @@ namespace hf {
 
         public:
 
-        FlowHoldPid(float P, float minAltitude=0.1) 
+        FlowHoldPid(const float P, const float minAltitude=0.1) 
             : _P(P), _minAltitude(minAltitude)
         {
             _previousTime = 0;
