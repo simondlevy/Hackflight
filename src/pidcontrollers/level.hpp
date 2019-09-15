@@ -1,5 +1,5 @@
 /*
-   level.hpp : PID controller for LevelPid mode
+   PID controller for Level mode
 
    Copyright (c) 2018 Juan Gallostra and Simon D. Levy
 
@@ -28,34 +28,62 @@
 
 namespace hf {
 
+    // Helper class
+    class _AnglePid {
+
+        friend class LevelPid;
+
+        private:
+
+            const float FEED_FORWARD = 0.5;
+            
+            // Simple P controller (no I or D)
+            float _P = 0;
+
+            float _demandToAngle = 0;
+
+        protected:
+
+            void init(const float P, const float maxAngleDegrees)
+            {
+                _P = P;
+
+                // Roll and pitch demands go between [-0.5, 0.5] so, for a
+                // given max angle, the following relation must hold true: 
+                // 0.5 * _demandToAngle = maxAngle.
+                _demandToAngle = 2* Filter::deg2rad(maxAngleDegrees);
+            }
+
+            float compute(float demand, float angle)
+            {
+                float error = demand * _demandToAngle - angle;
+                return error * _P + FEED_FORWARD * demand;
+            }
+
+    }; // class _AnglePid
+
     class LevelPid : public PidController {
 
         friend class Hackflight;
 
         private:
+
+            static constexpr float MAX_ANGLE_DEGREES = 10;
           
-            const float FEED_FORWARD = 0.5;
-            
-            float PTerms[2] = {0};
-            
-            float _demandsToAngle = 0;
+            _AnglePid _rollPid;
+            _AnglePid _pitchPid;
 
         public:
 
-            LevelPid(const float rollP, float const pitchP, float maxAngle = 10)
+            LevelPid(const float rollP, float const pitchP, 
+                    float maxRollDegrees = MAX_ANGLE_DEGREES, float maxPitchDegrees = MAX_ANGLE_DEGREES)
             {
-                PTerms[0] = rollP;
-                PTerms[1] = pitchP;
-                // roll and pitch demands go between [-0.5, 0.5] so, for a
-                // given max angle, the following relation must hold true:
-                // 0.5 * _demandsToAngle = maxAngle
-                // Since we work in radians:
-                // _demandsToAngle = deg2rad(maxAngle) * 2
-                _demandsToAngle = 2* Filter::deg2rad(maxAngle);
+                _rollPid.init(rollP, maxRollDegrees);
+                _pitchPid.init(pitchP, maxPitchDegrees);
             }
 
-            LevelPid(float rollPitchLevelPidP) 
-                : LevelPid(rollPitchLevelPidP, rollPitchLevelPidP)
+            LevelPid(const float P, const float maxAngleDegrees = MAX_ANGLE_DEGREES) 
+                : LevelPid(P, P, maxAngleDegrees, maxAngleDegrees)
             {
             }
 
@@ -63,17 +91,9 @@ namespace hf {
             {
                 (void)currentTime;
 
-                float _demands[2] = {demands.roll, demands.pitch};
-                for (int axis=0; axis<2; ++axis)
-                {
-                  float error = _demands[axis] * _demandsToAngle - state.rotation[axis];
-                  _demands[axis] = error * PTerms[axis] + FEED_FORWARD * _demands[axis];
-                }
-                
-                demands.roll = _demands[0];
-                demands.pitch = _demands[1];
+                demands.roll = _rollPid.compute(demands.roll, state.rotation[0]);
+                demands.pitch = _pitchPid.compute(demands.pitch, state.rotation[1]);
 
-                // We've always gotta do this!
                 return true;
             }
 
