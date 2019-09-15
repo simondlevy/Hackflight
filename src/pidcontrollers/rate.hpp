@@ -1,5 +1,5 @@
 /*
-   Common support for pitch, roll, yaw PID controllers
+   PID controller support for pitch, roll in acro mode
 
    Supports yaw stabilization and acro mode
 
@@ -49,9 +49,6 @@ namespace hf {
         float _lastError   = 0;
         float _errorI      = 0;
 
-        // Scale factor for stick demand
-        float _demandScale = 0;
-
         float computeITerm(float error, float rcCommand, float angularVel)
         {
             // Avoid integral windup
@@ -65,15 +62,27 @@ namespace hf {
             return _errorI * _I;
         }
 
+        float computePid(float PTerm, float ITerm, float DTerm, float rate)
+        {
+            PTerm = (PTerm * _demandsScale - rate) * _P;
+
+            return PTerm + ITerm + DTerm;
+        }
+
+        protected:
+
+        float _demandsScale;
+
+        void resetIntegral(void)
+        {
+            _errorI = 0;
+        }
+
         public:
 
-        void init (float P, float I, float demandScale) 
+        AnglePid(float P, float I, float demandsScale=1.0f) 
+            : _P(P), _I(I), _demandsScale(demandsScale)
         {
-            // Set constants
-            _P = P;
-            _I = I;
-            _demandScale = demandScale;
-
             // Zero-out previous values for D term
             _lastError   = 0;
 
@@ -82,26 +91,6 @@ namespace hf {
 
             // Initialize gyro error integral
             resetIntegral();
-        }
-
-        float computePid(float PTerm, float ITerm, float DTerm, float rate)
-        {
-            PTerm = (PTerm * _demandScale - rate) * _P;
-
-            return PTerm + ITerm + DTerm;
-        }
-
-        void resetIntegral(void)
-        {
-            _errorI = 0;
-        }
-
-        void updateReceiver(demands_t & demands, bool throttleIsDown)
-        {
-            // When landed, reset integral component of PID
-            if (throttleIsDown) {
-                resetIntegral();
-            }
         }
 
     };  // class AnglePid

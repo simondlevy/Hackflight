@@ -50,7 +50,7 @@ namespace hf {
             // Converted to radians from degrees in init() method for efficiency
             float _bigRate = 0;
 
-            float computeITermGyro(float error, float rateI, float rcCommand, float rate[3], uint8_t axis)
+            float computeITerm(float error, float rateI, float rcCommand, float rate[3], uint8_t axis)
             {
                 // Avoid integral windup
                 _errorI[axis] = Filter::constrainAbs(_errorI[axis] + error, WINDUP_MAX);
@@ -84,7 +84,7 @@ namespace hf {
                 float error = rcCommand * _demandsScale - rate[imuAxis];
 
                 // I
-                float ITerm = computeITermGyro(error, _IConstants[imuAxis], rcCommand, gyro, imuAxis);
+                float ITerm = computeITerm(error, _IConstants[imuAxis], rcCommand, gyro, imuAxis);
                 ITerm *= _proportionalCyclicDemand;
 
                 // D
@@ -99,12 +99,6 @@ namespace hf {
             }
 
             
-            float computePid(float rateP, float PTerm, float ITerm, float DTerm, float rate[3], uint8_t axis)
-            {
-                PTerm = (PTerm * _demandsScale - rate[axis]) * rateP;
-
-                return PTerm + ITerm + DTerm;
-            }
 
             float maxval(float a, float b)
             {
@@ -121,26 +115,12 @@ namespace hf {
             // proportion of cyclic demand compared to its maximum
             float _proportionalCyclicDemand;
 
-            void resetIntegral(void)
-            {
-                _errorI[AXIS_ROLL] = 0;
-                _errorI[AXIS_PITCH] = 0;
-            }
-
         public:
 
-            AcroPid(float P, float I, float D,float demandsScale=1.0f) :
-
-                _demandsScale(demandsScale)
+            AcroPid(float P, float I, float D,float demandsScale=1.0f) 
+                : _demandsScale(demandsScale)
             {
                 init();
-            
-                _PConstants[0] = P;
-                _PConstants[1] = P;
-                _IConstants[0] = I;
-                _IConstants[1] = I;
-                _DConstants[0] = D;
-                _DConstants[1] = D;
             }
 
             bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
