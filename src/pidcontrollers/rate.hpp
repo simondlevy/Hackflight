@@ -1,5 +1,5 @@
 /*
-   PID controller support for pitch, roll in acro mode
+   Common support for rate-based pitch, roll, yaw PID controllers
 
    Supports yaw stabilization and acro mode
 
@@ -28,44 +28,99 @@
 
 namespace hf {
 
-    class AnglePid {
+    class RatePid {
 
         friend class Hackflight;
 
         private: 
 
+        // Arbitrary constants
+        static constexpr float WINDUP_MAX             = 6.0f;
+        static constexpr float BIG_DEGREES_PER_SECOND = 40.0f; 
 
-        float computePid(float PTerm, float ITerm, float DTerm, float rate)
+        // Converted to radians from degrees in constructor for efficiency
+        float _bigAngularVelocity = 0;
+
+        // PID constants set in init() method
+        float _P = 0;
+        float _I = 0;
+        float _D = 0;
+
+        // Accumulated values
+        float _lastError   = 0;
+        float _errorI      = 0;
+        float _deltaError1 = 0;
+        float _deltaError2 = 0;
+ 
+        // Scale factor for stick demand
+        float _demandScale = 0;
+
+        public:
+
+        void init(float P, float I, float D, float demandScale) 
         {
-            PTerm = (PTerm * _demandsScale - rate) * _P;
+            // Set constants
+            _P = P;
+            _I = I;
+            _D = D;
+            _demandScale = demandScale;
 
-            return PTerm + ITerm + DTerm;
+            // Zero-out previous values for D term
+            _lastError = 0;
+
+            // Convert degree parameters to radians for use later
+            _bigAngularVelocity = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
+
+            // Initialize error integral
+            resetIntegral();
         }
 
-        protected:
+        float compute(float demand, float angularVelocity, float itermFactor)
+        {
+            // Compute P term
+            float pterm = (demand * _demandScale - angularVelocity) * _P;
 
-        float _demandsScale;
+            // Compute error as scaled demand minus angular velocity
+            float error = demand * _demandScale - angularVelocity;
+
+            // Avoid integral windup
+            _errorI = Filter::constrainAbs(_errorI + error, WINDUP_MAX);
+
+            // Reset integral on quick angular velocity change
+            if (fabs(angularVelocity) > _bigAngularVelocity) {
+                _errorI = 0;
+            }
+
+            // Compute I term
+            float iterm =  _errorI * _I;
+
+            // Compute D term
+            float dterm = 0;
+            if (_D > 0) { // optimization
+                float deltaError = error - _lastError;
+                float deltaErrorSum = _deltaError1 + _deltaError2 + deltaError;
+                _deltaError2 = _deltaError1;
+                _deltaError1 = deltaError;
+                dterm = deltaErrorSum * _D; 
+                _lastError = error;
+            }
+
+            return pterm + iterm + dterm;
+        }
 
         void resetIntegral(void)
         {
             _errorI = 0;
         }
 
-        public:
-
-        AnglePid(float P, float I, float demandsScale=1.0f) 
-            : _P(P), _I(I), _demandsScale(demandsScale)
+        void updateReceiver(demands_t & demands, bool throttleIsDown)
         {
-            // Zero-out previous values for D term
-            _lastError   = 0;
-
-            // Convert degree parameters to radians for use later
-            _bigAngularVel = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
-
-            // Initialize gyro error integral
-            resetIntegral();
+            // When landed, reset integral component of PID
+            if (throttleIsDown) {
+                resetIntegral();
+            }
         }
 
-    };  // class AnglePid
+    };  // class RatePid
 
 } // namespace hf
