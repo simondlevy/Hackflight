@@ -41,10 +41,10 @@ namespace hf {
 
         public:
 
-        YawPid(float P, float I, float demandScale = 1.0f) 
+        YawPid(float P, float I, float demandScale = 1.0f, float D=0.0f) 
         {
             // PI controller
-            _anglePid.init(P, I, 0, demandScale);
+            _anglePid.init(P, I, D, demandScale);
         }
 
         bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
