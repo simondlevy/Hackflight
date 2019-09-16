@@ -36,7 +36,7 @@ namespace hf {
 
         virtual void updateReceiver(demands_t & demands, bool throttleIsDown) { (void)demands; (void)throttleIsDown; }
 
-        uint8_t auxState = 0;
+        int8_t auxState = 0;
 
     };  // class PidController
 

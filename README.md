@@ -196,11 +196,11 @@ As with sensors, you can sub-class the <tt>PID_Controller</tt> class and call
 [Hackflight::addPidController()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L337-L342)
 to ensure that your PID controller is called in the
 [Hackflight::runPidControllers()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L122-L143) method.
-The <tt>addPidController()</tt> method requires you to to specify the auxiliary-switch state in which the specified PID controller will be active.
-For example, you can specify that a Level PID controller will be active in switch state 1 (or higher) and an
-[AltitudeHold](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/althold.hpp)
-PID controller will be active in switch state 2, as we've done in the previously-cited
-[example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_AltHold/DSMX_AltHold.ino#L99-L103).
+The <tt>addPidController()</tt> method allows you to to specify the
+auxiliary-switch state in which the specified PID controller will be active.
+For example, you can specify that an Acro controller will be active in switch
+state 0 and a Level controller in state 1.  If you leave out the switch state,
+the PID controller will be active in all switch states.
 
 As shown in the figure below, there are already PID controllers for Level (beginner) and Acro (racing) mode, as well
 as a PID controller for yaw.
