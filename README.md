@@ -211,7 +211,7 @@ common set of constants for simplicity.  The Yaw PID controller uses a single
 rate-based controller.  A typical firmware sketch would use a Level controller
 and Yaw controller, or an Acro controller and Yaw controller for the more
 adventurous.  
-<p align="center"> <img src="extras/media/pidcontrollers.png" width=400>
+<p align="center"> <img src="extras/media/pidcontrollers.png" width=600>
 </p>
 
 If you're mathematically-minded, you can think of a PID Controller as a function from a (<i>State</i>, <i>Demands</i>) pair to <i>Demands</i>:
