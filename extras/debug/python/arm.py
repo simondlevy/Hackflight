@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-
 '''
-arm.py : Test script for MSP arming of board
+Test script for MSP arming of board
 
 Copyright (C) Simon D. Levy, Pep Marti, Juan Gallostra Acin 2018
 

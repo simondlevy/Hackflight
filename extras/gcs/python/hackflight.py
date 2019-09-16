@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-
 '''
-hackflight.py : starter script for  Hackflight GCS
+Main script for  Hackflight GCS
 
 Copyright (C) Simon D. Levy 2016
 

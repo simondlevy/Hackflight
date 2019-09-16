@@ -1,5 +1,5 @@
 /*
-   realboard.hpp : Board subclass for real (hardware) boards
+   Board subclass for real (hardware) boards
 
    Copyright (c) 2018 Simon D. Levy
 

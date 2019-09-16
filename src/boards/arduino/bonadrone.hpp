@@ -1,5 +1,5 @@
 /*
-   bonadrone.hpp : Implementation of Hackflight Board routines for Bonadrone Flight Controller
+   Implementation of Hackflight Board routines for Bonadrone Flight Controller
 
    Copyright (c) 2018 Juan Gallostra Acin, Simon D. Levy, Pep Martí Saumell
 

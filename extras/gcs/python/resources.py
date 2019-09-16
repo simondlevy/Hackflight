@@ -1,5 +1,5 @@
 '''
-resources.py : Resource access to support pytinstall
+Resource access to support for GCS
 
 Copyright (C) Simon D. Levy 2018
 

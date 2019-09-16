@@ -1,5 +1,5 @@
 /*
-   arduino.hpp : Superclass for Arduino-based flight controllers
+   Superclass for Arduino-based flight controllers
 
    Copyright (c) 2018 Simon D. Levy
 

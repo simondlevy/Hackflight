@@ -1,5 +1,5 @@
 /*
-   pidcontroller.hpp : Abstract class for PID controllers
+   Abstract class for PID controllers
 
    Copyright (c) 2018 Simon D. Levy
 

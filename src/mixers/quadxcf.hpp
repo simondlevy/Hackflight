@@ -1,6 +1,5 @@
 /*
-   quadxcf.hpp : Mixer subclass for X-configuration quadcopters following the
-   Cleanflight numbering convention:
+   Mixer subclass for X-configuration quadcopters following the Cleanflight numbering convention:
 
     4cw   2ccw
        \ /

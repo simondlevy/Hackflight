@@ -1,5 +1,5 @@
 /*
-   ESP32Feather.ino : Hackflight sketch for ESP32 Feather
+   Hackflight sketch for ESP32 Feather
 
    Copyright (c) 2019 Simon D. Levy
 

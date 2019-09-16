@@ -1,5 +1,5 @@
 /*
-   rangefinder.hpp : Support for rangefinder sensors (sonar, time-of-flight)
+   Support for rangefinder sensors (sonar, time-of-flight)
 
    Copyright (c) 2018 Simon D. Levy
 

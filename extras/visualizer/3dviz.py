@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-3dviz.py: ROS rviz script for visualizing quadcopter state in 3D space
+ROS rviz script for visualizing quadcopter state in 3D space
 
 You should run this with a shell script:
 

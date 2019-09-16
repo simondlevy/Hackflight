@@ -1,5 +1,5 @@
 /*
-   datatypes.hpp : Datatype declarations
+   Datatype declarations
 
    Copyright (c) 2018 Simon D. Levy
 

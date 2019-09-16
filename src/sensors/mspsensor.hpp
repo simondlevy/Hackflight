@@ -1,5 +1,5 @@
 /*
-   mspsensor.hpp : Abstract class for sensors using MSP
+   Abstract class for sensors using MSP
 
    Copyright (c) 2018 Simon D. Levy
 

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-
 '''
-disarm.py : Test script for MSP disarming of board
+Test script for MSP disarming of board
 
 Copyright (C) Simon D. Levy, Pep Marti, Juan Gallostra Acin 2018
 

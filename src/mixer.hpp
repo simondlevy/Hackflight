@@ -1,5 +1,5 @@
 /*
-   mixer.hpp : Mixer class header
+   Mixer class
 
    Copyright (c) 2018 Simon D. Levy
 

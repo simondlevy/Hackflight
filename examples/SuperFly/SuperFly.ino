@@ -1,5 +1,5 @@
 /*
-   Superfly.ino : Hackflight sketch for SuperFly ESP8266 Hackable Flight Controller
+   Hackflight sketch for SuperFly ESP8266 Hackable Flight Controller
  
    Additional libraries needed:
 

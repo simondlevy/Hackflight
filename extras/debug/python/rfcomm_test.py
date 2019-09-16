@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-
 '''
-rfcomm_test.py Simple test to send characters to flight controller over Bluetooth
+Simple test to send characters to flight controller over Bluetooth
 
 Copyright (C) Simon D. Levy 2018
 

@@ -1,5 +1,5 @@
 /*
-   motor.hpp : abstract parent class for running motors on Arduino
+   Abstract parent class for running motors on Arduino
 
    Copyright (c) 2018 Simon D. Levy
 

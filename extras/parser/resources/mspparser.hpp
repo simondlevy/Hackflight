@@ -1,5 +1,5 @@
 /*
-   mspparser.hpp: header-only implementation of MSP parsing routines
+   MSP parsing routines
 
    Auto-generated code: DO NOT EDIT!
 

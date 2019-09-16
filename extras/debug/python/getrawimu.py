@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-
 '''
-getrawsimu.py Uses MSPPG to request and handle raw (integer) IMU messages from flight controller
+Uses MSPPG to request and handle raw (integer) IMU messages from flight controller
 
 Copyright (C) Simon D. Levy 2019
 

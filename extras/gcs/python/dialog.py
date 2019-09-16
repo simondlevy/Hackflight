@@ -1,5 +1,5 @@
 '''
-dialog.py : generic dialog code for Hackflight GCS
+Generic dialog code for Hackflight GCS
 
 Copyright (C) Simon D. Levy 2016
 

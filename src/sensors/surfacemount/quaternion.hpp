@@ -1,5 +1,5 @@
 /*
-   quaternion.hpp : Support for treating quaternion as a sensor
+   Support for treating quaternion as a sensor
    
    Supports IMUs like EM7180 SENtral Sensor Fusion solution, where 
    quaternion is computed in hardware, and simulation platforms like

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-
 '''
-comms.py : serial communications support for  Hackflight GCS
+Serial communications support for  Hackflight GCS
 
 Copyright (C) Simon D. Levy 2016
 

@@ -1,5 +1,5 @@
 /*
-   ThingDev.ino : Hackflight sketch for SparkfunESP8266 ThingDev
+   Hackflight sketch for SparkfunESP8266 ThingDev
 
    Solely for receiver prototyping
  

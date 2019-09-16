@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-
 '''
-imu.py : class for displaying vehicle orientation
+Class or displaying vehicle orientation
 
 Copyright (C) Alec Singer and Simon D. Levy 2016
 

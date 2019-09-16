@@ -1,5 +1,5 @@
 /*
-   sensor.hpp : Abstract class for sensors
+   Abstract class for sensors
 
    Copyright (c) 2018 Simon D. Levy
 

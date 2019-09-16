@@ -1,5 +1,5 @@
 '''
-vehicle.py : generates vehicle image for setup
+Generates vehicle image for IMU visualization in GCS
 
 Copyright (C) Alec Singer
 

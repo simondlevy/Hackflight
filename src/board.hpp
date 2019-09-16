@@ -1,5 +1,5 @@
 /*
-   board.hpp : class header for board-specific routines
+   Class header for board-specific routines
 
    Copyright (c) 2018 Simon D. Levy
 

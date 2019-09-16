@@ -1,5 +1,5 @@
 /*
-   mock.hpp : "Mock" receiver subclass for prototyping
+   "Mock" receiver subclass for prototyping
 
    This file is part of Hackflight.
 

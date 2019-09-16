@@ -1,8 +1,7 @@
 /*
-   hackflight.hpp : general header, plus init and update methods
+   Hackflight core algorithm
 
-   Copyright (c) 2018 Simon D. Levy
-   Contributed to by Alec Singer
+   Copyright (c) 2018 Simon D. Levy, Alec Singer
 
    This file is part of Hackflight.
 

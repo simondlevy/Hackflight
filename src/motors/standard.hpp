@@ -1,6 +1,5 @@
 /*
-   standard.hpp : Arduino code for brushless motor running on
-   standard ESC
+   Arduino code for brushless motor running on standard ESC
 
    Copyright (c) 2018 Juan Gallostra Acin, Simon D. Levy, Pep Martí Saumell
 
