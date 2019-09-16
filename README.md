@@ -206,7 +206,7 @@ As shown in the figure below, there are already PID controllers for Level (begin
 as a PID controller for yaw.
 (For an introduction to Acro and Level modes, read this [blog post](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).)  The Acro-mode PID controllers uses a separate rate-based controller for roll and yaw, but also supports
 using the same PID values for both.  In a likewise manner, the Level-mode PID controller uses a separate
-angle-based controller for these two axes, but allows you them to share a
+angle-based controller for these two axes, but allows them to share a
 common set of constants for simplicity.  The Yaw PID controller uses a single
 rate-based controller.  A typical firmware sketch would use a Level controller
 and Yaw controller, or an Acro controller and Yaw controller for the more
