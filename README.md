@@ -186,14 +186,11 @@ code will be called by the [checkOptionalSensors](https://github.com/simondlevy/
 ### PID Controllers
 
 Like sensors, PID controllers in Hackflight are subclasses of an abstract
-[class](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp#L27-L39), 
-whose <tt>modifyDemands()</tt> method takes the current state and demands, and modifies the demands based on the
-state.  (This class also provides an optional <tt>shouldFlashLed()</tt> method, to help you see when the PID
-controller is active.)  The Hackflight class [init](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L287) method
-requires you to provide a [Rate](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/rate.hpp) PID controller; however
-(especially for beginners), it is advisable to add a [Level](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/level.hpp) 
-PID controller as well, as shown in this [example](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX/DSMX.ino#L47-L62).
-For an introduction to Rate (a.k.a. Acro) and Level modes, read this [blog post](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).
+[class](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp#L27-L39),
+whose <tt>modifyDemands()</tt> method takes the current state and demands, and
+modifies the demands based on the state.  (This class also provides an optional
+<tt>shouldFlashLed()</tt> method, to help you see when the PID controller is
+active.)  
 
 As with sensors, you can sub-class the <tt>PID_Controller</tt> class and call
 [Hackflight::addPidController()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L337-L342)
@@ -205,8 +202,16 @@ For example, you can specify that a Level PID controller will be active in switc
 PID controller will be active in switch state 2, as we've done in the previously-cited
 [example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_AltHold/DSMX_AltHold.ino#L99-L103).
 
-<p align="center"> 
-<img src="extras/media/pidcontrollers2.png" width=400>
+As shown in the figure below, there are already PID controllers for Level (beginner) and Acro (racing) mode, as well
+as a PID controller for yaw.
+(For an introduction to Acro and Level modes, read this [blog post](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).)  The Acro-mode PID controllers uses a separate rate-based controller for roll and yaw, but also supports
+using the same PID values for both.  In a likewise manner, the Level-mode PID controller uses a separate
+angle-based controller for these two axes, but allows you them to share a
+common set of constants for simplicity.  The Yaw PID controller uses a single
+rate-based controller.  A typical firmware sketch would use a Level controller
+and Yaw controller, or an Acro controller and Yaw controller for the more
+adventurous.  
+<p align="center"> <img src="extras/media/pidcontrollers.png" width=400>
 </p>
 
 If you're mathematically-minded, you can think of a PID Controller as a function from a (<i>State</i>, <i>Demands</i>) pair to <i>Demands</i>:
