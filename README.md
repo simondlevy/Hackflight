@@ -248,7 +248,7 @@ to provide the quaternion directly
 [here](https://github.com/simondlevy/Hackflight/tree/master/extras/stm32f_examples))
 
 <p align="center"> 
-<img src="extras/media/boards7.png" width=800>
+<img src="extras/media/boards.png" width=800>
 </p>
 
 ### Control Flow Diagrams
