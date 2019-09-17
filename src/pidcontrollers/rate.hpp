@@ -1,7 +1,5 @@
 /*
-   Common support for rate-based pitch, roll, yaw PID controllers
-
-   Supports yaw stabilization and acro mode
+   Rate-mode PID controller 
 
    Copyright (c) 2018 Juan Gallostra and Simon D. Levy
 
@@ -18,107 +16,64 @@
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
-   */
+ */
 
 #pragma once
 
 #include "receiver.hpp"
 #include "filters.hpp"
 #include "datatypes.hpp"
+#include "ratebased.hpp"
+#include "pidcontroller.hpp"
 
 namespace hf {
 
-    class RatePid {
+    class RatePid : public PidController {
 
         friend class Hackflight;
 
         private: 
 
-        // Arbitrary constants
-        static constexpr float WINDUP_MAX             = 6.0f;
-        static constexpr float BIG_DEGREES_PER_SECOND = 40.0f; 
+        // Rate mode uses a rate controller for roll, pitch
+        RateBased _rollPid;
+        RateBased _pitchPid;
 
-        // Converted to radians from degrees in constructor for efficiency
-        float _bigAngularVelocity = 0;
+        float maxval(float a, float b)
+        {
+            return a > b ? a : b;
+        }
 
-        // PID constants set in init() method
-        float _Kp = 0;
-        float _Ki = 0;
-        float _Kd = 0;
+        protected:
 
-        // Accumulated values
-        float _lastError   = 0;
-        float _errorI      = 0;
-        float _deltaError1 = 0;
-        float _deltaError2 = 0;
- 
-        // Scale factor for stick demand
-        float _demandScale = 0;
+        // proportion of cyclic demand compared to its maximum
+        float _proportionalDemand;
 
         public:
 
-        void init(const float Kp, const float Ki, const float Kd, const float demandScale) 
+        RatePid(const float P, const float I, const float D,float demandScale=1.0f) 
         {
-            // Set constants
-            _Kp = Kp;
-            _Ki = Ki;
-            _Kd = Kd;
-            _demandScale = demandScale;
-
-            // Zero-out previous values for D term
-            _lastError = 0;
-
-            // Convert degree parameters to radians for use later
-            _bigAngularVelocity = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
-
-            // Initialize error integral
-            _errorI = 0;
+            _rollPid.init(P, I, D, demandScale);
+            _pitchPid.init(P, I, D, demandScale);
         }
 
-        float compute(float demand, float angularVelocity, float itermFactor)
+        bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
         {
-            // Compute P term
-            float pterm = (demand * _demandScale - angularVelocity) * _Kp;
+            (void)currentTime;
 
-            // Compute error as scaled demand minus angular velocity
-            float error = demand * _demandScale - angularVelocity;
+            demands.roll  = _rollPid.compute(demands.roll,  state.angularVel[0], _proportionalDemand);
+            demands.pitch = _pitchPid.compute(demands.pitch, state.angularVel[1], _proportionalDemand);
 
-            // Avoid integral windup
-            _errorI = Filter::constrainAbs(_errorI + error, WINDUP_MAX);
-
-            // Reset integral on quick angular velocity change
-            if (fabs(angularVelocity) > _bigAngularVelocity) {
-                _errorI = 0;
-            }
-
-            // Compute I term
-            float iterm =  _errorI * _Ki;
-
-            // Compute D term
-            float dterm = 0;
-            if (_Kd > 0) { // optimization
-                float deltaError = error - _lastError;
-                float deltaErrorSum = _deltaError1 + _deltaError2 + deltaError;
-                _deltaError2 = _deltaError1;
-                _deltaError1 = deltaError;
-                dterm = deltaErrorSum * _Kd; 
-                _lastError = error;
-            }
-
-            return pterm + iterm + dterm;
+            return true;
         }
 
-        void updateReceiver(demands_t & demands, bool throttleIsDown)
+        virtual void updateReceiver(demands_t & demands, bool throttleIsDown) override
         {
-            // When landed, reset integral component of PID
-            if (throttleIsDown) {
-                _errorI = 0; 
-            }
-        }
+            // Compute proportion of cyclic demand compared to its maximum
+            _proportionalDemand = maxval(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
 
-        void resetIntegral(void)
-        {
-            _errorI = 0;
+            // Check throttle-down for integral reset
+            _rollPid.updateReceiver(demands, throttleIsDown);
+            _pitchPid.updateReceiver(demands, throttleIsDown);
         }
 
     };  // class RatePid

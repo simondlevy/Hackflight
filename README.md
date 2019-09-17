@@ -202,9 +202,8 @@ For example, you can specify that an Acro controller will be active in switch
 state 0 and a Level controller in state 1.  If you leave out the switch state,
 the PID controller will be active in all switch states.
 
-As shown in the figure below, there are already PID controllers for Level (beginner) and Acro (racing) mode, as well
-as a PID controller for yaw.
-(For an introduction to Acro and Level modes, read this [blog post](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).)  The Acro-mode PID controllers uses a separate rate-based controller for roll and yaw, but also supports
+As shown in the figure below, there are already PID controllers supporting the basic flight modes.
+(For an introduction to flight modes, read this [blog post](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).)  The Acro-mode PID controllers uses a separate rate-based controller for roll and yaw, but also supports
 using the same PID values for both.  In a likewise manner, the Level-mode PID controller uses a separate
 angle-based controller for these two axes, but allows them to share a
 common set of constants for simplicity.  The Yaw PID controller uses a single

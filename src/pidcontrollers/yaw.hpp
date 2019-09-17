@@ -23,7 +23,7 @@
 #include "receiver.hpp"
 #include "filters.hpp"
 #include "datatypes.hpp"
-#include "rate.hpp"
+#include "ratebased.hpp"
 #include "pidcontroller.hpp"
 
 namespace hf {
@@ -37,7 +37,7 @@ namespace hf {
         // Arbitrary
         const float BIG_YAW_DEMAND = 0.1f;
 
-        RatePid _ratePid;
+        RateBased _ratePid;
 
         public:
 

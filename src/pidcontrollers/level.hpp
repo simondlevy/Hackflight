@@ -25,42 +25,9 @@
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
 #include "filters.hpp"
+#include "anglebased.hpp"
 
 namespace hf {
-
-    // Helper class
-    class _AnglePid {
-
-        friend class LevelPid;
-
-        private:
-
-            const float FEED_FORWARD = 0.5;
-            
-            // Simple P controller (no I or D)
-            float _Kp = 0;
-
-            float _demandToAngle = 0;
-
-        protected:
-
-            void init(const float Kp, const float maxAngleDegrees)
-            {
-                _Kp = Kp;
-
-                // Roll and pitch demands go between [-0.5, 0.5] so, for a
-                // given max angle, the following relation must hold true: 
-                // 0.5 * _demandToAngle = maxAngle.
-                _demandToAngle = 2* Filter::deg2rad(maxAngleDegrees);
-            }
-
-            float compute(float demand, float angle)
-            {
-                float error = demand * _demandToAngle - angle;
-                return error * _Kp + FEED_FORWARD * demand;
-            }
-
-    }; // class _AnglePid
 
     class LevelPid : public PidController {
 
@@ -70,8 +37,8 @@ namespace hf {
 
             static constexpr float MAX_ANGLE_DEGREES = 10;
           
-            _AnglePid _rollPid;
-            _AnglePid _pitchPid;
+            AngleBased _rollPid;
+            AngleBased _pitchPid;
 
         public:
 
