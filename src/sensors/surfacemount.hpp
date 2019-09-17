@@ -1,5 +1,5 @@
 /*
-   surfacemount.hpp : Abstract class for surface-mounted sensors (IMU, barometer)
+   Abstract class for surface-mounted sensors (IMU, barometer)
 
    Copyright (c) 2018 Simon D. Levy
    

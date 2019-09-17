@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-
 '''
-loiterboard_test.py Simple test to check SET_RANGE_AND_FLOW messages sent from Butterfly loiter-board
+Simple test to check SET_RANGE_AND_FLOW messages sent from Butterfly loiter-board
 
 Copyright (C) Simon D. Levy 2018
 

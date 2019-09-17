@@ -1,6 +1,5 @@
 /*
-   quadxap.hpp : Mixer subclass for X-configuration quadcopters following the
-   ArduPilot numbering convention:
+   Mixer subclass for X-configuration quadcopters following the ArduPilot numbering convention:
 
     3cw   1ccw
        \ /

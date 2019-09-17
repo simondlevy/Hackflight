@@ -1,5 +1,5 @@
 /*
-   linalg.hpp : Simple linear algebra support
+   Simple linear algebra support
    
    Copyright (c) 2018 Simon D. Levy
 

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-
 '''
-messages.py : message-display class
+Message-display class for GCS
 
 Copyright (C) Simon D. Levy 2016
 

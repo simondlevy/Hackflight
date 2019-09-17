@@ -1,5 +1,5 @@
 /*
-   accelerometer.hpp : Support for accelerometer
+   Support for accelerometer
 
    Hackflight requires your Board implementation to provide the
    quaternion directly, but access to accelerometer could be useful

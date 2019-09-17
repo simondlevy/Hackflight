@@ -1,5 +1,5 @@
 /*
-   pidcontroller.hpp : Abstract class for PID controllers
+   Abstract class for PID controllers
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -24,7 +24,7 @@
 
 namespace hf {
 
-    class PID_Controller {
+    class PidController {
 
         friend class Hackflight;
 
@@ -34,8 +34,10 @@ namespace hf {
 
         virtual bool shouldFlashLed(void) { return false; }
 
-        uint8_t auxState = 0;
+        virtual void updateReceiver(demands_t & demands, bool throttleIsDown) { (void)demands; (void)throttleIsDown; }
 
-    };  // class PID_Controller
+        int8_t auxState = 0;
+
+    };  // class PidController
 
 } // namespace hf

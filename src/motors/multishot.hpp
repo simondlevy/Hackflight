@@ -1,6 +1,5 @@
 /*
-   mulitshot.hpp : Arduino code for brushless motors running on
-   MultiShot ESC
+   Arduino code for brushless motors running on MultiShot ESC
 
    Copyright (c) 2018 Juan Gallostra Acin, Simon D. Levy, Pep Martí Saumell
 

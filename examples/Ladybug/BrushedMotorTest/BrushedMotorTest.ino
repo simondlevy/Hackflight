@@ -1,6 +1,6 @@
 
 /*
-   BrushedMotorTest.ino : Arduino sketch to test motors on Ladybug Flight Controller
+   Arduino sketch to test motors on Ladybug Flight Controller
 
    DID YOU REMEMOVE THE PROPELLERS FIRST?
 

@@ -1,7 +1,6 @@
 #!/usr/bin/python3
-
 '''
-msppg.py Multiwii Serial Protocol Parser Generator
+Multiwii Serial Protocol Parser Generator
 
 Copyright (C) Rob Jones, Alec Singer, Chris Lavin, Blake Liebling, Simon D. Levy 2015
 

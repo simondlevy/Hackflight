@@ -1,5 +1,5 @@
 /*
-   lpf_opticalflow.hpp : Support for PMW3901 optical-flow sensor with low-pass filter
+   Support for PMW3901 optical-flow sensor with low-pass filter
 
 
    Copyright (c) 2018 Simon D. Levy

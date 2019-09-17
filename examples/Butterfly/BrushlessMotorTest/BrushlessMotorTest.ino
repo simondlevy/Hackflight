@@ -1,5 +1,5 @@
 /*
-   BrushlessMotorTest.ino : Arduino sketch to test motors on Butterfly flight Controller
+   Arduino sketch to test motors on Butterfly flight Controller
 
    DID YOU REMEMOVE THE PROPELLERS FIRST?
 

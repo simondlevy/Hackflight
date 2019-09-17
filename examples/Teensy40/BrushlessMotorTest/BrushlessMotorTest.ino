@@ -1,5 +1,5 @@
 /*
-   BrushlessMotorTest.ino : Arduino sketch to test motors on Teensy4.0 flight Controller
+   Arduino sketch to test motors on Teensy4.0 flight Controller
 
    DID YOU REMEMOVE THE PROPELLERS FIRST?
 

@@ -1,5 +1,5 @@
 /*
-   Mock.ino : Hackflight sketch for Tlera Dragonfly with mock board and receiver
+   Hackflight sketch for Tlera Dragonfly with mock board and receiver
 
    Solely for receiver prototyping
 

@@ -1,5 +1,5 @@
 /*
-   esp8266.hpp : ESP8266 support for Arduino flight controllers
+   ESP8266 support for Arduino flight controllers
 
    This file is part of Hackflight.
 

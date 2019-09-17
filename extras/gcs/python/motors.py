@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-motors.py : class for testing motors
+Class for testing motors in GCS
 
 Copyright (C) Simon D. Levy 2016
 

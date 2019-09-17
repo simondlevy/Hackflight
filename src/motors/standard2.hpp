@@ -1,6 +1,5 @@
 /*
-   standard2.hpp : Arduino code for brushless motor running on
-   standard ESC.  Alternate version using Servo
+   Arduino code for brushless motor running on standard ESC.  Alternate version using Servo
 
    Copyright (c) 2019 Simon D. Levy
 

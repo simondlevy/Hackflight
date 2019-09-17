@@ -1,8 +1,7 @@
 /*
-   hackflight.hpp : general header, plus init and update methods
+   Hackflight core algorithm
 
-   Copyright (c) 2018 Simon D. Levy
-   Contributed to by Alec Singer
+   Copyright (c) 2018 Simon D. Levy, Alec Singer
 
    This file is part of Hackflight.
 
@@ -28,7 +27,6 @@
 #include "receiver.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
-#include "pidcontrollers/rate.hpp"
 #include "sensors/surfacemount/gyrometer.hpp"
 #include "sensors/surfacemount/quaternion.hpp"
 #include "sensors/mspsensor.hpp"
@@ -39,17 +37,18 @@ namespace hf {
 
         private: 
 
+            static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
+
             // Passed to Hackflight::init() for a particular build
             Board      * _board = NULL;
             Receiver   * _receiver = NULL;
-            Rate       * _ratePid = NULL;
             Mixer      * _mixer = NULL;
 
             // Supports periodic ad-hoc debugging
             Debugger _debugger;
 
             // PID controllers
-            PID_Controller * _pid_controllers[256] = {NULL};
+            PidController * _pid_controllers[256] = {NULL};
             uint8_t _pid_controller_count = 0;
 
             // Mandatory sensors on the board
@@ -75,7 +74,7 @@ namespace hf {
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(_state.rotation[axis]) < _ratePid->maxArmingAngle;
+                return fabs(_state.rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
             void checkQuaternion(void)
@@ -111,8 +110,6 @@ namespace hf {
                     // Update state with gyro rates
                     _gyrometer.modifyState(_state, time);
 
-                    //debugline("%+3.3f\n", _receiver->demands.throttle);
-
                     // For PID control, start with demands from receiver
                     memcpy(&_demands, &_receiver->demands, sizeof(demands_t));
 
@@ -139,12 +136,11 @@ namespace hf {
 
                 for (uint8_t k=0; k<_pid_controller_count; ++k) {
 
-                    PID_Controller * pidController = _pid_controllers[k];
+                    PidController * pidController = _pid_controllers[k];
 
                     float currentTime = _board->getTime();
 
-                    // XXX we should allow associating PID controllers with particular aux states
-                    if (pidController->auxState <= auxState) {  
+                    if (pidController->auxState == -1 || pidController->auxState == auxState) {  // -1 = always
 
                         if (pidController->modifyDemands(_state, _demands, currentTime) && pidController->shouldFlashLed()) {
                             shouldFlash = true;
@@ -155,7 +151,6 @@ namespace hf {
                 // Flash LED for certain PID controllers
                 _board->flashLed(shouldFlash);
             }
-
 
             void checkFailsafe(void)
             {
@@ -172,8 +167,10 @@ namespace hf {
                 // Check whether receiver data is available
                 if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
 
-                // Update ratePid with cyclic demands
-                _ratePid->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
+                // Update PID controllers with receiver demands
+                for (uint8_t k=0; k<_pid_controller_count; ++k) {
+                    _pid_controllers[k]->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
+                }
 
                 // Disarm
                 if (_state.armed && !_receiver->getAux2State()) {
@@ -186,13 +183,8 @@ namespace hf {
                 }
 
                 // Arm (after lots of safety checks!)
-                if (    _safeToArm &&
-                        !_state.armed && 
-                        _receiver->throttleIsDown() &&
-                        _receiver->getAux2State() && 
-                        !_failsafe && 
-                        safeAngle(AXIS_ROLL) && 
-                        safeAngle(AXIS_PITCH)) {
+                if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux2State() && 
+                        !_failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
                     _state.armed = true;
                     _yawInitial = _state.rotation[AXIS_YAW]; // grab yaw for headless mode
                 }
@@ -309,13 +301,12 @@ namespace hf {
 
         public:
 
-            void init(Board * board, Receiver * receiver, Mixer * mixer, Rate * ratePid, bool armed=false)
+            void init(Board * board, Receiver * receiver, Mixer * mixer, bool armed=false)
             {  
                 // Store the essentials
                 _board    = board;
                 _receiver = receiver;
                 _mixer    = mixer;
-                _ratePid  = ratePid;
 
                 // Ad-hoc debugging support
                 _debugger.init(board);
@@ -326,9 +317,6 @@ namespace hf {
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
-
-                // Last PID controller is always ratePid (rate), aux state = 0
-                addPidController(ratePid, 0);
 
                 // Initialize state
                 memset(&_state, 0, sizeof(state_t));
@@ -355,7 +343,7 @@ namespace hf {
                 add_sensor(sensor);
             }
 
-            void addPidController(PID_Controller * pidController, uint8_t auxState) 
+            void addPidController(PidController * pidController, int8_t auxState=-1) 
             {
                 pidController->auxState = auxState;
 

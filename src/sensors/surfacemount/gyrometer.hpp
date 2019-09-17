@@ -1,5 +1,5 @@
 /*
-   gyrometer.hpp : Support for gyrometer (a.k.a. gyroscope) 
+   Support for gyrometer (a.k.a. gyroscope) 
 
    Copyright (c) 2018 Simon D. Levy
 

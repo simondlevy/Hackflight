@@ -1,5 +1,5 @@
 /*
-   mock.hpp : Board subclass for Arduino prototyping without IMU or motors
+   Board subclass for Arduino prototyping without IMU or motors
 
    Copyright (c) 2018 Simon D. Levy
 

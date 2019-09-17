@@ -1,5 +1,5 @@
 /* 
-   filters.hpp: Filter classes and static methods
+   Filter classes and static methods
 
    Copyright (c) 2018 Simon D. Levy
 

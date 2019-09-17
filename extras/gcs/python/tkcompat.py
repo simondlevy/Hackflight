@@ -1,5 +1,5 @@
 '''
-tkcompat.py : Tkinter/tkinter compatability to support both Python2 and Python3
+Tkinter/tkinter compatability to support both Python2 and Python3
 
 Copyright (C) Simon D. Levy 2016
 

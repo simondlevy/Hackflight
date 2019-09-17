@@ -1,5 +1,5 @@
 /*
-   teensy40.hpp : Teensy4.0 Flight Controller implementation of Hackflight Board routines
+   Teensy4.0 Flight Controller implementation of Hackflight Board routines
 
    Uses EM7180 SENtral Sensor Hub in master mode mode
 

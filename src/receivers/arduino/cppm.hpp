@@ -1,5 +1,5 @@
 /*
-   cppm.hpp : CPPMRX receiver support for Arduino-based flight controllers
+   CPPM receiver support for Arduino-based flight controllers
 
    Copyright (c) 2018 Simon D. Levy
 

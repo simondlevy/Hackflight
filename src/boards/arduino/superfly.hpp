@@ -1,5 +1,5 @@
 /*
-   superfly.hpp : Superfly Hackable ESP8266 Flight Controller implementation of Hackflight Board routines
+   Superfly Hackable ESP8266 Flight Controller implementation of Hackflight Board routines
 
    Uses EM7180 SENtral Sensor Hub in master mode mode
 

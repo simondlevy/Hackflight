@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-
 '''
-config.py : constants for Hackflight GCS
+Constants for Hackflight GCS
 
 These should agree with the values in firmware Config.PwmConfg.
 

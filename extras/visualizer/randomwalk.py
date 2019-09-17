@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 '''
-randomwalk.py: Generate a 3D random walk to test visualization
+Generate a 3D random walk to test visualization
 
 Copyright (C) 2019 Simon D. Levy
 

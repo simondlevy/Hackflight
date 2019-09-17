@@ -68,7 +68,7 @@ configurations (QuadX, Hexacopter, Tricopter, etc.).  The
 (quad-X using Cleanflight numbering conventions)  and
 <a href="https://github.com/simondlevy/Hackflight/blob/master/src/mixers/quadxap.hpp">QuadXAP</a>
 (quad-X using ArduPilot numbering conventions) subclasses are already implemented.  
-* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp">PID_Controller</a>
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp">PidController</a>
 class provides a constructor where you specify the PID values appropriate for your model (see
 <b>PID Controllers</b> discussion below).
 
@@ -186,28 +186,30 @@ code will be called by the [checkOptionalSensors](https://github.com/simondlevy/
 ### PID Controllers
 
 Like sensors, PID controllers in Hackflight are subclasses of an abstract
-[class](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp#L27-L39), 
-whose <tt>modifyDemands()</tt> method takes the current state and demands, and modifies the demands based on the
-state.  (This class also provides an optional <tt>shouldFlashLed()</tt> method, to help you see when the PID
-controller is active.)  The Hackflight class [init](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L287) method
-requires you to provide a [Rate](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/rate.hpp) PID controller; however
-(especially for beginners), it is advisable to add a [Level](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/level.hpp) 
-PID controller as well, as shown in this [example](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX/DSMX.ino#L47-L62).
-For an introduction to Rate (a.k.a. Acro) and Level modes, read this [blog post](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).
+[class](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp#L27-L39),
+whose <tt>modifyDemands()</tt> method takes the current state and demands, and
+modifies the demands based on the state.  (This class also provides an optional
+<tt>shouldFlashLed()</tt> method, to help you see when the PID controller is
+active.)  
 
-As with sensors, you can sub-class the <tt>PID_Controller</tt> class and call
+As with sensors, you can sub-class the <tt>PidController</tt> class and call
 [Hackflight::addPidController()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L337-L342)
 to ensure that your PID controller is called in the
 [Hackflight::runPidControllers()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L122-L143) method.
-The <tt>addPidController()</tt> method requires you to to specify the auxiliary-switch state in which the specified PID controller will be active.
-For example, you can specify that a Level PID controller will be active in switch state 1 (or higher) and an
-[AltitudeHold](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontrollers/althold.hpp)
-PID controller will be active in switch state 2, as we've done in the previously-cited
-[example sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/DSMX_AltHold/DSMX_AltHold.ino#L99-L103).
+The <tt>addPidController()</tt> method allows you to to specify the
+auxiliary-switch state in which the specified PID controller will be active.
+For example, you can specify that an Acro controller will be active in switch
+state 0 and a Level controller in state 1.  If you leave out the switch state,
+the PID controller will be active in all switch states.
 
-<p align="center"> 
-<img src="extras/media/pidcontrollers2.png" width=400>
-</p>
+Note that a PID controller is not the same as a [flight mode](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).
+For example, so-called Acro mode requires a PID controller based on angular
+velocity (a.k.a. rate, computed from the gyrometer) for each of the three angles
+(roll, pitch yaw), and so-called Level mode requires these three angular-velocity controllers,
+plus a PID controller based on angle (computed from the quaternion) for the
+roll and pitch axes. 
+
+<p align="center"> <img src="extras/media/pidcontrollers.png" width=600> </p>
 
 If you're mathematically-minded, you can think of a PID Controller as a function from a (<i>State</i>, <i>Demands</i>) pair to <i>Demands</i>:
 <br><i>PID Controller</i>: <i>State</i> &times; <i>Demands</i> &rarr; <i>Demands</i>
@@ -239,14 +241,11 @@ to provide the quaternion directly
 
 * <b>MockBoard</b>: Parent class for Arduino development boards; enables algorithm, sensor, and receiver prototyping
 
-* <b>BonadroneBoard</b>: Parent class for the forthcoming brushless/brushed Arduino-compatible flight controller from 
-[Bonadrone.com](https://www.bonadrone.com/en)
-
 * <b>STM32FBoard</b>: Parent class for the popular line of Cleanflight-compatible controllers based on the STM32F architecture (more info
 [here](https://github.com/simondlevy/Hackflight/tree/master/extras/stm32f_examples))
 
 <p align="center"> 
-<img src="extras/media/boards7.png" width=800>
+<img src="extras/media/boards.png" width=800>
 </p>
 
 ### Control Flow Diagrams

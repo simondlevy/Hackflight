@@ -1,5 +1,5 @@
 /*
-   sentral.hpp : support for EM7180 SENtral Sensor Fusion solution
+   Support for EM7180 SENtral Sensor Fusion solution
 
    Copyright (c) 2018 Simon D. Levy
 

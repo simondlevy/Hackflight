@@ -1,5 +1,5 @@
 /*
-   rate.hpp : rate PID controller
+   Angular-velocity-based PID controller for roll, pitch, yaw
 
    Copyright (c) 2018 Juan Gallostra and Simon D. Levy
 
@@ -24,195 +24,91 @@
 #include "filters.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
+#include "pid.hpp"
 
 namespace hf {
 
-    // shared with Hackflight class
-    enum {
-        AXIS_ROLL = 0,
-        AXIS_PITCH,
-        AXIS_YAW
-    };
-
-    class Rate : public PID_Controller {
-
-        friend class Hackflight;
+    // Helper class for all three axes
+    class _AngularVelocityPid : public Pid {
 
         private: 
 
             // Arbitrary constants
-            const float GYRO_WINDUP_MAX             = 6.0f;
-            const float BIG_GYRO_DEGREES_PER_SECOND = 40.0f; 
-            const float BIG_YAW_DEMAND              = 0.1f;
-            const float MAX_ARMING_ANGLE_DEGREES    = 25.0f;
+            static constexpr float BIG_DEGREES_PER_SECOND = 40.0f; 
 
-            // Converted to radians from degrees in init() method for efficiency
-            float _bigGyroRate = 0;
-
-            // PID constants set in constructor
-            float _gyroYawP = 0; 
-            float _gyroYawI = 0;
-
-            float computeITermGyro(float error, float rateI, float rcCommand, float gyro[3], uint8_t axis)
-            {
-                // Avoid integral windup
-                _errorGyroI[axis] = Filter::constrainAbs(_errorGyroI[axis] + error, GYRO_WINDUP_MAX);
-
-                // Reset integral on quick gyro change or large gyroYaw command
-                if ((fabs(gyro[axis]) > _bigGyroRate) || ((axis == AXIS_YAW) && (fabs(rcCommand) > BIG_YAW_DEMAND)))
-                    _errorGyroI[axis] = 0;
-
-                return (_errorGyroI[axis] * rateI);
-            }
-
-            void init(void)
-            {
-              // Zero-out previous values for D term
-              for (uint8_t axis=0; axis<2; ++axis) {
-                  _lastError[axis] = 0;
-                  _gyroDeltaError1[axis] = 0;
-                  _gyroDeltaError2[axis] = 0;
-              }
-
-              // Convert degree parameters to radians for use later
-              _bigGyroRate   = Filter::deg2rad(BIG_GYRO_DEGREES_PER_SECOND);
-              maxArmingAngle = Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
-
-              // Initialize gyro error integral
-              resetIntegral();
-            }
-
-            float _lastError[2];
-            float _gyroDeltaError1[2]; 
-            float _gyroDeltaError2[2];
-            float _errorGyroI[3];
-
-            // Arrays of PID constants for pitch and roll
-            float _PConstants[2];
-            float _IConstants[2];
-            float _DConstants[2];
-
-            // Computes PID for pitch or roll
-            float computeCyclicPid(float rcCommand, float gyro[3], uint8_t imuAxis)
-            {
-                float error = rcCommand * _demandsToRate - gyro[imuAxis];
-
-                // I
-                float ITerm = computeITermGyro(error, _IConstants[imuAxis], rcCommand, gyro, imuAxis);
-                ITerm *= _proportionalCyclicDemand;
-
-                // D
-                float gyroDeltaError = error - _lastError[imuAxis];
-                _lastError[imuAxis] = error;
-                float gyroDeltaErrorSum = _gyroDeltaError1[imuAxis] + _gyroDeltaError2[imuAxis] + gyroDeltaError;
-                _gyroDeltaError2[imuAxis] = _gyroDeltaError1[imuAxis];
-                _gyroDeltaError1[imuAxis] = gyroDeltaError;
-                float DTerm = gyroDeltaErrorSum * _DConstants[imuAxis]; 
-
-                return computePid(_PConstants[imuAxis], _PTerm[imuAxis], ITerm, DTerm, gyro, imuAxis);
-            }
-
-            
-            float computePid(float rateP, float PTerm, float ITerm, float DTerm, float gyro[3], uint8_t axis)
-            {
-                PTerm = (PTerm * _demandsToRate - gyro[axis]) * rateP;
-
-                return PTerm + ITerm + DTerm;
-            }
-
-            float maxval(float a, float b)
-            {
-                return a > b ? a : b;
-            }
-
-        protected:
-
-            // For PTerm computation
-            float _PTerm[2]; // roll, pitch
-
-            float maxArmingAngle;
-
-            float _demandsToRate;
-
-            // proportion of cyclic demand compared to its maximum
-            float _proportionalCyclicDemand;
-
-            void resetIntegral(void)
-            {
-                _errorGyroI[AXIS_ROLL] = 0;
-                _errorGyroI[AXIS_PITCH] = 0;
-                _errorGyroI[AXIS_YAW] = 0;
-            }
+            // Converted to radians from degrees in constructor for efficiency
+            float _bigAngularVelocity = 0;
 
         public:
 
-            Rate(float gyroRollP, float gyroRollI, float gyroRollD,
-                       float gyroPitchP, float gyroPitchI, float gyroPitchD,
-                       float gyroYawP, float gyroYawI, float demandsToRate = 1.0f) :
-                _gyroYawP(gyroYawP), 
-                _gyroYawI(gyroYawI),
-                _demandsToRate(demandsToRate)
+            void init(const float Kp, const float Ki, const float Kd, const float demandScale) 
             {
-                init();
-                // Constants arrays
-                _PConstants[0] = gyroRollP;
-                _PConstants[1] = gyroPitchP;
-                _IConstants[0] = gyroRollI;
-                _IConstants[1] = gyroPitchI;
-                _DConstants[0] = gyroRollD;
-                _DConstants[1] = gyroPitchD;
+                Pid::init(Kp, Ki, Kd, demandScale);
+
+                // Convert degree parameters to radians for use later
+                _bigAngularVelocity = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
             }
-            
-            Rate(float gyroRollPitchP, float gyroRollPitchI, float gyroRollPitchD,
-                       float gyroYawP, float gyroYawI, float demandsToRate = 1.0f) :
-                _gyroYawP(gyroYawP), 
-                _gyroYawI(gyroYawI), 
-                _demandsToRate(demandsToRate)
+
+            float compute(float demand, float angularVelocity)
             {
-                init();
-                // Constants arrays
-                _PConstants[0] = gyroRollPitchP;
-                _PConstants[1] = gyroRollPitchP;
-                _IConstants[0] = gyroRollPitchI;
-                _IConstants[1] = gyroRollPitchI;
-                _DConstants[0] = gyroRollPitchD;
-                _DConstants[1] = gyroRollPitchD;
+                // Reset integral on quick angular velocity change
+                if (fabs(angularVelocity) > _bigAngularVelocity) {
+                    resetIntegral();
+                }
+
+                return Pid::compute(demand, angularVelocity);
+            }
+
+    };  // class _AngularVelocityPid
+
+    class RatePid : public PidController {
+
+        private: 
+
+            // Aribtrary constants
+            static constexpr float BIG_YAW_DEMAND = 0.1f;
+
+            // Rate mode uses a rate controller for roll, pitch
+            _AngularVelocityPid _rollPid;
+            _AngularVelocityPid _pitchPid;
+            _AngularVelocityPid _yawPid;
+
+        public:
+
+            RatePid(const float Kp, const float Ki, const float Kd, const float Kp_yaw, const float Ki_yaw, float demandScale=1.0f) 
+            {
+                _rollPid.init(Kp, Ki, Kd, demandScale);
+                _pitchPid.init(Kp, Ki, Kd, demandScale);
+                _yawPid.init(Kp_yaw, Ki_yaw, 0, demandScale);
             }
 
             bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
             {
                 (void)currentTime;
 
-                _PTerm[0] = demands.roll;
-                _PTerm[1] = demands.pitch;
+                demands.roll  = _rollPid.compute(demands.roll,  state.angularVel[0]);
+                demands.pitch = _pitchPid.compute(demands.pitch, state.angularVel[1]);
+                demands.yaw   = _yawPid.compute(demands.yaw, state.angularVel[2]);
 
-                // Pitch, roll use Euler angles
-                demands.roll  = computeCyclicPid(demands.roll,  state.angularVel, AXIS_ROLL);
-                demands.pitch = computeCyclicPid(demands.pitch, state.angularVel, AXIS_PITCH);
-
-                // For gyroYaw, P term comes directly from RC command, and D term is zero
-                float yawError = demands.yaw * _demandsToRate - state.angularVel[AXIS_YAW];
-                float ITermGyroYaw = computeITermGyro(yawError, _gyroYawI, demands.yaw, state.angularVel, AXIS_YAW);
-                demands.yaw = computePid(_gyroYawP, demands.yaw, ITermGyroYaw, 0, state.angularVel, AXIS_YAW);
-
-                // Prevent "gyroYaw jump" during gyroYaw correction
+                // Prevent "yaw jump" during correction
                 demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));
 
-                // We've always gotta do this!
+                // Reset yaw integral on large yaw command
+                if (fabs(demands.yaw) > BIG_YAW_DEMAND) {
+                    _yawPid.resetIntegral();
+                }
+
                 return true;
             }
 
-            void updateReceiver(demands_t & demands, bool throttleIsDown)
+            virtual void updateReceiver(demands_t & demands, bool throttleIsDown) override
             {
-                // Compute proportion of cyclic demand compared to its maximum
-                _proportionalCyclicDemand = maxval(fabs(demands.roll), fabs(demands.pitch)) / 0.5f;
-                
-                // When landed, reset integral component of PID
-                if (throttleIsDown) {
-                    resetIntegral();
-                }
+                // Check throttle-down for integral reset
+                _rollPid.updateReceiver(demands, throttleIsDown);
+                _pitchPid.updateReceiver(demands, throttleIsDown);
+                _yawPid.updateReceiver(demands, throttleIsDown);
             }
 
-    };  // class Rate
+    };  // class RatePid
 
 } // namespace hf

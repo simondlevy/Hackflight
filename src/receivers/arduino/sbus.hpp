@@ -1,5 +1,5 @@
 /*
-   sbus.hpp : Futaba SBUS receiver support for Arduino flight controllers
+   Futaba SBUS receiver support for Arduino flight controllers
 
    This file is part of Hackflight.
 

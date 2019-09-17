@@ -1,5 +1,5 @@
 /*
-   flowhold.hpp : Positon-hold PID controller using optical flow (body-frame velocity)
+   Positon-hold PID controller using optical flow (body-frame velocity)
 
    Copyright (c) 2018 Juan Gallostra and Simon D. Levy
 
@@ -25,7 +25,7 @@
 
 namespace hf {
 
-    class FlowHold : public PID_Controller {
+    class FlowHoldPid : public PidController {
 
         friend class Hackflight;
 
@@ -69,12 +69,12 @@ namespace hf {
 
         public:
 
-        FlowHold(float P, float minAltitude=0.1) 
+        FlowHoldPid(const float P, const float minAltitude=0.1) 
             : _P(P), _minAltitude(minAltitude)
         {
             _previousTime = 0;
         }
 
-    };  // class FlowHold
+    };  // class FlowHoldPid
 
 } // namespace hf

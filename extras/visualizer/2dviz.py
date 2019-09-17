@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 '''
-2dviz.py: 2D state visualizer 
+2D state visualizer 
 
 Dependencies: numpy, matplotlib, pyserial, pybluez, https://github.com/simondlevy/PyRoboViz
 

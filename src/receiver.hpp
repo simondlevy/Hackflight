@@ -1,5 +1,5 @@
 /*
-   receiver.hpp : RC receiver class header
+   Abstract RC receiver class
 
    Copyright (c) 2018 Simon D. Levy
 

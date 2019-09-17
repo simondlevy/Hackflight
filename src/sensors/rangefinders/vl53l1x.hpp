@@ -1,5 +1,5 @@
 /*
-   vl53l1x.hpp : Support for VL53L1X time-of-flight rangefinder
+   Support for VL53L1X time-of-flight rangefinder
 
    Copyright (c) 2018 Simon D. Levy
 

@@ -1,5 +1,5 @@
 /*
-   datatypes.hpp : Datatype declarations
+   Datatype declarations
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -21,6 +21,12 @@
 #pragma once
 
 namespace hf {
+
+    enum {
+        AXIS_ROLL = 0,
+        AXIS_PITCH, 
+        AXIS_YAW
+    };
 
     typedef struct {
 

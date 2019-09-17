@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-
 '''
-socket_disarm.py : Test script for MSP disarming of board over a socket
+Test script for MSP disarming of board over a socket
 
 Copyright (C) Simon D. Levy, Pep Marti, Juan Gallostra Acin 2018
 

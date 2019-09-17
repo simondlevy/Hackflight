@@ -1,5 +1,5 @@
 /*
-   esp32.hpp : Board subclass for ESP32 Feather
+   Board subclass for ESP32 Feather
 
    Copyright (c) 2019 Simon D. Levy
 

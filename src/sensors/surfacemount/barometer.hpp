@@ -1,5 +1,5 @@
 /*
-   barometer.hpp : Support for surface-mounted barometer
+   Support for surface-mounted barometer
 
    Copyright (c) 2018 Simon D. Levy
 

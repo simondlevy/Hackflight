@@ -1,5 +1,5 @@
 /*
-   magnetometer.hpp : Support for magnetometer (compass)
+   Support for magnetometer (a.k.a. compass)
 
    Hackflight requires your Board implementation to provide the
    quaternion directly, but access to magnetometer could be useful

@@ -1,5 +1,5 @@
 /*
-   brushed.hpp : Arduino code for brushed motors
+   Arduino code for brushed motors
 
    Copyright (c) 2018 Simon D. Levy
 

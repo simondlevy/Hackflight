@@ -1,5 +1,5 @@
 '''
-stateviz.py: State visualizer 
+State visualizer 
 
 Copyright (C) 2018 Simon D. Levy
 
