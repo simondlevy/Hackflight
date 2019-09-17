@@ -35,22 +35,19 @@ namespace hf {
 
         private:
 
-            static constexpr float MAX_ANGLE_DEGREES = 10;
-          
             AngleBased _rollPid;
             AngleBased _pitchPid;
 
         public:
 
-            LevelPid(const float rollP, float const pitchP, 
-                    float maxRollDegrees = MAX_ANGLE_DEGREES, float maxPitchDegrees = MAX_ANGLE_DEGREES)
+            LevelPid(const float rollP, float const pitchP, float rollDemandScale=1.0, float pitchDemandScale=1.0)
             {
-                _rollPid.init(rollP, maxRollDegrees);
-                _pitchPid.init(pitchP, maxPitchDegrees);
+                _rollPid.init(rollP, rollDemandScale);
+                _pitchPid.init(pitchP, pitchDemandScale);
             }
 
-            LevelPid(const float Kp, const float maxAngleDegrees = MAX_ANGLE_DEGREES) 
-                : LevelPid(Kp, Kp, maxAngleDegrees, maxAngleDegrees)
+            LevelPid(const float Kp, const float demandScale=1.0) 
+                : LevelPid(Kp, Kp, demandScale, demandScale)
             {
             }
 

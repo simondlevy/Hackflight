@@ -32,8 +32,6 @@ namespace hf {
 
         private:
 
-            const float FEED_FORWARD = 0.5;
-            
             // Simple P controller (no I or D)
             float _Kp = 0;
 
@@ -41,21 +39,19 @@ namespace hf {
 
         public:
 
-            void init(const float Kp, const float maxAngleDegrees)
+            void init(const float Kp, const float demandScale)
             {
                 _Kp = Kp;
-
-                // Roll and pitch demands go between [-0.5, 0.5] so, for a
-                // given max angle, the following relation must hold true: 
-                // 0.5 * _demandScale = maxAngle.
-                _demandScale = 2* Filter::deg2rad(maxAngleDegrees);
+                _demandScale = demandScale;
             }
 
             float compute(float demand, float angle)
             {
                 float error = demand * _demandScale - angle;
 
-                return error * _Kp + FEED_FORWARD * demand;
+                float pterm = _Kp * error;
+
+                return pterm;
             }
 
     }; // class AngleBased
