@@ -29,28 +29,51 @@
 
 namespace hf {
 
+    // Helper class
+    class _AnglePid : public Pid {
+
+        private:
+
+            static constexpr float FEED_FORWARD = 0.5;
+
+            float _Kp = 0;
+
+            float _demandToAngle = 0;
+
+        public:
+
+            void init(const float Kp, const float maxAngle) 
+            {
+                _Kp = Kp;
+
+                // Roll and pitch demands go between [-0.5, 0.5] so, for a  given max angle, the following relation must hold true:
+                // 0.5 * _demandToAngle = maxAngle
+                _demandToAngle = 2* Filter::deg2rad(maxAngle);
+            }
+
+            float compute(float demand, float angle)
+            {
+
+                float error = demand * _demandToAngle - angle;
+
+                return error * _Kp + FEED_FORWARD * demand;
+            }
+
+    }; // class _AnglePid
+
     class LevelPid : public PidController {
 
         private:
 
-            const float FEED_FORWARD = 0.5;
-
-            float PTerms[2] = {0};
-
-            float _demandsToAngle = 0;
+            _AnglePid _rollPid;
+            _AnglePid _pitchPid;
 
         public:
 
             LevelPid(float rollLevelP, float pitchLevelP, float maxAngle = 10)
             {
-                PTerms[0] = rollLevelP;
-                PTerms[1] = pitchLevelP;
-                // roll and pitch demands go between [-0.5, 0.5] so, for a
-                // given max angle, the following relation must hold true:
-                // 0.5 * _demandsToAngle = maxAngle
-                // Since we work in radians:
-                // _demandsToAngle = deg2rad(maxAngle) * 2
-                _demandsToAngle = 2* Filter::deg2rad(maxAngle);
+                _rollPid.init(rollLevelP, maxAngle);
+                _pitchPid.init(pitchLevelP, maxAngle);
             }
 
             LevelPid(float rollPitchLevelP)
@@ -62,17 +85,9 @@ namespace hf {
             {
                 (void)currentTime;
 
-                float _demands[2] = {demands.roll, demands.pitch};
-                for (int axis=0; axis<2; ++axis)
-                {
-                  float error = _demands[axis] * _demandsToAngle - state.rotation[axis];
-                  _demands[axis] = error * PTerms[axis] + FEED_FORWARD * _demands[axis];
-                }
+                demands.roll  = _rollPid.compute(demands.roll, state.rotation[0]); 
+                demands.pitch = _pitchPid.compute(demands.pitch, state.rotation[1]);
 
-                demands.roll = _demands[0];
-                demands.pitch = _demands[1];
-
-                // We've always gotta do this!
                 return true;
             }
 
