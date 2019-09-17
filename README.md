@@ -202,16 +202,14 @@ For example, you can specify that an Acro controller will be active in switch
 state 0 and a Level controller in state 1.  If you leave out the switch state,
 the PID controller will be active in all switch states.
 
-As shown in the figure below, there are already PID controllers supporting the basic flight modes.
-(For an introduction to flight modes, read this [blog post](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).)  The Acro-mode PID controllers uses a separate rate-based controller for roll and yaw, but also supports
-using the same PID values for both.  In a likewise manner, the Level-mode PID controller uses a separate
-angle-based controller for these two axes, but allows them to share a
-common set of constants for simplicity.  The Yaw PID controller uses a single
-rate-based controller.  A typical firmware sketch would use a Level controller
-and Yaw controller, or an Acro controller and Yaw controller for the more
-adventurous.  
-<p align="center"> <img src="extras/media/pidcontrollers.png" width=600>
-</p>
+Note that a PID controller is not the same as a [flight mode](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).
+For example, so-called Acro mode requires a PID controller based on angular
+velocity (a.k.a. rate, compute from the gyrometer) for each of the three angles
+(roll, pitch yaw), and so-called Level mode requires these three controllers,
+plus a PID controller based on angle (computed from the quaternion) for the
+roll and pitch axes. 
+
+<p align="center"> <img src="extras/media/pidcontrollers.png" width=600> </p>
 
 If you're mathematically-minded, you can think of a PID Controller as a function from a (<i>State</i>, <i>Demands</i>) pair to <i>Demands</i>:
 <br><i>PID Controller</i>: <i>State</i> &times; <i>Demands</i> &rarr; <i>Demands</i>
