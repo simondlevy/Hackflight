@@ -68,7 +68,7 @@ configurations (QuadX, Hexacopter, Tricopter, etc.).  The
 (quad-X using Cleanflight numbering conventions)  and
 <a href="https://github.com/simondlevy/Hackflight/blob/master/src/mixers/quadxap.hpp">QuadXAP</a>
 (quad-X using ArduPilot numbering conventions) subclasses are already implemented.  
-* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp">PID_Controller</a>
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp">PidController</a>
 class provides a constructor where you specify the PID values appropriate for your model (see
 <b>PID Controllers</b> discussion below).
 
@@ -192,7 +192,7 @@ modifies the demands based on the state.  (This class also provides an optional
 <tt>shouldFlashLed()</tt> method, to help you see when the PID controller is
 active.)  
 
-As with sensors, you can sub-class the <tt>PID_Controller</tt> class and call
+As with sensors, you can sub-class the <tt>PidController</tt> class and call
 [Hackflight::addPidController()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L337-L342)
 to ensure that your PID controller is called in the
 [Hackflight::runPidControllers()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L122-L143) method.
@@ -204,12 +204,12 @@ the PID controller will be active in all switch states.
 
 Note that a PID controller is not the same as a [flight mode](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).
 For example, so-called Acro mode requires a PID controller based on angular
-velocity (a.k.a. rate, compute from the gyrometer) for each of the three angles
-(roll, pitch yaw), and so-called Level mode requires these three controllers,
+velocity (a.k.a. rate, computed from the gyrometer) for each of the three angles
+(roll, pitch yaw), and so-called Level mode requires these three angular-velocity controllers,
 plus a PID controller based on angle (computed from the quaternion) for the
 roll and pitch axes. 
 
-<p align="center"> <img src="extras/media/pidcontrollers.png" width=600> </p>
+<p align="center"> <img src="extras/media/pidcontrollers2.png" width=600> </p>
 
 If you're mathematically-minded, you can think of a PID Controller as a function from a (<i>State</i>, <i>Demands</i>) pair to <i>Demands</i>:
 <br><i>PID Controller</i>: <i>State</i> &times; <i>Demands</i> &rarr; <i>Demands</i>
