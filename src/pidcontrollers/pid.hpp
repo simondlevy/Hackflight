@@ -29,6 +29,9 @@ namespace hf {
 
         private: 
 
+        // Helps prevent integral windup
+        static constexpr float WINDUP_MAX = 6.0f;
+
         // PID constants set in init() method
         float _Kp = 0;
         float _Ki = 0;
@@ -60,7 +63,7 @@ namespace hf {
             _errorI = 0;
         }
 
-        float compute(float demand, float value)
+        float compute(float demand, float value, float itermFactor = 1.0)
         {
             // Compute error as scaled demand minus angular velocity
             float error = demand * _demandScale - value;
@@ -72,7 +75,7 @@ namespace hf {
             float iterm = 0;
             if (_Ki > 0) { // optimization
                 _errorI = Filter::constrainAbs(_errorI + error, WINDUP_MAX); // avoid integral windup
-                iterm =  _errorI * _Ki;
+                iterm =  _errorI * _Ki * itermFactor;
             }
 
             // Compute D term

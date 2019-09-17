@@ -24,30 +24,37 @@
 
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
+#include "pid.hpp"
 #include "filters.hpp"
-#include "anglebased.hpp"
 
 namespace hf {
 
     class LevelPid : public PidController {
 
-        friend class Hackflight;
-
         private:
 
-            AngleBased _rollPid;
-            AngleBased _pitchPid;
+            const float FEED_FORWARD = 0.5;
+
+            float PTerms[2] = {0};
+
+            float _demandsToAngle = 0;
 
         public:
 
-            LevelPid(const float rollP, float const pitchP, float rollDemandScale=1.0, float pitchDemandScale=1.0)
+            LevelPid(float rollLevelP, float pitchLevelP, float maxAngle = 10)
             {
-                _rollPid.init(rollP, rollDemandScale);
-                _pitchPid.init(pitchP, pitchDemandScale);
+                PTerms[0] = rollLevelP;
+                PTerms[1] = pitchLevelP;
+                // roll and pitch demands go between [-0.5, 0.5] so, for a
+                // given max angle, the following relation must hold true:
+                // 0.5 * _demandsToAngle = maxAngle
+                // Since we work in radians:
+                // _demandsToAngle = deg2rad(maxAngle) * 2
+                _demandsToAngle = 2* Filter::deg2rad(maxAngle);
             }
 
-            LevelPid(const float Kp, const float demandScale=1.0) 
-                : LevelPid(Kp, Kp, demandScale, demandScale)
+            LevelPid(float rollPitchLevelP)
+                : LevelPid(rollPitchLevelP, rollPitchLevelP)
             {
             }
 
@@ -55,9 +62,17 @@ namespace hf {
             {
                 (void)currentTime;
 
-                demands.roll = _rollPid.compute(demands.roll, state.rotation[0]);
-                demands.pitch = _pitchPid.compute(demands.pitch, state.rotation[1]);
+                float _demands[2] = {demands.roll, demands.pitch};
+                for (int axis=0; axis<2; ++axis)
+                {
+                  float error = _demands[axis] * _demandsToAngle - state.rotation[axis];
+                  _demands[axis] = error * PTerms[axis] + FEED_FORWARD * _demands[axis];
+                }
 
+                demands.roll = _demands[0];
+                demands.pitch = _demands[1];
+
+                // We've always gotta do this!
                 return true;
             }
 
