@@ -34,9 +34,8 @@ Copyright (c) 2018 Simon D. Levy
 #include "boards/arduino/ladybug.hpp"
 #include "receivers/arduino/dsmx.hpp"
 #include "mixers/quadxcf.hpp"
+#include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
-#include "pidcontrollers/yaw.hpp"
-#include "pidcontrollers/acro.hpp"
 
 const uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
@@ -46,21 +45,18 @@ hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);
 
 hf::MixerQuadXCF mixer;
 
-hf::AcroPid acroPid = hf::AcroPid(0.225, 0.001875, 0.375);
+hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375, 1.0625, 0.005625f);
 
-hf::LevelPid levelPid = hf::LevelPid(0.20);
-
-hf::YawPid yawPid = hf::YawPid(1.0625, 0.005625f);
+hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 void setup(void)
 {
     // Initialize Hackflight firmware
     h.init(new hf::Ladybug(), &rc, &mixer);
 
-    // Add Level, Yaw PIDs
+    // Add PID controllers
     h.addPidController(&levelPid);
-    h.addPidController(&yawPid);
-    h.addPidController(&acroPid);
+    h.addPidController(&ratePid);
 }
 
 void loop(void)
