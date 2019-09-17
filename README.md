@@ -202,10 +202,13 @@ For example, you can specify that an Acro controller will be active in switch
 state 0 and a Level controller in state 1.  If you leave out the switch state,
 the PID controller will be active in all switch states.
 
-Note that a PID controller is not the same as a [flight mode](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).
-For example, so-called Acro mode requires a PID controller based on angular
+<b>Note that a PID controller is not the same as a
+[flight mode](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).</b>
+For example, so-called [Acro mode](http://ardupilot.org/copter/docs/acro-mode.html#acro-mode) 
+requires a PID controller based on angular
 velocity (a.k.a. rate, computed from the gyrometer) for each of the three angles
-(roll, pitch yaw), and so-called Level mode requires these three angular-velocity controllers,
+(roll, pitch yaw), and so-called [Stabilize](http://ardupilot.org/copter/docs/stabilize-mode.html#stabilize-mode) 
+mode requires these three angular-velocity controllers,
 plus a PID controller based on angle (computed from the quaternion) for the
 roll and pitch axes. 
 
