@@ -82,10 +82,9 @@ namespace hf {
             float dterm = 0;
             if (_Kd > 0) { // optimization
                 float deltaError = error - _lastError;
-                float deltaErrorSum = _deltaError1 + _deltaError2 + deltaError;
+                dterm = (_deltaError1 + _deltaError2 + deltaError) * _Kd; 
                 _deltaError2 = _deltaError1;
                 _deltaError1 = deltaError;
-                dterm = deltaErrorSum * _Kd; 
                 _lastError = error;
             }
 
