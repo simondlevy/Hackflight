@@ -52,10 +52,10 @@ namespace hf {
             // Values modified in-flight
             float _posTarget = 0;
             bool  _inBandPrev = false;
+            float _previousTime = 0;
+
             float _lastError = 0;
             float _integralError = 0;
-            float _altitudeTarget = 0;
-            float _previousTime = 0;
 
             bool inBand(float demand)
             {
@@ -130,10 +130,13 @@ namespace hf {
                 : _minAltitude(minAltitude)
             {
                 _posP = posP; 
+
                 _velP = velP; 
                 _velI = velI; 
                 _velD = velD; 
+
                 resetErrors();
+
                 _posTarget = 0;
                 _previousTime = 0;
                 _inBandPrev = false;
