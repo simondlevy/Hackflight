@@ -140,7 +140,7 @@ namespace hf {
 
                     float currentTime = _board->getTime();
 
-                    if (pidController->auxState == -1 || pidController->auxState == auxState) {  // -1 = always
+                    if (pidController->auxState <= auxState) {
 
                         if (pidController->modifyDemands(_state, _demands, currentTime) && pidController->shouldFlashLed()) {
                             shouldFlash = true;
@@ -343,7 +343,7 @@ namespace hf {
                 add_sensor(sensor);
             }
 
-            void addPidController(PidController * pidController, int8_t auxState=-1) 
+            void addPidController(PidController * pidController, uint8_t auxState=0) 
             {
                 pidController->auxState = auxState;
 

@@ -197,9 +197,9 @@ As with sensors, you can sub-class the <tt>PidController</tt> class and call
 to ensure that your PID controller is called in the
 [Hackflight::runPidControllers()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L122-L143) method.
 The <tt>addPidController()</tt> method allows you to to specify the
-auxiliary-switch state in which the specified PID controller will be active.
-For example, you can specify that an Acro controller will be active in switch
-state 0 and a Level controller in state 1.  If you leave out the switch state,
+auxiliary-switch state (aux state) in which the specified PID controller will be active.
+For example, you can specify that a Rate controller will be active in aux
+state 0 and a Level controller in aux state 1.  If you leave out the aux state,
 the PID controller will be active in all switch states.
 
 <b>Note that a PID controller is not the same as a
@@ -210,7 +210,9 @@ velocity (a.k.a. rate, computed from the gyrometer) for each of the three angles
 (roll, pitch yaw). So-called [Stabilize](http://ardupilot.org/copter/docs/stabilize-mode.html#stabilize-mode) 
 mode requires these three angular-velocity controllers,
 plus a PID controller based on angle (computed from the quaternion) for the
-roll and pitch axes. 
+roll and pitch axes.   To support his arrangement, in Hackflight, PID
+controllers for aux state 0 will also run in aux states 1 and 2, and PID
+controllers for aux state 1 will also run in aux state 2.
 
 <p align="center"> <img src="extras/media/pidcontrollers2.png" width=600> </p>
 
