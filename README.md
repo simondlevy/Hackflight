@@ -165,7 +165,7 @@ to support communicating with an external Arduino-compatible development board
 with a [VL53L1X](https://www.tindie.com/products/onehorse/vl53l1-long-range-proximity-sensor/)
 long-range proximity sensor and [PMW3901](https://www.tindie.com/products/onehorse/pmw3901-optical-flow-sensor/)
 optical-flow sensor (both from Pesky Products). Flashing this Arduino
-[sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Butterfly/LoiterBoard/LoiterBoard.ino)
+[sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Butterfly/ButterflyLoiterBoard/ButterflyLoiterBoard.ino)
 onto the Butterfly board will cause the board to output 
 messages to your flight controller's UART on the green wire (with the red and black wires providing power to the
 Butterfly from your flight controller).
