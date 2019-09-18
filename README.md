@@ -210,7 +210,7 @@ velocity (a.k.a. rate, computed from the gyrometer) for each of the three angles
 (roll, pitch yaw). So-called [Stabilize](http://ardupilot.org/copter/docs/stabilize-mode.html#stabilize-mode) 
 mode requires these three angular-velocity controllers,
 plus a PID controller based on angle (computed from the quaternion) for the
-roll and pitch axes.   To support his arrangement, in Hackflight, PID
+roll and pitch axes.   To support his arrangement in Hackflight, PID
 controllers for aux state 0 will also run in aux states 1 and 2, and PID
 controllers for aux state 1 will also run in aux state 2.
 
