@@ -194,9 +194,9 @@ modifies the demands based on the state.  (This class also provides an optional
 active.)  
 
 As with sensors, you can sub-class the <tt>PidController</tt> class and call
-[Hackflight::addPidController()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L337-L342)
+[Hackflight::addPidController()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L346-L351)
 to ensure that your PID controller is called in the
-[Hackflight::runPidControllers()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L122-L143) method.
+[Hackflight::runPidControllers()](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L129-L153) method.
 The <tt>addPidController()</tt> method allows you to to specify the
 auxiliary-switch state (aux state) in which the specified PID controller will be active.
 For example, you can specify that a Rate controller will be active in aux
