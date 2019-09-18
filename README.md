@@ -214,7 +214,7 @@ roll and pitch axes.   To support this arrangement in Hackflight, PID
 controllers for aux state 0 will also run in aux states 1 and 2, and PID
 controllers for aux state 1 will also run in aux state 2.
 
-<p align="center"> <img src="extras/media/pidcontrollers2.png" width=600> </p>
+<p align="center"> <img src="extras/media/pidcontrollers.png" width=600> </p>
 
 If you're mathematically-minded, you can think of a PID Controller as a function from a (<i>State</i>, <i>Demands</i>) pair to <i>Demands</i>:
 <br><i>PID Controller</i>: <i>State</i> &times; <i>Demands</i> &rarr; <i>Demands</i>
