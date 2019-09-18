@@ -119,9 +119,8 @@ As discussed above, Hackflight requires a bare minimum of two sensor readings:
 [quaternion and gyrometer](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp#L56-L57).
 Technically, the quaternion is more properly part of
 the vehicle state, but because of the availability of &ldquo;hardware
-quaternion&rdquo; data from modern sensors like the [EM7180 SENtral Sensor
-Fusion
-Solution](https://www.tindie.com/products/onehorse/ultimate-sensor-fusion-solution-mpu9250/),
+quaternion&rdquo; data from modern sensors like the 
+[EM7180 SENtral Sensor Fusion Solution](https://www.tindie.com/products/onehorse/ultimate-sensor-fusion-solution-lsm6dsm-lis2md/).
 we find it convenient to treat the quaternion as a sensor reading.  For
 inertial measurement units (IMUs) like the MPU9250 that do not deliver a
 hardware quaternion, Hackflight provides a
@@ -242,7 +241,7 @@ class used in [MulticopterSim](https://github.com/simondlevy/MulticopterSim/tree
 most boards
 
 * <b>SentralBoard</b>: Ancestor class for Arduino boards using the the
-[EM7180 SENtral Sensor Fusion Solution](https://www.tindie.com/products/onehorse/ultimate-sensor-fusion-solution-mpu9250/)
+[EM7180 SENtral Sensor Fusion Solution](https://www.tindie.com/products/onehorse/ultimate-sensor-fusion-solution-lsm6dsm-lis2md/).
 to provide the quaternion directly
 
 * <b>MockBoard</b>: Parent class for Arduino development boards; enables algorithm, sensor, and receiver prototyping
