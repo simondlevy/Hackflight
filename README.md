@@ -187,7 +187,7 @@ code will be called by the [checkOptionalSensors](https://github.com/simondlevy/
 ### PID Controllers
 
 Like sensors, PID controllers in Hackflight are subclasses of an abstract
-[class](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp#L27-L39),
+[class](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp#L27-L41),
 whose <tt>modifyDemands()</tt> method takes the current state and demands, and
 modifies the demands based on the state.  (This class also provides an optional
 <tt>shouldFlashLed()</tt> method, to help you see when the PID controller is
