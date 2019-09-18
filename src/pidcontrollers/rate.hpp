@@ -35,6 +35,7 @@ namespace hf {
 
             // Arbitrary constants
             static constexpr float BIG_DEGREES_PER_SECOND = 40.0f; 
+            static constexpr float WINDUP_MAX = 6.0f;
 
             // Converted to radians from degrees in constructor for efficiency
             float _bigAngularVelocity = 0;
@@ -43,7 +44,7 @@ namespace hf {
 
             void init(const float Kp, const float Ki, const float Kd, const float demandScale) 
             {
-                Pid::init(Kp, Ki, Kd, demandScale);
+                Pid::init(Kp, Ki, Kd, demandScale, WINDUP_MAX);
 
                 // Convert degree parameters to radians for use later
                 _bigAngularVelocity = Filter::deg2rad(BIG_DEGREES_PER_SECOND);

@@ -24,6 +24,7 @@
 #include "filters.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
+#include "pid.hpp"
 
 namespace hf {
 
@@ -37,16 +38,21 @@ namespace hf {
             static constexpr float HOVER_THROTTLE  = 0.05f;
             static constexpr float WINDUP_MAX      = 0.40f;
 
+            // P controller for position
+            Pid _posPid;
+
+            // PID controller for velocity
+            Pid _velPid;
+
             // Minimum altitude, set by constructor
             float _minAltitude = 0;
 
             // PID constants set by constructor
-            float _posP = 0;
+            float _Kp_pos = 0;
 
-            float _velP = 0;
-            float _velI = 0;
-            float _velD = 0;
-
+            float _Kp_vel = 0;
+            float _Ki_vel = 0;
+            float _Kd_vel = 0;
 
             // Values modified in-flight
             float _posTarget = 0;
@@ -86,7 +92,7 @@ namespace hf {
                 if (!inBandCurr) return false;
 
                 // compute velocity setpoint and error
-                float velTarget = (_posTarget - posActual) * _posP;
+                float velTarget = (_posTarget - posActual) * _Kp_pos;
                 float velError = velTarget - velActual;
 
                 // Update error integral and error derivative
@@ -95,7 +101,7 @@ namespace hf {
                 _lastError = velError;
 
                 // Compute control correction
-                correction = _velP * velError + _velD * deltaError + _velI * _integralError;                       
+                correction = _Kp_vel * velError + _Kd_vel * deltaError + _Ki_vel * _integralError;                       
 
                 return true;
             }
@@ -125,14 +131,14 @@ namespace hf {
 
         public:
 
-            AltitudeHoldPid(const float posP, const float velP, const float velI, const float velD, const float minAltitude=0.1) 
+            AltitudeHoldPid(const float Kp_pos, const float Kp_vel, const float Ki_vel, const float Kd_vel, const float minAltitude=0.1) 
                 : _minAltitude(minAltitude)
             {
-                _posP = posP; 
+                _Kp_pos = Kp_pos; 
 
-                _velP = velP; 
-                _velI = velI; 
-                _velD = velD; 
+                _Kp_vel = Kp_vel; 
+                _Ki_vel = Ki_vel; 
+                _Kd_vel = Kd_vel; 
 
                 resetErrors();
 

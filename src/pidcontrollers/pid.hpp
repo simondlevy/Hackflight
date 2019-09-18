@@ -29,8 +29,6 @@ namespace hf {
 
         private: 
 
-        // Helps prevent integral windup
-        static constexpr float WINDUP_MAX = 6.0f;
 
         // PID constants set in init() method
         float _Kp = 0;
@@ -46,15 +44,19 @@ namespace hf {
         // Scale factor for stick demand
         float _demandScale = 0;
 
+        // Prevents integral windup
+        float _windupMax = 0;
+
         public:
 
-        void init(const float Kp, const float Ki, const float Kd, const float demandScale) 
+        void init(const float Kp, const float Ki, const float Kd, const float demandScale, const float windupMax=0) 
         {
             // Set constants
             _Kp = Kp;
             _Ki = Ki;
             _Kd = Kd;
             _demandScale = demandScale;
+            _windupMax = windupMax;
 
             // Initialize previous error value for D term
             _lastError = 0;
@@ -74,7 +76,7 @@ namespace hf {
             // Compute I term
             float iterm = 0;
             if (_Ki > 0) { // optimization
-                _errorI = Filter::constrainAbs(_errorI + error, WINDUP_MAX); // avoid integral windup
+                _errorI = Filter::constrainAbs(_errorI + error, _windupMax); // avoid integral windup
                 iterm =  _errorI * _Ki;
             }
 
