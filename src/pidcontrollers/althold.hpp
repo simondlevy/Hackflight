@@ -34,7 +34,8 @@ namespace hf {
         private: 
 
             // Arbitrary constants
-            const float HOVER_THROTTLE  = 0.05f;
+            static constexpr float HOVER_THROTTLE  = 0.05f;
+            static constexpr float WINDUP_MAX      = 0.40f;
 
             // Minimum altitude, set by constructor
             float _minAltitude = 0;
@@ -46,8 +47,6 @@ namespace hf {
             float _velI = 0;
             float _velD = 0;
 
-            // Parameter to avoid integral windup
-            float _windupMax = 0;
 
             // Values modified in-flight
             float _posTarget = 0;
@@ -91,7 +90,7 @@ namespace hf {
                 float velError = velTarget - velActual;
 
                 // Update error integral and error derivative
-                _integralError = Filter::constrainAbs(_integralError + velError * deltaT, _windupMax);
+                _integralError = Filter::constrainAbs(_integralError + velError * deltaT, WINDUP_MAX);
                 float deltaError = (velError - _lastError) / deltaT;
                 _lastError = velError;
 
