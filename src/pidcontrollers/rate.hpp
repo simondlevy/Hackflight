@@ -54,7 +54,7 @@ namespace hf {
             {
                 // Reset integral on quick angular velocity change
                 if (fabs(angularVelocity) > _bigAngularVelocity) {
-                    resetIntegral();
+                    reset();
                 }
 
                 return Pid::compute(demand, angularVelocity);
@@ -96,7 +96,7 @@ namespace hf {
 
                 // Reset yaw integral on large yaw command
                 if (fabs(demands.yaw) > BIG_YAW_DEMAND) {
-                    _yawPid.resetIntegral();
+                    _yawPid.reset();
                 }
 
                 return true;

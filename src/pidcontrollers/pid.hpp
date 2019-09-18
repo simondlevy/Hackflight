@@ -58,17 +58,15 @@ namespace hf {
             _demandScale = demandScale;
             _windupMax = windupMax;
 
-            // Initialize previous error value for D term
-            _lastError = 0;
-
-            // Initialize error integral
-            _errorI = 0;
+            // Initialize error integral, previous value
+            reset();
         }
 
-        float compute(float demand, float value)
+        // Version 1: ignore time
+        float compute(float target, float value)
         {
-            // Compute error as scaled demand minus angular velocity
-            float error = demand * _demandScale - value;
+            // Compute error as scaled target minus actual
+            float error = target * _demandScale - value;
 
             // Compute P term
             float pterm = error * _Kp;
@@ -93,17 +91,39 @@ namespace hf {
             return pterm + iterm + dterm;
         }
 
+        // Version 2: use time
+        float compute(float target, float actual, float deltaT)
+        {
+            // Compute error as scaled target minus actual
+            float error = target - actual;
+
+            // Compute P term
+            float pterm = error * _Kp;
+
+            // Compute I term
+            _errorI = Filter::constrainAbs(_errorI + error * deltaT, _windupMax);
+            float iterm = _errorI * _Ki;
+
+            // Compute D term
+            float deltaError = (error - _lastError) / deltaT;
+            float dterm = deltaError * _Kd;
+            _lastError = error;
+
+            return pterm + iterm + dterm;
+        }
+
         void updateReceiver(demands_t & demands, bool throttleIsDown)
         {
             // When landed, reset integral component of PID
             if (throttleIsDown) {
-                _errorI = 0; 
+                reset();
             }
         }
 
-        void resetIntegral(void)
+        void reset(void)
         {
             _errorI = 0;
+            _lastError = 0;
         }
 
     };  // class Pid
