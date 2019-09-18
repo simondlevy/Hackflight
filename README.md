@@ -116,7 +116,7 @@ values to be sent to each motor:
 ### Sensors
 
 As discussed above, Hackflight requires a bare minimum of two sensor readings:
-[quaternion and gyrometer](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp#L53-L54).
+[quaternion and gyrometer](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp#L56-L57).
 Technically, the quaternion is more properly part of
 the vehicle state, but because of the availability of &ldquo;hardware
 quaternion&rdquo; data from modern sensors like the [EM7180 SENtral Sensor
@@ -151,7 +151,7 @@ that any sensor must implement: (1) reporting whether the sensor is ready to
 deliver new data; (2) modifying the vehicle state.  By requiring each sensor to
 report its readiness, we can avoid the need to write a separate timing loop for
 each sensor in the main [loop
-code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L348-L359). 
+code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L353-L367). 
 
 Many popular STM32F-based flight-control boards come with extra UARTs (serial
 ports) but lack ports for sensor
