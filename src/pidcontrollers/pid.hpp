@@ -49,7 +49,7 @@ namespace hf {
 
         public:
 
-        void init(const float Kp, const float Ki, const float Kd, const float demandScale, const float windupMax=0) 
+        void init(const float Kp, const float Ki, const float Kd, const float demandScale=1.0, const float windupMax=0.0) 
         {
             // Set constants
             _Kp = Kp;

@@ -36,7 +36,7 @@ namespace hf {
 
             // Arbitrary constants
             static constexpr float HOVER_THROTTLE  = 0.05f;
-            static constexpr float WINDUP_MAX      = 0.40f;
+            static constexpr float VEL_WINDUP_MAX  = 0.40f;
 
             // P controller for position
             Pid _posPid;
@@ -48,8 +48,6 @@ namespace hf {
             float _minAltitude = 0;
 
             // PID constants set by constructor
-            float _Kp_pos = 0;
-
             float _Kp_vel = 0;
             float _Ki_vel = 0;
             float _Kd_vel = 0;
@@ -91,12 +89,13 @@ namespace hf {
 
                 if (!inBandCurr) return false;
 
-                // compute velocity setpoint and error
-                float velTarget = (_posTarget - posActual) * _Kp_pos;
+                // Velocity target is output of position P controller
+                float velTarget = _posPid.compute(_posTarget, posActual);
+
                 float velError = velTarget - velActual;
 
                 // Update error integral and error derivative
-                _integralError = Filter::constrainAbs(_integralError + velError * deltaT, WINDUP_MAX);
+                _integralError = Filter::constrainAbs(_integralError + velError * deltaT, VEL_WINDUP_MAX);
                 float deltaError = (velError - _lastError) / deltaT;
                 _lastError = velError;
 
@@ -134,7 +133,8 @@ namespace hf {
             AltitudeHoldPid(const float Kp_pos, const float Kp_vel, const float Ki_vel, const float Kd_vel, const float minAltitude=0.1) 
                 : _minAltitude(minAltitude)
             {
-                _Kp_pos = Kp_pos; 
+                _posPid.init(Kp_pos, 0, 0);
+                _velPid.init(Kp_vel, Ki_vel, Kd_vel, 1, VEL_WINDUP_MAX);
 
                 _Kp_vel = Kp_vel; 
                 _Ki_vel = Ki_vel; 
