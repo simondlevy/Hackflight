@@ -200,7 +200,7 @@ The <tt>addPidController()</tt> method allows you to to specify the
 auxiliary-switch state (aux state) in which the specified PID controller will be active.
 For example, you can specify that a Rate controller will be active in aux
 state 0 and a Level controller in aux state 1.  If you leave out the aux state,
-the PID controller will be active in all switch states.
+the PID controller will be active in all states.
 
 <b>Note that a PID controller is not the same as a
 [flight mode](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).</b>
