@@ -98,8 +98,8 @@ To understand the principles behind the software, contniue reading.
 ## Design Principles
 
 There are two basic data types in Hackflight: 
-[state](https://github.com/simondlevy/Hackflight/blob/master/src/datatypes.hpp#L34-L44) and 
-[demands](https://github.com/simondlevy/Hackflight/blob/master/src/datatypes.hpp#L25-L32).  For anyone
+[state](https://github.com/simondlevy/Hackflight/blob/master/src/datatypes.hpp#L40-L51) and 
+[demands](https://github.com/simondlevy/Hackflight/blob/master/src/datatypes.hpp#L31-L38).  For anyone
 who's studied [Kalman filtering](http://home.wlu.edu/~levys/kalman_tutorial/), the state will be familiar:
 it is the set of values that define the state of the vehicle at a given time
 (altitude, orientation, angular velocity, ...), which gets modified by a set of
