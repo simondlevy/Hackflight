@@ -26,8 +26,7 @@ SPLASH_LOCATION = 430,260
 
 BACKGROUND_COLOR = 'white'
 
-CONNECTION_DELAY_MSEC  = 1000
-BOARD_REPLY_DELAY_MSEC = 1000
+CONNECTION_DELAY_MSEC  = 1500
 
 USB_UPDATE_MSEC = 200
 
@@ -237,7 +236,7 @@ class GCS(msppg.Parser):
 
         self.gotimu = False
         self.hide(self.error_label)
-        self.scheduleTask(BOARD_REPLY_DELAY_MSEC, self._checkimu)
+        self.scheduleTask(CONNECTION_DELAY_MSEC, self._checkimu)
 
     def _checkimu(self):
 
