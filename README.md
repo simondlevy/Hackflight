@@ -76,7 +76,8 @@ class provides a constructor where you specify the PID values appropriate for yo
 Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
 channel values,  we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program.
 that allows you to connect to the board and see what's going on. Windows users
-can run this program directly: just download [this zipfile](http://home.wlu.edu/~levys/hackflight-gcs.zip),
+can run this program directly: just download
+[this zipfile](https://simondlevy.academic.wlu.edu/files/software/hackflight-gcs.zip),
 unzip the file, open the folder, and double-click on <b>hackflight.exe</b>.
 Others can run the <b>hackflight.py</b> Python script in the
 <b>extras/gcs/python</b> folder.  To run the Python script you'll
