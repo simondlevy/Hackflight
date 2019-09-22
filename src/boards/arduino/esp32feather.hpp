@@ -55,6 +55,15 @@ namespace hf {
 
         protected:
 
+            virtual void adjustQuaternion(float & qw, float & qx, float & qy, float & qz) override
+            { 
+                Filter::swap(qw, qx);
+                Filter::swap(qy, qz);
+
+                qx = -qx;
+                qy = -qy;
+            }
+
             virtual void writeMotor(uint8_t index, float value) override
             {
             }

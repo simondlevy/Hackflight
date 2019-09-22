@@ -40,13 +40,6 @@ namespace hf {
                 StandardMotor(2) 
             };
 
-            void swap(float & a, float & b)
-            {
-                float tmp = a;
-                a = b;
-                b = tmp;
-            }
-
          protected:
 
             virtual void writeMotor(uint8_t index, float value) override
@@ -62,8 +55,8 @@ namespace hf {
 
             virtual void adjustQuaternion(float & qw, float & qx, float & qy, float & qz) override
             { 
-                swap(qw, qx);
-                swap(qy, qz);
+                Filter::swap(qw, qx);
+                Filter::swap(qy, qz);
 
                 qx = -qx;
                 qy = -qy;
