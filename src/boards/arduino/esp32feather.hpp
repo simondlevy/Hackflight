@@ -33,6 +33,13 @@ namespace hf {
                 : SentralBoard(13)
             {
 
+                // Use D32, D15 for power
+                powerPin(32, HIGH);
+                powerPin(15, LOW);
+
+                // Hang a bit
+                delay(100);
+
                 // Start I^2C
                 Wire.begin();
 

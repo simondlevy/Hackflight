@@ -23,6 +23,7 @@
 #include "hackflight.hpp"
 #include "boards/arduino/esp32feather.hpp"
 #include "receivers/mock.hpp"
+#include "pidcontrollers/rate.hpp"
 #include "mixers/quadxcf.hpp"
 
 hf::Hackflight h;
@@ -31,7 +32,7 @@ hf::MockReceiver rc;
 
 hf::MixerQuadXCF mixer;
 
-hf::Rate ratePid = hf::Rate(0, 0, 0, 0, 0);
+hf::RatePid ratePid = hf::RatePid(0, 0, 0, 0, 0);
 
 void setup(void)
 {
