@@ -116,9 +116,6 @@ namespace hf {
                     // Sync PID controllers to gyro update
                     runPidControllers();
 
-                    // Sync failsafe to gyro loop
-                    checkFailsafe();
-
                     // Use updated demands to run motors
                     if (_state.armed && !_failsafe && !_receiver->throttleIsDown()) {
                         _mixer->runArmed(_demands);
@@ -151,16 +148,6 @@ namespace hf {
                 // Flash LED for certain PID controllers
                 _board->flashLed(shouldFlash);
             }
-
-            void checkFailsafe(void)
-            {
-                if (_state.armed && (_receiver->lostSignal() || _board->isBatteryLow())) {
-                    _mixer->cutMotors();
-                    _state.armed = false;
-                    _failsafe = true;
-                    _board->showArmedStatus(false);
-                }
-            } 
 
             void checkReceiver(void)
             {
@@ -196,6 +183,14 @@ namespace hf {
 
                 // Set LED based on arming status
                 _board->showArmedStatus(_state.armed);
+
+                // Sync failsafe to receiver
+                if (_state.armed && (_receiver->lostSignal() || _board->isBatteryLow())) {
+                    _mixer->cutMotors();
+                    _state.armed = false;
+                    _failsafe = true;
+                    _board->showArmedStatus(false);
+                }
 
             } // checkReceiver
 
