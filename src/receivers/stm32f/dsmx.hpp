@@ -32,7 +32,7 @@ extern "C" {
 static void serial_event(uint16_t value, void * data)
 {
 
-    DSM2048 * rx = (DSM2048 *)data;
+    DSM2048_2 * rx = (DSM2048_2 *)data;
 
     rx->handleSerialEvent((uint8_t)value, micros());
 }
@@ -54,7 +54,7 @@ class DSMX_Receiver : public hf::Receiver {
             uartPinConfigure(serialPinConfig());
 
             // Create a DSM2048 object to handle serial interrupts
-            _rx = new DSM2048();
+            _rx = new DSM2048_2();
 
             // Open serial connection to receiver
             uartOpen(_uartDevice, serial_event, _rx,  115200, MODE_RX, SERIAL_NOT_INVERTED);
@@ -74,7 +74,7 @@ class DSMX_Receiver : public hf::Receiver {
 
     private:
 
-        DSM2048 * _rx = NULL;
+        DSM2048_2 * _rx = NULL;
 
         UARTDevice_e _uartDevice;
 
