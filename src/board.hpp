@@ -69,8 +69,8 @@ namespace hf {
             virtual void    serialWriteByte(uint8_t c) { (void)c; }
 
             // ------------------------ Adjust IMU readings based on IMU orientation ------------------------------------
-            virtual void adjustGyrometer(float & gx, float & gy, float & gz) { }
-            virtual void adjustQuaternion(float & qw, float & qx, float & qy, float & qz) { }
+            virtual void adjustGyrometer(float & gx, float & gy, float & gz) { (void)gx; (void)gy; (void)gz; }
+            virtual void adjustQuaternion(float & qw, float & qx, float & qy, float & qz) { (void)qw; (void)qx; (void)qy; (void)qz; }
 
             //------------------------------- Reboot for non-Arduino boards ---------------------------------------------
             virtual void reboot(void) { }

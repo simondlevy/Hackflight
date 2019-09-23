@@ -1,5 +1,5 @@
 /*
-   Spektrum DSMX support for Arduino flight controllers
+   Spektrum DSMX support for Arduino flight controllers using timer
 
    This file is part of Hackflight.
 
@@ -28,16 +28,6 @@ static DSM2048 _rx;
 static HardwareSerial * _hardwareSerial;
 
 void serialEvent1(void)
-{
-    _rx.handleSerialEvent(micros());
-}
-
-void serialEvent2(void)
-{
-    _rx.handleSerialEvent(micros());
-}
-
-void serialEvent3(void)
 {
     _rx.handleSerialEvent(micros());
 }

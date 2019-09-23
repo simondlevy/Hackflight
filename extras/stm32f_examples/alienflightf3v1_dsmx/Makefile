@@ -27,7 +27,8 @@ TARGET    ?= ALIENFLIGHTF3
 CF_DIR := $(HOME)/Desktop/cleanflight
 
 # Where you put Arduino libraries
-ARDUINO_DIR     := $(HOME)/Documents/Arduino/libraries
+#ARDUINO_DIR     := $(HOME)/Documents/Arduino/libraries
+ARDUINO_DIR     := /mnt/d/Users/levys/Documents/Arduino/libraries
 
 # Compile-time options
 OPTIONS   ?=

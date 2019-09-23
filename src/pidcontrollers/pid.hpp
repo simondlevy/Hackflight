@@ -114,6 +114,8 @@ namespace hf {
 
         void updateReceiver(demands_t & demands, bool throttleIsDown)
         {
+            (void)demands; 
+
             // When landed, reset integral component of PID
             if (throttleIsDown) {
                 reset();

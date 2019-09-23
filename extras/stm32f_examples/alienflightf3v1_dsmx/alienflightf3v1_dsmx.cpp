@@ -21,6 +21,7 @@
 #include <hackflight.hpp>
 #include <mixers/quadxcf.hpp>
 #include <pidcontrollers/level.hpp>
+#include <pidcontrollers/rate.hpp>
 #include <alienflightf3v1.hpp>
 #include <receivers/stm32f/dsmx.hpp>
 
@@ -33,7 +34,7 @@ extern "C" {
     void setup(void)
     {
          
-        hf::Rate * ratePid = new hf::Rate(
+        hf::RatePid * ratePid = new hf::RatePid(
                 0.125,      // Gyro pitch/roll P
                 0.001875f,  // Gyro pitch/roll I
                 0.175f,     // Gyro pitch/roll D
@@ -41,15 +42,16 @@ extern "C" {
                 0.005625f,  // Gyro yaw I
                 4.0f);      // Demands to rate
 
-        hf::Level * level = new hf::Level(0.20f);
+        hf::LevelPid * levelPid = new hf::LevelPid(0.20f);
 
         DSMX_Receiver * rc = new DSMX_Receiver(UARTDEV_2, CHANNEL_MAP);
 
-        // Add Level PID for aux switch position 1
-        h.addPidController(level, 1);
-
         // Initialize Hackflight firmware
-        h.init(new AlienflightF3V1(), rc, new hf::MixerQuadXCF(), ratePid);
+        h.init(new AlienflightF3V1(), rc, new hf::MixerQuadXCF());
+
+        // Add PID controllers
+        h.addPidController(levelPid);
+        h.addPidController(ratePid);
     }
 
     void loop(void)
