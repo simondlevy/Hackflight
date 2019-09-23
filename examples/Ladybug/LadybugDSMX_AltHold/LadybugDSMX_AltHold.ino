@@ -22,9 +22,10 @@
 
 #include "hackflight.hpp"
 #include "boards/arduino/ladybug.hpp"
-#include "receivers/arduino/dsmx.hpp"
+#include "receivers/arduino/dsmx_interrupt.hpp"
 #include "sensors/rangefinders/vl53l1x.hpp"
 #include "pidcontrollers/level.hpp"
+#include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/althold.hpp"
 #include "mixers/quadxcf.hpp"
 
@@ -36,16 +37,16 @@ hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);
 
 hf::MixerQuadXCF mixer;
 
-hf::Rate ratePid = hf::Rate(
+hf::RatePid ratePid = hf::RatePid(
         0.225f,     // Gyro pitch/roll P
         0.001875f,  // Gyro pitch/roll I
         0.375f,     // Gyro pitch/roll D
         1.0625f,    // Gyro yaw P
         0.005625f); // Gyro yaw I
 
-hf::Level level = hf::Level(0.20f);
+hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
-hf::AltitudeHold althold = hf::AltitudeHold(
+hf::AltitudeHoldPid altholdPid = hf::AltitudeHoldPid(
         1.00f,   // Altitude Hold P
         0.15f,   // Altitude Hold Velocity P
         0.01f,   // Altitude Hold Velocity I
@@ -60,17 +61,16 @@ void setup(void)
     rc.setTrimPitch(+.3);
 
     // Initialize Hackflight firmware
-    h.init(new hf::Ladybug(), &rc, &mixer, &ratePid);
+    h.init(new hf::Ladybug(), &rc, &mixer);
 
     // Add rangefinder sensor
     rangefinder.begin();
     h.addSensor(&rangefinder);
 
-    // Add Level PID for aux switch position 1
-    h.addPidController(&level, 1);
-
-    // Add altitude-hold and position-hold PID controllers for aux switch position 2
-    h.addPidController(&althold, 2);
+    // Add PID controllers
+    h.addPidController(&levelPid);
+    h.addPidController(&ratePid);
+    h.addPidController(&altholdPid, 1);
 }
 
 void loop(void)

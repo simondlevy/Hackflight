@@ -21,7 +21,7 @@
 #include "receiver.hpp"
 #include <DSMRX.h>
 
-static DSM2048 rx;
+static DSM2048 _rx;
 
 // Support different UARTs
 
@@ -29,17 +29,17 @@ static HardwareSerial * _hardwareSerial;
 
 void serialEvent1(void)
 {
-    rx.handleSerialEvent(micros());
+    _rx.handleSerialEvent(micros());
 }
 
 void serialEvent2(void)
 {
-    rx.handleSerialEvent(micros());
+    _rx.handleSerialEvent(micros());
 }
 
 void serialEvent3(void)
 {
-    rx.handleSerialEvent(micros());
+    _rx.handleSerialEvent(micros());
 }
 
 uint8_t dsmSerialAvailable(void)
@@ -51,7 +51,6 @@ uint8_t dsmSerialRead(void)
 {
     return _hardwareSerial->read();
 }
-
 
 namespace hf {
 
@@ -66,17 +65,17 @@ namespace hf {
 
             bool gotNewFrame(void)
             {
-                return rx.gotNewFrame();
+                return _rx.gotNewFrame();
             }
 
             void readRawvals(void)
             {
-                rx.getChannelValuesNormalized(rawvals, MAXCHAN);
+                _rx.getChannelValuesNormalized(rawvals, MAXCHAN);
             }
 
             bool lostSignal(void)
             {
-                return rx.timedOut(micros());
+                return _rx.timedOut(micros());
             }
 
         public:

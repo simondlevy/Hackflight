@@ -32,7 +32,7 @@ Copyright (c) 2018 Simon D. Levy
 
 #include "hackflight.hpp"
 #include "boards/arduino/butterfly.hpp"
-#include "receivers/arduino/dsmx.hpp"
+#include "receivers/arduino/dsmx_interrupt.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"

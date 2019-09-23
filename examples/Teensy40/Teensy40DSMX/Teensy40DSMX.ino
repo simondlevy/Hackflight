@@ -26,9 +26,10 @@
 
 #include "hackflight.hpp"
 #include "boards/arduino/teensy40.hpp"
-#include "receivers/arduino/dsmx.hpp"
+#include "receivers/arduino/dsmx_interrupt.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/level.hpp"
+#include "pidcontrollers/rate.hpp"
 
 constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
@@ -38,17 +39,19 @@ hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);
 
 hf::MixerQuadXCF mixer;
 
-hf::Rate ratePid = hf::Rate(0.01f, 0.00f, 0.00f, 0.10f, 0.01f, 8.58); 
+hf::RatePid ratePid = hf::RatePid(0.01f, 0.00f, 0.00f, 0.10f, 0.01f, 8.58); 
 
-hf::Level level = hf::Level(0.40f);
+hf::LevelPid levelPid = hf::LevelPid(0.40f);
 
 void setup(void)
 {
-    // Add Level PID for aux switch position 1
-    h.addPidController(&level, 1);
-
     // Initialize Hackflight firmware
-    h.init(new hf::Teensy40(), &rc, &mixer, &ratePid);
+    h.init(new hf::Teensy40(), &rc, &mixer);
+
+    // Add PID controllers
+    h.addPidController(&levelPid);
+    h.addPidController(&levelPid);
+
 }
 
 void loop(void)
