@@ -20,7 +20,7 @@
 
 #include <receiver.hpp>
 #include <hackflight.hpp>
-#include <DSMRX.h>
+#include <DSMRX2.h>
 
 // Cleanflight drivers
 extern "C" {
@@ -29,31 +29,12 @@ extern "C" {
 #include "drivers/serial_uart.h"
 }
 
-static DSM2048 * _rx;
-
-// Support for reading DSMX signals over UART
-static uint8_t _dsmAvailable;
-static uint8_t _dsmValue;
-
-uint8_t dsmSerialAvailable(void)
-{
-    return _dsmAvailable;
-}
-
-uint8_t dsmSerialRead(void)
-{
-    _dsmAvailable--;
-    return _dsmValue;
-}
-
 static void serial_event(uint16_t value, void * data)
 {
-    (void)data;
 
-    _dsmValue = (uint8_t)value;
-    _dsmAvailable = 1;
+    DSM2048 * rx = (DSM2048 *)data;
 
-    _rx->handleSerialEvent(micros());
+    rx->handleSerialEvent((uint8_t)value, micros());
 }
 
 class DSMX_Receiver : public hf::Receiver {
@@ -72,16 +53,14 @@ class DSMX_Receiver : public hf::Receiver {
             // Set up UART
             uartPinConfigure(serialPinConfig());
 
-            // Open serial connection to receiver
-            uartOpen(_uartDevice, serial_event, NULL,  115200, MODE_RX, SERIAL_NOT_INVERTED);
-
             // Create a DSM2048 object to handle serial interrupts
             _rx = new DSM2048();
+
+            // Open serial connection to receiver
+            uartOpen(_uartDevice, serial_event, _rx,  115200, MODE_RX, SERIAL_NOT_INVERTED);
         }
 
-
-        //protected:
-    public:
+    protected:
 
         virtual bool gotNewFrame(void) override
         {
@@ -94,6 +73,8 @@ class DSMX_Receiver : public hf::Receiver {
         } 
 
     private:
+
+        DSM2048 * _rx = NULL;
 
         UARTDevice_e _uartDevice;
 
