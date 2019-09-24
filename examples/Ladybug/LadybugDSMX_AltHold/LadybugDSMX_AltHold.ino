@@ -22,7 +22,7 @@
 
 #include "hackflight.hpp"
 #include "boards/arduino/ladybug.hpp"
-#include "receivers/arduino/dsmx_interrupt.hpp"
+#include "receivers/arduino/dsmx_serial1.hpp"
 #include "sensors/rangefinders/vl53l1x.hpp"
 #include "pidcontrollers/level.hpp"
 #include "pidcontrollers/rate.hpp"
@@ -33,7 +33,7 @@ constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 hf::Hackflight h;
 
-hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);
+hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP);
 
 hf::MixerQuadXCF mixer;
 
