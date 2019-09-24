@@ -21,43 +21,41 @@
  */
 
 #include <Arduino.h>
+#include "hackflight.hpp"
+#include "motors/standard.hpp"
 
 static uint8_t MOTOR_PIN = 11;
 
-static uint16_t val;
-static int16_t inc;
+static float  val;
+static int8_t dir;
 
-// Min, max PWM values
-const uint16_t PWM_MIN = 1000;
-const uint16_t PWM_MAX = 2000;
-
+hf::StandardMotor motor = hf::StandardMotor(MOTOR_PIN);
 
 void setup(void)
 {
     // Initialize the motor
-    pinMode(MOTOR_PIN, OUTPUT);
-    analogWrite(MOTOR_PIN, PWM_MIN>>3);
+    motor.init();
 
     // Start with motor off, increasing
-    val = PWM_MIN;
-    inc = +1;
+    val = 0;
+    dir = +1;
 
     delay(1000);
 }
 
 void loop(void)
 {
-    analogWrite(MOTOR_PIN, val >> 3);
+    motor.write(val);
 
-    val += inc;
+    val += dir * .001;
 
     // stop halfway
-    if (val >= (PWM_MIN+PWM_MAX)/2) {
-        inc = -1;
+    if (val >= 0.5) {
+        dir = -1;
     }
 
-    if (val <= PWM_MIN) {
-        inc = +1;
+    if (val <= 0) {
+        dir = +1;
     }
 
     delay(10);
