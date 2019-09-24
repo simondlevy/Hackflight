@@ -32,7 +32,7 @@
 
 #include "hackflight.hpp"
 #include "boards/arduino/butterfly.hpp"
-#include "receivers/arduino/dsmx.hpp"
+#include "receivers/arduino/dsmx_serial1.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
@@ -41,7 +41,7 @@ constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 hf::Hackflight h;
 
-hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);  
+hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP);  
 
 hf::MixerQuadXCF mixer;
 
@@ -49,20 +49,10 @@ hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f, 8.58);
 
 hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
-void serialEvent1(void)
-{
-    while (Serial1.available()) {
-        rc.handleSerialEvent(Serial1.read(), micros());
-    }
-}
-
 void setup(void)
 {
     // Initialize Hackflight firmware
     h.init(new hf::Butterfly(), &rc, &mixer);
-
-    // Start listening for receiver events on Serial1
-    Serial1.begin(115200);
 
     // Add Rate and Level PID controllers
     h.addPidController(&levelPid);

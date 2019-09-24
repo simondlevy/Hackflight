@@ -1,5 +1,5 @@
 /*
-   Spektrum DSMX support for Arduino flight controllers using timer
+   Spektrum DSMX support for Arduino flight controllers
 
    This file is part of Hackflight.
 
@@ -20,10 +20,6 @@
 
 #include "receiver.hpp"
 #include <DSMRX.h>
-
-// Support different UARTs
-
-static HardwareSerial * _hardwareSerial;
 
 namespace hf {
 
