@@ -11,7 +11,7 @@
 
        https://github.com/simondlevy/grumpyoldpizza
 
-Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2018 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -32,7 +32,7 @@ Copyright (c) 2018 Simon D. Levy
 
 #include "hackflight.hpp"
 #include "boards/arduino/butterfly.hpp"
-#include "receivers/arduino/dsmx_interrupt.hpp"
+#include "receivers/arduino/dsmx.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
@@ -49,10 +49,20 @@ hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f, 8.58);
 
 hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
+void serialEvent1(void)
+{
+    while (Serial1.available()) {
+        rc.handleSerialEvent(Serial1.read(), micros());
+    }
+}
+
 void setup(void)
 {
     // Initialize Hackflight firmware
     h.init(new hf::Butterfly(), &rc, &mixer);
+
+    // Start listening for receiver events on Serial1
+    Serial1.begin(115200);
 
     // Add Rate and Level PID controllers
     h.addPidController(&levelPid);

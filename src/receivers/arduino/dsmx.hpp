@@ -1,5 +1,5 @@
 /*
-   Spektrum DSMX support for Arduino flight controllers
+   Spektrum DSMX support for Arduino flight controllers using timer
 
    This file is part of Hackflight.
 
@@ -21,43 +21,22 @@
 #include "receiver.hpp"
 #include <DSMRX.h>
 
-static DSM2048 _rx;
-
 // Support different UARTs
 
 static HardwareSerial * _hardwareSerial;
-
-static void handleEvent(void)
-{
-    while (_hardwareSerial->available()) {
-        _rx.handleSerialEvent(_hardwareSerial->read(), micros());
-    }
-}
-
-void serialEvent1(void)
-{
-    handleEvent();
-}
-
-void serialEvent2(void)
-{
-    handleEvent();
-}
-
-void serialEvent3(void)
-{
-    handleEvent();
-}
 
 namespace hf {
 
     class DSMX_Receiver : public Receiver {
 
-         protected:
+        private:
+
+            DSM2048 _rx;
+
+        protected:
 
             void begin(void)
             {
-                _hardwareSerial->begin(115200);
             }
 
             bool gotNewFrame(void)
@@ -77,10 +56,14 @@ namespace hf {
 
         public:
 
-            DSMX_Receiver(const uint8_t channelMap[6], HardwareSerial * hardwareSerial=&Serial1) 
+            DSMX_Receiver(const uint8_t channelMap[6])
                 :  Receiver(channelMap) 
             { 
-                _hardwareSerial = hardwareSerial;
+            }
+
+            void handleSerialEvent(uint8_t value, uint32_t usec)
+            {
+                _rx.handleSerialEvent(value, usec);
             }
 
     }; // class DSMX_Receiver

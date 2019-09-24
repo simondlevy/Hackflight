@@ -1,6 +1,16 @@
 /*
    Hackflight sketch for ESP32 Feather with DSMX receiver
 
+   Additional libraries needed:
+
+       https://github.com/simondlevy/EM7180
+       https://github.com/simondlevy/CrossPlatformDataBus
+       https://github.com/simondlevy/SpektrumDSM 
+
+   Hardware support for ESP32:
+
+       https://github.com/simondlevy/grumpyoldpizza
+
    Copyright (c) 2019 Simon D. Levy
 
    This file is part of Hackflight.
@@ -23,8 +33,7 @@
 #include "hackflight.hpp"
 #include "boards/arduino/esp32feather.hpp"
 #include "receivers/mock.hpp"
-#include "receivers/arduino/dsmx_timer.hpp"
-#include "receivers/mock.hpp"
+#include "receivers/arduino/dsmx.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "mixers/quadxcf.hpp"
 
@@ -32,7 +41,7 @@ const uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 hf::Hackflight h;
 
-hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, &Serial2);
+hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP);
 
 hf::MixerQuadXCF mixer;
 
@@ -42,7 +51,9 @@ static void coreTask(void * params)
 {
     while (true) {
 
-        rc.handleEvents();
+        if (Serial2.available()) {
+            rc.handleSerialEvent(Serial2.read(), micros());
+        }
 
         delay(1);
     }
@@ -53,7 +64,8 @@ void setup(void)
     // Initialize Hackflight firmware
     h.init(new hf::ESP32FeatherBoard(), &rc, &mixer);
 
-    // Start the timer task for the receiver
+    // Start the receiver
+    Serial2.begin(115200);
     TaskHandle_t task;
     xTaskCreatePinnedToCore(coreTask, "Task", 10000, NULL, 1, &task, 0);
 }
