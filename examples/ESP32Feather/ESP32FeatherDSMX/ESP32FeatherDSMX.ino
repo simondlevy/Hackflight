@@ -61,8 +61,14 @@ static void coreTask(void * params)
 
 void setup(void)
 {
+    // Create a new Board instance
+    hf::ESP32FeatherBoard * board = new hf::ESP32FeatherBoard();
+
     // Initialize Hackflight firmware
-    h.init(new hf::ESP32FeatherBoard(), &rc, &mixer);
+    h.init(board, &rc, &mixer);
+
+    // Adjust for sloppy IMU mount
+    board->setRollAndPitchOffsets(0, 5);
 
     // Start the receiver
     Serial2.begin(115200);

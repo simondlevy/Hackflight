@@ -27,10 +27,15 @@ namespace hf {
 
     class ArduinoBoard : public RealBoard {
 
+        friend class Hackflight;
+
         private:
 
             uint8_t _led_pin = 0;
             bool    _led_inverted = false;
+
+            float _rollAdjustRadians = 0;
+            float _pitchAdjustRadians = 0;
 
         protected:
 
@@ -56,6 +61,12 @@ namespace hf {
                 Serial.write(c);
             }
 
+            virtual void adjustRollAndPitch(float & roll, float & pitch) override
+            {
+                pitch += _pitchAdjustRadians;
+                roll  += _rollAdjustRadians;
+            }
+
             static void powerPin(uint8_t id, uint8_t value)
             {
                 pinMode(id, OUTPUT);
@@ -75,6 +86,15 @@ namespace hf {
                 Serial.begin(115200);
 
                 RealBoard::init();
+            }
+
+            /**
+              * Compensates for poorly-mounted IMU.
+              */
+            void setRollAndPitchOffsets(float rollDegrees, float pitchDegrees)
+            {
+                _rollAdjustRadians  = Filter::deg2rad(rollDegrees);
+                _pitchAdjustRadians = Filter::deg2rad(pitchDegrees);
             }
 
     }; // class ArduinoBoard

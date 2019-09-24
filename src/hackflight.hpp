@@ -91,6 +91,9 @@ namespace hf {
                     // Update state with new quaternion to yield Euler angles
                     _quaternion.modifyState(_state, time);
 
+                    // Adjust Euler angles to compensate for sloppy IMU mounting
+                    _board->adjustRollAndPitch(_state.rotation[0], _state.rotation[1]);
+
                     // Synch serial comms to quaternion check
                     doSerialComms();
                 }
