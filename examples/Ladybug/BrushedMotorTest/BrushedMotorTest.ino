@@ -21,40 +21,44 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
+#include "hackflight.hpp"
+#include "motors/brushed.hpp"
 
 static uint8_t MOTOR_PIN = 13; // Motor 1: right rear
 //static uint8_t MOTOR_PIN = A2; // Motor 2: right front
 //static uint8_t MOTOR_PIN = 3;  // Motor 3: left rear
 //static uint8_t MOTOR_PIN = 11; // Motor 4: left front
 
-static uint8_t val;
-static uint8_t inc;
+static float  val;
+static int8_t dir;
+
+hf::BrushedMotor motor = hf::BrushedMotor(MOTOR_PIN);
 
 void setup(void)
 {
     // Initialize the motor
-    analogWriteFrequency(MOTOR_PIN, 10000);  
-    analogWrite(MOTOR_PIN, 0);  
+    motor.init();
 
     // Start with motor off, increasing
     val = 0;
-    inc = +1;
+    dir = +1;
+
+    delay(1000);
 }
 
 void loop(void)
 {
-    analogWrite(MOTOR_PIN, val);
+    motor.write(val);
 
-    val += inc;
+    val += dir * .001;
 
     // stop halfway
-    if (val == 128) {
-        inc = -1;
+    if (val >= 0.5) {
+        dir = -1;
     }
 
-    if (val == 0) {
-        inc = +1;
+    if (val <= 0) {
+        dir = +1;
     }
 
     delay(10);
