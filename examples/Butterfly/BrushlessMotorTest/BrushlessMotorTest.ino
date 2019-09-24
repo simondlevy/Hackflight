@@ -20,7 +20,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
 #include "hackflight.hpp"
 #include "motors/standard.hpp"
 
