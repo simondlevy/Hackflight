@@ -5,9 +5,6 @@
     debug messages.  Your Board implementation should provide and outbuf(char
     method that displays the message in an appropriate way.
 
-    Also provides an adHocDisplay() method for periodic display of data coming from
-    a high-frequency source like IMU.
-
     Copyright (c) 2018 Simon D. Levy
 
     This file is part of Hackflight.
@@ -53,17 +50,6 @@ namespace hf {
         void init(Board * board)
         {
             _board = board;
-        }
-
-        void adHoc(void)
-        {
-            float currTime = _board->getTime();
-
-            if (currTime - _prevTime > _adhoc_period)
-            {
-                _board->adHocDebug();
-                _prevTime = currTime;
-            }
         }
 
         public:

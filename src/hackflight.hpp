@@ -240,11 +240,6 @@ namespace hf {
                 sensor->board = board;
             }
 
-            void debug(void)
-            {
-                _debugger.adHoc();
-            }
-
         protected:
 
             virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 
@@ -359,9 +354,6 @@ namespace hf {
 
                 // Check optional sensors
                 checkOptionalSensors();
-
-                // Run periodic ad-hoc debugger
-                debug();
             } 
 
     }; // class Hackflight

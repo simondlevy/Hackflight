@@ -83,7 +83,6 @@ namespace hf {
 
             //--------------------------------------- Debugging ----------------------------------------------------------
             static  void outbuf(char * buf);
-            virtual void adHocDebug(void) { }
 
     }; // class Board
 
