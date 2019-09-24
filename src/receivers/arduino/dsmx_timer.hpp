@@ -27,21 +27,6 @@ static DSM2048 _rx;
 
 static HardwareSerial * _hardwareSerial;
 
-void serialEvent1(void)
-{
-    _rx.handleSerialEvent(micros());
-}
-
-uint8_t dsmSerialAvailable(void)
-{
-    return _hardwareSerial->available();
-}
-
-uint8_t dsmSerialRead(void)
-{
-    return _hardwareSerial->read();
-}
-
 namespace hf {
 
     class DSMX_Receiver : public Receiver {
@@ -74,6 +59,13 @@ namespace hf {
                 :  Receiver(channelMap) 
             { 
                 _hardwareSerial = hardwareSerial;
+            }
+
+            void handleEvents(void)
+            {
+                if (_hardwareSerial->available()) {
+                    _rx.handleSerialEvent(_hardwareSerial->read(), micros());
+                }
             }
 
     }; // class DSMX_Receiver

@@ -27,29 +27,26 @@ static DSM2048 _rx;
 
 static HardwareSerial * _hardwareSerial;
 
+static void handleEvent(void)
+{
+    while (_hardwareSerial->available()) {
+        _rx.handleSerialEvent(_hardwareSerial->read(), micros());
+    }
+}
+
 void serialEvent1(void)
 {
-    _rx.handleSerialEvent(micros());
+    handleEvent();
 }
 
 void serialEvent2(void)
 {
-    _rx.handleSerialEvent(micros());
+    handleEvent();
 }
 
 void serialEvent3(void)
 {
-    _rx.handleSerialEvent(micros());
-}
-
-uint8_t dsmSerialAvailable(void)
-{
-    return _hardwareSerial->available();
-}
-
-uint8_t dsmSerialRead(void)
-{
-    return _hardwareSerial->read();
+    handleEvent();
 }
 
 namespace hf {

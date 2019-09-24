@@ -23,7 +23,8 @@
 #include "hackflight.hpp"
 #include "boards/arduino/esp32feather.hpp"
 #include "receivers/mock.hpp"
-#include "receivers/arduino/dsmx.hpp"
+#include "receivers/arduino/dsmx_timer.hpp"
+#include "receivers/mock.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "mixers/quadxcf.hpp"
 
@@ -41,9 +42,7 @@ static void coreTask(void * params)
 {
     while (true) {
 
-        if (Serial2.available()) {
-           rx.handleSerialEvent(micros()); // rx is included by dsmx.hpp
-        }
+        rc.handleEvents();
 
         delay(1);
     }
@@ -51,8 +50,8 @@ static void coreTask(void * params)
 
 void setup(void)
 {
-     // Initialize Hackflight firmware
-     h.init(new hf::ESP32FeatherBoard(), &rc, &mixer, &ratePid);
+    // Initialize Hackflight firmware
+    h.init(new hf::ESP32FeatherBoard(), &rc, &mixer);
 
     // Start the timer task for the receiver
     TaskHandle_t task;
@@ -62,6 +61,4 @@ void setup(void)
 void loop(void)
 {
     h.update();
-
-    delay(10);
 }
