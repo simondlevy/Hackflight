@@ -28,12 +28,17 @@ namespace hf {
 
         private:
 
-            const uint16_t MINVAL = 125;
-            const uint16_t MAXVAL = 250;
+#ifdef ESP32
+            static const uint16_t OFFSET = 25;
+#else
+            static const uint16_t OFFSET = 0;
+#endif
+            static const uint16_t MINVAL = 125;
+            static const uint16_t MAXVAL = 250;
 
             void writeValue(uint16_t value)
             {
-                analogWrite(_pin, value);
+                analogWrite(_pin, value+OFFSET);
             }
 
         public:
@@ -51,9 +56,7 @@ namespace hf {
             }
 
             virtual void write(float value) override
-            {
-                writeValue((uint16_t)(MINVAL+value*(MAXVAL-MINVAL)));
-            }
+            { writeValue((uint16_t)(MINVAL+value*(MAXVAL-MINVAL))); }
 
     }; // class StandardMotor
 

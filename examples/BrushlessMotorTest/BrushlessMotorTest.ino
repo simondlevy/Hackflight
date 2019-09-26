@@ -1,5 +1,5 @@
 /*
-   Arduino sketch to test motors on Butterfly flight Controller
+   Arduino sketch to test brushless motor with standard ESC
 
    DID YOU REMEMOVE THE PROPELLERS FIRST?
 
@@ -23,7 +23,7 @@
 #include "hackflight.hpp"
 #include "motors/standard.hpp"
 
-static uint8_t MOTOR_PIN = 8;
+static uint8_t MOTOR_PIN = 21;
 
 static float  val;
 static int8_t dir;
