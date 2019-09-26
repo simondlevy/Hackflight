@@ -28,9 +28,13 @@ namespace hf {
 
         private:
 
-            // Min, max PWM values
-            const uint16_t PWM_MIN = 1000;
-            const uint16_t PWM_MAX = 2000;
+            const uint16_t MINVAL = 125;
+            const uint16_t MAXVAL = 250;
+
+            void writeValue(uint16_t value)
+            {
+                analogWrite(_pin, value);
+            }
 
         public:
 
@@ -42,12 +46,13 @@ namespace hf {
             virtual void init(void) override
             {
                 pinMode(_pin, OUTPUT);
-                analogWrite(_pin, PWM_MIN>>3);
+                writeValue(MINVAL);
+                Serial.begin(115200);
             }
 
             virtual void write(float value) override
             {
-                analogWrite(_pin, (uint16_t)(PWM_MIN+value*(PWM_MAX-PWM_MIN)) >> 3);
+                writeValue((uint16_t)(MINVAL+value*(MAXVAL-MINVAL)));
             }
 
     }; // class StandardMotor

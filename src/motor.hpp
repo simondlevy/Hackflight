@@ -20,6 +20,10 @@
 
 #pragma once
 
+#ifdef ESP32
+#include <analogWrite.h>
+#endif
+
 namespace hf {
 
     class Motor {
