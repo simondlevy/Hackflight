@@ -40,6 +40,9 @@ namespace hf {
         float _errorI      = 0;
         float _deltaError1 = 0;
         float _deltaError2 = 0;
+
+        // For deltaT-based controllers
+        float _previousTime = 0;
  
         // Scale factor for stick demand
         float _demandScale = 0;
@@ -92,8 +95,13 @@ namespace hf {
         }
 
         // Version 2: use time
-        float compute(float target, float actual, float deltaT)
+        float compute(float target, float actual, float currentTime)
         {
+            // Don't do anything until we have a positive deltaT
+            float deltaT = currentTime - _previousTime;
+            _previousTime = currentTime;
+            if (deltaT == currentTime) return 0;
+
             // Compute error as scaled target minus actual
             float error = target - actual;
 
@@ -126,6 +134,7 @@ namespace hf {
         {
             _errorI = 0;
             _lastError = 0;
+            _previousTime = 0;
         }
 
     };  // class Pid

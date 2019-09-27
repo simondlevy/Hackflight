@@ -38,7 +38,6 @@ namespace hf {
 
         bool gotCorrection(float demand, float velocity, float currentTime, float & correction)
         {
-
             return false;
         }
 
@@ -47,13 +46,15 @@ namespace hf {
 
         bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
         {
-            // Don't do anything till we've reached sufficient altitude
-            if (state.location[2] < _minAltitude) return false;
-
             // Don't do anything until we have a positive deltaT
             float deltaT = currentTime - _previousTime;
             _previousTime = currentTime;
             if (deltaT == currentTime) return false;
+
+            // Don't do anything till we've reached sufficient altitude
+            if (state.location[2] < _minAltitude) return false;
+
+            debugline("%+3.3f  %+3.3f\n", state.bodyVel[1], state.bodyVel[0]);
 
             demands.roll  -= _P * state.bodyVel[1];
             demands.pitch -= _P * state.bodyVel[0];

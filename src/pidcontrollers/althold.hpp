@@ -59,11 +59,6 @@ namespace hf {
 
             bool gotCorrection(float demand, float posActual, float velActual, float currentTime, float & correction)
             {
-                // Don't do anything until we have a positive deltaT
-                float deltaT = currentTime - _previousTime;
-                _previousTime = currentTime;
-                if (deltaT == currentTime) return false;
-
                 // Reset target if moved into stick deadband
                 bool inBandCurr = inBand(demand);
                 if (inBandCurr && !_inBandPrev) {
@@ -79,7 +74,7 @@ namespace hf {
                 float velTarget = _posPid.compute(_posTarget, posActual);
 
                 // Run velocity PID controller to get correction
-                correction = _velPid.compute(velTarget, velActual, deltaT);
+                correction = _velPid.compute(velTarget, velActual, currentTime);
 
                 return true;
             }

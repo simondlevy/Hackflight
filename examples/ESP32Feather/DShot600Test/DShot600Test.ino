@@ -38,11 +38,13 @@ void setup() {
 
     dshot.begin();
 
+    // Turn LED on
     pinMode(13,OUTPUT);
     digitalWrite(13, HIGH);
 
     delay(5000); // allow both motors to start up
 
+    // Turn LED off
     digitalWrite(13, LOW);
 
     sel = 0;
