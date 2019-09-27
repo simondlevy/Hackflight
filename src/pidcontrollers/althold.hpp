@@ -51,15 +51,10 @@ namespace hf {
             bool  _inBandPrev = false;
             float _previousTime = 0;
 
-            bool inBand(float demand)
+            bool ready(float demand, float altitude)
             {
-                return fabs(demand) < Receiver::STICK_DEADBAND; 
+                return (fabs(demand) < Receiver::STICK_DEADBAND) && (altitude > _minAltitude); 
             }
-
-            bool gotCorrection(float demand, float posActual, float velActual, float currentTime, float & correction)
-            {
-           }
-
 
         protected:
 
@@ -67,19 +62,15 @@ namespace hf {
             {
                 float altitude = state.location[2];
 
-                // Don't do anything till we've reached sufficient altitude
-                if (altitude < _minAltitude) return false;
+                // Don't do anything till we've reached sufficient altitude and are in stick deadband
+                if (!ready(demands.throttle, altitude)) return false;
 
-                // Reset target if moved into stick deadband
-                bool inBandCurr = inBand(demands.throttle);
-                if (inBandCurr && !_inBandPrev) {
+                // Reset controller when moving into deadband
+                if (!_inBandPrev) {
                     _altitudeTarget = altitude;
                     _velPid.reset();
+                    _inBandPrev = true;
                 }
-                _inBandPrev = inBandCurr;
-
-                // Don't do anything till we're in deadband
-                if (!inBandCurr) return false;
 
                 // Velocity target is output of position P controller
                 float velTarget = _posPid.compute(_altitudeTarget, altitude);
@@ -88,7 +79,6 @@ namespace hf {
                 demands.throttle = _velPid.compute(velTarget, state.inertialVel[2], currentTime);
 
                 return true;
-
             }
 
             virtual bool shouldFlashLed(void) override 
