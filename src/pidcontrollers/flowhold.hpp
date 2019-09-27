@@ -22,6 +22,7 @@
 
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
+#include "pid.hpp"
 
 namespace hf {
 
@@ -31,35 +32,23 @@ namespace hf {
 
         private: 
 
+        Pid _rollPid;
+        Pid _pitchPid;
+
         // PID constants set by constructor
-        float _P = 0;
         float _minAltitude = 0;
-        float _previousTime = 0;
-
-        bool gotCorrection(float demand, float velocity, float currentTime, float & correction)
-        {
-            return false;
-        }
-
 
         protected:
 
         bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
         {
-            // Don't do anything until we have a positive deltaT
-            float deltaT = currentTime - _previousTime;
-            _previousTime = currentTime;
-            if (deltaT == currentTime) return false;
-
             // Don't do anything till we've reached sufficient altitude
             if (state.location[2] < _minAltitude) return false;
 
-            debugline("%+3.3f  %+3.3f\n", state.bodyVel[1], state.bodyVel[0]);
+            demands.roll  = _rollPid.compute(0, state.bodyVel[1], currentTime);
+            demands.pitch = _pitchPid.compute(0, state.bodyVel[0], currentTime);
 
-            demands.roll  -= _P * state.bodyVel[1];
-            demands.pitch -= _P * state.bodyVel[0];
-
-            return false;
+            return true;
 
         }
 
@@ -70,10 +59,11 @@ namespace hf {
 
         public:
 
-        FlowHoldPid(const float P, const float minAltitude=0.1) 
-            : _P(P), _minAltitude(minAltitude)
+        FlowHoldPid(const float Kp, const float minAltitude=0.1) 
+            : _minAltitude(minAltitude)
         {
-            _previousTime = 0;
+            _rollPid.init(Kp, 0, 0);
+            _pitchPid.init(Kp, 0, 0);
         }
 
     };  // class FlowHoldPid

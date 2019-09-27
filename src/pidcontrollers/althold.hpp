@@ -35,7 +35,6 @@ namespace hf {
         private: 
 
             // Arbitrary constants
-            static constexpr float HOVER_THROTTLE  = 0.05f;
             static constexpr float VEL_WINDUP_MAX  = 0.40f;
 
             // P controller for position
@@ -48,7 +47,7 @@ namespace hf {
             float _minAltitude = 0;
 
             // Values modified in-flight
-            float _posTarget = 0;
+            float _altitudeTarget = 0;
             bool  _inBandPrev = false;
             float _previousTime = 0;
 
@@ -59,10 +58,22 @@ namespace hf {
 
             bool gotCorrection(float demand, float posActual, float velActual, float currentTime, float & correction)
             {
+           }
+
+
+        protected:
+
+            bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
+            {
+                float altitude = state.location[2];
+
+                // Don't do anything till we've reached sufficient altitude
+                if (altitude < _minAltitude) return false;
+
                 // Reset target if moved into stick deadband
-                bool inBandCurr = inBand(demand);
+                bool inBandCurr = inBand(demands.throttle);
                 if (inBandCurr && !_inBandPrev) {
-                    _posTarget = posActual;
+                    _altitudeTarget = altitude;
                     _velPid.reset();
                 }
                 _inBandPrev = inBandCurr;
@@ -71,29 +82,12 @@ namespace hf {
                 if (!inBandCurr) return false;
 
                 // Velocity target is output of position P controller
-                float velTarget = _posPid.compute(_posTarget, posActual);
+                float velTarget = _posPid.compute(_altitudeTarget, altitude);
 
                 // Run velocity PID controller to get correction
-                correction = _velPid.compute(velTarget, velActual, currentTime);
+                demands.throttle = _velPid.compute(velTarget, state.inertialVel[2], currentTime);
 
                 return true;
-            }
-
-
-        protected:
-
-            bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
-            {
-                // Don't do anything till we've reached sufficient altitude
-                if (state.location[2] < _minAltitude) return false;
-
-                float correction = 0;
-                if (gotCorrection(demands.throttle, state.location[2], state.inertialVel[2], currentTime, correction)) {
-                    demands.throttle = correction + HOVER_THROTTLE;
-                    return true;
-                }
-
-                return false;
 
             }
 
@@ -110,7 +104,7 @@ namespace hf {
                 _posPid.init(Kp_pos, 0, 0);
                 _velPid.init(Kp_vel, Ki_vel, Kd_vel, 1, VEL_WINDUP_MAX);
 
-                _posTarget = 0;
+                _altitudeTarget = 0;
                 _previousTime = 0;
                 _inBandPrev = false;
             }
