@@ -142,7 +142,9 @@ namespace hf {
 
                     if (pidController->auxState <= auxState) {
 
-                        if (pidController->modifyDemands(_state, _demands, currentTime) && pidController->shouldFlashLed()) {
+                        pidController->modifyDemands(_state, _demands, currentTime); 
+
+                        if (pidController->shouldFlashLed()) {
                             shouldFlash = true;
                         }
                     }

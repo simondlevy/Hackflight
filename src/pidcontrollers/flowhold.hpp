@@ -35,21 +35,12 @@ namespace hf {
         Pid _rollPid;
         Pid _pitchPid;
 
-        // PID constants set by constructor
-        float _minAltitude = 0;
-
         protected:
 
-        bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
+        void modifyDemands(state_t & state, demands_t & demands, float currentTime)
         {
-            // Don't do anything till we've reached sufficient altitude
-            if (state.location[2] < _minAltitude) return false;
-
             demands.roll  = _rollPid.compute(0, state.bodyVel[1], currentTime);
             demands.pitch = _pitchPid.compute(0, state.bodyVel[0], currentTime);
-
-            return true;
-
         }
 
         virtual bool shouldFlashLed(void) override 
@@ -59,8 +50,7 @@ namespace hf {
 
         public:
 
-        FlowHoldPid(const float Kp, const float minAltitude=0.1) 
-            : _minAltitude(minAltitude)
+        FlowHoldPid(const float Kp)
         {
             _rollPid.init(Kp, 0, 0);
             _pitchPid.init(Kp, 0, 0);

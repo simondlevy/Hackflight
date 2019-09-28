@@ -32,7 +32,7 @@ namespace hf {
 
         static constexpr float STICK_DEADBAND = 0.10;
 
-        virtual bool modifyDemands(state_t & state, demands_t & demands, float currentTime) = 0;
+        virtual void modifyDemands(state_t & state, demands_t & demands, float currentTime) = 0;
 
         virtual bool shouldFlashLed(void) { return false; }
 

@@ -52,7 +52,7 @@ namespace hf {
 
         protected:
 
-            bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
+            void modifyDemands(state_t & state, demands_t & demands, float currentTime)
             {
                 // Altitude hold is based on altitude and throttle demand
                 float altitude = state.location[2];
@@ -74,15 +74,6 @@ namespace hf {
 
                 // Run velocity PID controller to get correction
                 demands.throttle = _velPid.compute(velTarget, state.inertialVel[2], currentTime);
-
-                if (_inBand) {
-                    //debugline("alt: %f  tgt: %f", altitude, _altitudeTarget);
-                }
-                else {
-                    //debugline("alt: %f  vel tgt: %+3.2f", altitude, velTarget);
-                }
-
-                return true;
             }
 
             virtual bool shouldFlashLed(void) override 

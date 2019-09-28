@@ -83,7 +83,7 @@ namespace hf {
                 _yawPid.init(Kp_yaw, Ki_yaw, 0, demandScale);
             }
 
-            bool modifyDemands(state_t & state, demands_t & demands, float currentTime)
+            void modifyDemands(state_t & state, demands_t & demands, float currentTime)
             {
                 (void)currentTime;
 
@@ -98,8 +98,6 @@ namespace hf {
                 if (fabs(demands.yaw) > BIG_YAW_DEMAND) {
                     _yawPid.reset();
                 }
-
-                return true;
             }
 
             virtual void updateReceiver(demands_t & demands, bool throttleIsDown) override
