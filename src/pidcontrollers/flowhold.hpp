@@ -32,29 +32,26 @@ namespace hf {
 
         private: 
 
-        Pid _rollPid;
-        Pid _pitchPid;
+            Pid _rollPid;
 
         protected:
 
-        void modifyDemands(state_t & state, demands_t & demands, float currentTime)
-        {
-            demands.roll  = _rollPid.compute(0, state.bodyVel[1], currentTime);
-            demands.pitch = _pitchPid.compute(0, state.bodyVel[0], currentTime);
-        }
+            void modifyDemands(state_t & state, demands_t & demands, float currentTime)
+            {
+                demands.roll  = _rollPid.compute(0, state.bodyVel[1], currentTime);
+            }
 
-        virtual bool shouldFlashLed(void) override 
-        {
-            return true;
-        }
+            virtual bool shouldFlashLed(void) override 
+            {
+                return true;
+            }
 
         public:
 
-        FlowHoldPid(const float Kp)
-        {
-            _rollPid.init(Kp, 0, 0);
-            _pitchPid.init(Kp, 0, 0);
-        }
+            FlowHoldPid(const float Kp)
+            {
+                _rollPid.init(Kp, 0, 0);
+            }
 
     };  // class FlowHoldPid
 

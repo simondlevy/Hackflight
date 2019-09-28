@@ -36,7 +36,6 @@ namespace hf {
 
             // Arbitrary constants
             static constexpr float VEL_WINDUP_MAX  = 0.40f;
-            static constexpr float MIN_ALTITUDE    = 2.5f;
             static constexpr float PILOT_VELZ_MAX  = 2.5f; // http://ardupilot.org/copter/docs/altholdmode.html
 
             // P controller for position
