@@ -36,6 +36,7 @@ namespace hf {
 
             // Arbitrary constants
             static constexpr float VEL_WINDUP_MAX  = 0.40f;
+            static constexpr float MIN_ALTITUDE    = 5.0f;
 
             // P controller for position
             Pid _posPid;
@@ -43,18 +44,12 @@ namespace hf {
             // PID controller for velocity
             Pid _velPid;
 
-            // Minimum altitude, set by constructor
-            float _minAltitude = 0;
-
             // Values modified in-flight
             float _altitudeTarget = 0;
             bool  _inBandPrev = false;
             float _previousTime = 0;
 
-            bool ready(float demand, float altitude)
-            {
-                return (fabs(demand) < Receiver::STICK_DEADBAND) && (altitude > _minAltitude); 
-            }
+            bool _inBand = false;
 
         protected:
 
@@ -62,23 +57,32 @@ namespace hf {
             {
                 float altitude = state.location[2];
 
-                // Don't do anything till we've reached sufficient altitude and are in stick deadband
-                if (!ready(demands.throttle, altitude)) return false;
+                if (altitude < MIN_ALTITUDE) return false;
+
+                _inBand = fabs(demands.throttle) < STICK_DEADBAND; 
 
                 // Reset controller when moving into deadband
-                if (!_inBandPrev) {
+                if (_inBand && !_inBandPrev) {
                     _altitudeTarget = altitude;
                     _velPid.reset();
-                    _inBandPrev = true;
                 }
 
-                // Velocity target is output of position P controller
-                float velTarget = _posPid.compute(_altitudeTarget, altitude);
+                _inBandPrev = _inBand;
 
-                // Run velocity PID controller to get correction
-                demands.throttle = _velPid.compute(velTarget, state.inertialVel[2], currentTime);
+                //debugline("alt: %f  tgt: %f", altitude, _altitudeTarget);
 
-                return true;
+                if (_inBand) {
+
+                    // Velocity target is output of position P controller
+                    float velTarget = _posPid.compute(_altitudeTarget, altitude);
+
+                    // Run velocity PID controller to get correction
+                    demands.throttle = _velPid.compute(velTarget, state.inertialVel[2], currentTime);
+
+                    return true;
+                }
+
+                return false;
             }
 
             virtual bool shouldFlashLed(void) override 
@@ -88,14 +92,16 @@ namespace hf {
 
         public:
 
-            AltitudeHoldPid(const float Kp_pos, const float Kp_vel, const float Ki_vel, const float Kd_vel, const float minAltitude=0.1) 
-                : _minAltitude(minAltitude)
+            AltitudeHoldPid(const float Kp_pos, const float Kp_vel, const float Ki_vel, const float Kd_vel) 
             {
+                _inBand = false;
+
                 _posPid.init(Kp_pos, 0, 0);
                 _velPid.init(Kp_vel, Ki_vel, Kd_vel, 1, VEL_WINDUP_MAX);
 
                 _altitudeTarget = 0;
                 _previousTime = 0;
+                _inBand = false;
                 _inBandPrev = false;
             }
 
