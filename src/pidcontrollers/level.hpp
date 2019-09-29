@@ -32,23 +32,16 @@ namespace hf {
     // Helper class
     class _AnglePid : public Pid {
 
-        private:
-
-            static constexpr float FEED_FORWARD = 0.5;
-
         public:
 
-            void init(const float Kp, const float maxAngle) 
+            void init(const float Kp) 
             {
-                // We use a simple P controller (I=D=0).  Roll and pitch
-                // demands go between [-0.5, 0.5]; so, for a  given max angle,
-                // the following relation must hold true: 0.5 * _demandScale = maxAngle
-                Pid::init(Kp, 0, 0, 2* Filter::deg2rad(maxAngle));
+                Pid::init(Kp, 0, 0);
             }
 
             float compute(float demand, float angle)
             {
-                return Pid::compute(demand, angle) + FEED_FORWARD * demand;
+                return Pid::compute(demand, angle);
             }
 
     }; // class _AnglePid
@@ -62,10 +55,10 @@ namespace hf {
 
         public:
 
-            LevelPid(float rollLevelP, float pitchLevelP, float maxAngle = 10)
+            LevelPid(float rollLevelP, float pitchLevelP)
             {
-                _rollPid.init(rollLevelP, maxAngle);
-                _pitchPid.init(pitchLevelP, maxAngle);
+                _rollPid.init(rollLevelP);
+                _pitchPid.init(pitchLevelP);
             }
 
             LevelPid(float rollPitchLevelP)

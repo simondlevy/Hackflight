@@ -30,7 +30,7 @@ namespace hf {
         private: 
 
 
-        // PID constants set in init() method
+        // PID constants
         float _Kp = 0;
         float _Ki = 0;
         float _Kd = 0;
