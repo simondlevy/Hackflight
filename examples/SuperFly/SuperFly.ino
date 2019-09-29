@@ -36,10 +36,11 @@
 #include "receivers/arduino/esp8266.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
+static constexpr float   DEMAND_SCALE = 1.0f;
 
 hf::Hackflight h;
 
-hf::ESP8266_Receiver rc = hf::ESP8266_Receiver(CHANNEL_MAP, "SuperFly" /*, "Password"*/);
+hf::ESP8266_Receiver rc = hf::ESP8266_Receiver(CHANNEL_MAP, DEMAND_SCALE, "SuperFly" /*, "Password"*/);
 
 hf::MixerQuadXCF mixer;
 

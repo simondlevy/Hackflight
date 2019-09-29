@@ -21,6 +21,7 @@
 #include "receiver.hpp"
 
 static constexpr uint8_t DEFAULT_MAP[6] = {0,1,2,3,4,5};
+static constexpr float   DEFAULT_DEMAND_SCALE = 1.0f;
 
 namespace hf {
 
@@ -49,7 +50,7 @@ namespace hf {
         public:
 
             MockReceiver(void) 
-                : Receiver(DEFAULT_MAP)
+                : Receiver(DEFAULT_MAP, DEFAULT_DEMAND_SCALE)
             { 
             }
 

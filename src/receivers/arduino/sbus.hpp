@@ -112,9 +112,10 @@ namespace hf {
 
             SBUS_Receiver(
                     const uint8_t channelMap[6], 
+                    const float demandScale,
                     uint16_t serialConfig,
                     HardwareSerial * hardwareSerial=&Serial1) 
-                :  Receiver(channelMap) 
+                :  Receiver(channelMap, demandScale) 
             { 
                 _serialConfig = serialConfig;
                 _hardwareSerial = hardwareSerial;

@@ -48,8 +48,8 @@ namespace hf {
 
         public:
 
-            DSMX_Receiver_Serial1(const uint8_t channelMap[6])
-                :  DSMX_Receiver(channelMap) 
+            DSMX_Receiver_Serial1(const uint8_t channelMap[6], const float demandScale)
+                :  DSMX_Receiver(channelMap, demandScale) 
             { 
                 _dsmx_rx = this;
             }
