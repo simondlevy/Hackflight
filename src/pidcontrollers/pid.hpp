@@ -66,10 +66,10 @@ namespace hf {
         }
 
         // Version 1: ignore time
-        float compute(float target, float value)
+        float compute(float target, float actual)
         {
             // Compute error as scaled target minus actual
-            float error = target * _demandScale - value;
+            float error = target * _demandScale - actual;
 
             // Compute P term
             float pterm = error * _Kp;

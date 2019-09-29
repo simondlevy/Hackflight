@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include "receiver.hpp"
 #include "filters.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
@@ -84,8 +83,6 @@ namespace hf {
 
             AltitudeHoldPid(const float Kp_pos, const float Kp_vel, const float Ki_vel, const float Kd_vel) 
             {
-                _inBand = false;
-
                 _posPid.init(Kp_pos, 0, 0);
                 _velPid.init(Kp_vel, Ki_vel, Kd_vel, 1, VEL_WINDUP_MAX);
 

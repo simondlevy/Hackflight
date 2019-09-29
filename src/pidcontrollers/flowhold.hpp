@@ -32,13 +32,30 @@ namespace hf {
 
         private: 
 
+            // Arbitrary constants
+            static constexpr float VEL_WINDUP_MAX  = 0.40f;
+            static constexpr float PILOT_VELZ_MAX  = 2.5f; // http://ardupilot.org/copter/docs/altholdmode.html
+
             Pid _rollPid;
+
+            bool _inBand = false;
+            bool  _inBandPrev = false;
 
         protected:
 
             void modifyDemands(state_t & state, demands_t & demands, float currentTime)
             {
-                demands.roll  = _rollPid.compute(0, state.bodyVel[1], currentTime);
+                // Is throttle stick in deadband?
+                _inBand = fabs(demands.roll) < STICK_DEADBAND; 
+
+                // Reset controller when moving into deadband
+                if (_inBand && !_inBandPrev) {
+                    _rollPid.reset();
+                }
+                _inBandPrev = _inBand;
+
+                // Run velocity PID controller to get correction
+                if (_inBand) demands.roll  += _rollPid.compute(0, state.bodyVel[1], currentTime); 
             }
 
             virtual bool shouldFlashLed(void) override 
@@ -48,9 +65,12 @@ namespace hf {
 
         public:
 
-            FlowHoldPid(const float Kp)
+            FlowHoldPid(const float Kp, float Ki, float Kd)
             {
-                _rollPid.init(Kp, 0, 0);
+                _rollPid.init(Kp, Ki, Kd);
+
+                _inBand = false;
+                _inBandPrev = false;
             }
 
     };  // class FlowHoldPid
