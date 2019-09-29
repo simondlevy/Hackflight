@@ -253,20 +253,3 @@ to provide the quaternion directly
 <p align="center"> 
 <img src="extras/media/boards.png" width=800>
 </p>
-
-### Control Flow Diagrams
-
-<br><i>Courtesy of Juan Gallostra</i>
-
-#### Rate PID
-
-<p align="center"> 
-<img src="extras/media/ratepid.png" width=800>
-</p>
-
-#### Level PID
-
-<p align="center"> 
-<img src="extras/media/levelpid.png" width=800>
-</p>
-
