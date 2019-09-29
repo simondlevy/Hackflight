@@ -44,21 +44,17 @@ namespace hf {
         // For deltaT-based controllers
         float _previousTime = 0;
  
-        // Scale factor for stick demand
-        float _demandScale = 0;
-
         // Prevents integral windup
         float _windupMax = 0;
 
         public:
 
-        void init(const float Kp, const float Ki, const float Kd, const float demandScale=1.0, const float windupMax=0.0) 
+        void init(const float Kp, const float Ki, const float Kd, const float windupMax=0.0) 
         {
             // Set constants
             _Kp = Kp;
             _Ki = Ki;
             _Kd = Kd;
-            _demandScale = demandScale;
             _windupMax = windupMax;
 
             // Initialize error integral, previous value
@@ -69,7 +65,7 @@ namespace hf {
         float compute(float target, float actual)
         {
             // Compute error as scaled target minus actual
-            float error = target * _demandScale - actual;
+            float error = target - actual;
 
             // Compute P term
             float pterm = error * _Kp;

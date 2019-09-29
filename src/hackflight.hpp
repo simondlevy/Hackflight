@@ -113,8 +113,11 @@ namespace hf {
                     // Update state with gyro rates
                     _gyrometer.modifyState(_state, time);
 
-                    // For PID control, start with demands from receiver
-                    memcpy(&_demands, &_receiver->demands, sizeof(demands_t));
+                    // For PID control, start with demands from receiver, scaling roll/pitch/yaw by constant
+                    _demands.throttle = _receiver->demands.throttle;
+                    _demands.roll     = _receiver->demands.roll  * _receiver->_demandScale;
+                    _demands.pitch    = _receiver->demands.pitch * _receiver->_demandScale;
+                    _demands.yaw      = _receiver->demands.yaw   * _receiver->_demandScale;
 
                     // Sync PID controllers to gyro update
                     runPidControllers();
