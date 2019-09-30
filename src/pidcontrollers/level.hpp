@@ -25,34 +25,34 @@
 
 namespace hf {
 
-    // Helper class
-    class _AnglePid : public Pid {
-
-        private:
-
-            static constexpr float MAX_ANGLE_DEGREES = 45;
-
-            // Maximum roll pitch demand is +/-0.5, so to convert demand to 
-            // angle for error computation, we multiply by the folling amount:
-            float _demandMultiplier = 2 * Filter::deg2rad(MAX_ANGLE_DEGREES);
-
-        public:
-
-            void init(const float Kp) 
-            {
-                Pid::init(Kp, 0, 0);
-            }
-
-            float compute(float demand, float angle)
-            {
-                return Pid::compute(demand*_demandMultiplier, angle);
-            }
-
-    }; // class _AnglePid
-
     class LevelPid : public PidController {
 
         private:
+
+            // Helper class
+            class _AnglePid : public Pid {
+
+                private:
+
+                    static constexpr float MAX_ANGLE_DEGREES = 45;
+
+                    // Maximum roll pitch demand is +/-0.5, so to convert demand to 
+                    // angle for error computation, we multiply by the folling amount:
+                    float _demandMultiplier = 2 * Filter::deg2rad(MAX_ANGLE_DEGREES);
+
+                public:
+
+                    void init(const float Kp) 
+                    {
+                        Pid::init(Kp, 0, 0);
+                    }
+
+                    float compute(float demand, float angle)
+                    {
+                        return Pid::compute(demand*_demandMultiplier, angle);
+                    }
+
+            }; // class _AnglePid
 
             _AnglePid _rollPid;
             _AnglePid _pitchPid;
