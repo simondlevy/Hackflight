@@ -80,12 +80,10 @@ namespace hf {
             }
 
             // Version 1: ignore time
-            float compute(float target, float actual, bool debug=false)
+            float compute(float target, float actual)
             {
                 // Compute error as scaled target minus actual
                 float error = target - actual;
-
-                if (debug) debugline("target: %+3.2f    actual: %+3.2f", target*180/M_PI, actual*180/M_PI);
 
                 // Compute P term
                 float pterm = error * _Kp;

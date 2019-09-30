@@ -38,7 +38,7 @@ namespace hf {
             Pid _rollPid;
 
             bool _inBand = false;
-            bool  _inBandPrev = false;
+            bool _inBandPrev = false;
 
         protected:
 
@@ -54,7 +54,7 @@ namespace hf {
                 _inBandPrev = _inBand;
 
                 // Run velocity PID controller to get correction
-                if (_inBand) demands.roll  += _rollPid.compute(0, state.bodyVel[1], currentTime); 
+                //if (_inBand) demands.roll = _rollPid.compute(0, state.bodyVel[1], currentTime); 
             }
 
             virtual bool shouldFlashLed(void) override 

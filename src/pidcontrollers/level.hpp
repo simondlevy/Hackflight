@@ -43,9 +43,9 @@ namespace hf {
                 Pid::init(Kp, 0, 0);
             }
 
-            float compute(float demand, float angle, bool debug=false)
+            float compute(float demand, float angle)
             {
-                return Pid::compute(demand*_demandMultiplier, angle, debug);
+                return Pid::compute(demand*_demandMultiplier, angle);
             }
 
     }; // class _AnglePid
@@ -74,7 +74,7 @@ namespace hf {
             {
                 (void)currentTime;
 
-                demands.roll  = _rollPid.compute(demands.roll, state.rotation[0], true); 
+                demands.roll  = _rollPid.compute(demands.roll, state.rotation[0]); 
                 demands.pitch = _pitchPid.compute(demands.pitch, state.rotation[1]);
             }
 
