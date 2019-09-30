@@ -22,8 +22,6 @@
 
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
-#include "pid.hpp"
-#include "filters.hpp"
 
 namespace hf {
 
@@ -37,9 +35,9 @@ namespace hf {
                 Pid::init(Kp, 0, 0);
             }
 
-            float compute(float demand, float angle)
+            float compute(float demand, float angle, bool debug=false)
             {
-                return Pid::compute(demand, angle);
+                return Pid::compute(demand, angle, debug);
             }
 
     }; // class _AnglePid
@@ -47,6 +45,8 @@ namespace hf {
     class LevelPid : public PidController {
 
         private:
+
+            static constexpr float MAX_ANGLE_DEGREES = 45;
 
             _AnglePid _rollPid;
             _AnglePid _pitchPid;
@@ -68,7 +68,7 @@ namespace hf {
             {
                 (void)currentTime;
 
-                demands.roll  = _rollPid.compute(demands.roll, state.rotation[0]); 
+                demands.roll  = _rollPid.compute(demands.roll, state.rotation[0], true); 
                 demands.pitch = _pitchPid.compute(demands.pitch, state.rotation[1]);
             }
 

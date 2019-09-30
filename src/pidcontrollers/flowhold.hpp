@@ -22,7 +22,6 @@
 
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
-#include "pid.hpp"
 
 namespace hf {
 

@@ -21,6 +21,7 @@
 #pragma once
 
 #include "datatypes.hpp"
+#include "filters.hpp"
 
 namespace hf {
 
@@ -41,5 +42,118 @@ namespace hf {
         uint8_t auxState = 0;
 
     };  // class PidController
+
+    // PID controller for a single degree of freedom
+    class Pid {
+
+        private: 
+
+            // PID constants
+            float _Kp = 0;
+            float _Ki = 0;
+            float _Kd = 0;
+
+            // Accumulated values
+            float _lastError   = 0;
+            float _errorI      = 0;
+            float _deltaError1 = 0;
+            float _deltaError2 = 0;
+
+            // For deltaT-based controllers
+            float _previousTime = 0;
+     
+            // Prevents integral windup
+            float _windupMax = 0;
+
+        public:
+
+            void init(const float Kp, const float Ki, const float Kd, const float windupMax=0.0) 
+            {
+                // Set constants
+                _Kp = Kp;
+                _Ki = Ki;
+                _Kd = Kd;
+                _windupMax = windupMax;
+
+                // Initialize error integral, previous value
+                reset();
+            }
+
+            // Version 1: ignore time
+            float compute(float target, float actual, bool debug=false)
+            {
+                // Compute error as scaled target minus actual
+                float error = target - actual;
+
+                if (debug) debugline("target: %+3.2f    actual: %+3.2f", target, actual*180/M_PI);
+
+                // Compute P term
+                float pterm = error * _Kp;
+
+                // Compute I term
+                float iterm = 0;
+                if (_Ki > 0) { // optimization
+                    _errorI = Filter::constrainAbs(_errorI + error, _windupMax); // avoid integral windup
+                    iterm =  _errorI * _Ki;
+                }
+
+                // Compute D term
+                float dterm = 0;
+                if (_Kd > 0) { // optimization
+                    float deltaError = error - _lastError;
+                    dterm = (_deltaError1 + _deltaError2 + deltaError) * _Kd; 
+                    _deltaError2 = _deltaError1;
+                    _deltaError1 = deltaError;
+                    _lastError = error;
+                }
+
+                return pterm + iterm + dterm;
+            }
+
+            // Version 2: use time
+            float compute(float target, float actual, float currentTime)
+            {
+                // Don't do anything until we have a positive deltaT
+                float deltaT = currentTime - _previousTime;
+                _previousTime = currentTime;
+                if (deltaT == currentTime) return 0;
+
+                // Compute error as scaled target minus actual
+                float error = target - actual;
+
+                // Compute P term
+                float pterm = error * _Kp;
+
+                // Compute I term
+                _errorI = Filter::constrainAbs(_errorI + error * deltaT, _windupMax);
+                float iterm = _errorI * _Ki;
+
+                // Compute D term
+                float deltaError = (error - _lastError) / deltaT;
+                float dterm = deltaError * _Kd;
+                _lastError = error;
+
+                return pterm + iterm + dterm;
+            }
+
+            void updateReceiver(demands_t & demands, bool throttleIsDown)
+            {
+                (void)demands; 
+
+                // When landed, reset integral component of PID
+                if (throttleIsDown) {
+                    reset();
+                }
+            }
+
+            void reset(void)
+            {
+                _errorI = 0;
+                _lastError = 0;
+                _previousTime = 0;
+            }
+
+    };  // class Pid
+
 
 } // namespace hf
