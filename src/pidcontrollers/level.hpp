@@ -3,8 +3,6 @@
 
    Copyright (c) 2018 Juan Gallostra and Simon D. Levy
 
-   Author: Juan Gallostra
-
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify
