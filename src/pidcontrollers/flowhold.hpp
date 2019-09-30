@@ -69,9 +69,9 @@ namespace hf {
 
         public:
 
-            FlowHoldPid(const float Kp, float Ki, float Kd)
+            FlowHoldPid(const float Kp, float Ki)
             {
-                _rollPid.init(Kp, Ki, Kd);
+                _rollPid.init(Kp, Ki, 0);
 
                 _inBand = false;
                 _inBandPrev = false;
