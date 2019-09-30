@@ -53,12 +53,13 @@ namespace hf {
                 }
                 _inBandPrev = _inBand;
 
-                float targetVelocity = _inBand ? 0 : 2 * fabs(demands.roll) * PILOT_VELXY_MAX;
+                // Target velocity is zero inside deadband, scaled constant outside
+                float targetVelocity = _inBand ? 0 : 2 * demands.roll * PILOT_VELXY_MAX;
 
                 debugline("vel: %+3.2f   tgt: %+3.2f", state.bodyVel[1], targetVelocity);
 
                 // Run velocity PID controller to get correction
-                //if (_inBand) demands.roll = _rollPid.compute(0, state.bodyVel[1], currentTime); 
+                demands.roll = _rollPid.compute(targetVelocity, state.bodyVel[1]);//, currentTime); 
             }
 
             virtual bool shouldFlashLed(void) override 
