@@ -32,8 +32,8 @@ namespace hf {
         private: 
 
             // Arbitrary constants
-            static constexpr float VEL_WINDUP_MAX  = 0.40f;
-            static constexpr float PILOT_VELZ_MAX  = 2.5f; // http://ardupilot.org/copter/docs/altholdmode.html
+            static constexpr float VEL_WINDUP_MAX   = 0.40f;
+            static constexpr float PILOT_VELXY_MAX  = 2.5f; // http://ardupilot.org/copter/docs/altholdmode.html
 
             Pid _rollPid;
 
@@ -52,6 +52,10 @@ namespace hf {
                     _rollPid.reset();
                 }
                 _inBandPrev = _inBand;
+
+                float targetVelocity = _inBand ? 0 : 2 * fabs(demands.roll) * PILOT_VELXY_MAX;
+
+                debugline("vel: %+3.2f   tgt: %+3.2f", state.bodyVel[1], targetVelocity);
 
                 // Run velocity PID controller to get correction
                 //if (_inBand) demands.roll = _rollPid.compute(0, state.bodyVel[1], currentTime); 
