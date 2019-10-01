@@ -148,11 +148,9 @@ namespace hf {
 
                     PidController * pidController = _pid_controllers[k];
 
-                    float currentTime = _board->getTime();
-
                     if (pidController->auxState <= auxState) {
 
-                        pidController->modifyDemands(_state, _demands, currentTime); 
+                        pidController->modifyDemands(_state, _demands); 
 
                         if (pidController->shouldFlashLed()) {
                             shouldFlash = true;

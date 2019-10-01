@@ -33,7 +33,7 @@ namespace hf {
 
         static constexpr float STICK_DEADBAND = 0.10;
 
-        virtual void modifyDemands(state_t & state, demands_t & demands, float currentTime) = 0;
+        virtual void modifyDemands(state_t & state, demands_t & demands) = 0;
 
         virtual bool shouldFlashLed(void) { return false; }
 
@@ -79,7 +79,6 @@ namespace hf {
                 reset();
             }
 
-            // Version 1: ignore time
             float compute(float target, float actual)
             {
                 // Compute error as scaled target minus actual
@@ -104,32 +103,6 @@ namespace hf {
                     _deltaError1 = deltaError;
                     _lastError = error;
                 }
-
-                return pterm + iterm + dterm;
-            }
-
-            // Version 2: use time
-            float compute(float target, float actual, float currentTime)
-            {
-                // Don't do anything until we have a positive deltaT
-                float deltaT = currentTime - _previousTime;
-                _previousTime = currentTime;
-                if (deltaT == currentTime) return 0;
-
-                // Compute error as scaled target minus actual
-                float error = target - actual;
-
-                // Compute P term
-                float pterm = error * _Kp;
-
-                // Compute I term
-                _errorI = Filter::constrainAbs(_errorI + error * deltaT, _windupMax);
-                float iterm = _errorI * _Ki;
-
-                // Compute D term
-                float deltaError = (error - _lastError) / deltaT;
-                float dterm = deltaError * _Kd;
-                _lastError = error;
 
                 return pterm + iterm + dterm;
             }

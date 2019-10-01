@@ -82,10 +82,8 @@ namespace hf {
                 _yawPid.init(Kp_yaw, Ki_yaw, 0);
             }
 
-            void modifyDemands(state_t & state, demands_t & demands, float currentTime)
+            void modifyDemands(state_t & state, demands_t & demands)
             {
-                (void)currentTime;
-
                 demands.roll  = _rollPid.compute(demands.roll,  state.angularVel[0]);
                 demands.pitch = _pitchPid.compute(demands.pitch, state.angularVel[1]);
                 demands.yaw   = _yawPid.compute(demands.yaw, state.angularVel[2]);

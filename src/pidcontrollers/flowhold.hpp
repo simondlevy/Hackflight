@@ -37,7 +37,6 @@ namespace hf {
                 private:
 
                     // Arbitrary constants
-                    static constexpr float VEL_WINDUP_MAX   = 0.40f;
                     static constexpr float PILOT_VELXY_MAX  = 2.5f; // http://ardupilot.org/copter/docs/altholdmode.html
 
                     bool _inBand = false;
@@ -78,7 +77,7 @@ namespace hf {
 
         protected:
 
-            void modifyDemands(state_t & state, demands_t & demands, float currentTime)
+            void modifyDemands(state_t & state, demands_t & demands)
             {
                 demands.roll  = _rollPid.compute(demands.roll,  state.bodyVel[1]);
                 demands.pitch = _rollPid.compute(demands.pitch, state.bodyVel[0]);

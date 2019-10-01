@@ -49,7 +49,7 @@ namespace hf {
 
         protected:
 
-            void modifyDemands(state_t & state, demands_t & demands, float currentTime)
+            void modifyDemands(state_t & state, demands_t & demands)
             {
                 // Altitude hold is based on altitude and throttle demand
                 float altitude = state.location[2];
@@ -70,7 +70,7 @@ namespace hf {
                 float velTarget = _inBand ? _posPid.compute(_altitudeTarget, altitude) : PILOT_VELZ_MAX * throttle;
 
                 // Run velocity PID controller to get correction
-                demands.throttle = _velPid.compute(velTarget, state.inertialVel[2], currentTime);
+                demands.throttle = _velPid.compute(velTarget, state.inertialVel[2]);
             }
 
             virtual bool shouldFlashLed(void) override 

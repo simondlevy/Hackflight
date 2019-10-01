@@ -70,10 +70,8 @@ namespace hf {
             {
             }
 
-            void modifyDemands(state_t & state, demands_t & demands, float currentTime)
+            void modifyDemands(state_t & state, demands_t & demands)
             {
-                (void)currentTime;
-
                 demands.roll  = _rollPid.compute(demands.roll, state.rotation[0]); 
                 demands.pitch = _pitchPid.compute(demands.pitch, state.rotation[1]);
             }
