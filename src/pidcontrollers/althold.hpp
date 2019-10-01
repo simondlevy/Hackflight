@@ -23,7 +23,6 @@
 #include "filters.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
-#include "pid.hpp"
 
 namespace hf {
 
@@ -34,44 +33,28 @@ namespace hf {
         private: 
 
             // Arbitrary constants
-            static constexpr float VEL_WINDUP_MAX  = 0.40f;
             static constexpr float PILOT_VELZ_MAX  = 2.5f; // http://ardupilot.org/copter/docs/altholdmode.html
 
-            // P controller for position
+            // P controller for position.  This will serve as the set-point for velocity PID.
             Pid _posPid;
 
             // PID controller for velocity
-            Pid _velPid;
+            VelocityPid _velPid;
 
-            // Values modified in-flight
+            // This will be reset each time we re-enter throttle deadband.
             float _altitudeTarget = 0;
-            bool _inBand = false;
-            bool  _inBandPrev = false;
 
         protected:
 
-            void modifyDemands(state_t & state, demands_t & demands, float currentTime)
+            void modifyDemands(state_t & state, demands_t & demands)
             {
-                // Altitude hold is based on altitude and throttle demand
                 float altitude = state.location[2];
-                float throttle = demands.throttle;
 
-                // Is throttle stick in deadband?
-                _inBand = fabs(throttle) < STICK_DEADBAND; 
-
-                // Reset controller when moving into deadband
-                if (_inBand && !_inBandPrev) {
+                // Run the velocity-based PID controller, using position-based PID controller output inside deadband, throttle-stick
+                // proportion outside.  If we re-entered deadband, we reset the target altitude.
+                if (_velPid.compute(demands.throttle, _posPid.compute(_altitudeTarget, altitude), PILOT_VELZ_MAX, state.inertialVel[2])) {
                     _altitudeTarget = altitude;
-                    _velPid.reset();
                 }
-                _inBandPrev = _inBand;
-
-                // In band: velocity target is output of position P controller 
-                // Out of band: velocity target is a constant proprotion of stick demand
-                float velTarget = _inBand ? _posPid.compute(_altitudeTarget, altitude) : PILOT_VELZ_MAX * throttle;
-
-                // Run velocity PID controller to get correction
-                demands.throttle = _velPid.compute(velTarget, state.inertialVel[2], currentTime);
             }
 
             virtual bool shouldFlashLed(void) override 
@@ -84,11 +67,9 @@ namespace hf {
             AltitudeHoldPid(const float Kp_pos, const float Kp_vel, const float Ki_vel, const float Kd_vel) 
             {
                 _posPid.init(Kp_pos, 0, 0);
-                _velPid.init(Kp_vel, Ki_vel, Kd_vel, 1, VEL_WINDUP_MAX);
+                _velPid.init(Kp_vel, Ki_vel, Kd_vel);
 
                 _altitudeTarget = 0;
-                _inBand = false;
-                _inBandPrev = false;
             }
 
     };  // class AltitudeHoldPid

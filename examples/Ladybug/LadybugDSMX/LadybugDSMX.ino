@@ -37,11 +37,12 @@ Copyright (c) 2018 Simon D. Levy
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 
-const uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+static constexpr float DEMAND_SCALE = 1.0f;
 
 hf::Hackflight h;
 
-hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP);  
+hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
 hf::MixerQuadXCF mixer;
 

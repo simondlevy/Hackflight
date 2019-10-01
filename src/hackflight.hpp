@@ -77,6 +77,9 @@ namespace hf {
                 return fabs(_state.rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
+            uint32_t _qcount = 0;
+            uint32_t _gcount = 0;
+
             void checkQuaternion(void)
             {
                 // Some quaternion filters may need to know the current time
@@ -84,6 +87,8 @@ namespace hf {
 
                 // If quaternion data ready
                 if (_quaternion.ready(time)) {
+
+                    _qcount++;
 
                     // Adjust quaternion values based on IMU orientation
                     _board->adjustQuaternion(_quaternion._w, _quaternion._x, _quaternion._y, _quaternion._z);
@@ -107,14 +112,19 @@ namespace hf {
                 // If gyrometer data ready
                 if (_gyrometer.ready(time)) {
 
+                    _gcount++;
+
                     // Adjust gyrometer values based on IMU orientation
                     _board->adjustGyrometer(_gyrometer._x, _gyrometer._y, _gyrometer._z);
 
                     // Update state with gyro rates
                     _gyrometer.modifyState(_state, time);
 
-                    // For PID control, start with demands from receiver
-                    memcpy(&_demands, &_receiver->demands, sizeof(demands_t));
+                    // For PID control, start with demands from receiver, scaling roll/pitch/yaw by constant
+                    _demands.throttle = _receiver->demands.throttle;
+                    _demands.roll     = _receiver->demands.roll  * _receiver->_demandScale;
+                    _demands.pitch    = _receiver->demands.pitch * _receiver->_demandScale;
+                    _demands.yaw      = _receiver->demands.yaw   * _receiver->_demandScale;
 
                     // Sync PID controllers to gyro update
                     runPidControllers();
@@ -138,11 +148,9 @@ namespace hf {
 
                     PidController * pidController = _pid_controllers[k];
 
-                    float currentTime = _board->getTime();
-
                     if (pidController->auxState <= auxState) {
 
-                        pidController->modifyDemands(_state, _demands, currentTime); 
+                        pidController->modifyDemands(_state, _demands); 
 
                         if (pidController->shouldFlashLed()) {
                             shouldFlash = true;
@@ -234,7 +242,6 @@ namespace hf {
                 _sensors[_sensor_count++] = sensor;
             }
 
-            // Called by Hackflight::init() to associate sensor with board
             void add_sensor(SurfaceMountSensor * sensor, Board * board) 
             {
                 add_sensor(sensor);
@@ -298,6 +305,9 @@ namespace hf {
 
             void init(Board * board, Receiver * receiver, Mixer * mixer, bool armed=false)
             {  
+                _qcount = 0;
+                _gcount = 0;
+
                 // Store the essentials
                 _board    = board;
                 _receiver = receiver;

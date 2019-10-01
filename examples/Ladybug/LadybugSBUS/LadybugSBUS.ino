@@ -34,33 +34,36 @@
 #include "boards/arduino/ladybug.hpp"
 #include "receivers/arduino/sbus.hpp"
 #include "mixers/quadxcf.hpp"
+#include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
+static constexpr float DEMAND_SCALE = 1.0f;
 
 hf::Hackflight h;
 
-hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, SERIAL_SBUS);
+hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, DEMAND_SCALE, SERIAL_SBUS);
 
 hf::MixerQuadXCF mixer;
 
-hf::Rate ratePid = hf::Rate(
+hf::RatePid ratePid = hf::RatePid(
         0.225f,     // Gyro pitch/roll P
         0.001875f,  // Gyro pitch/roll I
         0.375f,     // Gyro pitch/roll D
         1.0625f,    // Gyro yaw P
         0.005625f); // Gyro yaw I
 
-hf::Level level = hf::Level(0.20f);
+hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 void setup(void)
 {
 
-    // Add Level PID for aux switch position 1
-    h.addPidController(&level, 1);
-
     // Use pin A1 for LED on original LadybugFc (newer uses A4)
-    h.init(new hf::Ladybug(A1), &rc, &mixer, &ratePid);
+    h.init(new hf::Ladybug(A1), &rc, &mixer);
+
+    // Add Rate, Level PID constrollers
+    h.addPidController(&ratePid, 0);
+    h.addPidController(&levelPid, 0);
 }
 
 void loop(void)

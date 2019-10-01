@@ -22,7 +22,6 @@
 
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
-#include "pid.hpp"
 
 namespace hf {
 
@@ -32,30 +31,37 @@ namespace hf {
 
         private: 
 
-            // Arbitrary constants
-            static constexpr float VEL_WINDUP_MAX  = 0.40f;
-            static constexpr float PILOT_VELZ_MAX  = 2.5f; // http://ardupilot.org/copter/docs/altholdmode.html
+            // Helper class
+            class _FlowVelocityPid : public VelocityPid {
 
-            Pid _rollPid;
+                private:
 
-            bool _inBand = false;
-            bool  _inBandPrev = false;
+                    // Arbitrary constants
+                    static constexpr float PILOT_VELXY_MAX  = 2.5f; // http://ardupilot.org/copter/docs/altholdmode.html
+
+                public:
+
+                    void init(float Kp, float Ki)
+                    {
+                        VelocityPid::init(Kp, Ki, 0);
+                    }
+
+                    void update(float & demand, float velocity)
+                    {
+                        VelocityPid::compute(demand, 0, 2*PILOT_VELXY_MAX, velocity);
+                    }
+
+            }; // _FlowVelocityPid
+
+            _FlowVelocityPid _rollPid;
+            _FlowVelocityPid _pitchPid;
 
         protected:
 
-            void modifyDemands(state_t & state, demands_t & demands, float currentTime)
+            void modifyDemands(state_t & state, demands_t & demands)
             {
-                // Is throttle stick in deadband?
-                _inBand = fabs(demands.roll) < STICK_DEADBAND; 
-
-                // Reset controller when moving into deadband
-                if (_inBand && !_inBandPrev) {
-                    _rollPid.reset();
-                }
-                _inBandPrev = _inBand;
-
-                // Run velocity PID controller to get correction
-                if (_inBand) demands.roll  += _rollPid.compute(0, state.bodyVel[1], currentTime); 
+                _rollPid.update(demands.roll,  state.bodyVel[1]);
+                _rollPid.update(demands.pitch, state.bodyVel[0]);
             }
 
             virtual bool shouldFlashLed(void) override 
@@ -65,12 +71,10 @@ namespace hf {
 
         public:
 
-            FlowHoldPid(const float Kp, float Ki, float Kd)
+            FlowHoldPid(const float Kp, float Ki)
             {
-                _rollPid.init(Kp, Ki, Kd);
-
-                _inBand = false;
-                _inBandPrev = false;
+                _rollPid.init(Kp, Ki);
+                _pitchPid.init(Kp, Ki);
             }
 
     };  // class FlowHoldPid

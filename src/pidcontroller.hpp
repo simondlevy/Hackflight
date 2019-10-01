@@ -21,6 +21,7 @@
 #pragma once
 
 #include "datatypes.hpp"
+#include "filters.hpp"
 
 namespace hf {
 
@@ -32,7 +33,7 @@ namespace hf {
 
         static constexpr float STICK_DEADBAND = 0.10;
 
-        virtual void modifyDemands(state_t & state, demands_t & demands, float currentTime) = 0;
+        virtual void modifyDemands(state_t & state, demands_t & demands) = 0;
 
         virtual bool shouldFlashLed(void) { return false; }
 
@@ -41,5 +42,130 @@ namespace hf {
         uint8_t auxState = 0;
 
     };  // class PidController
+
+    // PID controller for a single degree of freedom
+    class Pid {
+
+        private: 
+
+            // PID constants
+            float _Kp = 0;
+            float _Ki = 0;
+            float _Kd = 0;
+
+            // Accumulated values
+            float _lastError   = 0;
+            float _errorI      = 0;
+            float _deltaError1 = 0;
+            float _deltaError2 = 0;
+
+            // For deltaT-based controllers
+            float _previousTime = 0;
+     
+            // Prevents integral windup
+            float _windupMax = 0;
+
+        public:
+
+            void init(const float Kp, const float Ki, const float Kd, const float windupMax=0.4) 
+            {
+                // Set constants
+                _Kp = Kp;
+                _Ki = Ki;
+                _Kd = Kd;
+                _windupMax = windupMax;
+
+                // Initialize error integral, previous value
+                reset();
+            }
+
+            float compute(float target, float actual)
+            {
+                // Compute error as scaled target minus actual
+                float error = target - actual;
+
+                // Compute P term
+                float pterm = error * _Kp;
+
+                // Compute I term
+                float iterm = 0;
+                if (_Ki > 0) { // optimization
+                    _errorI = Filter::constrainAbs(_errorI + error, _windupMax); // avoid integral windup
+                    iterm =  _errorI * _Ki;
+                }
+
+                // Compute D term
+                float dterm = 0;
+                if (_Kd > 0) { // optimization
+                    float deltaError = error - _lastError;
+                    dterm = (_deltaError1 + _deltaError2 + deltaError) * _Kd; 
+                    _deltaError2 = _deltaError1;
+                    _deltaError1 = deltaError;
+                    _lastError = error;
+                }
+
+                return pterm + iterm + dterm;
+            }
+
+            void updateReceiver(demands_t & demands, bool throttleIsDown)
+            {
+                (void)demands; 
+
+                // When landed, reset integral component of PID
+                if (throttleIsDown) {
+                    reset();
+                }
+            }
+
+            void reset(void)
+            {
+                _errorI = 0;
+                _lastError = 0;
+                _previousTime = 0;
+            }
+
+    };  // class Pid
+
+    // Velocity-based PID controller
+    class VelocityPid : public Pid {
+
+        private:
+
+            static constexpr float STICK_DEADBAND = 0.10;
+
+            bool _inBandPrev = false;
+
+        public:
+
+            void init(float Kp, float Ki, float Kd)
+            {
+                Pid::init(Kp, Ki, Kd);
+            }
+
+            bool compute(float & demand, float inBandTargetVelocity, float outOfBandTargetScale, float actualVelocity)
+            {
+                // This is what we will return
+                bool didReset = false;
+
+                // Is throttle stick in deadband?
+                bool inBand = fabs(demand) < STICK_DEADBAND; 
+
+                // Reset controller when moving into deadband
+                if (inBand && !_inBandPrev) {
+                    reset();
+                    didReset = true;
+                }
+                _inBandPrev = inBand;
+
+                // Target velocity is a setpoint inside deadband, scaled constant outside
+                float targetVelocity = inBand ? inBandTargetVelocity : outOfBandTargetScale * demand;
+
+                // Run velocity PID controller to get correction
+                demand = Pid::compute(targetVelocity, actualVelocity);
+
+                return didReset;
+            }
+
+    }; // class VelocityPid
 
 } // namespace hf

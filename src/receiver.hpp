@@ -35,201 +35,196 @@ namespace hf {
 
         private: 
 
-        static constexpr uint8_t DEFAULT_CHANNEL_MAP[6] = {0, 1, 2, 3, 4, 5};
+            const float THROTTLE_MARGIN = 0.1f;
+            const float CYCLIC_EXPO     = 0.65f;
+            const float CYCLIC_RATE     = 0.90f;
+            const float THROTTLE_EXPO   = 0.20f;
+            const float AUX_THRESHOLD   = 0.4f;
 
-        const float THROTTLE_MARGIN   = 0.1f;
-        const float CYCLIC_EXPO       = 0.65f;
-        const float CYCLIC_RATE       = 0.90f;
-        const float THROTTLE_MID      = 0.00f;
-        const float THROTTLE_EXPO     = 0.20f;
+            float adjustCommand(float command, uint8_t channel)
+            {
+                command /= 2;
 
-        float adjustCommand(float command, uint8_t channel)
-        {
-            command /= 2;
+                if (rawvals[_channelMap[channel]] < 0) {
+                    command = -command;
+                }
 
-            if (rawvals[_channelMap[channel]] < 0) {
-                command = -command;
+                return command;
             }
 
-            return command;
-        }
+            float applyCyclicFunction(float command)
+            {
+                return rcFun(command, CYCLIC_EXPO, CYCLIC_RATE);
+            }
 
-        float applyCyclicFunction(float command)
-        {
-            return rcFun(command, CYCLIC_EXPO, CYCLIC_RATE);
-        }
+            float makePositiveCommand(uint8_t channel)
+            {
+                return fabs(rawvals[_channelMap[channel]]);
+            }
 
-        float makePositiveCommand(uint8_t channel)
-        {
-            return fabs(rawvals[_channelMap[channel]]);
-        }
+            static float rcFun(float x, float e, float r)
+            {
+                return (1 + e*(x*x - 1)) * x * r;
+            }
 
-        static float rcFun(float x, float e, float r)
-        {
-            return (1 + e*(x*x - 1)) * x * r;
-        }
-
-        // [-1,+1] -> [0,1] -> [-1,+1]
-        float throttleFun(float x)
-        {
-            float mid = THROTTLE_MID + 0.5;
-            float tmp = (x + 1) / 2 - mid;
-            float y = tmp>0 ? 1-mid : (tmp<0 ? mid : 1);
-            return (mid + tmp*(1-THROTTLE_EXPO + THROTTLE_EXPO * (tmp*tmp) / (y*y))) * 2 - 1;
-        }
+            // [-1,+1] -> [0,1] -> [-1,+1]
+            float throttleFun(float x)
+            {
+                float mid = 0.5;
+                float tmp = (x + 1) / 2 - mid;
+                float y = tmp>0 ? 1-mid : (tmp<0 ? mid : 1);
+                return (mid + tmp*(1-THROTTLE_EXPO + THROTTLE_EXPO * (tmp*tmp) / (y*y))) * 2 - 1;
+            }
 
         protected: 
 
-        // position that auxiliary switches must cross to be considered nonzero
-        const float AUX_THRESHOLD = 0.4f;
+            // maximum number of channels that any receiver will send (of which we'll use six)
+            static const uint8_t MAXCHAN = 8;
 
-        // maximum number of channels that any receiver will send (of which we'll use six)
-        static const uint8_t MAXCHAN = 8;
+            uint8_t _aux1State = 0;
+            uint8_t _aux2State = 0;
 
-        uint8_t _aux1State = 0;
-        uint8_t _aux2State = 0;
+            float _demandScale = 0;
 
-        // channel indices
-        enum {
-            CHANNEL_THROTTLE, 
-            CHANNEL_ROLL,    
-            CHANNEL_PITCH,  
-            CHANNEL_YAW,   
-            CHANNEL_AUX1,
-            CHANNEL_AUX2
-        };
+            // channel indices
+            enum {
+                CHANNEL_THROTTLE, 
+                CHANNEL_ROLL,    
+                CHANNEL_PITCH,  
+                CHANNEL_YAW,   
+                CHANNEL_AUX1,
+                CHANNEL_AUX2
+            };
 
-        uint8_t _channelMap[6] = {0};
+            uint8_t _channelMap[6] = {0};
 
-        // These must be overridden for each receiver
-        virtual bool gotNewFrame(void) = 0;
-        virtual void readRawvals(void) = 0;
+            // These must be overridden for each receiver
+            virtual bool gotNewFrame(void) = 0;
+            virtual void readRawvals(void) = 0;
 
-        // This can be overridden optionally
-        virtual void begin(void) { }
+            // This can be overridden optionally
+            virtual void begin(void) { }
 
-        // Software trim
-        float _trimRoll = 0;
-        float _trimPitch = 0;
-        float _trimYaw = 0;
+            // Software trim
+            float _trimRoll = 0;
+            float _trimPitch = 0;
+            float _trimYaw = 0;
 
-        // Default to non-headless mode
-        float headless = false;
+            // Default to non-headless mode
+            float headless = false;
 
-        // Raw receiver values in [-1,+1]
-        float rawvals[MAXCHAN] = {0};  
+            // Raw receiver values in [-1,+1]
+            float rawvals[MAXCHAN] = {0};  
 
-        demands_t demands;
+            demands_t demands;
 
-        float getRawval(uint8_t chan)
-        {
-            return rawvals[_channelMap[chan]];
-        }
-
-        // Override this if your receiver provides RSSI or other weak-signal detection
-        virtual bool lostSignal(void) { return false; }
-
-        Receiver(const uint8_t channelMap[6]) // throttle, roll, pitch, yaw, aux, arm
-        { 
-            for (uint8_t k=0; k<6; ++k) {
-                _channelMap[k] = channelMap[k];
+            float getRawval(uint8_t chan)
+            {
+                return rawvals[_channelMap[chan]];
             }
 
-            _trimRoll  = 0;
-            _trimPitch = 0;
-            _trimYaw   = 0;
-        }
+            // Override this if your receiver provides RSSI or other weak-signal detection
+            virtual bool lostSignal(void) { return false; }
 
-        // Default constructor
-        Receiver(void) 
-            : Receiver(DEFAULT_CHANNEL_MAP)
-        {
-        }
+            /**
+              * channelMap: throttle, roll, pitch, yaw, aux, arm
+              */
+            Receiver(const uint8_t channelMap[6], float demandScale=1.0) 
+            { 
+                for (uint8_t k=0; k<6; ++k) {
+                    _channelMap[k] = channelMap[k];
+                }
 
-        bool getDemands(float yawAngle)
-        {
-            // Wait till there's a new frame
-            if (!gotNewFrame()) return false;
+                _trimRoll  = 0;
+                _trimPitch = 0;
+                _trimYaw   = 0;
 
-            // Read raw channel values
-            readRawvals();
-
-            // Convert raw [-1,+1] to absolute value
-            demands.roll  = makePositiveCommand(CHANNEL_ROLL);
-            demands.pitch = makePositiveCommand(CHANNEL_PITCH);
-            demands.yaw   = makePositiveCommand(CHANNEL_YAW);
-
-            // Apply expo nonlinearity to roll, pitch
-            demands.roll  = applyCyclicFunction(demands.roll);
-            demands.pitch = applyCyclicFunction(demands.pitch);
-
-            // Put sign back on command, yielding [-0.5,+0.5]
-            demands.roll  = adjustCommand(demands.roll, CHANNEL_ROLL);
-            demands.pitch = adjustCommand(demands.pitch, CHANNEL_PITCH);
-            demands.yaw   = adjustCommand(demands.yaw, CHANNEL_YAW);
-
-            // Add in software trim
-            demands.roll  += _trimRoll;
-            demands.pitch += _trimPitch;
-            demands.yaw   += _trimYaw;
-
-            // Support headless mode
-            if (headless) {
-                float c = cos(yawAngle);
-                float s = sin(yawAngle);
-                float p = demands.pitch;
-                float r = demands.roll;
-                
-                demands.roll  = c*r - s*p;
+                _demandScale = demandScale;
             }
 
-            // Yaw demand needs to be reversed
-            demands.yaw = -demands.yaw;
+            bool getDemands(float yawAngle)
+            {
+                // Wait till there's a new frame
+                if (!gotNewFrame()) return false;
 
-            // Pass throttle demand through exponential function
-            demands.throttle = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
+                // Read raw channel values
+                readRawvals();
 
-            // Store auxiliary switch state
-            _aux1State = getRawval(CHANNEL_AUX1) >= 0.0 ? (getRawval(CHANNEL_AUX1) > AUX_THRESHOLD ? 2 : 1) : 0;
-            _aux2State = getRawval(CHANNEL_AUX2) >= AUX_THRESHOLD ? 1 : 0;
+                // Convert raw [-1,+1] to absolute value
+                demands.roll  = makePositiveCommand(CHANNEL_ROLL);
+                demands.pitch = makePositiveCommand(CHANNEL_PITCH);
+                demands.yaw   = makePositiveCommand(CHANNEL_YAW);
 
-            // Got a new frame
-            return true;
+                // Apply expo nonlinearity to roll, pitch
+                demands.roll  = applyCyclicFunction(demands.roll);
+                demands.pitch = applyCyclicFunction(demands.pitch);
 
-        }  // getDemands
+                // Put sign back on command, yielding [-0.5,+0.5]
+                demands.roll  = adjustCommand(demands.roll, CHANNEL_ROLL);
+                demands.pitch = adjustCommand(demands.pitch, CHANNEL_PITCH);
+                demands.yaw   = adjustCommand(demands.yaw, CHANNEL_YAW);
 
-        bool throttleIsDown(void)
-        {
-            return getRawval(CHANNEL_THROTTLE) < -1 + THROTTLE_MARGIN;
-        }
+                // Add in software trim
+                demands.roll  += _trimRoll;
+                demands.pitch += _trimPitch;
+                demands.yaw   += _trimYaw;
 
-        virtual uint8_t getAux1State(void)
-        {
-            return _aux1State;
-        }
+                // Support headless mode
+                if (headless) {
+                    float c = cos(yawAngle);
+                    float s = sin(yawAngle);
+                    float p = demands.pitch;
+                    float r = demands.roll;
+                    
+                    demands.roll  = c*r - s*p;
+                }
 
-        virtual uint8_t getAux2State(void)
-        {
-            return _aux2State;
-        }
+                // Yaw demand needs to be reversed
+                demands.yaw = -demands.yaw;
+
+                // Pass throttle demand through exponential function
+                demands.throttle = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
+
+                // Store auxiliary switch state
+                _aux1State = getRawval(CHANNEL_AUX1) >= 0.0 ? (getRawval(CHANNEL_AUX1) > AUX_THRESHOLD ? 2 : 1) : 0;
+                _aux2State = getRawval(CHANNEL_AUX2) >= AUX_THRESHOLD ? 1 : 0;
+
+                // Got a new frame
+                return true;
+
+            }  // getDemands
+
+            bool throttleIsDown(void)
+            {
+                return getRawval(CHANNEL_THROTTLE) < -1 + THROTTLE_MARGIN;
+            }
+
+            virtual uint8_t getAux1State(void)
+            {
+                return _aux1State;
+            }
+
+            virtual uint8_t getAux2State(void)
+            {
+                return _aux2State;
+            }
 
         public:
 
-        void setTrimRoll(float trim)
-        {
-            _trimRoll = trim;
-        }
+            void setTrimRoll(float trim)
+            {
+                _trimRoll = trim;
+            }
 
-        void setTrimPitch(float trim)
-        {
-            _trimPitch = trim;
-        }
+            void setTrimPitch(float trim)
+            {
+                _trimPitch = trim;
+            }
 
-        void setTrimYaw(float trim)
-        {
-            _trimYaw = trim;
-        }
-
+            void setTrimYaw(float trim)
+            {
+                _trimYaw = trim;
+            }
 
     }; // class Receiver
 

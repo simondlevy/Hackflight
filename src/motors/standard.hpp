@@ -52,11 +52,12 @@ namespace hf {
             {
                 pinMode(_pin, OUTPUT);
                 writeValue(MINVAL);
-                Serial.begin(115200);
             }
 
             virtual void write(float value) override
-            { writeValue((uint16_t)(MINVAL+value*(MAXVAL-MINVAL))); }
+            { 
+                writeValue((uint16_t)(MINVAL+value*(MAXVAL-MINVAL))); 
+            }
 
     }; // class StandardMotor
 

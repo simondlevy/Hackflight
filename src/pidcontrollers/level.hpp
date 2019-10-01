@@ -3,8 +3,6 @@
 
    Copyright (c) 2018 Juan Gallostra and Simon D. Levy
 
-   Author: Juan Gallostra
-
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify
@@ -24,48 +22,47 @@
 
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
-#include "pid.hpp"
-#include "filters.hpp"
 
 namespace hf {
-
-    // Helper class
-    class _AnglePid : public Pid {
-
-        private:
-
-            static constexpr float FEED_FORWARD = 0.5;
-
-        public:
-
-            void init(const float Kp, const float maxAngle) 
-            {
-                // We use a simple P controller (I=D=0).  Roll and pitch
-                // demands go between [-0.5, 0.5]; so, for a  given max angle,
-                // the following relation must hold true: 0.5 * _demandScale = maxAngle
-                Pid::init(Kp, 0, 0, 2* Filter::deg2rad(maxAngle));
-            }
-
-            float compute(float demand, float angle)
-            {
-                return Pid::compute(demand, angle) + FEED_FORWARD * demand;
-            }
-
-    }; // class _AnglePid
 
     class LevelPid : public PidController {
 
         private:
+
+            // Helper class
+            class _AnglePid : public Pid {
+
+                private:
+
+                    static constexpr float MAX_ANGLE_DEGREES = 45;
+
+                    // Maximum roll pitch demand is +/-0.5, so to convert demand to 
+                    // angle for error computation, we multiply by the folling amount:
+                    float _demandMultiplier = 2 * Filter::deg2rad(MAX_ANGLE_DEGREES);
+
+                public:
+
+                    void init(const float Kp) 
+                    {
+                        Pid::init(Kp, 0, 0);
+                    }
+
+                    float compute(float demand, float angle)
+                    {
+                        return Pid::compute(demand*_demandMultiplier, angle);
+                    }
+
+            }; // class _AnglePid
 
             _AnglePid _rollPid;
             _AnglePid _pitchPid;
 
         public:
 
-            LevelPid(float rollLevelP, float pitchLevelP, float maxAngle = 10)
+            LevelPid(float rollLevelP, float pitchLevelP)
             {
-                _rollPid.init(rollLevelP, maxAngle);
-                _pitchPid.init(pitchLevelP, maxAngle);
+                _rollPid.init(rollLevelP);
+                _pitchPid.init(pitchLevelP);
             }
 
             LevelPid(float rollPitchLevelP)
@@ -73,10 +70,8 @@ namespace hf {
             {
             }
 
-            void modifyDemands(state_t & state, demands_t & demands, float currentTime)
+            void modifyDemands(state_t & state, demands_t & demands)
             {
-                (void)currentTime;
-
                 demands.roll  = _rollPid.compute(demands.roll, state.rotation[0]); 
                 demands.pitch = _pitchPid.compute(demands.pitch, state.rotation[1]);
             }

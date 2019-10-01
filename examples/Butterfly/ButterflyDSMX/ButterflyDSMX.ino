@@ -37,15 +37,16 @@
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 
-constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+static constexpr float DEMAND_SCALE = 8.58f;
 
 hf::Hackflight h;
 
-hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP);  
+hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
 hf::MixerQuadXCF mixer;
 
-hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f, 8.58); 
+hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f); 
 
 hf::LevelPid levelPid = hf::LevelPid(0.20f);
 

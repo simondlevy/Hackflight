@@ -2,8 +2,8 @@
 <img src="extras/media/logo2.png" width=450>
 </p>
 
-Hackflight is simple, platform-independent, header-only C++ firmware for
-multirotor flight controllers and simulators.  It is geared toward people like
+Hackflight is a simple, platform-independent, header-only C++ toolkit for
+building multirotor flight controllers and simulators.  It is geared toward people like
 me who want to tinker with flight-control firmware, and use it to teach
 students about ideas like inertial measurement and PID tuning.  <b>If you are
 in the 99% percent of users who just want to get your vehicle flying without
@@ -203,7 +203,9 @@ For example, you can specify that a Rate controller will be active in aux
 state 0 and a Level controller in aux state 1.  If you leave out the aux state,
 the PID controller will be active in all states.
 
-<b>Note that a PID controller is not the same as a
+Note these two important points about PID controllers in Hackflight:
+
+1. <b>A PID controller is not the same as a
 [flight mode](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).</b>
 For example, so-called [Acro mode](http://ardupilot.org/copter/docs/acro-mode.html#acro-mode) 
 requires a PID controller based on angular
@@ -214,6 +216,10 @@ plus a PID controller based on angle (computed from the quaternion) for the
 roll and pitch axes.   To support this arrangement in Hackflight, PID
 controllers for aux state 0 will also run in aux states 1 and 2, and PID
 controllers for aux state 1 will also run in aux state 2.
+
+2. <b>It matters in which order you add PID controllers.</b>, because the output of one PID controller is the input to 
+the next.  For example, to get Stabilize mode, you want the Level controller to go first, setting the desired pitch/roll angles,
+and the Rate controller to go next, to control the rate at which the desired angle will be reached.
 
 <p align="center"> <img src="extras/media/pidcontrollers.png" width=600> </p>
 
@@ -253,20 +259,3 @@ to provide the quaternion directly
 <p align="center"> 
 <img src="extras/media/boards.png" width=800>
 </p>
-
-### Control Flow Diagrams
-
-<br><i>Courtesy of Juan Gallostra</i>
-
-#### Rate PID
-
-<p align="center"> 
-<img src="extras/media/ratepid.png" width=800>
-</p>
-
-#### Level PID
-
-<p align="center"> 
-<img src="extras/media/levelpid.png" width=800>
-</p>
-

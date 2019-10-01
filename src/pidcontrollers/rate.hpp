@@ -24,7 +24,6 @@
 #include "filters.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
-#include "pid.hpp"
 
 namespace hf {
 
@@ -42,9 +41,9 @@ namespace hf {
 
         public:
 
-            void init(const float Kp, const float Ki, const float Kd, const float demandScale) 
+            void init(const float Kp, const float Ki, const float Kd) 
             {
-                Pid::init(Kp, Ki, Kd, demandScale, WINDUP_MAX);
+                Pid::init(Kp, Ki, Kd, WINDUP_MAX);
 
                 // Convert degree parameters to radians for use later
                 _bigAngularVelocity = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
@@ -76,17 +75,15 @@ namespace hf {
 
         public:
 
-            RatePid(const float Kp, const float Ki, const float Kd, const float Kp_yaw, const float Ki_yaw, float demandScale=1.0f) 
+            RatePid(const float Kp, const float Ki, const float Kd, const float Kp_yaw, const float Ki_yaw) 
             {
-                _rollPid.init(Kp, Ki, Kd, demandScale);
-                _pitchPid.init(Kp, Ki, Kd, demandScale);
-                _yawPid.init(Kp_yaw, Ki_yaw, 0, demandScale);
+                _rollPid.init(Kp, Ki, Kd);
+                _pitchPid.init(Kp, Ki, Kd);
+                _yawPid.init(Kp_yaw, Ki_yaw, 0);
             }
 
-            void modifyDemands(state_t & state, demands_t & demands, float currentTime)
+            void modifyDemands(state_t & state, demands_t & demands)
             {
-                (void)currentTime;
-
                 demands.roll  = _rollPid.compute(demands.roll,  state.angularVel[0]);
                 demands.pitch = _pitchPid.compute(demands.pitch, state.angularVel[1]);
                 demands.yaw   = _yawPid.compute(demands.yaw, state.angularVel[2]);
