@@ -32,55 +32,36 @@ namespace hf {
         private: 
 
             // Helper class
-            class _VelocityPid : public Pid {
+            class _FlowVelocityPid : public VelocityPid {
 
                 private:
 
                     // Arbitrary constants
                     static constexpr float PILOT_VELXY_MAX  = 2.5f; // http://ardupilot.org/copter/docs/altholdmode.html
 
-                    bool _inBand = false;
-                    bool _inBandPrev = false;
-
                 public:
 
                     void init(float Kp, float Ki)
                     {
-                        Pid::init(Kp, Ki, 0);
-
-                        _inBand = false;
-                        _inBandPrev = false;
+                        VelocityPid::init(Kp, Ki, 0);
                     }
 
-                    float compute(float demand, float velocity)
+                    void update(float & demand, float velocity)
                     {
-                        // Is throttle stick in deadband?
-                        _inBand = fabs(demand) < STICK_DEADBAND; 
-
-                        // Reset controller when moving into deadband
-                        if (_inBand && !_inBandPrev) {
-                            reset();
-                        }
-                        _inBandPrev = _inBand;
-
-                        // Target velocity is zero inside deadband, scaled constant outside
-                        float targetVelocity = _inBand ? 0 : 2 * demand * PILOT_VELXY_MAX;
-
-                        // Run velocity PID controller to get correction
-                        return Pid::compute(targetVelocity, velocity);
+                        VelocityPid::compute(demand, 0, 2*PILOT_VELXY_MAX, velocity);
                     }
 
-            }; // _VelocityPid
+            }; // _FlowVelocityPid
 
-            _VelocityPid _rollPid;
-            _VelocityPid _pitchPid;
+            _FlowVelocityPid _rollPid;
+            _FlowVelocityPid _pitchPid;
 
         protected:
 
             void modifyDemands(state_t & state, demands_t & demands)
             {
-                demands.roll  = _rollPid.compute(demands.roll,  state.bodyVel[1]);
-                demands.pitch = _rollPid.compute(demands.pitch, state.bodyVel[0]);
+                _rollPid.update(demands.roll,  state.bodyVel[1]);
+                _rollPid.update(demands.pitch, state.bodyVel[0]);
             }
 
             virtual bool shouldFlashLed(void) override 

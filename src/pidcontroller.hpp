@@ -67,7 +67,7 @@ namespace hf {
 
         public:
 
-            void init(const float Kp, const float Ki, const float Kd, const float windupMax=0.0) 
+            void init(const float Kp, const float Ki, const float Kd, const float windupMax=0.4) 
             {
                 // Set constants
                 _Kp = Kp;
@@ -126,5 +126,46 @@ namespace hf {
 
     };  // class Pid
 
+    // Velocity-based PID controller
+    class VelocityPid : public Pid {
+
+        private:
+
+            static constexpr float STICK_DEADBAND = 0.10;
+
+            bool _inBandPrev = false;
+
+        public:
+
+            void init(float Kp, float Ki, float Kd)
+            {
+                Pid::init(Kp, Ki, Kd);
+            }
+
+            bool compute(float & demand, float inBandTargetVelocity, float outOfBandTargetScale, float actualVelocity)
+            {
+                // This is what we will return
+                bool didReset = false;
+
+                // Is throttle stick in deadband?
+                bool inBand = fabs(demand) < STICK_DEADBAND; 
+
+                // Reset controller when moving into deadband
+                if (inBand && !_inBandPrev) {
+                    reset();
+                    didReset = true;
+                }
+                _inBandPrev = inBand;
+
+                // Target velocity is zero inside deadband, scaled constant outside
+                float targetVelocity = inBand ? inBandTargetVelocity : outOfBandTargetScale * demand;
+
+                // Run velocity PID controller to get correction
+                demand = Pid::compute(targetVelocity, actualVelocity);
+
+                return didReset;
+            }
+
+    }; // class VelocityPid
 
 } // namespace hf
