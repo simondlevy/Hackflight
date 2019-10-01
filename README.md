@@ -2,8 +2,8 @@
 <img src="extras/media/logo2.png" width=450>
 </p>
 
-Hackflight is simple, platform-independent, header-only C++ firmware for
-multirotor flight controllers and simulators.  It is geared toward people like
+Hackflight is a simple, platform-independent, header-only C++ toolkit for
+building multirotor flight controllers and simulators.  It is geared toward people like
 me who want to tinker with flight-control firmware, and use it to teach
 students about ideas like inertial measurement and PID tuning.  <b>If you are
 in the 99% percent of users who just want to get your vehicle flying without
