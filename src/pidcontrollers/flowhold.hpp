@@ -48,7 +48,7 @@ namespace hf {
 
                     void update(float & demand, float velocity)
                     {
-                        VelocityPid::compute(demand, 0, 2*PILOT_VELXY_MAX, velocity);
+                        demand = VelocityPid::compute(demand, 0, 2*PILOT_VELXY_MAX, velocity);
                     }
 
             }; // _FlowVelocityPid

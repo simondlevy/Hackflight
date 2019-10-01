@@ -51,8 +51,11 @@ namespace hf {
                 float altitude = state.location[2];
 
                 // Run the velocity-based PID controller, using position-based PID controller output inside deadband, throttle-stick
-                // proportion outside.  If we re-entered deadband, we reset the target altitude.
-                if (_velPid.compute(demands.throttle, _posPid.compute(_altitudeTarget, altitude), PILOT_VELZ_MAX, state.inertialVel[2])) {
+                // proportion outside.  
+                demands.throttle = _velPid.compute(demands.throttle, _posPid.compute(_altitudeTarget, altitude), PILOT_VELZ_MAX, state.inertialVel[2]);
+
+                // If we re-entered deadband, we reset the target altitude.
+                if (_velPid.didReset()) {
                     _altitudeTarget = altitude;
                 }
             }

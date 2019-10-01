@@ -1,5 +1,5 @@
 /*
-   Abstract class for PID controllers
+   Abstract class for PID controllers, plus helper classes
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -134,18 +134,21 @@ namespace hf {
             static constexpr float STICK_DEADBAND = 0.10;
 
             bool _inBandPrev = false;
+            bool _didReset = false;
 
         public:
 
             void init(float Kp, float Ki, float Kd)
             {
                 Pid::init(Kp, Ki, Kd);
+
+                _inBandPrev = false;
+                _didReset = false;
             }
 
-            bool compute(float & demand, float inBandTargetVelocity, float outOfBandTargetScale, float actualVelocity)
+            float compute(float demand, float inBandTargetVelocity, float outOfBandTargetScale, float actualVelocity)
             {
-                // This is what we will return
-                bool didReset = false;
+                _didReset = false;
 
                 // Is throttle stick in deadband?
                 bool inBand = fabs(demand) < STICK_DEADBAND; 
@@ -153,7 +156,7 @@ namespace hf {
                 // Reset controller when moving into deadband
                 if (inBand && !_inBandPrev) {
                     reset();
-                    didReset = true;
+                    _didReset = true;
                 }
                 _inBandPrev = inBand;
 
@@ -161,9 +164,12 @@ namespace hf {
                 float targetVelocity = inBand ? inBandTargetVelocity : outOfBandTargetScale * demand;
 
                 // Run velocity PID controller to get correction
-                demand = Pid::compute(targetVelocity, actualVelocity);
+                return Pid::compute(targetVelocity, actualVelocity);
+            }
 
-                return didReset;
+            bool didReset(void)
+            {
+                return _didReset;
             }
 
     }; // class VelocityPid
