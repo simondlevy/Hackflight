@@ -157,7 +157,7 @@ namespace hf {
                 }
                 _inBandPrev = inBand;
 
-                // Target velocity is zero inside deadband, scaled constant outside
+                // Target velocity is a setpoint inside deadband, scaled constant outside
                 float targetVelocity = inBand ? inBandTargetVelocity : outOfBandTargetScale * demand;
 
                 // Run velocity PID controller to get correction
