@@ -48,7 +48,8 @@ hf::MixerQuadXCF mixer;
 
 hf::RatePid ratePid = hf::RatePid(0, 0, 0, 0, 0);
 
-static void coreTask(void * params)
+// Timer task for DSMX serial receiver
+static void receiverTask(void * params)
 {
     while (true) {
 
@@ -74,7 +75,7 @@ void setup(void)
     // Start the receiver
     Serial2.begin(115200);
     TaskHandle_t task;
-    xTaskCreatePinnedToCore(coreTask, "Task", 10000, NULL, 1, &task, 0);
+    xTaskCreatePinnedToCore(receiverTask, "Task", 10000, NULL, 1, &task, 0);
 }
 
 void loop(void)
