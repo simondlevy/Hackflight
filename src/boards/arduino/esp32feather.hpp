@@ -1,5 +1,5 @@
 /*
-   Board subclass for ESP32 Feather
+   Board subclass for ESP32 Feather with SENtral IMU and standard brushless motors
 
    Copyright (c) 2019 Simon D. Levy
 
@@ -39,6 +39,13 @@ namespace hf {
 
         protected:
 
+            virtual void writeMotor(uint8_t index, float value) override
+            {
+                motors[index].write(value);
+            }
+
+            // SENtral is mounted upside-down, so we have to adjust quaternion and gyro
+
             virtual void adjustQuaternion(float & qw, float & qx, float & qy, float & qz) override
             { 
                 Filter::swap(qw, qx);
@@ -48,9 +55,10 @@ namespace hf {
                 qy = -qy;
             }
 
-            virtual void writeMotor(uint8_t index, float value) override
-            {
-                motors[index].write(value);
+            virtual void adjustGyrometer(float & gx, float & gy, float & gz) override
+            { 
+                gy = -gy;
+                gz = -gz;
             }
 
         public:
