@@ -22,10 +22,36 @@
 
 #include <Wire.h>
 #include "sentral.hpp"
+#include "motors/standard.hpp"
 
 namespace hf {
 
     class ESP32FeatherBoard : public SentralBoard {
+
+        private:
+
+            StandardMotor motors[4] = { 
+                StandardMotor(33), 
+                StandardMotor(27), 
+                StandardMotor(18), 
+                StandardMotor(5) 
+            };
+
+        protected:
+
+            virtual void adjustQuaternion(float & qw, float & qx, float & qy, float & qz) override
+            { 
+                Filter::swap(qw, qx);
+                Filter::swap(qy, qz);
+
+                qx = -qx;
+                qy = -qy;
+            }
+
+            virtual void writeMotor(uint8_t index, float value) override
+            {
+                motors[index].write(value);
+            }
 
         public:
 
@@ -49,23 +75,13 @@ namespace hf {
                 // Start the USFS
                 SentralBoard::begin();
 
+                // Initialize the motors
+                for (uint8_t k=0; k<4; ++k) {
+                    motors[k].init();
+                }
+
                 // Hang a bit more
                 delay(100);
-            }
-
-        protected:
-
-            virtual void adjustQuaternion(float & qw, float & qx, float & qy, float & qz) override
-            { 
-                Filter::swap(qw, qx);
-                Filter::swap(qy, qz);
-
-                qx = -qx;
-                qy = -qy;
-            }
-
-            virtual void writeMotor(uint8_t index, float value) override
-            {
             }
 
     }; // class ESP32Feather

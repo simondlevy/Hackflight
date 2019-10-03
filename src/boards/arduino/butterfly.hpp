@@ -30,7 +30,6 @@ namespace hf {
 
     class Butterfly : public SentralBoard {
 
-
         private:
 
             StandardMotor motors[4] = { 

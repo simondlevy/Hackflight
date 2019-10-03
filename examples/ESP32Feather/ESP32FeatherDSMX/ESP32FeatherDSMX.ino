@@ -32,10 +32,10 @@
 
 #include "hackflight.hpp"
 #include "boards/arduino/esp32feather.hpp"
-#include "receivers/mock.hpp"
 #include "receivers/arduino/dsmx.hpp"
-#include "pidcontrollers/rate.hpp"
 #include "mixers/quadxcf.hpp"
+#include "pidcontrollers/rate.hpp"
+#include "pidcontrollers/level.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 1.0f;
@@ -46,7 +46,9 @@ hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);
 
 hf::MixerQuadXCF mixer;
 
-hf::RatePid ratePid = hf::RatePid(0, 0, 0, 0, 0);
+hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f); 
+
+hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
@@ -69,8 +71,9 @@ void setup(void)
     // Initialize Hackflight firmware
     h.init(board, &rc, &mixer);
 
-    // Adjust for sloppy IMU mount
-    board->setRollAndPitchOffsets(0, 5);
+    // Add Rate and Level PID controllers
+    h.addPidController(&levelPid);
+    h.addPidController(&ratePid);
 
     // Start the receiver
     Serial2.begin(115200);
