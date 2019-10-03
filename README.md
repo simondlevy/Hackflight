@@ -28,7 +28,7 @@ Hackable ESP8266 Flight Controller from Pesky Products
 * [Butterfly DIY](https://diydrones.com/profiles/blogs/hackhawk-ii-an-arduino-compatible-brushless-flight-controller)
 brushless flight controller (components from from Tlera Corp. and Pesky Products)
 
-* Certain [STM32F-based](https://github.com/simondlevy/Hackflight/tree/master/extras/stm32f_examples) flight controllers
+* Certain [STM32F3-based](https://github.com/simondlevy/Hackflight/tree/master/extras/stm32f_examples) flight controllers
 
 * [MulticopterSim](https://github.com/simondlevy/MulticopterSim) flight simulator based on UnrealEngine4
 
