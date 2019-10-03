@@ -17,6 +17,8 @@ injury to you and damage to your vehicle.
 
 Hackflight is current working on the following platforms:
 
+* [Huzzah32](https://www.adafruit.com/product/3405) development board from Adafruit Inc.
+
 * [Ladybug](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) brushed flight controller
 from Tlera Corp.
 
