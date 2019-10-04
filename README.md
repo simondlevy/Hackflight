@@ -112,9 +112,9 @@ controllers](https://en.wikipedia.org/wiki/PID_controller) to modify the
 demands (throttle, roll, pitch, yaw) received by the R/C receiver or other
 control device. Then the demands are then
 sent to the [mixer](https://github.com/simondlevy/Hackflight/blob/master/src/mixer.hpp), which determines the
-values to be sent to each motor:
+values to be sent to each motor.  The motors spin the propellers, which in turn modifies the state of the vehicle:
 
-<img src="extras/media/dataflow3.png" width=800>
+<img src="extras/media/dataflow.png" width=800>
 
 ### Sensors
 
