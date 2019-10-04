@@ -219,7 +219,7 @@ roll and pitch axes.   To support this arrangement in Hackflight, PID
 controllers for aux state 0 will also run in aux states 1 and 2, and PID
 controllers for aux state 1 will also run in aux state 2.
 
-2. <b>It matters in which order you add PID controllers.</b>, because the output of one PID controller is the input to 
+2. <b>It matters in which order you add PID controllers</b>, because the output of one PID controller is the input to 
 the next.  For example, to get Stabilize mode, you want the Level controller to go first, setting the desired pitch/roll angles,
 and the Rate controller to go next, to control the rate at which the desired angle will be reached.
 
