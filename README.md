@@ -183,7 +183,7 @@ Once you've implemented the sub-class(es) for a new sensor, you can call
 code will be called by the [checkOptionalSensors](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L221-L230) method.
 
 <p align="center"> 
-<img src="extras/media/sensors6.png" width=800>
+<img src="extras/media/sensors.png" width=800>
 </p>
 
 ### PID Controllers
