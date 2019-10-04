@@ -1,5 +1,5 @@
 <p align="center"> 
-<img src="extras/media/logo2.png" width=450>
+<img src="extras/media/logo.png" width=450>
 </p>
 
 Hackflight is a simple, platform-independent, header-only C++ toolkit for
