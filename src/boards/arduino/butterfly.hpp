@@ -23,12 +23,13 @@
 #pragma once
 
 #include <Wire.h>
+#include "arduino.hpp"
 #include "sentral.hpp"
 #include "motors/standard.hpp"
 
 namespace hf {
 
-    class Butterfly : public SentralBoard {
+    class Butterfly : public ArduinoBoard {
 
         private:
 
@@ -39,8 +40,20 @@ namespace hf {
                 StandardMotor(11) 
             };
 
+            SentralBoard sentral;
+
          protected:
 
+            virtual bool  getQuaternion(float & qw, float & qx, float & qy, float & qz) override
+            {
+                return sentral.getQuaternion(qw, qx, qy, qz);
+            }
+
+            virtual bool  getGyrometer(float & gx, float & gy, float & gz) override
+            {
+                return sentral.getGyrometer(gx, gy, gz);
+            }
+ 
             virtual void writeMotor(uint8_t index, float value) override
             {
                 motors[index].write(value);
@@ -64,7 +77,7 @@ namespace hf {
          public:
 
             Butterfly(void) 
-                : SentralBoard(13, true) // red LED, active low
+                : ArduinoBoard(13, true) // red LED, active low
             {
                 // Start telemetry on Serial2
                 Serial2.begin(115200);
@@ -83,7 +96,7 @@ namespace hf {
                 delay(100);
 
                 // Start the USFS
-                SentralBoard::begin();
+                sentral.begin();
 
                 // Initialize the motors
                 for (uint8_t k=0; k<4; ++k) {

@@ -23,18 +23,31 @@
 #pragma once
 
 #include <Wire.h>
-#include "boards/arduino/sentral.hpp"
+#include "arduino.hpp"
+#include "sentral.hpp"
 #include "motors/brushed.hpp"
 
 namespace hf {
 
-    class Ladybug : public SentralBoard {
+    class Ladybug : public ArduinoBoard {
 
         private:
 
             BrushedMotor motors[4] = { BrushedMotor(13), BrushedMotor(A2), BrushedMotor(3), BrushedMotor(11) };
 
+            SentralBoard sentral;
+
         protected:
+
+            virtual bool  getQuaternion(float & qw, float & qx, float & qy, float & qz) override
+            {
+                return sentral.getQuaternion(qw, qx, qy, qz);
+            }
+
+            virtual bool  getGyrometer(float & gx, float & gy, float & gz) override
+            {
+                return sentral.getGyrometer(gx, gy, gz);
+            }
 
             void writeMotor(uint8_t index, float value)
             {
@@ -45,7 +58,7 @@ namespace hf {
 
             // Support prototype version where LED is on pin A1
             Ladybug(uint8_t ledPin = A4) 
-                : SentralBoard(ledPin)
+                : ArduinoBoard(ledPin)
             {
                 // Start I^2C
                 Wire.begin();
@@ -53,7 +66,7 @@ namespace hf {
                 // Hang a bit before starting up the EM7180
                 delay(100);
 
-                SentralBoard::begin();
+                sentral.begin();
 
                 // Initialize the motors
                 for (int k=0; k<4; ++k) {

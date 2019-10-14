@@ -32,6 +32,7 @@
 #include "hackflight.hpp"
 #include "boards/arduino/superfly.hpp"
 #include "mixers/quadxcf.hpp"
+#include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 #include "receivers/arduino/esp8266.hpp"
 
@@ -44,22 +45,18 @@ hf::ESP8266_Receiver rc = hf::ESP8266_Receiver(CHANNEL_MAP, DEMAND_SCALE, "Super
 
 hf::MixerQuadXCF mixer;
 
-hf::Rate ratePid = hf::Rate(
-        0.225f,     // Gyro pitch/roll P
-        0.001875f,  // Gyro pitch/roll I
-        0.375f,     // Gyro pitch/roll D
-        1.0625f,    // Gyro yaw P
-        0.005625f); // Gyro yaw I
+hf::RatePid ratePid = hf::RatePid( 0.225f, 0.001875f, 0.375f, 1.0625f, 0.005625f); 
 
-hf::Level level = hf::Level(0.20f);
+hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 void setup(void)
 {
-    // Add Level PID for aux switch position 1
-    h.addPidController(&level, 1);
+    // Initialize Hackflight firmware
+    h.init(new hf::SuperFly(), &rc, &mixer);
 
-     // Initialize Hackflight firmware
-     h.init(new hf::SuperFly(), &rc, &mixer, &ratePid);
+    // Add Rate and Level PID controllers
+    h.addPidController(&levelPid);
+    h.addPidController(&ratePid);
 }
 
 void loop(void)

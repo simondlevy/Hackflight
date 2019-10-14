@@ -23,19 +23,31 @@
 #pragma once
 
 #include <Wire.h>
+#include "arduino.hpp"
 #include "sentral.hpp"
 
 namespace hf {
 
-    class SuperFly : public SentralBoard {
+    class SuperFly : public ArduinoBoard {
 
         private:
 
             const uint8_t MOTOR_PINS[4] = {4, 5, 12, 14};
 
+            SentralBoard sentral;
+
         protected:
 
-            void writeMotor(uint8_t index, float value)
+            virtual bool  getQuaternion(float & qw, float & qx, float & qy, float & qz) override
+            {
+                return sentral.getQuaternion(qw, qx, qy, qz);
+            }
+
+            virtual bool  getGyrometer(float & gx, float & gy, float & gz) override
+            {
+                return sentral.getGyrometer(gx, gy, gz);
+            }
+             void writeMotor(uint8_t index, float value)
             {
                 // Scale motor value from [0,1] to [0,1023]
                 analogWrite(MOTOR_PINS[index], (uint16_t)(value * 1023));
@@ -44,7 +56,7 @@ namespace hf {
         public:
 
             SuperFly(void) 
-                : SentralBoard(15)
+                : ArduinoBoard(15)
             {
                 // Start I^2C
                 Wire.begin(0,2); // SDA (0), SCL (2) on ESP8266
@@ -52,7 +64,7 @@ namespace hf {
                 // Hang a bit before starting up the EM7180
                 delay(100);
 
-                SentralBoard::begin();
+                sentral.begin();
 
                  // Initialize the motors
                 analogWriteFreq(200);  

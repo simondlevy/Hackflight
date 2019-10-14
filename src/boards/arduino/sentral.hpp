@@ -22,11 +22,10 @@
 
 #include <Wire.h>
 #include <EM7180_Master.h>
-#include "arduino.hpp"
 
 namespace hf {
 
-    class SentralBoard : public ArduinoBoard {
+    class SentralBoard {
 
         private:
 
@@ -51,12 +50,7 @@ namespace hf {
                 }
             }
 
-        protected:
-
-            SentralBoard(uint8_t ledPin, bool ledInverted=false) 
-                : ArduinoBoard(ledPin, ledInverted)
-            {
-            }
+        public:
 
             bool getGyrometer(float & gx, float & gy, float & gz)
             {

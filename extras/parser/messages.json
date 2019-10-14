@@ -25,6 +25,13 @@
    {"pitch"   : "float"},
    {"yaw"     : "float"}],
   
+  "SET_VELOCITY_SETPOINTS": 
+  [{"ID": 213},
+   {"vx"      : "float"}, 
+   {"vy"      : "float"}, 
+   {"vz"      : "float"}, 
+   {"yaw_rate": "float"}],
+
    "SET_MOTOR_NORMAL": 
   [{"ID": 215},
    {"comment": "We send floating-point values in [0,1], rather than PWM"}, 
@@ -33,15 +40,18 @@
    {"m3": "float"},
    {"m4": "float"}],
 
-  "SET_ARMED": 
+  "SET_RC_NORMAL": 
+  [{"ID": 217},
+   {"comment": "Set RC commands in interval [-1,+1]"}, 
+   {"c1": "float"}, 
+   {"c2": "float"}, 
+   {"c3": "float"}, 
+   {"c4": "float"}, 
+   {"c5": "float"}, 
+   {"c6": "float"}],
+
+   "SET_ARMED": 
   [{"ID": 216},
    {"comment": "Arm/disarm from MSP"}, 
-   {"flag": "byte"}],
-
-  "SET_VELOCITY_SETPOINTS": 
-  [{"ID": 213},
-   {"vx"      : "float"}, 
-   {"vy"      : "float"}, 
-   {"vz"      : "float"}, 
-   {"yaw_rate": "float"}]
+   {"flag": "byte"}]
 }
