@@ -39,13 +39,6 @@ namespace hf {
 
             EM7180_Master _sentral = EM7180_Master(MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
 
-        protected:
-
-            SentralBoard(uint8_t ledPin, bool ledInverted=false) 
-                : ArduinoBoard(ledPin, ledInverted)
-            {
-            }
-
             void checkEventStatus(void)
             {
                 _sentral.checkEventStatus();
@@ -56,6 +49,13 @@ namespace hf {
                         Serial.println(_sentral.getErrorString());
                     }
                 }
+            }
+
+        protected:
+
+            SentralBoard(uint8_t ledPin, bool ledInverted=false) 
+                : ArduinoBoard(ledPin, ledInverted)
+            {
             }
 
             bool getGyrometer(float & gx, float & gy, float & gz)
@@ -100,10 +100,6 @@ namespace hf {
                     }
                 }
             }
-
-            // Helpful for SENtral mounted upside-down
-            virtual void invertQuaternion(float & qw, float & qx, float & qy, float & qz) { }
-            virtual void invertGyrometer(float & gx, float & gy, float & gz) { }
 
     }; // class SentralBoard
 
