@@ -26,6 +26,7 @@
 #include "sentral.hpp"
 #include "motors/standard.hpp"
 #include "boards/realboard.hpp"
+#include "arduino.hpp"
 
 #include <TinyPICO.h>
 
@@ -70,12 +71,6 @@ namespace hf {
                 Serial.write(c);
             }
 
-            static void powerPin(uint8_t id, uint8_t value)
-            {
-                pinMode(id, OUTPUT);
-                digitalWrite(id, value);
-            }
-
             virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz) override
             {
                 return sentral.getQuaternion(qw, qx, qy, qz);
@@ -100,8 +95,8 @@ namespace hf {
                 RealBoard::init();
 
                 // Use D18,19 for SENtral power, ground
-                powerPin(18, HIGH);
-                powerPin(19, LOW);
+                ArduinoBoard::powerPin(18, HIGH);
+                ArduinoBoard::powerPin(19, LOW);
 
                 // Hang a bit 
                 delay(100);

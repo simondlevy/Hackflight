@@ -31,15 +31,6 @@ namespace hf {
             uint8_t _led_pin = 0;
             bool    _led_inverted = false;
 
-            float _rollAdjustRadians = 0;
-            float _pitchAdjustRadians = 0;
-
-            void init(void)
-            {
-                Serial.begin(115200);
-                RealBoard::init();
-            }
-
         protected:
 
             void setLed(bool isOn) 
@@ -62,23 +53,12 @@ namespace hf {
                 Serial.write(c);
             }
 
-            virtual void adjustRollAndPitch(float & roll, float & pitch) override
-            {
-                pitch += _pitchAdjustRadians;
-                roll  += _rollAdjustRadians;
-            }
+        public:
 
             static void powerPin(uint8_t id, uint8_t value)
             {
                 pinMode(id, OUTPUT);
                 digitalWrite(id, value);
-            }
-
-        public:
-
-            ArduinoBoard(void)
-            {
-                init();
             }
 
             ArduinoBoard(uint8_t ledPin, bool ledInverted=false)
@@ -89,17 +69,8 @@ namespace hf {
                 pinMode(_led_pin, OUTPUT);
                 digitalWrite(_led_pin, _led_inverted ? HIGH : LOW);
 
-                init();
-
-            }
-
-            /**
-             * Compensates for poorly-mounted IMU.
-             */
-            void setRollAndPitchOffsets(float rollDegrees, float pitchDegrees)
-            {
-                _rollAdjustRadians  = Filter::deg2rad(rollDegrees);
-                _pitchAdjustRadians = Filter::deg2rad(pitchDegrees);
+                Serial.begin(115200);
+                RealBoard::init();
             }
 
     }; // class ArduinoBoard

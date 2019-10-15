@@ -49,6 +49,9 @@ namespace hf {
             // Supports MSP over wireless protcols like Bluetooth
             bool _useSerialTelemetry = false;
 
+            float _rollAdjustRadians = 0;
+            float _pitchAdjustRadians = 0;
+
         protected:
 
             virtual void setLed(bool isOn) = 0;
@@ -167,6 +170,23 @@ namespace hf {
                 }
             }
  
+            virtual void adjustRollAndPitch(float & roll, float & pitch) override
+            {
+                pitch += _pitchAdjustRadians;
+                roll  += _rollAdjustRadians;
+            }
+
+        public:
+
+            /**
+             * Compensates for poorly-mounted IMU.
+             */
+            void setRollAndPitchOffsets(float rollDegrees, float pitchDegrees)
+            {
+                _rollAdjustRadians  = Filter::deg2rad(rollDegrees);
+                _pitchAdjustRadians = Filter::deg2rad(pitchDegrees);
+            }
+
     }; // class RealBoard
 
 } // namespace hf
