@@ -1,9 +1,9 @@
 /*
-   Butterfly Flight Controller implementation of Hackflight Board routines
+   TinyPICO implementation of Hackflight Board routines
 
    Uses EM7180 SENtral Sensor Hub in master mode mode
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2019 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -23,74 +23,91 @@
 #pragma once
 
 #include <Wire.h>
-#include "arduino.hpp"
 #include "sentral.hpp"
 #include "motors/standard.hpp"
+#include "boards/realboard.hpp"
+
+#include <TinyPICO.h>
 
 namespace hf {
 
-    class Butterfly : public ArduinoBoard {
+    class TinyPico : public RealBoard {
 
         private:
 
+            /*
             StandardMotor motors[4] = { 
                 StandardMotor(5), 
                 StandardMotor(8), 
                 StandardMotor(9), 
                 StandardMotor(11) 
-            };
+            };*/
 
             SentralBoard sentral;
 
-         protected:
+            TinyPICO tp;
 
-            virtual bool  getQuaternion(float & qw, float & qx, float & qy, float & qz) override
+        protected:
+
+
+            void setLed(bool isOn) 
+            { 
+                tp.DotStar_SetPixelColor(0, isOn?255:0, 0);
+            }
+
+            uint8_t serialNormalAvailable(void)
+            {
+                return Serial.available();
+            }
+
+            uint8_t serialNormalRead(void)
+            {
+                return Serial.read();
+            }
+
+            void serialNormalWrite(uint8_t c)
+            {
+                Serial.write(c);
+            }
+
+            static void powerPin(uint8_t id, uint8_t value)
+            {
+                pinMode(id, OUTPUT);
+                digitalWrite(id, value);
+            }
+
+            virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz) override
             {
                 return sentral.getQuaternion(qw, qx, qy, qz);
             }
 
-            virtual bool  getGyrometer(float & gx, float & gy, float & gz) override
+            virtual bool getGyrometer(float & gx, float & gy, float & gz) override
             {
                 return sentral.getGyrometer(gx, gy, gz);
             }
  
             virtual void writeMotor(uint8_t index, float value) override
             {
-                motors[index].write(value);
-            }
-
-            virtual uint8_t serialTelemetryAvailable(void) override
-            {
-                return Serial2.available();
-            }
-
-            virtual uint8_t serialTelemetryRead(void) override
-            {
-                return Serial2.read();
-            }
-
-            virtual void serialTelemetryWrite(uint8_t c) override
-            {
-                Serial2.write(c);
             }
 
          public:
 
-            Butterfly(void) 
-                : ArduinoBoard(13, true) // red LED, active low
+            TinyPico(void) 
             {
-                // Start telemetry on Serial2
-                Serial2.begin(115200);
+                Serial.begin(115200);
 
-                // Use D4 for power, D3 for ground
-                powerPin(4, HIGH);
-                powerPin(3, LOW);
+                // This will blink the LED
+                RealBoard::init();
+
+                // Use D18,19 for SENtral power, ground
+                powerPin(18, HIGH);
+                powerPin(19, LOW);
 
                 // Hang a bit 
                 delay(100);
 
                 // Start I^2C
-                Wire.begin(TWI_PINS_6_7);
+                Wire.begin();
 
                 // Hang a bit
                 delay(100);
@@ -100,13 +117,13 @@ namespace hf {
 
                 // Initialize the motors
                 for (uint8_t k=0; k<4; ++k) {
-                    motors[k].init();
+                    //motors[k].init();
                 }
 
                 // Hang a bit more
                 delay(100);
             }
 
-    }; // class Butterfly
+    }; // class TinyPico
 
 } // namespace hf

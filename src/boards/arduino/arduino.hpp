@@ -21,13 +21,10 @@
 #pragma once
 
 #include "hackflight.hpp"
-#include "boards/realboard.hpp"
 
 namespace hf {
 
     class ArduinoBoard : public RealBoard {
-
-        friend class Hackflight;
 
         private:
 
@@ -45,11 +42,9 @@ namespace hf {
 
         protected:
 
-            virtual void setLed(bool isOn) 
+            void setLed(bool isOn) 
             { 
-                digitalWrite(_led_pin, isOn ? 
-                        (_led_inverted?LOW:HIGH) : 
-                        (_led_inverted?HIGH:LOW));
+                digitalWrite(_led_pin, isOn ?  (_led_inverted?LOW:HIGH) : (_led_inverted?HIGH:LOW));
             }
 
             uint8_t serialNormalAvailable(void)
