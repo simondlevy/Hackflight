@@ -61,15 +61,10 @@ static void receiverTask(void * params)
 }
 */
 
-static hf::TinyPico * board = NULL;
-
 void setup(void)
 {
-    // Create a new Board instance
-    board = new hf::TinyPico();
-
     // Initialize Hackflight firmware
-    h.init(board, &rc, &mixer);
+    h.init(new hf::TinyPico(), &rc, &mixer);
 
     // Add Rate and Level PID controllers
     h.addPidController(&levelPid);
