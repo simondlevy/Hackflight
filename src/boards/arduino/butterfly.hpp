@@ -83,8 +83,7 @@ namespace hf {
                 Serial2.begin(115200);
 
                 // Use D4 for power, D3 for ground
-                powerPin(4, HIGH);
-                powerPin(3, LOW);
+                powerPins(4, 3);
 
                 // Hang a bit 
                 delay(100);

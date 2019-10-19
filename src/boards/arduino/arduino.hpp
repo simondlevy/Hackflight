@@ -31,6 +31,12 @@ namespace hf {
             uint8_t _led_pin = 0;
             bool    _led_inverted = false;
 
+            static void powerPin(uint8_t id, uint8_t value)
+            {
+                pinMode(id, OUTPUT);
+                digitalWrite(id, value);
+            }
+
         protected:
 
             void setLed(bool isOn) 
@@ -55,10 +61,10 @@ namespace hf {
 
         public:
 
-            static void powerPin(uint8_t id, uint8_t value)
+            static void powerPins(uint8_t pwr, uint8_t gnd)
             {
-                pinMode(id, OUTPUT);
-                digitalWrite(id, value);
+                powerPin(pwr, HIGH);
+                powerPin(gnd, LOW);
             }
 
             ArduinoBoard(uint8_t ledPin, bool ledInverted=false)
