@@ -43,7 +43,6 @@ static SoftwareSerial softwareSerial;
 hf::Hackflight h;
 
 hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);
-//hf::MockReceiver rc;
 
 hf::MixerQuadXCF mixer;
 

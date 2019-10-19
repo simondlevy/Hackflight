@@ -36,13 +36,12 @@ namespace hf {
 
         private:
 
-            /*
             StandardMotor motors[4] = { 
-                StandardMotor(5), 
-                StandardMotor(8), 
-                StandardMotor(9), 
-                StandardMotor(11) 
-            };*/
+                StandardMotor(25), 
+                StandardMotor(26), 
+                StandardMotor(27), 
+                StandardMotor(15) 
+            };
 
             SentralBoard sentral;
 
@@ -83,6 +82,7 @@ namespace hf {
  
             virtual void writeMotor(uint8_t index, float value) override
             {
+                motors[index].write(value);
             }
 
          public:
@@ -111,7 +111,7 @@ namespace hf {
 
                 // Initialize the motors
                 for (uint8_t k=0; k<4; ++k) {
-                    //motors[k].init();
+                    motors[k].init();
                 }
 
                 // Hang a bit more
