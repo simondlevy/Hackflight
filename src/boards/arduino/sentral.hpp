@@ -1,5 +1,5 @@
 /*
-   Support for EM7180 SENtral Sensor Fusion solution
+   Support for USFS
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -21,7 +21,7 @@
 #pragma once
 
 #include <Wire.h>
-#include <EM7180_Master.h>
+#include <USFS_Master.h>
 
 namespace hf {
 
@@ -29,14 +29,14 @@ namespace hf {
 
         private:
 
-            // Tunable EM7180 parameters
+            // Tunable USFS parameters
             static const uint8_t  MAG_RATE       = 100;  // Hz
             static const uint16_t ACCEL_RATE     = 330;  // Hz
             static const uint16_t GYRO_RATE      = 330;  // Hz
             static const uint8_t  BARO_RATE      = 50;   // Hz
             static const uint8_t  Q_RATE_DIVISOR = 5;    // 1/5 gyro rate
 
-            EM7180_Master _sentral = EM7180_Master(MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
+            USFS_Master _sentral = USFS_Master(MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
 
             void checkEventStatus(void)
             {
@@ -87,7 +87,7 @@ namespace hf {
 
             void begin(void)
             {
-                // Start the EM7180 in master mode, no interrupt
+                // Start the USFS in master mode, no interrupt
                 if (!_sentral.begin()) {
                     while (true) {
                         Serial.println(_sentral.getErrorString());
