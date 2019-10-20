@@ -164,6 +164,15 @@ namespace hf {
 
             void checkReceiver(void)
             {
+                // Sync failsafe to receiver
+                if ((_receiver->lostSignal() || _board->isBatteryLow()) && _state.armed) {
+                    _mixer->cutMotors();
+                    _state.armed = false;
+                    _failsafe = true;
+                    _board->showArmedStatus(false);
+                    return;
+                }
+
                 // Check whether receiver data is available
                 if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
 
@@ -196,14 +205,6 @@ namespace hf {
 
                 // Set LED based on arming status
                 _board->showArmedStatus(_state.armed);
-
-                // Sync failsafe to receiver
-                if (_state.armed && (_receiver->lostSignal() || _board->isBatteryLow())) {
-                    _mixer->cutMotors();
-                    _state.armed = false;
-                    _failsafe = true;
-                    _board->showArmedStatus(false);
-                }
 
             } // checkReceiver
 
