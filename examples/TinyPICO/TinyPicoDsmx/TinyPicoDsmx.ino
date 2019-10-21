@@ -25,8 +25,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SoftwareSerial.h>
-
 #include "hackflight.hpp"
 #include "boards/arduino/tinypico.hpp"
 #include "receivers/arduino/dsmx.hpp"
@@ -34,15 +32,16 @@
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 
-static constexpr uint8_t SERIAL_PIN = 4;
-static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
-static constexpr float DEMAND_SCALE = 8.0f;
+static const uint8_t SERIAL1_RX = 32;
+static const uint8_t SERIAL1_TX = 33; // unused
 
-static SoftwareSerial softwareSerial;
+static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+
+static constexpr float DEMAND_SCALE = 8.0f;
 
 hf::Hackflight h;
 
-hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);
+hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
 
 hf::MixerQuadXCF mixer;
 
@@ -55,8 +54,8 @@ static void receiverTask(void * params)
 {
     while (true) {
 
-        if (softwareSerial.available()) {
-            rc.handleSerialEvent(softwareSerial.read(), micros());
+        if (Serial1.available()) {
+            rc.handleSerialEvent(Serial1.read(), micros());
         }
 
         delay(1);
@@ -65,8 +64,8 @@ static void receiverTask(void * params)
 
 void setup(void)
 {
-    // Start software serial for the receiver
-    softwareSerial.begin(115000, SERIAL_PIN);
+    // Start receiver on Serial1
+    Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
     // Initialize Hackflight firmware
     h.init(new hf::TinyPico(), &rc, &mixer);

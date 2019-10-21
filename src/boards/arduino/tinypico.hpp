@@ -81,7 +81,7 @@ namespace hf {
  
             virtual void writeMotor(uint8_t index, float value) override
             {
-                //motors[index].write(value);
+                motors[index].write(value);
             }
 
          public:
@@ -110,7 +110,7 @@ namespace hf {
 
                 // Initialize the motors
                 for (uint8_t k=0; k<4; ++k) {
-                    //motors[k].init();
+                    motors[k].init();
                 }
 
                 // Hang a bit more
