@@ -26,7 +26,7 @@ from Tlera Corp.
 Hackable ESP8266 Flight Controller from Pesky Products
 
 * [Butterfly DIY](https://diydrones.com/profiles/blogs/hackhawk-ii-an-arduino-compatible-brushless-flight-controller)
-brushless flight controller (components from from Tlera Corp. and Pesky Products)
+brushless flight controller (components from Tlera Corp. and Pesky Products)
 
 * Certain [STM32F3-based](https://github.com/simondlevy/Hackflight/tree/master/extras/stm32f_examples) flight controllers
 
@@ -96,7 +96,7 @@ which uses the [VL53L1X long-range proximity sensor](https://www.tindie.com/prod
 to provide altitude hold.
 
 To get started with Hackflight, take a look at the [build wiki](https://github.com/simondlevy/Hackflight/wiki).
-To understand the principles behind the software, contniue reading.
+To understand the principles behind the software, continue reading.
 
 ## Design Principles
 
