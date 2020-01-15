@@ -122,11 +122,6 @@ namespace hf {
 
                     // Sync PID controllers to gyro update
                     runPidControllers();
-
-                    // Use updated demands to run motors
-                    if (_state.armed && !_failsafe && !_receiver->throttleIsDown()) {
-                        _mixer->runArmed(_demands);
-                    }
                 }
             }
 
@@ -154,6 +149,11 @@ namespace hf {
 
                 // Flash LED for certain PID controllers
                 _board->flashLed(shouldFlash);
+
+                // Use updated demands to run motors
+                if (_state.armed && !_failsafe && !_receiver->throttleIsDown()) {
+                    _mixer->runArmed(_demands);
+                }
             }
 
             void checkReceiver(void)
