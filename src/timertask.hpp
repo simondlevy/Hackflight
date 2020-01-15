@@ -21,6 +21,7 @@
 #pragma once
 
 #include "board.hpp"
+#include "debugger.hpp"
 
 namespace hf {
 
@@ -54,7 +55,7 @@ namespace hf {
             {
                 float time = _board->getTime();
 
-                if (time - _time > _period)
+                if ((time - _time) > _period)
                 {
                     doTask();
                     _time = time;

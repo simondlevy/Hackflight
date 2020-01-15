@@ -34,7 +34,7 @@
 
 namespace hf {
 
-    class Hackflight : public MspParser {
+    class Hackflight {
 
         private: 
 
@@ -97,9 +97,6 @@ namespace hf {
 
                     // Adjust Euler angles to compensate for sloppy IMU mounting
                     _board->adjustRollAndPitch(_state.rotation[0], _state.rotation[1]);
-
-                    // Synch serial comms to quaternion check
-                    doSerialComms();
                 }
             }
 
@@ -205,25 +202,6 @@ namespace hf {
 
             } // checkReceiver
 
-            void doSerialComms(void)
-            {
-                while (_board->serialAvailableBytes() > 0) {
-
-                    if (MspParser::parse(_board->serialReadByte())) {
-                        _board->reboot(); // parser returns true when reboot requested
-                    }
-                }
-
-                while (MspParser::availableBytes() > 0) {
-                    _board->serialWriteByte(MspParser::readByte());
-                }
-
-                // Support motor testing from GCS
-                if (!_state.armed) {
-                    _mixer->runDisarmed();
-                }
-            }
-
             void checkOptionalSensors(void)
             {
                 for (uint8_t k=0; k<_sensor_count; ++k) {
@@ -247,58 +225,6 @@ namespace hf {
                 sensor->board = board;
             }
 
-        protected:
-
-            virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 
-                    float & heading, float & velocityForward, float & velocityRightward) 
-            {
-                // XXX Use only heading for now
-                altitude = 0;
-                variometer = 0;
-                positionX = 0;
-                positionY = 0;
-                heading = -_state.rotation[AXIS_YAW]; // NB: Angle negated for remote visualization
-                velocityForward = 0;
-                velocityRightward = 0;
-            }
- 
-            virtual void handle_SET_ARMED(uint8_t  flag)
-            {
-                if (flag) {  // got arming command: arm only if throttle is down
-                    if (_receiver->throttleIsDown()) {
-                        _state.armed = true;
-                    }
-                }
-                else {          // got disarming command: always disarm
-                    _state.armed = false;
-                }
-            }
-
-            virtual void handle_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
-            {
-                c1 = _receiver->getRawval(0);
-                c2 = _receiver->getRawval(1);
-                c3 = _receiver->getRawval(2);
-                c4 = _receiver->getRawval(3);
-                c5 = _receiver->getRawval(4);
-                c6 = _receiver->getRawval(5);
-            }
-
-            virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
-            {
-                roll  = _state.rotation[AXIS_ROLL];
-                pitch = _state.rotation[AXIS_PITCH];
-                yaw   = _state.rotation[AXIS_YAW];
-            }
-
-            virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
-            {
-                _mixer->motorsDisarmed[0] = m1;
-                _mixer->motorsDisarmed[1] = m2;
-                _mixer->motorsDisarmed[2] = m3;
-                _mixer->motorsDisarmed[3] = m4;
-            }
-
         public:
 
             void init(Board * board, Receiver * receiver, Mixer * mixer, bool armed=false)
@@ -309,7 +235,7 @@ namespace hf {
                 _mixer    = mixer;
 
                 // Timer task initializations
-                _serialTask.init(_board, &_state, _mixer, _receiver);
+                _serialTask.init(board, &_state, mixer, receiver);
 
                 // Ad-hoc debugging support
                 _debugger.init(board);
@@ -327,11 +253,8 @@ namespace hf {
                 // Support safety override by simulator
                 _state.armed = armed;
 
-                // Initialize MPS parser for serial comms
-                MspParser::init();
-
-                // Initialize the receiver
-                _receiver->begin();
+               // Initialize the receiver
+               _receiver->begin();
 
                 // Tell the mixer which board to use
                 _mixer->board = board; 
@@ -366,7 +289,7 @@ namespace hf {
                 checkOptionalSensors();
 
                 // Update timer Tasks
-
+                _serialTask.update();
             } 
 
     }; // class Hackflight

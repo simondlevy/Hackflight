@@ -24,6 +24,7 @@
 #include "board.hpp"
 #include "mixer.hpp"
 #include "mspparser.hpp"
+#include "debugger.hpp"
 
 namespace hf {
 
@@ -33,7 +34,6 @@ namespace hf {
 
             static constexpr float FREQ = 66;
 
-            Board    * _board = NULL;
             Mixer    * _mixer = NULL;
             Receiver * _receiver = NULL;
             state_t  * _state = NULL;
@@ -113,7 +113,6 @@ namespace hf {
                 _mixer->motorsDisarmed[3] = m4;
             }
 
-
         public:
 
             SerialTask(void)
@@ -124,6 +123,8 @@ namespace hf {
             void init(Board * board, state_t * state, Mixer * mixer, Receiver * receiver) 
             {
                 TimerTask::init(board);
+
+                MspParser::init();
 
                 _state = state;
                 _mixer = mixer;
