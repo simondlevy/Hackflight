@@ -32,6 +32,7 @@ namespace hf {
         friend class Hackflight;
         friend class RealBoard;
         friend class MspParser;
+        friend class SerialTask;
 
         private: 
 
