@@ -25,6 +25,7 @@
 #include "mspparser.hpp"
 #include "mixer.hpp"
 #include "receiver.hpp"
+#include "timertask.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
 #include "sensors/surfacemount/gyrometer.hpp"
