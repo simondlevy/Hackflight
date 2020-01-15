@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include "board.hpp"
+
 namespace hf {
 
     class TimerTask {
@@ -31,20 +33,27 @@ namespace hf {
 
         protected:
 
-            virtual void doTask(void) = 0;
-
-        public:
+            Board * _board = NULL;
 
             TimerTask(float freq)
             {
                 _period = 1 / freq;
-
                 _time = 0;
             }
 
-
-            void update(float time)
+            void init(Board * board)
             {
+                _board = board;
+            }
+
+            virtual void doTask(void) = 0;
+
+        public:
+
+            void update(void)
+            {
+                float time = _board->getTime();
+
                 if (time - _time > _period)
                 {
                     doTask();

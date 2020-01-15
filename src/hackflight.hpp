@@ -56,6 +56,9 @@ namespace hf {
             Gyrometer _gyrometer;
             Quaternion _quaternion; // not really a sensor, but we treat it like one!
 
+            // Timer tasks
+            SerialTask _serialTask;
+
             // Additional sensors 
             Sensor * _sensors[256] = {NULL};
             uint8_t _sensor_count = 0;
@@ -305,6 +308,9 @@ namespace hf {
                 _receiver = receiver;
                 _mixer    = mixer;
 
+                // Timer task initializations
+                _serialTask.init(_board, &_state, _mixer, _receiver);
+
                 // Ad-hoc debugging support
                 _debugger.init(board);
 
@@ -358,6 +364,9 @@ namespace hf {
 
                 // Check optional sensors
                 checkOptionalSensors();
+
+                // Update timer Tasks
+
             } 
 
     }; // class Hackflight

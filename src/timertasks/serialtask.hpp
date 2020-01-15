@@ -116,15 +116,19 @@ namespace hf {
 
         public:
 
-            SerialTask(state_t * state, Board * board, Mixer * mixer, Receiver * receiver) 
+            SerialTask(void)
                 : TimerTask(FREQ)
             {
+            }
+
+            void init(Board * board, state_t * state, Mixer * mixer, Receiver * receiver) 
+            {
+                TimerTask::init(board);
+
                 _state = state;
-                _board = board;
                 _mixer = mixer;
                 _receiver = receiver;
             }
-
 
     };  // SerialTask
 
