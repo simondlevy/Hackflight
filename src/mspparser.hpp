@@ -60,7 +60,7 @@ namespace hf {
             uint8_t _dataSize;
             uint8_t _direction;
 
-            serialState_t  _state;
+            serialState_t  _serialState;
 
             void serialize8(uint8_t a)
             {
@@ -172,7 +172,7 @@ namespace hf {
                 _command = 0;
                 _offset = 0;
                 _dataSize = 0;
-                _state = IDLE;
+                _serialState = IDLE;
             }
             
             uint8_t availableBytes(void)
@@ -189,37 +189,37 @@ namespace hf {
             // returns true if reboot request, false otherwise
             bool parse(uint8_t c)
             {
-                switch (_state) {
+                switch (_serialState) {
 
                     case IDLE:
                         if (c == 'R') {
                             return true; // got reboot command
                         }
-                        _state = (c == '$') ? HEADER_START : IDLE;
+                        _serialState = (c == '$') ? HEADER_START : IDLE;
                         break;
 
                     case HEADER_START:
-                        _state = (c == 'M') ? HEADER_M : IDLE;
+                        _serialState = (c == 'M') ? HEADER_M : IDLE;
                         break;
 
                     case HEADER_M:
                         switch (c) {
                            case '>':
                                 _direction = 1;
-                                _state = HEADER_ARROW;
+                                _serialState = HEADER_ARROW;
                                 break;
                             case '<':
                                 _direction = 0;
-                                _state = HEADER_ARROW;
+                                _serialState = HEADER_ARROW;
                                 break;
                              default:
-                                _state = IDLE;
+                                _serialState = IDLE;
                         }
                         break;
 
                     case HEADER_ARROW:
                         if (c > INBUF_SIZE) {       // now we are expecting the payload size
-                            _state = IDLE;
+                            _serialState = IDLE;
                             return false;
                         }
                         _dataSize = c;
@@ -227,13 +227,13 @@ namespace hf {
                         _checksum = 0;
                         _inBufIndex = 0;
                         _checksum ^= c;
-                        _state = HEADER_SIZE;      // the command is to follow
+                        _serialState = HEADER_SIZE;      // the command is to follow
                         break;
 
                     case HEADER_SIZE:
                         _command = c;
                         _checksum ^= c;
-                        _state = HEADER_CMD;
+                        _serialState = HEADER_CMD;
                         break;
 
                     case HEADER_CMD:
@@ -244,10 +244,10 @@ namespace hf {
                             if (_checksum == c) {        // compare calculated and transferred _checksum
                                 dispatchMessage();
                             }
-                            _state = IDLE;
+                            _serialState = IDLE;
                         }
 
-                } // switch (_state)
+                } // switch (_serialState)
 
                 return false; // no reboot 
 

@@ -21,10 +21,8 @@
 #pragma once
 
 #include "timertask.hpp"
-#include "board.hpp"
 #include "mixer.hpp"
 #include "mspparser.hpp"
-#include "debugger.hpp"
 
 namespace hf {
 
@@ -33,10 +31,6 @@ namespace hf {
         private:
 
             static constexpr float FREQ = 66;
-
-            Mixer    * _mixer = NULL;
-            Receiver * _receiver = NULL;
-            state_t  * _state = NULL;
 
         protected:
 
@@ -122,13 +116,9 @@ namespace hf {
 
             void init(Board * board, state_t * state, Mixer * mixer, Receiver * receiver) 
             {
-                TimerTask::init(board);
+                TimerTask::init(board, state, mixer, receiver);
 
                 MspParser::init();
-
-                _state = state;
-                _mixer = mixer;
-                _receiver = receiver;
             }
 
     };  // SerialTask

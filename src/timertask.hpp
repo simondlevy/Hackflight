@@ -35,6 +35,9 @@ namespace hf {
         protected:
 
             Board * _board = NULL;
+            Mixer    * _mixer = NULL;
+            Receiver * _receiver = NULL;
+            state_t  * _state = NULL;
 
             TimerTask(float freq)
             {
@@ -42,9 +45,12 @@ namespace hf {
                 _time = 0;
             }
 
-            void init(Board * board)
+            void init(Board * board, state_t * state, Mixer * mixer, Receiver * receiver)
             {
                 _board = board;
+                _state = state;
+                _mixer = mixer;
+                _receiver = receiver;
             }
 
             virtual void doTask(void) = 0;
