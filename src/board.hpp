@@ -36,6 +36,7 @@ namespace hf {
         friend class Mixer;
         friend class TimerTask;
         friend class SerialTask;
+        friend class PidsTask;
 
         protected:
 

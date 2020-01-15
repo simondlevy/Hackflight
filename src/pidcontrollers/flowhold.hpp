@@ -58,10 +58,10 @@ namespace hf {
 
         protected:
 
-            void modifyDemands(state_t & state, demands_t & demands)
+            void modifyDemands(state_t * state, demands_t * demands)
             {
-                _rollPid.update(demands.roll,  state.bodyVel[1]);
-                _rollPid.update(demands.pitch, state.bodyVel[0]);
+                _rollPid.update(demands->roll,  state->bodyVel[1]);
+                _rollPid.update(demands->pitch, state->bodyVel[0]);
             }
 
             virtual bool shouldFlashLed(void) override 

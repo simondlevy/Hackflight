@@ -82,17 +82,17 @@ namespace hf {
                 _yawPid.init(Kp_yaw, Ki_yaw, 0);
             }
 
-            void modifyDemands(state_t & state, demands_t & demands)
+            void modifyDemands(state_t * state, demands_t * demands)
             {
-                demands.roll  = _rollPid.compute(demands.roll,  state.angularVel[0]);
-                demands.pitch = _pitchPid.compute(demands.pitch, state.angularVel[1]);
-                demands.yaw   = _yawPid.compute(demands.yaw, state.angularVel[2]);
+                demands->roll  = _rollPid.compute(demands->roll,  state->angularVel[0]);
+                demands->pitch = _pitchPid.compute(demands->pitch, state->angularVel[1]);
+                demands->yaw   = _yawPid.compute(demands->yaw, state->angularVel[2]);
 
                 // Prevent "yaw jump" during correction
-                demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));
+                demands->yaw = Filter::constrainAbs(demands->yaw, 0.1 + fabs(demands->yaw));
 
                 // Reset yaw integral on large yaw command
-                if (fabs(demands.yaw) > BIG_YAW_DEMAND) {
+                if (fabs(demands->yaw) > BIG_YAW_DEMAND) {
                     _yawPid.reset();
                 }
             }

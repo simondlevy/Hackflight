@@ -29,6 +29,7 @@
 #include "pidcontroller.hpp"
 #include "timertasks/serialtask.hpp"
 #include "timertasks/pidstask.hpp"
+#include "timertasks/mixertask.hpp"
 #include "sensors/surfacemount/gyrometer.hpp"
 #include "sensors/surfacemount/quaternion.hpp"
 #include "sensors/mspsensor.hpp"
@@ -49,10 +50,6 @@ namespace hf {
             // Supports periodic ad-hoc debugging
             Debugger _debugger;
 
-            // PID controllers
-            PidController * _pid_controllers[256] = {NULL};
-            uint8_t _pid_controller_count = 0;
-
             // Mandatory sensors on the board
             Gyrometer _gyrometer;
             Quaternion _quaternion; // not really a sensor, but we treat it like one!
@@ -60,6 +57,7 @@ namespace hf {
             // Timer tasks
             SerialTask _serialTask;
             PidsTask _pidsTask;
+            MixerTask _mixerTask;
 
             // Additional sensors 
             Sensor * _sensors[256] = {NULL};
@@ -121,40 +119,6 @@ namespace hf {
                     _demands.roll     = _receiver->demands.roll  * _receiver->_demandScale;
                     _demands.pitch    = _receiver->demands.pitch * _receiver->_demandScale;
                     _demands.yaw      = _receiver->demands.yaw   * _receiver->_demandScale;
-
-                    // Sync PID controllers to gyro update
-                    runPidControllers();
-                }
-            }
-
-            void runPidControllers(void)
-            {
-                // Each PID controllers is associated with at least one auxiliary switch state
-                uint8_t auxState = _receiver->getAux1State();
-
-                // Some PID controllers should cause LED to flash when they're active
-                bool shouldFlash = false;
-
-                for (uint8_t k=0; k<_pid_controller_count; ++k) {
-
-                    PidController * pidController = _pid_controllers[k];
-
-                    if (pidController->auxState <= auxState) {
-
-                        pidController->modifyDemands(_state, _demands); 
-
-                        if (pidController->shouldFlashLed()) {
-                            shouldFlash = true;
-                        }
-                    }
-                }
-
-                // Flash LED for certain PID controllers
-                _board->flashLed(shouldFlash);
-
-                // Use updated demands to run motors
-                if (_state.armed && !_failsafe && !_receiver->throttleIsDown()) {
-                    _mixer->runArmed(_demands);
                 }
             }
 
@@ -173,9 +137,7 @@ namespace hf {
                 if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
 
                 // Update PID controllers with receiver demands
-                for (uint8_t k=0; k<_pid_controller_count; ++k) {
-                    _pid_controllers[k]->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
-                }
+                _pidsTask.updateReceiverDemands();
 
                 // Disarm
                 if (_state.armed && !_receiver->getAux2State()) {
@@ -238,7 +200,8 @@ namespace hf {
 
                 // Timer task initializations
                 _serialTask.init(board, &_state, mixer, receiver);
-                _pidsTask.init(board, &_state, mixer, receiver);
+                _pidsTask.init(board, &_state, mixer, receiver, &_demands);
+                _mixerTask.init(board, &_state, mixer, receiver, &_demands, &_failsafe);
 
                 // Ad-hoc debugging support
                 _debugger.init(board);
@@ -274,9 +237,7 @@ namespace hf {
 
             void addPidController(PidController * pidController, uint8_t auxState=0) 
             {
-                pidController->auxState = auxState;
-
-                _pid_controllers[_pid_controller_count++] = pidController;
+                _pidsTask.addPidController(pidController, auxState);
             }
 
             void update(void)
@@ -294,6 +255,7 @@ namespace hf {
                 // Update timer Tasks
                 _serialTask.update();
                 _pidsTask.update();
+                _mixerTask.update();
             } 
 
     }; // class Hackflight

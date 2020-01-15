@@ -33,6 +33,8 @@ namespace hf {
         friend class RealBoard;
         friend class MspParser;
         friend class SerialTask;
+        friend class PidsTask;
+        friend class MixerTask;
 
         private: 
 

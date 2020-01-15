@@ -21,6 +21,7 @@
 #pragma once
 
 #include "timertask.hpp"
+#include "pidcontroller.hpp"
 
 namespace hf {
 
@@ -30,14 +31,41 @@ namespace hf {
 
             static constexpr float FREQ = 300;
 
+            demands_t * _demands = NULL;
+
+            // PID controllers
+            PidController * _pid_controllers[256] = {NULL};
+            uint8_t _pid_controller_count = 0;
+
         protected:
 
             // TimerTask overrides -------------------------------------------------------
 
             virtual void doTask(void) override
             {
-            }
+                // Each PID controllers is associated with at least one auxiliary switch state
+                uint8_t auxState = _receiver->getAux1State();
 
+                // Some PID controllers should cause LED to flash when they're active
+                bool shouldFlash = false;
+
+                for (uint8_t k=0; k<_pid_controller_count; ++k) {
+
+                    PidController * pidController = _pid_controllers[k];
+
+                    if (pidController->auxState <= auxState) {
+
+                        pidController->modifyDemands(_state, _demands); 
+
+                        if (pidController->shouldFlashLed()) {
+                            shouldFlash = true;
+                        }
+                    }
+                }
+
+                // Flash LED for certain PID controllers
+                _board->flashLed(shouldFlash);
+            }
 
         public:
 
@@ -46,11 +74,26 @@ namespace hf {
             {
             }
 
-            void init(Board * board, state_t * state, Mixer * mixer, Receiver * receiver) 
+            void init(Board * board, state_t * state, Mixer * mixer, Receiver * receiver, demands_t * demands) 
             {
                 TimerTask::init(board, state, mixer, receiver);
+
+                _demands = demands;
             }
 
+            void addPidController(PidController * pidController, uint8_t auxState=0) 
+            {
+                pidController->auxState = auxState;
+
+                _pid_controllers[_pid_controller_count++] = pidController;
+            }
+
+            void updateReceiverDemands(void)
+            {
+                for (uint8_t k=0; k<_pid_controller_count; ++k) {
+                    _pid_controllers[k]->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
+                }
+            }
 
     };  // PidsTask
 

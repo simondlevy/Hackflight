@@ -30,6 +30,7 @@ namespace hf {
         friend class MspParser;
         friend class RealBoard;
         friend class SerialTask;
+        friend class MixerTask;
 
         private:
 
@@ -78,20 +79,20 @@ namespace hf {
             float  motorsDisarmed[MAXMOTORS];
             uint8_t nmotors;
 
-            void runArmed(demands_t demands)
+            void runArmed(demands_t * demands)
             {
                 // Map throttle demand from [-1,+1] to [0,1]
-                demands.throttle = (demands.throttle + 1) / 2;
+                demands->throttle = (demands->throttle + 1) / 2;
 
                 float motors[MAXMOTORS];
 
                 for (uint8_t i = 0; i < nmotors; i++) {
 
                     motors[i] = 
-                        (demands.throttle * motorDirections[i].throttle + 
-                         demands.roll     * motorDirections[i].roll +     
-                         demands.pitch    * motorDirections[i].pitch +   
-                         demands.yaw      * motorDirections[i].yaw);      
+                        (demands->throttle * motorDirections[i].throttle + 
+                         demands->roll     * motorDirections[i].roll +     
+                         demands->pitch    * motorDirections[i].pitch +   
+                         demands->yaw      * motorDirections[i].yaw);      
                 }
 
                 float maxMotor = motors[0];
