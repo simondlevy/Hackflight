@@ -24,6 +24,33 @@ namespace hf {
 
     class TimerTask {
 
+        private:
+
+            float _period = 0;
+            float _time = 0;
+
+        protected:
+
+            virtual void doTask(void) = 0;
+
+        public:
+
+            TimerTask(float freq)
+            {
+                _period = 1 / freq;
+
+                _time = 0;
+            }
+
+
+            void update(float time)
+            {
+                if (time - _time > _period)
+                {
+                    doTask();
+                    _time = time;
+                }
+            }
 
     };  // TimerTask
 
