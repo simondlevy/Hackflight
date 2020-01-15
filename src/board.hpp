@@ -34,6 +34,7 @@ namespace hf {
         friend class Barometer;
         friend class Debugger;
         friend class Mixer;
+        friend class SerialTask;
 
         protected:
 
