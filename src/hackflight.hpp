@@ -28,6 +28,7 @@
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
 #include "timertasks/serialtask.hpp"
+#include "timertasks/pidstask.hpp"
 #include "sensors/surfacemount/gyrometer.hpp"
 #include "sensors/surfacemount/quaternion.hpp"
 #include "sensors/mspsensor.hpp"
