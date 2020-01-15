@@ -59,6 +59,7 @@ namespace hf {
 
             // Timer tasks
             SerialTask _serialTask;
+            PidsTask _pidsTask;
 
             // Additional sensors 
             Sensor * _sensors[256] = {NULL};
@@ -237,6 +238,7 @@ namespace hf {
 
                 // Timer task initializations
                 _serialTask.init(board, &_state, mixer, receiver);
+                _pidsTask.init(board, &_state, mixer, receiver);
 
                 // Ad-hoc debugging support
                 _debugger.init(board);
@@ -291,6 +293,7 @@ namespace hf {
 
                 // Update timer Tasks
                 _serialTask.update();
+                _pidsTask.update();
             } 
 
     }; // class Hackflight
