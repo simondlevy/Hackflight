@@ -55,7 +55,7 @@ these components:
 
 * The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp">Board</a>
 class specifies an abstract (pure virtual) <tt>getTime()</tt> method that you must
-implement for a particular flight controller or simulator.
+implement for a particular microcontroller or simulator.
 * The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/imu.hpp">IMU</a>
 class specifies an abstract (pure virtual) <tt>getQuaternion()</tt> and
 <tt>getGyrometer()</tt> method that you must implement for a particular IMU.
