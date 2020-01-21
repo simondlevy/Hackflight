@@ -21,7 +21,7 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/arduino/ladybug.hpp"
+#include "boards/arduino/ladybugfc.hpp"
 #include "receivers/arduino/dsmx_serial1.hpp"
 #include "sensors/rangefinders/vl53l1x.hpp"
 #include "pidcontrollers/level.hpp"
@@ -62,7 +62,7 @@ void setup(void)
     rc.setTrimPitch(+.3);
 
     // Initialize Hackflight firmware
-    h.init(new hf::Ladybug(), &rc, &mixer);
+    h.init(new hf::LadybugFC(), &rc, &mixer);
 
     // Add rangefinder sensor
     rangefinder.begin();

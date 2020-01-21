@@ -29,7 +29,7 @@
 
 namespace hf {
 
-    class Ladybug : public ArduinoBoard {
+    class LadybugFC : public ArduinoBoard {
 
         private:
 
@@ -57,7 +57,7 @@ namespace hf {
         public:
 
             // Support prototype version where LED is on pin A1
-            Ladybug(uint8_t ledPin = A4) 
+            LadybugFC(uint8_t ledPin = A4) 
                 : ArduinoBoard(ledPin)
             {
                 // Start I^2C
@@ -77,6 +77,6 @@ namespace hf {
                 delay(100);
             }
 
-    }; // class Ladybug
+    }; // class LadybugFC
 
 } // namespace hf

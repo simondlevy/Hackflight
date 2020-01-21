@@ -24,14 +24,6 @@
 #include "debugger.hpp"
 #include "datatypes.hpp"
 
-// Support delay(), micros() on non-Arduino boards
-#ifndef ARDUINO
-extern "C" {
-    extern uint32_t micros(void);
-    extern void     delay(uint32_t msec);
-}
-#endif
-
 namespace hf {
 
     class RealBoard : public Board {

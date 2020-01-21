@@ -31,7 +31,7 @@ Copyright (c) 2018 Simon D. Levy
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/arduino/ladybug.hpp"
+#include "boards/arduino/ladybugfc.hpp"
 #include "receivers/arduino/dsmx_serial1.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
@@ -53,7 +53,7 @@ hf::LevelPid levelPid = hf::LevelPid(0.20f);
 void setup(void)
 {
     // Initialize Hackflight firmware
-    h.init(new hf::Ladybug(), &rc, &mixer);
+    h.init(new hf::LadybugFC(), &rc, &mixer);
 
     // Add PID controllers
     h.addPidController(&levelPid);

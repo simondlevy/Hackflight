@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "hackflight.hpp"
+#include "boards/realboard.hpp"
 
 namespace hf {
 

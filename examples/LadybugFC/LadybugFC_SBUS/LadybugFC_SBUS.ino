@@ -31,7 +31,7 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/arduino/ladybug.hpp"
+#include "boards/arduino/ladybugfc.hpp"
 #include "receivers/arduino/sbus.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
@@ -58,8 +58,8 @@ hf::LevelPid levelPid = hf::LevelPid(0.20f);
 void setup(void)
 {
 
-    // Use pin A1 for LED on original LadybugFc (newer uses A4)
-    h.init(new hf::Ladybug(A1), &rc, &mixer);
+    // Use pin A1 for LED on original LadybugFC (newer uses A4)
+    h.init(new hf::LadybugFC(A1), &rc, &mixer);
 
     // Add Rate, Level PID constrollers
     h.addPidController(&ratePid, 0);
