@@ -30,7 +30,6 @@
 #include "timertasks/serialtask.hpp"
 #include "sensors/surfacemount/gyrometer.hpp"
 #include "sensors/surfacemount/quaternion.hpp"
-#include "sensors/mspsensor.hpp"
 
 namespace hf {
 

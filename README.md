@@ -28,8 +28,6 @@ Hackable ESP8266 Flight Controller from Pesky Products
 * [Butterfly DIY](https://diydrones.com/profiles/blogs/hackhawk-ii-an-arduino-compatible-brushless-flight-controller)
 brushless flight controller (components from from Tlera Corp. and Pesky Products)
 
-* Certain [STM32F3-based](https://github.com/simondlevy/Hackflight/tree/master/extras/stm32f_examples) flight controllers
-
 * [MulticopterSim](https://github.com/simondlevy/MulticopterSim) flight simulator based on UnrealEngine4
 
 By supporting floating-point operations, these platforms allow us to write simpler code based on standard units:
@@ -154,23 +152,6 @@ deliver new data; (2) modifying the vehicle state.  By requiring each sensor to
 report its readiness, we can avoid the need to write a separate timing loop for
 each sensor in the main [loop
 code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L353-L367). 
-
-Many popular STM32F-based flight-control boards come with extra UARTs (serial
-ports) but lack ports for sensor
-signals like I<sup>2</sup>C or SPI.  For this reason, , Hackflight also
-provides an abstract
-[class](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/mspsensor.hpp)
-to support communicating with an external Arduino-compatible development board
-(like Teensy board) connected to such sensors.  For example, this
-[image](https://github.com/simondlevy/Hackflight/blob/master/extras/media/loiterboard.jpg) shows a 
-[Butterfly Board](https://www.tindie.com/products/TleraCorp/butterfly-stm32l433-development-board/) from Tlera Corp., 
-with a [VL53L1X](https://www.tindie.com/products/onehorse/vl53l1-long-range-proximity-sensor/)
-long-range proximity sensor and [PMW3901](https://www.tindie.com/products/onehorse/pmw3901-optical-flow-sensor/)
-optical-flow sensor (both from Pesky Products). Flashing this Arduino
-[sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Butterfly/ButterflyLoiterBoard/ButterflyLoiterBoard.ino)
-onto the Butterfly board will cause the board to output 
-messages to your flight controller's UART on the green wire (with the red and black wires providing power to the
-Butterfly from your flight controller).
 
 To implement additional sensors, you can directly sub-class the Sensor class, as we've done with the 
 [Rangefinder](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/rangefinder.hpp) 
