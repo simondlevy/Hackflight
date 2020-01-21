@@ -48,15 +48,17 @@ adheres to standard practices for C++, notably, short, simple methods and
 minimal use of compiler macros like <b>#ifdef</b> that can make it difficult to
 follow what the code is doing.  
 
-Because a multirotor build typically involves choosing a flight-control board,
-radio receiver, model (airframe), and PID control settings, Hackflight provides
-a separate C++ class to support each of these components:
+Because a DIY multirotor build typically involves choosing a flight-control board,
+inertial measurement unit (IMU), radio receiver, model (airframe), motors, and PID
+control settings, Hackflight provides a separate C++ class to support each of
+these components:
 
 * The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp">Board</a>
-class specifies a set of four abstract (pure virtual) methods that you must
-implement for a particular flight controller or simulator: getting the current
-quaternion from the IMU; getting gyrometer rates from the IMU; sending
-commands to the motors; and getting the current time.  
+class specifies an abstract (pure virtual) <tt>getTime()</tt> method that you must
+implement for a particular flight controller or simulator
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/imu.hpp">IMU</a>
+class specifies an abstract (pure virtual) <tt>getQuaternion()</tt> and
+<tt>getGyrometer()</tt> method that you must implement for a particular IMU.
 * The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/receiver.hpp">Receiver</a>
 class performs basic functions associated with R/C control (tracking stick
 positions, checking switches) and specifies a set of abstract methods that you
@@ -68,10 +70,11 @@ configurations (QuadX, Hexacopter, Tricopter, etc.).  The
 (quad-X using Cleanflight numbering conventions)  and
 <a href="https://github.com/simondlevy/Hackflight/blob/master/src/mixers/quadxap.hpp">QuadXAP</a>
 (quad-X using ArduPilot numbering conventions) subclasses are already implemented.  
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/motor.hpp">Motor</a> class
+supports different kinds of motors (brushed, brushless).
 * The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp">PidController</a>
 class provides a constructor where you specify the PID values appropriate for your model (see
 <b>PID Controllers</b> discussion below).
-
 
 Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
 channel values,  we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program.
