@@ -52,7 +52,7 @@ hf::LevelPid levelPid = hf::LevelPid(0.20f);
 void setup(void)
 {
     // Initialize Hackflight firmware
-    h.init(new hf::SuperFly(), &rc, &mixer);
+    h.init(new hf::SuperFly(), &rc, &mixer, hf::superflyMotors);
 
     // Add Rate and Level PID controllers
     h.addPidController(&levelPid);

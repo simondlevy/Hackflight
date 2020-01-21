@@ -74,12 +74,6 @@ namespace hf {
                 return false;
              }
 
-            virtual void writeMotor(uint8_t index, float value) override
-            {
-                (void)index;
-                (void)value;
-            }
-
             uint8_t serialTelemetryAvailable(void) override
             {
                 return Serial1.available();

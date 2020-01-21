@@ -33,13 +33,6 @@ namespace hf {
 
         private:
 
-            StandardMotor motors[4] = { 
-                StandardMotor(5), 
-                StandardMotor(8), 
-                StandardMotor(9), 
-                StandardMotor(11) 
-            };
-
             SentralBoard sentral;
 
          protected:
@@ -54,11 +47,6 @@ namespace hf {
                 return sentral.getGyrometer(gx, gy, gz);
             }
  
-            virtual void writeMotor(uint8_t index, float value) override
-            {
-                motors[index].write(value);
-            }
-
             virtual uint8_t serialTelemetryAvailable(void) override
             {
                 return Serial2.available();
@@ -96,11 +84,6 @@ namespace hf {
 
                 // Start the USFS
                 sentral.begin();
-
-                // Initialize the motors
-                for (uint8_t k=0; k<4; ++k) {
-                    motors[k].init();
-                }
 
                 // Hang a bit more
                 delay(100);

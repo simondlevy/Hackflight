@@ -34,6 +34,7 @@
 #include "boards/arduino/butterfly.hpp"
 #include "receivers/arduino/dsmx_serial1.hpp"
 #include "mixers/quadxcf.hpp"
+#include "motors/standard.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 
@@ -50,10 +51,17 @@ hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f);
 
 hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
+hf::StandardMotor motor1(5);
+hf::StandardMotor motor2(8);
+hf::StandardMotor motor3(9);
+hf::StandardMotor motor4(11);
+
+hf::Motor * motors[4] = { &motor1, &motor2, &motor3, &motor4 };
+
 void setup(void)
 {
     // Initialize Hackflight firmware
-    h.init(new hf::Butterfly(), &rc, &mixer);
+    h.init(new hf::Butterfly(), &rc, &mixer, motors);
 
     // Add Rate and Level PID controllers
     h.addPidController(&levelPid);

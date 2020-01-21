@@ -31,6 +31,7 @@
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
+#include "motors/standard.hpp"
 
 static const uint8_t SERIAL1_RX = 32;
 static const uint8_t SERIAL1_TX = 33; // unused
@@ -48,6 +49,13 @@ hf::MixerQuadXCF mixer;
 hf::RatePid ratePid = hf::RatePid(0.05f, 0.00f, 0.00f, 0.10f, 0.01f); 
 
 hf::LevelPid levelPid = hf::LevelPid(0.20f);
+
+hf::StandardMotor motor1(25);
+hf::StandardMotor motor2(26);
+hf::StandardMotor motor3(27);
+hf::StandardMotor motor4(15);
+
+hf::Motor * motors[4] = { &motor1, &motor2, &motor3, &motor4 };
 
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
@@ -68,7 +76,7 @@ void setup(void)
     Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
     // Initialize Hackflight firmware
-    h.init(new hf::TinyPico(), &rc, &mixer);
+    h.init(new hf::TinyPico(), &rc, &mixer, motors);
 
     // Add Rate and Level PID controllers
     h.addPidController(&levelPid);

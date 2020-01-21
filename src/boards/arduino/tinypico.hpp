@@ -36,13 +36,6 @@ namespace hf {
 
         private:
 
-            StandardMotor motors[4] = { 
-                StandardMotor(25), 
-                StandardMotor(26), 
-                StandardMotor(27), 
-                StandardMotor(15) 
-            };
-
             SentralBoard sentral;
 
             TinyPICO tp;
@@ -79,11 +72,6 @@ namespace hf {
                 return sentral.getGyrometer(gx, gy, gz);
             }
  
-            virtual void writeMotor(uint8_t index, float value) override
-            {
-                motors[index].write(value);
-            }
-
          public:
 
             TinyPico(void) 
@@ -107,11 +95,6 @@ namespace hf {
 
                 // Start the USFS
                 sentral.begin();
-
-                // Initialize the motors
-                for (uint8_t k=0; k<4; ++k) {
-                    motors[k].init();
-                }
 
                 // Hang a bit more
                 delay(100);

@@ -24,6 +24,7 @@
 #include "board.hpp"
 #include "mspparser.hpp"
 #include "mixer.hpp"
+#include "motor.hpp"
 #include "receiver.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
@@ -226,7 +227,7 @@ namespace hf {
 
         public:
 
-            void init(Board * board, Receiver * receiver, Mixer * mixer, bool armed=false)
+            void init(Board * board, Receiver * receiver, Mixer * mixer, Motor ** motors, bool armed=false)
             {  
                 // Store the essentials
                 _board    = board;
@@ -255,8 +256,8 @@ namespace hf {
                // Initialize the receiver
                _receiver->begin();
 
-                // Tell the mixer which board to use
-                _mixer->board = board; 
+                // Tell the mixer which motors to use, and initialize them
+                mixer->useMotors(motors);
 
                 // Setup failsafe
                 _failsafe = false;

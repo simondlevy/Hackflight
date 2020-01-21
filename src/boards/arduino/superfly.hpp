@@ -28,6 +28,36 @@
 
 namespace hf {
 
+    class SuperflyMotor : public Motor {
+
+        public:
+
+            SuperflyMotor(uint8_t pin) 
+                : Motor(pin)
+            {
+            }
+
+        protected:
+
+            virtual void write(float value) override
+            {
+                analogWrite(_pin, (uint16_t)(value * 1023));
+            }
+
+            virtual void init(void) override
+            {
+                analogWrite(_pin, 0);  
+            }
+
+    }; // class SuperflyMotor
+
+    SuperflyMotor motor1(4);
+    SuperflyMotor motor2(5);
+    SuperflyMotor motor3(12);
+    SuperflyMotor motor4(14);
+
+    Motor * superflyMotors[4] = { &motor1, &motor2, &motor3, &motor4 };
+
     class SuperFly : public ArduinoBoard {
 
         private:
@@ -47,11 +77,6 @@ namespace hf {
             {
                 return sentral.getGyrometer(gx, gy, gz);
             }
-             void writeMotor(uint8_t index, float value)
-            {
-                // Scale motor value from [0,1] to [0,1023]
-                analogWrite(MOTOR_PINS[index], (uint16_t)(value * 1023));
-            }
 
         public:
 
@@ -66,11 +91,8 @@ namespace hf {
 
                 sentral.begin();
 
-                 // Initialize the motors
+                // Initialize the motors
                 analogWriteFreq(200);  
-                for (int k=0; k<4; ++k) {
-                    analogWrite(MOTOR_PINS[k], 0);  
-                }
 
                 // Hang a bit more
                 delay(100);

@@ -29,11 +29,16 @@
 
 namespace hf {
 
+    BrushedMotor motor1(13);
+    BrushedMotor motor2(A2);
+    BrushedMotor motor3(3);
+    BrushedMotor motor4(11);
+
+    Motor * ladybugFcMotors[4] = { &motor1, &motor2, &motor3, &motor4 };
+
     class LadybugFC : public ArduinoBoard {
 
         private:
-
-            BrushedMotor motors[4] = { BrushedMotor(13), BrushedMotor(A2), BrushedMotor(3), BrushedMotor(11) };
 
             SentralBoard sentral;
 
@@ -49,11 +54,6 @@ namespace hf {
                 return sentral.getGyrometer(gx, gy, gz);
             }
 
-            void writeMotor(uint8_t index, float value)
-            {
-                motors[index].write(value);
-            }
-
         public:
 
             // Support prototype version where LED is on pin A1
@@ -67,11 +67,6 @@ namespace hf {
                 delay(100);
 
                 sentral.begin();
-
-                // Initialize the motors
-                for (int k=0; k<4; ++k) {
-                    motors[k].init();
-                }
 
                 // Hang a bit more
                 delay(100);

@@ -62,7 +62,7 @@ void setup(void)
     rc.setTrimPitch(+.3);
 
     // Initialize Hackflight firmware
-    h.init(new hf::LadybugFC(), &rc, &mixer);
+    h.init(new hf::LadybugFC(), &rc, &mixer, hf::ladybugFcMotors);
 
     // Add rangefinder sensor
     rangefinder.begin();

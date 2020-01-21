@@ -21,6 +21,7 @@
 #pragma once
 
 #include "filters.hpp"
+#include "motor.hpp"
 
 namespace hf {
 
@@ -48,9 +49,14 @@ namespace hf {
 
             void writeMotor(uint8_t index, float value)
             {
+                _motors[index]->write(value);
+            }
+
+            void safeWriteMotor(uint8_t index, float value)
+            {
                 // Avoid sending the motor the same value over and over
                 if (_motorsPrev[index] != value) {
-                    board->writeMotor(index,value);
+                    writeMotor(index, value);
                 }
 
                 _motorsPrev[index] = value;
@@ -58,13 +64,13 @@ namespace hf {
 
         protected:
 
-            Board * board;
+            Motor ** _motors;
 
             motorMixer_t motorDirections[MAXMOTORS];
 
-            Mixer(uint8_t _nmotors)
+            Mixer(uint8_t nmotors)
             {
-                nmotors = _nmotors;
+                _nmotors = nmotors;
 
                 // set disarmed, previous motor values
                 for (uint8_t i = 0; i < nmotors; i++) {
@@ -74,60 +80,70 @@ namespace hf {
 
             }
 
-            // These are also use by MSP
+            uint8_t _nmotors;
+
+            // This is also use by serial task
             float  motorsDisarmed[MAXMOTORS];
-            uint8_t nmotors;
 
             void runArmed(demands_t demands)
             {
                 // Map throttle demand from [-1,+1] to [0,1]
                 demands.throttle = (demands.throttle + 1) / 2;
 
-                float motors[MAXMOTORS];
+                float motorvals[MAXMOTORS];
 
-                for (uint8_t i = 0; i < nmotors; i++) {
+                for (uint8_t i = 0; i < _nmotors; i++) {
 
-                    motors[i] = 
+                    motorvals[i] = 
                         (demands.throttle * motorDirections[i].throttle + 
                          demands.roll     * motorDirections[i].roll +     
                          demands.pitch    * motorDirections[i].pitch +   
                          demands.yaw      * motorDirections[i].yaw);      
                 }
 
-                float maxMotor = motors[0];
+                float maxMotor = motorvals[0];
 
-                for (uint8_t i = 1; i < nmotors; i++)
-                    if (motors[i] > maxMotor)
-                        maxMotor = motors[i];
+                for (uint8_t i = 1; i < _nmotors; i++)
+                    if (motorvals[i] > maxMotor)
+                        maxMotor = motorvals[i];
 
-                for (uint8_t i = 0; i < nmotors; i++) {
+                for (uint8_t i = 0; i < _nmotors; i++) {
 
                     // This is a way to still have good gyro corrections if at least one motor reaches its max
                     if (maxMotor > 1) {
-                        motors[i] -= maxMotor - 1;
+                        motorvals[i] -= maxMotor - 1;
                     }
 
                     // Keep motor values in interval [0,1]
-                    motors[i] = Filter::constrainMinMax(motors[i], 0, 1);
+                    motorvals[i] = Filter::constrainMinMax(motorvals[i], 0, 1);
                 }
 
-                for (uint8_t i = 0; i < nmotors; i++) {
-                    writeMotor(i, motors[i]);
+                for (uint8_t i = 0; i < _nmotors; i++) {
+                    safeWriteMotor(i, motorvals[i]);
+                }
+            }
+
+            void useMotors(Motor ** motors)
+            {
+                _motors = motors;
+
+                for (uint8_t i=0; i<_nmotors; ++i) {
+                    _motors[i]->init();
                 }
             }
 
             // This is how we can spin the motors from the GCS
             void runDisarmed(void)
             {
-                for (uint8_t i = 0; i < nmotors; i++) {
-                    writeMotor(i, motorsDisarmed[i]);
+                for (uint8_t i = 0; i < _nmotors; i++) {
+                    safeWriteMotor(i, motorsDisarmed[i]);
                 }
             }
 
             void cutMotors(void)
             {
-                for (uint8_t i = 0; i < nmotors; i++) {
-                    board->writeMotor(i, 0);
+                for (uint8_t i = 0; i < _nmotors; i++) {
+                    writeMotor(i, 0);
                 }
             }
 

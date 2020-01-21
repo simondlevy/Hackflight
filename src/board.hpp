@@ -59,9 +59,6 @@ namespace hf {
             virtual bool  getGyrometer(float & gx, float & gy, float & gz) = 0;
             virtual float getTime(void) = 0;
 
-            //--------------------------------------- Motor support ------------------------------------------------------
-            virtual void  writeMotor(uint8_t index, float value) { (void)index; (void)value; }
-
             //------------------------- Support for additional surface-mount sensors -------------------------------------
             virtual bool  getAccelerometer(float & ax, float & ay, float & az) { (void)ax; (void)ay; (void)az; return false; }
             virtual bool  getMagnetometer(float & mx, float & my, float & mz) { (void)mx; (void)my; (void)mz; return false; }
