@@ -48,14 +48,14 @@ adheres to standard practices for C++, notably, short, simple methods and
 minimal use of compiler macros like <b>#ifdef</b> that can make it difficult to
 follow what the code is doing.  
 
-Because a DIY multirotor build typically involves choosing a flight-control board,
+Because a DIY multirotor build typically involves choosing a microcontroller board,
 inertial measurement unit (IMU), radio receiver, model (airframe), motors, and PID
 control settings, Hackflight provides a separate C++ class to support each of
 these components:
 
 * The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp">Board</a>
 class specifies an abstract (pure virtual) <tt>getTime()</tt> method that you must
-implement for a particular flight controller or simulator
+implement for a particular flight controller or simulator.
 * The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/imu.hpp">IMU</a>
 class specifies an abstract (pure virtual) <tt>getQuaternion()</tt> and
 <tt>getGyrometer()</tt> method that you must implement for a particular IMU.
