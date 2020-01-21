@@ -24,10 +24,12 @@
 
 #include <Wire.h>
 #include "arduino.hpp"
-#include "sentral.hpp"
+#include "imus/usfs.hpp"
 #include "motors/brushed.hpp"
 
 namespace hf {
+
+    USFS ladybugIMU;
 
     BrushedMotor motor1(13);
     BrushedMotor motor2(A2);
@@ -38,22 +40,6 @@ namespace hf {
 
     class LadybugFC : public ArduinoBoard {
 
-        private:
-
-            SentralBoard sentral;
-
-        protected:
-
-            virtual bool  getQuaternion(float & qw, float & qx, float & qy, float & qz) override
-            {
-                return sentral.getQuaternion(qw, qx, qy, qz);
-            }
-
-            virtual bool  getGyrometer(float & gx, float & gy, float & gz) override
-            {
-                return sentral.getGyrometer(gx, gy, gz);
-            }
-
         public:
 
             // Support prototype version where LED is on pin A1
@@ -63,12 +49,7 @@ namespace hf {
                 // Start I^2C
                 Wire.begin();
 
-                // Hang a bit before starting up the EM7180
-                delay(100);
-
-                sentral.begin();
-
-                // Hang a bit more
+                // Hang a bit
                 delay(100);
             }
 

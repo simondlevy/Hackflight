@@ -21,7 +21,7 @@
 #pragma once
 
 #include "sensor.hpp"
-#include "board.hpp"
+#include "imu.hpp"
 
 namespace hf {
 
@@ -31,7 +31,7 @@ namespace hf {
 
         protected:
 
-            Board * board = NULL;
+            IMU * imu = NULL;
 
     };  // class SurfaceMountSensor
 

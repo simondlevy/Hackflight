@@ -23,7 +23,6 @@
 #include <math.h>
 
 #include "sensors/surfacemount.hpp"
-#include "board.hpp"
 
 namespace hf {
 
@@ -53,7 +52,7 @@ namespace hf {
             {
                 (void)time;
 
-                bool result = board->getGyrometer(_x, _y, _z);
+                bool result = imu->getGyrometer(_x, _y, _z);
 
                 return result;
             }

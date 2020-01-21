@@ -68,7 +68,7 @@ namespace hf {
             {
                 (void)time;
 
-                return board->getQuaternion(_w, _x, _y, _z);
+                return imu->getQuaternion(_w, _x, _y, _z);
             }
 
         public:

@@ -24,9 +24,11 @@
 
 #include <Wire.h>
 #include "arduino.hpp"
-#include "sentral.hpp"
+#include "imus/usfs.hpp"
 
 namespace hf {
+
+    USFS superflyIMU;
 
     class SuperflyMotor : public Motor {
 
@@ -60,24 +62,6 @@ namespace hf {
 
     class SuperFly : public ArduinoBoard {
 
-        private:
-
-            const uint8_t MOTOR_PINS[4] = {4, 5, 12, 14};
-
-            SentralBoard sentral;
-
-        protected:
-
-            virtual bool  getQuaternion(float & qw, float & qx, float & qy, float & qz) override
-            {
-                return sentral.getQuaternion(qw, qx, qy, qz);
-            }
-
-            virtual bool  getGyrometer(float & gx, float & gy, float & gz) override
-            {
-                return sentral.getGyrometer(gx, gy, gz);
-            }
-
         public:
 
             SuperFly(void) 
@@ -88,8 +72,6 @@ namespace hf {
 
                 // Hang a bit before starting up the EM7180
                 delay(100);
-
-                sentral.begin();
 
                 // Initialize the motors
                 analogWriteFreq(200);  

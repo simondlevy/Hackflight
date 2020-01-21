@@ -37,16 +37,6 @@ namespace hf {
 
          protected:
 
-            virtual bool  getQuaternion(float & qw, float & qx, float & qy, float & qz) override
-            {
-                return sentral.getQuaternion(qw, qx, qy, qz);
-            }
-
-            virtual bool  getGyrometer(float & gx, float & gy, float & gz) override
-            {
-                return sentral.getGyrometer(gx, gy, gz);
-            }
- 
             virtual uint8_t serialTelemetryAvailable(void) override
             {
                 return Serial2.available();

@@ -1,5 +1,5 @@
 /*
-   Support for USFS
+   Support for USFS IMU
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -22,10 +22,11 @@
 
 #include <Wire.h>
 #include <USFS_Master.h>
+#include "imu.hpp"
 
 namespace hf {
 
-    class SentralBoard {
+    class USFS : public IMU {
 
         private:
 
@@ -52,7 +53,7 @@ namespace hf {
 
         public:
 
-            bool getGyrometer(float & gx, float & gy, float & gz)
+            virtual bool getGyrometer(float & gx, float & gy, float & gz) override
             {
                 // Since gyro is updated most frequently, use it to drive SENtral polling
                 checkEventStatus();
@@ -73,7 +74,7 @@ namespace hf {
                 return false;
             }
 
-            bool getQuaternion(float & qw, float & qx, float & qy, float & qz)
+            virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz) override
             {
                 if (_sentral.gotQuaternion()) {
 
@@ -85,7 +86,7 @@ namespace hf {
                 return false;
             }
 
-            void begin(void)
+            virtual void begin(void) override
             {
                 // Start the USFS in master mode, no interrupt
                 if (!_sentral.begin()) {
@@ -95,6 +96,6 @@ namespace hf {
                 }
             }
 
-    }; // class SentralBoard
+    }; // class USFS
 
 } // namespace hf

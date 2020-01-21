@@ -1,9 +1,9 @@
 /*
-   Hackflight sketch for TinyPICO with DSMX receiver
+   Hackflight sketch for TinyPICO with Ultimate Sensor Fusion Solution IMU and DSMX receiver
 
    Additional libraries needed:
 
-       https://github.com/simondlevy/EM7180
+       https://github.com/simondlevy/USFS
        https://github.com/simondlevy/CrossPlatformDataBus
        https://github.com/simondlevy/SpektrumDSM 
 
@@ -32,6 +32,7 @@
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 #include "motors/standard.hpp"
+#include "imus/usfs.hpp"
 
 static const uint8_t SERIAL1_RX = 32;
 static const uint8_t SERIAL1_TX = 33; // unused
@@ -49,6 +50,8 @@ hf::MixerQuadXCF mixer;
 hf::RatePid ratePid = hf::RatePid(0.05f, 0.00f, 0.00f, 0.10f, 0.01f); 
 
 hf::LevelPid levelPid = hf::LevelPid(0.20f);
+
+hf::USFS imu;
 
 hf::StandardMotor motor1(25);
 hf::StandardMotor motor2(26);
@@ -76,7 +79,7 @@ void setup(void)
     Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
     // Initialize Hackflight firmware
-    h.init(new hf::TinyPico(), &rc, &mixer, motors);
+    h.init(new hf::TinyPico(), &imu, &rc, &mixer, motors);
 
     // Add Rate and Level PID controllers
     h.addPidController(&levelPid);

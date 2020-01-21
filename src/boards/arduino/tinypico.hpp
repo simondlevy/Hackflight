@@ -62,16 +62,6 @@ namespace hf {
                 Serial.write(c);
             }
 
-            virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz) override
-            {
-                return sentral.getQuaternion(qw, qx, qy, qz);
-            }
-
-            virtual bool getGyrometer(float & gx, float & gy, float & gz) override
-            {
-                return sentral.getGyrometer(gx, gy, gz);
-            }
- 
          public:
 
             TinyPico(void) 

@@ -1,9 +1,9 @@
 /*
-   Hackflight sketch for Butterfly Flight Controller with Spektrum DSMX receiver
+   Hackflight sketch for Butterfly board with Ultimate Sensor Fusion Solution IMU and DSMX receiver
 
    Additional libraries needed:
 
-       https://github.com/simondlevy/EM7180
+       https://github.com/simondlevy/USFS
        https://github.com/simondlevy/CrossPlatformDataBus
        https://github.com/simondlevy/SpektrumDSM 
 
@@ -32,6 +32,7 @@
 
 #include "hackflight.hpp"
 #include "boards/arduino/butterfly.hpp"
+#include "imus/usfs.hpp"
 #include "receivers/arduino/dsmx_serial1.hpp"
 #include "mixers/quadxcf.hpp"
 #include "motors/standard.hpp"
@@ -42,6 +43,8 @@ static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 8.58f;
 
 hf::Hackflight h;
+
+hf::USFS imu;
 
 hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
@@ -61,7 +64,7 @@ hf::Motor * motors[4] = { &motor1, &motor2, &motor3, &motor4 };
 void setup(void)
 {
     // Initialize Hackflight firmware
-    h.init(new hf::Butterfly(), &rc, &mixer, motors);
+    h.init(new hf::Butterfly(), &imu, &rc, &mixer, motors);
 
     // Add Rate and Level PID controllers
     h.addPidController(&levelPid);

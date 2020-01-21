@@ -22,6 +22,7 @@
 
 #include "sensor.hpp"
 #include "board.hpp"
+#include "imu.hpp"
 #include "mspparser.hpp"
 #include "mixer.hpp"
 #include "motor.hpp"
@@ -41,9 +42,14 @@ namespace hf {
             static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
 
             // Passed to Hackflight::init() for a particular build
-            Board      * _board = NULL;
+            Board      * _board    = NULL;
+            IMU        * _imu      = NULL;
             Receiver   * _receiver = NULL;
-            Mixer      * _mixer = NULL;
+            Mixer      * _mixer    = NULL;
+
+            // Mandatory sensors on the board
+            Gyrometer _gyrometer;
+            Quaternion _quaternion; // not really a sensor, but we treat it like one!
 
             // Supports periodic ad-hoc debugging
             Debugger _debugger;
@@ -51,10 +57,6 @@ namespace hf {
             // PID controllers
             PidController * _pid_controllers[256] = {NULL};
             uint8_t _pid_controller_count = 0;
-
-            // Mandatory sensors on the board
-            Gyrometer _gyrometer;
-            Quaternion _quaternion; // not really a sensor, but we treat it like one!
 
             // Timer tasks
             SerialTask _serialTask;
@@ -218,19 +220,20 @@ namespace hf {
                 _sensors[_sensor_count++] = sensor;
             }
 
-            void add_sensor(SurfaceMountSensor * sensor, Board * board) 
+            void add_sensor(SurfaceMountSensor * sensor, IMU * imu) 
             {
                 add_sensor(sensor);
 
-                sensor->board = board;
+                sensor->imu = imu;
             }
 
         public:
 
-            void init(Board * board, Receiver * receiver, Mixer * mixer, Motor ** motors, bool armed=false)
+            void init(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor ** motors, bool armed=false)
             {  
                 // Store the essentials
                 _board    = board;
+                _imu      = imu;
                 _receiver = receiver;
                 _mixer    = mixer;
 
@@ -241,8 +244,8 @@ namespace hf {
                 _debugger.init(board);
 
                 // Support for mandatory sensors
-                add_sensor(&_quaternion, board);
-                add_sensor(&_gyrometer, board);
+                add_sensor(&_quaternion, imu);
+                add_sensor(&_gyrometer, imu);
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
@@ -253,8 +256,11 @@ namespace hf {
                 // Support safety override by simulator
                 _state.armed = armed;
 
-               // Initialize the receiver
-               _receiver->begin();
+                // Initialize the receiver
+                _receiver->begin();
+
+                // Start the IMU
+                imu->begin();
 
                 // Tell the mixer which motors to use, and initialize them
                 mixer->useMotors(motors);

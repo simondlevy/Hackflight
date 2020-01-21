@@ -39,24 +39,7 @@ namespace hf {
 
         protected:
 
-            // NB: quaternion, gyrometer, accelerometer should return values as follows:
-            //
-            // QW: rightside-up +1, upside-down 0
-            // QX: roll right +,    left -
-            // QY: pitch forward -, back +
-            // QZ: yaw left -,      right +
-            //
-            // GX: roll right +,    left -
-            // GY: pitch forward -, back +
-            // GZ: yaw left -,      right +
-            //
-            // AX: pitch forward +, back -
-            // AY: roll right +,    left -
-            // AZ: rightside-up +,  upside-down -
-
             //------------------------------------ Core functionality ----------------------------------------------------
-            virtual bool  getQuaternion(float & qw, float & qx, float & qy, float & qz) = 0;
-            virtual bool  getGyrometer(float & gx, float & gy, float & gz) = 0;
             virtual float getTime(void) = 0;
 
             //------------------------- Support for additional surface-mount sensors -------------------------------------
