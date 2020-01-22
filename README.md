@@ -235,9 +235,6 @@ most boards
 
 * <b>MockBoard</b>: Parent class for Arduino development boards; enables algorithm, sensor, and receiver prototyping
 
-* <b>STM32FBoard</b>: Parent class for the popular line of Cleanflight-compatible controllers based on the STM32F architecture (more info
-[here](https://github.com/simondlevy/Hackflight/tree/master/extras/stm32f_examples))
-
 <p align="center"> 
 <img src="extras/media/boards2.png" width=800>
 </p>
