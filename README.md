@@ -230,11 +230,8 @@ class used in [MulticopterSim](https://github.com/simondlevy/MulticopterSim/tree
 
 * <b>ArduinoBoard</b>: Ancestor class for Arduino-compatible boards
 
-* <b>SoftwareQuaternionBoard</b>: Ancestor class for any board not providing a direct (hardware-based) quaternion reading; i.e.,
-most boards
-
 * <b>MockBoard</b>: Parent class for Arduino development boards; enables algorithm, sensor, and receiver prototyping
 
 <p align="center"> 
-<img src="extras/media/boards2.png" width=800>
+<img src="extras/media/boards.png" width=800>
 </p>
