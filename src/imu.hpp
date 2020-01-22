@@ -45,7 +45,7 @@ namespace hf {
 
         protected:
 
-        virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz) = 0;
+        virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz, float time) = 0;
 
         virtual bool getGyrometer(float & gx, float & gy, float & gz) = 0;
 

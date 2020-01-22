@@ -27,7 +27,7 @@
 
 namespace hf {
 
-    class SoftwareQuaternionIMU : protected IMU {
+    class SoftwareQuaternionIMU : public IMU {
 
         private:
 
@@ -45,8 +45,6 @@ namespace hf {
             const float _beta = sqrtf(3.0f / 4.0f) * Filter::deg2rad(GYRO_MEAS_ERROR_DEG);
             const float _zeta = sqrtf(3.0f / 4.0f) * Filter::deg2rad(GYRO_MEAS_DRIFT_DEG);  
 
-        protected:
-
             float _ax = 0;
             float _ay = 0;
             float _az = 0;
@@ -54,22 +52,24 @@ namespace hf {
             float _gy = 0;
             float _gz = 0;
 
+        protected:
+
             // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
             // using a 6DOF fiter (accel, gyro)
             MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(_beta, _zeta);
 
             virtual bool imuReady(void) = 0;
 
-            virtual void imuReadAccelGyro(void) = 0;
+            virtual void imuReadAccelGyro(float & ax, float & ay, float & az, float & gx, float & gy, float &gz) = 0;
 
         public:
 
-            bool getGyrometer(float & gx, float & gy, float & gz)
+            bool getGyrometer(float & gx, float & gy, float & gz) override
             {
                 // Read acceleromter Gs, gyrometer degrees/sec
                 if (imuReady()) {
 
-                    imuReadAccelGyro();
+                    imuReadAccelGyro(_ax, _ay, _az, _gx, _gy, _gz);
 
                     // Convert gyrometer values from degrees/sec to radians/sec
                     _gx = Filter::deg2rad(_gx);
@@ -87,7 +87,7 @@ namespace hf {
                 return false;
             }
 
-            bool getQuaternion(float & qw, float & qx, float & qy, float & qz, float time)
+            bool getQuaternion(float & qw, float & qx, float & qy, float & qz, float time) override
             {
                 // Update quaternion after some number of IMU readings
                 _quatCycleCount = (_quatCycleCount + 1) % QUATERNION_DIVISOR;

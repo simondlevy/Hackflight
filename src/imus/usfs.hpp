@@ -74,8 +74,10 @@ namespace hf {
                 return false;
             }
 
-            virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz) override
+            virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz, float time) override
             {
+                (void)time;
+
                 if (_sentral.gotQuaternion()) {
 
                     _sentral.readQuaternion(qw, qx, qy, qz);

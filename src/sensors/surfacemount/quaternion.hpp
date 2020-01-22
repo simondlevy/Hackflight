@@ -66,9 +66,7 @@ namespace hf {
 
             virtual bool ready(float time) override
             {
-                (void)time;
-
-                return imu->getQuaternion(_w, _x, _y, _z);
+                return imu->getQuaternion(_w, _x, _y, _z, time);
             }
 
         public:
