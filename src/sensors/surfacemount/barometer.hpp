@@ -25,7 +25,6 @@
 
 #include "sensor.hpp"
 #include "surfacemount.hpp"
-#include "board.hpp"
 
 namespace hf {
 
@@ -51,7 +50,7 @@ namespace hf {
             {
                 (void)time;
 
-                return board->getBarometer(_pressure);
+                return imu->getBarometer(_pressure);
             }
 
         public:

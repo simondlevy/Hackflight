@@ -37,11 +37,6 @@ namespace hf {
             //------------------------------------ Core functionality ----------------------------------------------------
             virtual float getTime(void) = 0;
 
-            //------------------------- Support for additional surface-mount sensors -------------------------------------
-            virtual bool  getAccelerometer(float & ax, float & ay, float & az) { (void)ax; (void)ay; (void)az; return false; }
-            virtual bool  getMagnetometer(float & mx, float & my, float & mz) { (void)mx; (void)my; (void)mz; return false; }
-            virtual bool  getBarometer(float & pressure) { (void)pressure;  return false; }
-
             //------------------------------- Serial communications via MSP ----------------------------------------------
             virtual uint8_t serialAvailableBytes(void) { return 0; }
             virtual uint8_t serialReadByte(void)  { return 1; }

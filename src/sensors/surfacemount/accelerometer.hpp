@@ -56,7 +56,7 @@ namespace hf {
             {
                 (void)time;
 
-                return board->getAccelerometer(_ax, _ay, _az);
+                return imu->getAccelerometer(_ax, _ay, _az);
             }
 
         public:

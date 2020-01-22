@@ -29,7 +29,6 @@
 
 #include "sensor.hpp"
 #include "surfacemount.hpp"
-#include "board.hpp"
 
 namespace hf {
 
@@ -56,7 +55,7 @@ namespace hf {
             {
                 (void)time;
 
-                return board->getMagnetometer(_uTs);
+                return imu->getMagnetometer(_uTs);
             }
 
         public:
