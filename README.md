@@ -167,7 +167,7 @@ Once you've implemented the sub-class(es) for a new sensor, you can call
 code will be called by the <tt>checkOptionalSensors</tt> method.
 
 <p align="center"> 
-<img src="extras/media/sensors.png" width=800>
+<img src="extras/media/sensors2.png" width=800>
 </p>
 
 ### PID Controllers
