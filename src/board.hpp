@@ -28,12 +28,7 @@ namespace hf {
     class Board {
 
         friend class Hackflight;
-        friend class Gyrometer;
-        friend class Quaternion;
-        friend class Accelerometer;
-        friend class Barometer;
         friend class Debugger;
-        friend class Mixer;
         friend class TimerTask;
         friend class SerialTask;
 
