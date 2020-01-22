@@ -30,7 +30,7 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/arduino/superfly.hpp"
+#include "boards/realboards/arduino/superfly.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"

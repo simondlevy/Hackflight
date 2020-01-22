@@ -1,9 +1,9 @@
 /*
-   Butterfly Flight Controller implementation of Hackflight Board routines
+   TinyPICO implementation of Hackflight Board routines
 
    Uses EM7180 SENtral Sensor Hub in master mode mode
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2019 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -23,62 +23,64 @@
 #pragma once
 
 #include <Wire.h>
-#include "arduino.hpp"
-#include "sentral.hpp"
 #include "motors/standard.hpp"
+#include "boards/realboard.hpp"
+#include "boards/realboards/arduino.hpp"
+
+#include <TinyPICO.h>
 
 namespace hf {
 
-    class Butterfly : public ArduinoBoard {
+    class TinyPico : public RealBoard {
 
         private:
 
-            SentralBoard sentral;
+            TinyPICO tp;
 
-         protected:
+        protected:
 
-            virtual uint8_t serialTelemetryAvailable(void) override
-            {
-                return Serial2.available();
+            void setLed(bool isOn) 
+            { 
+                tp.DotStar_SetPixelColor(0, isOn?255:0, 0);
             }
 
-            virtual uint8_t serialTelemetryRead(void) override
+            uint8_t serialNormalAvailable(void)
             {
-                return Serial2.read();
+                return Serial.available();
             }
 
-            virtual void serialTelemetryWrite(uint8_t c) override
+            uint8_t serialNormalRead(void)
             {
-                Serial2.write(c);
+                return Serial.read();
+            }
+
+            void serialNormalWrite(uint8_t c)
+            {
+                Serial.write(c);
             }
 
          public:
 
-            Butterfly(void) 
-                : ArduinoBoard(13, true) // red LED, active low
+            TinyPico(void) 
             {
-                // Start telemetry on Serial2
-                Serial2.begin(115200);
+                Serial.begin(115200);
 
-                // Use D4 for power, D3 for ground
-                powerPins(4, 3);
+                // This will blink the LED
+                RealBoard::init();
+
+                // Use D18,19 for SENtral power, ground
+                ArduinoBoard::powerPins(18, 19);
 
                 // Hang a bit 
                 delay(100);
 
                 // Start I^2C
-                Wire.begin(TWI_PINS_6_7);
+                Wire.begin();
 
                 // Hang a bit
                 delay(100);
-
-                // Start the USFS
-                sentral.begin();
-
-                // Hang a bit more
-                delay(100);
             }
 
-    }; // class Butterfly
+    }; // class TinyPico
 
 } // namespace hf

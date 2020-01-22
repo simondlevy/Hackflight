@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "boards/arduino/arduino.hpp"
+#include "boards/realdboards/arduino.hpp"
 
 namespace hf {
 

@@ -31,7 +31,7 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/arduino/butterfly.hpp"
+#include "boards/realboards/arduino/butterfly.hpp"
 #include "imus/usfs.hpp"
 #include "receivers/arduino/dsmx_serial1.hpp"
 #include "mixers/quadxcf.hpp"
