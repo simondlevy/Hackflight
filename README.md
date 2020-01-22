@@ -233,15 +233,11 @@ class used in [MulticopterSim](https://github.com/simondlevy/MulticopterSim/tree
 * <b>SoftwareQuaternionBoard</b>: Ancestor class for any board not providing a direct (hardware-based) quaternion reading; i.e.,
 most boards
 
-* <b>SentralBoard</b>: Ancestor class for Arduino boards using the the
-[EM7180 SENtral Sensor Fusion Solution](https://www.tindie.com/products/onehorse/ultimate-sensor-fusion-solution-lsm6dsm-lis2md/).
-to provide the quaternion directly
-
 * <b>MockBoard</b>: Parent class for Arduino development boards; enables algorithm, sensor, and receiver prototyping
 
 * <b>STM32FBoard</b>: Parent class for the popular line of Cleanflight-compatible controllers based on the STM32F architecture (more info
 [here](https://github.com/simondlevy/Hackflight/tree/master/extras/stm32f_examples))
 
 <p align="center"> 
-<img src="extras/media/boards.png" width=800>
+<img src="extras/media/boards2.png" width=800>
 </p>
