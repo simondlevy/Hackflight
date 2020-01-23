@@ -5,7 +5,7 @@
 
        https://github.com/simondlevy/EM7180
        https://github.com/simondlevy/CrossPlatformDataBus
-       https://github.com/simondlevy/SBUSRX
+       https://github.com/bolderflight/SBUS
 
    Hardware support for Ladybug flight controller:
 
@@ -32,7 +32,7 @@
 
 #include "hackflight.hpp"
 #include "boards/realboards/arduino/ladybugfc.hpp"
-#include "receivers/arduino/sbus.hpp"
+#include "receivers/arduino/sbus2.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
@@ -42,7 +42,7 @@ static constexpr float DEMAND_SCALE = 1.0f;
 
 hf::Hackflight h;
 
-hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, DEMAND_SCALE, SERIAL_SBUS);
+hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, DEMAND_SCALE);
 
 hf::MixerQuadXCF mixer;
 

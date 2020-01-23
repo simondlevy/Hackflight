@@ -1,6 +1,8 @@
 /*
    Futaba SBUS receiver support for Arduino flight controllers
 
+   Uses SBUS library from https://github.com/bolderflight/SBUS
+
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify
@@ -19,38 +21,7 @@
 #pragma once
 
 #include "receiver.hpp"
-#include <SBUSRX.h>
-
-static SBUSRX rx;
-
-// Support different UARTs
-
-static HardwareSerial * _hardwareSerial;
-
-void serialEvent1(void)
-{
-    rx.handleSerialEvent(micros());
-}
-
-void serialEvent2(void)
-{
-    rx.handleSerialEvent(micros());
-}
-
-void serialEvent3(void)
-{
-    rx.handleSerialEvent(micros());
-}
-
-uint8_t sbusSerialAvailable(void)
-{
-    return _hardwareSerial->available();
-}
-
-uint8_t sbusSerialRead(void)
-{
-    return _hardwareSerial->read();
-}
+#include <SBUS.h>
 
 namespace hf {
 
@@ -60,8 +31,7 @@ namespace hf {
 
             const uint16_t MAX_FAILSAFE = 10;
 
-            // Support different Arduino hardware
-            uint16_t _serialConfig;
+            SBUS rx = SBUS(Serial1);
 
             // These values must persist between calls to readRawvals()
             float    _channels[16];
@@ -71,17 +41,14 @@ namespace hf {
 
             void begin(void)
             {
-                _hardwareSerial->begin(100000, _serialConfig);
+                rx.begin();
             }
 
             bool gotNewFrame(void)
             {
-                if (rx.gotNewFrame()) {
-
-                    uint8_t failsafe = 0;
-                    uint16_t lostFrames = 0;
-
-                    rx.getChannelValuesNormalized(_channels, &failsafe, &lostFrames);
+                bool failsafe = false;
+                bool lostFrame = false;
+                if (rx.readCal(_channels, &failsafe, &lostFrame)) {
 
                     // accumulate consecutive failsafe hits
                     if (failsafe) {
@@ -112,13 +79,9 @@ namespace hf {
 
             SBUS_Receiver(
                     const uint8_t channelMap[6], 
-                    const float demandScale,
-                    uint16_t serialConfig,
-                    HardwareSerial * hardwareSerial=&Serial1) 
+                    const float demandScale)
                 :  Receiver(channelMap, demandScale) 
             { 
-                _serialConfig = serialConfig;
-                _hardwareSerial = hardwareSerial;
                 _failsafeCount = 0;
             }
 
