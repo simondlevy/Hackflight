@@ -22,6 +22,7 @@
 
 #include "filters.hpp"
 #include "motor.hpp"
+#include "demander.hpp"
 
 namespace hf {
 
@@ -149,4 +150,4 @@ namespace hf {
 
     }; // class Mixer
 
-} // namespace
+} // namespace hf
