@@ -45,16 +45,15 @@ namespace hf {
 
         protected:
 
-        virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz, float time) = 0;
+            virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz, float time) = 0;
+            virtual bool getGyrometer(float & gx, float & gy, float & gz) = 0;
 
-        virtual bool getGyrometer(float & gx, float & gy, float & gz) = 0;
+            virtual void begin(void) { }
 
-        virtual void begin(void) = 0;
-
-        //------------------------- Support for additional surface-mount sensors -------------------------------------
-        virtual bool  getAccelerometer(float & ax, float & ay, float & az) { (void)ax; (void)ay; (void)az; return false; }
-        virtual bool  getMagnetometer(float & mx, float & my, float & mz) { (void)mx; (void)my; (void)mz; return false; }
-        virtual bool  getBarometer(float & pressure) { (void)pressure;  return false; }
+            //------------------------- Support for additional surface-mount sensors -------------------------------------
+            virtual bool  getAccelerometer(float & ax, float & ay, float & az) { (void)ax; (void)ay; (void)az; return false; }
+            virtual bool  getMagnetometer(float & mx, float & my, float & mz) { (void)mx; (void)my; (void)mz; return false; }
+            virtual bool  getBarometer(float & pressure) { (void)pressure;  return false; }
 
     }; // class IMU
 
