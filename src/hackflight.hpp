@@ -162,7 +162,7 @@ namespace hf {
             {
                 // Sync failsafe to receiver
                 if (_receiver->lostSignal() && _state.armed) {
-                    _mixer->cutMotors();
+                    _mixer->cut();
                     _state.armed = false;
                     _failsafe = true;
                     _board->showArmedStatus(false);
@@ -196,7 +196,7 @@ namespace hf {
 
                 // Cut motors on throttle-down
                 if (_state.armed && _receiver->throttleIsDown()) {
-                    _mixer->cutMotors();
+                    _mixer->cut();
                 }
 
                 // Set LED based on arming status

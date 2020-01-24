@@ -140,7 +140,7 @@ namespace hf {
                 }
             }
 
-            void cutMotors(void)
+            void cut(void)
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     writeMotor(i, 0);
