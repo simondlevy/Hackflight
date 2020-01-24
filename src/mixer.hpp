@@ -26,7 +26,7 @@
 
 namespace hf {
 
-    class Mixer {
+    class Mixer : protected Demander {
 
         friend class Hackflight;
         friend class MspParser;

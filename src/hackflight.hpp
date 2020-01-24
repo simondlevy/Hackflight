@@ -24,6 +24,7 @@
 #include "board.hpp"
 #include "imu.hpp"
 #include "mspparser.hpp"
+#include "demander.hpp"
 #include "mixer.hpp"
 #include "motor.hpp"
 #include "receiver.hpp"
