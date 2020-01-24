@@ -85,7 +85,7 @@ namespace hf {
             // This is also use by serial task
             float  motorsDisarmed[MAXMOTORS];
 
-            void runArmed(demands_t demands)
+            void run(demands_t demands)
             {
                 // Map throttle demand from [-1,+1] to [0,1]
                 demands.throttle = (demands.throttle + 1) / 2;

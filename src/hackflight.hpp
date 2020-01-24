@@ -154,7 +154,7 @@ namespace hf {
 
                 // Use updated demands to run motors
                 if (_state.armed && !_failsafe && !_receiver->throttleIsDown()) {
-                    _mixer->runArmed(_demands);
+                    _mixer->run(_demands);
                 }
             }
 
