@@ -41,7 +41,7 @@ namespace hf {
 
             virtual void write(float value)  = 0;
 
-            virtual void init(void) = 0;
+            virtual void init(void) { }
 
     }; // class Motor
 
