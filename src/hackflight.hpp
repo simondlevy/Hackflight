@@ -253,12 +253,12 @@ namespace hf {
                 // Ad-hoc debugging support
                 _debugger.init(board);
 
+                // Support adding new sensors and PID controllers
+                _sensor_count = 0;
+
                 // Support for mandatory sensors
                 add_sensor(&_quaternion, imu);
                 add_sensor(&_gyrometer, imu);
-
-                // Support adding new sensors and PID controllers
-                _sensor_count = 0;
 
                 // Initialize state
                 memset(&_state, 0, sizeof(state_t));
@@ -269,14 +269,14 @@ namespace hf {
                 // Initialize the receiver
                 _receiver->begin();
 
+                // Setup failsafe
+                _failsafe = false;
+
                 // Start the IMU
                 imu->begin();
 
                 // Tell the mixer which motors to use, and initialize them
                 mixer->useMotors(motors);
-
-                // Setup failsafe
-                _failsafe = false;
 
             } // init
 
