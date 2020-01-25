@@ -86,7 +86,26 @@ namespace hf {
             // This is also use by serial task
             float  motorsDisarmed[MAXMOTORS];
 
-            void run(demands_t demands)
+            void useMotors(Motor ** motors)
+            {
+                _motors = motors;
+
+                for (uint8_t i=0; i<_nmotors; ++i) {
+                    _motors[i]->init();
+                }
+            }
+
+            // This is how we can spin the motors from the GCS
+            void runDisarmed(void)
+            {
+                for (uint8_t i = 0; i < _nmotors; i++) {
+                    safeWriteMotor(i, motorsDisarmed[i]);
+                }
+            }
+
+            // Demander overrides ----------------------------------------------
+
+            void run(demands_t demands) override
             {
                 // Map throttle demand from [-1,+1] to [0,1]
                 demands.throttle = (demands.throttle + 1) / 2;
@@ -124,24 +143,7 @@ namespace hf {
                 }
             }
 
-            void useMotors(Motor ** motors)
-            {
-                _motors = motors;
-
-                for (uint8_t i=0; i<_nmotors; ++i) {
-                    _motors[i]->init();
-                }
-            }
-
-            // This is how we can spin the motors from the GCS
-            void runDisarmed(void)
-            {
-                for (uint8_t i = 0; i < _nmotors; i++) {
-                    safeWriteMotor(i, motorsDisarmed[i]);
-                }
-            }
-
-            void cut(void)
+            void cut(void) override
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     writeMotor(i, 0);
