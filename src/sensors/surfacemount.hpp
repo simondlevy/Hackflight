@@ -27,7 +27,7 @@ namespace hf {
 
     class SurfaceMountSensor : public Sensor {
 
-        friend class Hackflight;
+        friend class HackflightBase;
 
         protected:
 

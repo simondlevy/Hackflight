@@ -36,21 +36,16 @@
 
 namespace hf {
 
-    class Hackflight {
+    class HackflightBase {
 
-        private: 
+        private:
 
             static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
 
-            // Passed to Hackflight::init() for a particular build
-            Board      * _board    = NULL;
-            IMU        * _imu      = NULL;
-            Receiver   * _receiver = NULL;
-            Mixer      * _mixer    = NULL;
+        protected:
 
-            // Mandatory sensors on the board
-            Gyrometer _gyrometer;
-            Quaternion _quaternion; // not really a sensor, but we treat it like one!
+            Board      * _board    = NULL;
+            Receiver   * _receiver = NULL;
 
             // Supports periodic ad-hoc debugging
             Debugger _debugger;
@@ -83,6 +78,43 @@ namespace hf {
             {
                 return fabs(_state.rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
+
+            void checkOptionalSensors(void)
+            {
+                for (uint8_t k=0; k<_sensor_count; ++k) {
+                    Sensor * sensor = _sensors[k];
+                    float time = _board->getTime();
+                    if (sensor->ready(time)) {
+                        sensor->modifyState(_state, time);
+                    }
+                }
+            }
+
+            void add_sensor(Sensor * sensor)
+            {
+                _sensors[_sensor_count++] = sensor;
+            }
+
+            void add_sensor(SurfaceMountSensor * sensor, IMU * imu) 
+            {
+                add_sensor(sensor);
+
+                sensor->imu = imu;
+            }
+
+    }; // class HackflightBase
+
+    class Hackflight : public HackflightBase {
+
+        private: 
+
+            // Passed to Hackflight::init() for a particular build
+            IMU        * _imu      = NULL;
+            Mixer      * _mixer    = NULL;
+
+            // Mandatory sensors on the board
+            Gyrometer _gyrometer;
+            Quaternion _quaternion; // not really a sensor, but we treat it like one!
 
             void checkQuaternion(void)
             {
@@ -204,29 +236,6 @@ namespace hf {
                 _board->showArmedStatus(_state.armed);
 
             } // checkReceiver
-
-            void checkOptionalSensors(void)
-            {
-                for (uint8_t k=0; k<_sensor_count; ++k) {
-                    Sensor * sensor = _sensors[k];
-                    float time = _board->getTime();
-                    if (sensor->ready(time)) {
-                        sensor->modifyState(_state, time);
-                    }
-                }
-            }
-
-            void add_sensor(Sensor * sensor)
-            {
-                _sensors[_sensor_count++] = sensor;
-            }
-
-            void add_sensor(SurfaceMountSensor * sensor, IMU * imu) 
-            {
-                add_sensor(sensor);
-
-                sensor->imu = imu;
-            }
 
         public:
 
