@@ -27,19 +27,19 @@ namespace hf {
 
     class PidController {
 
-        friend class Hackflight;
+        friend class HackflightBase;
 
         protected:
 
-        static constexpr float STICK_DEADBAND = 0.10;
+            static constexpr float STICK_DEADBAND = 0.10;
 
-        virtual void modifyDemands(state_t & state, demands_t & demands) = 0;
+            virtual void modifyDemands(state_t & state, demands_t & demands) = 0;
 
-        virtual bool shouldFlashLed(void) { return false; }
+            virtual bool shouldFlashLed(void) { return false; }
 
-        virtual void updateReceiver(demands_t & demands, bool throttleIsDown) { (void)demands; (void)throttleIsDown; }
+            virtual void updateReceiver(demands_t & demands, bool throttleIsDown) { (void)demands; (void)throttleIsDown; }
 
-        uint8_t auxState = 0;
+            uint8_t auxState = 0;
 
     };  // class PidController
 

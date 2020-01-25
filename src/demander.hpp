@@ -26,7 +26,7 @@ namespace hf {
 
     class Demander {
 
-        friend class Hackflight;
+        friend class HackflightBase;
 
         protected:
 
@@ -34,6 +34,6 @@ namespace hf {
 
             virtual void run(demands_t demands) = 0;
 
-    }; // class Mixer
+    }; // class Demander
 
 } // namespace hf

@@ -36,6 +36,8 @@
 
 namespace hf {
 
+    // HackflightBase -------------------------------------------------------------------------------------------
+
     class HackflightBase {
 
         private:
@@ -46,6 +48,7 @@ namespace hf {
 
             Board      * _board    = NULL;
             Receiver   * _receiver = NULL;
+            Demander   * _demander = NULL;
 
             // Supports periodic ad-hoc debugging
             Debugger _debugger;
@@ -102,7 +105,123 @@ namespace hf {
                 sensor->imu = imu;
             }
 
-    }; // class HackflightBase
+            void init(Board * board, Receiver * receiver, Demander * demander)
+            {  
+                // Store the essentials
+                _board    = board;
+                _receiver = receiver;
+                _demander = demander;
+
+                // Ad-hoc debugging support
+                _debugger.init(board);
+
+                // Support adding new sensors and PID controllers
+                _sensor_count = 0;
+
+                // Initialize state
+                memset(&_state, 0, sizeof(state_t));
+
+                // Initialize the receiver
+                _receiver->begin();
+
+                // Setup failsafe
+                _failsafe = false;
+            }
+
+            void addSensor(Sensor * sensor) 
+            {
+                add_sensor(sensor);
+            }
+
+            void runPidControllers(void)
+            {
+                // Each PID controllers is associated with at least one auxiliary switch state
+                uint8_t auxState = _receiver->getAux1State();
+
+                // Some PID controllers should cause LED to flash when they're active
+                bool shouldFlash = false;
+
+                for (uint8_t k=0; k<_pid_controller_count; ++k) {
+
+                    PidController * pidController = _pid_controllers[k];
+
+                    if (pidController->auxState <= auxState) {
+
+                        pidController->modifyDemands(_state, _demands); 
+
+                        if (pidController->shouldFlashLed()) {
+                            shouldFlash = true;
+                        }
+                    }
+                }
+
+                // Flash LED for certain PID controllers
+                _board->flashLed(shouldFlash);
+
+                // Use updated demands to run motors
+                if (_state.armed && !_failsafe && !_receiver->throttleIsDown()) {
+                    _demander->run(_demands);
+                }
+            }
+
+            void checkReceiver(void)
+            {
+                // Sync failsafe to receiver
+                if (_receiver->lostSignal() && _state.armed) {
+                    _demander->cut();
+                    _state.armed = false;
+                    _failsafe = true;
+                    _board->showArmedStatus(false);
+                    return;
+                }
+
+                // Check whether receiver data is available
+                if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
+
+                // Update PID controllers with receiver demands
+                for (uint8_t k=0; k<_pid_controller_count; ++k) {
+                    _pid_controllers[k]->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
+                }
+
+                // Disarm
+                if (_state.armed && !_receiver->getAux2State()) {
+                    _state.armed = false;
+                } 
+
+                // Avoid arming if aux2 switch down on startup
+                if (!_safeToArm) {
+                    _safeToArm = !_receiver->getAux2State();
+                }
+
+                // Arm (after lots of safety checks!)
+                if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux2State() && 
+                        !_failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
+                    _state.armed = true;
+                    _yawInitial = _state.rotation[AXIS_YAW]; // grab yaw for headless mode
+                }
+
+                // Cut motors on throttle-down
+                if (_state.armed && _receiver->throttleIsDown()) {
+                    _demander->cut();
+                }
+
+                // Set LED based on arming status
+                _board->showArmedStatus(_state.armed);
+
+            } // checkReceiver
+
+        public:
+
+            void addPidController(PidController * pidController, uint8_t auxState=0) 
+            {
+                pidController->auxState = auxState;
+
+                _pid_controllers[_pid_controller_count++] = pidController;
+            }
+
+     }; // class HackflightBase
+
+    // Hackflight -----------------------------------------------------------------------------------------------
 
     class Hackflight : public HackflightBase {
 
@@ -160,117 +279,26 @@ namespace hf {
                 }
             }
 
-            void runPidControllers(void)
-            {
-                // Each PID controllers is associated with at least one auxiliary switch state
-                uint8_t auxState = _receiver->getAux1State();
-
-                // Some PID controllers should cause LED to flash when they're active
-                bool shouldFlash = false;
-
-                for (uint8_t k=0; k<_pid_controller_count; ++k) {
-
-                    PidController * pidController = _pid_controllers[k];
-
-                    if (pidController->auxState <= auxState) {
-
-                        pidController->modifyDemands(_state, _demands); 
-
-                        if (pidController->shouldFlashLed()) {
-                            shouldFlash = true;
-                        }
-                    }
-                }
-
-                // Flash LED for certain PID controllers
-                _board->flashLed(shouldFlash);
-
-                // Use updated demands to run motors
-                if (_state.armed && !_failsafe && !_receiver->throttleIsDown()) {
-                    _mixer->run(_demands);
-                }
-            }
-
-            void checkReceiver(void)
-            {
-                // Sync failsafe to receiver
-                if (_receiver->lostSignal() && _state.armed) {
-                    _mixer->cut();
-                    _state.armed = false;
-                    _failsafe = true;
-                    _board->showArmedStatus(false);
-                    return;
-                }
-
-                // Check whether receiver data is available
-                if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
-
-                // Update PID controllers with receiver demands
-                for (uint8_t k=0; k<_pid_controller_count; ++k) {
-                    _pid_controllers[k]->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
-                }
-
-                // Disarm
-                if (_state.armed && !_receiver->getAux2State()) {
-                    _state.armed = false;
-                } 
-
-                // Avoid arming if aux2 switch down on startup
-                if (!_safeToArm) {
-                    _safeToArm = !_receiver->getAux2State();
-                }
-
-                // Arm (after lots of safety checks!)
-                if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux2State() && 
-                        !_failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
-                    _state.armed = true;
-                    _yawInitial = _state.rotation[AXIS_YAW]; // grab yaw for headless mode
-                }
-
-                // Cut motors on throttle-down
-                if (_state.armed && _receiver->throttleIsDown()) {
-                    _mixer->cut();
-                }
-
-                // Set LED based on arming status
-                _board->showArmedStatus(_state.armed);
-
-            } // checkReceiver
-
         public:
 
             void init(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor ** motors, bool armed=false)
             {  
-                // Store the essentials
-                _board    = board;
-                _imu      = imu;
-                _receiver = receiver;
-                _mixer    = mixer;
+                // Do general initialization
+                HackflightBase::init(board, receiver, mixer);
 
-                // Timer task initializations
+                // Store pointers to IMU, mixer
+                _imu   = imu;
+                _mixer = mixer;
+
+                // Initialize serial timer task
                 _serialTask.init(board, &_state, mixer, receiver);
-
-                // Ad-hoc debugging support
-                _debugger.init(board);
-
-                // Support adding new sensors and PID controllers
-                _sensor_count = 0;
-
-                // Support for mandatory sensors
-                add_sensor(&_quaternion, imu);
-                add_sensor(&_gyrometer, imu);
-
-                // Initialize state
-                memset(&_state, 0, sizeof(state_t));
 
                 // Support safety override by simulator
                 _state.armed = armed;
 
-                // Initialize the receiver
-                _receiver->begin();
-
-                // Setup failsafe
-                _failsafe = false;
+                // Support for mandatory sensors
+                add_sensor(&_quaternion, imu);
+                add_sensor(&_gyrometer, imu);
 
                 // Start the IMU
                 imu->begin();
@@ -279,18 +307,6 @@ namespace hf {
                 mixer->useMotors(motors);
 
             } // init
-
-            void addSensor(Sensor * sensor) 
-            {
-                add_sensor(sensor);
-            }
-
-            void addPidController(PidController * pidController, uint8_t auxState=0) 
-            {
-                pidController->auxState = auxState;
-
-                _pid_controllers[_pid_controller_count++] = pidController;
-            }
 
             void update(void)
             {
