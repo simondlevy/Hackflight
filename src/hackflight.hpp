@@ -44,31 +44,19 @@ namespace hf {
 
             static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
 
-        protected:
-
-            Board      * _board    = NULL;
-            Receiver   * _receiver = NULL;
-            Demander   * _demander = NULL;
-
-            // Supports periodic ad-hoc debugging
-            Debugger _debugger;
-
             // PID controllers
             PidController * _pid_controllers[256] = {NULL};
             uint8_t _pid_controller_count = 0;
 
-            // Timer tasks
-            SerialTask _serialTask;
+            // Supports periodic ad-hoc debugging
+            Debugger _debugger;
 
-            // Additional sensors 
+            // Mixer or receiver proxy
+            Demander * _demander = NULL;
+
+            // Sensors 
             Sensor * _sensors[256] = {NULL};
             uint8_t _sensor_count = 0;
-
-            // Vehicle state
-            state_t _state;
-
-            // Demands sent to mixer
-            demands_t _demands;
 
             // Safety
             bool _safeToArm = false;
@@ -81,6 +69,17 @@ namespace hf {
             {
                 return fabs(_state.rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
+
+        protected:
+
+            Board      * _board    = NULL;
+            Receiver   * _receiver = NULL;
+
+            // Vehicle state
+            state_t _state;
+
+            // Demands sent to mixer
+            demands_t _demands;
 
             void checkOptionalSensors(void)
             {
@@ -231,7 +230,10 @@ namespace hf {
             IMU        * _imu      = NULL;
             Mixer      * _mixer    = NULL;
 
-            // Mandatory sensors on the board
+            // Serial timer task for GCS
+            SerialTask _serialTask;
+
+             // Mandatory sensors on the board
             Gyrometer _gyrometer;
             Quaternion _quaternion; // not really a sensor, but we treat it like one!
 
