@@ -25,7 +25,7 @@
 
 namespace hf {
 
-    class SbusRXProxy : public RXProxy {
+    class SbusProxy : public RXProxy {
 
         private:
 
@@ -36,16 +36,23 @@ namespace hf {
 
             uint16_t _channels[16];
 
+            static uint16_t val2int(float val)
+            {
+                return MINVAL + (uint16_t)(val * (MAXVAL-MINVAL));
+            }
+
         protected:
 
-            virtual void setDemands(demands_t & demands) override
+            virtual void setChannelValues(demands_t & demands, bool armed) override
             {
-            }
 
-            virtual void setArmedStatus(bool status) override 
-            {
-            }
+                _channels[0] = val2int(demands.throttle);
+                _channels[1] = val2int(demands.roll);
+                _channels[2] = val2int(demands.pitch);
+                _channels[3] = val2int(demands.yaw);
 
+                _channels[4] = armed ? MAXVAL : MINVAL; // Aux1
+            }
 
         public:
 
@@ -53,11 +60,12 @@ namespace hf {
             {
                 sbus.begin();
 
+                // Set channels to neutral values
                 for (uint8_t k=0; k<16; ++k) {
                     _channels[k] = (MINVAL + MAXVAL) / 2;
                 }
             }
 
-    }; // class SbusRXProxy
+    }; // class SbusProxy
 
 } // namespace hf

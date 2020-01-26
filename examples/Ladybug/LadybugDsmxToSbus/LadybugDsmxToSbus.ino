@@ -44,7 +44,7 @@ hf::HackflightLite h;
 
 hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);
 
-hf::SbusRXProxy px;
+hf::SbusProxy px;
 
 void serialEvent2(void)
 {

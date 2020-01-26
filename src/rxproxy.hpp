@@ -30,47 +30,28 @@ namespace hf {
 
         private:
 
-            // Helps us detect change in armed status
-            bool _wasArmed = false;
+            bool _armed = false;
 
         protected:
 
-            RXProxy(void)
+            void setArmedStatus(bool armed)
             {
-                _wasArmed = false;
-            }
-
-            void checkArmDisarm(bool armed)
-            {
-                if (armed) {
-                    if (!_wasArmed) {
-                        setArmedStatus(true);
-                    }
-                    _wasArmed = true;
-                }
-                else {
-                    if (_wasArmed) {
-                        setArmedStatus(false);
-                    }
-                    _wasArmed = false;
-                }
+                _armed = armed;
             }
 
             void run(demands_t demands) override
             {
-                setDemands(demands);
+                setChannelValues(demands, _armed);
             }
 
             void cut(void) override
             {
                 demands_t demands;
                 demands.throttle = -1;
-                setDemands(demands);
+                setChannelValues(demands, false);
             }
 
-            virtual void setDemands(demands_t & demands) = 0;
-
-            virtual void setArmedStatus(bool status) = 0;
+            virtual void setChannelValues(demands_t & demands, bool armed) = 0;
 
     }; // class RXProxy
 

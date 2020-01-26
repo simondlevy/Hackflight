@@ -32,11 +32,6 @@ namespace hf {
             // Out output to the main flight controller
             RXProxy * _proxy;
 
-            void checkArmDisarm(void)
-            {
-                _proxy->checkArmDisarm(_state.armed);
-            }
-
         public:
 
             void init(Board * board, Receiver * receiver, RXProxy * proxy) 
@@ -53,7 +48,7 @@ namespace hf {
                 checkReceiver();
 
                 // Check change in armed state
-                checkArmDisarm();
+                _proxy->setArmedStatus(_state.armed);
 
                 // Check optional sensors
                 checkOptionalSensors();
