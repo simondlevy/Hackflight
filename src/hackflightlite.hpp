@@ -21,10 +21,21 @@
 #pragma once
 
 #include "hackflightbase.hpp"
+#include "rxproxy.hpp"
 
 namespace hf {
 
     class HackflightLite : public HackflightBase {
+
+        public:
+
+            void init(Board * board, Receiver * receiver, RXProxy * proxy) 
+            {
+            }
+
+            void update(void)
+            {
+            }
 
     }; // class HackflightLite
 

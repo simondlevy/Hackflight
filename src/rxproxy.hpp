@@ -28,6 +28,8 @@ namespace hf {
 
         friend class HackflightLite;
 
+        protected:
+
             void run(demands_t demands) override
             {
             }

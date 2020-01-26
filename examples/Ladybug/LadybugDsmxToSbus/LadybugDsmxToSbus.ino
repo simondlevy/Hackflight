@@ -31,31 +31,28 @@ Copyright (c) 2020 Simon D. Levy
 
 #include <Arduino.h>
 
-#include "hackflight.hpp"
+#include "hackflightlite.hpp"
 #include "boards/realboards/arduino/ladybug.hpp"
-#include "receivers/mock.hpp"
-#include "imus/softquats/mpu9250.hpp"
-#include "mixers/quadxcf.hpp"
-#include "motors/mock.hpp"
+#include "receivers/arduino/dsmx.hpp"
 
-hf::Hackflight h;
+static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
+static constexpr float DEMAND_SCALE = 1.0f;
 
-hf::MPU9250SoftwareQuaternionIMU imu;
+hf::HackflightLite h;
 
-hf::MockReceiver rc;
+hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);
 
-hf::MixerQuadXCF mixer;
+void serialEvent2(void)
+{
+    while (Serial1.available()) {
 
-hf::MockMotor motor1;
-hf::MockMotor motor2;
-hf::MockMotor motor3;
-hf::MockMotor motor4;
-
-hf::Motor * motors[4] = { &motor1, &motor2, &motor3, &motor4 };
+        rc.handleSerialEvent(Serial2.read(), micros());
+    }
+}
 
 void setup(void)
 {
-    h.init(new hf::Ladybug(), &imu, &rc, &mixer, motors);
+    Serial2.begin(115200);
 }
 
 void loop(void)
