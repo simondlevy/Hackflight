@@ -127,7 +127,7 @@ namespace hf {
             void runPidControllers(void)
             {
                 // Each PID controllers is associated with at least one auxiliary switch state
-                uint8_t auxState = _receiver->getAux1State();
+                uint8_t auxState = _receiver->getAux2State();
 
                 // Some PID controllers should cause LED to flash when they're active
                 bool shouldFlash = false;
@@ -175,17 +175,17 @@ namespace hf {
                 }
 
                 // Disarm
-                if (_state.armed && !_receiver->getAux2State()) {
+                if (_state.armed && !_receiver->getAux1State()) {
                     _state.armed = false;
                 } 
 
                 // Avoid arming if aux2 switch down on startup
                 if (!_safeToArm) {
-                    _safeToArm = !_receiver->getAux2State();
+                    _safeToArm = !_receiver->getAux1State();
                 }
 
                 // Arm (after lots of safety checks!)
-                if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux2State() && 
+                if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux1State() && 
                         !_failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
                     _state.armed = true;
                     _yawInitial = _state.rotation[AXIS_YAW]; // grab yaw for headless mode

@@ -30,6 +30,10 @@ namespace hf {
 
         protected:
 
+            void setArmedStatus(bool armed)
+            {
+            }
+
             void run(demands_t demands) override
             {
                 demand(demands);
