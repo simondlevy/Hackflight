@@ -27,6 +27,22 @@ namespace hf {
 
     class HackflightLite : public HackflightBase {
 
+        private:
+
+            // Helps us detect change in armed status
+            bool _wasArmed = false;
+
+            void checkArmDisarm(void)
+            {
+                if (_state.armed) {
+                    if (!_wasArmed) {
+                    }
+                    _wasArmed = true;
+                }
+                else {
+                    _wasArmed = false;
+                }
+            }
 
         public:
 
@@ -34,10 +50,20 @@ namespace hf {
             {
                 // Do general initialization
                 HackflightBase::init(board, receiver, proxy);
+
+                _wasArmed = false;
             }
 
             void update(void)
             {
+                // Grab control signal if available
+                checkReceiver();
+
+                // Check change in armed state
+                checkArmDisarm();
+
+                // Check optional sensors
+                checkOptionalSensors();
             }
 
     }; // class HackflightLite
