@@ -28,25 +28,49 @@ namespace hf {
 
         friend class HackflightLite;
 
+        private:
+
+            // Helps us detect change in armed status
+            bool _wasArmed = false;
+
         protected:
 
-            void setArmedStatus(bool armed)
+            RXProxy(void)
             {
+                _wasArmed = false;
+            }
+
+            void checkArmDisarm(bool armed)
+            {
+                if (armed) {
+                    if (!_wasArmed) {
+                        setArmedStatus(true);
+                    }
+                    _wasArmed = true;
+                }
+                else {
+                    if (_wasArmed) {
+                        setArmedStatus(false);
+                    }
+                    _wasArmed = false;
+                }
             }
 
             void run(demands_t demands) override
             {
-                demand(demands);
+                setDemands(demands);
             }
 
             void cut(void) override
             {
                 demands_t demands;
                 demands.throttle = -1;
-                demand(demands);
+                setDemands(demands);
             }
 
-            virtual void demand(demands_t & demands) = 0;
+            virtual void setDemands(demands_t & demands) = 0;
+
+            virtual void setArmedStatus(bool status) = 0;
 
     }; // class RXProxy
 

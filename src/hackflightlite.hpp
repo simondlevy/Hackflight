@@ -32,23 +32,9 @@ namespace hf {
             // Out output to the main flight controller
             RXProxy * _proxy;
 
-            // Helps us detect change in armed status
-            bool _wasArmed = false;
-
             void checkArmDisarm(void)
             {
-                if (_state.armed) {
-                    if (!_wasArmed) {
-                        _proxy->setArmedStatus(true);
-                    }
-                    _wasArmed = true;
-                }
-                else {
-                    if (_wasArmed) {
-                        _proxy->setArmedStatus(false);
-                    }
-                    _wasArmed = false;
-                }
+                _proxy->checkArmDisarm(_state.armed);
             }
 
         public:
@@ -59,8 +45,6 @@ namespace hf {
                 HackflightBase::init(board, receiver, proxy);
 
                 _proxy = proxy;
-
-                _wasArmed = false;
             }
 
             void update(void)

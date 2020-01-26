@@ -38,9 +38,14 @@ namespace hf {
 
         protected:
 
-            virtual void demand(demands_t & demands) override
+            virtual void setDemands(demands_t & demands) override
             {
             }
+
+            virtual void setArmedStatus(bool status) override 
+            {
+            }
+
 
         public:
 
