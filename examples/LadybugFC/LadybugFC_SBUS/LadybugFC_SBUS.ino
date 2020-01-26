@@ -32,7 +32,7 @@
 
 #include "hackflight.hpp"
 #include "boards/realboards/arduino/ladybugfc.hpp"
-#include "receivers/arduino/sbus2.hpp"
+#include "receivers/arduino/sbus.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
