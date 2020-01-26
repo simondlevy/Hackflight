@@ -34,8 +34,10 @@ Copyright (c) 2020 Simon D. Levy
 #include "hackflightlite.hpp"
 #include "boards/realboards/arduino/ladybug.hpp"
 #include "receivers/arduino/dsmx.hpp"
+#include "rxproxies/sbus.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
+
 static constexpr float DEMAND_SCALE = 1.0f;
 
 hf::HackflightLite h;
@@ -52,7 +54,9 @@ void serialEvent2(void)
 
 void setup(void)
 {
+    // Start UART for DSMX receiver
     Serial2.begin(115200);
+
 }
 
 void loop(void)

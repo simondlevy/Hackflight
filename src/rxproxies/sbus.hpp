@@ -1,5 +1,5 @@
 /*
-   RXProxy class
+   RXProxy class for SBUS
 
    Copyright (c) 2020 Simon D. Levy
 
@@ -20,30 +20,18 @@
 
 #pragma once
 
-#include "hackflightlite.hpp"
+#include "rxproxy.hpp"
 
 namespace hf {
 
-    class RXProxy : protected Demander {
-
-        friend class HackflightLite;
+    class SbusRXProxy : public RXProxy {
 
         protected:
 
-            void run(demands_t demands) override
+            virtual void demand(demands_t & demands) override
             {
-                demand(demands);
             }
 
-            void cut(void) override
-            {
-                demands_t demands;
-                demands.throttle = -1;
-                demand(demands);
-            }
-
-            virtual void demand(demands_t & demands) = 0;
-
-    }; // class RXProxy
+    }; // class SbusRXProxy
 
 } // namespace hf
