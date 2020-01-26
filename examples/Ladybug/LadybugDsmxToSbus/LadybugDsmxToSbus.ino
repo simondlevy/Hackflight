@@ -44,6 +44,8 @@ hf::HackflightLite h;
 
 hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);
 
+hf::SbusRXProxy px;
+
 void serialEvent2(void)
 {
     while (Serial1.available()) {
@@ -56,6 +58,9 @@ void setup(void)
 {
     // Start UART for DSMX receiver
     Serial2.begin(115200);
+
+    // Start UART for SBUS proxy
+
 
 }
 

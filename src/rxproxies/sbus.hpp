@@ -21,15 +21,36 @@
 #pragma once
 
 #include "rxproxy.hpp"
+#include "SBUS.h"
 
 namespace hf {
 
     class SbusRXProxy : public RXProxy {
 
+        private:
+
+            static const uint16_t MINVAL = 172;
+            static const uint16_t MAXVAL = 1811;
+
+            SBUS sbus = SBUS(Serial1);
+
+            uint16_t _channels[16];
+
         protected:
 
             virtual void demand(demands_t & demands) override
             {
+            }
+
+        public:
+
+            void begin(void)
+            {
+                sbus.begin();
+
+                for (uint8_t k=0; k<16; ++k) {
+                    _channels[k] = (MINVAL + MAXVAL) / 2;
+                }
             }
 
     }; // class SbusRXProxy

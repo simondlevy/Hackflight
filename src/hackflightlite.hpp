@@ -27,10 +27,13 @@ namespace hf {
 
     class HackflightLite : public HackflightBase {
 
+
         public:
 
             void init(Board * board, Receiver * receiver, RXProxy * proxy) 
             {
+                // Do general initialization
+                HackflightBase::init(board, receiver, proxy);
             }
 
             void update(void)
