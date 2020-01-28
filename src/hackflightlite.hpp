@@ -47,13 +47,18 @@ namespace hf {
                 // Grab control signal if available
                 checkReceiver();
 
+                runPidControllers();
+
+                Serial.println(_demands.throttle);
+
+                /*
                 // Check change in armed state
                 _proxy->setArmedStatus(_state.armed);
-
                 _proxy->run(_demands);
 
                 // Check optional sensors
                 checkOptionalSensors();
+                */
             }
 
     }; // class HackflightLite

@@ -126,6 +126,12 @@ namespace hf {
 
             void runPidControllers(void)
             {
+                // Start with demands from receiver, scaling roll/pitch/yaw by constant
+                _demands.throttle = _receiver->demands.throttle;
+                _demands.roll     = _receiver->demands.roll  * _receiver->_demandScale;
+                _demands.pitch    = _receiver->demands.pitch * _receiver->_demandScale;
+                _demands.yaw      = _receiver->demands.yaw   * _receiver->_demandScale;
+
                 // Each PID controllers is associated with at least one auxiliary switch state
                 uint8_t auxState = _receiver->getAux2State();
 

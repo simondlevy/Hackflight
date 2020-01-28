@@ -52,17 +52,11 @@ hf::SbusProxy px;
 
 void setup(void)
 {
-    Serial.begin(115000);
-
     h.init(new hf::Ladybug(), &rc, &px);
 }
 
 void loop(void)
 {
-    //h.update();
+    h.update();
 
-    if (rc.gotNewFrame()) {
-       rc.readRawvals(); 
-       Serial.println(rc.rawvals[0]);
-    }
 }
