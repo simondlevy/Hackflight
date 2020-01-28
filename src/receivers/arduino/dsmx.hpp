@@ -29,7 +29,8 @@ namespace hf {
 
             DSM2048 _rx;
 
-        protected:
+        //protected:
+        public:
 
             void begin(void)
             {

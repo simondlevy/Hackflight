@@ -31,11 +31,11 @@ Copyright (c) 2020 Simon D. Levy
 
 #include <Arduino.h>
 
-#include <DSMRX.h>
+//#include <DSMRX.h>
 
 #include "hackflightlite.hpp"
 #include "boards/realboards/arduino/ladybug.hpp"
-//#include "receivers/arduino/dsmx_serial2.hpp"
+#include "receivers/arduino/dsmx_serial2.hpp"
 #include "rxproxies/sbus.hpp"
 
 static const uint8_t CHANNELS = 8;
@@ -46,10 +46,11 @@ static constexpr float DEMAND_SCALE = 1.0f;
 
 hf::HackflightLite h;
 
-//hf::DSMX_Receiver_Serial2 rc = hf::DSMX_Receiver_Serial2(CHANNEL_MAP, DEMAND_SCALE);  
+hf::DSMX_Receiver_Serial2 rc = hf::DSMX_Receiver_Serial2(CHANNEL_MAP, DEMAND_SCALE);  
 
 hf::SbusProxy px;
 
+/*
 DSM2048 rx;
 
 void serialEvent2(void)
@@ -58,12 +59,13 @@ void serialEvent2(void)
         rx.handleSerialEvent(Serial2.read(), micros());
     }
 }
-
+*/
 
 void setup(void)
 {
     Serial.begin(115000);
-    Serial2.begin(115000);
+    rc.begin();
+    //Serial2.begin(115000);
     //h.init(new hf::Ladybug(), &rc, &px);
 }
 
@@ -71,6 +73,7 @@ void loop(void)
 {
     //h.update();
 
+/*
    if (rx.timedOut(micros())) {
         Serial.println("*** TIMED OUT ***");
     }
@@ -92,7 +95,9 @@ void loop(void)
         Serial.print("Fade count = ");
         Serial.println(rx.getFadeCount());
     }
-
+*/
+    Serial.println(rc.gotNewFrame());
+    
     // Need a little loop delay
     delay(5);
 }

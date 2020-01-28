@@ -37,7 +37,8 @@ namespace hf {
 
     class DSMX_Receiver_Serial2 : public DSMX_Receiver {
 
-        protected:
+        //protected:
+        public:
 
             void begin(void) override 
             {
