@@ -53,9 +53,8 @@ hf::SbusProxy px;
 void setup(void)
 {
     Serial.begin(115000);
-    rc.begin();
 
-    //h.init(new hf::Ladybug(), &rc, &px);
+    h.init(new hf::Ladybug(), &rc, &px);
 }
 
 void loop(void)
