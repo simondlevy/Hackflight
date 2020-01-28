@@ -78,7 +78,8 @@ namespace hf {
                 return (mid + tmp*(1-THROTTLE_EXPO + THROTTLE_EXPO * (tmp*tmp) / (y*y))) * 2 - 1;
             }
 
-        protected: 
+        //protected: 
+        public: 
 
             // maximum number of channels that any receiver will send (of which we'll use six)
             static const uint8_t MAXCHAN = 8;

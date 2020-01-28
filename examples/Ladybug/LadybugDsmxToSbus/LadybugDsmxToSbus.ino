@@ -50,22 +50,11 @@ hf::DSMX_Receiver_Serial2 rc = hf::DSMX_Receiver_Serial2(CHANNEL_MAP, DEMAND_SCA
 
 hf::SbusProxy px;
 
-/*
-DSM2048 rx;
-
-void serialEvent2(void)
-{
-    while (Serial2.available()) {
-        rx.handleSerialEvent(Serial2.read(), micros());
-    }
-}
-*/
-
 void setup(void)
 {
     Serial.begin(115000);
     rc.begin();
-    //Serial2.begin(115000);
+
     //h.init(new hf::Ladybug(), &rc, &px);
 }
 
@@ -73,31 +62,8 @@ void loop(void)
 {
     //h.update();
 
-/*
-   if (rx.timedOut(micros())) {
-        Serial.println("*** TIMED OUT ***");
+    if (rc.gotNewFrame()) {
+       rc.readRawvals(); 
+       Serial.println(rc.rawvals[0]);
     }
-
-    else if (rx.gotNewFrame()) {
-
-        float values[CHANNELS];
-
-        rx.getChannelValuesNormalized(values, CHANNELS);
-
-        for (int k=0; k<CHANNELS; ++k) {
-            Serial.print("Ch. ");
-            Serial.print(k+1);
-            Serial.print(": ");
-            Serial.print(values[k]);
-            Serial.print("    ");
-        }
-
-        Serial.print("Fade count = ");
-        Serial.println(rx.getFadeCount());
-    }
-*/
-    Serial.println(rc.gotNewFrame());
-    
-    // Need a little loop delay
-    delay(5);
 }
