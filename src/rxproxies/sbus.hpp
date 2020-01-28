@@ -32,7 +32,7 @@ namespace hf {
             static const uint16_t MINVAL = 172;
             static const uint16_t MAXVAL = 1811;
 
-            SBUS sbus = SBUS(Serial1);
+            //SBUS sbus = SBUS(Serial1);
 
             uint16_t _channels[16];
 
@@ -46,19 +46,21 @@ namespace hf {
             virtual void setChannelValues(demands_t & demands, bool armed) override
             {
 
+                /*
                 _channels[0] = val2int(demands.throttle);
                 _channels[1] = val2int(demands.roll);
                 _channels[2] = val2int(demands.pitch);
                 _channels[3] = val2int(demands.yaw);
 
                 _channels[4] = armed ? MAXVAL : MINVAL; // Aux1
+                */
             }
 
         public:
 
             void begin(void)
             {
-                sbus.begin();
+                //sbus.begin();
 
                 // Set channels to neutral values
                 for (uint8_t k=0; k<16; ++k) {

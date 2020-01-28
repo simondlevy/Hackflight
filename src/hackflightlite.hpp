@@ -50,6 +50,8 @@ namespace hf {
                 // Check change in armed state
                 _proxy->setArmedStatus(_state.armed);
 
+                _proxy->run(_demands);
+
                 // Check optional sensors
                 checkOptionalSensors();
             }

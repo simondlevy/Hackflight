@@ -1,5 +1,5 @@
 /*
-   Hackflight sketch for Ladybug dev board with DSMX => SBUS pass-thru
+   HackflightLite sketch for Ladybug dev board with DSMX => SBUS pass-thru
 
    Additional libraries needed:
 
@@ -31,10 +31,14 @@ Copyright (c) 2020 Simon D. Levy
 
 #include <Arduino.h>
 
+#include <DSMRX.h>
+
 #include "hackflightlite.hpp"
 #include "boards/realboards/arduino/ladybug.hpp"
-#include "receivers/arduino/dsmx.hpp"
+//#include "receivers/arduino/dsmx_serial2.hpp"
 #include "rxproxies/sbus.hpp"
+
+static const uint8_t CHANNELS = 8;
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 
@@ -42,29 +46,53 @@ static constexpr float DEMAND_SCALE = 1.0f;
 
 hf::HackflightLite h;
 
-hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);
+//hf::DSMX_Receiver_Serial2 rc = hf::DSMX_Receiver_Serial2(CHANNEL_MAP, DEMAND_SCALE);  
 
 hf::SbusProxy px;
 
+DSM2048 rx;
+
 void serialEvent2(void)
 {
-    while (Serial1.available()) {
-
-        rc.handleSerialEvent(Serial2.read(), micros());
+    while (Serial2.available()) {
+        rx.handleSerialEvent(Serial2.read(), micros());
     }
 }
 
+
 void setup(void)
 {
-    // Start UART for DSMX receiver
-    Serial2.begin(115200);
-
-    // Start UART for SBUS proxy
-
-
+    Serial.begin(115000);
+    Serial2.begin(115000);
+    //h.init(new hf::Ladybug(), &rc, &px);
 }
 
 void loop(void)
 {
-    h.update();
+    //h.update();
+
+   if (rx.timedOut(micros())) {
+        Serial.println("*** TIMED OUT ***");
+    }
+
+    else if (rx.gotNewFrame()) {
+
+        float values[CHANNELS];
+
+        rx.getChannelValuesNormalized(values, CHANNELS);
+
+        for (int k=0; k<CHANNELS; ++k) {
+            Serial.print("Ch. ");
+            Serial.print(k+1);
+            Serial.print(": ");
+            Serial.print(values[k]);
+            Serial.print("    ");
+        }
+
+        Serial.print("Fade count = ");
+        Serial.println(rx.getFadeCount());
+    }
+
+    // Need a little loop delay
+    delay(5);
 }
