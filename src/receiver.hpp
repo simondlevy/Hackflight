@@ -30,9 +30,6 @@ namespace hf {
     class Receiver {
 
         friend class HackflightBase;
-        friend class Hackflight;
-        friend class RealBoard;
-        friend class MspParser;
         friend class SerialTask;
         friend class PidTask;
 

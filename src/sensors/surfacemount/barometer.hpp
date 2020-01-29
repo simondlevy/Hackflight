@@ -30,8 +30,6 @@ namespace hf {
 
     class Barometer : public SurfaceMountSensor {
 
-        friend class Hackflight;
-
         private:
 
             // pascals

@@ -28,8 +28,6 @@ namespace hf {
 
     class AltitudeHoldPid : public PidController {
 
-        friend class Hackflight;
-
         private: 
 
             // Arbitrary constants

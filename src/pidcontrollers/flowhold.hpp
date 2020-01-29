@@ -27,8 +27,6 @@ namespace hf {
 
     class FlowHoldPid : public PidController {
 
-        friend class Hackflight;
-
         private: 
 
             // Helper class

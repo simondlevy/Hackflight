@@ -35,8 +35,6 @@ namespace hf {
 
     class Accelerometer : public SurfaceMountSensor {
 
-        friend class Hackflight;
-
         private:
 
             float _ax = 0;

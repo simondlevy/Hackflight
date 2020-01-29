@@ -34,8 +34,6 @@ namespace hf {
 
     class Magnetometer : public SurfaceMountSensor {
 
-        friend class Hackflight;
-
         private:
 
             float _mx = 0;
