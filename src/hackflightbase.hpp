@@ -27,6 +27,7 @@
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
 #include "sensors/surfacemount.hpp"
+#include "timertasks/pidtask.hpp"
 
 namespace hf {
 
@@ -35,10 +36,6 @@ namespace hf {
         private:
 
             static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
-
-            // PID controllers
-            PidController * _pid_controllers[256] = {NULL};
-            uint8_t _pid_controller_count = 0;
 
             // Supports periodic ad-hoc debugging
             Debugger _debugger;
@@ -57,6 +54,9 @@ namespace hf {
             // Support for headless mode
             float _yawInitial = 0;
 
+            // Timer task for PID controllers
+            PidTask _pidTask;
+
             bool safeAngle(uint8_t axis)
             {
                 return fabs(_state.rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
@@ -69,9 +69,6 @@ namespace hf {
 
             // Vehicle state
             state_t _state;
-
-            // Demands sent to mixer
-            demands_t _demands;
 
             void checkOptionalSensors(void)
             {
@@ -117,48 +114,14 @@ namespace hf {
 
                 // Setup failsafe
                 _failsafe = false;
+
+                // Initialize timer task for PID controllers
+                _pidTask.init(_board, _receiver, _demander, &_state, &_failsafe);
             }
 
             void addSensor(Sensor * sensor) 
             {
                 add_sensor(sensor);
-            }
-
-            void runPidControllers(void)
-            {
-                // Start with demands from receiver, scaling roll/pitch/yaw by constant
-                _demands.throttle = _receiver->demands.throttle;
-                _demands.roll     = _receiver->demands.roll  * _receiver->_demandScale;
-                _demands.pitch    = _receiver->demands.pitch * _receiver->_demandScale;
-                _demands.yaw      = _receiver->demands.yaw   * _receiver->_demandScale;
-
-                // Each PID controllers is associated with at least one auxiliary switch state
-                uint8_t auxState = _receiver->getAux2State();
-
-                // Some PID controllers should cause LED to flash when they're active
-                bool shouldFlash = false;
-
-                for (uint8_t k=0; k<_pid_controller_count; ++k) {
-
-                    PidController * pidController = _pid_controllers[k];
-
-                    if (pidController->auxState <= auxState) {
-
-                        pidController->modifyDemands(_state, _demands); 
-
-                        if (pidController->shouldFlashLed()) {
-                            shouldFlash = true;
-                        }
-                    }
-                }
-
-                // Flash LED for certain PID controllers
-                _board->flashLed(shouldFlash);
-
-                // Use updated demands to run motors
-                if (_state.armed && !_failsafe && !_receiver->throttleIsDown()) {
-                    _demander->run(_demands);
-                }
             }
 
             void checkReceiver(void)
@@ -176,9 +139,7 @@ namespace hf {
                 if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
 
                 // Update PID controllers with receiver demands
-                for (uint8_t k=0; k<_pid_controller_count; ++k) {
-                    _pid_controllers[k]->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
-                }
+                _pidTask.setReceiverDemands();
 
                 // Disarm
                 if (_state.armed && !_receiver->getAux1State()) {
@@ -207,13 +168,20 @@ namespace hf {
 
             } // checkReceiver
 
+            void update(void)
+            {
+                // Grab control signal if available
+                checkReceiver();
+
+                // Update PID controllers task
+                _pidTask.update();
+             }
+
         public:
 
             void addPidController(PidController * pidController, uint8_t auxState=0) 
             {
-                pidController->auxState = auxState;
-
-                _pid_controllers[_pid_controller_count++] = pidController;
+                _pidTask.addPidController(pidController, auxState);
             }
 
      }; // class HackflightBase

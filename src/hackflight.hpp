@@ -79,9 +79,6 @@ namespace hf {
 
                     // Update state with gyro rates
                     _gyrometer.modifyState(_state, time);
-
-                    // Sync PID controllers to gyro update
-                    runPidControllers();
                 }
             }
 
@@ -116,8 +113,8 @@ namespace hf {
 
             void update(void)
             {
-                // Grab control signal if available
-                checkReceiver();
+                // Run common update functions
+                HackflightBase::update();
 
                 // Check mandatory sensors
                 checkGyrometer();
@@ -126,7 +123,7 @@ namespace hf {
                 // Check optional sensors
                 checkOptionalSensors();
 
-                // Update timer Tasks
+                // Update serial comms task
                 _serialTask.update();
             } 
 

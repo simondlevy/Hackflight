@@ -1,0 +1,118 @@
+/*
+   Timer task for PID controllers
+
+   Copyright (c) 2020 Simon D. Levy
+
+   This file is part of Hackflight.
+
+   Hackflight is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   Hackflight is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   You should have received a copy of the GNU General Public License
+   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#pragma once
+
+#include "timertask.hpp"
+
+namespace hf {
+
+    class PidTask : public TimerTask {
+
+        friend class HackflightBase;
+
+        private:
+
+            static constexpr float FREQ = 300;
+
+            // PID controllers
+            PidController * _pid_controllers[256] = {NULL};
+            uint8_t _pid_controller_count = 0;
+
+            // Other stuff we need
+            Receiver * _receiver = NULL;
+            Demander * _demander = NULL;
+            state_t  * _state    = NULL;
+            bool     * _failsafe = NULL;
+
+        protected:
+
+            PidTask(void)
+                : TimerTask(FREQ)
+            {
+                _pid_controller_count = 0;
+            }
+
+            void init(Board * board, Receiver * receiver, Demander * demander, state_t * state, bool * failsafe)
+            {
+                TimerTask::init(board);
+
+                _receiver = receiver;
+                _demander = demander;
+                _state = state;
+                _failsafe = failsafe;
+            }
+
+            void addPidController(PidController * pidController, uint8_t auxState) 
+            {
+                pidController->auxState = auxState;
+
+                _pid_controllers[_pid_controller_count++] = pidController;
+            }
+
+            void setReceiverDemands()
+            {
+                for (uint8_t k=0; k<_pid_controller_count; ++k) {
+                    _pid_controllers[k]->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
+                }
+            }
+
+            virtual void doTask(void) override
+            {
+                // Start with demands from receiver, scaling roll/pitch/yaw by constant
+                demands_t demands = {};
+                demands.throttle = _receiver->demands.throttle;
+                demands.roll     = _receiver->demands.roll  * _receiver->_demandScale;
+                demands.pitch    = _receiver->demands.pitch * _receiver->_demandScale;
+                demands.yaw      = _receiver->demands.yaw   * _receiver->_demandScale;
+
+                // Each PID controllers is associated with at least one auxiliary switch state
+                uint8_t auxState = _receiver->getAux2State();
+
+                // Some PID controllers should cause LED to flash when they're active
+                bool shouldFlash = false;
+
+                for (uint8_t k=0; k<_pid_controller_count; ++k) {
+
+                    PidController * pidController = _pid_controllers[k];
+
+                    if (pidController->auxState <= auxState) {
+
+                        pidController->modifyDemands(_state, demands); 
+
+                        if (pidController->shouldFlashLed()) {
+                            shouldFlash = true;
+                        }
+                    }
+                }
+
+                // Flash LED for certain PID controllers
+                _board->flashLed(shouldFlash);
+
+                // Use updated demands to run motors
+                if (_state->armed && !(*_failsafe) && !_receiver->throttleIsDown()) {
+                    _demander->run(demands);
+                }
+             }
+
+
+    };  // PidTask
+
+} // namespace hf

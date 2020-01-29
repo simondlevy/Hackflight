@@ -27,6 +27,7 @@ namespace hf {
     class Demander {
 
         friend class HackflightBase;
+        friend class PidTask;
 
         protected:
 

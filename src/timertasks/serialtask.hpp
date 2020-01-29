@@ -30,6 +30,8 @@ namespace hf {
 
     class SerialTask : public TimerTask, public MspParser {
 
+        friend class Hackflight;
+
         private:
 
             static constexpr float FREQ = 66;
@@ -112,8 +114,6 @@ namespace hf {
                 _mixer->motorsDisarmed[2] = m3;
                 _mixer->motorsDisarmed[3] = m4;
             }
-
-        public:
 
             SerialTask(void)
                 : TimerTask(FREQ)

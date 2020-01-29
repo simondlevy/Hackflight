@@ -44,8 +44,8 @@ namespace hf {
 
             void update(void)
             {
-                // Grab control signal if available
-                checkReceiver();
+                // Run common update functions
+                HackflightBase::update();
 
                 runPidControllers();
 
