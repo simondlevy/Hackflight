@@ -35,7 +35,7 @@ Copyright (c) 2020 Simon D. Levy
 
 #include "hackflightlite.hpp"
 #include "boards/realboards/arduino/ladybug.hpp"
-#include "receivers/arduino/dsmx_serial2.hpp"
+#include "receivers/arduino/dsmx/dsmx_serial2.hpp"
 #include "rxproxies/sbus.hpp"
 
 static const uint8_t CHANNELS = 8;

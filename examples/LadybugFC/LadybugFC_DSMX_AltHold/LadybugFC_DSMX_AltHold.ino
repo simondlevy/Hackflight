@@ -22,7 +22,7 @@
 
 #include "hackflightfull.hpp"
 #include "boards/realboards/arduino/ladybugfc.hpp"
-#include "receivers/arduino/dsmx_serial1.hpp"
+#include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "sensors/rangefinders/vl53l1x.hpp"
 #include "pidcontrollers/level.hpp"
 #include "pidcontrollers/rate.hpp"

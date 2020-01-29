@@ -32,7 +32,7 @@ Copyright (c) 2018 Simon D. Levy
 
 #include "hackflightfull.hpp"
 #include "boards/realboards/arduino/ladybugfc.hpp"
-#include "receivers/arduino/dsmx_serial1.hpp"
+#include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
