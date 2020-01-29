@@ -147,6 +147,8 @@ namespace hf {
                     _safeToArm = !_receiver->getAux1State();
                 }
 
+                Serial.println(_receiver->getAux1State());
+
                 // Arm (after lots of safety checks!)
                 if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux1State() && 
                         !_state.failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {

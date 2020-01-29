@@ -25,7 +25,6 @@
 #include "mspparser.hpp"
 #include "mixer.hpp"
 #include "motor.hpp"
-#include "pidcontroller.hpp"
 #include "timertasks/serialtask.hpp"
 #include "sensors/surfacemount/gyrometer.hpp"
 #include "sensors/surfacemount/quaternion.hpp"

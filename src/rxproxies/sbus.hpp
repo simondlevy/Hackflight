@@ -27,20 +27,6 @@ namespace hf {
 
     class SbusProxy : public RXProxy {
 
-        private:
-
-            static const uint16_t MINVAL = 172;
-            static const uint16_t MAXVAL = 1811;
-
-            //SBUS sbus = SBUS(Serial1);
-
-            uint16_t _channels[16];
-
-            static uint16_t val2int(float val)
-            {
-                return MINVAL + (uint16_t)(val * (MAXVAL-MINVAL));
-            }
-
         protected:
 
             virtual void setChannelValues(demands_t & demands, bool armed) override
@@ -61,11 +47,6 @@ namespace hf {
             void begin(void)
             {
                 //sbus.begin();
-
-                // Set channels to neutral values
-                for (uint8_t k=0; k<16; ++k) {
-                    _channels[k] = (MINVAL + MAXVAL) / 2;
-                }
             }
 
     }; // class SbusProxy

@@ -27,38 +27,18 @@ namespace hf {
 
     class HackflightLite : public Hackflight {
 
-        private:
-
-            // Out output to the main flight controller
-            RXProxy * _proxy;
-
         public:
 
             void init(Board * board, Receiver * receiver, RXProxy * proxy) 
             {
                 // Do general initialization
                 Hackflight::init(board, receiver, proxy);
-
-                _proxy = proxy;
             }
 
             void update(void)
             {
                 // Run common update functions
                 Hackflight::update();
-
-                runPidControllers();
-
-                Serial.println(_demands.throttle);
-
-                /*
-                // Check change in armed state
-                _proxy->setArmedStatus(_state.armed);
-                _proxy->run(_demands);
-
-                // Check optional sensors
-                checkOptionalSensors();
-                */
             }
 
     }; // class HackflightLite
