@@ -28,30 +28,21 @@ namespace hf {
 
         friend class HackflightLite;
 
-        private:
-
-            bool _armed = false;
-
         protected:
-
-            void setArmedStatus(bool armed)
-            {
-                _armed = armed;
-            }
 
             void run(demands_t demands) override
             {
-                setChannelValues(demands, _armed);
+                setChannelValues(demands);
             }
 
             void cut(void) override
             {
-                demands_t demands;
+                demands_t demands = {};
                 demands.throttle = -1;
-                setChannelValues(demands, false);
+                setChannelValues(demands);
             }
 
-            virtual void setChannelValues(demands_t & demands, bool armed) = 0;
+            virtual void setChannelValues(demands_t & demands) = 0;
 
     }; // class RXProxy
 

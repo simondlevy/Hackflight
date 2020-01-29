@@ -29,17 +29,8 @@ namespace hf {
 
         protected:
 
-            virtual void setChannelValues(demands_t & demands, bool armed) override
+            virtual void setChannelValues(demands_t & demands) override
             {
-
-                /*
-                _channels[0] = val2int(demands.throttle);
-                _channels[1] = val2int(demands.roll);
-                _channels[2] = val2int(demands.pitch);
-                _channels[3] = val2int(demands.yaw);
-
-                _channels[4] = armed ? MAXVAL : MINVAL; // Aux1
-                */
             }
 
         public:
