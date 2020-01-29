@@ -49,7 +49,6 @@ namespace hf {
 
             // Safety
             bool _safeToArm = false;
-            bool _failsafe = false;
 
             // Support for headless mode
             float _yawInitial = 0;
@@ -113,10 +112,10 @@ namespace hf {
                 _receiver->begin();
 
                 // Setup failsafe
-                _failsafe = false;
+                _state.failsafe = false;
 
                 // Initialize timer task for PID controllers
-                _pidTask.init(_board, _receiver, _demander, &_state, &_failsafe);
+                _pidTask.init(_board, _receiver, _demander, &_state);
             }
 
             void addSensor(Sensor * sensor) 
@@ -130,7 +129,7 @@ namespace hf {
                 if (_receiver->lostSignal() && _state.armed) {
                     _demander->cut();
                     _state.armed = false;
-                    _failsafe = true;
+                    _state.failsafe = true;
                     _board->showArmedStatus(false);
                     return;
                 }
@@ -153,7 +152,7 @@ namespace hf {
 
                 // Arm (after lots of safety checks!)
                 if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux1State() && 
-                        !_failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
+                        !_state.failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
                     _state.armed = true;
                     _yawInitial = _state.rotation[AXIS_YAW]; // grab yaw for headless mode
                 }

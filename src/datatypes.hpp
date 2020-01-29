@@ -39,7 +39,8 @@ namespace hf {
 
     typedef struct {
 
-        bool  armed;
+        bool armed;
+        bool failsafe;
 
         float location[3];
         float rotation[3]; 

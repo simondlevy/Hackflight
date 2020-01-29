@@ -40,7 +40,6 @@ namespace hf {
             Receiver * _receiver = NULL;
             Demander * _demander = NULL;
             state_t  * _state    = NULL;
-            bool     * _failsafe = NULL;
 
         protected:
 
@@ -50,14 +49,13 @@ namespace hf {
                 _pid_controller_count = 0;
             }
 
-            void init(Board * board, Receiver * receiver, Demander * demander, state_t * state, bool * failsafe)
+            void init(Board * board, Receiver * receiver, Demander * demander, state_t * state)
             {
                 TimerTask::init(board);
 
                 _receiver = receiver;
                 _demander = demander;
                 _state = state;
-                _failsafe = failsafe;
             }
 
             void addPidController(PidController * pidController, uint8_t auxState) 
@@ -107,7 +105,7 @@ namespace hf {
                 _board->flashLed(shouldFlash);
 
                 // Use updated demands to run motors
-                if (_state->armed && !(*_failsafe) && !_receiver->throttleIsDown()) {
+                if (_state->armed && !_state->failsafe && !_receiver->throttleIsDown()) {
                     _demander->run(demands);
                 }
              }
