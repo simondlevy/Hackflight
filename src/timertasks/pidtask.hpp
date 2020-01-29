@@ -65,13 +65,6 @@ namespace hf {
                 _pid_controllers[_pid_controller_count++] = pidController;
             }
 
-            void setReceiverDemands()
-            {
-                for (uint8_t k=0; k<_pid_controller_count; ++k) {
-                    _pid_controllers[k]->updateReceiver(_receiver->throttleIsDown());
-                }
-            }
-
             virtual void doTask(void) override
             {
                 // Start with demands from receiver, scaling roll/pitch/yaw by constant
@@ -90,6 +83,9 @@ namespace hf {
                 for (uint8_t k=0; k<_pid_controller_count; ++k) {
 
                     PidController * pidController = _pid_controllers[k];
+
+                    // Some PID controllers need to reset their integral when the throttle is down
+                    pidController->updateReceiver(_receiver->throttleIsDown());
 
                     if (pidController->auxState <= auxState) {
 

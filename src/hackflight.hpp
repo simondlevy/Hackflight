@@ -137,9 +137,6 @@ namespace hf {
                 // Check whether receiver data is available
                 if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
 
-                // Update PID controllers with receiver demands
-                _pidTask.setReceiverDemands();
-
                 // Disarm
                 if (_state.armed && !_receiver->getAux1State()) {
                     _state.armed = false;
