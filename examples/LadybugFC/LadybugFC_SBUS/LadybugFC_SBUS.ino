@@ -30,7 +30,7 @@
 
 #include <Arduino.h>
 
-#include "hackflight.hpp"
+#include "hackflightfull.hpp"
 #include "boards/realboards/arduino/ladybugfc.hpp"
 #include "receivers/arduino/sbus.hpp"
 #include "mixers/quadxcf.hpp"
@@ -40,7 +40,7 @@
 static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,4,5};
 static constexpr float DEMAND_SCALE = 1.0f;
 
-hf::Hackflight h;
+hf::HackflightFull h;
 
 hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, DEMAND_SCALE);
 

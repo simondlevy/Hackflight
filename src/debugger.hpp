@@ -33,7 +33,7 @@ namespace hf {
 
     class Debugger {
 
-        friend class HackflightBase;
+        friend class Hackflight;
 
         private:
 

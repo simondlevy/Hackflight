@@ -28,7 +28,7 @@ namespace hf {
 
     class Gyrometer : public SurfaceMountSensor {
 
-        friend class Hackflight;
+        friend class HackflightFull;
 
         private:
 

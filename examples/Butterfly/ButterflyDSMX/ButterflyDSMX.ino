@@ -30,7 +30,7 @@
 
 #include <Arduino.h>
 
-#include "hackflight.hpp"
+#include "hackflightfull.hpp"
 #include "boards/realboards/arduino/butterfly.hpp"
 #include "imus/usfs.hpp"
 #include "receivers/arduino/dsmx_serial1.hpp"
@@ -42,7 +42,7 @@
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 8.58f;
 
-hf::Hackflight h;
+hf::HackflightFull h;
 
 hf::USFS imu;
 

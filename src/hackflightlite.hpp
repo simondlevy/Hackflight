@@ -20,12 +20,12 @@
 
 #pragma once
 
-#include "hackflightbase.hpp"
+#include "hackflight.hpp"
 #include "rxproxy.hpp"
 
 namespace hf {
 
-    class HackflightLite : public HackflightBase {
+    class HackflightLite : public Hackflight {
 
         private:
 
@@ -37,7 +37,7 @@ namespace hf {
             void init(Board * board, Receiver * receiver, RXProxy * proxy) 
             {
                 // Do general initialization
-                HackflightBase::init(board, receiver, proxy);
+                Hackflight::init(board, receiver, proxy);
 
                 _proxy = proxy;
             }
@@ -45,7 +45,7 @@ namespace hf {
             void update(void)
             {
                 // Run common update functions
-                HackflightBase::update();
+                Hackflight::update();
 
                 runPidControllers();
 

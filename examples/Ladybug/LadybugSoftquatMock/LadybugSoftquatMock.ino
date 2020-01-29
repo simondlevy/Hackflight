@@ -29,14 +29,14 @@ Copyright (c) 2020 Simon D. Levy
 
 #include <Arduino.h>
 
-#include "hackflight.hpp"
+#include "hackflightfull.hpp"
 #include "boards/realboards/arduino/ladybug.hpp"
 #include "receivers/mock.hpp"
 #include "imus/softquats/mpu9250.hpp"
 #include "mixers/quadxcf.hpp"
 #include "motors/mock.hpp"
 
-hf::Hackflight h;
+hf::HackflightFull h;
 
 hf::MPU9250SoftwareQuaternionIMU imu;
 

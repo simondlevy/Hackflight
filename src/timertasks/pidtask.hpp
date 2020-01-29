@@ -26,7 +26,7 @@ namespace hf {
 
     class PidTask : public TimerTask {
 
-        friend class HackflightBase;
+        friend class Hackflight;
 
         private:
 

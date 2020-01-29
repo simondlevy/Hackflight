@@ -21,7 +21,6 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hackflight.hpp"
 #include "motors/brushed.hpp"
 
 static uint8_t MOTOR_PIN = 13; // Motor 1: right rear

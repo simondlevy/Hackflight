@@ -39,7 +39,7 @@ namespace hf {
         // AY: roll right +,    left -
         // AZ: rightside-up +,  upside-down -
 
-        friend class Hackflight;
+        friend class HackflightFull;
         friend class Quaternion;
         friend class Gyrometer;
 

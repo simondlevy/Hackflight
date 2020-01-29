@@ -28,7 +28,7 @@ namespace hf {
 
     class Mixer : protected Demander {
 
-        friend class Hackflight;
+        friend class HackflightFull;
         friend class SerialTask;
 
         private:

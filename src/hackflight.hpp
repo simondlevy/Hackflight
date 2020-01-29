@@ -1,5 +1,5 @@
 /*
-   Hackflight "full monty" support (receiver, IMU, mixer, motors)
+   Hackflight core algorithm: receiver, sensors, PID controllers
 
    Copyright (c) 2020 Simon D. Levy
 
@@ -20,113 +20,170 @@
 
 #pragma once
 
-#include "hackflightbase.hpp"
-#include "imu.hpp"
-#include "mspparser.hpp"
-#include "mixer.hpp"
-#include "motor.hpp"
+#include "debugger.hpp"
+#include "board.hpp"
+#include "demander.hpp"
+#include "receiver.hpp"
+#include "datatypes.hpp"
 #include "pidcontroller.hpp"
-#include "timertasks/serialtask.hpp"
-#include "sensors/surfacemount/gyrometer.hpp"
-#include "sensors/surfacemount/quaternion.hpp"
+#include "sensors/surfacemount.hpp"
+#include "timertasks/pidtask.hpp"
 
 namespace hf {
 
-    class Hackflight : public HackflightBase {
+    class Hackflight {
 
-        private: 
+        private:
 
-            // Passed to Hackflight::init() for a particular build
-            IMU        * _imu      = NULL;
-            Mixer      * _mixer    = NULL;
+            static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
 
-            // Serial timer task for GCS
-            SerialTask _serialTask;
+            // Supports periodic ad-hoc debugging
+            Debugger _debugger;
 
-             // Mandatory sensors on the board
-            Gyrometer _gyrometer;
-            Quaternion _quaternion; // not really a sensor, but we treat it like one!
+            // Mixer or receiver proxy
+            Demander * _demander = NULL;
 
-            void checkQuaternion(void)
+            // Sensors 
+            Sensor * _sensors[256] = {NULL};
+            uint8_t _sensor_count = 0;
+
+            // Safety
+            bool _safeToArm = false;
+            bool _failsafe = false;
+
+            // Support for headless mode
+            float _yawInitial = 0;
+
+            // Timer task for PID controllers
+            PidTask _pidTask;
+
+            bool safeAngle(uint8_t axis)
             {
-                // Some quaternion filters may need to know the current time
-                float time = _board->getTime();
+                return fabs(_state.rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
+            }
 
-                // If quaternion data ready
-                if (_quaternion.ready(time)) {
+        protected:
 
-                    // Adjust quaternion values based on IMU orientation
-                    _board->adjustQuaternion(_quaternion._w, _quaternion._x, _quaternion._y, _quaternion._z);
+            Board      * _board    = NULL;
+            Receiver   * _receiver = NULL;
 
-                    // Update state with new quaternion to yield Euler angles
-                    _quaternion.modifyState(_state, time);
+            // Vehicle state
+            state_t _state;
 
-                    // Adjust Euler angles to compensate for sloppy IMU mounting
-                    _board->adjustRollAndPitch(_state.rotation[0], _state.rotation[1]);
+            void checkOptionalSensors(void)
+            {
+                for (uint8_t k=0; k<_sensor_count; ++k) {
+                    Sensor * sensor = _sensors[k];
+                    float time = _board->getTime();
+                    if (sensor->ready(time)) {
+                        sensor->modifyState(_state, time);
+                    }
                 }
             }
 
-            void checkGyrometer(void)
+            void add_sensor(Sensor * sensor)
             {
-                // Some gyrometers may need to know the current time
-                float time = _board->getTime();
-
-                // If gyrometer data ready
-                if (_gyrometer.ready(time)) {
-
-                    // Adjust gyrometer values based on IMU orientation
-                    _board->adjustGyrometer(_gyrometer._x, _gyrometer._y, _gyrometer._z);
-
-                    // Update state with gyro rates
-                    _gyrometer.modifyState(_state, time);
-                }
+                _sensors[_sensor_count++] = sensor;
             }
 
-        public:
+            void add_sensor(SurfaceMountSensor * sensor, IMU * imu) 
+            {
+                add_sensor(sensor);
 
-            void init(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor ** motors, bool armed=false)
+                sensor->imu = imu;
+            }
+
+            void init(Board * board, Receiver * receiver, Demander * demander)
             {  
-                // Do general initialization
-                HackflightBase::init(board, receiver, mixer);
+                // Store the essentials
+                _board    = board;
+                _receiver = receiver;
+                _demander = demander;
 
-                // Store pointers to IMU, mixer
-                _imu   = imu;
-                _mixer = mixer;
+                // Ad-hoc debugging support
+                _debugger.init(board);
 
-                // Initialize serial timer task
-                _serialTask.init(board, &_state, mixer, receiver);
+                // Support adding new sensors and PID controllers
+                _sensor_count = 0;
 
-                // Support safety override by simulator
-                _state.armed = armed;
+                // Initialize state
+                memset(&_state, 0, sizeof(state_t));
 
-                // Support for mandatory sensors
-                add_sensor(&_quaternion, imu);
-                add_sensor(&_gyrometer, imu);
+                // Initialize the receiver
+                _receiver->begin();
 
-                // Start the IMU
-                imu->begin();
+                // Setup failsafe
+                _failsafe = false;
 
-                // Tell the mixer which motors to use, and initialize them
-                mixer->useMotors(motors);
+                // Initialize timer task for PID controllers
+                _pidTask.init(_board, _receiver, _demander, &_state, &_failsafe);
+            }
 
-            } // init
+            void addSensor(Sensor * sensor) 
+            {
+                add_sensor(sensor);
+            }
+
+            void checkReceiver(void)
+            {
+                // Sync failsafe to receiver
+                if (_receiver->lostSignal() && _state.armed) {
+                    _demander->cut();
+                    _state.armed = false;
+                    _failsafe = true;
+                    _board->showArmedStatus(false);
+                    return;
+                }
+
+                // Check whether receiver data is available
+                if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
+
+                // Update PID controllers with receiver demands
+                _pidTask.setReceiverDemands();
+
+                // Disarm
+                if (_state.armed && !_receiver->getAux1State()) {
+                    _state.armed = false;
+                } 
+
+                // Avoid arming if aux2 switch down on startup
+                if (!_safeToArm) {
+                    _safeToArm = !_receiver->getAux1State();
+                }
+
+                // Arm (after lots of safety checks!)
+                if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux1State() && 
+                        !_failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
+                    _state.armed = true;
+                    _yawInitial = _state.rotation[AXIS_YAW]; // grab yaw for headless mode
+                }
+
+                // Cut motors on throttle-down
+                if (_state.armed && _receiver->throttleIsDown()) {
+                    _demander->cut();
+                }
+
+                // Set LED based on arming status
+                _board->showArmedStatus(_state.armed);
+
+            } // checkReceiver
 
             void update(void)
             {
-                // Run common update functions
-                HackflightBase::update();
+                // Grab control signal if available
+                checkReceiver();
 
-                // Check mandatory sensors
-                checkGyrometer();
-                checkQuaternion();
+                // Update PID controllers task
+                _pidTask.update();
+             }
 
-                // Check optional sensors
-                checkOptionalSensors();
+        public:
 
-                // Update serial comms task
-                _serialTask.update();
-            } 
+            void addPidController(PidController * pidController, uint8_t auxState=0) 
+            {
+                _pidTask.addPidController(pidController, auxState);
+            }
 
-    }; // class Hackflight
+     }; // class Hackflight
 
 } // namespace

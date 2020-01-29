@@ -20,7 +20,7 @@
 
 #include <Arduino.h>
 
-#include "hackflight.hpp"
+#include "hackflightfull.hpp"
 #include "boards/realboards/arduino/ladybugfc.hpp"
 #include "receivers/arduino/dsmx_serial1.hpp"
 #include "sensors/rangefinders/vl53l1x.hpp"
@@ -32,7 +32,7 @@
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 1.0f;
 
-hf::Hackflight h;
+hf::HackflightFull h;
 
 hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);
 
