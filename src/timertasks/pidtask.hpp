@@ -68,7 +68,7 @@ namespace hf {
             void setReceiverDemands()
             {
                 for (uint8_t k=0; k<_pid_controller_count; ++k) {
-                    _pid_controllers[k]->updateReceiver(_receiver->demands, _receiver->throttleIsDown());
+                    _pid_controllers[k]->updateReceiver(_receiver->throttleIsDown());
                 }
             }
 

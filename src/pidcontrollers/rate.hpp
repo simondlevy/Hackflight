@@ -97,12 +97,12 @@ namespace hf {
                 }
             }
 
-            virtual void updateReceiver(demands_t & demands, bool throttleIsDown) override
+            virtual void updateReceiver(bool throttleIsDown) override
             {
                 // Check throttle-down for integral reset
-                _rollPid.updateReceiver(demands, throttleIsDown);
-                _pitchPid.updateReceiver(demands, throttleIsDown);
-                _yawPid.updateReceiver(demands, throttleIsDown);
+                _rollPid.updateReceiver(throttleIsDown);
+                _pitchPid.updateReceiver(throttleIsDown);
+                _yawPid.updateReceiver(throttleIsDown);
             }
 
     };  // class RatePid

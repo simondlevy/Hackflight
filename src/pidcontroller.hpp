@@ -37,7 +37,7 @@ namespace hf {
 
             virtual bool shouldFlashLed(void) { return false; }
 
-            virtual void updateReceiver(demands_t & demands, bool throttleIsDown) { (void)demands; (void)throttleIsDown; }
+            virtual void updateReceiver(bool throttleIsDown) { (void)throttleIsDown; }
 
             uint8_t auxState = 0;
 
@@ -107,10 +107,8 @@ namespace hf {
                 return pterm + iterm + dterm;
             }
 
-            void updateReceiver(demands_t & demands, bool throttleIsDown)
+            void updateReceiver(bool throttleIsDown)
             {
-                (void)demands; 
-
                 // When landed, reset integral component of PID
                 if (throttleIsDown) {
                     reset();
