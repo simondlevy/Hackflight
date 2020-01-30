@@ -42,7 +42,7 @@ namespace hf {
 
             virtual void setChannelValues(demands_t & demands) = 0;
 
-            virtual void setArmed(bool armed) = 0;
+            virtual void sendDisarmed(void) = 0;
 
     }; // class RXProxy
 

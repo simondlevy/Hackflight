@@ -31,10 +31,13 @@ namespace hf {
 
             virtual void setChannelValues(demands_t & demands) override
             {
+                Serial.println(demands.throttle);
             }
 
-            virtual void setArmed(bool armed) override
+            virtual void sendDisarmed(void) override
             {
+                static uint32_t count;
+                Serial.println(count++);
             }
 
         public:

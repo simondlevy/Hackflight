@@ -31,24 +31,6 @@ namespace hf {
 
             RXProxy * _proxy = NULL;
 
-            bool _wasArmed = false;
-
-            void checkArmingChange(void)
-            {
-                if (_state.armed) {
-                    if (!_wasArmed) {
-                        Debugger::printf("arm\n");
-                    }
-                    _wasArmed = true;
-                }
-                else {
-                    if (_wasArmed) {
-                        Debugger::printf("disarm\n");
-                    }
-                    _wasArmed = false;
-                }
-            }
-
        public:
 
             void init(Board * board, Receiver * receiver, RXProxy * proxy) 
@@ -58,9 +40,6 @@ namespace hf {
 
                 // Store proxy for arming check
                 _proxy = proxy;
-
-                // Set up for arming change
-                _wasArmed = false;
             }
 
             void update(void)
@@ -68,8 +47,10 @@ namespace hf {
                 // Run common update functions
                 Hackflight::update();
 
-                // Check for dis/arm
-                checkArmingChange();
+                // Use proxy to send the correct channel values when not armed
+                if (!_state.armed) {
+                    _proxy->sendDisarmed();
+                }
             }
 
     }; // class HackflightLite
