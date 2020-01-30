@@ -27,6 +27,10 @@ namespace hf {
 
     class SbusProxy : public RXProxy {
 
+        private:
+
+            SBUS sbus = SBUS(Serial1);
+
         protected:
 
             virtual void setChannelValues(demands_t & demands) override
@@ -36,15 +40,14 @@ namespace hf {
 
             virtual void sendDisarmed(void) override
             {
-                static uint32_t count;
-                Serial.println(count++);
+                Serial.println(millis());
             }
 
         public:
 
             void begin(void)
             {
-                //sbus.begin();
+                sbus.begin();
             }
 
     }; // class SbusProxy
