@@ -28,8 +28,6 @@ namespace hf {
 
         friend class HackflightLite;
 
-        protected:
-
             void run(demands_t demands) override
             {
                 setChannelValues(demands);
@@ -43,6 +41,8 @@ namespace hf {
             }
 
             virtual void setChannelValues(demands_t & demands) = 0;
+
+            virtual void setArmed(bool armed) = 0;
 
     }; // class RXProxy
 

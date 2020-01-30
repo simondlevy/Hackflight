@@ -106,7 +106,6 @@ namespace hf {
                 }
              }
 
-
     };  // PidTask
 
 } // namespace hf

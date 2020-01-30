@@ -63,8 +63,8 @@ namespace hf {
 
         protected:
 
-            Board      * _board    = NULL;
-            Receiver   * _receiver = NULL;
+            Board    * _board    = NULL;
+            Receiver * _receiver = NULL;
 
             // Vehicle state
             state_t _state;

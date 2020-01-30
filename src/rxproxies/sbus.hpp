@@ -33,6 +33,10 @@ namespace hf {
             {
             }
 
+            virtual void setArmed(bool armed) override
+            {
+            }
+
         public:
 
             void begin(void)

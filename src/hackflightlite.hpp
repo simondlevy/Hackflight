@@ -27,18 +27,49 @@ namespace hf {
 
     class HackflightLite : public Hackflight {
 
-        public:
+        private:
+
+            RXProxy * _proxy = NULL;
+
+            bool _wasArmed = false;
+
+            void checkArmingChange(void)
+            {
+                if (_state.armed) {
+                    if (!_wasArmed) {
+                        Debugger::printf("arm\n");
+                    }
+                    _wasArmed = true;
+                }
+                else {
+                    if (_wasArmed) {
+                        Debugger::printf("disarm\n");
+                    }
+                    _wasArmed = false;
+                }
+            }
+
+       public:
 
             void init(Board * board, Receiver * receiver, RXProxy * proxy) 
             {
                 // Do general initialization
                 Hackflight::init(board, receiver, proxy);
+
+                // Store proxy for arming check
+                _proxy = proxy;
+
+                // Set up for arming change
+                _wasArmed = false;
             }
 
             void update(void)
             {
                 // Run common update functions
                 Hackflight::update();
+
+                // Check for dis/arm
+                checkArmingChange();
             }
 
     }; // class HackflightLite
