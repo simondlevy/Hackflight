@@ -31,22 +31,40 @@ namespace hf {
 
             SBUS sbus = SBUS(Serial1);
 
+            float _chanvals[16] = {};
+
+            void sendChannelValues(void)
+            {
+                sbus.writeCal(_chanvals);
+            }
+
         protected:
 
             virtual void setChannelValues(demands_t & demands) override
             {
-                Serial.println(demands.throttle);
+                _chanvals[0] = demands.throttle;
+                _chanvals[1] = demands.roll;
+                _chanvals[2] = demands.pitch;
+                _chanvals[3] = demands.yaw;
+
+                _chanvals[4] = +1.0;
+
+                sendChannelValues();
             }
 
             virtual void sendDisarmed(void) override
             {
-                Serial.println(millis());
+                _chanvals[4] = -1.0; // Aux1
+
+                sendChannelValues();
             }
 
         public:
 
             void begin(void)
             {
+                memset(_chanvals, 0, 16*sizeof(float));
+
                 sbus.begin();
             }
 
