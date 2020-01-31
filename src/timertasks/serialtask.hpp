@@ -48,9 +48,7 @@ namespace hf {
             {
                 while (_board->serialAvailableBytes() > 0) {
 
-                    if (MspParser::parse(_board->serialReadByte())) {
-                        _board->reboot(); // parser returns true when reboot requested
-                    }
+                    MspParser::parse(_board->serialReadByte());
                 }
 
                 while (MspParser::availableBytes() > 0) {

@@ -44,14 +44,6 @@ namespace hf {
             virtual uint8_t serialReadByte(void)  { return 1; }
             virtual void    serialWriteByte(uint8_t c) { (void)c; }
 
-            // --------------------------- Adjust IMU readings based on IMU mounting ------------------------------------
-            virtual void adjustGyrometer(float & gx, float & gy, float & gz) { (void)gx; (void)gy; (void)gz; }
-            virtual void adjustQuaternion(float & qw, float & qx, float & qy, float & qz) { (void)qw; (void)qx; (void)qy; (void)qz; }
-            virtual void adjustRollAndPitch(float & roll, float & pitch) { (void)roll; (void)pitch; }
-
-            //------------------------------- Reboot for non-Arduino boards ---------------------------------------------
-            virtual void reboot(void) { }
-
             //----------------------------------------- Safety -----------------------------------------------------------
             virtual void showArmedStatus(bool armed) { (void)armed; }
             virtual void flashLed(bool shouldflash) { (void)shouldflash; }

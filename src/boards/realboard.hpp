@@ -160,12 +160,6 @@ namespace hf {
                 }
             }
  
-            virtual void adjustRollAndPitch(float & roll, float & pitch) override
-            {
-                pitch += _pitchAdjustRadians;
-                roll  += _rollAdjustRadians;
-            }
-
         public:
 
             /**
