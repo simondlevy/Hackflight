@@ -26,16 +26,18 @@
 
 #include <Arduino.h>
 
+#include <i2c_t3.h>
+
 #include "hackflightfull.hpp"
 #include "boards/realboards/arduino/teensy40.hpp"
-#include "imus/mock.hpp"
+#include "imus/usfs.hpp"
 #include "receivers/mock.hpp"
 #include "motors/mock.hpp"
 #include "mixers/quadxcf.hpp"
 
 hf::HackflightFull h;
 
-hf::MockIMU imu;
+hf::USFS imu;
 
 hf::MockReceiver rc;
 
@@ -50,11 +52,18 @@ hf::Motor * motors[4] = { &motor1, &motor2, &motor3, &motor4 };
 
 void setup(void)
 {
-    // Initialize Hackflight firmware
+    hf::ArduinoBoard::powerPins(21, 22);
+
+    delay(100);
+
+    Wire.begin();
+
+    delay(100);
+
     h.init(new hf::Teensy40(), &imu, &rc, &mixer, motors);
 }
 
-void loop(void)
-{
+void loop()
+{  
     h.update();
 }
