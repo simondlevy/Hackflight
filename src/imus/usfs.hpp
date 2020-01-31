@@ -51,6 +51,12 @@ namespace hf {
                 }
             }
 
+        protected:
+
+            // Handle upside-down mounting
+            virtual void adjustGyrometer(float & gx, float & gy, float & gz) { (void)gx; (void)gy; (void)gz;  }
+            virtual void adjustQuaternion(float & qw, float & qx, float & qy, float & qz) { (void)qw; (void)qx; (void)qy; (void)qz;  }
+
         public:
 
             virtual bool getGyrometer(float & gx, float & gy, float & gz) override
@@ -68,6 +74,8 @@ namespace hf {
                     gy = radians(gy);
                     gz = radians(gz);
 
+                    adjustGyrometer(gx, gy, gz);
+
                     return true;
                 }
 
@@ -81,6 +89,8 @@ namespace hf {
                 if (_sentral.gotQuaternion()) {
 
                     _sentral.readQuaternion(qw, qx, qy, qz);
+
+                    adjustQuaternion(qw, qx, qy, qz);
 
                     return true;
                 }

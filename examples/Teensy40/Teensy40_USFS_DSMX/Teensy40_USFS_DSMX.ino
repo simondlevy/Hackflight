@@ -30,7 +30,7 @@
 
 #include "hackflightfull.hpp"
 #include "boards/realboards/arduino/teensy40.hpp"
-#include "imus/usfs.hpp"
+#include "imus/usfs_inverted.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "motors/mock.hpp"
 #include "mixers/quadxcf.hpp"
@@ -40,7 +40,7 @@ static constexpr float DEMAND_SCALE = 8.58f;
 
 hf::HackflightFull h;
 
-hf::USFS imu;
+hf::USFS_Inverted imu;
 
 hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
