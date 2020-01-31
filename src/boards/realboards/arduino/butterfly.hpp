@@ -1,7 +1,5 @@
 /*
-   Butterfly Flight Controller implementation of Hackflight Board routines
-
-   Uses EM7180 SENtral Sensor Hub in master mode mode
+   Butterfly implementation of Hackflight Board routines
 
    Copyright (c) 2018 Simon D. Levy
 
