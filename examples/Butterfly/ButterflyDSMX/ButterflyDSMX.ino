@@ -44,7 +44,8 @@ static constexpr float DEMAND_SCALE = 8.58f;
 
 hf::HackflightFull h;
 hf::USFS imu;
-hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
+hf::DSMX_Receiver_Serial1 rc = 
+    hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 hf::MixerQuadXCF mixer;
 hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f); 
 hf::LevelPid levelPid = hf::LevelPid(0.20f);
