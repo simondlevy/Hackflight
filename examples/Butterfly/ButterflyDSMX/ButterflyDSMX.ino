@@ -43,22 +43,13 @@ static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 8.58f;
 
 hf::HackflightFull h;
-
 hf::USFS imu;
-
 hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
-
 hf::MixerQuadXCF mixer;
-
 hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f); 
-
 hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
-hf::StandardMotor motor1(5);
-hf::StandardMotor motor2(8);
-hf::StandardMotor motor3(9);
-hf::StandardMotor motor4(11);
-
+hf::StandardMotor motor1(5), motor2(8), motor3(9), motor4(11);
 hf::Motor * motors[4] = { &motor1, &motor2, &motor3, &motor4 };
 
 void setup(void)
