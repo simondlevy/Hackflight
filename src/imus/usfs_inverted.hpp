@@ -26,14 +26,30 @@ namespace hf {
 
     class USFS_Inverted : public USFS {
 
+        private:
+
+            void swap(float & a, float & b)
+            {
+                float tmp = a;
+                a = b;
+                b = tmp;
+            }
+
         protected:
 
             virtual void adjustGyrometer(float & gx, float & gy, float & gz) override
             { 
+                gy = -gy;
+                gz = -gz;
             }
 
             virtual void adjustQuaternion(float & qw, float & qx, float & qy, float & qz) override
             { 
+                swap(qw, qx);
+                swap(qy, qz);
+
+                qx = -qx;
+                qy = -qy;
             }
 
     }; // class USFS_Inverted
