@@ -36,14 +36,18 @@ void setup(void)
     DSHOT_init(1);
 
     telem = 0;
-    val = 48;
+    val = 0;
 
     dir = +1;
 }
 
 void loop(void)
 {
-    DSHOT_send(&val, &telem);
+    static int count;
+
+    if (count++<500) {
+        DSHOT_send(&val, &telem);
+    }
 
     /*
     val[0] += dir;
