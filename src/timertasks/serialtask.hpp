@@ -30,7 +30,7 @@ namespace hf {
 
     class SerialTask : public TimerTask, public MspParser {
 
-        friend class HackflightFull;
+        friend class Hackflight;
 
         private:
 

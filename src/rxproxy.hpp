@@ -20,13 +20,11 @@
 
 #pragma once
 
-#include "hackflightlite.hpp"
-
 namespace hf {
 
     class RXProxy : protected Demander {
 
-        friend class HackflightLite;
+        friend class Hackflight;
 
             void run(demands_t demands) override
             {

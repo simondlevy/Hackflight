@@ -33,7 +33,7 @@ namespace hf {
 
     class Quaternion : public SurfaceMountSensor {
 
-        friend class HackflightFull;
+        friend class Hackflight;
 
         private:
 

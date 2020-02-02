@@ -30,7 +30,7 @@ Copyright (c) 2018 Simon D. Levy
 
 #include <Arduino.h>
 
-#include "hackflightfull.hpp"
+#include "hackflight.hpp"
 #include "boards/realboards/arduino/ladybugfc.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "mixers/quadxcf.hpp"
@@ -40,7 +40,7 @@ Copyright (c) 2018 Simon D. Levy
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 4.0f;
 
-hf::HackflightFull h;
+hf::Hackflight h;
 
 hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 

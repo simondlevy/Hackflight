@@ -25,7 +25,7 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hackflightfull.hpp"
+#include "hackflight.hpp"
 #include "boards/realboards/tinypico.hpp"
 #include "receivers/arduino/dsmx.hpp"
 #include "mixers/quadxcf.hpp"
@@ -41,7 +41,7 @@ static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 static constexpr float DEMAND_SCALE = 8.0f;
 
-hf::HackflightFull h;
+hf::Hackflight h;
 
 hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
 
