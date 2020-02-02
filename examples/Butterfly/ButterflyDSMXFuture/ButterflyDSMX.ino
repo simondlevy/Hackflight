@@ -40,9 +40,9 @@
 #include "pidcontrollers/level.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
-static constexpr float DEMAND_SCALE = 8.58f;
+static constexpr float DEMAND_SCALE = 8.0;
 
-hf::HackflightFull h;
+hf::Hackflight h;
 hf::USFS imu;
 hf::DSMX_Receiver_Serial1 rc = 
     hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
@@ -55,10 +55,8 @@ hf::Motor * motors[4] = { &motor1, &motor2, &motor3, &motor4 };
 
 void setup(void)
 {
-    // Initialize Hackflight firmware
     h.init(new hf::Butterfly(), &imu, &rc, &mixer, motors);
 
-    // Add Rate and Level PID controllers
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
 }
