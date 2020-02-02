@@ -21,10 +21,40 @@
 #include <Arduino.h>
 #include "DSHOT.h"
 
+static int8_t   dir;
+
+static const uint16_t MINVAL = 48;
+static const uint16_t MAXVAL = 2047;
+
+static uint8_t telem;
+static uint16_t val;
+
 void setup(void)
 {
+    Serial.begin(115200);
+
+    DSHOT_init(1);
+
+    telem = 0;
+    val = 48;
+
+    dir = +1;
 }
 
 void loop(void)
 {
+    DSHOT_send(&val, &telem);
+
+    /*
+    val[0] += dir;
+
+    if (val[0] == MAXVAL) {
+        dir = -1;
+    }
+
+    if (val[0] == MINVAL) {
+        dir = +1;
+    }
+    */
+    delay(10);
 }
