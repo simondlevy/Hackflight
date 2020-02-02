@@ -1,5 +1,5 @@
 /*
-   Simple test sketch for sending DSHOT600 ESC commands from Teensy4.0
+   Test DSMX => SBUS translation
 
    Copyright (c) 2020 Simon D. Levy
 
@@ -18,38 +18,26 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
-#include "DSHOT.h"
+#include <SBUS.h>
+#include <DSMRX.h>
+
+SBUS sbus = SBUS(Serial1);
 
 void setup(void)
 {
-    Serial.begin(115200);
-
-    DSHOT_init(1);
+    sbus.begin();
 }
 
 void loop(void)
 {
-    static int count;
-    static uint16_t runval;
-    uint8_t telem = 0;
+      static float chanvals[16];
 
-    if (count < 500) {
+      chanvals[0] = -1;
 
-        uint16_t stopval = 0;
-        DSHOT_send(&stopval, &telem);
-        runval = 1049;
-    }
+      chanvals[5] = millis() > 3000 ? +1 : -1;
 
-    else {
+      sbus.writeCal(chanvals);
 
-        for (uint8_t k=0; k<25; ++k) {
-            DSHOT_send(&runval, &telem);
-            delay(10);
-        }
-
-        runval += 1;
-    }
-
-    count++;
+      delay(10);
 }
+
