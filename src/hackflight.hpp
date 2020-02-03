@@ -210,7 +210,16 @@ namespace hf {
 
                 friend class Hackflight;
 
+                private:
+
+                    Hackflight * _h = NULL;
+
                 protected:
+
+                    void init(Hackflight * h) 
+                    {
+                        _h = h;
+                    }
 
                     virtual void update(void) = 0;
 
@@ -218,29 +227,22 @@ namespace hf {
 
             class UpdateFull : protected Updater {
 
+                friend class Hackflight;
+
                 virtual void update(void) override
                 {
-                    // Check mandatory sensors
-                    //checkGyrometer();
-                    //checkQuaternion();
-
-                    // Check optional sensors
-                    //checkOptionalSensors();
-
-                    // Update serial comms task
-                    //_serialTask.update();
+                    _h->updateFull();
                 }
 
             }; // class UpdateFull
 
             class UpdateLite : protected Updater {
 
+                friend class Hackflight;
+
                 virtual void update(void) override
                 {
-                    // Use proxy to send the correct channel values when not armed
-                    //if (!_state.armed) {
-                    //    _proxy->sendDisarmed();
-                    //}
+                    _h->updateLite();
                 }
 
             }; // class UpdateLite
@@ -248,6 +250,27 @@ namespace hf {
             Updater * _updater;
             UpdateFull _updaterFull;
             UpdateLite _updaterLite;
+
+            void updateLite(void)
+            {
+                // Use proxy to send the correct channel values when not armed
+                if (!_state.armed) {
+                    _proxy->sendDisarmed();
+                }
+            }
+
+            void updateFull(void)
+            {
+                // Check mandatory sensors
+                checkGyrometer();
+                checkQuaternion();
+
+                // Check optional sensors
+                checkOptionalSensors();
+
+                // Update serial comms task
+                _serialTask.update();
+            }
 
         public:
 
@@ -276,6 +299,10 @@ namespace hf {
                 // Tell the mixer which motors to use, and initialize them
                 mixer->useMotors(motors);
 
+                // Set the update function
+                _updater = &_updaterFull;
+                _updater->init(this);
+
             } // init
 
             void init(Board * board, Receiver * receiver, RXProxy * proxy) 
@@ -287,6 +314,8 @@ namespace hf {
                 _proxy = proxy;
 
                 // Set the update function
+                _updater = &_updaterLite;
+                _updater->init(this);
             }
 
             void addSensor(Sensor * sensor) 
