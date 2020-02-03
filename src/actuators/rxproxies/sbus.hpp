@@ -35,17 +35,6 @@ namespace hf {
 
             void sendChannelValues(void)
             {
-                Serial.print(_chanvals[0]);
-                Serial.print(" ");
-                Serial.print(_chanvals[1]);
-                Serial.print(" ");
-                Serial.print(_chanvals[2]);
-                Serial.print(" ");
-                Serial.print(_chanvals[3]);
-                Serial.print(" ");
-                Serial.print(_chanvals[5]);
-                Serial.println();
-
                 sbus.writeCal(_chanvals);
             }
 
@@ -70,9 +59,7 @@ namespace hf {
                 sendChannelValues();
             }
 
-        public:
-
-            void begin(void)
+            virtual void begin(void) override
             {
                 memset(_chanvals, 0, 16*sizeof(float));
 

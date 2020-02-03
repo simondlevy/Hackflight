@@ -38,6 +38,8 @@ namespace hf {
                 setChannelValues(demands);
             }
 
+            virtual void begin(void) = 0;
+
             virtual void setChannelValues(demands_t & demands) = 0;
 
             virtual void sendDisarmed(void) = 0;

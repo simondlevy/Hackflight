@@ -313,6 +313,9 @@ namespace hf {
                 // Store proxy for arming check
                 _proxy = proxy;
 
+                // Start proxy
+                _proxy->begin();
+
                 // Set the update function
                 _updater = &_updaterLite;
                 _updater->init(this);
