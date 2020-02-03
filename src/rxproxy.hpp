@@ -22,7 +22,7 @@
 
 namespace hf {
 
-    class RXProxy : protected Demander {
+    class RXProxy : protected Actuator {
 
         friend class Hackflight;
 

@@ -1,5 +1,5 @@
 /*
-   Abstract "Demander" class for mixers and receiver proxies
+   Abstract actuator class for mixers and receiver proxies
 
    Copyright (c) 2020 Simon D. Levy
 
@@ -24,7 +24,7 @@
 
 namespace hf {
 
-    class Demander {
+    class Actuator {
 
         friend class Hackflight;
         friend class PidTask;
@@ -35,6 +35,6 @@ namespace hf {
 
             virtual void run(demands_t demands) = 0;
 
-    }; // class Demander
+    }; // class Actuator
 
 } // namespace hf

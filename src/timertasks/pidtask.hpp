@@ -38,7 +38,7 @@ namespace hf {
 
             // Other stuff we need
             Receiver * _receiver = NULL;
-            Demander * _demander = NULL;
+            Actuator * _actuator = NULL;
             state_t  * _state    = NULL;
 
         protected:
@@ -49,12 +49,12 @@ namespace hf {
                 _pid_controller_count = 0;
             }
 
-            void init(Board * board, Receiver * receiver, Demander * demander, state_t * state)
+            void init(Board * board, Receiver * receiver, Actuator * actuator, state_t * state)
             {
                 TimerTask::init(board);
 
                 _receiver = receiver;
-                _demander = demander;
+                _actuator = actuator;
                 _state = state;
             }
 
@@ -102,7 +102,7 @@ namespace hf {
 
                 // Use updated demands to run motors
                 if (_state->armed && !_state->failsafe && !_receiver->throttleIsDown()) {
-                    _demander->run(demands);
+                    _actuator->run(demands);
                 }
              }
 

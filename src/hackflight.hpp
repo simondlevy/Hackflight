@@ -24,7 +24,7 @@
 #include "mspparser.hpp"
 #include "imu.hpp"
 #include "board.hpp"
-#include "demander.hpp"
+#include "actuator.hpp"
 #include "receiver.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
@@ -49,7 +49,7 @@ namespace hf {
             Debugger _debugger;
 
             // Mixer or receiver proxy
-            Demander * _demander = NULL;
+            Actuator * _actuator = NULL;
 
             RXProxy * _proxy = NULL;
 
@@ -138,12 +138,12 @@ namespace hf {
                 sensor->imu = imu;
             }
 
-            void init(Board * board, Receiver * receiver, Demander * demander)
+            void init(Board * board, Receiver * receiver, Actuator * actuator)
             {  
                 // Store the essentials
                 _board    = board;
                 _receiver = receiver;
-                _demander = demander;
+                _actuator = actuator;
 
                 // Ad-hoc debugging support
                 _debugger.init(board);
@@ -161,14 +161,14 @@ namespace hf {
                 _state.failsafe = false;
 
                 // Initialize timer task for PID controllers
-                _pidTask.init(_board, _receiver, _demander, &_state);
+                _pidTask.init(_board, _receiver, _actuator, &_state);
             }
 
             void checkReceiver(void)
             {
                 // Sync failsafe to receiver
                 if (_receiver->lostSignal() && _state.armed) {
-                    _demander->cut();
+                    _actuator->cut();
                     _state.armed = false;
                     _state.failsafe = true;
                     _board->showArmedStatus(false);
@@ -197,7 +197,7 @@ namespace hf {
 
                 // Cut motors on throttle-down
                 if (_state.armed && _receiver->throttleIsDown()) {
-                    _demander->cut();
+                    _actuator->cut();
                 }
 
                 // Set LED based on arming status
