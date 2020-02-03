@@ -22,13 +22,13 @@
 
 #include "filters.hpp"
 #include "motor.hpp"
-#include "demander.hpp"
+#include "actuator.hpp"
 
 namespace hf {
 
-    class Mixer : protected Demander {
+    class Mixer : protected Actuator {
 
-        friend class HackflightFull;
+        friend class Hackflight;
         friend class SerialTask;
 
         private:
@@ -101,7 +101,7 @@ namespace hf {
                 }
             }
 
-            // Demander overrides ----------------------------------------------
+            // Actuator overrides ----------------------------------------------
 
             void run(demands_t demands) override
             {

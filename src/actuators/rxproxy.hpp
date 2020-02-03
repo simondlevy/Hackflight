@@ -1,5 +1,5 @@
 /*
-   Abstract "Demander" class for mixers and receiver proxies
+   RXProxy class
 
    Copyright (c) 2020 Simon D. Levy
 
@@ -20,21 +20,28 @@
 
 #pragma once
 
-#include "datatypes.hpp"
-
 namespace hf {
 
-    class Demander {
+    class RXProxy : protected Actuator {
 
         friend class Hackflight;
-        friend class PidTask;
 
-        protected:
+            void run(demands_t demands) override
+            {
+                setChannelValues(demands);
+            }
 
-            virtual void cut(void) = 0;
+            void cut(void) override
+            {
+                demands_t demands = {};
+                demands.throttle = -1;
+                setChannelValues(demands);
+            }
 
-            virtual void run(demands_t demands) = 0;
+            virtual void setChannelValues(demands_t & demands) = 0;
 
-    }; // class Demander
+            virtual void sendDisarmed(void) = 0;
+
+    }; // class RXProxy
 
 } // namespace hf

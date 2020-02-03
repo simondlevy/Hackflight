@@ -1,13 +1,16 @@
 /*
-   Mixer subclass for X-configuration quadcopters following the Cleanflight numbering convention:
+   quadplusap.hpp : Mixer subclass for + configuration quadcopters following the
+   ArduPilot numbering convention:
 
-    4cw   2ccw
-       \ /
-        ^
-       / \
-    3ccw  1cw
+          1cw
+           |
+           |
+    4ccw - ^ - 2ccw
+           |
+           |
+          3cw
  
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2019 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -27,23 +30,23 @@
 #pragma once
 
 #include "board.hpp"
-#include "mixer.hpp"
 #include "datatypes.hpp"
+#include "actuators/mixer.hpp"
 
 namespace hf {
 
-    class MixerQuadXCF : public Mixer {
+    class MixerQuadPlusAP : public Mixer {
 
         public:
 
-            MixerQuadXCF(void) 
+            MixerQuadPlusAP(void) 
                 : Mixer(4)
             {
                 //                     Th  RR  PF  YR
-                motorDirections[0] = { +1, -1, +1, +1 };    // 1 right rear
-                motorDirections[1] = { +1, -1, -1, -1 };    // 2 right front
-                motorDirections[2] = { +1, +1, +1, -1 };    // 3 left rear
-                motorDirections[3] = { +1, +1, -1, +1 };    // 4 left front
+                motorDirections[0] = { +1,  0, -1, +1 };    // 1 front
+                motorDirections[1] = { +1, -1,  0, -1 };    // 2 right
+                motorDirections[2] = { +1,  0, +1, +1 };    // 3 rear
+                motorDirections[3] = { +1, +1,  0, -1 };    // 4 left
             }
     };
 

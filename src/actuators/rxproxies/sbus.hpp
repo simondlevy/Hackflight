@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "rxproxy.hpp"
+#include "actuators/rxproxy.hpp"
 #include "SBUS.h"
 
 namespace hf {

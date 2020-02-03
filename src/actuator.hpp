@@ -1,5 +1,5 @@
 /*
-   RXProxy class
+   Abstract actuator class for mixers and receiver proxies
 
    Copyright (c) 2020 Simon D. Levy
 
@@ -20,30 +20,21 @@
 
 #pragma once
 
-#include "hackflightlite.hpp"
+#include "datatypes.hpp"
 
 namespace hf {
 
-    class RXProxy : protected Demander {
+    class Actuator {
 
-        friend class HackflightLite;
+        friend class Hackflight;
+        friend class PidTask;
 
-            void run(demands_t demands) override
-            {
-                setChannelValues(demands);
-            }
+        protected:
 
-            void cut(void) override
-            {
-                demands_t demands = {};
-                demands.throttle = -1;
-                setChannelValues(demands);
-            }
+            virtual void cut(void) = 0;
 
-            virtual void setChannelValues(demands_t & demands) = 0;
+            virtual void run(demands_t demands) = 0;
 
-            virtual void sendDisarmed(void) = 0;
-
-    }; // class RXProxy
+    }; // class Actuator
 
 } // namespace hf

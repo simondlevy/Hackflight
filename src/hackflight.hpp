@@ -1,5 +1,5 @@
 /*
-   Hackflight core algorithm: receiver, sensors, PID controllers
+   Hackflight core algorithm
 
    Copyright (c) 2020 Simon D. Levy
 
@@ -21,13 +21,21 @@
 #pragma once
 
 #include "debugger.hpp"
+#include "mspparser.hpp"
+#include "imu.hpp"
 #include "board.hpp"
-#include "demander.hpp"
+#include "actuator.hpp"
 #include "receiver.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
+#include "motor.hpp"
+#include "actuators/mixer.hpp"
+#include "actuators/rxproxy.hpp"
 #include "sensors/surfacemount.hpp"
 #include "timertasks/pidtask.hpp"
+#include "timertasks/serialtask.hpp"
+#include "sensors/surfacemount/gyrometer.hpp"
+#include "sensors/surfacemount/quaternion.hpp"
 
 namespace hf {
 
@@ -41,7 +49,9 @@ namespace hf {
             Debugger _debugger;
 
             // Mixer or receiver proxy
-            Demander * _demander = NULL;
+            Actuator * _actuator = NULL;
+
+            RXProxy * _proxy = NULL;
 
             // Sensors 
             Sensor * _sensors[256] = {NULL};
@@ -56,12 +66,48 @@ namespace hf {
             // Timer task for PID controllers
             PidTask _pidTask;
 
+            // Passed to Hackflight::init() for a particular build
+            IMU        * _imu      = NULL;
+            Mixer      * _mixer    = NULL;
+
+            // Serial timer task for GCS
+            SerialTask _serialTask;
+
+             // Mandatory sensors on the board
+            Gyrometer _gyrometer;
+            Quaternion _quaternion; // not really a sensor, but we treat it like one!
+ 
             bool safeAngle(uint8_t axis)
             {
                 return fabs(_state.rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
-        protected:
+           void checkQuaternion(void)
+            {
+                // Some quaternion filters may need to know the current time
+                float time = _board->getTime();
+
+                // If quaternion data ready
+                if (_quaternion.ready(time)) {
+
+                    // Update state with new quaternion to yield Euler angles
+                    _quaternion.modifyState(_state, time);
+                }
+            }
+
+            void checkGyrometer(void)
+            {
+                // Some gyrometers may need to know the current time
+                float time = _board->getTime();
+
+                // If gyrometer data ready
+                if (_gyrometer.ready(time)) {
+
+                    // Update state with gyro rates
+                    _gyrometer.modifyState(_state, time);
+                }
+            }
+
 
             Board    * _board    = NULL;
             Receiver * _receiver = NULL;
@@ -92,12 +138,12 @@ namespace hf {
                 sensor->imu = imu;
             }
 
-            void init(Board * board, Receiver * receiver, Demander * demander)
+            void init(Board * board, Receiver * receiver, Actuator * actuator)
             {  
                 // Store the essentials
                 _board    = board;
                 _receiver = receiver;
-                _demander = demander;
+                _actuator = actuator;
 
                 // Ad-hoc debugging support
                 _debugger.init(board);
@@ -115,19 +161,14 @@ namespace hf {
                 _state.failsafe = false;
 
                 // Initialize timer task for PID controllers
-                _pidTask.init(_board, _receiver, _demander, &_state);
-            }
-
-            void addSensor(Sensor * sensor) 
-            {
-                add_sensor(sensor);
+                _pidTask.init(_board, _receiver, _actuator, &_state);
             }
 
             void checkReceiver(void)
             {
                 // Sync failsafe to receiver
                 if (_receiver->lostSignal() && _state.armed) {
-                    _demander->cut();
+                    _actuator->cut();
                     _state.armed = false;
                     _state.failsafe = true;
                     _board->showArmedStatus(false);
@@ -156,13 +197,136 @@ namespace hf {
 
                 // Cut motors on throttle-down
                 if (_state.armed && _receiver->throttleIsDown()) {
-                    _demander->cut();
+                    _actuator->cut();
                 }
 
                 // Set LED based on arming status
                 _board->showArmedStatus(_state.armed);
 
             } // checkReceiver
+
+            // Inner classes for full vs. lite version
+            class Updater {
+
+                friend class Hackflight;
+
+                private:
+
+                    Hackflight * _h = NULL;
+
+                protected:
+
+                    void init(Hackflight * h) 
+                    {
+                        _h = h;
+                    }
+
+                    virtual void update(void) = 0;
+
+            }; // class Updater
+
+            class UpdateFull : protected Updater {
+
+                friend class Hackflight;
+
+                virtual void update(void) override
+                {
+                    _h->updateFull();
+                }
+
+            }; // class UpdateFull
+
+            class UpdateLite : protected Updater {
+
+                friend class Hackflight;
+
+                virtual void update(void) override
+                {
+                    _h->updateLite();
+                }
+
+            }; // class UpdateLite
+
+            Updater * _updater;
+            UpdateFull _updaterFull;
+            UpdateLite _updaterLite;
+
+            void updateLite(void)
+            {
+                // Use proxy to send the correct channel values when not armed
+                if (!_state.armed) {
+                    _proxy->sendDisarmed();
+                }
+            }
+
+            void updateFull(void)
+            {
+                // Check mandatory sensors
+                checkGyrometer();
+                checkQuaternion();
+
+                // Check optional sensors
+                checkOptionalSensors();
+
+                // Update serial comms task
+                _serialTask.update();
+            }
+
+        public:
+
+            void init(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor ** motors, bool armed=false)
+            {  
+                // Do general initialization
+                Hackflight::init(board, receiver, mixer);
+
+                // Store pointers to IMU, mixer
+                _imu   = imu;
+                _mixer = mixer;
+
+                // Initialize serial timer task
+                _serialTask.init(board, &_state, mixer, receiver);
+
+                // Support safety override by simulator
+                _state.armed = armed;
+
+                // Support for mandatory sensors
+                add_sensor(&_quaternion, imu);
+                add_sensor(&_gyrometer, imu);
+
+                // Start the IMU
+                imu->begin();
+
+                // Tell the mixer which motors to use, and initialize them
+                mixer->useMotors(motors);
+
+                // Set the update function
+                _updater = &_updaterFull;
+                _updater->init(this);
+
+            } // init
+
+            void init(Board * board, Receiver * receiver, RXProxy * proxy) 
+            {
+                // Do general initialization
+                Hackflight::init(board, receiver, proxy);
+
+                // Store proxy for arming check
+                _proxy = proxy;
+
+                // Set the update function
+                _updater = &_updaterLite;
+                _updater->init(this);
+            }
+
+            void addSensor(Sensor * sensor) 
+            {
+                add_sensor(sensor);
+            }
+
+            void addPidController(PidController * pidController, uint8_t auxState=0) 
+            {
+                _pidTask.addPidController(pidController, auxState);
+            }
 
             void update(void)
             {
@@ -171,15 +335,11 @@ namespace hf {
 
                 // Update PID controllers task
                 _pidTask.update();
-             }
 
-        public:
-
-            void addPidController(PidController * pidController, uint8_t auxState=0) 
-            {
-                _pidTask.addPidController(pidController, auxState);
+                // Run full or lite update function
+                _updater->update();
             }
 
-     }; // class Hackflight
+    }; // class Hackflight
 
 } // namespace

@@ -33,10 +33,10 @@ Copyright (c) 2020 Simon D. Levy
 
 //#include <DSMRX.h>
 
-#include "hackflightlite.hpp"
+#include "hackflight.hpp"
 #include "boards/realboards/arduino/ladybug.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial2.hpp"
-#include "rxproxies/sbus.hpp"
+#include "actuators/rxproxies/sbus.hpp"
 
 static const uint8_t CHANNELS = 8;
 
@@ -44,7 +44,7 @@ static constexpr uint8_t CHANNEL_MAP[6] = {0,1,2,3,6,4};
 
 static constexpr float DEMAND_SCALE = 1.0f;
 
-hf::HackflightLite h;
+hf::Hackflight h;
 
 hf::DSMX_Receiver_Serial2 rc = hf::DSMX_Receiver_Serial2(CHANNEL_MAP, DEMAND_SCALE);  
 

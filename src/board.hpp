@@ -28,7 +28,6 @@ namespace hf {
     class Board {
 
         friend class Hackflight;
-        friend class HackflightFull;
         friend class Debugger;
         friend class TimerTask;
         friend class SerialTask;

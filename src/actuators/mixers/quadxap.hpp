@@ -27,8 +27,8 @@
 #pragma once
 
 #include "board.hpp"
-#include "mixer.hpp"
 #include "datatypes.hpp"
+#include "actuators/mixer.hpp"
 
 namespace hf {
 

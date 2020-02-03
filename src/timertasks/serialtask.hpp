@@ -22,15 +22,15 @@
 
 #include "timertask.hpp"
 #include "board.hpp"
-#include "mixer.hpp"
 #include "mspparser.hpp"
 #include "debugger.hpp"
+#include "actuators/mixer.hpp"
 
 namespace hf {
 
     class SerialTask : public TimerTask, public MspParser {
 
-        friend class HackflightFull;
+        friend class Hackflight;
 
         private:
 
