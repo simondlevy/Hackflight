@@ -28,7 +28,7 @@
 #include "hackflight.hpp"
 #include "boards/realboards/tinypico.hpp"
 #include "receivers/arduino/dsmx.hpp"
-#include "mixers/quadxcf.hpp"
+#include "actuators/mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 #include "motors/standard.hpp"

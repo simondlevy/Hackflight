@@ -33,7 +33,7 @@
 #include "imus/usfs_inverted.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "motors/mock.hpp"
-#include "mixers/quadxcf.hpp"
+#include "actuators/mixers/quadxcf.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 8.58f;

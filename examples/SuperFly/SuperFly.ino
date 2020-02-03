@@ -31,7 +31,7 @@
 
 #include "hackflight.hpp"
 #include "boards/realboards/arduino/superfly.hpp"
-#include "mixers/quadxcf.hpp"
+#include "actuators/mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 #include "receivers/arduino/esp8266.hpp"

@@ -24,7 +24,7 @@
 
 #include "hackflight.hpp"
 #include "arduino/mock.hpp"
-#include "mixers/quadxcf.hpp"
+#include "actuators/mixers/quadxcf.hpp"
 #include "receivers/mock.hpp"
 
 class RandomWalkHackflight : public hf::Hackflight {

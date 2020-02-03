@@ -33,7 +33,7 @@ Copyright (c) 2020 Simon D. Levy
 #include "boards/realboards/arduino/ladybug.hpp"
 #include "receivers/mock.hpp"
 #include "imus/softquats/mpu9250.hpp"
-#include "mixers/quadxcf.hpp"
+#include "actuators/mixers/quadxcf.hpp"
 #include "motors/mock.hpp"
 
 hf::Hackflight h;

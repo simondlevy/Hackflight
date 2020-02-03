@@ -27,7 +27,7 @@
 #include "pidcontrollers/level.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/althold.hpp"
-#include "mixers/quadxcf.hpp"
+#include "actuators/mixers/quadxcf.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 1.0f;
