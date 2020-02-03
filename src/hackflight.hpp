@@ -138,7 +138,7 @@ namespace hf {
                 sensor->imu = imu;
             }
 
-            void init(Board * board, Receiver * receiver, Actuator * actuator)
+            void general_init(Board * board, Receiver * receiver, Actuator * actuator)
             {  
                 // Store the essentials
                 _board    = board;
@@ -277,7 +277,7 @@ namespace hf {
             void init(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor ** motors, bool armed=false)
             {  
                 // Do general initialization
-                Hackflight::init(board, receiver, mixer);
+                general_init(board, receiver, mixer);
 
                 // Store pointers to IMU, mixer
                 _imu   = imu;
@@ -308,7 +308,7 @@ namespace hf {
             void init(Board * board, Receiver * receiver, RXProxy * proxy) 
             {
                 // Do general initialization
-                Hackflight::init(board, receiver, proxy);
+                general_init(board, receiver, proxy);
 
                 // Store proxy for arming check
                 _proxy = proxy;

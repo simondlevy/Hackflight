@@ -35,6 +35,17 @@ namespace hf {
 
             void sendChannelValues(void)
             {
+                Serial.print(_chanvals[0]);
+                Serial.print(" ");
+                Serial.print(_chanvals[1]);
+                Serial.print(" ");
+                Serial.print(_chanvals[2]);
+                Serial.print(" ");
+                Serial.print(_chanvals[3]);
+                Serial.print(" ");
+                Serial.print(_chanvals[5]);
+                Serial.println();
+
                 sbus.writeCal(_chanvals);
             }
 
@@ -47,14 +58,14 @@ namespace hf {
                 _chanvals[2] = demands.pitch;
                 _chanvals[3] = demands.yaw;
 
-                _chanvals[4] = +1.0;
+                _chanvals[5] = +1.0; // Aux1
 
                 sendChannelValues();
             }
 
             virtual void sendDisarmed(void) override
             {
-                _chanvals[4] = -1.0; // Aux1
+                _chanvals[5] = -1.0; // Aux1
 
                 sendChannelValues();
             }
