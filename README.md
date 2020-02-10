@@ -247,7 +247,8 @@ based on the demands sent by the receiver connected to your Arduino board, plus
 whatever sensors (rangefinder, optical flow) and PID controllers (altitude
 hold, position hold), you've added.  A simple example is provided in 
 [this sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/LadybugDsmxToSbus/LadybugDsmxToSbus.ino),
-which uses the [Ladybug development board]() from Tlera Corp., plus a DSMX receiver, and generates
+which uses the [Ladybug development board](https://www.tindie.com/products/tleracorp/ladybug-stm32l432-development-board/)
+from Tlera Corp., plus a DSMX receiver, and generates
 SBUS signals as input to the flight-control board.
 
 
