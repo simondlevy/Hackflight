@@ -238,7 +238,7 @@ class used in [MulticopterSim](https://github.com/simondlevy/MulticopterSim/tree
 
 ### HackflightLite
 
-Hackflight can also be used to add functionality to an existing Bind-N-Fly (BNF) multicopter.  In this flavor
+Hackflight can also be used to add functionality to an existing Ready-to-Fly (RTF) multicopter.  In this flavor
 of Hackflight, you rely on the IMU, stabilization PIDs, and mixer on the
 off-the-shelf flight controller on your 'copter.  Instead of specifying a mixer and motors, you specify 
 an [RXProxy](https://github.com/simondlevy/Hackflight/blob/master/src/actuators/rxproxy.hpp)
