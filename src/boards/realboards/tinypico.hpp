@@ -68,9 +68,6 @@ namespace hf {
                 // This will blink the LED
                 RealBoard::init();
 
-                // Use D18,19 for SENtral power, ground
-                ArduinoBoard::powerPins(18, 19);
-
                 // Hang a bit 
                 delay(100);
 
