@@ -26,53 +26,8 @@ namespace hf {
 
     class MockBoard : public ArduinoBoard {
 
-        private:
-
-            float _time = 0;
-
-            // motionless and sligthly off-level
-            float _qw = 0.90f;
-            float _qx = 0.05f;
-            float _qy = 0.05f;
-            float _qz = 0.00f;
-            float _gx = 0.00f;
-            float _gy = 0.00f;
-            float _gz = 0.00f;
-
         protected:
 
-            virtual bool  getQuaternion(float & qw, float & qx, float & qy, float & qz) override 
-            {
-                qw = _qw;
-                qx = _qx;
-                qy = _qy;
-                qz = _qz;
-
-                float time = getTime();
-
-                if (time-_time > .01) {
-                    _time = time;
-                    return true;
-                }
-
-                return false;
-            }
-
-            virtual bool getGyrometer(float & gx, float & gy, float & gz) override
-            {
-                gx = _gx;
-                gy = _gy;
-                gz = _gz;
-
-                float time = getTime();
-
-                if (time-_time > .01) {
-                    _time = time;
-                    return true;
-                }
-
-                return false;
-             }
 
             uint8_t serialTelemetryAvailable(void) override
             {
