@@ -27,7 +27,7 @@ static int8_t dir;
 
 void setup(void)
 {
-    motors.addMotor(25);
+    motors.addMotor(27);
 
     delay(100);
 
