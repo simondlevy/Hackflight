@@ -3,7 +3,7 @@
 
    Additional libraries needed:
 
-       https://github.com/simondlevy/MPU9250
+       https://github.com/simondlevy/MPU
        https://github.com/simondlevy/CrossPlatformDataBus
 
    Hardware support for SMT32L4:
