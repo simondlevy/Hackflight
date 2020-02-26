@@ -3,7 +3,7 @@
 
    Additional libraries needed:
 
-       https://github.com/simondlevy/USFS
+       https://github.com/simondlevy/MPU
        https://github.com/simondlevy/CrossPlatformDataBus
        https://github.com/simondlevy/SpektrumDSM 
 
@@ -31,7 +31,7 @@
 #include "actuators/mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
-#include "motors/standard.hpp"
+#include "motors/mock.hpp"
 #include "imus/usfs.hpp"
 
 static const uint8_t SERIAL1_RX = 32;
@@ -53,10 +53,10 @@ hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 hf::USFS imu;
 
-hf::StandardMotor motor1(25);
-hf::StandardMotor motor2(26);
-hf::StandardMotor motor3(27);
-hf::StandardMotor motor4(15);
+hf::MockMotor motor1;
+hf::MockMotor motor2;
+hf::MockMotor motor3;
+hf::MockMotor motor4;
 
 hf::Motor * motors[4] = { &motor1, &motor2, &motor3, &motor4 };
 
