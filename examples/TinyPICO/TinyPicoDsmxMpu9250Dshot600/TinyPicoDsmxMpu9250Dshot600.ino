@@ -27,7 +27,8 @@
 
 #include "hackflight.hpp"
 #include "boards/realboards/tinypico.hpp"
-#include "receivers/arduino/dsmx.hpp"
+//#include "receivers/arduino/dsmx.hpp"
+#include "receivers/mock.hpp"
 #include "actuators/mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
@@ -45,7 +46,7 @@ hf::Hackflight h;
 
 hf::MPU9250SoftwareQuaternionIMU imu;
 
-hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
+hf::MockReceiver rc;
 
 hf::MixerQuadXCF mixer;
 
@@ -66,7 +67,7 @@ static void receiverTask(void * params)
     while (true) {
 
         if (Serial1.available()) {
-            rc.handleSerialEvent(Serial1.read(), micros());
+            //rc.handleSerialEvent(Serial1.read(), micros());
         }
 
         delay(1);
