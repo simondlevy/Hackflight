@@ -103,6 +103,8 @@ namespace hf {
                 // If gyrometer data ready
                 if (_gyrometer.ready(time)) {
 
+                    //static uint32_t count; Serial.println(++count/time);
+
                     // Update state with gyro rates
                     _gyrometer.modifyState(_state, time);
                 }
