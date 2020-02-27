@@ -76,9 +76,6 @@ static void receiverTask(void * params)
 
 void setup(void)
 {
-    // Use D18,19 for USFS power, ground
-    hf::ArduinoBoard::powerPins(18, 19);
-
     // Start receiver on Serial1
     Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
