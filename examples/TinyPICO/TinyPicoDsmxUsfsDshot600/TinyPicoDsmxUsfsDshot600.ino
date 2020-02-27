@@ -1,16 +1,16 @@
 /*
-   Hackflight sketch for TinyPICO with Ultimate Sensor Fusion Solution IMU and DSMX receiver
+   Hackflight sketch for TinyPICO with DSMX receiver, Ultimate Sensor Fusion Solution IMU, and DSHOT600 ESCs
 
    Additional libraries needed:
 
-       https://github.com/simondlevy/MPU
+       https://github.com/simondlevy/USFS
        https://github.com/simondlevy/CrossPlatformDataBus
        https://github.com/simondlevy/SpektrumDSM 
 
        https://github.com/plerup/espsoftwareserial
 
 
-   Copyright (c) 2019 Simon D. Levy
+   Copyright (c) 2020 Simon D. Levy
 
    This file is part of Hackflight.
    Hackflight is free software: you can redistribute it and/or modify
@@ -27,13 +27,12 @@
 
 #include "hackflight.hpp"
 #include "boards/realboards/tinypico.hpp"
-//#include "receivers/arduino/dsmx.hpp"
-#include "receivers/mock.hpp"
+#include "receivers/arduino/dsmx.hpp"
 #include "actuators/mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 #include "motors/mock.hpp"
-#include "imus/softquats/mpu9250.hpp"
+#include "imus/usfs.hpp"
 
 static const uint8_t SERIAL1_RX = 32;
 static const uint8_t SERIAL1_TX = 33; // unused
@@ -44,15 +43,15 @@ static constexpr float DEMAND_SCALE = 8.0f;
 
 hf::Hackflight h;
 
-hf::MPU9250SoftwareQuaternionIMU imu;
-
-hf::MockReceiver rc;
+hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
 
 hf::MixerQuadXCF mixer;
 
 hf::RatePid ratePid = hf::RatePid(0.05f, 0.00f, 0.00f, 0.10f, 0.01f); 
 
 hf::LevelPid levelPid = hf::LevelPid(0.20f);
+
+hf::USFS imu;
 
 hf::MockMotor motor1;
 hf::MockMotor motor2;
@@ -67,7 +66,7 @@ static void receiverTask(void * params)
     while (true) {
 
         if (Serial1.available()) {
-            //rc.handleSerialEvent(Serial1.read(), micros());
+            rc.handleSerialEvent(Serial1.read(), micros());
         }
 
         delay(1);
