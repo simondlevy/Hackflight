@@ -66,20 +66,10 @@ namespace hf {
 
             bool getGyrometer(float & gx, float & gy, float & gz) override
             {
-                // Read acceleromter Gs, gyrometer degrees/sec
+                // Read acceleromter Gs, gyrometer rad/sec
                 if (imuReady()) {
 
                     imuReadAccelGyro(_ax, _ay, _az, _gx, _gy, _gz);
-
-                    // Convert gyrometer values from degrees/sec to radians/sec
-                    _gx = Filter::deg2rad(_gx);
-                    _gy = Filter::deg2rad(_gy);
-                    _gz = Filter::deg2rad(_gz);
-
-                    // Round to two decimal places
-                    gx = Filter::round2(_gx);
-                    gy = Filter::round2(_gy);
-                    gz = Filter::round2(_gz);
 
                     return true;
                 }

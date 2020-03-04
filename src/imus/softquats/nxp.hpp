@@ -22,23 +22,50 @@
 
 #include "imus/softquat.hpp"
 
+#include <Adafruit_Sensor.h>
+#include <Adafruit_FXAS21002C.h>
+#include <Adafruit_FXOS8700.h>
+
 namespace hf {
 
     class NxpSoftwareQuaternionIMU : public SoftwareQuaternionIMU {
+
+        private:
+
+            Adafruit_FXOS8700   _accelmag = Adafruit_FXOS8700(0x8700A, 0x8700B);
+            Adafruit_FXAS21002C _gyro     = Adafruit_FXAS21002C(0x0021002C);
+
+            sensors_event_t _g_event;
+            sensors_event_t _a_event;
+            sensors_event_t _m_event;
+
+            float mss2gs(float mss)
+            {
+                return mss / 9.8665;
+            }
 
         protected:
 
             virtual void begin(void) override
             {
+                _gyro.begin();
+                _accelmag.begin(ACCEL_RANGE_4G);
             }
 
             virtual bool imuReady(void) override 
             {
-                return true;
+                return _gyro.getEvent(&_g_event) && _accelmag.getEvent(&_a_event, &_m_event);
             }
 
             virtual void imuReadAccelGyro(float & ax, float & ay, float & az, float & gx, float & gy, float &gz) override
             {
+                ax = mss2gs(_a_event.acceleration.x);
+                ay = mss2gs(_a_event.acceleration.y);
+                az = mss2gs(_a_event.acceleration.z);
+
+                gx = _g_event.gyro.x;
+                gy = _g_event.gyro.y;
+                gz = _g_event.gyro.z;
             }
 
     }; // class NxpSoftwareQuaternionIMU

@@ -77,6 +77,12 @@ namespace hf {
             {
                 _mpu9250_imu.readAccelerometer(ax, ay, az);
                 _mpu9250_imu.readGyrometer(gx, gy, gz);
+
+                // Convert gyrometer values from degrees/sec to radians/sec
+                gx = Filter::deg2rad(gx);
+                gy = Filter::deg2rad(gy);
+                gz = Filter::deg2rad(gz);
+
             }
 
     }; // class MPU9250SoftwareQuaternionIMU
