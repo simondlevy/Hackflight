@@ -32,8 +32,10 @@ namespace hf {
 
         private:
 
-            Adafruit_FXOS8700   _accelmag = Adafruit_FXOS8700(0x8700A, 0x8700B);
-            Adafruit_FXAS21002C _gyro     = Adafruit_FXAS21002C(0x0021002C);
+            static const fxos8700AccelRange_t ACCEL_RANGE = ACCEL_RANGE_2G;
+
+            Adafruit_FXOS8700   _accelmag = Adafruit_FXOS8700();
+            Adafruit_FXAS21002C _gyro     = Adafruit_FXAS21002C();
 
             sensors_event_t _g_event;
             sensors_event_t _a_event;
@@ -49,7 +51,7 @@ namespace hf {
             virtual void begin(void) override
             {
                 _gyro.begin();
-                _accelmag.begin(ACCEL_RANGE_4G);
+                _accelmag.begin(ACCEL_RANGE);
             }
 
             virtual bool imuReady(void) override 
