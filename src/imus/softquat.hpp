@@ -32,7 +32,7 @@ namespace hf {
         private:
 
             // Global constants for 6 DoF quaternion filter
-            const float GYRO_MEAS_ERROR_DEG = 40.f;
+            const float GYRO_MEAS_ERROR_DEG = 20.f;
             const float GYRO_MEAS_DRIFT_DEG =  0.f;
 
             // Update quaternion after this number of gyro updates
