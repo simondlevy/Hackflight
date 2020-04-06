@@ -32,7 +32,7 @@
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 #include "motors/mock.hpp"
-#include "imus/usfs.hpp"
+#include "imus/usfss/usfs_rotated.hpp"
 
 static const uint8_t SERIAL1_RX = 32;
 static const uint8_t SERIAL1_TX = 33; // unused
