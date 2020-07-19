@@ -43,7 +43,8 @@ namespace hf {
 
     };  // class PidController
 
-    // PID controller for a single degree of freedom
+    // PID controller for a single degree of freedom.  Because time differences (dt) appear more-or-less constant,
+    // we avoid incoroporating them into the code; i.e., they are "absorbed" into tuning constants Ki and Kd.
     class Pid {
 
         private: 
