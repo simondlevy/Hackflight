@@ -35,7 +35,7 @@ hf::MockReceiver rc;
 
 hf::MixerQuadXCF mixer;
 
-hf::USFSMAX imu;
+hf::USFSMAX_IMU imu;
 
 hf::MockMotor motor1;
 hf::MockMotor motor2;
