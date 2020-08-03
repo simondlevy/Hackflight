@@ -62,25 +62,30 @@ namespace hf {
             USFSMAX::GyroScale_t GYRO_SCALE = USFSMAX::GYRO_SCALE_2000;
 
             USFSMAX_Basic _usfsmax = 
-                USFSMAX_Basic(
-                        ACCEL_ODR,
-                        GYRO_ODR,
-                        MAG_ODR,
-                        BARO_ODR,
-                        QUAT_DIV,
-                        LSM6DSM_GYRO_LPF,
-                        LSM6DSM_ACC_LPF_ODR,
-                        ACC_SCALE,
-                        GYRO_SCALE,
-                        LIS2MDL_MAG_LPF_ODR,
-                        LPS22HB_BARO_LPF,
-                        MAG_V,
-                        MAG_H,
-                        MAG_DECLINATION);
+                USFSMAX_Basic( ACCEL_ODR, GYRO_ODR, MAG_ODR, BARO_ODR, QUAT_DIV,
+                        LSM6DSM_GYRO_LPF, LSM6DSM_ACC_LPF_ODR,
+                        ACC_SCALE, GYRO_SCALE,
+                        LIS2MDL_MAG_LPF_ODR, LPS22HB_BARO_LPF,
+                        MAG_V, MAG_H, MAG_DECLINATION);
 
 
             virtual bool getGyrometer(float & gx, float & gy, float & gz) override
             {
+                switch (_usfsmax.dataReady()) {
+                    case USFSMAX::DATA_READY_GYRO_ACC:
+                    case USFSMAX::DATA_READY_GYRO_ACC_MAG_BARO:
+                        {
+                            float gyro[3] = {};
+                            float acc[3] = {};
+                            _usfsmax.readGyroAcc(gyro, acc);
+                            gx = gyro[0];
+                            gy = gyro[1];
+                            gz = gyro[2];
+                        }
+                        return true;
+                    default:
+                        break;
+                }
                 return false;
             }
 
@@ -88,11 +93,27 @@ namespace hf {
             {
                 (void)time;
 
+                if (_usfsmax.quaternionReady()) {
+                    float quat[4] = {};
+                    _usfsmax.readQuat(quat);
+                    qw = quat[0];
+                    qx = quat[1];
+                    qy = quat[2];
+                    qz = quat[3];
+                    return true;
+                }
+
                 return false;
             }
 
             virtual void begin(void) override
             {
+                Wire.setClock(100000); 
+                delay(100);
+                _usfsmax.begin();
+                Wire.setClock(I2C_CLOCK);// Set the I2C clock to high speed for run-mode data collection
+                delay(100);
+
             }
 
     }; // class USFSMAX
