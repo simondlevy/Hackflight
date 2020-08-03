@@ -61,6 +61,23 @@ namespace hf {
             USFSMAX::AccScale_t  ACC_SCALE  = USFSMAX::ACC_SCALE_16;
             USFSMAX::GyroScale_t GYRO_SCALE = USFSMAX::GYRO_SCALE_2000;
 
+            USFSMAX_Basic _usfsmax = 
+                USFSMAX_Basic(
+                        ACCEL_ODR,
+                        GYRO_ODR,
+                        MAG_ODR,
+                        BARO_ODR,
+                        QUAT_DIV,
+                        LSM6DSM_GYRO_LPF,
+                        LSM6DSM_ACC_LPF_ODR,
+                        ACC_SCALE,
+                        GYRO_SCALE,
+                        LIS2MDL_MAG_LPF_ODR,
+                        LPS22HB_BARO_LPF,
+                        MAG_V,
+                        MAG_H,
+                        MAG_DECLINATION);
+
 
             virtual bool getGyrometer(float & gx, float & gy, float & gz) override
             {
