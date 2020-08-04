@@ -15,7 +15,7 @@ like).  In addition to big user communities and loads of great features, these
 platforms have safety mechanisms that Hackflight lacks, which will help avoid
 injury to you and damage to your vehicle.
 
-Hackflight is current working on the following platforms:
+Hackflight is currently working on the following platforms:
 
 * [TinyPICO](https://www.tinypico.com)
 
