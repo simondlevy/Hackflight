@@ -1,9 +1,10 @@
 /*
-   Hackflight sketch for TinyPICO with Ultimate Sensor Fusion Solution IMU, and mock motors/receiver
+   Hackflight sketch for TinyPICO with USFSMAX IMU, DSMX receiver, and mock motors
 
    Additional libraries needed:
 
-       https://github.com/simondlevy/USFS
+       https://github.com/simondlevy/DSMRX
+       https://github.com/simondlevy/USFSMAX
        https://github.com/simondlevy/CrossPlatformDataBus
 
 
@@ -24,18 +25,25 @@
 
 #include "hackflight.hpp"
 #include "boards/realboards/tinypico.hpp"
-#include "receivers/mock.hpp"
+#include "receivers/arduino/dsmx.hpp"
 #include "actuators/mixers/quadxcf.hpp"
 #include "motors/mock.hpp"
-#include "imus/usfs.hpp"
+#include "imus/usfsmax.hpp"
+
+static const uint8_t SERIAL1_RX = 32;
+static const uint8_t SERIAL1_TX = 33; // unused
+
+static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+
+static constexpr float DEMAND_SCALE = 8.0f;
 
 hf::Hackflight h;
 
-hf::MockReceiver rc;
+hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
 
 hf::MixerQuadXCF mixer;
 
-hf::USFS imu;
+hf::USFSMAX_IMU imu;
 
 hf::MockMotor motor1;
 hf::MockMotor motor2;
@@ -44,9 +52,31 @@ hf::MockMotor motor4;
 
 hf::Motor * motors[4] = { &motor1, &motor2, &motor3, &motor4 };
 
+// Timer task for DSMX serial receiver
+static void receiverTask(void * params)
+{
+    while (true) {
+
+        if (Serial1.available()) {
+            rc.handleSerialEvent(Serial1.read(), micros());
+        }
+
+        delay(1);
+    }
+}
+
+
 void setup(void)
 {
+    // Start receiver on Serial1
+    Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
+
+    // Initialize Hackflight firmware
     h.init(new hf::TinyPico(), &imu, &rc, &mixer, motors);
+
+    // Start the receiver timed task
+    TaskHandle_t task;
+    xTaskCreatePinnedToCore(receiverTask, "Task", 10000, NULL, 1, &task, 0);
 }
 
 void loop(void)

@@ -77,10 +77,6 @@ namespace hf {
                 euler[0] = atan2(2.0f*(qw*qx+qy*qz),qw*qw-qx*qx-qy*qy+qz*qz);
                 euler[1] =  asin(2.0f*(qx*qz-qw*qy));
                 euler[2] = atan2(2.0f*(qx*qy+qw*qz),qw*qw+qx*qx-qy*qy-qz*qz);
-
-                euler[0] = int(euler[0]*1000)/1000.0;
-                euler[1] = int(euler[1]*1000)/1000.0;
-                euler[2] = int(euler[2]*1000)/1000.0;
             }
 
     };  // class Quaternion
