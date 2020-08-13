@@ -63,12 +63,12 @@ class specifies an abstract (pure virtual) <tt>getQuaternion()</tt> and
 class performs basic functions associated with R/C control (tracking stick
 positions, checking switches) and specifies a set of abstract methods that you
 implement for a particular receiver (reading channels values).  
-* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/mixer.hpp">Mixer</a>
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/actuators/mixer.hpp">Mixer</a>
 class is an abstract class that can be subclassed for various motor
 configurations (QuadX, Hexacopter, Tricopter, etc.).  The 
-<a href="https://github.com/simondlevy/Hackflight/blob/master/src/mixers/quadxcf.hpp">QuadXCF</a>
+<a href="https://github.com/simondlevy/Hackflight/blob/master/src/actuators/mixers/quadxcf.hpp">QuadXCF</a>
 (quad-X using Cleanflight numbering conventions)  and
-<a href="https://github.com/simondlevy/Hackflight/blob/master/src/mixers/quadxap.hpp">QuadXAP</a>
+<a href="https://github.com/simondlevy/Hackflight/blob/master/src/actuators/mixers/quadxap.hpp">QuadXAP</a>
 (quad-X using ArduPilot numbering conventions) subclasses are already implemented.  
 * The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/motor.hpp">Motor</a> class
 supports different kinds of motors (brushed, brushless).
