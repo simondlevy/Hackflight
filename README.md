@@ -128,7 +128,7 @@ quaternion&rdquo; data from modern sensors like the
 we find it convenient to treat the quaternion as a sensor reading.  For
 inertial measurement units (IMUs) like the MPU9250 that do not deliver a
 hardware quaternion, Hackflight provides a
-[QuaternionFilter](https://github.com/simondlevy/Hackflight/blob/master/src/filters.hpp#L105-L123)
+[QuaternionFilter](https://github.com/simondlevy/Hackflight/blob/master/src/filters.hpp#L109-L129)
 class that can be used to compute the quaternion using your microcontroller.
 
 If you're mathematically-minded, you can think of a sensor as a function from states to states:
