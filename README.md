@@ -147,7 +147,7 @@ these are all sub-classes of the
 class, which is in turn a sub-class of the
 [Sensor](https://github.com/simondlevy/Hackflight/blob/master/src/sensor.hpp#L27-L37)
 class.  Each surface-mount sensor accesses the appropriate virtual method of
-the [Board](https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp)
+the [IMU](https://github.com/simondlevy/Hackflight/blob/master/src/imu.hpp)
 class (<tt>getQuaternion()</tt>, <tt>getGyrometer()</tt>, ...).  The Sensor
 class is an abstract (virtual) class (a.k.a. interface) specifying two methods
 that any sensor must implement: (1) reporting whether the sensor is ready to
