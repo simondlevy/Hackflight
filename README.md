@@ -166,6 +166,8 @@ Once you've implemented the sub-class(es) for a new sensor, you can call
 <tt>Hackflight::addSensor()</tt> to ensure that the sensor
 code will be called by the <tt>checkOptionalSensors</tt> method.
 
+Here is the C++ class hierarchy for currently-supported sensors:
+
 <p align="center"> 
 <img src="extras/media/sensors2.png" width=800>
 </p>
