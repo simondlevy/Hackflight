@@ -175,7 +175,7 @@ Here is the C++ class hierarchy for currently-supported sensors:
 ### PID Controllers
 
 Like sensors, PID controllers in Hackflight are subclasses of an abstract
-[class](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp#L27-L41),
+[class](https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp#L27-L44),
 whose <tt>modifyDemands()</tt> method takes the current state and demands, and
 modifies the demands based on the state.  (This class also provides an optional
 <tt>shouldFlashLed()</tt> method, to help you see when the PID controller is
