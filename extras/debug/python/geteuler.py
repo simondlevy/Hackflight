@@ -21,7 +21,7 @@ along with this code.  If not, see <http:#www.gnu.org/licenses/>.
 
 BAUD = 115200
 
-PORT = 'COM9'          # Windows
+PORT = 'COM22'          # Windows
 #PORT = '/dev/ttyACM0' # Linux
 
 from msppg import Parser, serialize_ATTITUDE_RADIANS_Request
