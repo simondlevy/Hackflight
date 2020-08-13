@@ -104,7 +104,7 @@ To understand the principles behind the software, contniue reading.
 There are two basic data types in Hackflight: 
 [state](https://github.com/simondlevy/Hackflight/blob/master/src/datatypes.hpp#L40-L52) and 
 [demands](https://github.com/simondlevy/Hackflight/blob/master/src/datatypes.hpp#L31-L38).  For anyone
-who's studied [Kalman filtering](http://home.wlu.edu/~levys/kalman_tutorial/), the state will be familiar:
+who's studied [Kalman filtering](https://simondlevy.academic.wlu.edu/kalman-tutorial/), the state will be familiar:
 it is the set of values that define the state of the vehicle at a given time
 (altitude, orientation, angular velocity, ...), which gets modified by a set of
 sensors (gyrometer, accelerometer, barometer, rangefinder, ...).  Once the
