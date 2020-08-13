@@ -154,7 +154,7 @@ that any sensor must implement: (1) reporting whether the sensor is ready to
 deliver new data; (2) modifying the vehicle state.  By requiring each sensor to
 report its readiness, we can avoid the need to write a separate timing loop for
 each sensor in the main [loop
-code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L353-L367). 
+code](https://github.com/simondlevy/Hackflight/blob/master/src/hackflight.hpp#L261-L274). 
 
 To implement additional sensors, you can directly sub-class the Sensor class, as we've done with the 
 [Rangefinder](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/rangefinder.hpp) 
