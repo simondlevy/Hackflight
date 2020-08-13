@@ -124,7 +124,7 @@ As discussed above, Hackflight requires a bare minimum of two sensor readings:
 Technically, the quaternion is more properly part of
 the vehicle state, but because of the availability of &ldquo;hardware
 quaternion&rdquo; data from modern sensors like the 
-[EM7180 SENtral Sensor Fusion Solution](https://www.tindie.com/products/onehorse/ultimate-sensor-fusion-solution-lsm6dsm-lis2md/).
+[USFSMAX](https://www.tindie.com/products/onehorse/max32660-motion-co-processor/).
 we find it convenient to treat the quaternion as a sensor reading.  For
 inertial measurement units (IMUs) like the MPU9250 that do not deliver a
 hardware quaternion, Hackflight provides a
