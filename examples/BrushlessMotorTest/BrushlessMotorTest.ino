@@ -23,17 +23,17 @@
 #include "hackflight.hpp"
 #include "motors/standard.hpp"
 
-static uint8_t MOTOR_PIN = 5;
+static uint8_t MOTOR_PIN[1] = {5};
 
 static float  val;
 static int8_t dir;
 
-hf::StandardMotor motor = hf::StandardMotor(MOTOR_PIN);
+hf::StandardMotor motors = hf::StandardMotor(MOTOR_PIN, 1);
 
 void setup(void)
 {
     // Initialize the motor
-    motor.init();
+    motors.init();
 
     // Start with motor off, increasing
     val = 0;
@@ -44,7 +44,7 @@ void setup(void)
 
 void loop(void)
 {
-    motor.write(val);
+    motors.write(0, val);
 
     val += dir * .001;
 

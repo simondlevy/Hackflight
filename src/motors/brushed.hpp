@@ -28,14 +28,14 @@ namespace hf {
 
         public:
 
-            BrushedMotor(const uint8_t * pins, const uint8_t npins) 
-                : Motor(pins, npins) 
+            BrushedMotor(const uint8_t * pins, const uint8_t count) 
+                : Motor(pins, count) 
             {
             }
 
             void init(void) override
             {
-                for (uint8_t k=0; k<_npins; ++k) {
+                for (uint8_t k=0; k<_count; ++k) {
                     analogWriteFrequency(_pins[k], 10000);  
                     analogWrite(_pins[k], 0);  
                 }
