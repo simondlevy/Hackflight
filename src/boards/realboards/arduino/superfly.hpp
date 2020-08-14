@@ -32,33 +32,33 @@ namespace hf {
 
     class SuperflyMotor : public Motor {
 
+        private:
+
+            static constexpr uint8_t PINS[4] = {4, 5, 12, 14};
+
         public:
 
-            SuperflyMotor(uint8_t pin) 
-                : Motor(pin)
+            SuperflyMotor(void) : Motor(PINS, 4)
             {
             }
 
         protected:
 
-            virtual void write(float value) override
+            virtual void write(uint8_t index, float value) override
             {
-                analogWrite(_pin, (uint16_t)(value * 1023));
+                analogWrite(_pins[index], (uint16_t)(value * 1023));
             }
 
             virtual void init(void) override
             {
-                analogWrite(_pin, 0);  
+                for (uint8_t k=0; k<_count; ++k) {
+                    analogWrite(_pins[k], 0);  
+                }
             }
 
     }; // class SuperflyMotor
 
-    SuperflyMotor motor1(4);
-    SuperflyMotor motor2(5);
-    SuperflyMotor motor3(12);
-    SuperflyMotor motor4(14);
-
-    Motor * superflyMotors[4] = { &motor1, &motor2, &motor3, &motor4 };
+    SuperflyMotor superflyMotors;
 
     class SuperFly : public ArduinoBoard {
 
