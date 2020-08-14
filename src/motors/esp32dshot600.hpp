@@ -162,8 +162,6 @@ namespace hf {
 
         private:
 
-            static const uint8_t MAX_MOTORS = 10;
-
             // XXX idle value should be calibrated for each motor
             static constexpr uint16_t MIN = 48;
             static constexpr uint16_t MAX = 2047;
@@ -179,9 +177,7 @@ namespace hf {
 
             } motor_t;
 
-            motor_t _motors[MAX_MOTORS] = {};
-
-            uint8_t _motorCount = 0;
+            motor_t _motors[MAX_COUNT] = {};
 
             static void coreTask(void * params)
             {
@@ -190,7 +186,7 @@ namespace hf {
 
                 while (true) {
 
-                    for (uint8_t k=0; k<dshot->_motorCount; ++k) {
+                    for (uint8_t k=0; k<dshot->_count; ++k) {
                         dshot->outputOne(&dshot->_motors[k]);
                     }
 
@@ -241,25 +237,19 @@ namespace hf {
             NewEsp32DShot600(uint8_t pins[], uint8_t count) 
                 : Motor(pins, count)
             {
+                for (uint8_t k=0; k<count; ++k) {
+                    _motors[k++].pin = pins[k];
+                }
             }
 
             void init(void)
             {
-            }
-
-            void addMotor(uint8_t pin)
-            {
-                _motors[_motorCount++].pin = pin;
-            }
-
-            bool begin(void)
-            {
-                for (uint8_t k=0; k<_motorCount; ++k) {
+                for (uint8_t k=0; k<_count; ++k) {
 
                     motor_t * motor = &_motors[k];
 
                     if ((motor->rmt_send = rmtInit(motor->pin, true, RMT_MEM_64)) == NULL) {
-                        return false;
+                        return;
                     }
 
                     rmtSetTick(motor->rmt_send, 12.5); // 12.5ns sample rate
@@ -274,8 +264,6 @@ namespace hf {
 
                 TaskHandle_t Task;
                 xTaskCreatePinnedToCore(coreTask, "Task", 10000, this, 1, &Task, 0); 
-
-                return true;
             }
 
             void writeMotor(uint8_t index, float value)
