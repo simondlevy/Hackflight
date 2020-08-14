@@ -38,6 +38,10 @@ namespace hf {
 
     Motor * ladybugFcMotors[4] = { &motor1, &motor2, &motor3, &motor4 };
 
+    static const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
+
+    NewBrushedMotor ladybugFcNewMotors = NewBrushedMotor(MOTOR_PINS, 4);
+
     class LadybugFC : public ArduinoBoard {
 
         public:

@@ -48,7 +48,7 @@ namespace hf {
 
             void writeMotor(uint8_t index, float value)
             {
-                _motors[index]->write(value);
+                _motors->write(index, value);
             }
 
             void safeWriteMotor(uint8_t index, float value)
@@ -63,7 +63,7 @@ namespace hf {
 
         protected:
 
-            Motor ** _motors;
+            NewMotor * _motors;
 
             motorMixer_t motorDirections[MAXMOTORS];
 
@@ -84,13 +84,11 @@ namespace hf {
             // This is also use by serial task
             float  motorsDisarmed[MAXMOTORS];
 
-            void useMotors(Motor ** motors)
+            void useMotors(NewMotor * motors)
             {
                 _motors = motors;
 
-                for (uint8_t i=0; i<_nmotors; ++i) {
-                    _motors[i]->init();
-                }
+                _motors->init();
             }
 
             // This is how we can spin the motors from the GCS
