@@ -26,6 +26,16 @@
 
 namespace hf {
 
+    class NewMotor {
+
+        public:
+
+            NewMotor(const uint8_t * pins, const uint8_t npins)
+            {
+            }
+
+    }; // class NewMotor
+
     class Motor {
 
         protected:
