@@ -30,9 +30,9 @@ namespace hf {
 
         protected:
 
-            static const uint8_t MAX_PINS = 20; // arbitrary
+            static const uint8_t MAX_COUNT = 20; // arbitrary
 
-            uint8_t _pins[MAX_PINS];
+            uint8_t _pins[MAX_COUNT];
             uint8_t _count = 0;
 
         public:

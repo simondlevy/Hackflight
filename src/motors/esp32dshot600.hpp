@@ -158,7 +158,7 @@ namespace hf {
 
     }; // class Esp32DShot600
 
-    class NewEsp32DShot600 {
+    class NewEsp32DShot600 : public Motor {
 
         private:
 
@@ -238,9 +238,13 @@ namespace hf {
 
         public:
 
-            NewEsp32DShot600(void)
+            NewEsp32DShot600(uint8_t pins[], uint8_t count) 
+                : Motor(pins, count)
             {
-                _motorCount = 0;
+            }
+
+            void init(void)
+            {
             }
 
             void addMotor(uint8_t pin)
