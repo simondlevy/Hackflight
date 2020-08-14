@@ -32,7 +32,14 @@ namespace hf {
                 : NewMotor(pins, npins) 
             {
             }
-        
+
+            void init(void)
+            {
+                for (uint8_t k=0; k<_npins; ++k) {
+                    analogWriteFrequency(_pins[k], 10000);  
+                    analogWrite(_pins[k], 0);  
+                }
+            }
     }
 
     class BrushedMotor : public Motor {
