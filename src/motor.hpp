@@ -45,6 +45,10 @@ namespace hf {
                 _npins = npins;
             }
 
+            virtual void init(void) { }
+
+            virtual void write(uint8_t index, float value) = 0;
+
     }; // class NewMotor
 
     class Motor {

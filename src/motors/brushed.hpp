@@ -33,13 +33,19 @@ namespace hf {
             {
             }
 
-            void init(void)
+            void init(void) override
             {
                 for (uint8_t k=0; k<_npins; ++k) {
                     analogWriteFrequency(_pins[k], 10000);  
                     analogWrite(_pins[k], 0);  
                 }
             }
+
+            virtual void write(uint8_t index, float value) override
+            {
+                analogWrite(_pins[index], (uint8_t)(value * 255));
+            }
+
     }
 
     class BrushedMotor : public Motor {
