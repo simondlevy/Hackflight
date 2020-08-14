@@ -20,18 +20,16 @@
 #include "hackflight.hpp"
 #include "motors/esp32dshot600.hpp"
 
-hf::Esp32DShot600 motors;
+static const uint8_t PINS[1] = {27};
+
+hf::NewEsp32DShot600 motors = hf::NewEsp32DShot600(PINS, 1);
 
 static float val;
 static int8_t dir;
 
 void setup(void)
 {
-    motors.addMotor(27);
-
-    delay(100);
-
-    motors.begin();
+    motors.init();
 
     delay(1000);
 
@@ -41,7 +39,7 @@ void setup(void)
 
 void loop(void)
 {
-    motors.writeMotor(0, val);
+    motors.write(0, val);
 
     val += dir * .001;
 

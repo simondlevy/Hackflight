@@ -234,7 +234,7 @@ namespace hf {
 
         public:
 
-            NewEsp32DShot600(uint8_t pins[], uint8_t count) 
+            NewEsp32DShot600(const uint8_t pins[], const uint8_t count) 
                 : Motor(pins, count)
             {
                 for (uint8_t k=0; k<count; ++k) {
@@ -266,7 +266,7 @@ namespace hf {
                 xTaskCreatePinnedToCore(coreTask, "Task", 10000, this, 1, &Task, 0); 
             }
 
-            void writeMotor(uint8_t index, float value)
+            void write(uint8_t index, float value)
             {
                 _motors[index].outputValue = MIN + (uint16_t)(value * (MAX-MIN));
             }
