@@ -28,10 +28,21 @@ namespace hf {
 
     class NewMotor {
 
+        private:
+
+            static const uint8_t MAX_PINS = 20; // arbitrary
+
+            uint8_t _pins[MAX_PINS];
+            uint8_t _npins = 0;
+
         public:
 
             NewMotor(const uint8_t * pins, const uint8_t npins)
             {
+                for (uint8_t k=0; k<npins; ++k) {
+                    _pins[k] = pins[k];
+                }
+                _npins = npins;
             }
 
     }; // class NewMotor

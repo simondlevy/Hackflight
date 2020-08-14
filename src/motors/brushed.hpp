@@ -24,6 +24,17 @@
 
 namespace hf {
 
+    class NewBrushedMotor : public NewMotor {
+
+        public:
+
+            NewBrushedMotor(const uint8_t * pins, const uint8_t npins) 
+                : NewMotor(pins, npins) 
+            {
+            }
+        
+    }
+
     class BrushedMotor : public Motor {
 
         public:
