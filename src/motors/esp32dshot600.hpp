@@ -1,7 +1,7 @@
 /*
    ESP32 Arduino code for DSHOT600 protocol
 
-   Copyright (c) 2019 Simon D. Levy
+   Copyright (c) 2020 Simon D. Levy
 
    Adapted from https://github.com/JyeSmith/dshot-esc-tester/blob/master/dshot-esc-tester.ino, 
    which contains the following licensing notice:
