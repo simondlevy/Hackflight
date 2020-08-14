@@ -274,7 +274,7 @@ namespace hf {
 
         public:
 
-            void init(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, NewMotor * motors, bool armed=false)
+            void init(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor * motors, bool armed=false)
             {  
                 // Do general initialization
                 general_init(board, receiver, mixer);

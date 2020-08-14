@@ -26,7 +26,7 @@
 
 namespace hf {
 
-    class NewMotor {
+    class Motor {
 
         protected:
 
@@ -37,7 +37,7 @@ namespace hf {
 
         public:
 
-            NewMotor(const uint8_t * pins, const uint8_t npins)
+            Motor(const uint8_t * pins, const uint8_t npins)
             {
                 for (uint8_t k=0; k<npins; ++k) {
                     _pins[k] = pins[k];
@@ -48,25 +48,6 @@ namespace hf {
             virtual void init(void) { }
 
             virtual void write(uint8_t index, float value) = 0;
-
-    }; // class NewMotor
-
-    class Motor {
-
-        protected:
-
-            uint8_t _pin = 0;
-
-            Motor(uint8_t pin)
-            {
-                _pin = pin;
-            }
-
-        public:
-
-            virtual void write(float value)  = 0;
-
-            virtual void init(void) { }
 
     }; // class Motor
 

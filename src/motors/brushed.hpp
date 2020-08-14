@@ -24,12 +24,12 @@
 
 namespace hf {
 
-    class NewBrushedMotor : public NewMotor {
+    class BrushedMotor : public Motor {
 
         public:
 
-            NewBrushedMotor(const uint8_t * pins, const uint8_t npins) 
-                : NewMotor(pins, npins) 
+            BrushedMotor(const uint8_t * pins, const uint8_t npins) 
+                : Motor(pins, npins) 
             {
             }
 
@@ -44,28 +44,6 @@ namespace hf {
             virtual void write(uint8_t index, float value) override
             {
                 analogWrite(_pins[index], (uint8_t)(value * 255));
-            }
-
-    }; // class NewBrushedMotor
-
-    class BrushedMotor : public Motor {
-
-        public:
-
-            BrushedMotor(uint8_t pin) 
-                : Motor(pin)
-            {
-            }
-
-            virtual void init(void) override
-            {
-                analogWriteFrequency(_pin, 10000);  
-                analogWrite(_pin, 0);  
-            }
-
-            virtual void write(float value) override
-            {
-                analogWrite(_pin, (uint8_t)(value * 255));
             }
 
     }; // class BrushedMotor

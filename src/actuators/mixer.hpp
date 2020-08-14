@@ -63,7 +63,7 @@ namespace hf {
 
         protected:
 
-            NewMotor * _motors;
+            Motor * _motors;
 
             motorMixer_t motorDirections[MAXMOTORS];
 
@@ -84,7 +84,7 @@ namespace hf {
             // This is also use by serial task
             float  motorsDisarmed[MAXMOTORS];
 
-            void useMotors(NewMotor * motors)
+            void useMotors(Motor * motors)
             {
                 _motors = motors;
 
