@@ -8,7 +8,7 @@ me who want to tinker with flight-control firmware, and use it to teach
 students about ideas like inertial measurement and PID tuning.  <b>If you are
 in the 99% percent of users who just want to get your vehicle flying without
 getting into firmware hacking, I recommend
-[Cleanflight](http://cleanflight.com/)</b> (great for getting started when
+[Betaflight](http://betaflight.com/)</b> (great for getting started when
 you're on a budget) <b>or the [Ardupilot](http://copter.ardupilot.org)
 system</b> (for sophisticated mission planning with waypoint navigation and the
 like).  In addition to big user communities and loads of great features, these
