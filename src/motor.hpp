@@ -28,7 +28,7 @@ namespace hf {
 
     class NewMotor {
 
-        private:
+        protected:
 
             static const uint8_t MAX_PINS = 20; // arbitrary
 

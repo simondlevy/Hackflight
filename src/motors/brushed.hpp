@@ -46,7 +46,7 @@ namespace hf {
                 analogWrite(_pins[index], (uint8_t)(value * 255));
             }
 
-    }
+    }; // class NewBrushedMotor
 
     class BrushedMotor : public Motor {
 
