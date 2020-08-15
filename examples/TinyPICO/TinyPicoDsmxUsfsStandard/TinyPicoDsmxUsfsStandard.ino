@@ -41,6 +41,8 @@ static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 static constexpr float DEMAND_SCALE = 8.0f;
 
+static constexpr uint8_t MOTOR_PINS[4] = {25, 26, 27, 15};
+
 hf::Hackflight h;
 
 hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
@@ -53,12 +55,7 @@ hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 hf::USFS imu;
 
-hf::StandardMotor motor1(25);
-hf::StandardMotor motor2(26);
-hf::StandardMotor motor3(27);
-hf::StandardMotor motor4(15);
-
-hf::Motor * motors[4] = { &motor1, &motor2, &motor3, &motor4 };
+hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
 
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
@@ -82,7 +79,7 @@ void setup(void)
     Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
     // Initialize Hackflight firmware
-    h.init(new hf::TinyPico(), &imu, &rc, &mixer, motors);
+    h.init(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
 
     // Add Rate and Level PID controllers
     h.addPidController(&levelPid);

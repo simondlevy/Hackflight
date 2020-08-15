@@ -43,7 +43,7 @@ namespace hf {
 
         public:
 
-            StandardMotor(uint8_t pins[], uint8_t count) 
+            StandardMotor(const uint8_t pins[], const uint8_t count) 
                 : Motor(pins, count)
             {
             }
