@@ -46,12 +46,7 @@ hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCA
 
 hf::MixerQuadXCF mixer;
 
-hf::MockMotor motor1;
-hf::MockMotor motor2;
-hf::MockMotor motor3;
-hf::MockMotor motor4;
-
-hf::Motor * motors[4] = { &motor1, &motor2, &motor3, &motor4 };
+hf::MockMotor motors;
 
 void setup(void)
 {
@@ -63,7 +58,7 @@ void setup(void)
 
     delay(100);
 
-    h.init(new hf::Teensy40(), &imu, &rc, &mixer, motors);
+    h.init(new hf::Teensy40(), &imu, &rc, &mixer, &motors);
 }
 
 void loop()

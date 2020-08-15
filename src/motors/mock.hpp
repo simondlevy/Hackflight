@@ -29,7 +29,7 @@ namespace hf {
         public:
 
             MockMotor(void) 
-                : Motor(0)
+                : Motor(NULL, 0)
             {
             }
 
@@ -37,8 +37,9 @@ namespace hf {
             {
             }
 
-            virtual void write(float value) override
+            virtual void write(uint8_t index, float value) override
             {
+                (void)index;
                 (void)value;
             }
 

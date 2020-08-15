@@ -26,47 +26,28 @@
 
 namespace hf {
 
-    class NewMotor {
+    class Motor {
 
-        private:
+        protected:
 
-            static const uint8_t MAX_PINS = 20; // arbitrary
+            static const uint8_t MAX_COUNT = 20; // arbitrary
 
-            uint8_t _pins[MAX_PINS];
-            uint8_t _npins = 0;
+            uint8_t _pins[MAX_COUNT];
+            uint8_t _count = 0;
 
         public:
 
-            NewMotor(const uint8_t * pins, const uint8_t npins)
+            Motor(const uint8_t * pins, const uint8_t count)
             {
-                for (uint8_t k=0; k<npins; ++k) {
+                for (uint8_t k=0; k<count; ++k) {
                     _pins[k] = pins[k];
                 }
-                _npins = npins;
+                _count = count;
             }
 
             virtual void init(void) { }
 
             virtual void write(uint8_t index, float value) = 0;
-
-    }; // class NewMotor
-
-    class Motor {
-
-        protected:
-
-            uint8_t _pin = 0;
-
-            Motor(uint8_t pin)
-            {
-                _pin = pin;
-            }
-
-        public:
-
-            virtual void write(float value)  = 0;
-
-            virtual void init(void) { }
 
     }; // class Motor
 

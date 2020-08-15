@@ -36,27 +36,29 @@ namespace hf {
             static const uint16_t MINVAL = 125;
             static const uint16_t MAXVAL = 250;
 
-            void writeValue(uint16_t value)
+            void writeValue(uint8_t index, uint16_t value)
             {
-                analogWrite(_pin, value+OFFSET);
+                analogWrite(_pins[index], value+OFFSET);
             }
 
         public:
 
-            StandardMotor(uint8_t pin) 
-                : Motor(pin)
+            StandardMotor(const uint8_t pins[], const uint8_t count) 
+                : Motor(pins, count)
             {
             }
 
             virtual void init(void) override
             {
-                pinMode(_pin, OUTPUT);
-                writeValue(MINVAL);
+                for (uint8_t k=0; k<_count; ++k) {
+                    pinMode(_pins[k], OUTPUT);
+                    writeValue(k, MINVAL);
+                }
             }
 
-            virtual void write(float value) override
+            virtual void write(uint8_t index, float value) override
             { 
-                writeValue((uint16_t)(MINVAL+value*(MAXVAL-MINVAL))); 
+                writeValue(index, (uint16_t)(MINVAL+value*(MAXVAL-MINVAL))); 
             }
 
     }; // class StandardMotor

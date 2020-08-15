@@ -59,7 +59,7 @@ void setup(void)
 {
 
     // Use pin A1 for LED on original LadybugFC (newer uses A4)
-    h.init(new hf::LadybugFC(A1), &hf::ladybugIMU, &rc, &mixer, hf::ladybugFcMotors);
+    h.init(new hf::LadybugFC(A1), &hf::ladybugIMU, &rc, &mixer, &hf::ladybugFcNewMotors);
 
     // Add Rate, Level PID constrollers
     h.addPidController(&ratePid, 0);
