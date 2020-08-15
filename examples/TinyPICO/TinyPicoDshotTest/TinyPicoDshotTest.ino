@@ -22,7 +22,7 @@
 
 static const uint8_t PINS[1] = {27};
 
-hf::NewEsp32DShot600 motors = hf::NewEsp32DShot600(PINS, 1);
+hf::Esp32DShot600 motors = hf::Esp32DShot600(PINS, 1);
 
 static float val;
 static int8_t dir;

@@ -40,8 +40,6 @@ namespace hf {
                 _count = count;
             }
 
-        public:
-
             Motor(const uint8_t * pins, const uint8_t count)
             {
                 for (uint8_t k=0; k<count; ++k) {
@@ -49,6 +47,8 @@ namespace hf {
                 }
                 _count = count;
             }
+
+        public:
 
             virtual void init(void) { }
 
