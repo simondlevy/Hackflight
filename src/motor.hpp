@@ -35,6 +35,11 @@ namespace hf {
             uint8_t _pins[MAX_COUNT];
             uint8_t _count = 0;
 
+            Motor(const uint8_t count) 
+            {
+                _count = count;
+            }
+
         public:
 
             Motor(const uint8_t * pins, const uint8_t count)
