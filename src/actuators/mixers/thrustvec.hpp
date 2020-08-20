@@ -35,9 +35,9 @@ namespace hf {
             {
                 //                     Th  RR  PF  YR
                 motorDirections[0] = { +1, 0,  0, 0 };    // 1 right rear
-                motorDirections[1] = { +1, 0,, 0, 0 };    // 2 right front
+                motorDirections[1] = { +1, 0,  0, 0 };    // 2 right front
                 motorDirections[2] = { +1, 0,  0, 0 };    // 3 left rear
-                motorDirections[3] = { +1, 0,, 0, 0 };    // 4 left front
+                motorDirections[3] = { +1, 0 , 0, 0 };    // 4 left front
             }
     };
 
