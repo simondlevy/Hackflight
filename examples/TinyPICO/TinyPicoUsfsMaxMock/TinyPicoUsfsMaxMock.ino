@@ -37,16 +37,11 @@ hf::MixerQuadXCF mixer;
 
 hf::USFSMAX_IMU imu;
 
-hf::MockMotor motor1;
-hf::MockMotor motor2;
-hf::MockMotor motor3;
-hf::MockMotor motor4;
-
-hf::Motor * motors[4] = { &motor1, &motor2, &motor3, &motor4 };
+hf::MockMotor motors;
 
 void setup(void)
 {
-    h.init(new hf::TinyPico(), &imu, &rc, &mixer, motors);
+    h.init(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
 }
 
 void loop(void)
