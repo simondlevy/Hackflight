@@ -62,6 +62,8 @@ namespace hf {
                 if (state.rotation[2] < 0) {
                     state.rotation[2] += 2*M_PI;
                 }
+
+                imu->adjustEulerAngles(state.rotation[0], state.rotation[1], state.rotation[2]);
             }
 
             virtual bool ready(float time) override
