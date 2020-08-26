@@ -71,10 +71,6 @@ namespace hf {
 
         protected:
 
-            // Handle upside-down mounting
-            virtual void adjustGyrometer(float & gx, float & gy, float & gz) { (void)gx; (void)gy; (void)gz;  }
-            virtual void adjustQuaternion(float & qw, float & qx, float & qy, float & qz) { (void)qw; (void)qx; (void)qy; (void)qz;  }
-
             virtual bool getGyrometer(float & gx, float & gy, float & gz) override
             {
                 switch (_usfsmax.dataReady()) {
@@ -87,7 +83,6 @@ namespace hf {
                             gx = gyro[0];
                             gy = gyro[1];
                             gz = gyro[2];
-                            adjustGyrometer(gx, gy, gz);
                         }
                         return true;
                     default:
@@ -107,7 +102,7 @@ namespace hf {
                     qx = quat[1];
                     qy = quat[2];
                     qz = quat[3];
-                    adjustQuaternion(qw, qx, qy, qz);
+
                     return true;
                 }
 
