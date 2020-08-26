@@ -42,6 +42,9 @@ namespace hf {
             {
                 (void)time;
 
+                // Compensate for IMU mounting as needed
+                imu->adjustGyrometer(_x, _y, _z);
+
                 // NB: We negate gyro X, Y to simplify PID controller
                 state.angularVel[0] =  _x;
                 state.angularVel[1] = -_y;
