@@ -33,7 +33,7 @@ namespace hf {
         //
         // GX: roll right +,    left -
         // GY: pitch forward -, back +
-        // GZ: yaw left -,      right +
+        // GZ: yaw right +,     left -
         //
         // AX: pitch forward +, back -
         // AY: roll right +,    left -

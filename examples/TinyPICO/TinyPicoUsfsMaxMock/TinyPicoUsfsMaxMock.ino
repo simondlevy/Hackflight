@@ -27,7 +27,7 @@
 #include "receivers/mock.hpp"
 #include "actuators/mixers/quadxcf.hpp"
 #include "motors/mock.hpp"
-#include "imus/usfsmax.hpp"
+#include "imus/usfsmax/usfsmax_inverted.hpp"
 
 hf::Hackflight h;
 
@@ -35,7 +35,7 @@ hf::MockReceiver rc;
 
 hf::MixerQuadXCF mixer;
 
-hf::USFSMAX_IMU imu;
+hf::USFSMAX_Inverted imu;
 
 hf::MockMotor motors;
 

@@ -27,7 +27,7 @@
 #include "receivers/mock.hpp"
 #include "actuators/mixers/quadxcf.hpp"
 #include "motors/mock.hpp"
-#include "imus/softquats/nxp.hpp"
+#include "imus/softquat/nxp.hpp"
 
 hf::Hackflight h;
 
