@@ -149,7 +149,7 @@ namespace hf {
             {
                 _didReset = false;
 
-                // Is throttle stick in deadband?
+                // Is stick demand in deadband?
                 bool inBand = fabs(demand) < STICK_DEADBAND; 
 
                 // Reset controller when moving into deadband
