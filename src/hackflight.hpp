@@ -183,7 +183,7 @@ namespace hf {
                     _state.armed = false;
                 } 
 
-                // Avoid arming if aux2 switch down on startup
+                // Avoid arming if aux1 switch down on startup
                 if (!_safeToArm) {
                     _safeToArm = !_receiver->getAux1State();
                 }
