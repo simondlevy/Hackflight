@@ -31,6 +31,7 @@ namespace hf {
 
             FlowHoldPid(const float Kp, float Ki)
             {
+                rollPid.init(Kp, Ki, 0);
                 pitchPid.init(Kp, Ki, 0);
             }
 
@@ -38,15 +39,14 @@ namespace hf {
 
             virtual void modifyDemands(state_t * state, demands_t & demands) override
             {
-                debugline("%+3.3f", pitchPid.compute(0, state->inertialVel[0]));
-
-                //(fabs(demands.pitch) < STICK_DEADBAND)
-
+                demands.pitch += (0.5 - fabs(demands.pitch)) * pitchPid.compute(0, state->inertialVel[0]);
+                demands.roll  += (0.5 - fabs(demands.roll))  * rollPid.compute(0, state->inertialVel[1]);
 
             }
 
         private:
 
+            Pid rollPid;
             Pid pitchPid;
 
     };  // class FlowHoldPid
