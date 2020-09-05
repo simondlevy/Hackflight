@@ -35,7 +35,6 @@ namespace hf {
             static constexpr float STICK_DEADBAND = 0.10;   
 
             bool _inBandPrev = false;
-            bool didReset = false;
 
             // P controller for position.  This will serve as the set-point for velocity PID.
             Pid _posPid;
@@ -46,12 +45,15 @@ namespace hf {
             // This will be reset each time we re-enter throttle deadband.
             float _altitudeTarget = 0;
 
-            float computeVel(float demand, float inBandTargetVelocity, float outOfBandTargetScale, float actualVelocity)
+        protected:
+
+            void modifyDemands(state_t * state, demands_t & demands)
             {
-                didReset = false;
+                bool didReset = false;
+                float altitude = state->location[2];
 
                 // Is stick demand in deadband?
-                bool inBand = fabs(demand) < STICK_DEADBAND; 
+                bool inBand = fabs(demands.throttle) < STICK_DEADBAND; 
 
                 // Reset controller when moving into deadband
                 if (inBand && !_inBandPrev) {
@@ -61,21 +63,10 @@ namespace hf {
                 _inBandPrev = inBand;
 
                 // Target velocity is a setpoint inside deadband, scaled constant outside
-                float targetVelocity = inBand ? inBandTargetVelocity : outOfBandTargetScale * demand;
+                float targetVelocity = inBand ? _posPid.compute(_altitudeTarget, altitude) : PILOT_VELZ_MAX * demands.throttle;
 
                 // Run velocity PID controller to get correction
-                return _velPid.compute(targetVelocity, actualVelocity);
-            }
-
-        protected:
-
-            void modifyDemands(state_t * state, demands_t & demands)
-            {
-                float altitude = state->location[2];
-
-                // Run the velocity-based PID controller, using position-based PID controller output inside deadband, throttle-stick
-                // proportion outside.  
-                demands.throttle = computeVel(demands.throttle, _posPid.compute(_altitudeTarget, altitude), PILOT_VELZ_MAX, state->inertialVel[2]);
+                demands.throttle = _velPid.compute(targetVelocity, state->inertialVel[2]);
 
                 // If we re-entered deadband, we reset the target altitude.
                 if (didReset) {
@@ -96,7 +87,6 @@ namespace hf {
                 _velPid.init(Kp_vel, Ki_vel, Kd_vel);
 
                 _inBandPrev = false;
-                didReset = false;
                 _altitudeTarget = 0;
             }
 
