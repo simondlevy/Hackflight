@@ -31,13 +31,23 @@ namespace hf {
 
             FlowHoldPid(const float Kp, float Ki)
             {
+                pitchPid.init(Kp, Ki, 0);
             }
 
         protected:
 
             virtual void modifyDemands(state_t * state, demands_t & demands) override
             {
+                debugline("%+3.3f", pitchPid.compute(0, state->inertialVel[0]));
+
+                //(fabs(demands.pitch) < STICK_DEADBAND)
+
+
             }
+
+        private:
+
+            Pid pitchPid;
 
     };  // class FlowHoldPid
 
