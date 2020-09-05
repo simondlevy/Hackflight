@@ -28,98 +28,77 @@ namespace hf {
 
     class AltitudeHoldPid : public PidController {
 
-        // Velocity-based PID controller
-        class VelocityPid : public Pid {
-
-            private:
-
-                static constexpr float STICK_DEADBAND = 0.10;
-
-                bool _inBandPrev = false;
-                bool _didReset = false;
-
-            public:
-
-                void init(float Kp, float Ki, float Kd)
-                {
-                    Pid::init(Kp, Ki, Kd);
-
-                    _inBandPrev = false;
-                    _didReset = false;
-                }
-
-                float compute(float demand, float inBandTargetVelocity, float outOfBandTargetScale, float actualVelocity)
-                {
-                    _didReset = false;
-
-                    // Is stick demand in deadband?
-                    bool inBand = fabs(demand) < STICK_DEADBAND; 
-
-                    // Reset controller when moving into deadband
-                    if (inBand && !_inBandPrev) {
-                        reset();
-                        _didReset = true;
-                    }
-                    _inBandPrev = inBand;
-
-                    // Target velocity is a setpoint inside deadband, scaled constant outside
-                    float targetVelocity = inBand ? inBandTargetVelocity : outOfBandTargetScale * demand;
-
-                    // Run velocity PID controller to get correction
-                    return Pid::compute(targetVelocity, actualVelocity);
-                }
-
-                bool didReset(void)
-                {
-                    return _didReset;
-                }
-
-        }; // class VelocityPid
-
         private: 
 
-        // Arbitrary constants
-        static constexpr float PILOT_VELZ_MAX  = 2.5f; // http://ardupilot.org/copter/docs/altholdmode.html
+            // Arbitrary constants: for details see http://ardupilot.org/copter/docs/altholdmode.html
+            static constexpr float PILOT_VELZ_MAX  = 2.5f;
+            static constexpr float STICK_DEADBAND = 0.10;   
 
-        // P controller for position.  This will serve as the set-point for velocity PID.
-        Pid _posPid;
+            bool _inBandPrev = false;
+            bool didReset = false;
 
-        // PID controller for velocity
-        VelocityPid _velPid;
+            // P controller for position.  This will serve as the set-point for velocity PID.
+            Pid _posPid;
 
-        // This will be reset each time we re-enter throttle deadband.
-        float _altitudeTarget = 0;
+            // PID controller for velocity
+            Pid _velPid;
+
+            // This will be reset each time we re-enter throttle deadband.
+            float _altitudeTarget = 0;
+
+            float computeVel(float demand, float inBandTargetVelocity, float outOfBandTargetScale, float actualVelocity)
+            {
+                didReset = false;
+
+                // Is stick demand in deadband?
+                bool inBand = fabs(demand) < STICK_DEADBAND; 
+
+                // Reset controller when moving into deadband
+                if (inBand && !_inBandPrev) {
+                    _velPid.reset();
+                    didReset = true;
+                }
+                _inBandPrev = inBand;
+
+                // Target velocity is a setpoint inside deadband, scaled constant outside
+                float targetVelocity = inBand ? inBandTargetVelocity : outOfBandTargetScale * demand;
+
+                // Run velocity PID controller to get correction
+                return _velPid.compute(targetVelocity, actualVelocity);
+            }
 
         protected:
 
-        void modifyDemands(state_t * state, demands_t & demands)
-        {
-            float altitude = state->location[2];
+            void modifyDemands(state_t * state, demands_t & demands)
+            {
+                float altitude = state->location[2];
 
-            // Run the velocity-based PID controller, using position-based PID controller output inside deadband, throttle-stick
-            // proportion outside.  
-            demands.throttle = _velPid.compute(demands.throttle, _posPid.compute(_altitudeTarget, altitude), PILOT_VELZ_MAX, state->inertialVel[2]);
+                // Run the velocity-based PID controller, using position-based PID controller output inside deadband, throttle-stick
+                // proportion outside.  
+                demands.throttle = computeVel(demands.throttle, _posPid.compute(_altitudeTarget, altitude), PILOT_VELZ_MAX, state->inertialVel[2]);
 
-            // If we re-entered deadband, we reset the target altitude.
-            if (_velPid.didReset()) {
-                _altitudeTarget = altitude;
+                // If we re-entered deadband, we reset the target altitude.
+                if (didReset) {
+                    _altitudeTarget = altitude;
+                }
             }
-        }
 
-        virtual bool shouldFlashLed(void) override 
-        {
-            return true;
-        }
+            virtual bool shouldFlashLed(void) override 
+            {
+                return true;
+            }
 
         public:
 
-        AltitudeHoldPid(const float Kp_pos, const float Kp_vel, const float Ki_vel, const float Kd_vel) 
-        {
-            _posPid.init(Kp_pos, 0, 0);
-            _velPid.init(Kp_vel, Ki_vel, Kd_vel);
+            AltitudeHoldPid(const float Kp_pos, const float Kp_vel, const float Ki_vel, const float Kd_vel) 
+            {
+                _posPid.init(Kp_pos, 0, 0);
+                _velPid.init(Kp_vel, Ki_vel, Kd_vel);
 
-            _altitudeTarget = 0;
-        }
+                _inBandPrev = false;
+                didReset = false;
+                _altitudeTarget = 0;
+            }
 
     };  // class AltitudeHoldPid
 
