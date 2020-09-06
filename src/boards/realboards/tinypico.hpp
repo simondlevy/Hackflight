@@ -23,8 +23,6 @@
 #pragma once
 
 #include <Wire.h>
-#include "motors/standard.hpp"
-#include "boards/realboard.hpp"
 #include "boards/realboards/arduino.hpp"
 
 #include <TinyPICO.h>
