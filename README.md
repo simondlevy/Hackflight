@@ -253,4 +253,4 @@ from Tlera Corp., plus a DSMX receiver, and generates
 SBUS signals as input to the flight-control board.
 
 
-<img src="extras/media/dataflow_lite.png" width=800>
+<img src="extras/media/dataflow_lite2.png" width=800>
