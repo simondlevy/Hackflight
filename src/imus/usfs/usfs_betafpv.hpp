@@ -31,6 +31,15 @@ namespace hf {
             virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz, float time) override
             {
                 USFS::getQuaternion(qw, qx, qy, qz, time);
+
+
+                qw = 1 - qw;
+
+                float tmp = qx;
+                qx = qy;
+                qy = tmp;
+
+                //Debugger::printf("qx: %+3.3f\n", qx);
             }
 
             virtual bool getGyrometer(float & gx, float & gy, float & gz) override
