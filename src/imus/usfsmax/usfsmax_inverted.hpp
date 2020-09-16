@@ -26,15 +26,6 @@ namespace hf {
 
     class USFSMAX_Inverted : public USFSMAX_IMU {
 
-        private:
-
-            void swap(float & a, float & b)
-            {
-                float tmp = a;
-                a = b;
-                b = tmp;
-            }
-
         protected:
 
             virtual void adjustGyrometer(float & x, float & y, float & z) override

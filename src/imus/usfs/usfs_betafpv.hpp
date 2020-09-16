@@ -21,30 +21,22 @@
 #pragma once
 
 #include "imus/usfs.hpp"
+#include "filters.hpp"
 
 namespace hf {
 
     class USFS_BetaFPV : public USFS {
 
-        protected:
+            virtual void adjustEulerAngles(float & x, float & y, float & z) override
+            { 
+                x = M_PI - x;
 
-            virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz, float time) override
-            {
-                USFS::getQuaternion(qw, qx, qy, qz, time);
-
-
-                qw = 1 - qw;
-
-                float tmp = qx;
-                qx = qy;
-                qy = tmp;
-
-                //Debugger::printf("qx: %+3.3f\n", qx);
+                swap(x, y);
             }
 
-            virtual bool getGyrometer(float & gx, float & gy, float & gz) override
+            virtual void adjustGyrometer(float & x, float & y, float & z) override
             {
-                USFS::getGyrometer(gx, gy, gz);
+                //Debugger::printf("x=%+3.3f  y=%+3.3f  z=%+3.3f\n", x, y, z);
             }
 
 

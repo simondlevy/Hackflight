@@ -61,13 +61,6 @@ namespace hf {
                 return int(val*100)/100.f;
             }
 
-            static void swap(float & a, float & b)
-            {
-                float tmp = a;
-                a = b;
-                b = tmp;
-            }
-
     }; // class Filter
 
     class LowPassFilter {

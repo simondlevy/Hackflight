@@ -61,6 +61,14 @@ namespace hf {
             virtual bool  getMagnetometer(float & mx, float & my, float & mz) { (void)mx; (void)my; (void)mz; return false; }
             virtual bool  getBarometer(float & pressure) { (void)pressure;  return false; }
 
+            // Helper
+            static void swap(float & a, float & b)
+            {
+                float tmp = a;
+                a = b;
+                b = tmp;
+            }
+
     }; // class IMU
 
 } // namespace hf
