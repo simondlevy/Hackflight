@@ -26,6 +26,19 @@ namespace hf {
 
     class USFS_BetaFPV : public USFS {
 
+        protected:
+
+            virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz, float time) override
+            {
+                USFS::getQuaternion(qw, qx, qy, qz, time);
+            }
+
+            virtual bool getGyrometer(float & gx, float & gy, float & gz) override
+            {
+                USFS::getGyrometer(gx, gy, gz);
+            }
+
+
     }; // class USFS_BetaFPV
 
 } // namespace hf
