@@ -30,7 +30,7 @@ namespace hf {
             virtual void adjustEulerAngles(float & x, float & y, float & z) override
             { 
                 x = M_PI - x;
-                swap(x, y);
+                swap(x,y);
             }
 
             virtual void adjustGyrometer(float & x, float & y, float & z) override
