@@ -33,15 +33,11 @@ namespace hf {
             MixerThrustVector(void) 
                 : Mixer(4)
             {
-                //                     Th  RR  PF  YR
-                motorDirections[0] = { +1, 0,  0, 0 };    // 1 right rear
-                motorDirections[1] = { +1, 0,  0, 0 };    // 2 right front
-                motorDirections[2] = { +1, 0,  0, 0 };    // 3 left rear
-                motorDirections[3] = { +1, 0 , 0, 0 };    // 4 left front
-                //motorDirections[0] = { +1,  0,   0, +1 };   // rotor 1
-                //motorDirections[1] = { +1,  0,   0, -1 };   // rotor 2
-                //motorDirections[2] = {  0, +1,   0,  0 };   // servo 1
-                //motorDirections[3] = {  0,  0 , +1,  0 };   // servo 2
+                //                     Th   RR   PF  YR
+                motorDirections[0] = { +1,  0,   0, +1 };   // rotor 1
+                motorDirections[1] = { +1,  0,   0, -1 };   // rotor 2
+                motorDirections[2] = {  0, +1,   0,  0 };   // servo 1
+                motorDirections[3] = {  0,  0 , +1,  0 };   // servo 2
              }
     };
 
