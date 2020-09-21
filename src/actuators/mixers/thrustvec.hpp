@@ -39,6 +39,14 @@ namespace hf {
                 motorDirections[2] = {  0, +1,   0,  0 };   // servo 1
                 motorDirections[3] = {  0,  0 , +1,  0 };   // servo 2
              }
+
+        protected:
+
+            virtual float constrainMotorValue(uint8_t index, float value) override
+            {
+                return index < 2 ? Mixer::constrainMotorValue(index, value) : value;
+            }
+
     };
 
 } // namespace

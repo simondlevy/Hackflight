@@ -99,6 +99,13 @@ namespace hf {
                 }
             }
 
+            // This helps support servos
+            virtual float constrainMotorValue(uint8_t index, float value) 
+            {
+                (void)index;
+                return Filter::constrainMinMax(value, 0, 1);
+            }
+
             // Actuator overrides ----------------------------------------------
 
             void run(demands_t demands) override
@@ -130,8 +137,8 @@ namespace hf {
                         motorvals[i] -= maxMotor - 1;
                     }
 
-                    // Keep motor values in interval [0,1]
-                    motorvals[i] = Filter::constrainMinMax(motorvals[i], 0, 1);
+                    // Keep motor values in appropriate interval
+                    motorvals[i] = constrainMotorValue(i, motorvals[i]);
                 }
 
                 for (uint8_t i = 0; i < _nmotors; i++) {
