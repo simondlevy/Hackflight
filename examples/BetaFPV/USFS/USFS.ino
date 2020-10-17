@@ -24,26 +24,34 @@
 
 #include "hackflight.hpp"
 #include "boards/realboards/tinypico.hpp"
-#include "receivers/arduino/dsmx.hpp"
 #include "actuators/mixers/quadxcf.hpp"
-#include "motors/esp32dshot600.hpp"
 #include "imus/usfs/usfs_betafpv.hpp"
 
-static const uint8_t SERIAL1_RX = 32;
-static const uint8_t SERIAL1_TX = 33; // unused
+//#include "receivers/arduino/dsmx.hpp"
+//#include "motors/esp32dshot600.hpp"
+#include "receivers/mock.hpp"
+#include "motors/mock.hpp"
 
-static constexpr uint8_t RX_CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
-static constexpr float RX_DEMAND_SCALE = 8.0f;
+//static const uint8_t SERIAL1_RX = 32;
+//static const uint8_t SERIAL1_TX = 33; // unused
 
-static const uint8_t MOTOR_PINS[4] = {25, 26, 27, 15};
+//static constexpr uint8_t RX_CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+//static constexpr float RX_DEMAND_SCALE = 8.0f;
+
+//static const uint8_t MOTOR_PINS[4] = {25, 26, 27, 15};
 
 hf::Hackflight    h;
-hf::DSMX_Receiver rc = hf::DSMX_Receiver(RX_CHANNEL_MAP, RX_DEMAND_SCALE);  
 hf::MixerQuadXCF  mixer;
 hf::USFS_BetaFPV  imu;
-hf::Esp32DShot600 motors = hf::Esp32DShot600(MOTOR_PINS, 4);
+
+//hf::DSMX_Receiver rc = hf::DSMX_Receiver(RX_CHANNEL_MAP, RX_DEMAND_SCALE);  
+//hf::Esp32DShot600 motors = hf::Esp32DShot600(MOTOR_PINS, 4);
+
+hf::MockReceiver rc;
+hf::MockMotor motors;
 
 
+/*
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
 {
@@ -56,18 +64,19 @@ static void receiverTask(void * params)
         delay(1);
     }
 }
+*/
 
 void setup(void)
 {
     // Start receiver on Serial1
-    Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
+    //Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
     // Start Hackflight
     h.init(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
 
     // Start the receiver timed task
-    TaskHandle_t task;
-    xTaskCreatePinnedToCore(receiverTask, "Task", 10000, NULL, 1, &task, 0);
+    //TaskHandle_t task;
+    //xTaskCreatePinnedToCore(receiverTask, "Task", 10000, NULL, 1, &task, 0);
 }
 
 void loop(void)
