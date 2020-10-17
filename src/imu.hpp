@@ -50,7 +50,6 @@ namespace hf {
             virtual bool getGyrometer(float & gx, float & gy, float & gz) = 0;
 
             // Adjustment for non-standard mounting
-            virtual void adjustEulerAngles(float & x, float & y, float & z) { (void)x; (void)y; (void)z;  }
             virtual void adjustGyrometer(float & x, float & y, float & z) { (void)x; (void)y; (void)z;  }
 
             // Required by some IMUs

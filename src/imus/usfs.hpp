@@ -37,8 +37,6 @@ namespace hf {
             static const uint8_t  BARO_RATE      = 50;   // Hz
             static const uint8_t  Q_RATE_DIVISOR = 5;    // 1/5 gyro rate
 
-            USFS_Master _sentral = USFS_Master(MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
-
             void checkEventStatus(void)
             {
                 _sentral.checkEventStatus();
@@ -49,6 +47,15 @@ namespace hf {
                         Serial.println(_sentral.getErrorString());
                     }
                 }
+            }
+
+        protected:
+
+            USFS_Master _sentral = USFS_Master(MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
+
+            virtual void readSentralQuaternion(float & qw, float & qx, float & qy, float & qz)
+            {
+                _sentral.readQuaternion(qw, qx, qy, qz);
             }
 
         public:
@@ -80,10 +87,7 @@ namespace hf {
 
                 if (_sentral.gotQuaternion()) {
 
-                    _sentral.readQuaternion(qw, qx, qy, qz);
-                    //_sentral.readQuaternion(qw, qy, qx, qz);
-                    //qy = -qy;
-                    //Debugger::printf("%+3.3f  %+3.3f  %+3.3f  %+3.3f\n", qw, qx, qy, qz);
+                    readSentralQuaternion(qw, qx, qy, qz);
 
                     return true;
                 }
