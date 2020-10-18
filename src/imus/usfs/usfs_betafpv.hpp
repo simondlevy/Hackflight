@@ -27,22 +27,7 @@ namespace hf {
 
     class USFS_BetaFPV : public USFS {
 
-        protected:
-
-            virtual void readSentralQuaternion(float & qw, float & qx, float & qy, float & qz)
-            {
-                _sentral.readQuaternion(qw, qy, qx, qz);
-                qy = -qy;
-                Debugger::printf("%+3.3f  %+3.3f  %+3.3f  %+3.3f\n", qw, qx, qy, qz);
-            }
-
         public:
-
-            virtual void adjustGyrometer(float & x, float & y, float & z) override
-            {
-                //swap(x, y);
-                //z = -z;
-            }
 
 
     }; // class USFS_BetaFPV

@@ -30,17 +30,12 @@ namespace hf {
 
             virtual void adjustGyrometer(float & x, float & y, float & z) override
             { 
-                z = -z;
             }
 
             virtual void adjustEulerAngles(float & x, float & y, float & z) override
             { 
-                Serial.print("x: ");
-                Serial.print(x);
-                Serial.print("\ty: ");
-                Serial.print(y);
-                Serial.print("\tz: ");
-                Serial.println(z);
+                x = M_PI - x;
+                z = -z;
             }
 
      }; // class USFSMAX_Inverted

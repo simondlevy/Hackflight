@@ -62,6 +62,10 @@ namespace hf {
                 if (state.rotation[2] < 0) {
                     state.rotation[2] += 2*M_PI;
                 }
+
+                // Compensate for different mounting orientations
+                imu->adjustEulerAngles(state.rotation[0], state.rotation[1], state.rotation[2]);
+
             }
 
             virtual bool ready(float time) override
@@ -74,9 +78,9 @@ namespace hf {
             // We make this public so we can use it in different sketches
             static void computeEulerAngles(float qw, float qx, float qy, float qz, float euler[3])
             {
-                euler[0] = atan2(2.0f*(qw*qx+qy*qz),qw*qw-qx*qx-qy*qy+qz*qz);
-                euler[1] =  asin(2.0f*(qx*qz-qw*qy));
-                euler[2] = atan2(2.0f*(qx*qy+qw*qz),qw*qw+qx*qx-qy*qy-qz*qz);
+                euler[0] =  atan2(2.0f*(qw*qx+qy*qz),qw*qw-qx*qx-qy*qy+qz*qz);
+                euler[1] =   asin(2.0f*(qx*qz-qw*qy));
+                euler[2] =  atan2(2.0f*(qx*qy+qw*qz),qw*qw+qx*qx-qy*qy-qz*qz);
             }
 
     };  // class Quaternion

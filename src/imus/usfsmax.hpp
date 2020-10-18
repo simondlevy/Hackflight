@@ -96,8 +96,11 @@ namespace hf {
                 (void)time;
 
                 if (_usfsmax.quaternionReady()) {
+
                     float quat[4] = {};
+
                     _usfsmax.readQuat(quat);
+
                     qw = quat[0];
                     qx = quat[1];
                     qy = quat[2];
