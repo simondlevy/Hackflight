@@ -35,7 +35,8 @@ namespace hf {
 
             virtual void adjustEulerAngles(float & x, float & y, float & z) override
             { 
-                x = M_PI - x;
+                x = -(M_PI - x);
+                y = -y;
                 z = -z;
             }
 
