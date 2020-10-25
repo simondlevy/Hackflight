@@ -29,6 +29,8 @@
 #include "actuators/mixers/quadxcf.hpp"
 #include "motors/esp32dshot600.hpp"
 #include "imus/usfsmax/usfsmax_inverted.hpp"
+#include "pidcontrollers/rate.hpp"
+#include "pidcontrollers/level.hpp"
 
 static const uint8_t SERIAL1_RX = 32;
 static const uint8_t SERIAL1_TX = 33; // unused
@@ -43,6 +45,9 @@ hf::USFSMAX_Inverted imu;
 
 static const uint8_t MOTOR_PINS[4] = {25, 26, 27, 15};
 hf::Esp32DShot600 motors = hf::Esp32DShot600(MOTOR_PINS, 4);
+
+hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f);
+hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 hf::Hackflight h;
 
@@ -67,6 +72,10 @@ void setup(void)
 
     // Initialize Hackflight firmware
     h.init(new hf::TinyPico(), &imu, &rx, &mixer, &motors);
+
+    // Add Rate and Level PID controllers
+    h.addPidController(&levelPid);
+    h.addPidController(&ratePid);
 
     // Start the receiver timed task
     TaskHandle_t task;
