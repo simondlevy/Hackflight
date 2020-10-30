@@ -18,32 +18,30 @@
  */
 
 #include "hackflight.hpp"
-#include "boards/realboards/tinypico.hpp"
-#include "receivers/mock.hpp"
-#include "imus/mock.hpp"
 #include "motors/esp32dshot600.hpp"
-#include "actuators/mixers/quadxcf.hpp"
 
-static const uint8_t PINS[4] = {25, 26, 27, 15};
+static const uint8_t PINS[1] = {25};
 
-hf::Esp32DShot600 motors = hf::Esp32DShot600(PINS, 4);
+hf::Esp32DShot600 motors = hf::Esp32DShot600(PINS, 1);
 
-hf::Hackflight h;
-
-hf::MockReceiver rc;
-
-hf::MockIMU imu;
-
-hf::MixerQuadXCF mixer;
+static float  val;
+static int8_t dir;
 
 void setup(void)
 {
-    // Initialize Hackflight firmware
-    h.init(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
-
+    motors.init();
+    delay(5000);
+    dir = +1;
 }
 
 void loop(void)
 {
-    h.update();
+    motors.write(0, val);
+
+    val += .001 * dir;
+
+    if (val <= 0)   dir = +1;
+    if (val >= 0.5) dir = -1;
+
+    delay(10);
 }
