@@ -30,7 +30,7 @@ static int8_t dir;
 void setup(void)
 {
     motors.init();
-    delay(5000);
+    delay(1000);
     dir = +1;
 }
 
