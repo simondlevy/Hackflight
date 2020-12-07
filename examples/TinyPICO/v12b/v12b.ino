@@ -1,5 +1,10 @@
 /*
-   Test TinyPICO running DSHOT600 ESC protocol
+   Hackflight sketch for TinyPICO with USFSMAX IMU, and mock motors/receiver
+
+   Additional libraries needed:
+
+       https://github.com/simondlevy/USFSMAX
+       https://github.com/simondlevy/CrossPlatformDataBus
 
 
    Copyright (c) 2020 Simon D. Levy
@@ -18,31 +23,32 @@
  */
 
 #include "hackflight.hpp"
+#include "boards/realboards/tinypico.hpp"
+#include "receivers/mock.hpp"
+#include "actuators/mixers/quadxcf.hpp"
 #include "motors/esp32dshot600.hpp"
+#include "imus/usfsmax.hpp"
 
-static const uint8_t PINS[1] = {15};
+hf::Hackflight h;
 
-hf::Esp32DShot600 motors = hf::Esp32DShot600(PINS, 1);
+hf::MockReceiver rc;
 
-static float  val;
-static int8_t dir;
+hf::MixerQuadXCF mixer;
+
+hf::USFSMAX_IMU imu;
+
+//static const uint8_t MOTOR_PINS[4] = {15, 27 ,26, 25};
+static const uint8_t MOTOR_PINS[1] = {15};
+hf::Esp32DShot600 motors = hf::Esp32DShot600(MOTOR_PINS, 1);
 
 void setup(void)
 {
-    motors.init();
-    delay(1000);
-    dir = +1;
-    val = 0;
+    h.init(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
 }
 
 void loop(void)
 {
-    motors.write(0, val);
-
-    val += .0001 * dir;
-
-    if (val <= 0)   dir = +1;
-    if (val >= 0.5) dir = -1;
-
-    delay(1);
+    h.update();
+    
+    delay(10);
 }

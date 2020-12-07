@@ -40,7 +40,7 @@ namespace hf {
         private:
 
             // XXX idle value should be calibrated for each motor
-            static constexpr uint16_t MIN = 48;
+            static constexpr uint16_t MIN = 3;//48;
             static constexpr uint16_t MAX = 2047;
 
             typedef struct {
