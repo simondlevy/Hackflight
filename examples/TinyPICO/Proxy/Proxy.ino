@@ -28,8 +28,8 @@
 #include "motors/mock.hpp"
 #include "imus/mock.hpp"
 
-static const uint8_t SERIAL1_RX = 32;
-static const uint8_t SERIAL1_TX = 33; // unused
+static const uint8_t SERIAL1_RX =  4;
+static const uint8_t SERIAL1_TX = 15; // unused
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
