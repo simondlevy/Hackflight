@@ -284,7 +284,7 @@ namespace hf {
                 _mixer = mixer;
 
                 // Initialize serial timer task
-                _serialTask.init(board, &_state, mixer, receiver);
+                _serialTask.init(board, &_state, receiver, mixer);
 
                 // Support safety override by simulator
                 _state.armed = armed;

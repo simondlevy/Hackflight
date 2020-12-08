@@ -118,7 +118,7 @@ namespace hf {
             {
             }
 
-            void init(Board * board, state_t * state, Mixer * mixer, Receiver * receiver) 
+            void init(Board * board, state_t * state, Receiver * receiver, Mixer * mixer) 
             {
                 TimerTask::init(board);
 
