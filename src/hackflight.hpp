@@ -257,6 +257,9 @@ namespace hf {
                 if (!_state.armed) {
                     _proxy->sendDisarmed();
                 }
+
+                // Update serial comms task
+                _serialTask.update();
             }
 
             void updateFull(void)
@@ -309,6 +312,9 @@ namespace hf {
             {
                 // Do general initialization
                 general_init(board, receiver, proxy);
+
+                // Initialize serial timer task (no mixer)
+                _serialTask.init(board, &_state, receiver);
 
                 // Store proxy for arming check
                 _proxy = proxy;

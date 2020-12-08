@@ -40,6 +40,31 @@ namespace hf {
             Receiver * _receiver = NULL;
             state_t  * _state = NULL;
 
+            void (*_mixerfun)(state_t * state, Mixer * mixer);
+
+            static void _mixerfunFull(state_t * state, Mixer * mixer)
+            {
+                if (!state->armed) {
+                    mixer->runDisarmed();
+                }
+            }
+
+            static void _mixerfunProxy(state_t * state, Mixer * mixer)
+            {
+                (void)state;
+                (void)mixer;
+            }
+
+            void _init(Board * board, state_t * state, Receiver * receiver) 
+            {
+                TimerTask::init(board);
+
+                MspParser::init();
+
+                _state = state;
+                _receiver = receiver;
+             }
+
         protected:
 
             // TimerTask overrides -------------------------------------------------------
@@ -56,9 +81,7 @@ namespace hf {
                 }
 
                 // Support motor testing from GCS
-                if (!_state->armed) {
-                    _mixer->runDisarmed();
-                }
+                _mixerfun(_state, _mixer);
             }
 
             // MspParser overrides -------------------------------------------------------
@@ -118,15 +141,17 @@ namespace hf {
             {
             }
 
+            void init(Board * board, state_t * state, Receiver * receiver) 
+            {
+                _init(board, state, receiver);
+               _mixerfun = _mixerfunProxy;
+             }
+
             void init(Board * board, state_t * state, Receiver * receiver, Mixer * mixer) 
             {
-                TimerTask::init(board);
-
-                MspParser::init();
-
-                _state = state;
-                _mixer = mixer;
-                _receiver = receiver;
+                init(board, state, receiver);
+               _mixer = mixer;
+               _mixerfun = _mixerfunFull;
             }
 
     };  // SerialTask
