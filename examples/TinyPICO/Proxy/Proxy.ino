@@ -24,9 +24,7 @@
 #include "hackflight.hpp"
 #include "boards/realboards/tinypico.hpp"
 #include "receivers/arduino/dsmx.hpp"
-#include "actuators/mixers/quadxcf.hpp"
-#include "motors/mock.hpp"
-#include "imus/mock.hpp"
+#include "actuators/rxproxies/mock.hpp"
 
 static const uint8_t SERIAL1_RX =  4;
 static const uint8_t SERIAL1_TX = 15; // unused
@@ -37,13 +35,9 @@ static constexpr float DEMAND_SCALE = 8.0f;
 
 hf::Hackflight h;
 
-hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
+hf::DSMX_Receiver dsmx_in = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
 
-hf::MixerQuadXCF mixer;
-
-hf::MockIMU imu;
-
-hf::MockMotor motors;
+hf::MockProxy proxy;
 
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
@@ -51,7 +45,7 @@ static void receiverTask(void * params)
     while (true) {
 
         if (Serial1.available()) {
-            rc.handleSerialEvent(Serial1.read(), micros());
+            dsmx_in.handleSerialEvent(Serial1.read(), micros());
         }
 
         delay(1);
@@ -65,7 +59,7 @@ void setup(void)
     Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
     // Initialize Hackflight firmware
-    h.init(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
+    h.init(new hf::TinyPico(), &dsmx_in, &proxy);
 
     // Start the receiver timed task
     TaskHandle_t task;
