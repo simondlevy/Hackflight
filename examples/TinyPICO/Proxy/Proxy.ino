@@ -24,10 +24,14 @@
 #include "hackflight.hpp"
 #include "boards/realboards/tinypico.hpp"
 #include "receivers/arduino/dsmx.hpp"
+#include "actuators/rxproxies/sbus.hpp"
 #include "actuators/rxproxies/mock.hpp"
 
 static const uint8_t SERIAL1_RX =  4;
 static const uint8_t SERIAL1_TX = 15; // unused
+
+static const uint8_t SERIAL2_RX = 16; // unused
+static const uint8_t SERIAL2_TX = 14;
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
@@ -37,7 +41,7 @@ hf::Hackflight h;
 
 hf::DSMX_Receiver dsmx_in = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
 
-hf::MockProxy proxy;
+hf::SbusProxy sbus_out;
 
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
@@ -55,11 +59,15 @@ static void receiverTask(void * params)
 
 void setup(void)
 {
-    // Start receiver on Serial1
+    // Start DSMX receiver input on Serial1
     Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
+    // Start SBUS receiver output on Serial2
+    //Serial2.begin(115000, SERIAL_8N1, SERIAL2_RX, SERIAL2_TX);
+
     // Initialize Hackflight firmware
-    h.init(new hf::TinyPico(), &dsmx_in, &proxy);
+    h.init(new hf::TinyPico(), &dsmx_in, &sbus_out);
+    //h.init(new hf::TinyPico(), &dsmx_in, &mock_out);
 
     // Start the receiver timed task
     TaskHandle_t task;
