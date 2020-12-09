@@ -29,13 +29,13 @@ namespace hf {
 
         private:
 
-            SBUS sbus = SBUS(Serial2, 16, 14);
+            SBUS * _sbus = NULL;
 
             float _chanvals[16] = {};
 
             void sendChannelValues(void)
             {
-                sbus.writeCal(_chanvals);
+                _sbus->writeCal(_chanvals);
             }
 
         protected:
@@ -63,7 +63,14 @@ namespace hf {
             {
                 memset(_chanvals, 0, 16*sizeof(float));
 
-                sbus.begin();
+                _sbus->begin();
+            }
+
+        public:
+
+            SbusProxy(SBUS * sbus)
+            {
+                _sbus = sbus;
             }
 
     }; // class SbusProxy

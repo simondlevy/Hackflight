@@ -21,6 +21,8 @@
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <SBUS.h>
+
 #include "hackflight.hpp"
 #include "boards/realboards/tinypico.hpp"
 #include "receivers/arduino/dsmx.hpp"
@@ -37,11 +39,13 @@ static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 static constexpr float DEMAND_SCALE = 8.0f;
 
+SBUS sbus = SBUS(Serial2, 16, 14);
+
 hf::Hackflight h;
 
 hf::DSMX_Receiver dsmx_in = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
 
-hf::SbusProxy sbus_out;
+hf::SbusProxy sbus_out = hf::SbusProxy(&sbus);
 
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
