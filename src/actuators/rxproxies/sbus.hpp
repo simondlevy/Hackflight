@@ -29,7 +29,7 @@ namespace hf {
 
         private:
 
-            SBUS sbus = SBUS(Serial2);
+            SBUS sbus = SBUS(Serial2, 16, 14);
 
             float _chanvals[16] = {};
 

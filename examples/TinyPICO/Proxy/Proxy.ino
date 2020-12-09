@@ -62,12 +62,8 @@ void setup(void)
     // Start DSMX receiver input on Serial1
     Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
-    // Start SBUS receiver output on Serial2
-    //Serial2.begin(115000, SERIAL_8N1, SERIAL2_RX, SERIAL2_TX);
-
     // Initialize Hackflight firmware
     h.init(new hf::TinyPico(), &dsmx_in, &sbus_out);
-    //h.init(new hf::TinyPico(), &dsmx_in, &mock_out);
 
     // Start the receiver timed task
     TaskHandle_t task;
