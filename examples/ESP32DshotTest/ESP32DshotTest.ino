@@ -57,6 +57,16 @@ void loop(void)
             delay(1000);
             break;
 
+        case 2: 
+            Serial.println("Hit Enter to stop motor");
+            if (Serial.available()) {
+                Serial.read();
+                motors.write(0, 0);
+                state = 3;
+            }
+            delay(1000);
+            break;
+
         default:
             break;
 
