@@ -67,6 +67,16 @@ void loop(void)
             delay(1000);
             break;
 
+        case 3: 
+            Serial.println("Hit Enter disarm");
+            if (Serial.available()) {
+                Serial.read();
+                motors.disarm();
+                state = 4;
+            }
+            delay(1000);
+            break;
+
         default:
             break;
 

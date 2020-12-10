@@ -33,6 +33,8 @@
 
 #include "esp32-hal.h"
 
+static bool armed;
+
 namespace hf {
 
     class Esp32DShot600 : public Motor {
@@ -47,7 +49,6 @@ namespace hf {
                 rmt_data_t dshotPacket[16];
                 rmt_obj_t * rmt_send;
                 uint16_t outputValue;
-                uint16_t prevOutputValue;
                 bool requestTelemetry;
                 uint8_t receivedBytes;
                 uint8_t pin;
@@ -58,14 +59,17 @@ namespace hf {
 
             static void coreTask(void * params)
             {
-
                 Esp32DShot600 * dshot = (Esp32DShot600 *)params;
 
                 while (true) {
 
-                    for (uint8_t k=0; k<dshot->_count; ++k) {
-                        motor_t * motor = &dshot->_motors[k];  
-                        dshot->outputOne(motor);
+                    if (armed) {
+
+                        for (uint8_t k=0; k<dshot->_count; ++k) {
+                            motor_t * motor = &dshot->_motors[k];  
+                            dshot->outputOne(motor);
+                        }
+
                     }
 
                     delay(1);
@@ -137,20 +141,24 @@ namespace hf {
                         delay(1);  
                     }
                 }
+
+                delay(1000);
+
+                armed = false;
+
+                TaskHandle_t Task;
+                xTaskCreatePinnedToCore(coreTask, "Task", 10000, this, 1, &Task, 0); 
             }
 
 
             void arm(void) 
             {
-                for (uint8_t k=0; k<_count; ++k) {
+                armed = true;
+            }
 
-                    _motors[k].prevOutputValue = MIN;
-                }
-
-                delay(1000);
-
-                TaskHandle_t Task;
-                xTaskCreatePinnedToCore(coreTask, "Task", 10000, this, 1, &Task, 0); 
+            void disarm(void) 
+            {
+                armed = false;
             }
 
             void write(uint8_t index, float value)
