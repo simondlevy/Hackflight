@@ -33,8 +33,6 @@
 
 #include "esp32-hal.h"
 
-static bool armed;
-
 namespace hf {
 
     class Esp32DShot600 : public Motor {
@@ -63,7 +61,7 @@ namespace hf {
 
                 while (true) {
 
-                    if (armed) {
+                    if (dshot->armed) {
 
                         for (uint8_t k=0; k<dshot->_count; ++k) {
                             motor_t * motor = &dshot->_motors[k];  
@@ -114,6 +112,8 @@ namespace hf {
 
         public:
 
+            bool armed = false;
+
             Esp32DShot600(const uint8_t pins[], const uint8_t count) 
                 : Motor(pins, count)
             {
@@ -148,17 +148,6 @@ namespace hf {
 
                 TaskHandle_t Task;
                 xTaskCreatePinnedToCore(coreTask, "Task", 10000, this, 1, &Task, 0); 
-            }
-
-
-            void arm(void) 
-            {
-                armed = true;
-            }
-
-            void disarm(void) 
-            {
-                armed = false;
             }
 
             void write(uint8_t index, float value)
