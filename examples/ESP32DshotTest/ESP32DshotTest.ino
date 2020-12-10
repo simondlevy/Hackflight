@@ -24,25 +24,41 @@ static const uint8_t PINS[1] = {15};
 
 hf::Esp32DShot600 motors = hf::Esp32DShot600(PINS, 1);
 
-static float  val;
-static int8_t dir;
+static uint8_t state;
 
 void setup(void)
 {
+    Serial.begin(115200);
     motors.init();
-    delay(1000);
-    dir = +1;
-    val = 0;
+    state = 0;
 }
 
 void loop(void)
 {
-    motors.write(0, val);
+    switch (state) {
 
-    val += .0001 * dir;
+        case 0:  
+            Serial.println("Hit Enter to arm");
+            if (Serial.available()) {
+                Serial.read();
+                motors.arm();
+                state = 1;
+            }
+            delay(1000);
+            break;
 
-    if (val <= 0)   dir = +1;
-    if (val >= 0.5) dir = -1;
+        case 1: 
+            Serial.println("Hit Enter to start motor");
+            if (Serial.available()) {
+                Serial.read();
+                motors.write(0, 0.1);
+                state = 2;
+            }
+            delay(1000);
+            break;
 
-    delay(1);
+        default:
+            break;
+
+    }
 }

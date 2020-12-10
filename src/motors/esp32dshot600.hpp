@@ -39,8 +39,7 @@ namespace hf {
 
         private:
 
-            // XXX idle value should be calibrated for each motor
-            static constexpr uint16_t MIN = 3;//48;
+            static constexpr uint16_t MIN = 48;
             static constexpr uint16_t MAX = 2047;
 
             typedef struct {
@@ -48,6 +47,7 @@ namespace hf {
                 rmt_data_t dshotPacket[16];
                 rmt_obj_t * rmt_send;
                 uint16_t outputValue;
+                uint16_t prevOutputValue;
                 bool requestTelemetry;
                 uint8_t receivedBytes;
                 uint8_t pin;
@@ -64,7 +64,8 @@ namespace hf {
                 while (true) {
 
                     for (uint8_t k=0; k<dshot->_count; ++k) {
-                        dshot->outputOne(&dshot->_motors[k]);
+                        motor_t * motor = &dshot->_motors[k];  
+                        dshot->outputOne(motor);
                     }
 
                     delay(1);
@@ -91,15 +92,13 @@ namespace hf {
                 // For a bit to be 1, the pulse width is 1250 nanoseconds (T1H – time the pulse is high for a bit value of ONE)
                 // For a bit to be 0, the pulse width is 625 nanoseconds (T0H – time the pulse is high for a bit value of ZERO)
                 for (int i = 0; i < 16; i++) {
+                    motor->dshotPacket[i].level0 = 1;
+                    motor->dshotPacket[i].level1 = 0;
                     if (packet & 0x8000) {
-                        motor->dshotPacket[i].level0 = 1;
                         motor->dshotPacket[i].duration0 = 100;
-                        motor->dshotPacket[i].level1 = 0;
                         motor->dshotPacket[i].duration1 = 34;
                     } else {
-                        motor->dshotPacket[i].level0 = 1;
                         motor->dshotPacket[i].duration0 = 50;
-                        motor->dshotPacket[i].level1 = 0;
                         motor->dshotPacket[i].duration1 = 84;
                     }
                     packet <<= 1;
@@ -138,6 +137,17 @@ namespace hf {
                         delay(1);  
                     }
                 }
+            }
+
+
+            void arm(void) 
+            {
+                for (uint8_t k=0; k<_count; ++k) {
+
+                    _motors[k].prevOutputValue = MIN;
+                }
+
+                delay(1000);
 
                 TaskHandle_t Task;
                 xTaskCreatePinnedToCore(coreTask, "Task", 10000, this, 1, &Task, 0); 
