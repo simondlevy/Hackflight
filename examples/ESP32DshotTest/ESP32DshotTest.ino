@@ -72,7 +72,7 @@ void loop(void)
             if (Serial.available()) {
                 Serial.read();
                 motors.armed = false;
-                state = 4;
+                state = 0;
             }
             delay(1000);
             break;
