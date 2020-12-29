@@ -39,8 +39,8 @@ namespace hf {
 
         private:
 
-            //static constexpr uint16_t MIN = 48;
-            static constexpr uint16_t MIN = 75;
+            static constexpr uint16_t MIN = 48;
+            static constexpr uint16_t ARM = 75;
             static constexpr uint16_t MAX = 2047;
 
             typedef struct {
@@ -55,6 +55,8 @@ namespace hf {
             } motor_t;
 
             motor_t _motors[MAX_COUNT] = {};
+
+            bool armed = false;
 
             static void coreTask(void * params)
             {
@@ -79,7 +81,6 @@ namespace hf {
             {
                 uint16_t packet = (motor->outputValue << 1) /* | (motor->telemetry ? 1 : 0) */ ;
 
-                // https://github.com/betaflight/betaflight/blob/09b52975fbd8f6fcccb22228745d1548b8c3daab/src/main/drivers/pwm_output.c#L523
                 int csum = 0;
                 int csum_data = packet;
                 for (int i = 0; i < 3; i++) {
@@ -89,11 +90,10 @@ namespace hf {
                 csum &= 0xf;
                 packet = (packet << 4) | csum;
 
-                // durations are for dshot600
-                // https://blck.mn/2016/11/dshot-the-new-kid-on-the-block/
+                // Durations are for dshot600: https://blck.mn/2016/11/dshot-the-new-kid-on-the-block/
                 // Bit length (total timing period) is 1.67 microseconds (T0H + T0L or T1H + T1L).
-                // For a bit to be 1, the pulse width is 1250 nanoseconds (T1H – time the pulse is high for a bit value of ONE)
-                // For a bit to be 0, the pulse width is 625 nanoseconds (T0H – time the pulse is high for a bit value of ZERO)
+                // For a bit to be 1, pulse width is 1250 nsec (T1H – time the pulse is high for a bit value of ONE).
+                // For a bit to be 0, pulse width is 625 nsec (T0H – time the pulse is high for a bit value of ZERO).
                 for (int i = 0; i < 16; i++) {
                     motor->dshotPacket[i].level0 = 1;
                     motor->dshotPacket[i].level1 = 0;
@@ -111,9 +111,14 @@ namespace hf {
 
             } // outputOne
 
-        public:
+            void outputAll(uint16_t val) {
 
-            bool armed = false;
+                for (uint8_t k=0; k<_count; ++k) {
+                    _motors[k].outputValue = val;
+                }
+            }
+
+        public:
 
             Esp32DShot600(const uint8_t pins[], const uint8_t count) 
                 : Motor(pins, count)
@@ -137,13 +142,13 @@ namespace hf {
 
                     // Output disarm signal while esc initialises
                     motor->outputValue = MIN;
-                    while (millis() < 3500) {
+                    while (millis() < 5000) {
                         outputOne(motor);
                         delay(1);  
                     }
-                }
+                 }
 
-                delay(1000);
+                //delay(1000);
 
                 armed = false;
 
@@ -153,7 +158,21 @@ namespace hf {
 
             void write(uint8_t index, float value)
             {
-                _motors[index].outputValue = MIN + (uint16_t)(value * (MAX-MIN));
+                _motors[index].outputValue = ARM + (uint16_t)(value * (MAX-ARM));
+            }
+
+            void arm(void)
+            {
+                armed = true;
+
+                outputAll(ARM);
+            }
+
+            void disarm(void)
+            {
+                armed = false;
+
+                outputAll(ARM);
             }
 
     }; // class Esp32DShot600
