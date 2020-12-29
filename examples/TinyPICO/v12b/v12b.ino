@@ -1,5 +1,5 @@
 /*
-   Hackflight sketch for TinyPICO with USFSMAX IMU, and mock motors/receiver
+   Hackflight sketch for TinyPICO with USFSMAX IMU, DSMX receiver, and DSHOT600 motors
 
    Additional libraries needed:
 
@@ -24,26 +24,54 @@
 
 #include "hackflight.hpp"
 #include "boards/realboards/tinypico.hpp"
-#include "receivers/mock.hpp"
+#include "receivers/arduino/dsmx.hpp"
 #include "actuators/mixers/quadxcf.hpp"
 #include "motors/esp32dshot600.hpp"
 #include "imus/usfsmax.hpp"
 
+static const uint8_t SERIAL1_RX = 32;
+static const uint8_t SERIAL1_TX = 33; // unused
+
+static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+
+static constexpr float DEMAND_SCALE = 8.0f;
+
+static const uint8_t MOTOR_PINS[4] = {15, 27 ,26, 25};
+
 hf::Hackflight h;
 
-hf::MockReceiver rc;
+hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
 
 hf::MixerQuadXCF mixer;
 
 hf::USFSMAX_IMU imu;
 
-//static const uint8_t MOTOR_PINS[4] = {15, 27 ,26, 25};
-static const uint8_t MOTOR_PINS[1] = {15};
-hf::Esp32DShot600 motors = hf::Esp32DShot600(MOTOR_PINS, 1);
+hf::Esp32DShot600 motors = hf::Esp32DShot600(MOTOR_PINS, 4);
+
+// Timer task for DSMX serial receiver
+static void receiverTask(void * params)
+{
+    while (true) {
+
+        if (Serial1.available()) {
+            rc.handleSerialEvent(Serial1.read(), micros());
+        }
+
+        delay(1);
+    }
+}
+
 
 void setup(void)
 {
+    // Start receiver on Serial1
+    Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
+
     h.init(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
+
+    // Start the receiver timed task
+    TaskHandle_t task;
+    xTaskCreatePinnedToCore(receiverTask, "Task", 10000, NULL, 1, &task, 0);
 }
 
 void loop(void)
