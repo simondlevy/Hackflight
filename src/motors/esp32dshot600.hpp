@@ -39,7 +39,8 @@ namespace hf {
 
         private:
 
-            static constexpr uint16_t MIN = 48;
+            //static constexpr uint16_t MIN = 48;
+            static constexpr uint16_t MIN = 75;
             static constexpr uint16_t MAX = 2047;
 
             typedef struct {
