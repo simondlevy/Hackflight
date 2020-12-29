@@ -20,9 +20,9 @@
 #include "hackflight.hpp"
 #include "motors/esp32dshot600.hpp"
 
-static const uint8_t PINS[1] = {15};
+static const uint8_t PINS[2] = {15, 25};
 
-hf::Esp32DShot600 motors = hf::Esp32DShot600(PINS, 1);
+hf::Esp32DShot600 motors = hf::Esp32DShot600(PINS, 2);
 
 static uint8_t state;
 
@@ -30,7 +30,6 @@ void setup(void)
 {
     Serial.begin(115200);
     motors.init();
-    delay(1000);
 
     state = 0;
 }
@@ -54,6 +53,7 @@ void loop(void)
             if (Serial.available()) {
                 Serial.read();
                 motors.write(0, 0.1);
+                motors.write(1, 0.1);
                 state = 2;
             }
             delay(1000);
@@ -64,6 +64,7 @@ void loop(void)
             if (Serial.available()) {
                 Serial.read();
                 motors.write(0, 0);
+                motors.write(1, 0);
                 state = 3;
             }
             delay(1000);

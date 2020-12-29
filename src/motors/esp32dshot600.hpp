@@ -43,7 +43,8 @@ namespace hf {
             static constexpr uint16_t LEVEL_ARM = 75;
             static constexpr uint16_t LEVEL_MAX = 2047;
 
-            static constexpr uint16_t STARTUP_MSEC = 3500;
+            static constexpr uint16_t STARTUP_MSEC  = 3500;
+            static constexpr uint16_t INITIAL_DELAY = 1000;
 
             typedef struct {
 
@@ -141,15 +142,23 @@ namespace hf {
                     }
 
                     rmtSetTick(motor->rmt_send, 12.5); // 12.5ns sample rate
+                }
 
-                    // Output disarm signal while esc initialises
-                    motor->outputValue = LEVEL_MIN;
-                    uint32_t start = millis();
-                    while (millis()-start < STARTUP_MSEC) {
+                for (uint32_t start = millis(); millis()-start < STARTUP_MSEC; ) {
+
+                    for (uint8_t k=0; k<_count; ++k) {
+
+                        motor_t * motor = &_motors[k];
+
+                        // Output disarm signal while esc initialises
+                        motor->outputValue = LEVEL_MIN;
                         outputOne(motor);
-                        delay(1);  
                     }
-                 }
+
+                    delay(1);  
+                }
+
+                delay(INITIAL_DELAY);
 
                 armed = false;
 

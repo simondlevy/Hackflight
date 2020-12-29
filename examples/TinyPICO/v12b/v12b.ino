@@ -64,19 +64,21 @@ static void receiverTask(void * params)
 
 void setup(void)
 {
-    // Start receiver on Serial1
-    Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
+    motors.init();
 
-    h.init(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
+    // Start receiver on Serial1
+    //Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
+
+    //h.init(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
 
     // Start the receiver timed task
-    TaskHandle_t task;
-    xTaskCreatePinnedToCore(receiverTask, "Task", 10000, NULL, 1, &task, 0);
+    //TaskHandle_t task;
+    //xTaskCreatePinnedToCore(receiverTask, "Task", 10000, NULL, 1, &task, 0);
 }
 
 void loop(void)
 {
-    h.update();
+    //h.update();
     
-    delay(10);
+    //delay(10);
 }
