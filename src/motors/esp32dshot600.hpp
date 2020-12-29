@@ -39,9 +39,11 @@ namespace hf {
 
         private:
 
-            static constexpr uint16_t MIN = 48;
-            static constexpr uint16_t ARM = 75;
-            static constexpr uint16_t MAX = 2047;
+            static constexpr uint16_t LEVEL_MIN = 48;
+            static constexpr uint16_t LEVEL_ARM = 75;
+            static constexpr uint16_t LEVEL_MAX = 2047;
+
+            static constexpr uint16_t STARTUP_MSEC = 3500;
 
             typedef struct {
 
@@ -141,14 +143,13 @@ namespace hf {
                     rmtSetTick(motor->rmt_send, 12.5); // 12.5ns sample rate
 
                     // Output disarm signal while esc initialises
-                    motor->outputValue = MIN;
-                    while (millis() < 5000) {
+                    motor->outputValue = LEVEL_MIN;
+                    uint32_t start = millis();
+                    while (millis()-start < STARTUP_MSEC) {
                         outputOne(motor);
                         delay(1);  
                     }
                  }
-
-                //delay(1000);
 
                 armed = false;
 
@@ -158,21 +159,21 @@ namespace hf {
 
             void write(uint8_t index, float value)
             {
-                _motors[index].outputValue = ARM + (uint16_t)(value * (MAX-ARM));
+                _motors[index].outputValue = LEVEL_ARM + (uint16_t)(value * (LEVEL_MAX-LEVEL_ARM));
             }
 
             void arm(void)
             {
                 armed = true;
 
-                outputAll(ARM);
+                outputAll(LEVEL_ARM);
             }
 
             void disarm(void)
             {
                 armed = false;
 
-                outputAll(ARM);
+                outputAll(LEVEL_ARM);
             }
 
     }; // class Esp32DShot600
