@@ -30,6 +30,8 @@ void setup(void)
 {
     Serial.begin(115200);
     motors.init();
+    delay(1000);
+
     state = 0;
 }
 

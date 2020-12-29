@@ -39,8 +39,8 @@ namespace hf {
 
         private:
 
-            //static constexpr uint16_t MIN = 48;
-            static constexpr uint16_t MIN = 75;
+            static constexpr uint16_t MIN = 48;
+            static constexpr uint16_t ARM = 75;
             static constexpr uint16_t MAX = 2047;
 
             typedef struct {
@@ -111,6 +111,13 @@ namespace hf {
 
             } // outputOne
 
+            void outputAll(uint16_t val) {
+
+                for (uint8_t k=0; k<_count; ++k) {
+                    _motors[k].outputValue = val;
+                }
+            }
+
         public:
 
             Esp32DShot600(const uint8_t pins[], const uint8_t count) 
@@ -135,13 +142,13 @@ namespace hf {
 
                     // Output disarm signal while esc initialises
                     motor->outputValue = MIN;
-                    while (millis() < 3500) {
+                    while (millis() < 5000) {
                         outputOne(motor);
                         delay(1);  
                     }
-                }
+                 }
 
-                delay(1000);
+                //delay(1000);
 
                 armed = false;
 
@@ -151,17 +158,21 @@ namespace hf {
 
             void write(uint8_t index, float value)
             {
-                _motors[index].outputValue = MIN + (uint16_t)(value * (MAX-MIN));
+                _motors[index].outputValue = ARM + (uint16_t)(value * (MAX-ARM));
             }
 
             void arm(void)
             {
                 armed = true;
+
+                outputAll(ARM);
             }
 
             void disarm(void)
             {
                 armed = false;
+
+                outputAll(ARM);
             }
 
     }; // class Esp32DShot600
