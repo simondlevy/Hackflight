@@ -41,7 +41,7 @@ void loop(void)
             Serial.println("Hit Enter to arm");
             if (Serial.available()) {
                 Serial.read();
-                motors.armed = true;
+                motors.arm();
                 state = 1;
             }
             delay(1000);
@@ -71,7 +71,7 @@ void loop(void)
             Serial.println("Hit Enter disarm");
             if (Serial.available()) {
                 Serial.read();
-                motors.armed = false;
+                motors.disarm();
                 state = 0;
             }
             delay(1000);
