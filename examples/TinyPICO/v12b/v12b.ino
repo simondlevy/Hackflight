@@ -26,7 +26,7 @@
 #include "boards/realboards/tinypico.hpp"
 #include "receivers/arduino/dsmx.hpp"
 #include "actuators/mixers/quadxcf.hpp"
-#include "motors/esp32dshot600.hpp"
+#include "motors/standard.hpp"
 #include "imus/usfsmax.hpp"
 
 static const uint8_t SERIAL1_RX = 32;
@@ -46,7 +46,7 @@ hf::MixerQuadXCF mixer;
 
 hf::USFSMAX_IMU imu;
 
-hf::Esp32DShot600 motors = hf::Esp32DShot600(MOTOR_PINS, 4);
+hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
 
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
@@ -64,21 +64,19 @@ static void receiverTask(void * params)
 
 void setup(void)
 {
-    motors.init();
-
     // Start receiver on Serial1
-    //Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
+    Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
-    //h.init(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
+    h.init(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
 
     // Start the receiver timed task
-    //TaskHandle_t task;
-    //xTaskCreatePinnedToCore(receiverTask, "Task", 10000, NULL, 1, &task, 0);
+    TaskHandle_t task;
+    xTaskCreatePinnedToCore(receiverTask, "Task", 10000, NULL, 1, &task, 0);
 }
 
 void loop(void)
 {
-    //h.update();
+    h.update();
     
-    //delay(10);
+    delay(10);
 }
