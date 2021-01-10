@@ -1,5 +1,5 @@
 /*
-   Hackflight sketch for TinyPICO with USFSMAX IMU, DSMX receiver, and DSHOT600 motors
+   Hackflight sketch for TinyPICO with USFSMAX IMU, DSMX receiver, and standard motors
 
    Additional libraries needed:
 
@@ -27,10 +27,11 @@
 #include "receivers/arduino/dsmx.hpp"
 #include "actuators/mixers/quadxcf.hpp"
 #include "motors/standard.hpp"
+#include "motors/mock.hpp"
 #include "imus/usfsmax.hpp"
 
-static const uint8_t SERIAL1_RX = 32;
-static const uint8_t SERIAL1_TX = 33; // unused
+static const uint8_t SERIAL1_RX = 4;
+static const uint8_t SERIAL1_TX = 14; // unused
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
@@ -46,7 +47,9 @@ hf::MixerQuadXCF mixer;
 
 hf::USFSMAX_IMU imu;
 
-hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
+//hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
+
+hf::MockMotor motors;
 
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
