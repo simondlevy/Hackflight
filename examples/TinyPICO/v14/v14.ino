@@ -37,7 +37,7 @@ static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
 static constexpr float DEMAND_SCALE = 8.0f;
 
-static const uint8_t MOTOR_PINS[4] = {15, 27 ,26, 25};
+static const uint8_t MOTOR_PINS[4] = {25, 26 ,27, 15};
 
 hf::Hackflight h;
 
