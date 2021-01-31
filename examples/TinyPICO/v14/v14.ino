@@ -27,7 +27,6 @@
 #include "receivers/arduino/dsmx.hpp"
 #include "actuators/mixers/quadxcf.hpp"
 #include "motors/standard.hpp"
-#include "motors/mock.hpp"
 #include "imus/usfsmax.hpp"
 
 static const uint8_t SERIAL1_RX = 4;
@@ -47,9 +46,7 @@ hf::MixerQuadXCF mixer;
 
 hf::USFSMAX_IMU imu;
 
-//hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
-
-hf::MockMotor motors;
+hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
 
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
