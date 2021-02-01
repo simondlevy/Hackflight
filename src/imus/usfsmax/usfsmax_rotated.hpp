@@ -36,6 +36,7 @@ namespace hf {
             virtual void adjustEulerAngles(float & x, float & y, float & z) override
             { 
                 y = -y;
+                z = 2*M_PI - z;
             }
 
      }; // class USFSMAX_Rotated
