@@ -3,11 +3,12 @@
 
    Additional libraries needed:
 
-       https://github.com/simondlevy/USFSMAX
        https://github.com/simondlevy/CrossPlatformDataBus
+       https://github.com/simondlevy/USFSMAX
+       https://github.com/simondlevy/DSMRX
 
 
-   Copyright (c) 2020 Simon D. Levy
+   Copyright (c) 2021 Simon D. Levy
 
    This file is part of Hackflight.
    Hackflight is free software: you can redistribute it and/or modify
@@ -27,7 +28,7 @@
 #include "receivers/arduino/dsmx.hpp"
 #include "actuators/mixers/quadxcf.hpp"
 #include "motors/standard.hpp"
-#include "imus/usfsmax.hpp"
+#include "imus/usfsmax/usfsmax_rotated.hpp"
 
 static const uint8_t SERIAL1_RX = 4;
 static const uint8_t SERIAL1_TX = 14; // unused
@@ -44,7 +45,7 @@ hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);
 
 hf::MixerQuadXCF mixer;
 
-hf::USFSMAX_IMU imu;
+hf::USFSMAX_Rotated imu;
 
 hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
 

@@ -24,20 +24,14 @@ namespace hf {
 
     class IMU {
 
-        // NB: quaternion, gyrometer, accelerometer should return values as follows:
+        // NB: Euler angles and gyrometer should exhibit values as follows:
         //
-        // QW: rightside-up +1, upside-down 0
-        // QX: roll right +,    left -
-        // QY: pitch forward -, back +
-        // QZ: yaw left -,      right +
-        //
-        // GX: roll right +,    left -
+        // GX: roll right +, left -
         // GY: pitch forward -, back +
-        // GZ: yaw right +,     left -
+        // GZ: yaw right +, left -
         //
-        // AX: pitch forward +, back -
-        // AY: roll right +,    left -
-        // AZ: rightside-up +,  upside-down -
+        // EX: roll right +, left -
+        // EY: pitch forward +, back -
 
         friend class Hackflight;
         friend class Quaternion;
@@ -50,7 +44,7 @@ namespace hf {
             virtual bool getGyrometer(float & gx, float & gy, float & gz) = 0;
 
             // Adjustment for non-standard mounting
-            virtual void adjustEulerAngles(float & x, float & y, float & z) { (void)x; (void)y; (void)z;  }
+            virtual void adjustEulerAngles(float & x, float & y, float & z) { (void)x; (void)y; (void)z; }
             virtual void adjustGyrometer(float & x, float & y, float & z) { (void)x; (void)y; (void)z;  }
 
             // Required by some IMUs
