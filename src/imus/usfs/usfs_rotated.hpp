@@ -1,7 +1,7 @@
 /*
-   Support for USFS IMU on BetaFPV-style flight controller
+   Support for USFS IMU roated by 90 degrees
 
-   Copyright (c) 2020 Simon D. Levy
+   Copyright (c) 2021 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -25,11 +25,23 @@
 
 namespace hf {
 
-    class USFS_BetaFPV : public USFS {
+    class USFS_Rotated : public USFS {
 
-        public:
+        protected:
+
+            virtual void adjustGyrometer(float & x, float & y, float & z) override
+            { 
+                swap(x, y);
+                y = -y;
+            }
+
+            virtual void adjustEulerAngles(float & x, float & y, float & z) override
+            { 
+                swap(x, y);
+                x = -x;
+            }
 
 
-    }; // class USFS_BetaFPV
+    }; // class USFS_Rotated
 
 } // namespace hf

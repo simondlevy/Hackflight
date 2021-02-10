@@ -32,7 +32,7 @@ namespace hf {
         //
         // EX: roll right +, left -
         // EY: pitch forward +, back -
-        // EY: clockwise increase, counter decrease (mod 2PI)
+        // EZ: clockwise increase, counter decrease (mod 2PI)
 
         friend class Hackflight;
         friend class Quaternion;

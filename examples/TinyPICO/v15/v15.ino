@@ -28,7 +28,7 @@
 #include "receivers/arduino/dsmx.hpp"
 #include "actuators/mixers/quadxcf.hpp"
 #include "motors/standard.hpp"
-#include "imus/usfs.hpp"
+#include "imus/usfs/usfs_rotated.hpp"
 
 #include "receivers/mock.hpp"
 #include "motors/mock.hpp"
@@ -49,7 +49,7 @@ hf::MockReceiver rc;
 
 hf::MixerQuadXCF mixer;
 
-hf::USFS imu;
+hf::USFS_Rotated imu;
 
 //hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
 hf::MockMotor motors;
