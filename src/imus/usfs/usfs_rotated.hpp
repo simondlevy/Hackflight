@@ -31,16 +31,11 @@ namespace hf {
 
             virtual void adjustGyrometer(float & x, float & y, float & z) override
             { 
-                swap(x, y);
-                y = -y;
             }
 
             virtual void adjustEulerAngles(float & x, float & y, float & z) override
             { 
-                swap(x, y);
-                x = -x;
             }
-
 
     }; // class USFS_Rotated
 
