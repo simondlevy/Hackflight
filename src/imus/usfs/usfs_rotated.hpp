@@ -27,6 +27,15 @@ namespace hf {
 
     class USFS_Rotated : public USFS {
 
+        public:
+
+            /*
+            virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz, float time) override
+            {
+                return USFS::getQuaternion(qw, qy, qx, qz, time);
+            }
+            */
+
         protected:
 
             virtual void adjustGyrometer(float & x, float & y, float & z) override
