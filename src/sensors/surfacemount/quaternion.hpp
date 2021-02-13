@@ -56,15 +56,18 @@ namespace hf {
             {
                 (void)time;
 
-                computeEulerAngles(_w, _x, _y, _z, state.rotation);
+                float qw = _w, qx = _x, qy = _y, qz = _z;
+
+                imu->adjustQuaternion(qw, qx, qy, qz);
+
+                computeEulerAngles(qw, qx, qy, qz, state.rotation);
+
+                imu->adjustEulerAngles(state.rotation[0], state.rotation[1], state.rotation[2]);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
                 if (state.rotation[2] < 0) {
                     state.rotation[2] += 2*M_PI;
                 }
-
-                // Compensate for different mounting orientations
-                imu->adjustEulerAngles(state.rotation[0], state.rotation[1], state.rotation[2]);
             }
 
             virtual bool ready(float time) override
@@ -82,18 +85,6 @@ namespace hf {
                 euler[1] = asin(2.0f*(qx*qz-qw*qy));
                 euler[2] = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
             }
-
-            /* For 90-degrees-rotated IMU
-            static void computeEulerAngles(float qw, float qx, float qy, float qz, float euler[3])
-            {
-                float tmp = qx;
-                qx = -qy;
-                qy = tmp;
-                
-                euler[0] = -atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
-                euler[1] = -asin(2.0f*(qx*qz-qw*qy));
-                euler[2] = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
-            }*/
 
     };  // class Quaternion
 

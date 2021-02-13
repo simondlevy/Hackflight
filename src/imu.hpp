@@ -45,8 +45,9 @@ namespace hf {
             virtual bool getGyrometer(float & gx, float & gy, float & gz) = 0;
 
             // Adjustment for non-standard mounting
-            virtual void adjustEulerAngles(float & x, float & y, float & z) { (void)x; (void)y; (void)z; }
             virtual void adjustGyrometer(float & x, float & y, float & z) { (void)x; (void)y; (void)z;  }
+            virtual void adjustQuaternion(float & w, float & x, float & y, float & z) { (void)w; (void)x; (void)y; (void)z;  }
+            virtual void adjustEulerAngles(float & x, float & y, float & z) { (void)x; (void)y; (void)z;  }
 
             // Required by some IMUs
             virtual void begin(void) { }
@@ -55,14 +56,6 @@ namespace hf {
             virtual bool  getAccelerometer(float & ax, float & ay, float & az) { (void)ax; (void)ay; (void)az; return false; }
             virtual bool  getMagnetometer(float & mx, float & my, float & mz) { (void)mx; (void)my; (void)mz; return false; }
             virtual bool  getBarometer(float & pressure) { (void)pressure;  return false; }
-
-            // Helper
-            static void swap(float & a, float & b)
-            {
-                float tmp = a;
-                a = b;
-                b = tmp;
-            }
 
     }; // class IMU
 
