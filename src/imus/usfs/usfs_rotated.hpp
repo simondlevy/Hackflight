@@ -31,6 +31,9 @@ namespace hf {
 
             virtual void adjustGyrometer(float & x, float & y, float & z) override
             { 
+                float tmp = x;
+                x = y;
+                y = -tmp;
             }
 
             virtual void adjustQuaternion(float & w, float & x, float & y, float & z) override
