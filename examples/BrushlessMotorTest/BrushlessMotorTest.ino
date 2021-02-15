@@ -23,7 +23,7 @@
 #include "hackflight.hpp"
 #include "motors/standard.hpp"
 
-static uint8_t MOTOR_PIN[1] = {5};
+static uint8_t MOTOR_PIN[1] = {15};
 
 static float  val;
 static int8_t dir;

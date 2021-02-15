@@ -30,9 +30,6 @@
 #include "motors/standard.hpp"
 #include "imus/usfs/usfs_rotated.hpp"
 
-#include "receivers/mock.hpp"
-#include "motors/mock.hpp"
-
 static const uint8_t SERIAL1_RX = 4;
 static const uint8_t SERIAL1_TX = 14; // unused
 
@@ -44,15 +41,13 @@ static const uint8_t MOTOR_PINS[4] = {25, 26 ,27, 15};
 
 hf::Hackflight h;
 
-//hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
-hf::MockReceiver rc;
+hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
 
 hf::MixerQuadXCF mixer;
 
 hf::USFS_Rotated imu;
 
-//hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
-hf::MockMotor motors;
+hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
 
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
@@ -60,7 +55,7 @@ static void receiverTask(void * params)
     while (true) {
 
         if (Serial1.available()) {
-            //rc.handleSerialEvent(Serial1.read(), micros());
+            rc.handleSerialEvent(Serial1.read(), micros());
         }
 
         delay(1);
