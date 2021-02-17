@@ -29,6 +29,8 @@
 #include "actuators/mixers/quadxcf.hpp"
 #include "motors/standard.hpp"
 #include "imus/usfs/usfs_rotated.hpp"
+#include "pidcontrollers/rate.hpp"
+#include "pidcontrollers/level.hpp"
 
 static const uint8_t SERIAL1_RX = 4;
 static const uint8_t SERIAL1_TX = 14; // unused
@@ -48,6 +50,16 @@ hf::MixerQuadXCF mixer;
 hf::USFS_Rotated imu;
 
 hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
+
+static constexpr float Kp = 0.01;
+static constexpr float Ki = 0; 
+static constexpr float Kd = 0;
+static constexpr float Kp_yaw = 0.01;
+static constexpr float Ki_yaw = 0;
+
+hf::RatePid ratePid = hf::RatePid(Kp, Ki, Kd, Kp_yaw, Ki_yaw);
+
+hf::LevelPid levelPid = hf::LevelPid(0.40f);
 
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
@@ -69,6 +81,10 @@ void setup(void)
     Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
     h.init(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
+
+    // Add PID controllers
+    h.addPidController(&levelPid);
+    h.addPidController(&ratePid);
 
     // Start the receiver timed task
     TaskHandle_t task;
