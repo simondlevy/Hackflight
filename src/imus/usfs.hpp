@@ -101,6 +101,7 @@ namespace hf {
                 if (!_sentral.begin()) {
                     while (true) {
                         Serial.println(_sentral.getErrorString());
+                        delay(100);
                     }
                 }
             }
