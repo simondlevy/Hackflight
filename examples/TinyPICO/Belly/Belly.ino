@@ -40,8 +40,8 @@
 static const uint8_t PWR_PIN = 18;
 static const uint8_t GND_PIN = 19;
 
-static const uint8_t SERIAL1_RX = 4;
-static const uint8_t SERIAL1_TX = 14; // unused
+static const uint8_t SERIAL1_RX = 32;
+static const uint8_t SERIAL1_TX = 33; // unused
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
@@ -51,27 +51,19 @@ static const uint8_t MOTOR_PINS[4] = {25, 26 ,27, 15};
 
 hf::Hackflight h;
 
-// hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
+hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
 
 hf::MixerQuadXCF mixer;
 
-// hf::USFS_Rotated imu;
 hf::USFS imu;
 
-// hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
+hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
 
-hf::MockReceiver rc;
-hf::MockMotor motors;
+static const float D = 16;
 
-static constexpr float Kp = 0.01;
-static constexpr float Ki = 0; 
-static constexpr float Kd = 0;
-static constexpr float Kp_yaw = 0.01;
-static constexpr float Ki_yaw = 0;
+hf::RatePid ratePid = hf::RatePid(0.225/D, 0.001875/D, 0.375/D, 1.0625/D, 0.005625/D);
 
-hf::RatePid ratePid = hf::RatePid(Kp, Ki, Kd, Kp_yaw, Ki_yaw);
-
-hf::LevelPid levelPid = hf::LevelPid(0.40f);
+hf::LevelPid levelPid = hf::LevelPid(0.10f);
 
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
@@ -79,7 +71,7 @@ static void receiverTask(void * params)
     while (true) {
 
         if (Serial1.available()) {
-            //rc.handleSerialEvent(Serial1.read(), micros());
+            rc.handleSerialEvent(Serial1.read(), micros());
         }
 
         delay(1);

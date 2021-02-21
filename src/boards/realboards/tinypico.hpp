@@ -1,8 +1,6 @@
 /*
    TinyPICO implementation of Hackflight Board routines
 
-   Uses EM7180 SENtral Sensor Hub in master mode mode
-
    Copyright (c) 2019 Simon D. Levy
 
    This file is part of Hackflight.
