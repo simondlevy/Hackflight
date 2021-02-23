@@ -51,13 +51,13 @@ static const uint8_t MOTOR_PINS[4] = {25, 26 ,27, 15};
 
 hf::Hackflight h;
 
-hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
+//hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
 
 hf::MixerQuadXCF mixer;
 
 hf::USFS imu;
 
-hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
+// hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
 
 static const float D = 16;
 
@@ -65,13 +65,16 @@ hf::RatePid ratePid = hf::RatePid(0.225/D, 0.001875/D, 0.375/D, 1.0625/D, 0.0056
 
 hf::LevelPid levelPid = hf::LevelPid(0.10f);
 
+hf::MockReceiver rc;
+hf::MockMotor motors;
+
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
 {
     while (true) {
 
         if (Serial1.available()) {
-            rc.handleSerialEvent(Serial1.read(), micros());
+            // rc.handleSerialEvent(Serial1.read(), micros());
         }
 
         delay(1);
@@ -85,7 +88,7 @@ void setup(void)
    hf::ArduinoBoard::powerPins(PWR_PIN, GND_PIN);
 
     // Start receiver on Serial1
-    Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
+    // Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
     h.init(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
 
@@ -94,13 +97,11 @@ void setup(void)
     h.addPidController(&ratePid);
 
     // Start the receiver timed task
-    TaskHandle_t task;
-    xTaskCreatePinnedToCore(receiverTask, "Task", 10000, NULL, 1, &task, 0);
+    // TaskHandle_t task;
+    // xTaskCreatePinnedToCore(receiverTask, "Task", 10000, NULL, 1, &task, 0);
 }
 
 void loop(void)
 {
     h.update();
-    
-    delay(10);
 }
