@@ -198,53 +198,6 @@ namespace hf {
 
             } // checkReceiver
 
-            // Inner classes for full vs. lite version
-            class Updater {
-
-                friend class Hackflight;
-
-                private:
-
-                    Hackflight * _h = NULL;
-
-                protected:
-
-                    void init(Hackflight * h) 
-                    {
-                        _h = h;
-                    }
-
-                    virtual void update(void) = 0;
-
-            }; // class Updater
-
-            class UpdateFull : protected Updater {
-
-                friend class Hackflight;
-
-                virtual void update(void) override
-                {
-                    _h->updateFull();
-                }
-
-            }; // class UpdateFull
-
-            Updater * _updater;
-            UpdateFull _updaterFull;
-
-            void updateFull(void)
-            {
-                // Check mandatory sensors
-                checkGyrometer();
-                checkQuaternion();
-
-                // Check optional sensors
-                checkOptionalSensors();
-
-                // Update serial comms task
-                _serialTask.update();
-            }
-
         public:
 
             void init(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor * motors, bool armed=false)
@@ -272,10 +225,6 @@ namespace hf {
                 // Tell the mixer which motors to use, and initialize them
                 mixer->useMotors(motors);
 
-                // Set the update function
-                _updater = &_updaterFull;
-                _updater->init(this);
-
             } // init
 
             void addSensor(Sensor * sensor) 
@@ -296,8 +245,16 @@ namespace hf {
                 // Update PID controllers task
                 _pidTask.update();
 
-                // Run full or lite update function
-                _updater->update();
+                // Check mandatory sensors
+                checkGyrometer();
+                checkQuaternion();
+
+                // Check optional sensors
+                checkOptionalSensors();
+
+                // Update serial comms task
+                _serialTask.update();
+
             }
 
     }; // class Hackflight
