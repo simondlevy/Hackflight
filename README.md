@@ -234,5 +234,5 @@ class used in [MulticopterSim](https://github.com/simondlevy/MulticopterSim).
 * <b>MockBoard</b>: Parent class for Arduino development boards; enables algorithm, sensor, and receiver prototyping
 
 <p align="center"> 
-<img src="extras/media/boards.png" width=800>
+<img src="extras/media/boards2.png" width=800>
 </p>
