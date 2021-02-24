@@ -34,7 +34,7 @@
 #include "boards/realboards/arduino/butterfly.hpp"
 #include "imus/usfs.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
-#include "actuators/mixers/quadxcf.hpp"
+#include "mixers/quadxcf.hpp"
 #include "motors/standard.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"

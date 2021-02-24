@@ -24,13 +24,11 @@
 #include "mspparser.hpp"
 #include "imu.hpp"
 #include "board.hpp"
-#include "actuator.hpp"
 #include "receiver.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
 #include "motor.hpp"
-#include "actuators/mixer.hpp"
-#include "actuators/rxproxy.hpp"
+#include "mixer.hpp"
 #include "sensors/surfacemount.hpp"
 #include "timertasks/pidtask.hpp"
 #include "timertasks/serialtask.hpp"
@@ -47,11 +45,6 @@ namespace hf {
 
             // Supports periodic ad-hoc debugging
             Debugger _debugger;
-
-            // Mixer or receiver proxy
-            Actuator * _actuator = NULL;
-
-            RXProxy * _proxy = NULL;
 
             // Sensors 
             Sensor * _sensors[256] = {NULL};
@@ -138,12 +131,12 @@ namespace hf {
                 sensor->imu = imu;
             }
 
-            void general_init(Board * board, Receiver * receiver, Actuator * actuator)
+            void general_init(Board * board, Receiver * receiver, Mixer * mixer)
             {  
                 // Store the essentials
                 _board    = board;
                 _receiver = receiver;
-                _actuator = actuator;
+                _mixer = mixer;
 
                 // Ad-hoc debugging support
                 _debugger.init(board);
@@ -161,14 +154,14 @@ namespace hf {
                 _state.failsafe = false;
 
                 // Initialize timer task for PID controllers
-                _pidTask.init(_board, _receiver, _actuator, &_state);
+                _pidTask.init(_board, _receiver, _mixer, &_state);
             }
 
             void checkReceiver(void)
             {
                 // Sync failsafe to receiver
                 if (_receiver->lostSignal() && _state.armed) {
-                    _actuator->cut();
+                    _mixer->cut();
                     _state.armed = false;
                     _state.failsafe = true;
                     _board->showArmedStatus(false);
@@ -197,7 +190,7 @@ namespace hf {
 
                 // Cut motors on throttle-down
                 if (_state.armed && _receiver->throttleIsDown()) {
-                    _actuator->cut();
+                    _mixer->cut();
                 }
 
                 // Set LED based on arming status
@@ -236,31 +229,8 @@ namespace hf {
 
             }; // class UpdateFull
 
-            class UpdateLite : protected Updater {
-
-                friend class Hackflight;
-
-                virtual void update(void) override
-                {
-                    _h->updateLite();
-                }
-
-            }; // class UpdateLite
-
             Updater * _updater;
             UpdateFull _updaterFull;
-            UpdateLite _updaterLite;
-
-            void updateLite(void)
-            {
-                // Use proxy to send the correct channel values when not armed
-                if (!_state.armed) {
-                    _proxy->sendDisarmed();
-                }
-
-                // Update serial comms task
-                _serialTask.update();
-            }
 
             void updateFull(void)
             {
@@ -307,25 +277,6 @@ namespace hf {
                 _updater->init(this);
 
             } // init
-
-            void init(Board * board, Receiver * receiver, RXProxy * proxy) 
-            {
-                // Do general initialization
-                general_init(board, receiver, proxy);
-
-                // Initialize serial timer task (no mixer)
-                _serialTask.init(board, &_state, receiver);
-
-                // Store proxy for arming check
-                _proxy = proxy;
-
-                // Start proxy
-                _proxy->begin();
-
-                // Set the update function
-                _updater = &_updaterLite;
-                _updater->init(this);
-            }
 
             void addSensor(Sensor * sensor) 
             {

@@ -32,7 +32,7 @@
 
 #include "board.hpp"
 #include "datatypes.hpp"
-#include "actuators/mixer.hpp"
+#include "mixer.hpp"
 
 namespace hf {
 

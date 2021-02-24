@@ -1,7 +1,16 @@
 /*
-   Mixer subclass for thrust vectoring
+   quadplusap.hpp : Mixer subclass for + configuration quadcopters following the
+   ArduPilot numbering convention:
 
-   Copyright (c) 2020 Simon D. Levy
+          1cw
+           |
+           |
+    4ccw - ^ - 2ccw
+           |
+           |
+          3cw
+ 
+   Copyright (c) 2019 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -22,31 +31,23 @@
 
 #include "board.hpp"
 #include "datatypes.hpp"
-#include "actuators/mixer.hpp"
+#include "mixer.hpp"
 
 namespace hf {
 
-    class MixerThrustVector : public Mixer {
+    class MixerQuadPlusAP : public Mixer {
 
         public:
 
-            MixerThrustVector(void) 
+            MixerQuadPlusAP(void) 
                 : Mixer(4)
             {
-                //                     Th   RR   PF  YR
-                motorDirections[0] = { +1,  0,   0, +1 };   // rotor 1
-                motorDirections[1] = { +1,  0,   0, -1 };   // rotor 2
-                motorDirections[2] = {  0, +1,   0,  0 };   // servo 1
-                motorDirections[3] = {  0,  0 , +1,  0 };   // servo 2
-             }
-
-        protected:
-
-            virtual float constrainMotorValue(uint8_t index, float value) override
-            {
-                return index < 2 ? Mixer::constrainMotorValue(index, value) : value;
+                //                     Th  RR  PF  YR
+                motorDirections[0] = { +1,  0, -1, +1 };    // 1 front
+                motorDirections[1] = { +1, -1,  0, -1 };    // 2 right
+                motorDirections[2] = { +1,  0, +1, +1 };    // 3 rear
+                motorDirections[3] = { +1, +1,  0, -1 };    // 4 left
             }
-
     };
 
 } // namespace
