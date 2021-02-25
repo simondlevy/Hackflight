@@ -1,13 +1,7 @@
 /*
-   Mixer subclass for X-configuration quadcopters following the Cleanflight numbering convention:
+   Mixer subclass for thrust vectoring
 
-    4cw   2ccw
-       \ /
-        ^
-       / \
-    3ccw  1cw
- 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2020 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -28,23 +22,31 @@
 
 #include "board.hpp"
 #include "datatypes.hpp"
-#include "actuators/mixer.hpp"
+#include "mixer.hpp"
 
 namespace hf {
 
-    class MixerQuadXCF : public Mixer {
+    class MixerThrustVector : public Mixer {
 
         public:
 
-            MixerQuadXCF(void) 
+            MixerThrustVector(void) 
                 : Mixer(4)
             {
-                //                     Th  RR  PF  YR
-                motorDirections[0] = { +1, -1, +1, +1 };    // 1 right rear
-                motorDirections[1] = { +1, -1, -1, -1 };    // 2 right front
-                motorDirections[2] = { +1, +1, +1, -1 };    // 3 left rear
-                motorDirections[3] = { +1, +1, -1, +1 };    // 4 left front
+                //                     Th   RR   PF  YR
+                motorDirections[0] = { +1,  0,   0, +1 };   // rotor 1
+                motorDirections[1] = { +1,  0,   0, -1 };   // rotor 2
+                motorDirections[2] = {  0, +1,   0,  0 };   // servo 1
+                motorDirections[3] = {  0,  0 , +1,  0 };   // servo 2
+             }
+
+        protected:
+
+            virtual float constrainMotorValue(uint8_t index, float value) override
+            {
+                return index < 2 ? Mixer::constrainMotorValue(index, value) : value;
             }
+
     };
 
 } // namespace

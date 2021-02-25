@@ -24,7 +24,7 @@
 #include "board.hpp"
 #include "mspparser.hpp"
 #include "debugger.hpp"
-#include "actuators/mixer.hpp"
+#include "mixer.hpp"
 
 namespace hf {
 
@@ -39,21 +39,6 @@ namespace hf {
             Mixer    * _mixer = NULL;
             Receiver * _receiver = NULL;
             state_t  * _state = NULL;
-
-            void (*_mixerfun)(state_t * state, Mixer * mixer);
-
-            static void _mixerfunFull(state_t * state, Mixer * mixer)
-            {
-                if (!state->armed) {
-                    mixer->runDisarmed();
-                }
-            }
-
-            static void _mixerfunProxy(state_t * state, Mixer * mixer)
-            {
-                (void)state;
-                (void)mixer;
-            }
 
             void _init(Board * board, state_t * state, Receiver * receiver) 
             {
@@ -81,7 +66,9 @@ namespace hf {
                 }
 
                 // Support motor testing from GCS
-                _mixerfun(_state, _mixer);
+                if (!_state->armed) {
+                    _mixer->runDisarmed();
+                }
             }
 
             // MspParser overrides -------------------------------------------------------
@@ -141,17 +128,12 @@ namespace hf {
             {
             }
 
-            void init(Board * board, state_t * state, Receiver * receiver) 
-            {
-                _init(board, state, receiver);
-               _mixerfun = _mixerfunProxy;
-             }
-
             void init(Board * board, state_t * state, Receiver * receiver, Mixer * mixer) 
             {
-                init(board, state, receiver);
-               _mixer = mixer;
-               _mixerfun = _mixerfunFull;
+                TimerTask::init(board);
+                _state = state;
+                _receiver = receiver;
+                _mixer = mixer;
             }
 
     };  // SerialTask

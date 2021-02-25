@@ -234,23 +234,5 @@ class used in [MulticopterSim](https://github.com/simondlevy/MulticopterSim).
 * <b>MockBoard</b>: Parent class for Arduino development boards; enables algorithm, sensor, and receiver prototyping
 
 <p align="center"> 
-<img src="extras/media/boards.png" width=800>
+<img src="extras/media/boards2.png" width=800>
 </p>
-
-### HackflightLite
-
-Hackflight can also be used to add functionality to an existing Ready-to-Fly (RTF) multicopter.  In this flavor
-of Hackflight, you rely on the IMU, stabilization PIDs, and mixer on the
-off-the-shelf flight controller on your 'copter.  Instead of specifying a mixer and motors, you specify 
-an [RXProxy](https://github.com/simondlevy/Hackflight/blob/master/src/actuators/rxproxy.hpp)
-(receiver proxy) object that will send receiver signals into your controller,
-based on the demands sent by the receiver connected to your Arduino board, plus
-whatever sensors (rangefinder, optical flow) and PID controllers (altitude
-hold, position hold), you've added.  A simple example is provided in 
-[this sketch](https://github.com/simondlevy/Hackflight/blob/master/examples/Ladybug/LadybugDsmxToSbus/LadybugDsmxToSbus.ino),
-which uses the [Ladybug development board](https://www.tindie.com/products/tleracorp/ladybug-stm32l432-development-board/)
-from Tlera Corp., plus a DSMX receiver, and generates
-SBUS signals as input to the flight-control board.
-
-
-<img src="extras/media/dataflow_lite2.png" width=800>

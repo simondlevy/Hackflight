@@ -22,11 +22,10 @@
 
 #include "filters.hpp"
 #include "motor.hpp"
-#include "actuator.hpp"
 
 namespace hf {
 
-    class Mixer : protected Actuator {
+    class Mixer {
 
         friend class Hackflight;
         friend class SerialTask;
@@ -106,9 +105,16 @@ namespace hf {
                 return Filter::constrainMinMax(value, 0, 1);
             }
 
-            // Actuator overrides ----------------------------------------------
+            void cut(void)
+            {
+                for (uint8_t i = 0; i < _nmotors; i++) {
+                    writeMotor(i, 0);
+                }
+            }
 
-            void run(demands_t demands) override
+        public:
+
+            void run(demands_t demands)
             {
                 // Map throttle demand from [-1,+1] to [0,1]
                 demands.throttle = (demands.throttle + 1) / 2;
@@ -143,13 +149,6 @@ namespace hf {
 
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     safeWriteMotor(i, motorvals[i]);
-                }
-            }
-
-            void cut(void) override
-            {
-                for (uint8_t i = 0; i < _nmotors; i++) {
-                    writeMotor(i, 0);
                 }
             }
 
