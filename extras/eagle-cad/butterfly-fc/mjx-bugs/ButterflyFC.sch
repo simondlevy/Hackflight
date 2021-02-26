@@ -2406,45 +2406,6 @@ This footprint was designed to help hold the alignment of a through-hole compone
 </deviceset>
 </devicesets>
 </library>
-<library name="wirepad">
-<description>&lt;b&gt;Single Pads&lt;/b&gt;&lt;p&gt;
-&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
-<packages>
-<package name="SMD2,54-5,08">
-<description>&lt;b&gt;SMD PAD&lt;/b&gt;</description>
-<smd name="1" x="0" y="0" dx="2.54" dy="5.08" layer="1"/>
-<text x="0" y="0" size="0.0254" layer="27">&gt;VALUE</text>
-<text x="-1.5" y="-2.5" size="1.27" layer="25" rot="R90">&gt;NAME</text>
-</package>
-</packages>
-<symbols>
-<symbol name="PAD">
-<wire x1="-1.016" y1="1.016" x2="1.016" y2="-1.016" width="0.254" layer="94"/>
-<wire x1="-1.016" y1="-1.016" x2="1.016" y2="1.016" width="0.254" layer="94"/>
-<text x="-1.143" y="1.8542" size="1.778" layer="95">&gt;NAME</text>
-<text x="-1.143" y="-3.302" size="1.778" layer="96">&gt;VALUE</text>
-<pin name="P" x="2.54" y="0" visible="off" length="short" direction="pas" rot="R180"/>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="SMD5" prefix="PAD" uservalue="yes">
-<description>&lt;b&gt;SMD PAD&lt;/b&gt;</description>
-<gates>
-<gate name="1" symbol="PAD" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="SMD2,54-5,08">
-<connects>
-<connect gate="1" pin="P" pad="1"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 </libraries>
 <attributes>
 </attributes>
@@ -2460,16 +2421,6 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <part name="J2" library="SparkFun-Connectors" deviceset="CONN_14" device="NO_SILK"/>
 <part name="5VREG" library="SparkFun-Connectors" deviceset="CONN_03" device="1X03_NO_SILK"/>
 <part name="USFS" library="SparkFun-Connectors" deviceset="CONN_05" device="NO_SILK"/>
-<part name="PAD1" library="wirepad" deviceset="SMD5" device=""/>
-<part name="PAD2" library="wirepad" deviceset="SMD5" device=""/>
-<part name="PAD3" library="wirepad" deviceset="SMD5" device=""/>
-<part name="PAD4" library="wirepad" deviceset="SMD5" device=""/>
-<part name="PAD5" library="wirepad" deviceset="SMD5" device=""/>
-<part name="PAD6" library="wirepad" deviceset="SMD5" device=""/>
-<part name="PAD7" library="wirepad" deviceset="SMD5" device=""/>
-<part name="PAD8" library="wirepad" deviceset="SMD5" device=""/>
-<part name="PAD9" library="wirepad" deviceset="SMD5" device=""/>
-<part name="PAD10" library="wirepad" deviceset="SMD5" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -2495,36 +2446,6 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <instance part="USFS" gate="G$1" x="40.64" y="48.26" smashed="yes">
 <attribute name="VALUE" x="38.1" y="38.354" size="1.778" layer="96" font="vector"/>
 <attribute name="NAME" x="38.1" y="56.388" size="1.778" layer="95" font="vector"/>
-</instance>
-<instance part="PAD1" gate="1" x="15.24" y="139.7" smashed="yes">
-<attribute name="VALUE" x="14.097" y="136.398" size="1.778" layer="96"/>
-</instance>
-<instance part="PAD2" gate="1" x="15.24" y="129.54" smashed="yes">
-<attribute name="VALUE" x="14.097" y="126.238" size="1.778" layer="96"/>
-</instance>
-<instance part="PAD3" gate="1" x="35.56" y="139.7" smashed="yes">
-<attribute name="VALUE" x="34.417" y="136.398" size="1.778" layer="96"/>
-</instance>
-<instance part="PAD4" gate="1" x="35.56" y="129.54" smashed="yes">
-<attribute name="VALUE" x="34.417" y="126.238" size="1.778" layer="96"/>
-</instance>
-<instance part="PAD5" gate="1" x="53.34" y="139.7" smashed="yes">
-<attribute name="VALUE" x="52.197" y="136.398" size="1.778" layer="96"/>
-</instance>
-<instance part="PAD6" gate="1" x="53.34" y="129.54" smashed="yes">
-<attribute name="VALUE" x="52.197" y="126.238" size="1.778" layer="96"/>
-</instance>
-<instance part="PAD7" gate="1" x="73.66" y="139.7" smashed="yes">
-<attribute name="VALUE" x="72.517" y="136.398" size="1.778" layer="96"/>
-</instance>
-<instance part="PAD8" gate="1" x="73.66" y="129.54" smashed="yes">
-<attribute name="VALUE" x="72.517" y="126.238" size="1.778" layer="96"/>
-</instance>
-<instance part="PAD9" gate="1" x="91.44" y="139.7" smashed="yes">
-<attribute name="VALUE" x="90.297" y="136.398" size="1.778" layer="96"/>
-</instance>
-<instance part="PAD10" gate="1" x="91.44" y="129.54" smashed="yes">
-<attribute name="VALUE" x="90.297" y="126.238" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>
@@ -2555,31 +2476,6 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <pinref part="USFS" gate="G$1" pin="5"/>
 <wire x1="48.26" y1="53.34" x2="53.34" y2="53.34" width="0.1524" layer="91"/>
 <label x="48.26" y="53.34" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="PAD2" gate="1" pin="P"/>
-<wire x1="17.78" y1="129.54" x2="22.86" y2="129.54" width="0.1524" layer="91"/>
-<label x="17.78" y="129.54" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="PAD4" gate="1" pin="P"/>
-<wire x1="38.1" y1="129.54" x2="43.18" y2="129.54" width="0.1524" layer="91"/>
-<label x="38.1" y="129.54" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="PAD6" gate="1" pin="P"/>
-<wire x1="55.88" y1="129.54" x2="60.96" y2="129.54" width="0.1524" layer="91"/>
-<label x="55.88" y="129.54" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="PAD8" gate="1" pin="P"/>
-<wire x1="76.2" y1="129.54" x2="81.28" y2="129.54" width="0.1524" layer="91"/>
-<label x="76.2" y="129.54" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="PAD10" gate="1" pin="P"/>
-<wire x1="93.98" y1="129.54" x2="99.06" y2="129.54" width="0.1524" layer="91"/>
-<label x="93.98" y="129.54" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="5V" class="0">
@@ -2673,31 +2569,6 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <pinref part="5VREG" gate="J$1" pin="3"/>
 <wire x1="53.34" y1="78.74" x2="60.96" y2="78.74" width="0.1524" layer="91"/>
 <label x="53.34" y="78.74" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="PAD1" gate="1" pin="P"/>
-<wire x1="17.78" y1="139.7" x2="22.86" y2="139.7" width="0.1524" layer="91"/>
-<label x="17.78" y="139.7" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="PAD3" gate="1" pin="P"/>
-<wire x1="38.1" y1="139.7" x2="43.18" y2="139.7" width="0.1524" layer="91"/>
-<label x="38.1" y="139.7" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="PAD5" gate="1" pin="P"/>
-<wire x1="55.88" y1="139.7" x2="60.96" y2="139.7" width="0.1524" layer="91"/>
-<label x="55.88" y="139.7" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="PAD7" gate="1" pin="P"/>
-<wire x1="76.2" y1="139.7" x2="81.28" y2="139.7" width="0.1524" layer="91"/>
-<label x="76.2" y="139.7" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="PAD9" gate="1" pin="P"/>
-<wire x1="93.98" y1="139.7" x2="99.06" y2="139.7" width="0.1524" layer="91"/>
-<label x="93.98" y="139.7" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
