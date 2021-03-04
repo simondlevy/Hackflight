@@ -69,6 +69,10 @@ namespace hf {
              // Mandatory sensors on the board
             Gyrometer _gyrometer;
             Quaternion _quaternion; // not really a sensor, but we treat it like one!
+
+            uint32_t start_time = 0;
+            uint32_t quat_count = 0;
+            uint32_t gyro_count = 0;
  
             bool safeAngle(uint8_t axis)
             {
@@ -85,6 +89,8 @@ namespace hf {
 
                     // Update state with new quaternion to yield Euler angles
                     _quaternion.modifyState(_state, time);
+
+                    quat_count++;
                 }
             }
 
@@ -98,6 +104,8 @@ namespace hf {
 
                     // Update state with gyro rates
                     _gyrometer.modifyState(_state, time);
+
+                    gyro_count++;
                 }
             }
 
@@ -133,6 +141,8 @@ namespace hf {
 
             void general_init(Board * board, Receiver * receiver, Mixer * mixer)
             {  
+                start_time = millis();
+
                 // Store the essentials
                 _board    = board;
                 _receiver = receiver;
@@ -254,6 +264,15 @@ namespace hf {
 
                 // Update serial comms task
                 _serialTask.update();
+
+                uint32_t time = millis();
+                static uint32_t count;
+                if ((time - start_time) > 1000) {
+                    Debugger::printf("q: %d\tg: %d\n", quat_count, gyro_count);
+                    quat_count = 0;
+                    gyro_count = 0;
+                    start_time = time;
+                }
 
             }
 
