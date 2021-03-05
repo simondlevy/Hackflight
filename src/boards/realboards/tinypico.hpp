@@ -67,6 +67,9 @@ namespace hf {
                 // Hang a bit 
                 delay(100);
 
+                // Use GPIO18 for power, GPIO19 for ground
+                ArduinoBoard::powerPins(18, 19);
+
                 // Start I^2C
                 Wire.begin();
 

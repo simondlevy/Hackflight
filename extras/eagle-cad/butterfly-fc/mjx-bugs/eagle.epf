@@ -352,10 +352,14 @@ UsedLibraryUrn="urn:adsk.eagle:library:168"
 UsedLibrary="/home/levy/Documents/EAGLE/libraries/SparkFun-Eagle-Libraries/SparkFun-Connectors.lbr"
 
 [Win_1]
+Type="Control Panel"
+Number=0
+
+[Win_2]
 Type="Schematic Editor"
 Number=2
-File="ButterflyFC.sch"
-View="34.7503 -4.26456 178.116 119.753"
+File="/home/levy/Documents/EAGLE/projects/loiterboard/loiterboard.sch"
+View="-42.1251 -40.0736 137.878 120.352"
 WireWidths=" 0.0762 0.1016 0.127 0.15 0.2 0.2032 0.254 0.3048 0.4064 0.508 0.6096 0.8128 1.016 1.27 2.54 0.1524"
 PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 PadDrills=" 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.55 0.65 0.7 0.75 0.8 0.85 0.9 1 0.6"
@@ -371,7 +375,7 @@ DimensionExtWidths=" 0.127 0.254 0.1 0.13 0.26 0"
 DimensionExtLengths=" 1.27 2.54 1 2 3 0"
 DimensionExtOffsets=" 1.27 2.54 1 2 3 0"
 SmdSizes=" 0.3048 0.1524 0.4064 0.2032 0.6096 0.3048 0.8128 0.4064 1.016 0.508 1.27 0.6604 1.4224 0.7112 1.6764 0.8128 1.778 0.9144 1.9304 0.9652 2.1844 1.0668 2.54 1.27 3.81 1.9304 5.08 2.54 6.4516 3.2512 1.27 0.635"
-WireBend=0
+WireBend=4
 WireBendSet=31
 WireCap=1
 MiterStyle=1
@@ -394,17 +398,14 @@ ArcDirection=0
 AddLevel=2
 PadsSameType=0
 Layer=91
+Views=" 1: -42.1251 -40.0736 137.878 120.352"
 Sheet="1"
-
-[Win_2]
-Type="Control Panel"
-Number=0
 
 [Win_3]
 Type="Board Editor"
 Number=1
-File="ButterflyFC.brd"
-View="-2.1315 -25.125 107.356 72.375"
+File="/home/levy/Documents/EAGLE/projects/loiterboard/loiterboard.brd"
+View="-0.940375 9.18553 43.8039 59.0981"
 WireWidths=" 0.0762 0.1016 0.127 0.15 0.2 0.2032 0.254 0.3048 0.4064 0.508 0.6096 0.8128 1.016 1.27 2.54 0.1524"
 PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 PadDrills=" 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.55 0.65 0.7 0.75 0.8 0.85 0.9 1 0.6"
