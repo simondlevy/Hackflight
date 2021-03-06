@@ -105,32 +105,6 @@ namespace hf {
                 sensor->imu = imu;
             }
 
-            void general_init(Board * board, Receiver * receiver, Mixer * mixer)
-            {  
-                // Store the essentials
-                _board    = board;
-                _receiver = receiver;
-                _mixer = mixer;
-
-                // Ad-hoc debugging support
-                _debugger.init(board);
-
-                // Support adding new sensors and PID controllers
-                _sensor_count = 0;
-
-                // Initialize state
-                memset(&_state, 0, sizeof(state_t));
-
-                // Initialize the receiver
-                _receiver->begin();
-
-                // Setup failsafe
-                _state.failsafe = false;
-
-                // Initialize timer task for PID controllers
-                _pidTask.init(_board, _receiver, _mixer, &_state);
-            }
-
             void checkReceiver(void)
             {
                 // Sync failsafe to receiver
@@ -176,8 +150,29 @@ namespace hf {
 
             void init(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor * motors, bool armed=false)
             {  
-                general_init(board, receiver, mixer);
+                // Store the essentials
+                _board    = board;
+                _receiver = receiver;
+                _mixer = mixer;
 
+                // Ad-hoc debugging support
+                _debugger.init(board);
+
+                // Support adding new sensors and PID controllers
+                _sensor_count = 0;
+
+                // Initialize state
+                memset(&_state, 0, sizeof(state_t));
+
+                // Initialize the receiver
+                _receiver->begin();
+
+                // Setup failsafe
+                _state.failsafe = false;
+
+                // Initialize timer task for PID controllers
+                _pidTask.init(_board, _receiver, _mixer, &_state);
+ 
                 // Store pointers to IMU, mixer
                 _imu   = imu;
                 _mixer = mixer;
