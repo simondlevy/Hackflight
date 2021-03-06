@@ -29,18 +29,15 @@
 #include "mixers/quadxcf.hpp"
 #include "motors/standard.hpp"
 #include "imus/usfs/usfs_rotated.hpp"
+#include "imus/mock.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 
 #include "receivers/mock.hpp"
 #include "motors/mock.hpp"
 
-// For belly-mounted USFS
-static const uint8_t PWR_PIN = 18;
-static const uint8_t GND_PIN = 19;
-
-static const uint8_t SERIAL1_RX = 32;
-static const uint8_t SERIAL1_TX = 33; // unused
+static const uint8_t SERIAL1_RX = 4;
+static const uint8_t SERIAL1_TX = 14; // unused
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 
@@ -54,20 +51,20 @@ hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);
 
 hf::MixerQuadXCF mixer;
 
-hf::USFS imu;
+hf::USFS_Rotated imu;
 
-// hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
+hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
 
 static const float D = 16;
 
-hf::RatePid ratePid = hf::RatePid(0.225/D, 0.001875/D, 0.375/D, 1.0625/D, 0.005625/D);
+// hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f); 
+hf::RatePid ratePid = hf::RatePid( 0.01f, 0.00f, 0.00f, 0.010f, 0.001f); 
 
-hf::LevelPid levelPid = hf::LevelPid(0.10f);
+hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 //hf::MockReceiver rc;
-hf::MockMotor motors;
-
-static uint32_t count;
+//hf::MockMotor motors;
+//hf::MockIMU imu;
 
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)

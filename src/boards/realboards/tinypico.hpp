@@ -1,7 +1,7 @@
 /*
-   TinyPICO implementation of Hackflight Board routines
+   TinyPICO implementation of Hackflight Board routines, with IMU mounted on bottom of board
 
-   Copyright (c) 2019 Simon D. Levy
+   Copyright (c) 2021 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -59,6 +59,7 @@ namespace hf {
 
             TinyPico(void) 
             {
+                // Start serial communcation for GCS/debugging
                 Serial.begin(115200);
 
                 // This will blink the LED
