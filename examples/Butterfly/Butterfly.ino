@@ -31,7 +31,7 @@
 #include <Arduino.h>
 
 #include "hackflight.hpp"
-#include "boards/realboards/arduino/butterfly.hpp"
+#include "boards/realboards/arduino/butterfly_piggyback.hpp"
 #include "imus/usfs.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "mixers/quadxcf.hpp"
@@ -47,16 +47,16 @@ static constexpr float DEMAND_SCALE = 8.58f;
 
 hf::Hackflight h;
 hf::USFS imu;
-// hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
+hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 hf::MixerQuadXCF mixer;
 hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f); 
 hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 static const uint8_t MOTOR_PINS[4] = {5, 8 , 9, 11};
-// hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
+hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
 
-hf::MockReceiver rc;
-hf::MockMotor motors;
+// hf::MockReceiver rc;
+// hf::MockMotor motors;
 
 void setup(void)
 {
@@ -64,8 +64,8 @@ void setup(void)
     h.init(new hf::Butterfly(), &imu, &rc, &mixer, &motors);
 
     // Add Rate and Level PID controllers
-    // h.addPidController(&levelPid);
-    // h.addPidController(&ratePid);
+    h.addPidController(&levelPid);
+    h.addPidController(&ratePid);
 }
 
 void loop(void)

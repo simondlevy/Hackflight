@@ -1,12 +1,16 @@
 /*
-   Hackflight sketch for TinyPICO with USFS IMU mounted on its belly;
-   DSMX receiver, and standard motors
+   Hackflight sketch for TinyPICO with USFS IMU, DSMX receiver, and standard motors
+
    Additional libraries needed:
+
        https://github.com/simondlevy/CrossPlatformDataBus
        https://github.com/simondlevy/USFS
        https://github.com/simondlevy/DSMRX
+
    Copyright (c) 2021 Simon D. Levy
+
    This file is part of Hackflight.
+
    Hackflight is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
@@ -63,6 +67,8 @@ hf::LevelPid levelPid = hf::LevelPid(0.10f);
 //hf::MockReceiver rc;
 hf::MockMotor motors;
 
+static uint32_t count;
+
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
 {
@@ -76,7 +82,6 @@ static void receiverTask(void * params)
     }
 }
 
-
 void setup(void)
 {
     // Start receiver on Serial1
@@ -89,8 +94,8 @@ void setup(void)
     h.addPidController(&ratePid);
 
     // Start the receiver timed task
-    //TaskHandle_t task;
-    //xTaskCreatePinnedToCore(receiverTask, "Task", 10000, NULL, 1, &task, 0);
+    TaskHandle_t task;
+    xTaskCreatePinnedToCore(receiverTask, "ReceiverTask", 10000, NULL, 1, &task, 1);
 }
 
 void loop(void)
