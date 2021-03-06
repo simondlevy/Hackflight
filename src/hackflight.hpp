@@ -212,7 +212,6 @@ namespace hf {
 
             void init(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor * motors, bool armed=false)
             {  
-                // Do general initialization
                 general_init(board, receiver, mixer);
 
                 // Store pointers to IMU, mixer
@@ -268,7 +267,7 @@ namespace hf {
                 uint32_t time = millis();
                 static uint32_t count;
                 if ((time - start_time) > 1000) {
-                    // Debugger::printf("q: %d\tg: %d\n", quat_count, gyro_count);
+                    Debugger::printf("q: %d\tg: %d\n", quat_count, gyro_count);
                     quat_count = 0;
                     gyro_count = 0;
                     start_time = time;

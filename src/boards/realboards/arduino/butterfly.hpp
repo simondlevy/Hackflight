@@ -52,14 +52,11 @@ namespace hf {
                 // Start telemetry on Serial2
                 Serial2.begin(115200);
 
-                // Use D4 for power, D3 for ground
-                powerPins(4, 3);
-
                 // Hang a bit 
                 delay(100);
 
                 // Start I^2C
-                Wire.begin(TWI_PINS_6_7);
+                Wire.begin();
 
                 // Hang a bit
                 delay(100);
