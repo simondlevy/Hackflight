@@ -39,7 +39,8 @@ namespace hf {
 
     class Hackflight {
 
-        private:
+        // private:
+        public:
 
             static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
 
@@ -70,45 +71,10 @@ namespace hf {
             Gyrometer _gyrometer;
             Quaternion _quaternion; // not really a sensor, but we treat it like one!
 
-            uint32_t start_time = 0;
-            uint32_t quat_count = 0;
-            uint32_t gyro_count = 0;
- 
             bool safeAngle(uint8_t axis)
             {
                 return fabs(_state.rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
-
-           void checkQuaternion(void)
-            {
-                // Some quaternion filters may need to know the current time
-                float time = _board->getTime();
-
-                // If quaternion data ready
-                if (_quaternion.ready(time)) {
-
-                    // Update state with new quaternion to yield Euler angles
-                    _quaternion.modifyState(_state, time);
-
-                    quat_count++;
-                }
-            }
-
-            void checkGyrometer(void)
-            {
-                // Some gyrometers may need to know the current time
-                float time = _board->getTime();
-
-                // If gyrometer data ready
-                if (_gyrometer.ready(time)) {
-
-                    // Update state with gyro rates
-                    _gyrometer.modifyState(_state, time);
-
-                    gyro_count++;
-                }
-            }
-
 
             Board    * _board    = NULL;
             Receiver * _receiver = NULL;
@@ -116,7 +82,7 @@ namespace hf {
             // Vehicle state
             state_t _state;
 
-            void checkOptionalSensors(void)
+            void checkSensors(void)
             {
                 for (uint8_t k=0; k<_sensor_count; ++k) {
                     Sensor * sensor = _sensors[k];
@@ -141,8 +107,6 @@ namespace hf {
 
             void general_init(Board * board, Receiver * receiver, Mixer * mixer)
             {  
-                start_time = millis();
-
                 // Store the essentials
                 _board    = board;
                 _receiver = receiver;
@@ -254,25 +218,11 @@ namespace hf {
                 // Update PID controllers task
                 _pidTask.update();
 
-                // Check mandatory sensors
-                checkGyrometer();
-                checkQuaternion();
-
-                // Check optional sensors
-                checkOptionalSensors();
+                // Check sensors
+                checkSensors();
 
                 // Update serial comms task
                 _serialTask.update();
-
-                uint32_t time = millis();
-                static uint32_t count;
-                if ((time - start_time) > 1000) {
-                    Debugger::printf("q: %d\tg: %d\n", quat_count, gyro_count);
-                    quat_count = 0;
-                    gyro_count = 0;
-                    start_time = time;
-                }
-
             }
 
     }; // class Hackflight
