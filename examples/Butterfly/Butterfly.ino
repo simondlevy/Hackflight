@@ -64,8 +64,8 @@ void setup(void)
     h.init(new hf::Butterfly(), &imu, &rc, &mixer, &motors);
 
     // Add Rate and Level PID controllers
-    // h.addPidController(&levelPid);
-    // h.addPidController(&ratePid);
+    h.addPidController(&levelPid);
+    h.addPidController(&ratePid);
 }
 
 void loop(void)
