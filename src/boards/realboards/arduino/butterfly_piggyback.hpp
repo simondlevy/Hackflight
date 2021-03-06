@@ -27,36 +27,20 @@ namespace hf {
 
     class Butterfly : public ArduinoBoard {
 
-         protected:
-
-            virtual uint8_t serialTelemetryAvailable(void) override
-            {
-                return Serial2.available();
-            }
-
-            virtual uint8_t serialTelemetryRead(void) override
-            {
-                return Serial2.read();
-            }
-
-            virtual void serialTelemetryWrite(uint8_t c) override
-            {
-                Serial2.write(c);
-            }
-
          public:
 
             Butterfly(void) 
                 : ArduinoBoard(13, true) // red LED, active low
             {
-                // Start telemetry on Serial2
-                Serial2.begin(115200);
 
-                // Hang a bit 
+                // Use D4, D3 for power, gnd
+                ArduinoBoard::powerPins(4, 3);
+
+                // Hang a bit
                 delay(100);
-
-                // Start I^2C
-                Wire.begin();
+           
+                // Start I^2C on D6, D7
+                Wire.begin(TWI_PINS_6_7);
 
                 // Hang a bit
                 delay(100);
