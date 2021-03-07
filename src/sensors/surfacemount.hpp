@@ -35,6 +35,8 @@ namespace hf {
            plane of symmetry, positive nose up.
 
            https://en.wikipedia.org/wiki/Flight_dynamics_(fixed-wing_aircraft)
+
+           https://emissarydrones.com/what-is-roll-pitch-and-yaw
         */
 
 

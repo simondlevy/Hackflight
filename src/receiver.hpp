@@ -179,8 +179,8 @@ namespace hf {
                     demands.roll  = c*r - s*p;
                 }
 
-                // Yaw demand needs to be reversed
-                demands.yaw = -demands.yaw;
+                // Yaw demand needs to be reversed XXX Issue #45
+                // demands.yaw = -demands.yaw;
 
                 // Pass throttle demand through exponential function
                 demands.throttle = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
