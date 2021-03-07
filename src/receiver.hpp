@@ -169,6 +169,10 @@ namespace hf {
                 demands.pitch += _trimPitch;
                 demands.yaw   += _trimYaw;
 
+                // Negate pitch demand, so that pulling back on stick means positive demand.
+                // Doing this keeps demands consistent with Euler angles (positive pitch = nose up).
+                demands.pitch = -demands.pitch;
+
                 // Support headless mode
                 if (headless) {
                     float c = cos(yawAngle);
@@ -178,9 +182,6 @@ namespace hf {
                     
                     demands.roll  = c*r - s*p;
                 }
-
-                // Yaw demand needs to be reversed XXX Issue #45
-                // demands.yaw = -demands.yaw;
 
                 // Pass throttle demand through exponential function
                 demands.throttle = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);

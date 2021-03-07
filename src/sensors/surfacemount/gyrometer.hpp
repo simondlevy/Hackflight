@@ -47,10 +47,8 @@ namespace hf {
 
                 // NB: We negate gyro Y, Z to simplify PID controller
                 state.angularVel[0] = _x;
-                state.angularVel[1] = -_y;
+                state.angularVel[1] = _y;
                 state.angularVel[2] = _z;
-
-                // Debugger::printf("gz: %+3.3f", state.angularVel[2]);
             }
 
             virtual bool ready(float time) override
