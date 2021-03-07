@@ -63,7 +63,7 @@ namespace hf {
                 computeEulerAngles(qw, qx, qy, qz, state.rotation);
 
                 // Adjust rotation so that nose-up is positive
-                // state.rotation[1] = -state.rotation[1];
+                state.rotation[1] = -state.rotation[1];
 
                 imu->adjustEulerAngles(state.rotation[0], state.rotation[1], state.rotation[2]);
 

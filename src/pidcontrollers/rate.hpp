@@ -84,8 +84,6 @@ namespace hf {
 
             void modifyDemands(state_t * state, demands_t & demands)
             {
-                Debugger::printf("%+3.3f", state->angularVel[1]);
-
                 demands.roll  = _rollPid.compute(demands.roll,  state->angularVel[0]);
                 demands.pitch = _pitchPid.compute(-demands.pitch, -state->angularVel[1]);
                 demands.yaw   = _yawPid.compute(-demands.yaw, -state->angularVel[2]);
