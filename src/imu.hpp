@@ -24,16 +24,6 @@ namespace hf {
 
     class IMU {
 
-        // NB: Euler angles and gyrometer should exhibit values as follows:
-        //
-        // GX: roll right +, left -
-        // GY: pitch forward -, back +
-        // GZ: yaw right +, left -
-        //
-        // EX: roll right +, left -
-        // EY: pitch forward +, back -
-        // EZ: clockwise increase, counter decrease (mod 2PI)
-
         friend class Hackflight;
         friend class Quaternion;
         friend class Gyrometer;
@@ -45,10 +35,10 @@ namespace hf {
             virtual bool getGyrometer(float & gx, float & gy, float & gz) = 0;
 
             // Adjustment for non-standard mounting
+            // See sensors/surfacemount.hpp for comments
             virtual void adjustGyrometer(float & x, float & y, float & z) { (void)x; (void)y; (void)z; }
             virtual void adjustQuaternion(float & w, float & x, float & y, float & z) { (void)w; (void)x; (void)y; (void)z;  }
             virtual void adjustEulerAngles(float & x, float & y, float & z) { (void)x; (void)y; (void)z; }
-
 
             // Required by some IMUs
             virtual void begin(void) { }

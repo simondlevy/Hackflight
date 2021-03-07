@@ -27,6 +27,17 @@ namespace hf {
 
     class SurfaceMountSensor : public Sensor {
 
+        /*
+           The most common aeronautical convention defines roll as acting about
+           the longitudinal axis, positive with the starboard (right) wing
+           down. Yaw is about the vertical body axis, positive with the nose to
+           starboard. Pitch is about an axis perpendicular to the longitudinal
+           plane of symmetry, positive nose up.
+
+           https://en.wikipedia.org/wiki/Flight_dynamics_(fixed-wing_aircraft)
+        */
+
+
         friend class Hackflight;
 
         protected:
