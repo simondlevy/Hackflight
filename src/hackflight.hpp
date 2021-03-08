@@ -73,7 +73,7 @@ namespace hf {
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(_state.rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
+                return fabs(_state.x[STATE_PHI+2*axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
             Board    * _board    = NULL;
@@ -129,7 +129,7 @@ namespace hf {
                 }
 
                 // Check whether receiver data is available
-                if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
+                if (!_receiver->getDemands(_state.x[STATE_PSI] - _yawInitial)) return;
 
                 // Disarm
                 if (_state.armed && !_receiver->getAux1State()) {
@@ -145,7 +145,7 @@ namespace hf {
                 if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux1State() && 
                         !_state.failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
                     _state.armed = true;
-                    _yawInitial = _state.rotation[AXIS_YAW]; // grab yaw for headless mode
+                    _yawInitial = _state.x[STATE_PSI]; // grab yaw for headless mode
                 }
 
                 // Cut motors on throttle-down
