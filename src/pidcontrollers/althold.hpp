@@ -65,8 +65,10 @@ namespace hf {
                 // Target velocity is a setpoint inside deadband, scaled constant outside
                 float targetVelocity = inBand ? _posPid.compute(_altitudeTarget, altitude) : PILOT_VELZ_MAX * demands.throttle;
 
+                // Debugger::printf("%+3.3f", state->inertialVel[2]);
+
                 // Run velocity PID controller to get correction
-                demands.throttle = _velPid.compute(targetVelocity, state->inertialVel[2]);
+                // demands.throttle = _velPid.compute(targetVelocity, state->inertialVel[2]);
 
                 // If we re-entered deadband, we reset the target altitude.
                 if (didReset) {
