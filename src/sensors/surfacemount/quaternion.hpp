@@ -61,15 +61,21 @@ namespace hf {
                 imu->adjustQuaternion(qw, qx, qy, qz);
 
                 computeEulerAngles(qw, qx, qy, qz, state.rotation);
+                computeEulerAngles(qw, qx, qy, qz, state.x[STATE_PHI], state.x[STATE_THETA], state.x[STATE_PSI]);
 
                 // Adjust rotation so that nose-up is positive
                 state.rotation[1] = -state.rotation[1];
+                state.x[STATE_THETA] = -state.x[STATE_THETA];
 
                 imu->adjustEulerAngles(state.rotation[0], state.rotation[1], state.rotation[2]);
+                imu->adjustEulerAngles(state.x[STATE_PHI], state.x[STATE_THETA], state.x[STATE_PSI]);
+
+                Debugger::printf("%+3.3f  %+3.3f", state.rotation[1], state.x[STATE_THETA]);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
                 if (state.rotation[2] < 0) {
                     state.rotation[2] += 2*M_PI;
+                    state.x[STATE_PSI] += 2*M_PI;
                 }
             }
 
@@ -87,6 +93,14 @@ namespace hf {
                 euler[0] = atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
                 euler[1] = asin(2.0f*(qx*qz-qw*qy));
                 euler[2] = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
+            }
+
+            static void computeEulerAngles(float qw, float qx, float qy, float qz,
+                                           float & ex, float & ey, float & ez)
+            {
+                ex = atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
+                ey = asin(2.0f*(qx*qz-qw*qy));
+                ez = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
             }
 
     };  // class Quaternion
