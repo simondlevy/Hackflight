@@ -39,9 +39,8 @@ namespace hf {
 
             virtual void modifyDemands(state_t * state, demands_t & demands) override
             {
-                demands.pitch += (0.5 - fabs(demands.pitch)) * pitchPid.compute(0, state->inertialVel[0]);
-                demands.roll  += (0.5 - fabs(demands.roll))  * rollPid.compute(0, state->inertialVel[1]);
-
+                demands.pitch += (0.5 - fabs(demands.pitch)) * pitchPid.compute(0, state->x[STATE_DX]);
+                demands.roll  += (0.5 - fabs(demands.roll))  * rollPid.compute(0, state->x[STATE_DY]);
             }
 
         private:

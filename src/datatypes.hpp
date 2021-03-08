@@ -61,11 +61,6 @@ namespace hf {
         bool armed;
         bool failsafe;
 
-        float inertialVel[3]; 
-
-        float bodyAccel[3]; 
-        float bodyVel[3]; 
-
     } state_t;
 
 } // namespace hf
