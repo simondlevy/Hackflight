@@ -50,7 +50,7 @@ namespace hf {
             void modifyDemands(state_t * state, demands_t & demands)
             {
                 bool didReset = false;
-                float altitude = state->location[2];
+                float altitude = state->x[STATE_Z];
 
                 // Is stick demand in deadband?
                 bool inBand = fabs(demands.throttle) < STICK_DEADBAND; 

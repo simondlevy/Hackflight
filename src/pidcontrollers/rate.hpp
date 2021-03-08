@@ -85,6 +85,8 @@ namespace hf {
             void modifyDemands(state_t * state, demands_t & demands)
             {
                 demands.roll  = _rollPid.compute(demands.roll,  state->angularVel[0]);
+
+                // XXX Why do we have to negate pitch, yaw demands and state values?
                 demands.pitch = _pitchPid.compute(-demands.pitch, -state->angularVel[1]);
                 demands.yaw   = _yawPid.compute(-demands.yaw, -state->angularVel[2]);
 
