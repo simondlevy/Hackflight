@@ -28,7 +28,7 @@ namespace hf {
         AXIS_YAW
     };
 
-    // See Bouabdallah et al. (2007)
+    // See Bouabdallah et al. (2004)
     enum {
         STATE_X = 0,
         STATE_DX,
