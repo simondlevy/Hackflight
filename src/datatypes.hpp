@@ -62,7 +62,6 @@ namespace hf {
         bool failsafe;
 
         float inertialVel[3]; 
-        float angularVel[3]; 
 
         float bodyAccel[3]; 
         float bodyVel[3]; 

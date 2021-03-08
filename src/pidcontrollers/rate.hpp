@@ -84,13 +84,11 @@ namespace hf {
 
             void modifyDemands(state_t * state, demands_t & demands)
             {
-                Debugger::printf("%+3.3f  %+3.3f", state->angularVel[2], state->x[STATE_DPSI]);
-
-                demands.roll  = _rollPid.compute(demands.roll,  state->angularVel[0]);
+                demands.roll  = _rollPid.compute(demands.roll, state->x[STATE_DPHI]);
 
                 // XXX Why do we have to negate pitch, yaw demands and state values?
-                demands.pitch = _pitchPid.compute(-demands.pitch, -state->angularVel[1]);
-                demands.yaw   = _yawPid.compute(-demands.yaw, -state->angularVel[2]);
+                demands.pitch = _pitchPid.compute(-demands.pitch, -state->x[STATE_DTHETA]);
+                demands.yaw   = _yawPid.compute(-demands.yaw, -state->x[STATE_DPSI]);
 
                 // Prevent "yaw jump" during correction
                 demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));
