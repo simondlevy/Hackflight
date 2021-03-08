@@ -61,7 +61,6 @@ namespace hf {
         bool armed;
         bool failsafe;
 
-        float location[3];
         float inertialVel[3]; 
         float rotation[3]; 
         float angularVel[3]; 
