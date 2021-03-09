@@ -1,5 +1,5 @@
 /*
-   Abstract class for sensors
+   Support for USFS IMU
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -20,22 +20,40 @@
 
 #pragma once
 
-#include "datatypes.hpp"
+#include <Wire.h>
+#include <USFS_Master.h>
+#include "sensor.hpp"
 
 namespace hf {
 
-    class Sensor {
-
-        friend class Hackflight;
+    class UsfsQuat : public Sensor {
 
         protected:
 
-            virtual void begin(void) { }
+            virtual void modifyState(state_t & state, float time) override
+            {
+            }
 
-            virtual void modifyState(state_t & state, float time) = 0;
+            virtual bool ready(float time) override
+            {
+                return false;
+            }
 
-            virtual bool ready(float time) = 0;
+    }; // class UsfsQuat
 
-    };  // class Sensor
+    class UsfsGyro : public Sensor {
+
+        protected:
+
+            virtual void modifyState(state_t & state, float time) override
+            {
+            }
+
+            virtual bool ready(float time) override
+            {
+                return false;
+            }
+
+    }; // class UsfsGyro
 
 } // namespace hf

@@ -33,6 +33,7 @@
 #include "hackflight.hpp"
 #include "boards/realboards/arduino/butterfly_piggyback.hpp"
 #include "imus/usfs.hpp"
+#include "sensors/usfs.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "mixers/quadxcf.hpp"
 #include "motors/standard.hpp"
@@ -47,6 +48,8 @@ static constexpr float DEMAND_SCALE = 8.58f;
 static const uint8_t MOTOR_PINS[4] = {5, 8 , 9, 11};
 
 hf::USFS imu;
+hf::UsfsGyro gyro;
+hf::UsfsQuat quat;
 //hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 hf::MixerQuadXCF mixer;
 hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f); 
@@ -62,7 +65,11 @@ hf::Hackflight h(&board, &imu, &receiver, &mixer, &motors);
 
 void setup(void)
 {
-    // Add Rate and Level PID controllers
+    // Add gyro, quaternion sensors
+    h.addSensor(&gyro);
+    h.addSensor(&quat);
+
+    // Add rate and level PID controllers
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
 

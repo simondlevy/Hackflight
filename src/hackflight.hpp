@@ -158,7 +158,14 @@ namespace hf {
 
             } // checkReceiver
 
-        public:
+            void startSensors(void) 
+            {
+                for (uint8_t k=0; k<_sensor_count; ++k) {
+                    _sensors[k]->begin();
+                }
+            }
+
+         public:
 
             Hackflight(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor * motors)
             {
@@ -184,6 +191,9 @@ namespace hf {
 
                 // Initialize state
                 memset(&_state, 0, sizeof(state_t));
+
+                // Initialize the sensors
+                startSensors();
 
                 // Initialize the receiver
                 _receiver->begin();

@@ -184,7 +184,6 @@ class IMU(Dialog):
         self.rollrot[1][1] = +cos(rollAngle)
 
         pitchAngle = self.roll_pitch_yaw[1] 
-        print('%+3.3f' % pitchAngle)
         self.pitchrot[1][1] = +cos(pitchAngle) 
         self.pitchrot[1][2] = -sin(pitchAngle)
         self.pitchrot[2][1] = +sin(pitchAngle)
