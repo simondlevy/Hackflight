@@ -175,13 +175,16 @@ class IMU(Dialog):
 
         # Convert angles to X,Y,Z rotation matrices
 
-        rollAngle  = -self.roll_pitch_yaw[0] # negate so positive is roll rightward
+        # Roll-angle comes in as positive for right-side down, so negate for display
+        rollAngle  = -self.roll_pitch_yaw[0]
+
         self.rollrot[0][0] = +cos(rollAngle)
         self.rollrot[0][1] = -sin(rollAngle)
         self.rollrot[1][0] = +sin(rollAngle)
         self.rollrot[1][1] = +cos(rollAngle)
 
         pitchAngle = self.roll_pitch_yaw[1] 
+        print('%+3.3f' % pitchAngle)
         self.pitchrot[1][1] = +cos(pitchAngle) 
         self.pitchrot[1][2] = -sin(pitchAngle)
         self.pitchrot[2][1] = +sin(pitchAngle)

@@ -32,6 +32,11 @@ namespace hf {
             Butterfly(void) 
                 : ArduinoBoard(13, true) // red LED, active low
             {
+            }
+
+            void begin(void) override
+            {
+                ArduinoBoard::begin();
 
                 // Use D4, D3 for power, gnd
                 ArduinoBoard::powerPins(4, 3);

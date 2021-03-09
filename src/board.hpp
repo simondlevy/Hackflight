@@ -38,6 +38,9 @@ namespace hf {
             //------------------------------------ Core functionality ----------------------------------------------------
             virtual float getTime(void) = 0;
 
+            //-------------------------------------- For real boards -----------------------------------------------------
+            virtual void begin(void) { }
+
             //------------------------------- Serial communications via MSP ----------------------------------------------
             virtual uint8_t serialAvailableBytes(void) { return 0; }
             virtual uint8_t serialReadByte(void)  { return 1; }

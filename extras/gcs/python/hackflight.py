@@ -193,7 +193,7 @@ class GCS(msppg.Parser):
 
     def handle_ATTITUDE_RADIANS(self, x, y, z):
 
-        self.roll_pitch_yaw = x, -y, z  
+        self.roll_pitch_yaw = x, y, z  
 
         self.gotimu = True
 

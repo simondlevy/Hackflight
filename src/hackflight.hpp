@@ -75,8 +75,9 @@ namespace hf {
                 return fabs(_state.x[STATE_PHI+2*axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
-            Board    * _board    = NULL;
+            Board * _board = NULL;
             Receiver * _receiver = NULL;
+            Motor * _motors = NULL;
 
             // Vehicle state
             state_t _state;
@@ -159,18 +160,27 @@ namespace hf {
 
         public:
 
-            void init(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor * motors, bool armed=false)
-            {  
+            Hackflight(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor * motors)
+            {
                 // Store the essentials
                 _board    = board;
                 _receiver = receiver;
                 _mixer = mixer;
+                _imu   = imu;
+                _mixer = mixer;
+                _motors = motors;
+
+                // Support adding new sensors
+                _sensor_count = 0;
+            }
+
+            void begin(bool armed=false)
+            {  
+                // Start the board
+                _board->begin();
 
                 // Ad-hoc debugging support
-                _debugger.init(board);
-
-                // Support adding new sensors and PID controllers
-                _sensor_count = 0;
+                _debugger.init(_board);
 
                 // Initialize state
                 memset(&_state, 0, sizeof(state_t));
@@ -178,33 +188,30 @@ namespace hf {
                 // Initialize the receiver
                 _receiver->begin();
 
-                // Setup failsafe
+                // Initialize safety features
                 _state.failsafe = false;
+                _state.armed = armed;
 
                 // Initialize timer task for PID controllers
                 _pidTask.init(_board, _receiver, _mixer, &_state);
- 
-                // Store pointers to IMU, mixer
-                _imu   = imu;
-                _mixer = mixer;
 
                 // Initialize serial timer task
-                _serialTask.init(board, &_state, receiver, mixer);
+                _serialTask.init(_board, &_state, _receiver, _mixer);
 
                 // Support safety override by simulator
                 _state.armed = armed;
 
                 // Support for mandatory sensors
-                add_sensor(&_quaternion, imu);
-                add_sensor(&_gyrometer, imu);
+                add_sensor(&_quaternion, _imu);
+                add_sensor(&_gyrometer, _imu);
 
                 // Start the IMU
-                imu->begin();
+                _imu->begin();
 
                 // Tell the mixer which motors to use, and initialize them
-                mixer->useMotors(motors);
+                _mixer->useMotors(_motors);
 
-            } // init
+            } // begin
 
             void addSensor(Sensor * sensor) 
             {

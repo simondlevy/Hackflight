@@ -42,9 +42,6 @@ namespace hf {
             {
                 (void)time;
 
-                // Compensate for IMU mounting as needed
-                imu->adjustGyrometer(_x, _y, _z);
-
                 state.x[STATE_DPHI] = _x;
                 state.x[STATE_DTHETA] = _y;
                 state.x[STATE_DPSI] = _z;

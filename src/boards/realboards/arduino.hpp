@@ -39,6 +39,15 @@ namespace hf {
 
         protected:
 
+            void begin(void)
+            {
+                pinMode(_led_pin, OUTPUT);
+                digitalWrite(_led_pin, _led_inverted ? HIGH : LOW);
+
+                Serial.begin(115200);
+                RealBoard::init();
+            }
+
             void setLed(bool isOn) 
             { 
                 digitalWrite(_led_pin, isOn ?  (_led_inverted?LOW:HIGH) : (_led_inverted?HIGH:LOW));
@@ -72,11 +81,6 @@ namespace hf {
                 _led_pin = ledPin;
                 _led_inverted = ledInverted;
 
-                pinMode(_led_pin, OUTPUT);
-                digitalWrite(_led_pin, _led_inverted ? HIGH : LOW);
-
-                Serial.begin(115200);
-                RealBoard::init();
             }
 
     }; // class ArduinoBoard
