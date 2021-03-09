@@ -47,7 +47,6 @@ static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 8.58f;
 static const uint8_t MOTOR_PINS[4] = {5, 8 , 9, 11};
 
-hf::USFS imu;
 hf::UsfsGyro gyro;
 hf::UsfsQuat quat;
 //hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
@@ -61,7 +60,7 @@ hf::Butterfly board;
 hf::MockReceiver receiver; 
 hf::MockMotor motors;
 
-hf::Hackflight h(&board, &imu, &receiver, &mixer, &motors);
+hf::Hackflight h(&board, &receiver, &mixer, &motors);
 
 void setup(void)
 {

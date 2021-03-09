@@ -60,7 +60,6 @@ namespace hf {
             PidTask _pidTask;
 
             // Passed to Hackflight::init() for a particular build
-            IMU        * _imu      = NULL;
             Mixer      * _mixer    = NULL;
 
             // Serial timer task for GCS
@@ -103,18 +102,6 @@ namespace hf {
                         if (k<2) counts[k]++;
                     }
                 }
-            }
-
-            void add_sensor(Sensor * sensor)
-            {
-                _sensors[_sensor_count++] = sensor;
-            }
-
-            void add_sensor(SurfaceMountSensor * sensor, IMU * imu) 
-            {
-                add_sensor(sensor);
-
-                sensor->imu = imu;
             }
 
             void checkReceiver(void)
@@ -167,13 +154,11 @@ namespace hf {
 
          public:
 
-            Hackflight(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor * motors)
+            Hackflight(Board * board, Receiver * receiver, Mixer * mixer, Motor * motors)
             {
                 // Store the essentials
                 _board    = board;
                 _receiver = receiver;
-                _mixer = mixer;
-                _imu   = imu;
                 _mixer = mixer;
                 _motors = motors;
 
@@ -211,13 +196,6 @@ namespace hf {
                 // Support safety override by simulator
                 _state.armed = armed;
 
-                // Support for mandatory sensors
-                add_sensor(&_quaternion, _imu);
-                add_sensor(&_gyrometer, _imu);
-
-                // Start the IMU
-                _imu->begin();
-
                 // Tell the mixer which motors to use, and initialize them
                 _mixer->useMotors(_motors);
 
@@ -225,7 +203,7 @@ namespace hf {
 
             void addSensor(Sensor * sensor) 
             {
-                add_sensor(sensor);
+                _sensors[_sensor_count++] = sensor;
             }
 
             void addPidController(PidController * pidController, uint8_t auxState=0) 
