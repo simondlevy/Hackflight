@@ -39,8 +39,7 @@ namespace hf {
 
     class Hackflight {
 
-        // private:
-        public:
+        private:
 
             static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
 
