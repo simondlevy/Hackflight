@@ -22,18 +22,15 @@
 
 #include "debugger.hpp"
 #include "mspparser.hpp"
-#include "imu.hpp"
 #include "board.hpp"
 #include "receiver.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
+#include "sensor.hpp"
 #include "motor.hpp"
 #include "mixer.hpp"
-#include "sensors/surfacemount.hpp"
 #include "timertasks/pidtask.hpp"
 #include "timertasks/serialtask.hpp"
-#include "sensors/surfacemount/gyrometer.hpp"
-#include "sensors/surfacemount/quaternion.hpp"
 
 namespace hf {
 
@@ -64,10 +61,6 @@ namespace hf {
 
             // Serial timer task for GCS
             SerialTask _serialTask;
-
-             // Mandatory sensors on the board
-            Gyrometer _gyrometer;
-            Quaternion _quaternion; // not really a sensor, but we treat it like one!
 
             bool safeAngle(uint8_t axis)
             {

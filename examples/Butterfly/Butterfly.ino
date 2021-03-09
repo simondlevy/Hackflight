@@ -32,7 +32,6 @@
 
 #include "hackflight.hpp"
 #include "boards/realboards/arduino/butterfly_piggyback.hpp"
-#include "imus/usfs.hpp"
 #include "sensors/usfs.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "mixers/quadxcf.hpp"
