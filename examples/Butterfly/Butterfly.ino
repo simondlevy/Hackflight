@@ -48,18 +48,18 @@ static const uint8_t MOTOR_PINS[4] = {5, 8 , 9, 11};
 
 hf::UsfsGyro gyro;
 hf::UsfsQuat quat;
-//hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
-hf::MixerQuadXCF mixer;
+hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f); 
 hf::LevelPid levelPid = hf::LevelPid(0.20f);
 hf::Butterfly board;
 
-// hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
+hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
+hf::MixerQuadXCF mixer(&motors);
 
-hf::MockReceiver receiver; 
-hf::MockMotor motors;
+// hf::MockReceiver receiver; 
+// hf::MockMotor motors;
 
-hf::Hackflight h(&board, &receiver, &mixer, &motors);
+hf::Hackflight h(&board, &receiver, &mixer);
 
 void setup(void)
 {

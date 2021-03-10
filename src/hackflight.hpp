@@ -69,7 +69,6 @@ namespace hf {
 
             Board * _board = NULL;
             Receiver * _receiver = NULL;
-            Motor * _motors = NULL;
 
             // Vehicle state
             state_t _state;
@@ -147,13 +146,12 @@ namespace hf {
 
          public:
 
-            Hackflight(Board * board, Receiver * receiver, Mixer * mixer, Motor * motors)
+            Hackflight(Board * board, Receiver * receiver, Mixer * mixer)
             {
                 // Store the essentials
                 _board    = board;
                 _receiver = receiver;
                 _mixer = mixer;
-                _motors = motors;
 
                 // Support adding new sensors
                 _sensor_count = 0;
@@ -189,8 +187,8 @@ namespace hf {
                 // Support safety override by simulator
                 _state.armed = armed;
 
-                // Tell the mixer which motors to use, and initialize them
-                _mixer->useMotors(_motors);
+                // Start the mixer
+                _mixer->begin();
 
             } // begin
 
