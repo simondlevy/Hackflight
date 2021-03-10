@@ -34,7 +34,7 @@
 #include "boards/realboards/arduino/butterfly_piggyback.hpp"
 #include "sensors/usfs.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
-#include "mixers/quadxcf.hpp"
+#include "actuators/mixers/quadxcf.hpp"
 #include "motors/standard.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"

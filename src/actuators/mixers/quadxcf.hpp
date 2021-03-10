@@ -28,7 +28,7 @@
 
 #include "board.hpp"
 #include "datatypes.hpp"
-#include "mixer.hpp"
+#include "actuators/mixer.hpp"
 
 namespace hf {
 
