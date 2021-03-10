@@ -25,6 +25,7 @@ namespace hf {
     class Actuator {
 
         friend class Hackflight;
+        friend class SerialTask;
 
         protected:
 
@@ -33,6 +34,8 @@ namespace hf {
             virtual void runDisarmed(void) { }
 
             virtual void cut(void) { }
+
+            virtual void setMotorDisarmed(uint8_t index, float value) { }
 
         public:
 

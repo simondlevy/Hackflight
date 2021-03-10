@@ -28,7 +28,7 @@
 #include "pidcontroller.hpp"
 #include "sensor.hpp"
 #include "motor.hpp"
-#include "mixer.hpp"
+#include "actuator.hpp"
 #include "actuator.hpp"
 #include "timertasks/pidtask.hpp"
 #include "timertasks/serialtask.hpp"
@@ -58,7 +58,7 @@ namespace hf {
             PidTask _pidTask;
 
             // Passed to Hackflight::begin() for a particular build
-            Mixer      * _mixer    = NULL;
+            Actuator * _actuator = NULL;
 
             // Serial timer task for GCS
             SerialTask _serialTask;
@@ -101,7 +101,7 @@ namespace hf {
             {
                 // Sync failsafe to receiver
                 if (_receiver->lostSignal() && _state.armed) {
-                    _mixer->cut();
+                    _actuator->cut();
                     _state.armed = false;
                     _state.failsafe = true;
                     _board->showArmedStatus(false);
@@ -130,7 +130,7 @@ namespace hf {
 
                 // Cut motors on throttle-down
                 if (_state.armed && _receiver->throttleIsDown()) {
-                    _mixer->cut();
+                    _actuator->cut();
                 }
 
                 // Set LED based on arming status
@@ -147,12 +147,12 @@ namespace hf {
 
          public:
 
-            Hackflight(Board * board, Receiver * receiver, Mixer * mixer)
+            Hackflight(Board * board, Receiver * receiver, Actuator * actuator)
             {
                 // Store the essentials
                 _board    = board;
                 _receiver = receiver;
-                _mixer = mixer;
+                _actuator = actuator;
 
                 // Support adding new sensors
                 _sensor_count = 0;
@@ -180,16 +180,16 @@ namespace hf {
                 _state.armed = armed;
 
                 // Initialize timer task for PID controllers
-                _pidTask.begin(_board, _receiver, _mixer, &_state);
+                _pidTask.begin(_board, _receiver, _actuator, &_state);
 
                 // Initialize serial timer task
-                _serialTask.begin(_board, &_state, _receiver, _mixer);
+                _serialTask.begin(_board, &_state, _receiver, _actuator);
 
                 // Support safety override by simulator
                 _state.armed = armed;
 
-                // Start the mixer
-                _mixer->begin();
+                // Start the actuator
+                _actuator->begin();
 
             } // begin
 

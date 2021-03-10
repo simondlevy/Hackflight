@@ -24,7 +24,7 @@
 #include "board.hpp"
 #include "mspparser.hpp"
 #include "debugger.hpp"
-#include "mixer.hpp"
+#include "actuator.hpp"
 
 namespace hf {
 
@@ -36,7 +36,7 @@ namespace hf {
 
             static constexpr float FREQ = 66;
 
-            Mixer    * _mixer = NULL;
+            Actuator * _actuator = NULL;
             Receiver * _receiver = NULL;
             state_t  * _state = NULL;
 
@@ -67,7 +67,7 @@ namespace hf {
 
                 // Support motor testing from GCS
                 if (!_state->armed) {
-                    _mixer->runDisarmed();
+                    _actuator->runDisarmed();
                 }
             }
 
@@ -117,10 +117,10 @@ namespace hf {
 
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
             {
-                _mixer->motorsDisarmed[0] = m1;
-                _mixer->motorsDisarmed[1] = m2;
-                _mixer->motorsDisarmed[2] = m3;
-                _mixer->motorsDisarmed[3] = m4;
+                _actuator->setMotorDisarmed(0, m1);
+                _actuator->setMotorDisarmed(1, m2);
+                _actuator->setMotorDisarmed(2, m3);
+                _actuator->setMotorDisarmed(3, m4);
             }
 
             SerialTask(void)
@@ -128,12 +128,12 @@ namespace hf {
             {
             }
 
-            void begin(Board * board, state_t * state, Receiver * receiver, Mixer * mixer) 
+            void begin(Board * board, state_t * state, Receiver * receiver, Actuator * actuator) 
             {
                 TimerTask::begin(board);
                 _state = state;
                 _receiver = receiver;
-                _mixer = mixer;
+                _actuator = actuator;
             }
 
     };  // SerialTask

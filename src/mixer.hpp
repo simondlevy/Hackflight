@@ -22,13 +22,13 @@
 
 #include "filters.hpp"
 #include "motor.hpp"
+#include "actuator.hpp"
 
 namespace hf {
 
-    class Mixer {
+    class Mixer : public Actuator {
 
         friend class Hackflight;
-        friend class SerialTask;
 
         private:
 
@@ -43,7 +43,9 @@ namespace hf {
             // Arbitrary
             static const uint8_t MAXMOTORS = 20;
 
-            float _motorsPrev[MAXMOTORS] = {0};
+            float _motorsPrev[MAXMOTORS] = {};
+
+            float  _motorsDisarmed[MAXMOTORS] = {};
 
             void writeMotor(uint8_t index, float value)
             {
@@ -73,7 +75,7 @@ namespace hf {
 
                 // set disarmed, previous motor values
                 for (uint8_t i = 0; i < nmotors; i++) {
-                    motorsDisarmed[i] = 0;
+                    _motorsDisarmed[i] = 0;
                     _motorsPrev[i] = 0;
                 }
 
@@ -81,20 +83,22 @@ namespace hf {
 
             uint8_t _nmotors;
 
-            // This is also use by serial task
-            float  motorsDisarmed[MAXMOTORS];
-
-            void begin(void)
+            virtual void begin(void) override
             {
                 _motors->begin();
             }
 
             // This is how we can spin the motors from the GCS
-            void runDisarmed(void)
+            virtual void runDisarmed(void) override
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
-                    safeWriteMotor(i, motorsDisarmed[i]);
+                    safeWriteMotor(i, _motorsDisarmed[i]);
                 }
+            }
+
+            virtual void setMotorDisarmed(uint8_t index, float value) override
+            {
+                _motorsDisarmed[index] = value;
             }
 
             // This helps support servos
@@ -104,7 +108,7 @@ namespace hf {
                 return Filter::constrainMinMax(value, 0, 1);
             }
 
-            void cut(void)
+            virtual void cut(void) override
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     writeMotor(i, 0);
@@ -113,7 +117,7 @@ namespace hf {
 
         public:
 
-            void run(demands_t demands)
+            virtual void run(demands_t demands) override
             {
                 // Map throttle demand from [-1,+1] to [0,1]
                 demands.throttle = (demands.throttle + 1) / 2;
