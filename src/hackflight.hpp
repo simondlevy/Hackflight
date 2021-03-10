@@ -112,17 +112,17 @@ namespace hf {
                 if (!_receiver->getDemands(_state.x[STATE_PSI] - _yawInitial)) return;
 
                 // Disarm
-                if (_state.armed && !_receiver->getAux1State()) {
+                if (_state.armed && !_receiver->inArmedState()) {
                     _state.armed = false;
                 } 
 
                 // Avoid arming if aux1 switch down on startup
                 if (!_safeToArm) {
-                    _safeToArm = !_receiver->getAux1State();
+                    _safeToArm = !_receiver->inArmedState();
                 }
 
                 // Arm (after lots of safety checks!)
-                if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux1State() && 
+                if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->inArmedState() && 
                         !_state.failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
                     _state.armed = true;
                     _yawInitial = _state.x[STATE_PSI]; // grab yaw for headless mode

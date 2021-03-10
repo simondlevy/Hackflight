@@ -200,7 +200,7 @@ namespace hf {
                 return getRawval(CHANNEL_THROTTLE) < -1 + THROTTLE_MARGIN;
             }
 
-            virtual uint8_t getAux1State(void)
+            virtual uint8_t inArmedState(void)
             {
                 return _aux1State;
             }
