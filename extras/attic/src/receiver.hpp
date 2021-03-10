@@ -173,6 +173,16 @@ namespace hf {
                 // Doing this keeps demands consistent with Euler angles (positive pitch = nose up).
                 demands.pitch = -demands.pitch;
 
+                // Support headless mode
+                if (headless) {
+                    float c = cos(yawAngle);
+                    float s = sin(yawAngle);
+                    float p = demands.pitch;
+                    float r = demands.roll;
+                    
+                    demands.roll  = c*r - s*p;
+                }
+
                 // Pass throttle demand through exponential function
                 demands.throttle = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
 

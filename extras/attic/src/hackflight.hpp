@@ -51,6 +51,9 @@ namespace hf {
             // Safety
             bool _safeToArm = false;
 
+            // Support for headless mode
+            float _yawInitial = 0;
+
             // Timer task for PID controllers
             PidTask _pidTask;
 
@@ -106,7 +109,7 @@ namespace hf {
                 }
 
                 // Check whether receiver data is available
-                if (!_receiver->getDemands()) return;
+                if (!_receiver->getDemands(_state.x[STATE_PSI] - _yawInitial)) return;
 
                 // Disarm
                 if (_state.armed && !_receiver->inArmedState()) {
@@ -128,6 +131,7 @@ namespace hf {
                         safeAngle(AXIS_ROLL) && 
                         safeAngle(AXIS_PITCH)) {
                     _state.armed = true;
+                    _yawInitial = _state.x[STATE_PSI]; // grab yaw for headless mode
                 }
 
                 // Cut motors on throttle-down
