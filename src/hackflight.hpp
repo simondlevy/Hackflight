@@ -122,8 +122,14 @@ namespace hf {
                 }
 
                 // Arm (after lots of safety checks!)
-                if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->inArmedState() && 
-                        !_state.failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
+                if (
+                        _safeToArm &&
+                        !_state.armed && 
+                        _receiver->throttleIsDown() && 
+                        _receiver->inArmedState() && 
+                        !_state.failsafe && 
+                        safeAngle(AXIS_ROLL) && 
+                        safeAngle(AXIS_PITCH)) {
                     _state.armed = true;
                     _yawInitial = _state.x[STATE_PSI]; // grab yaw for headless mode
                 }
