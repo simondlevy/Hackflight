@@ -164,7 +164,7 @@ namespace hf {
 
         protected:
 
-            void init(void)
+            void begin(void)
             {
                 _checksum = 0;
                 _outBufIndex = 0;

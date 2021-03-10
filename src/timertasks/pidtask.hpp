@@ -89,7 +89,7 @@ namespace hf {
                     PidController * pidController = _pid_controllers[k];
 
                     // Some PID controllers need to reset their integral when the throttle is down
-                    pidController->updateReceiver(_receiver->throttleIsDown());
+                    pidController->updateReceiver(_receiver->inactive());
 
                     if (pidController->auxState <= auxState) {
 
@@ -105,7 +105,7 @@ namespace hf {
                 _board->flashLed(shouldFlash);
 
                 // Use updated demands to run motors
-                if (_state->armed && !_state->failsafe && !_receiver->throttleIsDown()) {
+                if (_state->armed && !_state->failsafe && !_receiver->inactive()) {
                     _actuator->run(demands);
                 }
              }

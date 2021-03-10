@@ -125,7 +125,7 @@ namespace hf {
                 if (
                         _safeToArm &&
                         !_state.armed && 
-                        _receiver->throttleIsDown() && 
+                        _receiver->inactive() && 
                         _receiver->inArmedState() && 
                         !_state.failsafe && 
                         safeAngle(AXIS_ROLL) && 
@@ -135,7 +135,7 @@ namespace hf {
                 }
 
                 // Cut motors on throttle-down
-                if (_state.armed && _receiver->throttleIsDown()) {
+                if (_state.armed && _receiver->inactive()) {
                     _actuator->cut();
                 }
 

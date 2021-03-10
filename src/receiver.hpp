@@ -195,7 +195,7 @@ namespace hf {
 
             }  // getDemands
 
-            bool throttleIsDown(void)
+            bool inactive(void)
             {
                 return getRawval(CHANNEL_THROTTLE) < -1 + THROTTLE_MARGIN;
             }

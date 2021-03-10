@@ -86,18 +86,6 @@ namespace hf {
                 velocityRightward = 0;
             }
  
-            virtual void handle_SET_ARMED(uint8_t  flag) override
-            {
-                if (flag) {  // got arming command: arm only if throttle is down
-                    if (_receiver->throttleIsDown()) {
-                        _state->armed = true;
-                    }
-                }
-                else {          // got disarming command: always disarm
-                    _state->armed = false;
-                }
-            }
-
             virtual void handle_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
             {
                 c1 = _receiver->getRawval(0);

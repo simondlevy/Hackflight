@@ -48,10 +48,5 @@
    {"c3": "float"}, 
    {"c4": "float"}, 
    {"c5": "float"}, 
-   {"c6": "float"}],
-
-   "SET_ARMED": 
-  [{"ID": 216},
-   {"comment": "Arm/disarm from MSP"}, 
-   {"flag": "byte"}]
+   {"c6": "float"}]
 }
