@@ -49,7 +49,7 @@ namespace hf {
                 analogWrite(_pins[index], (uint16_t)(value * 1023));
             }
 
-            virtual void init(void) override
+            virtual void begin(void) override
             {
                 for (uint8_t k=0; k<_count; ++k) {
                     analogWrite(_pins[k], 0);  

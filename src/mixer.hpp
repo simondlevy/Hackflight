@@ -87,7 +87,7 @@ namespace hf {
             {
                 _motors = motors;
 
-                _motors->init();
+                _motors->begin();
             }
 
             // This is how we can spin the motors from the GCS

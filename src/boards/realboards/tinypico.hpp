@@ -63,7 +63,7 @@ namespace hf {
                 Serial.begin(115200);
 
                 // This will blink the LED
-                RealBoard::init();
+                RealBoard::begin();
 
                 // Hang a bit 
                 delay(100);

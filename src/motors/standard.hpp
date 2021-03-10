@@ -48,7 +48,7 @@ namespace hf {
             {
             }
 
-            virtual void init(void) override
+            virtual void begin(void) override
             {
                 for (uint8_t k=0; k<_count; ++k) {
                     pinMode(_pins[k], OUTPUT);

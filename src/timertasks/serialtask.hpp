@@ -40,11 +40,11 @@ namespace hf {
             Receiver * _receiver = NULL;
             state_t  * _state = NULL;
 
-            void _init(Board * board, state_t * state, Receiver * receiver) 
+            void _begin(Board * board, state_t * state, Receiver * receiver) 
             {
-                TimerTask::init(board);
+                TimerTask::begin(board);
 
-                MspParser::init();
+                MspParser::begin();
 
                 _state = state;
                 _receiver = receiver;
@@ -128,9 +128,9 @@ namespace hf {
             {
             }
 
-            void init(Board * board, state_t * state, Receiver * receiver, Mixer * mixer) 
+            void begin(Board * board, state_t * state, Receiver * receiver, Mixer * mixer) 
             {
-                TimerTask::init(board);
+                TimerTask::begin(board);
                 _state = state;
                 _receiver = receiver;
                 _mixer = mixer;

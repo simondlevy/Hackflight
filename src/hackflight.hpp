@@ -56,7 +56,7 @@ namespace hf {
             // Timer task for PID controllers
             PidTask _pidTask;
 
-            // Passed to Hackflight::init() for a particular build
+            // Passed to Hackflight::begin() for a particular build
             Mixer      * _mixer    = NULL;
 
             // Serial timer task for GCS
@@ -165,7 +165,7 @@ namespace hf {
                 _board->begin();
 
                 // Ad-hoc debugging support
-                _debugger.init(_board);
+                _debugger.begin(_board);
 
                 // Initialize state
                 memset(&_state, 0, sizeof(state_t));
@@ -181,10 +181,10 @@ namespace hf {
                 _state.armed = armed;
 
                 // Initialize timer task for PID controllers
-                _pidTask.init(_board, _receiver, _mixer, &_state);
+                _pidTask.begin(_board, _receiver, _mixer, &_state);
 
                 // Initialize serial timer task
-                _serialTask.init(_board, &_state, _receiver, _mixer);
+                _serialTask.begin(_board, &_state, _receiver, _mixer);
 
                 // Support safety override by simulator
                 _state.armed = armed;

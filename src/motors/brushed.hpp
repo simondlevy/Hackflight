@@ -33,7 +33,7 @@ namespace hf {
             {
             }
 
-            void init(void) override
+            void begin(void) override
             {
                 for (uint8_t k=0; k<_count; ++k) {
                     analogWriteFrequency(_pins[k], 10000);  

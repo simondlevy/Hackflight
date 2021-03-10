@@ -47,7 +47,7 @@ namespace hf {
 
         protected:
 
-            void init(Board * board)
+            void begin(Board * board)
             {
                 _board = board;
             }

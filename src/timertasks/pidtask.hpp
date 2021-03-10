@@ -51,9 +51,9 @@ namespace hf {
                 _pid_controller_count = 0;
             }
 
-            void init(Board * board, Receiver * receiver, Mixer * mixer, state_t * state)
+            void begin(Board * board, Receiver * receiver, Mixer * mixer, state_t * state)
             {
-                TimerTask::init(board);
+                TimerTask::begin(board);
 
                 _receiver = receiver;
                 _mixer = mixer;
