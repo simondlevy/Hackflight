@@ -60,9 +60,9 @@ namespace hf {
                 _state = state;
             }
 
-            void addPidController(PidController * pidController, uint8_t auxState) 
+            void addPidController(PidController * pidController, uint8_t modeIndex) 
             {
-                pidController->auxState = auxState;
+                pidController->modeIndex = modeIndex;
 
                 _pid_controllers[_pid_controller_count++] = pidController;
             }
@@ -77,9 +77,7 @@ namespace hf {
                 demands.yaw      = _receiver->demands.yaw   * _receiver->_demandScale;
 
                 // Each PID controllers is associated with at least one auxiliary switch state
-                uint8_t auxState = _receiver->getAux2State();
-
-                //Debugger::printf("Aux state: %d", auxState);
+                uint8_t modeIndex = _receiver->getModeIndex();
 
                 // Some PID controllers should cause LED to flash when they're active
                 bool shouldFlash = false;
@@ -91,7 +89,7 @@ namespace hf {
                     // Some PID controllers need to reset their integral when the throttle is down
                     pidController->updateReceiver(_receiver->inactive());
 
-                    if (pidController->auxState <= auxState) {
+                    if (pidController->modeIndex <= modeIndex) {
 
                         pidController->modifyDemands(_state, demands); 
 

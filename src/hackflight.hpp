@@ -204,9 +204,9 @@ namespace hf {
                 _sensors[_sensor_count++] = sensor;
             }
 
-            void addPidController(PidController * pidController, uint8_t auxState=0) 
+            void addPidController(PidController * pidController, uint8_t modeIndex=0) 
             {
-                _pidTask.addPidController(pidController, auxState);
+                _pidTask.addPidController(pidController, modeIndex);
             }
 
             void update(void)

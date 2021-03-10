@@ -205,7 +205,7 @@ namespace hf {
                 return _aux1State;
             }
 
-            virtual uint8_t getAux2State(void)
+            virtual uint8_t getModeIndex(void)
             {
                 return _aux2State;
             }

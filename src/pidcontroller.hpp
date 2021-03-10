@@ -39,7 +39,7 @@ namespace hf {
 
             virtual void updateReceiver(bool throttleIsDown) { (void)throttleIsDown; }
 
-            uint8_t auxState = 0;
+            uint8_t modeIndex = 0;
 
     };  // class PidController
 
