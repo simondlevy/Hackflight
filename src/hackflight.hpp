@@ -25,6 +25,7 @@
 #include "board.hpp"
 #include "openloop.hpp"
 #include "state.hpp"
+#include "states/copterstate.hpp"
 #include "demands.hpp"
 #include "pidcontroller.hpp"
 #include "sensor.hpp"

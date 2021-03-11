@@ -58,9 +58,13 @@ namespace hf {
 
         public:
 
-        bool armed;
-        bool failsafe;
+            bool armed;
+            bool failsafe;
 
+            virtual bool safeToArm(void) 
+            {
+                return true;
+            }
 
     }; // class State
 
