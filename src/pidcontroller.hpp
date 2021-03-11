@@ -31,15 +31,21 @@ namespace hf {
 
         protected:
 
+            uint8_t modeIndex = 0;
+
             static constexpr float STICK_DEADBAND = 0.10;
 
             virtual void modifyDemands(state_t * state, demands_t & demands) = 0;
 
-            virtual bool shouldFlashLed(void) { return false; }
+            virtual bool shouldFlashLed(void)
+            {
+                return false;
+            }
 
-            virtual void updateReceiver(bool throttleIsDown) { (void)throttleIsDown; }
-
-            uint8_t modeIndex = 0;
+            virtual void resetOnInactivity(bool inactive)
+            { 
+                (void)inactive; 
+            }
 
     };  // class PidController
 
@@ -108,10 +114,9 @@ namespace hf {
                 return pterm + iterm + dterm;
             }
 
-            void updateReceiver(bool throttleIsDown)
+            void resetOnInactivity(bool inactive)
             {
-                // When landed, reset integral component of PID
-                if (throttleIsDown) {
+                if (inactive) {
                     reset();
                 }
             }

@@ -12,7 +12,7 @@
 
    Hackflight is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MEReceiverHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   MEOpenLoopControllerHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
@@ -23,7 +23,7 @@
 #include "debugger.hpp"
 #include "mspparser.hpp"
 #include "board.hpp"
-#include "receiver.hpp"
+#include "openloop.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
 #include "sensor.hpp"
@@ -66,7 +66,7 @@ namespace hf {
             }
 
             Board * _board = NULL;
-            Receiver * _receiver = NULL;
+            OpenLoopController * _olc = NULL;
 
             // Vehicle state
             state_t _state;
@@ -94,10 +94,10 @@ namespace hf {
                 }
             }
 
-            void checkReceiver(void)
+            void checkOpenLoopController(void)
             {
-                // Sync failsafe to receiver
-                if (_receiver->lostSignal() && _state.armed) {
+                // Sync failsafe to open-loop-controller
+                if (_olc->lostSignal() && _state.armed) {
                     _actuator->cut();
                     _state.armed = false;
                     _state.failsafe = true;
@@ -105,25 +105,25 @@ namespace hf {
                     return;
                 }
 
-                // Check whether receiver data is available
-                if (!_receiver->ready()) return;
+                // Check whether open-loop controller data is available
+                if (!_olc->ready()) return;
 
                 // Disarm
-                if (_state.armed && !_receiver->inArmedState()) {
+                if (_state.armed && !_olc->inArmedState()) {
                     _state.armed = false;
                 } 
 
                 // Avoid arming if aux1 switch down on startup
                 if (!_safeToArm) {
-                    _safeToArm = !_receiver->inArmedState();
+                    _safeToArm = !_olc->inArmedState();
                 }
 
                 // Arm (after lots of safety checks!)
                 if (
                         _safeToArm &&
                         !_state.armed && 
-                        _receiver->inactive() && 
-                        _receiver->inArmedState() && 
+                        _olc->inactive() && 
+                        _olc->inArmedState() && 
                         !_state.failsafe && 
                         safeAngle(AXIS_ROLL) && 
                         safeAngle(AXIS_PITCH)) {
@@ -131,14 +131,14 @@ namespace hf {
                 }
 
                 // Cut motors on throttle-down
-                if (_state.armed && _receiver->inactive()) {
+                if (_state.armed && _olc->inactive()) {
                     _actuator->cut();
                 }
 
                 // Set LED based on arming status
                 _board->showArmedStatus(_state.armed);
 
-            } // checkReceiver
+            } // checkOpenLoopController
 
             void startSensors(void) 
             {
@@ -149,11 +149,11 @@ namespace hf {
 
          public:
 
-            Hackflight(Board * board, Receiver * receiver, Actuator * actuator)
+            Hackflight(Board * board, OpenLoopController * olc, Actuator * actuator)
             {
                 // Store the essentials
                 _board    = board;
-                _receiver = receiver;
+                _olc = olc;
                 _actuator = actuator;
 
                 // Support adding new sensors
@@ -174,18 +174,18 @@ namespace hf {
                 // Initialize the sensors
                 startSensors();
 
-                // Initialize the receiver
-                _receiver->begin();
+                // Initialize the open-loop controller
+                _olc->begin();
 
                 // Initialize safety features
                 _state.failsafe = false;
                 _state.armed = armed;
 
                 // Initialize timer task for PID controllers
-                _pidTask.begin(_board, _receiver, _actuator, &_state);
+                _pidTask.begin(_board, _olc, _actuator, &_state);
 
                 // Initialize serial timer task
-                _serialTask.begin(_board, &_state, _receiver, _actuator);
+                _serialTask.begin(_board, &_state, _olc, _actuator);
 
                 // Support safety override by simulator
                 _state.armed = armed;
@@ -208,7 +208,7 @@ namespace hf {
             void update(void)
             {
                 // Grab control signal if available
-                checkReceiver();
+                checkOpenLoopController();
 
                 // Update PID controllers task
                 _pidTask.update();

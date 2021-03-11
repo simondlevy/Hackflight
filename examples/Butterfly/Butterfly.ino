@@ -33,13 +33,13 @@
 #include "hackflight.hpp"
 #include "boards/realboards/arduino/butterfly_piggyback.hpp"
 #include "sensors/usfs.hpp"
-#include "receivers/arduino/dsmx/dsmx_serial1.hpp"
+#include "openloops/receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "actuators/mixers/quadxcf.hpp"
 #include "motors/standard.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 
-#include "receivers/mock.hpp"
+#include "openloops/receivers/mock.hpp"
 #include "motors/mock.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};

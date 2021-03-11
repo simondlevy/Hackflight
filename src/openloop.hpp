@@ -61,9 +61,9 @@ namespace hf {
                 return false;
             }
 
-            virtual uint8_t inArmedState(void)
+            virtual bool inArmedState(void)
             {
-                return 0;
+                return true;
             }
 
             virtual uint8_t getModeIndex(void)

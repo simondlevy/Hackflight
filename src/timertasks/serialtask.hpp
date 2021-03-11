@@ -37,17 +37,17 @@ namespace hf {
             static constexpr float FREQ = 66;
 
             Actuator * _actuator = NULL;
-            Receiver * _receiver = NULL;
+            OpenLoopController * _olc = NULL;
             state_t  * _state = NULL;
 
-            void _begin(Board * board, state_t * state, Receiver * receiver) 
+            void _begin(Board * board, state_t * state, OpenLoopController * olc) 
             {
                 TimerTask::begin(board);
 
                 MspParser::begin();
 
                 _state = state;
-                _receiver = receiver;
+                _olc = olc;
              }
 
         protected:
@@ -88,12 +88,12 @@ namespace hf {
  
             virtual void handle_OLC_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
             {
-                c1 = _receiver->getRawval(0);
-                c2 = _receiver->getRawval(1);
-                c3 = _receiver->getRawval(2);
-                c4 = _receiver->getRawval(3);
-                c5 = _receiver->getRawval(4);
-                c6 = _receiver->getRawval(5);
+                c1 = _olc->getRawval(0);
+                c2 = _olc->getRawval(1);
+                c3 = _olc->getRawval(2);
+                c4 = _olc->getRawval(3);
+                c5 = _olc->getRawval(4);
+                c6 = _olc->getRawval(5);
             }
 
             virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
@@ -116,11 +116,11 @@ namespace hf {
             {
             }
 
-            void begin(Board * board, state_t * state, Receiver * receiver, Actuator * actuator) 
+            void begin(Board * board, state_t * state, OpenLoopController * olc, Actuator * actuator) 
             {
                 TimerTask::begin(board);
                 _state = state;
-                _receiver = receiver;
+                _olc = olc;
                 _actuator = actuator;
             }
 

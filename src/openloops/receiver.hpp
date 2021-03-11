@@ -28,11 +28,7 @@
 
 namespace hf {
 
-    class Receiver {
-
-        friend class Hackflight;
-        friend class SerialTask;
-        friend class PidTask;
+    class Receiver : public OpenLoopController {
 
         private: 
 
@@ -105,9 +101,6 @@ namespace hf {
             virtual bool gotNewFrame(void) = 0;
             virtual void readRawvals(void) = 0;
 
-            // This can be overridden optionally
-            virtual void begin(void) { }
-
             // Software trim
             float _trimRoll = 0;
             float _trimPitch = 0;
@@ -116,13 +109,16 @@ namespace hf {
             // Raw receiver values in [-1,+1]
             float rawvals[MAXCHAN] = {0};  
 
-            float getRawval(uint8_t chan)
+            virtual float getRawval(uint8_t chan) override
             {
                 return rawvals[_channelMap[chan]];
             }
 
             // Override this if your receiver provides RSSI or other weak-signal detection
-            virtual bool lostSignal(void) { return false; }
+            virtual bool lostSignal(void)
+            { 
+                return false; 
+            }
 
             /**
               * channelMap: throttle, roll, pitch, yaw, aux, arm
@@ -140,7 +136,7 @@ namespace hf {
                 _demandScale = demandScale;
             }
 
-            bool ready(void)
+            virtual bool ready(void) override
             {
                 // Wait till there's a new frame
                 if (!gotNewFrame()) return false;
@@ -183,7 +179,7 @@ namespace hf {
 
             }  // ready
 
-            void getDemands(demands_t & demands)
+            virtual void getDemands(demands_t & demands) override
             {
                 demands.throttle = _demands.throttle;
                 demands.roll     = _demands.roll  * _demandScale;
@@ -191,14 +187,14 @@ namespace hf {
                 demands.yaw      = _demands.yaw   * _demandScale;
             }
 
-            bool inactive(void)
+            virtual bool inactive(void) override
             {
                 return getRawval(CHANNEL_THROTTLE) < -1 + THROTTLE_MARGIN;
             }
 
-            virtual uint8_t inArmedState(void)
+            virtual bool inArmedState(void) override
             {
-                return _aux1State;
+                return _aux1State > 0;
             }
 
             virtual uint8_t getModeIndex(void)

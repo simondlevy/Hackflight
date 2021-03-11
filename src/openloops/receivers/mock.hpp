@@ -1,7 +1,5 @@
 /*
-   Spektrum DSMX support for Arduino flight controllers using Serial2
-
-   Copyright (c) 2019 Simon D. Levy
+   "Mock" receiver subclass for prototyping
 
    This file is part of Hackflight.
 
@@ -20,41 +18,42 @@
 
 #pragma once
 
-#include "receivers/arduino/dsmx.hpp"
-#include <DSMRX.h>
+#include "openloops/receiver.hpp"
 
-static hf::DSMX_Receiver * _dsmx_rx;
-
-void serialEvent2(void)
-{
-    while (Serial2.available()) {
-
-        _dsmx_rx->handleSerialEvent(Serial2.read(), micros());
-    }
-}
+static constexpr uint8_t DEFAULT_MAP[6] = {0,1,2,3,4,5};
+static constexpr float   DEFAULT_DEMAND_SCALE = 1.0f;
 
 namespace hf {
 
-    class DSMX_Receiver_Serial2 : public DSMX_Receiver {
+    class MockReceiver : public Receiver {
 
-        //protected:
-        public:
+        protected:
 
-            void begin(void) override 
+            void begin(void)
             {
-                Receiver::begin();
+            }
 
-                Serial2.begin(115200);
+            virtual bool gotNewFrame(void) override
+            {
+                return false;
+            }
+
+            void readRawvals(void)
+            {
+            }
+
+            bool lostSignal(void)
+            {
+                return false;
             }
 
         public:
 
-            DSMX_Receiver_Serial2(const uint8_t channelMap[6], const float demandScale)
-                :  DSMX_Receiver(channelMap, demandScale) 
+            MockReceiver(void) 
+                : Receiver(DEFAULT_MAP, DEFAULT_DEMAND_SCALE)
             { 
-                _dsmx_rx = this;
             }
 
-    }; // class DSMX_Receiver_Serial2
+    }; // class MockReceiver
 
 } // namespace hf

@@ -1,5 +1,5 @@
 /*
-   "Mock" receiver subclass for prototyping
+   Spektrum DSMX support for Arduino flight controllers
 
    This file is part of Hackflight.
 
@@ -18,14 +18,16 @@
 
 #pragma once
 
-#include "receiver.hpp"
-
-static constexpr uint8_t DEFAULT_MAP[6] = {0,1,2,3,4,5};
-static constexpr float   DEFAULT_DEMAND_SCALE = 1.0f;
+#include "openloops/receiver.hpp"
+#include <DSMRX.h>
 
 namespace hf {
 
-    class MockReceiver : public Receiver {
+    class DSMX_Receiver : public Receiver {
+
+        private:
+
+            DSM2048 _rx;
 
         protected:
 
@@ -33,27 +35,33 @@ namespace hf {
             {
             }
 
-            virtual bool gotNewFrame(void) override
+            bool gotNewFrame(void)
             {
-                return false;
+                return _rx.gotNewFrame();
             }
 
             void readRawvals(void)
             {
+                _rx.getChannelValuesNormalized(rawvals, MAXCHAN);
             }
 
             bool lostSignal(void)
             {
-                return false;
+                return _rx.timedOut(micros());
             }
 
         public:
 
-            MockReceiver(void) 
-                : Receiver(DEFAULT_MAP, DEFAULT_DEMAND_SCALE)
+            DSMX_Receiver(const uint8_t channelMap[6], const float demandScale)
+                :  Receiver(channelMap, demandScale) 
             { 
             }
 
-    }; // class MockReceiver
+            void handleSerialEvent(uint8_t value, uint32_t usec)
+            {
+                _rx.handleSerialEvent(value, usec);
+            }
+
+    }; // class DSMX_Receiver
 
 } // namespace hf

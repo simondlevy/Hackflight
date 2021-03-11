@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "receiver.hpp"
+#include "openloops/receiver.hpp"
 #include "filters.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
@@ -99,12 +99,12 @@ namespace hf {
                 }
             }
 
-            virtual void updateReceiver(bool throttleIsDown) override
+            virtual void resetOnInactivity(bool inactive) override
             {
                 // Check throttle-down for integral reset
-                _rollPid.updateReceiver(throttleIsDown);
-                _pitchPid.updateReceiver(throttleIsDown);
-                _yawPid.updateReceiver(throttleIsDown);
+                _rollPid.resetOnInactivity(inactive);
+                _pitchPid.resetOnInactivity(inactive);
+                _yawPid.resetOnInactivity(inactive);
             }
 
     };  // class RatePid

@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "receivers/arduino/dsmx.hpp"
+#include "openloops/receivers/arduino/dsmx.hpp"
 #include <DSMRX.h>
 
 static hf::DSMX_Receiver * _dsmx_rx;
