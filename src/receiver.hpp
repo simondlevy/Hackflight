@@ -41,6 +41,10 @@ namespace hf {
             const float THROTTLE_EXPO   = 0.20f;
             const float AUX_THRESHOLD   = 0.4f;
 
+            float _demandScale = 0;
+
+            demands_t _demands;
+
             float adjustCommand(float command, uint8_t channel)
             {
                 command /= 2;
@@ -84,8 +88,6 @@ namespace hf {
             uint8_t _aux1State = 0;
             uint8_t _aux2State = 0;
 
-            float _demandScale = 0;
-
             // channel indices
             enum {
                 CHANNEL_THROTTLE, 
@@ -115,8 +117,6 @@ namespace hf {
 
             // Raw receiver values in [-1,+1]
             float rawvals[MAXCHAN] = {0};  
-
-            demands_t demands;
 
             float getRawval(uint8_t chan)
             {
@@ -151,30 +151,30 @@ namespace hf {
                 readRawvals();
 
                 // Convert raw [-1,+1] to absolute value
-                demands.roll  = makePositiveCommand(CHANNEL_ROLL);
-                demands.pitch = makePositiveCommand(CHANNEL_PITCH);
-                demands.yaw   = makePositiveCommand(CHANNEL_YAW);
+                _demands.roll  = makePositiveCommand(CHANNEL_ROLL);
+                _demands.pitch = makePositiveCommand(CHANNEL_PITCH);
+                _demands.yaw   = makePositiveCommand(CHANNEL_YAW);
 
                 // Apply expo nonlinearity to roll, pitch
-                demands.roll  = applyCyclicFunction(demands.roll);
-                demands.pitch = applyCyclicFunction(demands.pitch);
+                _demands.roll  = applyCyclicFunction(_demands.roll);
+                _demands.pitch = applyCyclicFunction(_demands.pitch);
 
                 // Put sign back on command, yielding [-0.5,+0.5]
-                demands.roll  = adjustCommand(demands.roll, CHANNEL_ROLL);
-                demands.pitch = adjustCommand(demands.pitch, CHANNEL_PITCH);
-                demands.yaw   = adjustCommand(demands.yaw, CHANNEL_YAW);
+                _demands.roll  = adjustCommand(_demands.roll, CHANNEL_ROLL);
+                _demands.pitch = adjustCommand(_demands.pitch, CHANNEL_PITCH);
+                _demands.yaw   = adjustCommand(_demands.yaw, CHANNEL_YAW);
 
                 // Add in software trim
-                demands.roll  += _trimRoll;
-                demands.pitch += _trimPitch;
-                demands.yaw   += _trimYaw;
+                _demands.roll  += _trimRoll;
+                _demands.pitch += _trimPitch;
+                _demands.yaw   += _trimYaw;
 
                 // Negate pitch demand, so that pulling back on stick means positive demand.
                 // Doing this keeps demands consistent with Euler angles (positive pitch = nose up).
-                demands.pitch = -demands.pitch;
+                _demands.pitch = -_demands.pitch;
 
                 // Pass throttle demand through exponential function
-                demands.throttle = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
+                _demands.throttle = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
 
                 // Store auxiliary switch state
                 _aux1State = getRawval(CHANNEL_AUX1) >= 0.0 ? (getRawval(CHANNEL_AUX1) > AUX_THRESHOLD ? 2 : 1) : 0;
@@ -184,6 +184,14 @@ namespace hf {
                 return true;
 
             }  // getDemands
+
+            void getDemands(demands_t & demands)
+            {
+                demands.throttle = _demands.throttle;
+                demands.roll     = _demands.roll  * _demandScale;
+                demands.pitch    = _demands.pitch * _demandScale;
+                demands.yaw      = _demands.yaw   * _demandScale;
+            }
 
             bool inactive(void)
             {

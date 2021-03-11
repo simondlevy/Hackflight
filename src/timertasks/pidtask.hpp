@@ -71,10 +71,7 @@ namespace hf {
             {
                 // Start with demands from receiver, scaling roll/pitch/yaw by constant
                 demands_t demands = {};
-                demands.throttle = _receiver->demands.throttle;
-                demands.roll     = _receiver->demands.roll  * _receiver->_demandScale;
-                demands.pitch    = _receiver->demands.pitch * _receiver->_demandScale;
-                demands.yaw      = _receiver->demands.yaw   * _receiver->_demandScale;
+                _receiver->getDemands(demands);
 
                 // Each PID controllers is associated with at least one auxiliary switch state
                 uint8_t modeIndex = _receiver->getModeIndex();
