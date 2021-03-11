@@ -23,7 +23,7 @@
 #include <stdint.h>
 #include <math.h>
 
-#include "datatypes.hpp"
+#include "demands.hpp"
 
 namespace hf {
 

@@ -23,6 +23,7 @@
 #include "filters.hpp"
 #include "motor.hpp"
 #include "actuator.hpp"
+#include "demands.hpp"
 
 namespace hf {
 

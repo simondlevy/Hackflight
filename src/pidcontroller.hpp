@@ -20,8 +20,9 @@
 
 #pragma once
 
-#include "datatypes.hpp"
 #include "filters.hpp"
+#include "state.hpp"
+#include "demands.hpp"
 
 namespace hf {
 

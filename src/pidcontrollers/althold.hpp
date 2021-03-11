@@ -21,8 +21,9 @@
 #pragma once
 
 #include "filters.hpp"
-#include "datatypes.hpp"
 #include "pidcontroller.hpp"
+#include "state.hpp"
+#include "demands.hpp"
 
 namespace hf {
 

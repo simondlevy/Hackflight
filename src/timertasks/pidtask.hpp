@@ -21,6 +21,8 @@
 #pragma once
 
 #include "timertask.hpp"
+#include "state.hpp"
+#include "demands.hpp"
 
 namespace hf {
 

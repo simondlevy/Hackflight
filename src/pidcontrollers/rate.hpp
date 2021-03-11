@@ -22,7 +22,8 @@
 
 #include "openloops/receiver.hpp"
 #include "filters.hpp"
-#include "datatypes.hpp"
+#include "state.hpp"
+#include "demands.hpp"
 #include "pidcontroller.hpp"
 
 namespace hf {

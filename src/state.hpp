@@ -1,5 +1,5 @@
 /*
-   Abstract class for sensors
+   State datatype
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -16,26 +16,42 @@
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
- */
+   */
 
 #pragma once
 
-#include "state.hpp"
-
 namespace hf {
 
-    class Sensor {
+    enum {
+        AXIS_ROLL = 0,
+        AXIS_PITCH, 
+        AXIS_YAW
+    };
 
-        friend class Hackflight;
+    // See Bouabdallah et al. (2004)
+    enum {
+        STATE_X = 0,
+        STATE_DX,
+        STATE_Y,
+        STATE_DY,
+        STATE_Z,
+        STATE_DZ,
+        STATE_PHI,
+        STATE_DPHI,
+        STATE_THETA,
+        STATE_DTHETA,
+        STATE_PSI,
+        STATE_DPSI,
+        STATE_SIZE
+    };
 
-        protected:
+    typedef struct {
 
-            virtual void begin(void) { }
+        float x[STATE_SIZE];
 
-            virtual void modifyState(state_t & state, float time) = 0;
+        bool armed;
+        bool failsafe;
 
-            virtual bool ready(float time) = 0;
-
-    };  // class Sensor
+    } state_t;
 
 } // namespace hf

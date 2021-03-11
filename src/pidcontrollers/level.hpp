@@ -20,7 +20,8 @@
 
 #pragma once
 
-#include "datatypes.hpp"
+#include "state.hpp"
+#include "demands.hpp"
 #include "pidcontroller.hpp"
 
 namespace hf {

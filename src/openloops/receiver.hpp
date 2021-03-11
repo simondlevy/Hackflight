@@ -24,7 +24,7 @@
 #include <math.h>
 
 #include "openloop.hpp"
-#include "datatypes.hpp"
+#include "demands.hpp"
 
 namespace hf {
 
