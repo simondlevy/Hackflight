@@ -86,7 +86,7 @@ namespace hf {
                 velocityRightward = 0;
             }
  
-            virtual void handle_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
+            virtual void handle_OLC_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
             {
                 c1 = _receiver->getRawval(0);
                 c2 = _receiver->getRawval(1);

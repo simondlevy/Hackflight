@@ -9,7 +9,7 @@
    {"velocityForward":   "float"}, 
    {"velocityRightward": "float"}],
 
-  "RC_NORMAL": 
+  "OLC": 
   [{"ID": 121},
    {"comment": "16 channels in http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol"}, 
    {"c1": "float"}, 
@@ -40,7 +40,7 @@
    {"m3": "float"},
    {"m4": "float"}],
 
-  "SET_RC_NORMAL": 
+  "SET_OLC": 
   [{"ID": 217},
    {"comment": "Set RC commands in interval [-1,+1]"}, 
    {"c1": "float"}, 

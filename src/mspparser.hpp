@@ -287,7 +287,7 @@ namespace hf {
                         float c4 = 0;
                         float c5 = 0;
                         float c6 = 0;
-                        handle_RC_NORMAL_Request(c1, c2, c3, c4, c5, c6);
+                        handle_OLC_Request(c1, c2, c3, c4, c5, c6);
                         prepareToSendFloats(6);
                         sendFloat(c1);
                         sendFloat(c2);
@@ -365,7 +365,7 @@ namespace hf {
                         float c6 = 0;
                         memcpy(&c6,  &_inBuf[20], sizeof(float));
 
-                        handle_SET_RC_NORMAL(c1, c2, c3, c4, c5, c6);
+                        handle_SET_OLC(c1, c2, c3, c4, c5, c6);
                         } break;
 
                 }
@@ -382,7 +382,7 @@ namespace hf {
                 (void)velocityRightward;
             }
 
-            virtual void handle_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
+            virtual void handle_OLC_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
             {
                 (void)c1;
                 (void)c2;
@@ -415,7 +415,7 @@ namespace hf {
                 (void)m4;
             }
 
-            virtual void handle_SET_RC_NORMAL(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
+            virtual void handle_SET_OLC(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
             {
                 (void)c1;
                 (void)c2;
@@ -460,7 +460,7 @@ namespace hf {
                 return 34;
             }
 
-            static uint8_t serialize_RC_NORMAL_Request(uint8_t bytes[])
+            static uint8_t serialize_OLC_Request(uint8_t bytes[])
             {
                 bytes[0] = 36;
                 bytes[1] = 77;
@@ -472,7 +472,7 @@ namespace hf {
                 return 6;
             }
 
-            static uint8_t serialize_RC_NORMAL(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
+            static uint8_t serialize_OLC(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
             {
                 bytes[0] = 36;
                 bytes[1] = 77;
@@ -557,7 +557,7 @@ namespace hf {
                 return 22;
             }
 
-            static uint8_t serialize_SET_RC_NORMAL(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
+            static uint8_t serialize_SET_OLC(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
             {
                 bytes[0] = 36;
                 bytes[1] = 77;
