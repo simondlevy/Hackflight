@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <math.h>
 
+#include "openloop.hpp"
 #include "datatypes.hpp"
 
 namespace hf {
@@ -112,9 +113,6 @@ namespace hf {
             float _trimPitch = 0;
             float _trimYaw = 0;
 
-            // Default to non-headless mode
-            float headless = false;
-
             // Raw receiver values in [-1,+1]
             float rawvals[MAXCHAN] = {0};  
 
@@ -183,7 +181,7 @@ namespace hf {
                 // Got a new frame
                 return true;
 
-            }  // getDemands
+            }  // ready
 
             void getDemands(demands_t & demands)
             {
