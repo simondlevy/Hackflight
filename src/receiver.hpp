@@ -142,7 +142,7 @@ namespace hf {
                 _demandScale = demandScale;
             }
 
-            bool getDemands(void)
+            bool ready(void)
             {
                 // Wait till there's a new frame
                 if (!gotNewFrame()) return false;

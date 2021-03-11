@@ -106,7 +106,7 @@ namespace hf {
                 }
 
                 // Check whether receiver data is available
-                if (!_receiver->getDemands()) return;
+                if (!_receiver->ready()) return;
 
                 // Disarm
                 if (_state.armed && !_receiver->inArmedState()) {
