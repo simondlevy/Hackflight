@@ -1,7 +1,7 @@
 /*
-   State datatype
+   State subclass for multicopters
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2021 D. Levy
 
    This file is part of Hackflight.
 
@@ -20,7 +20,11 @@
 
 #pragma once
 
+#include "state.hpp"
+
 namespace hf {
+
+    class CopterState : public state {
 
     enum {
         AXIS_ROLL = 0,
@@ -45,23 +49,8 @@ namespace hf {
         STATE_SIZE
     };
 
-    typedef struct {
+    float x[STATE_SIZE];
 
-        float x[STATE_SIZE];
-
-        bool armed;
-        bool failsafe;
-
-    } state_t;
-
-    class State {
-
-        public:
-
-        bool armed;
-        bool failsafe;
-
-
-    }; // class State
+    } // class CopterState
 
 } // namespace hf
