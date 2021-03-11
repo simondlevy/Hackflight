@@ -130,7 +130,7 @@ class GCS(msppg.Parser):
 
         # Set up parser's request strings
         self.attitude_request = msppg.serialize_ATTITUDE_RADIANS_Request()
-        self.rc_request = msppg.serialize_RC_NORMAL_Request()
+        self.rc_request = msppg.serialize_OLC_Request()
 
         # No messages yet
         self.roll_pitch_yaw = [0]*3
@@ -180,7 +180,7 @@ class GCS(msppg.Parser):
 
         self.root.after(delay_msec, task)
 
-    def handle_RC_NORMAL(self, c1, c2, c3, c4, c5, c6):
+    def handle_OLC(self, c1, c2, c3, c4, c5, c6):
 
         # Display throttle as [0,1], other channels as [-1,+1]
         self.rxchannels = c1/2.+.5, c2, c3, c4, c5, c6

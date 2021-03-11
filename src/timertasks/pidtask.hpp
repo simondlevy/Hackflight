@@ -43,7 +43,7 @@ namespace hf {
             // Other stuff we need
             OpenLoopController * _olc = NULL;
             Actuator * _actuator = NULL;
-            state_t  * _state    = NULL;
+            State  * _state    = NULL;
 
         protected:
 
@@ -53,7 +53,7 @@ namespace hf {
                 _pid_controller_count = 0;
             }
 
-            void begin(Board * board, OpenLoopController * olc, Actuator * actuator, state_t * state)
+            void begin(Board * board, OpenLoopController * olc, Actuator * actuator, State * state)
             {
                 TimerTask::begin(board);
 

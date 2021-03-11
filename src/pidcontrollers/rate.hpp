@@ -83,13 +83,15 @@ namespace hf {
                 _yawPid.begin(Kp_yaw, Ki_yaw, 0);
             }
 
-            void modifyDemands(state_t * state, demands_t & demands)
+            void modifyDemands(State * state, demands_t & demands)
             {
-                demands.roll  = _rollPid.compute(demands.roll, state->x[STATE_DPHI]);
+                float * x = ((CopterState *)state)->x;
+
+                demands.roll  = _rollPid.compute(demands.roll, x[CopterState::STATE_DPHI]);
 
                 // XXX Why do we have to negate pitch, yaw demands and state values?
-                demands.pitch = _pitchPid.compute(-demands.pitch, -state->x[STATE_DTHETA]);
-                demands.yaw   = _yawPid.compute(-demands.yaw, -state->x[STATE_DPSI]);
+                demands.pitch = _pitchPid.compute(-demands.pitch, -x[CopterState::STATE_DTHETA]);
+                demands.yaw   = _yawPid.compute(-demands.yaw, -x[CopterState::STATE_DPSI]);
 
                 // Prevent "yaw jump" during correction
                 demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));

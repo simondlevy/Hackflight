@@ -23,6 +23,7 @@
 #include <Wire.h>
 #include <USFS_Master.h>
 #include "sensor.hpp"
+#include "states/copterstate.hpp"
 
 namespace hf {
 
@@ -97,9 +98,11 @@ namespace hf {
                 _usfs.begin();
             }
 
-            virtual void modifyState(state_t & state, float time) override
+            virtual void modifyState(State * state, float time) override
             {
                 (void)time;
+
+                CopterState * copterState = (CopterState *)state;
 
                 float qw = 0;
                 float qx = 0;
@@ -108,14 +111,17 @@ namespace hf {
 
                 _usfs.sentral.readQuaternion(qw, qx, qy, qz);
 
-                computeEulerAngles(qw, qx, qy, qz, state.x[STATE_PHI], state.x[STATE_THETA], state.x[STATE_PSI]);
+                computeEulerAngles(qw, qx, qy, qz,
+                        copterState->x[CopterState::STATE_PHI],
+                        copterState->x[CopterState::STATE_THETA],
+                        copterState->x[CopterState::STATE_PSI]);
 
                 // Adjust rotation so that nose-up is positive
-                state.x[STATE_THETA] = -state.x[STATE_THETA];
+                copterState->x[CopterState::STATE_THETA] = -copterState->x[CopterState::STATE_THETA];
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (state.x[STATE_PSI] < 0) {
-                    state.x[STATE_PSI] += 2*M_PI;
+                if (copterState->x[CopterState::STATE_PSI] < 0) {
+                    copterState->x[CopterState::STATE_PSI] += 2*M_PI;
                 }
             }
 
@@ -140,9 +146,11 @@ namespace hf {
                 _usfs.begin();
             }
 
-            virtual void modifyState(state_t & state, float time) override
+            virtual void modifyState(State * state, float time) override
             {
                 (void)time;
+
+                CopterState * copterState = (CopterState *)state;
 
                 float gx = 0;
                 float gy = 0;
@@ -152,9 +160,9 @@ namespace hf {
                 _usfs.sentral.readGyrometer(gx, gy, gz);
 
                 // Convert degrees / sec to radians / sec
-                state.x[STATE_DPHI] = radians(gx);
-                state.x[STATE_DTHETA] = radians(gy);
-                state.x[STATE_DPSI] = radians(gz);
+                copterState->x[CopterState::STATE_DPHI] = radians(gx);
+                copterState->x[CopterState::STATE_DTHETA] = radians(gy);
+                copterState->x[CopterState::STATE_DPSI] = radians(gz);
             }
 
             virtual bool ready(float time) override

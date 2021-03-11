@@ -24,7 +24,6 @@
 #include "mspparser.hpp"
 #include "board.hpp"
 #include "openloop.hpp"
-#include "state.hpp"
 #include "states/copterstate.hpp"
 #include "demands.hpp"
 #include "pidcontroller.hpp"
@@ -60,16 +59,11 @@ namespace hf {
             // Serial timer task for GCS
             SerialTask _serialTask;
 
-            bool safeAngle(uint8_t axis)
-            {
-                return fabs(_state.x[STATE_PHI+2*axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
-            }
-
             Board * _board = NULL;
             OpenLoopController * _olc = NULL;
 
             // Vehicle state
-            state_t _state;
+            CopterState _state;
 
             void checkSensors(void)
             {
@@ -88,7 +82,7 @@ namespace hf {
                     Sensor * sensor = _sensors[k];
                     float time = _board->getTime();
                     if (sensor->ready(time)) {
-                        sensor->modifyState(_state, time);
+                        sensor->modifyState(&_state, time);
                         if (k<2) counts[k]++;
                     }
                 }
@@ -125,8 +119,7 @@ namespace hf {
                         _olc->inactive() && 
                         _olc->inArmedState() && 
                         !_state.failsafe && 
-                        safeAngle(AXIS_ROLL) && 
-                        safeAngle(AXIS_PITCH)) {
+                        _state.safeToArm()) {
                     _state.armed = true;
                 }
 
@@ -169,7 +162,7 @@ namespace hf {
                 _debugger.begin(_board);
 
                 // Initialize state
-                memset(&_state, 0, sizeof(state_t));
+                memset(&_state, 0, sizeof(State));
 
                 // Initialize the sensors
                 startSensors();

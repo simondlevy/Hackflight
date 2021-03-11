@@ -48,7 +48,7 @@ namespace hf {
 
         protected:
 
-            void modifyDemands(state_t * state, demands_t & demands)
+            void modifyDemands(State * state, demands_t & demands)
             {
                 bool didReset = false;
                 float altitude = state->x[STATE_Z];

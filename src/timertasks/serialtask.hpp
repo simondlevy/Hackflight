@@ -25,6 +25,7 @@
 #include "mspparser.hpp"
 #include "debugger.hpp"
 #include "actuator.hpp"
+#include "states/copterstate.hpp"
 
 namespace hf {
 
@@ -38,9 +39,9 @@ namespace hf {
 
             Actuator * _actuator = NULL;
             OpenLoopController * _olc = NULL;
-            state_t  * _state = NULL;
+            CopterState  * _state = NULL;
 
-            void _begin(Board * board, state_t * state, OpenLoopController * olc) 
+            void _begin(Board * board, CopterState * state, OpenLoopController * olc) 
             {
                 TimerTask::begin(board);
 
@@ -81,7 +82,7 @@ namespace hf {
                 variometer = 0;
                 positionX = 0;
                 positionY = 0;
-                heading = -_state->x[STATE_PSI]; // NB: Angle negated for remote visualization
+                heading = -_state->x[CopterState::STATE_PSI]; // NB: Angle negated for remote visualization
                 velocityForward = 0;
                 velocityRightward = 0;
             }
@@ -98,9 +99,9 @@ namespace hf {
 
             virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
             {
-                roll  = _state->x[STATE_PHI];
-                pitch = _state->x[STATE_THETA];
-                yaw   = _state->x[STATE_PSI];
+                roll  = _state->x[CopterState::STATE_PHI];
+                pitch = _state->x[CopterState::STATE_THETA];
+                yaw   = _state->x[CopterState::STATE_PSI];
             }
 
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
@@ -116,10 +117,10 @@ namespace hf {
             {
             }
 
-            void begin(Board * board, state_t * state, OpenLoopController * olc, Actuator * actuator) 
+            void begin(Board * board, State * state, OpenLoopController * olc, Actuator * actuator) 
             {
                 TimerTask::begin(board);
-                _state = state;
+                _state = (CopterState *)state;
                 _olc = olc;
                 _actuator = actuator;
             }
