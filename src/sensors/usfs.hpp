@@ -23,7 +23,7 @@
 #include <Wire.h>
 #include <USFS_Master.h>
 #include "sensor.hpp"
-#include "states/copterstate.hpp"
+#include "states/mavstate.hpp"
 
 namespace hf {
 
@@ -102,7 +102,7 @@ namespace hf {
             {
                 (void)time;
 
-                CopterState * copterState = (CopterState *)state;
+                MavState * mavState = (MavState *)state;
 
                 float qw = 0;
                 float qx = 0;
@@ -112,16 +112,16 @@ namespace hf {
                 _usfs.sentral.readQuaternion(qw, qx, qy, qz);
 
                 computeEulerAngles(qw, qx, qy, qz,
-                        copterState->x[CopterState::STATE_PHI],
-                        copterState->x[CopterState::STATE_THETA],
-                        copterState->x[CopterState::STATE_PSI]);
+                        mavState->x[MavState::STATE_PHI],
+                        mavState->x[MavState::STATE_THETA],
+                        mavState->x[MavState::STATE_PSI]);
 
                 // Adjust rotation so that nose-up is positive
-                copterState->x[CopterState::STATE_THETA] = -copterState->x[CopterState::STATE_THETA];
+                mavState->x[MavState::STATE_THETA] = -mavState->x[MavState::STATE_THETA];
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (copterState->x[CopterState::STATE_PSI] < 0) {
-                    copterState->x[CopterState::STATE_PSI] += 2*M_PI;
+                if (mavState->x[MavState::STATE_PSI] < 0) {
+                    mavState->x[MavState::STATE_PSI] += 2*M_PI;
                 }
             }
 
@@ -150,7 +150,7 @@ namespace hf {
             {
                 (void)time;
 
-                CopterState * copterState = (CopterState *)state;
+                MavState * mavState = (MavState *)state;
 
                 float gx = 0;
                 float gy = 0;
@@ -160,9 +160,9 @@ namespace hf {
                 _usfs.sentral.readGyrometer(gx, gy, gz);
 
                 // Convert degrees / sec to radians / sec
-                copterState->x[CopterState::STATE_DPHI] = radians(gx);
-                copterState->x[CopterState::STATE_DTHETA] = radians(gy);
-                copterState->x[CopterState::STATE_DPSI] = radians(gz);
+                mavState->x[MavState::STATE_DPHI] = radians(gx);
+                mavState->x[MavState::STATE_DTHETA] = radians(gy);
+                mavState->x[MavState::STATE_DPSI] = radians(gz);
             }
 
             virtual bool ready(float time) override

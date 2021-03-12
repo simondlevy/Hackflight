@@ -24,7 +24,7 @@
 #include "mspparser.hpp"
 #include "board.hpp"
 #include "openloop.hpp"
-#include "states/copterstate.hpp"
+#include "states/mavstate.hpp"
 #include "demands.hpp"
 #include "pidcontroller.hpp"
 #include "sensor.hpp"
@@ -63,7 +63,7 @@ namespace hf {
             OpenLoopController * _olc = NULL;
 
             // Vehicle state
-            CopterState _state;
+            MavState _state;
 
             void checkSensors(void)
             {

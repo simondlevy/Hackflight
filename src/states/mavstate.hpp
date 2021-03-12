@@ -1,5 +1,5 @@
 /*
-   State subclass for multicopters
+   State subclass for miniature aerial vehicles
 
    Copyright (c) 2021 D. Levy
 
@@ -25,7 +25,7 @@
 
 namespace hf {
 
-    class CopterState : public State {
+    class MavState : public State {
 
         private:
 
@@ -72,6 +72,6 @@ namespace hf {
                 return safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH);
             }
 
-    }; // class CopterState
+    }; // class MavState
 
 } // namespace hf

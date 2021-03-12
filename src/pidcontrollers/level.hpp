@@ -23,7 +23,7 @@
 #include "state.hpp"
 #include "demands.hpp"
 #include "pidcontroller.hpp"
-#include "states/copterstate.hpp"
+#include "states/mavstate.hpp"
 
 namespace hf {
 
@@ -74,9 +74,9 @@ namespace hf {
 
             void modifyDemands(State * state, demands_t & demands)
             {
-                float * x = ((CopterState *)state)->x;
-                demands.roll  = _rollPid.compute(demands.roll, x[CopterState::STATE_PHI]); 
-                demands.pitch = _pitchPid.compute(demands.pitch, x[CopterState::STATE_THETA]);
+                float * x = ((MavState *)state)->x;
+                demands.roll  = _rollPid.compute(demands.roll, x[MavState::STATE_PHI]); 
+                demands.pitch = _pitchPid.compute(demands.pitch, x[MavState::STATE_THETA]);
             }
 
     };  // class LevelPid
