@@ -21,8 +21,8 @@
 #pragma once
 
 #include "filters.hpp"
-#include "pidcontroller.hpp"
 #include "state.hpp"
+#include "closedloops/pidcontroller.hpp"
 #include "demands/mavdemands.hpp"
 
 namespace hf {

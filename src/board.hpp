@@ -31,7 +31,7 @@ namespace hf {
         friend class Debugger;
         friend class TimerTask;
         friend class SerialTask;
-        friend class PidTask;
+        friend class ClosedLoopTask;
 
         protected:
 

@@ -25,10 +25,10 @@
 #include "board.hpp"
 #include "openloop.hpp"
 #include "states/mavstate.hpp"
-#include "pidcontroller.hpp"
+#include "closedloop.hpp"
 #include "sensor.hpp"
 #include "actuator.hpp"
-#include "timertasks/pidtask.hpp"
+#include "timertasks/closedlooptask.hpp"
 #include "timertasks/serialtask.hpp"
 
 namespace hf {
@@ -50,7 +50,7 @@ namespace hf {
             bool _safeToArm = false;
 
             // Timer task for PID controllers
-            PidTask _pidTask;
+            ClosedLoopTask _closedLoopTask;
 
             // Passed to Hackflight::begin() for a particular build
             Actuator * _actuator = NULL;
@@ -174,7 +174,7 @@ namespace hf {
                 _state.armed = armed;
 
                 // Initialize timer task for PID controllers
-                _pidTask.begin(_board, _olc, _actuator, &_state);
+                _closedLoopTask.begin(_board, _olc, _actuator, &_state);
 
                 // Initialize serial timer task
                 _serialTask.begin(_board, &_state, _olc, _actuator);
@@ -192,9 +192,9 @@ namespace hf {
                 _sensors[_sensor_count++] = sensor;
             }
 
-            void addPidController(PidController * pidController, uint8_t modeIndex=0) 
+            void addClosedLoopController(ClosedLoopController * controller, uint8_t modeIndex=0) 
             {
-                _pidTask.addPidController(pidController, modeIndex);
+                _closedLoopTask.addClosedLoopController(controller, modeIndex);
             }
 
             void update(void)
@@ -203,7 +203,7 @@ namespace hf {
                 checkOpenLoopController();
 
                 // Update PID controllers task
-                _pidTask.update();
+                _closedLoopTask.update();
 
                 // Check sensors
                 checkSensors();

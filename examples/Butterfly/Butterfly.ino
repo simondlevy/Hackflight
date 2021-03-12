@@ -36,8 +36,8 @@
 #include "openloops/receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "actuators/mixers/quadxcf.hpp"
 #include "motors/standard.hpp"
-#include "pidcontrollers/rate.hpp"
-#include "pidcontrollers/level.hpp"
+#include "closedloops/pidcontrollers/rate.hpp"
+#include "closedloops/pidcontrollers/level.hpp"
 
 #include "openloops/receivers/mock.hpp"
 #include "motors/mock.hpp"
@@ -68,8 +68,8 @@ void setup(void)
     h.addSensor(&quat);
 
     // Add rate and level PID controllers
-    h.addPidController(&levelPid);
-    h.addPidController(&ratePid);
+    h.addClosedLoopController(&levelPid);
+    h.addClosedLoopController(&ratePid);
 
     // Initialize Hackflight firmware
     h.begin();

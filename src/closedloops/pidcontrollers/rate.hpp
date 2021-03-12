@@ -24,7 +24,7 @@
 #include "filters.hpp"
 #include "state.hpp"
 #include "demands/mavdemands.hpp"
-#include "pidcontroller.hpp"
+#include "closedloops/pidcontroller.hpp"
 
 namespace hf {
 

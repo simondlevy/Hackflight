@@ -22,7 +22,7 @@
 
 #include "state.hpp"
 #include "demands/mavdemands.hpp"
-#include "pidcontroller.hpp"
+#include "closedloops/pidcontroller.hpp"
 #include "states/mavstate.hpp"
 
 namespace hf {

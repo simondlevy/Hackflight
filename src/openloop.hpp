@@ -29,7 +29,7 @@ namespace hf {
 
         friend class Hackflight;
         friend class SerialTask;
-        friend class PidTask;
+        friend class ClosedLoopTask;
 
         protected: 
 
