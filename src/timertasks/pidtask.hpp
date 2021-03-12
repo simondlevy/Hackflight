@@ -22,7 +22,7 @@
 
 #include "timertask.hpp"
 #include "state.hpp"
-#include "demands.hpp"
+#include "openloop.hpp"
 
 namespace hf {
 
@@ -72,7 +72,7 @@ namespace hf {
             virtual void doTask(void) override
             {
                 // Start with demands from open-loop controller
-                demands_t demands = {};
+                float demands[OpenLoopController::MAX_DEMANDS] = {};
                 _olc->getDemands(demands);
 
                 // Each PID controllers is associated with at least one auxiliary switch state

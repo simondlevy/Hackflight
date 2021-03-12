@@ -39,7 +39,7 @@ namespace hf {
 
         public:
 
-            virtual void run(demands_t demands) = 0;
+            virtual void run(float * demands) = 0;
 
     }; // class Actuator
 

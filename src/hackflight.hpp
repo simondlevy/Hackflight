@@ -25,7 +25,6 @@
 #include "board.hpp"
 #include "openloop.hpp"
 #include "states/mavstate.hpp"
-#include "demands.hpp"
 #include "pidcontroller.hpp"
 #include "sensor.hpp"
 #include "actuator.hpp"

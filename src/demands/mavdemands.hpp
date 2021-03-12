@@ -1,7 +1,7 @@
 /*
-   Demands datatype
+   Demands enumeration for miniature aerial vehicles
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2021 D. Levy
 
    This file is part of Hackflight.
 
@@ -16,19 +16,18 @@
    GNU General Public License for more details.
    You should have received a copy of the GNU General Public License
    along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
-   */
+ */
 
 #pragma once
 
 namespace hf {
 
-    typedef struct {
+    enum {
 
-        float throttle;
-        float roll;
-        float pitch;
-        float yaw;
-
-    } demands_t;
+        DEMANDS_THROTTLE = 0,
+        DEMANDS_ROLL,
+        DEMANDS_PITCH, 
+        DEMANDS_YAW
+    };
 
 } // namespace hf

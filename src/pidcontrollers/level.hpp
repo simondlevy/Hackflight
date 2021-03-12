@@ -21,7 +21,7 @@
 #pragma once
 
 #include "state.hpp"
-#include "demands.hpp"
+#include "demands/mavdemands.hpp"
 #include "pidcontroller.hpp"
 #include "states/mavstate.hpp"
 
@@ -72,11 +72,11 @@ namespace hf {
             {
             }
 
-            void modifyDemands(State * state, demands_t & demands)
+            void modifyDemands(State * state, float * demands)
             {
                 float * x = ((MavState *)state)->x;
-                demands.roll  = _rollPid.compute(demands.roll, x[MavState::STATE_PHI]); 
-                demands.pitch = _pitchPid.compute(demands.pitch, x[MavState::STATE_THETA]);
+                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], x[MavState::STATE_PHI]); 
+                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], x[MavState::STATE_THETA]);
             }
 
     };  // class LevelPid

@@ -23,8 +23,6 @@
 #include <stdint.h>
 #include <math.h>
 
-#include "demands.hpp"
-
 namespace hf {
 
     class OpenLoopController {
@@ -35,7 +33,9 @@ namespace hf {
 
         protected: 
 
-            virtual void getDemands(demands_t & demands) = 0;
+            static const uint8_t MAX_DEMANDS = 10; // arbitrary
+
+            virtual void getDemands(float * demands) = 0;
 
             virtual void begin(void) 
             { 

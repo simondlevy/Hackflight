@@ -23,7 +23,7 @@
 #include "openloops/receiver.hpp"
 #include "filters.hpp"
 #include "state.hpp"
-#include "demands.hpp"
+#include "demands/mavdemands.hpp"
 #include "pidcontroller.hpp"
 
 namespace hf {
@@ -83,21 +83,22 @@ namespace hf {
                 _yawPid.begin(Kp_yaw, Ki_yaw, 0);
             }
 
-            void modifyDemands(State * state, demands_t & demands)
+            void modifyDemands(State * state, float * demands)
             {
                 float * x = ((MavState *)state)->x;
 
-                demands.roll  = _rollPid.compute(demands.roll, x[MavState::STATE_DPHI]);
+                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], x[MavState::STATE_DPHI]);
 
                 // XXX Why do we have to negate pitch, yaw demands and state values?
-                demands.pitch = _pitchPid.compute(-demands.pitch, -x[MavState::STATE_DTHETA]);
-                demands.yaw   = _yawPid.compute(-demands.yaw, -x[MavState::STATE_DPSI]);
+                demands[DEMANDS_PITCH] = _pitchPid.compute(-demands[DEMANDS_PITCH], -x[MavState::STATE_DTHETA]);
+                demands[DEMANDS_YAW]   = _yawPid.compute(-demands[DEMANDS_YAW], -x[MavState::STATE_DPSI]);
 
                 // Prevent "yaw jump" during correction
-                demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));
+                demands[DEMANDS_YAW] =
+                    Filter::constrainAbs(demands[DEMANDS_YAW], 0.1 + fabs(demands[DEMANDS_YAW]));
 
                 // Reset yaw integral on large yaw command
-                if (fabs(demands.yaw) > BIG_YAW_DEMAND) {
+                if (fabs(demands[DEMANDS_YAW]) > BIG_YAW_DEMAND) {
                     _yawPid.reset();
                 }
             }

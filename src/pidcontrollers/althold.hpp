@@ -23,7 +23,7 @@
 #include "filters.hpp"
 #include "pidcontroller.hpp"
 #include "state.hpp"
-#include "demands.hpp"
+#include "demands/mavdemands.hpp"
 
 namespace hf {
 
@@ -48,13 +48,13 @@ namespace hf {
 
         protected:
 
-            void modifyDemands(State * state, demands_t & demands)
+            void modifyDemands(State * state, float * demands)
             {
                 bool didReset = false;
                 float altitude = state->x[STATE_Z];
 
                 // Is stick demand in deadband?
-                bool inBand = fabs(demands.throttle) < STICK_DEADBAND; 
+                bool inBand = fabs(demands[DEMANDS_THROTTLE]) < STICK_DEADBAND; 
 
                 // Reset controller when moving into deadband
                 if (inBand && !_inBandPrev) {
@@ -64,10 +64,12 @@ namespace hf {
                 _inBandPrev = inBand;
 
                 // Target velocity is a setpoint inside deadband, scaled constant outside
-                float targetVelocity = inBand ? _posPid.compute(_altitudeTarget, altitude) : PILOT_VELZ_MAX * demands.throttle;
+                float targetVelocity = inBand ?
+                                       _posPid.compute(_altitudeTarget, altitude) :
+                                       PILOT_VELZ_MAX * demands[DEMANDS_THROTTLE];
 
                 // Run velocity PID controller to get correction
-                demands.throttle = _velPid.compute(targetVelocity, state->x[STATE_DZ]);
+                demands[DEMANDS_THROTTLE] = _velPid.compute(targetVelocity, state->x[STATE_DZ]);
 
                 // If we re-entered deadband, we reset the target altitude.
                 if (didReset) {

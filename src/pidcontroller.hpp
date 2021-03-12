@@ -22,7 +22,6 @@
 
 #include "filters.hpp"
 #include "state.hpp"
-#include "demands.hpp"
 
 namespace hf {
 
@@ -36,7 +35,7 @@ namespace hf {
 
             static constexpr float STICK_DEADBAND = 0.10;
 
-            virtual void modifyDemands(State * state, demands_t & demands) = 0;
+            virtual void modifyDemands(State * state, float * demands) = 0;
 
             virtual bool shouldFlashLed(void)
             {
