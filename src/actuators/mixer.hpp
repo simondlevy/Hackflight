@@ -9,9 +9,10 @@
 #pragma once
 
 #include "filters.hpp"
-#include "motor.hpp"
 #include "actuator.hpp"
 #include "demands/mavdemands.hpp"
+
+#include <RFT_motor.hpp>
 
 namespace hf {
 
@@ -53,11 +54,11 @@ namespace hf {
 
         protected:
 
-            Motor * _motors;
+            rft::Motor * _motors;
 
             motorMixer_t motorDirections[MAXMOTORS];
 
-            Mixer(Motor * motors, uint8_t nmotors)
+            Mixer(rft::Motor * motors, uint8_t nmotors)
             {
                 _motors = motors;
                 _nmotors = nmotors;

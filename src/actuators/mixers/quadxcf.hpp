@@ -23,7 +23,7 @@ namespace hf {
 
         public:
 
-            MixerQuadXCF(Motor * motors) 
+            MixerQuadXCF(rft::Motor * motors) 
                 : Mixer(motors, 4)
             {
                 //                     Th  RR  PF  YR
