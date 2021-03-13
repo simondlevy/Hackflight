@@ -31,9 +31,6 @@ namespace hf {
             // Safety
             bool _safeToArm = false;
 
-            // Timer task for PID controllers
-            rft::ClosedLoopTask _closedLoopTask;
-
             SerialTask _serialTask;
 
             // Vehicle state
@@ -143,11 +140,6 @@ namespace hf {
                 _actuator->begin();
 
             } // begin
-
-            void addClosedLoopController(rft::ClosedLoopController * controller, uint8_t modeIndex=0) 
-            {
-                _closedLoopTask.addClosedLoopController(controller, modeIndex);
-            }
 
             void update(void)
             {
