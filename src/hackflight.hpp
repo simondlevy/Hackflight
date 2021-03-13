@@ -33,61 +33,13 @@ namespace hf {
             // Vehicle state
             MavState _state;
 
-            void checkSensors(void)
+       
+         protected:
+
+            virtual rft::State * getState(void) override
             {
-                for (uint8_t k=0; k<_sensor_count; ++k) {
-                    rft::Sensor * sensor = _sensors[k];
-                    float time = _board->getTime();
-                    if (sensor->ready(time)) {
-                        sensor->modifyState(&_state, time);
-                    }
-                }
+                return &_state;
             }
-
-            void checkOpenLoopController(void)
-            {
-                // Sync failsafe to open-loop-controller
-                if (_olc->lostSignal() && _state.armed) {
-                    _actuator->cut();
-                    _state.armed = false;
-                    _state.failsafe = true;
-                    _board->showArmedStatus(false);
-                    return;
-                }
-
-                // Check whether open-loop controller data is available
-                if (!_olc->ready()) return;
-
-                // Disarm
-                if (_state.armed && !_olc->inArmedState()) {
-                    _state.armed = false;
-                } 
-
-                // Avoid arming if aux1 switch down on startup
-                if (!_safeToArm) {
-                    _safeToArm = !_olc->inArmedState();
-                }
-
-                // Arm (after lots of safety checks!)
-                if (
-                        _safeToArm &&
-                        !_state.armed && 
-                        _olc->inactive() && 
-                        _olc->inArmedState() && 
-                        !_state.failsafe && 
-                        _state.safeToArm()) {
-                    _state.armed = true;
-                }
-
-                // Cut motors on throttle-down
-                if (_state.armed && _olc->inactive()) {
-                    _actuator->cut();
-                }
-
-                // Set LED based on arming status
-                _board->showArmedStatus(_state.armed);
-
-            } // checkOpenLoopController
 
          public:
 

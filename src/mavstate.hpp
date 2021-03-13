@@ -55,7 +55,7 @@ namespace hf {
 
         public:
 
-            virtual bool safeToArm(void) 
+            virtual bool safeToArm(void) override
             {
                 return safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH);
             }
