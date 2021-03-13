@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "openloops/receiver.hpp"
+#include "receiver.hpp"
 
 static constexpr uint8_t DEFAULT_MAP[6] = {0,1,2,3,4,5};
 static constexpr float   DEFAULT_DEMAND_SCALE = 1.0f;

@@ -8,16 +8,17 @@
 
 #pragma once
 
-#include "timertask.hpp"
-#include "board.hpp"
+#include <RFT_timertask.hpp>
+#include <RFT_board.hpp>
+#include <RFT_debugger.hpp>
+#include <RFT_actuator.hpp>
+
+#include "mavstate.hpp"
 #include "mspparser.hpp"
-#include "debugger.hpp"
-#include "actuator.hpp"
-#include "states/mavstate.hpp"
 
 namespace hf {
 
-    class SerialTask : public TimerTask, public MspParser {
+    class SerialTask : public rft::TimerTask, public MspParser {
 
         friend class Hackflight;
 
@@ -25,11 +26,11 @@ namespace hf {
 
             static constexpr float FREQ = 66;
 
-            Actuator * _actuator = NULL;
-            OpenLoopController * _olc = NULL;
+            rft::Actuator * _actuator = NULL;
+            rft::OpenLoopController * _olc = NULL;
             MavState  * _state = NULL;
 
-            void _begin(Board * board, MavState * state, OpenLoopController * olc) 
+            void _begin(rft::Board * board, MavState * state, rft::OpenLoopController * olc) 
             {
                 TimerTask::begin(board);
 
@@ -105,9 +106,9 @@ namespace hf {
             {
             }
 
-            void begin(Board * board, State * state, OpenLoopController * olc, Actuator * actuator) 
+            void begin(rft::Board * board, rft::State * state, rft::OpenLoopController * olc, rft::Actuator * actuator) 
             {
-                TimerTask::begin(board);
+                rft::TimerTask::begin(board);
                 _state = (MavState *)state;
                 _olc = olc;
                 _actuator = actuator;

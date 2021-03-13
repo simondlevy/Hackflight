@@ -8,15 +8,15 @@
 
 #pragma once
 
-#include "filters.hpp"
-#include "actuator.hpp"
-#include "demands/mavdemands.hpp"
-
+#include <RFT_filters.hpp>
+#include <RFT_actuator.hpp>
 #include <RFT_motor.hpp>
+
+#include "mavdemands.hpp"
 
 namespace hf {
 
-    class Mixer : public Actuator {
+    class Mixer : public rft::Actuator {
 
         friend class Hackflight;
 
@@ -95,7 +95,7 @@ namespace hf {
             virtual float constrainMotorValue(uint8_t index, float value) 
             {
                 (void)index;
-                return Filter::constrainMinMax(value, 0, 1);
+                return rft::Filter::constrainMinMax(value, 0, 1);
             }
 
             virtual void cut(void) override

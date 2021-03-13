@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "openloops/receiver.hpp"
+#include "receiver.hpp"
 #include <DSMRX.h>
 
 namespace hf {

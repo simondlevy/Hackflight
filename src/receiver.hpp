@@ -11,12 +11,13 @@
 #include <stdint.h>
 #include <math.h>
 
-#include "openloop.hpp"
-#include "demands/mavdemands.hpp"
+#include <RFT_openloop.hpp>
+
+#include "mavdemands.hpp"
 
 namespace hf {
 
-    class Receiver : public OpenLoopController {
+    class Receiver : public rft::OpenLoopController {
 
         private: 
 

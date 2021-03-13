@@ -8,12 +8,12 @@
 
 #pragma once
 
-#include "filters.hpp"
-#include "state.hpp"
+#include <RFT_filters.hpp>
+#include <RFT_state.hpp>
 
 namespace hf {
 
-    class MavState : public State {
+    class MavState : public rft::State {
 
         private:
 
@@ -50,7 +50,7 @@ namespace hf {
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(x[STATE_PHI+2*axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
+                return fabs(x[STATE_PHI+2*axis]) < rft::Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
         public:

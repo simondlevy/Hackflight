@@ -8,19 +8,20 @@
 
 #pragma once
 
-#include "state.hpp"
-#include "demands/mavdemands.hpp"
-#include "closedloops/pidcontroller.hpp"
-#include "states/mavstate.hpp"
+#include <RFT_state.hpp>
+#include <rft_closedloops/pidcontroller.hpp>
+
+#include "mavdemands.hpp"
+#include "mavstate.hpp"
 
 namespace hf {
 
-    class LevelPid : public PidController {
+    class LevelPid : public rft::PidController {
 
         private:
 
             // Helper class
-            class _AnglePid : public Pid {
+            class _AnglePid : public rft::Pid {
 
                 private:
 
@@ -28,7 +29,7 @@ namespace hf {
 
                     // Maximum roll pitch demand is +/-0.5, so to convert demand to 
                     // angle for error computation, we multiply by the folling amount:
-                    float _demandMultiplier = 2 * Filter::deg2rad(MAX_ANGLE_DEGREES);
+                    float _demandMultiplier = 2 * rft::Filter::deg2rad(MAX_ANGLE_DEGREES);
 
                 public:
 
@@ -60,7 +61,7 @@ namespace hf {
             {
             }
 
-            void modifyDemands(State * state, float * demands)
+            void modifyDemands(rft::State * state, float * demands)
             {
                 float * x = ((MavState *)state)->x;
                 demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], x[MavState::STATE_PHI]); 

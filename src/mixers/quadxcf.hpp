@@ -14,8 +14,9 @@
 
 #pragma once
 
-#include "board.hpp"
-#include "actuators/mixer.hpp"
+#include <RFT_motor.hpp>
+
+#include "mixer.hpp"
 
 namespace hf {
 

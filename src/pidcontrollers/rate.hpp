@@ -8,16 +8,17 @@
 
 #pragma once
 
-#include "openloops/receiver.hpp"
-#include "filters.hpp"
-#include "state.hpp"
-#include "demands/mavdemands.hpp"
-#include "closedloops/pidcontroller.hpp"
+#include <RFT_filters.hpp>
+#include <RFT_state.hpp>
+#include <rft_closedloops/pidcontroller.hpp>
+
+#include "mavdemands.hpp"
+#include "receiver.hpp"
 
 namespace hf {
 
     // Helper class for all three axes
-    class _AngularVelocityPid : public Pid {
+    class _AngularVelocityPid : public rft::Pid {
 
         private: 
 
@@ -35,7 +36,7 @@ namespace hf {
                 Pid::begin(Kp, Ki, Kd, WINDUP_MAX);
 
                 // Convert degree parameters to radians for use later
-                _bigAngularVelocity = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
+                _bigAngularVelocity = rft::Filter::deg2rad(BIG_DEGREES_PER_SECOND);
             }
 
             float compute(float demand, float angularVelocity)
@@ -50,7 +51,7 @@ namespace hf {
 
     };  // class _AngularVelocityPid
 
-    class RatePid : public PidController {
+    class RatePid : public rft::PidController {
 
         private: 
 
@@ -71,7 +72,7 @@ namespace hf {
                 _yawPid.begin(Kp_yaw, Ki_yaw, 0);
             }
 
-            void modifyDemands(State * state, float * demands)
+            void modifyDemands(rft::State * state, float * demands)
             {
                 float * x = ((MavState *)state)->x;
 
@@ -83,7 +84,7 @@ namespace hf {
 
                 // Prevent "yaw jump" during correction
                 demands[DEMANDS_YAW] =
-                    Filter::constrainAbs(demands[DEMANDS_YAW], 0.1 + fabs(demands[DEMANDS_YAW]));
+                    rft::Filter::constrainAbs(demands[DEMANDS_YAW], 0.1 + fabs(demands[DEMANDS_YAW]));
 
                 // Reset yaw integral on large yaw command
                 if (fabs(demands[DEMANDS_YAW]) > BIG_YAW_DEMAND) {

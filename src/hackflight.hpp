@@ -8,16 +8,15 @@
 
 #pragma once
 
-#include "debugger.hpp"
+#include <RoboFirmwareToolkit.hpp>
+#include <RFT_debugger.hpp>
+#include <RFT_board.hpp>
+#include <RFT_openloop.hpp>
+#include <RFT_closedloop.hpp>
+
 #include "mspparser.hpp"
-#include "board.hpp"
-#include "openloop.hpp"
-#include "states/mavstate.hpp"
-#include "closedloop.hpp"
-#include "sensor.hpp"
-#include "actuator.hpp"
-#include "timertasks/closedlooptask.hpp"
-#include "timertasks/serialtask.hpp"
+#include "mavstate.hpp"
+#include "serialtask.hpp"
 
 namespace hf {
 
@@ -28,49 +27,37 @@ namespace hf {
             static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
 
             // Supports periodic ad-hoc debugging
-            Debugger _debugger;
+            rft::Debugger _debugger;
 
             // Sensors 
-            Sensor * _sensors[256] = {NULL};
+            rft::Sensor * _sensors[256] = {NULL};
             uint8_t _sensor_count = 0;
 
             // Safety
             bool _safeToArm = false;
 
             // Timer task for PID controllers
-            ClosedLoopTask _closedLoopTask;
+            rft::ClosedLoopTask _closedLoopTask;
 
             // Passed to Hackflight::begin() for a particular build
-            Actuator * _actuator = NULL;
+            rft::Actuator * _actuator = NULL;
 
             // Serial timer task for GCS
             SerialTask _serialTask;
 
-            Board * _board = NULL;
-            OpenLoopController * _olc = NULL;
+            rft::Board * _board = NULL;
+            rft::OpenLoopController * _olc = NULL;
 
             // Vehicle state
             MavState _state;
 
             void checkSensors(void)
             {
-                static uint32_t counts[2];
-                /*
-                static uint32_t start;
-                uint32_t time = millis();
-                if (time-start > 1000) {
-                    Debugger::printf("q=%d  g=%d\n", counts[0], counts[1]);
-                    counts[0] = 0;
-                    counts[1] = 0;
-                    start = time;
-                }*/
-
                 for (uint8_t k=0; k<_sensor_count; ++k) {
-                    Sensor * sensor = _sensors[k];
+                    rft::Sensor * sensor = _sensors[k];
                     float time = _board->getTime();
                     if (sensor->ready(time)) {
                         sensor->modifyState(&_state, time);
-                        if (k<2) counts[k]++;
                     }
                 }
             }
@@ -129,7 +116,7 @@ namespace hf {
 
          public:
 
-            Hackflight(Board * board, OpenLoopController * olc, Actuator * actuator)
+            Hackflight(rft::Board * board, rft::OpenLoopController * olc, rft::Actuator * actuator)
             {
                 // Store the essentials
                 _board    = board;
@@ -149,7 +136,7 @@ namespace hf {
                 _debugger.begin(_board);
 
                 // Initialize state
-                memset(&_state, 0, sizeof(State));
+                memset(&_state, 0, sizeof(MavState));
 
                 // Initialize the sensors
                 startSensors();
@@ -175,12 +162,12 @@ namespace hf {
 
             } // begin
 
-            void addSensor(Sensor * sensor) 
+            void addSensor(rft::Sensor * sensor) 
             {
                 _sensors[_sensor_count++] = sensor;
             }
 
-            void addClosedLoopController(ClosedLoopController * controller, uint8_t modeIndex=0) 
+            void addClosedLoopController(rft::ClosedLoopController * controller, uint8_t modeIndex=0) 
             {
                 _closedLoopTask.addClosedLoopController(controller, modeIndex);
             }

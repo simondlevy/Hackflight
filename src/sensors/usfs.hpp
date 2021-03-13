@@ -10,8 +10,7 @@
 
 #include <Wire.h>
 #include <USFS_Master.h>
-#include "sensor.hpp"
-#include "states/mavstate.hpp"
+#include <RFT_sensor.hpp>
 
 namespace hf {
 
@@ -67,7 +66,7 @@ namespace hf {
 
     static _USFS  _usfs;
 
-    class UsfsQuat : public Sensor {
+    class UsfsQuat : public rft::Sensor {
 
         private:
 
@@ -86,7 +85,7 @@ namespace hf {
                 _usfs.begin();
             }
 
-            virtual void modifyState(State * state, float time) override
+            virtual void modifyState(rft::State * state, float time) override
             {
                 (void)time;
 
@@ -125,7 +124,7 @@ namespace hf {
     }; // class UsfsQuat
 
 
-    class UsfsGyro : public Sensor {
+    class UsfsGyro : public rft::Sensor {
 
         protected:
 
@@ -134,7 +133,7 @@ namespace hf {
                 _usfs.begin();
             }
 
-            virtual void modifyState(State * state, float time) override
+            virtual void modifyState(rft::State * state, float time) override
             {
                 (void)time;
 

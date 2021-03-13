@@ -8,14 +8,15 @@
 
 #pragma once
 
-#include "filters.hpp"
-#include "state.hpp"
-#include "closedloops/pidcontroller.hpp"
-#include "demands/mavdemands.hpp"
+#include <RFT_filters.hpp>
+#include <RFT_state.hpp>
+#include <RFT_closedloops/pidcontroller.hpp>
+
+#include "mavdemands.hpp"
 
 namespace hf {
 
-    class AltitudeHoldPid : public PidController {
+    class AltitudeHoldPid : public rft::PidController {
 
         private: 
 
