@@ -20,18 +20,11 @@
 
 namespace hf {
 
-    class Hackflight {
+    class Hackflight : public rft::RFT {
 
         private:
 
             static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
-
-            // Supports periodic ad-hoc debugging
-            rft::Debugger _debugger;
-
-            // Sensors 
-            rft::Sensor * _sensors[256] = {NULL};
-            uint8_t _sensor_count = 0;
 
             // Safety
             bool _safeToArm = false;
@@ -161,11 +154,6 @@ namespace hf {
                 _actuator->begin();
 
             } // begin
-
-            void addSensor(rft::Sensor * sensor) 
-            {
-                _sensors[_sensor_count++] = sensor;
-            }
 
             void addClosedLoopController(rft::ClosedLoopController * controller, uint8_t modeIndex=0) 
             {
