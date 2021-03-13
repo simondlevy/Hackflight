@@ -14,6 +14,8 @@
 #include <RFT_openloop.hpp>
 #include <RFT_closedloop.hpp>
 
+#include "receiver.hpp"
+#include "mixer.hpp"
 #include "mspparser.hpp"
 #include "mavstate.hpp"
 #include "serialtask.hpp"
@@ -32,14 +34,7 @@ namespace hf {
             // Timer task for PID controllers
             rft::ClosedLoopTask _closedLoopTask;
 
-            // Passed to Hackflight::begin() for a particular build
-            rft::Actuator * _actuator = NULL;
-
-            // Serial timer task for GCS
             SerialTask _serialTask;
-
-            rft::Board * _board = NULL;
-            rft::OpenLoopController * _olc = NULL;
 
             // Vehicle state
             MavState _state;
@@ -109,15 +104,9 @@ namespace hf {
 
          public:
 
-            Hackflight(rft::Board * board, rft::OpenLoopController * olc, rft::Actuator * actuator)
+            Hackflight(rft::Board * board, Receiver * receiver, Mixer * mixer) 
+                : rft::RFT(board, receiver, mixer)
             {
-                // Store the essentials
-                _board    = board;
-                _olc = olc;
-                _actuator = actuator;
-
-                // Support adding new sensors
-                _sensor_count = 0;
             }
 
             void begin(bool armed=false)
