@@ -28,9 +28,6 @@ namespace hf {
 
             static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
 
-            // Safety
-            bool _safeToArm = false;
-
             SerialTask _serialTask;
 
             // Vehicle state
@@ -92,13 +89,6 @@ namespace hf {
 
             } // checkOpenLoopController
 
-            void startSensors(void) 
-            {
-                for (uint8_t k=0; k<_sensor_count; ++k) {
-                    _sensors[k]->begin();
-                }
-            }
-
          public:
 
             Hackflight(rft::Board * board, Receiver * receiver, Mixer * mixer) 
@@ -108,20 +98,7 @@ namespace hf {
 
             void begin(bool armed=false)
             {  
-                // Start the board
-                _board->begin();
-
-                // Ad-hoc debugging support
-                _debugger.begin(_board);
-
-                // Initialize state
-                memset(&_state, 0, sizeof(MavState));
-
-                // Initialize the sensors
-                startSensors();
-
-                // Initialize the open-loop controller
-                _olc->begin();
+                RFT::begin(armed);
 
                 // Initialize safety features
                 _state.failsafe = false;
@@ -135,9 +112,6 @@ namespace hf {
 
                 // Support safety override by simulator
                 _state.armed = armed;
-
-                // Start the actuator
-                _actuator->begin();
 
             } // begin
 
