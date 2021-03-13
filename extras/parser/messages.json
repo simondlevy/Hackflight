@@ -1,0 +1,52 @@
+{
+  "STATE": 
+  [{"ID": 112},
+   {"altitude":          "float"}, 
+   {"variometer":        "float"}, 
+   {"positionX":         "float"}, 
+   {"positionY":         "float"}, 
+   {"heading":           "float"}, 
+   {"velocityForward":   "float"}, 
+   {"velocityRightward": "float"}],
+
+  "OLC": 
+  [{"ID": 121},
+   {"comment": "16 channels in http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol"}, 
+   {"c1": "float"}, 
+   {"c2": "float"}, 
+   {"c3": "float"}, 
+   {"c4": "float"}, 
+   {"c5": "float"}, 
+   {"c6": "float"}],
+
+  "ATTITUDE_RADIANS": 
+  [{"ID": 122},
+   {"roll"    : "float"}, 
+   {"pitch"   : "float"},
+   {"yaw"     : "float"}],
+  
+  "SET_VELOCITY_SETPOINTS": 
+  [{"ID": 213},
+   {"vx"      : "float"}, 
+   {"vy"      : "float"}, 
+   {"vz"      : "float"}, 
+   {"yaw_rate": "float"}],
+
+   "SET_MOTOR_NORMAL": 
+  [{"ID": 215},
+   {"comment": "We send floating-point values in [0,1], rather than PWM"}, 
+   {"m1": "float"},
+   {"m2": "float"},
+   {"m3": "float"},
+   {"m4": "float"}],
+
+  "SET_OLC": 
+  [{"ID": 217},
+   {"comment": "Set RC commands in interval [-1,+1]"}, 
+   {"c1": "float"}, 
+   {"c2": "float"}, 
+   {"c3": "float"}, 
+   {"c4": "float"}, 
+   {"c5": "float"}, 
+   {"c6": "float"}]
+}
