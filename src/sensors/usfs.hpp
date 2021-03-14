@@ -89,7 +89,7 @@ namespace hf {
             {
                 (void)time;
 
-                MavState * mavState = (MavState *)state;
+                State * mavstate = (State *)state;
 
                 float qw = 0;
                 float qx = 0;
@@ -99,16 +99,16 @@ namespace hf {
                 _usfs.sentral.readQuaternion(qw, qx, qy, qz);
 
                 computeEulerAngles(qw, qx, qy, qz,
-                        mavState->x[MavState::STATE_PHI],
-                        mavState->x[MavState::STATE_THETA],
-                        mavState->x[MavState::STATE_PSI]);
+                        mavstate->x[State::STATE_PHI],
+                        mavstate->x[State::STATE_THETA],
+                        mavstate->x[State::STATE_PSI]);
 
                 // Adjust rotation so that nose-up is positive
-                mavState->x[MavState::STATE_THETA] = -mavState->x[MavState::STATE_THETA];
+                mavstate->x[State::STATE_THETA] = -mavstate->x[State::STATE_THETA];
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (mavState->x[MavState::STATE_PSI] < 0) {
-                    mavState->x[MavState::STATE_PSI] += 2*M_PI;
+                if (mavstate->x[State::STATE_PSI] < 0) {
+                    mavstate->x[State::STATE_PSI] += 2*M_PI;
                 }
             }
 
@@ -137,7 +137,8 @@ namespace hf {
             {
                 (void)time;
 
-                MavState * mavState = (MavState *)state;
+                // Cast rft::state to hf::state
+                State * mavstate = (State *)state;
 
                 float gx = 0;
                 float gy = 0;
@@ -147,9 +148,9 @@ namespace hf {
                 _usfs.sentral.readGyrometer(gx, gy, gz);
 
                 // Convert degrees / sec to radians / sec
-                mavState->x[MavState::STATE_DPHI] = radians(gx);
-                mavState->x[MavState::STATE_DTHETA] = radians(gy);
-                mavState->x[MavState::STATE_DPSI] = radians(gz);
+                mavstate->x[State::STATE_DPHI] = radians(gx);
+                mavstate->x[State::STATE_DTHETA] = radians(gy);
+                mavstate->x[State::STATE_DPSI] = radians(gz);
             }
 
             virtual bool ready(float time) override

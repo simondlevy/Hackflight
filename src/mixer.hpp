@@ -12,7 +12,7 @@
 #include <RFT_actuator.hpp>
 #include <RFT_motor.hpp>
 
-#include "mavdemands.hpp"
+#include "demands.hpp"
 
 namespace hf {
 

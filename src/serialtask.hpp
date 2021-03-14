@@ -15,7 +15,7 @@
 #include <RFT_serialtask.hpp>
 #include <RFT_parser.hpp>
 
-#include "mavstate.hpp"
+#include "state.hpp"
 
 namespace hf {
 
@@ -37,11 +37,12 @@ namespace hf {
 
             void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw)
             {
-                MavState * mavstate = (MavState *)_state;
+                // Cast rft::State to hf::State
+                State * state = (State *)_state;
 
-                roll  = mavstate->x[MavState::STATE_PHI];
-                pitch = mavstate->x[MavState::STATE_THETA];
-                yaw   = mavstate->x[MavState::STATE_PSI];
+                roll  = state->x[State::STATE_PHI];
+                pitch = state->x[State::STATE_THETA];
+                yaw   = state->x[State::STATE_PSI];
             }
 
             void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4)

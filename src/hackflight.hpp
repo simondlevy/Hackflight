@@ -16,7 +16,7 @@
 
 #include "receiver.hpp"
 #include "mixer.hpp"
-#include "mavstate.hpp"
+#include "state.hpp"
 #include "serialtask.hpp"
 
 namespace hf {
@@ -29,7 +29,7 @@ namespace hf {
             SerialTask _serialTask;
 
             // Vehicle state
-            MavState _state;
+            State _state;
        
          protected:
 

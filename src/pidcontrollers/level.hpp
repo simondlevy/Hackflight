@@ -11,8 +11,8 @@
 #include <RFT_state.hpp>
 #include <rft_closedloops/pidcontroller.hpp>
 
-#include "mavdemands.hpp"
-#include "mavstate.hpp"
+#include "demands.hpp"
+#include "state.hpp"
 
 namespace hf {
 
@@ -63,9 +63,9 @@ namespace hf {
 
             void modifyDemands(rft::State * state, float * demands)
             {
-                float * x = ((MavState *)state)->x;
-                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], x[MavState::STATE_PHI]); 
-                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], x[MavState::STATE_THETA]);
+                float * x = ((State *)state)->x;
+                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], x[State::STATE_PHI]); 
+                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], x[State::STATE_THETA]);
             }
 
     };  // class LevelPid

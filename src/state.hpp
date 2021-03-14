@@ -13,7 +13,7 @@
 
 namespace hf {
 
-    class MavState : public rft::State {
+    class State : public rft::State {
 
         private:
 
@@ -60,6 +60,6 @@ namespace hf {
                 return safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH);
             }
 
-    }; // class MavState
+    }; // class State
 
 } // namespace hf

@@ -12,7 +12,7 @@
 #include <RFT_state.hpp>
 #include <RFT_closedloops/pidcontroller.hpp>
 
-#include "mavdemands.hpp"
+#include "demands.hpp"
 
 namespace hf {
 
