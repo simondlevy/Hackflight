@@ -14,11 +14,11 @@
 #include <RFT_actuator.hpp>
 
 #include "mavstate.hpp"
-#include "mspparser.hpp"
+#include "parser.hpp"
 
 namespace hf {
 
-    class SerialTask : public rft::TimerTask, public MspParser {
+    class SerialTask : public rft::TimerTask, public Parser {
 
         friend class Hackflight;
 
@@ -34,7 +34,7 @@ namespace hf {
             {
                 TimerTask::begin(board);
 
-                MspParser::begin();
+                Parser::begin();
 
                 _state = state;
                 _olc = olc;
@@ -48,11 +48,11 @@ namespace hf {
             {
                 while (_board->serialAvailableBytes() > 0) {
 
-                    MspParser::parse(_board->serialReadByte());
+                    Parser::parse(_board->serialReadByte());
                 }
 
-                while (MspParser::availableBytes() > 0) {
-                    _board->serialWriteByte(MspParser::readByte());
+                while (Parser::availableBytes() > 0) {
+                    _board->serialWriteByte(Parser::readByte());
                 }
 
                 // Support motor testing from GCS
@@ -61,22 +61,9 @@ namespace hf {
                 }
             }
 
-            // MspParser overrides -------------------------------------------------------
+            // Parser overrides -------------------------------------------------------
 
-            virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 
-                    float & heading, float & velocityForward, float & velocityRightward) override
-            {
-                // XXX Use only heading for now
-                altitude = 0;
-                variometer = 0;
-                positionX = 0;
-                positionY = 0;
-                heading = -_state->x[MavState::STATE_PSI]; // NB: Angle negated for remote visualization
-                velocityForward = 0;
-                velocityRightward = 0;
-            }
- 
-            virtual void handle_OLC_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
+            virtual void handle_Receiver_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
             {
                 c1 = _olc->getRawval(0);
                 c2 = _olc->getRawval(1);

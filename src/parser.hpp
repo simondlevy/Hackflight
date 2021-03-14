@@ -16,7 +16,7 @@
 
 namespace hf {
 
-    class MspParser {
+    class Parser {
 
         public:
 
@@ -245,27 +245,6 @@ namespace hf {
             {
                 switch (_command) {
 
-                    case 112:
-                    {
-                        float altitude = 0;
-                        float variometer = 0;
-                        float positionX = 0;
-                        float positionY = 0;
-                        float heading = 0;
-                        float velocityForward = 0;
-                        float velocityRightward = 0;
-                        handle_STATE_Request(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward);
-                        prepareToSendFloats(7);
-                        sendFloat(altitude);
-                        sendFloat(variometer);
-                        sendFloat(positionX);
-                        sendFloat(positionY);
-                        sendFloat(heading);
-                        sendFloat(velocityForward);
-                        sendFloat(velocityRightward);
-                        serialize8(_checksum);
-                        } break;
-
                     case 121:
                     {
                         float c1 = 0;
@@ -274,7 +253,7 @@ namespace hf {
                         float c4 = 0;
                         float c5 = 0;
                         float c6 = 0;
-                        handle_OLC_Request(c1, c2, c3, c4, c5, c6);
+                        handle_Receiver_Request(c1, c2, c3, c4, c5, c6);
                         prepareToSendFloats(6);
                         sendFloat(c1);
                         sendFloat(c2);
@@ -352,24 +331,13 @@ namespace hf {
                         float c6 = 0;
                         memcpy(&c6,  &_inBuf[20], sizeof(float));
 
-                        handle_SET_OLC(c1, c2, c3, c4, c5, c6);
+                        handle_SET_Receiver(c1, c2, c3, c4, c5, c6);
                         } break;
 
                 }
             }
 
-            virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, float & heading, float & velocityForward, float & velocityRightward)
-            {
-                (void)altitude;
-                (void)variometer;
-                (void)positionX;
-                (void)positionY;
-                (void)heading;
-                (void)velocityForward;
-                (void)velocityRightward;
-            }
-
-            virtual void handle_OLC_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
+            virtual void handle_Receiver_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
             {
                 (void)c1;
                 (void)c2;
@@ -402,7 +370,7 @@ namespace hf {
                 (void)m4;
             }
 
-            virtual void handle_SET_OLC(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
+            virtual void handle_SET_Receiver(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
             {
                 (void)c1;
                 (void)c2;
@@ -412,158 +380,6 @@ namespace hf {
                 (void)c6;
             }
 
-        public:
-
-            static uint8_t serialize_STATE_Request(uint8_t bytes[])
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 112;
-                bytes[5] = 112;
-
-                return 6;
-            }
-
-            static uint8_t serialize_STATE(uint8_t bytes[], float  altitude, float  variometer, float  positionX, float  positionY, float  heading, float  velocityForward, float  velocityRightward)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 28;
-                bytes[4] = 112;
-
-                memcpy(&bytes[5], &altitude, sizeof(float));
-                memcpy(&bytes[9], &variometer, sizeof(float));
-                memcpy(&bytes[13], &positionX, sizeof(float));
-                memcpy(&bytes[17], &positionY, sizeof(float));
-                memcpy(&bytes[21], &heading, sizeof(float));
-                memcpy(&bytes[25], &velocityForward, sizeof(float));
-                memcpy(&bytes[29], &velocityRightward, sizeof(float));
-
-                bytes[33] = CRC8(&bytes[3], 30);
-
-                return 34;
-            }
-
-            static uint8_t serialize_OLC_Request(uint8_t bytes[])
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 121;
-                bytes[5] = 121;
-
-                return 6;
-            }
-
-            static uint8_t serialize_OLC(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 24;
-                bytes[4] = 121;
-
-                memcpy(&bytes[5], &c1, sizeof(float));
-                memcpy(&bytes[9], &c2, sizeof(float));
-                memcpy(&bytes[13], &c3, sizeof(float));
-                memcpy(&bytes[17], &c4, sizeof(float));
-                memcpy(&bytes[21], &c5, sizeof(float));
-                memcpy(&bytes[25], &c6, sizeof(float));
-
-                bytes[29] = CRC8(&bytes[3], 26);
-
-                return 30;
-            }
-
-            static uint8_t serialize_ATTITUDE_RADIANS_Request(uint8_t bytes[])
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 122;
-                bytes[5] = 122;
-
-                return 6;
-            }
-
-            static uint8_t serialize_ATTITUDE_RADIANS(uint8_t bytes[], float  roll, float  pitch, float  yaw)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 12;
-                bytes[4] = 122;
-
-                memcpy(&bytes[5], &roll, sizeof(float));
-                memcpy(&bytes[9], &pitch, sizeof(float));
-                memcpy(&bytes[13], &yaw, sizeof(float));
-
-                bytes[17] = CRC8(&bytes[3], 14);
-
-                return 18;
-            }
-
-            static uint8_t serialize_SET_VELOCITY_SETPOINTS(uint8_t bytes[], float  vx, float  vy, float  vz, float  yaw_rate)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 16;
-                bytes[4] = 213;
-
-                memcpy(&bytes[5], &vx, sizeof(float));
-                memcpy(&bytes[9], &vy, sizeof(float));
-                memcpy(&bytes[13], &vz, sizeof(float));
-                memcpy(&bytes[17], &yaw_rate, sizeof(float));
-
-                bytes[21] = CRC8(&bytes[3], 18);
-
-                return 22;
-            }
-
-            static uint8_t serialize_SET_MOTOR_NORMAL(uint8_t bytes[], float  m1, float  m2, float  m3, float  m4)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 16;
-                bytes[4] = 215;
-
-                memcpy(&bytes[5], &m1, sizeof(float));
-                memcpy(&bytes[9], &m2, sizeof(float));
-                memcpy(&bytes[13], &m3, sizeof(float));
-                memcpy(&bytes[17], &m4, sizeof(float));
-
-                bytes[21] = CRC8(&bytes[3], 18);
-
-                return 22;
-            }
-
-            static uint8_t serialize_SET_OLC(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 24;
-                bytes[4] = 217;
-
-                memcpy(&bytes[5], &c1, sizeof(float));
-                memcpy(&bytes[9], &c2, sizeof(float));
-                memcpy(&bytes[13], &c3, sizeof(float));
-                memcpy(&bytes[17], &c4, sizeof(float));
-                memcpy(&bytes[21], &c5, sizeof(float));
-                memcpy(&bytes[25], &c6, sizeof(float));
-
-                bytes[29] = CRC8(&bytes[3], 26);
-
-                return 30;
-            }
-
-    }; // class MspParser
+    }; // class Parser
 
 } // namespace hf
