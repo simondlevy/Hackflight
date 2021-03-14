@@ -27,7 +27,6 @@ namespace hf {
 
             void handle_Receiver_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
             {
-                // Cast rft::OpenLoopController to hf::Receiver
                 Receiver * receiver = (Receiver *)_olc;
 
                 c1 = receiver->getRawval(0);
@@ -50,10 +49,12 @@ namespace hf {
 
             void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4)
             {
-                _actuator->setMotorDisarmed(0, m1);
-                _actuator->setMotorDisarmed(1, m2);
-                _actuator->setMotorDisarmed(2, m3);
-                _actuator->setMotorDisarmed(3, m4);
+                Mixer * mixer = (Mixer *)_actuator;
+
+                mixer->setMotorDisarmed(0, m1);
+                mixer->setMotorDisarmed(1, m2);
+                mixer->setMotorDisarmed(2, m3);
+                mixer->setMotorDisarmed(3, m4);
             }
 
 

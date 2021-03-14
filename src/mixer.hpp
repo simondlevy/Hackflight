@@ -19,6 +19,7 @@ namespace hf {
     class Mixer : public rft::Actuator {
 
         friend class Hackflight;
+        friend class SerialTask;
 
         private:
 
@@ -86,7 +87,7 @@ namespace hf {
                 }
             }
 
-            virtual void setMotorDisarmed(uint8_t index, float value) override
+            virtual void setMotorDisarmed(uint8_t index, float value)
             {
                 _motorsDisarmed[index] = value;
             }
