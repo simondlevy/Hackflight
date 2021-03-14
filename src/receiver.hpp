@@ -19,6 +19,8 @@ namespace hf {
 
     class Receiver : public rft::OpenLoopController {
 
+        friend class SerialTask;
+
         private: 
 
             const float THROTTLE_MARGIN = 0.1f;
@@ -98,7 +100,7 @@ namespace hf {
             // Raw receiver values in [-1,+1]
             float rawvals[MAXCHAN] = {0};  
 
-            virtual float getRawval(uint8_t chan) override
+            float getRawval(uint8_t chan)
             {
                 return rawvals[_channelMap[chan]];
             }

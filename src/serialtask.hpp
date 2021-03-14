@@ -27,12 +27,15 @@ namespace hf {
 
             void handle_Receiver_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
             {
-                c1 = _olc->getRawval(0);
-                c2 = _olc->getRawval(1);
-                c3 = _olc->getRawval(2);
-                c4 = _olc->getRawval(3);
-                c5 = _olc->getRawval(4);
-                c6 = _olc->getRawval(5);
+                // Cast rft::OpenLoopController to hf::Receiver
+                Receiver * receiver = (Receiver *)_olc;
+
+                c1 = receiver->getRawval(0);
+                c2 = receiver->getRawval(1);
+                c3 = receiver->getRawval(2);
+                c4 = receiver->getRawval(3);
+                c5 = receiver->getRawval(4);
+                c6 = receiver->getRawval(5);
             }
 
             void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw)
