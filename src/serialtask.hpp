@@ -63,7 +63,7 @@ namespace hf {
 
             // Parser overrides -------------------------------------------------------
 
-            virtual void handle_Receiver_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
+            void handle_Receiver_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
             {
                 c1 = _olc->getRawval(0);
                 c2 = _olc->getRawval(1);
@@ -73,14 +73,14 @@ namespace hf {
                 c6 = _olc->getRawval(5);
             }
 
-            virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
+            void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
             {
                 roll  = _state->x[MavState::STATE_PHI];
                 pitch = _state->x[MavState::STATE_THETA];
                 yaw   = _state->x[MavState::STATE_PSI];
             }
 
-            virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
+            void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
             {
                 _actuator->setMotorDisarmed(0, m1);
                 _actuator->setMotorDisarmed(1, m2);
