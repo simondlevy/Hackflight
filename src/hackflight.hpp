@@ -25,6 +25,7 @@ namespace hf {
 
         private:
 
+            // Serial comms task
             SerialTask _serialTask;
 
             // Vehicle state
