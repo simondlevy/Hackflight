@@ -28,7 +28,7 @@ namespace hf {
 
             rft::Actuator * _actuator = NULL;
             rft::OpenLoopController * _olc = NULL;
-            MavState  * _state = NULL;
+            rft::State * _state = NULL;
 
         protected:
 
@@ -65,9 +65,11 @@ namespace hf {
 
             void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
             {
-                roll  = _state->x[MavState::STATE_PHI];
-                pitch = _state->x[MavState::STATE_THETA];
-                yaw   = _state->x[MavState::STATE_PSI];
+                MavState * mavstate = (MavState *)_state;
+
+                roll  = mavstate->x[MavState::STATE_PHI];
+                pitch = mavstate->x[MavState::STATE_THETA];
+                yaw   = mavstate->x[MavState::STATE_PSI];
             }
 
             void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
@@ -86,7 +88,7 @@ namespace hf {
             void begin(rft::Board * board, rft::State * state, rft::OpenLoopController * olc, rft::Actuator * actuator) 
             {
                 rft::TimerTask::begin(board);
-                _state = (MavState *)state;
+                _state = state;
                 _olc = olc;
                 _actuator = actuator;
             }
