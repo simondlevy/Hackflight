@@ -12,23 +12,16 @@
 #include <RFT_board.hpp>
 #include <RFT_debugger.hpp>
 #include <RFT_actuator.hpp>
+#include <RFT_serialtask.hpp>
 
 #include "mavstate.hpp"
 #include "parser.hpp"
 
 namespace hf {
 
-    class SerialTask : public rft::TimerTask, public Parser {
+    class SerialTask : public rft::SerialTask, public rft::TimerTask, public Parser {
 
         friend class Hackflight;
-
-        private:
-
-            static constexpr float FREQ = 66;
-
-            rft::Actuator * _actuator = NULL;
-            rft::OpenLoopController * _olc = NULL;
-            rft::State * _state = NULL;
 
         protected:
 
