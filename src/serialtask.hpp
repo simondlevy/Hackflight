@@ -30,16 +30,6 @@ namespace hf {
             rft::OpenLoopController * _olc = NULL;
             MavState  * _state = NULL;
 
-            void _begin(rft::Board * board, MavState * state, rft::OpenLoopController * olc) 
-            {
-                TimerTask::begin(board);
-
-                Parser::begin();
-
-                _state = state;
-                _olc = olc;
-             }
-
         protected:
 
             // TimerTask overrides -------------------------------------------------------
