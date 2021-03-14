@@ -19,7 +19,7 @@
 
 namespace hf {
 
-    class SerialTask : public rft::SerialTask, public rft::TimerTask, public rft::Parser {
+    class SerialTask : public rft::SerialTask {
 
         friend class Hackflight;
 
@@ -52,40 +52,6 @@ namespace hf {
                 _actuator->setMotorDisarmed(3, m4);
             }
 
-
-        protected:
-
-            SerialTask(void)
-                : TimerTask(FREQ)
-            {
-            }
-
-            void begin(rft::Board * board, rft::State * state, rft::OpenLoopController * olc, rft::Actuator * actuator) 
-            {
-                rft::TimerTask::begin(board);
-                _state = state;
-                _olc = olc;
-                _actuator = actuator;
-            }
-
-            // TimerTask overrides -------------------------------------------------------
-
-            virtual void doTask(void)
-            {
-                while (_board->serialAvailableBytes() > 0) {
-
-                    rft::Parser::parse(_board->serialReadByte());
-                }
-
-                while (rft::Parser::availableBytes() > 0) {
-                    _board->serialWriteByte(rft::Parser::readByte());
-                }
-
-                // Support motor testing from GCS
-                if (!_state->armed) {
-                    _actuator->runDisarmed();
-                }
-            }
 
             // Parser overrides -------------------------------------------------------
 
