@@ -113,9 +113,6 @@ class GCS(msppg.Parser):
         self.splashimage = tk.PhotoImage(file=resource_path('splash.gif'))
         self._show_splash()
 
-        # Create a message parser 
-        #self.parser = msppg.Parser()
-
         # Set up parser's request strings
         self.attitude_request = msppg.serialize_ATTITUDE_RADIANS_Request()
         self.rc_request = msppg.serialize_OLC_Request()
