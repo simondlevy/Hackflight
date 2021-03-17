@@ -23,7 +23,7 @@ from serial.tools.list_ports import comports
 import os
 import tkcompat as tk
 
-import msppg
+from mspparser import MspParser
 
 from imu import IMU
 from motors import Motors
@@ -32,36 +32,12 @@ from resources import resource_path
 
 # GCS class runs the show =========================================================================================
 
-#####################################################################
-import struct
-import sys
 
-def _CRC8(data):
-
-    crc = 0x00
-   
-    for c in data:
-
-        crc ^= ord(c) if sys.version[0] == '2' else c
-
-    return crc
-
-def serialize_SET_MOTOR_NORMAL(m1, m2, m3, m4):
-    '''
-    Serializes the contents of a message of type SET_MOTOR_NORMAL.
-    '''
-    message_buffer = struct.pack('ffff', m1, m2, m3, m4)
-
-    msg = [len(message_buffer), 215] + list(message_buffer)
-    return bytes([ord('$'), ord('M'), ord('<')] + msg + [_CRC8(msg)])
-#####################################################################
-
-
-class GCS(msppg.Parser):
+class GCS(MspParser):
 
     def __init__(self):
 
-        msppg.Parser.__init__(self)
+        MspParser.__init__(self)
 
         # No communications or arming yet
         self.comms = None
@@ -139,8 +115,8 @@ class GCS(msppg.Parser):
         self._show_splash()
 
         # Set up parser's request strings
-        self.attitude_request = msppg.serialize_ATTITUDE_RADIANS_Request()
-        self.rc_request = msppg.serialize_RC_NORMAL_Request()
+        self.attitude_request = MspParser.serialize_ATTITUDE_RADIANS_Request()
+        self.rc_request = MspParser.serialize_RC_NORMAL_Request()
 
         # No messages yet
         self.roll_pitch_yaw = [0]*3
@@ -199,15 +175,11 @@ class GCS(msppg.Parser):
         if self.receiver.running:
             self._send_rc_request()
 
-        #self.messages.setCurrentMessage('Receiver: %04d %04d %04d %04d %04d' % (c1, c2, c3, c4, c5))
-
     def handle_ATTITUDE_RADIANS(self, x, y, z):
 
         self.roll_pitch_yaw = x, y, z  
 
         self.gotimu = True
-
-        #self.messages.setCurrentMessage('Roll/Pitch/Yaw: %+3.3f %+3.3f %+3.3f' % self.roll_pitch_yaw)
 
         # As soon as we handle the callback from one request, send another request, if IMU dialog is running
         if self.imu.running:
@@ -451,7 +423,7 @@ class GCS(msppg.Parser):
 
         values = [0]*4
         values[index-1] = percent / 100.
-        self.comms.send_message(serialize_SET_MOTOR_NORMAL, values)
+        self.comms.send_message(MspParser.serialize_SET_MOTOR_NORMAL, values)
 
     def _show_splash(self):
 
