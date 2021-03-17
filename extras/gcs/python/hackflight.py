@@ -32,6 +32,31 @@ from resources import resource_path
 
 # GCS class runs the show =========================================================================================
 
+#####################################################################
+import struct
+import sys
+
+def _CRC8(data):
+
+    crc = 0x00
+   
+    for c in data:
+
+        crc ^= ord(c) if sys.version[0] == '2' else c
+
+    return crc
+
+def serialize_SET_MOTOR_NORMAL(m1, m2, m3, m4):
+    '''
+    Serializes the contents of a message of type SET_MOTOR_NORMAL.
+    '''
+    message_buffer = struct.pack('ffff', m1, m2, m3, m4)
+
+    msg = [len(message_buffer), 215] + list(message_buffer)
+    return bytes([ord('$'), ord('M'), ord('<')] + msg + [_CRC8(msg)])
+#####################################################################
+
+
 class GCS(msppg.Parser):
 
     def __init__(self):
@@ -115,7 +140,7 @@ class GCS(msppg.Parser):
 
         # Set up parser's request strings
         self.attitude_request = msppg.serialize_ATTITUDE_RADIANS_Request()
-        self.rc_request = msppg.serialize_OLC_Request()
+        self.rc_request = msppg.serialize_RC_NORMAL_Request()
 
         # No messages yet
         self.roll_pitch_yaw = [0]*3
@@ -165,7 +190,7 @@ class GCS(msppg.Parser):
 
         self.root.after(delay_msec, task)
 
-    def handle_OLC(self, c1, c2, c3, c4, c5, c6):
+    def handle_RC_NORMAL(self, c1, c2, c3, c4, c5, c6):
 
         # Display throttle as [0,1], other channels as [-1,+1]
         self.rxchannels = c1/2.+.5, c2, c3, c4, c5, c6
@@ -426,7 +451,7 @@ class GCS(msppg.Parser):
 
         values = [0]*4
         values[index-1] = percent / 100.
-        self.comms.send_message(msppg.serialize_SET_MOTOR_NORMAL, values)
+        self.comms.send_message(serialize_SET_MOTOR_NORMAL, values)
 
     def _show_splash(self):
 
