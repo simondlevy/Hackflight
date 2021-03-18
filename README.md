@@ -94,6 +94,3 @@ angles, and the Rate controller to go next, to control the rate at which the
 desired angle will be reached.
 
 <p align="center"> <img src="extras/media/pidcontrollers.png" width=600> </p>
-
-If you're mathematically-minded, you can think of a PID Controller as a function from a (<i>State</i>, <i>Demands</i>) pair to <i>Demands</i>:
-<b><i>PID Controller</i>: <i>State</i> &times; <i>Demands</i> &rarr; <i>Demands</i></b>
