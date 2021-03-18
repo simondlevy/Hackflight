@@ -20,7 +20,8 @@ class AttitudeParser(Parser):
 
         Parser.__init__(self)
 
-        self.port = port
+        self.port = serial.Serial(port, 115200)
+
         self.request = AttitudeParser.serialize_ATTITUDE_RADIANS_Request()
 
     def begin(self):
@@ -56,9 +57,7 @@ def main():
     parser.add_argument(dest='com_port', help='COM port')
     args = parser.parse_args()
 
-    port = serial.Serial(args.com_port, 115200)
-
-    parser = AttitudeParser(port)
+    parser = AttitudeParser(args.com_port)
 
     # Connecting causes reboot on ESP32
     sleep(1)
