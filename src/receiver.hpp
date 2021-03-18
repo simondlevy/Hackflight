@@ -1,21 +1,9 @@
 /*
    Abstract RC receiver class
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2021 Simon D. Levy
 
-   This file is part of Hackflight.
-
-   Hackflight is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   Hackflight is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MEReceiverHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-   You should have received a copy of the GNU General Public License
-   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+   MIT License
  */
 
 #pragma once
@@ -23,15 +11,15 @@
 #include <stdint.h>
 #include <math.h>
 
-#include "datatypes.hpp"
+#include <RFT_openloop.hpp>
+
+#include "demands.hpp"
 
 namespace hf {
 
-    class Receiver {
+    class Receiver : public rft::OpenLoopController {
 
-        friend class Hackflight;
         friend class SerialTask;
-        friend class PidTask;
 
         private: 
 
@@ -40,6 +28,10 @@ namespace hf {
             const float CYCLIC_RATE     = 0.90f;
             const float THROTTLE_EXPO   = 0.20f;
             const float AUX_THRESHOLD   = 0.4f;
+
+            float _demands[4]; // throttle, roll, pitch, yaw
+
+            float _demandScale = 0;
 
             float adjustCommand(float command, uint8_t channel)
             {
@@ -84,8 +76,6 @@ namespace hf {
             uint8_t _aux1State = 0;
             uint8_t _aux2State = 0;
 
-            float _demandScale = 0;
-
             // channel indices
             enum {
                 CHANNEL_THROTTLE, 
@@ -102,21 +92,13 @@ namespace hf {
             virtual bool gotNewFrame(void) = 0;
             virtual void readRawvals(void) = 0;
 
-            // This can be overridden optionally
-            virtual void begin(void) { }
-
             // Software trim
             float _trimRoll = 0;
             float _trimPitch = 0;
             float _trimYaw = 0;
 
-            // Default to non-headless mode
-            float headless = false;
-
             // Raw receiver values in [-1,+1]
             float rawvals[MAXCHAN] = {0};  
-
-            demands_t demands;
 
             float getRawval(uint8_t chan)
             {
@@ -124,7 +106,10 @@ namespace hf {
             }
 
             // Override this if your receiver provides RSSI or other weak-signal detection
-            virtual bool lostSignal(void) { return false; }
+            virtual bool lostSignal(void)
+            { 
+                return false; 
+            }
 
             /**
               * channelMap: throttle, roll, pitch, yaw, aux, arm
@@ -142,7 +127,7 @@ namespace hf {
                 _demandScale = demandScale;
             }
 
-            bool getDemands(float yawAngle)
+            virtual bool ready(void) override
             {
                 // Wait till there's a new frame
                 if (!gotNewFrame()) return false;
@@ -151,39 +136,30 @@ namespace hf {
                 readRawvals();
 
                 // Convert raw [-1,+1] to absolute value
-                demands.roll  = makePositiveCommand(CHANNEL_ROLL);
-                demands.pitch = makePositiveCommand(CHANNEL_PITCH);
-                demands.yaw   = makePositiveCommand(CHANNEL_YAW);
+                _demands[DEMANDS_ROLL]  = makePositiveCommand(CHANNEL_ROLL);
+                _demands[DEMANDS_PITCH] = makePositiveCommand(CHANNEL_PITCH);
+                _demands[DEMANDS_YAW]   = makePositiveCommand(CHANNEL_YAW);
 
                 // Apply expo nonlinearity to roll, pitch
-                demands.roll  = applyCyclicFunction(demands.roll);
-                demands.pitch = applyCyclicFunction(demands.pitch);
+                _demands[DEMANDS_ROLL]  = applyCyclicFunction(_demands[DEMANDS_ROLL]);
+                _demands[DEMANDS_PITCH] = applyCyclicFunction(_demands[DEMANDS_PITCH]);
 
                 // Put sign back on command, yielding [-0.5,+0.5]
-                demands.roll  = adjustCommand(demands.roll, CHANNEL_ROLL);
-                demands.pitch = adjustCommand(demands.pitch, CHANNEL_PITCH);
-                demands.yaw   = adjustCommand(demands.yaw, CHANNEL_YAW);
+                _demands[DEMANDS_ROLL]  = adjustCommand(_demands[DEMANDS_ROLL], CHANNEL_ROLL);
+                _demands[DEMANDS_PITCH] = adjustCommand(_demands[DEMANDS_PITCH], CHANNEL_PITCH);
+                _demands[DEMANDS_YAW]   = adjustCommand(_demands[DEMANDS_YAW], CHANNEL_YAW);
 
                 // Add in software trim
-                demands.roll  += _trimRoll;
-                demands.pitch += _trimPitch;
-                demands.yaw   += _trimYaw;
+                _demands[DEMANDS_ROLL]  += _trimRoll;
+                _demands[DEMANDS_PITCH] += _trimPitch;
+                _demands[DEMANDS_YAW]   += _trimYaw;
 
-                // Support headless mode
-                if (headless) {
-                    float c = cos(yawAngle);
-                    float s = sin(yawAngle);
-                    float p = demands.pitch;
-                    float r = demands.roll;
-                    
-                    demands.roll  = c*r - s*p;
-                }
-
-                // Yaw demand needs to be reversed
-                demands.yaw = -demands.yaw;
+                // Negate pitch demand, so that pulling back on stick means positive demand.
+                // Doing this keeps demands consistent with Euler angles (positive pitch = nose up).
+                _demands[DEMANDS_PITCH] = -_demands[DEMANDS_PITCH];
 
                 // Pass throttle demand through exponential function
-                demands.throttle = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
+                _demands[DEMANDS_THROTTLE] = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
 
                 // Store auxiliary switch state
                 _aux1State = getRawval(CHANNEL_AUX1) >= 0.0 ? (getRawval(CHANNEL_AUX1) > AUX_THRESHOLD ? 2 : 1) : 0;
@@ -192,19 +168,27 @@ namespace hf {
                 // Got a new frame
                 return true;
 
-            }  // getDemands
+            }  // ready
 
-            bool throttleIsDown(void)
+            virtual void getDemands(float * demands) override
+            {
+                demands[DEMANDS_THROTTLE] = _demands[DEMANDS_THROTTLE];
+                demands[DEMANDS_ROLL]     = _demands[DEMANDS_ROLL]  * _demandScale;
+                demands[DEMANDS_PITCH]    = _demands[DEMANDS_PITCH] * _demandScale;
+                demands[DEMANDS_YAW]      = _demands[DEMANDS_YAW]   * _demandScale;
+            }
+
+            virtual bool inactive(void) override
             {
                 return getRawval(CHANNEL_THROTTLE) < -1 + THROTTLE_MARGIN;
             }
 
-            virtual uint8_t getAux1State(void)
+            virtual bool inArmedState(void) override
             {
-                return _aux1State;
+                return _aux1State > 0;
             }
 
-            virtual uint8_t getAux2State(void)
+            virtual uint8_t getModeIndex(void)
             {
                 return _aux2State;
             }

@@ -1,36 +1,27 @@
 /*
    PID controller for Level mode
 
-   Copyright (c) 2018 Juan Gallostra and Simon D. Levy
+   Copyright (c) 2021 Juan Gallostra and Simon D. Levy
 
-   This file is part of Hackflight.
-
-   Hackflight is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   Hackflight is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-   You should have received a copy of the GNU General Public License
-   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+   MIT License
  */
 
 #pragma once
 
-#include "datatypes.hpp"
-#include "pidcontroller.hpp"
+#include <RFT_state.hpp>
+#include <rft_closedloops/pidcontroller.hpp>
+
+#include "demands.hpp"
+#include "state.hpp"
 
 namespace hf {
 
-    class LevelPid : public PidController {
+    class LevelPid : public rft::PidController {
 
         private:
 
             // Helper class
-            class _AnglePid : public Pid {
+            class _AnglePid : public rft::DofPid {
 
                 private:
 
@@ -38,18 +29,18 @@ namespace hf {
 
                     // Maximum roll pitch demand is +/-0.5, so to convert demand to 
                     // angle for error computation, we multiply by the folling amount:
-                    float _demandMultiplier = 2 * Filter::deg2rad(MAX_ANGLE_DEGREES);
+                    float _demandMultiplier = 2 * rft::Filter::deg2rad(MAX_ANGLE_DEGREES);
 
                 public:
 
-                    void init(const float Kp) 
+                    void begin(const float Kp) 
                     {
-                        Pid::init(Kp, 0, 0);
+                        DofPid::begin(Kp, 0, 0);
                     }
 
                     float compute(float demand, float angle)
                     {
-                        return Pid::compute(demand*_demandMultiplier, angle);
+                        return DofPid::compute(demand*_demandMultiplier, angle);
                     }
 
             }; // class _AnglePid
@@ -61,8 +52,8 @@ namespace hf {
 
             LevelPid(float rollLevelP, float pitchLevelP)
             {
-                _rollPid.init(rollLevelP);
-                _pitchPid.init(pitchLevelP);
+                _rollPid.begin(rollLevelP);
+                _pitchPid.begin(pitchLevelP);
             }
 
             LevelPid(float rollPitchLevelP)
@@ -70,10 +61,11 @@ namespace hf {
             {
             }
 
-            void modifyDemands(state_t * state, demands_t & demands)
+            void modifyDemands(rft::State * state, float * demands)
             {
-                demands.roll  = _rollPid.compute(demands.roll, state->rotation[0]); 
-                demands.pitch = _pitchPid.compute(demands.pitch, state->rotation[1]);
+                float * x = ((State *)state)->x;
+                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], x[State::STATE_PHI]); 
+                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], x[State::STATE_THETA]);
             }
 
     };  // class LevelPid

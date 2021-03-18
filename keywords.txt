@@ -1,5 +1,5 @@
 Hackflight            KEYWORD1
-init                  KEYWORD2
+begin                 KEYWORD2
 
 
 

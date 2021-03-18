@@ -2,8 +2,8 @@ EAGLE AutoRouter Statistics:
 
 Job           : C:/Users/levys/Documents/EAGLE/projects/LadybugLoiterBoard/loiterboard.brd
 
-Start at      : 14:22:30 (8/2/2018)
-End at        : 14:22:34 (8/2/2018)
+Start at      : 14:22:30 (8/2/2021)
+End at        : 14:22:34 (8/2/2021)
 Elapsed time  : 00:00:03
 
 Signals       :    15   RoutingGrid: 6 mil  Layers: 2

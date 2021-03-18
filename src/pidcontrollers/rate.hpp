@@ -1,34 +1,24 @@
 /*
    Angular-velocity-based PID controller for roll, pitch, yaw
 
-   Copyright (c) 2018 Juan Gallostra and Simon D. Levy
+   Copyright (c) 2021 Juan Gallostra and Simon D. Levy
 
-   This file is part of Hackflight.
-
-   Hackflight is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   Hackflight is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-   You should have received a copy of the GNU General Public License
-   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+   MIT License
  */
 
 #pragma once
 
+#include <RFT_filters.hpp>
+#include <RFT_state.hpp>
+#include <rft_closedloops/pidcontroller.hpp>
+
+#include "demands.hpp"
 #include "receiver.hpp"
-#include "filters.hpp"
-#include "datatypes.hpp"
-#include "pidcontroller.hpp"
 
 namespace hf {
 
     // Helper class for all three axes
-    class _AngularVelocityPid : public Pid {
+    class _AngularVelocityPid : public rft::DofPid {
 
         private: 
 
@@ -41,12 +31,12 @@ namespace hf {
 
         public:
 
-            void init(const float Kp, const float Ki, const float Kd) 
+            void begin(const float Kp, const float Ki, const float Kd) 
             {
-                Pid::init(Kp, Ki, Kd, WINDUP_MAX);
+                DofPid::begin(Kp, Ki, Kd, WINDUP_MAX);
 
                 // Convert degree parameters to radians for use later
-                _bigAngularVelocity = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
+                _bigAngularVelocity = rft::Filter::deg2rad(BIG_DEGREES_PER_SECOND);
             }
 
             float compute(float demand, float angularVelocity)
@@ -56,12 +46,12 @@ namespace hf {
                     reset();
                 }
 
-                return Pid::compute(demand, angularVelocity);
+                return DofPid::compute(demand, angularVelocity);
             }
 
     };  // class _AngularVelocityPid
 
-    class RatePid : public PidController {
+    class RatePid : public rft::PidController {
 
         private: 
 
@@ -77,32 +67,37 @@ namespace hf {
 
             RatePid(const float Kp, const float Ki, const float Kd, const float Kp_yaw, const float Ki_yaw) 
             {
-                _rollPid.init(Kp, Ki, Kd);
-                _pitchPid.init(Kp, Ki, Kd);
-                _yawPid.init(Kp_yaw, Ki_yaw, 0);
+                _rollPid.begin(Kp, Ki, Kd);
+                _pitchPid.begin(Kp, Ki, Kd);
+                _yawPid.begin(Kp_yaw, Ki_yaw, 0);
             }
 
-            void modifyDemands(state_t * state, demands_t & demands)
+            void modifyDemands(rft::State * state, float * demands)
             {
-                demands.roll  = _rollPid.compute(demands.roll,  state->angularVel[0]);
-                demands.pitch = _pitchPid.compute(demands.pitch, state->angularVel[1]);
-                demands.yaw   = _yawPid.compute(demands.yaw, state->angularVel[2]);
+                float * x = ((State *)state)->x;
+
+                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], x[State::STATE_DPHI]);
+
+                // XXX Why do we have to negate pitch, yaw demands and state values?
+                demands[DEMANDS_PITCH] = _pitchPid.compute(-demands[DEMANDS_PITCH], -x[State::STATE_DTHETA]);
+                demands[DEMANDS_YAW]   = _yawPid.compute(-demands[DEMANDS_YAW], -x[State::STATE_DPSI]);
 
                 // Prevent "yaw jump" during correction
-                demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));
+                demands[DEMANDS_YAW] =
+                    rft::Filter::constrainAbs(demands[DEMANDS_YAW], 0.1 + fabs(demands[DEMANDS_YAW]));
 
                 // Reset yaw integral on large yaw command
-                if (fabs(demands.yaw) > BIG_YAW_DEMAND) {
+                if (fabs(demands[DEMANDS_YAW]) > BIG_YAW_DEMAND) {
                     _yawPid.reset();
                 }
             }
 
-            virtual void updateReceiver(bool throttleIsDown) override
+            virtual void resetOnInactivity(bool inactive) override
             {
                 // Check throttle-down for integral reset
-                _rollPid.updateReceiver(throttleIsDown);
-                _pitchPid.updateReceiver(throttleIsDown);
-                _yawPid.updateReceiver(throttleIsDown);
+                _rollPid.resetOnInactivity(inactive);
+                _pitchPid.resetOnInactivity(inactive);
+                _yawPid.resetOnInactivity(inactive);
             }
 
     };  // class RatePid
