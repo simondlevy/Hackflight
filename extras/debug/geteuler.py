@@ -14,6 +14,7 @@ from sys import stdout
 import argparse
 import struct
 
+
 class AttitudeParser(Parser):
 
     def __init__(self, port):
@@ -35,10 +36,12 @@ class AttitudeParser(Parser):
     def dispatchMessage(self):
 
         if self.message_id == 121:
-            self.handle_RC_NORMAL(*struct.unpack('=ffffff', self.message_buffer))
+            self.handle_RC_NORMAL(*struct.unpack('=ffffff',
+                                  self.message_buffer))
 
         if self.message_id == 122:
-            self.handle_ATTITUDE_RADIANS(*struct.unpack('=fff', self.message_buffer))
+            self.handle_ATTITUDE_RADIANS(*struct.unpack('=fff',
+                                         self.message_buffer))
 
     @staticmethod
     def serialize_ATTITUDE_RADIANS_Request():
@@ -50,6 +53,7 @@ class AttitudeParser(Parser):
         print('%+3.3f %+3.3f %+3.3f' % (roll, pitch, yaw))
         stdout.flush()
         self.port.write(self.request)
+
 
 def main():
 
@@ -74,6 +78,6 @@ def main():
 
             break
 
+
 if __name__ == '__main__':
     main()
-
