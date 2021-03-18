@@ -16,6 +16,17 @@ import struct
 
 class AttitudeParser(Parser):
 
+    def __init__(self, port):
+
+        Parser.__init__(self)
+
+        self.port = port
+        self.request = AttitudeParser.serialize_ATTITUDE_RADIANS_Request()
+
+    def begin(self):
+
+        self.port.write(self.request)
+
     def dispatchMessage(self):
 
         if self.message_id == 121:
@@ -33,24 +44,22 @@ class AttitudeParser(Parser):
 
         print('%+3.3f %+3.3f %+3.3f' % (roll, pitch, yaw))
         stdout.flush()
-        port.write(request)
+        self.port.write(self.request)
 
-if __name__ == '__main__':
+def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(dest='com_port', help='COM port')
-
-    # Parse and print the results
     args = parser.parse_args()
 
-    parser = AttitudeParser()
-    request = AttitudeParser.serialize_ATTITUDE_RADIANS_Request()
     port = serial.Serial(args.com_port, 115200)
+
+    parser = AttitudeParser(port)
 
     # Connecting causes reboot on ESP32
     sleep(1)
 
-    port.write(request)
+    parser.begin()
 
     while True:
 
@@ -61,4 +70,7 @@ if __name__ == '__main__':
         except KeyboardInterrupt:
 
             break
+
+if __name__ == '__main__':
+    main()
 
