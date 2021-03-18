@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-receiver.py : class for displaying PWM values from receiver
+receiver.py : class for displaying values from receiver
 
 Copyright (C) Simon D. Levy 2021
 MIT License
@@ -10,7 +10,7 @@ UPDATE_MSEC = 1
 
 from dialog import Dialog
 
-import tkcompat as tk
+import tkinter as tk
 
 class Receiver(Dialog):
 

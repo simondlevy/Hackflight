@@ -7,10 +7,11 @@ Copyright (C) Simon D. Levy 2021
 MIT License
 '''
 
-BAUD = 115200
-
 from serial import Serial
 from threading import Thread
+
+BAUD = 115200
+
 
 class Comms:
 
@@ -43,7 +44,7 @@ class Comms:
             try:
                 byte = self.port.read(1)
                 self.gcs.parse(byte)
-            except:
+            except Exception:
                 None
 
     def start(self):

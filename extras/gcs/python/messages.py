@@ -10,7 +10,7 @@ MIT License
 UPDATE_MSEC = 50
 SCROLLBAR_WIDTH = 20
 
-import tkcompat as tk
+import tkinter as tk
 
 from dialog import Dialog
 

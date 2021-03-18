@@ -35,7 +35,7 @@ MOTORS_TOP_Y    = 60
 MOTORS_BOTTOM_Y = 220
 MOTORS_RADIUS   = 20
 
-import tkcompat as tk
+import tkinter as tk
 
 from math import sqrt
 

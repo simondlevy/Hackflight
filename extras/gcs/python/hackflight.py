@@ -7,21 +7,10 @@ Copyright (C) Simon D. Levy 2021
 MIT License
 '''
 
-DISPLAY_WIDTH  = 800
-DISPLAY_HEIGHT = 600
-
-SPLASH_LOCATION = 430,260
-
-BACKGROUND_COLOR = 'white'
-
-CONNECTION_DELAY_MSEC  = 4000
-
-USB_UPDATE_MSEC = 200
-
 from comms import Comms
 from serial.tools.list_ports import comports
 import os
-import tkcompat as tk
+import tkinter as tk
 
 from mspparser import MspParser
 
@@ -30,7 +19,18 @@ from motors import Motors
 from receiver import Receiver
 from resources import resource_path
 
-# GCS class runs the show =========================================================================================
+DISPLAY_WIDTH = 800
+DISPLAY_HEIGHT = 600
+
+SPLASH_LOCATION = 430, 260
+
+BACKGROUND_COLOR = 'white'
+
+CONNECTION_DELAY_MSEC = 4000
+
+USB_UPDATE_MSEC = 200
+
+# GCS class runs the show =====================================================
 
 
 class GCS(MspParser):
@@ -51,12 +51,14 @@ class GCS(MspParser):
         self.root.title('Hackflight Ground Control Station')
         left = (self.root.winfo_screenwidth() - DISPLAY_WIDTH) / 2
         top = (self.root.winfo_screenheight() - DISPLAY_HEIGHT) / 2
-        self.root.geometry('%dx%d+%d+%d' % (DISPLAY_WIDTH, DISPLAY_HEIGHT, left, top))
+        self.root.geometry('%dx%d+%d+%d' % (DISPLAY_WIDTH, DISPLAY_HEIGHT,
+                                            left, top))
         self.frame = tk.Frame(self.root)
 
         # Too much hassle on Windows
         if 'nt' != os.name:
-            self.root.tk.call('wm', 'iconphoto', self.root._w, tk.PhotoImage('icon.xbm'))
+            self.root.tk.call('wm', 'iconphoto', self.root._w,
+                              tk.PhotoImage('icon.xbm'))
 
         self.root.protocol('WM_DELETE_WINDOW', self.quit)
 
@@ -65,12 +67,14 @@ class GCS(MspParser):
         self.pane2 = self._add_pane()
 
         # Add a buttons
-        self.button_connect = self._add_button('Connect', self.pane1, self._connect_callback)
-        self.button_imu  = self._add_button('IMU',  self.pane2, self._imu_callback)
-        self.button_motors = self._add_button('Motors', self.pane2, self._motors_button_callback)
-        self.button_receiver = self._add_button('Receiver', self.pane2, self._receiver_button_callback)
-        #self.button_messages = self._add_button('Messages', self.pane2, self._messages_button_callback)
-        #self.button_maps = self._add_button('Maps', self.pane2, self._maps_button_callback, disabled=False)
+        self.button_connect = self._add_button('Connect', self.pane1,
+                                               self._connect_callback)
+        self.button_imu = self._add_button('IMU', self.pane2,
+                                           self._imu_callback)
+        self.button_motors = self._add_button('Motors', self.pane2,
+                                              self._motors_button_callback)
+        self.button_receiver = self._add_button('Receiver', self.pane2,
+                                                self._receiver_button_callback)
 
         # Prepare for adding ports as they are detected by our timer task
         self.portsvar = tk.StringVar(self.root)
@@ -80,17 +84,16 @@ class GCS(MspParser):
 
         # Finalize Tk stuff
         self.frame.pack()
-        self.canvas = tk.Canvas(self.root, width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT, background='black')
+        self.canvas = tk.Canvas(self.root, width=DISPLAY_WIDTH,
+                                height=DISPLAY_HEIGHT, background='black')
         self.canvas.pack()
 
-
         # Set up a text label for reporting errors
-        errmsg = 'No response from board.  Possible reasons:\n\n' + \
-                 '    * You connected to the wrong port.\n\n' + \
-                 '    * Firmware uses serial receiver\n' + \
-                 '      (DSMX, SBUS), but receiver is\n' + \
-                 '      not connected.'
-        self.error_label = tk.Label(self.canvas, text=errmsg, bg='black', fg='red', font=(None,24), justify=tk.LEFT)
+        errmsg = ('No response from board.  Possible reasons:\n\n' +
+                  '    * You connected to the wrong port.\n\n' +
+                  '    * IMU is not responding.\n\n')
+        self.error_label = tk.Label(self.canvas, text=errmsg, bg='black',
+                                    fg='red', font=(None, 24), justify=tk.LEFT)
         self.hide(self.error_label)
 
         # Add widgets for motor-testing dialog; hide them immediately
@@ -100,15 +103,9 @@ class GCS(MspParser):
         # Create receiver dialog
         self.receiver = Receiver(self)
 
-        # Create messages dialog
-        #self.messages = Messages(self)
-
         # Create IMU dialog
         self.imu = IMU(self)
         self._schedule_connection_task()
-
-        # Create a maps dialog
-        #self.maps = Maps(self, yoffset=-30)
 
         # Create a splash image
         self.splashimage = tk.PhotoImage(file=resource_path('splash.gif'))
@@ -171,17 +168,19 @@ class GCS(MspParser):
         # Display throttle as [0,1], other channels as [-1,+1]
         self.rxchannels = c1/2.+.5, c2, c3, c4, c5, c6
 
-        # As soon as we handle the callback from one request, send another request, if receiver dialog is running
+        # As soon as we handle the callback from one request, send another
+        # request, if receiver dialog is running
         if self.receiver.running:
             self._send_rc_request()
 
     def handle_ATTITUDE_RADIANS(self, x, y, z):
 
-        self.roll_pitch_yaw = x, y, z  
+        self.roll_pitch_yaw = x, y, z
 
         self.gotimu = True
 
-        # As soon as we handle the callback from one request, send another request, if IMU dialog is running
+        # As soon as we handle the callback from one request, send another
+        # request, if IMU dialog is running
         if self.imu.running:
             self._send_attitude_request()
 
@@ -195,7 +194,7 @@ class GCS(MspParser):
 
         button = tk.Button(parent, text=label, command=callback)
         button.pack(side=tk.LEFT)
-        button.config(state = 'disabled' if disabled else 'normal')
+        button.config(state=('disabled' if disabled else 'normal'))
         return button
 
     # Callback for IMU button
@@ -205,9 +204,6 @@ class GCS(MspParser):
 
         self.motors.stop()
         self.receiver.stop()
-        #self.messages.stop()
-        #self.maps.stop()
-
         self._send_attitude_request()
         self.imu.start()
 
@@ -247,8 +243,6 @@ class GCS(MspParser):
 
         self.imu.stop()
         self.receiver.stop()
-        #self.messages.stop()
-        #self.maps.stop()
         self.motors.start()
 
     def _clear(self):
@@ -262,41 +256,8 @@ class GCS(MspParser):
 
         self.imu.stop()
         self.motors.stop()
-        #self.messages.stop()
-        #self.maps.stop()
-
         self._send_rc_request()
         self.receiver.start()
-
-    # Callback for Messages button
-    def _messages_button_callback(self):
-
-        self._clear()
-
-        self.imu.stop()
-        self.motors.stop()
-        #self.maps.stop()
-        self.receiver.stop()
-
-        self.messages.start()
-
-    def _getting_messages(self):
-
-        return self.button_connect['text'] == 'Disconnect'
-
-    # Callback for Maps button
-    def _maps_button_callback(self):
-
-        self._clear()
-
-        if self._getting_messages():
-
-            self.receiver.stop()
-            self.messages.stop()
-            self.imu.stop()
-            self.motors.stop()
-
-        #self.maps.start()
 
     # Callback for Connect / Disconnect button
     def _connect_callback(self):
@@ -304,12 +265,10 @@ class GCS(MspParser):
         if self.connected:
 
             self.imu.stop()
-            #self.maps.stop()
             self.motors.stop()
-            #self.messages.stop()
             self.receiver.stop()
 
-            if not self.comms is None:
+            if self.comms is not None:
 
                 self.comms.stop()
 
@@ -324,8 +283,6 @@ class GCS(MspParser):
             self._show_splash()
 
         else:
-
-            #self.maps.stop()
 
             self.comms = Comms(self)
             self.comms.start()
@@ -347,11 +304,12 @@ class GCS(MspParser):
         ports = []
 
         for port in allports:
-            
+
             portname = port[0]
 
-            if 'usbmodem' in portname or 'ttyACM' in portname or 'ttyUSB' in portname or 'COM' in portname:
-                if not portname in ['COM1', 'COM2']:
+            if any(name in portname
+                    for name in ('usbmodem', 'ttyACM', 'ttyUSB', 'COM')):
+                if portname not in ('COM1', 'COM2'):
                     ports.append(portname)
 
         return ports
@@ -365,8 +323,8 @@ class GCS(MspParser):
 
             if self.portsmenu is None:
 
-                self.portsmenu = tk.OptionMenu(self.pane1, self.portsvar, *ports)
-
+                self.portsmenu = tk.OptionMenu(self.pane1, self.portsvar,
+                                               *ports)
             else:
 
                 for port in ports:
@@ -379,13 +337,13 @@ class GCS(MspParser):
             if ports == []:
 
                 self.portsmenu['menu'].delete(0, 'end')
-                self.portsvar.set('') 
+                self.portsvar.set('')
                 self._disable_button(self.button_connect)
                 self._disable_buttons()
 
             # Connected
             else:
-                self.portsvar.set(ports[0]) # default value
+                self.portsvar.set(ports[0])  # default value
                 self._enable_button(self.button_connect)
 
             self.ports = ports
@@ -402,14 +360,12 @@ class GCS(MspParser):
         self._disable_button(self.button_imu)
         self._disable_button(self.button_motors)
         self._disable_button(self.button_receiver)
-        #self._disable_button(self.button_messages)
 
     def _enable_buttons(self):
 
         self._enable_button(self.button_imu)
         self._enable_button(self.button_motors)
         self._enable_button(self.button_receiver)
-        #self._enable_button(self.button_messages)
 
     def _enable_button(self, button):
 
@@ -427,7 +383,8 @@ class GCS(MspParser):
 
     def _show_splash(self):
 
-        self.splash = self.canvas.create_image(SPLASH_LOCATION, image=self.splashimage)
+        self.splash = self.canvas.create_image(SPLASH_LOCATION,
+                                               image=self.splashimage)
 
     def _hide_splash(self):
 
@@ -440,10 +397,6 @@ class GCS(MspParser):
     def _show_disarmed(self, widget):
 
         widget.configure(bg=BACKGROUND_COLOR)
-
-        if self._getting_messages():
-
-            self._enable_button(self.button_motors)
 
     def _handle_calibrate_response(self):
 
@@ -462,14 +415,12 @@ class GCS(MspParser):
 
         self.armed = armed
 
-        #self.messages.setCurrentMessage('ArmStatus: %s' % ('ARMED' if armed else 'Disarmed'))
-
     def _handle_battery_status(self, volts, amps):
 
         return
-        #self.messages.setCurrentMessage('BatteryStatus: %3.3f volts, %3.3f amps' % (volts, amps))
 
-# Main ==============================================================================================================
+# Main ========================================================================
+
 
 if __name__ == "__main__":
 

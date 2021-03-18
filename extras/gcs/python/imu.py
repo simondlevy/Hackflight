@@ -18,7 +18,7 @@ PITCH_ACTIVE = 2
 ROLL_ACTIVE = 3
 
 
-import tkcompat as tk
+import tkinter as tk
 
 from math import sin, cos
 
