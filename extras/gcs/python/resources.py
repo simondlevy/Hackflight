@@ -7,7 +7,7 @@ MIT License
 '''
 
 import os
-import sys
+
 
 def resource_path(filename):
 
