@@ -162,162 +162,290 @@ def get_vehicle(width, depth, length):
             # creates prop 1 on arm 1
 
             # North East far narrow tip
-            [+width+armLength + propLength - propNarrowWidth, +tipTL, +length+armLength - propLength - propNarrowWidth],     # 0  64
-            [+width+armLength + propLength + propNarrowWidth, +tipTU, +length+armLength - propLength + propNarrowWidth],     # 1  65
-            [+width+armLength + propLength + propNarrowWidth, +tipBU, +length+armLength - propLength + propNarrowWidth],     # 2  66
-            [+width+armLength + propLength - propNarrowWidth, +tipBL, +length+armLength - propLength - propNarrowWidth],     # 3  67
+            [+width+armLength + propLength - propNarrowWidth, +tipTL, 
+             +length+armLength - propLength - propNarrowWidth],     # 0  64
+            [+width+armLength + propLength + propNarrowWidth, +tipTU, 
+             +length+armLength - propLength + propNarrowWidth],     # 1  65
+            [+width+armLength + propLength + propNarrowWidth, +tipBU, 
+             +length+armLength - propLength + propNarrowWidth],     # 2  66
+            [+width+armLength + propLength - propNarrowWidth, +tipBL, 
+             +length+armLength - propLength - propNarrowWidth],     # 3  67
+
             # North East far wide
-            [+width+armLength + propNarrowLength - propWidth, +farTL, +length+armLength - propNarrowLength - propWidth],     # 4  68
-            [+width+armLength + propNarrowLength + propWidth, +farTU, +length+armLength - propNarrowLength + propWidth],     # 5  69
-            [+width+armLength + propNarrowLength + propWidth, +farBU, +length+armLength - propNarrowLength + propWidth],     # 6  70
-            [+width+armLength + propNarrowLength - propWidth, +farBL, +length+armLength - propNarrowLength - propWidth],     # 7  71
+            [+width+armLength + propNarrowLength - propWidth, +farTL, 
+             +length+armLength - propNarrowLength - propWidth],     # 4  68
+            [+width+armLength + propNarrowLength + propWidth, +farTU, 
+             +length+armLength - propNarrowLength + propWidth],     # 5  69
+            [+width+armLength + propNarrowLength + propWidth, +farBU, 
+             +length+armLength - propNarrowLength + propWidth],     # 6  70
+            [+width+armLength + propNarrowLength - propWidth, +farBL, 
+             +length+armLength - propNarrowLength - propWidth],     # 7  71
+
             # North East close wide
-            [+width+armLength + propShortLength - propWidth, +closeTL, +length+armLength - propShortLength - propWidth],     # 4  72
-            [+width+armLength + propShortLength + propWidth, +closeTU, +length+armLength - propShortLength + propWidth],     # 5  73
-            [+width+armLength + propShortLength + propWidth, +farBU, +length+armLength - propShortLength + propWidth],       # 6  74
-            [+width+armLength + propShortLength - propWidth, +farBL, +length+armLength - propShortLength - propWidth],       # 7  75
+            [+width+armLength + propShortLength - propWidth, +closeTL, 
+             +length+armLength - propShortLength - propWidth],     # 4  72
+            [+width+armLength + propShortLength + propWidth, +closeTU, 
+             +length+armLength - propShortLength + propWidth],     # 5  73
+            [+width+armLength + propShortLength + propWidth, +farBU, 
+             +length+armLength - propShortLength + propWidth],       # 6  74
+            [+width+armLength + propShortLength - propWidth, +farBL, 
+             +length+armLength - propShortLength - propWidth],       # 7  75
 
             # Middle narrow tip
-            [+width+armLength - propNarrowWidth, +endT, +length+armLength - propNarrowWidth],    # 4  76
-            [+width+armLength + propNarrowWidth, +endT, +length+armLength + propNarrowWidth],    # 5  77
-            [+width+armLength + propNarrowWidth, +endB, +length+armLength + propNarrowWidth],    # 6  78
-            [+width+armLength - propNarrowWidth, +endB, +length+armLength - propNarrowWidth],    # 7  79
+            [+width+armLength - propNarrowWidth, +endT, 
+             +length+armLength - propNarrowWidth],    # 4  76
+            [+width+armLength + propNarrowWidth, +endT, 
+             +length+armLength + propNarrowWidth],    # 5  77
+            [+width+armLength + propNarrowWidth, +endB, 
+             +length+armLength + propNarrowWidth],    # 6  78
+            [+width+armLength - propNarrowWidth, +endB, 
+             +length+armLength - propNarrowWidth],    # 7  79
 
             # South West close wide
-            [+width+armLength - propShortLength - propWidth, +closeTU, +length+armLength + propShortLength - propWidth],     # 4  80
-            [+width+armLength - propShortLength + propWidth, +closeTL, +length+armLength + propShortLength + propWidth],     # 5  81
-            [+width+armLength - propShortLength + propWidth, +closeBL, +length+armLength + propShortLength + propWidth],     # 6  82
-            [+width+armLength - propShortLength - propWidth, +closeBU, +length+armLength + propShortLength - propWidth],     # 7  83
+            [+width+armLength - propShortLength - propWidth, +closeTU, 
+             +length+armLength + propShortLength - propWidth],     # 4  80
+            [+width+armLength - propShortLength + propWidth, +closeTL, 
+             +length+armLength + propShortLength + propWidth],     # 5  81
+            [+width+armLength - propShortLength + propWidth, +closeBL, 
+             +length+armLength + propShortLength + propWidth],     # 6  82
+            [+width+armLength - propShortLength - propWidth, +closeBU, 
+             +length+armLength + propShortLength - propWidth],     # 7  83
+
             # South West far wide
-            [+width+armLength - propNarrowLength - propWidth, +farTU, +length+armLength + propNarrowLength - propWidth],     # 4  84
-            [+width+armLength - propNarrowLength + propWidth, +farTL, +length+armLength + propNarrowLength + propWidth],     # 5  85
-            [+width+armLength - propNarrowLength + propWidth, +farBL, +length+armLength + propNarrowLength + propWidth],     # 6  86
-            [+width+armLength - propNarrowLength - propWidth, +farBU, +length+armLength + propNarrowLength - propWidth],     # 7  87
+            [+width+armLength - propNarrowLength - propWidth, +farTU, 
+             +length+armLength + propNarrowLength - propWidth],     # 4  84
+            [+width+armLength - propNarrowLength + propWidth, +farTL, 
+             +length+armLength + propNarrowLength + propWidth],     # 5  85
+            [+width+armLength - propNarrowLength + propWidth, +farBL, 
+             +length+armLength + propNarrowLength + propWidth],     # 6  86
+            [+width+armLength - propNarrowLength - propWidth, +farBU, 
+             +length+armLength + propNarrowLength - propWidth],     # 7  87
+
             # South West far narrow tip
-            [+width+armLength - propLength - propNarrowWidth, +tipTU, +length+armLength + propLength - propNarrowWidth],     # 0  88
-            [+width+armLength - propLength + propNarrowWidth, +tipTL, +length+armLength + propLength + propNarrowWidth],     # 1  89
-            [+width+armLength - propLength + propNarrowWidth, +tipBL, +length+armLength + propLength + propNarrowWidth],     # 2  90
-            [+width+armLength - propLength - propNarrowWidth, +tipBU, +length+armLength + propLength - propNarrowWidth],     # 3  91
+            [+width+armLength - propLength - propNarrowWidth, +tipTU, 
+             +length+armLength + propLength - propNarrowWidth],     # 0  88
+            [+width+armLength - propLength + propNarrowWidth, +tipTL, 
+             +length+armLength + propLength + propNarrowWidth],     # 1  89
+            [+width+armLength - propLength + propNarrowWidth, +tipBL, 
+             +length+armLength + propLength + propNarrowWidth],     # 2  90
+            [+width+armLength - propLength - propNarrowWidth, +tipBU, 
+             +length+armLength + propLength - propNarrowWidth],     # 3  91
 
             # creates prop 4 on arm 4
 
             # North East far narrow tip
-            [-width-armLength + propLength - propNarrowWidth, +tipTL, -length-armLength - propLength - propNarrowWidth],     # 0  92
-            [-width-armLength + propLength + propNarrowWidth, +tipTU, -length-armLength - propLength + propNarrowWidth],     # 1  93
-            [-width-armLength + propLength + propNarrowWidth, +tipBU, -length-armLength - propLength + propNarrowWidth],     # 2  94
-            [-width-armLength + propLength - propNarrowWidth, +tipBL, -length-armLength - propLength - propNarrowWidth],     # 3  95
+            [-width-armLength + propLength - propNarrowWidth, +tipTL, 
+             -length-armLength - propLength - propNarrowWidth],     # 0  92
+            [-width-armLength + propLength + propNarrowWidth, +tipTU, 
+             -length-armLength - propLength + propNarrowWidth],     # 1  93
+            [-width-armLength + propLength + propNarrowWidth, +tipBU, 
+             -length-armLength - propLength + propNarrowWidth],     # 2  94
+            [-width-armLength + propLength - propNarrowWidth, +tipBL, 
+             -length-armLength - propLength - propNarrowWidth],     # 3  95
+
             # North East far wide
-            [-width-armLength + propNarrowLength - propWidth, +farTL, -length-armLength - propNarrowLength - propWidth],     # 4  96
-            [-width-armLength + propNarrowLength + propWidth, +farTU, -length-armLength - propNarrowLength + propWidth],     # 5  97
-            [-width-armLength + propNarrowLength + propWidth, +farBU, -length-armLength - propNarrowLength + propWidth],     # 6  98
-            [-width-armLength + propNarrowLength - propWidth, +farBL, -length-armLength - propNarrowLength - propWidth],     # 7  99
+            [-width-armLength + propNarrowLength - propWidth, +farTL, 
+             -length-armLength - propNarrowLength - propWidth],     # 4  96
+            [-width-armLength + propNarrowLength + propWidth, +farTU, 
+             -length-armLength - propNarrowLength + propWidth],     # 5  97
+            [-width-armLength + propNarrowLength + propWidth, +farBU, 
+             -length-armLength - propNarrowLength + propWidth],     # 6  98
+            [-width-armLength + propNarrowLength - propWidth, +farBL, 
+             -length-armLength - propNarrowLength - propWidth],     # 7  99
+
             # North East close wide
-            [-width-armLength + propShortLength - propWidth, +closeTL, -length-armLength - propShortLength - propWidth],     # 4  100
-            [-width-armLength + propShortLength + propWidth, +closeTU, -length-armLength - propShortLength + propWidth],     # 5  101
-            [-width-armLength + propShortLength + propWidth, +closeBU, -length-armLength - propShortLength + propWidth],     # 6  102
-            [-width-armLength + propShortLength - propWidth, +closeBL, -length-armLength - propShortLength - propWidth],     # 7  103
+            [-width-armLength + propShortLength - propWidth, +closeTL, 
+             -length-armLength - propShortLength - propWidth],     # 4  100
+            [-width-armLength + propShortLength + propWidth, +closeTU, 
+             -length-armLength - propShortLength + propWidth],     # 5  101
+            [-width-armLength + propShortLength + propWidth, +closeBU, 
+             -length-armLength - propShortLength + propWidth],     # 6  102
+            [-width-armLength + propShortLength - propWidth, +closeBL, 
+             -length-armLength - propShortLength - propWidth],     # 7  103
 
             # Middle narrow tip
-            [-width-armLength - propNarrowWidth, +endT, -length-armLength - propNarrowWidth],    # 4  104
-            [-width-armLength + propNarrowWidth, +endT, -length-armLength + propNarrowWidth],    # 5  105
-            [-width-armLength + propNarrowWidth, +endB, -length-armLength + propNarrowWidth],    # 6  106
-            [-width-armLength - propNarrowWidth, +endB, -length-armLength - propNarrowWidth],    # 7  107
+            [-width-armLength - propNarrowWidth, +endT, 
+             -length-armLength - propNarrowWidth],    # 4  104
+            [-width-armLength + propNarrowWidth, +endT, 
+             -length-armLength + propNarrowWidth],    # 5  105
+            [-width-armLength + propNarrowWidth, +endB, 
+             -length-armLength + propNarrowWidth],    # 6  106
+            [-width-armLength - propNarrowWidth, +endB, 
+             -length-armLength - propNarrowWidth],    # 7  107
 
             # South West close wide
-            [-width-armLength - propShortLength - propWidth, +closeTU, -length-armLength + propShortLength - propWidth],     # 4  108
-            [-width-armLength - propShortLength + propWidth, +closeTL, -length-armLength + propShortLength + propWidth],     # 5  109
-            [-width-armLength - propShortLength + propWidth, +closeBL, -length-armLength + propShortLength + propWidth],     # 6  110
-            [-width-armLength - propShortLength - propWidth, +closeBU, -length-armLength + propShortLength - propWidth],     # 7  111
+            [-width-armLength - propShortLength - propWidth, +closeTU, 
+             -length-armLength + propShortLength - propWidth],     # 4  108
+            [-width-armLength - propShortLength + propWidth, +closeTL, 
+             -length-armLength + propShortLength + propWidth],     # 5  109
+            [-width-armLength - propShortLength + propWidth, +closeBL, 
+             -length-armLength + propShortLength + propWidth],     # 6  110
+            [-width-armLength - propShortLength - propWidth, +closeBU, 
+             -length-armLength + propShortLength - propWidth],     # 7  111
+
             # South West far wide
-            [-width-armLength - propNarrowLength - propWidth, +farTU, -length-armLength + propNarrowLength - propWidth],     # 4  112
-            [-width-armLength - propNarrowLength + propWidth, +farTL, -length-armLength + propNarrowLength + propWidth],     # 5  113
-            [-width-armLength - propNarrowLength + propWidth, +farBL, -length-armLength + propNarrowLength + propWidth],     # 6  114
-            [-width-armLength - propNarrowLength - propWidth, +farBU, -length-armLength + propNarrowLength - propWidth],     # 7  115
+            [-width-armLength - propNarrowLength - propWidth, +farTU, 
+             -length-armLength + propNarrowLength - propWidth],     # 4  112
+            [-width-armLength - propNarrowLength + propWidth, +farTL, 
+             -length-armLength + propNarrowLength + propWidth],     # 5  113
+            [-width-armLength - propNarrowLength + propWidth, +farBL, 
+             -length-armLength + propNarrowLength + propWidth],     # 6  114
+            [-width-armLength - propNarrowLength - propWidth, +farBU, 
+             -length-armLength + propNarrowLength - propWidth],     # 7  115
+
             # South West far narrow tip
-            [-width-armLength - propLength - propNarrowWidth, +tipTU, -length-armLength + propLength - propNarrowWidth],     # 0  116
-            [-width-armLength - propLength + propNarrowWidth, +tipTL, -length-armLength + propLength + propNarrowWidth],     # 1  117
-            [-width-armLength - propLength + propNarrowWidth, +tipBL, -length-armLength + propLength + propNarrowWidth],     # 2  118
-            [-width-armLength - propLength - propNarrowWidth, +tipBU, -length-armLength + propLength - propNarrowWidth],     # 3  119
+            [-width-armLength - propLength - propNarrowWidth, +tipTU, 
+             -length-armLength + propLength - propNarrowWidth],     # 0  116
+            [-width-armLength - propLength + propNarrowWidth, +tipTL, 
+             -length-armLength + propLength + propNarrowWidth],     # 1  117
+            [-width-armLength - propLength + propNarrowWidth, +tipBL, 
+             -length-armLength + propLength + propNarrowWidth],     # 2  118
+            [-width-armLength - propLength - propNarrowWidth, +tipBU, 
+             -length-armLength + propLength - propNarrowWidth],     # 3  119
 
             # creates prop 3 on arm 3
 
             # North West far narrow tip
-            [+width+armLength - propLength - propNarrowWidth, +tipTU, -length-armLength - propLength + propNarrowWidth],     # 0  120
-            [+width+armLength - propLength + propNarrowWidth, +tipTL, -length-armLength - propLength - propNarrowWidth],     # 1  121
-            [+width+armLength - propLength + propNarrowWidth, +tipBL, -length-armLength - propLength - propNarrowWidth],     # 2  122
-            [+width+armLength - propLength - propNarrowWidth, +tipBU, -length-armLength - propLength + propNarrowWidth],     # 3  123
+            [+width+armLength - propLength - propNarrowWidth, +tipTU, 
+             -length-armLength - propLength + propNarrowWidth],     # 0  120
+            [+width+armLength - propLength + propNarrowWidth, +tipTL, 
+             -length-armLength - propLength - propNarrowWidth],     # 1  121
+            [+width+armLength - propLength + propNarrowWidth, +tipBL, 
+             -length-armLength - propLength - propNarrowWidth],     # 2  122
+            [+width+armLength - propLength - propNarrowWidth, +tipBU, 
+             -length-armLength - propLength + propNarrowWidth],     # 3  123
+
             # North West far wide
-            [+width+armLength - propNarrowLength - propWidth, +farTU, -length-armLength - propNarrowLength + propWidth],     # 4  124
-            [+width+armLength - propNarrowLength + propWidth, +farTL, -length-armLength - propNarrowLength - propWidth],     # 5  125
-            [+width+armLength - propNarrowLength + propWidth, +farBL, -length-armLength - propNarrowLength - propWidth],     # 6  126
-            [+width+armLength - propNarrowLength - propWidth, +farBU, -length-armLength - propNarrowLength + propWidth],     # 7  127
+            [+width+armLength - propNarrowLength - propWidth, +farTU, 
+             -length-armLength - propNarrowLength + propWidth],     # 4  124
+            [+width+armLength - propNarrowLength + propWidth, +farTL, 
+             -length-armLength - propNarrowLength - propWidth],     # 5  125
+            [+width+armLength - propNarrowLength + propWidth, +farBL, 
+             -length-armLength - propNarrowLength - propWidth],     # 6  126
+            [+width+armLength - propNarrowLength - propWidth, +farBU, 
+             -length-armLength - propNarrowLength + propWidth],     # 7  127
+
             # North West close wide
-            [+width+armLength - propShortLength - propWidth, +closeTU, -length-armLength - propShortLength + propWidth],     # 4  128
-            [+width+armLength - propShortLength + propWidth, +closeTL, -length-armLength - propShortLength - propWidth],     # 5  129
-            [+width+armLength - propShortLength + propWidth, +closeBL, -length-armLength - propShortLength - propWidth],     # 6  130
-            [+width+armLength - propShortLength - propWidth, +closeBU, -length-armLength - propShortLength + propWidth],     # 7  131
+            [+width+armLength - propShortLength - propWidth, +closeTU, 
+             -length-armLength - propShortLength + propWidth],     # 4  128
+            [+width+armLength - propShortLength + propWidth, +closeTL, 
+             -length-armLength - propShortLength - propWidth],     # 5  129
+            [+width+armLength - propShortLength + propWidth, +closeBL, 
+             -length-armLength - propShortLength - propWidth],     # 6  130
+            [+width+armLength - propShortLength - propWidth, +closeBU, 
+             -length-armLength - propShortLength + propWidth],     # 7  131
 
             # Middle narrow tip
-            [+width+armLength - propNarrowWidth, +endT, -length-armLength + propNarrowWidth],    # 4  132
-            [+width+armLength + propNarrowWidth, +endT, -length-armLength - propNarrowWidth],    # 5  133
-            [+width+armLength + propNarrowWidth, +endB, -length-armLength - propNarrowWidth],    # 6  134
-            [+width+armLength - propNarrowWidth, +endB, -length-armLength + propNarrowWidth],    # 7  135
+            [+width+armLength - propNarrowWidth, +endT, 
+             -length-armLength + propNarrowWidth],                 # 4  132
+            [+width+armLength + propNarrowWidth, +endT, 
+             -length-armLength - propNarrowWidth],                 # 5  133
+            [+width+armLength + propNarrowWidth, +endB, 
+             -length-armLength - propNarrowWidth],                 # 6  134
+            [+width+armLength - propNarrowWidth, +endB, 
+             -length-armLength + propNarrowWidth],                 # 7  135
 
             # South East close wide
-            [+width+armLength + propShortLength - propWidth, +closeTL, -length-armLength + propShortLength + propWidth],     # 4  136
-            [+width+armLength + propShortLength + propWidth, +closeTU, -length-armLength + propShortLength - propWidth],     # 5  137
-            [+width+armLength + propShortLength + propWidth, +closeBU, -length-armLength + propShortLength - propWidth],     # 6  138
-            [+width+armLength + propShortLength - propWidth, +closeBL, -length-armLength + propShortLength + propWidth],     # 7  139
+            [+width+armLength + propShortLength - propWidth, +closeTL, 
+             -length-armLength + propShortLength + propWidth],     # 4  136
+            [+width+armLength + propShortLength + propWidth, +closeTU, 
+             -length-armLength + propShortLength - propWidth],     # 5  137
+            [+width+armLength + propShortLength + propWidth, +closeBU, 
+             -length-armLength + propShortLength - propWidth],     # 6  138
+            [+width+armLength + propShortLength - propWidth, +closeBL, 
+             -length-armLength + propShortLength + propWidth],     # 7  139
+
             # South East far wide
-            [+width+armLength + propNarrowLength - propWidth, +farTL, -length-armLength + propNarrowLength + propWidth],     # 4  140
-            [+width+armLength + propNarrowLength + propWidth, +farTU, -length-armLength + propNarrowLength - propWidth],     # 5  141
-            [+width+armLength + propNarrowLength + propWidth, +farBU, -length-armLength + propNarrowLength - propWidth],     # 6  142
-            [+width+armLength + propNarrowLength - propWidth, +farBL, -length-armLength + propNarrowLength + propWidth],     # 7  143
+            [+width+armLength + propNarrowLength - propWidth, +farTL, 
+             -length-armLength + propNarrowLength + propWidth],     # 4  140
+            [+width+armLength + propNarrowLength + propWidth, +farTU, 
+             -length-armLength + propNarrowLength - propWidth],     # 5  141
+            [+width+armLength + propNarrowLength + propWidth, +farBU, 
+             -length-armLength + propNarrowLength - propWidth],     # 6  142
+            [+width+armLength + propNarrowLength - propWidth, +farBL, 
+             -length-armLength + propNarrowLength + propWidth],     # 7  143
+
             # South East far narrow tip
-            [+width+armLength + propLength - propNarrowWidth, +tipTL, -length-armLength + propLength + propNarrowWidth],     # 0  144
-            [+width+armLength + propLength + propNarrowWidth, +tipTU, -length-armLength + propLength - propNarrowWidth],     # 1  145
-            [+width+armLength + propLength + propNarrowWidth, +tipBU, -length-armLength + propLength - propNarrowWidth],     # 2  146
-            [+width+armLength + propLength - propNarrowWidth, +tipBL, -length-armLength + propLength + propNarrowWidth],     # 3  147
+            [+width+armLength + propLength - propNarrowWidth, +tipTL, 
+             -length-armLength + propLength + propNarrowWidth],     # 0  144
+            [+width+armLength + propLength + propNarrowWidth, +tipTU, 
+             -length-armLength + propLength - propNarrowWidth],     # 1  145
+            [+width+armLength + propLength + propNarrowWidth, +tipBU, 
+             -length-armLength + propLength - propNarrowWidth],     # 2  146
+            [+width+armLength + propLength - propNarrowWidth, +tipBL, 
+             -length-armLength + propLength + propNarrowWidth],     # 3  147
 
             # creates prop 2 on arm 2
 
             # North West far narrow tip
-            [-width-armLength - propLength - propNarrowWidth, +tipTU, +length+armLength - propLength + propNarrowWidth],     # 0  148
-            [-width-armLength - propLength + propNarrowWidth, +tipTL, +length+armLength - propLength - propNarrowWidth],     # 1  149
-            [-width-armLength - propLength + propNarrowWidth, +tipBL, +length+armLength - propLength - propNarrowWidth],     # 2  150
-            [-width-armLength - propLength - propNarrowWidth, +tipBU, +length+armLength - propLength + propNarrowWidth],     # 3  151
+            [-width-armLength - propLength - propNarrowWidth, +tipTU, 
+             +length+armLength - propLength + propNarrowWidth],     # 0  148
+            [-width-armLength - propLength + propNarrowWidth, +tipTL, 
+             +length+armLength - propLength - propNarrowWidth],     # 1  149
+            [-width-armLength - propLength + propNarrowWidth, +tipBL, 
+             +length+armLength - propLength - propNarrowWidth],     # 2  150
+            [-width-armLength - propLength - propNarrowWidth, +tipBU, 
+             +length+armLength - propLength + propNarrowWidth],     # 3  151
+
             # North West far wide
-            [-width-armLength - propNarrowLength - propWidth, +farTU, +length+armLength - propNarrowLength + propWidth],     # 4  152
-            [-width-armLength - propNarrowLength + propWidth, +farTL, +length+armLength - propNarrowLength - propWidth],     # 5  153
-            [-width-armLength - propNarrowLength + propWidth, +farBL, +length+armLength - propNarrowLength - propWidth],     # 6  154
-            [-width-armLength - propNarrowLength - propWidth, +farBU, +length+armLength - propNarrowLength + propWidth],     # 7  155
+            [-width-armLength - propNarrowLength - propWidth, +farTU, 
+             +length+armLength - propNarrowLength + propWidth],     # 4  152
+            [-width-armLength - propNarrowLength + propWidth, +farTL, 
+             +length+armLength - propNarrowLength - propWidth],     # 5  153
+            [-width-armLength - propNarrowLength + propWidth, +farBL, 
+             +length+armLength - propNarrowLength - propWidth],     # 6  154
+            [-width-armLength - propNarrowLength - propWidth, +farBU, 
+             +length+armLength - propNarrowLength + propWidth],     # 7  155
+
             # North West close wide
-            [-width-armLength - propShortLength - propWidth, +closeTU, +length+armLength - propShortLength + propWidth],     # 4  156
-            [-width-armLength - propShortLength + propWidth, +closeTL, +length+armLength - propShortLength - propWidth],     # 5  157
-            [-width-armLength - propShortLength + propWidth, +closeBL, +length+armLength - propShortLength - propWidth],     # 6  158
-            [-width-armLength - propShortLength - propWidth, +closeBU, +length+armLength - propShortLength + propWidth],     # 7  159
+            [-width-armLength - propShortLength - propWidth, +closeTU, 
+             +length+armLength - propShortLength + propWidth],     # 4  156
+            [-width-armLength - propShortLength + propWidth, +closeTL, 
+             +length+armLength - propShortLength - propWidth],     # 5  157
+            [-width-armLength - propShortLength + propWidth, +closeBL, 
+             +length+armLength - propShortLength - propWidth],     # 6  158
+            [-width-armLength - propShortLength - propWidth, +closeBU, 
+             +length+armLength - propShortLength + propWidth],     # 7  159
 
             # Middle narrow tip
-            [-width-armLength - propNarrowWidth, +endT, +length+armLength + propNarrowWidth],    # 4  160
-            [-width-armLength + propNarrowWidth, +endT, +length+armLength - propNarrowWidth],    # 5  161
-            [-width-armLength + propNarrowWidth, +endB, +length+armLength - propNarrowWidth],    # 6  162
-            [-width-armLength - propNarrowWidth, +endB, +length+armLength + propNarrowWidth],    # 7  163
+            [-width-armLength - propNarrowWidth, +endT, 
+             +length+armLength + propNarrowWidth],                 # 4  160
+            [-width-armLength + propNarrowWidth, +endT, 
+             +length+armLength - propNarrowWidth],                 # 5  161
+            [-width-armLength + propNarrowWidth, +endB, 
+             +length+armLength - propNarrowWidth],                 # 6  162
+            [-width-armLength - propNarrowWidth, +endB, 
+             +length+armLength + propNarrowWidth],                 # 7  163
 
             # South East close wide
-            [-width-armLength + propShortLength - propWidth, +closeTL, +length+armLength + propShortLength + propWidth],     # 4  164
-            [-width-armLength + propShortLength + propWidth, +closeTU, +length+armLength + propShortLength - propWidth],     # 5  165
-            [-width-armLength + propShortLength + propWidth, +closeBU, +length+armLength + propShortLength - propWidth],     # 6  166
-            [-width-armLength + propShortLength - propWidth, +closeBL, +length+armLength + propShortLength + propWidth],     # 7  167
+            [-width-armLength + propShortLength - propWidth, +closeTL, 
+             +length+armLength + propShortLength + propWidth],     # 4  164
+            [-width-armLength + propShortLength + propWidth, +closeTU, 
+             +length+armLength + propShortLength - propWidth],     # 5  165
+            [-width-armLength + propShortLength + propWidth, +closeBU, 
+             +length+armLength + propShortLength - propWidth],     # 6  166
+            [-width-armLength + propShortLength - propWidth, +closeBL, 
+             +length+armLength + propShortLength + propWidth],     # 7  167
+
             # South East far wide
-            [-width-armLength + propNarrowLength - propWidth, +farTL, +length+armLength + propNarrowLength + propWidth],     # 4  168
-            [-width-armLength + propNarrowLength + propWidth, +farTU, +length+armLength + propNarrowLength - propWidth],     # 5  169
-            [-width-armLength + propNarrowLength + propWidth, +farBU, +length+armLength + propNarrowLength - propWidth],     # 6  170
-            [-width-armLength + propNarrowLength - propWidth, +farBL, +length+armLength + propNarrowLength + propWidth],     # 7  171
+            [-width-armLength + propNarrowLength - propWidth, +farTL, 
+             +length+armLength + propNarrowLength + propWidth],     # 4  168
+            [-width-armLength + propNarrowLength + propWidth, +farTU, 
+             +length+armLength + propNarrowLength - propWidth],     # 5  169
+            [-width-armLength + propNarrowLength + propWidth, +farBU, 
+             +length+armLength + propNarrowLength - propWidth],     # 6  170
+            [-width-armLength + propNarrowLength - propWidth, +farBL, 
+             +length+armLength + propNarrowLength + propWidth],     # 7  171
+
             # South East far narrow tip
-            [-width-armLength + propLength - propNarrowWidth, +tipTL, +length+armLength + propLength + propNarrowWidth],     # 0   172
-            [-width-armLength + propLength + propNarrowWidth, +tipTU, +length+armLength + propLength - propNarrowWidth],     # 1   173
-            [-width-armLength + propLength + propNarrowWidth, +tipBU, +length+armLength + propLength - propNarrowWidth],     # 2  174
-            [-width-armLength + propLength - propNarrowWidth, +tipBL, +length+armLength + propLength + propNarrowWidth]      # 3  175
+            [-width-armLength + propLength - propNarrowWidth, +tipTL, 
+             +length+armLength + propLength + propNarrowWidth],     # 0   172
+            [-width-armLength + propLength + propNarrowWidth, +tipTU, 
+             +length+armLength + propLength - propNarrowWidth],     # 1   173
+            [-width-armLength + propLength + propNarrowWidth, +tipBU, 
+             +length+armLength + propLength - propNarrowWidth],     # 2  174
+            [-width-armLength + propLength - propNarrowWidth, +tipBL, 
+             +length+armLength + propLength + propNarrowWidth]      # 3  175
             ]
 
     #  Each face contains indices into points array above
