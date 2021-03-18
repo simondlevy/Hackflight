@@ -27,6 +27,10 @@ class AttitudeParser(Parser):
 
         self.port.write(self.request)
 
+    def update(self):
+
+        self.parse(self.port.read(1))
+
     def dispatchMessage(self):
 
         if self.message_id == 121:
@@ -65,7 +69,7 @@ def main():
 
         try:
 
-            parser.parse(port.read(1))
+            parser.update()
 
         except KeyboardInterrupt:
 
