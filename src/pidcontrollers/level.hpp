@@ -21,7 +21,7 @@ namespace hf {
         private:
 
             // Helper class
-            class _AnglePid : public rft::Pid {
+            class _AnglePid : public rft::DofPid {
 
                 private:
 
@@ -35,12 +35,12 @@ namespace hf {
 
                     void begin(const float Kp) 
                     {
-                        Pid::begin(Kp, 0, 0);
+                        DofPid::begin(Kp, 0, 0);
                     }
 
                     float compute(float demand, float angle)
                     {
-                        return Pid::compute(demand*_demandMultiplier, angle);
+                        return DofPid::compute(demand*_demandMultiplier, angle);
                     }
 
             }; // class _AnglePid

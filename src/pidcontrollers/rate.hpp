@@ -18,7 +18,7 @@
 namespace hf {
 
     // Helper class for all three axes
-    class _AngularVelocityPid : public rft::Pid {
+    class _AngularVelocityPid : public rft::DofPid {
 
         private: 
 
@@ -33,7 +33,7 @@ namespace hf {
 
             void begin(const float Kp, const float Ki, const float Kd) 
             {
-                Pid::begin(Kp, Ki, Kd, WINDUP_MAX);
+                DofPid::begin(Kp, Ki, Kd, WINDUP_MAX);
 
                 // Convert degree parameters to radians for use later
                 _bigAngularVelocity = rft::Filter::deg2rad(BIG_DEGREES_PER_SECOND);
@@ -46,7 +46,7 @@ namespace hf {
                     reset();
                 }
 
-                return Pid::compute(demand, angularVelocity);
+                return DofPid::compute(demand, angularVelocity);
             }
 
     };  // class _AngularVelocityPid
