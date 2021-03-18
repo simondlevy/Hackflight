@@ -58,10 +58,14 @@ def get_vehicle(width, depth, length):
             [+width + armWidth, -depth/2, +length - armWidth],  # 2   2
             [+width - armWidth, -depth/2, +length + armWidth],  # 3   3
 
-            [+width + armLength - armWidth, +depth/2, +length + armLength + armWidth],  # 4   4
-            [+width + armLength + armWidth, +depth/2, +length + armLength - armWidth],  # 5   5
-            [+width + armLength + armWidth, -depth/2, +length + armLength - armWidth],  # 6   6
-            [+width + armLength - armWidth, -depth/2, +length + armLength + armWidth],  # 7   7
+            [+width + armLength - armWidth, +depth/2, 
+             +length + armLength + armWidth],                   # 4   4
+            [+width + armLength + armWidth, +depth/2, 
+             +length + armLength - armWidth],                   # 5   5
+            [+width + armLength + armWidth, -depth/2, 
+             +length + armLength - armWidth],                   # 6   6
+            [+width + armLength - armWidth, -depth/2, 
+             +length + armLength + armWidth],                   # 7   7
 
             # creates arm 2
             [-width - armWidth, +depth/2, +length - armWidth],  # 0   8
@@ -69,16 +73,24 @@ def get_vehicle(width, depth, length):
             [-width + armWidth, -depth/2, +length + armWidth],  # 2   10
             [-width - armWidth, -depth/2, +length - armWidth],  # 3   11
 
-            [-width - armLength - armWidth, +depth/2, +length + armLength - armWidth],  # 4   12
-            [-width - armLength + armWidth, +depth/2, +length + armLength + armWidth],  # 5   13
-            [-width - armLength + armWidth, -depth/2, +length + armLength + armWidth],  # 6   14
-            [-width - armLength - armWidth, -depth/2, +length + armLength - armWidth],  # 7   15
+            [-width - armLength - armWidth, +depth/2, 
+             +length + armLength - armWidth],                   # 4   12
+            [-width - armLength + armWidth, +depth/2, 
+             +length + armLength + armWidth],                   # 5   13
+            [-width - armLength + armWidth, -depth/2, 
+             +length + armLength + armWidth],                   # 6   14
+            [-width - armLength - armWidth, -depth/2, 
+             +length + armLength - armWidth],                   # 7   15
 
             # creates arm 3
-            [+width + armLength - armWidth, +depth/2, -length - armLength - armWidth],  # 0   16
-            [+width + armLength + armWidth, +depth/2, -length - armLength + armWidth],  # 1   17
-            [+width + armLength + armWidth, -depth/2, -length - armLength + armWidth],  # 2   18
-            [+width + armLength - armWidth, -depth/2, -length - armLength - armWidth],  # 3   19
+            [+width + armLength - armWidth, +depth/2, 
+             -length - armLength - armWidth],                   # 0   16
+            [+width + armLength + armWidth, +depth/2, 
+             -length - armLength + armWidth],                   # 1   17
+            [+width + armLength + armWidth, -depth/2, 
+             -length - armLength + armWidth],                   # 2   18
+            [+width + armLength - armWidth, -depth/2, 
+             -length - armLength - armWidth],                   # 3   19
 
             [+width - armWidth, +depth/2, -length - armWidth],  # 4   20
             [+width + armWidth, +depth/2, -length + armWidth],  # 5   21
@@ -86,10 +98,14 @@ def get_vehicle(width, depth, length):
             [+width - armWidth, -depth/2, -length - armWidth],  # 7   23
 
             # creates arm 4
-            [-width - armLength - armWidth, +depth/2, -length - armLength + armWidth],  # 0   24
-            [-width - armLength + armWidth, +depth/2, -length - armLength - armWidth],  # 1   25
-            [-width - armLength + armWidth, -depth/2, -length - armLength - armWidth],  # 2   26
-            [-width - armLength - armWidth, -depth/2, -length - armLength + armWidth],  # 3   27
+            [-width - armLength - armWidth, +depth/2, 
+             -length - armLength + armWidth],                   # 0   24
+            [-width - armLength + armWidth, +depth/2, 
+             -length - armLength - armWidth],                   # 1   25
+            [-width - armLength + armWidth, -depth/2, 
+             -length - armLength - armWidth],                   # 2   26
+            [-width - armLength - armWidth, -depth/2, 
+             -length - armLength + armWidth],                   # 3   27
 
             [-width - armWidth, +depth/2, -length + armWidth],  # 4   28
             [-width + armWidth, +depth/2, -length - armWidth],  # 5   29
@@ -97,51 +113,51 @@ def get_vehicle(width, depth, length):
             [-width - armWidth, -depth/2, -length + armWidth],  # 7   31
 
             # creates the arrow body
-            [-arrowWidth, +arrowHeight, 0],  # 0   32
-            [+arrowWidth, +arrowHeight, 0],  # 1   33
-            [+arrowWidth, +depth, 0],       # 2   34
-            [-arrowWidth, +depth, 0],       # 3   35
+            [-arrowWidth, +arrowHeight, 0],                     # 0   32
+            [+arrowWidth, +arrowHeight, 0],                     # 1   33
+            [+arrowWidth, +depth, 0],                           # 2   34
+            [-arrowWidth, +depth, 0],                           # 3   35
 
-            [-arrowWidth, +arrowHeight, +arrowLength],  # 4  36
-            [+arrowWidth, +arrowHeight, +arrowLength],  # 5  37
-            [+arrowWidth, +depth, +arrowLength],       # 6  38
-            [-arrowWidth, +depth, +arrowLength],       # 7  39
+            [-arrowWidth, +arrowHeight, +arrowLength],          # 4  36
+            [+arrowWidth, +arrowHeight, +arrowLength],          # 5  37
+            [+arrowWidth, +depth, +arrowLength],                # 6  38
+            [-arrowWidth, +depth, +arrowLength],                # 7  39
 
             # creates the arrow head
-            [-(1/6)*arrowWidth, +arrowHeight, -arrowLength],  # 0  40
-            [+(1/6)*arrowWidth, +arrowHeight, -arrowLength],  # 1  41
-            [+(1/6)*arrowWidth, +depth, -arrowLength],       # 2  42
-            [-(1/6)*arrowWidth, +depth, -arrowLength],       # 3  43
+            [-(1/6)*arrowWidth, +arrowHeight, -arrowLength],    # 0  40
+            [+(1/6)*arrowWidth, +arrowHeight, -arrowLength],    # 1  41
+            [+(1/6)*arrowWidth, +depth, -arrowLength],          # 2  42
+            [-(1/6)*arrowWidth, +depth, -arrowLength],          # 3  43
 
-            [-arrowWidth - 2*arrowWidth, +arrowHeight, 0],   # 4  44
-            [+arrowWidth + 2*arrowWidth, +arrowHeight, 0],   # 5  45
-            [+arrowWidth + 2*arrowWidth, +depth, 0],         # 6  46
-            [-arrowWidth - 2*arrowWidth, +depth, 0],         # 7  47
+            [-arrowWidth - 2*arrowWidth, +arrowHeight, 0],      # 4  44
+            [+arrowWidth + 2*arrowWidth, +arrowHeight, 0],      # 5  45
+            [+arrowWidth + 2*arrowWidth, +depth, 0],            # 6  46
+            [-arrowWidth - 2*arrowWidth, +depth, 0],            # 7  47
 
             # creates the center box
-            [-width - armWidth, +depth, -length + armWidth],  # 0  48
-            [-width + armWidth, +depth, -length - armWidth],  # 1  49
+            [-width - armWidth, +depth, -length + armWidth],    # 0  48
+            [-width + armWidth, +depth, -length - armWidth],    # 1  49
 
-            [+width - armWidth, +depth, -length - armWidth],  # 2  50
-            [+width + armWidth, +depth, -length + armWidth],  # 3  51
+            [+width - armWidth, +depth, -length - armWidth],    # 2  50
+            [+width + armWidth, +depth, -length + armWidth],    # 3  51
 
-            [+width - armWidth, -depth, -length - armWidth],  # 4  52
-            [+width + armWidth, -depth, -length + armWidth],  # 5  53
+            [+width - armWidth, -depth, -length - armWidth],    # 4  52
+            [+width + armWidth, -depth, -length + armWidth],    # 5  53
 
-            [-width - armWidth, -depth, -length + armWidth],  # 6  54
-            [-width + armWidth, -depth, -length - armWidth],  # 7  55
+            [-width - armWidth, -depth, -length + armWidth],    # 6  54
+            [-width + armWidth, -depth, -length - armWidth],    # 7  55
 
-            [-width - armWidth, +depth, +length - armWidth],  # 8  56
-            [-width + armWidth, +depth, +length + armWidth],  # 9  57
+            [-width - armWidth, +depth, +length - armWidth],    # 8  56
+            [-width + armWidth, +depth, +length + armWidth],    # 9  57
 
-            [+width - armWidth, +depth, +length + armWidth],  # 10 58
-            [+width + armWidth, +depth, +length - armWidth],  # 11 59
+            [+width - armWidth, +depth, +length + armWidth],    # 10 58
+            [+width + armWidth, +depth, +length - armWidth],    # 11 59
 
-            [+width - armWidth, -depth, +length + armWidth],  # 12 60
-            [+width + armWidth, -depth, +length - armWidth],  # 13 61
+            [+width - armWidth, -depth, +length + armWidth],    # 12 60
+            [+width + armWidth, -depth, +length - armWidth],    # 13 61
 
-            [-width - armWidth, -depth, +length - armWidth],  # 14 62
-            [-width + armWidth, -depth, +length + armWidth],  # 15 63
+            [-width - armWidth, -depth, +length - armWidth],    # 14 62
+            [-width + armWidth, -depth, +length + armWidth],    # 15 63
 
             # creates prop 1 on arm 1
 
