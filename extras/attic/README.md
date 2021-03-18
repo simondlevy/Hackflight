@@ -1,93 +1,3 @@
-<p align="center"> 
-<img src="extras/media/logo.png" width=450>
-</p>
-
-Hackflight is a simple, platform-independent, header-only C++ toolkit for
-building multirotor flight controllers.  It is geared toward people like
-me who want to tinker with flight-control firmware, and use it to teach
-students about ideas like inertial measurement and PID tuning.  <b>If you are
-in the 99% percent of users who just want to get your vehicle flying without
-getting into firmware hacking, I recommend
-[Betaflight](http://betaflight.com/)</b> (great for getting started when
-you're on a budget) <b>or the [Ardupilot](http://copter.ardupilot.org)
-system</b> (for sophisticated mission planning with waypoint navigation and the
-like).  In addition to big user communities and loads of great features, these
-platforms have safety mechanisms that Hackflight lacks, which will help avoid
-injury to you and damage to your vehicle.
-
-Hackflight is currently working on the following platforms:
-
-* [TinyPICO](https://www.tinypico.com)
-
-* [Ladybug](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) brushed flight controller
-from Tlera Corp.
-
-* [SuperFly](https://www.tindie.com/products/onehorse/superfly-hackable-esp8266-flight-controller/) 
-Hackable ESP8266 Flight Controller from Pesky Products
-
-* [Butterfly DIY](https://diydrones.com/profiles/blogs/hackhawk-ii-an-arduino-compatible-brushless-flight-controller)
-brushless flight controller (components from from Tlera Corp. and Pesky Products)
-
-* [MulticopterSim](https://github.com/simondlevy/MulticopterSim) flight simulator based on UnrealEngine4
-
-By supporting floating-point operations, these platforms allow us to write simpler code based on standard units:
-
-* Distances in meters
-* Time in seconds
-* Quaternions in the interval [-1,+1]
-* Euler angles in radians
-* Accelerometer values in Gs
-* Barometric pressure in Pascals
-* Stick demands in the interval [-1,+1]
-* Motor demands in [0,1]
-
-Thanks to some help from [Sytelus](https://github.com/sytelus), the core
-Hackflight
-[firmware](https://github.com/simondlevy/hackflight/tree/master/src)
-adheres to standard practices for C++, notably, short, simple methods and
-minimal use of compiler macros like <b>#ifdef</b> that can make it difficult to
-follow what the code is doing.  
-
-Because a DIY multirotor build typically involves choosing a microcontroller board,
-inertial measurement unit (IMU), radio receiver, model (airframe), motors, and PID
-control settings, Hackflight provides a separate C++ class to support each of
-these components:
-
-* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/board.hpp">Board</a>
-class specifies an abstract (pure virtual) <tt>getTime()</tt> method that you must
-implement for a particular microcontroller or simulator.
-* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/imu.hpp">IMU</a>
-class specifies an abstract (pure virtual) <tt>getQuaternion()</tt> and
-<tt>getGyrometer()</tt> method that you must implement for a particular IMU.
-* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/receiver.hpp">Receiver</a>
-class performs basic functions associated with R/C control (tracking stick
-positions, checking switches) and specifies a set of abstract methods that you
-implement for a particular receiver (reading channels values).  
-* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/actuators/mixer.hpp">Mixer</a>
-class is an abstract class that can be subclassed for various motor
-configurations (QuadX, Hexacopter, Tricopter, etc.).  The 
-<a href="https://github.com/simondlevy/Hackflight/blob/master/src/actuators/mixers/quadxcf.hpp">QuadXCF</a>
-(quad-X using Cleanflight numbering conventions)  and
-<a href="https://github.com/simondlevy/Hackflight/blob/master/src/actuators/mixers/quadxap.hpp">QuadXAP</a>
-(quad-X using ArduPilot numbering conventions) subclasses are already implemented.  
-* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/motor.hpp">Motor</a> class
-supports different kinds of motors (brushed, brushless).
-* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/pidcontroller.hpp">PidController</a>
-class provides a constructor where you specify the PID values appropriate for your model (see
-<b>PID Controllers</b> discussion below).
-
-Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
-channel values,  we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program.
-that allows you to connect to the board and see what's going on. Windows users
-can run this program directly: just download
-[this zipfile](https://simondlevy.academic.wlu.edu/files/software/hackflight-gcs.zip),
-unzip the file, open the folder, and double-click on <b>hackflight.exe</b>.
-Others can run the <b>hackflight.py</b> Python script in the
-<b>extras/gcs/python</b> folder.  To run the Python script you'll
-need to install [MSPPG](https://github.com/simondlevy/hackflight/tree/master/extras/parser), a
-parser generator for the Multiwii Serial Protocol (MSP) messages used by the
-firmware. Follow the directions in that folder to install MSPPG for Python.
-
 To support working with new new sensors and PID control algorithms, the <b>Hackflight</b> C++ class provides
 two methods: <tt>addSensor</tt> and <tt>addPidController</tt>.   For an example of how to use these
 methods, take a look at 
@@ -130,9 +40,6 @@ inertial measurement units (IMUs) like the MPU9250 that do not deliver a
 hardware quaternion, Hackflight provides a
 [QuaternionFilter](https://github.com/simondlevy/Hackflight/blob/master/src/filters.hpp#L109-L129)
 class that can be used to compute the quaternion using your microcontroller.
-
-If you're mathematically-minded, you can think of a sensor as a function from states to states:
-<i>Sensor</i>: <i>State</i> &rarr; <i>State</i>
 
 To provide access to other popular surface-mount sensors that you may wish to read, Hackflight also has classes to support
 [accelerometers](https://github.com/simondlevy/Hackflight/blob/master/src/sensors/surfacemount/accelerometer.hpp), 
@@ -209,9 +116,6 @@ the next.  For example, to get Stabilize mode, you want the Level controller to 
 and the Rate controller to go next, to control the rate at which the desired angle will be reached.
 
 <p align="center"> <img src="extras/media/pidcontrollers.png" width=600> </p>
-
-If you're mathematically-minded, you can think of a PID Controller as a function from a (<i>State</i>, <i>Demands</i>) pair to <i>Demands</i>:
-<b><i>PID Controller</i>: <i>State</i> &times; <i>Demands</i> &rarr; <i>Demands</i></b>
 
 ### Board classes
 

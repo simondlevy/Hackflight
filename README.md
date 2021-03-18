@@ -2,6 +2,8 @@
 <img src="extras/media/logo.png" width=450>
 </p>
 
+## Intro
+
 Hackflight is a simple, platform-independent, header-only C++ toolkit for
 building multirotor flight controllers.  It is geared toward people like
 me who want to tinker with flight-control firmware, and use it to teach
@@ -14,6 +16,8 @@ system</b> (for sophisticated mission planning with waypoint navigation and the
 like).  In addition to big user communities and loads of great features, these
 platforms have safety mechanisms that Hackflight lacks, which will help avoid
 injury to you and damage to your vehicle.
+
+## Supported platforms
 
 Hackflight is currently working on the following platforms:
 
@@ -30,7 +34,10 @@ brushless flight controller (components from from Tlera Corp. and Pesky Products
 
 * [MulticopterSim](https://github.com/simondlevy/MulticopterSim) flight simulator based on UnrealEngine4
 
-By supporting floating-point operations, these platforms allow us to write simpler code based on standard units:
+## Standard units
+
+By supporting floating-point operations, these platforms allow us to write
+simpler code based on standard units:
 
 * Distances in meters
 * Time in seconds
@@ -41,12 +48,25 @@ By supporting floating-point operations, these platforms allow us to write simpl
 * Stick demands in the interval [-1,+1]
 * Motor demands in [0,1]
 
+## Design principles
+
 Thanks to some help from [Sytelus](https://github.com/sytelus), the core
 Hackflight
 [firmware](https://github.com/simondlevy/hackflight/tree/master/src)
 adheres to standard practices for C++, notably, short, simple methods and
 minimal use of compiler macros like <b>#ifdef</b> that can make it difficult to
 follow what the code is doing.  
+
+A typical Arduino sketch for hackflight is written as follows:
+
+1. Construct a ```Hackflight``` objecting using a ```Board```, ```Receiver```, and
+```Mixer``` object.
+
+2. Add sensors (```Gyrometer```, ```Quaternion```)
+
+3. Add PID controllers (```Rate```, ```Level```)
+
+4. In the ```loop()``` function, call ```Hackflight::update()```
 
 ## RoboFirmwareToolkit
 
