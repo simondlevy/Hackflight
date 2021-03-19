@@ -3,6 +3,7 @@
 
    Additional libraries needed:
 
+       https://github.com/simondlevy/RoboFirmwareToolkit
        https://github.com/simondlevy/CrossPlatformDataBus
        https://github.com/simondlevy/USFS
        https://github.com/simondlevy/DSMRX
@@ -12,49 +13,28 @@
    MIT License
  */
 
+#include <RoboFirmwareToolkit.hpp>
+#include <rft_boards/realboards/tinypico.hpp>
+#include <rft_motors/mock.hpp>
+
 #include "hackflight.hpp"
-#include "boards/realboards/tinypico.hpp"
-#include "receivers/arduino/dsmx.hpp"
 #include "mixers/quadxcf.hpp"
-#include "motors/standard.hpp"
-#include "imus/usfs/usfs_rotated.hpp"
-#include "imus/mock.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 
 #include "receivers/mock.hpp"
-#include "motors/mock.hpp"
 
-static const uint8_t SERIAL1_RX = 4;
-static const uint8_t SERIAL1_TX = 14; // unused
+rft::TinyPico board;
 
-static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+hf::MockReceiver receiver;
 
-static constexpr float DEMAND_SCALE = 8.0f;
+rft::MockMotor motors;
 
-static const uint8_t MOTOR_PINS[4] = {25, 26 ,27, 15};
+static hf::MixerQuadXCF mixer(&motors);
 
-hf::Hackflight h;
+static hf::Hackflight h(&board, &receiver, &mixer);
 
-hf::DSMX_Receiver rc = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
-
-hf::MixerQuadXCF mixer;
-
-hf::USFS_Rotated imu;
-
-hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
-
-static const float D = 16;
-
-// hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f); 
-hf::RatePid ratePid = hf::RatePid( 0.01f, 0.00f, 0.00f, 0.010f, 0.001f); 
-
-hf::LevelPid levelPid = hf::LevelPid(0.20f);
-
-//hf::MockReceiver rc;
-//hf::MockMotor motors;
-//hf::MockIMU imu;
-
+/*
 // Timer task for DSMX serial receiver
 static void receiverTask(void * params)
 {
@@ -67,24 +47,26 @@ static void receiverTask(void * params)
         delay(1);
     }
 }
+*/
 
 void setup(void)
 {
     // Start receiver on Serial1
-    Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
-
-    h.init(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
+    //Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
     // Add PID controllers
-    h.addPidController(&levelPid);
-    h.addPidController(&ratePid);
+    //h.addPidController(&levelPid);
+    //h.addPidController(&ratePid);
 
     // Start the receiver timed task
-    TaskHandle_t task;
-    xTaskCreatePinnedToCore(receiverTask, "ReceiverTask", 10000, NULL, 1, &task, 1);
+    //TaskHandle_t task;
+    //xTaskCreatePinnedToCore(receiverTask, "ReceiverTask", 10000, NULL, 1, &task, 1);
+
+    // Initialize Hackflight firmware
+    h.begin();
 }
 
 void loop(void)
 {
-    h.update();
+    //h.update();
 }
