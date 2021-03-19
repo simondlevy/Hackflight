@@ -21,9 +21,9 @@
 
 #include <RoboFirmwareToolkit.hpp>
 #include <rft_motors/standard.hpp>
-#include <rft_boards/realboards/arduino/butterfly_piggyback.hpp>
 
 #include "hackflight.hpp"
+#include "boards/butterfly_piggyback.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
