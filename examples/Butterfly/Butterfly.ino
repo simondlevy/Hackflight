@@ -33,7 +33,7 @@
 static const uint8_t MOTOR_PINS[4] = {5, 8 , 9, 11};
 static rft::StandardMotor motors = rft::StandardMotor(MOTOR_PINS, 4);
 
-static rft::Butterfly board;
+static hf::ButterflyPiggyback board;
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 8.58f;
