@@ -21,11 +21,26 @@ namespace hf {
 
     class LadybugFC : public rft::ArduinoBoard {
 
+        private:
+
+            static constexpr uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
+
         public:
+
+            rft::BrushedMotor motors = rft::BrushedMotor(MOTOR_PINS, 4);
+
+            UsfsGyro gyro;
+            UsfsQuat quat;
 
             LadybugFC(void)
                 : ArduinoBoard(A4)
             {
+            }
+
+            void begin(void) override 
+            {
+                rft::ArduinoBoard::begin();
+
                 // Start I^2C
                 Wire.begin();
 
