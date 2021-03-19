@@ -23,11 +23,7 @@ Hackflight is currently working on the following platforms:
 
 * [TinyPICO](https://www.tinypico.com)
 
-* [Ladybug](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) brushed flight controller
-from Tlera Corp.
-
-* [SuperFly](https://www.tindie.com/products/onehorse/superfly-hackable-esp8266-flight-controller/) 
-Hackable ESP8266 Flight Controller from Pesky Products
+* [Ladybug Flight Controller](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) from Tlera Corp
 
 * [Butterfly DIY](https://diydrones.com/profiles/blogs/hackhawk-ii-an-arduino-compatible-brushless-flight-controller)
 brushless flight controller (components from from Tlera Corp. and Pesky Products)
@@ -82,12 +78,11 @@ controllers below.)
 Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
 channel values,  we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program.
 that allows you to connect to the board and see what's going on. Windows users
-can run this program directly: just download
-[this zipfile](https://simondlevy.academic.wlu.edu/files/software/hackflight-gcs.zip),
-unzip the file, open the folder, and double-click on <b>hackflight.exe</b>.
-Others can run the <b>hackflight.py</b> Python script in the
-<b>extras/gcs/python</b> folder.  To run the Python script you'll
-need to install [MSPPG](https://github.com/simondlevy/hackflight/tree/master/extras/parser), a
+can run this program directly: just clone the [HackflightGCS](https://github.com/simondlevy/HackflightGCS)
+repository and double-click on <b>hackflight.exe</b>.  Others can run the
+<b>hackflight.py</b> Python script in the <b>extras/gcs/python</b> folder.  To
+run the Python script you'll need to install
+[MSPPG](https://github.com/simondlevy/hackflight/tree/master/extras/parser), a
 parser generator for the Multiwii Serial Protocol (MSP) messages used by the
 firmware. Follow the directions in that folder to install MSPPG for Python.
 
