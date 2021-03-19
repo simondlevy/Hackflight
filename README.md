@@ -82,7 +82,7 @@ can run this program directly: just clone the [HackflightGCS](https://github.com
 repository and double-click on <b>hackflight.exe</b>.  Others can run the
 <b>hackflight.py</b> Python script in the <b>extras/gcs/python</b> folder.  To
 run the Python script you'll need to install
-[MSPPG](https://github.com/simondlevy/hackflight/tree/master/extras/parser), a
+[MSPPG](https://github.com/simondlevy/RoboFirmwareToolkit/tree/master/extras/parser), a
 parser generator for the Multiwii Serial Protocol (MSP) messages used by the
 firmware. Follow the directions in that folder to install MSPPG for Python.
 
