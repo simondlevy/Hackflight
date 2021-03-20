@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include <RFT_filters.hpp>
 #include <RFT_state.hpp>
 #include <RFT_closedloops/pidcontroller.hpp>
 
 #include "demands.hpp"
+#include "state.hpp"
 
 namespace hf {
 
@@ -27,20 +27,22 @@ namespace hf {
             bool _inBandPrev = false;
 
             // P controller for position.  This will serve as the set-point for velocity PID.
-            DofPid _posPid;
+            rft::DofPid _posPid;
 
             // PID controller for velocity
-            DofPid _velPid;
+            rft::DofPid _velPid;
 
             // This will be reset each time we re-enter throttle deadband.
             float _altitudeTarget = 0;
 
         protected:
 
-            void modifyDemands(State * state, float * demands)
+            void modifyDemands(rft::State * state, float * demands)
             {
+                float * x = ((State *)state)->x;
+
                 bool didReset = false;
-                float altitude = state->x[STATE_Z];
+                float altitude = x[State::STATE_Z];
 
                 // Is stick demand in deadband?
                 bool inBand = fabs(demands[DEMANDS_THROTTLE]) < STICK_DEADBAND; 
@@ -58,7 +60,7 @@ namespace hf {
                                        PILOT_VELZ_MAX * demands[DEMANDS_THROTTLE];
 
                 // Run velocity PID controller to get correction
-                demands[DEMANDS_THROTTLE] = _velPid.compute(targetVelocity, state->x[STATE_DZ]);
+                demands[DEMANDS_THROTTLE] = _velPid.compute(targetVelocity, x[State::STATE_DZ]);
 
                 // If we re-entered deadband, we reset the target altitude.
                 if (didReset) {
