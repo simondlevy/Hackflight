@@ -10,7 +10,7 @@
 
 #include <Wire.h>
 #include <USFS_Master.h>
-#include <RFT_sensor.hpp>
+#include <sensor.hpp>
 
 namespace hf {
 
@@ -66,7 +66,7 @@ namespace hf {
 
     static _USFS  _usfs;
 
-    class UsfsQuat : public rft::Sensor {
+    class UsfsQuat : public Sensor {
 
         private:
 
@@ -85,11 +85,9 @@ namespace hf {
                 _usfs.begin();
             }
 
-            virtual void modifyState(rft::State * state, float time) override
+            virtual void modifyState(State * state, float time) override
             {
                 (void)time;
-
-                State * mavstate = (State *)state;
 
                 float qw = 0;
                 float qx = 0;
@@ -99,16 +97,16 @@ namespace hf {
                 _usfs.sentral.readQuaternion(qw, qx, qy, qz);
 
                 computeEulerAngles(qw, qx, qy, qz,
-                        mavstate->x[State::STATE_PHI],
-                        mavstate->x[State::STATE_THETA],
-                        mavstate->x[State::STATE_PSI]);
+                        state->x[State::STATE_PHI],
+                        state->x[State::STATE_THETA],
+                        state->x[State::STATE_PSI]);
 
                 // Adjust rotation so that nose-up is positive
-                mavstate->x[State::STATE_THETA] = -mavstate->x[State::STATE_THETA];
+                state->x[State::STATE_THETA] = -state->x[State::STATE_THETA];
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (mavstate->x[State::STATE_PSI] < 0) {
-                    mavstate->x[State::STATE_PSI] += 2*M_PI;
+                if (state->x[State::STATE_PSI] < 0) {
+                    state->x[State::STATE_PSI] += 2*M_PI;
                 }
             }
 
@@ -124,7 +122,7 @@ namespace hf {
     }; // class UsfsQuat
 
 
-    class UsfsGyro : public rft::Sensor {
+    class UsfsGyro : public Sensor {
 
         protected:
 
@@ -133,12 +131,9 @@ namespace hf {
                 _usfs.begin();
             }
 
-            virtual void modifyState(rft::State * state, float time) override
+            virtual void modifyState(State * state, float time) override
             {
                 (void)time;
-
-                // Cast rft::state to hf::state
-                State * mavstate = (State *)state;
 
                 float gx = 0;
                 float gy = 0;
@@ -148,9 +143,9 @@ namespace hf {
                 _usfs.sentral.readGyrometer(gx, gy, gz);
 
                 // Convert degrees / sec to radians / sec
-                mavstate->x[State::STATE_DPHI] = radians(gx);
-                mavstate->x[State::STATE_DTHETA] = radians(gy);
-                mavstate->x[State::STATE_DPSI] = radians(gz);
+                state->x[State::STATE_DPHI] = radians(gx);
+                state->x[State::STATE_DTHETA] = radians(gy);
+                state->x[State::STATE_DPSI] = radians(gz);
             }
 
             virtual bool ready(float time) override
