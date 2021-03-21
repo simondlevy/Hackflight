@@ -14,7 +14,7 @@
  */
 
 #include <RoboFirmwareToolkit.hpp>
-#include <rft_motors/mock.hpp>
+#include <rft_motors/standard.hpp>
 
 #include "hackflight.hpp"
 #include "boards/tinypico_belly.hpp"
@@ -23,52 +23,64 @@
 #include "pidcontrollers/level.hpp"
 #include "sensors/usfs.hpp"
 
-#include "receivers/mock.hpp"
+#include "receivers/arduino/dsmx.hpp"
 
-hf::TinyPicoBelly board;
+// Receiver --------------------------------------------------------------
 
-hf::MockReceiver receiver;
+static const uint8_t SERIAL1_RX = 32;
+static const uint8_t SERIAL1_TX = 33;  // unused
 
-rft::MockMotor motors;
+static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+static constexpr float DEMAND_SCALE = 8.0f;
 
-static hf::MixerQuadXCF mixer(&motors);
+hf::DSMX_Receiver receiver = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
 
-static hf::Hackflight h(&board, &receiver, &mixer);
-
-static hf::UsfsGyro gyro;
-static hf::UsfsQuat quat;
-
-/*
-// Timer task for DSMX serial receiver
 static void receiverTask(void * params)
 {
     while (true) {
 
         if (Serial1.available()) {
-            rc.handleSerialEvent(Serial1.read(), micros());
+            receiver.handleSerialEvent(Serial1.read(), micros());
         }
 
         delay(1);
     }
 }
-*/
+
+// Motors ----------------------------------------------------------------
+
+static const uint8_t MOTOR_PINS[4] = {25, 26 ,27, 15};
+
+rft::StandardMotor motors = rft::StandardMotor(MOTOR_PINS, 4);
+
+// -----------------------------------------------------------------------
+
+hf::TinyPicoBelly board;
+
+static hf::UsfsGyro gyro;
+static hf::UsfsQuat quat;
+static hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f); 
+static hf::LevelPid levelPid = hf::LevelPid(0.20f);
+static hf::MixerQuadXCF mixer(&motors);
+
+static hf::Hackflight h(&board, &receiver, &mixer);
 
 void setup(void)
 {
     // Start receiver on Serial1
-    //Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
+    Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
     // Add gyro, quaternion sensors
     h.addSensor(&gyro);
     h.addSensor(&quat);
 
     // Add PID controllers
-    //h.addPidController(&levelPid);
-    //h.addPidController(&ratePid);
+    h.addClosedLoopController(&levelPid);
+    h.addClosedLoopController(&ratePid);
 
     // Start the receiver timed task
-    //TaskHandle_t task;
-    //xTaskCreatePinnedToCore(receiverTask, "ReceiverTask", 10000, NULL, 1, &task, 1);
+    TaskHandle_t task;
+    xTaskCreatePinnedToCore(receiverTask, "ReceiverTask", 10000, NULL, 1, &task, 1);
 
     // Initialize Hackflight firmware
     h.begin();
