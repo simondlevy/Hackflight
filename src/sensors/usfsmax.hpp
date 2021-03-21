@@ -10,7 +10,7 @@
 
 #include <Wire.h>
 #include <USFSMAX_Basic.h>
-
+#include <RFT_debugger.hpp>
 #include "sensor.hpp"
 
 namespace hf {
@@ -60,6 +60,14 @@ namespace hf {
 
         bool _begun = false;
 
+        static void error(uint8_t status)
+        {
+            while (true) {
+                rft::Debugger::printf("Got error %d\n", status);
+                delay(500);
+            }
+        }
+
         protected:
 
         USFSMAX_Basic usfsmax =
@@ -83,7 +91,39 @@ namespace hf {
         {
             if (_begun) return;
 
+            uint8_t status = usfsmax.begin(); // Start USFSMAX
+
+            Serial.print("Configuring the coprocessor...\n");
+
+            if (status) {
+                error(status);
+            }
+
+            Wire.setClock(I2C_CLOCK);// Set the I2C clock to high speed for run-mode data collection
+            delay(100);
+
             _begun = true;
+        }
+
+        USFSMAX::DataReady_t dataReady(void)
+        {
+            return usfsmax.dataReady();
+        }
+
+        bool quaternionReady(void)
+        {
+            return usfsmax.quaternionReady();
+        }
+
+        void readQuaternion(float quat[4])
+        {
+            usfsmax.readQuat(quat);
+        }
+
+        void readGyro(float gyro[3]) 
+        {
+            float acc[3] = {};
+            usfsmax.readGyroAcc(gyro, acc);
         }
 
     }; // class _USFS
@@ -113,12 +153,13 @@ namespace hf {
             {
                 (void)time;
 
-                float qw = 0;
-                float qx = 0;
-                float qy = 0;
-                float qz = 0;
+                float quat[4] = {};
+                _usfsmax.readQuaternion(quat);
 
-                //_usfs.sentral.readQuaternion(qw, qx, qy, qz);
+                float qw = quat[0];
+                float qx = quat[1];
+                float qy = quat[2];
+                float qz = quat[0];
 
                 computeEulerAngles(qw, qx, qy, qz,
                         state->x[State::STATE_PHI],
@@ -138,7 +179,7 @@ namespace hf {
             {
                 (void)time;
 
-                return false;
+                return _usfsmax.quaternionReady();
             }
 
     }; // class UsfsQuat
@@ -157,24 +198,26 @@ namespace hf {
             {
                 (void)time;
 
-                float gx = 0;
-                float gy = 0;
-                float gz = 0;
-
-                // Returns degrees / sec
-                // _usfs.sentral.readGyrometer(gx, gy, gz);
+                float gyro[3] = {};
+                _usfsmax.readGyro(gyro);
 
                 // Convert degrees / sec to radians / sec
-                state->x[State::STATE_DPHI] = radians(gx);
-                state->x[State::STATE_DTHETA] = radians(gy);
-                state->x[State::STATE_DPSI] = radians(gz);
+                state->x[State::STATE_DPHI] = radians(gyro[0]);
+                state->x[State::STATE_DTHETA] = radians(gyro[1]);
+                state->x[State::STATE_DPSI] = radians(gyro[2]);
             }
 
             virtual bool ready(float time) override
             {
                 (void)time;
 
-                return false;
+                switch (_usfsmax.dataReady()) {
+                    case USFSMAX::DATA_READY_GYRO_ACC:
+                    case USFSMAX::DATA_READY_GYRO_ACC_MAG_BARO:
+                        return true;
+                    default:
+                        return false;
+                }
             }
 
     }; // class UsfsGyro
