@@ -1,5 +1,5 @@
 /*
-   Support for USFS IMU rotated 90
+   Support for USFS IMU rotated 90 clockwise
 
    Copyright (c) 2021 Simon D. Levy
 
@@ -108,6 +108,9 @@ namespace hf {
                 if (state->x[State::STATE_PSI] < 0) {
                     state->x[State::STATE_PSI] += 2*M_PI;
                 }
+
+
+                rft::Debugger::printf("%+3.3f\n", state->x[State::STATE_PHI]);
             }
 
             virtual bool ready(float time) override

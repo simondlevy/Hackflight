@@ -15,11 +15,11 @@
 
 #include <RoboFirmwareToolkit.hpp>
 #include <rft_motors/mock.hpp>
-#include <rft_boards/realboards/tinypico.hpp>
 
 #include "hackflight.hpp"
+#include "boards/tinypico.hpp"
 #include "mixers/quadxcf.hpp"
-#include "sensors/usfsmax.hpp"
+#include "sensors/usfs_rotated.hpp"
 
 #include "receivers/mock.hpp"
 
@@ -34,7 +34,7 @@ rft::MockMotor motors;
 
 // -----------------------------------------------------------------------
 
-rft::TinyPico board;
+hf::TinyPico board;
 
 static hf::UsfsGyro gyro;
 static hf::UsfsQuat quat;

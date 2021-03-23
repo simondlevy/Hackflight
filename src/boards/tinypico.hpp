@@ -1,5 +1,5 @@
 /*
-   TinyPICO dev board with USFS on bottom
+   TinyPICO dev board with I^2C
 
    Copyright (c) 2021 Simon D. Levy
 
@@ -14,16 +14,13 @@
 
 namespace hf {
 
-    class TinyPicoBelly : public rft::TinyPico {
+    class TinyPico : public rft::TinyPico {
 
          public:
 
             void begin(void) override
             {
                 rft::TinyPico::begin();
-
-                // Use D18, D19 for power, gnd
-                rft::ArduinoBoard::powerPins(18, 19);
 
                 // Hang a bit
                 delay(100);
