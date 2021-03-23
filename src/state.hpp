@@ -33,13 +33,13 @@ namespace hf {
                 STATE_DX,
                 STATE_Y,
                 STATE_DY,
-                STATE_Z,
+                STATE_Z,            // NED, so + downward
                 STATE_DZ,
-                STATE_PHI,
+                STATE_PHI,          // + roll right
                 STATE_DPHI,
-                STATE_THETA,
+                STATE_THETA,        // + nose up
                 STATE_DTHETA,
-                STATE_PSI,
+                STATE_PSI,          // + yaw right
                 STATE_DPSI,
                 STATE_SIZE
             };

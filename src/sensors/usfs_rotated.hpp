@@ -73,8 +73,8 @@ namespace hf {
             static void computeEulerAngles(float qw, float qx, float qy, float qz,
                                            float & ex, float & ey, float & ez)
             {
-                ex = atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
-                ey = asin(2.0f*(qx*qz-qw*qy));
+                ex = -asin(2.0f*(qx*qz-qw*qy));
+                ey = -atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
                 ez = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
             }
 
@@ -101,16 +101,10 @@ namespace hf {
                         state->x[State::STATE_THETA],
                         state->x[State::STATE_PSI]);
 
-                // Adjust rotation so that nose-up is positive
-                state->x[State::STATE_THETA] = -state->x[State::STATE_THETA];
-
                 // Convert heading from [-pi,+pi] to [0,2*pi]
                 if (state->x[State::STATE_PSI] < 0) {
                     state->x[State::STATE_PSI] += 2*M_PI;
                 }
-
-
-                rft::Debugger::printf("%+3.3f\n", state->x[State::STATE_PHI]);
             }
 
             virtual bool ready(float time) override
@@ -146,8 +140,8 @@ namespace hf {
                 _usfs.sentral.readGyrometer(gx, gy, gz);
 
                 // Convert degrees / sec to radians / sec
-                state->x[State::STATE_DPHI] = radians(gx);
-                state->x[State::STATE_DTHETA] = radians(gy);
+                state->x[State::STATE_DPHI] = radians(gy);
+                state->x[State::STATE_DTHETA] = -radians(gx);
                 state->x[State::STATE_DPSI] = radians(gz);
             }
 
