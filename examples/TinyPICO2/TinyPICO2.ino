@@ -21,12 +21,29 @@
 #include "mixers/quadxcf.hpp"
 #include "sensors/usfs_rotated.hpp"
 
-#include "receivers/mock.hpp"
+#include "receivers/arduino/dsmx.hpp"
 
 // Receiver --------------------------------------------------------------
 
-hf::MockReceiver receiver;
+static const uint8_t SERIAL1_RX = 4;
+static const uint8_t SERIAL1_TX = 14;  // unused
 
+static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+static constexpr float DEMAND_SCALE = 8.0f;
+
+hf::DSMX_Receiver receiver = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
+
+static void receiverTask(void * params)
+{
+    while (true) {
+
+        if (Serial1.available()) {
+            receiver.handleSerialEvent(Serial1.read(), micros());
+        }
+
+        delay(1);
+    }
+}
 
 // Motors ----------------------------------------------------------------
 
@@ -44,9 +61,16 @@ static hf::Hackflight h(&board, &receiver, &mixer);
 
 void setup(void)
 {
+    // Start receiver on Serial1
+    Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
+
     // Add gyro, quaternion sensors
     h.addSensor(&gyro);
     h.addSensor(&quat);
+
+    // Start the receiver timed task
+    TaskHandle_t task;
+    xTaskCreatePinnedToCore(receiverTask, "ReceiverTask", 10000, NULL, 1, &task, 1);
 
     // Initialize Hackflight firmware
     h.begin();
