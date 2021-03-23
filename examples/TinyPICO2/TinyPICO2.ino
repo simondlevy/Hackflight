@@ -14,7 +14,7 @@
  */
 
 #include <RoboFirmwareToolkit.hpp>
-#include <rft_motors/mock.hpp>
+#include <rft_motors/standard.hpp>
 
 #include "hackflight.hpp"
 #include "boards/tinypico.hpp"
@@ -47,7 +47,9 @@ static void receiverTask(void * params)
 
 // Motors ----------------------------------------------------------------
 
-rft::MockMotor motors;
+static const uint8_t MOTOR_PINS[4] = {25, 26 ,27, 15};
+
+rft::StandardMotor motors = rft::StandardMotor(MOTOR_PINS, 4);
 
 // -----------------------------------------------------------------------
 
