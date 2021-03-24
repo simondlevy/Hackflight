@@ -78,9 +78,8 @@ namespace hf {
 
                 demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], x[State::STATE_DPHI]);
 
-                // XXX Why do we have to negate pitch, yaw demands and state values?
-                demands[DEMANDS_PITCH] = _pitchPid.compute(-demands[DEMANDS_PITCH], -x[State::STATE_DTHETA]);
-                demands[DEMANDS_YAW]   = _yawPid.compute(-demands[DEMANDS_YAW], -x[State::STATE_DPSI]);
+                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], x[State::STATE_DTHETA]);
+                demands[DEMANDS_YAW]   = _yawPid.compute(demands[DEMANDS_YAW], x[State::STATE_DPSI]);
 
                 // Prevent "yaw jump" during correction
                 demands[DEMANDS_YAW] =
