@@ -20,7 +20,7 @@ namespace hf {
             DSM2048 _rx;
 
             uint8_t _rxpin = 0;
-            uint8_t _txpin = 0;
+            uint8_t _txpin = 0;  // unused
 
         protected:
 
@@ -72,6 +72,12 @@ namespace hf {
 
             void start(void)
             {
+                // Start receiver on Serial1
+                Serial1.begin(115000, SERIAL_8N1, _rxpin, _txpin);
+
+                // Start the receiver timed task
+                TaskHandle_t task;
+                xTaskCreatePinnedToCore(hf::DSMX_ESP32_Serial1::receiverTask, "ReceiverTask", 10000, this, 1, &task, 1);
             }
 
     }; // class DSMX_ESP32_Serial1
