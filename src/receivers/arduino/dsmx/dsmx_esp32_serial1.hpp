@@ -13,7 +13,7 @@
 
 namespace hf {
 
-    class DSMX_Receiver : public Receiver {
+    class DSMX_ESP32_Serial1 : public Receiver {
 
         private:
 
@@ -42,7 +42,7 @@ namespace hf {
 
         public:
 
-            DSMX_Receiver(const uint8_t channelMap[6], const float demandScale)
+            DSMX_ESP32_Serial1(const uint8_t channelMap[6], const float demandScale)
                 :  Receiver(channelMap, demandScale) 
             { 
             }
@@ -52,6 +52,6 @@ namespace hf {
                 _rx.handleSerialEvent(value, usec);
             }
 
-    }; // class DSMX_Receiver
+    }; // class DSMX_ESP32_Serial1
 
 } // namespace hf

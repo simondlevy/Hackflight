@@ -33,7 +33,7 @@ static const uint8_t SERIAL1_TX = 33;  // unused
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 8.0f;
 
-hf::DSMX_Receiver receiver = hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE);  
+hf::DSMX_ESP32_Serial1 receiver = hf::DSMX_ESP32_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
 static void receiverTask(void * params)
 {
