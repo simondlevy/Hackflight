@@ -19,7 +19,6 @@ namespace hf {
     class _USFSMAX {
 
         friend class UsfsQuat;
-        friend class UsfsGyro;
 
         private:
 
@@ -91,9 +90,13 @@ namespace hf {
         {
             if (_begun) return;
 
-            uint8_t status = usfsmax.begin(); // Start USFSMAX
+            // Initialize I^2C bus, setting I2C clock speed to 100kHz
+            Wire.begin();
+            delay(100);
+            Wire.setClock(100000); 
+            delay(1000);
 
-            Serial.print("Configuring the coprocessor...\n");
+            uint8_t status = usfsmax.begin(); // Start USFSMAX
 
             if (status) {
                 error(status);
@@ -120,12 +123,6 @@ namespace hf {
             usfsmax.readQuat(quat);
         }
 
-        void readGyro(float gyro[3]) 
-        {
-            float acc[3] = {};
-            usfsmax.readGyroAcc(gyro, acc);
-        }
-
     }; // class _USFS
 
     static _USFSMAX  _usfsmax;
@@ -133,14 +130,6 @@ namespace hf {
     class UsfsQuat : public Sensor {
 
         private:
-
-            static void computeEulerAngles(float qw, float qx, float qy, float qz,
-                    float & ex, float & ey, float & ez)
-            {
-                ex = atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
-                ey = asin(2.0f*(qx*qz-qw*qy));
-                ez = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
-            }
 
         protected:
 
@@ -153,26 +142,21 @@ namespace hf {
             {
                 (void)time;
 
-                float quat[4] = {};
-                _usfsmax.readQuaternion(quat);
+                float q[4] = {};
+                _usfsmax.readQuaternion(q);
 
-                float qw = quat[0];
-                float qx = quat[1];
-                float qy = quat[2];
-                float qz = quat[0];
+                float qw = q[0];
+                float qx = q[1];
+                float qy = q[2];
+                float qz = q[3];
 
-                computeEulerAngles(qw, qx, qy, qz,
-                        state->x[State::STATE_PHI],
-                        state->x[State::STATE_THETA],
-                        state->x[State::STATE_PSI]);
+                float ex = -atan2(2.0f*(qw*qx+qy*qz),qw*qw-qx*qx-qy*qy+qz*qz);
+                float ey = -asin(2.0f*(qx*qz-qw*qy));
+                float ez = -atan2(2.0f*(qx*qy+qw*qz),qw*qw+qx*qx-qy*qy-qz*qz);
 
-                // Adjust rotation so that nose-up is positive
-                state->x[State::STATE_THETA] = -state->x[State::STATE_THETA];
-
-                // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (state->x[State::STATE_PSI] < 0) {
-                    state->x[State::STATE_PSI] += 2*M_PI;
-                }
+                state->x[State::STATE_PHI] = ex;
+                state->x[State::STATE_THETA] = ey;
+                state->x[State::STATE_PSI] = ez;
             }
 
             virtual bool ready(float time) override
@@ -184,42 +168,5 @@ namespace hf {
 
     }; // class UsfsQuat
 
-
-    class UsfsGyro : public Sensor {
-
-        protected:
-
-            virtual void begin(void) override 
-            {
-                _usfsmax.begin();
-            }
-
-            virtual void modifyState(State * state, float time) override
-            {
-                (void)time;
-
-                float gyro[3] = {};
-                _usfsmax.readGyro(gyro);
-
-                // Convert degrees / sec to radians / sec
-                state->x[State::STATE_DPHI] = radians(gyro[0]);
-                state->x[State::STATE_DTHETA] = radians(gyro[1]);
-                state->x[State::STATE_DPSI] = radians(gyro[2]);
-            }
-
-            virtual bool ready(float time) override
-            {
-                (void)time;
-
-                switch (_usfsmax.dataReady()) {
-                    case USFSMAX::DATA_READY_GYRO_ACC:
-                    case USFSMAX::DATA_READY_GYRO_ACC_MAG_BARO:
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-
-    }; // class UsfsGyro
 
 } // namespace hf
