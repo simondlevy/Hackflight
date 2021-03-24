@@ -22,6 +22,20 @@ namespace hf {
             uint8_t _rxpin = 0;
             uint8_t _txpin = 0;  // unused
 
+            static void receiverTask(void * params)
+            {
+                hf::DSMX_ESP32_Serial1 * receiver =  (hf::DSMX_ESP32_Serial1 *)params;
+
+                while (true) {
+
+                    if (Serial1.available()) {
+                        receiver->handleSerialEvent(Serial1.read(), micros());
+                    }
+
+                    delay(1);
+                }
+            }
+
         protected:
 
             void begin(void)
@@ -45,19 +59,6 @@ namespace hf {
 
         public:
 
-            static void receiverTask(void * params)
-            {
-                hf::DSMX_ESP32_Serial1 * receiver =  (hf::DSMX_ESP32_Serial1 *)params;
-
-                while (true) {
-
-                    if (Serial1.available()) {
-                        receiver->handleSerialEvent(Serial1.read(), micros());
-                    }
-
-                    delay(1);
-                }
-            }
             DSMX_ESP32_Serial1(const uint8_t channelMap[6], const float demandScale, uint8_t rxpin, uint8_t txpin)
                 :  Receiver(channelMap, demandScale) 
             { 
