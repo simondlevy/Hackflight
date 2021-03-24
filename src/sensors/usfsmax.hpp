@@ -19,6 +19,7 @@ namespace hf {
     class _USFSMAX {
 
         friend class UsfsQuat;
+        friend class UsfsGyro;
 
         private:
 
@@ -108,9 +109,23 @@ namespace hf {
             _begun = true;
         }
 
-        USFSMAX::DataReady_t dataReady(void)
+        bool gyroReady(void)
         {
-            return usfsmax.dataReady();
+            switch (usfsmax.dataReady()) {
+                case USFSMAX::DATA_READY_GYRO_ACC:
+                    return true;
+                case USFSMAX::DATA_READY_GYRO_ACC_MAG_BARO:
+                    return true;
+            }
+
+            return false;
+        }
+
+        void readGyro(float gyro[3])
+        {
+            float acc[3] = {};
+
+            usfsmax.readGyroAcc(gyro, acc);
         }
 
         bool quaternionReady(void)
@@ -128,8 +143,6 @@ namespace hf {
     static _USFSMAX  _usfsmax;
 
     class UsfsQuat : public Sensor {
-
-        private:
 
         protected:
 
@@ -168,5 +181,35 @@ namespace hf {
 
     }; // class UsfsQuat
 
+    class UsfsGyro : public Sensor {
+
+        protected:
+
+            virtual void begin(void) override 
+            {
+                _usfsmax.begin();
+            }
+
+            virtual void modifyState(State * state, float time) override
+            {
+                (void)time;
+
+                float gyro[3] = {};
+                _usfsmax.readGyro(gyro);
+
+                // Convert degrees / sec to radians / sec
+                state->x[State::STATE_DPHI] = -radians(gyro[0]);
+                state->x[State::STATE_DTHETA] = radians(gyro[1]);
+                state->x[State::STATE_DPSI] = radians(gyro[2]);
+            }
+
+            virtual bool ready(float time) override
+            {
+                (void)time;
+
+                return _usfsmax.gyroReady();
+            }
+
+    }; // class UsfsGyro
 
 } // namespace hf

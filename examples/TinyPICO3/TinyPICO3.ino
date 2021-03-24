@@ -36,6 +36,7 @@ rft::MockMotor motors;
 
 rft::TinyPico board;
 static hf::UsfsQuat quat;
+static hf::UsfsGyro gyro;
 static hf::MixerQuadXCF mixer(&motors);
 
 static hf::Hackflight h(&board, &receiver, &mixer);
@@ -44,6 +45,7 @@ void setup(void)
 {
     // Add gyro, quaternion sensors
     h.addSensor(&quat);
+    h.addSensor(&gyro);
 
     // Initialize Hackflight firmware
     h.begin();
