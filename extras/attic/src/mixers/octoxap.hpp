@@ -31,7 +31,8 @@ namespace hf {
             MixerOctoXAP(rft::Motor * motors) 
                 : Mixer(motors, 8)
             {
-                //                     Th  RR  PF  YR
+                //                     Th  Rl  Pi  Yw
+                // XXX Pitch and yaw are probably inverted!
                 motorDirections[0] = { +1, -1, -1, +1 }; // 1
                 motorDirections[1] = { +1, +1, +1, +1 }; // 2    
                 motorDirections[2] = { +1, -1, -1, -1 }; // 3 

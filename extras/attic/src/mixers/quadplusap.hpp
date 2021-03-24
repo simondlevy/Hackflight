@@ -30,7 +30,8 @@ namespace hf {
             MixerQuadPlusAP(rft::Motor * motors) 
                 : Mixer(motors, 4)
             {
-                //                     Th  RR  PF  YR
+                //                     Th  Rl  Pi  Yw
+                // XXX Pitch and yaw are probably inverted!
                 motorDirections[0] = { +1,  0, -1, +1 };    // 1 front
                 motorDirections[1] = { +1, -1,  0, -1 };    // 2 right
                 motorDirections[2] = { +1,  0, +1, +1 };    // 3 rear
