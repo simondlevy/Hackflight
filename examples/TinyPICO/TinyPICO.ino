@@ -56,9 +56,6 @@ static hf::Hackflight h(&board, &receiver, &mixer);
 
 void setup(void)
 {
-    // Start receiver on Serial1
-    Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
-
     // Add gyro, quaternion sensors
     h.addSensor(&gyro);
     h.addSensor(&quat);
@@ -66,6 +63,9 @@ void setup(void)
     // Add PID controllers
     h.addClosedLoopController(&levelPid);
     h.addClosedLoopController(&ratePid);
+
+    // Start receiver on Serial1
+    Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
     // Start the receiver timed task
     TaskHandle_t task;
