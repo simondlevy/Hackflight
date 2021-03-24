@@ -23,7 +23,7 @@
 #include "pidcontrollers/level.hpp"
 #include "sensors/usfs.hpp"
 
-#include "receivers/arduino/dsmx.hpp"
+#include "receivers/arduino/dsmx/dsmx_esp32_serial1.hpp"
 
 // Receiver --------------------------------------------------------------
 
