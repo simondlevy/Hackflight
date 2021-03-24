@@ -34,7 +34,7 @@ static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 8.0f;
 
 
-hf::DSMX_ESP32_Serial1 receiver = hf::DSMX_ESP32_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
+hf::DSMX_ESP32_Serial1 receiver = hf::DSMX_ESP32_Serial1(CHANNEL_MAP, DEMAND_SCALE, SERIAL1_RX, SERIAL1_TX);  
 
 // Motors ----------------------------------------------------------------
 
@@ -63,6 +63,8 @@ void setup(void)
     // Add PID controllers
     h.addClosedLoopController(&levelPid);
     h.addClosedLoopController(&ratePid);
+
+    receiver.start();
 
     // Start receiver on Serial1
     Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);

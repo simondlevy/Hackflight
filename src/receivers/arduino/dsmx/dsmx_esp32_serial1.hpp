@@ -19,6 +19,9 @@ namespace hf {
 
             DSM2048 _rx;
 
+            uint8_t _rxpin = 0;
+            uint8_t _txpin = 0;
+
         protected:
 
             void begin(void)
@@ -55,14 +58,20 @@ namespace hf {
                     delay(1);
                 }
             }
-            DSMX_ESP32_Serial1(const uint8_t channelMap[6], const float demandScale)
+            DSMX_ESP32_Serial1(const uint8_t channelMap[6], const float demandScale, uint8_t rxpin, uint8_t txpin)
                 :  Receiver(channelMap, demandScale) 
             { 
+                _rxpin = rxpin;
+                _txpin = txpin;
             }
 
             void handleSerialEvent(uint8_t value, uint32_t usec)
             {
                 _rx.handleSerialEvent(value, usec);
+            }
+
+            void start(void)
+            {
             }
 
     }; // class DSMX_ESP32_Serial1
