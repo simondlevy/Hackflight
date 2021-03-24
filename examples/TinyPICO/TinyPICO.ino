@@ -63,8 +63,6 @@ void setup(void)
     h.addClosedLoopController(&levelPid);
     h.addClosedLoopController(&ratePid);
 
-    receiver.start();
-
     // Initialize Hackflight firmware
     h.begin();
 }

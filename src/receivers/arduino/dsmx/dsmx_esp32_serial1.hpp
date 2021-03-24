@@ -40,7 +40,13 @@ namespace hf {
 
             void begin(void)
             {
-            }
+                // Start receiver on Serial1
+                Serial1.begin(115000, SERIAL_8N1, _rxpin, _txpin);
+
+                // Start the receiver timed task
+                TaskHandle_t task;
+                xTaskCreatePinnedToCore(hf::DSMX_ESP32_Serial1::receiverTask, "ReceiverTask", 10000, this, 1, &task, 1);
+             }
 
             bool gotNewFrame(void)
             {
@@ -69,16 +75,6 @@ namespace hf {
             void handleSerialEvent(uint8_t value, uint32_t usec)
             {
                 _rx.handleSerialEvent(value, usec);
-            }
-
-            void start(void)
-            {
-                // Start receiver on Serial1
-                Serial1.begin(115000, SERIAL_8N1, _rxpin, _txpin);
-
-                // Start the receiver timed task
-                TaskHandle_t task;
-                xTaskCreatePinnedToCore(hf::DSMX_ESP32_Serial1::receiverTask, "ReceiverTask", 10000, this, 1, &task, 1);
             }
 
     }; // class DSMX_ESP32_Serial1
