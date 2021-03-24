@@ -21,7 +21,7 @@
 
 #include "hackflight.hpp"
 #include "boards/ladybugfc.hpp"
-#include "receivers/arduino/dsmx/dsmx_serial1.hpp"
+#include "receivers/dsmx/dsmx_serial1.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
