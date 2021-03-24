@@ -68,16 +68,6 @@ namespace hf {
 
     class UsfsQuat : public Sensor {
 
-        private:
-
-            static void computeEulerAngles(float qw, float qx, float qy, float qz,
-                                           float & ex, float & ey, float & ez)
-            {
-                ex = -asin(2.0f*(qx*qz-qw*qy));
-                ey = -atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
-                ez = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
-            }
-
         protected:
 
             virtual void begin(void) override 
@@ -96,15 +86,9 @@ namespace hf {
 
                 _usfs.sentral.readQuaternion(qw, qx, qy, qz);
 
-                computeEulerAngles(qw, qx, qy, qz,
-                        state->x[State::STATE_PHI],
-                        state->x[State::STATE_THETA],
-                        state->x[State::STATE_PSI]);
-
-                // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (state->x[State::STATE_PSI] < 0) {
-                    state->x[State::STATE_PSI] += 2*M_PI;
-                }
+                state->x[State::STATE_PHI] = asin(2.0f*(qx*qz-qw*qy));
+                state->x[State::STATE_THETA] = atan2(2.0f*(qw*qx+qy*qz),qw*qw-qx*qx-qy*qy+qz*qz);
+                state->x[State::STATE_PSI] = atan2(2.0f*(qx*qy+qw*qz),qw*qw+qx*qx-qy*qy-qz*qz);
             }
 
             virtual bool ready(float time) override
