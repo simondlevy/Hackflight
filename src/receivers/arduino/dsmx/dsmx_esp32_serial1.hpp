@@ -42,6 +42,19 @@ namespace hf {
 
         public:
 
+            static void receiverTask(void * params)
+            {
+                hf::DSMX_ESP32_Serial1 * receiver =  (hf::DSMX_ESP32_Serial1 *)params;
+
+                while (true) {
+
+                    if (Serial1.available()) {
+                        receiver->handleSerialEvent(Serial1.read(), micros());
+                    }
+
+                    delay(1);
+                }
+            }
             DSMX_ESP32_Serial1(const uint8_t channelMap[6], const float demandScale)
                 :  Receiver(channelMap, demandScale) 
             { 
