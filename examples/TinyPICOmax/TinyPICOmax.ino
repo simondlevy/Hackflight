@@ -23,7 +23,7 @@
 #include "pidcontrollers/level.hpp"
 #include "sensors/usfsmax.hpp"
 
-#include "receivers/arduino/dsmx/dsmx_esp32_serial1.hpp"
+#include "receivers/dsmx/dsmx_esp32_serial1.hpp"
 
 
 // Receiver --------------------------------------------------------------
