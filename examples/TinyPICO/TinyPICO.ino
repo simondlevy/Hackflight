@@ -33,19 +33,21 @@ static const uint8_t SERIAL1_TX = 33;  // unused
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 8.0f;
 
-hf::DSMX_ESP32_Serial1 receiver = hf::DSMX_ESP32_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
-
 static void receiverTask(void * params)
 {
+    hf::DSMX_ESP32_Serial1 * receiver =  (hf::DSMX_ESP32_Serial1 *)params;
+
     while (true) {
 
         if (Serial1.available()) {
-            receiver.handleSerialEvent(Serial1.read(), micros());
+            receiver->handleSerialEvent(Serial1.read(), micros());
         }
 
         delay(1);
     }
 }
+
+hf::DSMX_ESP32_Serial1 receiver = hf::DSMX_ESP32_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
 // Motors ----------------------------------------------------------------
 
@@ -80,7 +82,7 @@ void setup(void)
 
     // Start the receiver timed task
     TaskHandle_t task;
-    xTaskCreatePinnedToCore(receiverTask, "ReceiverTask", 10000, NULL, 1, &task, 1);
+    xTaskCreatePinnedToCore(receiverTask, "ReceiverTask", 10000, &receiver, 1, &task, 1);
 
     // Initialize Hackflight firmware
     h.begin();
