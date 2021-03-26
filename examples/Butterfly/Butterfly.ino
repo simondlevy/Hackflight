@@ -30,11 +30,13 @@
 #include "pidcontrollers/level.hpp"
 #include "sensors/usfs.hpp"
 
+// Motors
 static const uint8_t MOTOR_PINS[4] = {5, 8 , 9, 11};
 static rft::StandardMotor motors = rft::StandardMotor(MOTOR_PINS, 4);
 
 static hf::ButterflyPiggyback board;
 
+// Receiver --------------------------------------------------------------
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 8.58f;
 
@@ -44,9 +46,6 @@ static hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f);
 static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 static hf::MixerQuadXCF mixer(&motors);
-
-// hf::MockReceiver receiver; 
-// hf::MockMotor motors;
 
 static hf::Hackflight h(&board, &receiver, &mixer);
 

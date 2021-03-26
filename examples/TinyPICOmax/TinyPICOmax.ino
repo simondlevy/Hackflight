@@ -14,7 +14,7 @@
  */
 
 #include <RoboFirmwareToolkit.hpp>
-#include <rft_motors/mock.hpp>
+#include <rft_motors/standard.hpp>
 #include <rft_boards/realboards/tinypico.hpp>
 
 #include "hackflight.hpp"
@@ -26,6 +26,10 @@
 #include "receivers/dsmx/dsmx_esp32_serial1.hpp"
 
 
+// Motors ----------------------------------------------------------------
+static const uint8_t MOTOR_PINS[4] = {15, 27, 26 ,25};
+static rft::StandardMotor motors = rft::StandardMotor(MOTOR_PINS, 4);
+
 // Receiver --------------------------------------------------------------
 
 static const uint8_t SERIAL1_RX = 4;
@@ -35,11 +39,6 @@ static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 8.0f;
 
 hf::DSMX_ESP32_Serial1 receiver = hf::DSMX_ESP32_Serial1(CHANNEL_MAP, DEMAND_SCALE, SERIAL1_RX, SERIAL1_TX);  
-
-
-// Motors ----------------------------------------------------------------
-
-rft::MockMotor motors;
 
 // -----------------------------------------------------------------------
 
