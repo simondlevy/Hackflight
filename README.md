@@ -76,7 +76,7 @@ controllers below.)
 ## Ground Control Station
 
 Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
-channel values,  we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program.
+channel values,  we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program
 that allows you to connect to the board and see what's going on. Windows users
 can run this program directly: just clone the [HackflightGCS](https://github.com/simondlevy/HackflightGCS)
 repository and double-click on <b>hackflight.exe</b>.  Others can run the
