@@ -13,7 +13,7 @@
 #include <Wire.h>
 
 #include <rft_boards/realboards/arduino.hpp>
-#include <rft_motors/brushed.hpp>
+#include <rft_motors/realmotors/brushed.hpp>
 
 #include "sensors/usfs.hpp"
 

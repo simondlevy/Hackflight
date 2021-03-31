@@ -14,7 +14,7 @@
  */
 
 #include <RoboFirmwareToolkit.hpp>
-#include <rft_motors/standard.hpp>
+#include <rft_motors/realmotors/standard.hpp>
 #include <rft_boards/realboards/tinypico.hpp>
 
 #include "hackflight.hpp"
