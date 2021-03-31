@@ -358,8 +358,8 @@ Number=0
 [Win_2]
 Type="Schematic Editor"
 Number=2
-File="/home/levy/Documents/EAGLE/projects/loiterboard/loiterboard.sch"
-View="-42.1251 -40.0736 137.878 120.352"
+File="/home/levy/Documents/EAGLE/projects/thriverline/tinypico-fc.sch"
+View="-74.6272 -29.6768 34.511 81.7319"
 WireWidths=" 0.0762 0.1016 0.127 0.15 0.2 0.2032 0.254 0.3048 0.4064 0.508 0.6096 0.8128 1.016 1.27 2.54 0.1524"
 PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 PadDrills=" 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.55 0.65 0.7 0.75 0.8 0.85 0.9 1 0.6"
@@ -398,14 +398,14 @@ ArcDirection=0
 AddLevel=2
 PadsSameType=0
 Layer=91
-Views=" 1: -42.1251 -40.0736 137.878 120.352"
+Views=" 1: -74.6272 -29.6768 34.511 81.7319"
 Sheet="1"
 
 [Win_3]
 Type="Board Editor"
 Number=1
-File="/home/levy/Documents/EAGLE/projects/loiterboard/loiterboard.brd"
-View="-0.940375 9.18553 43.8039 59.0981"
+File="/home/levy/Documents/EAGLE/projects/thriverline/tinypico-fc.brd"
+View="35.6482 23.2452 73.9137 66.7107"
 WireWidths=" 0.0762 0.1016 0.127 0.15 0.2 0.2032 0.254 0.3048 0.4064 0.508 0.6096 0.8128 1.016 1.27 2.54 0.1524"
 PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 PadDrills=" 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.55 0.65 0.7 0.75 0.8 0.85 0.9 1 0.6"
@@ -443,7 +443,7 @@ SwapLevel=0
 ArcDirection=0
 AddLevel=2
 PadsSameType=0
-Layer=1
+Layer=16
 
 [Desktop]
 Screen="1920 1080"
