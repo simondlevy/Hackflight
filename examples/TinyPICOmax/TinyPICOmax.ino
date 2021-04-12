@@ -21,6 +21,7 @@
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
+#include "pidcontrollers/yaw.hpp"
 #include "sensors/usfsmax.hpp"
 
 #include "receivers/dsmx/dsmx_esp32_serial1.hpp"
@@ -45,7 +46,8 @@ hf::DSMX_ESP32_Serial1 receiver = hf::DSMX_ESP32_Serial1(CHANNEL_MAP, DEMAND_SCA
 rft::TinyPico board;
 static hf::UsfsQuat quat;
 static hf::UsfsGyro gyro;
-static hf::RatePid ratePid = hf::RatePid( 0.05f, 0.00f, 0.00f, 0.10f, 0.01f); 
+static hf::RatePid ratePid = hf::RatePid(0.05f, 0.00f, 0.00f); 
+static hf::YawPid yawPid = hf::YawPid(0.10f, 0.01f); 
 static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 static hf::MixerQuadXCF mixer(&motors);
 
@@ -59,6 +61,7 @@ void setup(void)
 
     // Add PID controllers
     h.addClosedLoopController(&levelPid);
+    h.addClosedLoopController(&yawPid);
     h.addClosedLoopController(&ratePid);
 
     // Initialize Hackflight firmware
