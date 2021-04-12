@@ -10,11 +10,9 @@
 
 #include <RFT_filters.hpp>
 #include <RFT_state.hpp>
-#include <rft_closedloops/pidcontroller.hpp>
+#include <rft_closedloops/pidcontrollers/angvel.hpp>
 
 #include "demands.hpp"
-#include "receiver.hpp"
-#include "pidcontrollers/angvel.hpp"
 
 namespace hf {
 
@@ -26,7 +24,7 @@ namespace hf {
             static constexpr float BIG_YAW_DEMAND = 0.1f;
 
             // Rate mode uses a rate controller for roll, pitch
-            _AngularVelocityPid _yawPid;
+            rft::AngularVelocityPid _yawPid;
 
         public:
 

@@ -10,11 +10,9 @@
 
 #include <RFT_filters.hpp>
 #include <RFT_state.hpp>
-#include <rft_closedloops/pidcontroller.hpp>
+#include <rft_closedloops/pidcontrollers/angvel.hpp>
 
 #include "demands.hpp"
-#include "receiver.hpp"
-#include "pidcontrollers/angvel.hpp"
 
 namespace hf {
 
@@ -23,8 +21,8 @@ namespace hf {
         private: 
 
             // Rate mode uses a rate controller for roll, pitch
-            _AngularVelocityPid _rollPid;
-            _AngularVelocityPid _pitchPid;
+            rft::AngularVelocityPid _rollPid;
+            rft::AngularVelocityPid _pitchPid;
 
         public:
 
