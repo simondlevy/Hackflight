@@ -46,7 +46,7 @@ hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCA
 
 hf::MixerQuadXCF mixer;
 
-hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375, 1.0625, 0.005625f);
+hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375, 2, 0.1);
 
 hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
