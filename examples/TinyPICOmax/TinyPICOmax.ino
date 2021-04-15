@@ -13,10 +13,6 @@
    MIT License
  */
 
-#include <RoboFirmwareToolkit.hpp>
-#include <rft_motors/realmotors/standard.hpp>
-#include <rft_boards/realboards/tinypico.hpp>
-
 #include "hackflight.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
@@ -43,7 +39,6 @@ hf::DSMX_ESP32_Serial1 receiver = hf::DSMX_ESP32_Serial1(CHANNEL_MAP, DEMAND_SCA
 
 // -----------------------------------------------------------------------
 
-rft::TinyPico board;
 static hf::UsfsQuat quat;
 static hf::UsfsGyro gyro;
 static hf::RatePid ratePid = hf::RatePid(0.05f, 0.00f, 0.00f); 
