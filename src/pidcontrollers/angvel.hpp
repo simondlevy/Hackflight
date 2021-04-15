@@ -25,39 +25,41 @@
 #include "state.hpp"
 #include "demands.hpp"
 #include "pidcontroller.hpp"
-#include "pidcontrollers/angvel.hpp"
 
 namespace hf {
 
-    class RatePid : public PidController {
+    // Helper class for all three axes
+    class AngularVelocityPid : public Pid {
 
         private: 
 
-            // Rate mode uses a rate controller for roll, pitch
-            AngularVelocityPid _rollPid;
-            AngularVelocityPid _pitchPid;
+            // Arbitrary constants
+            static constexpr float BIG_DEGREES_PER_SECOND = 40.0f; 
+            static constexpr float WINDUP_MAX = 6.0f;
+
+            // Converted to radians from degrees in constructor for efficiency
+            float _bigAngularVelocity = 0;
 
         public:
 
-            RatePid(const float Kp, const float Ki, const float Kd) 
+            void begin(const float Kp, const float Ki, const float Kd) 
             {
-                _rollPid.begin(Kp, Ki, Kd);
-                _pitchPid.begin(Kp, Ki, Kd);
+                Pid::begin(Kp, Ki, Kd, WINDUP_MAX);
+
+                // Convert degree parameters to radians for use later
+                _bigAngularVelocity = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
             }
 
-            void modifyDemands(state_t * state, float * demands)
+            float compute(float demand, float angularVelocity)
             {
-                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL],  state->x[STATE_DPHI]);
-                demands[DEMANDS_PITCH] = _pitchPid.compute(-demands[DEMANDS_PITCH], -state->x[STATE_DTHETA]);
+                // Reset integral on quick angular velocity change
+                if (fabs(angularVelocity) > _bigAngularVelocity) {
+                    reset();
+                }
+
+                return Pid::compute(demand, angularVelocity);
             }
 
-            virtual void updateReceiver(bool throttleIsDown) override
-            {
-                // Check throttle-down for integral reset
-                _rollPid.updateReceiver(throttleIsDown);
-                _pitchPid.updateReceiver(throttleIsDown);
-            }
-
-    };  // class RatePid
+    };  // class _AngularVelocityPid
 
 } // namespace hf

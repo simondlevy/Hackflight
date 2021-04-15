@@ -35,6 +35,7 @@ Copyright (c) 2018 Simon D. Levy
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
+#include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
@@ -46,8 +47,8 @@ hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCA
 
 hf::MixerQuadXCF mixer(&hf::ladybugFcNewMotors);
 
-hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375, 2, 0.1);
-
+hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
+hf::YawPid yawPid = hf::YawPid(2, 0.1);
 hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 void setup(void)
@@ -58,6 +59,7 @@ void setup(void)
     // Add PID controllers
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
+    h.addPidController(&yawPid);
 }
 
 void loop(void)

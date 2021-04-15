@@ -29,35 +29,42 @@
 
 namespace hf {
 
-    class RatePid : public PidController {
+    class YawPid : public PidController {
 
         private: 
 
+            // Aribtrary constants
+            static constexpr float BIG_YAW_DEMAND = 0.1f;
+
             // Rate mode uses a rate controller for roll, pitch
-            AngularVelocityPid _rollPid;
-            AngularVelocityPid _pitchPid;
+            AngularVelocityPid _yawPid;
 
         public:
 
-            RatePid(const float Kp, const float Ki, const float Kd) 
+            YawPid(const float Kp_yaw, const float Ki_yaw) 
             {
-                _rollPid.begin(Kp, Ki, Kd);
-                _pitchPid.begin(Kp, Ki, Kd);
+                _yawPid.begin(Kp_yaw, Ki_yaw, 0);
             }
 
             void modifyDemands(state_t * state, float * demands)
             {
-                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL],  state->x[STATE_DPHI]);
-                demands[DEMANDS_PITCH] = _pitchPid.compute(-demands[DEMANDS_PITCH], -state->x[STATE_DTHETA]);
+                demands[DEMANDS_YAW]   = _yawPid.compute(-demands[DEMANDS_YAW], -state->x[STATE_DPSI]);
+
+                // Prevent "yaw jump" during correction
+                demands[DEMANDS_YAW] = Filter::constrainAbs(demands[DEMANDS_YAW], 0.1 + fabs(demands[DEMANDS_YAW]));
+
+                // Reset yaw integral on large yaw command
+                if (fabs(demands[DEMANDS_YAW]) > BIG_YAW_DEMAND) {
+                    _yawPid.reset();
+                }
             }
 
             virtual void updateReceiver(bool throttleIsDown) override
             {
                 // Check throttle-down for integral reset
-                _rollPid.updateReceiver(throttleIsDown);
-                _pitchPid.updateReceiver(throttleIsDown);
+                _yawPid.updateReceiver(throttleIsDown);
             }
 
-    };  // class RatePid
+    };  // class YawPid
 
 } // namespace hf
