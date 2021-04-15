@@ -31,8 +31,8 @@ namespace hf {
 
             FlowHoldPid(const float Kp, float Ki)
             {
-                rollPid.init(Kp, Ki, 0);
-                pitchPid.init(Kp, Ki, 0);
+                rollPid.begin(Kp, Ki, 0);
+                pitchPid.begin(Kp, Ki, 0);
             }
 
         protected:

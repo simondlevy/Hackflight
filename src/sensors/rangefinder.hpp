@@ -87,7 +87,7 @@ namespace hf {
 
             Rangefinder(void) 
             {
-                _lpf.init();
+                _lpf.begin();
             }
 
     };  // class Rangefinder

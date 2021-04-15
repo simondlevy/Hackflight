@@ -79,7 +79,7 @@ namespace hf {
                 _historySize = historySize;
             }
 
-            void init(void)
+            void begin(void)
             {
                 for (uint8_t k=0; k<_historySize; ++k) {
                     _history[k] = 0;

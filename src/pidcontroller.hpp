@@ -68,7 +68,7 @@ namespace hf {
 
         public:
 
-            void init(const float Kp, const float Ki, const float Kd, const float windupMax=0.4) 
+            void begin(const float Kp, const float Ki, const float Kd, const float windupMax=0.4) 
             {
                 // Set constants
                 _Kp = Kp;

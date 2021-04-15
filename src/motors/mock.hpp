@@ -33,7 +33,7 @@ namespace hf {
             {
             }
 
-            virtual void init(void) override
+            virtual void begin(void) override
             {
             }
 

@@ -59,7 +59,7 @@ namespace hf {
             // Timer task for PID controllers
             PidTask _pidTask;
 
-            // Passed to Hackflight::init() for a particular build
+            // Passed to Hackflight::begin() for a particular build
             IMU        * _imu      = NULL;
             Mixer      * _mixer    = NULL;
 
@@ -131,7 +131,7 @@ namespace hf {
                 sensor->imu = imu;
             }
 
-            void general_init(Board * board, Receiver * receiver, Mixer * mixer)
+            void general_begin(Board * board, Receiver * receiver, Mixer * mixer)
             {  
                 // Store the essentials
                 _board    = board;
@@ -139,7 +139,7 @@ namespace hf {
                 _mixer = mixer;
 
                 // Ad-hoc debugging support
-                _debugger.init(board);
+                _debugger.begin(board);
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
@@ -154,7 +154,7 @@ namespace hf {
                 _state.failsafe = false;
 
                 // Initialize timer task for PID controllers
-                _pidTask.init(_board, _receiver, _mixer, &_state);
+                _pidTask.begin(_board, _receiver, _mixer, &_state);
             }
 
             void checkReceiver(void)
@@ -200,17 +200,17 @@ namespace hf {
 
         public:
 
-            void init(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor * motors, bool armed=false)
+            void begin(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor * motors, bool armed=false)
             {  
                 // Do general initialization
-                general_init(board, receiver, mixer);
+                general_begin(board, receiver, mixer);
 
                 // Store pointers to IMU, mixer
                 _imu   = imu;
                 _mixer = mixer;
 
                 // Initialize serial timer task
-                _serialTask.init(board, &_state, receiver, mixer);
+                _serialTask.begin(board, &_state, receiver, mixer);
 
                 // Support safety override by simulator
                 _state.armed = armed;

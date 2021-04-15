@@ -46,7 +46,7 @@ namespace hf {
 
             virtual void setLed(bool isOn) = 0;
 
-            void init(void)
+            void begin(void)
             {
                 // Flash LED
                 float pauseSeconds = LED_STARTUP_FLASH_SECONDS / LED_STARTUP_FLASH_COUNT;

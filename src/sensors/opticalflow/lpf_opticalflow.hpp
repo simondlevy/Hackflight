@@ -94,8 +94,8 @@ namespace hf {
                     }
                 }
 
-                _lpf_x.init();
-                _lpf_y.init();
+                _lpf_x.begin();
+                _lpf_y.begin();
 
                 _previousTime = 0;
 

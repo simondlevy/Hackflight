@@ -41,9 +41,9 @@ namespace hf {
 
         public:
 
-            void init(const float Kp, const float Ki, const float Kd) 
+            void begin(const float Kp, const float Ki, const float Kd) 
             {
-                Pid::init(Kp, Ki, Kd, WINDUP_MAX);
+                Pid::begin(Kp, Ki, Kd, WINDUP_MAX);
 
                 // Convert degree parameters to radians for use later
                 _bigAngularVelocity = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
@@ -77,9 +77,9 @@ namespace hf {
 
             RatePid(const float Kp, const float Ki, const float Kd, const float Kp_yaw, const float Ki_yaw) 
             {
-                _rollPid.init(Kp, Ki, Kd);
-                _pitchPid.init(Kp, Ki, Kd);
-                _yawPid.init(Kp_yaw, Ki_yaw, 0);
+                _rollPid.begin(Kp, Ki, Kd);
+                _pitchPid.begin(Kp, Ki, Kd);
+                _yawPid.begin(Kp_yaw, Ki_yaw, 0);
             }
 
             void modifyDemands(state_t * state, demands_t & demands)
