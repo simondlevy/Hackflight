@@ -58,19 +58,12 @@ namespace hf {
 
                 float qw = _w, qx = _x, qy = _y, qz = _z;
 
-                imu->adjustQuaternion(qw, qx, qy, qz);
-
                 computeEulerAngles(qw, qx, qy, qz, state.rotation);
                 computeEulerAngles(qw, qx, qy, qz, state.x[STATE_PHI], state.x[STATE_THETA], state.x[STATE_PSI]);
 
                 // Adjust rotation so that nose-up is positive
                 state.rotation[1] = -state.rotation[1];
                 state.x[STATE_THETA] = -state.x[STATE_THETA];
-
-                imu->adjustEulerAngles(state.rotation[0], state.rotation[1], state.rotation[2]);
-                imu->adjustEulerAngles(state.x[STATE_PHI], state.x[STATE_THETA], state.x[STATE_PSI]);
-
-                Debugger::printf("%+3.3f  %+3.3f", state.rotation[1], state.x[STATE_THETA]);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
                 if (state.rotation[2] < 0) {
