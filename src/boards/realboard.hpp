@@ -22,7 +22,6 @@
 
 #include "board.hpp"
 #include "debugger.hpp"
-#include "datatypes.hpp"
 
 namespace hf {
 

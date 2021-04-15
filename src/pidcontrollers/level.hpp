@@ -20,7 +20,8 @@
 
 #pragma once
 
-#include "datatypes.hpp"
+#include "state.hpp"
+#include "demands.hpp"
 #include "pidcontroller.hpp"
 
 namespace hf {
@@ -70,10 +71,10 @@ namespace hf {
             {
             }
 
-            void modifyDemands(state_t * state, demands_t & demands)
+            void modifyDemands(state_t * state, float * demands)
             {
-                demands.roll  = _rollPid.compute(demands.roll, state->x[STATE_PHI]);
-                demands.pitch = _pitchPid.compute(demands.pitch, state->x[STATE_THETA]);
+                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], state->x[STATE_PHI]);
+                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], state->x[STATE_THETA]);
             }
 
     };  // class LevelPid

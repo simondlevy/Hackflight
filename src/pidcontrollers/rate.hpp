@@ -22,7 +22,8 @@
 
 #include "receiver.hpp"
 #include "filters.hpp"
-#include "datatypes.hpp"
+#include "state.hpp"
+#include "demands.hpp"
 #include "pidcontroller.hpp"
 
 namespace hf {
@@ -82,17 +83,17 @@ namespace hf {
                 _yawPid.begin(Kp_yaw, Ki_yaw, 0);
             }
 
-            void modifyDemands(state_t * state, demands_t & demands)
+            void modifyDemands(state_t * state, float * demands)
             {
-                demands.roll  = _rollPid.compute(demands.roll,  state->x[STATE_DPHI]);
-                demands.pitch = _pitchPid.compute(-demands.pitch, -state->x[STATE_DTHETA]);
-                demands.yaw   = _yawPid.compute(-demands.yaw, -state->x[STATE_DPSI]);
+                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL],  state->x[STATE_DPHI]);
+                demands[DEMANDS_PITCH] = _pitchPid.compute(-demands[DEMANDS_PITCH], -state->x[STATE_DTHETA]);
+                demands[DEMANDS_YAW]   = _yawPid.compute(-demands[DEMANDS_YAW], -state->x[STATE_DPSI]);
 
                 // Prevent "yaw jump" during correction
-                demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));
+                demands[DEMANDS_YAW] = Filter::constrainAbs(demands[DEMANDS_YAW], 0.1 + fabs(demands[DEMANDS_YAW]));
 
                 // Reset yaw integral on large yaw command
-                if (fabs(demands.yaw) > BIG_YAW_DEMAND) {
+                if (fabs(demands[DEMANDS_YAW]) > BIG_YAW_DEMAND) {
                     _yawPid.reset();
                 }
             }

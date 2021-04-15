@@ -25,7 +25,7 @@
 #include "imu.hpp"
 #include "board.hpp"
 #include "receiver.hpp"
-#include "datatypes.hpp"
+#include "state.hpp"
 #include "pidcontroller.hpp"
 #include "motor.hpp"
 #include "mixer.hpp"
@@ -52,9 +52,6 @@ namespace hf {
 
             // Safety
             bool _safeToArm = false;
-
-            // Support for headless mode
-            float _yawInitial = 0;
 
             // Timer task for PID controllers
             PidTask _pidTask;
@@ -169,7 +166,9 @@ namespace hf {
                 }
 
                 // Check whether receiver data is available
-                if (!_receiver->getDemands(_state.x[STATE_PSI] - _yawInitial)) return;
+                if (!_receiver->getDemands()) {
+                    return;
+                }
 
                 // Disarm
                 if (_state.armed && !_receiver->getAux1State()) {
@@ -185,7 +184,6 @@ namespace hf {
                 if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux1State() && 
                         !_state.failsafe && safeAngle(STATE_PHI) && safeAngle(STATE_THETA)) {
                     _state.armed = true;
-                    _yawInitial = _state.x[STATE_PSI]; // grab yaw for headless mode
                 }
 
                 // Cut motors on throttle-down

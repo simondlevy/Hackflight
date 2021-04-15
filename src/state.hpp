@@ -47,15 +47,6 @@ namespace hf {
 
     typedef struct {
 
-        float throttle;
-        float roll;
-        float pitch;
-        float yaw;
-
-    } demands_t;
-
-    typedef struct {
-
         float x[STATE_SIZE];
 
         bool armed;

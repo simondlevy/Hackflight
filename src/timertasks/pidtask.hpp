@@ -70,11 +70,11 @@ namespace hf {
             virtual void doTask(void) override
             {
                 // Start with demands from receiver, scaling roll/pitch/yaw by constant
-                demands_t demands = {};
-                demands.throttle = _receiver->demands.throttle;
-                demands.roll     = _receiver->demands.roll  * _receiver->_demandScale;
-                demands.pitch    = _receiver->demands.pitch * _receiver->_demandScale;
-                demands.yaw      = _receiver->demands.yaw   * _receiver->_demandScale;
+                float demands[4] = {};
+                demands[DEMANDS_THROTTLE] = _receiver->demands[DEMANDS_THROTTLE];
+                demands[DEMANDS_ROLL]     = _receiver->demands[DEMANDS_ROLL]  * _receiver->_demandScale;
+                demands[DEMANDS_PITCH]    = _receiver->demands[DEMANDS_PITCH] * _receiver->_demandScale;
+                demands[DEMANDS_YAW]      = _receiver->demands[DEMANDS_YAW]   * _receiver->_demandScale;
 
                 // Each PID controllers is associated with at least one auxiliary switch state
                 uint8_t auxState = _receiver->getAux2State();
