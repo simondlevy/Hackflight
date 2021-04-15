@@ -202,19 +202,11 @@ namespace hf {
 
         public:
 
-            void setTrimRoll(float trim)
+            void setTrim(float roll, float pitch, float yaw)
             {
-                _trimRoll = trim;
-            }
-
-            void setTrimPitch(float trim)
-            {
-                _trimPitch = trim;
-            }
-
-            void setTrimYaw(float trim)
-            {
-                _trimYaw = trim;
+                _trimRoll = roll;
+                _trimPitch = pitch;
+                _trimYaw = yaw;
             }
 
     }; // class Receiver

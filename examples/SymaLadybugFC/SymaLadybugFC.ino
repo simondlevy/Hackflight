@@ -1,5 +1,6 @@
 /*
-   Hackflight sketch for Ladybug Flight Controller with Spektrum DSMX receiver
+   Hackflight sketch for Syma X5C copter with Ladybug Flight Controller with
+   Spektrum DSMX receiver
 
    Additional libraries needed:
 
@@ -44,6 +45,9 @@ void setup(void)
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
     h.addPidController(&yawPid);
+
+    // Adjust trim
+    rc.setTrim(0, 0.06, 0.02);
 }
 
 void loop(void)
