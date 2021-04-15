@@ -45,10 +45,10 @@ namespace hf {
                 // Compensate for IMU mounting as needed
                 imu->adjustGyrometer(_x, _y, _z);
 
-                // NB: We negate gyro X, Y to simplify PID controller
-                state.angularVel[0] =  _x;
-                state.angularVel[1] = -_y;
-                state.angularVel[2] = -_z;
+                // NB: We negate gyro Y, Z to simplify PID controller
+                state.angularVel[0] = _x;
+                state.angularVel[1] = _y;
+                state.angularVel[2] = _z;
             }
 
             virtual bool ready(float time) override
