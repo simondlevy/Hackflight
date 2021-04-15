@@ -20,8 +20,9 @@
 
 #pragma once
 
-#include "filters.hpp"
 #include "motor.hpp"
+
+#include <RFT_filters.hpp>
 
 namespace hf {
 
@@ -101,7 +102,7 @@ namespace hf {
             virtual float constrainMotorValue(uint8_t index, float value) 
             {
                 (void)index;
-                return Filter::constrainMinMax(value, 0, 1);
+                return rft::Filter::constrainMinMax(value, 0, 1);
             }
 
             void cut(void)

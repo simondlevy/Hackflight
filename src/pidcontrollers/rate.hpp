@@ -21,7 +21,7 @@
 #pragma once
 
 #include "receiver.hpp"
-#include "filters.hpp"
+#include <RFT_filters.hpp>
 #include "state.hpp"
 #include "demands.hpp"
 #include "pidcontroller.hpp"

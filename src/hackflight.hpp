@@ -34,6 +34,8 @@
 #include "sensors/surfacemount/gyrometer.hpp"
 #include "sensors/surfacemount/quaternion.hpp"
 
+#include <RFT_filters.hpp>
+
 namespace hf {
 
     class Hackflight {
@@ -65,7 +67,7 @@ namespace hf {
  
             bool safeAngle(uint8_t axis)
             {
-                return fabs(_state.x[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
+                return fabs(_state.x[axis]) < rft::Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
            void checkQuaternion(void)

@@ -39,7 +39,7 @@ namespace hf {
 
                     // Maximum roll pitch demand is +/-0.5, so to convert demand to 
                     // angle for error computation, we multiply by the folling amount:
-                    float _demandMultiplier = 2 * Filter::deg2rad(MAX_ANGLE_DEGREES);
+                    float _demandMultiplier = 2 * rft::Filter::deg2rad(MAX_ANGLE_DEGREES);
 
                 public:
 

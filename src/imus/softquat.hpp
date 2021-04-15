@@ -20,10 +20,10 @@
 
 #pragma once
 
-#include "filters.hpp"
 #include "imu.hpp"
 
 #include <math.h>
+#include <RFT_filters.hpp>
 
 namespace hf {
 
@@ -42,8 +42,8 @@ namespace hf {
             uint8_t _quatCycleCount = 0;
 
             // Params passed to Madgwick quaternion constructor
-            const float _beta = sqrtf(3.0f / 4.0f) * Filter::deg2rad(GYRO_MEAS_ERROR_DEG);
-            const float _zeta = sqrtf(3.0f / 4.0f) * Filter::deg2rad(GYRO_MEAS_DRIFT_DEG);  
+            const float _beta = sqrtf(3.0f / 4.0f) * rft::Filter::deg2rad(GYRO_MEAS_ERROR_DEG);
+            const float _zeta = sqrtf(3.0f / 4.0f) * rft::Filter::deg2rad(GYRO_MEAS_DRIFT_DEG);  
 
             float _ax = 0;
             float _ay = 0;
@@ -56,7 +56,7 @@ namespace hf {
 
             // Quaternion support: even though MPU9250 has a magnetometer, we keep it simple for now by 
             // using a 6DOF fiter (accel, gyro)
-            MadgwickQuaternionFilter6DOF _quaternionFilter = MadgwickQuaternionFilter6DOF(_beta, _zeta);
+            rft::MadgwickQuaternionFilter6DOF _quaternionFilter = rft::MadgwickQuaternionFilter6DOF(_beta, _zeta);
 
             virtual bool imuReady(void) = 0;
 

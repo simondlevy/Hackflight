@@ -21,7 +21,7 @@
 #pragma once
 
 #include "receiver.hpp"
-#include "filters.hpp"
+#include <RFT_filters.hpp>
 #include "state.hpp"
 #include "demands.hpp"
 #include "pidcontroller.hpp"
@@ -47,7 +47,7 @@ namespace hf {
                 Pid::begin(Kp, Ki, Kd, WINDUP_MAX);
 
                 // Convert degree parameters to radians for use later
-                _bigAngularVelocity = Filter::deg2rad(BIG_DEGREES_PER_SECOND);
+                _bigAngularVelocity = rft::Filter::deg2rad(BIG_DEGREES_PER_SECOND);
             }
 
             float compute(float demand, float angularVelocity)

@@ -23,6 +23,8 @@
 #include "imus/softquat.hpp"
 #include "MPU9250_Master_I2C.h"
 
+#include <RFT_filters.hpp>
+
 namespace hf {
 
     // Choices are:
@@ -79,9 +81,9 @@ namespace hf {
                 _mpu9250_imu.readGyrometer(gx, gy, gz);
 
                 // Convert gyrometer values from degrees/sec to radians/sec
-                gx = Filter::deg2rad(gx);
-                gy = Filter::deg2rad(gy);
-                gz = Filter::deg2rad(gz);
+                gx = rft::Filter::deg2rad(gx);
+                gy = rft::Filter::deg2rad(gy);
+                gz = rft::Filter::deg2rad(gz);
 
             }
 
