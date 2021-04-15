@@ -28,7 +28,7 @@ namespace hf {
         AXIS_YAW
     };
 
-    // See Bouabdallah et al. (2007)
+    // See Bouabdallah et al. (2004)
     enum {
         STATE_X = 0,
         STATE_DX,
@@ -60,13 +60,6 @@ namespace hf {
 
         bool armed;
         bool failsafe;
-
-        float inertialVel[3]; 
-        float rotation[3]; 
-        float angularVel[3]; 
-
-        float bodyAccel[3]; 
-        float bodyVel[3]; 
 
     } state_t;
 

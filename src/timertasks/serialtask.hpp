@@ -81,7 +81,7 @@ namespace hf {
                 variometer = 0;
                 positionX = 0;
                 positionY = 0;
-                heading = -_state->rotation[AXIS_YAW]; // NB: Angle negated for remote visualization
+                heading = -_state->x[STATE_PSI]; // NB: Angle negated for remote visualization
                 velocityForward = 0;
                 velocityRightward = 0;
             }
@@ -110,9 +110,9 @@ namespace hf {
 
             virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
             {
-                roll  = _state->rotation[AXIS_ROLL];
-                pitch = _state->rotation[AXIS_PITCH];
-                yaw   = _state->rotation[AXIS_YAW];
+                roll  = _state->x[STATE_PHI];
+                pitch = _state->x[STATE_THETA];
+                yaw   = _state->x[STATE_PSI];
             }
 
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override

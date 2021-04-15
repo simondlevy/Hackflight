@@ -58,16 +58,14 @@ namespace hf {
 
                 float qw = _w, qx = _x, qy = _y, qz = _z;
 
-                computeEulerAngles(qw, qx, qy, qz, state.rotation);
-                computeEulerAngles(qw, qx, qy, qz, state.x[STATE_PHI], state.x[STATE_THETA], state.x[STATE_PSI]);
+                computeEulerAngles(qw, qx, qy, qz, 
+                        state.x[STATE_PHI], state.x[STATE_THETA], state.x[STATE_PSI]);
 
                 // Adjust rotation so that nose-up is positive
-                state.rotation[1] = -state.rotation[1];
                 state.x[STATE_THETA] = -state.x[STATE_THETA];
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (state.rotation[2] < 0) {
-                    state.rotation[2] += 2*M_PI;
+                if (state.x[STATE_PSI] < 0) {
                     state.x[STATE_PSI] += 2*M_PI;
                 }
             }
@@ -80,13 +78,6 @@ namespace hf {
         public:
 
             // We make this public so we can use it in different sketches
-
-            static void computeEulerAngles(float qw, float qx, float qy, float qz, float euler[3])
-            {
-                euler[0] = atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
-                euler[1] = asin(2.0f*(qx*qz-qw*qy));
-                euler[2] = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
-            }
 
             static void computeEulerAngles(float qw, float qx, float qy, float qz,
                                            float & ex, float & ey, float & ez)

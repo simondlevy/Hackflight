@@ -72,8 +72,8 @@ namespace hf {
 
             void modifyDemands(state_t * state, demands_t & demands)
             {
-                demands.roll  = _rollPid.compute(demands.roll, state->rotation[0]); 
-                demands.pitch = _pitchPid.compute(demands.pitch, state->rotation[1]);
+                demands.roll  = _rollPid.compute(demands.roll, state->x[STATE_PHI]);
+                demands.pitch = _pitchPid.compute(demands.pitch, state->x[STATE_THETA]);
             }
 
     };  // class LevelPid
