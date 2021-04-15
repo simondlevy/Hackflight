@@ -200,7 +200,7 @@ namespace hf {
 
         public:
 
-            void begin(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor * motors, bool armed=false)
+            void begin(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, bool armed=false)
             {  
                 // Do general initialization
                 general_begin(board, receiver, mixer);
@@ -222,8 +222,8 @@ namespace hf {
                 // Start the IMU
                 imu->begin();
 
-                // Tell the mixer which motors to use, and initialize them
-                mixer->useMotors(motors);
+                // Start the mixer
+                mixer->begin();
 
             } // init
 

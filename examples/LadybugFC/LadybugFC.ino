@@ -44,7 +44,7 @@ hf::Hackflight h;
 
 hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
-hf::MixerQuadXCF mixer;
+hf::MixerQuadXCF mixer(&hf::ladybugFcNewMotors);
 
 hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375, 2, 0.1);
 
@@ -53,7 +53,7 @@ hf::LevelPid levelPid = hf::LevelPid(0.20f);
 void setup(void)
 {
     // Initialize Hackflight firmware
-    h.begin(new hf::LadybugFC(), &hf::ladybugIMU, &rc, &mixer, &hf::ladybugFcNewMotors);
+    h.begin(new hf::LadybugFC(), &hf::ladybugIMU, &rc, &mixer);
 
     // Add PID controllers
     h.addPidController(&levelPid);

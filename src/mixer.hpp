@@ -62,12 +62,13 @@ namespace hf {
 
         protected:
 
-            Motor * _motors;
+            Motor * _motors = NULL;
 
-            motorMixer_t motorDirections[MAXMOTORS];
+            motorMixer_t motorDirections[MAXMOTORS] = {};
 
-            Mixer(uint8_t nmotors)
+            Mixer(Motor * motors, uint8_t nmotors)
             {
+                _motors = motors;
                 _nmotors = nmotors;
 
                 // set disarmed, previous motor values
@@ -83,10 +84,8 @@ namespace hf {
             // This is also use by serial task
             float  motorsDisarmed[MAXMOTORS];
 
-            void useMotors(Motor * motors)
+            void begin(void)
             {
-                _motors = motors;
-
                 _motors->begin();
             }
 
