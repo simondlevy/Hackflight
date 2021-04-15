@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include "debugger.hpp"
 #include "mspparser.hpp"
 #include "imu.hpp"
 #include "board.hpp"
@@ -42,9 +41,6 @@ namespace hf {
         private:
 
             static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
-
-            // Supports periodic ad-hoc debugging
-            Debugger _debugger;
 
             // Sensors 
             Sensor * _sensors[256] = {NULL};
@@ -134,9 +130,6 @@ namespace hf {
                 _board    = board;
                 _receiver = receiver;
                 _mixer = mixer;
-
-                // Ad-hoc debugging support
-                _debugger.begin(board);
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;

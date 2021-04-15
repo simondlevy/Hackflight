@@ -21,7 +21,6 @@
 #pragma once
 
 #include "board.hpp"
-#include "debugger.hpp"
 
 namespace hf {
 

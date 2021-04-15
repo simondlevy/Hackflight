@@ -23,7 +23,6 @@
 #include "timertask.hpp"
 #include "board.hpp"
 #include "mspparser.hpp"
-#include "debugger.hpp"
 #include "mixer.hpp"
 
 namespace hf {
