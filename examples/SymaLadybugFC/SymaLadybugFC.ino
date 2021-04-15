@@ -34,12 +34,12 @@ static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
 static hf::YawPid yawPid = hf::YawPid(2, 0.1);
 static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
-static hf::Hackflight h(&receiver, &mixer);
+static hf::Hackflight h(&receiver, &hf::ladybugIMU, &mixer);
 
 void setup(void)
 {
     // Initialize Hackflight firmware
-    h.begin(new hf::LadybugFC(), &hf::ladybugIMU);
+    h.begin(new hf::LadybugFC());
 
     // Add PID controllers
     h.addPidController(&levelPid);

@@ -170,18 +170,18 @@ namespace hf {
 
         public:
 
-            Hackflight(Receiver * receiver, Mixer * mixer)
+            Hackflight(Receiver * receiver, IMU * imu, Mixer * mixer)
             {
                 // Store the essentials
                 _mixer = mixer;
+                _imu  = imu;
                 _receiver = receiver;
             }
 
-            void begin(Board * board, IMU * imu, bool armed=false)
+            void begin(Board * board, bool armed=false)
             {  
                 // Store the essentials
                 _board = board;
-                _imu  = imu;
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
