@@ -170,17 +170,17 @@ namespace hf {
 
         public:
 
-            Hackflight(Mixer * mixer)
+            Hackflight(Receiver * receiver, Mixer * mixer)
             {
                 // Store the essentials
                 _mixer = mixer;
+                _receiver = receiver;
             }
 
-            void begin(Board * board, IMU * imu, Receiver * receiver, bool armed=false)
+            void begin(Board * board, IMU * imu, bool armed=false)
             {  
                 // Store the essentials
                 _board = board;
-                _receiver = receiver;
                 _imu  = imu;
 
                 // Support adding new sensors and PID controllers
@@ -199,7 +199,7 @@ namespace hf {
                 _pidTask.begin(_board, _receiver, _mixer, &_state);
  
                 // Initialize serial timer task
-                _serialTask.begin(board, &_state, receiver, _mixer);
+                _serialTask.begin(board, &_state, _receiver, _mixer);
 
                 // Support safety override by simulator
                 _state.armed = armed;
