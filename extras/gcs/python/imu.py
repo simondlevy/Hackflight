@@ -2,21 +2,9 @@
 '''
 Class or displaying vehicle orientation
 
-Copyright (C) Alec Singer and Simon D. Levy 2016
+Copyright (C) Alec Singer and Simon D. Levy 2021
 
-This file is part of Hackflight.
-
-Hackflight is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as 
-published by the Free Software Foundation, either version 3 of the 
-License, or (at your option) any later version.
-This code is distributed in the hope that it will be useful,     
-but WITHOUT ANY WARRANTY without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License 
-along with this code.  If not, see <http:#www.gnu.org/licenses/>.
+MIT License
 '''
 
 LEVEL_MAX_ANGLE_DIFF = .25
@@ -30,7 +18,7 @@ PITCH_ACTIVE = 2
 ROLL_ACTIVE = 3
 
 
-import tkcompat as tk
+import tkinter as tk
 
 from math import sin, cos
 
@@ -175,7 +163,9 @@ class IMU(Dialog):
 
         # Convert angles to X,Y,Z rotation matrices
 
-        rollAngle  = -self.roll_pitch_yaw[0] # negate so positive is roll rightward
+        # Roll-angle comes in as positive for right-side down, so negate for display
+        rollAngle  = -self.roll_pitch_yaw[0]
+
         self.rollrot[0][0] = +cos(rollAngle)
         self.rollrot[0][1] = -sin(rollAngle)
         self.rollrot[1][0] = +sin(rollAngle)
