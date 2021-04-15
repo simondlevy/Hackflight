@@ -176,15 +176,15 @@ namespace hf {
                 _mixer = mixer;
                 _imu  = imu;
                 _receiver = receiver;
+
+                // Support adding new sensors and PID controllers
+                _sensor_count = 0;
             }
 
             void begin(Board * board, bool armed=false)
             {  
                 // Store the essentials
                 _board = board;
-
-                // Support adding new sensors and PID controllers
-                _sensor_count = 0;
 
                 // Initialize state
                 memset(&_state, 0, sizeof(state_t));
