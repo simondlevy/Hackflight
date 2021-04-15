@@ -1,30 +1,72 @@
 /*
-   TinyPICO dev board with I^2C
+   TinyPICO implementation of Hackflight Board routines
 
-   Copyright (c) 2021 Simon D. Levy
+   Copyright (c) 2019 Simon D. Levy
 
-   MIT License
+   This file is part of Hackflight.
+
+   Hackflight is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   Hackflight is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   You should have received a copy of the GNU General Public License
+   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #pragma once
 
 #include <Wire.h>
+#include "boards/realboards/arduino.hpp"
 
-#include "rft_boards/realboards/tinypico.hpp"
+#include <TinyPICO.h>
 
 namespace hf {
 
-    class TinyPico : public rft::TinyPico {
+    class TinyPico : public RealBoard {
+
+        private:
+
+            TinyPICO tp;
+
+        protected:
+
+            void setLed(bool isOn) 
+            { 
+                tp.DotStar_SetPixelColor(0, isOn?255:0, 0);
+            }
+
+            uint8_t serialNormalAvailable(void)
+            {
+                return Serial.available();
+            }
+
+            uint8_t serialNormalRead(void)
+            {
+                return Serial.read();
+            }
+
+            void serialNormalWrite(uint8_t c)
+            {
+                Serial.write(c);
+            }
 
          public:
 
-            void begin(void) override
+            TinyPico(void) 
             {
-                rft::TinyPico::begin();
+                Serial.begin(115200);
 
-                // Hang a bit
+                // This will blink the LED
+                RealBoard::begin();
+
+                // Hang a bit 
                 delay(100);
-           
+
                 // Start I^2C
                 Wire.begin();
 
