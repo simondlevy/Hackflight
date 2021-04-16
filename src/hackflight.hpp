@@ -55,8 +55,8 @@ namespace hf {
             PidTask _pidTask;
 
             // Passed to Hackflight::begin() for a particular build
-            IMU        * _imu      = NULL;
-            Mixer      * _mixer    = NULL;
+            IMU * _imu      = NULL;
+            Mixer * _mixer    = NULL;
 
             // Serial timer task for GCS
             SerialTask _serialTask;
@@ -82,21 +82,6 @@ namespace hf {
                         sensor->modifyState(_state, time);
                     }
                 }
-
-                /*
-                // If gyrometer data ready
-                if (_gyrometer.ready(time)) {
-
-                    // Update state with gyro rates
-                    _gyrometer.modifyState(_state, time);
-                }
-
-                // If quaternion data ready
-                if (_quaternion.ready(time)) {
-
-                    // Update state with new quaternion to yield Euler angles
-                    _quaternion.modifyState(_state, time);
-                }*/
              }
 
 
@@ -105,18 +90,6 @@ namespace hf {
 
             // Vehicle state
             state_t _state;
-
-            /*
-            void checkOptionalSensors(void)
-            {
-                for (uint8_t k=0; k<_sensor_count; ++k) {
-                    Sensor * sensor = _sensors[k];
-                    float time = _board->getTime();
-                    if (sensor->ready(time)) {
-                        sensor->modifyState(_state, time);
-                    }
-                }
-            }*/
 
             void add_sensor(Sensor * sensor)
             {
