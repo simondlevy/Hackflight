@@ -31,8 +31,6 @@
 
 namespace hf {
 
-    USFS ladybugIMU;
-
     static const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
 
     rft::BrushedMotor ladybugFcNewMotors = rft::BrushedMotor(MOTOR_PINS, 4);

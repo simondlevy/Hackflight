@@ -38,7 +38,8 @@ namespace hf {
         friend class Quaternion;
         friend class Gyrometer;
 
-        protected:
+        // XXX protected:
+        public:
 
             // Core functionality
             virtual bool getQuaternion(float & qw, float & qx, float & qy, float & qz, float time) = 0;

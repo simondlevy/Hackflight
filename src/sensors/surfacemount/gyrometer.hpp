@@ -36,7 +36,8 @@ namespace hf {
             float _y = 0;
             float _z = 0;
 
-        protected:
+        // XXX protected:
+        public:
 
             virtual void modifyState(state_t & state, float time) override
             {

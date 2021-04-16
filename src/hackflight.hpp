@@ -61,10 +61,6 @@ namespace hf {
             // Serial timer task for GCS
             SerialTask _serialTask;
 
-             // Mandatory sensors on the board
-            Gyrometer _gyrometer;
-            Quaternion _quaternion; // not really a sensor, but we treat it like one!
- 
             bool safeAngle(uint8_t axis)
             {
                 return fabs(_state.x[axis]) < rft::Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
@@ -90,18 +86,6 @@ namespace hf {
 
             // Vehicle state
             state_t _state;
-
-            void add_sensor(Sensor * sensor)
-            {
-                _sensors[_sensor_count++] = sensor;
-            }
-
-            void add_sensor(SurfaceMountSensor * sensor, IMU * imu) 
-            {
-                add_sensor(sensor);
-
-                sensor->imu = imu;
-            }
 
             void checkReceiver(void)
             {
@@ -147,20 +131,15 @@ namespace hf {
 
         public:
 
-            Hackflight(rft::Board * board, Receiver * receiver, IMU * imu, Mixer * mixer)
+            Hackflight(rft::Board * board, Receiver * receiver, Mixer * mixer)
             {
                 // Store the essentials
                 _board = board;
                 _receiver = receiver;
-                _imu  = imu;
                 _mixer = mixer;
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
-
-                // Support for mandatory sensors
-                add_sensor(&_quaternion, _imu);
-                add_sensor(&_gyrometer, _imu);
             }
 
             void begin(bool armed=false)
@@ -186,9 +165,6 @@ namespace hf {
                 // Support safety override by simulator
                 _state.armed = armed;
 
-                // Start the IMU
-                _imu->begin();
-
                 // Start the mixer
                 _mixer->begin();
 
@@ -196,7 +172,7 @@ namespace hf {
 
             void addSensor(Sensor * sensor) 
             {
-                add_sensor(sensor);
+                _sensors[_sensor_count++] = sensor;
             }
 
             void addPidController(PidController * pidController, uint8_t auxState=0) 

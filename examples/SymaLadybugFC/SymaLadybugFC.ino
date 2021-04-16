@@ -23,6 +23,11 @@
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
 
+#include "imus/usfs.hpp"
+#include "sensors/surfacemount/gyrometer.hpp"
+#include "sensors/surfacemount/quaternion.hpp"
+
+
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 4.0f;
 
@@ -36,10 +41,27 @@ static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
 static hf::YawPid yawPid = hf::YawPid(2, 0.1);
 static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
-static hf::Hackflight h(&board, &receiver, &hf::ladybugIMU, &mixer);
+static hf::Hackflight h(&board, &receiver, &mixer);
+
+static hf::Gyrometer gyrometer;
+static hf::Quaternion quaternion; // not really a sensor, but we treat it like one!
+
+static hf::USFS imu;
+ 
+static void add_sensor(hf::SurfaceMountSensor * sensor) 
+{
+    h.addSensor(sensor);
+    sensor->imu = &imu;
+}
+
 
 void setup(void)
 {
+
+    // XXX simplify
+    add_sensor(&quaternion);
+    add_sensor(&gyrometer);
+
     // Add PID controllers
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
@@ -50,6 +72,8 @@ void setup(void)
 
     // Initialize Hackflight firmware
     h.begin();
+
+    imu.begin();
 }
 
 void loop(void)

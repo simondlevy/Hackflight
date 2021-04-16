@@ -42,7 +42,8 @@ namespace hf {
 
         friend class Hackflight;
 
-        protected:
+        // XXX protected:
+        public:
 
             IMU * imu = NULL;
 
