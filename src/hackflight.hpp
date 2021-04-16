@@ -75,6 +75,15 @@ namespace hf {
                 // Some gyrometers may need to know the current time
                 float time = _board->getTime();
 
+                for (uint8_t k=0; k<_sensor_count; ++k) {
+                    Sensor * sensor = _sensors[k];
+                    float time = _board->getTime();
+                    if (sensor->ready(time)) {
+                        sensor->modifyState(_state, time);
+                    }
+                }
+
+                /*
                 // If gyrometer data ready
                 if (_gyrometer.ready(time)) {
 
@@ -87,7 +96,7 @@ namespace hf {
 
                     // Update state with new quaternion to yield Euler angles
                     _quaternion.modifyState(_state, time);
-                }
+                }*/
              }
 
 
