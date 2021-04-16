@@ -40,8 +40,8 @@ static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 static hf::Hackflight h(&board, &receiver, &mixer);
 
-static hf::Gyrometer gyrometer;
-static hf::Quaternion quaternion; // not really a sensor, but we treat it like one!
+static hf::UsfsGyrometer gyrometer;
+static hf::UsfsQuaternion quaternion; // not really a sensor, but we treat it like one!
 
 static hf::USFS imu;
  

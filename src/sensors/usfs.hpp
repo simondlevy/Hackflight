@@ -1,21 +1,9 @@
 /*
    Support for USFS IMU
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2021 Simon D. Levy
 
-   This file is part of Hackflight.
-
-   Hackflight is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   Hackflight is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-   You should have received a copy of the GNU General Public License
-   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+   MIT License
  */
 
 #pragma once
@@ -45,8 +33,8 @@ namespace hf {
     class USFS {
 
         friend class Hackflight;
-        friend class Quaternion;
-        friend class Gyrometer;
+        friend class UsfsQuaternion;
+        friend class UsfsGyrometer;
 
         private:
 
@@ -128,7 +116,7 @@ namespace hf {
 
     }; // class USFS
 
-    class Gyrometer : public Sensor {
+    class UsfsGyrometer : public Sensor {
 
         friend class Hackflight;
 
@@ -140,6 +128,15 @@ namespace hf {
 
         // XXX protected:
         public:
+
+            /*
+            virtual void begin(void) override
+            {
+                while (true) {
+                    Serial.println("gyro");
+                    delay(500);
+                }
+            }*/
 
             virtual void modifyState(state_t & state, float time) override
             {
@@ -164,7 +161,7 @@ namespace hf {
 
             USFS * imu = NULL;
 
-            Gyrometer(void)
+            UsfsGyrometer(void)
             {
                 _x = 0;
                 _y = 0;
@@ -173,7 +170,7 @@ namespace hf {
 
     };  // class Gyrometer
 
-    class Quaternion : public Sensor {
+    class UsfsQuaternion : public Sensor {
 
         friend class Hackflight;
 
@@ -189,13 +186,22 @@ namespace hf {
 
             USFS * imu = NULL;
 
-            Quaternion(void)
+            UsfsQuaternion(void)
             {
                 _w = 0;
                 _x = 0;
                 _y = 0;
                 _z = 0;
             }
+
+            /*
+            virtual void begin(void) override
+            {
+                while (true) {
+                    Serial.println("quat");
+                    delay(500);
+                }
+            }*/
 
             virtual void modifyState(state_t & state, float time) override
             {

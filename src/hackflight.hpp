@@ -76,6 +76,12 @@ namespace hf {
                 }
              }
 
+            void startSensors(void)
+            {
+                for (uint8_t k=0; k<_sensor_count; ++k) {
+                    _sensors[k]->begin();
+                }
+             }
 
             rft::Board    * _board    = NULL;
             Receiver * _receiver = NULL;
@@ -142,6 +148,9 @@ namespace hf {
             {  
                 // Initialize state
                 memset(&_state, 0, sizeof(state_t));
+
+                // Start the sensors
+                startSensors();
 
                 // Start the board
                 _board->begin();
