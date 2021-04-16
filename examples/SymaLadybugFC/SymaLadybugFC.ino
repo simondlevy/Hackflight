@@ -22,10 +22,7 @@
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
-
 #include "sensors/usfs.hpp"
-#include "sensors/gyrometer.hpp"
-#include "sensors/quaternion.hpp"
 
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
@@ -48,19 +45,15 @@ static hf::Quaternion quaternion; // not really a sensor, but we treat it like o
 
 static hf::USFS imu;
  
-static void add_sensor(hf::SurfaceMountSensor * sensor) 
-{
-    h.addSensor(sensor);
-    sensor->imu = &imu;
-}
-
 
 void setup(void)
 {
 
     // XXX simplify
-    add_sensor(&quaternion);
-    add_sensor(&gyrometer);
+    h.addSensor(&quaternion);
+    quaternion.imu = &imu;
+    h.addSensor(&gyrometer);
+    gyrometer.imu = &imu;
 
     // Add PID controllers
     h.addPidController(&levelPid);
