@@ -27,7 +27,6 @@
 #include "receiver.hpp"
 #include "state.hpp"
 #include "pidcontroller.hpp"
-#include "motor.hpp"
 #include "mixer.hpp"
 #include "sensors/surfacemount.hpp"
 #include "timertasks/pidtask.hpp"

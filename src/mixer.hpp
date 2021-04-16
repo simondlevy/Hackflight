@@ -20,8 +20,7 @@
 
 #pragma once
 
-#include "motor.hpp"
-
+#include <RFT_motor.hpp>
 #include <RFT_filters.hpp>
 
 namespace hf {
@@ -63,11 +62,11 @@ namespace hf {
 
         protected:
 
-            Motor * _motors = NULL;
+            rft::Motor * _motors = NULL;
 
             motorMixer_t motorDirections[MAXMOTORS] = {};
 
-            Mixer(Motor * motors, uint8_t nmotors)
+            Mixer(rft::Motor * motors, uint8_t nmotors)
             {
                 _motors = motors;
                 _nmotors = nmotors;

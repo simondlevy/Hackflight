@@ -23,11 +23,11 @@
 #pragma once
 
 #include <rft_boards/realboards/arduino.hpp>
+#include <rft_motors/realmotors/brushed.hpp>
 
 #include <Wire.h>
 
 #include "imus/usfs.hpp"
-#include "motors/brushed.hpp"
 
 namespace hf {
 
@@ -35,7 +35,7 @@ namespace hf {
 
     static const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
 
-    BrushedMotor ladybugFcNewMotors = BrushedMotor(MOTOR_PINS, 4);
+    rft::BrushedMotor ladybugFcNewMotors = rft::BrushedMotor(MOTOR_PINS, 4);
 
     class LadybugFC : public rft::ArduinoBoard {
 

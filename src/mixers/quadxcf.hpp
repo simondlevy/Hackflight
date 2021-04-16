@@ -27,6 +27,8 @@
 #pragma once
 
 #include <RFT_board.hpp>
+#include <RFT_motor.hpp>
+
 #include "mixer.hpp"
 
 namespace hf {
@@ -35,7 +37,7 @@ namespace hf {
 
         public:
 
-            MixerQuadXCF(Motor * motors) 
+            MixerQuadXCF(rft::Motor * motors) 
                 : Mixer(motors, 4)
             {
                 //                     Th  RR  PF  YR
