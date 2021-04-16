@@ -20,11 +20,11 @@
 
 #pragma once
 
-#include "boards/realboard.hpp"
+#include <rft_boards/realboard.hpp>
 
 namespace hf {
 
-    class ArduinoBoard : public RealBoard {
+    class ArduinoBoard : public rft::RealBoard {
 
         private:
 
@@ -45,7 +45,7 @@ namespace hf {
                 digitalWrite(_led_pin, _led_inverted ? HIGH : LOW);
 
                 Serial.begin(115200);
-                RealBoard::begin();
+                rft::RealBoard::begin();
             }
 
             void setLed(bool isOn) 
