@@ -70,20 +70,7 @@ namespace hf {
                 return fabs(_state.x[axis]) < rft::Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
-           void checkQuaternion(void)
-            {
-                // Some quaternion filters may need to know the current time
-                float time = _board->getTime();
-
-                // If quaternion data ready
-                if (_quaternion.ready(time)) {
-
-                    // Update state with new quaternion to yield Euler angles
-                    _quaternion.modifyState(_state, time);
-                }
-            }
-
-            void checkGyrometer(void)
+            void checkSensors(void)
             {
                 // Some gyrometers may need to know the current time
                 float time = _board->getTime();
@@ -94,7 +81,14 @@ namespace hf {
                     // Update state with gyro rates
                     _gyrometer.modifyState(_state, time);
                 }
-            }
+
+                // If quaternion data ready
+                if (_quaternion.ready(time)) {
+
+                    // Update state with new quaternion to yield Euler angles
+                    _quaternion.modifyState(_state, time);
+                }
+             }
 
 
             rft::Board    * _board    = NULL;
@@ -103,6 +97,7 @@ namespace hf {
             // Vehicle state
             state_t _state;
 
+            /*
             void checkOptionalSensors(void)
             {
                 for (uint8_t k=0; k<_sensor_count; ++k) {
@@ -112,7 +107,7 @@ namespace hf {
                         sensor->modifyState(_state, time);
                     }
                 }
-            }
+            }*/
 
             void add_sensor(Sensor * sensor)
             {
@@ -235,12 +230,8 @@ namespace hf {
                 // Update PID controllers task
                 _pidTask.update();
 
-                // Check mandatory sensors
-                checkGyrometer();
-                checkQuaternion();
-
-                // Check optional sensors
-                checkOptionalSensors();
+                // Check sensors
+                checkSensors();
 
                 // Update serial comms task
                 _serialTask.update();
