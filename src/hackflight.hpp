@@ -180,6 +180,10 @@ namespace hf {
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
+
+                // Support for mandatory sensors
+                add_sensor(&_quaternion, _imu);
+                add_sensor(&_gyrometer, _imu);
             }
 
             void begin(bool armed=false)
@@ -204,10 +208,6 @@ namespace hf {
 
                 // Support safety override by simulator
                 _state.armed = armed;
-
-                // Support for mandatory sensors
-                add_sensor(&_quaternion, _imu);
-                add_sensor(&_gyrometer, _imu);
 
                 // Start the IMU
                 _imu->begin();
