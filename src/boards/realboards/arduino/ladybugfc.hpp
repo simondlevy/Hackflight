@@ -27,8 +27,6 @@
 
 #include <Wire.h>
 
-#include "imus/usfs.hpp"
-
 namespace hf {
 
     static const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};

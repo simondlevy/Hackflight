@@ -23,9 +23,9 @@
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
 
-#include "imus/usfs.hpp"
-#include "sensors/surfacemount/gyrometer.hpp"
-#include "sensors/surfacemount/quaternion.hpp"
+#include "sensors/usfs.hpp"
+#include "sensors/gyrometer.hpp"
+#include "sensors/quaternion.hpp"
 
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
