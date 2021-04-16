@@ -22,8 +22,10 @@
 
 #pragma once
 
+#include <rft_boards/realboards/arduino.hpp>
+
 #include <Wire.h>
-#include "boards/realboards/arduino.hpp"
+
 #include "imus/usfs.hpp"
 #include "motors/brushed.hpp"
 
@@ -35,13 +37,13 @@ namespace hf {
 
     BrushedMotor ladybugFcNewMotors = BrushedMotor(MOTOR_PINS, 4);
 
-    class LadybugFC : public ArduinoBoard {
+    class LadybugFC : public rft::ArduinoBoard {
 
         protected:
 
             void begin(void)
             {
-                ArduinoBoard::begin();
+                rft::ArduinoBoard::begin();
 
                 // Start I^2C
                 Wire.begin();
@@ -54,7 +56,7 @@ namespace hf {
 
             // Support prototype version where LED is on pin A1
             LadybugFC(uint8_t ledPin = A4) 
-                : ArduinoBoard(ledPin)
+                : rft::ArduinoBoard(ledPin)
             {
             }
 
