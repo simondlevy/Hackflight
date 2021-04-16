@@ -40,9 +40,6 @@ static hf::Hackflight h(&board, &receiver, &hf::ladybugIMU, &mixer);
 
 void setup(void)
 {
-    // Initialize Hackflight firmware
-    h.begin();
-
     // Add PID controllers
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
@@ -50,6 +47,9 @@ void setup(void)
 
     // Adjust trim
     receiver.setTrim(0, 0.06, 0.02);
+
+    // Initialize Hackflight firmware
+    h.begin();
 }
 
 void loop(void)
