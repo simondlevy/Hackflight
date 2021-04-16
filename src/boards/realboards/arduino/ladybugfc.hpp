@@ -37,17 +37,25 @@ namespace hf {
 
     class LadybugFC : public ArduinoBoard {
 
+        protected:
+
+            void begin(void)
+            {
+                ArduinoBoard::begin();
+
+                // Start I^2C
+                Wire.begin();
+
+                // Hang a bit
+                delay(100);
+            }
+
         public:
 
             // Support prototype version where LED is on pin A1
             LadybugFC(uint8_t ledPin = A4) 
                 : ArduinoBoard(ledPin)
             {
-                // Start I^2C
-                Wire.begin();
-
-                // Hang a bit
-                delay(100);
             }
 
     }; // class LadybugFC

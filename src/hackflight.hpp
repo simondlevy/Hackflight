@@ -208,6 +208,9 @@ namespace hf {
                 add_sensor(&_quaternion, _imu);
                 add_sensor(&_gyrometer, _imu);
 
+                // Start the board
+                _board->begin();
+
                 // Start the IMU
                 _imu->begin();
 
