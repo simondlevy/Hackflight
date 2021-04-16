@@ -20,9 +20,10 @@
 
 #pragma once
 
+#include <RFT_board.hpp>
+
 #include "mspparser.hpp"
 #include "imu.hpp"
-#include "board.hpp"
 #include "receiver.hpp"
 #include "state.hpp"
 #include "pidcontroller.hpp"
@@ -97,7 +98,7 @@ namespace hf {
             }
 
 
-            Board    * _board    = NULL;
+            rft::Board    * _board    = NULL;
             Receiver * _receiver = NULL;
 
             // Vehicle state
@@ -170,7 +171,7 @@ namespace hf {
 
         public:
 
-            Hackflight(Board * board, Receiver * receiver, IMU * imu, Mixer * mixer)
+            Hackflight(rft::Board * board, Receiver * receiver, IMU * imu, Mixer * mixer)
             {
                 // Store the essentials
                 _board = board;

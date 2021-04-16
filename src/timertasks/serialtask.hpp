@@ -20,8 +20,9 @@
 
 #pragma once
 
+#include <RFT_board.hpp>
+
 #include "timertask.hpp"
-#include "board.hpp"
 #include "mspparser.hpp"
 #include "mixer.hpp"
 
@@ -39,7 +40,7 @@ namespace hf {
             Receiver * _receiver = NULL;
             state_t  * _state = NULL;
 
-            void _begin(Board * board, state_t * state, Receiver * receiver) 
+            void _begin(rft::Board * board, state_t * state, Receiver * receiver) 
             {
                 TimerTask::begin(board);
 
@@ -127,7 +128,7 @@ namespace hf {
             {
             }
 
-            void begin(Board * board, state_t * state, Receiver * receiver, Mixer * mixer) 
+            void begin(rft::Board * board, state_t * state, Receiver * receiver, Mixer * mixer) 
             {
                 TimerTask::begin(board);
                 _state = state;

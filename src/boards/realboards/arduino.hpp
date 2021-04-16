@@ -84,9 +84,12 @@ namespace hf {
 
     }; // class ArduinoBoard
 
-    void Board::outbuf(char * buf)
-    {
-        Serial.print(buf);
-    }
-
 } // namespace hf
+
+// XXX should go back in rft namespace
+void rft::Board::outbuf(char * buf)
+{
+    Serial.print(buf);
+}
+
+

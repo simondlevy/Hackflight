@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "board.hpp"
+#include <RFT_board.hpp>
 #include "mixer.hpp"
 
 namespace hf {

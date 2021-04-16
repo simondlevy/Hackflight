@@ -20,13 +20,13 @@
 
 #pragma once
 
-#include "board.hpp"
+#include <RFT_board.hpp>
 #include <RFT_debugger.hpp>
 #include <RFT_filters.hpp>
 
 namespace hf {
 
-    class RealBoard : public Board {
+    class RealBoard : public rft::Board {
 
         private:
 
