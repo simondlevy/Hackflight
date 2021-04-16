@@ -170,26 +170,27 @@ namespace hf {
 
         public:
 
-            Hackflight(Receiver * receiver, IMU * imu, Mixer * mixer)
+            Hackflight(Board * board, Receiver * receiver, IMU * imu, Mixer * mixer)
             {
                 // Store the essentials
-                _mixer = mixer;
-                _imu  = imu;
+                _board = board;
                 _receiver = receiver;
+                _imu  = imu;
+                _mixer = mixer;
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
             }
 
-            void begin(Board * board, bool armed=false)
+            void begin(bool armed=false)
             {  
-                // Store the essentials
-                _board = board;
-
                 // Initialize state
                 memset(&_state, 0, sizeof(state_t));
 
-                // Initialize the receiver
+                // Start the board
+                _board->begin();
+
+                // Start the receiver
                 _receiver->begin();
 
                 // Setup failsafe
@@ -199,7 +200,7 @@ namespace hf {
                 _pidTask.begin(_board, _receiver, _mixer, &_state);
  
                 // Initialize serial timer task
-                _serialTask.begin(board, &_state, _receiver, _mixer);
+                _serialTask.begin(_board, &_state, _receiver, _mixer);
 
                 // Support safety override by simulator
                 _state.armed = armed;
@@ -207,9 +208,6 @@ namespace hf {
                 // Support for mandatory sensors
                 add_sensor(&_quaternion, _imu);
                 add_sensor(&_gyrometer, _imu);
-
-                // Start the board
-                _board->begin();
 
                 // Start the IMU
                 _imu->begin();
