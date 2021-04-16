@@ -21,14 +21,14 @@
 #pragma once
 
 #include <RFT_board.hpp>
+#include <RFT_timertask.hpp>
 
-#include "timertask.hpp"
 #include "mspparser.hpp"
 #include "mixer.hpp"
 
 namespace hf {
 
-    class SerialTask : public TimerTask, public MspParser {
+    class SerialTask : public rft::TimerTask, public MspParser {
 
         friend class Hackflight;
 
@@ -42,7 +42,7 @@ namespace hf {
 
             void _begin(rft::Board * board, state_t * state, Receiver * receiver) 
             {
-                TimerTask::begin(board);
+                rft::TimerTask::begin(board);
 
                 MspParser::begin();
 
@@ -124,13 +124,13 @@ namespace hf {
             }
 
             SerialTask(void)
-                : TimerTask(FREQ)
+                : rft::TimerTask(FREQ)
             {
             }
 
             void begin(rft::Board * board, state_t * state, Receiver * receiver, Mixer * mixer) 
             {
-                TimerTask::begin(board);
+                rft::TimerTask::begin(board);
                 _state = state;
                 _receiver = receiver;
                 _mixer = mixer;

@@ -20,11 +20,11 @@
 
 #pragma once
 
-#include "timertask.hpp"
+#include <RFT_timertask.hpp>
 
 namespace hf {
 
-    class PidTask : public TimerTask {
+    class PidTask : public rft::TimerTask {
 
         friend class Hackflight;
 
@@ -46,14 +46,14 @@ namespace hf {
         protected:
 
             PidTask(void)
-                : TimerTask(FREQ)
+                : rft::TimerTask(FREQ)
             {
                 _pid_controller_count = 0;
             }
 
             void begin(rft::Board * board, Receiver * receiver, Mixer * mixer, state_t * state)
             {
-                TimerTask::begin(board);
+                rft::TimerTask::begin(board);
 
                 _receiver = receiver;
                 _mixer = mixer;

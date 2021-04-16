@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include "demands.hpp"
 #include <RFT_filters.hpp>
 
 namespace hf {
@@ -30,8 +29,6 @@ namespace hf {
         friend class PidTask;
 
         protected:
-
-            static constexpr float STICK_DEADBAND = 0.10;
 
             virtual void modifyDemands(state_t * state, float * demands) = 0;
 

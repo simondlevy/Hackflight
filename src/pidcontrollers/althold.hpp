@@ -30,6 +30,8 @@ namespace hf {
 
         private: 
 
+            static constexpr float STICK_DEADBAND = 0.10;
+
             // Arbitrary constants: for details see http://ardupilot.org/copter/docs/altholdmode.html
             static constexpr float PILOT_VELZ_MAX  = 2.5f;
             static constexpr float STICK_DEADBAND = 0.10;   
