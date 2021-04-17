@@ -13,9 +13,11 @@
 
 #include "demands.hpp"
 
+#include <RFT_openloop.hpp>
+
 namespace hf {
 
-    class Receiver {
+    class Receiver : public rft::OpenLoopController {
 
         friend class Hackflight;
         friend class SerialTask;
@@ -128,6 +130,11 @@ namespace hf {
                 _trimYaw   = 0;
 
                 _demandScale = demandScale;
+            }
+
+            virtual void getDemands(float * demands) override
+            {
+                // XXX
             }
 
             bool getDemands(void)

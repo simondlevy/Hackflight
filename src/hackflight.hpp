@@ -21,9 +21,11 @@
 #include <RFT_sensor.hpp>
 #include <RFT_filters.hpp>
 
+#include <RoboFirmwareToolkit.hpp>
+
 namespace hf {
 
-    class Hackflight {
+    class Hackflight : public rft::RFT {
 
         private:
 
@@ -118,9 +120,17 @@ namespace hf {
 
             } // checkReceiver
 
+        protected:
+
+            virtual State * getState(void) override
+            {
+                return &_state;
+            }
+
         public:
 
             Hackflight(rft::Board * board, Receiver * receiver, Mixer * mixer)
+                : rft::RFT(board, receiver, mixer)
             {
                 // Store the essentials
                 _board = board;
