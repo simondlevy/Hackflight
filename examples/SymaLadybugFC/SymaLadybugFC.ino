@@ -13,6 +13,8 @@
        https://github.com/simondlevy/grumpyoldpizza
 
    Copyright (c) 2018 Simon D. Levy
+
+   MIT License
  */
 
 #include "hackflight.hpp"
