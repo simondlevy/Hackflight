@@ -24,12 +24,12 @@
 #include <RFT_filters.hpp>
 #include "state.hpp"
 #include "demands.hpp"
-#include "pidcontroller.hpp"
+
 #include "pidcontrollers/angvel.hpp"
 
 namespace hf {
 
-    class RatePid : public PidController {
+    class RatePid : public rft::PidController {
 
         private: 
 
@@ -45,18 +45,20 @@ namespace hf {
                 _pitchPid.begin(Kp, Ki, Kd);
             }
 
-            void modifyDemands(State * state, float * demands)
+            virtual void modifyDemands(rft::State * state, float * demands) override
             {
-                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL],  state->x[State::DPHI]);
-                demands[DEMANDS_PITCH] = _pitchPid.compute(-demands[DEMANDS_PITCH], -state->x[State::DTHETA]);
+                State * hfstate = (State *)state;
+                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL],  hfstate->x[State::DPHI]);
+                demands[DEMANDS_PITCH] = _pitchPid.compute(-demands[DEMANDS_PITCH], -hfstate->x[State::DTHETA]);
             }
 
+            /* XXX should be replaced by resetOnInactivity()
             virtual void updateReceiver(bool throttleIsDown) override
             {
                 // Check throttle-down for integral reset
                 _rollPid.updateReceiver(throttleIsDown);
                 _pitchPid.updateReceiver(throttleIsDown);
-            }
+            }*/
 
     };  // class RatePid
 

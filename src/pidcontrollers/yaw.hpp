@@ -24,12 +24,11 @@
 #include <RFT_filters.hpp>
 #include "state.hpp"
 #include "demands.hpp"
-#include "pidcontroller.hpp"
 #include "pidcontrollers/angvel.hpp"
 
 namespace hf {
 
-    class YawPid : public PidController {
+    class YawPid : public rft::PidController {
 
         private: 
 
@@ -46,9 +45,11 @@ namespace hf {
                 _yawPid.begin(Kp_yaw, Ki_yaw, 0);
             }
 
-            void modifyDemands(State * state, float * demands)
+            void modifyDemands(rft::State * state, float * demands)
             {
-                demands[DEMANDS_YAW]   = _yawPid.compute(-demands[DEMANDS_YAW], -state->x[State::DPSI]);
+                State * hfstate = (State *)state;
+
+                demands[DEMANDS_YAW] = _yawPid.compute(-demands[DEMANDS_YAW], -hfstate->x[State::DPSI]);
 
                 // Prevent "yaw jump" during correction
                 demands[DEMANDS_YAW] = rft::Filter::constrainAbs(demands[DEMANDS_YAW], 0.1 + fabs(demands[DEMANDS_YAW]));
@@ -59,11 +60,12 @@ namespace hf {
                 }
             }
 
+            /* XXX should be replaced by resetOnInactivity()
             virtual void updateReceiver(bool throttleIsDown) override
             {
                 // Check throttle-down for integral reset
                 _yawPid.updateReceiver(throttleIsDown);
-            }
+            }*/
 
     };  // class YawPid
 

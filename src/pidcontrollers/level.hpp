@@ -22,16 +22,17 @@
 
 #include "state.hpp"
 #include "demands.hpp"
-#include "pidcontroller.hpp"
+
+#include <rft_closedloops/pidcontroller.hpp>
 
 namespace hf {
 
-    class LevelPid : public PidController {
+    class LevelPid : public rft::PidController {
 
         private:
 
             // Helper class
-            class _AnglePid : public Pid {
+            class _AnglePid : public rft::DofPid {
 
                 private:
 
@@ -45,12 +46,12 @@ namespace hf {
 
                     void begin(const float Kp) 
                     {
-                        Pid::begin(Kp, 0, 0);
+                        rft::DofPid::begin(Kp, 0, 0);
                     }
 
                     float compute(float demand, float angle)
                     {
-                        return Pid::compute(demand*_demandMultiplier, angle);
+                        return rft::DofPid::compute(demand*_demandMultiplier, angle);
                     }
 
             }; // class _AnglePid
@@ -71,10 +72,11 @@ namespace hf {
             {
             }
 
-            void modifyDemands(State * state, float * demands)
+            void modifyDemands(rft::State * state, float * demands)
             {
-                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], state->x[State::PHI]);
-                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], state->x[State::THETA]);
+                State * hfstate = (State *)state;
+                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], hfstate->x[State::PHI]);
+                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], hfstate->x[State::THETA]);
             }
 
     };  // class LevelPid

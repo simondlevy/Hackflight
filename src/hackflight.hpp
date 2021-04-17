@@ -13,11 +13,11 @@
 #include "mspparser.hpp"
 #include "receiver.hpp"
 #include "state.hpp"
-#include "pidcontroller.hpp"
 #include "mixer.hpp"
 #include "timertasks/pidtask.hpp"
 #include "timertasks/serialtask.hpp"
 
+#include <rft_closedloops/pidcontroller.hpp>
 #include <RFT_sensor.hpp>
 #include <RFT_filters.hpp>
 
@@ -167,7 +167,7 @@ namespace hf {
                 _sensors[_sensor_count++] = sensor;
             }
 
-            void addPidController(PidController * pidController, uint8_t auxState=0) 
+            void addPidController(rft::PidController * pidController, uint8_t auxState=0) 
             {
                 _pidTask.addPidController(pidController, auxState);
             }

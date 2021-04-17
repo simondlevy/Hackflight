@@ -21,6 +21,7 @@
 #pragma once
 
 #include <RFT_timertask.hpp>
+#include <rft_closedloops/pidcontroller.hpp>
 
 namespace hf {
 
@@ -35,7 +36,7 @@ namespace hf {
             static constexpr float FREQ = 300;
 
             // PID controllers
-            PidController * _pid_controllers[256] = {NULL};
+            rft::PidController * _pid_controllers[256] = {NULL};
             uint8_t _pid_controller_count = 0;
 
             // Other stuff we need
@@ -43,7 +44,8 @@ namespace hf {
             Mixer * _mixer = NULL;
             State * _state    = NULL;
 
-        protected:
+        // protected:
+        public:
 
             PidTask(void)
                 : rft::TimerTask(FREQ)
@@ -60,9 +62,9 @@ namespace hf {
                 _state = state;
             }
 
-            void addPidController(PidController * pidController, uint8_t auxState) 
+            void addPidController(rft::PidController * pidController, uint8_t auxState) 
             {
-                pidController->auxState = auxState;
+                pidController->modeIndex = auxState;
 
                 _pid_controllers[_pid_controller_count++] = pidController;
             }
@@ -79,19 +81,17 @@ namespace hf {
                 // Each PID controllers is associated with at least one auxiliary switch state
                 uint8_t auxState = _receiver->getAux2State();
 
-                //Debugger::printf("Aux state: %d", auxState);
-
                 // Some PID controllers should cause LED to flash when they're active
                 bool shouldFlash = false;
 
                 for (uint8_t k=0; k<_pid_controller_count; ++k) {
 
-                    PidController * pidController = _pid_controllers[k];
+                    rft::PidController * pidController = _pid_controllers[k];
 
                     // Some PID controllers need to reset their integral when the throttle is down
-                    pidController->updateReceiver(_receiver->throttleIsDown());
+                    // pidController->updateReceiver(_receiver->throttleIsDown());
 
-                    if (pidController->auxState <= auxState) {
+                    if (pidController->modeIndex <= auxState) {
 
                         pidController->modifyDemands(_state, demands); 
 
