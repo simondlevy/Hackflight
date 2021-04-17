@@ -10,10 +10,11 @@
 
 #include <RFT_motor.hpp>
 #include <RFT_filters.hpp>
+#include <RFT_actuator.hpp>
 
 namespace hf {
 
-    class Mixer {
+    class Mixer : public rft::Actuator {
 
         friend class Hackflight;
         friend class SerialTask;
