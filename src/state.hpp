@@ -9,10 +9,11 @@
 #pragma once
 
 #include <RFT_filters.hpp>
+#include <RFT_state.hpp>
 
 namespace hf {
 
-    class State {
+    class State : public rft::State{
 
         private:
 
@@ -25,15 +26,12 @@ namespace hf {
 
             float x[SIZE];
 
-            bool armed = false;
-            bool failsafe = false;
-
             bool safeAngle(uint8_t axis)
             {
                 return fabs(x[axis]) < rft::Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
-            bool safeToArm(void)
+            virtual bool safeToArm(void) override
             {
                 return safeAngle(PHI) && safeAngle(THETA);
             }
