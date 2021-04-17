@@ -8,9 +8,15 @@
 
 #pragma once
 
+#include <RFT_filters.hpp>
+
 namespace hf {
 
     class State {
+
+        private:
+
+            static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
 
         public:
 
@@ -19,10 +25,19 @@ namespace hf {
 
             float x[SIZE];
 
-            bool armed;
-            bool failsafe;
+            bool armed = false;
+            bool failsafe = false;
+
+            bool safeAngle(uint8_t axis)
+            {
+                return fabs(x[axis]) < rft::Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
+            }
+
+            bool safeToArm(void)
+            {
+                return safeAngle(PHI) && safeAngle(THETA);
+            }
 
     }; // class State
-
 
 } // namespace hf
