@@ -1,5 +1,5 @@
 /*
-   Hackflight state info
+   Hackflight state class
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -10,36 +10,21 @@
 
 namespace hf {
 
-    enum {
-        AXIS_ROLL = 0,
-        AXIS_PITCH, 
-        AXIS_YAW
-    };
+    class State {
 
-    // See Bouabdallah et al. (2004)
-    enum {
-        STATE_X = 0,
-        STATE_DX,
-        STATE_Y,
-        STATE_DY,
-        STATE_Z,
-        STATE_DZ,
-        STATE_PHI,
-        STATE_DPHI,
-        STATE_THETA,
-        STATE_DTHETA,
-        STATE_PSI,
-        STATE_DPSI,
-        STATE_SIZE
-    };
+        public:
 
-    typedef struct {
+            enum {AXIS_ROLL, AXIS_PITCH, AXIS_YAW};
 
-        float x[STATE_SIZE];
+            // See Bouabdallah et al. (2004)
+            enum {X, DX, Y, DY, Z, DZ, PHI, DPHI, THETA, DTHETA, PSI, DPSI, SIZE};
 
-        bool armed;
-        bool failsafe;
+            float x[SIZE];
 
-    } state_t;
+            bool armed;
+            bool failsafe;
+
+    }; // class State
+
 
 } // namespace hf

@@ -41,7 +41,7 @@ namespace hf {
             // Other stuff we need
             Receiver * _receiver = NULL;
             Mixer * _mixer = NULL;
-            state_t  * _state    = NULL;
+            State * _state    = NULL;
 
         protected:
 
@@ -51,7 +51,7 @@ namespace hf {
                 _pid_controller_count = 0;
             }
 
-            void begin(rft::Board * board, Receiver * receiver, Mixer * mixer, state_t * state)
+            void begin(rft::Board * board, Receiver * receiver, Mixer * mixer, State * state)
             {
                 rft::TimerTask::begin(board);
 

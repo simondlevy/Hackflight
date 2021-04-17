@@ -75,7 +75,7 @@ namespace hf {
             Receiver * _receiver = NULL;
 
             // Vehicle state
-            state_t _state;
+            State _state;
 
             void checkReceiver(void)
             {
@@ -105,7 +105,7 @@ namespace hf {
 
                 // Arm (after lots of safety checks!)
                 if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux1State() && 
-                        !_state.failsafe && safeAngle(STATE_PHI) && safeAngle(STATE_THETA)) {
+                        !_state.failsafe && safeAngle(State::PHI) && safeAngle(State::THETA)) {
                     _state.armed = true;
                 }
 
@@ -135,7 +135,7 @@ namespace hf {
             void begin(bool armed=false)
             {  
                 // Initialize state
-                memset(&_state, 0, sizeof(state_t));
+                memset(&_state, 0, sizeof(State));
 
                 // Start the board
                 _board->begin();

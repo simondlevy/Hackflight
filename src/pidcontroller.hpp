@@ -18,7 +18,7 @@ namespace hf {
 
         protected:
 
-            virtual void modifyDemands(state_t * state, float * demands) = 0;
+            virtual void modifyDemands(State * state, float * demands) = 0;
 
             virtual bool shouldFlashLed(void) { return false; }
 

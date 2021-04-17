@@ -143,14 +143,14 @@ namespace hf {
         }
 
 
-        virtual void modifyState(state_t & state, float time) override
+        virtual void modifyState(State & state, float time) override
         {
             (void)time;
 
             // NB: We negate gyro Y, Z to simplify PID controller
-            state.x[STATE_DPHI] = _x;
-            state.x[STATE_DTHETA] = _y;
-            state.x[STATE_DPSI] = _z;
+            state.x[State::DPHI] = _x;
+            state.x[State::DTHETA] = _y;
+            state.x[State::DPSI] = _z;
         }
 
         virtual bool ready(float time) override
@@ -193,21 +193,21 @@ namespace hf {
             _imu->begin();
         }
 
-        virtual void modifyState(state_t & state, float time) override
+        virtual void modifyState(State & state, float time) override
         {
             (void)time;
 
             float qw = _w, qx = _x, qy = _y, qz = _z;
 
             computeEulerAngles(qw, qx, qy, qz, 
-                    state.x[STATE_PHI], state.x[STATE_THETA], state.x[STATE_PSI]);
+                    state.x[State::PHI], state.x[State::THETA], state.x[State::PSI]);
 
             // Adjust rotation so that nose-up is positive
-            state.x[STATE_THETA] = -state.x[STATE_THETA];
+            state.x[State::THETA] = -state.x[State::THETA];
 
             // Convert heading from [-pi,+pi] to [0,2*pi]
-            if (state.x[STATE_PSI] < 0) {
-                state.x[STATE_PSI] += 2*M_PI;
+            if (state.x[State::PSI] < 0) {
+                state.x[State::PSI] += 2*M_PI;
             }
         }
 

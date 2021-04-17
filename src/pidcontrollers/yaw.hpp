@@ -46,9 +46,9 @@ namespace hf {
                 _yawPid.begin(Kp_yaw, Ki_yaw, 0);
             }
 
-            void modifyDemands(state_t * state, float * demands)
+            void modifyDemands(State * state, float * demands)
             {
-                demands[DEMANDS_YAW]   = _yawPid.compute(-demands[DEMANDS_YAW], -state->x[STATE_DPSI]);
+                demands[DEMANDS_YAW]   = _yawPid.compute(-demands[DEMANDS_YAW], -state->x[State::DPSI]);
 
                 // Prevent "yaw jump" during correction
                 demands[DEMANDS_YAW] = rft::Filter::constrainAbs(demands[DEMANDS_YAW], 0.1 + fabs(demands[DEMANDS_YAW]));

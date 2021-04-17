@@ -45,10 +45,10 @@ namespace hf {
                 _pitchPid.begin(Kp, Ki, Kd);
             }
 
-            void modifyDemands(state_t * state, float * demands)
+            void modifyDemands(State * state, float * demands)
             {
-                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL],  state->x[STATE_DPHI]);
-                demands[DEMANDS_PITCH] = _pitchPid.compute(-demands[DEMANDS_PITCH], -state->x[STATE_DTHETA]);
+                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL],  state->x[State::DPHI]);
+                demands[DEMANDS_PITCH] = _pitchPid.compute(-demands[DEMANDS_PITCH], -state->x[State::DTHETA]);
             }
 
             virtual void updateReceiver(bool throttleIsDown) override

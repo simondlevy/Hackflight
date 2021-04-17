@@ -38,9 +38,9 @@ namespace hf {
 
             Mixer    * _mixer = NULL;
             Receiver * _receiver = NULL;
-            state_t  * _state = NULL;
+            State  * _state = NULL;
 
-            void _begin(rft::Board * board, state_t * state, Receiver * receiver) 
+            void _begin(rft::Board * board, State * state, Receiver * receiver) 
             {
                 rft::TimerTask::begin(board);
 
@@ -81,7 +81,7 @@ namespace hf {
                 variometer = 0;
                 positionX = 0;
                 positionY = 0;
-                heading = -_state->x[STATE_PSI]; // NB: Angle negated for remote visualization
+                heading = -_state->x[State::PSI]; // NB: Angle negated for remote visualization
                 velocityForward = 0;
                 velocityRightward = 0;
             }
@@ -110,9 +110,9 @@ namespace hf {
 
             virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
             {
-                roll  = _state->x[STATE_PHI];
-                pitch = _state->x[STATE_THETA];
-                yaw   = _state->x[STATE_PSI];
+                roll  = _state->x[State::PHI];
+                pitch = _state->x[State::THETA];
+                yaw   = _state->x[State::PSI];
             }
 
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
@@ -128,7 +128,7 @@ namespace hf {
             {
             }
 
-            void begin(rft::Board * board, state_t * state, Receiver * receiver, Mixer * mixer) 
+            void begin(rft::Board * board, State * state, Receiver * receiver, Mixer * mixer) 
             {
                 rft::TimerTask::begin(board);
                 _state = state;
