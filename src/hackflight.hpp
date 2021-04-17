@@ -29,13 +29,6 @@ namespace hf {
 
         private:
 
-            // Sensors 
-            rft::Sensor * _sensors[256] = {NULL};
-            uint8_t _sensor_count = 0;
-
-            // Safety
-            bool _safeToArm = false;
-
             // Timer task for PID controllers
             PidTask _pidTask;
 
@@ -59,14 +52,6 @@ namespace hf {
                 }
              }
 
-            void startSensors(void)
-            {
-                for (uint8_t k=0; k<_sensor_count; ++k) {
-                    _sensors[k]->begin();
-                }
-             }
-
-            rft::Board    * _board    = NULL;
             Receiver * _receiver = NULL;
 
             // Vehicle state
@@ -171,11 +156,6 @@ namespace hf {
                 _mixer->begin();
 
             } // init
-
-            void addSensor(rft::Sensor * sensor) 
-            {
-                _sensors[_sensor_count++] = sensor;
-            }
 
             void addPidController(rft::PidController * pidController, uint8_t auxState=0) 
             {
