@@ -28,6 +28,9 @@ namespace hf {
     */
 
     class USFS {
+        /**
+          Singleton class for UsfsGyrometer, UsfsQuaternion below
+          */
 
         friend class Hackflight;
         friend class UsfsQuaternion;
