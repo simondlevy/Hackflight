@@ -34,6 +34,10 @@ namespace hf {
 
             float _motorsPrev[MAXMOTORS] = {0};
 
+            float  _motorsDisarmed[MAXMOTORS];
+
+            uint8_t _nmotors;
+
             void writeMotor(uint8_t index, float value)
             {
                 _motors->write(index, value);
@@ -62,16 +66,17 @@ namespace hf {
 
                 // set disarmed, previous motor values
                 for (uint8_t i = 0; i < nmotors; i++) {
-                    motorsDisarmed[i] = 0;
+                    _motorsDisarmed[i] = 0;
                     _motorsPrev[i] = 0;
                 }
 
             }
 
-            uint8_t _nmotors;
+            virtual void setMotorDisarmed(uint8_t index, float value)
+            {
+                _motorsDisarmed[index] = value;
+            }
 
-            // This is also use by serial task
-            float  motorsDisarmed[MAXMOTORS];
 
             void begin(void)
             {
@@ -82,7 +87,7 @@ namespace hf {
             void runDisarmed(void)
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
-                    safeWriteMotor(i, motorsDisarmed[i]);
+                    safeWriteMotor(i, _motorsDisarmed[i]);
                 }
             }
 
