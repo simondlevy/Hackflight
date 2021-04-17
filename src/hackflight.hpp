@@ -38,20 +38,6 @@ namespace hf {
             // Serial timer task for GCS
             SerialTask _serialTask;
 
-            void checkSensors(void)
-            {
-                // Some gyrometers may need to know the current time
-                float time = _board->getTime();
-
-                for (uint8_t k=0; k<_sensor_count; ++k) {
-                    rft::Sensor * sensor = _sensors[k];
-                    float time = _board->getTime();
-                    if (sensor->ready(time)) {
-                        sensor->modifyState(&_state, time);
-                    }
-                }
-             }
-
             Receiver * _receiver = NULL;
 
             // Vehicle state
@@ -118,12 +104,8 @@ namespace hf {
                 : rft::RFT(board, receiver, mixer)
             {
                 // Store the essentials
-                _board = board;
                 _receiver = receiver;
                 _mixer = mixer;
-
-                // Support adding new sensors and PID controllers
-                _sensor_count = 0;
             }
 
             void begin(bool armed=false)
