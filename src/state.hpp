@@ -14,8 +14,6 @@ namespace hf {
 
         public:
 
-            enum {AXIS_ROLL, AXIS_PITCH, AXIS_YAW};
-
             // See Bouabdallah et al. (2004)
             enum {X, DX, Y, DY, Z, DZ, PHI, DPHI, THETA, DTHETA, PSI, DPSI, SIZE};
 
