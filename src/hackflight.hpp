@@ -12,13 +12,13 @@
 
 #include "mspparser.hpp"
 #include "receiver.hpp"
-#include "sensor.hpp"
 #include "state.hpp"
 #include "pidcontroller.hpp"
 #include "mixer.hpp"
 #include "timertasks/pidtask.hpp"
 #include "timertasks/serialtask.hpp"
 
+#include <RFT_sensor.hpp>
 #include <RFT_filters.hpp>
 
 namespace hf {
@@ -28,7 +28,7 @@ namespace hf {
         private:
 
             // Sensors 
-            Sensor * _sensors[256] = {NULL};
+            rft::Sensor * _sensors[256] = {NULL};
             uint8_t _sensor_count = 0;
 
             // Safety
@@ -49,10 +49,10 @@ namespace hf {
                 float time = _board->getTime();
 
                 for (uint8_t k=0; k<_sensor_count; ++k) {
-                    Sensor * sensor = _sensors[k];
+                    rft::Sensor * sensor = _sensors[k];
                     float time = _board->getTime();
                     if (sensor->ready(time)) {
-                        sensor->modifyState(_state, time);
+                        sensor->modifyState(&_state, time);
                     }
                 }
              }
@@ -162,7 +162,7 @@ namespace hf {
 
             } // init
 
-            void addSensor(Sensor * sensor) 
+            void addSensor(rft::Sensor * sensor) 
             {
                 _sensors[_sensor_count++] = sensor;
             }

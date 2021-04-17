@@ -9,12 +9,9 @@
 #pragma once
 
 #include <math.h>
-
 #include <Wire.h>
-
 #include <USFS_Master.h>
-
-#include "sensor.hpp"
+#include <RFT_sensor.hpp>
 
 namespace hf {
 
@@ -123,7 +120,7 @@ namespace hf {
     // Singleton
     static USFS _usfs;
 
-    class UsfsGyrometer : public Sensor {
+    class UsfsGyrometer : public rft::Sensor {
 
         friend class Hackflight;
 
@@ -143,14 +140,16 @@ namespace hf {
         }
 
 
-        virtual void modifyState(State & state, float time) override
+        virtual void modifyState(rft::State * state, float time) override
         {
             (void)time;
 
+            State * hfstate = (State *)state;
+
             // NB: We negate gyro Y, Z to simplify PID controller
-            state.x[State::DPHI] = _x;
-            state.x[State::DTHETA] = _y;
-            state.x[State::DPSI] = _z;
+            hfstate->x[State::DPHI] = _x;
+            hfstate->x[State::DTHETA] = _y;
+            hfstate->x[State::DPSI] = _z;
         }
 
         virtual bool ready(float time) override
@@ -173,7 +172,7 @@ namespace hf {
 
     };  // class Gyrometer
 
-    class UsfsQuaternion : public Sensor {
+    class UsfsQuaternion : public rft::Sensor {
 
         friend class Hackflight;
 
@@ -193,21 +192,23 @@ namespace hf {
             _imu->begin();
         }
 
-        virtual void modifyState(State & state, float time) override
+        virtual void modifyState(rft::State * state, float time) override
         {
             (void)time;
+
+            State * hfstate = (State *)state;
 
             float qw = _w, qx = _x, qy = _y, qz = _z;
 
             computeEulerAngles(qw, qx, qy, qz, 
-                    state.x[State::PHI], state.x[State::THETA], state.x[State::PSI]);
+                    hfstate->x[State::PHI], hfstate->x[State::THETA], hfstate->x[State::PSI]);
 
             // Adjust rotation so that nose-up is positive
-            state.x[State::THETA] = -state.x[State::THETA];
+            hfstate->x[State::THETA] = -hfstate->x[State::THETA];
 
             // Convert heading from [-pi,+pi] to [0,2*pi]
-            if (state.x[State::PSI] < 0) {
-                state.x[State::PSI] += 2*M_PI;
+            if (hfstate->x[State::PSI] < 0) {
+                hfstate->x[State::PSI] += 2*M_PI;
             }
         }
 
