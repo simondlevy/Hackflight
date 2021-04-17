@@ -110,32 +110,16 @@ namespace hf {
 
             void begin(bool armed=false)
             {  
+                RFT::begin(armed);
+
                 // Initialize state
                 memset(&_state, 0, sizeof(State));
-
-                // Start the board
-                _board->begin();
-
-                // Start the sensors
-                startSensors();
-
-                // Start the receiver
-                _receiver->begin();
-
-                // Setup failsafe
-                _state.failsafe = false;
 
                 // Initialize timer task for PID controllers
                 _pidTask.begin(_board, _receiver, _mixer, &_state);
  
                 // Initialize serial timer task
                 _serialTask.begin(_board, &_state, _receiver, _mixer);
-
-                // Support safety override by simulator
-                _state.armed = armed;
-
-                // Start the mixer
-                _mixer->begin();
 
             } // init
 
