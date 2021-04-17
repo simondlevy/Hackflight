@@ -61,30 +61,6 @@ namespace hf {
 
             // MspParser overrides -------------------------------------------------------
 
-            virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 
-                    float & heading, float & velocityForward, float & velocityRightward) override
-            {
-                // XXX Use only heading for now
-                altitude = 0;
-                variometer = 0;
-                positionX = 0;
-                positionY = 0;
-                heading = -_state->x[State::PSI]; // NB: Angle negated for remote visualization
-                velocityForward = 0;
-                velocityRightward = 0;
-            }
- 
-            virtual void handle_SET_ARMED(uint8_t  flag) override
-            {
-                if (flag) {  // got arming command: arm only if throttle is down
-                    if (_receiver->throttleIsDown()) {
-                        _state->armed = true;
-                    }
-                }
-                else {          // got disarming command: always disarm
-                    _state->armed = false;
-                }
-            }
 
             virtual void handle_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
             {

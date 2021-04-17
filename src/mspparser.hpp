@@ -3,7 +3,7 @@
 
    Auto-generated code: DO NOT EDIT!
 
-   Copyright (C) Simon D. Levy 2018
+   Copyright (C) Simon D. Levy 2021
 
    MIT License
  */
@@ -245,27 +245,6 @@ namespace hf {
             {
                 switch (_command) {
 
-                    case 112:
-                    {
-                        float altitude = 0;
-                        float variometer = 0;
-                        float positionX = 0;
-                        float positionY = 0;
-                        float heading = 0;
-                        float velocityForward = 0;
-                        float velocityRightward = 0;
-                        handle_STATE_Request(altitude, variometer, positionX, positionY, heading, velocityForward, velocityRightward);
-                        prepareToSendFloats(7);
-                        sendFloat(altitude);
-                        sendFloat(variometer);
-                        sendFloat(positionX);
-                        sendFloat(positionY);
-                        sendFloat(heading);
-                        sendFloat(velocityForward);
-                        sendFloat(velocityRightward);
-                        serialize8(_checksum);
-                        } break;
-
                     case 121:
                     {
                         float c1 = 0;
@@ -298,23 +277,6 @@ namespace hf {
                         serialize8(_checksum);
                         } break;
 
-                    case 213:
-                    {
-                        float vx = 0;
-                        memcpy(&vx,  &_inBuf[0], sizeof(float));
-
-                        float vy = 0;
-                        memcpy(&vy,  &_inBuf[4], sizeof(float));
-
-                        float vz = 0;
-                        memcpy(&vz,  &_inBuf[8], sizeof(float));
-
-                        float yaw_rate = 0;
-                        memcpy(&yaw_rate,  &_inBuf[12], sizeof(float));
-
-                        handle_SET_VELOCITY_SETPOINTS(vx, vy, vz, yaw_rate);
-                        } break;
-
                     case 215:
                     {
                         float m1 = 0;
@@ -332,49 +294,7 @@ namespace hf {
                         handle_SET_MOTOR_NORMAL(m1, m2, m3, m4);
                         } break;
 
-                    case 217:
-                    {
-                        float c1 = 0;
-                        memcpy(&c1,  &_inBuf[0], sizeof(float));
-
-                        float c2 = 0;
-                        memcpy(&c2,  &_inBuf[4], sizeof(float));
-
-                        float c3 = 0;
-                        memcpy(&c3,  &_inBuf[8], sizeof(float));
-
-                        float c4 = 0;
-                        memcpy(&c4,  &_inBuf[12], sizeof(float));
-
-                        float c5 = 0;
-                        memcpy(&c5,  &_inBuf[16], sizeof(float));
-
-                        float c6 = 0;
-                        memcpy(&c6,  &_inBuf[20], sizeof(float));
-
-                        handle_SET_RC_NORMAL(c1, c2, c3, c4, c5, c6);
-                        } break;
-
-                    case 216:
-                    {
-                        uint8_t flag = 0;
-                        memcpy(&flag,  &_inBuf[0], sizeof(uint8_t));
-
-                        handle_SET_ARMED(flag);
-                        } break;
-
                 }
-            }
-
-            virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, float & heading, float & velocityForward, float & velocityRightward)
-            {
-                (void)altitude;
-                (void)variometer;
-                (void)positionX;
-                (void)positionY;
-                (void)heading;
-                (void)velocityForward;
-                (void)velocityRightward;
             }
 
             virtual void handle_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
@@ -394,14 +314,6 @@ namespace hf {
                 (void)yaw;
             }
 
-            virtual void handle_SET_VELOCITY_SETPOINTS(float  vx, float  vy, float  vz, float  yaw_rate)
-            {
-                (void)vx;
-                (void)vy;
-                (void)vz;
-                (void)yaw_rate;
-            }
-
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4)
             {
                 (void)m1;
@@ -410,55 +322,7 @@ namespace hf {
                 (void)m4;
             }
 
-            virtual void handle_SET_RC_NORMAL(float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
-            {
-                (void)c1;
-                (void)c2;
-                (void)c3;
-                (void)c4;
-                (void)c5;
-                (void)c6;
-            }
-
-            virtual void handle_SET_ARMED(uint8_t  flag)
-            {
-                (void)flag;
-            }
-
         public:
-
-            static uint8_t serialize_STATE_Request(uint8_t bytes[])
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 60;
-                bytes[3] = 0;
-                bytes[4] = 112;
-                bytes[5] = 112;
-
-                return 6;
-            }
-
-            static uint8_t serialize_STATE(uint8_t bytes[], float  altitude, float  variometer, float  positionX, float  positionY, float  heading, float  velocityForward, float  velocityRightward)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 28;
-                bytes[4] = 112;
-
-                memcpy(&bytes[5], &altitude, sizeof(float));
-                memcpy(&bytes[9], &variometer, sizeof(float));
-                memcpy(&bytes[13], &positionX, sizeof(float));
-                memcpy(&bytes[17], &positionY, sizeof(float));
-                memcpy(&bytes[21], &heading, sizeof(float));
-                memcpy(&bytes[25], &velocityForward, sizeof(float));
-                memcpy(&bytes[29], &velocityRightward, sizeof(float));
-
-                bytes[33] = CRC8(&bytes[3], 30);
-
-                return 34;
-            }
 
             static uint8_t serialize_RC_NORMAL_Request(uint8_t bytes[])
             {
@@ -521,24 +385,6 @@ namespace hf {
                 return 18;
             }
 
-            static uint8_t serialize_SET_VELOCITY_SETPOINTS(uint8_t bytes[], float  vx, float  vy, float  vz, float  yaw_rate)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 16;
-                bytes[4] = 213;
-
-                memcpy(&bytes[5], &vx, sizeof(float));
-                memcpy(&bytes[9], &vy, sizeof(float));
-                memcpy(&bytes[13], &vz, sizeof(float));
-                memcpy(&bytes[17], &yaw_rate, sizeof(float));
-
-                bytes[21] = CRC8(&bytes[3], 18);
-
-                return 22;
-            }
-
             static uint8_t serialize_SET_MOTOR_NORMAL(uint8_t bytes[], float  m1, float  m2, float  m3, float  m4)
             {
                 bytes[0] = 36;
@@ -555,41 +401,6 @@ namespace hf {
                 bytes[21] = CRC8(&bytes[3], 18);
 
                 return 22;
-            }
-
-            static uint8_t serialize_SET_RC_NORMAL(uint8_t bytes[], float  c1, float  c2, float  c3, float  c4, float  c5, float  c6)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 24;
-                bytes[4] = 217;
-
-                memcpy(&bytes[5], &c1, sizeof(float));
-                memcpy(&bytes[9], &c2, sizeof(float));
-                memcpy(&bytes[13], &c3, sizeof(float));
-                memcpy(&bytes[17], &c4, sizeof(float));
-                memcpy(&bytes[21], &c5, sizeof(float));
-                memcpy(&bytes[25], &c6, sizeof(float));
-
-                bytes[29] = CRC8(&bytes[3], 26);
-
-                return 30;
-            }
-
-            static uint8_t serialize_SET_ARMED(uint8_t bytes[], uint8_t  flag)
-            {
-                bytes[0] = 36;
-                bytes[1] = 77;
-                bytes[2] = 62;
-                bytes[3] = 1;
-                bytes[4] = 216;
-
-                memcpy(&bytes[5], &flag, sizeof(uint8_t));
-
-                bytes[6] = CRC8(&bytes[3], 3);
-
-                return 7;
             }
 
     }; // class MspParser
