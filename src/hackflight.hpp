@@ -149,11 +149,11 @@ namespace hf {
                 // Initialize state
                 memset(&_state, 0, sizeof(state_t));
 
-                // Start the sensors
-                startSensors();
-
                 // Start the board
                 _board->begin();
+
+                // Start the sensors
+                startSensors();
 
                 // Start the receiver
                 _receiver->begin();

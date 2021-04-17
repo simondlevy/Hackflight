@@ -43,17 +43,12 @@ static hf::Hackflight h(&board, &receiver, &mixer);
 static hf::UsfsGyrometer gyrometer;
 static hf::UsfsQuaternion quaternion; // not really a sensor, but we treat it like one!
 
-static hf::USFS imu;
- 
-
 void setup(void)
 {
 
-    // XXX simplify
+    // Add sensors
     h.addSensor(&quaternion);
-    quaternion.imu = &imu;
     h.addSensor(&gyrometer);
-    gyrometer.imu = &imu;
 
     // Add PID controllers
     h.addPidController(&levelPid);
@@ -65,8 +60,6 @@ void setup(void)
 
     // Initialize Hackflight firmware
     h.begin();
-
-    imu.begin();
 }
 
 void loop(void)
