@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include "board.hpp"
-#include "datatypes.hpp"
 #include "mixer.hpp"
 
 namespace hf {
@@ -28,8 +26,8 @@ namespace hf {
 
         public:
 
-            MixerOctoXAP(void) 
-                : Mixer(8)
+            MixerOctoXAP(rft::Motor * motors) 
+                : Mixer(motors, 8)
             {
                 //                     Th  RR  PF  YR
                 motorDirections[0] = { +1, -1, -1, +1 }; // 1

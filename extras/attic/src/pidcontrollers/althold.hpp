@@ -20,9 +20,10 @@
 
 #pragma once
 
-#include "filters.hpp"
-#include "datatypes.hpp"
-#include "pidcontroller.hpp"
+#include "state.hpp"
+#include "demands.hpp"
+
+#include <rft_closedloops/pidcontroller.hpp>
 
 namespace hf {
 

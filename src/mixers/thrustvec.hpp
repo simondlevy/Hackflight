@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "board.hpp"
-#include "datatypes.hpp"
 #include "mixer.hpp"
 
 namespace hf {
@@ -18,8 +16,8 @@ namespace hf {
 
         public:
 
-            MixerThrustVector(void) 
-                : Mixer(4)
+            MixerThrustVector(rft::Motor * motors) 
+                : Mixer(motors, 4)
             {
                 //                     Th   RR   PF  YR
                 motorDirections[0] = { +1,  0,   0, +1 };   // rotor 1

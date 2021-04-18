@@ -14,8 +14,6 @@
 
 #pragma once
 
-#include "board.hpp"
-#include "datatypes.hpp"
 #include "mixer.hpp"
 
 namespace hf {
@@ -24,8 +22,8 @@ namespace hf {
 
         public:
 
-            MixerQuadXAP(void) 
-                : Mixer(4)
+            MixerQuadXAP(rft::Motor * motors) 
+                : Mixer(motors, 4)
             {
                 //                     Th  RR  PF  YR
                 motorDirections[0] = { +1, -1, -1, -1 };    // 1 right front

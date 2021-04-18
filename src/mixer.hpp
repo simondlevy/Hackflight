@@ -1,6 +1,8 @@
 /*
    Mixer class
 
+   Converts demands into motor spins
+
    Copyright (c) 2018 Simon D. Levy
 
    MIT License
@@ -11,6 +13,8 @@
 #include <RFT_motor.hpp>
 #include <RFT_filters.hpp>
 #include <RFT_actuator.hpp>
+
+#include "demands.hpp"
 
 namespace hf {
 
