@@ -15,9 +15,9 @@
 #include "state.hpp"
 #include "mixer.hpp"
 #include "serialtask.hpp"
-#include "pidtask.hpp"
 
 #include <rft_closedloops/pidcontroller.hpp>
+#include <rft_timertasks/closedlooptask.hpp>
 #include <RFT_sensor.hpp>
 #include <RFT_filters.hpp>
 
@@ -29,8 +29,8 @@ namespace hf {
 
         private:
 
-            // Timer task for PID controllers
-            PidTask _pidTask;
+            // Timer task for closed-loop controllers
+            rft::ClosedLoopTask _closedLoopTask;
 
             // Passed to Hackflight::begin() for a particular build
             Mixer * _mixer    = NULL;
@@ -116,7 +116,7 @@ namespace hf {
                 memset(&_state, 0, sizeof(State));
 
                 // Initialize timer task for PID controllers
-                _pidTask.begin(_board, _receiver, _mixer, &_state);
+                _closedLoopTask.begin(_board, _receiver, _mixer, &_state);
  
                 // Initialize serial timer task
                 _serialTask.begin(_board, &_state, _receiver, _mixer);
@@ -125,7 +125,7 @@ namespace hf {
 
             void addPidController(rft::PidController * pidController, uint8_t auxState=0) 
             {
-                _pidTask.addController(pidController, auxState);
+                _closedLoopTask.addController(pidController, auxState);
             }
 
             void update(void)
@@ -134,7 +134,7 @@ namespace hf {
                 checkReceiver();
 
                 // Update PID controllers task
-                _pidTask.update();
+                _closedLoopTask.update();
 
                 RFT::update();
 
