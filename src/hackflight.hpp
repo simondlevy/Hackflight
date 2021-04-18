@@ -15,7 +15,7 @@
 #include "state.hpp"
 #include "mixer.hpp"
 #include "serialtask.hpp"
-#include "timertasks/pidtask.hpp"
+#include "pidtask.hpp"
 
 #include <rft_closedloops/pidcontroller.hpp>
 #include <RFT_sensor.hpp>
@@ -55,7 +55,7 @@ namespace hf {
                 }
 
                 // Check whether receiver data is available
-                if (!_receiver->getDemands()) {
+                if (!_receiver->ready()) {
                     return;
                 }
 
