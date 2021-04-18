@@ -55,29 +55,29 @@ namespace hf {
                 }
 
                 // Disarm
-                if (_state.armed && !_receiver->getAux1State()) {
+                if (_state.armed && !_receiver->inArmedState()) {
                     _state.armed = false;
                 } 
 
-                // Avoid arming if aux1 switch down on startup
+                // Avoid arming if armed on startup
                 if (!_safeToArm) {
-                    _safeToArm = !_receiver->getAux1State();
+                    _safeToArm = !_receiver->inArmedState();
                 }
 
                 // Arm (after lots of safety checks!)
                 if (
                         _safeToArm && 
                         !_state.armed && 
-                        _receiver->throttleIsDown() && 
-                        _receiver->getAux1State() && 
+                        _receiver->inactive() && 
+                        _receiver->inArmedState() && 
                         !_state.failsafe && 
                         _state.safeToArm()) {
 
                     _state.armed = true;
                 }
 
-                // Cut motors on throttle-down
-                if (_state.armed && _receiver->throttleIsDown()) {
+                // Cut motors on inactivity (e.g., throttle-down)
+                if (_state.armed && _receiver->inactive()) {
                     _mixer->cut();
                 }
 

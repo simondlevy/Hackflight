@@ -184,24 +184,14 @@ namespace hf {
 
             }  // getDemands
 
-            bool throttleIsDown(void)
+            virtual bool inactive(void) override
             {
                 return getRawval(CHANNEL_THROTTLE) < -1 + THROTTLE_MARGIN;
             }
 
-            bool inactive(void)
+            virtual bool inArmedState(void) override
             {
-                return getRawval(CHANNEL_THROTTLE) < -1 + THROTTLE_MARGIN;
-            }
-
-            virtual uint8_t getAux1State(void)
-            {
-                return _aux1State;
-            }
-
-            virtual uint8_t getAux2State(void)
-            {
-                return _aux2State;
+                return _aux1State > 0;
             }
 
             uint8_t getModeIndex(void)
