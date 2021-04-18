@@ -19,6 +19,7 @@ namespace hf {
 
             static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
 
+        // XXX protected
         public:
 
             // See Bouabdallah et al. (2004)
@@ -31,7 +32,7 @@ namespace hf {
                 return fabs(x[axis]) < rft::Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
-            virtual bool safeToArm(void) override
+            bool safeToArm(void)
             {
                 return safeAngle(PHI) && safeAngle(THETA);
             }

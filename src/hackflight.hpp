@@ -27,70 +27,26 @@ namespace hf {
 
         private:
 
-            // Passed to Hackflight::begin() for a particular build
-            Mixer * _mixer    = NULL;
+            // Passed to Hackflight constructor
+            Mixer * _mixer = NULL;
+            Receiver * _receiver = NULL;
 
             // Serial timer task for GCS
             SerialTask _serialTask;
 
-            Receiver * _receiver = NULL;
-
             // Vehicle state
             State _state;
-
-            void checkReceiver(void)
-            {
-                // Sync failsafe to receiver
-                if (_receiver->lostSignal() && _state.armed) {
-                    _mixer->cut();
-                    _state.armed = false;
-                    _state.failsafe = true;
-                    _board->showArmedStatus(false);
-                    return;
-                }
-
-                // Check whether receiver data is available
-                if (!_receiver->ready()) {
-                    return;
-                }
-
-                // Disarm
-                if (_state.armed && !_receiver->inArmedState()) {
-                    _state.armed = false;
-                } 
-
-                // Avoid arming if armed on startup
-                if (!_safeToArm) {
-                    _safeToArm = !_receiver->inArmedState();
-                }
-
-                // Arm (after lots of safety checks!)
-                if (
-                        _safeToArm && 
-                        !_state.armed && 
-                        _receiver->inactive() && 
-                        _receiver->inArmedState() && 
-                        !_state.failsafe && 
-                        _state.safeToArm()) {
-
-                    _state.armed = true;
-                }
-
-                // Cut motors on inactivity (e.g., throttle-down)
-                if (_state.armed && _receiver->inactive()) {
-                    _mixer->cut();
-                }
-
-                // Set LED based on arming status
-                _board->showArmedStatus(_state.armed);
-
-            } // checkReceiver
 
         protected:
 
             virtual State * getState(void) override
             {
                 return &_state;
+            }
+
+            virtual bool safeStateForArming(void) override
+            {
+                return _state.safeToArm();
             }
 
         public:
@@ -117,9 +73,6 @@ namespace hf {
 
             void update(void)
             {
-                // Grab control signal if available
-                checkReceiver();
-
                 RFT::update();
 
                 // Update serial comms task
