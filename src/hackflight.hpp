@@ -136,8 +136,7 @@ namespace hf {
                 // Update PID controllers task
                 _pidTask.update();
 
-                // Check sensors
-                checkSensors();
+                RFT::update();
 
                 // Update serial comms task
                 _serialTask.update();
