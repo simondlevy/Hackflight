@@ -125,7 +125,7 @@ namespace hf {
 
             void addPidController(rft::PidController * pidController, uint8_t auxState=0) 
             {
-                _pidTask.addPidController(pidController, auxState);
+                _pidTask.addController(pidController, auxState);
             }
 
             void update(void)
