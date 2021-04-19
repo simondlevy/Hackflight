@@ -39,11 +39,6 @@ namespace hf {
 
         protected:
 
-            virtual State * getState(void) override
-            {
-                return &_state;
-            }
-
             virtual bool safeStateForArming(void) override
             {
                 return _state.safeToArm();
@@ -52,7 +47,7 @@ namespace hf {
         public:
 
             Hackflight(rft::Board * board, Receiver * receiver, Mixer * mixer)
-                : rft::RFT(board, receiver, mixer)
+                : rft::RFT(&_state, board, receiver, mixer)
             {
                 // Store the essentials
                 _receiver = receiver;
@@ -61,10 +56,10 @@ namespace hf {
 
             void begin(bool armed=false)
             {  
-                RFT::begin(armed);
-
                 // Initialize state
                 memset(&_state, 0, sizeof(State));
+
+                RFT::begin(armed);
 
                 // Initialize serial timer task
                 _serialTask.begin(_board, &_state, _receiver, _mixer);
