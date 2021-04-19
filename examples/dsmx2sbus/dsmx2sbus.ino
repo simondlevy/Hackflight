@@ -37,21 +37,16 @@ void loop(void)
 
     else if (rx.gotNewFrame()) {
 
-        float values[8];
+        float invals[8] = {};
 
-        rx.getChannelValuesNormalized(values, 8);
+        rx.getChannelValuesNormalized(invals, 8);
 
-        for (int k=0; k<4; ++k) {
-            outvals[k] = values[k];
-            Serial.print("Ch. ");
-            Serial.print(k+1);
-            Serial.print(": ");
-            Serial.print(values[k]);
-            Serial.print("    ");
-        }
-
-        Serial.println();
-
+        outvals[0] = invals[0];
+        outvals[1] = invals[1];
+        outvals[2] = invals[2];
+        outvals[3] = invals[3];
+        outvals[4] = invals[6];
+        outvals[5] = invals[4];
     }
 
     sbus.writeCal(outvals);
