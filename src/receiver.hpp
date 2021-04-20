@@ -182,7 +182,7 @@ namespace hf {
                 // Got a new frame
                 return true;
 
-            }  // getDemands
+            }  // ready
 
             virtual bool inactive(void) override
             {
