@@ -20,12 +20,11 @@
 #include "hackflight.hpp"
 #include "boards/ladybugfc.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
-#include "mixers/quadxcf.hpp"
+#include "actuators/mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
 #include "sensors/usfs.hpp"
-
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 4.0f;

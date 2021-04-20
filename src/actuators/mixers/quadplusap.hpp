@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "mixer.hpp"
+#include "actuators/mixer.hpp"
 
 namespace hf {
 

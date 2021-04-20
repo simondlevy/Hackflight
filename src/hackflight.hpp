@@ -13,8 +13,9 @@
 #include "mspparser.hpp"
 #include "receiver.hpp"
 #include "state.hpp"
-#include "mixer.hpp"
 #include "serialtask.hpp"
+
+#include "actuators/mixer.hpp"
 
 #include <RFT_sensor.hpp>
 #include <RFT_filters.hpp>
@@ -52,6 +53,14 @@ namespace hf {
                 // Store the essentials
                 _receiver = receiver;
                 _mixer = mixer;
+            }
+
+            Hackflight(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
+                : rft::RFT(&_state, board, receiver, actuator)
+            {
+                // Store the essentials
+                _receiver = receiver;
+                _mixer = NULL;
             }
 
             void begin(bool armed=false)
