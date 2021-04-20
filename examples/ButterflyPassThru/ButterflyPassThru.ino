@@ -43,5 +43,7 @@ void setup(void)
 
 void loop(void)
 {
-    h.update();
+    Serial.println(millis());
+
+    //h.update();
 }

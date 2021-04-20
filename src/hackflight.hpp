@@ -29,7 +29,6 @@ namespace hf {
         private:
 
             // Passed to Hackflight constructor
-            Mixer * _mixer = NULL;
             Receiver * _receiver = NULL;
 
             // Serial timer task for GCS
@@ -47,12 +46,11 @@ namespace hf {
 
         public:
 
-            Hackflight(rft::Board * board, Receiver * receiver, Mixer * mixer)
-                : rft::RFT(&_state, board, receiver, mixer)
+            Hackflight(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
+                : rft::RFT(&_state, board, receiver, actuator)
             {
                 // Store the essentials
                 _receiver = receiver;
-                _mixer = mixer;
             }
 
             void begin(bool armed=false)
