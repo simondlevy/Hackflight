@@ -55,14 +55,6 @@ namespace hf {
                 _mixer = mixer;
             }
 
-            Hackflight(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
-                : rft::RFT(&_state, board, receiver, actuator)
-            {
-                // Store the essentials
-                _receiver = receiver;
-                _mixer = NULL;
-            }
-
             void begin(bool armed=false)
             {  
                 // Initialize state
@@ -71,7 +63,7 @@ namespace hf {
                 RFT::begin(armed);
 
                 // Initialize serial timer task
-                _serialTask.begin(_board, &_state, _receiver, _mixer);
+                _serialTask.begin(_board, &_state, _receiver, _actuator);
 
             } // init
 
