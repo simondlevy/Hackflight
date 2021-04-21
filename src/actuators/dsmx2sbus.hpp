@@ -22,11 +22,16 @@ namespace hf {
             {
             }
 
+            virtual void runDisarmed(void) override
+            {
+                Serial.println("disarmed");
+            }
+
         public:
 
             void run(float * demands)
             {
-                rft::Debugger::printf("%3.3f\n", demands[0]);
+                Serial.println("armed");
             }
 
     }; // class Dsmx2Sbus
