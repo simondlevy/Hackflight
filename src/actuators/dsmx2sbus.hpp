@@ -12,10 +12,23 @@ namespace hf {
 
     class Dsmx2Sbus : public rft::Actuator {
 
+
+        private:
+
+            SBUS sbus = SBUS(Serial2);
+
+            float outvals[16] = {};
+
+            void send(void)
+            {
+                sbus.writeCal(outvals);
+            }
+
         protected:
 
             void begin(void)
             {
+                sbus.begin();
             }
 
             void cut(void)
@@ -24,61 +37,30 @@ namespace hf {
 
             virtual void runDisarmed(void) override
             {
-                Serial.println("disarmed");
+                outvals[0] = -1;
+                outvals[1] = 0;
+                outvals[2] = 0;
+                outvals[3] = 0;
+                outvals[4] = -1;
+                outvals[5] = -1;
+
+                send();
             }
 
         public:
 
             void run(float * demands)
             {
-                Serial.println("armed");
+                outvals[0] = demands[0];
+                outvals[1] = demands[1];
+                outvals[2] = demands[2];
+                outvals[3] = demands[3];
+                outvals[4] = +1;
+                outvals[5] = -1;
+
+                send();
             }
 
     }; // class Dsmx2Sbus
 
 } // namespace hf
-
-/*
-DSM2048 rx;
-
-SBUS sbus = SBUS(Serial2);
-
-void serialEvent1(void)
-{
-    while (Serial1.available()) {
-        rx.handleSerialEvent(Serial1.read(), micros());
-    }
-}
-
-void setup(void)
-{
-    Serial1.begin(115000);
-
-    sbus.begin();
-}
-
-void loop(void)
-{
-    static float outvals[16] = {};
-
-    if (rx.timedOut(micros())) {
-        Serial.println("*** TIMED OUT ***");
-    }
-
-    else if (rx.gotNewFrame()) {
-
-        float invals[8] = {};
-
-        rx.getChannelValuesNormalized(invals, 8);
-
-        outvals[0] = invals[0];
-        outvals[1] = invals[1];
-        outvals[2] = invals[2];
-        outvals[3] = invals[3];
-        outvals[4] = invals[6];
-        outvals[5] = invals[4];
-    }
-
-    sbus.writeCal(outvals);
-}
-*/
