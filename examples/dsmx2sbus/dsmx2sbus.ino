@@ -24,8 +24,6 @@ void setup(void)
 {
     Serial1.begin(115000);
 
-    Serial.begin(115000);
-
     sbus.begin();
 }
 
@@ -50,19 +48,6 @@ void loop(void)
         outvals[4] = invals[6];
         outvals[5] = invals[4];
     }
-
-    Serial.print(outvals[0]);
-    Serial.print(" " );
-    Serial.print(outvals[1]);
-    Serial.print(" " );
-    Serial.print(outvals[2]);
-    Serial.print(" " );
-    Serial.print(outvals[3]);
-    Serial.print(" " );
-    Serial.print(outvals[4]);
-    Serial.print(" " );
-    Serial.print(outvals[5]);
-    Serial.println();
 
     sbus.writeCal(outvals);
 }

@@ -52,8 +52,8 @@ namespace hf {
             void run(float * demands)
             {
                 outvals[0] = demands[0];
-                outvals[1] = demands[1];
-                outvals[2] = demands[2];
+                outvals[1] = demands[1];  
+                outvals[2] = -demands[2];// XXX Why must this be reversed?
                 outvals[3] = demands[3];
                 outvals[4] = +1;
                 outvals[5] = -1;
