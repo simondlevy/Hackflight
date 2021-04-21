@@ -21,8 +21,20 @@ static rft::MockActuator actuator;
 
 static hf::Hackflight h(&board, &receiver, &actuator);
 
+static hf::UsfsQuaternion quat;
+static hf::UsfsGyrometer gyro;
+
 void setup(void)
 {
+    rft::ArduinoBoard::powerPins(4, 3);
+    delay(100);
+
+    Wire.begin(TWI_PINS_6_7);
+    delay(100);
+
+    h.addSensor(&quat);
+    h.addSensor(&gyro);
+
     h.begin();
 }
 
