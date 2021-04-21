@@ -19,6 +19,7 @@
 
 #include <RoboFirmwareToolkit.hpp>
 #include <rft_boards/realboards/arduino/butterfly.hpp>
+#include <rft_closedloops/passthru.hpp>
 
 #include "hackflight.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
@@ -35,15 +36,16 @@ static hf::Dsmx2Sbus actuator;
 
 static hf::Hackflight h(&board, &receiver, &actuator);
 
+static rft::PassthruController passthru;
+
 void setup(void)
 {
+    h.addClosedLoopController(&passthru);
 
     h.begin();
 }
 
 void loop(void)
 {
-    Serial.println(millis());
-
-    //h.update();
+    h.update();
 }

@@ -26,6 +26,7 @@ namespace hf {
 
             void run(float * demands)
             {
+                rft::Debugger::printf("%3.3f\n", demands[0]);
             }
 
     }; // class Dsmx2Sbus
