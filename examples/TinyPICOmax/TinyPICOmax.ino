@@ -23,6 +23,7 @@
 
 #include <rft_motors/realmotors/standard.hpp>
 #include <rft_boards/realboards/tinypico.hpp>
+#include <rft_closedloops/passthru.hpp>
 
 static rft::TinyPico board;
 
@@ -52,6 +53,8 @@ static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
 static hf::YawPid yawPid = hf::YawPid(2, 0.1);
 static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
+static rft::PassthruController passthru;
+
 static hf::Hackflight h(&board, &receiver, &mixer);
 
 void setup(void)
@@ -61,9 +64,12 @@ void setup(void)
     h.addSensor(&gyrometer);
 
     // Add PID controllers
-    h.addClosedLoopController(&levelPid);
-    h.addClosedLoopController(&ratePid);
-    h.addClosedLoopController(&yawPid);
+    // h.addClosedLoopController(&levelPid);
+    // h.addClosedLoopController(&ratePid);
+    // h.addClosedLoopController(&yawPid);
+
+
+    h.addClosedLoopController(&passthru);
 
     // Initialize Hackflight firmware
     h.begin();
