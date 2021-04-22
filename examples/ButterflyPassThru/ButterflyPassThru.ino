@@ -23,36 +23,23 @@
 
 #include "hackflight.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
-#include "actuators/dsmx2sbus.hpp"
-#include "sensors/usfs.hpp"
+#include "actuators/sbus.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
-static constexpr float DEMAND_SCALE = 4.0f;
+static constexpr float DEMAND_SCALE = 8.0f;
 
 static rft::Butterfly board;
 
 static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
-static hf::Dsmx2Sbus actuator;
+static hf::SbusActuator actuator;
 
 static hf::Hackflight h(&board, &receiver, &actuator);
 
 static rft::PassthruController passthru;
 
-static hf::UsfsQuaternion quat;
-static hf::UsfsGyrometer gyro;
-
 void setup(void)
 {
-    rft::ArduinoBoard::powerPins(4, 3);
-    delay(100);
-
-    Wire.begin(TWI_PINS_6_7);
-    delay(100);
-
-    h.addSensor(&quat);
-    h.addSensor(&gyro);
-
     h.addClosedLoopController(&passthru);
 
     h.begin();

@@ -1,5 +1,5 @@
 /*
-   DSMX to SBUS actuator
+   Actuator with SBUS output
 
    Copyright (c) 2021 Simon D. Levy
 
@@ -10,7 +10,7 @@
 
 namespace hf {
 
-    class Dsmx2Sbus : public rft::Actuator {
+    class SbusActuator : public rft::Actuator {
 
 
         private:
@@ -61,6 +61,6 @@ namespace hf {
                 send();
             }
 
-    }; // class Dsmx2Sbus
+    }; // class SbusActuator
 
 } // namespace hf
