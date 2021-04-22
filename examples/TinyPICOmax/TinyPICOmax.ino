@@ -14,7 +14,7 @@
  */
 
 #include "hackflight.hpp"
-#include "mixers/quadxcf.hpp"
+#include "actuators/mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
