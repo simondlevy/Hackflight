@@ -26,10 +26,10 @@ namespace hf {
                 : Mixer(motors, 4)
             {
                 //                     Th  RR  PF  YR
-                motorDirections[0] = { +1, -1, -1, -1 };    // 1 right front
-                motorDirections[1] = { +1, +1, +1, -1 };    // 2 left rear
-                motorDirections[2] = { +1, +1, -1, +1 };    // 3 left front
-                motorDirections[3] = { +1, -1, +1, +1 };    // 4 right rear
+                motorDirections[0] = { +1, -1, -1, +1 };    // 1 right front
+                motorDirections[1] = { +1, +1, +1, +1 };    // 2 left rear
+                motorDirections[2] = { +1, +1, -1, -1 };    // 3 left front
+                motorDirections[3] = { +1, -1, +1, -1 };    // 4 right rear
             }
     };
 

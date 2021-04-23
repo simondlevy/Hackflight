@@ -63,8 +63,13 @@ namespace hf {
             void modifyDemands(rft::State * state, float * demands)
             {
                 State * hfstate = (State *)state;
+
+                // Roll angle and roll demand are both positive for starboard right down
                 demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], hfstate->x[State::PHI]);
-                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], hfstate->x[State::THETA]);
+
+                // Pitch demand is postive for stick forward, but pitch angle is positive for nose up.
+                // So we negate pitch angle to compute demand
+                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], -hfstate->x[State::THETA]);
             }
 
     };  // class LevelPid

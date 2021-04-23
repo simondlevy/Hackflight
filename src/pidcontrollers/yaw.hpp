@@ -8,8 +8,9 @@
 
 #pragma once
 
-#include "receiver.hpp"
 #include <RFT_filters.hpp>
+
+#include "receiver.hpp"
 #include "state.hpp"
 #include "demands.hpp"
 #include "pidcontrollers/angvel.hpp"
@@ -37,7 +38,7 @@ namespace hf {
             {
                 State * hfstate = (State *)state;
 
-                demands[DEMANDS_YAW] = _yawPid.compute(-demands[DEMANDS_YAW], -hfstate->x[State::DPSI]);
+                demands[DEMANDS_YAW] = _yawPid.compute(demands[DEMANDS_YAW], hfstate->x[State::DPSI]);
 
                 // Prevent "yaw jump" during correction
                 demands[DEMANDS_YAW] = rft::Filter::constrainAbs(demands[DEMANDS_YAW], 0.1 + fabs(demands[DEMANDS_YAW]));

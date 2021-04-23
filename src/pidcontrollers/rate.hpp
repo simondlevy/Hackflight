@@ -9,11 +9,12 @@
 #pragma once
 
 #include "receiver.hpp"
-#include <RFT_filters.hpp>
 #include "state.hpp"
 #include "demands.hpp"
 
 #include "pidcontrollers/angvel.hpp"
+
+#include <RFT_Debugger.hpp>
 
 namespace hf {
 
@@ -36,8 +37,13 @@ namespace hf {
             virtual void modifyDemands(rft::State * state, float * demands) override
             {
                 State * hfstate = (State *)state;
+
+                // Roll angle and roll demand are both positive for starboard right down
                 demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL],  hfstate->x[State::DPHI]);
-                demands[DEMANDS_PITCH] = _pitchPid.compute(-demands[DEMANDS_PITCH], -hfstate->x[State::DTHETA]);
+
+                // Pitch demand is postive for stick forward, but pitch angle is positive for nose up.
+                // So we negate pitch angle to compute demand
+                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], -hfstate->x[State::DTHETA]);
             }
 
             /* XXX should be replaced by resetOnInactivity()

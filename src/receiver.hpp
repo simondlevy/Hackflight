@@ -88,9 +88,11 @@ namespace hf {
 
             uint8_t _channelMap[6] = {0};
 
-            // These must be overridden for each receiver
+            // This must be overridden for each receiver (including sim)
             virtual bool gotNewFrame(void) = 0;
-            virtual void readRawvals(void) = 0;
+
+            // This should be overridden for actual receivers (not sim)
+            virtual void readRawvals(void) { }
 
             // This can be overridden optionally
             virtual void begin(void) { }
@@ -167,10 +169,6 @@ namespace hf {
                 _demands[DEMANDS_ROLL]  += _trimRoll;
                 _demands[DEMANDS_PITCH] += _trimPitch;
                 _demands[DEMANDS_YAW]   += _trimYaw;
-
-                // Negate pitch demand, so that pulling back on stick means positive demand.
-                // Doing this keeps demands consistent with Euler angles (positive pitch = nose up).
-                _demands[DEMANDS_PITCH] = -_demands[DEMANDS_PITCH];
 
                 // Pass throttle demand through exponential function
                 _demands[DEMANDS_THROTTLE] = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
