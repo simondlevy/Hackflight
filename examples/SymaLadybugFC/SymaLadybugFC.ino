@@ -4,7 +4,7 @@
 
    Additional libraries needed:
 
-       https://github.com/simondlevy/EM7180
+       https://github.com/simondlevy/USFS
        https://github.com/simondlevy/CrossPlatformDataBus
        https://github.com/simondlevy/SpektrumDSM 
 
