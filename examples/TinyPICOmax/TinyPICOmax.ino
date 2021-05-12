@@ -14,7 +14,7 @@
  */
 
 #include "hackflight.hpp"
-#include "actuators/mixers/quadxcf.hpp"
+#include "actuators/mixers/quadxmw.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
@@ -44,7 +44,7 @@ hf::DSMX_ESP32_Serial1 receiver = hf::DSMX_ESP32_Serial1(CHANNEL_MAP, DEMAND_SCA
 // -----------------------------------------------------------------------
 
 
-static hf::MixerQuadXCF mixer(&motors);
+static hf::MixerQuadXMW mixer(&motors);
 
 static hf::UsfsMaxGyrometer gyrometer;
 static hf::UsfsMaxQuaternion quaternion; // not really a sensor, but we treat it like one!

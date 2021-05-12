@@ -1,5 +1,5 @@
 /*
-   Mixer subclass for X-configuration quadcopters following the Cleanflight numbering convention:
+   Mixer subclass for X-configuration quadcopters following the MultiWii numbering convention:
 
     4cw   2ccw
        \ /
@@ -18,11 +18,11 @@
 
 namespace hf {
 
-    class MixerQuadXCF : public Mixer {
+    class MixerQuadXMW : public Mixer {
 
         public:
 
-            MixerQuadXCF(rft::Motor * motors) 
+            MixerQuadXMW(rft::Motor * motors) 
                 : Mixer(motors, 4)
             {
                 //                     Th  RR  PF  YR

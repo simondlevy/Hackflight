@@ -20,7 +20,7 @@
 #include "hackflight.hpp"
 #include "boards/ladybugfc.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
-#include "actuators/mixers/quadxcf.hpp"
+#include "actuators/mixers/quadxmw.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
@@ -33,7 +33,7 @@ static hf::LadybugFC board;
 
 static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
-static hf::MixerQuadXCF mixer(&hf::ladybugFcNewMotors);
+static hf::MixerQuadXMW mixer(&hf::ladybugFcNewMotors);
 
 static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
 static hf::YawPid yawPid = hf::YawPid(2, 0.1);
