@@ -14,6 +14,18 @@ namespace hf {
 
     class CoaxialActuator : public rft::Actuator {
 
+        virtual void begin(void) override
+        { 
+        }
+
+        virtual void runDisarmed(void) override 
+        { 
+        }
+
+        virtual void cut(void) override
+        { 
+        }
+
         public:
 
             /*
