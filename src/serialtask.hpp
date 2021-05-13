@@ -46,6 +46,11 @@ namespace hf {
             yaw   = state->x[State::PSI];
         }
 
+        void handle_MOTOR_TYPE_Request(uint8_t & type)
+        {
+            // XXX
+        }
+
         void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4)
         {
             Mixer * mixer = (Mixer *)_actuator;
@@ -93,6 +98,15 @@ namespace hf {
                         sendFloat(yaw);
                         serialize8(_checksum);
                     } break;
+
+                    case 123:
+                        {
+                            uint8_t type = 0;
+                            handle_MOTOR_TYPE_Request(type);
+                            prepareToSendBytes(1);
+                            sendByte(type);
+                            serialize8(_checksum);
+                        } break;
 
                 case 215:
                     {
