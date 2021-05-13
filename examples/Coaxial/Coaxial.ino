@@ -15,7 +15,7 @@
 
 #include "hackflight.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
-#include "actuators/mixers/coaxial.hpp"
+#include "actuators/coaxial.hpp"
 #include "sensors/usfs.hpp"
 
 #include <rft_boards/realboards/arduino/teensy.hpp>
@@ -23,18 +23,16 @@
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 4.0f;
 
-static hf::LadybugFC board;
+static rft::Teensy40 board;
 
 static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
-static hf::MixerCoaxial mixer(&hf::ladybugFcNewMotors);
+static hf::CoaxialActuator actuator;
 
-static hf::Hackflight h(&board, &receiver, &mixer);
+static hf::Hackflight h(&board, &receiver, &actuator);
 
 void setup(void)
 {
-
-    // Initialize Hackflight firmware
     h.begin();
 }
 

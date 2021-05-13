@@ -1,21 +1,22 @@
 /*
-   Mixer subclass for thrust vectoring
+   Actuator for coaxial copters
 
-   Copyright (c) 2020 Simon D. Levy
+   Copyright (c) 2021 Simon D. Levy
 
    MIT License
  */
 
 #pragma once
 
-#include "actuators/mixer.hpp"
+#include <RFT_actuator.hpp>
 
 namespace hf {
 
-    class MixerCoaxial : public Mixer {
+    class CoaxialActuator : public rft::Actuator {
 
         public:
 
+            /*
             MixerCoaxial(rft::Motor * motors) 
                 : Mixer(motors, 4)
             {
@@ -25,14 +26,11 @@ namespace hf {
                 motorDirections[2] = {  0, +1,   0,  0 };   // servo 1
                 motorDirections[3] = {  0,  0 , +1,  0 };   // servo 2
              }
+             */
 
-        protected:
-
-            virtual float constrainMotorValue(uint8_t index, float value) override
+            void run(float * demands)
             {
-                return index < 2 ? Mixer::constrainMotorValue(index, value) : value;
             }
-
-    };
+     };
 
 } // namespace
