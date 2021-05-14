@@ -20,13 +20,6 @@ namespace hf {
 
     class MixerQuadXMW : public Mixer {
 
-        protected:
-
-            uint8_t getType(void) override
-            {
-                return 1; // Enables geometric motor display in GCS
-            }
-
         public:
 
             MixerQuadXMW(rft::Motor * motors) 
@@ -37,6 +30,11 @@ namespace hf {
                 motorDirections[1] = { +1, -1, -1, +1 };    // 2 right front
                 motorDirections[2] = { +1, +1, +1, +1 };    // 3 left rear
                 motorDirections[3] = { +1, +1, -1, -1 };    // 4 left front
+            }
+
+            uint8_t getType(void) override
+            {
+                return 1; // Enables geometric motor display in GCS
             }
     };
 

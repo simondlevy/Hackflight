@@ -48,7 +48,7 @@ namespace hf {
 
         void handle_MOTOR_TYPE_Request(uint8_t & type)
         {
-            // XXX
+            type = _actuator->getType();
         }
 
         void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4)
