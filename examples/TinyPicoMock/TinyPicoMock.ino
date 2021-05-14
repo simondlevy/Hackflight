@@ -9,7 +9,7 @@
  */
 
 #include <RoboFirmwareToolkit.hpp>
-#include <rft_boards/realboards/arduino/teensy.hpp>
+#include <rft_boards/realboards/tinypico.hpp>
 #include <rft_motors/mock.hpp>
 
 #include "hackflight.hpp"
@@ -18,7 +18,7 @@
 #include "sensors/usfsmax.hpp"
 
 
-static rft::Teensy40 board;
+static rft::TinyPico board;
 
 static hf::MockReceiver receiver;
 
