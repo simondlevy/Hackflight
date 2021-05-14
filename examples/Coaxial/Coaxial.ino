@@ -4,8 +4,6 @@
 
    Additional libraries needed:
 
-       https://github.com/simondlevy/EM7180
-       https://github.com/simondlevy/CrossPlatformDataBus
        https://github.com/simondlevy/SpektrumDSM 
 
    Copyright (c) 2021 Simon D. Levy
@@ -19,6 +17,7 @@
 #include "sensors/usfs.hpp"
 
 #include <rft_boards/realboards/arduino/teensy.hpp>
+#include <rft_closedloops/passthru.hpp>
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 4.0f;
@@ -31,8 +30,12 @@ static hf::CoaxialActuator actuator;
 
 static hf::Hackflight h(&board, &receiver, &actuator);
 
+static rft::PassthruController passthru;
+
 void setup(void)
 {
+    h.addClosedLoopController(&passthru);
+
     h.begin();
 }
 

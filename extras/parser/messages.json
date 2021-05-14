@@ -15,7 +15,11 @@
    {"pitch"   : "float"},
    {"yaw"     : "float"}],
   
-  "SET_MOTOR_NORMAL": 
+  "MOTOR_TYPE": 
+  [{"ID": 123},
+   {"mtype"    : "byte"}], 
+
+   "SET_MOTOR_NORMAL": 
   [{"ID": 215},
    {"comment": "We send floating-point values in [0,1], rather than PWM"}, 
    {"m1": "float"},
