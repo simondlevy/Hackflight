@@ -245,6 +245,8 @@ class GCS(MspParser):
 
         self._clear()
 
+        self.comms.send_request(self.motor_type_request)
+
         self.imu.stop()
         self.receiver.stop()
         self.motors.start()
