@@ -30,7 +30,7 @@ class MspParser(Parser, metaclass=abc.ABCMeta):
         return
 
     @abc.abstractmethod
-    def handle_MOTOR_TYPE(self, type):
+    def handle_MOTOR_TYPE(self, mtype):
         return
 
     @staticmethod

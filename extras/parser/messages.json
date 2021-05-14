@@ -17,7 +17,7 @@
   
   "MOTOR_TYPE": 
   [{"ID": 123},
-   {"type"    : "byte"}], 
+   {"mtype"    : "byte"}], 
 
    "SET_MOTOR_NORMAL": 
   [{"ID": 215},

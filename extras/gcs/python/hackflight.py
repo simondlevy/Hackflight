@@ -114,6 +114,7 @@ class GCS(MspParser):
         # Set up parser's request strings
         self.attitude_request = MspParser.serialize_ATTITUDE_RADIANS_Request()
         self.rc_request = MspParser.serialize_RC_NORMAL_Request()
+        self.motor_type_request = MspParser.serialize_MOTOR_TYPE_Request()
 
         # No messages yet
         self.roll_pitch_yaw = [0]*3
@@ -183,6 +184,9 @@ class GCS(MspParser):
         # request, if IMU dialog is running
         if self.imu.running:
             self._send_attitude_request()
+
+    def handle_MOTOR_TYPE(self, mtype):
+        print('Motor type: %d' % mtype)
 
     def _add_pane(self):
 
