@@ -15,7 +15,7 @@ import tkinter as tk
 from mspparser import MspParser
 
 from imu import IMU
-from motors import Motors
+from motors_quadxmw import MotorsQuadXMW
 from receiver import Receiver
 from resources import resource_path
 
@@ -97,8 +97,8 @@ class GCS(MspParser):
         self.hide(self.error_label)
 
         # Add widgets for motor-testing dialog; hide them immediately
-        self.motors = Motors(self)
-        self.motors.stop()
+        self.motors_quadxmw = MotorsQuadXMW(self)
+        self.motors_quadxmw.stop()
 
         # Create receiver dialog
         self.receiver = Receiver(self)
@@ -124,7 +124,7 @@ class GCS(MspParser):
         self.active_axis = 0
 
     def quit(self):
-        self.motors.stop()
+        self.motors_quadxmw.stop()
         self.root.destroy()
 
     def hide(self, widget):
@@ -206,7 +206,7 @@ class GCS(MspParser):
 
         self._clear()
 
-        self.motors.stop()
+        self.motors_quadxmw.stop()
         self.receiver.stop()
         self._send_attitude_request()
         self.imu.start()
@@ -249,7 +249,7 @@ class GCS(MspParser):
 
         self.imu.stop()
         self.receiver.stop()
-        self.motors.start()
+        self.motors_quadxmw.start()
 
     def _clear(self):
 
@@ -261,7 +261,7 @@ class GCS(MspParser):
         self._clear()
 
         self.imu.stop()
-        self.motors.stop()
+        self.motors_quadxmw.stop()
         self._send_rc_request()
         self.receiver.start()
 
@@ -271,7 +271,7 @@ class GCS(MspParser):
         if self.connected:
 
             self.imu.stop()
-            self.motors.stop()
+            self.motors_quadxmw.stop()
             self.receiver.stop()
 
             if self.comms is not None:

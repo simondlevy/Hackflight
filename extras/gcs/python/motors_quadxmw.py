@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-Class for testing motors in GCS
+Class for testing Multiwii quad-X layout motors in GCS
 
 Copyright (C) Simon D. Levy 2021
 
@@ -40,7 +40,7 @@ MOTORS_BOTTOM_Y = 220
 MOTORS_RADIUS = 20
 
 
-class Motors(Dialog):
+class MotorsQuadXMW(Dialog):
 
     def __init__(self, driver):
 
