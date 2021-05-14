@@ -13,7 +13,7 @@
 #include <rft_motors/mock.hpp>
 
 #include "hackflight.hpp"
-#include "actuators/mixers/quadxmw.hpp"
+#include "actuators/mixers/quadxap.hpp"
 #include "receivers/mock.hpp"
 #include "sensors/usfsmax.hpp"
 
@@ -24,7 +24,7 @@ static hf::MockReceiver receiver;
 
 static rft::MockMotor motors;
 
-static hf::MixerQuadXMW mixer(&motors);
+static hf::MixerQuadXAP mixer(&motors);
 
 static hf::Hackflight h(&board, &receiver, &mixer);
 
