@@ -10,7 +10,6 @@
 
 #include <RFT_board.hpp>
 
-#include "mspparser.hpp"
 #include "receiver.hpp"
 #include "state.hpp"
 #include "serialtask.hpp"
