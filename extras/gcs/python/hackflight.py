@@ -126,6 +126,7 @@ class GCS(MspParser):
 
     def quit(self):
         self.motors_quadxmw.stop()
+        self.motors_coaxial.stop()
         self.root.destroy()
 
     def hide(self, widget):
@@ -213,6 +214,7 @@ class GCS(MspParser):
         self._clear()
 
         self.motors_quadxmw.stop()
+        self.motors_coaxial.stop()
         self.receiver.stop()
         self._send_attitude_request()
         self.imu.start()
@@ -268,6 +270,7 @@ class GCS(MspParser):
 
         self.imu.stop()
         self.motors_quadxmw.stop()
+        self.motors_coaxial.stop()
         self._send_rc_request()
         self.receiver.start()
 
@@ -278,6 +281,7 @@ class GCS(MspParser):
 
             self.imu.stop()
             self.motors_quadxmw.stop()
+            self.motors_coaxial.stop()
             self.receiver.stop()
 
             if self.comms is not None:
