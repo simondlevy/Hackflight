@@ -16,6 +16,7 @@ from mspparser import MspParser
 
 from imu import IMU
 from motors_quadxmw import MotorsQuadXMW
+from motors_coaxial import MotorsCoaxial
 from receiver import Receiver
 from resources import resource_path
 
