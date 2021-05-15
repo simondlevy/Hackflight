@@ -19,6 +19,8 @@ WARNING_Y = 350
 
 SERVO1_X = 100
 SERVO2_X = 200
+MOTOR1_X = 300
+MOTOR2_X = 400
 
 class MotorsCoaxial(Dialog):
 
@@ -38,6 +40,8 @@ class MotorsCoaxial(Dialog):
         # Add scales for servos, motors
         self.servo1_scale = MotorScale(self, SERVO1_X, 'Servo 1')
         self.servo2_scale = MotorScale(self, SERVO2_X, 'Servo 2')
+        self.motor1_scale = MotorScale(self, MOTOR1_X, 'Motor 1')
+        self.motor2_scale = MotorScale(self, MOTOR2_X, 'Motor 2')
 
         # Index of active motor (0 = none)
         self.active_motor = 0
@@ -50,6 +54,8 @@ class MotorsCoaxial(Dialog):
 
         self.servo1_scale.start()
         self.servo2_scale.start()
+        self.motor1_scale.start()
+        self.motor2_scale.start()
 
     def stop(self):
 
@@ -59,6 +65,8 @@ class MotorsCoaxial(Dialog):
         self.hide(self.warning)
         self.servo1_scale.hide()
         self.servo2_scale.hide()
+        self.motor1_scale.hide()
+        self.motor2_scale.hide()
         self._turn_off_active()
 
     # Callback for motor-saftey checkbox
@@ -73,6 +81,8 @@ class MotorsCoaxial(Dialog):
             # Reset the scale and show it
             self.servo1_scale.start()
             self.servo2_scale.start()
+            self.motor1_scale.start()
+            self.motor2_scale.start()
 
         # Unchecked
         else:
