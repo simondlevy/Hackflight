@@ -97,9 +97,9 @@ class GCS(MspParser):
                                     fg='red', font=(None, 24), justify=tk.LEFT)
         self.hide(self.error_label)
 
-        # Add widgets for motor-testing dialog; hide them immediately
-        self.motors_quadxmw = MotorsQuadXMW(self)
-        self.motors_quadxmw.stop()
+        # Add widgets for motor-testing dialogs; hide them immediately
+        self.motors_quadxmw = self._add_motor_dialog(MotorsQuadXMW)
+        self.motors_coaxial = self._add_motor_dialog(MotorsCoaxial)
 
         # Create receiver dialog
         self.receiver = Receiver(self)
@@ -202,6 +202,11 @@ class GCS(MspParser):
         button.config(state=('disabled' if disabled else 'normal'))
         return button
 
+    def _add_motor_dialog(self, dialog):
+        d = dialog(self)
+        d.stop()
+        return d
+ 
     # Callback for IMU button
     def _imu_callback(self):
 
