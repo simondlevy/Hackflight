@@ -9,6 +9,7 @@ MIT License
 
 import tkinter as tk
 from dialog import Dialog
+from motor_scale import MotorScale
 
 MOTOR_SCALE_X = 300
 MOTOR_SCALE_Y = 90
