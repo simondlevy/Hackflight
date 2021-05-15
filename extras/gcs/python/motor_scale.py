@@ -9,16 +9,17 @@ MIT License
 
 import tkinter as tk
 
-SCALE_X = 300
 SCALE_Y = 90
 SCALE_LENGTH = 200
 
 
 class MotorScale(object):
 
-    def __init__(self, dialog):
+    def __init__(self, dialog, x):
 
         self.dialog = dialog
+        self.x = x
+
         canvas = dialog.driver.canvas
 
         # A a scale for motors
@@ -33,8 +34,8 @@ class MotorScale(object):
     def start(self):
 
         self.scale.set('0')
-        self.scale.place(x=SCALE_X, y=SCALE_Y)
-        self.label.place(x=SCALE_X+20, y=SCALE_Y+SCALE_LENGTH+10)
+        self.scale.place(x=self.x, y=SCALE_Y)
+        self.label.place(x=self.x+20, y=SCALE_Y+SCALE_LENGTH+10)
 
     def hide(self):
 

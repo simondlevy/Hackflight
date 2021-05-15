@@ -17,6 +17,7 @@ WARNING_TEXT = \
 WARNING_X = 40
 WARNING_Y = 350
 
+SERVO1_X = 100
 
 class MotorsCoaxial(Dialog):
 
@@ -34,7 +35,7 @@ class MotorsCoaxial(Dialog):
                                       bg='black', highlightthickness=0)
 
         # A a scale for motors
-        self.servo1_scale = MotorScale(self)
+        self.servo1_scale = MotorScale(self, SERVO1_X)
 
         # Index of active motor (0 = none)
         self.active_motor = 0
@@ -44,7 +45,8 @@ class MotorsCoaxial(Dialog):
         Dialog.start(self)
 
         self.warning.place(x=WARNING_X, y=WARNING_Y)
-        self._show_motors_image(self.label_motors)
+
+        self.servo1_scale.start()
 
     def stop(self):
 
@@ -69,9 +71,6 @@ class MotorsCoaxial(Dialog):
 
         # Unchecked
         else:
-
-            # Hide the scale
-            self.servo1_scale.hide()
 
             # Turn of any spinning motor
             self._turn_off_active()
