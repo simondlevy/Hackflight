@@ -54,8 +54,6 @@ class MotorsCoaxial(Dialog):
 
         self.servo1_scale.start()
         self.servo2_scale.start()
-        self.motor1_scale.start()
-        self.motor2_scale.start()
 
     def stop(self):
 
@@ -78,7 +76,7 @@ class MotorsCoaxial(Dialog):
             # Start with first motor
             self.active_motor = 1
 
-            # Reset the scale and show it
+            # Reset the scales and show them
             self.servo1_scale.start()
             self.servo2_scale.start()
             self.motor1_scale.start()
@@ -89,6 +87,10 @@ class MotorsCoaxial(Dialog):
 
             # Turn of any spinning motor
             self._turn_off_active()
+
+            # Hide motors
+            self.motor1_scale.hide()
+            self.motor2_scale.hide()
 
     def _turn_off_active(self):
         return
