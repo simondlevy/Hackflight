@@ -35,7 +35,7 @@ class MotorsCoaxial(Dialog):
                                       bg='black', highlightthickness=0)
 
         # A a scale for motors
-        self.servo1_scale = MotorScale(self, SERVO1_X)
+        self.servo1_scale = MotorScale(self, SERVO1_X, 'Servo 1')
 
         # Index of active motor (0 = none)
         self.active_motor = 0

@@ -15,7 +15,7 @@ SCALE_LENGTH = 200
 
 class MotorScale(object):
 
-    def __init__(self, dialog, x):
+    def __init__(self, dialog, x, label):
 
         self.dialog = dialog
         self.x = x
@@ -29,13 +29,13 @@ class MotorScale(object):
                               bg='black', fg='white')
 
         # A label for the scale
-        self.label = tk.Label(canvas, text='%', bg='black', fg='white')
+        self.label = tk.Label(canvas, text=(label), bg='black', fg='white')
 
     def start(self):
 
         self.scale.set('0')
         self.scale.place(x=self.x, y=SCALE_Y)
-        self.label.place(x=self.x+20, y=SCALE_Y+SCALE_LENGTH+10)
+        self.label.place(x=self.x, y=SCALE_Y+SCALE_LENGTH+10)
 
     def hide(self):
 
