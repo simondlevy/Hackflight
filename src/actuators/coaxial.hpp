@@ -40,7 +40,12 @@ namespace hf {
              }
              */
 
-            void run(float * demands)
+            virtual uint8_t getType(void) override
+            {
+                return 1;
+            }
+
+            virtual void run(float * demands) override
             {
             }
      };

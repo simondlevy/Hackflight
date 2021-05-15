@@ -19,7 +19,7 @@ class MspParser(Parser, metaclass=abc.ABCMeta):
             self.handle_ATTITUDE_RADIANS(*struct.unpack('=fff', self.message_buffer))
 
         if self.message_id == 123:
-            self.handle_MOTOR_TYPE(*struct.unpack('=B', self.message_buffer))
+            self.handle_ACTUATOR_TYPE(*struct.unpack('=B', self.message_buffer))
 
     @abc.abstractmethod
     def handle_RC_NORMAL(self, c1, c2, c3, c4, c5, c6):
@@ -30,7 +30,7 @@ class MspParser(Parser, metaclass=abc.ABCMeta):
         return
 
     @abc.abstractmethod
-    def handle_MOTOR_TYPE(self, mtype):
+    def handle_ACTUATOR_TYPE(self, mtype):
         return
 
     @staticmethod
@@ -44,7 +44,7 @@ class MspParser(Parser, metaclass=abc.ABCMeta):
         return bytes(msg, 'utf-8')
 
     @staticmethod
-    def serialize_MOTOR_TYPE_Request():
+    def serialize_ACTUATOR_TYPE_Request():
         msg = '$M<' + chr(0) + chr(123) + chr(123)
         return bytes(msg, 'utf-8')
 

@@ -15,7 +15,7 @@
    {"pitch"   : "float"},
    {"yaw"     : "float"}],
   
-  "MOTOR_TYPE": 
+  "ACTUATOR_TYPE": 
   [{"ID": 123},
    {"mtype"    : "byte"}], 
 

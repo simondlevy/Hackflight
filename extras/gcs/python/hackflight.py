@@ -101,6 +101,9 @@ class GCS(MspParser):
         self.motors_quadxmw = self._add_motor_dialog(MotorsQuadXMW)
         self.motors_coaxial = self._add_motor_dialog(MotorsCoaxial)
 
+        # Assume QuadXMW motor config
+        self.actuator_type = 0
+
         # Create receiver dialog
         self.receiver = Receiver(self)
 
@@ -115,7 +118,7 @@ class GCS(MspParser):
         # Set up parser's request strings
         self.attitude_request = MspParser.serialize_ATTITUDE_RADIANS_Request()
         self.rc_request = MspParser.serialize_RC_NORMAL_Request()
-        self.motor_type_request = MspParser.serialize_MOTOR_TYPE_Request()
+        self.actuator_type_request = MspParser.serialize_ACTUATOR_TYPE_Request()
 
         # No messages yet
         self.roll_pitch_yaw = [0]*3
@@ -187,8 +190,9 @@ class GCS(MspParser):
         if self.imu.running:
             self._send_attitude_request()
 
-    def handle_MOTOR_TYPE(self, mtype):
-        print('Motor type: %d' % mtype)
+    def handle_ACTUATOR_TYPE(self, atype):
+        print('got type %d' % atype)
+        self.actuator_type = atype
 
     def _add_pane(self):
 
@@ -207,7 +211,7 @@ class GCS(MspParser):
         d = dialog(self)
         d.stop()
         return d
- 
+
     # Callback for IMU button
     def _imu_callback(self):
 
@@ -253,10 +257,11 @@ class GCS(MspParser):
 
         self._clear()
 
-        self.comms.send_request(self.motor_type_request)
+        self.comms.send_request(self.actuator_type_request)
 
         self.imu.stop()
         self.receiver.stop()
+        print('atype: %d' % self.actuator_type)
         self.motors_quadxmw.start()
 
     def _clear(self):

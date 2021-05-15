@@ -28,7 +28,7 @@ MOTOR_SCALE_Y = 90
 MOTOR_SCALE_LENGTH = 200
 
 MOTORS_WARNING_TEXT = \
-        'I have removed the propellers and am ready to spin the motors safely.'
+        'I have removed the rotors and am ready to spin the motors safely.'
 
 MOTORS_WARNING_X = 40
 MOTORS_WARNING_Y = 350

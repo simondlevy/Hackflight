@@ -46,7 +46,7 @@ namespace hf {
             yaw   = state->x[State::PSI];
         }
 
-        void handle_MOTOR_TYPE_Request(uint8_t & type)
+        void handle_ACTUATOR_TYPE_Request(uint8_t & type)
         {
             type = _actuator->getType();
         }
@@ -102,7 +102,7 @@ namespace hf {
                     case 123:
                         {
                             uint8_t type = 0;
-                            handle_MOTOR_TYPE_Request(type);
+                            handle_ACTUATOR_TYPE_Request(type);
                             prepareToSendBytes(1);
                             sendByte(type);
                             serialize8(_checksum);
