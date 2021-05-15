@@ -15,7 +15,7 @@ SCALE_LENGTH = 200
 
 class MotorScale(object):
 
-    def __init__(self, dialog, x, label):
+    def __init__(self, dialog, x, label, minval, maxval):
 
         self.dialog = dialog
         self.x = x
@@ -23,7 +23,7 @@ class MotorScale(object):
         canvas = dialog.driver.canvas
 
         # A a scale for motors
-        self.scale = tk.Scale(canvas, from_=100, to_=0,
+        self.scale = tk.Scale(canvas, from_=maxval, to_=minval,
                               command=self.callback,
                               orient=tk.VERTICAL, length=SCALE_LENGTH,
                               bg='black', fg='white')

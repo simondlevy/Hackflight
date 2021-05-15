@@ -38,10 +38,10 @@ class MotorsCoaxial(Dialog):
                                       bg='black', highlightthickness=0)
 
         # Add scales for servos, motors
-        self.servo1_scale = MotorScale(self, SERVO1_X, 'Servo 1')
-        self.servo2_scale = MotorScale(self, SERVO2_X, 'Servo 2')
-        self.motor1_scale = MotorScale(self, MOTOR1_X, 'Motor 1')
-        self.motor2_scale = MotorScale(self, MOTOR2_X, 'Motor 2')
+        self.servo1_scale = MotorScale(self, SERVO1_X, 'Servo 1', -50, +50)
+        self.servo2_scale = MotorScale(self, SERVO2_X, 'Servo 2', -50, +50)
+        self.motor1_scale = MotorScale(self, MOTOR1_X, 'Motor 1', 0, 100)
+        self.motor2_scale = MotorScale(self, MOTOR2_X, 'Motor 2', 0, 100)
 
         # Index of active motor (0 = none)
         self.active_motor = 0
