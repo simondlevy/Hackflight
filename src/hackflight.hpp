@@ -70,7 +70,6 @@ namespace hf {
 
                 // Update serial comms task
                 _serialTask.update();
-
             }
 
     }; // class Hackflight

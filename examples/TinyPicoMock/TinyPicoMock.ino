@@ -14,9 +14,9 @@
 
 #include "hackflight.hpp"
 #include "actuators/mixers/quadxap.hpp"
+#include "actuators/coaxial.hpp"
 #include "receivers/mock.hpp"
 #include "sensors/usfsmax.hpp"
-
 
 static rft::TinyPico board;
 
@@ -24,9 +24,10 @@ static hf::MockReceiver receiver;
 
 static rft::MockMotor motors;
 
-static hf::MixerQuadXAP mixer(&motors);
+//static hf::MixerQuadXAP mixer(&motors);
+static hf::CoaxialActuator actuator;
 
-static hf::Hackflight h(&board, &receiver, &mixer);
+static hf::Hackflight h(&board, &receiver, &actuator);
 
 void setup(void)
 {

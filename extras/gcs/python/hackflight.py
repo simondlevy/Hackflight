@@ -191,8 +191,10 @@ class GCS(MspParser):
             self._send_attitude_request()
 
     def handle_ACTUATOR_TYPE(self, atype):
-        print('got type %d' % atype)
         self.actuator_type = atype
+        print(atype)
+        if self.motors_quadxmw.running:
+            self.comms.send_request(self.actuator_type_request)
 
     def _add_pane(self):
 
@@ -261,7 +263,6 @@ class GCS(MspParser):
 
         self.imu.stop()
         self.receiver.stop()
-        print('atype: %d' % self.actuator_type)
         self.motors_quadxmw.start()
 
     def _clear(self):
