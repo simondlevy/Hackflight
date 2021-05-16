@@ -36,6 +36,27 @@ namespace hf {
 
             CoaxialMotor _motors;
 
+            // XXX hard-code for now
+            static const uint8_t SERVO1_PIN = 22;
+            static const uint8_t SERVO2_PIN = 23;
+
+            Servo servo1;
+            Servo servo2;
+
+            void initServo(Servo & servo, uint8_t pin)
+            {
+                servo.attach(pin);
+                servo.write(90);
+            }
+
+        protected:
+
+            virtual void begin(void) override
+            {
+                initServo(servo1, SERVO1_PIN);
+                initServo(servo2, SERVO2_PIN);
+            }
+
         public:
 
             MixerCoaxial(void) 
