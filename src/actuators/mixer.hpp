@@ -83,13 +83,13 @@ namespace hf {
             }
 
 
-            void begin(void)
+            virtual void begin(void) override
             {
                 _motors->begin();
             }
 
             // This is how we can spin the motors from the GCS
-            void runDisarmed(void)
+            virtual void runDisarmed(void)
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     safeWriteMotor(i, _motorsDisarmed[i]);
@@ -103,7 +103,7 @@ namespace hf {
                 return rft::Filter::constrainMinMax(value, 0, 1);
             }
 
-            void cut(void)
+            virtual void cut(void)
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     writeMotor(i, 0);

@@ -11,6 +11,8 @@
 #include <RFT_motor.hpp>
 #include "actuators/mixer.hpp"
 
+#include <Servo.h>
+
 namespace hf {
 
     class MixerCoaxial : public Mixer {
