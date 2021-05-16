@@ -43,11 +43,6 @@ namespace hf {
 
             uint8_t _nmotors;
 
-            void writeMotor(uint8_t index, float value)
-            {
-                _motors->write(index, value);
-            }
-
             void safeWriteMotor(uint8_t index, float value)
             {
                 // Avoid sending the motor the same value over and over
@@ -77,7 +72,12 @@ namespace hf {
 
             }
 
-            virtual void setMotorDisarmed(uint8_t index, float value)
+            virtual void writeMotor(uint8_t index, float value)
+            {
+                _motors->write(index, value);
+            }
+
+            virtual void setMotorDisarmed(uint8_t index, float value) override
             {
                 _motorsDisarmed[index] = value;
             }

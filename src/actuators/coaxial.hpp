@@ -8,14 +8,13 @@
 
 #pragma once
 
-#include <RFT_motor.hpp>
-#include "actuators/mixer.hpp"
+#include <RFT_actuator.hpp>
 
 #include <Servo.h>
 
 namespace hf {
 
-    class MixerCoaxial : public Mixer {
+    class MixerCoaxial : public rft::Actuator {
 
         private:
 
@@ -57,16 +56,22 @@ namespace hf {
                 initServo(servo2, SERVO2_PIN);
             }
 
+            virtual void runDisarmed(void) override
+            {
+                // XXX
+            }
+
+            virtual void cut(void) override
+            {
+                // XXX
+            }
+
         public:
 
-            MixerCoaxial(void) 
-                : Mixer(&_motors, 4)
+            virtual void run(float * demands) override
             {
-                //                     Th  RR  PF  YR
-                motorDirections[0] = {  0, -1, -1,  0 };    // Servo 1
-                motorDirections[1] = {  0, +1, +1,  0 };    // Servo 2
-                motorDirections[2] = { +1,  0,  0, +1 };    // Motor 1
-                motorDirections[3] = { +1,  0,  0, -1 };    // Motor 2
+                Serial.printf("T: %+3.3f    R: %+3.3f    P: %+3.3f    Y: %+3.3f\n",
+                        demands[0], demands[1], demands[2], demands[3]);
             }
 
             virtual uint8_t getType(void) override

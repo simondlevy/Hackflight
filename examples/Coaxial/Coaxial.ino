@@ -13,7 +13,7 @@
 
 #include "hackflight.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
-#include "actuators/mixers/coaxial.hpp"
+#include "actuators/coaxial.hpp"
 #include "sensors/usfs.hpp"
 
 #include <rft_boards/realboards/arduino/teensy.hpp>
