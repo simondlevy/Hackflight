@@ -13,7 +13,7 @@
 
 #include "hackflight.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
-#include "actuators/coaxial.hpp"
+#include "actuators/mixers/coaxial.hpp"
 #include "sensors/usfs.hpp"
 
 #include <rft_boards/realboards/arduino/teensy.hpp>
@@ -26,9 +26,9 @@ static rft::Teensy40 board;
 
 static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
-static hf::CoaxialActuator actuator;
+static hf::MixerCoaxial mixer;
 
-static hf::Hackflight h(&board, &receiver, &actuator);
+static hf::Hackflight h(&board, &receiver, &mixer);
 
 static rft::PassthruController passthru;
 
