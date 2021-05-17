@@ -45,11 +45,10 @@ class MotorScale(object):
     def callback(self, valstr):
 
         print(valstr)
-        
+
+
 class ServoScale(MotorScale):
 
     def __init__(self, dialog, x, label):
 
         MotorScale.__init__(self, dialog, x, label, -50, +50)
-
-

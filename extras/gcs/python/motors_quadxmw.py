@@ -11,6 +11,7 @@ import tkinter as tk
 from math import sqrt
 from dialog import Dialog
 from resources import resource_path
+from debugger import debug
 
 MOTORS_IMAGE_FILE = resource_path('motors.gif')
 MOTORS1_IMAGE_FILE = resource_path('motors1.gif')
@@ -134,6 +135,7 @@ class MotorsQuadXMW(Dialog):
 
     def _send_motor_message(self, percent):
 
+        debug(self.active_motor)
         self.driver.sendMotorMessage(self.active_motor, percent)
 
     def _on_click(self, event):

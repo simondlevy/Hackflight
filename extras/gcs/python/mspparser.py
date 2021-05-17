@@ -13,13 +13,16 @@ class MspParser(Parser, metaclass=abc.ABCMeta):
     def dispatchMessage(self):
 
         if self.message_id == 121:
-            self.handle_RC_NORMAL(*struct.unpack('=ffffff', self.message_buffer))
+            self.handle_RC_NORMAL(*struct.unpack('=ffffff',
+                                                 self.message_buffer))
 
         if self.message_id == 122:
-            self.handle_ATTITUDE_RADIANS(*struct.unpack('=fff', self.message_buffer))
+            self.handle_ATTITUDE_RADIANS(*struct.unpack('=fff',
+                                                        self.message_buffer))
 
         if self.message_id == 123:
-            self.handle_ACTUATOR_TYPE(*struct.unpack('=B', self.message_buffer))
+            self.handle_ACTUATOR_TYPE(*struct.unpack('=B',
+                                                     self.message_buffer))
 
     @abc.abstractmethod
     def handle_RC_NORMAL(self, c1, c2, c3, c4, c5, c6):

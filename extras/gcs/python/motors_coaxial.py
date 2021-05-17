@@ -22,6 +22,7 @@ SERVO2_X = 300
 MOTOR1_X = 450
 MOTOR2_X = 600
 
+
 class MotorsCoaxial(Dialog):
 
     def __init__(self, driver):
@@ -93,6 +94,5 @@ class MotorsCoaxial(Dialog):
             self.motor2_scale.hide()
 
     def _turn_off_active(self):
-        return
-        # if self.driver.connected and self.active_motor > 0:
-        #     self._send_motor_message(0)
+        if self.driver.connected and self.active_motor > 0:
+            self._send_motor_message(0)
