@@ -62,6 +62,12 @@ namespace hf {
                 _motorsPrev[index] = value;
             }
 
+            void writeServoDisarmed(Servo & servo, uint8_t index)
+            {
+                // Convert [0,1] to [0,180] for servos
+                servo.write(90 + (int8_t)(100*_motorsDisarmed[index]));
+            }
+
         protected:
 
             virtual void begin(void) override
@@ -77,8 +83,8 @@ namespace hf {
 
             virtual void runDisarmed(void) override
             {
-                // Convert [0,1] to [0,180] for servos
-                servo2.write(90 + (int8_t)(100*_motorsDisarmed[1]));
+                writeServoDisarmed(servo1, 0);
+                writeServoDisarmed(servo2, 1);
             }
 
             virtual void cut(void) override
