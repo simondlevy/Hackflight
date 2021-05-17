@@ -14,9 +14,13 @@
 
 namespace hf {
 
-    class MixerCoaxial : public rft::Actuator {
+    class CoaxialActuator : public rft::Actuator {
 
         private:
+
+            static const uint8_t MAXMOTORS = 20; // arbitrary
+            float _motorsPrev[MAXMOTORS] = {};
+            float  _motorsDisarmed[MAXMOTORS];
 
             class CoaxialMotor : public rft::Motor {
 
@@ -48,12 +52,27 @@ namespace hf {
                 servo.write(90);
             }
 
+            void safeWriteMotor(uint8_t index, float value)
+            {
+                // Avoid sending the motor the same value over and over
+                if (_motorsPrev[index] != value) {
+                    //writeMotor(index, value);
+                }
+
+                _motorsPrev[index] = value;
+            }
+
         protected:
 
             virtual void begin(void) override
             {
                 initServo(servo1, SERVO1_PIN);
                 initServo(servo2, SERVO2_PIN);
+            }
+
+            virtual void setMotorDisarmed(uint8_t index, float value) override
+            {
+                _motorsDisarmed[index] = value;
             }
 
             virtual void runDisarmed(void) override
@@ -68,6 +87,14 @@ namespace hf {
 
         public:
 
+            CoaxialActuator(void)
+            {
+                for (uint8_t i = 0; i < 4; i++) {
+                    _motorsDisarmed[i] = 0;
+                    _motorsPrev[i] = 0;
+                }
+            }
+
             virtual void run(float * demands) override
             {
                 Serial.printf("T: %+3.3f    R: %+3.3f    P: %+3.3f    Y: %+3.3f\n",
@@ -78,6 +105,7 @@ namespace hf {
             {
                 return 1;
             }
-    };
+
+    }; // class CoaxialActuator
 
 } // namespace

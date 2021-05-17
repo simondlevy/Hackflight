@@ -34,13 +34,9 @@ namespace hf {
                 int8_t yaw;	     // R
             } motorMixer_t;
 
-            // Arbitrary
-            static const uint8_t MAXMOTORS = 20;
-
-            float _motorsPrev[MAXMOTORS] = {0};
-
+            static const uint8_t MAXMOTORS = 20; // arbitrary
+            float _motorsPrev[MAXMOTORS] = {};
             float  _motorsDisarmed[MAXMOTORS];
-
             uint8_t _nmotors;
 
             void safeWriteMotor(uint8_t index, float value)
@@ -69,10 +65,9 @@ namespace hf {
                     _motorsDisarmed[i] = 0;
                     _motorsPrev[i] = 0;
                 }
-
             }
 
-            virtual void writeMotor(uint8_t index, float value)
+            void writeMotor(uint8_t index, float value)
             {
                 _motors->write(index, value);
             }
@@ -81,7 +76,6 @@ namespace hf {
             {
                 _motorsDisarmed[index] = value;
             }
-
 
             virtual void begin(void) override
             {

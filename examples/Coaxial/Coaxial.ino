@@ -26,9 +26,9 @@ static rft::Teensy40 board;
 
 static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
-static hf::MixerCoaxial mixer;
+static hf::CoaxialActuator actuator;
 
-static hf::Hackflight h(&board, &receiver, &mixer);
+static hf::Hackflight h(&board, &receiver, &actuator);
 
 static rft::PassthruController passthru;
 

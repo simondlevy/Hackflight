@@ -15,10 +15,11 @@ SCALE_LENGTH = 200
 
 class MotorScale(object):
 
-    def __init__(self, dialog, x, label, minval=0, maxval=100):
+    def __init__(self, dialog, x, index, label, minval=0, maxval=100):
 
         self.dialog = dialog
         self.x = x
+        self.index = index
 
         canvas = dialog.driver.canvas
 
@@ -44,11 +45,11 @@ class MotorScale(object):
 
     def callback(self, valstr):
 
-        print(valstr)
+        self.dialog.driver.sendMotorMessage(self.index, int(valstr))
 
 
 class ServoScale(MotorScale):
 
-    def __init__(self, dialog, x, label):
+    def __init__(self, dialog, x, index, label):
 
-        MotorScale.__init__(self, dialog, x, label, -50, +50)
+        MotorScale.__init__(self, dialog, x, index, label, -50, +50)
