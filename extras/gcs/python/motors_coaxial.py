@@ -25,13 +25,13 @@ MOTOR2_X = 600
 
 class MotorsCoaxial(Dialog):
 
-    def __init__(self, driver):
+    def __init__(self, gcs):
 
-        Dialog.__init__(self, driver)
+        Dialog.__init__(self, gcs)
 
         # Add a warning checkbox for motor testing
         self.checkbox_var = tk.IntVar()
-        self.warning = tk.Checkbutton(self.driver.canvas,
+        self.warning = tk.Checkbutton(self.gcs.canvas,
                                       variable=self.checkbox_var,
                                       command=self._checkbox_callback,
                                       text=WARNING_TEXT,
@@ -94,5 +94,5 @@ class MotorsCoaxial(Dialog):
             self.motor2_scale.hide()
 
     def _turn_off_active(self):
-        if self.driver.connected and self.active_motor > 0:
+        if self.gcs.connected and self.active_motor > 0:
             self._send_motor_message(0)

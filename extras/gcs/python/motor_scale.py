@@ -21,7 +21,7 @@ class MotorScale(object):
         self.x = x
         self.index = index
 
-        canvas = dialog.driver.canvas
+        canvas = dialog.gcs.canvas
 
         # A a scale for motors
         self.scale = tk.Scale(canvas, from_=maxval, to_=minval,
@@ -45,7 +45,7 @@ class MotorScale(object):
 
     def callback(self, valstr):
 
-        self.dialog.driver.sendMotorMessage(self.index, int(valstr))
+        self.dialog.gcs.sendMotorMessage(self.index, int(valstr))
 
 
 class ServoScale(MotorScale):

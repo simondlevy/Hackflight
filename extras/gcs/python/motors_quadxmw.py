@@ -42,9 +42,9 @@ MOTORS_RADIUS = 20
 
 class MotorsQuadXMW(Dialog):
 
-    def __init__(self, driver):
+    def __init__(self, gcs):
 
-        Dialog.__init__(self, driver)
+        Dialog.__init__(self, gcs)
 
         # Add a quadcopter image for motor testing
         self.image_motors, self.label_motors = \
@@ -60,7 +60,7 @@ class MotorsQuadXMW(Dialog):
 
         # Add a warning checkbox for motor testing
         self.checkbox_var = tk.IntVar()
-        self.warning_motors = tk.Checkbutton(self.driver.canvas,
+        self.warning_motors = tk.Checkbutton(self.gcs.canvas,
                                              variable=self.checkbox_var,
                                              command=self._checkbox_callback,
                                              text=MOTORS_WARNING_TEXT,
@@ -68,13 +68,13 @@ class MotorsQuadXMW(Dialog):
                                              bg='black', highlightthickness=0)
 
         # A a scale for motors
-        self.scale = tk.Scale(self.driver.canvas, from_=100, to_=0,
+        self.scale = tk.Scale(self.gcs.canvas, from_=100, to_=0,
                               command=self._scale_callback,
                               orient=tk.VERTICAL, length=MOTOR_SCALE_LENGTH,
                               bg='black', fg='white')
 
         # A label for the scale
-        self.scale_label = tk.Label(self.driver.canvas, text='%', bg='black',
+        self.scale_label = tk.Label(self.gcs.canvas, text='%', bg='black',
                                     fg='white')
 
         # Index of active motor (0 = none)
@@ -134,7 +134,7 @@ class MotorsQuadXMW(Dialog):
 
     def _send_motor_message(self, percent):
 
-        self.driver.sendMotorMessage(self.active_motor, percent)
+        self.gcs.sendMotorMessage(self.active_motor, percent)
 
     def _on_click(self, event):
 
@@ -154,7 +154,7 @@ class MotorsQuadXMW(Dialog):
         the_file = tk.PhotoImage(file=filename)
         the_image = the_file.subsample(MOTORS_IMAGE_SCALEDOWN,
                                        MOTORS_IMAGE_SCALEDOWN)
-        the_label = tk.Label(self.driver.canvas,
+        the_label = tk.Label(self.gcs.canvas,
                              image=the_image, borderwidth=0)
         the_label.bind('<Button-1>', self._on_click)
         return the_image, the_label
@@ -198,5 +198,5 @@ class MotorsQuadXMW(Dialog):
             self._turn_off_active()
 
     def _turn_off_active(self):
-        if self.driver.connected and self.active_motor > 0:
+        if self.gcs.connected and self.active_motor > 0:
             self._send_motor_message(0)

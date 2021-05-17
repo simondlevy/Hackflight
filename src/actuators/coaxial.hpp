@@ -77,6 +77,7 @@ namespace hf {
 
             virtual void runDisarmed(void) override
             {
+                // Convert [0,1] to [0,180] for servos
                 servo2.write(90 + (uint8_t)(100*_motorsDisarmed[1]));
             }
 

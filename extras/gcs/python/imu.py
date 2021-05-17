@@ -58,9 +58,9 @@ def _transpose(a):
 
 class IMU(Dialog):
 
-    def __init__(self, driver, simulation=False):
+    def __init__(self, gcs, simulation=False):
 
-        Dialog.__init__(self, driver)
+        Dialog.__init__(self, gcs)
 
         # Vehicle dimensions
         W = VEHICLE_SCALE
@@ -110,7 +110,7 @@ class IMU(Dialog):
 
         if self.running:
 
-            self.roll_pitch_yaw = self.driver.getRollPitchYaw()
+            self.roll_pitch_yaw = self.gcs.getRollPitchYaw()
 
             self._update()
 
@@ -118,7 +118,7 @@ class IMU(Dialog):
 
     def _to_screen_coords(self, pv):
 
-        d = str(self.driver.root.geometry()).split('+')[0].split('x')
+        d = str(self.gcs.root.geometry()).split('+')[0].split('x')
         dims = [int(s)for s in d]
         width, height = dims[0], dims[1]
 
@@ -130,17 +130,16 @@ class IMU(Dialog):
 
     def _save(self):
 
-        self.driver.save(self.pitchroll_kp_scale.get(),
-                         self.yaw_kp_scale.get())
+        self.gcs.save(self.pitchroll_kp_scale.get(), self.yaw_kp_scale.get())
 
     def _create_window(self, x, widget):
 
-        return self.driver.canvas.create_window(x, 10, anchor=tk.NW,
-                                                window=widget)
+        return self.gcs.canvas.create_window(x, 10, anchor=tk.NW,
+                                             window=widget)
 
     def _create_button(self, text, x, command):
 
-        button = tk.Button(self.driver.canvas, text=text, height=2,
+        button = tk.Button(self.gcs.canvas, text=text, height=2,
                            command=command)
         button_window = self._create_window(x, button)
 
@@ -148,7 +147,7 @@ class IMU(Dialog):
 
     def _create_scale(self, text, x, callback):
 
-        scale = tk.Scale(self.driver.canvas, from_=0, to_=100, label=text,
+        scale = tk.Scale(self.gcs.canvas, from_=0, to_=100, label=text,
                          command=callback, orient=tk.HORIZONTAL, length=200,
                          bg='black', fg='white')
         scale_window = self._create_window(x, scale)
@@ -192,15 +191,15 @@ class IMU(Dialog):
         self.yawrot[2][2] = +cos(yawAngle)
 
         # Multiply matrices based on active axis
-        if self.driver.active_axis == YAW_ACTIVE:
+        if self.gcs.active_axis == YAW_ACTIVE:
             rot = _dotm(_dotm(self.rollrot, self.pitchrot), self.yawrot)
-        elif self.driver.active_axis == PITCH_ACTIVE:
+        elif self.gcs.active_axis == PITCH_ACTIVE:
             rot = _dotm(_dotm(self.yawrot, self.rollrot), self.pitchrot)
         else:
             rot = _dotm(_dotm(self.yawrot, self.pitchrot), self.rollrot)
 
         # Add a label for arming if needed
-        self.driver.checkArmed()
+        self.gcs.checkArmed()
 
         # Draw polygons
         for i in range(len(self.vehicle_faces)):
@@ -220,8 +219,8 @@ class IMU(Dialog):
 
             if self._is_polygon_front_face(poly):  # Backface culling
                 f = self.vehicle_face_colors[i]
-                self.faces.append(self.driver.canvas.create_polygon(*poly,
-                                                                    fill=f))
+                self.faces.append(self.gcs.canvas.create_polygon(*poly,
+                                                                 fill=f))
 
         # Update angle changes
         if self.roll_pitch_yaw_prev is not None:
@@ -323,11 +322,11 @@ if __name__ == "__main__":
 
     canvas = tk.Canvas(root, width=width, height=height, background='black')
 
-    driver = SliderDriver(root, canvas)
+    gcs = SliderDriver(root, canvas)
 
     canvas.pack()
 
-    sim = IMU(driver, simulation=True)
+    sim = IMU(gcs, simulation=True)
 
     sim.start()
 
