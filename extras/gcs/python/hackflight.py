@@ -19,6 +19,7 @@ from motors_quadxmw import MotorsQuadXMW
 from motors_coaxial import MotorsCoaxial
 from receiver import Receiver
 from resources import resource_path
+from debugging import debug
 
 DISPLAY_WIDTH = 800
 DISPLAY_HEIGHT = 600
@@ -396,6 +397,7 @@ class GCS(MspParser):
 
         values = [0]*4
         values[index-1] = percent / 100.
+        debug(values)
         self.comms.send_message(MspParser.serialize_SET_MOTOR_NORMAL, values)
 
     def _show_splash(self):
