@@ -83,7 +83,7 @@ namespace hf {
             }
 
             // This is how we can spin the motors from the GCS
-            virtual void runDisarmed(void)
+            virtual void runDisarmed(void) override
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     safeWriteMotor(i, _motorsDisarmed[i]);

@@ -77,7 +77,7 @@ namespace hf {
 
             virtual void runDisarmed(void) override
             {
-                // XXX
+                servo2.write(90 + (uint8_t)_motorsDisarmed[1]);
             }
 
             virtual void cut(void) override
