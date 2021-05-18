@@ -86,6 +86,7 @@ namespace hf {
 
                 // Set Motor1 to forward direction
                 digitalWrite(MOTOR1_PIN1, LOW);
+                digitalWrite(MOTOR2_PIN1, LOW);
             }
 
             virtual void setMotorDisarmed(uint8_t index, float value) override
@@ -99,6 +100,7 @@ namespace hf {
                 writeServoDisarmed(servo2, 1);
 
                 analogWrite(MOTOR1_PIN2, (uint8_t)(256*_motorsDisarmed[2]));
+                analogWrite(MOTOR2_PIN2, (uint8_t)(256*_motorsDisarmed[3]));
             }
 
             virtual void cut(void) override
