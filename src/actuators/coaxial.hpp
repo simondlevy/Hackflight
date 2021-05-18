@@ -22,31 +22,14 @@ namespace hf {
             float _motorsPrev[MAXMOTORS] = {};
             float  _motorsDisarmed[MAXMOTORS];
 
-            class CoaxialMotor : public rft::Motor {
 
-                public:
+            uint8_t _servo1_pin = 0;
+            uint8_t _servo2_pin = 0;
+            uint8_t _motor1_pin = 0;
+            uint8_t _motor2_pin = 0;
 
-                    CoaxialMotor(void)
-                        : rft::Motor(4) 
-                    {
-                    }
-
-                    virtual void write(uint8_t index, float value) override
-                    {
-                    }
-
-            }; 
-
-            CoaxialMotor _motors;
-
-            // XXX hard-code for now
-            static const uint8_t SERVO1_PIN = 22;
-            static const uint8_t SERVO2_PIN = 23;
-            static const uint8_t MOTOR1_PIN = 8;
-            static const uint8_t MOTOR2_PIN = 9;
-
-            Servo servo1;
-            Servo servo2;
+            Servo _servo1;
+            Servo _servo2;
 
             void initServo(Servo & servo, uint8_t pin)
             {
@@ -89,8 +72,8 @@ namespace hf {
 
             virtual void begin(void) override
             {
-                initServo(servo1, SERVO1_PIN);
-                initServo(servo2, SERVO2_PIN);
+                initServo(_servo1, _servo1_pin);
+                initServo(_servo2, _servo2_pin);
             }
 
             virtual void setMotorDisarmed(uint8_t index, float value) override
@@ -100,23 +83,28 @@ namespace hf {
 
             virtual void runDisarmed(void) override
             {
-                writeServoDisarmed(servo1, 0);
-                writeServoDisarmed(servo2, 1);
+                writeServoDisarmed(_servo1, 0);
+                writeServoDisarmed(_servo2, 1);
 
-                writeMotorDisarmed(MOTOR1_PIN, 2);
-                writeMotorDisarmed(MOTOR2_PIN, 3);
+                writeMotorDisarmed(_motor1_pin, 2);
+                writeMotorDisarmed(_motor2_pin, 3);
             }
 
             virtual void cut(void) override
             {
-                cutMotor(MOTOR1_PIN);
-                cutMotor(MOTOR2_PIN);
+                cutMotor(_motor1_pin);
+                cutMotor(_motor2_pin);
             }
 
         public:
 
-            CoaxialActuator(void)
+            CoaxialActuator(uint8_t servo1_pin, uint8_t servo2_pin, uint8_t motor1_pin, uint8_t motor2_pin)
             {
+                _servo1_pin = servo1_pin;
+                _servo2_pin = servo2_pin;
+                _motor1_pin = motor1_pin;
+                _motor2_pin = motor2_pin;
+
                 for (uint8_t i = 0; i < 4; i++) {
                     _motorsDisarmed[i] = 0;
                     _motorsPrev[i] = 0;
@@ -125,6 +113,7 @@ namespace hf {
 
             virtual void run(float * demands) override
             {
+                // XXX
                 Serial.printf("T: %+3.3f    R: %+3.3f    P: %+3.3f    Y: %+3.3f\n",
                         demands[0], demands[1], demands[2], demands[3]);
             }
