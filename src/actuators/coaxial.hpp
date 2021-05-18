@@ -75,14 +75,14 @@ namespace hf {
                 writeServo(servo, _motorsDisarmed[index]);
             }
 
-            void initMotor(uint8_t pin)
-            {
-                digitalWrite(pin, LOW);
-            }
-
             void writeMotorDisarmed(uint8_t pin, uint8_t index)
             {
                 analogWrite(pin, (uint8_t)(255*_motorsDisarmed[index]));
+            }
+
+            void cutMotor(uint8_t pin)
+            {
+                analogWrite(pin, 0);
             }
 
         protected:
@@ -109,7 +109,8 @@ namespace hf {
 
             virtual void cut(void) override
             {
-                // XXX
+                cutMotor(MOTOR1_PIN);
+                cutMotor(MOTOR2_PIN);
             }
 
         public:
