@@ -77,6 +77,16 @@ namespace hf {
                 writeServo(servo, _motorsDisarmed[index]);
             }
 
+            void initMotor(uint8_t pin)
+            {
+                digitalWrite(pin, LOW);
+            }
+
+            void writeMotorDisarmed(uint8_t pin, uint8_t index)
+            {
+                analogWrite(pin, (uint8_t)(255*_motorsDisarmed[index]));
+            }
+
         protected:
 
             virtual void begin(void) override
@@ -85,8 +95,8 @@ namespace hf {
                 initServo(servo2, SERVO2_PIN);
 
                 // Set Motor1 to forward direction
-                digitalWrite(MOTOR1_PIN1, LOW);
-                digitalWrite(MOTOR2_PIN1, LOW);
+                initMotor(MOTOR1_PIN1);
+                initMotor(MOTOR2_PIN1);
             }
 
             virtual void setMotorDisarmed(uint8_t index, float value) override
@@ -99,8 +109,8 @@ namespace hf {
                 writeServoDisarmed(servo1, 0);
                 writeServoDisarmed(servo2, 1);
 
-                analogWrite(MOTOR1_PIN2, (uint8_t)(256*_motorsDisarmed[2]));
-                analogWrite(MOTOR2_PIN2, (uint8_t)(256*_motorsDisarmed[3]));
+                writeMotorDisarmed(MOTOR1_PIN2, 2);
+                writeMotorDisarmed(MOTOR2_PIN2, 3);
             }
 
             virtual void cut(void) override
