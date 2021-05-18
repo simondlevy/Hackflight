@@ -49,7 +49,7 @@ namespace hf {
             void initServo(Servo & servo, uint8_t pin)
             {
                 servo.attach(pin);
-                servo.write(90);
+                writeServo(servo, 0);
             }
 
             void safeWriteMotor(uint8_t index, float value)
@@ -62,10 +62,15 @@ namespace hf {
                 _motorsPrev[index] = value;
             }
 
+            void writeServo(Servo & servo, float value)
+            {
+                // Convert [-.5,+.5] to [0,180]
+                servo.write(90 + (int8_t)(100*value));
+            }
+
             void writeServoDisarmed(Servo & servo, uint8_t index)
             {
-                // Convert [0,1] to [0,180] for servos
-                servo.write(90 + (int8_t)(100*_motorsDisarmed[index]));
+                writeServo(servo, _motorsDisarmed[index]);
             }
 
         protected:
