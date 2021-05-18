@@ -42,6 +42,10 @@ namespace hf {
             // XXX hard-code for now
             static const uint8_t SERVO1_PIN = 22;
             static const uint8_t SERVO2_PIN = 23;
+            static const uint8_t MOTOR1_PIN1 = 7;
+            static const uint8_t MOTOR1_PIN2 = 8;
+            static const uint8_t MOTOR2_PIN1 = 9;
+            static const uint8_t MOTOR2_PIN2 = 10;
 
             Servo servo1;
             Servo servo2;
@@ -79,6 +83,9 @@ namespace hf {
             {
                 initServo(servo1, SERVO1_PIN);
                 initServo(servo2, SERVO2_PIN);
+
+                // Set Motor1 to forward direction
+                digitalWrite(MOTOR1_PIN1, LOW);
             }
 
             virtual void setMotorDisarmed(uint8_t index, float value) override
@@ -90,6 +97,8 @@ namespace hf {
             {
                 writeServoDisarmed(servo1, 0);
                 writeServoDisarmed(servo2, 1);
+
+                analogWrite(MOTOR1_PIN2, (uint8_t)(256*_motorsDisarmed[2]));
             }
 
             virtual void cut(void) override
