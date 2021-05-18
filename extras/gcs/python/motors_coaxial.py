@@ -11,6 +11,8 @@ import tkinter as tk
 from dialog import Dialog
 from motor_scale import MotorScale, ServoScale
 
+from debugging import debug
+
 WARNING_TEXT = \
         'I have removed the rotors and am ready to spin the motors safely.'
 
@@ -66,16 +68,13 @@ class MotorsCoaxial(Dialog):
         self.servo2_scale.hide()
         self.motor1_scale.hide()
         self.motor2_scale.hide()
-        self._turn_off_active()
+        self._cut_motors()
 
     # Callback for motor-saftey checkbox
     def _checkbox_callback(self):
 
         # Checked
         if self.checkbox_var.get():
-
-            # Start with first motor
-            self.active_motor = 1
 
             # Reset the scales and show them
             self.servo1_scale.start()
@@ -87,12 +86,15 @@ class MotorsCoaxial(Dialog):
         else:
 
             # Turn of any spinning motor
-            self._turn_off_active()
+            self._cut_motors()
 
             # Hide motors
             self.motor1_scale.hide()
             self.motor2_scale.hide()
 
-    def _turn_off_active(self):
-        if self.gcs.connected and self.active_motor > 0:
-            self._send_motor_message(0)
+    def _cut_motors(self):
+        try:
+            self.gcs.sendMotorMessage(2, 0)
+            self.gcs.sendMotorMessage(3, 0)
+        except Exception:
+            return
