@@ -29,6 +29,12 @@ static const uint8_t MOTOR2_PIN = 9;
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 4.0f;
 
+static hf::NewServoMotor servo1 = hf::NewServoMotor(SERVO1_PIN);
+static hf::NewServoMotor servo2 = hf::NewServoMotor(SERVO2_PIN);
+
+static hf::NewBrushedMotor motor1 = hf::NewBrushedMotor(MOTOR1_PIN);
+static hf::NewBrushedMotor motor2 = hf::NewBrushedMotor(MOTOR2_PIN);
+
 static rft::Teensy40 board;
 
 static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
