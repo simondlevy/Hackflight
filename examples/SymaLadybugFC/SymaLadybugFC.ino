@@ -18,22 +18,29 @@
  */
 
 #include "hackflight.hpp"
-#include "boards/ladybugfc.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
-#include "actuators/mixers/quadxmw.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
 #include "sensors/usfs.hpp"
 
+#include "boards/ladybugfc_new.hpp"
+#include "actuators/mixers_new/quads/quadxmw_new.hpp"
+#include "motors_new/brushed.hpp"
+
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 4.0f;
 
-static hf::LadybugFC board;
+static hf::NewLadybugFC board;
 
 static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
-static hf::MixerQuadXMW mixer(&hf::ladybugFcNewMotors);
+static hf::NewBrushedMotor motor1 = hf::NewBrushedMotor(hf::NewLadybugFC::MOTOR1_PIN);
+static hf::NewBrushedMotor motor2 = hf::NewBrushedMotor(hf::NewLadybugFC::MOTOR2_PIN);
+static hf::NewBrushedMotor motor3 = hf::NewBrushedMotor(hf::NewLadybugFC::MOTOR3_PIN);
+static hf::NewBrushedMotor motor4 = hf::NewBrushedMotor(hf::NewLadybugFC::MOTOR4_PIN);
+
+static hf::NewMixerQuadXMW mixer = hf::NewMixerQuadXMW(&motor1, &motor2, &motor3, &motor4);
 
 static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
 static hf::YawPid yawPid = hf::YawPid(2, 0.1);
