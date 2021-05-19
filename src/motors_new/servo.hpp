@@ -29,7 +29,7 @@ namespace hf {
 
             virtual void begin(void) override 
             {
-                servo.attach(_pin);
+                _servo.attach(_pin);
             }
 
             virtual void write(float value) override

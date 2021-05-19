@@ -18,6 +18,8 @@
 #include <rft_closedloops/passthru.hpp>
 
 #include "actuators/mixers_new/coaxial_new.hpp"
+#include "motors_new/brushed.hpp"
+#include "motors_new/servo.hpp"
 
 static const uint8_t SERVO1_PIN = 22;
 static const uint8_t SERVO2_PIN = 23;
