@@ -8,19 +8,19 @@
 
 #pragma once
 
-#include "actuators/mixer_new.hpp"
+#include "actuators/mixers_new/quad_new.hpp"
 #include "motors_new/servo.hpp"
 
 #include <Servo.h>
 
 namespace hf {
 
-    class NewCoaxialMixer : public NewMixer {
+    class NewCoaxialMixer : public NewQuadMixer {
 
         public:
 
-            NewCoaxialMixer(NewServoMotor * servo1, NewServoMotor * servo2, NewMotor * motor3, NewMotor * motor4) 
-                : NewMixer(4)
+            NewCoaxialMixer(NewServoMotor * servo1, NewServoMotor * servo2, NewMotor * motor1, NewMotor * motor2) 
+                : NewQuadMixer(servo1, servo2, motor1, motor2)
             {
             }
 
