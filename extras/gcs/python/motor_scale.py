@@ -45,7 +45,7 @@ class MotorScale(object):
 
     def callback(self, valstr):
 
-        self.dialog.gcs.sendMotorMessage(self.index, self.adjust(int(valstr)))
+        self.dialog.gcs.sendMotorMessage(self.index, int(valstr))
 
     def adjust(self, value):
 
@@ -57,12 +57,3 @@ class ServoScale(MotorScale):
     def __init__(self, dialog, x, index, label):
 
         MotorScale.__init__(self, dialog, x, index, label, -50, +50)
-
-    def adjust(self, value):
-        '''
-        Normalize value to [0,100]
-        '''
-
-        return value + 50
-
-

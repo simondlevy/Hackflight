@@ -34,7 +34,8 @@ namespace hf {
 
             virtual void write(float value) override
             {
-                _servo.write((uint8_t)(180*value));
+                // [-.5,+.5] => [0,180]
+                _servo.write((uint8_t)(180*(value+0.5)));
             }
 
     }; // class ServoMotor

@@ -11,8 +11,6 @@ import tkinter as tk
 from dialog import Dialog
 from motor_scale import MotorScale, ServoScale
 
-from debugging import debug
-
 WARNING_TEXT = \
         'I have removed the rotors and am ready to spin the motors safely.'
 
