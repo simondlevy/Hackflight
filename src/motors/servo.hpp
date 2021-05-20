@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include "motor_new.hpp"
+#include "motor.hpp"
 
 #include <Servo.h>
 
 namespace hf {
 
-    class NewServoMotor : public NewMotor {
+    class ServoMotor : public Motor {
 
         private:
 
@@ -22,8 +22,8 @@ namespace hf {
 
         public:
 
-            NewServoMotor(uint8_t pin)
-                : NewMotor(pin)
+            ServoMotor(uint8_t pin)
+                : Motor(pin)
             {
             }
 
@@ -34,9 +34,9 @@ namespace hf {
 
             virtual void write(float value) override
             {
-                _servo.write((uint8_t)(180*value));
+                // _servo.write((uint8_t)(180*value));
             }
 
-    }; // class NewServoMotor
+    }; // class ServoMotor
 
 } // namespace hf

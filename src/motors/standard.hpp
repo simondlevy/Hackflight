@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "motor_new.hpp"
+#include "motor.hpp"
 
 #ifdef ESP32
 #include <analogWrite.h>
@@ -16,7 +16,7 @@
 
 namespace hf {
 
-    class NewStandardMotor : public RealMotor {
+    class StandardMotor : public Motor {
 
         private:
 
@@ -35,8 +35,8 @@ namespace hf {
 
         public:
 
-            NewStandardMotor(uint8_t pin)
-                : NewMotor(pin)
+            StandardMotor(uint8_t pin)
+                : Motor(pin)
             {
             }
 
@@ -51,6 +51,6 @@ namespace hf {
                 writeValue(_pin, (uint16_t)(MINVAL+value*(MAXVAL-MINVAL))); 
             }
 
-    }; // class NewStandardMotor
+    }; // class StandardMotor
 
 } // namespace hf

@@ -11,13 +11,13 @@
 
 namespace hf {
 
-    class NewMotor {
+    class Motor {
 
         protected:
 
             uint8_t _pin = 0;
 
-            NewMotor(uint8_t pin)
+            Motor(uint8_t pin)
             {
                 _pin = pin;
             }
@@ -28,6 +28,6 @@ namespace hf {
 
             virtual void write(float value) = 0;
 
-    }; // class NewMotor
+    }; // class Motor
 
 } // namespace hf

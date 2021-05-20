@@ -8,16 +8,16 @@
 
 #pragma once
 
-#include "motor_new.hpp"
+#include "motor.hpp"
 
 namespace hf {
 
-    class NewBrushedMotor : public NewMotor {
+    class BrushedMotor : public Motor {
 
         public:
 
-            NewBrushedMotor(uint8_t pin)
-                : NewMotor(pin)
+            BrushedMotor(uint8_t pin)
+                : Motor(pin)
             {
             }
 
@@ -32,6 +32,6 @@ namespace hf {
                 analogWrite(_pin, (uint8_t)(value * 255));
             }
 
-    }; // class NewBrushedMotor
+    }; // class BrushedMotor
 
 } // namespace hf

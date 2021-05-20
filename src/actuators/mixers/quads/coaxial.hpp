@@ -8,19 +8,19 @@
 
 #pragma once
 
-#include "actuators/mixers_new/quad_new.hpp"
-#include "motors_new/servo.hpp"
+#include "actuators/mixers/quad.hpp"
+#include "motors/servo.hpp"
 
 #include <Servo.h>
 
 namespace hf {
 
-    class NewCoaxialMixer : public NewQuadMixer {
+    class CoaxialMixer : public QuadMixer {
 
         public:
 
-            NewCoaxialMixer(NewServoMotor * servo1, NewServoMotor * servo2, NewMotor * motor1, NewMotor * motor2) 
-                : NewQuadMixer(servo1, servo2, motor1, motor2)
+            CoaxialMixer(ServoMotor * servo1, ServoMotor * servo2, Motor * motor1, Motor * motor2) 
+                : QuadMixer(servo1, servo2, motor1, motor2)
             {
                 //                     Th  RR  PF  YR
                 // motorDirections[0] = { +1, -1, +1, -1 };    // 1 right rear
@@ -34,6 +34,6 @@ namespace hf {
                 return 1;
             }
 
-    }; // class NewCoaxialMixer
+    }; // class CoaxialMixer
 
 } // namespace
