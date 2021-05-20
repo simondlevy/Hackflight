@@ -9,7 +9,7 @@
 #pragma once
 
 #include "actuators/mixer_new.hpp"
-#include "motor_new.hpp"
+#include "motors_new/servo.hpp"
 
 #include <Servo.h>
 
@@ -19,7 +19,7 @@ namespace hf {
 
         public:
 
-            NewCoaxialMixer(/*NewServoMotor * servo1, NewSerovMotor * servo2, NewMotor * motor3, NewMotor * motor4*/) 
+            NewCoaxialMixer(NewServoMotor * servo1, NewServoMotor * servo2, NewMotor * motor3, NewMotor * motor4) 
                 : NewMixer(4)
             {
             }

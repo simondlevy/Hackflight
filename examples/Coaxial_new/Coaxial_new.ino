@@ -39,7 +39,7 @@ static rft::Teensy40 board;
 
 static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
-static hf::NewCoaxialMixer mixer = hf::NewCoaxialMixer(/*SERVO1_PIN, SERVO2_PIN, MOTOR1_PIN, MOTOR2_PIN*/);
+static hf::NewCoaxialMixer mixer = hf::NewCoaxialMixer(&servo1, &servo2, &motor1, &motor2);
 
 static hf::Hackflight h(&board, &receiver, &mixer);
 
