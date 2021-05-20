@@ -27,7 +27,7 @@ static const uint8_t MOTOR1_PIN = 8;
 static const uint8_t MOTOR2_PIN = 9;
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
-static constexpr float DEMAND_SCALE = 4.0f;
+static constexpr float DEMAND_SCALE = 1.0f;
 
 static hf::ServoMotor servo1 = hf::ServoMotor(SERVO1_PIN);
 static hf::ServoMotor servo2 = hf::ServoMotor(SERVO2_PIN);
