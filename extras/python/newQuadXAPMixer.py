@@ -96,8 +96,8 @@ class Mixer(object):
         # XXX Something goes wrong in here.
         # That makes the motorvals into Nan or somethings
 
-
-
+        return motorvals
+        """
         maxMotor = motorvals[0]
 
         for i in range(1, 4):
@@ -112,11 +112,9 @@ class Mixer(object):
             # Keep motor values in appropriate interval
             motorvals[i] = self.constrainMinMax(motorvals[i], 0, 1)
 
-        return motorvals
-
+        """
     def constrainMinMax(self, val, min, max):
         if val < min:
             return min
         elif val > max:
             return max
-
