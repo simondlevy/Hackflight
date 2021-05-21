@@ -93,28 +93,18 @@ class Mixer(object):
                             demands[DEMANDS_YAW] *
                             self.motordirs[i].yaw)
 
-        # XXX Something goes wrong in here.
-        # That makes the motorvals into Nan or somethings
+        # Constrain the values between [0,1]
+        for i in range(4):
+            motorvals[i] = self._constrainMinMax(motorvals[i], 0, 1)
 
         return motorvals
-        """
-        maxMotor = motorvals[0]
 
-        for i in range(1, 4):
-            if (motorvals[i] > maxMotor):
-                maxMotor = motorvals[i]
-
-        for i in range(4):
-            # This is a way to still have good gyro corrections
-            # if at least one motor reaches its max
-            if (maxMotor > 1):
-                motorvals[i] -= maxMotor - 1
-            # Keep motor values in appropriate interval
-            motorvals[i] = self.constrainMinMax(motorvals[i], 0, 1)
-
-        """
-    def constrainMinMax(self, val, min, max):
+    def _constrainMinMax(self, val, min, max):
+        """Private function used to make sure
+        the values returned are between [0,1]"""
         if val < min:
             return min
         elif val > max:
             return max
+        else:
+            return val
