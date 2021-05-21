@@ -10,10 +10,11 @@
 
 #pragma once
 
-#include <RFT_motor.hpp>
+// #include <RFT_motor.hpp>
 #include <RFT_filters.hpp>
 #include <RFT_actuator.hpp>
 #include <RFT_debugger.hpp>
+#include <RFT_motor.hpp>
 
 #include "demands.hpp"
 
@@ -51,13 +52,12 @@ namespace hf {
 
         protected:
 
-            rft::Motor * _motors = NULL;
+            rft::Motor * _motors[MAXMOTORS] = {};
 
             motorMixer_t motorDirections[MAXMOTORS] = {};
 
-            Mixer(rft::Motor * motors, uint8_t nmotors)
+            Mixer(uint8_t nmotors)
             {
-                _motors = motors;
                 _nmotors = nmotors;
 
                 // set disarmed, previous motor values
@@ -67,9 +67,16 @@ namespace hf {
                 }
             }
 
+            void useMotors(rft::Motor ** motors)
+            {
+                for (uint8_t i = 0; i < _nmotors; i++) {
+                    _motors[i] = motors[i];
+                }
+             }
+
             void writeMotor(uint8_t index, float value)
             {
-                _motors->write(index, value);
+                _motors[index]->write(value);
             }
 
             virtual void setMotorDisarmed(uint8_t index, float value) override
@@ -79,7 +86,9 @@ namespace hf {
 
             virtual void begin(void) override
             {
-                _motors->begin();
+                for (uint8_t i=0; i<_nmotors; ++i) {
+                    _motors[i]->begin();
+                }
             }
 
             // This is how we can spin the motors from the GCS

@@ -11,15 +11,10 @@
 #pragma once
 
 #include <rft_boards/realboards/arduino.hpp>
-#include <rft_motors/realmotors/brushed.hpp>
 
 #include <Wire.h>
 
 namespace hf {
-
-    static const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
-
-    rft::BrushedMotor ladybugFcNewMotors = rft::BrushedMotor(MOTOR_PINS, 4);
 
     class LadybugFC : public rft::ArduinoBoard {
 
@@ -37,6 +32,11 @@ namespace hf {
             }
 
         public:
+
+            static const uint8_t MOTOR1_PIN = 13;
+            static const uint8_t MOTOR2_PIN = A2;
+            static const uint8_t MOTOR3_PIN = 3;
+            static const uint8_t MOTOR4_PIN = 11;
 
             // Support prototype version where LED is on pin A1
             LadybugFC(uint8_t ledPin = A4) 

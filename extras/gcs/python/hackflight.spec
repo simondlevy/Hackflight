@@ -3,7 +3,7 @@
 block_cipher = None
 
 
-a = Analysis(['hackflight.py'],
+a = Analysis(['gcs.py'],
              pathex=['D:\\Users\\levys\\Documents\\Arduino\\libraries\\Hackflight\\extras\\gcs\\python'],
              binaries=[],
              datas=[],
