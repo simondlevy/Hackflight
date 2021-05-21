@@ -28,7 +28,6 @@ class MotorMixer(object):
 
 
 class Mixer(object):
-    MAXMOTORS = 20
 
     def __init__(self):
         # Create a list with 4 MotorMixer objects
@@ -69,7 +68,6 @@ class Mixer(object):
         """
         Turn demands into motor spins in [0,1]
         """
-        # return 0.6 * np.ones(4)
 
         # XXX to fix
         # Supposed to lock the throttle values between [0,1]
