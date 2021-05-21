@@ -13,13 +13,12 @@
 
 #include "hackflight.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
+#include "actuators/mixers/quads/coaxial.hpp"
 
 #include <rft_boards/realboards/arduino/teensy.hpp>
 #include <rft_closedloops/passthru.hpp>
-
-#include "actuators/mixers/quads/coaxial.hpp"
-#include "motors/brushed.hpp"
-#include "motors/servo.hpp"
+#include <rft_motors/realmotors/brushed.hpp>
+#include <rft_motors/realmotors/servo.hpp>
 
 static const uint8_t SERVO1_PIN = 22;
 static const uint8_t SERVO2_PIN = 23;
@@ -29,11 +28,11 @@ static const uint8_t MOTOR2_PIN = 9;
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 1.0f;
 
-static hf::ServoMotor servo1 = hf::ServoMotor(SERVO1_PIN);
-static hf::ServoMotor servo2 = hf::ServoMotor(SERVO2_PIN);
+static rft::ServoMotor servo1 = rft::ServoMotor(SERVO1_PIN);
+static rft::ServoMotor servo2 = rft::ServoMotor(SERVO2_PIN);
 
-static hf::BrushedMotor motor1 = hf::BrushedMotor(MOTOR1_PIN);
-static hf::BrushedMotor motor2 = hf::BrushedMotor(MOTOR2_PIN);
+static rft::BrushedMotor motor1 = rft::BrushedMotor(MOTOR1_PIN);
+static rft::BrushedMotor motor2 = rft::BrushedMotor(MOTOR2_PIN);
 
 static rft::Teensy40 board;
 

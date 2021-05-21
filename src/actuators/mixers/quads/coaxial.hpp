@@ -9,8 +9,7 @@
 #pragma once
 
 #include "actuators/mixers/quad.hpp"
-#include "motors/servo.hpp"
-
+#include <rft_motors/realmotors/servo.hpp>
 #include <Servo.h>
 
 namespace hf {
@@ -19,7 +18,7 @@ namespace hf {
 
         public:
 
-            CoaxialMixer(ServoMotor * servo1, ServoMotor * servo2, Motor * rotor1, Motor * rotor2) 
+            CoaxialMixer(rft::ServoMotor * servo1, rft::ServoMotor * servo2, rft::Motor * rotor1, rft::Motor * rotor2) 
                 : QuadMixer(servo1, servo2, rotor1, rotor2)
             {
                 //                     Th  RR  PF  YR

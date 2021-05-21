@@ -9,7 +9,6 @@
 #pragma once
 
 #include "actuators/mixer.hpp"
-#include "motor.hpp"
 
 namespace hf {
 
@@ -17,10 +16,10 @@ namespace hf {
 
         public:
 
-            QuadMixer(Motor * motor1, Motor * motor2, Motor * motor3, Motor * motor4) 
+            QuadMixer(rft::Motor * motor1, rft::Motor * motor2, rft::Motor * motor3, rft::Motor * motor4) 
                 : Mixer(4)
             {
-                Motor * motors[4] = {motor1, motor2, motor3, motor4};
+                rft::Motor * motors[4] = {motor1, motor2, motor3, motor4};
                 Mixer::useMotors(motors);
             }
 

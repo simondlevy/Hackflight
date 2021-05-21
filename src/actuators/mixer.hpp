@@ -14,9 +14,9 @@
 #include <RFT_filters.hpp>
 #include <RFT_actuator.hpp>
 #include <RFT_debugger.hpp>
+#include <RFT_motor.hpp>
 
 #include "demands.hpp"
-#include "motor.hpp"
 
 namespace hf {
 
@@ -52,7 +52,7 @@ namespace hf {
 
         protected:
 
-            Motor * _motors[MAXMOTORS] = {};
+            rft::Motor * _motors[MAXMOTORS] = {};
 
             motorMixer_t motorDirections[MAXMOTORS] = {};
 
@@ -67,7 +67,7 @@ namespace hf {
                 }
             }
 
-            void useMotors(Motor ** motors)
+            void useMotors(rft::Motor ** motors)
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     _motors[i] = motors[i];
