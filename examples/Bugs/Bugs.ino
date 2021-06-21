@@ -1,8 +1,9 @@
 /*
    Hackflight sketch for TinyPICO with USFS IMU, DSMX receiver, and standard motors
 
-   Copyright (c) 2021 Simon D. Levy
+   Copyright (C) 2021 Simon D. Levy
  
+   MIT License
  */
 
 #include "hackflight.hpp"
