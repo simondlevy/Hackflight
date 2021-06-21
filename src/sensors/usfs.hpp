@@ -11,8 +11,8 @@
 #include <math.h>
 #include <Wire.h>
 #include <USFS_Master.h>
-#include "sensor.hpp"
-// #include <RFT_sensor.hpp>
+
+#include <RFT_sensor.hpp>
 
 namespace hf {
 
@@ -125,7 +125,7 @@ namespace hf {
     // Singleton
     static _USFS _usfs;
 
-    class UsfsGyrometer : public /*rft::*/Sensor {
+    class UsfsGyrometer : public rft::Sensor {
 
         friend class Hackflight;
 
@@ -145,7 +145,7 @@ namespace hf {
         }
 
 
-        virtual void modifyState(/*rft::*/State * state, float time) override
+        virtual void modifyState(rft::State * state, float time) override
         {
             (void)time;
 
@@ -177,7 +177,7 @@ namespace hf {
 
     };  // class Gyrometer
 
-    class UsfsQuaternion : public /*rft::*/Sensor {
+    class UsfsQuaternion : public rft::Sensor {
 
         friend class Hackflight;
 
@@ -197,7 +197,7 @@ namespace hf {
             _imu->begin();
         }
 
-        virtual void modifyState(/*rft::*/State * state, float time) override
+        virtual void modifyState(rft::State * state, float time) override
         {
             (void)time;
 

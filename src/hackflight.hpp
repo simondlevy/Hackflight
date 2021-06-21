@@ -10,7 +10,6 @@
 
 #include "mspparser.hpp"
 #include "receiver.hpp"
-#include "sensor.hpp"
 #include "state.hpp"
 #include "pidcontroller.hpp"
 #include "motor.hpp"
@@ -18,6 +17,7 @@
 #include "timertasks/serialtask.hpp"
 
 #include <RFT_board.hpp>
+#include <RFT_sensor.hpp>
 #include <RFT_actuator.hpp>
 #include <RFT_debugger.hpp>
 #include <RFT_filters.hpp>
@@ -37,7 +37,7 @@ namespace hf {
             rft::Actuator * _actuator = NULL;
 
             // Sensors 
-            Sensor * _sensors[256] = {};
+            rft::Sensor * _sensors[256] = {};
             uint8_t _sensor_count = 0;
 
             // Safety
@@ -66,10 +66,10 @@ namespace hf {
             void checkSensors(void)
             {
                 for (uint8_t k=0; k<_sensor_count; ++k) {
-                    Sensor * sensor = _sensors[k];
+                    rft::Sensor * sensor = _sensors[k];
                     float time = _board->getTime();
                     if (sensor->ready(time)) {
-                        sensor->modifyState(&_state, time);
+                        sensor->modifyState((rft::State *)&_state, time);
                     }
                 }
             }
@@ -169,7 +169,7 @@ namespace hf {
 
             } // begin
 
-            void addSensor(Sensor * sensor) 
+            void addSensor(rft::Sensor * sensor) 
             {
                 _sensors[_sensor_count++] = sensor;
             }
