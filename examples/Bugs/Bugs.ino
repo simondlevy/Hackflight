@@ -12,8 +12,6 @@
 #include "motors/standard.hpp"
 #include "imus/usfs.hpp"
 
-#include "motors/mock.hpp"
-
 static const uint8_t SERIAL1_RX = 32;
 static const uint8_t SERIAL1_TX = 33; // unused
 
@@ -23,8 +21,7 @@ static constexpr float DEMAND_SCALE = 8.0f;
 
 static const uint8_t MOTOR_PINS[4] = {25, 26 ,27, 15};
 
-//hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
-static hf::MockMotor motors;
+hf::StandardMotor motors = hf::StandardMotor(MOTOR_PINS, 4);
 
 static hf::DSMX_ESP32_Serial1 receiver = hf::DSMX_ESP32_Serial1(CHANNEL_MAP, DEMAND_SCALE, SERIAL1_RX, SERIAL1_TX);  
 
