@@ -8,21 +8,19 @@
 
 #pragma once
 
-#include "debugger.hpp"
 #include "mspparser.hpp"
-#include "imu.hpp"
-#include "board.hpp"
-#include "actuator.hpp"
 #include "receiver.hpp"
-#include "datatypes.hpp"
+#include "state.hpp"
 #include "pidcontroller.hpp"
 #include "motor.hpp"
-#include "actuator.hpp"
-#include "sensors/surfacemount.hpp"
 #include "timertasks/pidtask.hpp"
 #include "timertasks/serialtask.hpp"
-#include "sensors/surfacemount/gyrometer.hpp"
-#include "sensors/surfacemount/quaternion.hpp"
+
+#include <RFT_board.hpp>
+#include <RFT_sensor.hpp>
+#include <RFT_actuator.hpp>
+#include <RFT_debugger.hpp>
+#include <RFT_filters.hpp>
 
 namespace hf {
 
@@ -33,13 +31,13 @@ namespace hf {
             static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
 
             // Supports periodic ad-hoc debugging
-            Debugger _debugger;
+            rft::Debugger _debugger;
 
             // Actuator
-            Actuator * _actuator = NULL;
+            rft::Actuator * _actuator = NULL;
 
             // Sensors 
-            Sensor * _sensors[256] = {NULL};
+            rft::Sensor * _sensors[256] = {};
             uint8_t _sensor_count = 0;
 
             // Safety
@@ -51,75 +49,29 @@ namespace hf {
             // Timer task for PID controllers
             PidTask _pidTask;
 
-            // Passed to Hackflight::begin() for a particular build
-            IMU * _imu      = NULL;
-
             // Serial timer task for GCS
             SerialTask _serialTask;
 
-             // Mandatory sensors on the board
-            Gyrometer _gyrometer;
-            Quaternion _quaternion; // not really a sensor, but we treat it like one!
- 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(_state.rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
+                return fabs(_state.x[axis]) < rft::Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
-           void checkQuaternion(void)
-            {
-                // Some quaternion filters may need to know the current time
-                float time = _board->getTime();
-
-                // If quaternion data ready
-                if (_quaternion.ready(time)) {
-
-                    // Update state with new quaternion to yield Euler angles
-                    _quaternion.modifyState(_state, time);
-                }
-            }
-
-            void checkGyrometer(void)
-            {
-                // Some gyrometers may need to know the current time
-                float time = _board->getTime();
-
-                // If gyrometer data ready
-                if (_gyrometer.ready(time)) {
-
-                    // Update state with gyro rates
-                    _gyrometer.modifyState(_state, time);
-                }
-            }
-
-
-            Board    * _board    = NULL;
+            rft::Board  * _board = NULL;
             Receiver * _receiver = NULL;
 
             // Vehicle state
-            state_t _state;
+            State _state;
 
-            void checkOptionalSensors(void)
+            void checkSensors(void)
             {
                 for (uint8_t k=0; k<_sensor_count; ++k) {
-                    Sensor * sensor = _sensors[k];
+                    rft::Sensor * sensor = _sensors[k];
                     float time = _board->getTime();
                     if (sensor->ready(time)) {
-                        sensor->modifyState(_state, time);
+                        sensor->modifyState((rft::State *)&_state, time);
                     }
                 }
-            }
-
-            void add_sensor(Sensor * sensor)
-            {
-                _sensors[_sensor_count++] = sensor;
-            }
-
-            void add_sensor(SurfaceMountSensor * sensor, IMU * imu) 
-            {
-                add_sensor(sensor);
-
-                sensor->imu = imu;
             }
 
             void checkReceiver(void)
@@ -134,7 +86,7 @@ namespace hf {
                 }
 
                 // Check whether receiver data is available
-                if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
+                if (!_receiver->getDemands(_state.x[State::PSI] - _yawInitial)) return;
 
                 // Disarm
                 if (_state.armed && !_receiver->getAux1State()) {
@@ -148,9 +100,9 @@ namespace hf {
 
                 // Arm (after lots of safety checks!)
                 if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux1State() && 
-                        !_state.failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
+                        !_state.failsafe && safeAngle(State::PHI) && safeAngle(State::THETA)) {
                     _state.armed = true;
-                    _yawInitial = _state.rotation[AXIS_YAW]; // grab yaw for headless mode
+                    _yawInitial = _state.x[State::PSI]; // grab yaw for headless mode
                 }
 
                 // Cut motors on throttle-down
@@ -163,32 +115,38 @@ namespace hf {
 
             } // checkReceiver
 
+            void startSensors(void)
+            {
+                for (uint8_t k=0; k<_sensor_count; ++k) {
+                    _sensors[k]->begin();
+                }
+             }
 
         public:
 
-            Hackflight(Board * board, IMU * imu, Receiver * receiver, Actuator * actuator)
+            Hackflight(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
             {  
                 // Store the essentials
                 _board = board;
                 _receiver = receiver;
                 _actuator = actuator;
-                _imu = imu;
+
+                // Support adding new sensors
+                _sensor_count = 0;
             }
 
             void begin(bool armed=false)
             {  
+                // Start the board
                 _board->begin();
 
                 // Ad-hoc debugging support
                 _debugger.begin(_board);
 
-                // Support adding new sensors and PID controllers
-                _sensor_count = 0;
-
                 // Initialize state
-                memset(&_state, 0, sizeof(state_t));
+                memset(&_state.x, 0, sizeof(_state.x));
 
-                // Initialize the receiver
+                // Start the receiver
                 _receiver->begin();
 
                 // Setup failsafe
@@ -203,21 +161,17 @@ namespace hf {
                 // Support safety override by simulator
                 _state.armed = armed;
 
-                // Support for mandatory sensors
-                add_sensor(&_quaternion, _imu);
-                add_sensor(&_gyrometer, _imu);
-
-                // Start the IMU
-                _imu->begin();
+                // Start the sensors
+                startSensors();
 
                 // Tell the actuator to start the motors
                 _actuator->begin();
 
             } // begin
 
-            void addSensor(Sensor * sensor) 
+            void addSensor(rft::Sensor * sensor) 
             {
-                add_sensor(sensor);
+                _sensors[_sensor_count++] = sensor;
             }
 
             void addPidController(PidController * pidController, uint8_t auxState=0) 
@@ -233,12 +187,8 @@ namespace hf {
                 // Update PID controllers task
                 _pidTask.update();
 
-                // Check mandatory sensors
-                checkGyrometer();
-                checkQuaternion();
-
-                // Check optional sensors
-                checkOptionalSensors();
+                // Check sensors
+                checkSensors();
 
                 // Update serial comms task
                 _serialTask.update();

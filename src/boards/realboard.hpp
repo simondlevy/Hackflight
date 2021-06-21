@@ -8,13 +8,15 @@
 
 #pragma once
 
-#include "board.hpp"
-#include "debugger.hpp"
-#include "datatypes.hpp"
+#include "state.hpp"
+
+#include <RFT_board.hpp>
+#include <RFT_debugger.hpp>
+#include <RFT_filters.hpp>
 
 namespace hf {
 
-    class RealBoard : public Board {
+    class RealBoard : public rft::Board {
 
         private:
 
@@ -143,7 +145,7 @@ namespace hf {
             void error(const char * errmsg) 
             {
                 while (true) {
-                    Debugger::printf("%s\n", errmsg);
+                    rft::Debugger::printf("%s\n", errmsg);
                     delaySeconds(0.1);
                 }
             }
@@ -155,8 +157,8 @@ namespace hf {
              */
             void setRollAndPitchOffsets(float rollDegrees, float pitchDegrees)
             {
-                _rollAdjustRadians  = Filter::deg2rad(rollDegrees);
-                _pitchAdjustRadians = Filter::deg2rad(pitchDegrees);
+                _rollAdjustRadians  = rft::Filter::deg2rad(rollDegrees);
+                _pitchAdjustRadians = rft::Filter::deg2rad(pitchDegrees);
             }
 
     }; // class RealBoard

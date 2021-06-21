@@ -8,12 +8,26 @@
 
 #pragma once
 
-#include "datatypes.hpp"
 #include "pidcontroller.hpp"
+
+#include <rft_closedloops/pidcontroller.hpp>
 
 namespace hf {
 
     class FlowHoldPid : public PidController {
+
+        private:
+
+            rft::DofPid rollPid;
+            rft::DofPid pitchPid;
+
+        protected:
+
+            virtual void modifyDemands(State * state, float * demands) override
+            {
+                demands[DEMANDS_PITCH] += (0.5 - fabs(demands[DEMANDS_PITCH])) * pitchPid.compute(0, state->x[State::DX]);
+                demands[DEMANDS_ROLL]  += (0.5 - fabs(demands[DEMANDS_ROLL]))  * rollPid.compute(0, state->x[State::DY]);
+            }
 
         public:
 
@@ -22,20 +36,6 @@ namespace hf {
                 rollPid.begin(Kp, Ki, 0);
                 pitchPid.begin(Kp, Ki, 0);
             }
-
-        protected:
-
-            virtual void modifyDemands(state_t * state, demands_t & demands) override
-            {
-                demands.pitch += (0.5 - fabs(demands.pitch)) * pitchPid.compute(0, state->inertialVel[0]);
-                demands.roll  += (0.5 - fabs(demands.roll))  * rollPid.compute(0, state->inertialVel[1]);
-
-            }
-
-        private:
-
-            Pid rollPid;
-            Pid pitchPid;
 
     };  // class FlowHoldPid
 

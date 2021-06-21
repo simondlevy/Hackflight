@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "timertask.hpp"
+#include <RFT_timertask.hpp>
+#include <RFT_actuator.hpp>
 
 namespace hf {
 
-    class PidTask : public TimerTask {
+    class PidTask : public rft::TimerTask {
 
         friend class Hackflight;
 
@@ -28,20 +29,20 @@ namespace hf {
 
             // Other stuff we need
             Receiver * _receiver = NULL;
-            Actuator * _actuator = NULL;
-            state_t  * _state    = NULL;
+            rft::Actuator * _actuator = NULL;
+            State  * _state    = NULL;
 
         protected:
 
             PidTask(void)
-                : TimerTask(FREQ)
+                : rft::TimerTask(FREQ)
             {
                 _pid_controller_count = 0;
             }
 
-            void begin(Board * board, Receiver * receiver, Actuator * actuator, state_t * state)
+            void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
             {
-                TimerTask::begin(board);
+                rft::TimerTask::begin(board);
 
                 _receiver = receiver;
                 _actuator = actuator;
@@ -50,7 +51,7 @@ namespace hf {
 
             void addPidController(PidController * pidController, uint8_t auxState) 
             {
-                pidController->auxState = auxState;
+                pidController->modeIndex = auxState;
 
                 _pid_controllers[_pid_controller_count++] = pidController;
             }
@@ -58,16 +59,14 @@ namespace hf {
             virtual void doTask(void) override
             {
                 // Start with demands from receiver, scaling roll/pitch/yaw by constant
-                demands_t demands = {};
-                demands.throttle = _receiver->demands.throttle;
-                demands.roll     = _receiver->demands.roll  * _receiver->_demandScale;
-                demands.pitch    = _receiver->demands.pitch * _receiver->_demandScale;
-                demands.yaw      = _receiver->demands.yaw   * _receiver->_demandScale;
+                float demands[4] = {};
+                demands[DEMANDS_THROTTLE] = _receiver->demands[DEMANDS_THROTTLE];
+                demands[DEMANDS_ROLL]     = _receiver->demands[DEMANDS_ROLL]  * _receiver->_demandScale;
+                demands[DEMANDS_PITCH]    = _receiver->demands[DEMANDS_PITCH] * _receiver->_demandScale;
+                demands[DEMANDS_YAW]      = _receiver->demands[DEMANDS_YAW]   * _receiver->_demandScale;
 
                 // Each PID controllers is associated with at least one auxiliary switch state
                 uint8_t auxState = _receiver->getAux2State();
-
-                //Debugger::printf("Aux state: %d", auxState);
 
                 // Some PID controllers should cause LED to flash when they're active
                 bool shouldFlash = false;
@@ -77,9 +76,9 @@ namespace hf {
                     PidController * pidController = _pid_controllers[k];
 
                     // Some PID controllers need to reset their integral when the throttle is down
-                    pidController->updateReceiver(_receiver->throttleIsDown());
+                    pidController->resetOnInactivity(_receiver->throttleIsDown());
 
-                    if (pidController->auxState <= auxState) {
+                    if (pidController->modeIndex <= auxState) {
 
                         pidController->modifyDemands(_state, demands); 
 

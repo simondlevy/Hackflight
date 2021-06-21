@@ -131,7 +131,8 @@ class IMU(Dialog):
 
         # Negate incoming angles for display
         rollAngle = -self.roll_pitch_yaw[0]
-        pitchAngle = -self.roll_pitch_yaw[1]
+        # pitchAngle = -self.roll_pitch_yaw[1]
+        pitchAngle = self.roll_pitch_yaw[1]
         yawAngle = -self.roll_pitch_yaw[2]
 
         self.rollrot[0][0] = +cos(rollAngle)

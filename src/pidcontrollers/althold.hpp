@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "filters.hpp"
-#include "datatypes.hpp"
 #include "pidcontroller.hpp"
+
+#include <rft_closedloops/pidcontroller.hpp>
 
 namespace hf {
 
@@ -25,23 +25,23 @@ namespace hf {
             bool _inBandPrev = false;
 
             // P controller for position.  This will serve as the set-point for velocity PID.
-            Pid _posPid;
+            rft::DofPid _posPid;
 
             // PID controller for velocity
-            Pid _velPid;
+            rft::DofPid _velPid;
 
             // This will be reset each time we re-enter throttle deadband.
             float _altitudeTarget = 0;
 
         protected:
 
-            void modifyDemands(state_t * state, demands_t & demands)
+            void modifyDemands(State * state, float * demands) override
             {
                 bool didReset = false;
-                float altitude = state->location[2];
+                float altitude = state->x[State::Z];
 
                 // Is stick demand in deadband?
-                bool inBand = fabs(demands.throttle) < STICK_DEADBAND; 
+                bool inBand = fabs(demands[DEMANDS_THROTTLE]) < STICK_DEADBAND; 
 
                 // Reset controller when moving into deadband
                 if (inBand && !_inBandPrev) {
@@ -51,10 +51,12 @@ namespace hf {
                 _inBandPrev = inBand;
 
                 // Target velocity is a setpoint inside deadband, scaled constant outside
-                float targetVelocity = inBand ? _posPid.compute(_altitudeTarget, altitude) : PILOT_VELZ_MAX * demands.throttle;
+                float targetVelocity = inBand ?
+                                       _posPid.compute(_altitudeTarget, altitude) :
+                                       PILOT_VELZ_MAX * demands[DEMANDS_THROTTLE];
 
                 // Run velocity PID controller to get correction
-                demands.throttle = _velPid.compute(targetVelocity, state->inertialVel[2]);
+                demands[DEMANDS_THROTTLE] = _velPid.compute(targetVelocity, state->x[State::DZ]);
 
                 // If we re-entered deadband, we reset the target altitude.
                 if (didReset) {

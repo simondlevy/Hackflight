@@ -8,8 +8,10 @@
 
 #pragma once
 
-#include "datatypes.hpp"
 #include "pidcontroller.hpp"
+
+#include <rft_closedloops/pidcontroller.hpp>
+#include <RFT_filters.hpp>
 
 namespace hf {
 
@@ -18,7 +20,7 @@ namespace hf {
         private:
 
             // Helper class
-            class _AnglePid : public Pid {
+            class _AnglePid : public rft::DofPid {
 
                 private:
 
@@ -26,18 +28,18 @@ namespace hf {
 
                     // Maximum roll pitch demand is +/-0.5, so to convert demand to 
                     // angle for error computation, we multiply by the folling amount:
-                    float _demandMultiplier = 2 * Filter::deg2rad(MAX_ANGLE_DEGREES);
+                    float _demandMultiplier = 2 * rft::Filter::deg2rad(MAX_ANGLE_DEGREES);
 
                 public:
 
                     void begin(const float Kp) 
                     {
-                        Pid::begin(Kp, 0, 0);
+                        rft::DofPid::begin(Kp, 0, 0);
                     }
 
                     float compute(float demand, float angle)
                     {
-                        return Pid::compute(demand*_demandMultiplier, angle);
+                        return rft::DofPid::compute(demand*_demandMultiplier, angle);
                     }
 
             }; // class _AnglePid
@@ -58,10 +60,10 @@ namespace hf {
             {
             }
 
-            void modifyDemands(state_t * state, demands_t & demands)
+            void modifyDemands(State * state, float * demands) override
             {
-                demands.roll  = _rollPid.compute(demands.roll, state->rotation[0]); 
-                demands.pitch = _pitchPid.compute(demands.pitch, state->rotation[1]);
+                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], state->x[State::PHI]); 
+                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], state->x[State::THETA]);
             }
 
     };  // class LevelPid

@@ -8,13 +8,14 @@
 
 #pragma once
 
-#include "filters.hpp"
 #include "motor.hpp"
-#include "actuator.hpp"
+
+#include <RFT_actuator.hpp>
+#include <RFT_filters.hpp>
 
 namespace hf {
 
-    class Mixer : public Actuator {
+    class Mixer : public rft::Actuator {
 
         friend class Hackflight;
         friend class SerialTask;
@@ -91,25 +92,25 @@ namespace hf {
             virtual float constrainMotorValue(uint8_t index, float value) 
             {
                 (void)index;
-                return Filter::constrainMinMax(value, 0, 1);
+                return rft::Filter::constrainMinMax(value, 0, 1);
             }
 
             // Actuator overrides ----------------------------------------------
 
-            void run(demands_t demands) override
+            void run(float * demands) override
             {
                 // Map throttle demand from [-1,+1] to [0,1]
-                demands.throttle = (demands.throttle + 1) / 2;
+                demands[DEMANDS_THROTTLE] = (demands[DEMANDS_THROTTLE] + 1) / 2;
 
                 float motorvals[MAXMOTORS];
 
                 for (uint8_t i = 0; i < _nmotors; i++) {
 
                     motorvals[i] = 
-                        (demands.throttle * motorDirections[i].throttle + 
-                         demands.roll     * motorDirections[i].roll +     
-                         demands.pitch    * motorDirections[i].pitch +   
-                         demands.yaw      * motorDirections[i].yaw);      
+                        (demands[DEMANDS_THROTTLE] * motorDirections[i].throttle + 
+                         demands[DEMANDS_ROLL]     * motorDirections[i].roll +     
+                         demands[DEMANDS_PITCH]    * motorDirections[i].pitch +   
+                         demands[DEMANDS_YAW]      * motorDirections[i].yaw);      
                 }
 
                 float maxMotor = motorvals[0];

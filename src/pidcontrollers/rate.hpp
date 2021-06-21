@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "datatypes.hpp"
 #include "pidcontroller.hpp"
 #include "angvel.hpp"
+
 
 namespace hf {
 
@@ -30,17 +30,17 @@ namespace hf {
                 _pitchPid.begin(Kp, Ki, Kd);
             }
 
-            void modifyDemands(state_t * state, demands_t & demands)
+            virtual void modifyDemands(State * state, float * demands) override
             {
-                demands.roll  = _rollPid.compute(demands.roll,  state->angularVel[0]);
-                demands.pitch = _pitchPid.compute(demands.pitch, state->angularVel[1]);
+                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL],  state->x[State::DPHI]);
+                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], state->x[State::DTHETA]);
             }
 
-            virtual void updateReceiver(bool throttleIsDown) override
+            virtual void resetOnInactivity(bool inactive) override
             {
                 // Check throttle-down for integral reset
-                _rollPid.updateReceiver(throttleIsDown);
-                _pitchPid.updateReceiver(throttleIsDown);
+                _rollPid.resetOnInactivity(inactive);
+                _pitchPid.resetOnInactivity(inactive);
             }
 
     };  // class RatePid

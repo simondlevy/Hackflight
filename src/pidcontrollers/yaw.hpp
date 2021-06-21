@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "filters.hpp"
-#include "datatypes.hpp"
 #include "pidcontroller.hpp"
 #include "angvel.hpp"
+
+#include <RFT_filters.hpp>
 
 namespace hf {
 
@@ -32,23 +32,23 @@ namespace hf {
                 _yawPid.begin(Kp, Ki, 0);
             }
 
-            void modifyDemands(state_t * state, demands_t & demands)
+            virtual void modifyDemands(State * state, float * demands) override
             {
-                demands.yaw   = _yawPid.compute(demands.yaw, state->angularVel[2]);
+                demands[DEMANDS_YAW] = _yawPid.compute(demands[DEMANDS_YAW], state->x[State::DPSI]);
 
                 // Prevent "yaw jump" during correction
-                demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));
+                demands[DEMANDS_YAW] = rft::Filter::constrainAbs(demands[DEMANDS_YAW], 0.1 + fabs(demands[DEMANDS_YAW]));
 
                 // Reset yaw integral on large yaw command
-                if (fabs(demands.yaw) > BIG_YAW_DEMAND) {
+                if (fabs(demands[DEMANDS_YAW]) > BIG_YAW_DEMAND) {
                     _yawPid.reset();
                 }
             }
 
-            virtual void updateReceiver(bool throttleIsDown) override
+            virtual void resetOnInactivity(bool inactive) override
             {
                 // Check throttle-down for integral reset
-                _yawPid.updateReceiver(throttleIsDown);
+                _yawPid.resetOnInactivity(inactive);
             }
 
     };  // class RatePid

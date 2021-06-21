@@ -8,15 +8,15 @@
 
 #pragma once
 
-#include "timertask.hpp"
-#include "board.hpp"
 #include "mspparser.hpp"
-#include "debugger.hpp"
-#include "actuator.hpp"
+
+#include <RFT_timertask.hpp>
+#include <RFT_actuator.hpp>
+#include <RFT_board.hpp>
 
 namespace hf {
 
-    class SerialTask : public TimerTask, public MspParser {
+    class SerialTask : public rft::TimerTask, public MspParser {
 
         friend class Hackflight;
 
@@ -24,28 +24,28 @@ namespace hf {
 
             static constexpr float FREQ = 66;
 
-            Actuator    * _actuator = NULL;
+            rft::Actuator * _actuator = NULL;
             Receiver * _receiver = NULL;
-            state_t  * _state = NULL;
+            State  * _state = NULL;
 
-            void (*_actuatorfun)(state_t * state, Actuator * actuator);
+            void (*_actuatorfun)(State * state, rft::Actuator * actuator);
 
-            static void _actuatorfunFull(state_t * state, Actuator * actuator)
+            static void _actuatorfunFull(State * state, rft::Actuator * actuator)
             {
                 if (!state->armed) {
                     actuator->runDisarmed();
                 }
             }
 
-            static void _actuatorfunProxy(state_t * state, Actuator * actuator)
+            static void _actuatorfunProxy(State * state, rft::Actuator * actuator)
             {
                 (void)state;
                 (void)actuator;
             }
 
-            void _begin(Board * board, state_t * state, Receiver * receiver) 
+            void _begin(rft::Board * board, State * state, Receiver * receiver) 
             {
-                TimerTask::begin(board);
+                rft::TimerTask::begin(board);
 
                 MspParser::begin();
 
@@ -82,7 +82,7 @@ namespace hf {
                 variometer = 0;
                 positionX = 0;
                 positionY = 0;
-                heading = -_state->rotation[AXIS_YAW]; // NB: Angle negated for remote visualization
+                heading = -_state->x[State::PSI]; // NB: Angle negated for remote visualization
                 velocityForward = 0;
                 velocityRightward = 0;
             }
@@ -116,9 +116,9 @@ namespace hf {
 
             virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
             {
-                roll  = _state->rotation[AXIS_ROLL];
-                pitch = _state->rotation[AXIS_PITCH];
-                yaw   = _state->rotation[AXIS_YAW];
+                roll  = _state->x[State::PHI];
+                pitch = _state->x[State::THETA];
+                yaw   = _state->x[State::PSI];
             }
 
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
@@ -130,17 +130,17 @@ namespace hf {
             }
 
             SerialTask(void)
-                : TimerTask(FREQ)
+                : rft::TimerTask(FREQ)
             {
             }
 
-            void begin(Board * board, state_t * state, Receiver * receiver) 
+            void begin(rft::Board * board, State * state, Receiver * receiver) 
             {
                 _begin(board, state, receiver);
                 _actuatorfun = _actuatorfunProxy;
             }
 
-            void begin(Board * board, state_t * state, Receiver * receiver, Actuator * actuator) 
+            void begin(rft::Board * board, State * state, Receiver * receiver, rft::Actuator * actuator) 
             {
                 begin(board, state, receiver);
                 _actuator = actuator;
