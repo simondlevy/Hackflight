@@ -1,101 +1,52 @@
-#!/usr/bin/env python
 '''
 Class or displaying vehicle orientation
 
-Copyright (C) Alec Singer and Simon D. Levy 2016
+Copyright (C) Alec Singer and Simon D. Levy 2021
 
-This file is part of Hackflight.
-
-Hackflight is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as 
-published by the Free Software Foundation, either version 3 of the 
-License, or (at your option) any later version.
-This code is distributed in the hope that it will be useful,     
-but WITHOUT ANY WARRANTY without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License 
-along with this code.  If not, see <http:#www.gnu.org/licenses/>.
+MIT License
 '''
 
-LEVEL_MAX_ANGLE_DIFF = .25
-
-VEHICLE_SCALE = 0.10
-
-UPDATE_MSEC = 10
-
-YAW_ACTIVE = 1
-PITCH_ACTIVE = 2
-ROLL_ACTIVE = 3
-
-
-import tkcompat as tk
-
+import tkinter as tk
+import numpy as np
 from math import sin, cos
-
 from dialog import Dialog
-
 from vehicle import get_vehicle
 
-# Helpers so we don't have to use NumPy -----------------------
-
-def _eye3():
-    return [[1,0,0],[0,1,0],[0,0,1]]
-
-def _dotv(v,a):
-    d = [0,0,0]
-    d[0] = v[0]*a[0][0] + v[1]*a[1][0] + v[2]*a[2][0]
-    d[1] = v[0]*a[0][1] + v[1]*a[1][1] + v[2]*a[2][1]
-    d[2] = v[0]*a[0][2] + v[1]*a[1][2] + v[2]*a[2][2]
-    return d
-
-def _dotm(a,b):
-    _d = [[0,0,0],[0,0,0],[0,0,0]]
-    for i in range(3):
-        for j in range(3):
-            for k in range(3):
-                _d[i][j] += a[i][k]*b[k][j]
-    return _d
-
-def _transpose(a):
-    _t = _eye3()
-    for j in range(3):
-        for k in range(3):
-            _t[j][k] = a[k][j]
-    return _t
-
-# IMU class ---------------------------------------------------
 
 class IMU(Dialog):
 
-    def __init__(self, driver, simulation=False):
+    def __init__(self, gcs, simulation=False, vehicleScale=0.1, updateMsec=10):
 
-        Dialog.__init__(self, driver)
+        Dialog.__init__(self, gcs)
 
         # Vehicle dimensions
-        W = VEHICLE_SCALE
-        D = VEHICLE_SCALE / 2
-        L = VEHICLE_SCALE * 2
+        W = vehicleScale
+        D = vehicleScale / 2
+        L = vehicleScale * 2
 
-        #Let these be in World-coordinates (worldview-matrix already applied)
-        ####In right-handed, counter-clockwise order
-        self.vehicle_points, self.vehicle_faces, self.vehicle_face_colors = get_vehicle(W, D, L)
+        # Update period
+        self.update_msec = updateMsec
+
+        # Let these be in World-coordinates (worldview-matrix already applied)
+        # In right-handed, counter-clockwise order
+        (self.vehicle_points,
+         self.vehicle_faces,
+         self.vehicle_face_colors) = get_vehicle(W, D, L)
 
         # Assume no angles to start
         self.roll_pitch_yaw = None
 
         # Rotation matrices
-        self.pitchrot = _eye3()
-        self.yawrot = _eye3()
-        self.rollrot = _eye3()
+        self.pitchrot = np.eye(3)
+        self.yawrot = np.eye(3)
+        self.rollrot = np.eye(3)
 
         self.simulation = simulation
         self.running = False
 
     def start(self):
 
-        self.schedule_display_task(UPDATE_MSEC)
+        self.schedule_display_task(self.update_msec)
 
         self.running = True
 
@@ -103,7 +54,6 @@ class IMU(Dialog):
 
         self.roll_pitch_yaw_prev = None
         self.roll_pitch_yaw_change = None
-
 
     def stop(self):
 
@@ -120,15 +70,16 @@ class IMU(Dialog):
 
         if self.running:
 
-            self.roll_pitch_yaw = self.driver.getRollPitchYaw()
+            self.roll_pitch_yaw = self.gcs.getRollPitchYaw()
 
             self._update()
 
-            self.schedule_display_task(UPDATE_MSEC)
+            self.schedule_display_task(self.update_msec)
 
     def _to_screen_coords(self, pv):
 
-        dims = [int(s) for s in str(self.driver.root.geometry()).split('+')[0].split('x')]
+        d = str(self.gcs.root.geometry()).split('+')[0].split('x')
+        dims = [int(s)for s in d]
         width, height = dims[0], dims[1]
 
         x = width/2*pv[0] + width/2
@@ -139,24 +90,27 @@ class IMU(Dialog):
 
     def _save(self):
 
-        self.driver.save(self.pitchroll_kp_scale.get(), self.yaw_kp_scale.get())
+        self.gcs.save(self.pitchroll_kp_scale.get(), self.yaw_kp_scale.get())
 
     def _create_window(self, x, widget):
 
-        return self.driver.canvas.create_window(x, 10, anchor=tk.NW, window=widget)
+        return self.gcs.canvas.create_window(x, 10, anchor=tk.NW,
+                                             window=widget)
 
     def _create_button(self, text, x, command):
 
-        button = tk.Button(self.driver.canvas, text=text, height=2, command=command);
+        button = tk.Button(self.gcs.canvas, text=text, height=2,
+                           command=command)
         button_window = self._create_window(x, button)
 
         return button, button_window
 
     def _create_scale(self, text, x, callback):
-        
-        scale = tk.Scale(self.driver.canvas, from_=0, to_=100, label=text, command=callback,
-                orient=tk.HORIZONTAL, length=200, bg='black', fg='white')
-        scale_window = self._create_window(x, scale) 
+
+        scale = tk.Scale(self.gcs.canvas, from_=0, to_=100, label=text,
+                         command=callback, orient=tk.HORIZONTAL, length=200,
+                         bg='black', fg='white')
+        scale_window = self._create_window(x, scale)
 
         return scale, scale_window
 
@@ -175,59 +129,58 @@ class IMU(Dialog):
 
         # Convert angles to X,Y,Z rotation matrices
 
-        rollAngle  = -self.roll_pitch_yaw[0] # negate so positive is roll rightward
+        # Negate incoming angles for display
+        rollAngle = -self.roll_pitch_yaw[0]
+        pitchAngle = -self.roll_pitch_yaw[1]
+        yawAngle = -self.roll_pitch_yaw[2]
+
         self.rollrot[0][0] = +cos(rollAngle)
         self.rollrot[0][1] = -sin(rollAngle)
         self.rollrot[1][0] = +sin(rollAngle)
         self.rollrot[1][1] = +cos(rollAngle)
 
-        pitchAngle = self.roll_pitch_yaw[1] 
-        self.pitchrot[1][1] = +cos(pitchAngle) 
+        self.pitchrot[1][1] = +cos(pitchAngle)
         self.pitchrot[1][2] = -sin(pitchAngle)
         self.pitchrot[2][1] = +sin(pitchAngle)
         self.pitchrot[2][2] = +cos(pitchAngle)
 
-        yawAngle   = -self.roll_pitch_yaw[2]
         self.yawrot[0][0] = +cos(yawAngle)
         self.yawrot[0][2] = +sin(yawAngle)
         self.yawrot[2][0] = -sin(yawAngle)
         self.yawrot[2][2] = +cos(yawAngle)
 
-        # Multiply matrices based on active axis
-        if self.driver.active_axis == YAW_ACTIVE:
-            rot = _dotm(_dotm(self.rollrot, self.pitchrot), self.yawrot)
-        elif self.driver.active_axis == PITCH_ACTIVE:
-            rot = _dotm(_dotm(self.yawrot, self.rollrot), self.pitchrot)
-        else:
-            rot = _dotm(_dotm(self.yawrot, self.pitchrot), self.rollrot)
+        rot = np.dot(np.dot(self.yawrot, self.pitchrot), self.rollrot)
 
         # Add a label for arming if needed
-        self.driver.checkArmed()
+        self.gcs.checkArmed()
 
         # Draw polygons
         for i in range(len(self.vehicle_faces)):
 
-            poly = [] #transformed polygon
+            poly = []  # transformed polygon
 
             for j in range(len(self.vehicle_faces[0])):
 
                 v = self.vehicle_points[self.vehicle_faces[i][j]]
 
                 # Transform the point from 3D to 2D
-                ps = _dotv(v, _transpose(rot))
+                ps = np.dot(v, rot.transpose())
                 p = self._to_screen_coords(ps)
-               
+
                 # Put the screenpoint in the list of transformed vertices
                 poly.append((p[0], p[1]))
 
-            if self._is_polygon_front_face(poly): #Backface culling
-
-                self.faces.append(self.driver.canvas.create_polygon(*poly, fill=self.vehicle_face_colors[i]))
+            if self._is_polygon_front_face(poly):  # Backface culling
+                f = self.vehicle_face_colors[i]
+                self.faces.append(self.gcs.canvas.create_polygon(*poly,
+                                                                 fill=f))
 
         # Update angle changes
-        if not self.roll_pitch_yaw_prev is None:
-            self.roll_pitch_yaw_change = [abs(pair[0]-pair[1]) 
-                    for pair in zip(self.roll_pitch_yaw,self.roll_pitch_yaw_prev)]
+        if self.roll_pitch_yaw_prev is not None:
+            self.roll_pitch_yaw_change = [
+                    abs(pair[0]-pair[1])
+                    for pair in zip(self.roll_pitch_yaw,
+                                    self.roll_pitch_yaw_prev)]
         self.roll_pitch_yaw_prev = self.roll_pitch_yaw
 
     def _is_polygon_front_face(self, pts):
@@ -240,92 +193,3 @@ class IMU(Dialog):
         summa += (pts[0][0]-pts[num-1][0])*(pts[0][1]+pts[num-1][1])
 
         return summa > 0.0
-
-# Testing ==============================================================================================================
-
-class SliderDriver(object):
-
-    def __init__(self, root, canvas):
-
-        self.root = root
-        self.canvas = canvas
-
-        frame = tk.Frame(root)
-        pane = tk.PanedWindow(frame)
-        pane.pack(fill=tk.BOTH, expand=1)
-
-        self.yaw_scale   = self.add_scale(pane, 'Yaw', self.yaw_callback) 
-        self.pitch_scale = self.add_scale(pane, 'Pitch', self.pitch_callback) 
-        self.roll_scale  = self.add_scale(pane, 'Roll', self.roll_callback) 
-
-        tk.Button(pane, text='Reset', command=self.reset).pack()
-
-        pane.pack()
-        frame.pack()
-
-        self.reset()
-
-        self.active_axis = 0
-
-   
-    def reset(self):
-
-        self.yaw   = self.zero(self.yaw_scale)
-        self.pitch = self.zero(self.pitch_scale)
-        self.roll  = self.zero(self.roll_scale)
-
-    def zero(self, scale):
-
-        scale.set(0)
-        return 0
-
-    def add_scale(self, pane, label, callback):
-
-        scale = tk.Scale(pane, label=label, from_=-180, to=180, command=callback, orient=tk.HORIZONTAL, length=200)
-        scale.pack()
-        return scale
-
-    def yaw_callback(self, valstr):
-
-        self.active_axis = YAW_ACTIVE
-        self.yaw = int(valstr)
-
-    def pitch_callback(self, valstr):
-
-        self.active_axis = PITCH_ACTIVE
-        self.pitch = int(valstr)
-
-    def roll_callback(self, valstr):
-
-        self.active_axis = ROLL_ACTIVE
-        self.roll = int(valstr)
-
-    def getRollPitchYaw(self):
-
-        return self.yaw, self.pitch, self.roll
-
-    def checkArmed(self):
-
-        None
-
-if __name__ == "__main__":
-
-    width = 800
-    height = 800
-
-    root = tk.Tk()
-
-    root.geometry('%dx%d+%d+%d' % (width, height+200, 200, 200))
-    root.title('IMU')
-
-    canvas = tk.Canvas(root, width=width, height=height, background='black')
-
-    driver = SliderDriver(root, canvas)
-
-    canvas.pack()
-
-    sim = IMU(driver, simulation=True)
-
-    sim.start()
-
-    tk.mainloop()

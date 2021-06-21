@@ -1,4 +1,4 @@
-pyinstaller --onefile --windowed hackflight.py
+pyinstaller --onefile --windowed gcs.py
 mv dist hackflight
 mkdir hackflight/media
 cp media/*.gif hackflight/media

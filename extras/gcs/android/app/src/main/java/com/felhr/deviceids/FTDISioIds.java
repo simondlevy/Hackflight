@@ -343,7 +343,7 @@ public class FTDISioIds
                     new ConcreteDevice(0x0c6c, 0x04b2),
                     new ConcreteDevice(0x0c7d, 0x0005),
                     new ConcreteDevice(0x0d3a, 0x0300),
-                    new ConcreteDevice(0x0d46, 0x2020),
+                    new ConcreteDevice(0x0d46, 0x2021),
                     new ConcreteDevice(0x0d46, 0x2021),
                     new ConcreteDevice(0x0dcd, 0x0001),
                     new ConcreteDevice(0x0f94, 0x0001),
