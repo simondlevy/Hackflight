@@ -24,11 +24,10 @@ namespace hf {
 
         protected:
 
-            virtual void modifyDemands(state_t * state, float * demands) override
+            virtual void modifyDemands(State * state, float * demands) override
             {
-                demands[DEMANDS_PITCH] += (0.5 - fabs(demands[DEMANDS_PITCH])) * pitchPid.compute(0, state->inertialVel[0]);
-                demands[DEMANDS_ROLL]  += (0.5 - fabs(demands[DEMANDS_ROLL]))  * rollPid.compute(0, state->inertialVel[1]);
-
+                demands[DEMANDS_PITCH] += (0.5 - fabs(demands[DEMANDS_PITCH])) * pitchPid.compute(0, state->x[State::DX]);
+                demands[DEMANDS_ROLL]  += (0.5 - fabs(demands[DEMANDS_ROLL]))  * rollPid.compute(0, state->x[State::DY]);
             }
 
         private:

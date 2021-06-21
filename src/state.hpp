@@ -10,24 +10,18 @@
 
 namespace hf {
 
-    enum {
-        AXIS_ROLL = 0,
-        AXIS_PITCH, 
-        AXIS_YAW
-    };
+    class State {
 
-    typedef struct {
+        public:
 
-        bool armed;
-        bool failsafe;
+            bool armed;
+            bool failsafe;
 
-        float location[3];
-        float rotation[3]; 
-        float angularVel[3]; 
-        float bodyAccel[3]; 
-        float bodyVel[3]; 
-        float inertialVel[3]; 
+            // See Bouabdallah et al. (2004)
+            enum {X, DX, Y, DY, Z, DZ, PHI, DPHI, THETA, DTHETA, PSI, DPSI, SIZE};
 
-    } state_t;
+            float x[SIZE];
+
+    }; // class State
 
 } // namespace hf

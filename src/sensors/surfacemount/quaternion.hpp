@@ -40,19 +40,20 @@ namespace hf {
                 _z = 0;
             }
 
-            virtual void modifyState(state_t & state, float time) override
+            virtual void modifyState(State & state, float time) override
             {
                 (void)time;
 
-                computeEulerAngles(_w, _x, _y, _z, state.rotation);
+                computeEulerAngles(_w, _x, _y, _z,
+                                   state.x[State::PHI], state.x[State::THETA], state.x[State::PSI]);
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (state.rotation[2] < 0) {
-                    state.rotation[2] += 2*M_PI;
+                if (state.x[State::PSI] < 0) {
+                    state.x[State::PSI] += 2*M_PI;
                 }
 
                 // Compensate for different mounting orientations
-                imu->adjustEulerAngles(state.rotation[0], state.rotation[1], state.rotation[2]);
+                imu->adjustEulerAngles(state.x[State::PHI], state.x[State::THETA], state.x[State::PSI]);
 
             }
 
@@ -64,11 +65,12 @@ namespace hf {
         public:
 
             // We make this public so we can use it in different sketches
-            static void computeEulerAngles(float qw, float qx, float qy, float qz, float euler[3])
+            static void computeEulerAngles(float qw, float qx, float qy,float qz, 
+                                           float & phi, float & theta, float & psi)
             {
-                euler[0] =  atan2(2.0f*(qw*qx+qy*qz),qw*qw-qx*qx-qy*qy+qz*qz);
-                euler[1] =   asin(2.0f*(qx*qz-qw*qy));
-                euler[2] =  atan2(2.0f*(qx*qy+qw*qz),qw*qw+qx*qx-qy*qy-qz*qz);
+                phi = atan2(2.0f*(qw*qx+qy*qz),qw*qw-qx*qx-qy*qy+qz*qz);
+                theta = asin(2.0f*(qx*qz-qw*qy));
+                psi = atan2(2.0f*(qx*qy+qw*qz),qw*qw+qx*qx-qy*qy-qz*qz);
             }
 
     };  // class Quaternion

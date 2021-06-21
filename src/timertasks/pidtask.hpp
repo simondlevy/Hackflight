@@ -29,7 +29,7 @@ namespace hf {
             // Other stuff we need
             Receiver * _receiver = NULL;
             Actuator * _actuator = NULL;
-            state_t  * _state    = NULL;
+            State  * _state    = NULL;
 
         protected:
 
@@ -39,7 +39,7 @@ namespace hf {
                 _pid_controller_count = 0;
             }
 
-            void begin(Board * board, Receiver * receiver, Actuator * actuator, state_t * state)
+            void begin(Board * board, Receiver * receiver, Actuator * actuator, State * state)
             {
                 TimerTask::begin(board);
 

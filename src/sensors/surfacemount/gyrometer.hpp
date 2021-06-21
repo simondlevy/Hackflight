@@ -26,7 +26,7 @@ namespace hf {
 
         protected:
 
-            virtual void modifyState(state_t & state, float time) override
+            virtual void modifyState(State & state, float time) override
             {
                 (void)time;
 
@@ -34,9 +34,9 @@ namespace hf {
                 imu->adjustGyrometer(_x, _y, _z);
 
                 // NB: We negate gyro X, Y to simplify PID controller
-                state.angularVel[0] =  _x;
-                state.angularVel[1] = -_y;
-                state.angularVel[2] = -_z;
+                state.x[State::DPHI] = _x;
+                state.x[State::DTHETA] = -_y;
+                state.x[State::DPSI] = -_z;
             }
 
             virtual bool ready(float time) override

@@ -63,7 +63,7 @@ namespace hf {
  
             bool safeAngle(uint8_t axis)
             {
-                return fabs(_state.rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
+                return fabs(_state.x[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
            void checkQuaternion(void)
@@ -97,7 +97,7 @@ namespace hf {
             Receiver * _receiver = NULL;
 
             // Vehicle state
-            state_t _state;
+            State _state;
 
             void checkOptionalSensors(void)
             {
@@ -134,7 +134,7 @@ namespace hf {
                 }
 
                 // Check whether receiver data is available
-                if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
+                if (!_receiver->getDemands(_state.x[State::PSI] - _yawInitial)) return;
 
                 // Disarm
                 if (_state.armed && !_receiver->getAux1State()) {
@@ -148,9 +148,9 @@ namespace hf {
 
                 // Arm (after lots of safety checks!)
                 if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux1State() && 
-                        !_state.failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
+                        !_state.failsafe && safeAngle(State::PHI) && safeAngle(State::THETA)) {
                     _state.armed = true;
-                    _yawInitial = _state.rotation[AXIS_YAW]; // grab yaw for headless mode
+                    _yawInitial = _state.x[State::PSI]; // grab yaw for headless mode
                 }
 
                 // Cut motors on throttle-down
@@ -186,7 +186,7 @@ namespace hf {
                 _sensor_count = 0;
 
                 // Initialize state
-                memset(&_state, 0, sizeof(state_t));
+                memset(&_state.x, 0, sizeof(_state.x));
 
                 // Initialize the receiver
                 _receiver->begin();

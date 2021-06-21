@@ -33,10 +33,10 @@ namespace hf {
 
         protected:
 
-            void modifyDemands(state_t * state, float * demands)
+            void modifyDemands(State * state, float * demands)
             {
                 bool didReset = false;
-                float altitude = state->location[2];
+                float altitude = state->x[State::Z];
 
                 // Is stick demand in deadband?
                 bool inBand = fabs(demands[DEMANDS_THROTTLE]) < STICK_DEADBAND; 
@@ -49,10 +49,12 @@ namespace hf {
                 _inBandPrev = inBand;
 
                 // Target velocity is a setpoint inside deadband, scaled constant outside
-                float targetVelocity = inBand ? _posPid.compute(_altitudeTarget, altitude) : PILOT_VELZ_MAX * demands[DEMANDS_THROTTLE];
+                float targetVelocity = inBand ?
+                                       _posPid.compute(_altitudeTarget, altitude) :
+                                       PILOT_VELZ_MAX * demands[DEMANDS_THROTTLE];
 
                 // Run velocity PID controller to get correction
-                demands[DEMANDS_THROTTLE] = _velPid.compute(targetVelocity, state->inertialVel[2]);
+                demands[DEMANDS_THROTTLE] = _velPid.compute(targetVelocity, state->x[State::DZ]);
 
                 // If we re-entered deadband, we reset the target altitude.
                 if (didReset) {

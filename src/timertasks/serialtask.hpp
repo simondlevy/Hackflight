@@ -26,24 +26,24 @@ namespace hf {
 
             Actuator    * _actuator = NULL;
             Receiver * _receiver = NULL;
-            state_t  * _state = NULL;
+            State  * _state = NULL;
 
-            void (*_actuatorfun)(state_t * state, Actuator * actuator);
+            void (*_actuatorfun)(State * state, Actuator * actuator);
 
-            static void _actuatorfunFull(state_t * state, Actuator * actuator)
+            static void _actuatorfunFull(State * state, Actuator * actuator)
             {
                 if (!state->armed) {
                     actuator->runDisarmed();
                 }
             }
 
-            static void _actuatorfunProxy(state_t * state, Actuator * actuator)
+            static void _actuatorfunProxy(State * state, Actuator * actuator)
             {
                 (void)state;
                 (void)actuator;
             }
 
-            void _begin(Board * board, state_t * state, Receiver * receiver) 
+            void _begin(Board * board, State * state, Receiver * receiver) 
             {
                 TimerTask::begin(board);
 
@@ -82,7 +82,7 @@ namespace hf {
                 variometer = 0;
                 positionX = 0;
                 positionY = 0;
-                heading = -_state->rotation[AXIS_YAW]; // NB: Angle negated for remote visualization
+                heading = -_state->x[State::PSI]; // NB: Angle negated for remote visualization
                 velocityForward = 0;
                 velocityRightward = 0;
             }
@@ -116,9 +116,9 @@ namespace hf {
 
             virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
             {
-                roll  = _state->rotation[AXIS_ROLL];
-                pitch = _state->rotation[AXIS_PITCH];
-                yaw   = _state->rotation[AXIS_YAW];
+                roll  = _state->x[State::PHI];
+                pitch = _state->x[State::THETA];
+                yaw   = _state->x[State::PSI];
             }
 
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
@@ -134,13 +134,13 @@ namespace hf {
             {
             }
 
-            void begin(Board * board, state_t * state, Receiver * receiver) 
+            void begin(Board * board, State * state, Receiver * receiver) 
             {
                 _begin(board, state, receiver);
                 _actuatorfun = _actuatorfunProxy;
             }
 
-            void begin(Board * board, state_t * state, Receiver * receiver, Actuator * actuator) 
+            void begin(Board * board, State * state, Receiver * receiver, Actuator * actuator) 
             {
                 begin(board, state, receiver);
                 _actuator = actuator;
