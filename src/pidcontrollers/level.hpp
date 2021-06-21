@@ -57,10 +57,10 @@ namespace hf {
             {
             }
 
-            void modifyDemands(state_t * state, demands_t & demands)
+            void modifyDemands(state_t * state, float * demands)
             {
-                demands.roll  = _rollPid.compute(demands.roll, state->rotation[0]); 
-                demands.pitch = _pitchPid.compute(demands.pitch, state->rotation[1]);
+                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], state->rotation[0]); 
+                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], state->rotation[1]);
             }
 
     };  // class LevelPid

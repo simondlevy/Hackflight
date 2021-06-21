@@ -30,15 +30,15 @@ namespace hf {
                 _yawPid.begin(Kp, Ki, 0);
             }
 
-            void modifyDemands(state_t * state, demands_t & demands)
+            void modifyDemands(state_t * state, float * demands)
             {
-                demands.yaw   = _yawPid.compute(demands.yaw, state->angularVel[2]);
+                demands[DEMANDS_YAW]   = _yawPid.compute(demands[DEMANDS_YAW], state->angularVel[2]);
 
                 // Prevent "yaw jump" during correction
-                demands.yaw = Filter::constrainAbs(demands.yaw, 0.1 + fabs(demands.yaw));
+                demands[DEMANDS_YAW] = Filter::constrainAbs(demands[DEMANDS_YAW], 0.1 + fabs(demands[DEMANDS_YAW]));
 
                 // Reset yaw integral on large yaw command
-                if (fabs(demands.yaw) > BIG_YAW_DEMAND) {
+                if (fabs(demands[DEMANDS_YAW]) > BIG_YAW_DEMAND) {
                     _yawPid.reset();
                 }
             }

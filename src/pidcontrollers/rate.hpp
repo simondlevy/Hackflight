@@ -29,10 +29,10 @@ namespace hf {
                 _pitchPid.begin(Kp, Ki, Kd);
             }
 
-            void modifyDemands(state_t * state, demands_t & demands)
+            void modifyDemands(state_t * state, float * demands)
             {
-                demands.roll  = _rollPid.compute(demands.roll,  state->angularVel[0]);
-                demands.pitch = _pitchPid.compute(demands.pitch, state->angularVel[1]);
+                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL],  state->angularVel[0]);
+                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], state->angularVel[1]);
             }
 
             virtual void updateReceiver(bool throttleIsDown) override
