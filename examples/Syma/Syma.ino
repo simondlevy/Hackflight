@@ -40,24 +40,27 @@ Copyright (c) 2018 Simon D. Levy
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 4.0f;
 
-hf::Hackflight h;
+static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
-hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
+static hf::MixerQuadXMW mixer;
 
-hf::MixerQuadXMW mixer;
+static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375, 1.0625, 0.005625f);
 
-hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375, 1.0625, 0.005625f);
+static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
-hf::LevelPid levelPid = hf::LevelPid(0.20f);
+static hf::Hackflight h = hf::Hackflight(&hf::ladybugIMU, &receiver, &mixer);
 
 void setup(void)
 {
     // Initialize Hackflight firmware
-    h.begin(new hf::LadybugFC(), &hf::ladybugIMU, &rc, &mixer, &hf::ladybugFcNewMotors);
+    h.begin(new hf::LadybugFC(), &hf::ladybugFcNewMotors);
 
     // Add PID controllers
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
+
+    // Adjust trim
+    receiver.setTrimYaw(0.05);
 }
 
 void loop(void)
