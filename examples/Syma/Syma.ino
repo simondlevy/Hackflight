@@ -17,8 +17,6 @@
 
  */
 
-#include <Arduino.h>
-
 #include "hackflight.hpp"
 #include "boards/realboards/arduino/ladybugfc.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
