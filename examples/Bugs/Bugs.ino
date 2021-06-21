@@ -32,7 +32,7 @@ static hf::MockReceiver receiver;
 
 static hf::MixerQuadXMW mixer(&motors);
 
-static hf::MockIMU imu;
+static hf::USFS imu;
 
 static hf::TinyPico board;
 
