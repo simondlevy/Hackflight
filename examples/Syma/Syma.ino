@@ -26,6 +26,7 @@
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
+#include "sensors/usfs.hpp"
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 4.0f;
@@ -36,14 +37,21 @@ static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MA
 
 static hf::MixerQuadXMW mixer(&hf::ladybugFcMotors);
 
-static hf::Hackflight h = hf::Hackflight(&board, &hf::ladybugIMU, &receiver, &mixer);
+static hf::Hackflight h = hf::Hackflight(&board, &receiver, &mixer);
 
 static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
 static hf::YawPid yawPid = hf::YawPid(1.0625, 0.005625f);
 static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
+static hf::UsfsGyrometer gyrometer;
+static hf::UsfsQuaternion quaternion; // not really a sensor, but we treat it like one!
+
 void setup(void)
 {
+    // Add sensors
+    h.addSensor(&quaternion);
+    h.addSensor(&gyrometer);
+
     // Add PID controllers
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);

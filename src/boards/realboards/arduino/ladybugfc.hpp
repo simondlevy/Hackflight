@@ -15,12 +15,9 @@
 #include <RoboFirmwareToolkit.hpp>
 
 #include "boards/realboards/arduino.hpp"
-#include "imus/usfs.hpp"
 #include "motors/brushed.hpp"
 
 namespace hf {
-
-    USFS ladybugIMU;
 
     static const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
 
