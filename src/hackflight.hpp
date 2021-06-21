@@ -16,9 +16,10 @@
 #include "state.hpp"
 #include "pidcontroller.hpp"
 #include "motor.hpp"
-#include "actuator.hpp"
 #include "timertasks/pidtask.hpp"
 #include "timertasks/serialtask.hpp"
+
+#include <RFT_actuator.hpp>
 
 namespace hf {
 
@@ -32,7 +33,7 @@ namespace hf {
             Debugger _debugger;
 
             // Actuator
-            Actuator * _actuator = NULL;
+            rft::Actuator * _actuator = NULL;
 
             // Sensors 
             Sensor * _sensors[256] = {};
@@ -122,7 +123,7 @@ namespace hf {
 
         public:
 
-            Hackflight(Board * board, Receiver * receiver, Actuator * actuator)
+            Hackflight(Board * board, Receiver * receiver, rft::Actuator * actuator)
             {  
                 // Store the essentials
                 _board = board;

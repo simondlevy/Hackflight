@@ -10,6 +10,8 @@
 
 #include "timertask.hpp"
 
+#include <RFT_actuator.hpp>
+
 namespace hf {
 
     class PidTask : public TimerTask {
@@ -28,7 +30,7 @@ namespace hf {
 
             // Other stuff we need
             Receiver * _receiver = NULL;
-            Actuator * _actuator = NULL;
+            rft::Actuator * _actuator = NULL;
             State  * _state    = NULL;
 
         protected:
@@ -39,7 +41,7 @@ namespace hf {
                 _pid_controller_count = 0;
             }
 
-            void begin(Board * board, Receiver * receiver, Actuator * actuator, State * state)
+            void begin(Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
             {
                 TimerTask::begin(board);
 

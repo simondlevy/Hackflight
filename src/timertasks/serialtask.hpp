@@ -12,7 +12,8 @@
 #include "board.hpp"
 #include "mspparser.hpp"
 #include "debugger.hpp"
-#include "actuator.hpp"
+
+#include <RFT_actuator.hpp>
 
 namespace hf {
 
@@ -24,20 +25,20 @@ namespace hf {
 
             static constexpr float FREQ = 66;
 
-            Actuator    * _actuator = NULL;
+            rft::Actuator * _actuator = NULL;
             Receiver * _receiver = NULL;
             State  * _state = NULL;
 
-            void (*_actuatorfun)(State * state, Actuator * actuator);
+            void (*_actuatorfun)(State * state, rft::Actuator * actuator);
 
-            static void _actuatorfunFull(State * state, Actuator * actuator)
+            static void _actuatorfunFull(State * state, rft::Actuator * actuator)
             {
                 if (!state->armed) {
                     actuator->runDisarmed();
                 }
             }
 
-            static void _actuatorfunProxy(State * state, Actuator * actuator)
+            static void _actuatorfunProxy(State * state, rft::Actuator * actuator)
             {
                 (void)state;
                 (void)actuator;
@@ -140,7 +141,7 @@ namespace hf {
                 _actuatorfun = _actuatorfunProxy;
             }
 
-            void begin(Board * board, State * state, Receiver * receiver, Actuator * actuator) 
+            void begin(Board * board, State * state, Receiver * receiver, rft::Actuator * actuator) 
             {
                 begin(board, state, receiver);
                 _actuator = actuator;
