@@ -30,7 +30,6 @@
 #include "pidcontroller.hpp"
 #include "motor.hpp"
 #include "actuators/mixer.hpp"
-#include "actuators/rxproxy.hpp"
 #include "sensors/surfacemount.hpp"
 #include "timertasks/pidtask.hpp"
 #include "timertasks/serialtask.hpp"
@@ -48,10 +47,8 @@ namespace hf {
             // Supports periodic ad-hoc debugging
             Debugger _debugger;
 
-            // Mixer or receiver proxy
+            // Mixer
             Actuator * _actuator = NULL;
-
-            RXProxy * _proxy = NULL;
 
             // Sensors 
             Sensor * _sensors[256] = {NULL};
@@ -68,7 +65,6 @@ namespace hf {
 
             // Passed to Hackflight::init() for a particular build
             IMU        * _imu      = NULL;
-            Mixer      * _mixer    = NULL;
 
             // Serial timer task for GCS
             SerialTask _serialTask;
@@ -179,75 +175,6 @@ namespace hf {
 
             } // checkReceiver
 
-            // Inner classes for full vs. lite version
-            class Updater {
-
-                friend class Hackflight;
-
-                private:
-
-                    Hackflight * _h = NULL;
-
-                protected:
-
-                    void init(Hackflight * h) 
-                    {
-                        _h = h;
-                    }
-
-                    virtual void update(void) = 0;
-
-            }; // class Updater
-
-            class UpdateFull : protected Updater {
-
-                friend class Hackflight;
-
-                virtual void update(void) override
-                {
-                    _h->updateFull();
-                }
-
-            }; // class UpdateFull
-
-            class UpdateLite : protected Updater {
-
-                friend class Hackflight;
-
-                virtual void update(void) override
-                {
-                    _h->updateLite();
-                }
-
-            }; // class UpdateLite
-
-            Updater * _updater;
-            UpdateFull _updaterFull;
-            UpdateLite _updaterLite;
-
-            void updateLite(void)
-            {
-                // Use proxy to send the correct channel values when not armed
-                if (!_state.armed) {
-                    _proxy->sendDisarmed();
-                }
-
-                // Update serial comms task
-                _serialTask.update();
-            }
-
-            void updateFull(void)
-            {
-                // Check mandatory sensors
-                checkGyrometer();
-                checkQuaternion();
-
-                // Check optional sensors
-                checkOptionalSensors();
-
-                // Update serial comms task
-                _serialTask.update();
-            }
 
         public:
 
@@ -277,8 +204,7 @@ namespace hf {
                 _pidTask.init(_board, _receiver, _actuator, &_state);
  
                 // Store pointers to IMU, mixer
-                _imu   = imu;
-                _mixer = mixer;
+                _imu = imu;
 
                 // Initialize serial timer task
                 _serialTask.init(board, &_state, receiver, mixer);
@@ -295,10 +221,6 @@ namespace hf {
 
                 // Tell the mixer which motors to use, and initialize them
                 mixer->useMotors(motors);
-
-                // Set the update function
-                _updater = &_updaterFull;
-                _updater->init(this);
 
             } // init
 
@@ -320,8 +242,15 @@ namespace hf {
                 // Update PID controllers task
                 _pidTask.update();
 
-                // Run full or lite update function
-                _updater->update();
+                // Check mandatory sensors
+                checkGyrometer();
+                checkQuaternion();
+
+                // Check optional sensors
+                checkOptionalSensors();
+
+                // Update serial comms task
+                _serialTask.update();
             }
 
     }; // class Hackflight
