@@ -11,6 +11,7 @@
 #include "pidcontroller.hpp"
 
 #include <rft_closedloops/pidcontroller.hpp>
+#include <RFT_filters.hpp>
 
 namespace hf {
 

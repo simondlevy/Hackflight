@@ -1,33 +1,31 @@
 /*
-   Abstract class for PID controllers, plus helper classes
+   Abstract class for PID controllers
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2021 Simon D. Levy
 
    MIT License
  */
 
 #pragma once
 
-#include "state.hpp"
-#include "demands.hpp"
+#include <RFT_closedloop.hpp>
 
-#include <RFT_filters.hpp>
+#include "state.hpp"
 
 namespace hf {
 
-    class PidController {
+    class PidController : public rft::ClosedLoopController {
 
         friend class PidTask;
 
         protected:
 
+            virtual void modifyDemands(rft::State * state, float * demands) override
+            {
+                modifyDemands((State *)state, demands);
+            }
+
             virtual void modifyDemands(State * state, float * demands) = 0;
-
-            virtual bool shouldFlashLed(void) { return false; }
-
-            virtual void resetOnInactivity(bool inactive) { (void)inactive; }
-
-            uint8_t auxState = 0;
 
     };  // class PidController
 

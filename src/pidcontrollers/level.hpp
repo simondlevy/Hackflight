@@ -11,6 +11,7 @@
 #include "pidcontroller.hpp"
 
 #include <rft_closedloops/pidcontroller.hpp>
+#include <RFT_filters.hpp>
 
 namespace hf {
 
@@ -59,7 +60,7 @@ namespace hf {
             {
             }
 
-            void modifyDemands(State * state, float * demands)
+            void modifyDemands(State * state, float * demands) override
             {
                 demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], state->x[State::PHI]); 
                 demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], state->x[State::THETA]);

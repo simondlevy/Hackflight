@@ -11,6 +11,8 @@
 #include "pidcontroller.hpp"
 #include "angvel.hpp"
 
+#include <RFT_filters.hpp>
+
 namespace hf {
 
     class YawPid : public PidController {
@@ -30,7 +32,7 @@ namespace hf {
                 _yawPid.begin(Kp, Ki, 0);
             }
 
-            void modifyDemands(State * state, float * demands)
+            virtual void modifyDemands(State * state, float * demands) override
             {
                 demands[DEMANDS_YAW] = _yawPid.compute(demands[DEMANDS_YAW], state->x[State::DPSI]);
 
