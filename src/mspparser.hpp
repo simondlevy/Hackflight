@@ -311,6 +311,15 @@ namespace hf {
                         serialize8(_checksum);
                         } break;
 
+                    case 123:
+                    {
+                        uint8_t type = 0;
+                        handle_ACTUATOR_TYPE_Request(type);
+                        prepareToSendBytes(1);
+                        sendByte(type);
+                        serialize8(_checksum);
+                    } break;
+
                     case 213:
                     {
                         float vx = 0;
@@ -326,7 +335,7 @@ namespace hf {
                         memcpy(&yaw_rate,  &_inBuf[12], sizeof(float));
 
                         handle_SET_VELOCITY_SETPOINTS(vx, vy, vz, yaw_rate);
-                        } break;
+                    } break;
 
                     case 215:
                     {
@@ -343,7 +352,7 @@ namespace hf {
                         memcpy(&m4,  &_inBuf[12], sizeof(float));
 
                         handle_SET_MOTOR_NORMAL(m1, m2, m3, m4);
-                        } break;
+                    } break;
 
                     case 217:
                     {
@@ -366,7 +375,7 @@ namespace hf {
                         memcpy(&c6,  &_inBuf[20], sizeof(float));
 
                         handle_SET_RC_NORMAL(c1, c2, c3, c4, c5, c6);
-                        } break;
+                    } break;
 
                     case 216:
                     {
@@ -374,7 +383,7 @@ namespace hf {
                         memcpy(&flag,  &_inBuf[0], sizeof(uint8_t));
 
                         handle_SET_ARMED(flag);
-                        } break;
+                    } break;
 
                 }
             }
@@ -405,6 +414,11 @@ namespace hf {
                 (void)roll;
                 (void)pitch;
                 (void)yaw;
+            }
+
+            virtual void handle_ACTUATOR_TYPE_Request(uint8_t & type)
+            {
+                (void)type;
             }
 
             virtual void handle_SET_VELOCITY_SETPOINTS(float  vx, float  vy, float  vz, float  yaw_rate)

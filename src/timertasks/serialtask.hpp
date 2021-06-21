@@ -121,6 +121,11 @@ namespace hf {
                 c6 = _receiver->getRawval(5);
             }
 
+            void handle_ACTUATOR_TYPE_Request(uint8_t & type) override
+            {
+                type = 0; // XXX _actuator->getType();
+            }
+
             virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
             {
                 roll  = _state->rotation[AXIS_ROLL];
@@ -144,14 +149,14 @@ namespace hf {
             void begin(Board * board, state_t * state, Receiver * receiver) 
             {
                 _begin(board, state, receiver);
-               _mixerfun = _mixerfunProxy;
-             }
+                _mixerfun = _mixerfunProxy;
+            }
 
             void begin(Board * board, state_t * state, Receiver * receiver, Mixer * mixer) 
             {
                 begin(board, state, receiver);
-               _mixer = mixer;
-               _mixerfun = _mixerfunFull;
+                _mixer = mixer;
+                _mixerfun = _mixerfunFull;
             }
 
     };  // SerialTask
