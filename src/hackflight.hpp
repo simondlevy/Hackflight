@@ -178,18 +178,18 @@ namespace hf {
 
         public:
 
-            Hackflight(IMU * imu, Receiver * receiver, Mixer * mixer)
+            Hackflight(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer)
             {  
                 // Store the essentials
+                _board = board;
                 _receiver = receiver;
                 _mixer = mixer;
                 _imu = imu;
             }
 
-            void begin(Board * board, Motor * motors, bool armed=false)
+            void begin(Motor * motors, bool armed=false)
             {  
-                // Store the essentials
-                _board = board;
+                _board->begin();
 
                 // Ad-hoc debugging support
                 _debugger.begin(_board);

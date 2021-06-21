@@ -43,6 +43,12 @@ namespace hf {
             LadybugFC(uint8_t ledPin = A4) 
                 : ArduinoBoard(ledPin)
             {
+            }
+
+            void begin(void)
+            {
+                ArduinoBoard::begin();
+
                 // Start I^2C
                 Wire.begin();
 

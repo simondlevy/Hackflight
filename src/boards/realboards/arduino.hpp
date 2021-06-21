@@ -71,7 +71,10 @@ namespace hf {
             {
                 _led_pin = ledPin;
                 _led_inverted = ledInverted;
+            }
 
+            void begin(void)
+            {
                 pinMode(_led_pin, OUTPUT);
                 digitalWrite(_led_pin, _led_inverted ? HIGH : LOW);
 
