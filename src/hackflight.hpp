@@ -8,9 +8,7 @@
 
 #pragma once
 
-#include "debugger.hpp"
 #include "mspparser.hpp"
-#include "board.hpp"
 #include "receiver.hpp"
 #include "sensor.hpp"
 #include "state.hpp"
@@ -19,7 +17,9 @@
 #include "timertasks/pidtask.hpp"
 #include "timertasks/serialtask.hpp"
 
+#include <RFT_board.hpp>
 #include <RFT_actuator.hpp>
+#include <RFT_debugger.hpp>
 
 namespace hf {
 
@@ -30,7 +30,7 @@ namespace hf {
             static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
 
             // Supports periodic ad-hoc debugging
-            Debugger _debugger;
+            rft::Debugger _debugger;
 
             // Actuator
             rft::Actuator * _actuator = NULL;
@@ -56,7 +56,7 @@ namespace hf {
                 return fabs(_state.x[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
-            Board  * _board = NULL;
+            rft::Board  * _board = NULL;
             Receiver * _receiver = NULL;
 
             // Vehicle state
@@ -123,7 +123,7 @@ namespace hf {
 
         public:
 
-            Hackflight(Board * board, Receiver * receiver, rft::Actuator * actuator)
+            Hackflight(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
             {  
                 // Store the essentials
                 _board = board;

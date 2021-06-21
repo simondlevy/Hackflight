@@ -14,9 +14,6 @@
 
 #pragma once
 
-#include "board.hpp"
-#include "state.hpp"
-#include "demands.hpp"
 #include "actuators/mixer.hpp"
 
 namespace hf {

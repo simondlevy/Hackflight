@@ -8,13 +8,14 @@
 
 #pragma once
 
-#include "board.hpp"
-#include "debugger.hpp"
 #include "state.hpp"
+
+#include <RFT_board.hpp>
+#include <RFT_debugger.hpp>
 
 namespace hf {
 
-    class RealBoard : public Board {
+    class RealBoard : public rft::Board {
 
         private:
 
@@ -143,7 +144,7 @@ namespace hf {
             void error(const char * errmsg) 
             {
                 while (true) {
-                    Debugger::printf("%s\n", errmsg);
+                    rft::Debugger::printf("%s\n", errmsg);
                     delaySeconds(0.1);
                 }
             }

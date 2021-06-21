@@ -9,11 +9,10 @@
 #pragma once
 
 #include "timertask.hpp"
-#include "board.hpp"
 #include "mspparser.hpp"
-#include "debugger.hpp"
 
 #include <RFT_actuator.hpp>
+#include <RFT_board.hpp>
 
 namespace hf {
 
@@ -44,7 +43,7 @@ namespace hf {
                 (void)actuator;
             }
 
-            void _begin(Board * board, State * state, Receiver * receiver) 
+            void _begin(rft::Board * board, State * state, Receiver * receiver) 
             {
                 TimerTask::begin(board);
 
@@ -135,13 +134,13 @@ namespace hf {
             {
             }
 
-            void begin(Board * board, State * state, Receiver * receiver) 
+            void begin(rft::Board * board, State * state, Receiver * receiver) 
             {
                 _begin(board, state, receiver);
                 _actuatorfun = _actuatorfunProxy;
             }
 
-            void begin(Board * board, State * state, Receiver * receiver, rft::Actuator * actuator) 
+            void begin(rft::Board * board, State * state, Receiver * receiver, rft::Actuator * actuator) 
             {
                 begin(board, state, receiver);
                 _actuator = actuator;

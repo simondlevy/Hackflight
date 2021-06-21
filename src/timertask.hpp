@@ -8,8 +8,7 @@
 
 #pragma once
 
-#include "board.hpp"
-#include "debugger.hpp"
+#include <RFT_board.hpp>
 
 namespace hf {
 
@@ -22,7 +21,7 @@ namespace hf {
 
         protected:
 
-            Board * _board = NULL;
+            rft::Board * _board = NULL;
 
             TimerTask(float freq)
             {
@@ -30,7 +29,7 @@ namespace hf {
                 _time = 0;
             }
 
-            void begin(Board * board)
+            void begin(rft::Board * board)
             {
                 _board = board;
             }
