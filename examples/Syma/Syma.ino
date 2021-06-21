@@ -54,15 +54,15 @@ static hf::Hackflight h = hf::Hackflight(&board, &hf::ladybugIMU, &receiver, &mi
 
 void setup(void)
 {
-    // Start Hackflight firmware
-    h.begin(&hf::ladybugFcNewMotors);
-
     // Add PID controllers
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
 
     // Adjust trim
     receiver.setTrimYaw(0.05);
+
+    // Start Hackflight firmware
+    h.begin(&hf::ladybugFcMotors);
 }
 
 void loop(void)

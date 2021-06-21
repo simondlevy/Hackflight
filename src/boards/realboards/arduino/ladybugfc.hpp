@@ -33,7 +33,7 @@ namespace hf {
 
     static const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
 
-    BrushedMotor ladybugFcNewMotors = BrushedMotor(MOTOR_PINS, 4);
+    BrushedMotor ladybugFcMotors = BrushedMotor(MOTOR_PINS, 4);
 
     class LadybugFC : public ArduinoBoard {
 
