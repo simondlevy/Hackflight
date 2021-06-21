@@ -13,7 +13,6 @@
  */
 
 #include "hackflight.hpp"
-#include "boards/realboards/tinypico.hpp"
 #include "receivers/arduino/dsmx/dsmx_esp32_serial1.hpp"
 #include "mixers/quadxmw.hpp"
 #include "motors/standard.hpp"
@@ -21,6 +20,8 @@
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
 #include "sensors/usfs.hpp"
+
+#include <rft_boards/realboards/tinypico.hpp>
 
 static const uint8_t SERIAL1_RX = 32;
 static const uint8_t SERIAL1_TX = 33; // unused
@@ -31,7 +32,7 @@ static constexpr float DEMAND_SCALE = 8.0;
 
 static const uint8_t MOTOR_PINS[4] = {25, 26 ,27, 15};
 
-static hf::TinyPico board;
+static rft::TinyPico board;
 
 static hf::DSMX_ESP32_Serial1 receiver = hf::DSMX_ESP32_Serial1(CHANNEL_MAP, DEMAND_SCALE, SERIAL1_RX, SERIAL1_TX);  
 
@@ -51,6 +52,9 @@ static hf::UsfsQuaternion quaternion; // not really a sensor, but we treat it li
 
 void setup(void)
 {
+    // Start I^2C
+    Wire.begin();
+
     // Add sensors
     h.addSensor(&quaternion);
     h.addSensor(&gyrometer);

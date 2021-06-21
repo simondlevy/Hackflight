@@ -14,7 +14,8 @@
 
 #include <RoboFirmwareToolkit.hpp>
 
-#include "boards/realboards/arduino.hpp"
+#include <rft_boards/realboards/arduino.hpp>
+
 #include "motors/brushed.hpp"
 
 namespace hf {
@@ -23,19 +24,19 @@ namespace hf {
 
     BrushedMotor ladybugFcMotors = BrushedMotor(MOTOR_PINS, 4);
 
-    class LadybugFC : public ArduinoBoard {
+    class LadybugFC : public rft::ArduinoBoard {
 
         public:
 
             // Support prototype version where LED is on pin A1
             LadybugFC(uint8_t ledPin = A4) 
-                : ArduinoBoard(ledPin)
+                : rft::ArduinoBoard(ledPin)
             {
             }
 
             void begin(void)
             {
-                ArduinoBoard::begin();
+                rft::ArduinoBoard::begin();
 
                 // Start I^2C
                 Wire.begin();
