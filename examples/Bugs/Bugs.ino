@@ -11,6 +11,9 @@
 #include "mixers/quadxmw.hpp"
 #include "motors/standard.hpp"
 #include "imus/usfs.hpp"
+#include "pidcontrollers/rate.hpp"
+#include "pidcontrollers/yaw.hpp"
+#include "pidcontrollers/level.hpp"
 
 static const uint8_t SERIAL1_RX = 32;
 static const uint8_t SERIAL1_TX = 33; // unused
@@ -33,8 +36,18 @@ static hf::TinyPico board;
 
 static hf::Hackflight h = hf::Hackflight(&board, &imu, &receiver, &mixer);
 
+static hf::RatePid ratePid = hf::RatePid(0.1225, 0.0001875, 0.0375);
+static hf::YawPid yawPid = hf::YawPid(0.5, 0.05);
+static hf::LevelPid levelPid = hf::LevelPid(0.20);
+
 void setup(void)
 {
+    // Add PID controllers
+    h.addPidController(&levelPid);
+    h.addPidController(&ratePid);
+    h.addPidController(&yawPid);
+
+    // Start Hackflight firmware
     h.begin();
 }
 
