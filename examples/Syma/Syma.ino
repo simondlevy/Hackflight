@@ -45,7 +45,7 @@ static hf::LadybugFC board;
 
 static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
-static hf::MixerQuadXMW mixer;
+static hf::MixerQuadXMW mixer(&hf::ladybugFcMotors);
 
 static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
 
@@ -66,7 +66,7 @@ void setup(void)
     receiver.setTrimYaw(0.05);
 
     // Start Hackflight firmware
-    h.begin(&hf::ladybugFcMotors);
+    h.begin();
 }
 
 void loop(void)

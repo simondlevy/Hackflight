@@ -187,7 +187,7 @@ namespace hf {
                 _imu = imu;
             }
 
-            void begin(Motor * motors, bool armed=false)
+            void begin(bool armed=false)
             {  
                 _board->begin();
 
@@ -222,8 +222,8 @@ namespace hf {
                 // Start the IMU
                 _imu->begin();
 
-                // Tell the mixer which motors to use, and beginialize them
-                _mixer->useMotors(motors);
+                // Tell the mixer to start the motors
+                _mixer->begin();
 
             } // begin
 
