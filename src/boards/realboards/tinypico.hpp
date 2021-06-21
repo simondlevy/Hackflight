@@ -59,7 +59,7 @@ namespace hf {
 
          public:
 
-            TinyPico(void) 
+            void begin(void) 
             {
                 Serial.begin(115200);
 

@@ -6,13 +6,12 @@
  */
 
 #include "hackflight.hpp"
-// #include "boards/realboards/tinypico.hpp"
+#include "boards/realboards/tinypico.hpp"
 #include "receivers/arduino/dsmx.hpp"
 #include "mixers/quadxmw.hpp"
 #include "motors/standard.hpp"
 #include "imus/usfs.hpp"
 
-#include "boards/realboards/arduino/ladybugfc.hpp"
 #include "imus/mock.hpp"
 #include "receivers/mock.hpp"
 #include "motors/mock.hpp"
@@ -35,7 +34,7 @@ static hf::MixerQuadXMW mixer(&motors);
 
 static hf::MockIMU imu;
 
-static hf::LadybugFC board;
+static hf::TinyPico board;
 
 static hf::Hackflight h = hf::Hackflight(&board, &imu, &receiver, &mixer);
 
