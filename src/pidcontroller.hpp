@@ -10,7 +10,8 @@
 
 #include "state.hpp"
 #include "demands.hpp"
-#include "filters.hpp"
+
+#include <RFT_filters.hpp>
 
 namespace hf {
 
@@ -80,7 +81,7 @@ namespace hf {
                 // Compute I term
                 float iterm = 0;
                 if (_Ki > 0) { // optimization
-                    _errorI = Filter::constrainAbs(_errorI + error, _windupMax); // avoid integral windup
+                    _errorI = rft::Filter::constrainAbs(_errorI + error, _windupMax); // avoid integral windup
                     iterm =  _errorI * _Ki;
                 }
 
