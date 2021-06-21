@@ -24,7 +24,7 @@
 #include "board.hpp"
 #include "mspparser.hpp"
 #include "debugger.hpp"
-#include "actuators/mixer.hpp"
+#include "mixer.hpp"
 
 namespace hf {
 

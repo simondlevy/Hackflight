@@ -29,7 +29,8 @@ namespace hf {
         friend class Hackflight;
         friend class PidTask;
 
-        protected:
+        // XXX protected:
+        public:
 
             virtual void cut(void) = 0;
 

@@ -24,12 +24,12 @@
 #include "mspparser.hpp"
 #include "imu.hpp"
 #include "board.hpp"
-#include "actuator.hpp"
+#include "mixer.hpp"
 #include "receiver.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
 #include "motor.hpp"
-#include "actuators/mixer.hpp"
+#include "mixer.hpp"
 #include "sensors/surfacemount.hpp"
 #include "timertasks/pidtask.hpp"
 #include "timertasks/serialtask.hpp"
@@ -48,7 +48,7 @@ namespace hf {
             Debugger _debugger;
 
             // Mixer
-            Actuator * _actuator = NULL;
+            Mixer * _mixer = NULL;
 
             // Sensors 
             Sensor * _sensors[256] = {NULL};
@@ -138,7 +138,7 @@ namespace hf {
             {
                 // Sync failsafe to receiver
                 if (_receiver->lostSignal() && _state.armed) {
-                    _actuator->cut();
+                    _mixer->cut();
                     _state.armed = false;
                     _state.failsafe = true;
                     _board->showArmedStatus(false);
@@ -167,7 +167,7 @@ namespace hf {
 
                 // Cut motors on throttle-down
                 if (_state.armed && _receiver->throttleIsDown()) {
-                    _actuator->cut();
+                    _mixer->cut();
                 }
 
                 // Set LED based on arming status
@@ -183,7 +183,7 @@ namespace hf {
                 // Store the essentials
                 _board    = board;
                 _receiver = receiver;
-                _actuator = mixer;
+                _mixer = mixer;
 
                 // Ad-hoc debugging support
                 _debugger.begin(board);
@@ -201,7 +201,7 @@ namespace hf {
                 _state.failsafe = false;
 
                 // Initialize timer task for PID controllers
-                _pidTask.begin(_board, _receiver, _actuator, &_state);
+                _pidTask.begin(_board, _receiver, _mixer, &_state);
  
                 // Store pointers to IMU, mixer
                 _imu = imu;

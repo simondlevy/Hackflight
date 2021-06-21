@@ -33,7 +33,7 @@ Copyright (c) 2018 Simon D. Levy
 #include "hackflight.hpp"
 #include "boards/realboards/arduino/ladybugfc.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
-#include "actuators/mixers/quadxcf.hpp"
+#include "mixers/quadxmw.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 
@@ -44,7 +44,7 @@ hf::Hackflight h;
 
 hf::DSMX_Receiver_Serial1 rc = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
-hf::MixerQuadXCF mixer;
+hf::MixerQuadXMW mixer;
 
 hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375, 1.0625, 0.005625f);
 

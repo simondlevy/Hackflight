@@ -61,7 +61,8 @@ namespace hf {
                 _motorsPrev[index] = value;
             }
 
-        protected:
+        // XXX protected:
+        public:
 
             Motor * _motors;
 
