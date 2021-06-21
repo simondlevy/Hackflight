@@ -8,13 +8,12 @@
 
 #pragma once
 
-#include "timertask.hpp"
-
+#include <RFT_timertask.hpp>
 #include <RFT_actuator.hpp>
 
 namespace hf {
 
-    class PidTask : public TimerTask {
+    class PidTask : public rft::TimerTask {
 
         friend class Hackflight;
 
@@ -36,14 +35,14 @@ namespace hf {
         protected:
 
             PidTask(void)
-                : TimerTask(FREQ)
+                : rft::TimerTask(FREQ)
             {
                 _pid_controller_count = 0;
             }
 
             void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
             {
-                TimerTask::begin(board);
+                rft::TimerTask::begin(board);
 
                 _receiver = receiver;
                 _actuator = actuator;
