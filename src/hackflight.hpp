@@ -13,8 +13,8 @@
 #include "state.hpp"
 #include "pidcontroller.hpp"
 #include "motor.hpp"
-#include "timertasks/pidtask.hpp"
-#include "timertasks/serialtask.hpp"
+#include "pidtask.hpp"
+#include "serialtask.hpp"
 
 #include <RFT_board.hpp>
 #include <RFT_sensor.hpp>
