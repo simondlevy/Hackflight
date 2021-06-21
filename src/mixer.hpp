@@ -26,7 +26,7 @@
 
 namespace hf {
 
-    class Mixer : protected Actuator {
+    class Mixer : public Actuator {
 
         friend class Hackflight;
         friend class SerialTask;
@@ -86,13 +86,13 @@ namespace hf {
             // This is also use by serial task
             float  motorsDisarmed[MAXMOTORS];
 
-            void begin(void)
+            void begin(void) override
             {
                 _motors->begin();
             }
 
             // This is how we can spin the motors from the GCS
-            void runDisarmed(void)
+            void runDisarmed(void) override
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     safeWriteMotor(i, motorsDisarmed[i]);
@@ -151,6 +151,11 @@ namespace hf {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     writeMotor(i, 0);
                 }
+            }
+
+            virtual void setMotorDisarmed(uint8_t index, float value) override
+            {
+                motorsDisarmed[index] = value;
             }
 
     }; // class Mixer

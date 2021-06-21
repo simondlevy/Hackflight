@@ -24,12 +24,12 @@
 #include "mspparser.hpp"
 #include "imu.hpp"
 #include "board.hpp"
-#include "mixer.hpp"
+#include "actuator.hpp"
 #include "receiver.hpp"
 #include "datatypes.hpp"
 #include "pidcontroller.hpp"
 #include "motor.hpp"
-#include "mixer.hpp"
+#include "actuator.hpp"
 #include "sensors/surfacemount.hpp"
 #include "timertasks/pidtask.hpp"
 #include "timertasks/serialtask.hpp"
@@ -47,8 +47,8 @@ namespace hf {
             // Supports periodic ad-hoc debugging
             Debugger _debugger;
 
-            // Mixer
-            Mixer * _mixer = NULL;
+            // Actuator
+            Actuator * _actuator = NULL;
 
             // Sensors 
             Sensor * _sensors[256] = {NULL};
@@ -138,7 +138,7 @@ namespace hf {
             {
                 // Sync failsafe to receiver
                 if (_receiver->lostSignal() && _state.armed) {
-                    _mixer->cut();
+                    _actuator->cut();
                     _state.armed = false;
                     _state.failsafe = true;
                     _board->showArmedStatus(false);
@@ -167,7 +167,7 @@ namespace hf {
 
                 // Cut motors on throttle-down
                 if (_state.armed && _receiver->throttleIsDown()) {
-                    _mixer->cut();
+                    _actuator->cut();
                 }
 
                 // Set LED based on arming status
@@ -178,12 +178,12 @@ namespace hf {
 
         public:
 
-            Hackflight(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer)
+            Hackflight(Board * board, IMU * imu, Receiver * receiver, Actuator * actuator)
             {  
                 // Store the essentials
                 _board = board;
                 _receiver = receiver;
-                _mixer = mixer;
+                _actuator = actuator;
                 _imu = imu;
             }
 
@@ -207,10 +207,10 @@ namespace hf {
                 _state.failsafe = false;
 
                 // Initialize timer task for PID controllers
-                _pidTask.begin(_board, _receiver, _mixer, &_state);
+                _pidTask.begin(_board, _receiver, _actuator, &_state);
  
                 // Initialize serial timer task
-                _serialTask.begin(_board, &_state, _receiver, _mixer);
+                _serialTask.begin(_board, &_state, _receiver, _actuator);
 
                 // Support safety override by simulator
                 _state.armed = armed;
@@ -222,8 +222,8 @@ namespace hf {
                 // Start the IMU
                 _imu->begin();
 
-                // Tell the mixer to start the motors
-                _mixer->begin();
+                // Tell the actuator to start the motors
+                _actuator->begin();
 
             } // begin
 

@@ -25,7 +25,6 @@
 #include <Wire.h>
 
 #include <RoboFirmwareToolkit.hpp>
-#include <rft_motors/brushed.hpp>
 
 #include "boards/realboards/arduino.hpp"
 #include "imus/usfs.hpp"

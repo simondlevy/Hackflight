@@ -1,21 +1,9 @@
 /*
    Timer task for serial comms
 
-   Copyright (c) 2020 Simon D. Levy
+   Copyright (C) 2020 Simon D. Levy
 
-   This file is part of Hackflight.
-
-   Hackflight is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   Hackflight is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-   You should have received a copy of the GNU General Public License
-   along with Hackflight.  If not, see <http://www.gnu.org/licenses/>.
+   MIT License
  */
 
 #pragma once
@@ -24,7 +12,7 @@
 #include "board.hpp"
 #include "mspparser.hpp"
 #include "debugger.hpp"
-#include "mixer.hpp"
+#include "actuator.hpp"
 
 namespace hf {
 
@@ -36,23 +24,23 @@ namespace hf {
 
             static constexpr float FREQ = 66;
 
-            Mixer    * _mixer = NULL;
+            Actuator    * _actuator = NULL;
             Receiver * _receiver = NULL;
             state_t  * _state = NULL;
 
-            void (*_mixerfun)(state_t * state, Mixer * mixer);
+            void (*_actuatorfun)(state_t * state, Actuator * actuator);
 
-            static void _mixerfunFull(state_t * state, Mixer * mixer)
+            static void _actuatorfunFull(state_t * state, Actuator * actuator)
             {
                 if (!state->armed) {
-                    mixer->runDisarmed();
+                    actuator->runDisarmed();
                 }
             }
 
-            static void _mixerfunProxy(state_t * state, Mixer * mixer)
+            static void _actuatorfunProxy(state_t * state, Actuator * actuator)
             {
                 (void)state;
-                (void)mixer;
+                (void)actuator;
             }
 
             void _begin(Board * board, state_t * state, Receiver * receiver) 
@@ -81,7 +69,7 @@ namespace hf {
                 }
 
                 // Support motor testing from GCS
-                _mixerfun(_state, _mixer);
+                _actuatorfun(_state, _actuator);
             }
 
             // MspParser overrides -------------------------------------------------------
@@ -135,10 +123,10 @@ namespace hf {
 
             virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
             {
-                _mixer->motorsDisarmed[0] = m1;
-                _mixer->motorsDisarmed[1] = m2;
-                _mixer->motorsDisarmed[2] = m3;
-                _mixer->motorsDisarmed[3] = m4;
+                _actuator->setMotorDisarmed(0, m1);
+                _actuator->setMotorDisarmed(1, m2);
+                _actuator->setMotorDisarmed(2, m3);
+                _actuator->setMotorDisarmed(3, m4);
             }
 
             SerialTask(void)
@@ -149,14 +137,14 @@ namespace hf {
             void begin(Board * board, state_t * state, Receiver * receiver) 
             {
                 _begin(board, state, receiver);
-                _mixerfun = _mixerfunProxy;
+                _actuatorfun = _actuatorfunProxy;
             }
 
-            void begin(Board * board, state_t * state, Receiver * receiver, Mixer * mixer) 
+            void begin(Board * board, state_t * state, Receiver * receiver, Actuator * actuator) 
             {
                 begin(board, state, receiver);
-                _mixer = mixer;
-                _mixerfun = _mixerfunFull;
+                _actuator = actuator;
+                _actuatorfun = _actuatorfunFull;
             }
 
     };  // SerialTask

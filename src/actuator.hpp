@@ -36,6 +36,12 @@ namespace hf {
 
             virtual void run(demands_t demands) = 0;
 
+            virtual void runDisarmed(void) {}
+
+            virtual void setMotorDisarmed(uint8_t index, float value) { (void)index; (void)value; }
+
+            virtual void begin(void) { }
+
     }; // class Actuator
 
 } // namespace hf
