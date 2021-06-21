@@ -36,7 +36,7 @@ static hf::TinyPico board;
 
 static hf::Hackflight h = hf::Hackflight(&board, &imu, &receiver, &mixer);
 
-static hf::RatePid ratePid = hf::RatePid(0.04, 0.00, 0.00);
+static hf::RatePid ratePid = hf::RatePid(0.04, 0.002, 0.01);
 static hf::YawPid yawPid = hf::YawPid(0.10, 0.01);
 static hf::LevelPid levelPid = hf::LevelPid(0.20);
 

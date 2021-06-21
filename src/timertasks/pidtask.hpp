@@ -35,7 +35,7 @@ namespace hf {
             static constexpr float FREQ = 300;
 
             // PID controllers
-            PidController * _pid_controllers[256] = {NULL};
+            PidController * _pid_controllers[256] = {};
             uint8_t _pid_controller_count = 0;
 
             // Other stuff we need
