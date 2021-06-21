@@ -131,7 +131,7 @@ namespace hf {
                 }
             }
 
-            void init(void)
+            void begin(void)
             {
                 for (uint8_t k=0; k<_count; ++k) {
 
@@ -150,7 +150,7 @@ namespace hf {
 
                         motor_t * motor = &_motors[k];
 
-                        // Output disarm signal while esc initialises
+                        // Output disarm signal while esc beginialises
                         motor->outputValue = LEVEL_MIN;
                         outputOne(motor);
                     }

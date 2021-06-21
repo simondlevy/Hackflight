@@ -55,11 +55,11 @@ namespace hf {
                 (void)mixer;
             }
 
-            void _init(Board * board, state_t * state, Receiver * receiver) 
+            void _begin(Board * board, state_t * state, Receiver * receiver) 
             {
-                TimerTask::init(board);
+                TimerTask::begin(board);
 
-                MspParser::init();
+                MspParser::begin();
 
                 _state = state;
                 _receiver = receiver;
@@ -141,15 +141,15 @@ namespace hf {
             {
             }
 
-            void init(Board * board, state_t * state, Receiver * receiver) 
+            void begin(Board * board, state_t * state, Receiver * receiver) 
             {
-                _init(board, state, receiver);
+                _begin(board, state, receiver);
                _mixerfun = _mixerfunProxy;
              }
 
-            void init(Board * board, state_t * state, Receiver * receiver, Mixer * mixer) 
+            void begin(Board * board, state_t * state, Receiver * receiver, Mixer * mixer) 
             {
-                init(board, state, receiver);
+                begin(board, state, receiver);
                _mixer = mixer;
                _mixerfun = _mixerfunFull;
             }

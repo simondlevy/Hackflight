@@ -53,7 +53,7 @@ hf::LevelPid levelPid = hf::LevelPid(0.20f);
 void setup(void)
 {
     // Initialize Hackflight firmware
-    h.init(new hf::LadybugFC(), &hf::ladybugIMU, &rc, &mixer, &hf::ladybugFcNewMotors);
+    h.begin(new hf::LadybugFC(), &hf::ladybugIMU, &rc, &mixer, &hf::ladybugFcNewMotors);
 
     // Add PID controllers
     h.addPidController(&levelPid);

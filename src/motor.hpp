@@ -50,7 +50,7 @@ namespace hf {
 
         public:
 
-            virtual void init(void) { }
+            virtual void begin(void) { }
 
             virtual void write(uint8_t index, float value) = 0;
 

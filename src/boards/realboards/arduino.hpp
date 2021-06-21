@@ -76,7 +76,7 @@ namespace hf {
                 digitalWrite(_led_pin, _led_inverted ? HIGH : LOW);
 
                 Serial.begin(115200);
-                RealBoard::init();
+                RealBoard::begin();
             }
 
     }; // class ArduinoBoard

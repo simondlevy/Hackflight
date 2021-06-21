@@ -53,7 +53,7 @@ namespace hf {
                 _gotMessage = false;
                 memset(_sixvals, 0, 6*sizeof(float));
 
-                MspParser::init();
+                MspParser::begin();
             }
 
             bool gotNewFrame(void)

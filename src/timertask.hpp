@@ -42,7 +42,7 @@ namespace hf {
                 _time = 0;
             }
 
-            void init(Board * board)
+            void begin(Board * board)
             {
                 _board = board;
             }

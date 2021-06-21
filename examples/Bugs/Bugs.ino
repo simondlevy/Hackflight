@@ -73,7 +73,7 @@ void setup(void)
     // Start receiver on Serial1
     Serial1.begin(115000, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX);
 
-    h.init(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
+    h.begin(new hf::TinyPico(), &imu, &rc, &mixer, &motors);
 
     // Start the receiver timed task
     TaskHandle_t task;

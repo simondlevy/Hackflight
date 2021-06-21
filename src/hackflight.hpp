@@ -63,8 +63,8 @@ namespace hf {
             // Timer task for PID controllers
             PidTask _pidTask;
 
-            // Passed to Hackflight::init() for a particular build
-            IMU        * _imu      = NULL;
+            // Passed to Hackflight::begin() for a particular build
+            IMU * _imu      = NULL;
 
             // Serial timer task for GCS
             SerialTask _serialTask;
@@ -178,7 +178,7 @@ namespace hf {
 
         public:
 
-            void init(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor * motors, bool armed=false)
+            void begin(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor * motors, bool armed=false)
             {  
                 // Store the essentials
                 _board    = board;
@@ -186,7 +186,7 @@ namespace hf {
                 _actuator = mixer;
 
                 // Ad-hoc debugging support
-                _debugger.init(board);
+                _debugger.begin(board);
 
                 // Support adding new sensors and PID controllers
                 _sensor_count = 0;
@@ -201,13 +201,13 @@ namespace hf {
                 _state.failsafe = false;
 
                 // Initialize timer task for PID controllers
-                _pidTask.init(_board, _receiver, _actuator, &_state);
+                _pidTask.begin(_board, _receiver, _actuator, &_state);
  
                 // Store pointers to IMU, mixer
                 _imu = imu;
 
                 // Initialize serial timer task
-                _serialTask.init(board, &_state, receiver, mixer);
+                _serialTask.begin(board, &_state, receiver, mixer);
 
                 // Support safety override by simulator
                 _state.armed = armed;
@@ -219,10 +219,10 @@ namespace hf {
                 // Start the IMU
                 imu->begin();
 
-                // Tell the mixer which motors to use, and initialize them
+                // Tell the mixer which motors to use, and beginialize them
                 mixer->useMotors(motors);
 
-            } // init
+            } // begin
 
             void addSensor(Sensor * sensor) 
             {
