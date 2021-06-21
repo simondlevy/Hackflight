@@ -138,32 +138,6 @@ namespace hf {
                 sensor->imu = imu;
             }
 
-            void general_init(Board * board, Receiver * receiver, Actuator * actuator)
-            {  
-                // Store the essentials
-                _board    = board;
-                _receiver = receiver;
-                _actuator = actuator;
-
-                // Ad-hoc debugging support
-                _debugger.init(board);
-
-                // Support adding new sensors and PID controllers
-                _sensor_count = 0;
-
-                // Initialize state
-                memset(&_state, 0, sizeof(state_t));
-
-                // Initialize the receiver
-                _receiver->begin();
-
-                // Setup failsafe
-                _state.failsafe = false;
-
-                // Initialize timer task for PID controllers
-                _pidTask.init(_board, _receiver, _actuator, &_state);
-            }
-
             void checkReceiver(void)
             {
                 // Sync failsafe to receiver
@@ -279,9 +253,29 @@ namespace hf {
 
             void init(Board * board, IMU * imu, Receiver * receiver, Mixer * mixer, Motor * motors, bool armed=false)
             {  
-                // Do general initialization
-                general_init(board, receiver, mixer);
+                // Store the essentials
+                _board    = board;
+                _receiver = receiver;
+                _actuator = mixer;
 
+                // Ad-hoc debugging support
+                _debugger.init(board);
+
+                // Support adding new sensors and PID controllers
+                _sensor_count = 0;
+
+                // Initialize state
+                memset(&_state, 0, sizeof(state_t));
+
+                // Initialize the receiver
+                _receiver->begin();
+
+                // Setup failsafe
+                _state.failsafe = false;
+
+                // Initialize timer task for PID controllers
+                _pidTask.init(_board, _receiver, _actuator, &_state);
+ 
                 // Store pointers to IMU, mixer
                 _imu   = imu;
                 _mixer = mixer;
@@ -307,25 +301,6 @@ namespace hf {
                 _updater->init(this);
 
             } // init
-
-            void init(Board * board, Receiver * receiver, RXProxy * proxy) 
-            {
-                // Do general initialization
-                general_init(board, receiver, proxy);
-
-                // Initialize serial timer task (no mixer)
-                _serialTask.init(board, &_state, receiver);
-
-                // Store proxy for arming check
-                _proxy = proxy;
-
-                // Start proxy
-                _proxy->begin();
-
-                // Set the update function
-                _updater = &_updaterLite;
-                _updater->init(this);
-            }
 
             void addSensor(Sensor * sensor) 
             {
