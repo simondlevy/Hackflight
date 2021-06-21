@@ -10,7 +10,7 @@
 
 #include "board.hpp"
 #include "debugger.hpp"
-#include "datatypes.hpp"
+#include "state.hpp"
 
 namespace hf {
 

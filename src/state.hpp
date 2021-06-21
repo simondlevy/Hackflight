@@ -1,5 +1,5 @@
 /*
-   Datatype declarations
+   Datatype declarations for vehicle state
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -15,15 +15,6 @@ namespace hf {
         AXIS_PITCH, 
         AXIS_YAW
     };
-
-    typedef struct {
-
-        float throttle;
-        float roll;
-        float pitch;
-        float yaw;
-
-    } demands_t;
 
     typedef struct {
 

@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "filters.hpp"
-#include "datatypes.hpp"
 #include "pidcontroller.hpp"
 
 namespace hf {

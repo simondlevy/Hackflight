@@ -14,7 +14,7 @@
 #include "board.hpp"
 #include "actuator.hpp"
 #include "receiver.hpp"
-#include "datatypes.hpp"
+#include "state.hpp"
 #include "pidcontroller.hpp"
 #include "motor.hpp"
 #include "actuator.hpp"

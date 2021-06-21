@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "datatypes.hpp"
 #include "pidcontroller.hpp"
 #include "angvel.hpp"
 
