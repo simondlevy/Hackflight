@@ -78,7 +78,7 @@ namespace hf {
                     PidController * pidController = _pid_controllers[k];
 
                     // Some PID controllers need to reset their integral when the throttle is down
-                    pidController->updateReceiver(_receiver->throttleIsDown());
+                    pidController->resetOnInactivity(_receiver->throttleIsDown());
 
                     if (pidController->auxState <= auxState) {
 

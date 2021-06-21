@@ -10,6 +10,8 @@
 
 #include "pidcontroller.hpp"
 
+#include <rft_closedloops/pidcontroller.hpp>
+
 namespace hf {
 
     class AltitudeHoldPid : public PidController {
@@ -23,10 +25,10 @@ namespace hf {
             bool _inBandPrev = false;
 
             // P controller for position.  This will serve as the set-point for velocity PID.
-            Pid _posPid;
+            rft::DofPid _posPid;
 
             // PID controller for velocity
-            Pid _velPid;
+            rft::DofPid _velPid;
 
             // This will be reset each time we re-enter throttle deadband.
             float _altitudeTarget = 0;

@@ -10,6 +10,8 @@
 
 #include "pidcontroller.hpp"
 
+#include <rft_closedloops/pidcontroller.hpp>
+
 namespace hf {
 
     class LevelPid : public PidController {
@@ -17,7 +19,7 @@ namespace hf {
         private:
 
             // Helper class
-            class _AnglePid : public Pid {
+            class _AnglePid : public rft::DofPid {
 
                 private:
 
@@ -31,12 +33,12 @@ namespace hf {
 
                     void begin(const float Kp) 
                     {
-                        Pid::begin(Kp, 0, 0);
+                        rft::DofPid::begin(Kp, 0, 0);
                     }
 
                     float compute(float demand, float angle)
                     {
-                        return Pid::compute(demand*_demandMultiplier, angle);
+                        return rft::DofPid::compute(demand*_demandMultiplier, angle);
                     }
 
             }; // class _AnglePid

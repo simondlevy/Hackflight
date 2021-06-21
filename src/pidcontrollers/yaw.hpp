@@ -43,10 +43,10 @@ namespace hf {
                 }
             }
 
-            virtual void updateReceiver(bool throttleIsDown) override
+            virtual void resetOnInactivity(bool inactive) override
             {
                 // Check throttle-down for integral reset
-                _yawPid.updateReceiver(throttleIsDown);
+                _yawPid.resetOnInactivity(inactive);
             }
 
     };  // class RatePid

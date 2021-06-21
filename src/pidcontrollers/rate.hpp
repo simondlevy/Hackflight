@@ -11,6 +11,7 @@
 #include "pidcontroller.hpp"
 #include "angvel.hpp"
 
+
 namespace hf {
 
     class RatePid : public PidController {
@@ -35,11 +36,11 @@ namespace hf {
                 demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], state->x[State::DTHETA]);
             }
 
-            virtual void updateReceiver(bool throttleIsDown) override
+            virtual void resetOnInactivity(bool inactive) override
             {
                 // Check throttle-down for integral reset
-                _rollPid.updateReceiver(throttleIsDown);
-                _pitchPid.updateReceiver(throttleIsDown);
+                _rollPid.resetOnInactivity(inactive);
+                _pitchPid.resetOnInactivity(inactive);
             }
 
     };  // class RatePid

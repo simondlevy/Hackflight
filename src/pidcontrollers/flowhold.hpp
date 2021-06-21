@@ -10,17 +10,16 @@
 
 #include "pidcontroller.hpp"
 
+#include <rft_closedloops/pidcontroller.hpp>
+
 namespace hf {
 
     class FlowHoldPid : public PidController {
 
-        public:
+        private:
 
-            FlowHoldPid(const float Kp, float Ki)
-            {
-                rollPid.begin(Kp, Ki, 0);
-                pitchPid.begin(Kp, Ki, 0);
-            }
+            rft::DofPid rollPid;
+            rft::DofPid pitchPid;
 
         protected:
 
@@ -30,10 +29,13 @@ namespace hf {
                 demands[DEMANDS_ROLL]  += (0.5 - fabs(demands[DEMANDS_ROLL]))  * rollPid.compute(0, state->x[State::DY]);
             }
 
-        private:
+        public:
 
-            Pid rollPid;
-            Pid pitchPid;
+            FlowHoldPid(const float Kp, float Ki)
+            {
+                rollPid.begin(Kp, Ki, 0);
+                pitchPid.begin(Kp, Ki, 0);
+            }
 
     };  // class FlowHoldPid
 
