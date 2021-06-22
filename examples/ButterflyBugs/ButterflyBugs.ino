@@ -1,5 +1,6 @@
 /*
-   Hackflight sketch for TinyPICO with USFS IMU, DSMX receiver, and standard motors
+   Hackflight sketch for Tlear Butterfly with USFS IMU, DSMX receiver, and
+   standard motors
 
    Additional libraries needed:
 
@@ -13,38 +14,32 @@
  */
 
 #include "hackflight.hpp"
-#include "receivers/arduino/dsmx/dsmx_esp32_serial1.hpp"
 #include "mixers/quadxmw.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
 #include "sensors/usfs.hpp"
 
-#include <rft_boards/realboards/tinypico.hpp>
+#include <rft_boards/realboards/arduino/butterfly.hpp>
 #include <rft_motors/rotary/brushless.hpp>
+
+#include "receivers/mock.hpp"
 
 // Receiver ============================================================================
 
-static const uint8_t SERIAL1_RX = 32;
-static const uint8_t SERIAL1_TX = 33; // unused
-
-static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
-
-static constexpr float DEMAND_SCALE = 8.0;
-
-static hf::DSMX_ESP32_Serial1 receiver = hf::DSMX_ESP32_Serial1(CHANNEL_MAP, DEMAND_SCALE,
-                                                                 SERIAL1_RX, SERIAL1_TX);  
+static hf::MockReceiver receiver;
 
 // Board ================================================================================
 
-static rft::TinyPico board;
+// static rft::TinyPico board;
+static rft::Butterfly board;
 
 // Motors  ==============================================================================
 
-static rft::BrushlessMotorEsp32 motor1 = rft::BrushlessMotorEsp32(25);
-static rft::BrushlessMotorEsp32 motor2 = rft::BrushlessMotorEsp32(26);
-static rft::BrushlessMotorEsp32 motor3 = rft::BrushlessMotorEsp32(27);
-static rft::BrushlessMotorEsp32 motor4 = rft::BrushlessMotorEsp32(15);
+static rft::BrushlessMotorEsp32 motor1 = rft::BrushlessMotorEsp32(11);
+static rft::BrushlessMotorEsp32 motor2 = rft::BrushlessMotorEsp32(9);
+static rft::BrushlessMotorEsp32 motor3 = rft::BrushlessMotorEsp32(8);
+static rft::BrushlessMotorEsp32 motor4 = rft::BrushlessMotorEsp32(5);
 
 // Mixer ================================================================================
 
@@ -69,8 +64,12 @@ static hf::UsfsQuaternion quaternion; // not really a sensor, but we treat it li
 
 void setup(void)
 {
+    // USFS piggyback: use pins 4,3 for power, ground
+    rft::ArduinoBoard::powerPins(4, 3);
+    delay(100);
+
     // Start I^2C
-    Wire.begin();
+    Wire.begin(TWI_PINS_6_7);
 
     // Add sensors
     h.addSensor(&quaternion);
