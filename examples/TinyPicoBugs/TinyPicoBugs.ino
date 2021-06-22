@@ -21,7 +21,7 @@
 #include "sensors/usfs.hpp"
 
 #include <rft_boards/realboards/tinypico.hpp>
-#include <rft_motors/rotary/brushless.hpp>
+#include <rft_motors/rotary/brushless3.hpp>
 
 // Receiver ============================================================================
 
@@ -36,15 +36,14 @@ static hf::DSMX_ESP32_Serial1 receiver = hf::DSMX_ESP32_Serial1(CHANNEL_MAP, DEM
 
 // Board ================================================================================
 
-// static rft::TinyPico board;
-static rft::Butterfly board;
+static rft::TinyPico board;
 
 // Motors  ==============================================================================
 
-static rft::BrushlessMotorEsp32 motor1 = rft::BrushlessMotorEsp32(11 /*25*/);
-static rft::BrushlessMotorEsp32 motor2 = rft::BrushlessMotorEsp32(9 /*26*/);
-static rft::BrushlessMotorEsp32 motor3 = rft::BrushlessMotorEsp32(8 /*27*/);
-static rft::BrushlessMotorEsp32 motor4 = rft::BrushlessMotorEsp32(5 /*15*/);
+static rft::BrushlessMotor motor1 = rft::BrushlessMotor(25);
+static rft::BrushlessMotor motor2 = rft::BrushlessMotor(26);
+static rft::BrushlessMotor motor3 = rft::BrushlessMotor(27);
+static rft::BrushlessMotor motor4 = rft::BrushlessMotor(15);
 
 // Mixer ================================================================================
 

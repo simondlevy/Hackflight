@@ -19,15 +19,18 @@
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
 #include "sensors/usfs.hpp"
+#include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 
 #include <rft_boards/realboards/arduino/butterfly.hpp>
-#include <rft_motors/rotary/brushless.hpp>
+#include <rft_motors/rotary/brushless2.hpp>
 
-#include "receivers/mock.hpp"
 
 // Receiver ============================================================================
 
-static hf::MockReceiver receiver;
+static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
+static constexpr float DEMAND_SCALE = 8.0f;
+
+static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);
 
 // Board ================================================================================
 
@@ -36,10 +39,10 @@ static rft::Butterfly board;
 
 // Motors  ==============================================================================
 
-static rft::BrushlessMotor motor1 = rft::BrushlessMotor(11);
-static rft::BrushlessMotor motor2 = rft::BrushlessMotor(9);
-static rft::BrushlessMotor motor3 = rft::BrushlessMotor(8);
-static rft::BrushlessMotor motor4 = rft::BrushlessMotor(5);
+static rft::BrushlessMotor motor1 = rft::BrushlessMotor(5);
+static rft::BrushlessMotor motor2 = rft::BrushlessMotor(8);
+static rft::BrushlessMotor motor3 = rft::BrushlessMotor(9);
+static rft::BrushlessMotor motor4 = rft::BrushlessMotor(11);
 
 // Mixer ================================================================================
 
