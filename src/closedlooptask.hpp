@@ -25,7 +25,7 @@ namespace hf {
             static constexpr float FREQ = 300;
 
             // PID controllers
-            PidController * _controllers[256] = {};
+            rft::ClosedLoopController * _controllers[256] = {};
             uint8_t _controller_count = 0;
 
             // Other stuff we need
@@ -50,7 +50,7 @@ namespace hf {
                 _state = state;
             }
 
-            void addController(PidController * controller, uint8_t modeIndex) 
+            void addController(rft::ClosedLoopController * controller, uint8_t modeIndex) 
             {
                 controller->modeIndex = modeIndex;
 
@@ -71,7 +71,7 @@ namespace hf {
 
                 for (uint8_t k=0; k<_controller_count; ++k) {
 
-                    PidController * controller = _controllers[k];
+                    rft::ClosedLoopController * controller = _controllers[k];
 
                     // Some PID controllers need to reset their integral when the throttle is down
                     controller->resetOnInactivity(_olc->inactive());
