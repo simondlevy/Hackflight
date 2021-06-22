@@ -64,10 +64,13 @@ namespace hf {
 
             } motor_type_t;
 
+            motor_type_t _motor_type;
+
             motorMixer_t motorDirections[MAXMOTORS];
 
-            Mixer(motor_type_t motortype)
+            Mixer(motor_type_t motor_type)
             {
+                _motor_type = motor_type;
             }
 
             // For simulation / testing
