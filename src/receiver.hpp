@@ -29,6 +29,8 @@ namespace hf {
             const float THROTTLE_EXPO   = 0.20f;
             const float AUX_THRESHOLD   = 0.4f;
 
+            float _demandScale = 0;
+
             float adjustCommand(float command, uint8_t channel)
             {
                 command /= 2;
@@ -71,8 +73,6 @@ namespace hf {
 
             uint8_t _aux1State = 0;
             uint8_t _aux2State = 0;
-
-            float _demandScale = 0;
 
             // channel indices
             enum {
@@ -160,6 +160,11 @@ namespace hf {
 
                 // Pass throttle demand through exponential function
                 _demands[DEMANDS_THROTTLE] = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
+
+                // Multiply by demand scale
+                _demands[DEMANDS_ROLL] *= _demandScale;
+                _demands[DEMANDS_PITCH] *= _demandScale;
+                _demands[DEMANDS_YAW] *= _demandScale;
 
                 // Store auxiliary switch state
                 _aux1State = getRawval(CHANNEL_AUX1) >= 0.0 ? (getRawval(CHANNEL_AUX1) > AUX_THRESHOLD ? 2 : 1) : 0;
