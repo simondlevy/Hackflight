@@ -34,7 +34,7 @@ static rft::TinyPico board;
 
 static hf::DSMX_ESP32_Serial1 receiver = hf::DSMX_ESP32_Serial1(CHANNEL_MAP, DEMAND_SCALE, SERIAL1_RX, SERIAL1_TX);  
 
-static hf::MixerQuadXMW mixer = hf::MixerQuadXMW(hf::Mixer::BRUSHLESS, 25, 26, 27, 15);
+static hf::BrushlessMixerQuadXMW mixer = hf::BrushlessMixerQuadXMW(25, 26, 27, 15);
 
 static hf::Hackflight h = hf::Hackflight(&board, &receiver, &mixer);
 

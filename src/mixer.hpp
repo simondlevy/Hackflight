@@ -55,7 +55,7 @@ namespace hf {
                 _previousValues[index] = value;
             }
 
-        public:
+        protected:
 
             typedef enum {
 
@@ -63,8 +63,6 @@ namespace hf {
                 BRUSHLESS
 
             } motor_type_t;
-
-        protected:
 
             motorMixer_t motorDirections[MAXMOTORS];
 
