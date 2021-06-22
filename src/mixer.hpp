@@ -8,10 +8,9 @@
 
 #pragma once
 
-#include "motor.hpp"
-
 #include <RFT_actuator.hpp>
 #include <RFT_filters.hpp>
+#include <rft_motors/rotary.hpp>
 
 namespace hf {
 
@@ -37,7 +36,7 @@ namespace hf {
 
             void writeMotor(uint8_t index, float value)
             {
-                _motors->write(index, value);
+                // _motors->write(index, value);
             }
 
             void safeWriteMotor(uint8_t index, float value)
@@ -50,14 +49,18 @@ namespace hf {
                 _motorsPrev[index] = value;
             }
 
-        // XXX protected:
-        public:
 
-            Motor * _motors;
+        protected:
+
+            rft::Motor * _motors;
 
             motorMixer_t motorDirections[MAXMOTORS];
 
-            Mixer(Motor * motors, uint8_t nmotors)
+            Mixer(void) 
+            {
+            }
+
+            Mixer(rft::Motor * motors, uint8_t nmotors)
             {
                 _motors = motors;
                 _nmotors = nmotors;
@@ -146,6 +149,17 @@ namespace hf {
             {
                 motorsDisarmed[index] = value;
             }
+
+
+        public:
+
+            typedef enum {
+
+                BRUSHED,
+                BRUSHLESS
+
+            } motor_type_t;
+
 
     }; // class Mixer
 
