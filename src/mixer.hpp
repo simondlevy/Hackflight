@@ -55,9 +55,27 @@ namespace hf {
                 _previousValues[index] = value;
             }
 
+        public:
+
+            typedef enum {
+
+                BRUSHED,
+                BRUSHLESS
+
+            } motor_type_t;
+
         protected:
 
             motorMixer_t motorDirections[MAXMOTORS];
+
+            Mixer(motor_type_t motortype)
+            {
+            }
+
+            // For simulation / testing
+            Mixer(void)
+            {
+            }
 
             void addMotor(rft::Motor * motor, uint8_t pin)
             {
@@ -134,17 +152,6 @@ namespace hf {
             {
                 _disarmedValues[index] = value;
             }
-
-
-        public:
-
-            typedef enum {
-
-                BRUSHED,
-                BRUSHLESS
-
-            } motor_type_t;
-
 
     }; // class Mixer
 

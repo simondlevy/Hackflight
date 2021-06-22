@@ -34,6 +34,7 @@ namespace hf {
         public:
 
             MixerQuadXMW(motor_type_t mtype, uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, uint8_t m4_pin)
+                : Mixer(mtype)
             {
                 construct();
             }
