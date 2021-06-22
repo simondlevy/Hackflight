@@ -20,16 +20,28 @@ namespace hf {
 
     class MixerQuadXMW : public Mixer {
 
-        public:
+        private:
 
-            MixerQuadXMW(motor_type_t mtype, uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, uint8_t m4_pin)
+            void construct(void)
             {
                 //                     Th  RR  PF  YR
                 motorDirections[0] = { +1, -1, +1, +1 };    // 1 right rear
                 motorDirections[1] = { +1, -1, -1, -1 };    // 2 right front
                 motorDirections[2] = { +1, +1, +1, -1 };    // 3 left rear
                 motorDirections[3] = { +1, +1, -1, +1 };    // 4 left front
-             }
+            }
+
+        public:
+
+            MixerQuadXMW(motor_type_t mtype, uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, uint8_t m4_pin)
+            {
+                construct();
+            }
+
+            MixerQuadXMW(void)
+            {
+                construct();
+            }
     };
 
 } // namespace
