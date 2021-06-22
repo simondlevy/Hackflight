@@ -56,7 +56,7 @@ void setup(void)
     h.addPidController(&yawPid);
 
     // Adjust trim
-    receiver.setTrimYaw(0.05);
+    receiver.setTrim(0, 0.05, 0.05);
 
     // Start Hackflight firmware
     h.begin();
