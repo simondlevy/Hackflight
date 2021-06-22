@@ -9,6 +9,7 @@
 #pragma once
 
 #include "mspparser.hpp"
+#include "receiver.hpp"
 
 #include <RFT_timertask.hpp>
 #include <RFT_actuator.hpp>
