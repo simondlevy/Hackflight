@@ -98,9 +98,6 @@ namespace hf {
             float _trimPitch = 0;
             float _trimYaw = 0;
 
-            // Default to non-headless mode
-            float headless = false;
-
             // Raw receiver values in [-1,+1]
             float rawvals[MAXCHAN] = {0};  
 
@@ -131,7 +128,7 @@ namespace hf {
                 _demandScale = demandScale;
             }
 
-            bool getDemands(float yawAngle)
+            bool ready(void)
             {
                 // Wait till there's a new frame
                 if (!gotNewFrame()) return false;
@@ -157,16 +154,6 @@ namespace hf {
                 demands[DEMANDS_ROLL]  += _trimRoll;
                 demands[DEMANDS_PITCH] += _trimPitch;
                 demands[DEMANDS_YAW]   += _trimYaw;
-
-                // Support headless mode
-                if (headless) {
-                    float c = cos(yawAngle);
-                    float s = sin(yawAngle);
-                    float p = demands[DEMANDS_PITCH];
-                    float r = demands[DEMANDS_ROLL];
-                    
-                    demands[DEMANDS_ROLL]  = c*r - s*p;
-                }
 
                 // Yaw demand needs to be reversed
                 demands[DEMANDS_YAW] = -demands[DEMANDS_YAW];
