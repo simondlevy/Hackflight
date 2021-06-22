@@ -102,7 +102,7 @@ namespace hf {
             float rawvals[MAXCHAN] = {0};  
 
             // Demands (throttle, roll, pitch, yaw)
-            float demands[4] = {};
+            float _demands[4] = {};
 
             float getRawval(uint8_t chan)
             {
@@ -137,29 +137,29 @@ namespace hf {
                 readRawvals();
 
                 // Convert raw [-1,+1] to absolute value
-                demands[DEMANDS_ROLL]  = makePositiveCommand(CHANNEL_ROLL);
-                demands[DEMANDS_PITCH] = makePositiveCommand(CHANNEL_PITCH);
-                demands[DEMANDS_YAW]   = makePositiveCommand(CHANNEL_YAW);
+                _demands[DEMANDS_ROLL]  = makePositiveCommand(CHANNEL_ROLL);
+                _demands[DEMANDS_PITCH] = makePositiveCommand(CHANNEL_PITCH);
+                _demands[DEMANDS_YAW]   = makePositiveCommand(CHANNEL_YAW);
 
                 // Apply expo nonlinearity to roll, pitch
-                demands[DEMANDS_ROLL]  = applyCyclicFunction(demands[DEMANDS_ROLL]);
-                demands[DEMANDS_PITCH] = applyCyclicFunction(demands[DEMANDS_PITCH]);
+                _demands[DEMANDS_ROLL]  = applyCyclicFunction(_demands[DEMANDS_ROLL]);
+                _demands[DEMANDS_PITCH] = applyCyclicFunction(_demands[DEMANDS_PITCH]);
 
                 // Put sign back on command, yielding [-0.5,+0.5]
-                demands[DEMANDS_ROLL]  = adjustCommand(demands[DEMANDS_ROLL], CHANNEL_ROLL);
-                demands[DEMANDS_PITCH] = adjustCommand(demands[DEMANDS_PITCH], CHANNEL_PITCH);
-                demands[DEMANDS_YAW]   = adjustCommand(demands[DEMANDS_YAW], CHANNEL_YAW);
+                _demands[DEMANDS_ROLL]  = adjustCommand(_demands[DEMANDS_ROLL], CHANNEL_ROLL);
+                _demands[DEMANDS_PITCH] = adjustCommand(_demands[DEMANDS_PITCH], CHANNEL_PITCH);
+                _demands[DEMANDS_YAW]   = adjustCommand(_demands[DEMANDS_YAW], CHANNEL_YAW);
 
                 // Add in software trim
-                demands[DEMANDS_ROLL]  += _trimRoll;
-                demands[DEMANDS_PITCH] += _trimPitch;
-                demands[DEMANDS_YAW]   += _trimYaw;
+                _demands[DEMANDS_ROLL]  += _trimRoll;
+                _demands[DEMANDS_PITCH] += _trimPitch;
+                _demands[DEMANDS_YAW]   += _trimYaw;
 
                 // Yaw demand needs to be reversed
-                demands[DEMANDS_YAW] = -demands[DEMANDS_YAW];
+                _demands[DEMANDS_YAW] = -_demands[DEMANDS_YAW];
 
                 // Pass throttle demand through exponential function
-                demands[DEMANDS_THROTTLE] = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
+                _demands[DEMANDS_THROTTLE] = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
 
                 // Store auxiliary switch state
                 _aux1State = getRawval(CHANNEL_AUX1) >= 0.0 ? (getRawval(CHANNEL_AUX1) > AUX_THRESHOLD ? 2 : 1) : 0;
@@ -168,7 +168,12 @@ namespace hf {
                 // Got a new frame
                 return true;
 
-            }  // getDemands
+            }  // ready
+
+            void getDemands(float * demands)
+            {
+                memcpy(demands, _demands, sizeof(_demands));
+            }
 
             bool throttleIsDown(void)
             {
