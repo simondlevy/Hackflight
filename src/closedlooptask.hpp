@@ -31,7 +31,7 @@ namespace hf {
             // Other stuff we need
             rft::OpenLoopController * _olc = NULL;
             rft::Actuator * _actuator = NULL;
-            State  * _state    = NULL;
+            rft::State  * _state    = NULL;
 
         protected:
 
@@ -41,7 +41,7 @@ namespace hf {
                 _controller_count = 0;
             }
 
-            void begin(rft::Board * board, rft::OpenLoopController * olc, rft::Actuator * actuator, State * state)
+            void begin(rft::Board * board, rft::OpenLoopController * olc, rft::Actuator * actuator, rft::State * state)
             {
                 rft::TimerTask::begin(board);
 
