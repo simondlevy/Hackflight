@@ -28,30 +28,31 @@ namespace hf {
 
         private:
 
+            // Safety
+            bool _safeToArm = false;
+
+            // Sensors 
+            rft::Sensor * _sensors[256] = {};
+            uint8_t _sensor_count = 0;
+
             // Supports periodic ad-hoc debugging
             rft::Debugger _debugger;
 
             // Actuator
             rft::Actuator * _actuator = NULL;
 
-            // Sensors 
-            rft::Sensor * _sensors[256] = {};
-            uint8_t _sensor_count = 0;
+            rft::Board  * _board = NULL;
 
-            // Safety
-            bool _safeToArm = false;
+            rft::OpenLoopController * _olc = NULL;
+
+            // Vehicle state
+            State _state;
 
             // Timer task for PID controllers
             PidTask _pidTask;
 
             // Serial timer task for GCS
             SerialTask _serialTask;
-
-            rft::Board  * _board = NULL;
-            Receiver * _receiver = NULL;
-
-            // Vehicle state
-            State _state;
 
             void checkSensors(void)
             {
@@ -64,10 +65,10 @@ namespace hf {
                 }
             }
 
-            void checkReceiver(void)
+            void checkOpenLoopController(void)
             {
                 // Sync failsafe to receiver
-                if (_receiver->lostSignal() && _state.armed) {
+                if (_olc->lostSignal() && _state.armed) {
                     _actuator->cut();
                     _state.armed = false;
                     _state.failsafe = true;
@@ -76,37 +77,37 @@ namespace hf {
                 }
 
                 // Check whether receiver data is available
-                if (!_receiver->ready()) return;
+                if (!_olc->ready()) return;
 
                 // Disarm
-                if (_state.armed && !_receiver->inArmedState()) {
+                if (_state.armed && !_olc->inArmedState()) {
                     _state.armed = false;
                 } 
 
                 // Avoid arming if aux1 switch down on startup
                 if (!_safeToArm) {
-                    _safeToArm = !_receiver->inArmedState();
+                    _safeToArm = !_olc->inArmedState();
                 }
 
                 // Arm after lots of safety checks
                 if (_safeToArm
                     && !_state.armed
-                    && _receiver->inactive()
-                    && _receiver->inArmedState()
+                    && _olc->inactive()
+                    && _olc->inArmedState()
                     && !_state.failsafe
                     && _state.safeToArm()) {
                     _state.armed = true;
                 }
 
                 // Cut motors on throttle-down
-                if (_state.armed && _receiver->inactive()) {
+                if (_state.armed && _olc->inactive()) {
                     _actuator->cut();
                 }
 
                 // Set LED based on arming status
                 _board->showArmedStatus(_state.armed);
 
-            } // checkReceiver
+            } // checkOpenLoopController
 
             void startSensors(void)
             {
@@ -117,11 +118,11 @@ namespace hf {
 
         public:
 
-            Hackflight(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
+            Hackflight(rft::Board * board, rft::OpenLoopController * olc, rft::Actuator * actuator)
             {  
                 // Store the essentials
                 _board = board;
-                _receiver = receiver;
+                _olc = olc;
                 _actuator = actuator;
 
                 // Support adding new sensors
@@ -140,16 +141,16 @@ namespace hf {
                 memset(&_state.x, 0, sizeof(_state.x));
 
                 // Start the receiver
-                _receiver->begin();
+                _olc->begin();
 
                 // Setup failsafe
                 _state.failsafe = false;
 
                 // Initialize timer task for PID controllers
-                _pidTask.begin(_board, _receiver, _actuator, &_state);
+                _pidTask.begin(_board, _olc, _actuator, &_state);
  
                 // Initialize serial timer task
-                _serialTask.begin(_board, &_state, _receiver, _actuator);
+                _serialTask.begin(_board, &_state, _olc, _actuator);
 
                 // Support safety override by simulator
                 _state.armed = armed;
@@ -175,7 +176,7 @@ namespace hf {
             void update(void)
             {
                 // Grab control signal if available
-                checkReceiver();
+                checkOpenLoopController();
 
                 // Update PID controllers task
                 _pidTask.update();

@@ -10,6 +10,7 @@
 
 #include <RFT_timertask.hpp>
 #include <RFT_actuator.hpp>
+#include <RFT_openloop.hpp>
 
 namespace hf {
 
@@ -28,7 +29,7 @@ namespace hf {
             uint8_t _pid_controller_count = 0;
 
             // Other stuff we need
-            Receiver * _receiver = NULL;
+            rft::OpenLoopController * _olc = NULL;
             rft::Actuator * _actuator = NULL;
             State  * _state    = NULL;
 
@@ -40,11 +41,11 @@ namespace hf {
                 _pid_controller_count = 0;
             }
 
-            void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
+            void begin(rft::Board * board, rft::OpenLoopController * olc, rft::Actuator * actuator, State * state)
             {
                 rft::TimerTask::begin(board);
 
-                _receiver = receiver;
+                _olc = olc;
                 _actuator = actuator;
                 _state = state;
             }
@@ -58,12 +59,12 @@ namespace hf {
 
             virtual void doTask(void) override
             {
-                // Start with demands from receiver, scaling roll/pitch/yaw by constant
+                // Start with demands from olc, scaling roll/pitch/yaw by constant
                 float demands[4] = {};
-                _receiver->getDemands(demands);
+                _olc->getDemands(demands);
 
                 // Each PID controllers is associated with at least one auxiliary switch state
-                uint8_t auxState = _receiver->getModeIndex();
+                uint8_t auxState = _olc->getModeIndex();
 
                 // Some PID controllers should cause LED to flash when they're active
                 bool shouldFlash = false;
@@ -73,7 +74,7 @@ namespace hf {
                     PidController * pidController = _pid_controllers[k];
 
                     // Some PID controllers need to reset their integral when the throttle is down
-                    pidController->resetOnInactivity(_receiver->inactive());
+                    pidController->resetOnInactivity(_olc->inactive());
 
                     if (pidController->modeIndex <= auxState) {
 
@@ -89,7 +90,7 @@ namespace hf {
                 _board->flashLed(shouldFlash);
 
                 // Use updated demands to run motors
-                if (_state->armed && !_state->failsafe && !_receiver->inactive()) {
+                if (_state->armed && !_state->failsafe && !_olc->inactive()) {
                     _actuator->run(demands);
                 }
              }

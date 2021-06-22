@@ -13,6 +13,7 @@
 #include <RFT_timertask.hpp>
 #include <RFT_actuator.hpp>
 #include <RFT_board.hpp>
+#include <RFT_openloop.hpp>
 
 namespace hf {
 
@@ -25,7 +26,7 @@ namespace hf {
             static constexpr float FREQ = 66;
 
             rft::Actuator * _actuator = NULL;
-            Receiver * _receiver = NULL;
+            rft::OpenLoopController * _olc = NULL;
             State  * _state = NULL;
 
             void (*_actuatorfun)(State * state, rft::Actuator * actuator);
@@ -43,14 +44,14 @@ namespace hf {
                 (void)actuator;
             }
 
-            void _begin(rft::Board * board, State * state, Receiver * receiver) 
+            void _begin(rft::Board * board, State * state, rft::OpenLoopController * olc) 
             {
                 rft::TimerTask::begin(board);
 
                 MspParser::begin();
 
                 _state = state;
-                _receiver = receiver;
+                _olc = olc;
              }
 
         protected:
@@ -90,7 +91,7 @@ namespace hf {
             virtual void handle_SET_ARMED(uint8_t  flag) override
             {
                 if (flag) {  // got arming command: arm only if throttle is down
-                    if (_receiver->inactive()) {
+                    if (_olc->inactive()) {
                         _state->armed = true;
                     }
                 }
@@ -101,12 +102,14 @@ namespace hf {
 
             virtual void handle_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
             {
-                c1 = _receiver->getRawval(0);
-                c2 = _receiver->getRawval(1);
-                c3 = _receiver->getRawval(2);
-                c4 = _receiver->getRawval(3);
-                c5 = _receiver->getRawval(4);
-                c6 = _receiver->getRawval(5);
+                Receiver * receiver = (Receiver *)_olc;
+
+                c1 = receiver->getRawval(0);
+                c2 = receiver->getRawval(1);
+                c3 = receiver->getRawval(2);
+                c4 = receiver->getRawval(3);
+                c5 = receiver->getRawval(4);
+                c6 = receiver->getRawval(5);
             }
 
             void handle_ACTUATOR_TYPE_Request(uint8_t & type) override
@@ -134,15 +137,15 @@ namespace hf {
             {
             }
 
-            void begin(rft::Board * board, State * state, Receiver * receiver) 
+            void begin(rft::Board * board, State * state, rft::OpenLoopController * olc) 
             {
-                _begin(board, state, receiver);
+                _begin(board, state, olc);
                 _actuatorfun = _actuatorfunProxy;
             }
 
-            void begin(rft::Board * board, State * state, Receiver * receiver, rft::Actuator * actuator) 
+            void begin(rft::Board * board, State * state, rft::OpenLoopController *olc, rft::Actuator * actuator) 
             {
-                begin(board, state, receiver);
+                begin(board, state, olc);
                 _actuator = actuator;
                 _actuatorfun = _actuatorfunFull;
             }
