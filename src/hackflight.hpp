@@ -14,7 +14,6 @@
 #include "pidcontroller.hpp"
 #include "motor.hpp"
 #include "serialtask.hpp"
-#include "closedlooptask.hpp"
 
 #include <RFT_board.hpp>
 #include <RFT_sensor.hpp>
@@ -50,7 +49,7 @@ namespace hf {
             State _state;
 
             // Timer task for PID controllers
-            ClosedLoopTask _closedLoopTask;
+            rft::ClosedLoopTask _closedLoopTask;
 
             // Serial timer task for GCS
             SerialTask _serialTask;
