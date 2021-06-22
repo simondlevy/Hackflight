@@ -1,156 +1,132 @@
 /*
    Timer task for serial comms
 
-   Copyright (C) 2020 Simon D. Levy
-
    MIT License
  */
 
 #pragma once
 
-#include "mspparser.hpp"
-#include "receiver.hpp"
-
 #include <RFT_timertask.hpp>
-#include <RFT_actuator.hpp>
 #include <RFT_board.hpp>
-#include <RFT_openloop.hpp>
+#include <RFT_debugger.hpp>
+#include <RFT_actuator.hpp>
+#include <RFT_parser.hpp>
+#include <rft_timertasks/serialtask.hpp>
+
+#include "mixer.hpp"
 
 namespace hf {
 
-    class SerialTask : public rft::TimerTask, public MspParser {
+
+    class SerialTask : public rft::SerialTask {
 
         friend class Hackflight;
 
         private:
 
-            static constexpr float FREQ = 66;
+        void handle_RECEIVER_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
+        {
+            Receiver * receiver = (Receiver *)_olc;
 
-            rft::Actuator * _actuator = NULL;
-            rft::OpenLoopController * _olc = NULL;
-            State  * _state = NULL;
+            c1 = receiver->getRawval(0);
+            c2 = receiver->getRawval(1);
+            c3 = receiver->getRawval(2);
+            c4 = receiver->getRawval(3);
+            c5 = receiver->getRawval(4);
+            c6 = receiver->getRawval(5);
+        }
 
-            void (*_actuatorfun)(State * state, rft::Actuator * actuator);
+        void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw)
+        {
+            // Cast rft::State to hf::State
+            State * state = (State *)_state;
 
-            static void _actuatorfunFull(State * state, rft::Actuator * actuator)
-            {
-                if (!state->armed) {
-                    actuator->runDisarmed();
-                }
-            }
+            roll  = state->x[State::PHI];
+            pitch = state->x[State::THETA];
+            yaw   = state->x[State::PSI];
+        }
 
-            static void _actuatorfunProxy(State * state, rft::Actuator * actuator)
-            {
-                (void)state;
-                (void)actuator;
-            }
+        void handle_ACTUATOR_TYPE_Request(uint8_t & type)
+        {
+            type = _actuator->getType();
+        }
 
-            void _begin(rft::Board * board, State * state, rft::OpenLoopController * olc) 
-            {
-                rft::TimerTask::begin(board);
-
-                MspParser::begin();
-
-                _state = state;
-                _olc = olc;
-             }
+        void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4)
+        {
+            _actuator->setMotorDisarmed(0, m1);
+            _actuator->setMotorDisarmed(1, m2);
+            _actuator->setMotorDisarmed(2, m3);
+            _actuator->setMotorDisarmed(3, m4);
+        }
 
         protected:
 
-            // TimerTask overrides -------------------------------------------------------
+        void dispatchMessage(void) override
+        {
+            switch (_command) {
 
-            virtual void doTask(void) override
-            {
-                while (_board->serialAvailableBytes() > 0) {
+                case 121:
+                    {
+                        float c1 = 0;
+                        float c2 = 0;
+                        float c3 = 0;
+                        float c4 = 0;
+                        float c5 = 0;
+                        float c6 = 0;
+                        handle_RECEIVER_Request(c1, c2, c3, c4, c5, c6);
+                        prepareToSendFloats(6);
+                        sendFloat(c1);
+                        sendFloat(c2);
+                        sendFloat(c3);
+                        sendFloat(c4);
+                        sendFloat(c5);
+                        sendFloat(c6);
+                        serialize8(_checksum);
+                    } break;
 
-                    MspParser::parse(_board->serialReadByte());
-                }
+                case 122:
+                    {
+                        float roll = 0;
+                        float pitch = 0;
+                        float yaw = 0;
+                        handle_ATTITUDE_RADIANS_Request(roll, pitch, yaw);
+                        prepareToSendFloats(3);
+                        sendFloat(roll);
+                        sendFloat(pitch);
+                        sendFloat(yaw);
+                        serialize8(_checksum);
+                    } break;
 
-                while (MspParser::availableBytes() > 0) {
-                    _board->serialWriteByte(MspParser::readByte());
-                }
+                    case 123:
+                        {
+                            uint8_t type = 0;
+                            handle_ACTUATOR_TYPE_Request(type);
+                            prepareToSendBytes(1);
+                            sendByte(type);
+                            serialize8(_checksum);
+                        } break;
 
-                // Support motor testing from GCS
-                _actuatorfun(_state, _actuator);
-            }
+                case 215:
+                    {
+                        float m1 = 0;
+                        memcpy(&m1,  &_inBuf[0], sizeof(float));
 
-            // MspParser overrides -------------------------------------------------------
+                        float m2 = 0;
+                        memcpy(&m2,  &_inBuf[4], sizeof(float));
 
-            virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 
-                    float & heading, float & velocityForward, float & velocityRightward) override
-            {
-                // XXX Use only heading for now
-                altitude = 0;
-                variometer = 0;
-                positionX = 0;
-                positionY = 0;
-                heading = -_state->x[State::PSI]; // NB: Angle negated for remote visualization
-                velocityForward = 0;
-                velocityRightward = 0;
-            }
- 
-            virtual void handle_SET_ARMED(uint8_t  flag) override
-            {
-                if (flag) {  // got arming command: arm only if throttle is down
-                    if (_olc->inactive()) {
-                        _state->armed = true;
-                    }
-                }
-                else {          // got disarming command: always disarm
-                    _state->armed = false;
-                }
-            }
+                        float m3 = 0;
+                        memcpy(&m3,  &_inBuf[8], sizeof(float));
 
-            virtual void handle_RC_NORMAL_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6) override
-            {
-                Receiver * receiver = (Receiver *)_olc;
+                        float m4 = 0;
+                        memcpy(&m4,  &_inBuf[12], sizeof(float));
 
-                c1 = receiver->getRawval(0);
-                c2 = receiver->getRawval(1);
-                c3 = receiver->getRawval(2);
-                c4 = receiver->getRawval(3);
-                c5 = receiver->getRawval(4);
-                c6 = receiver->getRawval(5);
-            }
+                        handle_SET_MOTOR_NORMAL(m1, m2, m3, m4);
+                    } break;
 
-            void handle_ACTUATOR_TYPE_Request(uint8_t & type) override
-            {
-                type = 0; // XXX _actuator->getType();
-            }
+            } // switch (_command)
 
-            virtual void handle_ATTITUDE_RADIANS_Request(float & roll, float & pitch, float & yaw) override
-            {
-                roll  = _state->x[State::PHI];
-                pitch = _state->x[State::THETA];
-                yaw   = _state->x[State::PSI];
-            }
+        } // dispatchMessage 
 
-            virtual void handle_SET_MOTOR_NORMAL(float  m1, float  m2, float  m3, float  m4) override
-            {
-                _actuator->setMotorDisarmed(0, m1);
-                _actuator->setMotorDisarmed(1, m2);
-                _actuator->setMotorDisarmed(2, m3);
-                _actuator->setMotorDisarmed(3, m4);
-            }
-
-            SerialTask(void)
-                : rft::TimerTask(FREQ)
-            {
-            }
-
-            void begin(rft::Board * board, State * state, rft::OpenLoopController * olc) 
-            {
-                _begin(board, state, olc);
-                _actuatorfun = _actuatorfunProxy;
-            }
-
-            void begin(rft::Board * board, State * state, rft::OpenLoopController *olc, rft::Actuator * actuator) 
-            {
-                begin(board, state, olc);
-                _actuator = actuator;
-                _actuatorfun = _actuatorfunFull;
-            }
-
-    };  // SerialTask
+    }; // class SerialTask
 
 } // namespace hf
