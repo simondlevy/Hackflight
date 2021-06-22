@@ -77,9 +77,8 @@ namespace hf {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     _disarmedValues[i] = 0;
                     _previousValues[i] = 0;
+                    _motors[i]->begin();
                 }
-
-                // _motors->begin();
             }
 
             // This is how we can spin the motors from the GCS

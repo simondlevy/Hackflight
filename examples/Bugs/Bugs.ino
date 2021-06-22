@@ -41,10 +41,10 @@ static rft::TinyPico board;
 
 // Motors  ==============================================================================
 
-static rft::BrushlessMotor motor1 = rft::BrushlessMotor(25);
-static rft::BrushlessMotor motor2 = rft::BrushlessMotor(26);
-static rft::BrushlessMotor motor3 = rft::BrushlessMotor(27);
-static rft::BrushlessMotor motor4 = rft::BrushlessMotor(15);
+static rft::BrushlessMotorEsp32 motor1 = rft::BrushlessMotorEsp32(25);
+static rft::BrushlessMotorEsp32 motor2 = rft::BrushlessMotorEsp32(26);
+static rft::BrushlessMotorEsp32 motor3 = rft::BrushlessMotorEsp32(27);
+static rft::BrushlessMotorEsp32 motor4 = rft::BrushlessMotorEsp32(15);
 
 // Mixer ================================================================================
 
