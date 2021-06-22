@@ -28,8 +28,6 @@ namespace hf {
 
         private:
 
-            static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
-
             // Supports periodic ad-hoc debugging
             rft::Debugger _debugger;
 
@@ -48,11 +46,6 @@ namespace hf {
 
             // Serial timer task for GCS
             SerialTask _serialTask;
-
-            bool safeAngle(uint8_t axis)
-            {
-                return fabs(_state.x[axis]) < rft::Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
-            }
 
             rft::Board  * _board = NULL;
             Receiver * _receiver = NULL;
@@ -95,9 +88,13 @@ namespace hf {
                     _safeToArm = !_receiver->inArmedState();
                 }
 
-                // Arm (after lots of safety checks!)
-                if (_safeToArm && !_state.armed && _receiver->inactive() && _receiver->inArmedState() && 
-                        !_state.failsafe && safeAngle(State::PHI) && safeAngle(State::THETA)) {
+                // Arm after lots of safety checks
+                if (_safeToArm
+                    && !_state.armed
+                    && _receiver->inactive()
+                    && _receiver->inArmedState()
+                    && !_state.failsafe
+                    && _state.safeToArm()) {
                     _state.armed = true;
                 }
 
