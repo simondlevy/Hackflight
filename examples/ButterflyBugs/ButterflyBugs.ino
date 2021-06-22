@@ -36,10 +36,10 @@ static rft::Butterfly board;
 
 // Motors  ==============================================================================
 
-static rft::BrushlessMotorEsp32 motor1 = rft::BrushlessMotorEsp32(11);
-static rft::BrushlessMotorEsp32 motor2 = rft::BrushlessMotorEsp32(9);
-static rft::BrushlessMotorEsp32 motor3 = rft::BrushlessMotorEsp32(8);
-static rft::BrushlessMotorEsp32 motor4 = rft::BrushlessMotorEsp32(5);
+static rft::BrushlessMotor motor1 = rft::BrushlessMotor(11);
+static rft::BrushlessMotor motor2 = rft::BrushlessMotor(9);
+static rft::BrushlessMotor motor3 = rft::BrushlessMotor(8);
+static rft::BrushlessMotor motor4 = rft::BrushlessMotor(5);
 
 // Mixer ================================================================================
 
