@@ -50,9 +50,9 @@ namespace hf {
                 _state = state;
             }
 
-            void addController(PidController * controller, uint8_t auxState) 
+            void addController(PidController * controller, uint8_t modeIndex) 
             {
-                controller->modeIndex = auxState;
+                controller->modeIndex = modeIndex;
 
                 _controllers[_controller_count++] = controller;
             }
@@ -63,8 +63,8 @@ namespace hf {
                 float demands[4] = {};
                 _olc->getDemands(demands);
 
-                // Each PID controllers is associated with at least one auxiliary switch state
-                uint8_t auxState = _olc->getModeIndex();
+                // Each PID controllers is associated with at least one mode
+                uint8_t modeIndex = _olc->getModeIndex();
 
                 // Some PID controllers should cause LED to flash when they're active
                 bool shouldFlash = false;
@@ -76,7 +76,7 @@ namespace hf {
                     // Some PID controllers need to reset their integral when the throttle is down
                     controller->resetOnInactivity(_olc->inactive());
 
-                    if (controller->modeIndex <= auxState) {
+                    if (controller->modeIndex <= modeIndex) {
 
                         controller->modifyDemands(_state, demands); 
 
