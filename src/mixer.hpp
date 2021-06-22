@@ -32,7 +32,13 @@ namespace hf {
             // Arbitrary
             static const uint8_t MAXMOTORS = 20;
 
-            float _motorsPrev[MAXMOTORS] = {0};
+            rft::RotaryMotor * _motors[MAXMOTORS] = {};
+
+            float _previousValues[MAXMOTORS] = {};
+
+            float  _disarmedValues[MAXMOTORS];
+
+            uint8_t _nmotors;
 
             void writeMotor(uint8_t index, float value)
             {
@@ -42,63 +48,42 @@ namespace hf {
             void safeWriteMotor(uint8_t index, float value)
             {
                 // Avoid sending the motor the same value over and over
-                if (_motorsPrev[index] != value) {
+                if (_previousValues[index] != value) {
                     writeMotor(index, value);
                 }
 
-                _motorsPrev[index] = value;
+                _previousValues[index] = value;
             }
-
 
         protected:
 
-            rft::Motor * _motors;
-
             motorMixer_t motorDirections[MAXMOTORS];
 
-            Mixer(void) 
+            void addMotor(rft::Motor * motor, uint8_t pin)
             {
+                _motors[_nmotors++] = NULL; // XXX
             }
 
-            Mixer(rft::Motor * motors, uint8_t nmotors)
-            {
-                _motors = motors;
-                _nmotors = nmotors;
-
-                // set disarmed, previous motor values
-                for (uint8_t i = 0; i < nmotors; i++) {
-                    motorsDisarmed[i] = 0;
-                    _motorsPrev[i] = 0;
-                }
-
-            }
-
-            uint8_t _nmotors;
-
-            // This is also use by serial task
-            float  motorsDisarmed[MAXMOTORS];
+            // Actuator overrides ----------------------------------------------
 
             void begin(void) override
             {
-                _motors->begin();
+                // set disarmed, previous motor values
+                for (uint8_t i = 0; i < _nmotors; i++) {
+                    _disarmedValues[i] = 0;
+                    _previousValues[i] = 0;
+                }
+
+                // _motors->begin();
             }
 
             // This is how we can spin the motors from the GCS
             void runDisarmed(void) override
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
-                    safeWriteMotor(i, motorsDisarmed[i]);
+                    safeWriteMotor(i, _disarmedValues[i]);
                 }
             }
-
-            // This helps support servos
-            virtual float constrainMotorValue(uint8_t index, float value) 
-            {
-                (void)index;
-                return rft::Filter::constrainMinMax(value, 0, 1);
-            }
-
-            // Actuator overrides ----------------------------------------------
 
             void run(float * demands) override
             {
@@ -130,7 +115,7 @@ namespace hf {
                     }
 
                     // Keep motor values in appropriate interval
-                    motorvals[i] = constrainMotorValue(i, motorvals[i]);
+                    motorvals[i] = rft::Filter::constrainMinMax(motorvals[i], 0, 1);
                 }
 
                 for (uint8_t i = 0; i < _nmotors; i++) {
@@ -147,7 +132,7 @@ namespace hf {
 
             virtual void setMotorDisarmed(uint8_t index, float value) override
             {
-                motorsDisarmed[index] = value;
+                _disarmedValues[index] = value;
             }
 
 
