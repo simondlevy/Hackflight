@@ -63,7 +63,7 @@ namespace hf {
                 _receiver->getDemands(demands);
 
                 // Each PID controllers is associated with at least one auxiliary switch state
-                uint8_t auxState = _receiver->getAux2State();
+                uint8_t auxState = _receiver->getModeIndex();
 
                 // Some PID controllers should cause LED to flash when they're active
                 bool shouldFlash = false;
@@ -73,7 +73,7 @@ namespace hf {
                     PidController * pidController = _pid_controllers[k];
 
                     // Some PID controllers need to reset their integral when the throttle is down
-                    pidController->resetOnInactivity(_receiver->throttleIsDown());
+                    pidController->resetOnInactivity(_receiver->inactive());
 
                     if (pidController->modeIndex <= auxState) {
 
@@ -89,7 +89,7 @@ namespace hf {
                 _board->flashLed(shouldFlash);
 
                 // Use updated demands to run motors
-                if (_state->armed && !_state->failsafe && !_receiver->throttleIsDown()) {
+                if (_state->armed && !_state->failsafe && !_receiver->inactive()) {
                     _actuator->run(demands);
                 }
              }

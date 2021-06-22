@@ -90,7 +90,7 @@ namespace hf {
             virtual void handle_SET_ARMED(uint8_t  flag) override
             {
                 if (flag) {  // got arming command: arm only if throttle is down
-                    if (_receiver->throttleIsDown()) {
+                    if (_receiver->inactive()) {
                         _state->armed = true;
                     }
                 }

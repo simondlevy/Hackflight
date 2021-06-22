@@ -13,9 +13,11 @@
 
 #include "demands.hpp"
 
+#include <RFT_openloop.hpp>
+
 namespace hf {
 
-    class Receiver {
+    class Receiver : public rft::OpenLoopController {
 
         friend class Hackflight;
         friend class SerialTask;
@@ -90,9 +92,6 @@ namespace hf {
             virtual bool gotNewFrame(void) = 0;
             virtual void readRawvals(void) = 0;
 
-            // This can be overridden optionally
-            virtual void begin(void) { }
-
             // Software trim
             float _trimRoll = 0;
             float _trimPitch = 0;
@@ -108,9 +107,6 @@ namespace hf {
             {
                 return rawvals[_channelMap[chan]];
             }
-
-            // Override this if your receiver provides RSSI or other weak-signal detection
-            virtual bool lostSignal(void) { return false; }
 
             /**
               * channelMap: throttle, roll, pitch, yaw, aux, arm
@@ -128,7 +124,7 @@ namespace hf {
                 _demandScale = demandScale;
             }
 
-            bool ready(void)
+            virtual bool ready(void) override
             {
                 // Wait till there's a new frame
                 if (!gotNewFrame()) return false;
@@ -175,22 +171,22 @@ namespace hf {
 
             }  // ready
 
-            void getDemands(float * demands)
+            virtual void getDemands(float * demands) override
             {
                 memcpy(demands, _demands, sizeof(_demands));
             }
 
-            bool throttleIsDown(void)
+            virtual bool inactive(void) override
             {
                 return getRawval(CHANNEL_THROTTLE) < -1 + THROTTLE_MARGIN;
             }
 
-            virtual uint8_t getAux1State(void)
+            virtual bool inArmedState(void) override
             {
-                return _aux1State;
+                return _aux1State > 0;
             }
 
-            virtual uint8_t getAux2State(void)
+            virtual uint8_t getModeIndex(void) override
             {
                 return _aux2State;
             }
