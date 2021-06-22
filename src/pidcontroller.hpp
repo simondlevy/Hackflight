@@ -18,7 +18,8 @@ namespace hf {
 
         friend class PidTask;
 
-        protected:
+        // XXX protected:
+        public:
 
             virtual void modifyDemands(rft::State * state, float * demands) override
             {

@@ -13,14 +13,15 @@
 #include "state.hpp"
 #include "pidcontroller.hpp"
 #include "motor.hpp"
-#include "pidtask.hpp"
 #include "serialtask.hpp"
+#include "closedlooptask.hpp"
 
 #include <RFT_board.hpp>
 #include <RFT_sensor.hpp>
 #include <RFT_actuator.hpp>
 #include <RFT_debugger.hpp>
 #include <RFT_filters.hpp>
+#include <rft_timertasks/closedlooptask.hpp>
 
 namespace hf {
 
@@ -49,7 +50,7 @@ namespace hf {
             State _state;
 
             // Timer task for PID controllers
-            PidTask _pidTask;
+            ClosedLoopTask _closedLoopTask;
 
             // Serial timer task for GCS
             SerialTask _serialTask;
@@ -147,7 +148,7 @@ namespace hf {
                 _state.failsafe = false;
 
                 // Initialize timer task for PID controllers
-                _pidTask.begin(_board, _olc, _actuator, &_state);
+                _closedLoopTask.begin(_board, _olc, _actuator, &_state);
  
                 // Initialize serial timer task
                 _serialTask.begin(_board, &_state, _olc, _actuator);
@@ -170,7 +171,7 @@ namespace hf {
 
             void addPidController(PidController * pidController, uint8_t auxState=0) 
             {
-                _pidTask.addPidController(pidController, auxState);
+                _closedLoopTask.addController(pidController, auxState);
             }
 
             void update(void)
@@ -179,7 +180,7 @@ namespace hf {
                 checkOpenLoopController();
 
                 // Update PID controllers task
-                _pidTask.update();
+                _closedLoopTask.update();
 
                 // Check sensors
                 checkSensors();

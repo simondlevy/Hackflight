@@ -14,7 +14,7 @@
 
 namespace hf {
 
-    class PidTask : public rft::TimerTask {
+    class ClosedLoopTask : public rft::TimerTask {
 
         friend class Hackflight;
 
@@ -25,8 +25,8 @@ namespace hf {
             static constexpr float FREQ = 300;
 
             // PID controllers
-            PidController * _pid_controllers[256] = {};
-            uint8_t _pid_controller_count = 0;
+            PidController * _controllers[256] = {};
+            uint8_t _controller_count = 0;
 
             // Other stuff we need
             rft::OpenLoopController * _olc = NULL;
@@ -35,10 +35,10 @@ namespace hf {
 
         protected:
 
-            PidTask(void)
+            ClosedLoopTask(void)
                 : rft::TimerTask(FREQ)
             {
-                _pid_controller_count = 0;
+                _controller_count = 0;
             }
 
             void begin(rft::Board * board, rft::OpenLoopController * olc, rft::Actuator * actuator, State * state)
@@ -50,11 +50,11 @@ namespace hf {
                 _state = state;
             }
 
-            void addPidController(PidController * pidController, uint8_t auxState) 
+            void addController(PidController * controller, uint8_t auxState) 
             {
-                pidController->modeIndex = auxState;
+                controller->modeIndex = auxState;
 
-                _pid_controllers[_pid_controller_count++] = pidController;
+                _controllers[_controller_count++] = controller;
             }
 
             virtual void doTask(void) override
@@ -69,18 +69,18 @@ namespace hf {
                 // Some PID controllers should cause LED to flash when they're active
                 bool shouldFlash = false;
 
-                for (uint8_t k=0; k<_pid_controller_count; ++k) {
+                for (uint8_t k=0; k<_controller_count; ++k) {
 
-                    PidController * pidController = _pid_controllers[k];
+                    PidController * controller = _controllers[k];
 
                     // Some PID controllers need to reset their integral when the throttle is down
-                    pidController->resetOnInactivity(_olc->inactive());
+                    controller->resetOnInactivity(_olc->inactive());
 
-                    if (pidController->modeIndex <= auxState) {
+                    if (controller->modeIndex <= auxState) {
 
-                        pidController->modifyDemands(_state, demands); 
+                        controller->modifyDemands(_state, demands); 
 
-                        if (pidController->shouldFlashLed()) {
+                        if (controller->shouldFlashLed()) {
                             shouldFlash = true;
                         }
                     }
@@ -95,6 +95,6 @@ namespace hf {
                 }
              }
 
-    };  // PidTask
+    };  // ClosedLoopTask
 
 } // namespace hf
