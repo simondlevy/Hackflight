@@ -11,7 +11,7 @@
 
        https://github.com/simondlevy/grumpyoldpizza
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (C) 2021 Simon D. Levy
 
    MIT License
 
@@ -33,7 +33,7 @@ static hf::LadybugFC board;
 
 static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
-static hf::MixerQuadXMW mixer(&hf::ladybugFcMotors);
+static hf::MixerQuadXMW mixer = hf::MixerQuadXMW(hf::Mixer::BRUSHED, 13, A2, 3, 11);
 
 static hf::Hackflight h = hf::Hackflight(&board, &receiver, &mixer);
 
