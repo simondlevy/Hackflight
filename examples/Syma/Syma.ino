@@ -26,23 +26,46 @@
 #include "pidcontrollers/level.hpp"
 #include "sensors/usfs.hpp"
 
+#include <rft_motors/rotary/brushed.hpp>
+
+// Receiver ============================================================================
+
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 4.0f;
 
-static hf::LadybugFC board;
-
 static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);  
 
-static hf::BrushedMixerQuadXMW mixer = hf::BrushedMixerQuadXMW(13, A2, 3, 11);
+// Board ================================================================================
+
+static hf::LadybugFC board;
+
+// Motors  ==============================================================================
+
+static rft::BrushedMotor motor1 = rft::BrushedMotor(13);
+static rft::BrushedMotor motor2 = rft::BrushedMotor(A2);
+static rft::BrushedMotor motor3 = rft::BrushedMotor(3);
+static rft::BrushedMotor motor4 = rft::BrushedMotor(11);
+
+// Mixer ================================================================================
+
+static hf::MixerQuadXMW mixer = hf::MixerQuadXMW(&motor1, &motor2, &motor3, &motor4);
+
+// Hackflight object ====================================================================
 
 static hf::Hackflight h = hf::Hackflight(&board, &receiver, &mixer);
+
+// PID controllers ======================================================================
 
 static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
 static hf::YawPid yawPid = hf::YawPid(1.0625, 0.005625f);
 static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
+// Sensors ==============================================================================
+
 static hf::UsfsGyrometer gyrometer;
 static hf::UsfsQuaternion quaternion; // not really a sensor, but we treat it like one!
+
+// Setup ==============================================================================
 
 void setup(void)
 {
@@ -61,6 +84,8 @@ void setup(void)
     // Start Hackflight firmware
     h.begin();
 }
+
+// Loop ===============================================================================
 
 void loop(void)
 {

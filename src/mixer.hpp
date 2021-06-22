@@ -10,7 +10,7 @@
 
 #include <RFT_actuator.hpp>
 #include <RFT_filters.hpp>
-#include <RFT_motors.hpp>
+#include <rft_motors/rotary.hpp>
 
 namespace hf {
 
@@ -32,15 +32,17 @@ namespace hf {
             // Arbitrary
             static const uint8_t MAXMOTORS = 20;
 
+            // XXX make a class for this, or migrate it to rft::Motor
+            rft::RotaryMotor * _motors[MAXMOTORS] = {};
             uint8_t _pins[MAXMOTORS] = {};
             float _previousValues[MAXMOTORS] = {};
             float  _disarmedValues[MAXMOTORS];
 
-            uint8_t _nmotors;
+            uint8_t _nmotors = 0;
 
             void writeMotor(uint8_t index, float value)
             {
-                // _motors->write(index, value);
+                _motors[index]->write(value);
             }
 
             void safeWriteMotor(uint8_t index, float value)
@@ -55,30 +57,16 @@ namespace hf {
 
         protected:
 
-            typedef enum {
-
-                BRUSHED,
-                BRUSHLESS
-
-            } motor_type_t;
-
-            motor_type_t _motor_type;
-
             motorMixer_t motorDirections[MAXMOTORS];
 
-            Mixer(motor_type_t motor_type)
-            {
-                _motor_type = motor_type;
-            }
-
-            // For simulation / testing
             Mixer(void)
             {
+                _nmotors = 0;
             }
 
-            void addMotor(uint8_t pin)
+            void addMotor(rft::RotaryMotor * motor)
             {
-                _nmotors++;
+                _motors[_nmotors++] = motor;
             }
 
             // Actuator overrides ----------------------------------------------

@@ -2,9 +2,9 @@
    Mixer subclass for X-configuration quadcopters following the MultiWii numbering convention:
 
    4cw   2ccw
-   \ /
-   ^
-   / \
+      \ /
+       ^
+      / \
    3ccw  1cw
 
    Copyright (c) 2018 Simon D. Levy
@@ -15,6 +15,8 @@
 #pragma once
 
 #include "mixer.hpp"
+
+#include <rft_motors/rotary.hpp>
 
 namespace hf {
 
@@ -31,35 +33,26 @@ namespace hf {
                 motorDirections[3] = { +1, +1, -1, +1 };    // 4 left front
             }
 
-            MixerQuadXMW(motor_type_t mtype, uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, uint8_t m4_pin)
-                : Mixer(mtype)
+        public:
+
+            MixerQuadXMW(
+                    rft::RotaryMotor * motor1,
+                    rft::RotaryMotor * motor2,
+                    rft::RotaryMotor * motor3,
+                    rft::RotaryMotor * motor4)
             {
+                Mixer::addMotor(motor1);
+                Mixer::addMotor(motor2);
+                Mixer::addMotor(motor3);
+                Mixer::addMotor(motor4);
+
                 construct();
             }
 
+            // For simulation / testing
             MixerQuadXMW(void)
             {
                 construct();
-            }
-    };
-
-    class BrushedMixerQuadXMW : public MixerQuadXMW {
-
-        public:
-
-            BrushedMixerQuadXMW(uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, uint8_t m4_pin)
-                : MixerQuadXMW(Mixer::BRUSHED, m1_pin, m2_pin, m3_pin, m4_pin)
-            {
-            }
-    };
-
-    class BrushlessMixerQuadXMW : public MixerQuadXMW {
-
-        public:
-
-            BrushlessMixerQuadXMW(uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, uint8_t m4_pin)
-                : MixerQuadXMW(Mixer::BRUSHLESS, m1_pin, m2_pin, m3_pin, m4_pin)
-            {
             }
     };
 
