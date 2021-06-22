@@ -10,7 +10,7 @@
 
 #include <RFT_actuator.hpp>
 #include <RFT_filters.hpp>
-#include <rft_motors/rotary.hpp>
+#include <RFT_motors.hpp>
 
 namespace hf {
 
@@ -32,10 +32,8 @@ namespace hf {
             // Arbitrary
             static const uint8_t MAXMOTORS = 20;
 
-            rft::RotaryMotor * _motors[MAXMOTORS] = {};
-
+            uint8_t _pins[MAXMOTORS] = {};
             float _previousValues[MAXMOTORS] = {};
-
             float  _disarmedValues[MAXMOTORS];
 
             uint8_t _nmotors;
@@ -78,9 +76,9 @@ namespace hf {
             {
             }
 
-            void addMotor(rft::Motor * motor, uint8_t pin)
+            void addMotor(uint8_t pin)
             {
-                _motors[_nmotors++] = NULL; // XXX
+                _nmotors++;
             }
 
             // Actuator overrides ----------------------------------------------

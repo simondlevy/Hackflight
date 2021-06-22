@@ -21,7 +21,6 @@
 #include "sensors/usfs.hpp"
 
 #include <rft_boards/realboards/tinypico.hpp>
-#include <rft_motors/rotary.hpp>
 
 static const uint8_t SERIAL1_RX = 32;
 static const uint8_t SERIAL1_TX = 33; // unused
