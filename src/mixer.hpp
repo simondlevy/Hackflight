@@ -12,7 +12,7 @@
 
 #include <RFT_actuator.hpp>
 #include <RFT_filters.hpp>
-#include <rft_motors/rotary.hpp>
+#include <rft_motor.hpp>
 
 namespace hf {
 
@@ -35,7 +35,7 @@ namespace hf {
             static const uint8_t MAXMOTORS = 20;
 
             // XXX make a class for this, or migrate it to rft::Motor
-            rft::RotaryMotor * _motors[MAXMOTORS] = {};
+            rft::Motor * _motors[MAXMOTORS] = {};
             float _previousValues[MAXMOTORS] = {};
             float  _disarmedValues[MAXMOTORS];
 
@@ -65,7 +65,7 @@ namespace hf {
                 _nmotors = 0;
             }
 
-            void addMotor(rft::RotaryMotor * motor)
+            void addMotor(rft::Motor * motor)
             {
                 _motors[_nmotors++] = motor;
             }
