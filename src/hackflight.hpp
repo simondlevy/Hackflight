@@ -9,9 +9,9 @@
 #pragma once
 
 #include <RoboFirmwareToolkit.hpp>
-#include <rft_board.hpp>
-#include <rft_openloop.hpp>
-#include <rft_actuator.hpp>
+#include <RFT_board.hpp>
+#include <RFT_openloop.hpp>
+#include <RFT_actuator.hpp>
 #include <rft_timertasks/closedlooptask.hpp>
 
 #include "state.hpp"

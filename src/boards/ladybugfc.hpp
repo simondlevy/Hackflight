@@ -16,13 +16,7 @@
 
 #include <rft_boards/realboards/arduino.hpp>
 
-#include "motors/brushed.hpp"
-
 namespace hf {
-
-    static const uint8_t MOTOR_PINS[4] = {13, A2, 3, 11};
-
-    BrushedMotor ladybugFcMotors = BrushedMotor(MOTOR_PINS, 4);
 
     class LadybugFC : public rft::ArduinoBoard {
 
