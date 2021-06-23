@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "demands.hpp"
+
 #include <RFT_actuator.hpp>
 #include <RFT_filters.hpp>
 #include <rft_motors/rotary.hpp>
