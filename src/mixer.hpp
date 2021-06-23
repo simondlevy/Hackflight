@@ -36,7 +36,6 @@ namespace hf {
 
             // XXX make a class for this, or migrate it to rft::Motor
             rft::RotaryMotor * _motors[MAXMOTORS] = {};
-            uint8_t _pins[MAXMOTORS] = {};
             float _previousValues[MAXMOTORS] = {};
             float  _disarmedValues[MAXMOTORS];
 
