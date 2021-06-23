@@ -22,7 +22,7 @@
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 
 #include <rft_boards/realboards/arduino/butterfly.hpp>
-#include <rft_motors/rotary/brushless2.hpp>
+#include <rft_motors/rotary/brushless.hpp>
 
 
 // Receiver ============================================================================
@@ -54,7 +54,7 @@ static hf::Hackflight h = hf::Hackflight(&board, &receiver, &mixer);
 
 // PID controllers ======================================================================
 
-static hf::RatePid ratePid = hf::RatePid(0.04, 0.002, 0.01);
+static hf::RatePid ratePid = hf::RatePid(0.05, 0.00, 0.00);
 static hf::YawPid yawPid = hf::YawPid(0.10, 0.01);
 static hf::LevelPid levelPid = hf::LevelPid(0.20);
 
