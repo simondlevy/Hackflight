@@ -20,17 +20,6 @@ namespace hf {
 
     class MixerQuadXAP : public MixerQuad {
 
-        private:
-
-            void construct(void)
-            {
-                //                     Th  RR  PF  YR
-                motorDirections[0] = { +1, -1, -1, -1 };    // 1 right front
-                motorDirections[1] = { +1, +1, +1, -1 };    // 2 left rear
-                motorDirections[2] = { +1, +1, -1, +1 };    // 3 left front
-                motorDirections[3] = { +1, -1, +1, +1 };    // 4 right rear
-            }
-
         public:
 
             MixerQuadXAP(
@@ -41,13 +30,11 @@ namespace hf {
 
                 : MixerQuad(motor1, motor2, motor3, motor4)
             {
-                construct();
-            }
-
-            // For simulation / testing
-            MixerQuadXAP(void)
-            {
-                construct();
+                //                     Th  RR  PF  YR
+                motorDirections[0] = { +1, -1, -1, -1 };    // 1 right front
+                motorDirections[1] = { +1, +1, +1, -1 };    // 2 left rear
+                motorDirections[2] = { +1, +1, -1, +1 };    // 3 left front
+                motorDirections[3] = { +1, -1, +1, +1 };    // 4 right rear
             }
 
      }; // class MixerQuadXAP

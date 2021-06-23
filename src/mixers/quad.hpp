@@ -29,11 +29,6 @@ namespace hf {
                 Mixer::addMotor(motor3);
                 Mixer::addMotor(motor4);
             }
-
-            // For simulation / testing
-            MixerQuad()
-            {
-            }
     };
 
 } // namespace hf
