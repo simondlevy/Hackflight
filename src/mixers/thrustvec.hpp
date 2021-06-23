@@ -1,7 +1,7 @@
 /*
    Mixer subclass for thrust vectoring
 
-   Copyright (c) 2020 Simon D. Levy
+   Copyright (c) 2021 Simon D. Levy
 
    MIT License
  */
@@ -17,7 +17,6 @@ namespace hf {
         public:
 
             MixerThrustVector(void) 
-                : Mixer(4)
             {
                 //                     Th   RR   PF  YR
                 motorDirections[0] = { +1,  0,   0, +1 };   // rotor 1

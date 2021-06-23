@@ -69,6 +69,12 @@ namespace hf {
                 _motors[_nmotors++] = motor;
             }
 
+            virtual float constrainMotorValue(uint8_t index, float value)
+            {
+                (void)index; // all motors behave the same by default
+                return rft::Filter::constrainMinMax(value, 0, 1);
+            }
+
             // Actuator overrides ----------------------------------------------
 
             void begin(void) override
@@ -119,7 +125,7 @@ namespace hf {
                     }
 
                     // Keep motor values in appropriate interval
-                    motorvals[i] = rft::Filter::constrainMinMax(motorvals[i], 0, 1);
+                    motorvals[i] = constrainMotorValue(i, motorvals[i]);
                 }
 
                 for (uint8_t i = 0; i < _nmotors; i++) {
