@@ -20,7 +20,7 @@
 #include "hackflight.hpp"
 #include "boards/ladybugfc.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
-#include "mixers/quadxmw.hpp"
+#include "mixers/quad/xmw.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"

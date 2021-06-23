@@ -14,7 +14,7 @@
  */
 
 #include "hackflight.hpp"
-#include "mixers/quadxmw.hpp"
+#include "mixers/quad/xmw.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
@@ -25,7 +25,7 @@
 #include <rft_motors/rotary/brushless.hpp>
 
 
-// Receiver ============================================================================
+// Receiver ===========================================================================
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 8.0f;

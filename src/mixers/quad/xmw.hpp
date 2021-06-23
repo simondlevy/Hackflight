@@ -7,22 +7,20 @@
       / \
    3ccw  1cw
 
-   Copyright (c) 2018 Simon D. Levy
+   Copyright (c) 2021 Simon D. Levy
 
    MIT License
  */
 
 #pragma once
 
-#include "mixer.hpp"
-
-#include <rft_motors/rotary.hpp>
+#include "mixers/quad.hpp"
 
 namespace hf {
 
-    class MixerQuadXMW : public Mixer {
+    class MixerQuadXMW : public MixerQuad {
 
-        protected:
+        private:
 
             void construct(void)
             {
@@ -39,13 +37,10 @@ namespace hf {
                     rft::RotaryMotor * motor1,
                     rft::RotaryMotor * motor2,
                     rft::RotaryMotor * motor3,
-                    rft::RotaryMotor * motor4)
-            {
-                Mixer::addMotor(motor1);
-                Mixer::addMotor(motor2);
-                Mixer::addMotor(motor3);
-                Mixer::addMotor(motor4);
+                    rft::RotaryMotor * motor4) 
 
+                : MixerQuad(motor1, motor2, motor3, motor4)
+            {
                 construct();
             }
 
