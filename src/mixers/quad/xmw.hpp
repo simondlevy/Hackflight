@@ -31,10 +31,10 @@ namespace hf {
                 : MixerQuad(motor1, motor2, motor3, motor4)
             {
                 //                     Th  RR  PF  YR
-                motorDirections[0] = { +1, -1, +1, +1 };    // 1 right rear
-                motorDirections[1] = { +1, -1, -1, -1 };    // 2 right front
-                motorDirections[2] = { +1, +1, +1, -1 };    // 3 left rear
-                motorDirections[3] = { +1, +1, -1, +1 };    // 4 left front
+                motorDirections[0] = { +1, -1, +1, -1 };    // 1 right rear
+                motorDirections[1] = { +1, -1, -1, +1 };    // 2 right front
+                motorDirections[2] = { +1, +1, +1, +1 };    // 3 left rear
+                motorDirections[3] = { +1, +1, -1, -1 };    // 4 left front
             }
     };
 

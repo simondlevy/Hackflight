@@ -63,7 +63,10 @@ namespace hf {
             void modifyDemands(State * state, float * demands) override
             {
                 demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], state->x[State::PHI]); 
-                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], state->x[State::THETA]);
+
+                // Pitch demand is nose-down positive, so we negate
+                // pitch-forward (nose-down negative) to reconcile them
+                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], -state->x[State::THETA]);
             }
 
     };  // class LevelPid

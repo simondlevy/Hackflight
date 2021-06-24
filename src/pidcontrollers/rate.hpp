@@ -33,7 +33,12 @@ namespace hf {
             virtual void modifyDemands(State * state, float * demands) override
             {
                 demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL],  state->x[State::DPHI]);
-                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], state->x[State::DTHETA]);
+
+                // Pitch demand is nose-down positive, so we negate
+                // pitch-forward rate (nose-down negative) to reconcile them
+                demands[DEMANDS_PITCH] =
+                    _pitchPid.compute(demands[DEMANDS_PITCH],
+                            -state->x[State::DTHETA]);
             }
 
             virtual void resetOnInactivity(bool inactive) override

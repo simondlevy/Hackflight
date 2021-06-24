@@ -151,10 +151,9 @@ namespace hf {
 
             State * hfstate = (State *)state;
 
-            // NB: We negate gyro Y, Z to simplify PID controller
             hfstate->x[State::DPHI] = _x;
-            hfstate->x[State::DTHETA] = -_y;
-            hfstate->x[State::DPSI] = -_z;
+            hfstate->x[State::DTHETA] = _y;
+            hfstate->x[State::DPSI] = _z;
         }
 
         virtual bool ready(float time) override
