@@ -16,8 +16,8 @@
 
 #include "state.hpp"
 #include "receiver.hpp"
-#include "pidcontroller.hpp"
 #include "serialtask.hpp"
+#include "pidcontroller.hpp"
 
 namespace hf {
 

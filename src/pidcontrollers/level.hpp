@@ -10,7 +10,7 @@
 
 #include "pidcontroller.hpp"
 
-#include <rft_closedloops/pidcontroller.hpp>
+#include <rft_closedloops/dofpid.hpp>
 #include <RFT_filters.hpp>
 
 namespace hf {

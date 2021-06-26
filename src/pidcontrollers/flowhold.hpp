@@ -8,13 +8,11 @@
 
 #pragma once
 
-#include "pidcontroller.hpp"
-
 #include <rft_closedloops/pidcontroller.hpp>
 
 namespace hf {
 
-    class FlowHoldPid : public PidController {
+    class FlowHoldPid : public rft::PidController {
 
         private:
 

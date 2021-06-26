@@ -9,8 +9,8 @@
 #pragma once
 
 #include "pidcontroller.hpp"
-#include "angvel.hpp"
 
+#include <rft_closedloops/pidcontrollers/angvel.hpp>
 
 namespace hf {
 
@@ -19,8 +19,8 @@ namespace hf {
         private: 
 
             // Rate mode uses a rate controller for roll, pitch
-            _AngularVelocityPid _rollPid;
-            _AngularVelocityPid _pitchPid;
+            rft::AngularVelocityPid _rollPid;
+            rft::AngularVelocityPid _pitchPid;
 
         public:
 
