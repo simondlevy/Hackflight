@@ -51,7 +51,7 @@ namespace hf {
             void safeWriteMotor(uint8_t index, float value)
             {
                 // Avoid sending the motor the same value over and over
-                if (_previousValues[index] != value) {
+                if (true /*_previousValues[index] != value*/) {
                     writeMotor(index, value);
                 }
 
