@@ -1,6 +1,5 @@
 /*
-   Hackflight sketch for Tlear Butterfly with USFS IMU, DSMX receiver, and
-   standard motors
+   Hackflight sketch for TinyPICO with USFS IMU, DSMX receiver, and standard motors
 
    Additional libraries needed:
 
@@ -14,35 +13,37 @@
  */
 
 #include "hackflight.hpp"
+#include "receivers/arduino/dsmx/dsmx_esp32_serial1.hpp"
 #include "mixers/quad/xmw.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
 #include "sensors/usfs.hpp"
-#include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 
-#include <rft_boards/realboards/arduino/butterfly.hpp>
+#include <rft_boards/realboards/tinypico.hpp>
 #include <rft_motors/rotary/brushless.hpp>
 
+// Receiver ============================================================================
 
-// Receiver ===========================================================================
+static const uint8_t SERIAL1_RX = 32;
+static const uint8_t SERIAL1_TX = 33; // unused
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
-static constexpr float DEMAND_SCALE = 8.0f;
 
-static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);
+static constexpr float DEMAND_SCALE = 4.0;
+
+static hf::DSMX_ESP32_Serial1 receiver = hf::DSMX_ESP32_Serial1(CHANNEL_MAP, DEMAND_SCALE, SERIAL1_RX, SERIAL1_TX);  
 
 // Board ================================================================================
 
-// static rft::TinyPico board;
-static rft::Butterfly board;
+static rft::TinyPico board;
 
 // Motors  ==============================================================================
 
-static rft::BrushlessMotor motor1 = rft::BrushlessMotor(5);  // XXX 3
-static rft::BrushlessMotor motor2 = rft::BrushlessMotor(8);  // XXX 4
-static rft::BrushlessMotor motor3 = rft::BrushlessMotor(9);  // XXX 5
-static rft::BrushlessMotor motor4 = rft::BrushlessMotor(11); // XXX 8
+static rft::BrushlessMotor motor1 = rft::BrushlessMotor(25);
+static rft::BrushlessMotor motor2 = rft::BrushlessMotor(26);
+static rft::BrushlessMotor motor3 = rft::BrushlessMotor(27);
+static rft::BrushlessMotor motor4 = rft::BrushlessMotor(15);
 
 // Mixer ================================================================================
 
@@ -54,9 +55,9 @@ static hf::Hackflight h = hf::Hackflight(&board, &receiver, &mixer);
 
 // PID controllers ======================================================================
 
-static hf::RatePid ratePid = hf::RatePid(0.05, 0.00, 0.00);
-static hf::YawPid yawPid = hf::YawPid(0.10, 0.01);
-static hf::LevelPid levelPid = hf::LevelPid(0.20);
+static hf::RatePid ratePid = hf::RatePid(0.04, 0.00, 0.00);
+static hf::YawPid yawPid = hf::YawPid(0.20, 0.01);
+static hf::LevelPid levelPid = hf::LevelPid(0.80);
 
 // Sensors ==============================================================================
 
@@ -67,12 +68,11 @@ static hf::UsfsQuaternion quaternion; // not really a sensor, but we treat it li
 
 void setup(void)
 {
-    // XXX USFS piggyback: use pins 4,3 for power, ground
     rft::ArduinoBoard::powerPins(4, 3);
     delay(100);
 
     // Start I^2C
-    Wire.begin(TWI_PINS_6_7);
+    Wire.begin();
 
     // Add sensors
     h.addSensor(&quaternion);
@@ -84,7 +84,7 @@ void setup(void)
     h.addPidController(&yawPid);
 
     // Adjust trim
-    receiver.setTrim(0, 0.05, 0);
+    // receiver.setTrim(0, 0, 0);
 
     // Start Hackflight firmware
     h.begin();
