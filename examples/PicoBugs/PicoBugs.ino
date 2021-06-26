@@ -68,9 +68,6 @@ static hf::UsfsQuaternion quaternion; // not really a sensor, but we treat it li
 
 void setup(void)
 {
-    rft::ArduinoBoard::powerPins(4, 3);
-    delay(100);
-
     // Start I^2C
     Wire.begin();
 
@@ -84,7 +81,7 @@ void setup(void)
     h.addPidController(&yawPid);
 
     // Adjust trim
-    // receiver.setTrim(0, 0, 0);
+    receiver.setTrim(0, 0, -.01);
 
     // Start Hackflight firmware
     h.begin();
