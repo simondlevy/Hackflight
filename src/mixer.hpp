@@ -38,7 +38,6 @@ namespace hf {
 
             // XXX make a class for this, or migrate it to rft::Motor
             rft::Motor * _motors[MAXMOTORS] = {};
-            float _previousValues[MAXMOTORS] = {};
             float  _disarmedValues[MAXMOTORS];
 
             uint8_t _nmotors = 0;
@@ -46,16 +45,6 @@ namespace hf {
             void writeMotor(uint8_t index, float value)
             {
                 _motors[index]->write(value);
-            }
-
-            void safeWriteMotor(uint8_t index, float value)
-            {
-                // Avoid sending the motor the same value over and over
-                if (true /*_previousValues[index] != value*/) {
-                    writeMotor(index, value);
-                }
-
-                _previousValues[index] = value;
             }
 
         protected:
@@ -82,10 +71,9 @@ namespace hf {
 
             void begin(void) override
             {
-                // set disarmed, previous motor values
+                // set disarmed motor values
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     _disarmedValues[i] = 0;
-                    _previousValues[i] = 0;
                     _motors[i]->begin();
                 }
             }
@@ -94,7 +82,7 @@ namespace hf {
             void runDisarmed(void) override
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
-                    safeWriteMotor(i, _disarmedValues[i]);
+                    writeMotor(i, _disarmedValues[i]);
                 }
             }
 
@@ -132,7 +120,7 @@ namespace hf {
                 }
 
                 for (uint8_t i = 0; i < _nmotors; i++) {
-                    safeWriteMotor(i, motorvals[i]);
+                    writeMotor(i, motorvals[i]);
                 }
             }
 
