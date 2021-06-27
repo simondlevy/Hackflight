@@ -333,6 +333,22 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <text x="-1.27" y="1.397" size="0.6096" layer="25" font="vector" ratio="20">&gt;NAME</text>
 <text x="-1.27" y="-2.032" size="0.6096" layer="27" font="vector" ratio="20">&gt;VALUE</text>
 </package>
+<package name="1X02_NO_SILK">
+<description>&lt;h3&gt;Plated Through Hole - No Silk Outline&lt;/h3&gt;
+&lt;p&gt;Specifications:
+&lt;ul&gt;&lt;li&gt;Pin count:2&lt;/li&gt;
+&lt;li&gt;Pin pitch:0.1"&lt;/li&gt;
+&lt;/ul&gt;&lt;/p&gt;
+&lt;p&gt;Example device(s):
+&lt;ul&gt;&lt;li&gt;CONN_02&lt;/li&gt;
+&lt;/ul&gt;&lt;/p&gt;</description>
+<pad name="1" x="0" y="0" drill="1.016" diameter="1.8796" rot="R90"/>
+<pad name="2" x="2.54" y="0" drill="1.016" diameter="1.8796" rot="R90"/>
+<rectangle x1="2.286" y1="-0.254" x2="2.794" y2="0.254" layer="51"/>
+<rectangle x1="-0.254" y1="-0.254" x2="0.254" y2="0.254" layer="51"/>
+<text x="-1.27" y="1.397" size="0.6096" layer="25" font="vector" ratio="20">&gt;NAME</text>
+<text x="-1.27" y="-2.032" size="0.6096" layer="27" font="vector" ratio="20">&gt;VALUE</text>
+</package>
 </packages>
 </library>
 </libraries>
@@ -589,6 +605,10 @@ design rules under a new name.</description>
 <attribute name="PROD_ID" value="CONN-09696" x="32.639134375" y="33.381796875" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="33.909134375" y="35.413796875" size="0.6096" layer="27" font="vector" ratio="20" rot="R180"/>
 </element>
+<element name="J2" library="SparkFun-Connectors" package="1X02_NO_SILK" value="" x="10.95435625" y="6.24940625"/>
+<element name="J8" library="SparkFun-Connectors" package="1X02_NO_SILK" value="" x="41.327359375" y="6.31404375"/>
+<element name="J9" library="SparkFun-Connectors" package="1X02_NO_SILK" value="" x="9.985003125" y="66.25164375"/>
+<element name="J10" library="SparkFun-Connectors" package="1X02_NO_SILK" value="" x="45.457975" y="66.353534375"/>
 </elements>
 <signals>
 <signal name="GND">
@@ -633,9 +653,17 @@ design rules under a new name.</description>
 <contactref element="J5" pad="1"/>
 <contactref element="J6" pad="1"/>
 <contactref element="J1" pad="4"/>
+<contactref element="J2" pad="2"/>
+<contactref element="J8" pad="2"/>
+<contactref element="J10" pad="2"/>
+<contactref element="J9" pad="2"/>
 <wire x1="14" y1="56.1" x2="36.37" y2="71" width="0" layer="19" extent="1-1"/>
-<wire x1="42.895209375" y1="14.12935625" x2="14" y2="56.1" width="0" layer="19" extent="1-1"/>
-<wire x1="25.019134375" y1="33.381796875" x2="42.895209375" y2="14.12935625" width="0" layer="19" extent="1-1"/>
+<wire x1="25.019134375" y1="33.381796875" x2="14" y2="56.1" width="0" layer="19" extent="1-1"/>
+<wire x1="42.895209375" y1="14.12935625" x2="25.019134375" y2="33.381796875" width="0" layer="19" extent="1-1"/>
+<wire x1="13.49435625" y1="6.24940625" x2="25.019134375" y2="33.381796875" width="0" layer="19" extent="1-1"/>
+<wire x1="43.867359375" y1="6.31404375" x2="13.49435625" y2="6.24940625" width="0" layer="19" extent="1-1"/>
+<wire x1="12.525003125" y1="66.25164375" x2="43.867359375" y2="6.31404375" width="0" layer="19" extent="1-1"/>
+<wire x1="47.997975" y1="66.353534375" x2="12.525003125" y2="66.25164375" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="3V3">
 <contactref element="J4" pad="4"/>
@@ -738,6 +766,17 @@ design rules under a new name.</description>
 </signal>
 <signal name="CS">
 <contactref element="J7" pad="12"/>
+</signal>
+<signal name="LED">
+<contactref element="J7" pad="4"/>
+<contactref element="J2" pad="1"/>
+<contactref element="J8" pad="1"/>
+<contactref element="J10" pad="1"/>
+<contactref element="J9" pad="1"/>
+<wire x1="10.95435625" y1="6.24940625" x2="21.7" y2="63.38" width="0" layer="19" extent="1-1"/>
+<wire x1="41.327359375" y1="6.31404375" x2="10.95435625" y2="6.24940625" width="0" layer="19" extent="1-1"/>
+<wire x1="9.985003125" y1="66.25164375" x2="41.327359375" y2="6.31404375" width="0" layer="19" extent="1-1"/>
+<wire x1="45.457975" y1="66.353534375" x2="9.985003125" y2="66.25164375" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 <mfgpreviewcolors>
