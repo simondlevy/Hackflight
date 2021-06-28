@@ -3,6 +3,7 @@ extras/gcs/python/hackflight.zip
 obj/
 *#
 *.pro
+*.job
 *.swp
 *~
 ~*
