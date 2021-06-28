@@ -68,8 +68,8 @@ static hf::UsfsQuaternion quaternion; // not really a sensor, but we treat it li
 void setup(void)
 {
     // XXX USFS piggyback: use pins 4,3 for power, ground
-    rft::ArduinoBoard::powerPins(4, 3);
-    delay(100);
+    // rft::ArduinoBoard::powerPins(4, 3);
+    // delay(100);
 
     // Start I^2C
     Wire.begin(TWI_PINS_6_7);

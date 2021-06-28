@@ -23,7 +23,9 @@ sock.connect((ADDR, PORT))
 print('connected to ' + ADDR)
 stdout.flush()
 
-sleep(5)
+while True:
+    print(sock.recv(1))
+    stdout.flush()
 
 print('closing ...')
 sock.close()
