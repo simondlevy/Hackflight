@@ -79,13 +79,3 @@ class Parser(object):
         else:
             print('Unknown state detected: %d' % self.state)
 
-    @staticmethod
-    def crc8(data):
-
-        crc = 0x00
-
-        for c in data:
-
-            crc ^= c
-
-        return crc

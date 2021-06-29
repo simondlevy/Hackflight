@@ -10,6 +10,17 @@ from msp import Parser
 
 class MspParser(Parser, metaclass=abc.ABCMeta):
 
+    @staticmethod
+    def crc8(data):
+
+        crc = 0x00
+
+        for c in data:
+
+            crc ^= c
+
+        return crc
+
     def dispatchMessage(self):
 
         if self.message_id == 121:
@@ -55,4 +66,4 @@ class MspParser(Parser, metaclass=abc.ABCMeta):
     def serialize_SET_MOTOR_NORMAL(m1, m2, m3, m4):
         message_buffer = struct.pack('ffff', m1, m2, m3, m4)
         msg = [len(message_buffer), 215] + list(message_buffer)
-        return bytes([ord('$'), ord('M'), ord('<')] + msg + [Parser.crc8(msg)])
+        return bytes([ord('$'), ord('M'), ord('<')] + msg + [MspParser.crc8(msg)])
