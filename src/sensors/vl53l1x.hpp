@@ -38,8 +38,6 @@ namespace hf {
                 /*
                 State * hfstate = (State *)state;
 
-                float dist = _vl53l1x.getDistance(); // mm
-
                 //hfstate->x[State::Z] = dist;
 
                 if (_time_prev > 0) {
@@ -70,10 +68,15 @@ namespace hf {
                     return false;
                 }
 
+                // Get distance from sensor, convert it to meters, and 
+                // run it through the low-pass filter
+                float dist = _lpf.update(_vl53l1x.getDistance() / 1000.); // mm => m
+
                 // Enough time must also elapse between readings
                 if (time - _time_prev > _period) {
-                    rft::Debugger::printf("ready\n");
+                    rft::Debugger::printf("%3.3f    %+3.3f\n", dist, (dist - _dist_prev)/_period);
                     _time_prev = time;
+                    _dist_prev = dist;
                     return true;
                 }
 
@@ -82,7 +85,7 @@ namespace hf {
 
         public:
 
-            Vl53l1xRangefinder(uint16_t freq=2)
+            Vl53l1xRangefinder(uint16_t freq=100)
             {
 
                 _period = 1. / freq;
