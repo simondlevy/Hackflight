@@ -19,6 +19,7 @@
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
 #include "sensors/usfs.hpp"
+#include "sensors/vl53l1x.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 
 #include <rft_boards/realboards/arduino/butterfly.hpp>
@@ -62,6 +63,7 @@ static hf::LevelPid levelPid = hf::LevelPid(0.40);
 
 static hf::UsfsGyrometer gyrometer;
 static hf::UsfsQuaternion quaternion; // not really a sensor, but we treat it like one!
+static hf::VL53L1X rangefinder;
 
 // Setup ==============================================================================
 
@@ -77,6 +79,7 @@ void setup(void)
     // Add sensors
     h.addSensor(&quaternion);
     h.addSensor(&gyrometer);
+    h.addSensor(&rangefinder);
 
     // Add PID controllers
     h.addPidController(&levelPid);
