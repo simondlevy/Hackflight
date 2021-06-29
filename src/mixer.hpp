@@ -12,9 +12,9 @@
 
 #include <RFT_actuator.hpp>
 #include <RFT_filters.hpp>
-#include <rft_motor.hpp>
+#include <RFT_motor.hpp>
 
-#include <rft_debugger.hpp>
+#include <RFT_debugger.hpp>
 
 namespace hf {
 
