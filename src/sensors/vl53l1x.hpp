@@ -32,6 +32,11 @@ namespace hf {
 
             }
 
+            virtual void begin(void) override
+            {
+                vl53l1x.begin();
+            }
+
             virtual bool ready(float time) override
             {
                 return false;
