@@ -2955,6 +2955,7 @@ part number 2062-2P from STA</description>
 <part name="PMLFT" library="SparkFun-Connectors" deviceset="CONN_04" device=""/>
 <part name="PMRGT" library="SparkFun-Connectors" deviceset="CONN_04" device=""/>
 <part name="PWPWR" library="SparkFun-Connectors" deviceset="CONN_02" device=""/>
+<part name="SMIRF" library="SparkFun-Connectors" deviceset="CONN_04" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -2968,6 +2969,7 @@ part number 2062-2P from STA</description>
 <instance part="PMLFT" gate="G$1" x="30.48" y="58.42"/>
 <instance part="PMRGT" gate="G$1" x="55.88" y="58.42"/>
 <instance part="PWPWR" gate="G$1" x="40.64" y="71.12"/>
+<instance part="SMIRF" gate="G$1" x="86.36" y="58.42"/>
 </instances>
 <busses>
 </busses>
@@ -2979,14 +2981,13 @@ part number 2062-2P from STA</description>
 <wire x1="-9.48" y1="66.04" x2="-5.08" y2="66.04" width="0.1524" layer="91"/>
 <label x="-7.62" y="66.04" size="1.778" layer="95"/>
 </segment>
-</net>
-<net name="TX2/INT" class="0">
 <segment>
-<pinref part="LBLFT" gate="G$1" pin="6"/>
-<wire x1="-9.48" y1="68" x2="-9.48" y2="68.58" width="0.1524" layer="91"/>
-<wire x1="-9.48" y1="68.58" x2="-5.08" y2="68.58" width="0.1524" layer="91"/>
-<label x="-7.62" y="68.58" size="1.778" layer="95"/>
+<pinref part="SMIRF" gate="G$1" pin="4"/>
+<wire x1="91.44" y1="63.5" x2="96.52" y2="63.5" width="0.1524" layer="91"/>
+<label x="91.44" y="63.5" size="1.778" layer="95"/>
 </segment>
+</net>
+<net name="INT" class="0">
 <segment>
 <pinref part="VLLFT" gate="J$1" pin="3"/>
 <wire x1="35.56" y1="88.9" x2="38.1" y2="88.9" width="0.1524" layer="91"/>
@@ -3000,8 +3001,13 @@ part number 2062-2P from STA</description>
 <wire x1="-9.48" y1="71.12" x2="-5.08" y2="71.12" width="0.1524" layer="91"/>
 <label x="-7.62" y="71.12" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="SMIRF" gate="G$1" pin="2"/>
+<wire x1="91.44" y1="58.42" x2="96.52" y2="58.42" width="0.1524" layer="91"/>
+<label x="91.44" y="58.42" size="1.778" layer="95"/>
+</segment>
 </net>
-<net name="A4" class="0">
+<net name="LED" class="0">
 <segment>
 <pinref part="LBLFT" gate="G$1" pin="4"/>
 <wire x1="-9.48" y1="73.08" x2="-9.48" y2="73.66" width="0.1524" layer="91"/>
@@ -3044,6 +3050,11 @@ part number 2062-2P from STA</description>
 <pinref part="PWPWR" gate="G$1" pin="2"/>
 <wire x1="48.26" y1="73.66" x2="50.8" y2="73.66" width="0.1524" layer="91"/>
 <label x="48.26" y="73.66" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="SMIRF" gate="G$1" pin="3"/>
+<wire x1="91.44" y1="60.96" x2="96.52" y2="60.96" width="0.1524" layer="91"/>
+<label x="91.44" y="60.96" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="3.3V" class="0">
@@ -3143,6 +3154,19 @@ part number 2062-2P from STA</description>
 <pinref part="PMLFT" gate="G$1" pin="2"/>
 <wire x1="35.56" y1="58.42" x2="38.1" y2="58.42" width="0.1524" layer="91"/>
 <label x="35.56" y="58.42" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="TX2" class="0">
+<segment>
+<pinref part="LBLFT" gate="G$1" pin="6"/>
+<wire x1="-9.48" y1="68" x2="-9.48" y2="68.58" width="0.1524" layer="91"/>
+<wire x1="-9.48" y1="68.58" x2="-5.08" y2="68.58" width="0.1524" layer="91"/>
+<label x="-7.62" y="68.58" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="SMIRF" gate="G$1" pin="1"/>
+<wire x1="91.44" y1="55.88" x2="96.52" y2="55.88" width="0.1524" layer="91"/>
+<label x="91.44" y="55.88" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
