@@ -65,22 +65,24 @@ namespace hf {
 
             virtual bool ready(float time) override
             {
+                // Sensor must have new data
                 if (!_vl53l1x.newDataReady()) {
                     return false;
                 }
 
-                if (_time_prev > 0) {
-                    rft::Debugger::printf("%f  %f\n", _period, time - _time_prev);
+                // Enough time must also elapse between readings
+                if (time - _time_prev > _period) {
+                    rft::Debugger::printf("ready\n");
+                    _time_prev = time;
+                    return true;
                 }
 
-                _time_prev = time;
-
-                return true;
+                return false;
             }
 
         public:
 
-            Vl53l1xRangefinder(uint16_t freq=100)
+            Vl53l1xRangefinder(uint16_t freq=2)
             {
 
                 _period = 1. / freq;
