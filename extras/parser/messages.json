@@ -1,5 +1,5 @@
 {
-  "RC_NORMAL": 
+  "RECEIVER": 
   [{"ID": 121},
    {"comment": "16 channels in http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol"}, 
    {"c1": "float"}, 
@@ -19,7 +19,7 @@
   [{"ID": 123},
    {"mtype"    : "byte"}], 
 
-   "SET_MOTOR_NORMAL": 
+   "SET_MOTOR": 
   [{"ID": 215},
    {"comment": "We send floating-point values in [0,1], rather than PWM"}, 
    {"m1": "float"},

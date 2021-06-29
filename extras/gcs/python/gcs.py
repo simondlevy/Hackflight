@@ -113,7 +113,7 @@ class GCS(MspParser):
 
         # Set up parser's request strings
         self.attitude_request = MspParser.serialize_ATTITUDE_RADIANS_Request()
-        self.rc_request = MspParser.serialize_RC_NORMAL_Request()
+        self.rc_request = MspParser.serialize_RECEIVER_Request()
         self.actuator_type_request = \
             MspParser.serialize_ACTUATOR_TYPE_Request()
 
@@ -163,7 +163,7 @@ class GCS(MspParser):
 
         self.root.after(delay_msec, task)
 
-    def handle_RC_NORMAL(self, c1, c2, c3, c4, c5, c6):
+    def handle_RECEIVER(self, c1, c2, c3, c4, c5, c6):
 
         # Display throttle as [0,1], other channels as [-1,+1]
         self.rxchannels = c1/2.+.5, c2, c3, c4, c5, c6
@@ -393,7 +393,7 @@ class GCS(MspParser):
         values = [0]*4
         values[index-1] = percent / 100.
 
-        self.comms.send_message(MspParser.serialize_SET_MOTOR_NORMAL, values)
+        self.comms.send_message(MspParser.serialize_SET_MOTOR, values)
 
     def _show_splash(self):
 
