@@ -1,23 +1,22 @@
 #  MSP Parser subclass and message builders
 
+#  Copyright (C) 2021 Simon D. Levy
+
+#  AUTO-GENERATED CODE; DO NOT MODIFY
+
 #  MIT License
 
 import struct
 
 import abc
 
+
 class MspParser(metaclass=abc.ABCMeta):
 
     def __init__(self):
-
         self.state = 0
 
     def parse(self, char):
-        '''
-        Parses one character, triggering pre-set handlers upon a successful
-        parse.
-        '''
-
         byte = ord(char)
 
         if self.state == 0:  # sync char 1
@@ -41,7 +40,7 @@ class MspParser(metaclass=abc.ABCMeta):
             self.message_length_expected = byte
             self.message_checksum = byte
             # setup arraybuffer
-            self.message_buffer = b''
+            self.message_buffer = b""
             self.state += 1
 
         elif self.state == 4:
@@ -65,42 +64,33 @@ class MspParser(metaclass=abc.ABCMeta):
         elif self.state == 6:
             if self.message_checksum == byte:
                 # message received, process
-
                 self.dispatchMessage()
-
             else:
-                print('code: ' + str(self.message_id) + ' - crc failed')
+                print("code: " + str(self.message_id) + " - crc failed")
             # Reset variables
             self.message_length_received = 0
             self.state = 0
 
         else:
-            print('Unknown state detected: %d' % self.state)
+            print("Unknown state detected: %d" % self.state)
 
     @staticmethod
     def crc8(data):
-
         crc = 0x00
-
         for c in data:
-
             crc ^= c
-
         return crc
 
     def dispatchMessage(self):
 
         if self.message_id == 121:
-            self.handle_RC_NORMAL(*struct.unpack('=ffffff',
-                                                 self.message_buffer))
+            self.handle_RC_NORMAL(*struct.unpack('=ffffff', self.message_buffer))
 
         if self.message_id == 122:
-            self.handle_ATTITUDE_RADIANS(*struct.unpack('=fff',
-                                                        self.message_buffer))
+            self.handle_ATTITUDE_RADIANS(*struct.unpack('=fff', self.message_buffer))
 
         if self.message_id == 123:
-            self.handle_ACTUATOR_TYPE(*struct.unpack('=B',
-                                                     self.message_buffer))
+            self.handle_ACTUATOR_TYPE(*struct.unpack('=B', self.message_buffer))
 
     @abc.abstractmethod
     def handle_RC_NORMAL(self, c1, c2, c3, c4, c5, c6):
