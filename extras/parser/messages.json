@@ -17,6 +17,7 @@
   
   "ACTUATOR_TYPE": 
   [{"ID": 123},
+   {"comment": "Tells GCS how to display motor dialog"}, 
    {"mtype"    : "byte"}], 
 
    "SET_MOTOR": 
