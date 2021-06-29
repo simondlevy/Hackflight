@@ -9,6 +9,7 @@
 #pragma once
 
 #include <RFT_sensor.hpp>
+#include <RFT_filters.hpp>
 
 #include <VL53L1X.h>
 
@@ -22,6 +23,10 @@ namespace hf {
 
             VL53L1X _vl53l1x;
 
+            rft::LowPassFilter _lpf;
+
+            float _period = 0;
+
             // Support using temporal first different to compute State::DZ
             float _dist_prev = 0;
             float _time_prev = 0;
@@ -30,38 +35,59 @@ namespace hf {
 
             virtual void modifyState(rft::State * state, float time) override
             {
+                /*
                 State * hfstate = (State *)state;
 
-                float dist = _vl53l1x.getDistance();
+                float dist = _vl53l1x.getDistance(); // mm
 
-                hfstate->x[State::Z] = dist;
+                //hfstate->x[State::Z] = dist;
 
                 if (_time_prev > 0) {
-                    hfstate->x[State::DZ] = (dist - _dist_prev) / (time - _time_prev);
+
+                    float dz = dist - _dist_prev;
+                    float dt = time - _time_prev;
+
+                    //hfstate->x[State::DZ] = (dist - _dist_prev) / dt;
+
+                    rft::Debugger::printf("%f   %f\n", dist, _dist_prev);
                 }
 
                 _dist_prev = dist;
-                _time_prev = time;
-
+                */
             }
 
             virtual void begin(void) override
             {
                 _vl53l1x.begin();
+
+                _lpf.begin();
             }
 
             virtual bool ready(float time) override
             {
-                return _vl53l1x.newDataReady();
+                if (!_vl53l1x.newDataReady()) {
+                    return false;
+                }
+
+                if (_time_prev > 0) {
+                    rft::Debugger::printf("%f  %f\n", _period, time - _time_prev);
+                }
+
+                _time_prev = time;
+
+                return true;
             }
 
         public:
 
-          Vl53l1xRangefinder(void)
-          {
-            _dist_prev = 0;
-            _time_prev = 0;
-          }
+            Vl53l1xRangefinder(uint16_t freq=100)
+            {
+
+                _period = 1. / freq;
+
+                _dist_prev = 0;
+                _time_prev = 0;
+            }
 
 
     };  // class Vl53l1xRangefinder 
