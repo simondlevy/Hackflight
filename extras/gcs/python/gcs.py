@@ -112,7 +112,7 @@ class GCS(MspParser):
         self._show_splash()
 
         # Set up parser's request strings
-        self.attitude_request = MspParser.serialize_ATTITUDE_RADIANS_Request()
+        self.attitude_request = MspParser.serialize_STATE_Request()
         self.rc_request = MspParser.serialize_RECEIVER_Request()
         self.actuator_type_request = \
             MspParser.serialize_ACTUATOR_TYPE_Request()
@@ -173,9 +173,10 @@ class GCS(MspParser):
         if self.receiver.running:
             self._send_rc_request()
 
-    def handle_ATTITUDE_RADIANS(self, x, y, z):
+    def handle_STATE(self, _x, _dx, _y, _dy, _z,
+                     _dz, phi, _dphi, theta, _dtheta, psi, _dpsi):
 
-        self.roll_pitch_yaw = x, y, z
+        self.roll_pitch_yaw = phi, theta, psi
 
         self.gotimu = True
 

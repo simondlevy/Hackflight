@@ -9,11 +9,20 @@
    {"c5": "float"}, 
    {"c6": "float"}],
 
-  "ATTITUDE_RADIANS": 
+  "STATE": 
   [{"ID": 122},
-   {"roll"    : "float"}, 
-   {"pitch"   : "float"},
-   {"yaw"     : "float"}],
+   {"x"      : "float"}, 
+   {"dx"     : "float"},
+   {"y"      : "float"},
+   {"dy"     : "float"},
+   {"z"      : "float"},
+   {"dz"     : "float"},
+   {"phi"    : "float"},
+   {"dphi"   : "float"},
+   {"theta"  : "float"},
+   {"dtheta" : "float"},
+   {"psi"    : "float"},
+   {"dpsi"   : "float"}],
   
   "ACTUATOR_TYPE": 
   [{"ID": 123},

@@ -87,7 +87,7 @@ class MspParser(metaclass=abc.ABCMeta):
             self.handle_RECEIVER(*struct.unpack('=ffffff', self.message_buffer))
 
         if self.message_id == 122:
-            self.handle_ATTITUDE_RADIANS(*struct.unpack('=fff', self.message_buffer))
+            self.handle_STATE(*struct.unpack('=ffffffffffff', self.message_buffer))
 
         if self.message_id == 123:
             self.handle_ACTUATOR_TYPE(*struct.unpack('=B', self.message_buffer))
@@ -97,7 +97,7 @@ class MspParser(metaclass=abc.ABCMeta):
         return
 
     @abc.abstractmethod
-    def handle_ATTITUDE_RADIANS(self, roll, pitch, yaw):
+    def handle_STATE(self, x, dx, y, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
         return
 
     @abc.abstractmethod
@@ -110,7 +110,7 @@ class MspParser(metaclass=abc.ABCMeta):
         return bytes(msg, 'utf-8')
 
     @staticmethod
-    def serialize_ATTITUDE_RADIANS_Request():
+    def serialize_STATE_Request():
         msg = '$M<' + chr(0) + chr(122) + chr(122)
         return bytes(msg, 'utf-8')
 
