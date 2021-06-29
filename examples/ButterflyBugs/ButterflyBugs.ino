@@ -63,7 +63,7 @@ static hf::LevelPid levelPid = hf::LevelPid(0.40);
 
 static hf::UsfsGyrometer gyrometer;
 static hf::UsfsQuaternion quaternion; // not really a sensor, but we treat it like one!
-static hf::VL53L1X rangefinder;
+static hf::Vl53l1xRangefinder rangefinder;
 
 // Setup ==============================================================================
 

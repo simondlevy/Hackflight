@@ -10,11 +10,17 @@
 
 #include <RFT_sensor.hpp>
 
+#include <VL53L1X.h>
+
 namespace hf {
 
-    class VL53L1X : public rft::Sensor {
+    class Vl53l1xRangefinder : public rft::Sensor {
 
         friend class Hackflight;
+
+        private:
+
+            VL53L1X vl53l1x;
 
         protected:
 
@@ -31,6 +37,6 @@ namespace hf {
                 return false;
             }
 
-    };  // class VL523L1X 
+    };  // class Vl53l1xRangefinder 
 
 } // namespace hf
