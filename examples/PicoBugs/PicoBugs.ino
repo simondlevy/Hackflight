@@ -20,7 +20,7 @@
 #include "pidcontrollers/level.hpp"
 #include "sensors/usfs.hpp"
 
-#include <rft_boards/realboards/tinypico.hpp>
+#include <rft_boards/realboards/arduino_serial/tinypico.hpp>
 #include <rft_motors/rotary/brushless.hpp>
 
 // Receiver ============================================================================

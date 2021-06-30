@@ -14,7 +14,7 @@
 
 #include <RoboFirmwareToolkit.hpp>
 
-#include <rft_boards/realboards/arduino.hpp>
+#include <rft_boards/realboards/arduino_serial/arduino.hpp>
 
 namespace hf {
 

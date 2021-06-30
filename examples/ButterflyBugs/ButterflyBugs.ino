@@ -23,7 +23,7 @@
 #include "sensors/pmw3901.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 
-#include <rft_boards/realboards/arduino/butterfly.hpp>
+#include <rft_boards/realboards/arduino_serial/arduino/butterfly.hpp>
 #include <rft_motors/rotary/brushless.hpp>
 
 
