@@ -28,30 +28,20 @@ namespace hf {
             float _period = 0;
 
             // Support using temporal first different to compute State::DZ
-            float _dist_prev = 0;
+            float _dist_curr = 0;
             float _time_prev = 0;
 
         protected:
 
             virtual void modifyState(rft::State * state, float time) override
             {
-                /*
                 State * hfstate = (State *)state;
 
-                //hfstate->x[State::Z] = dist;
+                hfstate->x[State::DZ] = (_dist_curr - hfstate->x[State::Z]) / _period;
 
-                if (_time_prev > 0) {
+                hfstate->x[State::Z] = _dist_curr;
 
-                    float dz = dist - _dist_prev;
-                    float dt = time - _time_prev;
-
-                    //hfstate->x[State::DZ] = (dist - _dist_prev) / dt;
-
-                    rft::Debugger::printf("%f   %f\n", dist, _dist_prev);
-                }
-
-                _dist_prev = dist;
-                */
+                rft::Debugger::printf("%3.3f    %+3.3f\n", hfstate->x[State::Z], hfstate->x[State::DZ]);
             }
 
             virtual void begin(void) override
@@ -70,13 +60,11 @@ namespace hf {
 
                 // Get distance from sensor, convert it to meters, and 
                 // run it through the low-pass filter
-                float dist = _lpf.update(_vl53l1x.getDistance() / 1000.); // mm => m
+                _dist_curr = _lpf.update(_vl53l1x.getDistance() / 1000.); // mm => m
 
                 // Enough time must also elapse between readings
                 if (time - _time_prev > _period) {
-                    rft::Debugger::printf("%3.3f    %+3.3f\n", dist, (dist - _dist_prev)/_period);
                     _time_prev = time;
-                    _dist_prev = dist;
                     return true;
                 }
 
@@ -90,7 +78,6 @@ namespace hf {
 
                 _period = 1. / freq;
 
-                _dist_prev = 0;
                 _time_prev = 0;
             }
 
