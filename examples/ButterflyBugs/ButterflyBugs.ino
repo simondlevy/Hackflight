@@ -92,6 +92,9 @@ void setup(void)
     // Adjust trim
     receiver.setTrim(0, +0.05, -.008);
 
+    // Set up telemetry over Serial2
+    board.setTelemetryPort(&Serial2);
+
     // Start Hackflight firmware
     h.begin();
 }

@@ -11,7 +11,7 @@
 #include <RFT_actuator.hpp>
 #include <RFT_parser.hpp>
 
-#include <rft_timertasks/telemetrytasks/serialtask.hpp>
+#include <rft_timertasks/serialtask.hpp>
 
 namespace hf {
 
