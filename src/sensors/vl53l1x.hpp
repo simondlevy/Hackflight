@@ -23,6 +23,8 @@ namespace hf {
 
             VL53L1X _vl53l1x;
 
+            // Low-pass filter for altitude
+            // XXX Should we also filter the velocity?
             rft::LowPassFilter _lpf;
 
             float _period = 0;
@@ -40,8 +42,6 @@ namespace hf {
                 hfstate->x[State::DZ] = (_dist_curr - hfstate->x[State::Z]) / _period;
 
                 hfstate->x[State::Z] = _dist_curr;
-
-                rft::Debugger::printf("%3.3f    %+3.3f\n", hfstate->x[State::Z], hfstate->x[State::DZ]);
             }
 
             virtual void begin(void) override
