@@ -11,10 +11,9 @@
 #include <RFT_actuator.hpp>
 #include <RFT_parser.hpp>
 
-#include <rft_timertasks/serialtask.hpp>
+#include <rft_timertasks/telemetrytasks/serialtask.hpp>
 
 namespace hf {
-
 
     class SerialTask : public rft::SerialTask {
 
@@ -155,4 +154,4 @@ namespace hf {
 
         }; // class SerialTask
 
-} // namespace XXX
+} // namespace hf

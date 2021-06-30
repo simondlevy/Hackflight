@@ -29,7 +29,7 @@ namespace hf {
             State _state;
 
             // Serial timer task for GCS
-            SerialTask _serialTask;
+            SerialTask _gcsTask;
 
         public:
 
@@ -51,7 +51,7 @@ namespace hf {
                 RFT::begin(armed);
 
                 // Initialize serial timer task
-                _serialTask.begin(_board, &_state, _olc, _actuator);
+                _gcsTask.begin(_board, &_state, _olc, _actuator);
 
             } // begin
 
@@ -61,7 +61,7 @@ namespace hf {
                 RFT::update();
 
                 // Update serial comms task
-                _serialTask.update();
+                _gcsTask.update();
             }
 
     }; // class Hackflight
