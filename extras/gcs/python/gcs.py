@@ -112,7 +112,7 @@ class GCS(MspParser):
         self._show_splash()
 
         # Set up parser's request strings
-        self.attitude_request = MspParser.serialize_STATE_Request()
+        self.state_request = MspParser.serialize_STATE_Request()
         self.rc_request = MspParser.serialize_RECEIVER_Request()
         self.actuator_type_request = \
             MspParser.serialize_ACTUATOR_TYPE_Request()
@@ -183,7 +183,7 @@ class GCS(MspParser):
         # As soon as we handle the callback from one request, send another
         # request, if IMU dialog is running
         if self.imu.running:
-            self._send_attitude_request()
+            self._send_state_request()
 
     def handle_ACTUATOR_TYPE(self, atype):
         dlog = self.motors_coaxial if atype == 1 else self.motors_quadxmw
@@ -215,12 +215,12 @@ class GCS(MspParser):
         self.motors_quadxmw.stop()
         self.motors_coaxial.stop()
         self.receiver.stop()
-        self._send_attitude_request()
+        self._send_state_request()
         self.imu.start()
 
     def _start(self):
 
-        self._send_attitude_request()
+        self._send_state_request()
         self.imu.start()
 
         self.gotimu = False
@@ -237,10 +237,10 @@ class GCS(MspParser):
             self._disable_button(self.button_motors)
             self._disable_button(self.button_receiver)
 
-    # Sends Attitude request to FC
-    def _send_attitude_request(self):
+    # Sends state request to FC
+    def _send_state_request(self):
 
-        self.comms.send_request(self.attitude_request)
+        self.comms.send_request(self.state_request)
 
     # Sends RC request to FC
     def _send_rc_request(self):
