@@ -1,32 +1,23 @@
 /*
-   Hackflight core algorithm
+   Hackflight algorithm for real vehicles
 
-   Copyright (c) 2020 Simon D. Levy
+   Add serial tasks for GCS and telemetry
+
+   Copyright (c) 2021 Simon D. Levy
 
    MIT License
  */
 
 #pragma once
 
-#include <RoboFirmwareToolkit.hpp>
-#include <RFT_board.hpp>
-#include <RFT_openloop.hpp>
-#include <RFT_actuator.hpp>
-#include <rft_timertasks/closedlooptask.hpp>
-
-#include "state.hpp"
-#include "receiver.hpp"
+#include "hfpure.hpp"
 #include "serialtask.hpp"
-#include "pidcontroller.hpp"
 
 namespace hf {
 
-    class Hackflight : public rft::RFT {
+    class Hackflight : public HackflightPure {
 
         private:
-
-            // Vehicle state
-            State _state;
 
             // Serial timer task for GCS on main port (USB)
             SerialTask _gcsTask;
@@ -37,21 +28,12 @@ namespace hf {
         public:
 
             Hackflight(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
-                : rft::RFT(&_state, board, receiver, actuator)
+                : HackflightPure(board, receiver, actuator)
             {  
             }
-
-            void addPidController(PidController * pidController, uint8_t auxState=0) 
-            {
-                RFT::addClosedLoopController(pidController, auxState);
-            }
-
-            void begin(bool armed=false)
+            void begin()
             {  
-                // Initialize state
-                memset(&_state.x, 0, sizeof(_state.x));
-
-                RFT::begin(armed);
+                HackflightPure::begin();
 
                 // Start serial tasks
                 _gcsTask.begin(_board, &_state, _olc, _actuator);
@@ -61,7 +43,7 @@ namespace hf {
 
             void update(void)
             {
-                RFT::update();
+                HackflightPure::update();
 
                 // Update serial tasks
                 _gcsTask.update();
