@@ -9,6 +9,7 @@ MIT License
 
 import socket
 from sys import stdout
+from time import sleep
 
 from mspparser import MspParser
 
@@ -58,6 +59,8 @@ class BluetoothMspParser(MspParser):
 
     def stop(self):
 
+        BluetoothMspParser._debug('Shutting down ...')
+
         self.sock.close()
 
 
@@ -66,6 +69,16 @@ def main():
     btp = BluetoothMspParser('00:06:66:73:E3:A6')
 
     btp.start()
+
+    while True:
+
+        try:
+            sleep(.001)
+
+        except KeyboardInterrupt:
+            break
+
+    btp.stop()
 
 
 main()
