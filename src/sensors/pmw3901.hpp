@@ -28,7 +28,7 @@ namespace hf {
 
             virtual void modifyState(rft::State * state, float time) override
             {
-                State * hfstate = (State *)state;
+                // State * hfstate = (State *)state;
 
                 int16_t deltaX = 0;
                 int16_t deltaY = 0;

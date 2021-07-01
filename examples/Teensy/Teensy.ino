@@ -1,5 +1,5 @@
 /*
-   Hackflight sketch for Tlera Butterfly with USFS IMU, DSMX receiver, and
+   Hackflight sketch for Teensy4.0 with USFS IMU, DSMX receiver, and
    standard motors
 
    Additional libraries needed:
@@ -23,7 +23,7 @@
 #include "sensors/pmw3901.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 
-#include <rft_boards/realboards/arduino_serial/arduino/butterfly.hpp>
+#include <rft_boards/realboards/arduino_serial/arduino/teensy.hpp>
 #include <rft_motors/rotary/brushless.hpp>
 
 
@@ -37,7 +37,7 @@ static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MA
 // Board ================================================================================
 
 // static rft::TinyPico board;
-static rft::Butterfly board;
+static rft::Teensy40 board;
 
 // Motors  ==============================================================================
 
@@ -64,33 +64,30 @@ static hf::LevelPid levelPid = hf::LevelPid(0.40);
 
 static hf::UsfsGyrometer gyrometer;
 static hf::UsfsQuaternion quaternion; // not really a sensor, but we treat it like one!
-static hf::Vl53l1xRangefinder rangefinder;
-static hf::Pmw3901OpticalFlow flowSensor(38, &SPI1);
+// static hf::Vl53l1xRangefinder rangefinder;
+// static hf::Pmw3901OpticalFlow flowSensor(38, &SPI1);
 
 // Setup ==============================================================================
 
 void setup(void)
 {
-    // XXX USFS piggyback: use pins 4,3 for power, ground
-    // rft::ArduinoBoard::powerPins(4, 3);
-    // delay(100);
+    // USFS piggyback
+    rft::ArduinoBoard::powerPins(21, 22);
+    delay(100);
 
     // Start I^2C
-    Wire.begin(TWI_PINS_6_7);
+    Wire.begin();
 
     // Add sensors
     h.addSensor(&quaternion);
     h.addSensor(&gyrometer);
-    h.addSensor(&rangefinder);
-    h.addSensor(&flowSensor);
+    // h.addSensor(&rangefinder);
+    // h.addSensor(&flowSensor);
 
     // Add PID controllers
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
     h.addPidController(&yawPid);
-
-    // Adjust trim
-    receiver.setTrim(0, +0.05, -.008);
 
     // Start Hackflight firmware
     h.begin();
