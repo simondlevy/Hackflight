@@ -18,6 +18,8 @@ class BluetoothMspParser(MspParser):
 
     def __init__(self, addr, port=1):
 
+        MspParser.__init__(self)
+
         self.sock = socket.socket(socket.AF_BLUETOOTH,
                                   socket.SOCK_STREAM,
                                   socket.BTPROTO_RFCOMM)

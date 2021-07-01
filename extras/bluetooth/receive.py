@@ -24,27 +24,13 @@ print('connected to ' + ADDR)
 stdout.flush()
 
 while True:
-    print(sock.recv(1))
-    stdout.flush()
+
+    try:
+        print(sock.recv(1))
+        stdout.flush()
+
+    except KeyboardInterrupt:
+        break
 
 print('closing ...')
 sock.close()
-
-'''
-k = 0
-
-while True:
-
-        try:
-
-            sock.send(chr(k+97).encode())
-
-            k = (k+1) % 26
-
-            sleep(.01)
-
-        except KeyboardInterrupt:
-
-            sock.close()
-            break
-'''
