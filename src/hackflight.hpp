@@ -28,11 +28,11 @@ namespace hf {
             // Vehicle state
             State _state;
 
-            // Serial timer task for GCS
+            // Serial timer task for GCS on main port (USB)
             SerialTask _gcsTask;
 
-            // Serial timer task for telemetry
-            SerialTask _telemetryTask = SerialTask(1);
+            // Serial timer task for telemetry on secondary port (Serial1, Serial2, ...)
+            SerialTask _telemetryTask = SerialTask(true);
 
         public:
 
