@@ -7,14 +7,11 @@ Copyright (C) Simon D. Levy 2021
 MIT License
 '''
 
-ADDR = '00:06:66:73:E3:A6'
-PORT = 1
-
 import socket
-from time import sleep
 from sys import stdout
 
 from mspparser import MspParser
+
 
 class BluetoothMspParser(MspParser):
 
@@ -27,22 +24,48 @@ class BluetoothMspParser(MspParser):
         self.addr = addr
         self.port = port
 
+        self.state_request = MspParser.serialize_STATE_Request()
+
     def handle_STATE(self, _x, _dx, _y, _dy, _z,
                      _dz, phi, _dphi, theta, _dtheta, psi, _dpsi):
 
-        debug('%+3.3f  %+3.3f  %+3.3f' % phi, theta, psi)
+        BluetoothMspParser._debug('%+3.3f  %+3.3f  %+3.3f' % phi, theta, psi)
 
-        self.send_attitude_request()
+        self.send_state_request()
+
+    def handle_ACTUATOR_TYPE(self, atype):
+        return
+
+    def handle_RECEIVER(self, c1, c2, c3, c4, c5, c6):
+        return
+
+    @staticmethod
+    def _debug(msg):
+        print(msg)
+        stdout.flush()
+
+    def _send_state_request(self):
+
+        self.sock.send(self.state_request)
 
     def start(self):
 
-        sock.connect((self.addr, self.port))
+        self.sock.connect((self.addr, self.port))
 
-        print('connected to ' + self.addr)
-        stdout.flush()
+        BluetoothMspParser._debug('connected to ' + self.addr)
 
-        self.send_attitude_request()
+        self._send_state_request()
 
     def stop(self):
 
         self.sock.close()
+
+
+def main():
+
+    btp = BluetoothMspParser('00:06:66:73:E3:A6')
+
+    btp.start()
+
+
+main()
