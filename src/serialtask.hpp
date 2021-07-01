@@ -68,6 +68,11 @@ namespace hf {
 
         protected:
 
+            SerialTask(uint8_t port=0)
+                : rft::SerialTask(port)
+            {
+            }
+
             void dispatchMessage(void) override
             {
                 switch (_command) {
