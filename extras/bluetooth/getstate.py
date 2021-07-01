@@ -9,7 +9,6 @@ MIT License
 
 import socket
 from sys import stdout
-from time import sleep
 
 from mspparser import MspParser
 
@@ -32,9 +31,9 @@ class BluetoothMspParser(MspParser):
     def handle_STATE(self, _x, _dx, _y, _dy, _z,
                      _dz, phi, _dphi, theta, _dtheta, psi, _dpsi):
 
-        BluetoothMspParser._debug('%+3.3f  %+3.3f  %+3.3f' % phi, theta, psi)
+        BluetoothMspParser._debug('%+3.3f  %+3.3f  %+3.3f' % (phi, theta, psi))
 
-        self.send_state_request()
+        self._send_state_request()
 
     def handle_ACTUATOR_TYPE(self, atype):
         return
@@ -65,6 +64,10 @@ class BluetoothMspParser(MspParser):
 
         self.sock.close()
 
+    def update(self):
+
+        self.parse(self.sock.recv(1))
+
 
 def main():
 
@@ -75,7 +78,8 @@ def main():
     while True:
 
         try:
-            sleep(.001)
+
+            btp.update()
 
         except KeyboardInterrupt:
             break

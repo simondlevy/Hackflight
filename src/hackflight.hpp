@@ -53,11 +53,11 @@ namespace hf {
 
                 RFT::begin(armed);
 
-                // Initialize serial tasks
+                // Start serial tasks
                 _gcsTask.begin(_board, &_state, _olc, _actuator);
                 _telemetryTask.begin(_board, &_state, _olc, _actuator);
 
-            } // begin
+            }
 
             void update(void)
             {
