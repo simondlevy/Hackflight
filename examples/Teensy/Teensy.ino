@@ -36,15 +36,14 @@ static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MA
 
 // Board ================================================================================
 
-// static rft::TinyPico board;
-static rft::Teensy40 board;
+static rft::Teensy40 board = rft::Teensy40(&Serial3); // Use Serial3 for telemetry
 
 // Motors  ==============================================================================
 
-static rft::BrushlessMotor motor1 = rft::BrushlessMotor(5);  // XXX 3
-static rft::BrushlessMotor motor2 = rft::BrushlessMotor(8);  // XXX 4
-static rft::BrushlessMotor motor3 = rft::BrushlessMotor(9);  // XXX 5
-static rft::BrushlessMotor motor4 = rft::BrushlessMotor(11); // XXX 8
+static rft::BrushlessMotor motor1 = rft::BrushlessMotor(5); 
+static rft::BrushlessMotor motor2 = rft::BrushlessMotor(8); 
+static rft::BrushlessMotor motor3 = rft::BrushlessMotor(9); 
+static rft::BrushlessMotor motor4 = rft::BrushlessMotor(11);
 
 // Mixer ================================================================================
 
