@@ -22,9 +22,8 @@ namespace hf {
 
         public:
 
-            // Support prototype version where LED is on pin A1
-            LadybugFC(uint8_t ledPin = A4, HardwareSerial * telemetryPort=NULL) 
-                : rft::ArduinoBoard(ledPin, false, telemetryPort) // false = no LED inversion
+            LadybugFC(HardwareSerial * telemetryPort=NULL) 
+                : rft::ArduinoBoard(A4, false, telemetryPort) // A4 = LED pin; false = no LED inversion
             {
             }
 

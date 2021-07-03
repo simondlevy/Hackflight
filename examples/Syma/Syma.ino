@@ -37,7 +37,7 @@ static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MA
 
 // Board ================================================================================
 
-static hf::LadybugFC board;
+static hf::LadybugFC board = hf::LadybugFC(&Serial2);  // Bluetooth comms over Serial2
 
 // Motors  ==============================================================================
 

@@ -76,7 +76,8 @@ class BluetoothMspParser(MspParser):
 
 def main():
 
-    btp = BluetoothMspParser('00:06:66:73:E3:A6')
+    # btp = BluetoothMspParser('00:06:66:73:E3:A6')
+    btp = BluetoothMspParser('00:06:66:B8:6E:60')
 
     btp.start()
 
