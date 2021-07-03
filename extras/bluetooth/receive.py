@@ -18,7 +18,12 @@ sock = socket.socket(socket.AF_BLUETOOTH,
                      socket.SOCK_STREAM,
                      socket.BTPROTO_RFCOMM)
 
-sock.connect((ADDR, PORT))
+try:
+    sock.connect((ADDR, PORT))
+
+except:
+    print('Unable to connect to ' + ADDR)
+    exit(1)
 
 print('connected to ' + ADDR)
 stdout.flush()
