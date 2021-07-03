@@ -7,7 +7,8 @@ Copyright (C) Simon D. Levy 2021
 MIT License
 '''
 
-ADDR = '00:06:66:73:E3:A6'
+# ADDR = '00:06:66:73:E3:A6'
+ADDR = '00:06:66:B8:6E:60'
 PORT = 1
 
 import socket

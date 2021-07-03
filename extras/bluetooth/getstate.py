@@ -52,7 +52,12 @@ class BluetoothMspParser(MspParser):
 
     def start(self):
 
-        self.sock.connect((self.addr, self.port))
+        try:
+            self.sock.connect((self.addr, self.port))
+
+        except Exception:
+            BluetoothMspParser._debug('Unable to connect to ' + self.addr)
+            exit(1)
 
         BluetoothMspParser._debug('connected to ' + self.addr)
 
