@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.6.2">
+<eagle version="9.1.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -3038,7 +3038,7 @@ part number 2062-2P from STA</description>
 <part name="PAD3" library="wirepad" deviceset="SMD2" device=""/>
 <part name="PAD4" library="wirepad" deviceset="SMD2" device=""/>
 <part name="PAD5" library="wirepad" deviceset="SMD2" device=""/>
-<part name="PAD6" library="wirepad" deviceset="SMD2" device=""/>
+<part name="PAD6" library="wirepad" deviceset="SMD2" device="" value="LED"/>
 <part name="PAD7" library="wirepad" deviceset="SMD2" device=""/>
 <part name="PAD8" library="wirepad" deviceset="SMD2" device=""/>
 <part name="U$1" library="headers(2mm)" deviceset="1X2" device=""/>
@@ -3076,7 +3076,6 @@ part number 2062-2P from STA</description>
 </instance>
 <instance part="PWPWR" gate="G$1" x="40.64" y="71.12" smashed="yes">
 <attribute name="VALUE" x="38.1" y="66.294" size="1.778" layer="96" font="vector"/>
-<attribute name="NAME" x="38.1" y="76.708" size="1.778" layer="95" font="vector"/>
 </instance>
 <instance part="SMIRF" gate="G$1" x="86.36" y="58.42" smashed="yes">
 <attribute name="VALUE" x="81.28" y="51.054" size="1.778" layer="96" font="vector"/>
