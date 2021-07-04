@@ -62,16 +62,14 @@ static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 // Sensors ==============================================================================
 
-static hf::UsfsGyrometer gyrometer;
-static hf::UsfsQuaternion quaternion; // not really a sensor, but we treat it like one!
+static hf::USFS imu;
 
 // Setup ==============================================================================
 
 void setup(void)
 {
     // Add sensors
-    h.addSensor(&quaternion);
-    h.addSensor(&gyrometer);
+    h.addSensor(&imu);
 
     // Add PID controllers
     h.addPidController(&levelPid);
