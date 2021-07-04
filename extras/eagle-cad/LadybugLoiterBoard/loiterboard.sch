@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.1.1">
+<eagle version="9.6.2">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -181,6 +181,12 @@
 <pad name="5" x="3" y="0" drill="0.8" diameter="1.4224"/>
 <pad name="6" x="5" y="0" drill="0.8" diameter="1.4224"/>
 </package>
+<package name="1X2">
+<rectangle x1="-1.254" y1="-0.254" x2="-0.746" y2="0.254" layer="21"/>
+<rectangle x1="0.746" y1="-0.254" x2="1.254" y2="0.254" layer="21"/>
+<pad name="1" x="-1" y="0" drill="0.8" diameter="1.4224"/>
+<pad name="2" x="1" y="0" drill="0.8" diameter="1.4224"/>
+</package>
 </packages>
 <symbols>
 <symbol name="1X9_HEADER">
@@ -259,6 +265,22 @@
 <pin name="5" x="2.54" y="-2.54" visible="off" length="point" rot="R180"/>
 <pin name="6" x="2.54" y="-5.08" visible="off" length="point" rot="R180"/>
 </symbol>
+<symbol name="1X2_HEADER">
+<wire x1="-2.54" y1="2.54" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<wire x1="1.27" y1="0" x2="2.54" y2="0" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="2.54" x2="-2.54" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="-5.08" x2="2.54" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="2.54" y1="-5.08" x2="2.54" y2="-2.54" width="0.254" layer="94"/>
+<text x="0" y="0" size="1.016" layer="94" font="vector" rot="MR0" align="center">01</text>
+<text x="-2.54" y="3.175" size="1.27" layer="95" font="vector">&gt;NAME</text>
+<text x="-2.54" y="-6.985" size="1.27" layer="96" font="vector">&gt;VALUE</text>
+<pin name="1" x="2.54" y="0" visible="off" length="point" rot="R180"/>
+<wire x1="2.54" y1="-2.54" x2="2.54" y2="0" width="0.254" layer="94"/>
+<wire x1="2.54" y1="0" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<text x="0" y="-2.54" size="1.016" layer="94" font="vector" rot="MR0" align="center">02</text>
+<pin name="2" x="2.54" y="-2.54" visible="off" length="point" rot="R180"/>
+<wire x1="1.27" y1="-2.54" x2="2.54" y2="-2.54" width="0.254" layer="94"/>
+</symbol>
 </symbols>
 <devicesets>
 <deviceset name="1X9">
@@ -297,6 +319,22 @@
 <connect gate="G$1" pin="4" pad="4"/>
 <connect gate="G$1" pin="5" pad="5"/>
 <connect gate="G$1" pin="6" pad="6"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="1X2">
+<gates>
+<gate name="G$1" symbol="1X2_HEADER" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="1X2">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -2938,6 +2976,45 @@ part number 2062-2P from STA</description>
 </deviceset>
 </devicesets>
 </library>
+<library name="wirepad">
+<description>&lt;b&gt;Single Pads&lt;/b&gt;&lt;p&gt;
+&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
+<packages>
+<package name="SMD1,27-2,54">
+<description>&lt;b&gt;SMD PAD&lt;/b&gt;</description>
+<smd name="1" x="0" y="0" dx="1.27" dy="2.54" layer="1"/>
+<text x="0" y="0" size="0.0254" layer="27">&gt;VALUE</text>
+<text x="-0.8" y="-2.4" size="1.27" layer="25" rot="R90">&gt;NAME</text>
+</package>
+</packages>
+<symbols>
+<symbol name="PAD">
+<wire x1="-1.016" y1="1.016" x2="1.016" y2="-1.016" width="0.254" layer="94"/>
+<wire x1="-1.016" y1="-1.016" x2="1.016" y2="1.016" width="0.254" layer="94"/>
+<text x="-1.143" y="1.8542" size="1.778" layer="95">&gt;NAME</text>
+<text x="-1.143" y="-3.302" size="1.778" layer="96">&gt;VALUE</text>
+<pin name="P" x="2.54" y="0" visible="off" length="short" direction="pas" rot="R180"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="SMD2" prefix="PAD" uservalue="yes">
+<description>&lt;b&gt;SMD PAD&lt;/b&gt;</description>
+<gates>
+<gate name="1" symbol="PAD" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="SMD1,27-2,54">
+<connects>
+<connect gate="1" pin="P" pad="1"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -2956,20 +3033,86 @@ part number 2062-2P from STA</description>
 <part name="PMRGT" library="SparkFun-Connectors" deviceset="CONN_04" device=""/>
 <part name="PWPWR" library="SparkFun-Connectors" deviceset="CONN_02" device=""/>
 <part name="SMIRF" library="SparkFun-Connectors" deviceset="CONN_04" device=""/>
+<part name="PAD1" library="wirepad" deviceset="SMD2" device=""/>
+<part name="PAD2" library="wirepad" deviceset="SMD2" device=""/>
+<part name="PAD3" library="wirepad" deviceset="SMD2" device=""/>
+<part name="PAD4" library="wirepad" deviceset="SMD2" device=""/>
+<part name="PAD5" library="wirepad" deviceset="SMD2" device=""/>
+<part name="PAD6" library="wirepad" deviceset="SMD2" device=""/>
+<part name="PAD7" library="wirepad" deviceset="SMD2" device=""/>
+<part name="PAD8" library="wirepad" deviceset="SMD2" device=""/>
+<part name="U$1" library="headers(2mm)" deviceset="1X2" device=""/>
+<part name="PAD9" library="wirepad" deviceset="SMD2" device=""/>
+<part name="PAD10" library="wirepad" deviceset="SMD2" device=""/>
 </parts>
 <sheets>
 <sheet>
 <plain>
 </plain>
 <instances>
-<instance part="LBLFT" gate="G$1" x="-12.02" y="70.54"/>
-<instance part="LBRGT" gate="G$1" x="6.54" y="73.16"/>
-<instance part="VLLFT" gate="J$1" x="27.94" y="86.36"/>
-<instance part="VLRGT2" gate="J$1" x="48.26" y="86.36"/>
-<instance part="PMLFT" gate="G$1" x="30.48" y="58.42"/>
-<instance part="PMRGT" gate="G$1" x="55.88" y="58.42"/>
-<instance part="PWPWR" gate="G$1" x="40.64" y="71.12"/>
-<instance part="SMIRF" gate="G$1" x="86.36" y="58.42"/>
+<instance part="LBLFT" gate="G$1" x="-12.02" y="70.54" smashed="yes">
+<attribute name="NAME" x="-14.56" y="83.875" size="1.27" layer="95" font="vector"/>
+<attribute name="VALUE" x="-14.56" y="55.935" size="1.27" layer="96" font="vector"/>
+</instance>
+<instance part="LBRGT" gate="G$1" x="6.54" y="73.16" smashed="yes">
+<attribute name="NAME" x="4" y="83.955" size="1.27" layer="95" font="vector"/>
+<attribute name="VALUE" x="4" y="63.635" size="1.27" layer="96" font="vector"/>
+</instance>
+<instance part="VLLFT" gate="J$1" x="27.94" y="86.36" smashed="yes">
+<attribute name="VALUE" x="25.4" y="78.994" size="1.778" layer="96" font="vector"/>
+<attribute name="NAME" x="25.4" y="91.948" size="1.778" layer="95" font="vector"/>
+</instance>
+<instance part="VLRGT2" gate="J$1" x="48.26" y="86.36" smashed="yes">
+<attribute name="VALUE" x="45.72" y="78.994" size="1.778" layer="96" font="vector"/>
+<attribute name="NAME" x="45.72" y="91.948" size="1.778" layer="95" font="vector"/>
+</instance>
+<instance part="PMLFT" gate="G$1" x="30.48" y="58.42" smashed="yes">
+<attribute name="VALUE" x="25.4" y="51.054" size="1.778" layer="96" font="vector"/>
+<attribute name="NAME" x="25.4" y="66.548" size="1.778" layer="95" font="vector"/>
+</instance>
+<instance part="PMRGT" gate="G$1" x="55.88" y="58.42" smashed="yes">
+<attribute name="VALUE" x="50.8" y="51.054" size="1.778" layer="96" font="vector"/>
+<attribute name="NAME" x="50.8" y="66.548" size="1.778" layer="95" font="vector"/>
+</instance>
+<instance part="PWPWR" gate="G$1" x="40.64" y="71.12" smashed="yes">
+<attribute name="VALUE" x="38.1" y="66.294" size="1.778" layer="96" font="vector"/>
+<attribute name="NAME" x="38.1" y="76.708" size="1.778" layer="95" font="vector"/>
+</instance>
+<instance part="SMIRF" gate="G$1" x="86.36" y="58.42" smashed="yes">
+<attribute name="VALUE" x="81.28" y="51.054" size="1.778" layer="96" font="vector"/>
+<attribute name="NAME" x="81.28" y="66.548" size="1.778" layer="95" font="vector"/>
+</instance>
+<instance part="PAD1" gate="1" x="-7.62" y="40.64" smashed="yes">
+<attribute name="VALUE" x="-8.763" y="37.338" size="1.778" layer="96"/>
+</instance>
+<instance part="PAD2" gate="1" x="-7.62" y="35.56" smashed="yes">
+<attribute name="VALUE" x="-8.763" y="32.258" size="1.778" layer="96"/>
+</instance>
+<instance part="PAD3" gate="1" x="-7.62" y="25.4" smashed="yes">
+<attribute name="VALUE" x="-8.763" y="22.098" size="1.778" layer="96"/>
+</instance>
+<instance part="PAD4" gate="1" x="-7.62" y="20.32" smashed="yes">
+<attribute name="VALUE" x="-8.763" y="17.018" size="1.778" layer="96"/>
+</instance>
+<instance part="PAD5" gate="1" x="10.16" y="40.64" smashed="yes">
+<attribute name="VALUE" x="9.017" y="37.338" size="1.778" layer="96"/>
+</instance>
+<instance part="PAD6" gate="1" x="10.16" y="35.56" smashed="yes">
+<attribute name="VALUE" x="9.017" y="32.258" size="1.778" layer="96"/>
+</instance>
+<instance part="PAD7" gate="1" x="10.16" y="25.4" smashed="yes">
+<attribute name="VALUE" x="9.017" y="22.098" size="1.778" layer="96"/>
+</instance>
+<instance part="PAD8" gate="1" x="10.16" y="20.32" smashed="yes">
+<attribute name="VALUE" x="9.017" y="17.018" size="1.778" layer="96"/>
+</instance>
+<instance part="U$1" gate="G$1" x="-17.78" y="99.06" smashed="yes"/>
+<instance part="PAD9" gate="1" x="48.26" y="27.94" smashed="yes">
+<attribute name="VALUE" x="47.117" y="24.638" size="1.778" layer="96"/>
+</instance>
+<instance part="PAD10" gate="1" x="48.26" y="17.78" smashed="yes">
+<attribute name="VALUE" x="47.117" y="14.478" size="1.778" layer="96"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -2985,6 +3128,26 @@ part number 2062-2P from STA</description>
 <pinref part="SMIRF" gate="G$1" pin="4"/>
 <wire x1="91.44" y1="63.5" x2="96.52" y2="63.5" width="0.1524" layer="91"/>
 <label x="91.44" y="63.5" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="PAD1" gate="1" pin="P"/>
+<wire x1="-5.08" y1="40.64" x2="0" y2="40.64" width="0.1524" layer="91"/>
+<label x="-5.08" y="40.64" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="PAD3" gate="1" pin="P"/>
+<wire x1="-5.08" y1="25.4" x2="0" y2="25.4" width="0.1524" layer="91"/>
+<label x="-5.08" y="25.4" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="PAD5" gate="1" pin="P"/>
+<wire x1="12.7" y1="40.64" x2="17.78" y2="40.64" width="0.1524" layer="91"/>
+<label x="12.7" y="40.64" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="PAD7" gate="1" pin="P"/>
+<wire x1="12.7" y1="25.4" x2="17.78" y2="25.4" width="0.1524" layer="91"/>
+<label x="12.7" y="25.4" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="INT" class="0">
@@ -3013,6 +3176,26 @@ part number 2062-2P from STA</description>
 <wire x1="-9.48" y1="73.08" x2="-9.48" y2="73.66" width="0.1524" layer="91"/>
 <wire x1="-9.48" y1="73.66" x2="-5.08" y2="73.66" width="0.1524" layer="91"/>
 <label x="-7.62" y="73.66" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="PAD2" gate="1" pin="P"/>
+<wire x1="-5.08" y1="35.56" x2="0" y2="35.56" width="0.1524" layer="91"/>
+<label x="-5.08" y="35.56" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="PAD4" gate="1" pin="P"/>
+<wire x1="-5.08" y1="20.32" x2="0" y2="20.32" width="0.1524" layer="91"/>
+<label x="-5.08" y="20.32" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="PAD6" gate="1" pin="P"/>
+<wire x1="12.7" y1="35.56" x2="17.78" y2="35.56" width="0.1524" layer="91"/>
+<label x="12.7" y="35.56" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="PAD8" gate="1" pin="P"/>
+<wire x1="12.7" y1="20.32" x2="17.78" y2="20.32" width="0.1524" layer="91"/>
+<label x="12.7" y="20.32" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="A1/SCK" class="0">
@@ -3055,6 +3238,16 @@ part number 2062-2P from STA</description>
 <pinref part="SMIRF" gate="G$1" pin="3"/>
 <wire x1="91.44" y1="60.96" x2="96.52" y2="60.96" width="0.1524" layer="91"/>
 <label x="91.44" y="60.96" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="2"/>
+<wire x1="-15.24" y1="96.52" x2="-10.16" y2="96.52" width="0.1524" layer="91"/>
+<label x="-12.7" y="96.52" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="PAD10" gate="1" pin="P"/>
+<wire x1="50.8" y1="17.78" x2="55.88" y2="17.78" width="0.1524" layer="91"/>
+<label x="50.8" y="17.78" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="3.3V" class="0">
@@ -3167,6 +3360,18 @@ part number 2062-2P from STA</description>
 <pinref part="SMIRF" gate="G$1" pin="1"/>
 <wire x1="91.44" y1="55.88" x2="96.52" y2="55.88" width="0.1524" layer="91"/>
 <label x="91.44" y="55.88" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="VBAT" class="0">
+<segment>
+<pinref part="U$1" gate="G$1" pin="1"/>
+<wire x1="-15.24" y1="99.06" x2="-10.16" y2="99.06" width="0.1524" layer="91"/>
+<label x="-12.7" y="99.06" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="PAD9" gate="1" pin="P"/>
+<wire x1="50.8" y1="27.94" x2="55.88" y2="27.94" width="0.1524" layer="91"/>
+<label x="50.8" y="27.94" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
