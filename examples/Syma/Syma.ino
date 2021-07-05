@@ -72,9 +72,9 @@ void setup(void)
     h.addSensor(&imu);
 
     // Add PID controllers
-    h.addPidController(&levelPid);
-    h.addPidController(&ratePid);
-    h.addPidController(&yawPid);
+    h.addClosedLoopController(&levelPid);
+    h.addClosedLoopController(&ratePid);
+    h.addClosedLoopController(&yawPid);
 
     // Adjust trim
     receiver.setTrim(0, 0.05, 0.05);

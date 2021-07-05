@@ -34,22 +34,12 @@ namespace hf {
             {  
             }
 
-            void addPidController(PidController * pidController, uint8_t auxState=0) 
-            {
-                RFT::addClosedLoopController(pidController, auxState);
-            }
-
             void begin(bool armed=false)
             {  
                 // Initialize state
                 memset(&_state.x, 0, sizeof(_state.x));
 
                 RFT::begin(armed);
-            }
-
-            void update(void)
-            {
-                RFT::update();
             }
 
     }; // class HackflightPure

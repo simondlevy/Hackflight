@@ -84,9 +84,9 @@ void setup(void)
     // h.addSensor(&flowSensor);
 
     // Add PID controllers
-    h.addPidController(&levelPid);
-    h.addPidController(&ratePid);
-    h.addPidController(&yawPid);
+    h.addClosedLoopController(&levelPid);
+    h.addClosedLoopController(&ratePid);
+    h.addClosedLoopController(&yawPid);
 
     // Start Hackflight firmware
     h.begin();
