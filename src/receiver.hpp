@@ -151,9 +151,6 @@ namespace hf {
                 _demands[DEMANDS_PITCH] += _trimPitch;
                 _demands[DEMANDS_YAW]   += _trimYaw;
 
-                // Yaw demand needs to be reversed
-                // _demands[DEMANDS_YAW] = -_demands[DEMANDS_YAW];
-
                 // Pass throttle demand through exponential function
                 _demands[DEMANDS_THROTTLE] = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
 
