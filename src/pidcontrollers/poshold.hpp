@@ -17,7 +17,16 @@ namespace hf {
 
             virtual void modifyDemands(State * state, float * demands) override
             {
-                rft::Debugger::printf("DX=%+3.2f    DY=%+3.2f", state->x[State::DX], state->x[State::DY]);
+                float * x = state->x;
+                float phi = x[State::PSI];
+                float cphi = cos(phi);
+                float sphi = sin(phi);
+                float dx = x[State::DX];
+                float dy = x[State::DY];
+                float vfwd = cphi * dx + sphi * dy;
+                float vrgt = cphi * dy - sphi * dx;
+
+                rft::Debugger::printf("%+3.2f", vfwd);
             }
 
         public:
