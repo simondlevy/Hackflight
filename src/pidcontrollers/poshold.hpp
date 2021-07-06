@@ -16,7 +16,8 @@ namespace hf {
 
             static constexpr float STICK_DEADBAND = 0.20;   
 
-            rft::DofPid _pid;
+            rft::DofPid _xpid;
+            rft::DofPid _ypid;
 
             bool inband(float demand) 
             {
@@ -31,7 +32,7 @@ namespace hf {
                 float * x = state->x;
 
                 // Run controller only if roll and pitch are small
-                if (inband(demands[DEMANDS_ROLL])) {
+                if (inband(demands[DEMANDS_ROLL]) && inband(demands[DEMANDS_PITCH])) {
 
                     // Get heading
                     float psi = x[State::PSI];
@@ -47,7 +48,7 @@ namespace hf {
                     float vfwd = cpsi * dx + spsi * dy;
                     float vrgt = cpsi * dy - spsi * dx;
 
-                    demands[DEMANDS_ROLL] = _pid.compute(0, vrgt);
+                    demands[DEMANDS_ROLL] = _ypid.compute(0, vrgt);
                 }
             }
 
@@ -55,7 +56,7 @@ namespace hf {
 
             PositionHoldPid(const float Kp=0.1, const float Ki=0.0, const float Kd=0.0) 
             {
-                _pid.begin(Kp, Ki, Kd);
+                _ypid.begin(Kp, Ki, Kd);
             }
 
     };  // class PositionHoldPid
