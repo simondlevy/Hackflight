@@ -14,13 +14,7 @@ namespace hf {
 
         private:
 
-            static constexpr float MAX_ANGLE_DEGREES = 5;
-
-            float _maxAngle = 0;
-
-            bool safeAngle(float angle) {
-                return abs(angle) < _maxAngle;
-            }
+            static constexpr float STICK_DEADBAND = 0.20;   
 
             rft::DofPid _pid;
 
@@ -32,8 +26,7 @@ namespace hf {
                 float * x = state->x;
 
                 // Run controller only if roll and pitch are small
-                //if (safeAngle(x[State::PHI]) && safeAngle(x[State::THETA])) {
-                if (fabs(demands[DEMANDS_ROLL]) < 0.2) {
+                if (fabs(demands[DEMANDS_ROLL]) < STICK_DEADBAND) {
 
                     // Get heading
                     float psi = x[State::PSI];
@@ -51,17 +44,12 @@ namespace hf {
 
                     demands[DEMANDS_ROLL] = _pid.compute(0, vrgt);
                 }
-                else {
-                    //rft::Debugger::printf("NO");
-                }
             }
 
         public:
 
             PositionHoldPid(const float Kp=0.1, const float Ki=0.0, const float Kd=0.0) 
             {
-                _maxAngle = rft::Filter::deg2rad(MAX_ANGLE_DEGREES);
-
                 _pid.begin(Kp, Ki, Kd);
             }
 
