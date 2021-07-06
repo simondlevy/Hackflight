@@ -34,10 +34,8 @@ namespace hf {
                 // Run controller only if roll and pitch are small
                 if (inband(demands[DEMANDS_ROLL]) && inband(demands[DEMANDS_PITCH])) {
 
-                    // Get heading
+                    // Get heading for converting world-coordinate velocities to body coordinates
                     float psi = x[State::PSI];
-
-                    // Convert lateral velocity from world coordinates to body coordinates
 
                     float cpsi = cos(psi);
                     float spsi = sin(psi);
@@ -45,11 +43,8 @@ namespace hf {
                     float dx = x[State::DX];
                     float dy = x[State::DY];
 
-                    float vfwd = cpsi * dx + spsi * dy;
-                    float vrgt = cpsi * dy - spsi * dx;
-
-                    demands[DEMANDS_ROLL] = _ypid.compute(0, vrgt);
-                    demands[DEMANDS_PITCH] = _xpid.compute(0, vfwd);
+                    demands[DEMANDS_ROLL] = _ypid.compute(0, cpsi * dy - spsi * dx);
+                    demands[DEMANDS_PITCH] = _xpid.compute(0, cpsi * dx + spsi * dy);
                 }
             }
 
