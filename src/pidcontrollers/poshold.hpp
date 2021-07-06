@@ -49,6 +49,7 @@ namespace hf {
                     float vrgt = cpsi * dy - spsi * dx;
 
                     demands[DEMANDS_ROLL] = _ypid.compute(0, vrgt);
+                    demands[DEMANDS_PITCH] = _ypid.compute(0, vfwd);
                 }
             }
 
@@ -56,6 +57,7 @@ namespace hf {
 
             PositionHoldPid(const float Kp=0.1, const float Ki=0.0, const float Kd=0.0) 
             {
+                _xpid.begin(Kp, Ki, Kd);
                 _ypid.begin(Kp, Ki, Kd);
             }
 
