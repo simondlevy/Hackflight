@@ -15,30 +15,50 @@ namespace hf {
 
         private:
 
-            static constexpr float MAX_POSHOLD_ANGLE_DEGREES = 5;
+            static constexpr float MAX_ANGLE_DEGREES = 5;
+
+            float _maxAngle = 0;
+
+            bool safeAngle(float angle) {
+                return abs(angle) < _maxAngle;
+            }
 
         protected:
 
             virtual void modifyDemands(State * state, float * demands) override
             {
+                // Get state vector
                 float * x = state->x;
-                float phi = x[State::PHI];
-                float theta = x[State::THETA];
-                float psi = x[State::PSI];
-                float cpsi = cos(psi);
-                float spsi = sin(psi);
-                float dx = x[State::DX];
-                float dy = x[State::DY];
-                float vfwd = cpsi * dx + spsi * dy;
-                float vrgt = cpsi * dy - spsi * dx;
 
-                rft::Debugger::printf("%3.0f", fabs(rft::Filter::rad2deg(phi)));
+                // Run controller only if roll and pitch are small
+                if (safeAngle(x[State::PHI]) && safeAngle(x[State::THETA])) {
+
+                    // Get heading
+                    float psi = x[State::PSI];
+
+                    // Convert lateral velocity from world coordinates to body coordinates
+
+                    float cpsi = cos(psi);
+                    float spsi = sin(psi);
+
+                    float dx = x[State::DX];
+                    float dy = x[State::DY];
+
+                    float vfwd = cpsi * dx + spsi * dy;
+                    float vrgt = cpsi * dy - spsi * dx;
+
+                    rft::Debugger::printf("YES");
+                }
+                else {
+                    rft::Debugger::printf("NO");
+                }
             }
 
         public:
 
             PositionHoldPid(void)
             {
+                _maxAngle = rft::Filter::deg2rad(MAX_ANGLE_DEGREES);
             }
 
     };  // class PositionHoldPid
