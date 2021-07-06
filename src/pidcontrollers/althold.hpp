@@ -19,8 +19,8 @@ namespace hf {
         private: 
 
             // Arbitrary constants: for details see http://ardupilot.org/copter/docs/altholdmode.html
-            static constexpr float PILOT_VELZ_MAX  = 2.5f;
-            static constexpr float STICK_DEADBAND = 0.10;   
+            static constexpr float PILOT_VELZ_MAX = 2.5;
+            static constexpr float STICK_DEADBAND = 0.20;   
 
             // P controller for position.  This will serve as the set-point for velocity PID.
             rft::DofPid _posPid;
@@ -28,7 +28,7 @@ namespace hf {
             // PID controller for velocity
             rft::DofPid _velPid;
 
-            // Will be reset each time we re-enter throttle deadband.
+            // Will be reset each time we re-enter deadband.
             float _altitudeTarget = 0;
 
             // Tracks whether we just entered deadband

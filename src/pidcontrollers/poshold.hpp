@@ -1,64 +1,85 @@
 /*
-   Positon-hold PID controller
+   Position-hold PID controller
 
-   Copyright (c) 2018 Juan Gallostra and Simon D. Levy
+   Copyright (c) 2021 Simon D. Levy
 
    MIT License
    */
 
 #pragma once
 
+#include "pidcontroller.hpp"
+
+#include <rft_closedloops/dofpid.hpp>
+
 namespace hf {
 
     class PositionHoldPid : public PidController {
 
+        private: 
 
-        private:
+            // Arbitrary constants: for details see http://ardupilot.org/copter/docs/loiter-mode.html
+            static constexpr float PILOT_VELXY_MAX  = 5.0f;
+            static constexpr float STICK_DEADBAND = 0.20;   
 
-            static constexpr float MAX_ANGLE_DEGREES = 5;
+            // P controller for position.  This will serve as the set-point for velocity PID.
+            rft::DofPid _posPid;
 
-            float _maxAngle = 0;
+            // PID controller for velocity
+            rft::DofPid _velPid;
 
-            bool safeAngle(float angle) {
-                return abs(angle) < _maxAngle;
-            }
+            // Will be reset each time we re-enter deadband.
+            float __yTarget = 0;
+
+            // Tracks whether we just entered deadband
+            bool _inBandPrev = false;
 
         protected:
 
-            virtual void modifyDemands(State * state, float * demands) override
+            void modifyDemands(State * state, float * demands) override
             {
-                // Get state vector
-                float * x = state->x;
+                bool didReset = false;
+                float y = state->x[State::Y];
 
-                // Run controller only if roll and pitch are small
-                if (safeAngle(x[State::PHI]) && safeAngle(x[State::THETA])) {
+                // Is stick demand in deadband?
+                bool inBand = fabs(demands[DEMANDS_ROLL]) < STICK_DEADBAND; 
 
-                    // Get heading
-                    float psi = x[State::PSI];
-
-                    // Convert lateral velocity from world coordinates to body coordinates
-
-                    float cpsi = cos(psi);
-                    float spsi = sin(psi);
-
-                    float dx = x[State::DX];
-                    float dy = x[State::DY];
-
-                    float vfwd = cpsi * dx + spsi * dy;
-                    float vrgt = cpsi * dy - spsi * dx;
-
-                    rft::Debugger::printf("YES");
+                // Reset controller when moving into deadband
+                if (inBand && !_inBandPrev) {
+                    _velPid.reset();
+                    didReset = true;
                 }
-                else {
-                    rft::Debugger::printf("NO");
+                _inBandPrev = inBand;
+
+                // Target velocity is a setpoint inside deadband, scaled constant outside
+                float targetVelocity = inBand ?
+                                       _posPid.compute(__yTarget, y) :
+                                       PILOT_VELXY_MAX * demands[DEMANDS_ROLL];
+
+                // Run velocity PID controller to get correction
+                // XXX adjust for heading PSI
+                demands[DEMANDS_ROLL] = _velPid.compute(targetVelocity, state->y[State::DY]);
+
+                // If we re-entered deadband, we reset the target altitude.
+                if (didReset) {
+                    __yTarget = y;
                 }
+            }
+
+            virtual bool shouldFlashLed(void) override 
+            {
+                return true;
             }
 
         public:
 
-            PositionHoldPid(void)
+            PositionHoldPid(const float Kp_pos=1, const float Kp_vel=2.0, const float Ki_vel=1.0, const float Kd_vel=0.5) 
             {
-                _maxAngle = rft::Filter::deg2rad(MAX_ANGLE_DEGREES);
+                _posPid.begin(Kp_pos, 0, 0);
+                _velPid.begin(Kp_vel, Ki_vel, Kd_vel);
+
+                _inBandPrev = false;
+                __yTarget = 0;
             }
 
     };  // class PositionHoldPid
