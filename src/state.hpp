@@ -19,7 +19,7 @@ namespace hf {
 
         private:
 
-            static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
+            static constexpr float MAX_ARMING_ANGLE_DEGREES = 25;
 
             bool safeAngle(uint8_t axis)
             {

@@ -13,20 +13,26 @@ namespace hf {
     class PositionHoldPid : public PidController {
 
 
+        private:
+
+            static constexpr float MAX_POSHOLD_ANGLE_DEGREES = 5;
+
         protected:
 
             virtual void modifyDemands(State * state, float * demands) override
             {
                 float * x = state->x;
-                float phi = x[State::PSI];
-                float cphi = cos(phi);
-                float sphi = sin(phi);
+                float phi = x[State::PHI];
+                float theta = x[State::THETA];
+                float psi = x[State::PSI];
+                float cpsi = cos(psi);
+                float spsi = sin(psi);
                 float dx = x[State::DX];
                 float dy = x[State::DY];
-                float vfwd = cphi * dx + sphi * dy;
-                float vrgt = cphi * dy - sphi * dx;
+                float vfwd = cpsi * dx + spsi * dy;
+                float vrgt = cpsi * dy - spsi * dx;
 
-                rft::Debugger::printf("%+3.2f", vfwd);
+                rft::Debugger::printf("%3.0f", fabs(rft::Filter::rad2deg(phi)));
             }
 
         public:
