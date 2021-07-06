@@ -49,7 +49,7 @@ namespace hf {
                     float vrgt = cpsi * dy - spsi * dx;
 
                     demands[DEMANDS_ROLL] = _ypid.compute(0, vrgt);
-                    demands[DEMANDS_PITCH] = _ypid.compute(0, vfwd);
+                    demands[DEMANDS_PITCH] = _xpid.compute(0, vfwd);
                 }
             }
 
