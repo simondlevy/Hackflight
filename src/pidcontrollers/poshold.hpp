@@ -18,6 +18,11 @@ namespace hf {
 
             rft::DofPid _pid;
 
+            bool inband(float demand) 
+            {
+                return fabs(demand) < STICK_DEADBAND;
+            }
+
         protected:
 
             virtual void modifyDemands(State * state, float * demands) override
@@ -26,7 +31,7 @@ namespace hf {
                 float * x = state->x;
 
                 // Run controller only if roll and pitch are small
-                if (fabs(demands[DEMANDS_ROLL]) < STICK_DEADBAND) {
+                if (inband(demands[DEMANDS_ROLL])) {
 
                     // Get heading
                     float psi = x[State::PSI];
