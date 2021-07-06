@@ -16,13 +16,24 @@ namespace hf {
 
             static constexpr float STICK_DEADBAND = 0.20;   
 
-            rft::DofPid _xpid;
-            rft::DofPid _ypid;
-
             bool inband(float demand) 
             {
                 return fabs(demand) < STICK_DEADBAND;
             }
+
+            // Helper class
+            class VelPid : public rft::DofPid {
+
+                public:
+
+                    float compute(float vel) {
+
+                        return DofPid::compute(0, vel);
+                    }
+            }; 
+
+            VelPid _xpid;
+            VelPid _ypid;
 
         protected:
 
@@ -43,8 +54,8 @@ namespace hf {
                     float dx = x[State::DX];
                     float dy = x[State::DY];
 
-                    demands[DEMANDS_ROLL] = _ypid.compute(0, cpsi * dy - spsi * dx);
-                    demands[DEMANDS_PITCH] = _xpid.compute(0, cpsi * dx + spsi * dy);
+                    demands[DEMANDS_ROLL] = _ypid.compute(cpsi * dy - spsi * dx);
+                    demands[DEMANDS_PITCH] = _xpid.compute(cpsi * dx + spsi * dy);
                 }
             }
 
