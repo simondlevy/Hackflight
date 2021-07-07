@@ -3096,9 +3096,7 @@ part number 2062-2P from STA</description>
 <instance part="PAD5" gate="1" x="10.16" y="40.64" smashed="yes">
 <attribute name="VALUE" x="9.017" y="37.338" size="1.778" layer="96"/>
 </instance>
-<instance part="PAD6" gate="1" x="10.16" y="35.56" smashed="yes">
-<attribute name="VALUE" x="9.017" y="32.258" size="1.778" layer="96"/>
-</instance>
+<instance part="PAD6" gate="1" x="10.16" y="35.56" smashed="yes"/>
 <instance part="PAD7" gate="1" x="10.16" y="25.4" smashed="yes">
 <attribute name="VALUE" x="9.017" y="22.098" size="1.778" layer="96"/>
 </instance>
