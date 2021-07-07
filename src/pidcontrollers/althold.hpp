@@ -22,13 +22,10 @@ namespace hf {
             static constexpr float PILOT_VELZ_MAX = 2.5;
             static constexpr float STICK_DEADBAND = 0.20;   
 
-            // P controller for position.  This will serve as the set-point for velocity PID.
-            rft::DofPid _posPid;
-
             // PID controller for velocity
-            rft::DofPid _velPid;
+            rft::DofPid _pid;
 
-            // Will be reset each time we re-enter deadband.
+            // Will be reset each time we re-enter deadband
             float _altitudeTarget = 0;
 
             // Tracks whether we just entered deadband
@@ -46,18 +43,18 @@ namespace hf {
 
                 // Reset controller when moving into deadband
                 if (inBand && !_inBandPrev) {
-                    _velPid.reset();
+                    _pid.reset();
                     didReset = true;
                 }
                 _inBandPrev = inBand;
 
                 // Target velocity is a setpoint inside deadband, scaled constant outside
                 float targetVelocity = inBand ?
-                                       _posPid.compute(_altitudeTarget, altitude) :
+                                       _altitudeTarget - altitude :
                                        PILOT_VELZ_MAX * demands[DEMANDS_THROTTLE];
 
                 // Run velocity PID controller to get correction
-                demands[DEMANDS_THROTTLE] = _velPid.compute(targetVelocity, state->x[State::DZ]);
+                demands[DEMANDS_THROTTLE] = _pid.compute(targetVelocity, state->x[State::DZ]);
 
                 // If we re-entered deadband, we reset the target altitude.
                 if (didReset) {
@@ -72,10 +69,9 @@ namespace hf {
 
         public:
 
-            AltitudeHoldPid(const float Kp_pos=1, const float Kp_vel=0.75, const float Ki_vel=1.5, const float Kd_vel=0) 
+            AltitudeHoldPid(const float Kp_vel=0.75, const float Ki_vel=1.5, const float Kd_vel=0) 
             {
-                _posPid.begin(Kp_pos, 0, 0);
-                _velPid.begin(Kp_vel, Ki_vel, Kd_vel);
+                _pid.begin(Kp_vel, Ki_vel, Kd_vel);
 
                 _inBandPrev = false;
                 _altitudeTarget = 0;

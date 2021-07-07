@@ -32,6 +32,7 @@ namespace hf {
                     }
             }; 
 
+            // One PID controller for each axis (X, Y)
             VelPid _xpid;
             VelPid _ypid;
 
@@ -45,7 +46,7 @@ namespace hf {
                 // Run controller only if roll and pitch are small
                 if (inband(demands[DEMANDS_ROLL]) && inband(demands[DEMANDS_PITCH])) {
 
-                    // Get heading for converting world-coordinate velocities to body coordinates
+                    // Get heading for rotating world-coordinate velocities into body coordinates
                     float psi = x[State::PSI];
 
                     float cpsi = cos(psi);
