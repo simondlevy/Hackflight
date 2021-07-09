@@ -17,6 +17,8 @@ from receiver import Receiver
 from mixers import QuadXAPMixer, CoaxialMixer
 from pidcontrollers import RatePid, YawPid, LevelPid
 
+from debugging import debug
+
 
 class HackflightCopter(MulticopterServer):
 
@@ -41,11 +43,15 @@ class HackflightCopter(MulticopterServer):
         # Start with demands from receiver
         demands = np.array(list(self.receiver.getDemands()))
 
+        debug(demands)
+
         # Pass demands through closed-loop controllers
         for closedloop in self.closedloops:
             demands = closedloop.modifyDemands(state, demands)
 
-        return self.mixer.getMotors(demands)
+        motors = self.mixer.getMotors(demands)
+
+        return motors
 
     def handleImage(self, image):
         '''
@@ -79,12 +85,15 @@ def main():
         print('Unrecognized vehicle: %s' % args.vehicle)
         exit(1)
 
+    # Create Hackflight object
     h = HackflightCopter(Receiver(), mixerdict[args.vehicle]())
 
+    # Add PID controllers
     h.addClosedLoopController(RatePid(0.225, 0.001875, 0.375))
     h.addClosedLoopController(YawPid(2.0, 0.1))
     h.addClosedLoopController(LevelPid(0.2))
 
+    # Go!
     h.begin()
 
 

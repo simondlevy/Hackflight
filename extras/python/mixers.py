@@ -9,6 +9,7 @@ MIT License
 from demands import DEMANDS_THROTTLE, DEMANDS_ROLL, DEMANDS_PITCH, DEMANDS_YAW
 import numpy as np
 
+from debugging import debug
 
 class Mixer(object):
 
@@ -17,9 +18,6 @@ class Mixer(object):
         self.motordirs = motordirs
 
     def getMotors(self, demands):
-
-        # Map throttle demand from [-1,1] to [0,1]
-        demands[DEMANDS_THROTTLE] = (demands[DEMANDS_THROTTLE]+1)/2
 
         m = len(self.motordirs)
 

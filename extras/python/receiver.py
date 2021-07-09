@@ -36,14 +36,15 @@ class Receiver(object):
         # Default axis map and inverters
         self.axis_map = ([1, 2, 3, 0] if platform == 'win32' else [1, 3, 4, 0])
         self.invert = [-1, -1]
+        self.throttleFun = Receiver.throttleFunDefault
 
         # Initialize a controller or exit if nothing is plugged in
         try:
             self.js = pg.joystick.Joystick(0)
             if 'SPEKTRUM' in self.js.get_name():
-                self.axis_map = ([1, 2, 5, 0]if platform == 'win32'
-                                 else [1, 2, 3, 0])
+                self.axis_map = [1, 2, 3, 0]
                 self.invert = [+1, +1]
+                self.throttleFun = Receiver.throttleFunSpektrum
             self.js.init()
         except pg.error:
             print('Would you like to buy a controller?')
@@ -66,8 +67,6 @@ class Receiver(object):
                 axes = [self.js.get_axis(i)
                         for i in range(self.js.get_numaxes())]
 
-                print('%+3.3f' % axes[3])
-
                 # Use axis map to go from axes to demands
                 self.demands = np.array([axes[self.axis_map[i]]
                                          for i in range(4)])
@@ -76,12 +75,23 @@ class Receiver(object):
                 self.demands[0] *= self.invert[0]
                 self.demands[2] *= self.invert[1]
 
+                # Adjust for spring-loaded throttle stick
+                self.demands[0] = self.throttleFun(self.demands[0])
+
     def getDemands(self):
         '''
         Can be called on any thread
         '''
 
         return self.demands.copy()
+
+    @staticmethod
+    def throttleFunSpektrum(val):
+        return (val + 1) / 2
+
+    @staticmethod
+    def throttleFunDefault(val):
+        return val
 
 
 def main():
