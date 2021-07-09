@@ -85,11 +85,9 @@ class Receiver(object):
 
         return self.demands.copy()
 
-    @staticmethod
     def throttleFunSpektrum(val):
         return (val + 1) / 2
 
-    @staticmethod
     def throttleFunDefault(val):
         return val
 

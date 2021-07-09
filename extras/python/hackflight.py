@@ -43,8 +43,6 @@ class HackflightCopter(MulticopterServer):
         # Start with demands from receiver
         demands = np.array(list(self.receiver.getDemands()))
 
-        debug(demands)
-
         # Pass demands through closed-loop controllers
         for closedloop in self.closedloops:
             demands = closedloop.modifyDemands(state, demands)
