@@ -69,15 +69,6 @@ namespace hf {
 
         protected:
 
-            void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
-            {
-                rft::SerialTask::begin(board);
-                
-                _receiver = receiver;
-                _actuator = actuator;
-                _state = state;
-            }
-
             void dispatchMessage(void) override
             {
                 switch (_command) {
