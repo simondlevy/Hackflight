@@ -29,7 +29,7 @@ namespace hf {
 
             void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
             {  
-                HackflightPure::begin(board, receiver, actuator, state);
+                HackflightPure::begin(board, receiver, actuator);
 
                 // Start serial tasks
                 _gcsTask.begin(board, receiver, actuator, state);

@@ -21,9 +21,9 @@ namespace hf {
 
         public:
 
-            void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state, bool armed=false)
+            void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
             {
-                rft::RFT::begin(board, receiver, actuator, state, armed);
+                rft::RFT::begin(board, receiver, actuator);
             }
 
             void update(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
