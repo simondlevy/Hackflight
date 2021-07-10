@@ -26,9 +26,11 @@ namespace hf {
 
                     static constexpr float MAX_ANGLE_DEGREES = 45;
 
-                    // Maximum roll pitch demand is +/-0.5, so to convert demand to 
-                    // angle for error computation, we multiply by the folling amount:
-                    float _demandMultiplier = 2 * rft::Filter::deg2rad(MAX_ANGLE_DEGREES);
+                    // Maximum roll pitch demand is +/-0.5, so to convert
+                    // demand to angle for error computation, we multiply by
+                    // the folling amount:
+                    float _demandMultiplier =
+                        2 * rft::Filter::deg2rad(MAX_ANGLE_DEGREES);
 
                 public:
 
@@ -39,7 +41,8 @@ namespace hf {
 
                     float compute(float demand, float angle)
                     {
-                        return rft::DofPid::compute(demand*_demandMultiplier, angle);
+                        return rft::DofPid::compute(demand *
+                                                    _demandMultiplier, angle);
                     }
 
             }; // class _AnglePid
@@ -62,11 +65,15 @@ namespace hf {
 
             void modifyDemands(State * state, float * demands) override
             {
-                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL], state->x[State::PHI]); 
+                demands[DEMANDS_ROLL]
+                    = _rollPid.compute(demands[DEMANDS_ROLL],
+                                       state->x[State::PHI]); 
 
                 // Pitch demand is nose-down positive, so we negate
                 // pitch-forward (nose-down negative) to reconcile them
-                demands[DEMANDS_PITCH] = _pitchPid.compute(demands[DEMANDS_PITCH], -state->x[State::THETA]);
+                demands[DEMANDS_PITCH] =
+                    _pitchPid.compute(demands[DEMANDS_PITCH],
+                                      -state->x[State::THETA]);
             }
 
     };  // class LevelPid

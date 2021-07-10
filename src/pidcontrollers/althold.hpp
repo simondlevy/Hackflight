@@ -18,7 +18,8 @@ namespace hf {
 
         private: 
 
-            // Arbitrary constants: for details see http://ardupilot.org/copter/docs/altholdmode.html
+            // Arbitrary constants: for details see
+            // http://ardupilot.org/copter/docs/altholdmode.html
             static constexpr float PILOT_VELZ_MAX = 2.5;
             static constexpr float STICK_DEADBAND = 0.20;   
 
@@ -39,7 +40,8 @@ namespace hf {
                 float altitude = state->x[State::Z];
 
                 // Is stick demand in deadband?
-                bool inBand = fabs(demands[DEMANDS_THROTTLE]) < STICK_DEADBAND; 
+                bool inBand = fabs(demands[DEMANDS_THROTTLE]) <
+                    STICK_DEADBAND; 
 
                 // Reset controller when moving into deadband
                 if (inBand && !_inBandPrev) {
@@ -48,13 +50,16 @@ namespace hf {
                 }
                 _inBandPrev = inBand;
 
-                // Target velocity is a setpoint inside deadband, scaled constant outside
+                // Target velocity is a setpoint inside deadband, scaled
+                // constant outside
                 float targetVelocity = inBand ?
                                        _altitudeTarget - altitude :
-                                       PILOT_VELZ_MAX * demands[DEMANDS_THROTTLE];
+                                       PILOT_VELZ_MAX *
+                                       demands[DEMANDS_THROTTLE];
 
                 // Run velocity PID controller to get correction
-                demands[DEMANDS_THROTTLE] = _pid.compute(targetVelocity, state->x[State::DZ]);
+                demands[DEMANDS_THROTTLE] =
+                    _pid.compute(targetVelocity, state->x[State::DZ]);
 
                 // If we re-entered deadband, we reset the target altitude.
                 if (didReset) {
@@ -69,7 +74,9 @@ namespace hf {
 
         public:
 
-            AltitudeHoldPid(const float Kp_vel=0.75, const float Ki_vel=1.5, const float Kd_vel=0) 
+            AltitudeHoldPid(const float Kp_vel=0.75,
+                            const float Ki_vel=1.5,
+                            const float Kd_vel=0) 
             {
                 _pid.init(Kp_vel, Ki_vel, Kd_vel);
 

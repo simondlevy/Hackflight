@@ -30,9 +30,12 @@ namespace hf {
                 _pitchPid.init(Kp, Ki, Kd);
             }
 
-            virtual void modifyDemands(State * state, float * demands) override
+            virtual void modifyDemands(State * state,
+                    float * demands) override
             {
-                demands[DEMANDS_ROLL]  = _rollPid.compute(demands[DEMANDS_ROLL],  state->x[State::DPHI]);
+                demands[DEMANDS_ROLL]
+                    = _rollPid.compute(demands[DEMANDS_ROLL], 
+                                       state->x[State::DPHI]);
 
                 // Pitch demand is nose-down positive, so we negate
                 // pitch-forward rate (nose-down negative) to reconcile them
