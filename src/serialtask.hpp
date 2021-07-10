@@ -69,19 +69,18 @@ namespace hf {
 
         protected:
 
-            void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
+            void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
             {
                 rft::SerialTask::begin(board);
                 
                 _receiver = receiver;
                 _actuator = actuator;
+                _state = state;
             }
 
-
-            SerialTask(State * state, bool secondary=false)
+            SerialTask(bool secondary=false)
                 : rft::SerialTask(secondary)
             {
-                _state = state;
             }
 
             void dispatchMessage(void) override

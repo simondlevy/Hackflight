@@ -20,30 +20,30 @@ namespace hf {
         private:
 
             // Serial timer task for GCS on main port (USB)
-            SerialTask _gcsTask = SerialTask(&_state);
+            SerialTask _gcsTask;
 
             // Serial timer task for telemetry on secondary port (Serial1, Serial2, ...)
-            SerialTask _telemetryTask = SerialTask(&_state, true);
+            SerialTask _telemetryTask = SerialTask(true);
 
         public:
 
-            void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
+            void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
             {  
-                HackflightPure::begin(board, receiver, actuator);
+                HackflightPure::begin(board, receiver, actuator, state);
 
                 // Start serial tasks
-                _gcsTask.begin(board, receiver, actuator);
-                _telemetryTask.begin(board, receiver, actuator);
+                _gcsTask.begin(board, receiver, actuator, state);
+                _telemetryTask.begin(board, receiver, actuator, state);
 
             }
 
-            void update(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
+            void update(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
             {
-                HackflightPure::update(board, receiver, actuator);
+                HackflightPure::update(board, receiver, actuator, state);
 
                 // Update serial tasks
-                _gcsTask.update(receiver, actuator, &_state);
-                _telemetryTask.update(receiver, actuator, &_state);
+                _gcsTask.update(receiver, actuator, state);
+                _telemetryTask.update(receiver, actuator, state);
             }
 
     }; // class Hackflight

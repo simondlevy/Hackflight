@@ -19,21 +19,16 @@ namespace hf {
 
     class HackflightPure : public rft::RFT {
 
-        protected:
-
-            // Vehicle state
-            State _state;
-
         public:
 
-            void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, bool armed=false)
+            void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state, bool armed=false)
             {
-                rft::RFT::begin(board, receiver, actuator, &_state, armed);
+                rft::RFT::begin(board, receiver, actuator, state, armed);
             }
 
-            void update(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
+            void update(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
             {
-                rft::RFT::update(board, receiver, actuator, &_state);
+                rft::RFT::update(board, receiver, actuator, state);
             }
 
     }; // class HackflightPure

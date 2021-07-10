@@ -64,6 +64,10 @@ static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 static hf::USFS imu;
 
+// Vehicle state ========================================================================
+
+static hf::State state;
+
 // Setup ==============================================================================
 
 void setup(void)
@@ -80,12 +84,12 @@ void setup(void)
     receiver.setTrim(0, 0.05, 0.05);
 
     // Start Hackflight firmware
-    h.begin(&board, &receiver, &mixer);
+    h.begin(&board, &receiver, &mixer, &state);
 }
 
 // Loop ===============================================================================
 
 void loop(void)
 {
-    h.update(&board, &receiver, &mixer);
+    h.update(&board, &receiver, &mixer, &state);
 }
