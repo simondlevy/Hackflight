@@ -1,7 +1,7 @@
 /*
    Hackflight algorithm for real vehicles
 
-   Add serial tasks for GCS and telemetry
+   Supports adding serial communications tasks
 
    Copyright (c) 2021 Simon D. Levy
 
@@ -17,34 +17,12 @@ namespace hf {
 
     class Hackflight : public HackflightPure {
 
-        private:
-
-            // Serial timer task for GCS on main port (USB)
-            SerialTask _gcsTask;
-
-            // Serial timer task for telemetry on secondary port (Serial1, Serial2, ...)
-            SerialTask _telemetryTask = SerialTask(true);
-
         public:
 
-            void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
-            {  
-                HackflightPure::begin(board, receiver, actuator);
-
-                // Start serial tasks
-                _gcsTask.begin(board, receiver, actuator, state);
-                _telemetryTask.begin(board, receiver, actuator, state);
-            }
-
-            void update(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
+            void addSerialTask(SerialTask * task)
             {
-                HackflightPure::update(board, receiver, actuator, state);
-
-                // Update serial tasks
-                _gcsTask.update(receiver, actuator, state);
-                _telemetryTask.update(receiver, actuator, state);
+                rft::RFT::addSerialTask(task);
             }
 
-    }; // class Hackflight
-
-} // namespace hf
+    };
+} 

@@ -94,7 +94,7 @@ void setup(void)
     receiver.setTrim(0, 0.05, 0.05);
 
     // Start Hackflight firmware
-    h.begin(&board, &receiver, &mixer, &state);
+    h.begin(&board, &receiver, &mixer);
 }
 
 // Loop ===============================================================================
