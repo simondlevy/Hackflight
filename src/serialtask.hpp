@@ -10,8 +10,9 @@
 #include <RFT_debugger.hpp>
 #include <RFT_actuator.hpp>
 #include <RFT_parser.hpp>
-
 #include <rft_timertasks/serialtask.hpp>
+
+#include "state.hpp"
 
 namespace hf {
 
@@ -20,6 +21,8 @@ namespace hf {
         friend class Hackflight;
 
         private:
+
+            State * _state = NULL;
 
             void handle_RECEIVER_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
             {
@@ -36,21 +39,18 @@ namespace hf {
             void handle_STATE_Request(float & x, float & dx, float & y, float & dy, float & z, float & dz,
                                       float & phi, float & dphi, float & theta, float & dtheta, float & psi, float & dpsi)
             {
-                // Cast rft::State to hf::State
-                State * state = (State *)_state;
-
-                x = state->x[State::X];
-                dx = state->x[State::DX];
-                y = state->x[State::Y];
-                dy = state->x[State::DY];
-                z = state->x[State::Z];
-                dz = state->x[State::DZ];
-                phi = state->x[State::PHI];
-                dphi = state->x[State::DPHI];
-                theta = state->x[State::THETA];
-                dtheta = state->x[State::DTHETA];
-                psi = state->x[State::PSI];
-                dpsi = state->x[State::DPSI];
+                x = _state->x[State::X];
+                dx = _state->x[State::DX];
+                y = _state->x[State::Y];
+                dy = _state->x[State::DY];
+                z = _state->x[State::Z];
+                dz = _state->x[State::DZ];
+                phi = _state->x[State::PHI];
+                dphi = _state->x[State::DPHI];
+                theta = _state->x[State::THETA];
+                dtheta = _state->x[State::DTHETA];
+                psi = _state->x[State::PSI];
+                dpsi = _state->x[State::DPSI];
             }
 
             void handle_ACTUATOR_TYPE_Request(uint8_t & mtype)
@@ -68,9 +68,10 @@ namespace hf {
 
         protected:
 
-            SerialTask(uint8_t port=0)
-                : rft::SerialTask(port)
+            SerialTask(State * state, bool secondary=false)
+                : rft::SerialTask(secondary)
             {
+                _state = state;
             }
 
             void dispatchMessage(void) override
