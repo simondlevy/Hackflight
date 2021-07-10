@@ -169,6 +169,14 @@ namespace hf {
             {
             }
 
+            SerialTask(Receiver * receiver, rft::Actuator * actuator, State * state, bool secondary=false)
+                : rft::SerialTask(secondary)
+            {
+                _receiver = receiver;
+                _actuator = actuator;
+                _state = state;
+            }
+
         }; // class SerialTask
 
 } // namespace hf
