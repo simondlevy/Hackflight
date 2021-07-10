@@ -34,7 +34,6 @@ namespace hf {
                 // Start serial tasks
                 _gcsTask.begin(board, receiver, actuator, state);
                 _telemetryTask.begin(board, receiver, actuator, state);
-
             }
 
             void update(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)

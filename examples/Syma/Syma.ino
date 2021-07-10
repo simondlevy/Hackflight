@@ -68,7 +68,13 @@ static hf::USFS imu;
 
 static hf::State state;
 
-// Setup ==============================================================================
+// Serial tasks =========================================================================
+
+hf::SerialTask gcsTask;
+
+hf::SerialTask telemetryTask = hf::SerialTask(true);
+
+// Setup ================================================================================
 
 void setup(void)
 {

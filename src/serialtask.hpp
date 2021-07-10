@@ -78,11 +78,6 @@ namespace hf {
                 _state = state;
             }
 
-            SerialTask(bool secondary=false)
-                : rft::SerialTask(secondary)
-            {
-            }
-
             void dispatchMessage(void) override
             {
                 switch (_command) {
@@ -166,6 +161,13 @@ namespace hf {
                 } // switch (_command)
 
             } // dispatchMessage 
+
+    public:
+
+            SerialTask(bool secondary=false)
+                : rft::SerialTask(secondary)
+            {
+            }
 
         }; // class SerialTask
 
