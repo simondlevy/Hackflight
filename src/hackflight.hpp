@@ -27,24 +27,24 @@ namespace hf {
 
         public:
 
-            Hackflight(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
-                : HackflightPure(board, receiver, actuator)
+            Hackflight(Receiver * receiver, rft::Actuator * actuator)
+                : HackflightPure(receiver, actuator)
             {  
             }
 
-            void begin()
+            void begin(rft::Board * board)
             {  
-                HackflightPure::begin();
+                HackflightPure::begin(board);
 
                 // Start serial tasks
-                _gcsTask.begin(_board, _olc, _actuator);
-                _telemetryTask.begin(_board, _olc, _actuator);
+                _gcsTask.begin(board, _olc, _actuator);
+                _telemetryTask.begin(board, _olc, _actuator);
 
             }
 
-            void update(void)
+            void update(rft::Board * board)
             {
-                HackflightPure::update();
+                HackflightPure::update(board);
 
                 // Update serial tasks
                 _gcsTask.update(&_state);
