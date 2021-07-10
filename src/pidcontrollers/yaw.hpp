@@ -29,7 +29,7 @@ namespace hf {
 
             YawPid(const float Kp, const float Ki) 
             {
-                _yawPid.begin(Kp, Ki, 0);
+                _yawPid.init(Kp, Ki, 0);
             }
 
             virtual void modifyDemands(State * state, float * demands) override

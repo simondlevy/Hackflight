@@ -26,8 +26,8 @@ namespace hf {
 
             RatePid(const float Kp, const float Ki, const float Kd) 
             {
-                _rollPid.begin(Kp, Ki, Kd);
-                _pitchPid.begin(Kp, Ki, Kd);
+                _rollPid.init(Kp, Ki, Kd);
+                _pitchPid.init(Kp, Ki, Kd);
             }
 
             virtual void modifyDemands(State * state, float * demands) override

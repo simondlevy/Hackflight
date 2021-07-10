@@ -23,6 +23,5 @@ namespace hf {
             {
                 rft::RFT::addSerialTask(task);
             }
-
     };
 } 

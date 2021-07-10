@@ -64,8 +64,8 @@ namespace hf {
 
             PositionHoldPid(const float Kp=0.1, const float Ki=0.0, const float Kd=0.0) 
             {
-                _xpid.begin(Kp, Ki, Kd);
-                _ypid.begin(Kp, Ki, Kd);
+                _xpid.init(Kp, Ki, Kd);
+                _ypid.init(Kp, Ki, Kd);
             }
 
     };  // class PositionHoldPid

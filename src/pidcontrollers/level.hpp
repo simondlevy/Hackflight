@@ -32,9 +32,9 @@ namespace hf {
 
                 public:
 
-                    void begin(const float Kp) 
+                    void init(const float Kp) 
                     {
-                        rft::DofPid::begin(Kp, 0, 0);
+                        rft::DofPid::init(Kp, 0, 0);
                     }
 
                     float compute(float demand, float angle)
@@ -51,8 +51,8 @@ namespace hf {
 
             LevelPid(float rollLevelP, float pitchLevelP)
             {
-                _rollPid.begin(rollLevelP);
-                _pitchPid.begin(pitchLevelP);
+                _rollPid.init(rollLevelP);
+                _pitchPid.init(pitchLevelP);
             }
 
             LevelPid(float rollPitchLevelP)

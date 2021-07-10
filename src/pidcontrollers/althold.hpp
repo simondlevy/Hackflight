@@ -71,7 +71,7 @@ namespace hf {
 
             AltitudeHoldPid(const float Kp_vel=0.75, const float Ki_vel=1.5, const float Kd_vel=0) 
             {
-                _pid.begin(Kp_vel, Ki_vel, Kd_vel);
+                _pid.init(Kp_vel, Ki_vel, Kd_vel);
 
                 _inBandPrev = false;
                 _altitudeTarget = 0;
