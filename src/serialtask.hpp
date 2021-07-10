@@ -13,6 +13,7 @@
 #include <rft_timertasks/serialtask.hpp>
 
 #include "state.hpp"
+#include "receiver.hpp"
 
 namespace hf {
 
@@ -23,17 +24,16 @@ namespace hf {
         private:
 
             State * _state = NULL;
+            Receiver * _receiver = NULL;
 
             void handle_RECEIVER_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
             {
-                Receiver * receiver = (Receiver *)_olc;
-
-                c1 = receiver->getRawval(0);
-                c2 = receiver->getRawval(1);
-                c3 = receiver->getRawval(2);
-                c4 = receiver->getRawval(3);
-                c5 = receiver->getRawval(4);
-                c6 = receiver->getRawval(5);
+                c1 = _receiver->getRawval(0);
+                c2 = _receiver->getRawval(1);
+                c3 = _receiver->getRawval(2);
+                c4 = _receiver->getRawval(3);
+                c5 = _receiver->getRawval(4);
+                c6 = _receiver->getRawval(5);
             }
 
             void handle_STATE_Request(float & x, float & dx, float & y, float & dy, float & z, float & dz,
@@ -67,6 +67,14 @@ namespace hf {
             }
 
         protected:
+
+            void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
+            {
+                rft::SerialTask::begin(board, receiver, actuator);
+                
+                _receiver = receiver;
+            }
+
 
             SerialTask(State * state, bool secondary=false)
                 : rft::SerialTask(secondary)
