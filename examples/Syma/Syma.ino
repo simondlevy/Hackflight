@@ -70,9 +70,9 @@ static hf::State state;
 
 // Serial tasks =========================================================================
 
-hf::SerialTask gcsTask;
+hf::SerialTask gcsTask = hf::SerialTask(&receiver, &mixer, &state); 
 
-hf::SerialTask telemetryTask = hf::SerialTask(true);
+hf::SerialTask telemetryTask = hf::SerialTask(&receiver, &mixer, &state, true);
 
 // Setup ================================================================================
 
@@ -85,6 +85,10 @@ void setup(void)
     h.addClosedLoopController(&levelPid);
     h.addClosedLoopController(&ratePid);
     h.addClosedLoopController(&yawPid);
+
+    // Add serial tasks
+    h.addSerialTask(&gcsTask);
+    h.addSerialTask(&telemetryTask);
 
     // Adjust trim
     receiver.setTrim(0, 0.05, 0.05);
