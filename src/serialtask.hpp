@@ -25,6 +25,7 @@ namespace hf {
 
             State * _state = NULL;
             Receiver * _receiver = NULL;
+            rft::Actuator * _actuator = NULL;
 
             void handle_RECEIVER_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
             {
@@ -70,9 +71,10 @@ namespace hf {
 
             void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
             {
-                rft::SerialTask::begin(board, receiver, actuator);
+                rft::SerialTask::begin(board);
                 
                 _receiver = receiver;
+                _actuator = actuator;
             }
 
 

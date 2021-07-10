@@ -26,19 +26,14 @@ namespace hf {
 
         public:
 
-            HackflightPure(rft::Actuator * actuator)
-                : rft::RFT(actuator)
-            {  
+            void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, bool armed=false)
+            {
+                rft::RFT::begin(board, receiver, actuator, &_state, armed);
             }
 
-            void begin(rft::Board * board, Receiver * receiver, bool armed=false)
+            void update(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
             {
-                rft::RFT::begin(board, receiver, &_state, armed);
-            }
-
-            void update(rft::Board * board, Receiver * receiver)
-            {
-                rft::RFT::update(board, receiver, &_state);
+                rft::RFT::update(board, receiver, actuator, &_state);
             }
 
     }; // class HackflightPure

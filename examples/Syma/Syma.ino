@@ -52,7 +52,7 @@ static hf::MixerQuadXMW mixer = hf::MixerQuadXMW(&motor1, &motor2, &motor3, &mot
 
 // Hackflight object ====================================================================
 
-static hf::Hackflight h = hf::Hackflight(&mixer);
+static hf::Hackflight h;
 
 // PID controllers ======================================================================
 
@@ -80,12 +80,12 @@ void setup(void)
     receiver.setTrim(0, 0.05, 0.05);
 
     // Start Hackflight firmware
-    h.begin(&board, &receiver);
+    h.begin(&board, &receiver, &mixer);
 }
 
 // Loop ===============================================================================
 
 void loop(void)
 {
-    h.update(&board, &receiver);
+    h.update(&board, &receiver, &mixer);
 }
