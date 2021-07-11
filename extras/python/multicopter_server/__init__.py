@@ -14,6 +14,42 @@ import time
 import cv2
 
 
+def _run_telemetry(obj,
+                   host,
+                   motor_port,
+                   telemetryServerSocket,
+                   motorClientSocket):
+
+    running = False
+
+    while True:
+
+        try:
+            data, _ = telemetryServerSocket.recvfrom(8*13)
+        except Exception:
+            obj.done = True
+            break
+
+        telemetryServerSocket.settimeout(.1)
+
+        telem = np.frombuffer(data)
+
+        if not running:
+            MulticopterServer.debug('Running')
+            running = True
+
+        if telem[0] < 0:
+            motorClientSocket.close()
+            telemetryServerSocket.close()
+            break
+
+        motorvals = obj.getMotors(telem[0], telem[1:])
+
+        motorClientSocket.sendto(np.ndarray.tobytes(motorvals),
+                                 (host, motor_port))
+
+        time.sleep(.001)
+
 class MulticopterServer(object):
 
     # See Bouabdallah (2004)
@@ -48,8 +84,9 @@ class MulticopterServer(object):
 
         MulticopterServer.debug('Hit the Play button ...')
 
-        telemetryThread = Thread(target=self._run_telemetry,
-                                 args=(host,
+        telemetryThread = Thread(target=_run_telemetry,
+                                 args=(self,
+                                       host,
                                        motor_port,
                                        telemetryServerSocket,
                                        motorClientSocket))
@@ -101,42 +138,6 @@ class MulticopterServer(object):
     def debug(msg):
         print(msg)
         sys.stdout.flush()
-
-    def _run_telemetry(self,
-                       host,
-                       motor_port,
-                       telemetryServerSocket,
-                       motorClientSocket):
-
-        running = False
-
-        while True:
-
-            try:
-                data, _ = telemetryServerSocket.recvfrom(8*13)
-            except Exception:
-                self.done = True
-                break
-
-            telemetryServerSocket.settimeout(.1)
-
-            telem = np.frombuffer(data)
-
-            if not running:
-                MulticopterServer.debug('Running')
-                running = True
-
-            if telem[0] < 0:
-                motorClientSocket.close()
-                telemetryServerSocket.close()
-                break
-
-            motorvals = self.getMotors(telem[0], telem[1:])
-
-            motorClientSocket.sendto(np.ndarray.tobytes(motorvals),
-                                     (host, motor_port))
-
-            time.sleep(.001)
 
     @staticmethod
     def _make_udpsocket():
