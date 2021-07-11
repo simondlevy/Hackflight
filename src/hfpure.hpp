@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <RoboFirmwareToolkit.hpp>
+#include <rftpure.hpp>
 #include <RFT_board.hpp>
 #include <RFT_actuator.hpp>
 
@@ -17,18 +17,18 @@
 
 namespace hf {
 
-    class HackflightPure : public rft::RFT {
+    class HackflightPure : public rft::RFTPure {
 
         public:
 
             void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
             {
-                rft::RFT::begin(board, receiver, actuator);
+                rft::RFTPure::begin(board, receiver, actuator);
             }
 
             void update(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
             {
-                rft::RFT::update(board, receiver, actuator, state);
+                rft::RFTPure::update(board, receiver, actuator, state);
             }
 
     }; // class HackflightPure
