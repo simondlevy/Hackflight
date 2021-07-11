@@ -39,7 +39,6 @@ class MulticopterServer(object):
               image_cols=640):
 
         self.telem = None
-        self.image = None
         self.done = False
 
         # Telemetry in and motors out run on their own thread
