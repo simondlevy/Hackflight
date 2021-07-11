@@ -40,8 +40,10 @@ namespace hf {
 
         public:
 
-            DSMX_Receiver(const uint8_t channelMap[6], const float demandScale)
-                :  Receiver(channelMap, demandScale) 
+            DSMX_Receiver(const uint8_t channelMap[6],
+                          const float demandScale,
+                          const float trim[3]=NULL)
+                :  Receiver(channelMap, demandScale, trim) 
             { 
             }
 

@@ -65,8 +65,12 @@ namespace hf {
 
         public:
 
-            DSMX_ESP32_Serial1(const uint8_t channelMap[6], const float demandScale, uint8_t rxpin, uint8_t txpin)
-                :  Receiver(channelMap, demandScale) 
+            DSMX_ESP32_Serial1(const uint8_t channelMap[6],
+                               const float demandScale,
+                               uint8_t rxpin,
+                               uint8_t txpin,
+                               const float trim[3]=NULL)
+                :  Receiver(channelMap, demandScale, trim) 
             { 
                 _rxpin = rxpin;
                 _txpin = txpin;

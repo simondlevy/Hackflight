@@ -111,15 +111,19 @@ namespace hf {
             /**
               * channelMap: throttle, roll, pitch, yaw, aux, arm
               */
-            Receiver(const uint8_t channelMap[6], float demandScale=1.0) 
+            Receiver(const uint8_t channelMap[6],
+                     const float demandScale,
+                     const float trim[3] = NULL) 
             { 
                 for (uint8_t k=0; k<6; ++k) {
                     _channelMap[k] = channelMap[k];
                 }
 
-                _trimRoll  = 0;
-                _trimPitch = 0;
-                _trimYaw   = 0;
+                if (trim) {
+                    _trimRoll  = trim[0];
+                    _trimPitch = trim[1];
+                    _trimYaw   = trim[2];
+                }
 
                 _demandScale = demandScale;
             }
@@ -186,15 +190,6 @@ namespace hf {
             virtual uint8_t getModeIndex(void) override
             {
                 return _aux2State;
-            }
-
-        public:
-
-            void setTrim(float trimRoll, float trimPitch, float trimYaw)
-            {
-                _trimRoll = trimRoll;
-                _trimPitch = trimPitch;
-                _trimYaw = trimYaw;
             }
 
     }; // class Receiver

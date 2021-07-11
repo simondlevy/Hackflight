@@ -53,8 +53,11 @@ namespace hf {
 
         public:
 
-            CPPM_Receiver(uint8_t pin, const uint8_t channelMap[6], const float demandScale) 
-                : Receiver(channelMap, demandScale) 
+            CPPM_Receiver(uint8_t pin,
+                          const uint8_t channelMap[6],
+                          const float demandScale,
+                          const float trim[3] = NULL) 
+                : Receiver(channelMap, demandScale, trime) 
             { 
                 rx = new CPPMRX(pin, 6);
             }

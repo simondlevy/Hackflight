@@ -67,10 +67,10 @@ namespace hf {
 
         public:
 
-            SBUS_Receiver(
-                    const uint8_t channelMap[6], 
-                    const float demandScale)
-                :  Receiver(channelMap, demandScale) 
+            SBUS_Receiver(const uint8_t channelMap[6], 
+                          const float demandScale,
+                          const float trim[3]=NULL)
+                :  Receiver(channelMap, demandScale, trim) 
             { 
                 _failsafeCount = 0;
             }
