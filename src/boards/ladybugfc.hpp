@@ -12,7 +12,7 @@
 
 #include <Wire.h>
 
-#include <RoboFirmwareToolkit.hpp>
+#include <RFT_full.hpp>
 
 #include <rft_boards/realboards/arduino_serial/arduino.hpp>
 

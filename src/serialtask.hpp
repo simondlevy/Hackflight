@@ -10,7 +10,7 @@
 #include <RFT_debugger.hpp>
 #include <RFT_actuator.hpp>
 #include <RFT_parser.hpp>
-#include <rft_timertasks/serialtask.hpp>
+#include <RFT_serialtask.hpp>
 
 #include "state.hpp"
 #include "receiver.hpp"

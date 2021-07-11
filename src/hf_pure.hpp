@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <rftpure.hpp>
+#include <RFT_pure.hpp>
 #include <RFT_board.hpp>
 #include <RFT_actuator.hpp>
 
@@ -17,7 +17,7 @@
 
 namespace hf {
 
-    class HackflightPure : public rft::RFTPure {
+    class Hackflight : public rft::RFTPure {
 
         public:
 

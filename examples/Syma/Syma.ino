@@ -17,7 +17,7 @@
 
  */
 
-#include "hackflight.hpp"
+#include "hf_full.hpp"
 #include "boards/ladybugfc.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "mixers/quad/xmw.hpp"
