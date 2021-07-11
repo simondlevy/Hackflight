@@ -59,10 +59,6 @@ class HackflightCopter(MulticopterServer):
 
         self.receiver.update()
 
-    def addSensor(self, sensor):
-
-        self.sensors.append(sensor)
-
 
 def main():
 
