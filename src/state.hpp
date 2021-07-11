@@ -41,6 +41,12 @@ namespace hf {
 
             float x[SIZE];
 
+            State(bool start_armed=false)
+                : rft::State(start_armed)
+            {
+            }
+
+
     }; // class State
 
 } // namespace hf

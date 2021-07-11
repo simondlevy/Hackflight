@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <RoboFirmwareToolkit.hpp>
+#include <rftpure.hpp>
 #include <RFT_board.hpp>
 #include <RFT_actuator.hpp>
 
@@ -17,18 +17,18 @@
 
 namespace hf {
 
-    class HackflightPure : public rft::RFT {
-
-        protected:
-
-            // Vehicle state
-            State _state;
+    class HackflightPure : public rft::RFTPure {
 
         public:
 
-            HackflightPure(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
-                : rft::RFT(&_state, board, receiver, actuator)
-            {  
+            void begin(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
+            {
+                rft::RFTPure::begin(board, receiver, actuator);
+            }
+
+            void update(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
+            {
+                rft::RFTPure::update(board, receiver, actuator, state);
             }
 
     }; // class HackflightPure

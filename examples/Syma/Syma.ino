@@ -52,7 +52,7 @@ static hf::MixerQuadXMW mixer = hf::MixerQuadXMW(&motor1, &motor2, &motor3, &mot
 
 // Hackflight object ====================================================================
 
-static hf::Hackflight h = hf::Hackflight(&board, &receiver, &mixer);
+static hf::Hackflight h;
 
 // PID controllers ======================================================================
 
@@ -64,7 +64,17 @@ static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 static hf::USFS imu;
 
-// Setup ==============================================================================
+// Vehicle state ========================================================================
+
+static hf::State state;
+
+// Serial tasks =========================================================================
+
+hf::SerialTask gcsTask = hf::SerialTask(&receiver, &mixer, &state); 
+
+hf::SerialTask telemetryTask = hf::SerialTask(&receiver, &mixer, &state, true);
+
+// Setup ================================================================================
 
 void setup(void)
 {
@@ -76,16 +86,20 @@ void setup(void)
     h.addClosedLoopController(&ratePid);
     h.addClosedLoopController(&yawPid);
 
+    // Add serial tasks
+    h.addSerialTask(&gcsTask);
+    h.addSerialTask(&telemetryTask);
+
     // Adjust trim
     receiver.setTrim(0, 0.05, 0.05);
 
     // Start Hackflight firmware
-    h.begin();
+    h.begin(&board, &receiver, &mixer);
 }
 
 // Loop ===============================================================================
 
 void loop(void)
 {
-    h.update();
+    h.update(&board, &receiver, &mixer, &state);
 }
