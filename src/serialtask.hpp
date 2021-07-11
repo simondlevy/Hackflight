@@ -155,11 +155,6 @@ namespace hf {
 
     public:
 
-            SerialTask(bool secondary=false)
-                : rft::SerialTask(secondary)
-            {
-            }
-
             SerialTask(Receiver * receiver, rft::Actuator * actuator, State * state, bool secondary=false)
                 : rft::SerialTask(secondary)
             {
