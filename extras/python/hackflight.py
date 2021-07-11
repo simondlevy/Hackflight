@@ -22,12 +22,13 @@ from debugging import debug
 
 class HackflightCopter(MulticopterServer):
 
-    def __init__(self, receiver, mixer):
+    def __init__(self, receiver, mixer, pid_controllers):
 
         MulticopterServer.__init__(self)
 
         self.receiver = receiver
         self.mixer = mixer
+        self.pid_controllers = pid_controllers
 
         self.sensors = []
         self.closedloops = []
@@ -44,8 +45,8 @@ class HackflightCopter(MulticopterServer):
         demands = np.array(list(self.receiver.getDemands()))
 
         # Pass demands through closed-loop controllers
-        for closedloop in self.closedloops:
-            demands = closedloop.modifyDemands(state, demands)
+        for pid_controller in self.pid_controllers:
+            demands = pid_controller.modifyDemands(state, demands)
 
         motors = self.mixer.getMotors(demands)
 
@@ -61,10 +62,6 @@ class HackflightCopter(MulticopterServer):
     def addSensor(self, sensor):
 
         self.sensors.append(sensor)
-
-    def addClosedLoopController(self, controller):
-
-        self.closedloops.append(controller)
 
 
 def main():
@@ -84,12 +81,11 @@ def main():
         exit(1)
 
     # Create Hackflight object
-    h = HackflightCopter(Receiver(), mixerdict[args.vehicle]())
-
-    # Add PID controllers
-    h.addClosedLoopController(RatePid(0.225, 0.001875, 0.375))
-    h.addClosedLoopController(YawPid(2.0, 0.1))
-    h.addClosedLoopController(LevelPid(0.2))
+    h = HackflightCopter(Receiver(),
+                         mixerdict[args.vehicle](),
+                         (RatePid(0.225, 0.001875, 0.375),
+                          YawPid(2.0, 0.1),
+                          LevelPid(0.2)))
 
     # Go!
     h.begin()
