@@ -18,7 +18,8 @@ def _run_telemetry(obj,
                    host,
                    motor_port,
                    telemetryServerSocket,
-                   motorClientSocket):
+                   motorClientSocket,
+                   done):
 
     running = False
 
@@ -27,7 +28,7 @@ def _run_telemetry(obj,
         try:
             data, _ = telemetryServerSocket.recvfrom(8*13)
         except Exception:
-            obj.done = True
+            done[0] = True
             break
 
         telemetryServerSocket.settimeout(.1)
@@ -74,7 +75,7 @@ class MulticopterServer(object):
               image_rows=480,
               image_cols=640):
 
-        self.done = False
+        done = [False]
 
         # Telemetry in and motors out run on their own thread
         motorClientSocket = MulticopterServer._make_udpsocket()
@@ -88,7 +89,8 @@ class MulticopterServer(object):
                                        host,
                                        motor_port,
                                        telemetryServerSocket,
-                                       motorClientSocket))
+                                       motorClientSocket,
+                                       done))
 
 
         # Serve a socket with a maximum of one client
@@ -103,7 +105,7 @@ class MulticopterServer(object):
 
         telemetryThread.start()
 
-        while not self.done:
+        while not done[0]:
 
             try:
                 imgbytes = imageConn.recv(image_rows*image_cols*4)
