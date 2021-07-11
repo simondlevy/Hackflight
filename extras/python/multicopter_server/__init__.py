@@ -97,10 +97,6 @@ class MulticopterServer(object):
         '''
         return np.array([0.6, 0.6, 0.6, 0.6])
 
-    def isDone(self):
-
-        return self.done
-
     @staticmethod
     def debug(msg):
         print(msg)
