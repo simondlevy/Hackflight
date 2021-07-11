@@ -122,6 +122,8 @@ class MulticopterServer(object):
 
                 self.handleImage(image)
 
+            self.updateReceiver()
+
     def handleImage(self, image):
         '''
         Override for your application

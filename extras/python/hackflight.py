@@ -53,9 +53,10 @@ class HackflightCopter(MulticopterServer):
         return motors
 
     def handleImage(self, image):
-        '''
-        Since this method runs on the main thread, we can call it to update the
-        receiver '''
+
+        return
+
+    def updateReceiver(self):
 
         self.receiver.update()
 
