@@ -22,6 +22,19 @@ def _handleImage(image):
     cv2.waitKey(1)
 
 
+def _debug(msg):
+    print(msg)
+    sys.stdout.flush()
+
+
+def _make_udpsocket():
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
+
+    return sock
+
+
 def _run_telemetry(obj,
                    host,
                    motor_port,
@@ -44,7 +57,7 @@ def _run_telemetry(obj,
         telem = np.frombuffer(data)
 
         if not running:
-            MulticopterServer.debug('Running')
+            _debug('Running')
             running = True
 
         if telem[0] < 0:
@@ -90,11 +103,11 @@ class MulticopterServer(object):
         done = [False]
 
         # Telemetry in and motors out run on their own thread
-        motorClientSocket = MulticopterServer._make_udpsocket()
-        telemetryServerSocket = MulticopterServer._make_udpsocket()
+        motorClientSocket = _make_udpsocket()
+        telemetryServerSocket = _make_udpsocket()
         telemetryServerSocket.bind((host, telem_port))
 
-        MulticopterServer.debug('Hit the Play button ...')
+        _debug('Hit the Play button ...')
 
         telemetryThread = Thread(target=_run_telemetry,
                                  args=(obj,
@@ -112,7 +125,7 @@ class MulticopterServer(object):
         # This will block (wait) until a client connets
         imageConn, _ = imageServerSocket.accept()
         imageConn.settimeout(1)
-        MulticopterServer.debug('Got a connection!')
+        _debug('Got a connection!')
 
         telemetryThread.start()
 
@@ -141,15 +154,4 @@ class MulticopterServer(object):
         '''
         return np.array([0.6, 0.6, 0.6, 0.6])
 
-    @staticmethod
-    def debug(msg):
-        print(msg)
-        sys.stdout.flush()
 
-    @staticmethod
-    def _make_udpsocket():
-
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
-
-        return sock
