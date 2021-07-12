@@ -42,21 +42,17 @@ class _DofPid:
         pterm = error * self.Kp
 
         # Compute I term
-        iterm = 0
-        if self.Ki > 0:  # optimization
-            self.errorI = _DofPid.constrainAbs(self.errorI + error,
-                                               self.windupMax)
-            iterm = self.errorI * self.Ki
+        self.errorI = _DofPid.constrainAbs(self.errorI + error, self.windupMax)
+        iterm = self.errorI * self.Ki
 
         # Compute D term
-        dterm = 0
-        if self.Kd > 0:  # optimization
-            deltaError = error - self.lastError
-            dterm = ((self.deltaError1 + self.deltaError2 + deltaError) *
-                     self.Kd)
-            self.deltaError2 = self.deltaError1
-            self.deltaError1 = deltaError
-            self.lastError = error
+        deltaError = error - self.lastError
+        dterm = ((self.deltaError1 + self.deltaError2 + deltaError) * self.Kd)
+
+        # Update state
+        self.deltaError2 = self.deltaError1
+        self.deltaError1 = deltaError
+        self.lastError = error
 
         return pterm + iterm + dterm
 
