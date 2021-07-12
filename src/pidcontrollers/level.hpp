@@ -15,60 +15,68 @@
 
 namespace hf {
 
-    class LevelPid : public PidController {
+    // Helper class
+    class _LevelPid : public rft::DofPid {
 
         private:
 
-            // Helper class
-            class _AnglePid : public rft::DofPid {
+            static constexpr float MAX_ANGLE_DEGREES = 45;
 
-                private:
-
-                    static constexpr float MAX_ANGLE_DEGREES = 45;
-
-                    // Maximum roll pitch demand is +/-0.5, so to convert
-                    // demand to angle for error computation, we multiply by
-                    // the folling amount:
-                    float _demandMultiplier =
-                        2 * rft::Filter::deg2rad(MAX_ANGLE_DEGREES);
-
-                public:
-
-                    void init(const float Kp) 
-                    {
-                        rft::DofPid::init(Kp, 0, 0);
-                    }
-
-                    float compute(float demand, float angle)
-                    {
-                        return rft::DofPid::compute(demand *
-                                                    _demandMultiplier, angle);
-                    }
-
-            }; // class _AnglePid
-
-            _AnglePid _rollPid;
-            _AnglePid _pitchPid;
+            // Maximum roll pitch demand is +/-0.5, so to convert
+            // demand to angle for error computation, we multiply by
+            // the folling amount.
+            float _dmdmul = 2 * rft::Filter::deg2rad(MAX_ANGLE_DEGREES);
 
         public:
 
-            LevelPid(float rollLevelP, float pitchLevelP)
+            void init(const float Kp) 
             {
-                _rollPid.init(rollLevelP);
-                _pitchPid.init(pitchLevelP);
+                rft::DofPid::init(Kp, 0, 0);
             }
 
-            LevelPid(float rollPitchLevelP)
-                : LevelPid(rollPitchLevelP, rollPitchLevelP)
+            float compute(float demand, float angle)
             {
+                return rft::DofPid::compute(demand * _dmdmul, angle);
+            }
+
+    }; // class _LevelPid
+
+    class RollLevelPid : public PidController {
+
+        private:
+
+            _LevelPid _rollPid;
+
+        public:
+
+            RollLevelPid(const float Kp)
+            {
+                _rollPid.init(Kp);
             }
 
             void modifyDemands(State * state, float * demands) override
             {
-                demands[DEMANDS_ROLL]
-                    = _rollPid.compute(demands[DEMANDS_ROLL],
-                                       state->x[State::PHI]); 
+                demands[DEMANDS_ROLL] = _rollPid.compute(demands[DEMANDS_ROLL],
+                                                         state->x[State::PHI]); 
+            }
 
+    };  // class RollLevelPid
+
+    class PitchLevelPid : public PidController {
+
+        private:
+
+            _LevelPid _pitchPid;
+
+        public:
+
+            PitchLevelPid(const float Kp) 
+            {
+                _pitchPid.init(Kp);
+            }
+
+            void modifyDemands(State * state, float * demands) override
+            {
                 // Pitch demand is nose-down positive, so we negate
                 // pitch-forward (nose-down negative) to reconcile them
                 demands[DEMANDS_PITCH] =
@@ -76,6 +84,6 @@ namespace hf {
                                       -state->x[State::THETA]);
             }
 
-    };  // class LevelPid
+    };  // class PitchLevelPid
 
 } // namespace
