@@ -38,26 +38,29 @@ class _DofPid:
         pterm = error * self.Kp
 
         # Compute I term
-        self.errorI = _DofPid.constrainAbs(self.errorI + error, self.windupMax)
-        iterm = self.errorI * self.Ki
+        errorI = _DofPid.constrainAbs(self.state['errorI'] + error,
+                                      self.windupMax)
+        iterm = errorI * self.Ki
 
         # Compute D term
-        deltaError = error - self.lastError
-        dterm = ((self.deltaError1 + self.deltaError2 + deltaError) * self.Kd)
+        deltaError = error - self.state['lastError']
+        dterm = ((self.state['deltaError1'] +
+                  self.state['deltaError2'] + deltaError) * self.Kd)
 
         # Update state
-        self.deltaError2 = self.deltaError1
-        self.deltaError1 = deltaError
-        self.lastError = error
+        self.state = {'deltaError2': self.state['deltaError1'],
+                      'deltaError1': deltaError,
+                      'errorI': errorI,
+                      'lastError': error}
 
         return pterm + iterm + dterm
 
     def reset(self):
 
-        self.deltaError1 = 0
-        self.deltaError2 = 0
-        self.errorI = 0
-        self.lastError = 0
+        self.state = {'deltaError1': 0,
+                      'deltaError2': 0,
+                      'errorI': 0,
+                      'lastError': 0}
 
     @staticmethod
     def constrainAbs(val, lim):
