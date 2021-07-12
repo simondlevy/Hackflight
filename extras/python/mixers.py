@@ -9,7 +9,20 @@ MIT License
 from demands import DEMANDS_THROTTLE, DEMANDS_ROLL, DEMANDS_PITCH, DEMANDS_YAW
 import numpy as np
 
-from debugging import debug
+QUADXAP_MOTORDIRS = (
+                     {'throttle': +1, 'roll': -1, 'pitch': -1, 'yaw': +1},
+                     {'throttle': +1, 'roll': +1, 'pitch': +1, 'yaw': +1},
+                     {'throttle': +1, 'roll': +1, 'pitch': -1, 'yaw': -1},
+                     {'throttle': +1, 'roll': -1, 'pitch': +1, 'yaw': -1}
+                    )
+
+COAXIAL_MOTORDIRS = (
+                     {'throttle': +1, 'roll': 0, 'pitch': 0, 'yaw': +1},
+                     {'throttle': +1, 'roll': 0, 'pitch': 0, 'yaw': -1},
+                     {'throttle': 0, 'roll': +1, 'pitch': 0, 'yaw': 0},
+                     {'throttle': 0, 'roll': 0, 'pitch': +1, 'yaw': 0}
+                    )
+
 
 class Mixer(object):
 
@@ -64,27 +77,13 @@ class QuadXAPMixer(Mixer):
     2ccw  4cw
     '''
 
-    MOTORDIRS = (
-                 {'throttle': +1, 'roll': -1, 'pitch': -1, 'yaw': +1},
-                 {'throttle': +1, 'roll': +1, 'pitch': +1, 'yaw': +1},
-                 {'throttle': +1, 'roll': +1, 'pitch': -1, 'yaw': -1},
-                 {'throttle': +1, 'roll': -1, 'pitch': +1, 'yaw': -1}
-                )
-
     def __init__(self):
 
-        Mixer.__init__(self, self.MOTORDIRS)
+        Mixer.__init__(self, QUADXAP_MOTORDIRS)
 
 
 class CoaxialMixer(Mixer):
 
-    MOTORDIRS = (
-                 {'throttle': +1, 'roll': 0, 'pitch': 0, 'yaw': +1},
-                 {'throttle': +1, 'roll': 0, 'pitch': 0, 'yaw': -1},
-                 {'throttle': 0, 'roll': +1, 'pitch': 0, 'yaw': 0},
-                 {'throttle': 0, 'roll': 0, 'pitch': +1, 'yaw': 0}
-                )
-
     def __init__(self):
 
-        Mixer.__init__(self, self.MOTORDIRS)
+        Mixer.__init__(self, COAXIAL_MOTORDIRS)
