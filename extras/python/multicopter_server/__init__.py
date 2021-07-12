@@ -67,7 +67,7 @@ class MulticopterServer(object):
      STATE_PSI,
      STATE_DPSI) = range(12)
 
-    def start(self,
+    def start(obj,
               host='127.0.0.1',
               motor_port=5000,
               telem_port=5001,
@@ -85,7 +85,7 @@ class MulticopterServer(object):
         MulticopterServer.debug('Hit the Play button ...')
 
         telemetryThread = Thread(target=_run_telemetry,
-                                 args=(self,
+                                 args=(obj,
                                        host,
                                        motor_port,
                                        telemetryServerSocket,
@@ -120,9 +120,9 @@ class MulticopterServer(object):
 
                 image = cv2.cvtColor(rgba_image, cv2.COLOR_RGBA2RGB)
 
-                self.handleImage(image)
+                obj.handleImage(image)
 
-            self.updateReceiver()
+            obj.updateReceiver()
 
     def handleImage(self, image):
         '''
