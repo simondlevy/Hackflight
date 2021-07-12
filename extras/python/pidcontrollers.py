@@ -26,11 +26,7 @@ class _DofPid:
         self.Kd = Kd
         self.windupMax = windupMax
 
-        # Accumulated values
-        self.deltaError1 = 0
-        self.deltaError2 = 0
-
-        # Initialize error integral, previous value
+        # Initialize state
         self.reset()
 
     def compute(self, target, actual):
@@ -58,6 +54,8 @@ class _DofPid:
 
     def reset(self):
 
+        self.deltaError1 = 0
+        self.deltaError2 = 0
         self.errorI = 0
         self.lastError = 0
 
