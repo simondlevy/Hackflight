@@ -14,25 +14,7 @@ import time
 import cv2
 
 
-# See Bouabdallah (2004)
-(STATE_X,
- STATE_DX,
- STATE_Y,
- STATE_DY,
- STATE_Z,
- STATE_DZ,
- STATE_PHI,
- STATE_DPHI,
- STATE_THETA,
- STATE_DTHETA,
- STATE_PSI,
- STATE_DPSI) = range(12)
-
-
 def _handleImage(image):
-    '''
-    Override for your application
-    '''
     cv2.imshow('Image', image)
     cv2.waitKey(1)
 

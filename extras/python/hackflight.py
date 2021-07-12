@@ -11,7 +11,7 @@ import numpy as np
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 
-from multicopter_server import start
+from server import start
 
 from receiver import Receiver
 from mixers import QuadXAPMixer, CoaxialMixer
