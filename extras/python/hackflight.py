@@ -49,9 +49,6 @@ class HackflightCopter:
         self.mixer = mixer
         self.pid_controllers = pid_controllers
 
-        self.sensors = []
-        self.closedloops = []
-
     def begin(self):
 
         self.receiver.begin()
