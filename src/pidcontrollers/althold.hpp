@@ -10,11 +10,11 @@
 
 #include "pidcontroller.hpp"
 
-#include <rft_closedloops/dofpid.hpp>
+#include <RFT_pid.hpp>
 
 namespace hf {
 
-    class AltitudeHoldPid : public PidController {
+    class AltitudeHoldPid : public PidController, protected rft::DofPid {
 
         private: 
 
@@ -22,9 +22,6 @@ namespace hf {
             // http://ardupilot.org/copter/docs/altholdmode.html
             static constexpr float PILOT_VELZ_MAX = 2.5;
             static constexpr float STICK_DEADBAND = 0.20;   
-
-            // PID controller for velocity
-            rft::DofPid _pid;
 
             // Will be reset each time we re-enter deadband
             float _altitudeTarget = 0;
@@ -45,7 +42,7 @@ namespace hf {
 
                 // Reset controller when moving into deadband
                 if (inBand && !_inBandPrev) {
-                    _pid.reset();
+                    rft::DofPid::reset();
                     didReset = true;
                 }
                 _inBandPrev = inBand;
@@ -59,7 +56,7 @@ namespace hf {
 
                 // Run velocity PID controller to get correction
                 demands[DEMANDS_THROTTLE] =
-                    _pid.compute(targetVelocity, state->x[State::DZ]);
+                    rft::DofPid::compute(targetVelocity, state->x[State::DZ]);
 
                 // If we re-entered deadband, we reset the target altitude.
                 if (didReset) {
@@ -74,12 +71,11 @@ namespace hf {
 
         public:
 
-            AltitudeHoldPid(const float Kp_vel=0.75,
-                            const float Ki_vel=1.5,
-                            const float Kd_vel=0) 
+            AltitudeHoldPid(const float Kp=0.75,
+                            const float Ki=1.5,
+                            const float Kd=0)
+                : rft::DofPid(Kp, Ki, Kd)
             {
-                _pid.init(Kp_vel, Ki_vel, Kd_vel);
-
                 _inBandPrev = false;
                 _altitudeTarget = 0;
             }

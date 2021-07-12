@@ -10,7 +10,7 @@
 
 #include "pidcontroller.hpp"
 
-#include <rft_closedloops/dofpid.hpp>
+#include <RFT_pid.hpp>
 #include <RFT_filters.hpp>
 
 namespace hf {
@@ -38,7 +38,7 @@ namespace hf {
             _LevelPid(const float Kp,
                      const uint8_t state_axis,
                      const uint8_t demand_axis,
-                     int8_t state_direction) 
+                     int8_t state_direction=+1) 
             {
                 _Kp = Kp;
                 _state_axis = state_axis;
@@ -60,7 +60,7 @@ namespace hf {
         public:
 
             RollLevelPid(const float Kp)
-                : _LevelPid(Kp, State::PHI, DEMANDS_ROLL, +1)
+                : _LevelPid(Kp, State::PHI, DEMANDS_ROLL)
             {
             }
 

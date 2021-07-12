@@ -22,7 +22,6 @@
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "mixers/quad/xmw.hpp"
 #include "pidcontrollers/rate.hpp"
-#include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
 #include "sensors/usfs.hpp"
 
@@ -58,8 +57,9 @@ static hf::Hackflight h;
 
 // PID controllers ======================================================================
 
-static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
-static hf::YawPid yawPid = hf::YawPid(1.0625, 0.005625f);
+static hf::RollRatePid rollRatePid = hf::RollRatePid(0.225, 0.001875, 0.375);
+static hf::PitchRatePid pitchRatePid = hf::PitchRatePid(0.225, 0.001875, 0.375);
+static hf::YawRatePid yawRatePid = hf::YawRatePid(1.0625, 0.005625f);
 static hf::RollLevelPid rollLevelPid = hf::RollLevelPid(0.20f);
 static hf::PitchLevelPid pitchLevelPid = hf::PitchLevelPid(0.20f);
 
@@ -87,8 +87,9 @@ void setup(void)
     // Add PID controllers
     h.addClosedLoopController(&rollLevelPid);
     h.addClosedLoopController(&pitchLevelPid);
-    h.addClosedLoopController(&ratePid);
-    h.addClosedLoopController(&yawPid);
+    h.addClosedLoopController(&rollRatePid);
+    h.addClosedLoopController(&pitchRatePid);
+    h.addClosedLoopController(&yawRatePid);
 
     // Add serial tasks
     h.addSerialTask(&gcsTask);
