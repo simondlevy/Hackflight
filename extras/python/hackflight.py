@@ -19,6 +19,10 @@ from pidcontrollers import RatePid, YawPid, LevelPid
 
 from debugging import debug
 
+def _updateReceiver(receiver):
+
+    receiver.update()
+
 
 class HackflightCopter(MulticopterServer):
 
@@ -37,7 +41,7 @@ class HackflightCopter(MulticopterServer):
 
         self.receiver.begin()
 
-        MulticopterServer.start(self)
+        MulticopterServer.start(self, self.receiver, _updateReceiver)
 
     def getMotors(self, t, state):
 
@@ -51,14 +55,6 @@ class HackflightCopter(MulticopterServer):
         motors = self.mixer.getMotors(demands)
 
         return motors
-
-    def handleImage(self, image):
-
-        return
-
-    def updateReceiver(self):
-
-        self.receiver.update()
 
 
 def main():

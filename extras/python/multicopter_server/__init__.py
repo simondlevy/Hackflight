@@ -77,6 +77,8 @@ class MulticopterServer(object):
      STATE_DPSI) = range(12)
 
     def start(obj,
+              controller,
+              controllerUpdater,
               host='127.0.0.1',
               motor_port=5000,
               telem_port=5001,
@@ -131,7 +133,7 @@ class MulticopterServer(object):
 
                 imageHandler(image)
 
-            obj.updateReceiver()
+            controllerUpdater(controller)
 
     def getMotors(self, time, state):
         '''
