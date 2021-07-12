@@ -16,72 +16,75 @@
 namespace hf {
 
     // Helper class
-    class _LevelPid : public rft::DofPid {
+    class _LevelPid {
 
         private:
 
             static constexpr float MAX_ANGLE_DEGREES = 45;
 
+            uint8_t _state_axis = 0;
+            uint8_t _demand_axis = 0;
+            int8_t _state_direction = 0;
+
+            float _Kp = 0;
+
             // Maximum roll pitch demand is +/-0.5, so to convert
             // demand to angle for error computation, we multiply by
             // the folling amount.
-            float _dmdmul = 2 * rft::Filter::deg2rad(MAX_ANGLE_DEGREES);
+            float _dmdscale = 2 * rft::Filter::deg2rad(MAX_ANGLE_DEGREES);
 
-        public:
+        protected:
 
-            void init(const float Kp) 
+            _LevelPid(const float Kp,
+                     const uint8_t state_axis,
+                     const uint8_t demand_axis,
+                     int8_t state_direction) 
             {
-                rft::DofPid::init(Kp, 0, 0);
+                _Kp = Kp;
+                _state_axis = state_axis;
+                _demand_axis = demand_axis;
+                _state_direction = state_direction;
             }
 
-            float compute(float demand, float angle)
+            void compute(State * state, float * demands)
             {
-                return rft::DofPid::compute(demand * _dmdmul, angle);
+                demands[_demand_axis] =
+                    _Kp * (demands[_demand_axis] * _dmdscale -
+                          _state_direction * state->x[_state_axis]);
             }
 
     }; // class _LevelPid
 
-    class RollLevelPid : public PidController {
-
-        private:
-
-            _LevelPid _rollPid;
+    class RollLevelPid : public PidController, protected _LevelPid {
 
         public:
 
             RollLevelPid(const float Kp)
+                : _LevelPid(Kp, State::PHI, DEMANDS_ROLL, +1)
             {
-                _rollPid.init(Kp);
             }
 
             void modifyDemands(State * state, float * demands) override
             {
-                demands[DEMANDS_ROLL] = _rollPid.compute(demands[DEMANDS_ROLL],
-                                                         state->x[State::PHI]); 
+                _LevelPid::compute(state, demands);
             }
 
     };  // class RollLevelPid
 
-    class PitchLevelPid : public PidController {
-
-        private:
-
-            _LevelPid _pitchPid;
+    class PitchLevelPid : public PidController, protected _LevelPid {
 
         public:
 
             PitchLevelPid(const float Kp) 
+                : _LevelPid(Kp, State::THETA, DEMANDS_PITCH, -1)
+                // Pitch demand is nose-down positive, so we negate
+                // pitch-forward (nose-down negative) to reconcile them
             {
-                _pitchPid.init(Kp);
             }
 
             void modifyDemands(State * state, float * demands) override
             {
-                // Pitch demand is nose-down positive, so we negate
-                // pitch-forward (nose-down negative) to reconcile them
-                demands[DEMANDS_PITCH] =
-                    _pitchPid.compute(demands[DEMANDS_PITCH],
-                                      -state->x[State::THETA]);
+                _LevelPid::compute(state, demands);
             }
 
     };  // class PitchLevelPid
