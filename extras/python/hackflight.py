@@ -58,7 +58,6 @@ def main():
         exit(1)
 
     receiver = Receiver()
-    receiver.begin()
 
     mixer = mixerdict[args.vehicle]()
 

@@ -42,7 +42,6 @@ class Receiver(object):
 
         self.axes = None
 
-    def begin(self):
         '''Initializes the joystick and associated pygame instances'''
         pg.init()
         pg.joystick.init()
@@ -107,8 +106,6 @@ class Receiver(object):
 def main():
 
     receiver = Receiver(throttle_divisor=10000)
-
-    receiver.begin()
 
     while True:
 
