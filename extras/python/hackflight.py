@@ -40,9 +40,9 @@ def _make_udpsocket():
 
 
 def _run_telemetry(host,
-                   motorPort,
-                   telemetryServerSocket,
-                   motorClientSocket,
+                   motor_port,
+                   telemetry_server_socket,
+                   motor_client_socket,
                    receiver,
                    pid_controllers,
                    mixer,
@@ -53,12 +53,12 @@ def _run_telemetry(host,
     while True:
 
         try:
-            data, _ = telemetryServerSocket.recvfrom(8*13)
+            data, _ = telemetry_server_socket.recvfrom(8*13)
         except Exception:
             done[0] = True
             break
 
-        telemetryServerSocket.settimeout(.1)
+        telemetry_server_socket.settimeout(.1)
 
         telem = np.frombuffer(data)
 
@@ -70,8 +70,8 @@ def _run_telemetry(host,
             running = True
 
         if telem[0] < 0:
-            motorClientSocket.close()
-            telemetryServerSocket.close()
+            motor_client_socket.close()
+            telemetry_server_socket.close()
             break
 
         # Start with demands from receiver
@@ -85,15 +85,15 @@ def _run_telemetry(host,
         motorvals = mixer(demands)
 
         # Send motor values to client (simulator)
-        motorClientSocket.sendto(np.ndarray.tobytes(motorvals),
-                                 (host, motorPort))
+        motor_client_socket.sendto(np.ndarray.tobytes(motorvals),
+                                   (host, motor_port))
 
         # Yield to main thread
         sleep(.001)
 
 
 def main(host='127.0.0.1',
-         motorPort=5000,
+         motor_port=5000,
          telem_port=5001,
          image_port=5002,
          image_rows=480,
@@ -107,15 +107,15 @@ def main(host='127.0.0.1',
 
     args = parser.parse_args()
 
-    mixerdict = {'Phantom': mixer_quadxap, 'Ingenuity': mixer_coaxial}
+    mixer_dict = {'Phantom': mixer_quadxap, 'Ingenuity': mixer_coaxial}
 
-    if args.vehicle not in mixerdict:
+    if args.vehicle not in mixer_dict:
         print('Unrecognized vehicle: %s' % args.vehicle)
         exit(1)
 
     receiver = Receiver()
 
-    mixer = mixerdict[args.vehicle]
+    mixer = mixer_dict[args.vehicle]
 
     pid_controllers = (RatePid(0.225, 0.001875, 0.375),
                        YawPid(2.0, 0.1),
@@ -125,28 +125,28 @@ def main(host='127.0.0.1',
     done = [False]
 
     # Telemetry in and motors out run on their own thread
-    motorClientSocket = _make_udpsocket()
-    telemetryServerSocket = _make_udpsocket()
-    telemetryServerSocket.bind((host, telem_port))
+    motor_client_socket = _make_udpsocket()
+    telemetry_server_socket = _make_udpsocket()
+    telemetry_server_socket.bind((host, telem_port))
 
     _debug('Hit the Play button ...')
 
     # Serve a socket with a maximum of one client
-    imageServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    imageServerSocket.bind((host, image_port))
-    imageServerSocket.listen(1)
+    image_server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    image_server_socket.bind((host, image_port))
+    image_server_socket.listen(1)
 
     # This will block (wait) until a client connets
-    imageConn, _ = imageServerSocket.accept()
-    imageConn.settimeout(1)
+    image_conn, _ = image_server_socket.accept()
+    image_conn.settimeout(1)
     _debug('Got a connection!')
 
     # Start telemetry thread
     Thread(target=_run_telemetry,
            args=(host,
-                 motorPort,
-                 telemetryServerSocket,
-                 motorClientSocket,
+                 motor_port,
+                 telemetry_server_socket,
+                 motor_client_socket,
                  receiver,
                  pid_controllers,
                  mixer,
@@ -155,7 +155,7 @@ def main(host='127.0.0.1',
     while not done[0]:
 
         try:
-            imgbytes = imageConn.recv(image_rows*image_cols*4)
+            imgbytes = image_conn.recv(image_rows*image_cols*4)
 
         except Exception:  # likely a timeout from sim quitting
             break
