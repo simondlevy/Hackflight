@@ -6,7 +6,6 @@
    MIT License
 '''
 
-from closedloop import ClosedLoopController
 from demands import DEMANDS_ROLL, DEMANDS_PITCH, DEMANDS_YAW
 from state import STATE_PHI, STATE_DPHI, STATE_THETA, STATE_DTHETA, STATE_DPSI
 import numpy as np
@@ -117,7 +116,7 @@ class _AngularVelocityPid(_DofPid):
         return _DofPid.compute(self, demand, angularVelocity)
 
 
-class RatePid(ClosedLoopController):
+class RatePid:
 
     def __init__(self, Kp, Ki, Kd):
 
@@ -140,7 +139,7 @@ class RatePid(ClosedLoopController):
         return newdmnds
 
 
-class YawPid(ClosedLoopController):
+class YawPid:
 
     def __init__(self, Kp, Ki):
 
@@ -156,7 +155,7 @@ class YawPid(ClosedLoopController):
         return newdmnds
 
 
-class LevelPid(ClosedLoopController):
+class LevelPid:
 
     def __init__(self, Kp):
 
