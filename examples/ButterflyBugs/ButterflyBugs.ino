@@ -13,14 +13,12 @@
    MIT License
  */
 
-#include "hackflight.hpp"
+#include "hf_full.hpp"
 #include "mixers/quad/xmw.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/yaw.hpp"
 #include "pidcontrollers/level.hpp"
 #include "sensors/usfs.hpp"
-#include "sensors/vl53l1x.hpp"
-#include "sensors/pmw3901.hpp"
 #include "receivers/arduino/dsmx/dsmx_serial1.hpp"
 
 #include <rft_boards/realboards/arduino_serial/arduino/butterfly.hpp>
@@ -36,7 +34,6 @@ static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MA
 
 // Board ================================================================================
 
-// static rft::TinyPico board;
 static rft::Butterfly board;
 
 // Motors  ==============================================================================
@@ -52,7 +49,7 @@ static hf::MixerQuadXMW mixer = hf::MixerQuadXMW(&motor1, &motor2, &motor3, &mot
 
 // Hackflight object ====================================================================
 
-static hf::Hackflight h = hf::Hackflight(&board, &receiver, &mixer);
+static hf::Hackflight h;
 
 // PID controllers ======================================================================
 
@@ -62,43 +59,41 @@ static hf::LevelPid levelPid = hf::LevelPid(0.40);
 
 // Sensors ==============================================================================
 
-static hf::UsfsGyrometer gyrometer;
-static hf::UsfsQuaternion quaternion; // not really a sensor, but we treat it like one!
-static hf::Vl53l1xRangefinder rangefinder;
-static hf::Pmw3901OpticalFlow flowSensor(38, &SPI1);
+static hf::USFS imu;
+
+// Vehicle state ========================================================================
+
+static hf::State state;
+
+// Serial tasks =========================================================================
+
+hf::SerialTask gcsTask = hf::SerialTask(&receiver, &mixer, &state); 
 
 // Setup ==============================================================================
 
 void setup(void)
 {
-    // XXX USFS piggyback: use pins 4,3 for power, ground
-    // rft::ArduinoBoard::powerPins(4, 3);
-    // delay(100);
-
     // Start I^2C
-    Wire.begin(TWI_PINS_6_7);
+    Wire.begin();
 
     // Add sensors
-    h.addSensor(&quaternion);
-    h.addSensor(&gyrometer);
-    h.addSensor(&rangefinder);
-    h.addSensor(&flowSensor);
+    h.addSensor(&imu);
 
     // Add PID controllers
     h.addClosedLoopController(&levelPid);
     h.addClosedLoopController(&ratePid);
     h.addClosedLoopController(&yawPid);
 
-    // Adjust trim
-    receiver.setTrim(0, +0.05, -.008);
+    // Add serial tasks
+    h.addSerialTask(&gcsTask);
 
     // Start Hackflight firmware
-    h.begin();
+    h.begin(&board, &receiver, &mixer);
 }
 
 // Loop ===============================================================================
 
 void loop(void)
 {
-    h.update();
+    h.update(&board, &receiver, &mixer, &state);
 }
