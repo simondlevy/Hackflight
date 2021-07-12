@@ -74,7 +74,7 @@ hf::SerialTask gcsTask = hf::SerialTask(&receiver, &mixer, &state);
 void setup(void)
 {
     // Start I^2C
-    Wire.begin();
+    Wire.begin(TWI_PINS_6_7);
 
     // Add sensors
     h.addSensor(&imu);
