@@ -41,23 +41,6 @@ def _getMotors(parts, time, state):
     return motors
 
 
-class HackflightCopter:
-
-    def __init__(self, receiver, mixer, pid_controllers):
-
-        self.receiver = receiver
-        self.mixer = mixer
-        self.pid_controllers = pid_controllers
-
-    def begin(self):
-
-        self.receiver.begin()
-
-        start((self.receiver, self.mixer, self.pid_controllers),
-              _updateReceiver,
-              _getMotors)
-
-
 def main():
 
     parser = argparse.ArgumentParser(
@@ -74,15 +57,14 @@ def main():
         print('Unrecognized vehicle: %s' % args.vehicle)
         exit(1)
 
-    # Create Hackflight object
-    h = HackflightCopter(Receiver(),
-                         mixerdict[args.vehicle](),
-                         (RatePid(0.225, 0.001875, 0.375),
-                          YawPid(2.0, 0.1),
-                          LevelPid(0.2)))
+    receiver = Receiver()
+    receiver.begin()
 
-    # Go!
-    h.begin()
+    mixer = mixerdict[args.vehicle]()
+
+    pid_controllers = (RatePid(0.225, 0.001875, 0.375), YawPid(2.0, 0.1), LevelPid(0.2))
+
+    start((receiver, mixer, pid_controllers), _updateReceiver, _getMotors)
 
 
 main()
