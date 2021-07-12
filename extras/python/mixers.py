@@ -55,4 +55,4 @@ def mixerfun(motordirs, demands):
     motorvals[motorvals < 0] = 0
     motorvals[motorvals > 1] = 1
 
-    return motorvals.copy()
+    return motorvals
