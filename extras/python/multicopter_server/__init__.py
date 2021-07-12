@@ -14,6 +14,21 @@ import time
 import cv2
 
 
+# See Bouabdallah (2004)
+(STATE_X,
+ STATE_DX,
+ STATE_Y,
+ STATE_DY,
+ STATE_Z,
+ STATE_DZ,
+ STATE_PHI,
+ STATE_DPHI,
+ STATE_THETA,
+ STATE_DTHETA,
+ STATE_PSI,
+ STATE_DPSI) = range(12)
+
+
 def _handleImage(image):
     '''
     Override for your application
@@ -35,11 +50,12 @@ def _make_udpsocket():
     return sock
 
 
-def _run_telemetry(obj,
-                   host,
+def _run_telemetry(host,
                    motor_port,
                    telemetryServerSocket,
                    motorClientSocket,
+                   parts,
+                   motorGetter,
                    done):
 
     running = False
@@ -65,7 +81,7 @@ def _run_telemetry(obj,
             telemetryServerSocket.close()
             break
 
-        motorvals = obj.getMotors(telem[0], telem[1:])
+        motorvals = motorGetter(parts, telem[0], telem[1:])
 
         motorClientSocket.sendto(np.ndarray.tobytes(motorvals),
                                  (host, motor_port))
@@ -73,85 +89,62 @@ def _run_telemetry(obj,
         time.sleep(.001)
 
 
-class MulticopterServer(object):
+def start(parts,
+          updater,
+          motorGetter,
+          host='127.0.0.1',
+          motor_port=5000,
+          telem_port=5001,
+          image_port=5002,
+          image_rows=480,
+          image_cols=640,
+          imageHandler=_handleImage):
 
-    # See Bouabdallah (2004)
-    (STATE_X,
-     STATE_DX,
-     STATE_Y,
-     STATE_DY,
-     STATE_Z,
-     STATE_DZ,
-     STATE_PHI,
-     STATE_DPHI,
-     STATE_THETA,
-     STATE_DTHETA,
-     STATE_PSI,
-     STATE_DPSI) = range(12)
+    done = [False]
 
-    def start(obj,
-              controller,
-              controllerUpdater,
-              host='127.0.0.1',
-              motor_port=5000,
-              telem_port=5001,
-              image_port=5002,
-              image_rows=480,
-              image_cols=640,
-              imageHandler=_handleImage):
+    # Telemetry in and motors out run on their own thread
+    motorClientSocket = _make_udpsocket()
+    telemetryServerSocket = _make_udpsocket()
+    telemetryServerSocket.bind((host, telem_port))
 
-        done = [False]
+    _debug('Hit the Play button ...')
 
-        # Telemetry in and motors out run on their own thread
-        motorClientSocket = _make_udpsocket()
-        telemetryServerSocket = _make_udpsocket()
-        telemetryServerSocket.bind((host, telem_port))
+    telemetryThread = Thread(target=_run_telemetry,
+                             args=(host,
+                                   motor_port,
+                                   telemetryServerSocket,
+                                   motorClientSocket,
+                                   parts,
+                                   motorGetter,
+                                   done))
 
-        _debug('Hit the Play button ...')
+    # Serve a socket with a maximum of one client
+    imageServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    imageServerSocket.bind((host, image_port))
+    imageServerSocket.listen(1)
 
-        telemetryThread = Thread(target=_run_telemetry,
-                                 args=(obj,
-                                       host,
-                                       motor_port,
-                                       telemetryServerSocket,
-                                       motorClientSocket,
-                                       done))
+    # This will block (wait) until a client connets
+    imageConn, _ = imageServerSocket.accept()
+    imageConn.settimeout(1)
+    _debug('Got a connection!')
 
-        # Serve a socket with a maximum of one client
-        imageServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        imageServerSocket.bind((host, image_port))
-        imageServerSocket.listen(1)
+    telemetryThread.start()
 
-        # This will block (wait) until a client connets
-        imageConn, _ = imageServerSocket.accept()
-        imageConn.settimeout(1)
-        _debug('Got a connection!')
+    while not done[0]:
 
-        telemetryThread.start()
+        try:
+            imgbytes = imageConn.recv(image_rows*image_cols*4)
 
-        while not done[0]:
+        except Exception:  # likely a timeout from sim quitting
+            break
 
-            try:
-                imgbytes = imageConn.recv(image_rows*image_cols*4)
+        if len(imgbytes) == image_rows*image_cols*4:
 
-            except Exception:  # likely a timeout from sim quitting
-                break
+            rgba_image = np.reshape(np.frombuffer(imgbytes, 'uint8'),
+                                    (image_rows, image_cols, 4))
 
-            if len(imgbytes) == image_rows*image_cols*4:
+            image = cv2.cvtColor(rgba_image, cv2.COLOR_RGBA2RGB)
 
-                rgba_image = np.reshape(np.frombuffer(imgbytes, 'uint8'),
-                                        (image_rows, image_cols, 4))
+            imageHandler(image)
 
-                image = cv2.cvtColor(rgba_image, cv2.COLOR_RGBA2RGB)
-
-                imageHandler(image)
-
-            controllerUpdater(controller)
-
-    def getMotors(self, time, state):
-        '''
-        Override for your application
-        '''
-        return np.array([0.6, 0.6, 0.6, 0.6])
-
-
+        updater(parts)

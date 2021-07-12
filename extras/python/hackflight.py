@@ -11,24 +11,39 @@ import numpy as np
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 
-from multicopter_server import MulticopterServer
+from multicopter_server import start
 
 from receiver import Receiver
 from mixers import QuadXAPMixer, CoaxialMixer
 from pidcontrollers import RatePid, YawPid, LevelPid
 
-from debugging import debug
 
-def _updateReceiver(receiver):
+def _updateReceiver(parts):
+
+    receiver, _mixer, _pid_controllers = parts
 
     receiver.update()
 
 
-class HackflightCopter(MulticopterServer):
+def _getMotors(parts, time, state):
+
+    receiver, mixer, pid_controllers = parts
+
+    # Start with demands from receiver
+    demands = np.array(list(receiver.getDemands()))
+
+    # Pass demands through closed-loop controllers
+    for pid_controller in pid_controllers:
+        demands = pid_controller.modifyDemands(state, demands)
+
+    motors = mixer.getMotors(demands)
+
+    return motors
+
+
+class HackflightCopter:
 
     def __init__(self, receiver, mixer, pid_controllers):
-
-        MulticopterServer.__init__(self)
 
         self.receiver = receiver
         self.mixer = mixer
@@ -41,20 +56,9 @@ class HackflightCopter(MulticopterServer):
 
         self.receiver.begin()
 
-        MulticopterServer.start(self, self.receiver, _updateReceiver)
-
-    def getMotors(self, t, state):
-
-        # Start with demands from receiver
-        demands = np.array(list(self.receiver.getDemands()))
-
-        # Pass demands through closed-loop controllers
-        for pid_controller in self.pid_controllers:
-            demands = pid_controller.modifyDemands(state, demands)
-
-        motors = self.mixer.getMotors(demands)
-
-        return motors
+        start((self.receiver, self.mixer, self.pid_controllers),
+              _updateReceiver,
+              _getMotors)
 
 
 def main():
