@@ -27,13 +27,8 @@ class _DofPid:
         self.windupMax = windupMax
 
         # Accumulated values
-        self.lastError = 0
-        self.errorI = 0
         self.deltaError1 = 0
         self.deltaError2 = 0
-
-        # For deltaT-based controllers
-        self.previousTime = 0
 
         # Initialize error integral, previous value
         self.reset()
@@ -69,7 +64,6 @@ class _DofPid:
 
         self.errorI = 0
         self.lastError = 0
-        self.previousTime = 0
 
     @staticmethod
     def constrainAbs(val, lim):
