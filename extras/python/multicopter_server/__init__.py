@@ -14,6 +14,14 @@ import time
 import cv2
 
 
+def _handleImage(image):
+    '''
+    Override for your application
+    '''
+    cv2.imshow('Image', image)
+    cv2.waitKey(1)
+
+
 def _run_telemetry(obj,
                    host,
                    motor_port,
@@ -51,6 +59,7 @@ def _run_telemetry(obj,
 
         time.sleep(.001)
 
+
 class MulticopterServer(object):
 
     # See Bouabdallah (2004)
@@ -73,7 +82,8 @@ class MulticopterServer(object):
               telem_port=5001,
               image_port=5002,
               image_rows=480,
-              image_cols=640):
+              image_cols=640,
+              imageHandler=_handleImage):
 
         done = [False]
 
@@ -91,7 +101,6 @@ class MulticopterServer(object):
                                        telemetryServerSocket,
                                        motorClientSocket,
                                        done))
-
 
         # Serve a socket with a maximum of one client
         imageServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -120,16 +129,9 @@ class MulticopterServer(object):
 
                 image = cv2.cvtColor(rgba_image, cv2.COLOR_RGBA2RGB)
 
-                obj.handleImage(image)
+                imageHandler(image)
 
             obj.updateReceiver()
-
-    def handleImage(self, image):
-        '''
-        Override for your application
-        '''
-        cv2.imshow('Image', image)
-        cv2.waitKey(1)
 
     def getMotors(self, time, state):
         '''
