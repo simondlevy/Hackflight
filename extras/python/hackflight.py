@@ -79,7 +79,7 @@ def _run_telemetry(host,
 
         # Pass demands through closed-loop controllers
         for pid_controller in pid_controllers:
-            demands = pid_controller.modifyDemands(state, demands)
+            demands, _pidstate = pid_controller.modifyDemands(state, demands)
 
         # Run mixer on demands to get motor values
         motorvals = mixer(demands)

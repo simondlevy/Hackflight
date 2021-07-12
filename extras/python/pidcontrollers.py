@@ -53,7 +53,7 @@ class _DofPid:
                       'errorI': errorI,
                       'lastError': error}
 
-        return pterm + iterm + dterm
+        return pterm + iterm + dterm, self.state
 
     def reset(self):
 
@@ -119,15 +119,17 @@ class RatePid:
         newdmnds = demands.copy()
 
         # Roll angle and roll demand are both positive for starboard right down
-        newdmnds[DEMANDS_ROLL] = self.rollPid.compute(demands[DEMANDS_ROLL],
-                                                      state[STATE_DPHI])
+        roll, rstate = self.rollPid.compute(demands[DEMANDS_ROLL],
+                                            state[STATE_DPHI])
+        newdmnds[DEMANDS_ROLL] = roll
 
         # Pitch demand is postive for stick forward, but pitch angle is
         # positive for nose up.  So we negate pitch angle to compute demand
-        newdmnds[DEMANDS_PITCH] = self.pitchPid.compute(demands[DEMANDS_PITCH],
-                                                        -state[STATE_DTHETA])
+        pitch, pstate = self.pitchPid.compute(demands[DEMANDS_PITCH],
+                                              -state[STATE_DTHETA])
+        newdmnds[DEMANDS_PITCH] = pitch
 
-        return newdmnds
+        return newdmnds, (rstate, pstate)
 
 
 class YawPid:
@@ -140,10 +142,12 @@ class YawPid:
 
         newdmnds = demands.copy()
 
-        newdmnds[DEMANDS_YAW] = self.yawPid.compute(demands[DEMANDS_YAW],
-                                                    state[STATE_DPSI])
+        yaw, yawstate = self.yawPid.compute(demands[DEMANDS_YAW],
+                                            state[STATE_DPSI])
 
-        return newdmnds
+        newdmnds[DEMANDS_YAW] = yaw
+
+        return newdmnds, yawstate
 
 
 class LevelPid:
@@ -158,12 +162,14 @@ class LevelPid:
         newdmnds = demands.copy()
 
         # Roll angle and roll demand are both positive for starboard right down
-        newdmnds[DEMANDS_ROLL] = self.rollPid.compute(demands[DEMANDS_ROLL],
-                                                      state[STATE_PHI])
+        roll, rstate = self.rollPid.compute(demands[DEMANDS_ROLL],
+                                            state[STATE_PHI])
+        newdmnds[DEMANDS_ROLL] = roll
 
         # Pitch demand is postive for stick forward, but pitch angle is
         # positive for nose up.  So we negate pitch angle to compute demand
-        newdmnds[DEMANDS_PITCH] = self.pitchPid.compute(demands[DEMANDS_PITCH],
-                                                        -state[STATE_THETA])
+        pitch, pstate = self.pitchPid.compute(demands[DEMANDS_PITCH],
+                                              -state[STATE_THETA])
+        newdmnds[DEMANDS_PITCH] = pitch
 
-        return newdmnds
+        return newdmnds, (rstate, pstate)
