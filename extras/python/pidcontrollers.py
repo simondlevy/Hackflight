@@ -123,34 +123,6 @@ class RatePid:
         return pterm + iterm + dterm, controller_state
 
 
-class YawPid:
-
-    def __init__(self, Kp, Ki, windupMax=0.4):
-
-        self.Kp = Kp
-        self.Ki = Ki
-        self.windupMax = windupMax
-
-        self.state = {'errorI': 0, 'lastError': 0}
-
-    def modifyDemands(self, state, demands):
-
-        # Compute error as scaled target minus actual
-        error = demands[DEMANDS_YAW] - state[STATE_DPSI]
-
-        # Accumualte error integral
-        errorI = _constrainAbs(self.state['errorI'] + error, self.windupMax)
-
-        # Update controller state
-        self.state = {'errorI': errorI, 'lastError': error}
-
-        # Update demands
-        new_demands = demands.copy()
-        new_demands[DEMANDS_YAW] = error * self.Kp + errorI * self.Ki
-
-        return new_demands, self.state
-
-
 def make_yaw_pid(Kp, Ki, windupMax=0.4):
     '''
     A closure for rate control of yaw angle
