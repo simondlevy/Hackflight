@@ -16,7 +16,7 @@ def loop():
 
         pg.event.get()
 
-        debug(list(joystick.get_axis(i) for i in range(joystick.get_numaxes())))
+        debug(joystick.get_axis(1))
 
 
 def main():
