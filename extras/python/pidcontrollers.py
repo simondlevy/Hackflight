@@ -181,8 +181,6 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
 
         throttleDemand = demands[DEMANDS_THROTTLE]
 
-        debug(throttleDemand)
-
         # Is stick demand in deadband?
         inBand = abs(throttleDemand) < stickDeadband
 

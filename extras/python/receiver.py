@@ -72,15 +72,15 @@ def receiver():
 
 def main():
 
-    js, updater, getter = receiver()
+    js, update, get = receiver()
 
     while True:
 
         try:
 
-            updater(js)
+            update(js)
 
-            debug('T: %+3.3f   R: %+3.3f   P: %+3.3f   Y: %+3.3f' % tuple(getter()))
+            debug('T: %+3.3f  R: %+3.3f  P: %+3.3f  Y: %+3.3f' % tuple(get()))
 
         except KeyboardInterrupt:
 

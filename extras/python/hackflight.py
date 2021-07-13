@@ -111,7 +111,7 @@ def main(host='127.0.0.1',
         print('Unrecognized vehicle: %s' % args.vehicle)
         exit(1)
 
-    receiver_update, receiver_get = receiver()
+    receiver_object, receiver_update, receiver_get = receiver()
 
     mixer = mixer_dict[args.vehicle]
 
@@ -160,7 +160,7 @@ def main(host='127.0.0.1',
 
             _handleImage(image)
 
-        receiver_update()
+        receiver_update(receiver_object)
 
 
 main()
