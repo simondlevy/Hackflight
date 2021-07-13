@@ -6,23 +6,23 @@ def init():
     pg.init()
     pg.joystick.init()
 
+    js = pg.joystick.Joystick(0)
+    js.init()
 
-def loop():
+    return js
 
-    joystick = pg.joystick.Joystick(0)
-    joystick.init()
+def loop(js):
 
     while True:
 
         pg.event.get()
 
-        debug(joystick.get_axis(1))
-
+        debug(js.get_axis(1))
 
 def main():
 
-    init()
+    js = init()
 
-    loop()
+    loop(js)
 
 main()
