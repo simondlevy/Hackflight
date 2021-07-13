@@ -18,7 +18,7 @@ from time import sleep
 
 from receiver import Receiver
 from mixers import mixer_quadxap, mixer_coaxial
-from pidcontrollers import RatePid, YawPid, RollLevelPid, PitchLevelPid
+from pidcontrollers import RatePid, YawPid, LevelPid
 
 
 def _handleImage(image):
@@ -119,8 +119,7 @@ def main(host='127.0.0.1',
 
     pid_controllers = (RatePid(0.225, 0.001875, 0.375),
                        YawPid(2.0, 0.1),
-                       RollLevelPid(0.2),
-                       PitchLevelPid(0.2))
+                       LevelPid(0.2))
 
     # Allows telemetry thread to tell this thread when user closes socket
     done = [False]

@@ -68,59 +68,33 @@ class _DofPid:
         return -lim if val < -lim else (+lim if val > +lim else val)
 
 
-class _LevelPid:
+class LevelPid:
 
     MAX_ANGLE_DEGREES = 45
 
-    def __init__(self, Kp, state_axis, demand_axis, state_direction=+1):
+    def __init__(self, Kp):
 
         self.Kp = Kp
-        self.state_axis = state_axis
-        self.demand_axis = demand_axis
-        self.state_direction = state_direction
 
         # Maximum roll pitch demand is +/-0.5, so to convert demand to
         # angle for error computation, we multiply by the folling amount:
         self.dmdscale = 2 * np.radians(self.MAX_ANGLE_DEGREES)
 
-    def compute(self, state, demands):
-
-        demands[self.demand_axis] = self.Kp * (demands[self.demand_axis] *
-                                               self.dmdscale -
-                                               self.state_direction *
-                                               state[self.state_axis])
-
-
-class RollLevelPid(_LevelPid):
-
-    def __init__(self, Kp):
-
-        _LevelPid.__init__(self, Kp, STATE_PHI, DEMANDS_ROLL)
-
     def modifyDemands(self, state, demands):
 
-        newdmnds = demands.copy()
+        newdemands = demands.copy()
 
-        _LevelPid.compute(self, state, newdmnds)
-
-        return newdmnds, None
-
-
-class PitchLevelPid(_LevelPid):
-
-    def __init__(self, Kp):
+        newdemands[DEMANDS_ROLL] = self.Kp * (demands[DEMANDS_ROLL] *
+                                              self.dmdscale -
+                                              state[STATE_PHI])
 
         # Pitch demand is nose-down positive, so we negate
         # pitch-forward (nose-down negative) to reconcile them
-        _LevelPid.__init__(self, Kp, STATE_THETA, DEMANDS_PITCH, -1)
+        newdemands[DEMANDS_PITCH] = self.Kp * (demands[DEMANDS_PITCH] *
+                                              self.dmdscale +
+                                              state[STATE_THETA])
 
-    def modifyDemands(self, state, demands):
-
-        newdmnds = demands.copy()
-
-        _LevelPid.compute(self, state, newdmnds)
-
-        return newdmnds, None
+        return newdemands, None
 
 
 class _AngularVelocityPid(_DofPid):
