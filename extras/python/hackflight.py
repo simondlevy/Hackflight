@@ -39,22 +39,14 @@ def _udpsocket():
     return sock
 
 
-def _run_telemetry(host,
-                   motor_port,
-                   telemetry_server_socket,
-                   motor_client_socket,
-                   receiver,
-                   rate_pid_closure,
-                   yaw_pid_closure,
-                   level_pid_closure,
-                   mixer,
+def _run_telemetry(host, motor_port, telemetry_server_socket,
+                   motor_client_socket, receiver, pid_controllers, mixer,
                    done):
 
     running = False
 
-    rate_pid_fun, rate_pid_state = rate_pid_closure
-    yaw_pid_fun, yaw_pid_state = yaw_pid_closure
-    level_pid_fun, level_pid_state = level_pid_closure
+    pid_funs, pid_states = zip(*pid_controllers)
+    pid_states = list(pid_states)
 
     while True:
 
@@ -84,15 +76,9 @@ def _run_telemetry(host,
         demands = np.array(list(receiver.getDemands()))
 
         # Pass demands through closed-loop controllers
-        demands, rate_pid_state = rate_pid_fun(vehicle_state,
-                                               rate_pid_state, demands)
-        demands, yaw_pid_state = yaw_pid_fun(vehicle_state,
-                                             yaw_pid_state, demands)
-        demands, level_pid_state = level_pid_fun(vehicle_state,
-                                                 level_pid_state, demands)
-
-        # for pid_controller in pid_controllers:
-        #     demands, _pidstate = pid_controller.modifyDemands(state, demands)
+        for k, pid_fun in enumerate(pid_funs):
+            demands, pid_states[k] = pid_fun(vehicle_state, pid_states[k],
+                                             demands)
 
         # Run mixer on demands to get motor values
         motorvals = mixer(demands)
@@ -130,11 +116,9 @@ def main(host='127.0.0.1',
 
     mixer = mixer_dict[args.vehicle]
 
-    '''
-    pid_controllers = (RatePid(0.225, 0.001875, 0.375),
-                       YawPid(2.0, 0.1),
-                       LevelPid(0.2))
-    '''
+    pid_controllers = (rate_pid(0.225, 0.001875, 0.375),
+                       yaw_pid(2.0, 0.1),
+                       level_pid(0.2))
 
     # Allows telemetry thread to tell this thread when user closes socket
     done = [False]
@@ -158,15 +142,8 @@ def main(host='127.0.0.1',
 
     # Start telemetry thread
     Thread(target=_run_telemetry,
-           args=(host,
-                 motor_port,
-                 telemetry_server_socket,
-                 motor_client_socket,
-                 receiver,
-                 rate_pid(0.225, 0.001875, 0.375),
-                 yaw_pid(2.0, 0.1),
-                 level_pid(0.2),
-                 mixer,
+           args=(host, motor_port, telemetry_server_socket,
+                 motor_client_socket, receiver, pid_controllers, mixer,
                  done)).start()
 
     while not done[0]:
