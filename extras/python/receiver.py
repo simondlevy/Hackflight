@@ -29,8 +29,9 @@ def receiver():
     pg.init()
     pg.joystick.init()
 
+    js = None
+
     # Initialize a controller or exit if nothing is plugged in
-    '''
     try:
         js = pg.joystick.Joystick(0)
         if 'SPEKTRUM' in js.get_name():
@@ -40,31 +41,23 @@ def receiver():
             debug('Sorry, only Spektrum RC is currently supported')
             exit(1)
         js.init()
+
     except pg.error:
         debug('Would you like to buy a controller?')
         exit(1)
-    '''
 
-    def update():
+    def update(js):
         '''
         Should be called on main thread
         '''
 
-        pg.event.get()
-
-        joystick = pg.joystick.Joystick(0)
-        joystick.init()
-
-        debug(list(joystick.get_axis(i) for i in range(joystick.get_numaxes())))
-
-        return
-
-
-        for event in events:
+        for event in pg.event.get():
 
             # If you move the stick, poll all the directions
             # and return it as a tuple
             if event.type == pg.JOYAXISMOTION:
+
+                axes = [js.get_axis(i) for i in range(js.get_numaxes())]
 
                 # Use axis map to go from axes to demands
                 demands[1:4] = np.array([axes[axis_map[i]]
@@ -83,22 +76,20 @@ def receiver():
 
         return demands.copy()
 
-    return update, getDemands
+    return js, update, getDemands
 
 
 def main():
 
-    updater, getter = receiver()
+    js, updater, getter = receiver()
 
     while True:
 
         try:
 
-            updater()
+            updater(js)
 
-            getter()
-
-            # debug('T: %+3.3f   R: %+3.3f   P: %+3.3f   Y: %+3.3f' % tuple(getter()))
+            debug('T: %+3.3f   R: %+3.3f   P: %+3.3f   Y: %+3.3f' % tuple(getter()))
 
         except KeyboardInterrupt:
 
