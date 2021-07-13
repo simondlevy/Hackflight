@@ -6,9 +6,16 @@
    MIT License
 '''
 
+import numpy as np
+
 from demands import DEMANDS_ROLL, DEMANDS_PITCH, DEMANDS_YAW
 from state import STATE_PHI, STATE_DPHI, STATE_THETA, STATE_DTHETA, STATE_DPSI
-import numpy as np
+from debugging import debug
+
+
+def _constrainAbs(val, lim):
+
+    return -lim if val < -lim else (+lim if val > +lim else val)
 
 
 class _DofPid:
@@ -91,9 +98,10 @@ class LevelPid:
         # Pitch demand is nose-down positive, so we negate
         # pitch-forward (nose-down negative) to reconcile them
         newdemands[DEMANDS_PITCH] = self.Kp * (demands[DEMANDS_PITCH] *
-                                              self.dmdscale +
-                                              state[STATE_THETA])
+                                               self.dmdscale +
+                                               state[STATE_THETA])
 
+        # LevelPid uses no state
         return newdemands, None
 
 
@@ -146,17 +154,28 @@ class RatePid:
 
 class YawPid:
 
-    def __init__(self, Kp, Ki):
+    def __init__(self, Kp, Ki, windupMax=0.4):
 
-        self.yawPid = _AngularVelocityPid(Kp, Ki, 0)
+        self.Kp = Kp
+        self.Ki = Ki
+        self.windupMax = windupMax
+
+        self.state = {'errorI': 0, 'lastError': 0}
 
     def modifyDemands(self, state, demands):
 
-        newdmnds = demands.copy()
+        # Compute error as scaled target minus actual
+        error = demands[DEMANDS_YAW] - state[STATE_DPSI]
 
-        yaw, yawstate = self.yawPid.compute(demands[DEMANDS_YAW],
-                                            state[STATE_DPSI])
+        # Accumualte error integral
+        errorI = _constrainAbs(self.state['errorI'] + error, self.windupMax)
 
-        newdmnds[DEMANDS_YAW] = yaw
+        # Update controller state
+        self.state = {'errorI': errorI, 'lastError': error}
 
-        return newdmnds, yawstate
+        # Update demands
+        newdemands = demands.copy()
+        newdemands[DEMANDS_YAW] = error * self.Kp + errorI * self.Ki
+
+        return newdemands, self.state
+
