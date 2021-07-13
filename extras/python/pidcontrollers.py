@@ -68,21 +68,59 @@ class _DofPid:
         return -lim if val < -lim else (+lim if val > +lim else val)
 
 
-class _AnglePid(_DofPid):
+class _LevelPid:
 
     MAX_ANGLE_DEGREES = 45
 
-    def __init__(self, Kp):
+    def __init__(self, Kp, state_axis, demand_axis, state_direction=+1):
 
-        _DofPid.__init__(self, Kp, 0, 0)
+        self.Kp = Kp
+        self.state_axis = state_axis
+        self.demand_axis = demand_axis
+        self.state_direction = state_direction
 
         # Maximum roll pitch demand is +/-0.5, so to convert demand to
         # angle for error computation, we multiply by the folling amount:
-        self.demandMultiplier = 2 * np.radians(self.MAX_ANGLE_DEGREES)
+        self.dmdscale = 2 * np.radians(self.MAX_ANGLE_DEGREES)
 
-    def compute(self, demand, angle):
+    def compute(self, state, demands):
 
-        return _DofPid.compute(self, demand * self.demandMultiplier, angle)
+        demands[self.demand_axis] = self.Kp * (demands[self.demand_axis] *
+                                               self.dmdscale -
+                                               self.state_direction *
+                                               state[self.state_axis])
+
+
+class RollLevelPid(_LevelPid):
+
+    def __init__(self, Kp):
+
+        _LevelPid.__init__(self, Kp, STATE_PHI, DEMANDS_ROLL)
+
+    def modifyDemands(self, state, demands):
+
+        newdmnds = demands.copy()
+
+        _LevelPid.compute(self, state, newdmnds)
+
+        return newdmnds, None
+
+
+class PitchLevelPid(_LevelPid):
+
+    def __init__(self, Kp):
+
+        # Pitch demand is nose-down positive, so we negate
+        # pitch-forward (nose-down negative) to reconcile them
+        _LevelPid.__init__(self, Kp, STATE_THETA, DEMANDS_PITCH, -1)
+
+    def modifyDemands(self, state, demands):
+
+        newdmnds = demands.copy()
+
+        _LevelPid.compute(self, state, newdmnds)
+
+        return newdmnds, None
 
 
 class _AngularVelocityPid(_DofPid):
@@ -148,28 +186,3 @@ class YawPid:
         newdmnds[DEMANDS_YAW] = yaw
 
         return newdmnds, yawstate
-
-
-class LevelPid:
-
-    def __init__(self, Kp):
-
-        self.rollPid = _AnglePid(Kp)
-        self.pitchPid = _AnglePid(Kp)
-
-    def modifyDemands(self, state, demands):
-
-        newdmnds = demands.copy()
-
-        # Roll angle and roll demand are both positive for starboard right down
-        roll, rstate = self.rollPid.compute(demands[DEMANDS_ROLL],
-                                            state[STATE_PHI])
-        newdmnds[DEMANDS_ROLL] = roll
-
-        # Pitch demand is postive for stick forward, but pitch angle is
-        # positive for nose up.  So we negate pitch angle to compute demand
-        pitch, pstate = self.pitchPid.compute(demands[DEMANDS_PITCH],
-                                              -state[STATE_THETA])
-        newdmnds[DEMANDS_PITCH] = pitch
-
-        return newdmnds, (rstate, pstate)
