@@ -58,8 +58,7 @@ def receiver():
                 axes = [js.get_axis(i) for i in range(js.get_numaxes())]
 
                 # Use axis map to go from axes to demands
-                demands[0:4] = np.array([axes[axis_map[i]]
-                                         for i in range(0, 4)])
+                demands[0:4] = np.array([axes[axis_map[i]] for i in range(4)])
 
     def getDemands():
         '''
