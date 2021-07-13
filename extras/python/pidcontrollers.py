@@ -17,36 +17,6 @@ def _constrainAbs(val, lim):
     return -lim if val < -lim else (+lim if val > +lim else val)
 
 
-class LevelPid:
-
-    MAX_ANGLE_DEGREES = 45
-
-    def __init__(self, Kp):
-
-        self.Kp = Kp
-
-        # Maximum roll pitch demand is +/-0.5, so to convert demand to
-        # angle for error computation, we multiply by the folling amount:
-        self.dmdscale = 2 * np.radians(self.MAX_ANGLE_DEGREES)
-
-    def modifyDemands(self, state, demands):
-
-        new_demands = demands.copy()
-
-        new_demands[DEMANDS_ROLL] = self.Kp * (demands[DEMANDS_ROLL] *
-                                               self.dmdscale -
-                                               state[STATE_PHI])
-
-        # Pitch demand is nose-down positive, so we negate
-        # pitch-forward (nose-down negative) to reconcile them
-        new_demands[DEMANDS_PITCH] = self.Kp * (demands[DEMANDS_PITCH] *
-                                                self.dmdscale +
-                                                state[STATE_THETA])
-
-        # LevelPid uses no state
-        return new_demands, None
-
-
 class RatePid:
 
     # Arbitrary constants
@@ -182,6 +152,9 @@ class YawPid:
 
 
 def make_yaw_pid(Kp, Ki, windupMax=0.4):
+    '''
+    A closure for rate control of yaw angle
+    '''
 
     initial_state = {'errorI': 0, 'lastError': 0}
 
@@ -203,3 +176,29 @@ def make_yaw_pid(Kp, Ki, windupMax=0.4):
         return new_demands, new_controller_state
 
     return apply, initial_state
+
+
+def make_level_pid(Kp):
+
+    MAX_ANGLE_DEGREES = 45
+
+    # Maximum roll pitch demand is +/-0.5, so to convert demand to
+    # angle for error computation, we multiply by the folling amount:
+    dmdscale = 2 * np.radians(MAX_ANGLE_DEGREES)
+
+    def apply(vehicle_state, controller_state, demands):
+
+        new_demands = demands.copy()
+
+        new_demands[DEMANDS_ROLL] = Kp * (demands[DEMANDS_ROLL] * dmdscale -
+                                          vehicle_state[STATE_PHI])
+
+        # Pitch demand is nose-down positive, so we negate
+        # pitch-forward (nose-down negative) to reconcile them
+        new_demands[DEMANDS_PITCH] = Kp * (demands[DEMANDS_PITCH] * dmdscale +
+                                           vehicle_state[STATE_THETA])
+
+        # LevelPid uses no controller state
+        return new_demands, None
+
+    return apply, None

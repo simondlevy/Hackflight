@@ -18,7 +18,7 @@ from time import sleep
 
 from receiver import Receiver
 from mixers import mixer_quadxap, mixer_coaxial
-from pidcontrollers import RatePid, LevelPid, make_yaw_pid
+from pidcontrollers import RatePid, make_level_pid, make_yaw_pid
 
 
 def _handleImage(image):
@@ -46,13 +46,14 @@ def _run_telemetry(host,
                    receiver,
                    rate_pid,
                    yaw_pid_closure,
-                   level_pid,
+                   level_pid_closure,
                    mixer,
                    done):
 
     running = False
 
     yaw_pid_fun, yaw_pid_state = yaw_pid_closure
+    level_pid_fun, level_pid_state = level_pid_closure
 
     while True:
 
@@ -83,9 +84,10 @@ def _run_telemetry(host,
 
         # Pass demands through closed-loop controllers
         demands, _pidstate = rate_pid.modifyDemands(vehicle_state, demands)
-        demands, yaw_pid_state = yaw_pid_fun(vehicle_state, yaw_pid_state,
-                                             demands)
-        demands, _pidstate = level_pid.modifyDemands(vehicle_state, demands)
+        demands, yaw_pid_state = yaw_pid_fun(vehicle_state,
+                                             yaw_pid_state, demands)
+        demands, level_pid_state = level_pid_fun(vehicle_state,
+                                                 level_pid_state, demands)
 
         # for pid_controller in pid_controllers:
         #     demands, _pidstate = pid_controller.modifyDemands(state, demands)
@@ -161,7 +163,7 @@ def main(host='127.0.0.1',
                  receiver,
                  RatePid(0.225, 0.001875, 0.375),
                  make_yaw_pid(2.0, 0.1),
-                 LevelPid(0.2),
+                 make_level_pid(0.2),
                  mixer,
                  done)).start()
 
