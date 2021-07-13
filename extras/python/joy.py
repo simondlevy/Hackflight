@@ -1,6 +1,12 @@
 import pygame as pg
 from debugging import debug
 
+def init():
+
+    pg.init()
+    pg.joystick.init()
+
+
 def loop():
 
     while True:
@@ -15,8 +21,7 @@ def loop():
 
 def main():
 
-    pg.init()
-    pg.joystick.init()
+    init()
 
     loop()
 
