@@ -1,5 +1,5 @@
 '''
-   Classes for PID controllers
+   Closures for PID controllers
 
    Copyright (c) 2021 Simon D. Levy
 
@@ -17,96 +17,45 @@ def _constrainAbs(val, lim):
     return -lim if val < -lim else (+lim if val > +lim else val)
 
 
-class RatePid:
+# Rate -----------------------------------------------------------------------
 
-    # Arbitrary constants
-    BIG_DEGREES_PER_SECOND = 40.0
-    WINDUP_MAX = 6.0
 
-    def __init__(self, Kp, Ki, Kd, windupMax=0.4):
+def make_rate_pid(Kp, Ki, Kd, windupMax=0.4, maxDegreesPerSecond=40):
+    '''
+    A closure for PID control of pitch and roll angular velocities
+    '''
 
-        self.Kp = Kp
-        self.Ki = Ki
-        self.Kd = Kd
-        self.windupMax = windupMax
-
-        # Convert degree parameters to radians for use later
-        self.bigAngularVelocity = np.radians(self.BIG_DEGREES_PER_SECOND)
-
-        # Initialize state
-        self.state = [RatePid._newstate(), RatePid._newstate()]
-
-    @staticmethod
-    def _newstate():
+    # Helper
+    def newstate():
         return {'deltaError1': 0,
                 'deltaError2': 0,
                 'errorI': 0,
                 'lastError': 0}
 
-    def modifyDemands(self, state, demands):
-
-        new_demands = demands.copy()
-
-        new_demands[DEMANDS_ROLL], self.state[0] = \
-            RatePid._compute(self.Kp,
-                             self.Ki,
-                             self.Kd,
-                             self.windupMax,
-                             self.bigAngularVelocity,
-                             demands,
-                             DEMANDS_ROLL,
-                             state,
-                             STATE_DPHI,
-                             self.state[0])
-
-        new_demands[DEMANDS_PITCH], self.state[1] = \
-            RatePid._compute(self.Kp,
-                             self.Ki,
-                             self.Kd,
-                             self.windupMax,
-                             self.bigAngularVelocity,
-                             demands,
-                             DEMANDS_PITCH,
-                             state,
-                             STATE_DTHETA,
-                             self.state[1],
-                             -1)
-
-        return new_demands, self.state
-
-    @staticmethod
-    def _compute(Kp,
-                 Ki,
-                 Kd,
-                 windupMax,
-                 bigAngularVelocity,
-                 demands,
-                 demand_index,
-                 vehicle_state,
-                 vehicle_state_index,
-                 controller_state,
-                 state_direction=+1):
+    # Helper
+    def compute(Kp, Ki, Kd, windupMax, maxvel, demands, demand_index,
+                vehicle_state, vehicle_state_index, controller_state,
+                state_direction=+1):
         '''
         Handles one degree of freedom of angular velocity.  We specify the
         direction of the velocity because pitch demand is postive for stick
         forward, but pitch angle is positive for nose up.
         '''
 
-        angularVelocity = state_direction * vehicle_state[vehicle_state_index]
+        angvel = state_direction * vehicle_state[vehicle_state_index]
 
         # Reset integral on quick angular velocity change
-        if abs(angularVelocity) > bigAngularVelocity:
-            controller_state = RatePid._newstate()
+        if abs(angvel) > maxvel:
+            controller_state = newstate()
 
         # Compute error as scaled target minus actual
-        error = demands[demand_index] - angularVelocity
+        error = demands[demand_index] - angvel
 
         # Compute P term
         pterm = error * Kp
 
         # Compute I term
-        errorI = _constrainAbs(controller_state['errorI'] + error,
-                               windupMax)
+        errorI = _constrainAbs(controller_state['errorI'] + error, windupMax)
         iterm = errorI * Ki
 
         # Compute D term
@@ -122,13 +71,39 @@ class RatePid:
 
         return pterm + iterm + dterm, controller_state
 
+    # Convert degree parameters to radians for use later
+    maxvel = np.radians(maxDegreesPerSecond)
+
+    # Initialize controller state
+    initial_controller_state = newstate(), newstate()
+
+    def apply(vehicle_state, controller_state, demands):
+
+        new_demands = demands.copy()
+
+        new_demands[DEMANDS_ROLL], new_roll_controller_state = \
+            compute(Kp, Ki, Kd, windupMax, maxvel, demands, DEMANDS_ROLL,
+                    vehicle_state, STATE_DPHI, controller_state[0])
+
+        new_demands[DEMANDS_PITCH], new_pitch_controller_state = \
+            compute(Kp, Ki, Kd, windupMax, maxvel, demands, DEMANDS_PITCH,
+                    vehicle_state, STATE_DTHETA, controller_state[1], -1)
+
+        return (new_demands,
+                (new_roll_controller_state, new_pitch_controller_state))
+
+    return apply, initial_controller_state
+
+
+# Yaw ------------------------------------------------------------------------
+
 
 def make_yaw_pid(Kp, Ki, windupMax=0.4):
     '''
-    A closure for rate control of yaw angle
+    A closure for PI control of yaw angular velocity
     '''
 
-    initial_state = {'errorI': 0, 'lastError': 0}
+    initial_controller_state = {'errorI': 0, 'lastError': 0}
 
     def apply(vehicle_state, controller_state, demands):
 
@@ -147,10 +122,15 @@ def make_yaw_pid(Kp, Ki, windupMax=0.4):
 
         return new_demands, new_controller_state
 
-    return apply, initial_state
+    return apply, initial_controller_state
 
+
+# Level -----------------------------------------------------------------------
 
 def make_level_pid(Kp):
+    '''
+    A closure for P control of pitch and roll angles
+    '''
 
     MAX_ANGLE_DEGREES = 45
 

@@ -18,7 +18,7 @@ from time import sleep
 
 from receiver import Receiver
 from mixers import mixer_quadxap, mixer_coaxial
-from pidcontrollers import RatePid, make_level_pid, make_yaw_pid
+from pidcontrollers import make_rate_pid, make_level_pid, make_yaw_pid
 
 
 def _handleImage(image):
@@ -44,7 +44,7 @@ def _run_telemetry(host,
                    telemetry_server_socket,
                    motor_client_socket,
                    receiver,
-                   rate_pid,
+                   rate_pid_closure,
                    yaw_pid_closure,
                    level_pid_closure,
                    mixer,
@@ -52,6 +52,7 @@ def _run_telemetry(host,
 
     running = False
 
+    rate_pid_fun, rate_pid_state = rate_pid_closure
     yaw_pid_fun, yaw_pid_state = yaw_pid_closure
     level_pid_fun, level_pid_state = level_pid_closure
 
@@ -83,7 +84,8 @@ def _run_telemetry(host,
         demands = np.array(list(receiver.getDemands()))
 
         # Pass demands through closed-loop controllers
-        demands, _pidstate = rate_pid.modifyDemands(vehicle_state, demands)
+        demands, rate_pid_state = rate_pid_fun(vehicle_state,
+                                               rate_pid_state, demands)
         demands, yaw_pid_state = yaw_pid_fun(vehicle_state,
                                              yaw_pid_state, demands)
         demands, level_pid_state = level_pid_fun(vehicle_state,
@@ -161,7 +163,7 @@ def main(host='127.0.0.1',
                  telemetry_server_socket,
                  motor_client_socket,
                  receiver,
-                 RatePid(0.225, 0.001875, 0.375),
+                 make_rate_pid(0.225, 0.001875, 0.375),
                  make_yaw_pid(2.0, 0.1),
                  make_level_pid(0.2),
                  mixer,
