@@ -18,7 +18,7 @@ from time import sleep
 
 from receiver import Receiver
 from mixers import mixer_quadxap, mixer_coaxial
-from pidcontrollers import RatePid, YawPid, LevelPid
+from pidcontrollers import RatePid, LevelPid, make_yaw_pid
 
 
 def _handleImage(image):
@@ -44,11 +44,15 @@ def _run_telemetry(host,
                    telemetry_server_socket,
                    motor_client_socket,
                    receiver,
-                   pid_controllers,
+                   rate_pid,
+                   yaw_pid_closure,
+                   level_pid,
                    mixer,
                    done):
 
     running = False
+
+    yaw_pid_fun, yaw_pid_state = yaw_pid_closure
 
     while True:
 
@@ -63,7 +67,7 @@ def _run_telemetry(host,
         telem = np.frombuffer(data)
 
         # time = telem[0]
-        state = telem[1:]
+        vehicle_state = telem[1:]
 
         if not running:
             _debug('Running')
@@ -78,8 +82,13 @@ def _run_telemetry(host,
         demands = np.array(list(receiver.getDemands()))
 
         # Pass demands through closed-loop controllers
-        for pid_controller in pid_controllers:
-            demands, _pidstate = pid_controller.modifyDemands(state, demands)
+        demands, _pidstate = rate_pid.modifyDemands(vehicle_state, demands)
+        demands, yaw_pid_state = yaw_pid_fun(vehicle_state, yaw_pid_state,
+                                             demands)
+        demands, _pidstate = level_pid.modifyDemands(vehicle_state, demands)
+
+        # for pid_controller in pid_controllers:
+        #     demands, _pidstate = pid_controller.modifyDemands(state, demands)
 
         # Run mixer on demands to get motor values
         motorvals = mixer(demands)
@@ -117,9 +126,11 @@ def main(host='127.0.0.1',
 
     mixer = mixer_dict[args.vehicle]
 
+    '''
     pid_controllers = (RatePid(0.225, 0.001875, 0.375),
                        YawPid(2.0, 0.1),
                        LevelPid(0.2))
+    '''
 
     # Allows telemetry thread to tell this thread when user closes socket
     done = [False]
@@ -148,7 +159,9 @@ def main(host='127.0.0.1',
                  telemetry_server_socket,
                  motor_client_socket,
                  receiver,
-                 pid_controllers,
+                 RatePid(0.225, 0.001875, 0.375),
+                 make_yaw_pid(2.0, 0.1),
+                 LevelPid(0.2),
                  mixer,
                  done)).start()
 

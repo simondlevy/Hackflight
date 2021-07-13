@@ -10,7 +10,6 @@ import numpy as np
 
 from demands import DEMANDS_ROLL, DEMANDS_PITCH, DEMANDS_YAW
 from state import STATE_PHI, STATE_DPHI, STATE_THETA, STATE_DTHETA, STATE_DPSI
-from debugging import debug
 
 
 def _constrainAbs(val, lim):
@@ -32,20 +31,20 @@ class LevelPid:
 
     def modifyDemands(self, state, demands):
 
-        newdemands = demands.copy()
+        new_demands = demands.copy()
 
-        newdemands[DEMANDS_ROLL] = self.Kp * (demands[DEMANDS_ROLL] *
-                                              self.dmdscale -
-                                              state[STATE_PHI])
+        new_demands[DEMANDS_ROLL] = self.Kp * (demands[DEMANDS_ROLL] *
+                                               self.dmdscale -
+                                               state[STATE_PHI])
 
         # Pitch demand is nose-down positive, so we negate
         # pitch-forward (nose-down negative) to reconcile them
-        newdemands[DEMANDS_PITCH] = self.Kp * (demands[DEMANDS_PITCH] *
-                                               self.dmdscale +
-                                               state[STATE_THETA])
+        new_demands[DEMANDS_PITCH] = self.Kp * (demands[DEMANDS_PITCH] *
+                                                self.dmdscale +
+                                                state[STATE_THETA])
 
         # LevelPid uses no state
-        return newdemands, None
+        return new_demands, None
 
 
 class RatePid:
@@ -76,9 +75,9 @@ class RatePid:
 
     def modifyDemands(self, state, demands):
 
-        newdemands = demands.copy()
+        new_demands = demands.copy()
 
-        newdemands[DEMANDS_ROLL], self.state[0] = \
+        new_demands[DEMANDS_ROLL], self.state[0] = \
             RatePid._compute(self.Kp,
                              self.Ki,
                              self.Kd,
@@ -90,7 +89,7 @@ class RatePid:
                              STATE_DPHI,
                              self.state[0])
 
-        newdemands[DEMANDS_PITCH], self.state[1] = \
+        new_demands[DEMANDS_PITCH], self.state[1] = \
             RatePid._compute(self.Kp,
                              self.Ki,
                              self.Kd,
@@ -103,7 +102,7 @@ class RatePid:
                              self.state[1],
                              -1)
 
-        return newdemands, self.state
+        return new_demands, self.state
 
     @staticmethod
     def _compute(Kp,
@@ -176,7 +175,31 @@ class YawPid:
         self.state = {'errorI': errorI, 'lastError': error}
 
         # Update demands
-        newdemands = demands.copy()
-        newdemands[DEMANDS_YAW] = error * self.Kp + errorI * self.Ki
+        new_demands = demands.copy()
+        new_demands[DEMANDS_YAW] = error * self.Kp + errorI * self.Ki
 
-        return newdemands, self.state
+        return new_demands, self.state
+
+
+def make_yaw_pid(Kp, Ki, windupMax=0.4):
+
+    initial_state = {'errorI': 0, 'lastError': 0}
+
+    def apply(vehicle_state, controller_state, demands):
+
+        # Compute error as scaled target minus actual
+        error = demands[DEMANDS_YAW] - vehicle_state[STATE_DPSI]
+
+        # Accumualte error integral
+        errorI = _constrainAbs(controller_state['errorI'] + error, windupMax)
+
+        # Update controller state
+        new_controller_state = {'errorI': errorI, 'lastError': error}
+
+        # Update demands
+        new_demands = demands.copy()
+        new_demands[DEMANDS_YAW] = error * Kp + errorI * Ki
+
+        return new_demands, new_controller_state
+
+    return apply, initial_state
