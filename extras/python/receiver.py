@@ -24,8 +24,6 @@ def receiver():
     # Different axis maps for different controllers, OSs
     axis_map = ([1, 2, 3, 0] if platform == 'win32' else [1, 3, 4, 0])
 
-    invert_pitch = -1
-
     pg.init()
     pg.joystick.init()
 
@@ -36,7 +34,6 @@ def receiver():
         js = pg.joystick.Joystick(0)
         if 'SPEKTRUM' in js.get_name():
             axis_map = [1, 2, 3, 0]
-            invert_pitch = +1
         else:
             debug('Sorry, only Spektrum RC is currently supported')
             exit(1)
@@ -57,17 +54,12 @@ def receiver():
             # and return it as a tuple
             if event.type == pg.JOYAXISMOTION:
 
+                # Get raw axis values
                 axes = [js.get_axis(i) for i in range(js.get_numaxes())]
 
                 # Use axis map to go from axes to demands
-                demands[1:4] = np.array([axes[axis_map[i]]
-                                         for i in range(1, 4)])
-
-                # Adjust for axis direction
-                demands[2] *= invert_pitch
-
-                # Map throttle from [-1,+1] to [0,1]
-                demands[0] = axes[axis_map[0]]
+                demands[0:4] = np.array([axes[axis_map[i]]
+                                         for i in range(0, 4)])
 
     def getDemands():
         '''
