@@ -45,8 +45,7 @@ def _run_telemetry(host, motor_port, telemetry_server_socket,
 
     running = False
 
-    pid_funs, pid_states = zip(*pid_controllers)
-    pid_states = list(pid_states)
+    pid_states = [p[1] for p in pid_controllers]
 
     while True:
 
@@ -76,9 +75,9 @@ def _run_telemetry(host, motor_port, telemetry_server_socket,
         demands = np.array(list(receiver.getDemands()))
 
         # Pass demands through closed-loop controllers
-        for k, pid_fun in enumerate(pid_funs):
-            demands, pid_states[k] = pid_fun(vehicle_state, pid_states[k],
-                                             demands)
+        for k, p in enumerate(pid_controllers):
+            demands, pid_states[k] = p[0](vehicle_state, pid_states[k],
+                                          demands)
 
         # Run mixer on demands to get motor values
         motorvals = mixer(demands)
