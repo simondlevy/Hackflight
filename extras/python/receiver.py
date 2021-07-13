@@ -51,13 +51,13 @@ def receiver():
         # Grab a queue of all actions done
         events = pg.event.get()
 
+        debug(events)
+
         for event in events:
 
             # If you move the stick, poll all the directions
             # and return it as a tuple
             if event.type == pg.JOYAXISMOTION:
-
-                axes = [js.get_axis(i) for i in range(js.get_numaxes())]
 
                 # Use axis map to go from axes to demands
                 demands[1:4] = np.array([axes[axis_map[i]]
@@ -89,8 +89,9 @@ def main():
 
             updater()
 
-            debug('T: %+3.3f   R: %+3.3f   P: %+3.3f   Y: %+3.3f' %
-                  tuple(getter()))
+            getter()
+
+            # debug('T: %+3.3f   R: %+3.3f   P: %+3.3f   Y: %+3.3f' % tuple(getter()))
 
         except KeyboardInterrupt:
 

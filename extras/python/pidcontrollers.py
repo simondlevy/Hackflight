@@ -8,8 +8,12 @@
 
 import numpy as np
 
-from demands import DEMANDS_ROLL, DEMANDS_PITCH, DEMANDS_YAW
-from state import STATE_PHI, STATE_DPHI, STATE_THETA, STATE_DTHETA, STATE_DPSI
+from demands import DEMANDS_THROTTLE, DEMANDS_ROLL, DEMANDS_PITCH, DEMANDS_YAW
+
+from state import STATE_Z, STATE_DZ, STATE_PHI, STATE_DPHI, STATE_THETA, \
+                  STATE_DTHETA, STATE_DPSI
+
+from debugging import debug
 
 
 def _constrainAbs(val, lim):
@@ -49,7 +53,7 @@ def rate_pid(Kp=0.225, Ki=0.001875, Kd=0.375,
         if abs(angvel) > maxvel:
             controller_state = newstate()
 
-        # Compute error as scaled target minus actual
+        # Compute error as target minus actual
         error = demands[demand_index] - angvel
 
         # Compute P term
@@ -104,18 +108,18 @@ def yaw_pid(Kp=2.0, Ki=0.1, windupMax=0.4):
     A closure for PI control of yaw angular velocity
     '''
 
-    initial_controller_state = {'errorI': 0, 'lastError': 0}
+    initial_controller_state = {'errorI': 0}
 
     def apply(vehicle_state, controller_state, demands):
 
-        # Compute error as scaled target minus actual
+        # Compute error as target minus actual
         error = demands[DEMANDS_YAW] - vehicle_state[STATE_DPSI]
 
         # Accumualte error integral
         errorI = _constrainAbs(controller_state['errorI'] + error, windupMax)
 
         # Update controller state
-        new_controller_state = {'errorI': errorI, 'lastError': error}
+        new_controller_state = {'errorI': errorI}
 
         # Update demands
         new_demands = demands.copy()
@@ -157,5 +161,58 @@ def level_pid(Kp=0.2, maxAngleDegrees=45):
 
 # Altitude hold ---------------------------------------------------------------
 
-def alt_hold():
-    return
+def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
+                 pilotVelZMax=2.5, stickDeadband=0.2):
+    '''
+    A closure for PI control of altitude
+    '''
+
+    initial_controller_state = {'errorI': 0,
+                                'targetAltitude': 0,
+                                'inBand': False}
+
+    def apply(vehicle_state, controller_state, demands):
+
+        errorI = controller_state['errorI']
+        targetAltitude = controller_state['targetAltitude']
+
+        # NED => ENU
+        altitude = -vehicle_state[STATE_Z]
+
+        throttleDemand = demands[DEMANDS_THROTTLE]
+
+        debug(throttleDemand)
+
+        # Is stick demand in deadband?
+        inBand = abs(throttleDemand) < stickDeadband
+
+        # Reset controller when moving into deadband
+        if inBand and not controller_state['inBand']:
+            errorI = 0
+            targetAltitude = altitude
+
+        # Target velocity is a setpoint inside deadband, scaled
+        # constant outside
+        targetVelocity = (targetAltitude - altitude
+                          if inBand
+                          else pilotVelZMax * throttleDemand)
+
+        # Compute error as target velocity minus actual velocity, after
+        # negating actual to accommodate NED
+        error = targetVelocity + vehicle_state[STATE_DZ]
+
+        # Accumualte error integral
+        errorI = _constrainAbs(controller_state['errorI'] + error, windupMax)
+
+        # Update controller state
+        new_controller_state = {'errorI': errorI,
+                                'targetAltitude': targetAltitude,
+                                'inBand': inBand}
+
+        # Update demands
+        new_demands = demands.copy()
+        new_demands[DEMANDS_THROTTLE] = error * Kp + errorI * Ki
+
+        return new_demands, new_controller_state
+
+    return apply, initial_controller_state

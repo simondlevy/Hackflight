@@ -10,9 +10,7 @@ MIT License
 
 import pygame as pg
 import numpy as np
-from sys import platform
-
-from debugging import debug
+from sys import platform, stdout
 
 
 class Receiver(object):
@@ -108,8 +106,9 @@ def main():
 
             receiver.update()
 
-            debug('T: %+3.3f   R: %+3.3f   P: %+3.3f   Y: %+3.3f' %
+            print('T: %+3.3f   R: %+3.3f   P: %+3.3f   Y: %+3.3f' %
                   tuple(receiver.getDemands()))
+            stdout.flush()
 
         except KeyboardInterrupt:
 
