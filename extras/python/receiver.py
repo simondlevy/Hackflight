@@ -30,6 +30,7 @@ def receiver():
     pg.joystick.init()
 
     # Initialize a controller or exit if nothing is plugged in
+    '''
     try:
         js = pg.joystick.Joystick(0)
         if 'SPEKTRUM' in js.get_name():
@@ -42,16 +43,22 @@ def receiver():
     except pg.error:
         debug('Would you like to buy a controller?')
         exit(1)
+    '''
 
     def update():
         '''
         Should be called on main thread
         '''
 
-        # Grab a queue of all actions done
-        events = pg.event.get()
+        pg.event.get()
 
-        debug(events)
+        joystick = pg.joystick.Joystick(0)
+        joystick.init()
+
+        debug(list(joystick.get_axis(i) for i in range(joystick.get_numaxes())))
+
+        return
+
 
         for event in events:
 
