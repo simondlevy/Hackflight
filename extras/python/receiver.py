@@ -67,7 +67,7 @@ def receiver():
                 demands[2] *= invert_pitch
 
                 # Map throttle from [-1,+1] to [0,1]
-                demands[0] = (axes[axis_map[0]]) + 1 / 2
+                demands[0] = axes[axis_map[0]]
 
     def getDemands():
         '''
