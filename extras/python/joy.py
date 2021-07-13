@@ -9,12 +9,12 @@ def init():
 
 def loop():
 
+    joystick = pg.joystick.Joystick(0)
+    joystick.init()
+
     while True:
 
         pg.event.get()
-
-        joystick = pg.joystick.Joystick(0)
-        joystick.init()
 
         debug(list(joystick.get_axis(i) for i in range(joystick.get_numaxes())))
 
