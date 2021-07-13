@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 '''
-Simulated receiver class in python
-
-Adds in a gamecontroller class to allow for xbox one controller
-inputs. The getaxes() method returns a tuples with 4 values
-in the order: Left Vertical, Right Horizontal, Right Vertical
-and Left Vertical.
+Simulated receiver in python
 
 Copyright (C) 2021 S.Basnet, N. Manaye, N. Nguyen, S.D. Levy
 
