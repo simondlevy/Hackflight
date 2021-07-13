@@ -13,8 +13,6 @@ from demands import DEMANDS_THROTTLE, DEMANDS_ROLL, DEMANDS_PITCH, DEMANDS_YAW
 from state import STATE_Z, STATE_DZ, STATE_PHI, STATE_DPHI, STATE_THETA, \
                   STATE_DTHETA, STATE_DPSI
 
-from debugging import debug
-
 
 def _constrainAbs(val, lim):
 
@@ -22,7 +20,6 @@ def _constrainAbs(val, lim):
 
 
 # Rate -----------------------------------------------------------------------
-
 
 def rate_pid(Kp=0.225, Ki=0.001875, Kd=0.375,
              windupMax=0.4, maxDegreesPerSecond=40):
@@ -101,7 +98,6 @@ def rate_pid(Kp=0.225, Ki=0.001875, Kd=0.375,
 
 
 # Yaw ------------------------------------------------------------------------
-
 
 def yaw_pid(Kp=2.0, Ki=0.1, windupMax=0.4):
     '''
@@ -214,3 +210,20 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
         return new_demands, new_controller_state
 
     return apply, initial_controller_state
+
+
+# Position hold ---------------------------------------------------------------
+
+def pos_hold_pid(Kp=0.2, stickDeadband=0.2):
+    '''
+    A closure for P control of position
+    '''
+
+    def apply(vehicle_state, controller_state, demands):
+
+        new_demands = demands.copy()
+
+        # LevelPid uses no controller state
+        return new_demands, None
+
+    return apply, None
