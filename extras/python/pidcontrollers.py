@@ -20,7 +20,7 @@ def _constrainAbs(val, lim):
 # Rate -----------------------------------------------------------------------
 
 
-def make_rate_pid(Kp, Ki, Kd, windupMax=0.4, maxDegreesPerSecond=40):
+def rate_pid(Kp, Ki, Kd, windupMax=0.4, maxDegreesPerSecond=40):
     '''
     A closure for PID control of pitch and roll angular velocities
     '''
@@ -98,7 +98,7 @@ def make_rate_pid(Kp, Ki, Kd, windupMax=0.4, maxDegreesPerSecond=40):
 # Yaw ------------------------------------------------------------------------
 
 
-def make_yaw_pid(Kp, Ki, windupMax=0.4):
+def yaw_pid(Kp, Ki, windupMax=0.4):
     '''
     A closure for PI control of yaw angular velocity
     '''
@@ -127,16 +127,14 @@ def make_yaw_pid(Kp, Ki, windupMax=0.4):
 
 # Level -----------------------------------------------------------------------
 
-def make_level_pid(Kp):
+def level_pid(Kp, maxAngleDegrees=45):
     '''
     A closure for P control of pitch and roll angles
     '''
 
-    MAX_ANGLE_DEGREES = 45
-
     # Maximum roll pitch demand is +/-0.5, so to convert demand to
     # angle for error computation, we multiply by the folling amount:
-    dmdscale = 2 * np.radians(MAX_ANGLE_DEGREES)
+    dmdscale = 2 * np.radians(maxAngleDegrees)
 
     def apply(vehicle_state, controller_state, demands):
 

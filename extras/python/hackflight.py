@@ -18,7 +18,7 @@ from time import sleep
 
 from receiver import Receiver
 from mixers import mixer_quadxap, mixer_coaxial
-from pidcontrollers import make_rate_pid, make_level_pid, make_yaw_pid
+from pidcontrollers import rate_pid, level_pid, yaw_pid
 
 
 def _handleImage(image):
@@ -31,7 +31,7 @@ def _debug(msg):
     stdout.flush()
 
 
-def _make_udpsocket():
+def _udpsocket():
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
@@ -140,8 +140,8 @@ def main(host='127.0.0.1',
     done = [False]
 
     # Telemetry in and motors out run on their own thread
-    motor_client_socket = _make_udpsocket()
-    telemetry_server_socket = _make_udpsocket()
+    motor_client_socket = _udpsocket()
+    telemetry_server_socket = _udpsocket()
     telemetry_server_socket.bind((host, telem_port))
 
     _debug('Hit the Play button ...')
@@ -163,9 +163,9 @@ def main(host='127.0.0.1',
                  telemetry_server_socket,
                  motor_client_socket,
                  receiver,
-                 make_rate_pid(0.225, 0.001875, 0.375),
-                 make_yaw_pid(2.0, 0.1),
-                 make_level_pid(0.2),
+                 rate_pid(0.225, 0.001875, 0.375),
+                 yaw_pid(2.0, 0.1),
+                 level_pid(0.2),
                  mixer,
                  done)).start()
 
