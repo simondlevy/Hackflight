@@ -1,5 +1,5 @@
 '''
-   Motor mixer classes
+   Motor mixer functions
 
 Copyright (C) 2021 S.Basnet, N. Manaye, N. Nguyen, S.D. Levy
 
