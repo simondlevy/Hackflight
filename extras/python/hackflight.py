@@ -115,9 +115,7 @@ def main(host='127.0.0.1',
 
     mixer = mixer_dict[args.vehicle]
 
-    pid_controllers = (rate_pid(0.225, 0.001875, 0.375),
-                       yaw_pid(2.0, 0.1),
-                       level_pid(0.2))
+    pid_controllers = rate_pid(), yaw_pid(), level_pid()
 
     # Allows telemetry thread to tell this thread when user closes socket
     done = [False]

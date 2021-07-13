@@ -20,7 +20,8 @@ def _constrainAbs(val, lim):
 # Rate -----------------------------------------------------------------------
 
 
-def rate_pid(Kp, Ki, Kd, windupMax=0.4, maxDegreesPerSecond=40):
+def rate_pid(Kp=0.225, Ki=0.001875, Kd=0.375,
+             windupMax=0.4, maxDegreesPerSecond=40):
     '''
     A closure for PID control of pitch and roll angular velocities
     '''
@@ -98,7 +99,7 @@ def rate_pid(Kp, Ki, Kd, windupMax=0.4, maxDegreesPerSecond=40):
 # Yaw ------------------------------------------------------------------------
 
 
-def yaw_pid(Kp, Ki, windupMax=0.4):
+def yaw_pid(Kp=2.0, Ki=0.1, windupMax=0.4):
     '''
     A closure for PI control of yaw angular velocity
     '''
@@ -127,7 +128,7 @@ def yaw_pid(Kp, Ki, windupMax=0.4):
 
 # Level -----------------------------------------------------------------------
 
-def level_pid(Kp, maxAngleDegrees=45):
+def level_pid(Kp=0.2, maxAngleDegrees=45):
     '''
     A closure for P control of pitch and roll angles
     '''
@@ -152,3 +153,9 @@ def level_pid(Kp, maxAngleDegrees=45):
         return new_demands, None
 
     return apply, None
+
+
+# Altitude hold ---------------------------------------------------------------
+
+def alt_hold():
+    return
