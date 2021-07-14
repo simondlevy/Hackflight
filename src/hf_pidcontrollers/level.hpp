@@ -10,7 +10,6 @@
 
 #include "HF_pidcontroller.hpp"
 
-#include <RFT_pid.hpp>
 #include <RFT_filters.hpp>
 
 namespace hf {

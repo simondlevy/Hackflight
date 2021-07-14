@@ -14,8 +14,6 @@
 
 #include "HF_pidcontroller.hpp"
 
-#include <RFT_pid.hpp>
-
 namespace hf {
 
     class AltitudeHoldPid : public PidController {
@@ -30,7 +28,7 @@ namespace hf {
             float _stickDeadband = 0;
             float _pilotVelZMax = 0;
 
-            // State --------------------------------------
+            // Controller state ---------------------------
 
             // Error integral
             float _errorI = 0;

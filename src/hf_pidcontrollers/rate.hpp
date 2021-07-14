@@ -4,133 +4,105 @@
    Copyright (c) 2018 Juan Gallostra and Simon D. Levy
 
    MIT License
- */
+   */
 
 #pragma once
 
-#include <RFT_pid.hpp>
+#include <RFT_filters.hpp>
 
 #include "HF_pidcontroller.hpp"
 
 namespace hf {
 
-    class _RatePid : public rft::DofPid {
+    class RatePid : public PidController {
 
         private: 
 
-            // Arbitrary constants
-            static constexpr float BIG_DEGREES_PER_SECOND = 40.0f; 
-            static constexpr float WINDUP_MAX = 6.0f;
+            // Constants set in constructor ----------------------------
 
-            uint8_t _state_axis = 0;
-            uint8_t _demand_axis = 0;
-            int8_t _state_direction = 0;
+            float _Kp = 0;
+            float _Ki = 0;
+            float _Kd = 0;
+            float _windupMax = 0;
+            float _rateMax = 0;
 
-            // Converted to radians from degrees in constructor for efficiency
-            float _bigRate = 0;
+            // Controller state ----------------------------------------
+
+            typedef struct {
+
+                float errorI;
+                float deltaError1;
+                float deltaError2;
+                float errorPrev;
+
+            } controller_state_t;
+
+
+            controller_state_t _rstate = {};
+            controller_state_t _pstate = {};
+
+            // Helpers ---------------------------------------------------
+
+            void reset(controller_state_t * controller_state)
+            {
+                memset(controller_state, 0, sizeof(controller_state_t));
+            }
+
+            void modifyDemand(float angular_velocity,
+                              float * demands,
+                              uint8_t demand_axis,
+                              controller_state_t * controller_state)
+            {
+                // Reset integral on quick angular velocity change
+                if (fabs(angular_velocity) > _rateMax) {
+                    reset(controller_state);
+                }
+
+                // Compute error as difference between demand and angular velocity
+                float error = demands[demand_axis] - angular_velocity;
+
+                // Compute I term
+                controller_state->errorI = rft::Filter::constrainAbs(controller_state->errorI + error, _windupMax);
+
+                // Compute D term
+                float deltaError = error - controller_state->errorPrev;
+                float dterm = (controller_state->deltaError1 + controller_state->deltaError2 + deltaError) * _Kd; 
+                controller_state->deltaError2 = controller_state->deltaError1;
+                controller_state->deltaError1 = deltaError;
+                controller_state->errorPrev = error;
+
+                demands[demand_axis] = _Kp * error + _Ki * controller_state->errorI + dterm;
+            }
 
         protected:
 
-            _RatePid(const float Kp,
-                     const float Ki,
-                     const float Kd,
-                     uint8_t state_axis,
-                     uint8_t demand_axis,
-                     uint8_t state_direction=+1) 
-                : DofPid(Kp, Ki, Kd, WINDUP_MAX)
+            virtual void modifyDemands(State * state, float * demands) override
             {
-                // Convert degree parameters to radians for use later
-                _bigRate = rft::Filter::deg2rad(BIG_DEGREES_PER_SECOND);
+                modifyDemand(state->x[State::DPHI], demands, DEMANDS_ROLL, &_rstate);
 
-                _state_axis = state_axis;
-                _demand_axis = demand_axis;
-                _state_direction = state_direction;
+                // Pitch demand is nose-down positive, so we negate
+                // pitch-forward rate (nose-down negative)
+                modifyDemand(-state->x[State::DTHETA], demands, DEMANDS_PITCH, &_pstate);
             }
-
-            void compute(State * state, float * demands)
-            {
-                float angvel = state->x[_state_axis];
-
-                // Reset integral on quick angular velocity change
-                if (fabs(angvel) > _bigRate) {
-                    DofPid::reset();
-                }
-
-                demands[_demand_axis] =
-                    DofPid::compute(demands[_demand_axis],
-                                    _state_direction * angvel);
-            }
-
-    };  // class _RatePid
-
-
-    class RollRatePid : public PidController, protected _RatePid {
 
         public:
 
-            RollRatePid(const float Kp, const float Ki, const float Kd) 
-                : _RatePid(Kp, Ki, Kd, State::DPHI, DEMANDS_ROLL)
+            RatePid(const float Kp,
+                    const float Ki,
+                    const float Kd,
+                    const float windupMax=6.0,
+                    const float rateMaxDegreesPerSecond=40)
             {
+                _Kp = Kp;
+                _Ki = Ki;
+                _Kd = Kd;
+                _windupMax = windupMax;
+                _rateMax = rft::Filter::deg2rad(rateMaxDegreesPerSecond);
+
+                reset(&_rstate);
+                reset(&_pstate);
             }
 
-            virtual void modifyDemands(State * state, float * demands) override
-            {
-                _RatePid::compute(state, demands);
-            }
-
-            virtual void resetOnInactivity(bool inactive) override
-            {
-                // Check throttle-down for integral reset
-                _RatePid::resetOnInactivity(inactive);
-            }
-
-    };  // class RollRatePid
-
-
-    class PitchRatePid : public PidController, protected _RatePid {
-
-        public:
-
-            PitchRatePid(const float Kp, const float Ki, const float Kd) 
-                : _RatePid(Kp, Ki, Kd, State::DTHETA, DEMANDS_PITCH, -1)
-                  // Pitch demand is nose-down positive, so we negate
-                  // pitch-forward rate (nose-down negative) to reconcile them
-            {
-            }
-
-            virtual void modifyDemands(State * state, float * demands) override
-            {
-                _RatePid::compute(state, demands);
-            }
-
-            virtual void resetOnInactivity(bool inactive) override
-            {
-                // Check throttle-down for integral reset
-                _RatePid::resetOnInactivity(inactive);
-            }
-
-    };  // class PitchRatePid
-
-    class YawRatePid : public PidController, protected _RatePid {
-
-        public:
-
-            YawRatePid(const float Kp, const float Ki) 
-                : _RatePid(Kp, Ki, 0, State::DPSI, DEMANDS_YAW)
-            {
-            }
-
-            virtual void modifyDemands(State * state, float * demands) override
-            {
-                _RatePid::compute(state, demands);
-            }
-
-            virtual void resetOnInactivity(bool inactive) override
-            {
-                // Check throttle-down for integral reset
-                _RatePid::resetOnInactivity(inactive);
-            }
-
-    };  // class YawRatePid
+    };  // class RatePid
 
 } // namespace hf
