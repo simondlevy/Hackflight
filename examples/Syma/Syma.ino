@@ -25,7 +25,7 @@
 #include "hf_pidcontrollers/level.hpp"
 #include "hf_sensors/usfs.hpp"
 
-#include <rft_motors/rotary/brushed.hpp>
+#include <rft_motors/arduino/brushed.hpp>
 
 // Receiver ============================================================================
 
@@ -42,10 +42,10 @@ static hf::LadybugFC board = hf::LadybugFC(&Serial2);  // Bluetooth comms over S
 
 // Motors  ==============================================================================
 
-static rft::BrushedMotor motor1 = rft::BrushedMotor(13);
-static rft::BrushedMotor motor2 = rft::BrushedMotor(A2);
-static rft::BrushedMotor motor3 = rft::BrushedMotor(3);
-static rft::BrushedMotor motor4 = rft::BrushedMotor(11);
+static rft::ArduinoBrushedMotor motor1 = rft::ArduinoBrushedMotor(13);
+static rft::ArduinoBrushedMotor motor2 = rft::ArduinoBrushedMotor(A2);
+static rft::ArduinoBrushedMotor motor3 = rft::ArduinoBrushedMotor(3);
+static rft::ArduinoBrushedMotor motor4 = rft::ArduinoBrushedMotor(11);
 
 // Mixer ================================================================================
 
