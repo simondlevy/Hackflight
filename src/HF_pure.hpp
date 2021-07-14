@@ -26,30 +26,9 @@ namespace hf {
                 rft::RFTPure::begin(board, receiver, actuator);
             }
 
-            static void begin(
-                    rft::Board * board,
-                    Receiver * receiver,
-                    rft::Actuator * actuator,
-                    rft::Sensor ** sensors,
-                    uint8_t sensor_count)
-            {
-                rft::RFTPure::begin(board, receiver, actuator, sensors, sensor_count);
-            }
-
             void update(rft::Board * board, Receiver * receiver, rft::Actuator * actuator, State * state)
             {
                 rft::RFTPure::update(board, receiver, actuator, state);
-            }
-
-            void update(
-                    rft::Board * board,
-                    Receiver * receiver,
-                    rft::Actuator * actuator,
-                    State * state,
-                    rft::Sensor ** sensors,
-                    uint8_t sensor_count)
-            {
-                rft::RFTPure::update(board, receiver, actuator, state, sensors, sensor_count);
             }
 
     }; // class HackflightPure
