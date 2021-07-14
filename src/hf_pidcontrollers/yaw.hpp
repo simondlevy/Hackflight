@@ -34,10 +34,10 @@ namespace hf {
                 _errorI = 0;
             }
 
-            virtual void modifyDemands(State * state, float * demands) override
+            virtual void modifyDemands(float * state, float * demands) override
             {
                 // Compute error as difference between yaw demand and angular velocity
-                float error = demands[DEMANDS_YAW] - state->x[State::DPSI];
+                float error = demands[DEMANDS_YAW] - state[State::DPSI];
 
                 // Reset integral on quick angular velocity change
                 if (fabs(error) > _rateMax) {

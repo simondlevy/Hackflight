@@ -32,17 +32,17 @@ namespace hf {
 
         protected:
 
-            virtual void modifyDemands(State * state, float * demands) override
+            virtual void modifyDemands(float * state, float * demands) override
             {
                 demands[DEMANDS_ROLL] = 
                     _Kp * (demands[DEMANDS_ROLL] * _dmdscale 
-                            - state->x[State::PHI]);
+                            - state[State::PHI]);
 
                 // Pitch demand is nose-down positive, so we negate
                 // pitch-forward (nose-down negative) to reconcile them
                 demands[DEMANDS_PITCH] = 
                     _Kp * (demands[DEMANDS_PITCH] * _dmdscale 
-                            + state->x[State::THETA]);
+                            + state[State::THETA]);
             }
 
         public:

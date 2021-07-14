@@ -76,13 +76,13 @@ namespace hf {
 
         protected:
 
-            virtual void modifyDemands(State * state, float * demands) override
+            virtual void modifyDemands(float * state, float * demands) override
             {
-                modifyDemand(state->x[State::DPHI], demands, DEMANDS_ROLL, &_rstate);
+                modifyDemand(state[State::DPHI], demands, DEMANDS_ROLL, &_rstate);
 
                 // Pitch demand is nose-down positive, so we negate
                 // pitch-forward rate (nose-down negative)
-                modifyDemand(-state->x[State::DTHETA], demands, DEMANDS_PITCH, &_pstate);
+                modifyDemand(-state[State::DTHETA], demands, DEMANDS_PITCH, &_pstate);
             }
 
         public:

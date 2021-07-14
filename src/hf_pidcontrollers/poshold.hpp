@@ -29,23 +29,20 @@ namespace hf {
 
         protected:
 
-            void modifyDemands(State * state, float * demands) override
+            void modifyDemands(float * state, float * demands) override
             {
-                // Get state vector
-                float * x = state->x;
-
                 // Run controller only if roll and pitch are small
                 if (inband(demands[DEMANDS_PITCH]) && inband(demands[DEMANDS_ROLL])) {
 
                     // Get heading for rotating world-coordinate velocities
                     // into body coordinates
-                    float psi = x[State::PSI];
+                    float psi = state[State::PSI];
 
                     float cpsi = cos(psi);
                     float spsi = sin(psi);
 
-                    float dx = x[State::DX];
-                    float dy = x[State::DY];
+                    float dx = state[State::DX];
+                    float dy = state[State::DY];
 
                     demands[DEMANDS_ROLL] = -_Kp * (cpsi * dy - spsi * dx);
                     demands[DEMANDS_PITCH] = -_Kp * (cpsi * dx + spsi * dy);

@@ -43,10 +43,10 @@ namespace hf {
 
         protected:
 
-            void modifyDemands(State * state, float * demands) override
+            void modifyDemands(float * state, float * demands) override
             {
                 bool didReset = false;
-                float altitude = state->x[State::Z];
+                float altitude = state[State::Z];
 
                 // Is stick demand in deadband?
                 bool inBand = fabs(demands[DEMANDS_THROTTLE]) <
@@ -67,7 +67,7 @@ namespace hf {
                                        demands[DEMANDS_THROTTLE];
 
                 // Compute error as scaled target minus actual
-                float error = targetVelocity - state->x[State::DZ];
+                float error = targetVelocity - state[State::DZ];
 
                 // Compute I term, avoiding windup
                 _errorI = rft::Filter::constrainAbs(_errorI + error, _windupMax);
