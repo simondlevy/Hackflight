@@ -21,8 +21,9 @@ namespace hf {
     class AltitudeHoldPid : public PidController {
 
         private: 
+ 
+            // Constants set in instructor ----------------
 
-            // Constants set in instructor
             float _Kp = 0;
             float _Ki = 0;
             float _windupMax = 0;
