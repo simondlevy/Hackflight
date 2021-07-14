@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "receiver.hpp"
+#include "HF_receiver.hpp"
 #include <CPPMRX.h>
 
 namespace hf {

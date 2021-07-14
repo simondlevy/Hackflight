@@ -12,7 +12,7 @@
 
 #include <RFT_full.hpp>
 
-#include "serialtask.hpp"
+#include "HF_serialtask.hpp"
 
 namespace hf {
 

@@ -12,8 +12,8 @@
 #include <RFT_parser.hpp>
 #include <RFT_serialtask.hpp>
 
-#include "state.hpp"
-#include "receiver.hpp"
+#include "HF_state.hpp"
+#include "HF_receiver.hpp"
 
 namespace hf {
 

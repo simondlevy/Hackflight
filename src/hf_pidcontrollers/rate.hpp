@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <rft_pid.hpp>
+#include <RFT_pid.hpp>
 
-#include "pidcontroller.hpp"
+#include "HF_pidcontroller.hpp"
 
 namespace hf {
 

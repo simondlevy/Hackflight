@@ -12,8 +12,8 @@
 #include <RFT_board.hpp>
 #include <RFT_actuator.hpp>
 
-#include "state.hpp"
-#include "receiver.hpp"
+#include "HF_state.hpp"
+#include "HF_receiver.hpp"
 
 namespace hf {
 

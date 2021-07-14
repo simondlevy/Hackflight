@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "receiver.hpp"
+#include "HF_receiver.hpp"
 #include <SBUS.h>
 
 namespace hf {

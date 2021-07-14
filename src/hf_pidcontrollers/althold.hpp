@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "pidcontroller.hpp"
+#include "HF_pidcontroller.hpp"
 
 #include <RFT_pid.hpp>
 

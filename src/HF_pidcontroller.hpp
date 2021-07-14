@@ -12,7 +12,7 @@
 
 #include <RFT_closedloop.hpp>
 
-#include "state.hpp"
+#include "HF_state.hpp"
 
 namespace hf {
 

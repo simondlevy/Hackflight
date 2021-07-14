@@ -17,13 +17,13 @@
 
  */
 
-#include "hf_full.hpp"
-#include "boards/ladybugfc.hpp"
-#include "receivers/arduino/dsmx/dsmx_serial1.hpp"
-#include "mixers/quad/xmw.hpp"
-#include "pidcontrollers/rate.hpp"
-#include "pidcontrollers/level.hpp"
-#include "sensors/usfs.hpp"
+#include "HF_full.hpp"
+#include "hf_boards/ladybugfc.hpp"
+#include "hf_receivers/arduino/dsmx/dsmx_serial1.hpp"
+#include "hf_mixers/quad/xmw.hpp"
+#include "hf_pidcontrollers/rate.hpp"
+#include "hf_pidcontrollers/level.hpp"
+#include "hf_sensors/usfs.hpp"
 
 #include <rft_motors/rotary/brushed.hpp>
 

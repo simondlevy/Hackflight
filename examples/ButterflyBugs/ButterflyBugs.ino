@@ -13,13 +13,13 @@
    MIT License
  */
 
-#include "hf_full.hpp"
-#include "mixers/quad/xmw.hpp"
-#include "pidcontrollers/rate.hpp"
-#include "pidcontrollers/yaw.hpp"
-#include "pidcontrollers/level.hpp"
-#include "sensors/usfs.hpp"
-#include "receivers/arduino/dsmx/dsmx_serial1.hpp"
+#include "HF_full.hpp"
+#include "hf_mixers/quad/xmw.hpp"
+#include "hf_pidcontrollers/rate.hpp"
+#include "hf_pidcontrollers/yaw.hpp"
+#include "hf_pidcontrollers/level.hpp"
+#include "hf_sensors/usfs.hpp"
+#include "hf_receivers/arduino/dsmx/dsmx_serial1.hpp"
 
 #include <rft_boards/realboards/arduino_serial/arduino/butterfly.hpp>
 #include <rft_motors/rotary/brushless.hpp>

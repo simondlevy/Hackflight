@@ -12,13 +12,13 @@
    MIT License
  */
 
-#include "hackflight.hpp"
-#include "receivers/arduino/dsmx/dsmx_esp32_serial1.hpp"
-#include "mixers/quad/xmw.hpp"
-#include "pidcontrollers/rate.hpp"
-#include "pidcontrollers/yaw.hpp"
-#include "pidcontrollers/level.hpp"
-#include "sensors/usfs.hpp"
+#include "HF_full.hpp"
+#include "hf_receivers/arduino/dsmx/dsmx_esp32_serial1.hpp"
+#include "hf_mixers/quad/xmw.hpp"
+#include "hf_pidcontrollers/rate.hpp"
+#include "hf_pidcontrollers/yaw.hpp"
+#include "hf_pidcontrollers/level.hpp"
+#include "hf_sensors/usfs.hpp"
 
 #include <rft_boards/realboards/arduino_serial/tinypico.hpp>
 #include <rft_motors/rotary/brushless.hpp>

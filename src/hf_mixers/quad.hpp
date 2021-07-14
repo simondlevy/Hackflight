@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "mixer.hpp"
+#include "HF_mixer.hpp"
 
 #include <rft_motors/rotary.hpp>
 
