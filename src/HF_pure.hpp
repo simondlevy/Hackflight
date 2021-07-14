@@ -41,6 +41,17 @@ namespace hf {
                 rft::RFTPure::update(board, receiver, actuator, state);
             }
 
+            void update(
+                    rft::Board * board,
+                    Receiver * receiver,
+                    rft::Actuator * actuator,
+                    State * state,
+                    rft::Sensor ** sensors,
+                    uint8_t sensor_count)
+            {
+                rft::RFTPure::update(board, receiver, actuator, state, sensors, sensor_count);
+            }
+
     }; // class HackflightPure
 
 } // namespace hf
