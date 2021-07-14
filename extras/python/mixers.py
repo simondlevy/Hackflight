@@ -6,7 +6,7 @@ Copyright (C) 2021 S.Basnet, N. Manaye, N. Nguyen, S.D. Levy
 MIT License
 '''
 
-from demands import DEMANDS_THROTTLE, DEMANDS_ROLL, DEMANDS_PITCH, DEMANDS_YAW
+from demands import THROTTLE, ROLL, PITCH, YAW
 import numpy as np
 
 
@@ -18,10 +18,10 @@ def _mixer(motordirs, demands):
 
     for i in range(m):
 
-        motorvals[i] = (demands[DEMANDS_THROTTLE] * motordirs[i]['throttle'] +
-                        demands[DEMANDS_ROLL] * motordirs[i]['roll'] +
-                        demands[DEMANDS_PITCH] * motordirs[i]['pitch'] +
-                        demands[DEMANDS_YAW] * motordirs[i]['yaw'])
+        motorvals[i] = (demands[THROTTLE] * motordirs[i]['throttle'] +
+                        demands[ROLL] * motordirs[i]['roll'] +
+                        demands[PITCH] * motordirs[i]['pitch'] +
+                        demands[YAW] * motordirs[i]['yaw'])
 
     # Keep motor values in appropriate interval
     motorvals[motorvals < 0] = 0

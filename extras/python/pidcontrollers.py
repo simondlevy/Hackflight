@@ -8,10 +8,9 @@
 
 import numpy as np
 
-from demands import DEMANDS_THROTTLE, DEMANDS_ROLL, DEMANDS_PITCH, DEMANDS_YAW
+from demands import THROTTLE, ROLL, PITCH, YAW
 
-from state import STATE_Z, STATE_DZ, STATE_PHI, STATE_DPHI, STATE_THETA, \
-                  STATE_DTHETA, STATE_DPSI
+import state
 
 
 def _constrainAbs(val, lim):
@@ -83,13 +82,13 @@ def rate_pid(Kp=0.225, Ki=0.001875, Kd=0.375,
 
         new_demands = demands.copy()
 
-        new_demands[DEMANDS_ROLL], new_roll_controller_state = \
-            compute(Kp, Ki, Kd, windupMax, maxvel, demands, DEMANDS_ROLL,
-                    vehicle_state, STATE_DPHI, controller_state[0])
+        new_demands[ROLL], new_roll_controller_state = \
+            compute(Kp, Ki, Kd, windupMax, maxvel, demands, ROLL,
+                    vehicle_state, state.DPHI, controller_state[0])
 
-        new_demands[DEMANDS_PITCH], new_pitch_controller_state = \
-            compute(Kp, Ki, Kd, windupMax, maxvel, demands, DEMANDS_PITCH,
-                    vehicle_state, STATE_DTHETA, controller_state[1], -1)
+        new_demands[PITCH], new_pitch_controller_state = \
+            compute(Kp, Ki, Kd, windupMax, maxvel, demands, PITCH,
+                    vehicle_state, state.DTHETA, controller_state[1], -1)
 
         return (new_demands,
                 (new_roll_controller_state, new_pitch_controller_state))
@@ -109,7 +108,7 @@ def yaw_pid(Kp=2.0, Ki=0.1, windupMax=0.4):
     def apply(vehicle_state, controller_state, demands):
 
         # Compute error as target minus actual
-        error = demands[DEMANDS_YAW] - vehicle_state[STATE_DPSI]
+        error = demands[YAW] - vehicle_state[state.DPSI]
 
         # Accumualte error integral
         errorI = _constrainAbs(controller_state['errorI'] + error, windupMax)
@@ -119,7 +118,7 @@ def yaw_pid(Kp=2.0, Ki=0.1, windupMax=0.4):
 
         # Update demands
         new_demands = demands.copy()
-        new_demands[DEMANDS_YAW] = error * Kp + errorI * Ki
+        new_demands[YAW] = error * Kp + errorI * Ki
 
         return new_demands, new_controller_state
 
@@ -141,13 +140,13 @@ def level_pid(Kp=0.2, maxAngleDegrees=45):
 
         new_demands = demands.copy()
 
-        new_demands[DEMANDS_ROLL] = Kp * (demands[DEMANDS_ROLL] * dmdscale -
-                                          vehicle_state[STATE_PHI])
+        new_demands[ROLL] = Kp * (demands[ROLL] * dmdscale -
+                                  vehicle_state[state.PHI])
 
         # Pitch demand is nose-down positive, so we negate
         # pitch-forward (nose-down negative) to reconcile them
-        new_demands[DEMANDS_PITCH] = Kp * (demands[DEMANDS_PITCH] * dmdscale +
-                                           vehicle_state[STATE_THETA])
+        new_demands[PITCH] = Kp * (demands[PITCH] * dmdscale +
+                                   vehicle_state[state.THETA])
 
         # LevelPid uses no controller state
         return new_demands, None
@@ -173,9 +172,9 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
         targetAltitude = controller_state['targetAltitude']
 
         # NED => ENU
-        altitude = -vehicle_state[STATE_Z]
+        altitude = -vehicle_state[state.Z]
 
-        throttleDemand = demands[DEMANDS_THROTTLE]
+        throttleDemand = demands[THROTTLE]
 
         # Is stick demand in deadband?
         inBand = abs(throttleDemand) < stickDeadband
@@ -193,7 +192,7 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
 
         # Compute error as target velocity minus actual velocity, after
         # negating actual to accommodate NED
-        error = targetVelocity + vehicle_state[STATE_DZ]
+        error = targetVelocity + vehicle_state[state.DZ]
 
         # Accumualte error integral
         errorI = _constrainAbs(controller_state['errorI'] + error, windupMax)
@@ -205,7 +204,7 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
 
         # Update demands
         new_demands = demands.copy()
-        new_demands[DEMANDS_THROTTLE] = error * Kp + errorI * Ki
+        new_demands[THROTTLE] = error * Kp + errorI * Ki
 
         return new_demands, new_controller_state
 
@@ -217,6 +216,25 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
 def pos_hold_pid(Kp=0.2, stickDeadband=0.2):
     '''
     A closure for P control of position
+    '''
+
+    '''
+    def compute(Kp, state, demands, demand_axis):
+
+        # Run controller only if roll and pitch are small
+        if (inband(demands[demand_axis])):
+
+            # Get heading for rotating world-coordinate velocities
+            # into body coordinates
+            psi = state[state.PSI]
+
+            cpsi = cos(psi)
+            spsi = sin(psi)
+
+            dx = state[state.DX]
+            dy = state[state.DY]
+
+            demands[demand_axis] = -Kp * rotate(dx, dy, cpsi, spsi)
     '''
 
     def apply(vehicle_state, controller_state, demands):
