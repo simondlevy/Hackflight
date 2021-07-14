@@ -60,8 +60,7 @@ static hf::Hackflight h;
 static hf::RollRatePid rollRatePid = hf::RollRatePid(0.225, 0.001875, 0.375);
 static hf::PitchRatePid pitchRatePid = hf::PitchRatePid(0.225, 0.001875, 0.375);
 static hf::YawRatePid yawRatePid = hf::YawRatePid(1.0625, 0.005625f);
-static hf::RollLevelPid rollLevelPid = hf::RollLevelPid(0.20f);
-static hf::PitchLevelPid pitchLevelPid = hf::PitchLevelPid(0.20f);
+static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 // Sensors ==============================================================================
 
@@ -85,8 +84,7 @@ void setup(void)
     h.addSensor(&imu);
 
     // Add PID controllers
-    h.addClosedLoopController(&rollLevelPid);
-    h.addClosedLoopController(&pitchLevelPid);
+    h.addClosedLoopController(&levelPid);
     h.addClosedLoopController(&rollRatePid);
     h.addClosedLoopController(&pitchRatePid);
     h.addClosedLoopController(&yawRatePid);
