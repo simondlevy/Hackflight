@@ -32,7 +32,7 @@
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 4.0f;
-static constexpr float SOFTWARE_TRIM[3] = {0, 0.05, 0.05};
+static constexpr float SOFTWARE_TRIM[3] = {0, 0.05, 0.035};
 
 static hf::DSMX_Receiver_Serial1 receiver = 
     hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE, SOFTWARE_TRIM);  
