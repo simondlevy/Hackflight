@@ -18,6 +18,11 @@ def _constrainAbs(val, lim):
     return -lim if val < -lim else (+lim if val > +lim else val)
 
 
+def _in_band(val, band):
+
+    return abs(val) < band
+
+
 # Rate -----------------------------------------------------------------------
 
 def rate_pid(Kp=0.225, Ki=0.001875, Kd=0.375,
@@ -136,7 +141,7 @@ def level_pid(Kp=0.2, maxAngleDegrees=45):
     # angle for error computation, we multiply by the folling amount:
     dmdscale = 2 * np.radians(maxAngleDegrees)
 
-    def apply(vehicle_state, controller_state, demands):
+    def apply(vehicle_state, _controller_state, demands):
 
         new_demands = demands.copy()
 
@@ -177,7 +182,7 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
         throttleDemand = demands[THROTTLE]
 
         # Is stick demand in deadband?
-        inBand = abs(throttleDemand) < stickDeadband
+        inBand = _in_band(throttleDemand, stickDeadband)
 
         # Reset controller when moving into deadband
         if inBand and not controller_state['inBand']:
@@ -213,33 +218,30 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
 
 # Position hold ---------------------------------------------------------------
 
-def pos_hold_pid(Kp=0.2, stickDeadband=0.2):
+def pos_hold_pid(Kp=0.1, stickDeadband=0.2):
     '''
     A closure for P control of position
     '''
 
-    '''
-    def compute(Kp, state, demands, demand_axis):
-
-        # Run controller only if roll and pitch are small
-        if (inband(demands[demand_axis])):
-
-            # Get heading for rotating world-coordinate velocities
-            # into body coordinates
-            psi = state[state.PSI]
-
-            cpsi = cos(psi)
-            spsi = sin(psi)
-
-            dx = state[state.DX]
-            dy = state[state.DY]
-
-            demands[demand_axis] = -Kp * rotate(dx, dy, cpsi, spsi)
-    '''
-
-    def apply(vehicle_state, controller_state, demands):
+    def apply(vehicle_state, _controller_state, demands):
 
         new_demands = demands.copy()
+
+        if _in_band(demands[ROLL], stickDeadband) and \
+           _in_band(demands[PITCH], stickDeadband):
+
+            # Rotate X, Y velocities into body frame
+
+            psi = vehicle_state[state.PSI]
+
+            cpsi = np.cos(psi)
+            spsi = np.sin(psi)
+
+            dx = vehicle_state[state.DX]
+            dy = vehicle_state[state.DY]
+
+            new_demands[PITCH] = -Kp * (cpsi * dx + spsi * dy)
+            new_demands[ROLL] = -Kp * (cpsi * dy - spsi * dx)
 
         # LevelPid uses no controller state
         return new_demands, None
