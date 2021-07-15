@@ -1,11 +1,18 @@
-ALL = takeoff
+ALL = main KeyboardController
 all: $(ALL)
 
-takeoff: takeoff.hs Demands.hs State.hs Mixer.hs Server.hs PidController.hs AltitudeController.hs
-	ghc -Wall takeoff.hs
+main: main.hs Demands.hs State.hs Mixer.hs Server.hs PidController.hs AltitudeController.hs
+	ghc -Wall main.hs
 
-run: takeoff
-	./takeoff
+KeyboardController: KeyboardController.hs
+	ghc -Wall KeyboardController.hs
+
+run: main
+	./main
+
+kb: KeyboardController
+	./KeyboardController
+
 clean:
 	rm -rf $(ALL) *.hi *.o
 
