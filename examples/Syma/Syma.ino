@@ -22,16 +22,17 @@
 #include "hf_receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "hf_mixers/quad/xmw.hpp"
 #include "hf_pidcontrollers/rate.hpp"
+#include "hf_pidcontrollers/yaw.hpp"
 #include "hf_pidcontrollers/level.hpp"
 #include "hf_sensors/usfs.hpp"
 
-#include <rft_motors/rotary/brushed.hpp>
+#include <rft_motors/arduino/brushed.hpp>
 
 // Receiver ============================================================================
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 4.0f;
-static constexpr float SOFTWARE_TRIM[3] = {0, 0.05, 0.05};
+static constexpr float SOFTWARE_TRIM[3] = {0, 0.05, 0.035};
 
 static hf::DSMX_Receiver_Serial1 receiver = 
     hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE, SOFTWARE_TRIM);  
@@ -42,10 +43,10 @@ static hf::LadybugFC board = hf::LadybugFC(&Serial2);  // Bluetooth comms over S
 
 // Motors  ==============================================================================
 
-static rft::BrushedMotor motor1 = rft::BrushedMotor(13);
-static rft::BrushedMotor motor2 = rft::BrushedMotor(A2);
-static rft::BrushedMotor motor3 = rft::BrushedMotor(3);
-static rft::BrushedMotor motor4 = rft::BrushedMotor(11);
+static rft::ArduinoBrushedMotor motor1 = rft::ArduinoBrushedMotor(13);
+static rft::ArduinoBrushedMotor motor2 = rft::ArduinoBrushedMotor(A2);
+static rft::ArduinoBrushedMotor motor3 = rft::ArduinoBrushedMotor(3);
+static rft::ArduinoBrushedMotor motor4 = rft::ArduinoBrushedMotor(11);
 
 // Mixer ================================================================================
 
@@ -57,11 +58,9 @@ static hf::Hackflight h;
 
 // PID controllers ======================================================================
 
-static hf::RollRatePid rollRatePid = hf::RollRatePid(0.225, 0.001875, 0.375);
-static hf::PitchRatePid pitchRatePid = hf::PitchRatePid(0.225, 0.001875, 0.375);
-static hf::YawRatePid yawRatePid = hf::YawRatePid(1.0625, 0.005625f);
-static hf::RollLevelPid rollLevelPid = hf::RollLevelPid(0.20f);
-static hf::PitchLevelPid pitchLevelPid = hf::PitchLevelPid(0.20f);
+static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
+static hf::YawPid yawPid = hf::YawPid(1.0625, 0.005625f);
+static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 // Sensors ==============================================================================
 
@@ -85,11 +84,9 @@ void setup(void)
     h.addSensor(&imu);
 
     // Add PID controllers
-    h.addClosedLoopController(&rollLevelPid);
-    h.addClosedLoopController(&pitchLevelPid);
-    h.addClosedLoopController(&rollRatePid);
-    h.addClosedLoopController(&pitchRatePid);
-    h.addClosedLoopController(&yawRatePid);
+    h.addClosedLoopController(&levelPid);
+    h.addClosedLoopController(&ratePid);
+    h.addClosedLoopController(&yawPid);
 
     // Add serial tasks
     h.addSerialTask(&gcsTask);

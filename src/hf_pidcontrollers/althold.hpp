@@ -1,7 +1,11 @@
 /*
-   Altitude hold PID controller
+   PI controller for altitude hold
+
+   Based on algorithm in
+   http://ardupilot.org/copter/docs/altholdmode.html
 
    Copyright (c) 2018 Juan Gallostra and Simon D. Levy
+
 
    MIT License
    */
@@ -10,18 +14,24 @@
 
 #include "HF_pidcontroller.hpp"
 
-#include <RFT_pid.hpp>
-
 namespace hf {
 
-    class AltitudeHoldPid : public PidController, protected rft::DofPid {
+    class AltitudeHoldPid : public PidController {
 
         private: 
+ 
+            // Constants set in instructor ----------------
 
-            // Arbitrary constants: for details see
-            // http://ardupilot.org/copter/docs/altholdmode.html
-            static constexpr float PILOT_VELZ_MAX = 2.5;
-            static constexpr float STICK_DEADBAND = 0.20;   
+            float _Kp = 0;
+            float _Ki = 0;
+            float _windupMax = 0;
+            float _stickDeadband = 0;
+            float _pilotVelZMax = 0;
+
+            // Controller state ---------------------------
+
+            // Error integral
+            float _errorI = 0;
 
             // Will be reset each time we re-enter deadband
             float _altitudeTarget = 0;
@@ -29,20 +39,22 @@ namespace hf {
             // Tracks whether we just entered deadband
             bool _inBandPrev = false;
 
+            // --------------------------------------------
+
         protected:
 
-            void modifyDemands(State * state, float * demands) override
+            void modifyDemands(float * state, float * demands) override
             {
                 bool didReset = false;
-                float altitude = state->x[State::Z];
+                float altitude = state[State::Z];
 
                 // Is stick demand in deadband?
                 bool inBand = fabs(demands[DEMANDS_THROTTLE]) <
-                    STICK_DEADBAND; 
+                    _stickDeadband; 
 
                 // Reset controller when moving into deadband
                 if (inBand && !_inBandPrev) {
-                    rft::DofPid::reset();
+                    _errorI = 0;
                     didReset = true;
                 }
                 _inBandPrev = inBand;
@@ -51,12 +63,17 @@ namespace hf {
                 // constant outside
                 float targetVelocity = inBand ?
                                        _altitudeTarget - altitude :
-                                       PILOT_VELZ_MAX *
+                                       _pilotVelZMax *
                                        demands[DEMANDS_THROTTLE];
 
-                // Run velocity PID controller to get correction
-                demands[DEMANDS_THROTTLE] =
-                    rft::DofPid::compute(targetVelocity, state->x[State::DZ]);
+                // Compute error as scaled target minus actual
+                float error = targetVelocity - state[State::DZ];
+
+                // Compute I term, avoiding windup
+                _errorI = rft::Filter::constrainAbs(_errorI + error, _windupMax);
+
+                // Adjust throttle demand based on error
+                demands[DEMANDS_THROTTLE] = error * _Kp + _errorI * _Ki;
 
                 // If we re-entered deadband, we reset the target altitude.
                 if (didReset) {
@@ -71,11 +88,21 @@ namespace hf {
 
         public:
 
-            AltitudeHoldPid(const float Kp=0.75,
-                            const float Ki=1.5,
-                            const float Kd=0)
-                : rft::DofPid(Kp, Ki, Kd)
+            AltitudeHoldPid(const float Kp = 0.75,
+                            const float Ki = 1.5,
+                            const float windupMax = 0.4,
+                            const float pilotVelZMax = 2.5,
+                            const float stickDeadband = 0.20)   
             {
+                // Store constants
+                _Kp = Kp;
+                _Ki = Ki;
+                _windupMax = windupMax;
+                _pilotVelZMax = pilotVelZMax;
+                _stickDeadband = stickDeadband;
+
+                // Initialize state
+                _errorI = 0;
                 _inBandPrev = false;
                 _altitudeTarget = 0;
             }

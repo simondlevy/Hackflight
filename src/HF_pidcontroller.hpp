@@ -24,10 +24,10 @@ namespace hf {
 
             virtual void modifyDemands(rft::State * state, float * demands) override
             {
-                modifyDemands((State *)state, demands);
+                modifyDemands(((State *)state)->x, demands);
             }
 
-            virtual void modifyDemands(State * state, float * demands) = 0;
+            virtual void modifyDemands(float * state, float * demands) = 0;
 
     };  // class PidController
 

@@ -10,107 +10,53 @@
 
 namespace hf {
 
-    // Helper class
-    class _PosHoldPid {
+    class PositionHoldPid : public PidController {
 
         private:
 
-            static constexpr float STICK_DEADBAND = 0.20;   
+            // Constants set in constructor ----------------------------
 
             float _Kp = 0;
+            float _stickDeadband = 0.2;   
 
-            uint8_t _state_axis = 0;
-            uint8_t _demand_axis = 0;
-            int8_t _state_direction = 0;
+            // ----------------------------------------------------------
 
+            // Helper
             bool inband(float demand) 
             {
-                return fabs(demand) < STICK_DEADBAND;
+                return fabs(demand) < _stickDeadband;
             }
 
         protected:
 
-            _PosHoldPid(
-                    const float Kp,
-                    uint8_t state_axis,
-                    uint8_t demand_axis,
-                    uint8_t state_direction=+1) 
+            void modifyDemands(float * state, float * demands) override
             {
-                _Kp = Kp;
-                _state_axis = state_axis;
-                _demand_axis = demand_axis;
-                _state_direction = state_direction;
-            }
-
-            void compute(State * state, float * demands)
-            {
-                // Get state vector
-                float * x = state->x;
-
                 // Run controller only if roll and pitch are small
-                if (inband(demands[_demand_axis])) {
+                if (inband(demands[DEMANDS_PITCH]) && inband(demands[DEMANDS_ROLL])) {
 
                     // Get heading for rotating world-coordinate velocities
                     // into body coordinates
-                    float psi = x[State::PSI];
+                    float psi = state[State::PSI];
 
                     float cpsi = cos(psi);
                     float spsi = sin(psi);
 
-                    float dx = x[State::DX];
-                    float dy = x[State::DY];
+                    float dx = state[State::DX];
+                    float dy = state[State::DY];
 
-                    demands[_demand_axis] = -_Kp * rotate(dx, dy, cpsi, spsi);
+                    demands[DEMANDS_ROLL] = -_Kp * (cpsi * dy - spsi * dx);
+                    demands[DEMANDS_PITCH] = -_Kp * (cpsi * dx + spsi * dy);
                 }
             }
 
-            virtual float rotate(float dx, float dy,
-                    float cpsi, float spsi) = 0;
-
-    };  // class _PosHoldPid
-
-    class XPositionHoldPid : public PidController, protected _PosHoldPid {
-
         public:
 
-            XPositionHoldPid(const float Kp=0.1)
-                : _PosHoldPid(Kp, State::DX, DEMANDS_PITCH)
+            PositionHoldPid(float Kp=0.1, float stickDeadband=0.2)
             {
+                _Kp = Kp;
+                _stickDeadband = stickDeadband;
             }
 
-            void modifyDemands(State * state, float * demands) override
-            {
-                _PosHoldPid::compute(state, demands);
-            }
-
-             virtual float rotate(float dx, float dy,
-                    float cpsi, float spsi) override
-            {
-                return cpsi * dx + spsi * dy;
-            }
-
-    }; // class XPositionHoldPid
-
-    class YPositionHoldPid : public PidController, protected _PosHoldPid {
-
-        public:
-
-            YPositionHoldPid(const float Kp=0.1)
-                : _PosHoldPid(Kp, State::DY, DEMANDS_ROLL)
-            {
-            }
-
-            void modifyDemands(State * state, float * demands) override
-            {
-                _PosHoldPid::compute(state, demands);
-            }
-
-            virtual float rotate(float dx, float dy,
-                    float cpsi, float spsi) override
-            {
-                return cpsi * dy - spsi * dx;
-            }
-
-    }; // class YPositionHoldPid
+    }; // class PositionHoldPid
 
 } // namespace hf
