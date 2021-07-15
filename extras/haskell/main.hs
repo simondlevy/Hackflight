@@ -7,8 +7,9 @@
 import Hackflight
 import Board
 import Receiver
+import Mixer
 
 main :: IO ()
 
-main = let h = Hackflight Board Receiver
+main = let h = Hackflight Board Receiver (Mixer 0)
        in putStrLn (show (run h))

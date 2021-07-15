@@ -8,6 +8,15 @@
 
 module Mixer where
 
+data Mixer = Mixer {
+              motor_directions :: Double
+             } deriving (Show)
+         
+
+-- quadXAPMixer :: Mixer
+--quadXAPMixer motorDirections = \a -> \b -> a + b
+ 
+{--
 import Demands
 
 -- XXX should support different numbers of motors
@@ -31,3 +40,4 @@ quadXAPMixer demands =
               (t + r + p - y)
               (t + r - p + y)
               (t - r + p + y)
+--}

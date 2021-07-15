@@ -10,10 +10,12 @@ module Hackflight where
 
 import Board
 import Receiver
+import Mixer
 
 data Hackflight = Hackflight {
                    board :: Board,
-                   olc :: Receiver
+                   olc :: Receiver,
+                   mixer :: Mixer
                   } deriving (Show)
 
 run :: Hackflight -> Hackflight
