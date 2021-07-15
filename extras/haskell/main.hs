@@ -4,10 +4,9 @@
   MIT License
 --}
 
-import Mixer
-import Server
-import AltitudeController
+import Hackflight
 
 main :: IO ()
-main = let constants = AltitudeControllerConstants 10 1 0 10
-       in runMulticopter (makeAltitudeController constants) quadXAPMixer
+
+main = let h = Hackflight 0
+       in putStrLn (run h)
