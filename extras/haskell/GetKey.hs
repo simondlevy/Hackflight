@@ -1,3 +1,5 @@
+-- https://stackoverflow.com/questions/23068218/haskell-read-raw-keyboard-input
+
 module GetKey where
 import System.IO (stdin, hReady)
 
