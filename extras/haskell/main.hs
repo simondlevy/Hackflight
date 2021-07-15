@@ -5,8 +5,9 @@
 --}
 
 import Hackflight
+import Board
 
 main :: IO ()
 
-main = let h = Hackflight 0
+main = let h = Hackflight Board
        in putStrLn (show (run h))

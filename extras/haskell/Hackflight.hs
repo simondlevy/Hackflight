@@ -8,8 +8,9 @@
 
 module Hackflight where
 
--- See Bouabdallah et al. (2004)
-data Hackflight = Hackflight {value :: Double } deriving (Show)
+import Board
+
+data Hackflight = Hackflight {board :: Board } deriving (Show)
 
 run :: Hackflight -> Hackflight
 
