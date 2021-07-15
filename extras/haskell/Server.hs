@@ -6,7 +6,7 @@
   MIT License
 --}
 
-module Multicopter (runMulticopter) where
+module Server (runMulticopter) where
 
 import Control.Applicative
 import Network.Socket

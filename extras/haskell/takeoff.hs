@@ -5,7 +5,7 @@
 --}
 
 import Types
-import Multicopter
+import Server
 import AltitudeController
 
 main :: IO ()
