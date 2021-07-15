@@ -8,10 +8,16 @@
 
 module Mixer where
 
-data Mixer = Mixer {
-              motor_directions :: Double
-             } deriving (Show)
-         
+data MotorDirections = MotorDirections {
+                         d1 :: Int,
+                         d2 :: Int,
+                         d3 :: Int,
+                         d4 :: Int } deriving (Show)
+
+data Mixer = Op (Double->Double->Double) String (Double->Double->Double) 
+
+instance Show Mixer where
+   show (Op op str inv) = show str
 
 -- quadXAPMixer :: Mixer
 --quadXAPMixer motorDirections = \a -> \b -> a + b
