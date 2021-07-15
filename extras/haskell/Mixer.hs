@@ -14,10 +14,12 @@ data MotorDirections = MotorDirections {
                          d3 :: Int,
                          d4 :: Int } deriving (Show)
 
-data Mixer = Double (Double->Double->Double) String
+type Foo = Double
+
+data Mixer = Foo (Double->Double->Double) String
 
 instance Show Mixer where
-   show (Double a s) = show s
+   show (Foo a s) = show s
 
 -- quadXAPMixer :: Mixer
 --quadXAPMixer motorDirections = \a -> \b -> a + b
