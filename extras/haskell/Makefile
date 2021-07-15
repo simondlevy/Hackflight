@@ -1,7 +1,7 @@
 ALL = takeoff
 all: $(ALL)
 
-takeoff: takeoff.hs State.hs Types.hs Server.hs AltitudeController.hs
+takeoff: takeoff.hs State.hs Types.hs Server.hs PidController.hs AltitudeController.hs
 	ghc -Wall takeoff.hs
 
 run: takeoff

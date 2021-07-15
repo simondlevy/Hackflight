@@ -17,6 +17,7 @@ import Data.Serialize -- from cereal
 
 import Types
 import State
+import PidController
 
 -- Adapted from http://book.realworldhaskell.org/read/sockets-and-syslog.html
 

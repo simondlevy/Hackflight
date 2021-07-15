@@ -11,6 +11,7 @@ module AltitudeController(AltitudeControllerConstants(..), makeAltitudeControlle
 
 import Types
 import State
+import PidController
 
 data AltitudeControllerConstants =
     AltitudeControllerConstants {
