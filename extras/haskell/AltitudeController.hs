@@ -10,6 +10,7 @@ module AltitudeController(AltitudeControllerConstants(..), makeAltitudeControlle
 
 
 import Types
+import State
 
 data AltitudeControllerConstants =
     AltitudeControllerConstants {
