@@ -15,7 +15,7 @@ import Data.ByteString.Internal
 import Data.Either.Utils -- from MissingH
 import Data.Serialize -- from cereal
 
-import Types
+import Mixer
 import State
 import PidController
 

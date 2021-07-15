@@ -8,8 +8,8 @@
 
 module PidController where
 
+import Demands
 import State
-import Types
 
 type Time = Double
 

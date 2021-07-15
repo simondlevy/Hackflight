@@ -1,22 +1,14 @@
 {--
-  Types for Multicopter
+  Mixer type
 
   Copyright(C) 2021 Simon D.Levy
 
   MIT License
 --}
 
-module Types where
+module Mixer where
 
--------------------------------------------------------
-
-data Demands = Demands { throttle :: Double
-                       , roll :: Double  
-                       , pitch :: Double  
-                       , yaw :: Double  
-                     } deriving (Show)
-
--------------------------------------------------------
+import Demands
 
 -- XXX should support different numbers of motors
 data Motors = Motors { m1 :: Double
