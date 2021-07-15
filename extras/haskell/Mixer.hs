@@ -14,7 +14,7 @@ data MotorDirections = MotorDirections {
                          d3 :: Int,
                          d4 :: Int } deriving (Show)
 
-data Mixer = Op (Double->Double->Double) String
+data Mixer = Double (Double->Double->Double) String
 
 instance Show Mixer where
    show (Op a s) = show s
