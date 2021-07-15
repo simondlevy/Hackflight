@@ -1,7 +1,7 @@
 ALL = main KeyboardController
 all: $(ALL)
 
-main: main.hs Demands.hs State.hs Mixer.hs Server.hs PidController.hs AltitudeController.hs
+main: main.hs Board.hs Demands.hs State.hs Mixer.hs Server.hs PidController.hs AltitudeController.hs
 	ghc -Wall main.hs
 
 KeyboardController: KeyboardController.hs
