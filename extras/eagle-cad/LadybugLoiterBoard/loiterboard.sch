@@ -3237,14 +3237,14 @@ part number 2062-2P from STA</description>
 <label x="91.44" y="60.96" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$1" gate="G$1" pin="2"/>
-<wire x1="-15.24" y1="96.52" x2="-10.16" y2="96.52" width="0.1524" layer="91"/>
-<label x="-12.7" y="96.52" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="PAD10" gate="1" pin="P"/>
 <wire x1="50.8" y1="17.78" x2="55.88" y2="17.78" width="0.1524" layer="91"/>
 <label x="50.8" y="17.78" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="1"/>
+<wire x1="-15.24" y1="99.06" x2="-10.16" y2="99.06" width="0.1524" layer="91"/>
+<label x="-15.24" y="99.06" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="3.3V" class="0">
@@ -3361,14 +3361,14 @@ part number 2062-2P from STA</description>
 </net>
 <net name="VBAT" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="1"/>
-<wire x1="-15.24" y1="99.06" x2="-10.16" y2="99.06" width="0.1524" layer="91"/>
-<label x="-12.7" y="99.06" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="PAD9" gate="1" pin="P"/>
 <wire x1="50.8" y1="27.94" x2="55.88" y2="27.94" width="0.1524" layer="91"/>
 <label x="50.8" y="27.94" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="2"/>
+<wire x1="-15.24" y1="96.52" x2="-10.16" y2="96.52" width="0.1524" layer="91"/>
+<label x="-15.24" y="96.52" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
