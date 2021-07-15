@@ -6,6 +6,6 @@
   MIT License
 --}
 
-module OpenLoopController where
+module Receiver where
 
-data OpenLoopController = OpenLoopController deriving (Show)
+data Receiver = Receiver deriving (Show)

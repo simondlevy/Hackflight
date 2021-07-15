@@ -4,7 +4,7 @@ all: $(ALL)
 main: main.hs \
       Hackflight.hs \
       Board.hs \
-      OpenLoopController.hs \
+      Receiver.hs \
       Demands.hs \
       State.hs \
       Mixer.hs \

@@ -6,9 +6,9 @@
 
 import Hackflight
 import Board
-import OpenLoopController()
+import Receiver
 
 main :: IO ()
 
-main = let h = Hackflight Board
+main = let h = Hackflight Board Receiver
        in putStrLn (show (run h))

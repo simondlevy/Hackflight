@@ -9,8 +9,12 @@
 module Hackflight where
 
 import Board
+import Receiver
 
-data Hackflight = Hackflight {board :: Board } deriving (Show)
+data Hackflight = Hackflight {
+                   board :: Board,
+                   olc :: Receiver
+                  } deriving (Show)
 
 run :: Hackflight -> Hackflight
 
