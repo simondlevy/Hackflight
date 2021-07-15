@@ -8,5 +8,4 @@
 
 module Board where
 
--- See Bouabdallah et al. (2004)
 data Board = Board deriving (Show)

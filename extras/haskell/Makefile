@@ -1,7 +1,16 @@
 ALL = main KeyboardController
 all: $(ALL)
 
-main: main.hs Hackflight.hs Board.hs Demands.hs State.hs Mixer.hs Server.hs PidController.hs AltitudeController.hs
+main: main.hs \
+      Hackflight.hs \
+      Board.hs \
+      OpenLoopController.hs \
+      Demands.hs \
+      State.hs \
+      Mixer.hs \
+      Server.hs \
+      PidController.hs \
+      AltitudeController.hs
 	ghc -Wall main.hs
 
 KeyboardController: KeyboardController.hs

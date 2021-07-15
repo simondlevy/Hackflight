@@ -6,6 +6,7 @@
 
 import Hackflight
 import Board
+import OpenLoopController()
 
 main :: IO ()
 
