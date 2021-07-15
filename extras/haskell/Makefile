@@ -1,10 +1,14 @@
-ALL = test
+ALL = takeoff
 all: $(ALL)
 
-test: test.hs GetKey.hs
-	ghc -Wall test.hs
+takeoff: takeoff.hs Types.hs Multicopter.hs AltitudeController.hs
+	ghc -Wall takeoff.hs
 
-run: test
-	./test
+run: takeoff
+	./takeoff
 clean:
 	rm -rf $(ALL) *.hi *.o
+
+edit:
+	vim AltitudeController.hs
+
