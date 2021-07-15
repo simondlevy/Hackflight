@@ -9,4 +9,4 @@ import Hackflight
 main :: IO ()
 
 main = let h = Hackflight 0
-       in putStrLn (run h)
+       in putStrLn (show (run h))
