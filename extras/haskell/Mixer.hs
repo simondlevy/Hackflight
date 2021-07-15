@@ -17,7 +17,7 @@ data MotorDirections = MotorDirections {
 data Mixer = Double (Double->Double->Double) String
 
 instance Show Mixer where
-   show (Op a s) = show s
+   show (Double a s) = show s
 
 -- quadXAPMixer :: Mixer
 --quadXAPMixer motorDirections = \a -> \b -> a + b
