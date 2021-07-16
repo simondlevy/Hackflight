@@ -23,6 +23,7 @@ namespace hf {
 
         private:
 
+            // Store these for each serial task so we don't have to pass them on update
             State * _state = NULL;
             Receiver * _receiver = NULL;
             rft::Actuator * _actuator = NULL;
@@ -153,14 +154,17 @@ namespace hf {
 
             } // dispatchMessage 
 
-    public:
-
-            SerialTask(Receiver * receiver, rft::Actuator * actuator, State * state, bool secondary=false)
-                : rft::SerialTask(secondary)
+            void init(Receiver * receiver, rft::Actuator * actuator, State * state)
             {
                 _receiver = receiver;
                 _actuator = actuator;
                 _state = state;
+            }
+    public:
+
+            SerialTask(bool secondary=false)
+                : rft::SerialTask(secondary)
+            {
             }
 
         }; // class SerialTask

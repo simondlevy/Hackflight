@@ -52,10 +52,6 @@ static rft::ArduinoBrushedMotor motor4 = rft::ArduinoBrushedMotor(11);
 
 static hf::MixerQuadXMW mixer = hf::MixerQuadXMW(&motor1, &motor2, &motor3, &motor4);
 
-// Hackflight object ====================================================================
-
-static hf::Hackflight h;
-
 // PID controllers ======================================================================
 
 static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
@@ -66,15 +62,15 @@ static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 static hf::USFS imu;
 
-// Vehicle state ========================================================================
-
-static hf::State state;
-
 // Serial tasks =========================================================================
 
-hf::SerialTask gcsTask = hf::SerialTask(&receiver, &mixer, &state); 
+hf::SerialTask gcsTask;
 
-hf::SerialTask telemetryTask = hf::SerialTask(&receiver, &mixer, &state, true);
+hf::SerialTask telemetryTask = hf::SerialTask(true);
+
+// Hackflight object ====================================================================
+
+static hf::Hackflight h(&board, &receiver, &mixer);
 
 // Setup ================================================================================
 
@@ -93,12 +89,13 @@ void setup(void)
     h.addSerialTask(&telemetryTask);
 
     // Start Hackflight firmware
-    h.begin(&board, &receiver, &mixer);
+    h.begin();
 }
 
 // Loop ===============================================================================
 
 void loop(void)
 {
-    h.update(&board, &receiver, &mixer, &state);
+    // Update Hackflight firmware
+    h.update();
 }
