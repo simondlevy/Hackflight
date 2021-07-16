@@ -1,7 +1,7 @@
 ALL = Hackflight
 all: $(ALL)
 
-Hackflight: Hackflight.hs Mixer.hs Server.hs AltHoldPid.hs
+Hackflight: Hackflight.hs Mixer.hs Server.hs AltHoldPid.hs PidControl.hs
 	ghc -Wall Hackflight.hs
 	rm -f *.hi *.o
 
