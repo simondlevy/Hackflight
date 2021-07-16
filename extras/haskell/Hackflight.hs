@@ -10,4 +10,7 @@ import AltHoldPid
 
 main :: IO ()
 main = let altitudeTarget = 10
-       in run (altHoldClosure altitudeTarget 1 0 1) newAltHoldState quadXAPMixer
+           altKp = 1
+           altKi = 0
+           altWindupMax = 1
+       in run (altHoldClosure altitudeTarget altKp altKi altWindupMax) newAltHoldState quadXAPMixer
