@@ -3,6 +3,7 @@ all: $(ALL)
 
 Hackflight: Hackflight.hs Mixer.hs Server.hs AltHoldPid.hs
 	ghc -Wall Hackflight.hs
+	rm -f *.hi *.o
 
 run: Hackflight
 	./Hackflight
