@@ -26,12 +26,15 @@ namespace hf {
         public:
 
             Hackflight(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
+                : rft::RFTPure(board, receiver, actuator)
             {
-                rft::RFTPure(board, receiver, actuator, &_state);
             }
 
-            void begin(void)
+            void begin(bool armed=false)
             {
+                // Supports automatic arming for simulator
+                _state.armed = armed;
+
                 rft::RFTPure::begin();
             }
 
