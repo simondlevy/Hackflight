@@ -14,9 +14,6 @@ import Demands
 
 data AltHoldState = AltHoldState { previousTime :: Double , errorIntegral :: Double } deriving (Show)
 
-newAltHoldState :: AltHoldState
-newAltHoldState = AltHoldState 0 0
-
 type AltHoldFun = Time -> VehicleState -> Demands -> AltHoldState -> (Demands, AltHoldState)
 
 data AltHoldController = AltHoldController { fun :: AltHoldFun, state:: AltHoldState }
