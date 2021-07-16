@@ -16,7 +16,7 @@ data AltHoldState = AltHoldState { previousTime :: Double , errorIntegral :: Dou
 
 type AltHoldFun = Time -> VehicleState -> Demands -> AltHoldState -> (Demands, AltHoldState)
 
-data AltHoldController = AltHoldController { fun :: AltHoldFun, state:: AltHoldState }
+data AltHoldController = AltHoldController { controllerFun :: AltHoldFun, controllerState:: AltHoldState }
 
 altHoldClosure :: Double -> Double -> Double -> Double -> AltHoldFun
 
