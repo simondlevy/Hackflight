@@ -6,7 +6,7 @@
 
 import Mixer
 import Server
-import AltHoldPid
+import AltHoldPid(newAltHoldController)
 
 main :: IO ()
 main = let altHoldController = newAltHoldController 10 1 0 1

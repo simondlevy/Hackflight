@@ -17,9 +17,9 @@ import Data.Serialize -- from cereal
 
 import Mixer
 import State
-import AltHoldPid
+import AltHoldPid(AltHoldFun)
 
-run :: (AltHoldFun, AltHoldState) -> Mixer -> IO ()
+run :: (AltHoldFun, [Double]) -> Mixer -> IO ()
 run controller mixer = withSocketsDo $
 
     do 

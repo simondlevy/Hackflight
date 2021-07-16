@@ -6,22 +6,25 @@
   MIT License
 --}
 
-module AltHoldPid(newAltHoldController, AltHoldFun, AltHoldState) where
+module AltHoldPid(newAltHoldController, AltHoldFun) where
 
 
 import State
 import Demands
 
-data AltHoldState = AltHoldState { previousTime :: Double , errorIntegral :: Double } deriving (Show)
+type AltHoldFun = Time -> VehicleState -> Demands -> [Double] -> (Demands, [Double])
 
-type AltHoldFun = Time -> VehicleState -> Demands -> AltHoldState -> (Demands, AltHoldState)
+newAltHoldController :: Double -> Double -> Double -> Double -> (AltHoldFun, [Double])
+newAltHoldController target kp ki windupMax = 
+    ((altHoldClosure target kp ki windupMax), [0,0])
+
+errorIntegral :: [Double] -> Double
+errorIntegral controllerState = controllerState!!0
+
+previousTime :: [Double] -> Double
+previousTime controllerState = controllerState!!1
 
 altHoldClosure :: Double -> Double -> Double -> Double -> AltHoldFun
-
-newAltHoldController :: Double -> Double -> Double -> Double -> (AltHoldFun, AltHoldState)
-newAltHoldController target kp ki windupMax = 
-    ((altHoldClosure target kp ki windupMax), (AltHoldState 0 0))
-
 altHoldClosure target kp ki windupMax  =
 
     \time -> \vehicleState -> \_demands -> \controllerState ->
@@ -41,7 +44,7 @@ altHoldClosure target kp ki windupMax  =
          -- Compute throttle demand, constrained to [0,1]
          u = min (kp * dzdt_error + ki * newErrorIntegral) 1
 
-    in ((Demands u 0 0 0), (AltHoldState time newErrorIntegral))
+    in ((Demands u 0 0 0), [time, newErrorIntegral])
 
 constrainAbs :: Double -> Double -> Double
 constrainAbs x lim = if x < -lim then -lim else (if x > lim then lim else x)
