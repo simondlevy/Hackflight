@@ -23,6 +23,10 @@ data AltHoldController = AltHoldController { fun :: AltHoldFun, state:: AltHoldS
 
 altHoldClosure :: Double -> Double -> Double -> Double -> AltHoldFun
 
+newAltHoldController :: Double -> Double -> Double -> Double -> AltHoldController
+newAltHoldController target kp ki windupMax = 
+    AltHoldController (altHoldClosure target kp ki windupMax) (AltHoldState 0 0)
+
 altHoldClosure target kp ki windupMax  =
 
     \time -> \vehicleState -> \_demands -> \controllerState ->
