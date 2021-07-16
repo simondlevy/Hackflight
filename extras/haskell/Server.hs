@@ -17,6 +17,7 @@ import Data.Serialize -- from cereal
 
 import Mixer
 import State
+import AltHoldPid
 
 -- Adapted from http://book.realworldhaskell.org/read/sockets-and-syslog.html
 
@@ -29,7 +30,7 @@ makeUdpSocket port =
        return (sock, (addrAddress addr))
 
 
-run :: PidController -> Mixer -> IO ()
+run :: AltHoldPid -> Mixer -> IO ()
 run controller mixer = withSocketsDo $
 
     do 
@@ -42,7 +43,7 @@ run controller mixer = withSocketsDo $
 
        putStrLn "Hit the Play button ..."
 
-       processMessages telemetryServerSocket motorClientSocket motorClientSocketAddress (PidControllerState 0 0)
+       processMessages telemetryServerSocket motorClientSocket motorClientSocketAddress (AltHoldPidState 0 0)
 
     where processMessages telemetryServerSocket motorClientSocket motorClientSockAddr controllerState =
               do 
