@@ -35,24 +35,32 @@ run controller initialControllerState mixer = withSocketsDo $
        processMessages telemetryServerSocket motorClientSocket motorClientSocketAddress initialControllerState
 
     where processMessages telemetryServerSocket motorClientSocket motorClientSockAddr controllerState =
+
               do 
 
+                  -- Get raw bytes for time and 12D state vector from client (sim)
                   (msgIn, _) <- Network.Socket.ByteString.recvFrom telemetryServerSocket 104
 
+                  -- Convert bytes to a list of doubles
                   let v = bytesToDoubles msgIn
 
+                  -- Parse the doubles into time and vehicle state
                   let t = head v
                   let vs = makeState (tail v)
 
+                  -- Run the PID controller to get new demands
                   let (demands, newControllerState) = controller t vs  demands controllerState
 
+                  -- Run the mixer on the demands to get the motor values
                   let motors = mixer demands
 
+                  -- Send the motor values to the client
                   _ <- Network.Socket.ByteString.sendTo
                         motorClientSocket
                         (doublesToBytes [(m1 motors), (m2 motors), (m3 motors), (m4 motors)])
                         motorClientSockAddr
 
+                  -- Repeat
                   processMessages telemetryServerSocket motorClientSocket motorClientSockAddr newControllerState
                       
 
