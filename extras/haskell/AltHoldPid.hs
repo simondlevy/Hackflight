@@ -6,7 +6,7 @@
   MIT License
 --}
 
-module AltHoldFun where
+module AltHoldPid where
 
 
 import State

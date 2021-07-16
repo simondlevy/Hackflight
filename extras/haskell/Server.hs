@@ -19,7 +19,7 @@ import Mixer
 import State
 import AltHoldPid
 
-run :: AltHoldPid -> AltHoldState -> Mixer -> IO ()
+run :: AltHoldFun -> AltHoldState -> Mixer -> IO ()
 run controller initialControllerState mixer = withSocketsDo $
 
     do 
