@@ -32,9 +32,9 @@ run controller initialControllerState mixer = withSocketsDo $
 
        putStrLn "Hit the Play button ..."
 
-       processMessages telemetryServerSocket motorClientSocket motorClientSocketAddress initialControllerState
+       loop telemetryServerSocket motorClientSocket motorClientSocketAddress initialControllerState
 
-    where processMessages telemetryServerSocket motorClientSocket motorClientSockAddr controllerState =
+    where loop telemetryServerSocket motorClientSocket motorClientSockAddr controllerState =
 
               do 
 
@@ -61,7 +61,7 @@ run controller initialControllerState mixer = withSocketsDo $
                         motorClientSockAddr
 
                   -- Repeat
-                  processMessages telemetryServerSocket motorClientSocket motorClientSockAddr newControllerState
+                  loop telemetryServerSocket motorClientSocket motorClientSockAddr newControllerState
                       
 
 -- http://book.realworldhaskell.org/read/sockets-and-syslog.html

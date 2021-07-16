@@ -15,5 +15,5 @@ main = let altitudeTarget = 10
            altWindupMax = 1
            ac = altHoldClosure altitudeTarget altKp altKi altWindupMax
            as = newAltHoldState
-           altHoldController = AltHoldController ac as
+           -- altHoldController = AltHoldController ac as
        in run ac as quadXAPMixer
