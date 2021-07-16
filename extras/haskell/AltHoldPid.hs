@@ -6,7 +6,7 @@
   MIT License
 --}
 
-module AltHoldPid where
+module AltHoldFun where
 
 
 import State
@@ -17,11 +17,11 @@ data AltHoldState = AltHoldState { previousTime :: Double , errorIntegral :: Dou
 newAltHoldState :: AltHoldState
 newAltHoldState = AltHoldState 0 0
 
-type AltHoldPid = Time -> VehicleState -> Demands -> AltHoldState -> (Demands, AltHoldState)
+type AltHoldFun = Time -> VehicleState -> Demands -> AltHoldState -> (Demands, AltHoldState)
 
-data AltHoldPair = AltHoldPair { fun :: AltHoldPid, state:: AltHoldState }
+data AltHoldController = AltHoldController { fun :: AltHoldFun, state:: AltHoldState }
 
-altHoldClosure :: Double -> Double -> Double -> Double -> AltHoldPid
+altHoldClosure :: Double -> Double -> Double -> Double -> AltHoldFun
 
 altHoldClosure target kp ki windupMax  =
 
