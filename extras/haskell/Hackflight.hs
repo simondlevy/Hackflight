@@ -9,10 +9,5 @@ import Server
 import AltHoldPid
 
 main :: IO ()
-main = let altitudeTarget = 10
-           altKp = 1
-           altKi = 0
-           altWindupMax = 1
-           ac = altHoldClosure altitudeTarget altKp altKi altWindupMax
-           altHoldController = AltHoldController ac newAltHoldState
+main = let altHoldController = newAltHoldController 10 1 0 1
        in run altHoldController quadXAPMixer
