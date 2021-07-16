@@ -19,7 +19,7 @@ import Mixer
 import State
 import AltHoldPid
 
-run :: AltHoldController -> Mixer -> IO ()
+run :: (AltHoldFun, AltHoldState) -> Mixer -> IO ()
 run controller mixer = withSocketsDo $
 
     do 
@@ -48,10 +48,10 @@ run controller mixer = withSocketsDo $
                   let t = head v
                   let vs = makeState (tail v)
 
-                  let fun = funPart pidController
+                  let fun = fst pidController
 
                   -- Run the PID controller to get new demands
-                  let (demands, newControllerState) = fun t vs  demands (statePart pidController)
+                  let (demands, newControllerState) = fun t vs  demands (snd pidController)
 
                   -- Run the mixer on the demands to get the motor values
                   let motors = mixer demands
@@ -66,7 +66,7 @@ run controller mixer = withSocketsDo $
                   loop telemetryServerSocket
                        motorClientSocket
                        motorClientSockAddr
-                       (AltHoldController fun newControllerState )
+                       (fun, newControllerState )
 
 -- http://book.realworldhaskell.org/read/sockets-and-syslog.html
 

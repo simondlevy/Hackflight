@@ -16,13 +16,11 @@ data AltHoldState = AltHoldState { previousTime :: Double , errorIntegral :: Dou
 
 type AltHoldFun = Time -> VehicleState -> Demands -> AltHoldState -> (Demands, AltHoldState)
 
-data AltHoldController = AltHoldController { funPart :: AltHoldFun, statePart:: AltHoldState }
-
 altHoldClosure :: Double -> Double -> Double -> Double -> AltHoldFun
 
-newAltHoldController :: Double -> Double -> Double -> Double -> AltHoldController
+newAltHoldController :: Double -> Double -> Double -> Double -> (AltHoldFun, AltHoldState)
 newAltHoldController target kp ki windupMax = 
-    AltHoldController (altHoldClosure target kp ki windupMax) (AltHoldState 0 0)
+    ((altHoldClosure target kp ki windupMax), (AltHoldState 0 0))
 
 altHoldClosure target kp ki windupMax  =
 
