@@ -43,7 +43,7 @@ run controller mixer = withSocketsDo $
 
        putStrLn "Hit the Play button ..."
 
-       processMessages telemetryServerSocket motorClientSocket motorClientSocketAddress (AltHoldPidState 0 0)
+       processMessages telemetryServerSocket motorClientSocket motorClientSocketAddress newAltHoldState
 
     where processMessages telemetryServerSocket motorClientSocket motorClientSockAddr controllerState =
               do 
