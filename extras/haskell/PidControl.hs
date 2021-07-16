@@ -13,6 +13,3 @@ import AltHoldPid()
 data PidFun = AltHoldFun
 
 data PidState = AltHoldState
-
-data PidController = PidController {funPart :: PidFun, statePart :: PidState }
-
