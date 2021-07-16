@@ -19,17 +19,6 @@ import Mixer
 import State
 import AltHoldPid
 
--- Adapted from http://book.realworldhaskell.org/read/sockets-and-syslog.html
-
-makeUdpSocket :: String -> IO (Socket, SockAddr)
-makeUdpSocket port =
-    do 
-       addrInfo <- getAddrInfo (Just (defaultHints {addrFlags = [AI_PASSIVE]})) Nothing (Just port)
-       let addr = head addrInfo
-       sock <- socket (addrFamily addr) Datagram defaultProtocol
-       return (sock, (addrAddress addr))
-
-
 run :: AltHoldPid -> AltHoldState -> Mixer -> IO ()
 run controller initialControllerState mixer = withSocketsDo $
 
@@ -66,6 +55,16 @@ run controller initialControllerState mixer = withSocketsDo $
 
                   processMessages telemetryServerSocket motorClientSocket motorClientSockAddr newControllerState
                       
+
+-- http://book.realworldhaskell.org/read/sockets-and-syslog.html
+
+makeUdpSocket :: String -> IO (Socket, SockAddr)
+makeUdpSocket port =
+    do 
+       addrInfo <- getAddrInfo (Just (defaultHints {addrFlags = [AI_PASSIVE]})) Nothing (Just port)
+       let addr = head addrInfo
+       sock <- socket (addrFamily addr) Datagram defaultProtocol
+       return (sock, (addrAddress addr))
 
 -- https://stackoverflow.com/questions/20912582/haskell-bytestring-to-float-array
 
