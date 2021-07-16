@@ -12,12 +12,12 @@ module AltHoldPid where
 import State
 import Demands
 
-data AltHoldPidState = AltHoldPidState { previousTime :: Double , errorIntegral :: Double } deriving (Show)
+data AltHoldState = AltHoldState { previousTime :: Double , errorIntegral :: Double } deriving (Show)
 
-newAltHoldState :: AltHoldPidState
-newAltHoldState = AltHoldPidState 0 0
+newAltHoldState :: AltHoldState
+newAltHoldState = AltHoldState 0 0
 
-type AltHoldPid = Time -> VehicleState -> Demands -> AltHoldPidState -> (Demands, AltHoldPidState)
+type AltHoldPid = Time -> VehicleState -> Demands -> AltHoldState -> (Demands, AltHoldState)
 
 altHoldPid :: Double -> Double -> Double -> Double -> AltHoldPid
 
@@ -40,7 +40,7 @@ altHoldPid target kp ki windupMax  =
          -- Compute throttle demand, constrained to [0,1]
          u = min (kp * dzdt_error + ki * newErrorIntegral) 1
 
-    in ((Demands u 0 0 0), (AltHoldPidState time newErrorIntegral))
+    in ((Demands u 0 0 0), (AltHoldState time newErrorIntegral))
 
 constrainAbs :: Double -> Double -> Double
 constrainAbs x lim = if x < -lim then -lim else (if x > lim then lim else x)
