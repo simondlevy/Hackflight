@@ -19,9 +19,11 @@ newAltHoldState = AltHoldState 0 0
 
 type AltHoldPid = Time -> VehicleState -> Demands -> AltHoldState -> (Demands, AltHoldState)
 
-altHoldPid :: Double -> Double -> Double -> Double -> AltHoldPid
+data AltHoldPair = AltHoldPair AltHoldPid AltHoldState
 
-altHoldPid target kp ki windupMax  =
+altHoldClosure :: Double -> Double -> Double -> Double -> AltHoldPid
+
+altHoldClosure target kp ki windupMax  =
 
     \time -> \vehicleState -> \_demands -> \controllerState ->
 
