@@ -6,7 +6,7 @@
   MIT License
 --}
 
-module Multicopter (runMulticopter) where
+module Server (run) where
 
 import Control.Applicative
 import Network.Socket
@@ -30,8 +30,8 @@ makeUdpSocket port =
        return (sock, (addrAddress addr))
 
 
-runMulticopter :: PidController -> Mixer -> IO ()
-runMulticopter controller mixer = withSocketsDo $
+run :: PidController -> Mixer -> IO ()
+run controller mixer = withSocketsDo $
 
     do 
 

@@ -5,9 +5,8 @@
 --}
 
 import Mixer
-import Multicopter
+import Server
 import AltHoldPid
 
 main :: IO ()
-main = let constants = AltHoldPidConstants 10 1 0 10
-       in runMulticopter (makeAltHoldPid constants) quadXAPMixer
+main = run (altHoldPid 10 1 0 1) quadXAPMixer

@@ -6,42 +6,26 @@
   MIT License
 --}
 
-module AltHoldPid(AltHoldPidConstants(..), makeAltHoldPid) where
+module AltHoldPid(altHoldPid) where
 
 
 import State
 import Demands
 import PidControl
 
-data AltHoldPidConstants =
-    AltHoldPidConstants {
-      altitude_target ::Double
-    , altitude_Kp ::Double
-    , altitude_Ki ::Double
-    , altitude_windupMax ::Double
-    } deriving (Show)
-             
-type AltHoldPid = AltHoldPidConstants -> PidController
+altHoldPid :: Double -> Double -> Double -> Double -> PidController
 
-makeAltHoldPid :: AltHoldPid
-
-makeAltHoldPid constants =
+altHoldPid target kp ki windupMax  =
 
     \time -> \vehicleState -> \_demands -> \controllerState ->
 
     let  
-         -- Get constants 
-         ztarget = altitude_target constants
-         kp = altitude_Kp constants
-         ki = altitude_Ki constants
-         windupMax = altitude_windupMax constants
-
          -- Get vehicle state, negating for NED
          z = -(state_z vehicleState)
          dzdt = -(state_dz vehicleState)
 
          -- Compute dzdt setpoint and error
-         dzdt_error = (ztarget - z) - dzdt
+         dzdt_error = (target - z) - dzdt
 
          -- Update error integral
          dt = time - (previousTime controllerState)
