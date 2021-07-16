@@ -8,8 +8,4 @@
 
 module PidControl where
 
-import AltHoldPid()
-
-data PidFun = AltHoldFun
-
-data PidState = AltHoldState
+type PidControllerState = [Double]

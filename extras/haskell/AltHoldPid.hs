@@ -11,17 +11,18 @@ module AltHoldPid(newAltHoldController, AltHoldFun) where
 
 import State
 import Demands
+import PidControl
 
-type AltHoldFun = Time -> VehicleState -> Demands -> [Double] -> (Demands, [Double])
+type AltHoldFun = Time -> VehicleState -> Demands -> PidControllerState -> (Demands, PidControllerState)
 
-newAltHoldController :: Double -> Double -> Double -> Double -> (AltHoldFun, [Double])
+newAltHoldController :: Double -> Double -> Double -> Double -> (AltHoldFun, PidControllerState)
 newAltHoldController target kp ki windupMax = 
     ((altHoldClosure target kp ki windupMax), [0,0])
 
-errorIntegral :: [Double] -> Double
+errorIntegral :: PidControllerState -> Double
 errorIntegral controllerState = controllerState!!0
 
-previousTime :: [Double] -> Double
+previousTime :: PidControllerState -> Double
 previousTime controllerState = controllerState!!1
 
 altHoldClosure :: Double -> Double -> Double -> Double -> AltHoldFun

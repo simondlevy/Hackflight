@@ -17,9 +17,10 @@ import Data.Serialize -- from cereal
 
 import Mixer
 import State
+import PidControl(PidControllerState)
 import AltHoldPid(AltHoldFun)
 
-run :: (AltHoldFun, [Double]) -> Mixer -> IO ()
+run :: (AltHoldFun, PidControllerState) -> Mixer -> IO ()
 run controller mixer = withSocketsDo $
 
     do 
@@ -46,7 +47,7 @@ run controller mixer = withSocketsDo $
 
                   -- Parse the doubles into time and vehicle state
                   let t = head v
-                  let vs = makeState (tail v)
+                  let vs = makeVehicleState (tail v)
 
                   -- Get the function part of the PID controller
                   let controllerFun = fst pidController
