@@ -10,6 +10,7 @@ module AltHoldPid(AltHoldPidConstants(..), makeAltHoldPid) where
 
 
 import Types
+import State
 
 data AltHoldPidConstants =
     AltHoldPidConstants {

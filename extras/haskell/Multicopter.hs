@@ -16,6 +16,7 @@ import Data.Either.Utils -- from MissingH
 import Data.Serialize -- from cereal
 
 import Types
+import State
 
 -- Adapted from http://book.realworldhaskell.org/read/sockets-and-syslog.html
 
