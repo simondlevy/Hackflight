@@ -6,24 +6,24 @@
   MIT License
 --}
 
-module AltitudeController(AltitudeControllerConstants(..), makeAltitudeController) where
+module AltHoldPid(AltHoldPidConstants(..), makeAltHoldPid) where
 
 
 import Types
 
-data AltitudeControllerConstants =
-    AltitudeControllerConstants {
+data AltHoldPidConstants =
+    AltHoldPidConstants {
       altitude_target ::Double
     , altitude_Kp ::Double
     , altitude_Ki ::Double
     , altitude_windupMax ::Double
     } deriving (Show)
              
-type AltitudeController = AltitudeControllerConstants -> PidController
+type AltHoldPid = AltHoldPidConstants -> PidController
 
-makeAltitudeController :: AltitudeController
+makeAltHoldPid :: AltHoldPid
 
-makeAltitudeController constants =
+makeAltHoldPid constants =
 
     \time -> \vehicleState -> \_demands -> \controllerState ->
 

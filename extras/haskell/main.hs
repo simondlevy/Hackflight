@@ -6,8 +6,8 @@
 
 import Types
 import Multicopter
-import AltitudeController
+import AltHoldPid
 
 main :: IO ()
-main = let constants = AltitudeControllerConstants 10 1 0 10
-       in runMulticopter (makeAltitudeController constants) quadXAPMixer
+main = let constants = AltHoldPidConstants 10 1 0 10
+       in runMulticopter (makeAltHoldPid constants) quadXAPMixer

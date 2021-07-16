@@ -1,7 +1,7 @@
 ALL = main
 all: $(ALL)
 
-main: main.hs Types.hs Multicopter.hs AltitudeController.hs
+main: main.hs Types.hs Multicopter.hs AltHoldPid.hs
 	ghc -Wall main.hs
 
 run: main
@@ -10,5 +10,5 @@ clean:
 	rm -rf $(ALL) *.hi *.o
 
 edit:
-	vim AltitudeController.hs
+	vim AltHoldPid.hs
 
