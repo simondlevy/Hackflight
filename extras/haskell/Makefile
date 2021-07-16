@@ -13,5 +13,5 @@ edit:
 	vim AltHoldPid.hs
 
 commit:
-	git commit -m="More Haskell work" && git push
+	git commit -a -m="More Haskell work" && git push
 
