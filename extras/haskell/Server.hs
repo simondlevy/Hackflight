@@ -30,8 +30,8 @@ makeUdpSocket port =
        return (sock, (addrAddress addr))
 
 
-run :: AltHoldPid -> Mixer -> IO ()
-run controller mixer = withSocketsDo $
+run :: AltHoldPid -> AltHoldState -> Mixer -> IO ()
+run controller initialControllerState mixer = withSocketsDo $
 
     do 
 
@@ -43,7 +43,7 @@ run controller mixer = withSocketsDo $
 
        putStrLn "Hit the Play button ..."
 
-       processMessages telemetryServerSocket motorClientSocket motorClientSocketAddress newAltHoldState
+       processMessages telemetryServerSocket motorClientSocket motorClientSocketAddress initialControllerState
 
     where processMessages telemetryServerSocket motorClientSocket motorClientSockAddr controllerState =
               do 
@@ -56,7 +56,9 @@ run controller mixer = withSocketsDo $
                   let vs = makeState (tail v)
 
                   let (demands, newControllerState) = controller t vs  demands controllerState
+
                   let motors = mixer demands
+
                   _ <- Network.Socket.ByteString.sendTo
                         motorClientSocket
                         (doublesToBytes [(m1 motors), (m2 motors), (m3 motors), (m4 motors)])

@@ -9,4 +9,4 @@ import Server
 import AltHoldPid
 
 main :: IO ()
-main = run (altHoldPid 10 1 0 1) quadXAPMixer
+main = run (altHoldPid 10 1 0 1) newAltHoldState quadXAPMixer
