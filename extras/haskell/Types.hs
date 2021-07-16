@@ -9,14 +9,7 @@
 module Types where
 
 import State
-
-data Demands = Demands { throttle :: Double
-                       , roll :: Double  
-                       , pitch :: Double  
-                       , yaw :: Double  
-                     } deriving (Show)
-
--------------------------------------------------------
+import Demands
 
 -- XXX should support different numbers of motors
 data Motors = Motors { m1 :: Double
