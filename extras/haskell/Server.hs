@@ -32,17 +32,9 @@ run controller mixer = withSocketsDo $
 
        putStrLn "Hit the Play button ..."
 
-       loop telemetryServerSocket
-            motorClientSocket
-            motorClientSocketAddress
-            (fun controller)
-            (state controller)
+       loop telemetryServerSocket motorClientSocket motorClientSocketAddress controller 
 
-    where loop telemetryServerSocket
-               motorClientSocket
-               motorClientSockAddr
-               controllerFun
-               controllerState  =
+    where loop telemetryServerSocket motorClientSocket motorClientSockAddr pidController  =
 
               do 
 
@@ -56,8 +48,10 @@ run controller mixer = withSocketsDo $
                   let t = head v
                   let vs = makeState (tail v)
 
+                  let controllerFun = fun pidController
+
                   -- Run the PID controller to get new demands
-                  let (demands, newControllerState) = controllerFun t vs  demands controllerState
+                  let (demands, newControllerState) = controllerFun t vs  demands (state pidController)
 
                   -- Run the mixer on the demands to get the motor values
                   let motors = mixer demands
@@ -72,9 +66,7 @@ run controller mixer = withSocketsDo $
                   loop telemetryServerSocket
                        motorClientSocket
                        motorClientSockAddr
-                       controllerFun
-                       newControllerState
-                      
+                       (AltHoldController controllerFun newControllerState )
 
 -- http://book.realworldhaskell.org/read/sockets-and-syslog.html
 
