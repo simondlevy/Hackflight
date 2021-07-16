@@ -9,9 +9,7 @@
 module AltitudeController(AltitudeControllerConstants(..), makeAltitudeController) where
 
 
-import Demands
-import State
-import PidController
+import Types
 
 data AltitudeControllerConstants =
     AltitudeControllerConstants {

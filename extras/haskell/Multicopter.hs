@@ -6,7 +6,7 @@
   MIT License
 --}
 
-module Server (runMulticopter) where
+module Multicopter (runMulticopter) where
 
 import Control.Applicative
 import Network.Socket
@@ -15,9 +15,7 @@ import Data.ByteString.Internal
 import Data.Either.Utils -- from MissingH
 import Data.Serialize -- from cereal
 
-import Mixer
-import State
-import PidController
+import Types
 
 -- Adapted from http://book.realworldhaskell.org/read/sockets-and-syslog.html
 
@@ -46,10 +44,8 @@ runMulticopter controller mixer = withSocketsDo $
        processMessages telemetryServerSocket motorClientSocket motorClientSocketAddress (PidControllerState 0 0)
 
     where processMessages telemetryServerSocket motorClientSocket motorClientSockAddr controllerState =
-
               do 
 
-                  -- 1 time value, 12 state values = 13 double precision values = 104 bytes
                   (msgIn, _) <- Network.Socket.ByteString.recvFrom telemetryServerSocket 104
 
                   let v = bytesToDoubles msgIn
@@ -58,9 +54,7 @@ runMulticopter controller mixer = withSocketsDo $
                   let vs = makeState (tail v)
 
                   let (demands, newControllerState) = controller t vs  demands controllerState
-
                   let motors = mixer demands
-
                   _ <- Network.Socket.ByteString.sendTo
                         motorClientSocket
                         (doublesToBytes [(m1 motors), (m2 motors), (m3 motors), (m4 motors)])
