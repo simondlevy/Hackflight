@@ -19,7 +19,7 @@ newAltHoldState = AltHoldState 0 0
 
 type AltHoldPid = Time -> VehicleState -> Demands -> AltHoldState -> (Demands, AltHoldState)
 
-data AltHoldPair = AltHoldPair AltHoldPid AltHoldState
+data AltHoldPair = AltHoldPair { pid :: AltHoldPid, state:: AltHoldState }
 
 altHoldClosure :: Double -> Double -> Double -> Double -> AltHoldPid
 
