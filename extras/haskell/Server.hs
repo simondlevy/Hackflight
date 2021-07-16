@@ -48,10 +48,10 @@ run controller mixer = withSocketsDo $
                   let t = head v
                   let vs = makeState (tail v)
 
-                  let fun = controllerFun pidController
+                  let fun = funPart pidController
 
                   -- Run the PID controller to get new demands
-                  let (demands, newControllerState) = fun t vs  demands (controllerState pidController)
+                  let (demands, newControllerState) = fun t vs  demands (statePart pidController)
 
                   -- Run the mixer on the demands to get the motor values
                   let motors = mixer demands

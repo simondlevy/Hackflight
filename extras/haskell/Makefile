@@ -10,9 +10,6 @@ run: Hackflight
 clean:
 	rm -rf $(ALL) *.hi *.o
 
-edit:
-	vim AltHoldPid.hs
-
 commit:
 	git commit -a -m="More Haskell work" && git push
 
