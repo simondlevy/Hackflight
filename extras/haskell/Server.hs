@@ -32,7 +32,10 @@ run controller initialControllerState mixer = withSocketsDo $
 
        putStrLn "Hit the Play button ..."
 
-       loop telemetryServerSocket motorClientSocket motorClientSocketAddress initialControllerState
+       loop telemetryServerSocket
+            motorClientSocket
+            motorClientSocketAddress
+            initialControllerState
 
     where loop telemetryServerSocket motorClientSocket motorClientSockAddr controllerState =
 
