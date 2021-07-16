@@ -4,7 +4,7 @@
   MIT License
 --}
 
-import Types
+import Mixer
 import Multicopter
 import AltHoldPid
 

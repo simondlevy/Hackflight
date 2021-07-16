@@ -1,12 +1,12 @@
 {--
-  Types for Multicopter
+  Mixer type
 
   Copyright(C) 2021 Simon D.Levy
 
   MIT License
 --}
 
-module Types where
+module Mixer where
 
 import Demands
 
@@ -16,8 +16,6 @@ data Motors = Motors { m1 :: Double
                      , m3 :: Double  
                      , m4 :: Double  
                      } deriving (Show)
-
--------------------------------------------------------
 
 type Mixer = Demands -> Motors
 

@@ -1,7 +1,7 @@
 ALL = main
 all: $(ALL)
 
-main: main.hs Types.hs Multicopter.hs AltHoldPid.hs
+main: main.hs Mixer.hs Multicopter.hs AltHoldPid.hs
 	ghc -Wall main.hs
 
 run: main
