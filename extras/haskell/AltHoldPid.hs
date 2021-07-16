@@ -14,6 +14,9 @@ import Demands
 
 data AltHoldPidState = AltHoldPidState { previousTime :: Double , errorIntegral :: Double } deriving (Show)
 
+newAltHoldState :: AltHoldPidState
+newAltHoldState = AltHoldPidState 0 0
+
 type AltHoldPid = Time -> VehicleState -> Demands -> AltHoldPidState -> (Demands, AltHoldPidState)
 
 altHoldPid :: Double -> Double -> Double -> Double -> AltHoldPid
