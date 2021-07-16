@@ -8,7 +8,6 @@
 
 module Types where
 
-import State
 import Demands
 
 -- XXX should support different numbers of motors
@@ -32,11 +31,3 @@ quadXAPMixer demands =
               (t + r + p - y)
               (t + r - p + y)
               (t - r + p + y)
-     
--------------------------------------------------------
-
-data PidControllerState = PidControllerState { previousTime :: Double 
-                                             , errorIntegral :: Double
-                                             } deriving (Show)
-
-type PidController = Time -> VehicleState -> Demands -> PidControllerState -> (Demands, PidControllerState)

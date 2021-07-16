@@ -9,9 +9,9 @@
 module AltHoldPid(AltHoldPidConstants(..), makeAltHoldPid) where
 
 
-import Types
 import State
 import Demands
+import PidControl
 
 data AltHoldPidConstants =
     AltHoldPidConstants {
