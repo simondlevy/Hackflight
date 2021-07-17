@@ -17,9 +17,9 @@ import Data.Serialize -- from cereal
 
 import Mixer
 import State
-import PidControl(PidControllerFun, PidControllerState)
+import PidControl(AltHoldFun, AltHoldState)
 
-run :: (PidControllerFun, PidControllerState) -> Mixer -> IO ()
+run :: (AltHoldFun, AltHoldState) -> Mixer -> IO ()
 run controller mixer = withSocketsDo $
 
     do 

@@ -11,21 +11,21 @@ module PidControl where
 import State
 import Demands
 
-type PidControllerState = [Double]
+data AltHoldState = AltHoldState { errorI :: Double, timePrev :: Double } deriving (Show)
 
-type PidControllerFun = Time -> VehicleState -> Demands -> PidControllerState -> (Demands, PidControllerState)
+type AltHoldFun = Time -> VehicleState -> Demands -> AltHoldState -> (Demands, AltHoldState)
 
-newAltHoldController :: Double -> Double -> Double -> Double -> (PidControllerFun, PidControllerState)
+newAltHoldController :: Double -> Double -> Double -> Double -> (AltHoldFun, AltHoldState)
 newAltHoldController target kp ki windupMax = 
-    ((altHoldClosure target kp ki windupMax), [0,0])
+    ((altHoldClosure target kp ki windupMax), (AltHoldState 0 0))
 
-errorIntegral :: PidControllerState -> Double
-errorIntegral controllerState = controllerState!!0
+errorIntegral :: AltHoldState -> Double
+errorIntegral (AltHoldState e _) = e
 
-previousTime :: PidControllerState -> Double
-previousTime controllerState = controllerState!!1
+previousTime :: AltHoldState -> Double
+previousTime (AltHoldState _ t) = t
 
-altHoldClosure :: Double -> Double -> Double -> Double -> PidControllerFun
+altHoldClosure :: Double -> Double -> Double -> Double -> AltHoldFun
 altHoldClosure target kp ki windupMax  =
 
     \time -> \vehicleState -> \_demands -> \controllerState ->
@@ -45,7 +45,7 @@ altHoldClosure target kp ki windupMax  =
          -- Compute throttle demand, constrained to [0,1]
          u = min (kp * dzdt_error + ki * newErrorIntegral) 1
 
-    in ((Demands u 0 0 0), [time, newErrorIntegral])
+    in ((Demands u 0 0 0), (AltHoldState time newErrorIntegral))
 
 --------------------------------------------------------------------------------
 
