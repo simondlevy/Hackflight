@@ -6,7 +6,7 @@
   MIT License
 --}
 
-module PidControl where
+module PidControl(PidFun, PidState, newAltHoldController) where
 
 import State
 import Demands
