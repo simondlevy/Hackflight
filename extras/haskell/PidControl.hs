@@ -11,21 +11,21 @@ module PidControl where
 import State
 import Demands
 
-data AltHoldState = AltHoldState { errorI :: Double, timePrev :: Double } deriving (Show)
+data PidState = AltHoldState Double Double
 
-type AltHoldFun = Time -> VehicleState -> Demands -> AltHoldState -> (Demands, AltHoldState)
+type PidFun = Time -> VehicleState -> Demands -> PidState -> (Demands, PidState)
 
-newAltHoldController :: Double -> Double -> Double -> Double -> (AltHoldFun, AltHoldState)
+newAltHoldController :: Double -> Double -> Double -> Double -> (PidFun, PidState)
 newAltHoldController target kp ki windupMax = 
     ((altHoldClosure target kp ki windupMax), (AltHoldState 0 0))
 
-errorIntegral :: AltHoldState -> Double
+errorIntegral :: PidState -> Double
 errorIntegral (AltHoldState e _) = e
 
-previousTime :: AltHoldState -> Double
+previousTime :: PidState -> Double
 previousTime (AltHoldState _ t) = t
 
-altHoldClosure :: Double -> Double -> Double -> Double -> AltHoldFun
+altHoldClosure :: Double -> Double -> Double -> Double -> PidFun
 altHoldClosure target kp ki windupMax  =
 
     \time -> \vehicleState -> \_demands -> \controllerState ->
@@ -51,4 +51,3 @@ altHoldClosure target kp ki windupMax  =
 
 constrainAbs :: Double -> Double -> Double
 constrainAbs x lim = if x < -lim then -lim else (if x > lim then lim else x)
-
