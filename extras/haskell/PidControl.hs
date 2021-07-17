@@ -15,15 +15,20 @@ type PidControllerState = [Double]
 
 type PidControllerFun = Time -> VehicleState -> Demands -> PidControllerState ->(Demands, PidControllerState)
 
---------------------------------------------------------------------------------
-
 data AltHoldState = AltHoldState Double Double
 
-errorI :: AltHoldState -> Double
-errorI (AltHoldState e _) = e
+data YawPidState = YawPidState Double
 
-prevTime :: AltHoldState -> Double
-prevTime (AltHoldState _ t) = t
+type PidControlStates = AltHoldState
+
+altHoldErrorI :: AltHoldState -> Double
+altHoldErrorI (AltHoldState e _) = e
+
+altHoldPrevTime :: AltHoldState -> Double
+altHoldPrevTime (AltHoldState _ t) = t
+
+yawErrorI :: YawPidState -> Double
+yawErrorI (YawPidState e)  = e
 
 newAltHoldController :: Double -> Double -> Double -> Double -> (PidControllerFun, PidControllerState)
 newAltHoldController target kp ki windupMax = 
