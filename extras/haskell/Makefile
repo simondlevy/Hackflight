@@ -1,8 +1,12 @@
-ALL = Hackflight
+ALL = Hackflight test
 all: $(ALL)
 
 Hackflight: Hackflight.hs Mixer.hs Server.hs PidControl.hs
 	ghc -Wall Hackflight.hs
+	rm -f *.hi *.o
+
+test: test.hs
+	ghc -Wall test.hs
 	rm -f *.hi *.o
 
 run: Hackflight

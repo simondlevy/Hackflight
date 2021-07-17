@@ -13,22 +13,7 @@ import Demands
 
 type PidControllerState = [Double]
 
-type PidControllerFun = Time -> VehicleState -> Demands -> PidControllerState ->(Demands, PidControllerState)
-
-data AltHoldState = AltHoldState Double Double
-
-data YawPidState = YawPidState Double
-
-type PidControlStates = AltHoldState
-
-altHoldErrorI :: AltHoldState -> Double
-altHoldErrorI (AltHoldState e _) = e
-
-altHoldPrevTime :: AltHoldState -> Double
-altHoldPrevTime (AltHoldState _ t) = t
-
-yawErrorI :: YawPidState -> Double
-yawErrorI (YawPidState e)  = e
+type PidControllerFun = Time -> VehicleState -> Demands -> PidControllerState -> (Demands, PidControllerState)
 
 newAltHoldController :: Double -> Double -> Double -> Double -> (PidControllerFun, PidControllerState)
 newAltHoldController target kp ki windupMax = 
