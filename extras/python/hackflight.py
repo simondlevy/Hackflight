@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 '''
-Hackflight in PythoSimple take-off-and-move-forward scriptn
+Hackflight in Python
+
+Uses MulticopterSim SocketModule
 
 Copyright (C) 2021 S.Basnet, N. Manaye, N. Nguyen, S.D. Levy
 
@@ -16,7 +18,6 @@ import socket
 from sys import stdout
 from time import sleep
 
-from receiver import receiver
 from mixers import mixer_quadxap, mixer_coaxial
 from pidcontrollers import (rate_pid, level_pid, yaw_pid,
                             alt_hold_pid, pos_hold_pid)
@@ -41,8 +42,7 @@ def _udpsocket():
 
 
 def _run_telemetry(host, motor_port, telemetry_server_socket,
-                   motor_client_socket, get_receiver_demands, pid_controllers,
-                   mixer, done):
+                   motor_client_socket, pid_controllers, mixer, done):
 
     running = False
 
@@ -51,7 +51,7 @@ def _run_telemetry(host, motor_port, telemetry_server_socket,
     while True:
 
         try:
-            data, _ = telemetry_server_socket.recvfrom(8*13)
+            data, _ = telemetry_server_socket.recvfrom(8*17)
         except Exception:
             done[0] = True
             break
@@ -61,7 +61,7 @@ def _run_telemetry(host, motor_port, telemetry_server_socket,
         telem = np.frombuffer(data)
 
         # time = telem[0]
-        vehicle_state = telem[1:]
+        vehicle_state = telem[1:13]
 
         if not running:
             _debug('Running')
@@ -72,8 +72,8 @@ def _run_telemetry(host, motor_port, telemetry_server_socket,
             telemetry_server_socket.close()
             break
 
-        # Start with demands from receiver
-        demands = np.array(list(get_receiver_demands()))
+        # Start with demands from controller
+        demands = telem[13:]
 
         # Pass demands through closed-loop controllers
         for k, p in enumerate(pid_controllers):
@@ -112,8 +112,6 @@ def main(host='127.0.0.1',
         print('Unrecognized vehicle: %s' % args.vehicle)
         exit(1)
 
-    receiver_object, receiver_update, receiver_get = receiver()
-
     mixer = mixer_dict[args.vehicle]
 
     pid_controllers = (pos_hold_pid(), rate_pid(), yaw_pid(),
@@ -142,7 +140,7 @@ def main(host='127.0.0.1',
     # Start telemetry thread
     Thread(target=_run_telemetry,
            args=(host, motor_port, telemetry_server_socket,
-                 motor_client_socket, receiver_get, pid_controllers, mixer,
+                 motor_client_socket, pid_controllers, mixer,
                  done)).start()
 
     while not done[0]:
@@ -161,8 +159,6 @@ def main(host='127.0.0.1',
             image = cv2.cvtColor(rgba_image, cv2.COLOR_RGBA2RGB)
 
             _handleImage(image)
-
-        receiver_update(receiver_object)
 
 
 main()
