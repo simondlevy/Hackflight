@@ -38,21 +38,22 @@ run controller mixer = withSocketsDo $
 
               do 
 
-                  -- Get raw bytes for time and 12D state vector from client (sim)
-                  (msgIn, _) <- Network.Socket.ByteString.recvFrom telemetryServerSocket 104
+                  -- Get raw bytes for time, 12D state vector, and stick demands from client (sim)
+                  (msgIn, _) <- Network.Socket.ByteString.recvFrom telemetryServerSocket 136
 
                   -- Convert bytes to a list of doubles
-                  let v = bytesToDoubles msgIn
+                  let doubles = bytesToDoubles msgIn
 
-                  -- Parse the doubles into time and vehicle state
-                  let t = head v
-                  let vs = makeVehicleState (tail v)
+                  -- Parse the doubles into timed, vehicle state, and stick demands
+                  let time = head doubles
+                  let vehicleState = makeVehicleState (slice doubles 1 13)
+                  let demands = slice doubles 13 17
 
                   -- Get the function part of the PID controller
                   let controllerFun = fst pidController
 
                   -- Run the PID controller to get new demands
-                  let (demands, newControllerState) = controllerFun t vs  demands (snd pidController)
+                  let (demands, newControllerState) = controllerFun time vehicleState  demands (snd pidController)
 
                   -- Run the mixer on the demands to get the motor values
                   let motors = mixer demands
@@ -86,3 +87,8 @@ doublesToBytes = runPut . mapM_ putFloat64le
 
 bytesToDoubles :: ByteString -> [Double]
 bytesToDoubles bs = (fromRight ((runGet $ many getFloat64le) bs))
+
+-- https://stackoverflow.com/a/4597898
+
+slice :: [a] -> Int -> Int -> [a]
+slice xs from to = take (to - from + 1) (drop from xs)
