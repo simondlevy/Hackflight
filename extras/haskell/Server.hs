@@ -47,7 +47,9 @@ run controller mixer = withSocketsDo $
                   -- Parse the doubles into timed, vehicle state, and stick demands
                   let time = head doubles
                   let vehicleState = makeVehicleState (slice doubles 1 13)
-                  -- let demands = slice doubles 13 17
+                  let stickDemands = slice doubles 13 17
+
+                  print stickDemands
 
                   -- Get the function part of the PID controller
                   let controllerFun = fst pidController
@@ -64,7 +66,7 @@ run controller mixer = withSocketsDo $
                         (doublesToBytes [(m1 motors), (m2 motors), (m3 motors), (m4 motors)])
                         motorClientSockAddr
 
-                  -- Repeat
+                  -- Repeat until user presses top button
                   if time > 0 then
                       loop telemetryServerSocket
                            motorClientSocket
