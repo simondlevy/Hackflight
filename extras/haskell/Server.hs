@@ -47,7 +47,7 @@ run controller mixer = withSocketsDo $
                   -- Parse the doubles into timed, vehicle state, and stick demands
                   let time = head doubles
                   let vehicleState = makeVehicleState (slice doubles 1 13)
-                  let demands = slice doubles 13 17
+                  -- let demands = slice doubles 13 17
 
                   -- Get the function part of the PID controller
                   let controllerFun = fst pidController
@@ -65,10 +65,13 @@ run controller mixer = withSocketsDo $
                         motorClientSockAddr
 
                   -- Repeat
-                  loop telemetryServerSocket
-                       motorClientSocket
-                       motorClientSockAddr
-                       (controllerFun, newControllerState )
+                  if time > 0 then
+                      loop telemetryServerSocket
+                           motorClientSocket
+                           motorClientSockAddr
+                           (controllerFun, newControllerState )
+                  else
+                      putStrLn "Done"
 
 -- http://book.realworldhaskell.org/read/sockets-and-syslog.html
 
