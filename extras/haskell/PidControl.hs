@@ -15,7 +15,9 @@ module PidControl(PidController,
 import State
 import Demands
 
-data PidState = AltHoldState Double Double 
+data PidState =
+    AltHoldState { errorIntegral :: Double,
+                   previousTime ::  Double }
 
 type PidFun = Time -> VehicleState -> Demands -> PidState 
               -> (Demands, PidState)
@@ -28,12 +30,6 @@ newPidController f s = PidController f s
 newAltHoldController :: Double -> Double -> Double -> Double -> PidController
 newAltHoldController target kp ki windupMax = 
     PidController (altHoldClosure target kp ki windupMax) (AltHoldState 0 0)
-
-errorIntegral :: PidState -> Double
-errorIntegral (AltHoldState e _) = e
-
-previousTime :: PidState -> Double
-previousTime (AltHoldState _ t) = t
 
 altHoldClosure :: Double -> Double -> Double -> Double -> PidFun
 altHoldClosure target kp ki windupMax  =
