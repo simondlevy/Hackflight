@@ -15,7 +15,7 @@ import Demands
 
 data PidState = AltHoldState Double Double
 
-type PidFun = Time -> VehicleState -> Demands -> PidState -> (Demands, PidState)
+type PidFun = Time -> Demands -> PidState -> (Demands, PidState)
 
 loop :: (PidFun, PidState) -> (PidFun, PidState)
 
@@ -23,10 +23,8 @@ loop pidController  =
 
       let t = 0
 
-          s = VehicleState 0 0 0 0 0 0 0 0 0 0 0 0
-
           controllerFun = fst pidController
 
-          (d, n) = controllerFun t s d (snd pidController)
+          (d, n) = controllerFun t d (snd pidController)
 
       in loop (controllerFun, n)
