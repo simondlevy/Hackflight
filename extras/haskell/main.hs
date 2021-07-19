@@ -11,5 +11,5 @@ import PidControl(newAltHoldController)
 
 main :: IO ()
 
-main = let altHoldController = newAltHoldController 10 1 0 1
+main = let altHoldController = newAltHoldController 1 0 1
        in runServer hackflightFun altHoldController quadXAPMixer

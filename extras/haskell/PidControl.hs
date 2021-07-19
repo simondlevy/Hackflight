@@ -30,12 +30,12 @@ newPidController f s = PidController f s
 
 ----------------------------- Altitude hold ----------------------------------
 
-newAltHoldController :: Double -> Double -> Double -> Double -> PidController
-newAltHoldController target kp ki windupMax = 
-    PidController (altHoldClosure target kp ki windupMax) (AltHoldState 0 0 False)
+newAltHoldController :: Double -> Double -> Double -> PidController
+newAltHoldController kp ki windupMax = 
+    PidController (altHoldClosure kp ki windupMax) (AltHoldState 0 0 False)
 
-altHoldClosure :: Double -> Double -> Double -> Double -> PidFun
-altHoldClosure target kp ki windupMax  =
+altHoldClosure :: Double -> Double -> Double -> PidFun
+altHoldClosure kp ki windupMax  =
 
     \time -> \vehicleState -> \demands -> \controllerState ->
 
@@ -46,7 +46,7 @@ altHoldClosure target kp ki windupMax  =
          dzdt = -(state_dz vehicleState)
 
          -- Compute dzdt setpoint and error
-         dzdt_error = (target - z) - dzdt
+         dzdt_error = (0 - z) - dzdt
 
          -- Update error integral
          dt = time - (previousTime controllerState)
