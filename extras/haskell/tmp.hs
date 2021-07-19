@@ -4,7 +4,7 @@ where
 
 import Demands
 
-data S = AltHoldState Double Double
+data S = A Double Double
 
 type F = Double -> Demands -> S -> (Demands, S)
 
