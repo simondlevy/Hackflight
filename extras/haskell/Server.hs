@@ -20,8 +20,17 @@ import Mixer
 import State
 import PidControl(PidFun, PidState)
 
-getMotors :: Mixer -> Demands -> Motors
-getMotors mixer demands = mixer demands
+runPids :: Demands -> Time -> VehicleState -> (PidFun, PidState) -> Mixer 
+           -> (Motors, (PidFun, PidState))
+runPids demands time vstate controller mixer = 
+
+  -- Run the PID controller to get new demands and controller state
+  let (newDemands, newControllerState) = (fst controller) time vstate demands (snd controller)
+
+  -- Run the mixer on the new demands to get the motors, then return them and the new
+  -- controller state
+  in ((mixer newDemands), ((fst controller), newControllerState))
+
 
 run :: (PidFun, PidState) -> Mixer -> IO ()
 run controller mixer = withSocketsDo $
@@ -55,17 +64,12 @@ run controller mixer = withSocketsDo $
                                                   (d!!7) (d!!8) (d!!9) (d!!10) (d!!11) (d!!12)
                   let stickDemands = Demands (d!!13) (d!!14) (d!!15) (d!!16)
 
-                  -- Get the function part of the PID controller
-                  let controllerFun = fst pidController
-
-                  -- Run the PID controller to get new demands
-                  let (demands, newControllerState) = controllerFun time
-                                                                    vehicleState
-                                                                    stickDemands
-                                                                    (snd pidController)
-
                   -- Run the mixer on the demands to get the motor values
-                  let motors = getMotors mixer demands
+                  let (motors, newPidController)  = runPids stickDemands
+                                                            time
+                                                            vehicleState
+                                                            pidController
+                                                            mixer
 
                   -- Send the motor values to the client
                   _ <- Network.Socket.ByteString.sendTo
@@ -78,7 +82,7 @@ run controller mixer = withSocketsDo $
                       loop telemetryServerSocket
                            motorClientSocket
                            motorClientSockAddr
-                           (controllerFun, newControllerState )
+                           newPidController
                   else
                       putStrLn "Done"
 
