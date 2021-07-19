@@ -6,7 +6,7 @@
   MIT License
 --}
 
-module Hackflight
+module Hackflight(HackflightFun, hackflightFun)
 
 where
 
