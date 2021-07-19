@@ -66,7 +66,7 @@ runServer hackflightFun pidController mixer = withSocketsDo $
                         (doublesToBytes [(m1 motors), (m2 motors), (m3 motors), (m4 motors)])
                         motorClientSockAddr
 
-                  -- Repeat until user presses top button
+                  -- Repeat until user presses stop button in simulator
                   if time > 0 then
                       loop telemetryServerSocket
                            motorClientSocket
