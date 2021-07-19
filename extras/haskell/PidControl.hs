@@ -18,6 +18,7 @@ import Demands
 data PidState =
     AltHoldState { errorIntegral :: Double,
                    previousTime ::  Double,
+                   target :: Double,
                    inBand :: Bool }
 
 type PidFun = Time -> VehicleState -> Demands -> PidState 
@@ -32,7 +33,7 @@ newPidController f s = PidController f s
 
 newAltHoldController :: Double -> Double -> Double -> PidController
 newAltHoldController kp ki windupMax = 
-    PidController (altHoldClosure kp ki windupMax) (AltHoldState 0 0 False)
+    PidController (altHoldClosure kp ki windupMax) (AltHoldState 0 0 0 False)
 
 altHoldClosure :: Double -> Double -> Double -> PidFun
 altHoldClosure kp ki windupMax  =
@@ -58,7 +59,7 @@ altHoldClosure kp ki windupMax  =
                  (roll demands)
                  (pitch demands)
                  (yaw demands)),
-        (AltHoldState time newErrorIntegral False))
+        (AltHoldState time newErrorIntegral 0 False))
 
 
 --------------------------------- Helpers --------------------------------------
