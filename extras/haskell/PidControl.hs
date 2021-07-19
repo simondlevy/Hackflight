@@ -50,8 +50,9 @@ altHoldClosure kp ki windupMax stickDeadband =
 
          throttleDemand = throttle demands
 
-         inBand = in_band throttleDemand stickDeadband
+         inband = in_band throttleDemand stickDeadband
 
+         movedInBand = inband && not (inBand controllerState)
 
          -- Get vehicle state, negating for NED
          z = -(state_z vehicleState)
