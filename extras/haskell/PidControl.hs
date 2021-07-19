@@ -52,8 +52,8 @@ altHoldClosure kp ki windupMax stickDeadband =
 
          -- Update error integral
          dt = time - (previousTime controllerState)
-         newErrorIntegral =constrainAbs((errorIntegral controllerState) +
-                                        dzdt_error * dt) windupMax
+         newErrorIntegral = constrain_abs((errorIntegral controllerState) +
+                                         dzdt_error * dt) windupMax
 
     -- Compute throttle demand, constrained to [0,1]
     in ((Demands (min (kp * dzdt_error + ki * newErrorIntegral) 1)
@@ -65,5 +65,8 @@ altHoldClosure kp ki windupMax stickDeadband =
 
 --------------------------------- Helpers --------------------------------------
 
-constrainAbs :: Double -> Double -> Double
-constrainAbs x lim = if x < -lim then -lim else (if x > lim then lim else x)
+constrain_abs :: Double -> Double -> Double
+constrain_abs x lim = if x < -lim then -lim else (if x > lim then lim else x)
+
+in_band :: Double -> Double -> Bool
+in_band value band = abs(value) < band
