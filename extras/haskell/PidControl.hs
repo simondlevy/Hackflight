@@ -31,12 +31,13 @@ newPidController f s = PidController f s
 
 ----------------------------- Altitude hold ----------------------------------
 
-newAltHoldController :: Double -> Double -> Double -> PidController
-newAltHoldController kp ki windupMax = 
-    PidController (altHoldClosure kp ki windupMax) (AltHoldState 0 0 0 False)
+newAltHoldController :: Double -> Double -> Double -> Double -> PidController
+newAltHoldController kp ki windupMax stickDeadband = 
+    PidController (altHoldClosure kp ki windupMax stickDeadband)
+                  (AltHoldState 0 0 0 False)
 
-altHoldClosure :: Double -> Double -> Double -> PidFun
-altHoldClosure kp ki windupMax  =
+altHoldClosure :: Double -> Double -> Double -> Double -> PidFun
+altHoldClosure kp ki windupMax stickDeadband =
 
     \time -> \vehicleState -> \demands -> \controllerState ->
 
