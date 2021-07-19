@@ -183,9 +183,11 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
         debug(controller_state['errorI'])
 
         # Reset controller when moving into deadband
-        if inBand and not controller_state['inBand']:
-            controller_state['errorI'] = 0
-            controller_state['targetAltitude'] = altitude
+        controller_state = ({'errorI': 0,
+                             'targetAltitude': altitude,
+                             'inBand': True}
+                            if inBand and not controller_state['inBand']
+                            else controller_state)
 
         # Target velocity is a setpoint inside deadband, scaled
         # constant outside
