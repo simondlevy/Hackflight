@@ -37,7 +37,7 @@ newAltHoldController target kp ki windupMax =
 altHoldClosure :: Double -> Double -> Double -> Double -> PidFun
 altHoldClosure target kp ki windupMax  =
 
-    \time -> \vehicleState -> \_demands -> \controllerState ->
+    \time -> \vehicleState -> \demands -> \controllerState ->
 
     let  
 
@@ -56,7 +56,11 @@ altHoldClosure target kp ki windupMax  =
          -- Compute throttle demand, constrained to [0,1]
          u = min (kp * dzdt_error + ki * newErrorIntegral) 1
 
-    in ((Demands u 0 0 0), (AltHoldState time newErrorIntegral False))
+    in ((Demands u
+                 (roll demands)
+                 (pitch demands)
+                 (yaw demands)),
+        (AltHoldState time newErrorIntegral False))
 
 
 --------------------------------- Helpers --------------------------------------
