@@ -44,6 +44,14 @@ altHoldClosure kp ki windupMax stickDeadband =
     let  
          errorI = errorIntegral controllerState
          targetAltitude = target controllerState
+ 
+         -- NED => ENU
+         altitude = -(state_z vehicleState)
+
+         throttleDemand = throttle demands
+
+         inBand = in_band throttleDemand stickDeadband
+
 
          -- Get vehicle state, negating for NED
          z = -(state_z vehicleState)
