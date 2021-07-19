@@ -196,13 +196,12 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
         # Accumualte error integral
         errorI = _constrainAbs(new_controller_state['errorI'] + error,
                                windupMax)
-
-        # Update demands
-        new_demands = demands.copy()
-        new_demands[THROTTLE] = error * Kp + errorI * Ki
-
+        # Return updated demands and controller state
         return (
-                new_demands,
+                np.array([error * Kp + errorI * Ki,
+                         demands[ROLL],
+                         demands[PITCH],
+                         demands[YAW]]),
 
                 {'errorI': errorI,
                  'targetAltitude': new_controller_state['targetAltitude'],
