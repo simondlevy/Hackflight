@@ -39,6 +39,7 @@ altHoldClosure target kp ki windupMax  =
     \time -> \vehicleState -> \_demands -> \controllerState ->
 
     let  
+
          -- Get vehicle state, negating for NED
          z = -(state_z vehicleState)
          dzdt = -(state_dz vehicleState)
@@ -55,6 +56,7 @@ altHoldClosure target kp ki windupMax  =
          u = min (kp * dzdt_error + ki * newErrorIntegral) 1
 
     in ((Demands u 0 0 0), (AltHoldState time newErrorIntegral))
+
 
 --------------------------------- Helpers --------------------------------------
 
