@@ -4,16 +4,14 @@ where
 
 data S = A Double Double
 
-type F = Double -> Double -> S -> (Double, S)
+type F = Double -> S -> (Double, S)
 
 loop :: (F, S) -> (F, S)
 
 loop p  =
 
-      let t = 0
+      let f = fst p
 
-          f = fst p
-
-          (d, n) = f t d (snd p)
+          (d, n) = f d (snd p)
 
       in loop (f, n)
