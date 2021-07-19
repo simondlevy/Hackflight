@@ -1,4 +1,4 @@
-ALL = Hackflight
+ALL = Hackflight tmp.o
 all: $(ALL)
 
 Hackflight: Hackflight.hs Mixer.hs Server.hs PidControl.hs
@@ -22,6 +22,9 @@ PidControl.o: PidControl.hs State.o Demands.o
 
 Server.o: Server.hs Mixer.o State.o PidControl.o
 	ghc -Wall Server.hs
+
+tmp.o: tmp.hs Mixer.o State.o PidControl.o
+	ghc -Wall tmp.hs
 
 run: Hackflight
 	./Hackflight
