@@ -48,7 +48,7 @@ altHoldClosure kp ki windupMax stickDeadband =
          dzdt = -(state_dz vehicleState)
 
          -- Compute dzdt setpoint and error
-         dzdt_error = (0 - z) - dzdt
+         dzdt_error = ((target controllerState) - z) - dzdt
 
          -- Update error integral
          dt = time - (previousTime controllerState)
