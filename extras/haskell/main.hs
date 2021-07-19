@@ -5,7 +5,7 @@
 --}
 
 import Hackflight(hackflightFun)
-import Mixer
+import Mixer(quadXAPMixer)
 import Server(runServer)
 import PidControl(newAltHoldController)
 
