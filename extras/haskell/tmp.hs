@@ -4,18 +4,18 @@ where
 
 import Demands
 
-data PidState = AltHoldState Double Double
+data S = AltHoldState Double Double
 
-type PidFun = Double -> Demands -> PidState -> (Demands, PidState)
+type F = Double -> Demands -> S -> (Demands, S)
 
-loop :: (PidFun, PidState) -> (PidFun, PidState)
+loop :: (F, S) -> (F, S)
 
-loop pidController  =
+loop pc  =
 
       let t = 0
 
-          controllerFun = fst pidController
+          controllerFun = fst pc
 
-          (d, n) = controllerFun t d (snd pidController)
+          (d, n) = controllerFun t d (snd pc)
 
       in loop (controllerFun, n)
