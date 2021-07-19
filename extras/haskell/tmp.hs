@@ -12,8 +12,8 @@ loop pc  =
 
       let t = 0
 
-          controllerFun = fst pc
+          f = fst pc
 
-          (d, n) = controllerFun t d (snd pc)
+          (d, n) = f t d (snd pc)
 
-      in loop (controllerFun, n)
+      in loop (f, n)
