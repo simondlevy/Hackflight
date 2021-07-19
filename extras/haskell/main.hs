@@ -7,7 +7,7 @@
 import Hackflight(hackflightFun)
 import Mixer
 import Server(runServer)
-import PidControl
+import PidControl(newAltHoldController)
 
 main :: IO ()
 

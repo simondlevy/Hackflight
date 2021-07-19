@@ -13,17 +13,20 @@ where
 import State(Time, VehicleState)
 import Demands
 import Mixer(Mixer, Motors)
-import PidControl(PidFun, PidState)
+import PidControl(PidController, pidFun, pidState, newPidController)
 
-type HackflightFun = Demands -> Time -> VehicleState -> (PidFun, PidState) -> Mixer 
-                     -> (Motors, (PidFun, PidState))
+type HackflightFun = Demands -> Time -> VehicleState -> PidController -> Mixer 
+                     -> (Motors, PidController)
 
 hackflightFun :: HackflightFun
-hackflightFun demands time vstate controller mixer = 
+hackflightFun demands time vehicleState pidController mixer = 
 
   -- Run the PID controller to get new demands and controller state
-  let (newDemands, newControllerState) = (fst controller) time vstate demands (snd controller)
+  let (newDemands, newControllerState) = (pidFun pidController) time
+                                                                vehicleState
+                                                                demands 
+                                                                (pidState pidController)
 
   -- Run the mixer on the new demands to get the motors, then return them and the new
   -- controller state
-  in ((mixer newDemands), ((fst controller), newControllerState))
+  in ((mixer newDemands), (newPidController (pidFun pidController) newControllerState))

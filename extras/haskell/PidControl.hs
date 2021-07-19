@@ -6,18 +6,23 @@
   MIT License
 --}
 
-module PidControl(PidFun, PidState, newAltHoldController) where
+module PidControl(PidController, pidFun, pidState, newPidController, newAltHoldController) where
 
 import State
 import Demands
 
-data PidState = AltHoldState Double Double
+data PidState = AltHoldState Double Double 
 
 type PidFun = Time -> VehicleState -> Demands -> PidState -> (Demands, PidState)
 
-newAltHoldController :: Double -> Double -> Double -> Double -> (PidFun, PidState)
+data PidController = PidController { pidFun :: PidFun, pidState :: PidState }
+
+newPidController :: PidFun -> PidState -> PidController
+newPidController f s = PidController f s
+
+newAltHoldController :: Double -> Double -> Double -> Double -> PidController
 newAltHoldController target kp ki windupMax = 
-    ((altHoldClosure target kp ki windupMax), (AltHoldState 0 0))
+    PidController (altHoldClosure target kp ki windupMax) (AltHoldState 0 0)
 
 errorIntegral :: PidState -> Double
 errorIntegral (AltHoldState e _) = e

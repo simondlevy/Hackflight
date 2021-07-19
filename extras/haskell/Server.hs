@@ -19,10 +19,10 @@ import Demands
 import Mixer
 import State
 import Hackflight(HackflightFun)
-import PidControl(PidFun, PidState)
+import PidControl(PidController)
 
-runServer :: HackflightFun -> (PidFun, PidState) -> Mixer -> IO ()
-runServer hackflightFun controller mixer = withSocketsDo $
+runServer :: HackflightFun -> PidController -> Mixer -> IO ()
+runServer hackflightFun pidController mixer = withSocketsDo $
 
     do 
 
@@ -34,9 +34,9 @@ runServer hackflightFun controller mixer = withSocketsDo $
 
        putStrLn "Hit the Play button ..."
 
-       loop telemetryServerSocket motorClientSocket motorClientSocketAddress controller 
+       loop telemetryServerSocket motorClientSocket motorClientSocketAddress pidController 
 
-    where loop telemetryServerSocket motorClientSocket motorClientSockAddr pidController  =
+    where loop telemetryServerSocket motorClientSocket motorClientSockAddr controller  =
 
               do 
 
@@ -55,10 +55,10 @@ runServer hackflightFun controller mixer = withSocketsDo $
 
                   -- Run the mixer on the demands to get the motor values
                   let (motors, newPidController)  = hackflightFun stickDemands
-                                                            time
-                                                            vehicleState
-                                                            pidController
-                                                            mixer
+                                                                  time
+                                                                  vehicleState
+                                                                  controller
+                                                                  mixer
 
                   -- Send the motor values to the client
                   _ <- Network.Socket.ByteString.sendTo
