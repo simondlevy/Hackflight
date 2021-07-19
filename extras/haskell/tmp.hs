@@ -11,9 +11,14 @@ module Tmp
 where
 
 import State
-import PidControl(PidFun, PidState)
+import Demands
+
+data PidState = AltHoldState Double Double
+
+type PidFun = Time -> VehicleState -> Demands -> PidState -> (Demands, PidState)
 
 loop :: (PidFun, PidState) -> (PidFun, PidState)
+
 loop pidController  =
 
       let t = 0
@@ -22,6 +27,6 @@ loop pidController  =
 
           controllerFun = fst pidController
 
-          (d, newControllerState) = controllerFun t s d (snd pidController)
+          (d, n) = controllerFun t s d (snd pidController)
 
-      in loop (controllerFun, newControllerState)
+      in loop (controllerFun, n)
