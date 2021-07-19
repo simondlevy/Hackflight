@@ -53,10 +53,8 @@ altHoldClosure target kp ki windupMax  =
          newErrorIntegral =constrainAbs((errorIntegral controllerState) +
                                         dzdt_error * dt) windupMax
 
-         -- Compute throttle demand, constrained to [0,1]
-         u = min (kp * dzdt_error + ki * newErrorIntegral) 1
-
-    in ((Demands u
+    -- Compute throttle demand, constrained to [0,1]
+    in ((Demands (min (kp * dzdt_error + ki * newErrorIntegral) 1)
                  (roll demands)
                  (pitch demands)
                  (yaw demands)),
