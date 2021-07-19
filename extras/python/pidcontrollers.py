@@ -7,10 +7,9 @@
 '''
 
 import numpy as np
-
 from demands import THROTTLE, ROLL, PITCH, YAW
-
 import state
+from debugging import debug
 
 
 def _constrainAbs(val, lim):
@@ -173,9 +172,6 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
 
     def apply(vehicle_state, controller_state, demands):
 
-        errorI = controller_state['errorI']
-        targetAltitude = controller_state['targetAltitude']
-
         # NED => ENU
         altitude = -vehicle_state[state.Z]
 
@@ -184,14 +180,16 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
         # Is stick demand in deadband?
         inBand = _in_band(throttleDemand, stickDeadband)
 
+        debug(controller_state['errorI'])
+
         # Reset controller when moving into deadband
         if inBand and not controller_state['inBand']:
-            errorI = 0
-            targetAltitude = altitude
+            controller_state['errorI'] = 0
+            controller_state['targetAltitude'] = altitude
 
         # Target velocity is a setpoint inside deadband, scaled
         # constant outside
-        targetVelocity = (targetAltitude - altitude
+        targetVelocity = (controller_state['targetAltitude'] - altitude
                           if inBand
                           else pilotVelZMax * throttleDemand)
 
@@ -204,7 +202,8 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
 
         # Update controller state
         new_controller_state = {'errorI': errorI,
-                                'targetAltitude': targetAltitude,
+                                'targetAltitude':
+                                controller_state['targetAltitude'],
                                 'inBand': inBand}
 
         # Update demands
