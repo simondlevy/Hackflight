@@ -15,7 +15,7 @@ import Data.ByteString.Internal
 import Data.Either.Utils -- from MissingH
 import Data.Serialize -- from cereal
 
--- import Demands
+import Demands
 import Mixer
 import State
 import PidControl(PidFun, PidState)
@@ -50,7 +50,7 @@ run controller mixer = withSocketsDo $
                   let time = d!!0
                   let vehicleState = VehicleState (d!!1) (d!!2) (d!!3) (d!!4) (d!!5) (d!!6)
                                                   (d!!7) (d!!8) (d!!9) (d!!10) (d!!11) (d!!12)
-                  -- let sdemands = Demands (d!!13) (d!!14) (d!!15) (d!!16)
+                  let stickDemands = Demands (d!!13) (d!!14) (d!!15) (d!!16)
 
                   -- Get the function part of the PID controller
                   let controllerFun = fst pidController
@@ -58,7 +58,7 @@ run controller mixer = withSocketsDo $
                   -- Run the PID controller to get new demands
                   let (demands, newControllerState) = controllerFun time
                                                                     vehicleState
-                                                                    demands
+                                                                    stickDemands
                                                                     (snd pidController)
 
                   -- Run the mixer on the demands to get the motor values
