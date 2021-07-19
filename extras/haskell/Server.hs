@@ -21,8 +21,8 @@ import State
 import Hackflight(HackflightFun)
 import PidControl(PidController)
 
-runServer :: HackflightFun -> PidController -> Mixer -> IO ()
-runServer hackflightFun pidController mixer = withSocketsDo $
+runServer :: HackflightFun -> [PidController] -> Mixer -> IO ()
+runServer hackflightFun pidControllers mixer = withSocketsDo $
 
     do 
 
@@ -34,7 +34,7 @@ runServer hackflightFun pidController mixer = withSocketsDo $
 
        putStrLn "Hit the Play button ..."
 
-       loop telemetryServerSocket motorClientSocket motorClientSocketAddress pidController 
+       loop telemetryServerSocket motorClientSocket motorClientSocketAddress pidControllers
 
     where loop telemetryServerSocket motorClientSocket motorClientSockAddr controller  =
 
@@ -54,12 +54,10 @@ runServer hackflightFun pidController mixer = withSocketsDo $
                   let stickDemands = Demands (d!!13) (d!!14) (d!!15) (d!!16)
 
                   -- Run the mixer on the demands to get the motor values
-                  let (motors, newPidController)  = hackflightFun stickDemands
-                                                                  vehicleState
-                                                                  controller
-                                                                  mixer
-                  print motors
-
+                  let (motors, newPidControllers)  = hackflightFun stickDemands
+                                                                   vehicleState
+                                                                   controller
+                                                                   mixer
                   -- Send the motor values to the client
                   _ <- Network.Socket.ByteString.sendTo
                         motorClientSocket
@@ -71,7 +69,7 @@ runServer hackflightFun pidController mixer = withSocketsDo $
                       loop telemetryServerSocket
                            motorClientSocket
                            motorClientSockAddr
-                           newPidController
+                           newPidControllers
                   else
                       putStrLn "Done"
 
