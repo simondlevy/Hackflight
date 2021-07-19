@@ -6,7 +6,7 @@
   MIT License
 --}
 
-module Server (run) where
+module Server (runServer) where
 
 import Control.Applicative
 import Network.Socket
@@ -20,9 +20,9 @@ import Mixer
 import State
 import PidControl(PidFun, PidState)
 
-bigFun :: Demands -> Time -> VehicleState -> (PidFun, PidState) -> Mixer 
+runPids :: Demands -> Time -> VehicleState -> (PidFun, PidState) -> Mixer 
            -> (Motors, (PidFun, PidState))
-bigFun demands time vstate controller mixer = 
+runPids demands time vstate controller mixer = 
 
   -- Run the PID controller to get new demands and controller state
   let (newDemands, newControllerState) = (fst controller) time vstate demands (snd controller)
@@ -32,8 +32,8 @@ bigFun demands time vstate controller mixer =
   in ((mixer newDemands), ((fst controller), newControllerState))
 
 
-run :: (PidFun, PidState) -> Mixer -> IO ()
-run controller mixer = withSocketsDo $
+runServer :: (PidFun, PidState) -> Mixer -> IO ()
+runServer controller mixer = withSocketsDo $
 
     do 
 
@@ -65,7 +65,7 @@ run controller mixer = withSocketsDo $
                   let stickDemands = Demands (d!!13) (d!!14) (d!!15) (d!!16)
 
                   -- Run the mixer on the demands to get the motor values
-                  let (motors, newPidController)  = bigFun stickDemands
+                  let (motors, newPidController)  = runPids stickDemands
                                                             time
                                                             vehicleState
                                                             pidController

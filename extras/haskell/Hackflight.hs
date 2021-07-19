@@ -5,10 +5,10 @@
 --}
 
 import Mixer
-import Server
+import Server(runServer)
 import PidControl
 
 main :: IO ()
 
 main = let altHoldController = newAltHoldController 10 1 0 1
-       in run altHoldController quadXAPMixer
+       in runServer altHoldController quadXAPMixer
