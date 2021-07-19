@@ -20,8 +20,7 @@ data PidState =
                    target :: Double,
                    inBand :: Bool }
 
-type PidFun = Time -> VehicleState -> Demands -> PidState 
-              -> (Demands, PidState)
+type PidFun = VehicleState -> Demands -> PidState -> (Demands, PidState)
 
 data PidController = PidController { pidFun :: PidFun, pidState :: PidState }
 
@@ -39,7 +38,7 @@ newAltHoldController kp ki windupMax pilotVelZMax stickDeadband =
 altHoldClosure :: Double -> Double -> Double -> Double -> Double -> PidFun
 altHoldClosure kp ki windupMax pilotVelZMax stickDeadband =
 
-    \time -> \vehicleState -> \demands -> \controllerState ->
+    \vehicleState -> \demands -> \controllerState ->
 
     let  
          -- NED => ENU
@@ -57,22 +56,24 @@ altHoldClosure kp ki windupMax pilotVelZMax stickDeadband =
          -- Target velocity is a setpoint inside deadband, scaled
          -- constant outside
          targetVelocity = if inband
-                          then ((targetAltitude newControllerState) - altitude
-                          else pilotVelZMax * throttleDemand)
+                          then (target newControllerState) - altitude
+                          else pilotVelZMax * throttleDemand
 
 
          -- Compute error as target velocity minus actual velocity, after
          -- negating actual to accommodate NED
-         error = targetVelocity + (state_dz vehicleState)
+         err = targetVelocity + (state_dz vehicleState)
 
          -- Accumualte error integral
-         errorI = constrain_abs (controller_state['errorI'] + error, windupMax)
+         errI = constrain_abs ((errorIntegral controllerState) + err) windupMax
 
-    -- Compute throttle demand, constrained to [0,1]
-    -- in ((Demands (min (kp * dzdt_error + ki * newErrorIntegral) 1)
-    in  (demands,
-        (AltHoldState time newErrorIntegral newTargetAltitude False))
-
+    -- Return updated demands and controller state
+    in  (Demands (err * kp + errI * ki)
+                 (roll demands)
+                 (pitch demands)
+                 (yaw demands),
+         AltHoldState errI (target newControllerState) inband)
+                      
 
 --------------------------------- Helpers --------------------------------------
 

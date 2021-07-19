@@ -10,22 +10,21 @@ module Hackflight
 
 where
 
-import State(Time, VehicleState)
+import State(VehicleState)
 import Demands
 import Mixer(Mixer, Motors)
 import PidControl(PidController, pidFun, pidState, newPidController)
 
-type HackflightFun = Demands -> Time -> VehicleState -> PidController -> Mixer 
+type HackflightFun = Demands -> VehicleState -> PidController -> Mixer 
                      -> (Motors, PidController)
 
 hackflightFun :: HackflightFun
-hackflightFun demands time vehicleState pidController mixer = 
+hackflightFun demands vehicleState pidController mixer = 
 
   let controllerFun = pidFun pidController
 
   -- Run the PID controller to get new demands and controller state
-  in let (newDemands, newControllerState) = controllerFun time
-                                                          vehicleState
+  in let (newDemands, newControllerState) = controllerFun vehicleState
                                                           demands 
                                                           (pidState pidController)
 

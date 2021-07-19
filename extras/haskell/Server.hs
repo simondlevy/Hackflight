@@ -55,7 +55,6 @@ runServer hackflightFun pidController mixer = withSocketsDo $
 
                   -- Run the mixer on the demands to get the motor values
                   let (motors, newPidController)  = hackflightFun stickDemands
-                                                                  time
                                                                   vehicleState
                                                                   controller
                                                                   mixer

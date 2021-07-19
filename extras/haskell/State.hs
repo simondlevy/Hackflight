@@ -10,8 +10,6 @@
 
 module State where
 
-type Time = Double
-
 data VehicleState = VehicleState { 
                      state_x :: Double
                    , state_dx :: Double 
