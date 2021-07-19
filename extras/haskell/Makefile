@@ -23,8 +23,8 @@ PidControl.o: PidControl.hs State.o Demands.o
 Server.o: Server.hs Mixer.o State.o PidControl.o
 	ghc -Wall Server.hs
 
-tmp.o: tmp.hs Mixer.o State.o PidControl.o
-	ghc -Wall tmp.hs
+tmp.o: tmp.hs 
+	ghc -Wall -c tmp.hs
 
 run: Hackflight
 	./Hackflight

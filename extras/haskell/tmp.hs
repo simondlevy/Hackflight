@@ -6,31 +6,22 @@
   MIT License
 --}
 
-module Server (run) where
+module Tmp
+
+where
 
 import State
 import PidControl(PidFun, PidState)
 
-run :: (PidFun, PidState) -> IO ()
-run controller =
+loop :: (PidFun, PidState) -> (PidFun, PidState)
+loop pidController  =
 
-    do 
+      let t = 0
 
-       putStrLn "Hit the Play button ..."
+          s = VehicleState 0 0 0 0 0 0 0 0 0 0 0 0
 
-       loop controller
+          controllerFun = fst pidController
 
-    where loop pidController  =
+          (d, newControllerState) = controllerFun t s d (snd pidController)
 
-              do 
-                  -- Parse the doubles into timed, vehicle state, and stick demands
-                  let t = 0
-                  let s = VehicleState 0 0 0 0 0 0 0 0 0 0 0 0
-
-                  -- Get the function part of the PID controller
-                  let controllerFun = fst pidController
-
-                  -- Run the PID controller to get new demands
-                  let (d, newControllerState) = controllerFun t s d (snd pidController)
-
-                  loop (controllerFun, newControllerState)
+      in loop (controllerFun, newControllerState)
