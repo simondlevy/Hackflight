@@ -17,7 +17,6 @@ import Demands
 
 data PidState =
     AltHoldState { errorIntegral :: Double,
-                   previousTime ::  Double,
                    target :: Double,
                    inBand :: Bool }
 
@@ -31,20 +30,18 @@ newPidController f s = PidController f s
 
 ----------------------------- Altitude hold ----------------------------------
 
-newAltHoldController :: Double -> Double -> Double -> Double -> PidController
-newAltHoldController kp ki windupMax stickDeadband = 
-    PidController (altHoldClosure kp ki windupMax stickDeadband)
-                  (AltHoldState 0 0 0 False)
+newAltHoldController :: Double -> Double -> Double -> Double -> Double 
+                        -> PidController
+newAltHoldController kp ki windupMax pilotVelZMax stickDeadband = 
+    PidController (altHoldClosure kp ki windupMax pilotVelZMax stickDeadband)
+                  (AltHoldState 0 0 False)
 
-altHoldClosure :: Double -> Double -> Double -> Double -> PidFun
-altHoldClosure kp ki windupMax stickDeadband =
+altHoldClosure :: Double -> Double -> Double -> Double -> Double -> PidFun
+altHoldClosure kp ki windupMax pilotVelZMax stickDeadband =
 
     \time -> \vehicleState -> \demands -> \controllerState ->
 
     let  
-         errorI = errorIntegral controllerState
-         targetAltitude = target controllerState
- 
          -- NED => ENU
          altitude = -(state_z vehicleState)
 
@@ -53,21 +50,23 @@ altHoldClosure kp ki windupMax stickDeadband =
          inband = in_band throttleDemand stickDeadband
 
          -- Reset controller when moving into deadband
-         (newErrorI, newTargetAltitude) =  if inband && not (inBand controllerState)
-                                           then (0, targetAltitude)
-                                           else (errorI, targetAltitude)
+         newControllerState = if inband && not (inBand controllerState)
+                              then AltHoldState 0 altitude True
+                              else controllerState
 
-         -- Get vehicle state, negating for NED
-         z = -(state_z vehicleState)
-         dzdt = -(state_dz vehicleState)
+         -- Target velocity is a setpoint inside deadband, scaled
+         -- constant outside
+         targetVelocity = if inband
+                          then ((targetAltitude newControllerState) - altitude
+                          else pilotVelZMax * throttleDemand)
 
-         -- Compute dzdt setpoint and error
-         dzdt_error = ((target controllerState) - z) - dzdt
 
-         -- Update error integral
-         dt = time - (previousTime controllerState)
-         newErrorIntegral = constrain_abs((errorIntegral controllerState) +
-                                         dzdt_error * dt) windupMax
+         -- Compute error as target velocity minus actual velocity, after
+         -- negating actual to accommodate NED
+         error = targetVelocity + (state_dz vehicleState)
+
+         -- Accumualte error integral
+         errorI = constrain_abs (controller_state['errorI'] + error, windupMax)
 
     -- Compute throttle demand, constrained to [0,1]
     -- in ((Demands (min (kp * dzdt_error + ki * newErrorIntegral) 1)

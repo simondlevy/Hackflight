@@ -200,7 +200,8 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
         error = targetVelocity + vehicle_state[state.DZ]
 
         # Accumualte error integral
-        errorI = _constrainAbs(controller_state['errorI'] + error, windupMax)
+        errorI = _constrainAbs(new_controller_state['errorI'] + error,
+                               windupMax)
 
         # Update demands
         new_demands = demands.copy()
