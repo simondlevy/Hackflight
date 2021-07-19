@@ -6,14 +6,19 @@
   MIT License
 --}
 
-module PidControl(PidController, pidFun, pidState, newPidController, newAltHoldController) where
+module PidControl(PidController,
+                  pidFun,
+                  pidState,
+                  newPidController,
+                  newAltHoldController) where
 
 import State
 import Demands
 
 data PidState = AltHoldState Double Double 
 
-type PidFun = Time -> VehicleState -> Demands -> PidState -> (Demands, PidState)
+type PidFun = Time -> VehicleState -> Demands -> PidState 
+              -> (Demands, PidState)
 
 data PidController = PidController { pidFun :: PidFun, pidState :: PidState }
 
@@ -45,7 +50,8 @@ altHoldClosure target kp ki windupMax  =
 
          -- Update error integral
          dt = time - (previousTime controllerState)
-         newErrorIntegral = constrainAbs ((errorIntegral controllerState) + dzdt_error * dt) windupMax
+         newErrorIntegral =constrainAbs((errorIntegral controllerState) +
+                                        dzdt_error * dt) windupMax
 
          -- Compute throttle demand, constrained to [0,1]
          u = min (kp * dzdt_error + ki * newErrorIntegral) 1

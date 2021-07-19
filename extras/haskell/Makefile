@@ -1,4 +1,4 @@
-ALL = main tmp.o
+ALL = main
 all: $(ALL)
 
 main: main.hs Hackflight.hs State.hs Demands.hs Mixer.hs PidControl.hs Server.hs
@@ -25,9 +25,6 @@ PidControl.o: PidControl.hs State.o Demands.o
 
 Server.o: Server.hs Hackflight.o Demands.o Mixer.o State.o PidControl.o
 	ghc -Wall Server.hs
-
-tmp.o: tmp.hs 
-	ghc -Wall -c tmp.hs
 
 run: main
 	./main
