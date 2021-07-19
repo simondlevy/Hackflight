@@ -52,7 +52,10 @@ altHoldClosure kp ki windupMax stickDeadband =
 
          inband = in_band throttleDemand stickDeadband
 
-         movedInBand = inband && not (inBand controllerState)
+         -- Reset controller when moving into deadband
+         (newErrorI, newTargetAltitude) =  if inband && not (inBand controllerState)
+                                           then (0, targetAltitude)
+                                           else (errorI, targetAltitude)
 
          -- Get vehicle state, negating for NED
          z = -(state_z vehicleState)
@@ -71,7 +74,7 @@ altHoldClosure kp ki windupMax stickDeadband =
                  (roll demands)
                  (pitch demands)
                  (yaw demands)),
-        (AltHoldState time newErrorIntegral 0 False))
+        (AltHoldState time newErrorIntegral newTargetAltitude False))
 
 
 --------------------------------- Helpers --------------------------------------
