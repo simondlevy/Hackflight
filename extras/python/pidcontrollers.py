@@ -166,10 +166,6 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
     A closure for PI control of altitude
     '''
 
-    initial_controller_state = {'errorI': 0,
-                                'targetAltitude': 0,
-                                'inBand': False}
-
     def apply(vehicle_state, controller_state, demands):
 
         # NED => ENU
@@ -179,8 +175,6 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
 
         # Is stick demand in deadband?
         inBand = _in_band(throttleDemand, stickDeadband)
-
-        debug(controller_state['errorI'])
 
         # Reset controller when moving into deadband
         new_controller_state = ({'errorI': 0,
@@ -215,7 +209,7 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
                  'inBand': inBand}
                 )
 
-    return apply, initial_controller_state
+    return apply, {'errorI': 0, 'targetAltitude': 0, 'inBand': False}
 
 
 # Position hold ---------------------------------------------------------------
