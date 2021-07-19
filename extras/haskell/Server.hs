@@ -20,9 +20,9 @@ import Mixer
 import State
 import PidControl(PidFun, PidState)
 
-runPids :: Demands -> Time -> VehicleState -> (PidFun, PidState) -> Mixer 
+bigFun :: Demands -> Time -> VehicleState -> (PidFun, PidState) -> Mixer 
            -> (Motors, (PidFun, PidState))
-runPids demands time vstate controller mixer = 
+bigFun demands time vstate controller mixer = 
 
   -- Run the PID controller to get new demands and controller state
   let (newDemands, newControllerState) = (fst controller) time vstate demands (snd controller)
@@ -65,7 +65,7 @@ run controller mixer = withSocketsDo $
                   let stickDemands = Demands (d!!13) (d!!14) (d!!15) (d!!16)
 
                   -- Run the mixer on the demands to get the motor values
-                  let (motors, newPidController)  = runPids stickDemands
+                  let (motors, newPidController)  = bigFun stickDemands
                                                             time
                                                             vehicleState
                                                             pidController
