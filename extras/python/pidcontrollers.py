@@ -183,15 +183,15 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
         debug(controller_state['errorI'])
 
         # Reset controller when moving into deadband
-        controller_state = ({'errorI': 0,
-                             'targetAltitude': altitude,
-                             'inBand': True}
-                            if inBand and not controller_state['inBand']
-                            else controller_state)
+        new_controller_state = ({'errorI': 0,
+                                 'targetAltitude': altitude,
+                                 'inBand': True}
+                                if inBand and not controller_state['inBand']
+                                else controller_state)
 
         # Target velocity is a setpoint inside deadband, scaled
         # constant outside
-        targetVelocity = (controller_state['targetAltitude'] - altitude
+        targetVelocity = (new_controller_state['targetAltitude'] - altitude
                           if inBand
                           else pilotVelZMax * throttleDemand)
 
@@ -202,17 +202,17 @@ def alt_hold_pid(Kp=0.75, Ki=1.5, windupMax=0.4,
         # Accumualte error integral
         errorI = _constrainAbs(controller_state['errorI'] + error, windupMax)
 
-        # Update controller state
-        new_controller_state = {'errorI': errorI,
-                                'targetAltitude':
-                                controller_state['targetAltitude'],
-                                'inBand': inBand}
-
         # Update demands
         new_demands = demands.copy()
         new_demands[THROTTLE] = error * Kp + errorI * Ki
 
-        return new_demands, new_controller_state
+        return (
+                new_demands,
+
+                {'errorI': errorI,
+                 'targetAltitude': new_controller_state['targetAltitude'],
+                 'inBand': inBand}
+                )
 
     return apply, initial_controller_state
 
