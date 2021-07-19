@@ -15,6 +15,7 @@ import Data.ByteString.Internal
 import Data.Either.Utils -- from MissingH
 import Data.Serialize -- from cereal
 
+-- import Demands
 import Mixer
 import State
 import PidControl(PidFun, PidState)
@@ -38,24 +39,27 @@ run controller mixer = withSocketsDo $
 
               do 
 
-                  -- Get raw bytes for time, 12D state vector, and stick demands from client (sim)
+                  -- Get raw bytes for time, 12D state vector, and stick demands from
+                  -- client (sim)
                   (msgIn, _) <- Network.Socket.ByteString.recvFrom telemetryServerSocket 136
 
                   -- Convert bytes to a list of doubles
-                  let doubles = bytesToDoubles msgIn
+                  let d = bytesToDoubles msgIn
 
                   -- Parse the doubles into timed, vehicle state, and stick demands
-                  let time = head doubles
-                  let vehicleState = makeVehicleState (slice doubles 1 13)
-                  let stickDemands = slice doubles 13 17
-
-                  print stickDemands
+                  let time = d!!0
+                  let vehicleState = VehicleState (d!!1) (d!!2) (d!!3) (d!!4) (d!!5) (d!!6)
+                                                  (d!!7) (d!!8) (d!!9) (d!!10) (d!!11) (d!!12)
+                  -- let sdemands = Demands (d!!13) (d!!14) (d!!15) (d!!16)
 
                   -- Get the function part of the PID controller
                   let controllerFun = fst pidController
 
                   -- Run the PID controller to get new demands
-                  let (demands, newControllerState) = controllerFun time vehicleState  demands (snd pidController)
+                  let (demands, newControllerState) = controllerFun time
+                                                                    vehicleState
+                                                                    demands
+                                                                    (snd pidController)
 
                   -- Run the mixer on the demands to get the motor values
                   let motors = mixer demands
@@ -92,8 +96,3 @@ doublesToBytes = runPut . mapM_ putFloat64le
 
 bytesToDoubles :: ByteString -> [Double]
 bytesToDoubles bs = (fromRight ((runGet $ many getFloat64le) bs))
-
--- https://stackoverflow.com/a/4597898
-
-slice :: [a] -> Int -> Int -> [a]
-slice xs from to = take (to - from + 1) (drop from xs)
