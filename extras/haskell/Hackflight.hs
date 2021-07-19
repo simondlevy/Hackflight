@@ -23,11 +23,11 @@ hackflightFun demands vehicleState pidController mixer =
 
   let controllerFun = pidFun pidController
 
-  -- Run the PID controller to get new demands and controller state
-  in let (newDemands, newControllerState) = controllerFun vehicleState
-                                                          demands 
-                                                          (pidState pidController)
+      -- Run the PID controller to get new demands and controller state
+      (newDemands, newControllerState) = controllerFun vehicleState
+                                                       demands 
+                                                       (pidState pidController)
 
-      -- Run the mixer on the new demands to get the motors, then return them and a PID
-      -- controller made from the new controller state
-      in ((mixer newDemands), (newPidController controllerFun newControllerState))
+  -- Run the mixer on the new demands to get the motors, then return them and a PID
+  -- controller made from the new controller state
+  in ((mixer newDemands), (newPidController controllerFun newControllerState))
