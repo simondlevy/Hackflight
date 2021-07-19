@@ -1,12 +1,12 @@
-ALL = Hackflight tmp.o
+ALL = main tmp.o
 all: $(ALL)
 
-Hackflight: Hackflight.hs Mixer.hs Server.hs PidControl.hs
-	ghc -Wall Hackflight.hs
+main: main.hs Mixer.hs Server.hs PidControl.hs
+	ghc -Wall main.hs
 	rm -f *.hi *.o
 
-Hackflight.o: Hackflight.hs Mixer.o Server.o PidControl.o
-	ghc -Wall Hackflight.hs
+main.o: main.hs Mixer.o Server.o PidControl.o
+	ghc -Wall main.hs
 
 State.o: State.hs
 	ghc -Wall State.hs
@@ -26,8 +26,8 @@ Server.o: Server.hs Mixer.o State.o PidControl.o
 tmp.o: tmp.hs 
 	ghc -Wall -c tmp.hs
 
-run: Hackflight
-	./Hackflight
+run: main
+	./main
 clean:
 	rm -rf $(ALL) *.hi *.o
 

@@ -20,8 +20,10 @@ import Mixer
 import State
 import PidControl(PidFun, PidState)
 
-runPids :: Demands -> Time -> VehicleState -> (PidFun, PidState) -> Mixer 
-           -> (Motors, (PidFun, PidState))
+type RunPids = Demands -> Time -> VehicleState -> (PidFun, PidState) -> Mixer 
+               -> (Motors, (PidFun, PidState))
+
+runPids :: RunPids
 runPids demands time vstate controller mixer = 
 
   -- Run the PID controller to get new demands and controller state
