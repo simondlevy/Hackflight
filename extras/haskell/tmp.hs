@@ -8,12 +8,12 @@ type F = Double -> Double -> S -> (Double, S)
 
 loop :: (F, S) -> (F, S)
 
-loop pc  =
+loop p  =
 
       let t = 0
 
-          f = fst pc
+          f = fst p
 
-          (d, n) = f t d (snd pc)
+          (d, n) = f t d (snd p)
 
       in loop (f, n)
