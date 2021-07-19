@@ -84,7 +84,10 @@ run controller mixer = withSocketsDo $
 makeUdpSocket :: String -> IO (Socket, SockAddr)
 makeUdpSocket port =
     do 
-       addrInfo <- getAddrInfo (Just (defaultHints {addrFlags = [AI_PASSIVE]})) Nothing (Just port)
+       addrInfo <- getAddrInfo
+                   (Just (defaultHints {addrFlags = [AI_PASSIVE]}))
+                   Nothing
+                   (Just port)
        let addr = head addrInfo
        sock <- socket (addrFamily addr) Datagram defaultProtocol
        return (sock, (addrAddress addr))
