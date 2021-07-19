@@ -2,11 +2,9 @@ module Tmp
 
 where
 
-import Demands
-
 data S = A Double Double
 
-type F = Double -> Demands -> S -> (Demands, S)
+type F = Double -> Double -> S -> (Double, S)
 
 loop :: (F, S) -> (F, S)
 
