@@ -27,6 +27,8 @@ data PidController = PidController { pidFun :: PidFun, pidState :: PidState }
 newPidController :: PidFun -> PidState -> PidController
 newPidController f s = PidController f s
 
+----------------------------- Altitude hold ----------------------------------
+
 newAltHoldController :: Double -> Double -> Double -> Double -> PidController
 newAltHoldController target kp ki windupMax = 
     PidController (altHoldClosure target kp ki windupMax) (AltHoldState 0 0)
@@ -54,7 +56,7 @@ altHoldClosure target kp ki windupMax  =
 
     in ((Demands u 0 0 0), (AltHoldState time newErrorIntegral))
 
---------------------------------------------------------------------------------
+--------------------------------- Helpers --------------------------------------
 
 constrainAbs :: Double -> Double -> Double
 constrainAbs x lim = if x < -lim then -lim else (if x > lim then lim else x)
