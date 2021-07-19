@@ -42,6 +42,8 @@ altHoldClosure kp ki windupMax stickDeadband =
     \time -> \vehicleState -> \demands -> \controllerState ->
 
     let  
+         errorI = errorIntegral controllerState
+         targetAltitude = target controllerState
 
          -- Get vehicle state, negating for NED
          z = -(state_z vehicleState)
