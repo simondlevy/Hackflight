@@ -20,6 +20,9 @@ import Mixer
 import State
 import PidControl(PidFun, PidState)
 
+getMotors :: Mixer -> Demands -> Motors
+getMotors mixer demands = mixer demands
+
 run :: (PidFun, PidState) -> Mixer -> IO ()
 run controller mixer = withSocketsDo $
 
@@ -62,7 +65,7 @@ run controller mixer = withSocketsDo $
                                                                     (snd pidController)
 
                   -- Run the mixer on the demands to get the motor values
-                  let motors = mixer demands
+                  let motors = getMotors mixer demands
 
                   -- Send the motor values to the client
                   _ <- Network.Socket.ByteString.sendTo
