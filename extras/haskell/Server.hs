@@ -18,24 +18,11 @@ import Data.Serialize -- from cereal
 import Demands
 import Mixer
 import State
+import Hackflight(HackflightFun)
 import PidControl(PidFun, PidState)
 
-type RunPids = Demands -> Time -> VehicleState -> (PidFun, PidState) -> Mixer 
-               -> (Motors, (PidFun, PidState))
-
-runPids :: RunPids
-runPids demands time vstate controller mixer = 
-
-  -- Run the PID controller to get new demands and controller state
-  let (newDemands, newControllerState) = (fst controller) time vstate demands (snd controller)
-
-  -- Run the mixer on the new demands to get the motors, then return them and the new
-  -- controller state
-  in ((mixer newDemands), ((fst controller), newControllerState))
-
-
-runServer :: (PidFun, PidState) -> Mixer -> IO ()
-runServer controller mixer = withSocketsDo $
+runServer :: HackflightFun -> (PidFun, PidState) -> Mixer -> IO ()
+runServer hackflightFun controller mixer = withSocketsDo $
 
     do 
 
@@ -67,7 +54,7 @@ runServer controller mixer = withSocketsDo $
                   let stickDemands = Demands (d!!13) (d!!14) (d!!15) (d!!16)
 
                   -- Run the mixer on the demands to get the motor values
-                  let (motors, newPidController)  = runPids stickDemands
+                  let (motors, newPidController)  = hackflightFun stickDemands
                                                             time
                                                             vehicleState
                                                             pidController
