@@ -59,11 +59,12 @@ runServer hackflightFun pidController mixer = withSocketsDo $
                                                                   vehicleState
                                                                   controller
                                                                   mixer
+                  print motors
 
                   -- Send the motor values to the client
                   _ <- Network.Socket.ByteString.sendTo
                         motorClientSocket
-                        (doublesToBytes [(m1 motors), (m2 motors), (m3 motors), (m4 motors)])
+                        (doublesToBytes (motorValues motors))
                         motorClientSockAddr
 
                   -- Repeat until user presses stop button in simulator
