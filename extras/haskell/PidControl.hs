@@ -17,7 +17,8 @@ import Demands
 
 data PidState =
     AltHoldState { errorIntegral :: Double,
-                   previousTime ::  Double }
+                   previousTime ::  Double,
+                   inBand :: Bool }
 
 type PidFun = Time -> VehicleState -> Demands -> PidState 
               -> (Demands, PidState)
@@ -31,7 +32,7 @@ newPidController f s = PidController f s
 
 newAltHoldController :: Double -> Double -> Double -> Double -> PidController
 newAltHoldController target kp ki windupMax = 
-    PidController (altHoldClosure target kp ki windupMax) (AltHoldState 0 0)
+    PidController (altHoldClosure target kp ki windupMax) (AltHoldState 0 0 False)
 
 altHoldClosure :: Double -> Double -> Double -> Double -> PidFun
 altHoldClosure target kp ki windupMax  =
@@ -55,7 +56,7 @@ altHoldClosure target kp ki windupMax  =
          -- Compute throttle demand, constrained to [0,1]
          u = min (kp * dzdt_error + ki * newErrorIntegral) 1
 
-    in ((Demands u 0 0 0), (AltHoldState time newErrorIntegral))
+    in ((Demands u 0 0 0), (AltHoldState time newErrorIntegral False))
 
 
 --------------------------------- Helpers --------------------------------------
