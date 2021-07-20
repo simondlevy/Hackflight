@@ -59,7 +59,14 @@ rateDemand :: Double -> Double -> FullPidState -> FullPidConstants -> Double ->
 
 rateDemand demand angularVelocity pidState pidConstants rateMax = 
 
-    (demand, (FullPidState 0 0 0 0))
+    -- Reset PID state on quick angular velocity change
+    let newPidState = if abs(angularVelocity) > rateMax
+                      then (FullPidState 0 0 0 0)
+                      else pidState
+
+        newDemand = demand
+
+    in (newDemand, newPidState)
 
 rateClosure :: Double -> Double -> Double -> Double -> Double -> PidFun
 rateClosure kp ki kd windupMax rateMax =
@@ -69,8 +76,8 @@ rateClosure kp ki kd windupMax rateMax =
     let (rollDemand, rollPidState) = rateDemand (roll demands)
                                                 (state_phi vehicleState)
                                                 (rateRollState controllerState)
-                                                 (FullPidConstants kp ki kd windupMax)
-                                                 rateMax
+                                                (FullPidConstants kp ki kd windupMax)
+                                                rateMax
 
         (pitchDemand, pitchPidState) = rateDemand (pitch demands)
                                                   (state_theta vehicleState)
