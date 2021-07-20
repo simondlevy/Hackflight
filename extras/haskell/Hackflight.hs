@@ -7,34 +7,50 @@
 --}
 
 module Hackflight(HackflightFun, hackflightFun)
-
 where
 
 import State(VehicleState)
 import Demands
+import PidControl(PidController, newPidController, pidFun, pidState)
 import Mixer(Mixer, Motors)
-import PidControl(PidController, pidFun, pidState, newPidController)
 
-type HackflightFun = Demands -> VehicleState -> [PidController] -> Mixer 
-                     -> (Motors, [PidController])
+type HackflightFun = Demands ->
+                     VehicleState ->
+                     Mixer ->
+                     [PidController] ->
+                     (Motors, [PidController])
 
 hackflightFun :: HackflightFun
 
--- Base case: apply the mixer to the demands to get the motor values
-hackflightFun demands _vehicleState [] mixer = 
-    (mixer demands, [])
+helperFun :: Demands ->
+             VehicleState ->
+             Mixer ->
+             [PidController] ->
+             [PidController] ->
+             (Motors, [PidController])
 
-hackflightFun demands vehicleState pidControllers mixer = 
+-- Base case: apply mixer to final demands to get motors
+helperFun demands _ mixer [] newPidControllers =
+    (mixer demands, newPidControllers)
 
-    let pidController = pidControllers!!0
-      
-        controllerFun = pidFun pidController
+-- Recursive case: apply current PID controller to demands to get new demands
+-- and PID state; then recur on remaining PID controllers
+helperFun demands vehicleState mixer oldPidControllers newPidControllers =
 
-        -- Run the PID controller to get new demands and controller state
-        (newDemands, newControllerState) = controllerFun vehicleState
-                                                         demands 
-                                                         (pidState pidController)
+    let oldPidController = head oldPidControllers
+   
+        pfun = pidFun oldPidController
 
-    -- Run the mixer on the new demands to get the motors, then return them and a PID
-    -- controller made from the new controller state
-    in ((mixer newDemands), [(newPidController controllerFun newControllerState)])
+        pstate = pidState oldPidController
+
+        (newDemands, newPstate) = pfun vehicleState demands pstate
+
+        newPid = newPidController pfun newPstate
+
+    in helperFun newDemands
+                     vehicleState
+                     mixer (tail oldPidControllers)
+                     (newPid:newPidControllers)
+
+hackflightFun demands vehicleState mixer pidControllers =
+    helperFun demands vehicleState mixer pidControllers []

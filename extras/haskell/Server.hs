@@ -22,11 +22,13 @@ import Hackflight(HackflightFun)
 import PidControl(PidController)
 
 runServer :: HackflightFun -> [PidController] -> Mixer -> IO ()
+
 runServer hackflightFun pidControllers mixer = withSocketsDo $
 
     do 
 
-       (telemetryServerSocket, telemetryServerSocketAddress) <- makeUdpSocket "5001"
+       (telemetryServerSocket, telemetryServerSocketAddress) <-
+           makeUdpSocket "5001"
 
        (motorClientSocket, motorClientSocketAddress) <- makeUdpSocket "5000"
 
@@ -34,44 +36,69 @@ runServer hackflightFun pidControllers mixer = withSocketsDo $
 
        putStrLn "Hit the Play button ..."
 
-       loop telemetryServerSocket motorClientSocket motorClientSocketAddress pidControllers
+       loop telemetryServerSocket
+            motorClientSocket
+            motorClientSocketAddress
+            hackflightFun
+            mixer
+            pidControllers
 
-    where loop telemetryServerSocket motorClientSocket motorClientSockAddr controller  =
+loop :: Socket ->
+        Socket ->
+        SockAddr ->
+        HackflightFun ->
+        Mixer ->
+        [PidController]->
+        IO ()
 
-              do 
+loop telemetryServerSocket
+     motorClientSocket
+     motorClientSockAddr
+     hackflightFun
+     mixer
+     pidControllers =
 
-                  -- Get raw bytes for time, 12D state vector, and stick demands from
-                  -- client (sim)
-                  (msgIn, _) <- Network.Socket.ByteString.recvFrom telemetryServerSocket 136
+  do 
 
-                  -- Convert bytes to a list of doubles
-                  let d = bytesToDoubles msgIn
+      -- Get raw bytes for time, 12D state vector, and stick
+      -- demands from client (sim)
+      (msgIn, _) <- 
+          Network.Socket.ByteString.recvFrom telemetryServerSocket 136
 
-                  -- Parse the doubles into timed, vehicle state, and stick demands
-                  let time = d!!0
-                  let vehicleState = VehicleState (d!!1) (d!!2) (d!!3) (d!!4) (d!!5) (d!!6)
-                                                  (d!!7) (d!!8) (d!!9) (d!!10) (d!!11) (d!!12)
-                  let stickDemands = Demands (d!!13) (d!!14) (d!!15) (d!!16)
+      -- Convert bytes to a list of doubles
+      let d = bytesToDoubles msgIn
 
-                  -- Run the mixer on the demands to get the motor values
-                  let (motors, newPidControllers)  = hackflightFun stickDemands
-                                                                   vehicleState
-                                                                   controller
-                                                                   mixer
-                  -- Send the motor values to the client
-                  _ <- Network.Socket.ByteString.sendTo
-                        motorClientSocket
-                        (doublesToBytes (motorValues motors))
-                        motorClientSockAddr
+      -- Parse the doubles into timed, vehicle state, and stick
+      -- demands
+      let time = d!!0
 
-                  -- Repeat until user presses stop button in simulator
-                  if time > 0 then
-                      loop telemetryServerSocket
-                           motorClientSocket
-                           motorClientSockAddr
-                           newPidControllers
-                  else
-                      putStrLn "Done"
+      let vehicleState = VehicleState (d!!1) (d!!2) (d!!3) (d!!4)
+                                      (d!!5) (d!!6) (d!!7) (d!!8)
+                                      (d!!9) (d!!10) (d!!11) (d!!12)
+
+      let stickDemands = Demands (d!!13) (d!!14) (d!!15) (d!!16)
+
+      -- Run the mixer on the demands to get the motor values
+      let (motors, newPidControllers) = hackflightFun stickDemands
+                                                      vehicleState
+                                                      mixer
+                                                      pidControllers
+      -- Send the motor values to the client
+      _ <- Network.Socket.ByteString.sendTo
+            motorClientSocket
+            (doublesToBytes (motorValues motors))
+            motorClientSockAddr
+
+      -- Repeat until user presses stop button in simulator
+      if time > 0 then
+          loop telemetryServerSocket
+               motorClientSocket
+               motorClientSockAddr
+               hackflightFun
+               mixer
+               newPidControllers
+      else
+          putStrLn "Done"
 
 -- http://book.realworldhaskell.org/read/sockets-and-syslog.html
 
