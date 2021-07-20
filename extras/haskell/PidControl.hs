@@ -10,6 +10,7 @@ module PidControl(PidController,
                   pidFun,
                   pidState,
                   newPidController,
+                  newRateController,
                   newAltHoldController) where
 
 import State
