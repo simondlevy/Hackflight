@@ -52,16 +52,14 @@ rateClosure kp ki kd windupMax rateMax =
 
     \vehicleState -> \demands -> \controllerState ->
 
-    let computeDof = \stateAccessor ->
-                     \pidAccessor ->
-                     (stateAccessor vehicleState)
-
     -- Return updated demands and controller state
-    in  (Demands (throttle demands)
-                 (roll demands)
-                 (pitch demands)
-                 (yaw demands),
+    (Demands (throttle demands)
+             (newRoll demands)
+             (pitch demands)
+             (yaw demands),
          RateState (FullPidState 0 0 0 0) (FullPidState 0 0 0 0))
+
+    where newRoll demands = 0
 
 
 ----------------------------- Altitude hold ----------------------------------
