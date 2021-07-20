@@ -19,8 +19,8 @@ from sys import stdout
 from time import sleep
 
 from mixers import mixer_quadxap, mixer_coaxial
-from pidcontrollers import (rate_pid, level_pid, yaw_pid,
-                            alt_hold_pid, pos_hold_pid)
+from pidcontrollers import (rate_pid, level_pid, yaw_pid, alt_hold_pid,
+                            pos_hold_pid)
 
 
 def _handleImage(image):

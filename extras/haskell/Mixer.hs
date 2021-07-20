@@ -28,10 +28,10 @@ quadXAPMixer demands =
         r = (roll demands)
         p = (pitch demands)
         y = (yaw demands)
-    in Motors (constrain (t - r - p - y))
-              (constrain (t + r + p - y))
-              (constrain (t + r - p + y))
-              (constrain (t - r + p + y))
+    in Motors (constrain (t - r - p + y))
+              (constrain (t + r + p + y))
+              (constrain (t + r - p - y))
+              (constrain (t - r + p - y))
 
 constrain :: Double -> Double
 constrain x = if x < 0 then 0 else if x > 1 then 1 else x
