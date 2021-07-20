@@ -54,12 +54,12 @@ rateClosure kp ki kd windupMax rateMax =
 
     -- Return updated demands and controller state
     (Demands (throttle demands)
-             (newRoll demands)
-             (pitch demands)
+             (getDemand demands)
+             (getDemand demands)
              (yaw demands),
          RateState (FullPidState 0 0 0 0) (FullPidState 0 0 0 0))
 
-    where newRoll demands = 0
+    where getDemand demands = 0
 
 
 ----------------------------- Altitude hold ----------------------------------
