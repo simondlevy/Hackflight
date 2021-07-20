@@ -55,40 +55,38 @@ rateClosure kp ki kd windupMax rateMax =
 
     let 
 
-        computeDof oldDemand angularVelocity oldPidState =
+        computeDof demand angularVelocity oldPidState =
 
             let 
 
-                --  # Reset PID state on quick angular velocity change
+                --  Reset PID state on quick angular velocity change
                 newPidState = if abs(angularVelocity) > deg2rad(rateMax)
                               then (FullPidState 0 0 0 0)
                               else oldPidState
 
-                err = oldDemand - angularVelocity
-
-                pterm = kp * err
+                err = demand - angularVelocity
 
                 errI = constrain_abs ((pidErrorIntegral newPidState) + err)
                                       windupMax
-                iterm = ki * errI
-
                 deltaErr = err - (pidErrorPrev newPidState)
-                dterm = kd * ((pidDeltaError1 newPidState) +
-                              (pidDeltaError2 newPidState) +
-                              deltaErr)
+                errD = ((pidDeltaError1 newPidState) +
+                        (pidDeltaError2 newPidState) +
+                        deltaErr)
 
-                in (pterm + iterm + dterm, 
+                in ((kp * err) + (ki * errI) + (kd * errD), 
                     (FullPidState (pidErrorIntegral newPidState)
                                   deltaErr  -- deltaError1 <- deltaError
                                   (pidDeltaError1 newPidState) -- deltaError2 <- deltaError1
                                   err)) -- errorPrev <- error
 
         (rollDemand, rollPidState) = computeDof (roll demands)
-                                                 (-(state_dphi vehicleState))
+                                                 (state_dphi vehicleState)
                                                  (rateRollState controllerState)
 
+        -- Pitch demand is nose-down positive, so we negate pitch-forward
+        -- (nose-down negative) to reconcile them
         (pitchDemand, pitchPidState) = computeDof (pitch demands)
-                                                  (state_dtheta vehicleState)
+                                                  (-(state_dtheta vehicleState))
                                                   (ratePitchState controllerState)
 
     -- Return updated demands and controller state
