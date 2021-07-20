@@ -53,7 +53,12 @@ rateClosure kp ki kd windupMax rateMax =
     \vehicleState -> \demands -> \controllerState ->
 
     let computeDof stateDirection stateAccesor = (demand, pidState) where
-        demand = 0
+
+        demand = err * kp + errI * ki + errD * kd where
+            err = 0
+            errI = 0
+            errD = 0
+
         pidState = 0
     
     
