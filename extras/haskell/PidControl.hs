@@ -78,7 +78,7 @@ rateDemand demand angularVelocity pidState pidConstants rateMax =
 
         newDemand = demand
 
-    in (pterm + iterm + determ, newPidState)
+    in (pterm + iterm + dterm, newPidState)
 
 rateClosure :: Double -> Double -> Double -> Double -> Double -> PidFun
 rateClosure kp ki kd windupMax rateMax =
