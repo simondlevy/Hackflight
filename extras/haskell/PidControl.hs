@@ -22,6 +22,13 @@ data FullPidState =
                    pidDeltaError2 :: Double,
                    pidErrorPrev :: Double }
 
+data FullPidConstants = 
+
+    FullPidConstants { kp :: Double,
+                       ki :: Double,
+                       kd :: Double,
+                       windupMax :: Double }
+
 data PidState =
 
      AltHoldState { altErrorIntegral :: Double,
