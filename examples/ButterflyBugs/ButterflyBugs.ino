@@ -1,5 +1,5 @@
 /*
-   Hackflight sketch for Tlera Butterfly with USFS IMU, DSMX receiver, and
+   Hackflight sketch for Tlera STM32L4 with USFS IMU, DSMX receiver, and
    standard motors
 
    Additional libraries needed:
@@ -21,7 +21,7 @@
 #include "hf_sensors/usfs.hpp"
 #include "hf_receivers/arduino/dsmx/dsmx_serial1.hpp"
 
-#include <rft_boards/realboards/arduino_serial/arduino/butterfly.hpp>
+#include <rft_boards/realboards/arduino_serial/arduino/stm32l4.hpp>
 #include <rft_motors/rotary/brushless.hpp>
 
 
@@ -34,7 +34,7 @@ static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MA
 
 // Board ================================================================================
 
-static rft::Butterfly board;
+static rft::STM32L4 board;
 
 // Motors  ==============================================================================
 
