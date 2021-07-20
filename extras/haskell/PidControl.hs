@@ -53,7 +53,8 @@ rateClosure kp ki kd windupMax rateMax =
     \vehicleState -> \demands -> \controllerState ->
 
     let computeDof = \stateAccessor ->
-                     \pidAccessor -> (stateAccessor vehicleState)
+                     \pidAccessor ->
+                     (stateAccessor vehicleState)
 
     -- Return updated demands and controller state
     in  (Demands (throttle demands)
