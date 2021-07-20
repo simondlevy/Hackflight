@@ -54,17 +54,10 @@ newRateController kp ki kd windupMax rateMax =
     PidController (rateClosure kp ki kd windupMax rateMax)
                   (RateState (FullPidState 0 0 0 0) (FullPidState 0 0 0 0))
 
-rateDemand :: Double ->
-              Double ->
-              FullPidState ->
-              Double ->
-              Double ->
-              Double ->
-              Double ->
-              Double ->
+rateDemand :: Double -> Double -> FullPidState -> FullPidConstants -> Double ->
               (Double, FullPidState)
 
-rateDemand demand angularVelocity pidState kp ki kd windupMax rateMax = 
+rateDemand demand angularVelocity pidState pidConstants rateMax = 
 
     (demand, (FullPidState 0 0 0 0))
 
@@ -76,12 +69,14 @@ rateClosure kp ki kd windupMax rateMax =
     let (rollDemand, rollPidState) = rateDemand (roll demands)
                                                 (state_phi vehicleState)
                                                 (rateRollState controllerState)
-                                                 kp ki kd windupMax rateMax
+                                                 (FullPidConstants kp ki kd windupMax)
+                                                 rateMax
 
         (pitchDemand, pitchPidState) = rateDemand (pitch demands)
                                                   (state_theta vehicleState)
                                                   (ratePitchState controllerState)
-                                                  kp ki kd windupMax rateMax
+                                                  (FullPidConstants kp ki kd windupMax)
+                                                  rateMax
 
     -- Return updated demands and controller state
     in ((Demands (throttle demands) rollDemand pitchDemand (yaw demands)),
