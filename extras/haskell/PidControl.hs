@@ -71,6 +71,9 @@ rateDemand demand angularVelocity pidState pidConstants rateMax =
         errI = constrain_abs ((pidErrorIntegral pidState) + err) (windupMax pidConstants)
         iterm = errI * (ki pidConstants)
 
+        deltaErr = err - (pidErrorPrev pidState)
+        -- dterm = ((controller_state['deltaError1'] + controller_state['deltaError2'] + deltaError) * Kd)
+
         newDemand = demand
 
     in (newDemand, newPidState)
