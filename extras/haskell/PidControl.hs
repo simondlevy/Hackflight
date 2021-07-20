@@ -58,23 +58,23 @@ newRateController kp ki kd windupMax rateMax =
 rateDemand :: Double -> Double -> FullPidState -> FullPidConstants -> Double ->
               (Double, FullPidState)
 
-rateDemand demand angularVelocity pidState pidConstants rateMax = 
+rateDemand oldDemand angularVelocity oldPidState pidConstants rateMax = 
 
     -- Reset PID state on quick angular velocity change
     let newPidState = if abs(angularVelocity) > rateMax
                       then (FullPidState 0 0 0 0)
-                      else pidState
+                      else oldPidState
 
-        err = demand - angularVelocity
+        err = oldDemand - angularVelocity
 
         pterm = err * (pidKp pidConstants)
 
-        errI = constrain_abs ((pidErrorIntegral pidState) + err)
+        errI = constrain_abs ((pidErrorIntegral newPidState) + err)
                              (pidWindupMax pidConstants)
         iterm = errI * (pidKi pidConstants)
 
-        deltaErr = err - (pidErrorPrev pidState)
-        dterm = ((pidDeltaError1 pidState) + (pidDeltaError2 pidState) +
+        deltaErr = err - (pidErrorPrev newPidState)
+        dterm = ((pidDeltaError1 newPidState) + (pidDeltaError2 newPidState) +
                  deltaErr) * (pidKd pidConstants)
 
     in (pterm + iterm + dterm, 
