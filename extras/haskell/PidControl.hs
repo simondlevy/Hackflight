@@ -23,13 +23,6 @@ data FullPidState =
                    pidDeltaError2 :: Double,
                    pidErrorPrev :: Double }
 
-data FullPidConstants = 
-
-    FullPidConstants { pidKp :: Double,
-                       pidKi :: Double,
-                       pidKd :: Double,
-                       pidWindupMax :: Double }
-
 data PidState =
 
      AltHoldState { altErrorIntegral :: Double,
@@ -55,50 +48,48 @@ newRateController kp ki kd windupMax rateMax =
     PidController (rateClosure kp ki kd windupMax rateMax)
                   (RateState (FullPidState 0 0 0 0) (FullPidState 0 0 0 0))
 
-rateDemand :: Double -> Double -> FullPidState -> FullPidConstants -> Double ->
-              (Double, FullPidState)
-
-rateDemand oldDemand angularVelocity oldPidState pidConstants rateMax = 
-
-    -- Reset PID state on quick angular velocity change
-    let newPidState = if abs(angularVelocity) > rateMax
-                      then (FullPidState 0 0 0 0)
-                      else oldPidState
-
-        err = oldDemand - angularVelocity
-
-        pterm = err * (pidKp pidConstants)
-
-        errI = constrain_abs ((pidErrorIntegral newPidState) + err)
-                             (pidWindupMax pidConstants)
-        iterm = errI * (pidKi pidConstants)
-
-        deltaErr = err - (pidErrorPrev newPidState)
-        dterm = ((pidDeltaError1 newPidState) + (pidDeltaError2 newPidState) +
-                 deltaErr) * (pidKd pidConstants)
-
-    in (pterm + iterm + dterm, 
-        (FullPidState (pidErrorIntegral newPidState)
-                      deltaErr  -- deltaError1 <- deltaError
-                      (pidDeltaError1 newPidState) -- deltaError2 <- deltaError1
-                      err)) -- errorPrev <- error
-
 rateClosure :: Double -> Double -> Double -> Double -> Double -> PidFun
 rateClosure kp ki kd windupMax rateMax =
 
     \vehicleState -> \demands -> \controllerState ->
 
-    let (rollDemand, rollPidState) = rateDemand (roll demands)
-                                                (state_phi vehicleState)
-                                                (rateRollState controllerState)
-                                                (FullPidConstants kp ki kd windupMax)
-                                                rateMax
+    let 
 
-        (pitchDemand, pitchPidState) = rateDemand (pitch demands)
-                                                  (state_theta vehicleState)
+        computeDof oldDemand angularVelocity oldPidState =
+
+            let 
+
+                --  # Reset PID state on quick angular velocity change
+                newPidState = if abs(angularVelocity) > deg2rad(rateMax)
+                              then (FullPidState 0 0 0 0)
+                              else oldPidState
+
+                err = oldDemand - angularVelocity
+
+                pterm = kp * err
+
+                errI = constrain_abs ((pidErrorIntegral newPidState) + err)
+                                      windupMax
+                iterm = ki * errI
+
+                deltaErr = err - (pidErrorPrev newPidState)
+                dterm = kd * ((pidDeltaError1 newPidState) +
+                              (pidDeltaError2 newPidState) +
+                              deltaErr)
+
+                in (pterm + iterm + dterm, 
+                    (FullPidState (pidErrorIntegral newPidState)
+                                  deltaErr  -- deltaError1 <- deltaError
+                                  (pidDeltaError1 newPidState) -- deltaError2 <- deltaError1
+                                  err)) -- errorPrev <- error
+
+        (rollDemand, rollPidState) = computeDof (roll demands)
+                                                 (-(state_dphi vehicleState))
+                                                 (rateRollState controllerState)
+
+        (pitchDemand, pitchPidState) = computeDof (pitch demands)
+                                                  (state_dtheta vehicleState)
                                                   (ratePitchState controllerState)
-                                                  (FullPidConstants kp ki kd windupMax)
-                                                  rateMax
 
     -- Return updated demands and controller state
     in ((Demands (throttle demands) rollDemand pitchDemand (yaw demands)),
@@ -160,3 +151,6 @@ constrain_abs x lim = if x < -lim then -lim else (if x > lim then lim else x)
 
 in_band :: Double -> Double -> Bool
 in_band value band = abs(value) < band
+
+deg2rad :: Double -> Double
+deg2rad d = d * pi / 180

@@ -24,4 +24,4 @@ main = let
                                                     2.5  -- pilotVelZMax
                                                     0.2  -- stickDeadband
 
-       in runServer hackflightFun [rateController] quadXAPMixer
+       in runServer hackflightFun [rateController, altHoldController] quadXAPMixer
