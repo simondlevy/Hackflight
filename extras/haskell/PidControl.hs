@@ -77,8 +77,6 @@ rateDemand demand angularVelocity pidState pidConstants rateMax =
         dterm = ((pidDeltaError1 pidState) + (pidDeltaError2 pidState) +
                  deltaErr) * (pidKd pidConstants)
 
-        newDemand = demand
-
     in (pterm + iterm + dterm, 
         (FullPidState (pidErrorIntegral newPidState)
                       deltaErr  -- deltaError1 <- deltaError
