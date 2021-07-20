@@ -24,18 +24,16 @@ hackflightFun :: HackflightFun
 
 helperFun :: Demands ->
              VehicleState ->
-             Mixer ->
              [PidController] ->
              [PidController] ->
-             (Motors, [PidController])
+             (Demands, [PidController])
 
--- Base case: apply mixer to final demands to get motors
-helperFun demands _ mixer [] newPidControllers =
-    (mixer demands, newPidControllers)
+-- Base case: return final demands and PID controllers
+helperFun demands  _ [] newPidControllers = (demands, newPidControllers)
 
 -- Recursive case: apply current PID controller to demands to get new demands
 -- and PID state; then recur on remaining PID controllers
-helperFun demands vehicleState mixer oldPidControllers newPidControllers =
+helperFun demands vehicleState oldPidControllers newPidControllers =
 
     let oldPidController = head oldPidControllers
    
@@ -48,9 +46,14 @@ helperFun demands vehicleState mixer oldPidControllers newPidControllers =
         newPid = newPidController pfun newPstate
 
     in helperFun newDemands
-                     vehicleState
-                     mixer (tail oldPidControllers)
-                     (newPid:newPidControllers)
+                 vehicleState
+                 (tail oldPidControllers)
+                 (newPid:newPidControllers)
 
 hackflightFun demands vehicleState mixer pidControllers =
-    helperFun demands vehicleState mixer pidControllers []
+
+    let (newDemands, newPidControllers) =  helperFun demands
+                                                     vehicleState
+                                                     pidControllers
+                                                     []
+    in ((mixer newDemands), newPidControllers)
