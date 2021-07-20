@@ -47,20 +47,21 @@ newRateController kp ki kd windupMax rateMax =
     PidController (rateClosure kp ki kd windupMax rateMax)
                   (RateState (FullPidState 0 0 0 0) (FullPidState 0 0 0 0))
 
+
+computeDemand :: Double -> (Double, FullPidState)
+computeDemand demand = (demand, (FullPidState 0 0 0 0))
+
 rateClosure :: Double -> Double -> Double -> Double -> Double -> PidFun
 rateClosure kp ki kd windupMax rateMax =
 
     \vehicleState -> \demands -> \controllerState ->
 
+    let (rollDemand, rollPidState) = computeDemand (roll demands)
+        (pitchDemand, pitchPidState) = computeDemand (pitch demands)
+
     -- Return updated demands and controller state
-    (Demands (throttle demands)
-             (getDemand (roll demands) (rateRollState controllerState))
-             (getDemand (pitch demands) (ratePitchState controllerState))
-             (yaw demands),
-         RateState (FullPidState 0 0 0 0) (FullPidState 0 0 0 0))
-
-    where getDemand demand ratePidState = 0
-
+    in ((Demands (throttle demands) rollDemand pitchDemand (yaw demands)),
+        (RateState rollPidState pitchPidState))
 
 ----------------------------- Altitude hold ----------------------------------
 
