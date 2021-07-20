@@ -64,6 +64,10 @@ rateDemand demand angularVelocity pidState pidConstants rateMax =
                       then (FullPidState 0 0 0 0)
                       else pidState
 
+        err = demand - angularVelocity
+
+        pterm = err * (kp pidConstants)
+
         newDemand = demand
 
     in (newDemand, newPidState)
