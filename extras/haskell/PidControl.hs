@@ -24,10 +24,10 @@ data FullPidState =
 
 data FullPidConstants = 
 
-    FullPidConstants { kp :: Double,
-                       ki :: Double,
-                       kd :: Double,
-                       windupMax :: Double }
+    FullPidConstants { pidKp :: Double,
+                       pidKi :: Double,
+                       pidKd :: Double,
+                       pidWindupMax :: Double }
 
 data PidState =
 
@@ -66,15 +66,15 @@ rateDemand demand angularVelocity pidState pidConstants rateMax =
 
         err = demand - angularVelocity
 
-        pterm = err * (kp pidConstants)
+        pterm = err * (pidKp pidConstants)
 
         errI = constrain_abs ((pidErrorIntegral pidState) + err)
-                             (windupMax pidConstants)
-        iterm = errI * (ki pidConstants)
+                             (pidWindupMax pidConstants)
+        iterm = errI * (pidKi pidConstants)
 
         deltaErr = err - (pidErrorPrev pidState)
         dterm = ((pidDeltaError1 pidState) + (pidDeltaError2 pidState) +
-                 deltaErr) * (ki pidConstants)
+                 deltaErr) * (pidKd pidConstants)
 
         newDemand = demand
 
