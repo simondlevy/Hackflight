@@ -52,16 +52,8 @@ rateClosure kp ki kd windupMax rateMax =
 
     \vehicleState -> \demands -> \controllerState ->
 
-    let computeDof stateDirection stateAccesor = (demand, pidState) where
+    let compute = \stateAccessor -> (stateAccessor vehicleState)
 
-        demand = err * kp + errI * ki + errD * kd where
-            err = 0
-            errI = 0
-            errD = 0
-
-        pidState = 0
-    
-    
     -- Return updated demands and controller state
     in  (Demands (throttle demands)
                  (roll demands)
