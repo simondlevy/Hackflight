@@ -15,10 +15,21 @@ module PidControl(PidController,
 import State
 import Demands
 
+data FullPidState = 
+
+    FullPidState { pidErrorIntegral :: Double,
+                   pidDeltaError1 :: Double,
+                   pidDeltaError2 :: Double,
+                   pidErrorPrev :: Double }
+
 data PidState =
-    AltHoldState { errorIntegral :: Double,
-                   target :: Double,
-                   inBand :: Bool }
+
+     AltHoldState { altErrorIntegral :: Double,
+                    altTarget :: Double,
+                    altInBand :: Bool }
+
+   | RateState { rateRollState :: FullPidState,
+                 ratePitchState :: FullPidState }
 
 type PidFun = VehicleState -> Demands -> PidState -> (Demands, PidState)
 
@@ -26,6 +37,30 @@ data PidController = PidController { pidFun :: PidFun, pidState :: PidState }
 
 newPidController :: PidFun -> PidState -> PidController
 newPidController f s = PidController f s
+
+-------------------------------------- Rate ----------------------------------
+
+newRateController :: Double -> Double -> Double -> Double -> Double ->
+                     PidController
+
+newRateController kp ki kd windupMax rateMax = 
+    PidController (rateClosure kp ki kd windupMax rateMax)
+                  (RateState (FullPidState 0 0 0 0) (FullPidState 0 0 0 0))
+
+rateClosure :: Double -> Double -> Double -> Double -> Double -> PidFun
+rateClosure kp ki kd windupMax rateMax =
+
+    \vehicleState -> \demands -> \controllerState ->
+
+    let  
+
+    -- Return updated demands and controller state
+    in  (Demands (throttle demands)
+                 (roll demands)
+                 (pitch demands)
+                 (yaw demands),
+         RateState (FullPidState 0 0 0 0) (FullPidState 0 0 0 0))
+
 
 ----------------------------- Altitude hold ----------------------------------
 
@@ -49,30 +84,31 @@ altHoldClosure kp ki windupMax pilotVelZMax stickDeadband =
          inband = in_band throttleDemand stickDeadband
 
          -- Reset controller when moving into deadband
-         newControllerState = if inband && not (inBand controllerState)
+         newControllerState = if inband && not (altInBand controllerState)
                               then AltHoldState 0 altitude True
                               else controllerState
 
          -- Target velocity is a setpoint inside deadband, scaled
          -- constant outside
-         targetVelocity = if inband
-                          then (target newControllerState) - altitude
+         altTargetVelocity = if inband
+                          then (altTarget newControllerState) - altitude
                           else pilotVelZMax * throttleDemand
 
 
-         -- Compute error as target velocity minus actual velocity, after
+         -- Compute error as altTarget velocity minus actual velocity, after
          -- negating actual to accommodate NED
-         err = targetVelocity + (state_dz vehicleState)
+         err = altTargetVelocity + (state_dz vehicleState)
 
          -- Accumualte error integral
-         errI = constrain_abs ((errorIntegral controllerState) + err) windupMax
+         errI = constrain_abs ((altErrorIntegral controllerState) + err)
+                windupMax
 
     -- Return updated demands and controller state
     in  (Demands (err * kp + errI * ki)
                  (roll demands)
                  (pitch demands)
                  (yaw demands),
-         AltHoldState errI (target newControllerState) inband)
+         AltHoldState errI (altTarget newControllerState) inband)
                       
 
 --------------------------------- Helpers --------------------------------------
