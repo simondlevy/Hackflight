@@ -11,7 +11,8 @@ module PidControl(PidController,
                   pidState,
                   newPidController,
                   newRateController,
-                  newAltHoldController) where
+                  newAltHoldController,
+                  newYawController) where
 
 import State
 import Demands
