@@ -6,7 +6,7 @@
   MIT License
 --}
 
-module PidControl(PidController,
+module PidControllers(PidController,
                   pidFun,
                   pidState,
                   newPidController,
@@ -15,17 +15,11 @@ module PidControl(PidController,
                   levelController,
                   altHoldController,
                   posHoldController) where
+
 import VehicleState
 import PidState
 import Demands
 import Utils(constrain_abs, in_band, deg2rad)
-
-type PidFun = VehicleState -> Demands -> PidState -> (Demands, PidState)
-
-data PidController = PidController { pidFun :: PidFun, pidState :: PidState }
-
-newPidController :: PidFun -> PidState -> PidController
-newPidController f s = PidController f s
 
 -------------------------------------- Rate ----------------------------------
 

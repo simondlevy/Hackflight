@@ -10,6 +10,9 @@ module PidState
 
 where
 
+import VehicleState
+import Demands
+
 data FullPidState = 
 
     FullPidState { fullErrorIntegral :: Double,
@@ -29,3 +32,10 @@ data PidState =
    | YawState { yawErrorIntegral :: Double }
 
    | NoState { }
+
+type PidFun = VehicleState -> Demands -> PidState -> (Demands, PidState)
+
+data PidController = PidController { pidFun :: PidFun, pidState :: PidState }
+
+newPidController :: PidFun -> PidState -> PidController
+newPidController f s = PidController f s
