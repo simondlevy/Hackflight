@@ -10,7 +10,7 @@ module PidControl(PidController,
                   pidFun,
                   pidState,
                   newPidController,
-                  newRateController,
+                  rateController,
                   newAltHoldController,
                   newYawController,
                   newLevelController) where
@@ -47,10 +47,10 @@ newPidController f s = PidController f s
 
 -------------------------------------- Rate ----------------------------------
 
-newRateController :: Double -> Double -> Double -> Double -> Double ->
-                     PidController
+rateController :: Double -> Double -> Double -> Double -> Double ->
+                  PidController
 
-newRateController kp ki kd windupMax rateMax = 
+rateController kp ki kd windupMax rateMax = 
     PidController (rateClosure kp ki kd windupMax rateMax)
                   (RateState (FullPidState 0 0 0 0) (FullPidState 0 0 0 0))
 

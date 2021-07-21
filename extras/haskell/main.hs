@@ -7,16 +7,19 @@
 import Hackflight(hackflightFun)
 import Mixer(quadXAPMixer)
 import Server(runServer)
-import PidControl(newRateController, newAltHoldController, newYawController)
+import PidControl(rateController,
+                  newLevelController,
+                  newAltHoldController,
+                  newYawController)
 
 main :: IO ()
 
 main = let 
-           rateController = newRateController 0.225    -- Kp
-                                              0.001875 -- Ki
-                                              0.375    -- Kd
-                                              0.4      -- windupMax
-                                              40       -- maxDegreesPerSecond
+           rate = rateController 0.225    -- Kp
+                                 0.001875 -- Ki
+                                 0.375    -- Kd
+                                 0.4      -- windupMax
+                                 40       -- maxDegreesPerSecond
 
            yawController = newYawController 2.0 -- Kp
                                             0.1 -- Ki
@@ -29,5 +32,5 @@ main = let
                                                     0.2  -- stickDeadband
 
        in runServer hackflightFun
-                    [rateController, altHoldController, yawController]
+                    [rate, altHoldController, yawController]
                     quadXAPMixer
