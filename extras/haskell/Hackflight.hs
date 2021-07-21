@@ -20,7 +20,7 @@ type FullHackflightFun = OpenLoopController ->
                          [Sensor] ->
                          [PidController] ->
                          Mixer ->
-                         Motors
+                         (Motors, [PidController])
 
 type HackflightFun = Demands ->
                      VehicleState ->
