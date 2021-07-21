@@ -1,5 +1,5 @@
 {--
-  PID controller state
+  PID controller support
 
   Copyright(C) 2021 Simon D.Levy
 
