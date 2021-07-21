@@ -9,7 +9,8 @@ import Mixer(quadXAPMixer)
 import Server(runServer)
 import RatePid(rateController)
 import YawPid(yawController)
-import PidControllers(levelController, altHoldController, posHoldController)
+import LevelPid(levelController)
+import PidControllers(altHoldController, posHoldController)
 
 main :: IO ()
 
