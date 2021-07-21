@@ -81,19 +81,23 @@ rateClosure kp ki kd windupMax rateMax =
 
         (rollDemand, rollPidState) = computeDof (roll demands)
                                                  (state_dphi vehicleState)
-                                                 (rateRollState controllerState)
+                                                 (rateRollState
+                                                  controllerState)
 
         -- Pitch demand is nose-down positive, so we negate pitch-forward
         -- (nose-down negative) to reconcile them
         (pitchDemand, pitchPidState) = computeDof (pitch demands)
                                                   (-(state_dtheta vehicleState))
-                                                  (ratePitchState controllerState)
+                                                  (ratePitchState
+                                                   controllerState)
 
     -- Return updated demands and controller state
     in ((Demands (throttle demands) rollDemand pitchDemand (yaw demands)),
         (RateState rollPidState pitchPidState))
 
------------------------------ Altitude hold ----------------------------------
+--------------------------------- Level ---------------------------------------
+
+----------------------------- Altitude hold -----------------------------------
 
 newAltHoldController :: Double -> Double -> Double -> Double -> Double 
                         -> PidController
