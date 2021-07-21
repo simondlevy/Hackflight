@@ -83,14 +83,14 @@ rateClosure kp ki kd windupMax rateMax =
                                   err))
 
         (rollDemand, rollPidState) = computeDof (roll demands)
-                                                 (state_dphi vehicleState)
+                                                 (State.dphi vehicleState)
                                                  (rateRollState
                                                   controllerState)
 
         -- Pitch demand is nose-down positive, so we negate pitch-forward
         -- (nose-down negative) to reconcile them
         (pitchDemand, pitchPidState) = computeDof (pitch demands)
-                                                  (-(state_dtheta vehicleState))
+                                                  (-(State.dtheta vehicleState))
                                                   (ratePitchState
                                                    controllerState)
 
@@ -111,7 +111,7 @@ yawClosure kp ki windupMax =
     \vehicleState -> \demands -> \controllerState ->
 
     -- Compute error as target minus actual
-    let err = (yaw demands) - state_dpsi vehicleState
+    let err = (yaw demands) - State.dpsi vehicleState
 
         -- Accumualte error integral
         errI = constrain_abs ((yawErrorIntegral controllerState) + err)
@@ -139,7 +139,7 @@ altHoldClosure kp ki windupMax pilotVelZMax stickDeadband =
 
     let  
          -- NED => ENU
-         altitude = -(state_z vehicleState)
+         altitude = -(State.z vehicleState)
 
          throttleDemand = throttle demands
 
@@ -159,7 +159,7 @@ altHoldClosure kp ki windupMax pilotVelZMax stickDeadband =
 
          -- Compute error as altTarget velocity minus actual velocity, after
          -- negating actual to accommodate NED
-         err = altTargetVelocity + (state_dz vehicleState)
+         err = altTargetVelocity + (State.dz vehicleState)
 
          -- Accumualte error integral
          errI = constrain_abs ((altErrorIntegral controllerState) + err)
@@ -176,7 +176,7 @@ altHoldClosure kp ki windupMax pilotVelZMax stickDeadband =
 --------------------------------- Helpers --------------------------------------
 
 constrain_abs :: Double -> Double -> Double
-constrain_abs x lim = if x < -lim then -lim else (if x > lim then lim else x)
+constrain_abs v lim = if v < -lim then -lim else (if v > lim then lim else v)
 
 in_band :: Double -> Double -> Bool
 in_band value band = abs(value) < band

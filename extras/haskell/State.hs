@@ -11,17 +11,17 @@
 module State where
 
 data VehicleState = VehicleState { 
-                     state_x :: Double
-                   , state_dx :: Double 
-                   , state_y :: Double
-                   , state_dy :: Double 
-                   , state_z :: Double
-                   , state_dz :: Double 
-                   , state_phi :: Double
-                   , state_dphi :: Double 
-                   , state_theta :: Double
-                   , state_dtheta :: Double 
-                   , state_psi :: Double
-                   , state_dpsi :: Double 
+                     x :: Double
+                   , dx :: Double 
+                   , y :: Double
+                   , dy :: Double 
+                   , z :: Double
+                   , dz :: Double 
+                   , phi :: Double
+                   , dphi :: Double 
+                   , theta :: Double
+                   , dtheta :: Double 
+                   , psi :: Double
+                   , dpsi :: Double 
                    } deriving (Show)
 
