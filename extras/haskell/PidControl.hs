@@ -11,9 +11,9 @@ module PidControl(PidController,
                   pidState,
                   newPidController,
                   rateController,
-                  newAltHoldController,
-                  newYawController,
-                  newLevelController) where
+                  altHoldController,
+                  yawController,
+                  levelController) where
 
 import State
 import Demands
@@ -106,9 +106,9 @@ rateClosure kp ki kd windupMax rateMax =
 
 ----------------------------------- Yaw ---------------------------------------
 
-newYawController :: Double -> Double -> Double -> PidController
+yawController :: Double -> Double -> Double -> PidController
 
-newYawController kp ki windupMax = 
+yawController kp ki windupMax = 
     PidController (yawClosure kp ki windupMax) (YawState 0)
 
 yawClosure :: Double -> Double -> Double -> PidFun
@@ -132,9 +132,9 @@ yawClosure kp ki windupMax =
 
 ---------------------------------- Level --------------------------------------
 
-newLevelController :: Double -> Double -> PidController
+levelController :: Double -> Double -> PidController
 
-newLevelController kp maxAngleDegrees =
+levelController kp maxAngleDegrees =
     PidController (levelClosure kp maxAngleDegrees) LevelState
 
 levelClosure :: Double -> Double -> PidFun
@@ -166,9 +166,9 @@ levelClosure kp maxAngleDegrees =
 
 ----------------------------- Altitude hold -----------------------------------
 
-newAltHoldController :: Double -> Double -> Double -> Double -> Double 
+altHoldController :: Double -> Double -> Double -> Double -> Double 
                         -> PidController
-newAltHoldController kp ki windupMax pilotVelZMax stickDeadband = 
+altHoldController kp ki windupMax pilotVelZMax stickDeadband = 
     PidController (altHoldClosure kp ki windupMax pilotVelZMax stickDeadband)
                   (AltHoldState 0 0 False)
 
