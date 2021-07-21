@@ -10,6 +10,7 @@ import Server(runServer)
 import PidControl(rateController,
                   levelController,
                   altHoldController,
+                  posHoldController,
                   yawController)
 
 main :: IO ()
@@ -34,4 +35,9 @@ main = let
                                        2.5  -- pilotVelZMax
                                        0.2  -- stickDeadband
 
-       in runServer hackflightFun [rate, level, altHold, yaw] quadXAPMixer
+           posHold = posHoldController 0.1 -- Kp
+                                       0.2 -- stickDeadband
+
+       in runServer hackflightFun
+                    [posHold, rate, level, altHold, yaw]
+                    quadXAPMixer
