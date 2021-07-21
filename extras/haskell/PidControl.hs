@@ -16,28 +16,9 @@ module PidControl(PidController,
                   altHoldController,
                   posHoldController) where
 import State
+import PidState
 import Demands
 import Utils(constrain_abs, in_band, deg2rad)
-
-data FullPidState = 
-
-    FullPidState { fullErrorIntegral :: Double,
-                   fullDeltaError1 :: Double,
-                   fullDeltaError2 :: Double,
-                   fullErrorPrev :: Double }
-
-data PidState =
-
-     AltHoldState { altErrorIntegral :: Double,
-                    altTarget :: Double,
-                    altInBand :: Bool }
-
-   | RateState { rateRollState :: FullPidState,
-                 ratePitchState :: FullPidState }
-
-   | YawState { yawErrorIntegral :: Double }
-
-   | NoState { }
 
 type PidFun = VehicleState -> Demands -> PidState -> (Demands, PidState)
 
