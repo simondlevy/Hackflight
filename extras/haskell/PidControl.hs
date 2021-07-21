@@ -75,9 +75,9 @@ rateClosure kp ki kd windupMax rateMax =
 
                 in ((kp * err) + (ki * errI) + (kd * errD), 
                     (FullPidState (pidErrorIntegral newPidState)
-                                  deltaErr  -- deltaError1 <- deltaError
-                                  (pidDeltaError1 newPidState) -- deltaError2 <- deltaError1
-                                  err)) -- errorPrev <- error
+                                  deltaErr  
+                                  (pidDeltaError1 newPidState) 
+                                  err))
 
         (rollDemand, rollPidState) = computeDof (roll demands)
                                                  (state_dphi vehicleState)
