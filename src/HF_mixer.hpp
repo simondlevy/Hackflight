@@ -86,8 +86,14 @@ namespace hf {
                 }
             }
 
-            void run(float * demands) override
+            void run(float * demands, bool olcInactive) override
             {
+                // Don't run motors if open-looop controller is inactive
+                // (e.g., throttle is down)
+                if (olcInactive) {
+                    return;
+                }
+
                 // Map throttle demand from [-1,+1] to [0,1]
                 demands[DEMANDS_THROTTLE] = (demands[DEMANDS_THROTTLE] + 1) / 2;
 
@@ -96,10 +102,14 @@ namespace hf {
                 for (uint8_t i = 0; i < _nmotors; i++) {
 
                     motorvals[i] = 
-                        (demands[DEMANDS_THROTTLE] * motorDirections[i].throttle + 
-                         demands[DEMANDS_ROLL]     * motorDirections[i].roll +     
-                         demands[DEMANDS_PITCH]    * motorDirections[i].pitch +   
-                         demands[DEMANDS_YAW]      * motorDirections[i].yaw);      
+                        (demands[DEMANDS_THROTTLE] *
+                         motorDirections[i].throttle + 
+                         demands[DEMANDS_ROLL] * 
+                         motorDirections[i].roll +     
+                         demands[DEMANDS_PITCH]
+                         * motorDirections[i].pitch +   
+                         demands[DEMANDS_YAW]
+                         * motorDirections[i].yaw);      
                 }
 
                 float maxMotor = motorvals[0];
@@ -110,7 +120,8 @@ namespace hf {
 
                 for (uint8_t i = 0; i < _nmotors; i++) {
 
-                    // This is a way to still have good gyro corrections if at least one motor reaches its max
+                    // This is a way to still have good gyro corrections if at
+                    // least one motor reaches its max
                     if (maxMotor > 1) {
                         motorvals[i] -= maxMotor - 1;
                     }
