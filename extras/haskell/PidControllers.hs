@@ -7,7 +7,6 @@
 --}
 
 module PidControllers(PidController,
-                  pidState,
                   newPidController,
                   rateController,
                   yawController,
