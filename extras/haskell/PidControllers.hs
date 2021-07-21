@@ -17,7 +17,7 @@ module PidControllers(PidController,
                   posHoldController) where
 
 import VehicleState
-import PidState
+import PidControl
 import Demands
 import Utils(constrain_abs, in_band, deg2rad)
 
@@ -28,7 +28,7 @@ rateController :: Double -> Double -> Double -> Double -> Double ->
 
 rateController kp ki kd windupMax rateMax = 
     PidController (rateClosure kp ki kd windupMax rateMax)
-                  (RateState (FullPidState 0 0 0 0) (FullPidState 0 0 0 0))
+                  (RateState (FullPidControl 0 0 0 0) (FullPidControl 0 0 0 0))
 
 rateClosure :: Double -> Double -> Double -> Double -> Double -> PidFun
 rateClosure kp ki kd windupMax rateMax =
@@ -37,38 +37,38 @@ rateClosure kp ki kd windupMax rateMax =
 
     let 
 
-        computeDof demand angularVelocity oldPidState =
+        computeDof demand angularVelocity oldPidControl =
 
             let 
 
                 --  Reset PID state on quick angular velocity change
-                newPidState = if abs(angularVelocity) > deg2rad(rateMax)
-                              then (FullPidState 0 0 0 0)
-                              else oldPidState
+                newPidControl = if abs(angularVelocity) > deg2rad(rateMax)
+                              then (FullPidControl 0 0 0 0)
+                              else oldPidControl
 
                 err = demand - angularVelocity
 
-                errI = constrain_abs ((fullErrorIntegral newPidState) + err)
+                errI = constrain_abs ((fullErrorIntegral newPidControl) + err)
                                       windupMax
-                deltaErr = err - (fullErrorPrev newPidState)
-                errD = ((fullDeltaError1 newPidState) +
-                        (fullDeltaError2 newPidState) +
+                deltaErr = err - (fullErrorPrev newPidControl)
+                errD = ((fullDeltaError1 newPidControl) +
+                        (fullDeltaError2 newPidControl) +
                         deltaErr)
 
                 in ((kp * err) + (ki * errI) + (kd * errD), 
-                    (FullPidState (fullErrorIntegral newPidState)
+                    (FullPidControl (fullErrorIntegral newPidControl)
                                   deltaErr  
-                                  (fullDeltaError1 newPidState) 
+                                  (fullDeltaError1 newPidControl) 
                                   err))
 
-        (rollDemand, rollPidState) = computeDof (Demands.roll demands)
+        (rollDemand, rollPidControl) = computeDof (Demands.roll demands)
                                                  (VehicleState.dphi vehicleState)
                                                  (rateRollState
                                                   controllerState)
 
         -- Pitch demand is nose-down positive, so we negate pitch-forward
         -- (nose-down negative) to reconcile them
-        (pitchDemand, pitchPidState) = computeDof (Demands.pitch demands)
+        (pitchDemand, pitchPidControl) = computeDof (Demands.pitch demands)
                                                   (-(VehicleState.dtheta vehicleState))
                                                   (ratePitchState
                                                    controllerState)
@@ -78,7 +78,7 @@ rateClosure kp ki kd windupMax rateMax =
                  rollDemand
                  pitchDemand
                  (Demands.yaw demands)),
-        (RateState rollPidState pitchPidState))
+        (RateState rollPidControl pitchPidControl))
 
 ----------------------------------- Yaw ---------------------------------------
 

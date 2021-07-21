@@ -4,7 +4,7 @@ all: $(ALL)
 WARN = -Wall
 
 main: main.hs Hackflight.o VehicleState.o Demands.o Mixer.o PidControllers.o \
-      PidState.o Server.o Utils.o
+      PidControl.o Server.o Utils.o
 	ghc $(WARN) main.hs
 	rm -f *.hi *.o
 
@@ -14,8 +14,8 @@ main.o: main.hs Mixer.o Server.o PidControllers.o
 Hackflight.o: Hackflight.hs VehicleState.o Demands.o Mixer.o PidControllers.o
 	ghc $(WARN) Hackflight.hs
 
-PidState.o: PidState.hs
-	ghc $(WARN) PidState.hs
+PidControl.o: PidControl.hs
+	ghc $(WARN) PidControl.hs
 
 VehicleState.o: VehicleState.hs
 	ghc $(WARN) VehicleState.hs

@@ -6,36 +6,36 @@
   MIT License
 --}
 
-module PidState
+module PidControl
 
 where
 
 import VehicleState
 import Demands
 
-data FullPidState = 
+data FullPidControl = 
 
-    FullPidState { fullErrorIntegral :: Double,
+    FullPidControl { fullErrorIntegral :: Double,
                    fullDeltaError1 :: Double,
                    fullDeltaError2 :: Double,
                    fullErrorPrev :: Double }
 
-data PidState =
+data PidControl =
 
      AltHoldState { altErrorIntegral :: Double,
                     altTarget :: Double,
                     altInBand :: Bool }
 
-   | RateState { rateRollState :: FullPidState,
-                 ratePitchState :: FullPidState }
+   | RateState { rateRollState :: FullPidControl,
+                 ratePitchState :: FullPidControl }
 
    | YawState { yawErrorIntegral :: Double }
 
    | NoState { }
 
-type PidFun = VehicleState -> Demands -> PidState -> (Demands, PidState)
+type PidFun = VehicleState -> Demands -> PidControl -> (Demands, PidControl)
 
-data PidController = PidController { pidFun :: PidFun, pidState :: PidState }
+data PidController = PidController { pidFun :: PidFun, pidState :: PidControl }
 
-newPidController :: PidFun -> PidState -> PidController
+newPidController :: PidFun -> PidControl -> PidController
 newPidController f s = PidController f s
