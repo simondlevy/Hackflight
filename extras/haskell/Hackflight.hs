@@ -23,10 +23,10 @@ type HackflightFun = Demands ->
 hackflightFun :: HackflightFun
 
 closedLoopHelper :: Demands ->
-             VehicleState ->
-             [PidController] ->
-             [PidController] ->
-             (Demands, [PidController])
+                    VehicleState ->
+                    [PidController] ->
+                    [PidController] ->
+                    (Demands, [PidController])
 
 -- Base case: return final demands and PID controllers
 closedLoopHelper demands  _ [] newPidControllers = (demands, newPidControllers)
