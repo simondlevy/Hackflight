@@ -12,7 +12,8 @@ module PidControl(PidController,
                   newPidController,
                   newRateController,
                   newAltHoldController,
-                  newYawController) where
+                  newYawController,
+                  newLevelController) where
 
 import State
 import Demands
@@ -34,6 +35,8 @@ data PidState =
                  ratePitchState :: FullPidState }
 
    | YawState { yawErrorIntegral :: Double }
+
+   | LevelState { }
 
 type PidFun = VehicleState -> Demands -> PidState -> (Demands, PidState)
 
@@ -89,7 +92,7 @@ rateClosure kp ki kd windupMax rateMax =
 
         -- Pitch demand is nose-down positive, so we negate pitch-forward
         -- (nose-down negative) to reconcile them
-        (pitchDemand, pitchPidState) = computeDof (pitch demands)
+        (pitchDemand, pitchPidState) = computeDof (Demands.pitch demands)
                                                   (-(State.dtheta vehicleState))
                                                   (ratePitchState
                                                    controllerState)
@@ -114,7 +117,7 @@ yawClosure kp ki windupMax =
     \vehicleState -> \demands -> \controllerState ->
 
     -- Compute error as target minus actual
-    let err = (yaw demands) - State.dpsi vehicleState
+    let err = (Demands.yaw demands) - (State.dpsi vehicleState)
 
         -- Accumualte error integral
         errI = constrain_abs ((yawErrorIntegral controllerState) + err)
@@ -126,6 +129,40 @@ yawClosure kp ki windupMax =
                 (Demands.pitch demands)
                 (kp * err + ki * errI),
         YawState errI)
+
+---------------------------------- Level --------------------------------------
+
+newLevelController :: Double -> Double -> PidController
+
+newLevelController kp maxAngleDegrees =
+    PidController (levelClosure kp maxAngleDegrees) LevelState
+
+levelClosure :: Double -> Double -> PidFun
+levelClosure kp maxAngleDegrees =
+
+    \vehicleState -> \demands -> \_controllerState ->
+
+    let 
+        -- Maximum roll pitch demand is +/-0.5, so to convert demand to
+        -- angle for error computation, we multiply by the folling amount:
+        demandScale = 2 * deg2rad(maxAngleDegrees)
+
+    -- Return updated demands and controller state
+    in (Demands (Demands.throttle demands) 
+
+                -- New roll demand
+                (kp * (Demands.roll demands) * demandScale -
+                      (State.phi vehicleState))
+
+                -- Pitch demand is nose-down positive, so we negate
+                -- pitch-forward (nose-down negative) to reconcile them
+                -- and get new pitch demand
+                (kp * (Demands.pitch demands) * demandScale +
+                      (State.theta vehicleState))
+
+                (Demands.yaw demands),
+
+        LevelState)
 
 ----------------------------- Altitude hold -----------------------------------
 
