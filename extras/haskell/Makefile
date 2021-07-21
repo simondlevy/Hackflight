@@ -1,7 +1,8 @@
 ALL = main
 all: $(ALL)
 
-main: main.hs Hackflight.hs State.hs Demands.hs Mixer.hs PidControl.hs Server.hs
+main: main.hs Hackflight.hs State.hs Demands.hs Mixer.hs PidControl.hs \
+      Server.hs Utils.hs
 	ghc -Wall main.hs
 	rm -f *.hi *.o
 
@@ -13,6 +14,9 @@ Hackflight.o: Hackflight.hs State.o Demands.o Mixer.o PidControl.o
 
 State.o: State.hs
 	ghc -Wall State.hs
+
+Utils.o: Utils.hs
+	ghc -Wall Utils.hs
 
 Demands.o: Demands.hs
 	ghc -Wall Demands.hs

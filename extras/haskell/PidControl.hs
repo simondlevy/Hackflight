@@ -17,6 +17,7 @@ module PidControl(PidController,
                   posHoldController) where
 import State
 import Demands
+import Utils(constrain_abs, in_band, deg2rad)
 
 data FullPidState = 
 
@@ -248,14 +249,3 @@ posHoldClosure kp stickDeadband =
                     else demands
 
     in (newDemands, NoState)
-
---------------------------------- Helpers --------------------------------------
-
-constrain_abs :: Double -> Double -> Double
-constrain_abs v lim = if v < -lim then -lim else (if v > lim then lim else v)
-
-in_band :: Double -> Double -> Bool
-in_band value band = abs(value) < band
-
-deg2rad :: Double -> Double
-deg2rad d = d * pi / 180
