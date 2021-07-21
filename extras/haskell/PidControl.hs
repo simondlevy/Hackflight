@@ -18,10 +18,10 @@ import Demands
 
 data FullPidState = 
 
-    FullPidState { pidErrorIntegral :: Double,
-                   pidDeltaError1 :: Double,
-                   pidDeltaError2 :: Double,
-                   pidErrorPrev :: Double }
+    FullPidState { fullErrorIntegral :: Double,
+                   fullDeltaError1 :: Double,
+                   fullDeltaError2 :: Double,
+                   fullErrorPrev :: Double }
 
 data PidState =
 
@@ -31,6 +31,8 @@ data PidState =
 
    | RateState { rateRollState :: FullPidState,
                  ratePitchState :: FullPidState }
+
+   | YawState { yawErrorIntegral :: Double }
 
 type PidFun = VehicleState -> Demands -> PidState -> (Demands, PidState)
 
@@ -66,17 +68,17 @@ rateClosure kp ki kd windupMax rateMax =
 
                 err = demand - angularVelocity
 
-                errI = constrain_abs ((pidErrorIntegral newPidState) + err)
+                errI = constrain_abs ((fullErrorIntegral newPidState) + err)
                                       windupMax
-                deltaErr = err - (pidErrorPrev newPidState)
-                errD = ((pidDeltaError1 newPidState) +
-                        (pidDeltaError2 newPidState) +
+                deltaErr = err - (fullErrorPrev newPidState)
+                errD = ((fullDeltaError1 newPidState) +
+                        (fullDeltaError2 newPidState) +
                         deltaErr)
 
                 in ((kp * err) + (ki * errI) + (kd * errD), 
-                    (FullPidState (pidErrorIntegral newPidState)
+                    (FullPidState (fullErrorIntegral newPidState)
                                   deltaErr  
-                                  (pidDeltaError1 newPidState) 
+                                  (fullDeltaError1 newPidState) 
                                   err))
 
         (rollDemand, rollPidState) = computeDof (roll demands)
@@ -95,7 +97,31 @@ rateClosure kp ki kd windupMax rateMax =
     in ((Demands (throttle demands) rollDemand pitchDemand (yaw demands)),
         (RateState rollPidState pitchPidState))
 
---------------------------------- Level ---------------------------------------
+----------------------------------- Yaw ---------------------------------------
+
+newYawController :: Double -> Double -> Double -> PidController
+
+newYawController kp ki windupMax = 
+    PidController (yawClosure kp ki windupMax) (YawState 0)
+
+yawClosure :: Double -> Double -> Double -> PidFun
+yawClosure kp ki windupMax =
+
+    \vehicleState -> \demands -> \controllerState ->
+
+    -- Compute error as target minus actual
+    let err = (yaw demands) - state_dpsi vehicleState
+
+        -- Accumualte error integral
+        errI = constrain_abs ((yawErrorIntegral controllerState) + err)
+                             windupMax
+
+    -- Return updated demands and controller state
+    in (Demands (throttle demands) 
+                (roll demands)
+                (pitch demands)
+                (kp * err + ki * errI),
+        YawState errI)
 
 ----------------------------- Altitude hold -----------------------------------
 
