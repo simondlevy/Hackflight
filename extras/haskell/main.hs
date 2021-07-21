@@ -8,10 +8,8 @@ import Hackflight(hackflightFun)
 import Mixer(quadXAPMixer)
 import Server(runServer)
 import RatePid(rateController)
-import PidControllers(levelController,
-                      altHoldController,
-                      posHoldController,
-                      yawController)
+import YawPid(yawController)
+import PidControllers(levelController, altHoldController, posHoldController)
 
 main :: IO ()
 

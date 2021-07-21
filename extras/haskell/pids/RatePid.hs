@@ -1,5 +1,5 @@
 {--
-  PID control for pitch/level angular velocity
+  PID control for roll/pitch angular velocity
 
   Copyright(C) 2021 Simon D.Levy
 
