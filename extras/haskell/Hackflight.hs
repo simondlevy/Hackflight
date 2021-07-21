@@ -22,18 +22,18 @@ type HackflightFun = Demands ->
 
 hackflightFun :: HackflightFun
 
-helperFun :: Demands ->
+closedLoopHelper :: Demands ->
              VehicleState ->
              [PidController] ->
              [PidController] ->
              (Demands, [PidController])
 
 -- Base case: return final demands and PID controllers
-helperFun demands  _ [] newPidControllers = (demands, newPidControllers)
+closedLoopHelper demands  _ [] newPidControllers = (demands, newPidControllers)
 
 -- Recursive case: apply current PID controller to demands to get new demands
 -- and PID state; then recur on remaining PID controllers
-helperFun demands vehicleState oldPidControllers newPidControllers =
+closedLoopHelper demands vehicleState oldPidControllers newPidControllers =
 
     let oldPidController = head oldPidControllers
    
@@ -45,15 +45,15 @@ helperFun demands vehicleState oldPidControllers newPidControllers =
 
         newPid = newPidController pfun newPstate
 
-    in helperFun newDemands
+    in closedLoopHelper newDemands
                  vehicleState
                  (tail oldPidControllers)
                  (newPid:newPidControllers)
 
 hackflightFun demands vehicleState mixer pidControllers =
 
-    let (newDemands, newPidControllers) =  helperFun demands
-                                                     vehicleState
-                                                     pidControllers
-                                                     []
+    let (newDemands, newPidControllers) = closedLoopHelper demands
+                                                           vehicleState
+                                                           pidControllers
+                                                           []
     in ((mixer newDemands), newPidControllers)
