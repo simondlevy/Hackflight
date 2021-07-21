@@ -9,8 +9,8 @@ all: $(ALL)
 
 WARN = -Wall
 
-main: main.hs Hackflight.o VehicleState.o Demands.o Mixer.o PidControl.o \
-      Server.o Utils.o \
+main: main.hs Hackflight.o VehicleState.o Sensor.o OpenLoopControl.o Demands.o \
+      Mixer.o PidControl.o Server.o Utils.o \
       RatePid.o YawPid.o LevelPid.o AltHoldPid.o PosHoldPid.o
 	ghc -ipids $(WARN) main.hs
 	rm -f *.hi *.o pids/*.hi pids/*.o
@@ -20,6 +20,14 @@ main.o: main.hs Mixer.o Server.o
 
 Hackflight.o: Hackflight.hs VehicleState.o Demands.o Mixer.o
 	ghc $(WARN) Hackflight.hs
+
+OpenLoopControl.o: OpenLoopControl.hs Demands.o
+	ghc $(WARN) pids/OpenLoopControl.hs
+	mv pids/OpenLoopControl.o .
+
+Sensor.o: Sensor.hs VehicleState.o
+	ghc $(WARN) pids/Sensor.hs
+	mv pids/Sensor.o .
 
 RatePid.o: pids/RatePid.hs VehicleState.o PidControl.o Demands.o Utils.o
 	ghc $(WARN) pids/RatePid.hs
