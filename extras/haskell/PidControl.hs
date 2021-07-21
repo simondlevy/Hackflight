@@ -11,10 +11,10 @@ module PidControl(PidController,
                   pidState,
                   newPidController,
                   rateController,
-                  altHoldController,
                   yawController,
-                  levelController) where
-
+                  levelController,
+                  altHoldController,
+                  posHoldController) where
 import State
 import Demands
 
@@ -36,7 +36,7 @@ data PidState =
 
    | YawState { yawErrorIntegral :: Double }
 
-   | LevelState { }
+   | NoState { }
 
 type PidFun = VehicleState -> Demands -> PidState -> (Demands, PidState)
 
@@ -135,7 +135,7 @@ yawClosure kp ki windupMax =
 levelController :: Double -> Double -> PidController
 
 levelController kp maxAngleDegrees =
-    PidController (levelClosure kp maxAngleDegrees) LevelState
+    PidController (levelClosure kp maxAngleDegrees) NoState
 
 levelClosure :: Double -> Double -> PidFun
 levelClosure kp maxAngleDegrees =
@@ -162,7 +162,7 @@ levelClosure kp maxAngleDegrees =
 
                 (Demands.yaw demands),
 
-        LevelState)
+        NoState)
 
 ----------------------------- Altitude hold -----------------------------------
 
@@ -212,6 +212,42 @@ altHoldClosure kp ki windupMax pilotVelZMax stickDeadband =
                  (Demands.yaw demands),
          AltHoldState errI (altTarget newControllerState) inband)
                       
+
+---------------------------- Position hold ------------------------------------
+
+posHoldController :: Double -> Double -> PidController
+
+posHoldController kp stickDeadband =
+    PidController (posHoldClosure kp stickDeadband) NoState
+
+posHoldClosure :: Double -> Double -> PidFun
+posHoldClosure kp stickDeadband =
+
+    \vehicleState -> \demands -> \_controllerState ->
+
+    let newDemands = if in_band (Demands.roll demands) stickDeadband &&
+                        in_band (Demands.pitch demands) stickDeadband
+        
+                    then
+
+                        let p = State.psi vehicleState
+
+                            -- Rotate X, Y velocities into body frame
+
+                            cp = cos p
+                            sp = sin p
+
+                            xx = State.dx vehicleState
+                            yy = State.dy vehicleState
+
+                        in Demands (Demands.throttle demands)
+                                   (-kp * (cp * xx + sp * yy))
+                                   (-kp * (cp * yy - sp * xx))
+                                   (Demands.yaw demands)
+
+                    else demands
+
+    in (newDemands, NoState)
 
 --------------------------------- Helpers --------------------------------------
 
