@@ -8,7 +8,7 @@
   MIT License
 --}
 
-module State where
+module VehicleState where
 
 data VehicleState = VehicleState { 
                      x :: Double

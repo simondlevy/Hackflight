@@ -15,7 +15,7 @@ module PidControl(PidController,
                   levelController,
                   altHoldController,
                   posHoldController) where
-import State
+import VehicleState
 import PidState
 import Demands
 import Utils(constrain_abs, in_band, deg2rad)
@@ -68,14 +68,14 @@ rateClosure kp ki kd windupMax rateMax =
                                   err))
 
         (rollDemand, rollPidState) = computeDof (Demands.roll demands)
-                                                 (State.dphi vehicleState)
+                                                 (VehicleState.dphi vehicleState)
                                                  (rateRollState
                                                   controllerState)
 
         -- Pitch demand is nose-down positive, so we negate pitch-forward
         -- (nose-down negative) to reconcile them
         (pitchDemand, pitchPidState) = computeDof (Demands.pitch demands)
-                                                  (-(State.dtheta vehicleState))
+                                                  (-(VehicleState.dtheta vehicleState))
                                                   (ratePitchState
                                                    controllerState)
 
@@ -99,7 +99,7 @@ yawClosure kp ki windupMax =
     \vehicleState -> \demands -> \controllerState ->
 
     -- Compute error as target minus actual
-    let err = (Demands.yaw demands) - (State.dpsi vehicleState)
+    let err = (Demands.yaw demands) - (VehicleState.dpsi vehicleState)
 
         -- Accumualte error integral
         errI = constrain_abs ((yawErrorIntegral controllerState) + err)
@@ -134,13 +134,13 @@ levelClosure kp maxAngleDegrees =
 
                 -- New roll demand
                 (kp * (Demands.roll demands) * demandScale -
-                      (State.phi vehicleState))
+                      (VehicleState.phi vehicleState))
 
                 -- Pitch demand is nose-down positive, so we negate
                 -- pitch-forward (nose-down negative) to reconcile them
                 -- and get new pitch demand
                 (kp * (Demands.pitch demands) * demandScale +
-                      (State.theta vehicleState))
+                      (VehicleState.theta vehicleState))
 
                 (Demands.yaw demands),
 
@@ -161,7 +161,7 @@ altHoldClosure kp ki windupMax pilotVelZMax stickDeadband =
 
     let  
          -- NED => ENU
-         altitude = -(State.z vehicleState)
+         altitude = -(VehicleState.z vehicleState)
 
          throttleDemand = throttle demands
 
@@ -181,7 +181,7 @@ altHoldClosure kp ki windupMax pilotVelZMax stickDeadband =
 
          -- Compute error as altTarget velocity minus actual velocity, after
          -- negating actual to accommodate NED
-         err = altTargetVelocity + (State.dz vehicleState)
+         err = altTargetVelocity + (VehicleState.dz vehicleState)
 
          -- Accumualte error integral
          errI = constrain_abs ((altErrorIntegral controllerState) + err)
@@ -212,15 +212,15 @@ posHoldClosure kp stickDeadband =
         
                     then
 
-                        let p = State.psi vehicleState
+                        let p = VehicleState.psi vehicleState
 
                             -- Rotate X, Y velocities into body frame
 
                             cp = cos p
                             sp = sin p
 
-                            xx = State.dx vehicleState
-                            yy = State.dy vehicleState
+                            xx = VehicleState.dx vehicleState
+                            yy = VehicleState.dy vehicleState
 
                         in Demands (Demands.throttle demands)
                                    (-kp * (cp * xx + sp * yy))

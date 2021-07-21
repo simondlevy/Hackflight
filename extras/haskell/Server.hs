@@ -17,7 +17,7 @@ import Data.Serialize -- from cereal
 
 import Demands
 import Mixer
-import State
+import VehicleState
 import Hackflight(HackflightFun)
 import PidControl(PidController)
 

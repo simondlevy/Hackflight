@@ -3,7 +3,7 @@ all: $(ALL)
 
 WARN = -Wall
 
-main: main.hs Hackflight.o State.o Demands.o Mixer.o PidControl.o \
+main: main.hs Hackflight.o VehicleState.o Demands.o Mixer.o PidControl.o \
       PidState.o Server.o Utils.o
 	ghc $(WARN) main.hs
 	rm -f *.hi *.o
@@ -11,14 +11,14 @@ main: main.hs Hackflight.o State.o Demands.o Mixer.o PidControl.o \
 main.o: main.hs Mixer.o Server.o PidControl.o
 	ghc $(WARN) main.hs
 
-Hackflight.o: Hackflight.hs State.o Demands.o Mixer.o PidControl.o
+Hackflight.o: Hackflight.hs VehicleState.o Demands.o Mixer.o PidControl.o
 	ghc $(WARN) Hackflight.hs
 
 PidState.o: PidState.hs
 	ghc $(WARN) PidState.hs
 
-State.o: State.hs
-	ghc $(WARN) State.hs
+VehicleState.o: VehicleState.hs
+	ghc $(WARN) VehicleState.hs
 
 Utils.o: Utils.hs
 	ghc $(WARN) Utils.hs
@@ -29,10 +29,10 @@ Demands.o: Demands.hs
 Mixer.o: Mixer.hs
 	ghc $(WARN) Mixer.hs
 
-PidControl.o: PidControl.hs State.o Demands.o
+PidControl.o: PidControl.hs VehicleState.o Demands.o
 	ghc $(WARN) PidControl.hs
 
-Server.o: Server.hs Hackflight.o Demands.o Mixer.o State.o PidControl.o
+Server.o: Server.hs Hackflight.o Demands.o Mixer.o VehicleState.o PidControl.o
 	ghc $(WARN) Server.hs
 
 run: main

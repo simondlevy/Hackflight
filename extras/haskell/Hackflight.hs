@@ -9,7 +9,7 @@
 module Hackflight(HackflightFun, hackflightFun)
 where
 
-import State(VehicleState)
+import VehicleState
 import Demands
 import PidControl(PidController, newPidController, pidFun, pidState)
 import Mixer(Mixer, Motors)
