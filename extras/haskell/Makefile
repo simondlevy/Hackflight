@@ -13,7 +13,7 @@ main: main.hs Hackflight.o VehicleState.o Demands.o Mixer.o PidControl.o \
       Server.o Utils.o \
       RatePid.o YawPid.o LevelPid.o AltHoldPid.o PosHoldPid.o
 	ghc -ipids $(WARN) main.hs
-	rm -f *.hi *.o
+	rm -f *.hi *.o pids/*.hi pids/*.o
 
 main.o: main.hs Mixer.o Server.o
 	ghc $(WARN) main.hs
