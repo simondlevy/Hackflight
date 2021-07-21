@@ -10,7 +10,8 @@ import Server(runServer)
 import RatePid(rateController)
 import YawPid(yawController)
 import LevelPid(levelController)
-import PidControllers(altHoldController, posHoldController)
+import AltHoldPid(altHoldController)
+import PosHoldPid(posHoldController)
 
 main :: IO ()
 

@@ -1,21 +1,19 @@
 {--
-  PID control
+  PID controller for altitude hold
 
   Copyright(C) 2021 Simon D.Levy
 
   MIT License
 --}
 
-module PidControllers(PidController,
-                  altHoldController,
-                  posHoldController) where
+module AltHoldPid(altHoldController)
+
+where
 
 import VehicleState
 import PidControl
 import Demands
 import Utils(constrain_abs, in_band)
-
------------------------------ Altitude hold -----------------------------------
 
 altHoldController :: Double -> Double -> Double -> Double -> Double 
                         -> PidController
@@ -62,40 +60,3 @@ altHoldClosure kp ki windupMax pilotVelZMax stickDeadband =
                  (Demands.pitch demands)
                  (Demands.yaw demands),
          AltHoldState errI (altTarget newControllerState) inband)
-                      
-
----------------------------- Position hold ------------------------------------
-
-posHoldController :: Double -> Double -> PidController
-
-posHoldController kp stickDeadband =
-    PidController (posHoldClosure kp stickDeadband) NoState
-
-posHoldClosure :: Double -> Double -> PidFun
-posHoldClosure kp stickDeadband =
-
-    \vehicleState -> \demands -> \_controllerState ->
-
-    let newDemands = if in_band (Demands.roll demands) stickDeadband &&
-                        in_band (Demands.pitch demands) stickDeadband
-        
-                    then
-
-                        let p = VehicleState.psi vehicleState
-
-                            -- Rotate X, Y velocities into body frame
-
-                            cp = cos p
-                            sp = sin p
-
-                            xx = VehicleState.dx vehicleState
-                            yy = VehicleState.dy vehicleState
-
-                        in Demands (Demands.throttle demands)
-                                   (-kp * (cp * xx + sp * yy))
-                                   (-kp * (cp * yy - sp * xx))
-                                   (Demands.yaw demands)
-
-                    else demands
-
-    in (newDemands, NoState)

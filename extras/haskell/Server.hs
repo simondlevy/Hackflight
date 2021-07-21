@@ -19,7 +19,7 @@ import Demands
 import Mixer
 import VehicleState
 import Hackflight(HackflightFun)
-import PidControllers(PidController)
+import PidControl(PidController)
 
 runServer :: HackflightFun -> [PidController] -> Mixer -> IO ()
 

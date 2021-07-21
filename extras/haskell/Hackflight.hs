@@ -11,8 +11,7 @@ where
 
 import VehicleState
 import Demands
-import PidControl(pidFun, pidState, newPidController)
-import PidControllers(PidController)
+import PidControl(PidController, pidFun, pidState, newPidController)
 import Mixer(Mixer, Motors)
 
 type HackflightFun = Demands ->
