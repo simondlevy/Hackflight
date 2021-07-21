@@ -14,6 +14,16 @@ import Demands
 import PidControl(PidController, pidFun, pidState, newPidController)
 import Mixer(Mixer, Motors)
 
+type OpenLoopController = IO () -> Demands
+
+type Sensor = IO () -> VehicleState -> VehicleState
+
+type FullHackflightFun = OpenLoopController ->
+                         [Sensor] ->
+                         [PidController] ->
+                         Mixer ->
+                         Motors
+
 type HackflightFun = Demands ->
                      VehicleState ->
                      Mixer ->
