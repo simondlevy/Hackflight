@@ -17,7 +17,7 @@ import PidControl(PidController, pidFun, pidState, newPidController)
 import Mixer(Mixer, Motors)
 
 type FullHackflightFun = OpenLoopController ->
-                         [Sensor] ->
+                         -- [Sensor] ->
                          [PidController] ->
                          Mixer ->
                          (Motors, [PidController])
