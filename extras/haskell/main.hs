@@ -25,10 +25,13 @@ main = let
                                0.1 -- Ki
                                0.4 -- windupMax
 
+           level = levelController 0.2 -- Kp
+                                   45  -- maxAngleDegrees
+
            altHold = altHoldController 0.75 -- Kp
                                        1.5  -- Ki
                                        0.4  -- windupMax
                                        2.5  -- pilotVelZMax
                                        0.2  -- stickDeadband
 
-       in runServer hackflightFun [rate, altHold, yaw] quadXAPMixer
+       in runServer hackflightFun [rate, level, altHold, yaw] quadXAPMixer
