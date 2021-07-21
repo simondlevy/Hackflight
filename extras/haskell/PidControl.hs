@@ -82,7 +82,7 @@ rateClosure kp ki kd windupMax rateMax =
                                   (fullDeltaError1 newPidState) 
                                   err))
 
-        (rollDemand, rollPidState) = computeDof (roll demands)
+        (rollDemand, rollPidState) = computeDof (Demands.roll demands)
                                                  (State.dphi vehicleState)
                                                  (rateRollState
                                                   controllerState)
@@ -95,7 +95,10 @@ rateClosure kp ki kd windupMax rateMax =
                                                    controllerState)
 
     -- Return updated demands and controller state
-    in ((Demands (throttle demands) rollDemand pitchDemand (yaw demands)),
+    in ((Demands (Demands.throttle demands)
+                 rollDemand
+                 pitchDemand
+                 (Demands.yaw demands)),
         (RateState rollPidState pitchPidState))
 
 ----------------------------------- Yaw ---------------------------------------
@@ -118,9 +121,9 @@ yawClosure kp ki windupMax =
                              windupMax
 
     -- Return updated demands and controller state
-    in (Demands (throttle demands) 
-                (roll demands)
-                (pitch demands)
+    in (Demands (Demands.throttle demands) 
+                (Demands.roll demands)
+                (Demands.pitch demands)
                 (kp * err + ki * errI),
         YawState errI)
 
@@ -167,9 +170,9 @@ altHoldClosure kp ki windupMax pilotVelZMax stickDeadband =
 
     -- Return updated demands and controller state
     in  (Demands (err * kp + errI * ki)
-                 (roll demands)
-                 (pitch demands)
-                 (yaw demands),
+                 (Demands.roll demands)
+                 (Demands.pitch demands)
+                 (Demands.yaw demands),
          AltHoldState errI (altTarget newControllerState) inband)
                       
 
