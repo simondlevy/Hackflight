@@ -42,7 +42,6 @@ runServer hackflightFun pidControllers mixer = withSocketsDo $
             hackflightFun
             mixer
             pidControllers
-            0
 
 loop :: Socket ->
         Socket ->
@@ -50,7 +49,6 @@ loop :: Socket ->
         HackflightFun ->
         Mixer ->
         [PidController]->
-        Int ->
         IO ()
 
 loop telemetryServerSocket
@@ -58,8 +56,7 @@ loop telemetryServerSocket
      motorClientSockAddr
      hackflightFun
      mixer
-     pidControllers 
-     count =
+     pidControllers =
 
   do 
 
@@ -95,14 +92,13 @@ loop telemetryServerSocket
       putStrLn "-----"
 
       -- Repeat until user presses stop button in simulator
-      if count < 2 {-- time >= 0 --} then
+      if time >= 0  then
           loop telemetryServerSocket
                motorClientSocket
                motorClientSockAddr
                hackflightFun
                mixer
                newPidControllers
-               (count + 1)
       else
           putStrLn "Done"
 
