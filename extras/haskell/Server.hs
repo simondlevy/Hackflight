@@ -90,7 +90,7 @@ loop telemetryServerSocket
             motorClientSockAddr
 
       -- Repeat until user presses stop button in simulator
-      if time > 0 then
+      if time >= 0 then
           loop telemetryServerSocket
                motorClientSocket
                motorClientSockAddr
