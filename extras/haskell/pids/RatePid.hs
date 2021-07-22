@@ -14,7 +14,6 @@ import VehicleState
 import PidControl
 import Demands
 import Utils
-import Debugging
 
 rateController :: Double -> Double -> Double -> Double -> Double ->
                   PidController
@@ -54,7 +53,7 @@ rateClosure kp ki kd windupMax rateMax =
                                   (fullDeltaError1 newPidControl) 
                                   err))
 
-        (rollDemand, rollPidControl) = computeDof (debug "->rate: " (Demands.roll demands))
+        (rollDemand, rollPidControl) = computeDof (Demands.roll demands)
                                                  (VehicleState.dphi
                                                   vehicleState)
                                                  (rateRollState

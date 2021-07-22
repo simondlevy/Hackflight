@@ -89,8 +89,6 @@ loop telemetryServerSocket
             (doublesToBytes (motorValues motors))
             motorClientSockAddr
 
-      putStrLn "-----"
-
       -- Repeat until user presses stop button in simulator
       if time >= 0  then
           loop telemetryServerSocket
