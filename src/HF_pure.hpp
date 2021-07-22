@@ -25,7 +25,9 @@ namespace hf {
 
         public:
 
-            Hackflight(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
+            Hackflight(rft::Board * board,
+                       Receiver * receiver,
+                       rft::Actuator * actuator)
                 : rft::RFTPure(board, receiver, actuator)
             {
             }
