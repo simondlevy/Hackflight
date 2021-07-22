@@ -56,7 +56,7 @@ closedLoopHelper demands vehicleState oldPidControllers newPidControllers =
     in closedLoopHelper newDemands
                         vehicleState
                         (tail oldPidControllers)
-                        (newPid:newPidControllers)
+                        (newPidControllers ++ [newPid])
 
 hackflightFun demands vehicleState mixer pidControllers =
 

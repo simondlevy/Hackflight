@@ -42,6 +42,7 @@ runServer hackflightFun pidControllers mixer = withSocketsDo $
             hackflightFun
             mixer
             pidControllers
+            0
 
 loop :: Socket ->
         Socket ->
@@ -49,6 +50,7 @@ loop :: Socket ->
         HackflightFun ->
         Mixer ->
         [PidController]->
+        Int ->
         IO ()
 
 loop telemetryServerSocket
@@ -56,7 +58,8 @@ loop telemetryServerSocket
      motorClientSockAddr
      hackflightFun
      mixer
-     pidControllers =
+     pidControllers 
+     count =
 
   do 
 
@@ -78,7 +81,7 @@ loop telemetryServerSocket
 
       let stickDemands = Demands (d!!13) (d!!14) (d!!15) (d!!16)
 
-      -- Run the mixer on the demands to get the motor values
+      -- Run the Hackflight algorithm to get the motor values
       let (motors, newPidControllers) = hackflightFun stickDemands
                                                       vehicleState
                                                       mixer
@@ -89,14 +92,17 @@ loop telemetryServerSocket
             (doublesToBytes (motorValues motors))
             motorClientSockAddr
 
+      putStrLn "-----"
+
       -- Repeat until user presses stop button in simulator
-      if time >= 0 then
+      if count < 2 {-- time >= 0 --} then
           loop telemetryServerSocket
                motorClientSocket
                motorClientSockAddr
                hackflightFun
                mixer
                newPidControllers
+               (count + 1)
       else
           putStrLn "Done"
 
