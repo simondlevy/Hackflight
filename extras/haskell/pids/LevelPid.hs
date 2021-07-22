@@ -15,6 +15,8 @@ import PidControl
 import Demands
 import Utils(deg2rad)
 
+import Debugging
+
 levelController :: Double -> Double -> PidController
 
 levelController kp maxAngleDegrees =
@@ -40,7 +42,7 @@ levelClosure kp maxAngleDegrees =
 
     -- Return updated demands and controller state
     in ((Demands (Demands.throttle demands)
-                 rollDemand
+                 (debug "->level: " (Demands.roll demands))
                  pitchDemand
                  (Demands.yaw demands)),
         NoState)
