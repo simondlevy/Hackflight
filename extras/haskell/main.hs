@@ -5,6 +5,7 @@
 --}
 
 import Hackflight(hackflightFun)
+import PassThruSensor
 import Mixer(quadXAPMixer)
 import Server(runServer)
 import RatePid(rateController)
@@ -38,6 +39,9 @@ main = let
            posHold = posHoldController 0.5 -- Kp
                                        0.2 -- stickDeadband
 
+           
+
        in runServer hackflightFun
+                    [passThruSensor]
                     [posHold, rate, yaw, level, altHold]
                     quadXAPMixer

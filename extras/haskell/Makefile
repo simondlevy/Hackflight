@@ -11,23 +11,43 @@ WARN = -Wall
 
 main: main.hs Hackflight.o VehicleState.o Sensor.o Demands.o OpenLoopControl.o \
 	  ClosedLoopControl.o Mixer.o PidControl.o Server.o Utils.o \
+	  PassThruSensor.o \
       RatePid.o YawPid.o LevelPid.o AltHoldPid.o PosHoldPid.o
-	ghc -ipids $(WARN) main.hs
-
-main.o: main.hs Mixer.o Server.o
-	ghc $(WARN) main.hs
+	ghc -ipids -isensors $(WARN) main.hs
 
 Hackflight.o: Hackflight.hs VehicleState.o Demands.o Mixer.o
 	ghc $(WARN) Hackflight.hs
 
-ClosedLoopControl.o: ClosedLoopControl.hs Demands.o VehicleState.o
-	ghc $(WARN) ClosedLoopControl.hs
+VehicleState.o: VehicleState.hs
+	ghc $(WARN) VehicleState.hs
+
+Sensor.o: Sensor.hs VehicleState.o
+	ghc $(WARN) Sensor.hs
+
+Demands.o: Demands.hs
+	ghc $(WARN) Demands.hs
 
 OpenLoopControl.o: OpenLoopControl.hs Demands.o
 	ghc $(WARN) OpenLoopControl.hs
 
-Sensor.o: Sensor.hs VehicleState.o
-	ghc $(WARN) Sensor.hs
+ClosedLoopControl.o: ClosedLoopControl.hs Demands.o VehicleState.o
+	ghc $(WARN) ClosedLoopControl.hs
+
+Mixer.o: Mixer.hs
+	ghc $(WARN) Mixer.hs
+
+PidControl.o: PidControl.hs
+	ghc $(WARN) PidControl.hs
+
+Server.o: Server.hs Hackflight.o Demands.o Mixer.o VehicleState.o
+	ghc $(WARN) Server.hs
+
+Utils.o: Utils.hs
+	ghc $(WARN) Utils.hs
+
+PassThruSensor.o: sensors/PassThruSensor.hs Sensor.o
+	ghc $(WARN) sensors/PassThruSensor.hs
+	mv sensors/PassThruSensor.o .
 
 RatePid.o: pids/RatePid.hs VehicleState.o PidControl.o Demands.o Utils.o
 	ghc $(WARN) pids/RatePid.hs
@@ -48,24 +68,6 @@ AltHoldPid.o: pids/AltHoldPid.hs VehicleState.o PidControl.o Demands.o Utils.o
 PosHoldPid.o: pids/PosHoldPid.hs VehicleState.o PidControl.o Demands.o Utils.o
 	ghc $(WARN) pids/PosHoldPid.hs
 	mv pids/PosHoldPid.o .
-
-PidControl.o: PidControl.hs
-	ghc $(WARN) PidControl.hs
-
-VehicleState.o: VehicleState.hs
-	ghc $(WARN) VehicleState.hs
-
-Utils.o: Utils.hs
-	ghc $(WARN) Utils.hs
-
-Demands.o: Demands.hs
-	ghc $(WARN) Demands.hs
-
-Mixer.o: Mixer.hs
-	ghc $(WARN) Mixer.hs
-
-Server.o: Server.hs Hackflight.o Demands.o Mixer.o VehicleState.o
-	ghc $(WARN) Server.hs
 
 run: main
 	./main

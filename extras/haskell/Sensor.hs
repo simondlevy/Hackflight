@@ -12,4 +12,6 @@ where
 
 import VehicleState
 
-type Sensor = IO () -> VehicleState -> VehicleState
+-- type Sensor = IO () -> VehicleState -> VehicleState
+
+type Sensor = VehicleState -> VehicleState

@@ -16,14 +16,15 @@ import Data.Either.Utils -- from MissingH
 import Data.Serialize -- from cereal
 
 import Demands
+import Sensor
 import Mixer
 import VehicleState
 import Hackflight(HackflightFun)
 import PidControl(PidController)
 
-runServer :: HackflightFun -> [PidController] -> Mixer -> IO ()
+runServer :: HackflightFun -> [Sensor] -> [PidController] -> Mixer -> IO ()
 
-runServer hackflightFun pidControllers mixer = withSocketsDo $
+runServer hackflightFun sensors pidControllers mixer = withSocketsDo $
 
     do 
 
@@ -40,6 +41,7 @@ runServer hackflightFun pidControllers mixer = withSocketsDo $
             motorClientSocket
             motorClientSocketAddress
             hackflightFun
+            sensors
             mixer
             pidControllers
 
@@ -47,6 +49,7 @@ loop :: Socket ->
         Socket ->
         SockAddr ->
         HackflightFun ->
+        [Sensor] ->
         Mixer ->
         [PidController]->
         IO ()
@@ -55,6 +58,7 @@ loop telemetryServerSocket
      motorClientSocket
      motorClientSockAddr
      hackflightFun
+     sensors
      mixer
      pidControllers =
 
@@ -80,6 +84,7 @@ loop telemetryServerSocket
 
       -- Run the Hackflight algorithm to get the motor values
       let (motors, newPidControllers) = hackflightFun stickDemands
+                                                      sensors
                                                       vehicleState
                                                       mixer
                                                       pidControllers
@@ -95,6 +100,7 @@ loop telemetryServerSocket
                motorClientSocket
                motorClientSockAddr
                hackflightFun
+               sensors
                mixer
                newPidControllers
       else
