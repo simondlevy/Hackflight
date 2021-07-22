@@ -9,18 +9,20 @@
 module Hackflight(HackflightFun, hackflightFun)
 where
 
-import Sensor
-import OpenLoopControl
+-- import Sensor
 import VehicleState
 import Demands
-import PidControl(PidController, pidFun, pidState, newPidController)
+import PidControl(PidController)
 import Mixer(Mixer, Motors)
+import ClosedLoopControl(closedLoop)
 
+{--
 type FullHackflightFun = OpenLoopController ->
-                         -- [Sensor] ->
+                         [Sensor] ->
                          [PidController] ->
                          Mixer ->
                          (Motors, [PidController])
+--}
 
 type HackflightFun = Demands ->
                      VehicleState ->
@@ -30,38 +32,8 @@ type HackflightFun = Demands ->
 
 hackflightFun :: HackflightFun
 
-closedLoopHelper :: Demands ->
-                    VehicleState ->
-                    [PidController] ->
-                    [PidController] ->
-                    (Demands, [PidController])
-
--- Base case: return final demands and PID controllers
-closedLoopHelper demands  _ [] newPidControllers = (demands, newPidControllers)
-
--- Recursive case: apply current PID controller to demands to get new demands
--- and PID state; then recur on remaining PID controllers
-closedLoopHelper demands vehicleState oldPidControllers newPidControllers =
-
-    let oldPidController = head oldPidControllers
-   
-        pfun = pidFun oldPidController
-
-        pstate = pidState oldPidController
-
-        (newDemands, newPstate) = pfun vehicleState demands pstate
-
-        newPid = newPidController pfun newPstate
-
-    in closedLoopHelper newDemands
-                        vehicleState
-                        (tail oldPidControllers)
-                        (newPidControllers ++ [newPid])
-
 hackflightFun demands vehicleState mixer pidControllers =
 
-    let (newDemands, newPidControllers) = closedLoopHelper demands
-                                                           vehicleState
-                                                           pidControllers
-                                                           []
+    let (newDemands, newPidControllers) = closedLoop demands vehicleState pidControllers []
+
     in ((mixer newDemands), newPidControllers)
