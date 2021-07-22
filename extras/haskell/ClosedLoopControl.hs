@@ -18,35 +18,31 @@ closedLoop :: Demands ->
               [PidController] ->
               (Demands, [PidController])
 
-closedLoop demands vehicleState oldPidControllers =
+closedLoop demands vehicleState pidControllers =
 
-    closedLoopHelper demands vehicleState oldPidControllers []
-  
+    closedLoopHelper demands pidControllers []
 
-closedLoopHelper :: Demands ->
-                    VehicleState ->
-                    [PidController] ->
-                    [PidController] ->
-                    (Demands, [PidController])
+    where
 
--- Base case: return final demands and PID controllers
-closedLoopHelper demands  _ [] newPidControllers = (demands, newPidControllers)
+        -- Base case: ignore vehicle state and return new demands and new PID
+        -- controllers
+        closedLoopHelper newDemands  [] newPidControllers =
+            (newDemands, newPidControllers)
 
--- Recursive case: apply current PID controller to demands to get new demands
--- and PID state; then recur on remaining PID controllers
-closedLoopHelper demands vehicleState oldPidControllers newPidControllers =
+        -- Recursive case: apply current PID controller to demands to get new
+        -- demands and PID state; then recur on remaining PID controllers
+        closedLoopHelper oldDemands oldPidControllers newPidControllers =
 
-    let oldPidController = head oldPidControllers
-   
-        pfun = pidFun oldPidController
+            let oldPidController = head oldPidControllers
+           
+                pfun = pidFun oldPidController
 
-        pstate = pidState oldPidController
+                pstate = pidState oldPidController
 
-        (newDemands, newPstate) = pfun vehicleState demands pstate
+                (newDemands, newPstate) = pfun vehicleState oldDemands pstate
 
-        newPid = newPidController pfun newPstate
+                newPid = newPidController pfun newPstate
 
-    in closedLoopHelper newDemands
-                        vehicleState
-                        (tail oldPidControllers)
-                        (newPidControllers ++ [newPid])
+            in closedLoopHelper newDemands
+                                (tail oldPidControllers)
+                                (newPidControllers ++ [newPid])
