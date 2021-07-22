@@ -16,15 +16,25 @@ import PidControl(PidController, newPidController, pidFun, pidState)
 closedLoop :: Demands ->
               VehicleState ->
               [PidController] ->
-              [PidController] ->
               (Demands, [PidController])
 
+closedLoop demands vehicleState oldPidControllers =
+
+    closedLoopHelper demands vehicleState oldPidControllers []
+  
+
+closedLoopHelper :: Demands ->
+                    VehicleState ->
+                    [PidController] ->
+                    [PidController] ->
+                    (Demands, [PidController])
+
 -- Base case: return final demands and PID controllers
-closedLoop demands  _ [] newPidControllers = (demands, newPidControllers)
+closedLoopHelper demands  _ [] newPidControllers = (demands, newPidControllers)
 
 -- Recursive case: apply current PID controller to demands to get new demands
 -- and PID state; then recur on remaining PID controllers
-closedLoop demands vehicleState oldPidControllers newPidControllers =
+closedLoopHelper demands vehicleState oldPidControllers newPidControllers =
 
     let oldPidController = head oldPidControllers
    
@@ -36,7 +46,7 @@ closedLoop demands vehicleState oldPidControllers newPidControllers =
 
         newPid = newPidController pfun newPstate
 
-    in closedLoop newDemands
+    in closedLoopHelper newDemands
                         vehicleState
                         (tail oldPidControllers)
                         (newPidControllers ++ [newPid])

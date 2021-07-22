@@ -34,6 +34,8 @@ hackflightFun :: HackflightFun
 
 hackflightFun demands vehicleState mixer pidControllers =
 
-    let (newDemands, newPidControllers) = closedLoop demands vehicleState pidControllers []
+    let (newDemands, newPidControllers) = closedLoop demands
+                                                     vehicleState
+                                                     pidControllers
 
     in ((mixer newDemands), newPidControllers)
