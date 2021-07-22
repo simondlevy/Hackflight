@@ -15,6 +15,8 @@ import PidControl
 import Demands
 import Utils(constrain_abs)
 
+import Debugging
+
 yawController :: Double -> Double -> Double -> PidController
 
 yawController kp ki windupMax = 
@@ -34,7 +36,7 @@ yawClosure kp ki windupMax =
 
     -- Return updated demands and controller state
     in (Demands (Demands.throttle demands) 
-                (Demands.roll demands)
+                (debug "->yaw: " (Demands.roll demands))
                 (Demands.pitch demands)
                 (kp * err + ki * errI),
         YawState errI)

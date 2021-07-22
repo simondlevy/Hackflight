@@ -13,5 +13,5 @@ where
 import Text.Printf
 import Debug.Trace
 
-debug :: Double -> Double
-debug val = trace (printf "%+3.3f" val) val
+debug :: [Char] -> Double -> Double
+debug comment value = trace (printf "%s %+3.3f" comment value) value

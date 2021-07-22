@@ -11,7 +11,7 @@ import RatePid(rateController)
 import YawPid(yawController)
 import LevelPid(levelController)
 import AltHoldPid(altHoldController)
-import PosHoldPid(posHoldController)
+-- import PosHoldPid(posHoldController)
 
 main :: IO ()
 
@@ -26,7 +26,7 @@ main = let
                                0.1 -- Ki
                                0.4 -- windupMax
 
-           level = levelController 0.2 -- Kp
+           level = levelController 1.0 -- 0.2 -- Kp
                                    45  -- maxAngleDegrees
 
            altHold = altHoldController 0.75 -- Kp
@@ -35,8 +35,8 @@ main = let
                                        2.5  -- pilotVelZMax
                                        0.2  -- stickDeadband
 
-           posHold = posHoldController 0.1 -- Kp
-                                       0.2 -- stickDeadband
+           -- posHold = posHoldController 0.1 -- Kp
+           --                            0.2 -- stickDeadband
 
        in runServer hackflightFun
                     [rate, yaw, level, altHold]

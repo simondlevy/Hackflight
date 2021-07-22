@@ -13,7 +13,8 @@ where
 import VehicleState
 import PidControl
 import Demands
-import Utils(constrain_abs, deg2rad)
+import Utils
+import Debugging
 
 rateController :: Double -> Double -> Double -> Double -> Double ->
                   PidController
@@ -53,7 +54,7 @@ rateClosure kp ki kd windupMax rateMax =
                                   (fullDeltaError1 newPidControl) 
                                   err))
 
-        (rollDemand, rollPidControl) = computeDof (Demands.roll demands)
+        (rollDemand, rollPidControl) = computeDof (debug "->rate: " (Demands.roll demands))
                                                  (VehicleState.dphi
                                                   vehicleState)
                                                  (rateRollState
