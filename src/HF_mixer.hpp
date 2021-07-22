@@ -86,11 +86,11 @@ namespace hf {
                 }
             }
 
-            void run(float * demands, bool olcInactive) override
+            void run(float * demands, bool safe) override
             {
-                // Don't run motors if open-looop controller is inactive
-                // (e.g., throttle is down)
-                if (olcInactive) {
+                // Don't run motors if its not safe: vehicle should be
+                // armed, with throttle above minimum
+                if (!safe) {
                     return;
                 }
 
