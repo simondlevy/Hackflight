@@ -35,7 +35,7 @@ main = let
                                        2.5  -- pilotVelZMax
                                        0.2  -- stickDeadband
 
-           posHold = posHoldController 0.2 -- Kp
+           posHold = posHoldController 0.5 -- Kp
                                        0.2 -- stickDeadband
 
        in runServer hackflightFun

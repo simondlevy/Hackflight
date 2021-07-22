@@ -15,8 +15,6 @@ import PidControl
 import Demands
 import Utils(in_band)
 
-import Debugging
-
 posHoldController :: Double -> Double -> PidController
 
 posHoldController kp stickDeadband =
