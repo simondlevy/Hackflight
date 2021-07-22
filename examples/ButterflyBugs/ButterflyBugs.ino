@@ -22,54 +22,55 @@
 #include "hf_receivers/arduino/dsmx/dsmx_serial1.hpp"
 
 #include <rft_boards/realboards/arduino_serial/arduino/stm32l4.hpp>
-#include <rft_motors/rotary/brushless.hpp>
+#include <rft_motors/arduino/brushless.hpp>
 
 
-// Receiver ===========================================================================
+// Receiver ====================================================================
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 8.0f;
 
 static hf::DSMX_Receiver_Serial1 receiver = hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE);
 
-// Board ================================================================================
+// Board =======================================================================
 
 static rft::STM32L4 board;
 
-// Motors  ==============================================================================
+// Motors  =====================================================================
 
-static rft::BrushlessMotor motor1 = rft::BrushlessMotor(5);  // XXX 3
-static rft::BrushlessMotor motor2 = rft::BrushlessMotor(8);  // XXX 4
-static rft::BrushlessMotor motor3 = rft::BrushlessMotor(9);  // XXX 5
-static rft::BrushlessMotor motor4 = rft::BrushlessMotor(11); // XXX 8
+static rft::ArduinoBrushlessMotor motor1 =
+    rft::ArduinoBrushlessMotor(5);  // XXX 3
+static rft::ArduinoBrushlessMotor motor2 =
+    rft::ArduinoBrushlessMotor(8);  // XXX 4
+static rft::ArduinoBrushlessMotor motor3 =
+    rft::ArduinoBrushlessMotor(9);  // XXX 5
+static rft::ArduinoBrushlessMotor motor4 =
+    rft::ArduinoBrushlessMotor(11); // XXX 8
 
-// Mixer ================================================================================
+// Mixer =======================================================================
 
-static hf::MixerQuadXMW mixer = hf::MixerQuadXMW(&motor1, &motor2, &motor3, &motor4);
+static hf::MixerQuadXMW mixer =
+    hf::MixerQuadXMW(&motor1, &motor2, &motor3, &motor4);
 
-// Hackflight object ====================================================================
-
-static hf::Hackflight h;
-
-// PID controllers ======================================================================
+// PID controllers =============================================================
 
 static hf::RatePid ratePid = hf::RatePid(0.05, 0.00, 0.00);
 static hf::YawPid yawPid = hf::YawPid(0.10, 0.01);
 static hf::LevelPid levelPid = hf::LevelPid(0.40);
 
-// Sensors ==============================================================================
+// Sensors =====================================================================
 
 static hf::USFS imu;
 
-// Vehicle state ========================================================================
+// Serial tasks ================================================================
 
-static hf::State state;
+static hf::SerialTask gcsTask;
 
-// Serial tasks =========================================================================
+// Hackflight object ===========================================================
 
-hf::SerialTask gcsTask = hf::SerialTask(&receiver, &mixer, &state); 
+static hf::Hackflight h(&board, &receiver, &mixer);
 
-// Setup ==============================================================================
+// Setup =======================================================================
 
 void setup(void)
 {
@@ -88,12 +89,12 @@ void setup(void)
     h.addSerialTask(&gcsTask);
 
     // Start Hackflight firmware
-    h.begin(&board, &receiver, &mixer);
+    h.begin();
 }
 
-// Loop ===============================================================================
+// Loop ======================================================================
 
 void loop(void)
 {
-    h.update(&board, &receiver, &mixer, &state);
+    h.update();
 }

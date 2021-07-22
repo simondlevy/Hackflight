@@ -28,7 +28,7 @@
 
 #include <rft_motors/arduino/brushed.hpp>
 
-// Receiver ============================================================================
+// Receiver ===================================================================
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 4.0f;
@@ -37,42 +37,42 @@ static constexpr float SOFTWARE_TRIM[3] = {0, 0.05, 0.035};
 static hf::DSMX_Receiver_Serial1 receiver = 
     hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE, SOFTWARE_TRIM);  
 
-// Board ================================================================================
+// Board =======================================================================
 
-static hf::LadybugFC board = hf::LadybugFC(&Serial2);  // Bluetooth comms over Serial2
+// Bluetooth comms over Serial2
+static hf::LadybugFC board = hf::LadybugFC(&Serial2);  
 
-// Motors  ==============================================================================
+// Motors  =====================================================================
 
 static rft::ArduinoBrushedMotor motor1 = rft::ArduinoBrushedMotor(13);
 static rft::ArduinoBrushedMotor motor2 = rft::ArduinoBrushedMotor(A2);
 static rft::ArduinoBrushedMotor motor3 = rft::ArduinoBrushedMotor(3);
 static rft::ArduinoBrushedMotor motor4 = rft::ArduinoBrushedMotor(11);
 
-// Mixer ================================================================================
+// Mixer =======================================================================
 
 static hf::MixerQuadXMW mixer = hf::MixerQuadXMW(&motor1, &motor2, &motor3, &motor4);
 
-// PID controllers ======================================================================
+// PID controllers =============================================================
 
 static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
 static hf::YawPid yawPid = hf::YawPid(1.0625, 0.005625f);
 static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
-// Sensors ==============================================================================
+// Sensors =====================================================================
 
 static hf::USFS imu;
 
-// Serial tasks =========================================================================
+// Serial tasks ================================================================
 
 hf::SerialTask gcsTask;
-
 hf::SerialTask telemetryTask = hf::SerialTask(true);
 
-// Hackflight object ====================================================================
+// Hackflight object ===========================================================
 
 static hf::Hackflight h(&board, &receiver, &mixer);
 
-// Setup ================================================================================
+// Setup =======================================================================
 
 void setup(void)
 {
@@ -92,7 +92,7 @@ void setup(void)
     h.begin();
 }
 
-// Loop ===============================================================================
+// Loop ======================================================================
 
 void loop(void)
 {

@@ -23,7 +23,7 @@ namespace hf {
         public:
 
             LadybugFC(HardwareSerial * telemetryPort=NULL) 
-                : rft::ArduinoBoard(A4, false, telemetryPort) // A4 = LED pin; false = no LED inversion
+                : rft::ArduinoBoard(A4, telemetryPort) // LED on A4
             {
             }
 
