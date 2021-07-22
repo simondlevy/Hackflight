@@ -40,12 +40,12 @@ data PidController = PidController { pidFun :: PidFun, pidState :: PidControl }
 newPidController :: PidFun -> PidControl -> PidController
 newPidController f s = PidController f s
 
-closedLoop :: Demands ->
-              VehicleState ->
-              [PidController] ->
-              (Demands, [PidController])
+runClosedLoop :: Demands ->
+                 VehicleState ->
+                 [PidController] ->
+                 (Demands, [PidController])
 
-closedLoop demands vehicleState pidControllers =
+runClosedLoop demands vehicleState pidControllers =
 
     closedLoopHelper demands pidControllers []
 
