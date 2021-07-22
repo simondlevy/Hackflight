@@ -15,6 +15,8 @@ import PidControl
 import Demands
 import Utils(in_band)
 
+import Debugging
+
 posHoldController :: Double -> Double -> PidController
 
 posHoldController kp stickDeadband =
@@ -41,8 +43,8 @@ posHoldClosure kp stickDeadband =
                             yy = VehicleState.dy vehicleState
 
                         in Demands (Demands.throttle demands)
-                                   (-kp * (cp * xx + sp * yy))
                                    (-kp * (cp * yy - sp * xx))
+                                   (-kp * (cp * xx + sp * yy))
                                    (Demands.yaw demands)
 
                     else demands
