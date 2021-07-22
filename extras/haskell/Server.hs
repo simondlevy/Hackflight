@@ -20,7 +20,7 @@ import Sensor
 import Mixer
 import VehicleState
 import Hackflight(HackflightFun)
-import PidControl(PidController)
+import ClosedLoopControl(PidController)
 
 runServer :: HackflightFun -> [Sensor] -> [PidController] -> Mixer -> IO ()
 

@@ -1,17 +1,44 @@
 {--
-  Hackflight closed-loop control algorithm
+  Closed-loop controller support
 
   Copyright(C) 2021 Simon D.Levy
 
   MIT License
 --}
 
-module ClosedLoopControl(closedLoop)
+module ClosedLoopControl
+
 where
 
 import VehicleState
 import Demands
-import PidControl(PidController, newPidController, pidFun, pidState)
+
+data FullPidControl = 
+
+    FullPidControl { fullErrorIntegral :: Double,
+                   fullDeltaError1 :: Double,
+                   fullDeltaError2 :: Double,
+                   fullErrorPrev :: Double }
+
+data PidControl =
+
+     AltHoldState { altErrorIntegral :: Double,
+                    altTarget :: Double,
+                    altInBand :: Bool }
+
+   | RateState { rateRollState :: FullPidControl,
+                 ratePitchState :: FullPidControl }
+
+   | YawState { yawErrorIntegral :: Double }
+
+   | NoState { }
+
+type PidFun = VehicleState -> Demands -> PidControl -> (Demands, PidControl)
+
+data PidController = PidController { pidFun :: PidFun, pidState :: PidControl }
+
+newPidController :: PidFun -> PidControl -> PidController
+newPidController f s = PidController f s
 
 closedLoop :: Demands ->
               VehicleState ->

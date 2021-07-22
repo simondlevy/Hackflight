@@ -12,9 +12,8 @@ where
 import Sensor
 import VehicleState
 import Demands
-import PidControl(PidController)
 import Mixer(Mixer, Motors)
-import ClosedLoopControl(closedLoop)
+import ClosedLoopControl(PidController, closedLoop)
 
 type HackflightFun = Demands ->
                      [Sensor] ->

@@ -11,7 +11,7 @@ module PosHoldPid(posHoldController)
 where
 
 import VehicleState
-import PidControl
+import ClosedLoopControl
 import Demands
 import Utils(in_band)
 

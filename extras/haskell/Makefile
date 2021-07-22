@@ -10,7 +10,7 @@ all: $(ALL)
 WARN = -Wall
 
 main: main.hs Hackflight.o VehicleState.o Sensor.o Demands.o OpenLoopControl.o \
-	  ClosedLoopControl.o Mixer.o PidControl.o Server.o Utils.o \
+	  ClosedLoopControl.o Mixer.o Server.o Utils.o \
 	  PassThruSensor.o \
       RatePid.o YawPid.o LevelPid.o AltHoldPid.o PosHoldPid.o
 	ghc -ipids -isensors $(WARN) main.hs
@@ -36,9 +36,6 @@ ClosedLoopControl.o: ClosedLoopControl.hs Demands.o VehicleState.o
 Mixer.o: Mixer.hs
 	ghc $(WARN) Mixer.hs
 
-PidControl.o: PidControl.hs
-	ghc $(WARN) PidControl.hs
-
 Server.o: Server.hs Hackflight.o Demands.o Mixer.o VehicleState.o
 	ghc $(WARN) Server.hs
 
@@ -49,23 +46,25 @@ PassThruSensor.o: sensors/PassThruSensor.hs Sensor.o
 	ghc $(WARN) sensors/PassThruSensor.hs
 	mv sensors/PassThruSensor.o .
 
-RatePid.o: pids/RatePid.hs VehicleState.o PidControl.o Demands.o Utils.o
+RatePid.o: pids/RatePid.hs VehicleState.o ClosedLoopControl.o Demands.o Utils.o
 	ghc $(WARN) pids/RatePid.hs
 	mv pids/RatePid.o .
 
-YawPid.o: pids/YawPid.hs VehicleState.o PidControl.o Demands.o Utils.o
+YawPid.o: pids/YawPid.hs VehicleState.o ClosedLoopControl.o Demands.o Utils.o
 	ghc $(WARN) pids/YawPid.hs
 	mv pids/YawPid.o .
 
-LevelPid.o: pids/LevelPid.hs VehicleState.o PidControl.o Demands.o Utils.o
+LevelPid.o: pids/LevelPid.hs VehicleState.o ClosedLoopControl.o Demands.o Utils.o
 	ghc $(WARN) pids/LevelPid.hs
 	mv pids/LevelPid.o .
 
-AltHoldPid.o: pids/AltHoldPid.hs VehicleState.o PidControl.o Demands.o Utils.o
+AltHoldPid.o: pids/AltHoldPid.hs \
+	          VehicleState.o ClosedLoopControl.o Demands.o Utils.o
 	ghc $(WARN) pids/AltHoldPid.hs
 	mv pids/AltHoldPid.o .
 
-PosHoldPid.o: pids/PosHoldPid.hs VehicleState.o PidControl.o Demands.o Utils.o
+PosHoldPid.o: pids/PosHoldPid.hs VehicleState.o ClosedLoopControl.o Demands.o \
+	          Utils.o
 	ghc $(WARN) pids/PosHoldPid.hs
 	mv pids/PosHoldPid.o .
 
