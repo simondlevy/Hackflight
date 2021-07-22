@@ -15,6 +15,8 @@ import PidControl
 import Demands
 import Utils(deg2rad)
 
+import Debugging
+
 levelController :: Double -> Double -> PidController
 
 levelController kp maxAngleDegrees =
@@ -30,19 +32,17 @@ levelClosure kp maxAngleDegrees =
         -- angle for error computation, we multiply by the folling amount:
         demandScale = 2 * deg2rad(maxAngleDegrees)
 
-    -- Return updated demands and controller state
-    in (Demands (Demands.throttle demands) 
-
-                -- New roll demand
-                (kp * (Demands.roll demands) * demandScale -
+        rollDemand = ((demandScale * (debug(Demands.roll demands))) -
                       (VehicleState.phi vehicleState))
 
-                -- Pitch demand is nose-down positive, so we negate
-                -- pitch-forward (nose-down negative) to reconcile them
-                -- and get new pitch demand
-                (kp * (Demands.pitch demands) * demandScale +
-                      (VehicleState.theta vehicleState))
+        -- Pitch demand is nose-down positive, so we negate
+        -- pitch-forward (nose-down negative) to reconcile them
+        pitchDemand = ((demandScale * (Demands.pitch demands)) +
+                       (VehicleState.theta vehicleState))
 
-                (Demands.yaw demands),
-
+    -- Return updated demands and controller state
+    in ((Demands (Demands.throttle demands)
+                 rollDemand
+                 pitchDemand
+                 (Demands.yaw demands)),
         NoState)

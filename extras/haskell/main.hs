@@ -39,5 +39,5 @@ main = let
                                        0.2 -- stickDeadband
 
        in runServer hackflightFun
-                    [posHold, rate, level, altHold, yaw]
+                    [rate, yaw, level, altHold]
                     quadXAPMixer
