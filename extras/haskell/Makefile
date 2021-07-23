@@ -4,12 +4,17 @@
 #
 # MIT License
 
-ALL = main
+ALL = main # main2
 all: $(ALL)
 
 WARN = -Wall
 
-main: main.hs Hackflight.o VehicleState.o Sensor.o Demands.o OpenLoopControl.o \
+main: main.hs Hackflight.o VehicleState.o Demands.o ClosedLoopControl.o \
+      Mixer.o Utils.o RatePid.o YawPid.o LevelPid.o AltHoldPid.o PosHoldPid.o \
+      Server.o
+	ghc -iclosedloops $(WARN) main.hs
+
+main2: main.hs Hackflight.o VehicleState.o Sensor.o Demands.o OpenLoopControl.o \
 	  ClosedLoopControl.o Mixer.o Utils.o \
           RatePid.o YawPid.o LevelPid.o AltHoldPid.o PosHoldPid.o \
 	  SimSensor.o SimReceiver.o Server.o

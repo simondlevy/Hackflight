@@ -6,7 +6,7 @@
   MIT License
 --}
 
-module Hackflight(HackflightFun, hackflight, HackflightFun2, hackflight2)
+module Hackflight(HackflightFun, hackflight)
 where
 
 import Sensor(Sensor, runSensors)
@@ -16,39 +16,18 @@ import Mixer(Mixer, Motors)
 import ClosedLoopControl(PidController, runClosedLoop)
 import OpenLoopControl(OpenLoopController)
 
-type HackflightFun2 = OpenLoopController ->
-                      [Sensor] ->
-                      Mixer ->
-                      [PidController] ->
-                      (Motors, [PidController])
-
-hackflight2 :: HackflightFun2
-
-hackflight2 receiver sensors mixer pidControllers =
-
-    let vehicleState = initVehicleState
-
-        demands = Demands 0 0 0 0
-
-    in ((mixer demands), pidControllers)
-
--------------------------------------------------------------------------
-
-type HackflightFun = Demands ->
+type HackflightFun = OpenLoopController ->
                      [Sensor] ->
-                     VehicleState ->
                      Mixer ->
                      [PidController] ->
                      (Motors, [PidController])
 
 hackflight :: HackflightFun
 
-hackflight demands sensors vehicleState mixer pidControllers =
+hackflight receiver sensors mixer pidControllers =
 
-    let newVehicleState = runSensors sensors vehicleState
+    let vehicleState = initVehicleState
 
-        (newDemands, newPidControllers) = runClosedLoop demands
-                                                        vehicleState
-                                                        pidControllers
+        demands = Demands 0 0 0 0
 
-    in ((mixer newDemands), newPidControllers)
+    in ((mixer demands), pidControllers)
