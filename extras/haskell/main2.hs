@@ -12,12 +12,13 @@ import LevelPid(levelController)
 import AltHoldPid(altHoldController)
 import PosHoldPid(posHoldController)
 
--- import SimReceiver
--- import SimSensor
+import SimReceiver
+import SimSensor
 
 main :: IO ()
 
 main = let 
+          
            rate = rateController 0.225    -- Kp
                                  0.001875 -- Ki
                                  0.375    -- Kd
