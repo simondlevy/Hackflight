@@ -6,13 +6,13 @@
   MIT License
 --}
 
-module PassThruSensor
+module SimSensor
 
 where
 
 import Sensor
 
-passThruSensor :: Sensor
+simSensor :: Sensor
 
-passThruSensor vehicleState = vehicleState
+simSensor vehicleState = vehicleState
 

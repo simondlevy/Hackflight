@@ -11,7 +11,7 @@ WARN = -Wall
 
 main: main.hs Hackflight.o VehicleState.o Sensor.o Demands.o OpenLoopControl.o \
 	  ClosedLoopControl.o Mixer.o Server.o Utils.o \
-	  PassThruSensor.o \
+	  SimSensor.o \
       RatePid.o YawPid.o LevelPid.o AltHoldPid.o PosHoldPid.o
 	ghc -ipids -isensors $(WARN) main.hs
 
@@ -42,9 +42,9 @@ Server.o: Server.hs Hackflight.o Demands.o Mixer.o VehicleState.o
 Utils.o: Utils.hs
 	ghc $(WARN) Utils.hs
 
-PassThruSensor.o: sensors/PassThruSensor.hs Sensor.o
-	ghc $(WARN) sensors/PassThruSensor.hs
-	mv sensors/PassThruSensor.o .
+SimSensor.o: sensors/SimSensor.hs Sensor.o
+	ghc $(WARN) sensors/SimSensor.hs
+	mv sensors/SimSensor.o .
 
 RatePid.o: pids/RatePid.hs VehicleState.o ClosedLoopControl.o Demands.o Utils.o
 	ghc $(WARN) pids/RatePid.hs
