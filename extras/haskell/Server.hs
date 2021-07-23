@@ -48,7 +48,7 @@ loop :: Socket ->
         SockAddr ->
         HackflightFun ->
         Mixer ->
-        [PidController]->
+        [PidController] ->
         IO ()
 
 loop telemetryServerSocket
