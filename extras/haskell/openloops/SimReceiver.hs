@@ -12,7 +12,10 @@ import OpenLoopControl
 import Demands
 
 simReceiver :: OpenLoopController
-simReceiver = Demands 0 0 0 0
+simReceiver = do 
+  return (Demands 0 0 0 0)
+  
+-- simReceiver = Demands 0 0 0 0
 
 {--
 import Demands
