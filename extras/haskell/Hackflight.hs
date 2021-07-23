@@ -9,15 +9,12 @@
 module Hackflight(HackflightFun, hackflight)
 where
 
-import Sensor(Sensor, runSensors)
 import VehicleState
 import Demands
 import Mixer(Mixer, Motors)
 import ClosedLoopControl(PidController, runClosedLoop)
-import OpenLoopControl(OpenLoopController)
 
 type HackflightFun = Demands ->
-                     [Sensor] ->
                      VehicleState ->
                      Mixer ->
                      [PidController] ->
@@ -25,11 +22,9 @@ type HackflightFun = Demands ->
 
 hackflight :: HackflightFun
 
-hackflight demands sensors vehicleState mixer pidControllers =
+hackflight demands vehicleState mixer pidControllers =
 
-    let newVehicleState = runSensors sensors vehicleState
-
-        (newDemands, newPidControllers) = runClosedLoop demands
+    let (newDemands, newPidControllers) = runClosedLoop demands
                                                         vehicleState
                                                         pidControllers
 
