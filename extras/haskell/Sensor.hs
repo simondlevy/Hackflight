@@ -12,7 +12,7 @@ where
 
 import VehicleState
 
-type Sensor = IO () -> VehicleState
+type Sensor = VehicleState -> IO () -> VehicleState
 
 {--
 runSensors :: [Sensor] -> VehicleState -> VehicleState

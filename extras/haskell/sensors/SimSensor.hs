@@ -14,8 +14,8 @@ import VehicleState
 
 simSensor :: Sensor
 
-simSensor = do
-  return initVehicleState
+simSensor vehicleState = do
+  return vehicleState
 
 {--
 import Demands
