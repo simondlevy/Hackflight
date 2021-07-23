@@ -71,7 +71,7 @@ PosHoldPid.o: pids/PosHoldPid.hs VehicleState.o ClosedLoopControl.o Demands.o \
 run: main
 	./main
 clean:
-	rm -rf $(ALL) *.hi *.o pids/*.hi pids/*.o
+	rm -rf $(ALL) *.hi *.o */*.hi */*.o
 
 commit:
 	git commit -a -m="More Haskell work" && git push
