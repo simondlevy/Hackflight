@@ -17,7 +17,7 @@ main: main.hs Hackflight.o VehicleState.o Demands.o ClosedLoopControl.o \
 main2: main2.hs Hackflight.o VehicleState.o Sensor.o Demands.o \
        OpenLoopControl.o ClosedLoopControl.o Mixer.o Utils.o \
        RatePid.o YawPid.o LevelPid.o AltHoldPid.o PosHoldPid.o \
-       SimSensor.o SimReceiver.o
+      Server2.o
 	ghc -iopenloops -iclosedloops -isensors $(WARN) main.hs
 
 Hackflight.o: Hackflight.hs VehicleState.o Demands.o Mixer.o
@@ -46,6 +46,10 @@ Mixer.o: Mixer.hs
 	ghc $(WARN) Mixer.hs
 
 Server.o: Server.hs Hackflight.o Demands.o Mixer.o VehicleState.o
+	ghc $(WARN) Server.hs
+
+Server2.o: Server2.hs Hackflight.o Demands.o Mixer.o VehicleState.o \
+	   Sensor.o OpenLoopControl.o
 	ghc $(WARN) Server.hs
 
 Utils.o: Utils.hs
