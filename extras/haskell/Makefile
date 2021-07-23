@@ -4,7 +4,7 @@
 #
 # MIT License
 
-ALL = main # main2
+ALL = main main2
 all: $(ALL)
 
 WARN = -Wall
