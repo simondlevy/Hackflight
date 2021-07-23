@@ -10,8 +10,12 @@ module SimSensor (simSensor) where
 
 import Sensor
 
+import VehicleState
+
 simSensor :: Sensor
-simSensor vehicleState = vehicleState
+
+simSensor = do
+  return initVehicleState
 
 {--
 import Demands

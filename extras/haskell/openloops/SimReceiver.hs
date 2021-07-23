@@ -12,6 +12,7 @@ import OpenLoopControl
 import Demands
 
 simReceiver :: OpenLoopController
+
 simReceiver = do 
   return (Demands 0 0 0 0)
   
