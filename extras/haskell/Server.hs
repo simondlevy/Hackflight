@@ -24,7 +24,7 @@ import ClosedLoopControl(PidController)
 
 runServer :: HackflightFun -> [Sensor] -> [PidController] -> Mixer -> IO ()
 
-runServer hackflightFun sensors pidControllers mixer = withSocketsDo $
+runServer hackflight sensors pidControllers mixer = withSocketsDo $
 
     do 
 
@@ -40,7 +40,7 @@ runServer hackflightFun sensors pidControllers mixer = withSocketsDo $
        loop telemetryServerSocket
             motorClientSocket
             motorClientSocketAddress
-            hackflightFun
+            hackflight
             sensors
             mixer
             pidControllers
@@ -57,7 +57,7 @@ loop :: Socket ->
 loop telemetryServerSocket
      motorClientSocket
      motorClientSockAddr
-     hackflightFun
+     hackflight
      sensors
      mixer
      pidControllers =
@@ -83,7 +83,7 @@ loop telemetryServerSocket
       let stickDemands = Demands (d!!13) (d!!14) (d!!15) (d!!16)
 
       -- Run the Hackflight algorithm to get the motor values
-      let (motors, newPidControllers) = hackflightFun stickDemands
+      let (motors, newPidControllers) = hackflight stickDemands
                                                       sensors
                                                       vehicleState
                                                       mixer
@@ -99,7 +99,7 @@ loop telemetryServerSocket
           loop telemetryServerSocket
                motorClientSocket
                motorClientSockAddr
-               hackflightFun
+               hackflight
                sensors
                mixer
                newPidControllers

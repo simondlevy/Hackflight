@@ -4,7 +4,7 @@
   MIT License
 --}
 
-import Hackflight(hackflightFun)
+import Hackflight(hackflight)
 import SimSensor
 import Mixer(quadXAPMixer)
 import Server(runServer)
@@ -41,7 +41,7 @@ main = let
 
            
 
-       in runServer hackflightFun
+       in runServer hackflight
                     [simSensor]
                     [posHold, rate, yaw, level, altHold]
                     quadXAPMixer

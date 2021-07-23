@@ -6,7 +6,7 @@
   MIT License
 --}
 
-module Hackflight(HackflightFun, hackflightFun)
+module Hackflight(HackflightFun, hackflight)
 where
 
 import Sensor(Sensor, runSensors)
@@ -22,9 +22,9 @@ type HackflightFun = Demands ->
                      [PidController] ->
                      (Motors, [PidController])
 
-hackflightFun :: HackflightFun
+hackflight :: HackflightFun
 
-hackflightFun demands sensors vehicleState mixer pidControllers =
+hackflight demands sensors vehicleState mixer pidControllers =
 
     let newVehicleState = runSensors sensors vehicleState
 
