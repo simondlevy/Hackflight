@@ -14,15 +14,17 @@ import VehicleState
 import Demands
 import Mixer(Mixer, Motors)
 import ClosedLoopControl(PidController, runClosedLoop)
+import OpenLoopControl(OpenLoopController)
 
-type HackflightFun2 = [Sensor] ->
-                     Mixer ->
-                     [PidController] ->
-                     (Motors, [PidController])
+type HackflightFun2 = OpenLoopController ->
+                      [Sensor] ->
+                      Mixer ->
+                      [PidController] ->
+                      (Motors, [PidController])
 
 hackflight2 :: HackflightFun2
 
-hackflight2 sensors mixer pidControllers =
+hackflight2 receiver sensors mixer pidControllers =
 
     let vehicleState = initVehicleState
 
