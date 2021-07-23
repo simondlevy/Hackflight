@@ -12,8 +12,8 @@ WARN = -Wall
 main: main.hs Hackflight.o VehicleState.o Sensor.o Demands.o OpenLoopControl.o \
 	  ClosedLoopControl.o Mixer.o Server.o Utils.o \
 	  SimSensor.o \
-      RatePid.o YawPid.o LevelPid.o AltHoldPid.o PosHoldPid.o
-	ghc -ipids -isensors $(WARN) main.hs
+          RatePid.o YawPid.o LevelPid.o AltHoldPid.o PosHoldPid.o
+	ghc -iclosedloops -isensors $(WARN) main.hs
 
 Hackflight.o: Hackflight.hs VehicleState.o Demands.o Mixer.o
 	ghc $(WARN) Hackflight.hs
@@ -46,27 +46,29 @@ SimSensor.o: sensors/SimSensor.hs Sensor.o
 	ghc $(WARN) sensors/SimSensor.hs
 	mv sensors/SimSensor.o .
 
-RatePid.o: pids/RatePid.hs VehicleState.o ClosedLoopControl.o Demands.o Utils.o
-	ghc $(WARN) pids/RatePid.hs
-	mv pids/RatePid.o .
+RatePid.o: closedloops/RatePid.hs VehicleState.o ClosedLoopControl.o Demands.o \
+	   Utils.o
+	ghc $(WARN) closedloops/RatePid.hs
+	mv closedloops/RatePid.o .
 
-YawPid.o: pids/YawPid.hs VehicleState.o ClosedLoopControl.o Demands.o Utils.o
-	ghc $(WARN) pids/YawPid.hs
-	mv pids/YawPid.o .
+YawPid.o: closedloops/YawPid.hs VehicleState.o ClosedLoopControl.o Demands.o \
+	  Utils.o
+	ghc $(WARN) closedloops/YawPid.hs
+	mv closedloops/YawPid.o .
 
-LevelPid.o: pids/LevelPid.hs VehicleState.o ClosedLoopControl.o Demands.o Utils.o
-	ghc $(WARN) pids/LevelPid.hs
-	mv pids/LevelPid.o .
+LevelPid.o: closedloops/LevelPid.hs VehicleState.o ClosedLoopControl.o Demands.o Utils.o
+	ghc $(WARN) closedloops/LevelPid.hs
+	mv closedloops/LevelPid.o .
 
-AltHoldPid.o: pids/AltHoldPid.hs \
-	          VehicleState.o ClosedLoopControl.o Demands.o Utils.o
-	ghc $(WARN) pids/AltHoldPid.hs
-	mv pids/AltHoldPid.o .
+AltHoldPid.o: closedloops/AltHoldPid.hs \
+	      VehicleState.o ClosedLoopControl.o Demands.o Utils.o
+	ghc $(WARN) closedloops/AltHoldPid.hs
+	mv closedloops/AltHoldPid.o .
 
-PosHoldPid.o: pids/PosHoldPid.hs VehicleState.o ClosedLoopControl.o Demands.o \
-	          Utils.o
-	ghc $(WARN) pids/PosHoldPid.hs
-	mv pids/PosHoldPid.o .
+PosHoldPid.o: closedloops/PosHoldPid.hs VehicleState.o ClosedLoopControl.o \
+	      Demands.o Utils.o
+	ghc $(WARN) closedloops/PosHoldPid.hs
+	mv closedloops/PosHoldPid.o .
 
 run: main
 	./main
