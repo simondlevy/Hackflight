@@ -10,9 +10,9 @@ all: $(ALL)
 WARN = -Wall
 
 main: main.hs Hackflight.o VehicleState.o Sensor.o Demands.o OpenLoopControl.o \
-	  ClosedLoopControl.o Mixer.o Server.o Utils.o \
-	  SimSensor.o \
-          RatePid.o YawPid.o LevelPid.o AltHoldPid.o PosHoldPid.o
+	  ClosedLoopControl.o Mixer.o Utils.o \
+          RatePid.o YawPid.o LevelPid.o AltHoldPid.o PosHoldPid.o \
+	  SimSensor.o SimReceiver.o Server.o
 	ghc -iclosedloops -isensors $(WARN) main.hs
 
 Hackflight.o: Hackflight.hs VehicleState.o Demands.o Mixer.o
@@ -45,6 +45,10 @@ Utils.o: Utils.hs
 SimSensor.o: sensors/SimSensor.hs Sensor.o
 	ghc $(WARN) sensors/SimSensor.hs
 	mv sensors/SimSensor.o .
+
+SimReceiver.o: openloops/SimReceiver.hs OpenLoopControl.o
+	ghc $(WARN) openloops/SimReceiver.hs
+	mv openloops/SimReceiver.o .
 
 RatePid.o: closedloops/RatePid.hs VehicleState.o ClosedLoopControl.o Demands.o \
 	   Utils.o

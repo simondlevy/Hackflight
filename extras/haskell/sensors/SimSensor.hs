@@ -1,5 +1,5 @@
 {--
-  Pass-thru sensor for testing
+  "Sensor" that gets its data from simulator
 
   Copyright(C) 2021 Simon D.Levy
 

@@ -12,4 +12,6 @@ where
 
 import Demands
 
-type OpenLoopController = IO () -> Demands
+-- type OpenLoopController = IO () -> Demands
+
+type OpenLoopController = Demands
