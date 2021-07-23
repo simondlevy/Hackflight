@@ -1,18 +1,14 @@
 {--
-  Socket-based multicopter control
+  Socket-based "sensor"
 
   Copyright(C) 2021 Simon D.Levy
 
   MIT License
 --}
 
-module Server2 (simReceiver, simSensor) where
+module SimSensor (simSensor) where
 
-import OpenLoopController
 import Sensor
-
-simReceiver :: OpenLoopController
-simReceiver = Demands 0 0 0 0
 
 simSensor :: Sensor
 simSensor vehicleState = vehicleState
