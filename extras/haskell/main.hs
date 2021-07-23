@@ -4,7 +4,7 @@
   MIT License
 --}
 
-import Hackflight(hackflight)
+import Hackflight(hackflight, hackflight2)
 import SimSensor
 import Mixer(quadXAPMixer)
 import Server(runServer)
