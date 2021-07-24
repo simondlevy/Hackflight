@@ -51,5 +51,4 @@ makeSimSensorClosure =
 
        bind telemetrySocket telemetrySocketAddress
 
-
        return (simSensorClosure telemetrySocket)

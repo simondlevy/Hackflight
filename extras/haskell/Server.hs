@@ -21,7 +21,8 @@ import ClosedLoopControl(PidController)
 
 runServer :: HackflightFun -> [PidController] -> Mixer -> IO ()
 
-runServer hackflight pidControllers mixer = withSocketsDo $
+-- runServer hackflight pidControllers mixer = withSocketsDo $
+runServer hackflight pidControllers mixer = 
 
     do 
 
