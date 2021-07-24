@@ -14,8 +14,7 @@ import Sockets(makeUdpSocket)
 
 simSensor :: Sensor
 
-simSensor vehicleState = do
-  return vehicleState
+simSensor vehicleState telemetrySocket = vehicleState
 
 makeSimSensorClosure = withSocketsDo $
 
@@ -23,6 +22,8 @@ makeSimSensorClosure = withSocketsDo $
 
        (telemetryServerSocket, telemetryServerSocketAddress) <-
            makeUdpSocket "5001"
+
+       bind telemetryServerSocket telemetryServerSocketAddress
 
        return "okay"
 
