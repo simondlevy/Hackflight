@@ -8,11 +8,10 @@
 
 module SimReceiver (SimReceiver) where
 
-import OpenLoopControl
 import Demands
 
-type SimReceiver = OpenLoopController
+type SimReceiver = Demands
 
-receiver :: OpenLoopController
+receiver :: Demands
 
 receiver = (Demands 0 0 0 0)
