@@ -40,8 +40,6 @@ runServer hackflight pidControllers mixer = withSocketsDo $
        (telemetryServerSocket, telemetryServerSocketAddress) <-
            makeUdpSocket "5001"
 
-       (motorClientSocket, motorClientSocketAddress) <- makeUdpSocket "5000"
-
        bind telemetryServerSocket telemetryServerSocketAddress
 
        putStrLn "Hit the Play button ..."

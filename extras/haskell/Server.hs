@@ -8,13 +8,10 @@
 
 module Server (runServer) where
 
-import Control.Applicative
 import Network.Socket
 import Network.Socket.ByteString -- from network
-import Data.ByteString.Internal
-import Data.Either.Utils -- from MissingH
-import Data.Serialize -- from cereal
 
+import Utils(bytesToDoubles, doublesToBytes)
 import Demands
 import Mixer
 import VehicleState
@@ -127,11 +124,3 @@ makeUdpSocket port =
        let addr = head addrInfo
        sock <- socket (addrFamily addr) Datagram defaultProtocol
        return (sock, (addrAddress addr))
-
--- https://stackoverflow.com/questions/20912582/haskell-bytestring-to-float-array
-
-doublesToBytes :: [Double] -> ByteString
-doublesToBytes = runPut . mapM_ putFloat64le
-
-bytesToDoubles :: ByteString -> [Double]
-bytesToDoubles bs = (fromRight ((runGet $ many getFloat64le) bs))
