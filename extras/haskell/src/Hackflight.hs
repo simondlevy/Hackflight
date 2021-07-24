@@ -15,7 +15,7 @@ import Mixer(Mixer, Motors)
 import Receiver
 import ClosedLoopControl(PidController, runClosedLoop)
 
-type HackflightFun = Demands ->
+type HackflightFun = Receiver ->
                      VehicleState ->
                      Mixer ->
                      [PidController] ->
@@ -23,9 +23,9 @@ type HackflightFun = Demands ->
 
 hackflight :: HackflightFun
 
-hackflight demands vehicleState mixer pidControllers =
+hackflight receiver vehicleState mixer pidControllers =
 
-    let (newDemands, newPidControllers) = runClosedLoop demands
+    let (newDemands, newPidControllers) = runClosedLoop receiver
                                                         vehicleState
                                                         pidControllers
 
