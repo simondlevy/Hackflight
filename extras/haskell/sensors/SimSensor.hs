@@ -20,7 +20,7 @@ getNewVehicleState :: Socket ->  VehicleState -> IO VehicleState
 getNewVehicleState telemetrySocket vehicleState =
   do
     (msgIn, _) <- Network.Socket.ByteString.recvFrom telemetrySocket 136
-    return vehicleState
+    pure vehicleState
 
 
 simSensorClosure :: Socket -> Sensor
