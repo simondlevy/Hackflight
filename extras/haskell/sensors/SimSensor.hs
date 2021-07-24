@@ -29,12 +29,7 @@ makeSimSensorClosure = withSocketsDo $
        return (simSensorClosure telemetryServerSocket)
 {--
 
-import Demands
-import Mixer
 import VehicleState
-import Hackflight(HackflightFun)
-import ClosedLoopControl(PidController)
-
 import Control.Applicative
 import Network.Socket
 import Network.Socket.ByteString -- from network
