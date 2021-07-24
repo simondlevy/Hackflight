@@ -16,7 +16,7 @@ import Utils(bytesToDoubles)
 import Network.Socket
 import Network.Socket.ByteString -- from network
 
-getNewVehicleState :: Socket ->  VehicleState -> Maybe VehicleState
+getNewVehicleState :: Socket ->  VehicleState -> IO VehicleState
 
 getNewVehicleState telemetrySocket _oldVehicleState =
 
@@ -42,6 +42,7 @@ simSensorClosure telemetrySocket =
     \vehicleState -> vehicleState
 
 
+makeSimSensorClosure :: IO Sensor
 makeSimSensorClosure = 
 
     do 
