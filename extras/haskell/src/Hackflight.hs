@@ -10,9 +10,9 @@ module Hackflight(HackflightFun, hackflight)
 where
 
 import VehicleState
-import Demands
 import Mixer(Mixer, Motors)
 import Receiver
+import Sensor
 import ClosedLoopControl(PidController, runClosedLoop)
 
 type HackflightFun = Receiver ->
