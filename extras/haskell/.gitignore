@@ -1,4 +1,3 @@
-tmp/
-main
+dist
 *.o
 *.hi
