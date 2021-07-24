@@ -8,14 +8,23 @@
 
 module SimSensor (simSensor) where
 
+import Network.Socket
 import Sensor
-
-import VehicleState
+import Sockets(makeUdpSocket)
 
 simSensor :: Sensor
 
 simSensor vehicleState = do
   return vehicleState
+
+runServer hackflight pidControllers mixer = withSocketsDo $
+
+    do 
+
+       (telemetryServerSocket, telemetryServerSocketAddress) <-
+           makeUdpSocket "5001"
+
+       return "okay"
 
 {--
 import Demands
