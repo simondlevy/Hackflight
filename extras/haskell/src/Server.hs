@@ -94,6 +94,7 @@ loop telemetryServerSocket
 
           -- Run the Hackflight algorithm to get the motor values
           let (motors, newPidControllers) = hackflight stickDemands
+                                                       []
                                                        vehicleState
                                                        mixer
                                                        pidControllers
