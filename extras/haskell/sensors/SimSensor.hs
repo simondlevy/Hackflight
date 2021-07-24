@@ -16,17 +16,17 @@ import Sockets(makeUdpSocket)
 import Network.Socket
 import Network.Socket.ByteString -- from network
 
-getNewVehicleState :: Socket ->  IO ([Char])
-getNewVehicleState telemetrySocket =
+getNewVehicleState :: Socket ->  VehicleState -> IO (VehicleState)
+getNewVehicleState telemetrySocket vehicleState =
   do
     (msgIn, _) <- Network.Socket.ByteString.recvFrom telemetrySocket 136
-    return "getNewVehicleState"
+    return vehicleState
 
 
 simSensorClosure :: Socket -> Sensor
 simSensorClosure telemetrySocket = 
 
-    \vehicleState -> vehicleState
+    \vehicleState -> getNewVehicleState telemetrySocket vehicleState
 
 
 makeSimSensorClosure = 
