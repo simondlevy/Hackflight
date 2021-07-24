@@ -12,6 +12,7 @@ where
 import VehicleState
 import Demands
 import Mixer(Mixer, Motors)
+import SimReceiver
 import ClosedLoopControl(PidController, runClosedLoop)
 
 type HackflightFun = Demands ->

@@ -13,6 +13,4 @@ import Demands
 
 simReceiver :: OpenLoopController
 
-simReceiver demands = 
-
-  (Demands 0 0 0 0)
+simReceiver = (Demands 0 0 0 0)
