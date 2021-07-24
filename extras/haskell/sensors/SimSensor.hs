@@ -16,7 +16,7 @@ import Sockets(makeUdpSocket)
 import Network.Socket
 import Network.Socket.ByteString -- from network
 
-getNewVehicleState :: Socket ->  VehicleState -> IO (VehicleState)
+getNewVehicleState :: Socket ->  VehicleState -> IO VehicleState
 getNewVehicleState telemetrySocket vehicleState =
   do
     (msgIn, _) <- Network.Socket.ByteString.recvFrom telemetrySocket 136
