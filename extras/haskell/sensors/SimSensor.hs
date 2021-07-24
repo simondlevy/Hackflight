@@ -17,8 +17,6 @@ simSensorClosure socket =
 
     \vehicleState -> vehicleState
 
-
-{--
 makeSimSensorClosure = withSocketsDo $
 
     do 
@@ -28,8 +26,8 @@ makeSimSensorClosure = withSocketsDo $
 
        bind telemetryServerSocket telemetryServerSocketAddress
 
-       return "hello" -- (simSensor telemetryServerSocket)
-
+       return (simSensorClosure telemetryServerSocket)
+{--
 
 import Demands
 import Mixer
