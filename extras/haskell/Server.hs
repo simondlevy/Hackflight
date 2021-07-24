@@ -30,13 +30,19 @@ runServer hackflight pidControllers mixer = withSocketsDo $
        (telemetryServerSocket, telemetryServerSocketAddress) <-
            makeUdpSocket "5001"
 
+       (demandsServerSocket, demandsServerSocketAddress) <-
+           makeUdpSocket "5002"
+
        (motorClientSocket, motorClientSocketAddress) <- makeUdpSocket "5000"
 
        bind telemetryServerSocket telemetryServerSocketAddress
 
+       bind demandsServerSocket demandsServerSocketAddress
+
        putStrLn "Hit the Play button ..."
 
        loop telemetryServerSocket
+            demandsServerSocket
             motorClientSocket
             motorClientSocketAddress
             hackflight
@@ -45,6 +51,7 @@ runServer hackflight pidControllers mixer = withSocketsDo $
 
 loop :: Socket ->
         Socket ->
+        Socket ->
         SockAddr ->
         HackflightFun ->
         Mixer ->
@@ -52,6 +59,7 @@ loop :: Socket ->
         IO ()
 
 loop telemetryServerSocket
+     demandsServerSocket
      motorClientSocket
      motorClientSockAddr
      hackflight
@@ -60,23 +68,29 @@ loop telemetryServerSocket
 
   do 
 
-      -- Get raw bytes for time, 12D state vector, and stick
-      -- demands from client (sim)
-      (msgIn, _) <- 
-          Network.Socket.ByteString.recvFrom telemetryServerSocket 136
+      -- Get raw bytes for time and 12D state vector from client
+      (telemBytes, _) <- 
+          Network.Socket.ByteString.recvFrom telemetryServerSocket 104
 
       -- Convert bytes to a list of doubles
-      let d = bytesToDoubles msgIn
+      let telem = bytesToDoubles telemBytes
 
       -- Parse the doubles into timed, vehicle state, and stick
       -- demands
-      let time = d!!0
+      let time = telem!!0
 
-      let vehicleState = VehicleState (d!!1) (d!!2) (d!!3) (d!!4)
-                                      (d!!5) (d!!6) (d!!7) (d!!8)
-                                      (d!!9) (d!!10) (d!!11) (d!!12)
+      let vehicleState = VehicleState (telem!!1) (telem!!2) (telem!!3) (telem!!4)
+                                      (telem!!5) (telem!!6) (telem!!7) (telem!!8)
+                                      (telem!!9) (telem!!10) (telem!!11) (telem!!12)
 
-      let stickDemands = Demands (d!!13) (d!!14) (d!!15) (d!!16)
+      -- Get raw bytes for stick demands from client
+      (demandsBytes, _) <- 
+          Network.Socket.ByteString.recvFrom demandsServerSocket 32
+
+      -- Convert bytes to a list of doubles
+      let dmnds = bytesToDoubles demandsBytes
+
+      let stickDemands = Demands (dmnds!!0) (dmnds!!1) (dmnds!!2) (dmnds!!3)
 
       -- Run the Hackflight algorithm to get the motor values
       let (motors, newPidControllers) = hackflight stickDemands
@@ -92,6 +106,7 @@ loop telemetryServerSocket
       -- Repeat until user presses stop button in simulator
       if time >= 0  then
           loop telemetryServerSocket
+               demandsServerSocket
                motorClientSocket
                motorClientSockAddr
                hackflight
