@@ -17,7 +17,7 @@ simSensor :: Sensor
 simSensor vehicleState = do
   return vehicleState
 
-runServer hackflight pidControllers mixer = withSocketsDo $
+makeSimSensorClosure = withSocketsDo $
 
     do 
 
