@@ -11,7 +11,7 @@ WARN = -Wall
 
 main: main.hs Hackflight.o VehicleState.o Demands.o ClosedLoopControl.o \
       Mixer.o Utils.o RatePid.o YawPid.o LevelPid.o AltHoldPid.o PosHoldPid.o \
-      Server.o
+      Server.o Sockets.o
 	ghc -iclosedloops $(WARN) main.hs
 
 main2: main2.hs Hackflight.o VehicleState.o Sensor.o Demands.o \
@@ -45,7 +45,8 @@ ClosedLoopControl.o: ClosedLoopControl.hs Demands.o VehicleState.o
 Mixer.o: Mixer.hs
 	ghc $(WARN) Mixer.hs
 
-Server.o: Server.hs Hackflight.o Demands.o Mixer.o VehicleState.o Utils.o
+Server.o: Server.hs Hackflight.o Demands.o Mixer.o VehicleState.o Utils.o \
+	  Sockets.o
 	ghc $(WARN) Server.hs
 
 SimReceiver.o: openloops/SimReceiver.hs OpenLoopControl.o Demands.o 
@@ -55,6 +56,9 @@ SimReceiver.o: openloops/SimReceiver.hs OpenLoopControl.o Demands.o
 SimSensor.o: sensors/SimSensor.hs VehicleState.o
 	ghc $(WARN) sensors/SimSensor.hs
 	mv sensors/SimSensor.o .
+
+Sockets.o: Sockets.hs
+	ghc $(WARN) Sockets.hs
 
 Utils.o: Utils.hs
 	ghc $(WARN) Utils.hs
