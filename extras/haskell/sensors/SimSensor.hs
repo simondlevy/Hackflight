@@ -6,16 +6,19 @@
   MIT License
 --}
 
-module SimSensor (simSensor) where
+module SimSensor (simSensorClosure) where
 
 import Network.Socket
 import Sensor
 import Sockets(makeUdpSocket)
 
-simSensor :: Sensor
+simSensorClosure :: Socket -> Sensor
+simSensorClosure socket = 
 
-simSensor vehicleState telemetrySocket = vehicleState
+    \vehicleState -> vehicleState
 
+
+{--
 makeSimSensorClosure = withSocketsDo $
 
     do 
@@ -25,9 +28,9 @@ makeSimSensorClosure = withSocketsDo $
 
        bind telemetryServerSocket telemetryServerSocketAddress
 
-       return "okay"
+       return "hello" -- (simSensor telemetryServerSocket)
 
-{--
+
 import Demands
 import Mixer
 import VehicleState
