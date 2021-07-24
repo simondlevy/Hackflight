@@ -16,7 +16,7 @@ import Utils(bytesToDoubles)
 import Network.Socket
 import Network.Socket.ByteString -- from network
 
-getNewVehicleState :: Socket ->  VehicleState -> IO VehicleState
+getNewVehicleState :: Socket ->  VehicleState -> Maybe VehicleState
 
 getNewVehicleState telemetrySocket _oldVehicleState =
 
