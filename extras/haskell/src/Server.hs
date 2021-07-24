@@ -21,10 +21,10 @@ import VehicleState
 import Hackflight(HackflightFun)
 import ClosedLoopControl(PidController)
 
-runServer :: HackflightFun -> [PidController] -> Mixer -> IO ()
+runServer :: HackflightFun -> ReceiverFun -> [PidController] -> Mixer -> IO ()
 
 -- runServer hackflight pidControllers mixer = withSocketsDo $
-runServer hackflightFun pidControllers mixer = 
+runServer hackflightFun receiverFun pidControllers mixer = 
 
     do 
 
@@ -47,6 +47,7 @@ runServer hackflightFun pidControllers mixer =
             motorClientSocket
             motorClientSocketAddress
             hackflightFun
+            receiverFun
             mixer
             pidControllers
 
@@ -55,6 +56,7 @@ loop :: Socket ->
         Socket ->
         SockAddr ->
         HackflightFun ->
+        ReceiverFun ->
         Mixer ->
         [PidController] ->
         IO ()
@@ -64,6 +66,7 @@ loop telemetryServerSocket
      motorClientSocket
      motorClientSockAddr
      hackflightFun
+     receiverFun
      mixer
      pidControllers =
 
@@ -111,6 +114,7 @@ loop telemetryServerSocket
                motorClientSocket
                motorClientSockAddr
                hackflightFun
+               receiverFun
                mixer
                newPidControllers
 

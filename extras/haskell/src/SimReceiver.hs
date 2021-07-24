@@ -6,7 +6,7 @@
   MIT License
 --}
 
-module SimReceiver (SimReceiver) where
+module SimReceiver (ReceiverFun, simReceiver) where
 
 import Demands
 
