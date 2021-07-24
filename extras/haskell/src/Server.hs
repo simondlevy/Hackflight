@@ -15,6 +15,7 @@ import Utils(bytesToDoubles, doublesToBytes)
 import Sockets(makeUdpSocket)
 import Demands
 import Mixer
+import Sensor
 import VehicleState
 import Hackflight(HackflightFun)
 import ClosedLoopControl(PidController)
