@@ -14,7 +14,6 @@ import VehicleState
 
 type Sensor = VehicleState ->  VehicleState
 
-{--
 runSensors :: [Sensor] -> VehicleState -> VehicleState
 
 runSensors [] vehicleState = vehicleState
@@ -22,4 +21,3 @@ runSensors [] vehicleState = vehicleState
 runSensors sensors vehicleState = 
 
     runSensors (tail sensors) ((head sensors) vehicleState)
---}
