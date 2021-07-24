@@ -11,6 +11,8 @@ module SimReceiver (simReceiver) where
 import OpenLoopControl
 import Demands
 
+type SimReceiver = OpenLoopController
+
 simReceiver :: OpenLoopController
 
 simReceiver = (Demands 0 0 0 0)
