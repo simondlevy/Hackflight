@@ -38,6 +38,4 @@ main = let
            posHold = posHoldController 0.5 -- Kp
                                        0.2 -- stickDeadband
 
-           
-
        in runServer hackflight [posHold, rate, yaw, level, altHold] quadXAPMixer

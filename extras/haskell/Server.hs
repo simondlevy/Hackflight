@@ -94,9 +94,9 @@ loop telemetryServerSocket
 
           -- Run the Hackflight algorithm to get the motor values
           let (motors, newPidControllers) = hackflight stickDemands
-                                                          vehicleState
-                                                          mixer
-                                                          pidControllers
+                                                       vehicleState
+                                                       mixer
+                                                       pidControllers
           -- Send the motor values to the client
           _ <- Network.Socket.ByteString.sendTo
                 motorClientSocket
