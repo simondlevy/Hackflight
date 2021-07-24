@@ -10,8 +10,8 @@ module SimReceiver (SimReceiver) where
 
 import Demands
 
-type SimReceiver = Demands
+data SimReceiver = SimReceiver { receiverDemands :: Demands } deriving (Show)
 
-receiver :: Demands
+--receiver :: Demands
 
-receiver = (Demands 0 0 0 0)
+--receiver = (Demands 0 0 0 0)
