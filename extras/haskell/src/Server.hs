@@ -13,6 +13,7 @@ import Network.Socket.ByteString -- from network
 
 import Utils(bytesToDoubles, doublesToBytes)
 import Sockets(makeUdpSocket)
+import SimReceiver
 import Demands
 import Mixer
 import Sensor
