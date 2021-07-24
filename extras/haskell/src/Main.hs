@@ -5,7 +5,7 @@
 --}
 
 import Hackflight(hackflight)
-import Receiver
+import SimReceiver
 import Mixer(quadXAPMixer)
 import Server(runServer)
 import RatePid(rateController)

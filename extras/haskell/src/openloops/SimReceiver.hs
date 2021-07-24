@@ -6,12 +6,12 @@
   MIT License
 --}
 
-module Receiver (Receiver) where
+module SimReceiver (SimReceiver) where
 
 import OpenLoopControl
 import Demands
 
-type Receiver = OpenLoopController
+type SimReceiver = OpenLoopController
 
 receiver :: OpenLoopController
 
