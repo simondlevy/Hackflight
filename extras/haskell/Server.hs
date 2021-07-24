@@ -75,36 +75,35 @@ loop telemetryServerSocket
       -- Convert bytes to a list of doubles
       let telem = bytesToDoubles telemBytes
 
-      -- Parse the doubles into timed, vehicle state, and stick
-      -- demands
-      let time = telem!!0
+      if telem!!0 >= 0 
 
-      let vehicleState = VehicleState (telem!!1) (telem!!2) (telem!!3) (telem!!4)
-                                      (telem!!5) (telem!!6) (telem!!7) (telem!!8)
-                                      (telem!!9) (telem!!10) (telem!!11) (telem!!12)
+      then do
+ 
+          let vehicleState = VehicleState (telem!!1) (telem!!2) (telem!!3)
+                                          (telem!!4) (telem!!5) (telem!!6)
+                                          (telem!!7) (telem!!8) (telem!!9)
+                                          (telem!!10) (telem!!11) (telem!!12)
 
-      -- Get raw bytes for stick demands from client
-      (demandsBytes, _) <- 
-          Network.Socket.ByteString.recvFrom demandsServerSocket 32
+          -- Get raw bytes for stick demands from client
+          (demandsBytes, _) <- 
+              Network.Socket.ByteString.recvFrom demandsServerSocket 32
 
-      -- Convert bytes to a list of doubles
-      let dmnds = bytesToDoubles demandsBytes
+          -- Convert bytes to a list of doubles
+          let dmnds = bytesToDoubles demandsBytes
 
-      let stickDemands = Demands (dmnds!!0) (dmnds!!1) (dmnds!!2) (dmnds!!3)
+          let stickDemands = Demands (dmnds!!0) (dmnds!!1) (dmnds!!2) (dmnds!!3)
 
-      -- Run the Hackflight algorithm to get the motor values
-      let (motors, newPidControllers) = hackflight stickDemands
-                                                      vehicleState
-                                                      mixer
-                                                      pidControllers
-      -- Send the motor values to the client
-      _ <- Network.Socket.ByteString.sendTo
-            motorClientSocket
-            (doublesToBytes (motorValues motors))
-            motorClientSockAddr
+          -- Run the Hackflight algorithm to get the motor values
+          let (motors, newPidControllers) = hackflight stickDemands
+                                                          vehicleState
+                                                          mixer
+                                                          pidControllers
+          -- Send the motor values to the client
+          _ <- Network.Socket.ByteString.sendTo
+                motorClientSocket
+                (doublesToBytes (motorValues motors))
+                motorClientSockAddr
 
-      -- Repeat until user presses stop button in simulator
-      if time >= 0  then
           loop telemetryServerSocket
                demandsServerSocket
                motorClientSocket
@@ -112,8 +111,9 @@ loop telemetryServerSocket
                hackflight
                mixer
                newPidControllers
-      else
-          putStrLn "Done"
+
+        else putStrLn "Done"
+
 
 -- http://book.realworldhaskell.org/read/sockets-and-syslog.html
 
