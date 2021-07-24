@@ -9,13 +9,14 @@
 module Hackflight(HackflightFun, hackflight)
 where
 
+import Demands
 import VehicleState
 import Mixer(Mixer, Motors)
 import SimReceiver
 import Sensor
 import ClosedLoopControl(PidController, runClosedLoop)
 
-type HackflightFun = SimReceiver ->
+type HackflightFun = Demands ->
                      [Sensor] ->
                      VehicleState ->
                      Mixer ->
@@ -24,9 +25,9 @@ type HackflightFun = SimReceiver ->
 
 hackflight :: HackflightFun
 
-hackflight receiver sensors vehicleState mixer pidControllers =
+hackflight demands sensors vehicleState mixer pidControllers =
 
-    let (newDemands, newPidControllers) = runClosedLoop receiver
+    let (newDemands, newPidControllers) = runClosedLoop demands
                                                         vehicleState
                                                         pidControllers
 
