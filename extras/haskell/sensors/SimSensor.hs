@@ -8,31 +8,42 @@
 
 module SimSensor (simSensorClosure) where
 
-import Network.Socket
+import VehicleState
 import Sensor
 import Sockets(makeUdpSocket)
 
+
+import Network.Socket
+import Network.Socket.ByteString -- from network
+
+getNewVehicleState :: Socket ->  IO ([Char])
+getNewVehicleState telemetrySocket =
+  do
+    (msgIn, _) <- Network.Socket.ByteString.recvFrom telemetrySocket 136
+    return "getNewVehicleState"
+
+
 simSensorClosure :: Socket -> Sensor
-simSensorClosure socket = 
+simSensorClosure telemetrySocket = 
 
     \vehicleState -> vehicleState
 
-makeSimSensorClosure = withSocketsDo $
+
+makeSimSensorClosure = 
 
     do 
 
-       (telemetryServerSocket, telemetryServerSocketAddress) <-
+       (telemetrySocket, telemetrySocketAddress) <-
            makeUdpSocket "5001"
 
-       bind telemetryServerSocket telemetryServerSocketAddress
+       bind telemetrySocket telemetrySocketAddress
 
-       return (simSensorClosure telemetryServerSocket)
+       return (simSensorClosure telemetrySocket)
 {--
 
 import VehicleState
 import Control.Applicative
 import Network.Socket
-import Network.Socket.ByteString -- from network
 import Data.ByteString.Internal
 import Data.Either.Utils -- from MissingH
 import Data.Serialize -- from cereal
@@ -43,14 +54,14 @@ runServer hackflight pidControllers mixer = withSocketsDo $
 
     do 
 
-       (telemetryServerSocket, telemetryServerSocketAddress) <-
+       (telemetrySocket, telemetrySocketAddress) <-
            makeUdpSocket "5001"
 
-       bind telemetryServerSocket telemetryServerSocketAddress
+       bind telemetrySocket telemetrySocketAddress
 
        putStrLn "Hit the Play button ..."
 
-       loop telemetryServerSocket
+       loop telemetrySocket
             motorClientSocket
             motorClientSocketAddress
             hackflight
@@ -65,7 +76,7 @@ loop :: Socket ->
         [PidController]->
         IO ()
 
-loop telemetryServerSocket
+loop telemetrySocket
      motorClientSocket
      motorClientSockAddr
      hackflight
@@ -77,7 +88,7 @@ loop telemetryServerSocket
       -- Get raw bytes for time, 12D state vector, and stick
       -- demands from client (sim)
       (msgIn, _) <- 
-          Network.Socket.ByteString.recvFrom telemetryServerSocket 136
+          Network.Socket.ByteString.recvFrom telemetrySocket 136
 
       -- Convert bytes to a list of doubles
       let d = bytesToDoubles msgIn
@@ -105,7 +116,7 @@ loop telemetryServerSocket
 
       -- Repeat until user presses stop button in simulator
       if time >= 0  then
-          loop telemetryServerSocket
+          loop telemetrySocket
                motorClientSocket
                motorClientSockAddr
                hackflight
