@@ -11,13 +11,15 @@ module Server (runServer) where
 import Network.Socket
 import Network.Socket.ByteString -- from network
 
-import Utils(bytesToDoubles, doublesToBytes, slice)
 import Sockets(makeUdpSocket)
+
+import Sensor
+import VehicleState
 import SimReceiver(simReceiver)
-import SimSensor(simSensorClosure)
 import Mixer
 import Hackflight(HackflightFun)
 import PidControl(PidController)
+import Utils(bytesToDoubles, doublesToBytes, slice)
 
 runServer :: HackflightFun -> [PidController] -> Mixer -> IO ()
 
@@ -93,3 +95,13 @@ loop telemetryServerSocket
                newPidControllers
 
         else putStrLn "Done"
+
+------------------------------------------------------------------------------
+
+simSensorClosure :: [Double] -> Sensor
+
+simSensorClosure v =
+
+    -- Ignore input and return state made from socket telemetry values
+    \_vehicleState -> VehicleState (v!!0) (v!!1) (v!!2) (v!!3) (v!!4) (v!!5)
+                                   (v!!6) (v!!7) (v!!8) (v!!9) (v!!10) (v!!11)
