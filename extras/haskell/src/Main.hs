@@ -5,7 +5,6 @@
 --}
 
 import Hackflight(hackflight)
-import SimReceiver(simReceiver)
 import Mixer(quadXAPMixer)
 import Server(runServer)
 import RatePid(rateController)
@@ -40,6 +39,5 @@ main = let
                                        0.2 -- stickDeadband
 
        in runServer hackflight
-                    simReceiver
                     [posHold, rate, yaw, level, altHold]
                     quadXAPMixer
