@@ -26,10 +26,9 @@ hackflight receiver sensor mixer pidControllers =
 
     let vehicleState = sensorVehicleState sensor
 
-        demands = receiverDemands receiver
+        (demands, newPidControllers) =
+            runClosedLoop (receiverDemands receiver)
+                          vehicleState
+                          pidControllers
 
-        (newDemands, newPidControllers) = runClosedLoop demands
-                                                        vehicleState
-                                                        pidControllers
-
-    in ((mixer newDemands), newPidControllers)
+    in ((mixer demands), newPidControllers)
