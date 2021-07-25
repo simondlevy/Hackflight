@@ -29,19 +29,12 @@ runServer hackflightFun pidControllers mixer =
        (telemetryServerSocket, telemetryServerSocketAddress) <-
            makeUdpSocket "5001"
 
-       (demandsServerSocket, demandsServerSocketAddress) <-
-           makeUdpSocket "5002"
-
        (motorClientSocket, motorClientSocketAddress) <- makeUdpSocket "5000"
 
        bind telemetryServerSocket telemetryServerSocketAddress
-
-       bind demandsServerSocket demandsServerSocketAddress
-
        putStrLn "Hit the Play button ..."
 
        loop telemetryServerSocket
-            demandsServerSocket
             motorClientSocket
             motorClientSocketAddress
             hackflightFun
@@ -50,7 +43,6 @@ runServer hackflightFun pidControllers mixer =
 
 loop :: Socket ->
         Socket ->
-        Socket ->
         SockAddr ->
         HackflightFun ->
         Mixer ->
@@ -58,7 +50,6 @@ loop :: Socket ->
         IO ()
 
 loop telemetryServerSocket
-     demandsServerSocket
      motorClientSocket
      motorClientSockAddr
      hackflightFun
@@ -69,11 +60,12 @@ loop telemetryServerSocket
 
       -- Get raw bytes for time and 12D state vector from client
       (telemBytes, _) <- 
-          Network.Socket.ByteString.recvFrom telemetryServerSocket 104
+          Network.Socket.ByteString.recvFrom telemetryServerSocket (8*17)
 
       -- Convert bytes to a list of doubles
       let telem = bytesToDoubles telemBytes
 
+      -- First value is time, which will be negative when user quits
       if telem!!0 >= 0 
 
       then do
@@ -83,11 +75,8 @@ loop telemetryServerSocket
                                           (telem!!7) (telem!!8) (telem!!9)
                                           (telem!!10) (telem!!11) (telem!!12)
 
-          -- Get raw bytes for stick demands from client
-          (demandsBytes, _) <- 
-              Network.Socket.ByteString.recvFrom demandsServerSocket 32
-
-          let receiver = simReceiver $ bytesToDoubles demandsBytes
+          let receiver = simReceiver (telem!!13) (telem!!14)
+                                     (telem!!15) (telem!!16)
 
           -- Run the Hackflight algorithm to get the motor values
           let (motors, newPidControllers) = hackflightFun receiver
@@ -102,7 +91,6 @@ loop telemetryServerSocket
                 motorClientSockAddr
 
           loop telemetryServerSocket
-               demandsServerSocket
                motorClientSocket
                motorClientSockAddr
                hackflightFun
