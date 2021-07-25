@@ -6,38 +6,38 @@
   MIT License
 --}
 
-module ClosedLoopControl
+module PidControl
 
 where
 
 import VehicleState
 import Demands
 
-data FullPidControl = 
+data FullPidState = 
 
-    FullPidControl { fullErrorIntegral :: Double,
+    FullPidState { fullErrorIntegral :: Double,
                    fullDeltaError1 :: Double,
                    fullDeltaError2 :: Double,
                    fullErrorPrev :: Double }
 
-data PidControl =
+data PidState =
 
      AltHoldState { altErrorIntegral :: Double,
                     altTarget :: Double,
                     altInBand :: Bool }
 
-   | RateState { rateRollState :: FullPidControl,
-                 ratePitchState :: FullPidControl }
+   | RateState { rateRollState :: FullPidState,
+                 ratePitchState :: FullPidState }
 
    | YawState { yawErrorIntegral :: Double }
 
    | NoState { }
 
-type PidFun = VehicleState -> Demands -> PidControl -> (Demands, PidControl)
+type PidFun = VehicleState -> Demands -> PidState -> (Demands, PidState)
 
-data PidController = PidController { pidFun :: PidFun, pidState :: PidControl }
+data PidController = PidController { pidFun :: PidFun, pidState :: PidState }
 
-newPidController :: PidFun -> PidControl -> PidController
+newPidController :: PidFun -> PidState -> PidController
 newPidController f s = PidController f s
 
 runClosedLoop :: Demands ->

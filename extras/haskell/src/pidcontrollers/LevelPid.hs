@@ -11,7 +11,7 @@ module LevelPid(levelController)
 where
 
 import VehicleState
-import ClosedLoopControl
+import PidControl
 import Demands
 import Utils(deg2rad)
 

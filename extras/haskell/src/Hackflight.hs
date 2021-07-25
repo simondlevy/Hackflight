@@ -13,7 +13,7 @@ import VehicleState
 import Mixer(Mixer, Motors)
 import SimReceiver(SimReceiver, receiverDemands)
 import Sensor
-import ClosedLoopControl(PidController, runClosedLoop)
+import PidControl(PidController, runClosedLoop)
 
 type HackflightFun = SimReceiver ->
                      [Sensor] ->

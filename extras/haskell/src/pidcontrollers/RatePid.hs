@@ -11,7 +11,7 @@ module RatePid(rateController)
 where
 
 import VehicleState
-import ClosedLoopControl
+import PidControl
 import Demands
 import Utils
 
@@ -20,7 +20,7 @@ rateController :: Double -> Double -> Double -> Double -> Double ->
 
 rateController kp ki kd windupMax rateMax = 
     PidController (rateClosure kp ki kd windupMax rateMax)
-                  (RateState (FullPidControl 0 0 0 0) (FullPidControl 0 0 0 0))
+                  (RateState (FullPidState 0 0 0 0) (FullPidState 0 0 0 0))
 
 rateClosure :: Double -> Double -> Double -> Double -> Double -> PidFun
 rateClosure kp ki kd windupMax rateMax =
@@ -29,28 +29,28 @@ rateClosure kp ki kd windupMax rateMax =
 
     let 
 
-        computeDof demand angularVelocity oldPidControl =
+        computeDof demand angularVelocity oldPidState =
 
             let 
 
                 --  Reset PID state on quick angular velocity change
-                newPidControl = if abs(angularVelocity) > deg2rad(rateMax)
-                              then (FullPidControl 0 0 0 0)
-                              else oldPidControl
+                newPidState = if abs(angularVelocity) > deg2rad(rateMax)
+                              then (FullPidState 0 0 0 0)
+                              else oldPidState
 
                 err = demand - angularVelocity
 
-                errI = constrain_abs ((fullErrorIntegral newPidControl) + err)
+                errI = constrain_abs ((fullErrorIntegral newPidState) + err)
                                       windupMax
-                deltaErr = err - (fullErrorPrev newPidControl)
-                errD = ((fullDeltaError1 newPidControl) +
-                        (fullDeltaError2 newPidControl) +
+                deltaErr = err - (fullErrorPrev newPidState)
+                errD = ((fullDeltaError1 newPidState) +
+                        (fullDeltaError2 newPidState) +
                         deltaErr)
 
                 in ((kp * err) + (ki * errI) + (kd * errD), 
-                    (FullPidControl (fullErrorIntegral newPidControl)
+                    (FullPidState (fullErrorIntegral newPidState)
                                   deltaErr  
-                                  (fullDeltaError1 newPidControl) 
+                                  (fullDeltaError1 newPidState) 
                                   err))
 
         (rollDemand, rollPidControl) = computeDof (Demands.roll demands)

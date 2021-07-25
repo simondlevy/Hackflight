@@ -11,7 +11,7 @@ module YawPid(yawController)
 where
 
 import VehicleState
-import ClosedLoopControl
+import PidControl
 import Demands
 import Utils(constrain_abs)
 

@@ -17,7 +17,7 @@ import SimReceiver(simReceiver)
 import Mixer
 import VehicleState
 import Hackflight(HackflightFun)
-import ClosedLoopControl(PidController)
+import PidControl(PidController)
 
 runServer :: HackflightFun -> [PidController] -> Mixer -> IO ()
 
