@@ -13,7 +13,7 @@ import Network.Socket.ByteString -- from network
 
 import Utils(bytesToDoubles, doublesToBytes)
 import Sockets(makeUdpSocket)
-import SimReceiver
+import SimReceiver(simReceiver)
 import Demands
 import Mixer
 import Sensor
@@ -89,13 +89,10 @@ loop telemetryServerSocket
           (demandsBytes, _) <- 
               Network.Socket.ByteString.recvFrom demandsServerSocket 32
 
-          -- Convert bytes to a list of doubles
-          let dmnds = bytesToDoubles demandsBytes
-
-          let stickDemands = Demands (dmnds!!0) (dmnds!!1) (dmnds!!2) (dmnds!!3)
+          let receiver = simReceiver $ bytesToDoubles demandsBytes
 
           -- Run the Hackflight algorithm to get the motor values
-          let (motors, newPidControllers) = hackflightFun stickDemands
+          let (motors, newPidControllers) = hackflightFun receiver
                                                           []
                                                           vehicleState
                                                           mixer
