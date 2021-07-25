@@ -40,6 +40,8 @@ data PidController = PidController { pidFun :: PidFun, pidState :: PidState }
 newPidController :: PidFun -> PidState -> PidController
 newPidController f s = PidController f s
 
+--------------------------------------------------------------------------------
+
 runClosedLoop :: Demands ->
                  VehicleState ->
                  [PidController] ->

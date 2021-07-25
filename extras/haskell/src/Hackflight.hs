@@ -9,7 +9,7 @@
 module Hackflight(HackflightFun, hackflight)
 where
 
-import Receiver
+import Receiver(Receiver, getDemands)
 import Sensor(Sensor, runSensors)
 import Mixer(Mixer, Motors)
 import PidControl(PidController, runClosedLoop)
