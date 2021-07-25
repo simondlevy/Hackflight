@@ -72,12 +72,13 @@ loop telemetryServerSocket
 
       then do
 
-          let sensor = simSensorClosure $ slice telem 1 12
+          let sensor = SimSensor (telem!!1) (telem!!2) (telem!!3) 
+                                 (telem!!4) (telem!!5) (telem!!6) 
+                                 (telem!!7) (telem!!8) (telem!!9) 
+                                 (telem!!10) (telem!!11) (telem!!12) 
 
-          let receiver = SimReceiver (telem!!13)
-                                     (telem!!14)
-                                     (telem!!15)
-                                     (telem!!16)
+          let receiver = SimReceiver (telem!!13) (telem!!14)
+                                     (telem!!15) (telem!!16)
 
           -- Run the Hackflight algorithm to get the motor values
           let (motors, newPidControllers) = hackflightFun receiver
@@ -98,13 +99,3 @@ loop telemetryServerSocket
                newPidControllers
 
         else putStrLn "Done"
-
-------------------------------------------------------------------------------
-
-simSensorClosure :: [Double] -> Sensor
-
-simSensorClosure v =
-
-    -- Ignore input and return state made from socket telemetry values
-    \_vehicleState -> VehicleState (v!!0) (v!!1) (v!!2) (v!!3) (v!!4) (v!!5)
-                                   (v!!6) (v!!7) (v!!8) (v!!9) (v!!10) (v!!11)
