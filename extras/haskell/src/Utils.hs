@@ -23,6 +23,8 @@ in_band value band = abs(value) < band
 deg2rad :: Double -> Double
 deg2rad d = d * pi / 180
 
+constrain :: Double -> Double
+constrain x = if x < 0 then 0 else if x > 1 then 1 else x
 -- https://stackoverflow.com/a/20918430
 
 doublesToBytes :: [Double] -> ByteString

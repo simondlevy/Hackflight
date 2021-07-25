@@ -9,6 +9,7 @@
 module Mixer(Mixer, quadXAPMixer, Motors, motorValues) where
 
 import Demands
+import Utils(constrain)
 
 -- XXX should support different numbers of motors
 data Motors = Motors { m1 :: Double
@@ -32,6 +33,3 @@ quadXAPMixer demands =
               (constrain (t + r + p + y))
               (constrain (t + r - p - y))
               (constrain (t - r + p - y))
-
-constrain :: Double -> Double
-constrain x = if x < 0 then 0 else if x > 1 then 1 else x
