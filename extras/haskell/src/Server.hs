@@ -12,11 +12,10 @@ import Network.Socket
 import Network.Socket.ByteString -- from network
 
 import Sockets(makeUdpSocket)
-import Utils(bytesToDoubles, doublesToBytes, slice)
+import Utils(bytesToDoubles, doublesToBytes)
 
 import Receiver
 import Sensor
-import VehicleState
 import Mixer
 import Hackflight(HackflightFun)
 import PidControl(PidController)
@@ -40,23 +39,23 @@ runServer hackflightFun pidControllers mixer =
             motorClientSocket
             motorClientSocketAddress
             hackflightFun
-            mixer
             pidControllers
+            mixer
 
 loop :: Socket ->
         Socket ->
         SockAddr ->
         HackflightFun ->
-        Mixer ->
         [PidController] ->
+        Mixer ->
         IO ()
 
 loop telemetryServerSocket
      motorClientSocket
      motorClientSockAddr
      hackflightFun
-     mixer
-     pidControllers =
+     pidControllers
+     mixer =
 
   do 
 
@@ -83,8 +82,8 @@ loop telemetryServerSocket
           -- Run the Hackflight algorithm to get the motor values
           let (motors, newPidControllers) = hackflightFun receiver
                                                           [sensor]
-                                                          mixer
                                                           pidControllers
+                                                          mixer
           -- Send the motor values to the client
           _ <- Network.Socket.ByteString.sendTo
                 motorClientSocket
@@ -95,7 +94,7 @@ loop telemetryServerSocket
                motorClientSocket
                motorClientSockAddr
                hackflightFun
-               mixer
                newPidControllers
+               mixer
 
         else putStrLn "Done"

@@ -17,13 +17,13 @@ import VehicleState(initialVehicleState)
 
 type HackflightFun = Receiver ->
                      [Sensor] ->
-                     Mixer ->
                      [PidController] ->
+                     Mixer ->
                      (Motors, [PidController])
 
 hackflight :: HackflightFun
 
-hackflight receiver sensors mixer pidControllers =
+hackflight receiver sensors pidControllers mixer =
 
     let 
         (demands, newPidControllers) =

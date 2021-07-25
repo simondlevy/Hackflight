@@ -30,8 +30,3 @@ doublesToBytes = runPut . mapM_ putFloat64le
 
 bytesToDoubles :: ByteString -> [Double]
 bytesToDoubles bs = (fromRight ((runGet $ many getFloat64le) bs))
-
--- https://stackoverflow.com/a/4597898
-
-slice :: [a] -> Int -> Int -> [a]
-slice xs from to = take (to - from + 1) (drop from xs)
