@@ -14,6 +14,7 @@ import Network.Socket.ByteString -- from network
 import Utils(bytesToDoubles, doublesToBytes)
 import Sockets(makeUdpSocket)
 import SimReceiver(simReceiver)
+import SimSensor(simSensor)
 import Mixer
 import VehicleState
 import Hackflight(HackflightFun)
@@ -70,18 +71,16 @@ loop telemetryServerSocket
 
       then do
  
-          let vehicleState = VehicleState (telem!!1) (telem!!2) (telem!!3)
-                                          (telem!!4) (telem!!5) (telem!!6)
-                                          (telem!!7) (telem!!8) (telem!!9)
-                                          (telem!!10) (telem!!11) (telem!!12)
+          let sensor = simSensor (telem!!1) (telem!!2) (telem!!3) (telem!!4)
+                                 (telem!!5) (telem!!6) (telem!!7) (telem!!8)
+                                 (telem!!9) (telem!!10) (telem!!11) (telem!!12)
 
           let receiver = simReceiver (telem!!13) (telem!!14)
                                      (telem!!15) (telem!!16)
 
           -- Run the Hackflight algorithm to get the motor values
           let (motors, newPidControllers) = hackflightFun receiver
-                                                          []
-                                                          vehicleState
+                                                          sensor
                                                           mixer
                                                           pidControllers
           -- Send the motor values to the client

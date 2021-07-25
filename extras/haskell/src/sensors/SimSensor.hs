@@ -1,55 +1,34 @@
 {--
   Socket-based "sensor"
 
-  Copyright(C) 2021 Simon D.Levy
+  Just passes through state telemetry from simulator
+
+  Copyright(C) 2021 on D.Levy
 
   MIT License
 --}
 
-module SimSensor (simSensorClosure) where
+module SimSensor (SimSensor, SensorFun, simSensor, sensorVehicleState) where
 
 import VehicleState
-import Sensor
-import Sockets(makeUdpSocket)
-import Utils(bytesToDoubles)
 
-import Network.Socket
-import Network.Socket.ByteString -- from network
+data SimSensor = SimSensor { sensorVehicleState :: VehicleState } deriving (Show)
 
-getNewVehicleState :: Socket ->  VehicleState -> IO VehicleState
+type SensorFun = Double ->
+                 Double ->
+                 Double ->
+                 Double ->
+                 Double ->
+                 Double ->
+                 Double ->
+                 Double ->
+                 Double ->
+                 Double ->
+                 Double ->
+                 Double ->
+                 SimSensor
 
-getNewVehicleState telemetrySocket _oldVehicleState =
+simSensor :: SensorFun
+simSensor x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 =
+    SimSensor $ VehicleState x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 
 
-    do
-
-        -- Get raw bytes for time and 12D state vector from client
-        (telemBytes, _) <- 
-            Network.Socket.ByteString.recvFrom telemetrySocket 104
-
-        -- Convert bytes to a list of doubles
-        let telem = bytesToDoubles telemBytes
-
-        let newVehicleState = VehicleState (telem!!1) (telem!!2) (telem!!3)
-                                           (telem!!4) (telem!!5) (telem!!6)
-                                           (telem!!7) (telem!!8) (telem!!9)
-                                           (telem!!10) (telem!!11) (telem!!12)
-
-        return newVehicleState 
-
-simSensorClosure :: Socket -> Sensor
-simSensorClosure telemetrySocket = 
-
-    \vehicleState -> vehicleState
-
-
-makeSimSensorClosure :: IO Sensor
-makeSimSensorClosure = 
-
-    do 
-
-       (telemetrySocket, telemetrySocketAddress) <-
-           makeUdpSocket "5001"
-
-       bind telemetrySocket telemetrySocketAddress
-
-       return (simSensorClosure telemetrySocket)

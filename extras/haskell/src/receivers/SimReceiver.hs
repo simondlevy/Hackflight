@@ -1,6 +1,8 @@
 {--
   Socket-based "receiver"
 
+  Just passes through stick demands from simulator
+
   Copyright(C) 2021 on D.Levy
 
   MIT License
