@@ -14,11 +14,12 @@ import Network.Socket.ByteString -- from network
 import Sockets(makeUdpSocket)
 import Utils(bytesToDoubles, doublesToBytes)
 
+import Hackflight(HackflightFun)
 import Receiver
 import Sensor
-import Mixer
-import Hackflight(HackflightFun)
 import PidControl(PidController)
+import Mixer
+import Motor(getMotorValues)
 
 runServer :: HackflightFun -> [PidController] -> Mixer -> IO ()
 
@@ -71,23 +72,27 @@ loop telemetryServerSocket
 
       then do
 
+          -- Simulate a sensor using the next 12 values (state)
           let sensor = SimSensor (telem!!1) (telem!!2) (telem!!3) 
                                  (telem!!4) (telem!!5) (telem!!6) 
                                  (telem!!7) (telem!!8) (telem!!9) 
                                  (telem!!10) (telem!!11) (telem!!12) 
 
+          -- Simulate a receiver using the final four values (stick demands)
           let receiver = SimReceiver (telem!!13) (telem!!14)
                                      (telem!!15) (telem!!16)
 
           -- Run the Hackflight algorithm to get the motor values
+          -- and updated PID controllers
           let (motors, newPidControllers) = hackflightFun receiver
                                                           [sensor]
                                                           pidControllers
                                                           mixer
+          
           -- Send the motor values to the client
           _ <- Network.Socket.ByteString.sendTo
                 motorClientSocket
-                (doublesToBytes (motorValues motors))
+                (doublesToBytes (getMotorValues motors))
                 motorClientSockAddr
 
           loop telemetryServerSocket

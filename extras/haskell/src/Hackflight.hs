@@ -11,7 +11,8 @@ where
 
 import Receiver(Receiver, getDemands)
 import Sensor(Sensor, runSensors)
-import Mixer(Mixer, Motors)
+import Mixer(Mixer, getMotors)
+import Motor(Motors)
 import PidControl(PidController, runClosedLoop)
 import VehicleState(initialVehicleState)
 
@@ -31,4 +32,4 @@ hackflight receiver sensors pidControllers mixer =
                           (runSensors sensors initialVehicleState)
                           pidControllers
 
-    in ((mixer demands), newPidControllers)
+    in ((getMotors mixer demands), newPidControllers)

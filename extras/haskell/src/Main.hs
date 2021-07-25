@@ -5,7 +5,7 @@
 --}
 
 import Hackflight(hackflight)
-import Mixer(quadXAPMixer)
+import Mixer(Mixer(QuadXAPMixer))
 import Server(runServer)
 import RatePid(rateController)
 import YawPid(yawController)
@@ -40,4 +40,4 @@ main = let
 
        in runServer hackflight
                     [posHold, rate, yaw, level, altHold]
-                    quadXAPMixer
+                    QuadXAPMixer
