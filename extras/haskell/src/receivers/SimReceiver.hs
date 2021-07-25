@@ -14,8 +14,8 @@ import Demands
 
 data SimReceiver = SimReceiver { receiverDemands :: Demands } deriving (Show)
 
-type ReceiverFun = Double -> Double -> Double -> Double -> SimReceiver
+type ReceiverFun = [Double] -> SimReceiver
 
 simReceiver :: ReceiverFun
-simReceiver t r p y =  SimReceiver $ Demands t r p y
+simReceiver v =  SimReceiver $ Demands (v!!0) (v!!1) (v!!2) (v!!3) 
 

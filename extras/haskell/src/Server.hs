@@ -11,7 +11,7 @@ module Server (runServer) where
 import Network.Socket
 import Network.Socket.ByteString -- from network
 
-import Utils(bytesToDoubles, doublesToBytes)
+import Utils(bytesToDoubles, doublesToBytes, slice)
 import Sockets(makeUdpSocket)
 import SimReceiver(simReceiver)
 import SimSensor(simSensor)
@@ -70,13 +70,10 @@ loop telemetryServerSocket
       if telem!!0 >= 0 
 
       then do
- 
-          let sensor = simSensor (telem!!1) (telem!!2) (telem!!3) (telem!!4)
-                                 (telem!!5) (telem!!6) (telem!!7) (telem!!8)
-                                 (telem!!9) (telem!!10) (telem!!11) (telem!!12)
 
-          let receiver = simReceiver (telem!!13) (telem!!14)
-                                     (telem!!15) (telem!!16)
+          let sensor = simSensor $ slice telem 1 12
+
+          let receiver = simReceiver $ slice telem 13 16
 
           -- Run the Hackflight algorithm to get the motor values
           let (motors, newPidControllers) = hackflightFun receiver
