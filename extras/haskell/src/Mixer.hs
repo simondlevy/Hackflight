@@ -43,7 +43,13 @@ data NewMixer = QuadXAPMixer
 
 data Motor = Motor { motorValue :: Double }
 
-data NewMotors = QuadMotors {newm1 :: Motor, newm2 :: Motor, newm3 :: Motor, newm4 :: Motor}
+makeMotor :: Double -> Motor
+makeMotor value = Motor $ constrain value
+
+data NewMotors = QuadMotors {newm1 :: Motor
+                           , newm2 :: Motor
+                           , newm3 :: Motor
+                           , newm4 :: Motor}
 
 getMotors :: NewMixer -> Demands -> NewMotors
 
@@ -54,7 +60,7 @@ getMotors QuadXAPMixer demands =
         p = (pitch demands)
         y = (yaw demands)
 
-    in QuadMotors (Motor (constrain (t - r - p + y)))
-                  (Motor (constrain (t + r + p + y)))
-                  (Motor (constrain (t + r - p - y)))
-                  (Motor (constrain (t - r + p - y)))
+    in QuadMotors (makeMotor (t - r - p + y))
+                  (makeMotor (t + r + p + y))
+                  (makeMotor (t + r - p - y))
+                  (makeMotor (t - r + p - y))
