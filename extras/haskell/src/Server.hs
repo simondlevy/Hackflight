@@ -14,9 +14,7 @@ import Network.Socket.ByteString -- from network
 import Utils(bytesToDoubles, doublesToBytes)
 import Sockets(makeUdpSocket)
 import SimReceiver(simReceiver)
-import Demands
 import Mixer
-import Sensor
 import VehicleState
 import Hackflight(HackflightFun)
 import ClosedLoopControl(PidController)

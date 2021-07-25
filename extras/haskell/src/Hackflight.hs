@@ -9,7 +9,6 @@
 module Hackflight(HackflightFun, hackflight)
 where
 
-import Demands
 import VehicleState
 import Mixer(Mixer, Motors)
 import SimReceiver(SimReceiver, receiverDemands)
