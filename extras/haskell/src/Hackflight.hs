@@ -37,9 +37,10 @@ hackflight receiver sensors pidControllers mixer =
 
 --------------------------------------------------------------------------------
 
-fun :: PidController -> Demands -> VehicleState -> (Demands, PidController)
+pidUpdate :: VehicleState -> PidController -> Demands ->
+             (Demands, PidController)
 
-fun pidController demands vehicleState = 
+pidUpdate vehicleState pidController demands = 
 
     let pfun = pidFun pidController
 
@@ -68,9 +69,9 @@ closedLoopHelper _vehicleState newDemands [] newPidControllers =
 -- demands and PID state; then recur on remaining PID controllers
 closedLoopHelper vehicleState oldDemands oldPidControllers newPidControllers =
 
-    let (newDemands, newPid) = fun (head oldPidControllers)
-                                   oldDemands
-                                   vehicleState
+    let (newDemands, newPid) = pidUpdate vehicleState
+                                         (head oldPidControllers)
+                                         oldDemands
 
     in closedLoopHelper vehicleState
                         newDemands
