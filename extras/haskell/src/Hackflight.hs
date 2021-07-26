@@ -37,6 +37,46 @@ hackflight receiver sensors pidControllers mixer =
 
 --------------------------------------------------------------------------------
 
+fun :: PidController -> Demands -> VehicleState -> (Demands, PidController)
+
+fun pidController demands vehicleState = 
+
+    let pfun = pidFun pidController
+
+        pstate = pidState pidController
+
+        (newDemands, newPstate) = pfun vehicleState demands pstate
+
+        newPid = newPidController pfun newPstate
+
+    in (newDemands, newPid)
+
+-- Runs PID (closed-loop) controllers on vehicle state and demands to get 
+-- new demands and controller states
+closedLoopHelper :: VehicleState -> Demands -> [PidController]
+                  -> [PidController]
+                  -> (Demands, [PidController])
+
+
+-- Base case: ignore vehicle state and return new demands and new PID
+-- controllers
+closedLoopHelper _vehicleState newDemands [] newPidControllers =
+    (newDemands, newPidControllers)
+
+
+-- Recursive case: apply current PID controller to demands to get new
+-- demands and PID state; then recur on remaining PID controllers
+closedLoopHelper vehicleState oldDemands oldPidControllers newPidControllers =
+
+    let (newDemands, newPid) = fun (head oldPidControllers)
+                                   oldDemands
+                                   vehicleState
+
+    in closedLoopHelper vehicleState
+                        newDemands
+                        (tail oldPidControllers)
+                        (newPidControllers ++ [newPid])
+
 runClosedLoop :: Demands ->
                  VehicleState ->
                  [PidController] ->
@@ -44,29 +84,4 @@ runClosedLoop :: Demands ->
 
 runClosedLoop demands vehicleState pidControllers =
 
-    closedLoopHelper demands pidControllers []
-
-    where
-
-        -- Base case: ignore vehicle state and return new demands and new PID
-        -- controllers
-        closedLoopHelper newDemands  [] newPidControllers =
-            (newDemands, newPidControllers)
-
-        -- Recursive case: apply current PID controller to demands to get new
-        -- demands and PID state; then recur on remaining PID controllers
-        closedLoopHelper oldDemands oldPidControllers newPidControllers =
-
-            let oldPidController = head oldPidControllers
-           
-                pfun = pidFun oldPidController
-
-                pstate = pidState oldPidController
-
-                (newDemands, newPstate) = pfun vehicleState oldDemands pstate
-
-                newPid = newPidController pfun newPstate
-
-            in closedLoopHelper newDemands
-                                (tail oldPidControllers)
-                                (newPidControllers ++ [newPid])
+    closedLoopHelper vehicleState demands pidControllers []
