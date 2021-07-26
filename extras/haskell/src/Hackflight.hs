@@ -10,11 +10,11 @@ module Hackflight(HackflightFun, hackflight)
 where
 
 import Receiver(Receiver, getDemands)
-import Sensor(Sensor, runSensors)
+import Sensor(Sensor, modifyState)
 import Mixer(Mixer, getMotors)
 import Motor(Motors)
 import PidControl(PidController, runClosedLoop)
-import VehicleState(initialVehicleState)
+import VehicleState(VehicleState, initialVehicleState)
 
 type HackflightFun = Receiver ->
                      [Sensor] ->
@@ -33,3 +33,15 @@ hackflight receiver sensors pidControllers mixer =
                           pidControllers
 
     in ((getMotors mixer demands), newPidControllers)
+
+
+--------------------------------------------------------------------------------
+
+-- XXX should use fold
+runSensors :: [Sensor] -> VehicleState -> VehicleState
+
+runSensors [] vehicleState = vehicleState
+
+runSensors sensors vehicleState = 
+
+    runSensors (tail sensors) (modifyState (head sensors) vehicleState)

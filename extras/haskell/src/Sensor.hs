@@ -21,14 +21,3 @@ modifyState :: Sensor -> VehicleState -> VehicleState
 -- values received over socket
 modifyState (SimSensor v1 v2 v3 v4 v5 v6 v7 v8 v9 v10 v11 v12) _ =
   VehicleState v1 v2 v3 v4 v5 v6 v7 v8 v9 v10 v11 v12
-
---------------------------------------------------------------------------------
-
--- XXX should use fold
-runSensors :: [Sensor] -> VehicleState -> VehicleState
-
-runSensors [] vehicleState = vehicleState
-
-runSensors sensors vehicleState = 
-
-    runSensors (tail sensors) (modifyState (head sensors) vehicleState)
