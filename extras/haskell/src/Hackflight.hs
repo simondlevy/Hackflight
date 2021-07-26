@@ -30,22 +30,10 @@ hackflight receiver sensors pidControllers mixer =
     let 
         (demands, newPidControllers) =
             runClosedLoop (getDemands receiver)
-                          (runSensors sensors initialVehicleState)
+                          (foldr modifyState initialVehicleState sensors)
                           pidControllers
 
     in ((getMotors mixer demands), newPidControllers)
-
-
---------------------------------------------------------------------------------
-
--- XXX should use fold
-runSensors :: [Sensor] -> VehicleState -> VehicleState
-
-runSensors [] vehicleState = vehicleState
-
-runSensors sensors vehicleState = 
-
-    runSensors (tail sensors) (modifyState (head sensors) vehicleState)
 
 --------------------------------------------------------------------------------
 

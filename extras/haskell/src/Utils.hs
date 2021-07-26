@@ -26,10 +26,6 @@ deg2rad d = d * pi / 180
 constrain :: Double -> Double
 constrain x = if x < 0 then 0 else if x > 1 then 1 else x
 
--- https://stackoverflow.com/a/47157839
-compose :: Foldable t => t1 -> t (t1 -> t1) -> t1
-compose fs x = foldr (\f a -> f a) fs x
-
 -- https://stackoverflow.com/a/20918430
 
 doublesToBytes :: [Double] -> ByteString
