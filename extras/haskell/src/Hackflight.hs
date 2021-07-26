@@ -37,10 +37,10 @@ hackflight receiver sensors pidControllers mixer =
 
 --------------------------------------------------------------------------------
 
-pidUpdate :: VehicleState -> PidController -> Demands ->
+pidUpdate :: VehicleState -> Demands -> PidController -> 
              (Demands, PidController)
 
-pidUpdate vehicleState pidController demands = 
+pidUpdate vehicleState demands pidController = 
 
     let pfun = pidFun pidController
 
@@ -70,8 +70,8 @@ closedLoopHelper _vehicleState newDemands [] newPidControllers =
 closedLoopHelper vehicleState oldDemands oldPidControllers newPidControllers =
 
     let (newDemands, newPid) = pidUpdate vehicleState
-                                         (head oldPidControllers)
                                          oldDemands
+                                         (head oldPidControllers)
 
     in closedLoopHelper vehicleState
                         newDemands
