@@ -43,9 +43,9 @@ fun pidController demands vehicleState =
 
     let pfun = pidFun pidController
 
-        pstate = pidState pidController
-
-        (newDemands, newPstate) = pfun vehicleState demands pstate
+        (newDemands, newPstate) = pfun vehicleState
+                                  demands
+                                  (pidState pidController)
 
         newPid = newPidController pfun newPstate
 
