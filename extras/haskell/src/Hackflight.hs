@@ -32,6 +32,7 @@ hackflight receiver sensors pidControllers mixer =
             runClosedLoop (getDemands receiver)
                           (foldr modifyState initialVehicleState sensors)
                           pidControllers
+                          []
 
     in ((getMotors mixer demands), newPidControllers)
 
@@ -54,35 +55,25 @@ pidUpdate vehicleState demands pidController =
 
 -- Runs PID (closed-loop) controllers on vehicle state and demands to get 
 -- new demands and controller states
-closedLoopHelper :: VehicleState -> Demands -> [PidController]
-                  -> [PidController]
+runClosedLoop :: Demands -> VehicleState -> [PidController] -> [PidController]
                   -> (Demands, [PidController])
 
 
 -- Base case: ignore vehicle state and return new demands and new PID
 -- controllers
-closedLoopHelper _vehicleState newDemands [] newPidControllers =
+runClosedLoop newDemands _vehicleState [] newPidControllers =
     (newDemands, newPidControllers)
 
 
 -- Recursive case: apply current PID controller to demands to get new
 -- demands and PID state; then recur on remaining PID controllers
-closedLoopHelper vehicleState oldDemands oldPidControllers newPidControllers =
+runClosedLoop oldDemands vehicleState oldPidControllers newPidControllers =
 
     let (newDemands, newPid) = pidUpdate vehicleState
                                          oldDemands
                                          (head oldPidControllers)
 
-    in closedLoopHelper vehicleState
-                        newDemands
-                        (tail oldPidControllers)
-                        (newPidControllers ++ [newPid])
-
-runClosedLoop :: Demands ->
-                 VehicleState ->
-                 [PidController] ->
-                 (Demands, [PidController])
-
-runClosedLoop demands vehicleState pidControllers =
-
-    closedLoopHelper vehicleState demands pidControllers []
+    in runClosedLoop  newDemands
+                      vehicleState
+                      (tail oldPidControllers)
+                      (newPidControllers ++ [newPid])
