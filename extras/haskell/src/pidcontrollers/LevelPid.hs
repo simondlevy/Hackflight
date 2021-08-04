@@ -18,7 +18,7 @@ import Utils(deg2rad)
 levelController :: Double -> Double -> PidController
 
 levelController kp maxAngleDegrees =
-    PidController (levelClosure kp maxAngleDegrees) NoState
+    PidController (levelClosure kp maxAngleDegrees) NoState initialDemands
 
 levelClosure :: Double -> Double -> PidFun
 levelClosure kp maxAngleDegrees =

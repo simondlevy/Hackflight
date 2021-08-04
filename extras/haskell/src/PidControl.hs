@@ -35,7 +35,9 @@ data PidState =
 
 type PidFun = VehicleState -> Demands -> PidState -> (Demands, PidState)
 
-data PidController = PidController { pidFun :: PidFun, pidState :: PidState }
+data PidController = PidController { pidFun :: PidFun,
+                                     pidState :: PidState,
+                                     pidDemands :: Demands }
 
 pidUpdate :: VehicleState -> (Demands, PidController) -> 
              (Demands, PidController)
@@ -48,8 +50,6 @@ pidUpdate vehicleState (demands, pidController) =
                                   demands
                                   (pidState pidController)
 
-        newPid = PidController pfun newPstate
+        newPid = PidController pfun newPstate newDemands
 
     in (newDemands, newPid)
-
-
