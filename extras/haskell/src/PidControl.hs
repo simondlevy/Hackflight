@@ -53,3 +53,6 @@ pidUpdate vehicleState (demands, pidController) =
         newPid = PidController pfun newPstate newDemands
 
     in (newDemands, newPid)
+
+injectDemands :: PidController -> Demands -> PidController
+injectDemands (PidController f s _) demands = PidController f s demands
