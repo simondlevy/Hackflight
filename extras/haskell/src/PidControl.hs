@@ -40,3 +40,19 @@ data PidController = PidController { pidFun :: PidFun, pidState :: PidState }
 newPidController :: PidFun -> PidState -> PidController
 newPidController f s = PidController f s
 
+pidUpdate :: VehicleState -> (Demands, PidController) -> 
+             (Demands, PidController)
+
+pidUpdate vehicleState (demands, pidController) = 
+
+    let pfun = pidFun pidController
+
+        (newDemands, newPstate) = pfun vehicleState
+                                  demands
+                                  (pidState pidController)
+
+        newPid = newPidController pfun newPstate
+
+    in (newDemands, newPid)
+
+
