@@ -18,7 +18,7 @@ import Utils(constrain_abs)
 yawController :: Double -> Double -> Double -> PidController
 
 yawController kp ki windupMax = 
-    PidController (yawClosure kp ki windupMax) (YawState 0) initialDemands
+    PidController (yawClosure kp ki windupMax) (YawState 0)
 
 yawClosure :: Double -> Double -> Double -> PidFun
 yawClosure kp ki windupMax =

@@ -18,7 +18,7 @@ import Utils(in_band)
 posHoldController :: Double -> Double -> PidController
 
 posHoldController kp stickDeadband =
-    PidController (posHoldClosure kp stickDeadband) NoState initialDemands
+    PidController (posHoldClosure kp stickDeadband) NoState
 
 posHoldClosure :: Double -> Double -> PidFun
 posHoldClosure kp stickDeadband =

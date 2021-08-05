@@ -21,7 +21,6 @@ rateController :: Double -> Double -> Double -> Double -> Double ->
 rateController kp ki kd windupMax rateMax = 
     PidController (rateClosure kp ki kd windupMax rateMax)
                   (RateState (FullPidState 0 0 0 0) (FullPidState 0 0 0 0))
-                  initialDemands
 
 rateClosure :: Double -> Double -> Double -> Double -> Double -> PidFun
 rateClosure kp ki kd windupMax rateMax =
