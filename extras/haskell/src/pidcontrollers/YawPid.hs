@@ -21,9 +21,7 @@ yawController kp ki windupMax =
     PidController (yawClosure kp ki windupMax) (YawState 0)
 
 yawClosure :: Double -> Double -> Double -> PidFun
-yawClosure kp ki windupMax =
-
-    \vehicleState -> \demands -> \controllerState ->
+yawClosure kp ki windupMax vehicleState demands controllerState =
 
     -- Compute error as target minus actual
     let err = (Demands.yaw demands) - (VehicleState.dpsi vehicleState)

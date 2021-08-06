@@ -22,9 +22,7 @@ altHoldController kp ki windupMax pilotVelZMax stickDeadband =
                   (AltHoldState 0 0 False)
 
 altHoldClosure :: Double -> Double -> Double -> Double -> Double -> PidFun
-altHoldClosure kp ki windupMax pilotVelZMax stickDeadband =
-
-    \vehicleState -> \demands -> \controllerState ->
+altHoldClosure kp ki windupMax pilotVelZMax stickDeadband vehicleState demands controllerState =
 
     let  
          -- NED => ENU

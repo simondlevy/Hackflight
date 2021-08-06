@@ -21,9 +21,7 @@ posHoldController kp stickDeadband =
     PidController (posHoldClosure kp stickDeadband) NoState
 
 posHoldClosure :: Double -> Double -> PidFun
-posHoldClosure kp stickDeadband =
-
-    \vehicleState -> \demands -> \_controllerState ->
+posHoldClosure kp stickDeadband vehicleState demands _controllerState =
 
     let newDemands = if in_band (Demands.roll demands) stickDeadband &&
                         in_band (Demands.pitch demands) stickDeadband

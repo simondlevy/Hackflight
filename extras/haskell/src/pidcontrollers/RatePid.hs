@@ -23,9 +23,7 @@ rateController kp ki kd windupMax rateMax =
                   (RateState (FullPidState 0 0 0 0) (FullPidState 0 0 0 0))
 
 rateClosure :: Double -> Double -> Double -> Double -> Double -> PidFun
-rateClosure kp ki kd windupMax rateMax =
-
-    \vehicleState -> \demands -> \controllerState ->
+rateClosure kp ki kd windupMax rateMax vehicleState demands controllerState =
 
     let 
 

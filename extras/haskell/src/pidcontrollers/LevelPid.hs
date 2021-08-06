@@ -21,9 +21,7 @@ levelController kp maxAngleDegrees =
     PidController (levelClosure kp maxAngleDegrees) NoState
 
 levelClosure :: Double -> Double -> PidFun
-levelClosure kp maxAngleDegrees =
-
-    \vehicleState -> \demands -> \_controllerState ->
+levelClosure kp maxAngleDegrees vehicleState demands _controllerState =
 
     let 
         -- Maximum roll pitch demand is +/-0.5, so to convert demand to
