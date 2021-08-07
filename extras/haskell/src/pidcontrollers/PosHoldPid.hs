@@ -18,10 +18,10 @@ import Utils(in_band)
 posHoldController :: Double -> Double -> PidController
 
 posHoldController kp stickDeadband =
-    PidController (posHoldClosure kp stickDeadband) NoState
+    PidController (posHoldFun kp stickDeadband) NoState
 
-posHoldClosure :: Double -> Double -> PidFun
-posHoldClosure kp stickDeadband vehicleState demands _controllerState =
+posHoldFun :: Double -> Double -> PidFun
+posHoldFun kp stickDeadband vehicleState demands _controllerState =
 
     let newDemands = if in_band (Demands.roll demands) stickDeadband &&
                         in_band (Demands.pitch demands) stickDeadband

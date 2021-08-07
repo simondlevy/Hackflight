@@ -18,10 +18,10 @@ import Utils(constrain_abs)
 yawController :: Double -> Double -> Double -> PidController
 
 yawController kp ki windupMax = 
-    PidController (yawClosure kp ki windupMax) (YawState 0)
+    PidController (yawFun kp ki windupMax) (YawState 0)
 
-yawClosure :: Double -> Double -> Double -> PidFun
-yawClosure kp ki windupMax vehicleState demands controllerState =
+yawFun :: Double -> Double -> Double -> PidFun
+yawFun kp ki windupMax vehicleState demands controllerState =
 
     -- Compute error as target minus actual
     let err = (Demands.yaw demands) - (VehicleState.dpsi vehicleState)

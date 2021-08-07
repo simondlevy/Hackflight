@@ -18,11 +18,11 @@ import Utils(constrain_abs, in_band)
 altHoldController :: Double -> Double -> Double -> Double -> Double 
                         -> PidController
 altHoldController kp ki windupMax pilotVelZMax stickDeadband = 
-    PidController (altHoldClosure kp ki windupMax pilotVelZMax stickDeadband)
+    PidController (altHoldFun kp ki windupMax pilotVelZMax stickDeadband)
                   (AltHoldState 0 0 False)
 
-altHoldClosure :: Double -> Double -> Double -> Double -> Double -> PidFun
-altHoldClosure kp ki windupMax pilotVelZMax stickDeadband vehicleState demands controllerState =
+altHoldFun :: Double -> Double -> Double -> Double -> Double -> PidFun
+altHoldFun kp ki windupMax pilotVelZMax stickDeadband vehicleState demands controllerState =
 
     let  
          -- NED => ENU
