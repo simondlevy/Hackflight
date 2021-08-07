@@ -14,7 +14,7 @@ import Receiver(Receiver, getDemands)
 import Sensor(Sensor, modifyState)
 import Mixer(Mixer, getMotors)
 import Motor(Motors)
-import PidControl
+import PidControllers
 import VehicleState(initialVehicleState)
 
 type HackflightFun = Receiver ->

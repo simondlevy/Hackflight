@@ -17,7 +17,7 @@ import Utils(bytesToDoubles, doublesToBytes)
 import Hackflight(HackflightFun)
 import Receiver
 import Sensor
-import PidControl(PidController)
+import PidControllers(PidController)
 import Mixer
 import Motor(getMotorValues)
 

@@ -1,24 +1,18 @@
 {--
-  Closed-loop controller support
+  PID controllers for aerial vehicles
 
   Copyright(C) 2021 Simon D.Levy
 
   MIT License
 --}
 
-module PidControl
+module PidControllers
 
 where
 
+import FullPidController(FullPidState)
 import VehicleState
 import Demands
-
-data FullPidState = 
-
-    FullPidState { fullErrorIntegral :: Double,
-                   fullDeltaError1 :: Double,
-                   fullDeltaError2 :: Double,
-                   fullErrorPrev :: Double }
 
 data PidState =
 

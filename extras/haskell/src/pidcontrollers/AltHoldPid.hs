@@ -11,7 +11,7 @@ module AltHoldPid(altHoldController)
 where
 
 import VehicleState
-import PidControl
+import PidControllers
 import Demands
 import Utils(constrain_abs, in_band)
 
