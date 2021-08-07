@@ -50,11 +50,3 @@ hackflight receiver sensors pidControllers mixer =
     -- Send the final demands to the mixer, returning the resulting motor
     -- values and the new PID controller states
     in ((getMotors mixer newDemands), newPidControllers)
-
-addDemands :: Demands -> Demands -> Demands
-addDemands d1 d2 = Demands ((throttle d1) + (throttle d2))
-                           ((roll d1) + (roll d2))
-                           ((pitch d1) + (pitch d2))
-                           ((yaw d1) + (yaw d2))
-  
-
