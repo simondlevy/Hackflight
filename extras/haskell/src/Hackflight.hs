@@ -27,14 +27,12 @@ hackflight :: HackflightFun
 
 hackflight receiver sensors pidControllers mixer =
 
-    let rdemands = getDemands receiver
+    let rxDemands = getDemands receiver
 
         vehicleState = foldr modifyState initialVehicleState sensors
 
-        --(demands, newPidControllers) =
-        --    runClosedLoop rdemands vehicleState pidControllers []
-
-        dlist = [rdemands, rdemands, rdemands, rdemands]
+        -- Repclicate receiver demands for mapping
+        dlist = [rxDemands|_<-[1..(length pidControllers)]]
 
         combo = zip dlist pidControllers
 
