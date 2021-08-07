@@ -51,23 +51,18 @@ rateFun kp ki kd windupMax rateMax vehicleState demands controllerState =
                                   (fullDeltaError1 newPidState) 
                                   err))
 
-        (rollDemand, rollPidControl) = computeDof (Demands.roll demands)
-                                                 (VehicleState.dphi
-                                                  vehicleState)
+        (rollDemand, rollPidControl) = computeDof (roll demands)
+                                                 (dphi vehicleState)
                                                  (rateRollState
                                                   controllerState)
 
         -- Pitch demand is nose-down positive, so we negate pitch-forward
         -- (nose-down negative) to reconcile them
-        (pitchDemand, pitchPidControl) = computeDof (Demands.pitch demands)
-                                                  (-(VehicleState.dtheta
-                                                     vehicleState))
+        (pitchDemand, pitchPidControl) = computeDof (pitch demands)
+                                                  (-(dtheta vehicleState))
                                                   (ratePitchState
                                                    controllerState)
 
     -- Return updated demands and controller state
-    in ((Demands (Demands.throttle demands)
-                 rollDemand
-                 pitchDemand
-                 (Demands.yaw demands)),
+    in ((Demands (throttle demands) rollDemand pitchDemand (yaw demands)),
         (RateState rollPidControl pitchPidControl))

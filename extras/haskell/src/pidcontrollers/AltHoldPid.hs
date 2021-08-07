@@ -26,7 +26,7 @@ altHoldFun kp ki windupMax pilotVelZMax stickDeadband vehicleState demands contr
 
     let  
          -- NED => ENU
-         altitude = -(VehicleState.z vehicleState)
+         altitude = -(z vehicleState)
 
          throttleDemand = throttle demands
 
@@ -46,7 +46,7 @@ altHoldFun kp ki windupMax pilotVelZMax stickDeadband vehicleState demands contr
 
          -- Compute error as altTarget velocity minus actual velocity, after
          -- negating actual to accommodate NED
-         err = altTargetVelocity + (VehicleState.dz vehicleState)
+         err = altTargetVelocity + (dz vehicleState)
 
          -- Accumualte error integral
          errI = constrain_abs ((altErrorIntegral controllerState) + err)
@@ -54,7 +54,7 @@ altHoldFun kp ki windupMax pilotVelZMax stickDeadband vehicleState demands contr
 
     -- Return updated demands and controller state
     in  (Demands (err * kp + errI * ki)
-                 (Demands.roll demands)
-                 (Demands.pitch demands)
-                 (Demands.yaw demands),
+                 (roll demands)
+                 (pitch demands)
+                 (yaw demands),
          AltHoldState errI (altTarget newControllerState) inband)

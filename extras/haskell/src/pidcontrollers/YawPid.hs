@@ -24,15 +24,14 @@ yawFun :: Double -> Double -> Double -> PidFun
 yawFun kp ki windupMax vehicleState demands controllerState =
 
     -- Compute error as target minus actual
-    let err = (Demands.yaw demands) - (VehicleState.dpsi vehicleState)
+    let err = (yaw demands) - (dpsi vehicleState)
 
         -- Accumualte error integral
-        errI = constrain_abs ((yawErrorIntegral controllerState) + err)
-                             windupMax
+        errI = constrain_abs ((yawErrorIntegral controllerState) + err) windupMax
 
     -- Return updated demands and controller state
-    in (Demands (Demands.throttle demands) 
-                (Demands.roll demands)
-                (Demands.pitch demands)
+    in (Demands (throttle demands) 
+                (roll demands)
+                (pitch demands)
                 (kp * err + ki * errI),
         YawState errI)

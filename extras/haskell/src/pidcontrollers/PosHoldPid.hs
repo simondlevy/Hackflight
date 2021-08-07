@@ -23,25 +23,25 @@ posHoldController kp stickDeadband =
 posHoldFun :: Double -> Double -> PidFun
 posHoldFun kp stickDeadband vehicleState demands _controllerState =
 
-    let newDemands = if in_band (Demands.roll demands) stickDeadband &&
-                        in_band (Demands.pitch demands) stickDeadband
+    let newDemands = if in_band (roll demands) stickDeadband &&
+                        in_band (pitch demands) stickDeadband
         
                     then
 
-                        let p = VehicleState.psi vehicleState
+                        let p = psi vehicleState
 
                             -- Rotate X, Y velocities into body frame
 
                             cp = cos p
                             sp = sin p
 
-                            xx = VehicleState.dx vehicleState
-                            yy = VehicleState.dy vehicleState
+                            xx = dx vehicleState
+                            yy = dy vehicleState
 
-                        in Demands (Demands.throttle demands)
+                        in Demands (throttle demands)
                                    (-kp * (cp * yy - sp * xx))
                                    (-kp * (cp * xx + sp * yy))
-                                   (Demands.yaw demands)
+                                   (yaw demands)
 
                     else demands
 
