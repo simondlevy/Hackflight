@@ -7,15 +7,17 @@
 import Hackflight(hackflight)
 import Mixer(Mixer(QuadXAPMixer))
 import Server(runServer)
-import RatePid(rateController)
-import YawPid(yawController)
-import LevelPid(levelController)
-import AltHoldPid(altHoldController)
+
+-- import RatePid(rateController)
+-- import YawPid(yawController)
+-- import LevelPid(levelController)
+-- import AltHoldPid(altHoldController)
 import PosHoldPid(posHoldController)
 
 main :: IO ()
 
 main = let 
+{--
            rate = rateController 0.225    -- Kp
                                  0.001875 -- Ki
                                  0.375    -- Kd
@@ -34,10 +36,10 @@ main = let
                                        0.4  -- windupMax
                                        2.5  -- pilotVelZMax
                                        0.2  -- stickDeadband
-
+--}
            posHold = posHoldController 0.1 -- Kp
                                        0.2 -- stickDeadband
 
        in runServer hackflight
-                    [posHold, rate, yaw, level, altHold]
+                    [posHold {--, rate, yaw, level, altHold--}]
                     QuadXAPMixer

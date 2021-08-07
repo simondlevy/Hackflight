@@ -29,24 +29,24 @@ hackflight receiver sensors pidControllers mixer =
 
     let rxDemands = getDemands receiver
 
+       -- Inject the receiver demands into the PID controllers
+        pidControllers' = map (\p -> (PidController (pidFun p) 
+                                                    (pidState p)
+                                                    rxDemands))
+                              pidControllers
+
         -- Get the vehicle state by running the sensors
         vehicleState = foldr modifyState initialVehicleState sensors
 
-        -- Repclicate the receiver demands for mapping
-        demandsList = [rxDemands|_<-[1..(length pidControllers)]]
-
-        -- Map the PID update function to the pid controllers and demands
-        control = map (pidUpdate vehicleState) (zip demandsList pidControllers)
-
-        -- Extract the updated ew PID controllers
-        pidControllers' = map (\p -> snd p) control
+         -- Map the PID update function to the pid controllers
+        pidControllers'' = map (pidUpdate vehicleState) pidControllers'
 
         -- Extract the updated list of demands
-        demandsList' = map (\p -> fst p) control
+        demandsList' = map pidDemands pidControllers'
 
         -- Sum over the list of demands to get the final demands
         demands = foldr addDemands (Demands 0 0 0 0) demandsList'
 
     -- Send the final demands to the mixer, returning the resulting motor
     -- values and the new PID controller states
-    in ((getMotors mixer demands), pidControllers')
+    in ((getMotors mixer demands), pidControllers'')

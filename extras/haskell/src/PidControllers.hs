@@ -30,17 +30,17 @@ data PidState =
 type PidFun = VehicleState -> Demands -> PidState -> (Demands, PidState)
 
 data PidController = PidController { pidFun :: PidFun,
-                                     pidState :: PidState }
+                                     pidState :: PidState,
+                                     pidDemands :: Demands }
 
-pidUpdate :: VehicleState -> (Demands, PidController) -> 
-             (Demands, PidController)
+pidUpdate :: VehicleState -> PidController -> PidController
 
-pidUpdate vehicleState (demands, pidController) = 
+pidUpdate vehicleState pidController = 
 
-    let pfun = pidFun pidController
+    let pidFun' = pidFun pidController
 
-        (demands', pstate) = pfun vehicleState demands (pidState pidController)
+        (demands', pidState') = pidFun' vehicleState
+                                        (pidDemands pidController)
+                                        (pidState pidController)
 
-        pidController' = PidController pfun pstate
-
-    in (demands', pidController')
+    in PidController pidFun' pidState' demands'
