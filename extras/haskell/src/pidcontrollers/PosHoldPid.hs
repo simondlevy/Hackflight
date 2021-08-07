@@ -38,11 +38,11 @@ posHoldFun kp stickDeadband vehicleState demands _controllerState =
                             xx = dx vehicleState
                             yy = dy vehicleState
 
-                        in Demands (throttle demands)
+                        in Demands 0
                                    (-kp * (cp * yy - sp * xx))
                                    (-kp * (cp * xx + sp * yy))
-                                   (yaw demands)
+                                   0
 
-                    else demands
+                    else Demands 0 (roll demands) (pitch demands) 0
 
     in (newDemands, NoState)

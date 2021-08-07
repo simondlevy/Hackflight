@@ -64,5 +64,5 @@ rateFun kp ki kd windupMax rateMax vehicleState demands controllerState =
                                                    controllerState)
 
     -- Return updated demands and controller state
-    in ((Demands (throttle demands) rollDemand pitchDemand (yaw demands)),
-        (RateState rollPidControl pitchPidControl))
+    in (Demands 0 rollDemand pitchDemand 0,
+        RateState rollPidControl pitchPidControl)

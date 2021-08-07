@@ -15,7 +15,7 @@ import Sensor(Sensor, modifyState)
 import Mixer(Mixer, getMotors)
 import Motor(Motors)
 import PidControl
-import VehicleState(VehicleState, initialVehicleState)
+import VehicleState(initialVehicleState)
 
 type HackflightFun = Receiver ->
                      [Sensor] ->
@@ -27,37 +27,31 @@ hackflight :: HackflightFun
 
 hackflight receiver sensors pidControllers mixer =
 
-    let receiverDemands = getDemands receiver
+    let rdemands = getDemands receiver
 
         vehicleState = foldr modifyState initialVehicleState sensors
 
-        (demands, newPidControllers) =
-            runClosedLoop receiverDemands vehicleState pidControllers []
+        --(demands, newPidControllers) =
+        --    runClosedLoop rdemands vehicleState pidControllers []
 
-    in ((getMotors mixer demands), newPidControllers)
+        dlist = [rdemands, rdemands, rdemands, rdemands]
 
---------------------------------------------------------------------------------
+        combo = zip dlist pidControllers
 
--- Runs PID (closed-loop) controllers on vehicle state and demands to get 
--- new demands and controller states
-runClosedLoop :: Demands -> VehicleState -> [PidController] -> [PidController]
-                  -> (Demands, [PidController])
+        foo = map (pidUpdate vehicleState) combo
 
+        newNewPidControllers = map (\p -> snd p) foo
 
--- Base case: ignore vehicle state and return new demands and new PID
--- controllers
-runClosedLoop newDemands _vehicleState [] newPidControllers =
-    (newDemands, newPidControllers)
+        newDemandsList = map (\p -> fst p) foo
 
+        newDemands = foldr addDemands (Demands 0 0 0 0) newDemandsList
 
--- Recursive case: apply current PID controller to demands to get new
--- demands and PID state; then recur on remaining PID controllers
-runClosedLoop oldDemands vehicleState oldPidControllers newPidControllers =
+    in ((getMotors mixer newDemands), newNewPidControllers)
 
-    let (newDemands, newPid) = pidUpdate vehicleState
-                                         (oldDemands, (head oldPidControllers))
+addDemands :: Demands -> Demands -> Demands
+addDemands d1 d2 = Demands ((throttle d1) + (throttle d2))
+                           ((roll d1) + (roll d2))
+                           ((pitch d1) + (pitch d2))
+                           ((yaw d1) + (yaw d2))
+  
 
-    in runClosedLoop  newDemands
-                      vehicleState
-                      (tail oldPidControllers)
-                      (newPidControllers ++ [newPid])

@@ -30,8 +30,4 @@ yawFun kp ki windupMax vehicleState demands controllerState =
         errI = constrain_abs ((yawErrorIntegral controllerState) + err) windupMax
 
     -- Return updated demands and controller state
-    in (Demands (throttle demands) 
-                (roll demands)
-                (pitch demands)
-                (kp * err + ki * errI),
-        YawState errI)
+    in (Demands 0 0 0 (kp * err + ki * errI), YawState errI)

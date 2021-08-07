@@ -53,8 +53,5 @@ altHoldFun kp ki windupMax pilotVelZMax stickDeadband vehicleState demands contr
                 windupMax
 
     -- Return updated demands and controller state
-    in  (Demands (err * kp + errI * ki)
-                 (roll demands)
-                 (pitch demands)
-                 (yaw demands),
+    in  (Demands (err * kp + errI * ki) 0 0 0,
          AltHoldState errI (altTarget newControllerState) inband)

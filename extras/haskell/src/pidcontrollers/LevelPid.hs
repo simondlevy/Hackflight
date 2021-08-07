@@ -37,5 +37,4 @@ levelFun kp maxAngleDegrees vehicleState demands _controllerState =
                        (theta vehicleState))
 
     -- Return updated demands and controller state
-    in ((Demands (throttle demands) rollDemand pitchDemand (yaw demands)),
-        NoState)
+    in (Demands 0 rollDemand pitchDemand 0, NoState)
