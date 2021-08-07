@@ -27,12 +27,12 @@ hackflight :: HackflightFun
 
 hackflight receiver sensors pidControllers mixer =
 
-    let 
+    let receiverDemands = getDemands receiver
+
+        vehicleState = foldr modifyState initialVehicleState sensors
+
         (demands, newPidControllers) =
-            runClosedLoop (getDemands receiver)
-                          (foldr modifyState initialVehicleState sensors)
-                          pidControllers
-                          []
+            runClosedLoop receiverDemands vehicleState pidControllers []
 
     in ((getMotors mixer demands), newPidControllers)
 
