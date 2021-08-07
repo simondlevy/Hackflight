@@ -11,7 +11,7 @@ import RatePid(rateController)
 import YawPid(yawController)
 import LevelPid(levelController)
 import AltHoldPid(altHoldController)
-import PosHoldPid(posHoldController)
+-- import PosHoldPid(posHoldController)
 
 main :: IO ()
 
@@ -35,9 +35,10 @@ main = let
                                        2.5  -- pilotVelZMax
                                        0.2  -- stickDeadband
 
-           posHold = posHoldController 0.5 -- Kp
-                                       0.2 -- stickDeadband
+  --         posHold = posHoldController 0.5 -- Kp
+  --                                     0.2 -- stickDeadband
 
        in runServer hackflight
-                    [posHold, rate, yaw, level, altHold]
+                    -- [posHold, rate, yaw, level, altHold]
+                    [rate, yaw, level, altHold]
                     QuadXAPMixer

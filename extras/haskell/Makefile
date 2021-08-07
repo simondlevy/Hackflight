@@ -12,5 +12,8 @@ run: $(TARGET)
 	cabal build
 	$(TARGET)
 
+clean:
+	rm -rf dist/build
+
 commit:
 	git commit -a -m="More Haskell work" && git push
