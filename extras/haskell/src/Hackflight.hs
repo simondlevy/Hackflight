@@ -32,16 +32,16 @@ hackflight receiver sensors pidControllers mixer =
         -- Get the vehicle state by running the sensors
         vehicleState = foldr modifyState initialVehicleState sensors
 
-        -- Repclicate receiver demands for mapping
+        -- Repclicate the receiver demands for mapping
         dlist = [rxDemands|_<-[1..(length pidControllers)]]
 
         -- Map the PID update function to the pid controllers and demands
         newControl = map (pidUpdate vehicleState) (zip dlist pidControllers)
 
-        -- Extract the new PID controllers
+        -- Extract the updated ew PID controllers
         newPidControllers = map (\p -> snd p) newControl
 
-        -- Extract the new list of demands
+        -- Extract the updated list of demands
         newDemandsList = map (\p -> fst p) newControl
 
         -- Sum over the list of demands to get the final demands

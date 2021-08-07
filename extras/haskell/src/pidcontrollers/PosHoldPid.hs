@@ -43,6 +43,6 @@ posHoldFun kp stickDeadband vehicleState demands _controllerState =
                                    (-kp * (cp * xx + sp * yy))
                                    0
 
-                    else Demands 0 (roll demands) (pitch demands) 0
+                    else Demands 0 0 0 0
 
     in (newDemands, NoState)
