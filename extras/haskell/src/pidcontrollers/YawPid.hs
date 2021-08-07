@@ -18,7 +18,7 @@ import Utils(constrain_abs)
 yawController :: Double -> Double -> Double -> PidController
 
 yawController kp ki windupMax = 
-    PidController (yawFun kp ki windupMax) (YawState 0)
+    makePidController (yawFun kp ki windupMax) (YawState 0)
 
 yawFun :: Double -> Double -> Double -> PidFun
 yawFun kp ki windupMax vehicleState demands controllerState =

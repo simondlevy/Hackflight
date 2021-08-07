@@ -19,8 +19,8 @@ altHoldController :: Double -> Double -> Double -> Double -> Double
                      -> PidController
 
 altHoldController kp ki windupMax pilotVelZMax stickDeadband = 
-    PidController (altHoldFun kp ki windupMax pilotVelZMax stickDeadband)
-                  (AltHoldState 0 0 False)
+    makePidController (altHoldFun kp ki windupMax pilotVelZMax stickDeadband)
+                      (AltHoldState 0 0 False)
 
 
 altHoldFun :: Double -> Double -> Double -> Double -> Double -> PidFun

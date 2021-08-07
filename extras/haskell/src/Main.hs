@@ -7,6 +7,7 @@
 import Hackflight(hackflight)
 import Mixer(Mixer(QuadXAPMixer))
 import Server(runServer)
+
 import RatePid(rateController)
 import YawPid(yawController)
 import LevelPid(levelController)
@@ -16,6 +17,7 @@ import PosHoldPid(posHoldController)
 main :: IO ()
 
 main = let 
+
            rate = rateController 0.225    -- Kp
                                  0.001875 -- Ki
                                  0.375    -- Kd
