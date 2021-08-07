@@ -18,7 +18,7 @@ import Utils(in_band)
 posHoldController :: Double -> Double -> PidController
 
 posHoldController kp stickDeadband =
-    PidController (posHoldFun kp stickDeadband) NoState initialDemands
+    makePidController (posHoldFun kp stickDeadband) NoState
 
 posHoldFun :: Double -> Double -> PidFun
 posHoldFun kp stickDeadband vehicleState demands _controllerState =

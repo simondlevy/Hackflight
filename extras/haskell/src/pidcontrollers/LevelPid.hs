@@ -18,7 +18,7 @@ import Utils(deg2rad)
 levelController :: Double -> Double -> PidController
 
 levelController kp maxAngleDegrees =
-    PidController (levelFun kp maxAngleDegrees) NoState
+    makePidController (levelFun kp maxAngleDegrees) NoState
 
 levelFun :: Double -> Double -> PidFun
 levelFun kp maxAngleDegrees vehicleState demands _controllerState =

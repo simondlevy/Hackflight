@@ -33,6 +33,11 @@ data PidController = PidController { pidFun :: PidFun,
                                      pidState :: PidState,
                                      pidDemands :: Demands }
 
+makePidController :: PidFun -> PidState -> PidController
+
+makePidController pidFun' pidState' =
+    PidController pidFun' pidState' initialDemands
+
 pidUpdate :: VehicleState -> PidController -> PidController
 
 pidUpdate vehicleState pidController = 
