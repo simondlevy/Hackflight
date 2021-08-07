@@ -26,19 +26,16 @@ levelFun kp maxAngleDegrees vehicleState demands _controllerState =
     let 
         -- Maximum roll pitch demand is +/-0.5, so to convert demand to
         -- angle for error computation, we multiply by the folling amount:
-        demandScale = 2 * deg2rad(maxAngleDegrees)
+        demandScale = 2 * (deg2rad maxAngleDegrees)
 
-        rollDemand = ((kp * demandScale * (Demands.roll demands)) -
-                      (VehicleState.phi vehicleState))
+        rollDemand = ((kp * demandScale * (roll demands)) -
+                     (phi vehicleState))
 
         -- Pitch demand is nose-down positive, so we negate
         -- pitch-forward (nose-down negative) to reconcile them
-        pitchDemand = ((kp * demandScale * (Demands.pitch demands)) +
-                       (VehicleState.theta vehicleState))
+        pitchDemand = ((kp * demandScale * (pitch demands)) +
+                       (theta vehicleState))
 
     -- Return updated demands and controller state
-    in ((Demands (Demands.throttle demands)
-                 rollDemand
-                 pitchDemand
-                 (Demands.yaw demands)),
+    in ((Demands (throttle demands) rollDemand pitchDemand (yaw demands)),
         NoState)
