@@ -29,26 +29,23 @@ rateFun kp ki kd windupMax rateMax vehicleState demands pidState' =
 
     let 
 
-        (rollDemand, rollPidControl) = computeDemand kp
-                                                     ki 
-                                                     kd
-                                                     windupMax
-                                                     rateMax
-                                                     (rateRollState pidState')
-                                                     (roll demands)
-                                                     (dphi vehicleState)
+        computeDemand' pfun dfun vfun =
+            computeDemand kp
+                          ki
+                          kd
+                          windupMax
+                          rateMax
+                          (pfun pidState')
+                          (dfun demands)
+                          (vfun vehicleState)
+
+        (rollDemand, rollState) =
+            computeDemand' rateRollState roll dphi
 
         -- Pitch demand is nose-down positive, so we negate pitch-forward
         -- (nose-down negative) to reconcile them
-        (pitchDemand, pitchPidControl) = computeDemand kp
-                                                       ki
-                                                       kd
-                                                       windupMax
-                                                       rateMax
-                                                       (ratePitchState pidState')
-                                                       (pitch demands)
-                                                       (-(dtheta vehicleState))
+        (pitchDemand, pitchState) =
+            computeDemand' ratePitchState pitch (\vs -> -(dtheta vs))
 
     -- Return updated demands and controller state
-    in (Demands 0 rollDemand pitchDemand 0,
-        RateState rollPidControl pitchPidControl)
+    in (Demands 0 rollDemand pitchDemand 0, RateState rollState pitchState)
