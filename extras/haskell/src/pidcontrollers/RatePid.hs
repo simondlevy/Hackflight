@@ -22,46 +22,48 @@ rateController kp ki kd windupMax rateMax =
     PidController (rateFun kp ki kd windupMax rateMax)
                   (RateState (FullPidState 0 0 0 0) (FullPidState 0 0 0 0))
 
+
 rateFun :: Double -> Double -> Double -> Double -> Double -> PidFun
+
 rateFun kp ki kd windupMax rateMax vehicleState demands controllerState =
 
     let 
 
-        computeDof demand angularVelocity oldPidState =
+        computeDof demand angularVelocity pidState' =
 
             let 
 
                 --  Reset PID state on quick angular velocity change
-                newPidState = if abs(angularVelocity) > deg2rad(rateMax)
-                              then (FullPidState 0 0 0 0)
-                              else oldPidState
+                pidState'' = if abs(angularVelocity) > deg2rad(rateMax)
+                            then (FullPidState 0 0 0 0)
+                            else pidState'
 
                 err = demand - angularVelocity
 
-                errI = constrain_abs ((fullErrorIntegral newPidState) + err)
+                errI = constrain_abs ((fullErrorIntegral pidState'') + err)
                                       windupMax
-                deltaErr = err - (fullErrorPrev newPidState)
-                errD = ((fullDeltaError1 newPidState) +
-                        (fullDeltaError2 newPidState) +
+                deltaErr = err - (fullErrorPrev pidState'')
+                errD = ((fullDeltaError1 pidState'') +
+                        (fullDeltaError2 pidState'') +
                         deltaErr)
 
                 in ((kp * err) + (ki * errI) + (kd * errD), 
-                    (FullPidState (fullErrorIntegral newPidState)
+                    (FullPidState (fullErrorIntegral pidState'')
                                   deltaErr  
-                                  (fullDeltaError1 newPidState) 
+                                  (fullDeltaError1 pidState'') 
                                   err))
 
         (rollDemand, rollPidControl) = computeDof (roll demands)
-                                                 (dphi vehicleState)
-                                                 (rateRollState
+                                                  (dphi vehicleState)
+                                                  (rateRollState
                                                   controllerState)
 
         -- Pitch demand is nose-down positive, so we negate pitch-forward
         -- (nose-down negative) to reconcile them
         (pitchDemand, pitchPidControl) = computeDof (pitch demands)
-                                                  (-(dtheta vehicleState))
-                                                  (ratePitchState
-                                                   controllerState)
+                                                    (-(dtheta vehicleState))
+                                                    (ratePitchState
+                                                    controllerState)
 
     -- Return updated demands and controller state
     in (Demands 0 rollDemand pitchDemand 0,

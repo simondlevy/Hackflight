@@ -45,10 +45,8 @@ pidUpdate vehicleState (demands, pidController) =
 
     let pfun = pidFun pidController
 
-        (newDemands, newPstate) = pfun vehicleState
-                                  demands
-                                  (pidState pidController)
+        (demands', pstate) = pfun vehicleState demands (pidState pidController)
 
-        newPid = PidController pfun newPstate
+        pidController' = PidController pfun pstate
 
-    in (newDemands, newPid)
+    in (demands', pidController')

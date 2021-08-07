@@ -16,13 +16,23 @@ import Demands
 import Utils(constrain_abs, in_band)
 
 altHoldController :: Double -> Double -> Double -> Double -> Double 
-                        -> PidController
+                     -> PidController
+
 altHoldController kp ki windupMax pilotVelZMax stickDeadband = 
     PidController (altHoldFun kp ki windupMax pilotVelZMax stickDeadband)
                   (AltHoldState 0 0 False)
 
+
 altHoldFun :: Double -> Double -> Double -> Double -> Double -> PidFun
-altHoldFun kp ki windupMax pilotVelZMax stickDeadband vehicleState demands controllerState =
+
+altHoldFun kp
+           ki
+           windupMax
+           pilotVelZMax
+           stickDeadband
+           vehicleState
+           demands
+           controllerState =
 
     let  
          -- NED => ENU
@@ -33,15 +43,15 @@ altHoldFun kp ki windupMax pilotVelZMax stickDeadband vehicleState demands contr
          inband = in_band throttleDemand stickDeadband
 
          -- Reset controller when moving into deadband
-         newControllerState = if inband && not (altInBand controllerState)
-                              then AltHoldState 0 altitude True
-                              else controllerState
+         controllerState' = if inband && not (altInBand controllerState)
+                            then AltHoldState 0 altitude True
+                            else controllerState
 
          -- Target velocity is a setpoint inside deadband, scaled
          -- constant outside
          altTargetVelocity = if inband
-                          then (altTarget newControllerState) - altitude
-                          else pilotVelZMax * throttleDemand
+                             then (altTarget controllerState') - altitude
+                             else pilotVelZMax * throttleDemand
 
 
          -- Compute error as altTarget velocity minus actual velocity, after
@@ -54,4 +64,4 @@ altHoldFun kp ki windupMax pilotVelZMax stickDeadband vehicleState demands contr
 
     -- Return updated demands and controller state
     in  (Demands (err * kp + errI * ki) 0 0 0,
-         AltHoldState errI (altTarget newControllerState) inband)
+         AltHoldState errI (altTarget controllerState') inband)
