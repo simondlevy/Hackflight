@@ -27,12 +27,12 @@ hackflight :: HackflightFun
 
 hackflight receiver sensors pidControllers mixer =
 
-    let rxDemands = getDemands receiver
+    let 
 
        -- Inject the receiver demands into the PID controllers
         pidControllers' = map (\p -> (PidController (pidFun p) 
                                                     (pidState p)
-                                                    rxDemands))
+                                                    (getDemands receiver)))
                               pidControllers
 
         -- Get the vehicle state by running the sensors
