@@ -45,7 +45,7 @@ hackflight receiver sensors pidControllers mixer =
         demandsList' = map pidDemands pidControllers'
 
         -- Sum over the list of demands to get the final demands
-        demands = foldr addDemands (Demands 0 0 0 0) demandsList'
+        demands = foldr addDemands initialDemands demandsList'
 
     -- Send the final demands to the mixer, returning the resulting motor
     -- values and the new PID controller states
