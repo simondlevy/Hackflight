@@ -41,11 +41,9 @@ hackflight receiver sensors pidControllers mixer =
          -- Map the PID update function to the pid controllers
         pidControllers'' = map (pidUpdate vehicleState) pidControllers'
 
-        -- Extract the updated list of demands
-        demandsList' = map pidDemands pidControllers'
-
         -- Sum over the list of demands to get the final demands
-        demands = foldr addDemands initialDemands demandsList'
+        demands = foldr addDemands initialDemands (map pidDemands
+                                                       pidControllers'')
 
     -- Send the final demands to the mixer, returning the resulting motor
     -- values and the new PID controller states
