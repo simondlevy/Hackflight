@@ -19,6 +19,10 @@ data FullPidState =
                    deltaError2 :: Double,
                    errorPrev :: Double }
 
+initFullPidState :: FullPidState
+
+initFullPidState = FullPidState 0 0 0 0
+
 computeDemand :: Double ->
                  Double ->
                  Double ->
@@ -34,9 +38,7 @@ computeDemand kp ki kd windupMax valueMax pidState demand value =
     let 
 
         --  Reset PID state on quick value change
-        pidState' = if abs(value) > valueMax
-                     then (FullPidState 0 0 0 0)
-                     else pidState
+        pidState' = if abs(value) > valueMax then initFullPidState else pidState
 
         err = demand - value
 
