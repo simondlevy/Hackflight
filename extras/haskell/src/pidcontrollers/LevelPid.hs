@@ -31,8 +31,8 @@ levelFun kp maxAngleDegrees vehicleState demands _controllerState =
         rollDemand = ((kp * demandScale * (roll demands)) -
                      (phi vehicleState))
 
-        -- Pitch demand is nose-down positive, so we negate
-        -- pitch-forward (nose-down negative) to reconcile them
+        -- Pitch demand is nose-down positive, so we negate pitch-forward
+        -- vehicle state (nose-down negative) to reconcile them
         pitchDemand = ((kp * demandScale * (pitch demands)) +
                        (theta vehicleState))
 
