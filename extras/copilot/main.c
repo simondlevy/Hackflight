@@ -22,6 +22,7 @@ int main (int argc, char *argv[])
     udp_server_socket_init(&telemetry_server_socket, TELEMETRY_PORT, 0);
 
     printf("Hit the start button ...");
+    fflush(stdout);
 
     while (true) {
 
