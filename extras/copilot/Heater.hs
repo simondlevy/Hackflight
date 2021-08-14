@@ -18,11 +18,8 @@ import Prelude hiding ((>), (<), div)
 temp :: Stream Float
 temp = extern "temperature" Nothing
 
--- Calculate temperature in Celsius.
--- We need to cast the Word8 to a Float. Note that it is an unsafeCast, as there
--- is no direct relation between Word8 and Float.
 ctemp :: Stream Float
-ctemp = temp * (150.0 / 255.0) - 50.0
+ctemp = temp
 
 spec = do
   -- Triggers that fire when the ctemp is too low or too high,

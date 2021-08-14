@@ -7,17 +7,35 @@ float temperature;
 
 static float readTemperature(void)
 {
-    return 0;
+    static float val;
+    static int8_t dir;
+
+    // init
+    if (val == 0) {
+        val = 10;
+    }
+
+    if (val == 10) {
+        dir = +1;
+    }
+
+    if (val == 30) {
+        dir = -1;
+    }
+
+    val += dir;
+
+    return val;
 }
 
 void heaton (float temp) {
 
-    printf("%f => on\n", temp);
+    printf("%3.1f => on\n", temp);
 }
 
 void heatoff (float temp) {
     
-    printf("%f => off\n", temp);
+    printf("%3.1f => off\n", temp);
 }
 
 int main (int argc, char *argv[]) {
