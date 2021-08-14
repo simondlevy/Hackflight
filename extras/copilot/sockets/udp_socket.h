@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "socket_compat.hpp"
+#include "posix_sockets.h"
 
 typedef struct {
 
