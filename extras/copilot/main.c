@@ -33,6 +33,8 @@ int main (int argc, char *argv[])
         udp_set_timeout(telemetry_server_socket, 100);
 
         if (telemetry_bytes[0] < 0) {
+            udp_close_connection(motor_client_socket);
+            udp_close_connection(telemetry_server_socket);
             break;
         }
     }
