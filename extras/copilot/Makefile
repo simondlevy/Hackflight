@@ -8,3 +8,6 @@ clean:
 
 edit:
 	vim main.c
+
+run: main
+	./main
