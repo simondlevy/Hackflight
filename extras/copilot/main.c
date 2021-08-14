@@ -37,6 +37,10 @@ int main (int argc, char *argv[])
             udp_close_connection(telemetry_server_socket);
             break;
         }
+
+        double motors[4] = {0.6, 0.6, 0.6, 0.6};
+
+        udp_send_data(motor_client_socket, motors, sizeof(motors));
     }
 
     return 0;
