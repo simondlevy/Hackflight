@@ -19,6 +19,9 @@ int main (int argc, char *argv[])
     udp_socket_t motor_client_socket = {};
     udp_client_socket_init(&motor_client_socket, HOST, MOTOR_PORT, 0);
 
+    udp_socket_t telemetry_server_socket = {};
+    udp_server_socket_init(&telemetry_server_socket, TELEMETRY_PORT, 0);
+
     printf("Hit the start button ...");
 
     return 0;
