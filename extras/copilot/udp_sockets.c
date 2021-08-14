@@ -40,9 +40,9 @@ static void _error(const char * message)
     exit(1);
 }
 
-void udp_close_connection(int sock)
+void udp_close_connection(udp_socket_t udp_socket)
 {
-    close(sock);
+    close(udp_socket.sock);
 }
 
 void udp_client_socket_init(udp_socket_t * udp_socket, const char * host, const short port, unsigned int timeoutMsec)
