@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "sockets/posix_sockets.h"
+#include "sockets/udp_socket.h"
 
 static const char * HOST = "127.0.0.1";
 static const uint16_t MOTOR_PORT = 5000;
