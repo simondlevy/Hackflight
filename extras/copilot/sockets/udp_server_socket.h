@@ -6,34 +6,36 @@
 
 #pragma once
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "udp_socket.h"
 
-class UdpServerSocket : public UdpSocket {
+static void error(const char * message)
+{
+    fprintf(stderr, "%s\n", message);
+    exit(1);
+}
 
-    public:
+void udp_server_socket_init(udp_socket_t * udp_socket, const short port, unsigned int timeoutMsec)
+{
+    // Create socket
+    udp_socket->sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (udp_socket->sock == INVALID_SOCKET) {
+        error("socket failed()");
+    }
 
-        UdpServerSocket(const short port, const uint32_t timeoutMsec=0)
-        {
-            // Create socket
-            _sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-            if (_sock == INVALID_SOCKET) {
-                sprintf_s(_message, "socket() failed");
-                return;
-            }
+    // Prepare the sockaddr_in structure
+    struct sockaddr_in server;
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = INADDR_ANY;
+    server.sin_port = htons(port);
 
-            // Prepare the sockaddr_in structure
-            struct sockaddr_in server;
-            server.sin_family = AF_INET;
-            server.sin_addr.s_addr = INADDR_ANY;
-            server.sin_port = htons(port);
+    // Bind
+    if (bind(udp_socket->sock, (struct sockaddr *)&server, sizeof(server)) == SOCKET_ERROR) {
+        error("bind() failed");
+    }
 
-            // Bind
-            if (bind(_sock, (struct sockaddr *)&server, sizeof(server)) == SOCKET_ERROR) {
-                sprintf_s(_message, "bind() failed");
-                return;
-            }
-
-            // Check for / set up optional timeout for receiveData
-            UdpSocket::setUdpTimeout(timeoutMsec);
-        }
-};
+    // Check for / set up optional timeout for receiveData
+    setUdpTimeout(udp_socket->sock, timeoutMsec);
+}

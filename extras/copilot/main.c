@@ -8,6 +8,7 @@
 #include <stdint.h>
 
 #include "sockets/udp_client_socket.h"
+#include "sockets/udp_server_socket.h"
 
 static const char * HOST = "127.0.0.1";
 static const uint16_t MOTOR_PORT = 5000;

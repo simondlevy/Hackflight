@@ -1,6 +1,6 @@
 all: main
 
-main: main.c sockets/*.h sockets/udp_socket.h
+main: main.c sockets/*.h
 	gcc -Wall -std=c99 main.c -o main
 
 clean:
