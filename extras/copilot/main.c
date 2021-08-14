@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "sockets/socket_compat.h"
+
 static const char * HOST = "127.0.0.1";
 static const uint16_t MOTOR_PORT = 5000;
 static const uint16_t TELEMETRY_PORT = 5001;
