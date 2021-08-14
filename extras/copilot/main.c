@@ -24,5 +24,14 @@ int main (int argc, char *argv[])
 
     printf("Hit the start button ...");
 
+    while (true) {
+
+        uint8_t telemetry_bytes[17] = {};
+
+        receiveData(telemetry_server_socket, telemetry_bytes, sizeof(telemetry_bytes));
+
+        setTimeout(telemetry_server_socket, 100);
+    }
+
     return 0;
 }

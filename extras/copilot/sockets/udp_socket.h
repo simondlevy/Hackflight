@@ -19,7 +19,7 @@ typedef struct {
 
 } udp_socket_t;
 
-void setupTimeout(udp_socket_t udp_socket, uint32_t msec)
+void setTimeout(udp_socket_t udp_socket, uint32_t msec)
 {
     if (msec > 0) {
         setUdpTimeout(udp_socket.sock, msec);
