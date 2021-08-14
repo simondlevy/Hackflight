@@ -33,12 +33,12 @@ typedef struct {
 
 } udp_socket_t;
 
-static void inetPton(const char * host, struct sockaddr_in saddr_in)
+static void udp_inet_pton(const char * host, struct sockaddr_in saddr_in)
 {
     inet_pton(AF_INET, host, &(saddr_in.sin_addr));
 }
 
-static void setUdpTimeout(int sock, uint32_t msec)
+static void _set_timeout(int sock, uint32_t msec)
 {
     struct timeval timeout;
     timeout.tv_sec = msec / 1000;
@@ -46,7 +46,7 @@ static void setUdpTimeout(int sock, uint32_t msec)
     setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 }
 
-static void closeConnection(int sock)
+static void udp_close_connection(int sock)
 {
     close(sock);
 }
@@ -64,10 +64,10 @@ static void udp_client_socket_init(udp_socket_t * udp_socket, const char * host,
     memset((char *)&udp_socket->si_other, 0, SLEN);
     udp_socket->si_other.sin_family = AF_INET;
     udp_socket->si_other.sin_port = htons(port);
-    inetPton(host, udp_socket->si_other);
+    udp_inet_pton(host, udp_socket->si_other);
 
     // Check for / set up optional timeout for receiveData
-    setUdpTimeout(udp_socket->sock, timeoutMsec);
+    _set_timeout(udp_socket->sock, timeoutMsec);
 }
 
 static void error(const char * message)
@@ -96,17 +96,17 @@ static void udp_server_socket_init(udp_socket_t * udp_socket, const short port, 
     }
 
     // Check for / set up optional timeout for receiveData
-    setUdpTimeout(udp_socket->sock, timeoutMsec);
+    _set_timeout(udp_socket->sock, timeoutMsec);
 }
 
-void setTimeout(udp_socket_t udp_socket, uint32_t msec)
+void udp_set_timeout(udp_socket_t udp_socket, uint32_t msec)
 {
     if (msec > 0) {
-        setUdpTimeout(udp_socket.sock, msec);
+        _set_timeout(udp_socket.sock, msec);
     }
 }
 
-void sendData(udp_socket_t udp_socket, void * buf, size_t len)
+void udp_send_data(udp_socket_t udp_socket, void * buf, size_t len)
 {
     sendto(udp_socket.sock,
            (const char *)buf,
@@ -117,7 +117,7 @@ void sendData(udp_socket_t udp_socket, void * buf, size_t len)
 
 }
 
-bool receiveData(udp_socket_t udp_socket, void * buf, size_t len)
+bool udp_receiver_data(udp_socket_t udp_socket, void * buf, size_t len)
 {
     unsigned int recvd = 0;
 

@@ -27,9 +27,9 @@ int main (int argc, char *argv[])
 
         double telemetry_bytes[17] = {};
 
-        receiveData(telemetry_server_socket, telemetry_bytes, sizeof(telemetry_bytes));
+        udp_receiver_data(telemetry_server_socket, telemetry_bytes, sizeof(telemetry_bytes));
 
-        setTimeout(telemetry_server_socket, 100);
+        udp_set_timeout(telemetry_server_socket, 100);
 
         if (telemetry_bytes[0] < 0) {
             break;
