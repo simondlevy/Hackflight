@@ -8,31 +8,26 @@
 
 #pragma once
 
+#include <stdlib.h>
+#include <string.h>
+
 #include "udp_socket.h"
 
-#include <string.h>
-#include <time.h>
+void udp_client_socket_init(udp_socket_t * udp_socket, const char * host, const short port, unsigned int timeoutMsec)
+{
+    // Create socket
+    udp_socket->sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (udp_socket->sock == SOCKET_ERROR) {
+        fprintf(stderr, "socket() failed");
+        exit(1);
+    }
 
-class UdpClientSocket : public UdpSocket {
+    // Setup address structure
+    memset((char *)&udp_socket->si_other, 0, SLEN);
+    udp_socket->si_other.sin_family = AF_INET;
+    udp_socket->si_other.sin_port = htons(port);
+    inetPton(host, udp_socket->si_other);
 
-    public:
-
-        UdpClientSocket(const char * host, const short port, const uint32_t timeoutMsec=0)
-        {
-            // Create socket
-            _sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-            if (_sock == SOCKET_ERROR) {
-                sprintf_s(_message, "socket() failed");
-                return;
-            }
-
-            // Setup address structure
-            memset((char *)&_si_other, 0, sizeof(_si_other));
-            _si_other.sin_family = AF_INET;
-            _si_other.sin_port = htons(port);
-            Socket::inetPton(host, _si_other);
-
-            // Check for / set up optional timeout for receiveData
-            UdpSocket::setUdpTimeout(timeoutMsec);
-        }
-};
+    // Check for / set up optional timeout for receiveData
+    setUdpTimeout(udp_socket->sock, timeoutMsec);
+}
