@@ -33,5 +33,4 @@ spec = do
 
 -- Compile the spec
 main :: IO ()
--- main = interpret 30 spec
 main = reify spec >>= compile "array"
