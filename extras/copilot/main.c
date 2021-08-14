@@ -16,6 +16,9 @@ static const uint16_t TELEMETRY_PORT = 5001;
 
 int main (int argc, char *argv[])
 {
+    udp_socket_t motor_client_socket = {};
+    udp_client_socket_init(&motor_client_socket, HOST, MOTOR_PORT, 0);
+
     printf("Hit the start button ...");
 
     return 0;
