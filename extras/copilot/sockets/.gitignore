@@ -1,0 +1,16 @@
+*~
+*.pyc
+*.swp
+*.o
+linux/*server
+linux/*client
+*.VC.db
+*.suo
+*.opendb
+.vs
+.idea
+.kdev4
+.vscode
+Debug/
+windows/*/*/x64/
+windows/*/x64/

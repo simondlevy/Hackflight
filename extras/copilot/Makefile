@@ -5,3 +5,6 @@ main: main.c
 
 clean:
 	rm -f main *~
+
+edit:
+	vim main.c
