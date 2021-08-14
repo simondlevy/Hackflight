@@ -1,5 +1,5 @@
-heater: main.c heater.c heater.h
-	gcc -Wall -std=c99 heater.c main.c -o heater
+heater: heater_main.c heater.c heater.h
+	gcc -Wall -std=c99 heater.c heater_main.c -o heater
 
 heater.c: Heater.hs
 	runhaskell Heater.hs
