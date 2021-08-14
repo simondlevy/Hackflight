@@ -7,8 +7,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "sockets/udp_client_socket.h"
-#include "sockets/udp_server_socket.h"
+#include "udp_sockets.h"
 
 static const char * HOST = "127.0.0.1";
 static const uint16_t MOTOR_PORT = 5000;
@@ -26,11 +25,15 @@ int main (int argc, char *argv[])
 
     while (true) {
 
-        uint8_t telemetry_bytes[17] = {};
+        double telemetry_bytes[17] = {};
 
         receiveData(telemetry_server_socket, telemetry_bytes, sizeof(telemetry_bytes));
 
         setTimeout(telemetry_server_socket, 100);
+
+        if (telemetry_bytes[0] < 0) {
+            break;
+        }
     }
 
     return 0;
