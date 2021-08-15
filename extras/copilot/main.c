@@ -17,6 +17,11 @@ static const uint16_t TELEMETRY_PORT = 5001;
 
 double throttle = 0;
 
+void runMotor(double value)
+{
+    printf("runMotor: %f\n", value);
+}
+
 int main (int argc, char *argv[])
 {
     udp_socket_t motor_client_socket = {};
