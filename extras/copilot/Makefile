@@ -12,7 +12,7 @@ udp_sockets.o: udp_sockets.c udp_sockets.h
 hackflight.o: hackflight.c hackflight.h
 	gcc -Wall -std=c99 -c hackflight.c
 
-hackflight.c: Hackflight.hs
+hackflight.c: Hackflight.hs Demands.hs
 	runhaskell Hackflight.hs
 
 hackflight.h: Hackflight.hs
