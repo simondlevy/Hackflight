@@ -5,6 +5,7 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -33,7 +34,7 @@ int main (int argc, char *argv[])
     udp_socket_t telemetry_server_socket = {};
     udp_server_socket_init(&telemetry_server_socket, TELEMETRY_PORT, 0);
 
-    printf("Hit the start button ...");
+    printf("Hit the start button ...\n");
     fflush(stdout);
 
     while (true) {
@@ -49,20 +50,13 @@ int main (int argc, char *argv[])
 
             udp_set_timeout(telemetry_server_socket, 100);
 
-            if (telemetry_data[0] < 0) {
-                udp_close_connection(motor_client_socket);
-                udp_close_connection(telemetry_server_socket);
-                break;
-            }
-
             // Calls Copilot
             step();
         }
 
         else {
 
-            fprintf(stderr, "failed to receive\n");
-            fflush(stderr);
+            exit(0);
         }
     }
 
