@@ -1,9 +1,9 @@
 all: main
 
 main: main.o udp_sockets.o hackflight.o
-	gcc -o main main.o udp_sockets.o
+	gcc -o main main.o udp_sockets.o hackflight.o
 
-main.o: main.c udp_sockets.h
+main.o: main.c udp_sockets.h hackflight.h
 	gcc -Wall -std=c99 -c main.c
 
 udp_sockets.o: udp_sockets.c udp_sockets.h

@@ -9,12 +9,13 @@
 #include <string.h>
 
 #include "udp_sockets.h"
+#include "hackflight.h"
 
 static const char * HOST = "127.0.0.1";
 static const uint16_t MOTOR_PORT = 5000;
 static const uint16_t TELEMETRY_PORT = 5001;
 
-double receiver[4] = {};
+double throttle = 0;
 
 int main (int argc, char *argv[])
 {
@@ -39,7 +40,7 @@ int main (int argc, char *argv[])
             printf("%f\n", telemetry_data[0]);
             fflush(stdout);
 
-            memcpy(receiver, &telemetry_data[13], 4*sizeof(double));
+            throttle = telemetry_data[13];
 
             udp_set_timeout(telemetry_server_socket, 100);
 
@@ -48,6 +49,8 @@ int main (int argc, char *argv[])
                 udp_close_connection(telemetry_server_socket);
                 break;
             }
+
+            step();
 
             double motors[4] = {0.3, 0.3, 0.3, 0.3};
 
