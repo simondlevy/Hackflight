@@ -42,8 +42,8 @@ int main (int argc, char *argv[])
                     telemetry_data,
                     sizeof(telemetry_data))) {
 
-            printf("%f\n", telemetry_data[0]);
-            fflush(stdout);
+            //printf("%f\n", telemetry_data[0]);
+            //fflush(stdout);
 
             throttle = telemetry_data[13];
 
