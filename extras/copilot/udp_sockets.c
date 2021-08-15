@@ -45,7 +45,11 @@ void udp_close_connection(udp_socket_t udp_socket)
     close(udp_socket.sock);
 }
 
-void udp_client_socket_init(udp_socket_t * udp_socket, const char * host, const short port, unsigned int timeoutMsec)
+void udp_client_socket_init(
+        udp_socket_t * udp_socket,
+        const char * host,
+        const short port,
+        unsigned int timeoutMsec)
 {
     // Create socket
     udp_socket->sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -64,7 +68,10 @@ void udp_client_socket_init(udp_socket_t * udp_socket, const char * host, const 
     _set_timeout(udp_socket->sock, timeoutMsec);
 }
 
-void udp_server_socket_init(udp_socket_t * udp_socket, const short port, unsigned int timeoutMsec)
+void udp_server_socket_init(
+        udp_socket_t * udp_socket,
+        const short port,
+        unsigned int timeoutMsec)
 {
     // Create socket
     udp_socket->sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -79,7 +86,9 @@ void udp_server_socket_init(udp_socket_t * udp_socket, const short port, unsigne
     server.sin_port = htons(port);
 
     // Bind
-    if (bind(udp_socket->sock, (struct sockaddr *)&server, sizeof(server)) == SOCKET_ERROR) {
+    if (bind(udp_socket->sock,
+             (struct sockaddr *)&server,
+             sizeof(server)) == SOCKET_ERROR) {
         _error("bind() failed");
     }
 
@@ -115,5 +124,5 @@ bool udp_receive_data(udp_socket_t udp_socket, void * buf, size_t len)
                     0,
                     (struct sockaddr *) &(udp_socket.si_other),
                     &recvd)
-        == SLEN;
+        == len;
 }

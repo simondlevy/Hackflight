@@ -28,24 +28,32 @@ int main (int argc, char *argv[])
 
         double telemetry_data[17] = {};
 
-        udp_receive_data(
-                telemetry_server_socket,
-                telemetry_data,
-                sizeof(telemetry_data));
+        if (udp_receive_data(
+                    telemetry_server_socket,
+                    telemetry_data,
+                    sizeof(telemetry_data))) {
 
-        udp_set_timeout(telemetry_server_socket, 100);
+            printf("%f\n", telemetry_data[0]);
+            fflush(stdout);
 
-        if (telemetry_data[0] < 0) {
-            udp_close_connection(motor_client_socket);
-            udp_close_connection(telemetry_server_socket);
-            break;
+            udp_set_timeout(telemetry_server_socket, 100);
+
+            if (telemetry_data[0] < 0) {
+                udp_close_connection(motor_client_socket);
+                udp_close_connection(telemetry_server_socket);
+                break;
+            }
+
+            double motors[4] = {0.3, 0.3, 0.3, 0.3};
+
+            udp_send_data(motor_client_socket, motors, sizeof(motors));
         }
 
-        double motors[4] = {0.6, 0.6, 0.6, 0.6};
+        else {
 
-        printf("%f\n", telemetry_data[0]);
-
-        udp_send_data(motor_client_socket, motors, sizeof(motors));
+            fprintf(stderr, "failed to receive\n");
+            fflush(stderr);
+        }
     }
 
     return 0;

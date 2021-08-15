@@ -72,6 +72,8 @@ loop telemetryServerSocket
 
       then do
 
+          print $ telem!!0
+
           -- Simulate a sensor using the next 12 values (state)
           let sensor = SimSensor (telem!!1) (telem!!2) (telem!!3) 
                                  (telem!!4) (telem!!5) (telem!!6) 
