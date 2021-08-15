@@ -17,14 +17,16 @@ static const uint16_t TELEMETRY_PORT = 5001;
 
 double throttle = 0;
 
+static udp_socket_t motor_client_socket; 
+
 void runMotor(double value)
 {
-    printf("runMotor: %f\n", value);
+    double motors[4] = {value, value, value, value};
+    udp_send_data(motor_client_socket, motors, sizeof(motors));
 }
 
 int main (int argc, char *argv[])
 {
-    udp_socket_t motor_client_socket = {};
     udp_client_socket_init(&motor_client_socket, HOST, MOTOR_PORT, 0);
 
     udp_socket_t telemetry_server_socket = {};
@@ -42,9 +44,6 @@ int main (int argc, char *argv[])
                     telemetry_data,
                     sizeof(telemetry_data))) {
 
-            //printf("%f\n", telemetry_data[0]);
-            //fflush(stdout);
-
             throttle = telemetry_data[13];
 
             udp_set_timeout(telemetry_server_socket, 100);
@@ -56,10 +55,6 @@ int main (int argc, char *argv[])
             }
 
             step();
-
-            double motors[4] = {0.3, 0.3, 0.3, 0.3};
-
-            udp_send_data(motor_client_socket, motors, sizeof(motors));
         }
 
         else {
