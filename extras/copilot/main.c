@@ -21,10 +21,9 @@ double receiverThrottle = 0;
 static udp_socket_t motor_client_socket; 
 
 // Called by Copilot
-void runMotor(double value)
+void runMotors(double values[4])
 {
-    double motors[4] = {value, value, value, value};
-    udp_send_data(motor_client_socket, motors, sizeof(motors));
+    udp_send_data(motor_client_socket, values, 4*sizeof(double));
 }
 
 int main (int argc, char *argv[])
