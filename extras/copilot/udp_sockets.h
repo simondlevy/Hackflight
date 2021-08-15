@@ -20,9 +20,16 @@ typedef struct {
 
 void udp_close_connection(udp_socket_t udp_socket);
 
-void udp_client_socket_init(udp_socket_t * udp_socket, const char * host, const short port, unsigned int timeoutMsec);
+void udp_client_socket_init(
+        udp_socket_t * udp_socket,
+        const char * host,
+        const short port,
+        unsigned int timeoutMsec);
 
-void udp_server_socket_init(udp_socket_t * udp_socket, const short port, unsigned int timeoutMsec);
+void udp_server_socket_init(
+        udp_socket_t * udp_socket,
+        const short port,
+        unsigned int timeoutMsec);
 
 void udp_set_timeout(udp_socket_t udp_socket, uint32_t msec);
 
