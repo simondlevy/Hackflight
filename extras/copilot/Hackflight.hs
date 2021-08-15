@@ -20,11 +20,11 @@ receiverDemands  = extern "receiverDemands" Nothing
 motorValues :: Stream (Array 4 Double)
 motorValues = [array [0, 0, 0, 0]] ++ motorValues
 
-data MyDemands = MyDemands { throttle :: Stream Double }
+data Demands = Demands { throttle :: Stream Double }
 
 spec = do
 
-  let initialDemands = MyDemands (receiverDemands .!!0)
+  let initialDemands = Demands (receiverDemands .!!0)
 
   let newMotorValues = [array [0.1, 0.2, 0.3, 0.4]] ++ motorValues
 
