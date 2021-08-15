@@ -17,7 +17,7 @@ static const uint16_t MOTOR_PORT = 5000;
 static const uint16_t TELEMETRY_PORT = 5001;
 
 // Avaiable to Copilot
-double receiverThrottle = 0;
+double receiverDemands[4] = {};
 
 static udp_socket_t motor_client_socket; 
 
@@ -46,7 +46,9 @@ int main (int argc, char *argv[])
                     telemetry_data,
                     sizeof(telemetry_data))) {
 
-            receiverThrottle = telemetry_data[13];
+            memcpy(receiverDemands,
+                   &telemetry_data[13],
+                   sizeof(receiverDemands));
 
             udp_set_timeout(telemetry_server_socket, 100);
 

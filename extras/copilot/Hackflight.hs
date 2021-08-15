@@ -6,7 +6,6 @@ module Main where
 import Language.Copilot
 import Copilot.Compile.C99
 
-
 receiverDemands :: Stream (Array 4 Double)
 receiverDemands  = extern "receiverDemands" Nothing
 
