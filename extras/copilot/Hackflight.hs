@@ -1,3 +1,11 @@
+{--
+  Haskell Copilot support for Hackflight
+
+  Copyright(C) 2021 Simon D.Levy
+
+  MIT License
+--}
+
 {-# LANGUAGE RebindableSyntax #-}
 {-# LANGUAGE DataKinds        #-}
 

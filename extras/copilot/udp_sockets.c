@@ -1,6 +1,6 @@
 /* UDP socket support
  *
- * Copyright (C) 2019 Simon D. Levy
+ * Copyright (C) 2021 Simon D. Levy
  *
  * MIT License
  */

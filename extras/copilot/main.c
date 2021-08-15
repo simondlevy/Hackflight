@@ -1,4 +1,7 @@
 /*
+  Socket code for working with Haskell Copilot version of Hackflight via
+  simulator
+
   Copyright(C) 2021 Simon D.Levy
 
   MIT License
@@ -19,6 +22,7 @@ static const uint16_t TELEMETRY_PORT = 5001;
 // Avaiable to Copilot
 double receiverDemands[4] = {};
 
+// Shared by main() and runMotors()
 static udp_socket_t motor_client_socket; 
 
 // Called by Copilot
