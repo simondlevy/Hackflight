@@ -15,10 +15,12 @@ static const char * HOST = "127.0.0.1";
 static const uint16_t MOTOR_PORT = 5000;
 static const uint16_t TELEMETRY_PORT = 5001;
 
-double throttle = 0;
+// Avaiable to Copilot
+double receiverThrottle = 0;
 
 static udp_socket_t motor_client_socket; 
 
+// Called by Copilot
 void runMotor(double value)
 {
     double motors[4] = {value, value, value, value};
@@ -44,7 +46,7 @@ int main (int argc, char *argv[])
                     telemetry_data,
                     sizeof(telemetry_data))) {
 
-            throttle = telemetry_data[13];
+            receiverThrottle = telemetry_data[13];
 
             udp_set_timeout(telemetry_server_socket, 100);
 
@@ -54,6 +56,7 @@ int main (int argc, char *argv[])
                 break;
             }
 
+            // Calls Copilot
             step();
         }
 
