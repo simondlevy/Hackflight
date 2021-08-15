@@ -10,7 +10,7 @@ udp_sockets.o: udp_sockets.c udp_sockets.h
 	gcc -Wall -std=c99 -c udp_sockets.c
 
 clean:
-	rm -f main *~
+	rm -f main *.o *~
 
 edit:
 	vim main.c
