@@ -6,12 +6,15 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "udp_sockets.h"
 
 static const char * HOST = "127.0.0.1";
 static const uint16_t MOTOR_PORT = 5000;
 static const uint16_t TELEMETRY_PORT = 5001;
+
+double receiver[4] = {};
 
 int main (int argc, char *argv[])
 {
@@ -35,6 +38,8 @@ int main (int argc, char *argv[])
 
             printf("%f\n", telemetry_data[0]);
             fflush(stdout);
+
+            memcpy(receiver, &telemetry_data[13], 4*sizeof(double));
 
             udp_set_timeout(telemetry_server_socket, 100);
 
