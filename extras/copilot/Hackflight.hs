@@ -15,6 +15,7 @@ import Language.Copilot
 import Copilot.Compile.C99
 
 import Demands
+import VehicleState(initialVehicleState)
 
 receiverDemands :: Stream (Array 4 Double)
 receiverDemands  = extern "receiverDemands" Nothing
