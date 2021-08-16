@@ -28,6 +28,9 @@ motorValues = [array [0, 0, 0, 0]] ++ motorValues
 
 spec = do
 
+  -- Get the vehicle state by running the sensors
+  let vehicleState = initialVehicleState
+
   let initialDemands = Demands (receiverDemands .!!0)
                                (receiverDemands .!!1)
                                (receiverDemands .!!2)
