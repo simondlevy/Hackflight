@@ -16,7 +16,7 @@ import Copilot.Compile.C99
 
 import Demands
 import VehicleState(initialVehicleState)
-import Sensor
+import Sensors
 
 receiverDemands :: Stream (Array 4 Double)
 receiverDemands  = extern "receiverDemands" Nothing
@@ -30,10 +30,6 @@ spec = do
                                (receiverDemands .!!1)
                                (receiverDemands .!!2)
                                (receiverDemands .!!3)
-
-  let gyrometer = Gyrometer (gyrometerValues .!!0)
-                            (gyrometerValues .!!1)
-                            (gyrometerValues .!!2)
 
   let newMotorValues = [array [0.1, 0.2, 0.3, 0.4]] ++ motorValues
 
