@@ -20,4 +20,5 @@ quat :: Stream (Array 4 Double)
 quat = extern "quatValues" Nothing
 
 quatModifyState :: VehicleState
+
 quatModifyState = VehicleState 0 0 0 0 0 0 0 0 0 0 0 0
