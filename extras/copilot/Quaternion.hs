@@ -21,4 +21,8 @@ quat = extern "quatValues" Nothing
 
 quatModifyState :: VehicleState
 
-quatModifyState = VehicleState 0 0 0 0 0 0 0 0 0 0 0 0
+quatModifyState = VehicleState 0 0 0 0 0 0 phi 0 theta 0 psi 0
+
+  where phi = 0
+        theta = 0
+        psi = 0
