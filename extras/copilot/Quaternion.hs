@@ -1,5 +1,5 @@
 {--
-  Haskell Copilot support for gyrometer
+  Haskell Copilot support for using quaternion as a sensor
 
   Copyright(C) 2021 Simon D.Levy
 
@@ -16,8 +16,8 @@ import Language.Copilot
 
 import VehicleState
 
-gyro :: Stream (Array 3 Double)
-gyro = extern "gyro" Nothing
+quat :: Stream (Array 4 Double)
+quat = extern "quatValues" Nothing
 
-gyroModifyState :: VehicleState
-gyroModifyState = VehicleState 0 0 0 0 0 0 0 (gyro.!!0) 0 (gyro.!!1) 0 (gyro.!!2)
+quatModifyState :: VehicleState
+quatModifyState = VehicleState 0 0 0 0 0 0 0 0 0 0 0 0

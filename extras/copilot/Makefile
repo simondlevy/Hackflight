@@ -1,4 +1,11 @@
-HSRC = Hackflight.hs Demands.hs VehicleState.hs Gyrometer.hs
+#
+# Makefile for Hackflight Copilot socket version
+#
+# Copyright (c) 2021 Simon D. Levy
+#
+# MIT License
+
+HSRC = Hackflight.hs Demands.hs VehicleState.hs Gyrometer.hs Quaternion.hs
 
 all: socket_main
 

@@ -22,8 +22,8 @@ static const uint16_t TELEMETRY_PORT = 5001;
 
 // Avaiable to Copilot
 double receiverDemands[4] = {};
-double gyrometerValues[3] = {};
-double quaternionValues[4] = {};
+double gyroValues[3] = {};
+double quatValues[4] = {};
 
 // Shared by main() and runMotors()
 static udp_socket_t motor_client_socket; 
@@ -53,9 +53,9 @@ int main (int argc, char *argv[])
                     telemetry_data,
                     sizeof(telemetry_data))) {
 
-            gyrometerValues[0] = telemetry_data[8];
-            gyrometerValues[1] = telemetry_data[10];
-            gyrometerValues[2] = telemetry_data[12];
+            gyroValues[0] = telemetry_data[8];
+            gyroValues[1] = telemetry_data[10];
+            gyroValues[2] = telemetry_data[12];
 
             receiverDemands[0] = telemetry_data[13];
             receiverDemands[1] = telemetry_data[14];
@@ -76,10 +76,10 @@ int main (int argc, char *argv[])
             double s2 = sin(theta / 2);
             double s3 = sin(phi / 2);
 
-            quaternionValues[0] = c1 * c2 * c3 - s1 * s2 * s3;
-            quaternionValues[1] = s1 * s2 * c3 +c1 * c2 * s3;
-            quaternionValues[2] = s1 * c2 * c3 + c1 * s2 * s3;
-            quaternionValues[3] = c1 * s2 * c3 - s1 * c2 * s3;
+            quatValues[0] = c1 * c2 * c3 - s1 * s2 * s3;
+            quatValues[1] = s1 * s2 * c3 +c1 * c2 * s3;
+            quatValues[2] = s1 * c2 * c3 + c1 * s2 * s3;
+            quatValues[3] = c1 * s2 * c3 - s1 * c2 * s3;
 
             udp_set_timeout(telemetry_server_socket, 100);
 
