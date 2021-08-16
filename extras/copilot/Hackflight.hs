@@ -15,7 +15,7 @@ import Language.Copilot
 import Copilot.Compile.C99
 
 import Demands
-import VehicleState(initialVehicleState)
+import VehicleState
 import Gyrometer
 -- import Quaternion
 import EulerAngles
@@ -28,8 +28,10 @@ motorValues = [array [0, 0, 0, 0]] ++ motorValues
 
 spec = do
 
+  let sensors = [eulerModifyState, gyroModifyState]
+
   -- Get the vehicle state by running the sensors
-  let vehicleState = initialVehicleState
+  let vehicleState = foldr addStates initialVehicleState sensors
 
   let initialDemands = Demands (receiverDemands .!!0)
                                (receiverDemands .!!1)
@@ -37,8 +39,6 @@ spec = do
                                (receiverDemands .!!3)
 
   let newMotorValues = [array [0.1, 0.2, 0.3, 0.4]] ++ motorValues
-
-  let sensors = [eulerModifyState, gyroModifyState]
 
   trigger "runMotors" true [arg newMotorValues]
 
