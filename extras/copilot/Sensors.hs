@@ -20,5 +20,24 @@ data Sensor = Gyrometer { gyroX :: Stream Double
                         , gyroY :: Stream Double
                         , gyroZ :: Stream Double } 
 
-
 type SensorFun = Sensor -> VehicleState -> VehicleState
+
+gyroModifyState :: SensorFun
+
+gyroModifyState (Gyrometer gx gy gz) vehicleState = 
+
+  VehicleState (x vehicleState)
+               (dx vehicleState)
+               (y vehicleState)
+               (dy vehicleState)
+               (z vehicleState)
+               (dz vehicleState)
+               (phi vehicleState)
+               gx
+               (theta vehicleState)
+               gy
+               (psi vehicleState)
+               gz
+
+gyrometerValues :: Stream (Array 3 Double)
+gyrometerValues  = extern "gyrometerValues" Nothing
