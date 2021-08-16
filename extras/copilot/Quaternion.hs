@@ -8,7 +8,7 @@
 
 {-# LANGUAGE DataKinds        #-}
 
-module Gyrometer
+module Quaternion
 
 where
 
