@@ -21,6 +21,8 @@ static const uint16_t TELEMETRY_PORT = 5001;
 
 // Avaiable to Copilot
 double receiverDemands[4] = {};
+double gyrometerValues[3] = {};
+
 
 // Shared by main() and runMotors()
 static udp_socket_t motor_client_socket; 
@@ -50,9 +52,14 @@ int main (int argc, char *argv[])
                     telemetry_data,
                     sizeof(telemetry_data))) {
 
-            memcpy(receiverDemands,
-                   &telemetry_data[13],
-                   sizeof(receiverDemands));
+            gyrometerValues[0] = telemetry_data[8];
+            gyrometerValues[1] = telemetry_data[10];
+            gyrometerValues[2] = telemetry_data[12];
+
+            receiverDemands[0] = telemetry_data[13];
+            receiverDemands[1] = telemetry_data[14];
+            receiverDemands[2] = telemetry_data[15];
+            receiverDemands[3] = telemetry_data[16];
 
             udp_set_timeout(telemetry_server_socket, 100);
 
