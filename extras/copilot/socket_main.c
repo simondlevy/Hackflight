@@ -24,6 +24,7 @@ static const uint16_t TELEMETRY_PORT = 5001;
 double receiverDemands[4] = {};
 double gyroValues[3] = {};
 double quatValues[4] = {};
+double eulerValues[3] = {}; // XXX until we can get atan2 working in Copilot
 
 // Shared by main() and runMotors()
 static udp_socket_t motor_client_socket; 
@@ -65,6 +66,10 @@ int main (int argc, char *argv[])
             double phi = telemetry_data[7];
             double theta = telemetry_data[9];
             double psi = telemetry_data[11];
+
+            eulerValues[0] = phi;
+            eulerValues[1] = theta;
+            eulerValues[2] = psi;
 
             // http://www.euclideanspace.com/maths/geometry/rotations/conversions/
             // eulerToQuaternion/index.htm
