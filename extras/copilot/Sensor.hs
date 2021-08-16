@@ -6,6 +6,8 @@
   MIT License
 --}
 
+{-# LANGUAGE DataKinds        #-}
+
 module Sensor
 
 where
@@ -35,3 +37,6 @@ modifyState (Gyrometer gx gy gz) vehicleState =
                gy
                (psi vehicleState)
                gz
+
+gyrometerValues :: Stream (Array 3 Double)
+gyrometerValues  = extern "gyrometerValues" Nothing

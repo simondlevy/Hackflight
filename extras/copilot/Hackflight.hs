@@ -21,9 +21,6 @@ import Sensor
 receiverDemands :: Stream (Array 4 Double)
 receiverDemands  = extern "receiverDemands" Nothing
 
-gyrometerValues :: Stream (Array 3 Double)
-gyrometerValues  = extern "gyrometerValues" Nothing
-
 motorValues :: Stream (Array 4 Double)
 motorValues = [array [0, 0, 0, 0]] ++ motorValues
 
