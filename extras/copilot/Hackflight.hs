@@ -17,7 +17,8 @@ import Copilot.Compile.C99
 import Demands
 import VehicleState(initialVehicleState)
 import Gyrometer
-import Quaternion
+-- import Quaternion
+import EulerAngles
 
 receiverDemands :: Stream (Array 4 Double)
 receiverDemands  = extern "receiverDemands" Nothing
