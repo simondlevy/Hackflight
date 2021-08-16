@@ -1,10 +1,10 @@
-all: main
+all: socket_main
 
-main: main.o udp_sockets.o hackflight.o
-	gcc -o main main.o udp_sockets.o hackflight.o
+socket_main: socket_main.o udp_sockets.o hackflight.o
+	gcc -o socket_main socket_main.o udp_sockets.o hackflight.o
 
-main.o: main.c udp_sockets.h hackflight.h
-	gcc -Wall -std=c99 -c main.c
+socket_main.o: socket_main.c udp_sockets.h hackflight.h
+	gcc -Wall -std=c99 -c socket_main.c
 
 udp_sockets.o: udp_sockets.c udp_sockets.h
 	gcc -Wall -std=c99 -c udp_sockets.c
@@ -19,10 +19,13 @@ hackflight.h: Hackflight.hs
 	runhaskell Hackflight.hs
 
 clean:
-	rm -f main *.o hackflight.c hackflight.h *~
+	rm -f socket_main *.o hackflight.c hackflight.h *~
 
 edit:
-	vim main.c
+	vim socket_main.c
 
-run: main
-	./main
+run: socket_main
+	./socket_main
+
+commit:
+	git commit -a -m="More Haskell Copilot work"
