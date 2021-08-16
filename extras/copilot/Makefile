@@ -15,7 +15,7 @@ hackflight.o: hackflight.c hackflight.h
 hackflight.c: Hackflight.hs Demands.hs VehicleState.hs Gyrometer.hs
 	runhaskell Hackflight.hs
 
-hackflight.h: Hackflight.hs
+hackflight.h: Hackflight.hs Demands.hs VehicleState.hs Gyrometer.hs
 	runhaskell Hackflight.hs
 
 clean:
