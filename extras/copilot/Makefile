@@ -1,3 +1,5 @@
+HSRC = Hackflight.hs Demands.hs VehicleState.hs Gyrometer.hs
+
 all: socket_main
 
 socket_main: socket_main.o udp_sockets.o hackflight.o
@@ -12,10 +14,10 @@ udp_sockets.o: udp_sockets.c udp_sockets.h
 hackflight.o: hackflight.c hackflight.h
 	gcc -Wall -std=c99 -c hackflight.c
 
-hackflight.c: Hackflight.hs Demands.hs VehicleState.hs Gyrometer.hs
+hackflight.c: $(HSRC)
 	runhaskell Hackflight.hs
 
-hackflight.h: Hackflight.hs Demands.hs VehicleState.hs Gyrometer.hs
+hackflight.h: $(HSRC)
 	runhaskell Hackflight.hs
 
 clean:
