@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <math.h>
 
 #include "udp_sockets.h"
 #include "hackflight.h"
@@ -22,7 +23,7 @@ static const uint16_t TELEMETRY_PORT = 5001;
 // Avaiable to Copilot
 double receiverDemands[4] = {};
 double gyrometerValues[3] = {};
-
+double quaternionValues[4] = {};
 
 // Shared by main() and runMotors()
 static udp_socket_t motor_client_socket; 
@@ -60,6 +61,25 @@ int main (int argc, char *argv[])
             receiverDemands[1] = telemetry_data[14];
             receiverDemands[2] = telemetry_data[15];
             receiverDemands[3] = telemetry_data[16];
+
+            double phi = telemetry_data[7];
+            double theta = telemetry_data[9];
+            double psi = telemetry_data[11];
+
+            // http://www.euclideanspace.com/maths/geometry/rotations/conversions/
+            // eulerToQuaternion/index.htm
+
+            double c1 = cos(psi / 2);
+            double c2 = cos(theta / 2);
+            double c3 = cos(phi / 2);
+            double s1 = sin(psi / 2);
+            double s2 = sin(theta / 2);
+            double s3 = sin(phi / 2);
+
+            quaternionValues[0] = c1 * c2 * c3 - s1 * s2 * s3;
+            quaternionValues[1] = s1 * s2 * c3 +c1 * c2 * s3;
+            quaternionValues[2] = s1 * c2 * c3 + c1 * s2 * s3;
+            quaternionValues[3] = c1 * s2 * c3 - s1 * c2 * s3;
 
             udp_set_timeout(telemetry_server_socket, 100);
 
