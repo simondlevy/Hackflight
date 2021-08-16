@@ -16,7 +16,7 @@ import Copilot.Compile.C99
 
 import Demands
 import VehicleState(initialVehicleState)
-import Sensors
+import Gyrometer
 
 receiverDemands :: Stream (Array 4 Double)
 receiverDemands  = extern "receiverDemands" Nothing
@@ -32,6 +32,8 @@ spec = do
                                (receiverDemands .!!3)
 
   let newMotorValues = [array [0.1, 0.2, 0.3, 0.4]] ++ motorValues
+
+  let sensors = [gyroModifyState]
 
   trigger "runMotors" true [arg newMotorValues]
 
