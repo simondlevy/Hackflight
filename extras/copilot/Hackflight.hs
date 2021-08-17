@@ -18,7 +18,7 @@ import Copilot.Compile.C99
 import VehicleState
 import Altimeter
 import Utils(compose)
---import Gyrometer
+import Gyrometer
 -- import Quaternion
 --import EulerAngles
 
@@ -50,8 +50,18 @@ spec = do
 
   trigger "runMotors" true [arg m1, arg m2, arg m3, arg m4]
 
-  trigger "showVehicleState" true [  arg (z vehicleState)
-                                   , arg (dz vehicleState)
+  trigger "showVehicleState" true [  arg (x      vehicleState)
+                                   , arg (dx     vehicleState)
+                                   , arg (y      vehicleState)
+                                   , arg (dy     vehicleState)
+                                   , arg (z      vehicleState)
+                                   , arg (dz     vehicleState)
+                                   , arg (phi    vehicleState)
+                                   , arg (dphi   vehicleState)
+                                   , arg (theta  vehicleState)
+                                   , arg (dtheta vehicleState)
+                                   , arg (psi    vehicleState)
+                                   , arg (dpsi   vehicleState)
                                   ]
 
 -- Compile the spec

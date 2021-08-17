@@ -40,7 +40,19 @@ void runMotors(double m1, double m2, double m3, double m4)
 }
 
 // For debugging
-void showVehicleState(double z, double dz)
+void showVehicleState(
+        double x,
+        double dx,
+        double y,
+        double dy,
+        double z,
+        double dz,
+        double phi,
+        double dphi,
+        double theta,
+        double dtheta,
+        double psi,
+        double dpsi)
 {
     printf("z: %+3.3f  dz: %+3.3f\n", z, dz);
 }

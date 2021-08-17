@@ -6,7 +6,7 @@
 # MIT License
 
 HSRC = Hackflight.hs Demands.hs VehicleState.hs Sensor.hs Utils.hs \
-	   Gyrometer.hs Altimeter.hs
+	   sensors/Gyrometer.hs sensors/Altimeter.hs
 
 all: socket_main
 
@@ -23,10 +23,10 @@ hackflight.o: hackflight.c hackflight.h
 	gcc -Wall -std=c99 -c hackflight.c
 
 hackflight.c: $(HSRC)
-	runhaskell Hackflight.hs
+	runhaskell -isensors Hackflight.hs
 
 hackflight.h: $(HSRC)
-	runhaskell Hackflight.hs
+	runhaskell -isensors Hackflight.hs
 
 clean:
 	rm -f socket_main *.o hackflight.c hackflight.h *~
