@@ -17,6 +17,7 @@ import Copilot.Compile.C99
 --import Demands
 import VehicleState
 import Altimeter
+import Utils(compose)
 --import Gyrometer
 -- import Quaternion
 --import EulerAngles
@@ -35,10 +36,10 @@ receiverYaw  = extern "receiverYaw" Nothing
 
 spec = do
 
-  -- Get the vehicle state by running the sensors
-  -- let vehicleState = foldr addStates initialVehicleState sensors
+  let sensors = [altimeter]
 
-  let vehicleState = altimeter initialVehicleState
+  -- Get the vehicle state by running the sensors
+  let vehicleState = compose sensors initialVehicleState
 
   let motor = if receiverThrottle < 0 then 0 else receiverThrottle
 
