@@ -26,9 +26,7 @@ double receiverRoll = 0;
 double receiverPitch = 0;
 double receiverYaw = 0;
 
-double gyroValues[3] = {};
-double quatValues[4] = {};
-double eulerValues[3] = {}; // XXX until we can get atan2 working in Copilot
+double simSensorZ = 0;
 
 // Shared by main() and runMotors()
 static udp_socket_t motor_client_socket; 
@@ -38,6 +36,12 @@ void runMotors(double m1, double m2, double m3, double m4)
 {
     double values[4] = {m1, m2, m3, m4};
     udp_send_data(motor_client_socket, values, 4*sizeof(double));
+}
+
+// For debugging
+void showVehicleState(double z)
+{
+    printf("z: %f\n", z);
 }
 
 int main (int argc, char *argv[])
@@ -59,37 +63,12 @@ int main (int argc, char *argv[])
                     telemetry_data,
                     sizeof(telemetry_data))) {
 
-            gyroValues[0] = telemetry_data[8];
-            gyroValues[1] = telemetry_data[10];
-            gyroValues[2] = telemetry_data[12];
+            simSensorZ = telemetry_data[5];
 
             receiverThrottle = telemetry_data[13];
             receiverRoll = telemetry_data[14];
             receiverPitch = telemetry_data[15];
             receiverYaw = telemetry_data[16];
-
-            double phi = telemetry_data[7];
-            double theta = telemetry_data[9];
-            double psi = telemetry_data[11];
-
-            eulerValues[0] = phi;
-            eulerValues[1] = theta;
-            eulerValues[2] = psi;
-
-            // http://www.euclideanspace.com/maths/geometry/rotations/conversions/
-            // eulerToQuaternion/index.htm
-
-            double c1 = cos(psi / 2);
-            double c2 = cos(theta / 2);
-            double c3 = cos(phi / 2);
-            double s1 = sin(psi / 2);
-            double s2 = sin(theta / 2);
-            double s3 = sin(phi / 2);
-
-            quatValues[0] = c1 * c2 * c3 - s1 * s2 * s3;
-            quatValues[1] = s1 * s2 * c3 + c1 * c2 * s3;
-            quatValues[2] = s1 * c2 * c3 + c1 * s2 * s3;
-            quatValues[3] = c1 * s2 * c3 - s1 * c2 * s3;
 
             udp_set_timeout(telemetry_server_socket, 100);
 
