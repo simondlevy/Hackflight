@@ -21,4 +21,4 @@ simSensorZ = extern "simSensorZ" Nothing
 
 simSensorModifyState :: VehicleState
 
-simSensorModifyState = VehicleState 0 0 0 0 simSensorZ 0 0 0 0 0 0 0
+simSensorModifyState = VehicleState simSensorZ 
