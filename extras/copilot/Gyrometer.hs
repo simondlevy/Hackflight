@@ -1,5 +1,5 @@
 {--
-  Haskell Copilot support for gyrometer
+  Haskell Copilot support for simulated gyrometer
 
   Copyright(C) 2021 Simon D.Levy
 
@@ -8,7 +8,7 @@
 
 {-# LANGUAGE DataKinds        #-}
 
-module Gyrometer
+module SimGyrometer
 
 where
 
@@ -16,12 +16,28 @@ import Language.Copilot
 
 import VehicleState
 
-gyro :: Stream (Array 3 Double)
-gyro = extern "gyroValues" Nothing
+simGyroX :: Stream Double
+simGyroX = extern "simGyroX" Nothing
 
-gyroModifyState :: VehicleState
+simGyroY :: Stream Double
+simGyroY = extern "simGyroY" Nothing
 
-gyroModifyState = VehicleState 0 0 0 0 0 0 0 dphi 0 dtheta 0 dpsi
-  where dphi = gyro.!!0
-        dtheta = gyro.!!1
-        dpsi = gyro.!!2
+simGyroZ :: Stream Double
+simGyroZ = extern "simGyroZ" Nothing
+
+simGyroModifyState :: VehicleState
+
+simGyroModifyState =
+
+  VehicleState 0 -- x
+               0 -- dx
+               0 -- y
+               0 -- dy
+               0 -- z
+               0 -- dz
+               0 -- phi
+               simGyroX 
+               0 -- theta
+               simGyroY
+               0 -- psi
+               simGyroZ 

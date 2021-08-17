@@ -1,7 +1,7 @@
 {--
   Haskell Copilot support for Hackflight
 
-  Copyright(C) 2021 Simon D.Levy
+  Copyright(C) 2021 on D.Levy
 
   MIT License
 --}
@@ -16,8 +16,8 @@ import Copilot.Compile.C99
 
 --import Demands
 import VehicleState
-import SimAltimeter
-import SimGyrometer
+import Altimeter
+--import Gyrometer
 -- import Quaternion
 --import EulerAngles
 
@@ -38,7 +38,7 @@ spec = do
   -- Get the vehicle state by running the sensors
   -- let vehicleState = foldr addStates initialVehicleState sensors
 
-  let vehicleState = simAltimeterModifyState
+  let vehicleState = altimeter initialVehicleState
 
   let motor = if receiverThrottle < 0 then 0 else receiverThrottle
 

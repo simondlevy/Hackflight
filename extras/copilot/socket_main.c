@@ -26,8 +26,8 @@ double receiverRoll = 0;
 double receiverPitch = 0;
 double receiverYaw = 0;
 
-double simAltimeterZ = 0;
-double simAltimeterDz = 0;
+double altimeterZ = 0;
+double altimeterDz = 0;
 
 // Shared by main() and runMotors()
 static udp_socket_t motor_client_socket; 
@@ -64,8 +64,8 @@ int main (int argc, char *argv[])
                     telemetry_data,
                     sizeof(telemetry_data))) {
 
-            simAltimeterZ = telemetry_data[5];
-            simAltimeterDz = telemetry_data[6];
+            altimeterZ = telemetry_data[5];
+            altimeterDz = telemetry_data[6];
 
             receiverThrottle = telemetry_data[13];
             receiverRoll = telemetry_data[14];
