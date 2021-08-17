@@ -17,7 +17,7 @@ import Copilot.Compile.C99
 --import Demands
 import VehicleState
 import SimAltimeter
---import Gyrometer
+import SimGyrometer
 -- import Quaternion
 --import EulerAngles
 
@@ -38,7 +38,7 @@ spec = do
   -- Get the vehicle state by running the sensors
   -- let vehicleState = foldr addStates initialVehicleState sensors
 
-  let vehicleState = simSensorModifyState
+  let vehicleState = simAltimeterModifyState
 
   let motor = if receiverThrottle < 0 then 0 else receiverThrottle
 

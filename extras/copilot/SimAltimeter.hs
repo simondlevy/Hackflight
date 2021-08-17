@@ -1,5 +1,5 @@
 {--
-  Haskell Copilot support for pass-through "sensor"
+  Haskell Copilot support for simulated altimeter
 
   Copyright(C) 2021 Simon D.Levy
 
@@ -16,22 +16,22 @@ import Language.Copilot
 
 import VehicleState
 
-simSensorZ :: Stream Double
-simSensorZ = extern "simSensorZ" Nothing
+simAltimeterZ :: Stream Double
+simAltimeterZ = extern "simAltimeterZ" Nothing
 
-simSensorDz :: Stream Double
-simSensorDz = extern "simSensorDz" Nothing
+simAltimeterDz :: Stream Double
+simAltimeterDz = extern "simAltimeterDz" Nothing
 
-simSensorModifyState :: VehicleState
+simAltimeterModifyState :: VehicleState
 
-simSensorModifyState =
+simAltimeterModifyState =
 
   VehicleState 0 -- x
                0 -- dx
                0 -- y
                0 -- dy
-               simSensorZ
-               simSensorDz
+               simAltimeterZ
+               simAltimeterDz
                0 -- phi
                0 -- dphi
                0 -- theta

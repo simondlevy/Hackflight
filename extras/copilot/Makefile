@@ -5,8 +5,8 @@
 #
 # MIT License
 
-HSRC = Hackflight.hs Demands.hs VehicleState.hs SimAltimeter.hs
-# Gyrometer.hs EulerAngles.hs #Quaternion.hs
+HSRC = Hackflight.hs Demands.hs VehicleState.hs \
+	   SimGyrometer.hs SimAltimeter.hs
 
 all: socket_main
 
