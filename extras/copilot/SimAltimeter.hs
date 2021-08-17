@@ -8,7 +8,7 @@
 
 {-# LANGUAGE DataKinds        #-}
 
-module SimSensor
+module SimAltimeter
 
 where
 

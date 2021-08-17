@@ -16,7 +16,7 @@ import Copilot.Compile.C99
 
 --import Demands
 import VehicleState
-import SimSensor
+import SimAltimeter
 --import Gyrometer
 -- import Quaternion
 --import EulerAngles
