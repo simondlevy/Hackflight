@@ -27,6 +27,7 @@ double receiverPitch = 0;
 double receiverYaw = 0;
 
 double simSensorZ = 0;
+double simSensorDz = 0;
 
 // Shared by main() and runMotors()
 static udp_socket_t motor_client_socket; 
@@ -39,9 +40,9 @@ void runMotors(double m1, double m2, double m3, double m4)
 }
 
 // For debugging
-void showVehicleState(double z)
+void showVehicleState(double z, double dz)
 {
-    printf("z: %f\n", z);
+    printf("z: %+3.3f  dz: %+3.3f\n", z, dz);
 }
 
 int main (int argc, char *argv[])
@@ -64,6 +65,7 @@ int main (int argc, char *argv[])
                     sizeof(telemetry_data))) {
 
             simSensorZ = telemetry_data[5];
+            simSensorDz = telemetry_data[6];
 
             receiverThrottle = telemetry_data[13];
             receiverRoll = telemetry_data[14];

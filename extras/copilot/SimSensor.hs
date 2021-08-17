@@ -19,6 +19,9 @@ import VehicleState
 simSensorZ :: Stream Double
 simSensorZ = extern "simSensorZ" Nothing
 
+simSensorDz :: Stream Double
+simSensorDz = extern "simSensorDz" Nothing
+
 simSensorModifyState :: VehicleState
 
-simSensorModifyState = VehicleState simSensorZ 
+simSensorModifyState = VehicleState simSensorZ simSensorDz
