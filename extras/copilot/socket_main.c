@@ -21,7 +21,7 @@ static const uint16_t MOTOR_PORT = 5000;
 static const uint16_t TELEMETRY_PORT = 5001;
 
 // Avaiable to Copilot
-double receiverDemands[4] = {};
+double receiverThrottle = 0;
 double gyroValues[3] = {};
 double quatValues[4] = {};
 double eulerValues[3] = {}; // XXX until we can get atan2 working in Copilot
@@ -30,8 +30,10 @@ double eulerValues[3] = {}; // XXX until we can get atan2 working in Copilot
 static udp_socket_t motor_client_socket; 
 
 // Called by Copilot
-void runMotors(double values[4])
+void runMotors(double throttle)
 {
+    printf("%f\n", throttle);
+    double values[4] = {throttle, throttle, throttle, throttle};
     udp_send_data(motor_client_socket, values, 4*sizeof(double));
 }
 
@@ -58,10 +60,7 @@ int main (int argc, char *argv[])
             gyroValues[1] = telemetry_data[10];
             gyroValues[2] = telemetry_data[12];
 
-            receiverDemands[0] = telemetry_data[13];
-            receiverDemands[1] = telemetry_data[14];
-            receiverDemands[2] = telemetry_data[15];
-            receiverDemands[3] = telemetry_data[16];
+            receiverThrottle = telemetry_data[13];
 
             double phi = telemetry_data[7];
             double theta = telemetry_data[9];
