@@ -26,10 +26,10 @@ udp_sockets.o: udp_sockets.c udp_sockets.h
 hackflight.o: hackflight.c hackflight.h
 	gcc -Wall -std=c99 -c hackflight.c
 
-hackflight.c:
+hackflight.c: $(HSRC)
 	$(RUNH)
 	
-hackflight.h:
+hackflight.h: $(HSRC)
 	$(RUNH)
 
 clean:

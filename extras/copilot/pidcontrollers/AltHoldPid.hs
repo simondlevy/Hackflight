@@ -17,12 +17,12 @@ where
 import Language.Copilot
 import Copilot.Compile.C99
 
-{--
 import VehicleState
 import PidControllers
 import Demands
 import Utils(constrain_abs, in_band)
 
+{--
 altHoldController ::    Stream Double
                      -> Stream Double
                      -> Stream Double
