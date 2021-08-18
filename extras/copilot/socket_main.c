@@ -26,6 +26,10 @@ double receiverRoll = 0;
 double receiverPitch = 0;
 double receiverYaw = 0;
 
+double gyrometerX = 0;
+double gyrometerY = 0;
+double gyrometerZ = 0;
+
 double altimeterZ = 0;
 double altimeterDz = 0;
 
@@ -78,6 +82,10 @@ int main (int argc, char *argv[])
 
             altimeterZ = telemetry_data[5];
             altimeterDz = telemetry_data[6];
+
+            gyrometerX = telemetry_data[8];
+            gyrometerY = telemetry_data[10];
+            gyrometerZ = telemetry_data[12];
 
             receiverThrottle = telemetry_data[13];
             receiverRoll = telemetry_data[14];
