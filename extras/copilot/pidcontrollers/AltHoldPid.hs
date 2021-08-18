@@ -72,10 +72,12 @@ altHoldFun kp
 
          -- Compute error as altTarget velocity minus actual velocity, after
          -- negating actual to accommodate NED
-         err = altTargetVelocity + (dz vehicleState)
+         error' = altTargetVelocity + (dz vehicleState)
 
          -- Accumualte error integral
-         errI = constrain_abs ((altErrorIntegral controllerState) + err) windupMax
+         errorIntegral = constrain_abs ((altErrorIntegral controllerState) + error')
+                         windupMax
 
     -- Return updated demands and controller state
-    in  (Demands (err * kp + errI * ki) 0 0 0, AltHoldState errI altTarget' inband)
+    in  (Demands (error' * kp + errorIntegral * ki) 0 0 0,
+         AltHoldState errorIntegral altTarget' inband)
