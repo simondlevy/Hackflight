@@ -41,7 +41,9 @@ computeDemand :: Stream Double ->
 
 computeDemand kp ki kd windupMax valueMax pidState demand value =
 
-   (0, FullPidState 0 0 0 0)
+   let 
+
+   in (0, FullPidState 0 0 0 0)
 
 {--
     let 
