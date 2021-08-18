@@ -15,6 +15,7 @@ import Language.Copilot
 import Copilot.Compile.C99
 
 import Receiver
+import Demands
 import VehicleState
 import Utils(compose)
 
@@ -38,6 +39,8 @@ spec = do
                                   0.2  -- stickDeadband
 
   let pidControllers = [altHold]
+
+  let receiverDemands = Demands receiverThrottle receiverRoll receiverPitch receiverYaw
 
   let motor = if receiverThrottle < 0 then 0 else receiverThrottle
 
