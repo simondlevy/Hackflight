@@ -16,20 +16,21 @@ where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import FullPidController(FullPidState)
-import VehicleState
-import Demands
+--import FullPidController(FullPidState)
+--import VehicleState
+--import Demands
 
 data PidState =
 
-     AltHoldState { altErrorIntegral :: Serial Double,
-                    altTarget :: Serial Double,
-                    altInBand :: Serial Bool }
+     AltHoldState { altErrorIntegral :: Stream Double,
+                    altTarget :: Stream Double,
+                    altInBand :: Bool }
+{--
 
    | RateState { rateRollState :: FullPidState,
                  ratePitchState :: FullPidState }
 
-   | YawState { yawErrorIntegral :: Serial Double }
+   | YawState { yawErrorIntegral :: Stream Double }
 
    | NoState { }
 
@@ -55,3 +56,4 @@ pidUpdate vehicleState pidController =
                                         (pidState pidController)
 
     in PidController pidFun' pidState' demands'
+--}

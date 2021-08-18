@@ -14,6 +14,7 @@ module Main where
 import Language.Copilot
 import Copilot.Compile.C99
 
+import PidControllers
 import Receiver
 import VehicleState
 import Altimeter
