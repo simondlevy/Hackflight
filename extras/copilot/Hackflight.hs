@@ -55,6 +55,9 @@ spec = do
   -- Map the PID update function to the pid controllers
   let pidControllers'' = map (pidUpdate vehicleState) pidControllers'
 
+  -- Sum over the list of demands to get the final demands
+  let demands = foldr addDemands zeroDemands (map pidDemands pidControllers'')
+
   let motor = if receiverThrottle < 0 then 0 else receiverThrottle
 
   let m1 = motor
