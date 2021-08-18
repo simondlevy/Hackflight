@@ -37,21 +37,22 @@ computeDemand kp ki kd windupMax valueMax pidState demand value =
 
     let 
 
+        error' = demand - value
+
         --  Reset PID state on quick value change
-        pidState' = if abs(value) > valueMax then initFullPidState else pidState
+        reset = abs value > valueMax
 
-        err = demand - value
+        errorIntegral' = if reset then 0 else
+               constrain_abs ((errorIntegral pidState) + error') windupMax
 
-        errI = constrain_abs ((errorIntegral pidState') + err) windupMax
+        deltaError = if reset then 0 else error' - (errorPrev pidState)
 
-        deltaErr = err - (errorPrev pidState')
+        deltaError1' = if reset then 0 else deltaError1 pidState
 
         -- Run a simple low-pass filter on the error derivative
-        errD = ((deltaError1 pidState') + (deltaError2 pidState') + deltaErr)
+        errorDerivative = if reset then 0 else
+                          deltaError1' + (deltaError2 pidState) + deltaError
 
-    in (kp * err + ki * errI + kd * errD, 
+    in (kp * error' + ki * errorIntegral' + kd * errorDerivative, 
+       FullPidState errorIntegral' deltaError  deltaError1' error')
 
-       (FullPidState (errorIntegral pidState')
-                     deltaErr  
-                     (deltaError1 pidState') 
-                     err))
