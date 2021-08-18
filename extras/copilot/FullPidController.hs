@@ -7,7 +7,6 @@
 --}
 
 {-# LANGUAGE RebindableSyntax #-}
-{-# LANGUAGE DataKinds        #-}
 
 module FullPidController
 
