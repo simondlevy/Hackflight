@@ -17,6 +17,7 @@ import Copilot.Compile.C99
 import Receiver
 import Demands
 import VehicleState
+import Mixer(Mixer, getMotors)
 import Utils(compose)
 
 import Altimeter
