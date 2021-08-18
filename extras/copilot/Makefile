@@ -33,7 +33,7 @@ hackflight.h: $(HSRC)
 	$(RUNH)
 
 clean:
-	rm -f socket_main *.o hackflight.c hackflight.h *~
+	rm -f main *.o hackflight.c hackflight.h *~
 
 edit:
 	vim socket_main.c
