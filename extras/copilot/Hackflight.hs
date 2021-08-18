@@ -23,6 +23,7 @@ import Altimeter
 import Gyrometer
 import Euler
 
+import PidControllers
 import AltHoldPid
 
 spec = do
@@ -40,7 +41,12 @@ spec = do
 
   let pidControllers = [altHold]
 
+  -- Get the receiver demands
   let receiverDemands = Demands receiverThrottle receiverRoll receiverPitch receiverYaw
+
+  -- Inject the receiver demands into the PID controllers
+  let pidControllers' = map (\p -> (PidController (pidFun p) (pidState p) receiverDemands))
+                            pidControllers
 
   let motor = if receiverThrottle < 0 then 0 else receiverThrottle
 
