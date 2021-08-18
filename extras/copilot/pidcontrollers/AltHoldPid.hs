@@ -77,6 +77,5 @@ altHoldFun kp
          -- Accumualte error integral
          errI = constrain_abs ((altErrorIntegral controllerState) + err) windupMax
 
-   -- Return updated demands and controller state
-    in  (Demands 0 0 0 0,
-         AltHoldState 0 0 false)
+    -- Return updated demands and controller state
+    in  (Demands (err * kp + errI * ki) 0 0 0, AltHoldState errI altTarget' inband)
