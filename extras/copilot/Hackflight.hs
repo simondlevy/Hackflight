@@ -21,6 +21,8 @@ import Utils(compose)
 import Gyrometer
 import Euler
 
+import FullPidController
+
 spec = do
 
   let sensors = [euler, gyrometer, altimeter]

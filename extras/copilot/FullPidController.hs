@@ -20,27 +20,30 @@ import Utils(constrain_abs)
 
 data FullPidState = 
 
-    FullPidState { errorIntegral :: Serial Double,
-                   deltaError1 :: Serial Double,
-                   deltaError2 :: Serial Double,
-                   errorPrev :: Serial Double }
+    FullPidState { errorIntegral :: Stream Double,
+                   deltaError1 :: Stream Double,
+                   deltaError2 :: Stream Double,
+                   errorPrev :: Stream Double }
 
 initFullPidState :: FullPidState
 
 initFullPidState = FullPidState 0 0 0 0
 
-computeDemand :: Serial Double ->
-                 Serial Double ->
-                 Serial Double ->
-                 Serial Double ->
-                 Serial Double ->
+computeDemand :: Stream Double ->
+                 Stream Double ->
+                 Stream Double ->
+                 Stream Double ->
+                 Stream Double ->
                  FullPidState -> 
-                 Serial Double ->
-                 Serial Double ->
-                 (Serial Double, FullPidState)
+                 Stream Double ->
+                 Stream Double ->
+                 (Stream Double, FullPidState)
 
 computeDemand kp ki kd windupMax valueMax pidState demand value =
 
+   (0, FullPidState 0 0 0 0)
+
+{--
     let 
 
         --  Reset PID state on quick value change
@@ -61,3 +64,5 @@ computeDemand kp ki kd windupMax valueMax pidState demand value =
                      deltaErr  
                      (deltaError1 pidState') 
                      err))
+
+--}
