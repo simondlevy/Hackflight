@@ -66,6 +66,17 @@ altHoldFun kp
                       then altitude
                       else altTarget controllerState
 
-    -- Return updated demands and controller state
+         altTargetVelocity = if inband
+                             then altTarget' - altitude
+                             else pilotVelZMax * throttleDemand
+
+         -- Compute error as altTarget velocity minus actual velocity, after
+         -- negating actual to accommodate NED
+         err = altTargetVelocity + (dz vehicleState)
+
+         -- Accumualte error integral
+         errI = constrain_abs ((altErrorIntegral controllerState) + err) windupMax
+
+   -- Return updated demands and controller state
     in  (Demands 0 0 0 0,
          AltHoldState 0 0 false)

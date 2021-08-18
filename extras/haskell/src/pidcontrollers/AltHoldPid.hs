@@ -47,7 +47,6 @@ altHoldFun kp
                       then altitude
                       else altTarget controllerState
 
-         -- constant outside
          altTargetVelocity = if inband
                              then altTarget' - altitude
                              else pilotVelZMax * throttleDemand
