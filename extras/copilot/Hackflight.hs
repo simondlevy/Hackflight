@@ -28,10 +28,9 @@ import AltHoldPid
 
 spec = do
 
-  let sensors = [euler, gyrometer, altimeter]
+  -- Initialization --------------------------------------------
 
-  -- Get the vehicle state by running the sensors
-  let vehicleState = compose sensors initialVehicleState
+  let sensors = [euler, gyrometer, altimeter]
 
   let altHold = altHoldController 0.75 -- Kp
                                   1.5  -- Ki
@@ -41,8 +40,14 @@ spec = do
 
   let pidControllers = [altHold]
 
+  -- Main algorithm ---------------------------------------------
+
   -- Get the receiver demands
   let receiverDemands = Demands receiverThrottle receiverRoll receiverPitch receiverYaw
+
+  -- Get the vehicle state by running the sensors
+  let vehicleState = compose sensors initialVehicleState
+
 
   -- Inject the receiver demands into the PID controllers
   let pidControllers' = map (\p -> PidController (pidFun p) (pidState p) receiverDemands)

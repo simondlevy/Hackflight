@@ -14,9 +14,9 @@ data Demands = Demands { throttle :: Double
                        , yaw :: Double  
                      } deriving (Show)
 
-initialDemands :: Demands
+zeroDemands :: Demands
 
-initialDemands = Demands 0 0 0 0
+zeroDemands = Demands 0 0 0 0
 
 
 addDemands :: Demands -> Demands -> Demands

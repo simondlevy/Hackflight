@@ -25,6 +25,6 @@ data VehicleState = VehicleState {
                    , dpsi :: Double 
                    } deriving (Show)
 
-initialVehicleState :: VehicleState
-initialVehicleState = VehicleState 0 0 0 0 0 0 0 0 0 0 0 0
+zeroVehicleState :: VehicleState
+zeroVehicleState = VehicleState 0 0 0 0 0 0 0 0 0 0 0 0
 
