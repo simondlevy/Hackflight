@@ -29,14 +29,14 @@ initFullPidState :: FullPidState
 
 initFullPidState = FullPidState 0 0 0 0
 
-computeDemand :: Stream Double ->
-                 Stream Double ->
-                 Stream Double ->
-                 Stream Double ->
-                 Stream Double ->
-                 FullPidState -> 
-                 Stream Double ->
-                 Stream Double ->
+computeDemand :: Stream Double ->  -- kp
+                 Stream Double ->  -- ki
+                 Stream Double ->  -- kd
+                 Stream Double ->  -- windupMax
+                 Stream Double ->  -- valueMax
+                 FullPidState ->   
+                 Stream Double ->  -- demand
+                 Stream Double ->  -- value
                  (Stream Double, FullPidState)
 
 computeDemand kp ki kd windupMax valueMax pidState demand value =
@@ -44,16 +44,12 @@ computeDemand kp ki kd windupMax valueMax pidState demand value =
     let 
 
         --  Reset PID state on quick value change
-        pidState' = {-- if (abs value)  > valueMax then initFullPidState else --} pidState
+        -- pidState' = if (abs value)  > valueMax then initFullPidState else pidState
+        pidState' = initFullPidState 
 
         err = demand - value
 
         errI = constrain_abs ((errorIntegral pidState') + err) windupMax
-
-    in (0, initFullPidState)
-
-{--
-    let 
 
         deltaErr = err - (errorPrev pidState')
 
@@ -66,5 +62,3 @@ computeDemand kp ki kd windupMax valueMax pidState demand value =
                      deltaErr  
                      (deltaError1 pidState') 
                      err))
-
---}
