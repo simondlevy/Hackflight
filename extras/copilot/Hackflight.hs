@@ -31,6 +31,12 @@ spec = do
   -- Get the vehicle state by running the sensors
   let vehicleState = compose sensors initialVehicleState
 
+  let altHold = altHoldController 0.75 -- Kp
+                                  1.5  -- Ki
+                                  0.4  -- windupMax
+                                  2.5  -- pilotVelZMax
+                                  0.2  -- stickDeadband
+
   let motor = if receiverThrottle < 0 then 0 else receiverThrottle
 
   let m1 = motor
