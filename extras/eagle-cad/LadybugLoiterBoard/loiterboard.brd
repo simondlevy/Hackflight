@@ -759,10 +759,23 @@ design rules under a new name.</description>
 <contactref element="U$1" pad="1"/>
 <wire x1="38.5" y1="5.25" x2="44.45" y2="5.25" width="0.3048" layer="1"/>
 <wire x1="44.45" y1="5.25" x2="45.7" y2="4" width="0.3048" layer="1"/>
+<wire x1="29.82" y1="43.8" x2="29.82" y2="46.4" width="0.3048" layer="16"/>
+<wire x1="29.82" y1="46.4" x2="29.82" y2="46.58" width="0.3048" layer="16"/>
+<wire x1="29.82" y1="46.58" x2="28.7" y2="47.7" width="0.3048" layer="16"/>
+<wire x1="28.7" y1="47.7" x2="26.1" y2="47.7" width="0.3048" layer="16"/>
+<wire x1="25.1" y1="31.56" x2="22" y2="28.46" width="0.3048" layer="16"/>
+<wire x1="26.1" y1="47.7" x2="25.1" y2="46.7" width="0.3048" layer="16"/>
+<wire x1="25.1" y1="46.7" x2="25.1" y2="31.56" width="0.3048" layer="16"/>
+<wire x1="45.8" y1="48.4" x2="43.8" y2="46.4" width="0.3048" layer="16"/>
+<wire x1="45.8" y1="48.4" x2="45.9424" y2="48.4" width="0.3048" layer="16"/>
+<via x="45.9424" y="48.4" extent="1-16" drill="0.35"/>
+<wire x1="46.2424" y1="48.4" x2="52.2624" y2="54.42" width="0.3048" layer="1"/>
+<wire x1="52.2624" y1="54.42" x2="52.3944" y2="54.42" width="0.1524" layer="1"/>
+<wire x1="43.8" y1="46.4" x2="32.42" y2="46.4" width="0.3048" layer="16"/>
+<wire x1="32.42" y1="46.4" x2="29.82" y2="43.8" width="0.3048" layer="16"/>
+<wire x1="45.9424" y1="48.4" x2="46.2424" y2="48.4" width="0.1524" layer="1"/>
 <wire x1="38.5" y1="5.25" x2="38.456" y2="17.9936" width="0" layer="19" extent="1-1"/>
 <wire x1="20.5" y1="16" x2="38.456" y2="17.9936" width="0" layer="19" extent="1-1"/>
-<wire x1="29.82" y1="43.8" x2="22" y2="28.46" width="0" layer="19" extent="1-1"/>
-<wire x1="52.521875" y1="54.42" x2="29.82" y2="43.8" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="3.3V">
 <contactref element="LBLFT" pad="1"/>
