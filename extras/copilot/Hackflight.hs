@@ -36,7 +36,7 @@ receiverYaw  = extern "receiverYaw" Nothing
 
 spec = do
 
-  let sensors = [gyrometer, altimeter]
+  let sensors = [euler, gyrometer, altimeter]
 
   -- Get the vehicle state by running the sensors
   let vehicleState = compose sensors initialVehicleState
