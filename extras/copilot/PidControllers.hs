@@ -24,7 +24,7 @@ data PidState =
 
      AltHoldState { altErrorIntegral :: Stream Double,
                     altTarget :: Stream Double,
-                    altInBand :: Bool }
+                    altInBand :: Stream Bool }
 
    | RateState { rateRollState :: FullPidState,
                  ratePitchState :: FullPidState }
