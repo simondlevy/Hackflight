@@ -54,6 +54,11 @@ altHoldFun kp
 
     let  
 
+         -- NED => ENU
+         altitude = -(z vehicleState)
+
+         throttleDemand = throttle demands
+
     -- Return updated demands and controller state
     in  (Demands 0 0 0 0,
          AltHoldState 0 0 false)
