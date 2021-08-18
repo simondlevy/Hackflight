@@ -23,6 +23,6 @@ addDemands d1 d2 = Demands ((throttle d1) + (throttle d2))
                            ((roll d1) + (roll d2))
                            ((pitch d1) + (pitch d2))
                            ((yaw d1) + (yaw d2))
-initialDemands :: Demands
+zeroDemands :: Demands
 
-initialDemands = Demands 0 0 0 0
+zeroDemands = Demands 0 0 0 0

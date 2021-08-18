@@ -27,9 +27,9 @@ data VehicleState = VehicleState {       x :: Stream Double
 
                                  } deriving (Show)
 
-initialVehicleState :: VehicleState
+zeroVehicleState :: VehicleState
 
-initialVehicleState = VehicleState 0 0 0 0 0 0 0 0 0 0 0 0
+zeroVehicleState = VehicleState 0 0 0 0 0 0 0 0 0 0 0 0
 
 
 addStates :: VehicleState -> VehicleState -> VehicleState

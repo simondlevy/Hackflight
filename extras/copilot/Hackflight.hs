@@ -46,8 +46,7 @@ spec = do
   let receiverDemands = Demands receiverThrottle receiverRoll receiverPitch receiverYaw
 
   -- Get the vehicle state by running the sensors
-  let vehicleState = compose sensors initialVehicleState
-
+  let vehicleState = compose sensors zeroVehicleState
 
   -- Inject the receiver demands into the PID controllers
   let pidControllers' = map (\p -> PidController (pidFun p) (pidState p) receiverDemands)
