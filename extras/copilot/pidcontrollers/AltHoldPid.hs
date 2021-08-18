@@ -61,6 +61,6 @@ altHoldFun kp
 
          inband = in_band throttleDemand stickDeadband
 
-     -- Return updated demands and controller state
+    -- Return updated demands and controller state
     in  (Demands 0 0 0 0,
          AltHoldState 0 0 false)
