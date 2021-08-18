@@ -14,25 +14,12 @@ module Main where
 import Language.Copilot
 import Copilot.Compile.C99
 
---import Demands
+import Receiver
 import VehicleState
 import Altimeter
 import Utils(compose)
 import Gyrometer
--- import Quaternion
 import Euler
-
-receiverThrottle :: Stream Double
-receiverThrottle  = extern "receiverThrottle" Nothing
-
-receiverRoll :: Stream Double
-receiverRoll  = extern "receiverRoll" Nothing
-
-receiverPitch :: Stream Double
-receiverPitch  = extern "receiverPitch" Nothing
-
-receiverYaw :: Stream Double
-receiverYaw  = extern "receiverYaw" Nothing
 
 spec = do
 

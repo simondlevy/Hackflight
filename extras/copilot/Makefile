@@ -5,7 +5,8 @@
 #
 # MIT License
 
-HSRC = Hackflight.hs Demands.hs VehicleState.hs Sensor.hs Utils.hs \
+HSRC = Hackflight.hs Receiver.hs Demands.hs VehicleState.hs Sensor.hs Utils.hs \
+	   FullPidController.hs \
 	   sensors/Gyrometer.hs sensors/Altimeter.hs sensors/Euler.hs
 
 all: main
