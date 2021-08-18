@@ -17,7 +17,7 @@ import Copilot.Compile.C99
 import Receiver
 import Demands
 import VehicleState
-import Mixer(Mixer, getMotors)
+import Mixer
 import Utils(compose)
 
 import Altimeter
@@ -41,6 +41,8 @@ spec = do
 
   let pidControllers = [altHold]
 
+  let mixer = QuadXAPMixer
+
   -- Main algorithm ---------------------------------------------
 
   -- Get the receiver demands
@@ -58,6 +60,8 @@ spec = do
 
   -- Sum over the list of demands to get the final demands
   let demands = foldr addDemands zeroDemands (map pidDemands pidControllers'')
+
+  let motors = getMotors mixer demands
 
   let motor = if receiverThrottle < 0 then 0 else receiverThrottle
 
