@@ -7,6 +7,7 @@
 
 HSRC = Hackflight.hs Receiver.hs Demands.hs VehicleState.hs Sensor.hs Utils.hs \
 	   PidControllers.hs FullPidController.hs \
+	   pidcontrollers/AltHoldPid.hs \
 	   sensors/Gyrometer.hs sensors/Altimeter.hs sensors/Euler.hs
 
 all: main
@@ -23,11 +24,11 @@ udp_sockets.o: udp_sockets.c udp_sockets.h
 hackflight.o: hackflight.c hackflight.h
 	gcc -Wall -std=c99 -c hackflight.c
 
-hackflight.c: $(HSRC)
-	runhaskell -isensors Hackflight.hs
+hackflight.c:
+	runhaskell -isensors -ipidcontrollers Hackflight.hs
 
-hackflight.h: $(HSRC)
-	runhaskell -isensors Hackflight.hs
+hackflight.h:
+	runhaskell -isensors -ipidcontrollers Hackflight.hs
 
 clean:
 	rm -f socket_main *.o hackflight.c hackflight.h *~

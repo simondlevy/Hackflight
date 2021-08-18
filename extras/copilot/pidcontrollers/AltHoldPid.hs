@@ -9,13 +9,15 @@
 {-# LANGUAGE RebindableSyntax #-}
 {-# LANGUAGE DataKinds        #-}
 
-module AltHoldPid(altHoldController)
+-- jmodule AltHoldPid(altHoldController)
+module AltHoldPid
 
 where
 
 import Language.Copilot
 import Copilot.Compile.C99
 
+{--
 import VehicleState
 import PidControllers
 import Demands
@@ -80,3 +82,4 @@ altHoldFun kp
     -- Return updated demands and controller state
     in  (Demands (err * kp + errI * ki) 0 0 0,
          AltHoldState errI (altTarget controllerState') inband)
+--}

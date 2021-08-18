@@ -14,15 +14,15 @@ module Main where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import PidControllers
 import Receiver
 import VehicleState
-import Altimeter
 import Utils(compose)
+
+import Altimeter
 import Gyrometer
 import Euler
 
-import FullPidController
+import AltHoldPid
 
 spec = do
 
