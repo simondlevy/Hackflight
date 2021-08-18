@@ -37,6 +37,8 @@ spec = do
                                   2.5  -- pilotVelZMax
                                   0.2  -- stickDeadband
 
+  let pidControllers = [altHold]
+
   let motor = if receiverThrottle < 0 then 0 else receiverThrottle
 
   let m1 = motor
