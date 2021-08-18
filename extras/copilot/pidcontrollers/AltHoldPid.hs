@@ -22,7 +22,6 @@ import PidControllers
 import Demands
 import Utils(constrain_abs, in_band)
 
-{--
 altHoldController ::    Stream Double
                      -> Stream Double
                      -> Stream Double
@@ -32,9 +31,8 @@ altHoldController ::    Stream Double
 
 altHoldController kp ki windupMax pilotVelZMax stickDeadband = 
     makePidController (altHoldFun kp ki windupMax pilotVelZMax stickDeadband)
-                      (AltHoldState 0 0 False)
+                      (AltHoldState 0 0 false)
 
---}
 
 altHoldFun ::    Stream Double
               -> Stream Double
