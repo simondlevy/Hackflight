@@ -20,7 +20,7 @@ import Altimeter
 import Utils(compose)
 import Gyrometer
 -- import Quaternion
---import EulerAngles
+import Euler
 
 receiverThrottle :: Stream Double
 receiverThrottle  = extern "receiverThrottle" Nothing

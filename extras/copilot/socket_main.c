@@ -30,6 +30,10 @@ double gyrometerX = 0;
 double gyrometerY = 0;
 double gyrometerZ = 0;
 
+double eulerX = 0;
+double eulerY = 0;
+double eulerZ = 0;
+
 double altimeterZ = 0;
 double altimeterDz = 0;
 
@@ -82,6 +86,10 @@ int main (int argc, char *argv[])
 
             altimeterZ = telemetry_data[5];
             altimeterDz = telemetry_data[6];
+
+            eulerX = telemetry_data[7];
+            eulerY = telemetry_data[9];
+            eulerZ = telemetry_data[11];
 
             gyrometerX = telemetry_data[8];
             gyrometerY = telemetry_data[10];

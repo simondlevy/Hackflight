@@ -6,12 +6,12 @@
 # MIT License
 
 HSRC = Hackflight.hs Demands.hs VehicleState.hs Sensor.hs Utils.hs \
-	   sensors/Gyrometer.hs sensors/Altimeter.hs
+	   sensors/Gyrometer.hs sensors/Altimeter.hs sensors/Euler.hs
 
-all: socket_main
+all: main
 
-socket_main: socket_main.o udp_sockets.o hackflight.o
-	gcc -o socket_main socket_main.o udp_sockets.o hackflight.o -lm
+main: socket_main.o udp_sockets.o hackflight.o
+	gcc -o main socket_main.o udp_sockets.o hackflight.o -lm
 
 socket_main.o: socket_main.c udp_sockets.h hackflight.h
 	gcc -Wall -std=c99 -c socket_main.c
@@ -34,8 +34,8 @@ clean:
 edit:
 	vim socket_main.c
 
-run: socket_main
-	./socket_main
+run: main
+	./main
 
 commit:
 	git commit -a -m="More Haskell Copilot work"

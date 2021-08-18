@@ -1,4 +1,4 @@
-socket_main
+main
 hackflight.c
 hackflight.h
 *.o
